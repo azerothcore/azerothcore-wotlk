@@ -71,6 +71,7 @@ DataDir = "."
 #        Description: Logs directory setting.
 #        Important:   LogsDir needs to be quoted, as the string might contain space characters.
 #                     Logs directory must exists, or log file creation will be disabled.
+#        Example:     "/home/youruser/azeroth-server/logs"
 #        Default:     "" - (Log files will be stored in the current path)
 
 LogsDir = ""
@@ -86,9 +87,9 @@ LogsDir = ""
 #                                                                 section my.ini)
 #                     ".;/path/to/unix_socket;username;password;database" - (use Unix sockets on
 #                                                                           Unix/Linux)
-#        Default:     "127.0.0.1;3306;acore;acore;auth"       - (LoginDatabaseInfo)
-#                     "127.0.0.1;3306;acore;acore;world"      - (WorldDatabaseInfo)
-#                     "127.0.0.1;3306;acore;acore;characters" - (CharacterDatabaseInfo)
+#        Default:     "127.0.0.1;3306;acore;acore;acore_auth"       - (LoginDatabaseInfo)
+#                     "127.0.0.1;3306;acore;acore;acore_world"      - (WorldDatabaseInfo)
+#                     "127.0.0.1;3306;acore;acore;acore_characters" - (CharacterDatabaseInfo)
 
 LoginDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_auth"
 WorldDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_world"
@@ -183,11 +184,11 @@ Compression = 1
 #        Description: Maximum number of players in the world. Excluding Mods, GMs and Admins.
 #          Important: If you want to block players and only allow Mods, GMs or Admins to join the
 #                     server, use the DB field "auth.realmlist.allowedSecurityLevel".
-#            Default: 100 - (Enabled)
-#                     1+  - (Enabled)
-#                     0   - (Disabled, No limit)
+#            Default: 1000 - (Enabled)
+#                     1+   - (Enabled)
+#                     0    - (Disabled, No limit)
 
-PlayerLimit = 100
+PlayerLimit = 1000
 
 #
 #    SaveRespawnTimeImmediately
@@ -653,7 +654,7 @@ SQLDeveloperLogFile = ""
 #
 #    SQLDriverLogFile
 #        Description: Log file for SQL driver events.
-#        Example:     "SQLDriver.log" - (Enabled)
+#        Example:     "WorldSQLDriver.log" - (Enabled)
 #        Default:      ""             - (Disabled)
 
 SQLDriverLogFile = ""
@@ -2406,8 +2407,8 @@ Rate.XP.Pet     = 1
 
 #
 #    Rate.XP.BattlegroundKill
-#        Description: Experience rate for honorable kills in battlegrounds,
-#                     it works when Battleground.GiveXPForKills = 1
+#        Description: Experience rate for honorable kills in battlegrounds. Not affected by Rate.XP.Kill
+#                     Only works if Battleground.GiveXPForKills = 1
 #        Default:     1
 
 Rate.XP.BattlegroundKill = 1
@@ -2935,6 +2936,13 @@ Arena.AutoDistributePoints = 0
 #        Default:     7 - (Weekly)
 
 Arena.AutoDistributeInterval = 7
+
+#
+#    Arena.GamesRequired
+#        Description: Number of arena matches teams must participate in to be eligible for arena point distribution.
+#        Default:     10
+
+Arena.GamesRequired = 10
 
 #
 #    Arena.QueueAnnouncer.Enable

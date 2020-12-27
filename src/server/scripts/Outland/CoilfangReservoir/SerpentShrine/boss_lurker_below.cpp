@@ -51,7 +51,7 @@ class boss_the_lurker_below : public CreatureScript
 public:
     boss_the_lurker_below() : CreatureScript("boss_the_lurker_below") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_the_lurker_belowAI>(creature);
     }
@@ -247,7 +247,7 @@ public:
 
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_lurker_below_spout_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_lurker_below_spout_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
@@ -255,7 +255,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_lurker_below_spout_AuraScript();
     }
@@ -289,13 +289,13 @@ public:
             targets.remove_if(HasInLineCheck(GetCaster()));
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_lurker_below_spout_cone_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ENEMY_24);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_lurker_below_spout_cone_SpellScript();
     }

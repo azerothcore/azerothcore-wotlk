@@ -18,7 +18,7 @@ public:
             SetBossNumber(MAX_ENCOUNTER);
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
@@ -26,7 +26,7 @@ public:
             return true;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -37,7 +37,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(char const* str)
+        void Load(char const* str) override
         {
             if (!str)
             {
@@ -70,7 +70,7 @@ public:
         }
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_the_botanica_InstanceMapScript(map);
     }
@@ -85,7 +85,7 @@ public:
     {
         PrepareAuraScript(spell_botanica_call_of_the_falcon_AuraScript)
 
-        bool Load()
+        bool Load() override
         {
             _falconSet.clear();
             return true;
@@ -113,7 +113,7 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_botanica_call_of_the_falcon_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_botanica_call_of_the_falcon_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
@@ -123,7 +123,7 @@ public:
         std::set<uint64> _falconSet;
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_botanica_call_of_the_falcon_AuraScript();
     }
@@ -138,7 +138,7 @@ public:
     {
         PrepareAuraScript(spell_botanica_shift_form_AuraScript);
 
-        bool Load()
+        bool Load() override
         {
             _lastSchool = 0;
             _lastForm = 0;
@@ -185,7 +185,7 @@ public:
             return false;
         }
 
-        void Register()
+        void Register() override
         {
             DoCheckProc += AuraCheckProcFn(spell_botanica_shift_form_AuraScript::CheckProc);
         }
@@ -196,7 +196,7 @@ public:
         uint32 _swapTime;
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_botanica_shift_form_AuraScript();
     }

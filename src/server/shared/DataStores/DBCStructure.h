@@ -516,21 +516,11 @@ struct AreaTableEntry
     uint32  LiquidTypeOverride[4];                          // 29-32 liquid override by type
 
     // helpers
-    bool IsSanctuary() const
+    [[nodiscard]] bool IsSanctuary() const
     {
         if (mapid == 609)
             return true;
         return (flags & AREA_FLAG_SANCTUARY);
-    }
-
-    // Xinef: mark some zones / areas as inns
-    bool IsInn(TeamId teamId) const
-    {
-        if (teamId == TEAM_ALLIANCE)
-            return flags & AREA_FLAG_REST_ZONE_ALLIANCE;
-        else if (teamId == TEAM_HORDE)
-            return flags & AREA_FLAG_REST_ZONE_HORDE;
-        return false;
     }
 };
 
@@ -877,7 +867,7 @@ struct FactionEntry
     // 56 string flags
 
     // helpers
-    bool CanHaveReputation() const
+    [[nodiscard]] bool CanHaveReputation() const
     {
         return reputationListID >= 0;
     }
@@ -898,7 +888,7 @@ struct FactionTemplateEntry
     //-------------------------------------------------------  end structure
 
     // helpers
-    bool IsFriendlyTo(FactionTemplateEntry const& entry) const
+    [[nodiscard]] bool IsFriendlyTo(FactionTemplateEntry const& entry) const
     {
         // Xinef: Always friendly to self faction
         if (faction == entry.faction)
@@ -906,37 +896,37 @@ struct FactionTemplateEntry
 
         if (entry.faction)
         {
-            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (enemyFaction[i] == entry.faction)
+            for (unsigned int i : enemyFaction)
+                if (i == entry.faction)
                     return false;
-            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (friendFaction[i] == entry.faction)
+            for (unsigned int i : friendFaction)
+                if (i == entry.faction)
                     return true;
         }
         return (friendlyMask & entry.ourMask) || (ourMask & entry.friendlyMask);
     }
-    bool IsHostileTo(FactionTemplateEntry const& entry) const
+    [[nodiscard]] bool IsHostileTo(FactionTemplateEntry const& entry) const
     {
         if (entry.faction)
         {
-            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (enemyFaction[i] == entry.faction)
+            for (unsigned int i : enemyFaction)
+                if (i == entry.faction)
                     return true;
-            for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-                if (friendFaction[i] == entry.faction)
+            for (unsigned int i : friendFaction)
+                if (i == entry.faction)
                     return false;
         }
         return (hostileMask & entry.ourMask) != 0;
     }
-    bool IsHostileToPlayers() const { return (hostileMask & FACTION_MASK_PLAYER) != 0; }
-    bool IsNeutralToAll() const
+    [[nodiscard]] bool IsHostileToPlayers() const { return (hostileMask & FACTION_MASK_PLAYER) != 0; }
+    [[nodiscard]] bool IsNeutralToAll() const
     {
-        for (uint8 i = 0; i < MAX_FACTION_RELATIONS; ++i)
-            if (enemyFaction[i] != 0)
+        for (unsigned int i : enemyFaction)
+            if (i != 0)
                 return false;
         return hostileMask == 0 && friendlyMask == 0;
     }
-    bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD) != 0; }
+    [[nodiscard]] bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD) != 0; }
 };
 
 struct GameObjectDisplayInfoEntry
@@ -1189,7 +1179,7 @@ struct LFGDungeonEntry
     uint32  grouptype;                                      // 31
     //char*   desc[16];                                     // 32-47 Description
     // Helpers
-    uint32 Entry() const { return ID + (type << 24); }
+    [[nodiscard]] uint32 Entry() const { return ID + (type << 24); }
 };
 
 struct LightEntry
@@ -1278,16 +1268,16 @@ struct MapEntry
     uint32  maxPlayers;                                     // 65 max players, fallback if not present in MapDifficulty.dbc
 
     // Helpers
-    uint32 Expansion() const { return addon; }
+    [[nodiscard]] uint32 Expansion() const { return addon; }
 
-    bool IsDungeon() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID; }
-    bool IsNonRaidDungeon() const { return map_type == MAP_INSTANCE; }
-    bool Instanceable() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID || map_type == MAP_BATTLEGROUND || map_type == MAP_ARENA; }
-    bool IsRaid() const { return map_type == MAP_RAID; }
-    bool IsBattleground() const { return map_type == MAP_BATTLEGROUND; }
-    bool IsBattleArena() const { return map_type == MAP_ARENA; }
-    bool IsBattlegroundOrArena() const { return map_type == MAP_BATTLEGROUND || map_type == MAP_ARENA; }
-    bool IsWorldMap() const { return map_type == MAP_COMMON; }
+    [[nodiscard]] bool IsDungeon() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID; }
+    [[nodiscard]] bool IsNonRaidDungeon() const { return map_type == MAP_INSTANCE; }
+    [[nodiscard]] bool Instanceable() const { return map_type == MAP_INSTANCE || map_type == MAP_RAID || map_type == MAP_BATTLEGROUND || map_type == MAP_ARENA; }
+    [[nodiscard]] bool IsRaid() const { return map_type == MAP_RAID; }
+    [[nodiscard]] bool IsBattleground() const { return map_type == MAP_BATTLEGROUND; }
+    [[nodiscard]] bool IsBattleArena() const { return map_type == MAP_ARENA; }
+    [[nodiscard]] bool IsBattlegroundOrArena() const { return map_type == MAP_BATTLEGROUND || map_type == MAP_ARENA; }
+    [[nodiscard]] bool IsWorldMap() const { return map_type == MAP_COMMON; }
 
     bool GetEntrancePos(int32& mapid, float& x, float& y) const
     {
@@ -1299,12 +1289,12 @@ struct MapEntry
         return true;
     }
 
-    bool IsContinent() const
+    [[nodiscard]] bool IsContinent() const
     {
         return MapID == 0 || MapID == 1 || MapID == 530 || MapID == 571;
     }
 
-    bool IsDynamicDifficultyMap() const { return Flags & MAP_FLAG_DYNAMIC_DIFFICULTY; }
+    [[nodiscard]] bool IsDynamicDifficultyMap() const { return Flags & MAP_FLAG_DYNAMIC_DIFFICULTY; }
 };
 
 struct MapDifficultyEntry
@@ -1356,7 +1346,7 @@ struct PvPDifficultyEntry
 
     // helpers
     PvPDifficultyEntry(uint32 mapId, uint32 bracketId, uint32 minLevel, uint32 maxLevel, uint32 difficulty) : mapId(mapId), bracketId(bracketId), minLevel(minLevel), maxLevel(maxLevel), difficulty(difficulty) {}
-    BattlegroundBracketId GetBracketId() const { return BattlegroundBracketId(bracketId); }
+    [[nodiscard]] BattlegroundBracketId GetBracketId() const { return BattlegroundBracketId(bracketId); }
 };
 
 struct QuestSortEntry
@@ -1407,7 +1397,7 @@ struct ScalingStatValuesEntry
     uint32  ssdMultiplier3;                                 // 18 3.3
     uint32  armorMod2[5];                                   // 19-23 Armor for level
 
-    uint32 getssdMultiplier(uint32 mask) const
+    [[nodiscard]] uint32 getssdMultiplier(uint32 mask) const
     {
         if (mask & 0x4001F)
         {
@@ -1421,7 +1411,7 @@ struct ScalingStatValuesEntry
         return 0;
     }
 
-    uint32 getArmorMod(uint32 mask) const
+    [[nodiscard]] uint32 getArmorMod(uint32 mask) const
     {
         if (mask & 0x00F801E0)
         {
@@ -1439,7 +1429,7 @@ struct ScalingStatValuesEntry
         return 0;
     }
 
-    uint32 getDPSMod(uint32 mask) const
+    [[nodiscard]] uint32 getDPSMod(uint32 mask) const
     {
         if (mask & 0x7E00)
         {
@@ -1453,13 +1443,13 @@ struct ScalingStatValuesEntry
         return 0;
     }
 
-    uint32 getSpellBonus(uint32 mask) const
+    [[nodiscard]] uint32 getSpellBonus(uint32 mask) const
     {
         if (mask & 0x00008000) return spellPower;
         return 0;
     }
 
-    uint32 getFeralBonus(uint32 mask) const                 // removed in 3.2.x?
+    [[nodiscard]] uint32 getFeralBonus(uint32 mask) const                 // removed in 3.2.x?
     {
         if (mask & 0x00010000) return 0;                    // not used?
         return 0;
@@ -1715,8 +1705,8 @@ struct SpellRuneCostEntry
     uint32  RuneCost[3];                                    // 1-3 (0=blood, 1=frost, 2=unholy)
     uint32  runePowerGain;                                  // 4
 
-    bool NoRuneCost() const { return RuneCost[0] == 0 && RuneCost[1] == 0 && RuneCost[2] == 0; }
-    bool NoRunicPowerGain() const { return runePowerGain == 0; }
+    [[nodiscard]] bool NoRuneCost() const { return RuneCost[0] == 0 && RuneCost[1] == 0 && RuneCost[2] == 0; }
+    [[nodiscard]] bool NoRunicPowerGain() const { return runePowerGain == 0; }
 };
 
 #define MAX_SHAPESHIFT_SPELLS 8
@@ -1987,20 +1977,20 @@ struct VehicleSeatEntry
     uint32  m_flagsB;                                       // 45
     // 46-57 added in 3.1, floats mostly
 
-    bool CanEnterOrExit() const
+    [[nodiscard]] bool CanEnterOrExit() const
     {
         return ((m_flags & VEHICLE_SEAT_FLAG_CAN_ENTER_OR_EXIT) != 0 ||
                 //If it has anmation for enter/ride, means it can be entered/exited by logic
                 (m_flags & (VEHICLE_SEAT_FLAG_HAS_LOWER_ANIM_FOR_ENTER | VEHICLE_SEAT_FLAG_HAS_LOWER_ANIM_FOR_RIDE)) != 0);
     }
-    bool CanSwitchFromSeat() const { return m_flags & VEHICLE_SEAT_FLAG_CAN_SWITCH; }
-    bool IsUsableByOverride() const
+    [[nodiscard]] bool CanSwitchFromSeat() const { return m_flags & VEHICLE_SEAT_FLAG_CAN_SWITCH; }
+    [[nodiscard]] bool IsUsableByOverride() const
     {
         return (m_flags & (VEHICLE_SEAT_FLAG_UNCONTROLLED | VEHICLE_SEAT_FLAG_UNK18)
                 || (m_flagsB & (VEHICLE_SEAT_FLAG_B_USABLE_FORCED | VEHICLE_SEAT_FLAG_B_USABLE_FORCED_2 |
                                 VEHICLE_SEAT_FLAG_B_USABLE_FORCED_3 | VEHICLE_SEAT_FLAG_B_USABLE_FORCED_4)));
     }
-    bool IsEjectable() const { return m_flagsB & VEHICLE_SEAT_FLAG_B_EJECTABLE; }
+    [[nodiscard]] bool IsEjectable() const { return m_flagsB & VEHICLE_SEAT_FLAG_B_EJECTABLE; }
 };
 
 struct WMOAreaTableEntry
@@ -2093,32 +2083,32 @@ struct WorldStateUI
 // Structures not used for casting to loaded DBC data and not required then packing
 struct MapDifficulty
 {
-    MapDifficulty() : resetTime(0), maxPlayers(0), hasErrorMessage(false) {}
+    MapDifficulty()  {}
     MapDifficulty(uint32 _resetTime, uint32 _maxPlayers, bool _hasErrorMessage) : resetTime(_resetTime), maxPlayers(_maxPlayers), hasErrorMessage(_hasErrorMessage) {}
 
-    uint32 resetTime;
-    uint32 maxPlayers;
-    bool hasErrorMessage;
+    uint32 resetTime{0};
+    uint32 maxPlayers{0};
+    bool hasErrorMessage{false};
 };
 
 struct TalentSpellPos
 {
-    TalentSpellPos() : talent_id(0), rank(0) {}
+    TalentSpellPos()  {}
     TalentSpellPos(uint16 _talent_id, uint8 _rank) : talent_id(_talent_id), rank(_rank) {}
 
-    uint16 talent_id;
-    uint8  rank;
+    uint16 talent_id{0};
+    uint8  rank{0};
 };
 
 typedef std::map<uint32, TalentSpellPos> TalentSpellPosMap;
 
 struct TaxiPathBySourceAndDestination
 {
-    TaxiPathBySourceAndDestination() : ID(0), price(0) {}
+    TaxiPathBySourceAndDestination()  {}
     TaxiPathBySourceAndDestination(uint32 _id, uint32 _price) : ID(_id), price(_price) {}
 
-    uint32    ID;
-    uint32    price;
+    uint32    ID{0};
+    uint32    price{0};
 };
 typedef std::map<uint32, TaxiPathBySourceAndDestination> TaxiPathSetForSource;
 typedef std::map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;

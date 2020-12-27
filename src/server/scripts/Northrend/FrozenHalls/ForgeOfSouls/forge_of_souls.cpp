@@ -223,7 +223,7 @@ public:
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == 1)
             {
@@ -237,7 +237,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_fos_leader_secondAI(creature);
     }
@@ -256,7 +256,7 @@ public:
         int32 amount;
         bool fired;
 
-        bool Load()
+        bool Load() override
         {
             fired = false;
             amount = 0;
@@ -274,13 +274,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectAbsorb += AuraEffectAbsorbFn(spell_shield_of_bones_AuraScript::HandleAfterEffectAbsorb, EFFECT_0);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_shield_of_bones_AuraScript();
     }

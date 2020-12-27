@@ -442,7 +442,9 @@ void World::LoadConfigSettings(bool reload)
 
     ///- Read the player limit and the Message of the day from the config file
     if (!reload)
-        SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 100));
+    {
+        SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 1000));
+    }
 
     Motd::SetMotd(sConfigMgr->GetStringDefault("Motd", "Welcome to an AzerothCore server"));
 
@@ -1145,6 +1147,7 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_ARENA_RATING_DISCARD_TIMER]                 = sConfigMgr->GetIntDefault ("Arena.RatingDiscardTimer", 10 * MINUTE * IN_MILLISECONDS);
     m_bool_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS]              = sConfigMgr->GetBoolDefault("Arena.AutoDistributePoints", false);
     m_int_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS]        = sConfigMgr->GetIntDefault ("Arena.AutoDistributeInterval", 7); // pussywizard: spoiled by implementing constant day and hour, always 7 now
+    m_int_configs[CONFIG_ARENA_GAMES_REQUIRED]                       = sConfigMgr->GetIntDefault ("Arena.GamesRequired", 10);
     m_int_configs[CONFIG_ARENA_SEASON_ID]                            = sConfigMgr->GetIntDefault ("Arena.ArenaSeason.ID", 1);
     m_int_configs[CONFIG_ARENA_START_RATING]                         = sConfigMgr->GetIntDefault ("Arena.ArenaStartRating", 0);
     m_int_configs[CONFIG_ARENA_START_PERSONAL_RATING]                = sConfigMgr->GetIntDefault ("Arena.ArenaStartPersonalRating", 1000);
