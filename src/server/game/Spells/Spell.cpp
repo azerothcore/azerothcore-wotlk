@@ -5990,11 +5990,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                     // second check prevent fail at rechecks
                     if (skillId != SKILL_NONE && (!m_selfContainer || ((*m_selfContainer) != this)))
                     {
-                        bool canFailAtMax = skillId == SKILL_LOCKPICKING;
-
                         // chance for failure in orange lockpick
-                        if ((canFailAtMax || skillValue < sWorld->GetConfigMaxSkillValue()) && reqSkillValue > irand(skillValue - 25, skillValue + 37))
+                        if (skillId == SKILL_LOCKPICKING && reqSkillValue > irand(skillValue - 25, skillValue + 37))
+                        {
                             return SPELL_FAILED_TRY_AGAIN;
+                        }
                     }
                     break;
                 }
