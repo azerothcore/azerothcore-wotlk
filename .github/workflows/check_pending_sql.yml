@@ -9,12 +9,13 @@ jobs:
       - uses: actions/checkout@v2
       - name: Check for Procedure/Function
         run: |
-         if grep -R -q -i -E "(PROCEDURE|FUNCTION)" data/sql/updates/pending*
-            then
-                exit 1
-            else
-                exit 0
+         for i in `find data/sql/updates/pending* -name "*.sql" -type f`; do
+         if $(cat "$i"|sed "s/'.*'\(.*\)/\1/g"|grep -q -i -E "(PROCEDURE|FUNCTION)"); then
+            exit 1
+         else
+            exit 0
          fi
+         done
       - name: Semicolon check
         run: |
          for i in `find data/sql/updates/pending* -name "*.sql" -type f`; do
