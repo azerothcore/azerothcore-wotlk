@@ -14,7 +14,7 @@ DELETE FROM `creature` WHERE (`id` = 25261);
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (85226, 25261, 571, 0, 0, 1, 1, 23031, 0, 2280.96, 5180.91, 11.423, 3.735, 1200, 0, 0, 1, 0, 0, 0, 0, 0, '', 0);
 
-UPDATE `creature_template` SET `flags_extra` = 2 WHERE (`entry` IN (25258, 25259, 25260, 25261));
+UPDATE `creature_template` SET `flags_extra` = 2 and `unit_flags` = 0 WHERE (`entry` IN (25258, 25259, 25260, 25261));
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25258;
 
@@ -24,7 +24,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25258, 0, 1, 0, 34, 0, 100, 0, 2, 9, 0, 0, 0, 80, 2525801, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - On Reached Point 9 - Run Script'),
 (25258, 0, 2, 0, 34, 0, 100, 0, 2, 10, 0, 0, 0, 80, 2525802, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - On Reached Point 10 - Run Script'),
 (25258, 0, 3, 0, 34, 0, 100, 1, 2, 15, 0, 0, 0, 12, 25260, 3, 180000, 0, 0, 0, 8, 0, 0, 0, 0, 2255.77, 5186.26, 11.4391, 1.47479, 'Footman Rob - On Reached Point 15 - Summon Creature \'Footman Mitch\' (No Repeat)'),
-(25258, 0, 4, 0, 34, 0, 100, 0, 2, 17, 0, 0, 0, 80, 2525803, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - On Reached Point 17 - Run Script'),
+(25258, 0, 4, 0, 34, 0, 100, 0, 2, 16, 0, 0, 0, 80, 2525803, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - On Reached Point 16 - Run Script'),
 (25258, 0, 5, 0, 17, 0, 100, 0, 25260, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - On Summoned Unit - Store Targetlist'),
 (25258, 0, 6, 0, 1, 0, 100, 1, 100, 100, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - Out of Combat - Change Equipment (No Repeat)'),
 (25258, 0, 7, 0, 1, 0, 100, 1, 100, 100, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 10, 85222, 25259, 0, 0, 0, 0, 0, 0, 'Footman Rob - Out of Combat - Change Equipment (No Repeat)'),
@@ -117,7 +117,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH, 10, 2279.08, 5206.5, 12.494, 0, 60000, 0, 0, 100, 0),
 (@PATH, 11, 2278.6, 5205.3, 12.4926, 0, 16000, 0, 0, 100, 0),
 (@PATH, 12, 2275.55, 5197.84, 12.4897, 0, 0, 0, 0, 100, 0),
-(@PATH, 13, 2275.60, 5194.96, 12.489, 0, 0, 0, 0, 100, 0),
+(@PATH, 13, 2273.063, 5196.067, 12.4932, 0, 0, 0, 0, 100, 0),
 (@PATH, 14, 2265.21, 5198.54, 11.3533, 0, 0, 0, 0, 100, 0),
 (@PATH, 15, 2260.26, 5202.83, 11.4377, 0, 0, 0, 0, 100, 0),
 (@PATH, 16, 2258.98, 5205.83, 11.322, 0, 0, 0, 0, 100, 0),
