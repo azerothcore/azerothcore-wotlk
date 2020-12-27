@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609090256646931000');
 
 -- Cleanup existing creatures
-DELETE FROM creature WHERE GUID IN (
+DELETE FROM `creature` WHERE `guid` IN (
     85883 -- Yellowgill Frenzy, will be replaced by 145345 (otherwise would be duplicate)
 );
 
