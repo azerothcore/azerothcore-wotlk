@@ -15,9 +15,9 @@ fi
 
 for entry in "$AC_PATH_MODULES/"*/include.sh
 do
-    if [ -e $entry ]; then 
-        source $entry
+    if [ -e "$entry" ]; then 
+        source "$entry"
     fi
 done
 
-ACORE_VERSION=$("$AC_PATH_DEPS/jsonpath/JSONPath.sh" -f $AC_PATH_ROOT/acore.json -b '$.version')
+ACORE_VERSION=$("$AC_PATH_DEPS/jsonpath/JSONPath.sh" -f "$AC_PATH_ROOT/acore.json" -b '$.version')
