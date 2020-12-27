@@ -83,6 +83,17 @@ SET `pickpocketing_loot_template`.`comment` =
 END)
 WHERE `pickpocketing_loot_template`.`comment` = '' OR `pickpocketing_loot_template`.`comment` IS NULL;
 
+/* PROSPECTING */
+UPDATE `prospecting_loot_template`
+LEFT JOIN `item_template` ON `prospecting_loot_template`.`item` = `item_template`.`entry`
+SET `prospecting_loot_template`.`comment` = 
+(CASE
+    WHEN `prospecting_loot_template`.`reference` = 0 
+    THEN `item_template`.`name`
+    ELSE '(ReferenceTable)'
+END)
+WHERE `prospecting_loot_template`.`comment` = '' OR `prospecting_loot_template`.`comment` IS NULL;
+
 /* REFERENCE */
 UPDATE `reference_loot_template`
 LEFT JOIN `item_template` ON `reference_loot_template`.`item` = `item_template`.`entry`
