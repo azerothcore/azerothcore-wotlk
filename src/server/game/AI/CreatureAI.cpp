@@ -257,16 +257,15 @@ bool CreatureAI::_EnterEvadeMode()
     return true;
 }
 
-bool CreatureAI::CheckCircleRepositionRequirements()
+void CreatureAI::CheckCircleRepositionRequirements()
 {
-    if (Unit* victim = me->GetVictim()) {
-        if (me->IsFreeToMove() && victim->getAttackers().size() > 1)
+    if (Unit* victim = me->GetVictim())
+    {
+        if (me->IsFreeToMove() && victim->getAttackers().size() > 1 && me->IsWithinMeleeRange(victim))
         {
             me->GetMotionMaster()->MoveCircleTarget(victim);
-            return true;
         }
     }
-    return false;
 }
 
 Creature* CreatureAI::DoSummon(uint32 entry, const Position& pos, uint32 despawnTime, TempSummonType summonType)

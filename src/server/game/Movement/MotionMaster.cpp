@@ -339,10 +339,18 @@ void MotionMaster::MoveCircleTarget(Unit* target)
         point->m_positionZ = _owner->GetMapHeight(point->m_positionX, point->m_positionY, point->m_positionZ);
     }
 
-    Movement::MoveSplineInit init(_owner);
-    init.MoveTo(point->m_positionX, point->m_positionY, point->m_positionZ, true, true);
-    init.SetFacing(target);
-    init.Launch();
+    const Map* _map = _owner->GetBaseMap();
+
+    float x = point->m_positionX;
+    float y = point->m_positionY;
+    float z = point->m_positionZ;
+
+    if (_map->getValidPositionAndHeight(_owner, x, y, z, 0, _owner->GetExactDist(point))) {
+        Movement::MoveSplineInit init(_owner);
+        init.MoveTo(point->m_positionX, point->m_positionY, /* point->m_positionZ */ z, true);
+        init.SetFacing(target);
+        init.Launch();
+    }
 }
 
 void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlot slot)

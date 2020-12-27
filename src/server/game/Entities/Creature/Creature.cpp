@@ -586,20 +586,15 @@ void Creature::Update(uint32 diff)
                     RemoveCharmAuras();
                 }
 
-                // enable circle movement only for not scripted NPC
-                // this should exclude bosses, caster and all kind of scripted NPC
-                if (GetAIName().length() == 0 && GetScriptName().length() == 0)
+                // Circling the target
+                if (diff >= m_moveCircleMovementTime)
                 {
-                    // Circling the target
-                    if (diff >= m_moveCircleMovementTime)
-                    {
-                        AI()->CheckCircleRepositionRequirements();
-                        m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
-                    }
-                    else
-                    {
-                        m_moveCircleMovementTime -= diff;
-                    }
+                    AI()->CheckCircleRepositionRequirements();
+                    m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
+                }
+                else
+                {
+                    m_moveCircleMovementTime -= diff;
                 }
 
                 if (!IsInEvadeMode() && IsAIEnabled)

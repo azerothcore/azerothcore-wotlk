@@ -2261,8 +2261,12 @@ void Unit::SetMeleeAttackPoints()
         int8 anglePosition = ceil((i+1)/2) * ((i+1) % 2 ? -1 : 1);
         float step = float(M_PI*2) / attackPoints;
         Position const& pos = GetPosition();
-        float angle = GetOrientation() + float(M_PI * 2) + (step * anglePosition);
-        attackMeleePositions.push_back(AttackPosition(Position(pos.m_positionX + radius * cosf(angle), pos.m_positionY + radius * sinf(angle), pos.m_positionZ)));
+        float angle = float(M_PI * 2) + (step * anglePosition);
+        attackMeleePositions.push_back(AttackPosition(Position(
+            pos.m_positionX + radius * cosf(angle),
+            pos.m_positionY + radius * sinf(angle),
+            pos.m_positionZ)
+        ));
     }
     m_previousAttackerCount = getAttackers().size();
     m_previousPosition = GetPosition();
