@@ -3179,7 +3179,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 12579: // Player Winter's Chill
             case 29306: // Naxxramas(Gluth's Zombies): Infected Wound
             case 61920: // Ulduar(Spellbreaker): Supercharge
-            case 63978: // Ulduar(Rubble): Stone Nova 
+            case 63978: // Ulduar(Rubble): Stone Nova
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
                 break;
             case 43138: // North Fleet Reservist Kill Credit
@@ -3698,7 +3698,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectBasePoints[EFFECT_0] = 100; // 100% chance of procc'ing, not -10% (chance calculated in PrepareTriggersExecutedOnHit)
     });
 
-    // Easter Lay Noblegarden Egg Aura 
+    // Easter Lay Noblegarden Egg Aura
     ApplySpellFix({ 61719 }, [](SpellEntry* spellInfo)
     {
         // Interrupt flags copied from aura which this aura is linked with
@@ -3794,7 +3794,7 @@ void SpellMgr::LoadDbcDataCorrections()
         20184,  // Judgement of Justice
         20185,  // Judgement of Light
         20186,  // Judgement of Wisdom
-        68055   // Judgements of the Just	
+        68055   // Judgements of the Just
         }, [](SpellEntry* spellInfo)
     {
         // hack for seal of light and few spells, judgement consists of few single casts and each of them can proc
@@ -3979,7 +3979,7 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->EffectImplicitTargetB[EFFECT_1] = TARGET_DEST_DB;
     });
-  
+
     // Killing Spree (teleport)
     ApplySpellFix({ 57840 }, [](SpellEntry* spellInfo)
     {
@@ -4870,7 +4870,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Attributes &= ~SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION;
     });
 
-    // Koralon, Flaming Cinder 
+    // Koralon, Flaming Cinder
     ApplySpellFix({ 66690 }, [](SpellEntry* spellInfo)
     {
         // missing radius index

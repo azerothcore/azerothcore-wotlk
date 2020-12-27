@@ -444,7 +444,7 @@ private:
     typedef std::unordered_map<uint32, uint32> PetAuraMap;
 
 public:
-    PetAura()  
+    PetAura()
     {
         auras.clear();
     }

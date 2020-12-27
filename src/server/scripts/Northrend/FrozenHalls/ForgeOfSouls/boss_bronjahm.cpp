@@ -159,7 +159,7 @@ public:
                     me->CastSpell(me, SPELL_SOULSTORM, false);
                     me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
                     me->CastSpell(me, SPELL_SOULSTORM_VISUAL, true);
-                    
+
                     break;
             }
 

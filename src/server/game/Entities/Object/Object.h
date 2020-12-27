@@ -643,7 +643,7 @@ struct MovementInfo
     // spline
     float splineElevation{0.0f};
 
-    MovementInfo()  
+    MovementInfo()
     {
         pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
         transport.Reset();

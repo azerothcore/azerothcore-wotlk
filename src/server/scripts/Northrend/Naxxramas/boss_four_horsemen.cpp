@@ -310,7 +310,7 @@ public:
                 case EVENT_BERSERK:
                     Talk(SAY_SPECIAL);
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    
+
                     return;
                 case EVENT_SPELL_PRIMARY:
                     Talk(SAY_TAUNT);

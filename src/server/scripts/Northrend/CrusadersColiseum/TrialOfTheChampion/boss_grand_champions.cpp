@@ -711,7 +711,7 @@ public:
                             me->GetMotionMaster()->MovePoint(7, *mount);
                             events.RepeatEvent(200);
                             break;
-                        }                      
+                        }
                     }
                     break;
                 case EVENT_MOUNT_CHARGE:
@@ -829,7 +829,7 @@ public:
 
                 /****************** HUNTER ******************/
                 case EVENT_HUNTER_SPELL_DISENGAGE:
-                    
+
                     break;
                 case EVENT_HUNTER_SPELL_LIGHTNING_ARROWS:
                     me->CastSpell((Unit*)NULL, SPELL_LIGHTNING_ARROWS, false);
@@ -918,7 +918,7 @@ public:
                     }
                     break;
                 case EVENT_WARRIOR_SPELL_ROLLING_THROW:
-                    
+
                     break;
                     /*************** WARRIOR END ****************/
             }

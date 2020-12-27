@@ -244,7 +244,7 @@ public:
                         me->GetMotionMaster()->MoveJump(northForgePos.GetPositionX(), northForgePos.GetPositionY(), northForgePos.GetPositionZ(), 25.0f, 15.0f, 0);
                     else if (phase == 2)
                         me->GetMotionMaster()->MoveJump(southForgePos.GetPositionX(), southForgePos.GetPositionY(), southForgePos.GetPositionZ(), 25.0f, 15.0f, 0);
-                    
+
                     break;
                 case EVENT_SPELL_CHILLING_WAVE:
                     me->CastSpell(me->GetVictim(), SPELL_CHILLING_WAVE, false);

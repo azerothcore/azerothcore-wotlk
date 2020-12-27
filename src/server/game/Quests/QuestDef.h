@@ -388,7 +388,7 @@ protected:
 
 struct QuestStatusData
 {
-    QuestStatusData() 
+    QuestStatusData()
     {
         memset(ItemCount, 0, QUEST_ITEM_OBJECTIVES_COUNT * sizeof(uint16));
         memset(CreatureOrGOCount, 0, QUEST_OBJECTIVES_COUNT * sizeof(uint16));

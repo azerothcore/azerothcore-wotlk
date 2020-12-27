@@ -116,7 +116,7 @@ class SocialMgr
     private:
         SocialMgr();
         ~SocialMgr();
-    
+
     public:
         static SocialMgr* instance();
         // Misc

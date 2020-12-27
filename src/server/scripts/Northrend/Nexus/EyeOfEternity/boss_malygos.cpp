@@ -378,7 +378,7 @@ public:
                 case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     Talk(EMOTE_BERSERK);
-                    
+
                     break;
                 case EVENT_INTRO_MOVE_CENTER:
                     {
@@ -537,7 +537,7 @@ public:
                     }
                 case EVENT_VORTEX_LAND_0:
                     me->GetMotionMaster()->MoveLand(MI_POINT_VORTEX_LAND, CenterPos, 7.0f);
-                    
+
                     break;
                 case EVENT_VORTEX_LAND_1:
                     {

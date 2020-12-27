@@ -150,7 +150,7 @@ public:
                 case EVENT_SPELL_SNOBOLLED:
                     if( t->GetTypeId() == TYPEID_PLAYER )
                         me->CastSpell((Unit*)NULL, SPELL_SNOBOLLED, true);
-                    
+
                     break;
                 case EVENT_SPELL_BATTER:
                     if( t->GetTypeId() == TYPEID_PLAYER )
@@ -582,7 +582,7 @@ struct boss_jormungarAI : public ScriptedAI
                     me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
                     me->StopMovingOnCurrentPos();
                     DoResetThreat();
-                    
+
                     events.RescheduleEvent(EVENT_EMERGE, 6000);
                 }
                 break;
@@ -892,7 +892,7 @@ public:
                 case EVENT_SPELL_MASSIVE_CRASH:
                     me->GetMotionMaster()->Clear();
                     me->CastSpell((Unit*)NULL, SPELL_MASSIVE_CRASH, false);
-                    
+
                     events.RescheduleEvent(EVENT_GAZE, 2000);
                     break;
                 case EVENT_GAZE:
@@ -914,7 +914,7 @@ public:
                         me->GetMotionMaster()->MovementExpired();
                         me->SetReactState(REACT_AGGRESSIVE);
                     }
-                    
+
                     break;
                 case EVENT_JUMP_BACK:
                     {
@@ -963,7 +963,7 @@ public:
                     me->GetMotionMaster()->MoveCharge(destX, destY, destZ + 1.0f, 65.0f);
                     me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
                     events.RescheduleEvent(EVENT_CHECK_TRAMPLE_PLAYERS, 100);
-                    
+
                     break;
                 case EVENT_CHECK_TRAMPLE_PLAYERS:
                     if( DoTrampleIfValid() )
@@ -982,7 +982,7 @@ public:
                     break;
                 case EVENT_REFRESH_POSITION:
                     //me->SetFacingTo(me->GetOrientation());
-                    
+
                     break;
             }
 

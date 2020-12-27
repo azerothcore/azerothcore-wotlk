@@ -1871,7 +1871,7 @@ public:
                     break;
             }
         }
-        
+
         void SetPositionTraps(GameObject* go)
         {
             std::vector<Position> trapPositions;

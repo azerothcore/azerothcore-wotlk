@@ -191,7 +191,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
             float maxDist = MELEE_RANGE + owner->GetMeleeReach() + i_target->GetMeleeReach();
             if (!forceDest && (i_path->GetPathType() & PATHFIND_NOPATH || (!i_offset && !isPlayerPet && i_target->GetExactDistSq(i_path->GetActualEndPosition().x, i_path->GetActualEndPosition().y, i_path->GetActualEndPosition().z) > maxDist * maxDist)))
             {
-                if (owner->GetTypeId() == TYPEID_UNIT) 
+                if (owner->GetTypeId() == TYPEID_UNIT)
                 {
                     owner->ToCreature()->SetCannotReachTarget(false);
                 }

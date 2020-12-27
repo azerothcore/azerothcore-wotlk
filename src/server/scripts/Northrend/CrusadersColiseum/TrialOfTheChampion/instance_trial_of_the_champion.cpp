@@ -962,7 +962,7 @@ public:
                     {
                         if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
                             tirion->AI()->Talk(TEXT_GRATZ_SLAIN_CHAMPIONS);
-                        
+
                         HandleGameObject(GO_EnterGateGUID, true);
                     }
                     break;

@@ -3229,7 +3229,7 @@ void Unit::_UpdateAutoRepeatSpell()
     {
         return;
     }
-    
+
     static uint32 const HUNTER_AUTOSHOOT = 75;
 
     // Check "realtime" interrupts

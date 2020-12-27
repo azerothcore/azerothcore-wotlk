@@ -166,7 +166,7 @@ public:
             {
                 case EVENT_SPELL_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    
+
                     break;
                 case EVENT_SPELL_ENRAGE:
                     Talk(EMOTE_ENRAGE);

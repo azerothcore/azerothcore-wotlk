@@ -186,7 +186,7 @@ struct AchievementCriteriaData
     };
     uint32 ScriptId;
 
-    AchievementCriteriaData()  
+    AchievementCriteriaData()
     {
         raw.value1 = 0;
         raw.value2 = 0;
