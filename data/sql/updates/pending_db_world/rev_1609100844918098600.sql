@@ -102,7 +102,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 SET @PATH := 8522110;
 DELETE FROM `creature_addon` WHERE `guid` = 85221;
-INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`auras`) VALUES (85221,@PATH,0,0,1,0, '');
+INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`auras`) VALUES 
+(85221,@PATH,0,0,1,0, '');
 DELETE FROM `waypoint_data` WHERE `id` = @PATH;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES 
 (@PATH, 1, 2277.19, 5177.20, 11.33, 0, 0, 0, 0, 100, 0),
