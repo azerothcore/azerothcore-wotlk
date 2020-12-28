@@ -378,21 +378,19 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            Player* player = killer->ToPlayer();
-            if (!player)
+            if (!killer || killer->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (player->GetQuestStatus(QUEST_TAKEN_BY_THE_SCOURGE) == QUEST_STATUS_INCOMPLETE)
+            Player* player = killer->ToPlayer();
+
+            uint8 uiRand = urand(0, 99);
+            if (uiRand < 40)
             {
-                uint8 uiRand = urand(0, 99);
-                if (uiRand < 40)
-                {
-                    player->CastSpell(me, SPELL_FREED_WARSONG_PEON, true);
-                    player->KilledMonsterCredit(NPC_WARSONG_PEON, 0);
-                }
-                else if (uiRand < 80)
-                    player->CastSpell(me, nerubarVictims[urand(0, 2)], true);
+                player->CastSpell(me, SPELL_FREED_WARSONG_PEON, true);
+                player->KilledMonsterCredit(NPC_WARSONG_PEON, 0);
             }
+            else if (uiRand < 80)
+                player->CastSpell(me, nerubarVictims[urand(0, 2)], true);
         }
     };
 
