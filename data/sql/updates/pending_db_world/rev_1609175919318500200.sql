@@ -2,10 +2,11 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609175919318500200');
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 25270 AND `GroupID` = 0;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
-(25270, 0, 0, 'HOORAY! ME FREE!', 12, 0, 25, 0, 0, 0, 24627, 0, 'Warsong Peon'),
-(25270, 0, 1, 'Tanks, buddy!', 12, 0, 25, 0, 0, 0, 24628, 0, 'Warsong Peon'),
-(25270, 0, 2, 'Mister Mortuus gonna be so mad! Me go home now.', 12, 0, 25, 0, 0, 0, 24629, 0, 'Warsong Peon'),
-(25270, 0, 3, 'Why it keep telling me to put da lotion in da basket? Me no like da lotion!', 12, 0, 25, 0, 0, 0, 24630, 0, 'Warsong Peon');
+(25270, 0, 0, 'HOORAY! ME FREE!', 12, 1, 20, 0, 0, 0, 24627, 0, 'Warsong Peon'),
+(25270, 0, 1, 'Tanks, buddy!', 12, 1, 20, 0, 0, 0, 24628, 0, 'Warsong Peon'),
+(25270, 0, 2, 'Mister Mortuus gonna be so mad! Me go home now.', 12, 1, 20, 0, 0, 0, 24629, 0, 'Warsong Peon'),
+(25270, 0, 3, 'Why it keep telling me to put da lotion in da basket? Me no like da lotion!', 12, 1, 20, 0, 0, 0, 24630, 0, 'Warsong Peon'),
+(25270, 0, 4, 'Huh? Where me at? Dis don''t look good! Me run now!', 12, 1, 20, 0, 0, 0, 24626, 0, 'Warsong Peon');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `unit_flags`=`unit_flags`|512 WHERE `entry` = 25270;
 
