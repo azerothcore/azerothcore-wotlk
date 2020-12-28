@@ -1,4 +1,4 @@
--- INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609174873784850500');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609174873784850500');
 
 UPDATE `creature_template_addon` SET `auras` = '29266' WHERE (`entry` = 17508);
 
