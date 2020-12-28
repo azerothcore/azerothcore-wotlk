@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609175919318500200');
 
-DELETE FROM `creature_text` WHERE creatureID = 25270;
+DELETE FROM `creature_text` WHERE `CreatureID` = 25270 AND `GroupID` = 0;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
 (25270, 0, 0, 'HOORAY! ME FREE!', 12, 0, 25, 0, 0, 0, 24627, 0, 'Warsong Peon'),
 (25270, 0, 1, 'Tanks, buddy!', 12, 0, 25, 0, 0, 0, 24628, 0, 'Warsong Peon'),
