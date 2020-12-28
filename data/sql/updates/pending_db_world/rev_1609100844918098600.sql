@@ -8,7 +8,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 (85222, 25259, 571, 0, 0, 1, 1, 23031, 0, 2282.03, 5179.58, 11.423, 3.76991, 1200, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (85226, 25261, 571, 0, 0, 1, 1, 23031, 0, 2280.96, 5180.91, 11.423, 3.735, 1200, 0, 0, 1, 0, 0, 0, 0, 0, '', 0);
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' and `flags_extra` = 2 and `unit_flags` = 0 WHERE (`entry` IN (25258, 25259, 25260, 25261));
+UPDATE `creature_template` SET `flags_extra` = 2 AND `unit_flags` = 0 AND `AIName` = 'SmartAI' WHERE (`entry` IN (25258, 25259, 25260, 25261));
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25258);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
