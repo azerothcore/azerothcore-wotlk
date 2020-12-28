@@ -16,7 +16,6 @@ enum Says
 
 enum GuardSays
 {
-    EMOTE_FRENZY        = 0,
     EMOTE_SPAWN         = 1,
     EMOTE_SCARAB        = 2
 };
