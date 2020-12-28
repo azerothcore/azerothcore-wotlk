@@ -116,3 +116,16 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (85221, 85221, 0, 0, 4, 0, 0),
 (85221, 85226, 1, 305, 4, 8, 4),
 (85221, 85222, 1, 55, 4, 8, 4);
+                                                                                                                  
+DELETE FROM `creature_text` WHERE `CreatureID` IN (25245, 25258, 25259, 25260, 25261);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
+(25245, 0, 0, 'You lads know the drill.  No alcohol to servicemen on duty.  You want the general to kill me himself?', 12, 7, 100, 274, 0, 0, 24744, 0, 'James Deacon'),
+(25245, 1, 0, 'All right, all right... but you didn\'t get these from me!', 12, 7, 100, 6, 0, 0, 24745, 0, 'James Deacon'),
+(25258, 0, 0, 'One last drink before we head to the front?', 12, 7, 100, 1, 0, 0, 24475, 0, 'Footman Rob'),
+(25258, 1, 0, 'Barkeep!  Bring out your strongest ale.  We\'re off to the front.', 12, 7, 100, 1, 0, 0, 24478, 0, 'Footman Rob'),
+(25258, 2, 0, 'You\'ll surely make an exception for us, eh?  We might not come back.', 12, 7, 100, 1, 0, 0, 24479, 0, 'Footman Rob'),
+(25258, 3, 0, 'I guess that\'s it then.  Off we go.', 12, 7, 100, 1, 0, 0, 24482, 0, 'Footman Rob'),
+(25259, 0, 0, 'Sure, why not?', 12, 7, 100, 6, 0, 0, 24476, 0, 'Footman George'),
+(25260, 0, 0, 'Hey, guys!  Wait up!', 12, 7, 100, 0, 0, 0, 24761, 0, 'Footman Mitch'),
+(25261, 0, 0, 'That was the worst beer I\'ve ever had.', 12, 7, 100, 0, 0, 0, 24483, 0, 'Footman Chuck');
+                                                                                                                  
