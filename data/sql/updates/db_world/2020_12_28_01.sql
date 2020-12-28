@@ -1,3 +1,19 @@
+-- DB update 2020_12_28_00 -> 2020_12_28_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_12_28_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_12_28_00 2020_12_28_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1608651525587192300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1608651525587192300');
 
 UPDATE `acore_string` SET `content_default`='¦ Last IP: %s (Locked: %s)' WHERE  `entry`=752;
@@ -19,3 +35,12 @@ UPDATE `acore_string` SET `content_default`='¦ Account: %s (ID: %u), GMLevel: %
 UPDATE `acore_string` SET `content_default`='¦ Last Login: %s (Failed Logins: %u)' WHERE  `entry`=35405;
 UPDATE `acore_string` SET `content_default`='¦ Map: %s, Zone: %s, Area: %s' WHERE  `entry`=35409;
 UPDATE `acore_string` SET `content_default`='¦ Registration Email: %s - Email: %s' WHERE  `entry`=35406;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
