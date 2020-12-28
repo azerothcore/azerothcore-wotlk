@@ -379,7 +379,9 @@ public:
         void JustDied(Unit* killer) override
         {
             if (!killer || killer->GetTypeId() != TYPEID_PLAYER)
+            {
                 return;
+            }
 
             Player* player = killer->ToPlayer();
 
@@ -390,7 +392,9 @@ public:
                 player->KilledMonsterCredit(NPC_WARSONG_PEON, 0);
             }
             else if (uiRand < 80)
+            {
                 player->CastSpell(me, nerubarVictims[urand(0, 2)], true);
+            }
         }
     };
 
