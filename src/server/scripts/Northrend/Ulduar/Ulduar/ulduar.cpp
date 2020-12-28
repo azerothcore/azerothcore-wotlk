@@ -10,107 +10,6 @@
 #include "SpellAuraEffects.h"
 #include "Player.h"
 
-#define BASE_CAMP    200
-#define GROUNDS      201
-#define FORGE        202
-#define SCRAPYARD    203
-#define ANTECHAMBER  204
-#define WALKWAY      205
-#define CONSERVATORY 206
-#define MADNESS      207
-#define SPARK        208
-
-class go_ulduar_teleporter : public GameObjectScript
-{
-public:
-    go_ulduar_teleporter() : GameObjectScript("ulduar_teleporter") { }
-
-    bool OnGossipHello(Player* player, GameObject* go) override
-    {
-        InstanceScript* pInstance = go->GetInstanceScript();
-        if (!pInstance)
-            return true;
-
-        AddGossipItemFor(player, 0, "Teleport to the Expedition Base Camp.", GOSSIP_SENDER_MAIN, BASE_CAMP);
-        if (pInstance->GetData(TYPE_LEVIATHAN) >= DONE) // count special
-        {
-            AddGossipItemFor(player, 0, "Teleport to the Formation Grounds.", GOSSIP_SENDER_MAIN, GROUNDS);
-            if (pInstance->GetData(TYPE_LEVIATHAN) == DONE)
-            {
-                AddGossipItemFor(player, 0, "Teleport to the Colossal Forge.", GOSSIP_SENDER_MAIN, FORGE);
-                if (pInstance->GetData(TYPE_XT002) == DONE)
-                {
-                    AddGossipItemFor(player, 0, "Teleport to the Scrapyard.", GOSSIP_SENDER_MAIN, SCRAPYARD);
-                    AddGossipItemFor(player, 0, "Teleport to the Antechamber of Ulduar.", GOSSIP_SENDER_MAIN, ANTECHAMBER);
-                    if (pInstance->GetData(TYPE_KOLOGARN) == DONE)
-                    {
-                        AddGossipItemFor(player, 0, "Teleport to the Shattered Walkway.", GOSSIP_SENDER_MAIN, WALKWAY);
-                        if (pInstance->GetData(TYPE_AURIAYA) == DONE)
-                        {
-                            AddGossipItemFor(player, 0, "Teleport to the Conservatory of Life.", GOSSIP_SENDER_MAIN, CONSERVATORY);
-                            if (pInstance->GetData(DATA_CALL_TRAM))
-                                AddGossipItemFor(player, 0, "Teleport to the Spark of Imagination.", GOSSIP_SENDER_MAIN, SPARK);
-                            if (pInstance->GetData(TYPE_VEZAX) == DONE)
-                                AddGossipItemFor(player, 0, "Teleport to the Prison of Yogg-Saron.", GOSSIP_SENDER_MAIN, MADNESS);
-                        }
-                    }
-                }
-            }
-        }
-
-        SendGossipMenuFor(player, 14424, go->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, GameObject*  /*go*/, uint32 sender, uint32 action) override
-    {
-        if (sender != GOSSIP_SENDER_MAIN || !player->getAttackers().empty())
-            return true;
-
-        switch(action)
-        {
-            case BASE_CAMP:
-                player->TeleportTo(603, -706.122f, -92.6024f, 429.876f, 0);
-                CloseGossipMenuFor(player);
-                break;
-            case GROUNDS:
-                player->TeleportTo(603, 131.248f, -35.3802f, 409.804f, 0);
-                CloseGossipMenuFor(player);
-                break;
-            case FORGE:
-                player->TeleportTo(603, 553.233f, -12.3247f, 409.679f, 0);
-                CloseGossipMenuFor(player);
-                break;
-            case SCRAPYARD:
-                player->TeleportTo(603, 926.292f, -11.4635f, 418.595f, 0);
-                CloseGossipMenuFor(player);
-                break;
-            case ANTECHAMBER:
-                player->TeleportTo(603, 1498.09f, -24.246f, 420.967f, 0);
-                CloseGossipMenuFor(player);
-                break;
-            case WALKWAY:
-                player->TeleportTo(603, 1859.45f, -24.1f, 448.9f, 0);
-                CloseGossipMenuFor(player);
-                break;
-            case CONSERVATORY:
-                player->TeleportTo(603, 2086.27f, -24.3134f, 421.239f, 0);
-                CloseGossipMenuFor(player);
-                break;
-            case MADNESS:
-                player->TeleportTo(603, 1854.8f, -11.46f, 334.57f, 4.8f);
-                CloseGossipMenuFor(player);
-                break;
-            case SPARK:
-                player->TeleportTo(603, 2517.9f, 2568.9f, 412.7f, 0);
-                CloseGossipMenuFor(player);
-                break;
-        }
-
-        return true;
-    }
-};
-
 class npc_ulduar_keeper : public CreatureScript
 {
 public:
@@ -515,7 +414,6 @@ public:
 
 void AddSC_ulduar()
 {
-    new go_ulduar_teleporter();
     new npc_ulduar_keeper();
 
     new spell_ulduar_energy_sap();

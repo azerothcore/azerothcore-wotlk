@@ -442,7 +442,9 @@ void World::LoadConfigSettings(bool reload)
 
     ///- Read the player limit and the Message of the day from the config file
     if (!reload)
-        SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 100));
+    {
+        SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 1000));
+    }
 
     Motd::SetMotd(sConfigMgr->GetStringDefault("Motd", "Welcome to an AzerothCore server"));
 
