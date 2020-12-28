@@ -128,4 +128,3 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (25259, 0, 0, 'Sure, why not?', 12, 7, 100, 6, 0, 0, 24476, 0, 'Footman George'),
 (25260, 0, 0, 'Hey, guys!  Wait up!', 12, 7, 100, 0, 0, 0, 24761, 0, 'Footman Mitch'),
 (25261, 0, 0, 'That was the worst beer I\'ve ever had.', 12, 7, 100, 0, 0, 0, 24483, 0, 'Footman Chuck');
-                                                                                                                  
