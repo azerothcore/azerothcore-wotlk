@@ -181,6 +181,21 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (!me->IsInCombat() && sayGreet)
+            {
+                for( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
+                {
+                    if (pInstance)
+                    {
+                        if (Creature* cr = pInstance->instance->GetCreature(*itr))
+                        {
+                            if (cr->IsInCombat())
+                                DoZoneInCombat();
+                        }
+                    }
+                }
+            }
+
             if (!UpdateVictim())
                 return;
 
