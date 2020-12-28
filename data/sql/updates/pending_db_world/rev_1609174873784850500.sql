@@ -1,8 +1,8 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609174873784850500');
 
-UPDATE `creature_template_addon` SET `auras` = '29266' WHERE (`entry` = 17508);
+UPDATE `creature_template_addon` SET `auras` = '29266' WHERE `entry` = 17508;
 
-DELETE FROM `creature` WHERE `id` = 17426 and `guid` = 86514;
+DELETE FROM `creature` WHERE `id` = 17426 AND `guid` = 86514;
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17508;
 UPDATE `creature_template` SET `unit_flags` = 512, `AIName` = 'SmartAI' WHERE (`entry` = 17426);
@@ -26,4 +26,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1742600, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 41, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Galaen - Actionlist - Despawn In 5000 ms');
 
 -- Set correct quest prev for Galaen's Journal - The Fate of Vindicator Saruan based on WOW Head
-UPDATE `quest_template_addon` SET `PrevQuestID` = 9779 WHERE (`ID` = 9706);
+UPDATE `quest_template_addon` SET `PrevQuestID` = 9779 WHERE `ID` = 9706;
