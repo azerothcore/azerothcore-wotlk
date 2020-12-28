@@ -2,21 +2,13 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609100844918098600');
 
 UPDATE `creature` SET `MovementType`=2 WHERE `guid` = 85221;
 
-DELETE FROM `creature` WHERE (`id` = 25258);
+DELETE FROM `creature` WHERE (`id` IN (25258, 25261, 25259) and `guid` in (85221, 85222, 85226));
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
-(85221, 25258, 571, 0, 0, 1, 1, 23031, 0, 2280.15, 5179.14, 11.423, 4.38078, 1200, 0, 0, 1, 0, 2, 0, 0, 0, '', 0);
-
-DELETE FROM `creature` WHERE (`id` = 25259);
-INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
-(85222, 25259, 571, 0, 0, 1, 1, 23031, 0, 2282.03, 5179.58, 11.423, 3.76991, 1200, 0, 0, 1, 0, 0, 0, 0, 0, '', 0);
-
-DELETE FROM `creature` WHERE (`id` = 25261);
-INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
+(85221, 25258, 571, 0, 0, 1, 1, 23031, 0, 2280.15, 5179.14, 11.423, 4.38078, 1200, 0, 0, 1, 0, 2, 0, 0, 0, '', 0),
+(85222, 25259, 571, 0, 0, 1, 1, 23031, 0, 2282.03, 5179.58, 11.423, 3.76991, 1200, 0, 0, 1, 0, 0, 0, 0, 0, '', 0),
 (85226, 25261, 571, 0, 0, 1, 1, 23031, 0, 2280.96, 5180.91, 11.423, 3.735, 1200, 0, 0, 1, 0, 0, 0, 0, 0, '', 0);
 
-UPDATE `creature_template` SET `flags_extra` = 2 and `unit_flags` = 0 WHERE (`entry` IN (25258, 25259, 25260, 25261));
-
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25258;
+UPDATE `creature_template` SET `AIName` = 'SmartAI' and `flags_extra` = 2 and `unit_flags` = 0 WHERE (`entry` IN (25258, 25259, 25260, 25261));
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25258);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -80,21 +72,15 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2525803, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 41, 1, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Despawn Instant'),
 (2525803, 9, 3, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 41, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Despawn Instant');
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25259;
-
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25259);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (25259, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 4.27258, 'Footman George - On Data Set 1 1 - Set Orientation 4.27258');
-
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25260;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25260);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (25260, 0, 0, 1, 63, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Mitch - On Just Created - Say Line 0'),
 (25260, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Mitch - On Just Created - Set Run Off'),
 (25260, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2264.94, 5221.99, 11.2882, 4.3713, 'Footman Mitch - On Just Created - Move To Position');
-
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25261;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25261);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
