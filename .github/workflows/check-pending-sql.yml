@@ -1,4 +1,4 @@
-name: Check pending sql for Procedure/Function
+name: Check pending SQL
 on:
   pull_request:
 
