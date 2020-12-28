@@ -1203,8 +1203,8 @@ public:
                     events.RepeatEvent(14000);
                     break;
                 case EVENT_ANCIENT_CONSERVATOR_GRIP:
-					me->CastSpell(me, SPELL_CONSERVATOR_GRIP, true);
-					break;
+                   me->CastSpell(me, SPELL_CONSERVATOR_GRIP, true);
+                   break;
                 case EVENT_WATER_SPIRIT_CHARGE:
                     me->CastSpell(me, SPELL_TIDAL_WAVE_AURA, true);
                     me->CastSpell(me->GetVictim(), SPELL_TIDAL_WAVE, false);
