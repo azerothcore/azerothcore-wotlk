@@ -355,7 +355,6 @@ public:
 enum Nerubar
 {
     NPC_WARSONG_PEON                        = 25270,
-    QUEST_TAKEN_BY_THE_SCOURGE              = 11611,
     SPELL_FREED_WARSONG_MAGE                = 45526,
     SPELL_FREED_WARSONG_SHAMAN              = 45527,
     SPELL_FREED_WARSONG_WARRIOR             = 45514,
