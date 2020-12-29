@@ -50,15 +50,15 @@ public:
         uint32 morphtimer;
         bool spellhit;
 
-        void Reset()
+        void Reset() override
         {
             morphtimer = 0;
             spellhit = false;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void SpellHit(Unit* unit, const SpellInfo* spell)
+        void SpellHit(Unit* unit, const SpellInfo* spell) override
         {
             if (spellhit)
                 return;
@@ -81,7 +81,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // we mustn't remove the Creature in the same round in which we cast the summon spell, otherwise there will be no summons
             if (spellhit && morphtimer >= 5000)
@@ -90,9 +90,9 @@ public:
                 return;
             }
             // walk 5 seconds before summoning
-            if (spellhit && morphtimer<5000)
+            if (spellhit && morphtimer < 5000)
             {
-                morphtimer+=diff;
+                morphtimer += diff;
                 if (morphtimer >= 5000)
                 {
                     DoCast(me, SPELL_POLYMORPH_BACKFIRE); // summon copies
@@ -107,7 +107,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_spitelashesAI(creature);
     }
@@ -275,7 +275,8 @@ public:
                 {
                     me->DespawnOrUnsummon();
                     return;
-                } else MustDieTimer -= diff;
+                }
+                else MustDieTimer -= diff;
             }
 
             if (!Escape)
@@ -287,7 +288,8 @@ public:
                 {
                     DoCast(me, SPELL_RIZZLE_ESCAPE, false);
                     SpellEscapeTimer = 10000;
-                } else SpellEscapeTimer -= diff;
+                }
+                else SpellEscapeTimer -= diff;
 
                 if (TeleportTimer <= diff)
                 {
@@ -307,7 +309,8 @@ public:
                     me->GetMotionMaster()->MovementExpired();
                     me->GetMotionMaster()->MovePoint(CurrWP, WPs[CurrWP]);
                     Escape = true;
-                } else TeleportTimer -= diff;
+                }
+                else TeleportTimer -= diff;
 
                 return;
             }
@@ -322,11 +325,12 @@ public:
             {
                 if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                 {
-                   Talk(SAY_RIZZLE_GRENADE, player);
-                   DoCast(player, SPELL_RIZZLE_FROST_GRENADE, true);
+                    Talk(SAY_RIZZLE_GRENADE, player);
+                    DoCast(player, SPELL_RIZZLE_FROST_GRENADE, true);
                 }
                 GrenadeTimer = 30000;
-            } else GrenadeTimer -= diff;
+            }
+            else GrenadeTimer -= diff;
 
             if (CheckTimer <= diff)
             {
@@ -348,7 +352,8 @@ public:
                 }
 
                 CheckTimer = 1000;
-            } else CheckTimer -= diff;
+            }
+            else CheckTimer -= diff;
         }
 
     private:
@@ -372,7 +377,7 @@ public:
 
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_GET_MOONSTONE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         SendGossipMenuFor(player, 10811, creature->GetGUID());
-        
+
         return true;
     }
 
@@ -397,7 +402,7 @@ public:
         bool WeMustDie;
         uint32 WeMustDieTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->SetHover(true);
             me->SetSwim(true);
@@ -406,11 +411,11 @@ public:
             WeMustDieTimer = 1000;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void AttackStart(Unit* /*who*/) { }
+        void AttackStart(Unit* /*who*/) override { }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!who)
                 return;
@@ -423,7 +428,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (WeMustDie)
             {
@@ -436,7 +441,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_depth_chargeAI(creature);
     }

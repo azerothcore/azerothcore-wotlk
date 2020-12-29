@@ -10,6 +10,9 @@
 #include <chrono>
 #include <system_error>
 
+#ifdef WIN32
+#include <windows.h>
+#endif // WIN32
 using namespace acore;
 
 Thread::Thread() : m_task(nullptr), m_iThreadId(), m_ThreadImp()
@@ -88,13 +91,27 @@ void Thread::setPriority(Priority priority)
     switch (priority)
     {
 #ifdef WIN32
-        case Priority_Realtime: _ok = SetThreadPriority(handle, THREAD_PRIORITY_TIME_CRITICAL); break;
-        case Priority_Highest: _ok = SetThreadPriority(handle, THREAD_PRIORITY_HIGHEST);       break;
-        case Priority_High: _ok = SetThreadPriority(handle, THREAD_PRIORITY_ABOVE_NORMAL);  break;
-        case Priority_Normal: _ok = SetThreadPriority(handle, THREAD_PRIORITY_NORMAL);        break;
-        case Priority_Low: _ok = SetThreadPriority(handle, THREAD_PRIORITY_BELOW_NORMAL);  break;
-        case Priority_Lowest: _ok = SetThreadPriority(handle, THREAD_PRIORITY_LOWEST);        break;
-        case Priority_Idle: _ok = SetThreadPriority(handle, THREAD_PRIORITY_IDLE);          break;
+        case Priority_Realtime:
+            _ok = SetThreadPriority(handle, THREAD_PRIORITY_TIME_CRITICAL);
+            break;
+        case Priority_Highest:
+            _ok = SetThreadPriority(handle, THREAD_PRIORITY_HIGHEST);
+            break;
+        case Priority_High:
+            _ok = SetThreadPriority(handle, THREAD_PRIORITY_ABOVE_NORMAL);
+            break;
+        case Priority_Normal:
+            _ok = SetThreadPriority(handle, THREAD_PRIORITY_NORMAL);
+            break;
+        case Priority_Low:
+            _ok = SetThreadPriority(handle, THREAD_PRIORITY_BELOW_NORMAL);
+            break;
+        case Priority_Lowest:
+            _ok = SetThreadPriority(handle, THREAD_PRIORITY_LOWEST);
+            break;
+        case Priority_Idle:
+            _ok = SetThreadPriority(handle, THREAD_PRIORITY_IDLE);
+            break;
 #endif
         default:
             break;

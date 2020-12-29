@@ -41,7 +41,7 @@ WardenWin::~WardenWin()
     sLog->outDebug(LOG_FILTER_POOLSYS, "IM DESTRUCTING MYSELF QQ, OTHERSIZE: %u, OTHEREM: %u, MEMSIZE: %u, MEMEM: %u, CURSIZE: %u, CUREM: %u!\n", otherSize, otherClear, memSize, memClear, curSize, curClear);
 }
 
-void WardenWin::Init(WorldSession* session, BigNumber *k)
+void WardenWin::Init(WorldSession* session, BigNumber* k)
 {
     _session = session;
     // Generate Warden Key
@@ -72,7 +72,7 @@ void WardenWin::Init(WorldSession* session, BigNumber *k)
 
 ClientWardenModule* WardenWin::GetModuleForClient()
 {
-    ClientWardenModule *mod = new ClientWardenModule;
+    ClientWardenModule* mod = new ClientWardenModule;
 
     uint32 length = sizeof(Module.Module);
 
@@ -156,7 +156,7 @@ void WardenWin::RequestHash()
     _session->SendPacket(&pkt);
 }
 
-void WardenWin::HandleHashResult(ByteBuffer &buff)
+void WardenWin::HandleHashResult(ByteBuffer& buff)
 {
     buff.rpos(buff.wpos());
 
@@ -221,7 +221,8 @@ void WardenWin::RequestData()
         if (id != 786 /*WPE PRO*/ && id != 209 /*WoWEmuHacker*/)
             _currentChecks.push_back(id);
     }
-    _currentChecks.push_back(786); _currentChecks.push_back(209);
+    _currentChecks.push_back(786);
+    _currentChecks.push_back(209);
 
     ByteBuffer buff;
     buff << uint8(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
@@ -274,42 +275,42 @@ void WardenWin::RequestData()
         switch (type)
         {
             case MEM_CHECK:
-            {
-                buff << uint8(0x00);
-                buff << uint32(wd->Address);
-                buff << uint8(wd->Length);
-                break;
-            }
+                {
+                    buff << uint8(0x00);
+                    buff << uint32(wd->Address);
+                    buff << uint8(wd->Length);
+                    break;
+                }
             case PAGE_CHECK_A:
             case PAGE_CHECK_B:
-            {
-                buff.append(wd->Data.AsByteArray(0, false).get(), wd->Data.GetNumBytes());
-                buff << uint32(wd->Address);
-                buff << uint8(wd->Length);
-                break;
-            }
+                {
+                    buff.append(wd->Data.AsByteArray(0, false).get(), wd->Data.GetNumBytes());
+                    buff << uint32(wd->Address);
+                    buff << uint8(wd->Length);
+                    break;
+                }
             case MPQ_CHECK:
             case LUA_STR_CHECK:
-            {
-                buff << uint8(index++);
-                break;
-            }
+                {
+                    buff << uint8(index++);
+                    break;
+                }
             case DRIVER_CHECK:
-            {
-                buff.append(wd->Data.AsByteArray(0, false).get(), wd->Data.GetNumBytes());
-                buff << uint8(index++);
-                break;
-            }
+                {
+                    buff.append(wd->Data.AsByteArray(0, false).get(), wd->Data.GetNumBytes());
+                    buff << uint8(index++);
+                    break;
+                }
             case MODULE_CHECK:
-            {
-                uint32 seed = rand32();
-                buff << uint32(seed);
-                HmacHash hmac(4, (uint8*)&seed);
-                hmac.UpdateData(wd->Str);
-                hmac.Finalize();
-                buff.append(hmac.GetDigest(), hmac.GetLength());
-                break;
-            }
+                {
+                    uint32 seed = rand32();
+                    buff << uint32(seed);
+                    HmacHash hmac(4, (uint8*)&seed);
+                    hmac.UpdateData(wd->Str);
+                    hmac.Finalize();
+                    buff.append(hmac.GetDigest(), hmac.GetLength());
+                    break;
+                }
             /*case PROC_CHECK:
             {
                 buff.append(wd->i.AsByteArray(0, false).get(), wd->i.GetNumBytes());
@@ -345,7 +346,7 @@ void WardenWin::RequestData()
 #endif
 }
 
-void WardenWin::HandleData(ByteBuffer &buff)
+void WardenWin::HandleData(ByteBuffer& buff)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Handle data");
@@ -397,8 +398,8 @@ void WardenWin::HandleData(ByteBuffer &buff)
 #endif
     }
 
-    WardenCheckResult *rs;
-    WardenCheck *rd;
+    WardenCheckResult* rs;
+    WardenCheck* rd;
     uint8 type;
     uint16 checkFailed = 0;
 
@@ -413,133 +414,133 @@ void WardenWin::HandleData(ByteBuffer &buff)
         switch (type)
         {
             case MEM_CHECK:
-            {
-                uint8 Mem_Result;
-                buff >> Mem_Result;
-
-                if (Mem_Result != 0)
                 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MEM_CHECK not 0x00, CheckId %u account Id %u", *itr, _session->GetAccountId());
-#endif
-                    checkFailed = *itr;
-                    continue;
-                }
+                    uint8 Mem_Result;
+                    buff >> Mem_Result;
 
-                if (memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false).get(), rd->Length) != 0)
-                {
+                    if (Mem_Result != 0)
+                    {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MEM_CHECK fail CheckId %u account Id %u", *itr, _session->GetAccountId());
+                        sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MEM_CHECK not 0x00, CheckId %u account Id %u", *itr, _session->GetAccountId());
 #endif
-                    checkFailed = *itr;
+                        checkFailed = *itr;
+                        continue;
+                    }
+
+                    if (memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false).get(), rd->Length) != 0)
+                    {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                        sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MEM_CHECK fail CheckId %u account Id %u", *itr, _session->GetAccountId());
+#endif
+                        checkFailed = *itr;
+                        buff.rpos(buff.rpos() + rd->Length);
+                        continue;
+                    }
+
                     buff.rpos(buff.rpos() + rd->Length);
-                    continue;
-                }
-
-                buff.rpos(buff.rpos() + rd->Length);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MEM_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MEM_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
 #endif
-                break;
-            }
+                    break;
+                }
             case PAGE_CHECK_A:
             case PAGE_CHECK_B:
             case DRIVER_CHECK:
             case MODULE_CHECK:
-            {
-                const uint8 byte = 0xE9;
-                if (memcmp(buff.contents() + buff.rpos(), &byte, sizeof(uint8)) != 0)
                 {
+                    const uint8 byte = 0xE9;
+                    if (memcmp(buff.contents() + buff.rpos(), &byte, sizeof(uint8)) != 0)
+                    {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                        if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)
+                            sLog->outDebug(LOG_FILTER_WARDEN, "RESULT PAGE_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+
+                        if (type == MODULE_CHECK)
+                            sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MODULE_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+
+                        if (type == DRIVER_CHECK)
+                            sLog->outDebug(LOG_FILTER_WARDEN, "RESULT DRIVER_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+#endif
+                        checkFailed = *itr;
+                        buff.rpos(buff.rpos() + 1);
+                        continue;
+                    }
+
+                    buff.rpos(buff.rpos() + 1);
+
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                     if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)
-                        sLog->outDebug(LOG_FILTER_WARDEN, "RESULT PAGE_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
-
-                    if (type == MODULE_CHECK)
-                        sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MODULE_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
-
-                    if (type == DRIVER_CHECK)
-                        sLog->outDebug(LOG_FILTER_WARDEN, "RESULT DRIVER_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                        sLog->outDebug(LOG_FILTER_WARDEN, "RESULT PAGE_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    else if (type == MODULE_CHECK)
+                        sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MODULE_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    else if (type == DRIVER_CHECK)
+                        sLog->outDebug(LOG_FILTER_WARDEN, "RESULT DRIVER_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
 #endif
-                    checkFailed = *itr;
-                    buff.rpos(buff.rpos() + 1);
-                    continue;
+                    break;
                 }
-
-                buff.rpos(buff.rpos() + 1);
-
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)
-                sLog->outDebug(LOG_FILTER_WARDEN, "RESULT PAGE_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
-            else if (type == MODULE_CHECK)
-                sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MODULE_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
-            else if (type == DRIVER_CHECK)
-                sLog->outDebug(LOG_FILTER_WARDEN, "RESULT DRIVER_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
-#endif
-                break;
-            }
             case LUA_STR_CHECK:
-            {
-                uint8 Lua_Result;
-                buff >> Lua_Result;
-
-                if (Lua_Result != 0)
                 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_WARDEN, "RESULT LUA_STR_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
-#endif
-                    checkFailed = *itr;
-                    continue;
-                }
+                    uint8 Lua_Result;
+                    buff >> Lua_Result;
 
-                uint8 luaStrLen;
-                buff >> luaStrLen;
+                    if (Lua_Result != 0)
+                    {
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                        sLog->outDebug(LOG_FILTER_WARDEN, "RESULT LUA_STR_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+#endif
+                        checkFailed = *itr;
+                        continue;
+                    }
 
-                if (luaStrLen != 0)
-                {
-                    char *str = new char[luaStrLen + 1];
-                    memcpy(str, buff.contents() + buff.rpos(), luaStrLen);
-                    str[luaStrLen] = '\0'; // null terminator
+                    uint8 luaStrLen;
+                    buff >> luaStrLen;
+
+                    if (luaStrLen != 0)
+                    {
+                        char* str = new char[luaStrLen + 1];
+                        memcpy(str, buff.contents() + buff.rpos(), luaStrLen);
+                        str[luaStrLen] = '\0'; // null terminator
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_WARDEN, "Lua string: %s", str);
+                        sLog->outDebug(LOG_FILTER_WARDEN, "Lua string: %s", str);
 #endif
-                    delete[] str;
+                        delete[] str;
+                    }
+                    buff.rpos(buff.rpos() + luaStrLen);         // Skip string
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                    sLog->outDebug(LOG_FILTER_WARDEN, "RESULT LUA_STR_CHECK passed, CheckId %u account Id %u", *itr, _session->GetAccountId());
+#endif
+                    break;
                 }
-                buff.rpos(buff.rpos() + luaStrLen);         // Skip string
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_WARDEN, "RESULT LUA_STR_CHECK passed, CheckId %u account Id %u", *itr, _session->GetAccountId());
-#endif
-                break;
-            }
             case MPQ_CHECK:
-            {
-                uint8 Mpq_Result;
-                buff >> Mpq_Result;
-
-                if (Mpq_Result != 0)
                 {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MPQ_CHECK not 0x00 account id %u", _session->GetAccountId());
-#endif
-                    checkFailed = *itr;
-                    continue;
-                }
+                    uint8 Mpq_Result;
+                    buff >> Mpq_Result;
 
-                if (memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false).get(), 20) != 0) // SHA1
-                {
+                    if (Mpq_Result != 0)
+                    {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MPQ_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                        sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MPQ_CHECK not 0x00 account id %u", _session->GetAccountId());
 #endif
-                    checkFailed = *itr;
-                    buff.rpos(buff.rpos() + 20);            // 20 bytes SHA1
-                    continue;
-                }
+                        checkFailed = *itr;
+                        continue;
+                    }
 
-                buff.rpos(buff.rpos() + 20);                // 20 bytes SHA1
+                    if (memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false).get(), 20) != 0) // SHA1
+                    {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MPQ_CHECK passed, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                        sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MPQ_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
 #endif
-                break;
-            }
+                        checkFailed = *itr;
+                        buff.rpos(buff.rpos() + 20);            // 20 bytes SHA1
+                        continue;
+                    }
+
+                    buff.rpos(buff.rpos() + 20);                // 20 bytes SHA1
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+                    sLog->outDebug(LOG_FILTER_WARDEN, "RESULT MPQ_CHECK passed, CheckId %u account Id %u", *itr, _session->GetAccountId());
+#endif
+                    break;
+                }
             default:                                        // Should never happen
                 break;
         }

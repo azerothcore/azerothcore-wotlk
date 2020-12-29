@@ -291,9 +291,9 @@ enum AcoreStrings
     LANG_COMMAND_WHISPERON              = 285,
     LANG_COMMAND_WHISPEROFF             = 286,
     LANG_COMMAND_CREATGUIDNOTFOUND      = 287,
-      // TICKET STRINGS NEED REWRITE // 288-296 FREE
+    // TICKET STRINGS NEED REWRITE // 288-296 FREE
 
-      // END
+    // END
     LANG_COMMAND_WANDER_DISTANCE        = 297,
     LANG_COMMAND_SPAWNTIME              = 298,
     LANG_COMMAND_MODIFY_HONOR           = 299,
@@ -689,13 +689,13 @@ enum AcoreStrings
 
     LANG_BG_QUEUE_ANNOUNCE_SELF         = 711,
     LANG_BG_QUEUE_ANNOUNCE_WORLD        = 712,
-//                                      = 713, not used
-//                                      = 714, see LANG_PINFO_MAP_ONLINE
+    //                                      = 713, not used
+    //                                      = 714, see LANG_PINFO_MAP_ONLINE
     LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
-//                                      = 716, see LANG_PINFO_MAP_OFFLINE
+    //                                      = 716, see LANG_PINFO_MAP_OFFLINE
     LANG_BG_STARTED_ANNOUNCE_WORLD      = 717,
-    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN= 718,
-    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT= 719,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN = 718,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT = 719,
 
     LANG_BG_GROUP_TOO_LARGE             = 720,              // "Your group is too large for this battleground. Please regroup to join."
     LANG_ARENA_GROUP_TOO_LARGE          = 721,              // "Your group is too large for this arena. Please regroup to join."
@@ -703,7 +703,7 @@ enum AcoreStrings
     LANG_ARENA_NOT_ENOUGH_PLAYERS       = 723,              // "Your group does not have enough players to join this match."
     LANG_ARENA_GOLD_WINS                = 724,              // "The Gold Team wins!"
     LANG_ARENA_GREEN_WINS               = 725,              // "The Green Team wins!"
-//                                      = 726, not used
+    //                                      = 726, not used
     LANG_BG_GROUP_OFFLINE_MEMBER        = 727,              // "Your group has an offline member. Please remove him before joining."
     LANG_BG_GROUP_MIXED_FACTION         = 728,              // "Your group has players from the opposing faction. You can't join the battleground as a group."
     LANG_BG_GROUP_MIXED_LEVELS          = 729,              // "Your group has players from different battleground brakets. You can't join as group."
@@ -727,13 +727,13 @@ enum AcoreStrings
     LANG_DIST_ARENA_POINTS_END          = 746,
     LANG_BG_DISABLED                    = 747,
     LANG_ARENA_DISABLED                 = 748,
-//                                      = 749, see LANG_PINFO_ACC_OS
+    //                                      = 749, see LANG_PINFO_ACC_OS
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING = 750,       // "Not enough players. This game will close in %u mins."
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS = 751,  // "Not enough players. This game will close in %u seconds."
-//                                      = 752, see LANG_PINFO_ACC_IP
-//  LANG_BG_WS_START_TWO_MINUTES        = 753, - defined above
-//  LANG_BG_AB_START_TWO_MINUTES        = 754, - defined above
-//  LANG_BG_EY_START_TWO_MINUTES        = 755, - defined above
+    //                                      = 752, see LANG_PINFO_ACC_IP
+    //  LANG_BG_WS_START_TWO_MINUTES        = 753, - defined above
+    //  LANG_BG_AB_START_TWO_MINUTES        = 754, - defined above
+    //  LANG_BG_EY_START_TWO_MINUTES        = 755, - defined above
 
     // Room for BG/ARENA                = 773-784, 788-799 not used
     LANG_ARENA_TESTING                  = 785,
@@ -1098,7 +1098,7 @@ enum AcoreStrings
     LANG_BATTLEGROUND                   = 5015,
     LANG_ARENA                          = 5016,
     LANG_RAID                           = 5017,
-                                        //= 5018,
+    //= 5018,
     LANG_COMMAND_TEMP_FROZEN_PLAYER     = 5019,
     LANG_NPCINFO_PHASEMASK              = 5020,
     LANG_NPCINFO_ARMOR                  = 5021,
@@ -1290,7 +1290,7 @@ enum AcoreStrings
     LANG_BAN_CHARACTER_YOUPERMBANNEDMESSAGE_WORLD = 11005,
     LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD       = 11006,
     LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD   = 11007,
-    
+
 
     LANG_NPCINFO_INHABIT_TYPE                     = 11008,
     LANG_NPCINFO_FLAGS_EXTRA                      = 11009,
@@ -1304,7 +1304,7 @@ enum AcoreStrings
     LANG_SELECT_PLAYER_OR_PET                     = 11016,
 
     // Continue show Ban in world (ip)
-    LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD       	    = 11017,	
+    LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD       	    = 11017,
     LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD   	    = 11018,
 
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour

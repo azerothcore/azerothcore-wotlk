@@ -16,6 +16,11 @@ RUN ./azerothcore/bin/acore-db-asm 1
 
 FROM mysql:5.7
 
+# List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+# set timezone environment variable
+ENV TZ=Etc/UTC
+
 ENV LANG C.UTF-8
 
 # copy files from the previous build stage - see: https://docs.docker.com/develop/develop-images/multistage-build/

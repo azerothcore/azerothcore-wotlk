@@ -19,7 +19,7 @@ typedef unsigned __int32   uint32;
 typedef unsigned __int16   uint16;
 typedef unsigned __int8    uint8;
 #else
-#include <stdint.h>
+#include <cstdint>
 #ifndef uint64_t
 #ifdef __linux__
 #include <linux/types.h>
@@ -48,7 +48,8 @@ union u_map_fcc
 //
 struct file_MVER
 {
-    union{
+    union
+    {
         uint32 fcc;
         char   fcc_txt[4];
     };
@@ -56,15 +57,16 @@ struct file_MVER
     uint32 ver;
 };
 
-class FileLoader{
-    uint8  *data;
+class FileLoader
+{
+    uint8*  data;
     uint32  data_size;
 public:
     virtual bool prepareLoadedData();
-    uint8 *GetData()     {return data;}
+    uint8* GetData()     {return data;}
     uint32 GetDataSize() {return data_size;}
 
-    file_MVER *version;
+    file_MVER* version;
     FileLoader();
     ~FileLoader();
     bool loadFile(std::string const& filename, bool log = true);

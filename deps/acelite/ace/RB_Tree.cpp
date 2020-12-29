@@ -17,6 +17,11 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
+ACE_ALLOC_HOOK_DEFINE_Tc4(ACE_RB_Tree)
+ACE_ALLOC_HOOK_DEFINE_Tc4(ACE_RB_Tree_Iterator_Base)
+ACE_ALLOC_HOOK_DEFINE_Tc4(ACE_RB_Tree_Iterator)
+ACE_ALLOC_HOOK_DEFINE_Tc4(ACE_RB_Tree_Reverse_Iterator)
+
 // Constructor.
 
 template <class EXT_ID, class INT_ID>
@@ -1094,8 +1099,6 @@ ACE_RB_Tree<EXT_ID, INT_ID, COMPARE_KEYS, ACE_LOCK>::remove_i (ACE_RB_Tree_Node<
   return 0;
 }
 
-ACE_ALLOC_HOOK_DEFINE(ACE_RB_Tree_Iterator_Base)
-
 // Constructor.
 
 template <class EXT_ID, class INT_ID, class COMPARE_KEYS, class ACE_LOCK>
@@ -1174,8 +1177,6 @@ ACE_RB_Tree_Iterator_Base<EXT_ID, INT_ID, COMPARE_KEYS, ACE_LOCK>::dump_i (void)
 }
 
 
-ACE_ALLOC_HOOK_DEFINE(ACE_RB_Tree_Iterator)
-
 // Constructor.
 
 template <class EXT_ID, class INT_ID, class COMPARE_KEYS, class ACE_LOCK>
@@ -1209,7 +1210,6 @@ ACE_RB_Tree_Iterator<EXT_ID, INT_ID, COMPARE_KEYS, ACE_LOCK>::~ACE_RB_Tree_Itera
   ACE_TRACE ("ACE_RB_Tree_Iterator<EXT_ID, INT_ID, COMPARE_KEYS, ACE_LOCK>::~ACE_RB_Tree_Iterator");
 }
 
-ACE_ALLOC_HOOK_DEFINE(ACE_RB_Tree_Reverse_Iterator)
 
 // Constructor.
 

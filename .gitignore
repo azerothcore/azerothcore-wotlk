@@ -3,7 +3,7 @@
 #
 
 conf/*
-!conf/*.dist
+!conf/dist
 apps/drassil/*
 env/dist/*
 env/user/*
@@ -24,6 +24,7 @@ docker/worldserver/logs/
 docker/worldserver/data/
 !docker/build
 .env
+apps/joiner
 
 !.gitkeep
 
@@ -61,6 +62,8 @@ nbproject/
 .vscode
 .idea
 cmake-build-debug/*
+cmake-build-debug-coverage/*
+coverage-report/
 
 #
 # Eclipse

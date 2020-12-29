@@ -4,6 +4,10 @@
 #include "ace/Free_List.h"
 #include "ace/Guard_T.h"
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
 #if !defined (ACE_LACKS_PRAGMA_ONCE)
 # pragma once
 #endif /* ACE_LACKS_PRAGMA_ONCE */
@@ -155,6 +159,8 @@ ACE_Locked_Free_List<T, ACE_LOCK>::dealloc (size_t n)
       this->size_--;
     }
 }
+
+ACE_ALLOC_HOOK_DEFINE_Tcc(ACE_Locked_Free_List)
 
 ACE_END_VERSIONED_NAMESPACE_DECL
 

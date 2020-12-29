@@ -37,8 +37,6 @@ class ACE_Time_Value_T : public ACE_Time_Value
 public:
   typedef TIME_POLICY time_policy_t;
 
-  // = Initialization methods.
-
   /// Default Constructor.
   ACE_Time_Value_T (void) {}
 

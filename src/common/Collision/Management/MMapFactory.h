@@ -28,12 +28,12 @@ namespace MMAP
     // access point to MMapManager singleton
     class MMapFactory
     {
-        public:
-            static MMapManager* createOrGetMMapManager();
-            static void clear();
-            static bool IsPathfindingEnabled(const Map* map);
-            static void InitializeDisabledMaps();
-            static bool forbiddenMaps[1000];
+    public:
+        static MMapManager* createOrGetMMapManager();
+        static void clear();
+        static bool IsPathfindingEnabled(const Map* map);
+        static void InitializeDisabledMaps();
+        static bool forbiddenMaps[1000];
     };
 }
 

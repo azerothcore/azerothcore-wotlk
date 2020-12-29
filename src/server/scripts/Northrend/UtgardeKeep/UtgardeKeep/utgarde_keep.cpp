@@ -13,25 +13,25 @@ class npc_dragonflayer_forge_master : public CreatureScript
 public:
     npc_dragonflayer_forge_master() : CreatureScript("npc_dragonflayer_forge_master") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_dragonflayer_forge_masterAI(pCreature);
     }
 
     struct npc_dragonflayer_forge_masterAI : public ScriptedAI
     {
-        npc_dragonflayer_forge_masterAI(Creature *c) : ScriptedAI(c)
+        npc_dragonflayer_forge_masterAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
 
             float x = me->GetHomePosition().GetPositionX();
             float y = me->GetHomePosition().GetPositionY();
-            if (x>344.0f && x<357.0f && y<-35.0f && y>-44.0f)
+            if (x > 344.0f && x < 357.0f && y < -35.0f && y > -44.0f)
             {
                 dataId = DATA_FORGE_1;
                 prevDataId = 0;
             }
-            else if (x>380.0f && x<389.0f && y<-12.0f && y>-21.0f)
+            else if (x > 380.0f && x < 389.0f && y < -12.0f && y > -21.0f)
             {
                 dataId = DATA_FORGE_2;
                 prevDataId = DATA_FORGE_1;
@@ -47,20 +47,20 @@ public:
         uint32 dataId;
         uint32 prevDataId;
 
-        void Reset()
+        void Reset() override
         {
             if (pInstance)
                 pInstance->SetData(dataId, NOT_STARTED);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
                 pInstance->SetData(dataId, DONE);
             me->SaveRespawnTime();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if (pInstance)
             {
@@ -108,7 +108,7 @@ public:
             _setData = false;
         }
 
-        void Reset()
+        void Reset() override
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_REND, urand(2000, 3000));
@@ -116,7 +116,7 @@ public:
             _events.ScheduleEvent(EVENT_KNOCKAWAY, urand(3500, 6000));
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == WAYPOINT_MOTION_TYPE && id == POINT_LAST)
             {
@@ -134,7 +134,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (type == TYPE_PROTODRAKE_AT && data == DATA_PROTODRAKE_MOVE && !_setData && me->IsAlive() && me->GetDistance(protodrakeCheckPos) < 10.0f)
             {
@@ -146,7 +146,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -186,7 +186,7 @@ public:
 
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_enslaved_proto_drakeAI(creature);
     }
@@ -199,36 +199,36 @@ enum TickingTimeBomb
 
 class spell_ticking_time_bomb : public SpellScriptLoader
 {
-    public:
-        spell_ticking_time_bomb() : SpellScriptLoader("spell_ticking_time_bomb") { }
+public:
+    spell_ticking_time_bomb() : SpellScriptLoader("spell_ticking_time_bomb") { }
 
-        class spell_ticking_time_bomb_AuraScript : public AuraScript
+    class spell_ticking_time_bomb_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_ticking_time_bomb_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellEntry*/) override
         {
-            PrepareAuraScript(spell_ticking_time_bomb_AuraScript);
-
-            bool Validate(SpellInfo const* /*spellEntry*/)
-            {
-                return (bool) sSpellMgr->GetSpellInfo(SPELL_TICKING_TIME_BOMB_EXPLODE);
-            }
-
-            void HandleOnEffectRemove(AuraEffect const* /* aurEff */, AuraEffectHandleModes /* mode */)
-            {
-                if (GetCaster() == GetTarget())
-                {
-                    GetTarget()->CastSpell(GetTarget(), SPELL_TICKING_TIME_BOMB_EXPLODE, true);
-                }
-            }
-
-            void Register()
-            {
-                OnEffectRemove += AuraEffectRemoveFn(spell_ticking_time_bomb_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const
-        {
-            return new spell_ticking_time_bomb_AuraScript();
+            return (bool) sSpellMgr->GetSpellInfo(SPELL_TICKING_TIME_BOMB_EXPLODE);
         }
+
+        void HandleOnEffectRemove(AuraEffect const* /* aurEff */, AuraEffectHandleModes /* mode */)
+        {
+            if (GetCaster() == GetTarget())
+            {
+                GetTarget()->CastSpell(GetTarget(), SPELL_TICKING_TIME_BOMB_EXPLODE, true);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_ticking_time_bomb_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_ticking_time_bomb_AuraScript();
+    }
 };
 
 void AddSC_utgarde_keep()

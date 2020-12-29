@@ -24,6 +24,13 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
+ACE_ALLOC_HOOK_DEFINE_Tc5(ACE_Hash_Multi_Map_Manager)
+ACE_ALLOC_HOOK_DEFINE_Tc5(ACE_Hash_Multi_Map_Iterator_Base)
+ACE_ALLOC_HOOK_DEFINE_Tc5(ACE_Hash_Multi_Map_Const_Iterator_Base)
+ACE_ALLOC_HOOK_DEFINE_Tc5(ACE_Hash_Multi_Map_Iterator)
+ACE_ALLOC_HOOK_DEFINE_Tc5(ACE_Hash_Multi_Map_Const_Iterator)
+ACE_ALLOC_HOOK_DEFINE_Tc5(ACE_Hash_Multi_Map_Reverse_Iterator)
+
 template <class EXT_ID, class INT_ID>
 ACE_Hash_Multi_Map_Entry<EXT_ID, INT_ID>::ACE_Hash_Multi_Map_Entry (ACE_Hash_Multi_Map_Entry<EXT_ID, INT_ID> *next,
                                                                     ACE_Hash_Multi_Map_Entry<EXT_ID, INT_ID> *prev)
@@ -448,8 +455,6 @@ ACE_Hash_Multi_Map_Manager<EXT_ID, INT_ID, HASH_KEY, COMPARE_KEYS, ACE_LOCK>::re
 
 // ------------------------------------------------------------
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Hash_Multi_Map_Iterator_Base)
-
 template <class EXT_ID, class INT_ID, class HASH_KEY, class COMPARE_KEYS, class ACE_LOCK> void
 ACE_Hash_Multi_Map_Iterator_Base<EXT_ID, INT_ID, HASH_KEY, COMPARE_KEYS, ACE_LOCK>::dump_i (void) const
 {
@@ -521,8 +526,6 @@ ACE_Hash_Multi_Map_Iterator_Base<EXT_ID, INT_ID, HASH_KEY, COMPARE_KEYS, ACE_LOC
 }
 
 // ------------------------------------------------------------
-
-ACE_ALLOC_HOOK_DEFINE(ACE_Hash_Multi_Map_Const_Iterator_Base)
 
 template <class EXT_ID, class INT_ID, class HASH_KEY, class COMPARE_KEYS, class ACE_LOCK> void
 ACE_Hash_Multi_Map_Const_Iterator_Base<EXT_ID, INT_ID, HASH_KEY, COMPARE_KEYS, ACE_LOCK>::dump_i (void) const

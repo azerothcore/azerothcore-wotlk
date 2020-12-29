@@ -86,7 +86,7 @@ public:
         if (!*args)
             return false;
 
-         // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
+        // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
         GameTele const* tele = handler->extractGameTeleFromLink((char*)args);
         if (!tele)
         {
@@ -119,7 +119,6 @@ public:
         {
             if (target)
                 target->TeleportTo(target->m_homebindMapId, target->m_homebindX, target->m_homebindY, target->m_homebindZ, target->GetOrientation());
-            /* xinef: optimization, not needed function
             else
             {
                 PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_HOMEBIND);
@@ -137,7 +136,7 @@ public:
 
                     Player::SavePositionInDB(mapId, posX, posY, posZ, 0, zoneId, target_guid);
                 }
-            }*/
+            }
 
             return true;
         }
@@ -192,7 +191,7 @@ public:
 
             handler->PSendSysMessage(LANG_TELEPORTING_TO, nameLink.c_str(), handler->GetAcoreString(LANG_OFFLINE), tele->name.c_str());
             Player::SavePositionInDB(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation,
-                sMapMgr->GetZoneId(tele->mapId, tele->position_x, tele->position_y, tele->position_z), target_guid);
+                                     sMapMgr->GetZoneId(tele->mapId, tele->position_x, tele->position_y, tele->position_z), target_guid);
         }
 
         return true;

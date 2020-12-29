@@ -122,7 +122,7 @@ protected:
  * @brief A manager for asynchronous event demultiplexing.
  *
  * See the Proactor pattern description at
- * http://www.cs.wustl.edu/~schmidt/proactor.ps.gz for more
+ * http://www.dre.vanderbilt.edu/~schmidt/PDF/proactor.pdf for more
  * details.
  */
 class ACE_Export ACE_Proactor

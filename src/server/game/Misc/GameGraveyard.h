@@ -30,12 +30,12 @@ class Graveyard
 public:
     static Graveyard* instance();
 
-    typedef std::unordered_map<uint32, GraveyardStruct> GraveyardContainer;    
+    typedef std::unordered_map<uint32, GraveyardStruct> GraveyardContainer;
 
     GraveyardStruct const* GetGraveyard(uint32 ID) const;
     GraveyardStruct const* GetGraveyard(const std::string& name) const;
     GraveyardStruct const* GetDefaultGraveyard(TeamId teamId);
-    GraveyardStruct const* GetClosestGraveyard(float x, float y, float z, uint32 MapId, TeamId teamId);    
+    GraveyardStruct const* GetClosestGraveyard(float x, float y, float z, uint32 MapId, TeamId teamId);
     GraveyardData const* FindGraveyardData(uint32 id, uint32 zone);
     GraveyardContainer const& GetGraveyardData() const { return _graveyardStore; }
     bool AddGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, bool persist = true);

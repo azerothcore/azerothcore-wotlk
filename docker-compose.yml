@@ -22,6 +22,7 @@ services:
     stdin_open: true
     tty: true
     restart: unless-stopped
+    privileged: true
     build:
       context: ./docker/worldserver
       dockerfile: Dockerfile

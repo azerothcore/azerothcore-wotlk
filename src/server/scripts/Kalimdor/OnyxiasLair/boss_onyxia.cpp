@@ -74,13 +74,13 @@ static sOnyxMove OnyxiaMoveData[] =
 {
     {0, 0, 0, -64.496f, -214.906f, -84.4f, 0.0f}, // south ground
     {1, 5, SPELL_BREATH_S_TO_N, -64.496f, -214.906f, -60.0f, 0.0f}, // south
-    {2, 6, SPELL_BREATH_SW_TO_NE, -59.809f, -190.758f, -60.0f, 7*M_PI/4}, // south-west
-    {3, 7, SPELL_BREATH_W_TO_E, -29.450f, -180.600f, -60.0f, M_PI+M_PI/2}, // west
-    {4, 8, SPELL_BREATH_NW_TO_SE, 6.895f, -180.246f, -60.0f, M_PI+M_PI/4}, // north-west
+    {2, 6, SPELL_BREATH_SW_TO_NE, -59.809f, -190.758f, -60.0f, 7 * M_PI / 4}, // south-west
+    {3, 7, SPELL_BREATH_W_TO_E, -29.450f, -180.600f, -60.0f, M_PI + M_PI / 2}, // west
+    {4, 8, SPELL_BREATH_NW_TO_SE, 6.895f, -180.246f, -60.0f, M_PI + M_PI / 4}, // north-west
     {5, 1, SPELL_BREATH_N_TO_S,  22.876f, -217.152f, -60.0f, M_PI}, // north
-    {6, 2, SPELL_BREATH_NE_TO_SW, 10.2191f, -247.912f, -60.0f, 3*M_PI/4}, // north-east
-    {7, 3, SPELL_BREATH_E_TO_W, -31.496f, -250.123f, -60.0f, M_PI/2}, // east
-    {8, 4, SPELL_BREATH_SE_TO_NW, -63.5156f, -240.096f, -60.0f, M_PI/4}, // south-east
+    {6, 2, SPELL_BREATH_NE_TO_SW, 10.2191f, -247.912f, -60.0f, 3 * M_PI / 4}, // north-east
+    {7, 3, SPELL_BREATH_E_TO_W, -31.496f, -250.123f, -60.0f, M_PI / 2}, // east
+    {8, 4, SPELL_BREATH_SE_TO_NW, -63.5156f, -240.096f, -60.0f, M_PI / 4}, // south-east
 };
 
 enum Yells
@@ -100,7 +100,7 @@ class boss_onyxia : public CreatureScript
 public:
     boss_onyxia() : CreatureScript("boss_onyxia") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_onyxiaAI (pCreature);
     }
@@ -146,7 +146,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             CurrentWP = 0;
             SetPhase(0);
@@ -168,7 +168,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if( me->GetVictim() || me->GetDistance(who) > 30.0f )
                 return;
@@ -177,7 +177,7 @@ public:
                 AttackStart(who);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch( param )
             {
@@ -193,7 +193,7 @@ public:
             me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
@@ -208,22 +208,22 @@ public:
             BindPlayers();
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             if( m_pInstance )
                 m_pInstance->SetData(DATA_ONYXIA, DONE);
         }
 
-        void DamageTaken(Unit*, uint32 & /*damage*/, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
             switch( Phase )
             {
                 case 1:
-                    if( me->GetHealth()*100 / me->GetMaxHealth() <= 65 )
+                    if( me->GetHealth() * 100 / me->GetMaxHealth() <= 65 )
                         SetPhase(2);
                     break;
                 case 2:
-                    if( me->GetHealth()*100 / me->GetMaxHealth() <= 40 )
+                    if( me->GetHealth() * 100 / me->GetMaxHealth() <= 40 )
                     {
                         me->InterruptNonMeleeSpells(false);
                         SetPhase(3);
@@ -232,7 +232,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature *pSummoned)
+        void JustSummoned(Creature* pSummoned) override
         {
             if( !pSummoned )
                 return;
@@ -245,7 +245,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if( type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE )
                 return;
@@ -261,27 +261,27 @@ public:
                 }
             }
             else switch( id )
-            {
-                case 10:
-                    me->SetFacingTo(OnyxiaMoveData[0].o);
-                    events.ScheduleEvent(EVENT_LIFTOFF, 0);
-                    break;
-                case 11:
-                    me->SetFacingTo(OnyxiaMoveData[1].o);
-                    events.ScheduleEvent(EVENT_FLY_S_TO_N, 0);
-                    break;
-                case 12:
-                    me->SetFacingTo(OnyxiaMoveData[1].o);
-                    events.ScheduleEvent(EVENT_LAND, 0);
-                    break;
-                case 13:
-                    me->SetCanFly(false);
-                    me->SetDisableGravity(false);
-                    me->SetHover(false);
-                    me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
-                    events.ScheduleEvent(EVENT_PHASE_3_ATTACK, 0);
-                    break;
-            }
+                {
+                    case 10:
+                        me->SetFacingTo(OnyxiaMoveData[0].o);
+                        events.ScheduleEvent(EVENT_LIFTOFF, 0);
+                        break;
+                    case 11:
+                        me->SetFacingTo(OnyxiaMoveData[1].o);
+                        events.ScheduleEvent(EVENT_FLY_S_TO_N, 0);
+                        break;
+                    case 12:
+                        me->SetFacingTo(OnyxiaMoveData[1].o);
+                        events.ScheduleEvent(EVENT_LAND, 0);
+                        break;
+                    case 13:
+                        me->SetCanFly(false);
+                        me->SetDisableGravity(false);
+                        me->SetHover(false);
+                        me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
+                        events.ScheduleEvent(EVENT_PHASE_3_ATTACK, 0);
+                        break;
+                }
         }
 
         void HandleWhelpSpam(const uint32 diff)
@@ -293,8 +293,8 @@ public:
                     whelpSpamTimer -= diff;
                     if( whelpSpamTimer <= 0 )
                     {
-                        float angle = rand_norm()*2*M_PI;
-                        float dist = rand_norm()*4.0f;
+                        float angle = rand_norm() * 2 * M_PI;
+                        float dist = rand_norm() * 4.0f;
                         me->CastSpell(-33.18f + cos(angle)*dist, -258.80f + sin(angle)*dist, -89.0f, 17646, true);
                         me->CastSpell(-32.535f + cos(angle)*dist, -170.190f + sin(angle)*dist, -89.0f, 17646, true);
                         whelpCount += 2;
@@ -310,7 +310,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -323,7 +323,7 @@ public:
 
             DoMeleeAttackIfReady();
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -358,7 +358,6 @@ public:
                         me->StopMoving();
                         DoResetThreat();
                         me->GetMotionMaster()->MovePoint(10, OnyxiaMoveData[0].x, OnyxiaMoveData[0].y, OnyxiaMoveData[0].z);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_LIFTOFF:
@@ -372,21 +371,20 @@ public:
                         me->SetHover(true);
                         me->SetOrientation(OnyxiaMoveData[0].o);
                         me->SendMovementFlagUpdate();
-                        me->GetMotionMaster()->MoveTakeoff(11, OnyxiaMoveData[1].x+1.0f, OnyxiaMoveData[1].y, OnyxiaMoveData[1].z, 12.0f);
+                        me->GetMotionMaster()->MoveTakeoff(11, OnyxiaMoveData[1].x + 1.0f, OnyxiaMoveData[1].y, OnyxiaMoveData[1].z, 12.0f);
                         bManyWhelpsAvailable = true;
-                        events.PopEvent();
+                        
                         events.RescheduleEvent(EVENT_END_MANY_WHELPS_TIME, 10000);
                     }
                     break;
                 case EVENT_END_MANY_WHELPS_TIME:
                     bManyWhelpsAvailable = false;
-                    events.PopEvent();
                     break;
                 case EVENT_FLY_S_TO_N:
                     {
                         me->SetSpeed(MOVE_RUN, 2.95f, false);
                         me->GetMotionMaster()->MovePoint(5, OnyxiaMoveData[5].x, OnyxiaMoveData[5].y, OnyxiaMoveData[5].z);
-                        events.PopEvent();
+                        
                         whelpSpam = true;
                         events.ScheduleEvent(EVENT_WHELP_SPAM, 90000);
                         events.ScheduleEvent(EVENT_SUMMON_LAIR_GUARD, 30000);
@@ -408,8 +406,7 @@ public:
                     {
                         Talk(SAY_PHASE_3_TRANS);
                         me->SendMeleeAttackStop(me->GetVictim());
-                        me->GetMotionMaster()->MoveLand(13, OnyxiaMoveData[0].x+1.0f, OnyxiaMoveData[0].y, OnyxiaMoveData[0].z, 12.0f);
-                        events.PopEvent();
+                        me->GetMotionMaster()->MoveLand(13, OnyxiaMoveData[0].x + 1.0f, OnyxiaMoveData[0].y, OnyxiaMoveData[0].z, 12.0f);
                         DoResetThreat();
                     }
                     break;
@@ -420,7 +417,7 @@ public:
                             me->SetFacingToObject(v);
                             me->CastSpell(v, SPELL_FIREBALL, false);
                         }
-                        events.PopEvent();
+                        
                         events.ScheduleEvent(EVENT_SPELL_FIREBALL_SECOND, 4000);
                     }
                     break;
@@ -431,7 +428,6 @@ public:
                             me->SetFacingToObject(v);
                             me->CastSpell(v, SPELL_FIREBALL, false);
                         }
-                        events.PopEvent();
 
                         uint8 rand = urand(0, 99);
                         if( rand < 33 )
@@ -448,7 +444,6 @@ public:
                         if( newWP > 8 )
                             newWP = 1;
                         me->GetMotionMaster()->MovePoint(newWP, OnyxiaMoveData[newWP].x, OnyxiaMoveData[newWP].y, OnyxiaMoveData[newWP].z);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_PHASE_2_STEP_ACW:
@@ -457,7 +452,6 @@ public:
                         if( newWP < 1 )
                             newWP = 8;
                         me->GetMotionMaster()->MovePoint(newWP, OnyxiaMoveData[newWP].x, OnyxiaMoveData[newWP].y, OnyxiaMoveData[newWP].z);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_PHASE_2_STEP_ACROSS:
@@ -465,7 +459,7 @@ public:
                         me->SetFacingTo(OnyxiaMoveData[CurrentWP].o);
                         me->MonsterTextEmote("Onyxia takes in a deep breath...", 0, true);
                         me->CastSpell(me, OnyxiaMoveData[CurrentWP].spellId, false);
-                        events.PopEvent();
+                        
                         events.ScheduleEvent(EVENT_SPELL_BREATH, 8250);
                     }
                     break;
@@ -474,20 +468,16 @@ public:
                         uint8 newWP = OnyxiaMoveData[CurrentWP].DestId;
                         me->SetSpeed(MOVE_RUN, 2.95f, false);
                         me->GetMotionMaster()->MovePoint(newWP, OnyxiaMoveData[newWP].x, OnyxiaMoveData[newWP].y, OnyxiaMoveData[newWP].z);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_START_PHASE_3:
                     {
                         me->SetSpeed(MOVE_RUN, 2.95f, false);
                         me->GetMotionMaster()->MovePoint(12, OnyxiaMoveData[1].x, OnyxiaMoveData[1].y, OnyxiaMoveData[1].z);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_PHASE_3_ATTACK:
                     {
-                        events.PopEvent();
-
                         me->SetReactState(REACT_AGGRESSIVE);
                         AttackStart(SelectTarget(SELECT_TARGET_TOPAGGRO, 0, 0, false));
                         me->CastSpell(me, SPELL_BELLOWINGROAR, false);
@@ -512,14 +502,12 @@ public:
                     {
                         if( Creature* trigger = me->SummonCreature(12758, *me, TEMPSUMMON_TIMED_DESPAWN, 1000) )
                             trigger->CastSpell(trigger, 17731, false);
-
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_SUMMON_WHELP:
                     {
-                        float angle = rand_norm()*2*M_PI;
-                        float dist = rand_norm()*4.0f;
+                        float angle = rand_norm() * 2 * M_PI;
+                        float dist = rand_norm() * 4.0f;
                         me->CastSpell(-33.18f + cos(angle)*dist, -258.80f + sin(angle)*dist, -89.0f, 17646, true);
                         me->CastSpell(-32.535f + cos(angle)*dist, -170.190f + sin(angle)*dist, -89.0f, 17646, true);
                         events.RepeatEvent(30000);
@@ -528,7 +516,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (target->GetTypeId() == TYPEID_PLAYER && spell->DurationEntry && spell->DurationEntry->ID == 328 && spell->Effects[EFFECT_1].TargetA.GetTarget() == 1 && (spell->Effects[EFFECT_1].Amplitude == 50 || spell->Effects[EFFECT_1].Amplitude == 215)) // Deep Breath
                 if (m_pInstance)
@@ -542,7 +530,7 @@ class npc_onyxian_lair_guard : public CreatureScript
 public:
     npc_onyxian_lair_guard() : CreatureScript("npc_onyxian_lair_guard") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_onyxian_lair_guardAI (pCreature);
     }
@@ -558,7 +546,7 @@ public:
 
         EventMap events;
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if( me->GetVictim() || me->GetDistance(who) > 20.0f )
                 return;
@@ -567,7 +555,7 @@ public:
                 AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -577,7 +565,7 @@ public:
             if( me->HasUnitState(UNIT_STATE_CASTING) )
                 return;
 
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case 0:
                     break;
@@ -611,7 +599,7 @@ class npc_onyxia_whelp : public CreatureScript
 public:
     npc_onyxia_whelp() : CreatureScript("npc_onyxia_whelp") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_onyxia_whelpAI (pCreature);
     }
@@ -620,7 +608,7 @@ public:
     {
         npc_onyxia_whelpAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 
-        void MoveInLineOfSight(Unit *who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if( me->GetVictim() || me->GetDistance(who) > 20.0f )
                 return;
@@ -636,7 +624,7 @@ class npc_onyxia_trigger : public CreatureScript
 public:
     npc_onyxia_trigger() : CreatureScript("npc_onyxia_trigger") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_onyxia_triggerAI (pCreature);
     }
@@ -645,8 +633,8 @@ public:
     {
         npc_onyxia_triggerAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void UpdateAI(uint32  /*diff*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void UpdateAI(uint32  /*diff*/) override {}
     };
 };
 

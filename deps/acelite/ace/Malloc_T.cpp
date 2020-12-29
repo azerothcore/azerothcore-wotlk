@@ -35,8 +35,13 @@ ACE_Cached_Allocator<T, ACE_LOCK>::ACE_Cached_Allocator (size_t n_chunks)
   // previous versions of ACE
   size_t chunk_size = sizeof (T);
   chunk_size = ACE_MALLOC_ROUNDUP (chunk_size, ACE_MALLOC_ALIGN);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_ALLOCATOR (this->pool_,
+                 static_cast<char*>(ACE_Allocator::instance()->malloc(sizeof(char) * n_chunks * chunk_size)));
+#else
   ACE_NEW (this->pool_,
            char[n_chunks * chunk_size]);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
   for (size_t c = 0;
        c < n_chunks;
@@ -45,15 +50,21 @@ ACE_Cached_Allocator<T, ACE_LOCK>::ACE_Cached_Allocator (size_t n_chunks)
       void* placement = this->pool_ + c * chunk_size;
       this->free_list_.add (new (placement) ACE_Cached_Mem_Pool_Node<T>);
     }
-  // Put into free list using placement contructor, no real memory
+  // Put into free list using placement constructor, no real memory
   // allocation in the above <new>.
 }
 
 template <class T, class ACE_LOCK>
 ACE_Cached_Allocator<T, ACE_LOCK>::~ACE_Cached_Allocator (void)
 {
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free (this->pool_);
+#else
   delete [] this->pool_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
+
+ACE_ALLOC_HOOK_DEFINE_Tcc(ACE_Cached_Allocator)
 
 template <class T, class ACE_LOCK> void *
 ACE_Cached_Allocator<T, ACE_LOCK>::malloc (size_t nbytes)
@@ -62,9 +73,8 @@ ACE_Cached_Allocator<T, ACE_LOCK>::malloc (size_t nbytes)
   if (nbytes > sizeof (T))
     return 0;
 
-  // addr() call is really not absolutely necessary because of the way
-  // ACE_Cached_Mem_Pool_Node's internal structure arranged.
-  return this->free_list_.remove ()->addr ();
+  ACE_Cached_Mem_Pool_Node<T> *allocated = this->free_list_.remove ();
+  return allocated == 0 ? 0 : allocated->addr();
 }
 
 template <class T, class ACE_LOCK> void *
@@ -75,9 +85,8 @@ ACE_Cached_Allocator<T, ACE_LOCK>::calloc (size_t nbytes,
   if (nbytes > sizeof (T))
     return 0;
 
-  // addr() call is really not absolutely necessary because of the way
-  // ACE_Cached_Mem_Pool_Node's internal structure arranged.
-  void *ptr = this->free_list_.remove ()->addr ();
+  ACE_Cached_Mem_Pool_Node<T> *allocated = this->free_list_.remove ();
+  void *ptr = allocated == 0 ? 0 : allocated->addr();
   if (ptr != 0)
     ACE_OS::memset (ptr, initial_value, sizeof (T));
   return ptr;
@@ -117,7 +126,7 @@ ACE_Dynamic_Cached_Allocator<ACE_LOCK>::ACE_Dynamic_Cached_Allocator
 
       this->free_list_.add (new (placement) ACE_Cached_Mem_Pool_Node<char>);
     }
-  // Put into free list using placement contructor, no real memory
+  // Put into free list using placement constructor, no real memory
   // allocation in the above <new>.
 }
 
@@ -136,9 +145,8 @@ ACE_Dynamic_Cached_Allocator<ACE_LOCK>::malloc (size_t nbytes)
   if (nbytes > chunk_size_)
     return 0;
 
-  // addr() call is really not absolutely necessary because of the way
-  // ACE_Cached_Mem_Pool_Node's internal structure arranged.
-  return this->free_list_.remove ()->addr ();
+  ACE_Cached_Mem_Pool_Node<char> *allocated = this->free_list_.remove ();
+  return allocated == 0 ? 0 : allocated->addr();
 }
 
 template <class ACE_LOCK> void *
@@ -149,9 +157,8 @@ ACE_Dynamic_Cached_Allocator<ACE_LOCK>::calloc (size_t nbytes,
   if (nbytes > chunk_size_)
     return 0;
 
-  // addr() call is really not absolutely necessary because of the way
-  // ACE_Cached_Mem_Pool_Node's internal structure arranged.
-  void *ptr = this->free_list_.remove ()->addr ();
+  ACE_Cached_Mem_Pool_Node<char> *allocated = this->free_list_.remove ();
+  void *ptr = allocated == 0 ? 0 : allocated->addr();
   if (ptr != 0)
     ACE_OS::memset (ptr, initial_value, chunk_size_);
   return ptr;
@@ -170,7 +177,7 @@ ACE_Dynamic_Cached_Allocator<ACE_LOCK>::free (void * ptr)
     this->free_list_.add ((ACE_Cached_Mem_Pool_Node<char> *) ptr);
 }
 
-ACE_ALLOC_HOOK_DEFINE (ACE_Malloc_T)
+ACE_ALLOC_HOOK_DEFINE_Tmcc (ACE_Malloc_T)
 
 template <class MALLOC> void *
 ACE_Allocator_Adapter<MALLOC>::malloc (size_t nbytes)
@@ -355,6 +362,8 @@ ACE_Allocator_Adapter<MALLOC>::dump (void) const
 #endif /* ACE_HAS_DUMP */
 }
 
+ACE_ALLOC_HOOK_DEFINE_Tt(ACE_Allocator_Adapter)
+
 template <ACE_MEM_POOL_1, class ACE_LOCK, class ACE_CB> void
 ACE_Malloc_T<ACE_MEM_POOL_2, ACE_LOCK, ACE_CB>::dump (void) const
 {
@@ -503,17 +512,17 @@ ACE_Malloc_T<ACE_MEM_POOL_2, ACE_LOCK, ACE_CB>::ACE_Malloc_T (const ACE_TCHAR *p
 {
   ACE_TRACE ("ACE_Malloc_T<ACE_MEM_POOL_2, ACE_LOCK, ACE_CB>::ACE_Malloc_T");
   this->lock_ = ACE_Malloc_Lock_Adapter_T<ACE_LOCK> ()(pool_name);
-  if (this->lock_ == 0)
-    return;
+  if (this->lock_ != 0)
+    {
+      this->delete_lock_ = true;
 
-  this->delete_lock_ = true;
+      this->bad_flag_ = this->open ();
 
-  this->bad_flag_ = this->open ();
-
-  if (this->bad_flag_ == -1)
-    ACELIB_ERROR ((LM_ERROR,
-                ACE_TEXT ("%p\n"),
-                ACE_TEXT ("ACE_Malloc_T<ACE_MEM_POOL_2, ACE_LOCK, ACE_CB>::ACE_Malloc_T")));
+      if (this->bad_flag_ == -1)
+        ACELIB_ERROR ((LM_ERROR,
+                    ACE_TEXT ("%p\n"),
+                    ACE_TEXT ("ACE_Malloc_T<ACE_MEM_POOL_2, ACE_LOCK, ACE_CB>::ACE_Malloc_T")));
+    }
 }
 
 template <ACE_MEM_POOL_1, class ACE_LOCK, class ACE_CB>
@@ -528,16 +537,16 @@ ACE_Malloc_T<ACE_MEM_POOL_2, ACE_LOCK, ACE_CB>::ACE_Malloc_T (const ACE_TCHAR *p
   // Use pool_name for lock_name if lock_name not passed.
   const ACE_TCHAR *name = lock_name ? lock_name : pool_name;
   this->lock_ = ACE_Malloc_Lock_Adapter_T<ACE_LOCK> ()(name);
-  if (this->lock_ == 0)
-    return;
+  if (this->lock_ != 0)
+    {
+      this->delete_lock_ = true;
 
-  this->delete_lock_ = true;
-
-  this->bad_flag_ = this->open ();
-  if (this->bad_flag_ == -1)
-    ACELIB_ERROR ((LM_ERROR,
-                ACE_TEXT ("%p\n"),
-                ACE_TEXT ("ACE_Malloc_T<ACE_MEM_POOL_2, ACE_LOCK, ACE_CB>::ACE_Malloc_T")));
+      this->bad_flag_ = this->open ();
+      if (this->bad_flag_ == -1)
+        ACELIB_ERROR ((LM_ERROR,
+                    ACE_TEXT ("%p\n"),
+                    ACE_TEXT ("ACE_Malloc_T<ACE_MEM_POOL_2, ACE_LOCK, ACE_CB>::ACE_Malloc_T")));
+    }
 }
 
 

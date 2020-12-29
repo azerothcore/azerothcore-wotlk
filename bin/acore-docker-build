@@ -7,7 +7,7 @@ CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$CUR_PATH/../"
 
 docker build -t acbuild -f docker/build/Dockerfile . && docker run \
-    -v /$(pwd)/docker/build/cache:/azerothcore/build \
-    -v /$(pwd)/docker/worldserver/bin:/binworldserver \
-    -v /$(pwd)/docker/authserver/bin:/binauthserver \
+    -v /"$(pwd)"/docker/build/cache:/azerothcore/build \
+    -v /"$(pwd)"/docker/worldserver/bin:/binworldserver \
+    -v /"$(pwd)"/docker/authserver/bin:/binauthserver \
     acbuild

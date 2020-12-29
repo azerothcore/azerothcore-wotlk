@@ -31,11 +31,11 @@ public:
     const static int s_BYTE_SIZE = 32;
 
     AuthSocket(RealmSocket& socket);
-    virtual ~AuthSocket(void);
+    ~AuthSocket() override;
 
-    virtual void OnRead(void);
-    virtual void OnAccept(void);
-    virtual void OnClose(void);
+    void OnRead() override;
+    void OnAccept() override;
+    void OnClose() override;
 
     static ACE_INET_Addr const& GetAddressForClient(Realm const& realm, ACE_INET_Addr const& clientAddr);
 
@@ -57,7 +57,7 @@ public:
 
 private:
     RealmSocket& socket_;
-    RealmSocket& socket(void) { return socket_; }
+    RealmSocket& socket() { return socket_; }
 
     BigNumber N, s, g, v;
     BigNumber b, B;

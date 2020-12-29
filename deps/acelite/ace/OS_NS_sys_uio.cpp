@@ -8,9 +8,14 @@
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_unistd.h"
 
+#ifdef ACE_HAS_ALLOC_HOOKS
+# include "ace/Global_Macros.h"
+# include "ace/Malloc_Base.h"
+#endif
+
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-# if defined (ACE_LACKS_READV)
+#if defined (ACE_LACKS_READV)
 
 // "Fake" readv for operating systems without it.  Note that this is
 // thread-safe.
@@ -36,13 +41,15 @@ ACE_OS::readv_emulation (ACE_HANDLE handle,
       length += iov[i].iov_len;
 
   char *buf;
-#   if defined (ACE_HAS_ALLOCA)
-  buf = (char *) alloca (length);
-#   else
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_ALLOCATOR_RETURN (buf,
+                        (char *) ACE_Allocator::instance ()->malloc (length),
+                        -1);
+# else
   ACE_NEW_RETURN (buf,
                   char[length],
                   -1);
-#   endif /* !defined (ACE_HAS_ALLOCA) */
+# endif /* ACE_HAS_ALLOC_HOOKS */
 
   length = ACE_OS::read (handle, buf, length);
 
@@ -65,14 +72,16 @@ ACE_OS::readv_emulation (ACE_HANDLE handle,
         }
     }
 
-#   if !defined (ACE_HAS_ALLOCA)
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_Allocator::instance ()->free (buf);
+# else
   delete [] buf;
-#   endif /* !defined (ACE_HAS_ALLOCA) */
+# endif /* ACE_HAS_ALLOC_HOOKS */
   return length;
 }
-# endif /* ACE_LACKS_READV */
+#endif /* ACE_LACKS_READV */
 
-# if defined (ACE_LACKS_WRITEV)
+#if defined (ACE_LACKS_WRITEV)
 
 // "Fake" writev for operating systems without it.  Note that this is
 // thread-safe.
@@ -82,44 +91,38 @@ ACE_OS::writev_emulation (ACE_HANDLE handle, const iovec *iov, int n)
 {
   ACE_OS_TRACE ("ACE_OS::writev_emulation");
 
-  // To avoid having to allocate a temporary buffer to which all of
-  // the data will be copied and then written, this implementation
-  // performs incremental writes.
+  // 'handle' may be a datagram socket (or similar) so this operation
+  // must not be divided into multiple smaller writes.
 
-  ssize_t bytes_sent = 0;
+  if (n == 1)
+    return ACE_OS::write (handle, iov[0].iov_base, iov[0].iov_len);
 
+  ssize_t length = 0;
   for (int i = 0; i < n; ++i)
-    {
-      ssize_t const result =
-        ACE_OS::write (handle, iov[i].iov_base, iov[i].iov_len);
+    length += iov[i].iov_len;
 
-      if (result == -1)
-        {
-          // There is a subtle difference in behaviour depending on
-          // whether or not any data was sent.  If no data was sent,
-          // then always return -1.  Otherwise return bytes_sent.
-          // This gives the caller an opportunity to keep track of
-          // bytes that have already been sent.
-          if (bytes_sent > 0)
-            break;
-          else
-            return -1;
-        }
-      else
-        {
-          bytes_sent += result;
+  char *buf;
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_ALLOCATOR_RETURN (buf,
+                        (char *) ACE_Allocator::instance ()->malloc (length),
+                        -1);
+# else
+  ACE_NEW_RETURN (buf, char[length], -1);
+# endif /* ACE_HAS_ALLOC_HOOKS */
 
-          // Do not continue on to the next loop iteration if the
-          // amount of data sent was less than the amount data given.
-          // This avoids a subtle problem where "holes" in the data
-          // stream would occur if partial sends of a given buffer in
-          // the iovec array occured.
-          if (static_cast<size_t> (result) < iov[i].iov_len)
-            break;
-        }
-    }
+  char *iter = buf;
+  for (int i = 0; i < n; iter += iov[i++].iov_len)
+    ACE_OS::memcpy (iter, iov[i].iov_base, iov[i].iov_len);
 
-  return bytes_sent;
+  const ssize_t result = ACE_OS::write (handle, buf, length);
+
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_Allocator::instance ()->free (buf);
+# else
+  delete[] buf;
+# endif /* ACE_HAS_ALLOC_HOOKS */
+
+  return result;
 }
 # endif /* ACE_LACKS_WRITEV */
 

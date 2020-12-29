@@ -16,6 +16,8 @@ ACE_Log_Msg_IPC::~ACE_Log_Msg_IPC (void)
   (void) this->close ();
 }
 
+ACE_ALLOC_HOOK_DEFINE(ACE_Log_Msg_IPC)
+
 int
 ACE_Log_Msg_IPC::open (const ACE_TCHAR *logger_key)
 {
