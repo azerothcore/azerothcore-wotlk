@@ -16,40 +16,21 @@ jobs:
       matrix:
         os: [ubuntu-20.04]
         compiler: [clang]
-        modules: [with, without]
-        language: [ 'cpp', 'bash' ]
-        include:
-          - os: ubuntu-20.04
-            compiler: clang9
-            modules: without
-          - os: ubuntu-18.04
-            compiler: clang # default in 18.04 is clang 6
-            modules: without
-          - os: ubuntu-18.04
-            compiler: gcc # default in 18.04 is gcc 7
-            modules: without
-          - os: ubuntu-20.04
-            compiler: gcc # default in 20.04 is gcc 9
-            modules: without
-          - os: ubuntu-20.04
-            compiler: gcc10
-            modules: without
+        modules: [without]
+        language: [cpp]
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
       COMPILER: ${{ matrix.compiler }}
     if: github.repository == 'azerothcore/azerothcore-wotlk'
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
         with:
           languages: ${{ matrix.language }}
-    
       - name: Checkout modules
         run: ./apps/ci/ci-install-modules.sh
         if: matrix.modules == 'with'
