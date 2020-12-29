@@ -5493,12 +5493,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectTriggerSpell[0] = 68766;
     });
 
-    // Killing Spree (Off hand damage)
-    ApplySpellFix({ 57842 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->rangeIndex = 2; // Melee Range
-    });
-
     // Trial of the Crusader, Jaraxxus Intro spell
     ApplySpellFix({ 67888 }, [](SpellEntry* spellInfo)
     {
