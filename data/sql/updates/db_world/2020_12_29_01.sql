@@ -1,3 +1,19 @@
+-- DB update 2020_12_29_00 -> 2020_12_29_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_12_29_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_12_29_00 2020_12_29_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1609090256646931000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609090256646931000');
 
 -- Cleanup existing creatures
@@ -261,3 +277,12 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 -- Update movement
 UPDATE `creature` SET `wander_distance`=15, `MovementType`=1 WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+215;
 UPDATE `creature` SET `wander_distance`=0, `MovementType`=0 WHERE `guid` IN (@CGUID+203, @CGUID+204, @CGUID+205, @CGUID+206);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
