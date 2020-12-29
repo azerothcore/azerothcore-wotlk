@@ -40,7 +40,7 @@ UPDATE `creature` SET `spawntimesecs` = 33 WHERE `id` = 17886;
 UPDATE `gameobject` SET `spawntimesecs` = 30, `animprogress` = 100 WHERE `id` = 184850;
 UPDATE `gameobject_template` SET `Data3` = 3000 WHERE (`entry` = 184850);
 
-DELETE FROM `creature` WHERE `guid` IN (96886);
+DELETE FROM `creature` WHERE `guid` = 96886 and `id` = 17889;
 INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`) VALUES
 (96886, 17889, 530, 1, 1, 0, 0, -2143.43, -10692, 64.7658, 4.93928, 300, 0, 0, 42, 0, 0);
 
