@@ -164,9 +164,9 @@ class Channel
             if (state) flags |= MEMBER_FLAG_MUTED;
             else flags &= ~MEMBER_FLAG_MUTED;
         }
-        bool IsAllowedToSpeak(uint64 speakDelay) // pussywizard
+        bool IsAllowedToSpeak(static_cast<uint64>(speakDelay)) // pussywizard
         {
-            if (lastSpeakTime + speakDelay <= uint64(sWorld->GetGameTime()))
+            if (lastSpeakTime + speakDelay <= static_cast<uint64>(sWorld->GetGameTime()))
             {
                 lastSpeakTime = sWorld->GetGameTime();
                 return true;
