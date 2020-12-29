@@ -1255,6 +1255,26 @@ private:
     GlobalCooldownMgr _GlobalCooldownMgr;
 };
 
+struct AttackPosition {
+    AttackPosition(Position pos) : _pos(pos), _taken(false) {}
+    bool operator==(const int val)
+    {
+        return !val;
+    };
+    int operator=(const int val)
+    {
+        if (!val)
+        {
+            // _pos = NULL;
+            _taken = false;
+            return 0; // NULL
+        }
+        return 0; // NULL
+    };
+    Position _pos;
+    bool _taken;
+};
+
 // for clearing special attacks
 #define REACTIVE_TIMER_START 5000
 
@@ -1405,6 +1425,7 @@ public:
     virtual void SetCanDualWield(bool value) { m_canDualWield = value; }
     [[nodiscard]] float GetCombatReach() const override { return m_floatValues[UNIT_FIELD_COMBATREACH]; }
     [[nodiscard]] float GetMeleeReach() const { float reach = m_floatValues[UNIT_FIELD_COMBATREACH]; return reach > MIN_MELEE_REACH ? reach : MIN_MELEE_REACH; }
+    bool IsWithinRange(Unit const* obj, float dist) const;
     bool IsWithinCombatRange(const Unit* obj, float dist2compare) const;
     bool IsWithinMeleeRange(const Unit* obj, float dist = MELEE_RANGE) const;
     bool GetRandomContactPoint(const Unit* target, float& x, float& y, float& z, bool force = false) const;
@@ -1434,6 +1455,8 @@ public:
     bool AttackStop();
     void RemoveAllAttackers();
     [[nodiscard]] AttackerSet const& getAttackers() const { return m_attackers; }
+    void SetMeleeAttackPoints();
+    Position* GetMeleeAttackPoint(Unit* attacker);
     [[nodiscard]] bool isAttackingPlayer() const;
     [[nodiscard]] Unit* GetVictim() const { return m_attacking; }
 
@@ -2451,6 +2474,8 @@ public:
     // Movement info
     Movement::MoveSpline* movespline;
 
+    AttackPosition getAttackPosition() { return m_attackPosition; }
+
 protected:
     explicit Unit (bool isWorldObject);
 
@@ -2533,6 +2558,9 @@ protected:
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
     bool _instantCast;
 
+    std::vector<AttackPosition> attackMeleePositions;
+    AttackPosition m_attackPosition;
+
 private:
     bool IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, SpellInfo const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent, ProcEventInfo const& eventInfo);
     bool HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
@@ -2566,6 +2594,8 @@ private:
     HostileRefManager m_HostileRefManager;
 
     FollowerRefManager m_FollowingRefManager;
+    Unit* m_comboTarget;
+    int8 m_comboPoints;
 
     ComboPointHolderSet m_ComboPointHolders;
 
@@ -2576,6 +2606,10 @@ private:
 
     uint32 _oldFactionId;           ///< faction before charm
     bool m_petCatchUp;
+
+    static constexpr uint32 ATTACK_POINT_CHECK_INTERVAL = 200;
+    uint32 _attackPointCheckTimer = ATTACK_POINT_CHECK_INTERVAL;
+
 };
 
 namespace acore

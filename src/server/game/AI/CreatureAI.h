@@ -162,6 +162,8 @@ public:
 
     virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
 
+    void CheckCircleRepositionRequirements();
+
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);
 

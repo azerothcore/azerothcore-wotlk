@@ -153,9 +153,31 @@ ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, 
 #pragma warning(disable:4355)
 #endif
 Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
-    m_movedByPlayer(nullptr), m_lastSanctuaryTime(0), IsAIEnabled(false), NeedChangeAI(false),
-    m_ControlledByPlayer(false), m_CreatedByPlayer(false), movespline(new Movement::MoveSpline()), i_AI(nullptr), i_disabledAI(nullptr), m_realRace(0), m_race(0), m_AutoRepeatFirstCast(false), m_procDeep(0), m_removedAurasCount(0),
-    i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_ThreatManager(this), m_vehicle(nullptr), m_vehicleKit(nullptr), m_unitTypeMask(UNIT_MASK_NONE), m_HostileRefManager(this)
+    m_movedByPlayer(nullptr),
+    m_lastSanctuaryTime(0),
+    IsAIEnabled(false),
+    NeedChangeAI(false),
+    m_ControlledByPlayer(false),
+    m_CreatedByPlayer(false),
+    movespline(new Movement::MoveSpline()),
+    i_AI(nullptr),
+    i_disabledAI(nullptr),
+    m_realRace(0),
+    m_race(0),
+    m_AutoRepeatFirstCast(false),
+    m_procDeep(0),
+    m_removedAurasCount(0),
+    i_motionMaster(new MotionMaster(this)),
+    m_regenTimer(0),
+    m_ThreatManager(this),
+    m_vehicle(nullptr),
+    m_vehicleKit(nullptr),
+    m_unitTypeMask(UNIT_MASK_NONE),
+    m_attackPosition(NULL),
+    m_HostileRefManager(this),
+    // m_spellHistory(new SpellHistory(this)),
+    m_comboTarget(nullptr),
+    m_comboPoints(0)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -419,6 +441,16 @@ void Unit::Update(uint32 p_time)
         ModifyAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT, HealthAbovePct(75));
     }
 
+    if (_attackPointCheckTimer > p_time)
+    {
+        _attackPointCheckTimer -= p_time;
+    }
+    else
+    {
+        _attackPointCheckTimer = ATTACK_POINT_CHECK_INTERVAL;
+        SetMeleeAttackPoints();
+    }
+
     UpdateSplineMovement(p_time);
     GetMotionMaster()->UpdateMotion(p_time);
 }
@@ -575,6 +607,21 @@ bool Unit::IsWithinMeleeRange(const Unit* obj, float dist) const
     float maxdist = dist + sizefactor;
 
     return distsq < maxdist * maxdist;
+}
+
+bool Unit::IsWithinRange(Unit const* obj, float dist) const
+{
+    if (!obj || !IsInMap(obj) || !InSamePhase(obj))
+    {
+        return false;
+    }
+
+    float dx = GetPositionX() - obj->GetPositionX();
+    float dy = GetPositionY() - obj->GetPositionY();
+    float dz = GetPositionZ() - obj->GetPositionZ();
+    float distsq = dx * dx + dy * dy + dz * dz;
+
+    return distsq <= dist * dist;
 }
 
 bool Unit::GetRandomContactPoint(const Unit* obj, float& x, float& y, float& z, bool force) const
@@ -2189,6 +2236,132 @@ void Unit::AttackerStateUpdate (Unit* victim, WeaponAttackType attType, bool ext
     }
 }
 
+struct AttackDistance {
+    AttackDistance(uint8 index, AttackPosition attackPos) : _index(index), _attackPos(attackPos) {}
+    uint8 _index;
+    AttackPosition _attackPos;
+};
+
+void Unit::SetMeleeAttackPoints()
+{
+    if (getAttackers().size() <= 1)
+    {
+        return;
+    }
+
+    // Delete the attack positions each iteration.
+    attackMeleePositions.clear();
+
+    // Calculate the attack positions.
+    AttackerSet attackers = getAttackers();
+    AttackerSet meleeAttackers;
+
+    for (const auto& attacker: attackers)
+    {
+        if (attacker->IsWithinMeleeRange(this))
+        {
+            meleeAttackers.insert(attacker);
+        }
+    }
+
+    float step = float(M_PI*2) / meleeAttackers.size(); // all points of the circumference related to the player by the number of attackers
+    // 0.63
+
+    Position const& pos = GetPosition();
+
+    uint8 i = 0;
+    for (const auto& attacker: meleeAttackers)
+    {
+        CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(attacker->GetDisplayId());
+        float size = modelData->Scale ? modelData->Scale : 1;
+
+        // CreatureTemplate const* normalInfo = sObjectMgr->GetCreatureTemplate(Entry);
+        // attacker->
+
+        // calculate angle of space inside the circumference (around the player)
+        int8 anglePosition = ceil((i+1)/2) * ((i+1) % 2 ? -1 : 1);
+        float angle = float(M_PI * 2) + ((step / size) * anglePosition);
+        // 6.30 + (0.63 * -1) = 5.67
+
+        CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelInfo(attacker->GetDisplayId());
+        float boundingRadius = minfo->bounding_radius ? minfo->bounding_radius : MIN_MELEE_REACH;
+
+        attackMeleePositions.push_back(AttackPosition(Position(
+            pos.m_positionX + boundingRadius * cosf(angle),
+            pos.m_positionY + boundingRadius * sinf(angle),
+            pos.m_positionZ)
+        ));
+
+        i++;
+    }
+}
+
+Position* Unit::GetMeleeAttackPoint(Unit* attacker)
+{
+    if (getAttackers().size() <= 1)
+    {
+        return NULL;
+    }
+
+    // If the Creature is already on an attack Position and close enough to the Target abort
+    if (attacker->GetDistance(GetPosition()) < GetCombatReach() &&
+       !(attacker->m_attackPosition == 0) &&
+       attacker->GetDistance(attacker->m_attackPosition._pos) < 0.25f)
+    {
+       return NULL;
+    }
+
+    attacker->m_attackPosition = 0;
+
+    // Get all the distances
+    std::vector<AttackDistance> distances;
+    distances.reserve( attackMeleePositions.size());
+    for (uint8 i = 0; i < attackMeleePositions.size(); ++i)
+    {
+        // If the spot has been taken
+        if (!attackMeleePositions[i]._taken)
+        {
+            distances.push_back(AttackDistance(i,attackMeleePositions[i]));
+        }
+    }
+
+    if (distances.size() == 0)
+    {
+        return NULL;
+    }
+
+    // Get the shortest point
+    uint8 shortestIndex = 0;
+    float shortestLength = attacker->GetDistance2d(distances[0]._attackPos._pos.m_positionX, distances[0]._attackPos._pos.m_positionY);
+    for (uint8 i = 1; i < distances.size(); ++i)
+    {
+        float dist = attacker->GetDistance2d(distances[i]._attackPos._pos.m_positionX, distances[i]._attackPos._pos.m_positionY); // +GetDistance(distances[i]._attackPos._pos);
+        if (shortestLength > dist)
+        {
+            shortestLength = dist;
+            shortestIndex = i;
+        }
+    }
+
+    // Create closest Position
+    Position closestPos(distances[shortestIndex]._attackPos._pos);
+
+    // Too close mark point taken and find another spot
+    for (uint8 i = 0; i < attackMeleePositions.size(); ++i)
+    {
+        float dist = closestPos.GetExactDist(&attackMeleePositions[i]._pos);
+        if (dist < GetCombatReach()/2)
+        {
+            attackMeleePositions[i]._taken = true;
+        }
+    }
+    attacker->m_attackPosition = distances[shortestIndex]._attackPos;
+
+    Position* closestP = new Position;
+    *closestP = closestPos;
+    return closestP;
+}
+
 void Unit::HandleProcExtraAttackFor(Unit* victim)
 {
     while (m_extraAttacks)
@@ -3229,7 +3402,7 @@ void Unit::_UpdateAutoRepeatSpell()
     {
         return;
     }
-    
+
     static uint32 const HUNTER_AUTOSHOOT = 75;
 
     // Check "realtime" interrupts

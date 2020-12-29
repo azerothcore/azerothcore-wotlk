@@ -586,6 +586,17 @@ void Creature::Update(uint32 diff)
                     RemoveCharmAuras();
                 }
 
+                // Circling the target
+                if (diff >= m_moveCircleMovementTime)
+                {
+                    AI()->CheckCircleRepositionRequirements();
+                    m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
+                }
+                else
+                {
+                    m_moveCircleMovementTime -= diff;
+                }
+
                 if (!IsInEvadeMode() && IsAIEnabled)
                 {
                     // do not allow the AI to be changed during update
@@ -620,7 +631,7 @@ void Creature::Update(uint32 diff)
                     {
                         AI()->EnterEvadeMode();
                     }
-                } 
+                }
 
                 break;
             }
@@ -653,6 +664,20 @@ void Creature::Update(uint32 diff)
 
         sScriptMgr->OnCreatureUpdate(this, diff);
     }
+}
+
+bool Creature::IsFreeToMove()
+{
+    uint32 moveFlags = m_movementInfo.GetMovementFlags();
+    // Do not reposition ourself when we are not allowed to move
+    if ((IsMovementPreventedByCasting() || isMoving() || !CanFreeMove()) &&
+        (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE ||
+        moveFlags & MOVEMENTFLAG_SPLINE_ENABLED))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 void Creature::Regenerate(Powers power)
@@ -1522,8 +1547,10 @@ bool Creature::CanStartAttack(Unit const* who) const
 
     // This set of checks is should be done only for creatures
     if ((HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC) && who->GetTypeId() != TYPEID_PLAYER) ||      // flag is valid only for non player characters
-            (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC) && who->GetTypeId() == TYPEID_PLAYER))         // immune to PC and target is a player, return false
+        (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC) && who->GetTypeId() == TYPEID_PLAYER))         // immune to PC and target is a player, return false
+    {
         return false;
+    }
 
     if (Unit* owner = who->GetOwner())
         if (owner->GetTypeId() == TYPEID_PLAYER && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))     // immune to PC and target has player owner
@@ -2833,6 +2860,16 @@ void Creature::FocusTarget(Spell const* focusSpell, WorldObject const* target)
         SetInFront(target);
 }
 
+bool Creature::HasSpellFocus(Spell const* focusSpell) const
+{
+    if (isDead()) // dead creatures cannot focus
+    {
+        return false;
+    }
+
+    return focusSpell ? (focusSpell == _spellFocusInfo.Spell) : (_spellFocusInfo.Spell || _spellFocusInfo.Delay);
+}
+
 void Creature::ReleaseFocus(Spell const* focusSpell)
 {
     // focused to something else
@@ -2889,4 +2926,25 @@ float Creature::GetAttackDistance(Unit const* player) const
         retDistance = 5.0f;
 
     return (retDistance * aggroRate);
+}
+
+bool Creature::IsMovementPreventedByCasting() const
+{
+    Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL];
+    // first check if currently a movement allowed channel is active and we're not casting
+    if (!!spell && spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive() && spell->GetSpellInfo()->IsMoveAllowedChannel())
+    {
+        return false;
+    }
+
+    if (HasSpellFocus())
+    {
+        return true;
+    }
+
+    if (HasUnitState(UNIT_STATE_CASTING)) {
+        return true;
+    }
+
+    return false;
 }

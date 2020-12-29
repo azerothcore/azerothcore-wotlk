@@ -710,7 +710,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 {
     if (t_diff)
         _dynamicTree.update(t_diff);
-    
+
     /// update worldsessions for existing players
     for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
     {
@@ -3390,4 +3390,54 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
                 if (player->GetZoneId() == zoneId)
                     player->SendDirectMessage(&data);
     }
+}
+
+/**
+ *   \brief validate the new destination
+ *
+ *   Check if a given unit can reach a specific point and set the correct Z coord based on difference in height
+ *
+ *   \param maxHeight the desired range of a new Z coord.
+ *   \return true if the destination is valid, false otherwise
+ *
+ **/
+bool Map::isValidPositionAndGetHeight(Unit* owner, float dest_x, float dest_y, float &dest_z, float angle, float maxHeight/*  = 3.0f */) const
+{
+    acore::NormalizeMapCoord(dest_x);
+    acore::NormalizeMapCoord(dest_y);
+    if (owner->IsWithinLOS(dest_x, dest_y, dest_z))
+    {
+        const Map* _map = owner->GetBaseMap();
+
+        // if water environment
+        bool is_water_now = _map->IsInWater(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ());
+
+        if (is_water_now && _map->IsInWater(dest_x, dest_y, dest_z))
+        {
+            return true;
+        }
+
+        // otherwise calculate a new z
+        float new_z = _map->GetHeight(owner->GetPhaseMask(), dest_x, dest_y, dest_z, true);
+
+        if (new_z <= INVALID_HEIGHT || fabs(dest_z - new_z) > maxHeight)
+        {
+            return false;
+        }
+
+        bool is_water_next = _map->IsInWater(dest_x, dest_y, new_z);
+
+        if ((is_water_now && !is_water_next && owner->GetTypeId() == TYPEID_UNIT && !((Creature*)owner)->CanWalk()) ||
+            (!is_water_now && is_water_next && !owner->CanSwim()))
+        {
+            return false;
+        }
+
+        if (owner->IsWithinLOS(dest_x, dest_y, new_z)) {
+            dest_z = new_z;
+            return true;
+        }
+    }
+
+    return false;
 }
