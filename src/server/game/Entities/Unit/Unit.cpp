@@ -2272,19 +2272,19 @@ void Unit::SetMeleeAttackPoints()
     uint8 i = 0;
     for (const auto& attacker: meleeAttackers)
     {
-        CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(attacker->GetDisplayId());
-        float size = modelData->Scale ? modelData->Scale : 1;
+        // CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(attacker->GetDisplayId());
+        // float size = modelData->Scale ? modelData->Scale : 1;
 
         // CreatureTemplate const* normalInfo = sObjectMgr->GetCreatureTemplate(Entry);
         // attacker->
 
         // calculate angle of space inside the circumference (around the player)
         int8 anglePosition = ceil((i+1)/2) * ((i+1) % 2 ? -1 : 1);
-        float angle = float(M_PI * 2) + ((step / size) * anglePosition);
+        float angle = float(M_PI * 2) + ((step / 1) * anglePosition);
         // 6.30 + (0.63 * -1) = 5.67
 
         CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelInfo(attacker->GetDisplayId());
-        float boundingRadius = minfo->bounding_radius ? minfo->bounding_radius : MIN_MELEE_REACH;
+        float boundingRadius = minfo->bounding_radius > 0 ? minfo->bounding_radius : MIN_MELEE_REACH;
 
         attackMeleePositions.push_back(AttackPosition(Position(
             pos.m_positionX + boundingRadius * cosf(angle),
