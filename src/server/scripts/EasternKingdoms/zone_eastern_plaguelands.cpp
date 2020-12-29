@@ -52,12 +52,12 @@ class npc_eris_hevenfire : public CreatureScript
 public:
     npc_eris_hevenfire() : CreatureScript("npc_eris_hevenfire") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_eris_hevenfireAI(creature);
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_BALANCE_OF_LIGHT_AND_SHADOW)
         {
@@ -81,7 +81,7 @@ public:
         bool _spoken;
         uint32 _faction;
 
-        void Reset()
+        void Reset() override
         {
             _faction = 0;
             _spoken = false;
@@ -94,12 +94,12 @@ public:
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
 
-        void SetData(uint32 faction, uint32)
+        void SetData(uint32 faction, uint32) override
         {
             _faction = faction;
         }
 
-        void SetGUID(uint64 guid, int32)
+        void SetGUID(uint64 guid, int32) override
         {
             _playerGUID = guid;
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -111,7 +111,7 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_PEASANTS, 8000);
         }
 
-        bool CanBeSeen(Player const* player)
+        bool CanBeSeen(Player const* player) override
         {
             // requires this trinket to be seen
             return player->HasItemOrGemWithIdEquipped(ITEM_EYE_OF_DIVINITY, 1);
@@ -144,7 +144,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* creature)
+        void JustSummoned(Creature* creature) override
         {
             summons.Summon(creature);
             if (creature->GetEntry() == NPC_INJURED_PEASANT || creature->GetEntry() == NPC_PLAGUED_PEASANT)
@@ -168,7 +168,7 @@ public:
             }
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == 1)
                 _savedCount++;
@@ -200,7 +200,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -235,7 +235,7 @@ class npc_balance_of_light_and_shadow : public CreatureScript
 public:
     npc_balance_of_light_and_shadow() : CreatureScript("npc_balance_of_light_and_shadow") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_balance_of_light_and_shadowAI (creature);
     }
@@ -244,7 +244,7 @@ public:
     {
         npc_balance_of_light_and_shadowAI(Creature* creature) : NullCreatureAI(creature) { timer = 0; _targetGUID = 0; }
 
-        bool CanBeSeen(Player const* player)
+        bool CanBeSeen(Player const* player) override
         {
             // requires this trinket to be seen
             return player->HasItemOrGemWithIdEquipped(ITEM_EYE_OF_DIVINITY, 1);
@@ -253,13 +253,13 @@ public:
         uint32 timer;
         uint64 _targetGUID;
 
-        void SpellHit(Unit*, const SpellInfo* spellInfo)
+        void SpellHit(Unit*, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SHOOT && roll_chance_i(7))
                 me->CastSpell(me, SPELL_DEATHS_DOOR, true);
         }
 
-        void MovementInform(uint32 type, uint32  /*pointId*/)
+        void MovementInform(uint32 type, uint32  /*pointId*/) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -271,14 +271,14 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             if (TempSummon* summon = me->ToTempSummon())
                 if (Unit* creature = summon->GetSummoner())
                     creature->GetAI()->DoAction(2);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->GetEntry() != NPC_SCOURGE_ARCHER)
                 return;
@@ -313,18 +313,18 @@ public:
     {
         npc_ghoul_flayerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (killer->GetTypeId() == TYPEID_PLAYER)
                 me->SummonCreature(11064, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ghoul_flayerAI(creature);
     }

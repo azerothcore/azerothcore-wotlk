@@ -136,7 +136,7 @@ public:
                     }
         }
 
-        void OnUnitDeath(Unit* u)
+        void OnUnitDeath(Unit* u) override
         {
             if (bNooneDied && u->GetTypeId() == TYPEID_PLAYER)
             {
@@ -145,7 +145,7 @@ public:
             }
         }
 
-        void Initialize()
+        void Initialize() override
         {
             CLEANED = false;
             EncounterStatus = NOT_STARTED;
@@ -187,7 +187,7 @@ public:
             GO_FloorGUID = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             Map::PlayerList const& pl = instance->GetPlayers();
             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
@@ -200,7 +200,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch( creature->GetEntry() )
             {
@@ -250,7 +250,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch( go->GetEntry() )
             {
@@ -278,7 +278,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch( type )
             {
@@ -539,7 +539,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch( type )
             {
@@ -549,7 +549,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const
+        uint64 GetData64(uint32 type) const override
         {
             switch( type )
             {
@@ -569,7 +569,7 @@ public:
             return 0;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             events.Update(diff);
             switch( events.ExecuteEvent() )
@@ -1416,7 +1416,7 @@ public:
             }
         }
 
-        void OnPlayerEnter(Player* plr)
+        void OnPlayerEnter(Player* plr) override
         {
             if( instance->IsHeroic() )
             {
@@ -1602,7 +1602,7 @@ public:
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
             std::ostringstream saveStream;
@@ -1614,7 +1614,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             EncounterStatus = NOT_STARTED;
             CLEANED = false;
@@ -1652,7 +1652,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -1717,7 +1717,7 @@ public:
         }
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_trial_of_the_crusader_InstanceMapScript(map);
     }
