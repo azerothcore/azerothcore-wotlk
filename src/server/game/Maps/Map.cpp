@@ -3392,9 +3392,16 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
     }
 }
 
-// TODO / review
-// Z -> it will be modified
-bool Map::getValidPositionAndHeight(Unit* owner, float dest_x, float dest_y, float &dest_z, float angle, float distance) const
+/**
+ *   \brief validate the new destination
+ *
+ *   Check if a given unit can reach a specific point and set the correct Z coord based on difference in height
+ *
+ *   \param maxHeight the desired range of a new Z coord.
+ *   \return true if the destination is valid, false otherwise
+ *
+ **/
+bool Map::isValidPositionAndGetHeight(Unit* owner, float dest_x, float dest_y, float &dest_z, float angle, float maxHeight/*  = 3.0f */) const
 {
     acore::NormalizeMapCoord(dest_x);
     acore::NormalizeMapCoord(dest_y);
@@ -3413,7 +3420,7 @@ bool Map::getValidPositionAndHeight(Unit* owner, float dest_x, float dest_y, flo
         // otherwise calculate a new z
         float new_z = _map->GetHeight(owner->GetPhaseMask(), dest_x, dest_y, dest_z, true);
 
-        if (new_z <= INVALID_HEIGHT || fabs(dest_z - new_z) > 1.2f /* 3.0f */)
+        if (new_z <= INVALID_HEIGHT || fabs(dest_z - new_z) > maxHeight)
         {
             return false;
         }
@@ -3426,19 +3433,10 @@ bool Map::getValidPositionAndHeight(Unit* owner, float dest_x, float dest_y, flo
             return false;
         }
 
-        // if (!(new_z - dest_z) || distance / fabs(new_z - dest_z) > 1.0f)
-        // {
-        //     float new_z_left = _map->GetHeight(owner->GetPhaseMask(), dest_x + 1.0f * cos(angle + static_cast<float>(M_PI / 2)), dest_y + 1.0f * sin(angle + static_cast<float>(M_PI / 2)), dest_z, true);
-        //     float new_z_right = _map->GetHeight(owner->GetPhaseMask(), dest_x + 1.0f * cos(angle - static_cast<float>(M_PI / 2)), dest_y + 1.0f * sin(angle - static_cast<float>(M_PI / 2)), dest_z, true);
-        //     if (fabs(new_z_left - new_z) < 1.2f && fabs(new_z_right - new_z) < 1.2f)
-        //     {
-                // check the LOS of new_z
-                if (owner->IsWithinLOS(dest_x, dest_y, new_z)) {
-                    dest_z = new_z;
-                    return true;
-                }
-        //     }
-        // }
+        if (owner->IsWithinLOS(dest_x, dest_y, new_z)) {
+            dest_z = new_z;
+            return true;
+        }
     }
 
     return false;
