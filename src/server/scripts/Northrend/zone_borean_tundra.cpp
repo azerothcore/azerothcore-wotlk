@@ -355,6 +355,7 @@ public:
 enum Nerubar
 {
     NPC_WARSONG_PEON                        = 25270,
+    QUEST_TAKEN_BY_THE_SCOURGE              = 11611,
     SPELL_FREED_WARSONG_MAGE                = 45526,
     SPELL_FREED_WARSONG_SHAMAN              = 45527,
     SPELL_FREED_WARSONG_WARRIOR             = 45514,
@@ -384,15 +385,18 @@ public:
 
             Player* player = killer->ToPlayer();
 
-            uint8 uiRand = urand(0, 99);
-            if (uiRand < 40)
+            if (player->GetQuestStatus(QUEST_TAKEN_BY_THE_SCOURGE) == QUEST_STATUS_INCOMPLETE)
             {
-                player->CastSpell(me, SPELL_FREED_WARSONG_PEON, true);
-                player->KilledMonsterCredit(NPC_WARSONG_PEON, 0);
-            }
-            else if (uiRand < 80)
-            {
-                player->CastSpell(me, nerubarVictims[urand(0, 2)], true);
+                uint8 uiRand = urand(0, 99);
+                if (uiRand < 40)
+                {
+                    player->CastSpell(me, SPELL_FREED_WARSONG_PEON, true);
+                    player->KilledMonsterCredit(NPC_WARSONG_PEON, 0);
+                }
+                else if (uiRand < 80)
+                {
+                    player->CastSpell(me, nerubarVictims[urand(0, 2)], true);
+                }
             }
         }
     };
