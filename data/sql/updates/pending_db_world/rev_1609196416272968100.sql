@@ -90,3 +90,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `gameobject` WHERE (`id` = 181694) AND (`guid` IN (22188));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
 (22188, 181694, 530, 0, 0, 1, 1, -5083.38, -11252.2, 0.57825, -0.680679, 0, 0, 0, 0, 60, 100, 1, '', 0);
+
+DELETE FROM `creature_text` WHERE `CreatureID`=17318;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
+(17318, 0, 0, 'What\'s the big idea, Spark? Why\'d you call for this meeting?', 12, 0, 100, 1, 0, 0, 13776, 0, 'Geezle - Tree\'s Company - Text #1'),
+(17318, 1, 0, 'Relax, Spark! I have it all under control. We\'ll strip mine the Exodar right out from under \'em - making both you and I very, very rich in the process.', 12, 0, 100, 1, 0, 0, 13779, 0, 'Geezle - Tree\'s Company - Text #2'),
+(17318, 2, 0, 'Yes, sir. It won\'t happen again...', 12, 0, 100, 1, 0, 0, 13782, 0, 'Geezle - Tree\'s Company - Text #3');
+
