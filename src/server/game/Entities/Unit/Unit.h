@@ -2559,8 +2559,6 @@ protected:
     bool _instantCast;
 
     std::vector<AttackPosition> attackMeleePositions;
-    Position m_previousPosition;
-    uint8 m_previousAttackerCount;
     AttackPosition m_attackPosition;
 
 private:

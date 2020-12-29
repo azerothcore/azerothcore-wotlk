@@ -2253,23 +2253,47 @@ void Unit::SetMeleeAttackPoints()
     attackMeleePositions.clear();
 
     // Calculate the attack positions.
-    // radius (Melee range unknown so use default).
-    float radius = MIN_MELEE_REACH;
-    uint8 attackPoints = getAttackers().size() * 3;
-    for (uint8 i = 0; i < attackPoints; ++i)
+    AttackerSet attackers = getAttackers();
+    AttackerSet meleeAttackers;
+
+    for (const auto& attacker: attackers)
     {
+        if (attacker->IsWithinMeleeRange(this))
+        {
+            meleeAttackers.insert(attacker);
+        }
+    }
+
+    float step = float(M_PI*2) / meleeAttackers.size(); // all points of the circumference related to the player by the number of attackers
+    // 0.63
+
+    Position const& pos = GetPosition();
+
+    uint8 i = 0;
+    for (const auto& attacker: meleeAttackers)
+    {
+        CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(attacker->GetDisplayId());
+        float size = modelData->Scale ? modelData->Scale : 1;
+
+        // CreatureTemplate const* normalInfo = sObjectMgr->GetCreatureTemplate(Entry);
+        // attacker->
+
+        // calculate angle of space inside the circumference (around the player)
         int8 anglePosition = ceil((i+1)/2) * ((i+1) % 2 ? -1 : 1);
-        float step = float(M_PI*2) / attackPoints;
-        Position const& pos = GetPosition();
-        float angle = float(M_PI * 2) + (step * anglePosition);
+        float angle = float(M_PI * 2) + ((step / size) * anglePosition);
+        // 6.30 + (0.63 * -1) = 5.67
+
+        CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelInfo(attacker->GetDisplayId());
+        float boundingRadius = minfo->bounding_radius ? minfo->bounding_radius : MIN_MELEE_REACH;
+
         attackMeleePositions.push_back(AttackPosition(Position(
-            pos.m_positionX + radius * cosf(angle),
-            pos.m_positionY + radius * sinf(angle),
+            pos.m_positionX + boundingRadius * cosf(angle),
+            pos.m_positionY + boundingRadius * sinf(angle),
             pos.m_positionZ)
         ));
+
+        i++;
     }
-    m_previousAttackerCount = getAttackers().size();
-    m_previousPosition = GetPosition();
 }
 
 Position* Unit::GetMeleeAttackPoint(Unit* attacker)
@@ -2279,7 +2303,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return NULL;
     }
 
-    // If already on an attack Position and close to Target abort
+    // If the Creature is already on an attack Position and close enough to the Target abort
     if (attacker->GetDistance(GetPosition()) < GetCombatReach() &&
        !(attacker->m_attackPosition == 0) &&
        attacker->GetDistance(attacker->m_attackPosition._pos) < 0.25f)
