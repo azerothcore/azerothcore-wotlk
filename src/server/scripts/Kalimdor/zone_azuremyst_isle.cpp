@@ -13,7 +13,6 @@ EndScriptData */
 
 /* ContentData
 npc_draenei_survivor
-npc_engineer_spark_overgrind
 npc_injured_draenei
 npc_magwin
 npc_geezle
@@ -158,104 +157,6 @@ public:
 };
 
 /*######
-## npc_engineer_spark_overgrind
-######*/
-
-enum Overgrind
-{
-    SAY_TEXT        = 0,
-    SAY_EMOTE       = 1,
-    ATTACK_YELL     = 2,
-
-    AREA_COVE       = 3579,
-    AREA_ISLE       = 3639,
-    QUEST_GNOMERCY  = 9537,
-    FACTION_HOSTILE = 14,
-    SPELL_DYNAMITE  = 7978
-};
-
-class npc_engineer_spark_overgrind : public CreatureScript
-{
-public:
-    npc_engineer_spark_overgrind() : CreatureScript("npc_engineer_spark_overgrind") { }
-
-    struct npc_engineer_spark_overgrindAI : public ScriptedAI
-    {
-        npc_engineer_spark_overgrindAI(Creature* creature) : ScriptedAI(creature)
-        {
-            NormFaction = creature->getFaction();
-            NpcFlags = creature->GetUInt32Value(UNIT_NPC_FLAGS);
-
-            if (creature->GetAreaId() == AREA_COVE || creature->GetAreaId() == AREA_ISLE)
-                IsTreeEvent = true;
-        }
-
-        void Reset() override
-        {
-            DynamiteTimer = 8000;
-            EmoteTimer = urand(120000, 150000);
-
-            me->setFaction(NormFaction);
-            me->SetUInt32Value(UNIT_NPC_FLAGS, NpcFlags);
-
-            IsTreeEvent = false;
-        }
-
-        void EnterCombat(Unit* who) override
-        {
-            Talk(ATTACK_YELL, who);
-        }
-
-        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
-        {
-            CloseGossipMenuFor(player);
-            me->setFaction(FACTION_HOSTILE);
-            me->Attack(player, true);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!me->IsInCombat() && !IsTreeEvent)
-            {
-                if (EmoteTimer <= diff)
-                {
-                    Talk(SAY_TEXT);
-                    Talk(SAY_EMOTE);
-                    EmoteTimer = urand(120000, 150000);
-                }
-                else EmoteTimer -= diff;
-            }
-            else if (IsTreeEvent)
-                return;
-
-            if (!UpdateVictim())
-                return;
-
-            if (DynamiteTimer <= diff)
-            {
-                DoCastVictim(SPELL_DYNAMITE);
-                DynamiteTimer = 8000;
-            }
-            else DynamiteTimer -= diff;
-
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        uint32 NormFaction;
-        uint32 NpcFlags;
-        uint32 DynamiteTimer;
-        uint32 EmoteTimer;
-        bool   IsTreeEvent;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_engineer_spark_overgrindAI(creature);
-    }
-};
-
-/*######
 ## npc_injured_draenei
 ######*/
 
@@ -380,14 +281,14 @@ enum Geezle
     SPELL_TREE_DISGUISE = 30298,
 
     GEEZLE_SAY_1    = 0,
-    SPARK_SAY_2     = 3,
-    SPARK_SAY_3     = 4,
+    SPARK_SAY_2     = 7,
+    SPARK_SAY_3     = 8,
     GEEZLE_SAY_4    = 1,
-    SPARK_SAY_5     = 5,
-    SPARK_SAY_6     = 6,
+    SPARK_SAY_5     = 9,
+    SPARK_SAY_6     = 10,
     GEEZLE_SAY_7    = 2,
 
-    EMOTE_SPARK     = 7,
+    EMOTE_SPARK     = 6,
 
     NPC_SPARK       = 17243,
     GO_NAGA_FLAG    = 181694
@@ -730,7 +631,6 @@ public:
 void AddSC_azuremyst_isle()
 {
     new npc_draenei_survivor();
-    new npc_engineer_spark_overgrind();
     new npc_injured_draenei();
     new npc_magwin();
     new npc_geezle();
