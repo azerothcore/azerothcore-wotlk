@@ -6,3 +6,4 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (2134518, 192011, 571, 0, 0, 1, 1, 8427.42, 2910.6, 606.259, 1.61609, 0, 0, -0.722938, -0.690913, 300, 0, 1, '', 0);
 
 UPDATE `gameobject_template` SET `Data0` = 15715, `Data1` = 17 WHERE (`entry` = 192011);
+
