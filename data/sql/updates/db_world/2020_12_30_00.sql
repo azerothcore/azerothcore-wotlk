@@ -1,3 +1,19 @@
+-- DB update 2020_12_29_01 -> 2020_12_30_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_12_29_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_12_29_01 2020_12_30_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1607246968593658900'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1607246968593658900');
 
 -- Alliance
@@ -26,3 +42,12 @@ DELETE FROM `quest_offer_reward_locale` WHERE `ID`=24563 AND `locale`='deDE';
 INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES 
 (24563, 'deDE', 'Ihr tragt wirklich Quel''Delar bei Euch. Heute ist ein großer Tag für ganz Quel''Thalas und die Sin''dorei! Ihr habt meine Erlaubnis, zum Sonnenbrunnen zu gehen und die Wiederherstellung des Schwertes abzuschließen. Lasst den Kopf nicht hängen, $N. Die Söhne und Töchter Silbermonds haben viele Jahre auf diesen Tag gewartet.', 18019);
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
