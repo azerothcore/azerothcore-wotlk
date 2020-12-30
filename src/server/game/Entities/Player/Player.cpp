@@ -732,6 +732,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_usedTalentCount = 0;
     m_questRewardTalentCount = 0;
+    m_extraBonusTalentCount = 0;
 
     m_regenTimer = 0;
     m_regenTimerCount = 0;
@@ -3048,7 +3049,7 @@ bool Player::IsInAreaTriggerRadius(const AreaTrigger* trigger) const
     else
     {
         Position center(trigger->x, trigger->y, trigger->z, trigger->orientation);
-        if (IsWithinBox(center, trigger->length / 2 + delta, trigger->width / 2 + delta, trigger->height / 2 + delta))
+        if (!IsWithinBox(center, trigger->length / 2 + delta, trigger->width / 2 + delta, trigger->height / 2 + delta))
             return false;
     }
 
@@ -7283,6 +7284,14 @@ void Player::RewardReputation(Quest const* quest)
 
         if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]))
             GetReputationMgr().ModifyReputation(factionEntry, rep);
+    }
+}
+
+void Player::RewardExtraBonusTalentPoints(uint32 bonusTalentPoints)
+{
+    if (bonusTalentPoints)
+    {
+        m_extraBonusTalentCount += bonusTalentPoints;
     }
 }
 
@@ -20046,7 +20055,7 @@ void Player::_SaveMail(SQLTransaction& trans)
     if (!GetMailCacheSize() || !m_mailsUpdated)
     {
         return;
-    }    
+    }
 
     PreparedStatement* stmt = nullptr;
 
@@ -25426,6 +25435,7 @@ uint32 Player::CalculateTalentsPoints() const
     if (talentPointsForLevel > base_talent)
         talentPointsForLevel = base_talent;
 
+    talentPointsForLevel += m_extraBonusTalentCount;
     return uint32(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
 }
 

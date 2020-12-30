@@ -68,8 +68,12 @@ jobs:
   mac-build:
     strategy:
       fail-fast: false
-    runs-on: macos-10.15
-    name: macos-10.15
+      matrix:
+        os:
+          - macos-10.15
+          - macos-11.0
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
@@ -77,12 +81,14 @@ jobs:
         uses: actions/cache@v1.1.2
         with:
           path: /Users/runner/.ccache
-          key: ccache:macos-10.15:${{ github.ref }}:${{ github.sha }}
+          key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
-            ccache:macos-10.15:${{ github.ref }}
-            ccache:macos-10.15
+            ccache:${{ matrix.os }}:${{ github.ref }}
+            ccache:${{ matrix.os }}
+      - name: Install latest bash
+        run: brew install bash
       - name: Configure OS
-        run: source ./apps/ci/mac/ci-install.sh
+        run: source ./acore.sh install-deps
       - name: Build
         run: source ./apps/ci/mac/ci-compile.sh
       - name: Run unit tests

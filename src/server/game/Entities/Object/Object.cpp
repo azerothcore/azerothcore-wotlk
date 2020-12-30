@@ -1335,7 +1335,7 @@ bool Position::IsWithinBox(const Position& center, float xradius, float yradius,
     // is-in-cube check and we have to calculate only one point instead of 4
 
     // 2PI = 360*, keep in mind that ingame orientation is counter-clockwise
-    double rotation = 2 * M_PI - GetOrientation();
+    double rotation = 2 * M_PI - center.GetOrientation();
     double sinVal = std::sin(rotation);
     double cosVal = std::cos(rotation);
 
@@ -1347,8 +1347,8 @@ bool Position::IsWithinBox(const Position& center, float xradius, float yradius,
 
     // box edges are parallel to coordiante axis, so we can treat every dimension independently :D
     float dz = GetPositionZ() - center.GetPositionZ();
-    float dx = rotX - GetPositionX();
-    float dy = rotY - GetPositionY();
+    float dx = rotX - center.GetPositionX();
+    float dy = rotY - center.GetPositionY();
     if ((std::fabs(dx) > xradius) ||
         (std::fabs(dy) > yradius) ||
         (std::fabs(dz) > zradius))

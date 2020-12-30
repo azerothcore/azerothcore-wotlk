@@ -3971,6 +3971,15 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Dispel = DISPEL_NONE;
     });
 
+
+    //////////////////////////////////////////
+    ////////// ULDUAR
+    //////////////////////////////////////////
+    ApplySpellFix({ 64014, 64032, 64028, 64031, 64030, 64029, 64024, 64025, 65042 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetB[EFFECT_1] = TARGET_DEST_DB;
+    });
+  
     // Killing Spree (teleport)
     ApplySpellFix({ 57840 }, [](SpellEntry* spellInfo)
     {
@@ -7175,6 +7184,12 @@ void SpellMgr::LoadDbcDataCorrections()
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx7 |= SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER;
+    });
+
+    // Clicking on Warlock Summoning portal should not require mana
+    ApplySpellFix({ 61994 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->ManaCostPercentage = 0;
     });
 
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)

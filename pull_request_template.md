@@ -5,23 +5,23 @@
 
 <!-- WRITE A RELEVANT TITLE -->
 
-## CHANGES PROPOSED:
+## Changes Proposed:
 -  
 -  
 
 
-## ISSUES ADDRESSED:
+## Issues Addressed:
 - Closes 
 <!-- If the issue doesn't exist, describe it and how to reproduce it, please. If the issue already exists, just paste the link to the issue you close, like this: Closes https://github.com/azerothcore/azerothcore-wotlk/issues/967 -->
 
 
-## TESTS PERFORMED:
+## Tests Performed:
 -
 -
 <!-- Does it build without errors? Did you test in-game? What did you test? Did you do all these tests on Linux, Mac or Windows? Other tests performed -->
 
 
-## HOW TO TEST THE CHANGES:
+## How to Test the Changes:
 <!-- We need to confirm the changes first, so try to make the work easy for testers (who are not necessarily coders), please:
  - Which commands to use? Which NPC to teleport to?
  - Do we need to enable debug flags on Cmake?
@@ -30,13 +30,13 @@
 -->
 
 
-## KNOWN ISSUES AND TODO LIST:
+## Known Issues and TODO List:
 <!-- This is a TODO list with checkboxes to tick -->
 - [ ]
 - [ ] 
 
 
-## Target branch(es):
+## Target Branch(es):
 - [x] Master
 
 
@@ -48,7 +48,7 @@
 
 <!-- Do not remove the instructions below about testing, they will help users to test your PR -->
  
-## How to test AzerothCore PRs
+## How to Test AzerothCore PRs
  
 When a PR is ready to be tested, it will be marked as **[WAITING TO BE TESTED]**.
 

@@ -11,6 +11,8 @@
 #ifndef __WORLDSESSION_H
 #define __WORLDSESSION_H
 
+#include <utility>
+
 #include "Common.h"
 #include "SharedDefines.h"
 #include "AddonMgr.h"
@@ -159,8 +161,8 @@ class CharacterCreateInfo
     friend class Player;
 
 protected:
-    CharacterCreateInfo(std::string const& name, uint8 race, uint8 cclass, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId,
-                        WorldPacket& data) : Name(name), Race(race), Class(cclass), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair),
+    CharacterCreateInfo(std::string  name, uint8 race, uint8 cclass, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId,
+                        WorldPacket& data) : Name(std::move(name)), Race(race), Class(cclass), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair),
         OutfitId(outfitId), Data(data), CharCount(0)
     {}
 
