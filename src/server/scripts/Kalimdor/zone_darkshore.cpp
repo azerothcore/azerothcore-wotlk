@@ -14,7 +14,6 @@ EndScriptData */
 /* ContentData
 npc_kerlonian
 npc_prospector_remtravel
-npc_threshwackonator
 EndContentData */
 
 #include "ScriptMgr.h"
