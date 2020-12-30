@@ -77,6 +77,7 @@
 #include "SavingSystem.h"
 #include "ServerMotd.h"
 #include "GameGraveyard.h"
+#include "QuestTracker.h"
 #include <VMapManager2.h>
 
 #ifdef ELUNA
@@ -2028,6 +2029,9 @@ void World::SetInitialWorldSettings()
     mgr = ChannelMgr::forTeam(TEAM_HORDE);
     mgr->LoadChannels();
 
+    sLog->outString("Start QuestTracker system...");
+    sQuestTracker->InitSystem();
+
 #ifdef ELUNA
     ///- Run eluna scripts.
     // in multithread foreach: run scripts
@@ -2346,6 +2350,8 @@ void World::Update(uint32 diff)
     sScriptMgr->OnWorldUpdate(diff);
 
     SavingSystemMgr::Update(diff);
+
+    sQuestTracker->Update(diff);
 }
 
 void World::ForceGameEventUpdate()

@@ -77,6 +77,7 @@
 #include "TicketMgr.h"
 #include "ScriptMgr.h"
 #include "GameGraveyard.h"
+#include "QuestTracker.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -15859,15 +15860,8 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
     // check if Quest Tracker is enabled
     if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
     {
-        // prepare Quest Tracker datas
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_TRACK);
-        stmt->setUInt32(0, quest_id);
-        stmt->setUInt32(1, GetGUIDLow());
-        stmt->setString(2, _HASH);
-        stmt->setString(3, _DATE);
-
         // add to Quest Tracker
-        CharacterDatabase.Execute(stmt);
+        sQuestTracker->Add(quest_id, GetGUIDLow(), GitRevision::GetHash(), GitRevision::GetDate());
     }
 
     // Xinef: area auras may change on quest accept!
@@ -15900,13 +15894,8 @@ void Player::CompleteQuest(uint32 quest_id)
     // check if Quest Tracker is enabled
     if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
     {
-        // prepare Quest Tracker datas
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME);
-        stmt->setUInt32(0, quest_id);
-        stmt->setUInt32(1, GetGUIDLow());
-
         // add to Quest Tracker
-        CharacterDatabase.Execute(stmt);
+        sQuestTracker->UpdateCompleteTime(quest_id, GetGUIDLow());
     }
 }
 
