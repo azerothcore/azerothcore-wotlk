@@ -264,7 +264,8 @@ void CreatureAI::CombatReposition()
     if (
         !victim ||
         !me->IsFreeToMove() ||
-        !me->IsWithinMeleeRange(victim)
+        !me->IsWithinMeleeRange(victim) ||
+        (victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet())
     ) {
         return;
     }

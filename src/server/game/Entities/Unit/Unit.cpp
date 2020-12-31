@@ -2234,6 +2234,9 @@ struct AttackDistance {
 
 Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 {
+    if (!attacker) // only player & pets to save CPU
+        return NULL;
+
     AttackerSet attackers = getAttackers();
 
     if (attackers.size() <= 1)
@@ -2242,6 +2245,8 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     float attackerSize = attacker->GetObjectSize();
     float meleeReach = attacker->GetMeleeReach();
 
+    // in instance: the more attacker there are, the higher will be the tollerance
+    // outside: creatures should not intersecate
     float distanceTollerance = attacker->GetMap()->IsDungeon() ? -2.0f * tanh(attackers.size() / 5.0f) : 0.0f;
 
     float currentAngle, minDistance = 0;
@@ -2249,7 +2254,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     Unit *refUnit = NULL;
     for (const auto& otherAttacher: attackers)
     {
-        if (otherAttacher->GetGUID() == attacker->GetGUID() || otherAttacher->isMoving())
+        if (!otherAttacher || otherAttacher->GetGUID() == attacker->GetGUID() || otherAttacher->isMoving())
             continue;
 
         float tempDist = attacker->GetExactDist2d(otherAttacher) - (attacker->GetObjectSize()/2) - (otherAttacher->GetObjectSize()/2);
@@ -2260,7 +2265,6 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         if (tempDist == 0 || minDistance == 0 || tempDist < minDistance) {
             minDistance = tempDist;
             currentAngle = GetAngle(otherAttacher);
-
             refUnit = otherAttacher;
         }
     }

@@ -341,7 +341,7 @@ void MotionMaster::MoveBackwards(Unit* target, float dist)
     init.MoveTo(point.x, point.y, point.z);
     init.SetFacing(target);
     init.SetWalk(true);
-    //init.SetBackward();
+    init.SetOrientationInversed();
     init.Launch();
 }
 
