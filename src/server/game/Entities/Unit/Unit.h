@@ -2196,7 +2196,7 @@ public:
 
     uint32 GetDisplayId() { return GetUInt32Value(UNIT_FIELD_DISPLAYID); }
     virtual void SetDisplayId(uint32 modelId);
-    uint32 GetNativeDisplayId() { return GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID); }
+    uint32 GetNativeDisplayId() const { return GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID); }
     void RestoreDisplayId();
     void SetNativeDisplayId(uint32 modelId) { SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, modelId); }
     void setTransForm(uint32 spellid) { m_transform = spellid;}
@@ -2474,6 +2474,8 @@ public:
     Movement::MoveSpline* movespline;
 
     [[nodiscard]] AttackPosition getAttackPosition() { return m_attackPosition; }
+
+    [[nodiscard]] float GetCollisionHeight() const override;
 
 protected:
     explicit Unit (bool isWorldObject);

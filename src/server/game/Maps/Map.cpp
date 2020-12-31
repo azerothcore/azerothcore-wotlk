@@ -3397,47 +3397,92 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
  *
  *   Check if a given unit can reach a specific point and set the correct Z coord based on difference in height
  *
- *   \param maxHeight the desired range of a new Z coord.
+ *   \param maxDeviationAngle  the
+ *   \param maxHeight the desired max Height for the calculated Z coord. If the new Z exceed the maxHeight, this method returns false
  *   \return true if the destination is valid, false otherwise
  *
  **/
-bool Map::isValidPositionAndGetHeight(Unit* owner, float dest_x, float dest_y, float &dest_z, float maxHeight/*  = 3.0f */) const
+bool Map::CanReachPositionAndGetHeight(Unit* who, float dest_x, float dest_y, float &dest_z, float maxDeviationAngle /*= M_PI*2 */, float maxHeight/*  = 3.0f */, bool canFollowPath /*=true*/) const
 {
     acore::NormalizeMapCoord(dest_x);
     acore::NormalizeMapCoord(dest_y);
-    if (owner->IsWithinLOS(dest_x, dest_y, dest_z))
+
+    const Map* _map = who->GetBaseMap();
+
+    // if water environment
+    bool is_water_now = _map->IsInWater(who->GetPositionX(), who->GetPositionY(), who->GetPositionZ());
+
+    if (is_water_now && _map->IsInWater(dest_x, dest_y, dest_z))
     {
-        const Map* _map = owner->GetBaseMap();
-
-        // if water environment
-        bool is_water_now = _map->IsInWater(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ());
-
-        if (is_water_now && _map->IsInWater(dest_x, dest_y, dest_z))
-        {
-            return true;
-        }
-
-        // otherwise calculate a new z
-        float new_z = _map->GetHeight(owner->GetPhaseMask(), dest_x, dest_y, dest_z, true);
-
-        if (new_z <= INVALID_HEIGHT || fabs(dest_z - new_z) > maxHeight)
-        {
-            return false;
-        }
-
-        bool is_water_next = _map->IsInWater(dest_x, dest_y, new_z);
-
-        if ((is_water_now && !is_water_next && owner->GetTypeId() == TYPEID_UNIT && !((Creature*)owner)->CanWalk()) ||
-            (!is_water_now && is_water_next && !owner->CanSwim()))
-        {
-            return false;
-        }
-
-        if (owner->IsWithinLOS(dest_x, dest_y, new_z)) {
-            dest_z = new_z;
-            return true;
-        }
+        return true;
     }
 
-    return false;
+    // otherwise calculate a new z
+    float new_z = _map->GetHeight(who->GetPhaseMask(), dest_x, dest_y, dest_z, true);
+
+    if (new_z <= INVALID_HEIGHT)
+    {
+        return false;
+    }
+
+    bool is_water_next = _map->IsInWater(dest_x, dest_y, new_z);
+
+    // if not compatible inhabit type for the next position, return false
+    if ((is_water_now && !is_water_next && who->GetTypeId() == TYPEID_UNIT && !((Creature*)who)->CanWalk()) ||
+        (!is_water_now && is_water_next && !who->CanSwim()))
+    {
+        return false;
+    }
+
+    if (!who->IsWithinLOS(dest_x, dest_y, new_z)) {
+        return false;
+    }
+
+    Position pos = who->GetPosition();
+
+    // check map geometry for possible collision
+    if ((maxDeviationAngle <= 0.0f || !canFollowPath) && (
+        !who->IsWithinLOS(dest_x, dest_y, new_z) ||
+        VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(who->GetMap()->GetId(), pos.m_positionX, pos.m_positionY, pos.m_positionZ, dest_x, dest_y, dest_z, dest_x, dest_y, dest_z, 0.0f) ||
+        who->GetMap()->getObjectHitPos(who->GetPhaseMask(), pos.m_positionX, pos.m_positionY, pos.m_positionZ, dest_x, dest_y, dest_z, dest_x, dest_y, dest_z, 0.0f))
+    )
+    {
+        return false;
+    }
+
+    // check path for more accurate checks and results
+    if (canFollowPath) {
+        PathGenerator path(who);
+        path.SetUseStraightPath(!canFollowPath);
+        bool result = path.CalculatePath(pos.m_positionX, pos.m_positionY, pos.m_positionZ, false);
+
+        // there are no paths, then it's impossible to reach the position
+        if (!result)
+        {
+            return false;
+        }
+
+        double deviation = 0.0f;
+        for (auto & vector : path.GetPath()) {
+            deviation += who->GetAngle(vector.x, vector.y);
+
+            // to reach the position the Unit must deviate
+            // the straight path with a higher margin than the one desired
+            // in this case we return false
+            if (deviation > maxDeviationAngle)
+                return false;
+        }
+
+        new_z = path.GetEndPosition().z;
+    }
+
+    if (fabs(dest_z - new_z) > maxHeight) {
+        return false;
+    }
+
+
+    dest_z = new_z;
+
+    // finally
+    return true;
 }

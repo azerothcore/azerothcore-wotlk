@@ -12713,7 +12713,7 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
         WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
         data.append(GetPackGUID());
         data << uint32(sWorld->GetGameTime());   // Packet counter
-        data << player->GetCollisionHeight(true);
+        data << player->GetCollisionHeight();
         player->GetSession()->SendPacket(&data);
     }
 
@@ -12733,7 +12733,7 @@ void Unit::Dismount()
         WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
         data.append(GetPackGUID());
         data << uint32(sWorld->GetGameTime());   // Packet counter
-        data << thisPlayer->GetCollisionHeight(false);
+        data << thisPlayer->GetCollisionHeight();
         thisPlayer->GetSession()->SendPacket(&data);
     }
 
@@ -20020,4 +20020,33 @@ bool Unit::IsInCombatWith(Unit const* who) const
     }
     // Nothing found, false.
     return false;
+}
+
+//! Return collision height sent to client
+float Unit::GetCollisionHeight() const
+{
+    uint32 nativeDisplayId = GetNativeDisplayId();
+    if (IsMounted())
+    {
+        if (CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID));
+            CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId))
+        {
+            CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(nativeDisplayId);
+            ASSERT(displayInfo);
+            CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayInfo->ModelId);
+            ASSERT(modelData);
+
+            float scaleMod = GetFloatValue(OBJECT_FIELD_SCALE_X); // 99% sure about this
+
+            return scaleMod * mountModelData->MountHeight + modelData->CollisionHeight * 0.5f;
+        }
+    }
+
+    //! Dismounting case - use basic default model data
+    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(nativeDisplayId);
+    ASSERT(displayInfo);
+    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayInfo->ModelId);
+    ASSERT(modelData);
+
+    return modelData->CollisionHeight;
 }
