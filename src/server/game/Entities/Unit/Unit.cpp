@@ -2235,17 +2235,23 @@ struct AttackDistance {
 Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 {
     if (!attacker) // only player & pets to save CPU
+    {
         return NULL;
+    }
 
     AttackerSet attackers = getAttackers();
 
     if (attackers.size() <= 1)
+    {
         return NULL;
+    }
 
     float meleeReach = attacker->GetMeleeReach();
 
     if (meleeReach <= 0)
+    {
         return NULL;
+    }
 
     float currentAngle, minDistance = 0;
     Unit *refUnit = NULL;
@@ -2253,16 +2259,20 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 
     for (const auto& otherAttacker: attackers)
     {
+        // if the otherAttacker is not valid, skip
         if (!otherAttacker ||
             otherAttacker->GetGUID() == attacker->GetGUID() ||
             !otherAttacker->IsWithinMeleeRange(this) ||
             otherAttacker->isMoving()
         )
+        {
             continue;
+        }
 
         float tempDist = attacker->GetExactDist2d(otherAttacker) - (attacker->GetObjectSize()/2) - (otherAttacker->GetObjectSize()/2);
 
-        if (tempDist == 0 || minDistance == 0 || tempDist < minDistance) {
+        if (tempDist == 0 || minDistance == 0 || tempDist < minDistance)
+        {
             minDistance = tempDist;
             currentAngle = GetAngle(otherAttacker);
             refUnit = otherAttacker;
@@ -2276,7 +2286,9 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     float distanceTollerance = attacker->GetMap()->IsDungeon() ? -2.0f * tanh(validAttackers / 5.0f) : 0.0f;
 
     if (!refUnit || minDistance > distanceTollerance)
+    {
         return NULL;
+    }
 
     float attackerSize = attacker->GetObjectSize();
 
@@ -2286,7 +2298,8 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     // move away from collisions with another unit during combat
     // NOTE: it works only when there's enough space between the
     // attacker and the victim. We use a simpler one otherwise.
-    if (GetExactDist2d(refUnit) > ray) {
+    if (GetExactDist2d(refUnit) > ray)
+    {
         double refUnitX = refUnit->GetPositionX();
         double refUnitY = refUnit->GetPositionY();
         double victimX = GetPositionX();
@@ -2297,8 +2310,10 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         double b = 8.0f * ( (refUnitX * refUnitY) + (victimX * victimY) - (victimX * refUnitY) - (refUnitX * victimY) );
         double c = 4.0f * (- pow(victimY,2.0f) - pow(refUnitY,2.0f) + (2.0f*victimY*refUnitY) + pow(ray,2.0f));
 
-        if (a==0) // should not happen
+        if (a == 0) // should not happen
+        {
             return NULL;
+        }
 
         double sq = sqrt(pow(b,2.0f)-4.0f*a*c);
 
