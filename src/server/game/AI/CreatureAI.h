@@ -71,7 +71,8 @@ public:
 
     ~CreatureAI() override {}
 
-    void CombatReposition();
+    void MoveCircleChecks();
+    void MoveBackwardsChecks();
 
     /// == Reactions At =================================
 

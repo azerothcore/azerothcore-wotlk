@@ -257,7 +257,7 @@ bool CreatureAI::_EnterEvadeMode()
     return true;
 }
 
-void CreatureAI::CombatReposition()
+void CreatureAI::MoveCircleChecks()
 {
     Unit *victim = me->GetVictim();
 
@@ -270,20 +270,23 @@ void CreatureAI::CombatReposition()
         return;
     }
 
-    Position victimPos = victim->GetPosition();
+    me->GetMotionMaster()->MoveCircleTarget(me->GetVictim());
+}
 
-    // If we are closer than 50% of the combat reach we are going to reposition ourself
-    // Dont call if we have more than one attacker because Circling Target will take place.
-    float reach = CalculatePct(me->GetCombatReach() + victim->GetCombatReach(), 50);
-    float moveDist = CalculatePct(me->GetCombatReach() + victim->GetCombatReach(), 100);
+void CreatureAI::MoveBackwardsChecks() {
+    Unit *victim = me->GetVictim();
+
     if (
-        me->GetDistance(victimPos) < reach
-    )
-    {
-        me->GetMotionMaster()->MoveBackwards(victim, moveDist);
+        !victim ||
+        !me->IsFreeToMove() ||
+        (victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet())
+    ) {
+        return;
     }
 
-    me->GetMotionMaster()->MoveCircleTarget(me->GetVictim());
+    float moveDist = CalculatePct(me->GetCombatReach() + victim->GetCombatReach(), 100);
+
+    me->GetMotionMaster()->MoveBackwards(victim, moveDist);
 }
 
 Creature* CreatureAI::DoSummon(uint32 entry, const Position& pos, uint32 despawnTime, TempSummonType summonType)

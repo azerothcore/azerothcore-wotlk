@@ -731,7 +731,9 @@ public:
 
     bool IsFreeToMove();
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 1500;
+    static constexpr uint32 MOVE_BACKWARDS_CHECK_INTERVAL = 2000;
     uint32 m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
+    uint32 m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
 
 protected:
     bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);

@@ -589,15 +589,30 @@ void Creature::Update(uint32 diff)
                 // Circling the target
                 if (diff >= m_moveCircleMovementTime)
                 {
-                    AI()->CombatReposition();
-                    m_moveCircleMovementTime = urand(MOVE_CIRCLE_CHECK_INTERVAL / 2, MOVE_CIRCLE_CHECK_INTERVAL);
-                    //std::cout << "<timer>" << m_moveCircleMovementTime << "</timer>" << std::endl;
-                    //std::cout << "<GUID>" << GetGUID() << "</GUID>" << std::endl;
+                    AI()->MoveCircleChecks();
+                    m_moveCircleMovementTime = urand(MOVE_CIRCLE_CHECK_INTERVAL * 2, MOVE_CIRCLE_CHECK_INTERVAL * 3);
                 }
                 else
                 {
                     m_moveCircleMovementTime -= diff;
                 }
+
+                // If we are closer than 50% of the combat reach we are going to reposition the victim
+                if (Unit *victim = GetVictim();
+                    victim && GetDistance(victim->GetPosition()) < CalculatePct(GetCombatReach() + victim->GetCombatReach(), 50)) {
+                    if (diff >= m_moveBackwardsMovementTime)
+                    {
+                        AI()->MoveBackwardsChecks();
+                        m_moveBackwardsMovementTime = urand(MOVE_BACKWARDS_CHECK_INTERVAL/2, MOVE_BACKWARDS_CHECK_INTERVAL * 2);
+                    }
+                    else
+                    {
+                        m_moveBackwardsMovementTime -= diff;
+                    }
+                } else {
+                    m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
+                }
+
 
                 if (!IsInEvadeMode() && IsAIEnabled)
                 {

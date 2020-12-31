@@ -2473,7 +2473,7 @@ public:
     // Movement info
     Movement::MoveSpline* movespline;
 
-    AttackPosition getAttackPosition() { return m_attackPosition; }
+    [[nodiscard]] AttackPosition getAttackPosition() { return m_attackPosition; }
 
 protected:
     explicit Unit (bool isWorldObject);

@@ -2248,7 +2248,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return NULL;
 
     float currentAngle, minDistance = 0;
-    Unit *refUnit = NULL;
+    Unit *refUnit = nullptr;
     uint32 validAttackers=0;
 
     for (const auto& otherAttacker: attackers)
@@ -2275,8 +2275,9 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     // outside: creatures should not intersecate
     float distanceTollerance = attacker->GetMap()->IsDungeon() ? -2.0f * tanh(validAttackers / 5.0f) : 0.0f;
 
-    if (!refUnit || minDistance > distanceTollerance)
+    if (!refUnit || minDistance > distanceTollerance) {
         return NULL;
+    }
 
     float attackerSize = attacker->GetObjectSize();
 
@@ -2297,8 +2298,10 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         double b = 8.0f * ( (refUnitX * refUnitY) + (victimX * victimY) - (victimX * refUnitY) - (refUnitX * victimY) );
         double c = 4.0f * (- pow(victimY,2.0f) - pow(refUnitY,2.0f) + (2.0f*victimY*refUnitY) + pow(ray,2.0f));
 
-        if (a==0) // should not happen
+        if (a==0) {
+            // should not happen
             return NULL;
+        }
 
         double sq = sqrt(pow(b,2.0f)-4.0f*a*c);
 

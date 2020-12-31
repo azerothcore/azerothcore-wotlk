@@ -337,11 +337,10 @@ void MotionMaster::MoveBackwards(Unit* target, float dist)
     //else
     //    point.z = _owner->GetMapHeight(point.x, point.y, point.z);
 
-    if (_owner->GetMap()->isValidPositionAndGetHeight(_owner, point.x, point.y, point.z, 0.5f)) {
+    if (_owner->GetMap()->isValidPositionAndGetHeight(_owner, point.x, point.y, point.z, 1.2f)) {
         Movement::MoveSplineInit init(_owner);
         init.MoveTo(point.x, point.y, point.z);
         init.SetFacing(target);
-        init.SetWalk(true);
         init.SetOrientationInversed();
         init.Launch();
     }
