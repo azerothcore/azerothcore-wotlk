@@ -2241,7 +2241,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 
     AttackerSet attackers = getAttackers();
 
-    if (attackers.size() <= 1)
+    if (attackers.size() <= 1) // if the attackers are not more than one
     {
         return NULL;
     }
