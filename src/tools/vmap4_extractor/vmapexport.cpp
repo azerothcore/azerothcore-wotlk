@@ -5,11 +5,11 @@
  */
 
 #define _CRT_SECURE_NO_DEPRECATE
+#include <cerrno>
 #include <cstdio>
 #include <iostream>
-#include <vector>
 #include <list>
-#include <errno.h>
+#include <vector>
 
 #ifdef WIN32
 #include <Windows.h>
@@ -226,7 +226,7 @@ void ParsMapFiles()
     for (unsigned int i = 0; i < map_count; ++i)
     {
         sprintf(id, "%03u", map_ids[i].id);
-        sprintf(fn, "World\\Maps\\%s\\%s.wdt", map_ids[i].name, map_ids[i].name);
+        snprintf(fn, sizeof(fn), R"(World\Maps\%s\%s.wdt)", map_ids[i].name, map_ids[i].name);
         WDTFile WDT(fn, map_ids[i].name);
         if (WDT.init(id, map_ids[i].id))
         {

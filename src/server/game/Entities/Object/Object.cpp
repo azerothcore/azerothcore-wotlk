@@ -1350,10 +1350,11 @@ bool Position::IsWithinBox(const Position& center, float xradius, float yradius,
     float dx = rotX - center.GetPositionX();
     float dy = rotY - center.GetPositionY();
     if ((std::fabs(dx) > xradius) ||
-            (std::fabs(dy) > yradius) ||
-            (std::fabs(dz) > zradius))
+        (std::fabs(dy) > yradius) ||
+        (std::fabs(dz) > zradius))
+    {
         return false;
-
+    }
     return true;
 }
 

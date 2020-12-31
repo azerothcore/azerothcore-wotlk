@@ -12,7 +12,7 @@
 #include <vector>
 
 #ifndef _WIN32
-#include <stddef.h>
+#include <cstddef>
 #include <dirent.h>
 #endif
 
