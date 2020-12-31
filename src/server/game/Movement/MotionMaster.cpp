@@ -320,6 +320,31 @@ void MotionMaster::MoveChase(Unit* target, float dist, float angle)
     }
 }
 
+void MotionMaster::MoveBackwards(Unit* target, float dist)
+{
+    if (!target)
+        return;
+
+    Position const& pos = target->GetPosition();
+    float angle = target->GetAngle(_owner);
+    G3D::Vector3 point;
+    point.x = pos.m_positionX + dist * cosf(angle);
+    point.y = pos.m_positionY + dist * sinf(angle);
+    point.z = pos.m_positionZ;
+
+    //if (_owner->IsFlying())
+    //    point.z = pos.m_positionZ;
+    //else
+    //    point.z = _owner->GetMapHeight(point.x, point.y, point.z);
+
+    Movement::MoveSplineInit init(_owner);
+    init.MoveTo(point.x, point.y, point.z);
+    init.SetFacing(target);
+    init.SetWalk(true);
+    //init.SetBackward();
+    init.Launch();
+}
+
 void MotionMaster::MoveCircleTarget(Unit* target)
 {
     if (!target) {
@@ -345,10 +370,11 @@ void MotionMaster::MoveCircleTarget(Unit* target)
     float y = point->m_positionY;
     float z = point->m_positionZ;
 
-    if (_map->isValidPositionAndGetHeight(_owner, x, y, z, 0, 0.5f)) {
+    if (_map->isValidPositionAndGetHeight(_owner, x, y, z, 0.5f)) {
         Movement::MoveSplineInit init(_owner);
         init.SetSmooth();
         init.MoveTo(point->m_positionX, point->m_positionY, z, true);
+        init.SetWalk(true);
         init.SetFacing(target);
         init.Launch();
     }

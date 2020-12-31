@@ -71,6 +71,8 @@ public:
 
     ~CreatureAI() override {}
 
+    void CombatReposition();
+
     /// == Reactions At =================================
 
     // Called if IsVisible(Unit* who) is true at each who move, reaction at visibility zone enter
@@ -161,8 +163,6 @@ public:
     virtual bool CanSeeAlways(WorldObject const* /*obj*/) { return false; }
 
     virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
-
-    void CheckCircleRepositionRequirements();
 
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);

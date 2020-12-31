@@ -441,16 +441,6 @@ void Unit::Update(uint32 p_time)
         ModifyAuraState(AURA_STATE_HEALTH_ABOVE_75_PERCENT, HealthAbovePct(75));
     }
 
-    if (_attackPointCheckTimer > p_time)
-    {
-        _attackPointCheckTimer -= p_time;
-    }
-    else
-    {
-        _attackPointCheckTimer = ATTACK_POINT_CHECK_INTERVAL;
-        SetMeleeAttackPoints();
-    }
-
     UpdateSplineMovement(p_time);
     GetMotionMaster()->UpdateMotion(p_time);
 }
@@ -2242,124 +2232,90 @@ struct AttackDistance {
     AttackPosition _attackPos;
 };
 
-void Unit::SetMeleeAttackPoints()
-{
-    if (getAttackers().size() <= 1)
-    {
-        return;
-    }
-
-    // Delete the attack positions each iteration.
-    attackMeleePositions.clear();
-
-    // Calculate the attack positions.
-    AttackerSet attackers = getAttackers();
-    AttackerSet meleeAttackers;
-
-    for (const auto& attacker: attackers)
-    {
-        if (attacker->IsWithinMeleeRange(this))
-        {
-            meleeAttackers.insert(attacker);
-        }
-    }
-
-    float step = float(M_PI*2) / meleeAttackers.size(); // all points of the circumference related to the player by the number of attackers
-    // 0.63
-
-    Position const& pos = GetPosition();
-
-    uint8 i = 0;
-    for (const auto& attacker: meleeAttackers)
-    {
-        // CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(attacker->GetDisplayId());
-        // float size = modelData->Scale ? modelData->Scale : 1;
-
-        // CreatureTemplate const* normalInfo = sObjectMgr->GetCreatureTemplate(Entry);
-        // attacker->
-
-        // calculate angle of space inside the circumference (around the player)
-        int8 anglePosition = ceil((i+1)/2) * ((i+1) % 2 ? -1 : 1);
-        float angle = float(M_PI * 2) + ((step / 1) * anglePosition);
-        // 6.30 + (0.63 * -1) = 5.67
-
-        CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelInfo(attacker->GetDisplayId());
-        float boundingRadius = minfo->bounding_radius > 0 ? minfo->bounding_radius : MIN_MELEE_REACH;
-
-        attackMeleePositions.push_back(AttackPosition(Position(
-            pos.m_positionX + boundingRadius * cosf(angle),
-            pos.m_positionY + boundingRadius * sinf(angle),
-            pos.m_positionZ)
-        ));
-
-        i++;
-    }
-}
-
 Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 {
-    if (getAttackers().size() <= 1)
-    {
+    AttackerSet attackers = getAttackers();
+
+    if (attackers.size() <= 1)
         return NULL;
-    }
 
-    // If the Creature is already on an attack Position and close enough to the Target abort
-    if (attacker->GetDistance(GetPosition()) < GetCombatReach() &&
-       !(attacker->m_attackPosition == 0) &&
-       attacker->GetDistance(attacker->m_attackPosition._pos) < 0.25f)
+    float attackerSize = attacker->GetObjectSize();
+    float meleeReach = attacker->GetMeleeReach();
+
+    float distanceTollerance = attacker->GetMap()->IsDungeon() ? -2.0f * tanh(attackers.size() / 5.0f) : 0.0f;
+
+    float currentAngle, minDistance = 0;
+
+    Unit *refUnit = NULL;
+    for (const auto& otherAttacher: attackers)
     {
-       return NULL;
-    }
+        if (otherAttacher->GetGUID() == attacker->GetGUID() || otherAttacher->isMoving())
+            continue;
 
-    attacker->m_attackPosition = 0;
+        float tempDist = attacker->GetExactDist2d(otherAttacher) - (attacker->GetObjectSize()/2) - (otherAttacher->GetObjectSize()/2);
 
-    // Get all the distances
-    std::vector<AttackDistance> distances;
-    distances.reserve( attackMeleePositions.size());
-    for (uint8 i = 0; i < attackMeleePositions.size(); ++i)
-    {
-        // If the spot has been taken
-        if (!attackMeleePositions[i]._taken)
-        {
-            distances.push_back(AttackDistance(i,attackMeleePositions[i]));
+        if (tempDist > distanceTollerance)
+            continue;
+
+        if (tempDist == 0 || minDistance == 0 || tempDist < minDistance) {
+            minDistance = tempDist;
+            currentAngle = GetAngle(otherAttacher);
+
+            refUnit = otherAttacher;
         }
     }
 
-    if (distances.size() == 0)
-    {
+    if (!refUnit || meleeReach <= 0)
         return NULL;
+
+    double refUnitRay = refUnit->GetObjectSize() / 2.0f;
+
+    // Equation of tangent point
+    if (GetExactDist2d(refUnit) > refUnitRay) { // works only when there's enough space
+        double X1 = refUnit->GetPositionX();
+        double Y1 = refUnit->GetPositionY();
+        double Xp = GetPositionX();
+        double Yp = GetPositionY();
+
+        // calculate tangent star
+        double a = 4.0f * ( pow(refUnitRay,2.0f) - pow(X1,2.0f) + (2.0f * X1 * Xp) - pow(Xp,2.0f) );
+        double b = 8.0f * ( (X1 * Y1) + (Xp * Yp) - (Xp * Y1) - (X1 * Yp) );
+        double c = 4.0f * (- pow(Yp,2.0f) - pow(Y1,2.0f) + (2.0f*Yp*Y1) + pow(refUnitRay,2.0f));
+
+        if (a==0) // should not happen
+            return NULL;
+
+        double sq = sqrt(pow(b,2.0f)-4.0f*a*c);
+
+        double m1 = (-b + sq) / (2.0f*a);
+        double m2 = (-b - sq) / (2.0f*a);
+
+        // tangents
+        double xT1 = ((-1.0f) * (m1*(Yp - m1*Xp - Y1) - X1) ) / (1.0f + pow(m1,2.0f));
+        double xT2 = ((-1.0f) * (m2*(Yp - m2*Xp - Y1) - X1) ) / (1.0f + pow(m2,2.0f));
+
+        double yT1 = m1*(xT1 - Xp) + Yp;
+        double yT2 = m2*(xT2 - Xp) + Yp;
+
+        double distance = sqrt(pow(yT2-yT1,2.0f) + pow(xT2-xT1,2.0f));
+        double exactDist = GetExactDist2d(xT1, yT1);
+
+        double ortDist = sqrt(pow(exactDist,2.0f) - pow(distance/2.0f,2.0f));
+
+        double angle = currentAngle + 2.0f * atan(distance / (2.0f * ortDist)) * (urand(0, 1) ? -1 : 1);
+
+        float x, y, z;
+        GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, angle);
+
+        return new Position(x,y,z);
     }
 
-    // Get the shortest point
-    uint8 shortestIndex = 0;
-    float shortestLength = attacker->GetDistance2d(distances[0]._attackPos._pos.m_positionX, distances[0]._attackPos._pos.m_positionY);
-    for (uint8 i = 1; i < distances.size(); ++i)
-    {
-        float dist = attacker->GetDistance2d(distances[i]._attackPos._pos.m_positionX, distances[i]._attackPos._pos.m_positionY); // +GetDistance(distances[i]._attackPos._pos);
-        if (shortestLength > dist)
-        {
-            shortestLength = dist;
-            shortestIndex = i;
-        }
-    }
+    float angle = currentAngle + atan(attackerSize / (meleeReach)) * (urand(0, 1) ? -1 : 1);
 
-    // Create closest Position
-    Position closestPos(distances[shortestIndex]._attackPos._pos);
+    float x, y, z;
+    GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, angle);
 
-    // Too close mark point taken and find another spot
-    for (uint8 i = 0; i < attackMeleePositions.size(); ++i)
-    {
-        float dist = closestPos.GetExactDist(&attackMeleePositions[i]._pos);
-        if (dist < GetCombatReach()/2)
-        {
-            attackMeleePositions[i]._taken = true;
-        }
-    }
-    attacker->m_attackPosition = distances[shortestIndex]._attackPos;
-
-    Position* closestP = new Position;
-    *closestP = closestPos;
-    return closestP;
+    return new Position(x,y,z);
 }
 
 void Unit::HandleProcExtraAttackFor(Unit* victim)

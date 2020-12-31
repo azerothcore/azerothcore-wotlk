@@ -1455,7 +1455,6 @@ public:
     bool AttackStop();
     void RemoveAllAttackers();
     [[nodiscard]] AttackerSet const& getAttackers() const { return m_attackers; }
-    void SetMeleeAttackPoints();
     Position* GetMeleeAttackPoint(Unit* attacker);
     [[nodiscard]] bool isAttackingPlayer() const;
     [[nodiscard]] Unit* GetVictim() const { return m_attacking; }
@@ -2558,7 +2557,7 @@ protected:
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
     bool _instantCast;
 
-    std::vector<AttackPosition> attackMeleePositions;
+    std::map<uint64,AttackPosition> attackMeleePositions;
     AttackPosition m_attackPosition;
 
 private:

@@ -589,8 +589,10 @@ void Creature::Update(uint32 diff)
                 // Circling the target
                 if (diff >= m_moveCircleMovementTime)
                 {
-                    AI()->CheckCircleRepositionRequirements();
-                    m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
+                    AI()->CombatReposition();
+                    m_moveCircleMovementTime = urand(MOVE_CIRCLE_CHECK_INTERVAL / 2, MOVE_CIRCLE_CHECK_INTERVAL);
+                    //std::cout << "<timer>" << m_moveCircleMovementTime << "</timer>" << std::endl;
+                    //std::cout << "<GUID>" << GetGUID() << "</GUID>" << std::endl;
                 }
                 else
                 {

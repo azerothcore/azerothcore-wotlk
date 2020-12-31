@@ -3401,7 +3401,7 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
  *   \return true if the destination is valid, false otherwise
  *
  **/
-bool Map::isValidPositionAndGetHeight(Unit* owner, float dest_x, float dest_y, float &dest_z, float angle, float maxHeight/*  = 3.0f */) const
+bool Map::isValidPositionAndGetHeight(Unit* owner, float dest_x, float dest_y, float &dest_z, float maxHeight/*  = 3.0f */) const
 {
     acore::NormalizeMapCoord(dest_x);
     acore::NormalizeMapCoord(dest_y);
