@@ -2281,16 +2281,16 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         validAttackers++;
     }
 
+    float attackerSize = attacker->GetObjectSize();
+
     // in instance: the more attacker there are, the higher will be the tollerance
     // outside: creatures should not intersecate
-    float distanceTollerance = attacker->GetMap()->IsDungeon() ? -2.0f * tanh(validAttackers / 5.0f) : 0.0f;
+    float distanceTollerance = attacker->GetMap()->IsDungeon() ? -attackerSize * tanh(validAttackers / 5.0f) : 0.0f;
 
     if (!refUnit || minDistance > distanceTollerance)
     {
         return NULL;
     }
-
-    float attackerSize = attacker->GetObjectSize();
 
     double ray = attackerSize > refUnit->GetObjectSize() ? attackerSize / 2.0f : refUnit->GetObjectSize() / 2.0f;
 
