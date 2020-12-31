@@ -2608,7 +2608,6 @@ private:
 
     static constexpr uint32 ATTACK_POINT_CHECK_INTERVAL = 200;
     uint32 _attackPointCheckTimer = ATTACK_POINT_CHECK_INTERVAL;
-
 };
 
 namespace acore
