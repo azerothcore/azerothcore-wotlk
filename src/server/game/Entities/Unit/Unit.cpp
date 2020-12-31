@@ -2242,34 +2242,43 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     if (attackers.size() <= 1)
         return NULL;
 
-    float attackerSize = attacker->GetObjectSize();
     float meleeReach = attacker->GetMeleeReach();
 
-    // in instance: the more attacker there are, the higher will be the tollerance
-    // outside: creatures should not intersecate
-    float distanceTollerance = attacker->GetMap()->IsDungeon() ? -2.0f * tanh(attackers.size() / 5.0f) : 0.0f;
+    if (meleeReach <= 0)
+        return NULL;
 
     float currentAngle, minDistance = 0;
-
     Unit *refUnit = NULL;
-    for (const auto& otherAttacher: attackers)
+    AttackerSet validAttackers;
+
+    for (const auto& otherAttacker: attackers)
     {
-        if (!otherAttacher || otherAttacher->GetGUID() == attacker->GetGUID() || otherAttacher->isMoving())
+        if (!otherAttacker ||
+            otherAttacker->GetGUID() == attacker->GetGUID() ||
+            otherAttacker->isMoving() ||
+            !otherAttacker->IsWithinMeleeRange(this)
+        )
             continue;
 
-        float tempDist = attacker->GetExactDist2d(otherAttacher) - (attacker->GetObjectSize()/2) - (otherAttacher->GetObjectSize()/2);
-
-        if (tempDist > distanceTollerance)
-            continue;
+        float tempDist = attacker->GetExactDist2d(otherAttacker) - (attacker->GetObjectSize()/2) - (otherAttacker->GetObjectSize()/2);
 
         if (tempDist == 0 || minDistance == 0 || tempDist < minDistance) {
             minDistance = tempDist;
-            currentAngle = GetAngle(otherAttacher);
-            refUnit = otherAttacher;
+            currentAngle = GetAngle(otherAttacker);
+            refUnit = otherAttacker;
         }
+
+        validAttackers.insert(otherAttacker);
     }
 
-    if (!refUnit || meleeReach <= 0)
+    float attackerSize = attacker->GetObjectSize();
+
+
+    // in instance: the more attacker there are, the higher will be the tollerance
+    // outside: creatures should not intersecate
+    float distanceTollerance = attacker->GetMap()->IsDungeon() ? -2.0f * tanh(validAttackers.size() / 5.0f) : 0.0f;
+
+    if (!refUnit || minDistance > distanceTollerance)
         return NULL;
 
     double refUnitRay = refUnit->GetObjectSize() / 2.0f;
@@ -2309,7 +2318,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         double angle = currentAngle + 2.0f * atan(distance / (2.0f * ortDist)) * (urand(0, 1) ? -1 : 1);
 
         float x, y, z;
-        GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, angle);
+        GetNearPoint(attacker, x, y, z, attackerSize, frand(0.0f, attackerSize/2), angle);
 
         return new Position(x,y,z);
     }
@@ -2317,7 +2326,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     float angle = currentAngle + atan(attackerSize / (meleeReach)) * (urand(0, 1) ? -1 : 1);
 
     float x, y, z;
-    GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, angle);
+    GetNearPoint(attacker, x, y, z, attackerSize, frand(0.0f, attackerSize/2), angle);
 
     return new Position(x,y,z);
 }
