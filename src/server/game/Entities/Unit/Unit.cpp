@@ -2234,14 +2234,25 @@ struct AttackDistance {
 
 Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 {
-    if (!attacker || // only player & pets to save CPU
-        attacker->GetMeleeReach() <= 0 ||
-        getAttackers().size() <= 1) // if the attackers are not more than one
+    if (!attacker) // only player & pets to save CPU
     {
         return NULL;
     }
 
     AttackerSet attackers = getAttackers();
+
+    if (attackers.size() <= 1) // if the attackers are not more than one
+    {
+        return NULL;
+    }
+
+    float meleeReach = attacker->GetMeleeReach();
+
+    if (meleeReach <= 0)
+    {
+        return NULL;
+    }
+
     float currentAngle, minDistance = 0;
     Unit *refUnit = nullptr;
     uint32 validAttackers=0;
@@ -2329,7 +2340,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return new Position(x,y,z);
     }
 
-    float angle = frand(0.1f,0.3f) + currentAngle + atan(attackerSize / (attacker->GetMeleeReach())) * (urand(0, 1) ? -1 : 1);
+    float angle = frand(0.1f,0.3f) + currentAngle + atan(attackerSize / (meleeReach)) * (urand(0, 1) ? -1 : 1);
 
     float x, y, z;
     GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, angle);
