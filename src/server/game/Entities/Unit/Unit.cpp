@@ -2249,14 +2249,14 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 
     float currentAngle, minDistance = 0;
     Unit *refUnit = NULL;
-    AttackerSet validAttackers;
+    uint32 validAttackers=0;
 
     for (const auto& otherAttacker: attackers)
     {
         if (!otherAttacker ||
             otherAttacker->GetGUID() == attacker->GetGUID() ||
-            otherAttacker->isMoving() ||
-            !otherAttacker->IsWithinMeleeRange(this)
+            !otherAttacker->IsWithinMeleeRange(this) ||
+            otherAttacker->isMoving()
         )
             continue;
 
@@ -2268,32 +2268,34 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
             refUnit = otherAttacker;
         }
 
-        validAttackers.insert(otherAttacker);
+        validAttackers++;
     }
-
-    float attackerSize = attacker->GetObjectSize();
-
 
     // in instance: the more attacker there are, the higher will be the tollerance
     // outside: creatures should not intersecate
-    float distanceTollerance = attacker->GetMap()->IsDungeon() ? -2.0f * tanh(validAttackers.size() / 5.0f) : 0.0f;
+    float distanceTollerance = attacker->GetMap()->IsDungeon() ? -2.0f * tanh(validAttackers / 5.0f) : 0.0f;
 
     if (!refUnit || minDistance > distanceTollerance)
         return NULL;
 
-    double refUnitRay = refUnit->GetObjectSize() / 2.0f;
+    float attackerSize = attacker->GetObjectSize();
 
-    // Equation of tangent point
-    if (GetExactDist2d(refUnit) > refUnitRay) { // works only when there's enough space
-        double X1 = refUnit->GetPositionX();
-        double Y1 = refUnit->GetPositionY();
-        double Xp = GetPositionX();
-        double Yp = GetPositionY();
+    double ray = attackerSize > refUnit->GetObjectSize() ? attackerSize / 2.0f : refUnit->GetObjectSize() / 2.0f;
+
+    // Equation of tangent point to get the ideal angle to
+    // move away from collisions with another unit during combat
+    // NOTE: it works only when there's enough space between the
+    // attacker and the victim. We use a simpler one otherwise.
+    if (GetExactDist2d(refUnit) > ray) {
+        double refUnitX = refUnit->GetPositionX();
+        double refUnitY = refUnit->GetPositionY();
+        double victimX = GetPositionX();
+        double victimY = GetPositionY();
 
         // calculate tangent star
-        double a = 4.0f * ( pow(refUnitRay,2.0f) - pow(X1,2.0f) + (2.0f * X1 * Xp) - pow(Xp,2.0f) );
-        double b = 8.0f * ( (X1 * Y1) + (Xp * Yp) - (Xp * Y1) - (X1 * Yp) );
-        double c = 4.0f * (- pow(Yp,2.0f) - pow(Y1,2.0f) + (2.0f*Yp*Y1) + pow(refUnitRay,2.0f));
+        double a = 4.0f * ( pow(ray,2.0f) - pow(refUnitX,2.0f) + (2.0f * refUnitX * victimX) - pow(victimX,2.0f) );
+        double b = 8.0f * ( (refUnitX * refUnitY) + (victimX * victimY) - (victimX * refUnitY) - (refUnitX * victimY) );
+        double c = 4.0f * (- pow(victimY,2.0f) - pow(refUnitY,2.0f) + (2.0f*victimY*refUnitY) + pow(ray,2.0f));
 
         if (a==0) // should not happen
             return NULL;
@@ -2304,29 +2306,29 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         double m2 = (-b - sq) / (2.0f*a);
 
         // tangents
-        double xT1 = ((-1.0f) * (m1*(Yp - m1*Xp - Y1) - X1) ) / (1.0f + pow(m1,2.0f));
-        double xT2 = ((-1.0f) * (m2*(Yp - m2*Xp - Y1) - X1) ) / (1.0f + pow(m2,2.0f));
+        double xT1 = ((-1.0f) * (m1*(victimY - m1*victimX - refUnitY) - refUnitX) ) / (1.0f + pow(m1,2.0f));
+        double xT2 = ((-1.0f) * (m2*(victimY - m2*victimX - refUnitY) - refUnitX) ) / (1.0f + pow(m2,2.0f));
 
-        double yT1 = m1*(xT1 - Xp) + Yp;
-        double yT2 = m2*(xT2 - Xp) + Yp;
+        double yT1 = m1*(xT1 - victimX) + victimY;
+        double yT2 = m2*(xT2 - victimX) + victimY;
 
         double distance = sqrt(pow(yT2-yT1,2.0f) + pow(xT2-xT1,2.0f));
         double exactDist = GetExactDist2d(xT1, yT1);
 
         double ortDist = sqrt(pow(exactDist,2.0f) - pow(distance/2.0f,2.0f));
 
-        double angle = currentAngle + 2.0f * atan(distance / (2.0f * ortDist)) * (urand(0, 1) ? -1 : 1);
+        double angle = frand(0.1f,0.3f) + currentAngle + 2.0f * atan(distance / (2.0f * ortDist)) * (urand(0, 1) ? -1 : 1);
 
         float x, y, z;
-        GetNearPoint(attacker, x, y, z, attackerSize, frand(0.0f, attackerSize/2), angle);
+        GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, angle);
 
         return new Position(x,y,z);
     }
 
-    float angle = currentAngle + atan(attackerSize / (meleeReach)) * (urand(0, 1) ? -1 : 1);
+    float angle = frand(0.1f,0.3f) + currentAngle + atan(attackerSize / (meleeReach)) * (urand(0, 1) ? -1 : 1);
 
     float x, y, z;
-    GetNearPoint(attacker, x, y, z, attackerSize, frand(0.0f, attackerSize/2), angle);
+    GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, angle);
 
     return new Position(x,y,z);
 }
