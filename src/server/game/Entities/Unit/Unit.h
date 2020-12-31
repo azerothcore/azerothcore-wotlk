@@ -2594,7 +2594,6 @@ private:
 
     FollowerRefManager m_FollowingRefManager;
     Unit* m_comboTarget;
-    int8 m_comboPoints;
 
     ComboPointHolderSet m_ComboPointHolders;
 
