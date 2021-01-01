@@ -157,10 +157,10 @@ World::~World()
     //TODO free addSessQueue
 }
 
-World* World::instance()
+std::unique_ptr<IWorld>& getWorldInstance()
 {
-    static World instance;
-    return &instance;
+    static std::unique_ptr<IWorld> instance = std::make_unique<World>();
+    return instance;
 }
 
 /// Find a player in a specified zone
