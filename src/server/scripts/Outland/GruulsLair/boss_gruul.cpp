@@ -114,6 +114,8 @@ public:
                 case EVENT_HURTFUL_STRIKE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 5.0f))
                         me->CastSpell(target, SPELL_HURTFUL_STRIKE, false);
+                    else if (me->GetVictim())                                           /*If no target was found for Hurtful Strike, target the MT*/
+                        me->CastSpell(me->GetVictim(), SPELL_HURTFUL_STRIKE, false);
                     events.ScheduleEvent(EVENT_HURTFUL_STRIKE, 15000);
                     break;
                 case EVENT_GROUND_SLAM:
@@ -122,14 +124,17 @@ public:
                     events.DelayEvents(8001);
                     events.ScheduleEvent(EVENT_GROUND_SLAM, 60000);
                     events.ScheduleEvent(EVENT_SHATTER, 8000);
+                    me->SetControlled(true, UNIT_STATE_ROOT);       /* UNIT_STATE_STUNNED would prevent finishing the cast of Ground Slam */
                     break;
                 case EVENT_SHATTER:
                     Talk(SAY_SHATTER);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
                     me->CastSpell(me, SPELL_SHATTER, false);
                     break;
             }
 
-            DoMeleeAttackIfReady();
+            if (!me->HasUnitState(UNIT_STATE_ROOT))             /*Since we can not just use the UNIT_STATE_STUNNED flag on Gruul,*/
+                DoMeleeAttackIfReady();                         /*we need to prevent his autohits like this while he is rooted*/
         }
 
     private:
