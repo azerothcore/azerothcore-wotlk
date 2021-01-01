@@ -115,7 +115,9 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 5.0f))
                         me->CastSpell(target, SPELL_HURTFUL_STRIKE, false);
                     else if (me->GetVictim())                                           // If no target was found for Hurtful Strike, target the MT
+                    {
                         me->CastSpell(me->GetVictim(), SPELL_HURTFUL_STRIKE, false);
+                    }
                     events.ScheduleEvent(EVENT_HURTFUL_STRIKE, 15000);
                     break;
                 case EVENT_GROUND_SLAM:
