@@ -33,19 +33,19 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
 
     for (uint8 idx = 0; idx < MAX_CONF_WAYPOINTS + 1; ++idx)
     {
-        float wanderX = x + (wander_distance * (float)rand_norm() - wander_distance/2);
-        float wanderY = y + (wander_distance * (float)rand_norm() - wander_distance/2);
+        float wanderX = x + (wander_distance * (float)rand_norm() - wander_distance / 2);
+        float wanderY = y + (wander_distance * (float)rand_norm() - wander_distance / 2);
 
         // prevent invalid coordinates generation
         acore::NormalizeMapCoord(wanderX);
         acore::NormalizeMapCoord(wanderY);
 
         float new_z = map->GetHeight(unit->GetPhaseMask(), wanderX, wanderY, z, true);
-        if (new_z <= INVALID_HEIGHT || fabs(z-new_z) > 3.0f) // pussywizard
+        if (new_z <= INVALID_HEIGHT || fabs(z - new_z) > 3.0f) // pussywizard
         {
-            i_waypoints[idx][0] = idx > 0 ? i_waypoints[idx-1][0] : x;
-            i_waypoints[idx][1] = idx > 0 ? i_waypoints[idx-1][1] : y;
-            i_waypoints[idx][2] = idx > 0 ? i_waypoints[idx-1][2] : z;
+            i_waypoints[idx][0] = idx > 0 ? i_waypoints[idx - 1][0] : x;
+            i_waypoints[idx][1] = idx > 0 ? i_waypoints[idx - 1][1] : y;
+            i_waypoints[idx][2] = idx > 0 ? i_waypoints[idx - 1][2] : z;
             continue;
         }
         else if (unit->IsWithinLOS(wanderX, wanderY, z))
@@ -55,19 +55,19 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
             if ((is_water && !is_water_ok) || (!is_water && !is_land_ok))
             {
                 //! Cannot use coordinates outside our InhabitType. Use the current or previous position.
-                i_waypoints[idx][0] = idx > 0 ? i_waypoints[idx-1][0] : x;
-                i_waypoints[idx][1] = idx > 0 ? i_waypoints[idx-1][1] : y;
-                i_waypoints[idx][2] = idx > 0 ? i_waypoints[idx-1][2] : z;
+                i_waypoints[idx][0] = idx > 0 ? i_waypoints[idx - 1][0] : x;
+                i_waypoints[idx][1] = idx > 0 ? i_waypoints[idx - 1][1] : y;
+                i_waypoints[idx][2] = idx > 0 ? i_waypoints[idx - 1][2] : z;
                 continue;
             }
-            
+
         }
         else
         {
             //! Trying to access path outside line of sight. Skip this by using the current or previous position.
-            i_waypoints[idx][0] = idx > 0 ? i_waypoints[idx-1][0] : x;
-            i_waypoints[idx][1] = idx > 0 ? i_waypoints[idx-1][1] : y;
-            i_waypoints[idx][2] = idx > 0 ? i_waypoints[idx-1][2] : z;
+            i_waypoints[idx][0] = idx > 0 ? i_waypoints[idx - 1][0] : x;
+            i_waypoints[idx][1] = idx > 0 ? i_waypoints[idx - 1][1] : y;
+            i_waypoints[idx][2] = idx > 0 ? i_waypoints[idx - 1][2] : z;
             continue;
         }
 
@@ -89,14 +89,14 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
 }
 
 template<>
-void ConfusedMovementGenerator<Creature>::_InitSpecific(Creature* creature, bool &is_water_ok, bool &is_land_ok)
+void ConfusedMovementGenerator<Creature>::_InitSpecific(Creature* creature, bool& is_water_ok, bool& is_land_ok)
 {
     is_water_ok = creature->CanSwim();
     is_land_ok  = creature->CanWalk();
 }
 
 template<>
-void ConfusedMovementGenerator<Player>::_InitSpecific(Player* , bool &is_water_ok, bool &is_land_ok)
+void ConfusedMovementGenerator<Player>::_InitSpecific(Player*, bool& is_water_ok, bool& is_land_ok)
 {
     is_water_ok = true;
     is_land_ok  = true;

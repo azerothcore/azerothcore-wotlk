@@ -4,6 +4,8 @@ set -e
 
 echo "compile core"
 export CCACHE_CPP2=true
+export CCACHE_MAXSIZE='500MB'
+export CCACHE_COMPRESS=1
 ccache -s
-timeout 2700 bash ./acore.sh "compiler" "all"
+./acore.sh "compiler" "all"
 ccache -s

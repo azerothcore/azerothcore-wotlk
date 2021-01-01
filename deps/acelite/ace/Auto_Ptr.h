@@ -4,7 +4,7 @@
 /**
  *  @file    Auto_Ptr.h
  *
- *  @author Doug Schmidt <schmidt@uci.edu>
+ *  @author Doug Schmidt <d.schmidt@vanderbilt.edu>
  *  @author Irfan Pyarali <irfan@cs.wustl.edu>
  *  @author Jack Reeves <jack@fx.com>
  *  @author Dr. Harald M. Mueller <mueller@garwein.hai.siemens.co.at>
@@ -30,7 +30,6 @@
 #  pragma warning(disable: 4284)
 #endif /* _MSC_VER */
 
-
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 /**
@@ -45,7 +44,6 @@ class ACE_Auto_Basic_Ptr
 public:
   typedef X element_type;
 
-  // = Initialization and termination methods
   explicit ACE_Auto_Basic_Ptr (X * p = 0) : p_ (p) {}
 
   ACE_Auto_Basic_Ptr (ACE_Auto_Basic_Ptr<X> & ap);
@@ -70,12 +68,21 @@ protected:
 
 ACE_END_VERSIONED_NAMESPACE_DECL
 
+#if defined (ACE_HAS_CPP17)
+// C++17 has removed std::auto_ptr but this is heavily used
+// in ACE and TAO tests so for the moment we are providing
+// our own auto_ptr implementation
+# define ACE_LACKS_AUTO_PTR
+# include <memory>
+#endif /* ACE_HAS_CPP17 */
+
 #if !defined (ACE_LACKS_AUTO_PTR) && \
      defined (ACE_HAS_STANDARD_CPP_LIBRARY) && \
             (ACE_HAS_STANDARD_CPP_LIBRARY != 0)
 #include <memory>
 #if defined (ACE_USES_STD_NAMESPACE_FOR_STDCPP_LIB) && \
             (ACE_USES_STD_NAMESPACE_FOR_STDCPP_LIB != 0)
+using std::auto_ptr;
 #endif /* ACE_USES_STD_NAMESPACE_FOR_STDCPP_LIB */
 #else /* ACE_HAS_STANDARD_CPP_LIBRARY */
 
@@ -90,7 +97,6 @@ class auto_ptr : public ACE_Auto_Basic_Ptr<X>
 public:
   typedef X element_type;
 
-  // = Initialization and termination methods
   explicit auto_ptr (X * p = 0) : ACE_Auto_Basic_Ptr<X> (p) {}
   auto_ptr (auto_ptr<X> & ap) : ACE_Auto_Basic_Ptr<X> (ap.release ()) {}
 
@@ -111,7 +117,6 @@ class ACE_Auto_Ptr : public ACE_Auto_Basic_Ptr <X>
 public:
   typedef X element_type;
 
-  // = Initialization and termination methods
   explicit ACE_Auto_Ptr (X * p = 0) : ACE_Auto_Basic_Ptr<X> (p) {}
 
   X *operator-> () const;
@@ -131,7 +136,6 @@ class ACE_Auto_Basic_Array_Ptr
 public:
   typedef X element_type;
 
-  // = Initialization and termination methods.
   explicit ACE_Auto_Basic_Array_Ptr (X * p = 0) : p_ (p) {}
 
   ACE_Auto_Basic_Array_Ptr (ACE_Auto_Basic_Array_Ptr<X> & ap);
@@ -167,7 +171,6 @@ class ACE_Auto_Array_Ptr : public ACE_Auto_Basic_Array_Ptr<X>
 public:
   typedef X element_type;
 
-  // = Initialization and termination methods.
   explicit ACE_Auto_Array_Ptr (X *p = 0)
     : ACE_Auto_Basic_Array_Ptr<X> (p) {}
 

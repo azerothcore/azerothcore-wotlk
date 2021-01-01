@@ -34,6 +34,7 @@
 #        Description: Logs directory setting.
 #        Important:   LogsDir needs to be quoted, as the string might contain space characters.
 #                     Logs directory must exists, or log file creation will be disabled.
+#        Example:     "/home/youruser/azeroth-server/logs"
 #        Default:     "" - (Log files will be stored in the current path)
 
 LogsDir = ""
@@ -105,7 +106,7 @@ DebugLogMask = 64
 #
 #    SQLDriverLogFile
 #        Description: Log file for SQL driver events.
-#        Example:     "SQLDriver.log" - (Enabled)
+#        Example:     "AuthSQLDriver.log" - (Enabled)
 #        Default:      ""             - (Disabled)
 
 SQLDriverLogFile = ""
@@ -256,7 +257,7 @@ WrongPass.Logging = 0
 #                                                                 section my.ini)
 #                     ".;/path/to/unix_socket;username;password;database" - (use Unix sockets on
 #                                                                           Unix/Linux)
-#        Default:     "127.0.0.1;3306;acore;acore;auth"
+#        Default:     "127.0.0.1;3306;acore;acore;acore_auth"
 
 LoginDatabaseInfo = "127.0.0.1;3306;acore;acore;acore_auth"
 

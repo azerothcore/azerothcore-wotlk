@@ -40,11 +40,11 @@ public:
     {
         npc_webbed_creatureAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             uint32 spawnCreatureID = 0;
 
@@ -65,7 +65,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_webbed_creatureAI(creature);
     }

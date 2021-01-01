@@ -49,14 +49,14 @@ class boss_cyanigosa : public CreatureScript
 public:
     boss_cyanigosa() : CreatureScript("boss_cyanigosa") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_cyanigosaAI (pCreature);
     }
 
     struct boss_cyanigosaAI : public ScriptedAI
     {
-        boss_cyanigosaAI(Creature *c) : ScriptedAI(c)
+        boss_cyanigosaAI(Creature* c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -64,38 +64,38 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             DoZoneInCombat();
             Talk(SAY_AGGRO);
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_ARCANE_VACUUM, 30000);
-            events.RescheduleEvent(EVENT_SPELL_BLIZZARD, urand(5000,10000));
-            events.RescheduleEvent(EVENT_SPELL_TAIL_SWEEP, urand(15000,20000));
-            events.RescheduleEvent(EVENT_SPELL_UNCONTROLLABLE_ENERGY, urand(5000,8000));
+            events.RescheduleEvent(EVENT_SPELL_BLIZZARD, urand(5000, 10000));
+            events.RescheduleEvent(EVENT_SPELL_TAIL_SWEEP, urand(15000, 20000));
+            events.RescheduleEvent(EVENT_SPELL_UNCONTROLLABLE_ENERGY, urand(5000, 8000));
             if (IsHeroic())
                 events.RescheduleEvent(EVENT_SPELL_MANA_DESTRUCTION, 20000);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (!target || !spell)
                 return;
             switch(spell->Id)
             {
                 case SPELL_ARCANE_VACUUM:
-                    target->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+10.0f, target->GetOrientation());
+                    target->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, target->GetOrientation());
                     break;
             }
         }
 
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -105,7 +105,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -119,7 +119,7 @@ public:
                     break;
                 case EVENT_UNROOT:
                     me->SetControlled(false, UNIT_STATE_ROOT);
-                    events.PopEvent();
+                    
                     break;
                 case EVENT_SPELL_BLIZZARD:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true))
@@ -133,24 +133,24 @@ public:
                     break;
                 case EVENT_SPELL_TAIL_SWEEP:
                     me->CastSpell(me->GetVictim(), SPELL_TAIL_SWEEP, false);
-                    events.RepeatEvent(urand(15000,20000));
+                    events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_UNCONTROLLABLE_ENERGY:
                     me->CastSpell(me->GetVictim(), SPELL_UNCONTROLLABLE_ENERGY, false);
-                    events.RepeatEvent(urand(20000,25000));
+                    events.RepeatEvent(urand(20000, 25000));
                     break;
             }
 
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_BOSS_DIED, 0);
-            float h = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()+2.0f);
-            if (h != INVALID_HEIGHT && me->GetPositionZ()-h > 3.0f)
+            float h = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f);
+            if (h != INVALID_HEIGHT && me->GetPositionZ() - h > 3.0f)
             {
                 me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), h, me->GetOrientation(), true); // move to ground
                 me->StopMovingOnCurrentPos();
@@ -158,16 +158,16 @@ public:
             }
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim && victim->GetGUID() == me->GetGUID())
                 return;
             Talk(SAY_SLAY);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             ScriptedAI::EnterEvadeMode();

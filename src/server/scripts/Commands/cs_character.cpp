@@ -35,10 +35,17 @@ public:
 
         static std::vector<ChatCommand> characterDeletedCommandTable =
         {
-            { "delete",        SEC_CONSOLE,          true,  &HandleCharacterDeletedDeleteCommand,  "" },
-            { "list",          SEC_ADMINISTRATOR,    true,  &HandleCharacterDeletedListCommand,    "" },
-            { "restore",       SEC_ADMINISTRATOR,    true,  &HandleCharacterDeletedRestoreCommand, "" },
-            { "old",           SEC_CONSOLE,          true,  &HandleCharacterDeletedOldCommand,     "" },
+            { "delete",        SEC_CONSOLE,         true,  &HandleCharacterDeletedDeleteCommand,  "" },
+            { "list",          SEC_ADMINISTRATOR,   true,  &HandleCharacterDeletedListCommand,    "" },
+            { "restore",       SEC_ADMINISTRATOR,   true,  &HandleCharacterDeletedRestoreCommand, "" },
+            { "purge",         SEC_CONSOLE,         true,  &HandleCharacterDeletedPurgeCommand,   "" },
+        };
+
+        static std::vector<ChatCommand> characterCheckCommandTable =
+        {
+            { "bank",          SEC_GAMEMASTER,      false,  &HandleCharacterCheckBankCommand, "" },
+            { "bag",           SEC_GAMEMASTER,      false,  &HandleCharacterCheckBagCommand,  "" },
+            { "profession",    SEC_GAMEMASTER,      false,  &HandleCharacterCheckProfessionCommand, "" },
         };
 
         static std::vector<ChatCommand> characterCommandTable =
@@ -46,6 +53,7 @@ public:
             { "customize",      SEC_GAMEMASTER,     true,  &HandleCharacterCustomizeCommand,       "" },
             { "changefaction",  SEC_GAMEMASTER,     true,  &HandleCharacterChangeFactionCommand,   "" },
             { "changerace",     SEC_GAMEMASTER,     true,  &HandleCharacterChangeRaceCommand,      "" },
+            { "check",          SEC_GAMEMASTER,     false,  nullptr,                               "", characterCheckCommandTable },
             { "erase",          SEC_CONSOLE,        true,  &HandleCharacterEraseCommand,           "" },
             { "deleted",        SEC_ADMINISTRATOR,  true,  nullptr,                                "", characterDeletedCommandTable },
             { "level",          SEC_GAMEMASTER,     true,  &HandleCharacterLevelCommand,           "" },
@@ -119,7 +127,7 @@ public:
                 Field* fields = result->Fetch();
 
                 DeletedInfo info;
-                
+
                 info.lowGuid    = fields[0].GetUInt32();
                 info.name       = fields[1].GetString();
                 info.accountId  = fields[2].GetUInt32();
@@ -128,8 +136,7 @@ public:
                 AccountMgr::GetName(info.accountId, info.accountName);
                 info.deleteDate = time_t(fields[3].GetUInt32());
                 foundList.push_back(info);
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
         }
 
         return true;
@@ -160,12 +167,12 @@ public:
 
             if (!handler->GetSession())
                 handler->PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CONSOLE,
-                    itr->lowGuid, itr->name.c_str(), itr->accountName.empty() ? "<Not existing>" : itr->accountName.c_str(),
-                    itr->accountId, dateStr.c_str());
+                                         itr->lowGuid, itr->name.c_str(), itr->accountName.empty() ? "<Not existing>" : itr->accountName.c_str(),
+                                         itr->accountId, dateStr.c_str());
             else
                 handler->PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CHAT,
-                    itr->lowGuid, itr->name.c_str(), itr->accountName.empty() ? "<Not existing>" : itr->accountName.c_str(),
-                    itr->accountId, dateStr.c_str());
+                                         itr->lowGuid, itr->name.c_str(), itr->accountName.empty() ? "<Not existing>" : itr->accountName.c_str(),
+                                         itr->accountId, dateStr.c_str());
         }
 
         if (!handler->GetSession())
@@ -214,7 +221,7 @@ public:
         stmt->setUInt32(0, delInfo.lowGuid);
         if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
             sWorld->AddGlobalPlayerData(delInfo.lowGuid, delInfo.accountId, delInfo.name, (*result)[2].GetUInt8(), (*result)[0].GetUInt8(), (*result)[1].GetUInt8(), (*result)[3].GetUInt8(), 0, 0);
-                    
+
     }
 
     static void HandleCharacterLevel(Player* player, uint64 playerGuid, uint32 oldLevel, uint32 newLevel, ChatHandler* handler)
@@ -276,8 +283,8 @@ public:
                     continue;
 
                 char const* activeStr = target && target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index
-                ? handler->GetAcoreString(LANG_ACTIVE)
-                : "";
+                                        ? handler->GetAcoreString(LANG_ACTIVE)
+                                        : "";
 
                 char titleNameStr[80];
                 snprintf(titleNameStr, 80, name.c_str(), targetName);
@@ -507,7 +514,7 @@ public:
     *
     * @param args the search string which either contains a player GUID or a part fo the character-name
     */
-    
+
     static bool HandleCharacterDeletedListCommand(ChatHandler* handler, char const* args)
     {
         DeletedInfoList foundList;
@@ -639,7 +646,7 @@ public:
      *
      * @param args the search string which either contains a player GUID or a part of the character-name
      */
-    static bool HandleCharacterDeletedOldCommand(ChatHandler* /*handler*/, char const* args)
+    static bool HandleCharacterDeletedPurgeCommand(ChatHandler* /*handler*/, char const* args)
     {
         int32 keepDays = sWorld->getIntConfig(CONFIG_CHARDELETE_KEEP_DAYS);
 
@@ -877,10 +884,11 @@ public:
             QueryResult result = CharacterDatabase.PQuery("SELECT guid FROM characters");
             if (!result)
                 return true;
-            do{
+            do
+            {
                 uint64 _guid = result->Fetch()[0].GetUInt64();
                 char buff[20];
-                sprintf(buff,"%u", (uint32)_guid);
+                sprintf(buff, "%u", (uint32)_guid);
                 switch(PlayerDumpWriter().WriteDump(buff, uint32(_guid)))
                 {
                     case DUMP_SUCCESS:
@@ -899,7 +907,7 @@ public:
                         handler->SetSentErrorMessage(true);
                         return false;
                 }
-            }while(result->NextRow());
+            } while(result->NextRow());
         }
 
         if (!fileStr || !playerStr)
@@ -948,6 +956,165 @@ public:
                 return false;
         }
 
+        return true;
+    }
+
+    static bool HandleCharacterCheckBankCommand(ChatHandler* handler, char const* /*args*/)
+    {
+        handler->GetSession()->SendShowBank(handler->GetSession()->GetPlayer()->GetGUID());
+        return true;
+    }
+
+    static bool HandleCharacterCheckBagCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        char* Slot = strtok((char*)args, " ");
+
+        if (!Slot)
+            return false;
+
+        Player* player = handler->getSelectedPlayerOrSelf();
+
+        if (!player)
+            return false;
+
+        uint8 Counter = 0;
+        uint8 BagSlot = atoi(Slot);
+
+        switch (BagSlot)
+        {
+            case 2:
+                BagSlot = 19;
+                break;
+            case 3:
+                BagSlot = 20;
+                break;
+            case 4:
+                BagSlot = 21;
+                break;
+            case 5:
+                BagSlot = 22;
+                break;
+            default:
+                BagSlot = 1;
+                break;
+        }
+
+        handler->PSendSysMessage("--------------------------------------");
+
+        if (BagSlot == 1)
+        {
+            for (uint32 i = 23; i < 39; i++)
+            {
+                if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                {
+                    Counter++;
+                    std::ostringstream ItemString;
+                    ItemString << std::hex << ItemQualityColors[item->GetTemplate()->Quality];
+
+                    handler->PSendSysMessage("%u - |c%s|Hitem:%u:0:0:0:0:0:0:0:0:0|h[%s]|h|r - %u", Counter, ItemString.str().c_str(), item->GetEntry(), item->GetTemplate()->Name1.c_str(), item->GetCount());
+                }
+            }
+        }
+        else
+        {
+            if (Bag* bag = player->GetBagByPos(BagSlot))
+            {
+                for (uint32 i = 0; i < bag->GetBagSize(); i++)
+                {
+                    if (Item* item = player->GetItemByPos(BagSlot, i))
+                    {
+                        Counter++;
+                        std::ostringstream ItemString;
+                        ItemString << std::hex << ItemQualityColors[item->GetTemplate()->Quality];
+
+                        handler->PSendSysMessage("%u - |c%s|Hitem:%u:0:0:0:0:0:0:0:0:0|h[%s]|h|r - %u", Counter, ItemString.str().c_str(), item->GetEntry(), item->GetTemplate()->Name1.c_str(), item->GetCount());
+                    }
+                }
+            }
+        }
+
+        handler->PSendSysMessage("--------------------------------------");
+        return true;
+    }
+
+    static bool HandleCharacterCheckProfessionCommand(ChatHandler* handler, char const*)
+    {
+        Player* player = handler->getSelectedPlayerOrSelf();
+
+        if (!player)
+            return false;
+
+        uint8 Counter = 0;
+
+        handler->PSendSysMessage("--------------------------------------");
+
+        for (uint32 i = 1; i < sSkillLineStore.GetNumRows(); ++i)
+        {
+            SkillLineEntry const* SkillInfo = sSkillLineStore.LookupEntry(i);
+
+            if (!SkillInfo)
+                continue;
+
+            if ((SkillInfo->categoryId != SKILL_CATEGORY_PROFESSION) && !SkillInfo->canLink)
+                continue;
+
+            uint32 SkillID = SkillInfo->id;
+
+            if (player->HasSkill(SkillID))
+            {
+                Counter++;
+
+                switch (SkillID)
+                {
+                    case SKILL_ALCHEMY:
+                        handler->PSendSysMessage("%u - Alchemy - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    case SKILL_BLACKSMITHING:
+                        handler->PSendSysMessage("%u - Blacksmithing - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    case SKILL_ENCHANTING:
+                        handler->PSendSysMessage("%u - Enchanting - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    case SKILL_ENGINEERING:
+                        handler->PSendSysMessage("%u - Engineering - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    case SKILL_INSCRIPTION:
+                        handler->PSendSysMessage("%u - Inscription - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    case SKILL_JEWELCRAFTING:
+                        handler->PSendSysMessage("%u - Jewelcrafting - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    case SKILL_LEATHERWORKING:
+                        handler->PSendSysMessage("%u - Leatherworking - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    case SKILL_TAILORING:
+                        handler->PSendSysMessage("%u - Tailoring - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    case SKILL_SKINNING:
+                        handler->PSendSysMessage("%u - Skinning - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    case SKILL_HERBALISM:
+                        handler->PSendSysMessage("%u - Herbalism - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    case SKILL_MINING:
+                        handler->PSendSysMessage("%u - Mining - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    case SKILL_COOKING:
+                        handler->PSendSysMessage("%u - Cooking - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    case SKILL_FIRST_AID:
+                        handler->PSendSysMessage("%u - First Aid - %u", Counter, player->GetSkillValue(SkillID));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        handler->PSendSysMessage("--------------------------------------");
         return true;
     }
 };

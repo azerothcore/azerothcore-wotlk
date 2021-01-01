@@ -44,7 +44,7 @@ class npc_murkdeep : public CreatureScript
 public:
     npc_murkdeep() : CreatureScript("npc_murkdeep") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_murkdeepAI(creature);
     }
@@ -57,7 +57,7 @@ public:
         uint32 spawnTimer;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             spawnTimer = 0;
             phase = 0;
@@ -65,14 +65,14 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 5000);
             events.ScheduleEvent(EVENT_SPELL_NET, 10000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             spawnTimer += diff;
             if (spawnTimer >= 5000)
@@ -80,48 +80,48 @@ public:
                 spawnTimer = 0;
                 switch (phase)
                 {
-                case 0:
-                    if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f, true) && !me->FindNearestCreature(NPC_GREYMIST_HUNTER, 80.0f, true))
-                    {
-                        Player *player = me->SelectNearestPlayer(100.0f);
-                        if (!player)
-                            return;
+                    case 0:
+                        if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f, true) && !me->FindNearestCreature(NPC_GREYMIST_HUNTER, 80.0f, true))
+                        {
+                            Player* player = me->SelectNearestPlayer(100.0f);
+                            if (!player)
+                                return;
 
-                        phase++;
-                        for (int i = 0; i < 3; ++i)
-                            if (Creature* cr = me->SummonCreature(NPC_GREYMIST_COASTRUNNER, me->GetPositionX()+irand(-5, 5), me->GetPositionY()+irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                            phase++;
+                            for (int i = 0; i < 3; ++i)
+                                if (Creature* cr = me->SummonCreature(NPC_GREYMIST_COASTRUNNER, me->GetPositionX() + irand(-5, 5), me->GetPositionY() + irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                                    cr->AI()->AttackStart(player);
+                        }
+                        return;
+                    case 1:
+                        if (!me->FindNearestCreature(NPC_GREYMIST_COASTRUNNER, 80.0f))
+                        {
+                            Player* player = me->SelectNearestPlayer(100.0f);
+                            if (!player)
+                                return;
+
+                            phase++;
+                            for (int i = 0; i < 2; ++i)
+                                if (Creature* cr = me->SummonCreature(NPC_GREYMIST_WARRIOR, me->GetPositionX() + irand(-5, 5), me->GetPositionY() + irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                                    cr->AI()->AttackStart(player);
+                        }
+                        return;
+                    case 2:
+                        if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f))
+                        {
+                            Player* player = me->SelectNearestPlayer(100.0f);
+                            if (!player)
+                                return;
+
+                            phase++;
+                            if (Creature* cr = me->SummonCreature(NPC_GREYMIST_HUNTER, me->GetPositionX() + irand(-5, 5), me->GetPositionY() + irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
                                 cr->AI()->AttackStart(player);
-                    }
-                    return;
-                case 1:
-                    if (!me->FindNearestCreature(NPC_GREYMIST_COASTRUNNER, 80.0f))
-                    {
-                        Player *player = me->SelectNearestPlayer(100.0f);
-                        if (!player)
-                            return;
 
-                        phase++;
-                        for (int i = 0; i < 2; ++i)
-                            if (Creature* cr = me->SummonCreature(NPC_GREYMIST_WARRIOR, me->GetPositionX()+irand(-5, 5), me->GetPositionY()+irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-                                cr->AI()->AttackStart(player);
-                    }
-                    return;
-                case 2:
-                    if (!me->FindNearestCreature(NPC_GREYMIST_WARRIOR, 80.0f))
-                    {
-                        Player *player = me->SelectNearestPlayer(100.0f);
-                        if (!player)
-                            return;
-
-                        phase++;
-                        if (Creature* cr = me->SummonCreature(NPC_GREYMIST_HUNTER, me->GetPositionX()+irand(-5, 5), me->GetPositionY()+irand(-5, 5), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-                            cr->AI()->AttackStart(player);
-
-                        me->SetReactState(REACT_AGGRESSIVE);
-                        me->SetVisible(true);
-                        AttackStart(player);
-                    }
-                    return;
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            me->SetVisible(true);
+                            AttackStart(player);
+                        }
+                        return;
                 }
             }
 
@@ -183,19 +183,19 @@ public:
 
         uint32 FallAsleepTimer;
 
-        void Reset()
+        void Reset() override
         {
             FallAsleepTimer = urand(10000, 45000);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             FollowerAI::MoveInLineOfSight(who);
 
             if (!me->GetVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && who->GetEntry() == NPC_LILADRIS)
             {
-                if (me->IsWithinDistInMap(who, INTERACTION_DISTANCE*5))
+                if (me->IsWithinDistInMap(who, INTERACTION_DISTANCE * 5))
                 {
                     if (Player* player = GetLeaderForFollower())
                     {
@@ -210,7 +210,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*pCaster*/, const SpellInfo* pSpell)
+        void SpellHit(Unit* /*pCaster*/, const SpellInfo* pSpell) override
         {
             if (HasFollowState(STATE_FOLLOW_INPROGRESS | STATE_FOLLOW_PAUSED) && pSpell->Id == SPELL_AWAKEN)
                 ClearSleeping();
@@ -238,7 +238,7 @@ public:
             SetFollowPaused(false);
         }
 
-        void UpdateFollowerAI(uint32 diff)
+        void UpdateFollowerAI(uint32 diff) override
         {
             if (!UpdateVictim())
             {
@@ -263,7 +263,7 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_SLEEPER_AWAKENED)
         {
@@ -278,7 +278,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_kerlonianAI(creature);
     }
@@ -320,21 +320,21 @@ public:
     {
         npc_prospector_remtravelAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             if (urand(0, 1))
                 Talk(SAY_REM_AGGRO, who);
         }
 
-        void JustSummoned(Creature* /*pSummoned*/)
+        void JustSummoned(Creature* /*pSummoned*/) override
         {
             //unsure if it should be any
             //pSummoned->AI()->AttackStart(me);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             if (Player* player = GetPlayerForEscort())
             {
@@ -396,7 +396,7 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_ABSENT_MINDED_PT2)
         {
@@ -409,7 +409,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_prospector_remtravelAI(creature);
     }
@@ -469,7 +469,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF+1)
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
 
@@ -486,7 +486,7 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_GYROMAST_REV) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_INSERT_KEY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_INSERT_KEY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;

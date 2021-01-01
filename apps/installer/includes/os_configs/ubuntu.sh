@@ -1,9 +1,12 @@
 
 UBUNTU_VERSION=$(lsb_release -sr);
 
-if [[ $TRAVIS && $CONTINUOUS_INTEGRATION ]]; then
+sudo apt-get update
+
+if [[ $CONTINUOUS_INTEGRATION ]]; then
   sudo apt-get -y install build-essential libtool make cmake cmake-data clang openssl libgoogle-perftools-dev \
-  libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
+  libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev mysql-client \
+  libncurses5-dev
 else
   case $UBUNTU_VERSION in
     "14.04")

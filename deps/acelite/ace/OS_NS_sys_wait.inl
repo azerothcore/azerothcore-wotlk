@@ -10,7 +10,7 @@ ACE_OS::wait (int *status)
   ACE_OS_TRACE ("ACE_OS::wait");
 #if defined (ACE_LACKS_WAIT)
   ACE_UNUSED_ARG (status);
-  ACE_NOTSUP_RETURN (0);
+  ACE_NOTSUP_RETURN (-1);
 #else
   ACE_OSCALL_RETURN (::wait (status), pid_t, -1);
 #endif /* ACE_LACKS_WAIT */
@@ -29,7 +29,7 @@ ACE_OS::waitpid (pid_t pid,
   ACE_UNUSED_ARG (wait_options);
   ACE_UNUSED_ARG (handle);
 
-  ACE_NOTSUP_RETURN (0);
+  ACE_NOTSUP_RETURN (-1);
 #elif defined (ACE_WIN32)
   int blocking_period = ACE_BIT_ENABLED (wait_options, WNOHANG)
     ? 0 /* don't hang */

@@ -1,6 +1,9 @@
 #include "ace/config-all.h"
 
 #include "ace/Service_Object.h"
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 #if !defined (__ACE_INLINE__)
 #include "ace/Service_Object.inl"
@@ -27,11 +30,11 @@ ACE_Service_Type::dump (void) const
   ACE_TRACE ("ACE_Service_Type::dump");
 #endif /* ACE_HAS_DUMP */
 
-
   // Using printf, since the log facility may not have been
   // initialized yet. Using a "//" prefix, in case the executable
   // happens to be a code generator and the output gets embedded in
   // the generated C++ code.
+#ifndef ACE_LACKS_STDERR
   ACE_OS::fprintf(stderr,
                   "// [ST] dump, this=%p, name=%s, type=%p, so=%p, active=%d\n",
                   static_cast<void const *> (this),
@@ -39,7 +42,7 @@ ACE_Service_Type::dump (void) const
                   static_cast<void const *> (this->type_),
                   (this->type_ != 0) ? this->type_->object () : 0,
                   this->active_);
-
+#endif
 }
 
 ACE_Service_Type::ACE_Service_Type (const ACE_TCHAR *n,
@@ -75,7 +78,11 @@ ACE_Service_Type::~ACE_Service_Type (void)
   ACE_TRACE ("ACE_Service_Type::~ACE_Service_Type");
   this->fini ();
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(const_cast <ACE_TCHAR *> (this->name_));
+#else
   delete [] const_cast <ACE_TCHAR *> (this->name_);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 }
 
 int
@@ -161,7 +168,12 @@ ACE_Service_Type::name (const ACE_TCHAR *n)
 {
   ACE_TRACE ("ACE_Service_Type::name");
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(const_cast <ACE_TCHAR *> (this->name_));
+#else
   delete [] const_cast <ACE_TCHAR *> (this->name_);
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
   this->name_ = ACE::strnew (n);
 }
 

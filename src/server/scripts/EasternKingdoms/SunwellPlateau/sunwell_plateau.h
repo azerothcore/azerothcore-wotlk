@@ -53,7 +53,7 @@ enum CreatureIds
     NPC_VOID_SENTINEL                       = 25772,
     NPC_VOID_SPAWN                          = 25824,
 
-    
+
     NPC_KILJAEDEN_CONTROLLER                = 25608,
     NPC_KILJAEDEN                           = 25315,
     NPC_ANVEENA                             = 26046,

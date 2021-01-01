@@ -38,9 +38,9 @@ void MapChunk::GenerateTriangles()
             {
                 MCNKLiquidData& data = Adt->_LiquidHandler->MCNKData[Index];
                 float maxHeight = std::max(
-                    std::max(
-                    std::max(std::max(Vertices[topLeft].z, Vertices[topRight].z), Vertices[bottomLeft].z),
-                    Vertices[bottomRight].z), Vertices[center].z);
+                                      std::max(
+                                          std::max(std::max(Vertices[topLeft].z, Vertices[topRight].z), Vertices[bottomLeft].z),
+                                          Vertices[bottomRight].z), Vertices[center].z);
                 if (data.IsWater(x, y, maxHeight))
                     triangleType = Constants::TRIANGLE_TYPE_WATER;
             }

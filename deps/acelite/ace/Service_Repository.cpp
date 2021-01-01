@@ -114,7 +114,7 @@ int
 ACE_Service_Repository::fini (void)
 {
   ACE_TRACE ("ACE_Service_Repository::fini");
-  ACE_MT (ACE_GUARD_RETURN (ACE_Recursive_Thread_Mutex, ace_mon, this->lock_, -1));
+  ACE_GUARD_RETURN (ACE_SYNCH_RECURSIVE_MUTEX, ace_mon, this->lock_, -1);
 
   int retval = 0;
   // Do not be tempted to use the prefix decrement operator.  Use
@@ -209,7 +209,7 @@ int
 ACE_Service_Repository::close (void)
 {
   ACE_TRACE ("ACE_Service_Repository::close");
-  ACE_MT (ACE_GUARD_RETURN (ACE_Recursive_Thread_Mutex, ace_mon, this->lock_, -1));
+  ACE_GUARD_RETURN (ACE_SYNCH_RECURSIVE_MUTEX, ace_mon, this->lock_, -1);
 
 #ifndef ACE_NLOGGING
   if(ACE::debug ())
@@ -275,25 +275,21 @@ ACE_Service_Repository::find_i (const ACE_TCHAR name[],
                                 bool ignore_suspended) const
 {
   ACE_TRACE ("ACE_Service_Repository::find_i");
-  size_t i = 0;
-  array_type::const_iterator element = this->service_array_.end ();
+  array_type::const_iterator iter;
 
-  for (i = 0; i < this->service_array_.size(); i++)
+  for (iter = this->service_array_.begin(); iter != this->service_array_.end(); ++iter)
     {
-      array_type::const_iterator iter = this->service_array_.find (i);
-      if (iter != this->service_array_.end ()
-          && (*iter).second != 0 // skip any empty slots
+      if ((*iter).second != 0 // skip any empty slots
           && ACE_OS::strcmp (name, (*iter).second->name ()) == 0)
       {
-        element = iter;
         break;
       }
     }
 
-  if (element != this->service_array_.end ())
+  if (iter != this->service_array_.end ())
     {
-      slot = i;
-      if ((*element).second->fini_called ())
+      slot = (*iter).first;
+      if ((*iter).second->fini_called ())
         {
           if (srp != 0)
             *srp = 0;
@@ -301,10 +297,10 @@ ACE_Service_Repository::find_i (const ACE_TCHAR name[],
         }
 
       if (srp != 0)
-        *srp = (*element).second;
+        *srp = (*iter).second;
 
       if (ignore_suspended
-          && (*element).second->active () == 0)
+          && (*iter).second->active () == 0)
         return -2;
 
       return 0;
@@ -384,7 +380,7 @@ ACE_Service_Repository::find (const ACE_TCHAR name[],
                               bool ignore_suspended) const
 {
   ACE_TRACE ("ACE_Service_Repository::find");
-  ACE_MT (ACE_GUARD_RETURN (ACE_Recursive_Thread_Mutex, ace_mon, this->lock_, -1));
+  ACE_GUARD_RETURN (ACE_SYNCH_RECURSIVE_MUTEX, ace_mon, this->lock_, -1);
   size_t ignore_location = 0;
   return this->find_i (name, ignore_location, srp, ignore_suspended);
 }
@@ -406,10 +402,8 @@ ACE_Service_Repository::insert (const ACE_Service_Type *sr)
   // storage
   {
     // @TODO: Do we need a recursive mutex here?
-    ACE_MT (ACE_GUARD_RETURN (ACE_Recursive_Thread_Mutex,
-                              ace_mon,
-                              this->lock_,
-                              -1));
+    ACE_GUARD_RETURN (ACE_SYNCH_RECURSIVE_MUTEX,
+                      ace_mon, this->lock_, -1);
 
     return_value = find_i (sr->name (), i, &s, false);
 
@@ -463,7 +457,7 @@ ACE_Service_Repository::resume (const ACE_TCHAR name[],
                                 const ACE_Service_Type **srp)
 {
   ACE_TRACE ("ACE_Service_Repository::resume");
-  ACE_MT (ACE_GUARD_RETURN (ACE_Recursive_Thread_Mutex, ace_mon, this->lock_, -1));
+  ACE_GUARD_RETURN (ACE_SYNCH_RECURSIVE_MUTEX, ace_mon, this->lock_, -1);
 
   size_t i = 0;
   if (-1 == this->find_i (name, i, srp, 0))
@@ -479,7 +473,7 @@ ACE_Service_Repository::suspend (const ACE_TCHAR name[],
                                  const ACE_Service_Type **srp)
 {
   ACE_TRACE ("ACE_Service_Repository::suspend");
-  ACE_MT (ACE_GUARD_RETURN (ACE_Recursive_Thread_Mutex, ace_mon, this->lock_, -1));
+  ACE_GUARD_RETURN (ACE_SYNCH_RECURSIVE_MUTEX, ace_mon, this->lock_, -1);
   size_t i = 0;
   if (-1 == this->find_i (name, i, srp, 0))
     return -1;
@@ -497,7 +491,7 @@ ACE_Service_Repository::remove (const ACE_TCHAR name[], ACE_Service_Type **ps)
   ACE_TRACE ("ACE_Service_Repository::remove");
   ACE_Service_Type *s = 0;
   {
-    ACE_MT (ACE_GUARD_RETURN (ACE_Recursive_Thread_Mutex, ace_mon, this->lock_, -1));
+    ACE_GUARD_RETURN (ACE_SYNCH_RECURSIVE_MUTEX, ace_mon, this->lock_, -1);
 
     // Not found!?
     if (this->remove_i (name, &s) == -1)

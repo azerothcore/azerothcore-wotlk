@@ -11,7 +11,7 @@
 #include "SpellAuras.h"
 #include "SpellAuraEffects.h"
 
- enum Spells
+enum Spells
 {
     LFG_SPELL_DUNGEON_DESERTER = 71041,
     BG_SPELL_DESERTER = 26013
@@ -55,7 +55,7 @@ public:
         if (!*args)
             return false;
 
-         Player* targetPlayer = handler->getSelectedPlayer();
+        Player* targetPlayer = handler->getSelectedPlayer();
         if (!targetPlayer)
         {
             handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -71,24 +71,24 @@ public:
         }
         uint32 time = atoi(timeStr);
 
-         if (!time)
-         {
+        if (!time)
+        {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
             return false;
-         }
+        }
 
-         Aura* aura = targetPlayer->AddAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER, targetPlayer);
+        Aura* aura = targetPlayer->AddAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER, targetPlayer);
 
-         if (!aura)
-         {
+        if (!aura)
+        {
             handler->SendSysMessage(LANG_BAD_VALUE);
             handler->SetSentErrorMessage(true);
             return false;
-         }
+        }
         aura->SetDuration(time * IN_MILLISECONDS);
 
-         return true;
+        return true;
     }
 
     static bool HandleDeserterRemove(ChatHandler* handler, char const* /*args*/, bool isInstance)
@@ -101,9 +101,9 @@ public:
             return false;
         }
 
-         targetPlayer->RemoveAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
+        targetPlayer->RemoveAura(isInstance ? LFG_SPELL_DUNGEON_DESERTER : BG_SPELL_DESERTER);
 
-         return true;
+        return true;
     }
 
     static bool HandleDeserterInstanceAdd(ChatHandler* handler, char const* args)
@@ -127,7 +127,7 @@ public:
     }
 };
 
- void AddSC_deserter_commandscript()
+void AddSC_deserter_commandscript()
 {
     new deserter_commandscript();
 }

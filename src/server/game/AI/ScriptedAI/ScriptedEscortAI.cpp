@@ -27,7 +27,7 @@ npc_escortAI::npc_escortAI(Creature* creature) : ScriptedAI(creature),
     m_uiPlayerCheckTimer(0),
     m_uiEscortState(STATE_ESCORT_NONE),
     MaxPlayerDistance(DEFAULT_MAX_PLAYER_DISTANCE),
-    m_pQuestForEscort(NULL),
+    m_pQuestForEscort(nullptr),
     m_bIsActiveAttacker(true),
     m_bIsRunning(false),
     m_bCanInstantRespawn(false),
@@ -116,7 +116,7 @@ void npc_escortAI::JustDied(Unit* /*killer*/)
     {
         if (Group* group = player->GetGroup())
         {
-            for (GroupReference* groupRef = group->GetFirstMember(); groupRef != NULL; groupRef = groupRef->next())
+            for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                 if (Player* member = groupRef->GetSource())
                     if (member->IsInMap(player) && member->GetQuestStatus(m_pQuestForEscort->GetQuestId()) == QUEST_STATUS_INCOMPLETE)
                         member->FailQuest(m_pQuestForEscort->GetQuestId());
@@ -131,7 +131,7 @@ void npc_escortAI::JustDied(Unit* /*killer*/)
 
 void npc_escortAI::JustRespawned()
 {
-    RemoveEscortState(STATE_ESCORT_ESCORTING|STATE_ESCORT_RETURNING|STATE_ESCORT_PAUSED);
+    RemoveEscortState(STATE_ESCORT_ESCORTING | STATE_ESCORT_RETURNING | STATE_ESCORT_PAUSED);
 
     if (!IsCombatMovementAllowed())
         SetCombatMovement(true);
@@ -158,7 +158,7 @@ void npc_escortAI::EnterEvadeMode()
     me->RemoveAllAuras();
     me->DeleteThreatList();
     me->CombatStop(true);
-    me->SetLootRecipient(NULL);
+    me->SetLootRecipient(nullptr);
 
     if (HasEscortState(STATE_ESCORT_ESCORTING))
     {
@@ -183,7 +183,7 @@ bool npc_escortAI::IsPlayerOrGroupInRange()
     {
         if (Group* group = player->GetGroup())
         {
-            for (GroupReference* groupRef = group->GetFirstMember(); groupRef != NULL; groupRef = groupRef->next())
+            for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                 if (Player* member = groupRef->GetSource())
                     if (me->IsWithinDistInMap(member, GetMaxPlayerDistance()))
                         return true;
@@ -432,7 +432,7 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
     if (WaypointList.empty())
     {
         sLog->outErrorDb("TSCR: EscortAI (script: %s, creature entry: %u) starts with 0 waypoints (possible missing entry in script_waypoint. Quest: %u).",
-            me->GetScriptName().c_str(), me->GetEntry(), quest ? quest->GetQuestId() : 0);
+                         me->GetScriptName().c_str(), me->GetEntry(), quest ? quest->GetQuestId() : 0);
         return;
     }
 
@@ -556,7 +556,7 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
     uint32 startingWaypointId = CurrentWP->id;
 
     // Flying unit, just fill array
-    if (me->m_movementInfo.HasMovementFlag((MovementFlags)(MOVEMENTFLAG_CAN_FLY|MOVEMENTFLAG_DISABLE_GRAVITY)))
+    if (me->m_movementInfo.HasMovementFlag((MovementFlags)(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY)))
     {
         // xinef: first point in vector is unit real position
         points->clear();
@@ -571,7 +571,7 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
             std::vector<G3D::Vector3> pVector;
             // xinef: first point in vector is unit real position
             pVector.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            uint32 length = (WaypointList.size() - startingWaypointId)*size;
+            uint32 length = (WaypointList.size() - startingWaypointId) * size;
 
             uint32 cnt = 0;
             for (std::list<Escort_Waypoint>::const_iterator itr = CurrentWP; itr != WaypointList.end() && cnt <= length; ++itr, ++cnt)
@@ -579,11 +579,11 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
 
             if (pVector.size() > 2) // more than source + dest
             {
-                G3D::Vector3 middle = (pVector[0] + pVector[pVector.size()-1]) / 2.f;
+                G3D::Vector3 middle = (pVector[0] + pVector[pVector.size() - 1]) / 2.f;
                 G3D::Vector3 offset;
 
                 bool continueLoop = false;
-                for (uint32 i = 1; i < pVector.size()-1; ++i)
+                for (uint32 i = 1; i < pVector.size() - 1; ++i)
                 {
                     offset = middle - pVector[i];
                     if (fabs(offset.x) >= 0xFF || fabs(offset.y) >= 0xFF || fabs(offset.z) >= 0x7F)
@@ -599,6 +599,6 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
             // everything ok
             *points = pVector;
             break;
-       }
+        }
     }
 }

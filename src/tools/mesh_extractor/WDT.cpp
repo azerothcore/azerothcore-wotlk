@@ -10,7 +10,7 @@
 #include "Utils.h"
 #include "WorldModelHandler.h"
 
-WDT::WDT(std::string file) : IsGlobalModel(false), IsValid(false), Model(NULL)
+WDT::WDT(std::string file) : IsGlobalModel(false), IsValid(false), Model(nullptr)
 {
     Data = new ChunkedData(file, 2);
     ReadTileTable();

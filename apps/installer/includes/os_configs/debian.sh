@@ -1,4 +1,4 @@
-
+sudo apt-get update
 
 sudo apt-get install -y git cmake make gcc g++ clang libmysqlclient-dev \
 libssl1.0-dev libbz2-dev libreadline-dev libncurses-dev \

@@ -119,8 +119,8 @@ public:
 
         // set starting level
         uint32 startLevel = target->getClass() != CLASS_DEATH_KNIGHT
-            ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
-            : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
+                            ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
+                            : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
 
         target->_ApplyAllLevelScaleItemMods(false);
         target->SetLevel(startLevel);
@@ -271,7 +271,7 @@ public:
             atLogin = AtLoginFlags(AT_LOGIN_RESET_TALENTS | AT_LOGIN_RESET_PET_TALENTS);
             sWorld->SendWorldText(LANG_RESETALL_TALENTS);
             if (!handler->GetSession())
-               handler->SendSysMessage(LANG_RESETALL_TALENTS);
+                handler->SendSysMessage(LANG_RESETALL_TALENTS);
         }
         else
         {

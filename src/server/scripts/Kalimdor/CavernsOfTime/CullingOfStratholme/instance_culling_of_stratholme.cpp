@@ -12,10 +12,10 @@
 
 class instance_culling_of_stratholme : public InstanceMapScript
 {
-    public:
+public:
     instance_culling_of_stratholme() : InstanceMapScript("instance_culling_of_stratholme", 595) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_culling_of_stratholme_InstanceMapScript(pMap);
     }
@@ -31,7 +31,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
             // GOs
             _shkafGateGUID = 0;
             _exitGateGUID = 0;
-            
+
             // Instance
             _crateCount = 0;
             _showCrateTimer = 0;
@@ -41,12 +41,12 @@ class instance_culling_of_stratholme : public InstanceMapScript
             _loadTimer = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             return false;
         }
 
-        void FillInitialWorldStates(WorldPacket& data)
+        void FillInitialWorldStates(WorldPacket& data) override
         {
             data << uint32(WORLDSTATE_SHOW_CRATES) << uint32(0);
             data << uint32(WORLDSTATE_CRATES_REVEALED) << uint32(_crateCount);
@@ -55,7 +55,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
             data << uint32(WORLDSTATE_TIME_GUARDIAN_SHOW) << uint32(0);
         }
 
-        void OnPlayerEnter(Player* plr)
+        void OnPlayerEnter(Player* plr) override
         {
             if (instance->GetPlayersCountExceptGMs() == 1)
                 SetData(DATA_ARTHAS_REPOSITION, 2);
@@ -66,7 +66,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                 plr->CastSpell(plr, ((plr->getGender() == GENDER_MALE) ? SPELL_HUMAN_MALE : SPELL_HUMAN_FEMALE), true);
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -83,7 +83,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -100,7 +100,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -111,7 +111,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                     if (!instance->IsHeroic() || !_guardianTimer)
                         return;
                     DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN_SHOW, data);
-                    DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN, uint32(_guardianTimer / (MINUTE*IN_MILLISECONDS)));
+                    DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN, uint32(_guardianTimer / (MINUTE * IN_MILLISECONDS)));
                     if (data == 0)
                     {
                         _guardianTimer = 0;
@@ -125,7 +125,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                     if (instance->IsHeroic())
                     {
                         DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN_SHOW, true);
-                        _guardianTimer = 26*MINUTE*IN_MILLISECONDS;
+                        _guardianTimer = 26 * MINUTE * IN_MILLISECONDS;
                         if (!_infiniteGUID)
                             instance->SummonCreature(NPC_INFINITE, EventPos[EVENT_SRC_CORRUPTOR]);
                     }
@@ -134,7 +134,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                     _crateCount++;
                     if (_crateCount == 5)
                     {
-                        Map::PlayerList const &PlayerList = instance->GetPlayers();
+                        Map::PlayerList const& PlayerList = instance->GetPlayers();
                         if (!PlayerList.isEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 i->GetSource()->KilledMonsterCredit(NPC_GRAIN_CREATE_TRIGGER, 0);
@@ -151,19 +151,19 @@ class instance_culling_of_stratholme : public InstanceMapScript
                     _encounterState = data;
                     if (data == COS_PROGRESS_START_INTRO)
                     {
-                        if (Creature *arthas = instance->GetCreature(_arthasGUID))
+                        if (Creature* arthas = instance->GetCreature(_arthasGUID))
                             arthas->AI()->DoAction(ACTION_START_EVENT);
                     }
                     else if (data == COS_PROGRESS_KILLED_SALRAMM)
                     {
-                        if (Creature *arthas = instance->GetCreature(_arthasGUID))
+                        if (Creature* arthas = instance->GetCreature(_arthasGUID))
                             arthas->AI()->DoAction(ACTION_KILLED_SALRAMM);
                     }
                     break;
                 case DATA_ARTHAS_REPOSITION:
                     if (data == 2)
                         _respawnAndReposition = true;
-                    else if (Creature *arthas = instance->GetCreature(_arthasGUID))
+                    else if (Creature* arthas = instance->GetCreature(_arthasGUID))
                         Reposition(arthas);
                     return;
 
@@ -173,7 +173,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -185,7 +185,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const
+        uint64 GetData64(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -199,7 +199,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
             return 0;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             if (_loadTimer)
             {
@@ -213,7 +213,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
             // Used when arthas dies
             if (_respawnAndReposition)
             {
-                if (Creature *arthas = instance->GetCreature(_arthasGUID))
+                if (Creature* arthas = instance->GetCreature(_arthasGUID))
                 {
                     if (!arthas->IsAlive())
                     {
@@ -243,10 +243,10 @@ class instance_culling_of_stratholme : public InstanceMapScript
             // Used to display how much time players have
             if (_guardianTimer)
             {
-                uint32 div = uint32(_guardianTimer / (MINUTE*IN_MILLISECONDS));
+                uint32 div = uint32(_guardianTimer / (MINUTE * IN_MILLISECONDS));
                 _guardianTimer -= diff;
-                uint32 divAfter = uint32(_guardianTimer / (MINUTE*IN_MILLISECONDS));
-                
+                uint32 divAfter = uint32(_guardianTimer / (MINUTE * IN_MILLISECONDS));
+
                 if (divAfter == 0)
                 {
                     _guardianTimer = 0;
@@ -280,7 +280,7 @@ class instance_culling_of_stratholme : public InstanceMapScript
                 instance->SummonCreature(NPC_HOURGLASS, EventPos[EVENT_POS_HOURGLASS]);
 
                 if (_encounterState == COS_PROGRESS_CRATES_FOUND ||
-                    _encounterState == COS_PROGRESS_START_INTRO)
+                        _encounterState == COS_PROGRESS_START_INTRO)
                 {
                     ChromieWhisper(0);
 
@@ -357,18 +357,18 @@ class instance_culling_of_stratholme : public InstanceMapScript
             instance->LoadGrid(LeaderIntroPos6.GetPositionX(), LeaderIntroPos6.GetPositionY());
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-                saveStream << "C S " << _encounterState << ' ' << _guardianTimer;
+            saveStream << "C S " << _encounterState << ' ' << _guardianTimer;
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -398,21 +398,21 @@ class instance_culling_of_stratholme : public InstanceMapScript
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        private:
-            // NPCs
-            uint64 _arthasGUID;
-            uint64 _infiniteGUID;
+    private:
+        // NPCs
+        uint64 _arthasGUID;
+        uint64 _infiniteGUID;
 
-            // GOs
-            uint64 _shkafGateGUID;
-            uint64 _exitGateGUID;
-            uint32 _encounterState;
-            uint32 _crateCount;
-            uint32 _showCrateTimer;
-            uint32 _guardianTimer;
+        // GOs
+        uint64 _shkafGateGUID;
+        uint64 _exitGateGUID;
+        uint32 _encounterState;
+        uint32 _crateCount;
+        uint32 _showCrateTimer;
+        uint32 _guardianTimer;
 
-            bool _respawnAndReposition;
-            uint32 _loadTimer;
+        bool _respawnAndReposition;
+        uint32 _loadTimer;
     };
 };
 
