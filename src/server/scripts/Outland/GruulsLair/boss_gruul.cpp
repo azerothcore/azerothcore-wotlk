@@ -136,7 +136,9 @@ public:
             }
 
             if (!me->HasUnitState(UNIT_STATE_ROOT))             // Since we can not just use the UNIT_STATE_STUNNED flag on Gruul,
+            {
                 DoMeleeAttackIfReady();                         // we need to prevent his autohits like this while he is rooted
+            }
         }
 
     private:
