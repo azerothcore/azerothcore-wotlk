@@ -17,3 +17,10 @@ UPDATE `creature` SET `orientation`=2.40, `wander_distance`=4, `MovementType`=1 
 -- Fix EMOTE_DEATH
 UPDATE `creature_text` SET `Text`='%s takes his last breath.', `Type`=16, `BroadcastTextId`=13044, `comment`='heigan EMOTE_DEATH' WHERE `CreatureID`=15936 AND `GroupID`=3 AND `ID`=0;
 
+/* Loatheb */
+
+-- Useless, workaround implemented in boss_loatheb.cpp
+DELETE FROM `spell_script_names` WHERE `spell_id`=59481;
+-- Adjust movement speed for Spores
+UPDATE `creature_template` SET `speed_walk`=0.4, `speed_run`=0.4 WHERE `entry` IN (16286, 30068);
+
