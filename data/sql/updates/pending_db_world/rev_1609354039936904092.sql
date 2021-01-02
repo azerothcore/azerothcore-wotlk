@@ -15,7 +15,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 
 DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 21208) AND (`OptionID` IN (0));
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
-(21208, 0, 0, 'Turn the key to start the machine.', 2703, 1, 0, 0, 0, 0, 0, '', 0, 0);
+(21208, 0, 0, 'Turn the key to start the machine.', 2703, 1, 1, 0, 0, 0, 0, '', 0, 0);
 
 UPDATE `creature_template` SET `gossip_menu_id` = 0, `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 6669;
 
