@@ -1,5 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609602692076885000');
-DELETE FROM `creature` WHERE `id` = 1986;
+DELETE FROM `creature` WHERE (`id` = 1986) AND (`guid` BETWEEN 46958 AND 47268);
 INSERT INTO `creature` VALUES
     (46958, 1986, 1, 0, 0, 1, 1, 709, 0, 10901.5, 877.607, 1330.02, 4.54922, 300, 5, 0, 71, 0, 1, 0, 0, 0, '', 0),
     (46971, 1986, 1, 0, 0, 1, 1, 709, 0, 10948.4, 894.388, 1337.57, 2.37731, 300, 5, 0, 71, 0, 1, 0, 0, 0, '', 0),
