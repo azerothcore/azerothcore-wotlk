@@ -796,7 +796,7 @@ public:
         GetPosition(&pos);
         MovePosition(pos, dist, angle);
     }
-    void MovePositionToFirstCollision(Position& pos, float dist, float angle);
+    bool MovePositionToFirstCollision(Position& pos, float dist, float angle);
     void GetFirstCollisionPosition(Position& pos, float dist, float angle)
     {
         GetPosition(&pos);
