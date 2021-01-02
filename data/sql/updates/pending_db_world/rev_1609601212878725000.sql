@@ -1,11 +1,11 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609601212878725000');
 DELETE FROM `gossip_menu` WHERE `MenuID` IN (2405, 2406, 2407, 2408);
 INSERT INTO `gossip_menu` VALUES
-	(2405, 3077),
-	(2405, 3097),
-	(2405, 3098),
-	(2405, 3099),
-	(2406, 3100),
+    (2405, 3077),
+    (2405, 3097),
+    (2405, 3098),
+    (2405, 3099),
+    (2406, 3100),
     (2407, 3101),
     (2408, 3102);
 DELETE FROM `conditions` WHERE `SourceGroup` = 2405;
