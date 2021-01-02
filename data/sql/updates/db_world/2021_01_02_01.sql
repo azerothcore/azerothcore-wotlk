@@ -1,3 +1,19 @@
+-- DB update 2021_01_02_00 -> 2021_01_02_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_02_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_02_00 2021_01_02_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1609196416272968100'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 -- INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609196416272968100');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '', `spell1` = 0, `unit_flags`=`unit_flags`|512 WHERE (`entry` = 17243);
@@ -97,3 +113,12 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (17318, 1, 0, 'Relax, Spark! I have it all under control. We\'ll strip mine the Exodar right out from under \'em - making both you and I very, very rich in the process.', 12, 0, 100, 1, 0, 0, 13779, 0, 'Geezle - Tree\'s Company - Text #2'),
 (17318, 2, 0, 'Yes, sir. It won\'t happen again...', 12, 0, 100, 1, 0, 0, 13782, 0, 'Geezle - Tree\'s Company - Text #3');
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
