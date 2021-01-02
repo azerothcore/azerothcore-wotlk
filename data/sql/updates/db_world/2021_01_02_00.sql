@@ -1,3 +1,19 @@
+-- DB update 2021_01_01_00 -> 2021_01_02_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_01_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_01_00 2021_01_02_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1609174873784850500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609174873784850500');
 
 UPDATE `creature_template_addon` SET `auras` = '29266' WHERE `entry` = 17508;
@@ -27,3 +43,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 -- Set correct quest prev for Galaen's Journal - The Fate of Vindicator Saruan based on WOW Head
 UPDATE `quest_template_addon` SET `PrevQuestID` = 9779 WHERE `ID` = 9706;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
