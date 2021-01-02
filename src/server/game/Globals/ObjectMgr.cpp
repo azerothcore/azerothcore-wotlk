@@ -388,7 +388,7 @@ void ObjectMgr::LoadCreatureLocales()
 
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %lu Сreature Locale strings in %u ms", (unsigned long)_creatureLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %lu Creature Locale strings in %u ms", (unsigned long)_creatureLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadGossipMenuItemsLocales()
@@ -595,6 +595,7 @@ void ObjectMgr::LoadCreatureTemplates()
     }
 
     sLog->outString(">> Loaded %u creature definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void ObjectMgr::LoadCreatureTemplateAddons()
@@ -1704,6 +1705,7 @@ void ObjectMgr::LoadTempSummons()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u temp summons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void ObjectMgr::LoadCreatures()
@@ -3347,6 +3349,7 @@ void ObjectMgr::LoadPlayerInfo()
             } while (result->NextRow());
 
             sLog->outString(">> Loaded %u player create definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            sLog->outString();
         }
     }
 
@@ -3480,6 +3483,7 @@ void ObjectMgr::LoadPlayerInfo()
             } while (result->NextRow());
 
             sLog->outString(">> Loaded %u player create spells in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            sLog->outString();
         }
     }
 
@@ -7002,6 +7006,7 @@ void ObjectMgr::LoadReputationRewardRate()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u reputation_reward_rate in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void ObjectMgr::LoadReputationOnKill()
@@ -8773,7 +8778,6 @@ void ObjectMgr::LoadBroadcastTexts()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded " SZFMTD " broadcast texts in %u ms", _broadcastTextStore.size(), GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
 }
 
 void ObjectMgr::LoadBroadcastTextLocales()
@@ -9233,6 +9237,7 @@ void ObjectMgr::LoadGameObjectQuestItems()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u gameobject quest items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void ObjectMgr::LoadCreatureQuestItems()
@@ -9262,4 +9267,5 @@ void ObjectMgr::LoadCreatureQuestItems()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u creature quest items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
