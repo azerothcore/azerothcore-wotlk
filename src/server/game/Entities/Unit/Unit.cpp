@@ -176,8 +176,7 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_attackPosition(NULL),
     m_HostileRefManager(this),
     // m_spellHistory(new SpellHistory(this)),
-    m_comboTarget(nullptr),
-    m_comboPoints(0)
+    m_comboTarget(nullptr)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
