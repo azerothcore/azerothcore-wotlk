@@ -5,6 +5,7 @@
  */
 
 #include "Common.h"
+#include "Geometry.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
@@ -1304,12 +1305,7 @@ float Position::GetAngle(const Position* obj) const
 // Return angle in range 0..2*pi
 float Position::GetAngle(const float x, const float y) const
 {
-    float dx = x - GetPositionX();
-    float dy = y - GetPositionY();
-
-    float ang = atan2(dy, dx);
-    ang = (ang >= 0) ? ang : 2 * M_PI + ang;
-    return ang;
+    return getAngle(GetPositionX(), GetPositionY(), x, y);
 }
 
 void Position::GetSinCos(const float x, const float y, float& vsin, float& vcos) const

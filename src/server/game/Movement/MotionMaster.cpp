@@ -337,7 +337,7 @@ void MotionMaster::MoveBackwards(Unit* target, float dist)
     //else
     //    point.z = _owner->GetMapHeight(point.x, point.y, point.z);
 
-    if (_owner->GetMap()->CanReachPositionAndGetCoords(_owner, point.x, point.y, point.z, true, 1.2f)) {
+    if (_owner->GetMap()->CanReachPositionAndGetCoords(_owner, point.x, point.y, point.z, true, 6.0f, M_PI_4)) {
         Movement::MoveSplineInit init(_owner);
         init.MoveTo(point.x, point.y, point.z, true);
         init.SetFacing(target);
@@ -371,7 +371,7 @@ void MotionMaster::MoveCircleTarget(Unit* target)
     float y = point->m_positionY;
     float z = point->m_positionZ;
 
-    if (_map->CanReachPositionAndGetCoords(_owner, x, y, z, true, 0.5f)) {
+    if (_map->CanReachPositionAndGetCoords(_owner, x, y, z, true, 6.0f, M_PI/3)) {
         Movement::MoveSplineInit init(_owner);
         init.SetSmooth();
         init.MoveTo(x, y, z, true);

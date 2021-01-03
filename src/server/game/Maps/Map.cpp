@@ -5,6 +5,7 @@
  */
 
 #include "Map.h"
+#include "Geometry.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "DynamicTree.h"
@@ -3397,7 +3398,7 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
  * \param maxDeviationAngle  the maximum deviation that a creature can take to reach the destination
  *
  */
-bool Map::CanReachPositionAndGetCoords(Unit* who, PathGenerator path, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */, float maxDeviationAngle /*= M_PI*2 */) const
+bool Map::CanReachPositionAndGetCoords(Unit* who, PathGenerator path, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */, float maxSlopeAngle/* = M_PI/2 */, float maxDeviationAngle /*= M_PI*2 */) const
 {
     double deviation = 0.0f;
     G3D::Vector3 prevPath = path.GetStartPosition();
@@ -3414,13 +3415,9 @@ bool Map::CanReachPositionAndGetCoords(Unit* who, PathGenerator path, bool check
         if (deviation > maxDeviationAngle)
             return false;
 
-        float dx = x - prevPath.x;
-        float dy = y - prevPath.y;
+        float ang = getAngle(prevPath.x, prevPath.y, x, y);
 
-        float ang = atan2(dy, dx);
-        ang = (ang >= 0) ? ang : 2 * M_PI + ang;
-
-        if (CanReachPositionAndGetCoords(who, prevPath.x, prevPath.y, prevPath.z, ang, x, y, z, checkCollision, maxHeight))
+        if (CanReachPositionAndGetCoords(who, prevPath.x, prevPath.y, prevPath.z, ang, x, y, z, checkCollision, maxHeight, maxSlopeAngle))
         {
             return false;
         }
@@ -3431,9 +3428,9 @@ bool Map::CanReachPositionAndGetCoords(Unit* who, PathGenerator path, bool check
     return true;
 }
 
-bool Map::CanReachPositionAndGetCoords(Unit* who, float &destX, float &destY, float &destZ, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */) const
+bool Map::CanReachPositionAndGetCoords(Unit* who, float &destX, float &destY, float &destZ, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */, float maxSlopeAngle/* = M_PI/2 */) const
 {
-    return CanReachPositionAndGetCoords(who, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), who->GetOrientation(), destX, destY, destZ, checkCollision, maxHeight);
+    return CanReachPositionAndGetCoords(who, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), who->GetOrientation(), destX, destY, destZ, checkCollision, maxHeight, maxSlopeAngle);
 }
 
 /**
@@ -3446,7 +3443,7 @@ bool Map::CanReachPositionAndGetCoords(Unit* who, float &destX, float &destY, fl
  *   \return true if the destination is valid, false otherwise
  *
  **/
-bool Map::CanReachPositionAndGetCoords(Unit* who, float startX, float startY, float startZ, float startAngle, float &destX, float &destY, float &destZ, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */) const
+bool Map::CanReachPositionAndGetCoords(Unit* who, float startX, float startY, float startZ, float startAngle, float &destX, float &destY, float &destZ, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */, float maxSlopeAngle/* = M_PI/2 */) const
 {
     acore::NormalizeMapCoord(destX);
     acore::NormalizeMapCoord(destY);
@@ -3473,15 +3470,20 @@ bool Map::CanReachPositionAndGetCoords(Unit* who, float startX, float startY, fl
     }
 
 
-    if (destZ <= INVALID_HEIGHT)
+    if (destZ <= INVALID_HEIGHT || (destZ - startZ) > maxHeight)
+    {
+        return false;
+    }
+
+    float slopeAngle = getSlopeAngleAbs(startX, startY, startZ, destX, destY, destZ);
+
+    if (slopeAngle > maxSlopeAngle)
     {
         return false;
     }
 
     // if water environment
     bool is_water_now = _map->IsInWater(startX, startY, startZ);
-
-
 
     if (!isInLineOfSight(startX, startY, startZ, destX, destY, destZ, who->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS)) {
         return false;
@@ -3493,10 +3495,6 @@ bool Map::CanReachPositionAndGetCoords(Unit* who, float startX, float startY, fl
     if ((is_water_now && !is_water_next && who->GetTypeId() == TYPEID_UNIT && !((Creature*)who)->CanWalk()) ||
         (!is_water_now && is_water_next && !who->CanSwim()))
     {
-        return false;
-    }
-
-    if (destZ - startZ > maxHeight) {
         return false;
     }
 
