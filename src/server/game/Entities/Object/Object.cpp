@@ -2682,13 +2682,50 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
     pos.m_orientation = m_orientation;
 }
 
+Position WorldObject::GetFirstCollisionPosition(float startX, float startY, float startZ, float destX, float destY)
+{
+    float dx = destX - startX;
+    float dy = destY - startY;
+
+    float ang = atan2(dy, dx);
+    ang = (ang >= 0) ? ang : 2 * M_PI + ang;
+    Position pos = Position(startX, startY, startZ, ang);
+
+    float distance = pos.GetExactDist2d(destX,destY);
+
+    MovePositionToFirstCollision(pos, distance, ang);
+    return pos;
+};
+
+Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float destZ)
+{
+    Position pos = GetPosition();
+    float distance = GetExactDistSq(destX,destY,destZ);
+
+    float dx = destX - pos.GetPositionX();
+    float dy = destY - pos.GetPositionY();
+
+    float ang = atan2(dy, dx);
+    ang = (ang >= 0) ? ang : 2 * M_PI + ang;
+
+    MovePositionToFirstCollision(pos, distance, ang);
+    return pos;
+};
+
+Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
+{
+    Position pos = GetPosition();
+    GetFirstCollisionPosition(pos, dist, angle);
+    return pos;
+}
+
 /**
  *
  * \return true -> collision, false -> no collision
  */
 bool WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
 {
-    angle += m_orientation;
+    angle += pos.GetOrientation();
     float destx, desty, destz;
     destx = pos.m_positionX + dist * cos(angle);
     desty = pos.m_positionY + dist * sin(angle);

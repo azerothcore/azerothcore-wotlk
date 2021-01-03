@@ -3393,43 +3393,101 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
 }
 
 /**
+ *
+ * \param maxDeviationAngle  the maximum deviation that a creature can take to reach the destination
+ *
+ */
+bool Map::CanReachPositionAndGetCoords(Unit* who, PathGenerator path, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */, float maxDeviationAngle /*= M_PI*2 */) const
+{
+    double deviation = 0.0f;
+    G3D::Vector3 prevPath = path.GetStartPosition();
+    for (auto & vector : path.GetPath()) {
+        float x = vector.x;
+        float y = vector.y;
+        float z = vector.z;
+
+        deviation += who->GetRelativeAngle(x, y);
+
+        // to reach the position the Unit must deviate
+        // the straight path with a higher margin than the one desired
+        // in this case we return false
+        if (deviation > maxDeviationAngle)
+            return false;
+
+        float dx = x - prevPath.x;
+        float dy = y - prevPath.y;
+
+        float ang = atan2(dy, dx);
+        ang = (ang >= 0) ? ang : 2 * M_PI + ang;
+
+        if (CanReachPositionAndGetCoords(who, prevPath.x, prevPath.y, prevPath.z, ang, x, y, z, checkCollision, maxHeight))
+        {
+            return false;
+        }
+
+        prevPath = vector;
+    }
+
+    return true;
+}
+
+bool Map::CanReachPositionAndGetCoords(Unit* who, float &destX, float &destY, float &destZ, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */) const
+{
+    return CanReachPositionAndGetCoords(who, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), who->GetOrientation(), destX, destY, destZ, checkCollision, maxHeight);
+}
+
+/**
  *   \brief validate the new destination
  *
  *   Check if a given unit can reach a specific point and set the correct Z coord based on difference in height
  *
  *   \param maxHeight the desired max Height for the calculated Z coord. If the new Z exceed the maxHeight, this method returns false
- *   \param maxDeviationAngle  the maximum deviation that a creature can take to reach the destination
+
  *   \return true if the destination is valid, false otherwise
  *
  **/
-bool Map::CanReachPositionAndGetCoords(Unit* who, float &dest_x, float &dest_y, float &dest_z, float maxDeviationAngle /*= M_PI*2 */, float maxHeight/*  = 3.0f */) const
+bool Map::CanReachPositionAndGetCoords(Unit* who, float startX, float startY, float startZ, float startAngle, float &destX, float &destY, float &destZ, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */) const
 {
-    acore::NormalizeMapCoord(dest_x);
-    acore::NormalizeMapCoord(dest_y);
+    acore::NormalizeMapCoord(destX);
+    acore::NormalizeMapCoord(destY);
 
     const Map* _map = who->GetBaseMap();
 
-    // if water environment
-    bool is_water_now = _map->IsInWater(who->GetPositionX(), who->GetPositionY(), who->GetPositionZ());
+    // check map geometry for possible collision
+    if (checkCollision) {
+        Position pos = Position(startX, startY, startZ, startAngle);
 
-    float orig_z = dest_z;
+        float distance = pos.GetExactDist2d(destX,destY);
 
-    // otherwise calculate a new z
-    float new_z = _map->GetHeight(who->GetPhaseMask(), dest_x, dest_y, dest_z, true);
+        bool collided = who->MovePositionToFirstCollision(pos, distance, pos.GetRelativeAngle(destX,destY));
 
-    if (new_z <= INVALID_HEIGHT)
+        destX = pos.GetPositionX();
+        destY = pos.GetPositionY();
+        destZ = pos.GetPositionZ();
+
+        if (collided)
+            return false;
+    } else {
+        // otherwise calculate a new z
+        destZ = _map->GetHeight(who->GetPhaseMask(), destX, destY, destZ, true);
+    }
+
+
+    if (destZ <= INVALID_HEIGHT)
     {
         return false;
     }
 
-    dest_z = new_z;
+    // if water environment
+    bool is_water_now = _map->IsInWater(startX, startY, startZ);
 
-    if (is_water_now && _map->IsInWater(dest_x, dest_y, new_z))
-    {
-        return true;
+
+
+    if (!isInLineOfSight(startX, startY, startZ, destX, destY, destZ, who->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS)) {
+        return false;
     }
 
-    bool is_water_next = _map->IsInWater(dest_x, dest_y, new_z);
+    bool is_water_next = _map->IsInWater(destX, destY, destZ);
 
     // if not compatible inhabit type for the next position, return false
     if ((is_water_now && !is_water_next && who->GetTypeId() == TYPEID_UNIT && !((Creature*)who)->CanWalk()) ||
@@ -3438,73 +3496,7 @@ bool Map::CanReachPositionAndGetCoords(Unit* who, float &dest_x, float &dest_y, 
         return false;
     }
 
-    auto collisionCheck = [](Unit *who, float x, float y, float z, float angle, float &dx, float &dy, float &dz) {
-        if (!who->IsWithinLOS(dx, dy, dz)) {
-            return true;
-        }
-
-        float currentDistance = who->GetExactDist2d(dx,dy);
-
-        Position newPos = Position(x, y, z, angle);
-        bool collided = who->MovePositionToFirstCollision(newPos, currentDistance, who->GetRelativeAngle(dx,dy));
-
-        dx = newPos.GetPositionX();
-        dy = newPos.GetPositionY();
-        dz = newPos.GetPositionZ();
-
-        return collided;
-    };
-
-    // check map geometry for possible collision
-    if (maxDeviationAngle <= 0.0f)
-    {
-        if (collisionCheck(who, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), who->GetOrientation(), dest_x, dest_y, dest_z)) {
-            return false;
-        }
-    }
-    else
-    {
-        PathGenerator path(who);
-        bool result = path.CalculatePath(dest_x, dest_y, dest_z, false);
-
-        if (!result) {
-            return false;
-        }
-
-        double deviation = 0.0f;
-        G3D::Vector3 prevPath = path.GetStartPosition();
-        for (auto & vector : path.GetPath()) {
-            float x = vector.x;
-            float y = vector.y;
-            float z = vector.z;
-
-            deviation += who->GetRelativeAngle(x, y);
-
-            // to reach the position the Unit must deviate
-            // the straight path with a higher margin than the one desired
-            // in this case we return false
-            if (deviation > maxDeviationAngle)
-                return false;
-
-            float dx = x - prevPath.x;
-            float dy = y - prevPath.y;
-
-            float ang = atan2(dy, dx);
-            ang = (ang >= 0) ? ang : 2 * M_PI + ang;
-
-            if (collisionCheck(who, prevPath.x, prevPath.y, prevPath.z, ang, x, y, z))
-            {
-                dest_x = x;
-                dest_y = y;
-                dest_z = z;
-                return false;
-            }
-
-            prevPath = vector;
-        }
-    }
-
-    if (orig_z - new_z > maxHeight) {
+    if (destZ - startZ > maxHeight) {
         return false;
     }
 
