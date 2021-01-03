@@ -1,10 +1,4 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609681055620795500');
-/*
- * Raid: The Naxxramas
- * Update by Knindza | <www.azerothcore.org>
- * Copyright (C) <www.shadowburn.net> & <www.lichbane.com>
-*/
-
 /* ANUB'REKHAN SUMMONS */
 UPDATE `creature_template` SET `mindmg` = 3480, `maxdmg` = 4550, `DamageModifier` = 1.03 WHERE `entry` = 16573;
 UPDATE `creature_template` SET `mindmg` = 6960, `maxdmg` = 9060, `DamageModifier` = 1.03 WHERE `entry` = 29256;
