@@ -4,7 +4,7 @@
 /**
  *  @file    Log_Record.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -69,12 +69,11 @@ public:
   /// Default dtor.
   ~ACE_Log_Record (void);
 
-
   /// Write the contents of the logging record to the appropriate
   /// FILE if the corresponding type is enabled.
   int print (const ACE_TCHAR host_name[],
              u_long verbose_flag,
-#if !defined (ACE_HAS_WINCE)
+#if !defined (ACE_HAS_WINCE) && !defined (ACE_LACKS_STDERR)
              FILE *fp = stderr);
 #else
              FILE *fp);
@@ -90,7 +89,8 @@ public:
 
   int format_msg (const ACE_TCHAR host_name[],
                   u_long verbose_flag,
-                  ACE_TCHAR *verbose_msg);
+                  ACE_TCHAR *verbose_msg,
+                  size_t verbose_msg_size);
 
   /**
    * Returns a character array with the string form of the

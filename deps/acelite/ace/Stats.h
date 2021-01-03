@@ -165,7 +165,13 @@ public:
    */
   int print_summary (const u_int precision,
                      const ACE_UINT32 scale_factor = 1,
-                     FILE * = stdout) const;
+                     FILE *
+#ifdef ACE_LACKS_STDOUT
+                     = 0
+#else
+                     = stdout
+#endif
+                     ) const;
 
   /// Initialize internal state.
   void reset (void);

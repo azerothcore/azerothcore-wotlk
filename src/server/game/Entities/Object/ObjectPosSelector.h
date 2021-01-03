@@ -15,7 +15,7 @@ enum UsedPosType { USED_POS_PLUS, USED_POS_MINUS };
 
 inline UsedPosType operator ~(UsedPosType uptype)
 {
-    return uptype==USED_POS_PLUS ? USED_POS_MINUS : USED_POS_PLUS;
+    return uptype == USED_POS_PLUS ? USED_POS_MINUS : USED_POS_PLUS;
 }
 
 struct ObjectPosSelector
@@ -49,20 +49,20 @@ struct ObjectPosSelector
 
         float next_angle = nextUsedPos.first;
         if (nextUsedPos.second.sign * sign < 0)              // last node from diff. list (-pi+alpha)
-            next_angle = 2*M_PI-next_angle;                 // move to positive
+            next_angle = 2 * M_PI - next_angle;             // move to positive
 
-        return fabs(angle)+angle_step2 <= next_angle;
+        return fabs(angle) + angle_step2 <= next_angle;
     }
 
     bool CheckOriginal() const
     {
         return (m_UsedPosLists[USED_POS_PLUS].empty() || CheckAngle(*m_UsedPosLists[USED_POS_PLUS].begin(), 1.0f, 0)) &&
-            (m_UsedPosLists[USED_POS_MINUS].empty() || CheckAngle(*m_UsedPosLists[USED_POS_MINUS].begin(), -1.0f, 0));
+               (m_UsedPosLists[USED_POS_MINUS].empty() || CheckAngle(*m_UsedPosLists[USED_POS_MINUS].begin(), -1.0f, 0));
     }
 
     bool IsNonBalanced() const { return m_UsedPosLists[USED_POS_PLUS].empty() != m_UsedPosLists[USED_POS_MINUS].empty(); }
 
-    bool NextAngleFor(UsedPosList::value_type const& usedPos, float sign, UsedPosType uptype, float &angle)
+    bool NextAngleFor(UsedPosList::value_type const& usedPos, float sign, UsedPosType uptype, float& angle)
     {
         float angle_step  = GetAngle(usedPos.second);
 
@@ -88,7 +88,7 @@ struct ObjectPosSelector
         return true;
     }
 
-    bool NextSmallStepAngle(float sign, UsedPosType uptype, float &angle)
+    bool NextSmallStepAngle(float sign, UsedPosType uptype, float& angle)
     {
         // next possible angle
         angle  = m_smallStepAngle[uptype] + m_anglestep * sign;
@@ -124,7 +124,7 @@ struct ObjectPosSelector
     UsedPosList::value_type const* nextUsedPos(UsedPosType uptype);
 
     // angle from used pos to next possible free pos
-    float GetAngle(UsedPos const& usedPos) const { return acos(m_dist/(usedPos.dist+usedPos.size+m_size)); }
+    float GetAngle(UsedPos const& usedPos) const { return acos(m_dist / (usedPos.dist + usedPos.size + m_size)); }
 
     float m_center_x;
     float m_center_y;

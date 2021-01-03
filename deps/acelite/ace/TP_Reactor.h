@@ -132,7 +132,6 @@ private:
   /// hasn't got the token (and hence the thread) and a value of true
   /// vice-versa.
   bool owner_;
-
 };
 
 /**

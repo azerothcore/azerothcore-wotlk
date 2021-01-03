@@ -19,12 +19,12 @@ SHA1Hash::~SHA1Hash()
     SHA1_Init(&mC);
 }
 
-void SHA1Hash::UpdateData(const uint8 *dta, int len)
+void SHA1Hash::UpdateData(const uint8* dta, int len)
 {
     SHA1_Update(&mC, dta, len);
 }
 
-void SHA1Hash::UpdateData(const std::string &str)
+void SHA1Hash::UpdateData(const std::string& str)
 {
     UpdateData((uint8 const*)str.c_str(), str.length());
 }

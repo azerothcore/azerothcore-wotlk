@@ -17,7 +17,7 @@ private:
 
 public:
     static GroupMgr* instance();
-    
+
     typedef std::map<uint32, Group*> GroupContainer;
 
     Group* GetGroupByGUID(uint32 guid) const;

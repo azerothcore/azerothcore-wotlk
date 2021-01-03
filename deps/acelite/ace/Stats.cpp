@@ -217,13 +217,13 @@ ACE_Stats::print_summary (const u_int precision,
       // Build a format string, in case the C library doesn't support %*u.
       ACE_TCHAR format[32];
       if (tmp_precision == 0)
-        ACE_OS::sprintf (format, ACE_TEXT ("%%%d"), tmp_precision);
+        ACE_OS::snprintf (format, 32, ACE_TEXT ("%%%d"), tmp_precision);
       else
-        ACE_OS::sprintf (format, ACE_TEXT ("%%d.%%0%du"), tmp_precision);
+        ACE_OS::snprintf (format, 32, ACE_TEXT ("%%d.%%0%du"), tmp_precision);
 
       ACE_Stats_Value u (tmp_precision);
       ((ACE_Stats *) this)->mean (u, scale_factor);
-      ACE_OS::sprintf (mean_string, format, u.whole (), u.fractional ());
+      ACE_OS::snprintf (mean_string, 128, format, u.whole (), u.fractional ());
 
       ACE_Stats_Value sd (tmp_precision);
       if (((ACE_Stats *) this)->std_dev (sd, scale_factor))
@@ -235,7 +235,8 @@ ACE_Stats::print_summary (const u_int precision,
         {
           success = 1;
         }
-      ACE_OS::sprintf (std_dev_string, format, sd.whole (), sd.fractional ());
+      ACE_OS::snprintf (std_dev_string, 128, format, sd.whole (),
+                        sd.fractional ());
 
       ACE_Stats_Value minimum (tmp_precision), maximum (tmp_precision);
       if (min_ != 0)
@@ -248,10 +249,10 @@ ACE_Stats::print_summary (const u_int precision,
           const ACE_UINT64 m (max_);
           quotient (m, scale_factor, maximum);
         }
-      ACE_OS::sprintf (min_string, format,
-                       minimum.whole (), minimum.fractional ());
-      ACE_OS::sprintf (max_string, format,
-                       maximum.whole (), maximum.fractional ());
+      ACE_OS::snprintf (min_string, 128, format,
+                        minimum.whole (), minimum.fractional ());
+      ACE_OS::snprintf (max_string, 128, format,
+                        maximum.whole (), maximum.fractional ());
     }
 
   if (success == 1)

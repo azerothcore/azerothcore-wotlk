@@ -112,66 +112,66 @@ enum TFTowerStates
 
 class OPvPCapturePointTF : public OPvPCapturePoint
 {
-    public:
+public:
 
-        OPvPCapturePointTF(OutdoorPvP* pvp, OutdoorPvPTF_TowerType type);
+    OPvPCapturePointTF(OutdoorPvP* pvp, OutdoorPvPTF_TowerType type);
 
-        bool Update(uint32 diff);
+    bool Update(uint32 diff) override;
 
-        void ChangeState();
+    void ChangeState() override;
 
-        void SendChangePhase();
+    void SendChangePhase() override;
 
-        void FillInitialWorldStates(WorldPacket & data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player* player);
-        void HandlePlayerLeave(Player* player);
+    // used when player is activated/inactivated in the area
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 
-        void UpdateTowerState();
+    void UpdateTowerState();
 
-    protected:
+protected:
 
-        OutdoorPvPTF_TowerType m_TowerType;
+    OutdoorPvPTF_TowerType m_TowerType;
 
-        uint32 m_TowerState;
+    uint32 m_TowerState;
 };
 
 class OutdoorPvPTF : public OutdoorPvP
 {
-    public:
+public:
 
-        OutdoorPvPTF();
+    OutdoorPvPTF();
 
-        bool SetupOutdoorPvP();
+    bool SetupOutdoorPvP() override;
 
-        void HandlePlayerEnterZone(Player* player, uint32 zone);
-        void HandlePlayerLeaveZone(Player* player, uint32 zone);
+    void HandlePlayerEnterZone(Player* player, uint32 zone) override;
+    void HandlePlayerLeaveZone(Player* player, uint32 zone) override;
 
-        bool Update(uint32 diff);
+    bool Update(uint32 diff) override;
 
-        void FillInitialWorldStates(WorldPacket &data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        void SendRemoveWorldStates(Player* player);
+    void SendRemoveWorldStates(Player* player) override;
 
-        uint32 GetAllianceTowersControlled() const;
-        void SetAllianceTowersControlled(uint32 count);
+    uint32 GetAllianceTowersControlled() const;
+    void SetAllianceTowersControlled(uint32 count);
 
-        uint32 GetHordeTowersControlled() const;
-        void SetHordeTowersControlled(uint32 count);
+    uint32 GetHordeTowersControlled() const;
+    void SetHordeTowersControlled(uint32 count);
 
-        bool IsLocked() const;
+    bool IsLocked() const;
 
-    private:
+private:
 
-        bool m_IsLocked;
-        uint32 m_LockTimer;
-        uint32 m_LockTimerUpdate;
+    bool m_IsLocked;
+    uint32 m_LockTimer;
+    uint32 m_LockTimerUpdate;
 
-        uint32 m_AllianceTowersControlled;
-        uint32 m_HordeTowersControlled;
+    uint32 m_AllianceTowersControlled;
+    uint32 m_HordeTowersControlled;
 
-        uint32 hours_left, second_digit, first_digit;
+    uint32 hours_left, second_digit, first_digit;
 };
 
 #endif

@@ -17,11 +17,11 @@ void AuthCrypt::Init(BigNumber* K)
 {
     uint8 ServerEncryptionKey[SEED_KEY_SIZE] = { 0xCC, 0x98, 0xAE, 0x04, 0xE8, 0x97, 0xEA, 0xCA, 0x12, 0xDD, 0xC0, 0x93, 0x42, 0x91, 0x53, 0x57 };
     HmacHash serverEncryptHmac(SEED_KEY_SIZE, (uint8*)ServerEncryptionKey);
-    uint8 *encryptHash = serverEncryptHmac.ComputeHash(K);
+    uint8* encryptHash = serverEncryptHmac.ComputeHash(K);
 
     uint8 ServerDecryptionKey[SEED_KEY_SIZE] = { 0xC2, 0xB3, 0x72, 0x3C, 0xC6, 0xAE, 0xD9, 0xB5, 0x34, 0x3C, 0x53, 0xEE, 0x2F, 0x43, 0x67, 0xCE };
     HmacHash clientDecryptHmac(SEED_KEY_SIZE, (uint8*)ServerDecryptionKey);
-    uint8 *decryptHash = clientDecryptHmac.ComputeHash(K);
+    uint8* decryptHash = clientDecryptHmac.ComputeHash(K);
 
     //ARC4 _serverDecrypt(encryptHash);
     _clientDecrypt.Init(decryptHash);
@@ -43,7 +43,7 @@ void AuthCrypt::Init(BigNumber* K)
     _initialized = true;
 }
 
-void AuthCrypt::DecryptRecv(uint8 *data, size_t len)
+void AuthCrypt::DecryptRecv(uint8* data, size_t len)
 {
     if (!_initialized)
         return;
@@ -51,7 +51,7 @@ void AuthCrypt::DecryptRecv(uint8 *data, size_t len)
     _clientDecrypt.UpdateData(len, data);
 }
 
-void AuthCrypt::EncryptSend(uint8 *data, size_t len)
+void AuthCrypt::EncryptSend(uint8* data, size_t len)
 {
     if (!_initialized)
         return;

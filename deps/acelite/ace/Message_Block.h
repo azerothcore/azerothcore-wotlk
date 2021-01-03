@@ -4,7 +4,7 @@
 /**
  *  @file    Message_Block.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //==========================================================================
 
@@ -125,7 +125,6 @@ public:
     USER_FLAGS = 0x1000
   };
 
-  // = Initialization and termination.
   /// Create an empty message.
   ACE_Message_Block (ACE_Allocator *message_block_allocator = 0);
 
@@ -675,7 +674,6 @@ private:
 class ACE_Export ACE_Data_Block
 {
 public:
-  // = Initialization and termination methods.
   /// Default "do-nothing" constructor.
   ACE_Data_Block (void);
 
@@ -715,7 +713,7 @@ public:
    */
   char *mark (void) const;
 
-  // = Message size is the total amount of space allotred.
+  // = Message size is the total amount of space allocated.
 
   /// Get the total amount of allotted space in the message.  The amount of
   /// allotted space may be less than allocated space.

@@ -134,7 +134,7 @@ uint32 GenerateEnchSuffixFactor(uint32 item_id)
         case INVTYPE_QUIVER:
         case INVTYPE_RELIC:
             return 0;
-            // Select point coefficient
+        // Select point coefficient
         case INVTYPE_HEAD:
         case INVTYPE_BODY:
         case INVTYPE_CHEST:

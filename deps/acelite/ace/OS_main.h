@@ -4,7 +4,7 @@
 /**
  *  @file   OS_main.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  *  @author Jesper S. M|ller<stophph@diku.dk>
  *  @author and a cast of thousands...
  *
@@ -22,6 +22,10 @@
 # if !defined (ACE_LACKS_PRAGMA_ONCE)
 #  pragma once
 # endif /* ACE_LACKS_PRAGMA_ONCE */
+
+#if defined (ACE_MQX)
+# include "ace/MQX_Filesystem.h"
+#endif
 
 # if !defined (ACE_DOESNT_DEFINE_MAIN)
 
@@ -55,7 +59,7 @@ extern char* rtems_progname;
           return ace_main_i (argc, wide_argv.get_TCHAR_argv ()); \
         } \
         int ace_main_i
-#   else
+#   elif !defined (ACE_MQX)
 #     define ACE_TMAIN main
 #   endif /* ACE_USES_WCHAR */
 # endif
@@ -300,6 +304,31 @@ int ace_main_i
 
 #   endif   /* ACE_PSOSIM */
 # endif /* ACE_HAS_NONSTATIC_OBJECT_MANAGER && !ACE_HAS_WINCE && !ACE_DOESNT_INSTANTIATE_NONSTATIC_OBJECT_MANAGER */
+
+#  ifdef ACE_MQX
+#    include <iar_dynamic_init.h>
+#    include "ace/MQX_Filesystem.h"
+#    define ACE_TMAIN \
+ace_main_i(int argc, ACE_TCHAR *argv[]); \
+static void main_task(uint32_t param) { \
+  __iar_dynamic_initialization(); \
+  RTCS_create(); \
+  MQX_Filesystem::inst ().complete_initialization (); \
+  ace_main_i(0, 0); \
+} \
+static TASK_TEMPLATE_STRUCT  MQX_template_list[] = { \
+  {1, main_task, 25000, 9, "Main", MQX_AUTO_START_TASK, 0, 0 }, { 0 } \
+}; \
+static const MQX_INITIALIZATION_STRUCT  MQX_init_struct = { \
+  BSP_DEFAULT_PROCESSOR_NUMBER, BSP_DEFAULT_START_OF_KERNEL_MEMORY, \
+  BSP_DEFAULT_END_OF_KERNEL_MEMORY, BSP_DEFAULT_INTERRUPT_STACK_SIZE, \
+  MQX_template_list, BSP_DEFAULT_MQX_HARDWARE_INTERRUPT_LEVEL_MAX, \
+  BSP_DEFAULT_MAX_MSGPOOLS, BSP_DEFAULT_MAX_MSGQS, \
+  BSP_DEFAULT_IO_CHANNEL, (char const*)BSP_DEFAULT_IO_OPEN_MODE, 0, 0 \
+}; \
+int main() { return _mqx( (MQX_INITIALIZATION_STRUCT_PTR) &MQX_init_struct ); } \
+int ace_main_i
+#  endif /* ACE_MQX */
 
 #endif /* ACE_DOESNT_DEFINE_MAIN */
 

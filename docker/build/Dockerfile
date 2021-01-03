@@ -1,12 +1,13 @@
-FROM ubuntu:bionic
+FROM ubuntu:20.04
 
 # install the required dependencies to compile AzerothCore
-RUN apt update && apt install -y git cmake make gcc g++ clang libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev libace-6.* libace-dev
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt install -y git cmake make gcc g++ clang libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev libace-6.4.5 libace-dev
 
 # copy the sources from the host machine to the Docker container
 ADD .git /azerothcore/.git
 ADD deps /azerothcore/deps
-ADD conf/config.cmake.dist /azerothcore/conf/config.cmake.dist
+ADD conf/dist /azerothcore/conf/dist
 ADD src /azerothcore/src
 ADD modules /azerothcore/modules
 ADD CMakeLists.txt /azerothcore/CMakeLists.txt

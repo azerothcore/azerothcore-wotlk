@@ -108,7 +108,8 @@ public:
                         break;
                 }
                 ++phase;
-            } else FlyBackTimer-=diff;
+            }
+            else FlyBackTimer -= diff;
         }
     };
 
