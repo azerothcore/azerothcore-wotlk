@@ -602,16 +602,16 @@ public:
         uint32 _gongTimer;
         uint64 uiTargetGUID;
 
-        void Reset()
+        void Reset() override
         {
             _gongEvent = 0;
             _gongTimer = 0;
             uiTargetGUID = 0;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void sGossipSelect(Player* player, uint32 sender, uint32 action)
+        void sGossipSelect(Player* player, uint32 sender, uint32 action) override
         {
             if (me->GetCreatureTemplate()->GossipMenuId == sender && !action)
             {
@@ -624,7 +624,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*, const SpellInfo* spell)
+        void SpellHit(Unit*, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_COSMETIC_SPEAR_THROW)
             {
@@ -638,7 +638,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_gongEvent)
             {
@@ -768,7 +768,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_harrison_jonesAI>(creature);
     }
@@ -789,13 +789,13 @@ public:
             GetHitGObj()->SendCustomAnim(0);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_banging_the_gong_SpellScript::Activate, EFFECT_1, SPELL_EFFECT_ACTIVATE_OBJECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_banging_the_gong_SpellScript();
     }

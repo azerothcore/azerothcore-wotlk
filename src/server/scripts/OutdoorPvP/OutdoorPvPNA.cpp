@@ -656,7 +656,7 @@ public:
     {
     }
 
-    OutdoorPvP* GetOutdoorPvP() const
+    OutdoorPvP* GetOutdoorPvP() const override
     {
         return new OutdoorPvPNA();
     }

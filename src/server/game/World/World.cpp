@@ -157,10 +157,10 @@ World::~World()
     //TODO free addSessQueue
 }
 
-World* World::instance()
+std::unique_ptr<IWorld>& getWorldInstance()
 {
-    static World instance;
-    return &instance;
+    static std::unique_ptr<IWorld> instance = std::make_unique<World>();
+    return instance;
 }
 
 /// Find a player in a specified zone
@@ -442,7 +442,9 @@ void World::LoadConfigSettings(bool reload)
 
     ///- Read the player limit and the Message of the day from the config file
     if (!reload)
-        SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 100));
+    {
+        SetPlayerAmountLimit(sConfigMgr->GetIntDefault("PlayerLimit", 1000));
+    }
 
     Motd::SetMotd(sConfigMgr->GetStringDefault("Motd", "Welcome to an AzerothCore server"));
 
@@ -502,6 +504,8 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_XP_BG_KILL]                  = sConfigMgr->GetFloatDefault("Rate.XP.BattlegroundKill", 1.0f);
     rate_values[RATE_XP_QUEST]                    = sConfigMgr->GetFloatDefault("Rate.XP.Quest", 1.0f);
     rate_values[RATE_XP_EXPLORE]                  = sConfigMgr->GetFloatDefault("Rate.XP.Explore", 1.0f);
+    rate_values[RATE_XP_PET]                      = sConfigMgr->GetFloatDefault("Rate.XP.Pet", 1.0f);
+    rate_values[RATE_XP_PET_NEXT_LEVEL]           = sConfigMgr->GetFloatDefault("Rate.Pet.LevelXP", 0.05f);
     rate_values[RATE_REPAIRCOST]                  = sConfigMgr->GetFloatDefault("Rate.RepairCost", 1.0f);
 
     rate_values[RATE_SELLVALUE_ITEM_POOR]         = sConfigMgr->GetFloatDefault("Rate.SellValue.Item.Poor", 1.0f);
@@ -1126,11 +1130,24 @@ void World::LoadConfigSettings(bool reload)
         sLog->outError("Battleground.ReportAFK (%d) must be <10. Using 3 instead.", m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]);
         m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] = 3;
     }
-
+    m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN]        = sConfigMgr->GetIntDefault("Battleground.PlayerRespawn", 30);
+    if (m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN] < 3)
+    {
+        sLog->outError("Battleground.PlayerRespawn (%i) must be >2. Using 30 instead.", m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN]);
+        m_int_configs[CONFIG_BATTLEGROUND_PLAYER_RESPAWN] = 30;
+    }
+    m_int_configs[CONFIG_BATTLEGROUND_BUFF_RESPAWN]        = sConfigMgr->GetIntDefault("Battleground.BuffRespawn", 180);
+    if (m_int_configs[CONFIG_BATTLEGROUND_BUFF_RESPAWN] < 1)
+    {
+        sLog->outError("Battleground.BuffRespawn (%i) must be >0. Using 180 instead.", m_int_configs[CONFIG_BATTLEGROUND_BUFF_RESPAWN]);
+        m_int_configs[CONFIG_BATTLEGROUND_BUFF_RESPAWN] = 180;
+    }
+    
     m_int_configs[CONFIG_ARENA_MAX_RATING_DIFFERENCE]                = sConfigMgr->GetIntDefault ("Arena.MaxRatingDifference", 150);
     m_int_configs[CONFIG_ARENA_RATING_DISCARD_TIMER]                 = sConfigMgr->GetIntDefault ("Arena.RatingDiscardTimer", 10 * MINUTE * IN_MILLISECONDS);
     m_bool_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS]              = sConfigMgr->GetBoolDefault("Arena.AutoDistributePoints", false);
     m_int_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS]        = sConfigMgr->GetIntDefault ("Arena.AutoDistributeInterval", 7); // pussywizard: spoiled by implementing constant day and hour, always 7 now
+    m_int_configs[CONFIG_ARENA_GAMES_REQUIRED]                       = sConfigMgr->GetIntDefault ("Arena.GamesRequired", 10);
     m_int_configs[CONFIG_ARENA_SEASON_ID]                            = sConfigMgr->GetIntDefault ("Arena.ArenaSeason.ID", 1);
     m_int_configs[CONFIG_ARENA_START_RATING]                         = sConfigMgr->GetIntDefault ("Arena.ArenaStartRating", 0);
     m_int_configs[CONFIG_ARENA_START_PERSONAL_RATING]                = sConfigMgr->GetIntDefault ("Arena.ArenaStartPersonalRating", 1000);
@@ -1272,7 +1289,7 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_SHOW_KICK_IN_WORLD]         = sConfigMgr->GetBoolDefault("ShowKickInWorld", false);
     m_bool_configs[CONFIG_SHOW_MUTE_IN_WORLD]         = sConfigMgr->GetBoolDefault("ShowMuteInWorld", false);
     m_bool_configs[CONFIG_SHOW_BAN_IN_WORLD]          = sConfigMgr->GetBoolDefault("ShowBanInWorld", false);
-    m_int_configs[CONFIG_INTERVAL_LOG_UPDATE]         = sConfigMgr->GetIntDefault("RecordUpdateTimeDiffInterval", 60000);
+    m_int_configs[CONFIG_INTERVAL_LOG_UPDATE]         = sConfigMgr->GetIntDefault("RecordUpdateTimeDiffInterval", 300000);
     m_int_configs[CONFIG_MIN_LOG_UPDATE]              = sConfigMgr->GetIntDefault("MinRecordUpdateTimeDiff", 100);
     m_int_configs[CONFIG_NUMTHREADS]                  = sConfigMgr->GetIntDefault("MapUpdate.Threads", 1);
     m_int_configs[CONFIG_MAX_RESULTS_LOOKUP_COMMANDS] = sConfigMgr->GetIntDefault("Command.LookupMaxResults", 0);

@@ -44,7 +44,7 @@ Battlefield::Battlefield()
 
     m_uiKickAfkPlayersTimer = 1000;
 
-    m_LastResurectTimer = 30 * IN_MILLISECONDS;
+    m_LastResurectTimer = RESURRECTION_INTERVAL;
     m_StartGroupingTimer = 0;
     m_StartGrouping = false;
     StalkerGuid = 0;

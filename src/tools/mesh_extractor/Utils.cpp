@@ -165,7 +165,7 @@ float Utils::Distance( float x, float y )
 std::string Utils::Replace( std::string str, const std::string& oldStr, const std::string& newStr )
 {
     size_t pos = 0;
-    while((pos = str.find(oldStr, pos)) != std::string::npos)
+    while ((pos = str.find(oldStr, pos)) != std::string::npos)
     {
         str.replace(pos, oldStr.length(), newStr);
         pos += newStr.length();
@@ -223,7 +223,7 @@ std::string Utils::GetExtension( std::string path )
     std::string::size_type idx = path.rfind('.');
     std::string extension = "";
 
-    if(idx != std::string::npos)
+    if (idx != std::string::npos)
         extension = path.substr(idx + 1);
     return extension;
 }
@@ -525,7 +525,7 @@ char* Utils::GetPlainName(const char* FileName)
 {
     char* temp;
 
-    if((temp = (char*)strrchr(FileName, '\\')) != nullptr)
+    if ((temp = (char*)strrchr(FileName, '\\')) != nullptr)
         FileName = temp + 1;
     return (char*)FileName;
 }

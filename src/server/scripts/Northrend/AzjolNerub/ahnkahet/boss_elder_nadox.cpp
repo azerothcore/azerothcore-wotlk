@@ -88,7 +88,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -100,7 +100,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
 
@@ -114,7 +114,7 @@ public:
                 pInstance->SetData(DATA_ELDER_NADOX_EVENT, IN_PROGRESS);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_GUARDIAN_DIED)
             {
@@ -123,13 +123,13 @@ public:
             }
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             events.Reset();
             summons.DespawnAll();
@@ -140,7 +140,7 @@ public:
                 pInstance->SetData(DATA_ELDER_NADOX_EVENT, DONE);
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             if (cr)
             {
@@ -151,7 +151,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -219,7 +219,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_elder_nadoxAI(creature);
     }
@@ -236,7 +236,7 @@ public:
 
 
         uint32 uiSprintTimer;
-        void Reset()
+        void Reset() override
         {
             if (me->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY)
                 me->CastSpell(me, SPELL_GUARDIAN_AURA, true);
@@ -249,7 +249,7 @@ public:
             uiSprintTimer = 10000;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (me->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY)
             {
@@ -261,7 +261,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -278,7 +278,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ahnkahar_nerubianAI(creature);
     }
@@ -324,13 +324,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_ahn_kahet_swarmer_aura_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_ahn_kahet_swarmer_aura_SpellScript();
     }

@@ -14,7 +14,6 @@
 #define __WORLDSOCKETMGR_H
 
 #include "Common.h"
-#include <ace/Basic_Types.h>
 #include <ace/Thread_Mutex.h>
 
 class WorldSocket;

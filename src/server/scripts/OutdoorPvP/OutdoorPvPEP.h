@@ -177,15 +177,15 @@ public:
 
     OPvPCapturePointEP_EWT(OutdoorPvP* pvp);
 
-    void ChangeState();
+    void ChangeState() override;
 
-    void SendChangePhase();
+    void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
     // used when player is activated/inactivated in the area
-    bool HandlePlayerEnter(Player* player);
-    void HandlePlayerLeave(Player* player);
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 
 protected:
 
@@ -206,15 +206,15 @@ public:
 
     OPvPCapturePointEP_NPT(OutdoorPvP* pvp);
 
-    void ChangeState();
+    void ChangeState() override;
 
-    void SendChangePhase();
+    void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
     // used when player is activated/inactivated in the area
-    bool HandlePlayerEnter(Player* player);
-    void HandlePlayerLeave(Player* player);
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 
 protected:
 
@@ -235,15 +235,15 @@ public:
 
     OPvPCapturePointEP_CGT(OutdoorPvP* pvp);
 
-    void ChangeState();
+    void ChangeState() override;
 
-    void SendChangePhase();
+    void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
     // used when player is activated/inactivated in the area
-    bool HandlePlayerEnter(Player* player);
-    void HandlePlayerLeave(Player* player);
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 
 protected:
 
@@ -264,15 +264,15 @@ public:
 
     OPvPCapturePointEP_PWT(OutdoorPvP* pvp);
 
-    void ChangeState();
+    void ChangeState() override;
 
-    void SendChangePhase();
+    void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
     // used when player is activated/inactivated in the area
-    bool HandlePlayerEnter(Player* player);
-    void HandlePlayerLeave(Player* player);
+    bool HandlePlayerEnter(Player* player) override;
+    void HandlePlayerLeave(Player* player) override;
 
 protected:
 
@@ -293,16 +293,16 @@ public:
 
     OutdoorPvPEP();
 
-    bool SetupOutdoorPvP();
+    bool SetupOutdoorPvP() override;
 
-    void HandlePlayerEnterZone(Player* player, uint32 zone);
-    void HandlePlayerLeaveZone(Player* player, uint32 zone);
+    void HandlePlayerEnterZone(Player* player, uint32 zone) override;
+    void HandlePlayerLeaveZone(Player* player, uint32 zone) override;
 
-    bool Update(uint32 diff);
+    bool Update(uint32 diff) override;
 
-    void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-    void SendRemoveWorldStates(Player* player);
+    void SendRemoveWorldStates(Player* player) override;
 
     void BuffTeams();
 

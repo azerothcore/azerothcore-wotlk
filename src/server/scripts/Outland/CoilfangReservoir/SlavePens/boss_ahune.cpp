@@ -79,7 +79,7 @@ class boss_ahune : public CreatureScript
 public:
     boss_ahune() : CreatureScript("boss_ahune") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_ahuneAI (pCreature);
     }
@@ -111,14 +111,14 @@ public:
             events.RescheduleEvent(EVENT_SPELL_SUMMON_COLDWAVE, 5000);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             DoZoneInCombat();
             events.Reset();
             StartPhase1();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                 return;
@@ -244,9 +244,9 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
@@ -256,7 +256,7 @@ public:
             ScriptedAI::EnterEvadeMode();
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (summon)
             {
@@ -265,7 +265,7 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) override
         {
             if (summon && summon->GetEntry() == NPC_FROZEN_CORE)
             {
@@ -279,7 +279,7 @@ public:
             }
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             summons.DespawnAll();
             me->DespawnOrUnsummon(15000);
@@ -358,7 +358,7 @@ class npc_ahune_frozen_core : public CreatureScript
 public:
     npc_ahune_frozen_core() : CreatureScript("npc_ahune_frozen_core") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ahune_frozen_coreAI (pCreature);
     }
@@ -367,7 +367,7 @@ public:
     {
         npc_ahune_frozen_coreAI(Creature* c) : NullCreatureAI(c) {}
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->DespawnOrUnsummon();
         }

@@ -15,7 +15,7 @@ public:
     {
         instance_dire_maul_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        void Initialize()
+        void Initialize() override
         {
             _eastWingProgress = 0;
             _westWingProgress = 0;
@@ -25,7 +25,7 @@ public:
             _immoltharGUID = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -39,7 +39,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* gameobject)
+        void OnGameObjectCreate(GameObject* gameobject) override
         {
             switch (gameobject->GetEntry())
             {
@@ -59,7 +59,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -97,7 +97,7 @@ public:
             SaveToDB();
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             if (type == TYPE_EAST_WING_PROGRESS)
                 return _eastWingProgress;
@@ -109,14 +109,14 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             std::ostringstream saveStream;
             saveStream << "D M " << _eastWingProgress << ' ' << _westWingProgress << ' ' << _pylonsState << ' ' << _northWingProgress << ' ' << _northWingBosses;
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
                 return;
@@ -144,7 +144,7 @@ public:
         uint64 _immoltharGUID;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_dire_maul_InstanceMapScript(map);
     }

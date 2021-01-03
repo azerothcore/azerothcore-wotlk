@@ -50,15 +50,15 @@ public:
         uint32 morphtimer;
         bool spellhit;
 
-        void Reset()
+        void Reset() override
         {
             morphtimer = 0;
             spellhit = false;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void SpellHit(Unit* unit, const SpellInfo* spell)
+        void SpellHit(Unit* unit, const SpellInfo* spell) override
         {
             if (spellhit)
                 return;
@@ -81,7 +81,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // we mustn't remove the Creature in the same round in which we cast the summon spell, otherwise there will be no summons
             if (spellhit && morphtimer >= 5000)
@@ -107,7 +107,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_spitelashesAI(creature);
     }
@@ -402,7 +402,7 @@ public:
         bool WeMustDie;
         uint32 WeMustDieTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->SetHover(true);
             me->SetSwim(true);
@@ -411,11 +411,11 @@ public:
             WeMustDieTimer = 1000;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void AttackStart(Unit* /*who*/) { }
+        void AttackStart(Unit* /*who*/) override { }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!who)
                 return;
@@ -428,7 +428,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (WeMustDie)
             {
@@ -441,7 +441,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_depth_chargeAI(creature);
     }

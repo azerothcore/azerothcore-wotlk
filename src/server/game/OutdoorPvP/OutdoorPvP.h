@@ -185,7 +185,7 @@ public:
     OutdoorPvP();
 
     // dtor
-    virtual ~OutdoorPvP();
+    ~OutdoorPvP() override;
 
     // deletes all gos/creatures spawned by the pvp
     void DeleteSpawns();
@@ -206,9 +206,9 @@ public:
     // setup stuff
     virtual bool SetupOutdoorPvP() {return true;}
 
-    void OnGameObjectCreate(GameObject* go);
-    void OnGameObjectRemove(GameObject* go);
-    void OnCreatureCreate(Creature*) {}
+    void OnGameObjectCreate(GameObject* go) override;
+    void OnGameObjectRemove(GameObject* go) override;
+    void OnCreatureCreate(Creature*) override {}
 
     // send world state update to all players present
     void SendUpdateWorldState(uint32 field, uint32 value);

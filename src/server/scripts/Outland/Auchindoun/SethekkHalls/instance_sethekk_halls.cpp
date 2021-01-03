@@ -11,7 +11,7 @@ class instance_sethekk_halls : public InstanceMapScript
 public:
     instance_sethekk_halls() : InstanceMapScript("instance_sethekk_halls", 556) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_sethekk_halls_InstanceMapScript(map);
     }
@@ -24,21 +24,21 @@ public:
         uint64 m_uiIkissDoorGUID;
         uint64 _talonKingsCofferGUID;
 
-        void Initialize()
+        void Initialize() override
         {
             AnzuEncounter = NOT_STARTED;
             m_uiIkissDoorGUID = 0;
             _talonKingsCofferGUID = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (creature->GetEntry() == NPC_ANZU || creature->GetEntry() == NPC_VOICE_OF_THE_RAVEN_GOD)
                 if (AnzuEncounter >= IN_PROGRESS)
                     creature->DespawnOrUnsummon(1);
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -51,7 +51,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -70,7 +70,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -81,7 +81,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* strIn)
+        void Load(const char* strIn) override
         {
             if (!strIn)
             {

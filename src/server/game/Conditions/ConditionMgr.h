@@ -64,11 +64,11 @@ enum ConditionTypes
     CONDITION_IN_WATER              = 40,                   // 0                0              0                  true if unit in water
     CONDITION_TERRAIN_SWAP          = 41,                   // don't use on 3.3.5a
     CONDITION_STAND_STATE           = 42,                   // TODO: NOT SUPPORTED YET
-    CONDITION_DAILY_QUEST_DONE      = 43,                   // TODO: NOT SUPPORTED YET
+    CONDITION_DAILY_QUEST_DONE      = 43,                   // quest id         0              0                  true if daily quest has been completed for the day
     CONDITION_CHARMED               = 44,                   // TODO: NOT SUPPORTED YET
     CONDITION_PET_TYPE              = 45,                   // TODO: NOT SUPPORTED YET
     CONDITION_TAXI                  = 46,                   // TODO: NOT SUPPORTED YET
-    CONDITION_QUESTSTATE            = 47,                   // TODO: NOT SUPPORTED YET
+    CONDITION_QUESTSTATE            = 47,                   // quest_id         state_mask     0                  true if player is in any of the provided quest states for the quest (1 = not taken, 2 = completed, 8 = in progress, 32 = failed, 64 = rewarded)
     CONDITION_QUEST_OBJECTIVE_PROGRESS = 48,                // quest_id         objectiveIndex objectiveCount     true if player has reached the specified objectiveCount quest progress for the objectiveIndex for the specified quest
     CONDITION_DIFFICULTY_ID            = 49,                // don't use on 3.3.5a
     CONDITION_TC_END                   = 50,                // placeholder
@@ -166,7 +166,7 @@ struct ConditionSourceInfo
 {
     WorldObject* mConditionTargets[MAX_CONDITION_TARGETS]; // an array of targets available for conditions
     Condition* mLastFailedCondition;
-    ConditionSourceInfo(WorldObject* target0, WorldObject* target1 = NULL, WorldObject* target2 = nullptr)
+    ConditionSourceInfo(WorldObject* target0, WorldObject* target1 = nullptr, WorldObject* target2 = nullptr)
     {
         mConditionTargets[0] = target0;
         mConditionTargets[1] = target1;
@@ -214,7 +214,7 @@ struct Condition
 
     bool Meets(ConditionSourceInfo& sourceInfo);
     uint32 GetSearcherTypeMaskForCondition();
-    bool isLoaded() const { return ConditionType > CONDITION_NONE || ReferenceId; }
+    [[nodiscard]] bool isLoaded() const { return ConditionType > CONDITION_NONE || ReferenceId; }
     uint32 GetMaxAvailableConditionTargets();
 };
 
@@ -244,8 +244,8 @@ public:
     bool IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions);
     bool IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions);
     bool IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
-    bool CanHaveSourceGroupSet(ConditionSourceType sourceType) const;
-    bool CanHaveSourceIdSet(ConditionSourceType sourceType) const;
+    [[nodiscard]] bool CanHaveSourceGroupSet(ConditionSourceType sourceType) const;
+    [[nodiscard]] bool CanHaveSourceIdSet(ConditionSourceType sourceType) const;
     ConditionList GetConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry);
     ConditionList GetConditionsForSpellClickEvent(uint32 creatureId, uint32 spellId);
     ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);

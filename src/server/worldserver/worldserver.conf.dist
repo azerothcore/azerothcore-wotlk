@@ -71,6 +71,7 @@ DataDir = "."
 #        Description: Logs directory setting.
 #        Important:   LogsDir needs to be quoted, as the string might contain space characters.
 #                     Logs directory must exists, or log file creation will be disabled.
+#        Example:     "/home/youruser/azeroth-server/logs"
 #        Default:     "" - (Log files will be stored in the current path)
 
 LogsDir = ""
@@ -86,9 +87,9 @@ LogsDir = ""
 #                                                                 section my.ini)
 #                     ".;/path/to/unix_socket;username;password;database" - (use Unix sockets on
 #                                                                           Unix/Linux)
-#        Default:     "127.0.0.1;3306;acore;acore;auth"       - (LoginDatabaseInfo)
-#                     "127.0.0.1;3306;acore;acore;world"      - (WorldDatabaseInfo)
-#                     "127.0.0.1;3306;acore;acore;characters" - (CharacterDatabaseInfo)
+#        Default:     "127.0.0.1;3306;acore;acore;acore_auth"       - (LoginDatabaseInfo)
+#                     "127.0.0.1;3306;acore;acore;acore_world"      - (WorldDatabaseInfo)
+#                     "127.0.0.1;3306;acore;acore;acore_characters" - (CharacterDatabaseInfo)
 
 LoginDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_auth"
 WorldDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_world"
@@ -183,11 +184,11 @@ Compression = 1
 #        Description: Maximum number of players in the world. Excluding Mods, GMs and Admins.
 #          Important: If you want to block players and only allow Mods, GMs or Admins to join the
 #                     server, use the DB field "auth.realmlist.allowedSecurityLevel".
-#            Default: 100 - (Enabled)
-#                     1+  - (Enabled)
-#                     0   - (Disabled, No limit)
+#            Default: 1000 - (Enabled)
+#                     1+   - (Enabled)
+#                     0    - (Disabled, No limit)
 
-PlayerLimit = 100
+PlayerLimit = 1000
 
 #
 #    SaveRespawnTimeImmediately
@@ -653,7 +654,7 @@ SQLDeveloperLogFile = ""
 #
 #    SQLDriverLogFile
 #        Description: Log file for SQL driver events.
-#        Example:     "SQLDriver.log" - (Enabled)
+#        Example:     "WorldSQLDriver.log" - (Enabled)
 #        Default:      ""             - (Disabled)
 
 SQLDriverLogFile = ""
@@ -2392,19 +2393,22 @@ Rate.Drop.Item.ReferencedAmount = 1
 #    Rate.XP.Kill
 #    Rate.XP.Quest
 #    Rate.XP.Explore
+#    Rate.XP.Pet
 #        Description: Experience rates (outside battleground)
 #        Default:     1 - (Rate.XP.Kill)
 #                     1 - (Rate.XP.Quest)
 #                     1 - (Rate.XP.Explore)
+#                     1	- (Rate.XP.Pet)
 
 Rate.XP.Kill    = 1
 Rate.XP.Quest   = 1
 Rate.XP.Explore = 1
+Rate.XP.Pet     = 1
 
 #
 #    Rate.XP.BattlegroundKill
-#        Description: Experience rate for honorable kills in battlegrounds,
-#                     it works when Battleground.GiveXPForKills = 1
+#        Description: Experience rate for honorable kills in battlegrounds. Not affected by Rate.XP.Kill
+#                     Only works if Battleground.GiveXPForKills = 1
 #        Default:     1
 
 Rate.XP.BattlegroundKill = 1
@@ -2515,6 +2519,14 @@ Rate.MoveSpeed = 1
 #        Default:     1
 
 Rate.InstanceResetTime = 1
+
+#
+#    Rate.Pet.LevelXP
+#        Description: Modifies the amount of experience required to level up a pet.
+#					  The lower the rate the less experience is required.
+#        Default:     0.05
+#   
+Rate.Pet.LevelXP = 0.05
 
 #
 #    SkillGain.Crafting
@@ -2818,6 +2830,20 @@ Battleground.RewardLoserHonorFirst  = 5
 Battleground.RewardLoserHonorLast   = 5
 
 #
+#    Battleground.PlayerRespawn
+#        Description: Battleground player resurrection interval (in seconds).
+#        Default:     30
+
+Battleground.PlayerRespawn = 30
+
+#
+#    Battleground.BuffRespawn
+#        Description: Battleground buff respawn time (in seconds).
+#        Default:     180 (Recommended 10+)
+
+Battleground.BuffRespawn = 180
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -2910,6 +2936,13 @@ Arena.AutoDistributePoints = 0
 #        Default:     7 - (Weekly)
 
 Arena.AutoDistributeInterval = 7
+
+#
+#    Arena.GamesRequired
+#        Description: Number of arena matches teams must participate in to be eligible for arena point distribution.
+#        Default:     10
+
+Arena.GamesRequired = 10
 
 #
 #    Arena.QueueAnnouncer.Enable
@@ -3300,10 +3333,10 @@ ShowBanInWorld = 0
 #        Description: Time (in milliseconds) update time diff is written to the log file.
 #                     Update diff can be used as a performance indicator. Diff < 300: good
 #                     performance. Diff > 600 bad performance, may be caused by high CPU usage.
-#        Default:     60000 - (Enabled, 1 minute)
-#                     0     - (Disabled)
+#        Default:     300000 - (Enabled, 5 minutes)
+#                     0      - (Disabled)
 
-RecordUpdateTimeDiffInterval = 60000
+RecordUpdateTimeDiffInterval = 300000
 
 #
 #     MinRecordUpdateTimeDiff

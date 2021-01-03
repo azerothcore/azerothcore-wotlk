@@ -79,6 +79,11 @@ enum UlduarData
 
     // Tram
     DATA_CALL_TRAM                          = 710,
+
+    // Mage Barrier
+    DATA_MAGE_BARRIER                       = 800,
+    DATA_BRANN_MEMOTESAY                    = 801,
+    DATA_BRANN_EASY_MODE                    = 802,
 };
 
 enum UlduarNPCs
@@ -132,6 +137,7 @@ enum UlduarNPCs
     NPC_VEHICLE_CHOPPER                     = 33062,
     NPC_SALVAGED_DEMOLISHER                 = 33109,
     NPC_SALVAGED_DEMOLISHER_TURRET          = 33167,
+    NPC_BRANN_BASE_CAMP                     = 33579,
 
 
     // Algalon the Observer

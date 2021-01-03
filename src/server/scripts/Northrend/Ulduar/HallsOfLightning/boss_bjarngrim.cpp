@@ -98,7 +98,7 @@ class boss_bjarngrim : public CreatureScript
 public:
     boss_bjarngrim() : CreatureScript("boss_bjarngrim") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_bjarngrimAI (creature);
     }
@@ -133,7 +133,7 @@ public:
         SummonList summons;
         uint8 m_uiStance;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -153,7 +153,7 @@ public:
                 m_pInstance->SetData(TYPE_BJARNGRIM, NOT_STARTED);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
@@ -182,7 +182,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -190,7 +190,7 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             Talk(SAY_DEATH);
 
@@ -267,7 +267,7 @@ public:
             m_uiStance = stance;
         }
 
-        void WaypointReached(uint32 Point)
+        void WaypointReached(uint32 Point) override
         {
             if (Point == 1 || Point == 8)
                 me->CastSpell(me, SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
@@ -275,7 +275,7 @@ public:
                 me->RemoveAura(SPELL_TEMPORARY_ELECTRICAL_CHARGE);
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             if (!me->IsInCombat())
                 return;
@@ -362,7 +362,7 @@ class npc_stormforged_lieutenant : public CreatureScript
 public:
     npc_stormforged_lieutenant() : CreatureScript("npc_stormforged_lieutenant") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_stormforged_lieutenantAI (creature);
     }
@@ -374,7 +374,7 @@ public:
         EventMap events;
         uint64 BjarngrimGUID;
 
-        void Reset()
+        void Reset() override
         {
             if (me->IsSummon())
                 BjarngrimGUID = me->ToTempSummon()->GetSummonerGUID();
@@ -382,13 +382,13 @@ public:
                 BjarngrimGUID = 0;
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_ARC_WELD, 2000);
             events.ScheduleEvent(EVENT_RENEW_STEEL, 10000 + rand() % 1000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())

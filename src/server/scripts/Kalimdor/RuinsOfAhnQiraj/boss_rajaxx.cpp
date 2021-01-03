@@ -56,7 +56,7 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             enraged = false;
@@ -64,18 +64,18 @@ public:
             events.ScheduleEvent(EVENT_THUNDERCRASH, 12000);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             //SAY_DEATH
             _JustDied();
         }
 
-        void EnterCombat(Unit* /*victim*/)
+        void EnterCombat(Unit* /*victim*/) override
         {
             _EnterCombat();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -108,7 +108,7 @@ public:
         bool enraged;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_rajaxxAI(creature);
     }

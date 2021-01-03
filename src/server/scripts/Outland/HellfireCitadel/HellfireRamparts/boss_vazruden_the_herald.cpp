@@ -62,7 +62,7 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             me->SetVisible(true);
@@ -71,23 +71,23 @@ public:
             me->SummonCreature(NPC_HELLFIRE_SENTRY, -1383.39f, 1711.82f, 82.7961f, 5.67232f);
         }
 
-        void AttackStart(Unit*)
+        void AttackStart(Unit*) override
         {
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (summon->GetEntry() != NPC_HELLFIRE_SENTRY)
                 summon->SetInCombatWithZone();
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             instance->SetBossState(DATA_VAZRUDEN, DONE);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == POINT_MIDDLE)
             {
@@ -97,7 +97,7 @@ public:
             }
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             summons.Despawn(summon);
             if (summon->GetEntry() == NPC_HELLFIRE_SENTRY && summons.size() == 0)
@@ -112,21 +112,21 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) override
         {
             summons.Despawn(summon);
             if (summon->GetEntry() != NPC_HELLFIRE_SENTRY)
                 BossAI::EnterEvadeMode();
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (!me->IsVisible() && summons.size() == 0)
                 BossAI::EnterEvadeMode();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_vazruden_the_heraldAI(creature);
     }
@@ -143,25 +143,25 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetCanFly(true);
             me->SetDisableGravity(true);
             events.Reset();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->DespawnOrUnsummon(1);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_CHANGE_POS, 0);
             events.ScheduleEvent(EVENT_SPELL_FIREBALL, 5000);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (me->IsLevitating())
                 me->Attack(who, true);
@@ -169,7 +169,7 @@ public:
                 ScriptedAI::AttackStart(who);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_FLY_DOWN)
             {
@@ -179,7 +179,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == POINT_MIDDLE)
             {
@@ -192,7 +192,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -234,7 +234,7 @@ public:
         EventMap events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_nazanAI(creature);
     }
@@ -249,24 +249,24 @@ public:
     {
         boss_vazrudenAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             Talk(SAY_WIPE);
             me->DespawnOrUnsummon(1);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_AGGRO_TALK, 5000);
             events.ScheduleEvent(EVENT_SPELL_REVENGE, 4000);
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -275,13 +275,13 @@ public:
             }
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             me->CastSpell(me, SPELL_CALL_NAZAN, true);
             Talk(SAY_DIE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -305,7 +305,7 @@ public:
         EventMap events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_vazrudenAI(creature);
     }
@@ -326,13 +326,13 @@ public:
                 target->CastSpell(target, SPELL_SUMMON_LIQUID_FIRE, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_vazruden_fireball_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_vazruden_fireball_SpellScript();
     }
@@ -353,13 +353,13 @@ public:
                 target->GetAI()->DoAction(ACTION_FLY_DOWN);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_vazruden_call_nazan_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_vazruden_call_nazan_SpellScript();
     }

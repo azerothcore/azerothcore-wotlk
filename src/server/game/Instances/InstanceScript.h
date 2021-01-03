@@ -124,7 +124,7 @@ public:
 
     explicit InstanceScript(Map* map) : instance(map), completedEncounters(0) {}
 
-    virtual ~InstanceScript() {}
+    ~InstanceScript() override {}
 
     Map* instance;
 

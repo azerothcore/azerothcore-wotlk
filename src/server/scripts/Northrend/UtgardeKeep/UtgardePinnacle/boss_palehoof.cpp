@@ -99,7 +99,7 @@ class boss_palehoof : public CreatureScript
 public:
     boss_palehoof() : CreatureScript("boss_palehoof") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_palehoofAI (pCreature);
     }
@@ -118,7 +118,7 @@ public:
         uint8 Counter;
         uint8 RandomUnfreeze[4];
 
-        void Reset()
+        void Reset() override
         {
             for (uint8 i = 0; i < 4; ++i)
             {
@@ -173,7 +173,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_START_EVENT)
             {
@@ -197,13 +197,13 @@ public:
                     events.RescheduleEvent(EVENT_UNFREEZE_MONSTER, 3000);
             }
         }
-        void EnterCombat(Unit*  /*pWho*/)
+        void EnterCombat(Unit*  /*pWho*/) override
         {
             if (m_pInstance)
                 m_pInstance->SetData(DATA_GORTOK_PALEHOOF, IN_PROGRESS);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                 return;
@@ -211,12 +211,12 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -305,14 +305,14 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*pKiller*/)
+        void JustDied(Unit*  /*pKiller*/) override
         {
             me->SendPlaySound(SOUND_DEATH, false);
             if(m_pInstance)
                 m_pInstance->SetData(DATA_GORTOK_PALEHOOF, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -331,7 +331,7 @@ class npc_massive_jormungar : public CreatureScript
 public:
     npc_massive_jormungar() : CreatureScript("npc_massive_jormungar") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_massive_jormungarAI (pCreature);
     }
@@ -347,16 +347,16 @@ public:
         EventMap events;
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             summons.DespawnAll();
             events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit*) {}
+        void EnterCombat(Unit*) override {}
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_UNFREEZE)
             {
@@ -376,7 +376,7 @@ public:
                 summons.DespawnAll();
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
@@ -384,12 +384,12 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -439,7 +439,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*pKiller*/)
+        void JustDied(Unit*  /*pKiller*/) override
         {
             if (m_pInstance)
             {
@@ -459,7 +459,7 @@ class npc_ferocious_rhino : public CreatureScript
 public:
     npc_ferocious_rhino() : CreatureScript("npc_ferocious_rhino") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ferocious_rhinoAI (pCreature);
     }
@@ -474,15 +474,15 @@ public:
         InstanceScript* m_pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit*) {}
+        void EnterCombat(Unit*) override {}
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_UNFREEZE)
             {
@@ -500,7 +500,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
@@ -508,12 +508,12 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -549,7 +549,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*pKiller*/)
+        void JustDied(Unit*  /*pKiller*/) override
         {
             if (m_pInstance)
             {
@@ -569,7 +569,7 @@ class npc_ravenous_furbolg : public CreatureScript
 public:
     npc_ravenous_furbolg() : CreatureScript("npc_ravenous_furbolg") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ravenous_furbolgAI (pCreature);
     }
@@ -584,15 +584,15 @@ public:
         InstanceScript* m_pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit*) {}
+        void EnterCombat(Unit*) override {}
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_UNFREEZE)
             {
@@ -610,7 +610,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
@@ -618,12 +618,12 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -657,7 +657,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*pKiller*/)
+        void JustDied(Unit*  /*pKiller*/) override
         {
             if (m_pInstance)
             {
@@ -677,7 +677,7 @@ class npc_frenzied_worgen : public CreatureScript
 public:
     npc_frenzied_worgen() : CreatureScript("npc_frenzied_worgen") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_frenzied_worgenAI (pCreature);
     }
@@ -692,15 +692,15 @@ public:
         InstanceScript* m_pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit*) {}
+        void EnterCombat(Unit*) override {}
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_UNFREEZE)
             {
@@ -718,7 +718,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
@@ -726,12 +726,12 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -765,7 +765,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*pKiller*/)
+        void JustDied(Unit*  /*pKiller*/) override
         {
             if (m_pInstance)
             {

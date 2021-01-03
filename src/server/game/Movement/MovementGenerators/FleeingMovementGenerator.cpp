@@ -42,7 +42,7 @@ void FleeingMovementGenerator<T>::_setTargetLocation(T* owner)
 
     if (!isInLOS)
     {
-        i_nextCheckTime.Reset(500);
+        i_nextCheckTime.Reset(100);
         return;
     }
 

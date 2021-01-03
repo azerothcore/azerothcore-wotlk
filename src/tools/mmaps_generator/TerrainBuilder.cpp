@@ -73,7 +73,7 @@ namespace MMAP
     char const* MAP_VERSION_MAGIC = "v1.8";
 
     TerrainBuilder::TerrainBuilder(bool skipLiquid) : m_skipLiquid (skipLiquid) { }
-    TerrainBuilder::~TerrainBuilder() { }
+    TerrainBuilder::~TerrainBuilder() = default;
 
     /**************************************************************************/
     void TerrainBuilder::getLoopVars(Spot portion, int& loopStart, int& loopEnd, int& loopInc)
@@ -421,7 +421,7 @@ namespace MMAP
                 {
                     float quadHeight = 0;
                     uint32 validCount = 0;
-                    for(uint32 idx = 0; idx < 3; idx++)
+                    for (uint32 idx = 0; idx < 3; idx++)
                     {
                         float h = lverts_copy[ltris[idx] * 3 + 1];
                         if (h != INVALID_MAP_LIQ_HEIGHT && h < INVALID_MAP_LIQ_HEIGHT_MAX)
@@ -435,7 +435,7 @@ namespace MMAP
                     if (validCount > 0 && validCount < 3)
                     {
                         quadHeight /= validCount;
-                        for(uint32 idx = 0; idx < 3; idx++)
+                        for (uint32 idx = 0; idx < 3; idx++)
                         {
                             float h = lverts[ltris[idx] * 3 + 1];
                             if (h == INVALID_MAP_LIQ_HEIGHT || h > INVALID_MAP_LIQ_HEIGHT_MAX)
@@ -457,7 +457,7 @@ namespace MMAP
                 {
                     float minLLevel = INVALID_MAP_LIQ_HEIGHT_MAX;
                     float maxLLevel = INVALID_MAP_LIQ_HEIGHT;
-                    for(uint32 x = 0; x < 3; x++)
+                    for (uint32 x = 0; x < 3; x++)
                     {
                         float h = lverts[ltris[x] * 3 + 1];
                         if (minLLevel > h)
@@ -469,7 +469,7 @@ namespace MMAP
 
                     float maxTLevel = INVALID_MAP_LIQ_HEIGHT;
                     float minTLevel = INVALID_MAP_LIQ_HEIGHT_MAX;
-                    for(uint32 x = 0; x < 6; x++)
+                    for (uint32 x = 0; x < 6; x++)
                     {
                         float h = tverts[ttris[x] * 3 + 1];
                         if (maxTLevel < h)
@@ -579,21 +579,21 @@ namespace MMAP
                     break;
             }
 
-            /*
-                0-----1 .... 128
-                |\    |
-                | \ T |
-                |  \  |
-                | B \ |
-                |    \|
-                129---130 ... 386
-                |\    |
-                | \   |
-                |  \  |
-                |   \ |
-                |    \|
-                258---259 ... 515
-            */
+        /*
+            0-----1 .... 128
+            |\    |
+            | \ T |
+            |  \  |
+            | B \ |
+            |    \|
+            129---130 ... 386
+            |\    |
+            | \   |
+            |  \  |
+            |   \ |
+            |    \|
+            258---259 ... 515
+        */
 
     }
 
@@ -686,14 +686,14 @@ namespace MMAP
                 position.x -= 32 * GRID_SIZE;
                 position.y -= 32 * GRID_SIZE;
 
-                for (std::vector<GroupModel>::iterator it = groupModels.begin(); it != groupModels.end(); ++it)
+                for (auto & groupModel : groupModels)
                 {
                     std::vector<G3D::Vector3> tempVertices;
                     std::vector<G3D::Vector3> transformedVertices;
                     std::vector<MeshTriangle> tempTriangles;
                     WmoLiquid* liquid = nullptr;
 
-                    it->getMeshData(tempVertices, tempTriangles, liquid);
+                    groupModel.getMeshData(tempVertices, tempTriangles, liquid);
 
                     // first handle collision mesh
                     transform(tempVertices, transformedVertices, scale, rotation, position);
@@ -778,9 +778,9 @@ namespace MMAP
                         }
 
                         uint32 liqOffset = meshData.liquidVerts.size() / 3;
-                        for (uint32 j = 0; j < liqVerts.size(); ++j)
+                        for (auto & liqVert : liqVerts)
                         {
-                            meshData.liquidVerts.append(liqVerts[j].y, liqVerts[j].z, liqVerts[j].x);
+                            meshData.liquidVerts.append(liqVert.y, liqVert.z, liqVert.x);
                         }
 
                         for (uint32 j = 0; j < liqTris.size() / 3; ++j)
@@ -802,10 +802,10 @@ namespace MMAP
     /**************************************************************************/
     void TerrainBuilder::transform(std::vector<G3D::Vector3>& source, std::vector<G3D::Vector3>& transformedVertices, float scale, G3D::Matrix3& rotation, G3D::Vector3& position)
     {
-        for (std::vector<G3D::Vector3>::iterator it = source.begin(); it != source.end(); ++it)
+        for (auto & it : source)
         {
             // apply tranform, then mirror along the horizontal axes
-            G3D::Vector3 v((*it) * rotation * scale + position);
+            G3D::Vector3 v(it * rotation * scale + position);
             v.x *= -1.f;
             v.y *= -1.f;
             transformedVertices.push_back(v);
@@ -815,11 +815,11 @@ namespace MMAP
     /**************************************************************************/
     void TerrainBuilder::copyVertices(std::vector<G3D::Vector3>& source, G3D::Array<float>& dest)
     {
-        for (std::vector<G3D::Vector3>::iterator it = source.begin(); it != source.end(); ++it)
+        for (auto & it : source)
         {
-            dest.push_back((*it).y);
-            dest.push_back((*it).z);
-            dest.push_back((*it).x);
+            dest.push_back(it.y);
+            dest.push_back(it.z);
+            dest.push_back(it.x);
         }
     }
 
@@ -828,20 +828,20 @@ namespace MMAP
     {
         if (flip)
         {
-            for (std::vector<MeshTriangle>::iterator it = source.begin(); it != source.end(); ++it)
+            for (auto & it : source)
             {
-                dest.push_back((*it).idx2 + offset);
-                dest.push_back((*it).idx1 + offset);
-                dest.push_back((*it).idx0 + offset);
+                dest.push_back(it.idx2 + offset);
+                dest.push_back(it.idx1 + offset);
+                dest.push_back(it.idx0 + offset);
             }
         }
         else
         {
-            for (std::vector<MeshTriangle>::iterator it = source.begin(); it != source.end(); ++it)
+            for (auto & it : source)
             {
-                dest.push_back((*it).idx0 + offset);
-                dest.push_back((*it).idx1 + offset);
-                dest.push_back((*it).idx2 + offset);
+                dest.push_back(it.idx0 + offset);
+                dest.push_back(it.idx1 + offset);
+                dest.push_back(it.idx2 + offset);
             }
         }
     }
@@ -914,7 +914,7 @@ namespace MMAP
         // pretty silly thing, as we parse entire file and load only the tile we need
         // but we don't expect this file to be too large
         char* buf = new char[512];
-        while(fgets(buf, 512, fp))
+        while (fgets(buf, 512, fp))
         {
             float p0[3], p1[3];
             uint32 mid, tx, ty;

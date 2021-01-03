@@ -63,7 +63,7 @@ public:
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
 
@@ -73,7 +73,7 @@ public:
             HasYelled = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
 
@@ -97,7 +97,7 @@ public:
             events.ScheduleEvent(EVENT_SPEECH_1, 1000);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (rand() % 5)
                 return;
@@ -105,7 +105,7 @@ public:
             Talk(SAY_KILLTARGET, victim);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -204,7 +204,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void sGossipSelect(Player* player, uint32 sender, uint32 action)
+        void sGossipSelect(Player* player, uint32 sender, uint32 action) override
         {
             if (sender == GOSSIP_ID && action == 0)
             {
@@ -218,7 +218,7 @@ public:
         bool HasYelled;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_vaelAI(creature);
     }

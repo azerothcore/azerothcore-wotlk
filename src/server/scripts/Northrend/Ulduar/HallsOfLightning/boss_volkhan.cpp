@@ -70,7 +70,7 @@ class boss_volkhan : public CreatureScript
 public:
     boss_volkhan() : CreatureScript("boss_volkhan") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_volkhanAI (creature);
     }
@@ -90,7 +90,7 @@ public:
         uint8 PointID;
         uint8 ShatteredCount;
 
-        void Reset()
+        void Reset() override
         {
             x = y = z = PointID = ShatteredCount = 0;
             HealthCheck = 100;
@@ -106,7 +106,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
@@ -117,7 +117,7 @@ public:
             ScheduleEvents(false);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             Talk(SAY_DEATH);
 
@@ -168,7 +168,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -185,7 +185,7 @@ public:
             events.RescheduleEvent(EVENT_POSITION, 4000, 0, 1);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_MOLTEN_GOLEM)
@@ -197,7 +197,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_DESTROYED)
             {
@@ -207,7 +207,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -233,7 +233,7 @@ public:
                 events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0, 0, 2);
         }
 
-        void SpellHitTarget(Unit* /*who*/, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* /*who*/, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_TEMPER)
             {
@@ -259,7 +259,7 @@ public:
             events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0, 0, 2);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -311,7 +311,7 @@ class npc_molten_golem : public CreatureScript
 public:
     npc_molten_golem() : CreatureScript("npc_molten_golem") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_molten_golemAI (creature);
     }
@@ -326,14 +326,14 @@ public:
         EventMap events;
         InstanceScript* m_pInstance;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_BLAST, 7000);
             events.ScheduleEvent(EVENT_IMMOLATION, 3000);
         }
 
-        void DamageTaken(Unit*, uint32& uiDamage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& uiDamage, DamageEffectType, SpellSchoolMask) override
         {
             if (me->GetEntry() == NPC_BRITTLE_GOLEM)
             {
@@ -357,7 +357,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (me->GetEntry() == NPC_BRITTLE_GOLEM && param == ACTION_SHATTER)
             {
@@ -369,7 +369,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target or if we are frozen
             if (!UpdateVictim() || me->GetEntry() == NPC_BRITTLE_GOLEM)
@@ -435,7 +435,7 @@ class npc_hol_monument : public CreatureScript
 public:
     npc_hol_monument() : CreatureScript("npc_hol_monument") {}
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hol_monumentAI(creature);
     }
@@ -454,11 +454,11 @@ public:
         bool _isActive;
         uint64 _attackGUID;
 
-        void Reset()
+        void Reset() override
         {
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (_attackGUID)
                 ScriptedAI::MoveInLineOfSight(who);
@@ -474,7 +474,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.Reset();
             if (me->GetEntry() == 28961) // NPC_TITANIUM_SIEGEBREAKER
@@ -492,14 +492,14 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!_attackGUID || !_isActive)
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!_isActive && !_attackGUID)
                 return;

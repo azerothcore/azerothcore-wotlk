@@ -83,7 +83,7 @@ public:
         SummonList summons;
         bool bAchiev;
 
-        void Reset()
+        void Reset() override
         {
             bAchiev = true;
             me->SetControlled(false, UNIT_STATE_ROOT);
@@ -95,7 +95,7 @@ public:
                 pInstance->SetData(DATA_DEVOURER, NOT_STARTED);
         }
 
-        uint32 GetData(uint32 id) const
+        uint32 GetData(uint32 id) const override
         {
             if (id == 1)
                 return bAchiev;
@@ -103,7 +103,7 @@ public:
             return 0;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_FACE_AGGRO);
             DoZoneInCombat();
@@ -131,7 +131,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_PHANTOM_BLAST_H)
                 bAchiev = false;
@@ -152,9 +152,9 @@ public:
             }
         }
 
-        bool CanAIAttack(const Unit* target) const { return target->GetPositionZ() > 706.5f; }
+        bool CanAIAttack(const Unit* target) const override { return target->GetPositionZ() > 706.5f; }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -234,7 +234,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_FACE_DEATH);
             summons.DespawnAll();
@@ -242,7 +242,7 @@ public:
                 pInstance->SetData(DATA_DEVOURER, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -267,7 +267,7 @@ public:
                 Talk(textId);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() != NPC_CRUCIBLE_OF_SOULS)
                 summons.Summon(summon);
@@ -280,7 +280,7 @@ public:
                 }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
@@ -288,7 +288,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_devourer_of_soulsAI(creature);
     }
@@ -306,7 +306,7 @@ public:
 
         int8 dir;
 
-        bool Load()
+        bool Load() override
         {
             dir = urand(0, 1) ? 1 : -1;
             return true;
@@ -347,13 +347,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_wailing_souls_periodic_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_wailing_souls_periodic_AuraScript();
     }

@@ -56,7 +56,7 @@ class boss_morogrim_tidewalker : public CreatureScript
 public:
     boss_morogrim_tidewalker() : CreatureScript("boss_morogrim_tidewalker") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_morogrim_tidewalkerAI>(creature);
     }
@@ -67,12 +67,12 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -81,19 +81,19 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             summon->SetInCombatWithZone();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -103,7 +103,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_EARTHQUAKE, 40000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -160,7 +160,7 @@ public:
     {
         PrepareSpellScript(spell_morogrim_tidewalker_watery_grave_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             targetNumber = 0;
             return true;
@@ -174,7 +174,7 @@ public:
                     GetCaster()->CastSpell(target, wateryGraveId[targetNumber++], true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_morogrim_tidewalker_watery_grave_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
@@ -183,7 +183,7 @@ public:
         uint8 targetNumber;
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_morogrim_tidewalker_watery_grave_SpellScript();
     }
@@ -217,14 +217,14 @@ public:
                 GetCaster()->AddThreat(target, 1000000.0f);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_morogrim_tidewalker_water_globule_new_target_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             OnEffectHitTarget += SpellEffectFn(spell_morogrim_tidewalker_water_globule_new_target_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_morogrim_tidewalker_water_globule_new_target_SpellScript();
     }

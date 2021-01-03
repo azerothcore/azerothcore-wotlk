@@ -79,7 +79,7 @@ public:
 
         uint64 LynxGUID;
 
-        void Reset()
+        void Reset() override
         {
             instance->SetData(DATA_HALAZZIEVENT, NOT_STARTED);
             summons.DespawnAll();
@@ -95,14 +95,14 @@ public:
             EnterPhase(PHASE_LYNX);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             instance->SetData(DATA_HALAZZIEVENT, IN_PROGRESS);
             Talk(SAY_AGGRO);
             EnterPhase(PHASE_LYNX);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summon->AI()->AttackStart(me->GetVictim());
             if (summon->GetEntry() == NPC_SPIRIT_LYNX)
@@ -110,19 +110,19 @@ public:
             summons.Summon(summon);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth() && Phase != PHASE_ENRAGE)
                 damage = 0;
         }
 
-        void SpellHit(Unit*, const SpellInfo* spell)
+        void SpellHit(Unit*, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_TRANSFORM_SPLIT2)
                 EnterPhase(PHASE_HUMAN);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (Phase != PHASE_MERGE)
                 ScriptedAI::AttackStart(who);
@@ -179,7 +179,7 @@ public:
             Phase = NextPhase;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -288,7 +288,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -296,14 +296,14 @@ public:
             Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             instance->SetData(DATA_HALAZZIEVENT, DONE);
             Talk(SAY_DEATH);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_halazziAI>(creature);
     }
@@ -322,27 +322,27 @@ public:
         uint32 FrenzyTimer;
         uint32 shredder_timer;
 
-        void Reset()
+        void Reset() override
         {
             FrenzyTimer = urand(30000, 50000);  //frenzy every 30-50 seconds
             shredder_timer = 4000;
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
                 damage = 0;
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                 ScriptedAI::AttackStart(who);
         }
 
-        void EnterCombat(Unit* /*who*/) {/*DoZoneInCombat();*/ }
+        void EnterCombat(Unit* /*who*/) override {/*DoZoneInCombat();*/ }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -366,7 +366,7 @@ public:
 
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_halazzi_lynxAI(creature);
     }

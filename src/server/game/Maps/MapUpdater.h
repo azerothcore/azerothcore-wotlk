@@ -1,43 +1,40 @@
 #ifndef _MAP_UPDATER_H_INCLUDED
 #define _MAP_UPDATER_H_INCLUDED
 
-#include <ace/Thread_Mutex.h>
-#include <ace/Condition_Thread_Mutex.h>
-
-#include "DelayExecutor.h"
-#include "World.h"
+#include "Define.h"
+#include "PCQueue.h"
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
 class Map;
+class UpdateRequest;
 
 class MapUpdater
 {
 public:
-
     MapUpdater();
     virtual ~MapUpdater();
 
-    friend class MapUpdateRequest;
-    friend class LFGUpdateRequest;
-
-    int schedule_update(Map& map, uint32 diff, uint32 s_diff);
-    int schedule_lfg_update(uint32 diff);
-
-    int wait();
-
-    int activate(size_t num_threads);
-
-    int deactivate();
-
+    void schedule_update(Map& map, uint32 diff, uint32 s_diff);
+    void schedule_lfg_update(uint32 diff);
+    void wait();
+    void activate(size_t num_threads);
+    void deactivate();
     bool activated();
+    void update_finished();
 
 private:
+    void WorkerThread();
 
-    DelayExecutor m_executor;
-    ACE_Thread_Mutex m_mutex;
-    ACE_Condition_Thread_Mutex m_condition;
+    ProducerConsumerQueue<UpdateRequest*> _queue;
+
+    std::vector<std::thread> _workerThreads;
+    std::atomic<bool> _cancelationToken;
+
+    std::mutex _lock;
+    std::condition_variable _condition;
     size_t pending_requests;
-
-    void update_finished();
 };
 
 #endif //_MAP_UPDATER_H_INCLUDED

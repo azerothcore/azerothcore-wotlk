@@ -11,7 +11,7 @@ class instance_halls_of_stone : public InstanceMapScript
 public:
     instance_halls_of_stone() : InstanceMapScript("instance_halls_of_stone", 599) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_halls_of_stone_InstanceMapScript(pMap);
     }
@@ -41,7 +41,7 @@ public:
         bool isMaidenOfGriefDead;
         bool isKrystalusDead;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&Encounter, 0, sizeof(Encounter));
 
@@ -65,7 +65,7 @@ public:
             isKrystalusDead = false;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             {
@@ -75,7 +75,7 @@ public:
             return false;
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch(go->GetEntry())
             {
@@ -120,7 +120,7 @@ public:
         }
 
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch(creature->GetEntry())
             {
@@ -133,7 +133,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 id) const
+        uint64 GetData64(uint32 id) const override
         {
             switch(id)
             {
@@ -164,7 +164,7 @@ public:
             return 0;
         }
 
-        uint32 GetData(uint32 id) const
+        uint32 GetData(uint32 id) const override
         {
             switch(id)
             {
@@ -178,7 +178,7 @@ public:
             return 0;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -190,7 +190,7 @@ public:
             return false;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (type < MAX_ENCOUNTER)
                 Encounter[type] = data;
@@ -239,7 +239,7 @@ public:
                 SaveToDB();
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -250,7 +250,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* strIn)
+        void Load(const char* strIn) override
         {
             if (!strIn)
             {

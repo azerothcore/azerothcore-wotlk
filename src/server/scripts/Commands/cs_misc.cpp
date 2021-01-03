@@ -723,8 +723,7 @@ public:
             // before GM
             float x, y, z;
             handler->GetSession()->GetPlayer()->GetClosePoint(x, y, z, target->GetObjectSize());
-            if (target->TeleportTo(handler->GetSession()->GetPlayer()->GetMapId(), x, y, z, target->GetOrientation(), 0, handler->GetSession()->GetPlayer()))
-                target->SetPhaseMask(handler->GetSession()->GetPlayer()->GetPhaseMask(), false);
+            target->TeleportTo(handler->GetSession()->GetPlayer()->GetMapId(), x, y, z, target->GetOrientation(), 0, handler->GetSession()->GetPlayer());
         }
         else
         {
@@ -1424,7 +1423,6 @@ public:
             if (itemNameStr && itemNameStr[0])
             {
                 std::string itemName = itemNameStr + 1;
-                WorldDatabase.EscapeString(itemName);
 
                 PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_ITEM_TEMPLATE_BY_NAME);
                 stmt->setString(0, itemName);

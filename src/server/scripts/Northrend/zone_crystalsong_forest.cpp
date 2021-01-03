@@ -43,7 +43,7 @@ public:
         uint32 searchForShipTimer;
         uint32 transportEntry;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
             if (!path || path->empty())
@@ -71,14 +71,14 @@ public:
             transportEntry = (me->GetEntry() == NPC_HAMMERHEAD ? TRANSPORT_ORGRIMS_HAMMER : TRANSPORT_THE_SKYBREAKER);
         }
 
-        void MovementInform(uint32 type, uint32  /*id*/)
+        void MovementInform(uint32 type, uint32  /*id*/) override
         {
             if (type == ESCORT_MOTION_TYPE)
                 if (++pointId == 17) // path size
                     searchForShipTimer = 3000;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             // horde 7.55f, -0.09, 34.44, 3.13, +20
             // ally 45.18f, 0.03, 40.09, 3.14 +5
@@ -130,7 +130,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_preparations_for_war_vehicleAI(creature);
     }
@@ -167,12 +167,12 @@ public:
 
         uint64 targetGUID;
 
-        void Reset()
+        void Reset() override
         {
             targetGUID = 0;
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (me->IsNonMeleeSpellCast(false))
                 return;
@@ -213,7 +213,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_warmage_violetstandAI(creature);
     }

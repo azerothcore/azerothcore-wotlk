@@ -30,7 +30,7 @@ class boss_epoch_hunter : public CreatureScript
 public:
     boss_epoch_hunter() : CreatureScript("boss_epoch_hunter") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_epoch_hunterAI>(creature);
     }
@@ -41,11 +41,11 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
 
@@ -55,13 +55,13 @@ public:
             events.ScheduleEvent(EVENT_SPELL_WING_BUFFET, 14000);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (killer == me)
                 return;
@@ -71,7 +71,7 @@ public:
                 taretha->AI()->DoAction(me->GetEntry());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

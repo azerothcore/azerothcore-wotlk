@@ -47,7 +47,7 @@ extern int m_ServiceStatus;
 class WorldServerSignalHandler : public acore::SignalHandler
 {
 public:
-    virtual void HandleSignal(int sigNum)
+    void HandleSignal(int sigNum) override
     {
         switch (sigNum)
         {
@@ -79,7 +79,7 @@ private:
 public:
     FreezeDetectorRunnable(uint32 freezeDelay) : _loops(0), _lastChange(0), _delayTime(freezeDelay) {}
 
-    void run()
+    void run() override
     {
         if (!_delayTime)
             return;

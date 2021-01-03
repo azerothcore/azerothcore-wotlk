@@ -44,7 +44,7 @@ class npc_murkdeep : public CreatureScript
 public:
     npc_murkdeep() : CreatureScript("npc_murkdeep") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_murkdeepAI(creature);
     }
@@ -57,7 +57,7 @@ public:
         uint32 spawnTimer;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             spawnTimer = 0;
             phase = 0;
@@ -65,14 +65,14 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 5000);
             events.ScheduleEvent(EVENT_SPELL_NET, 10000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             spawnTimer += diff;
             if (spawnTimer >= 5000)
@@ -183,12 +183,12 @@ public:
 
         uint32 FallAsleepTimer;
 
-        void Reset()
+        void Reset() override
         {
             FallAsleepTimer = urand(10000, 45000);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             FollowerAI::MoveInLineOfSight(who);
@@ -210,7 +210,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*pCaster*/, const SpellInfo* pSpell)
+        void SpellHit(Unit* /*pCaster*/, const SpellInfo* pSpell) override
         {
             if (HasFollowState(STATE_FOLLOW_INPROGRESS | STATE_FOLLOW_PAUSED) && pSpell->Id == SPELL_AWAKEN)
                 ClearSleeping();
@@ -238,7 +238,7 @@ public:
             SetFollowPaused(false);
         }
 
-        void UpdateFollowerAI(uint32 diff)
+        void UpdateFollowerAI(uint32 diff) override
         {
             if (!UpdateVictim())
             {
@@ -263,7 +263,7 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_SLEEPER_AWAKENED)
         {
@@ -278,7 +278,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_kerlonianAI(creature);
     }
@@ -320,21 +320,21 @@ public:
     {
         npc_prospector_remtravelAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             if (urand(0, 1))
                 Talk(SAY_REM_AGGRO, who);
         }
 
-        void JustSummoned(Creature* /*pSummoned*/)
+        void JustSummoned(Creature* /*pSummoned*/) override
         {
             //unsure if it should be any
             //pSummoned->AI()->AttackStart(me);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             if (Player* player = GetPlayerForEscort())
             {
@@ -396,7 +396,7 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_ABSENT_MINDED_PT2)
         {
@@ -409,7 +409,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_prospector_remtravelAI(creature);
     }

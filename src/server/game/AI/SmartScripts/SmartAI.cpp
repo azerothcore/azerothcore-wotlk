@@ -626,12 +626,7 @@ void SmartAI::EnterEvadeMode()
     me->RemoveEvadeAuras();
 
     me->AddUnitState(UNIT_STATE_EVADE);
-    me->DeleteThreatList();
-    me->CombatStop(true);
-    me->LoadCreaturesAddon(true);
-    me->SetLootRecipient(nullptr);
-    me->ResetPlayerDamageReq();
-    me->SetLastDamagedTime(0);
+    _EnterEvadeMode();
 
     GetScript()->ProcessEventsFor(SMART_EVENT_EVADE);//must be after aura clear so we can cast spells from db
 
@@ -1181,7 +1176,7 @@ public:
 
     SmartTrigger() : AreaTriggerScript("SmartTrigger") {}
 
-    bool OnTrigger(Player* player, AreaTrigger const* trigger)
+    bool OnTrigger(Player* player, AreaTrigger const* trigger) override
     {
         if (!player->IsAlive())
             return false;

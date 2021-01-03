@@ -37,7 +37,7 @@ class boss_murmur : public CreatureScript
 public:
     boss_murmur() : CreatureScript("boss_murmur") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_murmurAI (creature);
     }
@@ -53,7 +53,7 @@ public:
         InstanceScript* instance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->SetHealth(me->CountPctFromMaxHealth(40));
@@ -63,7 +63,7 @@ public:
                 instance->SetData(DATA_MURMUREVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SPELL_SONIC_BOOM, 30000);
             events.ScheduleEvent(EVENT_SPELL_MURMURS_TOUCH, urand(8000, 20000));
@@ -79,13 +79,13 @@ public:
                 instance->SetData(DATA_MURMUREVENT, IN_PROGRESS);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             if (instance)
                 instance->SetData(DATA_MURMUREVENT, DONE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() || me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -169,13 +169,13 @@ public:
             SetHitDamage(GetHitUnit()->CountPctFromMaxHealth(90));
         }
 
-        void Register()
+        void Register() override
         {
             OnHit += SpellHitFn(spell_murmur_sonic_boom_effect_SpellScript::RecalculateDamage);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_murmur_sonic_boom_effect_SpellScript();
     }
@@ -196,13 +196,13 @@ public:
             targets.remove_if(acore::AllWorldObjectsInExactRange(GetCaster(), 25.0f, false));
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_murmur_thundering_storm_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_murmur_thundering_storm_SpellScript();
     }

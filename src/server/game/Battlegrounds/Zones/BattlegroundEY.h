@@ -308,53 +308,53 @@ const BattlegroundEYCapturingPointStruct m_CapturingPointTypes[EY_POINTS_MAX] =
 struct BattlegroundEYScore : public BattlegroundScore
 {
     BattlegroundEYScore(Player* player) : BattlegroundScore(player), FlagCaptures(0) { }
-    ~BattlegroundEYScore() { }
+    ~BattlegroundEYScore() override { }
     uint32 FlagCaptures;
 
-    uint32 GetAttr1() const final override { return FlagCaptures; }
+    uint32 GetAttr1() const final { return FlagCaptures; }
 };
 
 class BattlegroundEY : public Battleground
 {
 public:
     BattlegroundEY();
-    ~BattlegroundEY();
+    ~BattlegroundEY() override;
 
     /* inherited from BattlegroundClass */
-    void AddPlayer(Player* player);
-    void StartingEventCloseDoors();
-    void StartingEventOpenDoors();
+    void AddPlayer(Player* player) override;
+    void StartingEventCloseDoors() override;
+    void StartingEventOpenDoors() override;
 
     /* BG Flags */
-    uint64 GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const    { return _flagKeeperGUID; }
+    uint64 GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const override    { return _flagKeeperGUID; }
     void SetFlagPicker(uint64 guid)     { _flagKeeperGUID = guid; }
     uint8 GetFlagState() const          { return _flagState; }
     void RespawnFlag();
     void RespawnFlagAfterDrop();
 
-    void RemovePlayer(Player* player);
+    void RemovePlayer(Player* player) override;
     void HandleBuffUse(uint64 buff_guid);
-    void HandleAreaTrigger(Player* player, uint32 trigger);
-    void HandleKillPlayer(Player* player, Player* killer);
-    GraveyardStruct const* GetClosestGraveyard(Player* player);
-    bool SetupBattleground();
-    void Init();
-    void EndBattleground(TeamId winnerTeamId);
-    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
-    void FillInitialWorldStates(WorldPacket& data);
-    void SetDroppedFlagGUID(uint64 guid, TeamId /*teamId*/ = TEAM_NEUTRAL)  { _droppedFlagGUID = guid; }
+    void HandleAreaTrigger(Player* player, uint32 trigger) override;
+    void HandleKillPlayer(Player* player, Player* killer) override;
+    GraveyardStruct const* GetClosestGraveyard(Player* player) override;
+    bool SetupBattleground() override;
+    void Init() override;
+    void EndBattleground(TeamId winnerTeamId) override;
+    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
+    void FillInitialWorldStates(WorldPacket& data) override;
+    void SetDroppedFlagGUID(uint64 guid, TeamId /*teamId*/ = TEAM_NEUTRAL) override  { _droppedFlagGUID = guid; }
     uint64 GetDroppedFlagGUID() const { return _droppedFlagGUID; }
 
     /* Battleground Events */
-    void EventPlayerClickedOnFlag(Player* player, GameObject* gameObject);
-    void EventPlayerDroppedFlag(Player* player);
+    void EventPlayerClickedOnFlag(Player* player, GameObject* gameObject) override;
+    void EventPlayerDroppedFlag(Player* player) override;
 
     /* achievement req. */
-    bool AllNodesConrolledByTeam(TeamId teamId) const;
-    TeamId GetPrematureWinner();
+    bool AllNodesConrolledByTeam(TeamId teamId) const override;
+    TeamId GetPrematureWinner() override;
 
 private:
-    void PostUpdateImpl(uint32 diff);
+    void PostUpdateImpl(uint32 diff) override;
 
     void EventPlayerCapturedFlag(Player* Source, uint32 BgObjectType);
     void EventTeamLostPoint(TeamId teamId, uint32 point);

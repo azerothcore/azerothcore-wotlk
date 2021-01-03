@@ -75,7 +75,7 @@ namespace MMAP
         bool loadVMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData);
         void loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, const char* offMeshFilePath);
 
-        bool usesLiquids() const { return !m_skipLiquid; }
+        [[nodiscard]] bool usesLiquids() const { return !m_skipLiquid; }
 
         // vert and triangle methods
         static void transform(std::vector<G3D::Vector3>& original, std::vector<G3D::Vector3>& transformed,

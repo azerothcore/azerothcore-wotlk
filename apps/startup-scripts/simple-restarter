@@ -6,16 +6,20 @@
 _bin_path=$1
 _bin_file=$2
 
-_instant_crash_cnt=0
-_total_crashes=0
+_instant_crash_count=0
+_restart_count=0
 
-trap 'echo "va bene"' SIGHUP
+if [ "$#" -ne 2 ]; then
+    echo "Usage:    $0 path filename"
+    echo "Example:  $0 $HOME/azeroth-server/bin worldserver"
+    exit 1
+fi
 
 while true
 do
     if [ ! -f "$_bin_path/$_bin_file" ]; then
         echo "$_bin_path/$_bin_file doesn't exists!"
-        exit 0
+        exit 1
     fi
 
     STARTING_TIME=$(date +%s)
@@ -31,23 +35,23 @@ do
     #    exit 0
     #fi
 
-    echo "$_bin_file crashed (?), restarting..."
+    echo "$_bin_file terminated, restarting..."
 
     ENDING_TIME=$(date +%s)
     DIFFERENCE=$(( $ENDING_TIME - $STARTING_TIME ))
 
-    ((_total_crashes++))
-    echo "$_bin_file Crashed after $DIFFERENCE seconds, total crashes: $_total_crashes"
+    ((_restart_count++))
+    echo "$_bin_file Terminated after $DIFFERENCE seconds, termination count: : $_restart_count"
 
     if [ $DIFFERENCE -lt 10 ]; then
         # increment instant crash if runtime is lower than 10 seconds 
-        ((_instant_crash_cnt++))
+        ((_instant_crash_count++))
     else
-        _instant_crash_cnt=0 # reset count
+        _instant_crash_count=0 # reset count
     fi
 
-    if [ $_instant_crash_cnt -gt 5 ]; then
+    if [ $_instant_crash_count -gt 5 ]; then
         echo "$_bin_file Restarter exited. Infinite crash loop prevented. Please check your system"
-        exit 0
+        exit 1
     fi
 done

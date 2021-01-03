@@ -142,10 +142,6 @@ void PetAI::UpdateAI(uint32 diff)
 
     Unit* owner = me->GetCharmerOrOwner();
 
-    //if Pet is in combat put player in combat
-    if (me->IsInCombat())
-        owner->IsInCombat();
-
     if (m_updateAlliesTimer <= diff)
         // UpdateAllies self set update timer
         UpdateAllies();

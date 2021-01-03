@@ -51,13 +51,13 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             DoCast(me, SPELL_MAGMASPLASH, true);
         }
 
-        void EnterCombat(Unit* victim)
+        void EnterCombat(Unit* victim) override
         {
             BossAI::EnterCombat(victim);
             events.ScheduleEvent(EVENT_PYROBLAST, 7000);
@@ -74,7 +74,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
             if (!HealthBelowPct(10) || me->HasAura(SPELL_ENRAGE))
                 return;
@@ -83,7 +83,7 @@ public:
             events.ScheduleEvent(EVENT_EARTHQUAKE, 3000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -115,7 +115,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_golemaggAI(creature);
     }
@@ -133,12 +133,12 @@ public:
             instance = creature->GetInstanceScript();
         }
 
-        void Reset()
+        void Reset() override
         {
             mangleTimer = 7 * IN_MILLISECONDS;               // These times are probably wrong
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
             if (HealthAbovePct(50) || !instance)
                 return;
@@ -154,7 +154,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -176,7 +176,7 @@ public:
         uint32 mangleTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_core_ragerAI>(creature);
     }

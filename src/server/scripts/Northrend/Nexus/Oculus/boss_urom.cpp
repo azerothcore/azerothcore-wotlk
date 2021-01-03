@@ -80,7 +80,7 @@ class boss_urom : public CreatureScript
 public:
     boss_urom() : CreatureScript("boss_urom") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_uromAI (pCreature);
     }
@@ -107,7 +107,7 @@ public:
             return 0;
         }
 
-        void Reset()
+        void Reset() override
         {
             if (pInstance)
             {
@@ -128,7 +128,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_ID, 49838, true);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if( lock )
                 return;
@@ -175,7 +175,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if( lock )
                 return;
@@ -184,7 +184,7 @@ public:
                 ScriptedAI::AttackStart(who);
         }
 
-        void JustSummoned(Creature* pSummon)
+        void JustSummoned(Creature* pSummon) override
         {
             pSummon->SetInCombatWithZone();
             if( Unit* v = pSummon->SelectVictim() )
@@ -202,20 +202,24 @@ public:
             me->ResetPlayerDamageReq();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
-
             if (pInstance)
+            {
                 pInstance->SetData(DATA_UROM, DONE);
+            }
+            me->SetCanFly(false);
+            me->SetDisableGravity(false);
+            me->NearTeleportTo(x, y, z, 0.0f);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_PLAYER_KILL);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
         {
             switch( spell->Id )
             {
@@ -278,9 +282,9 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( releaseLockTimer )
             {
@@ -339,12 +343,11 @@ public:
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    
                     break;
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetCanFly(false);
             me->SetDisableGravity(false);

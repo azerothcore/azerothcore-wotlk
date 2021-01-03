@@ -29,7 +29,7 @@ class boss_ouro : public CreatureScript
 public:
     boss_ouro() : CreatureScript("boss_ouro") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_ouroAI(creature);
     }
@@ -48,7 +48,7 @@ public:
         bool Enrage;
         bool Submerged;
 
-        void Reset()
+        void Reset() override
         {
             Sweep_Timer = urand(5000, 10000);
             SandBlast_Timer = urand(20000, 35000);
@@ -61,12 +61,12 @@ public:
             Submerged = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             DoCastVictim(SPELL_BIRTH);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())

@@ -44,7 +44,7 @@ public:
     {
         boss_servant_quartersAI(Creature* creature) : BossAI(creature, DATA_SERVANT_QUARTERS) { }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->SetVisible(false);
@@ -59,7 +59,7 @@ public:
                 me->DespawnOrUnsummon(1);
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             me->setActive(true);
             if (me->GetEntry() == NPC_HYAKISS_THE_LURKER)
@@ -79,17 +79,17 @@ public:
             }
         }
 
-        void JustDied(Unit* /*who*/)
+        void JustDied(Unit* /*who*/) override
         {
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == POINT_MOTION_TYPE && point == EVENT_CHARGE)
                 events.ScheduleEvent(EVENT_SPELL_FEAR, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _events2.Update(diff);
             switch (_events2.ExecuteEvent())
@@ -153,7 +153,7 @@ public:
         EventMap _events2;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_servant_quartersAI>(creature);
     }

@@ -74,7 +74,7 @@ public:
                 me->SummonCreature(NPC_TEMPEST_MINION, TempestMinions[i], TEMPSUMMON_CORPSE_DESPAWN, 0);
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             ResetSummons();
@@ -93,7 +93,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (me->HasAura(SPELL_STONED_AURA))
                 return;
@@ -101,25 +101,25 @@ public:
             ScriptedAI::AttackStart(who);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDies(Creature* cr, Unit*)
+        void SummonedCreatureDies(Creature* cr, Unit*) override
         {
             summons.Despawn(cr);
             events.ScheduleEvent(EVENT_SUMMON_NEXT_MINION, 4000);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             // restore minions health
             if (spellInfo->Id == SPELL_OVERCHARGE)
                 target->SetFullHealth();
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.Reset();
             if (summons.size() < 4)
@@ -136,7 +136,7 @@ public:
                 pInstance->SetData(EVENT_EMALON, IN_PROGRESS);
         }
 
-        void JustDied(Unit* )
+        void JustDied(Unit* ) override
         {
             summons.DespawnAll();
             events.Reset();
@@ -144,7 +144,7 @@ public:
                 pInstance->SetData(EVENT_EMALON, DONE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -185,7 +185,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_emalonAI(creature);
     }
@@ -212,13 +212,13 @@ public:
             PreventDefaultAction();
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_voa_overcharge_AuraScript::HandlePeriodicDummy, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_voa_overcharge_AuraScript();
     }
@@ -245,13 +245,13 @@ public:
             SetHitDamage(damage);
         }
 
-        void Register()
+        void Register() override
         {
             OnHit += SpellHitFn(spell_voa_lightning_nova_SpellScript::HandleOnHit);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_voa_lightning_nova_SpellScript();
     }

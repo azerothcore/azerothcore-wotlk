@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <cstdio>
 
-Model::Model(std::string& filename) : filename(filename), vertices(0), indices(0)
+Model::Model(std::string& filename) : filename(filename), vertices(nullptr), indices(nullptr)
 {
     memset(&header, 0, sizeof(header));
 }
@@ -32,7 +32,7 @@ bool Model::open()
     _unload();
 
     memcpy(&header, f.getBuffer(), sizeof(ModelHeader));
-    if(header.nBoundingTriangles > 0)
+    if (header.nBoundingTriangles > 0)
     {
         f.seek(0);
         f.seekRelative(header.ofsBoundingVertices);

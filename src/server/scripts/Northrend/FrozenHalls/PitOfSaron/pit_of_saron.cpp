@@ -30,7 +30,7 @@ public:
         InstanceScript* pInstance;
         uint8 counter;
 
-        void Reset()
+        void Reset() override
         {
             counter = 0;
             events.Reset();
@@ -46,7 +46,7 @@ public:
                 }
         }
 
-        void SetData(uint32 type, uint32  /*val*/)
+        void SetData(uint32 type, uint32  /*val*/) override
         {
             if (type == DATA_START_INTRO && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE && counter == 0 && !me->IsVisible())
             {
@@ -55,7 +55,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch(events.ExecuteEvent())
@@ -349,21 +349,21 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustSummoned(Creature* s)
+        void JustSummoned(Creature* s) override
         {
             summons.Summon(s);
         }
 
-        void SummonedCreatureDespawn(Creature* s)
+        void SummonedCreatureDespawn(Creature* s) override
         {
             summons.Despawn(s);
         }
 
-        void AttackStart(Unit*  /*who*/) {}
-        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void AttackStart(Unit*  /*who*/) override {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_leaderAI(creature);
     }
@@ -386,12 +386,12 @@ public:
         InstanceScript* pInstance;
         bool isInvincible;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             if (pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE)
             {
@@ -416,13 +416,13 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == 1)
                 me->SetFacingTo(M_PI);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             // TODO This spell check is invalid
             //            if (SPELL_NECROLYTE_CHANNELING)
@@ -435,19 +435,19 @@ public:
                 c->AI()->SetData(DATA_START_INTRO, 0);
         }
 
-        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (isInvincible && damage >= me->GetHealth())
                 damage = me->GetHealth() - 1;
         }
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1337)
                 isInvincible = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -475,10 +475,10 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_deathwhisper_necrolyteAI(creature);
     }
@@ -500,12 +500,12 @@ public:
         EventMap events;
         InstanceScript* pInstance;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -517,7 +517,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch(events.ExecuteEvent())
@@ -559,7 +559,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_after_first_bossAI(creature);
     }
@@ -585,7 +585,7 @@ public:
         uint32 killsLeft;
         uint64 deathbringerGUID[2];
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE)
             {
@@ -609,7 +609,7 @@ public:
                 events.ScheduleEvent(6, 0);
         }
 
-        void SetData(uint32 type, uint32 id)
+        void SetData(uint32 type, uint32 id) override
         {
             if (!me->IsAlive() || pInstance->GetData(DATA_GARFROST) != DONE || pInstance->GetData(DATA_ICK) != DONE)
                 return;
@@ -658,7 +658,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -808,7 +808,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_tyrannus_eventsAI(creature);
     }
@@ -830,7 +830,7 @@ public:
         InstanceScript* pInstance;
         uint16 timer;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!pInstance)
                 return;
@@ -845,7 +845,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_icicle_triggerAI(creature);
     }
@@ -869,13 +869,13 @@ public:
         uint16 timer1;
         uint16 timer2;
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (target && spell && target->GetTypeId() == TYPEID_PLAYER && spell->Id == 70827 && pInstance)
                 pInstance->SetData(DATA_ACHIEV_DONT_LOOK_UP, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer1 <= diff)
             {
@@ -896,7 +896,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_collapsing_icicleAI(creature);
     }
@@ -938,7 +938,7 @@ public:
         SummonList summons;
         uint8 i;
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == 2)
             {
@@ -946,7 +946,7 @@ public:
             }
         }
 
-        void DoAction(int32 p)
+        void DoAction(int32 p) override
         {
             if (p == 1)
                 summons.DespawnAll();
@@ -989,17 +989,17 @@ public:
             }
         }
 
-        void JustSummoned(Creature* s)
+        void JustSummoned(Creature* s) override
         {
             summons.Summon(s);
         }
 
-        void SummonedCreatureDespawn(Creature* s)
+        void SummonedCreatureDespawn(Creature* s) override
         {
             summons.Despawn(s);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -1083,7 +1083,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_martin_or_gorkun_secondAI(creature);
     }
@@ -1104,12 +1104,12 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_ID, 70827, true);
         }
 
-        bool CanAIAttack(const Unit* who) const
+        bool CanAIAttack(const Unit* who) const override
         {
             return who->GetEntry() == NPC_FALLEN_WARRIOR;
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (!me->IsAlive() || me->IsInEvadeMode())
                 return;
@@ -1124,7 +1124,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_freed_slaveAI(creature);
     }
@@ -1164,7 +1164,7 @@ public:
         EventMap events;
         uint64 barrierGUID;
 
-        void DoAction(int32 p)
+        void DoAction(int32 p) override
         {
             if (p == 1)
             {
@@ -1173,7 +1173,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if ((spell->Id == SPELL_TELEPORT_JAINA || spell->Id == SPELL_TELEPORT_SYLVANAS) && target && target->GetTypeId() == TYPEID_PLAYER)
             {
@@ -1183,7 +1183,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != WAYPOINT_MOTION_TYPE)
                 return;
@@ -1205,7 +1205,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -1284,7 +1284,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_leader_secondAI(creature);
     }
@@ -1310,7 +1310,7 @@ public:
 
         uint16 timer;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer)
             {
@@ -1326,7 +1326,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_frostbite_invisible_stalkerAI(creature);
     }
@@ -1348,13 +1348,13 @@ public:
                 caster->CastSpell((float)urand(447, 480), (float)urand(200, 235), 528.71f, 70131, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_empowered_blizzardAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_pos_empowered_blizzardAuraScript();
     }
@@ -1373,7 +1373,7 @@ class SlaveRunEvent : public BasicEvent
 public:
     SlaveRunEvent(Creature& owner) : _owner(owner) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         uint32 pointId = 0;
         float minDist = _owner.GetExactDist2dSq(&slaveFreePos[pointId]);
@@ -1427,13 +1427,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_pos_slave_trigger_closestSpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_pos_slave_trigger_closestSpellScript();
     }
@@ -1459,13 +1459,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_pos_rimefang_frost_novaSpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_pos_rimefang_frost_novaSpellScript();
     }
@@ -1487,13 +1487,13 @@ public:
                     target->CastSpell(target, 69604, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_blightAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_pos_blightAuraScript();
     }
@@ -1519,13 +1519,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_glacial_strikeAuraScript::HandleEffectPeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_pos_glacial_strikeAuraScript();
     }
@@ -1536,7 +1536,7 @@ class at_tyrannus_event_starter : public AreaTriggerScript
 public:
     at_tyrannus_event_starter() : AreaTriggerScript("at_tyrannus_event_starter") { }
 
-    bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
     {
         InstanceScript* inst = player->GetInstanceScript();
         if (!inst)

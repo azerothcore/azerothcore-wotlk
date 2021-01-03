@@ -88,14 +88,14 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             if (instance->GetBossState(DATA_SAVIANA_RAGEFIRE) == DONE && instance->GetBossState(DATA_BALTHARUS_THE_WARBORN) == DONE)
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -107,18 +107,18 @@ public:
                 events.ScheduleEvent(EVENT_SUMMON_ADDS2, 20000);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
         }
 
-        void KilledUnit(Unit*  /*victim*/)
+        void KilledUnit(Unit*  /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -127,7 +127,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -167,13 +167,13 @@ public:
             EnterEvadeIfOutOfCombatArea();
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const
+        bool CheckEvadeIfOutOfCombatArea() const override
         {
             return me->GetPositionX() > 3060.0f;
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_general_zarithrianAI>(creature);
     }
@@ -191,33 +191,33 @@ public:
             npc_escortAI::SetDespawnAtEnd(false);
         }
 
-        void Reset()
+        void Reset() override
         {
             _lavaGoutCount = 0;
             AddWaypoints();
             Start(true, true);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_BLAST_NOVA, urand(20000, 30000));
             _events.ScheduleEvent(EVENT_LAVA_GOUT, 5000);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             // Prevent EvadeMode
         }
 
-        void IsSummonedBy(Unit* /*summoner*/)
+        void IsSummonedBy(Unit* /*summoner*/) override
         {
             // Let Zarithrian count as summoner. _instance cant be null since we got GetRubySanctumAI
             if (Creature* zarithrian = ObjectAccessor::GetCreature(*me, _instance->GetData64(NPC_GENERAL_ZARITHRIAN)))
                 zarithrian->AI()->JustSummoned(me);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             if (waypointId == MAX_PATH_FLAMECALLER_WAYPOINTS)
                 me->SetInCombatWithZone();
@@ -237,7 +237,7 @@ public:
             }
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -273,7 +273,7 @@ public:
         uint8 _lavaGoutCount;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_onyx_flamecallerAI>(creature);
     }

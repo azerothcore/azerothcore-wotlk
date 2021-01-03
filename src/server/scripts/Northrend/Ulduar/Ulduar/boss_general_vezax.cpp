@@ -100,7 +100,7 @@ class boss_vezax : public CreatureScript
 public:
     boss_vezax() : CreatureScript("boss_vezax") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_vezaxAI (pCreature);
     }
@@ -121,7 +121,7 @@ public:
 
         InstanceScript* pInstance;
 
-        void Reset()
+        void Reset() override
         {
             vaporsCount = 0;
             hardmodeAvailable = true;
@@ -135,12 +135,12 @@ public:
                 pInstance->SetData(TYPE_VEZAX, NOT_STARTED);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->setActive(false);
         }
 
-        void EnterCombat(Unit*  /*pWho*/)
+        void EnterCombat(Unit*  /*pWho*/) override
         {
             me->setActive(true);
             me->SetInCombatWithZone();
@@ -162,7 +162,7 @@ public:
             me->CastSpell(me, SPELL_AURA_OF_DESPAIR_1, true);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch( param )
             {
@@ -176,7 +176,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 id) const
+        uint32 GetData(uint32 id) const override
         {
             switch (id)
             {
@@ -188,13 +188,13 @@ public:
             return 0;
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (target && spell && target->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_VEZAX_SHADOW_CRASH_DMG)
                 bAchievShadowdodger = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -340,7 +340,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             summons.DespawnAll();
             if (pInstance)
@@ -357,7 +357,7 @@ public:
                 }
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
             {
@@ -374,14 +374,14 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDespawn(Creature* s)
+        void SummonedCreatureDespawn(Creature* s) override
         {
             summons.Despawn(s);
         }
@@ -393,7 +393,7 @@ class npc_ulduar_saronite_vapors : public CreatureScript
 public:
     npc_ulduar_saronite_vapors() : CreatureScript("npc_ulduar_saronite_vapors") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_saronite_vaporsAI (pCreature);
     }
@@ -408,7 +408,7 @@ public:
 
         InstanceScript* pInstance;
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             me->CastSpell(me, SPELL_SARONITE_VAPORS_AURA, true);
 
@@ -425,7 +425,7 @@ class npc_ulduar_saronite_animus : public CreatureScript
 public:
     npc_ulduar_saronite_animus() : CreatureScript("npc_ulduar_saronite_animus") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_saronite_animusAI (pCreature);
     }
@@ -445,7 +445,7 @@ public:
         InstanceScript* pInstance;
         uint16 timer;
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             me->DespawnOrUnsummon(3000);
 
@@ -454,7 +454,7 @@ public:
                     vezax->AI()->DoAction(2);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             UpdateVictim();
 
@@ -505,14 +505,14 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_aura_of_despair_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PREVENT_REGENERATE_POWER, AURA_EFFECT_HANDLE_REAL);
             AfterEffectRemove += AuraEffectRemoveFn(spell_aura_of_despair_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PREVENT_REGENERATE_POWER, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_aura_of_despair_AuraScript();
     }
@@ -538,13 +538,13 @@ public:
                     }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_mark_of_the_faceless_periodic_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_mark_of_the_faceless_periodic_AuraScript();
     }
@@ -566,13 +566,13 @@ public:
                 Cancel();
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mark_of_the_faceless_drainhealth_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_mark_of_the_faceless_drainhealth_SpellScript();
     }
@@ -596,13 +596,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectApply += AuraEffectApplyFn(spell_saronite_vapors_dummy_AuraScript::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_saronite_vapors_dummy_AuraScript();
     }
@@ -628,13 +628,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             AfterHit += SpellHitFn(spell_saronite_vapors_damage_SpellScript::HandleAfterHit);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_saronite_vapors_damage_SpellScript();
     }
@@ -645,7 +645,7 @@ class achievement_smell_saronite : public AchievementCriteriaScript
 public:
     achievement_smell_saronite() : AchievementCriteriaScript("achievement_smell_saronite") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target) override
     {
         return target && target->GetEntry() == NPC_VEZAX && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
     }
@@ -656,7 +656,7 @@ class achievement_shadowdodger : public AchievementCriteriaScript
 public:
     achievement_shadowdodger() : AchievementCriteriaScript("achievement_shadowdodger") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target) override
     {
         return target && target->GetEntry() == NPC_VEZAX && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(2);
     }

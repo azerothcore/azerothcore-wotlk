@@ -84,7 +84,7 @@ public:
     {
         boss_arlokkAI(Creature* creature) : BossAI(creature, DATA_ARLOKK) { }
 
-        void Reset()
+        void Reset() override
         {
             if (events.IsInPhase(PHASE_TWO))
                 me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
@@ -97,13 +97,13 @@ public:
             me->GetMotionMaster()->MovePoint(0, PosMoveOnSpawn[0]);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(7000, 9000), 0, PHASE_ONE);
@@ -139,7 +139,7 @@ public:
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             BossAI::EnterEvadeMode();
             if (GameObject* object = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_GONG_OF_BETHEKK)))
@@ -147,7 +147,7 @@ public:
             me->DespawnOrUnsummon(4000);
         }
 
-        void SetData(uint32 id, uint32 /*value*/)
+        void SetData(uint32 id, uint32 /*value*/) override
         {
             if (id == 1)
                 --_summonCountA;
@@ -155,7 +155,7 @@ public:
                 --_summonCountB;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -289,7 +289,7 @@ public:
         uint64 _triggersSideBGUID[5];
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetZulGurubAI<boss_arlokkAI>(creature);
     }
@@ -325,7 +325,7 @@ public:
     {
         npc_zulian_prowlerAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) { }
 
-        void Reset()
+        void Reset() override
         {
             if (me->GetPositionY() < -1625.0f)
                 _sideData = 1;
@@ -340,20 +340,20 @@ public:
             _events.ScheduleEvent(EVENT_ATTACK, 6000);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->GetMotionMaster()->Clear(false);
             me->RemoveAura(SPELL_SNEAK_RANK_1_1);
             me->RemoveAura(SPELL_SNEAK_RANK_1_2);
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_MARK_OF_ARLOKK_TRIGGER) // Should only hit if line of sight
                 me->Attack(caster, true);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (Unit* arlokk = ObjectAccessor::GetUnit(*me, _instance->GetData64(NPC_ARLOKK)))
             {
@@ -363,7 +363,7 @@ public:
             me->DespawnOrUnsummon(4000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (UpdateVictim())
             {
@@ -393,7 +393,7 @@ public:
         InstanceScript* _instance;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetZulGurubAI<npc_zulian_prowlerAI>(creature);
     }

@@ -90,7 +90,7 @@ class boss_svala : public CreatureScript
 public:
     boss_svala() : CreatureScript("boss_svala") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_svalaAI (creature);
     }
@@ -111,7 +111,7 @@ public:
         EventMap events2;
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             if (instance)
             {
@@ -131,13 +131,13 @@ public:
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             ScriptedAI::EnterEvadeMode();
         }
 
-        void SetData(uint32 data, uint32 param)
+        void SetData(uint32 data, uint32 param) override
         {
             if (data != 1 || param != 1 || Started || (instance && instance->GetData(DATA_SVALA_SORROWGRAVE) == DONE))
                 return;
@@ -157,14 +157,14 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_RITUAL_CHANNELER)
                 summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
@@ -177,7 +177,7 @@ public:
                 instance->SetData(DATA_SVALA_SORROWGRAVE, IN_PROGRESS);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
@@ -185,7 +185,7 @@ public:
                 instance->SetData(DATA_SVALA_SORROWGRAVE, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetEntry() == NPC_SCOURGE_HULK && instance)
             {
@@ -197,7 +197,7 @@ public:
                 Talk(SAY_SLAY);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
@@ -361,7 +361,7 @@ class npc_ritual_channeler : public CreatureScript
 public:
     npc_ritual_channeler() : CreatureScript("npc_ritual_channeler") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ritual_channelerAI (pCreature);
     }
@@ -370,7 +370,7 @@ public:
     {
         npc_ritual_channelerAI(Creature* pCreature) : NullCreatureAI(pCreature) {}
 
-        void AttackStart(Unit* pWho)
+        void AttackStart(Unit* pWho) override
         {
             if (me->GetMap()->GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
                 me->AddAura(SPELL_SHADOWS_IN_THE_DARK, me);
@@ -404,13 +404,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_svala_ritual_strike_SpellScript::HandleDummyEffect, EFFECT_2, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_svala_ritual_strike_SpellScript();
     }
@@ -425,13 +425,13 @@ public:
             amount = (GetCaster()->GetMap()->IsHeroic() ? 2000 : 1000);
         }
 
-        void Register()
+        void Register() override
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_svala_ritual_strike_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_svala_ritual_strike_AuraScript();
     }

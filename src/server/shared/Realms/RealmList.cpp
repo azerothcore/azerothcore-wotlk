@@ -8,7 +8,7 @@
 #include "RealmList.h"
 #include "DatabaseEnv.h"
 
-RealmList::RealmList() : m_UpdateInterval(0), m_NextUpdateTime(time(nullptr)) { }
+RealmList::RealmList() :  m_NextUpdateTime(time(nullptr)) { }
 
 RealmList* RealmList::instance()
 {

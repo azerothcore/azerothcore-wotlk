@@ -32,7 +32,7 @@ class DeathEvent : public BasicEvent
 public:
     DeathEvent(Creature& owner) : BasicEvent(), _owner(owner) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*diff*/) override
     {
         Unit::Kill(&_owner, &_owner);
         return true;
@@ -56,7 +56,7 @@ public:
         uint32 checktarget;
         uint32 dist = urand(1, 5);
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             CasterAI::InitializeAI();
             Unit* owner = me->GetOwner();
@@ -127,7 +127,7 @@ public:
         }
 
         // Do not reload Creature templates on evade mode enter - prevent visual lost
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (me->IsInEvadeMode() || !me->IsAlive())
                 return;
@@ -170,13 +170,13 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             selectionTimer = 0;
             checktarget = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             if (events.GetTimer() < 1200)
@@ -211,7 +211,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_mage_mirror_imageAI(creature);
     }

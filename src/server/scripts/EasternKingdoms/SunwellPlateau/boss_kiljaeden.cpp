@@ -135,7 +135,7 @@ public:
     {
     }
 
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         _caster->CastSpell(_caster, SPELL_ARMAGEDDON_MISSILE, true);
         _caster->SetPosition(_caster->GetPositionX(), _caster->GetPositionY(), _caster->GetPositionZ() - 20.0f, 0.0f);
@@ -151,7 +151,7 @@ class npc_kiljaeden_controller : public CreatureScript
 public:
     npc_kiljaeden_controller() : CreatureScript("npc_kiljaeden_controller") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_kiljaeden_controllerAI>(creature);
     }
@@ -174,7 +174,7 @@ public:
                     orb->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
         }
 
-        void Reset()
+        void Reset() override
         {
             instance->SetBossState(DATA_KILJAEDEN, NOT_STARTED);
             events.Reset();
@@ -191,7 +191,7 @@ public:
             events.ScheduleEvent(EVENT_RANDOM_TALK, 60000);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             EntryCheckPredicate kilCheck(NPC_KILJAEDEN);
             EntryCheckPredicate kalCheck(NPC_KALECGOS_KJ);
@@ -203,7 +203,7 @@ public:
             summons.DespawnAll();
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_SINISTER_REFLECTION)
@@ -212,7 +212,7 @@ public:
                 summon->setActive(true);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             summons.Despawn(summon);
 
@@ -230,7 +230,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -277,7 +277,7 @@ public:
         EventMap events2;
         uint8 phase;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -290,26 +290,26 @@ public:
             me->SetVisible(false);
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (me->GetReactState() == REACT_PASSIVE)
                 return;
             ScriptedAI::EnterEvadeMode();
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (me->GetReactState() == REACT_PASSIVE)
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
             {
@@ -328,7 +328,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_KJ_DEATH);
             instance->SetBossState(DATA_KILJAEDEN, DONE);
@@ -336,7 +336,7 @@ public:
                 Unit::Kill(controller, controller);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_NO_KILL_TALK)
             {
@@ -345,13 +345,13 @@ public:
             }
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && events.GetNextEventTime(EVENT_NO_KILL_TALK) == 0)
                 Talk(SAY_KJ_SLAY);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events2.ScheduleEvent(EVENT_TEXT_SPEACH11, 26000, EVENT_GROUP_SPEACH);
             Talk(SAY_KJ_EMERGE);
@@ -366,7 +366,7 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_ORBS, 10000);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_ARMAGEDDON_TARGET)
             {
@@ -379,7 +379,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
@@ -649,7 +649,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_kiljaedenAI>(creature);
     }
@@ -722,7 +722,7 @@ public:
     {
     }
 
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         Movement::MoveSplineInit init(_owner);
         init.MoveTo(_x, _y, _z, false, true);
@@ -743,7 +743,7 @@ public:
     {
     }
 
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         std::list<Creature*> cList;
         _owner->GetCreaturesWithEntryInRange(cList, 20.0f, NPC_SHATTERED_SUN_SOLDIER);
@@ -761,7 +761,7 @@ class npc_kalecgos_kj : public CreatureScript
 public:
     npc_kalecgos_kj() : CreatureScript("npc_kalecgos_kj") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_kalecgos_kjAI>(creature);
     }
@@ -777,13 +777,13 @@ public:
         InstanceScript* instance;
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_START_POST_EVENT)
             {
@@ -794,7 +794,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_SHATTERED_SUN_RIFTWAKER)
@@ -839,7 +839,7 @@ public:
                 summon->GetMotionMaster()->MovePoint(0, summon->GetPositionX(), summon->GetPositionY(), 30.0f);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (uint32 eventId = events.ExecuteEvent())
@@ -1030,13 +1030,13 @@ public:
                 GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_shadow_spike_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_kiljaeden_shadow_spike_AuraScript();
     }
@@ -1066,14 +1066,14 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_sinister_reflection_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kiljaeden_sinister_reflection_SpellScript();
     }
@@ -1101,13 +1101,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection_clone_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kiljaeden_sinister_reflection_clone_SpellScript();
     }
@@ -1128,13 +1128,13 @@ public:
                 target->CastSpell(target, SPELL_FLAME_DART_EXPLOSION, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_flame_dart_SpellScript::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kiljaeden_flame_dart_SpellScript();
     }
@@ -1157,13 +1157,13 @@ public:
             GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DARKNESS_OF_A_THOUSAND_SOULS_DAMAGE, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_darkness_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_kiljaeden_darkness_AuraScript();
     }
@@ -1188,13 +1188,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_power_of_the_blue_flight_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kiljaeden_power_of_the_blue_flight_SpellScript();
     }
@@ -1219,7 +1219,7 @@ public:
             GetUnitOwner()->RemoveAurasDueToSpell(SPELL_POSSESS_DRAKE_IMMUNITY);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
             OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleApply, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
@@ -1228,7 +1228,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript();
     }
@@ -1250,13 +1250,13 @@ public:
                 GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_armageddon_periodic_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_kiljaeden_armageddon_periodic_AuraScript();
     }
@@ -1277,13 +1277,13 @@ public:
             dest.RelocateOffset(offset);
         }
 
-        void Register()
+        void Register() override
         {
             OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_kiljaeden_armageddon_missile_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kiljaeden_armageddon_missile_SpellScript();
     }
@@ -1303,13 +1303,13 @@ public:
             targets.remove_if(acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_dragon_breath_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ALLY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kiljaeden_dragon_breath_SpellScript();
     }
