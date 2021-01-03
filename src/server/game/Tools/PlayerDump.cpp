@@ -51,9 +51,10 @@ static DumpTable dumpTables[DUMP_TABLE_COUNT] =
 };
 
 // Low level functions
-static bool findtoknth(std::string &str, int n, std::string::size_type &s, std::string::size_type &e)
+static bool findtoknth(std::string& str, int n, std::string::size_type& s, std::string::size_type& e)
 {
-    int i; s = e = 0;
+    int i;
+    s = e = 0;
     std::string::size_type size = str.size();
     for (i = 1; s < size && i < n; s++) if (str[s] == ' ') ++i;
     if (i < n)
@@ -64,89 +65,89 @@ static bool findtoknth(std::string &str, int n, std::string::size_type &s, std::
     return e != std::string::npos;
 }
 
-std::string gettoknth(std::string &str, int n)
+std::string gettoknth(std::string& str, int n)
 {
     std::string::size_type s = 0, e = 0;
     if (!findtoknth(str, n, s, e))
         return "";
 
-    return str.substr(s, e-s);
+    return str.substr(s, e - s);
 }
 
-bool findnth(std::string &str, int n, std::string::size_type &s, std::string::size_type &e)
+bool findnth(std::string& str, int n, std::string::size_type& s, std::string::size_type& e)
 {
-    s = str.find("VALUES ('")+9;
+    s = str.find("VALUES ('") + 9;
     if (s == std::string::npos) return false;
 
     do
     {
         e = str.find('\'', s);
         if (e == std::string::npos) return false;
-    } while (str[e-1] == '\\');
+    } while (str[e - 1] == '\\');
 
     for (int i = 1; i < n; ++i)
     {
         do
         {
-            s = e+4;
+            s = e + 4;
             e = str.find('\'', s);
             if (e == std::string::npos) return false;
-        } while (str[e-1] == '\\');
+        } while (str[e - 1] == '\\');
     }
     return true;
 }
 
-std::string gettablename(std::string &str)
+std::string gettablename(std::string& str)
 {
     std::string::size_type s = 13;
     std::string::size_type e = str.find(_TABLE_SIM_, s);
     if (e == std::string::npos)
         return "";
 
-    return str.substr(s, e-s);
+    return str.substr(s, e - s);
 }
 
-bool changenth(std::string &str, int n, const char *with, bool insert = false, bool nonzero = false)
+bool changenth(std::string& str, int n, const char* with, bool insert = false, bool nonzero = false)
 {
     std::string::size_type s, e;
     if (!findnth(str, n, s, e))
         return false;
 
-    if (nonzero && str.substr(s, e-s) == "0")
+    if (nonzero && str.substr(s, e - s) == "0")
         return true;                                        // not an error
     if (!insert)
-        str.replace(s, e-s, with);
+        str.replace(s, e - s, with);
     else
         str.insert(s, with);
 
     return true;
 }
 
-std::string getnth(std::string &str, int n)
+std::string getnth(std::string& str, int n)
 {
     std::string::size_type s, e;
     if (!findnth(str, n, s, e))
         return "";
 
-    return str.substr(s, e-s);
+    return str.substr(s, e - s);
 }
 
-bool changetoknth(std::string &str, int n, const char *with, bool insert = false, bool nonzero = false)
+bool changetoknth(std::string& str, int n, const char* with, bool insert = false, bool nonzero = false)
 {
     std::string::size_type s = 0, e = 0;
     if (!findtoknth(str, n, s, e))
         return false;
-    if (nonzero && str.substr(s, e-s) == "0")
+    if (nonzero && str.substr(s, e - s) == "0")
         return true;                                        // not an error
     if (!insert)
-        str.replace(s, e-s, with);
+        str.replace(s, e - s, with);
     else
         str.insert(s, with);
 
     return true;
 }
 
-uint32 registerNewGuid(uint32 oldGuid, std::map<uint32, uint32> &guidMap, uint32 hiGuid)
+uint32 registerNewGuid(uint32 oldGuid, std::map<uint32, uint32>& guidMap, uint32 hiGuid)
 {
     std::map<uint32, uint32>::const_iterator itr = guidMap.find(oldGuid);
     if (itr != guidMap.end())
@@ -157,7 +158,7 @@ uint32 registerNewGuid(uint32 oldGuid, std::map<uint32, uint32> &guidMap, uint32
     return newguid;
 }
 
-bool changeGuid(std::string &str, int n, std::map<uint32, uint32> &guidMap, uint32 hiGuid, bool nonzero = false)
+bool changeGuid(std::string& str, int n, std::map<uint32, uint32>& guidMap, uint32 hiGuid, bool nonzero = false)
 {
     char chritem[20];
     uint32 oldGuid = atoi(getnth(str, n).c_str());
@@ -170,7 +171,7 @@ bool changeGuid(std::string &str, int n, std::map<uint32, uint32> &guidMap, uint
     return changenth(str, n, chritem, false, nonzero);
 }
 
-bool changetokGuid(std::string &str, int n, std::map<uint32, uint32> &guidMap, uint32 hiGuid, bool nonzero = false)
+bool changetokGuid(std::string& str, int n, std::map<uint32, uint32>& guidMap, uint32 hiGuid, bool nonzero = false)
 {
     char chritem[20];
     uint32 oldGuid = atoi(gettoknth(str, n).c_str());
@@ -187,7 +188,7 @@ std::string CreateDumpString(char const* tableName, QueryResult result)
 {
     if (!tableName || !result) return "";
     std::ostringstream ss;
-    ss << "INSERT INTO "<< _TABLE_SIM_ << tableName << _TABLE_SIM_ << " VALUES (";
+    ss << "INSERT INTO " << _TABLE_SIM_ << tableName << _TABLE_SIM_ << " VALUES (";
     Field* fields = result->Fetch();
     for (uint32 i = 0; i < result->GetFieldCount(); ++i)
     {
@@ -251,20 +252,38 @@ void StoreGUID(QueryResult result, uint32 data, uint32 field, std::set<uint32>& 
 }
 
 // Writing - High-level functions
-bool PlayerDumpWriter::DumpTable(std::string& dump, uint32 guid, char const*tableFrom, char const*tableTo, DumpTableType type)
+bool PlayerDumpWriter::DumpTable(std::string& dump, uint32 guid, char const* tableFrom, char const* tableTo, DumpTableType type)
 {
     GUIDs const* guids = nullptr;
     char const* fieldname = nullptr;
 
     switch (type)
     {
-        case DTT_ITEM:      fieldname = "guid";      guids = &items; break;
-        case DTT_ITEM_GIFT: fieldname = "item_guid"; guids = &items; break;
-        case DTT_PET:       fieldname = "owner";                     break;
-        case DTT_PET_TABLE: fieldname = "guid";      guids = &pets;  break;
-        case DTT_MAIL:      fieldname = "receiver";                  break;
-        case DTT_MAIL_ITEM: fieldname = "mail_id";   guids = &mails; break;
-        default:            fieldname = "guid";                      break;
+        case DTT_ITEM:
+            fieldname = "guid";
+            guids = &items;
+            break;
+        case DTT_ITEM_GIFT:
+            fieldname = "item_guid";
+            guids = &items;
+            break;
+        case DTT_PET:
+            fieldname = "owner";
+            break;
+        case DTT_PET_TABLE:
+            fieldname = "guid";
+            guids = &pets;
+            break;
+        case DTT_MAIL:
+            fieldname = "receiver";
+            break;
+        case DTT_MAIL_ITEM:
+            fieldname = "mail_id";
+            guids = &mails;
+            break;
+        default:
+            fieldname = "guid";
+            break;
     }
 
     // for guid set stop if set is empty
@@ -307,28 +326,26 @@ bool PlayerDumpWriter::DumpTable(std::string& dump, uint32 guid, char const*tabl
                     StoreGUID(result, 1, items);                // item guid collection (mail_items.item_guid)
                     break;
                 case DTT_CHARACTER:
-                {
-                    if (result->GetFieldCount() <= 74)          // avoid crashes on next check
-                        sLog->outCrash("PlayerDumpWriter::DumpTable - Trying to access non-existing or wrong positioned field (`deleteInfos_Account`) in `characters` table.");
+                    {
+                        if (result->GetFieldCount() <= 74)          // avoid crashes on next check
+                            sLog->outCrash("PlayerDumpWriter::DumpTable - Trying to access non-existing or wrong positioned field (`deleteInfos_Account`) in `characters` table.");
 
-                    if (result->Fetch()[74].GetUInt32())        // characters.deleteInfos_Account - if filled error
-                        return false;
-                    break;
-                }
+                        if (result->Fetch()[74].GetUInt32())        // characters.deleteInfos_Account - if filled error
+                            return false;
+                        break;
+                    }
                 default:
                     break;
             }
 
             dump += CreateDumpString(tableTo, result);
             dump += "\n";
-        }
-        while (result->NextRow());
-    }
-    while (guids && guids_itr != guids->end());              // not set case iterate single time, set case iterate for all guids
+        } while (result->NextRow());
+    } while (guids && guids_itr != guids->end());            // not set case iterate single time, set case iterate for all guids
     return true;
 }
 
-bool PlayerDumpWriter::GetDump(uint32 guid, std::string &dump)
+bool PlayerDumpWriter::GetDump(uint32 guid, std::string& dump)
 {
     dump = "";
 
@@ -373,7 +390,7 @@ DumpReturn PlayerDumpWriter::WriteDump(const std::string& file, uint32 guid)
 // Reading - High-level functions
 #define ROLLBACK(DR) {fclose(fin); return (DR);}
 
-void fixNULLfields(std::string &line)
+void fixNULLfields(std::string& line)
 {
     std::string nullString("'NULL'");
     size_t pos = line.find(nullString);
@@ -457,7 +474,8 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
             ROLLBACK(DUMP_FILE_BROKEN);
         }
 
-        std::string line; line.assign(buf);
+        std::string line;
+        line.assign(buf);
 
         // skip empty strings
         size_t nw_pos = line.find_first_not_of(" \t\n\r\7");
@@ -466,8 +484,8 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
         // skip logfile-side dump start notice, the important notes and dump end notices
         if ((line.substr(nw_pos, 16) == "== START DUMP ==") ||
-            (line.substr(nw_pos, 15) == "IMPORTANT NOTE:") ||
-            (line.substr(nw_pos, 14) == "== END DUMP =="))
+                (line.substr(nw_pos, 15) == "IMPORTANT NOTE:") ||
+                (line.substr(nw_pos, 14) == "== END DUMP =="))
             continue;
 
         // add required_ check
@@ -510,147 +528,147 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
         switch (type)
         {
             case DTT_CHARACTER:
-            {
-                if (!changenth(line, 1, newguid))           // characters.guid update
-                    ROLLBACK(DUMP_FILE_BROKEN);
-
-                if (!changenth(line, 2, chraccount))        // characters.account update
-                    ROLLBACK(DUMP_FILE_BROKEN);
-
-                race = uint8(atol(getnth(line, 4).c_str()));
-                playerClass = uint8(atol(getnth(line, 5).c_str()));
-                gender = uint8(atol(getnth(line, 6).c_str()));
-                level = uint8(atol(getnth(line, 7).c_str()));
-                if (name == "")
                 {
-                    // check if the original name already exists
-                    name = getnth(line, 3);
+                    if (!changenth(line, 1, newguid))           // characters.guid update
+                        ROLLBACK(DUMP_FILE_BROKEN);
 
-                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
-                    stmt->setString(0, name);
-                    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+                    if (!changenth(line, 2, chraccount))        // characters.account update
+                        ROLLBACK(DUMP_FILE_BROKEN);
 
-                    if (result)
-                        if (!changenth(line, 38, "1"))       // characters.at_login set to "rename on login"
-                            ROLLBACK(DUMP_FILE_BROKEN);
+                    race = uint8(atol(getnth(line, 4).c_str()));
+                    playerClass = uint8(atol(getnth(line, 5).c_str()));
+                    gender = uint8(atol(getnth(line, 6).c_str()));
+                    level = uint8(atol(getnth(line, 7).c_str()));
+                    if (name == "")
+                    {
+                        // check if the original name already exists
+                        name = getnth(line, 3);
+
+                        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
+                        stmt->setString(0, name);
+                        PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+                        if (result)
+                            if (!changenth(line, 38, "1"))       // characters.at_login set to "rename on login"
+                                ROLLBACK(DUMP_FILE_BROKEN);
+                    }
+                    else if (!changenth(line, 3, name.c_str())) // characters.name
+                        ROLLBACK(DUMP_FILE_BROKEN);
+
+                    const char null[5] = "NULL";
+                    if (!changenth(line, 75, null))             // characters.deleteInfos_Account
+                        ROLLBACK(DUMP_FILE_BROKEN);
+                    if (!changenth(line, 76, null))             // characters.deleteInfos_Name
+                        ROLLBACK(DUMP_FILE_BROKEN);
+                    if (!changenth(line, 77, null))             // characters.deleteDate
+                        ROLLBACK(DUMP_FILE_BROKEN);
+                    break;
                 }
-                else if (!changenth(line, 3, name.c_str())) // characters.name
-                    ROLLBACK(DUMP_FILE_BROKEN);
-
-                const char null[5] = "NULL";
-                if (!changenth(line, 75, null))             // characters.deleteInfos_Account
-                    ROLLBACK(DUMP_FILE_BROKEN);
-                if (!changenth(line, 76, null))             // characters.deleteInfos_Name
-                    ROLLBACK(DUMP_FILE_BROKEN);
-                if (!changenth(line, 77, null))             // characters.deleteDate
-                    ROLLBACK(DUMP_FILE_BROKEN);
-                break;
-            }
             case DTT_CHAR_TABLE:
-            {
-                if (!changenth(line, 1, newguid))           // character_*.guid update
-                    ROLLBACK(DUMP_FILE_BROKEN);
-                break;
-            }
+                {
+                    if (!changenth(line, 1, newguid))           // character_*.guid update
+                        ROLLBACK(DUMP_FILE_BROKEN);
+                    break;
+                }
             case DTT_EQSET_TABLE:
-            {
-                if (!changenth(line, 1, newguid))
-                    ROLLBACK(DUMP_FILE_BROKEN);             // character_equipmentsets.guid
+                {
+                    if (!changenth(line, 1, newguid))
+                        ROLLBACK(DUMP_FILE_BROKEN);             // character_equipmentsets.guid
 
-                char newSetGuid[24];
-                snprintf(newSetGuid, 24, UI64FMTD, sObjectMgr->GenerateEquipmentSetGuid());
-                if (!changenth(line, 2, newSetGuid))
-                    ROLLBACK(DUMP_FILE_BROKEN);             // character_equipmentsets.setguid
-                break;
-            }
+                    char newSetGuid[24];
+                    snprintf(newSetGuid, 24, UI64FMTD, sObjectMgr->GenerateEquipmentSetGuid());
+                    if (!changenth(line, 2, newSetGuid))
+                        ROLLBACK(DUMP_FILE_BROKEN);             // character_equipmentsets.setguid
+                    break;
+                }
             case DTT_INVENTORY:
-            {
-                if (!changenth(line, 1, newguid))           // character_inventory.guid update
-                    ROLLBACK(DUMP_FILE_BROKEN);
+                {
+                    if (!changenth(line, 1, newguid))           // character_inventory.guid update
+                        ROLLBACK(DUMP_FILE_BROKEN);
 
-                if (!changeGuid(line, 2, items, sObjectMgr->_hiItemGuid, true))
-                    ROLLBACK(DUMP_FILE_BROKEN);             // character_inventory.bag update
-                if (!changeGuid(line, 4, items, sObjectMgr->_hiItemGuid))
-                    ROLLBACK(DUMP_FILE_BROKEN);             // character_inventory.item update
-                break;
-            }
+                    if (!changeGuid(line, 2, items, sObjectMgr->_hiItemGuid, true))
+                        ROLLBACK(DUMP_FILE_BROKEN);             // character_inventory.bag update
+                    if (!changeGuid(line, 4, items, sObjectMgr->_hiItemGuid))
+                        ROLLBACK(DUMP_FILE_BROKEN);             // character_inventory.item update
+                    break;
+                }
             case DTT_MAIL:                                  // mail
-            {
-                if (!changeGuid(line, 1, mails, sObjectMgr->_mailId))
-                    ROLLBACK(DUMP_FILE_BROKEN);             // mail.id update
-                if (!changenth(line, 6, newguid))           // mail.receiver update
-                    ROLLBACK(DUMP_FILE_BROKEN);
-                break;
-            }
+                {
+                    if (!changeGuid(line, 1, mails, sObjectMgr->_mailId))
+                        ROLLBACK(DUMP_FILE_BROKEN);             // mail.id update
+                    if (!changenth(line, 6, newguid))           // mail.receiver update
+                        ROLLBACK(DUMP_FILE_BROKEN);
+                    break;
+                }
             case DTT_MAIL_ITEM:                             // mail_items
-            {
-                if (!changeGuid(line, 1, mails, sObjectMgr->_mailId))
-                    ROLLBACK(DUMP_FILE_BROKEN);             // mail_items.id
-                if (!changeGuid(line, 2, items, sObjectMgr->_hiItemGuid))
-                    ROLLBACK(DUMP_FILE_BROKEN);             // mail_items.item_guid
-                if (!changenth(line, 3, newguid))           // mail_items.receiver
-                    ROLLBACK(DUMP_FILE_BROKEN);
-                break;
-            }
+                {
+                    if (!changeGuid(line, 1, mails, sObjectMgr->_mailId))
+                        ROLLBACK(DUMP_FILE_BROKEN);             // mail_items.id
+                    if (!changeGuid(line, 2, items, sObjectMgr->_hiItemGuid))
+                        ROLLBACK(DUMP_FILE_BROKEN);             // mail_items.item_guid
+                    if (!changenth(line, 3, newguid))           // mail_items.receiver
+                        ROLLBACK(DUMP_FILE_BROKEN);
+                    break;
+                }
             case DTT_ITEM:
-            {
-                // item, owner, data field:item, owner guid
-                if (!changeGuid(line, 1, items, sObjectMgr->_hiItemGuid))
-                   ROLLBACK(DUMP_FILE_BROKEN);              // item_instance.guid update
-                if (!changenth(line, 3, newguid))           // item_instance.owner_guid update
-                    ROLLBACK(DUMP_FILE_BROKEN);
-                break;
-            }
+                {
+                    // item, owner, data field:item, owner guid
+                    if (!changeGuid(line, 1, items, sObjectMgr->_hiItemGuid))
+                        ROLLBACK(DUMP_FILE_BROKEN);              // item_instance.guid update
+                    if (!changenth(line, 3, newguid))           // item_instance.owner_guid update
+                        ROLLBACK(DUMP_FILE_BROKEN);
+                    break;
+                }
             case DTT_ITEM_GIFT:
-            {
-                if (!changenth(line, 1, newguid))           // character_gifts.guid update
-                    ROLLBACK(DUMP_FILE_BROKEN);
-                if (!changeGuid(line, 2, items, sObjectMgr->_hiItemGuid))
-                    ROLLBACK(DUMP_FILE_BROKEN);             // character_gifts.item_guid update
-                break;
-            }
+                {
+                    if (!changenth(line, 1, newguid))           // character_gifts.guid update
+                        ROLLBACK(DUMP_FILE_BROKEN);
+                    if (!changeGuid(line, 2, items, sObjectMgr->_hiItemGuid))
+                        ROLLBACK(DUMP_FILE_BROKEN);             // character_gifts.item_guid update
+                    break;
+                }
             case DTT_PET:
-            {
-                //store a map of old pet id to new inserted pet id for use by type 5 tables
-                snprintf(currpetid, 20, "%s", getnth(line, 1).c_str());
-                if (*lastpetid == '\0')
-                    snprintf(lastpetid, 20, "%s", currpetid);
-                if (strcmp(lastpetid, currpetid) != 0)
                 {
-                    snprintf(newpetid, 20, "%d", sObjectMgr->GeneratePetNumber());
-                    snprintf(lastpetid, 20, "%s", currpetid);
+                    //store a map of old pet id to new inserted pet id for use by type 5 tables
+                    snprintf(currpetid, 20, "%s", getnth(line, 1).c_str());
+                    if (*lastpetid == '\0')
+                        snprintf(lastpetid, 20, "%s", currpetid);
+                    if (strcmp(lastpetid, currpetid) != 0)
+                    {
+                        snprintf(newpetid, 20, "%d", sObjectMgr->GeneratePetNumber());
+                        snprintf(lastpetid, 20, "%s", currpetid);
+                    }
+
+                    std::map<uint32, uint32> :: const_iterator petids_iter = petids.find(atoi(currpetid));
+
+                    if (petids_iter == petids.end())
+                    {
+                        petids.insert(PetIdsPair(atoi(currpetid), atoi(newpetid)));
+                    }
+
+                    if (!changenth(line, 1, newpetid))          // character_pet.id update
+                        ROLLBACK(DUMP_FILE_BROKEN);
+                    if (!changenth(line, 3, newguid))           // character_pet.owner update
+                        ROLLBACK(DUMP_FILE_BROKEN);
+
+                    break;
                 }
-
-                std::map<uint32, uint32> :: const_iterator petids_iter = petids.find(atoi(currpetid));
-
-                if (petids_iter == petids.end())
-                {
-                    petids.insert(PetIdsPair(atoi(currpetid), atoi(newpetid)));
-                }
-
-                if (!changenth(line, 1, newpetid))          // character_pet.id update
-                    ROLLBACK(DUMP_FILE_BROKEN);
-                if (!changenth(line, 3, newguid))           // character_pet.owner update
-                    ROLLBACK(DUMP_FILE_BROKEN);
-
-                break;
-            }
             case DTT_PET_TABLE:                             // pet_aura, pet_spell, pet_spell_cooldown
-            {
-                snprintf(currpetid, 20, "%s", getnth(line, 1).c_str());
+                {
+                    snprintf(currpetid, 20, "%s", getnth(line, 1).c_str());
 
-                // lookup currpetid and match to new inserted pet id
-                std::map<uint32, uint32> :: const_iterator petids_iter = petids.find(atoi(currpetid));
-                if (petids_iter == petids.end())             // couldn't find new inserted id
-                    ROLLBACK(DUMP_FILE_BROKEN);
+                    // lookup currpetid and match to new inserted pet id
+                    std::map<uint32, uint32> :: const_iterator petids_iter = petids.find(atoi(currpetid));
+                    if (petids_iter == petids.end())             // couldn't find new inserted id
+                        ROLLBACK(DUMP_FILE_BROKEN);
 
-                snprintf(newpetid, 20, "%d", petids_iter->second);
+                    snprintf(newpetid, 20, "%d", petids_iter->second);
 
-                if (!changenth(line, 1, newpetid))
-                    ROLLBACK(DUMP_FILE_BROKEN);
+                    if (!changenth(line, 1, newpetid))
+                        ROLLBACK(DUMP_FILE_BROKEN);
 
-                break;
-            }
+                    break;
+                }
             default:
                 sLog->outError("Unknown dump table type: %u", type);
                 break;

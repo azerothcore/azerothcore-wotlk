@@ -31,7 +31,7 @@ public:
     {
         boss_firemawAI(Creature* creature) : BossAI(creature, BOSS_FIREMAW) { }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if (instance->GetBossState(BOSS_BROODLORD) != DONE)
             {
@@ -45,7 +45,7 @@ public:
             events.ScheduleEvent(EVENT_FLAMEBUFFET, 5000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -80,7 +80,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_firemawAI>(creature);
     }

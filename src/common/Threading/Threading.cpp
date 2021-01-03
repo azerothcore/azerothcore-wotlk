@@ -10,6 +10,9 @@
 #include <chrono>
 #include <system_error>
 
+#ifdef WIN32
+#include <windows.h>
+#endif // WIN32
 using namespace acore;
 
 Thread::Thread() : m_task(nullptr), m_iThreadId(), m_ThreadImp()

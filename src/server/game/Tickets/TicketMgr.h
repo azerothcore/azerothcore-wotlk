@@ -178,7 +178,7 @@ private:
 
 public:
     static TicketMgr* instance();
-    
+
     void LoadTickets();
     void LoadSurveys();
 

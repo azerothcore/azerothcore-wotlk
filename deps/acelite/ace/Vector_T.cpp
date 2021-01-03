@@ -13,7 +13,7 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Vector)
+ACE_ALLOC_HOOK_DEFINE_Tcs(ACE_Vector)
 
 template <class T, size_t DEFAULT_SIZE>
 void ACE_Vector<T, DEFAULT_SIZE>::resize (const size_t new_size,
@@ -66,6 +66,7 @@ ACE_Vector<T, DEFAULT_SIZE>::operator== (const ACE_Vector<T, DEFAULT_SIZE> &s) c
 }
 
 // ****************************************************************
+ACE_ALLOC_HOOK_DEFINE_Tcs(ACE_Vector_Iterator)
 
 template <class T, size_t DEFAULT_SIZE> int
 ACE_Vector_Iterator<T, DEFAULT_SIZE>::next (T *&item)

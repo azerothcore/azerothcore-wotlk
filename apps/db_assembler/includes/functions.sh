@@ -44,7 +44,7 @@ function dbasm_mysqlExec() {
             fi
 
             # create configured account if not exists
-            "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -P "$MYSQL_PORT" -e "CREATE USER '${MYSQL_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${MYSQL_PASS}' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0;"
+            "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -P "$MYSQL_PORT" -e "CREATE USER IF NOT EXISTS '${MYSQL_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${MYSQL_PASS}' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0;"
             "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -P "$MYSQL_PORT" -e "GRANT CREATE ON *.* TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION;"
             for db in ${DATABASES[@]}
             do
@@ -148,7 +148,7 @@ function dbasm_assemble() {
     shopt -s globstar
 
     if [ $with_base = true ]; then
-        echo "" > $OUTPUT_FOLDER$database$suffix_base".sql"
+        echo "" > "$OUTPUT_FOLDER$database$suffix_base.sql"
 
 
         if [ ! ${#base[@]} -eq 0 ]; then
@@ -157,11 +157,11 @@ function dbasm_assemble() {
             for d in "${base[@]}"
             do
                 echo "Searching on $d ..."
-                if [ ! -z $d ]; then
+                if [ ! -z "$d" ]; then
                     for entry in "$d"/**/*.sql
                     do
                         if [[ -e $entry ]]; then
-                            cat "$entry" >> $OUTPUT_FOLDER$database$suffix_base".sql"
+                            cat "$entry" >> "$OUTPUT_FOLDER$database$suffix_base.sql"
                         fi
                     done
                 fi
@@ -170,9 +170,9 @@ function dbasm_assemble() {
     fi
 
     if [ $with_updates = true ]; then
-        updFile=$OUTPUT_FOLDER$database$suffix_upd".sql"
+        updFile="$OUTPUT_FOLDER$database$suffix_upd.sql"
 
-        echo "" > $updFile
+        echo "" > "$updFile"
 
         if [ ! ${#updates[@]} -eq 0 ]; then
             echo "Generating $OUTPUT_FOLDER$database$suffix_upd ..."
@@ -180,15 +180,15 @@ function dbasm_assemble() {
             for d in "${updates[@]}"
             do
                 echo "Searching on $d ..."
-                if [ ! -z $d ]; then
+                if [ ! -z "$d" ]; then
                     for entry in "$d"/**/*.sql
                     do
                         if [[ ! -e $entry ]]; then
                             continue
                         fi
 
-                        echo "-- $file" >> $updFile
-                        cat "$entry" >> $updFile
+                        echo "-- $file" >> "$updFile"
+                        cat "$entry" >> "$updFile"
                     done
                 fi
             done
@@ -196,9 +196,9 @@ function dbasm_assemble() {
     fi
 
     if [ $with_custom = true ]; then
-        custFile=$OUTPUT_FOLDER$database$suffix_custom".sql"
+        custFile="$OUTPUT_FOLDER$database$suffix_custom.sql"
 
-        echo "" > $custFile
+        echo "" > "$custFile"
 
         if [ ! ${#custom[@]} -eq 0 ]; then
             echo "Generating $OUTPUT_FOLDER$database$suffix_custom ..."
@@ -206,15 +206,15 @@ function dbasm_assemble() {
             for d in "${custom[@]}"
             do
                 echo "Searching on $d ..."
-                if [ ! -z $d ]; then
+                if [ ! -z "$d" ]; then
                     for entry in "$d"/**/*.sql
                     do
                         if [[ ! -e $entry ]]; then
                             continue
                         fi
 
-                        echo "-- $file" >> $custFile
-                        cat "$entry" >> $custFile
+                        echo "-- $file" >> "$custFile"
+                        cat "$entry" >> "$custFile"
                     done
                 fi
             done

@@ -15,13 +15,13 @@
 class WorldRunnable : public acore::Runnable
 {
 public:
-    void run();
+    void run() override;
 };
 
 class AuctionListingRunnable : public acore::Runnable
 {
 public:
-    void run();
+    void run() override;
 };
 #endif
 /// @}

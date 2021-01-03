@@ -7,7 +7,10 @@
 #include "ace/OS_NS_string.h"
 #include "ace/OS_NS_sys_time.h"
 #include "ace/OS_NS_sys_socket.h"
-# include "ace/OS_NS_unistd.h"
+#include "ace/OS_NS_unistd.h"
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 #if !defined (__ACE_INLINE__)
 # include "ace/Ping_Socket.inl"
@@ -36,7 +39,7 @@ ACE_END_VERSIONED_NAMESPACE_DECL
 #else  /* #if ! defined (ACE_WIN32) */
 
 /*
- * This was a surpise to me...  This stuff is not defined anywhere under MSVC.
+ * This was a surprise to me...  This stuff is not defined anywhere under MSVC.
  * These values have only been checked for NT4 and Win2K.  They were taken from
  * the MSDN ping.c program and modified.
  */
@@ -114,7 +117,7 @@ ACE_Ping_Socket::ACE_Ping_Socket (ACE_Addr const & local,
     }
 
   // trying to increase the size of socket receive buffer - some
-  // protection from multiple responces e.g., when falling to the
+  // protection from multiple responses e.g., when falling to the
   // multi-cast address
   int size = 64 * 1024;
   ACE_SOCK::set_option (SOL_SOCKET,

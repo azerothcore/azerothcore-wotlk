@@ -402,29 +402,29 @@ bool MySQLConnection::ExecuteTransaction(SQLTransaction& transaction)
         switch (itr->type)
         {
             case SQL_ELEMENT_PREPARED:
+            {
+                PreparedStatement* stmt = data.element.stmt;
+                ASSERT(stmt);
+                if (!Execute(stmt))
                 {
-                    PreparedStatement* stmt = data.element.stmt;
-                    ASSERT(stmt);
-                    if (!Execute(stmt))
-                    {
-                        sLog->outSQLDriver("[Warning] Transaction aborted. %u queries not executed.", (uint32)queries.size());
-                        RollbackTransaction();
-                        return false;
-                    }
+                    sLog->outSQLDriver("[Warning] Transaction aborted. %u queries not executed.", (uint32)queries.size());
+                    RollbackTransaction();
+                    return false;
                 }
-                break;
+            }
+            break;
             case SQL_ELEMENT_RAW:
+            {
+                const char* sql = data.element.query;
+                ASSERT(sql);
+                if (!Execute(sql))
                 {
-                    const char* sql = data.element.query;
-                    ASSERT(sql);
-                    if (!Execute(sql))
-                    {
-                        sLog->outSQLDriver("[Warning] Transaction aborted. %u queries not executed.", (uint32)queries.size());
-                        RollbackTransaction();
-                        return false;
-                    }
+                    sLog->outSQLDriver("[Warning] Transaction aborted. %u queries not executed.", (uint32)queries.size());
+                    RollbackTransaction();
+                    return false;
                 }
-                break;
+            }
+            break;
         }
     }
 
@@ -515,26 +515,26 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo)
 #if !(MARIADB_VERSION_ID >= 100200)
         case CR_INVALID_CONN_HANDLE:
 #endif
+        {
+            m_reconnecting = true;
+            uint64 oldThreadId = mysql_thread_id(GetHandle());
+            mysql_close(GetHandle());
+            if (this->Open())                           // Don't remove 'this' pointer unless you want to skip loading all prepared statements....
             {
-                m_reconnecting = true;
-                uint64 oldThreadId = mysql_thread_id(GetHandle());
-                mysql_close(GetHandle());
-                if (this->Open())                           // Don't remove 'this' pointer unless you want to skip loading all prepared statements....
-                {
-                    sLog->outSQLDriver("Connection to the MySQL server is active.");
-                    if (oldThreadId != mysql_thread_id(GetHandle()))
-                        sLog->outSQLDriver("Successfully reconnected to %s @%s:%s (%s).",
-                                           m_connectionInfo.database.c_str(), m_connectionInfo.host.c_str(), m_connectionInfo.port_or_socket.c_str(),
-                                           (m_connectionFlags & CONNECTION_ASYNC) ? "asynchronous" : "synchronous");
+                sLog->outSQLDriver("Connection to the MySQL server is active.");
+                if (oldThreadId != mysql_thread_id(GetHandle()))
+                    sLog->outSQLDriver("Successfully reconnected to %s @%s:%s (%s).",
+                                       m_connectionInfo.database.c_str(), m_connectionInfo.host.c_str(), m_connectionInfo.port_or_socket.c_str(),
+                                       (m_connectionFlags & CONNECTION_ASYNC) ? "asynchronous" : "synchronous");
 
-                    m_reconnecting = false;
-                    return true;
-                }
-
-                uint32 lErrno = mysql_errno(GetHandle());   // It's possible this attempted reconnect throws 2006 at us. To prevent crazy recursive calls, sleep here.
-                std::this_thread::sleep_for(3s);            // Sleep 3 seconds
-                return _HandleMySQLErrno(lErrno);           // Call self (recursive)
+                m_reconnecting = false;
+                return true;
             }
+
+            uint32 lErrno = mysql_errno(GetHandle());   // It's possible this attempted reconnect throws 2006 at us. To prevent crazy recursive calls, sleep here.
+            std::this_thread::sleep_for(3s);            // Sleep 3 seconds
+            return _HandleMySQLErrno(lErrno);           // Call self (recursive)
+        }
 
         case ER_LOCK_DEADLOCK:
             return false;    // Implemented in TransactionTask::Execute and DatabaseWorkerPool<T>::DirectCommitTransaction

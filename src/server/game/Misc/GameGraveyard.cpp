@@ -12,7 +12,7 @@ Graveyard* Graveyard::instance()
 
 void Graveyard::LoadGraveyardFromDB()
 {
-    uint32 oldMSTime = getMSTime();    
+    uint32 oldMSTime = getMSTime();
 
     _graveyardStore.clear();
 
@@ -38,7 +38,7 @@ void Graveyard::LoadGraveyardFromDB()
         Graveyard.y = fields[3].GetFloat();
         Graveyard.z = fields[4].GetFloat();
         Graveyard.name = fields[5].GetString();
-        
+
         if (!Utf8toWStr(Graveyard.name, Graveyard.wnameLow))
         {
             sLog->outErrorDb("Wrong UTF8 name for id %u in `game_graveyard` table, ignoring.", ID);
@@ -143,9 +143,9 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
         {
             // if find graveyard at different map from where entrance placed (or no entrance data), use any first
             if (!mapEntry
-                || mapEntry->entrance_map < 0
-                || uint32(mapEntry->entrance_map) != entry->Map
-                || (mapEntry->entrance_x == 0 && mapEntry->entrance_y == 0))
+                    || mapEntry->entrance_map < 0
+                    || uint32(mapEntry->entrance_map) != entry->Map
+                    || (mapEntry->entrance_x == 0 && mapEntry->entrance_y == 0))
             {
                 // not have any corrdinates for check distance anyway
                 entryFar = entry;
@@ -153,8 +153,8 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
             }
 
             // at entrance map calculate distance (2D);
-            float dist2 = (entry->x - mapEntry->entrance_x)*(entry->x - mapEntry->entrance_x)
-                + (entry->y - mapEntry->entrance_y)*(entry->y - mapEntry->entrance_y);
+            float dist2 = (entry->x - mapEntry->entrance_x) * (entry->x - mapEntry->entrance_x)
+                          + (entry->y - mapEntry->entrance_y) * (entry->y - mapEntry->entrance_y);
             if (foundEntr)
             {
                 if (dist2 < distEntr)
@@ -173,7 +173,7 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(float x, float y, float z,
         // find now nearest graveyard at same map
         else
         {
-            float dist2 = (entry->x - x)*(entry->x - x) + (entry->y - y)*(entry->y - y) + (entry->z - z)*(entry->z - z);
+            float dist2 = (entry->x - x) * (entry->x - x) + (entry->y - y) * (entry->y - y) + (entry->z - z) * (entry->z - z);
             if (foundNear)
             {
                 if (dist2 < distNear)
@@ -254,7 +254,7 @@ void Graveyard::RemoveGraveyardLink(uint32 id, uint32 zoneId, TeamId teamId, boo
 
     for (; range.first != range.second; ++range.first)
     {
-        GraveyardData & data = range.first->second;
+        GraveyardData& data = range.first->second;
 
         // skip not matching safezone id
         if (data.safeLocId != id)

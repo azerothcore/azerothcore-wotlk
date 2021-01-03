@@ -4,7 +4,7 @@
 /**
  *  @file    SV_Message_Queue.h
  *
- *  @author Douglas C. Schmidt <schmidt@uci.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //===========================================================================
 
@@ -43,7 +43,6 @@ public:
     ACE_NOWAIT = IPC_NOWAIT
   };
 
-  // = Initialization and termination methods.
   /// Open a message queue using the <external_id>.
   ACE_SV_Message_Queue (void);
   ACE_SV_Message_Queue (key_t external_id,

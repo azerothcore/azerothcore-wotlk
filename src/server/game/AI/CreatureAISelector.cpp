@@ -32,7 +32,7 @@ namespace FactorySelector
                 return scriptedAI;
 
         // AIname in db
-        std::string ainame=creature->GetAIName();
+        std::string ainame = creature->GetAIName();
         if (!ai_factory && !ainame.empty())
             ai_factory = ai_registry.GetRegistryItem(ainame);
 

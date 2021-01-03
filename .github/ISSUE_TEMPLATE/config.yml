@@ -1,9 +1,10 @@
 blank_issues_enabled: false
 contact_links:
   - name: Website
-    url: http://www.azerothcore.org
+    url: https://www.azerothcore.org
+    about: On the AC website you can find a lot of things, such as existing modules.
   - name: Wiki
-    url: azerothcore.org/wiki
+    url: https://www.azerothcore.org/wiki
     about: You can find plenty of information on our Wiki.
   - name: How to ask for help
     url: https://www.azerothcore.org/wiki/How-to-ask-for-help

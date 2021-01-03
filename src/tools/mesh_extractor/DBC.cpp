@@ -58,7 +58,7 @@ std::string DBC::GetStringByOffset( int offset )
             break;
         }
     }
-    char* d = new char[len+1];
+    char* d = new char[len + 1];
     strcpy(d, (const char*)(StringBlock + offset));
     d[len] = '\0';
     std::string val = std::string(d);

@@ -7,7 +7,6 @@
 #ifndef QUERYRESULT_H
 #define QUERYRESULT_H
 
-#include "AutoPtr.h"
 #include <ace/Thread_Mutex.h>
 
 #include "Errors.h"
@@ -29,12 +28,12 @@ public:
     ~ResultSet();
 
     bool NextRow();
-    uint64 GetRowCount() const { return _rowCount; }
-    uint32 GetFieldCount() const { return _fieldCount; }
+    [[nodiscard]] uint64 GetRowCount() const { return _rowCount; }
+    [[nodiscard]] uint32 GetFieldCount() const { return _fieldCount; }
 #ifdef ELUNA
     std::string GetFieldName(uint32 index) const;
 #endif
-    Field* Fetch() const { return _currentRow; }
+    [[nodiscard]] Field* Fetch() const { return _currentRow; }
     const Field& operator [] (uint32 index) const
     {
         ASSERT(index < _fieldCount);
@@ -52,7 +51,7 @@ private:
     MYSQL_FIELD* _fields;
 };
 
-typedef acore::AutoPtr<ResultSet, ACE_Thread_Mutex> QueryResult;
+typedef std::shared_ptr<ResultSet> QueryResult;
 
 class PreparedResultSet
 {
@@ -61,10 +60,10 @@ public:
     ~PreparedResultSet();
 
     bool NextRow();
-    uint64 GetRowCount() const { return m_rowCount; }
-    uint32 GetFieldCount() const { return m_fieldCount; }
+    [[nodiscard]] uint64 GetRowCount() const { return m_rowCount; }
+    [[nodiscard]] uint32 GetFieldCount() const { return m_fieldCount; }
 
-    Field* Fetch() const
+    [[nodiscard]] Field* Fetch() const
     {
         ASSERT(m_rowPosition < m_rowCount);
         return m_rows[uint32(m_rowPosition)];
@@ -97,7 +96,7 @@ private:
 
 };
 
-typedef acore::AutoPtr<PreparedResultSet, ACE_Thread_Mutex> PreparedQueryResult;
+typedef std::shared_ptr<PreparedResultSet> PreparedQueryResult;
 
 #endif
 

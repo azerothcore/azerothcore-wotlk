@@ -80,8 +80,7 @@ void SmartWaypointMgr::LoadFromDB()
 
         last_entry = entry;
         total++;
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     sLog->outString(">> Loaded %u SmartAI waypoint paths (total %u waypoints) in %u ms", count, total, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
@@ -141,32 +140,32 @@ void SmartAIMgr::LoadSmartAIFromDB()
             switch (source_type)
             {
                 case SMART_SCRIPT_TYPE_CREATURE:
-                {
-                    if (!sObjectMgr->GetCreatureTemplate((uint32)temp.entryOrGuid))
                     {
-                        sLog->outErrorDb("SmartAIMgr::LoadSmartAIFromDB: Creature entry (%u) does not exist, skipped loading.", uint32(temp.entryOrGuid));
-                        continue;
+                        if (!sObjectMgr->GetCreatureTemplate((uint32)temp.entryOrGuid))
+                        {
+                            sLog->outErrorDb("SmartAIMgr::LoadSmartAIFromDB: Creature entry (%u) does not exist, skipped loading.", uint32(temp.entryOrGuid));
+                            continue;
+                        }
+                        break;
                     }
-                    break;
-                }
                 case SMART_SCRIPT_TYPE_GAMEOBJECT:
-                {
-                    if (!sObjectMgr->GetGameObjectTemplate((uint32)temp.entryOrGuid))
                     {
-                        sLog->outErrorDb("SmartAIMgr::LoadSmartAIFromDB: GameObject entry (%u) does not exist, skipped loading.", uint32(temp.entryOrGuid));
-                        continue;
+                        if (!sObjectMgr->GetGameObjectTemplate((uint32)temp.entryOrGuid))
+                        {
+                            sLog->outErrorDb("SmartAIMgr::LoadSmartAIFromDB: GameObject entry (%u) does not exist, skipped loading.", uint32(temp.entryOrGuid));
+                            continue;
+                        }
+                        break;
                     }
-                    break;
-                }
                 case SMART_SCRIPT_TYPE_AREATRIGGER:
-                {
-                    if (!sObjectMgr->GetAreaTrigger((uint32)temp.entryOrGuid))
                     {
-                        sLog->outErrorDb("SmartAIMgr::LoadSmartAIFromDB: AreaTrigger entry (%u) does not exist, skipped loading.", uint32(temp.entryOrGuid));
-                        continue;
+                        if (!sObjectMgr->GetAreaTrigger((uint32)temp.entryOrGuid))
+                        {
+                            sLog->outErrorDb("SmartAIMgr::LoadSmartAIFromDB: AreaTrigger entry (%u) does not exist, skipped loading.", uint32(temp.entryOrGuid));
+                            continue;
+                        }
+                        break;
                     }
-                    break;
-                }
                 case SMART_SCRIPT_TYPE_TIMED_ACTIONLIST:
                     break;//nothing to check, really
                 default:
@@ -269,8 +268,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
         }
         // store the new event
         mEventMap[source_type][temp.entryOrGuid].push_back(temp);
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     sLog->outString(">> Loaded %u SmartAI scripts in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
@@ -284,46 +282,46 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
     {
         case SMART_TARGET_CREATURE_DISTANCE:
         case SMART_TARGET_CREATURE_RANGE:
-        {
-            if (e.target.unitDistance.creature && !sObjectMgr->GetCreatureTemplate(e.target.unitDistance.creature))
             {
-                sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Creature entry %u as target_param1, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.target.unitDistance.creature);
-                return false;
+                if (e.target.unitDistance.creature && !sObjectMgr->GetCreatureTemplate(e.target.unitDistance.creature))
+                {
+                    sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent Creature entry %u as target_param1, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.target.unitDistance.creature);
+                    return false;
+                }
+                break;
             }
-            break;
-        }
         case SMART_TARGET_GAMEOBJECT_DISTANCE:
         case SMART_TARGET_GAMEOBJECT_RANGE:
-        {
-            if (e.target.goDistance.entry && !sObjectMgr->GetGameObjectTemplate(e.target.goDistance.entry))
             {
-                sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent GameObject entry %u as target_param1, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.target.goDistance.entry);
-                return false;
+                if (e.target.goDistance.entry && !sObjectMgr->GetGameObjectTemplate(e.target.goDistance.entry))
+                {
+                    sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses non-existent GameObject entry %u as target_param1, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.target.goDistance.entry);
+                    return false;
+                }
+                break;
             }
-            break;
-        }
         case SMART_TARGET_CREATURE_GUID:
-        {
-            if (e.target.unitGUID.entry && !IsCreatureValid(e, e.target.unitGUID.entry))
-                return false;
-            break;
-        }
+            {
+                if (e.target.unitGUID.entry && !IsCreatureValid(e, e.target.unitGUID.entry))
+                    return false;
+                break;
+            }
         case SMART_TARGET_GAMEOBJECT_GUID:
-        {
-            if (e.target.goGUID.entry && !IsGameObjectValid(e, e.target.goGUID.entry))
-                return false;
-            break;
-        }
+            {
+                if (e.target.goGUID.entry && !IsGameObjectValid(e, e.target.goGUID.entry))
+                    return false;
+                break;
+            }
         case SMART_TARGET_PLAYER_DISTANCE:
         case SMART_TARGET_CLOSEST_PLAYER:
-        {
-            if (e.target.playerDistance.dist == 0)
             {
-                sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u has maxDist 0 as target_param1, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
-                return false;
+                if (e.target.playerDistance.dist == 0)
+                {
+                    sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u has maxDist 0 as target_param1, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                    return false;
+                }
+                break;
             }
-            break;
-        }
         case SMART_TARGET_PLAYER_RANGE:
         case SMART_TARGET_SELF:
         case SMART_TARGET_VICTIM:
@@ -369,8 +367,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         return false;
     }
     if (e.action.type <= 0
-        || (e.action.type >= SMART_ACTION_TC_END && e.action.type <= SMART_ACTION_AC_START)
-        || e.action.type >= SMART_ACTION_AC_END)
+            || (e.action.type >= SMART_ACTION_TC_END && e.action.type <= SMART_ACTION_AC_START)
+            || e.action.type >= SMART_ACTION_AC_END)
     {
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an invalid action type (%u), skipped.", e.entryOrGuid, e.event_id, e.GetActionType());
         return false;
@@ -402,12 +400,13 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
     if (e.target.type < 0 || (e.target.type >= SMART_TARGET_TC_END && e.target.type < SMART_TARGET_AC_START) || e.target.type >= SMART_TARGET_AC_END)
     {
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has an invalid target type (%u), skipped.",
-                e.entryOrGuid, e.event_id, e.GetTargetType());
+                         e.entryOrGuid, e.event_id, e.GetTargetType());
         return false;
     }
-    if (e.target.type == SMART_TARGET_LOOT_RECIPIENTS || e.target.type == SMART_TARGET_VEHICLE_PASSENGER) {
+    if (e.target.type == SMART_TARGET_LOOT_RECIPIENTS || e.target.type == SMART_TARGET_VEHICLE_PASSENGER)
+    {
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has a target type that is not yet supported on AzerothCore (%u), skipped.",
-                e.entryOrGuid, e.event_id, e.GetTargetType());
+                         e.entryOrGuid, e.event_id, e.GetTargetType());
         return false;
     }
     if (e.event.event_phase_mask > SMART_EVENT_PHASE_ALL)
@@ -472,7 +471,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 break;
             case SMART_EVENT_OOC_LOS:
             case SMART_EVENT_IC_LOS:
-                if (!IsMinMaxValid(e, e.event.los.cooldownMin, e.event.los.cooldownMax)) {
+                if (!IsMinMaxValid(e, e.event.los.cooldownMin, e.event.los.cooldownMax))
+                {
                     return false;
                 }
 
@@ -501,17 +501,17 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
                 break;
             case SMART_EVENT_FRIENDLY_MISSING_BUFF:
-            {
-                if (!IsSpellValid(e, e.event.missingBuff.spell))
-                    return false;
+                {
+                    if (!IsSpellValid(e, e.event.missingBuff.spell))
+                        return false;
 
-                if (!NotNULL(e, e.event.missingBuff.radius))
-                    return false;
+                    if (!NotNULL(e, e.event.missingBuff.radius))
+                        return false;
 
-                if (!IsMinMaxValid(e, e.event.missingBuff.repeatMin, e.event.missingBuff.repeatMax))
-                    return false;
-                break;
-            }
+                    if (!IsMinMaxValid(e, e.event.missingBuff.repeatMin, e.event.missingBuff.repeatMax))
+                        return false;
+                    break;
+                }
             case SMART_EVENT_KILL:
                 if (!IsMinMaxValid(e, e.event.kill.cooldownMin, e.event.kill.cooldownMax))
                     return false;
@@ -548,84 +548,84 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
                 break;
             case SMART_EVENT_RECEIVE_EMOTE:
-            {
-                if (e.event.emote.emote && !IsTextEmoteValid(e, e.event.emote.emote))
-                    return false;
+                {
+                    if (e.event.emote.emote && !IsTextEmoteValid(e, e.event.emote.emote))
+                        return false;
 
-                if (!IsMinMaxValid(e, e.event.emote.cooldownMin, e.event.emote.cooldownMax))
-                    return false;
-                break;
-            }
+                    if (!IsMinMaxValid(e, e.event.emote.cooldownMin, e.event.emote.cooldownMax))
+                        return false;
+                    break;
+                }
             case SMART_EVENT_HAS_AURA:
             case SMART_EVENT_TARGET_BUFFED:
-            {
-                if (!IsSpellValid(e, e.event.aura.spell))
-                    return false;
-
-                if (!IsMinMaxValid(e, e.event.aura.repeatMin, e.event.aura.repeatMax))
-                    return false;
-                break;
-            }
-            case SMART_EVENT_TRANSPORT_ADDCREATURE:
-            {
-                if (e.event.transportAddCreature.creature && !IsCreatureValid(e, e.event.transportAddCreature.creature))
-                    return false;
-                break;
-            }
-            case SMART_EVENT_MOVEMENTINFORM:
-            {
-                if (e.event.movementInform.type > NULL_MOTION_TYPE)
                 {
-                    sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses invalid Motion type %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.movementInform.type);
-                    return false;
+                    if (!IsSpellValid(e, e.event.aura.spell))
+                        return false;
+
+                    if (!IsMinMaxValid(e, e.event.aura.repeatMin, e.event.aura.repeatMax))
+                        return false;
+                    break;
                 }
-                break;
-            }
+            case SMART_EVENT_TRANSPORT_ADDCREATURE:
+                {
+                    if (e.event.transportAddCreature.creature && !IsCreatureValid(e, e.event.transportAddCreature.creature))
+                        return false;
+                    break;
+                }
+            case SMART_EVENT_MOVEMENTINFORM:
+                {
+                    if (e.event.movementInform.type > NULL_MOTION_TYPE)
+                    {
+                        sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses invalid Motion type %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.movementInform.type);
+                        return false;
+                    }
+                    break;
+                }
             case SMART_EVENT_DATA_SET:
-            {
-                if (!IsMinMaxValid(e, e.event.dataSet.cooldownMin, e.event.dataSet.cooldownMax))
-                    return false;
-                break;
-            }
+                {
+                    if (!IsMinMaxValid(e, e.event.dataSet.cooldownMin, e.event.dataSet.cooldownMax))
+                        return false;
+                    break;
+                }
             case SMART_EVENT_AREATRIGGER_ONTRIGGER:
-            {
-                if (e.event.areatrigger.id && !IsAreaTriggerValid(e, e.event.areatrigger.id))
-                    return false;
-                break;
-            }
+                {
+                    if (e.event.areatrigger.id && !IsAreaTriggerValid(e, e.event.areatrigger.id))
+                        return false;
+                    break;
+                }
             case SMART_EVENT_TEXT_OVER:
                 //if (e.event.textOver.textGroupID && !IsTextValid(e, e.event.textOver.textGroupID)) return false;// 0 is a valid text group!
                 break;
             case SMART_EVENT_LINK:
-            {
-                if (e.link && e.link == e.event_id)
                 {
-                    sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u, Event %u, Link Event is linking self (infinite loop), skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id);
-                    return false;
+                    if (e.link && e.link == e.event_id)
+                    {
+                        sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u, Event %u, Link Event is linking self (infinite loop), skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id);
+                        return false;
+                    }
+                    break;
                 }
-                break;
-            }
             case SMART_EVENT_IS_BEHIND_TARGET:
                 if (!IsMinMaxValid(e, e.event.behindTarget.cooldownMin, e.event.behindTarget.cooldownMax))
                     return false;
                 break;
             case SMART_EVENT_GAME_EVENT_START:
             case SMART_EVENT_GAME_EVENT_END:
-            {
-                GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
-                if (e.event.gameEvent.gameEventId >= events.size() || !events[e.event.gameEvent.gameEventId].isValid())
-                    return false;
-                break;
-            }
-            case SMART_EVENT_ACTION_DONE:
-            {
-                if (e.event.doAction.eventId > EVENT_CHARGE)
                 {
-                    sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses invalid event id %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.doAction.eventId);
-                    return false;
+                    GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
+                    if (e.event.gameEvent.gameEventId >= events.size() || !events[e.event.gameEvent.gameEventId].isValid())
+                        return false;
+                    break;
                 }
-                break;
-            }
+            case SMART_EVENT_ACTION_DONE:
+                {
+                    if (e.event.doAction.eventId > EVENT_CHARGE)
+                    {
+                        sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u uses invalid event id %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.doAction.eventId);
+                        return false;
+                    }
+                    break;
+                }
             case SMART_EVENT_FRIENDLY_HEALTH_PCT:
                 if (!IsMinMaxValid(e, e.event.friendlyHealthPct.repeatMin, e.event.friendlyHealthPct.repeatMax))
                     return false;
@@ -898,7 +898,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_EVENT_PHASE:
             if (e.action.setEventPhase.phase >= SMART_EVENT_PHASE_MAX)
             {
-                sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u attempts to set phase %u. Phase mask cannot be used past phase %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.setEventPhase.phase, SMART_EVENT_PHASE_MAX-1);
+                sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u attempts to set phase %u. Phase mask cannot be used past phase %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.setEventPhase.phase, SMART_EVENT_PHASE_MAX - 1);
                 return false;
             }
             break;
@@ -921,21 +921,21 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_RANDOM_PHASE:
             {
                 if (e.action.randomPhase.phase1 >= SMART_EVENT_PHASE_MAX ||
-                    e.action.randomPhase.phase2 >= SMART_EVENT_PHASE_MAX ||
-                    e.action.randomPhase.phase3 >= SMART_EVENT_PHASE_MAX ||
-                    e.action.randomPhase.phase4 >= SMART_EVENT_PHASE_MAX ||
-                    e.action.randomPhase.phase5 >= SMART_EVENT_PHASE_MAX ||
-                    e.action.randomPhase.phase6 >= SMART_EVENT_PHASE_MAX)
+                        e.action.randomPhase.phase2 >= SMART_EVENT_PHASE_MAX ||
+                        e.action.randomPhase.phase3 >= SMART_EVENT_PHASE_MAX ||
+                        e.action.randomPhase.phase4 >= SMART_EVENT_PHASE_MAX ||
+                        e.action.randomPhase.phase5 >= SMART_EVENT_PHASE_MAX ||
+                        e.action.randomPhase.phase6 >= SMART_EVENT_PHASE_MAX)
                 {
                     sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u attempts to set invalid phase, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                     return false;
                 }
                 if (e.action.randomPhase.phase1 == 0 &&
-                    e.action.randomPhase.phase2 == 0 &&
-                    e.action.randomPhase.phase3 == 0 &&
-                    e.action.randomPhase.phase4 == 0 &&
-                    e.action.randomPhase.phase5 == 0 &&
-                    e.action.randomPhase.phase6 == 0)
+                        e.action.randomPhase.phase2 == 0 &&
+                        e.action.randomPhase.phase3 == 0 &&
+                        e.action.randomPhase.phase4 == 0 &&
+                        e.action.randomPhase.phase5 == 0 &&
+                        e.action.randomPhase.phase6 == 0)
                 {
                     sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u attempts to set invalid phase, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                     return false;
@@ -945,7 +945,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_RANDOM_PHASE_RANGE:       //PhaseMin, PhaseMax
             {
                 if (e.action.randomPhaseRange.phaseMin >= SMART_EVENT_PHASE_MAX ||
-                    e.action.randomPhaseRange.phaseMax >= SMART_EVENT_PHASE_MAX)
+                        e.action.randomPhaseRange.phaseMax >= SMART_EVENT_PHASE_MAX)
                 {
                     sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u attempts to set invalid phase, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                     return false;
@@ -1034,20 +1034,20 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 break;
             }
         case SMART_ACTION_CREATE_TIMED_EVENT:
-        {
-            if (!IsMinMaxValid(e, e.action.timeEvent.min, e.action.timeEvent.max))
-                return false;
+            {
+                if (!IsMinMaxValid(e, e.action.timeEvent.min, e.action.timeEvent.max))
+                    return false;
 
-            if (!IsMinMaxValid(e, e.action.timeEvent.repeatMin, e.action.timeEvent.repeatMax))
-                return false;
-            break;
-        }
+                if (!IsMinMaxValid(e, e.action.timeEvent.repeatMin, e.action.timeEvent.repeatMax))
+                    return false;
+                break;
+            }
         case SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST:
-        {
-            if (!IsMinMaxValid(e, e.action.randTimedActionList.entry1, e.action.randTimedActionList.entry2))
-                return false;
-            break;
-        }
+            {
+                if (!IsMinMaxValid(e, e.action.randTimedActionList.entry1, e.action.randTimedActionList.entry2))
+                    return false;
+                break;
+            }
         case SMART_ACTION_SET_POWER:
         case SMART_ACTION_ADD_POWER:
         case SMART_ACTION_REMOVE_POWER:
@@ -1058,82 +1058,82 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             }
             break;
         case SMART_ACTION_GAME_EVENT_STOP:
-        {
-            return false;
-            uint32 eventId = e.action.gameEventStop.id;
-
-            GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
-            if (eventId < 1 || eventId >= events.size())
             {
-                sLog->outError("SmartAIMgr: Entry %u SourceType %u Event %u Action %u uses non-existent event, eventId %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.gameEventStop.id);
                 return false;
-            }
+                uint32 eventId = e.action.gameEventStop.id;
 
-            GameEventData const& eventData = events[eventId];
-            if (!eventData.isValid())
-            {
-                sLog->outError("SmartAIMgr: Entry %u SourceType %u Event %u Action %u uses non-existent event, eventId %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.gameEventStop.id);
-                return false;
-            }
-            break;
-        }
-        case SMART_ACTION_GAME_EVENT_START:
-        {
-            return false;
-            uint32 eventId = e.action.gameEventStart.id;
-
-            GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
-            if (eventId < 1 || eventId >= events.size())
-            {
-                sLog->outError("SmartAIMgr: Entry %u SourceType %u Event %u Action %u uses non-existent event, eventId %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.gameEventStart.id);
-                return false;
-            }
-
-            GameEventData const& eventData = events[eventId];
-            if (!eventData.isValid())
-            {
-                sLog->outError("SmartAIMgr: Entry %u SourceType %u Event %u Action %u uses non-existent event, eventId %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.gameEventStart.id);
-                return false;
-            }
-            break;
-        }
-        case SMART_ACTION_EQUIP:
-        {
-
-            if (e.GetScriptType() == SMART_SCRIPT_TYPE_CREATURE)
-            {
-                int8 equipId = (int8)e.action.equip.entry;
-
-                if (equipId)
+                GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
+                if (eventId < 1 || eventId >= events.size())
                 {
-                    EquipmentInfo const* einfo = sObjectMgr->GetEquipmentInfo(e.entryOrGuid, equipId);
-                    if (!einfo)
+                    sLog->outError("SmartAIMgr: Entry %u SourceType %u Event %u Action %u uses non-existent event, eventId %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.gameEventStop.id);
+                    return false;
+                }
+
+                GameEventData const& eventData = events[eventId];
+                if (!eventData.isValid())
+                {
+                    sLog->outError("SmartAIMgr: Entry %u SourceType %u Event %u Action %u uses non-existent event, eventId %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.gameEventStop.id);
+                    return false;
+                }
+                break;
+            }
+        case SMART_ACTION_GAME_EVENT_START:
+            {
+                return false;
+                uint32 eventId = e.action.gameEventStart.id;
+
+                GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
+                if (eventId < 1 || eventId >= events.size())
+                {
+                    sLog->outError("SmartAIMgr: Entry %u SourceType %u Event %u Action %u uses non-existent event, eventId %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.gameEventStart.id);
+                    return false;
+                }
+
+                GameEventData const& eventData = events[eventId];
+                if (!eventData.isValid())
+                {
+                    sLog->outError("SmartAIMgr: Entry %u SourceType %u Event %u Action %u uses non-existent event, eventId %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.gameEventStart.id);
+                    return false;
+                }
+                break;
+            }
+        case SMART_ACTION_EQUIP:
+            {
+
+                if (e.GetScriptType() == SMART_SCRIPT_TYPE_CREATURE)
+                {
+                    int8 equipId = (int8)e.action.equip.entry;
+
+                    if (equipId)
                     {
-                        sLog->outError("SmartScript: SMART_ACTION_EQUIP uses non-existent equipment info id %u for creature %u, skipped.", equipId, e.entryOrGuid);
-                        return false;
+                        EquipmentInfo const* einfo = sObjectMgr->GetEquipmentInfo(e.entryOrGuid, equipId);
+                        if (!einfo)
+                        {
+                            sLog->outError("SmartScript: SMART_ACTION_EQUIP uses non-existent equipment info id %u for creature %u, skipped.", equipId, e.entryOrGuid);
+                            return false;
+                        }
                     }
                 }
+                break;
             }
-            break;
-        }
         case SMART_ACTION_LOAD_GRID:
-        {
-            if (!acore::IsValidMapCoord(e.target.x, e.target.y))
             {
-                sLog->outError("SmartScript: SMART_ACTION_LOAD_GRID uses invalid map coords: %u, skipped.", e.entryOrGuid);
-                return false;
+                if (!acore::IsValidMapCoord(e.target.x, e.target.y))
+                {
+                    sLog->outError("SmartScript: SMART_ACTION_LOAD_GRID uses invalid map coords: %u, skipped.", e.entryOrGuid);
+                    return false;
+                }
+                break;
             }
-            break;
-        }
         case SMART_ACTION_SET_IN_COMBAT_WITH_ZONE:
-        {
-            if (e.GetScriptType() == SMART_SCRIPT_TYPE_GAMEOBJECT)
             {
-                sLog->outErrorDb("SmartScript: action_type %u is not allowed with source_type %u. Entry %u, skipped.", e.GetActionType(), e.GetScriptType(), e.entryOrGuid);
-                return false;
+                if (e.GetScriptType() == SMART_SCRIPT_TYPE_GAMEOBJECT)
+                {
+                    sLog->outErrorDb("SmartScript: action_type %u is not allowed with source_type %u. Entry %u, skipped.", e.GetActionType(), e.GetScriptType(), e.entryOrGuid);
+                    return false;
+                }
+                break;
             }
-            break;
-        }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         case SMART_ACTION_FOLLOW:
         case SMART_ACTION_SET_ORIENTATION:

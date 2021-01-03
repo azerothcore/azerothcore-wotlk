@@ -35,7 +35,7 @@ class boss_azgalor : public CreatureScript
 public:
     boss_azgalor() : CreatureScript("boss_azgalor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_azgalorAI>(creature);
     }
@@ -57,7 +57,7 @@ public:
 
         bool go;
 
-        void Reset()
+        void Reset() override
         {
             damageTaken = 0;
             RainTimer = 20000;
@@ -71,7 +71,7 @@ public:
                 instance->SetData(DATA_AZGALOREVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if (IsEvent)
                 instance->SetData(DATA_AZGALOREVENT, IN_PROGRESS);
@@ -79,12 +79,12 @@ public:
             Talk(SAY_ONAGGRO);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_ONSLAY);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             if (waypointId == 7 && instance)
             {
@@ -94,7 +94,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             hyjal_trashAI::JustDied(killer);
             if (IsEvent)
@@ -102,7 +102,7 @@ public:
             Talk(SAY_ONDEATH);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (IsEvent)
             {
@@ -131,26 +131,30 @@ public:
             if (RainTimer <= diff)
             {
                 DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true), SPELL_RAIN_OF_FIRE);
-                RainTimer = 20000+rand()%15000;
-            } else RainTimer -= diff;
+                RainTimer = 20000 + rand() % 15000;
+            }
+            else RainTimer -= diff;
 
             if (DoomTimer <= diff)
             {
                 DoCast(SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true), SPELL_DOOM);//never on tank
-                DoomTimer = 45000+rand()%5000;
-            } else DoomTimer -= diff;
+                DoomTimer = 45000 + rand() % 5000;
+            }
+            else DoomTimer -= diff;
 
             if (HowlTimer <= diff)
             {
                 DoCast(me, SPELL_HOWL_OF_AZGALOR);
                 HowlTimer = 30000;
-            } else HowlTimer -= diff;
+            }
+            else HowlTimer -= diff;
 
             if (CleaveTimer <= diff)
             {
                 DoCastVictim(SPELL_CLEAVE);
-                CleaveTimer = 10000+rand()%5000;
-            } else CleaveTimer -= diff;
+                CleaveTimer = 10000 + rand() % 5000;
+            }
+            else CleaveTimer -= diff;
 
             if (EnrageTimer < diff && !enraged)
             {
@@ -158,7 +162,8 @@ public:
                 DoCast(me, SPELL_BERSERK, true);
                 enraged = true;
                 EnrageTimer = 600000;
-            } else EnrageTimer -= diff;
+            }
+            else EnrageTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -171,7 +176,7 @@ class npc_lesser_doomguard : public CreatureScript
 public:
     npc_lesser_doomguard() : CreatureScript("npc_lesser_doomguard") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_lesser_doomguardAI>(creature);
     }
@@ -190,7 +195,7 @@ public:
         uint64 AzgalorGUID;
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() override
         {
             CrippleTimer = 50000;
             WarstompTimer = 10000;
@@ -198,30 +203,30 @@ public:
             CheckTimer = 5000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
         }
 
-        void WaypointReached(uint32 /*waypointId*/)
+        void WaypointReached(uint32 /*waypointId*/) override
         {
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (me->IsWithinDist(who, 50) && !me->IsInCombat() && me->IsValidAttackTarget(who))
                 AttackStart(who);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (CheckTimer <= diff)
             {
@@ -236,7 +241,8 @@ public:
                     }
                 }
                 CheckTimer = 5000;
-            } else CheckTimer -= diff;
+            }
+            else CheckTimer -= diff;
 
             //Return since we have no target
             if (!UpdateVictim())
@@ -245,14 +251,16 @@ public:
             if (WarstompTimer <= diff)
             {
                 DoCast(me, SPELL_WARSTOMP);
-                WarstompTimer = 10000+rand()%5000;
-            } else WarstompTimer -= diff;
+                WarstompTimer = 10000 + rand() % 5000;
+            }
+            else WarstompTimer -= diff;
 
             if (CrippleTimer <= diff)
             {
                 DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true), SPELL_CRIPPLE);
-                CrippleTimer = 25000+rand()%5000;
-            } else CrippleTimer -= diff;
+                CrippleTimer = 25000 + rand() % 5000;
+            }
+            else CrippleTimer -= diff;
 
             DoMeleeAttackIfReady();
         }

@@ -57,7 +57,7 @@ namespace ArenaSpectator
     void CreatePacket(WorldPacket& data, const char* m)
     {
         size_t len = strlen(m);
-        data.Initialize(SMSG_MESSAGECHAT, 1+4+8+4+8+4+1+len+1);
+        data.Initialize(SMSG_MESSAGECHAT, 1 + 4 + 8 + 4 + 8 + 4 + 1 + len + 1);
         data << uint8(CHAT_MSG_WHISPER);
         data << uint32(LANG_ADDON);
         data << uint64(0);
@@ -87,7 +87,7 @@ namespace ArenaSpectator
         bg->SpectatorsSendPacket(data);
     }
 
-    template<class T> 
+    template<class T>
     void SendCommand_String(T* o, uint64 targetGUID, const char* prefix, const char* c)
     {
         if (!IS_PLAYER_GUID(targetGUID))
@@ -163,29 +163,29 @@ namespace ArenaSpectator
             SendCommand_UInt32Value(p, itr->first, "STA", plr->IsAlive() ? 1 : 0);
             Powers ptype = plr->getPowerType();
             SendCommand_UInt32Value(p, itr->first, "PWT", ptype);
-            SendCommand_UInt32Value(p, itr->first, "MPW", ptype == POWER_RAGE || ptype == POWER_RUNIC_POWER ? plr->GetMaxPower(ptype)/10 : plr->GetMaxPower(ptype));
-            SendCommand_UInt32Value(p, itr->first, "CPW", ptype == POWER_RAGE || ptype == POWER_RUNIC_POWER ? plr->GetPower(ptype)/10 : plr->GetPower(ptype));
+            SendCommand_UInt32Value(p, itr->first, "MPW", ptype == POWER_RAGE || ptype == POWER_RUNIC_POWER ? plr->GetMaxPower(ptype) / 10 : plr->GetMaxPower(ptype));
+            SendCommand_UInt32Value(p, itr->first, "CPW", ptype == POWER_RAGE || ptype == POWER_RUNIC_POWER ? plr->GetPower(ptype) / 10 : plr->GetPower(ptype));
             Pet* pet = plr->GetPet();
             SendCommand_UInt32Value(p, itr->first, "PHP", pet && pet->GetCreatureTemplate()->family ? (uint32)pet->GetHealthPct() : 0);
             SendCommand_UInt32Value(p, itr->first, "PET", pet ? pet->GetCreatureTemplate()->family : 0);
             SendCommand_GUID(p, itr->first, "TRG", plr->GetTarget());
             SendCommand_UInt32Value(p, itr->first, "RES", 1);
             SendCommand_UInt32Value(p, itr->first, "CDC", 1);
-            SendCommand_UInt32Value(p, itr->first, "TIM", (bg->GetStartTime() < 46*MINUTE*IN_MILLISECONDS) ? (46*MINUTE*IN_MILLISECONDS-bg->GetStartTime())/IN_MILLISECONDS : 0);
+            SendCommand_UInt32Value(p, itr->first, "TIM", (bg->GetStartTime() < 46 * MINUTE * IN_MILLISECONDS) ? (46 * MINUTE * IN_MILLISECONDS - bg->GetStartTime()) / IN_MILLISECONDS : 0);
             // "SPE" not here (only possible to send starting a new cast)
 
             // send all "CD"
             SpellCooldowns const& sc = plr->GetSpellCooldownMap();
             for (SpellCooldowns::const_iterator itrc = sc.begin(); itrc != sc.end(); ++itrc)
-                if (itrc->second.sendToSpectator && itrc->second.maxduration >= SPECTATOR_COOLDOWN_MIN*IN_MILLISECONDS && itrc->second.maxduration <= SPECTATOR_COOLDOWN_MAX*IN_MILLISECONDS)
-                    if (uint32 cd = (getMSTimeDiff(World::GetGameTimeMS(), itrc->second.end)/1000))
-                        SendCommand_Cooldown(p, itr->first, "ACD", itrc->first, cd, itrc->second.maxduration/1000);
+                if (itrc->second.sendToSpectator && itrc->second.maxduration >= SPECTATOR_COOLDOWN_MIN * IN_MILLISECONDS && itrc->second.maxduration <= SPECTATOR_COOLDOWN_MAX * IN_MILLISECONDS)
+                    if (uint32 cd = (getMSTimeDiff(World::GetGameTimeMS(), itrc->second.end) / 1000))
+                        SendCommand_Cooldown(p, itr->first, "ACD", itrc->first, cd, itrc->second.maxduration / 1000);
 
             // send all visible "AUR"
-            Unit::VisibleAuraMap const *visibleAuras = plr->GetVisibleAuras();
+            Unit::VisibleAuraMap const* visibleAuras = plr->GetVisibleAuras();
             for (Unit::VisibleAuraMap::const_iterator aitr = visibleAuras->begin(); aitr != visibleAuras->end(); ++aitr)
             {
-                Aura *aura = aitr->second->GetBase();
+                Aura* aura = aitr->second->GetBase();
                 if (ShouldSendAura(aura, aitr->second->GetEffectMask(), plr->GetGUID(), false))
                     SendCommand_Aura(p, itr->first, "AUR", aura->GetCasterGUID(), aura->GetSpellInfo()->Id, aura->GetSpellInfo()->IsPositive(), aura->GetSpellInfo()->Dispel, aura->GetDuration(), aura->GetMaxDuration(), (aura->GetCharges() > 1 ? aura->GetCharges() : aura->GetStackAmount()), false);
             }
@@ -200,13 +200,13 @@ namespace ArenaSpectator
         if (remove || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH) || aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_GENERIC)
             return true;
 
-        for(uint8 i=EFFECT_0; i<MAX_SPELL_EFFECTS; ++i)
+        for(uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
         {
-            if (effMask & (1<<i))
+            if (effMask & (1 << i))
             {
                 AuraType at = aura->GetEffect(i)->GetAuraType();
-                if ((aura->GetEffect(i)->GetAmount() && (aura->GetSpellInfo()->IsPositive() || targetGUID != aura->GetCasterGUID())) || 
-                    at == SPELL_AURA_MECHANIC_IMMUNITY || at == SPELL_AURA_EFFECT_IMMUNITY || at == SPELL_AURA_STATE_IMMUNITY || at == SPELL_AURA_SCHOOL_IMMUNITY || at == SPELL_AURA_DISPEL_IMMUNITY)
+                if ((aura->GetEffect(i)->GetAmount() && (aura->GetSpellInfo()->IsPositive() || targetGUID != aura->GetCasterGUID())) ||
+                        at == SPELL_AURA_MECHANIC_IMMUNITY || at == SPELL_AURA_EFFECT_IMMUNITY || at == SPELL_AURA_STATE_IMMUNITY || at == SPELL_AURA_SCHOOL_IMMUNITY || at == SPELL_AURA_DISPEL_IMMUNITY)
                     return true;
             }
         }

@@ -154,16 +154,16 @@ PoolObject* PoolGroup<T>::RollOne(ActivePoolData& spawns, uint32 triggerFrom)
             // Triggering object is marked as spawned at this time and can be also rolled (respawn case)
             // so this need explicit check for this case
             if (roll < 0 && (ExplicitlyChanced[i].guid == triggerFrom || !spawns.IsActiveObject<T>(ExplicitlyChanced[i].guid)))
-               return &ExplicitlyChanced[i];
+                return &ExplicitlyChanced[i];
         }
     }
     if (!EqualChanced.empty())
     {
-        int32 index = irand(0, EqualChanced.size()-1);
+        int32 index = irand(0, EqualChanced.size() - 1);
         // Triggering object is marked as spawned at this time and can be also rolled (respawn case)
         // so this need explicit check for this case
         if (EqualChanced[index].guid == triggerFrom || !spawns.IsActiveObject<T>(EqualChanced[index].guid))
-           return &EqualChanced[index];
+            return &EqualChanced[index];
     }
 
     return nullptr;
@@ -175,7 +175,7 @@ PoolObject* PoolGroup<T>::RollOne(ActivePoolData& spawns, uint32 triggerFrom)
 template<class T>
 void PoolGroup<T>::DespawnObject(ActivePoolData& spawns, uint32 guid)
 {
-    for (size_t i=0; i < EqualChanced.size(); ++i)
+    for (size_t i = 0; i < EqualChanced.size(); ++i)
     {
         // if spawned
         if (spawns.IsActiveObject<T>(EqualChanced[i].guid))
@@ -576,8 +576,7 @@ void PoolMgr::LoadFromDB()
             pPoolTemplate.MaxLimit  = fields[1].GetUInt32();
 
             ++count;
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
 
         sLog->outString(">> Loaded %u objects pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
         sLog->outString();
@@ -634,8 +633,7 @@ void PoolMgr::LoadFromDB()
                 mCreatureSearchMap.insert(p);
 
                 ++count;
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
 
             sLog->outString(">> Loaded %u creatures in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
             sLog->outString();
@@ -676,8 +674,8 @@ void PoolMgr::LoadFromDB()
 
                 GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(data->id);
                 if (goinfo->type != GAMEOBJECT_TYPE_CHEST &&
-                    goinfo->type != GAMEOBJECT_TYPE_GOOBER &&
-                    goinfo->type != GAMEOBJECT_TYPE_FISHINGHOLE)
+                        goinfo->type != GAMEOBJECT_TYPE_GOOBER &&
+                        goinfo->type != GAMEOBJECT_TYPE_FISHINGHOLE)
                 {
                     sLog->outErrorDb("`pool_gameobject` has a not lootable gameobject spawn (GUID: %u, type: %u) defined for pool id (%u), skipped.", guid, goinfo->type, pool_id);
                     continue;
@@ -705,8 +703,7 @@ void PoolMgr::LoadFromDB()
                 mGameobjectSearchMap.insert(p);
 
                 ++count;
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
 
             sLog->outString(">> Loaded %u gameobject in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
             sLog->outString();
@@ -773,8 +770,7 @@ void PoolMgr::LoadFromDB()
                 mPoolSearchMap.insert(p);
 
                 ++count;
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
 
             // Now check for circular reference
             // All pool_ids are in pool_template
@@ -787,11 +783,11 @@ void PoolMgr::LoadFromDB()
                     if (checkedPools.find(poolItr->second) != checkedPools.end())
                     {
                         std::ostringstream ss;
-                        ss<< "The pool(s) ";
-                        for (std::set<uint32>::const_iterator itr=checkedPools.begin(); itr != checkedPools.end(); ++itr)
+                        ss << "The pool(s) ";
+                        for (std::set<uint32>::const_iterator itr = checkedPools.begin(); itr != checkedPools.end(); ++itr)
                             ss << *itr << ' ';
                         ss << "create(s) a circular reference, which can cause the server to freeze.\nRemoving the last link between mother pool "
-                            << poolItr->first << " and child pool " << poolItr->second;
+                           << poolItr->first << " and child pool " << poolItr->second;
                         sLog->outErrorDb("%s", ss.str().c_str());
                         mPoolPoolGroups[poolItr->second].RemoveOneRelation(poolItr->first);
                         mPoolSearchMap.erase(poolItr);
@@ -889,8 +885,7 @@ void PoolMgr::LoadFromDB()
                 mQuestSearchMap.insert(p);
 
                 ++count;
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
 
             sLog->outString(">> Loaded %u quests in pools in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
             sLog->outString();
@@ -903,8 +898,8 @@ void PoolMgr::LoadFromDB()
         uint32 oldMSTime = getMSTime();
 
         QueryResult result = WorldDatabase.Query("SELECT DISTINCT pool_template.entry, pool_pool.pool_id, pool_pool.mother_pool FROM pool_template"
-            " LEFT JOIN game_event_pool ON pool_template.entry=game_event_pool.pool_entry"
-            " LEFT JOIN pool_pool ON pool_template.entry=pool_pool.pool_id WHERE game_event_pool.pool_entry IS NULL");
+                             " LEFT JOIN game_event_pool ON pool_template.entry=game_event_pool.pool_entry"
+                             " LEFT JOIN pool_pool ON pool_template.entry=pool_pool.pool_id WHERE game_event_pool.pool_entry IS NULL");
 
         if (!result)
         {
@@ -937,8 +932,7 @@ void PoolMgr::LoadFromDB()
                     SpawnPool(pool_entry);
                     count++;
                 }
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
 
             sLog->outBasic("Pool handling system initialized, %u pools spawned in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
             sLog->outString();

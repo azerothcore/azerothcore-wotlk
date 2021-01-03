@@ -11,7 +11,7 @@
 #include <string>
 
 ChunkedData::ChunkedData( FILE* stream, uint32 maxLength, uint32 chunksHint /*= 300*/ ) :
-Stream(stream)
+    Stream(stream)
 {
     if (!Stream)
         return;

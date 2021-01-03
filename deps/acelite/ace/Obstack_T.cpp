@@ -15,7 +15,7 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Obstack_T)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Obstack_T)
 
 template <class ACE_CHAR_T> void
 ACE_Obstack_T<ACE_CHAR_T>::dump (void) const

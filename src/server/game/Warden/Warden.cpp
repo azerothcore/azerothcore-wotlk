@@ -20,8 +20,8 @@
 #include "BanManager.h"
 
 Warden::Warden() : _session(nullptr), _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
-                   _dataSent(false), _previousTimestamp(0), _module(nullptr), _initialized(false)
-{ 
+    _dataSent(false), _previousTimestamp(0), _module(nullptr), _initialized(false)
+{
     memset(_inputKey, 0, sizeof(_inputKey));
     memset(_outputKey, 0, sizeof(_outputKey));
     memset(_seed, 0, sizeof(_seed));
@@ -144,7 +144,8 @@ bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 le
     }
 }
 
-struct keyData {
+struct keyData
+{
     union
     {
         struct
@@ -184,56 +185,115 @@ std::string Warden::Penalty(WardenCheck* check /*= NULL*/, uint16 checkFailed /*
     if (checkFailed)
         switch (checkFailed)
         {
-            case 47: banReason += " (FrameXML Signature Check)"; break;
-            case 51: banReason += " (Lua DoString)"; break;
-            case 59: banReason += " (Lua Protection Patch)"; break;
-            case 72: banReason += " (Movement State related)"; break;
-            case 118: banReason += " (Wall Climb)"; break;
-            case 121: banReason += " (No Fall Damage Patch)"; break;
-            case 193: banReason += " (Follow Unit Check)"; break;
-            case 209: banReason += " (WoWEmuHacker Injection)"; longBan = true; break;
-            case 237: banReason += " (AddChatMessage)"; break;
-            case 246: banReason += " (Language Patch)"; break;
-            case 260: banReason += " (Jump Momentum)"; break;
-            case 288: banReason += " (Language Patch)"; break;
-            case 308: banReason += " (SendChatMessage)"; break;
-            case 312: banReason += " (Jump Physics)"; break;
-            case 314: banReason += " (GetCharacterInfo)"; break;
-            case 329: banReason += " (Wall Climb)"; break;
-            case 343: banReason += " (Login Password Pointer)"; break;
-            case 349: banReason += " (Language Patch)"; break;
-            case 712: banReason += " (WS2_32.Send)"; break;
-            case 780: banReason += " (Lua Protection Remover)"; break;
-            case 781: banReason += " (Walk on Water Patch)"; break;
-            case 782: banReason += " (Collision M2 Special)"; longBan = true; break;
-            case 783: banReason += " (Collision M2 Regular)"; longBan = true; break;
-            case 784: banReason += " (Collision WMD)"; longBan = true; break;
-            case 785: banReason += " (Multi-Jump Patch)"; break;
-            case 786: banReason += " (WPE PRO)"; longBan = true; break;
-            case 787: banReason += " (rEdoX Packet Editor)"; break;
+            case 47:
+                banReason += " (FrameXML Signature Check)";
+                break;
+            case 51:
+                banReason += " (Lua DoString)";
+                break;
+            case 59:
+                banReason += " (Lua Protection Patch)";
+                break;
+            case 72:
+                banReason += " (Movement State related)";
+                break;
+            case 118:
+                banReason += " (Wall Climb)";
+                break;
+            case 121:
+                banReason += " (No Fall Damage Patch)";
+                break;
+            case 193:
+                banReason += " (Follow Unit Check)";
+                break;
+            case 209:
+                banReason += " (WoWEmuHacker Injection)";
+                longBan = true;
+                break;
+            case 237:
+                banReason += " (AddChatMessage)";
+                break;
+            case 246:
+                banReason += " (Language Patch)";
+                break;
+            case 260:
+                banReason += " (Jump Momentum)";
+                break;
+            case 288:
+                banReason += " (Language Patch)";
+                break;
+            case 308:
+                banReason += " (SendChatMessage)";
+                break;
+            case 312:
+                banReason += " (Jump Physics)";
+                break;
+            case 314:
+                banReason += " (GetCharacterInfo)";
+                break;
+            case 329:
+                banReason += " (Wall Climb)";
+                break;
+            case 343:
+                banReason += " (Login Password Pointer)";
+                break;
+            case 349:
+                banReason += " (Language Patch)";
+                break;
+            case 712:
+                banReason += " (WS2_32.Send)";
+                break;
+            case 780:
+                banReason += " (Lua Protection Remover)";
+                break;
+            case 781:
+                banReason += " (Walk on Water Patch)";
+                break;
+            case 782:
+                banReason += " (Collision M2 Special)";
+                longBan = true;
+                break;
+            case 783:
+                banReason += " (Collision M2 Regular)";
+                longBan = true;
+                break;
+            case 784:
+                banReason += " (Collision WMD)";
+                longBan = true;
+                break;
+            case 785:
+                banReason += " (Multi-Jump Patch)";
+                break;
+            case 786:
+                banReason += " (WPE PRO)";
+                longBan = true;
+                break;
+            case 787:
+                banReason += " (rEdoX Packet Editor)";
+                break;
         }
 
     switch (action)
     {
-    case WARDEN_ACTION_LOG:
-        return "None";
-        break;
-    case WARDEN_ACTION_KICK:
-        _session->KickPlayer("WARDEN_ACTION_KICK");
-        return "Kick";
-        break;
-    case WARDEN_ACTION_BAN:
-        {
-            std::stringstream duration;
-            duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
-            std::string accountName;
-            AccountMgr::GetName(_session->GetAccountId(), accountName);
-            sBan->BanAccount(accountName, ((longBan && false /*ZOMG!*/) ? "1209600s" : duration.str()), banReason, "Server");
+        case WARDEN_ACTION_LOG:
+            return "None";
+            break;
+        case WARDEN_ACTION_KICK:
+            _session->KickPlayer("WARDEN_ACTION_KICK");
+            return "Kick";
+            break;
+        case WARDEN_ACTION_BAN:
+            {
+                std::stringstream duration;
+                duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
+                std::string accountName;
+                AccountMgr::GetName(_session->GetAccountId(), accountName);
+                sBan->BanAccount(accountName, ((longBan && false /*ZOMG!*/) ? "1209600s" : duration.str()), banReason, "Server");
 
-            return "Ban";
-        }
-    default:
-        break;
+                return "Ban";
+            }
+        default:
+            break;
     }
     return "Undefined";
 }

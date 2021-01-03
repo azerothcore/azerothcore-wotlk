@@ -37,7 +37,7 @@ extern "C"
 #if !defined (__cpu_set_t_defined) || !defined (ACE_HAS_CPU_SET_T)
 #if defined (ACE_HAS_CPUSET_T)
    typedef cpuset_t cpu_set_t;
-#else
+#elif !defined (ACE_HAS_CPU_SET_T)
 #  define ACE_CPU_SETSIZE 1024
    typedef struct
    {

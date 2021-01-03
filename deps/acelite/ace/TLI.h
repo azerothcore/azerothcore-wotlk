@@ -53,7 +53,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_TLI : public ACE_IPC_SAP
 {
 public:
-  // = Initialization and termination methods.
   /// Initialize a TLI endpoint.
   ACE_HANDLE open (const char device[],
                    int oflag = O_RDWR,

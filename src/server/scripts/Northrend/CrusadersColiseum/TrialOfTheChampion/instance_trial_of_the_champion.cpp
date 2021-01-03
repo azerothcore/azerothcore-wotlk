@@ -19,7 +19,7 @@ class instance_trial_of_the_champion : public InstanceMapScript
 public:
     instance_trial_of_the_champion() : InstanceMapScript("instance_trial_of_the_champion", 650) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_trial_of_the_champion_InstanceMapScript(pMap);
     }
@@ -53,7 +53,7 @@ public:
         uint64 GO_MainGateGUID;
         uint64 GO_EnterGateGUID;
 
-        void Initialize()
+        void Initialize() override
         {
             TeamIdInInstance = TEAM_NEUTRAL;
             InstanceProgress = 0;
@@ -82,7 +82,7 @@ public:
             GO_EnterGateGUID = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
                 if( m_auiEncounter[i] == IN_PROGRESS )
@@ -91,11 +91,11 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
-                Map::PlayerList const &players = instance->GetPlayers();
+                Map::PlayerList const& players = instance->GetPlayers();
                 if( !players.isEmpty() )
                     if( Player* pPlayer = players.begin()->GetSource() )
                         TeamIdInInstance = pPlayer->GetTeamId();
@@ -126,23 +126,23 @@ public:
                     break;
 
                 // Grand Champion Minions:
-                case NPC_ORGRIMMAR_MINION: 
+                case NPC_ORGRIMMAR_MINION:
                     if( TeamIdInInstance == TEAM_HORDE )
                         creature->UpdateEntry(NPC_STORMWIND_MINION);
                     break;
-                case NPC_SILVERMOON_MINION: 
+                case NPC_SILVERMOON_MINION:
                     if( TeamIdInInstance == TEAM_HORDE )
                         creature->UpdateEntry(NPC_GNOMEREGAN_MINION);
                     break;
-                case NPC_THUNDER_BLUFF_MINION: 
+                case NPC_THUNDER_BLUFF_MINION:
                     if( TeamIdInInstance == TEAM_HORDE )
                         creature->UpdateEntry(NPC_EXODAR_MINION);
                     break;
-                case NPC_SENJIN_MINION: 
+                case NPC_SENJIN_MINION:
                     if( TeamIdInInstance == TEAM_HORDE )
                         creature->UpdateEntry(NPC_DARNASSUS_MINION);
                     break;
-                case NPC_UNDERCITY_MINION: 
+                case NPC_UNDERCITY_MINION:
                     if( TeamIdInInstance == TEAM_HORDE )
                         creature->UpdateEntry(NPC_IRONFORGE_MINION);
                     break;
@@ -185,7 +185,7 @@ public:
                         creature->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, ca->mount);
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch( go->GetEntry() )
             {
@@ -204,7 +204,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
             std::ostringstream saveStream;
@@ -214,7 +214,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             CLEANED = false;
             events.Reset();
@@ -255,7 +255,7 @@ public:
 
         // EVENT STUFF BELOW:
 
-        void OnPlayerEnter(Player *)
+        void OnPlayerEnter(Player*) override
         {
             if( DoNeedCleanup(true) )
                 InstanceCleanup();
@@ -266,13 +266,13 @@ public:
         bool DoNeedCleanup(bool /*enter*/)
         {
             uint8 aliveCount = 0;
-            Map::PlayerList const &pl = instance->GetPlayers();
+            Map::PlayerList const& pl = instance->GetPlayers();
             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                 if( Player* plr = itr->GetSource() )
                     if( plr->IsAlive() && !plr->IsGameMaster() )
                         ++aliveCount;
 
-            bool need = aliveCount==0;
+            bool need = aliveCount == 0;
             if( !need && CLEANED )
                 CLEANED = false;
             return need;
@@ -298,9 +298,9 @@ public:
                                 veh->DespawnOrUnsummon();
                                 veh->SetRespawnTime(3);
                             }
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                         {
-                            for( uint8 j=0; j<3; ++j )
+                            for( uint8 j = 0; j < 3; ++j )
                             {
                                 if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[i][j]) )
                                     c->DespawnOrUnsummon();
@@ -331,7 +331,7 @@ public:
                             announcer->SetRespawnTime(3);
                             announcer->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
-                            for( uint8 i=0; i<3; ++i )
+                            for( uint8 i = 0; i < 3; ++i )
                                 if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                                 {
                                     uint32 entry = c->GetEntry();
@@ -339,21 +339,21 @@ public:
                                     switch( i )
                                     {
                                         case 0:
-                                            if( Creature* pBoss = announcer->SummonCreature(entry, 736.695f, 650.02f, 412.4f, 3*M_PI/2) )
+                                            if( Creature* pBoss = announcer->SummonCreature(entry, 736.695f, 650.02f, 412.4f, 3 * M_PI / 2) )
                                             {
                                                 NPC_GrandChampionGUID[0] = pBoss->GetGUID();
                                                 pBoss->AI()->SetData(0, 2);
                                             }
                                             break;
                                         case 1:
-                                            if( Creature* pBoss = announcer->SummonCreature(entry, 756.32f, 650.05f, 412.4f, 3*M_PI/2) )
+                                            if( Creature* pBoss = announcer->SummonCreature(entry, 756.32f, 650.05f, 412.4f, 3 * M_PI / 2) )
                                             {
                                                 NPC_GrandChampionGUID[1] = pBoss->GetGUID();
                                                 pBoss->AI()->SetData(1, 2);
                                             }
                                             break;
                                         case 2:
-                                            if( Creature* pBoss = announcer->SummonCreature(entry, 746.5f, 650.65f, 411.7f, 3*M_PI/2) )
+                                            if( Creature* pBoss = announcer->SummonCreature(entry, 746.5f, 650.65f, 411.7f, 3 * M_PI / 2) )
                                             {
                                                 NPC_GrandChampionGUID[2] = pBoss->GetGUID();
                                                 pBoss->AI()->SetData(2, 2);
@@ -368,8 +368,8 @@ public:
                 case INSTANCE_PROGRESS_ARGENT_SOLDIERS_DIED:
                     // revert to INSTANCE_PROGRESS_CHAMPIONS_DEAD
                     {
-                        for( uint8 i=0; i<3; ++i )
-                            for( uint8 j=0; j<3; ++j )
+                        for( uint8 i = 0; i < 3; ++i )
+                            for( uint8 j = 0; j < 3; ++j )
                             {
                                 if( Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]) )
                                     c->DespawnOrUnsummon();
@@ -432,7 +432,7 @@ public:
             CLEANED = true;
         }
 
-        uint32 GetData(uint32 uiData) const
+        uint32 GetData(uint32 uiData) const override
         {
             switch( uiData )
             {
@@ -445,7 +445,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 uiData) const
+        uint64 GetData64(uint32 uiData) const override
         {
             switch( uiData )
             {
@@ -458,7 +458,7 @@ public:
             return 0;
         }
 
-        void SetData(uint32 uiType, uint32 uiData)
+        void SetData(uint32 uiType, uint32 uiData) override
         {
             switch( uiType )
             {
@@ -483,12 +483,14 @@ public:
                             {
                                 shortver = true;
 
-                                temp1 = urand(0,4);
+                                temp1 = urand(0, 4);
                                 DoSummonGrandChampion(temp1, 0);
-                                do { temp2 = urand(0,4); } while( temp1 == temp2 );
+                                do { temp2 = urand(0, 4); }
+                                while( temp1 == temp2 );
                                 DoSummonGrandChampion(temp2, 1);
                                 uint8 number = 0;
-                                do { number = urand(0,4); } while( number == temp1 || number == temp2 );
+                                do { number = urand(0, 4); }
+                                while( number == temp1 || number == temp2 );
                                 DoSummonGrandChampion(number, 2);
 
                                 InstanceProgress = INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST;
@@ -504,7 +506,7 @@ public:
                         case INSTANCE_PROGRESS_CHAMPIONS_DEAD:
                             if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
                             {
-                                Counter = urand(0,1);
+                                Counter = urand(0, 1);
                                 if( Counter )
                                     announcer->AI()->Talk(TEXT_INTRODUCE_EADRIC);
                                 else
@@ -598,7 +600,7 @@ public:
                         InstanceProgress = INSTANCE_PROGRESS_CHAMPIONS_DEAD;
                         m_auiEncounter[0] = DONE;
                         bool creditCasted = false;
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->GetMotionMaster()->MovePoint(9, 747.36f, 670.07f, 411.9f);
@@ -729,7 +731,7 @@ public:
             if( Creature* pBoss = instance->SummonCreature(CHAMPION_TO_SUMMON, SpawnPos) )
             {
                 NPC_GrandChampionGUID[BossOrder] = pBoss->GetGUID();
-                pBoss->ToCreature()->SetHomePosition(748.309f, 619.448f, 411.3f, M_PI/2);
+                pBoss->ToCreature()->SetHomePosition(748.309f, 619.448f, 411.3f, M_PI / 2);
                 pBoss->ToCreature()->SetReactState(REACT_PASSIVE);
                 pBoss->AI()->SetData(BossOrder, (shortver ? 1 : 0));
 
@@ -737,27 +739,27 @@ public:
                     if( Creature* pAdd = instance->SummonCreature(MINION_TO_SUMMON, SpawnPos) )
                     {
                         NPC_GrandChampionMinionsGUID[BossOrder][i] = pAdd->GetGUID();
-                        pAdd->SetHomePosition(748.309f, 619.448f, 411.3f, M_PI/2);
-                        pAdd->GetMotionMaster()->MoveFollow(pBoss, 2.0f, (i+1)*M_PI/2);
+                        pAdd->SetHomePosition(748.309f, 619.448f, 411.3f, M_PI / 2);
+                        pAdd->GetMotionMaster()->MoveFollow(pBoss, 2.0f, (i + 1)*M_PI / 2);
                         pAdd->SetReactState(REACT_PASSIVE);
                     }
 
             }
-            
+
             if (!shortver)
                 if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
                 {
                     if( TeamIdInInstance == TEAM_HORDE )
                         TEXT_ID -= 10;
                     announcer->AI()->Talk(TEXT_ID);
-                    announcer->AI()->Talk(TEXT_ID+1);
+                    announcer->AI()->Talk(TEXT_ID + 1);
                 }
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             events.Update(diff);
-            switch( events.GetEvent() )
+            switch( events.ExecuteEvent() )
             {
                 case EVENT_NULL:
                     break;
@@ -770,46 +772,46 @@ public:
                     break;
                 case EVENT_SUMMON_GRAND_CHAMPION_1:
                     {
-                        temp1 = urand(0,4);
+                        temp1 = urand(0, 4);
                         DoSummonGrandChampion(temp1, 0);
                         HandleGameObject(GO_MainGateGUID, true);
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 6000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_SUMMON_GRAND_CHAMPION_2:
                     {
-                        do { temp2 = urand(0,4); } while( temp1 == temp2 );
+                        do { temp2 = urand(0, 4); }
+                        while( temp1 == temp2 );
                         DoSummonGrandChampion(temp2, 1);
                         HandleGameObject(GO_MainGateGUID, true);
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 6000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_SUMMON_GRAND_CHAMPION_3:
                     {
                         uint8 number = 0;
-                        do { number = urand(0,4); } while( number == temp1 || number == temp2 );
+                        do { number = urand(0, 4); }
+                        while( number == temp1 || number == temp2 );
                         DoSummonGrandChampion(number, 2);
                         HandleGameObject(GO_MainGateGUID, true);
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 6000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_CLOSE_GATE:
                     {
                         HandleGameObject(GO_MainGateGUID, false);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_YELL_WELCOME_2:
                     {
-                        if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
+                        if (Creature* tirion = instance->GetCreature(NPC_TirionGUID))
+                        {
                             tirion->AI()->Talk(TEXT_WELCOME_2);
+                        }
+
                         events.RescheduleEvent(EVENT_SUMMON_GRAND_CHAMPION_1, 8000);
-                        events.PopEvent();
+                        break;
                     }
-                    break;
                 case EVENT_GRAND_GROUP_1_MOVE_MIDDLE:
                     {
                         if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
@@ -819,20 +821,19 @@ public:
                                 tirion->AI()->Talk(TEXT_BEGIN);
                             HandleGameObject(GO_EnterGateGUID, false);
                         }
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[1][i]) )
                             {
-                                float angle = rand_norm()*2*M_PI;
-                                c->GetMotionMaster()->MovePoint(0, 748.309f+3.0f*cos(angle), 619.448f+3.0f*sin(angle), 411.3f);
+                                float angle = rand_norm() * 2 * M_PI;
+                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_1_ATTACK, 3000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_GROUP_1_ATTACK:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[1][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -842,25 +843,23 @@ public:
                                 c->AI()->DoZoneInCombat();
                             }
                         Counter = 0;
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_GROUP_2_MOVE_MIDDLE:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[0][i]) )
                             {
-                                float angle = rand_norm()*2*M_PI;
-                                c->GetMotionMaster()->MovePoint(0, 748.309f+3.0f*cos(angle), 619.448f+3.0f*sin(angle), 411.3f);
+                                float angle = rand_norm() * 2 * M_PI;
+                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_2_ATTACK, 3000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_GROUP_2_ATTACK:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[0][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -869,25 +868,23 @@ public:
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
                             }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_GROUP_3_MOVE_MIDDLE:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[2][i]) )
                             {
-                                float angle = rand_norm()*2*M_PI;
-                                c->GetMotionMaster()->MovePoint(0, 748.309f+3.0f*cos(angle), 619.448f+3.0f*sin(angle), 411.3f);
+                                float angle = rand_norm() * 2 * M_PI;
+                                c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_GROUP_3_ATTACK, 3000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_GROUP_3_ATTACK:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[2][i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -896,25 +893,23 @@ public:
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
                             }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_CHAMPIONS_MOVE_MIDDLE:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
-                                float angle = rand_norm()*2*M_PI;
-                                c->GetMotionMaster()->MovePoint(4, 748.309f+3.0f*cos(angle), 619.448f+3.0f*sin(angle), 411.3f);
+                                float angle = rand_norm() * 2 * M_PI;
+                                c->GetMotionMaster()->MovePoint(4, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * sin(angle), 411.3f);
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_CHAMPIONS_MOUNTS_ATTACK, 3000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_CHAMPIONS_MOUNTS_ATTACK:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -924,12 +919,11 @@ public:
                                 c->AI()->DoZoneInCombat();
                                 c->CastSpell(c, 67865, true); // SPELL_TRAMPLE_AURA
                             }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_CHAMPIONS_MOVE_SIDE:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->AI()->DoAction(1);
@@ -948,12 +942,11 @@ public:
                             }
 
                         events.ScheduleEvent(EVENT_GRAND_CHAMPIONS_ATTACK, 15000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRAND_CHAMPIONS_ATTACK:
                     {
-                        for( uint8 i=0; i<3; ++i )
+                        for( uint8 i = 0; i < 3; ++i )
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -963,14 +956,13 @@ public:
                                 c->AI()->DoZoneInCombat();
                                 c->AI()->DoAction(2);
                             }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_GRATZ_SLAIN_CHAMPIONS:
                     {
                         if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
                             tirion->AI()->Talk(TEXT_GRATZ_SLAIN_CHAMPIONS);
-                        events.PopEvent();
+                        
                         HandleGameObject(GO_EnterGateGUID, true);
                     }
                     break;
@@ -978,7 +970,6 @@ public:
                     {
                         if( Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
                             announcer->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_START_ARGENT_CHALLENGE_INTRO:
@@ -1002,33 +993,32 @@ public:
                                 announcer->AI()->Talk(TEXT_CHEER_PALETRESS_2);
                             }
                         }
-                            
+
                         for( int8 i = 0; i < 3; ++i )
                         {
                             Position pos(SpawnPosition);
                             float x = pos.GetPositionX();
 
-                            pos.m_positionX = x-2.0f+(i-1)*10.0f;
+                            pos.m_positionX = x - 2.0f + (i - 1) * 10.0f;
                             if( Creature* pTrash = instance->SummonCreature(NPC_ARGENT_LIGHTWIELDER, pos) )
                             {
-                                pTrash->AI()->SetData(i,0);
+                                pTrash->AI()->SetData(i, 0);
                                 NPC_ArgentSoldierGUID[i][0] = pTrash->GetGUID();
                             }
-                            pos.m_positionX = x+(i-1)*10.0f;
+                            pos.m_positionX = x + (i - 1) * 10.0f;
                             if( Creature* pTrash = instance->SummonCreature(NPC_ARGENT_MONK, pos) )
                             {
-                                pTrash->AI()->SetData(i,0);
+                                pTrash->AI()->SetData(i, 0);
                                 NPC_ArgentSoldierGUID[i][1] = pTrash->GetGUID();
                             }
-                            pos.m_positionX = x+2.0f+(i-1)*10.0f;
+                            pos.m_positionX = x + 2.0f + (i - 1) * 10.0f;
                             if( Creature* pTrash = instance->SummonCreature(NPC_PRIESTESS, pos) )
                             {
-                                pTrash->AI()->SetData(i,0);
+                                pTrash->AI()->SetData(i, 0);
                                 NPC_ArgentSoldierGUID[i][2] = pTrash->GetGUID();
                             }
                         }
                         events.ScheduleEvent(EVENT_SUMMON_ARGENT_CHALLENGE, 4000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_SUMMON_ARGENT_CHALLENGE:
@@ -1040,7 +1030,6 @@ public:
                         events.ScheduleEvent(EVENT_CLOSE_GATE, 5000);
                         events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_SAY_1, 4000);
                         events.ScheduleEvent(EVENT_ARGENT_SOLDIER_GROUP_ATTACK, 12500);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_SAY_1:
@@ -1049,21 +1038,19 @@ public:
                             ac->AI()->Talk(Counter ? TEXT_EADRIC_SAY_1 : TEXT_PALETRESS_SAY_1);
                         if( !Counter )
                             events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_SAY_2, 6000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_SAY_2:
                     {
                         if( Creature* ac = instance->GetCreature(NPC_ArgentChampionGUID) )
                             ac->AI()->Talk(TEXT_PALETRESS_SAY_2);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_SOLDIER_GROUP_ATTACK:
                     {
                         Counter = 0;
-                        for( uint8 i=0; i<3; ++i )
-                            for( uint8 j=0; j<3; ++j )
+                        for( uint8 i = 0; i < 3; ++i )
+                            for( uint8 j = 0; j < 3; ++j )
                                 if( Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]) )
                                 {
                                     c->SetReactState(REACT_AGGRESSIVE);
@@ -1072,16 +1059,15 @@ public:
                                 }
                         if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
                             tirion->AI()->Talk(TEXT_YOU_MAY_BEGIN);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_MOVE_FORWARD:
                     {
-                    if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID)) {
-                        boss->GetMotionMaster()->MovePoint(0, 746.881f, 635.263f, 411.7f);
-                    }
-                    events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_ATTACK, 3000);
-                    events.PopEvent();
+                        if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID))
+                        {
+                            boss->GetMotionMaster()->MovePoint(0, 746.881f, 635.263f, 411.7f);
+                        }
+                        events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_ATTACK, 3000);
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_ATTACK:
@@ -1094,7 +1080,6 @@ public:
                                 boss->AI()->AttackStart(target);
                             boss->AI()->DoZoneInCombat();
                         }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_RUN_MIDDLE:
@@ -1104,7 +1089,6 @@ public:
                             boss->GetMotionMaster()->MovePoint(1, 747.13f, 628.037f, 411.2f);
                             events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_LEAVE_CHEST, 6000);
                         }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_LEAVE_CHEST:
@@ -1123,7 +1107,6 @@ public:
 
                         events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_DISAPPEAR, 4000);
                         events.ScheduleEvent(EVENT_RESTORE_ANNOUNCER_GOSSIP, 15000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_ARGENT_CHALLENGE_DISAPPEAR:
@@ -1133,7 +1116,6 @@ public:
                             boss->GetMotionMaster()->MovePoint(0, SpawnPosition);
                             boss->DespawnOrUnsummon(3000);
                         }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_SUMMON_BLACK_KNIGHT:
@@ -1156,7 +1138,6 @@ public:
                                 announcer->SetFacingToObject(bk_vehicle);
                                 announcer->AI()->Talk(TEXT_BK_RAFTERS);
                             }
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_START_BLACK_KNIGHT_SCENE:
@@ -1169,7 +1150,6 @@ public:
                             bk->AI()->Talk(TEXT_BK_SPOILED);
                         }
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_CAST_ANNOUNCER, 2000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_BLACK_KNIGHT_CAST_ANNOUNCER:
@@ -1189,7 +1169,6 @@ public:
                             }
                         }
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_KILL_ANNOUNCER, 1000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_BLACK_KNIGHT_KILL_ANNOUNCER:
@@ -1198,7 +1177,6 @@ public:
                             bk_vehicle->AI()->DoAction(1);
 
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_MOVE_FORWARD, 4000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_BLACK_KNIGHT_MOVE_FORWARD:
@@ -1213,7 +1191,6 @@ public:
                             if (announcer->IsAlive())
                                 Unit::Kill(announcer, announcer);
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_SAY_TASK, 14000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_BLACK_KNIGHT_SAY_TASK:
@@ -1224,7 +1201,6 @@ public:
                             bk->AI()->Talk(TEXT_BK_TASK);
                         }
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_ATTACK, 5000);
-                        events.PopEvent();
                     }
                     break;
                 case EVENT_BLACK_KNIGHT_ATTACK:
@@ -1238,13 +1214,12 @@ public:
                             bk->AI()->DoZoneInCombat();
                             bk->AI()->DoAction(1);
                         }
-                        events.PopEvent();
                     }
                     break;
-            }           
+            }
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {

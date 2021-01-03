@@ -51,16 +51,23 @@ WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, uint64 guid)
 {
     switch (GUID_HIPART(guid))
     {
-        case HIGHGUID_PLAYER:        return GetPlayer(p, guid);
+        case HIGHGUID_PLAYER:
+            return GetPlayer(p, guid);
         case HIGHGUID_TRANSPORT:
         case HIGHGUID_MO_TRANSPORT:
-        case HIGHGUID_GAMEOBJECT:    return GetGameObject(p, guid);
+        case HIGHGUID_GAMEOBJECT:
+            return GetGameObject(p, guid);
         case HIGHGUID_VEHICLE:
-        case HIGHGUID_UNIT:          return GetCreature(p, guid);
-        case HIGHGUID_PET:           return GetPet(p, guid);
-        case HIGHGUID_DYNAMICOBJECT: return GetDynamicObject(p, guid);
-        case HIGHGUID_CORPSE:        return GetCorpse(p, guid);
-        default:                     return nullptr;
+        case HIGHGUID_UNIT:
+            return GetCreature(p, guid);
+        case HIGHGUID_PET:
+            return GetPet(p, guid);
+        case HIGHGUID_DYNAMICOBJECT:
+            return GetDynamicObject(p, guid);
+        case HIGHGUID_CORPSE:
+            return GetCorpse(p, guid);
+        default:
+            return nullptr;
     }
 }
 
@@ -345,8 +352,8 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
     // ignore bones creating option in case insignia
 
     if (map && corpse->IsPositionValid() && inWorld && (insignia ||
-        (map->IsBattlegroundOrArena() ? sWorld->getBoolConfig(CONFIG_DEATH_BONES_BG_OR_ARENA) : sWorld->getBoolConfig(CONFIG_DEATH_BONES_WORLD))) &&
-        !map->IsRemovalGrid(corpse->GetPositionX(), corpse->GetPositionY()))
+            (map->IsBattlegroundOrArena() ? sWorld->getBoolConfig(CONFIG_DEATH_BONES_BG_OR_ARENA) : sWorld->getBoolConfig(CONFIG_DEATH_BONES_WORLD))) &&
+            !map->IsRemovalGrid(corpse->GetPositionX(), corpse->GetPositionY()))
     {
         // Create bones, don't change Corpse
         bones = new Corpse;

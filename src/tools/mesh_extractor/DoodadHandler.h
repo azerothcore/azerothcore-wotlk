@@ -50,7 +50,7 @@ public:
     ~DoodadHandler();
 
     std::vector<Vector3> Vertices;
-    std::vector<Triangle<uint32> > Triangles;
+    std::vector<Triangle<uint32>> Triangles;
     bool IsSane() { return _definitions && _paths; }
 
 

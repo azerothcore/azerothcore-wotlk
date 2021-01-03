@@ -9,7 +9,8 @@
 #include "DBC.h"
 #include "Utils.h"
 
-char const* MPQManager::Files[] = {
+char const* MPQManager::Files[] =
+{
     "common.MPQ",
     "common-2.MPQ",
     "expansion.MPQ",
@@ -90,7 +91,7 @@ FILE* MPQManager::GetFileFrom(const std::string& path, MPQArchive* file )
     mpq_archive* mpq_a = file->mpq_a;
 
     uint32_t filenum;
-    if(libmpq__file_number(mpq_a, path.c_str(), &filenum))
+    if (libmpq__file_number(mpq_a, path.c_str(), &filenum))
         return nullptr;
 
     libmpq__off_t transferred;

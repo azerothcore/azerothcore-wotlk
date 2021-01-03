@@ -30,7 +30,7 @@ class boss_blackheart_the_inciter : public CreatureScript
 public:
     boss_blackheart_the_inciter() : CreatureScript("boss_blackheart_the_inciter") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_blackheart_the_inciterAI (creature);
     }
@@ -47,7 +47,7 @@ public:
 
         bool InciteChaos;
 
-        void Reset()
+        void Reset() override
         {
             InciteChaos = false;
             events.Reset();
@@ -56,20 +56,20 @@ public:
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, NOT_STARTED);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0,1))
+            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (instance)
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_INCITE, 20000);
@@ -81,44 +81,43 @@ public:
                 instance->SetData(DATA_BLACKHEARTTHEINCITEREVENT, IN_PROGRESS);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (InciteChaos && SelectTargetFromPlayerList(100.0f))
                 return;
             CreatureAI::EnterEvadeMode();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
 
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_INCITE_WAIT:
                     InciteChaos = false;
-                    events.PopEvent();
                     break;
                 case EVENT_SPELL_INCITE:
-                {
-                    me->CastSpell(me, SPELL_INCITE_CHAOS, false);
-
-                    std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
-                    for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
                     {
-                        Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                        if (target && target->GetTypeId() == TYPEID_PLAYER)
-                            me->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
-                    }
+                        me->CastSpell(me, SPELL_INCITE_CHAOS, false);
 
-                    DoResetThreat();
-                    InciteChaos = true;
-                    events.DelayEvents(15000);
-                    events.RepeatEvent(40000);
-                    events.ScheduleEvent(EVENT_INCITE_WAIT, 15000);
-                    break;
-                }
+                        std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
+                        for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
+                        {
+                            Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
+                            if (target && target->GetTypeId() == TYPEID_PLAYER)
+                                me->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
+                        }
+
+                        DoResetThreat();
+                        InciteChaos = true;
+                        events.DelayEvents(15000);
+                        events.RepeatEvent(40000);
+                        events.ScheduleEvent(EVENT_INCITE_WAIT, 15000);
+                        break;
+                    }
                 case EVENT_SPELL_CHARGE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                         me->CastSpell(target, SPELL_CHARGE, false);

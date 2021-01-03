@@ -125,7 +125,7 @@ public:
                     // send area in "id - [name]" format
                     std::ostringstream ss;
                     if (handler->GetSession())
-                        ss << areaEntry->ID << " - |cffffffff|Harea:" << areaEntry->ID << "|h[" << name << ' ' << localeNames[locale]<< "]|h|r";
+                        ss << areaEntry->ID << " - |cffffffff|Harea:" << areaEntry->ID << "|h[" << name << ' ' << localeNames[locale] << "]|h|r";
                     else
                         ss << areaEntry->ID << " - " << name << ' ' << localeNames[locale];
 
@@ -1025,7 +1025,7 @@ public:
         return true;
     }
 
-    static bool HandleLookupTaxiNodeCommand(ChatHandler* handler, const char * args)
+    static bool HandleLookupTaxiNodeCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
             return false;
@@ -1082,10 +1082,10 @@ public:
                     // send taxinode in "id - [name] (Map:m X:x Y:y Z:z)" format
                     if (handler->GetSession())
                         handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CHAT, id, id, name.c_str(), localeNames[locale],
-                            nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
+                                                 nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
                     else
                         handler->PSendSysMessage(LANG_TAXINODE_ENTRY_LIST_CONSOLE, id, name.c_str(), localeNames[locale],
-                            nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
+                                                 nodeEntry->map_id, nodeEntry->x, nodeEntry->y, nodeEntry->z);
 
                     if (!found)
                         found = true;
@@ -1126,7 +1126,7 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
         bool limitReached = false;
 
-        GameTeleContainer const & teleMap = sObjectMgr->GetGameTeleMap();
+        GameTeleContainer const& teleMap = sObjectMgr->GetGameTeleMap();
         for (GameTeleContainer::const_iterator itr = teleMap.begin(); itr != teleMap.end(); ++itr)
         {
             GameTele const* tele = &itr->second;
@@ -1219,8 +1219,8 @@ public:
                     char const* knownStr = target && target->HasTitle(titleInfo) ? handler->GetAcoreString(LANG_KNOWN) : "";
 
                     char const* activeStr = target && target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index
-                        ? handler->GetAcoreString(LANG_ACTIVE)
-                        : "";
+                                            ? handler->GetAcoreString(LANG_ACTIVE)
+                                            : "";
 
                     char titleNameStr[80];
                     snprintf(titleNameStr, 80, name.c_str(), targetName);
@@ -1350,7 +1350,7 @@ public:
         int32 limit = limitStr ? atoi(limitStr) : -1;
 
         if (!Utf8ToUpperOnlyLatin
-            (account))
+                (account))
             return false;
 
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LIST_BY_NAME);
@@ -1428,15 +1428,13 @@ public:
                     }
 
                     if (plevel > 0 && prace > 0 && prace <= RACE_DRAENEI && pclass > 0 && pclass <= CLASS_DRUID)
-                        handler->PSendSysMessage("  %s (GUID %u) - %s - %s - %u%s", name.c_str(), guid, name_races[prace-1], name_classes[pclass-1], plevel, (online ? " - [ONLINE]" : ""));
+                        handler->PSendSysMessage("  %s (GUID %u) - %s - %s - %u%s", name.c_str(), guid, name_races[prace - 1], name_classes[pclass - 1], plevel, (online ? " - [ONLINE]" : ""));
                     else
                         handler->PSendSysMessage(LANG_LOOKUP_PLAYER_CHARACTER, name.c_str(), guid);
                     ++counter;
-                }
-                while (result2->NextRow() && (limit == -1 || counter < limit));
+                } while (result2->NextRow() && (limit == -1 || counter < limit));
             }
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
 
         if (counter == 0) // empty accounts only
         {

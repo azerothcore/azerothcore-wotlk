@@ -275,17 +275,17 @@ char* DBCFileLoader::AutoProduceStrings(char const* format, char* dataTable)
                     offset += sizeof(uint8);
                     break;
                 case FT_STRING:
+                {
+                    // fill only not filled entries
+                    char** slot = (char**)(&dataTable[offset]);
+                    if (!*slot || !** slot)
                     {
-                        // fill only not filled entries
-                        char** slot = (char**)(&dataTable[offset]);
-                        if (!*slot || !** slot)
-                        {
-                            const char* st = getRecord(y).getString(x);
-                            *slot = stringPool + (st - (char const*)stringTable);
-                        }
-                        offset += sizeof(char*);
-                        break;
+                        const char* st = getRecord(y).getString(x);
+                        *slot = stringPool + (st - (char const*)stringTable);
                     }
+                    offset += sizeof(char*);
+                    break;
+                }
                 case FT_LOGIC:
                     ASSERT(false && "Attempted to load DBC files that does not have field types that match what is in the core. Check DBCfmt.h or your DBC files.");
                     break;

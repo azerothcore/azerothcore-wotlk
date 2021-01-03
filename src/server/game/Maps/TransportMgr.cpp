@@ -478,7 +478,7 @@ void TransportMgr::CreateInstanceTransports(Map* map)
         CreateTransport(*itr, 0, map);
 }
 
-bool TransportAnimation::GetAnimNode(uint32 time, TransportAnimationEntry const* &curr, TransportAnimationEntry const* &next, float &percPos) const
+bool TransportAnimation::GetAnimNode(uint32 time, TransportAnimationEntry const*& curr, TransportAnimationEntry const*& next, float& percPos) const
 {
     if (Path.empty())
         return false;
@@ -497,7 +497,7 @@ bool TransportAnimation::GetAnimNode(uint32 time, TransportAnimationEntry const*
     return false;
 }
 
-void TransportAnimation::GetAnimRotation(uint32 time, G3D::Quat &curr, G3D::Quat &next, float &percRot) const
+void TransportAnimation::GetAnimRotation(uint32 time, G3D::Quat& curr, G3D::Quat& next, float& percRot) const
 {
     if (Rotations.empty())
     {

@@ -17,7 +17,8 @@
 #include "SocialMgr.h"
 
 // Cleanup bad characters
-void cleanStr(std::string &str) {
+void cleanStr(std::string& str)
+{
     str.erase(remove(str.begin(), str.end(), '|'), str.end());
 }
 
@@ -27,7 +28,7 @@ void WorldSession::HandleGuildQueryOpcode(WorldPacket& recvPacket)
     recvPacket >> guildId;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-   sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_QUERY [%s]: Guild: %u", GetPlayerInfo().c_str(), guildId);
+    sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_QUERY [%s]: Guild: %u", GetPlayerInfo().c_str(), guildId);
 #endif
     if (!guildId)
         return;
@@ -226,7 +227,7 @@ void WorldSession::HandleGuildSetOfficerNoteOpcode(WorldPacket& recvPacket)
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_SET_OFFICER_NOTE [%s]: Target: %s, Note: %s",
-         GetPlayerInfo().c_str(), playerName.c_str(), note.c_str());
+                   GetPlayerInfo().c_str(), playerName.c_str(), note.c_str());
 #endif
 
     // Check for overflow
@@ -349,10 +350,10 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "MSG_SAVE_GUILD_EMBLEM [%s]: Guid: [" UI64FMTD
-        "] Style: %d, Color: %d, BorderStyle: %d, BorderColor: %d, BackgroundColor: %d"
-        , GetPlayerInfo().c_str(), vendorGuid, emblemInfo.GetStyle()
-        , emblemInfo.GetColor(), emblemInfo.GetBorderStyle()
-        , emblemInfo.GetBorderColor(), emblemInfo.GetBackgroundColor());
+                   "] Style: %d, Color: %d, BorderStyle: %d, BorderColor: %d, BackgroundColor: %d"
+                   , GetPlayerInfo().c_str(), vendorGuid, emblemInfo.GetStyle()
+                   , emblemInfo.GetColor(), emblemInfo.GetBorderStyle()
+                   , emblemInfo.GetBorderColor(), emblemInfo.GetBackgroundColor());
 #endif
     if (GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_TABARDDESIGNER))
     {
@@ -379,7 +380,7 @@ void WorldSession::HandleGuildEventLogQueryOpcode(WorldPacket& /* recvPacket */)
         guild->SendEventLog(this);
 }
 
-void WorldSession::HandleGuildBankMoneyWithdrawn(WorldPacket & /* recvData */)
+void WorldSession::HandleGuildBankMoneyWithdrawn(WorldPacket& /* recvData */)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "MSG_GUILD_BANK_MONEY_WITHDRAWN [%s]", GetPlayerInfo().c_str());
@@ -408,9 +409,9 @@ void WorldSession::HandleGuildBankerActivate(WorldPacket& recvData)
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANKER_ACTIVATE [%s]: Go: [" UI64FMTD "] AllSlots: %u"
-        , GetPlayerInfo().c_str(), guid, sendAllSlots);
+                   , GetPlayerInfo().c_str(), guid, sendAllSlots);
 #endif
-    Guild * const guild = GetPlayer()->GetGuild();
+    Guild* const guild = GetPlayer()->GetGuild();
     if (!guild)
     {
         Guild::SendCommandResult(this, GUILD_COMMAND_VIEW_TAB, ERR_GUILD_PLAYER_NOT_IN_GUILD);
@@ -431,7 +432,7 @@ void WorldSession::HandleGuildBankQueryTab(WorldPacket& recvData)
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_QUERY_TAB [%s]: Go: [" UI64FMTD "], TabId: %u, ShowTabs: %u"
-       , GetPlayerInfo().c_str(), guid, tabId, full);
+                   , GetPlayerInfo().c_str(), guid, tabId, full);
 #endif
     if (GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_GUILD_BANK))
         if (Guild* guild = GetPlayer()->GetGuild())
@@ -446,7 +447,7 @@ void WorldSession::HandleGuildBankDepositMoney(WorldPacket& recvData)
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_DEPOSIT_MONEY [%s]: Go: [" UI64FMTD "], money: %u",
-        GetPlayerInfo().c_str(), guid, money);
+                   GetPlayerInfo().c_str(), guid, money);
 #endif
     if (GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_GUILD_BANK))
         if (money && GetPlayer()->HasEnoughMoney(money))
@@ -462,7 +463,7 @@ void WorldSession::HandleGuildBankWithdrawMoney(WorldPacket& recvData)
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_WITHDRAW_MONEY [%s]: Go: [" UI64FMTD "], money: %u",
-        GetPlayerInfo().c_str(), guid, money);
+                   GetPlayerInfo().c_str(), guid, money);
 #endif
     if (money && GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_GUILD_BANK))
         if (Guild* guild = GetPlayer()->GetGuild())
@@ -579,7 +580,7 @@ void WorldSession::HandleGuildBankUpdateTab(WorldPacket& recvData)
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_UPDATE_TAB [%s]: Go: [" UI64FMTD "], TabId: %u, Name: %s, Icon: %s"
-        , GetPlayerInfo().c_str(), guid, tabId, name.c_str(), icon.c_str());
+                   , GetPlayerInfo().c_str(), guid, tabId, name.c_str(), icon.c_str());
 #endif
 
     // Check for overflow
@@ -608,7 +609,7 @@ void WorldSession::HandleGuildBankLogQuery(WorldPacket& recvData)
         guild->SendBankLog(this, tabId);
 }
 
-void WorldSession::HandleQueryGuildBankTabText(WorldPacket &recvData)
+void WorldSession::HandleQueryGuildBankTabText(WorldPacket& recvData)
 {
     uint8 tabId;
     recvData >> tabId;
@@ -621,7 +622,7 @@ void WorldSession::HandleQueryGuildBankTabText(WorldPacket &recvData)
         guild->SendBankTabText(this, tabId);
 }
 
-void WorldSession::HandleSetGuildBankTabText(WorldPacket &recvData)
+void WorldSession::HandleSetGuildBankTabText(WorldPacket& recvData)
 {
     uint8 tabId;
     std::string text;
