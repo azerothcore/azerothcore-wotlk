@@ -266,7 +266,8 @@ void CreatureAI::MoveCircleChecks()
         !me->IsFreeToMove() ||
         !me->IsWithinMeleeRange(victim) ||
         (victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet())
-    ) {
+    )
+    {
         return;
     }
 
@@ -280,7 +281,8 @@ void CreatureAI::MoveBackwardsChecks() {
         !victim ||
         !me->IsFreeToMove() ||
         (victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet())
-    ) {
+    )
+    {
         return;
     }
 

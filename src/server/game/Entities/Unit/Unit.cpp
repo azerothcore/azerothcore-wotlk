@@ -173,7 +173,6 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_vehicle(nullptr),
     m_vehicleKit(nullptr),
     m_unitTypeMask(UNIT_MASK_NONE),
-    m_attackPosition(0),
     m_HostileRefManager(this),
     m_comboTarget(nullptr)
 {
@@ -604,10 +603,10 @@ bool Unit::IsWithinRange(Unit const* obj, float dist) const
         return false;
     }
 
-    float dx = GetPositionX() - obj->GetPositionX();
-    float dy = GetPositionY() - obj->GetPositionY();
-    float dz = GetPositionZ() - obj->GetPositionZ();
-    float distsq = dx * dx + dy * dy + dz * dz;
+    auto dx = GetPositionX() - obj->GetPositionX();
+    auto dy = GetPositionY() - obj->GetPositionY();
+    auto dz = GetPositionZ() - obj->GetPositionZ();
+    auto distsq = dx * dx + dy * dy + dz * dz;
 
     return distsq <= dist * dist;
 }
@@ -2224,12 +2223,6 @@ void Unit::AttackerStateUpdate (Unit* victim, WeaponAttackType attType, bool ext
     }
 }
 
-struct AttackDistance {
-    AttackDistance(uint8 index, AttackPosition attackPos) : _index(index), _attackPos(attackPos) {}
-    uint8 _index;
-    AttackPosition _attackPos;
-};
-
 Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 {
     if (!attacker) // only player & pets to save CPU
@@ -2279,7 +2272,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         validAttackers++;
     }
 
-    float attackerSize = attacker->GetObjectSize();
+    auto attackerSize = attacker->GetObjectSize();
 
     // in instance: the more attacker there are, the higher will be the tollerance
     // outside: creatures should not intersecate

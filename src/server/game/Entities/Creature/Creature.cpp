@@ -609,7 +609,9 @@ void Creature::Update(uint32 diff)
                     {
                         m_moveBackwardsMovementTime -= diff;
                     }
-                } else {
+                }
+                else
+                {
                     m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
                 }
 
@@ -2959,7 +2961,8 @@ bool Creature::IsMovementPreventedByCasting() const
         return true;
     }
 
-    if (HasUnitState(UNIT_STATE_CASTING)) {
+    if (HasUnitState(UNIT_STATE_CASTING))
+    {
         return true;
     }
 

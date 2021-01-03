@@ -2473,8 +2473,6 @@ public:
     // Movement info
     Movement::MoveSpline* movespline;
 
-    [[nodiscard]] AttackPosition getAttackPosition() { return m_attackPosition; }
-
     [[nodiscard]] float GetCollisionHeight() const override;
 
 protected:
@@ -2559,9 +2557,6 @@ protected:
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
     bool _instantCast;
 
-    std::map<uint64,AttackPosition> attackMeleePositions;
-    AttackPosition m_attackPosition;
-
 private:
     bool IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, SpellInfo const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent, ProcEventInfo const& eventInfo);
     bool HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
@@ -2606,9 +2601,6 @@ private:
 
     uint32 _oldFactionId;           ///< faction before charm
     bool m_petCatchUp;
-
-    static constexpr uint32 ATTACK_POINT_CHECK_INTERVAL = 200;
-    uint32 _attackPointCheckTimer = ATTACK_POINT_CHECK_INTERVAL;
 };
 
 namespace acore

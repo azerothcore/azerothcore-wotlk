@@ -82,9 +82,13 @@ namespace Movement
         moveFlags |= MOVEMENTFLAG_SPLINE_ENABLED;
 
         if (!args.flags.orientationInversed)
+        {
             moveFlags = (moveFlags & ~(MOVEMENTFLAG_BACKWARD)) | MOVEMENTFLAG_FORWARD;
+        }
         else
+        {
             moveFlags = (moveFlags & ~(MOVEMENTFLAG_FORWARD)) | MOVEMENTFLAG_BACKWARD;
+        }
 
         if (moveFlags & MOVEMENTFLAG_ROOT)
             moveFlags &= ~MOVEMENTFLAG_MASK_MOVING;

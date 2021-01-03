@@ -87,7 +87,9 @@ public:
 
         bool useRaycast = false;
         if (para && (strcmp(para, "line") == 0 || strcmp(para, "ray") == 0 || strcmp(para, "raycast") == 0))
+        {
             useRaycast = true;
+        }
 
         // unit locations
         float x, y, z;

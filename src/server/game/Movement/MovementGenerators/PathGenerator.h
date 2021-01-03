@@ -85,7 +85,10 @@ class PathGenerator
                 len += sqrt( dx * dx + dy * dy + dz * dz );
             }
             else
+            {
                 return len;
+            }
+
             for (uint32 i = 1; i < size; ++i)
             {
                 dx = _pathPoints[i].x - _pathPoints[i - 1].x;

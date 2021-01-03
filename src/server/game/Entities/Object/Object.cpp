@@ -1153,11 +1153,15 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks ch
     {
         oz += GetCollisionHeight();
         float x, y, z;
-        if (GetTypeId() == TYPEID_PLAYER) {
+        if (GetTypeId() == TYPEID_PLAYER)
+        {
             GetPosition(x, y, z);
             z += GetCollisionHeight();
-        } else
+        }
+        else
+        {
             GetHitSpherePointFor({ ox, oy, oz }, x, y, z);
+        }
 
         return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks);
     }
@@ -2687,7 +2691,7 @@ Position WorldObject::GetFirstCollisionPosition(float startX, float startY, floa
     ang = (ang >= 0) ? ang : 2 * M_PI + ang;
     Position pos = Position(startX, startY, startZ, ang);
 
-    float distance = pos.GetExactDist2d(destX,destY);
+    auto distance = pos.GetExactDist2d(destX,destY);
 
     MovePositionToFirstCollision(pos, distance, ang);
     return pos;
@@ -2741,8 +2745,11 @@ bool WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
 
     // Check for valid path types before we proceed
     if (!(path.GetPathType() & PATHFIND_NOT_USING_PATH))
-        if (path.GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END))
+    {
+        if (path.GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)) {
             return false;
+        }
+    }
 
     // collision check
     bool col = (!result || (path.GetPathType() & PATHFIND_SHORTCUT) || (path.GetPathType() & PATHFIND_FARFROMPOLY));
@@ -2833,20 +2840,24 @@ bool WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
     pos.m_orientation = m_orientation;
 
     // position has no ground under it (or is too far away)
-    /*if (groundZ <= INVALID_HEIGHT)
+/*     if (ground <= INVALID_HEIGHT)
     {
         if (Unit const* unit = ToUnit())
         {
             // unit can fly, ignore.
             if (unit->CanFly())
-                return;
+            {
+                return false;
+            }
 
             // fall back to gridHeight if any
-            float gridHeight = GetMap()->GetGridHeight(pos.m_positionX, pos.m_positionY);
+            float gridHeight = GetMap()->GetHeight(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
             if (gridHeight > INVALID_HEIGHT)
-                pos.m_positionZ = gridHeight + unit->GetHoverOffset();
+            {
+                pos.m_positionZ = gridHeight + unit->GetHoverHeight();
+            }
         }
-    }*/
+    } */
 
     return col;
 }

@@ -323,7 +323,9 @@ void MotionMaster::MoveChase(Unit* target, float dist, float angle)
 void MotionMaster::MoveBackwards(Unit* target, float dist)
 {
     if (!target)
+    {
         return;
+    }
 
     Position const& pos = target->GetPosition();
     float angle = target->GetAngle(_owner);
@@ -337,7 +339,8 @@ void MotionMaster::MoveBackwards(Unit* target, float dist)
     //else
     //    point.z = _owner->GetMapHeight(point.x, point.y, point.z);
 
-    if (_owner->GetMap()->CanReachPositionAndGetCoords(_owner, point.x, point.y, point.z, true, 6.0f, M_PI_4)) {
+    if (_owner->GetMap()->CanReachPositionAndGetCoords(_owner, point.x, point.y, point.z, true, 6.0f, M_PI_4))
+    {
         Movement::MoveSplineInit init(_owner);
         init.MoveTo(point.x, point.y, point.z, true);
         init.SetFacing(target);
@@ -348,12 +351,14 @@ void MotionMaster::MoveBackwards(Unit* target, float dist)
 
 void MotionMaster::MoveCircleTarget(Unit* target)
 {
-    if (!target) {
+    if (!target)
+    {
         return;
     }
 
     Position* point = target->GetMeleeAttackPoint(_owner);
-    if (point == NULL) {
+    if (point == NULL)
+    {
         return;
     }
 
@@ -371,7 +376,8 @@ void MotionMaster::MoveCircleTarget(Unit* target)
     float y = point->m_positionY;
     float z = point->m_positionZ;
 
-    if (_map->CanReachPositionAndGetCoords(_owner, x, y, z, true, 6.0f, M_PI/3)) {
+    if (_map->CanReachPositionAndGetCoords(_owner, x, y, z, true, 6.0f, M_PI/3))
+    {
         Movement::MoveSplineInit init(_owner);
         init.SetSmooth();
         init.MoveTo(x, y, z, true);

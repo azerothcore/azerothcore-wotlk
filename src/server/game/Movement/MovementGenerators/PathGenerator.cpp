@@ -93,11 +93,15 @@ dtPolyRef PathGenerator::GetPathPolyByPosition(dtPolyRef const* polyPath, uint32
         }
 
         if (minDist < 1.0f) // shortcut out - close enough for us
+        {
             break;
+        }
     }
 
     if (distance)
+    {
         *distance = dtMathSqrtf(minDist);
+    }
 
     return (minDist < 3.0f) ? nearestPoly : INVALID_POLYREF;
 }
@@ -199,18 +203,26 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         if (_source->GetMap()->IsUnderWater(p.x, p.y, p.z))
         {
             if (Unit const* _sourceUnit = _source->ToUnit())
+            {
                 if (_sourceUnit->CanSwim())
+                {
                     buildShotrcut = true;
+                }
+            }
         }
         else
         {
             if (Unit const* _sourceUnit = _source->ToUnit())
             {
                 if (_sourceUnit->CanFly())
+                {
                     buildShotrcut = true;
+                }
                 // Allow to build a shortcut if the unit is falling and it's trying to move downwards towards a target (i.e. charging)
                 else if (_sourceUnit->IsFalling() && endPos.z < startPos.z)
+                {
                     buildShotrcut = true;
+                }
             }
         }
 
@@ -286,11 +298,13 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         }
 
         for (pathEndIndex = _polyLength-1; pathEndIndex > pathStartIndex; --pathEndIndex)
+        {
             if (_pathPolyRefs[pathEndIndex] == endPoly)
             {
                 endPolyFound = true;
                 break;
             }
+        }
     }
 
     if (startPolyFound && endPolyFound)
@@ -476,9 +490,13 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
     // by now we know what type of path we can get
     if (_pathPolyRefs[_polyLength - 1] == endPoly && !(_type & PATHFIND_INCOMPLETE))
+    {
         _type = PATHFIND_NORMAL;
+    }
     else
+    {
         _type = PATHFIND_INCOMPLETE;
+    }
 
     AddFarFromPolyFlags(startFarFromPoly, endFarFromPoly);
 
@@ -579,7 +597,9 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
 void PathGenerator::NormalizePath()
 {
     for (uint32 i = 0; i < _pathPoints.size(); ++i)
+    {
         _source->UpdateAllowedPositionZ(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z);
+    }
 }
 
 void PathGenerator::BuildShortcut()
@@ -782,10 +802,14 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
     {
         // Pick the closest points on poly border
         if (dtStatusFailed(_navMeshQuery->closestPointOnPolyBoundary(polys[0], startPos, iterPos)))
+        {
             return DT_FAILURE;
+        }
 
         if (dtStatusFailed(_navMeshQuery->closestPointOnPolyBoundary(polys[npolys - 1], endPos, targetPos)))
+        {
             return DT_FAILURE;
+        }
     }
     else
     {
@@ -832,7 +856,9 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
 
         uint32 nvisited = 0;
         if (dtStatusFailed(_navMeshQuery->moveAlongSurface(polys[0], iterPos, moveTgt, &_filter, result, visited, (int*)&nvisited, MAX_VISIT_POLY)))
+        {
             return DT_FAILURE;
+        }
         npolys = FixupCorridor(polys, npolys, MAX_PATH_LENGTH, visited, nvisited);
 
         if (dtStatusFailed(_navMeshQuery->getPolyHeight(polys[0], result, &result[1])))
@@ -984,7 +1010,11 @@ bool PathGenerator::IsInvalidDestinationZ(Unit const* target) const
 void PathGenerator::AddFarFromPolyFlags(bool startFarFromPoly, bool endFarFromPoly)
 {
     if (startFarFromPoly)
+    {
         _type = PathType(_type | PATHFIND_FARFROMPOLY_START);
+    }
     if (endFarFromPoly)
+    {
         _type = PathType(_type | PATHFIND_FARFROMPOLY_END);
+    }
 }

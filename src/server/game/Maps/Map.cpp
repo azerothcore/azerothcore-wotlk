@@ -3402,7 +3402,8 @@ bool Map::CanReachPositionAndGetCoords(Unit* who, PathGenerator path, bool check
 {
     double deviation = 0.0f;
     G3D::Vector3 prevPath = path.GetStartPosition();
-    for (auto & vector : path.GetPath()) {
+    for (auto & vector : path.GetPath())
+    {
         float x = vector.x;
         float y = vector.y;
         float z = vector.z;
@@ -3413,7 +3414,9 @@ bool Map::CanReachPositionAndGetCoords(Unit* who, PathGenerator path, bool check
         // the straight path with a higher margin than the one desired
         // in this case we return false
         if (deviation > maxDeviationAngle)
+        {
             return false;
+        }
 
         float ang = getAngle(prevPath.x, prevPath.y, x, y);
 
@@ -3451,20 +3454,25 @@ bool Map::CanReachPositionAndGetCoords(Unit* who, float startX, float startY, fl
     const Map* _map = who->GetBaseMap();
 
     // check map geometry for possible collision
-    if (checkCollision) {
+    if (checkCollision)
+    {
         Position pos = Position(startX, startY, startZ, startAngle);
 
-        float distance = pos.GetExactDist2d(destX,destY);
+        auto distance = pos.GetExactDist2d(destX,destY);
 
-        bool collided = who->MovePositionToFirstCollision(pos, distance, pos.GetRelativeAngle(destX,destY));
+        auto collided = who->MovePositionToFirstCollision(pos, distance, pos.GetRelativeAngle(destX,destY));
 
         destX = pos.GetPositionX();
         destY = pos.GetPositionY();
         destZ = pos.GetPositionZ();
 
         if (collided)
+        {
             return false;
-    } else {
+        }
+    }
+    else
+    {
         // otherwise calculate a new z
         destZ = _map->GetHeight(who->GetPhaseMask(), destX, destY, destZ, true);
     }
@@ -3485,7 +3493,8 @@ bool Map::CanReachPositionAndGetCoords(Unit* who, float startX, float startY, fl
     // if water environment
     bool is_water_now = _map->IsInWater(startX, startY, startZ);
 
-    if (!isInLineOfSight(startX, startY, startZ, destX, destY, destZ, who->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS)) {
+    if (!isInLineOfSight(startX, startY, startZ, destX, destY, destZ, who->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS))
+    {
         return false;
     }
 
