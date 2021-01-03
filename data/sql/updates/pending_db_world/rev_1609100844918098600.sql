@@ -1,7 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609100844918098600');
 
-UPDATE `creature` SET `MovementType` = 2 WHERE `guid` = 85221;
-
 DELETE FROM `creature` WHERE (`id` IN (25258, 25261, 25259) AND `guid` IN (85221, 85222, 85226));
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (85221, 25258, 571, 0, 0, 1, 1, 23031, 0, 2280.15, 5179.14, 11.423, 4.38078, 1200, 0, 0, 1, 0, 2, 0, 0, 0, '', 0),
@@ -10,7 +8,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 
 UPDATE `creature_template` SET `flags_extra` = 2, `unit_flags` = 0, `AIName` = 'SmartAI' WHERE `entry` IN (25258, 25259, 25260, 25261);
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25258);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (25258, 25259, 25260, 25261));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (25258, 0, 0, 0, 34, 0, 100, 1, 2, 5, 0, 0, 0, 80, 2525800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - On Reached Point 5 - Run Script (No Repeat)'),
 (25258, 0, 1, 0, 34, 0, 100, 0, 2, 9, 0, 0, 0, 80, 2525801, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - On Reached Point 9 - Run Script'),
@@ -20,15 +18,17 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25258, 0, 5, 0, 17, 0, 100, 0, 25260, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - On Summoned Unit - Store Targetlist'),
 (25258, 0, 6, 0, 1, 0, 100, 1, 100, 100, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - Out of Combat - Change Equipment (No Repeat)'),
 (25258, 0, 7, 0, 1, 0, 100, 1, 100, 100, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 10, 85222, 25259, 0, 0, 0, 0, 0, 0, 'Footman Rob - Out of Combat - Change Equipment (No Repeat)'),
-(25258, 0, 8, 0, 1, 0, 100, 1, 100, 100, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 10, 85226, 25261, 0, 0, 0, 0, 0, 0, 'Footman Rob - Out of Combat - Change Equipment (No Repeat)');
+(25258, 0, 8, 0, 1, 0, 100, 1, 100, 100, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 10, 85226, 25261, 0, 0, 0, 0, 0, 0, 'Footman Rob - Out of Combat - Change Equipment (No Repeat)'),
+(25259, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 4.27258, 'Footman George - On Data Set 1 1 - Set Orientation 4.27258'),
+(25260, 0, 0, 1, 63, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Mitch - On Just Created - Say Line 0'),
+(25260, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Mitch - On Just Created - Set Run Off'),
+(25260, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2264.94, 5221.99, 11.2882, 4.3713, 'Footman Mitch - On Just Created - Move To Position'),
+(25261, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 4.27258, 'Footman Chuck - On Data Set 1 1 - Set Orientation 4.28258');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2525800);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (2525800, 2525801, 2525802, 2525803));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2525800, 9, 0, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 1, 0, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Say Line 0'),
-(2525800, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 85222, 25259, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Say Line 0');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2525801);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2525800, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 85222, 25259, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Say Line 0'),
 (2525801, 9, 0, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 1, 1, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Say Line 1'),
 (2525801, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 0, 6000, 0, 0, 0, 0, 10, 110613, 25245, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Say Line 0'),
 (2525801, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 2, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Say Line 2'),
@@ -48,11 +48,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2525801, 9, 16, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 71, 1, 0, 2703, 0, 0, 0, 10, 85226, 25261, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Change Equipment'),
 (2525801, 9, 17, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Change Equipment'),
 (2525801, 9, 18, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 10, 85222, 25259, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Change Equipment'),
-(2525801, 9, 19, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 10, 85226, 25261, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Change Equipment');
-
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2525802);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2525801, 9, 19, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 10, 85226, 25261, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Change Equipment'),
 (2525802, 9, 0, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 1, 3, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Say Line 3'),
 (2525802, 9, 1, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 85222, 25259, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Set Data 1 1'),
 (2525802, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 10, 85226, 25261, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Set Data 1 1'),
@@ -62,29 +58,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2525802, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 5, 11, 0, 0, 0, 0, 0, 10, 85226, 25261, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Play Emote 11'),
 (2525802, 9, 7, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 5, 274, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Play Emote 274'),
 (2525802, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 5, 274, 0, 0, 0, 0, 0, 10, 85222, 25259, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Play Emote 274'),
-(2525802, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 5, 274, 0, 0, 0, 0, 0, 10, 85226, 25261, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Play Emote 274');
-
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2525803);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2525802, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 5, 274, 0, 0, 0, 0, 0, 10, 85226, 25261, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Play Emote 274'),
 (2525803, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 41, 1, 0, 0, 0, 0, 0, 10, 85222, 25259, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Despawn Instant'),
 (2525803, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 41, 1, 0, 0, 0, 0, 0, 10, 85226, 25261, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Despawn Instant'),
 (2525803, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 41, 1, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Despawn Instant'),
 (2525803, 9, 3, 0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 41, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Rob - Actionlist - Despawn Instant');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25259);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(25259, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 4.27258, 'Footman George - On Data Set 1 1 - Set Orientation 4.27258');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25260);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(25260, 0, 0, 1, 63, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Mitch - On Just Created - Say Line 0'),
-(25260, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Footman Mitch - On Just Created - Set Run Off'),
-(25260, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2264.94, 5221.99, 11.2882, 4.3713, 'Footman Mitch - On Just Created - Move To Position');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25261);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(25261, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 4.27258, 'Footman Chuck - On Data Set 1 1 - Set Orientation 4.28258');
 
 SET @PATH := 8522110;
 DELETE FROM `creature_addon` WHERE `guid` = 85221;
