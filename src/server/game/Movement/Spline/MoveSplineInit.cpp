@@ -79,10 +79,12 @@ namespace Movement
         move_spline.onTransport = transport;
 
         uint32 moveFlags = unit->m_movementInfo.GetMovementFlags();
-        //if (!args.flags.OrientationInversed)
-            moveFlags |= (MOVEMENTFLAG_SPLINE_ENABLED | MOVEMENTFLAG_FORWARD);
-        //else
-        //    moveFlags |= (MOVEMENTFLAG_SPLINE_ENABLED | MOVEMENTFLAG_BACKWARD);
+        moveFlags |= MOVEMENTFLAG_SPLINE_ENABLED;
+
+        if (!args.flags.orientationInversed)
+            moveFlags = (moveFlags & ~(MOVEMENTFLAG_BACKWARD)) | MOVEMENTFLAG_FORWARD;
+        else
+            moveFlags = (moveFlags & ~(MOVEMENTFLAG_FORWARD)) | MOVEMENTFLAG_BACKWARD;
 
         if (moveFlags & MOVEMENTFLAG_ROOT)
             moveFlags &= ~MOVEMENTFLAG_MASK_MOVING;
