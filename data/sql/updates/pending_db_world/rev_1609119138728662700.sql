@@ -17,10 +17,26 @@ UPDATE `creature` SET `orientation`=2.40, `wander_distance`=4, `MovementType`=1 
 -- Fix EMOTE_DEATH
 UPDATE `creature_text` SET `Text`='%s takes his last breath.', `Type`=16, `BroadcastTextId`=13044, `comment`='heigan EMOTE_DEATH' WHERE `CreatureID`=15936 AND `GroupID`=3 AND `ID`=0;
 
+
 /* Loatheb */
 
 -- Useless, workaround implemented in boss_loatheb.cpp
 DELETE FROM `spell_script_names` WHERE `spell_id`=59481;
 -- Adjust movement speed for Spores
 UPDATE `creature_template` SET `speed_walk`=0.4, `speed_run`=0.4 WHERE `entry` IN (16286, 30068);
+
+
+/* Instructor Razuvious */
+
+-- Fix texts and emotes
+UPDATE `creature_text` SET `GroupID`=2, `ID`=3, `comment`='Razuvious SAY_TAUNTED #4' WHERE `CreatureID`=16061 AND `GroupID`=1 AND `ID`=1;
+UPDATE `broadcast_text_locale` SET `MaleText`='%s suelta un grito triunfal.' WHERE `ID`=13082 AND `locale` IN ('esES', 'esMX');
+UPDATE `creature_text` SET `Type`=16, `comment`='Razuvious SAY_SLAY' WHERE `CreatureID`=16061 AND `GroupID`=4 AND `ID`=0;
+UPDATE `creature_text` SET `comment`='Razuvious SAY_AGGRO #4' WHERE `CreatureID`=16061 AND `GroupID`=0 AND `ID`=3;
+UPDATE `creature_text` SET `GroupID`=2, `ID`=4, `comment`='Razuvious SAY_TAUNTED #5' WHERE `CreatureID`=16061 AND `GroupID`=1 AND `ID`=0;
+UPDATE `creature_text` SET `Probability`=20 WHERE `CreatureID`=16061 AND `GroupID`=2 AND `ID` IN (0, 1, 2, 3, 4);
+UPDATE `creature_text` SET `Probability`=25 WHERE `CreatureID`=16061 AND `GroupID`=0 AND `ID` IN (0, 1, 2, 3);
+UPDATE `creature_text` SET `Sound`=8862 WHERE `CreatureID`=16061 AND `GroupID`=2 AND `ID`=4;
+UPDATE `creature_text` SET `GroupID`=1 WHERE `CreatureID`=16061 AND `GroupID`=4 AND `ID`=0;
+UPDATE `creature_text` SET `Sound`=8863 WHERE `CreatureID`=16061 AND `GroupID`=1 AND `ID`=0;
 
