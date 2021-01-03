@@ -29,8 +29,9 @@ inline float getSlopeAngle(float startX, float startY, float startZ, float destX
 
     float ang = acos(a / (b * c));
 
-    if (isnan(ang)) {
-        return 0;
+    if (isnan(ang))
+    {
+        return 0.0f;
     }
 
     return ang;
