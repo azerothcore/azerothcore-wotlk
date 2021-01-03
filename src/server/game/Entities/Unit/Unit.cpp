@@ -173,9 +173,8 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     m_vehicle(nullptr),
     m_vehicleKit(nullptr),
     m_unitTypeMask(UNIT_MASK_NONE),
-    m_attackPosition(NULL),
+    m_attackPosition(0),
     m_HostileRefManager(this),
-    // m_spellHistory(new SpellHistory(this)),
     m_comboTarget(nullptr)
 {
 #ifdef _MSC_VER
@@ -2235,21 +2234,21 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 {
     if (!attacker) // only player & pets to save CPU
     {
-        return NULL;
+        return nullptr;
     }
 
     AttackerSet attackers = getAttackers();
 
     if (attackers.size() <= 1) // if the attackers are not more than one
     {
-        return NULL;
+        return nullptr;
     }
 
     float meleeReach = attacker->GetMeleeReach();
 
     if (meleeReach <= 0)
     {
-        return NULL;
+        return nullptr;
     }
 
     float currentAngle, minDistance = 0;
@@ -2288,7 +2287,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 
     if (!refUnit || minDistance > distanceTollerance)
     {
-        return NULL;
+        return nullptr;
     }
 
     double ray = attackerSize > refUnit->GetObjectSize() ? attackerSize / 2.0f : refUnit->GetObjectSize() / 2.0f;
@@ -2311,7 +2310,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 
         if (a == 0) // should not happen
         {
-            return NULL;
+            return nullptr;
         }
 
         double sq = sqrt(pow(b,2.0f)-4.0f*a*c);

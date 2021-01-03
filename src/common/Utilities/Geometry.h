@@ -13,21 +13,21 @@ using namespace std;
 
 inline float getAngle(float startX, float startY, float destX, float destY)
 {
-    float dx = destX - startX;
-    float dy = destY - startY;
+    auto dx = destX - startX;
+    auto dy = destY - startY;
 
-    float ang = atan2(dy, dx);
+    auto ang = atan2(dy, dx);
     ang = (ang >= 0) ? ang : 2 * M_PI + ang;
     return ang;
 }
 
 inline float getSlopeAngle(float startX, float startY, float startZ, float destX, float destY, float destZ)
 {
-    float a = (startX * destX + startY * destY + startZ * destZ);
-    float b = sqrt(pow(startX,2.0f) + pow(startY,2.0f) + pow(startZ, 2.0f));
-    float c = sqrt(pow(destX,2.0f) + pow(destY,2.0f) + pow(destZ, 2.0f));
+    auto a = (startX * destX + startY * destY + startZ * destZ);
+    auto b = sqrt(pow(startX,2.0f) + pow(startY,2.0f) + pow(startZ, 2.0f));
+    auto c = sqrt(pow(destX,2.0f) + pow(destY,2.0f) + pow(destZ, 2.0f));
 
-    float ang = acos(a / (b * c));
+    auto ang = acos(a / (b * c));
 
     if (isnan(ang))
     {
