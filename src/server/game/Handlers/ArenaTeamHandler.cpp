@@ -240,11 +240,13 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket& recvData)
         GroupQueueInfo ginfo;
         BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
         if (queue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
+        {
             if (ginfo.IsInvitedToBGInstanceGUID)
             {
                 SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, "", "", ERR_ARENA_TEAMS_LOCKED);
                 return;
             }
+        }
     }
 
     // If team consists only of the captain, disband the team
@@ -285,8 +287,10 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket& recvData)
             GroupQueueInfo ginfo;
             BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
             if (queue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
+            {
                 if (ginfo.IsInvitedToBGInstanceGUID)
                     return;
+            }
         }
 
         // Teams cannot be disbanded during fights
@@ -346,11 +350,13 @@ void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket& recvData)
         GroupQueueInfo ginfo;
         BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
         if (queue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
+        {
             if (ginfo.IsInvitedToBGInstanceGUID)
             {
                 SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, "", "", ERR_ARENA_TEAMS_LOCKED);
                 return;
             }
+        }
     }
 
     // Player cannot be removed during fights
