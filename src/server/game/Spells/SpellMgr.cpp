@@ -4659,12 +4659,11 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectRadiusIndex[2] = EFFECT_RADIUS_20_YARDS; // SPELL_EFFECT_WEAPON_DAMAGE
     });
 
-
     // WintergraspCannon - Spell Fire Cannon - RangeIndex
     ApplySpellFix({ 51422 }, [](SpellEntry* spellInfo)
-        {
-            spellInfo->rangeIndex = 187; // "300yd"
-        });
+    {
+        spellInfo->rangeIndex = 187; // "300yd"
+    });
 
     // WintergraspCatapult - Spell Plague Barrell - Range
     ApplySpellFix({ 57606 }, [](SpellEntry* spellInfo)
