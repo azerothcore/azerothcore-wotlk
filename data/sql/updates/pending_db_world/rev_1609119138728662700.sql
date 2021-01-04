@@ -28,15 +28,20 @@ UPDATE `creature_template` SET `speed_walk`=0.4, `speed_run`=0.4 WHERE `entry` I
 
 /* Instructor Razuvious */
 
--- Fix texts and emotes
-UPDATE `creature_text` SET `GroupID`=2, `ID`=3, `comment`='Razuvious SAY_TAUNTED #4' WHERE `CreatureID`=16061 AND `GroupID`=1 AND `ID`=1;
+-- Fix all emotes / texts / dialogues / sound files
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
+(16061, 0, 0, 'Do as I taught you!', 14, 0, 25, 0, 0, 8855, 13075, 3, 'Razuvious SAY_AGGRO #1');
+(16061, 0, 1, 'The time for practice is over! Show me what you have learned!', 14, 0, 25, 0, 0, 8859, 13078, 3, 'Razuvious SAY_AGGRO #2');
+(16061, 0, 2, 'Show them no mercy!', 14, 0, 25, 0, 0, 8856, 13076, 3, 'Razuvious SAY_AGGRO #3');
+(16061, 0, 3, 'Sweep the leg... Do you have a problem with that?', 14, 0, 25, 0, 0, 8861, 13080, 3, 'Razuvious SAY_AGGRO #4');
+(16061, 1, 0, '%s lets loose a triumphant shout.', 16, 0, 50, 0, 0, 8863, 13082, 3, 'Razuvious SAY_SLAY #1');
+(16061, 1, 1, 'You should have stayed home.', 14, 0, 50, 0, 0, 8862, 13081, 3, 'Razuvious SAY_SLAY #2');
+(16061, 2, 0, 'Hah hah, I\'m just getting warmed up!', 14, 0, 20, 0, 0, 8852, 13072, 3, 'Razuvious SAY_TAUNTED #1');
+(16061, 2, 1, 'Stand and fight!', 14, 0, 20, 0, 0, 8853, 13073, 3, 'Razuvious SAY_TAUNTED #2');
+(16061, 2, 2, 'Show me what you\'ve got!', 14, 0, 20, 0, 0, 8854, 13074, 3, 'Razuvious SAY_TAUNTED #3');
+(16061, 2, 3, 'You disappoint me, students!', 14, 0, 20, 0, 0, 8858, 13077, 3, 'Razuvious SAY_TAUNTED #4');
+(16061, 2, 4, 'You should have stayed home.', 14, 0, 20, 0, 0, 8862, 13081, 3, 'Razuvious SAY_TAUNTED #5');
+(16061, 3, 0, 'An honorable... death.', 14, 0, 100, 0, 0, 8860, 13079, 3, 'Razuvious SAY_DEATH');
+-- Fix translation
 UPDATE `broadcast_text_locale` SET `MaleText`='%s suelta un grito triunfal.' WHERE `ID`=13082 AND `locale` IN ('esES', 'esMX');
-UPDATE `creature_text` SET `Type`=16, `comment`='Razuvious SAY_SLAY' WHERE `CreatureID`=16061 AND `GroupID`=4 AND `ID`=0;
-UPDATE `creature_text` SET `comment`='Razuvious SAY_AGGRO #4' WHERE `CreatureID`=16061 AND `GroupID`=0 AND `ID`=3;
-UPDATE `creature_text` SET `GroupID`=2, `ID`=4, `comment`='Razuvious SAY_TAUNTED #5' WHERE `CreatureID`=16061 AND `GroupID`=1 AND `ID`=0;
-UPDATE `creature_text` SET `Probability`=20 WHERE `CreatureID`=16061 AND `GroupID`=2 AND `ID` IN (0, 1, 2, 3, 4);
-UPDATE `creature_text` SET `Probability`=25 WHERE `CreatureID`=16061 AND `GroupID`=0 AND `ID` IN (0, 1, 2, 3);
-UPDATE `creature_text` SET `Sound`=8862 WHERE `CreatureID`=16061 AND `GroupID`=2 AND `ID`=4;
-UPDATE `creature_text` SET `GroupID`=1 WHERE `CreatureID`=16061 AND `GroupID`=4 AND `ID`=0;
-UPDATE `creature_text` SET `Sound`=8863 WHERE `CreatureID`=16061 AND `GroupID`=1 AND `ID`=0;
 

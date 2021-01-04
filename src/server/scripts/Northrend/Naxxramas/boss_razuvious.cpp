@@ -22,19 +22,14 @@ enum Spells
     SPELL_JAGGED_KNIFE              = 55550,
     SPELL_HOPELESS                  = 29125,
 
-    SPELL_BLOOD_STRIKE              = 61696,
-    SPELL_TAUNT                     = 29060,
-    SPELL_BONE_BARRIER              = 29061
+    SPELL_TAUNT                     = 29060
 };
 
 enum Events
 {
     EVENT_SPELL_UNBALANCING_STRIKE  = 1,
     EVENT_SPELL_DISRUPTING_SHOUT    = 2,
-    EVENT_SPELL_JAGGED_KNIFE        = 3,
-
-    EVENT_MINION_BLOOD_STRIKE       = 4,
-    EVENT_MINION_BONE_BARRIER       = 5
+    EVENT_SPELL_JAGGED_KNIFE        = 3
 };
 
 enum Misc
@@ -90,7 +85,10 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            Talk(SAY_SLAY);
+            if (roll_chance_i(30))
+            {
+                Talk(SAY_SLAY);
+            }
             if (who->GetTypeId() == TYPEID_PLAYER)
             {
                 if (pInstance)
@@ -205,31 +203,18 @@ public:
                 cr->SetInCombatWithZone();
                 cr->AI()->AttackStart(who);
             }
-            events.ScheduleEvent(EVENT_MINION_BLOOD_STRIKE, 4000);
-            events.ScheduleEvent(EVENT_MINION_BONE_BARRIER, 9000);
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING) || me->IsCharmed())
-                return;
-
-            switch (events.ExecuteEvent())
+            if (UpdateVictim())
             {
-                case EVENT_MINION_BLOOD_STRIKE:
-                    me->CastSpell(me->GetVictim(), SPELL_BLOOD_STRIKE, false);
-                    events.RepeatEvent(8000);
-                    break;
-                case EVENT_MINION_BONE_BARRIER:
-                    me->CastSpell(me, SPELL_BONE_BARRIER, true);
-                    events.RepeatEvent(40000);
-                    break;
+                events.Update(diff);
+                if (!me->HasUnitState(UNIT_STATE_CASTING) || !me->IsCharmed())
+                {
+                    DoMeleeAttackIfReady();
+                }
             }
-            DoMeleeAttackIfReady();
         }
     };
 };
