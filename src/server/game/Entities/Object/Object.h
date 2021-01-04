@@ -643,7 +643,7 @@ struct MovementInfo
     // spline
     float splineElevation{0.0f};
 
-    MovementInfo()  
+    MovementInfo()
     {
         pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
         transport.Reset();
@@ -796,7 +796,10 @@ public:
         GetPosition(&pos);
         MovePosition(pos, dist, angle);
     }
-    void MovePositionToFirstCollision(Position& pos, float dist, float angle);
+    bool MovePositionToFirstCollision(Position& pos, float dist, float angle);
+    Position GetFirstCollisionPosition(float startX, float startY, float startZ, float destX, float destY);
+    Position GetFirstCollisionPosition(float destX, float destY, float destZ);
+    Position GetFirstCollisionPosition(float dist, float angle);
     void GetFirstCollisionPosition(Position& pos, float dist, float angle)
     {
         GetPosition(&pos);
@@ -1060,6 +1063,9 @@ public:
     [[nodiscard]] virtual float GetStationaryY() const { return GetPositionY(); }
     [[nodiscard]] virtual float GetStationaryZ() const { return GetPositionZ(); }
     [[nodiscard]] virtual float GetStationaryO() const { return GetOrientation(); }
+    float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
+
+    virtual float GetCollisionHeight() const { return 0.0f; }
 
 protected:
     std::string m_name;
