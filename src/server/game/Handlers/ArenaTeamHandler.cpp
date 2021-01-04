@@ -287,10 +287,8 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket& recvData)
             GroupQueueInfo ginfo;
             BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
             if (queue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
-            {
                 if (ginfo.IsInvitedToBGInstanceGUID)
                     return;
-            }
         }
 
         // Teams cannot be disbanded during fights
