@@ -25,7 +25,9 @@
 namespace
 {
     std::vector<std::tuple<uint32 /*ID*/, uint32 /*CharLowGuid*/, std::string /*Hash*/, std::string /*Rev*/>> _questTrackStore;
-    std::vector<PreparedStatement*> _queueStmt;
+    std::vector<std::tuple<uint32 /*ID*/, uint32 /*CharLowGuid*/>> _questCompleteStore;
+    std::vector<std::tuple<uint32 /*ID*/, uint32 /*CharLowGuid*/>> _questAbandonStore;
+    std::vector<std::tuple<uint32 /*ID*/, uint32 /*CharLowGuid*/>> _questGMCompleteStore;
     TaskScheduler scheduler;
 }
 
@@ -43,7 +45,7 @@ void QuestTracker::InitSystem()
         return;
     }
 
-    scheduler.Schedule(15s, [this](TaskContext context)
+    scheduler.Schedule(10s, [this](TaskContext context)
     {
         Execute();
 
@@ -63,6 +65,7 @@ void QuestTracker::Update(uint32 diff)
 
 void QuestTracker::Execute()
 {
+    /// Insert section
     auto trans = CharacterDatabase.BeginTransaction();
 
     for (auto const& [ID, CharacterLowGuid, Hash, Revision] : _questTrackStore)
@@ -75,43 +78,53 @@ void QuestTracker::Execute()
         trans->Append(stmt);
     }
 
-    for (auto const& stmt : _queueStmt)
-        trans->Append(stmt);
-
     CharacterDatabase.CommitTransaction(trans);
 
     _questTrackStore.clear();
-    _queueStmt.clear();
+
+    // Update section
+    auto SendUpdateQuestTrack = [](uint8 stmtIndex, uint32 questID, uint32 characterLowGuid)
+    {
+        auto trans = CharacterDatabase.BeginTransaction();
+
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(stmtIndex);
+        stmt->setUInt32(0, questID);
+        stmt->setUInt32(1, characterLowGuid);
+        trans->Append(stmt);
+
+        CharacterDatabase.CommitTransaction(trans);
+    };
+
+    for (auto const& [questID, characterLowGuid] : _questCompleteStore)
+        SendUpdateQuestTrack(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME, questID, characterLowGuid);
+
+    for (auto const& [questID, characterLowGuid] : _questAbandonStore)
+        SendUpdateQuestTrack(CHAR_UPD_QUEST_TRACK_ABANDON_TIME, questID, characterLowGuid);
+
+    for (auto const& [questID, characterLowGuid] : _questGMCompleteStore)
+        SendUpdateQuestTrack(CHAR_UPD_QUEST_TRACK_GM_COMPLETE, questID, characterLowGuid);
+
+    _questCompleteStore.clear();
+    _questAbandonStore.clear();
+    _questGMCompleteStore.clear();
 }
 
 void QuestTracker::Add(uint32 questID, uint32 characterLowGuid, std::string const& coreHash, std::string const& coreRevision)
 {
-    _questTrackStore.emplace_back(std::make_tuple(questID, characterLowGuid, coreHash, coreRevision));
+    _questTrackStore.emplace_back(questID, characterLowGuid, coreHash, coreRevision);
 }
 
 void QuestTracker::UpdateCompleteTime(uint32 questID, uint32 characterLowGuid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME);
-    stmt->setUInt32(0, questID);
-    stmt->setUInt32(1, characterLowGuid);
-
-    _queueStmt.emplace_back(stmt);
+    _questCompleteStore.emplace_back(questID, characterLowGuid);
 }
 
 void QuestTracker::UpdateAbandonTime(uint32 questID, uint32 characterLowGuid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_ABANDON_TIME);
-    stmt->setUInt32(0, questID);
-    stmt->setUInt32(1, characterLowGuid);
-
-    _queueStmt.emplace_back(stmt);
+    _questAbandonStore.emplace_back(questID, characterLowGuid);
 }
 
 void QuestTracker::UpdateGMComplete(uint32 questID, uint32 characterLowGuid)
 {
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_GM_COMPLETE);
-    stmt->setUInt32(0, questID);
-    stmt->setUInt32(1, characterLowGuid);
-
-    _queueStmt.emplace_back(stmt);
+    _questGMCompleteStore.emplace_back(questID, characterLowGuid);
 }
