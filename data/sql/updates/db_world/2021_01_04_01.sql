@@ -1,3 +1,19 @@
+-- DB update 2021_01_04_00 -> 2021_01_04_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_04_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_04_00 2021_01_04_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1609602692076885000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609602692076885000');
 DELETE FROM `creature` WHERE (`id` = 1986) AND (`guid` BETWEEN 46958 AND 47268);
 INSERT INTO `creature`  (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
@@ -46,3 +62,12 @@ INSERT INTO `creature`  (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (47266, 1986, 1, 0, 0, 1, 1, 709, 0, 10728.2, 871.7, 1328.7, 2.65916, 300, 5, 0, 71, 0, 1, 0, 0, 0, '', 0),
 (47267, 1986, 1, 0, 0, 1, 1, 709, 0, 10708, 873.924, 1324.61, 1.77671, 300, 5, 0, 71, 0, 1, 0, 0, 0, '', 0),
 (47268, 1986, 1, 0, 0, 1, 1, 709, 0, 10893, 986.807, 1337.14, 2.47837, 300, 0, 0, 71, 0, 0, 0, 0, 0, '', 0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
