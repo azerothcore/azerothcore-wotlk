@@ -339,7 +339,7 @@ void MotionMaster::MoveBackwards(Unit* target, float dist)
     //else
     //    point.z = _owner->GetMapHeight(point.x, point.y, point.z);
 
-    if (_owner->GetMap()->CanReachPositionAndGetCoords(_owner, point.x, point.y, point.z, true, 6.0f, M_PI_4))
+    if (_owner->GetMap()->CanReachPositionAndGetCoords(_owner, point.x, point.y, point.z, true, 6.0f, M_PI/4))
     {
         Movement::MoveSplineInit init(_owner);
         init.MoveTo(point.x, point.y, point.z, true);
