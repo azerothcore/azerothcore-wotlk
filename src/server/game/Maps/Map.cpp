@@ -3393,14 +3393,8 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
     }
 }
 
-/**
- *
- * \param maxDeviationAngle  the maximum deviation that a creature can take to reach the destination
- *
- */
-bool Map::CanReachPositionAndGetCoords(Unit* who, PathGenerator path, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */, float maxSlopeAngle/* = M_PI/2 */, float maxDeviationAngle /*= M_PI*2 */) const
+bool Map::CanReachPositionAndGetCoords(WorldObject* source, PathGenerator path, bool checkCollision) const
 {
-    double deviation = 0.0f;
     G3D::Vector3 prevPath = path.GetStartPosition();
     for (auto & vector : path.GetPath())
     {
@@ -3408,19 +3402,7 @@ bool Map::CanReachPositionAndGetCoords(Unit* who, PathGenerator path, bool check
         float y = vector.y;
         float z = vector.z;
 
-        deviation += who->GetRelativeAngle(x, y);
-
-        // to reach the position the Unit must deviate
-        // the straight path with a higher margin than the one desired
-        // in this case we return false
-        if (deviation > maxDeviationAngle)
-        {
-            return false;
-        }
-
-        float ang = getAngle(prevPath.x, prevPath.y, x, y);
-
-        if (CanReachPositionAndGetCoords(who, prevPath.x, prevPath.y, prevPath.z, ang, x, y, z, checkCollision, maxHeight, maxSlopeAngle))
+        if (CanReachPositionAndGetCoords(source, prevPath.x, prevPath.y, prevPath.z, x, y, z, checkCollision, false, false))
         {
             return false;
         }
@@ -3431,82 +3413,126 @@ bool Map::CanReachPositionAndGetCoords(Unit* who, PathGenerator path, bool check
     return true;
 }
 
-bool Map::CanReachPositionAndGetCoords(Unit* who, float &destX, float &destY, float &destZ, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */, float maxSlopeAngle/* = M_PI/2 */) const
+bool Map::CanReachPositionAndGetCoords(WorldObject* source, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes, bool findPath) const
 {
-    return CanReachPositionAndGetCoords(who, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), who->GetOrientation(), destX, destY, destZ, checkCollision, maxHeight, maxSlopeAngle);
+    return CanReachPositionAndGetCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, checkCollision, checkSlopes, findPath);
 }
 
 /**
- *   \brief validate the new destination
+ *   \brief validate the new destination and set reachable points
  *
- *   Check if a given unit can reach a specific point and set the correct Z coord based on difference in height
+ *   Check if a given unit can reach a specific point and set the correct dest coords based on paths
  *
- *   \param maxHeight the desired max Height for the calculated Z coord. If the new Z exceed the maxHeight, this method returns false
-
  *   \return true if the destination is valid, false otherwise
  *
  **/
-bool Map::CanReachPositionAndGetCoords(Unit* who, float startX, float startY, float startZ, float startAngle, float &destX, float &destY, float &destZ, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */, float maxSlopeAngle/* = M_PI/2 */) const
+bool Map::CanReachPositionAndGetCoords(WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes, bool findPath) const
 {
-    acore::NormalizeMapCoord(destX);
-    acore::NormalizeMapCoord(destY);
-
-    const Map* _map = who->GetBaseMap();
-
-    // check map geometry for possible collision
-    if (checkCollision)
-    {
-        Position pos = Position(startX, startY, startZ, startAngle);
-
-        auto distance = pos.GetExactDist2d(destX,destY);
-
-        auto collided = who->MovePositionToFirstCollision(pos, distance, pos.GetRelativeAngle(destX,destY));
-
-        destX = pos.GetPositionX();
-        destY = pos.GetPositionY();
-        destZ = pos.GetPositionZ();
-
-        if (collided)
-        {
-            return false;
-        }
+    if (findPath) {
+        PathGenerator path(source);
+        path.SetSlopeCheck(checkSlopes);
+        return CanReachPositionAndGetCoords(source, path, checkCollision);
     }
     else
     {
-        // otherwise calculate a new z
-        destZ = _map->GetHeight(who->GetPhaseMask(), destX, destY, destZ, true);
+        // Prevent invalid coordinates here, position is unchanged
+        if (!acore::IsValidMapCoord(startX, startY, startZ) || !acore::IsValidMapCoord(destX, destY, destZ))
+        {
+            sLog->outCrash("WorldObject::CanReachPositionAndGetCoords invalid coordinates startX: %f, startY: %f, startZ: %f, destX: %f, destY: %f, destZ: %f", startX, startY, startZ, destX, destY, destZ);
+            return false;
+        }
+
+        PathGenerator *path = new PathGenerator(source);
+
+        // Use a detour raycast to get our first collision point
+        path->SetUseRaycast(true);
+        bool result = path->CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
+
+        bool notOnGround = path->GetPathType() & PATHFIND_NOT_USING_PATH;
+
+        // Check for valid path types before we proceed
+        if (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END))
+        {
+            return false;
+        }
+
+        // collision check
+        bool collided = (!result || (path->GetPathType() & PATHFIND_SHORTCUT) || (path->GetPathType() & PATHFIND_FARFROMPOLY));
+
+        G3D::Vector3 endPos = path->GetPath().back();
+        destX = endPos.x;
+        destY = endPos.y;
+        destZ = endPos.z;
+
+        float angle = getAngle(startX, startY, destX, destY);
+
+        // check static LOS
+        float halfHeight = source->GetCollisionHeight() * 0.5f;
+
+        // Unit is not on the ground, check for potential collision via vmaps
+        if (notOnGround)
+        {
+            bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(source->GetMapId(),
+                startX, startY, startZ + halfHeight,
+                destX, destY, destZ + halfHeight,
+                destX, destY, destZ, -0.5f);
+
+            destZ -= halfHeight;
+
+            // Collided with static LOS object, move back to collision point
+            if (col)
+            {
+                destX -= CONTACT_DISTANCE * std::cos(angle);
+                destY -= CONTACT_DISTANCE * std::sin(angle);
+                collided = true;
+            }
+        }
+
+        // check dynamic collision
+        bool col = source->GetMap()->getObjectHitPos(source->GetPhaseMask(),
+            startX, startY, startZ + halfHeight,
+            destX, destY, destZ + halfHeight,
+            destX, destY, destZ, -0.5f);
+
+        destZ -= halfHeight;
+
+        // Collided with a gameobject, move back to collision point
+        if (col)
+        {
+            destX -= CONTACT_DISTANCE * std::cos(angle);
+            destY -= CONTACT_DISTANCE * std::sin(angle);
+            collided = true;
+        }
+
+        acore::NormalizeMapCoord(startX);
+        acore::NormalizeMapCoord(startY);
+        source->UpdateAllowedPositionZ(destX, destY, destZ);
+
+        // position has no ground under it (or is too far away)
+        if (Unit const* unit = source->ToUnit(); !unit->CanFly())
+        {
+            if (destZ <= INVALID_HEIGHT)
+            {
+                // fall back to gridHeight if any
+                GridMap* gmap = unit->GetMap()->GetGrid(startX, startY);
+                if (!gmap) { // should not happen
+                    return false;
+                }
+
+                float gridHeight = gmap->getHeight(startX,startY);
+
+                if (gridHeight > INVALID_HEIGHT)
+                {
+                    startZ = gridHeight + unit->GetHoverHeight();
+                }
+            }
+
+            if (!notOnGround && checkSlopes && !path->IsWalkableClimb(startX, startY, startZ, destX, destY, destZ))
+            {
+                return false;
+            }
+        }
+
+        return checkCollision ? !collided : true;
     }
-
-
-    if (destZ <= INVALID_HEIGHT || (destZ - startZ) > maxHeight)
-    {
-        return false;
-    }
-
-    float slopeAngle = getSlopeAngleAbs(startX, startY, startZ, destX, destY, destZ);
-
-    if (slopeAngle > maxSlopeAngle)
-    {
-        return false;
-    }
-
-    // if water environment
-    bool is_water_now = _map->IsInWater(startX, startY, startZ);
-
-    if (!isInLineOfSight(startX, startY, startZ, destX, destY, destZ, who->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS))
-    {
-        return false;
-    }
-
-    bool is_water_next = _map->IsInWater(destX, destY, destZ);
-
-    // if not compatible inhabit type for the next position, return false
-    if ((is_water_now && !is_water_next && who->GetTypeId() == TYPEID_UNIT && !((Creature*)who)->CanWalk()) ||
-        (!is_water_now && is_water_next && !who->CanSwim()))
-    {
-        return false;
-    }
-
-    // finally
-    return true;
 }

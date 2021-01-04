@@ -2719,11 +2719,7 @@ Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
     return pos;
 }
 
-/**
- *
- * \return true -> collision, false -> no collision
- */
-bool WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
+void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
 {
     angle += pos.GetOrientation();
     float destx, desty, destz;
@@ -2731,135 +2727,11 @@ bool WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
     desty = pos.m_positionY + dist * sin(angle);
     destz = pos.m_positionZ;
 
-    // Prevent invalid coordinates here, position is unchanged
-    if (!acore::IsValidMapCoord(destx, desty))
-    {
-        sLog->outCrash("WorldObject::MovePositionToFirstCollision invalid coordinates X: %f and Y: %f were passed!", destx, desty);
-        return false;
-    }
+    if (!GetMap()->CanReachPositionAndGetCoords(this, destx, desty, destz, false, true, false))
+        return;
 
-    // Use a detour raycast to get our first collision point
-    PathGenerator path(this);
-    path.SetUseRaycast(true);
-    bool result = path.CalculatePath(destx, desty, destz, false);
-
-    // Check for valid path types before we proceed
-    if (!(path.GetPathType() & PATHFIND_NOT_USING_PATH))
-    {
-        if (path.GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)) {
-            return false;
-        }
-    }
-
-    // collision check
-    bool col = (!result || (path.GetPathType() & PATHFIND_SHORTCUT) || (path.GetPathType() & PATHFIND_FARFROMPOLY));
-
-    G3D::Vector3 endPos = path.GetPath().back();
-    destx = endPos.x;
-    desty = endPos.y;
-    destz = endPos.z;
-
-    // Xinef: ugly hack for dalaran arena
-    float selfAddition = 1.5f;
-    float allowedDiff = 6.0f;
-    float newDist = dist;
-    if (GetMapId() == 617)
-    {
-        allowedDiff = 3.5f;
-        selfAddition = 1.0f;
-        destz = pos.m_positionZ + 1.0f;
-    }
-    else
-        UpdateAllowedPositionZ(destx, desty, destz);
-
-    // collision occured
-    if (VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetMapId(), pos.m_positionX, pos.m_positionY, pos.m_positionZ + selfAddition, destx, desty, destz + 0.5f, destx, desty, destz, -0.5f))
-    {
-        // move back a bit
-        if (pos.GetExactDist2d(destx, desty) > CONTACT_DISTANCE)
-        {
-            destx -= CONTACT_DISTANCE * cos(angle);
-            desty -= CONTACT_DISTANCE * sin(angle);
-        }
-
-        newDist = sqrt((pos.m_positionX - destx) * (pos.m_positionX - destx) + (pos.m_positionY - desty) * (pos.m_positionY - desty));
-        col = true;
-    }
-
-    // check dynamic collision, Collided with a gameobject
-    if (GetMap()->getObjectHitPos(GetPhaseMask(), pos.m_positionX, pos.m_positionY, pos.m_positionZ + selfAddition, destx, desty, destz + 0.5f, destx, desty, destz, -0.5f))
-    {
-        // move back a bit
-        if (pos.GetExactDist2d(destx, desty) > CONTACT_DISTANCE)
-        {
-            destx -= CONTACT_DISTANCE * cos(angle);
-            desty -= CONTACT_DISTANCE * sin(angle);
-        }
-        newDist = sqrt((pos.m_positionX - destx) * (pos.m_positionX - destx) + (pos.m_positionY - desty) * (pos.m_positionY - desty));
-        col = true;
-    }
-
-    float step = newDist / 10.0f;
-
-    for (uint8 j = 0; j < 10; ++j)
-    {
-        // do not allow too big z changes
-        if (fabs(pos.m_positionZ - destz) > allowedDiff)
-        {
-            destx -= step * cos(angle);
-            desty -= step * sin(angle);
-            UpdateAllowedPositionZ(destx, desty, destz);
-        }
-        // we have correct destz now
-        else
-            break;
-    }
-
-    acore::NormalizeMapCoord(destx);
-    acore::NormalizeMapCoord(desty);
-    UpdateAllowedPositionZ(destx, desty, destz);
-
-    float ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-    float floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, destz, true);
-    ground = fabs(ground - destz) <= fabs(floor - pos.m_positionZ) ? ground : floor;
-    if (destz < ground)
-        destz = ground;
-
-    // Xinef: check if last z updates did not move z too far away
-    //newDist = pos.GetExactDist(destx, desty, destz);
-    //float ratio = newDist / dist;
-    //if (ratio > 1.3f)
-    //{
-    //  ratio = (1 / ratio) + (0.3f / ratio);
-    //  destx = pos.GetPositionX() + (fabs(destx - pos.GetPositionX()) * cos(angle) * ratio);
-    //  desty = pos.GetPositionY() + (fabs(desty - pos.GetPositionY()) * sin(angle) * ratio);
-    //  destz = pos.GetPositionZ() + (fabs(destz - pos.GetPositionZ()) * ratio * (destz < pos.GetPositionZ() ? -1.0f : 1.0f));
-    //}
-
+    pos.SetOrientation(GetOrientation());
     pos.Relocate(destx, desty, destz);
-    pos.m_orientation = m_orientation;
-
-    // position has no ground under it (or is too far away)
-/*     if (ground <= INVALID_HEIGHT)
-    {
-        if (Unit const* unit = ToUnit())
-        {
-            // unit can fly, ignore.
-            if (unit->CanFly())
-            {
-                return false;
-            }
-
-            // fall back to gridHeight if any
-            float gridHeight = GetMap()->GetHeight(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-            if (gridHeight > INVALID_HEIGHT)
-            {
-                pos.m_positionZ = gridHeight + unit->GetHoverHeight();
-            }
-        }
-    } */
-
-    return col;
 }
 
 void WorldObject::MovePositionToFirstCollisionForTotem(Position& pos, float dist, float angle, bool forGameObject)

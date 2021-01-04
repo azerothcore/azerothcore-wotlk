@@ -23,18 +23,8 @@ inline float getAngle(float startX, float startY, float destX, float destY)
 
 inline float getSlopeAngle(float startX, float startY, float startZ, float destX, float destY, float destZ)
 {
-    auto a = (startX * destX + startY * destY + startZ * destZ);
-    auto b = sqrt(pow(startX,2.0f) + pow(startY,2.0f) + pow(startZ, 2.0f));
-    auto c = sqrt(pow(destX,2.0f) + pow(destY,2.0f) + pow(destZ, 2.0f));
-
-    auto ang = acos(a / (b * c));
-
-    if (isnan(ang))
-    {
-        return 0.0f;
-    }
-
-    return ang;
+    float floorDist = sqrt(pow(startY - destY, 2.0f) + pow(startX - destX,2.0f));
+    return atan(abs(destZ - startZ) / abs(floorDist));
 }
 
 inline float getSlopeAngleAbs(float startX, float startY, float startZ, float destX, float destY, float destZ)

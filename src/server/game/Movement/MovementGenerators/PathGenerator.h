@@ -53,9 +53,15 @@ class PathGenerator
         // Calculate the path from owner to given destination
         // return: true if new path was calculated, false otherwise (no change needed)
         bool CalculatePath(float destX, float destY, float destZ, bool forceDest = false);
+        bool CalculatePath(float x, float y, float z, float destX, float destY, float destZ, bool forceDest);
         bool IsInvalidDestinationZ(Unit const* target) const;
+        bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight) const;
+        bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ) const;
 
         // option setters - use optional
+
+        // when set, it skips paths with too high slopes (doesn't work with StraightPath enabled)
+        void SetSlopeCheck(bool checkSlope) { _slopeCheck = checkSlope; }
         void SetUseStraightPath(bool useStraightPath) { _useStraightPath = useStraightPath; }
         void SetPathLengthLimit(float distance) { _pointPathLimit = std::min<uint32>(uint32(distance/SMOOTH_PATH_STEP_SIZE), MAX_POINT_PATH_LENGTH); }
         void SetUseRaycast(bool useRaycast) { _useRaycast = useRaycast; }
@@ -107,8 +113,9 @@ class PathGenerator
         Movement::PointsArray _pathPoints;  // our actual (x,y,z) path to the target
         PathType _type;                     // tells what kind of path this is
 
-        bool _useStraightPath;  // type of path will be generated
+        bool _useStraightPath;  // type of path will be generated (do not use it for movement paths)
         bool _forceDestination; // when set, we will always arrive at given point
+        bool _slopeCheck;       // when set, it skips paths with too high slopes (doesn't work with _useStraightPath)
         uint32 _pointPathLimit; // limit point path size; min(this, MAX_POINT_PATH_LENGTH)
         bool _useRaycast;       // use raycast if true for a straight line path
 

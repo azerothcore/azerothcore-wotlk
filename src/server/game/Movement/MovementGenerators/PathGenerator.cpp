@@ -13,18 +13,19 @@
 #include "DisableMgr.h"
 #include "DetourCommon.h"
 #include "DetourNavMeshQuery.h"
+#include "Geometry.h"
 
 ////////////////// PathGenerator //////////////////
 PathGenerator::PathGenerator(WorldObject const* owner) :
-    _polyLength(0), _type(PATHFIND_BLANK), _useStraightPath(false),
-    _forceDestination(false), _pointPathLimit(MAX_POINT_PATH_LENGTH), _useRaycast(false),
+    _polyLength(0), _type(PATHFIND_BLANK), _useStraightPath(false), _forceDestination(false),
+    _slopeCheck(false), _pointPathLimit(MAX_POINT_PATH_LENGTH), _useRaycast(false),
     _endPosition(G3D::Vector3::zero()), _source(owner), _navMesh(nullptr),
     _navMeshQuery(nullptr)
 {
     memset(_pathPolyRefs, 0, sizeof(_pathPolyRefs));
 
     uint32 mapId = _source->GetMapId();
-    //if (MMAP::MMapFactory::IsPathfindingEnabled(_sourceUnit->FindMap())) // pussywizard: checked before creating new PathGenerator
+    //if (MMAP::MMapFactory::IsPathfindingEnabled(_sourceUnit->FindMap()))
     {
         MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
         _navMesh = mmap->GetNavMesh(mapId);
@@ -43,6 +44,11 @@ bool PathGenerator::CalculatePath(float destX, float destY, float destZ, bool fo
     float x, y, z;
     _source->GetPosition(x, y, z);
 
+    return CalculatePath(x, y, z, destX, destY, destZ, forceDest);
+}
+
+bool PathGenerator::CalculatePath(float x, float y, float z, float destX, float destY, float destZ, bool forceDest)
+{
     if (!acore::IsValidMapCoord(destX, destY, destZ) || !acore::IsValidMapCoord(x, y, z))
         return false;
 
@@ -833,6 +839,9 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
         if (!GetSteerTarget(iterPos, targetPos, SMOOTH_PATH_SLOP, polys, npolys, steerPos, steerPosFlag, steerPosRef))
             break;
 
+        if (_slopeCheck && !IsWalkableClimb(iterPos[0], iterPos[1], iterPos[2], targetPos[0], targetPos[1], targetPos[2]))
+            break;
+
         bool endOfPath = (steerPosFlag & DT_STRAIGHTPATH_END) != 0;
         bool offMeshConnection = (steerPosFlag & DT_STRAIGHTPATH_OFFMESH_CONNECTION) != 0;
 
@@ -927,6 +936,26 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
     return nsmoothPath < MAX_POINT_PATH_LENGTH ? DT_SUCCESS : DT_FAILURE;
 }
 
+bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ) const
+{
+    return IsWalkableClimb(x, y, z, destX, destY, destZ, _source->GetCollisionHeight());
+}
+
+bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight) const
+{
+    float diffHeight = abs(destZ - z);
+    float slopeAngle = getSlopeAngleAbs(x, y, z, destX, destY, destZ);
+    float slopeAngleDegree = (slopeAngle * 180.0f / M_PI);
+    float minHeight = sourceHeight - (sourceHeight * slopeAngleDegree / 100);
+    // check walkable slopes, based on unit height
+    if (slopeAngle && (slopeAngle > M_PI/2 || diffHeight > minHeight))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool PathGenerator::InRangeYZX(float const* v1, float const* v2, float r, float h) const
 {
     const float dx = v2[0] - v1[0];
@@ -977,11 +1006,12 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
         if ((_pathPoints[i-1] - target).squaredLength() >= distSq)
             break; // bingo!
 
-        // check if the shortened path is still in LoS with the target
+        // check if the shortened path is still in LoS with the target and it is walkable
         _source->GetHitSpherePointFor({ _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z + collisionHeight }, x, y, z);
-        if (!_source->GetMap()->isInLineOfSight(x, y, z, _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z + collisionHeight, _source->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS))
+        if (!_source->GetMap()->isInLineOfSight(x, y, z, _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z + collisionHeight, _source->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS)
+            || (_slopeCheck && !IsWalkableClimb(_source->GetPositionX(), _source->GetPositionY(), _source->GetPositionZ(), _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z)))
         {
-            // whenver we find a point that is not in LoS anymore, simply use last valid path
+            // whenver we find a point that is not valid anymore, simply use last valid path
             _pathPoints.resize(i + 1);
             return;
         }
