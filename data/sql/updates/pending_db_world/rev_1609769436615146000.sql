@@ -21,8 +21,8 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (3894, 11, 0, 'Rest now, my daughter.', 12, 7, 100, 1, 0, 0, 1351, 0, 'Pelturas Whitemoon'),
 (3894, 12, 0, '%s looks at $n, and then weeps with joy.', 16, 0, 100, 0, 0, 0, 1352, 0, 'Pelturas Whitemoon'),
 (3894, 13, 0, 'Relara is saved, $n.  Thank you.', 12, 7, 100, 18, 0, 0, 1353, 0, 'Pelturas Whitemoon');
-DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (3892, 3894)) AND (`source_type`= 0));
-DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (389400, 389401, 389402, 389403)) AND (`source_type`= 9));
+DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (3892, 3894)) AND (`source_type`= 0);
+DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (389400, 389401, 389402, 389403)) AND (`source_type`= 9);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (3892, 0, 0, 0, 1, 0, 100, 1, 0, 0, 0, 0, 0, 11, 46765, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Relara Whitemoon - Out Of Combat - Cast Self Visual - Sleep Until Cancelled  (DND)'),
 (3894, 0, 0, 1, 20, 0, 100, 0, 1020, 0, 0, 0, 0, 80, 389400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Pelturas Whitemoon - On Quest \'Orendil\'s Cure\' Finished - Run Script'),
