@@ -583,10 +583,12 @@ void ArenaTeam::MassInviteToEvent(WorldSession* session)
 
 uint8 ArenaTeam::GetSlotByType(uint32 type)
 {    
+    uint8 slot = 0xFF;
+    
     if (!ArenaSlotByType.count(type))
     {
         sLog->outError("FATAL: Unknown arena team type %u for some arena team", type);
-        return 0xFF;
+        return slot;
     }
 
     uint8 slot = ArenaSlotByType[type];
@@ -594,7 +596,13 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
     // Get the changed slot type
     sScriptMgr->OnGetSlotByType(type, slot);
 
-    return slot;
+    if (slot != 0xFF)
+    {
+        return slot;
+    }
+
+    sLog->outError("FATAL: Unknown arena team type %u for some arena team", type);
+    return 0xFF;
 }
 
 bool ArenaTeam::IsMember(uint64 guid) const
