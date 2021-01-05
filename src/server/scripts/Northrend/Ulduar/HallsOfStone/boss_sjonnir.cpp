@@ -96,7 +96,7 @@ class boss_sjonnir : public CreatureScript
 public:
     boss_sjonnir() : CreatureScript("boss_sjonnir") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_sjonnirAI (pCreature);
     }
@@ -115,7 +115,7 @@ public:
         uint8 SummonPhase;
         uint8 SlugeCount;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -148,7 +148,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             Talk(SAY_AGGRO);
 
@@ -174,7 +174,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_SLUG_KILLED)
             {
@@ -184,7 +184,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -306,7 +306,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             Talk(SAY_DEATH);
 
@@ -322,7 +322,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (urand(0, 1))
                 return;
@@ -377,7 +377,7 @@ class boss_sjonnir_dwarf : public CreatureScript
 public:
     boss_sjonnir_dwarf() : CreatureScript("boss_sjonnir_dwarf") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_sjonnir_dwarfAI (pCreature);
     }
@@ -386,7 +386,7 @@ public:
     {
         boss_sjonnir_dwarfAI(Creature* c) : ScriptedAI(c) { }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -401,7 +401,7 @@ class boss_sjonnir_iron_sludge : public CreatureScript
 public:
     boss_sjonnir_iron_sludge() : CreatureScript("boss_sjonnir_iron_sludge") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_sjonnir_iron_sludgeAI (pCreature);
     }
@@ -411,22 +411,22 @@ public:
         boss_sjonnir_iron_sludgeAI(Creature* c) : ScriptedAI(c) { }
 
         EventMap events;
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_TOXIC_VOLLEY, 5000);
         }
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             if (InstanceScript* pInstance = me->GetInstanceScript())
                 if (Creature* sjonnir = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_SJONNIR)))
                     sjonnir->AI()->DoAction(ACTION_SLUG_KILLED);
         }
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -457,7 +457,7 @@ class boss_sjonnir_malformed_ooze : public CreatureScript
 public:
     boss_sjonnir_malformed_ooze() : CreatureScript("boss_sjonnir_malformed_ooze") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_sjonnir_malformed_oozeAI (pCreature);
     }
@@ -467,16 +467,16 @@ public:
         boss_sjonnir_malformed_oozeAI(Creature* c) : ScriptedAI(c) {    }
 
         EventMap events;
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == POINT_MOTION_TYPE && point == 0)
                 events.RescheduleEvent(EVENT_MALFORMED_OOZE_CHECK, 1000);
         }
 
-        void EnterCombat(Unit*) { }
-        void MoveInLineOfSight(Unit*) { }
+        void EnterCombat(Unit*) override { }
+        void MoveInLineOfSight(Unit*) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())

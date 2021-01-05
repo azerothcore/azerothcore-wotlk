@@ -291,7 +291,7 @@ public:
         bool _isBanished;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_ragnarosAI>(creature);
     }
@@ -323,7 +323,7 @@ public:
         InstanceScript* instance;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_son_of_flameAI>(creature);
     }

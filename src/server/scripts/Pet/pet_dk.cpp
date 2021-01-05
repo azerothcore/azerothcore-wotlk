@@ -44,7 +44,7 @@ public:
             _targetGUID = 0;
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type == POINT_MOTION_TYPE && point == 1)
             {
@@ -53,7 +53,7 @@ public:
             }
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
             Unit* owner = me->GetOwner();
@@ -98,7 +98,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             RemoveTargetAura();
             _targetGUID = who->GetGUID();
@@ -112,7 +112,7 @@ public:
                 target->RemoveAura(SPELL_DK_SUMMON_GARGOYLE_1, me->GetGUID());
         }
 
-        void Reset()
+        void Reset() override
         {
             _selectionTimer = 0;
             me->SetReactState(REACT_PASSIVE);
@@ -147,7 +147,7 @@ public:
             _despawning = true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_initialSelection)
             {
@@ -206,7 +206,7 @@ public:
         bool _initialSelection;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_dk_ebon_gargoyleAI(creature);
     }
@@ -221,14 +221,14 @@ public:
     {
         npc_pet_dk_ghoulAI(Creature* c) : CombatAI(c) { }
 
-        void JustDied(Unit* /*who*/)
+        void JustDied(Unit* /*who*/) override
         {
             if (me->IsGuardian() || me->IsSummon())
                 me->ToTempSummon()->UnSummon();
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_dk_ghoulAI (pCreature);
     }
@@ -243,7 +243,7 @@ public:
     {
         npc_pet_dk_army_of_the_deadAI(Creature* creature) : CombatAI(creature) { }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             CombatAI::InitializeAI();
             ((Minion*)me)->SetFollowAngle(rand_norm() * 2 * M_PI);
@@ -254,7 +254,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_dk_army_of_the_deadAI (creature);
     }
@@ -269,7 +269,7 @@ public:
     {
         npc_pet_dk_dancing_rune_weaponAI(Creature* creature) : NullCreatureAI(creature) { }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             // Xinef: Hit / Expertise scaling
             me->AddAura(61017, me);
@@ -280,7 +280,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_dk_dancing_rune_weaponAI (creature);
     }

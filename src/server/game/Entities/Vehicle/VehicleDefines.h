@@ -71,7 +71,7 @@ struct VehicleSeat
         Passenger.Reset();
     }
 
-    bool IsEmpty() const { return !Passenger.Guid; }
+    [[nodiscard]] bool IsEmpty() const { return !Passenger.Guid; }
 
     VehicleSeatEntry const* SeatInfo;
     PassengerInfo Passenger;
@@ -95,8 +95,8 @@ typedef std::map<int8, VehicleSeat> SeatMap;
 class TransportBase
 {
 protected:
-    TransportBase() { }
-    virtual ~TransportBase() { }
+    TransportBase() = default;
+    virtual ~TransportBase() = default;
 
 public:
     /// This method transforms supplied transport offsets into global coordinates

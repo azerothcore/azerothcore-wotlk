@@ -18,14 +18,14 @@ public:
     typedef std::unordered_map< uint32, Map*> InstancedMaps;
 
     MapInstanced(uint32 id);
-    ~MapInstanced() {}
+    ~MapInstanced() override {}
 
     // functions overwrite Map versions
-    void Update(const uint32, const uint32, bool thread = true);
-    void DelayedUpdate(const uint32 diff);
+    void Update(const uint32, const uint32, bool thread = true) override;
+    void DelayedUpdate(const uint32 diff) override;
     //void RelocationNotify();
-    void UnloadAll();
-    bool CanEnter(Player* player, bool loginCheck = false);
+    void UnloadAll() override;
+    bool CanEnter(Player* player, bool loginCheck = false) override;
 
     Map* CreateInstanceForPlayer(const uint32 mapId, Player* player);
     Map* FindInstanceMap(uint32 instanceId) const
@@ -36,7 +36,7 @@ public:
     bool DestroyInstance(InstancedMaps::iterator& itr);
 
     InstancedMaps& GetInstancedMaps() { return m_InstancedMaps; }
-    virtual void InitVisibilityDistance();
+    void InitVisibilityDistance() override;
 
 private:
     InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty);

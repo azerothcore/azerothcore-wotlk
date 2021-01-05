@@ -43,7 +43,7 @@ public:
     {
     }
 
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         _caster->AI()->Talk(EMOTE_SHIELD);
         _caster->CastSpell(_caster, SPELL_CHARGE_RIFTS, true);
@@ -59,7 +59,7 @@ class boss_anomalus : public CreatureScript
 public:
     boss_anomalus() : CreatureScript("boss_anomalus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_anomalusAI (creature);
     }
@@ -73,21 +73,21 @@ public:
         bool achievement;
         uint16 activeRifts;
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             achievement = true;
             me->CastSpell(me, SPELL_CLOSE_RIFTS, true);
         }
 
-        uint32 GetData(uint32 data) const
+        uint32 GetData(uint32 data) const override
         {
             if (data == me->GetEntry())
                 return achievement;
             return 0;
         }
 
-        void SetData(uint32 type, uint32)
+        void SetData(uint32 type, uint32) override
         {
             if (type == me->GetEntry())
             {
@@ -101,13 +101,13 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             activeRifts++;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO);
             BossAI::EnterCombat(who);
@@ -121,14 +121,14 @@ public:
                 events.ScheduleEvent(EVENT_ANOMALUS_ARCANE_ATTRACTION, 8000);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DEATH);
             BossAI::JustDied(killer);
             me->CastSpell(me, SPELL_CLOSE_RIFTS, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -182,7 +182,7 @@ public:
             EnterEvadeIfOutOfCombatArea();
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const
+        bool CheckEvadeIfOutOfCombatArea() const override
         {
             return me->GetHomePosition().GetExactDist2d(me) > 60.0f;
         }
@@ -196,7 +196,7 @@ public:
     {
     }
 
-    bool OnCheck(Player* /*player*/, Unit* target)
+    bool OnCheck(Player* /*player*/, Unit* target) override
     {
         if (!target)
             return false;

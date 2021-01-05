@@ -22,7 +22,7 @@ public:
         CLIENT_UPDATE_MASK_BITS = sizeof(ClientUpdateMaskType) * 8,
     };
 
-    UpdateMask() : _fieldCount(0), _blockCount(0), _bits(nullptr) { }
+    UpdateMask()  { }
 
     UpdateMask(UpdateMask const& right) : _bits(nullptr)
     {
@@ -34,7 +34,7 @@ public:
 
     void SetBit(uint32 index) { _bits[index] = 1; }
     void UnsetBit(uint32 index) { _bits[index] = 0; }
-    bool GetBit(uint32 index) const { return _bits[index] != 0; }
+    [[nodiscard]] bool GetBit(uint32 index) const { return _bits[index] != 0; }
 
     void AppendToPacket(ByteBuffer* data)
     {
@@ -49,8 +49,8 @@ public:
         }
     }
 
-    uint32 GetBlockCount() const { return _blockCount; }
-    uint32 GetCount() const { return _fieldCount; }
+    [[nodiscard]] uint32 GetBlockCount() const { return _blockCount; }
+    [[nodiscard]] uint32 GetCount() const { return _fieldCount; }
 
     void SetCount(uint32 valuesCount)
     {
@@ -105,9 +105,9 @@ public:
     }
 
 private:
-    uint32 _fieldCount;
-    uint32 _blockCount;
-    uint8* _bits;
+    uint32 _fieldCount{0};
+    uint32 _blockCount{0};
+    uint8* _bits{nullptr};
 };
 
 #endif

@@ -28,7 +28,7 @@ public:
     {
         PrepareSpellScript(spell_winter_veil_mistletoe_SpellScript);
 
-        bool Validate(SpellInfo const* /*spell*/)
+        bool Validate(SpellInfo const* /*spell*/) override
         {
             if (!sSpellMgr->GetSpellInfo(SPELL_CREATE_MISTLETOE) ||
                     !sSpellMgr->GetSpellInfo(SPELL_CREATE_HOLLY) ||
@@ -46,13 +46,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_winter_veil_mistletoe_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_winter_veil_mistletoe_SpellScript();
     }
@@ -95,13 +95,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_winter_wondervolt_trap_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_winter_wondervolt_trap_SpellScript();
     }
@@ -177,13 +177,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectLaunch += SpellEffectFn(spell_winter_veil_racer_rocket_slam_SpellScript::HandleTriggerSpell, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_winter_veil_racer_rocket_slam_SpellScript();
     }
@@ -217,13 +217,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_winter_veil_racer_slam_hit_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_winter_veil_racer_slam_hit_SpellScript();
     }
@@ -271,7 +271,7 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             if (m_scriptSpellId == SPELL_AIR_RIFLE_HIT_TRIGGER)
                 OnEffectHitTarget += SpellEffectFn(spell_winter_veil_shoot_air_rifle_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
@@ -280,7 +280,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_winter_veil_shoot_air_rifle_SpellScript();
     }

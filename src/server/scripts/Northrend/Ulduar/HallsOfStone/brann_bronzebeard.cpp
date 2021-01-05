@@ -693,7 +693,7 @@ class dark_rune_protectors : public CreatureScript
 public:
     dark_rune_protectors() : CreatureScript("dark_rune_protectors") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new dark_rune_protectorsAI (creature);
     }
@@ -703,18 +703,18 @@ public:
         dark_rune_protectorsAI(Creature* c) : ScriptedAI(c) { }
 
         EventMap events;
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_DRP_CHARGE, 10000);
             events.ScheduleEvent(EVENT_DRP_CLEAVE, 7000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -751,7 +751,7 @@ class dark_rune_stormcaller : public CreatureScript
 public:
     dark_rune_stormcaller() : CreatureScript("dark_rune_stormcaller") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new dark_rune_stormcallerAI (creature);
     }
@@ -761,18 +761,18 @@ public:
         dark_rune_stormcallerAI(Creature* c) : ScriptedAI(c) { }
 
         EventMap events;
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_DRS_LIGHTNING_BOLD, 5000);
             events.ScheduleEvent(EVENT_DRS_SHADOW_WORD_PAIN, 12000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -807,7 +807,7 @@ class iron_golem_custodian : public CreatureScript
 public:
     iron_golem_custodian() : CreatureScript("iron_golem_custodian") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new iron_golem_custodianAI (creature);
     }
@@ -816,17 +816,17 @@ public:
     {
         iron_golem_custodianAI(Creature* c) : ScriptedAI(c) { }
         EventMap events;
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_IGC_CRUSH, 6000);
             events.ScheduleEvent(EVENT_IGC_GROUND_SMASH, 4000);
         }
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -871,13 +871,13 @@ public:
                 caster->CastSpell(caster, caster->GetMap()->IsHeroic() ? SPELL_DARK_MATTER_H : SPELL_DARK_MATTER, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectRemove += AuraEffectRemoveFn(spell_hos_dark_matter_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_hos_dark_matter_AuraScript();
     }

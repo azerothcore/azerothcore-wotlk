@@ -32,11 +32,11 @@ public:
     {
         npc_frosthoundAI(Creature* creature) : npc_escortAI(creature) {}
 
-        void AttackStart(Unit* /*who*/) {}
-        void EnterCombat(Unit* /*who*/) {}
-        void EnterEvadeMode() {}
+        void AttackStart(Unit* /*who*/) override {}
+        void EnterCombat(Unit* /*who*/) override {}
+        void EnterEvadeMode() override {}
 
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -49,15 +49,15 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
         }
 
-        void OnCharmed(bool /*apply*/)
+        void OnCharmed(bool /*apply*/) override
         {
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -65,7 +65,7 @@ public:
                 return;
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -84,7 +84,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             cr->ToTempSummon()->SetTempSummonType(TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT);
             cr->ToTempSummon()->InitStats(20000);
@@ -95,7 +95,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_frosthoundAI(creature);
     }
@@ -122,7 +122,7 @@ public:
         uint32 hpTimer;
         bool charging;
 
-        void Reset()
+        void Reset() override
         {
             spellTimer = 0;
             hpTimer = 0;
@@ -130,13 +130,13 @@ public:
             me->SetControlled(false, UNIT_STATE_STUNNED);
         }
 
-        void MovementInform(uint32 type, uint32  /*pointId*/)
+        void MovementInform(uint32 type, uint32  /*pointId*/) override
         {
             if (type == POINT_MOTION_TYPE)
                 me->SetControlled(true, UNIT_STATE_STUNNED);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_STORM_HAMMER)
             {
@@ -152,7 +152,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (charging)
                 return;
@@ -185,7 +185,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_iron_watcherAI(creature);
     }
@@ -221,7 +221,7 @@ public:
         bool rollPath;
         bool setVisible;
 
-        void Reset()
+        void Reset() override
         {
             npc_escortAI::Reset();
             if (me->HasUnitState(UNIT_STATE_EVADE))
@@ -238,9 +238,9 @@ public:
             me->UpdateEntry(roll_chance_i(25) ? NPC_TIME_LOST_PROTO_DRAKE : NPC_VYRAGOSA, 0, false);
         }
 
-        void WaypointReached(uint32  /*pointId*/) { }
+        void WaypointReached(uint32  /*pointId*/) override { }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.Reset();
             if (me->GetEntry() == NPC_TIME_LOST_PROTO_DRAKE)
@@ -255,7 +255,7 @@ public:
             }
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             if (rollPath)
             {
@@ -299,7 +299,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_time_lost_proto_drakeAI(creature);
     }
@@ -337,14 +337,14 @@ public:
         bool switching;
         bool startPath;
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (switching || me->HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
                 return;
             ScriptedAI::EnterEvadeMode();
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetRegeneratingHealth(true);
             me->SetSpeed(MOVE_RUN, 1.14f, true); // ZOMG!
@@ -358,13 +358,13 @@ public:
             me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         }
 
-        void PassengerBoarded(Unit*, int8, bool apply)
+        void PassengerBoarded(Unit*, int8, bool apply) override
         {
             if (!apply && me->IsAlive() && me->HasAura(SPELL_WYRM_GRIP))
                 me->RemoveAurasDueToSpell(SPELL_WYRM_GRIP);
         }
 
-        void MovementInform(uint32 type, uint32 pointId)
+        void MovementInform(uint32 type, uint32 pointId) override
         {
             if (type == POINT_MOTION_TYPE && pointId == 1 && !me->GetCharmerGUID())
             {
@@ -383,7 +383,7 @@ public:
                 Unit::Kill(me, me);
         }
 
-        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (who != me)
             {
@@ -393,16 +393,16 @@ public:
             }
         }
 
-        void AttackStart(Unit*) { }
-        void MoveInLineOfSight(Unit*  /*who*/) { }
+        void AttackStart(Unit*) override { }
+        void MoveInLineOfSight(Unit*  /*who*/) override { }
 
-        void OnCharmed(bool apply)
+        void OnCharmed(bool apply) override
         {
             if (apply)
                 setCharm = true;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
         {
             if (!playerGUID && spellInfo->Id == SPELL_SPEAR_OF_HODIR)
             {
@@ -450,7 +450,7 @@ public:
             return nullptr;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (startPath)
             {
@@ -570,7 +570,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_wild_wyrmAI(creature);
     }
@@ -607,7 +607,7 @@ public:
             ModStackAmount(-1);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_q13003_thursting_hodirs_spear_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
             OnEffectApply += AuraEffectApplyFn(spell_q13003_thursting_hodirs_spear_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
@@ -615,7 +615,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_q13003_thursting_hodirs_spear_AuraScript();
     }
@@ -672,13 +672,13 @@ public:
                 player->VehicleSpellInitialize();
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_q13007_iron_colossus_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q13007_iron_colossus_SpellScript();
     };
@@ -760,18 +760,18 @@ public:
 
         bool freed;
 
-        void Reset()
+        void Reset() override
         {
             freed = false;
             me->CastSpell(me, SPELL_ICE_PRISON, true);
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             Reset();
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (!freed)
                 return;
@@ -780,7 +780,7 @@ public:
                 me->DespawnOrUnsummon();
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             if (spell->Id != SPELL_ICE_LANCE)
                 return;
@@ -795,7 +795,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_brunnhildar_prisonerAI(creature);
     }
@@ -832,19 +832,19 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.ScheduleEvent(EVENT_CHECK_AREA, 5000);
             me->SetSpeed(MOVE_RUN, 2.0f);
         }
 
-        void MovementInform(uint32 type, uint32  /*id*/)
+        void MovementInform(uint32 type, uint32  /*id*/) override
         {
             if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
                 events.ScheduleEvent(EVENT_REACHED_HOME, 2000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -897,7 +897,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_freed_protodrakeAI(creature);
     }
@@ -912,11 +912,11 @@ public:
     {
         npc_icefangAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void AttackStart(Unit* /*who*/) { }
-        void EnterCombat(Unit* /*who*/) { }
-        void EnterEvadeMode() { }
+        void AttackStart(Unit* /*who*/) override { }
+        void EnterCombat(Unit* /*who*/) override { }
+        void EnterEvadeMode() override { }
 
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
+        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -925,11 +925,11 @@ public:
             }
         }
 
-        void WaypointReached(uint32 /*waypointId*/) { }
-        void JustDied(Unit* /*killer*/) { }
-        void OnCharmed(bool /*apply*/) { }
+        void WaypointReached(uint32 /*waypointId*/) override { }
+        void JustDied(Unit* /*killer*/) override { }
+        void OnCharmed(bool /*apply*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -938,7 +938,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_icefangAI(creature);
     }
@@ -959,7 +959,7 @@ public:
     public:
         npc_hyldsmeet_protodrakeAI(Creature* creature) : CreatureAI(creature), _accessoryRespawnTimer(0), _vehicleKit(creature->GetVehicleKit()) { }
 
-        void PassengerBoarded(Unit* who, int8 /*seat*/, bool apply)
+        void PassengerBoarded(Unit* who, int8 /*seat*/, bool apply) override
         {
             if (apply)
                 return;
@@ -968,7 +968,7 @@ public:
                 _accessoryRespawnTimer = 5 * MINUTE * IN_MILLISECONDS;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //! We need to manually reinstall accessories because the vehicle itself is friendly to players,
             //! so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
@@ -986,7 +986,7 @@ public:
         Vehicle* _vehicleKit;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hyldsmeet_protodrakeAI(creature);
     }
@@ -1006,13 +1006,13 @@ public:
     {
         PrepareAuraScript(spell_close_rift_AuraScript);
 
-        bool Load()
+        bool Load() override
         {
             _counter = 0;
             return true;
         }
 
-        bool Validate(SpellInfo const* /*spell*/)
+        bool Validate(SpellInfo const* /*spell*/) override
         {
             return sSpellMgr->GetSpellInfo(SPELL_DESPAWN_RIFT);
         }
@@ -1023,7 +1023,7 @@ public:
                 GetTarget()->CastSpell((Unit*)NULL, SPELL_DESPAWN_RIFT, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_close_rift_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
@@ -1033,7 +1033,7 @@ public:
 
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_close_rift_AuraScript();
     }

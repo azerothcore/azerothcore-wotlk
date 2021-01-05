@@ -25,7 +25,7 @@ public:
         uint64 KaelStateRightGUID;
         uint64 KaelStateLeftGUID;
 
-        void Initialize()
+        void Initialize() override
         {
             SetBossNumber(MAX_ENCOUNTER);
             AlarGUID = 0;
@@ -39,7 +39,7 @@ public:
             KaelStateLeftGUID = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -64,7 +64,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* gobject)
+        void OnGameObjectCreate(GameObject* gobject) override
         {
             switch (gobject->GetEntry())
             {
@@ -80,7 +80,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier) const
+        uint64 GetData64(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -106,7 +106,7 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -117,7 +117,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(char const* str)
+        void Load(char const* str) override
         {
             if (!str)
             {
@@ -150,7 +150,7 @@ public:
         }
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_the_eye_InstanceMapScript(map);
     }
@@ -172,13 +172,13 @@ public:
             return true;
         }
 
-        void Register()
+        void Register() override
         {
             DoCheckProc += AuraCheckProcFn(spell_the_eye_counterchargeScript::PrepareProc);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_the_eye_counterchargeScript();
     }

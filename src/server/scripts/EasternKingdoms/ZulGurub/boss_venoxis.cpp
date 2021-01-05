@@ -80,7 +80,7 @@ public:
     {
         boss_venoxisAI(Creature* creature) : BossAI(creature, DATA_VENOXIS) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             // remove all spells and auras from previous attempts
@@ -93,14 +93,14 @@ public:
             events.SetPhase(PHASE_ONE);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(SAY_VENOXIS_DEATH);
             me->RemoveAllAuras();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             me->SetReactState(REACT_AGGRESSIVE);
@@ -119,7 +119,7 @@ public:
             DoZoneInCombat();
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
             // check if venoxis is ready to transform
             if (!_transformed && !HealthAbovePct(50))
@@ -136,7 +136,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -251,7 +251,7 @@ public:
         bool _frenzied;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_venoxisAI(creature);
     }

@@ -59,7 +59,7 @@ public:
     {
         npc_emilyAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             if (Creature* Mrfloppy = GetClosestCreatureWithEntry(me, NPC_MRFLOPPY, 50.0f))
                 summoned->AI()->AttackStart(Mrfloppy);
@@ -67,7 +67,7 @@ public:
                 summoned->AI()->AttackStart(me->GetVictim());
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -174,12 +174,12 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*Who*/)
+        void EnterCombat(Unit* /*Who*/) override
         {
             Talk(SAY_RANDOMAGGRO);
         }
 
-        void Reset()
+        void Reset() override
         {
             _mrfloppyGUID     = 0;
             _RavenousworgGUID = 0;
@@ -190,7 +190,7 @@ public:
         uint64   _mrfloppyGUID;
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_PERILOUS_ADVENTURE)
         {
@@ -204,7 +204,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_emilyAI(creature);
     }
@@ -220,9 +220,9 @@ public:
     {
         npc_mrfloppyAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* Who)
+        void EnterCombat(Unit* Who) override
         {
             if (Creature* Emily = GetClosestCreatureWithEntry(me, NPC_EMILY, 50.0f))
             {
@@ -240,23 +240,23 @@ public:
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (Creature* Emily = GetClosestCreatureWithEntry(me, NPC_EMILY, 50.0f))
                 me->GetMotionMaster()->MoveFollow(Emily, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_mrfloppyAI(creature);
     }
@@ -276,7 +276,7 @@ public:
             _attack = false;
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
                 _pacified = true;
@@ -288,7 +288,7 @@ public:
                 CombatAI::AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
                 _pacified = true;
@@ -304,7 +304,7 @@ public:
         bool   _attack;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ravenous_worgAI(creature);
     }
@@ -334,19 +334,19 @@ public:
     {
         npc_outhouse_bunnyAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             _counter = 0;
             _gender  = 0;
         }
 
-        void SetData(uint32 Type, uint32 Data)
+        void SetData(uint32 Type, uint32 Data) override
         {
             if (Type == 1)
                 _gender = Data;
         }
 
-        void SpellHit(Unit* Caster, const SpellInfo* Spell)
+        void SpellHit(Unit* Caster, const SpellInfo* Spell) override
         {
             if (Spell->Id == SPELL_OUTHOUSE_GROANS)
             {
@@ -373,7 +373,7 @@ public:
         uint8 _gender;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_outhouse_bunnyAI(creature);
     }
@@ -396,12 +396,12 @@ public:
     {
         npc_tallhorn_stagAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             _phase = 1;
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (_phase == 1)
             {
@@ -419,7 +419,7 @@ public:
         uint8 _phase;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_tallhorn_stagAI(creature);
     }
@@ -448,7 +448,7 @@ public:
     {
         npc_amberpine_woodsmanAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             if (me->FindNearestCreature(NPC_TALLHORN_STAG, 0.2f))
             {
@@ -458,7 +458,7 @@ public:
                 _events.ScheduleEvent(EVENT_WOODSMAN_1, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _events.Update(diff);
 
@@ -484,7 +484,7 @@ public:
         EventMap _events;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_amberpine_woodsmanAI(creature);
     }
@@ -514,19 +514,19 @@ public:
     {
         npc_wounded_skirmisherAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             _despawnTimer = 5000;
             _playerGUID = 0;
         }
 
-        void MovementInform(uint32, uint32 id)
+        void MovementInform(uint32, uint32 id) override
         {
             if (id == 1)
                 me->DespawnOrUnsummon(_despawnTimer);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_RENEW_SKIRMISHER && caster->GetTypeId() == TYPEID_PLAYER
                     && caster->ToPlayer()->GetQuestStatus(QUEST_OVERWHELMED) == QUEST_STATUS_INCOMPLETE)
@@ -543,7 +543,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -555,7 +555,7 @@ public:
         uint32 _despawnTimer;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_wounded_skirmisherAI(creature);
     }
@@ -593,7 +593,7 @@ public:
     {
         npc_venture_co_stragglerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             _playerGUID   = 0;
 
@@ -601,7 +601,7 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _events.Update(diff);
 
@@ -643,7 +643,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_SMOKE_BOMB && caster->GetTypeId() == TYPEID_PLAYER)
             {
@@ -660,7 +660,7 @@ public:
         uint64 _playerGUID;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_venture_co_stragglerAI(creature);
     }
@@ -708,7 +708,7 @@ public:
     {
         npc_lake_frogAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             _following = false;
             _runningScript = false;
@@ -716,7 +716,7 @@ public:
                 me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_following)
                 if (!me->HasAura(SPELL_FROG_LOVE))
@@ -755,7 +755,7 @@ public:
             }
         }
 
-        void ReceiveEmote(Player* player, uint32 emote)
+        void ReceiveEmote(Player* player, uint32 emote) override
         {
             if (_following || _runningScript)
                 return;
@@ -785,7 +785,7 @@ public:
             }
         }
 
-        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/)
+        void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
         {
             DoCast(player, SPELL_SUMMON_ASHWOOD_BRAND);
         }
@@ -796,7 +796,7 @@ public:
         bool   _runningScript;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_lake_frogAI(creature);
     }
@@ -816,7 +816,7 @@ public:
     {
         PrepareSpellScript(spell_shredder_delivery_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             return GetCaster()->GetTypeId() == TYPEID_UNIT;
         }
@@ -827,13 +827,13 @@ public:
                 GetCaster()->ToCreature()->DespawnOrUnsummon();
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_shredder_delivery_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_shredder_delivery_SpellScript();
     }
@@ -865,13 +865,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectApply += AuraEffectApplyFn(spell_infected_worgen_bite_AuraScript::HandleAfterEffectApply, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAPPLY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_infected_worgen_bite_AuraScript();
     }

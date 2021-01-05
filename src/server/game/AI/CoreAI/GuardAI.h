@@ -18,8 +18,8 @@ public:
 
     static int Permissible(Creature const* creature);
 
-    void Reset();
-    void EnterEvadeMode();
-    void JustDied(Unit* killer);
+    void Reset() override;
+    void EnterEvadeMode() override;
+    void JustDied(Unit* killer) override;
 };
 #endif

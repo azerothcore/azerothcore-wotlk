@@ -48,12 +48,12 @@ public:
             _intro = false;
         }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!_intro && who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -64,7 +64,7 @@ public:
         }
 
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
@@ -75,19 +75,19 @@ public:
             events.ScheduleEvent(EVENT_HEALTH_CHECK_20, 500);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(SAY_DEATH);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -142,7 +142,7 @@ public:
         bool _intro;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_thorngrin_the_tenderAI(creature);
     }

@@ -82,7 +82,7 @@ class boss_jaraxxus : public CreatureScript
 public:
     boss_jaraxxus() : CreatureScript("boss_jaraxxus") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_jaraxxusAI(pCreature);
     }
@@ -100,7 +100,7 @@ public:
         EventMap events;
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             if( pInstance )
@@ -113,7 +113,7 @@ public:
                 c->DespawnOrUnsummon();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->setActive(true);
             events.Reset();
@@ -133,7 +133,7 @@ public:
                 pInstance->SetData(TYPE_JARAXXUS, IN_PROGRESS);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
             switch( spell->Id )
             {
@@ -179,7 +179,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -249,7 +249,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*pKiller*/)
+        void JustDied(Unit* /*pKiller*/) override
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
@@ -257,17 +257,17 @@ public:
                 pInstance->SetData(TYPE_JARAXXUS, DONE);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->setActive(false);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -276,7 +276,7 @@ public:
                 pInstance->SetData(TYPE_FAILED, 1);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
     };
 };
 
@@ -285,7 +285,7 @@ class npc_fel_infernal : public CreatureScript
 public:
     npc_fel_infernal() : CreatureScript("npc_fel_infernal") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_fel_infernalAI(pCreature);
     }
@@ -296,7 +296,7 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             if( Unit* target = me->SelectNearestTarget(200.0f) )
             {
@@ -307,7 +307,7 @@ public:
             events.RescheduleEvent(EVENT_SPELL_FEL_STEAK, urand(7000, 20000));
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -338,12 +338,12 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->DespawnOrUnsummon(10000);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->DespawnOrUnsummon();
         }
@@ -356,7 +356,7 @@ class npc_mistress_of_pain : public CreatureScript
 public:
     npc_mistress_of_pain() : CreatureScript("npc_mistress_of_pain") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_mistress_of_painAI(pCreature);
     }
@@ -367,7 +367,7 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             if( Unit* target = me->SelectNearestTarget(200.0f) )
             {
@@ -381,13 +381,13 @@ public:
                 events.RescheduleEvent(EVENT_SPELL_MISTRESS_KISS, urand(10000, 15000));
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo*  /*spell*/)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo*  /*spell*/) override
         {
             //if (caster && spell && spell->Id == 66287 /*control vehicle*/)
             //  caster->ClearUnitState(UNIT_STATE_ONVEHICLE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -420,12 +420,12 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->DespawnOrUnsummon(10000);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->DespawnOrUnsummon();
         }
@@ -453,13 +453,13 @@ public:
                     }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_toc25_mistress_kiss_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_toc25_mistress_kiss_AuraScript();
     }
@@ -492,14 +492,14 @@ public:
             GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mistress_kiss_area_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             OnEffectHitTarget += SpellEffectFn(spell_mistress_kiss_area_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_mistress_kiss_area_SpellScript();
     }

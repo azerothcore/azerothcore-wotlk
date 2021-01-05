@@ -57,7 +57,7 @@ class boss_ionar : public CreatureScript
 public:
     boss_ionar() : CreatureScript("boss_ionar") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_ionarAI (creature);
     }
@@ -74,7 +74,7 @@ public:
         SummonList summons;
         uint8 HealthCheck;
 
-        void Reset()
+        void Reset() override
         {
             HealthCheck = 50;
             events.Reset();
@@ -99,7 +99,7 @@ public:
             events.RescheduleEvent(EVENT_STATIC_OVERLOAD, 5000, 0, 1);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
@@ -110,7 +110,7 @@ public:
             ScheduleEvents(false);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             Talk(SAY_DEATH);
 
@@ -120,7 +120,7 @@ public:
                 m_pInstance->SetData(TYPE_IONAR, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -128,7 +128,7 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_DISPERSE)
                 Split();
@@ -161,7 +161,7 @@ public:
             events.ScheduleEvent(EVENT_CALL_SPARKS, 15000, 0, 2);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -218,7 +218,7 @@ class npc_spark_of_ionar : public CreatureScript
 public:
     npc_spark_of_ionar() : CreatureScript("npc_spark_of_ionar") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_spark_of_ionarAI (creature);
     }
@@ -229,18 +229,18 @@ public:
 
         bool returning;
 
-        void MoveInLineOfSight(Unit*) { }
-        void UpdateAI(uint32) { }
-        void AttackStart(Unit*  /*who*/) { }
+        void MoveInLineOfSight(Unit*) override { }
+        void UpdateAI(uint32) override { }
+        void AttackStart(Unit*  /*who*/) override { }
 
-        void Reset() { returning = false; }
+        void Reset() override { returning = false; }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_CALLBACK)
             {

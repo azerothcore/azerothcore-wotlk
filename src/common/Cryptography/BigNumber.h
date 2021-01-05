@@ -67,12 +67,12 @@ public:
         return t %= bn;
     }
 
-    bool isZero() const;
+    [[nodiscard]] bool isZero() const;
 
     BigNumber ModExp(BigNumber const& bn1, BigNumber const& bn2);
     BigNumber Exp(BigNumber const&);
 
-    int32 GetNumBytes(void);
+    int32 GetNumBytes();
 
     struct bignum_st* BN() { return _bn; }
 
@@ -80,8 +80,8 @@ public:
 
     std::unique_ptr<uint8[]> AsByteArray(int32 minSize = 0, bool littleEndian = true);
 
-    char* AsHexStr() const;
-    char* AsDecStr() const;
+    [[nodiscard]] char* AsHexStr() const;
+    [[nodiscard]] char* AsDecStr() const;
 
 private:
     struct bignum_st* _bn;

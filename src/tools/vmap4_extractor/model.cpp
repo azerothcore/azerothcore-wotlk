@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <cstdio>
 
-Model::Model(std::string& filename) : filename(filename), vertices(0), indices(0)
+Model::Model(std::string& filename) : filename(filename), vertices(nullptr), indices(nullptr)
 {
     memset(&header, 0, sizeof(header));
 }

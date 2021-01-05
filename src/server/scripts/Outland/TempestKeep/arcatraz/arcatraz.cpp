@@ -75,7 +75,7 @@ public:
         EventMap events;
         EventMap events2;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
 
@@ -86,28 +86,28 @@ public:
             events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO1, 3000);
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (who && me->Attack(who, true))
                 me->GetMotionMaster()->MoveChase(who, 20.0f);
         }
 
-        void KilledUnit(Unit* /*who*/)
+        void KilledUnit(Unit* /*who*/) override
         {
             Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_MILL_CHECK_HEALTH, 1000);
             events.ScheduleEvent(EVENT_MILL_PYROBLAST, 30000);
@@ -115,7 +115,7 @@ public:
             events.ScheduleEvent(EVENT_MILL_ICEBLOCK, 1000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
@@ -232,7 +232,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_millhouse_manastormAI(creature);
     }
@@ -321,12 +321,12 @@ public:
         {
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             if (summon->GetEntry() == NPC_HARBINGER_SKYRISS)
             {
@@ -342,16 +342,16 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit*) { }
-        void AttackStart(Unit*) { }
-        void EnterCombat(Unit*) { }
+        void MoveInLineOfSight(Unit*) override { }
+        void AttackStart(Unit*) override { }
+        void EnterCombat(Unit*) override { }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             me->setActive(false);
         }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             me->setActive(false);
@@ -364,7 +364,7 @@ public:
 
         }
 
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (attacker && IS_PLAYER_GUID(attacker->GetCharmerOrOwnerOrOwnGUID()) && damage > 0 && !me->isActiveObject())
             {
@@ -378,7 +378,7 @@ public:
             damage = 0;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (data == FAIL)
             {
@@ -402,7 +402,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -562,7 +562,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_warden_mellicharAI(creature);
     }
@@ -589,14 +589,14 @@ public:
                 caster->RemoveAurasDueToSpell(SPELL_SOUL_STEAL);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_arcatraz_soul_steal_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_arcatraz_soul_steal_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_arcatraz_soul_steal_AuraScript();
     }

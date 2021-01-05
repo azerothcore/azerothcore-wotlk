@@ -407,7 +407,7 @@ class npc_anachronos_the_ancient : public CreatureScript
 public:
     npc_anachronos_the_ancient() : CreatureScript("npc_anachronos_the_ancient") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_anachronos_the_ancientAI(creature);
     }
@@ -427,7 +427,7 @@ public:
         uint64 PlayerGUID;
         bool eventEnd;
 
-        void Reset()
+        void Reset() override
         {
             AnimationTimer = 1500;
             AnimationCount = 0;
@@ -709,7 +709,7 @@ public:
             }
             ++AnimationCount;
         }
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (AnimationTimer)
             {
@@ -735,7 +735,7 @@ class npc_qiraj_war_spawn : public CreatureScript
 public:
     npc_qiraj_war_spawn() : CreatureScript("npc_qiraj_war_spawn") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_qiraj_war_spawnAI(creature);
     }
@@ -750,7 +750,7 @@ public:
         bool Timers;
         bool hasTarget;
 
-        void Reset()
+        void Reset() override
         {
             MobGUID = 0;
             PlayerGUID = 0;
@@ -758,10 +758,10 @@ public:
             hasTarget = false;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
-        void JustDied(Unit* /*slayer*/);
+        void EnterCombat(Unit* /*who*/) override { }
+        void JustDied(Unit* /*slayer*/) override;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!Timers)
             {
@@ -852,7 +852,7 @@ class npc_anachronos_quest_trigger : public CreatureScript
 public:
     npc_anachronos_quest_trigger() : CreatureScript("npc_anachronos_quest_trigger") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_anachronos_quest_triggerAI(creature);
     }
@@ -873,7 +873,7 @@ public:
         bool Announced;
         bool Failed;
 
-        void Reset()
+        void Reset() override
         {
             PlayerGUID = 0;
 
@@ -966,7 +966,7 @@ public:
                 Announced = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!PlayerGUID || !EventStarted)
                 return;
@@ -1014,7 +1014,7 @@ class go_crystalline_tear : public GameObjectScript
 public:
     go_crystalline_tear() : GameObjectScript("go_crystalline_tear") { }
 
-    bool OnQuestAccept(Player* player, GameObject* go, Quest const* quest)
+    bool OnQuestAccept(Player* player, GameObject* go, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_A_PAWN_ON_THE_ETERNAL_BOARD)
         {

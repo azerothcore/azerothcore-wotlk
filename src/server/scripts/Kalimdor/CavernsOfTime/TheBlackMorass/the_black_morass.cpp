@@ -63,7 +63,7 @@ class NpcRunToHome : public BasicEvent
 public:
     NpcRunToHome(Creature& owner) : _owner(owner) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         _owner.GetMotionMaster()->MoveTargetedHome();
         return true;
@@ -78,7 +78,7 @@ class npc_medivh_bm : public CreatureScript
 public:
     npc_medivh_bm() : CreatureScript("npc_medivh_bm") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_medivh_bmAI(creature);
     }
@@ -108,7 +108,7 @@ public:
         Movement::PointsArray groundArray;
         Movement::PointsArray airArray;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->CastSpell(me, SPELL_MANA_SHIELD, true);
@@ -117,7 +117,7 @@ public:
                 me->CastSpell(me, SPELL_MEDIVH_CHANNEL, false);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if (instance)
                 instance->SetData64(DATA_SUMMONED_NPC, summon->GetGUID());
@@ -138,13 +138,13 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) override
         {
             if (instance)
                 instance->SetData64(DATA_DELETED_NPC, summon->GetGUID());
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!events.Empty() || (instance && instance->GetData(TYPE_AEONUS) == DONE))
                 return;
@@ -167,9 +167,9 @@ public:
             }
         }
 
-        void AttackStart(Unit* ) { }
+        void AttackStart(Unit* ) override { }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_OUTRO)
             {
@@ -181,14 +181,14 @@ public:
             }
         }
 
-        void JustDied(Unit* )
+        void JustDied(Unit* ) override
         {
             me->SetRespawnTime(DAY);
             events.Reset();
             Talk(SAY_DEATH);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (uint32 eventId = events.ExecuteEvent())
@@ -279,7 +279,7 @@ class npc_time_rift : public CreatureScript
 public:
     npc_time_rift() : CreatureScript("npc_time_rift") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_time_riftAI(creature);
     }
@@ -296,7 +296,7 @@ public:
         InstanceScript* instance;
         uint64 riftKeeperGUID;
 
-        void Reset()
+        void Reset() override
         {
             if (instance && instance->GetData(DATA_RIFT_NUMBER) >= 18)
             {
@@ -308,7 +308,7 @@ public:
             events.ScheduleEvent(EVENT_CHECK_DEATH, 8000);
         }
 
-        void SetGUID(uint64 guid, int32)
+        void SetGUID(uint64 guid, int32) override
         {
             riftKeeperGUID = guid;
         }
@@ -344,7 +344,7 @@ public:
                 DoSummonAtRift(entry);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -390,13 +390,13 @@ public:
                 instance->SetData(DATA_DAMAGE_SHIELD, 1);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_morass_corrupt_medivh_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_black_morass_corrupt_medivh_AuraScript();
     }

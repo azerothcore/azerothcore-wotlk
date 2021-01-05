@@ -1358,7 +1358,7 @@ public:
             _marked = false;
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_ARCANE_DISRUPTION && !_marked)
             {
@@ -1377,7 +1377,7 @@ public:
         bool _marked;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_crate_helperAI(creature);
     }
@@ -1499,7 +1499,7 @@ public:
         InstanceScript* pInstance;
         uint32 allowTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             locked = false;
@@ -1518,7 +1518,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!allowTimer && !locked && (who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && me->GetDistance(who) < 15.0f)
                 InfectMe(2000);
@@ -1526,7 +1526,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_INFECT_CITIZIEN)
                 InfectMe(1);
@@ -1540,7 +1540,7 @@ public:
             changeTimer = time;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_ARTHAS_CRUSADER_STRIKE)
             {
@@ -1554,7 +1554,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             ScriptedAI::UpdateAI(diff);
 
@@ -1589,7 +1589,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_cos_stratholme_citizienAI(creature);
     }

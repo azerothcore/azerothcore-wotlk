@@ -62,7 +62,7 @@ class boss_teron_gorefiend : public CreatureScript
 public:
     boss_teron_gorefiend() : CreatureScript("boss_teron_gorefiend") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_teron_gorefiendAI>(creature);
     }
@@ -76,13 +76,13 @@ public:
 
         bool intro;
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             me->CastSpell(me, SPELL_SHADOW_OF_DEATH_REMOVE, true);
         }
 
-        void SetData(uint32 type, uint32 id)
+        void SetData(uint32 type, uint32 id) override
         {
             if (type || !me->IsAlive())
                 return;
@@ -94,7 +94,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             events.ScheduleEvent(EVENT_SPELL_INCINERATE, 24000);
@@ -103,7 +103,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_SHADOW_OF_DEATH, 20000);
         }
 
-        void KilledUnit(Unit*  /*victim*/)
+        void KilledUnit(Unit*  /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_TALK_KILL) == 0)
             {
@@ -112,19 +112,19 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
             me->CastSpell(me, SPELL_SHADOW_OF_DEATH_REMOVE, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim() )
                 return;
@@ -168,7 +168,7 @@ public:
             EnterEvadeIfOutOfCombatArea();
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const
+        bool CheckEvadeIfOutOfCombatArea() const override
         {
             return me->GetDistance(me->GetHomePosition()) > 100.0f;
         }
@@ -204,14 +204,14 @@ public:
             GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_SKELETON4, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectAbsorb += AuraEffectAbsorbFn(spell_teron_gorefiend_shadow_of_death_AuraScript::Absorb, EFFECT_0);
             AfterEffectRemove += AuraEffectRemoveFn(spell_teron_gorefiend_shadow_of_death_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_teron_gorefiend_shadow_of_death_AuraScript();
     }
@@ -239,14 +239,14 @@ public:
                 effect->RecalculateAmount();
         }
 
-        void Register()
+        void Register() override
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_teron_gorefiend_spirit_lance_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_DECREASE_SPEED);
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_teron_gorefiend_spirit_lance_AuraScript::Update, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_teron_gorefiend_spirit_lance_AuraScript();
     }
@@ -266,13 +266,13 @@ public:
             Unit::Kill(nullptr, GetTarget());
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectRemove += AuraEffectRemoveFn(spell_teron_gorefiend_spiritual_vengeance_AuraScript::HandleEffectRemove, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_teron_gorefiend_spiritual_vengeance_AuraScript();
     }
@@ -287,7 +287,7 @@ public:
     {
         PrepareAuraScript(spell_teron_gorefiend_shadowy_construct_AuraScript)
 
-        bool Load()
+        bool Load() override
         {
             return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
         }
@@ -311,13 +311,13 @@ public:
             GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_BRIEF_STUN, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectApply += AuraEffectApplyFn(spell_teron_gorefiend_shadowy_construct_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_teron_gorefiend_shadowy_construct_AuraScript();
     }

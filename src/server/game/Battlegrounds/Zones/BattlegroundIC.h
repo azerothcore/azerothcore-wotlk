@@ -879,52 +879,52 @@ enum HonorRewards
 struct BattlegroundICScore : public BattlegroundScore
 {
     BattlegroundICScore(Player* player) : BattlegroundScore(player), BasesAssaulted(0), BasesDefended(0) { }
-    ~BattlegroundICScore() { }
+    ~BattlegroundICScore() override { }
     uint32 BasesAssaulted;
     uint32 BasesDefended;
 
-    uint32 GetAttr1() const final override { return BasesAssaulted; }
-    uint32 GetAttr2() const final override { return BasesDefended; }
+    uint32 GetAttr1() const final { return BasesAssaulted; }
+    uint32 GetAttr2() const final { return BasesDefended; }
 };
 
 class BattlegroundIC : public Battleground
 {
 public:
     BattlegroundIC();
-    ~BattlegroundIC();
+    ~BattlegroundIC() override;
 
     /* inherited from BattlegroundClass */
-    void AddPlayer(Player* player);
-    void StartingEventCloseDoors();
-    void StartingEventOpenDoors();
-    void PostUpdateImpl(uint32 diff);
+    void AddPlayer(Player* player) override;
+    void StartingEventCloseDoors() override;
+    void StartingEventOpenDoors() override;
+    void PostUpdateImpl(uint32 diff) override;
 
-    void RemovePlayer(Player* player);
-    void HandleAreaTrigger(Player* player, uint32 trigger);
-    bool SetupBattleground();
+    void RemovePlayer(Player* player) override;
+    void HandleAreaTrigger(Player* player, uint32 trigger) override;
+    bool SetupBattleground() override;
     void SpawnLeader(uint32 teamid);
-    void HandleKillUnit(Creature* unit, Player* killer);
-    void HandleKillPlayer(Player* player, Player* killer);
-    void EndBattleground(TeamId winnerTeamId);
-    void EventPlayerClickedOnFlag(Player* source, GameObject* /*gameObject*/);
+    void HandleKillUnit(Creature* unit, Player* killer) override;
+    void HandleKillPlayer(Player* player, Player* killer) override;
+    void EndBattleground(TeamId winnerTeamId) override;
+    void EventPlayerClickedOnFlag(Player* source, GameObject* /*gameObject*/) override;
 
-    void EventPlayerDamagedGO(Player* /*player*/, GameObject* go, uint32 eventType);
-    void DestroyGate(Player* player, GameObject* go);
+    void EventPlayerDamagedGO(Player* /*player*/, GameObject* go, uint32 eventType) override;
+    void DestroyGate(Player* player, GameObject* go) override;
 
-    GraveyardStruct const* GetClosestGraveyard(Player* player);
+    GraveyardStruct const* GetClosestGraveyard(Player* player) override;
 
     /* Scorekeeping */
-    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
+    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
 
-    void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-    void HandlePlayerResurrect(Player* player);
+    void HandlePlayerResurrect(Player* player) override;
 
     uint32 GetNodeState(uint8 nodeType) const { return (uint8)nodePoint[nodeType].nodeState; }
 
-    bool AllNodesConrolledByTeam(TeamId teamId) const;  // overwrited
+    bool AllNodesConrolledByTeam(TeamId teamId) const override;  // overwrited
     bool IsResourceGlutAllowed(TeamId teamId) const;
-    void DoAction(uint32 action, uint64 guid);
+    void DoAction(uint32 action, uint64 guid) override;
 private:
     uint32 closeFortressDoorsTimer;
     bool doorsClosed;

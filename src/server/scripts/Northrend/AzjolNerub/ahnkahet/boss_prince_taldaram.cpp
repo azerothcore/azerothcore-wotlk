@@ -73,7 +73,7 @@ public:
         uint64 vanishTarget;
         uint32 vanishDamage;
 
-        void Reset()
+        void Reset() override
         {
             if (me->GetPositionZ() > 15.0f)
                 me->CastSpell(me, SPELL_BEAM_VISUAL, true);
@@ -93,7 +93,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_FREE)
             {
@@ -109,7 +109,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if (pInstance)
                 pInstance->SetData(DATA_PRINCE_TALDARAM_EVENT, IN_PROGRESS);
@@ -130,13 +130,13 @@ public:
             vanishDamage = 0;
         }
 
-        void SpellHitTarget(Unit*, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit*, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_CONJURE_FLAME_SPHERE)
                 summons.DoAction(ACTION_SPHERE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -221,7 +221,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (vanishTarget)
             {
@@ -234,7 +234,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
@@ -243,7 +243,7 @@ public:
                 pInstance->SetData(DATA_PRINCE_TALDARAM_EVENT, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (urand(0, 1))
                 return;
@@ -255,7 +255,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_taldaramAI(creature);
     }
@@ -274,7 +274,7 @@ public:
 
         uint32 uiDespawnTimer;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_SPHERE)
             {
@@ -287,28 +287,28 @@ public:
             }
         }
 
-        void MovementInform(uint32  /*type*/, uint32 id)
+        void MovementInform(uint32  /*type*/, uint32 id) override
         {
             if (id == 0)
                 me->DisappearAndDie();
         }
 
-        void Reset()
+        void Reset() override
         {
             me->CastSpell(me, SPELL_FLAME_SPHERE_SPAWN_EFFECT, true);
             me->CastSpell(me, SPELL_FLAME_SPHERE_VISUAL, true);
             uiDespawnTimer = 13 * IN_MILLISECONDS;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) override {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void JustDied(Unit* /*who*/)
+        void JustDied(Unit* /*who*/) override
         {
             me->CastSpell(me, SPELL_FLAME_SPHERE_DEATH_EFFECT, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (uiDespawnTimer <= diff)
                 me->DisappearAndDie();
@@ -317,7 +317,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_taldaram_flamesphereAI(creature);
     }

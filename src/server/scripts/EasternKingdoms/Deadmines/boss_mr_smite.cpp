@@ -31,7 +31,7 @@ class boss_mr_smite : public CreatureScript
 public:
     boss_mr_smite() : CreatureScript("boss_mr_smite") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_mr_smiteAI>(creature);
     }
@@ -46,7 +46,7 @@ public:
         bool health67;
         bool health34;
 
-        void Reset()
+        void Reset() override
         {
             health67 = false;
             health34 = false;
@@ -57,14 +57,14 @@ public:
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_CHECK_HEALTH1, 500);
             events.ScheduleEvent(EVENT_CHECK_HEALTH2, 500);
             events.ScheduleEvent(EVENT_SMITE_SLAM, 3000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -133,7 +133,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;

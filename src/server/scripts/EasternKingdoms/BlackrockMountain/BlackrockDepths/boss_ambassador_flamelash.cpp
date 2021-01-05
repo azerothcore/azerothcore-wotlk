@@ -45,7 +45,7 @@ class boss_ambassador_flamelash : public CreatureScript
 public:
     boss_ambassador_flamelash() : CreatureScript("boss_ambassador_flamelash") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_ambassador_flamelashAI>(creature);
     }
@@ -206,7 +206,7 @@ class npc_burning_spirit : public CreatureScript
 public:
     npc_burning_spirit() : CreatureScript("npc_burning_spirit") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_burning_spiritAI>(creature);
     }

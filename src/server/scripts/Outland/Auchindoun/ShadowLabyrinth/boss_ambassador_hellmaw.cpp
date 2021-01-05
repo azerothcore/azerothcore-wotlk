@@ -30,7 +30,7 @@ class boss_ambassador_hellmaw : public CreatureScript
 public:
     boss_ambassador_hellmaw() : CreatureScript("boss_ambassador_hellmaw") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_ambassador_hellmawAI(creature);
     }
@@ -46,7 +46,7 @@ public:
         EventMap events;
         bool isBanished;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param != 1)
                 return;
@@ -57,7 +57,7 @@ public:
             isBanished = false;
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             isBanished = false;
@@ -74,7 +74,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             if (isBanished)
                 return;
@@ -88,38 +88,38 @@ public:
                 instance->SetData(TYPE_HELLMAW, IN_PROGRESS);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (isBanished)
                 return;
             npc_escortAI::MoveInLineOfSight(who);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (isBanished)
                 return;
             npc_escortAI::AttackStart(who);
         }
 
-        void WaypointReached(uint32 /*waypointId*/)
+        void WaypointReached(uint32 /*waypointId*/) override
         {
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (instance)
                 instance->SetData(TYPE_HELLMAW, DONE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 

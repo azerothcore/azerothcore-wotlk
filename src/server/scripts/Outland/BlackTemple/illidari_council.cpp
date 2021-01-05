@@ -102,7 +102,7 @@ class VerasEnvenom : public BasicEvent
 public:
     VerasEnvenom(Unit& owner, uint64 targetGUID) : _owner(owner), _targetGUID(targetGUID) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         if (Player* target = ObjectAccessor::GetPlayer(_owner, _targetGUID))
         {
@@ -124,7 +124,7 @@ class boss_illidari_council : public CreatureScript
 public:
     boss_illidari_council() : CreatureScript("boss_illidari_council") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_illidari_councilAI>(creature);
     }
@@ -138,7 +138,7 @@ public:
 
         uint64 councilGUIDs[4];
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             Creature* member = nullptr;
@@ -147,10 +147,10 @@ public:
                     member->AI()->EnterEvadeMode();
         }
 
-        void AttackStart(Unit*) { }
-        void MoveInLineOfSight(Unit*) { }
+        void AttackStart(Unit*) override { }
+        void MoveInLineOfSight(Unit*) override { }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (!me->isActiveObject() && param == ACTION_START_ENCOUNTER)
             {
@@ -194,7 +194,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (!me->isActiveObject())
                 return;
@@ -220,18 +220,18 @@ struct boss_illidari_council_memberAI : public ScriptedAI
     InstanceScript* instance;
     EventMap events;
 
-    void Reset()
+    void Reset() override
     {
         events.Reset();
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         me->SetOwnerGUID(0);
         ScriptedAI::EnterEvadeMode();
     }
 
-    void DoAction(int32 param)
+    void DoAction(int32 param) override
     {
         if (param == ACTION_ENRAGE)
         {
@@ -240,7 +240,7 @@ struct boss_illidari_council_memberAI : public ScriptedAI
         }
     }
 
-    void KilledUnit(Unit*)
+    void KilledUnit(Unit*) override
     {
         if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
         {
@@ -249,14 +249,14 @@ struct boss_illidari_council_memberAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit*)
+    void JustDied(Unit*) override
     {
         Talk(SAY_COUNCIL_DEATH);
         if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ILLIDARI_COUNCIL)))
             council->GetAI()->DoAction(ACTION_END_ENCOUNTER);
     }
 
-    void EnterCombat(Unit*  /*who*/)
+    void EnterCombat(Unit*  /*who*/) override
     {
         if (Creature* council = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ILLIDARI_COUNCIL)))
             council->GetAI()->DoAction(ACTION_START_ENCOUNTER);
@@ -268,7 +268,7 @@ class boss_gathios_the_shatterer : public CreatureScript
 public:
     boss_gathios_the_shatterer() : CreatureScript("boss_gathios_the_shatterer") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_gathios_the_shattererAI>(creature);
     }
@@ -290,7 +290,7 @@ public:
             return ObjectAccessor::GetCreature(*me, instance->GetData64(RAND(NPC_GATHIOS_THE_SHATTERER, NPC_HIGH_NETHERMANCER_ZEREVOR)));
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_illidari_council_memberAI::EnterCombat(who);
             events.ScheduleEvent(EVENT_SPELL_BLESSING, 10000);
@@ -301,7 +301,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 4000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -356,7 +356,7 @@ class boss_high_nethermancer_zerevor : public CreatureScript
 public:
     boss_high_nethermancer_zerevor() : CreatureScript("boss_high_nethermancer_zerevor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_high_nethermancer_zerevorAI>(creature);
     }
@@ -365,13 +365,13 @@ public:
     {
         boss_high_nethermancer_zerevorAI(Creature* creature) : boss_illidari_council_memberAI(creature) { }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (who && me->Attack(who, true))
                 me->GetMotionMaster()->MoveChase(who, 20.0f);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_illidari_council_memberAI::EnterCombat(who);
             events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 25000);
@@ -381,7 +381,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, 10000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -429,7 +429,7 @@ class boss_lady_malande : public CreatureScript
 public:
     boss_lady_malande() : CreatureScript("boss_lady_malande") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_lady_malandeAI>(creature);
     }
@@ -438,13 +438,13 @@ public:
     {
         boss_lady_malandeAI(Creature* creature) : boss_illidari_council_memberAI(creature) { }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (who && me->Attack(who, true))
                 me->GetMotionMaster()->MoveChase(who, 20.0f);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             boss_illidari_council_memberAI::EnterCombat(who);
             events.ScheduleEvent(EVENT_SPELL_REFLECTIVE_SHIELD, 10000);
@@ -453,7 +453,7 @@ public:
             events.ScheduleEvent(EVENT_SPELL_EMPOWERED_SMITE, 15000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -493,7 +493,7 @@ class boss_veras_darkshadow : public CreatureScript
 public:
     boss_veras_darkshadow() : CreatureScript("boss_veras_darkshadow") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_veras_darkshadowAI>(creature);
     }
@@ -502,7 +502,7 @@ public:
     {
         boss_veras_darkshadowAI(Creature* creature) : boss_illidari_council_memberAI(creature) { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             me->SetCanDualWield(true);
             boss_illidari_council_memberAI::EnterCombat(who);
@@ -510,12 +510,12 @@ public:
             events.ScheduleEvent(EVENT_SPELL_ENRAGE, 900000);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summon->CastSpell(summon, SPELL_VANISH_VISUAL, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -565,13 +565,13 @@ public:
             amount = -1;
         }
 
-        void Register()
+        void Register() override
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_illidari_council_balance_of_power_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_illidari_council_balance_of_power_AuraScript();
     }
@@ -586,7 +586,7 @@ public:
     {
         PrepareSpellScript(spell_illidari_council_empyreal_balance_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             _sharedHealth = 0;
             _sharedHealthMax = 0;
@@ -623,7 +623,7 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_illidari_council_empyreal_balance_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             AfterCast += SpellCastFn(spell_illidari_council_empyreal_balance_SpellScript::HandleAfterCast);
@@ -635,7 +635,7 @@ public:
         uint8 _targetCount;
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_illidari_council_empyreal_balance_SpellScript();
     }
@@ -660,13 +660,13 @@ public:
             target->CastCustomSpell(dmgInfo.GetAttacker(), SPELL_REFLECTIVE_SHIELD_T, &bp, nullptr, nullptr, true, NULL, aurEff);
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectAbsorb += AuraEffectAbsorbFn(spell_illidari_council_reflective_shield_AuraScript::ReflectDamage, EFFECT_0);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_illidari_council_reflective_shield_AuraScript();
     }
@@ -695,13 +695,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_illidari_council_judgement_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_illidari_council_judgement_SpellScript();
     }
@@ -726,13 +726,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidari_council_deadly_strike_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_illidari_council_deadly_strike_AuraScript();
     }

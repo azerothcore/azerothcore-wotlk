@@ -20,15 +20,15 @@ class WardenMac : public Warden
 {
 public:
     WardenMac();
-    ~WardenMac();
+    ~WardenMac() override;
 
-    void Init(WorldSession* session, BigNumber* k);
-    ClientWardenModule* GetModuleForClient();
-    void InitializeModule();
-    void RequestHash();
-    void HandleHashResult(ByteBuffer& buff);
-    void RequestData();
-    void HandleData(ByteBuffer& buff);
+    void Init(WorldSession* session, BigNumber* k) override;
+    ClientWardenModule* GetModuleForClient() override;
+    void InitializeModule() override;
+    void RequestHash() override;
+    void HandleHashResult(ByteBuffer& buff) override;
+    void RequestData() override;
+    void HandleData(ByteBuffer& buff) override;
 };
 
 #endif

@@ -43,7 +43,7 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
                 i_y += 0.2f * sin(unit->GetOrientation());
             }
 
-            init.MoveTo(i_x, i_y, i_z);
+            init.MoveTo(i_x, i_y, i_z, true);
         }
     }
     else
@@ -55,7 +55,7 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
             i_y += 0.2f * sin(unit->GetOrientation());
         }
 
-        init.MoveTo(i_x, i_y, i_z);
+        init.MoveTo(i_x, i_y, i_z, true);
     }
     if (speed > 0.0f)
         init.SetVelocity(speed);
@@ -101,10 +101,10 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 /*diff*/)
             if (m_precomputedPath.size() > 2)
                 init.MovebyPath(m_precomputedPath);
             else if (m_precomputedPath.size() == 2)
-                init.MoveTo(m_precomputedPath[1].x, m_precomputedPath[1].y, m_precomputedPath[1].z);
+                init.MoveTo(m_precomputedPath[1].x, m_precomputedPath[1].y, m_precomputedPath[1].z, true);
         }
         else
-            init.MoveTo(i_x, i_y, i_z);
+            init.MoveTo(i_x, i_y, i_z, true);
         if (speed > 0.0f) // Default value for point motion type is 0.0, if 0.0 spline will use GetSpeed on unit
             init.SetVelocity(speed);
 

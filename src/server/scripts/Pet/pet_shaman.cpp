@@ -41,18 +41,18 @@ public:
         npc_pet_shaman_earth_elementalAI(Creature* creature) : ScriptedAI(creature), _initAttack(true) { }
 
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_SHAMAN_ANGEREDEARTH, 0);
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_initAttack)
             {
@@ -83,7 +83,7 @@ public:
         bool _initAttack;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_shaman_earth_elementalAI(creature);
     }
@@ -98,12 +98,12 @@ public:
     {
         npc_pet_shaman_fire_elementalAI(Creature* creature) : ScriptedAI(creature), _initAttack(true) { }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_SHAMAN_FIRENOVA, urand(5000, 20000));
@@ -114,7 +114,7 @@ public:
             me->CastSpell(me, SPELL_SHAMAN_FIRESHIELD, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_initAttack)
             {
@@ -155,7 +155,7 @@ public:
         bool _initAttack;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_shaman_fire_elementalAI(creature);
     }

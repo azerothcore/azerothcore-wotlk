@@ -14,7 +14,7 @@ class instance_oculus : public InstanceMapScript
 public:
     instance_oculus() : InstanceMapScript("instance_oculus", 578) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_oculus_InstanceMapScript(pMap);
     }
@@ -37,7 +37,7 @@ public:
         bool bEmeraldVoid;
         bool bRubyVoid;
 
-        void Initialize()
+        void Initialize() override
         {
             EregosCacheGUID = 0;
             uiDrakosGUID    = 0;
@@ -53,7 +53,7 @@ public:
             memset(&DragonCageDoorGUID, 0, sizeof(DragonCageDoorGUID));
         }
 
-        void OnCreatureCreate(Creature* pCreature)
+        void OnCreatureCreate(Creature* pCreature) override
         {
             switch( pCreature->GetEntry() )
             {
@@ -72,7 +72,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* pGo)
+        void OnGameObjectCreate(GameObject* pGo) override
         {
             switch( pGo->GetEntry() )
             {
@@ -99,7 +99,7 @@ public:
             }
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             if (m_auiEncounter[DATA_DRAKOS] == DONE && m_auiEncounter[DATA_VAROS] != DONE)
             {
@@ -113,13 +113,13 @@ public:
             }
         }
 
-        void OnUnitDeath(Unit* unit)
+        void OnUnitDeath(Unit* unit) override
         {
             if (unit->GetEntry() == NPC_CENTRIFUGE_CONSTRUCT)
                 SetData(DATA_CC_COUNT, DONE);
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch( type )
             {
@@ -184,7 +184,7 @@ public:
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch( type )
             {
@@ -200,7 +200,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const
+        uint64 GetData64(uint32 identifier) const override
         {
             switch( identifier )
             {
@@ -222,7 +222,7 @@ public:
         }
 
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -233,7 +233,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if( !in )
             {
@@ -262,7 +262,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {

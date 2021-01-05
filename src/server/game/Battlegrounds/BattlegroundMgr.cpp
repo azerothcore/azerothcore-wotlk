@@ -482,7 +482,7 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
                 maxPlayersPerTeam = 5;
                 break;
         }
-
+        sScriptMgr->OnSetArenaMaxPlayersPerTeam(arenaType, maxPlayersPerTeam);
         bg->SetMaxPlayersPerTeam(maxPlayersPerTeam);
     }
 
@@ -748,19 +748,23 @@ bool BattlegroundMgr::IsArenaType(BattlegroundTypeId bgTypeId)
 
 BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgTypeId, uint8 arenaType)
 {
-    if (arenaType)
-    {
-        switch (arenaType)
-        {
+    if (arenaType) {
+        uint32 queueTypeID = BATTLEGROUND_QUEUE_NONE;
+        switch (arenaType) {
             case ARENA_TYPE_2v2:
-                return BATTLEGROUND_QUEUE_2v2;
+                queueTypeID = BATTLEGROUND_QUEUE_2v2;
+                break;
             case ARENA_TYPE_3v3:
-                return BATTLEGROUND_QUEUE_3v3;
+                queueTypeID = BATTLEGROUND_QUEUE_3v3;
+                break;
             case ARENA_TYPE_5v5:
-                return BATTLEGROUND_QUEUE_5v5;
+                queueTypeID = BATTLEGROUND_QUEUE_5v5;
+                break;
             default:
-                return BATTLEGROUND_QUEUE_NONE;
+                break;
         }
+        sScriptMgr->OnArenaTypeIDToQueueID(bgTypeId, arenaType, queueTypeID);
+        return BattlegroundQueueTypeId(queueTypeID);
     }
 
     if (BattlegroundMgr::bgToQueue.find(bgTypeId) == BattlegroundMgr::bgToQueue.end())
@@ -783,17 +787,23 @@ BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueue
 
 uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
 {
+    uint8 arenaType = 0;
     switch (bgQueueTypeId)
     {
         case BATTLEGROUND_QUEUE_2v2:
-            return ARENA_TYPE_2v2;
+            arenaType = ARENA_TYPE_2v2;
+            break;
         case BATTLEGROUND_QUEUE_3v3:
-            return ARENA_TYPE_3v3;
+            arenaType = ARENA_TYPE_3v3;
+            break;
         case BATTLEGROUND_QUEUE_5v5:
-            return ARENA_TYPE_5v5;
+            arenaType = ARENA_TYPE_5v5;
+            break;
         default:
-            return 0;
+            break;
     }
+    sScriptMgr->OnArenaQueueIdToArenaType(bgQueueTypeId, arenaType);
+    return arenaType;
 }
 
 void BattlegroundMgr::ToggleTesting()

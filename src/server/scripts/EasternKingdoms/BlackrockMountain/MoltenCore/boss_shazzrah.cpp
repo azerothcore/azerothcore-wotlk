@@ -38,7 +38,7 @@ public:
     {
         boss_shazzrahAI(Creature* creature) : BossAI(creature, BOSS_SHAZZRAH) { }
 
-        void EnterCombat(Unit* target)
+        void EnterCombat(Unit* target) override
         {
             BossAI::EnterCombat(target);
             events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 6000);
@@ -48,7 +48,7 @@ public:
             events.ScheduleEvent(EVENT_SHAZZRAH_GATE, 45000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -99,7 +99,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_shazzrahAI(creature);
     }
@@ -115,7 +115,7 @@ public:
     {
         PrepareSpellScript(spell_shazzrah_gate_dummy_SpellScript);
 
-        bool Validate(SpellInfo const* /*spellInfo*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             if (!sSpellMgr->GetSpellInfo(SPELL_SHAZZRAH_GATE))
                 return false;
@@ -142,14 +142,14 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_shazzrah_gate_dummy_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
             OnEffectHitTarget += SpellEffectFn(spell_shazzrah_gate_dummy_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_shazzrah_gate_dummy_SpellScript();
     }

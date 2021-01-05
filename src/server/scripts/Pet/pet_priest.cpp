@@ -32,7 +32,7 @@ public:
     {
         npc_pet_pri_lightwellAI(Creature* creature) : TotemAI(creature) { }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             if (Unit* owner = me->ToTempSummon()->GetSummoner())
             {
@@ -47,7 +47,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_pri_lightwellAI(creature);
     }
@@ -62,7 +62,7 @@ public:
     {
         npc_pet_pri_shadowfiendAI(Creature* creature) : PetAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             PetAI::Reset();
             if (!me->HasAura(SPELL_PRIEST_SHADOWFIEND_DODGE))
@@ -72,7 +72,7 @@ public:
                 AttackStart(target);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (me->IsSummon())
                 if (Unit* owner = me->ToTempSummon()->GetSummoner())
@@ -81,7 +81,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_pri_shadowfiendAI(creature);
     }

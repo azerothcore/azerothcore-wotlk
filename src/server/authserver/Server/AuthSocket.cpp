@@ -118,7 +118,7 @@ typedef struct AuthHandler
 {
     eAuthCmd cmd;
     uint32 status;
-    bool (AuthSocket::*handler)(void);
+    bool (AuthSocket::*handler)();
 } AuthHandler;
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some paltform
@@ -133,7 +133,7 @@ class PatcherRunnable: public acore::Runnable
 {
 public:
     PatcherRunnable(class AuthSocket*);
-    void run();
+    void run() override;
 
 private:
     AuthSocket* mySocket;
@@ -151,8 +151,8 @@ public:
     typedef std::map<std::string, PATCH_INFO*> Patches;
     ~Patcher();
     Patcher();
-    Patches::const_iterator begin() const { return _patches.begin(); }
-    Patches::const_iterator end() const { return _patches.end(); }
+    [[nodiscard]] Patches::const_iterator begin() const { return _patches.begin(); }
+    [[nodiscard]] Patches::const_iterator end() const { return _patches.end(); }
     void LoadPatchMD5(char*);
     bool GetHash(char* pat, uint8 mymd5[16]);
 
@@ -188,15 +188,15 @@ AuthSocket::AuthSocket(RealmSocket& socket) :
 }
 
 // Close patch file descriptor before leaving
-AuthSocket::~AuthSocket(void) { }
+AuthSocket::~AuthSocket() = default;
 
 // Accept the connection
-void AuthSocket::OnAccept(void)
+void AuthSocket::OnAccept()
 {
     sLog->outBasic("'%s:%d' Accepting connection", socket().getRemoteAddress().c_str(), socket().getRemotePort());
 }
 
-void AuthSocket::OnClose(void)
+void AuthSocket::OnClose()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "AuthSocket::OnClose");
@@ -213,7 +213,7 @@ void AuthSocket::OnRead()
     uint32 challengesInARowRealmList = 0;
 
     uint8 _cmd;
-    while (1)
+    while (true)
     {
         if (!socket().recv_soft((char*)&_cmd, 1))
             return;
@@ -1196,8 +1196,8 @@ void PatcherRunnable::run() { }
 
 // Preload MD5 hashes of existing patch files on server
 #ifndef _WIN32
+#include <cerrno>
 #include <dirent.h>
-#include <errno.h>
 void Patcher::LoadPatchesInfo()
 {
     DIR* dirp;

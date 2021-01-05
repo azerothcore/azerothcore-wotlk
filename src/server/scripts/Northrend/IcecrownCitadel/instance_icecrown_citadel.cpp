@@ -120,7 +120,7 @@ class RespawnEvent : public BasicEvent
 public:
     RespawnEvent(Creature& owner) : _owner(owner) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         _owner.RemoveCorpse(false);
         _owner.Respawn();
@@ -136,7 +136,7 @@ class DelayedCastMincharEvent : public BasicEvent
 public:
     DelayedCastMincharEvent(Creature* trigger, uint32 spellId) : _trigger(trigger), _spellId(spellId) {}
 
-    bool Execute(uint64 /*time*/, uint32 /*diff*/)
+    bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
         if (Creature* minchar = _trigger->FindNearestCreature(NPC_INFILTRATOR_MINCHAR_BQ, 50.0f, true))
             _trigger->CastSpell(minchar, _spellId, true);
@@ -227,7 +227,7 @@ public:
             BloodPrinceTrashCount = 0;
         }
 
-        void FillInitialWorldStates(WorldPacket& data)
+        void FillInitialWorldStates(WorldPacket& data) override
         {
             if (instance->IsHeroic())
             {
@@ -239,7 +239,7 @@ public:
             }
         }
 
-        void OnPlayerAreaUpdate(Player* player, uint32  /*oldArea*/, uint32 newArea)
+        void OnPlayerAreaUpdate(Player* player, uint32  /*oldArea*/, uint32 newArea) override
         {
             if (newArea == 4890 /*Putricide's Laboratory of Alchemical Horrors and Fun*/ ||
                     newArea == 4891 /*The Sanctum of Blood*/ ||
@@ -255,7 +255,7 @@ public:
             }
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
                 TeamIdInInstance = player->GetTeamId();
@@ -268,7 +268,7 @@ public:
                 SpawnGunship();
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -509,13 +509,13 @@ public:
             }
         }
 
-        void OnCreatureRemove(Creature* creature)
+        void OnCreatureRemove(Creature* creature) override
         {
             if (creature->GetEntry() == NPC_SINDRAGOSA)
                 SindragosaGUID = 0;
         }
 
-        uint32 GetCreatureEntry(uint32 /*guidLow*/, CreatureData const* data)
+        uint32 GetCreatureEntry(uint32 /*guidLow*/, CreatureData const* data) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -560,7 +560,7 @@ public:
             return entry;
         }
 
-        uint32 GetGameObjectEntry(uint32 /*guidLow*/, uint32 entry)
+        uint32 GetGameObjectEntry(uint32 /*guidLow*/, uint32 entry) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -591,7 +591,7 @@ public:
             return entry;
         }
 
-        void OnUnitDeath(Unit* unit)
+        void OnUnitDeath(Unit* unit) override
         {
             Creature* creature = unit->ToCreature();
             if (!creature)
@@ -664,7 +664,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -861,7 +861,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -900,7 +900,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -941,7 +941,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const
+        uint64 GetData64(uint32 type) const override
         {
             switch (type)
             {
@@ -1051,7 +1051,7 @@ public:
                     _player->DestroyItemCount(ITEM_GOBLIN_ROCKET_PACK, _player->GetItemCount(ITEM_GOBLIN_ROCKET_PACK), true);
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
@@ -1223,7 +1223,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -1390,7 +1390,7 @@ public:
             }
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/) override
         {
             switch (criteria_id)
             {
@@ -1426,7 +1426,7 @@ public:
             return false;
         }
 
-        bool CheckRequiredBosses(uint32 bossId, Player const*  /*player*/) const
+        bool CheckRequiredBosses(uint32 bossId, Player const*  /*player*/) const override
         {
             switch (bossId)
             {
@@ -1598,7 +1598,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -1612,7 +1612,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* str)
+        void Load(const char* str) override
         {
             if (!str)
             {
@@ -1668,7 +1668,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             // Xinef: A Feast of Souls (24547) whispers
             if (LichKingRandomWhisperTimer <= diff)
@@ -1765,7 +1765,7 @@ public:
             }
         }
 
-        void ProcessEvent(WorldObject* source, uint32 eventId)
+        void ProcessEvent(WorldObject* source, uint32 eventId) override
         {
             switch (eventId)
             {
@@ -1973,7 +1973,7 @@ public:
         bool IsOrbWhispererEligible;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_icecrown_citadel_InstanceMapScript(map);
     }

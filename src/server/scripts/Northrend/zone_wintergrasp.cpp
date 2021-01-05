@@ -709,7 +709,7 @@ public:
             return false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             VehicleAI::UpdateAI(diff);
 
@@ -731,7 +731,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_wg_siege_machineAI(creature);
     }
@@ -772,7 +772,7 @@ public:
             return nullptr;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _checkTimer += diff;
             if (_checkTimer >= 1000)
@@ -789,7 +789,7 @@ public:
         uint32 _checkTimer;
     };
 
-    GameObjectAI* GetAI(GameObject* go) const
+    GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_wg_vehicle_teleporterAI(go);
     }
@@ -808,7 +808,7 @@ public:
     {
         PrepareSpellScript(spell_wintergrasp_force_building_SpellScript);
 
-        bool Validate(SpellInfo const* /*spell*/)
+        bool Validate(SpellInfo const* /*spell*/) override
         {
             if (!sSpellMgr->GetSpellInfo(SPELL_BUILD_CATAPULT_FORCE)
                     || !sSpellMgr->GetSpellInfo(SPELL_BUILD_DEMOLISHER_FORCE)
@@ -825,13 +825,13 @@ public:
                 target->CastSpell(target, GetEffectValue(), false, nullptr, nullptr, target->GetGUID());
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_wintergrasp_force_building_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_wintergrasp_force_building_SpellScript();
     }
@@ -863,13 +863,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHit += SpellEffectFn(spell_wintergrasp_create_vehicle_SpellScript::HandleSummon, EFFECT_1, SPELL_EFFECT_SUMMON);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_wintergrasp_create_vehicle_SpellScript;
     }
@@ -885,7 +885,7 @@ public:
         PrepareSpellScript(spell_wintergrasp_rp_gg_SpellScript);
 
         bool handled;
-        bool Load()
+        bool Load() override
         {
             handled = false;
             return true;
@@ -899,13 +899,13 @@ public:
             GetCaster()->CastSpell(GetExplTargetDest()->GetPositionX(), GetExplTargetDest()->GetPositionY(), GetExplTargetDest()->GetPositionZ(), SPELL_RP_GG_TRIGGER_MISSILE, true);
         }
 
-        void Register()
+        void Register() override
         {
             AfterCast += SpellCastFn(spell_wintergrasp_rp_gg_SpellScript::HandleFinish);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_wintergrasp_rp_gg_SpellScript();
     }
@@ -931,13 +931,13 @@ public:
             target->CastSpell(target, SPELL_TELEPORT_TO_FORTRESS, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_wintergrasp_portal_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_wintergrasp_portal_SpellScript();
     }
@@ -961,13 +961,13 @@ public:
             return SPELL_CAST_OK;
         }
 
-        void Register()
+        void Register() override
         {
             OnCheckCast += SpellCheckCastFn(spell_wintergrasp_water_SpellScript::CheckCast);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_wintergrasp_water_SpellScript();
     }
@@ -991,13 +991,13 @@ public:
             PreventDefaultAction();
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_wintergrasp_hide_small_elementals_AuraScript::HandlePeriodicDummy, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_wintergrasp_hide_small_elementals_AuraScript();
     }
@@ -1024,13 +1024,13 @@ public:
             SetHitDamage(damage);
         }
 
-        void Register()
+        void Register() override
         {
             OnHit += SpellHitFn(spell_wg_reduce_damage_by_distance_SpellScript::RecalculateDamage);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_wg_reduce_damage_by_distance_SpellScript();
     }
@@ -1046,7 +1046,7 @@ class achievement_wg_didnt_stand_a_chance : public AchievementCriteriaScript
 public:
     achievement_wg_didnt_stand_a_chance() : AchievementCriteriaScript("achievement_wg_didnt_stand_a_chance") { }
 
-    bool OnCheck(Player* source, Unit* target)
+    bool OnCheck(Player* source, Unit* target) override
     {
         if (!target)
             return false;
@@ -1070,7 +1070,7 @@ class achievement_wg_vehicular_gnomeslaughter : public AchievementCriteriaScript
 public:
     achievement_wg_vehicular_gnomeslaughter() : AchievementCriteriaScript("achievement_wg_vehicular_gnomeslaughter") { }
 
-    bool OnCheck(Player* source, Unit* target)
+    bool OnCheck(Player* source, Unit* target) override
     {
         if (!target)
             return false;
@@ -1090,7 +1090,7 @@ class achievement_wg_within_our_grasp : public AchievementCriteriaScript
 public:
     achievement_wg_within_our_grasp() : AchievementCriteriaScript("achievement_wg_within_our_grasp") { }
 
-    bool OnCheck(Player*  /*source*/, Unit*  /*target*/)
+    bool OnCheck(Player*  /*source*/, Unit*  /*target*/) override
     {
         Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
         if (!wintergrasp)

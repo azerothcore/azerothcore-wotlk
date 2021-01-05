@@ -43,7 +43,7 @@ class LFGUpdateRequest : public UpdateRequest
 public:
     LFGUpdateRequest(MapUpdater& u, uint32 d) : m_updater(u), m_diff(d) {}
 
-    void call()
+    void call() override
     {
         uint32 startTime = getMSTime();
         sLFGMgr->Update(m_diff, 1);

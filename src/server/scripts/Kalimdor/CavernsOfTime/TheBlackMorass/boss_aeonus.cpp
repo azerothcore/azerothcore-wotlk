@@ -46,19 +46,19 @@ public:
         EventMap events;
         InstanceScript* instance;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_MEDIVH)))
                 if (me->GetDistance2d(medivh) < 20.0f)
                     me->CastSpell(me, SPELL_CORRUPT_MEDIVH, false);
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             Talk(SAY_ENTER);
             ScriptedAI::InitializeAI();
@@ -70,7 +70,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_CLEAVE, 5000);
             events.ScheduleEvent(EVENT_SANDBREATH, 20000);
@@ -80,7 +80,7 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_TIME_KEEPER)
             {
@@ -95,19 +95,19 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             instance->SetData(TYPE_AEONUS, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -141,7 +141,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_aeonusAI(creature);
     }
