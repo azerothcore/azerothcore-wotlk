@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609855337931898000');
+INSERT INTO `version_db_auth` (`sql_rev`) VALUES ('1609867708436603000');
 ALTER TABLE `account_muted`
 CHARSET = 'utf8',
 MODIFY `mutedby` varchar(50) NOT NULL,
