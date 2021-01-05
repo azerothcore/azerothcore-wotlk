@@ -2225,7 +2225,7 @@ void Unit::AttackerStateUpdate (Unit* victim, WeaponAttackType attType, bool ext
 
 Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 {
-    if (!attacker) // only player & pets to save CPU
+    if (!attacker)
     {
         return nullptr;
     }
@@ -2284,7 +2284,8 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     }
 
     double ray = attackerSize > refUnit->GetObjectSize() ? attackerSize / 2.0f : refUnit->GetObjectSize() / 2.0f;
-    double angle;
+    double distance2d = meleeReach;
+    double angle = 0;
 
     // Equation of tangent point to get the ideal angle to
     // move away from collisions with another unit during combat
@@ -2319,20 +2320,21 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 
         double ortDist = sqrt(pow(exactDist,2.0f) - pow(distance/2.0f,2.0f));
 
-        angle = frand(0.1f,0.3f) + currentAngle + 2.0f * atan(distance / (2.0f * ortDist));
-    }
+        angle = 2.0f * atan(distance / (2.0f * ortDist));
 
-    angle = angle && !isnan(angle) ? angle : // or fallback to the simpler method
-        frand(0.1f,0.3f) + currentAngle + atan(attackerSize / (meleeReach));
+        distance2d = ortDist;
+    }
 
     int8 direction =  (urand(0, 1) ? -1 : 1);
 
+    angle = frand(0.1f,0.3f) + (angle && !isnan(angle) ? angle : atan(attackerSize / (meleeReach))); // or fallback to the simpler method
+
     float x, y, z;
-    GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, angle * direction);
+    GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * direction);
 
     if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z))
     {
-        GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, angle * (direction * -1)); // try the other side
+        GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * (direction * -1)); // try the other side
 
         if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z))
         {

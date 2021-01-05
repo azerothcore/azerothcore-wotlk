@@ -11,7 +11,7 @@
 
 using namespace std;
 
-inline float getAngle(float startX, float startY, float destX, float destY)
+[[nodiscard]] inline float getAngle(float startX, float startY, float destX, float destY)
 {
     auto dx = destX - startX;
     auto dy = destY - startY;
@@ -21,13 +21,13 @@ inline float getAngle(float startX, float startY, float destX, float destY)
     return ang;
 }
 
-inline float getSlopeAngle(float startX, float startY, float startZ, float destX, float destY, float destZ)
+[[nodiscard]] inline float getSlopeAngle(float startX, float startY, float startZ, float destX, float destY, float destZ)
 {
     float floorDist = sqrt(pow(startY - destY, 2.0f) + pow(startX - destX,2.0f));
     return atan(abs(destZ - startZ) / abs(floorDist));
 }
 
-inline float getSlopeAngleAbs(float startX, float startY, float startZ, float destX, float destY, float destZ)
+[[nodiscard]] inline float getSlopeAngleAbs(float startX, float startY, float startZ, float destX, float destY, float destZ)
 {
     return abs(getSlopeAngle(startX, startY, startZ, destX, destY, destZ));
 }

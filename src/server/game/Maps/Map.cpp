@@ -3402,7 +3402,7 @@ bool Map::CanReachPositionAndGetCoords(WorldObject* source, PathGenerator path, 
         float y = vector.y;
         float z = vector.z;
 
-        if (CanReachPositionAndGetCoords(source, prevPath.x, prevPath.y, prevPath.z, x, y, z, checkCollision, false, false))
+        if (!CanReachPositionAndGetCoords(source, prevPath.x, prevPath.y, prevPath.z, x, y, z, checkCollision, false, false))
         {
             return false;
         }
@@ -3431,7 +3431,18 @@ bool Map::CanReachPositionAndGetCoords(WorldObject* source, float startX, float 
     if (findPath) {
         PathGenerator path(source);
         path.SetSlopeCheck(checkSlopes);
-        return CanReachPositionAndGetCoords(source, path, checkCollision);
+        bool result = path.CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
+        if (!result || !CanReachPositionAndGetCoords(source, path, checkCollision))
+        {
+            return false;
+        }
+
+        G3D::Vector3 endPos = path.GetEndPosition();
+        destX = endPos.x;
+        destY = endPos.y;
+        destZ = endPos.z;
+
+        return true;
     }
     else
     {
