@@ -76,7 +76,13 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
         }
 
         // to nearest contact position
-        i_target->GetContactPoint(owner, x, y, z);
+        /** NOTE: creatures should reach you using the
+        * nearest contact point, however, disabling it
+        * simplify the job for the repositioning algorithm
+        * that must be still used to resolve creature collisions
+        * @todo we could probably create a conf for it.
+        */
+        //i_target->GetContactPoint(owner, x, y, z);
     }
     else
     {
@@ -191,7 +197,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
             float maxDist = MELEE_RANGE + owner->GetMeleeReach() + i_target->GetMeleeReach();
             if (!forceDest && (i_path->GetPathType() & PATHFIND_NOPATH || (!i_offset && !isPlayerPet && i_target->GetExactDistSq(i_path->GetActualEndPosition().x, i_path->GetActualEndPosition().y, i_path->GetActualEndPosition().z) > maxDist * maxDist)))
             {
-                if (owner->GetTypeId() == TYPEID_UNIT) 
+                if (owner->GetTypeId() == TYPEID_UNIT)
                 {
                     owner->ToCreature()->SetCannotReachTarget(false);
                 }
