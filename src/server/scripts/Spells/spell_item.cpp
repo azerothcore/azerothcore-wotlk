@@ -1677,7 +1677,7 @@ public:
                 return false;
 
             return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetHeal() > 0;
-            
+
         }
 
         void Register() override
