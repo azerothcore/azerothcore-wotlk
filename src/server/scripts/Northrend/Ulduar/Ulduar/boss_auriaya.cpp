@@ -93,7 +93,7 @@ class boss_auriaya : public CreatureScript
 public:
     boss_auriaya() : CreatureScript("boss_auriaya") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_auriayaAI (pCreature);
     }
@@ -112,7 +112,7 @@ public:
         bool _feralDied;
         bool _nineLives;
 
-        void Reset()
+        void Reset() override
         {
             _feralDied = false;
             _nineLives = false;
@@ -131,7 +131,7 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
         }
 
-        uint32 GetData(uint32 param) const
+        uint32 GetData(uint32 param) const override
         {
             if (param == DATA_CRAZY_CAT)
                 return !_feralDied;
@@ -141,7 +141,7 @@ public:
             return 0;
         }
 
-        void JustSummoned(Creature* cr)
+        void JustSummoned(Creature* cr) override
         {
             if (cr->GetEntry() == NPC_SANCTUM_SENTRY)
                 cr->GetMotionMaster()->MoveFollow(me, 6, rand_norm() * 2 * 3.14f);
@@ -151,15 +151,15 @@ public:
             summons.Summon(cr);
         }
 
-        void SummonedCreatureDies(Creature* cr, Unit*)
+        void SummonedCreatureDies(Creature* cr, Unit*) override
         {
             if (cr->GetEntry() == NPC_SANCTUM_SENTRY)
                 _feralDied = true;
         }
 
-        void JustReachedHome() { me->setActive(false); }
+        void JustReachedHome() override { me->setActive(false); }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_AURIAYA, IN_PROGRESS);
@@ -178,7 +178,7 @@ public:
             me->setActive(true);
         }
 
-        void KilledUnit(Unit*  /*victim*/)
+        void KilledUnit(Unit*  /*victim*/) override
         {
             if (urand(0, 2))
                 return;
@@ -195,7 +195,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*victim*/)
+        void JustDied(Unit* /*victim*/) override
         {
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_AURIAYA, DONE);
@@ -207,7 +207,7 @@ public:
             me->PlayDirectSound(SOUND_DEATH);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_FERAL_DEATH_WITH_STACK)
                 events.ScheduleEvent(EVENT_RESPAWN_FERAL_DEFENDER, 25000);
@@ -215,7 +215,7 @@ public:
                 _nineLives = true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -276,7 +276,7 @@ class npc_auriaya_sanctum_sentry : public CreatureScript
 public:
     npc_auriaya_sanctum_sentry() : CreatureScript("npc_auriaya_sanctum_sentry") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_auriaya_sanctum_sentryAI (pCreature);
     }
@@ -288,14 +288,14 @@ public:
         uint32 _savagePounceTimer;
         uint32 _ripFleshTimer;
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             if (me->GetInstanceScript())
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_AURIAYA)))
                     cr->SetInCombatWithZone();
         }
 
-        void Reset()
+        void Reset() override
         {
             _savagePounceTimer = 5000;
             _ripFleshTimer = 0;
@@ -303,7 +303,7 @@ public:
             me->CastSpell(me, SPELL_STRENGTH_OF_THE_PACK, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -338,7 +338,7 @@ class npc_auriaya_feral_defender : public CreatureScript
 public:
     npc_auriaya_feral_defender() : CreatureScript("npc_auriaya_feral_defender") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_auriaya_feral_defenderAI (pCreature);
     }
@@ -352,7 +352,7 @@ public:
         uint8 _feralEssenceStack;
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             summons.DespawnAll();
             _feralRushTimer = 3000;
@@ -363,7 +363,7 @@ public:
                 aur->SetStackAmount(_feralEssenceStack);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             // inform about our death, start timer
             if (me->GetInstanceScript())
@@ -379,7 +379,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_FERAL_RESPAWN)
             {
@@ -401,7 +401,7 @@ public:
                 summons.DespawnAll();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -443,13 +443,13 @@ public:
             unitList.remove_if(PlayerOrPetCheck());
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_auriaya_sentinel_blast_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_auriaya_sentinel_blast_SpellScript();
     }
@@ -460,7 +460,7 @@ class achievement_auriaya_crazy_cat_lady : public AchievementCriteriaScript
 public:
     achievement_auriaya_crazy_cat_lady() : AchievementCriteriaScript("achievement_auriaya_crazy_cat_lady") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
@@ -476,7 +476,7 @@ class achievement_auriaya_nine_lives : public AchievementCriteriaScript
 public:
     achievement_auriaya_nine_lives() : AchievementCriteriaScript("achievement_auriaya_nine_lives") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())

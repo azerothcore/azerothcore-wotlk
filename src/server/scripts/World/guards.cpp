@@ -40,7 +40,7 @@ public:
     {
         guard_shattrath_scryerAI(Creature* creature) : GuardAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             banishTimer = 5000;
             exileTimer = 8500;
@@ -48,7 +48,7 @@ public:
             canTeleport = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -92,7 +92,7 @@ public:
         bool canTeleport;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new guard_shattrath_scryerAI(creature);
     }
@@ -107,7 +107,7 @@ public:
     {
         guard_shattrath_aldorAI(Creature* creature) : GuardAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             banishTimer = 5000;
             exileTimer = 8500;
@@ -115,7 +115,7 @@ public:
             canTeleport = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -158,7 +158,7 @@ public:
         bool canTeleport;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new guard_shattrath_aldorAI(creature);
     }

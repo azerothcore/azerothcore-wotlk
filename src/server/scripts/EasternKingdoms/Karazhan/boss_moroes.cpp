@@ -80,13 +80,13 @@ public:
 
         InstanceScript* instance;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             BossAI::InitializeAI();
             InitializeGuests();
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             BossAI::JustReachedHome();
             InitializeGuests();
@@ -113,13 +113,13 @@ public:
             _events2.ScheduleEvent(EVENT_GUEST_TALK, 10000);
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             me->CastSpell(me, SPELL_DUAL_WIELD, true);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
@@ -135,7 +135,7 @@ public:
             DoZoneInCombat();
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -144,7 +144,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             summons.clear();
             BossAI::JustDied(killer);
@@ -153,7 +153,7 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_GARROTE);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
@@ -168,7 +168,7 @@ public:
             return acore::Containers::SelectRandomContainerElement(guestList);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _events2.Update(diff);
             switch (_events2.ExecuteEvent())
@@ -239,7 +239,7 @@ public:
         uint8 _activeGuests;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_moroesAI>(creature);
     }
@@ -268,13 +268,13 @@ public:
 
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_moroes_vanish_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_moroes_vanish_SpellScript();
     }

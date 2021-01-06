@@ -32,7 +32,7 @@ class boss_infinite_corruptor : public CreatureScript
 public:
     boss_infinite_corruptor() : CreatureScript("boss_infinite_corruptor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_infinite_corruptorAI(creature);
     }
@@ -47,7 +47,7 @@ public:
         SummonList summons;
         uint32 beamTimer;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -60,9 +60,9 @@ public:
             beamTimer = 1;
         }
 
-        void JustSummoned(Creature* cr) { summons.Summon(cr); }
+        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->InterruptNonMeleeSpells(false);
             events.ScheduleEvent(EVENT_SPELL_VOID_STRIKE, 8000);
@@ -70,14 +70,17 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+            {
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
                 {
                     if (cr->GetEntry() == NPC_TIME_RIFT)
+                    {
                         cr->DespawnOrUnsummon(1000);
+                    }
                     else
                     {
                         cr->DespawnOrUnsummon(5000);
@@ -85,12 +88,16 @@ public:
                         cr->MonsterSay("You have my thanks for saving my existence in this timeline. Now i must report back to my superiors. They must know immediately of what i just experienced.", LANG_UNIVERSAL, 0);
                     }
                 }
+            }
 
             if (InstanceScript* pInstance = me->GetInstanceScript())
+            {
                 pInstance->SetData(DATA_SHOW_INFINITE_TIMER, 0);
+                pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CORRUPTING_BLIGHT);
+            }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (!me->IsAlive())
                 return;
@@ -103,7 +110,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (beamTimer)
             {

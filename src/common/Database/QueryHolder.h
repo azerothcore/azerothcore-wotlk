@@ -16,7 +16,7 @@ private:
     typedef std::pair<SQLElementData, SQLResultSetUnion> SQLResultPair;
     std::vector<SQLResultPair> m_queries;
 public:
-    SQLQueryHolder() { }
+    SQLQueryHolder() = default;
     ~SQLQueryHolder();
     bool SetQuery(size_t index, const char* sql);
     bool SetPQuery(size_t index, const char* format, ...) ATTR_PRINTF(3, 4);
@@ -39,7 +39,7 @@ private:
 public:
     SQLQueryHolderTask(SQLQueryHolder* holder, QueryResultHolderFuture res)
         : m_holder(holder), m_result(res) { };
-    bool Execute();
+    bool Execute() override;
 
 };
 

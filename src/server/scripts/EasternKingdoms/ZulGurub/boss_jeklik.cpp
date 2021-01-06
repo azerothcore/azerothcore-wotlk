@@ -74,18 +74,18 @@ public:
     {
         boss_jeklikAI(Creature* creature) : BossAI(creature, DATA_JEKLIK) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
@@ -100,7 +100,7 @@ public:
             DoCast(me, SPELL_BAT_FORM);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
             if (events.IsInPhase(PHASE_ONE) && !HealthAbovePct(50))
             {
@@ -117,7 +117,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -188,7 +188,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetZulGurubAI<boss_jeklikAI>(creature);
     }
@@ -206,15 +206,15 @@ public:
 
         uint32 Bomb_Timer;
 
-        void Reset()
+        void Reset() override
         {
             Bomb_Timer = 2000;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -234,7 +234,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_batriderAI(creature);
     }

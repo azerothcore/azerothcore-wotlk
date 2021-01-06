@@ -11,7 +11,7 @@ class instance_onyxias_lair : public InstanceMapScript
 public:
     instance_onyxias_lair() : InstanceMapScript("instance_onyxias_lair", 249) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_onyxias_lair_InstanceMapScript(pMap);
     }
@@ -27,7 +27,7 @@ public:
         std::vector<uint64> minions;
         bool bDeepBreath;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             m_uiOnyxiasGUID = 0;
@@ -35,7 +35,7 @@ public:
             bDeepBreath = true;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
                 if( m_auiEncounter[i] == IN_PROGRESS )
@@ -44,7 +44,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* pCreature)
+        void OnCreatureCreate(Creature* pCreature) override
         {
             switch( pCreature->GetEntry() )
             {
@@ -58,7 +58,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch( go->GetEntry() )
             {
@@ -70,7 +70,7 @@ public:
             }
         }
 
-        void SetData(uint32 uiType, uint32 uiData)
+        void SetData(uint32 uiType, uint32 uiData) override
         {
             switch(uiType)
             {
@@ -98,7 +98,7 @@ public:
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 uiType) const
+        uint32 GetData(uint32 uiType) const override
         {
             switch(uiType)
             {
@@ -109,7 +109,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 uiData) const
+        uint64 GetData64(uint32 uiData) const override
         {
             switch(uiData)
             {
@@ -120,7 +120,7 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
             std::ostringstream saveStream;
@@ -130,7 +130,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if( !in )
             {
@@ -159,7 +159,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {

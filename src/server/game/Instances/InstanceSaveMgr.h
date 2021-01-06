@@ -27,10 +27,10 @@ class InstanceSave;
 
 struct InstancePlayerBind
 {
-    InstanceSave* save;
+    InstanceSave* save{nullptr};
     bool perm : 1;
     bool extended : 1;
-    InstancePlayerBind() : save(nullptr), perm(false), extended(false) {}
+    InstancePlayerBind() :  perm(false), extended(false) {}
 };
 
 typedef std::unordered_map< uint32 /*mapId*/, InstancePlayerBind > BoundInstancesMap;
@@ -49,27 +49,27 @@ public:
 
     InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, time_t extendedResetTime);
     ~InstanceSave();
-    uint32 GetInstanceId() const { return m_instanceid; }
-    uint32 GetMapId() const { return m_mapid; }
-    Difficulty GetDifficulty() const { return m_difficulty; }
+    [[nodiscard]] uint32 GetInstanceId() const { return m_instanceid; }
+    [[nodiscard]] uint32 GetMapId() const { return m_mapid; }
+    [[nodiscard]] Difficulty GetDifficulty() const { return m_difficulty; }
 
     /* Saved when the instance is generated for the first time */
     void InsertToDB();
     // pussywizard: deleting is done internally when there are no binds left
 
-    std::string GetInstanceData() const { return m_instanceData; }
+    [[nodiscard]] std::string GetInstanceData() const { return m_instanceData; }
     void SetInstanceData(std::string str) { m_instanceData = str; }
-    uint32 GetCompletedEncounterMask() const { return m_completedEncounterMask; }
+    [[nodiscard]] uint32 GetCompletedEncounterMask() const { return m_completedEncounterMask; }
     void SetCompletedEncounterMask(uint32 mask) { m_completedEncounterMask = mask; }
 
     // pussywizard: for normal instances this corresponds to 0, for raid/heroic instances this caches the global reset time for the map
-    time_t GetResetTime() const { return m_resetTime; }
-    time_t GetExtendedResetTime() const { return m_extendedResetTime; }
+    [[nodiscard]] time_t GetResetTime() const { return m_resetTime; }
+    [[nodiscard]] time_t GetExtendedResetTime() const { return m_extendedResetTime; }
     time_t GetResetTimeForDB();
     void SetResetTime(time_t resetTime) { m_resetTime = resetTime; }
     void SetExtendedResetTime(time_t extendedResetTime) { m_extendedResetTime = extendedResetTime; }
 
-    bool CanReset() const { return m_canReset; }
+    [[nodiscard]] bool CanReset() const { return m_canReset; }
     void SetCanReset(bool canReset) { m_canReset = canReset; }
 
     InstanceTemplate const* GetTemplate();
@@ -101,7 +101,7 @@ class InstanceSaveManager
     friend class InstanceSave;
 
 private:
-    InstanceSaveManager() : lock_instLists(false) {};
+    InstanceSaveManager()  {};
     ~InstanceSaveManager();
 
 public:
@@ -111,11 +111,11 @@ public:
 
     struct InstResetEvent
     {
-        uint8 type; // 0 - unused, 1-4 warnings about pending reset, 5 - reset
+        uint8 type{0}; // 0 - unused, 1-4 warnings about pending reset, 5 - reset
         Difficulty difficulty: 8;
-        uint16 mapid;
+        uint16 mapid{0};
 
-        InstResetEvent() : type(0), difficulty(DUNGEON_DIFFICULTY_NORMAL), mapid(0) {}
+        InstResetEvent() :  difficulty(DUNGEON_DIFFICULTY_NORMAL) {}
         InstResetEvent(uint8 t, uint32 _mapid, Difficulty d)
             : type(t), difficulty(d), mapid(_mapid) {}
     };
@@ -126,13 +126,13 @@ public:
     void LoadInstanceSaves();
     void LoadCharacterBinds();
 
-    time_t GetResetTimeFor(uint32 mapid, Difficulty d) const
+    [[nodiscard]] time_t GetResetTimeFor(uint32 mapid, Difficulty d) const
     {
         ResetTimeByMapDifficultyMap::const_iterator itr  = m_resetTimeByMapDifficulty.find(MAKE_PAIR32(mapid, d));
         return itr != m_resetTimeByMapDifficulty.end() ? itr->second : 0;
     }
 
-    time_t GetExtendedResetTimeFor(uint32 mapid, Difficulty d) const
+    [[nodiscard]] time_t GetExtendedResetTimeFor(uint32 mapid, Difficulty d) const
     {
         ResetTimeByMapDifficultyMap::const_iterator itr  = m_resetExtendedTimeByMapDifficulty.find(MAKE_PAIR32(mapid, d));
         return itr != m_resetExtendedTimeByMapDifficulty.end() ? itr->second : 0;
@@ -148,7 +148,7 @@ public:
         m_resetExtendedTimeByMapDifficulty[MAKE_PAIR32(mapid, d)] = t;
     }
 
-    ResetTimeByMapDifficultyMap const& GetResetTimeMap() const
+    [[nodiscard]] ResetTimeByMapDifficultyMap const& GetResetTimeMap() const
     {
         return m_resetTimeByMapDifficulty;
     }
@@ -183,7 +183,7 @@ protected:
 private:
     void _ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool warn, time_t resetTime);
     void _ResetSave(InstanceSaveHashMap::iterator& itr);
-    bool lock_instLists;
+    bool lock_instLists{false};
     InstanceSaveHashMap m_instanceSaveById;
     ResetTimeByMapDifficultyMap m_resetTimeByMapDifficulty;
     ResetTimeByMapDifficultyMap m_resetExtendedTimeByMapDifficulty;

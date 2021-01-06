@@ -8,13 +8,14 @@
 #define _ADDONMGR_H
 
 #include "Define.h"
-#include <string>
 #include <list>
+#include <string>
+#include <utility>
 
 struct AddonInfo
 {
-    AddonInfo(const std::string& name, uint8 enabled, uint32 crc, uint8 state, bool crcOrPubKey)
-        : Name(name), Enabled(enabled), CRC(crc), State(state), UsePublicKeyOrCRC(crcOrPubKey) {}
+    AddonInfo(std::string  name, uint8 enabled, uint32 crc, uint8 state, bool crcOrPubKey)
+        : Name(std::move(name)), Enabled(enabled), CRC(crc), State(state), UsePublicKeyOrCRC(crcOrPubKey) {}
 
     std::string Name;
     uint8 Enabled;
@@ -25,7 +26,7 @@ struct AddonInfo
 
 struct SavedAddon
 {
-    SavedAddon(const std::string& name, uint32 crc) : Name(name)
+    SavedAddon(std::string  name, uint32 crc) : Name(std::move(name))
     {
         CRC = crc;
     }

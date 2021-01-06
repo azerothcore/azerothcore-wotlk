@@ -121,7 +121,7 @@ struct CoordPair
             y_coord = LIMIT - 1;
     }
 
-    bool IsCoordValid() const
+    [[nodiscard]] bool IsCoordValid() const
     {
         return x_coord < LIMIT && y_coord < LIMIT;
     }
@@ -133,7 +133,7 @@ struct CoordPair
         return *this;
     }
 
-    uint32 GetId() const
+    [[nodiscard]] uint32 GetId() const
     {
         return y_coord * LIMIT + x_coord;
     }

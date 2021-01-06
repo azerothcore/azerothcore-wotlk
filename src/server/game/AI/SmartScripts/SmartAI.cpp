@@ -1176,7 +1176,7 @@ public:
 
     SmartTrigger() : AreaTriggerScript("SmartTrigger") {}
 
-    bool OnTrigger(Player* player, AreaTrigger const* trigger)
+    bool OnTrigger(Player* player, AreaTrigger const* trigger) override
     {
         if (!player->IsAlive())
             return false;

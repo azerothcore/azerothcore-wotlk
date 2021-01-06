@@ -34,7 +34,7 @@ public:
             LoadDoorData(doorData);
         }
 
-        void Initialize()
+        void Initialize() override
         {
             _zealotLorkhanGUID = 0;
             _zealotZathGUID = 0;
@@ -45,13 +45,13 @@ public:
             _goGongOfBethekkGUID = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             // not active in Zul'Gurub
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -76,7 +76,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -95,7 +95,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -107,7 +107,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 uiData) const
+        uint64 GetData64(uint32 uiData) const override
         {
             switch (uiData)
             {
@@ -133,7 +133,7 @@ public:
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -144,7 +144,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* str)
+        void Load(const char* str) override
         {
             if (!str)
             {
@@ -188,7 +188,7 @@ public:
         uint64 _goGongOfBethekkGUID;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_zulgurub_InstanceMapScript(map);
     }

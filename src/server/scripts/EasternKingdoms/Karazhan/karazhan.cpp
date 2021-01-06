@@ -422,7 +422,7 @@ class npc_image_of_medivh : public CreatureScript
 public:
     npc_image_of_medivh() : CreatureScript("npc_image_of_medivh") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_image_of_medivhAI(creature);
     }
@@ -447,7 +447,7 @@ public:
 
         bool EventStarted;
 
-        void Reset()
+        void Reset() override
         {
             ArcanagosGUID = 0;
             MTimer = 0;
@@ -475,7 +475,7 @@ public:
                 me->DespawnOrUnsummon();
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit* /*who*/) override {}
 
         uint32 NextStep(uint32 Step)
         {
@@ -559,7 +559,7 @@ public:
 
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
 
             if (YellTimer <= diff)

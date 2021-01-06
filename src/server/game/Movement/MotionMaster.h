@@ -85,7 +85,7 @@ private:
             --_top;
     }
 
-    bool needInitTop() const
+    [[nodiscard]] bool needInitTop() const
     {
         if (empty())
             return false;
@@ -107,20 +107,20 @@ public:
     void Initialize();
     void InitDefault();
 
-    bool empty() const { return (_top < 0); }
-    int size() const { return _top + 1; }
-    _Ty top() const
+    [[nodiscard]] bool empty() const { return (_top < 0); }
+    [[nodiscard]] int size() const { return _top + 1; }
+    [[nodiscard]] _Ty top() const
     {
         ASSERT(!empty());
         return Impl[_top];
     }
-    _Ty GetMotionSlot(int slot) const
+    [[nodiscard]] _Ty GetMotionSlot(int slot) const
     {
         ASSERT(slot >= 0);
         return Impl[slot];
     }
 
-    uint8 GetCleanFlags() const { return _cleanFlag; }
+    [[nodiscard]] uint8 GetCleanFlags() const { return _cleanFlag; }
 
     void DirectDelete(_Ty curr);
     void DelayedDelete(_Ty curr);
@@ -165,6 +165,8 @@ public:
     void MoveRandom(float wanderDistance = 0.0f);
     void MoveFollow(Unit* target, float dist, float angle, MovementSlot slot = MOTION_SLOT_ACTIVE);
     void MoveChase(Unit* target, float dist = 0.0f, float angle = 0.0f);
+    void MoveCircleTarget(Unit* target);
+    void MoveBackwards(Unit* target, float dist);
     void MoveConfused();
     void MoveFleeing(Unit* enemy, uint32 time = 0);
     void MovePoint(uint32 id, const Position& pos, bool generatePath = true, bool forceDestination = true)
@@ -178,7 +180,7 @@ public:
     void MoveTakeoff(uint32 id, Position const& pos, float speed);
     void MoveTakeoff(uint32 id, float x, float y, float z, float speed); // pussywizard: added for easy calling by passing 3 floats x, y, z
 
-    void MoveCharge(float x, float y, float z, float speed = SPEED_CHARGE, uint32 id = EVENT_CHARGE, const Movement::PointsArray* path = NULL, bool generatePath = false, float orientation = 0.0f);
+    void MoveCharge(float x, float y, float z, float speed = SPEED_CHARGE, uint32 id = EVENT_CHARGE, const Movement::PointsArray* path = nullptr, bool generatePath = false, float orientation = 0.0f);
     void MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ);
     void MoveJumpTo(float angle, float speedXY, float speedZ);
     void MoveJump(Position const& pos, float speedXY, float speedZ, uint32 id = 0)
@@ -193,9 +195,9 @@ public:
     void MovePath(uint32 path_id, bool repeatable);
     void MoveRotate(uint32 time, RotateDirection direction);
 
-    MovementGeneratorType GetCurrentMovementGeneratorType() const;
-    MovementGeneratorType GetMotionSlotType(int slot) const;
-    uint32 GetCurrentSplineId() const; // Xinef: Escort system
+    [[nodiscard]] MovementGeneratorType GetCurrentMovementGeneratorType() const;
+    [[nodiscard]] MovementGeneratorType GetMotionSlotType(int slot) const;
+    [[nodiscard]] uint32 GetCurrentSplineId() const; // Xinef: Escort system
 
     void propagateSpeedChange();
     void ReinitializeMovement();

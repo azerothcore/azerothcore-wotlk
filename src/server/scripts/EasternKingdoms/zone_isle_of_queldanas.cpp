@@ -109,7 +109,7 @@ class npc_bh_thalorien_dawnseeker : public CreatureScript
 public:
     npc_bh_thalorien_dawnseeker() : CreatureScript("npc_bh_thalorien_dawnseeker") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_bh_thalorien_dawnseekerAI(creature);
     }
@@ -125,7 +125,7 @@ public:
         uint64 playerGUID;
         uint64 morlenGUID;
 
-        void Reset()
+        void Reset() override
         {
             me->SetVisible(false);
             me->SetRegeneratingHealth(true);
@@ -158,12 +158,12 @@ public:
             events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, urand(4000, 10000));
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature* summon) override
         {
             summons.Despawn(summon);
             if (summon->GetEntry() != NPC_SUNWELL_DEFENDER && me->isActiveObject())
@@ -198,7 +198,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
             {
@@ -208,7 +208,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!me->isActiveObject())
                 return;
@@ -411,20 +411,20 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == EVENT_CHARGE)
                 events.ScheduleEvent(EVENT_SET_FACING, 0);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (me->isActiveObject())
                 return;
             ScriptedAI::EnterEvadeMode();
         }
 
-        void SetData(uint32 type, uint32 id)
+        void SetData(uint32 type, uint32 id) override
         {
             if (type == 1 && id == 1 && !me->isActiveObject())
                 if (Player* p = me->SelectNearestPlayer(50.0f))
@@ -465,13 +465,13 @@ public:
                     c->AI()->DoAction(-1);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectLaunch += SpellEffectFn(spell_bh_cleanse_quel_delar_SpellScript::OnEffect, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_bh_cleanse_quel_delar_SpellScript();
     }
@@ -482,7 +482,7 @@ class npc_grand_magister_rommath : public CreatureScript
 public:
     npc_grand_magister_rommath() : CreatureScript("npc_grand_magister_rommath") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_grand_magister_rommathAI(creature);
     }
@@ -500,7 +500,7 @@ public:
         bool announced;
         uint64 playerGUID;
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!announced && who->GetTypeId() == TYPEID_PLAYER && who->GetPositionZ() < 30.0f)
             {
@@ -511,7 +511,7 @@ public:
             }
         }
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == -1 && !me->isActiveObject())
             {
@@ -535,7 +535,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!me->isActiveObject())
                 return;
@@ -643,7 +643,7 @@ class npc_greengill_slave : public CreatureScript
 public:
     npc_greengill_slave() : CreatureScript("npc_greengill_slave") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_greengill_slaveAI(creature);
     }
@@ -652,9 +652,9 @@ public:
     {
         npc_greengill_slaveAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo)
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             Player* player = caster->ToPlayer();
             if (!player)
@@ -675,7 +675,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             DoMeleeAttackIfReady();
         }

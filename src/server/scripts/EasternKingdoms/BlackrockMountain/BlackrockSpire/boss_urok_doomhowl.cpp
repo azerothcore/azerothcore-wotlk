@@ -38,18 +38,18 @@ public:
     {
         boss_urok_doomhowlAI(Creature* creature) : BossAI(creature, DATA_UROK_DOOMHOWL) {}
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             me->CastSpell(me, SPELL_UROK_SPAWN, true);
             BossAI::InitializeAI();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events.ScheduleEvent(SPELL_REND, urand(17000, 20000));
@@ -57,12 +57,12 @@ public:
             Talk(SAY_AGGRO);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -92,7 +92,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_urok_doomhowlAI(creature);
     }

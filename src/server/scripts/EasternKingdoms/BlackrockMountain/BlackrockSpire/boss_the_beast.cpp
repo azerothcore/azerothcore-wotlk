@@ -27,7 +27,7 @@ class boss_the_beast : public CreatureScript
 public:
     boss_the_beast() : CreatureScript("boss_the_beast") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_thebeastAI(creature);
     }
@@ -36,12 +36,12 @@ public:
     {
         boss_thebeastAI(Creature* creature) : BossAI(creature, DATA_THE_BEAST) { }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
             events.ScheduleEvent(EVENT_FLAME_BREAK,     12 * IN_MILLISECONDS);
@@ -49,12 +49,12 @@ public:
             events.ScheduleEvent(EVENT_TERRIFYING_ROAR, 23 * IN_MILLISECONDS);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

@@ -229,7 +229,7 @@ class boss_sartharion : public CreatureScript
 public:
     boss_sartharion() : CreatureScript("boss_sartharion") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_sartharionAI (pCreature);
     }
@@ -1007,7 +1007,7 @@ class boss_sartharion_tenebron : public CreatureScript
 public:
     boss_sartharion_tenebron() : CreatureScript("boss_sartharion_tenebron") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_sartharion_tenebronAI (pCreature);
     }
@@ -1190,7 +1190,7 @@ class boss_sartharion_shadron : public CreatureScript
 public:
     boss_sartharion_shadron() : CreatureScript("boss_sartharion_shadron") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_sartharion_shadronAI (pCreature);
     }
@@ -1315,7 +1315,7 @@ class boss_sartharion_vesperon : public CreatureScript
 public:
     boss_sartharion_vesperon() : CreatureScript("boss_sartharion_vesperon") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_sartharion_vesperonAI (pCreature);
     }
@@ -1437,7 +1437,7 @@ class npc_twilight_summon : public CreatureScript
 public:
     npc_twilight_summon() : CreatureScript("npc_twilight_summon") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_twilight_summonAI (pCreature);
     }
@@ -1556,7 +1556,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_sartharion_lava_strike_SpellScript();
     }

@@ -69,7 +69,7 @@ class boss_felblood_kaelthas : public CreatureScript
 public:
     boss_felblood_kaelthas() : CreatureScript("boss_felblood_kaelthas") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_felblood_kaelthasAI(creature);
     }
@@ -88,7 +88,7 @@ public:
         SummonList summons;
         bool introSpeak;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -97,7 +97,7 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 if (*itr == summon->GetGUID())
@@ -105,18 +105,18 @@ public:
             summons.Summon(summon);
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             instance->SetData(DATA_KAELTHAS_EVENT, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             instance->SetData(DATA_KAELTHAS_EVENT, IN_PROGRESS);
             me->SetInCombatWithZone();
@@ -130,7 +130,7 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_SHOCK_BARRIER, 50000);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!introSpeak && me->IsWithinDistInMap(who, 40.0f) && who->GetTypeId() == TYPEID_PLAYER)
             {
@@ -142,7 +142,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
             {
@@ -182,7 +182,7 @@ public:
                 }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             switch (events2.ExecuteEvent())
@@ -298,13 +298,13 @@ public:
             Unit::DealDamage(GetCaster(), GetCaster(), damage);
         }
 
-        void Register()
+        void Register() override
         {
             AfterCast += SpellCastFn(spell_mt_phoenix_burn_SpellScript::HandleAfterCast);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_mt_phoenix_burn_SpellScript();
     }

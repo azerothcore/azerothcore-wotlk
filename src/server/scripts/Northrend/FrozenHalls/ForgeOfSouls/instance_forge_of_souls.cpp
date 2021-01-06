@@ -12,7 +12,7 @@ class instance_forge_of_souls : public InstanceMapScript
 public:
     instance_forge_of_souls() : InstanceMapScript("instance_forge_of_souls", 632) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_forge_of_souls_InstanceScript(map);
     }
@@ -32,7 +32,7 @@ public:
         uint64 NPC_GuardFirstGUID;
         uint64 NPC_GuardSecondGUID;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             teamIdInInstance = TEAM_NEUTRAL;
@@ -45,7 +45,7 @@ public:
             NPC_GuardSecondGUID = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS) return true;
@@ -53,7 +53,7 @@ public:
             return false;
         }
 
-        void OnPlayerEnter(Player* /*plr*/)
+        void OnPlayerEnter(Player* /*plr*/) override
         {
             // this will happen only after crash and loading the instance from db
             if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE && (!NPC_LeaderSecondGUID || !instance->GetCreature(NPC_LeaderSecondGUID)))
@@ -63,7 +63,7 @@ public:
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
@@ -132,7 +132,7 @@ public:
                     summon->GetMotionMaster()->MovePath(outroPositions[i].pathId, false);
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch(type)
             {
@@ -150,7 +150,7 @@ public:
                 SaveToDB();
         }
 
-        uint64 GetData64(uint32 type) const
+        uint64 GetData64(uint32 type) const override
         {
             switch (type)
             {
@@ -161,7 +161,7 @@ public:
             return 0;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -185,7 +185,7 @@ public:
             return false;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -197,7 +197,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {

@@ -86,7 +86,7 @@ template<class OBJECT_TYPES>
 class TypeMapContainer
 {
 public:
-    template<class SPECIFIC_TYPE> size_t Count() const { return acore::Count(i_elements, (SPECIFIC_TYPE*)NULL); }
+    template<class SPECIFIC_TYPE> [[nodiscard]] size_t Count() const { return acore::Count(i_elements, (SPECIFIC_TYPE*)NULL); }
 
     /// inserts a specific object into the container
     template<class SPECIFIC_TYPE> bool insert(SPECIFIC_TYPE* obj)
@@ -102,8 +102,8 @@ public:
     //    return (t != NULL);
     //}
 
-    ContainerMapList<OBJECT_TYPES>& GetElements(void) { return i_elements; }
-    const ContainerMapList<OBJECT_TYPES>& GetElements(void) const { return i_elements;}
+    ContainerMapList<OBJECT_TYPES>& GetElements() { return i_elements; }
+    [[nodiscard]] const ContainerMapList<OBJECT_TYPES>& GetElements() const { return i_elements;}
 
 private:
     ContainerMapList<OBJECT_TYPES> i_elements;

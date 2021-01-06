@@ -176,7 +176,7 @@ public:
     public:
         EffectHandler(SpellEffectFnType _pEffectHandlerScript, uint8 _effIndex, uint16 _effName);
         std::string ToString();
-        bool CheckEffect(SpellInfo const* spellEntry, uint8 effIndex);
+        bool CheckEffect(SpellInfo const* spellEntry, uint8 effIndex) override;
         void Call(SpellScript* spellScript, SpellEffIndex effIndex);
     private:
         SpellEffectFnType pEffectHandlerScript;
@@ -195,7 +195,7 @@ public:
     {
     public:
         TargetHook(uint8 _effectIndex, uint16 _targetType, bool _area, bool _dest);
-        bool CheckEffect(SpellInfo const* spellInfo, uint8 effIndex);
+        bool CheckEffect(SpellInfo const* spellInfo, uint8 effIndex) override;
         std::string ToString();
         uint16 GetTarget() const { return targetType; }
     protected:
@@ -242,7 +242,7 @@ public:
 
 #define PrepareSpellScript(CLASSNAME) SPELLSCRIPT_FUNCTION_TYPE_DEFINES(CLASSNAME) SPELLSCRIPT_FUNCTION_CAST_DEFINES(CLASSNAME)
 public:
-    bool _Validate(SpellInfo const* entry);
+    bool _Validate(SpellInfo const* entry) override;
     bool _Load(Spell* spell);
     void _InitHit();
     bool _IsEffectPrevented(SpellEffIndex effIndex) { return m_hitPreventEffectMask & (1 << effIndex); }
@@ -500,7 +500,7 @@ public:
     public:
         EffectBase(uint8 _effIndex, uint16 _effName);
         std::string ToString();
-        bool CheckEffect(SpellInfo const* spellEntry, uint8 effIndex);
+        bool CheckEffect(SpellInfo const* spellEntry, uint8 effIndex) override;
     };
     class EffectPeriodicHandler : public EffectBase
     {
@@ -621,7 +621,7 @@ public:
 public:
     AuraScript() : _SpellScript(), m_aura(nullptr), m_auraApplication(nullptr), m_defaultActionPrevented(false)
     {}
-    bool _Validate(SpellInfo const* entry);
+    bool _Validate(SpellInfo const* entry) override;
     bool _Load(Aura* aura);
     void _PrepareScriptCall(AuraScriptHookType hookType, AuraApplication const* aurApp = nullptr);
     void _FinishScriptCall();

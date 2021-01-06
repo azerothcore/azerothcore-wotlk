@@ -11,7 +11,7 @@ class instance_shadow_labyrinth : public InstanceMapScript
 public:
     instance_shadow_labyrinth() : InstanceMapScript("instance_shadow_labyrinth", 555) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_shadow_labyrinth_InstanceMapScript(map);
     }
@@ -28,7 +28,7 @@ public:
 
         uint32 m_uiFelOverseerCount;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -39,7 +39,7 @@ public:
             m_uiFelOverseerCount = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS)
@@ -48,7 +48,7 @@ public:
             return false;
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -65,7 +65,7 @@ public:
             }
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -79,7 +79,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 uiData)
+        void SetData(uint32 type, uint32 uiData) override
         {
             switch (type)
             {
@@ -114,14 +114,14 @@ public:
                 SaveToDB();
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             if (type == TYPE_OVERSEER)
                 return m_auiEncounter[0];
             return 0;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             std::ostringstream saveStream;
             saveStream << "S L " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' '
@@ -130,7 +130,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {

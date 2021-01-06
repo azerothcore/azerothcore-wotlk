@@ -326,13 +326,13 @@ public:
 
         uint32 resetTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->CastSpell(me, SPELL_STUN_PERMANENT, true);
             resetTimer = 5000;
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (!_EnterEvadeMode())
                 return;
@@ -340,13 +340,13 @@ public:
             Reset();
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             resetTimer = 5000;
             damage = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -360,10 +360,10 @@ public:
                 resetTimer -= diff;
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_training_dummyAI(creature);
     }
@@ -385,14 +385,14 @@ public:
 
         uint32 deathTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->SetControlled(true, UNIT_STATE_STUNNED); //disable rotate
             me->SetLootRecipient(me->GetOwner());
             me->SelectLevel();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (!_EnterEvadeMode())
                 return;
@@ -400,7 +400,7 @@ public:
             Reset();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!me->HasUnitState(UNIT_STATE_STUNNED))
                 me->SetControlled(true, UNIT_STATE_STUNNED);//disable rotate
@@ -416,10 +416,10 @@ public:
                 deathTimer -= diff;
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_target_dummyAI(creature);
     }
@@ -526,7 +526,7 @@ public:
         SpawnAssociation* SpawnAssoc;
         uint64 SpawnedGUID;
 
-        void Reset() {}
+        void Reset() override {}
 
         Creature* SummonGuard()
         {
@@ -553,7 +553,7 @@ public:
             return nullptr;
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (!SpawnAssoc)
@@ -630,7 +630,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_air_force_botsAI(creature);
     }
@@ -799,7 +799,7 @@ public:
         bool Active;
         uint32 CanIteract;
 
-        void Reset()
+        void Reset() override
         {
             Active = true;
             CanIteract = 3500;
@@ -811,7 +811,7 @@ public:
             me->SendMovementFlagUpdate();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!Active)
             {
@@ -826,9 +826,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void ReceiveEmote(Player* player, uint32 emote)
+        void ReceiveEmote(Player* player, uint32 emote) override
         {
             if (me->IsWithinLOS(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ()) && me->IsWithinDistInMap(player, 30.0f))
             {
@@ -858,7 +858,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dancing_flamesAI(creature);
     }
@@ -952,7 +952,7 @@ public:
         std::list<uint64> Patients;
         std::vector<Location*> Coordinates;
 
-        void Reset()
+        void Reset() override
         {
             PlayerGUID = 0;
 
@@ -1053,12 +1053,12 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff);
+        void UpdateAI(uint32 diff) override;
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if ((quest->GetQuestId() == 6624) || (quest->GetQuestId() == 6622))
             CAST_AI(npc_doctor::npc_doctorAI, creature->AI())->BeginEvent(player);
@@ -1066,7 +1066,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_doctorAI(creature);
     }
@@ -1088,7 +1088,7 @@ public:
         uint64 DoctorGUID;
         Location* Coord;
 
-        void Reset()
+        void Reset() override
         {
             DoctorGUID = 0;
             Coord = nullptr;
@@ -1122,9 +1122,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             Player* player = caster->ToPlayer();
             if (!player || !me->IsAlive() || spell->Id != 20804)
@@ -1164,7 +1164,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             //lower HP on every world tick makes it a useful counter, not officlone though
             if (me->IsAlive() && me->GetHealth() > 6)
@@ -1184,7 +1184,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_injured_patientAI(creature);
     }
@@ -1291,7 +1291,7 @@ public:
 
         uint32 RunAwayTimer;
 
-        void Reset()
+        void Reset() override
         {
             CasterGUID = 0;
 
@@ -1306,9 +1306,9 @@ public:
             me->SetHealth(me->CountPctFromMaxHealth(70));
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             if (spell->Id == SPELL_LESSER_HEAL_R2 || spell->Id == SPELL_FORTITUDE_R1)
             {
@@ -1418,12 +1418,12 @@ public:
             }
         }
 
-        void WaypointReached(uint32 /*waypointId*/)
+        void WaypointReached(uint32 /*waypointId*/) override
         {
 
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (CanRun && !me->IsInCombat())
             {
@@ -1457,7 +1457,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_garments_of_questsAI(creature);
     }
@@ -1481,16 +1481,16 @@ public:
     {
         npc_guardianAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void UpdateAI(uint32 /*diff*/)
+        void UpdateAI(uint32 /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -1503,7 +1503,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_guardianAI(creature);
     }
@@ -1681,8 +1681,8 @@ public:
     {
         npc_steam_tonkAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
-        void EnterCombat(Unit* /*who*/) { }
+        void Reset() override { }
+        void EnterCombat(Unit* /*who*/) override { }
 
         void OnPossess(bool apply)
         {
@@ -1699,7 +1699,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_steam_tonkAI(creature);
     }
@@ -1739,12 +1739,12 @@ public:
     {
         npc_wormholeAI(Creature* creature) : PassiveAI(creature) { }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             _showUnderground = urand(0, 100) == 0; // Guessed value, it is really rare though
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             return (type == DATA_SHOW_UNDERGROUND && _showUnderground) ? 1 : 0;
         }
@@ -2286,7 +2286,7 @@ public:
             return 0;
         }
 
-        void Reset()
+        void Reset() override
         {
             if (GameObject* launcher = FindNearestLauncher())
             {
@@ -2331,7 +2331,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_fireworkAI(creature);
     }
@@ -2356,7 +2356,7 @@ class npc_spring_rabbit : public CreatureScript
 public:
     npc_spring_rabbit() : CreatureScript("npc_spring_rabbit") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_spring_rabbitAI(creature);
     }
@@ -2371,7 +2371,7 @@ public:
         uint32 searchTimer;
         uint64 rabbitGUID;
 
-        void Reset()
+        void Reset() override
         {
             inLove = false;
             rabbitGUID = 0;
@@ -2382,16 +2382,16 @@ public:
                 me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void DoAction(int32 /*param*/)
+        void DoAction(int32 /*param*/) override
         {
             inLove = true;
             if (Unit* owner = me->GetOwner())
                 owner->CastSpell(owner, SPELL_SPRING_FLING, true);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (inLove)
             {
@@ -2456,7 +2456,7 @@ public:
     {
         npc_stable_masterAI(Creature* creature) : SmartAI(creature) { }
 
-        void sGossipSelect(Player* player, uint32 menuId, uint32 gossipListId)
+        void sGossipSelect(Player* player, uint32 menuId, uint32 gossipListId) override
         {
             SmartAI::sGossipSelect(player, menuId, gossipListId);
             if (menuId != STABLE_MASTER_GOSSIP_SUB_MENU)
@@ -2493,7 +2493,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_stable_masterAI(creature);
     }

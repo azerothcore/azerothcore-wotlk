@@ -37,7 +37,7 @@ class boss_maiden_of_grief : public CreatureScript
 public:
     boss_maiden_of_grief() : CreatureScript("boss_maiden_of_grief") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_maiden_of_griefAI (pCreature);
     }
@@ -52,7 +52,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             if (pInstance)
@@ -62,7 +62,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             events.ScheduleEvent(EVENT_STORM, 5000);
             events.ScheduleEvent(EVENT_SHOCK, 26000 + rand() % 6000);
@@ -77,7 +77,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if(!UpdateVictim())
                 return;
@@ -124,7 +124,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             Talk(SAY_DEATH);
 
@@ -132,7 +132,7 @@ public:
                 pInstance->SetData(BOSS_MAIDEN_OF_GRIEF, DONE);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             if (urand(0, 1))
                 return;

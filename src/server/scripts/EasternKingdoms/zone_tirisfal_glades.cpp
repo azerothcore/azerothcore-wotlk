@@ -38,7 +38,7 @@ class npc_calvin_montague : public CreatureScript
 public:
     npc_calvin_montague() : CreatureScript("npc_calvin_montague") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_590)
         {
@@ -49,7 +49,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_calvin_montagueAI(creature);
     }
@@ -62,7 +62,7 @@ public:
         uint32 m_uiPhaseTimer;
         uint64 m_uiPlayerGUID;
 
-        void Reset()
+        void Reset() override
         {
             m_uiPhase = 0;
             m_uiPhaseTimer = 5000;
@@ -74,9 +74,9 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void AttackedBy(Unit* pAttacker)
+        void AttackedBy(Unit* pAttacker) override
         {
             if (me->GetVictim() || me->IsFriendlyTo(pAttacker))
                 return;
@@ -84,7 +84,7 @@ public:
             AttackStart(pAttacker);
         }
 
-        void DamageTaken(Unit* pDoneBy, uint32& uiDamage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* pDoneBy, uint32& uiDamage, DamageEffectType, SpellSchoolMask) override
         {
             if (!pDoneBy)
                 return;
@@ -104,7 +104,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (m_uiPhase)
             {

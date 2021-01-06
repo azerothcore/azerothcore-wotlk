@@ -48,9 +48,9 @@ public:
     {
         npc_oox09hlAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             if (who->GetEntry() == NPC_MARAUDING_OWL || who->GetEntry() == NPC_VILE_AMBUSHER)
                 return;
@@ -58,12 +58,12 @@ public:
             Talk(SAY_OOX_AGGRO);
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             summoned->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
         }
 
-        void sQuestAccept(Player* player, Quest const* quest)
+        void sQuestAccept(Player* player, Quest const* quest) override
         {
             if (quest->GetQuestId() == QUEST_RESQUE_OOX_09)
             {
@@ -74,7 +74,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
             {
@@ -92,7 +92,7 @@ public:
             }
         }
 
-        void WaypointStart(uint32 pointId)
+        void WaypointStart(uint32 pointId) override
         {
             switch (pointId)
             {
@@ -118,7 +118,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_oox09hlAI(creature);
     }
@@ -173,13 +173,13 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
         }
 
-        void Reset()
+        void Reset() override
         {
             postEventCount = 0;
             postEventTimer = 3000;
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             _IsByOutrunner = false;
             spawnId = 0;
@@ -187,7 +187,7 @@ public:
             npc_escortAI::JustRespawned();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
             {
@@ -221,13 +221,13 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             summoned->SetWalk(false);
             summoned->GetMotionMaster()->MovePoint(0, AmbushMoveTo[spawnId].posX, AmbushMoveTo[spawnId].posY, AmbushMoveTo[spawnId].posZ);
         }
 
-        void sQuestAccept(Player* player, Quest const* quest)
+        void sQuestAccept(Player* player, Quest const* quest) override
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
             if (quest->GetQuestId() == QUEST_RINJI_TRAPPED)
@@ -239,7 +239,7 @@ public:
             }
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -265,7 +265,7 @@ public:
             }
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             //Check if we have a current target
             if (!UpdateVictim())
@@ -311,7 +311,7 @@ public:
         bool   _IsByOutrunner;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_rinjiAI(creature);
     }

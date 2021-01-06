@@ -193,7 +193,7 @@ public:
                 }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (type == DATA_RESURRECT_CAST && data == DATA_RESURRECT_CAST)
             {
@@ -218,7 +218,7 @@ public:
                 window->SetGoState(state);
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             events2.Reset();
@@ -233,13 +233,13 @@ public:
             me->SetWalk(false);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (phase == PHASE_FINAL && events.GetNextEventTime(EVENT_GRAVITY_LAPSE_END) == 0)
                 BossAI::AttackStart(who);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (phase == PHASE_NONE && who->GetTypeId() == TYPEID_PLAYER && me->IsValidAttackTarget(who))
             {
@@ -251,25 +251,25 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_NETHER_VAPOR)
                 summon->GetMotionMaster()->MoveRandom(20.0f);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             if (phase == PHASE_FINAL)
                 return;
@@ -307,7 +307,7 @@ public:
             }
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
 
@@ -315,7 +315,7 @@ public:
             BossAI::JustDied(killer);
         }
 
-        void MovementInform(uint32 type, uint32 point)
+        void MovementInform(uint32 type, uint32 point) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -359,7 +359,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (EnterEvadeIfOutOfCombatArea())
                 return;
@@ -700,13 +700,13 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const
+        bool CheckEvadeIfOutOfCombatArea() const override
         {
             return me->GetHomePosition().GetExactDist2d(me) > 165.0f || !SelectTargetFromPlayerList(165.0f);
         }
 
     };
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_kaelthasAI>(creature);
     }
@@ -721,7 +721,7 @@ public:
     {
         PrepareSpellScript(spell_kaelthas_kael_phase_two_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             if (GetCaster()->GetTypeId() == TYPEID_UNIT)
                 if (InstanceScript* instance = GetCaster()->GetInstanceScript())
@@ -730,12 +730,12 @@ public:
             return true;
         }
 
-        void Register()
+        void Register() override
         {
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kaelthas_kael_phase_two_SpellScript();
     }
@@ -757,13 +757,13 @@ public:
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_REMOTE_TOY_STUN, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_kaelthas_remote_toy_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_kaelthas_remote_toy_AuraScript();
     }
@@ -785,13 +785,13 @@ public:
                 GetCaster()->CastSpell(GetCaster(), i, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_kaelthas_summon_weapons_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kaelthas_summon_weapons_SpellScript();
     }
@@ -811,13 +811,13 @@ public:
             GetCaster()->GetAI()->SetData(DATA_RESURRECT_CAST, DATA_RESURRECT_CAST);
         }
 
-        void Register()
+        void Register() override
         {
             BeforeCast += SpellCastFn(spell_kaelthas_resurrection_SpellScript::HandleBeforeCast);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kaelthas_resurrection_SpellScript();
     }
@@ -838,13 +838,13 @@ public:
                 targets.remove_if(acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kaelthas_mind_control_SpellScript::SelectTarget, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kaelthas_mind_control_SpellScript();
     }
@@ -864,13 +864,13 @@ public:
             Unit::DealDamage(GetUnitOwner(), GetUnitOwner(), GetUnitOwner()->CountPctFromMaxHealth(5) + 1);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_kaelthas_burn_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_kaelthas_burn_AuraScript();
     }
@@ -885,7 +885,7 @@ public:
     {
         PrepareAuraScript(spell_kaelthas_flame_strike_AuraScript);
 
-        bool Load()
+        bool Load() override
         {
             return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
         }
@@ -897,13 +897,13 @@ public:
             GetUnitOwner()->ToCreature()->DespawnOrUnsummon(2000);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectRemove += AuraEffectRemoveFn(spell_kaelthas_flame_strike_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_kaelthas_flame_strike_AuraScript();
     }
@@ -916,7 +916,7 @@ public:
     {
     }
 
-    bool Execute(uint64 /*execTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         if (_owner->IsBeingTeleportedNear())
             _owner->m_Events.AddEvent(new lapseTeleport(_owner), _owner->m_Events.CalculateTime(1));
@@ -941,7 +941,7 @@ public:
     {
         PrepareSpellScript(spell_kaelthas_gravity_lapse_SpellScript);
 
-        bool Load()
+        bool Load() override
         {
             _currentSpellId = SPELL_GRAVITY_LAPSE_TELEPORT1;
             return true;
@@ -958,7 +958,7 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_kaelthas_gravity_lapse_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
@@ -967,7 +967,7 @@ public:
         uint32 _currentSpellId;
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kaelthas_gravity_lapse_SpellScript();
     }
@@ -1000,13 +1000,13 @@ public:
                 GetCaster()->CastSpell(*itr, SPELL_NETHER_BEAM_DAMAGE, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_kaelthas_nether_beam_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kaelthas_nether_beam_SpellScript();
     }
@@ -1028,13 +1028,13 @@ public:
                 GetCaster()->SummonCreature(NPC_NETHER_VAPOR, GetCaster()->GetPositionX() + 6 * cos(i / 5.0f * 2 * M_PI), GetCaster()->GetPositionY() + 6 * sin(i / 5.0f * 2 * M_PI), GetCaster()->GetPositionZ() + 7.0f + i, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_kaelthas_summon_nether_vapor_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_kaelthas_summon_nether_vapor_SpellScript();
     }

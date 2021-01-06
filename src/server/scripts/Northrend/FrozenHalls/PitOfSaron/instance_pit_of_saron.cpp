@@ -40,7 +40,7 @@ public:
         bool bAchievEleven;
         bool bAchievDontLookUp;
 
-        void Initialize()
+        void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             teamIdInInstance = TEAM_NEUTRAL;
@@ -66,7 +66,7 @@ public:
             bAchievDontLookUp = true;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS) return true;
@@ -74,14 +74,14 @@ public:
             return false;
         }
 
-        void OnPlayerEnter(Player*  /*plr*/)
+        void OnPlayerEnter(Player*  /*plr*/) override
         {
             instance->LoadGrid(LeaderIntroPos.GetPositionX(), LeaderIntroPos.GetPositionY());
             if (Creature* c = instance->GetCreature(GetData64(DATA_LEADER_FIRST_GUID)))
                 c->AI()->SetData(DATA_START_INTRO, 0);
         }
 
-        uint32 GetCreatureEntry(uint32 /*guidLow*/, CreatureData const* data)
+        uint32 GetCreatureEntry(uint32 /*guidLow*/, CreatureData const* data) override
         {
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
@@ -107,7 +107,7 @@ public:
             return entry;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
@@ -247,7 +247,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -259,7 +259,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch(type)
             {
@@ -304,7 +304,7 @@ public:
                 SaveToDB();
         }
 
-        void SetData64(uint32 type, uint64 data)
+        void SetData64(uint32 type, uint64 data) override
         {
             switch(type)
             {
@@ -320,7 +320,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -339,7 +339,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const
+        uint64 GetData64(uint32 type) const override
         {
             switch (type)
             {
@@ -372,7 +372,7 @@ public:
             return 0;
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {
@@ -382,7 +382,7 @@ public:
             return false;
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -394,7 +394,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -427,7 +427,7 @@ public:
         }
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_pit_of_saron_InstanceScript(map);
     }

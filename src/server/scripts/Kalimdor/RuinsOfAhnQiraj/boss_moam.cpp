@@ -51,7 +51,7 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             _Reset();
             me->SetPower(POWER_MANA, 0);
@@ -60,7 +60,7 @@ public:
             //events.ScheduleEvent(EVENT_WIDE_SLASH, 11000);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
             if (!_isStonePhase && HealthBelowPct(45))
             {
@@ -69,7 +69,7 @@ public:
             }
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             switch (action)
             {
@@ -94,7 +94,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -164,7 +164,7 @@ public:
         bool _isStonePhase;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_moamAI(creature);
     }

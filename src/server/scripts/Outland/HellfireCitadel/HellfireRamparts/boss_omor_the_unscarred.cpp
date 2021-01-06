@@ -48,14 +48,14 @@ public:
         {
         }
 
-        void Reset()
+        void Reset() override
         {
             Talk(SAY_WIPE);
             BossAI::Reset();
             _targetGUID = 0;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             Talk(SAY_AGGRO);
             BossAI::EnterCombat(who);
@@ -67,7 +67,7 @@ public:
             events.ScheduleEvent(EVENT_ORBITAL_STRIKE, 20000);
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
@@ -76,20 +76,20 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             Talk(SAY_SUMMON);
             summons.Summon(summon);
             summon->SetInCombatWithZone();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Talk(SAY_DIE);
             BossAI::JustDied(killer);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -163,7 +163,7 @@ public:
         uint64 _targetGUID;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_omor_the_unscarredAI>(creature);
     }

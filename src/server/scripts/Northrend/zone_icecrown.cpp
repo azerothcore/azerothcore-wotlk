@@ -48,7 +48,7 @@ public:
         {
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER || me->GetDistance(who) > 8.0f || who->ToPlayer()->GetQuestStatus(QUEST_BLACK_KNIGHT_CURSE) != QUEST_STATUS_INCOMPLETE)
                 return;
@@ -61,7 +61,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_black_knight_graveyardAI(creature);
     }
@@ -114,7 +114,7 @@ public:
         uint64 playerGUID2;
         uint32 currentQuest;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -123,7 +123,7 @@ public:
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         }
 
-        void JustSummoned(Creature* creature)
+        void JustSummoned(Creature* creature) override
         {
             summons.Summon(creature);
             if (creature->GetEntry() != NPC_PRINCE)
@@ -213,7 +213,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -309,7 +309,7 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         if (npc_battle_at_valhalasAI* vAI = CAST_AI(npc_battle_at_valhalas::npc_battle_at_valhalasAI, creature->AI()))
@@ -340,7 +340,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_battle_at_valhalasAI(creature);
     }
@@ -358,13 +358,13 @@ public:
         uint32 attackTimer;
         uint32 summonTimer;
 
-        void Reset()
+        void Reset() override
         {
             summonTimer = 1;
             CombatAI::Reset();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             attackTimer += diff;
             if (attackTimer >= 1500)
@@ -392,7 +392,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_llod_genericAI(creature);
     }
@@ -451,7 +451,7 @@ public:
         uint64 _landgrenGUID;
         uint64 _landgrenSoulGUID;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             _landgrenGUID = 0;
             _landgrenSoulGUID = 0;
@@ -465,7 +465,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -574,7 +574,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_lord_areteAI(creature);
     }
@@ -594,7 +594,7 @@ public:
 
         uint32 checkTimer;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!me->IsInCombat())
                 return;
@@ -618,7 +618,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_boneguard_footmanAI(creature);
     }
@@ -1085,13 +1085,13 @@ public:
                 station->HandleSpellClick(charmer, 0);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_switch_infragreen_bomber_station_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_switch_infragreen_bomber_station_SpellScript();
     }
@@ -1122,14 +1122,14 @@ public:
             aura->ModStackAmount(GetEffectValue() - 1);
         }
 
-        void Register()
+        void Register() override
         {
             if (m_scriptSpellId == SPELL_CHARGE_SHIELD)
                 OnEffectHitTarget += SpellEffectFn(spell_charge_shield_bomber_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_charge_shield_bomber_SpellScript();
     }
@@ -1151,7 +1151,7 @@ public:
             ModStackAmount(-1);
         }
 
-        void Register()
+        void Register() override
         {
             if (m_scriptSpellId == SPELL_INFRA_GREEN_SHIELD)
             {
@@ -1161,7 +1161,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_charge_shield_bomber_AuraScript();
     }
@@ -1206,13 +1206,13 @@ public:
                 GetCaster()->RemoveAurasDueToSpell(SPELL_BURNING);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_fight_fire_bomber_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_fight_fire_bomber_SpellScript();
     }
@@ -1234,13 +1234,13 @@ public:
             GetCaster()->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), GetSpellInfo()->Effects[effIndex].CalcValue(), true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectLaunch += SpellEffectFn(spell_anti_air_rocket_bomber_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_anti_air_rocket_bomber_SpellScript();
     }
@@ -1265,7 +1265,7 @@ public:
             return nullptr;
         }
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner) override
         {
             if (!summoner)
                 return;
@@ -1280,7 +1280,7 @@ public:
             me->setFaction(summoner->getFaction());
         }
 
-        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
         {
             if (who != me)
                 if (me->HealthBelowPct(80) && urand(0, 1))
@@ -1309,7 +1309,7 @@ public:
                     }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             uint32 eventId = events.ExecuteEvent();
@@ -1410,7 +1410,7 @@ public:
 
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_infra_green_bomber_genericAI(creature);
     }
@@ -1443,7 +1443,7 @@ public:
             SetCombatMovement(false);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             if (me->GetAreaId() != AREA_SUNREAVER_PAVILION && me->GetAreaId() != AREA_SILVER_COVENANT_PAVILION)
@@ -1463,7 +1463,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_guardian_pavilionAI(creature);
     }
@@ -1512,7 +1512,7 @@ public:
         EventMap events;
         bool isVulnerable;
 
-        void Reset()
+        void Reset() override
         {
             me->SetControlled(true, UNIT_STATE_STUNNED);
             isVulnerable = false;
@@ -1532,7 +1532,7 @@ public:
             events.ScheduleEvent(EVENT_DUMMY_RECAST_DEFEND, 5000);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (!_EnterEvadeMode())
                 return;
@@ -1540,13 +1540,13 @@ public:
             Reset();
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
             events.RescheduleEvent(EVENT_DUMMY_RESET, 10000);
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spell)
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
             switch (me->GetEntry())
             {
@@ -1576,7 +1576,7 @@ public:
                     isVulnerable = true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -1618,11 +1618,11 @@ public:
                 me->SetControlled(true, UNIT_STATE_STUNNED);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_tournament_training_dummyAI(creature);
     }
@@ -1743,7 +1743,7 @@ public:
         uint64 guidMason[3];
         uint64 guidHalof;
 
-        void Reset()
+        void Reset() override
         {
             me->SetRegeneratingHealth(false);
             DoCast(SPELL_THREAT_PULSE);
@@ -1751,23 +1751,23 @@ public:
             events.ScheduleEvent(EVENT_SPAWN, 3000);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
 
-        void JustSummoned(Creature* Summoned)
+        void JustSummoned(Creature* Summoned) override
         {
             Summons.Summon(Summoned);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Summons.DespawnAll();
             me->DespawnOrUnsummon();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -1998,7 +1998,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_blessed_bannerAI(creature);
     }
@@ -2036,7 +2036,7 @@ public:
 
         EventMap events;
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner) override
         {
             if (!summoner)
                 return;
@@ -2044,7 +2044,7 @@ public:
             me->GetMotionMaster()->MovePoint(POINT_GRAB_DECOY, summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ() + 3.0f);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -2055,7 +2055,7 @@ public:
                         DoCast(summoner, SPELL_GRAB);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             VehicleAI::UpdateAI(diff);
             events.Update(diff);
@@ -2072,7 +2072,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
             switch (spell->Id)
             {
@@ -2087,7 +2087,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_frostbrood_skytalonAI(creature);
     }

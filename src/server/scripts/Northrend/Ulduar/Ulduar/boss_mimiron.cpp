@@ -286,7 +286,7 @@ class boss_mimiron : public CreatureScript
 public:
     boss_mimiron() : CreatureScript("boss_mimiron") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_mimironAI (pCreature);
     }
@@ -316,7 +316,7 @@ public:
         uint8 minutesTalkNum;
         uint32 outofCombatTimer;
 
-        void Reset()
+        void Reset() override
         {
             hardmode = false;
             berserk = false;
@@ -335,19 +335,19 @@ public:
                 pInstance->SetData(TYPE_MIMIRON, NOT_STARTED);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (who)
                 me->Attack(who, true); // skip following
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->setActive(false);
             ScriptedAI::JustReachedHome();
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             me->setActive(true);
             DoZoneInCombat();
@@ -406,7 +406,7 @@ public:
                 pInstance->SetData(TYPE_MIMIRON, IN_PROGRESS);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!me->IsInCombat())
             {
@@ -826,9 +826,9 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit*  /*mover*/) {}
+        void MoveInLineOfSight(Unit*  /*mover*/) override {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (bIsEvading)
                 return;
@@ -858,12 +858,12 @@ public:
             bIsEvading = false;
         }
 
-        void JustSummoned(Creature* s)
+        void JustSummoned(Creature* s) override
         {
             summons.Summon(s);
         }
 
-        void SummonedCreatureDespawn(Creature* s)
+        void SummonedCreatureDespawn(Creature* s) override
         {
             summons.Despawn(s);
         }
@@ -919,7 +919,7 @@ public:
                 }
         }
 
-        void SetData(uint32  /*id*/, uint32 value)
+        void SetData(uint32  /*id*/, uint32 value) override
         {
             switch (value) // end of phase 1-3, 4-6 for voltron
             {
@@ -967,7 +967,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 id) const
+        uint32 GetData(uint32 id) const override
         {
             switch (id)
             {
@@ -994,7 +994,7 @@ class npc_ulduar_leviathan_mkii : public CreatureScript
 public:
     npc_ulduar_leviathan_mkii() : CreatureScript("npc_ulduar_leviathan_mkii") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_leviathan_mkiiAI (pCreature);
     }
@@ -1012,7 +1012,7 @@ public:
         bool bIsEvading;
         uint8 Phase;
 
-        void Reset()
+        void Reset() override
         {
             Phase = 0;
             if (Unit* c = GetS3())
@@ -1027,7 +1027,7 @@ public:
             events.Reset();
         }
 
-        void SetData(uint32 id, uint32 value)
+        void SetData(uint32 id, uint32 value) override
         {
             if (id == 1) // setting phase to start fighting
             {
@@ -1069,7 +1069,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth() || me->GetHealth() < 15000)
             {
@@ -1116,7 +1116,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1191,9 +1191,9 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* /*mover*/) {}
+        void MoveInLineOfSight(Unit* /*mover*/) override {}
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
                 if (Creature* c = GetMimiron())
@@ -1227,7 +1227,7 @@ public:
                 }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (bIsEvading)
                 return;
@@ -1243,7 +1243,7 @@ public:
             bIsEvading = false;
         }
 
-        void PassengerBoarded(Unit* p, int8  /*seat*/, bool apply)
+        void PassengerBoarded(Unit* p, int8  /*seat*/, bool apply) override
         {
             if (p->GetEntry() == NPC_LEVIATHAN_MKII_CANNON && !apply)
             {
@@ -1261,7 +1261,7 @@ public:
             return 0;
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
@@ -1277,7 +1277,7 @@ class npc_ulduar_vx001 : public CreatureScript
 public:
     npc_ulduar_vx001() : CreatureScript("npc_ulduar_vx001") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_vx001AI (pCreature);
     }
@@ -1299,7 +1299,7 @@ public:
         uint32 spinningUpOrientation;
         uint16 spinningUpTimer;
 
-        void Reset()
+        void Reset() override
         {
             Phase = 0;
             fighting = false;
@@ -1309,9 +1309,9 @@ public:
             events.Reset();
         }
 
-        void AttackStart(Unit* /*who*/) {}
+        void AttackStart(Unit* /*who*/) override {}
 
-        void SetData(uint32 id, uint32 value)
+        void SetData(uint32 id, uint32 value) override
         {
             if (id == 1) // setting phase to start fighting
             {
@@ -1358,12 +1358,12 @@ public:
             }
         }
 
-        uint32 GetData(uint32  /*id*/) const
+        uint32 GetData(uint32  /*id*/) const override
         {
             return spinningUpOrientation;
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == 1337)
                 if( Vehicle* vk = me->GetVehicleKit() )
@@ -1373,7 +1373,7 @@ public:
                                 r->ToCreature()->DespawnOrUnsummon(1);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth() || me->GetHealth() < 15000)
             {
@@ -1417,7 +1417,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!fighting)
                 return;
@@ -1541,9 +1541,9 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* /*mover*/) {}
+        void MoveInLineOfSight(Unit* /*mover*/) override {}
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
                 if( Creature* c = GetMimiron() )
@@ -1577,7 +1577,7 @@ public:
                 }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (bIsEvading)
                 return;
@@ -1593,13 +1593,13 @@ public:
             bIsEvading = false;
         }
 
-        void PassengerBoarded(Unit* p, int8  /*seat*/, bool apply)
+        void PassengerBoarded(Unit* p, int8  /*seat*/, bool apply) override
         {
             if (p->GetEntry() == NPC_ROCKET_VISUAL && !apply)
                 p->ToCreature()->DespawnOrUnsummon(8000);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
@@ -1615,7 +1615,7 @@ class npc_ulduar_aerial_command_unit : public CreatureScript
 public:
     npc_ulduar_aerial_command_unit() : CreatureScript("npc_ulduar_aerial_command_unit") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_aerial_command_unitAI (pCreature);
     }
@@ -1637,20 +1637,20 @@ public:
         uint8 Phase;
         bool immobilized;
 
-        void Reset()
+        void Reset() override
         {
             Phase = 0;
             events.Reset();
             summons.DespawnAll();
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (who)
                 me->Attack(who, true); // skip following
         }
 
-        void SetData(uint32 id, uint32 value)
+        void SetData(uint32 id, uint32 value) override
         {
             if (id == 1) // setting phase to start fighting
             {
@@ -1696,13 +1696,13 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == 1337)
                 summons.DespawnAll();
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth() || me->GetHealth() < 15000)
             {
@@ -1751,7 +1751,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1865,9 +1865,9 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* /*mover*/) {}
+        void MoveInLineOfSight(Unit* /*mover*/) override {}
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
                 if( Creature* c = GetMimiron() )
@@ -1901,7 +1901,7 @@ public:
                 }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (bIsEvading)
                 return;
@@ -1917,19 +1917,19 @@ public:
             bIsEvading = false;
         }
 
-        void JustSummoned(Creature* s)
+        void JustSummoned(Creature* s) override
         {
             summons.Summon(s);
             if (s->GetEntry() == NPC_BOMB_BOT)
                 s->m_positionZ = 364.34f;
         }
 
-        void SummonedCreatureDespawn(Creature* s)
+        void SummonedCreatureDespawn(Creature* s) override
         {
             summons.Despawn(s);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             if( spell->Id == SPELL_SELF_REPAIR )
             {
@@ -1945,7 +1945,7 @@ class npc_ulduar_proximity_mine : public CreatureScript
 public:
     npc_ulduar_proximity_mine() : CreatureScript("npc_ulduar_proximity_mine") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_proximity_mineAI (pCreature);
     }
@@ -1963,11 +1963,11 @@ public:
         uint16 timer;
         uint16 timer2;
 
-        void AttackStart(Unit* /*who*/) {}
-        void MoveInLineOfSight(Unit* /*who*/) {}
-        bool CanAIAttack(const Unit*  /*target*/) const { return false; }
+        void AttackStart(Unit* /*who*/) override {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
+        bool CanAIAttack(const Unit*  /*target*/) const override { return false; }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (target && spell && target->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_MINE_EXPLOSION)
                 if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -1976,7 +1976,7 @@ public:
         }
 
         // MoveInLineOfSight is checked every few yards, can't use it
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer2 <= diff)
             {
@@ -2010,7 +2010,7 @@ class npc_ulduar_mimiron_rocket : public CreatureScript
 public:
     npc_ulduar_mimiron_rocket() : CreatureScript("npc_ulduar_mimiron_rocket") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_mimiron_rocketAI (pCreature);
     }
@@ -2019,25 +2019,25 @@ public:
     {
         npc_ulduar_mimiron_rocketAI(Creature* pCreature) : NullCreatureAI(pCreature) {}
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             if (!me->isDead())
                 Reset();
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetCanFly(true);
             me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
             me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         }
 
-        void SetData(uint32  /*id*/, uint32  /*value*/)
+        void SetData(uint32  /*id*/, uint32  /*value*/) override
         {
             me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 100.0f, false, true);
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (!me->GetVehicle())
             {
@@ -2053,7 +2053,7 @@ class npc_ulduar_magnetic_core : public CreatureScript
 public:
     npc_ulduar_magnetic_core() : CreatureScript("npc_ulduar_magnetic_core") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_magnetic_coreAI (pCreature);
     }
@@ -2079,12 +2079,12 @@ public:
         InstanceScript* pInstance;
         uint16 despawnTimer;
 
-        void SetData(uint32  /*id*/, uint32  /*value*/)
+        void SetData(uint32  /*id*/, uint32  /*value*/) override
         {
             despawnTimer = 20000;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (despawnTimer <= diff)
             {
@@ -2102,7 +2102,7 @@ class npc_ulduar_bot_summon_trigger : public CreatureScript
 public:
     npc_ulduar_bot_summon_trigger() : CreatureScript("npc_ulduar_bot_summon_trigger") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_bot_summon_triggerAI (pCreature);
     }
@@ -2114,13 +2114,13 @@ public:
         uint32 timer;
         uint8 option;
 
-        void Reset()
+        void Reset() override
         {
             timer = 8000;
             option = 0;
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch( param )
             {
@@ -2139,7 +2139,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( timer <= diff )
             {
@@ -2182,13 +2182,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_rapid_burst_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_mimiron_rapid_burst_AuraScript();
     }
@@ -2206,7 +2206,7 @@ public:
         uint32 lastMSTime;
         float lastOrientation;
 
-        bool Load()
+        bool Load() override
         {
             lastMSTime = World::GetGameTimeMS();
             lastOrientation = -1.0f;
@@ -2235,13 +2235,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_p3wx2_laser_barrage_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_mimiron_p3wx2_laser_barrage_AuraScript();
     }
@@ -2278,7 +2278,7 @@ class npc_ulduar_flames_initial : public CreatureScript
 public:
     npc_ulduar_flames_initial() : CreatureScript("npc_ulduar_flames_initial") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_flames_initialAI (pCreature);
     }
@@ -2301,7 +2301,7 @@ public:
         EventMap events;
         uint32 CreateTime;
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == 1337)
                 RemoveAll();
@@ -2333,7 +2333,7 @@ public:
             me->DespawnOrUnsummon();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (InstanceScript* pInstance = me->GetInstanceScript())
                 if (pInstance->GetData(TYPE_MIMIRON) != IN_PROGRESS)
@@ -2398,7 +2398,7 @@ class npc_ulduar_flames_spread : public CreatureScript
 public:
     npc_ulduar_flames_spread() : CreatureScript("npc_ulduar_flames_spread") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_flames_spreadAI (pCreature);
     }
@@ -2407,7 +2407,7 @@ public:
     {
         npc_ulduar_flames_spreadAI(Creature* pCreature) : NullCreatureAI(pCreature) {}
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             switch( spell->Id )
             {
@@ -2440,7 +2440,7 @@ class npc_ulduar_emergency_fire_bot : public CreatureScript
 public:
     npc_ulduar_emergency_fire_bot() : CreatureScript("npc_ulduar_emergency_fire_bot") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_emergency_fire_botAI (pCreature);
     }
@@ -2455,16 +2455,16 @@ public:
 
         EventMap events;
 
-        void MoveInLineOfSight(Unit*) {}
-        void AttackStart(Unit*) {}
+        void MoveInLineOfSight(Unit*) override {}
+        void AttackStart(Unit*) override {}
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == 1)
                 events.ScheduleEvent(EVENT_EMERGENCY_BOT_ATTACK, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch( events.ExecuteEvent() )
@@ -2497,7 +2497,7 @@ class npc_ulduar_rocket_strike_trigger : public CreatureScript
 public:
     npc_ulduar_rocket_strike_trigger() : CreatureScript("npc_ulduar_rocket_strike_trigger") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_ulduar_rocket_strike_triggerAI (pCreature);
     }
@@ -2506,7 +2506,7 @@ public:
     {
         npc_ulduar_rocket_strike_triggerAI(Creature* pCreature) : NullCreatureAI(pCreature) {}
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (!target || !spell)
                 return;
@@ -2528,7 +2528,7 @@ class achievement_mimiron_firefighter : public AchievementCriteriaScript
 public:
     achievement_mimiron_firefighter() : AchievementCriteriaScript("achievement_mimiron_firefighter") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target) override
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
     }
@@ -2539,7 +2539,7 @@ class achievement_mimiron_set_up_us_the_bomb_11 : public AchievementCriteriaScri
 public:
     achievement_mimiron_set_up_us_the_bomb_11() : AchievementCriteriaScript("achievement_mimiron_set_up_us_the_bomb_11") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target) override
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(11);
     }
@@ -2550,7 +2550,7 @@ class achievement_mimiron_set_up_us_the_bomb_12 : public AchievementCriteriaScri
 public:
     achievement_mimiron_set_up_us_the_bomb_12() : AchievementCriteriaScript("achievement_mimiron_set_up_us_the_bomb_12") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target) override
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(12);
     }
@@ -2561,7 +2561,7 @@ class achievement_mimiron_set_up_us_the_bomb_13 : public AchievementCriteriaScri
 public:
     achievement_mimiron_set_up_us_the_bomb_13() : AchievementCriteriaScript("achievement_mimiron_set_up_us_the_bomb_13") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target)
+    bool OnCheck(Player*  /*player*/, Unit* target) override
     {
         return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(13);
     }

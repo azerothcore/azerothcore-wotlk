@@ -50,7 +50,7 @@ class boss_xevozz : public CreatureScript
 public:
     boss_xevozz() : CreatureScript("boss_xevozz") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_xevozzAI (pCreature);
     }
@@ -66,13 +66,13 @@ public:
         EventMap events;
         SummonList spheres;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             spheres.DespawnAll();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
@@ -81,7 +81,7 @@ public:
             events.RescheduleEvent(EVENT_SUMMON_SPHERES, 10000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -147,7 +147,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustSummoned(Creature* pSummoned)
+        void JustSummoned(Creature* pSummoned) override
         {
             if (pSummoned)
             {
@@ -159,7 +159,7 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature* pSummoned)
+        void SummonedCreatureDespawn(Creature* pSummoned) override
         {
             if (pSummoned)
             {
@@ -169,7 +169,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             spheres.DespawnAll();
@@ -177,7 +177,7 @@ public:
                 pInstance->SetData(DATA_BOSS_DIED, 0);
         }
 
-        void KilledUnit(Unit* pVictim)
+        void KilledUnit(Unit* pVictim) override
         {
             if (pVictim && pVictim->GetGUID() == me->GetGUID())
                 return;
@@ -185,9 +185,9 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             events.Reset();

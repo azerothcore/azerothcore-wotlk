@@ -48,7 +48,7 @@ class npc_frost_tomb : public CreatureScript
 public:
     npc_frost_tomb() : CreatureScript("npc_frost_tomb") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_frost_tombAI(pCreature);
     }
@@ -72,7 +72,7 @@ public:
         }
         uint64 PrisonerGUID;
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (killer->GetGUID() != me->GetGUID())
                 if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -84,7 +84,7 @@ public:
             me->DespawnOrUnsummon(5000);
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (PrisonerGUID)
             {
@@ -106,7 +106,7 @@ class boss_keleseth : public CreatureScript
 public:
     boss_keleseth() : CreatureScript("boss_keleseth") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_kelesethAI (pCreature);
     }
@@ -121,14 +121,14 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             if (pInstance)
                 pInstance->SetData(DATA_KELESETH, NOT_STARTED);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
         /*void KilledUnit(Unit * victim)
         {
@@ -137,14 +137,14 @@ public:
             DoScriptText(SAY_KILL, me);
         }*/
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_KELESETH, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_SHADOWBOLT, 0);
@@ -158,7 +158,7 @@ public:
                 pInstance->SetData(DATA_KELESETH, IN_PROGRESS);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if( !who )
                 return;
@@ -166,7 +166,7 @@ public:
             UnitAI::AttackStartCaster(who, 12.0f);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -235,7 +235,7 @@ class npc_vrykul_skeleton : public CreatureScript
 public:
     npc_vrykul_skeleton() : CreatureScript("npc_vrykul_skeleton") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_vrykul_skeletonAI (pCreature);
     }
@@ -250,7 +250,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_DECREPIFY, urand(10000, 20000));
@@ -258,7 +258,7 @@ public:
                 events.RescheduleEvent(EVENT_SPELL_BONE_ARMOR, urand(25000, 120000));
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth())
             {
@@ -278,7 +278,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( pInstance && pInstance->GetData(DATA_KELESETH) != IN_PROGRESS )
             {
@@ -349,13 +349,13 @@ public:
                     target->CastSpell((Unit*)NULL, SPELL_FROST_TOMB_SUMMON, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_frost_tombAuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_frost_tombAuraScript();
     }

@@ -45,14 +45,14 @@ public:
         {
         }
 
-        void EnterCombat(Unit* victim)
+        void EnterCombat(Unit* victim) override
         {
             BossAI::EnterCombat(victim);
             events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 25000);
             events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 15000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -83,7 +83,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_garrAI(creature);
     }
@@ -100,12 +100,12 @@ public:
 
         uint32 immolateTimer;
 
-        void Reset()
+        void Reset() override
         {
             immolateTimer = 4000;                              //These times are probably wrong
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             uint32 const health10pct = me->CountPctFromMaxHealth(10);
             uint32 health = me->GetHealth();
@@ -117,7 +117,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -135,7 +135,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_fireswornAI(creature);
     }

@@ -101,7 +101,7 @@ public:
             _timer = 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (_timer)
             {
@@ -118,7 +118,7 @@ public:
         uint32 _timer;
     };
 
-    GameObjectAI* GetAI(GameObject* go) const
+    GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_witherbark_totem_bundleAI(go);
     }
@@ -287,19 +287,19 @@ public:
                 go->SummonCreature(NPC_WINTERFIN_TADPOLE, go->GetPositionX() + cos(2 * M_PI * i / 3.0f) * 0.60f, go->GetPositionY() + sin(2 * M_PI * i / 3.0f) * 0.60f, go->GetPositionZ() + 0.5f, go->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
         }
 
-        void OnStateChanged(uint32 state, Unit*  /*unit*/)
+        void OnStateChanged(uint32 state, Unit*  /*unit*/) override
         {
             if (requireSummon == 1 && state == GO_READY)
                 requireSummon = 2;
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (go->isSpawned() && requireSummon == 2)
                 SummonTadpoles();
         }
 
-        bool GossipHello(Player* player, bool  /*reportUse*/)
+        bool GossipHello(Player* player, bool  /*reportUse*/) override
         {
             if (requireSummon)
                 return false;
@@ -320,7 +320,7 @@ public:
         }
     };
 
-    GameObjectAI* GetAI(GameObject* go) const
+    GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_tadpole_cageAI(go);
     }
@@ -342,7 +342,7 @@ public:
             timer { 0 }
         { }
 
-        void UpdateAI(uint32  diff)
+        void UpdateAI(uint32  diff) override
         {
             timer += diff;
             if (timer > 3000)
@@ -367,7 +367,7 @@ public:
         uint32 timer;
     };
 
-    GameObjectAI* GetAI(GameObject* go) const
+    GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_flamesAI(go);
     }
@@ -389,7 +389,7 @@ public:
             timer { 0 }
         { }
 
-        void UpdateAI(uint32  diff)
+        void UpdateAI(uint32  diff) override
         {
             timer += diff;
             if (timer > 3000)
@@ -414,7 +414,7 @@ public:
         uint32 timer;
     };
 
-    GameObjectAI* GetAI(GameObject* go) const
+    GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_heatAI(go);
     }
@@ -1395,7 +1395,7 @@ public:
         /// _and_ CMSG_GAMEOBJECT_REPORT_USE, this GossipHello hook is called
         /// twice. The script's handling is fine as it won't remove two charges
         /// on the well. We have to find how to segregate REPORT_USE and USE.
-        bool GossipHello(Player* player, bool reportUse)
+        bool GossipHello(Player* player, bool reportUse) override
         {
             if (reportUse)
                 return false;
@@ -1437,7 +1437,7 @@ public:
         uint32 _stoneId;
     };
 
-    GameObjectAI* GetAI(GameObject* go) const
+    GameObjectAI* GetAI(GameObject* go) const override
     {
         return new go_soulwellAI(go);
     }

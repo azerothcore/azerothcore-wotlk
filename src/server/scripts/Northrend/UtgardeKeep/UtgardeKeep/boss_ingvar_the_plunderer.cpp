@@ -91,7 +91,7 @@ class boss_ingvar_the_plunderer : public CreatureScript
 public:
     boss_ingvar_the_plunderer() : CreatureScript("boss_ingvar_the_plunderer") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_ingvar_the_plundererAI(pCreature);
     }
@@ -109,7 +109,7 @@ public:
         uint64 ValkyrGUID;
         uint64 ThrowGUID;
 
-        void Reset()
+        void Reset() override
         {
             ValkyrGUID = 0;
             ThrowGUID = 0;
@@ -126,7 +126,7 @@ public:
                 pInstance->SetData(DATA_INGVAR, NOT_STARTED);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (me->GetDisplayId() == DISPLAYID_DEFAULT && damage >= me->GetHealth())
             {
@@ -146,7 +146,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.Reset();
             // schedule Phase 1 abilities
@@ -162,7 +162,7 @@ public:
                 pInstance->SetData(DATA_INGVAR, IN_PROGRESS);
         }
 
-        void JustSummoned(Creature* s)
+        void JustSummoned(Creature* s) override
         {
             summons.Summon(s);
             if (s->GetEntry() == NPC_ANNHYLDE)
@@ -182,7 +182,7 @@ public:
             }
         }
 
-        void KilledUnit(Unit* /*who*/)
+        void KilledUnit(Unit* /*who*/) override
         {
             if (me->GetDisplayId() == DISPLAYID_DEFAULT)
                 Talk(YELL_KILL_2);
@@ -208,7 +208,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             events.Reset();
             summons.DespawnAll();
@@ -220,14 +220,14 @@ public:
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->DisableRotate(false);
             ScriptedAI::EnterEvadeMode();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

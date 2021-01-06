@@ -44,7 +44,7 @@ class boss_selin_fireheart : public CreatureScript
 public:
     boss_selin_fireheart() : CreatureScript("boss_selin_fireheart") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_selin_fireheartAI>(creature);
     };
@@ -61,7 +61,7 @@ public:
         SummonList summons;
         uint64 CrystalGUID;
 
-        bool CanAIAttack(const Unit* who) const
+        bool CanAIAttack(const Unit* who) const override
         {
             return who->GetPositionX() > 216.0f;
         }
@@ -75,20 +75,20 @@ public:
             me->SummonCreature(NPC_FEL_CRYSTAL, 263.149f, 0.309245f, 1.32057f, 3.15905f, TEMPSUMMON_CORPSE_DESPAWN);
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summon->SetReactState(REACT_PASSIVE);
             summons.Summon(summon);
         }
 
-        void SummonedCreatureDies(Creature* summon, Unit*)
+        void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             summons.Despawn(summon);
             if (events.GetPhaseMask() & 0x01)
                 events.ScheduleEvent(EVENT_RESTORE_COMBAT, 0);
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -98,7 +98,7 @@ public:
             me->SetPower(POWER_MANA, 0);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             instance->SetData(DATA_SELIN_EVENT, IN_PROGRESS);
@@ -111,13 +111,13 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 7500, 1);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
 
@@ -147,7 +147,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == 2)
             {
@@ -165,7 +165,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

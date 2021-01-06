@@ -56,7 +56,7 @@ public:
         boss_grand_warlock_nethekurseAI(Creature* creature) : BossAI(creature, DATA_NETHEKURSE) { }
 
         EventMap events2;
-        void Reset()
+        void Reset() override
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             EventStage = EVENT_STAGE_NONE;
@@ -75,13 +75,13 @@ public:
             me->SummonCreature(NPC_FEL_ORC_CONVERT, 189.616f, 259.866f, -13.1966f, 1.95748f);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DIE);
             _JustDied();
         }
 
-        void SetData(uint32 data, uint32 value)
+        void SetData(uint32 data, uint32 value) override
         {
             if (data != SETDATA_DATA)
                 return;
@@ -108,7 +108,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (EventStage < EVENT_STAGE_MAIN)
                 return;
@@ -119,14 +119,14 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
             summon->SetReactState(REACT_DEFENSIVE);
             summon->SetRegeneratingHealth(false);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->IsWithinDistInMap(who, 30.0f))
             {
@@ -155,16 +155,16 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_SLAY);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events2.Update(diff);
             uint32 eventId = events2.ExecuteEvent();
@@ -238,7 +238,7 @@ public:
         uint32 EventStage;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_grand_warlock_nethekurseAI>(creature);
     }
@@ -258,13 +258,13 @@ public:
             amount = 1000;
         }
 
-        void Register()
+        void Register() override
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_tsh_shadow_sear_AuraScript::CalculateDamageAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_tsh_shadow_sear_AuraScript();
     }
@@ -295,13 +295,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_tsh_shadow_bolt_SpellScript::SelectRandomPlayer, EFFECT_0, TARGET_UNIT_TARGET_ENEMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_tsh_shadow_bolt_SpellScript();
     }

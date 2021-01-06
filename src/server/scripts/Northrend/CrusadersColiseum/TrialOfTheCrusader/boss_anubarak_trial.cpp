@@ -58,7 +58,7 @@ class HideNpcEvent : public BasicEvent
 public:
     HideNpcEvent(Creature& owner) : _owner(owner) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         _owner.SetVisible(false);
         return true;
@@ -135,7 +135,7 @@ class boss_anubarak_trial : public CreatureScript
 public:
     boss_anubarak_trial() : CreatureScript("boss_anubarak_trial") {}
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_anubarak_trialAI(pCreature);
     };
@@ -160,7 +160,7 @@ public:
         uint64 SphereGUID[6];
         uint64 BurrowGUID[4];
 
-        void Reset()
+        void Reset() override
         {
             me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -178,7 +178,7 @@ public:
             }
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch( param )
             {
@@ -188,7 +188,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             me->setActive(true);
             events.Reset();
@@ -223,12 +223,12 @@ public:
                 pInstance->SetData(TYPE_ANUBARAK, IN_PROGRESS);
         }
 
-        void JustReachedHome()
+        void JustReachedHome() override
         {
             me->setActive(false);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -353,7 +353,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* summon) override
         {
             if( !summon )
                 return;
@@ -361,7 +361,7 @@ public:
             summons.Summon(summon);
         }
 
-        void JustDied(Unit* /*pKiller*/)
+        void JustDied(Unit* /*pKiller*/) override
         {
             events.Reset();
             summons.DespawnAll();
@@ -387,13 +387,13 @@ public:
                     }
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if( who->GetTypeId() == TYPEID_PLAYER )
                 Talk(SAY_KILL_PLAYER);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -402,7 +402,7 @@ public:
                 pInstance->SetData(TYPE_FAILED, 1);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER || me->GetExactDistSq(who) > 6400.0f) // 80yd*80yd
                 return;
@@ -420,7 +420,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             return target->GetEntry() != NPC_FROST_SPHERE;
         }
@@ -432,7 +432,7 @@ class npc_swarm_scarab : public CreatureScript
 public:
     npc_swarm_scarab() : CreatureScript("npc_swarm_scarab") {}
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_swarm_scarabAI(pCreature);
     };
@@ -444,13 +444,13 @@ public:
         int32 determinationTimer;
         int32 despawnTimer;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if( param == 1 )
                 despawnTimer = 2000;
         }
 
-        void Reset()
+        void Reset() override
         {
             me->SetCorpseDelay(10 * 60);
             me->CastSpell(me, SPELL_ACID_MANDIBLE, true);
@@ -469,12 +469,12 @@ public:
                 }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             DoZoneInCombat();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( despawnTimer )
             {
@@ -503,13 +503,13 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             me->CastSpell(me, RAID_MODE(SPELL_TRAITOR_KING_10, SPELL_TRAITOR_KING_25, SPELL_TRAITOR_KING_10, SPELL_TRAITOR_KING_25), true);
             me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             return target->GetEntry() != NPC_FROST_SPHERE && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
@@ -521,7 +521,7 @@ class npc_frost_sphere : public CreatureScript
 public:
     npc_frost_sphere() : CreatureScript("npc_frost_sphere") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_frost_sphereAI(pCreature);
     };
@@ -558,7 +558,7 @@ public:
 
         uint32 permafrostTimer;
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if( me->GetHealth() <= damage )
             {
@@ -573,7 +573,7 @@ public:
             }
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
         {
             if( spell->Id == SPELL_SPIKE_FAIL )
             {
@@ -582,7 +582,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( permafrostTimer )
             {
@@ -610,7 +610,7 @@ class npc_nerubian_burrower : public CreatureScript
 public:
     npc_nerubian_burrower() : CreatureScript("npc_nerubian_burrower") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_nerubian_burrowerAI(pCreature);
     };
@@ -628,7 +628,7 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             me->SetCorpseDelay(10 * 60);
             me->CastSpell(me, SPELL_EXPOSE_WEAKNESS, true);
@@ -644,7 +644,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if( !target || !spell )
                 return;
@@ -663,7 +663,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -712,12 +712,12 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
         }
 
-        bool CanAIAttack(const Unit* target) const
+        bool CanAIAttack(const Unit* target) const override
         {
             return target->GetEntry() != NPC_FROST_SPHERE;
         }
@@ -729,7 +729,7 @@ class npc_anubarak_spike : public CreatureScript
 public:
     npc_anubarak_spike() : CreatureScript("npc_anubarak_spike") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_anubarak_spikeAI(pCreature);
     };
@@ -745,7 +745,7 @@ public:
         EventMap events;
         uint64 TargetGUID;
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if( param == -1 )
             {
@@ -788,12 +788,12 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             SelectNewTarget(false);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( TargetGUID )
             {
@@ -826,7 +826,7 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
         }
@@ -859,13 +859,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_pursuing_spikesAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_pursuing_spikesAuraScript();
     }
@@ -887,7 +887,7 @@ public:
     {
         PrepareAuraScript(spell_gen_leeching_swarm_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellEntry*/)
+        bool Validate(SpellInfo const* /*spellEntry*/) override
         {
             if (!sSpellMgr->GetSpellInfo(SPELL_LEECHING_SWARM_DMG))
                 return false;
@@ -909,13 +909,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_leeching_swarm_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_gen_leeching_swarm_AuraScript();
     }
@@ -941,13 +941,13 @@ public:
         }
 
 
-        void Register()
+        void Register() override
         {
             AfterHit += SpellHitFn(spell_gen_leeching_swarm_dmg_SpellScript::HandleAfterHit);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_gen_leeching_swarm_dmg_SpellScript();
     }
