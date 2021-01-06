@@ -54,9 +54,11 @@ class PathGenerator
         // return: true if new path was calculated, false otherwise (no change needed)
         bool CalculatePath(float destX, float destY, float destZ, bool forceDest = false);
         bool CalculatePath(float x, float y, float z, float destX, float destY, float destZ, bool forceDest);
-        bool IsInvalidDestinationZ(Unit const* target) const;
-        bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight) const;
-        bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ) const;
+        [[nodiscard]] bool IsInvalidDestinationZ(Unit const* target) const;
+        [[nodiscard]] bool IsWalkableClimb(float const* v1, float const* v2) const;
+        [[nodiscard]] bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight) const;
+        [[nodiscard]] bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ) const;
+        [[nodiscard]] float GetRequiredHeightToClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight) const;
 
         // option setters - use optional
 

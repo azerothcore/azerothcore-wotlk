@@ -359,13 +359,9 @@ void MotionMaster::MoveCircleTarget(Unit* target)
         return;
     }
 
-    float x = point->m_positionX;
-    float y = point->m_positionY;
-    float z = point->m_positionZ;
-
     Movement::MoveSplineInit init(_owner);
     init.SetSmooth();
-    init.MoveTo(x, y, z, false);
+    init.MoveTo(point->m_positionX, point->m_positionY, point->m_positionZ, false);
     init.SetWalk(true);
     init.SetFacing(target);
     init.Launch();

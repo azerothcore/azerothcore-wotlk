@@ -3393,27 +3393,34 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
     }
 }
 
-bool Map::CanReachPositionAndGetCoords(WorldObject* source, PathGenerator path, bool checkCollision) const
+bool Map::CanReachPositionAndGetCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool checkCollision) const
 {
-    G3D::Vector3 prevPath = path.GetStartPosition();
-    for (auto & vector : path.GetPath())
+    G3D::Vector3 prevPath = path->GetStartPosition();
+    for (auto & vector : path->GetPath())
     {
         float x = vector.x;
         float y = vector.y;
         float z = vector.z;
 
-        if (!CanReachPositionAndGetCoords(source, prevPath.x, prevPath.y, prevPath.z, x, y, z, checkCollision, false, false))
+        if (!CanReachPositionAndGetCoords(source, prevPath.x, prevPath.y, prevPath.z, x, y, z, checkCollision, true, false))
         {
+            destX = x;
+            destY = y;
+            destZ = z;
             return false;
         }
 
         prevPath = vector;
     }
 
+    destX = path->GetEndPosition().x;
+    destY = path->GetEndPosition().y;
+    destZ = path->GetEndPosition().z;
+
     return true;
 }
 
-bool Map::CanReachPositionAndGetCoords(WorldObject* source, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes, bool findPath) const
+bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes, bool findPath) const
 {
     return CanReachPositionAndGetCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, checkCollision, checkSlopes, findPath);
 }
@@ -3426,18 +3433,18 @@ bool Map::CanReachPositionAndGetCoords(WorldObject* source, float &destX, float 
  *   \return true if the destination is valid, false otherwise
  *
  **/
-bool Map::CanReachPositionAndGetCoords(WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes, bool findPath) const
+bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes, bool findPath) const
 {
     if (findPath) {
-        PathGenerator path(source);
-        path.SetSlopeCheck(checkSlopes);
-        bool result = path.CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
-        if (!result || !CanReachPositionAndGetCoords(source, path, checkCollision))
+        PathGenerator *path = new PathGenerator(source);
+        path->SetSlopeCheck(true);
+        bool result = path->CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
+        if (!result || !CanReachPositionAndGetCoords(source, path, destX, destY, destZ, checkCollision))
         {
             return false;
         }
 
-        G3D::Vector3 endPos = path.GetEndPosition();
+        G3D::Vector3 endPos = path->GetEndPosition();
         destX = endPos.x;
         destY = endPos.y;
         destZ = endPos.z;

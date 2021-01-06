@@ -192,6 +192,16 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
         }
 
         bool result = i_path->CalculatePath(x, y, z, forceDest);
+        const Unit *unit = owner->ToUnit();
+        if (result && unit && !unit->GetMap()->CanReachPositionAndGetCoords(unit, i_path, x, y, z, false)) {
+            if (!i_offset) {
+                i_target->GetContactPoint(owner, x, y, z);
+            }
+
+            // recalculate
+            result = i_path->CalculatePath(x, y, z, forceDest);
+        }
+
         if (result)
         {
             float maxDist = MELEE_RANGE + owner->GetMeleeReach() + i_target->GetMeleeReach();
@@ -228,6 +238,12 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
             }
             // then use normal MoveTo - if we have to
         }
+    }
+
+    const Unit *unit = owner->ToUnit();
+    if (unit && !unit->GetMap()->CanReachPositionAndGetCoords(unit, x, y, z, true, true, false)) {
+        if (!forceDest)
+            return;
     }
 
     owner->AddUnitState(UNIT_STATE_CHASE);

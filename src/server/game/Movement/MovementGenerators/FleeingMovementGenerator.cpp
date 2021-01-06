@@ -143,7 +143,7 @@ bool FleeingMovementGenerator<T>::_getPoint(T* owner, float& x, float& y, float&
         temp_y = y + distance * sin(angle);
         float temp_z = z;
 
-        if (!_map->CanReachPositionAndGetCoords(owner, temp_x, temp_y, temp_z))
+        if (!_map->CanReachPositionAndGetCoords(owner, temp_x, temp_y, temp_z, true, true, false))
         {
             break;
         }

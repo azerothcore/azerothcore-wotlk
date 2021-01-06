@@ -494,6 +494,14 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         }
     }
 
+    if (!_polyLength)
+    {
+        sLog->outError("PathGenerator::BuildPolyPath: %lu Path Build failed: 0 length path", _source->GetGUID());
+        BuildShortcut();
+        _type = PATHFIND_NOPATH;
+        return;
+    }
+
     // by now we know what type of path we can get
     if (_pathPolyRefs[_polyLength - 1] == endPoly && !(_type & PATHFIND_INCOMPLETE))
     {
@@ -777,6 +785,7 @@ bool PathGenerator::GetSteerTarget(float const* startPos, float const* endPos,
         if ((steerPathFlags[ns] & DT_STRAIGHTPATH_OFFMESH_CONNECTION) ||
             !InRangeYZX(&steerPath[ns*VERTEX_SIZE], startPos, minTargetDist, 1000.0f))
             break;
+
         ns++;
     }
     // Failed to find good point to steer to.
@@ -839,9 +848,6 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
         if (!GetSteerTarget(iterPos, targetPos, SMOOTH_PATH_SLOP, polys, npolys, steerPos, steerPosFlag, steerPosRef))
             break;
 
-        if (_slopeCheck && !IsWalkableClimb(iterPos[0], iterPos[1], iterPos[2], targetPos[0], targetPos[1], targetPos[2]))
-            break;
-
         bool endOfPath = (steerPosFlag & DT_STRAIGHTPATH_END) != 0;
         bool offMeshConnection = (steerPosFlag & DT_STRAIGHTPATH_OFFMESH_CONNECTION) != 0;
 
@@ -874,6 +880,11 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
             sLog->outDebug(LOG_FILTER_MAPS, "PathGenerator::FindSmoothPath: Cannot find height at position X: %f Y: %f Z: %f for %lu", result[2], result[0], result[1], _source->GetGUID());
         result[1] += 0.5f;
         dtVcopy(iterPos, result);
+
+        if (_slopeCheck && !IsWalkableClimb(iterPos, steerPos))
+        {
+            return DT_FAILURE;
+        }
 
         // Handle end of path and off-mesh links when close enough.
         if (endOfPath && InRangeYZX(iterPos, steerPos, SMOOTH_PATH_SLOP, 1.0f))
@@ -936,24 +947,56 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
     return nsmoothPath < MAX_POINT_PATH_LENGTH ? DT_SUCCESS : DT_FAILURE;
 }
 
+bool PathGenerator::IsWalkableClimb(float const* v1, float const* v2) const
+{
+    return IsWalkableClimb(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+}
+
 bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ) const
 {
     return IsWalkableClimb(x, y, z, destX, destY, destZ, _source->GetCollisionHeight());
 }
 
+/**
+ * @brief Check if a slope can be climbed based on source height
+ * This method is meant for short distances or linear paths
+ *
+ * @param x start x coord
+ * @param y start y coord
+ * @param z start z coord
+ * @param destX destination x coord
+ * @param destY destination y coord
+ * @param destZ destination z coord
+ * @param sourceHeight height of the source
+ * @return bool check if you can climb the path
+ */
 bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight) const
 {
     float diffHeight = abs(destZ - z);
+    float reqHeight = GetRequiredHeightToClimb(x, y, z, destX, destY, destZ, sourceHeight);
+    // check walkable slopes, based on unit height
+    return diffHeight <= reqHeight;
+}
+
+/**
+ * @brief Return the height of a slope that can be climbed based on source height
+ * This method is meant for short distances or linear paths
+ *
+ * @param x start x coord
+ * @param y start y coord
+ * @param z start z coord
+ * @param destX destination x coord
+ * @param destY destination y coord
+ * @param destZ destination z coord
+ * @param sourceHeight height of the source
+ * @return float the maximum height that a source can climb based on slope angle
+ */
+float PathGenerator::GetRequiredHeightToClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight) const
+{
     float slopeAngle = getSlopeAngleAbs(x, y, z, destX, destY, destZ);
     float slopeAngleDegree = (slopeAngle * 180.0f / M_PI);
-    float minHeight = sourceHeight - (sourceHeight * slopeAngleDegree / 100);
-    // check walkable slopes, based on unit height
-    if (slopeAngle && (slopeAngle > M_PI/2 || diffHeight > minHeight))
-    {
-        return false;
-    }
-
-    return true;
+    float climbableHeight = sourceHeight - (sourceHeight * (slopeAngleDegree / 100));
+    return climbableHeight;
 }
 
 bool PathGenerator::InRangeYZX(float const* v1, float const* v2, float r, float h) const

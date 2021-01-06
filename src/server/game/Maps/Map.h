@@ -475,9 +475,9 @@ public:
     float GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = nullptr, bool swim = false, float maxSearchDist = 50.0f) const;
     [[nodiscard]] float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
     [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const;
-    bool CanReachPositionAndGetCoords(WorldObject* ByteBufferSourceException, PathGenerator path, bool checkCollision = true) const;
-    bool CanReachPositionAndGetCoords(WorldObject* ByteBufferSourceException, float &destX, float &destY, float &destZ, bool checkCollision = true, bool checkSlopes = true, bool findPath = true) const;
-    bool CanReachPositionAndGetCoords(WorldObject* ByteBufferSourceException, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool checkCollision = true, bool checkSlopes = true, bool findPath = true) const;
+    bool CanReachPositionAndGetCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool checkCollision = true) const;
+    bool CanReachPositionAndGetCoords(const WorldObject* source, float &destX, float &destY, float &destZ, bool checkCollision = true, bool checkSlopes = true, bool findPath = true) const;
+    bool CanReachPositionAndGetCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool checkCollision = true, bool checkSlopes = true, bool findPath = true) const;
     void Balance() { _dynamicTree.balance(); }
     void RemoveGameObjectModel(const GameObjectModel& model) { _dynamicTree.remove(model); }
     void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }
