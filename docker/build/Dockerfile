@@ -6,8 +6,10 @@ RUN apt update && apt install -y git cmake make gcc g++ clang libmysqlclient-dev
 
 # copy the sources from the host machine to the Docker container
 ADD .git /azerothcore/.git
+ADD acore.sh /azerothcore/acore.sh
+ADD apps /azerothcore/apps
 ADD deps /azerothcore/deps
-ADD conf/dist /azerothcore/conf/dist
+ADD conf /azerothcore/conf
 ADD src /azerothcore/src
 ADD modules /azerothcore/modules
 ADD CMakeLists.txt /azerothcore/CMakeLists.txt
@@ -15,16 +17,11 @@ ADD CMakeLists.txt /azerothcore/CMakeLists.txt
 ARG ENABLE_SCRIPTS=1
 ENV ENABLE_SCRIPTS=$ENABLE_SCRIPTS
 
-ENTRYPOINT  cd azerothcore/build && \
-            # run cmake
-            cmake ../ -DCMAKE_INSTALL_PREFIX=/azeroth-server -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DTOOLS=0 -DSCRIPTS=$ENABLE_SCRIPTS -DWITH_WARNINGS=1 -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror" && \
-            # calculate the optimal number of threads
-            MTHREADS=`grep -c ^processor /proc/cpuinfo`; MTHREADS=$(($MTHREADS + 2)) && \
-            # run compilation
-            make -j $MTHREADS && \
-            make install -j $MTHREADS && \
+WORKDIR /azerothcore/
+
+ENTRYPOINT  bash acore.sh compiler build && \
             # copy the binary files "authserver" and "worldserver" files back to the host
             # - the directories "/binworldserver" and "/binauthserver" are meant to be bound to the host directories
             # - see docker/build/README.md to view the bindings
-            cp -f /azeroth-server/bin/worldserver /binworldserver && \
-            cp -f /azeroth-server/bin/authserver /binauthserver
+            cp -f env/dist/bin/worldserver /binworldserver && \
+            cp -f env/dist/bin/authserver /binauthserver
