@@ -2284,7 +2284,6 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     }
 
     double ray = attackerSize > refUnit->GetObjectSize() ? attackerSize / 2.0f : refUnit->GetObjectSize() / 2.0f;
-    double distance2d = meleeReach;
     double angle = 0;
 
     // Equation of tangent point to get the ideal angle to
@@ -2321,8 +2320,6 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         double ortDist = sqrt(pow(exactDist,2.0f) - pow(distance/2.0f,2.0f));
 
         angle = 2.0f * atan(distance / (2.0f * ortDist));
-
-        distance2d = ortDist;
     }
 
     int8 direction =  (urand(0, 1) ? -1 : 1);
