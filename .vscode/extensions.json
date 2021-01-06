@@ -1,0 +1,6 @@
+{
+    "recommendations": [
+        "notskm.clang-tidy",
+        "xaver.clang-format"
+    ]
+}
