@@ -1910,7 +1910,15 @@ float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, fl
         LiquidData liquid_status;
 
         ZLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status);
-        return res ? liquid_status.level : ground_z;
+        switch (res)
+        {
+            case LIQUID_MAP_ABOVE_WATER:
+                return std::max<float>(liquid_status.level, ground_z);
+            case LIQUID_MAP_NO_WATER:
+                return ground_z;
+            default:
+                return liquid_status.level;
+        }
     }
 
     return VMAP_INVALID_HEIGHT_VALUE;
@@ -3393,7 +3401,7 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
     }
 }
 
-bool Map::CanReachPositionAndGetCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool checkCollision) const
+bool Map::CanReachPositionAndGetCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes) const
 {
     G3D::Vector3 prevPath = path->GetStartPosition();
     for (auto & vector : path->GetPath())
@@ -3402,7 +3410,7 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, PathGenerator 
         float y = vector.y;
         float z = vector.z;
 
-        if (!CanReachPositionAndGetCoords(source, prevPath.x, prevPath.y, prevPath.z, x, y, z, checkCollision, true, false))
+        if (!CanReachPositionAndGetCoords(source, prevPath.x, prevPath.y, prevPath.z, x, y, z, checkCollision, checkSlopes, false))
         {
             destX = x;
             destY = y;
@@ -3435,6 +3443,7 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float &destX, 
  **/
 bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes, bool findPath) const
 {
+    return true;
     if (findPath) {
         PathGenerator *path = new PathGenerator(source);
         path->SetSlopeCheck(true);
@@ -3469,10 +3478,10 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         bool notOnGround = path->GetPathType() & PATHFIND_NOT_USING_PATH;
 
         // Check for valid path types before we proceed
-        if (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END))
+        /*if (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END))
         {
             return false;
-        }
+        }*/
 
         // collision check
         bool collided = (!result || (path->GetPathType() & PATHFIND_SHORTCUT) || (path->GetPathType() & PATHFIND_FARFROMPOLY));
@@ -3527,7 +3536,8 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         source->UpdateAllowedPositionZ(destX, destY, destZ);
 
         // position has no ground under it (or is too far away)
-        if (Unit const* unit = source->ToUnit(); !unit->CanFly())
+        bool is_water_now = IsInWater(startX, startY, startZ);
+        if (Unit const* unit = source->ToUnit(); !unit->CanFly() && !(is_water_now && unit->CanSwim()))
         {
             if (destZ <= INVALID_HEIGHT)
             {
