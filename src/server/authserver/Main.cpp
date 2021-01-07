@@ -347,6 +347,14 @@ extern int main(int argc, char** argv)
             sLog->outDetail("Ping MySQL to keep connection alive");
             LoginDatabase.KeepAlive();
         }
+		
+#ifdef _WIN32
+        if (m_ServiceStatus == 0)
+            break;
+
+        while (m_ServiceStatus == 2)
+            Sleep(1000);
+#endif		
     }
 
     // Close the Database Pool and library
