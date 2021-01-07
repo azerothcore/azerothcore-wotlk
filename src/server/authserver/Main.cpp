@@ -240,11 +240,18 @@ extern int main(int argc, char** argv)
 
     // Initialize the signal handlers
     AuthServerSignalHandler SignalINT, SignalTERM;
+	
+#ifdef _WIN32
+    AuthServerSignalHandler SignalBREAK;
+#endif /* _WIN32 */
 
     // Register authservers's signal handlers
     ACE_Sig_Handler Handler;
     Handler.register_handler(SIGINT, &SignalINT);
     Handler.register_handler(SIGTERM, &SignalTERM);
+#ifdef _WIN32
+    Handler.register_handler(SIGBREAK, &SignalBREAK);
+#endif
 
 #if defined(_WIN32) || defined(__linux__)
 
