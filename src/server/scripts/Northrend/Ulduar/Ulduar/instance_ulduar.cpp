@@ -52,6 +52,7 @@ public:
         bool m_leviathanTowers[4];
         std::list<uint64> _leviathanVehicles;
         uint32 m_unbrokenAchievement;
+        uint32 m_mageBarrier;
 
         // Razorscale
         uint64 m_RazorscaleHarpoonFireStateGUID[4];
@@ -90,6 +91,7 @@ public:
         uint64 m_algalonUniverseGUID;
         uint64 m_algalonTrapdoorGUID;
         uint64 m_brannBronzebeardAlgGUID;
+        uint64 m_brannBronzebeardBaseCamp;
         uint32 m_algalonTimer;
 
         // Shared
@@ -128,6 +130,8 @@ public:
             m_leviathanDoorsGUID    = 0;
             _leviathanVehicles.clear();
             m_unbrokenAchievement   = 1;
+            m_mageBarrier           = 0;
+            m_brannBronzebeardBaseCamp = 0;
 
             // Razorscale
             memset(&m_RazorscaleHarpoonFireStateGUID, 0, sizeof(m_RazorscaleHarpoonFireStateGUID));
@@ -339,6 +343,9 @@ public:
                     break;
                 case NPC_BRANN_BRONZBEARD_ALG:
                     m_brannBronzebeardAlgGUID = creature->GetGUID();
+                    break;
+                case NPC_BRANN_BASE_CAMP:
+                    m_brannBronzebeardBaseCamp = creature->GetGUID();
                     break;
                 //! These creatures are summoned by something else than Algalon
                 //! but need to be controlled/despawned by him - so they need to be
@@ -617,6 +624,10 @@ public:
                     m_auiEncounter[type] |= 1 << data;
                     break;
 
+                case DATA_MAGE_BARRIER:
+                    m_mageBarrier = data;
+                    break;
+
                 case EVENT_TOWER_OF_LIFE_DESTROYED:
                 case EVENT_TOWER_OF_STORM_DESTROYED:
                 case EVENT_TOWER_OF_FROST_DESTROYED:
@@ -696,6 +707,18 @@ public:
                             if (data == 1 && t->GetGoState() == GO_STATE_READY && t->GetPathProgress() == 0)
                                 MimironTram->SetGoState(GO_STATE_ACTIVE);
                         }
+                    break;
+                case DATA_BRANN_MEMOTESAY:
+                    if (Creature* cr = instance->GetCreature(m_brannBronzebeardBaseCamp))
+                    {
+                        cr->MonsterTextEmote("Go to your vehicles!", 0, true);
+                    }
+                    break;
+                case DATA_BRANN_EASY_MODE:
+                    ProcessEvent(nullptr, EVENT_TOWER_OF_STORM_DESTROYED);
+                    ProcessEvent(nullptr, EVENT_TOWER_OF_FROST_DESTROYED);
+                    ProcessEvent(nullptr, EVENT_TOWER_OF_FLAMES_DESTROYED);
+                    ProcessEvent(nullptr, EVENT_TOWER_OF_LIFE_DESTROYED);
                     break;
             }
 
@@ -875,6 +898,9 @@ public:
                 case EVENT_TOWER_OF_FLAMES_DESTROYED:
                     return m_leviathanTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED];
 
+                case DATA_MAGE_BARRIER:
+                    return m_mageBarrier;
+
                 case DATA_UNBROKEN_ACHIEVEMENT:
                     return m_unbrokenAchievement;
 
@@ -935,7 +961,7 @@ public:
                        << m_auiEncounter[4] << ' ' << m_auiEncounter[5] << ' ' << m_auiEncounter[6] << ' ' << m_auiEncounter[7] << ' '
                        << m_auiEncounter[8] << ' ' << m_auiEncounter[9] << ' ' << m_auiEncounter[10] << ' ' << m_auiEncounter[11] << ' '
                        << m_auiEncounter[12] << ' ' << m_auiEncounter[13] << ' ' << m_auiEncounter[14] << ' ' << m_conspeedatoryAttempt << ' '
-                       << m_unbrokenAchievement << ' ' << m_algalonTimer << ' ' << C_of_Ulduar_MASK;
+                       << m_unbrokenAchievement << ' ' << m_algalonTimer << ' ' << C_of_Ulduar_MASK << ' ' << m_mageBarrier;
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
@@ -983,6 +1009,9 @@ public:
 
                 // achievement Conqueror/Champion of Ulduar
                 loadStream >> C_of_Ulduar_MASK;
+
+                //Base Camp - Mage Barrier status
+                loadStream >> m_mageBarrier;
             }
 
             OUT_LOAD_INST_DATA_COMPLETE;
