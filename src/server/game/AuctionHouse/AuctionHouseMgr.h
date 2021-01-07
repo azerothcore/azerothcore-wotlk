@@ -90,8 +90,8 @@ public:
     AuctionHouseObject() { next = AuctionsMap.begin(); }
     ~AuctionHouseObject()
     {
-        for (AuctionEntryMap::iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
-            delete itr->second;
+        for (auto & itr : AuctionsMap)
+            delete itr.second;
     }
 
     typedef std::map<uint32, AuctionEntry*> AuctionEntryMap;

@@ -8,11 +8,12 @@
 #define DBCFILE_H
 #include <cassert>
 #include <string>
+#include <utility>
 
 class DBCFile
 {
 public:
-    DBCFile(const std::string& filename);
+    DBCFile(std::string  filename);
     ~DBCFile();
 
     // Open database. It must be openened before it can be used.
@@ -22,10 +23,9 @@ public:
     class Exception
     {
     public:
-        Exception(const std::string& message): message(message)
+        Exception(std::string  message): message(std::move(message))
         { }
-        virtual ~Exception()
-        { }
+        virtual ~Exception() = default;
         const std::string& getMessage() {return message;}
     private:
         std::string message;

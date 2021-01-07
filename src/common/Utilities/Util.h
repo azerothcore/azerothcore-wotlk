@@ -239,32 +239,32 @@ inline bool isNumericOrSpace(wchar_t wchar)
 
 inline bool isBasicLatinString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isBasicLatinCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isBasicLatinCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
             return false;
     return true;
 }
 
 inline bool isExtendedLatinString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isExtendedLatinCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isExtendedLatinCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
             return false;
     return true;
 }
 
 inline bool isCyrillicString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isCyrillicCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isCyrillicCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
             return false;
     return true;
 }
 
 inline bool isEastAsianString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isEastAsianCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isEastAsianCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
             return false;
     return true;
 }
@@ -578,7 +578,7 @@ class EventMap
     typedef std::multimap<uint32, uint32> EventStore;
 
 public:
-    EventMap() : _time(0), _phase(0), _lastEvent(0) { }
+    EventMap()  { }
 
     /**
     * @name Reset
@@ -908,9 +908,9 @@ public:
     }
 
 private:
-    uint32 _time;
-    uint32 _phase;
-    uint32 _lastEvent;
+    uint32 _time{0};
+    uint32 _phase{0};
+    uint32 _lastEvent{0};
 
     EventStore _eventMap;
 };

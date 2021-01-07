@@ -35,9 +35,9 @@ bool wdt_MAIN::prepareLoadedData()
 
 WDT_file::WDT_file()
 {
-    mphd = 0;
-    main = 0;
-    wmo  = 0;
+    mphd = nullptr;
+    main = nullptr;
+    wmo  = nullptr;
 }
 
 WDT_file::~WDT_file()
@@ -47,9 +47,9 @@ WDT_file::~WDT_file()
 
 void WDT_file::free()
 {
-    mphd = 0;
-    main = 0;
-    wmo  = 0;
+    mphd = nullptr;
+    main = nullptr;
+    wmo  = nullptr;
     FileLoader::free();
 }
 

@@ -865,7 +865,7 @@ void ArenaTeam::UpdateArenaPointsHelper(std::map<uint32, uint32>& playerPoints)
     // Called after a match has ended and the stats are already modified
     // Helper function for arena point distribution (this way, when distributing, no actual calculation is required, just a few comparisons)
     // 10 played games per week is a minimum
-    if (Stats.WeekGames < 10)
+    if (Stats.WeekGames < sWorld->getIntConfig(CONFIG_ARENA_GAMES_REQUIRED))
         return;
 
     // To get points, a player has to participate in at least 30% of the matches

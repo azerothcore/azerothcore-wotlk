@@ -315,16 +315,13 @@ PlayerSocial* SocialMgr::LoadFromDB(PreparedQueryResult result, uint64 guid)
     if (!result)
         return social;
 
-    uint8 flags = 0;
-    std::string note = "";
-
     do
     {
         Field* fields = result->Fetch();
 
         auto friendGuid = fields[0].GetUInt32();
-        flags = fields[1].GetUInt8();
-        note = fields[2].GetString();
+        auto flags = fields[1].GetUInt8();
+        auto note = fields[2].GetString();
 
         social->m_playerSocialMap[friendGuid] = FriendInfo(flags, note);
     } while (result->NextRow());

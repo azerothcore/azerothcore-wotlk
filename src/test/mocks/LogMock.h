@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ */
 
 #ifndef AZEROTHCORE_LOGMOCK_H
 #define AZEROTHCORE_LOGMOCK_H
@@ -7,6 +10,9 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+
+LoginDatabaseWorkerPool LoginDatabase;
+
 class LogMock: public ILog {
 public:
     ~LogMock() override {}

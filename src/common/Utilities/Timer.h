@@ -53,7 +53,7 @@ struct IntervalTimer
 public:
 
     IntervalTimer()
-        : _interval(0), _current(0)
+         
     {
     }
 
@@ -97,8 +97,8 @@ public:
 
 private:
 
-    time_t _interval;
-    time_t _current;
+    time_t _interval{0};
+    time_t _current{0};
 };
 
 struct TimeTracker

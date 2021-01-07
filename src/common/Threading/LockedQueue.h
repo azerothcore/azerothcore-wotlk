@@ -7,11 +7,11 @@
 #ifndef LOCKEDQUEUE_H
 #define LOCKEDQUEUE_H
 
+#include "Debugging/Errors.h"
 #include <ace/Guard_T.h>
 #include <ace/Thread_Mutex.h>
+#include <cassert>
 #include <deque>
-#include <assert.h>
-#include "Debugging/Errors.h"
 
 namespace ACE_Based
 {
@@ -25,20 +25,18 @@ namespace ACE_Based
         StorageType _queue;
 
         //! Cancellation flag.
-        volatile bool _canceled;
+        volatile bool _canceled{false};
 
     public:
 
         //! Create a LockedQueue.
         LockedQueue()
-            : _canceled(false)
+             
         {
         }
 
         //! Destroy a LockedQueue.
-        virtual ~LockedQueue()
-        {
-        }
+        virtual ~LockedQueue() = default;
 
         //! Adds an item to the queue.
         void add(const T& item)

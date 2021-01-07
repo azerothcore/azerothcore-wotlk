@@ -25,6 +25,7 @@
 #include "MapRefManager.h"
 #include "DynamicTree.h"
 #include "GameObjectModel.h"
+#include "PathGenerator.h"
 #include "Log.h"
 #include "DataMap.h"
 #include <bitset>
@@ -50,6 +51,7 @@ class BattlegroundMap;
 class Transport;
 class StaticTransport;
 class MotionTransport;
+class PathGenerator;
 namespace acore
 {
     struct ObjectUpdater;
@@ -213,7 +215,7 @@ public:
     [[nodiscard]] float getMinHeight(float x, float y) const;
     [[nodiscard]] float getLiquidLevel(float x, float y) const;
     [[nodiscard]] uint8 getTerrainType(float x, float y) const;
-    ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = 0);
+    ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = nullptr);
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push, N), also any gcc version not support it at some platform
@@ -237,14 +239,13 @@ enum LevelRequirementVsMode
 
 struct ZoneDynamicInfo
 {
-    ZoneDynamicInfo() : MusicId(0), WeatherId(0), WeatherGrade(0.0f),
-        OverrideLightId(0), LightFadeInTime(0) { }
+    ZoneDynamicInfo()  { }
 
-    uint32 MusicId;
-    uint32 WeatherId;
-    float WeatherGrade;
-    uint32 OverrideLightId;
-    uint32 LightFadeInTime;
+    uint32 MusicId{0};
+    uint32 WeatherId{0};
+    float WeatherGrade{0.0f};
+    uint32 OverrideLightId{0};
+    uint32 LightFadeInTime{0};
 };
 
 #if defined(__GNUC__)
@@ -336,7 +337,7 @@ public:
     bool UnloadGrid(NGridType& ngrid);
     virtual void UnloadAll();
 
-    [[nodiscard]] uint32 GetId(void) const { return i_mapEntry->MapID; }
+    [[nodiscard]] uint32 GetId() const { return i_mapEntry->MapID; }
 
     static bool ExistMap(uint32 mapid, int gx, int gy);
     static bool ExistVMap(uint32 mapid, int gx, int gy);
@@ -357,7 +358,7 @@ public:
     [[nodiscard]] float GetMinHeight(float x, float y) const;
     Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr);
 
-    ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = 0) const;
+    ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = nullptr) const;
 
     uint32 GetAreaId(float x, float y, float z, bool* isOutdoors) const;
     bool GetAreaInfo(float x, float y, float z, uint32& mogpflags, int32& adtId, int32& rootId, int32& groupId) const;
@@ -369,7 +370,7 @@ public:
 
     [[nodiscard]] uint8 GetTerrainType(float x, float y) const;
     [[nodiscard]] float GetWaterLevel(float x, float y) const;
-    bool IsInWater(float x, float y, float z, LiquidData* data = 0) const;
+    bool IsInWater(float x, float y, float z, LiquidData* data = nullptr) const;
     [[nodiscard]] bool IsUnderWater(float x, float y, float z) const;
 
     void MoveAllCreaturesInMoveList();
@@ -451,7 +452,7 @@ public:
 
     void UpdateIteratorBack(Player* player);
 
-    TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = NULL, uint32 duration = 0, Unit* summoner = NULL, uint32 spellId = 0, uint32 vehId = 0);
+    TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, Unit* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0);
     GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
     Player* GetPlayer(uint64 guid);
@@ -471,9 +472,12 @@ public:
     BattlegroundMap* ToBattlegroundMap() { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap*>(this); else return nullptr;  }
     [[nodiscard]] const BattlegroundMap* ToBattlegroundMap() const { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap const*>(this); return nullptr; }
 
-    float GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = NULL, bool swim = false, float maxSearchDist = 50.0f) const;
+    float GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = nullptr, bool swim = false, float maxSearchDist = 50.0f) const;
     [[nodiscard]] float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
     [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const;
+    bool CanReachPositionAndGetCoords(Unit* who, PathGenerator path, bool checkCollision = true, float maxHeight = 3.0f, float maxSlopeAngle = M_PI/2, float maxDeviationAngle = M_PI*2) const;
+    bool CanReachPositionAndGetCoords(Unit* who, float &destX, float &destY, float &destZ, bool checkCollision = true, float maxHeight = 3.0f, float maxSlopeAngle = M_PI/2) const;
+    bool CanReachPositionAndGetCoords(Unit* who, float startX, float startY, float startZ, float startAngle, float &destX, float &destY, float &destZ, bool checkCollision = true, float maxHeight = 3.0f, float maxSlopeAngle = M_PI/2) const;
     void Balance() { _dynamicTree.balance(); }
     void RemoveGameObjectModel(const GameObjectModel& model) { _dynamicTree.remove(model); }
     void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }

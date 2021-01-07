@@ -7,6 +7,8 @@
 #ifndef _TRANSACTION_H
 #define _TRANSACTION_H
 
+#include <utility>
+
 #include "SQLOperation.h"
 
 //- Forward declare (don't include header to prevent circular includes)
@@ -22,7 +24,7 @@ class Transaction
     friend class DatabaseWorkerPool;
 
 public:
-    Transaction() : _cleanedUp(false) { }
+    Transaction()  { }
     ~Transaction() { Cleanup(); }
 
     void Append(PreparedStatement* statement);
@@ -36,7 +38,7 @@ protected:
     std::list<SQLElementData> m_queries;
 
 private:
-    bool _cleanedUp;
+    bool _cleanedUp{false};
 };
 
 typedef std::shared_ptr<Transaction> SQLTransaction;
@@ -48,8 +50,8 @@ class TransactionTask : public SQLOperation
     friend class DatabaseWorker;
 
 public:
-    TransactionTask(SQLTransaction trans) : m_trans(trans) { } ;
-    ~TransactionTask() override { };
+    TransactionTask(SQLTransaction trans) : m_trans(std::move(trans)) { } ;
+    ~TransactionTask() override = default;
 
 protected:
     bool Execute() override;

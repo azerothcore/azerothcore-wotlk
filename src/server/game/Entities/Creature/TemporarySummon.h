@@ -29,7 +29,7 @@ class TempSummon : public Creature
 {
 public:
     explicit TempSummon(SummonPropertiesEntry const* properties, uint64 owner, bool isWorldObject);
-    ~TempSummon() override {}
+    ~TempSummon() override = default;
     void Update(uint32 time) override;
     virtual void InitStats(uint32 lifetime);
     virtual void InitSummon();
