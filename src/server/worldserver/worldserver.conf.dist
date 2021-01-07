@@ -2394,7 +2394,7 @@ Rate.Drop.Item.ReferencedAmount = 1
 #        Default:     1 - (Rate.XP.Kill)
 #                     1 - (Rate.XP.Quest)
 #                     1 - (Rate.XP.Explore)
-#                     1	- (Rate.XP.Pet)
+#                     1 - (Rate.XP.Pet)
 
 Rate.XP.Kill    = 1
 Rate.XP.Quest   = 1
@@ -2519,7 +2519,7 @@ Rate.InstanceResetTime = 1
 #
 #    Rate.Pet.LevelXP
 #        Description: Modifies the amount of experience required to level up a pet.
-#					  The lower the rate the less experience is required.
+#       The lower the rate the less experience is required.
 #        Default:     0.05
 #
 Rate.Pet.LevelXP = 0.05
@@ -3419,10 +3419,10 @@ MonsterSight = 50.000000
 StrictChannelNames = 0
 
 #
-#	Instance.SharedNormalHeroicId
-#		Description: 	No description
-#		Default:		0 - Disable
-#						1 - Enable
+# Instance.SharedNormalHeroicId
+#  Description:  No description
+#  Default:  0 - Disable
+#      1 - Enable
 #
 
 Instance.SharedNormalHeroicId = 0
@@ -3438,17 +3438,17 @@ Instance.SharedNormalHeroicId = 0
 Instance.ResetTimeRelativeTimestamp = 1135814400
 
 #
-#	TeleportTimeoutNear
-#		Description: 	No description
-#		Default:		25
+# TeleportTimeoutNear
+#  Description:  No description
+#  Default:  25
 #
 
 TeleportTimeoutNear = 25
 
 #
-#	TeleportTimeoutFar
-#		Description: 	No description
-#		Default:		45
+# TeleportTimeoutFar
+#  Description:  No description
+#  Default:  45
 #
 
 TeleportTimeoutFar = 45

@@ -3792,7 +3792,7 @@ void SpellMgr::LoadDbcDataCorrections()
         20184,  // Judgement of Justice
         20185,  // Judgement of Light
         20186,  // Judgement of Wisdom
-        68055   // Judgements of the Just	
+        68055   // Judgements of the Just 
         }, [](SpellEntry* spellInfo)
     {
         // hack for seal of light and few spells, judgement consists of few single casts and each of them can proc
