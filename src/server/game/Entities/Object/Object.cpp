@@ -1448,78 +1448,65 @@ void WorldObject::GetRandomPoint(const Position& pos, float distance, float& ran
     UpdateGroundPositionZ(rand_x, rand_y, rand_z);            // update to LOS height if available
 }
 
-void WorldObject::UpdateGroundPositionZ(float x, float y, float& z) const
+void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
 {
-    float new_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z /*+ 2.0f*/, true); // pussywizard: +2.0f is added in all inner functions
+    float new_z = GetMapHeight(x, y, z);
     if (new_z > INVALID_HEIGHT)
-        z = new_z + 0.05f;                                   // just to be sure that we are not a few pixel under the surface
+        z = new_z + (isType(TYPEMASK_UNIT) ? static_cast<Unit const*>(this)->GetHoverHeight() : 0.0f);
 }
 
-void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z) const
+void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* groundZ) const
 {
     // TODO: Allow transports to be part of dynamic vmap tree
     //if (GetTransport())
     //    return;
 
-    switch (GetTypeId())
+        if (Unit const* unit = ToUnit())
     {
-        case TYPEID_UNIT:
+        if (!unit->CanFly())
+        {
+            bool canSwim = unit->CanSwim();
+            float ground_z = z;
+            float max_z;
+            if (canSwim)
+                max_z = GetMapWaterOrGroundLevel(x, y, z, &ground_z);
+            else
+                max_z = ground_z = GetMapHeight(x, y, z);
+
+            if (max_z > INVALID_HEIGHT)
             {
-                // non fly unit don't must be in air
-                // non swim unit must be at ground (mostly speedup, because it don't must be in water and water level check less fast
-                if (!ToCreature()->CanFly())
-                {
-                    bool canSwim = ToCreature()->CanSwim();
-                    float ground_z = z;
-                    float max_z = canSwim
-                                  ? GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK))
-                                  : ((ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true)));
-                    if (max_z > INVALID_HEIGHT)
-                    {
-                        if (z > max_z)
-                            z = max_z;
-                        else if (z < ground_z)
-                            z = ground_z;
-                    }
-                }
-                else
-                {
-                    float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
-                    if (z < ground_z)
-                        z = ground_z;
-                }
-                break;
-            }
-        case TYPEID_PLAYER:
-            {
-                // for server controlled moves playr work same as creature (but it can always swim)
-                if (!ToPlayer()->CanFly())
-                {
-                    float ground_z = z;
-                    float max_z = GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK));
-                    if (max_z > INVALID_HEIGHT)
-                    {
-                        if (z > max_z)
-                            z = max_z;
-                        else if (z < ground_z)
-                            z = ground_z;
-                    }
-                }
-                else
-                {
-                    float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
-                    if (z < ground_z)
-                        z = ground_z;
-                }
-                break;
-            }
-        default:
-            {
-                float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
-                if (ground_z > INVALID_HEIGHT)
+                // hovering units cannot go below their hover height
+                float hoverOffset = unit->GetHoverHeight();
+                max_z += hoverOffset;
+                ground_z += hoverOffset;
+
+                if (z > max_z)
+                    z = max_z;
+                else if (z < ground_z)
                     z = ground_z;
-                break;
             }
+
+            if (groundZ)
+                *groundZ = ground_z;
+        }
+        else
+        {
+            float ground_z = GetMapHeight(x, y, z) + unit->GetHoverHeight();
+            if (z < ground_z)
+                z = ground_z;
+
+            if (groundZ)
+               *groundZ = ground_z;
+        }
+    }
+    else
+    {
+        float ground_z = GetMapHeight(x, y, z);
+        if (ground_z > INVALID_HEIGHT)
+            z = ground_z;
+
+        if (groundZ)
+            *groundZ = ground_z;
     }
 }
 
@@ -3044,5 +3031,15 @@ uint64 WorldObject::GetTransGUID() const
 
 float WorldObject::GetMapHeight(float x, float y, float z, bool vmap/* = true*/, float distanceToSearch/* = DEFAULT_HEIGHT_SEARCH*/) const
 {
+    if (z != MAX_HEIGHT)
+        z += GetCollisionHeight();
+
     return GetMap()->GetHeight(GetPhaseMask(), x, y, z, vmap, distanceToSearch);
+}
+
+float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* ground/* = nullptr*/) const
+{
+    return GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, ground,
+        isType(TYPEMASK_UNIT) ? !static_cast<Unit const*>(this)->HasAuraType(SPELL_AURA_WATER_WALK) : false,
+        GetCollisionHeight());
 }

@@ -120,6 +120,8 @@ class MotionTransport;
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 typedef std::unordered_set<uint32> UpdatePlayerSet;
 
+float const DEFAULT_COLLISION_HEIGHT = 2.03128f; // Most common value in dbc
+
 class Object
 {
 public:
@@ -138,6 +140,7 @@ public:
     [[nodiscard]] uint32 GetEntry() const { return GetUInt32Value(OBJECT_FIELD_ENTRY); }
     void SetEntry(uint32 entry) { SetUInt32Value(OBJECT_FIELD_ENTRY, entry); }
 
+    float GetObjectScale() const { return GetFloatValue(OBJECT_FIELD_SCALE_X); }
     virtual void SetObjectScale(float scale) { SetFloatValue(OBJECT_FIELD_SCALE_X, scale); }
 
     [[nodiscard]] TypeID GetTypeId() const { return m_objectTypeId; }
@@ -827,7 +830,7 @@ public:
 
     [[nodiscard]] virtual float GetCombatReach() const { return 0.0f; } // overridden (only) in Unit
     void UpdateGroundPositionZ(float x, float y, float& z) const;
-    void UpdateAllowedPositionZ(float x, float y, float& z) const;
+    void UpdateAllowedPositionZ(float x, float y, float& z, float* groundZ = nullptr) const;
 
     void GetRandomPoint(const Position& srcPos, float distance, float& rand_x, float& rand_y, float& rand_z) const;
     void GetRandomPoint(const Position& srcPos, float distance, Position& pos) const
@@ -1063,9 +1066,12 @@ public:
     [[nodiscard]] virtual float GetStationaryY() const { return GetPositionY(); }
     [[nodiscard]] virtual float GetStationaryZ() const { return GetPositionZ(); }
     [[nodiscard]] virtual float GetStationaryO() const { return GetOrientation(); }
-    float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
+
+    [[nodiscard]] float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr) const;
+    [[nodiscard]] float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
 
     virtual float GetCollisionHeight() const { return 0.0f; }
+    virtual float GetCollisionWidth() const { return 0.0f; }
 
 protected:
     std::string m_name;

@@ -2474,6 +2474,7 @@ public:
     Movement::MoveSpline* movespline;
 
     [[nodiscard]] float GetCollisionHeight() const override;
+    [[nodiscard]] float GetCollisionWidth() const override;
 
 protected:
     explicit Unit (bool isWorldObject);

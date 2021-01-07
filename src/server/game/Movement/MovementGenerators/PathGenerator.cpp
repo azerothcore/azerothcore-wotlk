@@ -166,9 +166,9 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
     if (startPoly == INVALID_POLYREF || endPoly == INVALID_POLYREF)
     {
         BuildShortcut();
-        bool path = _source->GetTypeId() == TYPEID_UNIT && _source->ToCreature()->CanFly();
+        bool path = _source->GetTypeId() == TYPEID_UNIT ? _source->ToCreature()->CanFly() : true;
 
-        bool waterPath = _source->GetTypeId() == TYPEID_UNIT && _source->ToCreature()->CanSwim();
+        bool waterPath = _source->GetTypeId() == TYPEID_UNIT ? _source->ToCreature()->CanSwim() : true;
         if (waterPath)
         {
             // Check both start and end points, if they're both in water, then we can *safely* let the creature move
@@ -194,6 +194,18 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         if (!_useRaycast)
         {
             _type = PATHFIND_NOPATH;
+            return;
+        }
+    }
+
+    // no need to build a path if the creature is flying or swimming the entire path
+    if (Unit const* _sourceUnit = _source->ToUnit()) {
+        bool noPath = (_source->GetMap()->IsUnderWater(startPos.x, startPos.y, startPos.z) &&
+            _source->GetMap()->IsUnderWater(endPos.x, endPos.y, endPos.z) &&
+            _sourceUnit->CanSwim() && _sourceUnit->isSwimming()) || _sourceUnit->IsFlying();
+        if (noPath) {
+            BuildShortcut();
+            _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
             return;
         }
     }
@@ -881,7 +893,9 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
         result[1] += 0.5f;
         dtVcopy(iterPos, result);
 
-        if (_slopeCheck && !IsWalkableClimb(iterPos, steerPos))
+        bool canCheckSlope = _slopeCheck && (GetPathType() & ~(PATHFIND_NOT_USING_PATH));
+
+        if (canCheckSlope && !IsWalkableClimb(iterPos, steerPos))
         {
             return DT_FAILURE;
         }
@@ -1049,10 +1063,12 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
         if ((_pathPoints[i-1] - target).squaredLength() >= distSq)
             break; // bingo!
 
+        bool canCheckSlope = _slopeCheck && (GetPathType() & ~(PATHFIND_NOT_USING_PATH));
+
         // check if the shortened path is still in LoS with the target and it is walkable
         _source->GetHitSpherePointFor({ _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z + collisionHeight }, x, y, z);
         if (!_source->GetMap()->isInLineOfSight(x, y, z, _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z + collisionHeight, _source->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS)
-            || (_slopeCheck && !IsWalkableClimb(_source->GetPositionX(), _source->GetPositionY(), _source->GetPositionZ(), _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z)))
+            || (canCheckSlope && !IsWalkableClimb(_source->GetPositionX(), _source->GetPositionY(), _source->GetPositionZ(), _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z)))
         {
             // whenver we find a point that is not valid anymore, simply use last valid path
             _pathPoints.resize(i + 1);

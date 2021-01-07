@@ -3421,9 +3421,9 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, PathGenerator 
         prevPath = vector;
     }
 
-    destX = path->GetEndPosition().x;
-    destY = path->GetEndPosition().y;
-    destZ = path->GetEndPosition().z;
+    destX = prevPath.x;
+    destY = prevPath.y;
+    destZ = prevPath.z;
 
     return true;
 }
@@ -3443,8 +3443,11 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float &destX, 
  **/
 bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes, bool findPath) const
 {
-    return true;
-    if (findPath) {
+    bool isWaterNow = IsInWater(startX, startY, startZ);
+    bool isWaterNext = IsInWater(destX, destY, destZ);
+    const Unit* unit = source->ToUnit();
+
+    if (findPath && !isWaterNow && !isWaterNext && (!unit || !unit->IsFlying())) {
         PathGenerator *path = new PathGenerator(source);
         path->SetSlopeCheck(true);
         bool result = path->CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
@@ -3466,6 +3469,8 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         if (!acore::IsValidMapCoord(startX, startY, startZ) || !acore::IsValidMapCoord(destX, destY, destZ))
         {
             sLog->outCrash("WorldObject::CanReachPositionAndGetCoords invalid coordinates startX: %f, startY: %f, startZ: %f, destX: %f, destY: %f, destZ: %f", startX, startY, startZ, destX, destY, destZ);
+            // go back
+            destX = startX; destY = startY; destZ = startZ;
             return false;
         }
 
@@ -3475,13 +3480,16 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         path->SetUseRaycast(true);
         bool result = path->CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
 
-        bool notOnGround = path->GetPathType() & PATHFIND_NOT_USING_PATH;
+        bool notOnGround = path->GetPathType() & PATHFIND_NOT_USING_PATH
+            || (isWaterNow || isWaterNext) || (unit && unit->IsFlying());
 
         // Check for valid path types before we proceed
-        /*if (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END))
+        if (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END))
         {
+            // go back
+            destX = startX; destY = startY; destZ = startZ;
             return false;
-        }*/
+        }
 
         // collision check
         bool collided = (!result || (path->GetPathType() & PATHFIND_SHORTCUT) || (path->GetPathType() & PATHFIND_FARFROMPOLY));
@@ -3504,8 +3512,6 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
                 destX, destY, destZ + halfHeight,
                 destX, destY, destZ, -0.5f);
 
-            destZ -= halfHeight;
-
             // Collided with static LOS object, move back to collision point
             if (col)
             {
@@ -3521,8 +3527,6 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
             destX, destY, destZ + halfHeight,
             destX, destY, destZ, -0.5f);
 
-        destZ -= halfHeight;
-
         // Collided with a gameobject, move back to collision point
         if (col)
         {
@@ -3531,32 +3535,47 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
             collided = true;
         }
 
-        acore::NormalizeMapCoord(startX);
-        acore::NormalizeMapCoord(startY);
-        source->UpdateAllowedPositionZ(destX, destY, destZ);
+        float groundZ = VMAP_INVALID_HEIGHT_VALUE;
+        acore::NormalizeMapCoord(destX);
+        acore::NormalizeMapCoord(destZ);
+        source->UpdateAllowedPositionZ(destX, destY, destZ, &groundZ);
 
         // position has no ground under it (or is too far away)
-        bool is_water_now = IsInWater(startX, startY, startZ);
-        if (Unit const* unit = source->ToUnit(); !unit->CanFly() && !(is_water_now && unit->CanSwim()))
-        {
-            if (destZ <= INVALID_HEIGHT)
+        if (unit) {
+            if (!unit->CanFly() && !isWaterNext)
             {
-                // fall back to gridHeight if any
-                GridMap* gmap = unit->GetMap()->GetGrid(startX, startY);
-                if (!gmap) { // should not happen
-                    return false;
+                if (groundZ <= INVALID_HEIGHT)
+                {
+                    // fall back to gridHeight if any
+                    GridMap* gmap = unit->GetMap()->GetGrid(startX, startY);
+                    if (!gmap) { // should not happen
+                        // go back
+                        destX = startX; destY = startY; destZ = startZ;
+                        return false;
+                    }
+
+                    float gridHeight = gmap->getHeight(startX,startY);
+
+                    if (gridHeight > INVALID_HEIGHT)
+                    {
+                        startZ = gridHeight + unit->GetHoverHeight();
+                    }
                 }
 
-                float gridHeight = gmap->getHeight(startX,startY);
-
-                if (gridHeight > INVALID_HEIGHT)
+                if (!notOnGround && checkSlopes && !path->IsWalkableClimb(startX, startY, startZ, destX, destY, destZ))
                 {
-                    startZ = gridHeight + unit->GetHoverHeight();
+                    // go back
+                    destX = startX; destY = startY; destZ = startZ;
+                    return false;
                 }
             }
 
-            if (!notOnGround && checkSlopes && !path->IsWalkableClimb(startX, startY, startZ, destX, destY, destZ))
-            {
+            const Creature *creature = unit->ToCreature();
+            bool cannotSwim = isWaterNext && !unit->CanSwim();
+            bool cannotWalkOrFly = !isWaterNext && !source->ToPlayer() && !unit->CanFly() && (creature && !creature->CanWalk());
+            if (cannotSwim || cannotWalkOrFly) {
+                // go back
+                destX = startX; destY = startY; destZ = startZ;
                 return false;
             }
         }
