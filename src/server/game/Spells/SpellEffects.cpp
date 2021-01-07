@@ -6072,16 +6072,25 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
     Map* map = caster->GetMap();
     TempSummon* summon = nullptr;
 
+    uint32 currMinionsCount = m_caster->m_Controlled.size();
+    uint32 totalNumGuardians = numGuardians + currMinionsCount;
+
     for (uint32 count = 0; count < numGuardians; ++count)
     {
         Position pos;
 
+
+
         // xinef: do not use precalculated position for effect summon pet in this function, it means it was cast by NPC and should have its position overridden
-        if (count == 0 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET)
+        if (totalNumGuardians == 0 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET)
+        {
             pos = *destTarget;
-        else
-            // randomize position for multiple summons
+        }
+        else 
+        {
+            // randomize position
             m_caster->GetRandomPoint(*destTarget, radius, pos);
+        }
 
         summon = map->SummonCreature(entry, pos, properties, duration, caster, m_spellInfo->Id);
         if (!summon)
@@ -6091,8 +6100,8 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         summon->SetLevel(summonLevel);
 
         // xinef: if we have more than one guardian, change follow angle
-        if (summon->HasUnitTypeMask(UNIT_MASK_MINION) && numGuardians > 1)
-            ((Minion*)summon)->SetFollowAngle(PET_FOLLOW_ANGLE + (count * M_PI / (numGuardians - 1)));
+        if (summon->HasUnitTypeMask(UNIT_MASK_MINION) && totalNumGuardians > 1)
+            ((Minion*)summon)->SetFollowAngle(m_caster->GetAbsoluteAngle(pos.GetPositionX(), pos.GetPositionY()));
         //else if (summon->HasUnitTypeMask(UNIT_MASK_MINION) && m_targets.HasDst())
         //    ((Minion*)summon)->SetFollowAngle(m_caster->GetAngle(summon));
 

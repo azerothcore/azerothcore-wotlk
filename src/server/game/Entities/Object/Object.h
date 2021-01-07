@@ -545,6 +545,12 @@ struct Position
 
     float GetAngle(const Position* pos) const;
     [[nodiscard]] float GetAngle(float x, float y) const;
+    float GetAbsoluteAngle(float x, float y) const
+    {
+        float dx = x - m_positionX;
+        float dy = y - m_positionY;
+        return NormalizeOrientation(std::atan2(dy, dx));
+    }
     float GetRelativeAngle(const Position* pos) const
     {
         return GetAngle(pos) - m_orientation;
