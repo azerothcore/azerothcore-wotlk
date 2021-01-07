@@ -69,8 +69,14 @@ public:
         switch (sigNum)
         {
             case SIGINT:
+				stopEvent = true;
+				break;
             case SIGTERM:
-                stopEvent = true;
+#ifdef _WIN32
+            case SIGBREAK:
+                if (m_ServiceStatus != 1)
+#endif
+					stopEvent = true;
                 break;
         }
     }
