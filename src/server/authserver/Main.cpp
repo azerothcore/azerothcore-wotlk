@@ -95,19 +95,19 @@ extern int main(int argc, char** argv)
 {
     // Command line parsing to get the configuration file name
     char const* configFile = _ACORE_REALM_CONFIG;
-    int count = 1;
-    while (count < argc)
+    int c = 1;
+    while (c < argc)
     {
-        if (strcmp(argv[count], "-c") == 0)
+        if (strcmp(argv[c], "-c") == 0)
         {
-            if (++count >= argc)
+            if (++c >= argc)
             {
                 printf("Runtime-Error: -c option requires an input argument\n");
                 usage(argv[0]);
                 return 1;
             }
             else
-                configFile = argv[count];
+                configFile = argv[c];
         }
 		
 #ifdef _WIN32
@@ -144,7 +144,7 @@ extern int main(int argc, char** argv)
             WinServiceRun();
 #endif
 		
-        ++count;
+        ++c;
     }
 
     sConfigMgr->SetConfigList(std::string(configFile));
