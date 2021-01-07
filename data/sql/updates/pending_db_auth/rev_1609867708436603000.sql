@@ -3,3 +3,5 @@ ALTER TABLE `account_muted`
 CHARSET = 'utf8',
 MODIFY `mutedby` varchar(50) NOT NULL,
 MODIFY `mutereason` varchar(255) NOT NULL;
+ALTER TABLE `logs`
+MODIFY `string` text;
