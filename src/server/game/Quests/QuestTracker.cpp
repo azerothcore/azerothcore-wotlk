@@ -83,7 +83,7 @@ void QuestTracker::Execute()
     _questTrackStore.clear();
 
     // Update section
-    auto SendUpdateQuestTrack = [](uint8 stmtIndex, uint32 questID, uint32 characterLowGuid)
+    auto SendUpdateQuestTrack = [](CharacterDatabaseStatements stmtIndex, uint32 questID, uint32 characterLowGuid)
     {
         auto trans = CharacterDatabase.BeginTransaction();
 
