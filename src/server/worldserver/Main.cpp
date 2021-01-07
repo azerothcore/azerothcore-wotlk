@@ -62,43 +62,43 @@ extern int main(int argc, char** argv)
 {
     ///- Command line parsing to get the configuration file name
     char const* configFile = _ACORE_CORE_CONFIG;
-    int c = 1;
-    while (c < argc)
+    int count = 1;
+    while (count < argc)
     {
-        if (strcmp(argv[c], "--dry-run") == 0)
+        if (strcmp(argv[count], "--dry-run") == 0)
         {
             sConfigMgr->setDryRun(true);
         }
 
-        if (!strcmp(argv[c], "-c"))
+        if (!strcmp(argv[count], "-c"))
         {
-            if (++c >= argc)
+            if (++count >= argc)
             {
                 printf("Runtime-Error: -c option requires an input argument\n");
                 usage(argv[0]);
                 return 1;
             }
             else
-                configFile = argv[c];
+                configFile = argv[count];
         }
 
 #ifdef _WIN32
-        if (strcmp(argv[c], "-s") == 0) // Services
+        if (strcmp(argv[count], "-s") == 0) // Services
         {
-            if (++c >= argc)
+            if (++count >= argc)
             {
                 printf("Runtime-Error: -s option requires an input argument\n");
                 usage(argv[0]);
                 return 1;
             }
 
-            if (strcmp(argv[c], "install") == 0)
+            if (strcmp(argv[count], "install") == 0)
             {
                 if (WinServiceInstall())
                     printf("Installing service\n");
                 return 1;
             }
-            else if (strcmp(argv[c], "uninstall") == 0)
+            else if (strcmp(argv[count], "uninstall") == 0)
             {
                 if (WinServiceUninstall())
                     printf("Uninstalling service\n");
@@ -106,16 +106,16 @@ extern int main(int argc, char** argv)
             }
             else
             {
-                printf("Runtime-Error: unsupported option %s\n", argv[c]);
+                printf("Runtime-Error: unsupported option %s\n", argv[count]);
                 usage(argv[0]);
                 return 1;
             }
         }
 
-        if (strcmp(argv[c], "--service") == 0)
+        if (strcmp(argv[count], "--service") == 0)
             WinServiceRun();
 #endif
-        ++c;
+        ++count;
     }
 
     sConfigMgr->SetConfigList(std::string(configFile), std::string(CONFIG_FILE_LIST));

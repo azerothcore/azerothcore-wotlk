@@ -42,8 +42,8 @@
 #ifdef _WIN32
 #include "ServiceWin32.h"
 char serviceName[] = "authserver";
-char serviceLongName[] = "AzerothCore auth service";
-char serviceDescription[] = "AzerothCore World of Warcraft emulator auth service";
+char serviceLongName[] = "AzerothCore authentication service";
+char serviceDescription[] = "AzerothCore World of Warcraft emulator authentication service";
 /*
  * -1 - not in service mode
  *  0 - stopped
@@ -101,38 +101,38 @@ extern int main(int argc, char** argv)
 {
     // Command line parsing to get the configuration file name
     char const* configFile = _ACORE_REALM_CONFIG;
-    int c = 1;
-    while (c < argc)
+    int count = 1;
+    while (count < argc)
     {
-        if (strcmp(argv[c], "-c") == 0)
+        if (strcmp(argv[count], "-c") == 0)
         {
-            if (++c >= argc)
+            if (++count >= argc)
             {
                 printf("Runtime-Error: -c option requires an input argument\n");
                 usage(argv[0]);
                 return 1;
             }
             else
-                configFile = argv[c];
+                configFile = argv[count];
         }
 		
 #ifdef _WIN32
-        if (strcmp(argv[c], "-s") == 0) // Services
+        if (strcmp(argv[count], "-s") == 0) // Services
         {
-            if (++c >= argc)
+            if (++count >= argc)
             {
                 printf("Runtime-Error: -s option requires an input argument\n");
                 usage(argv[0]);
                 return 1;
             }
 
-            if (strcmp(argv[c], "install") == 0)
+            if (strcmp(argv[count], "install") == 0)
             {
                 if (WinServiceInstall())
                     printf("Installing service\n");
                 return 1;
             }
-            else if (strcmp(argv[c], "uninstall") == 0)
+            else if (strcmp(argv[count], "uninstall") == 0)
             {
                 if (WinServiceUninstall())
                     printf("Uninstalling service\n");
@@ -140,16 +140,16 @@ extern int main(int argc, char** argv)
             }
             else
             {
-                printf("Runtime-Error: unsupported option %s\n", argv[c]);
+                printf("Runtime-Error: unsupported option %s\n", argv[count]);
                 usage(argv[0]);
                 return 1;
             }
         }
 
-        if (strcmp(argv[c], "--service") == 0)
+        if (strcmp(argv[count], "--service") == 0)
             WinServiceRun();
 #endif		
-        ++c;
+        ++count;
     }
 
     sConfigMgr->SetConfigList(std::string(configFile));
