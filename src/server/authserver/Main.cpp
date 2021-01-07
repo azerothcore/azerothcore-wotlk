@@ -115,7 +115,7 @@ extern int main(int argc, char** argv)
         {
             if (++c >= argc)
             {
-                printf("Runtime-Error: -s option requires an input argument");
+                printf("Runtime-Error: -s option requires an input argument\n");
                 usage(argv[0]);
                 return 1;
             }
@@ -134,7 +134,7 @@ extern int main(int argc, char** argv)
             }
             else
             {
-                printf("Runtime-Error: unsupported option %s", argv[c]);
+                printf("Runtime-Error: unsupported option %s\n", argv[c]);
                 usage(argv[0]);
                 return 1;
             }
@@ -142,8 +142,7 @@ extern int main(int argc, char** argv)
 
         if (strcmp(argv[c], "--service") == 0)
             WinServiceRun();
-#endif
-		
+#endif		
         ++c;
     }
 
