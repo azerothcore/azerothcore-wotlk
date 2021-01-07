@@ -1,3 +1,19 @@
+-- DB update 2021_01_07_00 -> 2021_01_07_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_07_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_07_00 2021_01_07_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1609803806703890000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609803806703890000');
 
 -- add initial delay of half a second to In Combat - Cast 'Lightning Shield' + add comments to all rows
@@ -23,3 +39,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (17982, 0, 18, 0, 61, 0, 100, 0, 45, 0, 0, 0, 0, 80, 1798202, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Demolitionist Legoso - On Waypoint 45 Reached - Run Script'),
 (17982, 0, 19, 0, 40, 0, 100, 0, 49, 0, 0, 0, 0, 80, 1798203, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Demolitionist Legoso - On Waypoint 49 Reached - Run Script'),
 (17982, 0, 20, 0, 7, 1, 100, 1, 0, 0, 0, 0, 0, 80, 1798204, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Demolitionist Legoso - On Evade - Run Script (Phase 1) (No Repeat)');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
