@@ -15,10 +15,10 @@ var/*
 docker/build/cache
 docker/authserver/bin
 docker/worldserver/bin
-docker/authserver/etc/authserver.conf
-docker/authserver/etc/authserver.conf.dist
-docker/worldserver/etc/worldserver.conf
-docker/worldserver/etc/worldserver.conf.dist
+docker/*/etc/authserver.conf
+docker/*/etc/authserver.conf.dist
+docker/*/etc/worldserver.conf
+docker/*/etc/worldserver.conf.dist
 docker/authserver/logs/
 docker/worldserver/logs/
 docker/worldserver/data/
