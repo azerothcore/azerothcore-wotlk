@@ -14,4 +14,3 @@ bool WinServiceRun();
 
 #endif                                                      // _WIN32_SERVICE_
 #endif                                                      // _WIN32
-

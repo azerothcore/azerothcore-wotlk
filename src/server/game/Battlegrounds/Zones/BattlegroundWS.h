@@ -127,7 +127,6 @@ enum BG_WS_CreatureTypes
     BG_CREATURES_MAX_WS       = 2
 };
 
-
 enum BG_WS_Objectives
 {
     WS_OBJECTIVE_CAPTURE_FLAG   = 42,

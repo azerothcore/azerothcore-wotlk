@@ -1631,7 +1631,6 @@ void SpellMgr::LoadSpellGroups()
         ++count;
     } while (result->NextRow());
 
-
     sLog->outString(">> Loaded %u spell group definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
@@ -1671,7 +1670,6 @@ void SpellMgr::LoadSpellGroupStackRules()
                 present = true;
                 break;
             }
-
 
         if (!present)
         {
@@ -3179,7 +3177,7 @@ void SpellMgr::LoadSpellCustomAttr()
             case 12579: // Player Winter's Chill
             case 29306: // Naxxramas(Gluth's Zombies): Infected Wound
             case 61920: // Ulduar(Spellbreaker): Supercharge
-            case 63978: // Ulduar(Rubble): Stone Nova 
+            case 63978: // Ulduar(Rubble): Stone Nova
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
                 break;
             case 43138: // North Fleet Reservist Kill Credit
@@ -3698,7 +3696,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectBasePoints[EFFECT_0] = 100; // 100% chance of procc'ing, not -10% (chance calculated in PrepareTriggersExecutedOnHit)
     });
 
-    // Easter Lay Noblegarden Egg Aura 
+    // Easter Lay Noblegarden Egg Aura
     ApplySpellFix({ 61719 }, [](SpellEntry* spellInfo)
     {
         // Interrupt flags copied from aura which this aura is linked with
@@ -3971,7 +3969,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Dispel = DISPEL_NONE;
     });
 
-
     //////////////////////////////////////////
     ////////// ULDUAR
     //////////////////////////////////////////
@@ -3979,7 +3976,7 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->EffectImplicitTargetB[EFFECT_1] = TARGET_DEST_DB;
     });
-  
+
     // Killing Spree (teleport)
     ApplySpellFix({ 57840 }, [](SpellEntry* spellInfo)
     {
@@ -4870,7 +4867,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Attributes &= ~SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION;
     });
 
-    // Koralon, Flaming Cinder 
+    // Koralon, Flaming Cinder
     ApplySpellFix({ 66690 }, [](SpellEntry* spellInfo)
     {
         // missing radius index
@@ -7236,7 +7233,6 @@ void SpellMgr::LoadDbcDataCorrections()
 
         }
 
-
         if (spellInfo->activeIconID == 2158)  // flight
         {
             spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
@@ -7268,7 +7264,6 @@ void SpellMgr::LoadDbcDataCorrections()
                 areaEntry->flags |= AREA_FLAG_REST_ZONE_ALLIANCE;
         }
 
-
     // Xinef: fix for something?
     SummonPropertiesEntry* properties = const_cast<SummonPropertiesEntry*>(sSummonPropertiesStore.LookupEntry(121));
     properties->Type = SUMMON_TYPE_TOTEM;
@@ -7284,20 +7279,17 @@ void SpellMgr::LoadDbcDataCorrections()
     CreatureDisplayInfoEntry* displayEntry = const_cast<CreatureDisplayInfoEntry*>(sCreatureDisplayInfoStore.LookupEntry(17028)); // Kurken
     displayEntry->scale = 2.5f;
 
-
     // Oracles and Frenzyheart faction
     FactionEntry* factionEntry = const_cast<FactionEntry*>(sFactionStore.LookupEntry(1104));
     factionEntry->ReputationFlags[0] = 0;
     factionEntry = const_cast<FactionEntry*>(sFactionStore.LookupEntry(1105));
     factionEntry->ReputationFlags[0] = 0;
 
-
     // Various factions, added 14, 16 to hostile mask
     FactionTemplateEntry* factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1978)); // Warsong Offensive
     factionTemplateEntry->hostileMask |= 8;
     factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1921)); // The Taunka
     factionTemplateEntry->hostileMask |= 8;
-
 
     // Remove vehicles attr, making accessories selectable
     VehicleSeatEntry* vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4689)); // Siege Engine, Accessory
@@ -7310,7 +7302,6 @@ void SpellMgr::LoadDbcDataCorrections()
     vse->m_flags &= ~VEHICLE_SEAT_FLAG_CAN_SWITCH;
     vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(3077)); // Salvaged Demolisher Seat, Ulduar - not allow to change seats
     vse->m_flags &= ~VEHICLE_SEAT_FLAG_CAN_SWITCH;
-
 
     // pussywizard: fix z offset for some vehicles:
     vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(6206)); // Marrowgar - Bone Spike
@@ -7341,12 +7332,9 @@ void SpellMgr::LoadDbcDataCorrections()
     vse->m_attachmentOffsetX += 0.0f;
     vse->m_attachmentOffsetY += 1.6f;
 
-
-
     // Once Bitten, Twice Shy (10 player) - Icecrown Citadel
     AchievementEntry* achievement = const_cast<AchievementEntry*>(sAchievementStore.LookupEntry(4539));
     achievement->mapID = 631;    // Correct map requirement (currently has Ulduar)
-
 
     // Ring of Valor starting Locations
     GraveyardStruct const* entry = sGraveyard->GetGraveyard(1364);
