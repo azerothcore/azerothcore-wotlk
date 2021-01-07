@@ -2,14 +2,25 @@ FROM ubuntu:20.04
 
 # List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
+ENV CONTINUOUS_INTEGRATION=1
+
 # set timezone environment variable
 ENV TZ=Etc/UTC
 
 # set noninteractive mode so tzdata doesn't ask to set timezone on install
 ENV DEBIAN_FRONTEND=noninteractive
 
+# install essentials
+RUN apt-get update && apt-get install -y git lsb-core
+
+# copy needed files to run our scripts
+COPY ./conf /azerothcore/conf
+COPY ./deps /azerothcore/deps
+COPY ./apps /azerothcore/apps
+COPY ./acore.sh /azerothcore/acore.sh
+
 # install the required dependencies to run the worldserver
-RUN apt update && apt install -y libmysqlclient-dev libssl-dev libace-6.4.5 libace-dev libreadline-dev net-tools tzdata;
+RUN /azerothcore/acore.sh install-deps
 
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata

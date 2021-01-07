@@ -1,6 +1,11 @@
 {
     "recommendations": [
         "notskm.clang-tidy",
-        "xaver.clang-format"
+        "xaver.clang-format",
+        "bbenoist.doxygen",
+        "ms-vscode.cpptools",
+        "austin.code-gnu-global",
+        "twxs.cmake",
+        "ms-vscode-remote.remote-containers"
     ]
 }

@@ -24,8 +24,8 @@ services:
     restart: unless-stopped
     privileged: true
     build:
-      context: ./docker/worldserver
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./docker/worldserver/Dockerfile
     networks:
       - ac-network
     ports:
@@ -50,8 +50,8 @@ services:
   ac-authserver:
     restart: unless-stopped
     build:
-      context: ./docker/authserver
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./docker/authserver/Dockerfile
     networks:
       - ac-network
     ports:

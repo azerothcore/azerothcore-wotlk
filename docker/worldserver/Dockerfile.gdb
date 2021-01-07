@@ -1,6 +1,12 @@
 FROM ubuntu:20.04
+ARG USER_ID=1000
+ARG GROUP_ID=1000
 
 LABEL description="AC Worldserver Debug Container for use with Visual Studio"
+
+# List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+ENV CONTINUOUS_INTEGRATION=1
 
 # set timezone environment variable
 ENV TZ=Etc/UTC
@@ -8,28 +14,36 @@ ENV TZ=Etc/UTC
 # set noninteractive mode so tzdata doesn't ask to set timezone on install
 ENV DEBIAN_FRONTEND=noninteractive
 
-# install the required dependencies to run the worldserver
-RUN apt update && apt install -y libmysqlclient-dev libssl-dev libace-6.4.5 libace-dev libreadline-dev net-tools tzdata;
+# install essentials
+RUN apt-get update && apt-get install -y gdb gdbserver git lsb-core sudo
 
-# install build dependencies to debug
-RUN apt-get install -y gdb gdbserver openssh-server
+# copy needed files to run our scripts
+COPY ./conf /azerothcore/conf
+COPY ./deps /azerothcore/deps
+COPY ./apps /azerothcore/apps
+COPY ./acore.sh /azerothcore/acore.sh
+
+# install the required dependencies to run the worldserver
+RUN /azerothcore/acore.sh install-deps
 
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
-# configure SSH for communication with Visual Studio
-RUN mkdir -p /var/run/sshd
+# Create a non-root user
+RUN addgroup --gid $GROUP_ID acore && \
+    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
+    passwd -d acore && \
+    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config && \
-    echo 'PermitEmptyPasswords yes' >> /etc/ssh/sshd_config && \
-    echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config && \
-    ssh-keygen -A && \
-    passwd -d root && \
-    echo "ssh" >> /etc/securetty
+# Correct permissions for non-root operations
+RUN chown -R acore:acore \
+    /run \
+    /home/acore \
+    /opt/ \
+    /azerothcore
+
+USER acore
 
 RUN mkdir -p /azerothcore
 WORKDIR /azerothcore
 
-CMD ["/usr/sbin/sshd", "-D"]
-
-EXPOSE 22
