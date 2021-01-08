@@ -6,8 +6,6 @@ rm '/usr/local/bin/2to3'
 
 brew update
 
-
-
 ##########################################
 ## workaround for cmake already being installed in the github runners
 if ! command -v cmake &>/dev/null ; then
