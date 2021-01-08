@@ -45,7 +45,7 @@ void QuestTracker::InitSystem()
         return;
     }
 
-    scheduler.Schedule(10s, [this](TaskContext context)
+    scheduler.Schedule(30s, [this](TaskContext context)
     {
         Execute();
 
