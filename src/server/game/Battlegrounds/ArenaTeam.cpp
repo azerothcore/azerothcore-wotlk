@@ -14,6 +14,7 @@
 #include "WorldSession.h"
 #include "Opcodes.h"
 #include "ScriptMgr.h"
+#include "BattlegroundMgr.h"
 
 ArenaTeam::ArenaTeam()
     : TeamId(0), Type(0), TeamName(), CaptainGuid(0), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),
@@ -308,17 +309,46 @@ void ArenaTeam::SetCaptain(uint64 guid)
 
 void ArenaTeam::DelMember(uint64 guid, bool cleanDb)
 {
+    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+    Group* group = (player && player->GetGroup()) ? player->GetGroup() : nullptr;
+
     // Remove member from team
     for (MemberList::iterator itr = Members.begin(); itr != Members.end(); ++itr)
+    {
+        // Remove queues of members
+        if (Player* playerMember = ObjectAccessor::FindPlayerInOrOutOfWorld(itr->Guid))
+        {
+            if (group && playerMember->GetGroup() && group->GetGUID() == playerMember->GetGroup()->GetGUID())
+            {
+                if (BattlegroundQueueTypeId bgQueue = BattlegroundMgr::BGQueueTypeId(BATTLEGROUND_AA, GetType()))
+                {
+                    GroupQueueInfo ginfo;
+                    BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
+                    if (queue.GetPlayerGroupInfoData(playerMember->GetGUID(), &ginfo))
+                    {
+                        if (!ginfo.IsInvitedToBGInstanceGUID)
+                        {
+                            WorldPacket data;
+                            playerMember->RemoveBattlegroundQueueId(bgQueue);
+                            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, nullptr, playerMember->GetBattlegroundQueueIndex(bgQueue), STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
+                            queue.RemovePlayer(playerMember->GetGUID(), true, 0);
+                            playerMember->GetSession()->SendPacket(&data);
+                        }
+                    }
+                }
+            }
+        }
+
         if (itr->Guid == guid)
         {
             Members.erase(itr);
             sWorld->UpdateGlobalPlayerArenaTeam(GUID_LOPART(guid), GetSlot(), 0);
             break;
         }
+    }
 
     // Inform player and remove arena team info from player data
-    if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+    if (player)
     {
         player->GetSession()->SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, GetName(), "", 0);
         // delete all info regarding this team

@@ -24,7 +24,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 (2406, 3100),
 (2407, 3101),
 (2408, 3102);
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 14 AND `SourceGroup` = 2405;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` IN (14,15) AND `SourceGroup` = 2405;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (14, 2405, 3097, 0, 0, 8, 0, 4512, 0, 0, 0, 0, 0, '', 'Show gossip text 3099 if quest \'A Little Slime Goes a Long Way (Part 1)\' is rewarded'),
 (14, 2405, 3097, 0, 0, 9, 0, 4513, 0, 0, 1, 0, 0, '', 'Show gossip text 3099 if quest \'A Little Slime Goes a Long Way (Part 2)\' is not taken'),
