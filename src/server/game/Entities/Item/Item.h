@@ -138,7 +138,9 @@ enum SellResult
     SELL_ERR_YOU_DONT_OWN_THAT_ITEM              = 4,       // You don't own that item.
     SELL_ERR_UNK                                 = 5,       // Nothing appears...
     SELL_ERR_ONLY_EMPTY_BAG                      = 6,       // You can only do that with empty bags.
-    SELL_ERR_CANT_SELL_TO_THIS_MERCHANT          = 7        // You cannot sell items to this merchant.
+    SELL_ERR_CANT_SELL_TO_THIS_MERCHANT          = 7,       // You cannot sell items to this merchant.
+    SELL_ERR_MUST_REPAIR_ITEM_DURABILITY_TO_USE  = 8,       // You must repair that item's durability to use it.
+    SELL_INTERNAL_BAG_ERROR                      = 9,       // Internal Bag Error
 };
 
 // -1 from client enchantment slot number
