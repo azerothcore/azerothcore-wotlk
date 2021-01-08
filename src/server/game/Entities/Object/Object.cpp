@@ -1461,7 +1461,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
     //if (GetTransport())
     //    return;
 
-        if (Unit const* unit = ToUnit())
+    if (Unit const* unit = ToUnit())
     {
         if (!unit->CanFly())
         {

@@ -200,8 +200,8 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
     // no need to build a path if the creature is flying or swimming the entire path
     if (Unit const* _sourceUnit = _source->ToUnit()) {
-        bool noPath = (_source->GetMap()->IsUnderWater(startPos.x, startPos.y, startPos.z) &&
-            _source->GetMap()->IsUnderWater(endPos.x, endPos.y, endPos.z) &&
+        bool noPath = (//_source->GetMap()->IsUnderWater(startPos.x, startPos.y, startPos.z) &&
+            //_source->GetMap()->IsUnderWater(endPos.x, endPos.y, endPos.z) &&
             _sourceUnit->CanSwim() && _sourceUnit->isSwimming()) || _sourceUnit->IsFlying();
         if (noPath) {
             BuildShortcut();
