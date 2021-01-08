@@ -2284,7 +2284,6 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     }
 
     double ray = attackerSize > refUnit->GetObjectSize() ? attackerSize / 2.0f : refUnit->GetObjectSize() / 2.0f;
-    double distance2d = meleeReach;
     double angle = 0;
 
     // Equation of tangent point to get the ideal angle to
@@ -2302,11 +2301,6 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         double a = 4.0f * ( pow(ray,2.0f) - pow(refUnitX,2.0f) + (2.0f * refUnitX * victimX) - pow(victimX,2.0f) );
         double b = 8.0f * ( (refUnitX * refUnitY) + (victimX * victimY) - (victimX * refUnitY) - (refUnitX * victimY) );
         double c = 4.0f * (- pow(victimY,2.0f) - pow(refUnitY,2.0f) + (2.0f*victimY*refUnitY) + pow(ray,2.0f));
-
-        if (a == 0) // should not happen
-        {
-            return nullptr;
-        }
 
         double sq = sqrt(pow(b,2.0f)-4.0f*a*c);
 
@@ -2326,14 +2320,12 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         double ortDist = sqrt(pow(exactDist,2.0f) - pow(distance/2.0f,2.0f));
 
         angle = 2.0f * atan(distance / (2.0f * ortDist));
-
-        distance2d = ortDist;
     }
 
     int8 direction =  (urand(0, 1) ? -1 : 1);
 
     angle = frand(0.1f,0.3f) + (angle && !isnan(angle) ? angle : atan(attackerSize / (meleeReach))); // or fallback to the simpler method
-
+    
     float x, y, z;
     GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * direction);
 
