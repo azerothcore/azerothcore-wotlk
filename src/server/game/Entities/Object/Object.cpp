@@ -1480,6 +1480,12 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
                 max_z += hoverOffset;
                 ground_z += hoverOffset;
 
+                // do not allow creatures to walk on
+                // water level while swimming
+                if (unit->isSwimming()) {
+                    max_z = max_z - (unit->GetCollisionHeight() / 2.0f);
+                }
+
                 if (z > max_z)
                     z = max_z;
                 else if (z < ground_z)
