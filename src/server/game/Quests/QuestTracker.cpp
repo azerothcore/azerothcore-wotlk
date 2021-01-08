@@ -85,7 +85,7 @@ void QuestTracker::Execute()
     // Update section
     auto updateTrans = CharacterDatabase.BeginTransaction();
 
-    auto SendUpdateQuestTrack = [](CharacterDatabaseStatements stmtIndex, uint32 questID, uint32 characterLowGuid)
+    auto SendUpdateQuestTrack = [&updateTrans](CharacterDatabaseStatements stmtIndex, uint32 questID, uint32 characterLowGuid)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(stmtIndex);
         stmt->setUInt32(0, questID);
