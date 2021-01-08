@@ -6,6 +6,9 @@
         "ms-vscode.cpptools",
         "austin.code-gnu-global",
         "twxs.cmake",
-        "ms-vscode-remote.remote-containers"
+        "ms-vscode-remote.remote-containers",
+        "mhutchie.git-graph",
+        "github.vscode-pull-request-github",
+        "eamodio.gitlens"
     ]
 }
