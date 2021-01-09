@@ -1764,7 +1764,6 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
     if (owner)
         victimResistance += std::max((float(victim->getLevel()) - float(owner->getLevel())) * 5.0f, 0.0f);
 
-
     static uint32 const BOSS_LEVEL = 83;
     static float const BOSS_RESISTANCE_CONSTANT = 510.0f;
     uint32 level = victim->getLevel();
@@ -2284,6 +2283,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     }
 
     double ray = attackerSize > refUnit->GetObjectSize() ? attackerSize / 2.0f : refUnit->GetObjectSize() / 2.0f;
+    double angle = 0;
 
     // Equation of tangent point to get the ideal angle to
     // move away from collisions with another unit during combat
@@ -2300,11 +2300,6 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         double a = 4.0f * ( pow(ray,2.0f) - pow(refUnitX,2.0f) + (2.0f * refUnitX * victimX) - pow(victimX,2.0f) );
         double b = 8.0f * ( (refUnitX * refUnitY) + (victimX * victimY) - (victimX * refUnitY) - (refUnitX * victimY) );
         double c = 4.0f * (- pow(victimY,2.0f) - pow(refUnitY,2.0f) + (2.0f*victimY*refUnitY) + pow(ray,2.0f));
-
-        if (a == 0) // should not happen
-        {
-            return nullptr;
-        }
 
         double sq = sqrt(pow(b,2.0f)-4.0f*a*c);
 
@@ -2323,18 +2318,25 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 
         double ortDist = sqrt(pow(exactDist,2.0f) - pow(distance/2.0f,2.0f));
 
-        double angle = frand(0.1f,0.3f) + currentAngle + 2.0f * atan(distance / (2.0f * ortDist)) * (urand(0, 1) ? -1 : 1);
-
-        float x, y, z;
-        GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, angle);
-
-        return new Position(x,y,z);
+        angle = 2.0f * atan(distance / (2.0f * ortDist));
     }
 
-    float angle = frand(0.1f,0.3f) + currentAngle + atan(attackerSize / (meleeReach)) * (urand(0, 1) ? -1 : 1);
+    int8 direction =  (urand(0, 1) ? -1 : 1);
+
+    angle = frand(0.1f,0.3f) + (angle && !isnan(angle) ? angle : atan(attackerSize / (meleeReach))); // or fallback to the simpler method
 
     float x, y, z;
-    GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, angle);
+    GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * direction);
+
+    if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z))
+    {
+        GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * (direction * -1)); // try the other side
+
+        if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z))
+        {
+            return nullptr;
+        }
+    }
 
     return new Position(x,y,z);
 }
@@ -9053,7 +9055,6 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         }
     }
 
-
     // Custom basepoints/target for exist spell
     // dummy basepoints or other customs
     switch (trigger_spell_id)
@@ -9449,7 +9450,6 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit* victim, uint32 /*damage*/, Au
     return true;
 }
 
-
 void Unit::setPowerType(Powers new_powertype)
 {
     SetByteValue(UNIT_FIELD_BYTES_0, 3, new_powertype);
@@ -9561,7 +9561,6 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
             if (ReputationRank const* repRank = targetPlayerOwner->GetReputationMgr().GetForcedRankIfAny(selfFactionTemplateEntry))
                 return *repRank;
     }
-
 
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
     {
@@ -11150,7 +11149,6 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
         if (((*i)->GetMiscValue() & spellProto->GetSchoolMask()))
             if (spellProto->ValidateAttribute6SpellDamageMods(caster, *i, damagetype == DOT))
                 AddPct(TakenTotalMod, (*i)->GetAmount());
-
 
     // .. taken pct: dummy auras
     AuraEffectList const& mDummyAuras = GetAuraEffectsByType(SPELL_AURA_DUMMY);
@@ -14312,7 +14310,6 @@ float Unit::GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spell
     return spellInfo->GetMinRange(!IsHostileTo(target));
 }
 
-
 uint32 Unit::GetCreatureType() const
 {
     if (GetTypeId() == TYPEID_PLAYER)
@@ -16637,16 +16634,6 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, SpellInfo const
     // Custom chances
     switch (spellProto->SpellFamilyName)
     {
-        case SPELLFAMILY_SHAMAN:
-            {
-                // Blessing of the Eternals, Earthliving proc
-                if (spellProto->SpellIconID == 1929)
-                {
-                    if (victim && (float(victim->GetHealth() * 100.0f / victim->GetMaxHealth()) > 35.0f))
-                        return roll_chance_f(chance);
-                }
-                break;
-            }
         case SPELLFAMILY_WARRIOR:
             {
                 // Recklessness, allow to proc only once for whirlwind
@@ -17885,7 +17872,6 @@ bool Unit::IsInRaidWith(Unit const* unit) const
     else
         return false;
 }
-
 
 void Unit::GetPartyMembers(std::list<Unit*>& TagUnitMap)
 {

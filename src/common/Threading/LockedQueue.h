@@ -31,7 +31,7 @@ namespace ACE_Based
 
         //! Create a LockedQueue.
         LockedQueue()
-             
+
         {
         }
 
