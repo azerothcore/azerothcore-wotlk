@@ -261,7 +261,6 @@ public:
     }
 };
 
-
 enum hourglass
 {
     NPC_FUTURE_HOURGLASS            = 27840,
@@ -337,7 +336,6 @@ public:
 
         Player* getSummoner() { return ObjectAccessor::GetPlayer(*me, summonerGUID); }
         Creature* getFuture() { return ObjectAccessor::GetCreature(*me, futureGUID); }
-
 
         uint32 randEntry()
         {
@@ -1383,8 +1381,6 @@ public:
         }
     };
 };
-
-
 
 // Theirs
 

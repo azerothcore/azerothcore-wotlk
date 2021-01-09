@@ -221,7 +221,6 @@ public:
             return 0;
         }
 
-
         std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;

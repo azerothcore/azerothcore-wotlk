@@ -51,8 +51,6 @@ enum Misc
     TELEPORTTIME                  = 30000
 };
 
-
-
 struct boss_twinemperorsAI : public ScriptedAI
 {
     boss_twinemperorsAI(Creature* creature): ScriptedAI(creature)
