@@ -485,7 +485,6 @@ struct Position
 
     [[nodiscard]] Position GetPosition() const { return *this; }
 
-
     Position::PositionXYZStreamer PositionXYZStream()
     {
         return PositionXYZStreamer(*this);
@@ -592,7 +591,6 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZStreamer const& str
 ByteBuffer& operator >> (ByteBuffer& buf, Position::PositionXYZStreamer const& streamer);
 ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& streamer);
 ByteBuffer& operator >> (ByteBuffer& buf, Position::PositionXYZOStreamer const& streamer);
-
 
 struct MovementInfo
 {
