@@ -1075,6 +1075,13 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_GUILD_RESET_HOUR] = 6;
     }
 
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_0] = sConfigMgr->GetIntDefault("Guild.BankTabCost0", 1000000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_1] = sConfigMgr->GetIntDefault("Guild.BankTabCost1", 2500000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_2] = sConfigMgr->GetIntDefault("Guild.BankTabCost2", 5000000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_3] = sConfigMgr->GetIntDefault("Guild.BankTabCost3", 10000000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_4] = sConfigMgr->GetIntDefault("Guild.BankTabCost4", 25000000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_5] = sConfigMgr->GetIntDefault("Guild.BankTabCost5", 50000000);
+
     m_bool_configs[CONFIG_DETECT_POS_COLLISION] = sConfigMgr->GetBoolDefault("DetectPosCollision", true);
 
     m_bool_configs[CONFIG_RESTRICTED_LFG_CHANNEL]      = sConfigMgr->GetBoolDefault("Channel.RestrictedLfg", true);

@@ -75,17 +75,17 @@ inline uint32 _GetGuildBankTabPrice(uint8 tabId)
     switch (tabId)
     {
         case 0:
-            return 100;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_0);
         case 1:
-            return 250;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_1);
         case 2:
-            return 500;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_2);
         case 3:
-            return 1000;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_3);
         case 4:
-            return 2500;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_4);
         case 5:
-            return 5000;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_5);
         default:
             return 0;
     }
@@ -1486,7 +1486,7 @@ void Guild::HandleBuyBankTab(WorldSession* session, uint8 tabId)
     if (tabId != _GetPurchasedTabsSize())
         return;
 
-    uint32 tabCost = _GetGuildBankTabPrice(tabId) * GOLD;
+    uint32 tabCost = _GetGuildBankTabPrice(tabId);
     if (!tabCost)
         return;
 
