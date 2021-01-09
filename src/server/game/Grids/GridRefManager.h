@@ -27,4 +27,3 @@ public:
     iterator rend() { return iterator(nullptr); }
 };
 #endif
-

@@ -530,7 +530,6 @@ void ObjectAccessor::UnloadAll()
 
 std::map<std::string, Player*> ObjectAccessor::playerNameToPlayerPointer;
 
-
 /// Global definitions for the hashmap storage
 
 template class HashMapHolder<Player>;

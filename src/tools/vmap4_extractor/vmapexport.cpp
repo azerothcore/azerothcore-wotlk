@@ -433,7 +433,6 @@ bool processArgv(int argc, char** argv, const char* versionString)
     return result;
 }
 
-
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 // Main
 //
@@ -517,7 +516,6 @@ int main(int argc, char** argv)
             strcpy(map_ids[x].name, dbc->getRecord(x).getString(1));
             printf("Map - %s\n", map_ids[x].name);
         }
-
 
         delete dbc;
         ParsMapFiles();

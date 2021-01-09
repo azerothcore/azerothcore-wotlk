@@ -7,7 +7,6 @@
 #include "InstanceScript.h"
 #include "magtheridons_lair.h"
 
-
 DoorData const doorData[] =
 {
     { GO_MAGTHERIDON_DOORS,  TYPE_MAGTHERIDON,   DOOR_TYPE_ROOM,  BOUNDARY_S },
@@ -224,4 +223,3 @@ void AddSC_instance_magtheridons_lair()
 {
     new instance_magtheridons_lair();
 }
-

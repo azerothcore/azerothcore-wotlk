@@ -542,8 +542,6 @@ public:
     };
 };
 
-
-
 class npc_azure_binder : public CreatureScript
 {
 public:
@@ -1161,7 +1159,6 @@ public:
         return new spell_destroy_door_sealAuraScript();
     }
 };
-
 
 class go_violet_hold_gate_lever : public GameObjectScript
 {

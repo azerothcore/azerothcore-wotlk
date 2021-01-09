@@ -666,7 +666,6 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recvData)
     _player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(guid, _player->GetGUID(), true), _player->m_Events.CalculateTime(delay - diff));
 }
 
-
 void WorldSession::HandleAuctionListOwnerItemsEvent(uint64 creatureGuid)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
