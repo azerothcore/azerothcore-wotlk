@@ -2324,7 +2324,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     int8 direction =  (urand(0, 1) ? -1 : 1);
 
     angle = frand(0.1f,0.3f) + (angle && !isnan(angle) ? angle : atan(attackerSize / (meleeReach))); // or fallback to the simpler method
-    
+
     float x, y, z;
     GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * direction);
 
