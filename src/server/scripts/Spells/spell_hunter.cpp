@@ -336,8 +336,6 @@ public:
     }
 };
 
-
-
 // Theirs
 // 13161 Aspect of the Beast
 class spell_hun_aspect_of_the_beast : public SpellScriptLoader
@@ -404,7 +402,6 @@ public:
         return new spell_hun_aspect_of_the_beast_AuraScript();
     }
 };
-
 
 // Theirs
 // 34074 - Aspect of the Viper
@@ -574,7 +571,6 @@ public:
         return new spell_hun_chimera_shot_SpellScript();
     }
 };
-
 
 // -19572 - Improved Mend Pet
 class spell_hun_improved_mend_pet : public SpellScriptLoader

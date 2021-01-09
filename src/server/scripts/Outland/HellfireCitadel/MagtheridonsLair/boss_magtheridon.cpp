@@ -95,7 +95,6 @@ public:
 
         EventMap events2;
 
-
         void Reset() override
         {
             events2.Reset();
@@ -153,7 +152,6 @@ public:
                     events2.ScheduleEvent(EVENT_CHECK_GRASP, 0);
                     break;
             }
-
 
             if (!UpdateVictim() || !CheckInRoom())
                 return;
@@ -325,4 +323,3 @@ void AddSC_boss_magtheridon()
     new spell_magtheridon_blaze();
     new spell_magtheridon_shadow_grasp();
 }
-

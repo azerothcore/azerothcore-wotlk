@@ -72,7 +72,6 @@ public:
     }
 };
 
-
 // Theirs
 
 /*######
@@ -304,7 +303,6 @@ public:
         }
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
-
 
         void UpdateAI(uint32 /*diff*/) override
         {
