@@ -3311,12 +3311,12 @@ Guild.AllowMultipleGuildMaster = 0
 #                     25000000 - (2500 Gold)
 #                     50000000 - (5000 Gold)
 
-Guild.BankTabCost0 = 1000000;
-Guild.BankTabCost1 = 2500000;
-Guild.BankTabCost2 = 5000000;
-Guild.BankTabCost3 = 10000000;
-Guild.BankTabCost4 = 25000000;
-Guild.BankTabCost5 = 50000000;
+Guild.BankTabCost0 = 1000000
+Guild.BankTabCost1 = 2500000
+Guild.BankTabCost2 = 5000000
+Guild.BankTabCost3 = 10000000
+Guild.BankTabCost4 = 25000000
+Guild.BankTabCost5 = 50000000
 
 #
 #     ShowKickInWorld
