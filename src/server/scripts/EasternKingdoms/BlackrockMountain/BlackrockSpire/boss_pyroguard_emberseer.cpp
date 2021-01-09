@@ -368,7 +368,6 @@ public:
         void UpdateAI(uint32 diff) override
         {
 
-
             if (!UpdateVictim())
             {
                 _events.Update(diff);

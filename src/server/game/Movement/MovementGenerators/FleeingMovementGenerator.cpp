@@ -60,12 +60,13 @@ bool FleeingMovementGenerator<T>::_getPoint(T* owner, float& x, float& y, float&
     if (!owner)
         return false;
 
+    const Map* _map = owner->GetBaseMap();
+
     x = owner->GetPositionX();
     y = owner->GetPositionY();
     z = owner->GetPositionZ();
 
     float temp_x, temp_y, angle;
-    const Map* _map = owner->GetBaseMap();
     // primitive path-finding
     for (uint8 i = 0; i < 18; ++i)
     {
@@ -151,37 +152,20 @@ bool FleeingMovementGenerator<T>::_getPoint(T* owner, float& x, float& y, float&
 
         temp_x = x + distance * cos(angle);
         temp_y = y + distance * sin(angle);
-        acore::NormalizeMapCoord(temp_x);
-        acore::NormalizeMapCoord(temp_y);
-        if (owner->IsWithinLOS(temp_x, temp_y, z))
+        float temp_z = z;
+
+        if (_map->CanReachPositionAndGetCoords(owner, temp_x, temp_y, temp_z, true, 3.0f, M_PI/4))
         {
-            bool is_water_now = _map->IsInWater(x, y, z);
-
-            if (is_water_now && _map->IsInWater(temp_x, temp_y, z))
+            if (!(temp_z - z) || distance / fabs(temp_z - z) > 1.0f)
             {
-                x = temp_x;
-                y = temp_y;
-                return true;
-            }
-            float new_z = _map->GetHeight(owner->GetPhaseMask(), temp_x, temp_y, z, true);
-
-            if (new_z <= INVALID_HEIGHT || fabs(z - new_z) > 3.0f)
-                continue;
-
-            bool is_water_next = _map->IsInWater(temp_x, temp_y, new_z);
-
-            if ((is_water_now && !is_water_next && !is_land_ok) || (!is_water_now && is_water_next && !is_water_ok))
-                continue;
-
-            if (!(new_z - z) || distance / fabs(new_z - z) > 1.0f)
-            {
-                float new_z_left = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle + static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle + static_cast<float>(M_PI / 2)), z, true);
-                float new_z_right = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle - static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle - static_cast<float>(M_PI / 2)), z, true);
-                if (fabs(new_z_left - new_z) < 1.2f && fabs(new_z_right - new_z) < 1.2f)
+                float temp_z_left = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle + static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle + static_cast<float>(M_PI / 2)), z, true);
+                float temp_z_right = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle - static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle - static_cast<float>(M_PI / 2)), z, true);
+                if (fabs(temp_z_left - temp_z) < 1.2f && fabs(temp_z_right - temp_z) < 1.2f)
                 {
+                    // use new values
                     x = temp_x;
                     y = temp_y;
-                    z = new_z;
+                    z = temp_z;
                     return true;
                 }
             }

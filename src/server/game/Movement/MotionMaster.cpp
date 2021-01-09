@@ -320,12 +320,81 @@ void MotionMaster::MoveChase(Unit* target, float dist, float angle)
     }
 }
 
+void MotionMaster::MoveBackwards(Unit* target, float dist)
+{
+    if (!target)
+    {
+        return;
+    }
+
+    Position const& pos = target->GetPosition();
+    float angle = target->GetAngle(_owner);
+    G3D::Vector3 point;
+    point.x = pos.m_positionX + dist * cosf(angle);
+    point.y = pos.m_positionY + dist * sinf(angle);
+    point.z = pos.m_positionZ;
+
+    //if (_owner->IsFlying())
+    //    point.z = pos.m_positionZ;
+    //else
+    //    point.z = _owner->GetMapHeight(point.x, point.y, point.z);
+
+    if (_owner->GetMap()->CanReachPositionAndGetCoords(_owner, point.x, point.y, point.z, true, 6.0f, M_PI/4))
+    {
+        Movement::MoveSplineInit init(_owner);
+        init.MoveTo(point.x, point.y, point.z, true);
+        init.SetFacing(target);
+        init.SetOrientationInversed();
+        init.Launch();
+    }
+}
+
+void MotionMaster::MoveCircleTarget(Unit* target)
+{
+    if (!target)
+    {
+        return;
+    }
+
+    Position* point = target->GetMeleeAttackPoint(_owner);
+    if (point == NULL)
+    {
+        return;
+    }
+
+    if (_owner->IsFlying()) {
+        // Dont do anything yet might add later
+    }
+    else
+    {
+        point->m_positionZ = _owner->GetMapHeight(point->m_positionX, point->m_positionY, point->m_positionZ);
+    }
+
+    const Map* _map = _owner->GetBaseMap();
+
+    float x = point->m_positionX;
+    float y = point->m_positionY;
+    float z = point->m_positionZ;
+
+    if (_map->CanReachPositionAndGetCoords(_owner, x, y, z, true, 6.0f, M_PI/3))
+    {
+        Movement::MoveSplineInit init(_owner);
+        init.SetSmooth();
+        init.MoveTo(x, y, z, true);
+        init.SetWalk(true);
+        init.SetFacing(target);
+        init.Launch();
+    }
+}
+
 void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlot slot)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     // ignore movement request if target not exist
     if (!target || target == _owner || _owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+    {
         return;
+    }
 
     //_owner->AddUnitState(UNIT_STATE_FOLLOW);
     if (_owner->GetTypeId() == TYPEID_PLAYER)

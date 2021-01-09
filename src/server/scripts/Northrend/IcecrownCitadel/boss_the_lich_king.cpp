@@ -358,7 +358,6 @@ void SendPacketToPlayers(WorldPacket const* data, Unit* source)
                     player->GetSession()->SendPacket(data);
 }
 
-
 struct ShadowTrapLKTargetSelector : public acore::unary_function<Unit*, bool>
 {
 public:
@@ -384,8 +383,6 @@ private:
     bool _reqLOS;
     float _maxDist;
 };
-
-
 
 struct NonTankLKTargetSelector : public acore::unary_function<Unit*, bool>
 {
@@ -420,7 +417,6 @@ private:
     uint32 _exclude1;
     uint32 _exclude2;
 };
-
 
 struct DefileTargetSelector : public acore::unary_function<Unit*, bool>
 {
@@ -611,7 +607,6 @@ private:
     float _difference;
     bool _reverse;
 };
-
 
 class boss_the_lich_king : public CreatureScript
 {
@@ -1459,7 +1454,6 @@ public:
                     }
                     break;
 
-
                 case EVENT_OUTRO_LK_TALK_1:
                     if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
                     {
@@ -1626,7 +1620,6 @@ public:
                 case EVENT_OUTRO_FORDRING_JUMP:
                     me->CastSpell((Unit*)NULL, SPELL_JUMP, false);
                     break;
-
 
                 default:
                     break;

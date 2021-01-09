@@ -449,7 +449,6 @@ public:
                     break;
             }
 
-
             EnterEvadeIfOutOfCombatArea();
 
             if (!UpdateVictim())
