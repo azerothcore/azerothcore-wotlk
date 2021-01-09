@@ -139,4 +139,3 @@ namespace FactorySelector
         return (ai_factory == NULL ? new NullGameObjectAI(go) : ai_factory->Create(go));
     }
 }
-

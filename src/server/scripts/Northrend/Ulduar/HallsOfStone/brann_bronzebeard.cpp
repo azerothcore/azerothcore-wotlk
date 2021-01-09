@@ -497,7 +497,6 @@ public:
 
                         me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
-
                         // Spawn Chest and quest credit
                         if (Player* plr = SelectTargetFromPlayerList(200.0f))
                         {

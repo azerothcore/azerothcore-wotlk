@@ -89,8 +89,6 @@ const uint32 TABLE_SPELL_PUNISH[4] = {SPELL_ZELIEK_CONDEMNATION, SPELL_BLAUMEUX_
 const uint32 TABLE_SPELL_SECONDARY_10[4] = {SPELL_ZELIEK_HOLY_WRATH_10, SPELL_BLAUMEUX_VOID_ZONE_10, 0, 0};
 const uint32 TABLE_SPELL_SECONDARY_25[4] = {SPELL_ZELIEK_HOLY_WRATH_25, SPELL_BLAUMEUX_VOID_ZONE_25, 0, 0};
 
-
-
 const Position WaypointPositions[12] =
 {
     // Thane waypoints
@@ -310,7 +308,7 @@ public:
                 case EVENT_BERSERK:
                     Talk(SAY_SPECIAL);
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    
+
                     return;
                 case EVENT_SPELL_PRIMARY:
                     Talk(SAY_TAUNT);

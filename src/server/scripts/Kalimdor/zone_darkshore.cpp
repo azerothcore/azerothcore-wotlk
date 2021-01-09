@@ -148,7 +148,6 @@ public:
     };
 };
 
-
 // Theirs
 /*####
 # npc_kerlonian
