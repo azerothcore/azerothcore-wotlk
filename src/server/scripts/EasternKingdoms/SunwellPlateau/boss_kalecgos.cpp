@@ -16,7 +16,6 @@ enum Yells
     SAY_SATH_SPELL1                             = 3,
     SAY_SATH_SPELL2                             = 4,
 
-
     SAY_EVIL_AGGRO                              = 0,
     SAY_EVIL_SLAY                               = 1,
     SAY_GOOD_PLRWIN                             = 2,

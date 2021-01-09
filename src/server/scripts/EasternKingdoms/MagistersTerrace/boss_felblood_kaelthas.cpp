@@ -276,7 +276,6 @@ public:
                     break;
             }
 
-
             if (events.GetPhaseMask() == 0)
                 DoMeleeAttackIfReady();
         }

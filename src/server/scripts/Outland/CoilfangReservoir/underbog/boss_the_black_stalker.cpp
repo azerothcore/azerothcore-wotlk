@@ -73,7 +73,6 @@ public:
                 events.ScheduleEvent(EVENT_SPELL_SPORES, urand(10000, 15000));
         }
 
-
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);

@@ -2155,7 +2155,6 @@ void Pet::HandleAsynchLoadSucceed()
         if (spell->GetSpellInfo()->HasEffect(SPELL_EFFECT_SUMMON_PET))
             CastSpell(this, 32752, true, nullptr, nullptr, GetGUID());
 
-
     if (owner->NeedSendSpectatorData() && GetCreatureTemplate()->family)
     {
         ArenaSpectator::SendCommand_UInt32Value(owner->FindMap(), owner->GetGUID(), "PHP", (uint32)GetHealthPct());
