@@ -210,7 +210,6 @@ public:
     };
 };
 
-
 // Theirs
 /*######
 ## npc_rivern_frostwind
