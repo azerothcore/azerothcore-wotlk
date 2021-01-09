@@ -468,7 +468,6 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
 
-
         void UpdateAI(uint32 /*diff*/) override { }
     };
 
@@ -709,4 +708,3 @@ void AddSC_boss_janalai()
     new npc_janalai_hatchling();
     new npc_janalai_egg();
 }
-

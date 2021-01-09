@@ -363,7 +363,6 @@ public:
             }
         }
 
-
         void UpdateAI(uint32 diff) override
         {
             if (addSpawnTimer <= diff)
