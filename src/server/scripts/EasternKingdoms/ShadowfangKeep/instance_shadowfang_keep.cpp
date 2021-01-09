@@ -96,8 +96,7 @@ public:
 
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
-    };
-
+    }
 };
 
 class spell_shadowfang_keep_haunting_spirits : public SpellScriptLoader

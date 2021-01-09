@@ -135,7 +135,6 @@ float AllianceOverrunWP[55][3] = //waypoints in the alliance base used in the en
     {5180.41f, -2121.87f, 1292.62f}, //52 garg target3
     {5088.68f, -2432.04f, 1441.73f}, //53 garg target4
     {5111.26f, -2454.73f, 1449.63f}//54 garg target5
-
 };
 
 float HordeOverrunWP[21][3] = //waypoints in the horde base used in the end in the cleaning wave
@@ -622,7 +621,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_ghoul : public CreatureScript
@@ -723,7 +721,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_necromancer : public CreatureScript
@@ -849,7 +846,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_banshee : public CreatureScript
@@ -953,7 +949,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_crypt_fiend : public CreatureScript
@@ -1041,7 +1036,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_fel_stalker : public CreatureScript
@@ -1129,7 +1123,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_frost_wyrm : public CreatureScript
@@ -1459,7 +1452,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_hyjal_trash()

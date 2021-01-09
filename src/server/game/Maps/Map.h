@@ -579,7 +579,6 @@ private:
     void UpdateActiveCells(const float& x, const float& y, const uint32 t_diff);
 
 protected:
-
     ACE_Thread_Mutex Lock;
     ACE_Thread_Mutex GridLock;
     ACE_RW_Thread_Mutex MMapLock;

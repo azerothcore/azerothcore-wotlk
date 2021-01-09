@@ -168,7 +168,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_lesser_doomguard : public CreatureScript
@@ -265,7 +264,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_azgalor()

@@ -392,7 +392,6 @@ public:
 
             return 0;
         }
-
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
