@@ -3303,7 +3303,7 @@ Guild.AllowMultipleGuildMaster = 0
 
 #
 #     Guild.BankTabCost0-5
-#        Description: Changes the price of the guild tabs.
+#        Description: Changes the price of the guild tabs. Note that the client will still show the default values.
 #        Default:     1000000  - (100 Gold)
 #                     2500000  - (250 Gold)
 #                     5000000  - (500 Gold)
