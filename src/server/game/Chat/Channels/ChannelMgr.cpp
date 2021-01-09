@@ -124,7 +124,6 @@ Channel* ChannelMgr::GetChannel(std::string const& name, Player* player, bool pk
     return i->second;
 }
 
-
 uint32 ChannelMgr::_channelIdMax = 0;
 ChannelMgr::ChannelRightsMap ChannelMgr::channels_rights;
 ChannelRights ChannelMgr::channelRightsEmpty;

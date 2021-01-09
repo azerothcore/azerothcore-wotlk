@@ -451,7 +451,6 @@ PreparedStatementTask::PreparedStatementTask(PreparedStatement* stmt, PreparedQu
 {
 }
 
-
 PreparedStatementTask::~PreparedStatementTask()
 {
     delete m_stmt;
