@@ -287,7 +287,7 @@ bool Warden::ProcessLuaCheckResponse(std::string const& msg)
     }
 
     uint16 id = 0;
- 
+
     {
         std::stringstream msg2(msg);
         std::string temp;
