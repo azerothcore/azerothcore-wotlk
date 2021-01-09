@@ -656,7 +656,7 @@ public:
         }
 
         void RespawnDragons(bool checkCombat)
-        {          
+        {
             for (uint8 i = 0; i < MAX_DRAGONS; ++i)
             {
                 if (instance->GetBossState(dragons[i]) == DONE)

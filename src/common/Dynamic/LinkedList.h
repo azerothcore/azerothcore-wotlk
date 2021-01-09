@@ -75,7 +75,7 @@ private:
     LinkedListElement iLast;
     uint32 iSize{0};
 public:
-    LinkedListHead() 
+    LinkedListHead()
     {
         // create empty list
 

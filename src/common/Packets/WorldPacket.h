@@ -14,7 +14,7 @@ class WorldPacket : public ByteBuffer
 {
 public:
     // just container for later use
-    WorldPacket()                                       : ByteBuffer(0) 
+    WorldPacket()                                       : ByteBuffer(0)
     {
     }
     explicit WorldPacket(uint16 opcode, size_t res = 200) : ByteBuffer(res), m_opcode(opcode) { }
