@@ -122,4 +122,3 @@ void AddSC_boss_void_reaver()
 {
     new boss_void_reaver();
 }
-

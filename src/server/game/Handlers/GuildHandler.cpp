@@ -564,7 +564,6 @@ void WorldSession::HandleGuildBankBuyTab(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_BUY_TAB [%s]: Go: [" UI64FMTD "], TabId: %u", GetPlayerInfo().c_str(), guid, tabId);
 #endif
 
-
     if (GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_GUILD_BANK))
         if (Guild* guild = GetPlayer()->GetGuild())
             guild->HandleBuyBankTab(this, tabId);

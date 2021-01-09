@@ -1315,7 +1315,6 @@ public:
     }
 };
 
-
 // Theirs
 /*######
 ## npc_commander_dawnforge
