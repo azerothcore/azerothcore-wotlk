@@ -156,7 +156,6 @@ public:
                 events2.ScheduleEvent(EVENT_INTRO_2, 3000);
         }
 
-
         void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))

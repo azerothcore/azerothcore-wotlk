@@ -259,7 +259,6 @@ int RASocket::authenticate()
     return 0;
 }
 
-
 int RASocket::subnegotiate()
 {
     char buf[1024];

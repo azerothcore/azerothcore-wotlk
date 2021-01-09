@@ -392,7 +392,6 @@ void ScriptMgr::OnPacketSend(WorldSession* session, WorldPacket const& packet)
     FOREACH_SCRIPT(ServerScript)->OnPacketSend(session, copy);
 }
 
-
 void ScriptMgr::OnOpenStateChange(bool open)
 {
 #ifdef ELUNA
@@ -400,7 +399,6 @@ void ScriptMgr::OnOpenStateChange(bool open)
 #endif
     FOREACH_SCRIPT(WorldScript)->OnOpenStateChange(open);
 }
-
 
 void ScriptMgr::OnLoadCustomDatabaseTable()
 {
@@ -2395,4 +2393,3 @@ MailScript::MailScript(const char* name)
 {
     ScriptRegistry<MailScript>::AddScript(this);
 }
-

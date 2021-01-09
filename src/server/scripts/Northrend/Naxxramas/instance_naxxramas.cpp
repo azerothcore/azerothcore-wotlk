@@ -620,7 +620,6 @@ public:
                     _horsemanTimer = 0;
             }
 
-
             if (!InstanceScript::SetBossState(bossId, state))
                 return false;
 
@@ -822,7 +821,7 @@ public:
                     if (Creature* kelthuzad = instance->GetCreature(_kelthuzadGUID))
                         kelthuzad->AI()->Talk(_currentWingTaunt);
                     ++_currentWingTaunt;
-                    
+
                     break;
             }
         }
