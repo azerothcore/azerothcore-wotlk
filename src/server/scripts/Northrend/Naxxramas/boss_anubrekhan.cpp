@@ -190,7 +190,7 @@ public:
                     }
                 case EVENT_SPELL_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    
+
                     break;
             }
 
@@ -203,4 +203,3 @@ void AddSC_boss_anubrekhan()
 {
     new boss_anubrekhan();
 }
-

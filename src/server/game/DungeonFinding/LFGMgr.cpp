@@ -426,7 +426,6 @@ namespace lfg
                     lockData = LFG_LOCKSTATUS_MISSING_ITEM;
             }
 
-
             sScriptMgr->OnInitializeLockedDungeons(player, level, lockData);
 
             /* TODO VoA closed if WG is not under team control (LFG_LOCKSTATUS_RAID_LOCKED)

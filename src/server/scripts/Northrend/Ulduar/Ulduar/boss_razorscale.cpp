@@ -70,7 +70,6 @@
 #define TEXT_DEEP_BREATH                    "Razorscale takes a deep breath..."
 #define TEXT_GROUNDED_PERMANENTLY           "Razorscale grounded permanently!"
 
-
 #define CORDS_GROUND                        588.0f, -166.0f, 391.1f
 #define CORDS_AIR                           588.0f, -178.0f, 490.0f
 #define REPAIR_POINTS                       25

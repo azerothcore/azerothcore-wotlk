@@ -379,7 +379,6 @@ void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, int64 source)
     }
 }
 
-
 void TicketMgr::ShowList(ChatHandler& handler, bool onlineOnly) const
 {
     handler.SendSysMessage(onlineOnly ? LANG_COMMAND_TICKETSHOWONLINELIST : LANG_COMMAND_TICKETSHOWLIST);
