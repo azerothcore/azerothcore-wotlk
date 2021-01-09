@@ -89,7 +89,6 @@ enum Spells
     SPELL_NETHER_BEAM                   = 35869,
     SPELL_NETHER_BEAM_DAMAGE            = 35873,
 
-
     SPELL_REMOTE_TOY_STUN               = 37029
 };
 
