@@ -10,7 +10,6 @@
 #include "karazhan.h"
 #include "SpellInfo.h"
 
-
 enum PrinceSay
 {
     SAY_AGGRO = 0,
@@ -74,7 +73,6 @@ struct InfernalPoint
     { -10935.7f, -1996.0f }
 };*/
 
-
 //---------Infernal code first
 class netherspite_infernal : public CreatureScript
 {
@@ -99,7 +97,6 @@ public:
         void Reset() override { }
         void EnterCombat(Unit* /*who*/) override { }
         void MoveInLineOfSight(Unit* /*who*/) override { }
-
 
         void UpdateAI(uint32 diff) override
         {
@@ -150,7 +147,6 @@ public:
         }
     };
 };
-
 
 class boss_malchezaar : public CreatureScript
 {
@@ -468,7 +464,6 @@ public:
 
         uint32 AxesTargetSwitchTimer;
         InstanceScript* instance;
-
 
         void Initialize()
         {

@@ -508,7 +508,6 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid
                         if (pet->ToPet())
                             pet->ToPet()->ClearCastWhenWillAvailable();
 
-
                         charmInfo->SetForcedSpell(0);
                         charmInfo->SetForcedTargetGUID(0);
                         break;

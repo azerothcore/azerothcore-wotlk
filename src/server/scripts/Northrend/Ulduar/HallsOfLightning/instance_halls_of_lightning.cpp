@@ -180,7 +180,6 @@ public:
             return saveStream.str();
         }
 
-
         void Load(const char* in) override
         {
             if (!in)

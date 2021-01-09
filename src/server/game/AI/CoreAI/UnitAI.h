@@ -111,7 +111,6 @@ struct PowerUsersSelector : public acore::unary_function<Unit*, bool>
     float const _dist;
     bool const _playerOnly;
 
-
     PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly) { }
 
     bool operator()(Unit const* target) const
