@@ -450,7 +450,6 @@ void SmartAI::UpdatePath(const uint32 diff)
     }
 }
 
-
 void SmartAI::CheckConditions(const uint32 diff)
 {
     Vehicle* vehicle = me->GetVehicleKit();

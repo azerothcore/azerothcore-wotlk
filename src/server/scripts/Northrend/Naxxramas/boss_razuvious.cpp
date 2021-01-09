@@ -27,7 +27,6 @@ enum Spells
     SPELL_BLOOD_STRIKE              = 61696,
 };
 
-
 enum Events
 {
     EVENT_SPELL_UNBALANCING_STRIKE  = 1,

@@ -38,4 +38,3 @@ public:
     [[nodiscard]] MapReference const* nocheck_prev() const { return (MapReference const*)Reference<Map, Player>::nocheck_prev(); }
 };
 #endif
-

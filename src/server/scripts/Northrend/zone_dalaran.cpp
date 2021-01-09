@@ -711,7 +711,6 @@ public:
     };
 };
 
-
 class npc_dalaran_warrior : public CreatureScript
 {
 public:
