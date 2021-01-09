@@ -31,7 +31,6 @@ enum DruidSpells
     SPELL_DRUID_GLYPH_OF_BARKSKIN           = 63057,
     SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER   = 63058,
 
-
     // Theirs
     SPELL_DRUID_ENRAGE_MOD_DAMAGE           = 51185,
     SPELL_DRUID_GLYPH_OF_TYPHOON            = 62135,
@@ -364,7 +363,6 @@ public:
         return new spell_dru_treant_scaling_AuraScript();
     }
 };
-
 
 // Theirs
 // -1850 - Dash
