@@ -66,7 +66,6 @@ enum AssemblySpells
 #define SPELL_LIGHTNING_WHIRL       RAID_MODE(SPELL_LIGHTNING_WHIRL_10, SPELL_LIGHTNING_WHIRL_25)
 #define SPELL_LIGHTNING_TENDRILS    RAID_MODE(SPELL_LIGHTNING_TENDRILS_10, SPELL_LIGHTNING_TENDRILS_25)
 
-
 enum eEnums
 {
     // Steelbreaker
@@ -830,7 +829,6 @@ public:
         }
     };
 };
-
 
 class spell_shield_of_runes : public SpellScriptLoader
 {

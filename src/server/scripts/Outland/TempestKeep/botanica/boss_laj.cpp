@@ -142,4 +142,3 @@ void AddSC_boss_laj()
 {
     new boss_laj();
 }
-
