@@ -26,6 +26,7 @@
 #include "DynamicTree.h"
 #include "GameObjectModel.h"
 #include "PathGenerator.h"
+#include "ObjectDefines.h"
 #include "Log.h"
 #include "DataMap.h"
 #include <bitset>
@@ -358,7 +359,7 @@ public:
     [[nodiscard]] float GetMinHeight(float x, float y) const;
     Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr);
 
-    ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = nullptr) const;
+    ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = nullptr, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const;
 
     uint32 GetAreaId(float x, float y, float z, bool* isOutdoors) const;
     bool GetAreaInfo(float x, float y, float z, uint32& mogpflags, int32& adtId, int32& rootId, int32& groupId) const;
@@ -473,7 +474,7 @@ public:
     [[nodiscard]] const BattlegroundMap* ToBattlegroundMap() const { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap const*>(this); return nullptr; }
 
     float GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = nullptr, bool swim = false, float maxSearchDist = 50.0f) const;
-    [[nodiscard]] float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
+    [[nodiscard]] float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const;
     [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const;
     bool CanReachPositionAndGetCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool checkCollision = true, bool checkSlopes = true) const;
     bool CanReachPositionAndGetCoords(const WorldObject* source, float &destX, float &destY, float &destZ, bool checkCollision = true, bool checkSlopes = true, bool findPath = true) const;
