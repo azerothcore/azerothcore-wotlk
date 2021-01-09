@@ -795,7 +795,6 @@ GraveyardStruct const* BattlegroundSA::GetClosestGraveyard(Player* player)
     if (!closest && GraveyardStatus[BG_SA_BEACH_GY] == player->GetTeamId())
         return sGraveyard->GetGraveyard(BG_SA_GYEntries[BG_SA_BEACH_GY]);
 
-
     return closest;
 }
 

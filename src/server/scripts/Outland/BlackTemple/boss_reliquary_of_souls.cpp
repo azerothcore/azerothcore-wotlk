@@ -193,7 +193,6 @@ public:
 
         void AttackStart(Unit*) override { }
 
-
         void JustDied(Unit* killer) override
         {
             summons.clear();

@@ -28,7 +28,6 @@ enum Events
     EVENT_DARK_SHELL
 };
 
-
 class boss_pandemonius : public CreatureScript
 {
 public:

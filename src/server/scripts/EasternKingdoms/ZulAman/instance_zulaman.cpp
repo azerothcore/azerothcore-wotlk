@@ -405,4 +405,3 @@ void AddSC_instance_zulaman()
 {
     new instance_zulaman();
 }
-

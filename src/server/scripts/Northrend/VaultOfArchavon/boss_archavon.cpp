@@ -125,7 +125,7 @@ class boss_archavon : public CreatureScript
                         {
                             DoCast(target, SPELL_ROCK_SHARDS);
                         }
-                        
+
                         events.RepeatEvent(15000);
                         break;
                     case EVENT_CHOKING_CLOUD:
@@ -133,7 +133,7 @@ class boss_archavon : public CreatureScript
                         {
                             DoCast(target, RAID_MODE(SPELL_CRUSHING_LEAP_10, SPELL_CRUSHING_LEAP_25), true); //10y ~ 80y, ignore range
                         }
-                        
+
                         events.RepeatEvent(30000);
                         break;
                     case EVENT_STOMP:
@@ -215,7 +215,6 @@ class spell_archavon_rock_shards : public SpellScriptLoader
             return new spell_archavon_rock_shards_SpellScript();
         }
 };
-
 
 void AddSC_boss_archavon()
 {

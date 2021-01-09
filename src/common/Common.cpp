@@ -35,4 +35,3 @@ void CleanStringForMysqlQuery(std::string& str)
     while ((n = str.find('"')) != str.npos) str.erase(n, 1);
     while ((n = str.find('\'')) != str.npos) str.erase(n, 1);
 }
-

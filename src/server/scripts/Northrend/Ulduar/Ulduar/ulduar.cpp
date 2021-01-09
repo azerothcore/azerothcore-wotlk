@@ -411,7 +411,6 @@ public:
     }
 };
 
-
 void AddSC_ulduar()
 {
     new npc_ulduar_keeper();
