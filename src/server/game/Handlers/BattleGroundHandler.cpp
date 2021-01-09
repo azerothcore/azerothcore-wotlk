@@ -715,7 +715,6 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
                             member->RemoveBattlegroundQueueId(mqtid);
                         }
 
-
         uint32 ateamId = 0;
         uint32 arenaRating = 0;
         uint32 matchmakerRating = 0;
