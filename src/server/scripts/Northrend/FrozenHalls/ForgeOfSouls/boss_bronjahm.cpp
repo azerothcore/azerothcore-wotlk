@@ -198,7 +198,6 @@ public:
     }
 };
 
-
 class npc_fos_corrupted_soul_fragment : public CreatureScript
 {
 public:
@@ -251,7 +250,6 @@ public:
     }
 };
 
-
 class spell_bronjahm_magic_bane : public SpellScriptLoader
 {
 public:
@@ -289,7 +287,6 @@ public:
     }
 };
 
-
 class spell_bronjahm_soulstorm_channel_ooc : public SpellScriptLoader
 {
 public:
@@ -316,7 +313,6 @@ public:
         return new spell_bronjahm_soulstorm_channel_ooc_AuraScript();
     }
 };
-
 
 class spell_bronjahm_soulstorm_visual : public SpellScriptLoader
 {
@@ -361,7 +357,6 @@ public:
     }
 };
 
-
 class spell_bronjahm_soulstorm_targeting : public SpellScriptLoader
 {
 public:
@@ -387,7 +382,6 @@ public:
         return new spell_bronjahm_soulstorm_targeting_SpellScript();
     }
 };
-
 
 void AddSC_boss_bronjahm()
 {

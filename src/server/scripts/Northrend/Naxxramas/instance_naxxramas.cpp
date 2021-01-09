@@ -620,7 +620,6 @@ public:
                     _horsemanTimer = 0;
             }
 
-
             if (!InstanceScript::SetBossState(bossId, state))
                 return false;
 

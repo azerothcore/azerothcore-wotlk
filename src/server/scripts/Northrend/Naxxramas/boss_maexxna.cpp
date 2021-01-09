@@ -198,7 +198,6 @@ public:
     };
 };
 
-
 class boss_maexxna_webwrap : public CreatureScript
 {
 public:
@@ -236,4 +235,3 @@ void AddSC_boss_maexxna()
     new boss_maexxna();
     new boss_maexxna_webwrap();
 }
-

@@ -11,7 +11,6 @@
 #include "RealmSocket.h"
 #include "Log.h"
 
-
 RealmSocket::Session::Session() = default;
 
 RealmSocket::Session::~Session() = default;

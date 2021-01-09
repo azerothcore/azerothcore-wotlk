@@ -210,7 +210,6 @@ public:
     }
 };
 
-
 class npc_fos_leader_second : public CreatureScript
 {
 public:
@@ -242,7 +241,6 @@ public:
         return new npc_fos_leader_secondAI(creature);
     }
 };
-
 
 class spell_shield_of_bones : public SpellScriptLoader
 {

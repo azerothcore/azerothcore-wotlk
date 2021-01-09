@@ -238,7 +238,6 @@ public:
             if (!player)
                 return;
 
-
             uint32 uiEntry = aPlaguedCritters[urand(0, 2)];
             for (uint8 i = 0; i < 30; ++i)
             {
@@ -379,7 +378,6 @@ public:
                 // if the gate is in cooldown, skip the other checks
                 if (_gateTrapsCooldown[i])
                     break;
-
 
                 // Check that the trap is not on cooldown, if so check if player/pet is in range
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -585,7 +583,6 @@ public:
             }
         }
     };
-
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

@@ -940,7 +940,6 @@ public:
                 }
         }
 
-
         void Register() override
         {
             AfterHit += SpellHitFn(spell_gen_leeching_swarm_dmg_SpellScript::HandleAfterHit);

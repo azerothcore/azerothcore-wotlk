@@ -51,7 +51,6 @@ public:
     }
 };
 
-
 // Theirs
 /*######
 ## at_coilfang_waterfall
@@ -350,7 +349,6 @@ public:
         return true;
     }
 };
-
 
 /*######
 ## at_brewfest

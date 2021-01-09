@@ -153,9 +153,28 @@ ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, 
 #pragma warning(disable:4355)
 #endif
 Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
-    m_movedByPlayer(nullptr), m_lastSanctuaryTime(0), IsAIEnabled(false), NeedChangeAI(false),
-    m_ControlledByPlayer(false), m_CreatedByPlayer(false), movespline(new Movement::MoveSpline()), i_AI(nullptr), i_disabledAI(nullptr), m_realRace(0), m_race(0), m_AutoRepeatFirstCast(false), m_procDeep(0), m_removedAurasCount(0),
-    i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_ThreatManager(this), m_vehicle(nullptr), m_vehicleKit(nullptr), m_unitTypeMask(UNIT_MASK_NONE), m_HostileRefManager(this)
+    m_movedByPlayer(nullptr),
+    m_lastSanctuaryTime(0),
+    IsAIEnabled(false),
+    NeedChangeAI(false),
+    m_ControlledByPlayer(false),
+    m_CreatedByPlayer(false),
+    movespline(new Movement::MoveSpline()),
+    i_AI(nullptr),
+    i_disabledAI(nullptr),
+    m_realRace(0),
+    m_race(0),
+    m_AutoRepeatFirstCast(false),
+    m_procDeep(0),
+    m_removedAurasCount(0),
+    i_motionMaster(new MotionMaster(this)),
+    m_regenTimer(0),
+    m_ThreatManager(this),
+    m_vehicle(nullptr),
+    m_vehicleKit(nullptr),
+    m_unitTypeMask(UNIT_MASK_NONE),
+    m_HostileRefManager(this),
+    m_comboTarget(nullptr)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -575,6 +594,21 @@ bool Unit::IsWithinMeleeRange(const Unit* obj, float dist) const
     float maxdist = dist + sizefactor;
 
     return distsq < maxdist * maxdist;
+}
+
+bool Unit::IsWithinRange(Unit const* obj, float dist) const
+{
+    if (!obj || !IsInMap(obj) || !InSamePhase(obj))
+    {
+        return false;
+    }
+
+    auto dx = GetPositionX() - obj->GetPositionX();
+    auto dy = GetPositionY() - obj->GetPositionY();
+    auto dz = GetPositionZ() - obj->GetPositionZ();
+    auto distsq = dx * dx + dy * dy + dz * dz;
+
+    return distsq <= dist * dist;
 }
 
 bool Unit::GetRandomContactPoint(const Unit* obj, float& x, float& y, float& z, bool force) const
@@ -1730,7 +1764,6 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
     if (owner)
         victimResistance += std::max((float(victim->getLevel()) - float(owner->getLevel())) * 5.0f, 0.0f);
 
-
     static uint32 const BOSS_LEVEL = 83;
     static float const BOSS_RESISTANCE_CONSTANT = 510.0f;
     uint32 level = victim->getLevel();
@@ -2187,6 +2220,125 @@ void Unit::AttackerStateUpdate (Unit* victim, WeaponAttackType attType, bool ext
                                  GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
 #endif
     }
+}
+
+Position* Unit::GetMeleeAttackPoint(Unit* attacker)
+{
+    if (!attacker) // only player & pets to save CPU
+    {
+        return nullptr;
+    }
+
+    AttackerSet attackers = getAttackers();
+
+    if (attackers.size() <= 1) // if the attackers are not more than one
+    {
+        return nullptr;
+    }
+
+    float meleeReach = attacker->GetMeleeReach();
+
+    if (meleeReach <= 0)
+    {
+        return nullptr;
+    }
+
+    float currentAngle, minDistance = 0;
+    Unit *refUnit = nullptr;
+    uint32 validAttackers=0;
+
+    for (const auto& otherAttacker: attackers)
+    {
+        // if the otherAttacker is not valid, skip
+        if (!otherAttacker ||
+            otherAttacker->GetGUID() == attacker->GetGUID() ||
+            !otherAttacker->IsWithinMeleeRange(this) ||
+            otherAttacker->isMoving()
+        )
+        {
+            continue;
+        }
+
+        float tempDist = attacker->GetExactDist2d(otherAttacker) - (attacker->GetObjectSize()/2) - (otherAttacker->GetObjectSize()/2);
+
+        if (tempDist == 0 || minDistance == 0 || tempDist < minDistance)
+        {
+            minDistance = tempDist;
+            currentAngle = GetAngle(otherAttacker);
+            refUnit = otherAttacker;
+        }
+
+        validAttackers++;
+    }
+
+    auto attackerSize = attacker->GetObjectSize();
+
+    // in instance: the more attacker there are, the higher will be the tollerance
+    // outside: creatures should not intersecate
+    float distanceTollerance = attacker->GetMap()->IsDungeon() ? -attackerSize * tanh(validAttackers / 5.0f) : 0.0f;
+
+    if (!refUnit || minDistance > distanceTollerance)
+    {
+        return nullptr;
+    }
+
+    double ray = attackerSize > refUnit->GetObjectSize() ? attackerSize / 2.0f : refUnit->GetObjectSize() / 2.0f;
+    double angle = 0;
+
+    // Equation of tangent point to get the ideal angle to
+    // move away from collisions with another unit during combat
+    // NOTE: it works only when there's enough space between the
+    // attacker and the victim. We use a simpler one otherwise.
+    if (GetExactDist2d(refUnit) > ray)
+    {
+        double refUnitX = refUnit->GetPositionX();
+        double refUnitY = refUnit->GetPositionY();
+        double victimX = GetPositionX();
+        double victimY = GetPositionY();
+
+        // calculate tangent star
+        double a = 4.0f * ( pow(ray,2.0f) - pow(refUnitX,2.0f) + (2.0f * refUnitX * victimX) - pow(victimX,2.0f) );
+        double b = 8.0f * ( (refUnitX * refUnitY) + (victimX * victimY) - (victimX * refUnitY) - (refUnitX * victimY) );
+        double c = 4.0f * (- pow(victimY,2.0f) - pow(refUnitY,2.0f) + (2.0f*victimY*refUnitY) + pow(ray,2.0f));
+
+        double sq = sqrt(pow(b,2.0f)-4.0f*a*c);
+
+        double m1 = (-b + sq) / (2.0f*a);
+        double m2 = (-b - sq) / (2.0f*a);
+
+        // tangents
+        double xT1 = ((-1.0f) * (m1*(victimY - m1*victimX - refUnitY) - refUnitX) ) / (1.0f + pow(m1,2.0f));
+        double xT2 = ((-1.0f) * (m2*(victimY - m2*victimX - refUnitY) - refUnitX) ) / (1.0f + pow(m2,2.0f));
+
+        double yT1 = m1*(xT1 - victimX) + victimY;
+        double yT2 = m2*(xT2 - victimX) + victimY;
+
+        double distance = sqrt(pow(yT2-yT1,2.0f) + pow(xT2-xT1,2.0f));
+        double exactDist = GetExactDist2d(xT1, yT1);
+
+        double ortDist = sqrt(pow(exactDist,2.0f) - pow(distance/2.0f,2.0f));
+
+        angle = 2.0f * atan(distance / (2.0f * ortDist));
+    }
+
+    int8 direction =  (urand(0, 1) ? -1 : 1);
+
+    angle = frand(0.1f,0.3f) + (angle && !isnan(angle) ? angle : atan(attackerSize / (meleeReach))); // or fallback to the simpler method
+
+    float x, y, z;
+    GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * direction);
+
+    if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z))
+    {
+        GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * (direction * -1)); // try the other side
+
+        if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z))
+        {
+            return nullptr;
+        }
+    }
+
+    return new Position(x,y,z);
 }
 
 void Unit::HandleProcExtraAttackFor(Unit* victim)
@@ -8903,7 +9055,6 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         }
     }
 
-
     // Custom basepoints/target for exist spell
     // dummy basepoints or other customs
     switch (trigger_spell_id)
@@ -9299,7 +9450,6 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit* victim, uint32 /*damage*/, Au
     return true;
 }
 
-
 void Unit::setPowerType(Powers new_powertype)
 {
     SetByteValue(UNIT_FIELD_BYTES_0, 3, new_powertype);
@@ -9411,7 +9561,6 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
             if (ReputationRank const* repRank = targetPlayerOwner->GetReputationMgr().GetForcedRankIfAny(selfFactionTemplateEntry))
                 return *repRank;
     }
-
 
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
     {
@@ -11001,7 +11150,6 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
             if (spellProto->ValidateAttribute6SpellDamageMods(caster, *i, damagetype == DOT))
                 AddPct(TakenTotalMod, (*i)->GetAmount());
 
-
     // .. taken pct: dummy auras
     AuraEffectList const& mDummyAuras = GetAuraEffectsByType(SPELL_AURA_DUMMY);
     for (AuraEffectList::const_iterator i = mDummyAuras.begin(); i != mDummyAuras.end(); ++i)
@@ -12554,7 +12702,7 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
         WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
         data.append(GetPackGUID());
         data << uint32(sWorld->GetGameTime());   // Packet counter
-        data << player->GetCollisionHeight(true);
+        data << player->GetCollisionHeight();
         player->GetSession()->SendPacket(&data);
     }
 
@@ -12574,7 +12722,7 @@ void Unit::Dismount()
         WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
         data.append(GetPackGUID());
         data << uint32(sWorld->GetGameTime());   // Packet counter
-        data << thisPlayer->GetCollisionHeight(false);
+        data << thisPlayer->GetCollisionHeight();
         thisPlayer->GetSession()->SendPacket(&data);
     }
 
@@ -14161,7 +14309,6 @@ float Unit::GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spell
         return spellInfo->GetMinRange();
     return spellInfo->GetMinRange(!IsHostileTo(target));
 }
-
 
 uint32 Unit::GetCreatureType() const
 {
@@ -16487,16 +16634,6 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, SpellInfo const
     // Custom chances
     switch (spellProto->SpellFamilyName)
     {
-        case SPELLFAMILY_SHAMAN:
-            {
-                // Blessing of the Eternals, Earthliving proc
-                if (spellProto->SpellIconID == 1929)
-                {
-                    if (victim && (float(victim->GetHealth() * 100.0f / victim->GetMaxHealth()) > 35.0f))
-                        return roll_chance_f(chance);
-                }
-                break;
-            }
         case SPELLFAMILY_WARRIOR:
             {
                 // Recklessness, allow to proc only once for whirlwind
@@ -17735,7 +17872,6 @@ bool Unit::IsInRaidWith(Unit const* unit) const
     else
         return false;
 }
-
 
 void Unit::GetPartyMembers(std::list<Unit*>& TagUnitMap)
 {
@@ -19861,4 +19997,33 @@ bool Unit::IsInCombatWith(Unit const* who) const
     }
     // Nothing found, false.
     return false;
+}
+
+//! Return collision height sent to client
+float Unit::GetCollisionHeight() const
+{
+    uint32 nativeDisplayId = GetNativeDisplayId();
+    if (IsMounted())
+    {
+        if (CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID));
+            CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId))
+        {
+            CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(nativeDisplayId);
+            ASSERT(displayInfo);
+            CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayInfo->ModelId);
+            ASSERT(modelData);
+
+            float scaleMod = GetFloatValue(OBJECT_FIELD_SCALE_X); // 99% sure about this
+
+            return scaleMod * mountModelData->MountHeight + modelData->CollisionHeight * 0.5f;
+        }
+    }
+
+    //! Dismounting case - use basic default model data
+    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(nativeDisplayId);
+    ASSERT(displayInfo);
+    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayInfo->ModelId);
+    ASSERT(modelData);
+
+    return modelData->CollisionHeight;
 }

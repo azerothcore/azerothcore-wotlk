@@ -431,7 +431,6 @@ public:
         if (creature->IsVendor() && player->GetReputationRank(59) >= REP_FRIENDLY)
             AddGossipItemFor(player, 4781, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-
         if (player->GetQuestRewardStatus(QUEST_A_BINDING_CONTRACT) != 1 &&
                 !player->HasItemCount(ITEM_THRORIUM_BROTHERHOOD_CONTRACT, 1, true) &&
                 player->HasItemCount(ITEM_SULFURON_INGOT))

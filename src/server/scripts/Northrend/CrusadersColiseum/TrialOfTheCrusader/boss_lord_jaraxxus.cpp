@@ -76,7 +76,6 @@ enum JaraxxusEvents
     EVENT_SPELL_MISTRESS_KISS,
 };
 
-
 class boss_jaraxxus : public CreatureScript
 {
 public:

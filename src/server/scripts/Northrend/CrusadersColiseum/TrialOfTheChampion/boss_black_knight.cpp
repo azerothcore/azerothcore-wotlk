@@ -84,7 +84,6 @@ enum Models
     MODEL_GHOST                     = 21300
 };
 
-
 class boss_black_knight : public CreatureScript
 {
 public:

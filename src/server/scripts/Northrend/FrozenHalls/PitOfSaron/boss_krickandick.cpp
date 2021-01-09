@@ -392,7 +392,6 @@ public:
                     me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MoveTakeoff(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 9.0f, 0.5f * 7.0f);
 
-
                     events.RescheduleEvent(8, 2000);
                     break;
                 case 8:

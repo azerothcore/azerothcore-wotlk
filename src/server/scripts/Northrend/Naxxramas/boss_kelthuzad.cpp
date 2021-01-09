@@ -618,7 +618,6 @@ public:
     }
 };
 
-
 void AddSC_boss_kelthuzad()
 {
     new boss_kelthuzad();
