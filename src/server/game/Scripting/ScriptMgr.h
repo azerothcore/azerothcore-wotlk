@@ -1017,22 +1017,17 @@ public:
     // Called when an account logged in successfully
     virtual void OnAccountLogin(uint32 /*accountId*/) { }
 
-
     // Called when an account login failed
     virtual void OnFailedAccountLogin(uint32 /*accountId*/) { }
-
 
     // Called when Email is successfully changed for Account
     virtual void OnEmailChange(uint32 /*accountId*/) { }
 
-
     // Called when Email failed to change for Account
     virtual void OnFailedEmailChange(uint32 /*accountId*/) { }
 
-
     // Called when Password is successfully changed for Account
     virtual void OnPasswordChange(uint32 /*accountId*/) { }
-
 
     // Called when Password failed to change for Account
     virtual void OnFailedPasswordChange(uint32 /*accountId*/) { }
@@ -1332,7 +1327,6 @@ public: /* ItemScript */
     void OnGossipSelect(Player* player, Item* item, uint32 sender, uint32 action);
     void OnGossipSelectCode(Player* player, Item* item, uint32 sender, uint32 action, const char* code);
 
-
 public: /* CreatureScript */
 
     bool OnGossipHello(Player* player, Creature* creature);
@@ -1562,7 +1556,6 @@ public: /* UnitScript */
     void ModifyHealRecieved(Unit* target, Unit* attacker, uint32& addHealth);
     uint32 DealDamage(Unit* AttackerUnit, Unit* pVictim, uint32 damage, DamageEffectType damagetype);
     void OnBeforeRollMeleeOutcomeAgainst(const Unit* attacker, const Unit* victim, WeaponAttackType attType, int32& attackerMaxSkillValueForLevel, int32& victimMaxSkillValueForLevel, int32& attackerWeaponSkill, int32& victimDefenseSkill, int32& crit_chance, int32& miss_chance, int32& dodge_chance, int32& parry_chance, int32& block_chance);
-
 
 public: /* MovementHandlerScript */
 

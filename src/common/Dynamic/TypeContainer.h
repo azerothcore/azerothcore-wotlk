@@ -109,4 +109,3 @@ private:
     ContainerMapList<OBJECT_TYPES> i_elements;
 };
 #endif
-

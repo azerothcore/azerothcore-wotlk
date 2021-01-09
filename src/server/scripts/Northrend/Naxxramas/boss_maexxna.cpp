@@ -169,7 +169,7 @@ public:
                     if (me->GetHealthPct() < 30)
                     {
                         me->CastSpell(me, RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25), true);
-                        
+
                         break;
                     }
 
@@ -197,7 +197,6 @@ public:
         }
     };
 };
-
 
 class boss_maexxna_webwrap : public CreatureScript
 {
@@ -236,4 +235,3 @@ void AddSC_boss_maexxna()
     new boss_maexxna();
     new boss_maexxna_webwrap();
 }
-

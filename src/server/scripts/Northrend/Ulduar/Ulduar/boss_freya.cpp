@@ -42,7 +42,6 @@ enum FreyaSpells
     SPELL_UNSTABLE_SUN_FREYA_DAMAGE_25          = 62865,
     SPELL_UNSTABLE_SUN_VISUAL                   = 62216,
 
-
     // ELDERS
     SPELL_DRAINED_OF_POWER                      = 62467,
     SPELL_STONEBARK_ESSENCE                     = 62483,
@@ -1054,7 +1053,6 @@ public:
         }
     };
 };
-
 
 class boss_freya_healthy_spore : public CreatureScript
 {
