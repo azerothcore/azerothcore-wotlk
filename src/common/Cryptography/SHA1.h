@@ -35,4 +35,3 @@ private:
     uint8 mDigest[SHA_DIGEST_LENGTH];
 };
 #endif
-

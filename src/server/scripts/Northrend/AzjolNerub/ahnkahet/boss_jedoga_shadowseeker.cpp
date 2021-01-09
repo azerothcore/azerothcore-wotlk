@@ -6,7 +6,6 @@
 #include "ScriptedCreature.h"
 #include "ahnkahet.h"
 
-
 enum Yells
 {
     TEXT_AGGRO          = 0,

@@ -197,4 +197,3 @@ private:
 #endif  /* _WORLDSOCKET_H */
 
 /// @}
-
