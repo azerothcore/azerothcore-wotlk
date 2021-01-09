@@ -6,7 +6,6 @@
 #include "ScriptedCreature.h"
 #include "arcatraz.h"
 
-
 enum MillhouseSays
 {
     SAY_INTRO_1                 = 0,

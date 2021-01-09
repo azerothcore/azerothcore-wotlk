@@ -118,4 +118,3 @@ std::unique_ptr<ILog>& getLogInstance();
 #define sLog getLogInstance()
 
 #endif
-

@@ -76,7 +76,6 @@ enum eEvents
     EVENT_GRAB,
 };
 
-
 class npc_ulduar_iron_construct : public CreatureScript
 {
 public:

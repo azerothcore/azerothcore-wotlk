@@ -99,4 +99,3 @@ private:
 typedef std::shared_ptr<PreparedResultSet> PreparedQueryResult;
 
 #endif
-

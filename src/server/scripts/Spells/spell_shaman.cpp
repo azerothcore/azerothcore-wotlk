@@ -403,7 +403,6 @@ public:
     }
 };
 
-
 // Theirs
 // 52759 - Ancestral Awakening (Proc)
 class spell_sha_ancestral_awakening_proc : public SpellScriptLoader

@@ -615,7 +615,6 @@ void Creature::Update(uint32 diff)
                     m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
                 }
 
-
                 if (!IsInEvadeMode() && IsAIEnabled)
                 {
                     // do not allow the AI to be changed during update
@@ -790,7 +789,6 @@ void Creature::RegenerateHealth()
         else
             addvalue = uint32(Spirit * 0.80 * HealthIncreaseRate);
     }
-
 
     // Apply modifiers (if any).
     AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
@@ -1363,7 +1361,6 @@ bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const
     }
     else
         CreateVehicleKit(vehId, Entry);
-
 
     if (!UpdateEntry(Entry, data))
         return false;
