@@ -32,7 +32,6 @@
 #include "Chat.h"
 #include "Vehicle.h"
 
-
 // Ours
 class spell_gen_model_visible : public SpellScriptLoader
 {
@@ -447,7 +446,6 @@ public:
 
     public:
         spell_gen_disabled_above_level_SpellScript(uint8 level) : SpellScript(), _level(level) { }
-
 
         SpellCastResult CheckRequirement()
         {
@@ -1497,7 +1495,6 @@ public:
         return new spell_gen_haunted_SpellScript();
     }
 };
-
 
 // Theirs
 class spell_gen_absorb0_hitlimit1 : public SpellScriptLoader

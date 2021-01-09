@@ -130,4 +130,3 @@ void AddSC_boss_the_maker()
 {
     new boss_the_maker();
 }
-

@@ -85,7 +85,6 @@ public:
     }
 };
 
-
 // Theirs
 /*######
 ## npc_sinkhole_kill_credit

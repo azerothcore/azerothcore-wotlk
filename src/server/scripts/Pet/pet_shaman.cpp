@@ -40,7 +40,6 @@ public:
     {
         npc_pet_shaman_earth_elementalAI(Creature* creature) : ScriptedAI(creature), _initAttack(true) { }
 
-
         void EnterCombat(Unit*) override
         {
             _events.Reset();

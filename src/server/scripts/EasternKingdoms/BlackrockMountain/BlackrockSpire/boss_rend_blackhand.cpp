@@ -53,7 +53,6 @@ enum Misc
     REND_PATH_2                     = 1379681,
 };
 
-
 struct Wave
 {
     uint32 entry;
@@ -110,7 +109,6 @@ static Wave Wave6[] = // 27 sec
     { 10442, 210.8935f, -423.913f,  111.0125f },
     { 10442, 212.2642f, -430.7648f, 110.9807f }
 };
-
 
 /*Position const GythLoc =      { 211.762f,  -397.5885f, 111.1817f,  4.747295f   };
 Position const Teleport1Loc = { 194.2993f, -474.0814f, 121.4505f, -0.01225555f };

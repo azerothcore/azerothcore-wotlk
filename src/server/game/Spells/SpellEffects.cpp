@@ -1717,9 +1717,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
 
     /* == gem perfection handling over == */
 
-
     /* == profession specialization handling == */
-
 
     // init items_count to 1, since 1 item will be created regardless of specialization
     int32 itemsCount = 1;
