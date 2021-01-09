@@ -425,7 +425,6 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
     recvData >> petitionGuid;                              // petition guid
     recvData >> unk;
 
-
     Petition const* petition = sPetitionMgr->GetPetition(GUID_LOPART(petitionGuid));
     if (!petition)
     {
@@ -491,7 +490,6 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
             return;
         }
     }
-
 
     uint32 signs = signatures->signatureMap.size();
     if (++signs > type)                                        // client signs maximum

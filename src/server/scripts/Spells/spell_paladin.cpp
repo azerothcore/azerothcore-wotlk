@@ -286,7 +286,6 @@ public:
     }
 };
 
-
 // Theirs
 // 31850 - Ardent Defender
 class spell_pal_ardent_defender : public SpellScriptLoader

@@ -425,7 +425,6 @@ public:
     }
 };
 
-
 void AddSC_instance_karazhan()
 {
     new instance_karazhan();

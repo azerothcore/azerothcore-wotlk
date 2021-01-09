@@ -277,4 +277,3 @@ private:
     bool _teamScores500Disadvantage[BG_TEAMS_COUNT] {};
 };
 #endif
-

@@ -234,7 +234,6 @@ public:
     {
         npc_ahnkahar_nerubianAI(Creature* c) : ScriptedAI(c) { }
 
-
         uint32 uiSprintTimer;
         void Reset() override
         {

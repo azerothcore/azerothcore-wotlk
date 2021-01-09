@@ -153,7 +153,6 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     targets.Read(recvPacket, pUser);
     HandleClientCastFlags(recvPacket, castFlags, targets);
 
-
     // Note: If script stop casting it must send appropriate data to client to prevent stuck item in gray state.
     if (!sScriptMgr->OnItemUse(pUser, pItem, targets))
     {
@@ -259,7 +258,6 @@ void WorldSession::HandleOpenWrappedItemCallback(PreparedQueryResult result, uin
 
     if (item->GetGUIDLow() != itemLowGUID || !item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED)) // during getting result, gift was swapped with another item
         return;
-
 
     if (!result)
     {

@@ -1669,7 +1669,6 @@ public:
             }
         }
 
-
         void HandleScript(SpellEffIndex /*eff*/)
         {
             Creature* target = GetHitCreature();
@@ -2026,7 +2025,6 @@ public:
         return new spell_shield_generator_AuraScript();
     }
 };
-
 
 class spell_demolisher_ride_vehicle : public SpellScriptLoader
 {

@@ -5,6 +5,7 @@
  */
 
 #include "Common.h"
+#include "Geometry.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
@@ -1150,13 +1151,19 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks ch
 {
     if (IsInWorld())
     {
+        oz += GetCollisionHeight();
         float x, y, z;
         if (GetTypeId() == TYPEID_PLAYER)
+        {
             GetPosition(x, y, z);
+            z += GetCollisionHeight();
+        }
         else
+        {
             GetHitSpherePointFor({ ox, oy, oz }, x, y, z);
+        }
 
-        return GetMap()->isInLineOfSight(x, y, z + 2.0f, ox, oy, oz + 2.0f, GetPhaseMask(), checks);
+        return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks);
     }
     return true;
 }
@@ -1302,12 +1309,7 @@ float Position::GetAngle(const Position* obj) const
 // Return angle in range 0..2*pi
 float Position::GetAngle(const float x, const float y) const
 {
-    float dx = x - GetPositionX();
-    float dy = y - GetPositionY();
-
-    float ang = atan2(dy, dx);
-    ang = (ang >= 0) ? ang : 2 * M_PI + ang;
-    return ang;
+    return getAngle(GetPositionX(), GetPositionY(), x, y);
 }
 
 void Position::GetSinCos(const float x, const float y, float& vsin, float& vcos) const
@@ -1842,7 +1844,6 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj, bool checkAlert) co
 
         if (checkAlert)
             visibilityRange += (visibilityRange * 0.08f) + 1.5f;
-
 
         Unit const* targetUnit = obj->ToUnit();
 
@@ -2621,7 +2622,6 @@ void WorldObject::GetContactPoint(const WorldObject* obj, float& x, float& y, fl
     }
 }
 
-
 void WorldObject::GetChargeContactPoint(const WorldObject* obj, float& x, float& y, float& z, float distance2d) const
 {
     // angle to face `obj` to `this` using distance includes size of `obj`
@@ -2680,22 +2680,82 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
     pos.m_orientation = m_orientation;
 }
 
-void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
+Position WorldObject::GetFirstCollisionPosition(float startX, float startY, float startZ, float destX, float destY)
 {
-    angle += m_orientation;
+    auto dx = destX - startX;
+    auto dy = destY - startY;
+
+    auto ang = atan2(dy, dx);
+    ang = (ang >= 0) ? ang : 2 * M_PI + ang;
+    Position pos = Position(startX, startY, startZ, ang);
+
+    auto distance = pos.GetExactDist2d(destX,destY);
+
+    MovePositionToFirstCollision(pos, distance, ang);
+    return pos;
+};
+
+Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float destZ)
+{
+    Position pos = GetPosition();
+    auto distance = GetExactDistSq(destX,destY,destZ);
+
+    auto dx = destX - pos.GetPositionX();
+    auto dy = destY - pos.GetPositionY();
+
+    auto ang = atan2(dy, dx);
+    ang = (ang >= 0) ? ang : 2 * M_PI + ang;
+
+    MovePositionToFirstCollision(pos, distance, ang);
+    return pos;
+};
+
+Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
+{
+    Position pos = GetPosition();
+    GetFirstCollisionPosition(pos, dist, angle);
+    return pos;
+}
+
+/**
+ *
+ * \return true -> collision, false -> no collision
+ */
+bool WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
+{
+    angle += pos.GetOrientation();
     float destx, desty, destz;
     destx = pos.m_positionX + dist * cos(angle);
     desty = pos.m_positionY + dist * sin(angle);
     destz = pos.m_positionZ;
-    if (isType(TYPEMASK_UNIT | TYPEMASK_PLAYER) && !ToUnit()->IsInWater())
-        destz += 2.0f;
 
     // Prevent invalid coordinates here, position is unchanged
     if (!acore::IsValidMapCoord(destx, desty))
     {
         sLog->outCrash("WorldObject::MovePositionToFirstCollision invalid coordinates X: %f and Y: %f were passed!", destx, desty);
-        return;
+        return false;
     }
+
+    // Use a detour raycast to get our first collision point
+    PathGenerator path(this);
+    path.SetUseRaycast(true);
+    bool result = path.CalculatePath(destx, desty, destz, false);
+
+    // Check for valid path types before we proceed
+    if (!(path.GetPathType() & PATHFIND_NOT_USING_PATH))
+    {
+        if (path.GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)) {
+            return false;
+        }
+    }
+
+    // collision check
+    bool col = (!result || (path.GetPathType() & PATHFIND_SHORTCUT) || (path.GetPathType() & PATHFIND_FARFROMPOLY));
+
+    G3D::Vector3 endPos = path.GetPath().back();
+    destx = endPos.x;
+    desty = endPos.y;
+    destz = endPos.z;
 
     // Xinef: ugly hack for dalaran arena
     float selfAddition = 1.5f;
@@ -2710,10 +2770,8 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
     else
         UpdateAllowedPositionZ(destx, desty, destz);
 
-    bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetMapId(), pos.m_positionX, pos.m_positionY, pos.m_positionZ + selfAddition, destx, desty, destz + 0.5f, destx, desty, destz, -0.5f);
-
     // collision occured
-    if (col)
+    if (VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetMapId(), pos.m_positionX, pos.m_positionY, pos.m_positionZ + selfAddition, destx, desty, destz + 0.5f, destx, desty, destz, -0.5f))
     {
         // move back a bit
         if (pos.GetExactDist2d(destx, desty) > CONTACT_DISTANCE)
@@ -2723,13 +2781,11 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
         }
 
         newDist = sqrt((pos.m_positionX - destx) * (pos.m_positionX - destx) + (pos.m_positionY - desty) * (pos.m_positionY - desty));
+        col = true;
     }
 
-    // check dynamic collision
-    col = GetMap()->getObjectHitPos(GetPhaseMask(), pos.m_positionX, pos.m_positionY, pos.m_positionZ + selfAddition, destx, desty, destz + 0.5f, destx, desty, destz, -0.5f);
-
-    // Collided with a gameobject
-    if (col)
+    // check dynamic collision, Collided with a gameobject
+    if (GetMap()->getObjectHitPos(GetPhaseMask(), pos.m_positionX, pos.m_positionY, pos.m_positionZ + selfAddition, destx, desty, destz + 0.5f, destx, desty, destz, -0.5f))
     {
         // move back a bit
         if (pos.GetExactDist2d(destx, desty) > CONTACT_DISTANCE)
@@ -2738,6 +2794,7 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
             desty -= CONTACT_DISTANCE * sin(angle);
         }
         newDist = sqrt((pos.m_positionX - destx) * (pos.m_positionX - destx) + (pos.m_positionY - desty) * (pos.m_positionY - desty));
+        col = true;
     }
 
     float step = newDist / 10.0f;
@@ -2779,6 +2836,28 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
 
     pos.Relocate(destx, desty, destz);
     pos.m_orientation = m_orientation;
+
+    // position has no ground under it (or is too far away)
+/*     if (ground <= INVALID_HEIGHT)
+    {
+        if (Unit const* unit = ToUnit())
+        {
+            // unit can fly, ignore.
+            if (unit->CanFly())
+            {
+                return false;
+            }
+
+            // fall back to gridHeight if any
+            float gridHeight = GetMap()->GetHeight(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+            if (gridHeight > INVALID_HEIGHT)
+            {
+                pos.m_positionZ = gridHeight + unit->GetHoverHeight();
+            }
+        }
+    } */
+
+    return col;
 }
 
 void WorldObject::MovePositionToFirstCollisionForTotem(Position& pos, float dist, float angle, bool forGameObject)
@@ -2903,7 +2982,6 @@ void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= NULL*/)
     else
         SendMessageToSet(&data, true);
 }
-
 
 void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= NULL*/)
 {
@@ -3087,4 +3165,9 @@ uint64 WorldObject::GetTransGUID() const
     if (GetTransport())
         return GetTransport()->GetGUID();
     return 0;
+}
+
+float WorldObject::GetMapHeight(float x, float y, float z, bool vmap/* = true*/, float distanceToSearch/* = DEFAULT_HEIGHT_SEARCH*/) const
+{
+    return GetMap()->GetHeight(GetPhaseMask(), x, y, z, vmap, distanceToSearch);
 }
