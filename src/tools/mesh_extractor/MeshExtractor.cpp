@@ -166,7 +166,6 @@ void ExtractGameobjectModels()
                 fwrite(indices, sizeof(uint16), numTris, output);
             }
 
-
             fwrite("VERT", 4, 1, output);
             wsize = sizeof(int) + sizeof(float) * 3 * numVerts;
             fwrite(&wsize, sizeof(int), 1, output);

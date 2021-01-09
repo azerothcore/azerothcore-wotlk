@@ -94,7 +94,6 @@ enum VezaxEvents
 #define TEXT_VEZAX_DEATH                            "Oh, what horrors await...."
 #define TEXT_VEZAX_HARDMODE                         "Behold, now! Terror, absolute!"
 
-
 class boss_vezax : public CreatureScript
 {
 public:
