@@ -98,7 +98,6 @@ public:
     }
 };
 
-
 // Theirs
 // 13877, 33735, (check 51211, 65956) - Blade Flurry
 class spell_rog_blade_flurry : public SpellScriptLoader

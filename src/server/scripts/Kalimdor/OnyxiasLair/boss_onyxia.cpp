@@ -373,7 +373,7 @@ public:
                         me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(11, OnyxiaMoveData[1].x + 1.0f, OnyxiaMoveData[1].y, OnyxiaMoveData[1].z, 12.0f);
                         bManyWhelpsAvailable = true;
-                        
+
                         events.RescheduleEvent(EVENT_END_MANY_WHELPS_TIME, 10000);
                     }
                     break;
@@ -384,7 +384,7 @@ public:
                     {
                         me->SetSpeed(MOVE_RUN, 2.95f, false);
                         me->GetMotionMaster()->MovePoint(5, OnyxiaMoveData[5].x, OnyxiaMoveData[5].y, OnyxiaMoveData[5].z);
-                        
+
                         whelpSpam = true;
                         events.ScheduleEvent(EVENT_WHELP_SPAM, 90000);
                         events.ScheduleEvent(EVENT_SUMMON_LAIR_GUARD, 30000);
@@ -417,7 +417,7 @@ public:
                             me->SetFacingToObject(v);
                             me->CastSpell(v, SPELL_FIREBALL, false);
                         }
-                        
+
                         events.ScheduleEvent(EVENT_SPELL_FIREBALL_SECOND, 4000);
                     }
                     break;
@@ -459,7 +459,7 @@ public:
                         me->SetFacingTo(OnyxiaMoveData[CurrentWP].o);
                         me->MonsterTextEmote("Onyxia takes in a deep breath...", 0, true);
                         me->CastSpell(me, OnyxiaMoveData[CurrentWP].spellId, false);
-                        
+
                         events.ScheduleEvent(EVENT_SPELL_BREATH, 8250);
                     }
                     break;
