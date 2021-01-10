@@ -3507,10 +3507,11 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         // Unit is not on the ground, check for potential collision via vmaps
         if (notOnGround)
         {
+            float _x = destX, _y = destY, _z = destZ;
             bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(source->GetMapId(),
                 startX, startY, startZ + halfHeight,
-                destX, destY, destZ + halfHeight,
-                destX, destY, destZ, -0.5f);
+                _x, _y, _z + halfHeight,
+                _x, _y, _z, -0.5f);
 
             // Collided with static LOS object, move back to collision point
             if (col)
@@ -3522,10 +3523,11 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         }
 
         // check dynamic collision
+        float _x = destX, _y = destY, _z = destZ;
         bool col = source->GetMap()->getObjectHitPos(source->GetPhaseMask(),
             startX, startY, startZ + halfHeight,
-            destX, destY, destZ + halfHeight,
-            destX, destY, destZ, -0.5f);
+            _x, _y, _z + halfHeight,
+            _x, _y, _z, -0.5f);
 
         // Collided with a gameobject, move back to collision point
         if (col)
