@@ -12,7 +12,7 @@
 #include "Log.h"
 #include "DisableMgr.h"
 #include "DetourCommon.h"
-#include "DetourNavMeshQuery.h"
+#include "DetourExtended.h"
 #include "Geometry.h"
 
 ////////////////// PathGenerator //////////////////
