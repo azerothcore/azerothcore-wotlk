@@ -388,7 +388,6 @@ public:
             }
         }
     };
-
 };
 
 //Scarlet courier
