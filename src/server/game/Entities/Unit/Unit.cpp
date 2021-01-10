@@ -2283,14 +2283,14 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return nullptr;
     }
 
-    double ray = attackerSize > refUnit->GetCollisionWidth() ? attackerSize / 2.0f : refUnit->GetCollisionWidth() / 2.0f;
+    double radius = attackerSize > refUnit->GetCollisionWidth() ? attackerSize / 2.0f : refUnit->GetCollisionWidth() / 2.0f;
     double angle = 0;
 
     // Equation of tangent point to get the ideal angle to
     // move away from collisions with another unit during combat
     // NOTE: it works only when there's enough space between the
     // attacker and the victim. We use a simpler one otherwise.
-    if (GetExactDist2d(refUnit) > ray)
+    if (GetExactDist2d(refUnit) > radius)
     {
         double refUnitX = refUnit->GetPositionX();
         double refUnitY = refUnit->GetPositionY();
@@ -2298,9 +2298,9 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         double victimY = GetPositionY();
 
         // calculate tangent star
-        double a = 4.0f * ( pow(ray,2.0f) - pow(refUnitX,2.0f) + (2.0f * refUnitX * victimX) - pow(victimX,2.0f) );
+        double a = 4.0f * ( pow(radius,2.0f) - pow(refUnitX,2.0f) + (2.0f * refUnitX * victimX) - pow(victimX,2.0f) );
         double b = 8.0f * ( (refUnitX * refUnitY) + (victimX * victimY) - (victimX * refUnitY) - (refUnitX * victimY) );
-        double c = 4.0f * (- pow(victimY,2.0f) - pow(refUnitY,2.0f) + (2.0f*victimY*refUnitY) + pow(ray,2.0f));
+        double c = 4.0f * (- pow(victimY,2.0f) - pow(refUnitY,2.0f) + (2.0f*victimY*refUnitY) + pow(radius,2.0f));
 
         double sq = sqrt(pow(b,2.0f)-4.0f*a*c);
 
@@ -20021,25 +20021,24 @@ float Unit::GetCollisionWidth() const
     float scaleMod = GetObjectScale(); // 99% sure about this
     float objectSize = GetObjectSize();
 
+    //! Dismounting case - use basic default model data
+    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
+    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
+    float collisionWidth;
+
     if (IsMounted())
     {
         if (CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID)))
         {
             if (CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId))
             {
-                CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
-                CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
-                float const collisionWidth = scaleMod * (std::max(mountModelData->CollisionWidth, modelData->CollisionWidth) * modelData->Scale * displayInfo->scale * 0.5f);
+                collisionWidth = scaleMod * (std::max(mountModelData->CollisionWidth, modelData->CollisionWidth) * modelData->Scale * displayInfo->scale);
                 return objectSize == DEFAULT_WORLD_OBJECT_SIZE && collisionWidth > 0.0f ? collisionWidth : objectSize;
             }
         }
-    }
+    } 
 
-    //! Dismounting case - use basic default model data
-    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
-    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
-
-    float const collisionWidth = scaleMod * modelData->CollisionWidth * modelData->Scale * displayInfo->scale;
+    collisionWidth = scaleMod * modelData->CollisionWidth * modelData->Scale * displayInfo->scale;
     return objectSize == DEFAULT_WORLD_OBJECT_SIZE && collisionWidth > 0.0f ? collisionWidth : objectSize;
 }
 
@@ -20048,24 +20047,22 @@ float Unit::GetCollisionHeight() const
 {
     float scaleMod = GetObjectScale(); // 99% sure about this
 
+    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
+    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
+    float collisionHeight;
     if (IsMounted())
     {
         if (CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID)))
         {
             if (CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId))
             {
-                CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
-                CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
-                float const collisionHeight = scaleMod * (mountModelData->MountHeight + modelData->CollisionHeight * modelData->Scale * displayInfo->scale * 0.5f);
+                collisionHeight = scaleMod * (mountModelData->MountHeight + modelData->CollisionHeight * modelData->Scale * displayInfo->scale * 0.5f);
                 return collisionHeight == 0.0f ? DEFAULT_COLLISION_HEIGHT : collisionHeight;
             }
         }
-    }
+    } 
 
     //! Dismounting case - use basic default model data
-    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
-    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
-
-    float const collisionHeight = scaleMod * modelData->CollisionHeight * modelData->Scale * displayInfo->scale;
+    collisionHeight = scaleMod * modelData->CollisionHeight * modelData->Scale * displayInfo->scale;
     return collisionHeight == 0.0f ? DEFAULT_COLLISION_HEIGHT : collisionHeight;
 }
