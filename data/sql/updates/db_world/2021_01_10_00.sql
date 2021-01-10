@@ -1,3 +1,19 @@
+-- DB update 2021_01_09_02 -> 2021_01_10_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_09_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_09_02 2021_01_10_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1609100844918098600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609100844918098600');
 
 DELETE FROM `creature` WHERE (`id` IN (25258, 25261, 25259) AND `guid` IN (85221, 85222, 85226));
@@ -106,3 +122,12 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (25259, 0, 0, 'Sure, why not?', 12, 7, 100, 6, 0, 0, 24476, 0, 'Footman George'),
 (25260, 0, 0, 'Hey, guys!  Wait up!', 12, 7, 100, 0, 0, 0, 24761, 0, 'Footman Mitch'),
 (25261, 0, 0, 'That was the worst beer I\'ve ever had.', 12, 7, 100, 0, 0, 0, 24483, 0, 'Footman Chuck');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
