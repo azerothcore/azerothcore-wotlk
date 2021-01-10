@@ -242,7 +242,6 @@ class OutdoorPvPNA;
 class OPvPCapturePointNA : public OPvPCapturePoint
 {
 public:
-
     OPvPCapturePointNA(OutdoorPvP* pvp);
 
     bool Update(uint32 diff) override;
@@ -265,7 +264,6 @@ public:
     TeamId GetControllingFaction() const;
 
 protected:
-
     // called when a faction takes control
     void FactionTakeOver(TeamId teamId);
 
@@ -279,7 +277,6 @@ protected:
     void UpdateHalaaWorldState();
 
 private:
-
     bool m_capturable;
 
     uint32 m_GuardsAlive;
@@ -301,7 +298,6 @@ private:
 class OutdoorPvPNA : public OutdoorPvP
 {
 public:
-
     OutdoorPvPNA();
 
     bool SetupOutdoorPvP() override;
@@ -318,7 +314,6 @@ public:
     void HandleKillImpl(Player* player, Unit* killed) override;
 
 private:
-
     OPvPCapturePointNA* m_obj;
 };
 

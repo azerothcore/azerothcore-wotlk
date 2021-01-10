@@ -1193,7 +1193,6 @@ public:
 
         void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
         {
-
             if (Unit* target = GetTarget())
             {
                 if (target->GetMapId() == 603)

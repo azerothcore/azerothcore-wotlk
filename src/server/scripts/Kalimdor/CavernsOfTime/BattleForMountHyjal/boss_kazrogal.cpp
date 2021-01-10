@@ -152,7 +152,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class spell_mark_of_kazrogal : public SpellScriptLoader
