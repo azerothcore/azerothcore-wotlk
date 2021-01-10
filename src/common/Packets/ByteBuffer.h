@@ -53,7 +53,7 @@ public:
     const static size_t DEFAULT_SIZE = 0x1000;
 
     // constructor
-    ByteBuffer()  
+    ByteBuffer()
     {
         _storage.reserve(DEFAULT_SIZE);
     }
@@ -367,7 +367,6 @@ public:
         lt.tm_year = ((packedDate >> 24) & 0x1F) + 100;
 
         return uint32(mktime(&lt));
-
     }
 
     ByteBuffer& ReadPackedTime(uint32& time)

@@ -85,7 +85,6 @@ public:
             OnEffectApply += AuraEffectApplyFn(spell_q11065_wrangle_some_aether_rays_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_q11065_wrangle_some_aether_rays_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
-
     };
 
     AuraScript* GetAuraScript() const override
@@ -226,7 +225,6 @@ public:
             if (m_scriptSpellId == 40825)
                 OnEffectRemove += AuraEffectRemoveFn(spell_q11026_a11051_banish_the_demons_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
-
     };
 
     AuraScript* GetAuraScript() const override
@@ -290,7 +288,6 @@ public:
             OnEffectApply += AuraEffectApplyFn(spell_q10525_vision_guide_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
             AfterEffectRemove += AuraEffectRemoveFn(spell_q10525_vision_guide_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
         }
-
     };
 
     AuraScript* GetAuraScript() const override
@@ -528,7 +525,6 @@ public:
                 OnEffectRemove += AuraEffectRemoveFn(spell_q10769_dissension_amongst_the_ranks_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             }
         }
-
     };
 
     class spell_q10769_dissension_amongst_the_ranks_SpellScript : public SpellScript
@@ -635,7 +631,6 @@ public:
                 if (GetSpellInfo()->Effects[effIndex].TriggerSpell == 41064)
                     trigger->CastSpell(trigger, 41284, true);
             }
-
         }
 
         void Register() override
@@ -1017,7 +1012,6 @@ public:
     }
 };
 
-
 // Theirs
 class spell_generic_quest_update_entry_SpellScript : public SpellScript
 {
@@ -1265,7 +1259,6 @@ public:
             OnEffectApply += AuraEffectApplyFn(spell_q11396_11399_force_shield_arcane_purple_x3_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_q11396_11399_force_shield_arcane_purple_x3_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
-
     };
 
     AuraScript* GetAuraScript() const override
@@ -1701,7 +1694,6 @@ public:
         {
             AfterEffectApply += AuraEffectApplyFn(spell_q12851_going_bearback_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
         }
-
     };
 
     AuraScript* GetAuraScript() const override
@@ -2839,7 +2831,6 @@ public:
     }
 };
 
-
 enum DeathComesFromOnHigh
 {
     SPELL_FORGE_CREDIT                  = 51974,
@@ -3076,7 +3067,6 @@ public:
         return new spell_q9718_crow_transform_AuraScript();
     }
 };
-
 
 void AddSC_quest_spell_scripts()
 {

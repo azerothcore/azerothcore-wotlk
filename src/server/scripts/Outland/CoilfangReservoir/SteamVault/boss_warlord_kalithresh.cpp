@@ -110,7 +110,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_naga_distiller : public CreatureScript
@@ -165,7 +164,6 @@ public:
             }
         }
     };
-
 };
 
 void AddSC_boss_warlord_kalithresh()

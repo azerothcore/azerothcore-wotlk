@@ -978,12 +978,10 @@ void Channel::SendToAllWatching(WorldPacket* data)
 
 void Channel::Voice(uint64 /*guid1*/, uint64 /*guid2*/)
 {
-
 }
 
 void Channel::DeVoice(uint64 /*guid1*/, uint64 /*guid2*/)
 {
-
 }
 
 void Channel::MakeNotifyPacket(WorldPacket* data, uint8 notify_type)

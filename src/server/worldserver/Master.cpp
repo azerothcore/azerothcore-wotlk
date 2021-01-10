@@ -134,7 +134,7 @@ int Master::Run()
     sLog->outString("                                ╚██████╗╚██████╔╝██║  ██║███████╗");
     sLog->outString("                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
 
-    sLog->outString("  	  AzerothCore 3.3.5a  -  www.azerothcore.org\n");
+    sLog->outString("     AzerothCore 3.3.5a  -  www.azerothcore.org\n");
 
     /// worldserver PID file creation
     std::string pidFile = sConfigMgr->GetStringDefault("PidFile", "");
@@ -202,7 +202,6 @@ int Master::Run()
     auctionLising_thread.setPriority(acore::Priority_High);
 
 #if defined(_WIN32) || defined(__linux__)
-
 
     ///- Handle affinity for multiple processors and process priority
     uint32 affinity = sConfigMgr->GetIntDefault("UseProcessors", 0);
