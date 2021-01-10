@@ -2,8 +2,14 @@
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
-#ifndef _GEOMETRY_H
-#define _GEOMETRY_H
+/**
+ * 
+ * Utility library to define some global function for geometric calculations
+ * 
+ */
+
+#ifndef _ACORE_GEOMETRY_H
+#define _ACORE_GEOMETRY_H
 
 #include <cmath>
 #include <iostream>
@@ -17,7 +23,7 @@ using namespace std;
     auto dy = destY - startY;
 
     auto ang = atan2(dy, dx);
-    ang = (ang >= 0) ? ang : 2 * M_PI + ang;
+    ang = (ang >= 0) ? ang : 2 * float(M_PI) + ang;
     return ang;
 }
 
@@ -32,4 +38,19 @@ using namespace std;
     return abs(getSlopeAngle(startX, startY, startZ, destX, destY, destZ));
 }
 
-#endif
+[[nodiscard]] inline double getCircleAreaByRadius(double radius)
+{
+    return radius * radius * M_PI;
+}
+
+[[nodiscard]] inline double getCirclePerimeterByRadius(double radius)
+{
+    return radius * M_PI;
+}
+
+[[nodiscard]] inline double getCylinderVolume(double height, double radius)
+{
+    return height * getCircleAreaByRadius(radius);
+}
+
+#endif // _ACORE_GEOMETRY_H

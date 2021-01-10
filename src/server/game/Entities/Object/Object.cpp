@@ -5,7 +5,7 @@
  */
 
 #include "Common.h"
-#include "Geometry.h"
+#include "Physics.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
@@ -1475,15 +1475,22 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
 
             if (max_z > INVALID_HEIGHT)
             {
-                // hovering units cannot go below their hover height
-                float hoverOffset = unit->GetHoverHeight();
-                max_z += hoverOffset;
-                ground_z += hoverOffset;
-
-                // do not allow creatures to walk on
-                // water level while swimming
                 if (unit->isSwimming()) {
-                    max_z = max_z - (unit->GetCollisionHeight() / 2.0f);
+                    // have a fun with Archimedes' formula
+                    auto height = unit->GetCollisionHeight();
+                    auto width = unit->GetCollisionWidth();
+                    auto weight = getWeight(height, width, 1040); // avg human specific weight
+                    auto heightInWater = height - (getOutOfInWater(width, weight, 10202) * 3.0f); // avg human density
+                    // do not allow creatures to walk on
+                    // water level while swimming
+                    z = max_z = max_z - (heightInWater > 0.0f ? heightInWater : (height - (height / 3));
+                } 
+                else 
+                {
+                    // hovering units cannot go below their hover height
+                    float hoverOffset = unit->GetHoverHeight();
+                    max_z += hoverOffset;
+                    ground_z += hoverOffset;
                 }
 
                 if (z > max_z)
