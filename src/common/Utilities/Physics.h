@@ -33,7 +33,7 @@ using namespace std;
  * @param weight specific weight
  * @return float 
  */
-[[nodiscard]] inline float getOutOfInWater(float width, float weight, float density)
+[[nodiscard]] inline float getOutOfWater(float width, float weight, float density)
 {
     auto baseArea = getCircleAreaByRadius(width / 2.0f);
     return weight / (baseArea * density);

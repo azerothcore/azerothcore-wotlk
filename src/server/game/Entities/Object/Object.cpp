@@ -1156,12 +1156,13 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks ch
         if (GetTypeId() == TYPEID_PLAYER)
         {
             GetPosition(x, y, z);
-            z += GetCollisionHeight();
         }
         else
         {
             GetHitSpherePointFor({ ox, oy, oz }, x, y, z);
         }
+
+        z += GetCollisionHeight();
 
         return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks);
     }
@@ -1475,15 +1476,16 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
 
             if (max_z > INVALID_HEIGHT)
             {
-                if (unit->isSwimming()) {
+                if (canSwim) {
                     // have a fun with Archimedes' formula
                     auto height = unit->GetCollisionHeight();
                     auto width = unit->GetCollisionWidth();
                     auto weight = getWeight(height, width, 1040); // avg human specific weight
-                    auto heightInWater = height - (getOutOfInWater(width, weight, 10202) * 3.0f); // avg human density
+                    auto heightOutOfWater = getOutOfWater(width, weight, 10202) * 4.0f; // avg human density
+                    auto heightInWater = height - heightOutOfWater;
                     // do not allow creatures to walk on
                     // water level while swimming
-                    z = max_z = max_z - (heightInWater > 0.0f ? heightInWater : (height - (height / 3));
+                    max_z = max_z - (height > heightInWater ? heightInWater : (height - (height / 3)));
                 } 
                 else 
                 {
