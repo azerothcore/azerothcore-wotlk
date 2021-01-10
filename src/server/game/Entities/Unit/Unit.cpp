@@ -20014,7 +20014,7 @@ float Unit::GetCollisionWidth() const
                 return objectSize == DEFAULT_WORLD_OBJECT_SIZE && collisionWidth > 0.0f ? collisionWidth : objectSize;
             }
         }
-    }
+    } 
 
     collisionWidth = scaleMod * modelData->CollisionWidth * modelData->Scale * displayInfo->scale;
     return objectSize == DEFAULT_WORLD_OBJECT_SIZE && collisionWidth > 0.0f ? collisionWidth : objectSize;
@@ -20038,7 +20038,7 @@ float Unit::GetCollisionHeight() const
                 return collisionHeight == 0.0f ? DEFAULT_COLLISION_HEIGHT : collisionHeight;
             }
         }
-    }
+    } 
 
     //! Dismounting case - use basic default model data
     collisionHeight = scaleMod * modelData->CollisionHeight * modelData->Scale * displayInfo->scale;
