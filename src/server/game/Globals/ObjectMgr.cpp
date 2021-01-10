@@ -1696,7 +1696,6 @@ void ObjectMgr::LoadTempSummons()
         _tempSummonDataStore[key].push_back(data);
 
         ++count;
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u temp summons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));

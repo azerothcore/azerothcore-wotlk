@@ -584,7 +584,6 @@ public:
 
     // Should return a fully valid Battleground object for the type ID.
     [[nodiscard]] virtual Battleground* GetBattleground() const = 0;
-
 };
 
 class OutdoorPvPScript : public ScriptObject
