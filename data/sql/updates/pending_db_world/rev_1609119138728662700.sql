@@ -46,3 +46,26 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 -- Fix translation
 UPDATE `broadcast_text_locale` SET `MaleText`='%s suelta un grito triunfal.' WHERE `ID`=13082 AND `locale` IN ('esES', 'esMX');
 
+
+/* Gothik the Harvester */
+
+-- Minion difficulty spells
+DELETE FROM `spelldifficulty_dbc` WHERE `ID` IN (55604, 27825, 27831, 27989, 56408, 27993, 55606, 27994, 55648);
+INSERT INTO `spelldifficulty_dbc` (`id`,`DifficultySpellID_1`,`DifficultySpellID_2`) VALUES
+(55604, 55604, 55645), -- death plague
+(27831, 27831, 55638), -- shadow bolt volley
+(27989, 27989, 56407), -- arcane explosion
+(55606, 55606, 55608), -- unholy aura
+(27994, 27994, 55646), -- drain life
+(55648, 55648, 27995); -- unholy frenzy
+
+-- Rider damage aura + visual aura
+DELETE FROM `creature_template_addon` WHERE `entry` IN (16126, 29986, 16148, 29990, 16150, 29988);
+INSERT INTO `creature_template_addon` (`entry`,`mount`,`auras`) VALUES
+(16126, 25278, '55606'),
+(29986, 25278, '55608'),
+(16148, 0, '10848'),
+(29990, 0, '10848'),
+(16150, 0, '55606 10848'),
+(29988, 0, '55608 10848');
+
