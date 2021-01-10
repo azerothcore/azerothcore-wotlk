@@ -562,7 +562,6 @@ public:
 class boss_alyson_antille : public CreatureScript
 {
 public:
-
     boss_alyson_antille()
         : CreatureScript("boss_alyson_antille")
     {
