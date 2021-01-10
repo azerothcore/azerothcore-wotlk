@@ -367,7 +367,7 @@ public:
                             {
                                 pInstance->SetData(DATA_HUNDRED_CLUB, 0);
                                 return;
-                            }z
+                            }
                         }
                         events.RepeatEvent(5000);
                         return;
