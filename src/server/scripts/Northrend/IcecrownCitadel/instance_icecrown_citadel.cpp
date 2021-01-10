@@ -1607,7 +1607,6 @@ public:
                        << ColdflameJetsState << ' ' << BloodQuickeningState << ' ' << BloodQuickeningMinutes << ' ' << WeeklyQuestId10 << ' ' << PutricideEventProgress << ' '
                        << uint32(LichKingHeroicAvailable ? 1 : 0) << ' ' << BloodPrinceTrashCount << ' ' << uint32(IsBuffAvailable ? 1 : 0);
 
-
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
         }
@@ -1871,7 +1870,7 @@ public:
                     break;
             }
         }
-        
+
         void SetPositionTraps(GameObject* go)
         {
             std::vector<Position> trapPositions;

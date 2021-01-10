@@ -702,7 +702,6 @@ struct SmartAction
 
         struct
         {
-
             uint32 emote1;
             uint32 emote2;
             uint32 emote3;
@@ -1697,7 +1696,6 @@ public:
     bool active;
     bool runOnce;
     bool enableTimed;
-
 };
 
 typedef std::unordered_map<uint32, WayPoint*> WPPath;

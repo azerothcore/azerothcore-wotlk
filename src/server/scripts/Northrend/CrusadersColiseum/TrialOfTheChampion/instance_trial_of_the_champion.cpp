@@ -245,7 +245,6 @@ public:
                 for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
                     if( m_auiEncounter[i] == IN_PROGRESS )
                         m_auiEncounter[i] = NOT_STARTED;
-
             }
             else
                 OUT_LOAD_INST_DATA_FAIL;
@@ -743,7 +742,6 @@ public:
                         pAdd->GetMotionMaster()->MoveFollow(pBoss, 2.0f, (i + 1)*M_PI / 2);
                         pAdd->SetReactState(REACT_PASSIVE);
                     }
-
             }
 
             if (!shortver)
@@ -962,7 +960,7 @@ public:
                     {
                         if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
                             tirion->AI()->Talk(TEXT_GRATZ_SLAIN_CHAMPIONS);
-                        
+
                         HandleGameObject(GO_EnterGateGUID, true);
                     }
                     break;

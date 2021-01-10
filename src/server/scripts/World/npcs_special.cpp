@@ -304,8 +304,6 @@ public:
     }
 };
 
-
-
 enum eTrainingDummy
 {
     SPELL_STUN_PERMANENT        = 61204
@@ -424,7 +422,6 @@ public:
         return new npc_target_dummyAI(creature);
     }
 };
-
 
 // Theirs
 /*########
@@ -1420,7 +1417,6 @@ public:
 
         void WaypointReached(uint32 /*waypointId*/) override
         {
-
         }
 
         void UpdateAI(uint32 diff) override
@@ -1844,7 +1840,6 @@ public:
             }
         }
     };
-
 
     CreatureAI* GetAI(Creature* creature) const override
     {

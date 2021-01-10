@@ -95,7 +95,6 @@ enum Misc
 {
     HEART_VEHICLE_SEAT          = 0,
 
-
     ACTION_AWAKEN_HEART         = -5,
     ACTION_HIDE_HEART           = -4,
     ACTION_HEART_BROKEN         = -3,
@@ -105,7 +104,6 @@ enum Misc
     DATA_XT002_NERF_ENGINEERING = 50,
     DATA_XT002_GRAVITY_ACHIEV   = 51,
 };
-
 
 class boss_xt002 : public CreatureScript
 {
@@ -393,7 +391,6 @@ public:
             // Disabled by stunned state
             DoMeleeAttackIfReady();
         }
-
     };
 };
 
