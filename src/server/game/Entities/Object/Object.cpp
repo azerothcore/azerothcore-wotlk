@@ -1476,7 +1476,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
 
             if (max_z > INVALID_HEIGHT)
             {
-                if (canSwim) {
+                if (canSwim && unit->GetMap()->IsInWater(x, y, max_z - 0.5f)) {
                     // have a fun with Archimedes' formula
                     auto height = unit->GetCollisionHeight();
                     auto width = unit->GetCollisionWidth();
@@ -1486,7 +1486,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
                     // do not allow creatures to walk on
                     // water level while swimming
                     max_z = max_z - (height > heightInWater ? heightInWater : (height - (height / 3)));
-                } 
+                }
                 else 
                 {
                     // hovering units cannot go below their hover height
