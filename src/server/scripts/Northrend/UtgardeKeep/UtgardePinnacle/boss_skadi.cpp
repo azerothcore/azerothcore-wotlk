@@ -167,7 +167,6 @@ public:
 
         void DoAction(int32 param) override
         {
-
             if (param == ACTION_PHASE2)
             {
                 SecondPhase = true;
@@ -306,7 +305,6 @@ public:
                 AchievementHitCount++;
                 if (AchievementHitCount >= 3 && m_pInstance)
                     m_pInstance->SetData(DATA_SKADI_ACHIEVEMENT, true);
-
             }
         }
 

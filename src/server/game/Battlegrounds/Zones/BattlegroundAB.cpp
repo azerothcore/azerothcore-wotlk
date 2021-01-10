@@ -117,7 +117,6 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
 
 void BattlegroundAB::StartingEventCloseDoors()
 {
-
     for (uint32 obj = BG_AB_OBJECT_BANNER_NEUTRAL; obj < BG_AB_DYNAMIC_NODES_COUNT * BG_AB_OBJECTS_PER_NODE; ++obj)
         SpawnBGObject(obj, RESPAWN_ONE_DAY);
     for (uint32 i = 0; i < BG_AB_DYNAMIC_NODES_COUNT * 3; ++i)

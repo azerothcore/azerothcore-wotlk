@@ -183,7 +183,6 @@ public:
     private:
         bool _setData;
         EventMap _events;
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override

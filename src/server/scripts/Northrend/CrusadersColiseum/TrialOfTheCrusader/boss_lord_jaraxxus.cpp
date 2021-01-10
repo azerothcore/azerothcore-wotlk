@@ -347,7 +347,6 @@ public:
             me->DespawnOrUnsummon();
         }
     };
-
 };
 
 class npc_mistress_of_pain : public CreatureScript
@@ -429,7 +428,6 @@ public:
             me->DespawnOrUnsummon();
         }
     };
-
 };
 
 class spell_toc25_mistress_kiss : public SpellScriptLoader

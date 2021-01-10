@@ -761,7 +761,6 @@ public:
                             sayer->MonsterSay("SOMEONE TRY THIS SUPER BREW!", LANG_UNIVERSAL, 0);
                             //sayer->CastSpell(sayer, SPELL_CREATE_SUPER_BREW, true);
                             sayer->SummonCreature(NPC_SUPER_BREW_TRIGGER, sayer->GetPositionX() + 15 * cos(sayer->GetOrientation()), sayer->GetPositionY() + 15 * sin(sayer->GetOrientation()), sayer->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
-
                         }
                         else
                         {
@@ -1325,7 +1324,6 @@ public:
                 else
                     target->CastSpell(target, SPELL_RAM_FATIGUE, true);
             }
-
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1632,7 +1630,6 @@ public:
                 else if ((cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
             }
-
         }
 
         void Register() override

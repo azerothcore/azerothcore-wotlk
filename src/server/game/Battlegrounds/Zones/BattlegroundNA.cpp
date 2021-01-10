@@ -29,7 +29,6 @@ BattlegroundNA::BattlegroundNA()
 
 BattlegroundNA::~BattlegroundNA()
 {
-
 }
 
 void BattlegroundNA::StartingEventCloseDoors()

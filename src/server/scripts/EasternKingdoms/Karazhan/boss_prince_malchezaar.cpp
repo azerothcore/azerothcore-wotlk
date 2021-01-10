@@ -195,7 +195,6 @@ public:
             clearweapons();
             positions.clear();
             instance->HandleGameObject(instance->GetData64(DATA_GO_NETHER_DOOR), true);
-
         }
 
         void clearweapons()
@@ -439,7 +438,6 @@ public:
 
             DoMeleeAttackIfReady();
         }
-
     };
 };
 
@@ -455,7 +453,6 @@ public:
 
     struct prince_axesAI : public ScriptedAI
     {
-
         prince_axesAI(Creature* creature) : ScriptedAI(creature)
         {
             Initialize();

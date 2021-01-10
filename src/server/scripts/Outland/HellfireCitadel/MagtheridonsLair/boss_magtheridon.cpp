@@ -86,7 +86,6 @@ private:
 class boss_magtheridon : public CreatureScript
 {
 public:
-
     boss_magtheridon() : CreatureScript("boss_magtheridon") { }
 
     struct boss_magtheridonAI : public BossAI
@@ -130,7 +129,6 @@ public:
             events.ScheduleEvent(EVENT_EMOTE2, 60000);
             events.ScheduleEvent(EVENT_EMOTE3, 120000);
             events.ScheduleEvent(EVENT_ENTER_COMBAT, 123000);
-
         }
 
         void UpdateAI(uint32 diff) override

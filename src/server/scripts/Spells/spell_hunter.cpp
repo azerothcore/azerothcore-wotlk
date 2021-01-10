@@ -1151,7 +1151,6 @@ public:
                     player->SendTameFailure(PET_TAME_ANOTHER_SUMMON_ACTIVE);
                     return SPELL_FAILED_DONT_REPORT;
                 }
-
             }
             else
             {
