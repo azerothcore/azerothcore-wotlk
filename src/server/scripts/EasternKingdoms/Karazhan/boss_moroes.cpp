@@ -265,7 +265,6 @@ public:
                 GetCaster()->RemoveAurasDueToSpell(SPELL_VANISH);
                 GetCaster()->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), target->GetOrientation());
             }
-
         }
 
         void Register() override

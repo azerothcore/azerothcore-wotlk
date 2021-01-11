@@ -16,7 +16,6 @@
 class Bag : public Item
 {
 public:
-
     Bag();
     ~Bag() override;
 
@@ -49,7 +48,6 @@ public:
     void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const override;
 
 protected:
-
     // Bag Storage space
     Item* m_bagslot[MAX_BAG_SIZE];
 };

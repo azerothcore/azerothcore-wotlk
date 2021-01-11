@@ -128,7 +128,6 @@ struct keyData
 
 void WardenMac::HandleHashResult(ByteBuffer& buff)
 {
-
     // test
     int keyIn[4];
 

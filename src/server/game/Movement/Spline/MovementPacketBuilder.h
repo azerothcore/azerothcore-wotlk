@@ -24,7 +24,6 @@ namespace Movement
     {
         static void WriteCommonMonsterMovePart(const MoveSpline& mov, ByteBuffer& data);
     public:
-
         static void WriteMonsterMove(const MoveSpline& mov, ByteBuffer& data);
         static void WriteStopMovement(Vector3 const& loc, uint32 splineId, ByteBuffer& data);
         static void WriteCreate(const MoveSpline& mov, ByteBuffer& data);
