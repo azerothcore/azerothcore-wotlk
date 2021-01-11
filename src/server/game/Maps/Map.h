@@ -357,6 +357,7 @@ public:
     [[nodiscard]] float GetHeight(float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
     [[nodiscard]] float GetGridHeight(float x, float y) const;
     [[nodiscard]] float GetMinHeight(float x, float y) const;
+    [[nodiscard]] float GetGridHeight(float x, float y) const;
     Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr);
 
     ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = nullptr, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const;

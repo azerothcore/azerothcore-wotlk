@@ -1953,20 +1953,16 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
 {
     // find raw .map surface under Z coordinates
     float mapHeight = VMAP_INVALID_HEIGHT_VALUE;
-    if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
-    {
-        float gridHeight = gmap->getHeight(x, y);
-        // look from a bit higher pos to find the floor, ignore under surface case
-        if (z + 2.0f > gridHeight)
-            mapHeight = gridHeight;
-    }
+    float gridHeight = GetGridHeight(x, y);
+    if (G3D::fuzzyGe(z, gridHeight - GROUND_HEIGHT_TOLERANCE))
+        mapHeight = gridHeight;
 
     float vmapHeight = VMAP_INVALID_HEIGHT_VALUE;
     if (checkVMap)
     {
         VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
-        //if (vmgr->isHeightCalcEnabled()) // pussywizard: optimization
-        vmapHeight = vmgr->getHeight(GetId(), x, y, z + 2.0f, maxSearchDist);   // look from a bit higher pos to find the floor
+        // if (vmgr->isHeightCalcEnabled())
+            vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);
     }
 
     // mapHeight set for any above raw ground Z or <= INVALID_HEIGHT

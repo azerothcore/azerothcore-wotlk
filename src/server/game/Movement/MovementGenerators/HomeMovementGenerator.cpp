@@ -51,6 +51,7 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature* owner)
         init.SetFacing(o);
     }
 
+    owner->UpdateAllowedPositionZ(x, y, z);
     init.MoveTo(x, y, z, MMAP::MMapFactory::IsPathfindingEnabled(owner->FindMap()), true);
     init.SetWalk(false);
     init.Launch();
