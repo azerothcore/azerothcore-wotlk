@@ -112,7 +112,6 @@ public:
     //one selection pool for horde, other one for alliance
     SelectionPool m_SelectionPools[BG_TEAMS_COUNT];
 private:
-
     BattlegroundTypeId m_bgTypeId;
     ArenaType m_arenaType;
     uint32 m_WaitTimes[BG_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS][COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME];

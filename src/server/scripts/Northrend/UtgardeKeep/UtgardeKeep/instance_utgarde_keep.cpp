@@ -371,7 +371,6 @@ public:
             return false;
         }
     };
-
 };
 
 void AddSC_instance_utgarde_keep()

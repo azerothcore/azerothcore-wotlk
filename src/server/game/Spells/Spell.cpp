@@ -784,7 +784,6 @@ void Spell::SelectExplicitTargets()
                 m_targets.SetUnitTarget(redirect);
                 m_spellFlags |= SPELL_FLAG_REDIRECTED;
             }
-
         }
     }
 }
@@ -5589,7 +5588,6 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             break;
         }
-
     }
     // Spell casted only on battleground
     if (m_spellInfo->HasAttribute(SPELL_ATTR3_BATTLEGROUND) &&  m_caster->GetTypeId() == TYPEID_PLAYER)

@@ -647,7 +647,6 @@ public:
                     SetEscortPaused(true);
                     eventInRun = true;
                     break;
-
             }
         }
 
@@ -1427,7 +1426,6 @@ public:
                         arthas->AI()->Reset();
                 }
                 player->NearTeleportTo(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY(), LeaderIntroPos2.GetPositionZ(), LeaderIntroPos2.GetOrientation());
-
             }
         }
 

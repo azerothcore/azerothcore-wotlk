@@ -88,7 +88,6 @@ public:
                         }
                         else
                         {
-
                             events.RescheduleEvent(2, 2500);
                         }
                     }
@@ -1402,7 +1401,6 @@ public:
 
     class spell_pos_slave_trigger_closestSpellScript : public SpellScript
     {
-
         PrepareSpellScript(spell_pos_slave_trigger_closestSpellScript);
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
