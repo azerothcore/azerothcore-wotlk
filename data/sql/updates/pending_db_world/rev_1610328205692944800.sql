@@ -28,16 +28,14 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 (117236, 25311, 571, 0, 0, 1, 1, 23077, 1, 2176.37207, 5364.32666, 24.247068, 1.197413, 300, 0, 0, 7984, 0, 0, 0, 0, 0, '', 0),
 (117272, 25311, 571, 0, 0, 1, 1, 23077, 1, 2176.887207, 5364.059082, 33.037594, 1.25239, 300, 0, 0, 7984, 0, 0, 0, 0, 0, '', 0);
 
--- Unsheath weapons on Valiance Keep Defender to fall more in line with other guards patrolling
+-- Unsheath weapons on Valiance Keep Defender to fall more in line with other guards patrolling and delete Scourged Flamespitter waypoint
 
-DELETE FROM `creature_addon` WHERE (`guid` IN (112674, 112675, 112676, 112681));
+DELETE FROM `creature_addon` WHERE (`guid` IN (112674, 112675, 112676, 112681, 118406));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES
 (112674, 1126740, 0, 0, 1, 0, 0, NULL),
 (112675, 1126750, 0, 0, 1, 0, 0, NULL),
 (112676, 1126760, 0, 0, 1, 0, 0, NULL),
 (112681, 1126810, 0, 0, 1, 0, 0, NULL);
 
--- Fix Scourge Flamespitter being weird and having a waypoint ?
 
-DELETE FROM `creature_addon` WHERE (`guid` IN (118406));
 
