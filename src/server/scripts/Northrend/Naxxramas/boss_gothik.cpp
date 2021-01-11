@@ -51,12 +51,7 @@ enum Spells
     // Dead knight
     SPELL_WHIRLWIND                 = 56408,
     // Living rider
-    SPELL_BLOOD_PRESENCE            = 55212,
-    SPELL_DEATH_COIL                = 55209,
-    SPELL_HASTE_AURA                = 13589,
-    SPELL_HYSTERIA                  = 55213,
-    SPELL_INTIMIDATING_SHOUT        = 5246,
-    SPELL_VEIL_OF_DARKNESS          = 28350,
+    SPELL_SHADOW_BOLT_VOLLEY        = 27831,
     // Dead rider
     SPELL_DRAIN_LIFE                = 27994,
     SPELL_UNHOLY_FRENZY             = 55648,
@@ -73,9 +68,7 @@ enum Misc
     NPC_DEAD_KNIGHT                 = 16148,
     NPC_DEAD_HORSE                  = 16149,
     NPC_DEAD_RIDER                  = 16150,
-    //NPC_TRIGGER                     = 16137,
-
-    ACTION_GATE_OPEN                = 1
+    //NPC_TRIGGER                     = 16137
 };
 
 enum Events
@@ -96,12 +89,7 @@ enum Events
     // Dead knight
     EVENT_SPELL_WHIRLWIND           = 10,
     // Living rider
-    EVENT_SPELL_BLOOD_PRESENCE      = 11,
-    EVENT_SPELL_DEATH_COIL          = 12,
-    EVENT_SPELL_HASTE_AURA          = 13,
-    EVENT_SPELL_HYSTERIA            = 14,
-    EVENT_SPELL_INTIMIDATING_SHOUT  = 15,
-    EVENT_SPELL_VEIL_OF_DARKNESS    = 16,
+    EVENT_SPELL_SHADOW_BOLT_VOLLEY  = 12,
     // Dead rider
     EVENT_SPELL_DRAIN_LIFE          = 17,
     EVENT_SPELL_UNHOLY_FRENZY       = 18,
@@ -271,16 +259,17 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 40.0f, true))
-            {
-                summon->AddThreat(target, 1.0f);
-                summon->TauntApply(target);
-                AttackStart(target);
-            }
-            summon->SetInCombatWithZone();
             if (gateOpened)
             {
-                summon->AI()->DoAction(ACTION_GATE_OPEN);
+                summons.DoZoneInCombat();
+            }
+            else
+            {
+                if (Unit* target = me->SelectNearestTarget(50.0f))
+                {
+                    AttackStart(target);
+                    DoZoneInCombat();
+                }
             }
         }
 
@@ -487,7 +476,7 @@ public:
                         me->CastSpell(me, SPELL_TELEPORT_LIVE, false);
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_DISABLE_MOVE);
-                        summons.DoAction(ACTION_GATE_OPEN);
+                        me->RemoveAllAuras();
                         summons.DoZoneInCombat();
                         events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 1000);
                         events.ScheduleEvent(EVENT_SPELL_HARVEST_SOUL, urand(5000, 15000));
@@ -503,7 +492,6 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
-                        summons.DoAction(ACTION_GATE_OPEN);
                         summons.DoZoneInCombat();
                         gateOpened = true;
                         Talk(EMOTE_GATE_OPENED);
@@ -530,38 +518,36 @@ public:
         explicit npc_boss_gothik_minionAI(Creature* c) : CombatAI(c)
         {
             livingSide = IN_LIVE_SIDE(me);
-            gateOpened = false;
         }
         EventMap events;
         bool livingSide;
-        bool gateOpened;
         bool IsOnSameSide(Unit const* who) const { return livingSide == IN_LIVE_SIDE(who); }
-        bool CanAIAttack(Unit const* target) const override { return gateOpened || IsOnSameSide(target); }
-        void Reset() override { events.Reset(); }
+
+        void Reset() override
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->SetNoCallAssistance(false);
+            events.Reset();
+        }
+
         void EnterCombat(Unit*  /*who*/) override
         {
-            me->SetInCombatWithZone();
             switch (me->GetEntry())
             {
                 case NPC_LIVING_TRAINEE:
-                    events.ScheduleEvent(EVENT_SPELL_DEATH_PLAGUE, 2000);
+                    events.ScheduleEvent(EVENT_SPELL_DEATH_PLAGUE, 3000);
                     break;
                 case NPC_DEAD_TRAINEE:
-                    events.ScheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, 2000);
+                    events.ScheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, 2500);
                     break;
                 case NPC_LIVING_KNIGHT:
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_MARK, 2000);
+                    events.ScheduleEvent(EVENT_SPELL_SHADOW_MARK, 3000);
                     break;
                 case NPC_DEAD_KNIGHT:
                     events.ScheduleEvent(EVENT_SPELL_WHIRLWIND, 2000);
                     break;
                 case NPC_LIVING_RIDER:
-                    events.ScheduleEvent(EVENT_SPELL_BLOOD_PRESENCE, 1);
-                    events.ScheduleEvent(EVENT_SPELL_DEATH_COIL, 3000);
-                    events.ScheduleEvent(EVENT_SPELL_HYSTERIA, 10000);
-                    events.ScheduleEvent(EVENT_SPELL_HASTE_AURA, 1000);
-                    events.ScheduleEvent(EVENT_SPELL_INTIMIDATING_SHOUT, urand(4000, 9000));
-                    events.ScheduleEvent(EVENT_SPELL_VEIL_OF_DARKNESS, urand(5000, 7000));
+                    events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT_VOLLEY, 3000);
                     break;
                 case NPC_DEAD_RIDER:
                     events.ScheduleEvent(EVENT_SPELL_DRAIN_LIFE, urand(2000, 3500));
@@ -572,19 +558,17 @@ public:
                     break;
             }
         }
+
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!attacker || (!gateOpened && !IsOnSameSide(attacker)))
+            if (!attacker && !IsOnSameSide(attacker))
             {
                 damage = 0;
             }
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_GATE_OPEN)
+            if (!me->IsInCombat())
             {
-                gateOpened = true;
+                me->CallForHelp(25.0f);
+                AttackStart(attacker);
             }
         }
 
@@ -622,7 +606,7 @@ public:
             {
                 case EVENT_SPELL_DEATH_PLAGUE:
                     me->CastSpell(me->GetVictim(), SPELL_DEATH_PLAGUE, false);
-                    events.RepeatEvent(urand(15000, 20000));
+                    events.RepeatEvent(urand(2500, 5000));
                     break;
                 case EVENT_SPELL_ARCANE_EXPLOSION:
                     if (Unit* victim = me->GetVictim())
@@ -632,7 +616,7 @@ public:
                             me->CastSpell(victim, SPELL_ARCANE_EXPLOSION, false);
                         }
                     }
-                    events.RepeatEvent(urand(5000, 10000));
+                    events.RepeatEvent(2500);
                     break;
                 case EVENT_SPELL_SHADOW_MARK:
                     if (Unit* victim = me->GetVictim())
@@ -642,7 +626,7 @@ public:
                             me->CastSpell(me->GetVictim(), SPELL_SHADOW_MARK, false);
                         }
                     }
-                    events.RepeatEvent(urand(15000, 20000));
+                    events.RepeatEvent(urand(5000, 7000));
                     break;
                 case EVENT_SPELL_WHIRLWIND:
                     if (Unit* victim = me->GetVictim())
@@ -652,58 +636,35 @@ public:
                             me->CastSpell(victim, SPELL_WHIRLWIND, false);
                         }
                     }
-                case EVENT_SPELL_BLOOD_PRESENCE:
-                    if (!me->HasAura(SPELL_BLOOD_PRESENCE))
-                    {
-                        me->CastSpell(me, SPELL_BLOOD_PRESENCE, false);
-                    }
+                    events.RepeatEvent(urand(4000, 6000));
                     break;
-                case EVENT_SPELL_HASTE_AURA:
-                    if (!me->HasAura(SPELL_HASTE_AURA))
-                    {
-                        me->CastSpell(me, SPELL_HASTE_AURA, false);
-                    }
-                case EVENT_SPELL_DEATH_COIL:
-                    me->CastSpell(me->GetVictim(), SPELL_DEATH_COIL, false);
-                    events.RepeatEvent(urand(5000, 9000));
+                case EVENT_SPELL_SHADOW_BOLT_VOLLEY:
+                    me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT_VOLLEY, false);
+                    events.RepeatEvent(5000);
                     break;
-                case EVENT_SPELL_HYSTERIA:
-                    if (!me->HasAura(SPELL_HYSTERIA))
+                case EVENT_SPELL_DRAIN_LIFE:
+                    if (Unit* victim = me->GetVictim())
                     {
-                        me->CastSpell(me, SPELL_HYSTERIA, false);
+                        if (victim->IsWithinDist(me, 20))
+                        {
+                            me->CastSpell(victim, SPELL_DRAIN_LIFE, false);
+                        }
                     }
-                    events.RepeatEvent(urand(15000, 20000));
+                    events.RepeatEvent(urand(8000, 12000));
                     break;
-                case EVENT_SPELL_INTIMIDATING_SHOUT:
+                case EVENT_SPELL_UNHOLY_FRENZY:
+                    me->AddAura(SPELL_UNHOLY_FRENZY, me);
+                    events.RepeatEvent(urand(15000, 17000));
+                    break;
+                case EVENT_SPELL_STOMP:
                     if (Unit* victim = me->GetVictim())
                     {
                         if (victim->IsWithinDist(me, 10))
                         {
-                            me->CastSpell(victim, SPELL_INTIMIDATING_SHOUT, false);
+                            me->CastSpell(victim, SPELL_STOMP, false);
                         }
                     }
-                    events.RepeatEvent(urand(14000, 22000));
-                    break;
-                case EVENT_SPELL_VEIL_OF_DARKNESS:
-                    me->CastSpell(me->GetVictim(), SPELL_VEIL_OF_DARKNESS, false);
-                    events.RepeatEvent(urand(13000, 19000));
-                    break;
-                case EVENT_SPELL_DRAIN_LIFE:
-                    me->CastSpell(me->GetVictim(), SPELL_DRAIN_LIFE, false);
-                    events.RepeatEvent(urand(6000, 15000));
-                    break;
-                case EVENT_SPELL_UNHOLY_FRENZY:
-                    if (!me->HasAura(SPELL_UNHOLY_FRENZY))
-                    {
-                        me->CastSpell(me, SPELL_UNHOLY_FRENZY, false);
-                    }
-                    events.RepeatEvent(urand(2000, 5000));
-                    break;
-                case NPC_DEAD_HORSE:
-                    me->CastSpell(me->GetVictim(), SPELL_STOMP, false);
                     events.RepeatEvent(urand(4000, 9000));
-                    break;
-                default:
                     break;
             }
             DoMeleeAttackIfReady();
