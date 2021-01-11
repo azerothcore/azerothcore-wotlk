@@ -963,7 +963,7 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
 
 bool PathGenerator::IsWalkableClimb(float const* v1, float const* v2) const
 {
-    return IsWalkableClimb(v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+    return IsWalkableClimb(v1[2], v1[0], v1[1], v2[2], v2[0], v2[1]);
 }
 
 bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ) const
