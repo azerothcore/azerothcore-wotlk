@@ -1033,7 +1033,6 @@ enum infraGreenBomberQuests
     SPELL_WAITING_FOR_A_BOMBER  = 59563,
     SPELL_FLIGHT_ORDERS         = 61281,
 
-
     EVENT_TAKE_PASSENGER        = 1,
     EVENT_START_FLIGHT          = 2,
     EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE           = 3,
@@ -1095,7 +1094,6 @@ public:
     {
         return new spell_switch_infragreen_bomber_station_SpellScript();
     }
-
 };
 
 class spell_charge_shield_bomber : public SpellScriptLoader
@@ -1407,7 +1405,6 @@ public:
 
     private:
         EventMap events;
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1415,7 +1412,6 @@ public:
         return new npc_infra_green_bomber_genericAI(creature);
     }
 };
-
 
 // Theirs
 /*######
@@ -1459,7 +1455,6 @@ public:
                 who->CastSpell(who, SPELL_TRESPASSER_H, true);
             else
                 who->CastSpell(who, SPELL_TRESPASSER_A, true);
-
         }
     };
 
@@ -1619,14 +1614,12 @@ public:
         }
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_tournament_training_dummyAI(creature);
     }
-
 };
 
 // Battle for Crusaders' Pinnacle
@@ -1754,7 +1747,6 @@ public:
         void EnterCombat(Unit* /*who*/) override { }
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
-
 
         void JustSummoned(Creature* Summoned) override
         {

@@ -275,7 +275,6 @@ public:
                 SaveToDB();
                 OUT_SAVE_INST_DATA_COMPLETE;
             }
-
         }
 
         uint32 GetData(uint32 type) const override

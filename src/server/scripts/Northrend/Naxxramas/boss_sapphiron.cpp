@@ -238,7 +238,7 @@ public:
             {
                 case EVENT_BERSERK:
                     Talk(EMOTE_ENRAGE);
-                    me->CastSpell(me, SPELL_BERSERK, true);  
+                    me->CastSpell(me, SPELL_BERSERK, true);
                     return;
                 case EVENT_SPELL_CLEAVE:
                     me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
@@ -268,7 +268,6 @@ public:
                 case EVENT_FLIGHT_START:
                     if (me->HealthBelowPct(11))
                     {
-                        
                         return;
                     }
                     events.RepeatEvent(45000);
@@ -352,7 +351,7 @@ public:
                     me->SetDisableGravity(false);
 
                     me->SetHover(false);
-                    
+
                     events.ScheduleEvent(EVENT_GROUND, 1500);
                     return;
                 case EVENT_GROUND:
@@ -369,7 +368,6 @@ public:
                                 pInstance->SetData(DATA_HUNDRED_CLUB, 0);
                                 return;
                             }
-
                         }
                         events.RepeatEvent(5000);
                         return;

@@ -918,7 +918,6 @@ enum headlessHorseman
     SPELL_PUMPKIN_AURA                              = 42294,
     SPELL_BURNING_BODY                              = 43184,
 
-
     // NP
     SPELL_HORSEMAN_SMOKE                            = 42355,
     SPELL_SPIRIT_PARTICLES_GREEN_CHEST              = 43161,
@@ -970,7 +969,6 @@ public:
             me->GetCreaturesWithEntryInRange(unitList, 100.0f, NPC_PUMPKIN_FIEND);
             for (std::list<Creature*>::iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
                 (*itr)->ToCreature()->DespawnOrUnsummon(500);
-
 
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
