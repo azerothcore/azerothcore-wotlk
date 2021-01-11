@@ -9,6 +9,7 @@
         "ms-vscode-remote.remote-containers",
         "mhutchie.git-graph",
         "github.vscode-pull-request-github",
-        "eamodio.gitlens"
+        "eamodio.gitlens",
+        "cschlosser.doxdocgen"
     ]
 }
