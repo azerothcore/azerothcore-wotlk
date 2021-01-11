@@ -162,4 +162,3 @@ void AddSC_boss_renataki()
 {
     new boss_renataki();
 }
-

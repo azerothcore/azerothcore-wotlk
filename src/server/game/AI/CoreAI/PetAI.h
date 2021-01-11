@@ -35,7 +35,6 @@ enum SpecialPets
 class PetAI : public CreatureAI
 {
 public:
-
     explicit PetAI(Creature* c);
 
     void UpdateAI(uint32) override;

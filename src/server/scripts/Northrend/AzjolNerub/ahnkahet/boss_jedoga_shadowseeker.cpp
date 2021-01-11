@@ -6,7 +6,6 @@
 #include "ScriptedCreature.h"
 #include "ahnkahet.h"
 
-
 enum Yells
 {
     TEXT_AGGRO          = 0,
@@ -135,7 +134,6 @@ public:
                 me->SummonCreature(NPC_INITIATE, 366.861f, -721.702f, -16.1797f, 5.65409f);
                 me->SummonCreature(NPC_INITIATE, 362.343f, -718.019f, -16.1797f, 5.51665f);
                 me->SummonCreature(NPC_INITIATE, 358.906f, -714.357f, -16.1797f, 5.35957f);
-
             }
         }
 

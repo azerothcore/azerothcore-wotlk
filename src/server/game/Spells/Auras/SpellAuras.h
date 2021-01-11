@@ -48,7 +48,6 @@ private:
     void _InitFlags(Unit* caster, uint8 effMask);
     void _HandleEffect(uint8 effIndex, bool apply);
 public:
-
     Unit* GetTarget() const { return _target; }
     Aura* GetBase() const { return _base; }
 

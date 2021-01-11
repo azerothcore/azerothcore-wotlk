@@ -361,7 +361,6 @@ enum eAchievementCriteria
     ACHIEV_CRITERIA_REALM_FIRST_GRAND_CRUSADER              = 12350,
 };
 
-
 enum euiWorldStates
 {
     UPDATE_STATE_UI_SHOW                                    = 4390,

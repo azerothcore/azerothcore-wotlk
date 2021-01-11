@@ -319,7 +319,6 @@ void TicketMgr::LoadTickets()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u GM tickets in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-
 }
 
 void TicketMgr::LoadSurveys()
@@ -332,7 +331,6 @@ void TicketMgr::LoadSurveys()
         _lastSurveyId = (*result)[0].GetUInt32();
 
     sLog->outString(">> Loaded GM Survey count from database in %u ms", GetMSTimeDiffToNow(oldMSTime));
-
 }
 
 void TicketMgr::AddTicket(GmTicket* ticket)
@@ -378,7 +376,6 @@ void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, int64 source)
         ticket->SaveToDB(trans);
     }
 }
-
 
 void TicketMgr::ShowList(ChatHandler& handler, bool onlineOnly) const
 {

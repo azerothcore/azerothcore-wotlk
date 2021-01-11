@@ -4,11 +4,8 @@
 
 #include "gtest/gtest.h"
 #include "Formulas.h"
-#include "SharedDefines.h"
-#include "Log.h"
 #include "LogMock.h"
-
-LoginDatabaseWorkerPool LoginDatabase;
+#include "WorldMock.h"
 
 using namespace acore::Honor;
 using namespace acore::XP;
@@ -92,4 +89,12 @@ TEST(FormulasTest, BaseGain)
     // check outError() has been called after passing an invalid ContentLevels content
     EXPECT_CALL(*logMock, outErrorMock()).Times(1);
     EXPECT_EQ(BaseGain(79, 1, ContentLevels(999)), 0);
+}
+
+TEST(FormulasTest, Gain)
+{
+    auto worldMock = new WorldMock();
+    sWorld.reset((worldMock));
+    // TODO: create mocks of Player and Creature
+    // Gain(nullptr, nullptr);
 }

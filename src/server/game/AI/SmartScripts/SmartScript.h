@@ -307,7 +307,6 @@ private:
                     mStoredEvents.erase(i);
                     return;
                 }
-
             }
         }
     }
@@ -321,7 +320,6 @@ private:
                 {
                     return (*i);
                 }
-
             }
         }
         SmartScriptHolder s;

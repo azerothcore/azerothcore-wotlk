@@ -269,7 +269,6 @@ namespace MMAP
             if (fread(&lheader, sizeof(map_liquidHeader), 1, mapFile) != 1)
                 printf("TerrainBuilder::loadMap: Failed to read some data expected 1, read 0\n");
 
-
             float* liquid_map = nullptr;
 
             if (!(lheader.flags & MAP_LIQUID_NO_TYPE))
@@ -594,7 +593,6 @@ namespace MMAP
             |    \|
             258---259 ... 515
         */
-
     }
 
     /**************************************************************************/
@@ -939,7 +937,6 @@ namespace MMAP
                 meshData.offMeshConnectionsAreas.append((unsigned char)0xFF);
                 meshData.offMeshConnectionsFlags.append((unsigned short)0xFF);  // all movement masks can make this path
             }
-
         }
 
         delete [] buf;

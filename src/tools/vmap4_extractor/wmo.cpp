@@ -175,7 +175,6 @@ bool WMOGroup::open()
             f.read(&fogIdx, 4);
             f.read(&liquidType, 4);
             f.read(&groupWMOID, 4);
-
         }
         else if (!strcmp(fourcc, "MOPY"))
         {

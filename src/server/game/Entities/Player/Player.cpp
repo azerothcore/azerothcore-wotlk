@@ -732,6 +732,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_usedTalentCount = 0;
     m_questRewardTalentCount = 0;
+    m_extraBonusTalentCount = 0;
 
     m_regenTimer = 0;
     m_regenTimerCount = 0;
@@ -2643,7 +2644,6 @@ void Player::RegenerateAll()
             // xinef: if grace is started, increase it but no more than cap
             else if (uint32 grace = GetGracePeriod(i))
             {
-
                 if (grace < RUNE_GRACE_PERIOD)
                     SetGracePeriod(i, std::min<uint32>(grace + m_regenTimer, RUNE_GRACE_PERIOD));
             }
@@ -4109,7 +4109,6 @@ bool Player::IsNeedCastPassiveSpellAtLearn(SpellInfo const* spellInfo) const
     ShapeshiftForm form = GetShapeshiftForm();
     return (!spellInfo->Stances || (form && (spellInfo->Stances & (1 << (form - 1)))) ||
             (!form && spellInfo->HasAttribute(SPELL_ATTR2_NOT_NEED_SHAPESHIFT)));
-
 }
 
 void Player::learnSpell(uint32 spellId)
@@ -7286,6 +7285,14 @@ void Player::RewardReputation(Quest const* quest)
     }
 }
 
+void Player::RewardExtraBonusTalentPoints(uint32 bonusTalentPoints)
+{
+    if (bonusTalentPoints)
+    {
+        m_extraBonusTalentCount += bonusTalentPoints;
+    }
+}
+
 void Player::UpdateHonorFields()
 {
     /// called when rewarding honor and at each save
@@ -7567,7 +7574,6 @@ uint32 Player::GetArenaTeamIdFromStorage(uint32 guid, uint8 slot)
     }
     return 0;
 }
-
 
 void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
 {
@@ -8278,7 +8284,6 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     if (CanUseAttackType(attType))
         _ApplyWeaponDamage(slot, proto, ssv, apply);
 
-
     // Druids get feral AP bonus from weapon dps (also use DPS from ScalingStatValue)
     if (getClass() == CLASS_DRUID)
     {
@@ -8646,7 +8651,6 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
 
             if (spellData.SpellPPMRate)
             {
-
                 uint32 WeaponSpeed = GetAttackTime(attType);
                 chance = GetPPMProcChance(WeaponSpeed, spellData.SpellPPMRate, spellInfo);
             }
@@ -12635,7 +12639,6 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, count);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
         pItem = StoreItem(dest, pItem, update);
-
 
         if (allowedLooters.size() > 1 && pItem->GetTemplate()->GetMaxStackSize() == 1 && pItem->IsSoulBound())
         {
@@ -18831,7 +18834,6 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
                         delete item;
                         continue;
                     }
-
                 }
 
                 // Item's state may have changed after storing
@@ -19135,7 +19137,6 @@ void Player::_LoadMail()
             m->checked = fields[11].GetUInt8();
             m->stationery = fields[12].GetUInt8();
             m->mailTemplateId = fields[13].GetInt16();
-
 
             if (m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
             {
@@ -20046,7 +20047,7 @@ void Player::_SaveMail(SQLTransaction& trans)
     if (!GetMailCacheSize() || !m_mailsUpdated)
     {
         return;
-    }    
+    }
 
     PreparedStatement* stmt = nullptr;
 
@@ -21629,7 +21630,6 @@ void Player::LeaveAllArenaTeams(uint64 guid)
     } while (result->NextRow());
 }
 
-
 uint32 Player::GetArenaTeamId(uint8 slot) const
 {
     uint32 rtVal = 0;
@@ -21644,7 +21644,6 @@ uint32 Player::GetArenaTeamId(uint8 slot) const
 
     return rtVal;
 }
-
 
 uint32 Player::GetArenaPersonalRating(uint8 slot) const
 {
@@ -23215,7 +23214,6 @@ void Player::AddComboPoints(Unit* target, int8 count)
     else if (*comboPoints < 0)
         *comboPoints = 0;
 
-
     SendComboPoints();
 }
 
@@ -24721,7 +24719,6 @@ void Player::UpdateUnderwaterState(Map* m, float x, float y, float z)
         _lastLiquid = nullptr;
     }
 
-
     // All liquids type - check under water position
     if (liquid_status.type_flags & (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN | MAP_LIQUID_TYPE_MAGMA | MAP_LIQUID_TYPE_SLIME))
     {
@@ -25426,6 +25423,7 @@ uint32 Player::CalculateTalentsPoints() const
     if (talentPointsForLevel > base_talent)
         talentPointsForLevel = base_talent;
 
+    talentPointsForLevel += m_extraBonusTalentCount;
     return uint32(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
 }
 
@@ -25557,7 +25555,6 @@ uint32 Player::GetPhaseMaskForSpawn() const
 
     if (!phase)
         phase = PHASEMASK_NORMAL;
-
 
     // some aura phases include 1 normal map in addition to phase itself
     uint32 n_phase = phase & ~PHASEMASK_NORMAL;

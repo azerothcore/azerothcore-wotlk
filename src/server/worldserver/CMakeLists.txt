@@ -21,7 +21,7 @@ if( WIN32 )
     list(APPEND PRIVATE_SOURCES worldserver.rc)
   endif()
 endif()
- 
+
 if (USE_COREPCH)
   set(PRIVATE_PCH_HEADER PrecompiledHeaders/worldPCH.h)
 endif()
