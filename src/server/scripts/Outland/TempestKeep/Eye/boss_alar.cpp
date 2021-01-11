@@ -62,7 +62,6 @@ enum Misc
 
     EVENT_MOVE_TO_PHASE_2       = 20,
     EVENT_FINISH_DIVE           = 21
-
 };
 
 // Xinef: Ruse of the Ashtongue (10946)

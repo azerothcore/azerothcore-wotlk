@@ -183,7 +183,6 @@ void CreatureTextMgr::LoadCreatureTextLocales()
             continue;
 
         ObjectMgr::AddLocaleString(Text, locale, data.Text);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u Creature Text Locale in %u ms", uint32(mLocaleTextMap.size()), GetMSTimeDiffToNow(oldMSTime));
