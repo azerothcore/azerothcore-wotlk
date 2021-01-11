@@ -30,7 +30,7 @@ float dtQueryFilterExt::getCost(const float* pa, const float* pb,
 	float destX=pb[2], destY=pb[0], destZ=pb[1];
 	float slopeAngle = getSlopeAngle(startX, startY, startZ, destX, destY, destZ);
     float slopeAngleDegree = (slopeAngle * 180.0f / M_PI);
-    float cost = slopeAngleDegree > 0 ? 1.0f - (1.0f * (slopeAngleDegree/100)) : 1.0f;
+    float cost = slopeAngleDegree > 0 ? 1.0f + (1.0f * (slopeAngleDegree/100)) : 1.0f;
 	float dist = dtVdist(pa, pb);
 	auto totalCost = dist * cost;
 	return totalCost;
