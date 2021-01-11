@@ -47,13 +47,13 @@ uint32 realmID;                                             ///< Id of the realm
 void usage(const char* prog)
 {
     sLog->outString("Usage:\n"
-					" %s [<options>]\n"
-					"    -c config_file           use config_file as configuration file\n\r", prog);
+                    " %s [<options>]\n"
+                    "    -c config_file           use config_file as configuration file\n\r", prog);
 #ifdef _WIN32
-	sLog->outString("    Running as service functions:\n"
-					"    --service                run as service\n"
-					"    -s install               install service\n"
-					"    -s uninstall             uninstall service\n\r");
+    sLog->outString("    Running as service functions:\n"
+                    "    --service                run as service\n"
+                    "    -s install               install service\n"
+                    "    -s uninstall             uninstall service\n\r");
 #endif
 }
 

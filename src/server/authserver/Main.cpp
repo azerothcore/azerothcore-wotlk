@@ -69,14 +69,14 @@ public:
         switch (sigNum)
         {
             case SIGINT:
-				stopEvent = true;
-				break;
+                stopEvent = true;
+                break;
             case SIGTERM:
 #ifdef _WIN32
             case SIGBREAK:
                 if (m_ServiceStatus != 1)
 #endif
-					stopEvent = true;
+                    stopEvent = true;
                 break;
         }
     }
@@ -86,13 +86,13 @@ public:
 void usage(const char* prog)
 {
     sLog->outString("Usage:\n"
-					" %s [<options>]\n"
-					"    -c config_file           use config_file as configuration file\n\r", prog);
+                    " %s [<options>]\n"
+                    "    -c config_file           use config_file as configuration file\n\r", prog);
 #ifdef _WIN32
-	sLog->outString("    Running as service functions:\n"
-					"    --service                run as service\n"
-					"    -s install               install service\n"
-					"    -s uninstall             uninstall service\n\r");
+    sLog->outString("    Running as service functions:\n"
+                    "    --service                run as service\n"
+                    "    -s install               install service\n"
+                    "    -s uninstall             uninstall service\n\r");
 #endif
 }
 
@@ -115,7 +115,7 @@ extern int main(int argc, char** argv)
             else
                 configFile = argv[count];
         }
-		
+
 #ifdef _WIN32
         if (strcmp(argv[count], "-s") == 0) // Services
         {
@@ -148,7 +148,7 @@ extern int main(int argc, char** argv)
 
         if (strcmp(argv[count], "--service") == 0)
             WinServiceRun();
-#endif		
+#endif
         ++count;
     }
 
@@ -240,7 +240,7 @@ extern int main(int argc, char** argv)
 
     // Initialize the signal handlers
     AuthServerSignalHandler SignalINT, SignalTERM;
-	
+
 #ifdef _WIN32
     AuthServerSignalHandler SignalBREAK;
 #endif /* _WIN32 */
@@ -347,14 +347,14 @@ extern int main(int argc, char** argv)
             sLog->outDetail("Ping MySQL to keep connection alive");
             LoginDatabase.KeepAlive();
         }
-		
+
 #ifdef _WIN32
         if (m_ServiceStatus == 0)
             break;
 
         while (m_ServiceStatus == 2)
             Sleep(1000);
-#endif		
+#endif
     }
 
     // Close the Database Pool and library
