@@ -1760,7 +1760,6 @@ public:
         {
             OnEffectHitTarget += SpellEffectFn(spell_dk_death_strike_SpellScript::HandleDummy, EFFECT_2, SPELL_EFFECT_DUMMY);
         }
-
     };
 
     SpellScript* GetSpellScript() const override
