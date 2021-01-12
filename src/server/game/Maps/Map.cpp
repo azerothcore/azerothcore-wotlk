@@ -1993,6 +1993,14 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
     return mapHeight;                               // explicitly use map data
 }
 
+float Map::GetGridHeight(float x, float y) const
+{
+    if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
+        return gmap->getHeight(x, y);
+
+    return VMAP_INVALID_HEIGHT_VALUE;
+}
+
 float Map::GetMinHeight(float x, float y) const
 {
     if (GridMap const* grid = const_cast<Map*>(this)->GetGrid(x, y))

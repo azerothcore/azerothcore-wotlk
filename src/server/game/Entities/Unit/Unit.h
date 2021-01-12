@@ -1428,6 +1428,7 @@ public:
     [[nodiscard]] bool IsWithinRange(Unit const* obj, float dist) const;
     bool IsWithinCombatRange(const Unit* obj, float dist2compare) const;
     bool IsWithinMeleeRange(const Unit* obj, float dist = MELEE_RANGE) const;
+    float GetMeleeRange(Unit const* target) const;
     bool GetRandomContactPoint(const Unit* target, float& x, float& y, float& z, bool force = false) const;
     uint32 m_extraAttacks;
     bool m_canDualWield;

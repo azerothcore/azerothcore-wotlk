@@ -599,7 +599,7 @@ void Creature::Update(uint32 diff)
 
                 // If we are closer than 50% of the combat reach we are going to reposition the victim
                 if (Unit *victim = GetVictim();
-                    victim && GetDistance(victim->GetPosition()) < CalculatePct(GetCombatReach() + victim->GetCombatReach(), 50)) {
+                    victim && GetDistance(victim->GetPosition()) < GetMeleeRange(victim)) {
                     if (diff >= m_moveBackwardsMovementTime)
                     {
                         AI()->MoveBackwardsChecks();

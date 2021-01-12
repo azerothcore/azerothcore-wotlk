@@ -1570,48 +1570,39 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
             }
         default:
             {
-                float dist;
+                float dist = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
                 float angle = targetType.CalcDirectionAngle();
-                float objSize = m_caster->GetObjectSize();
-                if (targetType.GetTarget() == TARGET_DEST_CASTER_SUMMON)
+                float objSize = m_caster->GetCombatReach();
+
+                switch (targetType.GetTarget())
+                {
+                case TARGET_DEST_CASTER_SUMMON:
                     dist = PET_FOLLOW_DIST;
-                else
-                    dist = m_spellInfo->Effects[effIndex].CalcRadius(m_caster);
+                    break;
+                case TARGET_DEST_CASTER_RANDOM:
+                    if (dist > objSize)
+                        dist = objSize + (dist - objSize) * float(rand_norm());
+                    break;
+                case TARGET_DEST_CASTER_FRONT_LEFT:
+                case TARGET_DEST_CASTER_BACK_LEFT:
+                case TARGET_DEST_CASTER_FRONT_RIGHT:
+                case TARGET_DEST_CASTER_BACK_RIGHT:
+                {
+                    static float const DefaultTotemDistance = 3.0f;
+                    if (!m_spellInfo->Effects[effIndex].HasRadius())
+                        dist = DefaultTotemDistance;
+                    break;
+                }
+                default:
+                    break;
+                }
 
                 if (dist < objSize)
-                {
                     dist = objSize;
-                    // xinef: give the summon some space (eg. totems)
-                    if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->Effects[effIndex].IsEffect(SPELL_EFFECT_SUMMON))
-                        dist += objSize;
-                }
-                else if (targetType.GetTarget() == TARGET_DEST_CASTER_RANDOM)
-                    dist = objSize + (dist - objSize) * (float)rand_norm();
 
-                Position pos;
-                bool totemCollision = false;
-                if (m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_SUMMON)
-                {
-                    SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(m_spellInfo->Effects[effIndex].MiscValueB);
-                    if (properties && (properties->Type == SUMMON_TYPE_TOTEM || properties->Type == SUMMON_TYPE_LIGHTWELL))
-                    {
-                        totemCollision = true;
-                        m_caster->GetFirstCollisionPositionForTotem(pos, dist, angle, false);
-                    }
-                }
-                else if (m_spellInfo->Effects[effIndex].Effect >= SPELL_EFFECT_SUMMON_OBJECT_SLOT1 && m_spellInfo->Effects[effIndex].Effect <= SPELL_EFFECT_SUMMON_OBJECT_SLOT4)
-                {
-                    totemCollision = true;
-                    m_caster->GetFirstCollisionPositionForTotem(pos, dist, angle, true);
-                }
+                Position pos = dest._position;
+                m_caster->MovePositionToFirstCollision(pos, dist, angle);
 
-                if (!totemCollision)
-                {
-                    if (m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_LEAP || m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_TELEPORT_UNITS || m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_JUMP_DEST || (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_SUMMON))
-                        m_caster->GetFirstCollisionPosition(pos, dist, angle);
-                    else
-                        m_caster->GetNearPosition(pos, dist, angle);
-                }
                 dest.Relocate(pos);
                 break;
             }
