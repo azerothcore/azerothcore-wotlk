@@ -162,7 +162,6 @@ public:
             switch (creature->GetEntry())
             {
             case NPC_VERDISA:
-                
                 AddGossipItemFor(player, 9573, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
                 if (player->HasItemCount(ITEM_AMBER_ESSENCE))
                 {
