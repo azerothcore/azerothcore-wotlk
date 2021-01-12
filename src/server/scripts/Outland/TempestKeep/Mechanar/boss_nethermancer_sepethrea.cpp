@@ -176,7 +176,6 @@ public:
 
             DoMeleeAttackIfReady();
         }
-
     };
     CreatureAI* GetAI(Creature* creature) const override
     {

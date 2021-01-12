@@ -44,7 +44,6 @@ public:
     void LoadGraveyardFromDB();
 
 private:
-
     GraveyardContainer _graveyardStore;
 
     // for wintergrasp only

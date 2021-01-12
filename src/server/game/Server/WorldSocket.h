@@ -191,10 +191,8 @@ private:
     bool m_OutActive;
 
     uint32 m_Seed;
-
 };
 
 #endif  /* _WORLDSOCKET_H */
 
 /// @}
-

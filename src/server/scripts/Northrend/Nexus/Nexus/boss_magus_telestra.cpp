@@ -238,7 +238,6 @@ public:
             GetUnitOwner()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             GetUnitOwner()->SetControlled(true, UNIT_STATE_STUNNED);
             GetUnitOwner()->ToCreature()->LoadEquipment(0, true);
-
         }
 
         void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)

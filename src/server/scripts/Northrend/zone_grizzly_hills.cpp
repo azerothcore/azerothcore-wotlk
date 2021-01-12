@@ -21,7 +21,6 @@ enum qRedRocket
     SPELL_TORPEDO_EXPLODE                       = 49290,
     SPELL_ALLIANCE_TORPEDO_KILL_CREDIT          = 49510,
     SPELL_HORDE_TORPEDO_KILL_CREDIT             = 49340,
-
 };
 
 class npc_riding_the_red_rocket : public CreatureScript
@@ -71,7 +70,6 @@ public:
         return new npc_riding_the_red_rocketAI(creature);
     }
 };
-
 
 // Theirs
 
@@ -304,7 +302,6 @@ public:
         }
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
-
 
         void UpdateAI(uint32 /*diff*/) override
         {
