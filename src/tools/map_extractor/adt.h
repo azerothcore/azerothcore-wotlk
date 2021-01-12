@@ -254,7 +254,6 @@ public:
         else
             return 0xFFFFFFFFFFFFFFFFuLL;
     }
-
 };
 
 // Adt file min/max height chunk

@@ -198,13 +198,11 @@ public:
                     me->CastSpell(me, SPELL_CONSECRATION, false);
                     events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 20000);
                     break;
-
             }
 
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_captain_skarloc()

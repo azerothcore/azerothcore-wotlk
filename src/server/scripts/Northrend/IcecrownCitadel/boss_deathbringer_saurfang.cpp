@@ -575,7 +575,6 @@ public:
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_1, 10000);
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_2, 18000);
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_3, 24000);*/
-
                     }
                     break;
                 case ACTION_EVADE:

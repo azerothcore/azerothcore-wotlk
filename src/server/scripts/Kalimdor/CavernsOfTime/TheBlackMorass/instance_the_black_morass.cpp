@@ -10,7 +10,6 @@
 #include "SpellInfo.h"
 #include "ScriptedCreature.h"
 
-
 const Position PortalLocation[4] =
 {
     {-2041.06f, 7042.08f, 29.99f, 1.30f},
@@ -340,7 +339,6 @@ public:
     protected:
         EventMap Events;
     };
-
 };
 
 void AddSC_instance_the_black_morass()
