@@ -1,3 +1,19 @@
+-- DB update 2021_01_10_00 -> 2021_01_12_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_10_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_10_00 2021_01_12_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1601843049417097700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1601843049417097700');
 
 UPDATE `creature_template` SET `npcflag`= 2 WHERE `entry` IN (27657, 27658, 27659);
@@ -23,3 +39,12 @@ DELETE FROM `broadcast_text` WHERE `ID` IN (26950, 29536);
 INSERT INTO `broadcast_text` (`ID`, `Language`, `MaleText`, `FemaleText`, `EmoteID0`, `EmoteID1`, `EmoteID2`, `EmoteDelay0`, `EmoteDelay1`, `EmoteDelay2`, `SoundId`, `Unk1`, `Unk2`, `VerifiedBuild`) VALUES 
 (26950, 0, 'Varos Cloudstrider and his ring guardians protect the second ring.  Your drakes are more than a match for the ring guardians, but Varos stands behind an impenetrable shield created from the energy of the Oculus itself.  Ten centrifuge constructs power the shield from the ring and platforms above.  Destroy them and Varos will be vulnerable.$B$BI can grant you the power to call upon a drake from the red flight.  Speak to Eternos or Verdisa if you prefer to draw on the power of the bronze or the green.', '', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019),(29536, 0, 'Varos Cloudstrider and his ring guardians protect the second ring.  Your drakes are more than a match for the ring guardians, but Varos stands behind an impenetrable shield created from the energy of the Oculus itself.  Ten centrifuge constructs power the shield from the ring and platforms above.  Destroy them and Varos will be vulnerable.', 'Varos Cloudstrider and his ring guardians protect the second ring.  Your drakes are more than a match for the ring guardians, but Varos stands behind an impenetrable shield created from the energy of the Oculus itself.  Ten centrifuge constructs power the shield from the ring and platforms above.  Destroy them and Varos will be vulnerable.', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019);
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
