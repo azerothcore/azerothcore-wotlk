@@ -458,6 +458,7 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
                         events.CancelEvent(EVENT_TELEPORT);
+
                         break;
                     }
                     events.RepeatEvent(1000);
@@ -482,6 +483,7 @@ public:
                         events.ScheduleEvent(EVENT_SPELL_HARVEST_SOUL, urand(5000, 15000));
                         events.ScheduleEvent(EVENT_TELEPORT, 20000);
                         events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+
                     }
                     waveCount++;
                     break;
@@ -496,6 +498,7 @@ public:
                         gateOpened = true;
                         Talk(EMOTE_GATE_OPENED);
                     }
+
                     break;
             }
             DoMeleeAttackIfReady();
