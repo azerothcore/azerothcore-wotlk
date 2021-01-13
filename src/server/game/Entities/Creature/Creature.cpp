@@ -603,7 +603,7 @@ void Creature::Update(uint32 diff)
                 {
                     float MaxRange = GetMeleeRange(victim) / 2;
                     // If we are closer than 50% of the combat reach we are going to reposition the victim
-                    if (IsInDist(&victim->GetPosition(), MaxRange))
+                    if (IsInDist(victim, MaxRange))
                     {
                         if (diff >= m_moveBackwardsMovementTime)
                         {
