@@ -165,6 +165,7 @@ public:
                     break;
                 case EVENT_SPELL_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
+
                     break;
                 case EVENT_NECROTIC_AURA_FADING:
                     Talk(SAY_NECROTIC_AURA_FADING);
