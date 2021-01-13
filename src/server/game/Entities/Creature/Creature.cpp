@@ -597,20 +597,30 @@ void Creature::Update(uint32 diff)
                     m_moveCircleMovementTime -= diff;
                 }
 
-                // If we are closer than 50% of the combat reach we are going to reposition the victim
-                if (Unit *victim = GetVictim();
-                    victim && GetDistance(victim->GetPosition()) < GetMeleeRange(victim)) {
-                    if (diff >= m_moveBackwardsMovementTime)
+                bool movingBackwards = false;
+
+                if (Unit *victim = GetVictim())
+                {
+                    float MaxRange = GetMeleeRange(victim) / 2;
+                    // If we are closer than 50% of the combat reach we are going to reposition the victim
+                    if (IsInDist(&victim->GetPosition(), MaxRange))
                     {
-                        AI()->MoveBackwardsChecks();
-                        m_moveBackwardsMovementTime = urand(MOVE_BACKWARDS_CHECK_INTERVAL/2, MOVE_BACKWARDS_CHECK_INTERVAL * 2);
-                    }
-                    else
-                    {
-                        m_moveBackwardsMovementTime -= diff;
+                        if (diff >= m_moveBackwardsMovementTime)
+                        {
+                            AI()->MoveBackwardsChecks();
+                            m_moveBackwardsMovementTime = urand(MOVE_BACKWARDS_CHECK_INTERVAL / 2, MOVE_BACKWARDS_CHECK_INTERVAL * 2);
+                        }
+                        else
+                        {
+                            m_moveBackwardsMovementTime -= diff;
+                        }
+
+                        movingBackwards = true;
                     }
                 }
-                else
+
+
+                if (!movingBackwards)
                 {
                     m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
                 }

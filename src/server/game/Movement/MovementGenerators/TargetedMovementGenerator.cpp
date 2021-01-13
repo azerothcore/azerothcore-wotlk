@@ -63,8 +63,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
         if (i_target->IsWithinDistInMap(owner, CONTACT_DISTANCE))
             return;
 
-        float allowedRange = MELEE_RANGE;
-        if ((!initial || (owner->movespline->Finalized() && this->GetMovementGeneratorType() == CHASE_MOTION_TYPE)) && i_target->IsWithinMeleeRange(owner, allowedRange) && i_target->IsWithinLOS(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ()))
+        if ((!initial || (owner->movespline->Finalized() && this->GetMovementGeneratorType() == CHASE_MOTION_TYPE)) && i_target->IsWithinMeleeRange(owner) && i_target->IsWithinLOS(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ()))
             return;
 
         bool inRange = i_target->GetRandomContactPoint(owner, x, y, z, forcePoint);
@@ -206,7 +205,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
 
         if (result)
         {
-            float maxDist = MELEE_RANGE + owner->GetMeleeReach() + i_target->GetMeleeReach();
+            float maxDist = owner->GetMeleeRange(i_target.getTarget());
             if (!forceDest && (i_path->GetPathType() & PATHFIND_NOPATH || (!i_offset && !isPlayerPet && i_target->GetExactDistSq(i_path->GetActualEndPosition().x, i_path->GetActualEndPosition().y, i_path->GetActualEndPosition().z) > maxDist * maxDist)))
             {
                 if (owner->GetTypeId() == TYPEID_UNIT)

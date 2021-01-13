@@ -592,7 +592,7 @@ bool Unit::IsWithinMeleeRange(const Unit* obj, float dist) const
 
     float maxdist = dist + GetMeleeRange(obj); 
 
-    return distsq < maxdist * maxdist;
+    return distsq <= maxdist * maxdist;
 }
 
 float Unit::GetMeleeRange(Unit const* target) const
@@ -641,7 +641,7 @@ bool Unit::GetRandomContactPoint(const Unit* obj, float& x, float& y, float& z, 
         z = this->GetPositionZ();
         obj->UpdateAllowedPositionZ(x, y, z);
     }
-    float maxDist = MELEE_RANGE + GetMeleeReach() + obj->GetMeleeReach();
+    float maxDist = GetMeleeRange(obj);
     if (GetExactDistSq(x, y, z) >= maxDist * maxDist)
     {
         if (force)

@@ -5867,8 +5867,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (m_caster->GetMapId() == 618) // pussywizard: 618 Ring of Valor
                             pos.m_positionZ = std::max(pos.m_positionZ, 28.28f);
 
-                        float maxdist = MELEE_RANGE + m_caster->GetMeleeReach() + target->GetMeleeReach();
-                        if (target->GetExactDistSq(&pos) > maxdist * maxdist)
+                        float maxdist = m_caster->GetMeleeRange(target);
+                        if (!target->IsInDist(&pos, maxdist))
                             return SPELL_FAILED_NOPATH;
 
                         if (m_caster->GetMapId() == 618) // pussywizard: 618 Ring of Valor

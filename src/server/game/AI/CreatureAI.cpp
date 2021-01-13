@@ -286,7 +286,7 @@ void CreatureAI::MoveBackwardsChecks() {
         return;
     }
 
-    float moveDist = std::min(me->GetCombatReach(), me->GetMeleeRange(victim));
+    float moveDist = me->GetMeleeRange(victim) / 2;
 
     me->GetMotionMaster()->MoveBackwards(victim, moveDist);
 }
