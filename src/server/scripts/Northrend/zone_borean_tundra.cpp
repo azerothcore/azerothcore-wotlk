@@ -197,9 +197,7 @@ public:
                 }
             }
             else phaseTimer -= diff;
-
         }
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -296,7 +294,6 @@ public:
 
             player->CastSpell(player, SPELL_SUMMON_WYRMREST_SKYTALON, true);
             player->CastSpell(player, SPELL_WYRMREST_SKYTALON_RIDE_PERIODIC, true);
-
         }
 
         return true;
@@ -1270,7 +1267,6 @@ public:
 
         return true;
     }
-
 };
 
 enum BloodsporeRuination

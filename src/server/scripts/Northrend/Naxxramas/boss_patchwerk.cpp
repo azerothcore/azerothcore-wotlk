@@ -173,7 +173,6 @@ public:
                     }
                     events.RepeatEvent(1000);
                     break;
-
             }
 
             DoMeleeAttackIfReady();

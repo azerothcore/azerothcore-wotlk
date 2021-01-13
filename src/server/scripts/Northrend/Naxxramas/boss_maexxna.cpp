@@ -93,7 +93,6 @@ public:
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_MAEXXNA_GATE)))
                     go->SetGoState(GO_STATE_ACTIVE);
             }
-
         }
 
         void EnterCombat(Unit* who) override

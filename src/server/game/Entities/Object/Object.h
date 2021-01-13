@@ -328,7 +328,6 @@ public:
     DataMap CustomData;
 
 protected:
-
     Object();
 
     void _InitValues();
@@ -635,7 +634,6 @@ struct MovementInfo
         }
 
         float zspeed, sinAngle, cosAngle, xyspeed;
-
     } jump;
 
     // spline

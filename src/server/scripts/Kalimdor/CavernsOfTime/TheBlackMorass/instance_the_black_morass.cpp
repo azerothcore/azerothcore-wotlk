@@ -339,7 +339,6 @@ public:
     protected:
         EventMap Events;
     };
-
 };
 
 void AddSC_instance_the_black_morass()

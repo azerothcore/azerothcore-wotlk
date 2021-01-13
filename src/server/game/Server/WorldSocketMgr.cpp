@@ -42,7 +42,6 @@
 class ReactorRunnable : protected ACE_Task_Base
 {
 public:
-
     ReactorRunnable() :
         m_Reactor(0),
         m_Connections(0),
@@ -115,7 +114,6 @@ public:
     }
 
 protected:
-
     void AddNewSockets()
     {
         ACORE_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
