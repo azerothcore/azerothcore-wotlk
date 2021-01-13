@@ -592,7 +592,7 @@ bool Unit::IsWithinMeleeRange(const Unit* obj, float dist) const
 
     float maxdist = dist + GetMeleeRange(obj); 
 
-    return distsq <= maxdist * maxdist;
+    return distsq < maxdist * maxdist;
 }
 
 float Unit::GetMeleeRange(Unit const* target) const
