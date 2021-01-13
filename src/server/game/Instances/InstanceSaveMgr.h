@@ -46,7 +46,6 @@ class InstanceSave
 {
     friend class InstanceSaveManager;
 public:
-
     InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, time_t extendedResetTime);
     ~InstanceSave();
     [[nodiscard]] uint32 GetInstanceId() const { return m_instanceid; }
@@ -80,7 +79,6 @@ public:
 
     typedef std::list<uint32> PlayerListType;
 private:
-
     PlayerListType m_playerList;
     time_t m_resetTime;
     time_t m_extendedResetTime;

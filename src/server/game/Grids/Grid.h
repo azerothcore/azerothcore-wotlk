@@ -36,7 +36,6 @@ class Grid
     // allows the GridLoader to access its internals
     template<class A, class T, class O> friend class GridLoader;
 public:
-
     /** destructor to clean up its resources. This includes unloading the
     grid if it has not been unload.
     */
@@ -113,11 +112,9 @@ public:
         return i_container.GetElements().isEmpty();
     }*/
 private:
-
     TypeMapContainer<GRID_OBJECT_TYPES> i_container;
     TypeMapContainer<WORLD_OBJECT_TYPES> i_objects;
     //typedef std::set<void*> ActiveGridObjects;
     //ActiveGridObjects m_activeGridObjects;
 };
 #endif
-

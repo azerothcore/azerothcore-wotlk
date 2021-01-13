@@ -139,7 +139,7 @@ class Channel
     {
         uint64 player;
         uint8 flags;
-        uint32 lastSpeakTime; // pussywizard
+        uint64 lastSpeakTime; // pussywizard
         Player* plrPtr; // pussywizard
 
         bool HasFlag(uint8 flag) const { return flags & flag; }
@@ -164,9 +164,9 @@ class Channel
             if (state) flags |= MEMBER_FLAG_MUTED;
             else flags &= ~MEMBER_FLAG_MUTED;
         }
-        bool IsAllowedToSpeak(uint32 speakDelay) // pussywizard
+        bool IsAllowedToSpeak(uint64 speakDelay) // pussywizard
         {
-            if (lastSpeakTime + speakDelay <= sWorld->GetGameTime())
+            if (lastSpeakTime + speakDelay <= static_cast<uint64>(sWorld->GetGameTime()))
             {
                 lastSpeakTime = sWorld->GetGameTime();
                 return true;
@@ -333,4 +333,3 @@ private:
     PlayersWatchingContainer playersWatchingStore;
 };
 #endif
-

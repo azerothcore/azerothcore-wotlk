@@ -98,7 +98,6 @@ public:
             }
         }
     };
-
 };
 
 class boss_keleseth : public CreatureScript
@@ -215,7 +214,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 enum eSkeletonEnum
@@ -329,7 +327,6 @@ public:
                 DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class spell_frost_tomb : public SpellScriptLoader

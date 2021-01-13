@@ -81,7 +81,6 @@ void Pet::AddToWorld()
         GetCharmInfo()->SetIsFollowing(false);
         GetCharmInfo()->SetIsReturning(false);
     }
-
 }
 
 void Pet::RemoveFromWorld()
@@ -839,7 +838,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             }
         case SUMMON_PET:
             {
-
                 if (pInfo)
                 {
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->min_dmg));
@@ -1192,7 +1190,6 @@ void Pet::_SaveSpellCooldowns(SQLTransaction& trans, bool logout)
             stmt->setUInt32(1, itr2->first);
             stmt->setUInt32(2, cooldown);
             trans->Append(stmt);
-
         }
     }
 }
@@ -2155,7 +2152,6 @@ void Pet::HandleAsynchLoadSucceed()
         if (spell->GetSpellInfo()->HasEffect(SPELL_EFFECT_SUMMON_PET))
             CastSpell(this, 32752, true, nullptr, nullptr, GetGUID());
 
-
     if (owner->NeedSendSpectatorData() && GetCreatureTemplate()->family)
     {
         ArenaSpectator::SendCommand_UInt32Value(owner->FindMap(), owner->GetGUID(), "PHP", (uint32)GetHealthPct());
@@ -2330,7 +2326,6 @@ void Pet::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
 
     if (update)
     {
-
         if (Player* playerOwner = GetCharmerOrOwnerPlayerOrPlayerItself())
         {
             WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);

@@ -35,8 +35,6 @@ enum Events
     EVENT_FROZEN_ORB_STALKER            = 2,
     EVENT_CAST_WHITEOUT                 = 3,
     EVENT_CAST_WHITEOUT_GROUND_EFFECT   = 4,
-
-
 };
 
 enum Misc
@@ -44,7 +42,6 @@ enum Misc
     NPC_FROZEN_ORB                      = 38456,
     NPC_FROZEN_ORB_STALKER              = 38461,
 };
-
 
 class boss_toravon : public CreatureScript
 {
