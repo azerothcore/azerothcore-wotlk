@@ -78,7 +78,6 @@ namespace Movement
         void UninitializedSplineInitMethod(Vector3 const*, index_type, bool, index_type) { ABORT(); }
 
     public:
-
         explicit SplineBase()  {}
 
         /** Caclulates the position for given segment Idx, and percent of segment length t
@@ -133,12 +132,10 @@ namespace Movement
         typedef length_type LengthType;
         typedef std::vector<length_type> LengthArray;
     protected:
-
         LengthArray lengths;
 
         [[nodiscard]] index_type computeIndexInBounds(length_type length) const;
     public:
-
         explicit Spline() = default;
 
         /** Calculates the position for given t

@@ -99,7 +99,6 @@ float hatcherway[2][5][3] =
 class boss_janalai : public CreatureScript
 {
 public:
-
     boss_janalai()
         : CreatureScript("boss_janalai")
     {
@@ -444,7 +443,6 @@ public:
 class npc_janalai_firebomb : public CreatureScript
 {
 public:
-
     npc_janalai_firebomb()
         : CreatureScript("npc_janalai_firebomb")
     {
@@ -468,7 +466,6 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
 
-
         void UpdateAI(uint32 /*diff*/) override { }
     };
 
@@ -481,7 +478,6 @@ public:
 class npc_janalai_hatcher : public CreatureScript
 {
 public:
-
     npc_janalai_hatcher()
         : CreatureScript("npc_janalai_hatcher")
     {
@@ -599,7 +595,6 @@ public:
                     }
                     else
                         me->DisappearAndDie();
-
                 }
                 else WaitTimer -= diff;
             }
@@ -615,7 +610,6 @@ public:
 class npc_janalai_hatchling : public CreatureScript
 {
 public:
-
     npc_janalai_hatchling()
         : CreatureScript("npc_janalai_hatchling")
     {
@@ -698,7 +692,6 @@ public:
             }
         }
     };
-
 };
 
 void AddSC_boss_janalai()
@@ -709,4 +702,3 @@ void AddSC_boss_janalai()
     new npc_janalai_hatchling();
     new npc_janalai_egg();
 }
-

@@ -121,7 +121,6 @@ enum Texts
     FLAME_LEVIATHAN_EMOTE_PURSUE,
     FLAME_LEVIATHAN_EMOTE_OVERLOAD,
     FLAME_LEVIATHAN_EMOTE_REPAIR
-
 };
 
 enum Sounds
@@ -1092,7 +1091,6 @@ public:
             }
         }
     };
-
 };
 
 class npc_thorims_hammer : public CreatureScript
@@ -1669,7 +1667,6 @@ public:
             }
         }
 
-
         void HandleScript(SpellEffIndex /*eff*/)
         {
             Creature* target = GetHitCreature();
@@ -2026,7 +2023,6 @@ public:
         return new spell_shield_generator_AuraScript();
     }
 };
-
 
 class spell_demolisher_ride_vehicle : public SpellScriptLoader
 {

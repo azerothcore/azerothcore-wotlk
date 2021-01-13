@@ -40,7 +40,6 @@ enum Misc
 class boss_high_botanist_freywinn : public CreatureScript
 {
 public:
-
     boss_high_botanist_freywinn() : CreatureScript("boss_high_botanist_freywinn")
     {
     }
@@ -146,4 +145,3 @@ void AddSC_boss_high_botanist_freywinn()
 {
     new boss_high_botanist_freywinn();
 }
-

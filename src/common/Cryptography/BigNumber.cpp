@@ -4,7 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-
 #include "Cryptography/BigNumber.h"
 #include <openssl/bn.h>
 #include <openssl/crypto.h>
@@ -186,4 +185,3 @@ char* BigNumber::AsDecStr() const
 {
     return BN_bn2dec(_bn);
 }
-

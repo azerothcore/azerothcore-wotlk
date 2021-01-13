@@ -45,7 +45,6 @@ enum Misc
     EVENT_SPELL_EARTHQUAKE          = 3,
     EVENT_SUMMON_MURLOCS            = 4,
     EVENT_KILL_TALK                 = 5
-
 };
 
 const uint32 wateryGraveId[4] = {SPELL_WATERY_GRAVE_1, SPELL_WATERY_GRAVE_2, SPELL_WATERY_GRAVE_3, SPELL_WATERY_GRAVE_4};
