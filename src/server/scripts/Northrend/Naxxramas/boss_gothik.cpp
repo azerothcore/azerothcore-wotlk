@@ -89,16 +89,16 @@ enum Events
     // Dead knight
     EVENT_SPELL_WHIRLWIND           = 10,
     // Living rider
-    EVENT_SPELL_SHADOW_BOLT_VOLLEY  = 12,
+    EVENT_SPELL_SHADOW_BOLT_VOLLEY  = 11,
     // Dead rider
-    EVENT_SPELL_DRAIN_LIFE          = 17,
-    EVENT_SPELL_UNHOLY_FRENZY       = 18,
+    EVENT_SPELL_DRAIN_LIFE          = 12,
+    EVENT_SPELL_UNHOLY_FRENZY       = 13,
     // HORSE
-    EVENT_SPELL_STOMP               = 19,
+    EVENT_SPELL_STOMP               = 14,
     // Intro
-    EVENT_INTRO_2                   = 20,
-    EVENT_INTRO_3                   = 21,
-    EVENT_INTRO_4                   = 22
+    EVENT_INTRO_2                   = 15,
+    EVENT_INTRO_3                   = 16,
+    EVENT_INTRO_4                   = 17
 };
 
 const uint32 gothikWaves[24][2] =
