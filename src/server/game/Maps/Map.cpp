@@ -1955,16 +1955,20 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
 {
     // find raw .map surface under Z coordinates
     float mapHeight = VMAP_INVALID_HEIGHT_VALUE;
-    float gridHeight = GetGridHeight(x, y);
-    if (G3D::fuzzyGe(z, gridHeight - GROUND_HEIGHT_TOLERANCE))
-        mapHeight = gridHeight;
+    if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
+    {
+        float gridHeight = gmap->getHeight(x, y);
+        // look from a bit higher pos to find the floor, ignore under surface case
+        if (z + 2.0f > gridHeight)
+            mapHeight = gridHeight;
+    }
 
     float vmapHeight = VMAP_INVALID_HEIGHT_VALUE;
     if (checkVMap)
     {
         VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
         //if (vmgr->isHeightCalcEnabled()) // pussywizard: optimization
-        vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);   // look from a bit higher pos to find the floor
+        vmapHeight = vmgr->getHeight(GetId(), x, y, z + 2.0f, maxSearchDist);   // look from a bit higher pos to find the floor
     }
 
     // mapHeight set for any above raw ground Z or <= INVALID_HEIGHT
@@ -2076,31 +2080,28 @@ uint32 Map::GetAreaId(float x, float y, float z, bool* isOutdoors) const
     int32 adtId, rootId, groupId;
     WMOAreaTableEntry const* wmoEntry = 0;
     AreaTableEntry const* atEntry = 0;
-    bool haveAreaInfo = GetAreaInfo(x, y, z, mogpFlags, adtId, rootId, groupId);
+    bool haveAreaInfo = false;
 
-    uint32 gridAreaId = 0;
-    float gridMapHeight = INVALID_HEIGHT;
-    if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
+    if (GetAreaInfo(x, y, z, mogpFlags, adtId, rootId, groupId))
     {
-        gridAreaId = gmap->getArea(x, y);
-        gridMapHeight = gmap->getHeight(x, y);
+        haveAreaInfo = true;
+        wmoEntry = GetWMOAreaTableEntryByTripple(rootId, adtId, groupId);
+        if (wmoEntry)
+            atEntry = sAreaTableStore.LookupEntry(wmoEntry->areaId);
     }
 
     uint16 areaId = 0;
 
-    // floor is the height we are closer to (but only if above)
-    if (haveAreaInfo && G3D::fuzzyGe(z, z - GROUND_HEIGHT_TOLERANCE) && (G3D::fuzzyLt(z, gridMapHeight - GROUND_HEIGHT_TOLERANCE) || z > gridMapHeight))
+    if (atEntry)
+        areaId = atEntry->ID;
+    else
     {
-        wmoEntry = GetWMOAreaTableEntryByTripple(rootId, adtId, groupId);
-        if (wmoEntry)
-            areaId = wmoEntry->areaId;
-
+        if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
+            areaId = gmap->getArea(x, y);
+        // this used while not all *.map files generated (instances)
         if (!areaId)
-            areaId = gridAreaId;
+            areaId = i_mapEntry->linked_zone;
     }
-
-    if (!areaId)
-        areaId = i_mapEntry->linked_zone;
 
     if (isOutdoors)
     {
