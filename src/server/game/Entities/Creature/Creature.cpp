@@ -620,7 +620,7 @@ void Creature::Update(uint32 diff)
                     {
                         AI()->EnterEvadeMode();
                     }
-                } 
+                }
 
                 break;
             }

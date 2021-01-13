@@ -396,7 +396,7 @@ typedef std::list<VendorItemCount> VendorItemCounts;
 
 struct TrainerSpell
 {
-    TrainerSpell()  
+    TrainerSpell()
     {
         for (unsigned int & i : learnedSpell)
             i = 0;
@@ -797,7 +797,7 @@ private:
 
     bool m_cannotReachTarget;
     uint32 m_cannotReachTimer;
-    
+
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
 };
 

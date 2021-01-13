@@ -642,7 +642,7 @@ enum EquipmentSetUpdateState
 
 struct EquipmentSet
 {
-    EquipmentSet()  
+    EquipmentSet()
     {
         for (unsigned int & Item : Items)
             Item = 0;
@@ -998,7 +998,7 @@ struct BGData
 // holder for Entry Point data (pussywizard: stored in db)
 struct EntryPointData
 {
-    EntryPointData()  
+    EntryPointData()
     {
         ClearTaxiPath();
     }
