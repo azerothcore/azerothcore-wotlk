@@ -2274,14 +2274,24 @@ float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap/*=tr
 
 bool Map::IsInWater(float x, float y, float pZ, LiquidData* data) const
 {
-    LiquidData liquid_status;
-    LiquidData* liquid_ptr = data ? data : &liquid_status;
-    return getLiquidStatus(x, y, pZ, MAP_ALL_LIQUIDS, liquid_ptr) & (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER);
+    if (const_cast<Map*>(this)->GetGrid(x, y))
+    {
+        LiquidData liquid_status;
+        LiquidData* liquid_ptr = data ? data : &liquid_status;
+        return getLiquidStatus(x, y, pZ, MAP_ALL_LIQUIDS, liquid_ptr) & (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER);
+    }
+
+    return false;
 }
 
 bool Map::IsUnderWater(float x, float y, float z) const
 {
-    return getLiquidStatus(x, y, z, MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN) & LIQUID_MAP_UNDER_WATER;
+    if (const_cast<Map*>(this)->GetGrid(x, y))
+    {
+        return getLiquidStatus(x, y, z, MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN) & LIQUID_MAP_UNDER_WATER;
+    }
+
+    return false;
 }
 
 char const* Map::GetMapName() const
