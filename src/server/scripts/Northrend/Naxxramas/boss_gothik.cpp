@@ -414,15 +414,12 @@ public:
             {
                 case EVENT_INTRO_2:
                     Talk(SAY_INTRO_2);
-
                     break;
                 case EVENT_INTRO_3:
                     Talk(SAY_INTRO_3);
-
                     break;
                 case EVENT_INTRO_4:
                     Talk(SAY_INTRO_4);
-
                     break;
                 case EVENT_SPELL_SHADOW_BOLT:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_SHADOW_BOLT_10, SPELL_SHADOW_BOLT_25), false);
@@ -484,7 +481,6 @@ public:
                         events.ScheduleEvent(EVENT_TELEPORT, 20000);
                         events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
                     }
-
                     waveCount++;
                     break;
                 case EVENT_CHECK_PLAYERS:
@@ -498,7 +494,6 @@ public:
                         gateOpened = true;
                         Talk(EMOTE_GATE_OPENED);
                     }
-
                     break;
             }
             DoMeleeAttackIfReady();
