@@ -285,10 +285,34 @@ public:
             Unit* target = GetTarget();
             if (target->getLevel() <= 70)
             {
-                uint32 spellId = 0;
+                uint16 spellId = 0;
 
                 switch (m_scriptSpellId)
                 {
+                    case SPELL_MOUNT_SPEED_CARROT:
+                        spellId = SPELL_CARROT_ON_A_STICK_EFFECT;
+                        break;
+                    case SPELL_MITHRIL_SPURS:
+                        spellId = SPELL_MITHRIL_SPURS_EFFECT;
+                        break;
+                    case SPELL_MOUNT_SPEED_RIDING:
+                        spellId = SPELL_RIDING_CROP_EFFECT;
+                        break;
+                    default:
+                        return;
+                }
+
+                target->CastSpell(target, spellId, aurEff);
+            }
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* target = GetTarget();
+            uint16 spellId = 0;
+
+            switch (m_scriptSpellId)
+            {
                 case SPELL_MOUNT_SPEED_CARROT:
                     spellId = SPELL_CARROT_ON_A_STICK_EFFECT;
                     break;
@@ -300,30 +324,6 @@ public:
                     break;
                 default:
                     return;
-                }
-
-                target->CastSpell(target, spellId, aurEff);
-            }
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-            uint32 spellId = 0;
-
-            switch (m_scriptSpellId)
-            {
-            case SPELL_MOUNT_SPEED_CARROT:
-                spellId = SPELL_CARROT_ON_A_STICK_EFFECT;
-                break;
-            case SPELL_MITHRIL_SPURS:
-                spellId = SPELL_MITHRIL_SPURS_EFFECT;
-                break;
-            case SPELL_MOUNT_SPEED_RIDING:
-                spellId = SPELL_RIDING_CROP_EFFECT;
-                break;
-            default:
-                return;
             }
 
             target->RemoveAurasDueToSpell(spellId);
