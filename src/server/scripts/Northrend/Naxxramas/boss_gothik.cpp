@@ -485,6 +485,7 @@ public:
                         events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
 
                     }
+
                     waveCount++;
                     break;
                 case EVENT_CHECK_PLAYERS:
