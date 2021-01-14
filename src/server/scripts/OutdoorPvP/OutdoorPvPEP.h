@@ -174,7 +174,6 @@ class OutdoorPvPEP;
 class OPvPCapturePointEP_EWT : public OPvPCapturePoint
 {
 public:
-
     OPvPCapturePointEP_EWT(OutdoorPvP* pvp);
 
     void ChangeState() override;
@@ -188,13 +187,11 @@ public:
     void HandlePlayerLeave(Player* player) override;
 
 protected:
-
     void SummonSupportUnitAtNorthpassTower(TeamId teamId);
 
     void UpdateTowerState();
 
 protected:
-
     uint32 m_TowerState;
 
     TeamId m_UnitsSummonedSideId;
@@ -203,7 +200,6 @@ protected:
 class OPvPCapturePointEP_NPT : public OPvPCapturePoint
 {
 public:
-
     OPvPCapturePointEP_NPT(OutdoorPvP* pvp);
 
     void ChangeState() override;
@@ -217,13 +213,11 @@ public:
     void HandlePlayerLeave(Player* player) override;
 
 protected:
-
     void SummonGO(TeamId teamId);
 
     void UpdateTowerState();
 
 protected:
-
     uint32 m_TowerState;
 
     TeamId m_SummonedGOSideId;
@@ -232,7 +226,6 @@ protected:
 class OPvPCapturePointEP_CGT : public OPvPCapturePoint
 {
 public:
-
     OPvPCapturePointEP_CGT(OutdoorPvP* pvp);
 
     void ChangeState() override;
@@ -246,13 +239,11 @@ public:
     void HandlePlayerLeave(Player* player) override;
 
 protected:
-
     void LinkGraveyard(TeamId teamId);
 
     void UpdateTowerState();
 
 protected:
-
     uint32 m_TowerState;
 
     TeamId m_GraveyardSide;
@@ -261,7 +252,6 @@ protected:
 class OPvPCapturePointEP_PWT : public OPvPCapturePoint
 {
 public:
-
     OPvPCapturePointEP_PWT(OutdoorPvP* pvp);
 
     void ChangeState() override;
@@ -275,13 +265,11 @@ public:
     void HandlePlayerLeave(Player* player) override;
 
 protected:
-
     void SummonFlightMaster(TeamId teamId);
 
     void UpdateTowerState();
 
 protected:
-
     TeamId m_FlightMasterSpawnedId;
 
     uint32 m_TowerState;
@@ -290,7 +278,6 @@ protected:
 class OutdoorPvPEP : public OutdoorPvP
 {
 public:
-
     OutdoorPvPEP();
 
     bool SetupOutdoorPvP() override;
@@ -309,7 +296,6 @@ public:
     void SetControlledState(uint32 index, TeamId teamId);
 
 private:
-
     // how many towers are controlled
     TeamId EP_ControlsId[EP_TOWER_NUM];
 

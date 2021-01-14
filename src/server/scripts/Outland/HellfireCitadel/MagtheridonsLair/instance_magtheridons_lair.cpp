@@ -7,7 +7,6 @@
 #include "InstanceScript.h"
 #include "magtheridons_lair.h"
 
-
 DoorData const doorData[] =
 {
     { GO_MAGTHERIDON_DOORS,  TYPE_MAGTHERIDON,   DOOR_TYPE_ROOM,  BOUNDARY_S },
@@ -211,7 +210,6 @@ public:
         std::set<uint64> _wardersSet;
         std::set<uint64> _cubesSet;
         std::set<uint64> _columnSet;
-
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
@@ -224,4 +222,3 @@ void AddSC_instance_magtheridons_lair()
 {
     new instance_magtheridons_lair();
 }
-

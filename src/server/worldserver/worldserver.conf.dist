@@ -289,7 +289,6 @@ PlayerSave.Stats.SaveOnlyOnLogout = 1
 vmap.enableLOS    = 1
 vmap.enableHeight = 1
 
-
 #
 #    vmap.petLOS
 #        Description: Check line of sight for pets, to avoid them attacking through walls.
@@ -748,7 +747,6 @@ LogDB.World = 0
 
 LogDB.Chat = 0
 
-
 #    ChatLogFile
 #        Description: Log file for chat logs.
 #        Default:     "Chat.log" - (Enabled)
@@ -794,7 +792,6 @@ ChatLogs.SysChan = 0
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-
 ChatLogs.Party = 0
 
 #
@@ -802,7 +799,6 @@ ChatLogs.Party = 0
 #        Description: Log raid chat.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
-
 
 ChatLogs.Raid = 0
 
@@ -2398,7 +2394,7 @@ Rate.Drop.Item.ReferencedAmount = 1
 #        Default:     1 - (Rate.XP.Kill)
 #                     1 - (Rate.XP.Quest)
 #                     1 - (Rate.XP.Explore)
-#                     1	- (Rate.XP.Pet)
+#                     1 - (Rate.XP.Pet)
 
 Rate.XP.Kill    = 1
 Rate.XP.Quest   = 1
@@ -2523,9 +2519,9 @@ Rate.InstanceResetTime = 1
 #
 #    Rate.Pet.LevelXP
 #        Description: Modifies the amount of experience required to level up a pet.
-#					  The lower the rate the less experience is required.
+#       The lower the rate the less experience is required.
 #        Default:     0.05
-#   
+#
 Rate.Pet.LevelXP = 0.05
 
 #
@@ -2715,7 +2711,6 @@ Battleground.QueueAnnouncer.Enable = 0
 #                     1 - (Private, Only queued players can see it)
 
 Battleground.QueueAnnouncer.PlayerOnly = 0
-
 
 #
 #    Battleground.PrematureFinishTimer
@@ -3004,7 +2999,6 @@ Arena.ArenaWinRatingModifier1 = 48
 #        Default:     24
 
 Arena.ArenaWinRatingModifier2 = 24
-
 
 #
 #    Arena.ArenaLoseRatingModifier
@@ -3333,10 +3327,10 @@ ShowBanInWorld = 0
 #        Description: Time (in milliseconds) update time diff is written to the log file.
 #                     Update diff can be used as a performance indicator. Diff < 300: good
 #                     performance. Diff > 600 bad performance, may be caused by high CPU usage.
-#        Default:     60000 - (Enabled, 1 minute)
-#                     0     - (Disabled)
+#        Default:     300000 - (Enabled, 5 minutes)
+#                     0      - (Disabled)
 
-RecordUpdateTimeDiffInterval = 60000
+RecordUpdateTimeDiffInterval = 300000
 
 #
 #     MinRecordUpdateTimeDiff
@@ -3425,10 +3419,10 @@ MonsterSight = 50.000000
 StrictChannelNames = 0
 
 #
-#	Instance.SharedNormalHeroicId
-#		Description: 	No description
-#		Default:		0 - Disable
-#						1 - Enable
+# Instance.SharedNormalHeroicId
+#  Description:  No description
+#  Default:  0 - Disable
+#      1 - Enable
 #
 
 Instance.SharedNormalHeroicId = 0
@@ -3444,17 +3438,17 @@ Instance.SharedNormalHeroicId = 0
 Instance.ResetTimeRelativeTimestamp = 1135814400
 
 #
-#	TeleportTimeoutNear
-#		Description: 	No description
-#		Default:		25
+# TeleportTimeoutNear
+#  Description:  No description
+#  Default:  25
 #
 
 TeleportTimeoutNear = 25
 
 #
-#	TeleportTimeoutFar
-#		Description: 	No description
-#		Default:		45
+# TeleportTimeoutFar
+#  Description:  No description
+#  Default:  45
 #
 
 TeleportTimeoutFar = 45

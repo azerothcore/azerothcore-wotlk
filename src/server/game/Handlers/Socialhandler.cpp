@@ -4,7 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-
 #include "WorldSession.h"
 #include "AccountMgr.h"
 #include "Log.h"

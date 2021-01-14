@@ -216,7 +216,6 @@ public:
     }
 
 private:
-
     void Enqueue(SQLOperation* op)
     {
         _queue->enqueue(op);

@@ -32,7 +32,6 @@ EndContentData */
 class AreaTrigger_at_voltarus_middle : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_voltarus_middle()
         : AreaTriggerScript("at_voltarus_middle")
     {
@@ -51,7 +50,6 @@ public:
     }
 };
 
-
 // Theirs
 /*######
 ## at_coilfang_waterfall
@@ -65,7 +63,6 @@ enum CoilfangGOs
 class AreaTrigger_at_coilfang_waterfall : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_coilfang_waterfall()
         : AreaTriggerScript("at_coilfang_waterfall")
     {
@@ -97,7 +94,6 @@ enum LegionTeleporter
 class AreaTrigger_at_legion_teleporter : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_legion_teleporter()
         : AreaTriggerScript("at_legion_teleporter")
     {
@@ -139,7 +135,6 @@ enum StormwrightShelf
 class AreaTrigger_at_stormwright_shelf : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_stormwright_shelf()
         : AreaTriggerScript("at_stormwright_shelf")
     {
@@ -167,7 +162,6 @@ enum ScentLarkorwi
 class AreaTrigger_at_scent_larkorwi : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_scent_larkorwi()
         : AreaTriggerScript("at_scent_larkorwi")
     {
@@ -198,7 +192,6 @@ enum AtLastRites
 class AreaTrigger_at_last_rites : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_last_rites()
         : AreaTriggerScript("at_last_rites")
     {
@@ -260,7 +253,6 @@ enum Waygate
 class AreaTrigger_at_sholazar_waygate : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_sholazar_waygate() : AreaTriggerScript("at_sholazar_waygate") { }
 
     bool OnTrigger(Player* player, AreaTrigger const* trigger) override
@@ -350,7 +342,6 @@ public:
         return true;
     }
 };
-
 
 /*######
 ## at_brewfest

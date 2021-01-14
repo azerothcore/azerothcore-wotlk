@@ -621,7 +621,6 @@ public:
     };
 };
 
-
 // Theirs
 /*######
 ##Quest 12848
@@ -912,7 +911,6 @@ public:
 
         return false;
     }
-
 };
 
 /*####
@@ -975,7 +973,6 @@ public:
                     miner->DisappearAndDie();
         }
     };
-
 };
 
 /*####
@@ -1121,7 +1118,6 @@ public:
             npc_escortAI::UpdateAI(diff);
         }
     };
-
 };
 
 /*######
@@ -1159,7 +1155,6 @@ public:
 
         return true;
     }
-
 };
 
 void AddSC_the_scarlet_enclave_c1()
