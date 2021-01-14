@@ -320,6 +320,7 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
+            Unit* target = GetTarget();
             if (uint16 spellId = getMountSpellId())
             {
                 GetTarget()->RemoveAurasDueToSpell(spellId);
