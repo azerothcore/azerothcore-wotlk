@@ -323,7 +323,7 @@ public:
             Unit* target = GetTarget();
             if (uint16 spellId = getMountSpellId())
             {
-                GetTarget()->RemoveAurasDueToSpell(spellId);
+                target->RemoveAurasDueToSpell(spellId);
             }
         }
 
