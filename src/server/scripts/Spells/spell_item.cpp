@@ -280,19 +280,27 @@ public:
     {
         PrepareAuraScript(spell_item_with_mount_speed_AuraScript);
 
-        uint16 getSpellEffectId(uint32 spellId)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            switch (spellId)
+            if (!sSpellMgr->GetSpellInfo(SPELL_MOUNT_SPEED_CARROT)
+                || !sSpellMgr->GetSpellInfo(SPELL_MITHRIL_SPURS)
+                || !sSpellMgr->GetSpellInfo(SPELL_MOUNT_SPEED_RIDING))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        uint16 getMountSpellId()
+        {
+            switch (m_scriptSpellId)
             {
                 case SPELL_MOUNT_SPEED_CARROT:
                     return SPELL_CARROT_ON_A_STICK_EFFECT;
-                    break;
                 case SPELL_MITHRIL_SPURS:
                     return SPELL_MITHRIL_SPURS_EFFECT;
-                    break;
                 case SPELL_MOUNT_SPEED_RIDING:
                     return SPELL_RIDING_CROP_EFFECT;
-                    break;
                 default:
                     return 0;
             }
@@ -303,9 +311,7 @@ public:
             Unit* target = GetTarget();
             if (target->getLevel() <= 70)
             {
-                uint16 spellId = getSpellEffectId(m_scriptSpellId);
-
-                if (spellId != 0)
+                if (uint16 spellId = getMountSpellId())
                 {
                     target->CastSpell(target, spellId, aurEff);
                 }
@@ -314,9 +320,7 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            uint16 spellId = getSpellEffectId(m_scriptSpellId);
-
-            if (spellId != 0)
+            if (uint16 spellId = getMountSpellId())
             {
                 GetTarget()->RemoveAurasDueToSpell(spellId);
             }
