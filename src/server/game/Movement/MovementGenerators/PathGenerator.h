@@ -114,14 +114,9 @@ class PathGenerator
         Movement::PointsArray _pathPoints;  // our actual (x,y,z) path to the target
         PathType _type;                     // tells what kind of path this is
 
-<<<<<<< HEAD
         bool _useStraightPath;  // type of path will be generated (do not use it for movement paths)
         bool _forceDestination; // when set, we will always arrive at given point
         bool _slopeCheck;       // when set, it skips paths with too high slopes (doesn't work with _useStraightPath)
-=======
-        bool _useStraightPath;  // type of path will be generated
-        bool _forceDestination; // when set, we will always arrive at given point
->>>>>>> parent of df600f99... fix(Core/CreatureAI): revert NPC repositioning and path system (temporarily) (#4274)
         uint32 _pointPathLimit; // limit point path size; min(this, MAX_POINT_PATH_LENGTH)
         bool _useRaycast;       // use raycast if true for a straight line path
 
@@ -133,11 +128,7 @@ class PathGenerator
         dtNavMesh const* _navMesh;              // the nav mesh
         dtNavMeshQuery const* _navMeshQuery;    // the nav mesh query used to find the path
 
-<<<<<<< HEAD
         dtQueryFilterExt _filter;  // use single filter for all movements, update it when needed
-=======
-        dtQueryFilter _filter;  // use single filter for all movements, update it when needed
->>>>>>> parent of df600f99... fix(Core/CreatureAI): revert NPC repositioning and path system (temporarily) (#4274)
 
         void SetStartPosition(G3D::Vector3 const& point) { _startPosition = point; }
         void SetEndPosition(G3D::Vector3 const& point) { _actualEndPosition = point; _endPosition = point; }
