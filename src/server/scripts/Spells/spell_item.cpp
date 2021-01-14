@@ -303,7 +303,7 @@ public:
             Unit* target = GetTarget();
             if (target->getLevel() <= 70)
             {
-                uint16 spellId = this->getSpellEffectId(m_scriptSpellId);
+                uint16 spellId = getSpellEffectId(m_scriptSpellId);
 
                 if (spellId != 0)
                 {
@@ -314,7 +314,7 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            uint16 spellId = this->getSpellEffectId(m_scriptSpellId);
+            uint16 spellId = getSpellEffectId(m_scriptSpellId);
 
             if (spellId != 0)
             {
