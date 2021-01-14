@@ -109,7 +109,15 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recvData)
         data << Name;
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
         data << Title;
-        data << ci->IconName;                               // "Directions" for guard, string for Icons 2.3.0
+        if (ci->npcflag & UNIT_NPC_FLAG_TRAINER_CLASS)
+        {
+            if (Player* player = GetPlayer())
+                player->getClass() == ci->trainer_class ? data << "Trainer" : data << "Speak";
+            else
+                data << ci->IconName;
+        }
+        else
+            data << ci->IconName;                           // "Directions" for guard, string for Icons 2.3.0
         data << uint32(ci->type_flags);                     // flags
         data << uint32(ci->type);                           // CreatureType.dbc
         data << uint32(ci->family);                         // CreatureFamily.dbc
