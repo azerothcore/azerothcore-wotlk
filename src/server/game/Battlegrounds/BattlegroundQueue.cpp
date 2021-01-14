@@ -384,7 +384,6 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, const int32 aliFree, c
     auto Ali_itr = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].begin();
     for (; Ali_itr != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].end() && m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), aliFree); ++Ali_itr);
 
-
     // horde: at first fill as much as possible
     auto Horde_itr = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].begin();
     for (; Horde_itr != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].end() && m_SelectionPools[TEAM_HORDE].AddGroup((*Horde_itr), hordeFree); ++Horde_itr);

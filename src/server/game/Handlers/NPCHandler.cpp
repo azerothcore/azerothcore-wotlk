@@ -618,7 +618,6 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
 
     data.put<uint8>(wpos, num);                             // set real data to placeholder
     SendPacket(&data);
-
 }
 
 void WorldSession::SendStableResult(uint8 res)
@@ -1038,4 +1037,3 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
         _player->DurabilityRepairAll(true, discountMod, guildBank);
     }
 }
-

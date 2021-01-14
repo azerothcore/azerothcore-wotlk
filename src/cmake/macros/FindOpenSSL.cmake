@@ -28,6 +28,7 @@
 SET(_OPENSSL_ROOT_HINTS
   "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\OpenSSL (32-bit)_is1;Inno Setup: App Path]"
   "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\OpenSSL (64-bit)_is1;Inno Setup: App Path]"
+  "$ENV{OPENSSL_ROOT_DIR}"
   )
 
 IF(PLATFORM EQUAL 64)
@@ -182,7 +183,7 @@ ENDIF(WIN32 AND NOT CYGWIN)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(OpenSSL DEFAULT_MSG
-  OPENSSL_LIBRARIES 
+  OPENSSL_LIBRARIES
   OPENSSL_INCLUDE_DIR
 )
 

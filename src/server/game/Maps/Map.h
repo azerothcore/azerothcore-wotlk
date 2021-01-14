@@ -25,6 +25,7 @@
 #include "MapRefManager.h"
 #include "DynamicTree.h"
 #include "GameObjectModel.h"
+#include "PathGenerator.h"
 #include "Log.h"
 #include "DataMap.h"
 #include <bitset>
@@ -50,6 +51,7 @@ class BattlegroundMap;
 class Transport;
 class StaticTransport;
 class MotionTransport;
+class PathGenerator;
 namespace acore
 {
     struct ObjectUpdater;
@@ -188,7 +190,6 @@ class GridMap
     uint8 _liquidOffY;
     uint8 _liquidWidth;
     uint8 _liquidHeight;
-
 
     bool loadAreaData(FILE* in, uint32 offset, uint32 size);
     bool loadHeightData(FILE* in, uint32 offset, uint32 size);
@@ -473,6 +474,9 @@ public:
     float GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = nullptr, bool swim = false, float maxSearchDist = 50.0f) const;
     [[nodiscard]] float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
     [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const;
+    bool CanReachPositionAndGetCoords(Unit* who, PathGenerator path, bool checkCollision = true, float maxHeight = 3.0f, float maxSlopeAngle = M_PI/2, float maxDeviationAngle = M_PI*2) const;
+    bool CanReachPositionAndGetCoords(Unit* who, float &destX, float &destY, float &destZ, bool checkCollision = true, float maxHeight = 3.0f, float maxSlopeAngle = M_PI/2) const;
+    bool CanReachPositionAndGetCoords(Unit* who, float startX, float startY, float startZ, float startAngle, float &destX, float &destY, float &destZ, bool checkCollision = true, float maxHeight = 3.0f, float maxSlopeAngle = M_PI/2) const;
     void Balance() { _dynamicTree.balance(); }
     void RemoveGameObjectModel(const GameObjectModel& model) { _dynamicTree.remove(model); }
     void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }
@@ -575,7 +579,6 @@ private:
     void UpdateActiveCells(const float& x, const float& y, const uint32 t_diff);
 
 protected:
-
     ACE_Thread_Mutex Lock;
     ACE_Thread_Mutex GridLock;
     ACE_RW_Thread_Mutex MMapLock;
@@ -660,7 +663,6 @@ private:
     ZoneDynamicInfoMap _zoneDynamicInfo;
     uint32 _defaultLight;
 };
-
 
 enum InstanceResetMethod
 {

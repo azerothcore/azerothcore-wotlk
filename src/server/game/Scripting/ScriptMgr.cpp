@@ -70,7 +70,6 @@ template class ScriptRegistry<MailScript>;
 ScriptMgr::ScriptMgr()
     : _scriptCount(0), _scheduledScripts(0)
 {
-
 }
 
 ScriptMgr::~ScriptMgr()
@@ -392,7 +391,6 @@ void ScriptMgr::OnPacketSend(WorldSession* session, WorldPacket const& packet)
     FOREACH_SCRIPT(ServerScript)->OnPacketSend(session, copy);
 }
 
-
 void ScriptMgr::OnOpenStateChange(bool open)
 {
 #ifdef ELUNA
@@ -400,7 +398,6 @@ void ScriptMgr::OnOpenStateChange(bool open)
 #endif
     FOREACH_SCRIPT(WorldScript)->OnOpenStateChange(open);
 }
-
 
 void ScriptMgr::OnLoadCustomDatabaseTable()
 {
@@ -500,7 +497,6 @@ void ScriptMgr::OnGroupRateCalculation(float& rate, uint32 count, bool isRaid)
                 continue; \
             if (C->MapID == V->GetId()) \
             {
-
 #define SCR_MAP_END \
                 return; \
             } \
@@ -722,7 +718,6 @@ bool ScriptMgr::OnItemRemove(Player* player, Item* item)
 #endif
     GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, false);
     return tmpscript->OnRemove(player, item);
-
 }
 
 bool ScriptMgr::OnCastItemCombatSpell(Player* player, Unit* victim, SpellInfo const* spellInfo, Item* item)
@@ -2395,4 +2390,3 @@ MailScript::MailScript(const char* name)
 {
     ScriptRegistry<MailScript>::AddScript(this);
 }
-

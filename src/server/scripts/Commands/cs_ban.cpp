@@ -373,7 +373,6 @@ public:
                                  fields[0].GetCString(), fields[1].GetCString(), permanent ? handler->GetAcoreString(LANG_BANINFO_NEVER) : fields[2].GetCString(),
                                  permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[3].GetUInt64(), true).c_str(), fields[4].GetCString(), fields[5].GetCString());
 
-
         return true;
     }
 

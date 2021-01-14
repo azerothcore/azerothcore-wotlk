@@ -221,7 +221,6 @@ public:
             return 0;
         }
 
-
         std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
@@ -254,7 +253,6 @@ public:
                 for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
                     if( m_auiEncounter[i] == IN_PROGRESS )
                         m_auiEncounter[i] = NOT_STARTED;
-
             }
             else
                 OUT_LOAD_INST_DATA_FAIL;

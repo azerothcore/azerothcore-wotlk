@@ -154,4 +154,3 @@ void AddSC_boss_pathaleon_the_calculator()
 {
     new boss_pathaleon_the_calculator();
 }
-

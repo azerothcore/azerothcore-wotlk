@@ -93,7 +93,6 @@ private:
     }
     void InitTop();
 public:
-
     explicit MotionMaster(Unit* unit) : _expList(nullptr), _top(-1), _owner(unit), _cleanFlag(MMCF_NONE)
     {
         for (uint8 i = 0; i < MAX_MOTION_SLOT; ++i)
@@ -165,6 +164,8 @@ public:
     void MoveRandom(float wanderDistance = 0.0f);
     void MoveFollow(Unit* target, float dist, float angle, MovementSlot slot = MOTION_SLOT_ACTIVE);
     void MoveChase(Unit* target, float dist = 0.0f, float angle = 0.0f);
+    void MoveCircleTarget(Unit* target);
+    void MoveBackwards(Unit* target, float dist);
     void MoveConfused();
     void MoveFleeing(Unit* enemy, uint32 time = 0);
     void MovePoint(uint32 id, const Position& pos, bool generatePath = true, bool forceDestination = true)

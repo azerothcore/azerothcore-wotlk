@@ -10,7 +10,6 @@
 
 enum IPLoggingTypes
 {
-
     // AccountActionIpLogger();
     ACCOUNT_LOGIN = 0,
     ACCOUNT_FAIL_LOGIN = 1,
@@ -302,7 +301,6 @@ public:
         return;
     }
 };
-
 
 void AddSC_action_ip_logger()
 {
