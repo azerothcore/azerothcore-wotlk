@@ -258,7 +258,7 @@ public:
     }
 };
 
-enum MountSpells
+enum MountModSpells
 {
     SPELL_CARROT_ON_A_STICK_EFFECT = 48402,
     SPELL_RIDING_CROP_EFFECT = 48383,
