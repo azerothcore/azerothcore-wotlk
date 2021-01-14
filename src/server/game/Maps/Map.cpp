@@ -5,7 +5,6 @@
  */
 
 #include "Map.h"
-#include "Geometry.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "DynamicTree.h"
