@@ -461,7 +461,6 @@ class AuraScript : public _SpellScript
     // internal use classes & functions
     // DO NOT THESE IN SCRIPTS
 public:
-
 #define AURASCRIPT_FUNCTION_TYPE_DEFINES(CLASSNAME) \
         typedef bool(CLASSNAME::*AuraCheckAreaTargetFnType)(Unit* target); \
         typedef void(CLASSNAME::*AuraDispelFnType)(DispelInfo* dispelInfo); \

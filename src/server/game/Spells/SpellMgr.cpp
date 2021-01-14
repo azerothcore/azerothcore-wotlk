@@ -387,7 +387,6 @@ bool SpellMgr::ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg)
                                 sLog->outErrorDb("Craft spell %u not have create item entry.", spellInfo->Id);
                             return false;
                         }
-
                     }
                     // also possible IsLootCrafting case but fake item must exist anyway
                     else if (!sObjectMgr->GetItemTemplate(spellInfo->Effects[i].ItemType))
@@ -1422,7 +1421,6 @@ void SpellMgr::LoadSpellRequired()
         // xinef: fill additionalTalentInfo data, currently Blessing of Sanctuary only
         if (GetTalentSpellCost(spellReq) > 0)
             mTalentSpellAdditionalSet.insert(spellId);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u spell required records in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -1531,7 +1529,6 @@ void SpellMgr::LoadSpellTargetPositions()
             sLog->outErrorDb("Spell (Id: %u, effIndex: %u) listed in `spell_target_position` does not have target TARGET_DEST_DB (17).", Spell_ID, effIndex);
             continue;
         }
-
     } while (result->NextRow());
 
     /*
@@ -2368,7 +2365,6 @@ void SpellMgr::LoadPetDefaultSpells()
     CreatureTemplateContainer const* ctc = sObjectMgr->GetCreatureTemplates();
     for (CreatureTemplateContainer::const_iterator itr = ctc->begin(); itr != ctc->end(); ++itr)
     {
-
         if (!itr->second.PetSpellDataId)
             continue;
 
@@ -7237,7 +7233,6 @@ void SpellMgr::LoadDbcDataCorrections()
                     spellInfo2->rangeIndex = 187; // 300yd
                 }
             }
-
         }
 
         if (spellInfo->activeIconID == 2158)  // flight

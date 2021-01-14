@@ -198,7 +198,6 @@ BanReturn BanManager::BanIP(std::string const& IP, std::string const& Duration, 
         if (WorldSession* session = sWorld->FindOfflineSession(AccountID))
             if (session->GetPlayerName() != Author)
                 session->KickPlayer("Ban IP at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
-
     } while (resultAccounts->NextRow());
 
     LoginDatabase.CommitTransaction(trans);

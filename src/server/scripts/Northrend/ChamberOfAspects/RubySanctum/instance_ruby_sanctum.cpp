@@ -101,7 +101,6 @@ public:
                     if (Creature* halion = instance->GetCreature(HalionGUID))
                         halion->AI()->JustSummoned(creature);
                     break;
-
             }
         }
 

@@ -268,7 +268,6 @@ enum Events
     EVENT_DESTROY_SOUL,
     EVENT_TELEPORT_BACK,
     EVENT_SOUL_RIP,
-
 };
 
 enum EventGroups
@@ -694,7 +693,6 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_SIT);
-
         }
 
         bool CanAIAttack(Unit const* target) const override
@@ -828,7 +826,6 @@ public:
                         tirion->PlayDirectSound(17389);
                     }
                 }
-
             }
             else if (damage >= me->GetHealth())
                 damage = me->GetHealth() - 1;
@@ -2138,7 +2135,6 @@ public:
                 a->SetDuration(0);
             if (GetCaster()->GetTypeId() == TYPEID_UNIT)
                 GetCaster()->ToCreature()->DespawnOrUnsummon(3000);
-
         }
 
         void Register() override

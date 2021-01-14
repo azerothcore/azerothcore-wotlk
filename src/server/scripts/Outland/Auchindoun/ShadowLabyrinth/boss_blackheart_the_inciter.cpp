@@ -135,7 +135,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_blackheart_the_inciter()

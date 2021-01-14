@@ -889,7 +889,6 @@ public:
                 me->ToTempSummon()->DespawnOrUnsummon(1);
         }
     };
-
 };
 
 class npc_shadowy_mercenary : public CreatureScript
