@@ -1151,13 +1151,19 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks ch
 {
     if (IsInWorld())
     {
+        oz += GetCollisionHeight();
         float x, y, z;
         if (GetTypeId() == TYPEID_PLAYER)
+        {
             GetPosition(x, y, z);
+            z += GetCollisionHeight();
+        }
         else
+        {
             GetHitSpherePointFor({ ox, oy, oz }, x, y, z);
+        }
 
-        return GetMap()->isInLineOfSight(x, y, z + 2.0f, ox, oy, oz + 2.0f, GetPhaseMask(), checks);
+        return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks);
     }
     return true;
 }
@@ -1303,12 +1309,7 @@ float Position::GetAngle(const Position* obj) const
 // Return angle in range 0..2*pi
 float Position::GetAngle(const float x, const float y) const
 {
-    float dx = x - GetPositionX();
-    float dy = y - GetPositionY();
-
-    float ang = atan2(dy, dx);
-    ang = (ang >= 0) ? ang : 2 * M_PI + ang;
-    return ang;
+    return getAngle(GetPositionX(), GetPositionY(), x, y);
 }
 
 void Position::GetSinCos(const float x, const float y, float& vsin, float& vcos) const

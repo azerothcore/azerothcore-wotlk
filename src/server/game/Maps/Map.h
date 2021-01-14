@@ -52,6 +52,7 @@ class BattlegroundMap;
 class Transport;
 class StaticTransport;
 class MotionTransport;
+class PathGenerator;
 namespace acore
 {
     struct ObjectUpdater;

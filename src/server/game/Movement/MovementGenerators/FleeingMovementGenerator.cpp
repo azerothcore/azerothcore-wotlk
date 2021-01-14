@@ -49,12 +49,13 @@ bool FleeingMovementGenerator<T>::_getPoint(T* owner, float& x, float& y, float&
     if (!owner)
         return false;
 
+    const Map* _map = owner->GetBaseMap();
+
     x = owner->GetPositionX();
     y = owner->GetPositionY();
     z = owner->GetPositionZ();
 
     float temp_x, temp_y, angle;
-    const Map* _map = owner->GetBaseMap();
     // primitive path-finding
     for (uint8 i = 0; i < 18; ++i)
     {

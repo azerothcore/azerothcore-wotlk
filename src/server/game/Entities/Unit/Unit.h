@@ -1254,6 +1254,26 @@ private:
     GlobalCooldownMgr _GlobalCooldownMgr;
 };
 
+struct AttackPosition {
+    AttackPosition(Position pos) : _pos(pos), _taken(false) {}
+    bool operator==(const int val)
+    {
+        return !val;
+    };
+    int operator=(const int val)
+    {
+        if (!val)
+        {
+            // _pos = NULL;
+            _taken = false;
+            return 0; // NULL
+        }
+        return 0; // NULL
+    };
+    Position _pos;
+    bool _taken;
+};
+
 // for clearing special attacks
 #define REACTIVE_TIMER_START 5000
 
@@ -1404,6 +1424,7 @@ public:
     virtual void SetCanDualWield(bool value) { m_canDualWield = value; }
     [[nodiscard]] float GetCombatReach() const override { return m_floatValues[UNIT_FIELD_COMBATREACH]; }
     [[nodiscard]] float GetMeleeReach() const { float reach = m_floatValues[UNIT_FIELD_COMBATREACH]; return reach > MIN_MELEE_REACH ? reach : MIN_MELEE_REACH; }
+    [[nodiscard]] bool IsWithinRange(Unit const* obj, float dist) const;
     bool IsWithinCombatRange(const Unit* obj, float dist2compare) const;
     bool IsWithinMeleeRange(const Unit* obj, float dist = 0.f) const;
     float GetMeleeRange(Unit const* target) const;
@@ -1434,6 +1455,7 @@ public:
     bool AttackStop();
     void RemoveAllAttackers();
     [[nodiscard]] AttackerSet const& getAttackers() const { return m_attackers; }
+    [[nodiscard]] Position* GetMeleeAttackPoint(Unit* attacker);
     [[nodiscard]] bool isAttackingPlayer() const;
     [[nodiscard]] Unit* GetVictim() const { return m_attacking; }
 
@@ -2174,7 +2196,7 @@ public:
 
     uint32 GetDisplayId() { return GetUInt32Value(UNIT_FIELD_DISPLAYID); }
     virtual void SetDisplayId(uint32 modelId);
-    uint32 GetNativeDisplayId() { return GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID); }
+    [[nodiscard]] uint32 GetNativeDisplayId() const { return GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID); }
     void RestoreDisplayId();
     void SetNativeDisplayId(uint32 modelId) { SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, modelId); }
     void setTransForm(uint32 spellid) { m_transform = spellid;}
@@ -2569,6 +2591,7 @@ private:
     HostileRefManager m_HostileRefManager;
 
     FollowerRefManager m_FollowingRefManager;
+    Unit* m_comboTarget;
 
     ComboPointHolderSet m_ComboPointHolders;
 

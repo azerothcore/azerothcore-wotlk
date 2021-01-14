@@ -371,7 +371,9 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlo
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     // ignore movement request if target not exist
     if (!target || target == _owner || _owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
+    {
         return;
+    }
 
     //_owner->AddUnitState(UNIT_STATE_FOLLOW);
     if (_owner->GetTypeId() == TYPEID_PLAYER)

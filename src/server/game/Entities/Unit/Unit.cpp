@@ -153,9 +153,28 @@ ProcEventInfo::ProcEventInfo(Unit* actor, Unit* actionTarget, Unit* procTarget, 
 #pragma warning(disable:4355)
 #endif
 Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
-    m_movedByPlayer(nullptr), m_lastSanctuaryTime(0), IsAIEnabled(false), NeedChangeAI(false),
-    m_ControlledByPlayer(false), m_CreatedByPlayer(false), movespline(new Movement::MoveSpline()), i_AI(nullptr), i_disabledAI(nullptr), m_realRace(0), m_race(0), m_AutoRepeatFirstCast(false), m_procDeep(0), m_removedAurasCount(0),
-    i_motionMaster(new MotionMaster(this)), m_regenTimer(0), m_ThreatManager(this), m_vehicle(nullptr), m_vehicleKit(nullptr), m_unitTypeMask(UNIT_MASK_NONE), m_HostileRefManager(this)
+    m_movedByPlayer(nullptr),
+    m_lastSanctuaryTime(0),
+    IsAIEnabled(false),
+    NeedChangeAI(false),
+    m_ControlledByPlayer(false),
+    m_CreatedByPlayer(false),
+    movespline(new Movement::MoveSpline()),
+    i_AI(nullptr),
+    i_disabledAI(nullptr),
+    m_realRace(0),
+    m_race(0),
+    m_AutoRepeatFirstCast(false),
+    m_procDeep(0),
+    m_removedAurasCount(0),
+    i_motionMaster(new MotionMaster(this)),
+    m_regenTimer(0),
+    m_ThreatManager(this),
+    m_vehicle(nullptr),
+    m_vehicleKit(nullptr),
+    m_unitTypeMask(UNIT_MASK_NONE),
+    m_HostileRefManager(this),
+    m_comboTarget(nullptr)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -12685,7 +12704,7 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
         WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
         data.append(GetPackGUID());
         data << uint32(sWorld->GetGameTime());   // Packet counter
-        data << player->GetCollisionHeight(true);
+        data << player->GetCollisionHeight();
         player->GetSession()->SendPacket(&data);
     }
 
@@ -12705,7 +12724,7 @@ void Unit::Dismount()
         WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
         data.append(GetPackGUID());
         data << uint32(sWorld->GetGameTime());   // Packet counter
-        data << thisPlayer->GetCollisionHeight(false);
+        data << thisPlayer->GetCollisionHeight();
         thisPlayer->GetSession()->SendPacket(&data);
     }
 

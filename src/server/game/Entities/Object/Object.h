@@ -1040,6 +1040,9 @@ public:
     [[nodiscard]] virtual float GetStationaryY() const { return GetPositionY(); }
     [[nodiscard]] virtual float GetStationaryZ() const { return GetPositionZ(); }
     [[nodiscard]] virtual float GetStationaryO() const { return GetOrientation(); }
+    float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
+
+    virtual float GetCollisionHeight() const { return 0.0f; }
 
     [[nodiscard]] float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr) const;
     [[nodiscard]] float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
