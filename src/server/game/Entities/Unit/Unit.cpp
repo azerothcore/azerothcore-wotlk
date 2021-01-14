@@ -2249,9 +2249,9 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return nullptr;
     }
 
-    float currentAngle, minDistance = 0;
+    float currentAngle = 0, minDistance = 0;
     Unit *refUnit = nullptr;
-    uint32 validAttackers=0;
+    uint32 validAttackers = 0;
 
     double attackerSize = attacker->GetCollisionWidth();
 
