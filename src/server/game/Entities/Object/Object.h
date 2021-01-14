@@ -792,12 +792,6 @@ public:
         GetPosition(&pos);
         MovePositionToFirstCollision(pos, dist, angle);
     }
-    void MovePositionToFirstCollisionForTotem(Position& pos, float dist, float angle, bool forGameObject);
-    void GetFirstCollisionPositionForTotem(Position& pos, float dist, float angle, bool forGameObject)
-    {
-        GetPosition(&pos);
-        MovePositionToFirstCollisionForTotem(pos, dist, angle, forGameObject);
-    }
     void GetRandomNearPosition(Position& pos, float radius)
     {
         GetPosition(&pos);

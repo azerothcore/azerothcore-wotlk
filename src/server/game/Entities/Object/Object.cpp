@@ -1140,9 +1140,9 @@ bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool
 
 Position WorldObject::GetHitSpherePointFor(Position const& dest) const
 {
-    G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ());
+    G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight());
     G3D::Vector3 vObj(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
-    G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetObjectSize());
+    G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetCombatReach());
 
     return Position(contactPoint.x, contactPoint.y, contactPoint.z, GetAngle(contactPoint.x, contactPoint.y));
 }
@@ -1156,13 +1156,12 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks ch
         if (GetTypeId() == TYPEID_PLAYER)
         {
             GetPosition(x, y, z);
+            z += GetCollisionHeight();
         }
         else
         {
             GetHitSpherePointFor({ ox, oy, oz }, x, y, z);
         }
-
-        z += GetCollisionHeight();
 
         return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks);
     }
@@ -2654,8 +2653,8 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
         return;
     }
 
-    ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-    floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
+    ground = GetMapHeight(destx, desty, MAX_HEIGHT);
+    floor = GetMapHeight(destx, desty, pos.m_positionZ);
     destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
 
     float step = dist / 10.0f;
@@ -2667,14 +2666,14 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
         {
             destx -= step * cos(angle);
             desty -= step * sin(angle);
-            ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-            floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
+            ground = GetMapHeight(destx, desty, MAX_HEIGHT);
+            floor = GetMapHeight(destx, desty, pos.m_positionZ);
             destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
         }
         // we have correct destz now
         else
             break;
-    }
+        }
 
     pos.Relocate(destx, desty, destz);
 
@@ -2729,104 +2728,11 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
     desty = pos.m_positionY + dist * sin(angle);
     destz = pos.m_positionZ;
 
-    if (!GetMap()->CanReachPositionAndGetCoords(this, destx, desty, destz, false, true, false))
+    if (!GetMap()->CanReachPositionAndGetCoords(this, destx, desty, destz, false, false, false))
         return;
 
     pos.SetOrientation(GetOrientation());
     pos.Relocate(destx, desty, destz);
-}
-
-void WorldObject::MovePositionToFirstCollisionForTotem(Position& pos, float dist, float angle, bool forGameObject)
-{
-    angle += m_orientation;
-    float destx, desty, destz, ground, floor;
-    pos.m_positionZ += 2.0f;
-    destx = pos.m_positionX + dist * cos(angle);
-    desty = pos.m_positionY + dist * sin(angle);
-    destz = pos.GetPositionZ();
-
-    // Prevent invalid coordinates here, position is unchanged
-    if (!acore::IsValidMapCoord(destx, desty))
-    {
-        sLog->outCrash("WorldObject::MovePositionToFirstCollision invalid coordinates X: %f and Y: %f were passed!", destx, desty);
-        return;
-    }
-
-    bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetMapId(), pos.m_positionX, pos.m_positionY, pos.m_positionZ, destx, desty, destz, destx, desty, destz, -0.5f);
-
-    // collision occured
-    if (col)
-    {
-        // move back a bit
-        if (pos.GetExactDist2d(destx, desty) > CONTACT_DISTANCE)
-        {
-            destx -= CONTACT_DISTANCE * cos(angle);
-            desty -= CONTACT_DISTANCE * sin(angle);
-        }
-
-        dist = sqrt((pos.m_positionX - destx) * (pos.m_positionX - destx) + (pos.m_positionY - desty) * (pos.m_positionY - desty));
-    }
-
-    // check dynamic collision
-    col = GetMap()->getObjectHitPos(GetPhaseMask(), pos.m_positionX, pos.m_positionY, pos.m_positionZ + 0.5f, destx, desty, destz + 0.5f, destx, desty, destz, -0.5f);
-
-    // Collided with a gameobject
-    if (col)
-    {
-        // move back a bit
-        if (pos.GetExactDist2d(destx, desty) > CONTACT_DISTANCE)
-        {
-            destx -= CONTACT_DISTANCE * cos(angle);
-            desty -= CONTACT_DISTANCE * sin(angle);
-        }
-        dist = sqrt((pos.m_positionX - destx) * (pos.m_positionX - destx) + (pos.m_positionY - desty) * (pos.m_positionY - desty));
-    }
-
-    float prevdx = destx, prevdy = desty, prevdz = destz;
-    bool anyvalid = false;
-
-    ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-    floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
-    destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
-
-    // xinef: if we have gameobject, store last valid ground position
-    // xinef: I assume you wanted to spawn totem in air and allow it to fall down if no valid position was found
-    if (forGameObject)
-        prevdz = destz;
-
-    float step = dist / 10.0f;
-    for (uint8 j = 0; j < 10; ++j)
-    {
-        // do not allow too big z changes
-        if (fabs(pos.m_positionZ - destz) > 4.0f)
-        {
-            destx -= step * cos(angle);
-            desty -= step * sin(angle);
-            ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-            floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
-            destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
-            if (j == 9 && fabs(pos.m_positionZ - destz) <= 4.0f)
-                anyvalid = true;
-        }
-        // we have correct destz now
-        else
-        {
-            anyvalid = true;
-            break;
-        }
-    }
-    if (!anyvalid)
-    {
-        destx = prevdx;
-        desty = prevdy;
-        destz = prevdz;
-    }
-
-    acore::NormalizeMapCoord(destx);
-    acore::NormalizeMapCoord(desty);
-
-    pos.Relocate(destx, desty, destz);
-    pos.m_orientation = m_orientation;
 }
 
 void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)

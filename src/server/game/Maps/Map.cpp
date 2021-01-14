@@ -1993,6 +1993,14 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
     return mapHeight;                               // explicitly use map data
 }
 
+float Map::GetGridHeight(float x, float y) const
+{
+    if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
+        return gmap->getHeight(x, y);
+
+    return VMAP_INVALID_HEIGHT_VALUE;
+}
+
 float Map::GetMinHeight(float x, float y) const
 {
     if (GridMap const* grid = const_cast<Map*>(this)->GetGrid(x, y))
@@ -3443,6 +3451,15 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float &destX, 
  **/
 bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes, bool findPath) const
 {
+    // Prevent invalid coordinates here, position is unchanged
+    if (!acore::IsValidMapCoord(startX, startY, startZ) || !acore::IsValidMapCoord(destX, destY, destZ))
+    {
+        sLog->outCrash("WorldObject::CanReachPositionAndGetCoords invalid coordinates startX: %f, startY: %f, startZ: %f, destX: %f, destY: %f, destZ: %f", startX, startY, startZ, destX, destY, destZ);
+        // go back
+        destX = startX; destY = startY; destZ = startZ;
+        return false;
+    }
+
     bool isWaterNow = IsInWater(startX, startY, startZ);
     bool isWaterNext = IsInWater(destX, destY, destZ);
     const Unit* unit = source->ToUnit();
@@ -3465,15 +3482,6 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
     }
     else
     {
-        // Prevent invalid coordinates here, position is unchanged
-        if (!acore::IsValidMapCoord(startX, startY, startZ) || !acore::IsValidMapCoord(destX, destY, destZ))
-        {
-            sLog->outCrash("WorldObject::CanReachPositionAndGetCoords invalid coordinates startX: %f, startY: %f, startZ: %f, destX: %f, destY: %f, destZ: %f", startX, startY, startZ, destX, destY, destZ);
-            // go back
-            destX = startX; destY = startY; destZ = startZ;
-            return false;
-        }
-
         PathGenerator *path = new PathGenerator(source);
 
         // Use a detour raycast to get our first collision point
@@ -3507,11 +3515,12 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         // Unit is not on the ground, check for potential collision via vmaps
         if (notOnGround)
         {
-            float _x = destX, _y = destY, _z = destZ;
             bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(source->GetMapId(),
                 startX, startY, startZ + halfHeight,
-                _x, _y, _z + halfHeight,
-                _x, _y, _z, -0.5f);
+                destX, destY, destZ + halfHeight,
+                destX, destY, destZ, -0.5f);
+
+            destZ -= halfHeight;
 
             // Collided with static LOS object, move back to collision point
             if (col)
@@ -3523,11 +3532,12 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         }
 
         // check dynamic collision
-        float _x = destX, _y = destY, _z = destZ;
         bool col = source->GetMap()->getObjectHitPos(source->GetPhaseMask(),
             startX, startY, startZ + halfHeight,
-            _x, _y, _z + halfHeight,
-            _x, _y, _z, -0.5f);
+            destX, destY, destZ + halfHeight,
+            destX, destY, destZ, -0.5f);
+
+        destZ -= halfHeight;
 
         // Collided with a gameobject, move back to collision point
         if (col)

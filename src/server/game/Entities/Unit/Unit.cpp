@@ -590,10 +590,15 @@ bool Unit::IsWithinMeleeRange(const Unit* obj, float dist) const
     float dz = GetPositionZ() - obj->GetPositionZ();
     float distsq = dx * dx + dy * dy + dz * dz;
 
-    float sizefactor = GetMeleeReach() + obj->GetMeleeReach();
-    float maxdist = dist + sizefactor;
+    float maxdist = dist + GetMeleeRange(obj); 
 
     return distsq < maxdist * maxdist;
+}
+
+float Unit::GetMeleeRange(Unit const* target) const
+{
+    float range = GetCombatReach() + target->GetCombatReach() + 4.0f / 3.0f;
+    return std::max(range, NOMINAL_MELEE_RANGE);
 }
 
 bool Unit::IsWithinRange(Unit const* obj, float dist) const
@@ -636,7 +641,7 @@ bool Unit::GetRandomContactPoint(const Unit* obj, float& x, float& y, float& z, 
         z = this->GetPositionZ();
         obj->UpdateAllowedPositionZ(x, y, z);
     }
-    float maxDist = MELEE_RANGE + GetMeleeReach() + obj->GetMeleeReach();
+    float maxDist = GetMeleeRange(obj);
     if (GetExactDistSq(x, y, z) >= maxDist * maxDist)
     {
         if (force)
@@ -2244,9 +2249,9 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return nullptr;
     }
 
-    float currentAngle, minDistance = 0;
+    float currentAngle = 0, minDistance = 0;
     Unit *refUnit = nullptr;
-    uint32 validAttackers=0;
+    uint32 validAttackers = 0;
 
     double attackerSize = attacker->GetCollisionWidth();
 

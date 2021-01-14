@@ -286,7 +286,7 @@ void CreatureAI::MoveBackwardsChecks() {
         return;
     }
 
-    float moveDist = CalculatePct(me->GetCombatReach() + victim->GetCombatReach(), 100);
+    float moveDist = me->GetMeleeRange(victim) / 2;
 
     me->GetMotionMaster()->MoveBackwards(victim, moveDist);
 }
