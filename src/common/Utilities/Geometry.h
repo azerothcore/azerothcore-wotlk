@@ -3,9 +3,9 @@
  */
 
 /**
- * 
+ *
  * Utility library to define some global function for geometric calculations
- * 
+ *
  */
 
 #ifndef _ACORE_GEOMETRY_H

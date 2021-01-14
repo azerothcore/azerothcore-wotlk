@@ -9,12 +9,12 @@
 
 class dtQueryFilterExt: public dtQueryFilter
 {
-	float m_areaCost[DT_MAX_AREAS];		///< Cost per area type. (Used by default implementation.)
-	unsigned short m_includeFlags;		///< Flags for polygons that can be visited. (Used by default implementation.)
-	unsigned short m_excludeFlags;		///< Flags for polygons that should not be visted. (Used by default implementation.)
+    float m_areaCost[DT_MAX_AREAS];   ///< Cost per area type. (Used by default implementation.)
+    unsigned short m_includeFlags;    ///< Flags for polygons that can be visited. (Used by default implementation.)
+    unsigned short m_excludeFlags;    ///< Flags for polygons that should not be visted. (Used by default implementation.)
 
-    public: 
-	    dtQueryFilterExt();
+    public:
+        dtQueryFilterExt();
 
         bool passFilter(const dtPolyRef ref,
                         const dtMeshTile* tile,

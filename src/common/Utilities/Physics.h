@@ -3,9 +3,9 @@
  */
 
 /**
- * 
+ *
  * Utility library to define some global function for simple physics calculations
- * 
+ *
  */
 
 #ifndef _ACORE_PHYSICS_H
@@ -27,11 +27,11 @@ using namespace std;
 
 /**
  * @brief Get the height immersed in water
- * 
- * @param height 
- * @param width 
+ *
+ * @param height
+ * @param width
  * @param weight specific weight
- * @return float 
+ * @return float
  */
 [[nodiscard]] inline float getOutOfWater(float width, float weight, float density)
 {

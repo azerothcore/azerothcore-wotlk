@@ -1486,7 +1486,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
                     // water level while swimming
                     max_z = max_z - (height > heightInWater ? heightInWater : (height - (height / 3)));
                 }
-                else 
+                else
                 {
                     // hovering units cannot go below their hover height
                     float hoverOffset = unit->GetHoverHeight();
