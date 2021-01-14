@@ -2274,24 +2274,14 @@ float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap/*=tr
 
 bool Map::IsInWater(float x, float y, float pZ, LiquidData* data) const
 {
-    if (const_cast<Map*>(this)->GetGrid(x, y))
-    {
-        LiquidData liquid_status;
-        LiquidData* liquid_ptr = data ? data : &liquid_status;
-        return getLiquidStatus(x, y, pZ, MAP_ALL_LIQUIDS, liquid_ptr) & (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER);
-    }
-
-    return false;
+    LiquidData liquid_status;
+    LiquidData* liquid_ptr = data ? data : &liquid_status;
+    return getLiquidStatus(x, y, pZ, MAP_ALL_LIQUIDS, liquid_ptr) & (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER);
 }
 
 bool Map::IsUnderWater(float x, float y, float z) const
 {
-    if (const_cast<Map*>(this)->GetGrid(x, y))
-    {
-        return getLiquidStatus(x, y, z, MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN) & LIQUID_MAP_UNDER_WATER;
-    }
-
-    return false;
+    return getLiquidStatus(x, y, z, MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN) & LIQUID_MAP_UNDER_WATER;
 }
 
 char const* Map::GetMapName() const
@@ -3461,6 +3451,15 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float &destX, 
  **/
 bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes, bool findPath) const
 {
+    // Prevent invalid coordinates here, position is unchanged
+    if (!acore::IsValidMapCoord(startX, startY, startZ) || !acore::IsValidMapCoord(destX, destY, destZ))
+    {
+        sLog->outCrash("WorldObject::CanReachPositionAndGetCoords invalid coordinates startX: %f, startY: %f, startZ: %f, destX: %f, destY: %f, destZ: %f", startX, startY, startZ, destX, destY, destZ);
+        // go back
+        destX = startX; destY = startY; destZ = startZ;
+        return false;
+    }
+
     bool isWaterNow = IsInWater(startX, startY, startZ);
     bool isWaterNext = IsInWater(destX, destY, destZ);
     const Unit* unit = source->ToUnit();
@@ -3483,15 +3482,6 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
     }
     else
     {
-        // Prevent invalid coordinates here, position is unchanged
-        if (!acore::IsValidMapCoord(startX, startY, startZ) || !acore::IsValidMapCoord(destX, destY, destZ))
-        {
-            sLog->outCrash("WorldObject::CanReachPositionAndGetCoords invalid coordinates startX: %f, startY: %f, startZ: %f, destX: %f, destY: %f, destZ: %f", startX, startY, startZ, destX, destY, destZ);
-            // go back
-            destX = startX; destY = startY; destZ = startZ;
-            return false;
-        }
-
         PathGenerator *path = new PathGenerator(source);
 
         // Use a detour raycast to get our first collision point
