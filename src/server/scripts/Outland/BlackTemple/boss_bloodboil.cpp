@@ -183,7 +183,6 @@ public:
             return me->GetHomePosition().GetExactDist2d(me) > 105.0f;
         }
     };
-
 };
 
 class spell_gurtogg_bloodboil : public SpellScriptLoader

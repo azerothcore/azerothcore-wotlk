@@ -1231,7 +1231,6 @@ public:
     [[nodiscard]] ReactStates GetPlayerReactState() const { return _oldReactState; }
 
 private:
-
     Unit* _unit;
     UnitActionBarEntry PetActionBar[MAX_UNIT_ACTION_BAR_INDEX];
     CharmSpellInfo _charmspells[4];

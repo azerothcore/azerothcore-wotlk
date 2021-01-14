@@ -590,7 +590,7 @@ bool Unit::IsWithinMeleeRange(const Unit* obj, float dist) const
     float dz = GetPositionZ() - obj->GetPositionZ();
     float distsq = dx * dx + dy * dy + dz * dz;
 
-    float maxdist = dist + GetMeleeRange(obj); 
+    float maxdist = dist + GetMeleeRange(obj);
 
     return distsq < maxdist * maxdist;
 }
@@ -1769,7 +1769,6 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
     if (owner)
         victimResistance += std::max((float(victim->getLevel()) - float(owner->getLevel())) * 5.0f, 0.0f);
 
-
     static uint32 const BOSS_LEVEL = 83;
     static float const BOSS_RESISTANCE_CONSTANT = 510.0f;
     uint32 level = victim->getLevel();
@@ -2288,7 +2287,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return nullptr;
     }
 
-    double radius = attackerSize > refUnit->GetCollisionWidth() ? attackerSize / 2.0f : refUnit->GetCollisionWidth() / 2.0f;
+    double ray = attackerSize > refUnit->GetObjectSize() ? attackerSize / 2.0f : refUnit->GetObjectSize() / 2.0f;
     double angle = 0;
 
     // Equation of tangent point to get the ideal angle to
@@ -2334,11 +2333,11 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     float x, y, z;
     GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * direction);
 
-    if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z, true, true, false))
+    if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z))
     {
         GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * (direction * -1)); // try the other side
 
-        if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z, true, true, false))
+        if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z))
         {
             return nullptr;
         }
@@ -2381,7 +2380,6 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
 
 MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackType attType, int32 crit_chance, int32 miss_chance, int32 dodge_chance, int32 parry_chance, int32 block_chance) const
 {
-
     if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsEvadingAttacks())
         return MELEE_HIT_EVADE;
 
@@ -9061,7 +9059,6 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         }
     }
 
-
     // Custom basepoints/target for exist spell
     // dummy basepoints or other customs
     switch (trigger_spell_id)
@@ -9457,7 +9454,6 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit* victim, uint32 /*damage*/, Au
     return true;
 }
 
-
 void Unit::setPowerType(Powers new_powertype)
 {
     SetByteValue(UNIT_FIELD_BYTES_0, 3, new_powertype);
@@ -9569,7 +9565,6 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
             if (ReputationRank const* repRank = targetPlayerOwner->GetReputationMgr().GetForcedRankIfAny(selfFactionTemplateEntry))
                 return *repRank;
     }
-
 
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
     {
@@ -9938,7 +9933,6 @@ void Unit::ModifyAuraState(AuraStateType flag, bool apply)
                     if( AuraApplication* aurApp = (*itr).second->GetApplicationOfTarget(GetGUID()) )
                         (*itr).second->HandleAllEffects(aurApp, AURA_EFFECT_HANDLE_REAL, true);
             }
-
         }
     }
     else
@@ -11159,7 +11153,6 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
             if (spellProto->ValidateAttribute6SpellDamageMods(caster, *i, damagetype == DOT))
                 AddPct(TakenTotalMod, (*i)->GetAmount());
 
-
     // .. taken pct: dummy auras
     AuraEffectList const& mDummyAuras = GetAuraEffectsByType(SPELL_AURA_DUMMY);
     for (AuraEffectList::const_iterator i = mDummyAuras.begin(); i != mDummyAuras.end(); ++i)
@@ -11307,7 +11300,6 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
         for (AuraEffectList::const_iterator i = mDamageDonebyAP.begin(); i != mDamageDonebyAP.end(); ++i)
             if ((*i)->GetMiscValue() & schoolMask)
                 DoneAdvertisedBenefit += int32(CalculatePct(GetTotalAttackPowerValue(BASE_ATTACK), (*i)->GetAmount()));
-
     }
     return DoneAdvertisedBenefit;
 }
@@ -12776,7 +12768,6 @@ void Unit::Dismount()
 
 void Unit::SetInCombatWith(Unit* enemy, uint32 duration)
 {
-
     // Xinef: Dont allow to start combat with triggers
     if (enemy->GetTypeId() == TYPEID_UNIT && enemy->ToCreature()->IsTrigger())
         return;
@@ -12803,7 +12794,6 @@ void Unit::SetInCombatWith(Unit* enemy, uint32 duration)
 
 void Unit::CombatStart(Unit* target, bool initialAggro)
 {
-
     // Xinef: Dont allow to start combat with triggers
     if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsTrigger())
         return;
@@ -13088,7 +13078,6 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
                         if (FactionState const* repState = player->GetReputationMgr().GetState(factionEntry))
                             if (!(repState->Flags & FACTION_FLAG_AT_WAR))
                                 return false;
-
             }
         }
     }
@@ -14091,7 +14080,6 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
     {
         // else positive mods here, there are no currently
         // when there will be, change GetTotalAuraModifierByMiscValue to GetTotalPositiveAuraModifierByMiscValue
-
     }
 
     // Glyphs which increase duration of selfcasted buffs
@@ -14319,7 +14307,6 @@ float Unit::GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spell
         return spellInfo->GetMinRange();
     return spellInfo->GetMinRange(!IsHostileTo(target));
 }
-
 
 uint32 Unit::GetCreatureType() const
 {
@@ -15773,7 +15760,6 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                                 takeCharges = true;
                             else if (triggeredByAura->GetAmount()) // aura must have amount
                             {
-
                                 int32 damageLeft = triggeredByAura->GetAmount();
                                 // No damage left
                                 if (damageLeft < int32(damage))
@@ -16350,7 +16336,6 @@ float Unit::CalculateDefaultCoefficient(SpellInfo const* spellInfo, DamageEffect
     float DotFactor = 1.0f;
     if (damagetype == DOT)
     {
-
         int32 DotDuration = spellInfo->GetDuration();
         if (!spellInfo->IsChanneled() && DotDuration > 0)
             DotFactor = DotDuration / 15000.0f;
@@ -16645,16 +16630,6 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, SpellInfo const
     // Custom chances
     switch (spellProto->SpellFamilyName)
     {
-        case SPELLFAMILY_SHAMAN:
-            {
-                // Blessing of the Eternals, Earthliving proc
-                if (spellProto->SpellIconID == 1929)
-                {
-                    if (victim && (float(victim->GetHealth() * 100.0f / victim->GetMaxHealth()) > 35.0f))
-                        return roll_chance_f(chance);
-                }
-                break;
-            }
         case SPELLFAMILY_WARRIOR:
             {
                 // Recklessness, allow to proc only once for whirlwind
@@ -16761,7 +16736,6 @@ bool Unit::HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura)
     // heal
     CastCustomSpell(this, 33110, &heal, nullptr, nullptr, true, nullptr, nullptr, caster_guid);
     return true;
-
 }
 bool Unit::HandleAuraRaidProcFromCharge(AuraEffect* triggeredByAura)
 {
@@ -17893,7 +17867,6 @@ bool Unit::IsInRaidWith(Unit const* unit) const
     else
         return false;
 }
-
 
 void Unit::GetPartyMembers(std::list<Unit*>& TagUnitMap)
 {
@@ -20041,7 +20014,7 @@ float Unit::GetCollisionWidth() const
                 return objectSize == DEFAULT_WORLD_OBJECT_SIZE && collisionWidth > 0.0f ? collisionWidth : objectSize;
             }
         }
-    } 
+    }
 
     collisionWidth = scaleMod * modelData->CollisionWidth * modelData->Scale * displayInfo->scale;
     return objectSize == DEFAULT_WORLD_OBJECT_SIZE && collisionWidth > 0.0f ? collisionWidth : objectSize;
@@ -20065,7 +20038,7 @@ float Unit::GetCollisionHeight() const
                 return collisionHeight == 0.0f ? DEFAULT_COLLISION_HEIGHT : collisionHeight;
             }
         }
-    } 
+    }
 
     //! Dismounting case - use basic default model data
     collisionHeight = scaleMod * modelData->CollisionHeight * modelData->Scale * displayInfo->scale;

@@ -1717,9 +1717,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
 
     /* == gem perfection handling over == */
 
-
     /* == profession specialization handling == */
-
 
     // init items_count to 1, since 1 item will be created regardless of specialization
     int32 itemsCount = 1;
@@ -3007,7 +3005,6 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
         {
             sLog->outError("Spell::EffectEnchantItemTmp: unknown spell id %i", spell_id);
             return;
-
         }
 
         for (int j = BASE_ATTACK; j <= OFF_ATTACK; ++j)

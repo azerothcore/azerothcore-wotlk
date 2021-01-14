@@ -64,13 +64,11 @@ enum Talks
     SAY_DEATH,
     SAY_NALORAKK_EVENT1, // Unimplemented
     SAY_NALORAKK_EVENT2 // Unimplemented
-
 };
 
 class boss_nalorakk : public CreatureScript
 {
 public:
-
     boss_nalorakk()
         : CreatureScript("boss_nalorakk")
     {
@@ -339,7 +337,6 @@ public:
                         inMove = false;
                         return;
                 }
-
             }
         }
 
@@ -462,4 +459,3 @@ void AddSC_boss_nalorakk()
 {
     new boss_nalorakk();
 }
-

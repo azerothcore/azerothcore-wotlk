@@ -50,7 +50,6 @@ namespace MMAP
         MMapTileSet mmapLoadedTiles;        // maps [map grid coords] to [dtTile]
     };
 
-
     typedef std::unordered_map<uint32, MMapData*> MMapDataSet;
 
     // singleton class
