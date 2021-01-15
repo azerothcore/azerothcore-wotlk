@@ -32,7 +32,6 @@
 #include "Chat.h"
 #include "Vehicle.h"
 
-
 // Ours
 class spell_gen_model_visible : public SpellScriptLoader
 {
@@ -447,7 +446,6 @@ public:
 
     public:
         spell_gen_disabled_above_level_SpellScript(uint8 level) : SpellScript(), _level(level) { }
-
 
         SpellCastResult CheckRequirement()
         {
@@ -1245,7 +1243,6 @@ public:
             OnEffectApply += AuraEffectApplyFn(spell_gen_visual_dummy_stun_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_gen_visual_dummy_stun_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
-
     };
 
     AuraScript* GetAuraScript() const override
@@ -1497,7 +1494,6 @@ public:
         return new spell_gen_haunted_SpellScript();
     }
 };
-
 
 // Theirs
 class spell_gen_absorb0_hitlimit1 : public SpellScriptLoader
@@ -2314,7 +2310,6 @@ public:
                     WorldPacket data2;
                     player->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, 42292, GetSpellInfo()->CategoryRecoveryTime); // PvP Trinket spell
                     player->GetSession()->SendPacket(&data2);
-
                 }
             }
         }
@@ -3067,7 +3062,6 @@ public:
             OnEffectApply += AuraEffectApplyFn(spell_gen_damage_reduction_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
             OnEffectRemove += AuraEffectRemoveFn(spell_gen_damage_reduction_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
         }
-
     };
 
     AuraScript* GetAuraScript() const override
@@ -4896,7 +4890,6 @@ public:
     {
         return new spell_gen_vendor_bark_trigger_SpellScript();
     }
-
 };
 
 enum WhisperGulchYoggSaronWhisper

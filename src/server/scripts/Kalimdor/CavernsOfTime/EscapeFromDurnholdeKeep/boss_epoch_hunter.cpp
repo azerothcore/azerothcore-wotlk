@@ -6,7 +6,6 @@
 #include "ScriptedCreature.h"
 #include "old_hillsbrad.h"
 
-
 enum EpochHunter
 {
     SAY_AGGRO                   = 3,
@@ -105,7 +104,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_epoch_hunter()

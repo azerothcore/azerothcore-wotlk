@@ -132,7 +132,6 @@ public:
 
             instance->SetData(DATA_ARAN, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), true);
-
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -142,7 +141,6 @@ public:
             instance->SetData(DATA_ARAN, IN_PROGRESS);
             instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), false);
             DoZoneInCombat();
-
         }
 
         void FlameWreathEffect()
@@ -570,7 +568,6 @@ public:
     {
         water_elementalAI(Creature* creature) : ScriptedAI(creature)
         {
-
         }
 
         uint32 CastTimer;

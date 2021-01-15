@@ -363,7 +363,6 @@ public:
             }
         }
 
-
         void UpdateAI(uint32 diff) override
         {
             if (addSpawnTimer <= diff)
@@ -1194,7 +1193,6 @@ public:
 
         void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
         {
-
             if (Unit* target = GetTarget())
             {
                 if (target->GetMapId() == 603)

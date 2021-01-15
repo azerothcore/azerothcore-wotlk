@@ -243,7 +243,6 @@ public:
                         m_auiEncounter[i] = NOT_STARTED;
 
                 spheres = data5;
-
             }
             else OUT_LOAD_INST_DATA_FAIL;
 
@@ -283,7 +282,6 @@ public:
 
                 if (!PlayerList.empty())
                     caster->CastSpell(acore::Containers::SelectRandomContainerElement(PlayerList), caster->GetMap()->IsHeroic() ? SPELL_SHADOW_SICKLE_H : SPELL_SHADOW_SICKLE, true);
-
             }
         }
 

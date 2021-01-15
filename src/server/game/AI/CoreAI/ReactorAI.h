@@ -14,7 +14,6 @@ class Unit;
 class ReactorAI : public CreatureAI
 {
 public:
-
     explicit ReactorAI(Creature* c) : CreatureAI(c) {}
 
     void MoveInLineOfSight(Unit*) override {}

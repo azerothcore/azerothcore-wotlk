@@ -399,7 +399,6 @@ void Map::DeleteFromWorld(Player* player)
     delete player;
 }
 
-
 void Map::EnsureGridCreated(const GridCoord& p)
 {
     if (getNGrid(p.x_coord, p.y_coord)) // pussywizard
@@ -626,7 +625,6 @@ bool Map::IsGridLoaded(const GridCoord& p) const
 {
     return (getNGrid(p.x_coord, p.y_coord) && isGridObjectDataLoaded(p.x_coord, p.y_coord));
 }
-
 
 void Map::VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
                                    TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
@@ -2004,7 +2002,6 @@ float Map::GetMinHeight(float x, float y) const
 
     return -500.0f;
 }
-
 
 inline bool IsOutdoorWMO(uint32 mogpFlags, int32 /*adtId*/, int32 /*rootId*/, int32 /*groupId*/, WMOAreaTableEntry const* wmoEntry, AreaTableEntry const* atEntry)
 {

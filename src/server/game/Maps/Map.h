@@ -189,7 +189,6 @@ class GridMap
     uint8 _liquidWidth;
     uint8 _liquidHeight;
 
-
     bool loadAreaData(FILE* in, uint32 offset, uint32 size);
     bool loadHeightData(FILE* in, uint32 offset, uint32 size);
     bool loadLiquidData(FILE* in, uint32 offset, uint32 size);
@@ -575,7 +574,6 @@ private:
     void UpdateActiveCells(const float& x, const float& y, const uint32 t_diff);
 
 protected:
-
     ACE_Thread_Mutex Lock;
     ACE_Thread_Mutex GridLock;
     ACE_RW_Thread_Mutex MMapLock;
@@ -660,7 +658,6 @@ private:
     ZoneDynamicInfoMap _zoneDynamicInfo;
     uint32 _defaultLight;
 };
-
 
 enum InstanceResetMethod
 {

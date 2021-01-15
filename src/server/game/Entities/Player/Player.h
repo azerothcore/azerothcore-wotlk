@@ -642,7 +642,7 @@ enum EquipmentSetUpdateState
 
 struct EquipmentSet
 {
-    EquipmentSet()  
+    EquipmentSet()
     {
         for (unsigned int & Item : Items)
             Item = 0;
@@ -998,7 +998,7 @@ struct BGData
 // holder for Entry Point data (pussywizard: stored in db)
 struct EntryPointData
 {
-    EntryPointData()  
+    EntryPointData()
     {
         ClearTaxiPath();
     }
@@ -1042,11 +1042,9 @@ public:                                                 // constructors
     void SetInAcceptProcess(bool state) { m_acceptProccess = state; }
 
 private:                                                // internal functions
-
     void Update(bool for_trader = true);
 
 private:                                                // fields
-
     Player*    m_player;                                // Player who own of this TradeData
     Player*    m_trader;                                // Player who trade with m_player
 

@@ -1099,7 +1099,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             }
         case SMART_ACTION_EQUIP:
             {
-
                 if (e.GetScriptType() == SMART_SCRIPT_TYPE_CREATURE)
                 {
                     int8 equipId = (int8)e.action.equip.entry;
