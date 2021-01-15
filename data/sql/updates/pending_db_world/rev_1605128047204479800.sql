@@ -1,4 +1,4 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1605128047204479800');
+-- INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1605128047204479800');
 
 -- SUMMARY: We edit the old table, then we create the new table, then we transfer the rows from the old table to the new table, then we remove no longer used columns from the old table, then we add foreign keys, then we add the strings, then update the .reload command
 
@@ -115,19 +115,19 @@ DROP `quest_done_H`,
 DROP `completed_achievement`,
 DROP `quest_failed_text`,
 RENAME TO `dungeon_access_template`,
-COMMENT='Dungeon access template and single requirements';
+COMMENT='Dungeon/raid access template and single requirements';
 
 -- Rename columns
 ALTER TABLE `dungeon_access_template`
-CHANGE `mapId` `instance_id` mediumint unsigned NOT NULL COMMENT 'Map ID from instance_template' AFTER `id`,
-CHANGE `difficulty` `difficulty` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic' AFTER `instance_id`,
+CHANGE `mapId` `map_id` mediumint unsigned NOT NULL COMMENT 'Map ID from instance_template' AFTER `id`,
+CHANGE `difficulty` `difficulty` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic' AFTER `map_id`,
 CHANGE `level_min` `min_level` tinyint unsigned NULL DEFAULT NULL AFTER `difficulty`,
 CHANGE `level_max` `max_level` tinyint unsigned NULL DEFAULT NULL AFTER `min_level`,
 CHANGE `item_level` `min_avg_item_level` smallint unsigned NULL DEFAULT NULL COMMENT 'Min average ilvl required to enter' AFTER `max_level`,
 CHANGE `comment` `comment` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic' AFTER `min_avg_item_level`;
 
 -- Add KEY CONSTRAINTS
-ALTER TABLE `dungeon_access_template` ADD CONSTRAINT `FK_dungeon_access_template__instance_template` FOREIGN KEY (`instance_id`) REFERENCES `instance_template` (`map`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `dungeon_access_template` ADD CONSTRAINT `FK_dungeon_access_template__instance_template` FOREIGN KEY (`map_id`) REFERENCES `instance_template` (`map`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `dungeon_access_requirements` ADD CONSTRAINT `FK_dungeon_access_requirements__dungeon_access_template` FOREIGN KEY (`dungeon_access_id`) REFERENCES `dungeon_access_template` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 
