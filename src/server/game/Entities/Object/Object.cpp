@@ -1540,16 +1540,9 @@ float WorldObject::GetGridActivationRange() const
     {
         return ToCreature()->m_SightDistance;
     }
-    else if (GetTypeId() == TYPEID_GAMEOBJECT && ToGameObject()->IsTransport())
+    else if (GetTypeId() == TYPEID_GAMEOBJECT && ToGameObject()->IsTransport() && isActiveObject())
     {
-        if (isActiveObject())
-        {
-            return GetMap()->GetVisibilityRange();
-        }
-        else
-        {
-            return 0.0f;
-        }
+        return GetMap()->GetVisibilityRange();
     }
     else
     {
