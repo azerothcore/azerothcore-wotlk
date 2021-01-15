@@ -1544,10 +1544,8 @@ float WorldObject::GetGridActivationRange() const
     {
         return GetMap()->GetVisibilityRange();
     }
-    else
-    {
-        return 0.0f;
-    }
+
+    return 0.0f;
 }
 
 float WorldObject::GetVisibilityRange() const
