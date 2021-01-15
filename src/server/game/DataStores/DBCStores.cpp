@@ -738,7 +738,7 @@ bool readCamera(M2Camera const* cam, uint32 buffSize, M2Header const* header, Ci
 
                 float x = lastTarget.locations.x;
                 float y = lastTarget.locations.y;
-                float z = lastTarget.locations.z;
+                // float z = lastTarget.locations.z;
 
                 // Now, the timestamps for target cam and position can be different. So, if they differ we interpolate
                 if (lastTarget.timeStamp != posTimestamps[i])
@@ -750,7 +750,7 @@ bool readCamera(M2Camera const* cam, uint32 buffSize, M2Header const* header, Ci
                     float zDiff = nextTarget.locations.z - lastTarget.locations.z;
                     x = lastTarget.locations.x + (xDiff * (float(timeDiffThis) / float(timeDiffTarget)));
                     y = lastTarget.locations.y + (yDiff * (float(timeDiffThis) / float(timeDiffTarget)));
-                    z = lastTarget.locations.z + (zDiff * (float(timeDiffThis) / float(timeDiffTarget)));
+                    // z = lastTarget.locations.z + (zDiff * (float(timeDiffThis) / float(timeDiffTarget)));
                 }
                 float xDiff = x - thisCam.locations.x;
                 float yDiff = y - thisCam.locations.y;
