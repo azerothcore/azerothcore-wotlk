@@ -112,9 +112,13 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recvData)
         if (ci->npcflag & UNIT_NPC_FLAG_TRAINER_CLASS)
         {
             if (Player* player = GetPlayer())
-                player->getClass() == ci->trainer_class ? data << "Trainer" : data << "Speak";
+            {
+                data << player->getClass() == ci->trainer_class ?  "Trainer" : "Speak";
+            }
             else
+            {
                 data << ci->IconName;
+            }
         }
         else
             data << ci->IconName;                           // "Directions" for guard, string for Icons 2.3.0
