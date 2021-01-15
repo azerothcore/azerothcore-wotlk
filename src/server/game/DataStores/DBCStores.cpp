@@ -747,7 +747,7 @@ bool readCamera(M2Camera const* cam, uint32 buffSize, M2Header const* header, Ci
                     uint32 timeDiffThis = posTimestamps[i] - lastTarget.timeStamp;
                     float xDiff = nextTarget.locations.x - lastTarget.locations.x;
                     float yDiff = nextTarget.locations.y - lastTarget.locations.y;
-                    float zDiff = nextTarget.locations.z - lastTarget.locations.z;
+                    // float zDiff = nextTarget.locations.z - lastTarget.locations.z;
                     x = lastTarget.locations.x + (xDiff * (float(timeDiffThis) / float(timeDiffTarget)));
                     y = lastTarget.locations.y + (yDiff * (float(timeDiffThis) / float(timeDiffTarget)));
                     // z = lastTarget.locations.z + (zDiff * (float(timeDiffThis) / float(timeDiffTarget)));
