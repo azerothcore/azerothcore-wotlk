@@ -586,22 +586,11 @@ void Creature::Update(uint32 diff)
                     RemoveCharmAuras();
                 }
 
-                // Circling the target
-                if (diff >= m_moveCircleMovementTime)
-                {
-                    AI()->MoveCircleChecks();
-                    m_moveCircleMovementTime = urand(MOVE_CIRCLE_CHECK_INTERVAL * 2, MOVE_CIRCLE_CHECK_INTERVAL * 3);
-                }
-                else
-                {
-                    m_moveCircleMovementTime -= diff;
-                }
-
                 bool movingBackwards = false;
 
                 if (Unit *victim = GetVictim())
                 {
-                    float MaxRange = GetMeleeRange(victim) / 2;
+                    float MaxRange = GetCollisionWidth() / 2;
                     // If we are closer than 50% of the combat reach we are going to reposition the victim
                     if (IsInDist(victim, MaxRange))
                     {
@@ -622,6 +611,16 @@ void Creature::Update(uint32 diff)
 
                 if (!movingBackwards)
                 {
+                    // Circling the target
+                    if (diff >= m_moveCircleMovementTime)
+                    {
+                        AI()->MoveCircleChecks();
+                        m_moveCircleMovementTime = urand(MOVE_CIRCLE_CHECK_INTERVAL * 2, MOVE_CIRCLE_CHECK_INTERVAL * 3);
+                    }
+                    else
+                    {
+                        m_moveCircleMovementTime -= diff;
+                    }
                     m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
                 }
 

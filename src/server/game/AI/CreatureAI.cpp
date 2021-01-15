@@ -264,7 +264,7 @@ void CreatureAI::MoveCircleChecks()
     if (
         !victim ||
         !me->IsFreeToMove() ||
-        !me->IsWithinMeleeRange(victim) ||
+        !me->IsWithinMeleeRange(victim) || me == victim->GetVictim() ||
         (victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet())  // only player & pets to save CPU
     )
     {
