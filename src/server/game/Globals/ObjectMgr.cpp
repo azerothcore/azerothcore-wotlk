@@ -6163,8 +6163,8 @@ void ObjectMgr::LoadAccessRequirements()
 
         //Get the common variables for the access requirements 
         uint8 dungeon_access_id = fields[0].GetUInt8();
-        uint32 mapid = fields[1].GetUInt32();
-        uint8 difficulty = fields[2].GetUInt8();
+        uint32 mapid            = fields[1].GetUInt32();
+        uint8 difficulty        = fields[2].GetUInt8();
 
         //Set up the access requirements
         DungeonProgressionRequirements* ar = new DungeonProgressionRequirements();
@@ -6184,7 +6184,7 @@ void ObjectMgr::LoadAccessRequirements()
                 uint32 requirement_id        = progression_requirement_row[1].GetUInt32();
                 std::string requirement_hint = progression_requirement_row[2].GetString();
                 uint8 requirement_faction    = progression_requirement_row[3].GetUInt8();
-                uint32 priorityOrder = progression_requirement_row[3].IsNull() ? UINT32_MAX : progression_requirement_row[3].GetUInt32();
+                uint32 priorityOrder         = progression_requirement_row[3].IsNull() ? UINT32_MAX : progression_requirement_row[3].GetUInt32();
 
                 ProgressionRequirement* progression_requirement = new ProgressionRequirement();
                 progression_requirement->id           = requirement_id;

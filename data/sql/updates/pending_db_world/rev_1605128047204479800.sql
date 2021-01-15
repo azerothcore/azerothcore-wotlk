@@ -1,4 +1,4 @@
--- INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1605128047204479800');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1605128047204479800');
 
 -- SUMMARY: We edit the old table, then we create the new table, then we transfer the rows from the old table to the new table, then we remove no longer used columns from the old table, then we add foreign keys, then we add the strings, then update the .reload command
 
