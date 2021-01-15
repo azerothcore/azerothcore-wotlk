@@ -22,4 +22,3 @@ void GroupReference::sourceObjectDestroyLink()
 {
     // called from invalidate()
 }
-

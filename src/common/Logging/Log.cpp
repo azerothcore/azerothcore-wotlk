@@ -16,7 +16,6 @@ extern LoginDatabaseWorkerPool LoginDatabase;
 
 #include <stdarg.h>
 #include <stdio.h>
-#include <ace/Stack_Trace.h>
 
 Log::Log() :
     raLogfile(NULL), logfile(NULL), gmLogfile(NULL), charLogfile(NULL),
@@ -64,7 +63,6 @@ Log::~Log()
         fclose(miscLogFile);
     miscLogFile = NULL;
 }
-
 
 std::unique_ptr<ILog>& getLogInstance()
 {

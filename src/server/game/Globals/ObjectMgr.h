@@ -421,7 +421,7 @@ struct AreaTrigger
 
 struct BroadcastText
 {
-    BroadcastText()  
+    BroadcastText()
     {
         MaleText.resize(DEFAULT_LOCALE + 1);
         FemaleText.resize(DEFAULT_LOCALE + 1);
