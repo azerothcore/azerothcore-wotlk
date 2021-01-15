@@ -121,7 +121,9 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recvData)
             }
         }
         else
+        {
             data << ci->IconName;                           // "Directions" for guard, string for Icons 2.3.0
+        }
         data << uint32(ci->type_flags);                     // flags
         data << uint32(ci->type);                           // CreatureType.dbc
         data << uint32(ci->family);                         // CreatureFamily.dbc
