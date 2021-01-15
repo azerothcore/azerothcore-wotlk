@@ -6141,7 +6141,7 @@ void ObjectMgr::LoadAccessRequirements()
     {
         Field* fields = access_template_result->Fetch();
 
-        //Get the common variables for the access requirements 
+        //Get the common variables for the access requirements
         uint8 dungeon_access_id = fields[0].GetUInt8();
         uint32 mapid            = fields[1].GetUInt32();
         uint8 difficulty        = fields[2].GetUInt8();
@@ -6156,7 +6156,7 @@ void ObjectMgr::LoadAccessRequirements()
         QueryResult progression_requirements_results = WorldDatabase.PQuery("SELECT requirement_type, requirement_id, requirement_hint, priority faction FROM dungeon_access_requirements where dungeon_access_id = %u", dungeon_access_id);
         if (progression_requirements_results)
         {
-            do 
+            do
             {
                 Field* progression_requirement_row = progression_requirements_results->Fetch();
 

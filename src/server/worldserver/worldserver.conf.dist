@@ -3537,7 +3537,7 @@ LFG.Location.All = 0
 #         1 = Display only one requirement at a time (BlizzLike, like in the LFG interface)
 #         2 = Display detailed requirements, all at once, with clickable links
 #        Default: 1
-#  
+#
 DungeonAccessRequirements.PrintMode = 1
 
 #    DungeonAccessRequirement.PortalAvgIlevelCheck
@@ -3545,7 +3545,7 @@ DungeonAccessRequirements.PrintMode = 1
 #        Description: Enable average item level requirement when entering a dungeon/raid's portal (= deny the entry if player has too low average ilevel, like in LFG).
 #        Default:     0 - (Disabled  -> Blizzlike)
 #                     1 - (Enabled)
-  
+
 DungeonAccessRequirement.PortalAvgIlevelCheck = 0
 
 #    DungeonAccessRequirement.LFGLevelDBCOverride
@@ -3553,7 +3553,7 @@ DungeonAccessRequirement.PortalAvgIlevelCheck = 0
 #        Description: If enabled, use `min_level` and `max_level` values from table `dungeon_access_requirements` to list or to hide a dungeon from the LFG window.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
-  
+
 DungeonAccessRequirement.LFGLevelDBCOverride = 0
 
 #    DungeonAccessRequirement.OptionalStringID
