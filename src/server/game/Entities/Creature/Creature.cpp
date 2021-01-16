@@ -586,8 +586,6 @@ void Creature::Update(uint32 diff)
                     RemoveCharmAuras();
                 }
 
-                bool movingBackwards = false;
-
                 if (Unit *victim = GetVictim())
                 {
                     float MaxRange = GetCollisionWidth() / 2;
@@ -597,31 +595,24 @@ void Creature::Update(uint32 diff)
                         if (diff >= m_moveBackwardsMovementTime)
                         {
                             AI()->MoveBackwardsChecks();
-                            m_moveBackwardsMovementTime = urand(MOVE_BACKWARDS_CHECK_INTERVAL / 2, MOVE_BACKWARDS_CHECK_INTERVAL * 2);
+                            m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
                         }
                         else
                         {
                             m_moveBackwardsMovementTime -= diff;
                         }
-
-                        movingBackwards = true;
                     }
                 }
 
-
-                if (!movingBackwards)
+                // Circling the target
+                if (diff >= m_moveCircleMovementTime)
                 {
-                    // Circling the target
-                    if (diff >= m_moveCircleMovementTime)
-                    {
-                        AI()->MoveCircleChecks();
-                        m_moveCircleMovementTime = urand(MOVE_CIRCLE_CHECK_INTERVAL * 2, MOVE_CIRCLE_CHECK_INTERVAL * 3);
-                    }
-                    else
-                    {
-                        m_moveCircleMovementTime -= diff;
-                    }
-                    m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
+                    AI()->MoveCircleChecks();
+                    m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
+                }
+                else
+                {
+                    m_moveCircleMovementTime -= diff;
                 }
 
                 if (!IsInEvadeMode() && IsAIEnabled)
