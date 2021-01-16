@@ -10641,7 +10641,7 @@ uint32 Player::GetFreeInventorySpace() const
     uint32 freeSpace = 0;
 
     // Check backpack
-    for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+    for (auto slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
     {
         Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
         if (!item)
