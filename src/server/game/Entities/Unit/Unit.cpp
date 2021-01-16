@@ -2266,7 +2266,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
             continue;
         }
 
-        double tempDist = attacker->GetExactDist2d(otherAttacker) - (attackerSize/2) - (otherAttacker->GetCollisionWidth()/2);
+        double tempDist = attacker->GetExactDist2d(otherAttacker) - (attackerSize/2.0f) - (otherAttacker->GetCollisionWidth()/2.0f);
 
         if (tempDist == 0 || minDistance == 0 || tempDist < minDistance)
         {
