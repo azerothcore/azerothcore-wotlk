@@ -3139,18 +3139,20 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_POSITIVE_TAKEN_BONUS;
                 break;
             case 65280: // Ulduar, Hodir, Singed
-            case 65775: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles
-            case 67861:
-            case 67862:
-            case 67863:
+            case 65775: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (10 normal)
+            case 67861: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (25 normal)
+            case 67862: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (10 heroic)
+            case 67863: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (25 heroic)
+            case 55604: // Naxxramas, Unrelenting Trainee, Death Plague (10 mode)
+            case 55645: // Naxxramas, Unrelenting Trainee, Death Plague (25 mode)
             case 67721: // Anub'arak, Nerubian Burrower, Expose Weakness (normal)
             case 67847: // Anub'arak, Nerubian Burrower, Expose Weakness (heroic)
             case 64638: // Ulduar, Winter Jormungar, Acidic Bite
             case 71157: // Icecrown Citadel, Plagued Zombie, Infected Wound
-            case 72963: // Icecrown Citadel, Valithria Dreamwalker, Flesh Rot (Rot Worm)
-            case 72964:
-            case 72965:
-            case 72966:
+            case 72963: // Icecrown Citadel, Rot Worm, Flesh Rot (10 normal)
+            case 72964: // Icecrown Citadel, Rot Worm, Flesh Rot (25 normal)
+            case 72965: // Icecrown Citadel, Rot Worm, Flesh Rot (10 heroic)
+            case 72966: // Icecrown Citadel, Rot Worm, Flesh Rot (25 heroic)
             case 72465: // Icecrown Citadel, Sindragosa, Respite for a Tormented Soul (weekly quest)
             case 45271: // Sunwell, Eredar Twins encounter, Dark Strike
             case 45347: // Sunwell, Eredar Twins encounter, Dark Touched
