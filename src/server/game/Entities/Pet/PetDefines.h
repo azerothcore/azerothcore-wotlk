@@ -185,7 +185,6 @@ enum PetScalingSpells
     SPELL_DK_PET_SCALING_01             = 51996,
     SPELL_DK_PET_SCALING_02             = 54566,
     SPELL_DK_PET_SCALING_03             = 61697
-
 };
 
 #define PET_FOLLOW_DIST  1.0f

@@ -1987,7 +1987,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 enum eEnhShamanSpells
@@ -2114,7 +2113,6 @@ public:
                     events.RepeatEvent(30000);
                     EventMapGCD(events, 1500);
                     break;
-
             }
 
             DoMeleeAttackIfReady();
@@ -2362,7 +2360,6 @@ public:
             me->DespawnOrUnsummon();
         }
     };
-
 };
 
 enum eHunterPetSpells
