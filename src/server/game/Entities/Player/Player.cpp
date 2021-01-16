@@ -19736,12 +19736,16 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                         {
                             const ItemTemplate* itemTemplate = sObjectMgr->GetItemTemplate(missingReq->id);
                             if (!itemTemplate)
+                            {
                                 continue;
+                            }
 
                             //Get the localised name
                             std::string name = itemTemplate->Name1;
                             if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemTemplate->ItemId))
+                            {
                                 ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+                            }
 
                             std::stringstream stream;
                             stream << "|c";
