@@ -6917,14 +6917,10 @@ SpellCastResult Spell::CheckItems()
                 }
             case SPELL_EFFECT_CREATE_RANDOM_ITEM:
             {
-                Unit* target = m_targets.GetUnitTarget() ? m_targets.GetUnitTarget() : player;
-                if (target->GetTypeId() == TYPEID_PLAYER && !IsTriggered())
+                if (player->GetFreeInventorySpace() == 0)
                 {
-                    if (target->ToPlayer()->GetFreeInventorySpace() == 0)
-                    {
-                        player->SendEquipError(EQUIP_ERR_INVENTORY_FULL, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
-                        return SPELL_FAILED_DONT_REPORT;
-                    }
+                    player->SendEquipError(EQUIP_ERR_INVENTORY_FULL, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
+                    return SPELL_FAILED_DONT_REPORT;
                 }
                 break;
             }
