@@ -1475,7 +1475,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
 
             if (max_z > INVALID_HEIGHT)
             {
-                if (canSwim && unit->GetMap()->IsInWater(x, y, max_z - GROUND_HEIGHT_TOLERANCE)) {
+                if (canSwim && unit->GetMap()->IsInWater(x, y, max_z - WATER_HEIGHT_TOLERANCE)) {
                     // have a fun with Archimedes' formula
                     auto height = unit->GetCollisionHeight();
                     auto width = unit->GetCollisionWidth();
