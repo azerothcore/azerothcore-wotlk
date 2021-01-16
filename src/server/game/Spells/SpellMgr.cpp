@@ -6754,10 +6754,10 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectBasePoints[0] = 1; // corrects seat id (points - 1 = seatId)
     });
 
-    // The Iron Colossus
-    ApplySpellFix({ 56513, 56524 }, [](SpellEntry* spellInfo)
+    // Jormungar Strike
+    ApplySpellFix({ 56513 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->RecoveryTime = (spellInfo->Id == 56524 ? 6000 : 2000);
+        spellInfo->RecoveryTime = 2000;
     });
 
     ApplySpellFix({
@@ -6766,12 +6766,6 @@ void SpellMgr::LoadDbcDataCorrections()
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->RecoveryTime = 3000;
-    });
-
-    // Jormungar Strike
-    ApplySpellFix({ 56513 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->RecoveryTime = 2000;
     });
 
     ApplySpellFix({
