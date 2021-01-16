@@ -151,7 +151,6 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
             {
                 for (uint32 x = 0; x < liquidHeader.Width; x++)
                 {
-
                     if (!liquidDataGeometry.ShouldRender(x, y))
                         continue;
 
@@ -173,7 +172,6 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
 
                     tris.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_WATER, vertOffset, vertOffset + 2, vertOffset + 1));
                     tris.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_WATER, vertOffset + 2, vertOffset + 3, vertOffset + 1));
-
                 }
             }
         }
