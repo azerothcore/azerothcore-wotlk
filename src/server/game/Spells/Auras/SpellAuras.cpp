@@ -1511,7 +1511,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 break;
         }
-
     }
     // mods at aura remove
     else

@@ -983,7 +983,6 @@ void BattlefieldWG::UpdatedDestroyedTowerCount(TeamId team, GameObject* go)
                 if (go && player->GetDistance2d(go) < 100.0f)
                     player->KilledMonsterCredit(NPC_QUEST_VEHICLE_PROTECTED, 0);
             }
-
     }
 }
 

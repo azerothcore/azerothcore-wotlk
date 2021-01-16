@@ -483,7 +483,6 @@ public:
 class AreaTrigger_at_sunwell_eredar_twins : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_sunwell_eredar_twins() : AreaTriggerScript("at_sunwell_eredar_twins") {}
 
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
