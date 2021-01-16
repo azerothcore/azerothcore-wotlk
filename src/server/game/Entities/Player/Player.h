@@ -1242,6 +1242,7 @@ public:
     [[nodiscard]] Item* GetItemByPos(uint16 pos) const;
     [[nodiscard]] Item* GetItemByPos(uint8 bag, uint8 slot) const;
     [[nodiscard]] Bag*  GetBagByPos(uint8 slot) const;
+    uint32 GetFreeInventorySpace() const;
     [[nodiscard]] inline Item* GetUseableItemByPos(uint8 bag, uint8 slot) const //Does additional check for disarmed weapons
     {
         if (!CanUseAttackType(GetAttackBySlot(slot)))
