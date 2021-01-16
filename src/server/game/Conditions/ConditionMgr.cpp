@@ -1613,7 +1613,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     switch (cond->ConditionType) {
         case CONDITION_UNUSED_41:
         case CONDITION_UNUSED_49:
-            sLog->outErrorDb("SourceEntry %u in `conditions` table has a ConditionType that is a unused (%u), skipped.",
+            sLog->outErrorDb("SourceEntry %u in `conditions` table has a ConditionType that is unused (%u), skipped.",
                              cond->SourceEntry, uint32(cond->ConditionType));
             return false;
         case CONDITION_STAND_STATE:
