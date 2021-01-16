@@ -23,7 +23,7 @@ enum DataTypes
     DATA_HALION_INTRO2                      = 4,
     DATA_HALION_INTRO_DONE                  = 5,
     DATA_HALION                             = 6,
-    
+
     MAX_ENCOUNTERS                          = 7,
 
     // Etc

@@ -53,7 +53,7 @@ public:
             GO_PlatformGUID = 0;
             bPokeAchiev = false;
         }
-        
+
         bool IsEncounterInProgress() const override
         {
             return EncounterStatus == IN_PROGRESS;
@@ -75,7 +75,7 @@ public:
                     if (!pPlayer->IsAlive())
                         return;
 
-                    if (Creature* c = pPlayer->SummonCreature(NPC_WYRMREST_SKYTALON, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ()-20.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+                    if (Creature* c = pPlayer->SummonCreature(NPC_WYRMREST_SKYTALON, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ() - 20.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
                     {
                         c->SetCanFly(true);
                         c->setFaction(pPlayer->getFaction());
@@ -150,8 +150,8 @@ public:
                             if (GameObject* go = instance->GetGameObject(GO_ExitPortalGUID))
                                 go->SetPhaseMask(1, true);
                             if (Creature* c = instance->GetCreature(NPC_MalygosGUID))
-                                if (c->SummonCreature(NPC_ALEXSTRASZA, 798.0f, 1268.0f, 299.0f, 2.45f ,TEMPSUMMON_TIMED_DESPAWN, 604800000))
-                            break;
+                                if (c->SummonCreature(NPC_ALEXSTRASZA, 798.0f, 1268.0f, 299.0f, 2.45f, TEMPSUMMON_TIMED_DESPAWN, 604800000))
+                                    break;
                     }
                     if (data == DONE)
                         SaveToDB();
@@ -177,7 +177,8 @@ public:
         {
             switch(type)
             {
-                case DATA_MALYGOS_GUID:         return NPC_MalygosGUID;
+                case DATA_MALYGOS_GUID:
+                    return NPC_MalygosGUID;
             }
             return 0;
         }

@@ -165,12 +165,12 @@ struct ConditionSourceInfo
 {
     WorldObject* mConditionTargets[MAX_CONDITION_TARGETS]; // an array of targets available for conditions
     Condition* mLastFailedCondition;
-    ConditionSourceInfo(WorldObject* target0, WorldObject* target1 = NULL, WorldObject* target2 = NULL)
+    ConditionSourceInfo(WorldObject* target0, WorldObject* target1 = nullptr, WorldObject* target2 = nullptr)
     {
         mConditionTargets[0] = target0;
         mConditionTargets[1] = target1;
         mConditionTargets[2] = target2;
-        mLastFailedCondition = NULL;
+        mLastFailedCondition = nullptr;
     }
 };
 
@@ -213,7 +213,7 @@ struct Condition
 
     bool Meets(ConditionSourceInfo& sourceInfo);
     uint32 GetSearcherTypeMaskForCondition();
-    bool isLoaded() const { return ConditionType > CONDITION_NONE || ReferenceId; }
+    [[nodiscard]] bool isLoaded() const { return ConditionType > CONDITION_NONE || ReferenceId; }
     uint32 GetMaxAvailableConditionTargets();
 };
 
@@ -228,46 +228,46 @@ typedef std::map<uint32, ConditionList> ConditionReferenceContainer;//only used 
 
 class ConditionMgr
 {
-    private:
-        ConditionMgr();
-        ~ConditionMgr();
+private:
+    ConditionMgr();
+    ~ConditionMgr();
 
-    public:
-        static ConditionMgr* instance();
+public:
+    static ConditionMgr* instance();
 
-        void LoadConditions(bool isReload = false);
-        bool isConditionTypeValid(Condition* cond);
-        ConditionList GetConditionReferences(uint32 refId);
+    void LoadConditions(bool isReload = false);
+    bool isConditionTypeValid(Condition* cond);
+    ConditionList GetConditionReferences(uint32 refId);
 
-        uint32 GetSearcherTypeMaskForConditionList(ConditionList const& conditions);
-        bool IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions);
-        bool IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions);
-        bool IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
-        bool CanHaveSourceGroupSet(ConditionSourceType sourceType) const;
-        bool CanHaveSourceIdSet(ConditionSourceType sourceType) const;
-        ConditionList GetConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry);
-        ConditionList GetConditionsForSpellClickEvent(uint32 creatureId, uint32 spellId);
-        ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
-        ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
-        ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
+    uint32 GetSearcherTypeMaskForConditionList(ConditionList const& conditions);
+    bool IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions);
+    bool IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions);
+    bool IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
+    [[nodiscard]] bool CanHaveSourceGroupSet(ConditionSourceType sourceType) const;
+    [[nodiscard]] bool CanHaveSourceIdSet(ConditionSourceType sourceType) const;
+    ConditionList GetConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry);
+    ConditionList GetConditionsForSpellClickEvent(uint32 creatureId, uint32 spellId);
+    ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
+    ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
+    ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
 
-    private:
-        bool isSourceTypeValid(Condition* cond);
-        bool addToLootTemplate(Condition* cond, LootTemplate* loot);
-        bool addToGossipMenus(Condition* cond);
-        bool addToGossipMenuItems(Condition* cond);
-        bool addToSpellImplicitTargetConditions(Condition* cond);
-        bool IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
+private:
+    bool isSourceTypeValid(Condition* cond);
+    bool addToLootTemplate(Condition* cond, LootTemplate* loot);
+    bool addToGossipMenus(Condition* cond);
+    bool addToGossipMenuItems(Condition* cond);
+    bool addToSpellImplicitTargetConditions(Condition* cond);
+    bool IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
 
-        void Clean(); // free up resources
-        std::list<Condition*> AllocatedMemoryStore; // some garbage collection :)
+    void Clean(); // free up resources
+    std::list<Condition*> AllocatedMemoryStore; // some garbage collection :)
 
-        ConditionContainer                ConditionStore;
-        ConditionReferenceContainer       ConditionReferenceStore;
-        CreatureSpellConditionContainer   VehicleSpellConditionStore;
-        CreatureSpellConditionContainer   SpellClickEventConditionStore;
-        NpcVendorConditionContainer       NpcVendorConditionContainerStore;
-        SmartEventConditionContainer      SmartEventConditionStore;
+    ConditionContainer                ConditionStore;
+    ConditionReferenceContainer       ConditionReferenceStore;
+    CreatureSpellConditionContainer   VehicleSpellConditionStore;
+    CreatureSpellConditionContainer   SpellClickEventConditionStore;
+    NpcVendorConditionContainer       NpcVendorConditionContainerStore;
+    SmartEventConditionContainer      SmartEventConditionStore;
 };
 
 #define sConditionMgr ConditionMgr::instance()

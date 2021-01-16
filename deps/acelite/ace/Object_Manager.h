@@ -197,6 +197,8 @@ class ACE_Export ACE_Object_Manager : public ACE_Object_Manager_Base
 {
 
 public:
+  ACE_ALLOC_HOOK_DECLARE;
+
   /**
    * Explicitly initialize (construct the singleton instance of) the
    * ACE_Object_Manager.  Returns 0 on success, -1 on failure, and 1
@@ -234,7 +236,7 @@ public:
   /**
    * Register an ACE_Cleanup object for cleanup at process
    * termination.  The object is deleted via the
-   * <ace_cleanup_destroyer>.  If you need more flexiblity, see the
+   * <ace_cleanup_destroyer>.  If you need more flexibility, see the
    * @c other at_exit method below.  For OS's that do not have
    * processes, cleanup takes place at the end of <main>.  Returns 0
    * on success.  On failure, returns -1 and sets errno to: EAGAIN if

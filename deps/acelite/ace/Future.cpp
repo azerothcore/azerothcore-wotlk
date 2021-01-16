@@ -14,6 +14,11 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Future_Holder)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Future_Observer)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Future_Rep)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Future)
+
 template <class T>
 ACE_Future_Holder<T>::ACE_Future_Holder (void)
 {
@@ -190,7 +195,10 @@ ACE_Future_Rep<T>::set (const T &r,
           while (iterator != end)
             {
               OBSERVER *observer = *iterator++;
-              observer->update (caller);
+              if (observer)
+              {
+                observer->update (caller);
+              }
             }
 
           // Signal all the waiting threads.

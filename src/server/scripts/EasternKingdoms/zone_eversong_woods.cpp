@@ -7,13 +7,12 @@
 /* ScriptData
 SDName: Eversong_Woods
 SD%Complete: 95
-SDComment: Quest support: 
+SDComment: Quest support:
 SDCategory: Eversong Woods
 EndScriptData */
 
 /* ContentData
 EndContentData */
-
 
 void AddSC_eversong_woods()
 {

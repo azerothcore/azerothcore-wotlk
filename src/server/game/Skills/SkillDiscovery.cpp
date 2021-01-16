@@ -65,7 +65,7 @@ void LoadSkillDiscoveryTable()
         if (chance <= 0)                                    // chance
         {
             ssNonDiscoverableEntries << "spellId = " << spellId << " reqSkillOrSpell = " << reqSkillOrSpell
-                << " reqSkillValue = " << reqSkillValue << " chance = " << chance << "(chance problem)\n";
+                                     << " reqSkillValue = " << reqSkillValue << " chance = " << chance << "(chance problem)\n";
             continue;
         }
 
@@ -85,14 +85,14 @@ void LoadSkillDiscoveryTable()
 
             // mechanic discovery
             if (reqSpellInfo->Mechanic != MECHANIC_DISCOVERY &&
-                // explicit discovery ability
-                !reqSpellInfo->IsExplicitDiscovery())
+                    // explicit discovery ability
+                    !reqSpellInfo->IsExplicitDiscovery())
             {
                 if (reportedReqSpells.find(absReqSkillOrSpell) == reportedReqSpells.end())
                 {
                     sLog->outErrorDb("Spell (ID: %u) not have MECHANIC_DISCOVERY (28) value in Mechanic field in spell.dbc"
-                        " and not 100%% chance random discovery ability but listed for spellId %u (and maybe more) in `skill_discovery_template` table",
-                        absReqSkillOrSpell, spellId);
+                                     " and not 100%% chance random discovery ability but listed for spellId %u (and maybe more) in `skill_discovery_template` table",
+                                     absReqSkillOrSpell, spellId);
                     reportedReqSpells.insert(absReqSkillOrSpell);
                 }
                 continue;
@@ -120,8 +120,7 @@ void LoadSkillDiscoveryTable()
         }
 
         ++count;
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     if (!ssNonDiscoverableEntries.str().empty())
         sLog->outErrorDb("Some items can't be successfully discovered: have in chance field value < 0.000001 in `skill_discovery_template` DB table . List:\n%s", ssNonDiscoverableEntries.str().c_str());
@@ -212,8 +211,8 @@ uint32 GetSkillDiscoverySpell(uint32 skillId, uint32 spellId, Player* player)
         for (SkillDiscoveryList::const_iterator item_iter = tab->second.begin(); item_iter != tab->second.end(); ++item_iter)
         {
             if (roll_chance_f(item_iter->chance * sWorld->getRate(RATE_SKILL_DISCOVERY)) &&
-                item_iter->reqSkillValue <= skillvalue &&
-                !player->HasSpell(item_iter->spellId))
+                    item_iter->reqSkillValue <= skillvalue &&
+                    !player->HasSpell(item_iter->spellId))
                 return item_iter->spellId;
         }
 
@@ -230,8 +229,8 @@ uint32 GetSkillDiscoverySpell(uint32 skillId, uint32 spellId, Player* player)
         for (SkillDiscoveryList::const_iterator item_iter = tab->second.begin(); item_iter != tab->second.end(); ++item_iter)
         {
             if (roll_chance_f(item_iter->chance * sWorld->getRate(RATE_SKILL_DISCOVERY)) &&
-                item_iter->reqSkillValue <= skillvalue &&
-                !player->HasSpell(item_iter->spellId))
+                    item_iter->reqSkillValue <= skillvalue &&
+                    !player->HasSpell(item_iter->spellId))
                 return item_iter->spellId;
         }
 

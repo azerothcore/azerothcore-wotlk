@@ -451,7 +451,7 @@ public:
         char const* name = "test";
         uint8 code = atoi(args);
 
-        WorldPacket data(SMSG_CHANNEL_NOTIFY, (1+10));
+        WorldPacket data(SMSG_CHANNEL_NOTIFY, (1 + 10));
         data << code;                                           // notify type
         data << name;                                           // channel name
         data << uint32(0);
@@ -787,7 +787,7 @@ public:
         if (!target || target->IsTotem() || target->IsPet())
             return false;
 
-        ThreatContainer::StorageType const &threatList = target->getThreatManager().getThreatList();
+        ThreatContainer::StorageType const& threatList = target->getThreatManager().getThreatList();
         ThreatContainer::StorageType::const_iterator itr;
         uint32 count = 0;
         handler->PSendSysMessage("Threat list of %s (guid %u)", target->GetName().c_str(), target->GetGUIDLow());
@@ -801,7 +801,7 @@ public:
             }
             handler->PSendSysMessage("   %u.   %s   (guid %u)  - threat %f", ++count, unit->GetName().c_str(), unit->GetGUIDLow(), (*itr)->getThreat());
         }
-        ThreatContainer::StorageType const &threatList2 = target->getThreatManager().getOfflineThreatList();
+        ThreatContainer::StorageType const& threatList2 = target->getThreatManager().getOfflineThreatList();
         for (itr = threatList2.begin(); itr != threatList2.end(); ++itr)
         {
             Unit* unit = (*itr)->getTarget();
@@ -1128,13 +1128,13 @@ public:
         if (isInt32)
         {
             uint32 value = (uint32)atoi(y);
-            target->SetUInt32Value(opcode , value);
+            target->SetUInt32Value(opcode, value);
             handler->PSendSysMessage(LANG_SET_UINT_FIELD, GUID_LOPART(guid), opcode, value);
         }
         else
         {
             float value = (float)atof(y);
-            target->SetFloatValue(opcode , value);
+            target->SetFloatValue(opcode, value);
             handler->PSendSysMessage(LANG_SET_FLOAT_FIELD, GUID_LOPART(guid), opcode, value);
         }
 

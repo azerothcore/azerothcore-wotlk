@@ -51,7 +51,7 @@ class npc_daphne_stilwell : public CreatureScript
 public:
     npc_daphne_stilwell() : CreatureScript("npc_daphne_stilwell") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_TOME_VALOR)
         {
@@ -64,7 +64,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_daphne_stilwellAI(creature);
     }
@@ -76,13 +76,13 @@ public:
         SummonList summons;
         uint8 textCounter;
 
-        void Reset()
+        void Reset() override
         {
             summons.DespawnAll();
             textCounter = SAY_DS_DOWN_1;
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
 
@@ -136,7 +136,7 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (me->Attack(who, false))
             {
@@ -145,7 +145,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* creature)
+        void JustSummoned(Creature* creature) override
         {
             creature->SetHomePosition(me->GetHomePosition());
             creature->GetMotionMaster()->MoveChase(me);
@@ -155,7 +155,7 @@ public:
             summons.Summon(creature);
         }
 
-        void SummonedCreatureDies(Creature* creature, Unit*)
+        void SummonedCreatureDies(Creature* creature, Unit*) override
         {
             summons.Despawn(creature);
             if (summons.empty())

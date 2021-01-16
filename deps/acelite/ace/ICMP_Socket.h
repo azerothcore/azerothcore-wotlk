@@ -37,8 +37,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_ICMP_Socket : public ACE_SOCK
 {
 public:
-  // = Initialization methods.
-
   /**
    * @name Data transfer routines.
    *

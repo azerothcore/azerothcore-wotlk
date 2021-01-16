@@ -45,14 +45,14 @@ public:
         uint64 balindaGUID;
         uint32 resetTimer;
 
-        void Reset()
+        void Reset() override
         {
             waterBoltTimer            = 3 * IN_MILLISECONDS;
             resetTimer                = 5 * IN_MILLISECONDS;
             balindaGUID = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -61,7 +61,8 @@ public:
             {
                 DoCastVictim(SPELL_WATERBOLT);
                 waterBoltTimer = 5 * IN_MILLISECONDS;
-            } else waterBoltTimer -= diff;
+            }
+            else waterBoltTimer -= diff;
 
             // check if creature is not outside of building
             if (resetTimer < diff)
@@ -70,13 +71,14 @@ public:
                     if (me->GetDistance2d(pBalinda->GetHomePosition().GetPositionX(), pBalinda->GetHomePosition().GetPositionY()) > 50)
                         EnterEvadeMode();
                 resetTimer = 5 * IN_MILLISECONDS;
-            } else resetTimer -= diff;
+            }
+            else resetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_water_elementalAI(creature);
     }
@@ -100,7 +102,7 @@ public:
 
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             arcaneExplosionTimer      = urand(5 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
             coneOfColdTimer           = 8 * IN_MILLISECONDS;
@@ -112,17 +114,17 @@ public:
             summons.DespawnAll();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(YELL_AGGRO);
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             Reset();
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* summoned) override
         {
             CAST_AI(npc_water_elemental::npc_water_elementalAI, summoned->AI())->balindaGUID = me->GetGUID();
             summoned->AI()->AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0, 50, true));
@@ -130,12 +132,12 @@ public:
             summons.Summon(summoned);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             summons.DespawnAll();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -145,31 +147,36 @@ public:
                 if (summons.empty())
                     me->SummonCreature(NPC_WATER_ELEMENTAL, 0, 0, 0, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 45 * IN_MILLISECONDS);
                 waterElementalTimer = 50 * IN_MILLISECONDS;
-            } else waterElementalTimer -= diff;
+            }
+            else waterElementalTimer -= diff;
 
             if (arcaneExplosionTimer < diff)
             {
                 DoCastVictim(SPELL_ARCANE_EXPLOSION);
                 arcaneExplosionTimer =  urand(5 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
-            } else arcaneExplosionTimer -= diff;
+            }
+            else arcaneExplosionTimer -= diff;
 
             if (coneOfColdTimer < diff)
             {
                 DoCastVictim(SPELL_CONE_OF_COLD);
                 coneOfColdTimer = urand(10 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
-            } else coneOfColdTimer -= diff;
+            }
+            else coneOfColdTimer -= diff;
 
             if (fireBoltTimer < diff)
             {
                 DoCastVictim(SPELL_FIREBALL);
                 fireBoltTimer = urand(5 * IN_MILLISECONDS, 9 * IN_MILLISECONDS);
-            } else fireBoltTimer -= diff;
+            }
+            else fireBoltTimer -= diff;
 
             if (frostboltTimer < diff)
             {
                 DoCastVictim(SPELL_FROSTBOLT);
                 frostboltTimer = urand(4 * IN_MILLISECONDS, 12 * IN_MILLISECONDS);
-            } else frostboltTimer -= diff;
+            }
+            else frostboltTimer -= diff;
 
             // check if creature is not outside of building
             if (resetTimer < diff)
@@ -180,13 +187,14 @@ public:
                     Talk(YELL_EVADE);
                 }
                 resetTimer = 5 * IN_MILLISECONDS;
-            } else resetTimer -= diff;
+            }
+            else resetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_balindaAI(creature);
     }

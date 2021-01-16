@@ -48,7 +48,7 @@ public:
             SetBossNumber(EncounterCount);
         }
 
-        void Initialize()
+        void Initialize() override
         {
             // Razorgore
             EggCount = 0;
@@ -75,7 +75,7 @@ public:
             NefarianGUID = 0;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -116,7 +116,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -149,13 +149,13 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             if (go->GetEntry() == 177807) // Egg
                 EggList.remove(go->GetGUID());
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             // pussywizard:
             if (GetBossState(type) == DONE && state != DONE) // prevent undoneing a boss xd
@@ -198,7 +198,7 @@ public:
                                 nefarian->DespawnOrUnsummon();
                             break;
                         case FAIL:
-                            _events.ScheduleEvent(EVENT_RESPAWN_NEFARIUS, 15*IN_MILLISECONDS*MINUTE);
+                            _events.ScheduleEvent(EVENT_RESPAWN_NEFARIUS, 15 * IN_MILLISECONDS * MINUTE);
                             SetBossState(BOSS_NEFARIAN, NOT_STARTED);
                             break;
                         default:
@@ -209,32 +209,41 @@ public:
             return true;
         }
 
-        uint64 GetData64(uint32 id) const
+        uint64 GetData64(uint32 id) const override
         {
             switch (id)
             {
-                case DATA_RAZORGORE_THE_UNTAMED:  return RazorgoreTheUntamedGUID;
-                case DATA_VAELASTRAZ_THE_CORRUPT: return VaelastraszTheCorruptGUID;
-                case DATA_BROODLORD_LASHLAYER:    return BroodlordLashlayerGUID;
-                case DATA_FIRENAW:                return FiremawGUID;
-                case DATA_EBONROC:                return EbonrocGUID;
-                case DATA_FLAMEGOR:               return FlamegorGUID;
-                case DATA_CHROMAGGUS:             return ChromaggusGUID;
-                case DATA_LORD_VICTOR_NEFARIUS:   return LordVictorNefariusGUID;
-                case DATA_NEFARIAN:               return NefarianGUID;
+                case DATA_RAZORGORE_THE_UNTAMED:
+                    return RazorgoreTheUntamedGUID;
+                case DATA_VAELASTRAZ_THE_CORRUPT:
+                    return VaelastraszTheCorruptGUID;
+                case DATA_BROODLORD_LASHLAYER:
+                    return BroodlordLashlayerGUID;
+                case DATA_FIRENAW:
+                    return FiremawGUID;
+                case DATA_EBONROC:
+                    return EbonrocGUID;
+                case DATA_FLAMEGOR:
+                    return FlamegorGUID;
+                case DATA_CHROMAGGUS:
+                    return ChromaggusGUID;
+                case DATA_LORD_VICTOR_NEFARIUS:
+                    return LordVictorNefariusGUID;
+                case DATA_NEFARIAN:
+                    return NefarianGUID;
             }
 
             return 0;
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (type == DATA_EGG_EVENT)
             {
                 switch (data)
                 {
                     case IN_PROGRESS:
-                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45*IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 45 * IN_MILLISECONDS);
                         EggEvent = data;
                         EggCount = 0;
                         break;
@@ -262,14 +271,14 @@ public:
             }
         }
 
-        void OnUnitDeath(Unit* unit)
+        void OnUnitDeath(Unit* unit) override
         {
             //! HACK, needed because of buggy CreatureAI after charm
             if (unit->GetEntry() == NPC_RAZORGORE && GetBossState(BOSS_RAZORGORE) != DONE)
                 SetBossState(BOSS_RAZORGORE, DONE);
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             if (_events.Empty())
                 return;
@@ -337,7 +346,7 @@ public:
         uint64 NefarianGUID;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_blackwing_lair_InstanceMapScript(map);
     }

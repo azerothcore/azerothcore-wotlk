@@ -4,7 +4,7 @@
 /**
  *  @file    Mutex.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //==========================================================================
 
@@ -23,15 +23,15 @@
 #include "ace/OS_NS_unistd.h"
 #include "ace/os_include/os_fcntl.h"
 
-# if !defined (ACE_DEFAULT_MUTEX_A)
-#   define ACE_DEFAULT_MUTEX_A "ACE_MUTEX"
-# endif /* ACE_DEFAULT_MUTEX_A */
+#if !defined (ACE_DEFAULT_MUTEX_A)
+# define ACE_DEFAULT_MUTEX_A "ACE_MUTEX"
+#endif /* ACE_DEFAULT_MUTEX_A */
 
-# if defined (ACE_HAS_WCHAR)
-#   define ACE_DEFAULT_MUTEX_W ACE_TEXT_WIDE(ACE_DEFAULT_MUTEX_A)
-# endif /* ACE_HAS_WCHAR */
+#if defined (ACE_HAS_WCHAR)
+# define ACE_DEFAULT_MUTEX_W ACE_TEXT_WIDE (ACE_DEFAULT_MUTEX_A)
+#endif /* ACE_HAS_WCHAR */
 
-# define ACE_DEFAULT_MUTEX ACE_TEXT (ACE_DEFAULT_MUTEX_A)
+#define ACE_DEFAULT_MUTEX ACE_TEXT (ACE_DEFAULT_MUTEX_A)
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -144,6 +144,10 @@ public:
   const ACE_mutex_t &lock (void) const;
   ACE_mutex_t &lock (void);
 
+  /// If a file was created as the underlying storage for the mutex,
+  /// remove it from the filesystem (for process-shared mutexes).
+  static int unlink (const ACE_TCHAR *name);
+
   /// Dump the state of an object.
   void dump (void) const;
 
@@ -152,9 +156,20 @@ public:
 
   // = This should be protected but some C++ compilers complain...
 public:
-#if defined (ACE_HAS_PTHREADS) || defined(ACE_HAS_STHREADS)
+#if defined ACE_HAS_PTHREADS && defined ACE_LACKS_MUTEXATTR_PSHARED
+# define ACE_MUTEX_USE_PROCESS_LOCK
+# define ACE_MUTEX_PROCESS_LOCK_IS_SEMA
+  ACE_sema_t process_sema_;
+  typedef ACE_sema_t Process_Lock;
+#elif defined ACE_HAS_PTHREADS || defined ACE_HAS_STHREADS
+# define ACE_MUTEX_USE_PROCESS_LOCK
+# define ACE_MUTEX_PROCESS_LOCK_IS_MUTEX
+  typedef ACE_mutex_t Process_Lock;
+#endif
+
+#ifdef ACE_MUTEX_USE_PROCESS_LOCK
   /// This lock resides in shared memory.
-  ACE_mutex_t *process_lock_;
+  Process_Lock *process_lock_;
 
   /**
    * Remember the name of the mutex if we created it so we can unlink
@@ -162,7 +177,7 @@ public:
    * can destroy it).
    */
   const ACE_TCHAR *lockname_;
-#endif /* ACE_HAS_PTHREADS */
+#endif /* ACE_MUTEX_USE_PROCESS_LOCK */
 
   /// Mutex type supported by the OS.
   ACE_mutex_t lock_;
@@ -176,7 +191,7 @@ public:
 
 private:
   // Prevent assignment and initialization.
-  void operator= (const ACE_Mutex &);
+  ACE_Mutex &operator= (const ACE_Mutex &);
   ACE_Mutex (const ACE_Mutex &);
 };
 

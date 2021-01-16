@@ -29,21 +29,21 @@ enum BattlegroundRLObjects
 
 class BattlegroundRL : public Battleground
 {
-    public:
-        BattlegroundRL();
-        ~BattlegroundRL();
+public:
+    BattlegroundRL();
+    ~BattlegroundRL() override;
 
-        /* inherited from BattlegroundClass */
-        void AddPlayer(Player* player);
-        void Init();
-        void FillInitialWorldStates(WorldPacket &d);
-        void StartingEventCloseDoors();
-        void StartingEventOpenDoors();
+    /* inherited from BattlegroundClass */
+    void AddPlayer(Player* player) override;
+    void Init() override;
+    void FillInitialWorldStates(WorldPacket& d) override;
+    void StartingEventCloseDoors() override;
+    void StartingEventOpenDoors() override;
 
-        void RemovePlayer(Player* player);
-        void HandleAreaTrigger(Player* player, uint32 trigger);
-        bool SetupBattleground();
-        void HandleKillPlayer(Player* player, Player* killer);
-        bool HandlePlayerUnderMap(Player* player);
+    void RemovePlayer(Player* player) override;
+    void HandleAreaTrigger(Player* player, uint32 trigger) override;
+    bool SetupBattleground() override;
+    void HandleKillPlayer(Player* player, Player* killer) override;
+    bool HandlePlayerUnderMap(Player* player) override;
 };
 #endif

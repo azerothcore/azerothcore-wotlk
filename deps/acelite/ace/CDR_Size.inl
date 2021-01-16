@@ -144,6 +144,26 @@ ACE_SizeCDR::write_wstring (const ACE_CDR::WChar *x)
 }
 
 ACE_INLINE ACE_CDR::Boolean
+ACE_SizeCDR::write_string (const std::string &x)
+{
+  ACE_CDR::ULong len =
+    static_cast<ACE_CDR::ULong> (x.size ());
+  return this->write_string (len,
+                             x.empty () ? 0 : x.c_str ());
+}
+
+#if !defined(ACE_LACKS_STD_WSTRING)
+ACE_INLINE ACE_CDR::Boolean
+ACE_SizeCDR::write_wstring (const std::wstring &x)
+{
+  ACE_CDR::ULong len =
+    static_cast<ACE_CDR::ULong> (x.size ());
+  return this->write_wstring (len,
+                              x.empty () ? 0 : x.c_str ());
+}
+#endif
+
+ACE_INLINE ACE_CDR::Boolean
 ACE_SizeCDR::write_char_array (const ACE_CDR::Char *x,
                                  ACE_CDR::ULong length)
 {
@@ -371,6 +391,22 @@ operator<< (ACE_SizeCDR &ss, const ACE_CDR::WChar *x)
   ss.write_wstring (x);
   return (ACE_CDR::Boolean) ss.good_bit ();
 }
+
+ACE_INLINE ACE_CDR::Boolean
+operator<< (ACE_SizeCDR &ss, const std::string& x)
+{
+  ss.write_string (x);
+  return (ACE_CDR::Boolean) ss.good_bit ();
+}
+
+#if !defined(ACE_LACKS_STD_WSTRING)
+ACE_INLINE ACE_CDR::Boolean
+operator<< (ACE_SizeCDR &ss, const std::wstring& x)
+{
+  ss.write_wstring (x);
+  return (ACE_CDR::Boolean) ss.good_bit ();
+}
+#endif
 
 // The following use the helper classes
 ACE_INLINE ACE_CDR::Boolean

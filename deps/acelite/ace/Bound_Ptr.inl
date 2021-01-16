@@ -1,6 +1,4 @@
 /* -*- C++ -*- */
-// Bound_Ptr.i
-
 #include "ace/Guard_T.h"
 #if !defined (ACE_NEW_THROWS_EXCEPTIONS)
 #  include "ace/Log_Category.h"
@@ -148,12 +146,14 @@ ACE_Strong_Bound_Ptr<X, ACE_LOCK>::ACE_Strong_Bound_Ptr (X *p)
 {
 }
 
+#if !defined (ACE_HAS_CPP11)
 template <class X, class ACE_LOCK> inline
-ACE_Strong_Bound_Ptr<X, ACE_LOCK>::ACE_Strong_Bound_Ptr (std::unique_ptr<X> p)
+ACE_Strong_Bound_Ptr<X, ACE_LOCK>::ACE_Strong_Bound_Ptr (auto_ptr<X> p)
   : counter_ (COUNTER::create_strong ()),
     ptr_ (p.release())
 {
 }
+#endif /* !ACE_HAS_CPP11 */
 
 template <class X, class ACE_LOCK> inline
 ACE_Strong_Bound_Ptr<X, ACE_LOCK>::ACE_Strong_Bound_Ptr (const ACE_Strong_Bound_Ptr<X, ACE_LOCK> &r)
@@ -303,8 +303,9 @@ ACE_Strong_Bound_Ptr<X, ACE_LOCK>::reset (X *p)
     delete old_ptr;
 }
 
+#if !defined (ACE_HAS_CPP11)
 template<class X, class ACE_LOCK> inline void
-ACE_Strong_Bound_Ptr<X, ACE_LOCK>::reset(std::unique_ptr<X> p)
+ACE_Strong_Bound_Ptr<X, ACE_LOCK>::reset (auto_ptr<X> p)
 {
   COUNTER *old_counter = this->counter_;
   X_t *old_ptr = this->ptr_;
@@ -313,6 +314,7 @@ ACE_Strong_Bound_Ptr<X, ACE_LOCK>::reset(std::unique_ptr<X> p)
   if (COUNTER::detach_strong (old_counter) == 0)
     delete old_ptr;
 }
+#endif /* !ACE_HAS_CPP11 */
 
 template <class X, class ACE_LOCK> inline
 ACE_Weak_Bound_Ptr<X, ACE_LOCK>::ACE_Weak_Bound_Ptr (X *p)

@@ -12,7 +12,7 @@
 #include <sstream>
 
 ByteBufferPositionException::ByteBufferPositionException(bool add, size_t pos,
-                                                         size_t size, size_t valueSize)
+        size_t size, size_t valueSize)
 {
     std::ostringstream ss;
 
@@ -24,7 +24,7 @@ ByteBufferPositionException::ByteBufferPositionException(bool add, size_t pos,
 }
 
 ByteBufferSourceException::ByteBufferSourceException(size_t pos, size_t size,
-                                                     size_t valueSize)
+        size_t valueSize)
 {
     std::ostringstream ss;
 

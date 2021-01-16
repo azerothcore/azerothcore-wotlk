@@ -34,7 +34,7 @@ enum Npc
     NPC_JEDOGA_SHADOWSEEKER         = 29310,
     NPC_HERALD_JOLAZJ               = 29311,
     NPC_AMANITAR                    = 30258,
-    
+
     //spells
     SPELL_SHADOW_SICKLE             = 56701, // Shadow Sickle Normal
     SPELL_SHADOW_SICKLE_H           = 59104  // Shadow Sickle Heroic
