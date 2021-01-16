@@ -1,3 +1,19 @@
+-- DB update 2021_01_15_00 -> 2021_01_16_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_15_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_15_00 2021_01_16_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1607523114128420000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1607523114128420000');
 
 UPDATE `game_tele` SET `position_x`=3677.532959, `position_y`=2166.696777, `position_z`=35.807980, `orientation`=2.301083 WHERE `id`=455; -- Azjol-Nerub
@@ -21,3 +37,12 @@ INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orient
 (1449, 8515.682617, 716.982239, 558.247864, 1.573150, 571, 'TrialOfTheCrusader'),
 (1450, 9327.247070, -1114.638550, 1245.147095, 0.002312, 571, 'UlduarRaid'),
 (1490, 5474.070313, 39.761471, 149.545578, 6.271932, 571, 'CrystalsongForest');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
