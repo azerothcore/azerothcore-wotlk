@@ -436,7 +436,9 @@ namespace lfg
 
                 //Check for ilvl
                 if (ar->reqItemLevel && (float)ar->reqItemLevel > avgItemLevel)
+                {
                     lockData = LFG_LOCKSTATUS_TOO_LOW_GEAR_SCORE;
+                }
 
                 //Check if player has the required achievements
                 for (const ProgressionRequirement* achievementRequirement : ar->achievements)

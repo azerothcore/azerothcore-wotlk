@@ -19611,8 +19611,10 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         if (sWorld->getBoolConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PORTAL_CHECK_ILVL))
         {
             uint16 currentIlvl = (uint16)GetAverageItemLevelForDF();
-            if(ar->reqItemLevel > currentIlvl)
+            if (ar->reqItemLevel > currentIlvl)
+            {
                 minRequiredIlvl = currentIlvl;
+            }
         }
 
 
@@ -19634,15 +19636,25 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                 {
                     //Blizzlike method of printing out the requirements
                     if (missingQuests.size() && !missingQuests[0]->hint.empty())
+                    {
                         ChatHandler(GetSession()).PSendSysMessage("%s", missingQuests[0]->hint.c_str());
-                    else if (mapDiff->hasErrorMessage) // if (missingAchievement) covered by this case
+                    }
+                    else if (mapDiff->hasErrorMessage)
+                    { // if (missingAchievement) covered by this case
                         SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
+                    }
                     else if (missingItems.size())
+                    {
                         GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), LevelMin, sObjectMgr->GetItemTemplate(missingItems[0]->id)->Name1.c_str());
+                    }
                     else if (LevelMin)
+                    {
                         GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
-                    else if(minRequiredIlvl)
+                    }
+                    else if (minRequiredIlvl)
+                    {
                         ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, minRequiredIlvl);
+                    }
                 }
                 else
                 {
@@ -19654,11 +19666,15 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                         {
                             Quest const* questTemplate = sObjectMgr->GetQuestTemplate(missingReq->id);
                             if (!questTemplate)
+                            {
                                 continue;
+                            }
 
                             std::string questTitle = questTemplate->GetTitle();
                             if (QuestLocale const* questLocale = sObjectMgr->GetQuestLocale(questTemplate->GetQuestId()))
+                            {
                                 ObjectMgr::GetLocaleString(questLocale->Title, loc_idx, questTitle);
+                            }
 
                             std::stringstream stream;
                             stream << "|cffff7c0a|Hquest:";
@@ -19687,7 +19703,9 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                         {
                             AchievementEntry const* achievementEntry = sAchievementStore.LookupEntry(missingReq->id);
                             if (!achievementEntry)
+                            {
                                 continue;
+                            }
 
                             std::string name = *achievementEntry->name;
 

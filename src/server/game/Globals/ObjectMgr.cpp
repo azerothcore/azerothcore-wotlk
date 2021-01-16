@@ -6132,10 +6132,8 @@ void ObjectMgr::LoadAccessRequirements()
         return;
     }
 
-
     uint32 count = 0;
     uint32 countProgressionRequirements = 0;
-
 
     do
     {

@@ -3530,18 +3530,16 @@ Calculate.Gameoject.Zone.Area.Data = 0
 
 LFG.Location.All = 0
 
+#    Dungeon Access Requirements Print modes
 #
-#    DungeonAccessRequirements.PrintMode
+#     Select the preferred format to display information to the player who cannot enter a portal dungeon because when has not met the access requirements:
+#         0 = Display no extra information, only "Requirements  not met"
+#         1 = Display only one requirement at a time (BlizzLike, like in the LFG interface)
+#         2 = Display detailed requirements, all at once, with clickable links
+#        Default: 1
 #
-#        Description: Select the preferred format to display information to the player who cannot enter a portal dungeon because when has not met the access requirements:
-#        Default:     1 - (Display only one requirement at a time (BlizzLike, like in the LFG interface))
-#                     0 - (Display no extra information, only "Requirements  not met")
-#                     2 - (Display detailed requirements, all at once, with clickable links)
-#
-
 DungeonAccessRequirements.PrintMode = 1
 
-#
 #    DungeonAccessRequirement.PortalAvgIlevelCheck
 #
 #        Description: Enable average item level requirement when entering a dungeon/raid's portal (= deny the entry if player has too low average ilevel, like in LFG).
@@ -3550,7 +3548,6 @@ DungeonAccessRequirements.PrintMode = 1
 
 DungeonAccessRequirement.PortalAvgIlevelCheck = 0
 
-#
 #    DungeonAccessRequirement.LFGLevelDBCOverride
 #
 #        Description: If enabled, use `min_level` and `max_level` values from table `dungeon_access_requirements` to list or to hide a dungeon from the LFG window.
@@ -3559,13 +3556,12 @@ DungeonAccessRequirement.PortalAvgIlevelCheck = 0
 
 DungeonAccessRequirement.LFGLevelDBCOverride = 0
 
-#
 #    DungeonAccessRequirement.OptionalStringID
 #
 #        Description: Displays an extra message from acore_strings to the chat after printing the dungeon access requirements to the user.
 #                     To enable it set the number to the entry of the specific string in acore_strings
 #        Default:     0 - (Disabled)
-
+#                     1 - (Enabled)
 DungeonAccessRequirement.OptionalStringID = 0
 
 #

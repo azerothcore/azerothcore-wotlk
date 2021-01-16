@@ -132,7 +132,13 @@ ALTER TABLE `dungeon_access_requirements` ADD CONSTRAINT `FK_dungeon_access_requ
 
 
 -- Add the acore_strings
-
+DELETE FROM `acore_string` WHERE `entry` = 882;
+DELETE FROM `acore_string` WHERE `entry` = 883;
+DELETE FROM `acore_string` WHERE `entry` = 884;
+DELETE FROM `acore_string` WHERE `entry` = 885;
+DELETE FROM `acore_string` WHERE `entry` = 886;
+DELETE FROM `acore_string` WHERE `entry` = 887;
+DELETE FROM `acore_string` WHERE `entry` = 888;
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (882, 'To enter, you must complete the following quest(s):');
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (883, 'To enter, you must complete the following achievement(s):');
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES (884, 'To enter, you must have the following item(s) in your inventory:');
