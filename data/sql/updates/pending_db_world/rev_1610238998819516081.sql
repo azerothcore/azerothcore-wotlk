@@ -1,8 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1610238998819516081');
 
-UPDATE `creature` SET `MovementType`=2, `currentwaypoint`=1 WHERE `guid`=13990;
-UPDATE `creature` SET `MovementType`=2, `currentwaypoint`=1 WHERE `guid`=13991;
-UPDATE `creature` SET `MovementType`=2, `currentwaypoint`=1 WHERE `guid`=13992;
+UPDATE `creature` SET `MovementType`=2, `currentwaypoint`=1 WHERE `guid` IN (13990, 13991, 13992);
 
 DELETE FROM `creature_addon` WHERE (`guid` IN (13990, 13991, 13992));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES
