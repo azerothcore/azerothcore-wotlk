@@ -735,7 +735,6 @@ public:
                 default:
                     return nullptr;
             }
-
         }
 
         void UpdateEscortAI(uint32 diff) override
