@@ -310,7 +310,7 @@ enum SpellAttr1
     SPELL_ATTR1_DRAIN_ALL_POWER                  = 0x00000002, // TITLE Drain all power DESCRIPTION Ignores listed power cost and drains entire pool instead
     SPELL_ATTR1_CHANNELED_1                      = 0x00000004, // TITLE Channeled (type 1) DESCRIPTION Both "channeled" attributes have identical handling in server & client
     SPELL_ATTR1_CANT_BE_REDIRECTED               = 0x00000008, // TITLE Ignore redirection effects DESCRIPTION Spell will not be attracted by SPELL_MAGNET auras (Grounding Totem)
-    SPELL_ATTR1_UNK4                             = 0x00000010, // TITLE Unknown attribute 4@Attr1
+    SPELL_ATTR1_UNK4                             = 0x00000010, // TITLE Unknown attribute 4@Attr1 DESCRIPTION stealth and whirlwind
     SPELL_ATTR1_NOT_BREAK_STEALTH                = 0x00000020, // TITLE Does not break stealth
     SPELL_ATTR1_CHANNELED_2                      = 0x00000040, // TITLE Channeled (type 2) DESCRIPTION Both "channeled" attributes have identical handling in server & client
     SPELL_ATTR1_CANT_BE_REFLECTED                = 0x00000080, // TITLE Ignore reflection effects DESCRIPTION Spell will pierce through Spell Reflection and similar
@@ -343,28 +343,28 @@ enum SpellAttr1
 enum SpellAttr2
 {
     SPELL_ATTR2_CAN_TARGET_DEAD                  = 0x00000001, // TITLE Can target dead players or corpses
-    SPELL_ATTR2_UNK1                             = 0x00000002, // TITLE Unknown attribute 1@Attr2
+    SPELL_ATTR2_UNK1                             = 0x00000002, // TITLE Unknown attribute 1@Attr2 DESCRIPTION vanish, shadowform, Ghost Wolf and other
     SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS            = 0x00000004, // TITLE Ignore Line of Sight
     SPELL_ATTR2_UNK3                             = 0x00000008, // TITLE Ignore aura scaling
     SPELL_ATTR2_DISPLAY_IN_STANCE_BAR            = 0x00000010, // TITLE Show in stance bar (client only)
     SPELL_ATTR2_AUTOREPEAT_FLAG                  = 0x00000020, // TITLE Ranged auto-attack spell
     SPELL_ATTR2_CANT_TARGET_TAPPED               = 0x00000040, // TITLE Cannot target others' tapped units DESCRIPTION Can only target untapped units, or those tapped by caster
     SPELL_ATTR2_UNK7                             = 0x00000080, // TITLE Unknown attribute 7@Attr2
-    SPELL_ATTR2_UNK8                             = 0x00000100, // TITLE Unknown attribute 8@Attr2
+    SPELL_ATTR2_UNK8                             = 0x00000100, // TITLE Unknown attribute 8@Attr2 DESCRIPTION not set in 3.0.3
     SPELL_ATTR2_UNK9                             = 0x00000200, // TITLE Unknown attribute 9@Attr2
     SPELL_ATTR2_UNK10                            = 0x00000400, // TITLE Unknown attribute 10@Attr2 DESCRIPTION Related to taming?
     SPELL_ATTR2_HEALTH_FUNNEL                    = 0x00000800, // TITLE Health Funnel
-    SPELL_ATTR2_UNK12                            = 0x00001000, // TITLE Unknown attribute 12@Attr2
+    SPELL_ATTR2_UNK12                            = 0x00001000, // TITLE Unknown attribute 12@Attr2 DESCRIPTION Cleave, Heart Strike, Maul, Sunder Armor, Swipe
     SPELL_ATTR2_PRESERVE_ENCHANT_IN_ARENA        = 0x00002000, // TITLE Enchant persists when entering arena
     SPELL_ATTR2_UNK14                            = 0x00004000, // TITLE Unknown attribute 14@Attr2
-    SPELL_ATTR2_UNK15                            = 0x00008000, // TITLE Unknown attribute 15@Attr2
+    SPELL_ATTR2_UNK15                            = 0x00008000, // TITLE Unknown attribute 15@Attr2 DESCRIPTION not set in 3.0.3
     SPELL_ATTR2_TAME_BEAST                       = 0x00010000, // TITLE Tame Beast
     SPELL_ATTR2_NOT_RESET_AUTO_ACTIONS           = 0x00020000, // TITLE Don't reset swing timer DESCRIPTION Does not reset melee/ranged autoattack timer on cast
     SPELL_ATTR2_REQ_DEAD_PET                     = 0x00040000, // TITLE Requires dead pet
     SPELL_ATTR2_NOT_NEED_SHAPESHIFT              = 0x00080000, // TITLE Also allow outside shapeshift DESCRIPTION Even if Stances are nonzero, allow spell to be cast outside of shapeshift (though not in a different shapeshift)
     SPELL_ATTR2_UNK20                            = 0x00100000, // TITLE Unknown attribute 20@Attr2
     SPELL_ATTR2_DAMAGE_REDUCED_SHIELD            = 0x00200000, // TITLE Damage reduction ability DESCRIPTION Causes BG flags to be dropped if combined with ATTR1_DISPEL_AURAS_ON_IMMUNITY
-    SPELL_ATTR2_UNK22                            = 0x00400000, // TITLE Unknown attribute 22@Attr2
+    SPELL_ATTR2_UNK22                            = 0x00400000, // TITLE Unknown attribute 22@Attr2 DESCRIPTION Ambush, Backstab, Cheap Shot, Death Grip, Garrote, Judgements, Mutilate, Pounce, Ravage, Shiv, Shred
     SPELL_ATTR2_IS_ARCANE_CONCENTRATION          = 0x00800000, // TITLE Arcane Concentration
     SPELL_ATTR2_UNK24                            = 0x01000000, // TITLE Unknown attribute 24@Attr2
     SPELL_ATTR2_UNK25                            = 0x02000000, // TITLE Unknown attribute 25@Attr2
@@ -418,7 +418,7 @@ enum SpellAttr4
     SPELL_ATTR4_PROC_ONLY_ON_CASTER              = 0x00000002, // TITLE Only proc on self-cast
     SPELL_ATTR4_FADES_WHILE_LOGGED_OUT           = 0x00000004, // TITLE Buff expires while offline DESCRIPTION Debuffs (except Resurrection Sickness) will automatically do this
     SPELL_ATTR4_UNK3                             = 0x00000008, // TITLE Unknown attribute 3@Attr4
-    SPELL_ATTR4_UNK4                             = 0x00000010, // TITLE Treat as delayed spell
+    SPELL_ATTR4_UNK4                             = 0x00000010, // TITLE Treat as delayed spell DESCRIPTION This will no longer cause guards to attack on use??
     SPELL_ATTR4_UNK5                             = 0x00000020, // TITLE Unknown attribute 5@Attr4
     SPELL_ATTR4_NOT_STEALABLE                    = 0x00000040, // TITLE Aura cannot be stolen
     SPELL_ATTR4_CAN_CAST_WHILE_CASTING           = 0x00000080, // TITLE Can be cast while casting DESCRIPTION Ignores already in-progress cast and still casts
@@ -433,19 +433,19 @@ enum SpellAttr4
     SPELL_ATTR4_NOT_USABLE_IN_ARENA              = 0x00010000, // TITLE Not usable in arena DESCRIPTION Makes spell unusable despite CD <= 10min
     SPELL_ATTR4_USABLE_IN_ARENA                  = 0x00020000, // TITLE Usable in arena DESCRIPTION Makes spell usable despite CD > 10min
     SPELL_ATTR4_AREA_TARGET_CHAIN                = 0x00040000, // TITLE Chain area targets DESCRIPTION [NYI] Hits area targets over time instead of all at once
-    SPELL_ATTR4_UNK19                            = 0x00080000, // TITLE Unknown attribute 19@Attr4
+    SPELL_ATTR4_UNK19                            = 0x00080000, // TITLE Unknown attribute 19@Attr4 DESCRIPTION proc dalayed, after damage or don't proc on absorb?
     SPELL_ATTR4_NOT_CHECK_SELFCAST_POWER         = 0x00100000, // TITLE Allow self-cast to override stronger aura (client only)
     SPELL_ATTR4_DONT_REMOVE_IN_ARENA             = 0x00200000, // TITLE Keep when entering arena
-    SPELL_ATTR4_UNK22                            = 0x00400000, // TITLE Unknown attribute 22@Attr4
+    SPELL_ATTR4_UNK22                            = 0x00400000, // TITLE Unknown attribute 22@Attr4 DESCRIPTION Seal of Command (42058,57770) and Gymer's Smash 55426
     SPELL_ATTR4_CANT_TRIGGER_ITEM_SPELLS         = 0x00800000, // TITLE Cannot trigger item spells
     SPELL_ATTR4_UNK24                            = 0x01000000, // TITLE Unknown attribute 24@Attr4 DESCRIPTION Shoot-type spell?
     SPELL_ATTR4_IS_PET_SCALING                   = 0x02000000, // TITLE Pet Scaling aura
     SPELL_ATTR4_CAST_ONLY_IN_OUTLAND             = 0x04000000, // TITLE Only in Outland/Northrend
     SPELL_ATTR4_INHERIT_CRIT_FROM_AURA           = 0x08000000, // TITLE Inherit critical chance from triggering aura
-    SPELL_ATTR4_UNK28                            = 0x10000000, // TITLE Unknown attribute 28@Attr4
+    SPELL_ATTR4_UNK28                            = 0x10000000, // TITLE Unknown attribute 28@Attr4 DESCRIPTION Aimed Shot
     SPELL_ATTR4_UNK29                            = 0x20000000, // TITLE Unknown attribute 29@Attr4
     SPELL_ATTR4_UNK30                            = 0x40000000, // TITLE Unknown attribute 30@Attr4
-    SPELL_ATTR4_UNK31                            = 0x80000000  // TITLE Unknown attribute 31@Attr4
+    SPELL_ATTR4_UNK31                            = 0x80000000  // TITLE Unknown attribute 31@Attr4 DESCRIPTION Polymorph (chicken) 228 and Sonic Boom (38052,38488)
 };
 
 enum SpellAttr5
@@ -501,14 +501,14 @@ enum SpellAttr6
     SPELL_ATTR6_CASTABLE_WHILE_ON_VEHICLE        = 0x00001000, // TITLE Castable while caster is on vehicle
     SPELL_ATTR6_CAN_TARGET_INVISIBLE             = 0x00002000, // TITLE Can target invisible units
     SPELL_ATTR6_UNK14                            = 0x00004000, // TITLE Unknown attribute 14@Attr6
-    SPELL_ATTR6_UNK15                            = 0x00008000, // TITLE Unknown attribute 15@Attr6
+    SPELL_ATTR6_UNK15                            = 0x00008000, // TITLE Unknown attribute 15@Attr6 DESCRIPTION only 54368, 67892
     SPELL_ATTR6_UNK16                            = 0x00010000, // TITLE Unknown attribute 16@Attr6
     SPELL_ATTR6_UNK17                            = 0x00020000, // TITLE Unknown attribute 17@Attr6 DESCRIPTION Mount related?
     SPELL_ATTR6_CAST_BY_CHARMER                  = 0x00040000, // TITLE Spell is cast by charmer DESCRIPTION Client will prevent casting if not possessed, charmer will be caster for all intents and purposes
-    SPELL_ATTR6_UNK19                            = 0x00080000, // TITLE Unknown attribute 19@Attr6
+    SPELL_ATTR6_UNK19                            = 0x00080000, // TITLE Unknown attribute 19@Attr6 DESCRIPTION only 47488, 50782
     SPELL_ATTR6_ONLY_VISIBLE_TO_CASTER           = 0x00100000, // TITLE Only visible to caster (client only)
     SPELL_ATTR6_CLIENT_UI_TARGET_EFFECTS         = 0x00200000, // TITLE Client UI target effects (client only)
-    SPELL_ATTR6_UNK22                            = 0x00400000, // TITLE Unknown attribute 22@Attr6
+    SPELL_ATTR6_UNK22                            = 0x00400000, // TITLE Unknown attribute 22@Attr6 DESCRIPTION only 72054
     SPELL_ATTR6_UNK23                            = 0x00800000, // TITLE Unknown attribute 23@Attr6
     SPELL_ATTR6_CAN_TARGET_UNTARGETABLE          = 0x01000000, // TITLE Can target untargetable units
     SPELL_ATTR6_NOT_RESET_SWING_IF_INSTANT       = 0x02000000, // TITLE Do not reset swing timer if cast time is instant
@@ -522,37 +522,37 @@ enum SpellAttr6
 
 enum SpellAttr7
 {
-    SPELL_ATTR7_UNK0                             = 0x00000001, // TITLE Unknown attribute 0@Attr7
+    SPELL_ATTR7_UNK0                             = 0x00000001, // TITLE Unknown attribute 0@Attr7 DESCRIPTION Shaman's new spells (Call of the ...), Feign Death.
     SPELL_ATTR7_IGNORE_DURATION_MODS             = 0x00000002, // TITLE Ignore duration modifiers
     SPELL_ATTR7_REACTIVATE_AT_RESURRECT          = 0x00000004, // TITLE Reactivate at resurrect (client only)
     SPELL_ATTR7_IS_CHEAT_SPELL                   = 0x00000008, // TITLE Is cheat spell DESCRIPTION Cannot cast if caster doesn't have UnitFlag2 & UNIT_FLAG2_ALLOW_CHEAT_SPELLS
     SPELL_ATTR7_UNK4                             = 0x00000010, // TITLE Unknown attribute 4@Attr7 DESCRIPTION Soulstone related?
     SPELL_ATTR7_SUMMON_PLAYER_TOTEM              = 0x00000020, // TITLE Summons player-owned totem
     SPELL_ATTR7_NO_PUSHBACK_ON_DAMAGE            = 0x00000040, // TITLE Damage dealt by this does not cause spell pushback
-    SPELL_ATTR7_UNK7                             = 0x00000080, // TITLE Unknown attribute 7@Attr7
+    SPELL_ATTR7_UNK7                             = 0x00000080, // TITLE Unknown attribute 7@Attr7 DESCRIPTION 66218 (Launch) spell.
     SPELL_ATTR7_HORDE_ONLY                       = 0x00000100, // TITLE Horde only
     SPELL_ATTR7_ALLIANCE_ONLY                    = 0x00000200, // TITLE Alliance only
     SPELL_ATTR7_DISPEL_CHARGES                   = 0x00000400, // TITLE Dispel/Spellsteal remove individual charges
     SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER         = 0x00000800, // TITLE Only interrupt non-player casting
-    SPELL_ATTR7_UNK12                            = 0x00001000, // TITLE Unknown attribute 12@Attr7
-    SPELL_ATTR7_UNK13                            = 0x00002000, // TITLE Unknown attribute 13@Attr7
-    SPELL_ATTR7_UNK14                            = 0x00004000, // TITLE Unknown attribute 14@Attr7
+    SPELL_ATTR7_UNK12                            = 0x00001000, // TITLE Unknown attribute 12@Attr7 DESCRIPTION Not set in 3.2.2a.
+    SPELL_ATTR7_UNK13                            = 0x00002000, // TITLE Unknown attribute 13@Attr7 DESCRIPTION Not set in 3.2.2a.
+    SPELL_ATTR7_UNK14                            = 0x00004000, // TITLE Unknown attribute 14@Attr7 DESCRIPTION Only 52150 (Raise Dead - Pet) spell.
     SPELL_ATTR7_UNK15                            = 0x00008000, // TITLE Unknown attribute 15@Attr7 DESCRIPTION Exorcism - guaranteed crit vs families?
     SPELL_ATTR7_CAN_RESTORE_SECONDARY_POWER      = 0x00010000, // TITLE Can restore secondary power DESCRIPTION Only spells with this attribute can replenish a non-active power type
-    SPELL_ATTR7_UNK17                            = 0x00020000, // TITLE Unknown attribute 17@Attr7
+    SPELL_ATTR7_UNK17                            = 0x00020000, // TITLE Unknown attribute 17@Attr7 DESCRIPTION Only 27965 (Suicide) spell.
     SPELL_ATTR7_HAS_CHARGE_EFFECT                = 0x00040000, // TITLE Has charge effect
     SPELL_ATTR7_ZONE_TELEPORT                    = 0x00080000, // TITLE Is zone teleport
     SPELL_ATTR7_UNK20                            = 0x00100000, // TITLE Unknown attribute 20@Attr7 DESCRIPTION Invulnerability related?
     SPELL_ATTR7_UNK21                            = 0x00200000, // TITLE Unknown attribute 21@Attr7
     SPELL_ATTR7_IGNORE_COLD_WEATHER_FLYING       = 0x00400000, // TITLE Ignore cold weather flying restriction DESCRIPTION Set for loaner mounts, allows them to be used despite lacking required flight skill
-    SPELL_ATTR7_UNK23                            = 0x00800000, // TITLE Unknown attribute 23@Attr7
-    SPELL_ATTR7_UNK24                            = 0x01000000, // TITLE Unknown attribute 24@Attr7
+    SPELL_ATTR7_UNK23                            = 0x00800000, // TITLE Unknown attribute 23@Attr7 DESCRIPTION Motivate, Mutilate, Shattering Throw
+    SPELL_ATTR7_UNK24                            = 0x01000000, // TITLE Unknown attribute 24@Attr7 DESCRIPTION Motivate, Mutilate, Perform Speech, Shattering Throw
     SPELL_ATTR7_UNK25                            = 0x02000000, // TITLE Unknown attribute 25@Attr7
     SPELL_ATTR7_UNK26                            = 0x04000000, // TITLE Unknown attribute 26@Attr7
     SPELL_ATTR7_UNK27                            = 0x08000000, // TITLE Unknown attribute 27@Attr7
     SPELL_ATTR7_CONSOLIDATED_RAID_BUFF           = 0x10000000, // TITLE Consolidate in raid buff frame (client only)
-    SPELL_ATTR7_UNK29                            = 0x20000000, // TITLE Unknown attribute 29@Attr7
-    SPELL_ATTR7_UNK30                            = 0x40000000, // TITLE Unknown attribute 30@Attr7
+    SPELL_ATTR7_UNK29                            = 0x20000000, // TITLE Unknown attribute 29@Attr7 DESCRIPTION only 69028, 71237
+    SPELL_ATTR7_UNK30                            = 0x40000000, // TITLE Unknown attribute 30@Attr7 DESCRIPTION Burning Determination, Divine Sacrifice, Earth Shield, Prayer of Mending
     SPELL_ATTR7_CLIENT_INDICATOR                 = 0x80000000  // TITLE Client indicator (client only)
 };
 
