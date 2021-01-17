@@ -2333,11 +2333,11 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     float x, y, z;
     GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * direction);
 
-    if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z))
+    if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z, true, true, false))
     {
         GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * (direction * -1)); // try the other side
 
-        if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z))
+        if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z, true, true, false))
         {
             return nullptr;
         }

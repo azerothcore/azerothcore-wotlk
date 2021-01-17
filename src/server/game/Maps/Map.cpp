@@ -3561,7 +3561,7 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
 
                     if (gridHeight > INVALID_HEIGHT)
                     {
-                        startZ = gridHeight + unit->GetHoverHeight();
+                        destZ = gridHeight + unit->GetHoverHeight();
                     }
                 }
 
