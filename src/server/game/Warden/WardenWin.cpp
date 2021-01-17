@@ -524,7 +524,8 @@ void WardenWin::HandleData(ByteBuffer& buff)
     for (uint16 const checkId : _CurrentChecks)
     {
         WardenCheck const* rd = sWardenCheckMgr->GetWardenDataById(checkId);
-        switch (rd->Type)
+        uint8 const type = rd->Type;
+        switch (type)
         {
             case MEM_CHECK:
             {
