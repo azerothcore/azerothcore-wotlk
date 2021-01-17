@@ -26,7 +26,8 @@ enum Spells
     SPELL_RAIN_OF_FIRE_25               = 54099,
     SPELL_FRENZY_10                     = 28798,
     SPELL_FRENZY_25                     = 54100,
-    SPELL_WIDOWS_EMBRACE                = 28732
+    SPELL_WIDOWS_EMBRACE                = 28732,
+    SPELL_MINION_WIDOWS_EMBRACE         = 54097
 };
 
 enum Events
@@ -175,7 +176,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_POISON_BOLT:
-                    if (!me->HasAura(SPELL_WIDOWS_EMBRACE))
+                    if (!me->HasAura(RAID_MODE(SPELL_WIDOWS_EMBRACE, SPELL_MINION_WIDOWS_EMBRACE)))
                     {
                         me->CastCustomSpell(RAID_MODE(SPELL_POISON_BOLT_VOLLEY_10, SPELL_POISON_BOLT_VOLLEY_25), SPELLVALUE_MAX_TARGETS, RAID_MODE(3, 10), me, false);
                     }
@@ -205,9 +206,9 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spell) override
+        void SpellHit(Unit* caster, const SpellInfo* spell) override
         {
-            if (spell->Id == SPELL_WIDOWS_EMBRACE)
+            if (spell->Id == RAID_MODE(SPELL_WIDOWS_EMBRACE, SPELL_MINION_WIDOWS_EMBRACE))
             {
                 Talk(EMOTE_WIDOWS_EMBRACE);
                 if (me->HasAura(RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25)))
@@ -216,6 +217,10 @@ public:
                     events.RescheduleEvent(EVENT_SPELL_FRENZY, 60000);
                 }
                 pInstance->SetData(DATA_FRENZY_REMOVED, 0);
+                if (Is25ManRaid())
+                {
+                    Unit::Kill(caster, caster);
+                }
             }
         }
     };
