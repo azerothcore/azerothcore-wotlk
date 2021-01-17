@@ -3541,8 +3541,6 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         }
 
         float groundZ = VMAP_INVALID_HEIGHT_VALUE;
-        acore::NormalizeMapCoord(destX);
-        acore::NormalizeMapCoord(destZ);
         source->UpdateAllowedPositionZ(destX, destY, destZ, &groundZ);
 
         // position has no ground under it (or is too far away)
