@@ -4699,7 +4699,7 @@ void Unit::RemoveArenaAuras()
     {
         AuraApplication const* aurApp = iter->second;
         Aura const* aura = aurApp->GetBase();
-        if (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR4_UNK21) // don't remove stances, shadowform, pally/hunter auras
+        if (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR4_DONT_REMOVE_IN_ARENA) // don't remove stances, shadowform, pally/hunter auras
                 && !aura->IsPassive()                               // don't remove passive auras
                 && !aura->IsArea()                                  // don't remove area auras, eg pet talents affecting owner
                 && (aurApp->IsPositive() || IsPet() || !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR3_DEATH_PERSISTENT))) // not negative death persistent auras
