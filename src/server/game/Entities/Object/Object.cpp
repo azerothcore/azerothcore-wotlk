@@ -2537,10 +2537,26 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, 
 {
     GetNearPoint2D(x, y, distance2d + searcher_size, absAngle);
     z = GetPositionZ();
-    if (searcher)
+
+    if (searcher) {
+        if (Unit const* unit = searcher->ToUnit(); Unit const* target = ToUnit())
+        {
+            if (unit && target && unit->IsInWater() && target->IsInWater())
+            {
+                // if the searcher is in water
+                // we have no ground so we can
+                // set the target height to the
+                // z-coord to keep the searcher
+                // at the correct height (face to face)
+                z += GetCollisionHeight() - unit->GetCollisionHeight();
+            }
+        }
         searcher->UpdateAllowedPositionZ(x, y, z);
+    }
     else
+    {
         UpdateAllowedPositionZ(x, y, z);
+    }
 
     // if detection disabled, return first point
     if (!sWorld->getBoolConfig(CONFIG_DETECT_POS_COLLISION))
