@@ -1,3 +1,19 @@
+-- DB update 2021_01_17_01 -> 2021_01_17_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_17_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_17_01 2021_01_17_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1607717075635849200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1607717075635849200');
 
 -- Improve existing teleports
@@ -51,3 +67,12 @@ INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orient
 (1487, 4857.473145, -1791.165527, 1156.655273, 4.799088, 1, 'HyjalCaveInside'),
 (1488, 4822.816895, -1749.725098, 1162.031372, 5.478453, 1, 'HyjalCaveOutside'),
 (1489, 5372.716309, -3378.710205, 1655.467529, 5.276584, 1, 'HyjalTheWorldTree');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
