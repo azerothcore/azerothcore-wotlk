@@ -595,7 +595,7 @@ void Creature::Update(uint32 diff)
                         if (diff >= m_moveBackwardsMovementTime)
                         {
                             AI()->MoveBackwardsChecks();
-                            m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
+                            m_moveBackwardsMovementTime = urand(MOVE_BACKWARDS_CHECK_INTERVAL, MOVE_BACKWARDS_CHECK_INTERVAL * 2);
                         }
                         else
                         {
@@ -608,7 +608,7 @@ void Creature::Update(uint32 diff)
                 if (diff >= m_moveCircleMovementTime)
                 {
                     AI()->MoveCircleChecks();
-                    m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
+                    m_moveCircleMovementTime = urand(MOVE_CIRCLE_CHECK_INTERVAL, MOVE_CIRCLE_CHECK_INTERVAL * 2);
                 }
                 else
                 {
