@@ -50,7 +50,7 @@ enum Events
     EVENT_SPEECH_4                  = 4,
     EVENT_SPEECH_5                  = 5,
     EVENT_SPEECH_6                  = 6,
-    EVENT_SPEECH_7                  = 7, 
+    EVENT_SPEECH_7                  = 7,
     EVENT_ESSENCEOFTHERED           = 8,
     EVENT_FLAMEBREATH               = 9,
     EVENT_FIRENOVA                  = 10,
@@ -147,7 +147,7 @@ public:
                                 nefarius->SetStandState(UNIT_STAND_STATE_STAND);
                             }
                             events.ScheduleEvent(EVENT_SPEECH_3, 18000);
-                            break; 
+                            break;
                         case EVENT_SPEECH_3:
                             if (Creature* nefarius = me->GetMap()->GetCreature(m_nefariusGuid))
                                 nefarius->CastSpell(me, SPELL_RED_LIGHTNING, TRIGGERED_NONE);
