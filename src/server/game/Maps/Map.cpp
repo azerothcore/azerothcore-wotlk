@@ -3485,7 +3485,7 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
             || (isWaterNow || isWaterNext) || (unit && unit->IsFlying());
 
         // Check for valid path types before we proceed
-        if (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END))
+        if (!result || (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)))
         {
             // go back
             destX = startX; destY = startY; destZ = startZ;
@@ -3493,7 +3493,7 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         }
 
         // collision check
-        bool collided = (!result || (path->GetPathType() & PATHFIND_SHORTCUT) || (path->GetPathType() & PATHFIND_FARFROMPOLY));
+        bool collided = false;
 
         G3D::Vector3 endPos = path->GetPath().back();
         destX = endPos.x;
