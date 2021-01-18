@@ -79,6 +79,11 @@ enum UlduarData
 
     // Tram
     DATA_CALL_TRAM                          = 710,
+
+    // Mage Barrier
+    DATA_MAGE_BARRIER                       = 800,
+    DATA_BRANN_MEMOTESAY                    = 801,
+    DATA_BRANN_EASY_MODE                    = 802,
 };
 
 enum UlduarNPCs
@@ -132,8 +137,8 @@ enum UlduarNPCs
     NPC_VEHICLE_CHOPPER                     = 33062,
     NPC_SALVAGED_DEMOLISHER                 = 33109,
     NPC_SALVAGED_DEMOLISHER_TURRET          = 33167,
+    NPC_BRANN_BASE_CAMP                     = 33579,
 
-    
     // Algalon the Observer
     NPC_BRANN_BRONZBEARD_ALG                = 34064,
     NPC_AZEROTH                             = 34246,
@@ -245,7 +250,6 @@ enum UlduarMisc
     ACTION_TOWER_OF_FROST_DESTROYED         = 2,
     ACTION_TOWER_OF_FLAMES_DESTROYED        = 3,
     ACTION_TOWER_OF_LIFE_DESTROYED          = 4,
-
 
     // Algalon the Observer
     WORLD_STATE_ALGALON_DESPAWN_TIMER       = 4131,

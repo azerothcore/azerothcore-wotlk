@@ -70,16 +70,14 @@ void ChannelMgr::LoadChannels()
                 Field* banFields = banResult->Fetch();
                 if (!banFields)
                     break;
-                newChannel->AddBan(banFields[0].GetUInt32(), banFields[1].GetUInt32());     
-            }
-            while (banResult->NextRow());
+                newChannel->AddBan(banFields[0].GetUInt32(), banFields[1].GetUInt32());
+            } while (banResult->NextRow());
         }
 
-        if (channelDBId > ChannelMgr::_channelIdMax) 
+        if (channelDBId > ChannelMgr::_channelIdMax)
             ChannelMgr::_channelIdMax = channelDBId;
         ++count;
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     sLog->outString(">> Loaded %u channels for %s in %ums", count, _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde", GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
@@ -125,7 +123,6 @@ Channel* ChannelMgr::GetChannel(std::string const& name, Player* player, bool pk
 
     return i->second;
 }
-
 
 uint32 ChannelMgr::_channelIdMax = 0;
 ChannelMgr::ChannelRightsMap ChannelMgr::channels_rights;

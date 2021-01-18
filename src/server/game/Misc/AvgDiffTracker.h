@@ -17,16 +17,16 @@ public:
 
     uint32 getTimeWeightedAverage()
     {
-        if (tab[AVG_DIFF_COUNT-1] == 0)
+        if (tab[AVG_DIFF_COUNT - 1] == 0)
             return 0;
 
         uint32 sum = 0, weightsum = 0;
-        for (uint32 i=0; i<AVG_DIFF_COUNT; ++i)
+        for (uint32 i = 0; i < AVG_DIFF_COUNT; ++i)
         {
-            sum += tab[i]*tab[i];
+            sum += tab[i] * tab[i];
             weightsum += tab[i];
         }
-        return sum/weightsum;
+        return sum / weightsum;
     }
 
     uint32 getMax()
@@ -50,10 +50,10 @@ public:
             max[0] = 0;
         }
 
-        if (tab[AVG_DIFF_COUNT-1])
-            average = total/AVG_DIFF_COUNT;
+        if (tab[AVG_DIFF_COUNT - 1])
+            average = total / AVG_DIFF_COUNT;
         else if (index)
-            average = total/index;
+            average = total / index;
         else
             average = 0;
     }

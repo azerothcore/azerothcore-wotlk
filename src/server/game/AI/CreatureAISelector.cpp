@@ -32,7 +32,7 @@ namespace FactorySelector
                 return scriptedAI;
 
         // AIname in db
-        std::string ainame=creature->GetAIName();
+        std::string ainame = creature->GetAIName();
         if (!ai_factory && !ainame.empty())
             ai_factory = ai_registry.GetRegistryItem(ainame);
 
@@ -116,7 +116,6 @@ namespace FactorySelector
         }*/
 
         return (mv_factory == NULL ? NULL : mv_factory->Create(creature));
-
     }
 
     GameObjectAI* SelectGameObjectAI(GameObject* go)
@@ -139,4 +138,3 @@ namespace FactorySelector
         return (ai_factory == NULL ? new NullGameObjectAI(go) : ai_factory->Create(go));
     }
 }
-

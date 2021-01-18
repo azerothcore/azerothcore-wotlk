@@ -50,7 +50,7 @@ LoginDatabaseWorkerPool LoginDatabase;                      // Accessor to the a
 class AuthServerSignalHandler : public acore::SignalHandler
 {
 public:
-    virtual void HandleSignal(int sigNum)
+    void HandleSignal(int sigNum) override
     {
         switch (sigNum)
         {
@@ -113,7 +113,7 @@ extern int main(int argc, char** argv)
     sLog->outString("                                ╚██████╗╚██████╔╝██║  ██║███████╗");
     sLog->outString("                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
 
-    sLog->outString("  	  AzerothCore 3.3.5a  -  www.azerothcore.org\n");
+    sLog->outString("     AzerothCore 3.3.5a  -  www.azerothcore.org\n");
 
     sLog->outString("Using configuration file %s.", configFile);
 

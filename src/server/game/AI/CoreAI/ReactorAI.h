@@ -13,13 +13,12 @@ class Unit;
 
 class ReactorAI : public CreatureAI
 {
-    public:
+public:
+    explicit ReactorAI(Creature* c) : CreatureAI(c) {}
 
-        explicit ReactorAI(Creature* c) : CreatureAI(c) {}
+    void MoveInLineOfSight(Unit*) override {}
+    void UpdateAI(uint32 diff) override;
 
-        void MoveInLineOfSight(Unit*) {}
-        void UpdateAI(uint32 diff);
-
-        static int Permissible(const Creature*);
+    static int Permissible(const Creature*);
 };
 #endif

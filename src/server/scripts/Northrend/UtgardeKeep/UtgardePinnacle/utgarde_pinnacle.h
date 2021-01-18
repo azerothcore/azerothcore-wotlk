@@ -15,7 +15,7 @@ enum Data
     DATA_NPC_RAVENOUS_FURBOLG           = 11,
     DATA_NPC_MASSIVE_JORMUNGAR          = 12,
     DATA_NPC_FEROCIOUS_RHINO            = 13,
-    
+
     YMIRON_DOOR                         = 20,
     STATIS_GENERATOR                    = 21,
 

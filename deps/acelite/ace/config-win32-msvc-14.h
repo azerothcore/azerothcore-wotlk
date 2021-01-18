@@ -38,5 +38,19 @@
 // Visual Studio 2015 has 3 parameter wcstok
 #define ACE_HAS_3_PARAM_WCSTOK
 
+// Visual Studio 2015 has adequate C++11 support
+#define ACE_HAS_CPP11
+
+#define ACE_PUTENV_EQUIVALENT ::_putenv
+#define ACE_TEMPNAM_EQUIVALENT ::_tempnam
+#define ACE_STRDUP_EQUIVALENT ::_strdup
+#define ACE_MKDIR_EQUIVALENT ::_mkdir
+#define ACE_ACCESS_EQUIVALENT ::_access
+#define ACE_CHDIR_EQUIVALENT ::_chdir
+#define ACE_RMDIR_EQUIVALENT ::_rmdir
+#define ACE_GETCWD_EQUIVALENT ::_getcwd
+#define ACE_SWAB_EQUIVALENT ::_swab
+#define ACE_UNLINK_EQUIVALENT ::_unlink
+
 #include /**/ "ace/post.h"
 #endif /* ACE_CONFIG_WIN32_MSVC_14_H */

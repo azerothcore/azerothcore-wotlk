@@ -53,7 +53,7 @@ MPQFile::MPQFile(const char* filename):
         mpq_archive* mpq_a = (*i)->mpq_a;
 
         uint32_t filenum;
-        if(libmpq__file_number(mpq_a, filename, &filenum))
+        if (libmpq__file_number(mpq_a, filename, &filenum))
             continue;
         libmpq__off_t transferred;
         libmpq__file_unpacked_size(mpq_a, filenum, &size);
@@ -72,7 +72,6 @@ MPQFile::MPQFile(const char* filename):
         libmpq__file_read(mpq_a, filenum, (unsigned char*)buffer, size, &transferred);
         /*libmpq_file_getdata(&mpq_a, hash, fileno, (unsigned char*)buffer);*/
         return;
-
     }
     eof = true;
     buffer = 0;

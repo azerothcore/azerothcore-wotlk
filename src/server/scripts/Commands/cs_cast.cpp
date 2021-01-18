@@ -26,7 +26,7 @@ public:
     std::vector<ChatCommand> GetCommands() const override
     {
         static std::vector<ChatCommand> castCommandTable =
-        {   
+        {
             { "back",           SEC_GAMEMASTER,  false, &HandleCastBackCommand,              "" },
             { "dist",           SEC_GAMEMASTER,  false, &HandleCastDistCommand,              "" },
             { "self",           SEC_GAMEMASTER,  false, &HandleCastSelfCommand,              "" },

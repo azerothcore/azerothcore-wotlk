@@ -84,6 +84,8 @@ struct ace_yy_buffer_state
 #endif /* ACE_USES_WCHAR */
   }
 
+  ACE_ALLOC_HOOK_DECLARE;
+
   // Input related
   char input_[ACE_YY_CONVERSION_SPACE];
   size_t index_;
@@ -101,6 +103,8 @@ struct ace_yy_buffer_state
   ACE_Encoding_Converter* converter_;
 #endif /* ACE_USES_WCHAR */
 };
+
+ACE_ALLOC_HOOK_DEFINE(ace_yy_buffer_state)
 
 // ******************************************************************
 // Global functions
@@ -242,7 +246,9 @@ ACE_Svc_Conf_Lexer::input (ACE_Svc_Conf_Param* param,
             }
           else
             {
+#ifndef ACE_LACKS_STDERR
               ACE_OS::fprintf (stderr, "ERROR: input in scanner failed\n");
+#endif
               ACE_OS::exit (2);
             }
         }

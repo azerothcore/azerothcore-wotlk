@@ -41,7 +41,6 @@ class ACE_Export ACE_Based_Pointer_Repository
 public:
   // = Use ACE_Null_Mutex to allow locking while iterating.
 
-  // = Initialization and termination methods.
   ACE_Based_Pointer_Repository (void);
   ~ACE_Based_Pointer_Repository (void);
 
@@ -64,7 +63,6 @@ public:
   int unbind (void *addr);
 
 private:
-
   /// Use the "Cheshire-Cat" technique to hide the implementation in
   /// order to avoid circular #include dependencies.
   ACE_Based_Pointer_Repository_Rep *rep_;

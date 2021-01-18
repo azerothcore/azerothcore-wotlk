@@ -143,7 +143,6 @@ protected:
   virtual HANDLER *make_handler (void);
 
 private:
-
   /// Asynch_Connect used to make life easier :-)
   ACE_Asynch_Connect asynch_connect_;
 

@@ -136,8 +136,7 @@ public:
                 AccountMgr::GetName(info.accountId, info.accountName);
                 info.deleteDate = time_t(fields[3].GetUInt32());
                 foundList.push_back(info);
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
         }
 
         return true;
@@ -168,12 +167,12 @@ public:
 
             if (!handler->GetSession())
                 handler->PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CONSOLE,
-                    itr->lowGuid, itr->name.c_str(), itr->accountName.empty() ? "<Not existing>" : itr->accountName.c_str(),
-                    itr->accountId, dateStr.c_str());
+                                         itr->lowGuid, itr->name.c_str(), itr->accountName.empty() ? "<Not existing>" : itr->accountName.c_str(),
+                                         itr->accountId, dateStr.c_str());
             else
                 handler->PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CHAT,
-                    itr->lowGuid, itr->name.c_str(), itr->accountName.empty() ? "<Not existing>" : itr->accountName.c_str(),
-                    itr->accountId, dateStr.c_str());
+                                         itr->lowGuid, itr->name.c_str(), itr->accountName.empty() ? "<Not existing>" : itr->accountName.c_str(),
+                                         itr->accountId, dateStr.c_str());
         }
 
         if (!handler->GetSession())
@@ -222,7 +221,6 @@ public:
         stmt->setUInt32(0, delInfo.lowGuid);
         if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
             sWorld->AddGlobalPlayerData(delInfo.lowGuid, delInfo.accountId, delInfo.name, (*result)[2].GetUInt8(), (*result)[0].GetUInt8(), (*result)[1].GetUInt8(), (*result)[3].GetUInt8(), 0, 0);
-
     }
 
     static void HandleCharacterLevel(Player* player, uint64 playerGuid, uint32 oldLevel, uint32 newLevel, ChatHandler* handler)
@@ -284,8 +282,8 @@ public:
                     continue;
 
                 char const* activeStr = target && target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index
-                ? handler->GetAcoreString(LANG_ACTIVE)
-                : "";
+                                        ? handler->GetAcoreString(LANG_ACTIVE)
+                                        : "";
 
                 char titleNameStr[80];
                 snprintf(titleNameStr, 80, name.c_str(), targetName);
@@ -885,10 +883,11 @@ public:
             QueryResult result = CharacterDatabase.PQuery("SELECT guid FROM characters");
             if (!result)
                 return true;
-            do{
+            do
+            {
                 uint64 _guid = result->Fetch()[0].GetUInt64();
                 char buff[20];
-                sprintf(buff,"%u", (uint32)_guid);
+                sprintf(buff, "%u", (uint32)_guid);
                 switch(PlayerDumpWriter().WriteDump(buff, uint32(_guid)))
                 {
                     case DUMP_SUCCESS:
@@ -907,7 +906,7 @@ public:
                         handler->SetSentErrorMessage(true);
                         return false;
                 }
-            }while(result->NextRow());
+            } while(result->NextRow());
         }
 
         if (!fileStr || !playerStr)
@@ -985,11 +984,21 @@ public:
 
         switch (BagSlot)
         {
-            case 2: BagSlot = 19; break;
-            case 3: BagSlot = 20; break;
-            case 4: BagSlot = 21; break;
-            case 5: BagSlot = 22; break;
-            default: BagSlot = 1; break;
+            case 2:
+                BagSlot = 19;
+                break;
+            case 3:
+                BagSlot = 20;
+                break;
+            case 4:
+                BagSlot = 21;
+                break;
+            case 5:
+                BagSlot = 22;
+                break;
+            default:
+                BagSlot = 1;
+                break;
         }
 
         handler->PSendSysMessage("--------------------------------------");

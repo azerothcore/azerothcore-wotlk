@@ -19,30 +19,30 @@ class ChannelMgr
     typedef std::unordered_map<std::wstring, Channel*> ChannelMap;
     typedef std::map<std::string, ChannelRights> ChannelRightsMap;
 
-    public:
-        ChannelMgr(TeamId teamId) : _teamId(teamId)
-        { }
+public:
+    ChannelMgr(TeamId teamId) : _teamId(teamId)
+    { }
 
-        ~ChannelMgr();
+    ~ChannelMgr();
 
-        static ChannelMgr * forTeam(TeamId teamId);
+    static ChannelMgr* forTeam(TeamId teamId);
 
-        Channel* GetJoinChannel(std::string const& name, uint32 channel_id);
-        Channel* GetChannel(std::string const& name, Player* p, bool pkt = true);
-        void LoadChannels();
+    Channel* GetJoinChannel(std::string const& name, uint32 channel_id);
+    Channel* GetChannel(std::string const& name, Player* p, bool pkt = true);
+    void LoadChannels();
 
-        static void LoadChannelRights();
-        static const ChannelRights& GetChannelRightsFor(const std::string& name);
-        static void SetChannelRightsFor(const std::string& name, const uint32& flags, const uint32& speakDelay, const std::string& joinmessage, const std::string& speakmessage, const std::set<uint32>& moderators);
-        static uint32 _channelIdMax;
+    static void LoadChannelRights();
+    static const ChannelRights& GetChannelRightsFor(const std::string& name);
+    static void SetChannelRightsFor(const std::string& name, const uint32& flags, const uint32& speakDelay, const std::string& joinmessage, const std::string& speakmessage, const std::set<uint32>& moderators);
+    static uint32 _channelIdMax;
 
-    private:
-        ChannelMap channels;
-        TeamId _teamId;
-        static ChannelRightsMap channels_rights;
-        static ChannelRights channelRightsEmpty; // when not found in the map, reference to this is returned
+private:
+    ChannelMap channels;
+    TeamId _teamId;
+    static ChannelRightsMap channels_rights;
+    static ChannelRights channelRightsEmpty; // when not found in the map, reference to this is returned
 
-        void MakeNotOnPacket(WorldPacket* data, std::string const& name);
+    void MakeNotOnPacket(WorldPacket* data, std::string const& name);
 };
 
 class AllianceChannelMgr : public ChannelMgr { public: AllianceChannelMgr() : ChannelMgr(TEAM_ALLIANCE) {} };

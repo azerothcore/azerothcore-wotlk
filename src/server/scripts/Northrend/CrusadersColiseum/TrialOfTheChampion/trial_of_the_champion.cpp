@@ -30,31 +30,31 @@ public:
         uint32 gossipTextId = 0;
         switch (pInstance->GetData(DATA_INSTANCE_PROGRESS))
         {
-        case INSTANCE_PROGRESS_INITIAL:
-            if (!player->GetVehicle())
-            {
-                if (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE)
-                    gossipTextId = 15043; //Horde text
+            case INSTANCE_PROGRESS_INITIAL:
+                if (!player->GetVehicle())
+                {
+                    if (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE)
+                        gossipTextId = 15043; //Horde text
+                    else
+                        gossipTextId = 14757; //Alliance text
+                }
                 else
-                    gossipTextId = 14757; //Alliance text
-            }
-            else
-            {
-                gossipTextId = 14688;
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1a, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1338);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1b, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1341);
-            }
-            break;
-        case INSTANCE_PROGRESS_CHAMPIONS_DEAD:
-            gossipTextId = 14737;
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1339);
-            break;
-        case INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED:
-            gossipTextId = 14738;
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1340);
-            break;
-        default:
-            return true;
+                {
+                    gossipTextId = 14688;
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1a, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1338);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT1b, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1341);
+                }
+                break;
+            case INSTANCE_PROGRESS_CHAMPIONS_DEAD:
+                gossipTextId = 14737;
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1339);
+                break;
+            case INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED:
+                gossipTextId = 14738;
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_START_EVENT3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1340);
+                break;
+            default:
+                return true;
         }
 
         SendGossipMenuFor(player, gossipTextId, creature->GetGUID());
@@ -70,9 +70,9 @@ public:
         if(!pInstance)
             return true;
 
-        if(uiAction == GOSSIP_ACTION_INFO_DEF+1338 || uiAction == GOSSIP_ACTION_INFO_DEF+1341 || uiAction == GOSSIP_ACTION_INFO_DEF+1339 || uiAction == GOSSIP_ACTION_INFO_DEF+1340)
+        if(uiAction == GOSSIP_ACTION_INFO_DEF + 1338 || uiAction == GOSSIP_ACTION_INFO_DEF + 1341 || uiAction == GOSSIP_ACTION_INFO_DEF + 1339 || uiAction == GOSSIP_ACTION_INFO_DEF + 1340)
         {
-            pInstance->SetData(DATA_ANNOUNCER_GOSSIP_SELECT, (uiAction == GOSSIP_ACTION_INFO_DEF+1341 ? 1 : 0));
+            pInstance->SetData(DATA_ANNOUNCER_GOSSIP_SELECT, (uiAction == GOSSIP_ACTION_INFO_DEF + 1341 ? 1 : 0));
             creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         }
 
@@ -87,7 +87,7 @@ public:
 
     struct npc_announcer_toc5AI : public CreatureAI
     {
-        npc_announcer_toc5AI(Creature *creature) : CreatureAI(creature) {}
+        npc_announcer_toc5AI(Creature* creature) : CreatureAI(creature) {}
 
         void Reset() override
         {
@@ -102,7 +102,7 @@ public:
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage >= me->GetHealth()) // for bk scene so strangulate doesn't kill him
-                damage = me->GetHealth()-1;
+                damage = me->GetHealth() - 1;
         }
 
         void MovementInform(uint32 type, uint32 /*id*/) override

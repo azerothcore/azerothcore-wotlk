@@ -7,18 +7,14 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <string>
-#include <list>
-#include <vector>
-#include <ace/Configuration_Import_Export.h>
-#include <ace/Thread_Mutex.h>
-#include <AutoPtr.h>
-
-typedef acore::AutoPtr<ACE_Configuration_Heap, ACE_Null_Mutex> Config;
+#include "Common.h"
 
 class ConfigMgr
 {
-    friend class ConfigLoader;
+    ConfigMgr() = default;
+    ConfigMgr(ConfigMgr const&) = delete;
+    ConfigMgr& operator=(ConfigMgr const&) = delete;
+    ~ConfigMgr() = default;
 
 public:
     static ConfigMgr* instance();
@@ -54,21 +50,7 @@ public:
 private:
     bool dryRun = false;
 
-    bool GetValueHelper(const char* name, ACE_TString& result);
     bool LoadData(std::string const& file);
-
-    typedef ACE_Thread_Mutex LockType;
-    typedef ACE_Guard<LockType> GuardType;
-
-    std::vector<std::string> _modulesConfigFiles;
-    std::string _initConfigFile;
-    Config _config;
-    LockType _configLock;
-
-    ConfigMgr() = default;
-    ConfigMgr(ConfigMgr const&) = delete;
-    ConfigMgr& operator=(ConfigMgr const&) = delete;
-    ~ConfigMgr() = default;
 };
 
 #define sConfigMgr ConfigMgr::instance()

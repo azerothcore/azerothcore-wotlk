@@ -23,7 +23,7 @@ class boss_magmus : public CreatureScript
 public:
     boss_magmus() : CreatureScript("boss_magmus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_magmusAI(creature);
     }
@@ -35,15 +35,15 @@ public:
         uint32 FieryBurst_Timer;
         uint32 WarStomp_Timer;
 
-        void Reset()
+        void Reset() override
         {
             FieryBurst_Timer = 5000;
-            WarStomp_Timer =0;
+            WarStomp_Timer = 0;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -54,7 +54,8 @@ public:
             {
                 DoCastVictim(SPELL_FIERYBURST);
                 FieryBurst_Timer = 6000;
-            } else FieryBurst_Timer -= diff;
+            }
+            else FieryBurst_Timer -= diff;
 
             //WarStomp_Timer
             if (HealthBelowPct(51))
@@ -63,13 +64,14 @@ public:
                 {
                     DoCastVictim(SPELL_WARSTOMP);
                     WarStomp_Timer = 8000;
-                } else WarStomp_Timer -= diff;
+                }
+                else WarStomp_Timer -= diff;
             }
 
             DoMeleeAttackIfReady();
         }
         // When he die open door to last chamber
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (InstanceScript* instance = killer->GetInstanceScript())
                 instance->HandleGameObject(instance->GetData64(DATA_THRONE_DOOR), true);

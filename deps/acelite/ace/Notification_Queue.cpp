@@ -8,6 +8,8 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
+ACE_ALLOC_HOOK_DEFINE(ACE_Notification_Queue_Node)
+
 ACE_Notification_Queue::
 ACE_Notification_Queue()
   : ACE_Copy_Disabled()

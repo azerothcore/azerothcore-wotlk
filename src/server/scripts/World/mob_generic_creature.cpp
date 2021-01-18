@@ -30,20 +30,20 @@ public:
         uint32 BuffTimer;           //This variable keeps track of buffs
         bool IsSelfRooted;
 
-        void Reset()
+        void Reset() override
         {
             GlobalCooldown = 0;
             BuffTimer = 0;          //Rebuff as soon as we can
             IsSelfRooted = false;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             if (!me->IsWithinMeleeRange(who))
                 IsSelfRooted = true;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Always decrease our global cooldown first
             if (GlobalCooldown > diff)
@@ -70,7 +70,8 @@ public:
                         BuffTimer = 600000;
                     }//Try agian in 30 seconds
                     else BuffTimer = 30000;
-                } else BuffTimer -= diff;
+                }
+                else BuffTimer -= diff;
             }
 
             //Return since we have no target
@@ -138,7 +139,6 @@ public:
 
                         //Set our global cooldown
                         GlobalCooldown = GENERIC_CREATURE_COOLDOWN;
-
                     }//If no spells available and we arn't moving run to target
                     else if (IsSelfRooted)
                     {
@@ -151,7 +151,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new generic_creatureAI(creature);
     }
@@ -174,7 +174,7 @@ public:
         uint32 timer, interval;
         const SpellInfo* spell;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer <= diff)
             {
@@ -187,7 +187,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new trigger_periodicAI(creature);
     }
@@ -201,14 +201,14 @@ public:
     struct trigger_deathAI : public NullCreatureAI
     {
         trigger_deathAI(Creature* creature) : NullCreatureAI(creature) { }
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (me->m_spells[0])
                 me->CastSpell(killer, me->m_spells[0], true);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new trigger_deathAI(creature);
     }

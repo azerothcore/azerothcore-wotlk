@@ -171,11 +171,11 @@ void HostileReference::updateOnlineStatus()
     // target is no player or not gamemaster
     // target is not in flight
     if (isValid()
-        && (getTarget()->GetTypeId() != TYPEID_PLAYER || !getTarget()->ToPlayer()->IsGameMaster())
-        && !getTarget()->IsInFlight()
-        && getTarget()->IsInMap(GetSourceUnit())
-        && getTarget()->InSamePhase(GetSourceUnit())
-        )
+            && (getTarget()->GetTypeId() != TYPEID_PLAYER || !getTarget()->ToPlayer()->IsGameMaster())
+            && !getTarget()->IsInFlight()
+            && getTarget()->IsInMap(GetSourceUnit())
+            && getTarget()->InSamePhase(GetSourceUnit())
+       )
     {
         Creature* creature = GetSourceUnit()->ToCreature();
         online = getTarget()->isInAccessiblePlaceFor(creature);
@@ -247,7 +247,7 @@ HostileReference* ThreatContainer::getReferenceByTarget(Unit* victim) const
     uint64 const guid = victim->GetGUID();
     for (ThreatContainer::StorageType::const_iterator i = iThreatList.begin(); i != iThreatList.end(); ++i)
     {
-        HostileReference *ref = (*i);
+        HostileReference* ref = (*i);
         if (ref && ref->getUnitGuid() == guid)
             return ref;
     }
@@ -438,7 +438,7 @@ void ThreatManager::_addThreat(Unit* victim, float threat)
 
     if (!ref) // there was no ref => create a new one
     {
-                                                            // threat has to be 0 here
+        // threat has to be 0 here
         HostileReference* hostileRef = new HostileReference(victim, this, 0);
         iThreatContainer.addReference(hostileRef);
         hostileRef->addThreat(threat); // now we add the real threat
@@ -535,8 +535,8 @@ void ThreatManager::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStat
     switch (threatRefStatusChangeEvent->getType())
     {
         case UEV_THREAT_REF_THREAT_CHANGE:
-            if ((getCurrentVictim() == hostilRef && threatRefStatusChangeEvent->getFValue()<0.0f) ||
-                (getCurrentVictim() != hostilRef && threatRefStatusChangeEvent->getFValue()>0.0f))
+            if ((getCurrentVictim() == hostilRef && threatRefStatusChangeEvent->getFValue() < 0.0f) ||
+                    (getCurrentVictim() != hostilRef && threatRefStatusChangeEvent->getFValue() > 0.0f))
                 setDirty(true);                             // the order in the threat list might have changed
             break;
         case UEV_THREAT_REF_ONLINE_STATUS:
@@ -594,7 +594,7 @@ bool ThreatManager::isNeedUpdateToClient(uint32 time)
 // Reset all aggro without modifying the threatlist.
 void ThreatManager::resetAllAggro()
 {
-    ThreatContainer::StorageType &threatList = iThreatContainer.iThreatList;
+    ThreatContainer::StorageType& threatList = iThreatContainer.iThreatList;
     if (threatList.empty())
         return;
 

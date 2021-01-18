@@ -12,8 +12,7 @@
 #include "G3D/Set.h"
 #include "BoundingIntervalHierarchy.h"
 
-
-template<class T, class BoundsFunc = BoundsTrait<T> >
+template<class T, class BoundsFunc = BoundsTrait<T>>
 class BIHWrap
 {
     template<class RayCallback>

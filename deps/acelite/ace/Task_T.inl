@@ -34,10 +34,10 @@ ACE_Task<ACE_SYNCH_USE, TIME_POLICY>::ungetq (ACE_Message_Block *mb, ACE_Time_Va
 }
 
 template <ACE_SYNCH_DECL, class TIME_POLICY> ACE_INLINE int
-ACE_Task<ACE_SYNCH_USE, TIME_POLICY>::flush (u_long flag)
+ACE_Task<ACE_SYNCH_USE, TIME_POLICY>::flush (u_long f)
 {
   ACE_TRACE ("ACE_Task<ACE_SYNCH_USE, TIME_POLICY>::flush");
-  if (ACE_BIT_ENABLED (flag, ACE_Task_Flags::ACE_FLUSHALL))
+  if (ACE_BIT_ENABLED (f, ACE_Task_Flags::ACE_FLUSHALL))
     return this->msg_queue_ != 0 && this->msg_queue_->close ();
   else
     return -1;   // Note, need to be more careful about what we free...

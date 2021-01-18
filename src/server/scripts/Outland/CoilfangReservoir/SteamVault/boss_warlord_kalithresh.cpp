@@ -33,7 +33,7 @@ class boss_warlord_kalithresh : public CreatureScript
 public:
     boss_warlord_kalithresh() : CreatureScript("boss_warlord_kalithresh") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_warlord_kalithreshAI (creature);
     }
@@ -48,14 +48,14 @@ public:
         InstanceScript* instance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             if (instance)
                 instance->SetData(TYPE_WARLORD_KALITHRESH, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_REFLECTION, 10000);
@@ -66,26 +66,26 @@ public:
                 instance->SetData(TYPE_WARLORD_KALITHRESH, IN_PROGRESS);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (instance)
                 instance->SetData(TYPE_WARLORD_KALITHRESH, DONE);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
 
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_REFLECTION:
                     me->CastSpell(me, SPELL_SPELL_REFLECTION, false);
@@ -110,7 +110,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_naga_distiller : public CreatureScript
@@ -118,7 +117,7 @@ class npc_naga_distiller : public CreatureScript
 public:
     npc_naga_distiller() : CreatureScript("npc_naga_distiller") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_naga_distillerAI (creature);
     }
@@ -133,14 +132,14 @@ public:
         InstanceScript* instance;
         uint32 spellTimer;
 
-        void Reset()
+        void Reset() override
         {
             spellTimer = 0;
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param != 1)
                 return;
@@ -151,7 +150,7 @@ public:
             spellTimer = 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (spellTimer)
             {
@@ -165,7 +164,6 @@ public:
             }
         }
     };
-
 };
 
 void AddSC_boss_warlord_kalithresh()

@@ -14,7 +14,7 @@ template <class T>
 class DBCStorageIterator : public std::iterator<std::forward_iterator_tag, T>
 {
 public:
-    DBCStorageIterator() : _index(nullptr), _pos(0), _end(0) { }
+    DBCStorageIterator() : _index(nullptr) { }
     DBCStorageIterator(T** index, uint32 size, uint32 pos = 0) : _index(index), _pos(pos), _end(size)
     {
         if (_pos < _end)
@@ -51,8 +51,8 @@ public:
 
 private:
     T** _index;
-    uint32 _pos;
-    uint32 _end;
+    uint32 _pos{0};
+    uint32 _end{0};
 };
 
 #endif // DBCStorageIterator_h__

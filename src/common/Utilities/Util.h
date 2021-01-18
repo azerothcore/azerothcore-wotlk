@@ -43,10 +43,10 @@ public:
     Tokenizer(const std::string& src, char const sep, uint32 vectorReserve = 0);
     ~Tokenizer() { delete[] m_str; }
 
-    const_iterator begin() const { return m_storage.begin(); }
-    const_iterator end() const { return m_storage.end(); }
+    [[nodiscard]] const_iterator begin() const { return m_storage.begin(); }
+    [[nodiscard]] const_iterator end() const { return m_storage.end(); }
 
-    size_type size() const { return m_storage.size(); }
+    [[nodiscard]] size_type size() const { return m_storage.size(); }
 
     reference operator [] (size_type i) { return m_storage[i]; }
     const_reference operator [] (size_type i) const { return m_storage[i]; }
@@ -239,32 +239,32 @@ inline bool isNumericOrSpace(wchar_t wchar)
 
 inline bool isBasicLatinString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isBasicLatinCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isBasicLatinCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
             return false;
     return true;
 }
 
 inline bool isExtendedLatinString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isExtendedLatinCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isExtendedLatinCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
             return false;
     return true;
 }
 
 inline bool isCyrillicString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isCyrillicCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isCyrillicCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
             return false;
     return true;
 }
 
 inline bool isEastAsianString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isEastAsianCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isEastAsianCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
             return false;
     return true;
 }
@@ -404,12 +404,12 @@ public:
         part[2] = p3;
     }
 
-    inline bool IsEqual(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
+    [[nodiscard]] inline bool IsEqual(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
     {
         return (part[0] == p1 && part[1] == p2 && part[2] == p3);
     }
 
-    inline bool HasFlag(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
+    [[nodiscard]] inline bool HasFlag(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
     {
         return (part[0] & p1 || part[1] & p2 || part[2] & p3);
     }
@@ -578,7 +578,7 @@ class EventMap
     typedef std::multimap<uint32, uint32> EventStore;
 
 public:
-    EventMap() : _time(0), _phase(0) { }
+    EventMap()  { }
 
     /**
     * @name Reset
@@ -605,7 +605,7 @@ public:
     * @name GetTimer
     * @return Current timer value.
     */
-    uint32 GetTimer() const
+    [[nodiscard]] uint32 GetTimer() const
     {
         return _time;
     }
@@ -619,7 +619,7 @@ public:
     * @name GetPhaseMask
     * @return Active phases as mask.
     */
-    uint8 GetPhaseMask() const
+    [[nodiscard]] uint8 GetPhaseMask() const
     {
         return _phase;
     }
@@ -628,7 +628,7 @@ public:
     * @name Empty
     * @return True, if there are no events scheduled.
     */
-    bool Empty() const
+    [[nodiscard]] bool Empty() const
     {
         return _eventMap.empty();
     }
@@ -641,9 +641,13 @@ public:
     void SetPhase(uint8 phase)
     {
         if (!phase)
+        {
             _phase = 0;
+        }
         else if (phase <= 8)
+        {
             _phase = (1 << (phase - 1));
+        }
     }
 
     /**
@@ -654,7 +658,9 @@ public:
     void AddPhase(uint8 phase)
     {
         if (phase && phase <= 8)
+        {
             _phase |= (1 << (phase - 1));
+        }
     }
 
     /**
@@ -665,7 +671,9 @@ public:
     void RemovePhase(uint8 phase)
     {
         if (phase && phase <= 8)
+        {
             _phase &= ~(1 << (phase - 1));
+        }
     }
 
     /**
@@ -679,10 +687,14 @@ public:
     void ScheduleEvent(uint32 eventId, uint32 time, uint32 group = 0, uint32 phase = 0)
     {
         if (group && group <= 8)
+        {
             eventId |= (1 << (group + 15));
+        }
 
         if (phase && phase <= 8)
+        {
             eventId |= (1 << (phase + 23));
+        }
 
         _eventMap.insert(EventStore::value_type(_time + time, eventId));
     }
@@ -711,22 +723,7 @@ public:
     */
     void RepeatEvent(uint32 time)
     {
-        if (Empty())
-            return;
-
-        uint32 eventId = _eventMap.begin()->second;
-        _eventMap.erase(_eventMap.begin());
-        ScheduleEvent(eventId, time);
-    }
-
-    /**
-    * @name PopEvent
-    * @brief Remove the first event in the map.
-    */
-    void PopEvent()
-    {
-        if (!Empty())
-            _eventMap.erase(_eventMap.begin());
+        _eventMap.insert(EventStore::value_type(_time + time, _lastEvent));
     }
 
     /**
@@ -741,37 +738,20 @@ public:
             EventStore::iterator itr = _eventMap.begin();
 
             if (itr->first > _time)
+            {
                 return 0;
+            }
             else if (_phase && (itr->second & 0xFF000000) && !((itr->second >> 24) & _phase))
+            {
                 _eventMap.erase(itr);
+            }
             else
             {
                 uint32 eventId = (itr->second & 0x0000FFFF);
+                _lastEvent = itr->second;
                 _eventMap.erase(itr);
                 return eventId;
             }
-        }
-
-        return 0;
-    }
-
-    /**
-    * @name GetEvent
-    * @brief Returns the next event to execute.
-    * @return Id of the event to execute.
-    */
-    uint32 GetEvent()
-    {
-        while (!Empty())
-        {
-            EventStore::iterator itr = _eventMap.begin();
-
-            if (itr->first > _time)
-                return 0;
-            else if (_phase && (itr->second & 0xFF000000) && !(itr->second & (_phase << 24)))
-                _eventMap.erase(itr);
-            else
-                return (itr->second & 0x0000FFFF);
         }
 
         return 0;
@@ -796,9 +776,10 @@ public:
                 ScheduleEvent(itr->second, delay);
                 _eventMap.erase(itr);
                 itr = _eventMap.begin();
+                continue;
             }
-            else
-                ++itr;
+
+            ++itr;
         }
     }
 
@@ -811,7 +792,9 @@ public:
     void DelayEvents(uint32 delay, uint32 group)
     {
         if (group > 8 || Empty())
+        {
             return;
+        }
 
         EventStore delayed;
 
@@ -820,10 +803,11 @@ public:
             if (!group || (itr->second & (1 << (group + 15))))
             {
                 delayed.insert(EventStore::value_type(itr->first + delay, itr->second));
-                _eventMap.erase(itr++);
+                itr = _eventMap.erase(itr);
+                continue;
             }
-            else
-                ++itr;
+
+            ++itr;
         }
 
         _eventMap.insert(delayed.begin(), delayed.end());
@@ -837,14 +821,19 @@ public:
     void CancelEvent(uint32 eventId)
     {
         if (Empty())
+        {
             return;
+        }
 
         for (EventStore::iterator itr = _eventMap.begin(); itr != _eventMap.end();)
         {
             if (eventId == (itr->second & 0x0000FFFF))
-                _eventMap.erase(itr++);
-            else
-                ++itr;
+            {
+                itr = _eventMap.erase(itr);
+                continue;
+            }
+
+            ++itr;
         }
     }
 
@@ -856,7 +845,9 @@ public:
     void CancelEventGroup(uint32 group)
     {
         if (!group || group > 8 || Empty())
+        {
             return;
+        }
 
         uint32 groupMask = (1 << (group + 15));
         for (EventStore::iterator itr = _eventMap.begin(); itr != _eventMap.end();)
@@ -865,9 +856,10 @@ public:
             {
                 _eventMap.erase(itr);
                 itr = _eventMap.begin();
+                continue;
             }
-            else
-                ++itr;
+
+            ++itr;
         }
     }
 
@@ -877,14 +869,20 @@ public:
     * @param eventId Wanted event id.
     * @return Time of found event.
     */
-    uint32 GetNextEventTime(uint32 eventId) const
+    [[nodiscard]] uint32 GetNextEventTime(uint32 eventId) const
     {
         if (Empty())
+        {
             return 0;
+        }
 
-        for (EventStore::const_iterator itr = _eventMap.begin(); itr != _eventMap.end(); ++itr)
-            if (eventId == (itr->second & 0x0000FFFF))
-                return itr->first;
+        for (auto const& itr : _eventMap)
+        {
+            if (eventId == (itr.second & 0x0000FFFF))
+            {
+                return itr.first;
+            }
+        }
 
         return 0;
     }
@@ -893,7 +891,7 @@ public:
      * @name GetNextEventTime
      * @return Time of next event.
      */
-    uint32 GetNextEventTime() const
+    [[nodiscard]] uint32 GetNextEventTime() const
     {
         return Empty() ? 0 : _eventMap.begin()->first;
     }
@@ -910,8 +908,9 @@ public:
     }
 
 private:
-    uint32 _time;
-    uint32 _phase;
+    uint32 _time{0};
+    uint32 _phase{0};
+    uint32 _lastEvent{0};
 
     EventStore _eventMap;
 };
