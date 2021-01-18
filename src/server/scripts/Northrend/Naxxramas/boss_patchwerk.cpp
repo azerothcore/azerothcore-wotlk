@@ -160,7 +160,7 @@ public:
                 case EVENT_SPELL_BERSERK:
                     Talk(EMOTE_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    events.ScheduleEvent(EVENT_SPELL_SLIME_BOLT, 2000);
+                    events.ScheduleEvent(EVENT_SPELL_SLIME_BOLT, 3000);
                     break;
                 case EVENT_SPELL_SLIME_BOLT:
                     me->CastSpell(me, SPELL_SLIME_BOLT, false);
