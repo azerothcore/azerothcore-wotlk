@@ -45,7 +45,7 @@
 
 #ifdef ELUNA
 #include "LuaEngine.h"
-#endif 
+#endif
 
 TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
 {

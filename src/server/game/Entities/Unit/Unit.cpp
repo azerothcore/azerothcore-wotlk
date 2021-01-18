@@ -9574,7 +9574,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     // player cannot attack in mount state
     if (GetTypeId() == TYPEID_PLAYER && IsMounted())
         return false;
-         
+
     // creatures cannot attack while evading
     Creature* creature = ToCreature();
     if (creature && creature->IsInEvadeMode())

@@ -143,6 +143,6 @@ namespace MMAP
         ProducerConsumerQueue<uint32> _queue;
         std::atomic<bool> _cancelationToken;
     };
-} 
+}
 
 #endif

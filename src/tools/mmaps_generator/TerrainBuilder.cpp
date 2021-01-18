@@ -398,7 +398,7 @@ namespace MMAP
                             // merge different types of water
                             liquidType = NAV_WATER;
                             break;
-                        case MAP_LIQUID_TYPE_MAGMA: 
+                        case MAP_LIQUID_TYPE_MAGMA:
                         case MAP_LIQUID_TYPE_SLIME:
                             liquidType = NAV_MAGMA_SLIME;
                             break;
@@ -723,7 +723,7 @@ namespace MMAP
                             case 1:
                                 type = NAV_WATER;
                                 break;
-                            case 2: 
+                            case 2:
                             case 3:
                                 type = NAV_MAGMA_SLIME;
                                 break;

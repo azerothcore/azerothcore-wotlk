@@ -42,7 +42,7 @@ namespace MMAP
         m_offMeshFilePath    (offMeshFilePath),
         m_skipContinents     (skipContinents),
         m_skipJunkMaps       (skipJunkMaps),
-        m_skipBattlegrounds  (skipBattlegrounds), 
+        m_skipBattlegrounds  (skipBattlegrounds),
         m_maxWalkableAngle   (maxWalkableAngle),
         m_maxWalkableAngleNotSteep (maxWalkableAngleNotSteep),
         m_bigBaseUnit        (bigBaseUnit),
@@ -659,7 +659,7 @@ namespace MMAP
                 rcRasterizeTriangles(m_rcContext, tVerts, tVertCount, tTris, triFlags, tTriCount, *tile.solid, config.walkableClimb);
                 delete[] triFlags;
 
-                rcFilterLowHangingWalkableObstacles(m_rcContext, config.walkableClimb, *tile.solid); 
+                rcFilterLowHangingWalkableObstacles(m_rcContext, config.walkableClimb, *tile.solid);
                 rcFilterLedgeSpans(m_rcContext, tileCfg.walkableHeight, tileCfg.walkableClimb, *tile.solid);
                 rcFilterWalkableLowHeightSpans(m_rcContext, tileCfg.walkableHeight, *tile.solid);
 
