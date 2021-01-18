@@ -361,7 +361,6 @@ void MotionMaster::MoveCircleTarget(Unit* target)
 
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(point->m_positionX, point->m_positionY, point->m_positionZ, false);
-    init.SetWalk(true);
     init.SetFacing(target);
     init.Launch();
 }
@@ -565,12 +564,12 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
         return;
 
     // use larger distance for vmap height search than in most other cases
-    float tz = _owner->GetMap()->GetHeight(_owner->GetPhaseMask(), _owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ(), true, MAX_FALL_DISTANCE);
+    float tz = _owner->GetMapHeight(_owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ(), true, MAX_FALL_DISTANCE);
     if (tz <= INVALID_HEIGHT)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outStaticDebug("MotionMaster::MoveFall: unable retrive a proper height at map %u (x: %f, y: %f, z: %f).",
-                             _owner->GetMap()->GetId(), _owner->GetPositionX(), _owner->GetPositionX(), _owner->GetPositionZ());
+                             _owner->GetMap()->GetId(), _owner->GetPositionX(), _owner->GetPositionX(), _owner->GetPositionZ() + _owner->GetPositionZ());
 #endif
         return;
     }

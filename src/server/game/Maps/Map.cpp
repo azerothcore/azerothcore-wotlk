@@ -1907,7 +1907,7 @@ float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, fl
 
         LiquidData liquid_status;
 
-        ZLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status);
+        ZLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status, collisionHeight);
         switch (res)
         {
             case LIQUID_MAP_ABOVE_WATER:
@@ -1961,8 +1961,7 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
     if (checkVMap)
     {
         VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
-        // if (vmgr->isHeightCalcEnabled())
-            vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);
+        vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);   // look from a bit higher pos to find the floor
     }
 
     // mapHeight set for any above raw ground Z or <= INVALID_HEIGHT
@@ -2059,7 +2058,7 @@ bool Map::GetAreaInfo(float x, float y, float z, uint32& flags, int32& adtId, in
         {
             float _mapheight = gmap->getHeight(x, y);
             // z + 2.0f condition taken from GetHeight(), not sure if it's such a great choice...
-            if (z + 2.0f > _mapheight &&  _mapheight > vmap_z)
+            if (z > _mapheight &&  _mapheight > vmap_z)
                 return false;
         }
         return true;
@@ -3456,9 +3455,9 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
     bool isWaterNow = IsInWater(startX, startY, startZ);
     bool isWaterNext = IsInWater(destX, destY, destZ);
     const Unit* unit = source->ToUnit();
+    PathGenerator* path = new PathGenerator(source);
 
     if (findPath && !isWaterNow && !isWaterNext && (!unit || !unit->IsFlying())) {
-        PathGenerator *path = new PathGenerator(source);
         path->SetSlopeCheck(true);
         bool result = path->CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
         if (!result || !CanReachPositionAndGetCoords(source, path, destX, destY, destZ, checkCollision))
@@ -3475,8 +3474,6 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
     }
     else
     {
-        PathGenerator *path = new PathGenerator(source);
-
         // Use a detour raycast to get our first collision point
         path->SetUseRaycast(true);
         bool result = path->CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
@@ -3487,8 +3484,6 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         // Check for valid path types before we proceed
         if (!result || (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)))
         {
-            // go back
-            destX = startX; destY = startY; destZ = startZ;
             return false;
         }
 
@@ -3500,7 +3495,7 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         destY = endPos.y;
         destZ = endPos.z;
 
-        float angle = getAngle(startX, startY, destX, destY);
+        float angle = getAngle(destX, destY, startX, startY);
 
         // check static LOS
         float halfHeight = source->GetCollisionHeight() * 0.5f;
@@ -3552,12 +3547,10 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
                     // fall back to gridHeight if any
                     GridMap* gmap = unit->GetMap()->GetGrid(startX, startY);
                     if (!gmap) { // should not happen
-                        // go back
-                        destX = startX; destY = startY; destZ = startZ;
                         return false;
                     }
 
-                    float gridHeight = gmap->getHeight(startX,startY);
+                    float gridHeight = gmap->getHeight(startX, startY);
 
                     if (gridHeight > INVALID_HEIGHT)
                     {
@@ -3567,18 +3560,14 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
 
                 if (!notOnGround && checkSlopes && !path->IsWalkableClimb(startX, startY, startZ, destX, destY, destZ))
                 {
-                    // go back
-                    destX = startX; destY = startY; destZ = startZ;
                     return false;
                 }
             }
 
-            const Creature *creature = unit->ToCreature();
+            const Creature* creature = unit->ToCreature();
             bool cannotSwim = isWaterNext && !unit->CanSwim();
             bool cannotWalkOrFly = !isWaterNext && !source->ToPlayer() && !unit->CanFly() && (creature && !creature->CanWalk());
             if (cannotSwim || cannotWalkOrFly) {
-                // go back
-                destX = startX; destY = startY; destZ = startZ;
                 return false;
             }
         }

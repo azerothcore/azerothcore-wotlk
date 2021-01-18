@@ -189,22 +189,23 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
             lastOwnerXYZ.Relocate(-5000.0f, -5000.0f, -5000.0f);
             return;
         }
-
-        bool result = i_path->CalculatePath(x, y, z, forceDest);
-        const Unit *unit = owner->ToUnit();
-        float _tempX=x, _tempY=y, _tempZ=z;
-        if (result && unit && !unit->GetMap()->CanReachPositionAndGetCoords(unit, i_path, _tempX, _tempY, _tempZ, false)) {
-            // recalculate
-            i_target->GetContactPoint(owner, _tempX, _tempY, _tempZ);
-            result = i_path->CalculatePath(_tempX, _tempY, _tempZ, forceDest);
-        }
-
-        x = _tempX;
-        y = _tempY;
-        z = _tempZ;
-
-        if (result)
+       
+        if (i_path->CalculatePath(x, y, z, forceDest))
         {
+            if (const Unit* unit = owner->ToUnit())
+            {
+                float _tempX = x, _tempY = y, _tempZ = z;
+                if (!unit->GetMap()->CanReachPositionAndGetCoords(unit, i_path, _tempX, _tempY, _tempZ, false)) {
+                    // recalculate
+                    i_target->GetContactPoint(owner, _tempX, _tempY, _tempZ);
+                    i_path->CalculatePath(_tempX, _tempY, _tempZ, forceDest);
+                }
+
+                x = _tempX;
+                y = _tempY;
+                z = _tempZ;
+            }
+
             float maxDist = owner->GetMeleeRange(i_target.getTarget());
             if (!forceDest && (i_path->GetPathType() & PATHFIND_NOPATH || (!i_offset && !isPlayerPet && i_target->GetExactDistSq(i_path->GetActualEndPosition().x, i_path->GetActualEndPosition().y, i_path->GetActualEndPosition().z) > maxDist * maxDist)))
             {
@@ -236,12 +237,13 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
             if (owner->GetTypeId() == TYPEID_UNIT)
             {
                 owner->ToCreature()->SetCannotReachTarget(true);
+                return;
             }
             // then use normal MoveTo - if we have to
         }
     }
 
-    const Unit *unit = owner->ToUnit();
+    const Unit* unit = owner->ToUnit();
     if (unit && !unit->GetMap()->CanReachPositionAndGetCoords(unit, x, y, z, true, true, false)) {
         if (!forceDest)
             return;

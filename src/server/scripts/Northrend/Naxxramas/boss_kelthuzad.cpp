@@ -146,14 +146,14 @@ public:
                 for (uint8 j = 0; j < 8; ++j)
                 {
                     float angle = M_PI * 2 / 8 * j;
-                    me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonPositions[i].GetPositionX() + 6 * cos(angle), SummonPositions[i].GetPositionY() + 6 * sin(angle), SummonPositions[i].GetPositionZ() + 0.5f, SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonPositions[i].GetPositionX() + 6 * cos(angle), SummonPositions[i].GetPositionY() + 6 * sin(angle), SummonPositions[i].GetPositionZ(), SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
             for (uint8 i = 6; i < 12; ++i)
                 for (uint8 j = 1; j < 4; ++j)
                 {
                     float dist = j == 2 ? 0.0f : 8.0f; // second in middle
                     float angle = SummonPositions[i].GetOrientation() + M_PI * 2 / 4 * j;
-                    me->SummonCreature(NPC_UNSTOPPABLE_ABOMINATION, SummonPositions[i].GetPositionX() + dist * cos(angle), SummonPositions[i].GetPositionY() + dist * sin(angle), SummonPositions[i].GetPositionZ() + 0.5f, SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    me->SummonCreature(NPC_UNSTOPPABLE_ABOMINATION, SummonPositions[i].GetPositionX() + dist * cos(angle), SummonPositions[i].GetPositionY() + dist * sin(angle), SummonPositions[i].GetPositionZ(), SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
             for (uint8 i = 6; i < 12; ++i)
                 for (uint8 j = 0; j < 1; ++j)

@@ -588,31 +588,31 @@ void Creature::Update(uint32 diff)
 
                 if (Unit *victim = GetVictim())
                 {
-                    float MaxRange = GetCollisionWidth() / 2;
                     // If we are closer than 50% of the combat reach we are going to reposition the victim
-                    if (IsInDist(victim, MaxRange))
+                    if (diff >= m_moveBackwardsMovementTime)
                     {
-                        if (diff >= m_moveBackwardsMovementTime)
-                        {
-                            AI()->MoveBackwardsChecks();
-                            m_moveBackwardsMovementTime = urand(MOVE_BACKWARDS_CHECK_INTERVAL, MOVE_BACKWARDS_CHECK_INTERVAL * 2);
-                        }
-                        else
-                        {
-                            m_moveBackwardsMovementTime -= diff;
-                        }
-                    }
-                }
+                        float MaxRange = (GetCollisionWidth() + GetVictim()->GetCollisionWidth()) / 2;
 
-                // Circling the target
-                if (diff >= m_moveCircleMovementTime)
-                {
-                    AI()->MoveCircleChecks();
-                    m_moveCircleMovementTime = urand(MOVE_CIRCLE_CHECK_INTERVAL, MOVE_CIRCLE_CHECK_INTERVAL * 2);
-                }
-                else
-                {
-                    m_moveCircleMovementTime -= diff;
+                        if (IsInDist(victim, MaxRange))
+                            AI()->MoveBackwardsChecks();
+
+                        m_moveBackwardsMovementTime = urand(MOVE_BACKWARDS_CHECK_INTERVAL, MOVE_BACKWARDS_CHECK_INTERVAL * 3);
+                    }
+                    else
+                    {
+                        m_moveBackwardsMovementTime -= diff;
+                    }
+
+                    // Circling the target
+                    if (diff >= m_moveCircleMovementTime)
+                    {
+                        AI()->MoveCircleChecks();
+                        m_moveCircleMovementTime = urand(MOVE_CIRCLE_CHECK_INTERVAL, MOVE_CIRCLE_CHECK_INTERVAL * 2);
+                    }
+                    else
+                    {
+                        m_moveCircleMovementTime -= diff;
+                    }
                 }
 
                 if (!IsInEvadeMode() && IsAIEnabled)
@@ -2844,11 +2844,16 @@ void Creature::SetDisplayId(uint32 modelId)
 {
     Unit::SetDisplayId(modelId);
 
+    float combatReach = DEFAULT_WORLD_OBJECT_SIZE;
+
     if (CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelInfo(modelId))
     {
         SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (IsPet() ? 1.0f : minfo->bounding_radius) * GetFloatValue(OBJECT_FIELD_SCALE_X));
-        SetFloatValue(UNIT_FIELD_COMBATREACH, (IsPet() ? DEFAULT_COMBAT_REACH : minfo->combat_reach) * GetFloatValue(OBJECT_FIELD_SCALE_X));
+        if (!IsPet() && minfo->combat_reach > 0)
+            combatReach = minfo->combat_reach;
     }
+
+    SetFloatValue(UNIT_FIELD_COMBATREACH, combatReach * GetFloatValue(OBJECT_FIELD_SCALE_X));
 }
 
 void Creature::SetTarget(uint64 guid)

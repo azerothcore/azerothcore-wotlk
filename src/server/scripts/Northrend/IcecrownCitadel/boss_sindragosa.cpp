@@ -1654,7 +1654,7 @@ public:
                         me->SetDisableGravity(true);
                         me->SetHover(true);
                         me->SendMovementFlagUpdate();
-                        float floorZ = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f);
+                        float floorZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         float destZ;
                         if (floorZ > 190.0f) destZ = floorZ + 25.0f;
                         else destZ = me->GetPositionZ() + 25.0f;
@@ -1676,7 +1676,7 @@ public:
                     }
                     else
                     {
-                        float floorZ = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f);
+                        float floorZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         float destZ;
                         if (floorZ > 190.0f) destZ = floorZ;
                         else destZ = me->GetPositionZ() - 25.0f;

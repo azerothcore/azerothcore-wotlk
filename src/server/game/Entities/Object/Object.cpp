@@ -1142,7 +1142,7 @@ Position WorldObject::GetHitSpherePointFor(Position const& dest) const
 {
     G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight());
     G3D::Vector3 vObj(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
-    G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetCombatReach());
+    G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetObjectSize());
 
     return Position(contactPoint.x, contactPoint.y, contactPoint.z, GetAngle(contactPoint.x, contactPoint.y));
 }
@@ -1170,16 +1170,28 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks ch
 
 bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, LineOfSightChecks checks) const
 {
-    if (!IsInMap(obj))
+   if (!IsInMap(obj))
         return false;
 
-    float x, y, z;
+    float ox, oy, oz;
     if (obj->GetTypeId() == TYPEID_PLAYER)
-        obj->GetPosition(x, y, z);
+    {
+        obj->GetPosition(ox, oy, oz);
+        oz += GetCollisionHeight();
+    }
     else
-        obj->GetHitSpherePointFor(GetPosition(), x, y, z);
+        obj->GetHitSpherePointFor({ GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight() }, ox, oy, oz);
 
-    return IsWithinLOS(x, y, z, checks);
+    float x, y, z;
+    if (GetTypeId() == TYPEID_PLAYER)
+    {
+        GetPosition(x, y, z);
+        z += GetCollisionHeight();
+    }
+    else
+        GetHitSpherePointFor({ obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ() + obj->GetCollisionHeight() }, x, y, z);
+
+    return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks);
 }
 
 void WorldObject::GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z) const
@@ -1478,7 +1490,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
                 if (canSwim && unit->GetMap()->IsInWater(x, y, max_z - WATER_HEIGHT_TOLERANCE)) {
                     // have a fun with Archimedes' formula
                     auto height = unit->GetCollisionHeight();
-                    auto width = unit->GetCollisionWidth();
+                    auto width = GetObjectSize();
                     auto weight = getWeight(height, width, 1040); // avg human specific weight
                     auto heightOutOfWater = getOutOfWater(width, weight, 10202) * 4.0f; // avg human density
                     auto heightInWater = height - heightOutOfWater;
@@ -2686,10 +2698,11 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
         }
         // we have correct destz now
         else
+        {
+            pos.Relocate(destx, desty, destz);
             break;
         }
-
-    pos.Relocate(destx, desty, destz);
+    }
 
     acore::NormalizeMapCoord(pos.m_positionX);
     acore::NormalizeMapCoord(pos.m_positionY);
@@ -2736,16 +2749,13 @@ Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
 
 void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
 {
-    angle += m_orientation;
+    angle += GetOrientation();
     float destx, desty, destz;
     destx = pos.m_positionX + dist * cos(angle);
     desty = pos.m_positionY + dist * sin(angle);
     destz = pos.m_positionZ;
-    if (isType(TYPEMASK_UNIT | TYPEMASK_PLAYER) && !ToUnit()->IsInWater())
-        destz += 2.0f;
 
-    if (!GetMap()->CanReachPositionAndGetCoords(this, destx, desty, destz, false, false, false))
-        return;
+    GetMap()->CanReachPositionAndGetCoords(this, destx, desty, destz, false, false, false);
 
     pos.SetOrientation(GetOrientation());
     pos.Relocate(destx, desty, destz);

@@ -2241,7 +2241,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return nullptr;
     }
 
-    float meleeReach = std::min(attacker->GetMeleeReach(), GetMeleeRange(attacker) / 2);
+    float meleeReach = GetMeleeRange(attacker) / 2;
 
     if (meleeReach <= 0)
     {
@@ -2266,9 +2266,9 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
             continue;
         }
 
-        double tempDist = attacker->GetExactDist2d(otherAttacker) - (attackerSize/2.0f) - (otherAttacker->GetCollisionWidth()/2.0f);
+        double tempDist = attacker->GetExactDist2d(otherAttacker) - (attackerSize / 2.0f) - (otherAttacker->GetCollisionWidth() / 2.0f);
 
-        if (tempDist == 0 || minDistance == 0 || tempDist < minDistance)
+        if (minDistance == 0 || tempDist < minDistance)
         {
             minDistance = tempDist;
             currentAngle = GetAngle(otherAttacker);
@@ -2277,6 +2277,9 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 
         validAttackers++;
     }
+
+    if (!validAttackers)
+        return nullptr;
 
     // in instance: the more attacker there are, the higher will be the tollerance
     // outside: creatures should not intersecate
@@ -2287,55 +2290,19 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return nullptr;
     }
 
-    double ray = attackerSize > refUnit->GetObjectSize() ? attackerSize / 2.0f : refUnit->GetObjectSize() / 2.0f;
-    double angle = 0;
+    double radius = attackerSize > refUnit->GetCollisionWidth() ? attackerSize / 2.0f : refUnit->GetCollisionWidth() / 2.0f;
 
-    // Equation of tangent point to get the ideal angle to
-    // move away from collisions with another unit during combat
-    // NOTE: it works only when there's enough space between the
-    // attacker and the victim. We use a simpler one otherwise.
-    if (GetExactDist2d(refUnit) > ray)
-    {
-        double refUnitX = refUnit->GetPositionX();
-        double refUnitY = refUnit->GetPositionY();
-        double victimX = GetPositionX();
-        double victimY = GetPositionY();
+    int8 direction = (urand(0, 1) ? -1 : 1);
 
-        // calculate tangent star
-        double a = 4.0f * ( pow(ray,2.0f) - pow(refUnitX,2.0f) + (2.0f * refUnitX * victimX) - pow(victimX,2.0f) );
-        double b = 8.0f * ( (refUnitX * refUnitY) + (victimX * victimY) - (victimX * refUnitY) - (refUnitX * victimY) );
-        double c = 4.0f * (- pow(victimY,2.0f) - pow(refUnitY,2.0f) + (2.0f*victimY*refUnitY) + pow(ray,2.0f));
-
-        double sq = sqrt(pow(b,2.0f)-4.0f*a*c);
-
-        double m1 = (-b + sq) / (2.0f*a);
-        double m2 = (-b - sq) / (2.0f*a);
-
-        // tangents
-        double xT1 = ((-1.0f) * (m1*(victimY - m1*victimX - refUnitY) - refUnitX) ) / (1.0f + pow(m1,2.0f));
-        double xT2 = ((-1.0f) * (m2*(victimY - m2*victimX - refUnitY) - refUnitX) ) / (1.0f + pow(m2,2.0f));
-
-        double yT1 = m1*(xT1 - victimX) + victimY;
-        double yT2 = m2*(xT2 - victimX) + victimY;
-
-        double distance = sqrt(pow(yT2-yT1,2.0f) + pow(xT2-xT1,2.0f));
-        double exactDist = GetExactDist2d(xT1, yT1);
-
-        double ortDist = sqrt(pow(exactDist,2.0f) - pow(distance/2.0f,2.0f));
-
-        angle = 2.0f * atan(distance / (2.0f * ortDist));
-    }
-
-    int8 direction =  (urand(0, 1) ? -1 : 1);
-
-    angle = frand(0.1f,0.3f) + (angle && !isnan(angle) ? angle : atan(attackerSize / (meleeReach))); // or fallback to the simpler method
+    float angularRadius = 2.0f * atan(attackerSize / (2.0f * sqrt(meleeReach)));
+    double angle = currentAngle + angularRadius * direction; // or fallback to the simpler method
 
     float x, y, z;
-    GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * direction);
+    GetNearPoint(this, x, y, z, attackerSize, 0.0f, angle);
 
     if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z, true, true, false))
     {
-        GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * (direction * -1)); // try the other side
+        GetNearPoint(this, x, y, z, attackerSize, 0.0f, angle * -1); // try the other side
 
         if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z, true, true, false))
         {
@@ -18792,7 +18759,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     {
         float x = pos.GetPositionX() + 2.0f * cos(pos.GetOrientation() - M_PI / 2.0f);
         float y = pos.GetPositionY() + 2.0f * sin(pos.GetOrientation() - M_PI / 2.0f);
-        float z = GetMap()->GetHeight(GetPhaseMask(), x, y, pos.GetPositionZ()) + 0.1f;
+        float z = GetMapHeight(x, y, pos.GetPositionZ());
         if (z > INVALID_HEIGHT)
             pos.Relocate(x, y, z);
     }
