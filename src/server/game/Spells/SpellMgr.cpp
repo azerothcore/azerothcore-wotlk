@@ -1109,6 +1109,9 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 if (!player)
                     return false;
 
+                if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE))
+                    return false;
+
                 Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
                 if (!Bf || player->GetTeamId() != Bf->GetDefenderTeam() || Bf->IsWarTime())
                     return false;
