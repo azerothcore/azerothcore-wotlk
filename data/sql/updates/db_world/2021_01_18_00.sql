@@ -1,3 +1,19 @@
+-- DB update 2021_01_17_03 -> 2021_01_18_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_17_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_17_03 2021_01_18_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1609468029866821701'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609468029866821701');
 
 DELETE FROM `creature_text_locale` WHERE `Locale` IN ('deDE','esES','esMX','frFR','ruRU') AND `CreatureID`=9623 AND `GroupID`=0 AND `ID`=0;
@@ -219,3 +235,12 @@ INSERT INTO `npc_text_locale` (`ID`,`Locale`,`Text0_0`,`Text0_1`,`Text1_0`,`Text
 (8195,'ruRU','Думаю, старейшина Камнещеп сейчас в Мародоне. Это в Пустошах.','Думаю, старейшина Камнещеп сейчас в Мародоне. Это в Пустошах.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (13321,'esES','','Desde este muelle, El Valentía hace el viaje de ida y vuelta entre Ventormenta y Auberdine.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (13321,'esMX','','Desde este muelle, El Valentía hace el viaje de ida y vuelta entre Ventormenta y Auberdine.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
