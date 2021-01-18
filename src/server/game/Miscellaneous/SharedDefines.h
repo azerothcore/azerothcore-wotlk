@@ -3588,8 +3588,7 @@ static_assert(sizeof(MmapTileHeader) == (sizeof(MmapTileHeader::mmapMagic) +
               sizeof(MmapTileHeader::usesLiquids) +
               sizeof(MmapTileHeader::padding)), "MmapTileHeader has uninitialized padding fields");
 
-
-enum NavArea
+enum NavTerrain
 {
     NAV_AREA_EMPTY          = 0,
     // areas 1-60 will be used for destructible areas (currently skipped in vmaps, WMO with flag 1)

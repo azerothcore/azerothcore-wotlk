@@ -419,7 +419,6 @@ public:
     };
 };
 
-
 void AddSC_boss_bjarngrim()
 {
     new boss_bjarngrim();
