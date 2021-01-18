@@ -7073,7 +7073,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({
         75536, // Explosion (prevent error message in console)
         71607, // Explosion (prevent error message in console)
-        71610  // Emergency Recall [Camera trigger] 
+        71610  // Emergency Recall [Camera trigger]
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_TARGET_ANY;
