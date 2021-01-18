@@ -1335,7 +1335,7 @@ bool Position::IsWithinBox(const Position& center, float xradius, float yradius,
     // is-in-cube check and we have to calculate only one point instead of 4
 
     // 2PI = 360*, keep in mind that ingame orientation is counter-clockwise
-    double rotation = 2 * M_PI - GetOrientation();
+    double rotation = 2 * M_PI - center.GetOrientation();
     double sinVal = std::sin(rotation);
     double cosVal = std::cos(rotation);
 
@@ -1347,8 +1347,8 @@ bool Position::IsWithinBox(const Position& center, float xradius, float yradius,
 
     // box edges are parallel to coordiante axis, so we can treat every dimension independently :D
     float dz = GetPositionZ() - center.GetPositionZ();
-    float dx = rotX - GetPositionX();
-    float dy = rotY - GetPositionY();
+    float dx = rotX - center.GetPositionX();
+    float dy = rotY - center.GetPositionY();
     if ((std::fabs(dx) > xradius) ||
         (std::fabs(dy) > yradius) ||
         (std::fabs(dz) > zradius))
@@ -1842,7 +1842,6 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj, bool checkAlert) co
 
         if (checkAlert)
             visibilityRange += (visibilityRange * 0.08f) + 1.5f;
-
 
         Unit const* targetUnit = obj->ToUnit();
 
@@ -2621,7 +2620,6 @@ void WorldObject::GetContactPoint(const WorldObject* obj, float& x, float& y, fl
     }
 }
 
-
 void WorldObject::GetChargeContactPoint(const WorldObject* obj, float& x, float& y, float& z, float distance2d) const
 {
     // angle to face `obj` to `this` using distance includes size of `obj`
@@ -2903,7 +2901,6 @@ void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= NULL*/)
     else
         SendMessageToSet(&data, true);
 }
-
 
 void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= NULL*/)
 {

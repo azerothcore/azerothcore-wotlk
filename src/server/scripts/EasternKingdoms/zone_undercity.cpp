@@ -481,7 +481,6 @@ enum ThrallMisc
     THRALL_SAY_THRONE_10 = 34,
     THRALL_SAY_THRONE_11 = 35,
 
-
     // Sounds
     SOUND_THRALL_1 = 16212,
     SOUND_THRALL_2 = 16214,

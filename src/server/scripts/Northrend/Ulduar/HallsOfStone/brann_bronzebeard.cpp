@@ -179,7 +179,6 @@ public:
                 default:
                     break;
             }
-
         }
         SendGossipMenuFor(player, TEXT_ID_START, creature->GetGUID());
         return true;
@@ -223,7 +222,6 @@ public:
 
     struct brann_bronzebeardAI : public npc_escortAI
     {
-
         brann_bronzebeardAI(Creature* c) : npc_escortAI(c), summons(me)
         {
             AbedneumGUID = MarnakGUID = KaddrakGUID = 0;
@@ -497,7 +495,6 @@ public:
 
                         me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
-
                         // Spawn Chest and quest credit
                         if (Player* plr = SelectTargetFromPlayerList(200.0f))
                         {
@@ -516,7 +513,6 @@ public:
                     }
                 case EVENT_GO_TO_SJONNIR:
                     {
-
                         if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
                             door->SetGoState(GO_STATE_ACTIVE);
                         SetEscortPaused(false);

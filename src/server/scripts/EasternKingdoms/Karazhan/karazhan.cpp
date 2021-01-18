@@ -413,7 +413,6 @@ public:
 #define SAY_DIALOG_ARCANAGOS_8      "What have you done, wizard? This cannot be! I'm burning from... within!"
 #define SAY_DIALOG_MEDIVH_9         "He should not have angered me. I must go... recover my strength now..."
 
-
 //static float MedivPos[4] = {-11161.49f, -1902.24f, 91.48f, 1.94f};
 static float ArcanagosPos[4] = {-11169.75f, -1881.48f, 107.39f, 4.83f};
 
@@ -556,12 +555,10 @@ public:
                 default:
                     return 2000;
             }
-
         }
 
         void UpdateAI(uint32 diff) override
         {
-
             if (YellTimer <= diff)
             {
                 if (EventStarted)
@@ -588,7 +585,6 @@ public:
             }
         }
     };
-
 };
 
 void AddSC_karazhan()

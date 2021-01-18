@@ -350,7 +350,6 @@ void BattlegroundIC::HandleAreaTrigger(Player* player, uint32 trigger)
                 player->CastSpell(player, SPELL_BACK_DOOR_JOB, true);
             break;
     }
-
 }
 
 void BattlegroundIC::UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor)
@@ -950,7 +949,6 @@ void BattlegroundIC::DestroyGate(Player*  /*player*/, GameObject* go)
 
 void BattlegroundIC::EventPlayerDamagedGO(Player* /*player*/, GameObject* /*go*/, uint32 /*eventType*/)
 {
-
 }
 
 GraveyardStruct const* BattlegroundIC::GetClosestGraveyard(Player* player)

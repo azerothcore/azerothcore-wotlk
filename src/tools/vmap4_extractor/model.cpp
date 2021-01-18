@@ -118,7 +118,6 @@ bool Model::ConvertToVMAPModel(const char* outfilename)
     return true;
 }
 
-
 Vec3D fixCoordSystem(Vec3D v)
 {
     return Vec3D(v.x, v.z, -v.y);

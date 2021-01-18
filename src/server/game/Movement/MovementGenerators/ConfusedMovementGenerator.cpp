@@ -60,7 +60,6 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
                 i_waypoints[idx][2] = idx > 0 ? i_waypoints[idx - 1][2] : z;
                 continue;
             }
-
         }
         else
         {
