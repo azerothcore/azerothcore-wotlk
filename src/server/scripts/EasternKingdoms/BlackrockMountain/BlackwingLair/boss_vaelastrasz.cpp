@@ -87,7 +87,7 @@ public:
             _Reset();
 
             me->SetStandState(UNIT_STAND_STATE_DEAD);
-            me->SetReactState(REACT_PASSIVE);  
+            me->SetReactState(REACT_PASSIVE);
             Initialize();
         }
 
