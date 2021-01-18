@@ -18,7 +18,6 @@ class Field
     friend class PreparedResultSet;
 
 public:
-
     [[nodiscard]] bool GetBool() const // Wrapper, actually gets integer
     {
         return (GetUInt8() == 1);
@@ -224,7 +223,6 @@ public:
         }
 #endif
         return static_cast<char const*>(data.value);
-
     }
 
     [[nodiscard]] std::string GetString() const
@@ -410,4 +408,3 @@ private:
 };
 
 #endif
-

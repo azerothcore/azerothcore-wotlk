@@ -124,7 +124,6 @@ protected:
     bool ShowHelpForSubCommands(std::vector<ChatCommand> const& table, char const* cmd, char const* subcmd);
 
 private:
-
     WorldSession* m_session;                           // != NULL for chat command call and NULL for CLI command
 
     // common global flag

@@ -328,7 +328,6 @@ public:
     DataMap CustomData;
 
 protected:
-
     Object();
 
     void _InitValues();
@@ -485,7 +484,6 @@ struct Position
 
     [[nodiscard]] Position GetPosition() const { return *this; }
 
-
     Position::PositionXYZStreamer PositionXYZStream()
     {
         return PositionXYZStreamer(*this);
@@ -593,7 +591,6 @@ ByteBuffer& operator >> (ByteBuffer& buf, Position::PositionXYZStreamer const& s
 ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& streamer);
 ByteBuffer& operator >> (ByteBuffer& buf, Position::PositionXYZOStreamer const& streamer);
 
-
 struct MovementInfo
 {
     // common
@@ -637,13 +634,12 @@ struct MovementInfo
         }
 
         float zspeed, sinAngle, cosAngle, xyspeed;
-
     } jump;
 
     // spline
     float splineElevation{0.0f};
 
-    MovementInfo()  
+    MovementInfo()
     {
         pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
         transport.Reset();

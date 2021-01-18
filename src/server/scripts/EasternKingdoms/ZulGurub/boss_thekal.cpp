@@ -400,7 +400,6 @@ public:
 class npc_zealot_zath : public CreatureScript
 {
 public:
-
     npc_zealot_zath()
         : CreatureScript("npc_zealot_zath")
     {

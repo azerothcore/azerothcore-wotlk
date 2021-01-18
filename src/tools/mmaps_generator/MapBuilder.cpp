@@ -49,7 +49,7 @@ namespace MMAP
     MapBuilder::MapBuilder(float maxWalkableAngle, bool skipLiquid,
                            bool skipContinents, bool skipJunkMaps, bool skipBattlegrounds,
                            bool debugOutput, bool bigBaseUnit, const char* offMeshFilePath) :
-        
+
         m_debugOutput        (debugOutput),
         m_offMeshFilePath    (offMeshFilePath),
         m_skipContinents     (skipContinents),
@@ -57,7 +57,7 @@ namespace MMAP
         m_skipBattlegrounds  (skipBattlegrounds),
         m_maxWalkableAngle   (maxWalkableAngle),
         m_bigBaseUnit        (bigBaseUnit),
-        
+
         _cancelationToken    (false)
     {
         m_terrainBuilder = new TerrainBuilder(skipLiquid);

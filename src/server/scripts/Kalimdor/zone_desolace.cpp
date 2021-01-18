@@ -54,7 +54,6 @@ enum Caravan
     NPC_LESSER_INFERNAL                 = 4676,
     NPC_DOOMWARDER                      = 4677,
     NPC_NETHER                          = 4684,
-
 };
 
 class npc_cork_gizelton : public CreatureScript
@@ -376,7 +375,6 @@ public:
                 case 282:
                     events.ScheduleEvent(EVENT_RESTART_ESCORT, 1000);
                     break;
-
             }
         }
 
@@ -412,7 +410,6 @@ public:
     };
 };
 
-
 // Theirs
 enum DyingKodo
 {
@@ -430,7 +427,6 @@ enum DyingKodo
     SPELL_KODO_KOMBO_PLAYER_BUFF    = 18172,
     SPELL_KODO_KOMBO_DESPAWN_BUFF   = 18377,
     SPELL_KODO_KOMBO_GOSSIP         = 18362
-
 };
 
 class npc_aged_dying_ancient_kodo : public CreatureScript
@@ -499,7 +495,6 @@ public:
     {
         return new npc_aged_dying_ancient_kodoAI(creature);
     }
-
 };
 
 /*######

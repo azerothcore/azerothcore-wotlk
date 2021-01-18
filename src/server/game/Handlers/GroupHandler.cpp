@@ -1134,3 +1134,85 @@ void WorldSession::HandleOptOutOfLootOpcode(WorldPacket& recvData)
 
     GetPlayer()->SetPassOnGroupLoot(passOnLoot);
 }
+
+void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
+{
+    std::string playerName1, playerName2;
+
+    // first = moved from, second = moved to
+    recv_data >> playerName1;
+    recv_data >> playerName2;
+
+    if (!normalizePlayerName(playerName1))
+    {
+        SendPartyResult(PARTY_OP_SWAP, playerName1, ERR_GROUP_SWAP_FAILED);
+        return;
+    }
+    if (!normalizePlayerName(playerName2))
+    {
+        SendPartyResult(PARTY_OP_SWAP, playerName1, ERR_GROUP_SWAP_FAILED);
+        return;
+    }
+
+    Group* group = GetPlayer()->GetGroup();
+    if (!group || !group->isRaidGroup())
+    {
+        return;
+    }
+
+    if (!group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
+    {
+        return;
+    }
+
+    //get guid, member may be offline
+    auto getGuid = [&group](std::string const& playerName)
+    {
+        // no player, cheating?
+        if (!group->GetMemberGUID(playerName))
+        {
+            return uint64(0);
+        }
+
+        if (Player* player = ObjectAccessor::FindPlayerByName(playerName.c_str()))
+        {
+            return player->GetGUID();
+        }
+        else
+        {
+            if (uint64 guid = sObjectMgr->GetPlayerGUIDByName(playerName))
+            {
+                return guid;
+            }
+            else
+            {
+                return uint64(0); // no player - again, cheating?
+            }
+        }
+    };
+
+    uint64 guid1 = getGuid(playerName1);
+    uint64 guid2 = getGuid(playerName2);
+
+    if(!guid1 || !guid2)
+    {
+        SendPartyResult(PARTY_OP_SWAP, playerName1, ERR_GROUP_SWAP_FAILED);
+        return;
+    }
+
+    uint8 groupId1 = group->GetMemberGroup(guid1);
+    uint8 groupId2 = group->GetMemberGroup(guid2);
+
+    if (groupId1 == MAX_RAID_SUBGROUPS + 1 || groupId2 == MAX_RAID_SUBGROUPS + 1)
+    {
+        return;
+    }
+
+    if (groupId1 == groupId2)
+    {
+        return;
+    }
+
+    group->ChangeMembersGroup(guid1, groupId2);
+    group->ChangeMembersGroup(guid2, groupId1);
+}
