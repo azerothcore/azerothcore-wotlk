@@ -158,7 +158,7 @@ class npc_og_suit : public CreatureScript
                 }
                 if (npc_og_suitAI* pEscortAI = CAST_AI(npc_og_suitAI, me->AI()))
                 {
-                    if (variation == 5) 
+                    if (variation == 5)
                     {
                         pEscortAI->Start(true, true, 0, nullptr, false, true);
                     }
@@ -1584,7 +1584,7 @@ class npc_og_mekkatorque : public CreatureScript
                                 pPlayer->SendUpdateWorldState(Worldstates[n], 0);
                     }
                 }
-            } 
+            }
 
             void UpdateBannerState(float radius)
             {
@@ -1611,7 +1611,7 @@ class npc_og_mekkatorque : public CreatureScript
                 {
                     for (std::list<uint64>::const_iterator itr = SummonsGUID.begin(); itr != SummonsGUID.end(); ++itr)
                         if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                            summon->DisappearAndDie(); 
+                            summon->DisappearAndDie();
                     SummonsGUID.clear();
                 }
                 if (!BannerList.empty())
@@ -1631,9 +1631,9 @@ class npc_og_mekkatorque : public CreatureScript
 typedef npc_og_mekkatorque::npc_og_mekkatorqueAI MekkAI;
 
         bool OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const* /*pQuest*/) override
-        { 
+        {
                 if (!bProcessing)
-                { 
+                {
                     CAST_AI(MekkAI, pCreature->AI())->pEscortPlayer = pPlayer;
                     pCreature->MonsterSay(MEK_1_1, LANG_UNIVERSAL, NULL);
                     CAST_AI(MekkAI, pCreature->AI())->DoPlaySoundToSet(pCreature, SOUND_MEK_1);
@@ -1649,7 +1649,7 @@ typedef npc_og_mekkatorque::npc_og_mekkatorqueAI MekkAI;
                             CAST_AI(npc_og_i_tank::npc_og_i_tankAI, p_iTank->AI())->SetupMovement(n-1);
                     CAST_AI(MekkAI, pCreature->AI())->JumpToNextStep(4000);
                     bProcessing = true;
-                } 
+                }
             return true;
         }
 
@@ -2549,7 +2549,7 @@ void AddSC_operation_gnomeregan()
     new npc_og_camera_vehicle;
     new npc_og_mekkatorque;
     new npc_og_assistants;
-    new npc_og_i_infantry; 
+    new npc_og_i_infantry;
     new npc_og_infantry;
     new npc_og_boltcog;
     new npc_og_cannon;
