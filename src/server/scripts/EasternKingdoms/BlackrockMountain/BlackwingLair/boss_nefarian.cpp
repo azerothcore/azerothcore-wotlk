@@ -468,8 +468,11 @@ public:
                 me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
                 for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
                     (*itr)->DespawnOrUnsummon();
-
-            } else DespawnTimer -= diff;
+            } 
+            else 
+            {
+                DespawnTimer -= diff;
+            }
 
             if (!UpdateVictim())
                 return;
@@ -588,7 +591,6 @@ public:
         bool canDespawn;
         uint32 DespawnTimer;
         bool Phase3;
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override

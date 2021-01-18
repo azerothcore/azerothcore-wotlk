@@ -3551,9 +3551,9 @@ void AuraEffect::HandleModStateImmunityMask(AuraApplication const* aurApp, uint8
             aura_immunity_list.push_back(SPELL_AURA_MOD_POSSESS);
         }
         // UNK
-        if ((GetMiscValue() & (1 << 8)))
-        {
-        }
+        // if ((GetMiscValue() & (1 << 8)))
+        // {
+        // }
         // Fear, OK
         if (GetMiscValue() & (1 << 9))
         {
@@ -6328,7 +6328,6 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
     if (caster)
         caster->SendSpellNonMeleeDamageLog(target, GetId(), damage + absorb + resist, GetSpellInfo()->GetSchoolMask(), absorb, resist, false, 0, crit);
 
-
     int32 new_damage;
 
     new_damage = Unit::DealDamage(caster, target, damage, &cleanDamage, DOT, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), false);
@@ -6823,7 +6822,6 @@ void AuraEffect::HandleRaidProcFromChargeAuraProc(AuraApplication* aurApp, ProcE
 #endif
     target->CastSpell(target, triggerSpellId, true, NULL, this, GetCasterGUID());
 }
-
 
 void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurApp, ProcEventInfo& /*eventInfo*/)
 {
