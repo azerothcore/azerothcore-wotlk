@@ -1166,13 +1166,25 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, LineOfSightChecks che
     if (!IsInMap(obj))
         return false;
 
-    float x, y, z;
+    float ox, oy, oz;
     if (obj->GetTypeId() == TYPEID_PLAYER)
-        obj->GetPosition(x, y, z);
+    {
+        obj->GetPosition(ox, oy, oz);
+        oz += GetCollisionHeight();
+    }
     else
-        obj->GetHitSpherePointFor(GetPosition(), x, y, z);
+        obj->GetHitSpherePointFor({ GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight() }, ox, oy, oz);
 
-    return IsWithinLOS(x, y, z, checks);
+    float x, y, z;
+    if (GetTypeId() == TYPEID_PLAYER)
+    {
+        GetPosition(x, y, z);
+        z += GetCollisionHeight();
+    }
+    else
+        GetHitSpherePointFor({ obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ() + obj->GetCollisionHeight() }, x, y, z);
+
+    return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks);
 }
 
 void WorldObject::GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z) const
