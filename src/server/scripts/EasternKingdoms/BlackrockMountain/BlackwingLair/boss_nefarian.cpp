@@ -162,7 +162,7 @@ public:
         {
             Initialize();
         }
-        
+
         void Initialize()
         {
             SpawnedAdds = 0;
@@ -202,7 +202,7 @@ public:
             me->setFaction(103);
             me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
             DoCast(me, SPELL_NEFARIANS_BARRIER);
-            me->SetStandState(UNIT_STAND_STATE_STAND); 
+            me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             AttackStart(target);
             events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 10000));
@@ -267,9 +267,9 @@ public:
                             if (Unit* player = me->SelectNearestPlayer(60.0f))
                             {
                                 me->SetFacingToObject(player);
-                                Talk(SAY_SUCCESS); 
+                                Talk(SAY_SUCCESS);
                                 if (GameObject* portcullis1 = me->FindNearestGameObject(GO_PORTCULLIS_ACTIVE, 65.0f))
-                                    portcullis1->SetGoState(GO_STATE_ACTIVE); 
+                                    portcullis1->SetGoState(GO_STATE_ACTIVE);
                                 if (GameObject* portcullis2 = me->FindNearestGameObject(GO_PORTCULLIS_TOBOSSROOMS, 80.0f))
                                     portcullis2->SetGoState(GO_STATE_ACTIVE);
                             }
@@ -343,7 +343,7 @@ public:
                                 {
                                     if (Creature* nefarian = me->SummonCreature(NPC_NEFARIAN, NefarianLoc[0]))
                                     {
-                                        nefarian->setActive(true); 
+                                        nefarian->setActive(true);
                                         nefarian->SetCanFly(true);
                                         nefarian->SetDisableGravity(true);
                                         nefarian->CastSpell(nullptr, SPELL_SHADOWFLAME_INITIAL);
@@ -468,8 +468,8 @@ public:
                 me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
                 for (std::list<Creature*>::const_iterator itr = constructList.begin(); itr != constructList.end(); ++itr)
                     (*itr)->DespawnOrUnsummon();
-            } 
-            else 
+            }
+            else
             {
                 DespawnTimer -= diff;
             }
