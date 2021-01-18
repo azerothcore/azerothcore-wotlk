@@ -553,7 +553,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-
             if (!sWorld->getBoolConfig(CONFIG_MINIGOB_MANABONK))
                 return;
 
@@ -620,7 +619,6 @@ public:
     {
         npc_dalaran_mageAI(Creature* creature) : ScriptedAI(creature)
         {
-
         }
 
         uint32 CoC_Timer;
@@ -649,9 +647,9 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
         }
+
         void UpdateAI(uint32 diff) override
         {
-
             if (!UpdateVictim())
                 return;
 
@@ -711,7 +709,6 @@ public:
     };
 };
 
-
 class npc_dalaran_warrior : public CreatureScript
 {
 public:
@@ -754,7 +751,6 @@ public:
         }
         void UpdateAI(uint32 diff) override
         {
-
             if (!UpdateVictim())
                 return;
 
