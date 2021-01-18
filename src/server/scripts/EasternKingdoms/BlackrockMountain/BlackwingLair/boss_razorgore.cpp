@@ -189,7 +189,7 @@ public:
 
                     GetCaster()->GetAI()->DoAction(TALK_EGG_BROKEN_RAND);
                     egg->SetLootState(GO_READY);
-                    egg->UseDoorOrButton(10000); 
+                    egg->UseDoorOrButton(10000);
                 }
         }
 
