@@ -146,7 +146,7 @@ public:
                     if (me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FORCEFUL_SMASH, false);
-                        
+
                         events.RescheduleEvent(EVENT_SPELL_UNHOLY_POWER, 1000);
                         break;
                     }
@@ -156,7 +156,7 @@ public:
                     Talk(SAY_SMASH);
                     Talk(EMOTE_SMASH);
                     me->CastSpell(me, SPELL_UNHOLY_POWER, false);
-                    
+
                     events.ScheduleEvent(EVENT_SPELL_FORCEFUL_SMASH, urand(40000, 48000));
                     break;
                 case EVENT_SPELL_OVERLORDS_BRAND:

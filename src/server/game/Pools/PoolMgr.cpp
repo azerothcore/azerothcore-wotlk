@@ -942,7 +942,6 @@ void PoolMgr::LoadFromDB()
 
 void PoolMgr::LoadQuestPools()
 {
-
 }
 
 void PoolMgr::SaveQuestsToDB(bool daily, bool weekly, bool other)

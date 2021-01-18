@@ -39,8 +39,8 @@ enum ChatNotify
     CHAT_MODE_CHANGE_NOTICE           = 0x0C,           //?
     CHAT_ANNOUNCEMENTS_ON_NOTICE      = 0x0D,           //+ "[%s] Channel announcements enabled by %s.";
     CHAT_ANNOUNCEMENTS_OFF_NOTICE     = 0x0E,           //+ "[%s] Channel announcements disabled by %s.";
-    // CHAT_MODERATION_ON_NOTICE         = 0x0F,           //+ "[%s] Channel moderation enabled by %s.";
-    // CHAT_MODERATION_OFF_NOTICE        = 0x10,           //+ "[%s] Channel moderation disabled by %s.";
+    CHAT_MODERATION_ON_NOTICE         = 0x0F,           //+ "[%s] Channel moderation enabled by %s.";
+    CHAT_MODERATION_OFF_NOTICE        = 0x10,           //+ "[%s] Channel moderation disabled by %s.";
     CHAT_MUTED_NOTICE                 = 0x11,           //+ "[%s] You do not have permission to speak.";
     CHAT_PLAYER_KICKED_NOTICE         = 0x12,           //? "[%s] Player %s kicked by %s.";
     CHAT_BANNED_NOTICE                = 0x13,           //+ "[%s] You are bannedStore from that channel.";
@@ -139,7 +139,7 @@ class Channel
     {
         uint64 player;
         uint8 flags;
-        uint32 lastSpeakTime; // pussywizard
+        uint64 lastSpeakTime; // pussywizard
         Player* plrPtr; // pussywizard
 
         bool HasFlag(uint8 flag) const { return flags & flag; }
@@ -164,9 +164,9 @@ class Channel
             if (state) flags |= MEMBER_FLAG_MUTED;
             else flags &= ~MEMBER_FLAG_MUTED;
         }
-        bool IsAllowedToSpeak(uint32 speakDelay) // pussywizard
+        bool IsAllowedToSpeak(uint64 speakDelay) // pussywizard
         {
-            if (lastSpeakTime + speakDelay <= sWorld->GetGameTime())
+            if (lastSpeakTime + speakDelay <= static_cast<uint64>(sWorld->GetGameTime()))
             {
                 lastSpeakTime = sWorld->GetGameTime();
                 return true;
@@ -219,6 +219,7 @@ public:
     void LeaveNotify(Player* p);
     void FlagsNotify(Player* p);
     static void CleanOldChannelsInDB();
+    void ToggleModeration(Player* p);
 
     // pussywizard:
     void AddWatching(Player* p);
@@ -262,6 +263,8 @@ private:
     void MakeNotInLfg(WorldPacket* data);                                   //? 0x21
     void MakeVoiceOn(WorldPacket* data, uint64 guid);                       //+ 0x22
     void MakeVoiceOff(WorldPacket* data, uint64 guid);                      //+ 0x23
+    void MakeModerationOn(WorldPacket* data, uint64 guid);
+    void MakeModerationOff(WorldPacket* data, uint64 guid);
 
     void SendToAll(WorldPacket* data, uint64 guid = 0);
     void SendToAllButOne(WorldPacket* data, uint64 who);
@@ -317,6 +320,7 @@ private:
     typedef std::unordered_set<Player*> PlayersWatchingContainer;
 
     bool _announce;
+    bool _moderation;
     bool _ownership;
     bool _IsSaved;
     bool _isOwnerGM;
@@ -333,4 +337,3 @@ private:
     PlayersWatchingContainer playersWatchingStore;
 };
 #endif
-

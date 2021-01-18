@@ -202,7 +202,7 @@ public:
                     me->SetReactState(REACT_AGGRESSIVE);
                     if (!UpdateVictim())
                         return;
-                    
+
                     break;
                 case EVENT_SPECIAL:
                     switch(urand(0, 2))
@@ -315,7 +315,7 @@ public:
                             c->AI()->Reset();
                         }
                     }
-                    
+
                     events.RescheduleEvent(1, 3000);
                     break;
                 case 1:
@@ -335,7 +335,7 @@ public:
                             if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_GUARD_1_GUID + i)))
                                 c->DespawnOrUnsummon();
                     }
-                    
+
                     events.RescheduleEvent(2, 7000);
                     break;
                 case 2:
@@ -350,12 +350,12 @@ public:
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_LEADER_FIRST_GUID)))
                             c->AI()->Talk(c->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_1 : SAY_SYLVANAS_KRICK_1);
                     }
-                    
+
                     events.RescheduleEvent(3, 6500);
                     break;
                 case 3:
                     Talk(SAY_OUTRO_KRICK_2);
-                    
+
                     events.RescheduleEvent(4, 17000);
                     break;
                 case 4:
@@ -366,12 +366,12 @@ public:
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_LEADER_FIRST_GUID)))
                             c->AI()->Talk(c->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_2 : SAY_SYLVANAS_KRICK_2);
                     }
-                    
+
                     events.RescheduleEvent(5, 6500);
                     break;
                 case 5:
                     Talk(SAY_OUTRO_KRICK_3);
-                    
+
                     events.RescheduleEvent(6, 6500);
                     break;
                 case 6:
@@ -381,7 +381,7 @@ public:
                             c->SetFacingToObject(me);
                             c->AI()->Talk(SAY_TYRANNUS_KRICK_1);
                         }
-                    
+
                     events.RescheduleEvent(7, 4000);
                     break;
                 case 7:
@@ -392,12 +392,11 @@ public:
                     me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MoveTakeoff(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 9.0f, 0.5f * 7.0f);
 
-                    
                     events.RescheduleEvent(8, 2000);
                     break;
                 case 8:
                     Talk(SAY_OUTRO_KRICK_4);
-                    
+
                     events.RescheduleEvent(9, 1500);
                     break;
                 case 9:
@@ -415,14 +414,14 @@ public:
 
                     me->RemoveAllAuras();
                     me->GetMotionMaster()->MoveFall(0, true);
-                    
+
                     events.RescheduleEvent(10, 5000);
                     break;
                 case 10:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_KRICK_2);
-                    
+
                     events.RescheduleEvent(11, 9000);
                     break;
                 case 11:
@@ -438,7 +437,7 @@ public:
                     }
                     me->setActive(false);
                     Unit::Kill(me, me);
-                    
+
                     break;
             }
         }

@@ -181,7 +181,6 @@ enum MalygosLightOverrides
     LIGHT_OBSCURE_ARCANE_RUNES       = 1825,
 };
 
-
 class boss_malygos : public CreatureScript
 {
 public:
@@ -378,7 +377,7 @@ public:
                 case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     Talk(EMOTE_BERSERK);
-                    
+
                     break;
                 case EVENT_INTRO_MOVE_CENTER:
                     {
@@ -537,7 +536,7 @@ public:
                     }
                 case EVENT_VORTEX_LAND_0:
                     me->GetMotionMaster()->MoveLand(MI_POINT_VORTEX_LAND, CenterPos, 7.0f);
-                    
+
                     break;
                 case EVENT_VORTEX_LAND_1:
                     {
@@ -842,7 +841,6 @@ public:
     };
 };
 
-
 #define VORTEX_DEFAULT_DIFF 250
 #define VORTEX_TRAVEL_TIME 3000
 //#define VORTEX_RADIUS 25.0f
@@ -945,7 +943,6 @@ public:
     };
 };
 
-
 class npc_power_spark : public CreatureScript
 {
 public:
@@ -1042,7 +1039,6 @@ public:
     };
 };
 
-
 class npc_nexus_lord : public CreatureScript
 {
 public:
@@ -1136,7 +1132,6 @@ public:
     };
 };
 
-
 class npc_scion_of_eternity : public CreatureScript
 {
 public:
@@ -1210,7 +1205,6 @@ public:
         void AttackStart(Unit*  /*who*/) override {}
     };
 };
-
 
 class npc_hover_disk : public CreatureScript
 {
@@ -1354,7 +1348,6 @@ public:
     };
 };
 
-
 class npc_alexstrasza : public CreatureScript
 {
 public:
@@ -1412,7 +1405,6 @@ public:
     };
 };
 
-
 class npc_eoe_wyrmrest_skytalon : public CreatureScript
 {
 public:
@@ -1449,7 +1441,6 @@ public:
     };
 };
 
-
 class go_the_focusing_iris : public GameObjectScript
 {
 public:
@@ -1466,7 +1457,6 @@ public:
         return true;
     }
 };
-
 
 class spell_eoe_ph3_surge_of_power : public SpellScriptLoader
 {
@@ -1524,7 +1514,6 @@ public:
         return new spell_eoe_ph3_surge_of_power_SpellScript();
     }
 };
-
 
 void AddSC_boss_malygos()
 {
