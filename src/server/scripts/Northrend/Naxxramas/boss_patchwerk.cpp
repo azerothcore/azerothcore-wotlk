@@ -111,8 +111,7 @@ public:
             {
                 case EVENT_SPELL_HATEFUL_STRIKE:
                     {
-                        //Cast Hateful strike on the player with the highest
-                        //amount of HP within melee distance, and second threat amount
+                        // Cast Hateful strike on the player with the highest amount of HP within melee distance, and second threat amount
                         std::list<Unit*> meleeRangeTargets;
                         Unit* finalTarget = nullptr;
                         uint8 counter = 0;
