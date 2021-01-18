@@ -198,17 +198,14 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         }
     }
 
-    // no need to build a path if the creature is flying or swimming the entire path
-    if (Unit const* _sourceUnit = _source->ToUnit()) {
-        bool noPath = (//_source->GetMap()->IsUnderWater(startPos.x, startPos.y, startPos.z) &&
-            _source->GetMap()->IsUnderWater(endPos.x, endPos.y, endPos.z) &&
-            _sourceUnit->CanSwim() && _sourceUnit->isSwimming()) || _sourceUnit->IsFlying();
-        if (noPath) {
-            BuildShortcut();
+    // no need to build a path if the creature is swimming the entire path
+    if (Unit const* _sourceUnit = _source->ToUnit(); _source->GetMap()->IsInWater(startPos.x, startPos.y, startPos.z) &&
+        _source->GetMap()->IsInWater(endPos.x, endPos.y, endPos.z ) &&
+        _sourceUnit->CanSwim() && _sourceUnit->isSwimming()) {
+        BuildShortcut();
             _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
             return;
         }
-    }
 
     // we may need a better number here
     bool startFarFromPoly = distToStartPoly > 7.0f;
@@ -217,19 +214,6 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
     {
         bool buildShotrcut = false;
 
-        G3D::Vector3 const& p = (distToStartPoly > 7.0f) ? startPos : endPos;
-        if (_source->GetMap()->IsUnderWater(p.x, p.y, p.z))
-        {
-            if (Unit const* _sourceUnit = _source->ToUnit())
-            {
-                if (_sourceUnit->CanSwim())
-                {
-                    buildShotrcut = true;
-                }
-            }
-        }
-        else
-        {
             if (Unit const* _sourceUnit = _source->ToUnit())
             {
                 if (_sourceUnit->CanFly())
@@ -242,7 +226,6 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
                     buildShotrcut = true;
                 }
             }
-        }
 
         if (buildShotrcut)
         {
@@ -622,8 +605,29 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
 
 void PathGenerator::NormalizePath()
 {
-    for (uint32 i = 0; i < _pathPoints.size(); ++i)
+    uint32 last = _pathPoints.size() -1;
+    float lastX=_pathPoints[last].x, lastY=_pathPoints[last].y, lastZ=_pathPoints[last].z;
+    float prevX=_pathPoints[0].x, prevY=_pathPoints[0].y, prevZ=_pathPoints[0].z;
+    _source->UpdateAllowedPositionZ(_pathPoints[0].x, _pathPoints[0].y, _pathPoints[0].z);
+
+    for (uint32 i = 1; i < _pathPoints.size(); ++i)
     {
+        float nextX=_pathPoints[i].x, nextY=_pathPoints[i].y, nextZ=_pathPoints[i].z;
+        Unit const* unit = _source->ToUnit();
+        bool goSwim = unit && unit->CanSwim() && unit->GetMap()->IsUnderWater(prevX, prevY, prevZ) && unit->GetMap()->IsUnderWater(nextX, nextY, nextZ);
+        float groundZ = unit->GetMapWaterOrGroundLevel(nextX, nextY, nextZ);
+        bool goFly = unit && unit->CanFly() && G3D::fuzzyGt(nextZ, groundZ + GROUND_HEIGHT_TOLERANCE);
+        bool noGravity = goSwim || goFly;
+        if (noGravity && (G3D::fuzzyGe(lastZ, groundZ) || G3D::fuzzyGe(nextZ, prevZ)))
+    {
+            _pathPoints[i].z = std::fmaxf(nextZ, unit->GetPositionZ());
+            continue;
+        }
+
+        prevX=nextX;
+        prevY=nextY;
+        prevZ=nextZ;
+
         _source->UpdateAllowedPositionZ(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z);
     }
 }
