@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 enum eSpells
 {
     // quests
@@ -24,7 +24,7 @@ enum eSpells
     SPELL_DANCE_CREDIT          = 73830,
     SPELL_ROAR_CREDIT           = 73832,
     SPELL_CHEER_CREDIT          = 73833,
-    
+
     // Prepping the Speech
     SPELL_CREATE_TELEPORTER     = 74206,
     SPELL_CREDIT_OZZIE          = 74154,
@@ -360,12 +360,12 @@ const Position BragBotSpawn[2] =
     {-4933.62f, 717.18f, 261.65f, 1.6f}
 };
 
-const uint32 Worldstates[15] = 
+const uint32 Worldstates[15] =
 {
     4981,
     5027,
     5040,
-    5018,                      
+    5018,
     5039,
     5044,
     5006,
@@ -386,16 +386,16 @@ const Position TroggSpawn               = {-5181.74f, 631.21f, 398.54f, 4.7f};
 
 const Position ExplosionBunnySpawn      = {-5183.24f, 608.97f, 410.89f, 4.7f};
 
-// Texts in Prepping the Speech 
+// Texts in Prepping the Speech
 enum MEK_T
 {
     MEK1_0_0 = 0,
     MEK1_0_1,
-    MEK1_0_2, 
-    MEK1_0_3, 
-    MEK1_0_4, 
-    MEK1_0_5, 
-    MEK1_0_6, 
+    MEK1_0_2,
+    MEK1_0_3,
+    MEK1_0_4,
+    MEK1_0_5,
+    MEK1_0_6,
     MEK1_0_7,
 
     MEK1_REPLY = 0,
