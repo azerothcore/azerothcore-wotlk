@@ -1,3 +1,19 @@
+-- DB update 2021_01_18_03 -> 2021_01_19_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_18_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_18_03 2021_01_19_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1608817912001240800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1608817912001240800');
 
 UPDATE `quest_template_locale` SET `ObjectiveText1`='Iniciado indigno dominado' WHERE `ID`=12848 AND `locale` IN ('esEs', 'esMX');
@@ -354,3 +370,12 @@ DELETE FROM `quest_offer_reward_locale` WHERE `ID`=13188 AND `locale` IN ('esES'
 INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES 
 (13188, 'esES', '<Varian Wrynn mira a la distancia.>$B$BClaro, viejo amigo... Sangre y honor.$B$B<Varian Wrynn fija su mirada en ti.>$B$BSi no fuera por esta carta de Tirion, llevarías grilletes. Solo la protección de uno de los más grandes paladines que han existido podría asegurar tu supervivencia.$B$BNosotros... lucharemos juntos contra la Plaga. ¡Contra el Rey Exánime!$B$B¡GLORIA A LA ALIANZA!', 18019),
 (13188, 'esMX', '<Varian Wrynn mira a la distancia.>$B$BClaro, viejo amigo... Sangre y honor.$B$B<Varian Wrynn fija su mirada en ti.>$B$BSi no fuera por esta carta de Tirion, llevarías grilletes. Solo la protección de uno de los más grandes paladines que han existido podría asegurar tu supervivencia.$B$BNosotros... lucharemos juntos contra la Plaga. ¡Contra el Rey Exánime!$B$B¡GLORIA A LA ALIANZA!', 18019);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
