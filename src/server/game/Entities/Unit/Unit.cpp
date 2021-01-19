@@ -2290,19 +2290,17 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return nullptr;
     }
 
-    double radius = attackerSize > refUnit->GetCollisionWidth() ? attackerSize / 2.0f : refUnit->GetCollisionWidth() / 2.0f;
-
     int8 direction = (urand(0, 1) ? -1 : 1);
 
-    float angularRadius = 2.0f * atan(attackerSize / (2.0f * sqrt(meleeReach)));
+    float angularRadius = 2.0f * atan(attackerSize / (2.0f * sqrt(meleeReach))) + frand(0.1f,0.3f);
     double angle = currentAngle + angularRadius * direction; // or fallback to the simpler method
 
     float x, y, z;
-    GetNearPoint(this, x, y, z, attackerSize, 0.0f, angle);
-
+    GetNearPoint(attacker, x, y, z, meleeReach, 0.0f, angle);
+    
     if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z, true, true, false))
     {
-        GetNearPoint(this, x, y, z, attackerSize, 0.0f, angle * -1); // try the other side
+        GetNearPoint(attacker, x, y, z, meleeReach, 0.0f, angle * -1); // try the other side
 
         if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z, true, true, false))
         {
