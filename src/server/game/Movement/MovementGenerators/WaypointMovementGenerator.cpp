@@ -162,7 +162,7 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
     creature->UpdateAllowedPositionZ(node->x, node->y, z);
     //! Do not use formationDest here, MoveTo requires transport offsets due to DisableTransportPathTransformations() call
     //! but formationDest contains global coordinates
-    init.MoveTo(node->x, node->y, z, true);
+    init.MoveTo(node->x, node->y, z, true, true);
 
     //! Accepts angles such as 0.00001 and -0.00001, 0 must be ignored, default value in waypoint table
     if (node->orientation && node->delay)

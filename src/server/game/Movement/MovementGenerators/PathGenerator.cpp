@@ -616,6 +616,7 @@ void PathGenerator::NormalizePath()
         Unit const* unit = _source->ToUnit();
         bool goSwim = unit && unit->CanSwim() && unit->GetMap()->IsUnderWater(prevX, prevY, prevZ) && unit->GetMap()->IsUnderWater(nextX, nextY, nextZ);
         float groundZ = unit->GetMapWaterOrGroundLevel(nextX, nextY, nextZ);
+        // under water the creature can follow a path but should not stick to the ground
         if (goSwim && (G3D::fuzzyGe(lastZ, groundZ) || G3D::fuzzyGe(nextZ, prevZ)))
         {
             _pathPoints[i].z = std::fmaxf(nextZ, unit->GetPositionZ());
