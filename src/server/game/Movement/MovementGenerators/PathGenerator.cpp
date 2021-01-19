@@ -616,10 +616,8 @@ void PathGenerator::NormalizePath()
         Unit const* unit = _source->ToUnit();
         bool goSwim = unit && unit->CanSwim() && unit->GetMap()->IsUnderWater(prevX, prevY, prevZ) && unit->GetMap()->IsUnderWater(nextX, nextY, nextZ);
         float groundZ = unit->GetMapWaterOrGroundLevel(nextX, nextY, nextZ);
-        bool goFly = unit && unit->CanFly() && G3D::fuzzyGt(nextZ, groundZ + GROUND_HEIGHT_TOLERANCE);
-        bool noGravity = goSwim || goFly;
-        if (noGravity && (G3D::fuzzyGe(lastZ, groundZ) || G3D::fuzzyGe(nextZ, prevZ)))
-    {
+        if (goSwim && (G3D::fuzzyGe(lastZ, groundZ) || G3D::fuzzyGe(nextZ, prevZ)))
+        {
             _pathPoints[i].z = std::fmaxf(nextZ, unit->GetPositionZ());
             continue;
         }
