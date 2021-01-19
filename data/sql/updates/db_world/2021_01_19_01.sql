@@ -1,3 +1,19 @@
+-- DB update 2021_01_19_00 -> 2021_01_19_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_19_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_19_00 2021_01_19_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1607503600897995800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1607503600897995800');
 
 DELETE FROM `quest_offer_reward_locale` WHERE `ID` IN (783, 5261, 33, 18, 6, 3903, 3904, 3905, 15, 21, 3105, 3101, 3102, 3103, 3100, 3104, 5623, 5624, 54, 2158, 47, 60, 61, 1097, 62, 76, 40, 239, 11, 176, 35, 52, 83, 5545, 37, 45, 71, 39, 59, 46, 106, 111, 107, 114, 88, 85, 86, 84, 87, 16) AND `locale` IN ('esES');
@@ -182,3 +198,12 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (87,'esMX','Hola $N. ¿Has encontrado mi collar?',18019),
 (16,'esMX','Cultivar es un trabajo sediento, y siempre estoy buscando agua de mamantial refrescante.$B$BSi tienes agua, entonces estoy dispuesto a hacer un intercambio.',18019);
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
