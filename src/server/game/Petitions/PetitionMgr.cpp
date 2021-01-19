@@ -8,7 +8,6 @@ Xinef
 #include "Log.h"
 #include "DatabaseEnv.h"
 
-
 PetitionMgr::PetitionMgr()
 {
 }
@@ -163,5 +162,3 @@ void PetitionMgr::RemoveSignaturesByPlayerAndType(uint32 playerGuid, uint8 type)
             itr->second.signatureMap.erase(signItr);
     }
 }
-
-

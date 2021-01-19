@@ -364,7 +364,7 @@ protected:
         int numBVH2{0};
 
     public:
-        BuildStats() 
+        BuildStats()
         {
             for (int & i : numLeavesN) i = 0;
         }

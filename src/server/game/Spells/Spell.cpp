@@ -263,7 +263,6 @@ GameObject* SpellCastTargets::GetGOTarget() const
     return nullptr;
 }
 
-
 void SpellCastTargets::SetGOTarget(GameObject* target)
 {
     if (!target)
@@ -785,7 +784,6 @@ void Spell::SelectExplicitTargets()
                 m_targets.SetUnitTarget(redirect);
                 m_spellFlags |= SPELL_FLAG_REDIRECTED;
             }
-
         }
     }
 }
@@ -1816,7 +1814,6 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
         return;
 
     float srcToDestDelta = m_targets.GetDstPos()->m_positionZ - m_targets.GetSrcPos()->m_positionZ;
-
 
     // xinef: supply correct target type, DEST_DEST and similar are ALWAYS undefined
     // xinef: correct target is stored in TRIGGERED SPELL, however as far as i noticed, all checks are ENTRY, ENEMY
@@ -3406,7 +3403,6 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
         finish(false);
         return SPELL_FAILED_SPELL_IN_PROGRESS;
     }
-
 
     LoadScripts();
 
@@ -5356,7 +5352,6 @@ SpellCastResult Spell::CheckCast(bool strict)
             return SPELL_FAILED_NOT_READY;
     }
 
-
     if (m_spellInfo->HasAttribute(SPELL_ATTR7_IS_CHEAT_SPELL) && !m_caster->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS))
     {
         m_customError = SPELL_CUSTOM_ERROR_GM_ONLY;
@@ -5481,7 +5476,6 @@ SpellCastResult Spell::CheckCast(bool strict)
             return SPELL_FAILED_MOVING;
     }
 
-
     Vehicle* vehicle = m_caster->GetVehicle();
     if (vehicle && !(_triggeredCastFlags & TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE))
     {
@@ -5594,7 +5588,6 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
             break;
         }
-
     }
     // Spell casted only on battleground
     if (m_spellInfo->HasAttribute(SPELL_ATTR3_BATTLEGROUND) &&  m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -6702,10 +6695,11 @@ SpellCastResult Spell::CheckPower()
 
 SpellCastResult Spell::CheckItems()
 {
-    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+    Player* player = m_caster->ToPlayer();
+    if (!player)
+    {
         return SPELL_CAST_OK;
-
-    Player* p_caster = m_caster->ToPlayer();
+    }
 
     if (!m_CastItem)
     {
@@ -6715,7 +6709,7 @@ SpellCastResult Spell::CheckItems()
     else
     {
         uint32 itemid = m_CastItem->GetEntry();
-        if (!p_caster->HasItemCount(itemid))
+        if (!player->HasItemCount(itemid))
             return SPELL_FAILED_ITEM_NOT_READY;
 
         ItemTemplate const* proto = m_CastItem->GetTemplate();
@@ -6803,7 +6797,7 @@ SpellCastResult Spell::CheckItems()
     // do not take reagents for these item casts
     if (!(m_CastItem && m_CastItem->GetTemplate()->Flags & ITEM_FLAG_NO_REAGENT_COST))
     {
-        bool checkReagents = !(_triggeredCastFlags & TRIGGERED_IGNORE_POWER_AND_REAGENT_COST) && !p_caster->CanNoReagentCast(m_spellInfo);
+        bool checkReagents = !(_triggeredCastFlags & TRIGGERED_IGNORE_POWER_AND_REAGENT_COST) && !player->CanNoReagentCast(m_spellInfo);
         // Not own traded item (in trader trade slot) requires reagents even if triggered spell
         if (!checkReagents)
             if (Item* targetItem = m_targets.GetItemTarget())
@@ -6838,7 +6832,7 @@ SpellCastResult Spell::CheckItems()
                         }
                     }
                 }
-                if (!p_caster->HasItemCount(itemid, itemcount))
+                if (!player->HasItemCount(itemid, itemcount))
                     return SPELL_FAILED_REAGENTS;
             }
         }
@@ -6849,7 +6843,7 @@ SpellCastResult Spell::CheckItems()
         {
             if (m_spellInfo->Totem[i] != 0)
             {
-                if (p_caster->HasItemCount(m_spellInfo->Totem[i]))
+                if (player->HasItemCount(m_spellInfo->Totem[i]))
                 {
                     totems -= 1;
                     continue;
@@ -6867,7 +6861,7 @@ SpellCastResult Spell::CheckItems()
         {
             if (m_spellInfo->TotemCategory[i] != 0)
             {
-                if (p_caster->HasItemTotemCategory(m_spellInfo->TotemCategory[i]))
+                if (player->HasItemTotemCategory(m_spellInfo->TotemCategory[i]))
                 {
                     TotemCategory -= 1;
                     continue;
@@ -6902,7 +6896,7 @@ SpellCastResult Spell::CheckItems()
                             // TODO: Needs review
                             if (pProto && !(pProto->ItemLimitCategory))
                             {
-                                p_caster->SendEquipError(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
+                                player->SendEquipError(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
                                 return SPELL_FAILED_DONT_REPORT;
                             }
                             else
@@ -6911,11 +6905,11 @@ SpellCastResult Spell::CheckItems()
                                     return SPELL_FAILED_TOO_MANY_OF_ITEM;
                                 else if (!(target->ToPlayer()->HasItemCount(m_spellInfo->Effects[i].ItemType)))
                                 {
-                                    p_caster->SendEquipError(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
+                                    player->SendEquipError(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
                                     return SPELL_FAILED_DONT_REPORT;
                                 }
                                 else
-                                    p_caster->CastSpell(m_caster, m_spellInfo->Effects[EFFECT_1].CalcValue(), false);        // move this to anywhere
+                                    player->CastSpell(m_caster, m_spellInfo->Effects[EFFECT_1].CalcValue(), false);        // move this to anywhere
                                 return SPELL_FAILED_DONT_REPORT;
                             }
                         }
@@ -6933,10 +6927,10 @@ SpellCastResult Spell::CheckItems()
                     if (m_CastItem && m_CastItem->GetTemplate()->Flags & ITEM_FLAG_NO_REAGENT_COST)
                         return SPELL_FAILED_TOTEM_CATEGORY;
                     ItemPosCountVec dest;
-                    InventoryResult msg = p_caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, m_spellInfo->Effects[i].ItemType, 1);
+                    InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, m_spellInfo->Effects[i].ItemType, 1);
                     if (msg != EQUIP_ERR_OK)
                     {
-                        p_caster->SendEquipError(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
+                        player->SendEquipError(msg, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
                         return SPELL_FAILED_DONT_REPORT;
                     }
                 }
@@ -7049,7 +7043,7 @@ SpellCastResult Spell::CheckItems()
                     uint32 item_disenchantskilllevel = itemProto->RequiredDisenchantSkill;
                     if (item_disenchantskilllevel == uint32(-1))
                         return SPELL_FAILED_CANT_BE_DISENCHANTED;
-                    if (item_disenchantskilllevel > p_caster->GetSkillValue(SKILL_ENCHANTING))
+                    if (item_disenchantskilllevel > player->GetSkillValue(SKILL_ENCHANTING))
                         return SPELL_FAILED_LOW_CASTLEVEL;
                     if (item_quality > 4 || item_quality < 2)
                         return SPELL_FAILED_CANT_BE_DISENCHANTED;
@@ -7071,7 +7065,7 @@ SpellCastResult Spell::CheckItems()
                         return SPELL_FAILED_CANT_BE_PROSPECTED;
                     //Check for enough skill in jewelcrafting
                     uint32 item_prospectingskilllevel = m_targets.GetItemTarget()->GetTemplate()->RequiredSkillRank;
-                    if (item_prospectingskilllevel > p_caster->GetSkillValue(SKILL_JEWELCRAFTING))
+                    if (item_prospectingskilllevel > player->GetSkillValue(SKILL_JEWELCRAFTING))
                         return SPELL_FAILED_LOW_CASTLEVEL;
                     //make sure the player has the required ores in inventory
                     if (m_targets.GetItemTarget()->GetCount() < 5)
@@ -7094,7 +7088,7 @@ SpellCastResult Spell::CheckItems()
                         return SPELL_FAILED_CANT_BE_MILLED;
                     //Check for enough skill in inscription
                     uint32 item_millingskilllevel = m_targets.GetItemTarget()->GetTemplate()->RequiredSkillRank;
-                    if (item_millingskilllevel > p_caster->GetSkillValue(SKILL_INSCRIPTION))
+                    if (item_millingskilllevel > player->GetSkillValue(SKILL_INSCRIPTION))
                         return SPELL_FAILED_LOW_CASTLEVEL;
                     //make sure the player has the required herbs in inventory
                     if (m_targets.GetItemTarget()->GetCount() < 5)
@@ -7186,7 +7180,7 @@ SpellCastResult Spell::CheckItems()
                     if (!pProto)
                         return SPELL_FAILED_ITEM_AT_MAX_CHARGES;
 
-                    if (Item* pitem = p_caster->GetItemByEntry(item_id))
+                    if (Item* pitem = player->GetItemByEntry(item_id))
                     {
                         for (int x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
                             if (pProto->Spells[x].SpellCharges != 0 && pitem->GetSpellCharges(x) == pProto->Spells[x].SpellCharges)
@@ -8561,4 +8555,3 @@ namespace acore
     }
 
 } //namespace acore
-

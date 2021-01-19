@@ -85,7 +85,5 @@ public:
 
 private:
     struct bignum_st* _bn;
-
 };
 #endif
-
