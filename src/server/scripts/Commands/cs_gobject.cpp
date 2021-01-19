@@ -655,7 +655,6 @@ public:
 
         if (!object)
         {
-
             handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, abs(guidLow));
             handler->SetSentErrorMessage(true);
             return false;

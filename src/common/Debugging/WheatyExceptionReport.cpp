@@ -48,7 +48,6 @@ inline LPTSTR ErrorMessage(DWORD dw)
         sprintf(msgBuf, "Unknown error: %u", dw);
         return msgBuf;
     }
-
 }
 
 //============================== Global Variables =============================
@@ -794,7 +793,6 @@ void WheatyExceptionReport::WriteStackDetails(
                     &sip.si))                                       // Address of the SYMBOL_INFO structure (inside "sip" object)
         {
             Log(_T("%hs+%I64X"), sip.si.Name, symDisplacement);
-
         }
         else                                                // No symbol found.  Print out the logical address instead.
         {
@@ -837,7 +835,6 @@ void WheatyExceptionReport::WriteStackDetails(
             Log(_T("\r\n"));
         }
     }
-
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -853,7 +850,6 @@ BOOL CALLBACK WheatyExceptionReport::EnumerateSymbolsCallback(
     {
         ClearSymbols();
         FormatSymbolValue(pSymInfo, (STACKFRAME64*)UserContext);
-
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {

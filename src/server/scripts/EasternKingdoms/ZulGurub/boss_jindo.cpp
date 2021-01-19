@@ -175,7 +175,6 @@ public:
 class npc_healing_ward : public CreatureScript
 {
 public:
-
     npc_healing_ward()
         : CreatureScript("npc_healing_ward")
     {
@@ -227,7 +226,6 @@ public:
 class npc_shade_of_jindo : public CreatureScript
 {
 public:
-
     npc_shade_of_jindo()
         : CreatureScript("npc_shade_of_jindo")
     {
@@ -249,7 +247,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-
             //ShadowShock_Timer
             if (ShadowShock_Timer <= diff)
             {
