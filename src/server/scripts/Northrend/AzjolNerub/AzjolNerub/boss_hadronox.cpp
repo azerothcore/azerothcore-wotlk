@@ -180,7 +180,6 @@ public:
                     Talk(SAY_HADRONOX_EMOTE);
                     me->GetMotionMaster()->MoveCharge(hadronoxSteps[eventId - 1].GetPositionX(), hadronoxSteps[eventId - 1].GetPositionY(), hadronoxSteps[eventId - 1].GetPositionZ(), 10.0f, 0, NULL, true);
                     break;
-
             }
 
             DoMeleeAttackIfReady();

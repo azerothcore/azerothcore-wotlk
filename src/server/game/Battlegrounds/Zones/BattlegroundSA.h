@@ -501,7 +501,6 @@ public:
     bool notEvenAScratch(TeamId teamId) const { return _notEvenAScratch[teamId]; }
 
 private:
-
     /// Return gate id, relative to bg data, according to gameobject id
     uint32 GetGateIDFromEntry(uint32 id)
     {

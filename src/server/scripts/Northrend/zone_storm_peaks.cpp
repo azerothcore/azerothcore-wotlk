@@ -438,7 +438,6 @@ public:
                 }
                 else
                     Talk(2);
-
             }
         }
 
@@ -1029,7 +1028,6 @@ public:
 
     private:
         uint8 _counter;
-
     };
 
     AuraScript* GetAuraScript() const override

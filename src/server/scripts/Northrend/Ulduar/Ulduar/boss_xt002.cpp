@@ -391,7 +391,6 @@ public:
             // Disabled by stunned state
             DoMeleeAttackIfReady();
         }
-
     };
 };
 

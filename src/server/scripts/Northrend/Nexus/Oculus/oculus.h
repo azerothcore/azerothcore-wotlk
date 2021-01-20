@@ -9,6 +9,10 @@
 #include "SpellAuras.h"
 #include "SpellAuraEffects.h"
 
+Position const VerdisaPOS = { 949.056f, 1032.97f, 359.967f, 1.035795f };
+Position const BelgaristraszPOS = { 941.355f, 1044.26f,  359.967f, 0.222459f };
+Position const EternosPOS = { 943.202f, 1059.35f, 359.967f, 5.757278f };
+
 enum Data
 {
     DATA_DRAKOS,            // Drakos the Interrogator
@@ -45,6 +49,11 @@ enum NPCs
     NPC_IMAGE_OF_BELGARISTRASZ = 28012,
 };
 
+enum Talks
+{
+    SAY_BELGARISTRASZ = 0,
+};
+
 enum Items
 {
     ITEM_EMERALD_ESSENCE    = 37815,
@@ -78,4 +87,8 @@ enum OculusWorldStates
     WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT = 3486
 };
 
+enum MISC
+{
+    POINT_MOVE_DRAKES
+};
 #endif

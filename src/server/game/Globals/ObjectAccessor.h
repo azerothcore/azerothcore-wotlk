@@ -32,7 +32,6 @@ template <class T>
 class HashMapHolder
 {
 public:
-
     typedef std::unordered_map<uint64, T*> MapType;
     typedef ACE_RW_Thread_Mutex LockType;
 
@@ -60,7 +59,6 @@ public:
     static LockType* GetLock() { return &i_lock; }
 
 private:
-
     //Non instanceable only static
     HashMapHolder() = default;
 
