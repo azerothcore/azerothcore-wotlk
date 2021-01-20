@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '161059817563053770
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1610598175630537700');
 
-UPDATE `creature_template` SET `faction` = '1639', `unit_flags` = '4096', `flags_extra` = '0' WHERE `entry` = '17551';
+UPDATE `creature_template` SET `faction` = 1639, `unit_flags` = 4096, `flags_extra` = 0 WHERE `entry` = 17551;
 
 --
 -- END UPDATING QUERIES

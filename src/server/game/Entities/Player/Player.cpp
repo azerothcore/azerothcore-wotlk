@@ -10636,6 +10636,28 @@ Bag* Player::GetBagByPos(uint8 bag) const
     return nullptr;
 }
 
+uint32 Player::GetFreeInventorySpace() const
+{
+    uint32 freeSpace = 0;
+
+    // Check backpack
+    for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+    {
+        Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+        if (!item)
+            freeSpace += 1;
+    }
+
+    // Check bags
+    for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
+    {
+        if (Bag* bag = GetBagByPos(i))
+            freeSpace += bag->GetFreeSlots();
+    }
+
+    return freeSpace;
+}
+
 Item* Player::GetWeaponForAttack(WeaponAttackType attackType, bool useable /*= false*/) const
 {
     uint8 slot;
@@ -15854,7 +15876,7 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
     if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
     {
         // prepare Quest Tracker datas
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_TRACK);
+        auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_TRACK);
         stmt->setUInt32(0, quest_id);
         stmt->setUInt32(1, GetGUIDLow());
         stmt->setString(2, _HASH);
@@ -15871,31 +15893,35 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
 
 void Player::CompleteQuest(uint32 quest_id)
 {
-    if (quest_id)
+    if (!quest_id)
     {
-        SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
-
-        uint16 log_slot = FindQuestSlot(quest_id);
-        if (log_slot < MAX_QUEST_LOG_SIZE)
-            SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
-
-        Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id);
-        if (qInfo && qInfo->HasFlag(QUEST_FLAGS_TRACKING))
-        {
-            RewardQuest(qInfo, 0, this, false);
-        }
-
-        // Xinef: area auras may change on quest completion!
-        UpdateZoneDependentAuras(GetZoneId());
-        UpdateAreaDependentAuras(GetAreaId());
-        AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD | ADDITIONAL_SAVING_QUEST_STATUS);
+        return;
     }
+
+    SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
+
+    auto log_slot = FindQuestSlot(quest_id);
+    if (log_slot < MAX_QUEST_LOG_SIZE)
+    {
+        SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
+    }
+
+    Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id);
+    if (qInfo && qInfo->HasFlag(QUEST_FLAGS_TRACKING))
+    {
+        RewardQuest(qInfo, 0, this, false);
+    }
+
+    // Xinef: area auras may change on quest completion!
+    UpdateZoneDependentAuras(GetZoneId());
+    UpdateAreaDependentAuras(GetAreaId());
+    AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD | ADDITIONAL_SAVING_QUEST_STATUS);
 
     // check if Quest Tracker is enabled
     if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
     {
         // prepare Quest Tracker datas
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME);
+        auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME);
         stmt->setUInt32(0, quest_id);
         stmt->setUInt32(1, GetGUIDLow());
 
