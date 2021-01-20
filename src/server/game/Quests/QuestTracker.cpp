@@ -65,9 +65,11 @@ void QuestTracker::Update(uint32 diff)
 
 void QuestTracker::Execute()
 {
-    /// Insert section
-    //auto insertTrans = CharacterDatabase.BeginTransaction();
+    sLog->outString("> QuestTracker: Start Execute...");
 
+    uint32 msTimeStart = getMSTime();
+
+    /// Insert section
     for (auto const& [ID, CharacterLowGuid, Hash, Revision] : _questTrackStore)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_TRACK);
@@ -78,13 +80,11 @@ void QuestTracker::Execute()
         CharacterDatabase.Execute(stmt);
     }
 
-    //CharacterDatabase.CommitTransaction(insertTrans);
+    sLog->outString("> QuestTracker: Execute 'CHAR_INS_QUEST_TRACK' (%u)", static_cast<uint32>(_questTrackStore.size()));
 
     _questTrackStore.clear();
 
     // Update section
-    //auto updateTrans = CharacterDatabase.BeginTransaction();
-
     auto SendUpdateQuestTrack = [](CharacterDatabaseStatements stmtIndex, uint32 questID, uint32 characterLowGuid)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(stmtIndex);
@@ -96,17 +96,23 @@ void QuestTracker::Execute()
     for (auto const& [questID, characterLowGuid] : _questCompleteStore)
         SendUpdateQuestTrack(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME, questID, characterLowGuid);
 
+    sLog->outString("> QuestTracker: Execute 'CHAR_UPD_QUEST_TRACK_COMPLETE_TIME' (%u)", static_cast<uint32>(_questCompleteStore.size()));
+
     for (auto const& [questID, characterLowGuid] : _questAbandonStore)
         SendUpdateQuestTrack(CHAR_UPD_QUEST_TRACK_ABANDON_TIME, questID, characterLowGuid);
+
+    sLog->outString("> QuestTracker: Execute 'CHAR_UPD_QUEST_TRACK_ABANDON_TIME' (%u)", static_cast<uint32>(_questAbandonStore.size()));
 
     for (auto const& [questID, characterLowGuid] : _questGMCompleteStore)
         SendUpdateQuestTrack(CHAR_UPD_QUEST_TRACK_GM_COMPLETE, questID, characterLowGuid);
 
-    //CharacterDatabase.CommitTransaction(updateTrans);
+    sLog->outString("> QuestTracker: Execute 'CHAR_UPD_QUEST_TRACK_GM_COMPLETE' (%u)", static_cast<uint32>(_questGMCompleteStore.size()));
 
     _questCompleteStore.clear();
     _questAbandonStore.clear();
     _questGMCompleteStore.clear();
+
+    sLog->outString("> QuestTracker: Execute end in %u ms", GetMSTimeDiffToNow(msTimeStart));
 }
 
 void QuestTracker::Add(uint32 questID, uint32 characterLowGuid, std::string const& coreHash, std::string const& coreRevision)
