@@ -289,7 +289,6 @@ PlayerSave.Stats.SaveOnlyOnLogout = 1
 vmap.enableLOS    = 1
 vmap.enableHeight = 1
 
-
 #
 #    vmap.petLOS
 #        Description: Check line of sight for pets, to avoid them attacking through walls.
@@ -748,7 +747,6 @@ LogDB.World = 0
 
 LogDB.Chat = 0
 
-
 #    ChatLogFile
 #        Description: Log file for chat logs.
 #        Default:     "Chat.log" - (Enabled)
@@ -794,7 +792,6 @@ ChatLogs.SysChan = 0
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-
 ChatLogs.Party = 0
 
 #
@@ -802,7 +799,6 @@ ChatLogs.Party = 0
 #        Description: Log raid chat.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
-
 
 ChatLogs.Raid = 0
 
@@ -1594,7 +1590,7 @@ IsPreloadedContinentTransport.Enabled = 0
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Warden.Enabled = 1
+Warden.Enabled = 0
 
 #
 #    Warden.NumMemChecks
@@ -1602,7 +1598,15 @@ Warden.Enabled = 1
 #        Default:     3 - (Enabled)
 #                     0 - (Disabled)
 
-Warden.NumMemChecks = 2
+Warden.NumMemChecks = 3
+
+#
+#    Warden.NumLuaChecks
+#        Description: Number of Warden LUA checks that are sent to the client each cycle.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Warden.NumLuaChecks = 1
 
 #
 #    Warden.NumOtherChecks
@@ -1611,7 +1615,7 @@ Warden.NumMemChecks = 2
 #        Default:     7 - (Enabled)
 #                     0 - (Disabled)
 
-Warden.NumOtherChecks = 5
+Warden.NumOtherChecks = 7
 
 #
 #    Warden.LogFile
@@ -1648,7 +1652,7 @@ Warden.ClientCheckHoldOff = 30
 #                     1 - (Kick)
 #                     2 - (Ban)
 
-Warden.ClientCheckFailAction = 2
+Warden.ClientCheckFailAction = 0
 
 #
 #    Warden.BanDuration
@@ -2037,6 +2041,14 @@ Channel.RestrictedLfg = 1
 
 Channel.SilentlyGMJoin = 0
 
+#    Channel.ModerationGMLevel
+#        Min GM account security level required for executing moderator in-game commands in the channels
+#        This also bypasses password prompts on joining channels which require password
+#                 0 (in-game channel moderator privileges only)
+#        Default: 1 (enabled for moderators and above)
+
+Channel.ModerationGMLevel = 1
+
 #
 #    ChatLevelReq.Channel
 #        Description: Level requirement for characters to be able to write in chat channels.
@@ -2398,7 +2410,7 @@ Rate.Drop.Item.ReferencedAmount = 1
 #        Default:     1 - (Rate.XP.Kill)
 #                     1 - (Rate.XP.Quest)
 #                     1 - (Rate.XP.Explore)
-#                     1	- (Rate.XP.Pet)
+#                     1 - (Rate.XP.Pet)
 
 Rate.XP.Kill    = 1
 Rate.XP.Quest   = 1
@@ -2523,9 +2535,9 @@ Rate.InstanceResetTime = 1
 #
 #    Rate.Pet.LevelXP
 #        Description: Modifies the amount of experience required to level up a pet.
-#					  The lower the rate the less experience is required.
+#       The lower the rate the less experience is required.
 #        Default:     0.05
-#   
+#
 Rate.Pet.LevelXP = 0.05
 
 #
@@ -2715,7 +2727,6 @@ Battleground.QueueAnnouncer.Enable = 0
 #                     1 - (Private, Only queued players can see it)
 
 Battleground.QueueAnnouncer.PlayerOnly = 0
-
 
 #
 #    Battleground.PrematureFinishTimer
@@ -3004,7 +3015,6 @@ Arena.ArenaWinRatingModifier1 = 48
 #        Default:     24
 
 Arena.ArenaWinRatingModifier2 = 24
-
 
 #
 #    Arena.ArenaLoseRatingModifier
@@ -3302,6 +3312,31 @@ NoResetTalentsCost = 0
 Guild.AllowMultipleGuildMaster = 0
 
 #
+#     Guild.BankInitialTabs
+#        Description: Changes the amounts of available tabs of the guild bank on guild creation
+#        Default:     0   (no tabs given for free)
+#                     1-6 (amount of tabs of the guild bank at guild creation)
+
+Guild.BankInitialTabs = 0
+
+#
+#     Guild.BankTabCost0-5
+#        Description: Changes the price of the guild tabs. Note that the client will still show the default values.
+#        Default:     1000000  - (100 Gold)
+#                     2500000  - (250 Gold)
+#                     5000000  - (500 Gold)
+#                     10000000 - (1000 Gold)
+#                     25000000 - (2500 Gold)
+#                     50000000 - (5000 Gold)
+
+Guild.BankTabCost0 = 1000000
+Guild.BankTabCost1 = 2500000
+Guild.BankTabCost2 = 5000000
+Guild.BankTabCost3 = 10000000
+Guild.BankTabCost4 = 25000000
+Guild.BankTabCost5 = 50000000
+
+#
 #     ShowKickInWorld
 #        Description: Determines whether a message is broadcast to the entire server when a
 #                     player gets kicked
@@ -3425,10 +3460,10 @@ MonsterSight = 50.000000
 StrictChannelNames = 0
 
 #
-#	Instance.SharedNormalHeroicId
-#		Description: 	No description
-#		Default:		0 - Disable
-#						1 - Enable
+# Instance.SharedNormalHeroicId
+#  Description:  No description
+#  Default:  0 - Disable
+#      1 - Enable
 #
 
 Instance.SharedNormalHeroicId = 0
@@ -3444,17 +3479,17 @@ Instance.SharedNormalHeroicId = 0
 Instance.ResetTimeRelativeTimestamp = 1135814400
 
 #
-#	TeleportTimeoutNear
-#		Description: 	No description
-#		Default:		25
+# TeleportTimeoutNear
+#  Description:  No description
+#  Default:  25
 #
 
 TeleportTimeoutNear = 25
 
 #
-#	TeleportTimeoutFar
-#		Description: 	No description
-#		Default:		45
+# TeleportTimeoutFar
+#  Description:  No description
+#  Default:  45
 #
 
 TeleportTimeoutFar = 45

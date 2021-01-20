@@ -14,7 +14,6 @@ EndScriptData */
 /* ContentData
 EndContentData */
 
-
 void AddSC_eversong_woods()
 {
 }

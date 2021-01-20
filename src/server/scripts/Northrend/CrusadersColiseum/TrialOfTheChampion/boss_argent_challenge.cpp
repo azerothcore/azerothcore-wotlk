@@ -423,7 +423,7 @@ public:
                 case EVENT_MEMORY_SCALE:
                     me->SetObjectScale(1.0f);
                     events.ScheduleEvent(EVENT_MEMORY_START_ATTACK, 5000);
-                    
+
                     break;
                 case EVENT_MEMORY_START_ATTACK:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -462,7 +462,6 @@ public:
         return new npc_memoryAI(pCreature);
     }
 };
-
 
 enum ArgentSoldierSpells
 {

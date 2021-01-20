@@ -183,7 +183,6 @@ public:
                     go->SetGoState(GO_STATE_ACTIVE);
             }
             _justSpawned = false;
-
         }
 
         void EnterEvadeMode() override
@@ -277,7 +276,7 @@ public:
                             go->SetPhaseMask(2, true);
                         }
                     }
-                    
+
                     break;
                 case EVENT_SUMMON_SOLDIER:
                     if (Creature* cr = me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonPositions[urand(0, 5)], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
@@ -527,7 +526,7 @@ public:
                     if (me->HealthBelowPct(35))
                     {
                         me->CastSpell(me, SPELL_FRENZY, true);
-                        
+
                         break;
                     }
                     events.RepeatEvent(1000);
@@ -617,7 +616,6 @@ public:
         return new spell_kelthuzad_detonate_mana_AuraScript();
     }
 };
-
 
 void AddSC_boss_kelthuzad()
 {

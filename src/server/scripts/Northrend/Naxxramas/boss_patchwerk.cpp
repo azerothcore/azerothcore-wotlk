@@ -157,7 +157,7 @@ public:
                     Talk(EMOTE_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
                     events.ScheduleEvent(EVENT_SPELL_SLIME_BOLT, 2000);
-                    
+
                     break;
                 case EVENT_SPELL_SLIME_BOLT:
                     me->CastSpell(me, SPELL_SLIME_BOLT, false);
@@ -168,12 +168,11 @@ public:
                     {
                         Talk(EMOTE_ENRAGE);
                         me->CastSpell(me, SPELL_FRENZY, true);
-                        
+
                         break;
                     }
                     events.RepeatEvent(1000);
                     break;
-
             }
 
             DoMeleeAttackIfReady();
