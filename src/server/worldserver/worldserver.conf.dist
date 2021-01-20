@@ -3312,6 +3312,14 @@ NoResetTalentsCost = 0
 Guild.AllowMultipleGuildMaster = 0
 
 #
+#     Guild.BankInitialTabs
+#        Description: Changes the amounts of available tabs of the guild bank on guild creation
+#        Default:     0   (no tabs given for free)
+#                     1-6 (amount of tabs of the guild bank at guild creation)
+
+Guild.BankInitialTabs = 0
+
+#
 #     Guild.BankTabCost0-5
 #        Description: Changes the price of the guild tabs. Note that the client will still show the default values.
 #        Default:     1000000  - (100 Gold)
