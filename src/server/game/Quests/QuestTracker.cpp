@@ -103,7 +103,7 @@ void QuestTracker::Execute()
         SendUpdateQuestTrack(CHAR_UPD_QUEST_TRACK_GM_COMPLETE, questID, characterLowGuid);
 
     CharacterDatabase.CommitTransaction(updateTrans);
-    
+
     _questCompleteStore.clear();
     _questAbandonStore.clear();
     _questGMCompleteStore.clear();
