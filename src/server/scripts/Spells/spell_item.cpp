@@ -268,9 +268,6 @@ enum MountModSpells
     SPELL_MOUNT_SPEED_RIDING = 48776
 };
 
-// 48777 - Mount Speed (11122: Carrot on a Stick)
-// 48776 - Mount Speed (25653: Riding Crop / 32863: Skybreaker Whip - "Property of the Top Orc")
-// 7215 - Mithril Spurs (7969 Mithril Spurs)
 class spell_item_with_mount_speed : public SpellScriptLoader
 {
 public:
