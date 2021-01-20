@@ -44,6 +44,11 @@ public:
     MovementGeneratorType GetMovementGeneratorType() { return RANDOM_MOTION_TYPE; }
 
 private:
+    bool CanMove(int32 diff)
+    {
+        _nextMoveTime.Update(diff);
+        return _nextMoveTime.Passed();
+    }
     TimeTrackerSmall _nextMoveTime;
     uint8 _moveCount;
     float _wanderDistance;
