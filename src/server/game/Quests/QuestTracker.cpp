@@ -66,7 +66,7 @@ void QuestTracker::Update(uint32 diff)
 void QuestTracker::Execute()
 {
     /// Insert section
-    auto insertTrans = CharacterDatabase.BeginTransaction();
+    //auto insertTrans = CharacterDatabase.BeginTransaction();
 
     for (auto const& [ID, CharacterLowGuid, Hash, Revision] : _questTrackStore)
     {
@@ -75,22 +75,22 @@ void QuestTracker::Execute()
         stmt->setUInt32(1, CharacterLowGuid);
         stmt->setString(2, Hash);
         stmt->setString(3, Revision);
-        insertTrans->Append(stmt);
+        CharacterDatabase.Execute(stmt);
     }
 
-    CharacterDatabase.CommitTransaction(insertTrans);
+    //CharacterDatabase.CommitTransaction(insertTrans);
 
     _questTrackStore.clear();
 
     // Update section
-    auto updateTrans = CharacterDatabase.BeginTransaction();
+    //auto updateTrans = CharacterDatabase.BeginTransaction();
 
-    auto SendUpdateQuestTrack = [&updateTrans](CharacterDatabaseStatements stmtIndex, uint32 questID, uint32 characterLowGuid)
+    auto SendUpdateQuestTrack = [](CharacterDatabaseStatements stmtIndex, uint32 questID, uint32 characterLowGuid)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(stmtIndex);
         stmt->setUInt32(0, questID);
         stmt->setUInt32(1, characterLowGuid);
-        updateTrans->Append(stmt);
+        CharacterDatabase.Execute(stmt);
     };
 
     for (auto const& [questID, characterLowGuid] : _questCompleteStore)
@@ -102,7 +102,7 @@ void QuestTracker::Execute()
     for (auto const& [questID, characterLowGuid] : _questGMCompleteStore)
         SendUpdateQuestTrack(CHAR_UPD_QUEST_TRACK_GM_COMPLETE, questID, characterLowGuid);
 
-    CharacterDatabase.CommitTransaction(updateTrans);
+    //CharacterDatabase.CommitTransaction(updateTrans);
 
     _questCompleteStore.clear();
     _questAbandonStore.clear();
