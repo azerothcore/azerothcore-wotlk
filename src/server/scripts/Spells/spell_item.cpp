@@ -1572,6 +1572,11 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
+            if (!GetCaster())
+            {
+                return;
+            }
+
             Player* player = GetCaster()->ToPlayer();
             if (Creature * creature = player->FindNearestCreature(CREATURE_INSTANT_STATUE_PEDESTAL, 0.0f, true))
             {
