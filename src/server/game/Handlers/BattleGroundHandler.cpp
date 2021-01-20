@@ -182,7 +182,6 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         SendPacket(&data);
 
         sScriptMgr->OnPlayerJoinBG(_player);
-
     }
     // check if group can queue:
     else

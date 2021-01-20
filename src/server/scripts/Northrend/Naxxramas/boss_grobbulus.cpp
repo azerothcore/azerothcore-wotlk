@@ -217,7 +217,6 @@ public:
             me->SetFloatValue(UNIT_FIELD_COMBATREACH, 2.0f + (0.00025f * sizeTimer));
         }
     };
-
 };
 
 class spell_grobbulus_poison : public SpellScriptLoader

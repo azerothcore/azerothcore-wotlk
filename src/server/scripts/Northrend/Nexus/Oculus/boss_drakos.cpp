@@ -100,7 +100,6 @@ public:
                                 pGo->UseDoorOrButton(0, false);
                             }
             }
-
         }
 
         void KilledUnit(Unit* /*victim*/) override

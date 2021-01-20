@@ -27,7 +27,6 @@ enum MekgineerSteamrigger
     EVENT_SPELL_SHRINK          = 4,
     EVENT_SPELL_SAW             = 5,
     EVENT_SPELL_NET             = 6
-
 };
 
 class boss_mekgineer_steamrigger : public CreatureScript
