@@ -1,3 +1,19 @@
+-- DB update 2021_01_20_00 -> 2021_01_20_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_20_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_20_00 2021_01_20_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1609073866409457800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609073866409457800');
 
 DELETE FROM `quest_request_items_locale` WHERE `ID` IN (57, 109, 155, 156, 161, 163, 167, 199, 212, 217, 224, 237, 253, 255, 256, 257, 258, 263, 271, 274, 275, 276, 277, 278, 280, 1369, 1371, 1375, 4603, 4604, 5517, 5521, 5524, 7789, 7795, 7800, 7805, 7811, 7818, 7823, 7824, 7836, 7874, 7875, 7876, 8157, 8158, 8159, 8163, 8164, 8165, 8294, 8426, 8427, 8428, 8429, 8430, 8431, 8432, 8433, 8434, 8435, 10357, 10362) AND `locale` = 'deDE';
@@ -66,3 +82,12 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 (8435, 'deDE', 'Der Kampf gegen die Schildwachen der Silberschwingen in der Kriegshymnenschlucht ist von großer Bedeutung. Unter dem Vorwand einen Wald zu beschützen, der ihnen nicht gehört, versucht die Allianz der Horde eines unserer größten Holzvorkommen streitig zu machen.$B$BLasst dies nicht zu, $N! Kommt zu mir mit einem Beweis für ehrvolle Taten im Namen der Horde zurück!', 18019),
 (10357, 'deDE', '$N, Ihr wart eine enorme Unterstützung bei unserer Stoffsammelaktion. Da wir sehr hart am Aufstocken unserer Vorräte arbeiten, muss ich Euch wohl auch von unserem neusten und schwerwiegendsten Mangel berichten: Runenstoff. Wir brauchen ihn ganz dringend und hoffen, dass Ihr uns hierbei, wie schon zuvor, wieder unterstützen könnt.$B$BSolltet Ihr gewillt sein, so bringt mir bitte all den Runenstoff, den Ihr entbehren könnt. Für den Anfang wären wir mit 60 Stücken einverstanden, dann sehen wir weiter.', 18019),
 (10362, 'deDE', '$N, Ihr wart eine enorme Unterstützung bei unserer Stoffsammelaktion. Da wir sehr hart am Aufstocken unserer Vorräte arbeiten, muss ich Euch wohl auch von unserem neusten und schwerwiegendsten Mangel berichten: Runenstoff. Wir brauchen ihn ganz dringend und hoffen, dass Ihr uns hierbei, wie schon zuvor, wieder unterstützen könnt.$B$BSolltet Ihr gewillt sein, so bringt mir bitte all den Runenstoff, den Ihr entbehren könnt. Für den Anfang wären wir mit 60 Stücken einverstanden, dann sehen wir weiter.', 18019);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
