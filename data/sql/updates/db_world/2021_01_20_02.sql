@@ -1,3 +1,19 @@
+-- DB update 2021_01_20_01 -> 2021_01_20_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_20_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_20_01 2021_01_20_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1610238998819516081'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1610238998819516081');
 
 UPDATE `creature` SET `MovementType`=2, `currentwaypoint`=1 WHERE `guid` IN (13990, 13991, 13992);
@@ -319,3 +335,12 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (139920,100,-1191.3-(@diff_x2),-2057.78-(@diff_y2),93.244,0.558508),
 (139920,101,-1179.36-(@diff_x2),-2050.48-(@diff_y2),93.4187,0.566362);
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
