@@ -1572,13 +1572,13 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            if (!GetCaster())
+            Unit* caster = GetCaster();
+            if (!caster)
             {
                 return;
             }
 
-            Player* player = GetCaster()->ToPlayer();
-            if (Creature * creature = player->FindNearestCreature(CREATURE_INSTANT_STATUE_PEDESTAL, 0.0f, true))
+            if (Creature * creature = caster->FindNearestCreature(CREATURE_INSTANT_STATUE_PEDESTAL, 0.0f, true))
             {
                 creature->RemoveAurasDueToSpell(SPELL_INSTANT_STATUE);
             }
