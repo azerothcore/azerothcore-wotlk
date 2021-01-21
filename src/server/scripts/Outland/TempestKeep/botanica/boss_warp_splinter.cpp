@@ -34,7 +34,6 @@ enum Misc
 class boss_warp_splinter : public CreatureScript
 {
 public:
-
     boss_warp_splinter() : CreatureScript("boss_warp_splinter") { }
     struct boss_warp_splinterAI : public BossAI
     {

@@ -1772,7 +1772,6 @@ public:
                 c->getThreatManager().resetAllAggro();
                 for (ThreatContainer::StorageType::const_iterator iter = me_tl.begin(); iter != me_tl.end(); ++iter)
                     c->getThreatManager().addThreat((*iter)->getTarget(), (*iter)->getThreat());
-
             }
         }
 
@@ -2990,7 +2989,6 @@ public:
                 else
                     break;
             }
-
         }
 
         bool CanAIAttack(Unit const* target) const override

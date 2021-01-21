@@ -103,7 +103,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_hydromancer_thespia()
