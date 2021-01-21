@@ -20,6 +20,22 @@ bool _SpellScript::_Validate(SpellInfo const* entry)
     return true;
 }
 
+bool _SpellScript::_ValidateSpellInfo(uint32 const* begin, uint32 const* end)
+{
+    bool allValid = true;
+    while (begin != end)
+    {
+        if (!sSpellMgr->GetSpellInfo(*begin))
+        {
+            sLog->outError("_SpellScript::ValidateSpellInfo: Spell %u does not exist.", *begin);
+            allValid = false;
+        }
+
+        ++begin;
+    }
+    return allValid;
+}
+
 void _SpellScript::_Register()
 {
     m_currentScriptState = SPELL_SCRIPT_STATE_REGISTRATION;
