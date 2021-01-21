@@ -2256,11 +2256,11 @@ bool Map::getObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float 
     return result;
 }
 
-float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap/*=true*/, float collisionHeight /*= DEFAULT_COLLISION_HEIGHT*/) const
+float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap/*=true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
 {
     float h1, h2;
-    h1 = GetHeight(x, y, z, vmap, collisionHeight);
-    h2 = _dynamicTree.getHeight(x, y, z, collisionHeight, phasemask);
+    h1 = GetHeight(x, y, z, vmap, maxSearchDist);
+    h2 = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
     return std::max<float>(h1, h2);
 }
 
@@ -3545,13 +3545,7 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
                 if (groundZ <= INVALID_HEIGHT)
                 {
                     // fall back to gridHeight if any
-                    GridMap* gmap = unit->GetMap()->GetGrid(startX, startY);
-                    if (!gmap) { // should not happen
-                        return false;
-                    }
-
-                    float gridHeight = gmap->getHeight(startX, startY);
-
+                     float gridHeight = GetGridHeight(destX, destY);
                     if (gridHeight > INVALID_HEIGHT)
                     {
                         destZ = gridHeight + unit->GetHoverHeight();

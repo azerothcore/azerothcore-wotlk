@@ -898,6 +898,15 @@ bool Object::PrintIndexError(uint32 index, bool set) const
     return false;
 }
 
+
+bool Position::operator==(Position const& a)
+{
+    return (G3D::fuzzyEq(a.m_positionX, m_positionX) &&
+        G3D::fuzzyEq(a.m_positionY, m_positionY) &&
+        G3D::fuzzyEq(a.m_positionZ, m_positionZ) &&
+        G3D::fuzzyEq(a.m_orientation, m_orientation));
+}
+
 void Position::RelocatePolarOffset(float angle, float dist, float z /*= 0.0f*/)
 {
     SetOrientation(GetOrientation() + angle);

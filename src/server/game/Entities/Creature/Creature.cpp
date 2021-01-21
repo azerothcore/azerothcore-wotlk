@@ -2833,11 +2833,19 @@ void Creature::SetObjectScale(float scale)
 {
     Unit::SetObjectScale(scale);
 
+    float combatReach = DEFAULT_WORLD_OBJECT_SIZE;
+
     if (CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelInfo(GetDisplayId()))
     {
         SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (IsPet() ? 1.0f : minfo->bounding_radius) * scale);
-        SetFloatValue(UNIT_FIELD_COMBATREACH, (IsPet() ? DEFAULT_COMBAT_REACH : minfo->combat_reach) * scale);
+        if (minfo->combat_reach > 0)
+            combatReach = minfo->combat_reach;
     }
+
+    if (IsPet())
+        combatReach = DEFAULT_COMBAT_REACH;
+
+    SetFloatValue(UNIT_FIELD_COMBATREACH, combatReach * GetFloatValue(OBJECT_FIELD_SCALE_X) * scale);
 }
 
 void Creature::SetDisplayId(uint32 modelId)
@@ -2848,12 +2856,15 @@ void Creature::SetDisplayId(uint32 modelId)
 
     if (CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelInfo(modelId))
     {
-        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (IsPet() ? 1.0f : minfo->bounding_radius) * GetFloatValue(OBJECT_FIELD_SCALE_X));
-        if (!IsPet() && minfo->combat_reach > 0)
+        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (IsPet() ? 1.0f : minfo->bounding_radius) * GetObjectScale());
+        if (minfo->combat_reach > 0)
             combatReach = minfo->combat_reach;
     }
 
-    SetFloatValue(UNIT_FIELD_COMBATREACH, combatReach * GetFloatValue(OBJECT_FIELD_SCALE_X));
+    if (IsPet())
+        combatReach = DEFAULT_COMBAT_REACH;
+
+    SetFloatValue(UNIT_FIELD_COMBATREACH, combatReach * GetObjectScale());
 }
 
 void Creature::SetTarget(uint64 guid)

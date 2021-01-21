@@ -12,6 +12,7 @@
 #include "Timer.h"
 #include "Unit.h"
 #include "PathGenerator.h"
+#include <optional>
 
 class TargetedMovementGeneratorBase
 {
@@ -40,7 +41,7 @@ public:
     bool DoUpdate(T*, uint32);
     Unit* GetTarget() const { return i_target.getTarget(); }
 
-    void unitSpeedChanged() { i_recalculateTravel = true; }
+    void unitSpeedChanged() { i_recalculateTravel = true; _lastTargetPosition.reset(); }
     bool IsReachable() const { return (i_path) ? (i_path->GetPathType() & PATHFIND_NORMAL) : true; }
 
 protected:
@@ -54,6 +55,7 @@ protected:
     float i_angle;
     bool i_recalculateTravel : 1;
     bool i_targetReached : 1;
+    std::optional<Position> _lastTargetPosition;
 };
 
 template<class T>

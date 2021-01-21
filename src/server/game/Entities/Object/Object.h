@@ -799,7 +799,7 @@ public:
 
     [[nodiscard]] float GetObjectSize() const
     {
-        return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? m_floatValues[UNIT_FIELD_COMBATREACH] : DEFAULT_WORLD_OBJECT_SIZE;
+        return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? m_floatValues[UNIT_FIELD_COMBATREACH] : DEFAULT_WORLD_OBJECT_SIZE * GetObjectScale();
     }
 
     [[nodiscard]] virtual float GetCombatReach() const { return 0.0f; } // overridden (only) in Unit
@@ -1045,7 +1045,7 @@ public:
     [[nodiscard]] float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
 
     virtual float GetCollisionHeight() const { return 0.0f; }
-    virtual float GetCollisionWidth() const { return 0.0f; }
+    virtual float GetCollisionWidth() const { return GetObjectSize(); }
 
 protected:
     std::string m_name;
