@@ -14,7 +14,7 @@ bool _SpellScript::_Validate(SpellInfo const* entry)
 {
     if (!Validate(entry))
     {
-        sLog->outError("TSCR: Spell `%u` did not pass Validate() function of script `%s` - script will be not added to the spell", entry->Id, m_scriptName->c_str());
+        sLog->outError("TSCR: Spell `%u` did not pass Validate() function of script `%s` - script will not be added to the spell", entry->Id, m_scriptName->c_str());
         return false;
     }
     return true;
