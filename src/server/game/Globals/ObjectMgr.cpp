@@ -6150,20 +6150,20 @@ void ObjectMgr::LoadAccessRequirements()
         ar->levelMax     = fields[4].GetUInt8();
         ar->reqItemLevel = fields[5].GetUInt16();
 
-        //                                                                  0                 1               2                 3        4
-        QueryResult progression_requirements_results = WorldDatabase.PQuery("SELECT requirement_type, requirement_id, requirement_hint, priority, faction FROM dungeon_access_requirements where dungeon_access_id = %u", dungeon_access_id);
+        //                                                                          0                 1               2                 3        4        
+        QueryResult progression_requirements_results = WorldDatabase.PQuery("SELECT requirement_type, requirement_id, requirement_hint, faction, priority FROM dungeon_access_requirements where dungeon_access_id = %u", dungeon_access_id);
         if (progression_requirements_results)
         {
             do
             {
                 Field* progression_requirement_row = progression_requirements_results->Fetch();
 
-                uint8 requirement_type       = progression_requirement_row[0].GetUInt8();
-                uint32 requirement_id        = progression_requirement_row[1].GetUInt32();
-                std::string requirement_hint = progression_requirement_row[2].GetString();
-                uint8 requirement_faction    = progression_requirement_row[3].GetUInt8();
-                uint32 priorityOrder         = progression_requirement_row[3].IsNull() ? UINT32_MAX : progression_requirement_row[3].GetUInt32();
-
+                const uint8 requirement_type       = progression_requirement_row[0].GetUInt8();
+                const uint32 requirement_id        = progression_requirement_row[1].GetUInt32();
+                const std::string requirement_hint = progression_requirement_row[2].GetString();
+                const uint8 requirement_faction    = progression_requirement_row[3].GetUInt8();
+                const uint8 priorityOrder          = progression_requirement_row[4].IsNull() ? UINT8_MAX : progression_requirement_row[4].GetUInt8();
+                
                 ProgressionRequirement* progression_requirement = new ProgressionRequirement();
                 progression_requirement->id           = requirement_id;
                 progression_requirement->hint         = requirement_hint;
