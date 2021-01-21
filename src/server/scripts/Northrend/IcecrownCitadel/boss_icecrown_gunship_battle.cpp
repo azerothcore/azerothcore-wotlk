@@ -1938,11 +1938,11 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ROCKET_PACK_DAMAGE) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_ROCKET_BURST))
-                return false;
-
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_ROCKET_PACK_DAMAGE,
+                    SPELL_ROCKET_BURST
+                });
         }
 
         void HandlePeriodic(AuraEffect const* /*aurEff*/)
