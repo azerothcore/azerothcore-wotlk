@@ -19,7 +19,7 @@ CREATE TABLE `dungeon_access_requirements` (
   `requirement_id` mediumint unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
   `requirement_hint` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
   `faction` tinyint unsigned NOT NULL DEFAULT 2 COMMENT '0 = Alliance, 1 = Horde, 2 = Both factions',
-  `priority` int unsigned NULL DEFAULT NULL COMMENT 'Order of print for the requirement, it is applied per type. 0 Being higest priority',
+  `priority` tinyint unsigned NULL COMMENT 'Priority order for the requirement, sorted by type. 0 is the highest priority',
   `comment` varchar(255) COLLATE 'utf8_general_ci' NULL,
   PRIMARY KEY (`dungeon_access_id`, `requirement_type`, `requirement_id`)
 ) COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid' ENGINE='MyISAM' COLLATE 'utf8_general_ci';
@@ -121,9 +121,9 @@ COMMENT='Dungeon/raid access template and single requirements';
 ALTER TABLE `dungeon_access_template`
 CHANGE `mapId` `map_id` mediumint unsigned NOT NULL COMMENT 'Map ID from instance_template' AFTER `id`,
 CHANGE `difficulty` `difficulty` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic' AFTER `map_id`,
-CHANGE `level_min` `min_level` tinyint unsigned NULL DEFAULT NULL AFTER `difficulty`,
-CHANGE `level_max` `max_level` tinyint unsigned NULL DEFAULT NULL AFTER `min_level`,
-CHANGE `item_level` `min_avg_item_level` smallint unsigned NULL DEFAULT NULL COMMENT 'Min average ilvl required to enter' AFTER `max_level`,
+CHANGE `level_min` `min_level` tinyint unsigned NULL AFTER `difficulty`,
+CHANGE `level_max` `max_level` tinyint unsigned NULL AFTER `min_level`,
+CHANGE `item_level` `min_avg_item_level` smallint unsigned NULL COMMENT 'Min average ilvl required to enter' AFTER `max_level`,
 CHANGE `comment` `comment` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic' AFTER `min_avg_item_level`;
 
 -- Add KEY CONSTRAINTS

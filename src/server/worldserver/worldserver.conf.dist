@@ -3579,10 +3579,10 @@ DungeonAccessRequirement.LFGLevelDBCOverride = 0
 #
 #    DungeonAccessRequirement.OptionalStringID
 #
-#        Description: Displays an extra message from acore_strings to the chat after printing the dungeon access requirements to the user.
-#                     To enable it set the number to the entry of the specific string in acore_strings
+#        Description: Display an extra message from acore_strings in the chat after printing the dungeon access requirements.
+#                     To enable it set the ID of your desired string from the table acore_strings
 #        Default:     0 - (Disabled)
-#                     1 - (Enabled)
+#                     1+ - (Enabled)
 
 DungeonAccessRequirement.OptionalStringID = 0
 
