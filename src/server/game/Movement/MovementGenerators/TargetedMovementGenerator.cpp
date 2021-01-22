@@ -33,6 +33,8 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
     if (owner->HasUnitState(UNIT_STATE_CASTING) && !owner->CanMoveDuringChannel())
         return;
 
+    Creature* cOwner= owner->ToCreature();
+
     float x, y, z;
     bool isPlayerPet = owner->IsPet() && IS_PLAYER_GUID(owner->GetOwnerGUID());
     bool sameTransport = owner->GetTransport() && owner->GetTransport() ==  i_target->GetTransport();
@@ -42,7 +44,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
     bool forceDest =
         // (owner->FindMap() && owner->FindMap()->IsDungeon() && !isPlayerPet) || // force in instances to prevent exploiting
         (owner->GetTypeId() == TYPEID_UNIT && ((owner->IsPet() && owner->HasUnitState(UNIT_STATE_FOLLOW)))) || // allow pets following their master to cheat while generating paths
-        // ((Creature*)owner)->isWorldBoss() || ((Creature*)owner)->IsDungeonBoss() || // force for all bosses, even not in instances
+        (cOwner && (cOwner->isWorldBoss() || cOwner->IsDungeonBoss())) || // force for all bosses, even not in instances
         (owner->GetMapId() == 572 && (owner->GetPositionX() < 1275.0f || i_target->GetPositionX() < 1275.0f)) || // pussywizard: Ruins of Lordaeron - special case (acid)
         sameTransport || // nothing to comment, can't find path on transports so allow it
         (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) || // for .npc follow
@@ -112,9 +114,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
 
         if (i_target->GetTypeId() == TYPEID_PLAYER)
         {
-            Creature* creature = owner->ToCreature();
-
-            if (creature && creature->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
+            if (cOwner && cOwner->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
             {
                 // fix distance and angle for vanity pets
                 dist = 0.3f;
@@ -191,7 +191,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
         }
        
          bool success = i_path->CalculatePath(x, y, z, forceDest);
-         if (!success || (i_path->GetPathType() & (PATHFIND_NOPATH)))
+         if (!success)
          {
              if (owner->GetTypeId() == TYPEID_UNIT)
              {
@@ -203,7 +203,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
          }
 
          float maxDist = owner->GetMeleeRange(i_target.getTarget());
-         if (!forceDest && (!i_offset && !isPlayerPet && i_target->GetExactDistSq(i_path->GetActualEndPosition().x, i_path->GetActualEndPosition().y, i_path->GetActualEndPosition().z) > maxDist * maxDist))
+         if (!forceDest && (i_path->GetPathType() & PATHFIND_NOPATH || (!i_offset && !isPlayerPet && i_target->GetExactDistSq(i_path->GetActualEndPosition().x, i_path->GetActualEndPosition().y, i_path->GetActualEndPosition().z) > maxDist * maxDist)))
          {
              if (owner->GetTypeId() == TYPEID_UNIT)
              {

@@ -2241,14 +2241,13 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return nullptr;
     }
 
-    float meleeReach = attacker->GetMeleeReach();
-
+    float meleeReach = GetExactDist2d(attacker);
     if (meleeReach <= 0)
     {
         return nullptr;
     }
 
-    float currentAngle = 0, minDistance = 0;
+    float minAngle = 0;
     Unit *refUnit = nullptr;
     uint32 validAttackers = 0;
 
@@ -2266,80 +2265,47 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
             continue;
         }
 
-        double tempDist = attacker->GetExactDist2d(otherAttacker) - (attackerSize / 2.0f) - (otherAttacker->GetCollisionWidth() / 2.0f);
+        float curretAngle = atan(attacker->GetExactDist2d(otherAttacker) / meleeReach);
 
-        if (minDistance == 0 || tempDist < minDistance)
+        if (minAngle == 0 || curretAngle < minAngle)
         {
-            minDistance = tempDist;
-            currentAngle = GetAngle(otherAttacker);
+            minAngle = curretAngle;
             refUnit = otherAttacker;
         }
 
         validAttackers++;
     }
 
-    if (!validAttackers)
+    if (!validAttackers || !refUnit)
         return nullptr;
+
+    float contactDist = (attackerSize + refUnit->GetCollisionWidth()) / 2.0f;
+    float requiredAngle = atan(contactDist / meleeReach);
+    float attackersAngle = atan(attacker->GetExactDist2d(refUnit) / meleeReach);
 
     // in instance: the more attacker there are, the higher will be the tollerance
     // outside: creatures should not intersecate
-    double distanceTollerance = attacker->GetMap()->IsDungeon() ? -(attackerSize / 2.0f) * tanh(validAttackers / 5.0f) : (attackerSize / 2.0f);
+    float angleTollerance = attacker->GetMap()->IsDungeon() ? requiredAngle - requiredAngle * tanh(validAttackers / 5.0f) : requiredAngle;
 
-    if (!refUnit || minDistance > distanceTollerance)
+    if (attackersAngle > angleTollerance)
     {
         return nullptr;
     }
 
-    double radius = attackerSize > refUnit->GetCollisionWidth() ? attackerSize / 2.0f : refUnit->GetCollisionWidth() / 2.0f;
-    double angle = 0;
+    double angle = atan(contactDist / meleeReach);
 
-    // Equation of tangent point to get the ideal angle to
-    // move away from collisions with another unit during combat
-    // NOTE: it works only when there's enough space between the
-    // attacker and the victim. We use a simpler one otherwise.
-    if (GetExactDist2d(refUnit) > radius)
-    {
-        double refUnitX = refUnit->GetPositionX();
-        double refUnitY = refUnit->GetPositionY();
-        double victimX = GetPositionX();
-        double victimY = GetPositionY();
-
-        // calculate tangent star
-        double a = 4.0f * ( pow(radius,2.0f) - pow(refUnitX,2.0f) + (2.0f * refUnitX * victimX) - pow(victimX,2.0f) );
-        double b = 8.0f * ( (refUnitX * refUnitY) + (victimX * victimY) - (victimX * refUnitY) - (refUnitX * victimY) );
-        double c = 4.0f * (- pow(victimY,2.0f) - pow(refUnitY,2.0f) + (2.0f*victimY*refUnitY) + pow(radius,2.0f));
-
-        double sq = sqrt(pow(b,2.0f)-4.0f*a*c);
-
-        double m1 = (-b + sq) / (2.0f*a);
-        double m2 = (-b - sq) / (2.0f*a);
-
-        // tangents
-        double xT1 = ((-1.0f) * (m1*(victimY - m1*victimX - refUnitY) - refUnitX) ) / (1.0f + pow(m1,2.0f));
-        double xT2 = ((-1.0f) * (m2*(victimY - m2*victimX - refUnitY) - refUnitX) ) / (1.0f + pow(m2,2.0f));
-
-        double yT1 = m1*(xT1 - victimX) + victimY;
-        double yT2 = m2*(xT2 - victimX) + victimY;
-
-        double distance = sqrt(pow(yT2-yT1,2.0f) + pow(xT2-xT1,2.0f));
-        double exactDist = GetExactDist2d(xT1, yT1);
-
-        double ortDist = sqrt(pow(exactDist,2.0f) - pow(distance/2.0f,2.0f));
-
-        angle = 2.0f * atan(distance / (2.0f * ortDist));
-    }
-
-    int8 direction =  (urand(0, 1) ? -1 : 1);
-
-    double angularRadius = frand(0.1f,0.3f) + (angle && !isnan(angle) ? angle : atan(attackerSize / (meleeReach))); // or fallback to the simpler method
-    double absAngle = currentAngle + angularRadius * direction;
+    float angularRadius = frand(0.1f, 0.3f) + angle;
+    int8 direction = (urand(0, 1) ? -1 : 1);
+    float currentAngle = GetAngle(refUnit);
+    float absAngle = currentAngle + angularRadius * direction;
 
     float x, y, z;
-    GetNearPoint(attacker, x, y, z, meleeReach, 0.0f, absAngle);
+    float distance = meleeReach - GetObjectSize();
+    GetNearPoint(attacker, x, y, z, distance, 0.0f, absAngle);
     
     if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z, true, true, false))
     {
-        GetNearPoint(attacker, x, y, z, meleeReach, 0.0f, absAngle * -1); // try the other side
+        GetNearPoint(attacker, x, y, z, distance, 0.0f, absAngle * -1); // try the other side
 
         if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z, true, true, false))
         {
@@ -20023,7 +19989,7 @@ float Unit::GetCollisionWidth() const
         }
     }
 
-    float collisionWidth = scaleMod * modelData->CollisionWidth * modelData->Scale * displayInfo->scale;
+    float collisionWidth = scaleMod * modelData->CollisionWidth * modelData->Scale * displayInfo->scale * 2.f;
     return objectSize == defaultSize && collisionWidth > 0.0f ? collisionWidth : objectSize;
 }
 
