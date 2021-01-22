@@ -19624,9 +19624,15 @@ bool Unit::SetSwim(bool enable)
         return false;
 
     if (enable)
+    {
         AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
+    }
     else
+    {
         RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
+    }
 
     return true;
 }
