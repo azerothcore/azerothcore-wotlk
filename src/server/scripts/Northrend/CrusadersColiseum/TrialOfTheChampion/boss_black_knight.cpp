@@ -145,7 +145,6 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                 me->AddUnitState(UNIT_STATE_DIED);
-
             }
         }
 
@@ -362,7 +361,6 @@ public:
         {
             npc_escortAI::UpdateAI(uiDiff);
         }
-
     };
 
     CreatureAI* GetAI(Creature* pCreature) const override

@@ -263,7 +263,6 @@ public:
 
             if (Unit* target = GetHitUnit())
             {
-
                 Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
 
                 if (item == GetCastItem())

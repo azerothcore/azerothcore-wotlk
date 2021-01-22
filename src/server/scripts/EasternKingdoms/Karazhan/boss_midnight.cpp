@@ -436,7 +436,6 @@ public:
             OnEffectApply += AuraEffectApplyFn(spell_midnight_fixate_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_midnight_fixate_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
-
     };
 
     AuraScript* GetAuraScript() const override
