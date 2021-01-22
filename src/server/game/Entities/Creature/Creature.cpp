@@ -2724,6 +2724,16 @@ bool Creature::SetSwim(bool enable)
     return true;
 }
 
+bool Creature::CanSwim() const {
+    if (Unit::CanSwim())
+        return true;
+
+    if (IsPet() || IS_PLAYER_GUID(GetOwnerGUID()))
+        return true;
+
+    return GetCreatureTemplate()->InhabitType & INHABIT_WATER;
+}
+
 bool Creature::SetCanFly(bool enable, bool  /*packetOnly*/ /* = false */)
 {
     if (!Unit::SetCanFly(enable))

@@ -1145,11 +1145,10 @@ bool PathGenerator::IsSwimmableSegment(float const* v1, float const* v2, bool ch
  */
 bool PathGenerator::IsSwimmableSegment(float x, float y, float z, float destX, float destY, float destZ, bool checkSwim) const
 {
-    Unit const* _sourceUnit = _source->ToUnit();
-    return  !_sourceUnit || 
-            ( _source->GetMap()->IsInWater(x, y, z) &&
+    Creature const* _sourceCreature = _source->ToCreature();
+    return   _source->GetMap()->IsInWater(x, y, z) &&
             _source->GetMap()->IsInWater(destX, destY, destZ) &&
-            (!checkSwim || _sourceUnit->CanSwim()));
+            (!checkSwim || !_sourceCreature || _sourceCreature->CanSwim());
 }
 
 bool PathGenerator::IsWaterPath(Movement::PointsArray _pathPoints) const
