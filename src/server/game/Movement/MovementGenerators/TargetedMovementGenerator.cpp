@@ -46,7 +46,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
         (owner->GetMapId() == 572 && (owner->GetPositionX() < 1275.0f || i_target->GetPositionX() < 1275.0f)) || // pussywizard: Ruins of Lordaeron - special case (acid)
         sameTransport || // nothing to comment, can't find path on transports so allow it
         (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) || // for .npc follow
-        this->GetMovementGeneratorType() == CHASE_MOTION_TYPE && owner->CanFly()
+        (this->GetMovementGeneratorType() == CHASE_MOTION_TYPE && owner->CanFly())
     ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
     bool forcePoint = ((!isPlayerPet || owner->GetMapId() == 618) && (forceDest || !useMMaps)) || sameTransport;
@@ -263,7 +263,7 @@ bool TargetedMovementGeneratorMedium<T, D>::DoUpdate(T* owner, uint32 time_diff)
     bool resetMoveState = owner->HasUnitState(UNIT_STATE_NOT_MOVE) || static_cast<D*>(this)->_lostTarget(owner);  //prevent crash after creature killed pet
 
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
-    if (resetMoveState || owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsMovementPreventedByCasting())
+    if (resetMoveState || (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsMovementPreventedByCasting()))
     {
         if (resetMoveState)
             D::_clearUnitStateMove(owner);
