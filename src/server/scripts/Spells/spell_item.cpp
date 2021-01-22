@@ -1563,7 +1563,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            return static_cast<bool>(sSpellMgr->GetSpellInfo(SPELL_INSTANT_STATUE));
+            return ValidateSpellInfo({ SPELL_INSTANT_STATUE });
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
