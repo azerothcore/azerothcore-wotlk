@@ -30,10 +30,10 @@ Replace `/path/to/your/data` with the path of where your data folder is.
 
 ```
 docker run --name ac-worldserver \
-    --mount type=bind,source=/path/to/your/data,target=/azeroth-server/env/dist/data \
-    --mount type=bind,source="$(pwd)"/docker/worldserver/bin/,target=/azeroth-server/env/dist/bin \
-    --mount type=bind,source="$(pwd)"/docker/worldserver/etc/,target=/azeroth-server/env/dist/etc \
-    --mount type=bind,source="$(pwd)"/docker/worldserver/logs/,target=/azeroth-server/env/dist/logs \
+    --mount type=bind,source=/path/to/your/data,target=/azerothcore/env/dist/data \
+    --mount type=bind,source="$(pwd)"/docker/worldserver/bin/,target=/azerothcore/env/dist/bin \
+    --mount type=bind,source="$(pwd)"/docker/worldserver/etc/,target=/azerothcore/env/dist/etc \
+    --mount type=bind,source="$(pwd)"/docker/worldserver/logs/,target=/azerothcore/env/dist/logs \
     -p 127.0.0.1:8085:8085 \
     --network ac-network \
     -it azerothcore/worldserver
