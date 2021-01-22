@@ -361,6 +361,7 @@ void MotionMaster::MoveCircleTarget(Unit* target)
 
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(point->m_positionX, point->m_positionY, point->m_positionZ, false);
+    init.SetWalk(true);
     init.SetFacing(target);
     init.Launch();
 }
