@@ -102,6 +102,11 @@ public:
     {
         PrepareSpellScript(spell_warr_intervene_SpellScript);
 
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_WARRIOR_INTERVENE_TRIGGER });
+        }
+
         void HandleApplyAura(SpellEffIndex /*effIndex*/)
         {
             if (Unit* target = GetHitUnit())
@@ -128,6 +133,11 @@ public:
     class spell_warr_improved_spell_reflection_AuraScript : public AuraScript
     {
         PrepareAuraScript(spell_warr_improved_spell_reflection_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_WARRIOR_SPELL_REFLECTION, SPELL_WARRIOR_IMPROVED_SPELL_REFLECTION_TRIGGER });
+        }
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
@@ -164,6 +174,11 @@ public:
     class spell_warr_improved_spell_reflection_trigger_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_warr_improved_spell_reflection_trigger_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_WARRIOR_SPELL_REFLECTION });
+        }
 
         void FilterTargets(std::list<WorldObject*>& unitList)
         {
@@ -506,6 +521,11 @@ public:
     {
         PrepareSpellScript(spell_warr_bloodthirst_SpellScript);
 
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_WARRIOR_BLOODTHIRST });
+        }
+
         void HandleDamage(SpellEffIndex /*effIndex*/)
         {
             int32 damage = GetEffectValue();
@@ -548,6 +568,11 @@ public:
     {
         PrepareSpellScript(spell_warr_bloodthirst_heal_SpellScript);
 
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_WARRIOR_BLOODTHIRST_DAMAGE });
+        }
+
         void HandleHeal(SpellEffIndex /*effIndex*/)
         {
             if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_WARRIOR_BLOODTHIRST_DAMAGE))
@@ -575,6 +600,17 @@ public:
     class spell_warr_overpower_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_warr_overpower_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo(
+                {
+                    SPELL_WARRIOR_UNRELENTING_ASSAULT_RANK_1,
+                    SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_1,
+                    SPELL_WARRIOR_UNRELENTING_ASSAULT_RANK_2,
+                    SPELL_WARRIOR_UNRELENTING_ASSAULT_TRIGGER_2
+                });
+        }
 
         void HandleEffect(SpellEffIndex /*effIndex*/)
         {
@@ -864,6 +900,11 @@ public:
     class spell_warr_vigilance_trigger_SpellScript : public SpellScript
     {
         PrepareSpellScript(spell_warr_vigilance_trigger_SpellScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_WARRIOR_TAUNT });
+        }
 
         void HandleScript(SpellEffIndex effIndex)
         {
