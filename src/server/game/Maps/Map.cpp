@@ -785,6 +785,19 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 
         VisitNearbyCellsOfPlayer(player, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
 
+        // If player is using far sight, visit that object too
+        if (WorldObject* viewPoint = player->GetViewpoint())
+        {
+            if (Creature* viewCreature = viewPoint->ToCreature())
+            {
+                VisitNearbyCellsOf(viewCreature, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
+            }
+            else if (DynamicObject* viewObject = viewPoint->ToDynObject())
+            {
+                VisitNearbyCellsOf(viewObject, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
+            }
+        }
+
         // handle updates for creatures in combat with player and are more than X yards away
         if (player->IsInCombat())
         {
@@ -2267,6 +2280,28 @@ bool Map::IsUnderWater(float x, float y, float z) const
 char const* Map::GetMapName() const
 {
     return i_mapEntry ? i_mapEntry->name[sWorld->GetDefaultDbcLocale()] : "UNNAMEDMAP\x0";
+}
+
+void Map::UpdateObjectVisibility(WorldObject* obj, Cell cell, CellCoord cellpair)
+{
+    cell.SetNoCreate();
+    acore::VisibleChangesNotifier notifier(*obj);
+    TypeContainerVisitor<acore::VisibleChangesNotifier, WorldTypeMapContainer > player_notifier(notifier);
+    cell.Visit(cellpair, player_notifier, *this, *obj, obj->GetVisibilityRange());
+}
+
+void Map::UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair)
+{
+    acore::VisibleNotifier notifier(*player, false, false);
+
+    cell.SetNoCreate();
+    TypeContainerVisitor<acore::VisibleNotifier, WorldTypeMapContainer > world_notifier(notifier);
+    TypeContainerVisitor<acore::VisibleNotifier, GridTypeMapContainer  > grid_notifier(notifier);
+    cell.Visit(cellpair, world_notifier, *this, *player->m_seer, player->GetSightRange());
+    cell.Visit(cellpair, grid_notifier, *this, *player->m_seer, player->GetSightRange());
+
+    // send data
+    notifier.SendToSelf();
 }
 
 void Map::SendInitSelf(Player* player)
