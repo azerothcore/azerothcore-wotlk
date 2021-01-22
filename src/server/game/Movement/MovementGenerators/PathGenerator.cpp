@@ -160,31 +160,19 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
     _type = PathType(PATHFIND_NORMAL);
 
+    Creature const* creature = _source->ToCreature();
+
     // we have a hole in our mesh
     // make shortcut path and mark it as NOPATH ( with flying and swimming exception )
     // its up to caller how he will use this info
     if (startPoly == INVALID_POLYREF || endPoly == INVALID_POLYREF)
     {
         BuildShortcut();
-        bool path = _source->GetTypeId() == TYPEID_UNIT ? _source->ToCreature()->CanFly() : true;
 
-        bool waterPath = _source->GetTypeId() == TYPEID_UNIT ? _source->ToCreature()->CanSwim() : true;
-        if (waterPath)
-        {
-            // Check both start and end points, if they're both in water, then we can *safely* let the creature move
-            for (uint32 i = 0; i < _pathPoints.size(); ++i)
-            {
-                ZLiquidStatus status = _source->GetMap()->getLiquidStatus(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z, MAP_ALL_LIQUIDS, nullptr);
-                // One of the points is not in the water, cancel movement.
-                if (status == LIQUID_MAP_NO_WATER)
-                {
-                    waterPath = false;
-                    break;
-                }
-            }
-        }
-
-        if (path || waterPath)
+        bool canSwim = creature ? creature->CanSwim() : true;
+        bool path = creature ? creature->CanFly() : true;
+        bool waterPath = IsWaterPath(_pathPoints);
+        if (path || (waterPath && canSwim))
         {
             _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
             return;
@@ -198,34 +186,31 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         }
     }
 
-    // no need to build a path if the creature is swimming the entire path
-    if (Unit const* _sourceUnit = _source->ToUnit(); _source->GetMap()->IsInWater(startPos.x, startPos.y, startPos.z) &&
-        _source->GetMap()->IsInWater(endPos.x, endPos.y, endPos.z ) &&
-        _sourceUnit->CanSwim() && _sourceUnit->isSwimming()) {
-        BuildShortcut();
-            _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
-            return;
-        }
-
     // we may need a better number here
     bool startFarFromPoly = distToStartPoly > 7.0f;
     bool endFarFromPoly = distToEndPoly > 7.0f;
-    if (startFarFromPoly || endFarFromPoly)
+    // create a shortcut if the path begins or end too far
+    // away from the desired path points.
+    // swimming creatures should not use a shortcut
+    // because exiting the water must be done following a proper path
+    // we just need to remove/normalize paths between 2 adjacent points
+    if ((!creature || !creature->CanSwim() || !creature->IsInWater()) 
+        && (startFarFromPoly || endFarFromPoly))
     {
         bool buildShotrcut = false;
 
-            if (Unit const* _sourceUnit = _source->ToUnit())
+        if (Unit const* _sourceUnit = _source->ToUnit())
+        {
+            if (_sourceUnit->CanFly())
             {
-                if (_sourceUnit->CanFly())
-                {
-                    buildShotrcut = true;
-                }
-                // Allow to build a shortcut if the unit is falling and it's trying to move downwards towards a target (i.e. charging)
-                else if (_sourceUnit->IsFalling() && endPos.z < startPos.z)
-                {
-                    buildShotrcut = true;
-                }
+                buildShotrcut = true;
             }
+            // Allow to build a shortcut if the unit is falling and it's trying to move downwards towards a target (i.e. charging)
+            else if (_sourceUnit->IsFalling() && endPos.z < startPos.z)
+            {
+                buildShotrcut = true;
+            }
+        }
 
         if (buildShotrcut)
         {
@@ -575,13 +560,45 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
     }
 
     _pathPoints.resize(pointCount);
-    for (uint32 i = 0; i < pointCount; ++i)
-        _pathPoints[i] = G3D::Vector3(pathPoints[i*VERTEX_SIZE+2], pathPoints[i*VERTEX_SIZE], pathPoints[i*VERTEX_SIZE+1]);
+    uint32 newPointCount = 0;
+    for (uint32 i = 0; i < pointCount; ++i) {
+        G3D::Vector3 vector = G3D::Vector3(pathPoints[i*VERTEX_SIZE+2], pathPoints[i*VERTEX_SIZE], pathPoints[i*VERTEX_SIZE+1]);
+        ZLiquidStatus status = _source->GetMap()->getLiquidStatus(vector.x, vector.y, vector.z, MAP_ALL_LIQUIDS, nullptr);
+        // One of the points is not in the water
+        if (status == LIQUID_MAP_UNDER_WATER)
+        {
+            // if the first point is under water
+            // then just set a proper z for it
+            if (i == 0)
+            {
+                vector.z = std::fmaxf(vector.z, _source->GetPositionZ());
+            }
+            // if the last point is under water
+            // then set the desired end position instead
+            else if (i == pointCount - 1 )
+            {
+                _pathPoints[newPointCount] = GetActualEndPosition();
+            }
+            // if one of the mid-points of the path is underwater
+            // then we can create a shortcut between the previous one
+            // and the next one by not including it inside the list
+            else
+                continue;
+        }
+        else
+        {
+            _pathPoints[newPointCount] = vector;
+        }
+
+        newPointCount++;
+    }
+
+    _pathPoints.resize(newPointCount);
 
     NormalizePath();
 
     // first point is always our current location - we need the next one
-    SetActualEndPosition(_pathPoints[pointCount-1]);
+    SetActualEndPosition(_pathPoints[newPointCount-1]);
 
     // force the given destination, if needed
     if (_forceDestination &&
@@ -605,28 +622,8 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
 
 void PathGenerator::NormalizePath()
 {
-    uint32 last = _pathPoints.size() -1;
-    float lastX=_pathPoints[last].x, lastY=_pathPoints[last].y, lastZ=_pathPoints[last].z;
-    float prevX=_pathPoints[0].x, prevY=_pathPoints[0].y, prevZ=_pathPoints[0].z;
-    _source->UpdateAllowedPositionZ(_pathPoints[0].x, _pathPoints[0].y, _pathPoints[0].z);
-
-    for (uint32 i = 1; i < _pathPoints.size(); ++i)
+    for (uint32 i = 0; i < _pathPoints.size(); ++i)
     {
-        float nextX=_pathPoints[i].x, nextY=_pathPoints[i].y, nextZ=_pathPoints[i].z;
-        Unit const* unit = _source->ToUnit();
-        bool goSwim = unit && unit->CanSwim() && unit->GetMap()->IsUnderWater(prevX, prevY, prevZ) && unit->GetMap()->IsUnderWater(nextX, nextY, nextZ);
-        float groundZ = unit->GetMapWaterOrGroundLevel(nextX, nextY, nextZ);
-        // under water the creature can follow a path but should not stick to the ground
-        if (goSwim && (G3D::fuzzyGe(lastZ, groundZ) || G3D::fuzzyGe(nextZ, prevZ)))
-        {
-            _pathPoints[i].z = std::fmaxf(nextZ, unit->GetPositionZ());
-            continue;
-        }
-
-        prevX=nextX;
-        prevY=nextY;
-        prevZ=nextZ;
-
         _source->UpdateAllowedPositionZ(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z);
     }
 }
@@ -898,7 +895,7 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
 
         bool canCheckSlope = _slopeCheck && (GetPathType() & ~(PATHFIND_NOT_USING_PATH));
 
-        if (canCheckSlope && !IsWalkableClimb(iterPos, steerPos))
+        if (canCheckSlope && !IsSwimmableSegment(iterPos, steerPos) && !IsWalkableClimb(iterPos, steerPos))
         {
             return DT_FAILURE;
         }
@@ -1071,7 +1068,11 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
         // check if the shortened path is still in LoS with the target and it is walkable
         _source->GetHitSpherePointFor({ _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z + collisionHeight }, x, y, z);
         if (!_source->GetMap()->isInLineOfSight(x, y, z, _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z + collisionHeight, _source->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS)
-            || (canCheckSlope && !IsWalkableClimb(_source->GetPositionX(), _source->GetPositionY(), _source->GetPositionZ(), _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z)))
+            || (canCheckSlope
+                && !IsSwimmableSegment(_source->GetPositionX(), _source->GetPositionY(), _source->GetPositionZ(), _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z)
+                && !IsWalkableClimb(_source->GetPositionX(), _source->GetPositionY(), _source->GetPositionZ(), _pathPoints[i - 1].x, _pathPoints[i - 1].y, _pathPoints[i - 1].z)
+                )
+        )
         {
             // whenver we find a point that is not valid anymore, simply use last valid path
             _pathPoints.resize(i + 1);
@@ -1109,4 +1110,62 @@ void PathGenerator::AddFarFromPolyFlags(bool startFarFromPoly, bool endFarFromPo
     {
         _type = PathType(_type | PATHFIND_FARFROMPOLY_END);
     }
+}
+
+/**
+ * @brief predict if a certain segment is underwater and the unit can swim
+ * Must only be used for very short segments since this check doesn't work on
+ * long paths that alternate terrain and water.
+ * 
+ * @param v1 
+ * @param v2 
+ * @return true 
+ * @return false 
+ */
+bool PathGenerator::IsSwimmableSegment(float const* v1, float const* v2, bool checkSwim) const
+{
+    return IsSwimmableSegment(v1[2], v1[0], v1[1], v2[2], v2[0], v2[1], checkSwim);
+}
+
+
+/**
+ * @brief predict if a certain segment is underwater and the unit can swim
+ * Must only be used for very short segments since this check doesn't work on
+ * long paths that alternate terrain and water.
+ * 
+ * @param x 
+ * @param y 
+ * @param z 
+ * @param destX 
+ * @param destY 
+ * @param destZ 
+ * @param checkSwim also check if the unit can swim
+ * @return true if there's water at the end AND at the start of the segment
+ * @return false if there's no water at the end OR at the start of the segment
+ */
+bool PathGenerator::IsSwimmableSegment(float x, float y, float z, float destX, float destY, float destZ, bool checkSwim) const
+{
+    Unit const* _sourceUnit = _source->ToUnit();
+    return  !_sourceUnit || 
+            ( _source->GetMap()->IsInWater(x, y, z) &&
+            _source->GetMap()->IsInWater(destX, destY, destZ) &&
+            (!checkSwim || _sourceUnit->CanSwim()));
+}
+
+bool PathGenerator::IsWaterPath(Movement::PointsArray _pathPoints) const
+{
+    bool waterPath = true;
+    // Check both start and end points, if they're both in water, then we can *safely* let the creature move
+    for (uint32 i = 0; i < _pathPoints.size(); ++i)
+    {
+        ZLiquidStatus status = _source->GetMap()->getLiquidStatus(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z, MAP_ALL_LIQUIDS, nullptr);
+        // One of the points is not in the water
+        if (status == LIQUID_MAP_NO_WATER)
+        {
+            waterPath = false;
+            break;
+        }
+    }
+
+    return waterPath;
 }

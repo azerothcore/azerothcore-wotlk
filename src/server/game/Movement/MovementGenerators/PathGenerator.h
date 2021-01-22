@@ -58,6 +58,9 @@ class PathGenerator
         [[nodiscard]] bool IsWalkableClimb(float const* v1, float const* v2) const;
         [[nodiscard]] bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight) const;
         [[nodiscard]] bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ) const;
+        [[nodiscard]] bool IsWaterPath(Movement::PointsArray _pathPoints) const;
+        [[nodiscard]] bool IsSwimmableSegment(float const* v1, float const* v2, bool checkSwim = true) const;
+        [[nodiscard]] bool IsSwimmableSegment(float x, float y, float z, float destX, float destY, float destZ, bool checkSwim = true) const;
         [[nodiscard]] float GetRequiredHeightToClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight) const;
 
         // option setters - use optional
