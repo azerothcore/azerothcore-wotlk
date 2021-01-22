@@ -1046,6 +1046,7 @@ public:
 
     virtual float GetCollisionHeight() const { return 0.0f; }
     virtual float GetCollisionWidth() const { return GetObjectSize(); }
+    virtual float GetCollisionRadius() const { return GetObjectSize() / 2; }
 
 protected:
     std::string m_name;

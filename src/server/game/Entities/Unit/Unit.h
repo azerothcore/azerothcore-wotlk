@@ -2475,6 +2475,7 @@ public:
 
     [[nodiscard]] float GetCollisionHeight() const override;
     [[nodiscard]] float GetCollisionWidth() const override;
+    [[nodiscard]] float GetCollisionRadius() const override;
 
 protected:
     explicit Unit (bool isWorldObject);

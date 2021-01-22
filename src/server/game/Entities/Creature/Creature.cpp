@@ -591,7 +591,7 @@ void Creature::Update(uint32 diff)
                     // If we are closer than 50% of the combat reach we are going to reposition the victim
                     if (diff >= m_moveBackwardsMovementTime)
                     {
-                        float MaxRange = (GetCollisionWidth() + GetVictim()->GetCollisionWidth()) / 2;
+                        float MaxRange = GetCollisionRadius() + GetVictim()->GetCollisionRadius();
 
                         if (IsInDist(victim, MaxRange))
                             AI()->MoveBackwardsChecks();

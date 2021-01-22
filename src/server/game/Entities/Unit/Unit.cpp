@@ -2251,7 +2251,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     Unit *refUnit = nullptr;
     uint32 validAttackers = 0;
 
-    double attackerSize = attacker->GetCollisionWidth();
+    double attackerSize = attacker->GetCollisionRadius();
 
     for (const auto& otherAttacker: attackers)
     {
@@ -2279,7 +2279,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     if (!validAttackers || !refUnit)
         return nullptr;
 
-    float contactDist = (attackerSize + refUnit->GetCollisionWidth()) / 2.0f;
+    float contactDist = attackerSize + refUnit->GetCollisionRadius();
     float requiredAngle = atan(contactDist / meleeReach);
     float attackersAngle = atan(attacker->GetExactDist2d(refUnit) / meleeReach);
 
@@ -19964,6 +19964,13 @@ bool Unit::IsInCombatWith(Unit const* who) const
     return false;
 }
 
+/**
+ * @brief this method gets the diameter of a Unit by DB if any value is defined, otherwise it gets the value by the DBC
+ * 
+ * If the player is mounted the diameter also takes in consideration the mount size
+ * 
+ * @return float The diameter of a unit
+ */
 float Unit::GetCollisionWidth() const
 {
     if (GetTypeId() == TYPEID_PLAYER)
@@ -19983,14 +19990,27 @@ float Unit::GetCollisionWidth() const
         {
             if (CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId))
             {
-                if (mountModelData->CollisionWidth > modelData->CollisionWidth)
+                if (G3D::fuzzyGt(mountModelData->CollisionWidth, modelData->CollisionWidth))
                     modelData = mountModelData;
             }
         }
     }
 
-    float collisionWidth = scaleMod * modelData->CollisionWidth * modelData->Scale * displayInfo->scale * 2.f;
-    return objectSize == defaultSize && collisionWidth > 0.0f ? collisionWidth : objectSize;
+    float collisionWidth = scaleMod * modelData->CollisionWidth * modelData->Scale * displayInfo->scale * 2;
+    // if the objectSize is the default value or the creature is mounted and we have a DBC value, then we can retrieve DBC value instead
+    return G3D::fuzzyGt(collisionWidth, 0.0f) && (G3D::fuzzyEq(objectSize,defaultSize) || IsMounted())  ? collisionWidth : objectSize;
+}
+
+/**
+ * @brief this method gets the radius of a Unit by DB if any value is defined, otherwise it gets the value by the DBC
+ * 
+ * If the player is mounted the radius also takes in consideration the mount size
+ * 
+ * @return float The radius of a unit
+ */
+float Unit::GetCollisionRadius() const
+{
+    return GetCollisionWidth() / 2;
 }
 
 //! Return collision height sent to client
