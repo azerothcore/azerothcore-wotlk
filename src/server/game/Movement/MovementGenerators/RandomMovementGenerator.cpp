@@ -272,12 +272,9 @@ bool RandomMovementGenerator<Creature>::DoUpdate(Creature* creature, const uint3
         }
     }
 
-    if (!_nextMoveTime.Passed())
+    if (!_nextMoveTime.Passed() && CanMove(diff))
     {
-        if (CanMove(diff))
-        {
-            return true;
-        }
+        return true;
     }
     else
     {
