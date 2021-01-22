@@ -1574,7 +1574,7 @@ public:
                 return;
             }
 
-            if (Creature * creature = caster->FindNearestCreature(CREATURE_INSTANT_STATUE_PEDESTAL, 0.0f, true))
+            if (Creature* creature = caster->FindNearestCreature(CREATURE_INSTANT_STATUE_PEDESTAL, 0.0f, true))
             {
                 creature->RemoveAurasDueToSpell(SPELL_INSTANT_STATUE);
             }
