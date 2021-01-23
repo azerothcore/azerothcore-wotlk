@@ -811,7 +811,7 @@ void LoadM2Cameras(const std::string& dataPath)
             std::streamoff const fileSize = m2file.tellg();
 
             // Reject if not at least the size of the header
-            if (static_cast<uint32 const>(fileSize) < sizeof(M2Header))
+            if (static_cast<uint32>(fileSize) < sizeof(M2Header))
             {
                 sLog->outError("Camera file %s is damaged. File is smaller than header size", filename.c_str());
                 m2file.close();
