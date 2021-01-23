@@ -465,7 +465,7 @@ public:
     [[nodiscard]] bool IsGuard() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_GUARD; }
     [[nodiscard]] bool CanWalk() const { return GetCreatureTemplate()->InhabitType & INHABIT_GROUND; }
     [[nodiscard]] bool CanSwim() const override;
-    [[nodiscard]] bool CanFly()  const override { return GetCreatureTemplate()->InhabitType & INHABIT_AIR; }
+    [[nodiscard]] bool CanFly()  const override;
 
     void SetReactState(ReactStates st) { m_reactState = st; }
     [[nodiscard]] ReactStates GetReactState() const { return m_reactState; }

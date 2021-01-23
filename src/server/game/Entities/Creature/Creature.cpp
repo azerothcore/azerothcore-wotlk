@@ -2733,7 +2733,8 @@ bool Creature::SetSwim(bool enable)
  * @return true 
  * @return false 
  */
-bool Creature::CanSwim() const {
+bool Creature::CanSwim() const 
+{
     if (Unit::CanSwim())
         return true;
 
@@ -2755,6 +2756,14 @@ bool Creature::SetCanFly(bool enable, bool  /*packetOnly*/ /* = false */)
     data.append(GetPackGUID());
     SendMessageToSet(&data, false);
     return true;
+}
+
+bool Creature::CanFly() const
+{
+    if (Unit::IsFlying())
+        return true;
+
+    return GetCreatureTemplate()->InhabitType & INHABIT_AIR;
 }
 
 bool Creature::SetWaterWalking(bool enable, bool packetOnly /* = false */)
