@@ -189,7 +189,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T* owner, bool in
             lastOwnerXYZ.Relocate(-5000.0f, -5000.0f, -5000.0f);
             return;
         }
-       
+
          bool success = i_path->CalculatePath(x, y, z, forceDest);
          if (!success)
          {

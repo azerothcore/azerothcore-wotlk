@@ -1116,11 +1116,11 @@ void PathGenerator::AddFarFromPolyFlags(bool startFarFromPoly, bool endFarFromPo
  * @brief predict if a certain segment is underwater and the unit can swim
  * Must only be used for very short segments since this check doesn't work on
  * long paths that alternate terrain and water.
- * 
- * @param v1 
- * @param v2 
- * @return true 
- * @return false 
+ *
+ * @param v1
+ * @param v2
+ * @return true
+ * @return false
  */
 bool PathGenerator::IsSwimmableSegment(float const* v1, float const* v2, bool checkSwim) const
 {
@@ -1133,12 +1133,12 @@ bool PathGenerator::IsSwimmableSegment(float const* v1, float const* v2, bool ch
  * Must only be used for very short segments since this check doesn't work on
  * long paths that alternate terrain and water.
  * 
- * @param x 
- * @param y 
- * @param z 
- * @param destX 
- * @param destY 
- * @param destZ 
+ * @param x
+ * @param y
+ * @param z
+ * @param destX
+ * @param destY
+ * @param destZ
  * @param checkSwim also check if the unit can swim
  * @return true if there's water at the end AND at the start of the segment
  * @return false if there's no water at the end OR at the start of the segment

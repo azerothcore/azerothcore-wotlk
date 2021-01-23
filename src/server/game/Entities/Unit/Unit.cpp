@@ -2302,7 +2302,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     float x, y, z;
     float distance = meleeReach - GetObjectSize();
     GetNearPoint(attacker, x, y, z, distance, 0.0f, absAngle);
-    
+
     if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z, true, true, false))
     {
         GetNearPoint(attacker, x, y, z, distance, 0.0f, absAngle * -1); // try the other side
@@ -19972,9 +19972,9 @@ bool Unit::IsInCombatWith(Unit const* who) const
 
 /**
  * @brief this method gets the diameter of a Unit by DB if any value is defined, otherwise it gets the value by the DBC
- * 
+ *
  * If the player is mounted the diameter also takes in consideration the mount size
- * 
+ *
  * @return float The diameter of a unit
  */
 float Unit::GetCollisionWidth() const
@@ -20009,9 +20009,9 @@ float Unit::GetCollisionWidth() const
 
 /**
  * @brief this method gets the radius of a Unit by DB if any value is defined, otherwise it gets the value by the DBC
- * 
+ *
  * If the player is mounted the radius also takes in consideration the mount size
- * 
+ *
  * @return float The radius of a unit
  */
 float Unit::GetCollisionRadius() const
@@ -20021,7 +20021,7 @@ float Unit::GetCollisionRadius() const
 
 //! Return collision height sent to client
 float Unit::GetCollisionHeight() const
-{ 
+{
     float scaleMod = GetObjectScale(); // 99% sure about this
     float defaultHeight = DEFAULT_WORLD_OBJECT_SIZE * scaleMod;
 
