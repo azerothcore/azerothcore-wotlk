@@ -5,7 +5,7 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 (-1, 724),
 (-7, 724),
 (-1, 725),
-(-7, 726),
+(-7, 725),
 (-1, 726),
 (-7, 726),
 (-1, 727),
