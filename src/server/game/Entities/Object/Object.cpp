@@ -1486,8 +1486,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
     {
         if (!unit->CanFly())
         {
-            Creature const* c = ToCreature();
-            bool canSwim = c ? c->CanSwim() : true;
+            bool canSwim = unit->CanSwim();
             float ground_z = z;
             float max_z;
             if (canSwim)
