@@ -302,7 +302,8 @@ enum InhabitTypeValues
     INHABIT_GROUND = 1,
     INHABIT_WATER  = 2,
     INHABIT_AIR    = 4,
-    INHABIT_ANYWHERE = INHABIT_GROUND | INHABIT_WATER | INHABIT_AIR
+    INHABIT_ROOT   = 8,
+    INHABIT_ANYWHERE = INHABIT_GROUND | INHABIT_WATER | INHABIT_AIR | INHABIT_ROOT
 };
 
 // Enums used by StringTextData::Type (CreatureEventAI)
@@ -520,15 +521,6 @@ public:
     bool SetWaterWalking(bool enable, bool packetOnly = false) override;
     bool SetFeatherFall(bool enable, bool packetOnly = false) override;
     bool SetHover(bool enable, bool packetOnly = false) override;
-    bool HasSpellFocus(Spell const* focusSpell = nullptr) const;
-
-    struct
-    {
-        ::Spell const* Spell = nullptr;
-        uint32 Delay = 0;         // ms until the creature's target should snap back (0 = no snapback scheduled)
-        uint64 Target;            // the creature's "real" target while casting
-        float Orientation = 0.0f; // the creature's "real" orientation while casting
-    } _spellFocusInfo;
 
     [[nodiscard]] uint32 GetShieldBlockValue() const override
     {
@@ -733,17 +725,10 @@ public:
     void SetTarget(uint64 guid) override;
     void FocusTarget(Spell const* focusSpell, WorldObject const* target);
     void ReleaseFocus(Spell const* focusSpell);
-    bool IsMovementPreventedByCasting() const;
 
     // Part of Evade mechanics
     [[nodiscard]] time_t GetLastDamagedTime() const { return _lastDamagedTime; }
     void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
-
-    bool IsFreeToMove();
-    static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 1500;
-    static constexpr uint32 MOVE_BACKWARDS_CHECK_INTERVAL = 2000;
-    uint32 m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
-    uint32 m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
 
 protected:
     bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
