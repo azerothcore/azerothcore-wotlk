@@ -568,10 +568,11 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
         if (status == LIQUID_MAP_UNDER_WATER)
         {
             // if the first point is under water
-            // then just set a proper z for it
+            // then set a proper z for it
             if (i == 0)
             {
                 vector.z = std::fmaxf(vector.z, _source->GetPositionZ());
+                _pathPoints[newPointCount] = vector;
             }
             // if the last point is under water
             // then set the desired end position instead
