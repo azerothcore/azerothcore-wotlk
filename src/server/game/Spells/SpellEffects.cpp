@@ -6079,7 +6079,7 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
 
 
         // xinef: do not use precalculated position for effect summon pet in this function, it means it was cast by NPC and should have its position overridden
-        if (totalNumGuardians == 0 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET)
+        if (totalNumGuardians == 1 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET)
         {
             pos = *destTarget;
         }
