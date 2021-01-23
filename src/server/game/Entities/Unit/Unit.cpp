@@ -18904,6 +18904,15 @@ bool Unit::IsFalling() const
     return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR) || movespline->isFalling();
 }
 
+/**
+ * @brief this method checks the current flag of a unit
+ * 
+ * These flags can be set within the database or dynamically changed at runtime
+ * UNIT_FLAG_SWIMMING must be updated when a unit enters a swimmable area
+ * 
+ * @return true 
+ * @return false 
+ */
 bool Unit::CanSwim() const
 {
     // Mirror client behavior, if this method returns false then client will not use swimming animation and for players will apply gravity as if there was no water

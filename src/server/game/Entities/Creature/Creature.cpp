@@ -2724,6 +2724,15 @@ bool Creature::SetSwim(bool enable)
     return true;
 }
 
+/**
+ * @brief This method check the current flag/status of a creature and its inhabit type
+ * 
+ * Pets should swim by default to properly follow the player
+ * NOTE: You can set the UNIT_FLAG_CANNOT_SWIM temporary to deny a creature to swim
+ * 
+ * @return true 
+ * @return false 
+ */
 bool Creature::CanSwim() const {
     if (Unit::CanSwim())
         return true;
