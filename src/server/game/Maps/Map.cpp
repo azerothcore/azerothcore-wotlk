@@ -3490,11 +3490,6 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         // collision check
         bool collided = false;
 
-        G3D::Vector3 endPos = path->GetPath().back();
-        destX = endPos.x;
-        destY = endPos.y;
-        destZ = endPos.z;
-
         float angle = getAngle(destX, destY, startX, startY);
 
         // check static LOS
@@ -3503,35 +3498,39 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
         // Unit is not on the ground, check for potential collision via vmaps
         if (notOnGround)
         {
+            float x = destX, y = destY, z = destZ;
             bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(source->GetMapId(),
                 startX, startY, startZ + halfHeight,
                 destX, destY, destZ + halfHeight,
-                destX, destY, destZ, -0.5f);
+                x, y, z, -0.5f);
 
-            destZ -= halfHeight;
+            z -= halfHeight;
 
             // Collided with static LOS object, move back to collision point
             if (col)
             {
                 destX -= CONTACT_DISTANCE * std::cos(angle);
                 destY -= CONTACT_DISTANCE * std::sin(angle);
+                destZ = z;
                 collided = true;
             }
         }
 
         // check dynamic collision
+        float x = destX, y = destY, z = destZ;
         bool col = source->GetMap()->getObjectHitPos(source->GetPhaseMask(),
             startX, startY, startZ + halfHeight,
             destX, destY, destZ + halfHeight,
-            destX, destY, destZ, -0.5f);
+            x, y, z, -0.5f);
 
-        destZ -= halfHeight;
+        z -= halfHeight;
 
         // Collided with a gameobject, move back to collision point
         if (col)
         {
             destX -= CONTACT_DISTANCE * std::cos(angle);
             destY -= CONTACT_DISTANCE * std::sin(angle);
+            destZ = z;
             collided = true;
         }
 
@@ -3559,7 +3558,7 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
             }
 
             const Creature* creature = unit->ToCreature();
-            bool cannotSwim = isWaterNext && !unit->CanSwim();
+            bool cannotSwim = isWaterNext && (creature && !creature->CanSwim());
             bool cannotWalkOrFly = !isWaterNext && !source->ToPlayer() && !unit->CanFly() && (creature && !creature->CanWalk());
             if (cannotSwim || cannotWalkOrFly) {
                 return false;
