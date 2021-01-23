@@ -194,7 +194,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
     // swimming creatures should not use a shortcut
     // because exiting the water must be done following a proper path
     // we just need to remove/normalize paths between 2 adjacent points
-    if ((!creature || !creature->CanSwim() || !creature->IsInWater()) 
+    if ((!creature || !creature->CanSwim() || !creature->IsInWater())
         && (startFarFromPoly || endFarFromPoly))
     {
         bool buildShotrcut = false;
@@ -1132,7 +1132,7 @@ bool PathGenerator::IsSwimmableSegment(float const* v1, float const* v2, bool ch
  * @brief predict if a certain segment is underwater and the unit can swim
  * Must only be used for very short segments since this check doesn't work on
  * long paths that alternate terrain and water.
- * 
+ *
  * @param x
  * @param y
  * @param z
