@@ -693,7 +693,7 @@ void PathGenerator::UpdateFilter()
     }
 }
 
-NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z)
+NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
 {
     LiquidData data;
     ZLiquidStatus liquidStatus = _source->GetMap()->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &data);
@@ -1157,9 +1157,9 @@ bool PathGenerator::IsWaterPath(Movement::PointsArray _pathPoints) const
     // Check both start and end points, if they're both in water, then we can *safely* let the creature move
     for (uint32 i = 0; i < _pathPoints.size(); ++i)
     {
-        ZLiquidStatus status = _source->GetMap()->getLiquidStatus(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z, MAP_ALL_LIQUIDS, nullptr);
+        NavTerrain terrain = GetNavTerrain(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z);
         // One of the points is not in the water
-        if (status == LIQUID_MAP_NO_WATER)
+        if (terrain != NAV_MAGMA && terrain != NAV_WATER)
         {
             waterPath = false;
             break;

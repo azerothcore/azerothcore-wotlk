@@ -156,7 +156,7 @@ class PathGenerator
         void BuildPointPath(float const* startPoint, float const* endPoint);
         void BuildShortcut();
 
-        NavTerrain GetNavTerrain(float x, float y, float z);
+        NavTerrain GetNavTerrain(float x, float y, float z) const;
         void CreateFilter();
         void UpdateFilter();
 
