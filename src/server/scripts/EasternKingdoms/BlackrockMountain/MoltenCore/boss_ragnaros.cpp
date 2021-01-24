@@ -254,7 +254,6 @@ public:
                                         _hasSubmergedOnce = true;
                                         _isBanished = true;
                                         _emergeTimer = 90000;
-
                                     }
                                     else
                                     {

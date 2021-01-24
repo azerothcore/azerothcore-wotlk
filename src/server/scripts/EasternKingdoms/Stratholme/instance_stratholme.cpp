@@ -137,7 +137,6 @@ public:
                     baron->AI()->Talk(SAY_BARON_GUARD_DEAD);
                 if (GameObject* gate = instance->GetGameObject(_zigguratDoorsGUID5))
                     gate->SetGoState(GO_STATE_ACTIVE);
-
             }
         }
 

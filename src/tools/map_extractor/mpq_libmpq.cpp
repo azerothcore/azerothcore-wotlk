@@ -77,7 +77,6 @@ MPQFile::MPQFile(const char* filename):
         libmpq__file_read(mpq_a, filenum, (unsigned char*)buffer, size, &transferred);
         /*libmpq_file_getdata(&mpq_a, hash, fileno, (unsigned char*)buffer);*/
         return;
-
     }
     eof = true;
     buffer = nullptr;

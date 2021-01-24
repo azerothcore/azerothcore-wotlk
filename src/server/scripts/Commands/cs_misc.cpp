@@ -1216,7 +1216,6 @@ public:
 
         //Not a supported argument
         return false;
-
     }
 
     static bool HandleLinkGraveCommand(ChatHandler* handler, char const* args)
