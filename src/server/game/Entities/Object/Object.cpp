@@ -1479,8 +1479,8 @@ void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
 /**
  * @brief Get the minimum height of a object that should be in water
  * to start floating/swim
- * 
- * @return float 
+ *
+ * @return float
  */
 float WorldObject::GetMinHeightInWater() const
 {

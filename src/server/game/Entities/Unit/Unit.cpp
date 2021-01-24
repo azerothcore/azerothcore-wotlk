@@ -18906,12 +18906,10 @@ bool Unit::IsFalling() const
 
 /**
  * @brief this method checks the current flag of a unit
- * 
+ *
  * These flags can be set within the database or dynamically changed at runtime
  * UNIT_FLAG_SWIMMING must be updated when a unit enters a swimmable area
- * 
- * @return true 
- * @return false 
+ *
  */
 bool Unit::CanSwim() const
 {
