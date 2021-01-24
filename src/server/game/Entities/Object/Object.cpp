@@ -1476,6 +1476,23 @@ void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
         z = new_z + (isType(TYPEMASK_UNIT) ? static_cast<Unit const*>(this)->GetHoverHeight() : 0.0f);
 }
 
+/**
+ * @brief Get the minimum height of a object that should be in water
+ * to start floating/swim
+ * 
+ * @return float 
+ */
+float WorldObject::GetMinHeightInWater() const
+{
+    // have a fun with Archimedes' formula
+    auto height = GetCollisionHeight();
+    auto width = GetCollisionWidth();
+    auto weight = getWeight(height, width, 1040); // avg human specific weight
+    auto heightOutOfWater = getOutOfWater(width, weight, 10202) * 4.0f; // avg human density
+    auto heightInWater = height - heightOutOfWater;
+    return (height > heightInWater ? heightInWater : (height - (height / 3)));
+}
+
 void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* groundZ) const
 {
     // TODO: Allow transports to be part of dynamic vmap tree
@@ -1486,7 +1503,8 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
     {
         if (!unit->CanFly())
         {
-            bool canSwim = unit->CanSwim();
+            Creature const* c = unit->ToCreature();
+            bool canSwim = c ? c->CanSwim() : true;
             float ground_z = z;
             float max_z;
             if (canSwim)
@@ -1497,15 +1515,9 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
             if (max_z > INVALID_HEIGHT)
             {
                 if (canSwim && unit->GetMap()->IsInWater(x, y, max_z - WATER_HEIGHT_TOLERANCE)) {
-                    // have a fun with Archimedes' formula
-                    auto height = unit->GetCollisionHeight();
-                    auto width = GetObjectSize();
-                    auto weight = getWeight(height, width, 1040); // avg human specific weight
-                    auto heightOutOfWater = getOutOfWater(width, weight, 10202) * 4.0f; // avg human density
-                    auto heightInWater = height - heightOutOfWater;
                     // do not allow creatures to walk on
                     // water level while swimming
-                    max_z = max_z - (height > heightInWater ? heightInWater : (height - (height / 3)));
+                    max_z = max_z - GetMinHeightInWater();
                 }
                 else
                 {

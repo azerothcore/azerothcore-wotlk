@@ -3649,8 +3649,6 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
 
 void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
 {
-    bool isValk = GetEntry() == 37098;
-
     if (m_is_updating_environment)
         return;
 
@@ -3664,12 +3662,8 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         return;
     }
 
-    if (option <= 1 && GetExactDistSq(&m_last_environment_position) < 2.5f * 2.5f)
-        return;
     m_last_environment_position.Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
     m_staticFloorZ = GetMap()->GetHeight(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ());
-
-    float ground = GetFloorZ();
 
     m_is_updating_environment = true;
 
@@ -3691,8 +3685,10 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
 
     ZLiquidStatus liquidStatus = baseMap->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquidData);
 
+    float minHeightInWater = GetMinHeightInWater();
+
     // IsInWater
-    bool enoughWater = (liquidData.level > INVALID_HEIGHT && liquidData.level > liquidData.depth_level && liquidData.level - liquidData.depth_level >= 1.5f); // also check if theres enough water - at least 2yd
+    bool enoughWater = (liquidData.level > INVALID_HEIGHT && liquidData.level > liquidData.depth_level && liquidData.level - liquidData.depth_level >= minHeightInWater); // also check if theres enough water
     m_last_isinwater_status = (liquidStatus & (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER)) && enoughWater;
     m_last_islittleabovewater_status = (liquidData.level > INVALID_HEIGHT && liquidData.level > liquidData.depth_level && liquidData.level <= z + 3.0f && liquidData.level > z - 1.0f);
 
@@ -3747,12 +3743,12 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
     // Refresh being in water
     if (m_last_isinwater_status)
     {
-        if (!c->CanFly() || z < liquidData.level - 2.0f)
+        if (!c->CanFly() || enoughWater)
         {
             if (!HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD) && c->CanSwim() && (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY)))
             {
                 SetSwim(true);
-                SetDisableGravity(true);
+                // SetDisableGravity(true);
                 changed = true;
             }
             isInAir = false;
@@ -3780,9 +3776,10 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
     {
         if (GetMap()->GetGrid(x, y))
         {
-            if (ground > INVALID_HEIGHT)
+            float temp = GetFloorZ();
+            if (temp > INVALID_HEIGHT)
             {
-                ground_z = (c->CanSwim() && liquidData.level > INVALID_HEIGHT) ? liquidData.level : ground;
+                ground_z = (c->CanSwim() && liquidData.level > INVALID_HEIGHT) ? liquidData.level : temp;
                 bool canHover = c->CanHover();
                 isInAir = flyingBarelyInWater || (G3D::fuzzyGt(GetPositionZ(), ground_z + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + GROUND_HEIGHT_TOLERANCE) || G3D::fuzzyLt(GetPositionZ(), ground_z - GROUND_HEIGHT_TOLERANCE)); // Can be underground too, prevent the falling
             }
