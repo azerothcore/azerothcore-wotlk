@@ -3522,6 +3522,11 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
             return false;
         }
 
+        G3D::Vector3 endPos = path->GetPath().back();
+        destX = endPos.x;
+        destY = endPos.y;
+        destZ = endPos.z;
+
         // collision check
         bool collided = false;
 

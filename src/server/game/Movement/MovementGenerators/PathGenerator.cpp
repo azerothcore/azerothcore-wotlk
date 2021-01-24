@@ -194,22 +194,17 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
     // swimming creatures should not use a shortcut
     // because exiting the water must be done following a proper path
     // we just need to remove/normalize paths between 2 adjacent points
-    if ((!creature || !creature->CanSwim() || !creature->IsInWater())
+    if ((!creature || !creature->CanSwim() || !creature->IsInWater() || _useRaycast)
         && (startFarFromPoly || endFarFromPoly))
     {
         bool buildShotrcut = false;
 
-        if (Unit const* _sourceUnit = _source->ToUnit())
+        Unit const* _sourceUnit = _source->ToUnit();
+        if (_useRaycast || 
+            (_sourceUnit && (_sourceUnit->CanFly() || (_sourceUnit->IsFalling() && endPos.z < startPos.z)))
+        )
         {
-            if (_sourceUnit->CanFly())
-            {
-                buildShotrcut = true;
-            }
-            // Allow to build a shortcut if the unit is falling and it's trying to move downwards towards a target (i.e. charging)
-            else if (_sourceUnit->IsFalling() && endPos.z < startPos.z)
-            {
-                buildShotrcut = true;
-            }
+            buildShotrcut = true;
         }
 
         if (buildShotrcut)
