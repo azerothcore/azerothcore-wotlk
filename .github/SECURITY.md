@@ -20,8 +20,7 @@ Versions of MySQL:
 | ------------- | ------------------ |
 | 8.0           | :white_check_mark: |
 | 5.7           | :white_check_mark: |
-| 5.6           | :white_check_mark: |
-| 5.5 and lower | :red_circle:       |
+| 5.6 and lower | :red_circle:       |
 
 Versions of MariaDB:
 
