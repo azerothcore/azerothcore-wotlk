@@ -347,7 +347,6 @@ public:
             if (roll_chance_i(33))
                 if (Unit* target = GetCaster()->GetAI()->SelectTarget(SELECT_TARGET_RANDOM, 0, 30.0f, true))
                     target->CastSpell(GetCaster(), SPELL_TAUNT, true);
-
         }
 
         void Register() override

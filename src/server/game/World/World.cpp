@@ -1075,6 +1075,14 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_GUILD_RESET_HOUR] = 6;
     }
 
+    m_int_configs[CONFIG_GUILD_BANK_INITIAL_TABS] = sConfigMgr->GetIntDefault("Guild.BankInitialTabs", 0);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_0] = sConfigMgr->GetIntDefault("Guild.BankTabCost0", 1000000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_1] = sConfigMgr->GetIntDefault("Guild.BankTabCost1", 2500000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_2] = sConfigMgr->GetIntDefault("Guild.BankTabCost2", 5000000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_3] = sConfigMgr->GetIntDefault("Guild.BankTabCost3", 10000000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_4] = sConfigMgr->GetIntDefault("Guild.BankTabCost4", 25000000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_5] = sConfigMgr->GetIntDefault("Guild.BankTabCost5", 50000000);
+
     m_bool_configs[CONFIG_DETECT_POS_COLLISION] = sConfigMgr->GetBoolDefault("DetectPosCollision", true);
 
     m_bool_configs[CONFIG_RESTRICTED_LFG_CHANNEL]      = sConfigMgr->GetBoolDefault("Channel.RestrictedLfg", true);
@@ -1308,6 +1316,7 @@ void World::LoadConfigSettings(bool reload)
     // Warden
     m_bool_configs[CONFIG_WARDEN_ENABLED]              = sConfigMgr->GetBoolDefault("Warden.Enabled", false);
     m_int_configs[CONFIG_WARDEN_NUM_MEM_CHECKS]        = sConfigMgr->GetIntDefault("Warden.NumMemChecks", 3);
+    m_int_configs[CONFIG_WARDEN_NUM_LUA_CHECKS]        = sConfigMgr->GetIntDefault("Warden.NumLuaChecks", 1);
     m_int_configs[CONFIG_WARDEN_NUM_OTHER_CHECKS]      = sConfigMgr->GetIntDefault("Warden.NumOtherChecks", 7);
     m_int_configs[CONFIG_WARDEN_CLIENT_BAN_DURATION]   = sConfigMgr->GetIntDefault("Warden.BanDuration", 86400);
     m_int_configs[CONFIG_WARDEN_CLIENT_CHECK_HOLDOFF]  = sConfigMgr->GetIntDefault("Warden.ClientCheckHoldOff", 30);
@@ -1398,6 +1407,8 @@ void World::LoadConfigSettings(bool reload)
     //Debug
     m_bool_configs[CONFIG_DEBUG_BATTLEGROUND] = sConfigMgr->GetBoolDefault("Debug.Battleground", false);
     m_bool_configs[CONFIG_DEBUG_ARENA]        = sConfigMgr->GetBoolDefault("Debug.Arena",        false);
+
+    m_int_configs[CONFIG_GM_LEVEL_CHANNEL_MODERATION] = sConfigMgr->GetIntDefault("Channel.ModerationGMLevel", 1);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);

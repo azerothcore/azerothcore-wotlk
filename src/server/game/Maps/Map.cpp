@@ -5,7 +5,6 @@
  */
 
 #include "Map.h"
-#include "Geometry.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "DynamicTree.h"
@@ -785,6 +784,19 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         player->Update(s_diff);
 
         VisitNearbyCellsOfPlayer(player, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
+
+        // If player is using far sight, visit that object too
+        if (WorldObject* viewPoint = player->GetViewpoint())
+        {
+            if (Creature* viewCreature = viewPoint->ToCreature())
+            {
+                VisitNearbyCellsOf(viewCreature, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
+            }
+            else if (DynamicObject* viewObject = viewPoint->ToDynObject())
+            {
+                VisitNearbyCellsOf(viewObject, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
+            }
+        }
 
         // handle updates for creatures in combat with player and are more than X yards away
         if (player->IsInCombat())
@@ -2270,6 +2282,28 @@ char const* Map::GetMapName() const
     return i_mapEntry ? i_mapEntry->name[sWorld->GetDefaultDbcLocale()] : "UNNAMEDMAP\x0";
 }
 
+void Map::UpdateObjectVisibility(WorldObject* obj, Cell cell, CellCoord cellpair)
+{
+    cell.SetNoCreate();
+    acore::VisibleChangesNotifier notifier(*obj);
+    TypeContainerVisitor<acore::VisibleChangesNotifier, WorldTypeMapContainer > player_notifier(notifier);
+    cell.Visit(cellpair, player_notifier, *this, *obj, obj->GetVisibilityRange());
+}
+
+void Map::UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair)
+{
+    acore::VisibleNotifier notifier(*player, false, false);
+
+    cell.SetNoCreate();
+    TypeContainerVisitor<acore::VisibleNotifier, WorldTypeMapContainer > world_notifier(notifier);
+    TypeContainerVisitor<acore::VisibleNotifier, GridTypeMapContainer  > grid_notifier(notifier);
+    cell.Visit(cellpair, world_notifier, *this, *player->m_seer, player->GetSightRange());
+    cell.Visit(cellpair, grid_notifier, *this, *player->m_seer, player->GetSightRange());
+
+    // send data
+    notifier.SendToSelf();
+}
+
 void Map::SendInitSelf(Player* player)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -3388,121 +3422,4 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
                 if (player->GetZoneId() == zoneId)
                     player->SendDirectMessage(&data);
     }
-}
-
-/**
- *
- * \param maxDeviationAngle  the maximum deviation that a creature can take to reach the destination
- *
- */
-bool Map::CanReachPositionAndGetCoords(Unit* who, PathGenerator path, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */, float maxSlopeAngle/* = M_PI/2 */, float maxDeviationAngle /*= M_PI*2 */) const
-{
-    double deviation = 0.0f;
-    G3D::Vector3 prevPath = path.GetStartPosition();
-    for (auto & vector : path.GetPath())
-    {
-        float x = vector.x;
-        float y = vector.y;
-        float z = vector.z;
-
-        deviation += who->GetRelativeAngle(x, y);
-
-        // to reach the position the Unit must deviate
-        // the straight path with a higher margin than the one desired
-        // in this case we return false
-        if (deviation > maxDeviationAngle)
-        {
-            return false;
-        }
-
-        float ang = getAngle(prevPath.x, prevPath.y, x, y);
-
-        if (CanReachPositionAndGetCoords(who, prevPath.x, prevPath.y, prevPath.z, ang, x, y, z, checkCollision, maxHeight, maxSlopeAngle))
-        {
-            return false;
-        }
-
-        prevPath = vector;
-    }
-
-    return true;
-}
-
-bool Map::CanReachPositionAndGetCoords(Unit* who, float &destX, float &destY, float &destZ, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */, float maxSlopeAngle/* = M_PI/2 */) const
-{
-    return CanReachPositionAndGetCoords(who, who->GetPositionX(), who->GetPositionY(), who->GetPositionZ(), who->GetOrientation(), destX, destY, destZ, checkCollision, maxHeight, maxSlopeAngle);
-}
-
-/**
- *   \brief validate the new destination
- *
- *   Check if a given unit can reach a specific point and set the correct Z coord based on difference in height
- *
- *   \param maxHeight the desired max Height for the calculated Z coord. If the new Z exceed the maxHeight, this method returns false
-
- *   \return true if the destination is valid, false otherwise
- *
- **/
-bool Map::CanReachPositionAndGetCoords(Unit* who, float startX, float startY, float startZ, float startAngle, float &destX, float &destY, float &destZ, bool checkCollision /*= true */, float maxHeight/*  = 3.0f */, float maxSlopeAngle/* = M_PI/2 */) const
-{
-    acore::NormalizeMapCoord(destX);
-    acore::NormalizeMapCoord(destY);
-
-    const Map* _map = who->GetBaseMap();
-
-    // check map geometry for possible collision
-    if (checkCollision)
-    {
-        Position pos = Position(startX, startY, startZ, startAngle);
-
-        auto distance = pos.GetExactDist2d(destX,destY);
-
-        auto collided = who->MovePositionToFirstCollision(pos, distance, pos.GetRelativeAngle(destX,destY));
-
-        destX = pos.GetPositionX();
-        destY = pos.GetPositionY();
-        destZ = pos.GetPositionZ();
-
-        if (collided)
-        {
-            return false;
-        }
-    }
-    else
-    {
-        // otherwise calculate a new z
-        destZ = _map->GetHeight(who->GetPhaseMask(), destX, destY, destZ, true);
-    }
-
-    if (destZ <= INVALID_HEIGHT || (destZ - startZ) > maxHeight)
-    {
-        return false;
-    }
-
-    float slopeAngle = getSlopeAngleAbs(startX, startY, startZ, destX, destY, destZ);
-
-    if (slopeAngle > maxSlopeAngle)
-    {
-        return false;
-    }
-
-    // if water environment
-    bool is_water_now = _map->IsInWater(startX, startY, startZ);
-
-    if (!isInLineOfSight(startX, startY, startZ, destX, destY, destZ, who->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS))
-    {
-        return false;
-    }
-
-    bool is_water_next = _map->IsInWater(destX, destY, destZ);
-
-    // if not compatible inhabit type for the next position, return false
-    if ((is_water_now && !is_water_next && who->GetTypeId() == TYPEID_UNIT && !((Creature*)who)->CanWalk()) ||
-        (!is_water_now && is_water_next && !who->CanSwim()))
-    {
-        return false;
-    }
-
-    // finally
-    return true;
 }

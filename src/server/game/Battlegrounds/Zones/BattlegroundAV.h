@@ -1001,7 +1001,6 @@ const float BG_AV_CreaturePos[AV_CPLACE_MAX][4] =
 
 enum BG_AV_CreatureIds
 {
-
     AV_NPC_A_TOWERDEFENSE  = 0,     // stormpike bowman
     AV_NPC_A_GRAVEDEFENSE0 = 1,     // stormpike Defender
     AV_NPC_A_GRAVEDEFENSE1 = 2,     // seasoned defender
@@ -1053,7 +1052,6 @@ enum BG_AV_CreatureIds
     AV_NPC_S_MINE_H_4      = 46,
     AV_NPC_HERALD          = 47,
     AV_NPC_INFO_MAX        = 48
-
 };
 
 const uint32 BG_AV_CreatureInfo[AV_NPC_INFO_MAX] =
@@ -1242,7 +1240,6 @@ const float BG_AV_StaticCreaturePos[AV_STATICCPLACE_MAX][5] =
     {773.651f, -497.482f, 99.0408f, 2.11185f, 46 }, //14284 - Stormpike Battleguard
     {949.1f, -506.913f, 95.4237f, 3.31613f, 46 }, //14284 - Stormpike Battleguard
     {-1370.9f, -219.793f, 98.4258f, 5.04381f, 47}, //drek thar
-
 };
 
 const uint32 BG_AV_StaticCreatureInfo[51] =
@@ -1452,7 +1449,6 @@ enum BG_AV_WorldStates
         AV_FROSTWOLFE_UNUSED            = 1393,
         AV_FROSTWOLFW_UNUSED            = 1392
     */
-
 };
 
 //alliance_control neutral_control horde_control

@@ -1172,7 +1172,6 @@ void SmartGameObjectAI::SpellHit(Unit* unit, const SpellInfo* spellInfo)
 class SmartTrigger : public AreaTriggerScript
 {
 public:
-
     SmartTrigger() : AreaTriggerScript("SmartTrigger") {}
 
     bool OnTrigger(Player* player, AreaTrigger const* trigger) override
