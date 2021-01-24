@@ -1563,7 +1563,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            return static_cast<bool>(sSpellMgr->GetSpellInfo(SPELL_INSTANT_STATUE));
+            return ValidateSpellInfo({ SPELL_INSTANT_STATUE });
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1574,7 +1574,7 @@ public:
                 return;
             }
 
-            if (Creature * creature = caster->FindNearestCreature(CREATURE_INSTANT_STATUE_PEDESTAL, 0.0f, true))
+            if (Creature* creature = caster->FindNearestCreature(CREATURE_INSTANT_STATUE_PEDESTAL, 0.0f, true))
             {
                 creature->RemoveAurasDueToSpell(SPELL_INSTANT_STATUE);
             }
