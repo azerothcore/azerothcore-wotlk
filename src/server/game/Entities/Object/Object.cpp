@@ -1529,13 +1529,23 @@ bool Position::IsPositionValid() const
 float WorldObject::GetGridActivationRange() const
 {
     if (ToPlayer())
+    {
+        if (ToPlayer()->IsOnCinematic())
+        {
+            return DEFAULT_VISIBILITY_INSTANCE;
+        }
         return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
+    }
     else if (ToCreature())
+    {
         return ToCreature()->m_SightDistance;
-    else if (GetTypeId() == TYPEID_GAMEOBJECT && ToGameObject()->IsTransport())
+    }
+    else if (GetTypeId() == TYPEID_GAMEOBJECT && ToGameObject()->IsTransport() && isActiveObject())
+    {
         return GetMap()->GetVisibilityRange();
-    else
-        return 0.0f;
+    }
+
+    return 0.0f;
 }
 
 float WorldObject::GetVisibilityRange() const
@@ -1564,15 +1574,27 @@ float WorldObject::GetSightRange(const WorldObject* target) const
             if (target)
             {
                 if (target->IsVisibilityOverridden() && target->GetTypeId() == TYPEID_UNIT)
+                {
                     return MAX_VISIBILITY_DISTANCE;
+                }
                 else if (target->GetTypeId() == TYPEID_GAMEOBJECT)
                 {
                     if (IsInWintergrasp() && target->IsInWintergrasp())
+                    {
                         return VISIBILITY_DIST_WINTERGRASP + VISIBILITY_INC_FOR_GOBJECTS;
+                    }
                     else if (target->IsVisibilityOverridden())
+                    {
                         return MAX_VISIBILITY_DISTANCE;
+                    }
+                    else if (ToPlayer()->IsOnCinematic())
+                    {
+                        return DEFAULT_VISIBILITY_INSTANCE;
+                    }
                     else
+                    {
                         return GetMap()->GetVisibilityRange() + VISIBILITY_INC_FOR_GOBJECTS;
+                    }
                 }
 
                 return IsInWintergrasp() && target->IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
@@ -1580,9 +1602,18 @@ float WorldObject::GetSightRange(const WorldObject* target) const
             return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
         }
         else if (ToCreature())
+        {
             return ToCreature()->m_SightDistance;
+        }
         else
+        {
             return SIGHT_RANGE_UNIT;
+        }
+    }
+
+    if (ToDynObject() && isActiveObject())
+    {
+        return GetMap()->GetVisibilityRange();
     }
 
     return 0.0f;
@@ -1842,7 +1873,6 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj, bool checkAlert) co
 
         if (checkAlert)
             visibilityRange += (visibilityRange * 0.08f) + 1.5f;
-
 
         Unit const* targetUnit = obj->ToUnit();
 
@@ -2621,7 +2651,6 @@ void WorldObject::GetContactPoint(const WorldObject* obj, float& x, float& y, fl
     }
 }
 
-
 void WorldObject::GetChargeContactPoint(const WorldObject* obj, float& x, float& y, float& z, float distance2d) const
 {
     // angle to face `obj` to `this` using distance includes size of `obj`
@@ -2903,7 +2932,6 @@ void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= NULL*/)
     else
         SendMessageToSet(&data, true);
 }
-
 
 void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= NULL*/)
 {

@@ -53,7 +53,6 @@ public:
     std::vector<Triangle<uint32>> Triangles;
     bool IsSane() { return _definitions && _paths; }
 
-
 protected:
     void ProcessInternal(MapChunk* chunk);
 

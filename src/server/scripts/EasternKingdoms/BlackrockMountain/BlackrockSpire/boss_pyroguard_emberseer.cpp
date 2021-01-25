@@ -367,8 +367,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-
-
             if (!UpdateVictim())
             {
                 _events.Update(diff);
@@ -384,7 +382,6 @@ public:
                                         if (Creature* Emberseer = me->FindNearestCreature(NPC_PYROGAURD_EMBERSEER, 30.0f, true))
                                             DoCast(Emberseer, SPELL_ENCAGE_EMBERSEER);
                                 break;
-
                             }
                     }
                 }

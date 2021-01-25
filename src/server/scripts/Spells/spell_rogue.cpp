@@ -98,7 +98,6 @@ public:
     }
 };
 
-
 // Theirs
 // 13877, 33735, (check 51211, 65956) - Blade Flurry
 class spell_rog_blade_flurry : public SpellScriptLoader
@@ -264,7 +263,6 @@ public:
 
             if (Unit* target = GetHitUnit())
             {
-
                 Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
 
                 if (item == GetCastItem())

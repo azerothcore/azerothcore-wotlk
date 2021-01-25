@@ -244,7 +244,6 @@ public:
             PreventDefaultAction();
             GetUnitOwner()->SetFacingTo(Position::NormalizeOrientation(GetUnitOwner()->GetOrientation() + 0.1f));
             GetUnitOwner()->CastSpell(GetUnitOwner(), aurEff->GetAmount(), true);
-
         }
 
         void Register() override
