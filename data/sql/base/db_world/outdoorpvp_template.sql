@@ -11,7 +11,7 @@ CREATE TABLE `outdoorpvp_template`
 (
   `TypeId` tinyint(3) unsigned NOT NULL,
   `ScriptName` char(64) NOT NULL DEFAULT '',
-  `comment` text,
+  `comment` text DEFAULT NULL,
   PRIMARY KEY (`TypeId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='OutdoorPvP Templates';
 /*!40101 SET character_set_client = @saved_cs_client */;

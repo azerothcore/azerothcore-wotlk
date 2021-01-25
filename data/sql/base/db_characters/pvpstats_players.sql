@@ -18,11 +18,11 @@ CREATE TABLE `pvpstats_players`
   `score_bonus_honor` mediumint(8) unsigned NOT NULL,
   `score_damage_done` mediumint(8) unsigned NOT NULL,
   `score_healing_done` mediumint(8) unsigned NOT NULL,
-  `attr_1` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `attr_2` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `attr_3` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `attr_4` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `attr_5` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `attr_1` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `attr_2` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `attr_3` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `attr_4` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `attr_5` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`battleground_id`,`character_guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
