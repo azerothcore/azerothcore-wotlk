@@ -10,7 +10,6 @@
 
 enum IPLoggingTypes
 {
-
     // AccountActionIpLogger();
     ACCOUNT_LOGIN = 0,
     ACCOUNT_FAIL_LOGIN = 1,

@@ -175,7 +175,6 @@ void RestoreAssemblyHealth(uint64 guid1, uint64 guid2, Creature* me)
     if(Creature* cr2 = ObjectAccessor::GetCreature(*me, guid2))
         if(cr2->IsAlive())
             cr2->SetHealth(cr2->GetMaxHealth());
-
 }
 
 class boss_steelbreaker : public CreatureScript

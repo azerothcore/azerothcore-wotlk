@@ -387,7 +387,6 @@ bool SpellMgr::ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg)
                                 sLog->outErrorDb("Craft spell %u not have create item entry.", spellInfo->Id);
                             return false;
                         }
-
                     }
                     // also possible IsLootCrafting case but fake item must exist anyway
                     else if (!sObjectMgr->GetItemTemplate(spellInfo->Effects[i].ItemType))
@@ -1110,6 +1109,9 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 if (!player)
                     return false;
 
+                if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE))
+                    return false;
+
                 Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
                 if (!Bf || player->GetTeamId() != Bf->GetDefenderTeam() || Bf->IsWarTime())
                     return false;
@@ -1422,7 +1424,6 @@ void SpellMgr::LoadSpellRequired()
         // xinef: fill additionalTalentInfo data, currently Blessing of Sanctuary only
         if (GetTalentSpellCost(spellReq) > 0)
             mTalentSpellAdditionalSet.insert(spellId);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u spell required records in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -1531,7 +1532,6 @@ void SpellMgr::LoadSpellTargetPositions()
             sLog->outErrorDb("Spell (Id: %u, effIndex: %u) listed in `spell_target_position` does not have target TARGET_DEST_DB (17).", Spell_ID, effIndex);
             continue;
         }
-
     } while (result->NextRow());
 
     /*
@@ -1770,6 +1770,7 @@ void SpellMgr::LoadSpellProcEvents()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u extra spell proc event conditions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void SpellMgr::LoadSpellProcs()
@@ -2368,7 +2369,6 @@ void SpellMgr::LoadPetDefaultSpells()
     CreatureTemplateContainer const* ctc = sObjectMgr->GetCreatureTemplates();
     for (CreatureTemplateContainer::const_iterator itr = ctc->begin(); itr != ctc->end(); ++itr)
     {
-
         if (!itr->second.PetSpellDataId)
             continue;
 
@@ -3143,18 +3143,20 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_POSITIVE_TAKEN_BONUS;
                 break;
             case 65280: // Ulduar, Hodir, Singed
-            case 65775: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles
-            case 67861:
-            case 67862:
-            case 67863:
+            case 65775: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (10 normal)
+            case 67861: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (25 normal)
+            case 67862: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (10 heroic)
+            case 67863: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (25 heroic)
+            case 55604: // Naxxramas, Unrelenting Trainee, Death Plague (10 mode)
+            case 55645: // Naxxramas, Unrelenting Trainee, Death Plague (25 mode)
             case 67721: // Anub'arak, Nerubian Burrower, Expose Weakness (normal)
             case 67847: // Anub'arak, Nerubian Burrower, Expose Weakness (heroic)
             case 64638: // Ulduar, Winter Jormungar, Acidic Bite
             case 71157: // Icecrown Citadel, Plagued Zombie, Infected Wound
-            case 72963: // Icecrown Citadel, Valithria Dreamwalker, Flesh Rot (Rot Worm)
-            case 72964:
-            case 72965:
-            case 72966:
+            case 72963: // Icecrown Citadel, Rot Worm, Flesh Rot (10 normal)
+            case 72964: // Icecrown Citadel, Rot Worm, Flesh Rot (25 normal)
+            case 72965: // Icecrown Citadel, Rot Worm, Flesh Rot (10 heroic)
+            case 72966: // Icecrown Citadel, Rot Worm, Flesh Rot (25 heroic)
             case 72465: // Icecrown Citadel, Sindragosa, Respite for a Tormented Soul (weekly quest)
             case 45271: // Sunwell, Eredar Twins encounter, Dark Strike
             case 45347: // Sunwell, Eredar Twins encounter, Dark Touched
@@ -5497,6 +5499,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectTriggerSpell[0] = 68766;
     });
 
+    // Killing Spree (Off hand damage)
+    ApplySpellFix({ 57842 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->rangeIndex = 2; // Melee Range
+    });
+
     // Trial of the Crusader, Jaraxxus Intro spell
     ApplySpellFix({ 67888 }, [](SpellEntry* spellInfo)
     {
@@ -7237,7 +7245,6 @@ void SpellMgr::LoadDbcDataCorrections()
                     spellInfo2->rangeIndex = 187; // 300yd
                 }
             }
-
         }
 
         if (spellInfo->activeIconID == 2158)  // flight

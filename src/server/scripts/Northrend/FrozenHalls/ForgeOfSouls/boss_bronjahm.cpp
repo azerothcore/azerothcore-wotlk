@@ -240,7 +240,6 @@ public:
                     else
                         timer -= diff;
                 }
-
         }
     };
 

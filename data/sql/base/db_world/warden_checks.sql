@@ -12,13 +12,13 @@ CREATE TABLE `warden_checks`
   `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `type` tinyint(3) unsigned DEFAULT NULL,
   `data` varchar(48) DEFAULT NULL,
-  `str` varchar(20) DEFAULT NULL,
+  `str` varchar(170) DEFAULT NULL,
   `address` int(10) unsigned DEFAULT NULL,
   `length` tinyint(3) unsigned DEFAULT NULL,
   `result` varchar(24) DEFAULT NULL,
   `comment` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=787 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=793 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `warden_checks` WRITE;
@@ -809,7 +809,12 @@ INSERT INTO `warden_checks` VALUES
 (783,243,'','',8016079,6,'0F8462010000','Collision M2 Regular'),
 (784,243,'','',8054762,2,'7506','Collision WMD'),
 (785,243,'','',9995315,5,'75440FB75E','Multi-Jump Patch'),
-(786,217,'','WPESPY.DLL',0,0,'','WPE PRO - injected dll');
+(786,217,'','WPESPY.DLL',0,0,'','WPE PRO - injected dll'),
+(788,139,NULL,'forceinsecure() return issecure()',NULL,NULL,NULL,'Detects naive Lua unlockers'),
+(789,139,NULL,'return not not PQR_IsMoving',NULL,NULL,NULL,'Detects PQR'),
+(790,139,NULL,'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find(\"|cffffd200PQR|r\") then return true end end',NULL,NULL,NULL,'Detects PQR'),
+(791,139,NULL,'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find(\"|cFF32CD32EWT|r\") then return true end end',NULL,NULL,NULL,'Detects EWT'),
+(792,139,NULL,'local f=DEFAULT_CHAT_FRAME for i=1,f:GetNumMessages() do if (f:GetMessageInfo(i)):find(\"|cFFFF4400WoWPlus|r\") then return true end end',NULL,NULL,NULL,'Detects WoWPlus');
 /*!40000 ALTER TABLE `warden_checks` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

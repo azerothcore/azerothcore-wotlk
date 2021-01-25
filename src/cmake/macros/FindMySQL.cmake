@@ -154,6 +154,7 @@ find_path(MYSQL_INCLUDE_DIR
     "$ENV{ProgramFiles}/MySQL/*/include"
     "$ENV{SystemDrive}/MySQL/*/include"
     "c:/msys/local/include"
+    "$ENV{MYSQL_INCLUDE_DIR}"
   DOC
     "Specify the directory containing mysql.h."
 )
@@ -197,6 +198,7 @@ if( WIN32 )
       "$ENV{ProgramFiles}/MySQL/*/lib/opt"
       "$ENV{SystemDrive}/MySQL/*/lib/opt"
       "c:/msys/local/include"
+      "$ENV{MYSQL_LIBRARY}"
     DOC "Specify the location of the mysql library here."
   )
 endif( WIN32 )

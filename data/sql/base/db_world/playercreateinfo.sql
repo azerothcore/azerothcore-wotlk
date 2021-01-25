@@ -9,14 +9,14 @@ DROP TABLE IF EXISTS `playercreateinfo`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `playercreateinfo` 
 (
-  `race` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `class` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `map` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `zone` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `position_x` float NOT NULL DEFAULT '0',
-  `position_y` float NOT NULL DEFAULT '0',
-  `position_z` float NOT NULL DEFAULT '0',
-  `orientation` float NOT NULL DEFAULT '0',
+  `race` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `class` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `map` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `zone` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `position_x` float NOT NULL DEFAULT 0,
+  `position_y` float NOT NULL DEFAULT 0,
+  `position_z` float NOT NULL DEFAULT 0,
+  `orientation` float NOT NULL DEFAULT 0,
   PRIMARY KEY (`race`,`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
