@@ -1203,6 +1203,11 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     _CreateDefaultGuildRanks(pLeaderSession->GetSessionDbLocaleIndex()); // Create default ranks
     bool ret = AddMember(m_leaderGuid, GR_GUILDMASTER);                  // Add guildmaster
 
+    for (short i = 0; i < static_cast<short>(sWorld->getIntConfig(CONFIG_GUILD_BANK_INITIAL_TABS)); i++)
+    {
+        _CreateNewBankTab();
+    }
+
     if (ret)
         sScriptMgr->OnGuildCreate(this, pLeader, name);
 

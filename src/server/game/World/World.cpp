@@ -1075,6 +1075,7 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_GUILD_RESET_HOUR] = 6;
     }
 
+    m_int_configs[CONFIG_GUILD_BANK_INITIAL_TABS] = sConfigMgr->GetIntDefault("Guild.BankInitialTabs", 0);
     m_int_configs[CONFIG_GUILD_BANK_TAB_COST_0] = sConfigMgr->GetIntDefault("Guild.BankTabCost0", 1000000);
     m_int_configs[CONFIG_GUILD_BANK_TAB_COST_1] = sConfigMgr->GetIntDefault("Guild.BankTabCost1", 2500000);
     m_int_configs[CONFIG_GUILD_BANK_TAB_COST_2] = sConfigMgr->GetIntDefault("Guild.BankTabCost2", 5000000);
