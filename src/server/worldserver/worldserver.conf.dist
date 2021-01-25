@@ -3233,7 +3233,6 @@ PlayerStart.AllReputation = 0
 
 PlayerStart.CustomSpells = 0
 
-
 #
 #    PlayerStart.MapsExplored
 #        Description: Characters start with all maps explored.
