@@ -9,13 +9,13 @@ DROP TABLE IF EXISTS `lfg_dungeon_template`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `lfg_dungeon_template` 
 (
-  `dungeonId` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Unique id from LFGDungeons.dbc',
+  `dungeonId` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Unique id from LFGDungeons.dbc',
   `name` varchar(255) CHARACTER SET latin1 DEFAULT NULL,
-  `position_x` float NOT NULL DEFAULT '0',
-  `position_y` float NOT NULL DEFAULT '0',
-  `position_z` float NOT NULL DEFAULT '0',
-  `orientation` float NOT NULL DEFAULT '0',
-  `VerifiedBuild` smallint(5) DEFAULT '0',
+  `position_x` float NOT NULL DEFAULT 0,
+  `position_y` float NOT NULL DEFAULT 0,
+  `position_z` float NOT NULL DEFAULT 0,
+  `orientation` float NOT NULL DEFAULT 0,
+  `VerifiedBuild` smallint(5) DEFAULT 0,
   PRIMARY KEY (`dungeonId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
