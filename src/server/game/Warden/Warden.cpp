@@ -18,9 +18,10 @@
 #include "Warden.h"
 #include "AccountMgr.h"
 #include "BanManager.h"
+#include "SharedDefines.h"
 
 Warden::Warden() : _session(nullptr), _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
-    _dataSent(false), _previousTimestamp(0), _module(nullptr), _initialized(false)
+    _dataSent(false), _module(nullptr), _initialized(false)
 {
     memset(_inputKey, 0, sizeof(_inputKey));
     memset(_outputKey, 0, sizeof(_outputKey));
@@ -77,6 +78,8 @@ void Warden::RequestModule()
     memcpy(request.ModuleKey, _module->Key, 16);
     request.Size = _module->CompressedSize;
 
+    EndianConvert(request.Size);
+
     // Encrypt with warden RC4 key.
     EncryptData((uint8*)&request, sizeof(WardenModuleUse));
 
@@ -85,31 +88,37 @@ void Warden::RequestModule()
     _session->SendPacket(&pkt);
 }
 
-void Warden::Update()
+void Warden::Update(uint32 const diff)
 {
-    if (_initialized)
+    if (!_initialized)
     {
-        uint32 currentTimestamp = World::GetGameTimeMS();
-        uint32 diff = getMSTimeDiff(_previousTimestamp, currentTimestamp);
-        _previousTimestamp = currentTimestamp;
+        return;
+    }
 
-        if (_dataSent)
+    if (_dataSent)
+    {
+        uint32 maxClientResponseDelay = sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_RESPONSE_DELAY);
+        if (maxClientResponseDelay > 0)
         {
-            uint32 maxClientResponseDelay = sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_RESPONSE_DELAY);
-            if (maxClientResponseDelay > 0)
+            if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
             {
-                if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
-                    _session->KickPlayer("clientResponseTimer > maxClientResponseDelay");
-                else
-                    _clientResponseTimer += diff;
+                _session->KickPlayer("Warden: clientResponseTimer > maxClientResponseDelay (Warden::Update)");
             }
+            else
+            {
+                _clientResponseTimer += diff;
+            }
+        }
+    }
+    else
+    {
+        if (diff >= _checkTimer)
+        {
+            RequestChecks();
         }
         else
         {
-            if (diff >= _checkTimer)
-                RequestData();
-            else
-                _checkTimer -= diff;
+            _checkTimer -= diff;
         }
     }
 }
@@ -166,136 +175,142 @@ uint32 Warden::BuildChecksum(const uint8* data, uint32 length)
     SHA1(data, length, hash.bytes.bytes);
     uint32 checkSum = 0;
     for (uint8 i = 0; i < 5; ++i)
+    {
         checkSum = checkSum ^ hash.ints.ints[i];
+    }
 
     return checkSum;
 }
 
-std::string Warden::Penalty(WardenCheck* check /*= NULL*/, uint16 checkFailed /*= 0*/)
+static std::string GetWardenActionStr(uint32 action)
 {
-    WardenActions action;
+    switch (action)
+    {
+    case WARDEN_ACTION_LOG:
+        return "WARDEN_ACTION_LOG";
+    case WARDEN_ACTION_KICK:
+        return "WARDEN_ACTION_KICK";
+    case WARDEN_ACTION_BAN:
+        return "WARDEN_ACTION_BAN";
+    }
 
-    if (check)
-        action = check->Action;
-    else
-        action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
+    return "UNHANDLED ACTION";
+}
 
-    std::string banReason = "Anticheat violation";
-    bool longBan = false; // 14d = 1209600s
-    if (checkFailed)
-        switch (checkFailed)
+void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
+{
+    WardenCheck const* checkData = sWardenCheckMgr->GetWardenDataById(checkId);
+
+    uint32 action = WardenActions(sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_FAIL_ACTION));
+    std::string causeMsg;
+    if (checkId && checkData)
+    {
+        action = checkData->Action;
+
+        if (checkData->Comment.empty())
         {
-            case 47:
-                banReason += " (FrameXML Signature Check)";
-                break;
-            case 51:
-                banReason += " (Lua DoString)";
-                break;
-            case 59:
-                banReason += " (Lua Protection Patch)";
-                break;
-            case 72:
-                banReason += " (Movement State related)";
-                break;
-            case 118:
-                banReason += " (Wall Climb)";
-                break;
-            case 121:
-                banReason += " (No Fall Damage Patch)";
-                break;
-            case 193:
-                banReason += " (Follow Unit Check)";
-                break;
-            case 209:
-                banReason += " (WoWEmuHacker Injection)";
-                longBan = true;
-                break;
-            case 237:
-                banReason += " (AddChatMessage)";
-                break;
-            case 246:
-                banReason += " (Language Patch)";
-                break;
-            case 260:
-                banReason += " (Jump Momentum)";
-                break;
-            case 288:
-                banReason += " (Language Patch)";
-                break;
-            case 308:
-                banReason += " (SendChatMessage)";
-                break;
-            case 312:
-                banReason += " (Jump Physics)";
-                break;
-            case 314:
-                banReason += " (GetCharacterInfo)";
-                break;
-            case 329:
-                banReason += " (Wall Climb)";
-                break;
-            case 343:
-                banReason += " (Login Password Pointer)";
-                break;
-            case 349:
-                banReason += " (Language Patch)";
-                break;
-            case 712:
-                banReason += " (WS2_32.Send)";
-                break;
-            case 780:
-                banReason += " (Lua Protection Remover)";
-                break;
-            case 781:
-                banReason += " (Walk on Water Patch)";
-                break;
-            case 782:
-                banReason += " (Collision M2 Special)";
-                longBan = true;
-                break;
-            case 783:
-                banReason += " (Collision M2 Regular)";
-                longBan = true;
-                break;
-            case 784:
-                banReason += " (Collision WMD)";
-                longBan = true;
-                break;
-            case 785:
-                banReason += " (Multi-Jump Patch)";
-                break;
-            case 786:
-                banReason += " (WPE PRO)";
-                longBan = true;
-                break;
-            case 787:
-                banReason += " (rEdoX Packet Editor)";
-                break;
+            causeMsg = "Warden id " + std::to_string(checkId) + " violation";
         }
+        else
+        {
+            causeMsg = "Warden: " + checkData->Comment;
+        }
+    }
+    else
+    {
+        // if its not warden check id based, reason must be always provided
+        ASSERT(!reason.empty());
+        causeMsg = reason;
+    }
 
     switch (action)
     {
         case WARDEN_ACTION_LOG:
-            return "None";
             break;
         case WARDEN_ACTION_KICK:
-            _session->KickPlayer("WARDEN_ACTION_KICK");
-            return "Kick";
+        {
+            _session->KickPlayer(causeMsg.find("Warden") != std::string::npos ? causeMsg : "Warden: " + causeMsg);
             break;
+        }
         case WARDEN_ACTION_BAN:
-            {
-                std::stringstream duration;
-                duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
-                std::string accountName;
-                AccountMgr::GetName(_session->GetAccountId(), accountName);
-                sBan->BanAccount(accountName, ((longBan && false /*ZOMG!*/) ? "1209600s" : duration.str()), banReason, "Server");
-
-                return "Ban";
-            }
-        default:
+        {
+            std::stringstream duration;
+            duration << sWorld->getIntConfig(CONFIG_WARDEN_CLIENT_BAN_DURATION) << "s";
+            std::string accountName;
+            AccountMgr::GetName(_session->GetAccountId(), accountName);
+            sBan->BanAccount(accountName, duration.str(), causeMsg, "Server");
             break;
+        }
     }
-    return "Undefined";
+
+    std::string reportMsg;
+    if (checkId)
+    {
+        if (Player const* plr = _session->GetPlayer())
+        {
+            std::string const reportFormat = "Player %s (guid %u, account id: %u) failed warden %u check (%s). Action: %s";
+            reportMsg = acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUIDLow(), _session->GetAccountId(),
+                                           checkId, ((checkData && !checkData->Comment.empty()) ? checkData->Comment.c_str() : "<warden comment is not set>"),
+                                           GetWardenActionStr(action).c_str());
+        }
+        else
+        {
+            std::string const reportFormat = "Account id: %u failed warden %u check. Action: %s";
+            reportMsg = acore::StringFormat(reportFormat, _session->GetAccountId(), checkId, GetWardenActionStr(action).c_str());
+        }
+    }
+    else
+    {
+        if (Player const* plr = _session->GetPlayer())
+        {
+            std::string const reportFormat = "Player %s (guid %u, account id: %u) triggered warden penalty by reason: %s. Action: %s";
+            reportMsg = acore::StringFormat(reportFormat, plr->GetName().c_str(), plr->GetGUIDLow(), _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
+        }
+        else
+        {
+            std::string const reportFormat = "Account id: %u failed warden %u check. Action: %s";
+            reportMsg = acore::StringFormat(reportFormat, _session->GetAccountId(), causeMsg.c_str(), GetWardenActionStr(action).c_str());
+        }
+    }
+
+    reportMsg = "Warden: " + reportMsg;
+    sLog->outString(reportMsg.c_str());
+}
+
+bool Warden::ProcessLuaCheckResponse(std::string const& msg)
+{
+    static constexpr char WARDEN_TOKEN[] = "_TW\t";
+    // if msg starts with WARDEN_TOKEN
+    if (!(msg.rfind(WARDEN_TOKEN, 0) == 0))
+    {
+        return false;
+    }
+
+    uint16 id = 0;
+
+    {
+        std::stringstream msg2(msg);
+        std::string temp;
+        while (msg2 >> temp)
+        {
+            // Found check id - stop loop
+            if (std::stringstream(temp) >> id)
+                break;
+        }
+    }
+
+    if (id < sWardenCheckMgr->GetMaxValidCheckId())
+    {
+        WardenCheck const* check = sWardenCheckMgr->GetWardenDataById(id);
+        if (check && check->Type == LUA_EVAL_CHECK)
+        {
+            ApplyPenalty(id, "");
+            return true;
+        }
+    }
+
+    ApplyPenalty(0, "Sent bogus Lua check response for Warden");
+    return true;
 }
 
 void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)

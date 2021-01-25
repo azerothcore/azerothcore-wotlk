@@ -26,5 +26,5 @@ ENTRYPOINT  cd azerothcore/build && \
             # copy the binary files "authserver" and "worldserver" files back to the host
             # - the directories "/binworldserver" and "/binauthserver" are meant to be bound to the host directories
             # - see docker/build/README.md to view the bindings
-            cp /azeroth-server/bin/worldserver /binworldserver && \
-            cp /azeroth-server/bin/authserver /binauthserver
+            cp -f /azeroth-server/bin/worldserver /binworldserver && \
+            cp -f /azeroth-server/bin/authserver /binauthserver
