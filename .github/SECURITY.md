@@ -63,7 +63,7 @@ Versions of macOS:
 | --------------- | ------------------ |
 | 10.15           | :white_check_mark: |
 
-**Note**: We do NOT support any repacks that may or may not have been made based on AzerothCore.
+**Note**: We do NOT support any repacks that may or may not have been made based on AzerothCore. Nor do we support any of the releases that are made under AzerothCore.
 
 ## Reporting a Vulnerability
 
