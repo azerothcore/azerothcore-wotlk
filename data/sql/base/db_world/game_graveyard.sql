@@ -9,11 +9,11 @@ DROP TABLE IF EXISTS `game_graveyard`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `game_graveyard` 
 (
-  `ID` int(10) NOT NULL DEFAULT '0',
-  `Map` int(10) NOT NULL DEFAULT '0',
-  `x` float NOT NULL DEFAULT '0',
-  `y` float NOT NULL DEFAULT '0',
-  `z` float NOT NULL DEFAULT '0',
+  `ID` int(10) NOT NULL DEFAULT 0,
+  `Map` int(10) NOT NULL DEFAULT 0,
+  `x` float NOT NULL DEFAULT 0,
+  `y` float NOT NULL DEFAULT 0,
+  `z` float NOT NULL DEFAULT 0,
   `Comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;

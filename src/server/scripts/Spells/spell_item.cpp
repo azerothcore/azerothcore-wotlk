@@ -1672,13 +1672,11 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-
             SpellInfo const* spellInfo = eventInfo.GetHealInfo()->GetSpellInfo();
             if (!spellInfo || !spellInfo->HasEffect(SPELL_EFFECT_HEAL))
                 return false;
 
             return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetHeal() > 0;
-
         }
 
         void Register() override

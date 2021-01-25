@@ -1042,11 +1042,9 @@ public:                                                 // constructors
     void SetInAcceptProcess(bool state) { m_acceptProccess = state; }
 
 private:                                                // internal functions
-
     void Update(bool for_trader = true);
 
 private:                                                // fields
-
     Player*    m_player;                                // Player who own of this TradeData
     Player*    m_trader;                                // Player who trade with m_player
 
@@ -1244,6 +1242,7 @@ public:
     [[nodiscard]] Item* GetItemByPos(uint16 pos) const;
     [[nodiscard]] Item* GetItemByPos(uint8 bag, uint8 slot) const;
     [[nodiscard]] Bag*  GetBagByPos(uint8 slot) const;
+    [[nodiscard]] uint32 GetFreeInventorySpace() const;
     [[nodiscard]] inline Item* GetUseableItemByPos(uint8 bag, uint8 slot) const //Does additional check for disarmed weapons
     {
         if (!CanUseAttackType(GetAttackBySlot(slot)))
@@ -2561,6 +2560,40 @@ public:
 
     [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
 
+    //! Return collision height sent to client
+    float GetCollisionHeight(bool mounted)
+    {
+        if (mounted)
+        {
+            CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID));
+            if (!mountDisplayInfo)
+                return GetCollisionHeight(false);
+
+            CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId);
+            if (!mountModelData)
+                return GetCollisionHeight(false);
+
+            CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId());
+            ASSERT(displayInfo);
+            CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayInfo->ModelId);
+            ASSERT(modelData);
+
+            float scaleMod = GetFloatValue(OBJECT_FIELD_SCALE_X); // 99% sure about this
+
+            return scaleMod * mountModelData->MountHeight + modelData->CollisionHeight * 0.5f;
+        }
+        else
+        {
+            //! Dismounting case - use basic default model data
+            CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId());
+            ASSERT(displayInfo);
+            CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayInfo->ModelId);
+            ASSERT(modelData);
+
+            return modelData->CollisionHeight;
+        }
+    }
+
     // OURS
     // saving
     void AdditionalSavingAddMask(uint8 mask) { m_additionalSaveTimer = 2000; m_additionalSaveMask |= mask; }
@@ -2607,6 +2640,17 @@ public:
     [[nodiscard]] SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
 
     static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
+
+    // Cinematic camera data and remote sight functions
+    [[nodiscard]] uint32 GetActiveCinematicCamera() const { return m_activeCinematicCameraId; }
+    void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { m_activeCinematicCameraId = cinematicCameraId; }
+    [[nodiscard]] bool IsOnCinematic() const { return (m_cinematicCamera != nullptr); }
+    void BeginCinematic();
+    void EndCinematic();
+    void UpdateCinematicLocation(uint32 diff);
+
+    std::string GetMapAreaAndZoneString();
+    std::string GetCoordsMapAreaAndZoneString();
 
 protected:
     // Gamemaster whisper whitelist
@@ -2957,6 +3001,14 @@ private:
     uint32 manaBeforeDuel;
 
     bool m_isInstantFlightOn;
+
+    // Remote location information
+    uint32 m_cinematicDiff;
+    uint32 m_lastCinematicCheck;
+    uint32 m_activeCinematicCameraId;
+    FlyByCameraCollection* m_cinematicCamera;
+    Position m_remoteSightPosition;
+    Creature* m_CinematicObject;
 };
 
 void AddItemsSetItem(Player* player, Item* item);
