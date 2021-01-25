@@ -9,11 +9,11 @@ DROP TABLE IF EXISTS `playercreateinfo_action`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `playercreateinfo_action` 
 (
-  `race` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `class` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `button` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `action` int(10) unsigned NOT NULL DEFAULT '0',
-  `type` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `race` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `class` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `button` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `action` int(10) unsigned NOT NULL DEFAULT 0,
+  `type` smallint(5) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`race`,`class`,`button`),
   KEY `playercreateinfo_race_class_index` (`race`,`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
