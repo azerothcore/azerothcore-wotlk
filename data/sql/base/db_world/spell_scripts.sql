@@ -9,17 +9,17 @@ DROP TABLE IF EXISTS `spell_scripts`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `spell_scripts` 
 (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `effIndex` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `delay` int(10) unsigned NOT NULL DEFAULT '0',
-  `command` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `datalong` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `datalong2` int(10) unsigned NOT NULL DEFAULT '0',
-  `dataint` int(11) NOT NULL DEFAULT '0',
-  `x` float NOT NULL DEFAULT '0',
-  `y` float NOT NULL DEFAULT '0',
-  `z` float NOT NULL DEFAULT '0',
-  `o` float NOT NULL DEFAULT '0'
+  `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `effIndex` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `delay` int(10) unsigned NOT NULL DEFAULT 0,
+  `command` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `datalong` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `datalong2` int(10) unsigned NOT NULL DEFAULT 0,
+  `dataint` int(11) NOT NULL DEFAULT 0,
+  `x` float NOT NULL DEFAULT 0,
+  `y` float NOT NULL DEFAULT 0,
+  `z` float NOT NULL DEFAULT 0,
+  `o` float NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -91,7 +91,7 @@ INSERT INTO `spell_scripts` VALUES
 (24195,0,0,15,24102,0,0,0,0,0,0),
 (24195,0,0,15,24103,0,0,0,0,0,0),
 (24195,0,0,15,69530,0,0,0,0,0,0),
-(56515,0,0,15,56516,2,0,0,0,0,0),
+(56515,0,0,15,56516,0,0,0,0,0,0),
 (53062,0,0,15,53067,2,0,0,0,0,0),
 (45980,0,1,18,0,0,0,0,0,0,0),
 (51864,0,0,15,51865,2,0,0,0,0,0),
@@ -127,7 +127,6 @@ INSERT INTO `spell_scripts` VALUES
 (58917,0,0,15,58919,0,0,0,0,0,0),
 (53010,0,0,14,52989,0,0,0,0,0,0),
 (50630,0,0,14,46598,0,0,0,0,0,0),
-(55818,0,0,15,55528,1,0,0,0,0,0),
 (37834,0,0,14,32567,0,0,0,0,0,0),
 (68861,0,0,15,68858,2,1,0,0,0,0),
 (69051,0,0,15,69023,3,1,0,0,0,0),
@@ -150,7 +149,10 @@ INSERT INTO `spell_scripts` VALUES
 (38173,0,0,10,22023,12000,0,0,0,0,0),
 (53099,0,0,15,53098,0,0,0,0,0,0),
 (55288,0,0,15,55289,0,0,0,0,0,0),
-(46550,0,0,14,46424,0,0,0,0,0,0);
+(46550,0,0,14,46424,0,0,0,0,0,0),
+(59064,0,0,6,1,0,0,1333.49,-4375.51,26.204,0.104),
+(59439,0,0,6,0,0,0,1969.03,237.55,38.39,3.21),
+(60940,0,0,6,0,0,0,1769.13,772.25,56.22,3.97);
 /*!40000 ALTER TABLE `spell_scripts` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
