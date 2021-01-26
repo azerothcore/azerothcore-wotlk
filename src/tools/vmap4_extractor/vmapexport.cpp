@@ -226,7 +226,7 @@ void ParsMapFiles()
     for (unsigned int i = 0; i < map_count; ++i)
     {
         sprintf(id, "%03u", map_ids[i].id);
-        sprintf(fn, "World\\Maps\\%s\\%s.wdt", map_ids[i].name, map_ids[i].name);
+        snprintf(fn, sizeof(fn), R"(World\Maps\%s\%s.wdt)", map_ids[i].name, map_ids[i].name);
         WDTFile WDT(fn, map_ids[i].name);
         if (WDT.init(id, map_ids[i].id))
         {
@@ -433,7 +433,6 @@ bool processArgv(int argc, char** argv, const char* versionString)
     return result;
 }
 
-
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 // Main
 //
@@ -517,7 +516,6 @@ int main(int argc, char** argv)
             strcpy(map_ids[x].name, dbc->getRecord(x).getString(1));
             printf("Map - %s\n", map_ids[x].name);
         }
-
 
         delete dbc;
         ParsMapFiles();

@@ -93,10 +93,8 @@ private:
     void FreeBindBuffer();
     void CleanUp();
     bool _NextRow();
-
 };
 
 typedef std::shared_ptr<PreparedResultSet> PreparedQueryResult;
 
 #endif
-

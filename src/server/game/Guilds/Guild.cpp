@@ -75,17 +75,17 @@ inline uint32 _GetGuildBankTabPrice(uint8 tabId)
     switch (tabId)
     {
         case 0:
-            return 100;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_0);
         case 1:
-            return 250;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_1);
         case 2:
-            return 500;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_2);
         case 3:
-            return 1000;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_3);
         case 4:
-            return 2500;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_4);
         case 5:
-            return 5000;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_5);
         default:
             return 0;
     }
@@ -471,7 +471,6 @@ bool Guild::BankTab::WriteSlotPacket(WorldPacket& data, uint8 slotId, bool ignor
     {
         data << uint32(0);                                  // 3.3.0 (0x00018020, 0x00018000)
 
-
         if (uint32 random = pItem->GetItemRandomPropertyId())
         {
             data << uint32(random);                         // Random item property id
@@ -592,15 +591,17 @@ void Guild::Member::SetStats(Player* player)
     m_name      = player->GetName();
     m_level     = player->getLevel();
     m_class     = player->getClass();
+    m_gender    = player->getGender();
     m_zoneId    = player->GetZoneId();
     m_accountId = player->GetSession()->GetAccountId();
 }
 
-void Guild::Member::SetStats(std::string const& name, uint8 level, uint8 _class, uint32 zoneId, uint32 accountId)
+void Guild::Member::SetStats(std::string const& name, uint8 level, uint8 _class, uint8 gender, uint32 zoneId, uint32 accountId)
 {
     m_name      = name;
     m_level     = level;
     m_class     = _class;
+    m_gender    = gender;
     m_zoneId    = zoneId;
     m_accountId = accountId;
 }
@@ -670,9 +671,10 @@ bool Guild::Member::LoadFromDB(Field* fields)
     SetStats(fields[12].GetString(),
              fields[13].GetUInt8(),                         // characters.level
              fields[14].GetUInt8(),                         // characters.class
-             fields[15].GetUInt16(),                        // characters.zone
-             fields[16].GetUInt32());                       // characters.account
-    m_logoutTime = fields[17].GetUInt32();                  // characters.logout_time
+             fields[15].GetUInt8(),                         // characters.gender
+             fields[16].GetUInt16(),                        // characters.zone
+             fields[17].GetUInt32());                       // characters.account
+    m_logoutTime = fields[18].GetUInt32();                  // characters.logout_time
 
     if (!CheckStats())
         return false;
@@ -711,7 +713,7 @@ void Guild::Member::WritePacket(WorldPacket& data, bool sendOfficerNote) const
          << uint32(m_rankId)
          << uint8(m_level)
          << uint8(m_class)
-         << uint8(0)
+         << uint8(m_gender)
          << uint32(m_zoneId);
 
     if (!m_flags)
@@ -1201,6 +1203,11 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     _CreateDefaultGuildRanks(pLeaderSession->GetSessionDbLocaleIndex()); // Create default ranks
     bool ret = AddMember(m_leaderGuid, GR_GUILDMASTER);                  // Add guildmaster
 
+    for (short i = 0; i < static_cast<short>(sWorld->getIntConfig(CONFIG_GUILD_BANK_INITIAL_TABS)); i++)
+    {
+        _CreateNewBankTab();
+    }
+
     if (ret)
         sScriptMgr->OnGuildCreate(this, pLeader, name);
 
@@ -1302,7 +1309,6 @@ void Guild::HandleRoster(WorldSession* session)
 
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
         itr->second->WritePacket(data, _HasRankRight(session->GetPlayer(), GR_RIGHT_VIEWOFFNOTE));
-
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_ROSTER [%s]", session->GetPlayerInfo().c_str());
@@ -1483,7 +1489,7 @@ void Guild::HandleBuyBankTab(WorldSession* session, uint8 tabId)
     if (tabId != _GetPurchasedTabsSize())
         return;
 
-    uint32 tabCost = _GetGuildBankTabPrice(tabId) * GOLD;
+    uint32 tabCost = _GetGuildBankTabPrice(tabId);
     if (!tabCost)
         return;
 
@@ -2257,8 +2263,9 @@ bool Guild::AddMember(uint64 guid, uint8 rankId)
                 name,
                 fields[1].GetUInt8(),
                 fields[2].GetUInt8(),
-                fields[3].GetUInt16(),
-                fields[4].GetUInt32());
+                fields[3].GetUInt8(),
+                fields[4].GetUInt16(),
+                fields[5].GetUInt32());
 
             ok = member->CheckStats();
         }

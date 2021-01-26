@@ -116,7 +116,6 @@ public:
     ArenaType GetArenaType() { return m_arenaType; }
     BattlegroundTypeId GetBGTypeID() { return m_bgTypeId; }
 private:
-
     BattlegroundTypeId m_bgTypeId;
     ArenaType m_arenaType;
     uint32 m_WaitTimes[BG_TEAMS_COUNT][MAX_BATTLEGROUND_BRACKETS][COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME];

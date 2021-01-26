@@ -714,7 +714,6 @@ uint32 Battleground::GetRealRepFactionForPlayer(uint32 factionId, Player* player
     return factionId;
 }
 
-
 void Battleground::UpdateWorldState(uint32 Field, uint32 Value)
 {
     WorldPacket data;

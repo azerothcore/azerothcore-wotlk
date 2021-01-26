@@ -65,7 +65,6 @@ public:
     [[nodiscard]] bool matchesTypeMask(uint32 pMask) const { return iType & pMask; }
 
     void setType(uint32 pType) { iType = pType; }
-
 };
 
 //==============================================================
@@ -122,4 +121,3 @@ public:
 
 //==============================================================
 #endif
-

@@ -208,7 +208,6 @@ public:
             me->CastSpell(me, SPELL_EMPYREAL_BALANCE, true);
         }
     };
-
 };
 struct boss_illidari_council_memberAI : public ScriptedAI
 {

@@ -204,7 +204,6 @@ public:
     static std::unordered_map<uint8, uint8> ArenaReqPlayersForType; // Type -> Players count
 
 protected:
-
     uint32      TeamId;
     uint8       Type;
     std::string TeamName;
@@ -220,4 +219,3 @@ protected:
     ArenaTeamStats Stats;
 };
 #endif
-
