@@ -622,6 +622,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u battlegrounds in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void BattlegroundMgr::InitAutomaticArenaPointDistribution()
