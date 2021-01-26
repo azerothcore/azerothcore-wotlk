@@ -1055,7 +1055,6 @@ public:
                         events.ScheduleEvent(EVENT_SPELL_SHOCK_BLAST, 20000);
                         events.ScheduleEvent(EVENT_PROXIMITY_MINES_1, 6000);
                         break;
-
                 }
             }
         }
@@ -1677,7 +1676,6 @@ public:
                         DoZoneInCombat();
                         events.Reset();
                         events.ScheduleEvent(EVENT_SPELL_PLASMA_BALL, 0);
-
                 }
             }
             else if (id == 2 && !immobilized && Phase == 3) // magnetic core

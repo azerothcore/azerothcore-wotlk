@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `autobroadcast`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `autobroadcast` 
 (
-  `realmid` int(11) NOT NULL DEFAULT '-1',
+  `realmid` int(11) NOT NULL DEFAULT -1,
   `id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
-  `weight` tinyint(3) unsigned DEFAULT '1',
+  `weight` tinyint(3) unsigned DEFAULT 1,
   `text` longtext NOT NULL,
   PRIMARY KEY (`id`,`realmid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

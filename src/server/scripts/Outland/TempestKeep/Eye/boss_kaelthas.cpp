@@ -703,7 +703,6 @@ public:
         {
             return me->GetHomePosition().GetExactDist2d(me) > 165.0f || !SelectTargetFromPlayerList(165.0f);
         }
-
     };
     CreatureAI* GetAI(Creature* creature) const override
     {

@@ -15,7 +15,6 @@
 DBCFile::DBCFile(std::string  filename):
     filename(std::move(filename)), recordSize(0), recordCount(0), fieldCount(0), stringSize(0), data(nullptr), stringTable(nullptr)
 {
-
 }
 
 bool DBCFile::open()

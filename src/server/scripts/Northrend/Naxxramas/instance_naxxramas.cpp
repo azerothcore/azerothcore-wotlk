@@ -109,7 +109,6 @@ public:
             sapphironAchievement = true;
             heiganAchievement = true;
             immortalAchievement = 1;
-
         }
 
         std::set<GameObject*> HeiganEruption[4];
@@ -909,7 +908,6 @@ public:
             else
                 OUT_LOAD_INST_DATA_FAIL;
         }
-
     };
 };
 class boss_naxxramas_misc : public CreatureScript

@@ -268,7 +268,6 @@ public:
                 case EVENT_FLIGHT_START:
                     if (me->HealthBelowPct(11))
                     {
-
                         return;
                     }
                     events.RepeatEvent(45000);
@@ -369,7 +368,6 @@ public:
                                 pInstance->SetData(DATA_HUNDRED_CLUB, 0);
                                 return;
                             }
-
                         }
                         events.RepeatEvent(5000);
                         return;

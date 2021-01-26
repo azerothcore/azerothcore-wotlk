@@ -10,10 +10,10 @@ DROP TABLE IF EXISTS `gm_survey`;
 CREATE TABLE `gm_survey` 
 (
   `surveyId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `guid` int(10) unsigned NOT NULL DEFAULT '0',
-  `mainSurvey` int(10) unsigned NOT NULL DEFAULT '0',
+  `guid` int(10) unsigned NOT NULL DEFAULT 0,
+  `mainSurvey` int(10) unsigned NOT NULL DEFAULT 0,
   `comment` longtext NOT NULL,
-  `createTime` int(10) unsigned NOT NULL DEFAULT '0',
+  `createTime` int(10) unsigned NOT NULL DEFAULT 0,
   `maxMMR` smallint(5) NOT NULL,
   PRIMARY KEY (`surveyId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
