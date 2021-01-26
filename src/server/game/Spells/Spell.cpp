@@ -1405,7 +1405,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         {
                             prevZ = tstZ;
                         }
-                    
+
                         tstZ = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ, true);
                         ground = tstZ;
 
@@ -2885,7 +2885,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         DoTriggersOnSpellHit(spellHitTarget, mask);
 
         // if target is fallged for pvp also flag caster if a player
-        if (enablePvP) 
+        if (enablePvP)
         {
             m_caster->ToPlayer()->UpdatePvP(true);
         }
