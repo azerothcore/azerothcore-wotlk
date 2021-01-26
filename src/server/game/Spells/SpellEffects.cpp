@@ -2759,15 +2759,18 @@ void Spell::EffectTeleUnitsFaceCaster(SpellEffIndex  /*effIndex*/)
     if (!unitTarget || unitTarget->IsInFlight())
         return;
 
-    if (!m_targets.HasDst())
+    if (unitTarget->IsInFlight())
+        return;
+
+    if (m_targets.HasDst())
+    {
+        unitTarget->NearTeleportTo(destTarget->GetPositionX(), destTarget->GetPositionY(), destTarget->GetPositionZ(), destTarget->GetAbsoluteAngle(m_caster), unitTarget == m_caster);
+    }
+    else
     {
         sLog->outError("Spell::EffectTeleUnitsFaceCaster - does not have destination for spell ID %u\n", m_spellInfo->Id);
         return;
     }
-
-    float x, y, z;
-    destTarget->GetPosition(x, y, z);
-    unitTarget->NearTeleportTo(x, y, z, unitTarget->GetAngle(m_caster));
 }
 
 void Spell::EffectLearnSkill(SpellEffIndex effIndex)
