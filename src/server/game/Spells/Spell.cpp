@@ -784,10 +784,6 @@ void Spell::SelectExplicitTargets()
                 m_targets.SetUnitTarget(redirect);
                 m_spellFlags |= SPELL_FLAG_REDIRECTED;
             }
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/master
         }
     }
 }
