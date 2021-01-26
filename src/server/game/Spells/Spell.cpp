@@ -845,7 +845,7 @@ void Spell::SelectSpellTargets()
 
                     if (!itr->scaleAura && itr->targetGUID != m_caster->GetGUID())
                         needErase = true;
-                    
+
                     sScriptMgr->OnRemoveAuraScaleTargets(this, *itr, m_auraScaleMask, needErase);
 
                     if (needErase)

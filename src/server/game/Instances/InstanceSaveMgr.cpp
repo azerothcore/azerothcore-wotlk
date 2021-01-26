@@ -173,7 +173,7 @@ void InstanceSave::InsertToDB()
     stmt->setString(5, data);
     CharacterDatabase.Execute(stmt);
 
-    sScriptMgr->OnInstanceSave(this);    
+    sScriptMgr->OnInstanceSave(this);
 }
 
 time_t InstanceSave::GetResetTimeForDB()

@@ -1881,7 +1881,7 @@ void Pet::InitTalentForLevel()
         resetTalents(); // Remove all talent points
 
     SetFreeTalentPoints(talentPointsForLevel - m_usedTalentCount);
-    
+
     if (!m_loading)
         owner->ToPlayer()->SendTalentsInfoData(true);
 }
@@ -1892,9 +1892,9 @@ uint8 Pet::GetMaxTalentPointsForLevel(uint8 level)
     // Mod points from owner SPELL_AURA_MOD_PET_TALENT_POINTS
     if (Unit* owner = GetOwner())
         points += owner->GetTotalAuraModifier(SPELL_AURA_MOD_PET_TALENT_POINTS);
-    
+
     sScriptMgr->OnCalculateMaxTalentPointsForLevel(this, level, points);
-    
+
     return points;
 }
 

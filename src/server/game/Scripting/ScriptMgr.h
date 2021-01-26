@@ -940,7 +940,7 @@ public:
     // After completed a quest
     [[nodiscard]] virtual bool OnBeforeQuestComplete(Player* /*player*/, uint32 /*quest_id*/) { return true; }
 
-    // Before durability repair action, you can even modify the discount value 
+    // Before durability repair action, you can even modify the discount value
     virtual void OnBeforeDurabilityRepair(Player* /*player*/, uint64 /*npcGUID*/, uint64 /*itemGUID*/, float&/*discountMod*/, uint8 /*guildBank*/) { }
 
     //Before buying something from any vendor
@@ -1383,7 +1383,7 @@ protected:
 
 public:
 
-    bool IsDatabaseBound() const { return false; }    
+    bool IsDatabaseBound() const { return false; }
 
     virtual void OnConstructObject(Object* /*origin*/) { }
 
@@ -1393,7 +1393,7 @@ public:
 
     virtual void OnDestructPlayer(Player* /*origin*/) { }
 
-    virtual void OnConstructGroup(Group* /*origin*/) { }    
+    virtual void OnConstructGroup(Group* /*origin*/) { }
 
     virtual void OnDestructGroup(Group* /*origin*/) { }
 
@@ -1405,7 +1405,7 @@ public:
 
     [[nodiscard]] virtual bool CanApplySoulboundFlag(Item* /*item*/, ItemTemplate const* /*proto*/) { return true; }
 
-    [[nodiscard]] virtual bool CanItemApplyEquipSpell(Player* /*player*/, Item* /*item*/) { return true; }    
+    [[nodiscard]] virtual bool CanItemApplyEquipSpell(Player* /*player*/, Item* /*item*/) { return true; }
 
     [[nodiscard]] virtual bool CanSendAuctionHello(WorldSession const* /*session*/, uint64 /*guid*/, Creature* /*creature*/) { return true; }
 
@@ -1712,7 +1712,7 @@ public: /* PlayerScript */
     void OnIsPvP(Player* player, bool& result);
     void OnGetMaxSkillValueForLevel(Player* player, uint16& result);
     bool NotSetArenaTeamInfoField(Player* player, uint8 slot, ArenaTeamInfoType type, uint32 value);
-    bool CanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dungeons, const std::string& comment);        
+    bool CanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dungeons, const std::string& comment);
     bool CanEnterMap(Player* player, MapEntry const* entry, InstanceTemplate const* instance, MapDifficulty const* mapDiff, bool loginCheck);
     bool CanInitTrade(Player* player, Player* target);
     void OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);

@@ -738,7 +738,7 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
             return BATTLEGROUND_QUEUE_NONE;
         else
             return BattlegroundMgr::ArenaTypeToQueue[arenaType];
-    } 
+    }
 
     if (BattlegroundMgr::bgToQueue.find(bgTypeId) == BattlegroundMgr::bgToQueue.end())
         return BATTLEGROUND_QUEUE_NONE;

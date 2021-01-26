@@ -113,7 +113,7 @@ WorldObject::~WorldObject()
 Object::~Object()
 {
     sScriptMgr->OnDestructObject(this);
-    
+
     if (IsInWorld())
     {
         sLog->outCrash("Object::~Object - guid=" UI64FMTD ", typeid=%d, entry=%u deleted but still in world!!", GetGUID(), GetTypeId(), GetEntry());

@@ -548,7 +548,6 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
                 _sourceUnit->UpdateAllowedPositionZ(_pathPoints[lastIdx].x, _pathPoints[lastIdx].y, _pathPoints[lastIdx].z);
         }
 
-
     // pussywizard: fix for running back and forth while target moves
     // pussywizard: second point (first is actual position) is forward to current server position, but when received by the client it's already behind, so the npc runs back to that point
     // pussywizard: the higher speed, the more probable the situation is, so try to move second point as far forward the path as possible

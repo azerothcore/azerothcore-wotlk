@@ -453,7 +453,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     Spell* spell = new Spell(mover, spellInfo, TRIGGERED_NONE, 0, false);
 
     sScriptMgr->ValidateSpellAtCastSpellResult(_player, mover, spell, oldSpellId, spellId);
-    
+
     spell->m_cast_count = castCount;                       // set count of casts
     spell->prepare(&targets);
 }

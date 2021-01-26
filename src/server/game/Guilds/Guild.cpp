@@ -2877,7 +2877,7 @@ void Guild::_SendBankList(WorldSession* session /* = NULL*/, uint8 tabId /*= 0*/
 {
     if (!sScriptMgr->CanGuildSendBankList(this, session, tabId, sendAllSlots))
         return;
-    
+
     WorldPacket data(SMSG_GUILD_BANK_LIST, 500);
     data << uint64(m_bankMoney);
     data << uint8(tabId);

@@ -981,7 +981,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 Player::~Player()
 {
     sScriptMgr->OnDestructPlayer(this);
-    
+
     // it must be unloaded already in PlayerLogout and accessed only for loggined player
     //m_social = nullptr;
 
@@ -8070,7 +8070,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     sScriptMgr->OnCustomScalingStatValueBefore(this, proto, slot, apply, CustomScalingStatValue);
 
     uint32 ScalingStatValue = proto->ScalingStatValue > 0 ? proto->ScalingStatValue : CustomScalingStatValue;
-    
+
     if (ssd && ssd_level > ssd->MaxLevel)
         ssd_level = ssd->MaxLevel;
 
@@ -8379,7 +8379,7 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
 
         ssv = ScalingStatValue ? sScalingStatValuesStore.LookupEntry(ssd_level) : nullptr;
     }
-    
+
     WeaponAttackType attType = BASE_ATTACK;
     float damage = 0.0f;
 
@@ -8579,7 +8579,7 @@ void Player::ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply,
     {
         if (!sScriptMgr->CanApplyEquipSpell(this, spellInfo, item, apply, form_change))
             return;
-        
+
         // Cannot be used in this stance/form
         if (spellInfo->CheckShapeshift(GetShapeshiftForm()) != SPELL_CAST_OK)
             return;
@@ -8707,7 +8707,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
 {
     if (!sScriptMgr->CanCastItemCombatSpell(this, target, attType, procVictim, procEx, item, proto))
         return;
-    
+
     // Can do effect if any damage done to target
     if (procVictim & PROC_FLAG_TAKEN_DAMAGE)
         //if (damageInfo->procVictim & PROC_FLAG_TAKEN_ANY_DAMAGE)
@@ -8833,7 +8833,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
 {
     if (!sScriptMgr->CanCastItemUseSpell(this, item, targets, cast_count, glyphIndex))
         return;
-    
+
     ItemTemplate const* proto = item->GetTemplate();
     // special learning case
     if (proto->Spells[0].SpellId == 483 || proto->Spells[0].SpellId == 55884)
@@ -9097,7 +9097,7 @@ void Player::_ApplyAmmoBonuses()
         currentAmmoDPS = (ammo_proto->Damage[0].DamageMin + ammo_proto->Damage[0].DamageMax) / 2;
 
     sScriptMgr->OnApplyAmmoBonuses(this, ammo_proto, currentAmmoDPS);
-    
+
     if (currentAmmoDPS == GetAmmoDPS())
         return;
 
@@ -12091,7 +12091,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
         {
             if (!sScriptMgr->CanEquipItem(const_cast<Player*>(this), slot, dest, pItem, swap, not_loading))
                 return EQUIP_ERR_CANT_DO_RIGHT_NOW;
-            
+
             // item used
             if (pItem->m_lootGenerated)
                 return EQUIP_ERR_ALREADY_LOOTED;
@@ -12255,7 +12255,7 @@ InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
 {
     if (!sScriptMgr->CanUnequipItem(const_cast<Player*>(this), pos, swap))
         return EQUIP_ERR_CANT_DO_RIGHT_NOW;
-    
+
     // Applied only to equipped items and bank bags
     if (!IsEquipmentPos(pos) && !IsBagPos(pos))
         return EQUIP_ERR_OK;
@@ -12581,7 +12581,7 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
 
         if (!sScriptMgr->CanUseItem(const_cast<Player*>(this), proto, result))
             return result;
-        
+
         if (getLevel() < proto->RequiredLevel)
             return EQUIP_ERR_CANT_EQUIP_LEVEL_I;
 
@@ -17304,7 +17304,7 @@ void Player::KilledMonsterCredit(uint32 entry, uint64 guid)
         {
             if (!sScriptMgr->PassedQuestKilledMonsterCredit(this, qInfo, entry, real_entry, guid))
                 continue;
-            
+
             if (qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_KILL) /*&& !qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_CAST)*/)
             {
                 for (uint8 j = 0; j < QUEST_OBJECTIVES_COUNT; ++j)
@@ -17865,7 +17865,7 @@ void Player::_LoadArenaTeamInfo()
                 continue;
 
             uint8 slot = itr.second;
-            
+
             SetArenaTeamInfoField(slot, ARENA_TEAM_ID, arenaTeamId);
             SetArenaTeamInfoField(slot, ARENA_TEAM_TYPE, arenaTeam->GetType());
             SetArenaTeamInfoField(slot, ARENA_TEAM_MEMBER, (arenaTeam->GetCaptain() == GetGUID()) ? 0 : 1);
@@ -22238,7 +22238,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
             AddRefundReference(it->GetGUIDLow());
         }
     }
-    
+
     sScriptMgr->OnAfterStoreOrEquipNewItem(this, vendorslot, it, count, bag, slot, pProto, pVendor, crItem, bStore);
 
     return true;
@@ -28127,7 +28127,7 @@ void Player::RemoveRestFlag(RestFlag restFlag)
 void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
 {
     if (sScriptMgr->NotSetArenaTeamInfoField(this, slot, type, value))
-        SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value); 
+        SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
 }
 
 uint32 Player::GetArenaPersonalRating(uint8 slot) const
@@ -28195,5 +28195,5 @@ void Player::SetServerSideVisibilityDetect(ServerSideVisibilityType type, Accoun
 {
     sScriptMgr->OnSetServerSideVisibilityDetect(this, type, sec);
 
-    m_serverSideVisibilityDetect.SetValue(type, sec);    
+    m_serverSideVisibilityDetect.SetValue(type, sec);
 }

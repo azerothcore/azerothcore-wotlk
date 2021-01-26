@@ -2194,7 +2194,7 @@ bool ScriptMgr::OnBeforePlayerQuestComplete(Player* player, uint32 quest_id)
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
     if (!itr->second->OnBeforeQuestComplete(player, quest_id))
         ret=false; // we change ret value only when scripts return false
-        
+
     return ret;
 }
 
@@ -2202,7 +2202,6 @@ void ScriptMgr::OnBeforeStoreOrEquipNewItem(Player* player, uint32 vendorslot, u
 {
     FOREACH_SCRIPT(PlayerScript)->OnBeforeStoreOrEquipNewItem(player, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore);
 }
-
 
 bool ScriptMgr::CanJoinInArenaQueue(Player* player, uint64 BattlemasterGuid, uint8 arenaslot, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, uint8 IsRated, GroupJoinBattlegroundResult& err)
 {
@@ -2634,7 +2633,6 @@ void ScriptMgr::OnCreate(Group* group, Player* leader)
     FOREACH_SCRIPT(GroupScript)->OnCreate(group, leader);
 }
 
-
 void ScriptMgr::OnAuraRemove(Unit* unit, AuraApplication* aurApp, AuraRemoveMode mode)
 {
     FOREACH_SCRIPT(UnitScript)->OnAuraRemove(unit, aurApp, mode);
@@ -2732,7 +2730,6 @@ bool ScriptMgr::CanSendMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInf
 
     return ret;
 }
-
 
 bool ScriptMgr::CanModAuraEffectDamageDone(AuraEffect const* auraEff, Unit* target, AuraApplication const* aurApp, uint8 mode, bool apply)
 {

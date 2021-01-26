@@ -612,9 +612,9 @@ void ArenaTeam::MassInviteToEvent(WorldSession* session)
 }
 
 uint8 ArenaTeam::GetSlotByType(uint32 type)
-{    
+{
     uint8 slot = 0xFF;
-    
+
     if (!ArenaSlotByType.count(type))
     {
         sLog->outError("FATAL: Unknown arena team type %u for some arena team", type);
@@ -622,7 +622,7 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
     }
 
     uint8 slot = ArenaSlotByType[type];
-    
+
     // Get the changed slot type
     sScriptMgr->OnGetSlotByType(type, slot);
 
@@ -926,7 +926,7 @@ void ArenaTeam::SaveToDB()
 {
     if (!sScriptMgr->CanSaveToDB(this))
         return;
-    
+
     // Save team and member stats to db
     // Called after a match has ended or when calculating arena_points
 

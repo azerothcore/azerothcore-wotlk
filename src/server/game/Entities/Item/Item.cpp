@@ -95,7 +95,7 @@ void AddItemsSetItem(Player* player, Item* item)
                 {
                     player->ApplyEquipSpell(spellInfo, nullptr, true);
                 }
-                
+
                 eff->spells[y] = spellInfo;
                 break;
             }

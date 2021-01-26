@@ -123,7 +123,7 @@ uint32 ArenaTeamMgr::GenerateArenaTeamId()
         sLog->outError("Arena team ids overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
-    
+
     return NextArenaTeamId++;
 }
 

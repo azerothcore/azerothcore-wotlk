@@ -880,7 +880,7 @@ void WorldSession::SendPetitionShowList(uint64 guid)
     if (creature->IsTabardDesigner())
     {
         sScriptMgr->PetitionShowList(_player, creature, CharterEntry, CharterDispayID, CharterCost);
-        
+
         data << uint8(1);                                   // count
         data << uint32(1);                                  // index
         data << CharterEntry;                               // charter entry
@@ -924,7 +924,7 @@ void WorldSession::SendPetitionShowList(uint64 guid)
         CharterEntry = ARENA_TEAM_CHARTER_5v5;
         CharterDispayID = CHARTER_DISPLAY_ID;
         CharterCost = sWorld->getIntConfig(CONFIG_CHARTER_COST_ARENA_5v5);
-        
+
         // 5v5
         sScriptMgr->PetitionShowList(_player, creature, CharterEntry, CharterDispayID, CharterCost);
         data << uint32(3);                                  // index

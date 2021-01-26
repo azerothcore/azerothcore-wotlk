@@ -657,7 +657,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
     {
         if (!sScriptMgr->CanSellItem(_player, pItem, creature))
             return;
-        
+
         // prevent sell not owner item
         if (_player->GetGUID() != pItem->GetOwnerGUID())
         {

@@ -65,7 +65,7 @@ Group::Group() : m_leaderGuid(0), m_leaderName(""), m_groupType(GROUPTYPE_NORMAL
 Group::~Group()
 {
     sScriptMgr->OnDestructGroup(this);
-    
+
     if (m_bgGroup)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
