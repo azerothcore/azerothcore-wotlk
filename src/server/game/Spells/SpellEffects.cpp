@@ -2760,7 +2760,9 @@ void Spell::EffectTeleUnitsFaceCaster(SpellEffIndex  /*effIndex*/)
         return;
 
     if (unitTarget->IsInFlight())
+    {
         return;
+    }
 
     if (m_targets.HasDst())
     {
