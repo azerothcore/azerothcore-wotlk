@@ -6705,7 +6705,7 @@ SpellCastResult Spell::CheckRange(bool strict)
         }
 
         // Xinef: check min range for self casts
-		if (minRange && rangeType != SPELL_RANGE_RANGED && m_caster->IsWithinCombatRange(target, minRange)) // skip this check if minRange = 0
+        if (minRange && rangeType != SPELL_RANGE_RANGED && m_caster->IsWithinCombatRange(target, minRange)) // skip this check if minRange = 0
         {
             return SPELL_FAILED_TOO_CLOSE;
         }
