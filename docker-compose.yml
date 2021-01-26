@@ -24,6 +24,7 @@ services:
     tty: true
     image: azerothcore/worldserver
     restart: unless-stopped
+    privileged: true
     build:
       context: ./docker/worldserver
       dockerfile: Dockerfile

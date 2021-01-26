@@ -84,8 +84,7 @@ void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table
 
             ss << id;
         }
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     if (found)
     {
@@ -143,4 +142,3 @@ void CharacterDatabaseCleaner::CleanCharacterQuestStatus()
 {
     CharacterDatabase.DirectExecute("DELETE FROM character_queststatus WHERE status = 0");
 }
-

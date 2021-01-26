@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -10,14 +10,21 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
-# Set projectname (must be done AFTER setting configurationtypes)
-project(AzerothCore)
-
 # Require a min version Cmake
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.8...3.19)
+
+# Fallback for using newer policies on CMake <3.12.
+if(${CMAKE_VERSION} VERSION_LESS 3.12)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+endif()
+
+message(STATUS "CMake version: ${CMAKE_VERSION}")
 
 # CMake policies (can not be handled elsewhere)
 cmake_policy(SET CMP0005 NEW)
+
+# Set projectname (must be done AFTER setting configurationtypes)
+project(AzerothCore VERSION 3.0.0 LANGUAGES CXX C)
 
 # add this options before PROJECT keyword
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
@@ -142,7 +149,7 @@ add_subdirectory(src)
 
 CU_RUN_HOOK("AFTER_SRC_LOAD")
 
-if( UNIT_TESTS )
+if( BUILD_TESTING )
     # we use these flags to get code coverage
     set(UNIT_TEST_CXX_FLAGS "-fprofile-arcs -ftest-coverage -fno-inline")
 

@@ -31,13 +31,17 @@
 #  define ACE_HAS_NEW_NOTHROW
 #endif /* __GNUC__ >= 3.3 */
 
-#if (__GNUC__ >= 5 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7))
-# if __cplusplus > 199711L
-#  define ACE_HAS_CPP11
-# endif
-# if __cplusplus > 201103L
-#  define ACE_HAS_CPP14
-# endif
+#if __cplusplus >= 201103L
+# define ACE_HAS_CPP11
+#endif
+#if __cplusplus >= 201402L
+# define ACE_HAS_CPP14
+#endif
+#if __cplusplus >= 201703L
+# define ACE_HAS_CPP17
+#endif
+#if __cplusplus >= 202002L
+# define ACE_HAS_CPP20
 #endif
 
 #if (defined (i386) || defined (__i386__)) && !defined (ACE_SIZEOF_LONG_DOUBLE)
@@ -132,8 +136,9 @@
 #  endif
 
 #  if defined (ACE_GCC_HAS_TEMPLATE_INSTANTIATION_VISIBILITY_ATTRS) && ACE_GCC_HAS_TEMPLATE_INSTANTIATION_VISIBILITY_ATTRS == 1
-#   define ACE_EXPORT_SINGLETON_DECLARATION(T) template class ACE_Proper_Export_Flag T
-#   define ACE_EXPORT_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK) template class ACE_Proper_Export_Flag SINGLETON_TYPE <CLASS, LOCK>;
+#   define ACE_EXPORT_SINGLETON_DECLARATION(T) __extension__ extern template class ACE_Proper_Export_Flag T
+#   define ACE_EXPORT_SINGLETON_DECLARE(SINGLETON_TYPE, CLASS, LOCK)  __extension__ extern template class ACE_Proper_Export_Flag SINGLETON_TYPE <CLASS, LOCK>;
+#   define ACE_HAS_EXPLICIT_TEMPLATE_CLASS_INSTANTIATION
 #  else  /* ACE_GCC_HAS_TEMPLATE_INSTANTIATION_VISIBILITY_ATTRS */
 #   define ACE_EXPORT_SINGLETON_DECLARATION(T)     \
         _Pragma ("GCC visibility push(default)")  \

@@ -47,10 +47,11 @@ ACE_FIFO_Caching_Strategy<ATTRIBUTES, CACHING_UTILITY>::ACE_FIFO_Caching_Strateg
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-ACE_ALLOC_HOOK_DEFINE(ACE_LRU_Caching_Strategy)
-ACE_ALLOC_HOOK_DEFINE(ACE_LFU_Caching_Strategy)
-ACE_ALLOC_HOOK_DEFINE(ACE_FIFO_Caching_Strategy)
-ACE_ALLOC_HOOK_DEFINE(ACE_Null_Caching_Strategy)
+ACE_ALLOC_HOOK_DEFINE_Tccc(ACE_Caching_Strategy_Adapter)
+ACE_ALLOC_HOOK_DEFINE_Tcc(ACE_LRU_Caching_Strategy)
+ACE_ALLOC_HOOK_DEFINE_Tcc(ACE_LFU_Caching_Strategy)
+ACE_ALLOC_HOOK_DEFINE_Tcc(ACE_FIFO_Caching_Strategy)
+ACE_ALLOC_HOOK_DEFINE_Tcc(ACE_Null_Caching_Strategy)
 
 ACE_END_VERSIONED_NAMESPACE_DECL
 

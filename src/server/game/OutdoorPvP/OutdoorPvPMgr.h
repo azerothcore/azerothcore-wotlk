@@ -26,70 +26,70 @@ struct OutdoorPvPData
 // class to handle player enter / leave / areatrigger / GO use events
 class OutdoorPvPMgr
 {
-    private:
-        OutdoorPvPMgr();
-        ~OutdoorPvPMgr() {};
+private:
+    OutdoorPvPMgr();
+    ~OutdoorPvPMgr() {};
 
-    public:
-        static OutdoorPvPMgr* instance();
+public:
+    static OutdoorPvPMgr* instance();
 
-        // create outdoor pvp events
-        void InitOutdoorPvP();
+    // create outdoor pvp events
+    void InitOutdoorPvP();
 
-        // cleanup
-        void Die();
+    // cleanup
+    void Die();
 
-        // called when a player enters an outdoor pvp area
-        void HandlePlayerEnterZone(Player* player, uint32 areaflag);
+    // called when a player enters an outdoor pvp area
+    void HandlePlayerEnterZone(Player* player, uint32 areaflag);
 
-        // called when player leaves an outdoor pvp area
-        void HandlePlayerLeaveZone(Player* player, uint32 areaflag);
+    // called when player leaves an outdoor pvp area
+    void HandlePlayerLeaveZone(Player* player, uint32 areaflag);
 
-        // called when player resurrects
-        void HandlePlayerResurrects(Player* player, uint32 areaflag);
+    // called when player resurrects
+    void HandlePlayerResurrects(Player* player, uint32 areaflag);
 
-        // return assigned outdoor pvp
-        OutdoorPvP* GetOutdoorPvPToZoneId(uint32 zoneid);
+    // return assigned outdoor pvp
+    OutdoorPvP* GetOutdoorPvPToZoneId(uint32 zoneid);
 
-        // handle custom (non-exist in dbc) spell if registered
-        bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go);
+    // handle custom (non-exist in dbc) spell if registered
+    bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go);
 
-        // handle custom go if registered
-        bool HandleOpenGo(Player* player, uint64 guid);
+    // handle custom go if registered
+    bool HandleOpenGo(Player* player, uint64 guid);
 
-        ZoneScript* GetZoneScript(uint32 zoneId);
+    ZoneScript* GetZoneScript(uint32 zoneId);
 
-        void AddZone(uint32 zoneid, OutdoorPvP* handle);
+    void AddZone(uint32 zoneid, OutdoorPvP* handle);
 
-        void Update(uint32 diff);
+    void Update(uint32 diff);
 
-        void HandleGossipOption(Player* player, uint64 guid, uint32 gossipid);
+    void HandleGossipOption(Player* player, uint64 guid, uint32 gossipid);
 
-        bool CanTalkTo(Player* player, Creature* creature, GossipMenuItems const& gso);
+    bool CanTalkTo(Player* player, Creature* creature, GossipMenuItems const& gso);
 
-        void HandleDropFlag(Player* player, uint32 spellId);
+    void HandleDropFlag(Player* player, uint32 spellId);
 
-        // pussywizard: lock required because different functions affect m_players
-        ACE_Thread_Mutex _lock;
+    // pussywizard: lock required because different functions affect m_players
+    ACE_Thread_Mutex _lock;
 
-    private:
-        typedef std::vector<OutdoorPvP*> OutdoorPvPSet;
-        typedef std::map<uint32 /* zoneid */, OutdoorPvP*> OutdoorPvPMap;
-        typedef std::map<OutdoorPvPTypes, OutdoorPvPData*> OutdoorPvPDataMap;
+private:
+    typedef std::vector<OutdoorPvP*> OutdoorPvPSet;
+    typedef std::map<uint32 /* zoneid */, OutdoorPvP*> OutdoorPvPMap;
+    typedef std::map<OutdoorPvPTypes, OutdoorPvPData*> OutdoorPvPDataMap;
 
-        // contains all initiated outdoor pvp events
-        // used when initing / cleaning up
-        OutdoorPvPSet  m_OutdoorPvPSet;
+    // contains all initiated outdoor pvp events
+    // used when initing / cleaning up
+    OutdoorPvPSet  m_OutdoorPvPSet;
 
-        // maps the zone ids to an outdoor pvp event
-        // used in player event handling
-        OutdoorPvPMap   m_OutdoorPvPMap;
+    // maps the zone ids to an outdoor pvp event
+    // used in player event handling
+    OutdoorPvPMap   m_OutdoorPvPMap;
 
-        // Holds the outdoor PvP templates
-        OutdoorPvPDataMap m_OutdoorPvPDatas;
+    // Holds the outdoor PvP templates
+    OutdoorPvPDataMap m_OutdoorPvPDatas;
 
-        // update interval
-        uint32 m_UpdateTimer;
+    // update interval
+    uint32 m_UpdateTimer;
 };
 
 #define sOutdoorPvPMgr OutdoorPvPMgr::instance()

@@ -32,7 +32,7 @@ single_cpu_increment (volatile long *value)
      (defined (__SUNPRO_CC) && (defined (__i386) || defined (__x86_64))))
   return ace_atomic_add_long (
            reinterpret_cast<volatile unsigned long*> (value), 1);
-#elif defined(__GNUC__) && defined(PPC)
+#elif defined(__GNUC__) && defined(__PPC__)
   long tmp;
   asm("lwz %0,%1" : "=r" (tmp) : "m" (*value) );
   asm("addi %0,%0,1" : "+r" (tmp) );
@@ -56,7 +56,7 @@ single_cpu_decrement (volatile long *value)
      (defined (__SUNPRO_CC) && (defined (__i386) || defined (__x86_64))))
   return ace_atomic_add_long (
             reinterpret_cast<volatile unsigned long*> (value), -1);
-#elif defined(__GNUC__) && defined(PPC)
+#elif defined(__GNUC__) && defined(__PPC__)
   long tmp;
   asm("lwz %0,%1" : "=r" (tmp) : "m" (*value) );
   asm("addi %0,%0,-1" : "+r" (tmp) );
@@ -79,7 +79,7 @@ single_cpu_exchange (volatile long *value, long rhs)
      (defined (__SUNPRO_CC) && (defined (__i386) || defined (__x86_64))))
   return ace_atomic_swap_long (
            reinterpret_cast<volatile unsigned long*> (value), rhs);
-#elif defined(__GNUC__) && defined(PPC)
+#elif defined(__GNUC__) && defined(__PPC__)
   long tmp;
   asm("lwz %0,%1" : "=r" (tmp) : "m" (rhs) );
   asm("stw %0,%1" : "+r" (tmp), "=m" (*value) );
@@ -102,7 +102,7 @@ single_cpu_exchange_add (volatile long *value, long rhs)
      (defined (__SUNPRO_CC) && (defined (__i386) || defined (__x86_64))))
   return ace_atomic_swap_add_long (
            reinterpret_cast<volatile unsigned long*> (value), rhs);
-#elif defined(__GNUC__) && defined(PPC)
+#elif defined(__GNUC__) && defined(__PPC__)
   long tmp;
   asm("add %0,%1,%2" : "=r" (tmp) : "r" (*value), "r" (rhs) );
   asm("stw %0,%1" : "+r" (tmp), "=m" (*value) );

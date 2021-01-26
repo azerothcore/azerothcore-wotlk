@@ -4,7 +4,7 @@
 /**
  *  @file    Select_Reactor.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -46,7 +46,6 @@ template<>
 class ACE_Export ACE_Guard< ACE_Reactor_Token_T<ACE_Noop_Token> >
 {
 public:
-  // = Initialization and termination methods.
   ACE_Guard (ACE_Reactor_Token_T<ACE_Noop_Token> &) {}
   ACE_Guard (ACE_Reactor_Token_T<ACE_Noop_Token> &, int) {}
   ~ACE_Guard (void) {}

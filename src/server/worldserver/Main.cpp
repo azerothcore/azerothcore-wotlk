@@ -82,7 +82,7 @@ extern int main(int argc, char** argv)
                 configFile = argv[c];
         }
 
-        #ifdef _WIN32
+#ifdef _WIN32
         if (strcmp(argv[c], "-s") == 0) // Services
         {
             if (++c >= argc)
@@ -114,7 +114,7 @@ extern int main(int argc, char** argv)
 
         if (strcmp(argv[c], "--service") == 0)
             WinServiceRun();
-        #endif
+#endif
         ++c;
     }
 

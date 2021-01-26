@@ -8,6 +8,44 @@
 #include "Errors.h"
 #include "Log.h"
 #include "Util.h"
+#include <ace/Configuration_Import_Export.h>
+#include <memory>
+#include <mutex>
+
+namespace
+{
+    std::unique_ptr<ACE_Configuration_Heap> _config;
+    std::vector<std::string> _modulesConfigFiles;
+    std::string _initConfigFile;
+    std::mutex _configLock;
+
+    // Defined here as it must not be exposed to end-users.
+    bool GetValueHelper(const char* name, ACE_TString& result)
+    {
+        std::lock_guard<std::mutex> guard(_configLock);
+
+        if (!_config.get())
+            return false;
+
+        ACE_TString section_name;
+        ACE_Configuration_Section_Key section_key;
+        const ACE_Configuration_Section_Key& root_key = _config->root_section();
+
+        int i = 0;
+
+        while (!_config->enumerate_sections(root_key, i, section_name))
+        {
+            _config->open_section(root_key, section_name.c_str(), 0, section_key);
+
+            if (!_config->get_string_value(section_key, name, result))
+                return true;
+
+            ++i;
+        }
+
+        return false;
+    }
+}
 
 ConfigMgr* ConfigMgr::instance()
 {
@@ -15,38 +53,11 @@ ConfigMgr* ConfigMgr::instance()
     return &instance;
 }
 
-// Defined here as it must not be exposed to end-users.
-bool ConfigMgr::GetValueHelper(const char* name, ACE_TString& result)
-{
-    GuardType guard(_configLock);
-
-    if (!_config.get())
-        return false;
-
-    ACE_TString section_name;
-    ACE_Configuration_Section_Key section_key;
-    const ACE_Configuration_Section_Key& root_key = _config->root_section();
-
-    int i = 0;
-
-    while (!_config->enumerate_sections(root_key, i, section_name))
-    {
-        _config->open_section(root_key, section_name.c_str(), 0, section_key);
-
-        if (!_config->get_string_value(section_key, name, result))
-            return true;
-
-        ++i;
-    }
-
-    return false;
-}
-
 bool ConfigMgr::LoadInitial(std::string const& file)
 {
     ASSERT(file.c_str());
 
-    GuardType guard(_configLock);
+    std::lock_guard<std::mutex> guard(_configLock);
 
     _config.reset(new ACE_Configuration_Heap());
     if (!_config->open())
@@ -62,7 +73,7 @@ bool ConfigMgr::LoadMore(std::string const& file)
     ASSERT(file.c_str());
     ASSERT(_config);
 
-    GuardType guard(_configLock);
+    std::lock_guard<std::mutex> guard(_configLock);
 
     return LoadData(file);
 }
@@ -91,7 +102,11 @@ std::string ConfigMgr::GetStringDefault(std::string const& name, const std::stri
     ACE_TString val;
 
     if (GetValueHelper(name.c_str(), val))
-        return val.c_str();
+    {
+        std::string value = val.c_str();
+        value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
+        return value;
+    }
     else
     {
         if (logUnused)
@@ -113,7 +128,7 @@ bool ConfigMgr::GetBoolDefault(std::string const& name, bool def, bool logUnused
         return def;
     }
 
-    return (val == "true" || val == "TRUE" || val == "yes" || val == "YES" || val == "1");
+    return StringToBool(val.c_str());
 }
 
 int ConfigMgr::GetIntDefault(std::string const& name, int def, bool logUnused /*= true*/)
@@ -121,7 +136,7 @@ int ConfigMgr::GetIntDefault(std::string const& name, int def, bool logUnused /*
     ACE_TString val;
 
     if (GetValueHelper(name.c_str(), val))
-        return atoi(val.c_str());
+        return std::stoi(val.c_str());
     else
     {
         if (logUnused)
@@ -136,7 +151,7 @@ float ConfigMgr::GetFloatDefault(std::string const& name, float def, bool logUnu
     ACE_TString val;
 
     if (GetValueHelper(name.c_str(), val))
-        return (float)atof(val.c_str());
+        return std::stof(val.c_str());
     else
     {
         if (logUnused)
@@ -148,7 +163,7 @@ float ConfigMgr::GetFloatDefault(std::string const& name, float def, bool logUnu
 
 std::list<std::string> ConfigMgr::GetKeysByString(std::string const& name)
 {
-    GuardType guard(_configLock);
+    std::lock_guard<std::mutex> guard(_configLock);
 
     std::list<std::string> keys;
     if (!_config.get())

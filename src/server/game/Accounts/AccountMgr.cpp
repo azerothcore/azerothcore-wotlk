@@ -121,7 +121,6 @@ namespace AccountMgr
         return AOR_OK;
     }
 
-
     AccountOpResult ChangeUsername(uint32 accountId, std::string newUsername, std::string newPassword)
     {
         // Check if accounts exists
@@ -240,7 +239,7 @@ namespace AccountMgr
         stmt->setString(1, CalculateShaPassHash(username, password));
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
-        return (result) ? true : false;
+        return !!result;
     }
 
     uint32 GetCharactersCount(uint32 accountId)

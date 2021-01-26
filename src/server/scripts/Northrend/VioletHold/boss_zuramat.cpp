@@ -46,14 +46,14 @@ class boss_zuramat : public CreatureScript
 public:
     boss_zuramat() : CreatureScript("boss_zuramat") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_zuramatAI (pCreature);
     }
 
     struct boss_zuramatAI : public ScriptedAI
     {
-        boss_zuramatAI(Creature *c) : ScriptedAI(c), summons(me)
+        boss_zuramatAI(Creature* c) : ScriptedAI(c), summons(me)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -62,25 +62,25 @@ public:
         EventMap events;
         SummonList summons;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_SHROUD_OF_DARKNESS, urand(5000,7000));
-            events.RescheduleEvent(EVENT_SPELL_VOID_SHIFT, urand(23000,25000));
+            events.RescheduleEvent(EVENT_SPELL_SHROUD_OF_DARKNESS, urand(5000, 7000));
+            events.RescheduleEvent(EVENT_SPELL_VOID_SHIFT, urand(23000, 25000));
             events.RescheduleEvent(EVENT_SPELL_SUMMON_VOID_SENTRY, 10000);
             if (pInstance)
                 pInstance->SetData(DATA_ACHIEV, 1);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -90,7 +90,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -105,7 +105,7 @@ public:
                         me->CastSpell(target, SPELL_VOID_SHIFT, false);
                         me->MonsterWhisper("Gaze... into the void.", target->ToPlayer(), false);
                     }
-                    events.RepeatEvent(urand(18000,22000));
+                    events.RepeatEvent(urand(18000, 22000));
                     break;
                 case EVENT_SPELL_SUMMON_VOID_SENTRY:
                     me->CastSpell((Unit*)NULL, SPELL_SUMMON_VOID_SENTRY, false);
@@ -116,7 +116,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
@@ -124,7 +124,7 @@ public:
                 pInstance->SetData(DATA_BOSS_DIED, 0);
         }
 
-        void KilledUnit(Unit * victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim && victim->GetGUID() == me->GetGUID())
                 return;
@@ -132,7 +132,7 @@ public:
             Talk(SAY_SLAY);
         }
 
-        void JustSummoned(Creature* pSummoned)
+        void JustSummoned(Creature* pSummoned) override
         {
             if (pSummoned)
             {
@@ -143,7 +143,7 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature *pSummoned)
+        void SummonedCreatureDespawn(Creature* pSummoned) override
         {
             if (pSummoned)
             {
@@ -155,9 +155,9 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             events.Reset();
@@ -173,14 +173,14 @@ class npc_vh_void_sentry : public CreatureScript
 public:
     npc_vh_void_sentry() : CreatureScript("npc_vh_void_sentry") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_vh_void_sentryAI (pCreature);
     }
 
     struct npc_vh_void_sentryAI : public NullCreatureAI
     {
-        npc_vh_void_sentryAI(Creature *c) : NullCreatureAI(c)
+        npc_vh_void_sentryAI(Creature* c) : NullCreatureAI(c)
         {
             pInstance = c->GetInstanceScript();
             SummonedGUID = 0;
@@ -198,14 +198,14 @@ public:
         uint64 SummonedGUID;
         uint16 checkTimer;
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == -1337)
                 if (Creature* c = pInstance->instance->GetCreature(SummonedGUID))
                     c->DespawnOrUnsummon();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
             {
@@ -216,13 +216,13 @@ public:
             me->DespawnOrUnsummon(5000);
         }
 
-        void SummonedCreatureDespawn(Creature *pSummoned)
+        void SummonedCreatureDespawn(Creature* pSummoned) override
         {
             if (pSummoned)
                 pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (checkTimer <= diff)
             {

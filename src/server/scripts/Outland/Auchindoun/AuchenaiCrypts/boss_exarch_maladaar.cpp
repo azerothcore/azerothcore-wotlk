@@ -33,7 +33,7 @@ class boss_exarch_maladaar : public CreatureScript
 public:
     boss_exarch_maladaar() : CreatureScript("boss_exarch_maladaar") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_exarch_maladaarAI (creature);
     }
@@ -48,12 +48,12 @@ public:
         bool _talked;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!_talked && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 150.0f))
             {
@@ -64,7 +64,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             Talk(SAY_AGGRO);
 
@@ -74,13 +74,13 @@ public:
             events.ScheduleEvent(EVENT_CHECK_HEALTH, 5000);
         }
 
-        void KilledUnit(Unit*)
+        void KilledUnit(Unit*) override
         {
-            if (urand(0,1))
+            if (urand(0, 1))
                 Talk(SAY_SLAY);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             Talk(SAY_DEATH);
 
@@ -88,7 +88,7 @@ public:
             me->SummonCreature(19412, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 600000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -97,14 +97,13 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_CHECK_HEALTH:
                     if (HealthBelowPct(25))
                     {
                         Talk(SAY_SUMMON);
                         me->CastSpell(me, SPELL_SUMMON_AVATAR, false);
-                        events.PopEvent();
                         return;
                     }
                     events.RepeatEvent(2000);
@@ -161,7 +160,7 @@ class npc_stolen_soul : public CreatureScript
 public:
     npc_stolen_soul() : CreatureScript("npc_stolen_soul") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_stolen_soulAI (creature);
     }
@@ -173,24 +172,24 @@ public:
         uint8 myClass;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             myClass = CLASS_WARRIOR;
             events.ScheduleEvent(EVENT_STOLEN_SOUL_SPELL, 1000);
         }
 
-        void DoAction(int32 pClass)
+        void DoAction(int32 pClass) override
         {
             myClass = pClass;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
 
             events.Update(diff);
-            if (events.GetEvent() == EVENT_STOLEN_SOUL_SPELL)
+            if (events.ExecuteEvent() == EVENT_STOLEN_SOUL_SPELL)
             {
                 switch (myClass)
                 {

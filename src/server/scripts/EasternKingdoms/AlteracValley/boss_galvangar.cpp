@@ -38,7 +38,7 @@ public:
         uint32 MortalStrikeTimer;
         uint32 ResetTimer;
 
-        void Reset()
+        void Reset() override
         {
             CleaveTimer                     = urand(1 * IN_MILLISECONDS, 9 * IN_MILLISECONDS);
             FrighteningShoutTimer           = urand(2 * IN_MILLISECONDS, 19 * IN_MILLISECONDS);
@@ -48,17 +48,17 @@ public:
             ResetTimer                      = 5 * IN_MILLISECONDS;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(YELL_AGGRO);
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             Reset();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -67,31 +67,36 @@ public:
             {
                 DoCastVictim(SPELL_CLEAVE);
                 CleaveTimer =  urand(10 * IN_MILLISECONDS, 16 * IN_MILLISECONDS);
-            } else CleaveTimer -= diff;
+            }
+            else CleaveTimer -= diff;
 
             if (FrighteningShoutTimer <= diff)
             {
                 DoCastVictim(SPELL_FRIGHTENING_SHOUT);
                 FrighteningShoutTimer = urand(10 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
-            } else FrighteningShoutTimer -= diff;
+            }
+            else FrighteningShoutTimer -= diff;
 
             if (Whirlwind1Timer <= diff)
             {
                 DoCastVictim(SPELL_WHIRLWIND1);
                 Whirlwind1Timer = urand(6 * IN_MILLISECONDS, 10 * IN_MILLISECONDS);
-            } else Whirlwind1Timer -= diff;
+            }
+            else Whirlwind1Timer -= diff;
 
             if (Whirlwind2Timer <= diff)
             {
                 DoCastVictim(SPELL_WHIRLWIND2);
                 Whirlwind2Timer = urand(10 * IN_MILLISECONDS, 25 * IN_MILLISECONDS);
-            } else Whirlwind2Timer -= diff;
+            }
+            else Whirlwind2Timer -= diff;
 
             if (MortalStrikeTimer <= diff)
             {
                 DoCastVictim(SPELL_MORTAL_STRIKE);
                 MortalStrikeTimer = urand(10 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
-            } else MortalStrikeTimer -= diff;
+            }
+            else MortalStrikeTimer -= diff;
 
             // check if creature is not outside of building
             if (ResetTimer <= diff)
@@ -102,13 +107,14 @@ public:
                     Talk(YELL_EVADE);
                 }
                 ResetTimer = 5 * IN_MILLISECONDS;
-            } else ResetTimer -= diff;
+            }
+            else ResetTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_galvangarAI(creature);
     }

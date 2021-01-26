@@ -96,31 +96,36 @@ public:
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     DoCast(target, SPELL_BERSERKER_CHARGE);
                 BerserkerChargeTimer = 25000;
-            } else BerserkerChargeTimer -= diff;
+            }
+            else BerserkerChargeTimer -= diff;
 
             if (UppercutTimer <= diff)
             {
                 DoCastVictim(SPELL_UPPERCUT);
                 UppercutTimer = 20000;
-            } else UppercutTimer -= diff;
+            }
+            else UppercutTimer -= diff;
 
             if (ThunderclapTimer <= diff)
             {
                 DoCastVictim(SPELL_THUNDERCLAP);
                 ThunderclapTimer = 15000;
-            } else ThunderclapTimer -= diff;
+            }
+            else ThunderclapTimer -= diff;
 
             if (MortalStrikeTimer <= diff)
             {
                 DoCastVictim(SPELL_MORTAL_STRIKE);
                 MortalStrikeTimer = 15000;
-            } else MortalStrikeTimer -= diff;
+            }
+            else MortalStrikeTimer -= diff;
 
             if (CleaveTimer <= diff)
             {
                 DoCastVictim(SPELL_CLEAVE);
                 CleaveTimer = 7000;
-            } else CleaveTimer -= diff;
+            }
+            else CleaveTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
