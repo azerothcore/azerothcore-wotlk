@@ -1495,9 +1495,13 @@ float WorldObject::GetMinHeightInWater() const
 
 void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* groundZ) const
 {
-    // TODO: Allow transports to be part of dynamic vmap tree
-    //if (GetTransport())
-    //    return;
+    if (GetTransport())
+    {
+        if (groundZ)
+            *groundZ = z;
+
+        return;
+    }
 
     if (Unit const* unit = ToUnit())
     {
@@ -2832,7 +2836,8 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
     desty = pos.m_positionY + dist * sin(angle);
     destz = pos.m_positionZ;
 
-    GetMap()->CanReachPositionAndGetCoords(this, destx, desty, destz, false, false, false);
+    if (!GetMap()->CanReachPositionAndGetCoords(this, destx, desty, destz, false, false, false))
+        return;
 
     pos.SetOrientation(GetOrientation());
     pos.Relocate(destx, desty, destz);

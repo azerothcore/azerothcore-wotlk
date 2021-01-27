@@ -532,6 +532,8 @@ struct Position
         return GetAngle(pos) - m_orientation;
     }
     [[nodiscard]] float GetRelativeAngle(float x, float y) const { return GetAngle(x, y) - m_orientation; }
+    float ToAbsoluteAngle(float relAngle) const { return NormalizeOrientation(relAngle + m_orientation); }
+
     void GetSinCos(float x, float y, float& vsin, float& vcos) const;
 
     [[nodiscard]] bool IsInDist2d(float x, float y, float dist) const
