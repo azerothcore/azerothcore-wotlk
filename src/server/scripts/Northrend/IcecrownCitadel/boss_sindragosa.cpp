@@ -201,18 +201,16 @@ public:
         {
             if (!sindragosa->IsAlive())
                 return true;
+
             Position pos;
             _owner->GetPosition(&pos);
-            _owner->m_positionZ -= 1.0f; // +2.0f in UpdateGroundPositionZ, prevent going over GO model of another ice block, because new would be spawned on top of the old one xd
             _owner->UpdateGroundPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-            if (pos.GetPositionZ() < 203.0f)
-                pos.m_positionZ = 203.0f;
+
             if (TempSummon* summon = sindragosa->SummonCreature(NPC_ICE_TOMB, pos))
             {
-                summon->m_positionZ = summon->GetPositionZ() + 5.0f;
                 summon->AI()->SetGUID(_owner->GetGUID(), DATA_TRAPPED_PLAYER);
                 _owner->CastSpell(_owner, SPELL_ICE_TOMB_UNTARGETABLE, true);
-                if (GameObject* go = summon->SummonGameObject(GO_ICE_BLOCK, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ() - 3.5f, pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                if (GameObject* go = summon->SummonGameObject(GO_ICE_BLOCK, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0))
                 {
                     go->SetSpellId(SPELL_ICE_TOMB_DAMAGE);
                     summon->AddGameObject(go);
