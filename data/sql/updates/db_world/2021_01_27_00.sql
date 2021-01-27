@@ -1,3 +1,19 @@
+-- DB update 2021_01_26_00 -> 2021_01_27_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_01_26_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_01_26_00 2021_01_27_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1609769436615146000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609769436615146000');
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (3892, 3894);
 DELETE FROM `creature_text` WHERE (`CreatureID` IN (3892, 3894)) AND (`GroupID` BETWEEN 0 AND 13);
@@ -80,3 +96,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (389403, 9, 12, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Pelturas Whitemoon - On Script - Play Emote Bow'),
 (389403, 9, 13, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Pelturas Whitemoon - On Script - Set Orientation'),
 (389403, 9, 14, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Pelturas Whitemoon - On Script - Add Npc Flag Questgiver');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
