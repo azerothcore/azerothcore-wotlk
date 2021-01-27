@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `character_queststatus_rewarded`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `character_queststatus_rewarded` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
-  `quest` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
-  `active` tinyint(3) unsigned NOT NULL DEFAULT '1',
+  `guid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
+  `quest` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
+  `active` tinyint(3) unsigned NOT NULL DEFAULT 1,
   PRIMARY KEY (`guid`,`quest`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
 /*!40101 SET character_set_client = @saved_cs_client */;

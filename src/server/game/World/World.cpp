@@ -1885,13 +1885,15 @@ void World::SetInitialWorldSettings()
     AddonMgr::LoadFromDB();
 
     // pussywizard:
-    sLog->outString("Deleting invalid mail items...\n");
+    sLog->outString("Deleting invalid mail items...");
+    sLog->outString();
     CharacterDatabase.Query("DELETE mi FROM mail_items mi LEFT JOIN item_instance ii ON mi.item_guid = ii.guid WHERE ii.guid IS NULL");
     CharacterDatabase.Query("DELETE mi FROM mail_items mi LEFT JOIN mail m ON mi.mail_id = m.id WHERE m.id IS NULL");
     CharacterDatabase.Query("UPDATE mail m LEFT JOIN mail_items mi ON m.id = mi.mail_id SET m.has_items=0 WHERE m.has_items<>0 AND mi.mail_id IS NULL");
 
     ///- Handle outdated emails (delete/return)
     sLog->outString("Returning old mails...");
+    sLog->outString();
     sObjectMgr->ReturnOrDeleteOldMails(false);
 
     ///- Load AutoBroadCast
@@ -1925,10 +1927,12 @@ void World::SetInitialWorldSettings()
     sCalendarMgr->LoadFromDB();
 
     sLog->outString("Initializing SpellInfo precomputed data..."); // must be called after loading items, professions, spells and pretty much anything
+    sLog->outString();
     sObjectMgr->InitializeSpellInfoPrecomputedData();
 
     ///- Initialize game time and timers
     sLog->outString("Initialize game time and timers");
+    sLog->outString();
     m_gameTime = time(nullptr);
     m_startTime = m_gameTime;
 
@@ -1959,9 +1963,11 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize MapManager
     sLog->outString("Starting Map System");
+    sLog->outString();
     sMapMgr->Initialize();
 
     sLog->outString("Starting Game Event system...");
+    sLog->outString();
     uint32 nextGameEvent = sGameEventMgr->StartSystem();
     m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
 
@@ -1972,6 +1978,7 @@ void World::SetInitialWorldSettings()
     Channel::CleanOldChannelsInDB();
 
     sLog->outString("Starting Arena Season...");
+    sLog->outString();
     sGameEventMgr->StartArenaSeason();
 
     sTicketMgr->Initialize();
@@ -2018,6 +2025,7 @@ void World::SetInitialWorldSettings()
     InitCalendarOldEventsDeletionTime();
 
     sLog->outString("Calculate Guild cap reset time...");
+    sLog->outString();
     InitGuildResetTime();
 
     sLog->outString("Load Petitions...");
@@ -2163,6 +2171,7 @@ void World::LoadAutobroadcasts()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u autobroadcast definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 /// Update the World !
