@@ -47,7 +47,7 @@ Any information that can help the developers to identify and fix the issue shoul
 Examples:
 - was this bug always present in AzerothCore? if it was introduced after a change, please mention it
 - the code line(s) that cause the issue
-- does this feature work in other server appplications (e.g. CMaNGOS, TrinityCore, etc...) ?
+- does this feature work in other server applications (e.g. CMaNGOS, TrinityCore, etc...) ?
 -->
 
 

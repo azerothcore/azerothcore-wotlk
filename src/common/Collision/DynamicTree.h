@@ -23,7 +23,6 @@ class DynamicMapTree
     DynTreeImpl* impl;
 
 public:
-
     DynamicMapTree();
     ~DynamicMapTree();
 

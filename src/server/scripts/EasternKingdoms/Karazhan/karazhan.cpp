@@ -555,12 +555,10 @@ public:
                 default:
                     return 2000;
             }
-
         }
 
         void UpdateAI(uint32 diff) override
         {
-
             if (YellTimer <= diff)
             {
                 if (EventStarted)
@@ -587,7 +585,6 @@ public:
             }
         }
     };
-
 };
 
 void AddSC_karazhan()

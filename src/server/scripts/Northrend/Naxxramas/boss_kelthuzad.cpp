@@ -183,7 +183,6 @@ public:
                     go->SetGoState(GO_STATE_ACTIVE);
             }
             _justSpawned = false;
-
         }
 
         void EnterEvadeMode() override
