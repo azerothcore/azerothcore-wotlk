@@ -368,7 +368,6 @@ public:
 class AreaTrigger_at_celestial_planetarium_enterance : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_celestial_planetarium_enterance()
         : AreaTriggerScript("at_celestial_planetarium_enterance")
     {
@@ -410,7 +409,6 @@ public:
         return true;
     }
 };
-
 
 void AddSC_ulduar()
 {

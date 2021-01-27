@@ -11,7 +11,7 @@ CREATE TABLE `version_db_auth`
 (
   `sql_rev` varchar(100) NOT NULL,
   `required_rev` varchar(100) DEFAULT NULL,
-  `2019_02_08_00` bit(1) DEFAULT NULL,
+  `2020_02_07_00` bit(1) DEFAULT NULL,
   PRIMARY KEY (`sql_rev`),
   KEY `required` (`required_rev`),
   CONSTRAINT `required` FOREIGN KEY (`required_rev`) REFERENCES `version_db_auth` (`sql_rev`)
@@ -20,6 +20,9 @@ CREATE TABLE `version_db_auth`
 
 LOCK TABLES `version_db_auth` WRITE;
 /*!40000 ALTER TABLE `version_db_auth` DISABLE KEYS */;
+INSERT INTO `version_db_auth` VALUES 
+('1554142988374631100',NULL,NULL),
+('1579213352894781043',NULL,NULL);
 /*!40000 ALTER TABLE `version_db_auth` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

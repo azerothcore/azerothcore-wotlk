@@ -395,7 +395,6 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
 
-
         void MovementInform(uint32, uint32) override
         {
             arrived = true;
@@ -454,4 +453,3 @@ void AddSC_boss_akilzon()
     new boss_akilzon();
     new npc_akilzon_eagle();
 }
-

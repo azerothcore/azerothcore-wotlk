@@ -71,7 +71,6 @@ enum SpellData
     SPELL_SLEEP                                     = 64394,
 };
 
-
 enum NPCs
 {
     //NPC_MIMIRON                                   = 33350,
@@ -87,7 +86,6 @@ enum NPCs
     NPC_MAGNETIC_CORE                               = 34068,
 };
 
-
 enum GOs
 {
     //GO_MIMIRON_ELEVATOR                           = 194749,
@@ -97,7 +95,6 @@ enum GOs
     GO_BUTTON                                       = 194739,
     // pads: 194740-48
 };
-
 
 enum HardMode
 {
@@ -129,7 +126,6 @@ enum HardMode
     SPELL_ENTER_VEHICLE_2                           = 63314,
     SPELL_ENTER_VEHICLE_4                           = 63316,
 };
-
 
 enum EVENTS
 {
@@ -203,7 +199,6 @@ enum EVENTS
     EVENT_EMERGENCY_BOT_ATTACK                      = 70,
 };
 
-
 enum SOUNDS
 {
     SOUND_TANK_INTRO                                = 15611,
@@ -227,7 +222,6 @@ enum SOUNDS
     SOUND_TANK_HARD_INTRO                           = 15629,
 };
 
-
 #define SPELL_NAPALM_SHELL                          RAID_MODE(SPELL_NAPALM_SHELL_10, SPELL_NAPALM_SHELL_25)
 #define SPELL_PLASMA_BLAST                          RAID_MODE(SPELL_PLASMA_BLAST_10, SPELL_PLASMA_BLAST_25)
 #define SPELL_MINE_EXPLOSION                        RAID_MODE(SPELL_MINE_EXPLOSION_10, SPELL_MINE_EXPLOSION_25)
@@ -235,7 +229,6 @@ enum SOUNDS
 #define SPELL_HAND_PULSE_R                          RAID_MODE(SPELL_HAND_PULSE_10_R, SPELL_HAND_PULSE_25_R)
 #define SPELL_HAND_PULSE_L                          RAID_MODE(SPELL_HAND_PULSE_10_L, SPELL_HAND_PULSE_25_L)
 #define SPELL_FROST_BOMB_EXPLOSION                  RAID_MODE(SPELL_FROST_BOMB_EXPLOSION_10, SPELL_FROST_BOMB_EXPLOSION_25)
-
 
 #define TEXT_AGGRO                                  "Oh, my! I wasn't expecting company! The workshop is such a mess! How embarrassing!"
 #define TEXT_BERSERK                                "Oh, my! It would seem that we are out of time, my friends!"
@@ -273,8 +266,6 @@ enum ComputerTalks
     TALK_COMPUTER_ONE = 11,
     TALK_COMPUTER_ZERO = 12,
 };
-
-
 
 #define GetMimiron() ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_MIMIRON))
 #define GetLMK2() ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MIMIRON_LEVIATHAN_MKII))
@@ -1064,7 +1055,6 @@ public:
                         events.ScheduleEvent(EVENT_SPELL_SHOCK_BLAST, 20000);
                         events.ScheduleEvent(EVENT_PROXIMITY_MINES_1, 6000);
                         break;
-
                 }
             }
         }
@@ -1686,7 +1676,6 @@ public:
                         DoZoneInCombat();
                         events.Reset();
                         events.ScheduleEvent(EVENT_SPELL_PLASMA_BALL, 0);
-
                 }
             }
             else if (id == 2 && !immobilized && Phase == 3) // magnetic core

@@ -92,7 +92,6 @@ public:
         }
         return true;
     }
-
 };
 
 /*######
@@ -150,7 +149,6 @@ public:
 
         return true;
     }
-
 };
 
 /*######
@@ -207,7 +205,6 @@ public:
         }
         return true;
     }
-
 };
 
 /*######
@@ -531,7 +528,6 @@ public:
                         EventOnWait = false;
                         break;
                 }
-
             }
             else if (EventOnWait) EventTimer -= diff;
         }
@@ -544,7 +540,6 @@ public:
             EventOnWait = true;
         }
     };
-
 };
 
 /*####

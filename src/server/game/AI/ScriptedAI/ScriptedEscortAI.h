@@ -126,4 +126,3 @@ private:
     bool HasImmuneToNPCFlags;
 };
 #endif
-

@@ -14,7 +14,6 @@ EndScriptData */
 /* ContentData
 npc_kerlonian
 npc_prospector_remtravel
-npc_threshwackonator
 EndContentData */
 
 #include "ScriptMgr.h"
@@ -148,7 +147,6 @@ public:
         }
     };
 };
-
 
 // Theirs
 /*####
@@ -415,89 +413,6 @@ public:
     }
 };
 
-/*####
-# npc_threshwackonator
-####*/
-
-enum Threshwackonator
-{
-    EMOTE_START             = 0,
-    SAY_AT_CLOSE            = 1,
-    QUEST_GYROMAST_REV      = 2078,
-    NPC_GELKAK              = 6667,
-    FACTION_HOSTILE         = 14
-};
-
-#define GOSSIP_ITEM_INSERT_KEY  "[PH] Insert key"
-
-class npc_threshwackonator : public CreatureScript
-{
-public:
-    npc_threshwackonator() : CreatureScript("npc_threshwackonator") { }
-
-    struct npc_threshwackonatorAI : public FollowerAI
-    {
-        npc_threshwackonatorAI(Creature* creature) : FollowerAI(creature) { }
-
-        void Reset() override { }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            FollowerAI::MoveInLineOfSight(who);
-
-            if (!me->GetVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && who->GetEntry() == NPC_GELKAK)
-            {
-                if (me->IsWithinDistInMap(who, 10.0f))
-                {
-                    Talk(SAY_AT_CLOSE, who);
-                    DoAtEnd();
-                }
-            }
-        }
-
-        void DoAtEnd()
-        {
-            me->setFaction(FACTION_HOSTILE);
-
-            if (Player* pHolder = GetLeaderForFollower())
-                AttackStart(pHolder);
-
-            SetFollowComplete(true);
-        }
-    };
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            CloseGossipMenuFor(player);
-
-            if (npc_threshwackonatorAI* pThreshAI = CAST_AI(npc_threshwackonator::npc_threshwackonatorAI, creature->AI()))
-            {
-                creature->AI()->Talk(EMOTE_START);
-                pThreshAI->StartFollow(player);
-            }
-        }
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_GYROMAST_REV) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_INSERT_KEY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_threshwackonatorAI(creature);
-    }
-};
-
 void AddSC_darkshore()
 {
     // Ours
@@ -506,5 +421,4 @@ void AddSC_darkshore()
     // Theirs
     new npc_kerlonian();
     new npc_prospector_remtravel();
-    new npc_threshwackonator();
 }

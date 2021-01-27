@@ -70,7 +70,6 @@
 #define TEXT_DEEP_BREATH                    "Razorscale takes a deep breath..."
 #define TEXT_GROUNDED_PERMANENTLY           "Razorscale grounded permanently!"
 
-
 #define CORDS_GROUND                        588.0f, -166.0f, 391.1f
 #define CORDS_AIR                           588.0f, -178.0f, 490.0f
 #define REPAIR_POINTS                       25
@@ -431,7 +430,6 @@ public:
                             if( npc_entry )
                                 if (Creature* c = me->SummonCreature(npc_entry, x, y, 391.1f, j * M_PI / 2, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                                     DoZoneInCombat(c);
-
                         }
                     }
                     break;

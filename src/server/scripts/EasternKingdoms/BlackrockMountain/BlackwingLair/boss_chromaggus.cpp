@@ -238,7 +238,6 @@ public:
                                     {
                                         DoCast(player, SPELL_CHROMATIC_MUT_1);
                                     }
-
                                 }
                             }
                         }
