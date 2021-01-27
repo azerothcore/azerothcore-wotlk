@@ -3551,9 +3551,9 @@ void AuraEffect::HandleModStateImmunityMask(AuraApplication const* aurApp, uint8
             aura_immunity_list.push_back(SPELL_AURA_MOD_POSSESS);
         }
         // UNK
-        if ((GetMiscValue() & (1 << 8)))
-        {
-        }
+        // if ((GetMiscValue() & (1 << 8)))
+        // {
+        // }
         // Fear, OK
         if (GetMiscValue() & (1 << 9))
         {

@@ -69,7 +69,6 @@ public:
                     go->SendCustomAnim(1);
                 }
             }
-
         }
     };
 
@@ -230,7 +229,6 @@ public:
                 caster->CastSpell(caster, SPELL_APPLY_DIGUISE, true);
                 caster->setFaction(88);
             }
-
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

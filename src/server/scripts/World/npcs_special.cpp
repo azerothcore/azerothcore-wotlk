@@ -1297,7 +1297,7 @@ public:
 
             RunAwayTimer = 5000;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            me->SetPvP(true);
             me->SetStandState(UNIT_STAND_STATE_KNEEL);
             // expect database to have RegenHealth=0
             me->SetHealth(me->CountPctFromMaxHealth(70));
@@ -1417,7 +1417,6 @@ public:
 
         void WaypointReached(uint32 /*waypointId*/) override
         {
-
         }
 
         void UpdateAI(uint32 diff) override

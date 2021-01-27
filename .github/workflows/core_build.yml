@@ -24,7 +24,7 @@ jobs:
             compiler: clang # default in 18.04 is clang 6
             modules: without
           - os: ubuntu-18.04
-            compiler: gcc # default in 18.04 is gcc 7
+            compiler: gcc8
             modules: without
           - os: ubuntu-20.04
             compiler: gcc # default in 20.04 is gcc 9
@@ -73,7 +73,7 @@ jobs:
       matrix:
         os:
           - macos-10.15
-          - macos-11.0
+ #         - macos-11.0
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     needs: [build]

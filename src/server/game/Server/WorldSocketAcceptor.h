@@ -30,7 +30,6 @@ public:
     }
 
 protected:
-
     virtual int handle_timeout(const ACE_Time_Value& /*current_time*/, const void* /*act = 0*/)
     {
         sLog->outBasic("Resuming acceptor");
