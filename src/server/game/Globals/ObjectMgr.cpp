@@ -636,7 +636,6 @@ void ObjectMgr::LoadCreatureTemplateResistances()
         creatureTemplate.resistance[school] = fields[2].GetInt16();
 
         ++count;
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u creature template resistances in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -683,7 +682,6 @@ void ObjectMgr::LoadCreatureTemplateSpells()
         creatureTemplate.spells[index] = fields[2].GetUInt32();;
 
         ++count;
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u creature template spells in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
