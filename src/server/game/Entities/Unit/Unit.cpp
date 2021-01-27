@@ -3661,6 +3661,9 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         return;
     }
 
+    if (option <= 1 && GetExactDistSq(&m_last_environment_position) < 2.5f*2.5f)
+        return;
+
     m_last_environment_position.Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
     m_staticFloorZ = GetMap()->GetHeight(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ());
 
@@ -3675,7 +3678,8 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         return;
     }
 
-    bool canFallGround = option == 0 && GetInstanceId() == 0 && !IsInCombat() && !GetVehicle() && !GetTransport() && !HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && !c->IsTrigger() && !c->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && GetMotionMaster()->GetCurrentMovementGeneratorType() <= RANDOM_MOTION_TYPE && !HasUnitState(UNIT_STATE_EVADE) && !IsControlledByPlayer();
+    bool canChangeFlying = option == 3 || GetMotionMaster()->GetCurrentMovementGeneratorType() != WAYPOINT_MOTION_TYPE;
+    bool canFallGround = option == 0 && canChangeFlying && GetInstanceId() == 0 && !IsInCombat() && !GetVehicle() && !GetTransport() && !HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && !c->IsTrigger() && !c->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && GetMotionMaster()->GetCurrentMovementGeneratorType() <= RANDOM_MOTION_TYPE && !HasUnitState(UNIT_STATE_EVADE) && !IsControlledByPlayer();
     float x = GetPositionX(), y = GetPositionY(), z = GetPositionZ();
     bool isInAir = true;
     float ground_z = z;
@@ -3792,7 +3796,7 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         }
     }
 
-    if (!HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD))
+    if (!HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD) && canChangeFlying)
     {
         // xinef: summoned vehicles are treated as always in air, fixes flying on such units
         if (IsVehicle() && !c->GetDBTableGUIDLow())

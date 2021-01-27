@@ -1659,7 +1659,11 @@ void Creature::setDeathState(DeathState s, bool despawn)
         if (m_formation && m_formation->getLeader() == this)
             m_formation->FormationReset(true);
 
-        if (!despawn && (CanFly() || IsFlying()) && !HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING)) // pussywizard: added MOVEMENTFLAG_SWIMMING check because IsFlying() returns true when swimming creatures have MOVEMENTFLAG_DISABLE_GRAVITY
+        bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsUnderWater();
+        SetHover(false, false);
+        SetDisableGravity(false, false);
+
+        if (needsFalling)
             GetMotionMaster()->MoveFall(0, true);
 
         Unit::setDeathState(CORPSE, despawn);
