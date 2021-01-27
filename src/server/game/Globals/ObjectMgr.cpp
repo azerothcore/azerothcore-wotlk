@@ -31,6 +31,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "Transport.h"
+#include "Unit.h"
 #include "UpdateMask.h"
 #include "Util.h"
 #include "Vehicle.h"
@@ -459,19 +460,17 @@ void ObjectMgr::LoadCreatureTemplates()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                 0              1                 2                  3                 4            5           6        7         8
+//                                                   0      1                   2                   3                   4            5            6         7         8
     QueryResult result = WorldDatabase.Query("SELECT entry, difficulty_entry_1, difficulty_entry_2, difficulty_entry_3, KillCredit1, KillCredit2, modelid1, modelid2, modelid3, "
-                         //                                           9       10      11       12           13           14        15     16      17          18       19         20         21
+//                        9         10    11       12        13              14        15        16   17       18       19          20
                          "modelid4, name, subname, IconName, gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, "
-                         //                                         22      23     24     25        26          27             28              29                30           31          32          33
+//                        21      22     23      24      25         26           27              28              29               30          31          32
                          "scale, `rank`, mindmg, maxdmg, dmgschool, attackpower, DamageModifier, BaseAttackTime, RangeAttackTime, unit_class, unit_flags, unit_flags2, "
-                         //                                             34         35         36             37             38             39          40           41              42           43
+//                        33            34      35            36             37             38            39           40           41                 42
                          "dynamicflags, family, trainer_type, trainer_spell, trainer_class, trainer_race, minrangedmg, maxrangedmg, rangedattackpower, type, "
-                         //                                            44        45          46           47          48          49           50           51           52           53         54
-                         "type_flags, lootid, pickpocketloot, skinloot, resistance1, resistance2, resistance3, resistance4, resistance5, resistance6, spell1, "
-                         //                                          55      56      57      58      59      60      61          62            63       64       65       66         67
-                         "spell2, spell3, spell4, spell5, spell6, spell7, spell8, PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, "
-                         //                                             68          69             70             71             72            73           74           75                76               77           78
+//                        43          44      45              46        47              48         49       50       51      52
+                         "type_flags, lootid, pickpocketloot, skinloot, PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, "
+//                        53           54           55              56            57             58            59          60           61                    62           63
                          "InhabitType, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, flags_extra, ScriptName "
                          "FROM creature_template;");
 
@@ -542,28 +541,28 @@ void ObjectMgr::LoadCreatureTemplates()
         creatureTemplate.SkinLootId        = fields[46].GetUInt32();
 
         for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-            creatureTemplate.resistance[i] = fields[47 + i - 1].GetInt16();
+            creatureTemplate.resistance[i] = 0;
 
-        for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
-            creatureTemplate.spells[i] = fields[53 + i].GetUInt32();
+        for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
+            creatureTemplate.spells[i] = 0;
 
-        creatureTemplate.PetSpellDataId     = fields[61].GetUInt32();
-        creatureTemplate.VehicleId          = fields[62].GetUInt32();
-        creatureTemplate.mingold            = fields[63].GetUInt32();
-        creatureTemplate.maxgold            = fields[64].GetUInt32();
-        creatureTemplate.AIName             = fields[65].GetString();
-        creatureTemplate.MovementType       = uint32(fields[66].GetUInt8());
-        creatureTemplate.InhabitType        = uint32(fields[67].GetUInt8());
-        creatureTemplate.HoverHeight        = fields[68].GetFloat();
-        creatureTemplate.ModHealth          = fields[69].GetFloat();
-        creatureTemplate.ModMana            = fields[70].GetFloat();
-        creatureTemplate.ModArmor           = fields[71].GetFloat();
-        creatureTemplate.RacialLeader       = fields[72].GetBool();
-        creatureTemplate.movementId         = fields[73].GetUInt32();
-        creatureTemplate.RegenHealth        = fields[74].GetBool();
-        creatureTemplate.MechanicImmuneMask = fields[75].GetUInt32();
-        creatureTemplate.flags_extra        = fields[76].GetUInt32();
-        creatureTemplate.ScriptID           = GetScriptId(fields[77].GetCString());
+        creatureTemplate.PetSpellDataId     = fields[47].GetUInt32();
+        creatureTemplate.VehicleId          = fields[48].GetUInt32();
+        creatureTemplate.mingold            = fields[49].GetUInt32();
+        creatureTemplate.maxgold            = fields[50].GetUInt32();
+        creatureTemplate.AIName             = fields[51].GetString();
+        creatureTemplate.MovementType       = uint32(fields[52].GetUInt8());
+        creatureTemplate.InhabitType        = uint32(fields[53].GetUInt8());
+        creatureTemplate.HoverHeight        = fields[54].GetFloat();
+        creatureTemplate.ModHealth          = fields[55].GetFloat();
+        creatureTemplate.ModMana            = fields[56].GetFloat();
+        creatureTemplate.ModArmor           = fields[57].GetFloat();
+        creatureTemplate.RacialLeader       = fields[58].GetBool();
+        creatureTemplate.movementId         = fields[59].GetUInt32();
+        creatureTemplate.RegenHealth        = fields[60].GetBool();
+        creatureTemplate.MechanicImmuneMask = fields[61].GetUInt32();
+        creatureTemplate.flags_extra        = fields[62].GetUInt32();
+        creatureTemplate.ScriptID           = GetScriptId(fields[63].GetCString());
 
         ++count;
     } while (result->NextRow());
@@ -583,6 +582,9 @@ void ObjectMgr::LoadCreatureTemplates()
         }
     }
 
+    LoadCreatureTemplateResistances();
+    LoadCreatureTemplateSpells();
+
     // Checking needs to be done after loading because of the difficulty self referencing
     for (CreatureTemplateContainer::iterator itr = _creatureTemplateStore.begin(); itr != _creatureTemplateStore.end(); ++itr)
     {
@@ -591,6 +593,100 @@ void ObjectMgr::LoadCreatureTemplates()
     }
 
     sLog->outString(">> Loaded %u creature definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
+}
+
+void ObjectMgr::LoadCreatureTemplateResistances()
+{
+    uint32 oldMSTime = getMSTime();
+
+    //                                               0           1       2
+    QueryResult result = WorldDatabase.Query("SELECT CreatureID, School, Resistance FROM creature_template_resistance");
+
+    if (!result)
+    {
+        sLog->outString(">> Loaded 0 creature template resistance definitions. DB table `creature_template_resistance` is empty.");
+        sLog->outString();
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 creatureID = fields[0].GetUInt32();
+        uint8 school = fields[1].GetUInt8();
+
+        if (school == SPELL_SCHOOL_NORMAL || school >= MAX_SPELL_SCHOOL)
+        {
+            sLog->outErrorDb("creature_template_resistance has resistance definitions for creature %u but this school %u doesn't exist", creatureID, school);
+            continue;
+        }
+
+        CreatureTemplateContainer::iterator itr = _creatureTemplateStore.find(creatureID);
+        if (itr == _creatureTemplateStore.end())
+        {
+            sLog->outErrorDb("creature_template_resistance has resistance definitions for creature %u but this creature doesn't exist", creatureID);
+            continue;
+        }
+
+        CreatureTemplate& creatureTemplate = itr->second;
+        creatureTemplate.resistance[school] = fields[2].GetInt16();
+
+        ++count;
+
+    } while (result->NextRow());
+
+    sLog->outString(">> Loaded %u creature template resistances in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
+}
+
+void ObjectMgr::LoadCreatureTemplateSpells()
+{
+    uint32 oldMSTime = getMSTime();
+
+    //                                               0           1       2
+    QueryResult result = WorldDatabase.Query("SELECT CreatureID, `Index`, Spell FROM creature_template_spell");
+
+    if (!result)
+    {
+        sLog->outString(">> Loaded 0 creature template spell definitions. DB table `creature_template_spell` is empty.");
+        sLog->outString();
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 creatureID = fields[0].GetUInt32();
+        uint8 index = fields[1].GetUInt8();
+
+        if (index >= MAX_CREATURE_SPELLS)
+        {
+            sLog->outErrorDb("creature_template_spell has spell definitions for creature %u with a incorrect index %u", creatureID, index);
+            continue;
+        }
+
+        CreatureTemplateContainer::iterator itr = _creatureTemplateStore.find(creatureID);
+        if (itr == _creatureTemplateStore.end())
+        {
+            sLog->outErrorDb("creature_template_spell has spell definitions for creature %u but this creature doesn't exist", creatureID);
+            continue;
+        }
+
+        CreatureTemplate& creatureTemplate = itr->second;
+        creatureTemplate.spells[index] = fields[2].GetUInt32();;
+
+        ++count;
+
+    } while (result->NextRow());
+
+    sLog->outString(">> Loaded %u creature template spells in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
@@ -967,7 +1063,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
             sLog->outErrorDb("Creature (Entry: %u) has non-existing PetSpellDataId (%u).", cInfo->Entry, cInfo->PetSpellDataId);
     }
 
-    for (uint8 j = 0; j < CREATURE_MAX_SPELLS; ++j)
+    for (uint8 j = 0; j < MAX_CREATURE_SPELLS; ++j)
     {
         if (cInfo->spells[j] && !sSpellMgr->GetSpellInfo(cInfo->spells[j]))
         {

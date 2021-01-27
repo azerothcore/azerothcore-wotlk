@@ -125,7 +125,7 @@ struct CreatureTemplate
     uint32  pickpocketLootId;
     uint32  SkinLootId;
     int32   resistance[MAX_SPELL_SCHOOL];
-    uint32  spells[CREATURE_MAX_SPELLS];
+    uint32  spells[MAX_CREATURE_SPELLS];
     uint32  PetSpellDataId;
     uint32  VehicleId;
     uint32  mingold;
@@ -141,6 +141,7 @@ struct CreatureTemplate
     uint32  movementId;
     bool    RegenHealth;
     uint32  MechanicImmuneMask;
+    uint8   SpellSchoolImmuneMask;
     uint32  flags_extra;
     uint32  ScriptID;
     WorldPacket queryData; // pussywizard
@@ -477,6 +478,7 @@ public:
     bool isCanInteractWithBattleMaster(Player* player, bool msg) const;
     bool isCanTrainingAndResetTalentsOf(Player* player) const;
     bool CanCreatureAttack(Unit const* victim, bool skipDistCheck = false) const;
+    void LoadSpellTemplateImmunity();
     bool IsImmunedToSpell(SpellInfo const* spellInfo) override;
 
     [[nodiscard]] bool HasMechanicTemplateImmunity(uint32 mask) const;
@@ -605,7 +607,7 @@ public:
     SpellInfo const* reachWithSpellAttack(Unit* victim);
     SpellInfo const* reachWithSpellCure(Unit* victim);
 
-    uint32 m_spells[CREATURE_MAX_SPELLS];
+    uint32 m_spells[MAX_CREATURE_SPELLS];
     CreatureSpellCooldowns m_CreatureSpellCooldowns;
     uint32 m_ProhibitSchoolTime[7];
 
