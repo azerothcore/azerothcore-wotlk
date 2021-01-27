@@ -3507,104 +3507,91 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
 
         return true;
     }
-    else
+
+    // Use a detour raycast to get our first collision point
+    path->SetUseRaycast(true);
+    bool result = path->CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
+
+    bool notOnGround = path->GetPathType() & PATHFIND_NOT_USING_PATH
+        || (isWaterNow || isWaterNext) || (unit && unit->IsFlying());
+
+    // Check for valid path types before we proceed
+    if (!result || (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)))
     {
-        // Use a detour raycast to get our first collision point
-        path->SetUseRaycast(true);
-        bool result = path->CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
+        return false;
+    }
 
-        bool notOnGround = path->GetPathType() & PATHFIND_NOT_USING_PATH
-            || (isWaterNow || isWaterNext) || (unit && unit->IsFlying());
+    G3D::Vector3 endPos = path->GetPath().back();
+    destX = endPos.x;
+    destY = endPos.y;
+    destZ = endPos.z;
 
-        // Check for valid path types before we proceed
-        if (!result || (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)))
-        {
-            return false;
-        }
+    // collision check
+    bool collided = false;
 
-        G3D::Vector3 endPos = path->GetPath().back();
-        destX = endPos.x;
-        destY = endPos.y;
-        destZ = endPos.z;
+    float angle = getAngle(destX, destY, startX, startY);
 
-        // collision check
-        bool collided = false;
+    // check static LOS
+    float halfHeight = source->GetCollisionHeight() * 0.5f;
 
-        float angle = getAngle(destX, destY, startX, startY);
-
-        // check static LOS
-        float halfHeight = source->GetCollisionHeight() * 0.5f;
-
-        // Unit is not on the ground, check for potential collision via vmaps
-        if (notOnGround)
-        {
-            float x = destX, y = destY, z = destZ;
-            bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(source->GetMapId(),
-                startX, startY, startZ + halfHeight,
-                destX, destY, destZ + halfHeight,
-                x, y, z, -0.5f);
-
-            z -= halfHeight;
-
-            // Collided with static LOS object, move back to collision point
-            if (col)
-            {
-                destX -= CONTACT_DISTANCE * std::cos(angle);
-                destY -= CONTACT_DISTANCE * std::sin(angle);
-                destZ = z;
-                collided = true;
-            }
-        }
-
-        // check dynamic collision
-        float x = destX, y = destY, z = destZ;
-        bool col = source->GetMap()->getObjectHitPos(source->GetPhaseMask(),
+    // Unit is not on the ground, check for potential collision via vmaps
+    if (notOnGround)
+    {
+        bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(source->GetMapId(),
             startX, startY, startZ + halfHeight,
             destX, destY, destZ + halfHeight,
-            x, y, z, -0.5f);
+            destX, destY, destZ, -0.5f);
 
-        z -= halfHeight;
+        destZ -= halfHeight;
 
-        // Collided with a gameobject, move back to collision point
+        // Collided with static LOS object, move back to collision point
         if (col)
         {
             destX -= CONTACT_DISTANCE * std::cos(angle);
             destY -= CONTACT_DISTANCE * std::sin(angle);
-            destZ = z;
             collided = true;
         }
+    }
 
-        float groundZ = VMAP_INVALID_HEIGHT_VALUE;
-        source->UpdateAllowedPositionZ(destX, destY, destZ, &groundZ);
+    // check dynamic collision
+    bool col = source->GetMap()->getObjectHitPos(source->GetPhaseMask(),
+        startX, startY, startZ + halfHeight,
+        destX, destY, destZ + halfHeight,
+        destX, destY, destZ, -0.5f);
 
-        // position has no ground under it (or is too far away)
-        if (unit) {
-            if (!unit->CanFly() && !isWaterNext)
+    destZ -= halfHeight;
+
+    // Collided with a gameobject, move back to collision point
+    if (col)
+    {
+        destX -= CONTACT_DISTANCE * std::cos(angle);
+        destY -= CONTACT_DISTANCE * std::sin(angle);
+        collided = true;
+    }
+
+    float groundZ = VMAP_INVALID_HEIGHT_VALUE;
+    source->UpdateAllowedPositionZ(destX, destY, destZ, &groundZ);
+
+    // position has no ground under it (or is too far away)
+    if (unit) {
+        if (!unit->CanFly() && !isWaterNext)
+        {
+            if (groundZ <= INVALID_HEIGHT)
             {
-                if (groundZ <= INVALID_HEIGHT)
+                // fall back to gridHeight if any
+                float gridHeight = GetGridHeight(destX, destY);
+                if (gridHeight > INVALID_HEIGHT)
                 {
-                    // fall back to gridHeight if any
-                     float gridHeight = GetGridHeight(destX, destY);
-                    if (gridHeight > INVALID_HEIGHT)
-                    {
-                        destZ = gridHeight + unit->GetHoverHeight();
-                    }
-                }
-
-                if (!notOnGround && checkSlopes && !path->IsWalkableClimb(startX, startY, startZ, destX, destY, destZ))
-                {
-                    return false;
+                    destZ = gridHeight + unit->GetHoverHeight();
                 }
             }
 
-            const Creature* creature = unit->ToCreature();
-            bool cannotSwim = isWaterNext && (creature && !creature->CanSwim());
-            bool cannotWalkOrFly = !isWaterNext && !source->ToPlayer() && !unit->CanFly() && (creature && !creature->CanWalk());
-            if (cannotSwim || cannotWalkOrFly) {
+            if (checkSlopes && !notOnGround && !path->IsWalkableClimb(startX, startY, startZ, destX, destY, destZ))
+            {
                 return false;
             }
         }
-
-        return checkCollision ? !collided : true;
     }
+
+    return checkCollision ? !collided : true;
 }
