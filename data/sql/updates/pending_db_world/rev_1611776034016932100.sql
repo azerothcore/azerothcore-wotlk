@@ -13,7 +13,7 @@ DROP TABLE IF EXISTS `creature_template_spell`;
 CREATE TABLE IF NOT EXISTS `creature_template_spell` (
   `CreatureID` MEDIUMINT(8) unsigned NOT NULL,
   `Index` TINYINT(6) UNSIGNED NOT NULL DEFAULT '0',
-  `Spell` mediumint(8) UNSIGNED DEFAULT NULL,
+  `Spell` MEDIUMINT(8) UNSIGNED DEFAULT NULL,
   `VerifiedBuild` SMALLINT(5) DEFAULT '0',
   PRIMARY KEY (`CreatureID`, `Index`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
