@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `ip2nation`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ip2nation` 
 (
-  `ip` int(11) unsigned NOT NULL DEFAULT '0',
+  `ip` int(11) unsigned NOT NULL DEFAULT 0,
   `country` char(2) NOT NULL DEFAULT '',
   KEY `ip` (`ip`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

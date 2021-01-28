@@ -6916,6 +6916,15 @@ SpellCastResult Spell::CheckItems()
                     }
                     break;
                 }
+            case SPELL_EFFECT_CREATE_RANDOM_ITEM:
+            {
+                if (player->GetFreeInventorySpace() == 0)
+                {
+                    player->SendEquipError(EQUIP_ERR_INVENTORY_FULL, nullptr, nullptr, m_spellInfo->Effects[i].ItemType);
+                    return SPELL_FAILED_DONT_REPORT;
+                }
+                break;
+            }
             case SPELL_EFFECT_ENCHANT_ITEM:
                 if (m_spellInfo->Effects[i].ItemType && m_targets.GetItemTarget()
                         && (m_targets.GetItemTarget()->IsWeaponVellum() || m_targets.GetItemTarget()->IsArmorVellum()))
