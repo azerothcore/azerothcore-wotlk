@@ -103,6 +103,7 @@ void CalendarMgr::LoadFromDB()
         } while (result->NextRow());
 
     sLog->outString(">> Loaded %u calendar invites", count);
+    sLog->outString();
 
     for (uint64 i = 1; i < _maxEventId; ++i)
         if (!GetEvent(i))
