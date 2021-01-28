@@ -5,16 +5,16 @@ CREATE TABLE IF NOT EXISTS `creature_template_resistance` (
   `CreatureID` MEDIUMINT(8) UNSIGNED NOT NULL,
   `School` TINYINT(6) UNSIGNED NOT NULL,
   `Resistance` SMALLINT(6) DEFAULT NULL,
-  `VerifiedBuild` SMALLINT(5) DEFAULT 0,
+  `VerifiedBuild` SMALLINT(5) DEFAULT '0',
   PRIMARY KEY (`CreatureID`, `School`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `creature_template_spell`;
 CREATE TABLE IF NOT EXISTS `creature_template_spell` (
-  `CreatureID` mediumint(8) unsigned NOT NULL,
-  `Index` TINYINT(6) unsigned NOT NULL DEFAULT 0,
-  `Spell` mediumint(8) unsigned DEFAULT NULL,
-  `VerifiedBuild` smallint(5) DEFAULT 0,
+  `CreatureID` MEDIUMINT(8) unsigned NOT NULL,
+  `Index` TINYINT(6) UNSIGNED NOT NULL DEFAULT '0',
+  `Spell` mediumint(8) UNSIGNED DEFAULT NULL,
+  `VerifiedBuild` SMALLINT(5) DEFAULT '0',
   PRIMARY KEY (`CreatureID`, `Index`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
