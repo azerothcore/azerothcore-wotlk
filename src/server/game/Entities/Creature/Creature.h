@@ -40,7 +40,7 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_UNUSED_10           = 0x00000200,   // TODO: Implement CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE (creature won't update movement flags)
     CREATURE_FLAG_EXTRA_GHOST_VISIBILITY    = 0x00000400,   // creature will be only visible for dead players
     CREATURE_FLAG_EXTRA_UNUSED_12           = 0x00000800,   // TODO: Implement CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK (creature will use offhand attacks)
-    CREATURE_FLAG_EXTRA_UNUSED_13           = 0x00001000,   // TODO: CREATURE_FLAG_EXTRA_NO_SELL_VENDOR (players can't sell items to this vendor)
+    CREATURE_FLAG_EXTRA_NO_SELL_VENDOR      = 0x00001000,   // players can't sell items to this vendor
     CREATURE_FLAG_EXTRA_UNUSED_14           = 0x00002000,
     CREATURE_FLAG_EXTRA_WORLDEVENT          = 0x00004000,   // custom flag for world event creatures (left room for merging)
     CREATURE_FLAG_EXTRA_GUARD               = 0x00008000,   // Creature is guard
@@ -62,7 +62,7 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_UNUSED_32           = 0x80000000,
 
     // Masks
-    CREATURE_FLAG_EXTRA_UNUSED              = (CREATURE_FLAG_EXTRA_UNUSED_10 | CREATURE_FLAG_EXTRA_UNUSED_12 | CREATURE_FLAG_EXTRA_UNUSED_13 |
+    CREATURE_FLAG_EXTRA_UNUSED              = (CREATURE_FLAG_EXTRA_UNUSED_10 | CREATURE_FLAG_EXTRA_UNUSED_12 |
                                                CREATURE_FLAG_EXTRA_UNUSED_14 | CREATURE_FLAG_EXTRA_UNUSED_17 | CREATURE_FLAG_EXTRA_UNUSED_22 |
                                                CREATURE_FLAG_EXTRA_UNUSED_25 | CREATURE_FLAG_EXTRA_UNUSED_26 | CREATURE_FLAG_EXTRA_UNUSED_27 |
                                                CREATURE_FLAG_EXTRA_UNUSED_28 | CREATURE_FLAG_EXTRA_UNUSED_32),
