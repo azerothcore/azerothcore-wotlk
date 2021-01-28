@@ -9,12 +9,12 @@ DROP TABLE IF EXISTS `spelldifficulty_dbc`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `spelldifficulty_dbc` 
 (
-  `id` int(11) unsigned NOT NULL DEFAULT '0',
-  `spellid0` int(11) unsigned NOT NULL DEFAULT '0',
-  `spellid1` int(11) unsigned NOT NULL DEFAULT '0',
-  `spellid2` int(11) unsigned NOT NULL DEFAULT '0',
-  `spellid3` int(11) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
+  `ID` int(11) NOT NULL DEFAULT 0,
+  `DifficultySpellID_1` int(11) NOT NULL DEFAULT 0,
+  `DifficultySpellID_2` int(11) NOT NULL DEFAULT 0,
+  `DifficultySpellID_3` int(11) NOT NULL DEFAULT 0,
+  `DifficultySpellID_4` int(11) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -48,7 +48,7 @@ INSERT INTO `spelldifficulty_dbc` VALUES
 (28542,28542,55665,0,0),
 (28547,28547,55699,0,0),
 (28599,28599,40070,0,0),
-(29107,29107,55543,0,0),
+(29107,55543,29107,0,0),
 (30495,30495,35953,0,0),
 (30598,30598,36056,0,0),
 (30641,30641,36814,0,0),

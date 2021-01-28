@@ -11,7 +11,8 @@ CREATE TABLE `account_access`
 (
   `id` int(10) unsigned NOT NULL,
   `gmlevel` tinyint(3) unsigned NOT NULL,
-  `RealmID` int(11) NOT NULL DEFAULT '-1',
+  `RealmID` int(11) NOT NULL DEFAULT -1,
+  `comment` varchar(255) DEFAULT '',
   PRIMARY KEY (`id`,`RealmID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -19,16 +20,16 @@ CREATE TABLE `account_access`
 LOCK TABLES `account_access` WRITE;
 /*!40000 ALTER TABLE `account_access` DISABLE KEYS */;
 INSERT INTO `account_access` VALUES 
-(1,4,-1),
-(2,4,-1),
-(3,4,-1),
-(4,4,-1),
-(5,4,-1),
-(6,4,-1),
-(7,4,-1),
-(8,4,-1),
-(9,4,-1),
-(10,4,-1);
+(1,4,-1,'Test account - Console Admin'),
+(2,4,-1,'Test account - Console Admin'),
+(3,3,-1,'Test account - Ingame Admin'),
+(4,3,-1,'Test account - Ingame Admin'),
+(5,2,-1,'Test account - Major Game Master'),
+(6,2,-1,'Test account - Major Game Master'),
+(7,1,-1,'Test account - Minor Game Master'),
+(8,1,-1,'Test account - Minor Game Master'),
+(9,0,-1,'Test account - Player'),
+(10,0,-1,'Test account - Player');
 /*!40000 ALTER TABLE `account_access` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

@@ -13,14 +13,14 @@ CREATE TABLE `pet_levelstats`
   `level` tinyint(3) unsigned NOT NULL,
   `hp` smallint(5) unsigned NOT NULL,
   `mana` smallint(5) unsigned NOT NULL,
-  `armor` int(10) unsigned NOT NULL DEFAULT '0',
+  `armor` int(10) unsigned NOT NULL DEFAULT 0,
   `str` smallint(5) unsigned NOT NULL,
   `agi` smallint(5) unsigned NOT NULL,
   `sta` smallint(5) unsigned NOT NULL,
   `inte` smallint(5) unsigned NOT NULL,
   `spi` smallint(5) unsigned NOT NULL,
-  `min_dmg` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `max_dmg` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `min_dmg` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `max_dmg` smallint(5) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`creature_entry`,`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores pet levels stats.';
 /*!40101 SET character_set_client = @saved_cs_client */;

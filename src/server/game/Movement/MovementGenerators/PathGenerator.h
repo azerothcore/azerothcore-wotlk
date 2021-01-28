@@ -101,7 +101,6 @@ public:
     }
 
 private:
-
     dtPolyRef _pathPolyRefs[MAX_PATH_LENGTH];   // array of detour polygon references
     uint32 _polyLength;                         // number of polygons in the path
 
