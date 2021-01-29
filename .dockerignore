@@ -1,6 +1,10 @@
 build*/
 var/*
-data/
+data/contrib/
+data/dbc/
+data/maps/
+data/docs/
+data/vmaps/
 conf/*
 !conf/dist
 docker/worldserver/data/*
