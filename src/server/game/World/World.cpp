@@ -1412,7 +1412,7 @@ void World::LoadConfigSettings(bool reload)
     // Quest Tracker
     m_bool_configs[CONFIG_QUEST_TRACKER_ENABLE] = sConfigMgr->GetBoolDefault("QuestTracker.Enable", false);
     m_bool_configs[CONFIG_QUEST_TRACKER_QUEUE_ENABLE] = sConfigMgr->GetBoolDefault("QuestTracker.Queue.Enable", false);
-    m_bool_configs[CONFIG_QUEST_TRACKER_QUEUE_DELAY] = sConfigMgr->GetBoolDefault("QuestTracker.Queue.Delay", 10);
+    m_int_configs[CONFIG_QUEST_TRACKER_QUEUE_DELAY] = sConfigMgr->GetIntDefault("QuestTracker.Queue.Delay", 10);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
