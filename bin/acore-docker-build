@@ -7,7 +7,6 @@ docker run \
     -v /"$(pwd)"/conf/dist:/azerothcore/conf/dist \
     -v /"$(pwd)"/src:/azerothcore/src \
     -v /"$(pwd)"/modules:/azerothcore/modules \
-    -v /"$(pwd)"/CMakeLists.txt:/azerothcore/CMakeLists.txt \
     -v /"$(pwd)"/docker/build/cache:/azerothcore/build \
     -v /"$(pwd)"/docker/worldserver/bin:/binworldserver \
     -v /"$(pwd)"/docker/authserver/bin:/binauthserver \
