@@ -137,7 +137,7 @@ UPDATE `creature_template` SET `VehicleId` = 0, `ScriptName` = 'npc_og_camera_ve
 UPDATE `creature_template` SET `mechanic_immune_mask` = 8192 WHERE `entry` IN (39860, 39826, 39799, 39819, 39273, 39910, 39837);
 
 DELETE FROM `creature` WHERE `id` IN (39273, 39910);
-INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
+INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`wander_distance`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
 (250249, 39273, 0, 1, 256, 0, 0, -5423.01, 535.254, 386.516, 5.23555, 300, 0, 0, 630000, 0, 0, 0, 134217728, 0),
 (250248, 39910, 0, 1, 256, 0, 0, -5427.93, 532.323, 386.85, 5.27046, 300, 0, 0, 630000, 0, 0, 0, 0, 0);
 UPDATE `creature` SET `position_x` = -5424.462891, `position_y` = 531.410095, `position_z` = 386.743347, `orientation` = 5.2 WHERE `id` = 39271;
