@@ -1317,7 +1317,7 @@ Instance.UnloadDelay = 1800000
 #        Default:     10
 #
 
-QuestTracker.Enable = 1
+QuestTracker.Enable = 0
 QuestTracker.Queue.Enable = 0
 QuestTracker.Queue.Delay = 10
 
