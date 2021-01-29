@@ -2636,7 +2636,7 @@ bool Creature::IsImmuneToKnockback() const
         return false;
 
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(GetEntry());
-    return cinfo && (cinfo->flags_extra & CREATURE_FLAG_EXTRA_KNOCKBACK_IMMUNE);
+    return cinfo && (cinfo->flags_extra & CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK);
 }
 
 bool Creature::SetWalk(bool enable)
