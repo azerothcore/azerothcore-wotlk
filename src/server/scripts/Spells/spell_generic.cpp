@@ -32,7 +32,6 @@
 #include "Chat.h"
 #include "Vehicle.h"
 
-
 // Ours
 class spell_gen_model_visible : public SpellScriptLoader
 {
@@ -447,7 +446,6 @@ public:
 
     public:
         spell_gen_disabled_above_level_SpellScript(uint8 level) : SpellScript(), _level(level) { }
-
 
         SpellCastResult CheckRequirement()
         {
@@ -1245,7 +1243,6 @@ public:
             OnEffectApply += AuraEffectApplyFn(spell_gen_visual_dummy_stun_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_gen_visual_dummy_stun_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
-
     };
 
     AuraScript* GetAuraScript() const override
@@ -1497,7 +1494,6 @@ public:
         return new spell_gen_haunted_SpellScript();
     }
 };
-
 
 // Theirs
 class spell_gen_absorb0_hitlimit1 : public SpellScriptLoader
@@ -2314,7 +2310,6 @@ public:
                     WorldPacket data2;
                     player->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, 42292, GetSpellInfo()->CategoryRecoveryTime); // PvP Trinket spell
                     player->GetSession()->SendPacket(&data2);
-
                 }
             }
         }
@@ -3067,7 +3062,6 @@ public:
             OnEffectApply += AuraEffectApplyFn(spell_gen_damage_reduction_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
             OnEffectRemove += AuraEffectRemoveFn(spell_gen_damage_reduction_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
         }
-
     };
 
     AuraScript* GetAuraScript() const override
@@ -4249,6 +4243,48 @@ public:
     }
 };
 
+enum ParalyticPoison
+{
+    SPELL_PARALYSIS = 35202
+};
+
+// 35201 - Paralytic Poison
+class spell_gen_paralytic_poison : public SpellScriptLoader
+{
+public:
+    spell_gen_paralytic_poison() : SpellScriptLoader("spell_gen_paralytic_poison") { }
+
+    class spell_gen_paralytic_poison_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_paralytic_poison_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return (sSpellMgr->GetSpellInfo(SPELL_PARALYSIS));
+        }
+
+        void HandleStun(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            {
+                return;
+            }
+
+            GetTarget()->CastSpell((Unit*)nullptr, SPELL_PARALYSIS, true, nullptr, aurEff);
+        }
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_gen_paralytic_poison_AuraScript::HandleStun, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_gen_paralytic_poison_AuraScript();
+    }
+};
+
 // Blade Warding - 64440
 enum BladeWarding
 {
@@ -4896,7 +4932,6 @@ public:
     {
         return new spell_gen_vendor_bark_trigger_SpellScript();
     }
-
 };
 
 enum WhisperGulchYoggSaronWhisper
@@ -5110,6 +5145,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_count_pct_from_max_hp("spell_gen_100pct_count_pct_from_max_hp", 100);
     new spell_gen_despawn_self();
     new spell_gen_bandage();
+    new spell_gen_paralytic_poison();
     new spell_gen_blade_warding();
     new spell_gen_lifebloom("spell_hexlord_lifebloom", SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_tur_ragepaw_lifebloom", SPELL_TUR_RAGEPAW_LIFEBLOOM_FINAL_HEAL);

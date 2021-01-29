@@ -51,7 +51,7 @@ public:
             switch (urand(0, 2))
             {
                 case 0:
-                    if (Player* player = killer->ToPlayer()) 
+                    if (Player* player = killer->ToPlayer())
                     {
                         player->KilledMonsterCredit(NPC_EXPEDITION_RESEARCHER, 0);
                     }
@@ -63,7 +63,7 @@ public:
                     break;
             }
 
-            if (spawnCreatureID) 
+            if (spawnCreatureID)
             {
                 me->SummonCreature(spawnCreatureID, 0.0f, 0.0f, 0.0f, me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
             }

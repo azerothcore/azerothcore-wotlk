@@ -142,4 +142,3 @@ void UpdateData::Clear()
     m_outOfRangeGUIDs.clear();
     m_blockCount = 0;
 }
-

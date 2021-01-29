@@ -24,7 +24,7 @@ jobs:
             compiler: clang # default in 18.04 is clang 6
             modules: without
           - os: ubuntu-18.04
-            compiler: gcc # default in 18.04 is gcc 7
+            compiler: gcc8
             modules: without
           - os: ubuntu-20.04
             compiler: gcc # default in 20.04 is gcc 9
@@ -51,9 +51,11 @@ jobs:
             ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
             ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
       - name: Configure OS
-        run: source ./apps/ci/ci-install.sh
+        run: source ./acore.sh install-deps
         env:
           CONTINUOUS_INTEGRATION: true
+      - name: Create conf/config.sh
+        run: source ./apps/ci/ci-conf.sh
       - name: Import db
         run: source ./apps/ci/ci-import-db.sh
       - name: Build
@@ -71,7 +73,7 @@ jobs:
       matrix:
         os:
           - macos-10.15
-          - macos-11.0
+ #         - macos-11.0
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     needs: [build]

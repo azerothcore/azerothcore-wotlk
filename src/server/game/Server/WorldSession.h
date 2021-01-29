@@ -389,7 +389,6 @@ public:
     void SetCalendarEventCreationCooldown(time_t cooldown) { _calendarEventCreationCooldown = cooldown; }
 
 public:                                                 // opcodes handlers
-
     void Handle_NULL(WorldPacket& recvPacket);          // not used
     void Handle_EarlyProccess(WorldPacket& recvPacket); // just mark packets processed in WorldSocket::OnRead
     void Handle_ServerSide(WorldPacket& recvPacket);    // sever side only, can't be accepted from client
@@ -524,6 +523,7 @@ public:                                                 // opcodes handlers
     void HandleLootMethodOpcode(WorldPacket& recvPacket);
     void HandleLootRoll(WorldPacket& recvData);
     void HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData);
+    void HandleGroupSwapSubGroupOpcode(WorldPacket& recvData);
     void HandleRaidTargetUpdateOpcode(WorldPacket& recvData);
     void HandleRaidReadyCheckOpcode(WorldPacket& recvData);
     void HandleRaidReadyCheckFinishedOpcode(WorldPacket& recvData);
@@ -714,6 +714,7 @@ public:                                                 // opcodes handlers
     void HandleChannelBan(WorldPacket& recvPacket);
     void HandleChannelUnban(WorldPacket& recvPacket);
     void HandleChannelAnnouncements(WorldPacket& recvPacket);
+    void HandleChannelModerateOpcode(WorldPacket& recvPacket);
     void HandleChannelDeclineInvite(WorldPacket& recvPacket);
     void HandleChannelDisplayListQuery(WorldPacket& recvPacket);
     void HandleGetChannelMemberCount(WorldPacket& recvPacket);

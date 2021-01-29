@@ -241,7 +241,6 @@ class Spell
     friend void Unit::SetCurrentCastedSpell(Spell* pSpell);
     friend class SpellScript;
 public:
-
     void EffectNULL(SpellEffIndex effIndex);
     void EffectUnused(SpellEffIndex effIndex);
     void EffectDistract(SpellEffIndex effIndex);
