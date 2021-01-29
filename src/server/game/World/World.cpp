@@ -1042,8 +1042,6 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_WORLD_BOSS_LEVEL_DIFF] = sConfigMgr->GetIntDefault("WorldBossLevelDiff", 3);
 
-    m_bool_configs[CONFIG_QUEST_ENABLE_QUEST_TRACKER] = sConfigMgr->GetBoolDefault("Quests.EnableQuestTracker", false);
-
     // note: disable value (-1) will assigned as 0xFFFFFFF, to prevent overflow at calculations limit it to max possible player level MAX_LEVEL(100)
     m_int_configs[CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF] = sConfigMgr->GetIntDefault("Quests.LowLevelHideDiff", 4);
     if (m_int_configs[CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF] > MAX_LEVEL)
@@ -1410,6 +1408,11 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_DEBUG_ARENA]        = sConfigMgr->GetBoolDefault("Debug.Arena",        false);
 
     m_int_configs[CONFIG_GM_LEVEL_CHANNEL_MODERATION] = sConfigMgr->GetIntDefault("Channel.ModerationGMLevel", 1);
+
+    // Quest Tracker
+    m_bool_configs[CONFIG_QUEST_TRACKER_ENABLE] = sConfigMgr->GetBoolDefault("QuestTracker.Enable", false);
+    m_bool_configs[CONFIG_QUEST_TRACKER_QUEUE_ENABLE] = sConfigMgr->GetBoolDefault("QuestTracker.Queue.Enable", false);
+    m_bool_configs[CONFIG_QUEST_TRACKER_QUEUE_DELAY] = sConfigMgr->GetBoolDefault("QuestTracker.Queue.Delay", 10);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);

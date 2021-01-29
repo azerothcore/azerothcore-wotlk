@@ -1302,12 +1302,24 @@ Instance.ResetTimeHour = 4
 Instance.UnloadDelay = 1800000
 
 #
-#    Quests.EnableQuestTracker
+#    QuestTracker.Enable
 #        Description: Store data in the database about quest completion and abandonment to help finding bugged quests.
 #        Default:     0  - (Disabled)
 #                     1  - (Enabled)
+#
+#    QuestTracker.Queue.Enable
+#        Description: Enable queue
+#        Default:     0  - (Disabled)
+#                     1  - (Enabled)
+#
+#    QuestTracker.Queue.Delay
+#        Description: Delay for update queue in seconds. 1 seconds minimun
+#        Default:     10
+#
 
-Quests.EnableQuestTracker = 0
+QuestTracker.Enable = 1
+QuestTracker.Queue.Enable = 0
+QuestTracker.Queue.Delay = 10
 
 #
 #    Quests.LowLevelHideDiff

@@ -27,6 +27,7 @@ public:
 
     void InitSystem();
     void Update(uint32 diff);
+    void SetExecuteDelay();
     void Execute();
 
     void Add(uint32 questID, uint32 characterLowGuid, std::string const& coreHash, std::string const& coreRevision);

@@ -233,7 +233,7 @@ public:
             player->ModifyMoney(-ReqOrRewMoney);
 
         // check if Quest Tracker is enabled
-        if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
+        if (sWorld->getBoolConfig(CONFIG_QUEST_TRACKER_ENABLE))
         {
             // add to Quest Tracker
             sQuestTracker->UpdateGMComplete(quest->GetQuestId(), player->GetGUIDLow());

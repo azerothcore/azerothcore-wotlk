@@ -15897,7 +15897,7 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
     SendQuestUpdate(quest_id);
 
     // check if Quest Tracker is enabled
-    if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
+    if (sWorld->getBoolConfig(CONFIG_QUEST_TRACKER_ENABLE))
     {
         // add to Quest Tracker
         sQuestTracker->Add(quest_id, GetGUIDLow(), GitRevision::GetHash(), GitRevision::GetDate());
@@ -15935,7 +15935,7 @@ void Player::CompleteQuest(uint32 quest_id)
     AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD | ADDITIONAL_SAVING_QUEST_STATUS);
 
     // check if Quest Tracker is enabled
-    if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
+    if (sWorld->getBoolConfig(CONFIG_QUEST_TRACKER_ENABLE))
     {
         // add to Quest Tracker
         sQuestTracker->UpdateCompleteTime(quest_id, GetGUIDLow());

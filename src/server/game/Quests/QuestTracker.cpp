@@ -17,7 +17,8 @@
 
 #include "QuestTracker.h"
 #include "DatabaseEnv.h"
-#include "GameConfig.h"
+#include "Duration.h"
+#include "World.h"
 #include "TaskScheduler.h"
 #include "StringFormat.h"
 #include <tuple>
@@ -46,20 +47,20 @@ QuestTracker* QuestTracker::instance()
 
 void QuestTracker::InitSystem()
 {
-    if (!CONF_GET_BOOL("QuestTracker.Enable"))
+    if (!sWorld->getBoolConfig(CONFIG_QUEST_TRACKER_ENABLE))
     {
-        LOG_INFO("server.loading", ">> System disabled");
+        sLog->outString(">> System disabled");
         return;
     }
 
     SetExecuteDelay();
 
-    LOG_INFO("server.loading", ">> System loading");
+    sLog->outString(">> System loading");
 }
 
 void QuestTracker::Update(uint32 diff)
 {
-    if (!CONF_GET_BOOL("QuestTracker.Enable"))
+    if (!sWorld->getBoolConfig(CONFIG_QUEST_TRACKER_ENABLE))
         return;
 
     scheduler.Update(diff);
@@ -67,13 +68,13 @@ void QuestTracker::Update(uint32 diff)
 
 void QuestTracker::SetExecuteDelay()
 {
-    if (!CONF_GET_BOOL("QuestTracker.Queue.Enable") || !CONF_GET_BOOL("QuestTracker.Queue.Enable"))
+    if (!sWorld->getBoolConfig(CONFIG_QUEST_TRACKER_ENABLE) || !sWorld->getBoolConfig(CONFIG_QUEST_TRACKER_QUEUE_ENABLE))
         return;
 
-    Seconds updateSecs = Seconds(CONF_GET_UINT("QuestTracker.Queue.Delay"));
+    Seconds updateSecs = Seconds(sWorld->getIntConfig(CONFIG_QUEST_TRACKER_QUEUE_DELAY));
     if (updateSecs < 1s)
     {
-        LOG_ERROR("server", "> QuestTracker: ExecuteDelay < 1 second. Set 10 seconds");
+        sLog->outError("> QuestTracker: ExecuteDelay < 1 second. Set 10 seconds");
         updateSecs = 10s;
         return;
     }
@@ -96,7 +97,7 @@ void QuestTracker::Execute()
         _questGMCompleteStore.empty())
         return;
 
-    LOG_INFO("server", "> QuestTracker: Start Execute...");
+    sLog->outString("> QuestTracker: Start Execute...");
 
     uint32 msTimeStart = getMSTime();
 
@@ -113,7 +114,7 @@ void QuestTracker::Execute()
             CharacterDatabase.Execute(stmt);
         }
 
-        LOG_INFO("server", "> QuestTracker: Execute 'CHAR_INS_QUEST_TRACK' (%u)", static_cast<uint32>(_questTrackStore.size()));
+        sLog->outString("> QuestTracker: Execute 'CHAR_INS_QUEST_TRACK' (%u)", static_cast<uint32>(_questTrackStore.size()));
 
         _questTrackStore.clear();
     }
@@ -135,7 +136,7 @@ void QuestTracker::Execute()
         for (auto const& [questID, characterLowGuid] : updateStore)
             SendUpdateQuestTracker(questID, characterLowGuid);
 
-        LOG_INFO("server", "> QuestTracker: Execute '%s' (%u)", updateType.c_str(), static_cast<uint32>(updateStore.size()));
+        sLog->outString("> QuestTracker: Execute '%s' (%u)", updateType.c_str(), static_cast<uint32>(updateStore.size()));
 
         updateStore.clear();
     };
@@ -144,12 +145,12 @@ void QuestTracker::Execute()
     SendUpdate(_questAbandonStore, CHAR_UPD_QUEST_TRACK_ABANDON_TIME, "CHAR_UPD_QUEST_TRACK_ABANDON_TIME");
     SendUpdate(_questGMCompleteStore, CHAR_UPD_QUEST_TRACK_GM_COMPLETE, "CHAR_UPD_QUEST_TRACK_GM_COMPLETE");
 
-    LOG_INFO("server", "> QuestTracker: Execute end in %u ms", GetMSTimeDiffToNow(msTimeStart));
+    sLog->outString("> QuestTracker: Execute end in %u ms", GetMSTimeDiffToNow(msTimeStart));
 }
 
 void QuestTracker::Add(uint32 questID, uint32 characterLowGuid, std::string const& coreHash, std::string const& coreRevision)
 {
-    if (CONF_GET_BOOL("QuestTracker.Queue.Enable"))
+    if (sWorld->getBoolConfig(CONFIG_QUEST_TRACKER_QUEUE_ENABLE))
         _questTrackStore.emplace_back(questID, characterLowGuid, coreHash, coreRevision);
     else
     {
@@ -164,7 +165,7 @@ void QuestTracker::Add(uint32 questID, uint32 characterLowGuid, std::string cons
 
 void QuestTracker::UpdateCompleteTime(uint32 questID, uint32 characterLowGuid)
 {
-    if (CONF_GET_BOOL("QuestTracker.Queue.Enable"))
+    if (sWorld->getBoolConfig(CONFIG_QUEST_TRACKER_QUEUE_ENABLE))
         _questCompleteStore.emplace_back(questID, characterLowGuid);
     else
     {
@@ -177,7 +178,7 @@ void QuestTracker::UpdateCompleteTime(uint32 questID, uint32 characterLowGuid)
 
 void QuestTracker::UpdateAbandonTime(uint32 questID, uint32 characterLowGuid)
 {
-    if (CONF_GET_BOOL("QuestTracker.Queue.Enable"))
+    if (sWorld->getBoolConfig(CONFIG_QUEST_TRACKER_QUEUE_ENABLE))
         _questAbandonStore.emplace_back(questID, characterLowGuid);
     else
     {
@@ -190,7 +191,7 @@ void QuestTracker::UpdateAbandonTime(uint32 questID, uint32 characterLowGuid)
 
 void QuestTracker::UpdateGMComplete(uint32 questID, uint32 characterLowGuid)
 {
-    if (CONF_GET_BOOL("QuestTracker.Queue.Enable"))
+    if (sWorld->getBoolConfig(CONFIG_QUEST_TRACKER_QUEUE_ENABLE))
         _questGMCompleteStore.emplace_back(questID, characterLowGuid);
     else
     {
