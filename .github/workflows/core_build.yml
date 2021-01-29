@@ -182,4 +182,4 @@ jobs:
           docker-compose --version
       - name: Build
         run: |
-          docker build -t azerothcore/database -f docker/database/Dockerfile .
+          docker-compose build ac-database
