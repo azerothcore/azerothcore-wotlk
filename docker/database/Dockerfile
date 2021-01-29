@@ -4,11 +4,6 @@ FROM alpine:3.9 as builder
 RUN apk add --no-cache bash
 
 # copy the sources from the host machine
-COPY apps /azerothcore/apps
-COPY bin /azerothcore/bin
-COPY conf /azerothcore/conf
-COPY data /azerothcore/data
-COPY deps /azerothcore/deps
 COPY acore.json /azerothcore/acore.json
 
 # run the AzerothCore database assembler
