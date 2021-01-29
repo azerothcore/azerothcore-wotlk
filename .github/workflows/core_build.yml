@@ -128,7 +128,7 @@ jobs:
     strategy:
       fail-fast: true
     runs-on: ubuntu-20.04
-#    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Configure
