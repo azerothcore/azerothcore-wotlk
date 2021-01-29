@@ -18,6 +18,21 @@ services:
       - type: volume
         source: ac-database
         target: /var/lib/mysql
+      - type: bind
+        source: ./apps
+        target: /azerothcore/apps
+      - type: bind
+        source: ./bin
+        target: /azerothcore/bin
+      - type: bind
+        source: ./conf
+        target: /azerothcore/conf
+      - type: bind
+        source: ./data
+        target: /azerothcore/data
+      - type: bind
+        source: ./deps
+        target: /azerothcore/deps
 
   ac-worldserver:
     stdin_open: true
