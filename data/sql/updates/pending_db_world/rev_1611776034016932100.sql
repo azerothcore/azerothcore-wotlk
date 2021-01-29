@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_resistance` (
 
 DROP TABLE IF EXISTS `creature_template_spell`;
 CREATE TABLE IF NOT EXISTS `creature_template_spell` (
-  `CreatureID` MEDIUMINT(8) unsigned NOT NULL,
+  `CreatureID` MEDIUMINT(8) UNSIGNED NOT NULL,
   `Index` TINYINT(6) UNSIGNED NOT NULL DEFAULT 0,
   `Spell` MEDIUMINT(8) UNSIGNED DEFAULT NULL,
   `VerifiedBuild` SMALLINT(5) DEFAULT 0,
