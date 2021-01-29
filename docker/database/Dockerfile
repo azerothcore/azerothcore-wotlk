@@ -4,10 +4,10 @@ FROM alpine:3.9 as builder
 RUN apk add --no-cache bash
 
 # copy the sources from the host machine
+COPY bin /azerothcore/bin
 COPY acore.json /azerothcore/acore.json
 
 # run the AzerothCore database assembler
-COPY bin /azerothcore/bin
 RUN ./azerothcore/bin/acore-db-asm 1
 
 FROM mysql:5.7
