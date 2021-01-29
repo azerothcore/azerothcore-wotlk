@@ -7,6 +7,7 @@ RUN apk add --no-cache bash
 COPY acore.json /azerothcore/acore.json
 
 # run the AzerothCore database assembler
+COPY bin /azerothcore/bin
 RUN ./azerothcore/bin/acore-db-asm 1
 
 FROM mysql:5.7
