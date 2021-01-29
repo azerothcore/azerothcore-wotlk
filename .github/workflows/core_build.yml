@@ -144,7 +144,7 @@ jobs:
       - name: Authserver Build
         run: |
           docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/authserver
-      - name: Build
+      - name: Database Build
         run: |
           docker build -t azerothcore/database -f docker/database/Dockerfile .
       - name: Add assets
