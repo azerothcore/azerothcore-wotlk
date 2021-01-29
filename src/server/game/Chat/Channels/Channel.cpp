@@ -978,12 +978,10 @@ void Channel::SendToAllWatching(WorldPacket* data)
 
 void Channel::Voice(uint64 /*guid1*/, uint64 /*guid2*/)
 {
-
 }
 
 void Channel::DeVoice(uint64 /*guid1*/, uint64 /*guid2*/)
 {
-
 }
 
 void Channel::MakeNotifyPacket(WorldPacket* data, uint8 notify_type)
@@ -1259,4 +1257,55 @@ void Channel::RemoveWatching(Player* p)
     PlayersWatchingContainer::iterator itr = playersWatchingStore.find(p);
     if (itr != playersWatchingStore.end())
         playersWatchingStore.erase(itr);
+}
+
+void Channel::ToggleModeration(Player* player)
+{
+    uint64 guid = player->GetGUIDLow();
+
+    if (!IsOn(guid))
+    {
+        WorldPacket data;
+        MakeNotMember(&data);
+        SendToOne(&data, guid);
+        return;
+    }
+
+    const uint32 level = sWorld->getIntConfig(CONFIG_GM_LEVEL_CHANNEL_MODERATION);
+    const bool gm = (level && player->GetSession()->GetSecurity() >= level);
+
+    if (!playersStore[guid].IsModerator() && !gm)
+    {
+        WorldPacket data;
+        MakeNotModerator(&data);
+        SendToOne(&data, guid);
+        return;
+    }
+
+    // toggle channel moderation
+    _moderation = !_moderation;
+
+    WorldPacket data;
+    if (_moderation)
+    {
+        MakeModerationOn(&data, guid);
+    }
+    else
+    {
+        MakeModerationOff(&data, guid);
+    }
+
+    SendToAll(&data);
+}
+
+void Channel::MakeModerationOn(WorldPacket* data, uint64 guid)
+{
+    MakeNotifyPacket(data, CHAT_MODERATION_ON_NOTICE);
+    *data << uint64(guid);
+}
+
+void Channel::MakeModerationOff(WorldPacket* data, uint64 guid)
+{
+    MakeNotifyPacket(data, CHAT_MODERATION_OFF_NOTICE);
+    *data << uint64(guid);
 }

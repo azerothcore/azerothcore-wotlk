@@ -1094,7 +1094,6 @@ public:
     {
         return new spell_switch_infragreen_bomber_station_SpellScript();
     }
-
 };
 
 class spell_charge_shield_bomber : public SpellScriptLoader
@@ -1406,7 +1405,6 @@ public:
 
     private:
         EventMap events;
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1457,7 +1455,6 @@ public:
                 who->CastSpell(who, SPELL_TRESPASSER_H, true);
             else
                 who->CastSpell(who, SPELL_TRESPASSER_A, true);
-
         }
     };
 
@@ -1617,14 +1614,12 @@ public:
         }
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_tournament_training_dummyAI(creature);
     }
-
 };
 
 // Battle for Crusaders' Pinnacle

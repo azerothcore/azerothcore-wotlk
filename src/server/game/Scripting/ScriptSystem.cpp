@@ -74,5 +74,4 @@ void SystemMgr::LoadScriptWaypoints()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u Script Waypoint nodes in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
 }

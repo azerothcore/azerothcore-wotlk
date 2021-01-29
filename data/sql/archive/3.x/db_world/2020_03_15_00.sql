@@ -1,0 +1,28 @@
+-- DB update 2020_03_12_00 -> 2020_03_15_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_03_12_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_03_12_00 2020_03_15_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1582041321256109939'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1582041321256109939');
+
+UPDATE `gameobject_template_addon` SET `flags` = `flags` | 4 WHERE `entry` IN (SELECT `entry` FROM `gameobject_template` WHERE `type` = 2 AND `data3` = 0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
