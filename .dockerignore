@@ -12,6 +12,5 @@ docker/build/cache/
 .idea
 cmake-build-debug/*
 .git/
-deps/
 src/
 modules/
