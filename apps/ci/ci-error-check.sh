@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-
-DB_ERRORS_FILE="./env/dist/bin/DBErrors.log";
+if [[ $CI_DOCKER ]]; then
+  DB_ERRORS_FILE="./docker/worldserver/logs/DBErrors.log";
+else
+  DB_ERRORS_FILE="./env/dist/bin/DBErrors.log";
+fi
 
 if [[ ! -f ${DB_ERRORS_FILE} ]]; then
     echo "File ${DB_ERRORS_FILE} not found!";

@@ -128,7 +128,7 @@ jobs:
     strategy:
       fail-fast: true
     runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+#    if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Configure
@@ -138,48 +138,24 @@ jobs:
       - name: Build
         run: |
           ./bin/acore-docker-build-no-scripts
-
-  docker-worldserver:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
+      - name: Worldserver Build
         run: |
           docker build -t azerothcore/worldserver -f docker/worldserver/Dockerfile docker/worldserver
-
-  docker-authserver:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
+      - name: Authserver Build
         run: |
           docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/authserver
-
-  docker-database:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
       - name: Build
         run: |
           docker build -t azerothcore/database -f docker/database/Dockerfile .
+      - name: Add assets
+        run: source ./acore.sh client-data
+        env:
+          CI_DOCKER: true
+      - name: Generate configs
+        run: source ./bin/acore-docker-generate-etc
+      - name: Dry Run
+        run: docker-compose up -d && timeout 5m
+      - name: Check startup errors
+        run: source ./apps/ci/ci-error-check.sh
+        env:
+          CI_DOCKER: true
