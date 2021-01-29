@@ -131,6 +131,8 @@ jobs:
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
       - name: Configure
         run: |
           docker --version
