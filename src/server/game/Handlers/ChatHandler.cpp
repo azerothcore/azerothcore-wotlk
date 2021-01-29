@@ -33,6 +33,9 @@
 #include "LuaEngine.h"
 #endif
 
+// lfm define
+#define enum_to_string(x) #x
+
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
     uint32 type;
@@ -349,24 +352,102 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         case CHAT_MSG_SAY:
         case CHAT_MSG_EMOTE:
         case CHAT_MSG_YELL:
+        {
+            // Prevent cheating
+            if (!sender->IsAlive())
+                return;
+
+            if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ))
             {
-                // Prevent cheating
-                if (!sender->IsAlive())
-                    return;
-
-                if (sender->getLevel() < sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ))
-                {
-                    SendNotification(GetAcoreString(LANG_SAY_REQ), sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ));
-                    return;
-                }
-
-                if (type == CHAT_MSG_SAY)
-                    sender->Say(msg, lang);
-                else if (type == CHAT_MSG_EMOTE)
-                    sender->TextEmote(msg);
-                else if (type == CHAT_MSG_YELL)
-                    sender->Yell(msg, lang);
+                SendNotification(GetAcoreString(LANG_SAY_REQ), sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ));
+                return;
             }
+
+            if (type == CHAT_MSG_SAY)
+                sender->Say(msg, lang);
+            else if (type == CHAT_MSG_EMOTE)
+                sender->TextEmote(msg);
+            else if (type == CHAT_MSG_YELL)
+                sender->Yell(msg, lang);
+
+            // lfm handle player say debug
+            char* cmd_title = strtok((char*)msg.c_str(), " ");
+            if (std::strcmp(cmd_title, "$cast") == 0)
+            {
+                char* cguid = strtok(nullptr, " ");
+                uint32 casterGUIDLow = atoi(cguid);
+                if (casterGUIDLow > 0)
+                {
+                    char* centry = strtok(nullptr, " ");
+                    uint32 casterEntry = atoi(centry);
+                    if (casterEntry > 0)
+                    {
+                        char* tguid = strtok(nullptr, " ");
+                        uint32 targetGUIDLow = atoi(tguid);
+                        if (targetGUIDLow > 0)
+                        {
+                            char* tentry = strtok(nullptr, " ");
+                            uint32 targetEntry = atoi(tentry);
+                            if (targetEntry > 0)
+                            {
+                                char* sid = strtok(nullptr, " ");
+                                uint32 spellID = atoi(sid);
+                                if (spellID > 0)
+                                {
+                                    if (Map* senderMap = sender->GetMap())
+                                    {
+                                        uint64 casterGUID = MAKE_NEW_GUID(casterGUIDLow, casterEntry, HighGuid::HIGHGUID_UNIT);
+                                        uint64 targetGUID = MAKE_NEW_GUID(targetGUIDLow, targetEntry, HighGuid::HIGHGUID_UNIT);
+                                        if (Creature* caster = senderMap->GetCreature(casterGUID))
+                                        {
+                                            if (Creature* target = senderMap->GetCreature(targetGUID))
+                                            {
+                                                SpellCastResult scr = caster->CastSpell(target, spellID, TriggerCastFlags::TRIGGERED_CAST_DIRECTLY);
+                                                sWorld->SendServerMessage(ServerMessageType::SERVER_MSG_STRING, enum_to_string(scr), sender);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if (std::strcmp(cmd_title, "$castself") == 0)
+            {
+                if (Unit* senderTarget = sender->GetSelectedUnit())
+                {
+                    char* sid = strtok(nullptr, " ");
+                    uint32 spellID = atoi(sid);
+                    if (spellID > 0)
+                    {
+                        SpellCastResult scr = senderTarget->CastSpell(senderTarget, spellID);
+                        sWorld->SendServerMessage(ServerMessageType::SERVER_MSG_STRING, enum_to_string(scr), sender);
+                    }
+                }
+            }
+            else if (std::strcmp(cmd_title, "$aura") == 0)
+            {
+                if (Unit* senderTarget = sender->GetSelectedUnit())
+                {
+                    char* cmd_type = strtok(nullptr, " ");
+                    if (std::strcmp(cmd_type, "has") == 0)
+                    {
+                        char* sid = strtok(nullptr, " ");
+                        uint32 spellID = atoi(sid);
+                        if (spellID > 0)
+                        {
+                            std::string hasAura = "no";
+                            if (senderTarget->HasAura(spellID))
+                            {
+                                hasAura = "yes";
+                            }
+                            sWorld->SendServerMessage(ServerMessageType::SERVER_MSG_STRING, hasAura.c_str(), sender);
+                        }
+                    }
+                }
+            }
+        }
             break;
         case CHAT_MSG_WHISPER:
             {

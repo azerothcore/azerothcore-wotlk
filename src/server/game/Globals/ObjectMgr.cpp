@@ -499,47 +499,71 @@ void ObjectMgr::LoadCreatureTemplates()
         for (uint8 i = 0; i < MAX_KILL_CREDIT; ++i)
             creatureTemplate.KillCredit[i] = fields[4 + i].GetUInt32();
 
-        creatureTemplate.Modelid1          = fields[6].GetUInt32();
-        creatureTemplate.Modelid2          = fields[7].GetUInt32();
-        creatureTemplate.Modelid3          = fields[8].GetUInt32();
-        creatureTemplate.Modelid4          = fields[9].GetUInt32();
-        creatureTemplate.Name              = fields[10].GetString();
-        creatureTemplate.SubName           = fields[11].GetString();
-        creatureTemplate.IconName          = fields[12].GetString();
-        creatureTemplate.GossipMenuId      = fields[13].GetUInt32();
-        creatureTemplate.minlevel          = fields[14].GetUInt8();
-        creatureTemplate.maxlevel          = fields[15].GetUInt8();
-        creatureTemplate.expansion         = uint32(fields[16].GetInt16());
-        creatureTemplate.faction           = uint32(fields[17].GetUInt16());
-        creatureTemplate.npcflag           = fields[18].GetUInt32();
-        creatureTemplate.speed_walk        = fields[19].GetFloat();
-        creatureTemplate.speed_run         = fields[20].GetFloat();
-        creatureTemplate.scale             = fields[21].GetFloat();
-        creatureTemplate.rank              = uint32(fields[22].GetUInt8());
-        creatureTemplate.mindmg            = fields[23].GetFloat();
-        creatureTemplate.maxdmg            = fields[24].GetFloat();
-        creatureTemplate.dmgschool         = uint32(fields[25].GetInt8());
-        creatureTemplate.attackpower       = fields[26].GetUInt32();
-        creatureTemplate.DamageModifier    = fields[27].GetFloat();
-        creatureTemplate.BaseAttackTime    = fields[28].GetUInt32();
-        creatureTemplate.RangeAttackTime   = fields[29].GetUInt32();
-        creatureTemplate.unit_class        = uint32(fields[30].GetUInt8());
-        creatureTemplate.unit_flags        = fields[31].GetUInt32();
-        creatureTemplate.unit_flags2       = fields[32].GetUInt32();
-        creatureTemplate.dynamicflags      = fields[33].GetUInt32();
-        creatureTemplate.family            = uint32(fields[34].GetUInt8());
-        creatureTemplate.trainer_type      = uint32(fields[35].GetUInt8());
-        creatureTemplate.trainer_spell     = fields[36].GetUInt32();
-        creatureTemplate.trainer_class     = uint32(fields[37].GetUInt8());
-        creatureTemplate.trainer_race      = uint32(fields[38].GetUInt8());
-        creatureTemplate.minrangedmg       = fields[39].GetFloat();
-        creatureTemplate.maxrangedmg       = fields[40].GetFloat();
+        creatureTemplate.Modelid1 = fields[6].GetUInt32();
+        creatureTemplate.Modelid2 = fields[7].GetUInt32();
+        creatureTemplate.Modelid3 = fields[8].GetUInt32();
+        creatureTemplate.Modelid4 = fields[9].GetUInt32();
+        creatureTemplate.Name = fields[10].GetString();
+        creatureTemplate.SubName = fields[11].GetString();
+        creatureTemplate.IconName = fields[12].GetString();
+        creatureTemplate.GossipMenuId = fields[13].GetUInt32();
+
+        // lfm gossip from trinitycore
+        if (creatureTemplate.GossipMenuId == 0)
+        {
+            if (creatureTemplate.Entry == 234)
+            {
+                bool breakPoint = true;
+            }
+            uint32 tcID = creatureTemplate.Entry + 100000;
+            creatureTemplate.GossipMenuId = tcID;
+            //if (_gossipMenusStore.find(tcID) != _gossipMenusStore.end())
+            //{
+            //    creatureTemplate.GossipMenuId = tcID;
+            //}
+        }
+
+        creatureTemplate.minlevel = fields[14].GetUInt8();
+        creatureTemplate.maxlevel = fields[15].GetUInt8();
+        creatureTemplate.expansion = uint32(fields[16].GetInt16());
+        creatureTemplate.faction = uint32(fields[17].GetUInt16());
+        creatureTemplate.npcflag = fields[18].GetUInt32();
+        creatureTemplate.speed_walk = fields[19].GetFloat();
+        creatureTemplate.speed_run = fields[20].GetFloat();
+        creatureTemplate.scale = fields[21].GetFloat();
+        creatureTemplate.rank = uint32(fields[22].GetUInt8());
+        creatureTemplate.mindmg = fields[23].GetFloat();
+        creatureTemplate.maxdmg = fields[24].GetFloat();
+        creatureTemplate.dmgschool = uint32(fields[25].GetInt8());
+        creatureTemplate.attackpower = fields[26].GetUInt32();
+        creatureTemplate.DamageModifier = fields[27].GetFloat();
+        creatureTemplate.BaseAttackTime = fields[28].GetUInt32();
+        creatureTemplate.RangeAttackTime = fields[29].GetUInt32();
+        creatureTemplate.unit_class = uint32(fields[30].GetUInt8());
+        creatureTemplate.unit_flags = fields[31].GetUInt32();
+
+        // lfm npc loading
+        if (creatureTemplate.Entry == 4444)
+        {
+            creatureTemplate.unit_flags |= UnitFlags::UNIT_FLAG_IMMUNE_TO_NPC;
+            creatureTemplate.unit_flags |= UnitFlags::UNIT_FLAG_IMMUNE_TO_PC;
+        }
+
+        creatureTemplate.unit_flags2 = fields[32].GetUInt32();
+        creatureTemplate.dynamicflags = fields[33].GetUInt32();
+        creatureTemplate.family = uint32(fields[34].GetUInt8());
+        creatureTemplate.trainer_type = uint32(fields[35].GetUInt8());
+        creatureTemplate.trainer_spell = fields[36].GetUInt32();
+        creatureTemplate.trainer_class = uint32(fields[37].GetUInt8());
+        creatureTemplate.trainer_race = uint32(fields[38].GetUInt8());
+        creatureTemplate.minrangedmg = fields[39].GetFloat();
+        creatureTemplate.maxrangedmg = fields[40].GetFloat();
         creatureTemplate.rangedattackpower = uint32(fields[41].GetUInt16());
-        creatureTemplate.type              = uint32(fields[42].GetUInt8());
-        creatureTemplate.type_flags        = fields[43].GetUInt32();
-        creatureTemplate.lootid            = fields[44].GetUInt32();
-        creatureTemplate.pickpocketLootId  = fields[45].GetUInt32();
-        creatureTemplate.SkinLootId        = fields[46].GetUInt32();
+        creatureTemplate.type = uint32(fields[42].GetUInt8());
+        creatureTemplate.type_flags = fields[43].GetUInt32();
+        creatureTemplate.lootid = fields[44].GetUInt32();
+        creatureTemplate.pickpocketLootId = fields[45].GetUInt32();
+        creatureTemplate.SkinLootId = fields[46].GetUInt32();
 
         for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
             creatureTemplate.resistance[i] = fields[47 + i - 1].GetInt16();
@@ -547,23 +571,42 @@ void ObjectMgr::LoadCreatureTemplates()
         for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
             creatureTemplate.spells[i] = fields[53 + i].GetUInt32();
 
-        creatureTemplate.PetSpellDataId     = fields[61].GetUInt32();
-        creatureTemplate.VehicleId          = fields[62].GetUInt32();
-        creatureTemplate.mingold            = fields[63].GetUInt32();
-        creatureTemplate.maxgold            = fields[64].GetUInt32();
-        creatureTemplate.AIName             = fields[65].GetString();
-        creatureTemplate.MovementType       = uint32(fields[66].GetUInt8());
-        creatureTemplate.InhabitType        = uint32(fields[67].GetUInt8());
-        creatureTemplate.HoverHeight        = fields[68].GetFloat();
-        creatureTemplate.ModHealth          = fields[69].GetFloat();
-        creatureTemplate.ModMana            = fields[70].GetFloat();
-        creatureTemplate.ModArmor           = fields[71].GetFloat();
-        creatureTemplate.RacialLeader       = fields[72].GetBool();
-        creatureTemplate.movementId         = fields[73].GetUInt32();
-        creatureTemplate.RegenHealth        = fields[74].GetBool();
+        creatureTemplate.PetSpellDataId = fields[61].GetUInt32();
+        creatureTemplate.VehicleId = fields[62].GetUInt32();
+        creatureTemplate.mingold = fields[63].GetUInt32();
+        creatureTemplate.maxgold = fields[64].GetUInt32();
+        creatureTemplate.AIName = fields[65].GetString();
+
+        // EJ lfm scripts
+        if (creatureTemplate.Entry == 10000 || creatureTemplate.Entry == 4444)
+        {
+            creatureTemplate.AIName = "";
+        }
+
+        creatureTemplate.MovementType = uint32(fields[66].GetUInt8());
+        creatureTemplate.InhabitType = uint32(fields[67].GetUInt8());
+        creatureTemplate.HoverHeight = fields[68].GetFloat();
+        creatureTemplate.ModHealth = fields[69].GetFloat();
+        creatureTemplate.ModMana = fields[70].GetFloat();
+        creatureTemplate.ModArmor = fields[71].GetFloat();
+        creatureTemplate.RacialLeader = fields[72].GetBool();
+        creatureTemplate.movementId = fields[73].GetUInt32();
+        creatureTemplate.RegenHealth = fields[74].GetBool();
         creatureTemplate.MechanicImmuneMask = fields[75].GetUInt32();
-        creatureTemplate.flags_extra        = fields[76].GetUInt32();
-        creatureTemplate.ScriptID           = GetScriptId(fields[77].GetCString());
+        creatureTemplate.flags_extra = fields[76].GetUInt32();
+
+        std::string scriptName = std::string(fields[77].GetCString());
+
+        // EJ lfm scripts
+        if (creatureTemplate.Entry == 10000)
+        {
+            scriptName = "npc_arugal_10000";
+        }
+        else if (creatureTemplate.Entry == 4444)
+        {
+            scriptName = "npc_deathstalker_vincent_4444";
+        }
+        creatureTemplate.ScriptID = GetScriptId(scriptName.c_str());
 
         ++count;
     } while (result->NextRow());
@@ -5452,7 +5495,27 @@ void ObjectMgr::LoadGossipText()
         return;
     }
 
-    _gossipTextStore.rehash(result->GetRowCount());
+    // lfm npc_text from lfm
+    QueryResult lfmQR = WorldDatabase.Query("SELECT ID, "
+        "text0_0, text0_1, BroadcastTextID0, lang0, Probability0, em0_0, em0_1, em0_2, em0_3, em0_4, em0_5, "
+        "text1_0, text1_1, BroadcastTextID1, lang1, Probability1, em1_0, em1_1, em1_2, em1_3, em1_4, em1_5, "
+        "text2_0, text2_1, BroadcastTextID2, lang2, Probability2, em2_0, em2_1, em2_2, em2_3, em2_4, em2_5, "
+        "text3_0, text3_1, BroadcastTextID3, lang3, Probability3, em3_0, em3_1, em3_2, em3_3, em3_4, em3_5, "
+        "text4_0, text4_1, BroadcastTextID4, lang4, Probability4, em4_0, em4_1, em4_2, em4_3, em4_4, em4_5, "
+        "text5_0, text5_1, BroadcastTextID5, lang5, Probability5, em5_0, em5_1, em5_2, em5_3, em5_4, em5_5, "
+        "text6_0, text6_1, BroadcastTextID6, lang6, Probability6, em6_0, em6_1, em6_2, em6_3, em6_4, em6_5, "
+        "text7_0, text7_1, BroadcastTextID7, lang7, Probability7, em7_0, em7_1, em7_2, em7_3, em7_4, em7_5 "
+        "FROM npc_text_lfm");
+    if (!lfmQR)
+    {
+        sLog->outErrorDb(">> Loaded 0 lfm npc texts, table is empty!");
+        sLog->outString();
+        return;
+    }
+    uint64 totalRowCount = result->GetRowCount() + lfmQR->GetRowCount();
+
+    //_gossipTextStore.rehash(result->GetRowCount());
+    _gossipTextStore.rehash(totalRowCount);
 
     uint32 count = 0;
     uint8 cic;
@@ -5503,6 +5566,49 @@ void ObjectMgr::LoadGossipText()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u npc texts in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
+
+    // lfm insert to gossip text store
+    count = 0;
+    do
+    {
+        cic = 0;
+        Field* fields = lfmQR->Fetch();
+        uint32 id = fields[cic++].GetUInt32();
+        if (!id)
+        {
+            sLog->outErrorDb("Table `npc_text_lfm` has record wit reserved id 0, ignore.");
+            continue;
+        }
+        GossipText& gText = _gossipTextStore[id];
+        for (uint8 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; ++i)
+        {
+            gText.Options[i].Text_0 = fields[cic++].GetString();
+            gText.Options[i].Text_1 = fields[cic++].GetString();
+            gText.Options[i].BroadcastTextID = fields[cic++].GetUInt32();
+            gText.Options[i].Language = fields[cic++].GetUInt8();
+            gText.Options[i].Probability = fields[cic++].GetFloat();
+            for (uint8 j = 0; j < MAX_GOSSIP_TEXT_EMOTES; ++j)
+            {
+                gText.Options[i].Emotes[j]._Delay = fields[cic++].GetUInt16();
+                gText.Options[i].Emotes[j]._Emote = fields[cic++].GetUInt16();
+            }
+        }
+        for (uint8 i = 0; i < MAX_GOSSIP_TEXT_OPTIONS; i++)
+        {
+            if (gText.Options[i].BroadcastTextID)
+            {
+                if (!sObjectMgr->GetBroadcastText(gText.Options[i].BroadcastTextID))
+                {
+                    sLog->outErrorDb("GossipText (Id: %u) in table `npc_text_lfm` has non-existing or incompatible BroadcastTextID%u %u.", id, i, gText.Options[i].BroadcastTextID);
+                    gText.Options[i].BroadcastTextID = 0;
+                }
+            }
+        }
+        count++;
+    } while (lfmQR->NextRow());
+
+    sLog->outString(">> Loaded %u lfm npc texts in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
@@ -8398,8 +8504,10 @@ void ObjectMgr::LoadGossipMenu()
 
         GossipMenus gMenu;
 
-        gMenu.MenuID        = fields[0].GetUInt16();
-        gMenu.TextID        = fields[1].GetUInt32();
+        // lfm menuid to 32
+        //gMenu.MenuID = fields[0].GetUInt16();
+        gMenu.MenuID = fields[0].GetUInt32();
+        gMenu.TextID = fields[1].GetUInt32();
 
         if (!GetGossipText(gMenu.TextID))
         {
@@ -8409,6 +8517,28 @@ void ObjectMgr::LoadGossipMenu()
 
         _gossipMenusStore.insert(GossipMenusContainer::value_type(gMenu.MenuID, gMenu));
     } while (result->NextRow());
+
+    // lfm gossip menu from lfm
+    QueryResult lfmQR = WorldDatabase.Query("SELECT MenuID, TextID FROM gossip_menu_lfm");
+    if (!lfmQR)
+    {
+        sLog->outErrorDb(">> Loaded 0 gossip_menu_lfm entries. DB table `gossip_menu` is empty!");
+        sLog->outString();
+        return;
+    }
+    do
+    {
+        Field* fields = lfmQR->Fetch();
+        GossipMenus gMenu;
+        gMenu.MenuID = fields[0].GetUInt32();
+        gMenu.TextID = fields[1].GetUInt32();
+        if (!GetGossipText(gMenu.TextID))
+        {
+            sLog->outErrorDb("Table gossip_menu_lfm entry %u are using non-existing TextID %u", gMenu.MenuID, gMenu.TextID);
+            continue;
+        }
+        _gossipMenusStore.insert(GossipMenusContainer::value_type(gMenu.MenuID, gMenu));
+    } while (lfmQR->NextRow());
 
     sLog->outString(">> Loaded %u gossip_menu entries in %u ms", (uint32)_gossipMenusStore.size(), GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
@@ -8651,6 +8781,10 @@ void ObjectMgr::LoadScriptNames()
         _scriptNamesStore.push_back((*result)[0].GetString());
         ++count;
     } while (result->NextRow());
+
+    // lfm hardcode script names 
+    _scriptNamesStore.push_back("npc_arugal_10000");
+    _scriptNamesStore.push_back("npc_deathstalker_vincent_4444");
 
     std::sort(_scriptNamesStore.begin(), _scriptNamesStore.end());
     sLog->outString(">> Loaded %d Script Names in %u ms", count, GetMSTimeDiffToNow(oldMSTime));

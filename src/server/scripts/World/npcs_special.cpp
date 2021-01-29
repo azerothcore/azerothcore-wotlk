@@ -2494,6 +2494,222 @@ public:
     }
 };
 
+// lfm extra scripts 
+enum LFM_Creature_Entry
+{
+    LFM_Creature_Entry_Deathstalker_Vincent = 4444,
+    LFM_Creature_Entry_Arugal = 10000,
+};
+
+class npc_arugal_10000: public CreatureScript
+{
+public:
+    npc_arugal_10000() : CreatureScript("npc_arugal_10000") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_arugal_10000AI(creature);
+    }
+
+    struct npc_arugal_10000AI : public ScriptedAI
+    {
+        npc_arugal_10000AI(Creature* creature) : ScriptedAI(creature)
+        {
+            show = true;
+        }
+
+        bool show;
+        EventMap events;
+
+        void Reset() override
+        {
+            show = true;
+            events.Reset();
+            events.ScheduleEvent(1, 1000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (show)
+            {
+                events.Update(diff);
+                switch (events.ExecuteEvent())
+                {
+                case 1:
+                {
+                    if (me->SelectNearestPlayer(45.0f))
+                    {
+                        events.ScheduleEvent(2, 5000);
+                        events.ScheduleEvent(3, 14000);
+                        events.ScheduleEvent(4, 22000);
+                        events.ScheduleEvent(5, 26000);
+                        events.ScheduleEvent(6, 28000);
+                        events.ScheduleEvent(7, 28500);
+                        events.ScheduleEvent(8, 33000);
+                        events.ScheduleEvent(9, 33500);
+                    }
+                    else
+                    {
+                        events.RepeatEvent(1000);
+                    }
+                    break;
+                }
+                case 2:
+                {
+                    std::list<Creature*> list;
+                    me->GetCreatureListWithEntryInGrid(list, LFM_Creature_Entry::LFM_Creature_Entry_Deathstalker_Vincent, 10.0f);
+                    if (list.size() > 0)
+                    {
+                        for (std::list<Creature*>::iterator cIT = list.begin(); cIT != list.end(); cIT++)
+                        {
+                            if (Creature* vincent = *cIT)
+                            {
+                                // handle only one
+                                me->SetFacingToObject(vincent);
+                                vincent->AI()->SetData(1, 0);
+                                me->AI()->Talk(0);
+                                me->HandleEmoteCommand(Emote::EMOTE_ONESHOT_TALK_NO_SHEATHE);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        sLog->outError("Can not found creature 'Deathstalker Vincent'");
+                        show = false;
+                        events.Reset();
+                    }
+                    break;
+                }
+                case 3:
+                {
+                    me->AI()->Talk(1);
+                    me->HandleEmoteCommand(Emote::EMOTE_ONESHOT_POINT_NO_SHEATHE);
+                    break;
+                }
+                case 4:
+                {
+                    me->AI()->Talk(2);
+                    break;
+                }
+                case 5:
+                {
+                    std::list<Creature*> list;
+                    me->GetCreatureListWithEntryInGrid(list, LFM_Creature_Entry::LFM_Creature_Entry_Deathstalker_Vincent, 10.0f);
+                    if (list.size() > 0)
+                    {
+                        for (std::list<Creature*>::iterator cIT = list.begin(); cIT != list.end(); cIT++)
+                        {
+                            if (Creature* vincent = *cIT)
+                            {
+                                // handle only one
+                                me->CastSpell(me, 12948);
+                                vincent->AI()->SetData(1, 1);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        sLog->outError("Can not found creature 'Deathstalker Vincent'");
+                        show = false;
+                        events.Reset();
+                    }
+                    break;
+                }
+                case 6:
+                {
+                    if (Player* targetPlayer = me->SelectNearestPlayer(45.0f))
+                    {
+                        me->SetFacingToObject(targetPlayer);
+                    }
+                    break;
+                }
+                case 7:
+                {
+                    me->AI()->Talk(3);
+                    me->HandleEmoteCommand(Emote::EMOTE_ONESHOT_LAUGH_NO_SHEATHE);
+                    break;
+                }
+                case 8:
+                {
+                    me->CastSpell(me, 4801);
+                    break;
+                }
+                case 9:
+                {
+                    me->SetRespawnDelay(7 * TimeConstants::DAY);
+                    me->DespawnOrUnsummon();
+                    show = false;
+                    break;
+                }
+                }
+            }
+        }
+    };
+};
+
+class npc_deathstalker_vincent_4444 : public CreatureScript
+{
+public:
+    npc_deathstalker_vincent_4444() : CreatureScript("npc_deathstalker_vincent_4444") { }
+
+    struct npc_deathstalker_vincent_4444AI : public ScriptedAI
+    {
+        npc_deathstalker_vincent_4444AI(Creature* creature) : ScriptedAI(creature)
+        {
+            show = true;
+        }
+
+        bool show;
+        EventMap events;
+
+        void Reset() override
+        {
+            me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+            me->ClearUnitState(UNIT_STATE_DIED);
+            me->SetStandState(UnitStandStateType::UNIT_STAND_STATE_STAND);
+        }
+
+        void SetData(uint32 type, uint32 data) override
+        {
+            if (type == 1 && data == 0)
+            {
+                std::list<Creature*> list;
+                me->GetCreatureListWithEntryInGrid(list, LFM_Creature_Entry::LFM_Creature_Entry_Arugal, 10.0f);
+                if (list.size() > 0)
+                {
+                    for (std::list<Creature*>::iterator cIT = list.begin(); cIT != list.end(); cIT++)
+                    {
+                        if (Creature* arugal = *cIT)
+                        {
+                            // handle only one
+                            me->SetFacingToObject(arugal);
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (type == 1 && data == 1)
+            {
+                me->AI()->Talk(0);
+                me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                me->AddUnitState(UNIT_STATE_DIED);
+                me->SetStandState(UnitStandStateType::UNIT_STAND_STATE_DEAD);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_deathstalker_vincent_4444AI(creature);
+    }
+};
+
 void AddSC_npcs_special()
 {
     // Ours
@@ -2520,4 +2736,8 @@ void AddSC_npcs_special()
     new npc_firework();
     new npc_spring_rabbit();
     new npc_stable_master();
+
+    // lfm scripts register
+    new npc_arugal_10000();
+    new npc_deathstalker_vincent_4444();
 }

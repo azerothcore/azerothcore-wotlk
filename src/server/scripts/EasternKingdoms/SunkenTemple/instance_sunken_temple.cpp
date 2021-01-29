@@ -28,19 +28,32 @@ public:
 
             _forcefieldGUID = 0;
             _jammalanGUID = 0;
+
+            // lfm green channeling
+            greenChannelingCheckDelay = 5000;
+            barrierGuardsGUIDSet.clear();
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
-                case NPC_JAMMAL_AN_THE_PROPHET:
-                    _jammalanGUID = creature->GetGUID();
-                    break;
+            case NPC_JAMMAL_AN_THE_PROPHET:
+            {
+                _jammalanGUID = creature->GetGUID();
+                break;
+            }
             }
 
             if (creature->IsAlive() && creature->GetDBTableGUIDLow() && creature->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && creature->GetEntry() != NPC_SHADE_OF_ERANIKUS)
                 _dragonkinList.push_back(creature->GetGUID());
+
+            // lfm green channeling 
+            uint32 creatureEntry = creature->GetEntry();
+            if (creatureEntry == 5712 || creatureEntry == 5713 || creatureEntry == 5714 || creatureEntry == 5715 || creatureEntry == 5716 || creatureEntry == 5717)
+            {
+                barrierGuardsGUIDSet.insert(creature->GetGUID());
+            }
         }
 
         void OnUnitDeath(Unit* unit) override
@@ -138,11 +151,39 @@ public:
             _events.Update(diff);
             switch (_events.ExecuteEvent())
             {
-                case DATA_STATUES:
-                    ++_statuePhase;
-                    if (_statuePhase == MAX_STATUE_PHASE)
-                        instance->SummonGameObject(GO_IDOL_OF_HAKKAR, -480.08f, 94.29f, -189.72f, 1.571f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
-                    break;
+            case DATA_STATUES:
+            {
+                ++_statuePhase;
+                if (_statuePhase == MAX_STATUE_PHASE)
+                    instance->SummonGameObject(GO_IDOL_OF_HAKKAR, -480.08f, 94.29f, -189.72f, 1.571f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
+                break;
+            }
+            }
+
+            if (greenChannelingCheckDelay >= 0)
+            {
+                greenChannelingCheckDelay -= diff;
+            }
+            else
+            {
+                for (std::unordered_set<uint64>::iterator guidIT = barrierGuardsGUIDSet.begin(); guidIT != barrierGuardsGUIDSet.end(); guidIT++)
+                {
+                    uint64 eachGUID = *guidIT;
+                    if (Creature* guardC = instance->GetCreature(eachGUID))
+                    {
+                        if (!guardC->IsInCombat())
+                        {
+                            if (!guardC->isMoving())
+                            {
+                                if (!guardC->HasAura(13540))
+                                {
+                                    guardC->CastSpell(guardC, 13540);
+                                }
+                            }
+                        }
+                    }
+                }
+                greenChannelingCheckDelay = 5000;
             }
         }
 
@@ -184,6 +225,10 @@ public:
         uint64 _jammalanGUID;
         std::list<uint64> _dragonkinList;
         EventMap _events;
+
+        // lfm green channeling
+        int greenChannelingCheckDelay;
+        std::unordered_set<uint64> barrierGuardsGUIDSet;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
