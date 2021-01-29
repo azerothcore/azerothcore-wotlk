@@ -137,7 +137,7 @@ jobs:
           docker-compose --version
       - name: Build
         run: |
-          ./bin/acore-docker-build-no-scripts
+          ./bin/acore-docker-build
       - name: Worldserver Build
         run: |
           docker build -t azerothcore/worldserver -f docker/worldserver/Dockerfile docker/worldserver
