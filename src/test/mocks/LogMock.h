@@ -16,7 +16,6 @@ LoginDatabaseWorkerPool LoginDatabase;
 class LogMock: public ILog {
 public:
     ~LogMock() override {}
-    MOCK_METHOD(void, outDB, (LogTypes type), (const char* str));
     MOCK_METHOD(void, Initialize, ());
     MOCK_METHOD(void, ReloadConfig, ());
     MOCK_METHOD(void, InitColors, (const std::string& init_str));
