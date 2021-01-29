@@ -1770,6 +1770,7 @@ void SpellMgr::LoadSpellProcEvents()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u extra spell proc event conditions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void SpellMgr::LoadSpellProcs()
