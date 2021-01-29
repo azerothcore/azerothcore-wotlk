@@ -22,9 +22,6 @@ services:
         source: ./apps
         target: /azerothcore/apps
       - type: bind
-        source: ./bin
-        target: /azerothcore/bin
-      - type: bind
         source: ./conf
         target: /azerothcore/conf
       - type: bind
