@@ -1,10 +1,13 @@
 build*/
 var/*
-data/contrib/*
-data/doc/*
+data/
 conf/*
 !conf/dist
 docker/worldserver/data/*
-docker/build/cache
+docker/build/cache/
 .idea
 cmake-build-debug/*
+.git/
+deps/
+src/
+modules/
