@@ -3,6 +3,10 @@
 docker build --build-arg ENABLE_SCRIPTS=0 -t acbuild -f docker/build/Dockerfile .
 
 docker run \
+    -v /"$(pwd)"/deps:/azerothcore/deps \
+    -v /"$(pwd)"/conf/dist:/azerothcore/conf/dist \
+    -v /"$(pwd)"/src:/azerothcore/src \
+    -v /"$(pwd)"/modules:/azerothcore/modules \
     -v /"$(pwd)"/docker/build/cache:/azerothcore/build \
     -v /"$(pwd)"/docker/worldserver/bin:/binworldserver \
     -v /"$(pwd)"/docker/authserver/bin:/binauthserver \
