@@ -154,7 +154,9 @@ jobs:
       - name: Generate configs
         run: source ./bin/acore-docker-generate-etc
       - name: Dry Run
-        run: timeout 5m docker-compose up
+        run: docker-compose up -d && sleep 3m
+      - name: Dry Run Log
+        run: cat ./docker/worldserver/logs/Server.log
       - name: Check startup errors
         run: source ./apps/ci/ci-error-check.sh
         env:
