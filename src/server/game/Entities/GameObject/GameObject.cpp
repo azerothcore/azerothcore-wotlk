@@ -1190,7 +1190,6 @@ GameObject* GameObject::LookupFishingHoleAround(float range)
 {
     GameObject* ok = nullptr;
 
-
     CellCoord p(acore::ComputeCellCoord(GetPositionX(), GetPositionY()));
     Cell cell(p);
     acore::NearestGameObjectFishingHole u_check(*this, range);

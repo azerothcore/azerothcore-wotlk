@@ -3551,9 +3551,9 @@ void AuraEffect::HandleModStateImmunityMask(AuraApplication const* aurApp, uint8
             aura_immunity_list.push_back(SPELL_AURA_MOD_POSSESS);
         }
         // UNK
-        if ((GetMiscValue() & (1 << 8)))
-        {
-        }
+        // if ((GetMiscValue() & (1 << 8)))
+        // {
+        // }
         // Fear, OK
         if (GetMiscValue() & (1 << 9))
         {
@@ -6007,14 +6007,6 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                             }
                     return;
                 }
-            // quest A Tangled Skein (12555)
-            case 51165:
-                {
-                    if( caster && caster->GetTypeId() == TYPEID_PLAYER )
-                        caster->ToPlayer()->KilledMonsterCredit(28289, 0);
-
-                    break;
-                }
             case 24745: // Summon Templar, Trigger
             case 24747: // Summon Templar Fire, Trigger
             case 24757: // Summon Templar Air, Trigger
@@ -6327,7 +6319,6 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
 #endif
     if (caster)
         caster->SendSpellNonMeleeDamageLog(target, GetId(), damage + absorb + resist, GetSpellInfo()->GetSchoolMask(), absorb, resist, false, 0, crit);
-
 
     int32 new_damage;
 
@@ -6823,7 +6814,6 @@ void AuraEffect::HandleRaidProcFromChargeAuraProc(AuraApplication* aurApp, ProcE
 #endif
     target->CastSpell(target, triggerSpellId, true, NULL, this, GetCasterGUID());
 }
-
 
 void AuraEffect::HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurApp, ProcEventInfo& /*eventInfo*/)
 {
