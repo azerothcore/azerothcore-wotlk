@@ -3505,15 +3505,24 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float sta
 {
     bool isValid = true;
     float tempX=destX, tempY=destY, tempZ=destZ;
-    isValid = CheckCollisionAndGetValidCoords(source, startX, startY, startZ, destX, destY, destZ, failOnCollision);
-    if (isValid) {
-        destX = tempX, destY = tempY, destZ = tempZ;
+    if (!CheckCollisionAndGetValidCoords(source, startX, startY, startZ, destX, destY, destZ, failOnCollision))
+    {
+        return false;
     }
+        
+    destX = tempX, destY = tempY, destZ = tempZ;
 
     const Unit* unit = source->ToUnit();
+    // if it's not an unit (Object) then we do not have to continue
+    // with walkable checks
     if (!unit)
-        return isValid;
+    {
+        return true;
+    }
 
+    /*
+     * Walkable checks
+     */
     bool isWaterNext = HasEnoughWater(unit, destX, destY, destZ);
     const Creature* creature = unit->ToCreature();
     bool cannotEnterWater = isWaterNext && (creature && !creature->CanEnterWater());
@@ -3524,7 +3533,7 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float sta
         return false;
     }
 
-    return isValid;
+    return true;
 }
 
 /**
