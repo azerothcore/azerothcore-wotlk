@@ -6007,14 +6007,6 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                             }
                     return;
                 }
-            // quest A Tangled Skein (12555)
-            case 51165:
-                {
-                    if( caster && caster->GetTypeId() == TYPEID_PLAYER )
-                        caster->ToPlayer()->KilledMonsterCredit(28289, 0);
-
-                    break;
-                }
             case 24745: // Summon Templar, Trigger
             case 24747: // Summon Templar Fire, Trigger
             case 24757: // Summon Templar Air, Trigger
