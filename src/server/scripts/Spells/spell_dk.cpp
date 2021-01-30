@@ -1324,7 +1324,7 @@ public:
     {
         PrepareSpellScript(spell_dk_corpse_explosion_SpellScript);
 
-        bool Validate(SpellInfo const* spellInfo) override
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             return ValidateSpellInfo(
                 {
@@ -1766,7 +1766,7 @@ public:
     {
         PrepareSpellScript(spell_dk_ghoul_explode_SpellScript);
 
-        bool Validate(SpellInfo const* spellInfo) override
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             return ValidateSpellInfo({ SPELL_DK_CORPSE_EXPLOSION_TRIGGERED });
         }
@@ -2179,7 +2179,7 @@ public:
     {
         PrepareSpellScript(spell_dk_raise_dead_SpellScript);
 
-        bool Validate(SpellInfo const* spellInfo) override
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             return ValidateSpellInfo(
                 {
