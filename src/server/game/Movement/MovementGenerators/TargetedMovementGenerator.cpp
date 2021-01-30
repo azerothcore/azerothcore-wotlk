@@ -259,7 +259,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     Unit* target = i_target.getTarget();
 
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
-    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || cOwner && owner->ToCreature()->IsMovementPreventedByCasting())
+    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || (cOwner && owner->ToCreature()->IsMovementPreventedByCasting()))
     {
         i_path = nullptr;
         owner->StopMoving();
@@ -412,8 +412,6 @@ void FollowMovementGenerator<T>::MovementInform(T* owner)
 
 //-----------------------------------------------//
 
-template void ChaseMovementGenerator<Player>::DoInitialize(Player*);
-template void ChaseMovementGenerator<Creature>::DoInitialize(Creature*);
 template void ChaseMovementGenerator<Player>::DoFinalize(Player*);
 template void ChaseMovementGenerator<Creature>::DoFinalize(Creature*);
 template void ChaseMovementGenerator<Player>::DoReset(Player*);
