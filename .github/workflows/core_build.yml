@@ -132,13 +132,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Cache
-          uses: actions/cache@v1.1.2
-          with:
-            path: ./docker/build/cache/.ccache
-            key: ccache:ubuntu-20.04:${{ github.ref }}:${{ github.sha }}
-            restore-keys: |
-              ccache:ubuntu-20.04:${{ github.ref }}
-              ccache:ubuntu-20.04
+        uses: actions/cache@v1.1.2
+        with:
+           path: ./docker/build/cache/.ccache
+           key: ccache:ubuntu-20.04:${{ github.ref }}:${{ github.sha }}
+           restore-keys: |
+             ccache:ubuntu-20.04:${{ github.ref }}
+             ccache:ubuntu-20.04
       - name: Configure
         run: |
           docker --version
