@@ -1770,10 +1770,6 @@ public:
         bool Validate(SpellInfo const* spellInfo) override
         {
             return ValidateSpellInfo({ SPELL_DK_CORPSE_EXPLOSION_TRIGGERED });
-
-            if (spellInfo->Effects[EFFECT_2].CalcValue() <= 0)
-                return false;
-            return true;
         }
 
         void HandleDamage(SpellEffIndex /*effIndex*/)

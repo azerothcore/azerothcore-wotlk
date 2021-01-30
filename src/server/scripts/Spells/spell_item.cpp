@@ -3592,10 +3592,6 @@ public:
         bool Validate(SpellInfo const* /*spell*/) override
         {
             return ValidateSpellInfo({ SPELL_CREATE_DEMON_BROILED_SURPRISE });
-
-            if (!sObjectMgr->GetCreatureTemplate(NPC_ABYSSAL_FLAMEBRINGER) || !sObjectMgr->GetQuestTemplate(QUEST_SUPER_HOT_STEW))
-                return false;
-            return true;
         }
 
         bool Load() override
@@ -4040,10 +4036,6 @@ public:
         bool Validate(SpellInfo const* /*spell*/) override
         {
             return ValidateSpellInfo({ SPELL_CHICKEN_NET, SPELL_CAPTURE_CHICKEN_ESCAPE });
-
-            if (!sObjectMgr->GetQuestTemplate(QUEST_CHICKEN_PARTY) || !sObjectMgr->GetQuestTemplate(QUEST_FLOWN_THE_COOP))
-                return false;
-            return true;
         }
 
         void HandleDummy(SpellEffIndex /* effIndex */)

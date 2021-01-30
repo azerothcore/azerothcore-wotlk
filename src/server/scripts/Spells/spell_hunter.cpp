@@ -689,10 +689,6 @@ public:
         bool Validate(SpellInfo const* spellInfo) override
         {
             return ValidateSpellInfo({ SPELL_HUNTER_MASTERS_CALL_TRIGGERED });
-
-            if (!sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].CalcValue()) || !sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_1].CalcValue()))
-                return false;
-            return true;
         }
 
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
