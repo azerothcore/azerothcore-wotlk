@@ -9,16 +9,16 @@ DROP TABLE IF EXISTS `quest_details`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `quest_details` 
 (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `Emote1` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `Emote2` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `Emote3` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `Emote4` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `EmoteDelay1` int(10) unsigned NOT NULL DEFAULT '0',
-  `EmoteDelay2` int(10) unsigned NOT NULL DEFAULT '0',
-  `EmoteDelay3` int(10) unsigned NOT NULL DEFAULT '0',
-  `EmoteDelay4` int(10) unsigned NOT NULL DEFAULT '0',
-  `VerifiedBuild` smallint(5) NOT NULL DEFAULT '0',
+  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `Emote1` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `Emote2` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `Emote3` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `Emote4` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `EmoteDelay1` int(10) unsigned NOT NULL DEFAULT 0,
+  `EmoteDelay2` int(10) unsigned NOT NULL DEFAULT 0,
+  `EmoteDelay3` int(10) unsigned NOT NULL DEFAULT 0,
+  `EmoteDelay4` int(10) unsigned NOT NULL DEFAULT 0,
+  `VerifiedBuild` smallint(5) NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1363,7 +1363,7 @@ INSERT INTO `quest_details` VALUES
 (12542,4,0,0,0,0,0,0,0,12340),
 (12545,4,0,0,0,0,0,0,0,12340),
 (12561,4,0,0,0,0,0,0,0,12340),
-(12593,4,500,1000,1000,0,0,0,0,12340),
+(12593,396,397,396,396,1000,500,1000,1000,20886),
 (12619,4,0,0,0,0,0,0,0,12340),
 (12624,4,0,0,0,0,0,0,0,12340),
 (12636,4,0,0,0,0,0,0,0,12340),

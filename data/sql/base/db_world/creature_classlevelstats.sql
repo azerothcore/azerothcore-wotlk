@@ -11,17 +11,17 @@ CREATE TABLE `creature_classlevelstats`
 (
   `level` tinyint(3) unsigned NOT NULL,
   `class` tinyint(3) unsigned NOT NULL,
-  `basehp0` smallint(5) unsigned NOT NULL DEFAULT '1',
-  `basehp1` smallint(5) unsigned NOT NULL DEFAULT '1',
-  `basehp2` smallint(5) unsigned NOT NULL DEFAULT '1',
-  `basemana` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `basearmor` smallint(5) unsigned NOT NULL DEFAULT '1',
-  `attackpower` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `rangedattackpower` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `damage_base` float NOT NULL DEFAULT '0',
-  `damage_exp1` float NOT NULL DEFAULT '0',
-  `damage_exp2` float NOT NULL DEFAULT '0',
-  `comment` text,
+  `basehp0` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `basehp1` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `basehp2` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `basemana` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `basearmor` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `attackpower` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `rangedattackpower` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `damage_base` float NOT NULL DEFAULT 0,
+  `damage_exp1` float NOT NULL DEFAULT 0,
+  `damage_exp2` float NOT NULL DEFAULT 0,
+  `comment` text DEFAULT NULL,
   PRIMARY KEY (`level`,`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
