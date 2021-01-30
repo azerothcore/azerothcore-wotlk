@@ -200,7 +200,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         bool buildShotrcut = false;
 
         Unit const* _sourceUnit = _source->ToUnit();
-        if (_useRaycast || 
+        if (_useRaycast ||
             (_sourceUnit && (_sourceUnit->CanFly() || (_sourceUnit->IsFalling() && endPos.z < startPos.z)))
         )
         {

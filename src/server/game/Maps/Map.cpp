@@ -3456,15 +3456,6 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
  * and normalize the coords. Use this method for long paths, otherwise use the
  * overloaded method with the start coords when you need to do a quick check on small segments
  *
- * @param source 
- * @param path 
- * @param destX 
- * @param destY 
- * @param destZ 
- * @param failOnCollision 
- * @param failOnSlopes 
- * @return true 
- * @return false 
  */
 bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
 {
@@ -3512,7 +3503,7 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float &de
  **/
 bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
 {
-    bool isValid = true;   
+    bool isValid = true;
     float tempX=destX, tempY=destY, tempZ=destZ;
     isValid = CheckCollisionAndGetValidCoords(source, startX, startY, startZ, destX, destY, destZ, failOnCollision);
     if (isValid) {
@@ -3527,7 +3518,7 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float sta
     const Creature* creature = unit->ToCreature();
     bool cannotEnterWater = isWaterNext && (creature && !creature->CanEnterWater());
     bool cannotWalkOrFly = !isWaterNext && !source->ToPlayer() && !unit->CanFly() && (creature && !creature->CanWalk());
-    if (cannotEnterWater || cannotWalkOrFly || 
+    if (cannotEnterWater || cannotWalkOrFly ||
         (failOnSlopes && !PathGenerator::IsWalkableClimb(startX, startY, startZ, destX, destY, destZ, source->GetCollisionHeight())))
     {
         return false;
@@ -3539,9 +3530,6 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float sta
 /**
  * @brief validate the new destination and set coords
  * Check if a given unit can face collisions in a specific segment
- * 
- * @param failOnCollision if the 
- * @param failOnSlopes
  *
  * @return true if the destination is valid, false otherwise
  *

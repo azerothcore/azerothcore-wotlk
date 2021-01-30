@@ -3661,7 +3661,7 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         return;
     }
 
-    // run environment checks everytime the unit moves 
+    // run environment checks everytime the unit moves
     // more than it's average radius
     // TODO: find better solution here
     float radiusWidth = GetCollisionRadius();
