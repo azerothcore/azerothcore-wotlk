@@ -3436,7 +3436,22 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
     }
 }
 
-bool Map::CanReachPositionAndGetCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes) const
+/**
+ * @brief Check if a given source can reach a specific point following a path
+ * and normalize the coords. Use this method for long paths, otherwise use the
+ * overloaded method with the start coords when you need to do a quick check on small segments
+ *
+ * @param source 
+ * @param path 
+ * @param destX 
+ * @param destY 
+ * @param destZ 
+ * @param failOnCollision 
+ * @param failOnSlopes 
+ * @return true 
+ * @return false 
+ */
+bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
 {
     G3D::Vector3 prevPath = path->GetStartPosition();
     for (auto & vector : path->GetPath())
@@ -3445,7 +3460,7 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, PathGenerator 
         float y = vector.y;
         float z = vector.z;
 
-        if (!CanReachPositionAndGetCoords(source, prevPath.x, prevPath.y, prevPath.z, x, y, z, checkCollision, checkSlopes, false))
+        if (!CanReachPositionAndGetValidCoords(source, prevPath.x, prevPath.y, prevPath.z, x, y, z, failOnCollision, failOnSlopes))
         {
             destX = x;
             destY = y;
@@ -3463,57 +3478,79 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, PathGenerator 
     return true;
 }
 
-bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes, bool findPath) const
+bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
 {
-    return CanReachPositionAndGetCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, checkCollision, checkSlopes, findPath);
+    return CanReachPositionAndGetValidCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, failOnCollision, failOnSlopes);
 }
 
 /**
- *   \brief validate the new destination and set reachable points
+ * @brief validate the new destination and set reachable coords
+ * Check if a given unit can reach a specific point on a segment
+ * and set the correct dest coords
+ * NOTE: use this method with small segments.
  *
- *   Check if a given unit can reach a specific point and set the correct dest coords based on paths
+ * @param failOnCollision if true, the methods will return false when a collision occurs
+ * @param failOnSlopes if true, the methods will return false when a non walkable slope is found
  *
- *   \return true if the destination is valid, false otherwise
+ * @return true if the destination is valid, false otherwise
  *
  **/
-bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool checkCollision, bool checkSlopes, bool findPath) const
+bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
+{
+    bool isValid = true;   
+    float tempX=destX, tempY=destY, tempZ=destZ;
+    isValid = CheckCollisionAndGetValidCoords(source, startX, startY, startZ, destX, destY, destZ, failOnCollision);
+    if (isValid) {
+        destX = tempX, destY = tempY, destZ = tempZ;
+    }
+
+    const Unit* unit = source->ToUnit();
+    if (!unit)
+        return isValid;
+
+    bool isWaterNext = IsInWater(destX, destY, destZ);
+    const Creature* creature = unit->ToCreature();
+    bool cannotSwim = isWaterNext && (creature && !creature->CanSwim());
+    bool cannotWalkOrFly = !isWaterNext && !source->ToPlayer() && !unit->CanFly() && (creature && !creature->CanWalk());
+    if (cannotSwim || cannotWalkOrFly || 
+        (failOnSlopes && !PathGenerator::IsWalkableClimb(startX, startY, startZ, destX, destY, destZ, source->GetCollisionHeight())))
+    {
+        return false;
+    }
+
+    return isValid;
+}
+
+/**
+ * @brief validate the new destination and set coords
+ * Check if a given unit can face collisions in a specific segment
+ * 
+ * @param failOnCollision if the 
+ * @param failOnSlopes
+ *
+ * @return true if the destination is valid, false otherwise
+ *
+ **/
+bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision) const
 {
     // Prevent invalid coordinates here, position is unchanged
     if (!acore::IsValidMapCoord(startX, startY, startZ) || !acore::IsValidMapCoord(destX, destY, destZ))
     {
-        sLog->outCrash("WorldObject::CanReachPositionAndGetCoords invalid coordinates startX: %f, startY: %f, startZ: %f, destX: %f, destY: %f, destZ: %f", startX, startY, startZ, destX, destY, destZ);
-        // go back
-        destX = startX; destY = startY; destZ = startZ;
+        sLog->outCrash("Map::CheckCollisionAndGetValidCoords invalid coordinates startX: %f, startY: %f, startZ: %f, destX: %f, destY: %f, destZ: %f", startX, startY, startZ, destX, destY, destZ);
         return false;
     }
 
-    bool isWaterNow = IsInWater(startX, startY, startZ);
     bool isWaterNext = IsInWater(destX, destY, destZ);
-    const Unit* unit = source->ToUnit();
+
     PathGenerator* path = new PathGenerator(source);
-
-    if (findPath && !isWaterNow && !isWaterNext && (!unit || !unit->IsFlying())) {
-        path->SetSlopeCheck(true);
-        bool result = path->CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
-        if (!result || !CanReachPositionAndGetCoords(source, path, destX, destY, destZ, checkCollision))
-        {
-            return false;
-        }
-
-        G3D::Vector3 endPos = path->GetEndPosition();
-        destX = endPos.x;
-        destY = endPos.y;
-        destZ = endPos.z;
-
-        return true;
-    }
 
     // Use a detour raycast to get our first collision point
     path->SetUseRaycast(true);
     bool result = path->CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
 
+    const Unit* unit = source->ToUnit();
     bool notOnGround = path->GetPathType() & PATHFIND_NOT_USING_PATH
-        || (isWaterNow || isWaterNext) || (unit && unit->IsFlying());
+        || isWaterNext || (unit && unit->IsFlying());
 
     // Check for valid path types before we proceed
     if (!result || (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)))
@@ -3573,25 +3610,17 @@ bool Map::CanReachPositionAndGetCoords(const WorldObject* source, float startX, 
     source->UpdateAllowedPositionZ(destX, destY, destZ, &groundZ);
 
     // position has no ground under it (or is too far away)
-    if (unit) {
-        if (!unit->CanFly() && !isWaterNext)
+    if (groundZ <= INVALID_HEIGHT && unit && unit->CanFly())
+    {
+        // fall back to gridHeight if any
+        float gridHeight = GetGridHeight(destX, destY);
+        if (gridHeight > INVALID_HEIGHT)
         {
-            if (groundZ <= INVALID_HEIGHT)
-            {
-                // fall back to gridHeight if any
-                float gridHeight = GetGridHeight(destX, destY);
-                if (gridHeight > INVALID_HEIGHT)
-                {
-                    destZ = gridHeight + unit->GetHoverHeight();
-                }
-            }
-
-            if (checkSlopes && !notOnGround && !path->IsWalkableClimb(startX, startY, startZ, destX, destY, destZ))
-            {
-                return false;
-            }
+            destZ = gridHeight + unit->GetHoverHeight();
+        } else {
+            return false;
         }
     }
 
-    return checkCollision ? !collided : true;
+    return failOnCollision ? !collided : true;
 }

@@ -980,7 +980,7 @@ bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, floa
  * @param sourceHeight height of the source
  * @return bool check if you can climb the path
  */
-bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight) const
+bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight)
 {
     float diffHeight = abs(destZ - z);
     float reqHeight = GetRequiredHeightToClimb(x, y, z, destX, destY, destZ, sourceHeight);
@@ -1001,7 +1001,7 @@ bool PathGenerator::IsWalkableClimb(float x, float y, float z, float destX, floa
  * @param sourceHeight height of the source
  * @return float the maximum height that a source can climb based on slope angle
  */
-float PathGenerator::GetRequiredHeightToClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight) const
+float PathGenerator::GetRequiredHeightToClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight)
 {
     float slopeAngle = getSlopeAngleAbs(x, y, z, destX, destY, destZ);
     float slopeAngleDegree = (slopeAngle * 180.0f / M_PI);

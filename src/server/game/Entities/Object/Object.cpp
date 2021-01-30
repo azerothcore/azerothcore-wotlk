@@ -2836,7 +2836,7 @@ void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float 
     desty = pos.m_positionY + dist * sin(angle);
     destz = pos.m_positionZ;
 
-    if (!GetMap()->CanReachPositionAndGetCoords(this, destx, desty, destz, false, false, false))
+    if (!GetMap()->CheckCollisionAndGetValidCoords(this, pos.m_positionX, pos.m_positionY, pos.m_positionZ, destx, desty, destz, false))
         return;
 
     pos.SetOrientation(GetOrientation());

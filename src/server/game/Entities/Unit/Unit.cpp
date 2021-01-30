@@ -2302,11 +2302,11 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     float distance = meleeReach - GetObjectSize();
     GetNearPoint(attacker, x, y, z, distance, 0.0f, absAngle);
 
-    if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z, true, true, false))
+    if (!GetMap()->CanReachPositionAndGetValidCoords(this, x, y, z, true, true))
     {
         GetNearPoint(attacker, x, y, z, distance, 0.0f, absAngle * -1); // try the other side
 
-        if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z, true, true, false))
+        if (!GetMap()->CanReachPositionAndGetValidCoords(this, x, y, z, true, true))
         {
             return nullptr;
         }
@@ -3661,7 +3661,13 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         return;
     }
 
-    if (option <= 1 && GetExactDistSq(&m_last_environment_position) < 2.5f*2.5f)
+    // run environment checks everytime the unit moves 
+    // more than it's average radius
+    // TODO: find better solution here
+    float radiusWidth = GetCollisionRadius();
+    float radiusHeight = GetCollisionHeight() / 2;
+    float radiusAvg = (radiusWidth + radiusHeight) / 2;
+    if (option <= 1 && GetExactDistSq(&m_last_environment_position) < radiusAvg*radiusAvg)
         return;
 
     m_last_environment_position.Relocate(GetPositionX(), GetPositionY(), GetPositionZ());

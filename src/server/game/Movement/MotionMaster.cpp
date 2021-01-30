@@ -362,7 +362,7 @@ void MotionMaster::MoveBackwards(Unit* target, float dist)
     point.y = pos.m_positionY + dist * sinf(angle);
     point.z = pos.m_positionZ;
 
-    if (!_owner->GetMap()->CanReachPositionAndGetCoords(_owner, point.x, point.y, point.z, true, true, false))
+    if (!_owner->GetMap()->CanReachPositionAndGetValidCoords(_owner, point.x, point.y, point.z, true, true))
     {
         return;
     }
