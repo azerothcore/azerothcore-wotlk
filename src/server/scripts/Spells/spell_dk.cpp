@@ -1331,7 +1331,6 @@ public:
                     SPELL_DK_CORPSE_EXPLOSION_TRIGGERED,
                     SPELL_DK_GHOUL_EXPLODE,
                     SPELL_DK_CORPSE_EXPLOSION_VISUAL,
-                    (uint32) spellInfo->Effects[EFFECT_1].CalcValue()
                 });
         }
 
@@ -2184,8 +2183,6 @@ public:
         {
             return ValidateSpellInfo(
                 {
-                    (uint32) spellInfo->Effects[EFFECT_1].CalcValue(),
-                    (uint32) spellInfo->Effects[EFFECT_2].CalcValue(),
                     SPELL_DK_RAISE_DEAD_USE_REAGENT,
                     SPELL_DK_MASTER_OF_GHOULS
                 });
