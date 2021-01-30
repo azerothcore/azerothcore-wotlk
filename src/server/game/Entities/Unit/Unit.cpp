@@ -3641,7 +3641,7 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
     }
 
     if (IsInWater())
-        return IsUnderWater() ? c->CanSwim() : (c->CanSwim() || c->CanFly());
+        return IsUnderWater() ? c->CanEnterWater() : (c->CanEnterWater() || c->CanFly());
     else
         return c->CanWalk() || c->CanFly() || (c->CanSwim() && IsInWater(true));
 }
@@ -3676,14 +3676,13 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
     m_is_updating_environment = true;
 
     bool changed = false;
-    Creature* c = this->ToCreature();
     Map* baseMap = const_cast<Map*>(GetBaseMap());
+    Creature* c = this->ToCreature();
     if (!c || !baseMap)
     {
         m_is_updating_environment = false;
         return;
     }
-
     bool canChangeFlying = option == 3 || GetMotionMaster()->GetCurrentMovementGeneratorType() != WAYPOINT_MOTION_TYPE;
     bool canFallGround = option == 0 && canChangeFlying && GetInstanceId() == 0 && !IsInCombat() && !GetVehicle() && !GetTransport() && !HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && !c->IsTrigger() && !c->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && GetMotionMaster()->GetCurrentMovementGeneratorType() <= RANDOM_MOTION_TYPE && !HasUnitState(UNIT_STATE_EVADE) && !IsControlledByPlayer();
     float x = GetPositionX(), y = GetPositionY(), z = GetPositionZ();
@@ -3691,13 +3690,9 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
     float ground_z = z;
     LiquidData liquidData;
     liquidData.level = INVALID_HEIGHT;
-
     ZLiquidStatus liquidStatus = baseMap->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquidData);
-
-    float minHeightInWater = GetMinHeightInWater();
-
     // IsInWater
-    bool enoughWater = (liquidData.level > INVALID_HEIGHT && liquidData.level > liquidData.depth_level && liquidData.level - liquidData.depth_level >= minHeightInWater); // also check if theres enough water
+    bool enoughWater = baseMap->HasEnoughWater(this, liquidData);
     m_last_isinwater_status = (liquidStatus & (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER)) && enoughWater;
     m_last_islittleabovewater_status = (liquidData.level > INVALID_HEIGHT && liquidData.level > liquidData.depth_level && liquidData.level <= z + 3.0f && liquidData.level > z - 1.0f);
 
@@ -12892,6 +12887,8 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
                 creature->GetFormation()->MemberAttackStart(creature, enemy);
         }
 
+        creature->RefreshSwimmingFlag();
+
         if (IsPet())
         {
             UpdateSpeed(MOVE_RUN, true);
@@ -17569,6 +17566,9 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     CombatStop();
     DeleteThreatList();
+
+    if (Creature* creature = ToCreature())
+        creature->RefreshSwimmingFlag();
 
     if (GetTypeId() == TYPEID_PLAYER)
         sScriptMgr->OnPlayerBeingCharmed(ToPlayer(), charmer, _oldFactionId, charmer->getFaction());

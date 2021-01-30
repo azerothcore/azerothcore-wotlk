@@ -652,8 +652,8 @@ void PathGenerator::CreateFilter()
             includeFlags |= NAV_GROUND;          // walk
 
         // creatures don't take environmental damage
-        if (creature->CanSwim())
-            includeFlags |= (NAV_WATER | NAV_MAGMA);                 // swim
+        if (creature->CanEnterWater())
+            includeFlags |= (NAV_WATER | NAV_MAGMA);
     }
     else // assume Player
     {

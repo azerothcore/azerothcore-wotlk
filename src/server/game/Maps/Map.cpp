@@ -2289,6 +2289,21 @@ bool Map::IsUnderWater(float x, float y, float z) const
     return getLiquidStatus(x, y, z, MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN) & LIQUID_MAP_UNDER_WATER;
 }
 
+bool Map::HasEnoughWater(WorldObject const* searcher, float x, float y, float z) const
+{
+    LiquidData liquidData;
+    liquidData.level = INVALID_HEIGHT;
+    ZLiquidStatus liquidStatus = getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquidData);
+    return (liquidStatus & (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER)) && HasEnoughWater(searcher, liquidData);
+}
+
+bool Map::HasEnoughWater(WorldObject const* searcher, LiquidData liquidData) const
+{
+    float minHeightInWater = searcher->GetMinHeightInWater();
+    return liquidData.level > INVALID_HEIGHT && liquidData.level > liquidData.depth_level && liquidData.level - liquidData.depth_level >= minHeightInWater;
+}
+
+
 char const* Map::GetMapName() const
 {
     return i_mapEntry ? i_mapEntry->name[sWorld->GetDefaultDbcLocale()] : "UNNAMEDMAP\x0";
@@ -3508,11 +3523,11 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float sta
     if (!unit)
         return isValid;
 
-    bool isWaterNext = IsInWater(destX, destY, destZ);
+    bool isWaterNext = HasEnoughWater(unit, destX, destY, destZ);
     const Creature* creature = unit->ToCreature();
-    bool cannotSwim = isWaterNext && (creature && !creature->CanSwim());
+    bool cannotEnterWater = isWaterNext && (creature && !creature->CanEnterWater());
     bool cannotWalkOrFly = !isWaterNext && !source->ToPlayer() && !unit->CanFly() && (creature && !creature->CanWalk());
-    if (cannotSwim || cannotWalkOrFly || 
+    if (cannotEnterWater || cannotWalkOrFly || 
         (failOnSlopes && !PathGenerator::IsWalkableClimb(startX, startY, startZ, destX, destY, destZ, source->GetCollisionHeight())))
     {
         return false;

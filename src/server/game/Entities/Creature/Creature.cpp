@@ -164,7 +164,8 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(),
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0),  m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
     m_DBTableGuid(0), m_equipmentId(0), m_originalEquipmentId(0), m_originalAnimTier(UNIT_BYTE1_FLAG_GROUND), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
-    m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_waypointID(0), m_path_id(0), m_formation(nullptr), _lastDamagedTime(0), m_cannotReachTarget(false), m_cannotReachTimer(0)
+    m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_waypointID(0), m_path_id(0), m_formation(nullptr), _lastDamagedTime(0), m_cannotReachTarget(false), m_cannotReachTimer(0),
+    _isMissingSwimmingFlagOutOfCombat(false)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
     m_valuesCount = UNIT_END;
@@ -2725,16 +2726,6 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
     if (!packetOnly && !Unit::SetDisableGravity(disable))
         return false;
 
-    /*if (IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
-    {
-        if (IsLevitating())
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
-        else if (IsHovering())
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
-        else
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
-    }*/
-
     if (!movespline->Initialized())
         return true;
 
@@ -2773,7 +2764,26 @@ bool Creature::CanSwim() const
     if (IsPet() || IS_PLAYER_GUID(GetOwnerGUID()))
         return true;
 
+    return false;
+}
+
+bool Creature::CanEnterWater() const
+{
+    if (CanSwim())
+        return true;
+
     return GetCreatureTemplate()->InhabitType & INHABIT_WATER;
+}
+
+void Creature::RefreshSwimmingFlag(bool recheck)
+{
+    if (!_isMissingSwimmingFlagOutOfCombat || recheck)
+        _isMissingSwimmingFlagOutOfCombat = !HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
+
+    // Check if the creature has UNIT_FLAG_SWIMMING and add it if it's missing
+    // Creatures must be able to chase a target in water if they can enter water
+    if (_isMissingSwimmingFlagOutOfCombat && CanEnterWater())
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
 }
 
 bool Creature::SetCanFly(bool enable, bool  /*packetOnly*/ /* = false */)

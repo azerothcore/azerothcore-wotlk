@@ -466,6 +466,7 @@ public:
     [[nodiscard]] bool IsGuard() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_GUARD; }
     [[nodiscard]] bool CanWalk() const { return GetCreatureTemplate()->InhabitType & INHABIT_GROUND; }
     [[nodiscard]] bool CanSwim() const override;
+    [[nodiscard]] bool CanEnterWater() const override;
     [[nodiscard]] bool CanFly()  const override;
     [[nodiscard]] bool CanHover() const { return m_originalAnimTier & UNIT_BYTE1_FLAG_HOVER || IsHovering(); }
 
@@ -747,6 +748,12 @@ public:
     uint32 m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
     uint32 m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
 
+    bool HasSwimmingFlagOutOfCombat() const
+    {
+        return !_isMissingSwimmingFlagOutOfCombat;
+    }
+    void RefreshSwimmingFlag(bool recheck = false);
+
 protected:
     bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
     bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
@@ -819,6 +826,8 @@ private:
     uint32 m_cannotReachTimer;
 
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
+
+    bool _isMissingSwimmingFlagOutOfCombat;
 };
 
 class AssistDelayEvent : public BasicEvent

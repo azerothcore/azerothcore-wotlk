@@ -71,15 +71,11 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         // point underwater
         else if (ground < levelZ)
         {
-            if (!creature->CanSwim())
+            if (!creature->CanEnterWater())
             {
-                if (ground < levelZ - 1.5f)
-                {
-                    _validPointsVector[_currentPoint].erase(randomIter);
-                    _preComputedPaths.erase(pathIdx);
-                    return;
-                }
-                levelZ = ground;
+                _validPointsVector[_currentPoint].erase(randomIter);
+                _preComputedPaths.erase(pathIdx);
+                return;
             }
             else
             {
@@ -98,6 +94,8 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
                 return;
             }
         }
+
+        creature->UpdateAllowedPositionZ(x, y, newZ);
 
         if (newZ > INVALID_HEIGHT)
         {

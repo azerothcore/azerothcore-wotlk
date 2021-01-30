@@ -373,6 +373,8 @@ public:
     [[nodiscard]] float GetWaterLevel(float x, float y) const;
     bool IsInWater(float x, float y, float z, LiquidData* data = nullptr) const;
     [[nodiscard]] bool IsUnderWater(float x, float y, float z) const;
+    [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, float x, float y, float z) const;
+    [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, LiquidData liquidData) const;
 
     void MoveAllCreaturesInMoveList();
     void MoveAllGameObjectsInMoveList();

@@ -297,7 +297,7 @@ void FleeingMovementGenerator<Creature>::_Init(Creature* owner)
         return;
 
     //owner->SetTargetGuid(ObjectGuid());
-    is_water_ok = owner->CanSwim();
+    is_water_ok = owner->CanEnterWater();
     is_land_ok  = owner->CanWalk();
 }
 

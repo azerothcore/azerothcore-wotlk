@@ -27,6 +27,9 @@ void HomeMovementGenerator<Creature>::DoFinalize(Creature* owner)
         owner->AI()->JustReachedHome();
     }
 
+    if (!owner->HasSwimmingFlagOutOfCombat())
+        owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
+
     owner->UpdateEnvironmentIfNeeded(2);
 }
 
