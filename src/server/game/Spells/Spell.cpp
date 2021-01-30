@@ -6929,6 +6929,7 @@ SpellCastResult Spell::CheckItems()
                             }
                         }
                     }
+                    break;
                 }
             case SPELL_EFFECT_CREATE_RANDOM_ITEM:
             {
