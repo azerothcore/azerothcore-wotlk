@@ -6929,8 +6929,9 @@ SpellCastResult Spell::CheckItems()
                             }
                         }
                     }
-                    break;
                 }
+                break;
+            }
             case SPELL_EFFECT_CREATE_RANDOM_ITEM:
             {
                 if (player->GetFreeInventorySpace() == 0)
