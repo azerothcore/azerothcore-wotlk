@@ -112,7 +112,7 @@ namespace AccountMgr
         stmt->setUInt32(0, accountId);
         trans->Append(stmt);
 
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_MUTEDEL);
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_MUTED);
         stmt->setUInt32(0, accountId);
         trans->Append(stmt);
 
