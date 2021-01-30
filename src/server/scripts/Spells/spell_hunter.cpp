@@ -695,11 +695,9 @@ public:
     {
         PrepareSpellScript(spell_hun_masters_call_SpellScript);
 
-        bool Validate(SpellInfo const* spellInfo) override
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_MASTERS_CALL_TRIGGERED) || !sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].CalcValue()) || !sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_1].CalcValue()))
-                return false;
-            return true;
+            return ValidateSpellInfo(SPELL_HUNTER_MASTERS_CALL_TRIGGERED);
         }
 
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
