@@ -686,7 +686,7 @@ public:
     {
         PrepareSpellScript(spell_hun_masters_call_SpellScript);
 
-        bool Validate(SpellInfo const* spellInfo) override
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
             return ValidateSpellInfo({ SPELL_HUNTER_MASTERS_CALL_TRIGGERED });
         }
