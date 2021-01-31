@@ -550,3 +550,5 @@ DELETE FROM `creature_loot_template` WHERE `entry` IN (
 21126, -- Coilfang Scale-Healer - Jaggal Clam Meat
 21127 -- Coilfang Tempest - Jaggal Clam Meat
 ) AND `Item` IN (24477,5504,5503,15924) AND `Reference` = 0;
+
+UPDATE `creature_template` SET `lootid` = 0 WHERE `entry` IN (3388,240,246);
