@@ -43,10 +43,8 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (!owner || !owner->IsAlive())
         return false;
 
-    bool resetMoveState = owner->HasUnitState(UNIT_STATE_NOT_MOVE) || _lostTarget(owner);  //prevent crash after creature killed pet
-
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
-    if (resetMoveState || (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsMovementPreventedByCasting()))
+    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsMovementPreventedByCasting()))
     {
         i_path = nullptr;
         owner->StopMoving();
@@ -62,10 +60,10 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     Creature* cOwner = owner->ToCreature();
 
     bool forceDest =
-        (cOwner && (cOwner->isWorldBoss() || cOwner->IsDungeonBoss())) || // force for all bosses, even not in instances
+        //(cOwner && (cOwner->isWorldBoss() || cOwner->IsDungeonBoss())) || // force for all bosses, even not in instances
         (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) || // for .npc follow
         (owner->CanFly())
-    ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
+        ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
 
     Unit* target = i_target.getTarget();
@@ -116,13 +114,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     _lastTargetPosition = i_target->GetPosition();
 
-
-    if (!owner->HasUnitState(UNIT_STATE_FOLLOW) && !owner->HasUnitState(UNIT_STATE_CHASE))
-        return true;
-
-    bool positionOkay = PositionOkay(owner, target, maxRange, angle);
-
-    if (positionOkay && !hasMoveState)
+    if (PositionOkay(owner, target, maxRange, angle) && !hasMoveState)
         return true;
 
     bool moveToward = !owner->IsInDist(target, maxRange);
@@ -200,14 +192,14 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 template<>
 void ChaseMovementGenerator<Player>::DoInitialize(Player* owner)
 {
-     _lastTargetPosition.reset();
+    _lastTargetPosition.reset();
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
 
 template<>
 void ChaseMovementGenerator<Creature>::DoInitialize(Creature* owner)
 {
-     _lastTargetPosition.reset();
+    _lastTargetPosition.reset();
     owner->SetWalk(false);
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
@@ -217,9 +209,7 @@ void ChaseMovementGenerator<T>::DoFinalize(T* owner)
 {
     owner->ClearUnitState(UNIT_STATE_CHASE | UNIT_STATE_CHASE_MOVE);
     if (Creature* cOwner = owner->ToCreature())
-    {
         cOwner->SetCannotReachTarget(false);
-    }
 }
 
 template<class T>
@@ -244,7 +234,7 @@ void ChaseMovementGenerator<T>::MovementInform(T* owner)
 template<class T>
 bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target, float range, std::optional<ChaseAngle> angle)
 {
-   if (owner->GetExactDistSq(target) > G3D::square(owner->GetCombatReach() + target->GetCombatReach() + range))
+    if (owner->GetExactDistSq(target) > G3D::square(owner->GetCombatReach() + target->GetCombatReach() + range))
         return false;
 
     return !owner->IsPet() || !angle || angle->IsAngleOkay(target->GetRelativeAngle(owner));
@@ -390,7 +380,7 @@ void FollowMovementGenerator<Creature>::_updateSpeed(Creature* owner)
 template<class T>
 void FollowMovementGenerator<T>::DoInitialize(T* owner)
 {
-     _lastTargetPosition.reset();
+    _lastTargetPosition.reset();
     owner->AddUnitState(UNIT_STATE_FOLLOW);
     _updateSpeed(owner);
 }

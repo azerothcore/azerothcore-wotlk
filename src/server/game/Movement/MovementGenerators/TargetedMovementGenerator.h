@@ -46,7 +46,7 @@ public:
     Unit* GetTarget() const { return i_target.getTarget(); }
 
     bool EnableWalking() const { return false;}
-    bool _lostTarget(T* u) const { return u->GetVictim() != this->GetTarget(); }
+    bool HasLostTarget(Unit* unit) const { return unit->GetVictim() != this->GetTarget(); }
 
 private:
     PathGenerator* i_path;
