@@ -11,7 +11,7 @@ CREATE TABLE `character_talent`
 (
   `guid` int(10) unsigned NOT NULL,
   `spell` mediumint(8) unsigned NOT NULL,
-  `specMask` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `specMask` tinyint(3) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

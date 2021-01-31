@@ -9,11 +9,11 @@ DROP TABLE IF EXISTS `quest_request_items`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `quest_request_items` 
 (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `EmoteOnComplete` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `EmoteOnIncomplete` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `CompletionText` text,
-  `VerifiedBuild` smallint(5) NOT NULL DEFAULT '0',
+  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `EmoteOnComplete` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `EmoteOnIncomplete` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `CompletionText` text DEFAULT NULL,
+  `VerifiedBuild` smallint(5) NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1240,7 +1240,7 @@ INSERT INTO `quest_request_items` VALUES
 (1389,6,6,'Do you have the crystals?',12340),
 (1390,1,0,'NULL',12340),
 (1391,20,0,'Please have mercy on me! I have information that goes beyond alliance boundaries. While I am no sympathizer of the Horde, there is political treachery going on that must be revealed!',12340),
-(1392,0,0,'Greetings.  And welcome to the Harborage.',12340),
+(1392,0,0,'Greetings. And welcome to the Harborage.',12340),
 (1393,1,0,NULL,12340),
 (1394,1,0,NULL,12340),
 (1395,3,3,'Hello! Don\'t mind all the commotion, it\'s just business as usual at Nethergarde Keep.$B$BYou have something for me?',12340),
@@ -7680,6 +7680,7 @@ INSERT INTO `quest_request_items` VALUES
 (24480,0,0,'What happened inside the Halls of Reflection?',12340),
 (24500,0,0,'We need to get this information to the Alliance! It may well be the key to Arthas\' defeat.',12340),
 (24522,0,0,'What brings you here?',12340),
+(24535,0,0,'Did you visit the ground where Thalorien fell defending the Sunwell?',12340),
 (24536,0,0,'You analyze that reek yet, kid?',12340),
 (24541,0,0,'Did they toss ya a crate to deliver?',12340),
 (24545,0,0,'As you draw near, the forge\'s flame seems to burn even more ravenously...',12340),
