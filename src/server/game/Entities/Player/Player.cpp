@@ -19656,7 +19656,7 @@ void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const Pro
     }
 }
 
-void Player::PrettyPrintRequirementsItemsList(const std::vector<const ProgressionRequirement*>& missingItems) const 
+void Player::PrettyPrintRequirementsItemsList(const std::vector<const ProgressionRequirement*>& missingItems) const
 {
     LocaleConstant loc_idx;
     for (const ProgressionRequirement* missingReq : missingItems)

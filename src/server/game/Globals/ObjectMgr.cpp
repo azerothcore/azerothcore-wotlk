@@ -6154,7 +6154,7 @@ void ObjectMgr::LoadAccessRequirements()
         ar->levelMax     = fields[4].GetUInt8();
         ar->reqItemLevel = fields[5].GetUInt16();
 
-        //                                                                              0                 1               2                 3        4         6  
+        //                                                                              0                 1               2                 3        4         6
         QueryResult progression_requirements_results = WorldDatabase.PQuery("SELECT requirement_type, requirement_id, requirement_hint, faction, priority, leader_only FROM dungeon_access_requirements where dungeon_access_id = %u", dungeon_access_id);
         if (progression_requirements_results)
         {
