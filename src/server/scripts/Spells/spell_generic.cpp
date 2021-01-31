@@ -5043,6 +5043,39 @@ public:
     }
 };
 
+// Used for some spells cast by vehicles or charmed creatures that do not send a cooldown event on their own
+class spell_gen_charmed_unit_spell_cooldown : public SpellScriptLoader
+{
+public:
+    spell_gen_charmed_unit_spell_cooldown() : SpellScriptLoader("spell_gen_charmed_unit_spell_cooldown") { }
+
+    class spell_gen_charmed_unit_spell_cooldown_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_charmed_unit_spell_cooldown_SpellScript);
+
+        void HandleCast()
+        {
+            Unit* caster = GetCaster();
+            if (Player* owner = caster->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                WorldPacket data;
+                caster->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, GetSpellInfo()->Id, GetSpellInfo()->RecoveryTime);
+                owner->SendDirectMessage(&data);
+            }
+        }
+
+        void Register() override
+        {
+            OnCast += SpellCastFn(spell_gen_charmed_unit_spell_cooldown_SpellScript::HandleCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_gen_charmed_unit_spell_cooldown_SpellScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     // ours:
@@ -5171,4 +5204,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_whisper_gulch_yogg_saron_whisper();
     new spell_gen_eject_all_passengers();
     new spell_gen_eject_passenger();
+    new spell_gen_charmed_unit_spell_cooldown();
 }
