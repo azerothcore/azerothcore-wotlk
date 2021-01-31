@@ -19588,7 +19588,7 @@ void Player::SendSavedInstances()
 
 void Player::PrettyPrintRequirementsQuestList(const std::vector<const ProgressionRequirement*>& missingQuests) const
 {
-    LocaleConstant loc_idx;
+    LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
     for (const ProgressionRequirement* missingReq : missingQuests)
     {
         Quest const* questTemplate = sObjectMgr->GetQuestTemplate(missingReq->id);
@@ -19625,7 +19625,7 @@ void Player::PrettyPrintRequirementsQuestList(const std::vector<const Progressio
 
 void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const ProgressionRequirement*>& missingAchievements) const
 {
-    LocaleConstant loc_idx;
+    LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
     for (const ProgressionRequirement* missingReq : missingAchievements)
     {
         AchievementEntry const* achievementEntry = sAchievementStore.LookupEntry(missingReq->id);
@@ -19658,7 +19658,7 @@ void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const Pro
 
 void Player::PrettyPrintRequirementsItemsList(const std::vector<const ProgressionRequirement*>& missingItems) const
 {
-    LocaleConstant loc_idx;
+    LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
     for (const ProgressionRequirement* missingReq : missingItems)
     {
         const ItemTemplate* itemTemplate = sObjectMgr->GetItemTemplate(missingReq->id);
@@ -19806,7 +19806,6 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
 
         Difficulty target_difficulty = GetDifficulty(mapEntry->IsRaid());
         MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(target_map, target_difficulty);
-        LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
         if (LevelMin || LevelMax || minRequiredIlvl
             || missingPlayerItems.size() || missingPlayerQuests.size() || missingPlayerAchievements.size()
             || missingLeaderItems.size() || missingLeaderQuests.size() || missingLeaderAchievements.size())
