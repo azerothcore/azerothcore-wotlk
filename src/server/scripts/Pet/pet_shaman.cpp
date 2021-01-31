@@ -46,9 +46,7 @@ public:
             _events.ScheduleEvent(EVENT_SHAMAN_ANGEREDEARTH, 0);
         }
 
-        void InitializeAI() override
-        {
-        }
+        void InitializeAI() override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -96,9 +94,7 @@ public:
     {
         npc_pet_shaman_fire_elementalAI(Creature* creature) : ScriptedAI(creature), _initAttack(true) { }
 
-        void InitializeAI() override
-        {
-        }
+        void InitializeAI() override { }
 
         void EnterCombat(Unit*) override
         {
