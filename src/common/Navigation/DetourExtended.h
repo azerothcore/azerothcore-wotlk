@@ -9,9 +9,7 @@
 
 class dtQueryFilterExt: public dtQueryFilter
 {
-
 public:
-
     float getCost(const float* pa, const float* pb,
         const dtPolyRef prevRef, const dtMeshTile* prevTile, const dtPoly* prevPoly,
         const dtPolyRef curRef, const dtMeshTile* curTile, const dtPoly* curPoly,
