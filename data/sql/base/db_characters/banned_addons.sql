@@ -12,7 +12,7 @@ CREATE TABLE `banned_addons`
   `Id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Name` varchar(255) NOT NULL,
   `Version` varchar(255) NOT NULL DEFAULT '',
-  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `Timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`Id`),
   UNIQUE KEY `idx_name_ver` (`Name`,`Version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -9,23 +9,78 @@ DROP TABLE IF EXISTS `achievement_dbc`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `achievement_dbc` 
 (
-  `ID` int(10) unsigned NOT NULL,
-  `requiredFaction` int(11) NOT NULL DEFAULT '-1',
-  `mapID` int(11) NOT NULL DEFAULT '-1',
-  `points` int(10) unsigned NOT NULL DEFAULT '0',
-  `flags` int(10) unsigned NOT NULL DEFAULT '0',
-  `count` int(10) unsigned NOT NULL DEFAULT '0',
-  `refAchievement` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `ID` int(11) NOT NULL DEFAULT 0,
+  `Faction` int(11) NOT NULL DEFAULT 0,
+  `Instance_Id` int(11) NOT NULL DEFAULT 0,
+  `Supercedes` int(11) NOT NULL DEFAULT 0,
+  `Title_Lang_enUS` varchar(100) DEFAULT NULL,
+  `Title_Lang_enGB` varchar(100) DEFAULT NULL,
+  `Title_Lang_koKR` varchar(100) DEFAULT NULL,
+  `Title_Lang_frFR` varchar(100) DEFAULT NULL,
+  `Title_Lang_deDE` varchar(100) DEFAULT NULL,
+  `Title_Lang_enCN` varchar(100) DEFAULT NULL,
+  `Title_Lang_zhCN` varchar(100) DEFAULT NULL,
+  `Title_Lang_enTW` varchar(100) DEFAULT NULL,
+  `Title_Lang_zhTW` varchar(100) DEFAULT NULL,
+  `Title_Lang_esES` varchar(100) DEFAULT NULL,
+  `Title_Lang_esMX` varchar(100) DEFAULT NULL,
+  `Title_Lang_ruRU` varchar(100) DEFAULT NULL,
+  `Title_Lang_ptPT` varchar(100) DEFAULT NULL,
+  `Title_Lang_ptBR` varchar(100) DEFAULT NULL,
+  `Title_Lang_itIT` varchar(100) DEFAULT NULL,
+  `Title_Lang_Unk` varchar(100) DEFAULT NULL,
+  `Title_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Description_Lang_enUS` varchar(200) DEFAULT NULL,
+  `Description_Lang_enGB` varchar(200) DEFAULT NULL,
+  `Description_Lang_koKR` varchar(200) DEFAULT NULL,
+  `Description_Lang_frFR` varchar(200) DEFAULT NULL,
+  `Description_Lang_deDE` varchar(200) DEFAULT NULL,
+  `Description_Lang_enCN` varchar(200) DEFAULT NULL,
+  `Description_Lang_zhCN` varchar(200) DEFAULT NULL,
+  `Description_Lang_enTW` varchar(200) DEFAULT NULL,
+  `Description_Lang_zhTW` varchar(200) DEFAULT NULL,
+  `Description_Lang_esES` varchar(200) DEFAULT NULL,
+  `Description_Lang_esMX` varchar(200) DEFAULT NULL,
+  `Description_Lang_ruRU` varchar(200) DEFAULT NULL,
+  `Description_Lang_ptPT` varchar(200) DEFAULT NULL,
+  `Description_Lang_ptBR` varchar(200) DEFAULT NULL,
+  `Description_Lang_itIT` varchar(200) DEFAULT NULL,
+  `Description_Lang_Unk` varchar(100) DEFAULT NULL,
+  `Description_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Category` int(11) NOT NULL DEFAULT 0,
+  `Points` int(11) NOT NULL DEFAULT 0,
+  `Ui_Order` int(11) NOT NULL DEFAULT 0,
+  `Flags` int(11) NOT NULL DEFAULT 0,
+  `IconID` int(11) NOT NULL DEFAULT 0,
+  `Reward_Lang_enUS` varchar(100) DEFAULT NULL,
+  `Reward_Lang_enGB` varchar(100) DEFAULT NULL,
+  `Reward_Lang_koKR` varchar(100) DEFAULT NULL,
+  `Reward_Lang_frFR` varchar(100) DEFAULT NULL,
+  `Reward_Lang_deDE` varchar(100) DEFAULT NULL,
+  `Reward_Lang_enCN` varchar(100) DEFAULT NULL,
+  `Reward_Lang_zhCN` varchar(100) DEFAULT NULL,
+  `Reward_Lang_enTW` varchar(100) DEFAULT NULL,
+  `Reward_Lang_zhTW` varchar(100) DEFAULT NULL,
+  `Reward_Lang_esES` varchar(100) DEFAULT NULL,
+  `Reward_Lang_esMX` varchar(100) DEFAULT NULL,
+  `Reward_Lang_ruRU` varchar(100) DEFAULT NULL,
+  `Reward_Lang_ptPT` varchar(100) DEFAULT NULL,
+  `Reward_Lang_ptBR` varchar(100) DEFAULT NULL,
+  `Reward_Lang_itIT` varchar(100) DEFAULT NULL,
+  `Reward_Lang_Unk` varchar(100) DEFAULT NULL,
+  `Reward_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Minimum_Criteria` int(11) NOT NULL DEFAULT 0,
+  `Shares_Criteria` int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`ID`) USING BTREE
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `achievement_dbc` WRITE;
 /*!40000 ALTER TABLE `achievement_dbc` DISABLE KEYS */;
 INSERT INTO `achievement_dbc` VALUES 
-(3696,-1,-1,0,2,1,0),
-(4788,-1,-1,0,2,1,0),
-(4789,-1,-1,0,2,1,0);
+(3696,-1,-1,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,2,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,1,0),
+(4788,-1,-1,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,2,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,1,0),
+(4789,-1,-1,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,0,0,0,2,0,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,1,0);
 /*!40000 ALTER TABLE `achievement_dbc` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
