@@ -3509,7 +3509,7 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float sta
     {
         return false;
     }
-        
+
     destX = tempX, destY = tempY, destZ = tempZ;
 
     const Unit* unit = source->ToUnit();

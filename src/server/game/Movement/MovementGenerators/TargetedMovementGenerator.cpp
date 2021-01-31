@@ -52,7 +52,10 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         owner->StopMoving();
         _lastTargetPosition.reset();
         if (Creature* cOwner = owner->ToCreature())
+        {
             cOwner->SetCannotReachTarget(false);
+        }
+
         return true;
     }
 
@@ -84,7 +87,10 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             i_recalculateTravel = false;
             i_path = nullptr;
             if (Creature* cOwner = owner->ToCreature())
+            {
                 cOwner->SetCannotReachTarget(false);
+            }
+
             owner->StopMoving();
             owner->SetInFront(target);
             MovementInform(owner);
@@ -210,11 +216,9 @@ template<class T>
 void ChaseMovementGenerator<T>::DoFinalize(T* owner)
 {
     owner->ClearUnitState(UNIT_STATE_CHASE | UNIT_STATE_CHASE_MOVE);
-
-    if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE))
+    if (Creature* cOwner = owner->ToCreature())
     {
-        if (Creature* cOwner = owner->ToCreature())
-            cOwner->SetCannotReachTarget(false);
+        cOwner->SetCannotReachTarget(false);
     }
 }
 

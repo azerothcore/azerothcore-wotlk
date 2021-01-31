@@ -175,7 +175,7 @@ enum UnitBytes1_Flags
     UNIT_BYTE1_FLAG_GROUND          = 0x00,
     UNIT_BYTE1_FLAG_ALWAYS_STAND    = 0x01,
     UNIT_BYTE1_FLAG_HOVER           = 0x02,
-    UNIT_BYTE1_FLAG_FLY             = 0x04,
+    UNIT_BYTE1_FLAG_FLY             = 0x03,
     UNIT_BYTE1_FLAG_SUBMERGED       = 0x04,
     UNIT_BYTE1_FLAG_ALL             = 0xFF
 };
