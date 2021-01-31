@@ -20,7 +20,7 @@ CREATE TABLE `dungeon_access_requirements` (
   `requirement_hint` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
   `faction` tinyint unsigned NOT NULL DEFAULT 2 COMMENT '0 = Alliance, 1 = Horde, 2 = Both factions',
   `priority` tinyint unsigned NULL COMMENT 'Priority order for the requirement, sorted by type. 0 is the highest priority',
-  `leader_only` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'true = will pass the requirement met if the leader of the party meets it, false = only passes the requirement if the player meets it',
+  `leader_only` TINYINT(1) NOT NULL DEFAULT FALSE COMMENT 'true = will pass the requirement met if the leader of the party meets it, false = only passes the requirement if the player meets it',
   `comment` varchar(255) COLLATE 'utf8_general_ci' NULL,
   PRIMARY KEY (`dungeon_access_id`, `requirement_type`, `requirement_id`)
 ) COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid' ENGINE='MyISAM' COLLATE 'utf8_general_ci';
