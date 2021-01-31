@@ -280,9 +280,7 @@ bool RandomMovementGenerator<Creature>::DoUpdate(Creature* creature, const uint3
     else
     {
         if (creature->IsStopped())
-        {
             _nextMoveTime.Reset(sWorld->getIntConfig(CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER) * IN_MILLISECONDS);
-        }
     }
 
     if (creature->movespline->Finalized())
