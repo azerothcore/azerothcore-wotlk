@@ -43,7 +43,6 @@ void ChannelMgr::LoadChannels()
     if (!result)
     {
         sLog->outString(">> Loaded 0 channels for %s", _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde");
-        sLog->outString();
         return;
     }
 
@@ -136,8 +135,8 @@ void ChannelMgr::LoadChannelRights()
     QueryResult result = CharacterDatabase.Query("SELECT name, flags, speakdelay, joinmessage, delaymessage, moderators FROM channels_rights");
     if (!result)
     {
-        sLog->outString();
         sLog->outString(">>  Loaded 0 Channel Rights!");
+        sLog->outString();
         return;
     }
 

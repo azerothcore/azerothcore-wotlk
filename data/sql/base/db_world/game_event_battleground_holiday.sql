@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `game_event_battleground_holiday`;
 CREATE TABLE `game_event_battleground_holiday` 
 (
   `eventEntry` tinyint(3) unsigned NOT NULL COMMENT 'Entry of the game event',
-  `bgflag` int(10) unsigned NOT NULL DEFAULT '0',
+  `bgflag` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`eventEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
