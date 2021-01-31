@@ -331,29 +331,27 @@ public:
         return true;
     }
 
-    static bool HandleDevCommand(ChatHandler* handler, char const* args)
+    static bool HandleDevCommand(ChatHandler* handler, char const* enable)
     {
-        if (!*args)
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (!*enable)
         {
-            if (handler->GetSession()->GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER))
-                handler->GetSession()->SendNotification(LANG_DEV_ON);
-            else
-                handler->GetSession()->SendNotification(LANG_DEV_OFF);
+            handler->GetSession()->SendNotification(player->IsDeveloper() ? LANG_DEV_ON : LANG_DEV_OFF);
             return true;
         }
 
-        std::string argstr = (char*)args;
+        std::string enablestr = (char*)enable;
 
-        if (argstr == "on")
+        if (enablestr == "on")
         {
-            handler->GetSession()->GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER);
+            player->SetDeveloper(true);
             handler->GetSession()->SendNotification(LANG_DEV_ON);
             return true;
         }
-
-        if (argstr == "off")
+        else if (enablestr == "off")
         {
-            handler->GetSession()->GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER);
+            player->SetDeveloper(false);
             handler->GetSession()->SendNotification(LANG_DEV_OFF);
             return true;
         }
