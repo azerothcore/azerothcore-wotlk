@@ -3503,7 +3503,6 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float &de
  **/
 bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
 {
-    bool isValid = true;
     float tempX=destX, tempY=destY, tempZ=destZ;
     if (!CheckCollisionAndGetValidCoords(source, startX, startY, startZ, destX, destY, destZ, failOnCollision))
     {
