@@ -3913,7 +3913,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Kindred Spirits, damage aura
     ApplySpellFix({ 57458 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_UNK21;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_DONT_REMOVE_IN_ARENA;
     });
 
     // Chimera Shot - Serpent trigger
