@@ -48,7 +48,6 @@ public:
 
         void InitializeAI() override
         {
-            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
         }
 
         void UpdateAI(uint32 diff) override
@@ -99,7 +98,6 @@ public:
 
         void InitializeAI() override
         {
-            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
         }
 
         void EnterCombat(Unit*) override
