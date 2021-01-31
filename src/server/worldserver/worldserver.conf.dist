@@ -2041,6 +2041,14 @@ Channel.RestrictedLfg = 1
 
 Channel.SilentlyGMJoin = 0
 
+#    Channel.ModerationGMLevel
+#        Min GM account security level required for executing moderator in-game commands in the channels
+#        This also bypasses password prompts on joining channels which require password
+#                 0 (in-game channel moderator privileges only)
+#        Default: 1 (enabled for moderators and above)
+
+Channel.ModerationGMLevel = 1
+
 #
 #    ChatLevelReq.Channel
 #        Description: Level requirement for characters to be able to write in chat channels.
@@ -3302,6 +3310,14 @@ NoResetTalentsCost = 0
 #                     1 - (Enabled)
 
 Guild.AllowMultipleGuildMaster = 0
+
+#
+#     Guild.BankInitialTabs
+#        Description: Changes the amounts of available tabs of the guild bank on guild creation
+#        Default:     0   (no tabs given for free)
+#                     1-6 (amount of tabs of the guild bank at guild creation)
+
+Guild.BankInitialTabs = 0
 
 #
 #     Guild.BankTabCost0-5
