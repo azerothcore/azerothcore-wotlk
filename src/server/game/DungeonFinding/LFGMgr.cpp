@@ -193,6 +193,7 @@ namespace lfg
         if (!result)
         {
             sLog->outError(">> Loaded 0 lfg entrance positions. DB table `lfg_dungeon_template` is empty!");
+            sLog->outString();
             return;
         }
 
@@ -219,6 +220,7 @@ namespace lfg
         } while (result->NextRow());
 
         sLog->outString(">> Loaded %u lfg entrance positions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        sLog->outString();
 
         // Fill all other teleport coords from areatriggers
         for (LFGDungeonContainer::iterator itr = LfgDungeonStore.begin(); itr != LfgDungeonStore.end(); ++itr)

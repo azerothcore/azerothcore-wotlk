@@ -1,0 +1,29 @@
+-- DB update 2020_05_08_00 -> 2020_05_09_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2020_05_08_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2020_05_08_00 2020_05_09_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1585523678966764200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1585523678966764200');
+
+UPDATE `creature_text` SET `Text`="You will have your challenge, Fordring.", `Sound`=16321, `BroadcastTextId`=35747, `comment`="The Lich King SAY CHALLENGE" WHERE `CreatureID`=35877 AND `GroupID`=0;
+
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

@@ -1109,6 +1109,9 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 if (!player)
                     return false;
 
+                if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE))
+                    return false;
+
                 Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
                 if (!Bf || player->GetTeamId() != Bf->GetDefenderTeam() || Bf->IsWarTime())
                     return false;
@@ -1767,6 +1770,7 @@ void SpellMgr::LoadSpellProcEvents()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u extra spell proc event conditions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void SpellMgr::LoadSpellProcs()
@@ -5495,6 +5499,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectTriggerSpell[0] = 68766;
     });
 
+    // Killing Spree (Off hand damage)
+    ApplySpellFix({ 57842 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->rangeIndex = 2; // Melee Range
+    });
+
     // Trial of the Crusader, Jaraxxus Intro spell
     ApplySpellFix({ 67888 }, [](SpellEntry* spellInfo)
     {
@@ -6756,10 +6766,58 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectBasePoints[0] = 1; // corrects seat id (points - 1 = seatId)
     });
 
-    // The Iron Colossus
-    ApplySpellFix({ 56513, 56524 }, [](SpellEntry* spellInfo)
+    // Jormungar Strike
+    ApplySpellFix({ 56513 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->RecoveryTime = (spellInfo->Id == 56524 ? 6000 : 2000);
+        spellInfo->RecoveryTime = 2000;
+    });
+
+    ApplySpellFix({
+    37851, // Tag Greater Felfire Diemetradon
+    37918  // Arcano-pince
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 3000;
+    });
+
+    ApplySpellFix({
+        54997, // Cast Net (tooltip says 10s but sniffs say 6s)
+        56524  // Acid Breath
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 6000;
+    });
+
+    ApplySpellFix({
+        47911, // EMP
+        48620, // Wing Buffet
+        51752  // Stampy's Stompy-Stomp
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 10000;
+    });
+
+    ApplySpellFix({
+        37727, // Touch of Darkness
+        54996  // Ice Slick (tooltip says 20s but sniffs say 12s)
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 12000;
+    });
+
+    // Signal Helmet to Attack
+    ApplySpellFix({ 51748 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 15000;
+    });
+
+    ApplySpellFix({
+        51756, // Charge
+        37919, //Arcano-dismantle
+        37917  //Arcano-Cloak
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 20000;
     });
 
     // Kaw the Mammoth Destroyer

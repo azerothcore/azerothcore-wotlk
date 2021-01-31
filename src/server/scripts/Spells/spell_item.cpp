@@ -258,43 +258,82 @@ public:
     }
 };
 
-enum mithrilSpurs
+enum MountModSpells
 {
-    SPELL_MITHRIL_SPEED         = 59916,
+    SPELL_CARROT_ON_A_STICK_EFFECT = 48402,
+    SPELL_RIDING_CROP_EFFECT = 48383,
+    SPELL_MITHRIL_SPURS_EFFECT = 59916,
+    SPELL_MITHRIL_SPURS = 7215,
+    SPELL_MOUNT_SPEED_CARROT = 48777,
+    SPELL_MOUNT_SPEED_RIDING = 48776
 };
 
-class spell_item_mithril_spurs : public SpellScriptLoader
+class spell_item_with_mount_speed : public SpellScriptLoader
 {
 public:
-    spell_item_mithril_spurs() : SpellScriptLoader("spell_item_mithril_spurs") { }
+    spell_item_with_mount_speed() : SpellScriptLoader("spell_item_with_mount_speed") { }
 
-    class spell_item_mithril_spurs_AuraScript : public AuraScript
+    class spell_item_with_mount_speed_AuraScript : public AuraScript
     {
-        PrepareAuraScript(spell_item_mithril_spurs_AuraScript);
+        PrepareAuraScript(spell_item_with_mount_speed_AuraScript);
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            if (!sSpellMgr->GetSpellInfo(SPELL_MOUNT_SPEED_CARROT)
+                || !sSpellMgr->GetSpellInfo(SPELL_MITHRIL_SPURS)
+                || !sSpellMgr->GetSpellInfo(SPELL_MOUNT_SPEED_RIDING))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        uint16 getMountSpellId()
+        {
+            switch (m_scriptSpellId)
+            {
+                case SPELL_MOUNT_SPEED_CARROT:
+                    return SPELL_CARROT_ON_A_STICK_EFFECT;
+                case SPELL_MITHRIL_SPURS:
+                    return SPELL_MITHRIL_SPURS_EFFECT;
+                case SPELL_MOUNT_SPEED_RIDING:
+                    return SPELL_RIDING_CROP_EFFECT;
+                default:
+                    return 0;
+            }
+        }
+
+        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
             if (target->getLevel() <= 70)
-                target->AddAura(SPELL_MITHRIL_SPEED, target);
+            {
+                if (uint16 spellId = getMountSpellId())
+                {
+                    target->CastSpell(target, spellId, aurEff);
+                }
+            }
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             Unit* target = GetTarget();
-            target->RemoveAurasDueToSpell(SPELL_MITHRIL_SPEED);
+            if (uint16 spellId = getMountSpellId())
+            {
+                target->RemoveAurasDueToSpell(spellId);
+            }
         }
 
         void Register() override
         {
-            OnEffectApply += AuraEffectApplyFn(spell_item_mithril_spurs_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_item_mithril_spurs_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            OnEffectApply += AuraEffectApplyFn(spell_item_with_mount_speed_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_item_with_mount_speed_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
     AuraScript* GetAuraScript() const override
     {
-        return new spell_item_mithril_spurs_AuraScript();
+        return new spell_item_with_mount_speed_AuraScript();
     }
 };
 
@@ -709,42 +748,6 @@ public:
     AuraScript* GetAuraScript() const override
     {
         return new spell_item_skull_of_impeding_doom_AuraScript();
-    }
-};
-
-class spell_item_carrot_on_a_stick : public SpellScriptLoader
-{
-public:
-    spell_item_carrot_on_a_stick() : SpellScriptLoader("spell_item_carrot_on_a_stick") { }
-
-    class spell_item_carrot_on_a_stick_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_item_carrot_on_a_stick_AuraScript);
-
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            PreventDefaultAction();
-            if (GetTarget()->getLevel() > 70)
-                return;
-            GetTarget()->CastSpell(GetTarget(), 48402, true);
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            PreventDefaultAction();
-            GetTarget()->RemoveAurasDueToSpell(48402);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_item_carrot_on_a_stick_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_item_carrot_on_a_stick_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_item_carrot_on_a_stick_AuraScript();
     }
 };
 
@@ -4219,7 +4222,7 @@ void AddSC_item_spell_scripts()
     new spell_item_runescroll_of_fortitude();
     new spell_item_branns_communicator();
     new spell_item_goblin_gumbo_kettle();
-    new spell_item_mithril_spurs();
+    new spell_item_with_mount_speed();
     new spell_item_magic_dust();
     new spell_item_toy_train_set();
     new spell_item_rocket_chicken();
@@ -4231,7 +4234,6 @@ void AddSC_item_spell_scripts()
     new spell_item_essence_of_life();
     new spell_item_crazy_alchemists_potion();
     new spell_item_skull_of_impeding_doom();
-    new spell_item_carrot_on_a_stick();
     new spell_item_feast();
     new spell_item_gnomish_universal_remote();
     new spell_item_strong_anti_venom();
