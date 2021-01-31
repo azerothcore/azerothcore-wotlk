@@ -3303,6 +3303,14 @@ PvPToken.ItemCount = 1
 NoResetTalentsCost = 0
 
 #
+#    ToggleXP.Cost
+#        Description: Cost of locking/unlocking XP
+#        Default:     100000 - (10 Gold)
+#
+
+ToggleXP.Cost = 100000
+
+#
 #     Guild.AllowMultipleGuildMaster
 #        Description: Allow more than one guild master. Additional Guild Masters must be set using
 #                     the ".guild rank" command.
