@@ -1075,6 +1075,7 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_GUILD_RESET_HOUR] = 6;
     }
 
+    m_int_configs[CONFIG_GUILD_BANK_INITIAL_TABS] = sConfigMgr->GetIntDefault("Guild.BankInitialTabs", 0);
     m_int_configs[CONFIG_GUILD_BANK_TAB_COST_0] = sConfigMgr->GetIntDefault("Guild.BankTabCost0", 1000000);
     m_int_configs[CONFIG_GUILD_BANK_TAB_COST_1] = sConfigMgr->GetIntDefault("Guild.BankTabCost1", 2500000);
     m_int_configs[CONFIG_GUILD_BANK_TAB_COST_2] = sConfigMgr->GetIntDefault("Guild.BankTabCost2", 5000000);
@@ -1315,6 +1316,7 @@ void World::LoadConfigSettings(bool reload)
     // Warden
     m_bool_configs[CONFIG_WARDEN_ENABLED]              = sConfigMgr->GetBoolDefault("Warden.Enabled", false);
     m_int_configs[CONFIG_WARDEN_NUM_MEM_CHECKS]        = sConfigMgr->GetIntDefault("Warden.NumMemChecks", 3);
+    m_int_configs[CONFIG_WARDEN_NUM_LUA_CHECKS]        = sConfigMgr->GetIntDefault("Warden.NumLuaChecks", 1);
     m_int_configs[CONFIG_WARDEN_NUM_OTHER_CHECKS]      = sConfigMgr->GetIntDefault("Warden.NumOtherChecks", 7);
     m_int_configs[CONFIG_WARDEN_CLIENT_BAN_DURATION]   = sConfigMgr->GetIntDefault("Warden.BanDuration", 86400);
     m_int_configs[CONFIG_WARDEN_CLIENT_CHECK_HOLDOFF]  = sConfigMgr->GetIntDefault("Warden.ClientCheckHoldOff", 30);
@@ -1410,6 +1412,8 @@ void World::LoadConfigSettings(bool reload)
     //Debug
     m_bool_configs[CONFIG_DEBUG_BATTLEGROUND] = sConfigMgr->GetBoolDefault("Debug.Battleground", false);
     m_bool_configs[CONFIG_DEBUG_ARENA]        = sConfigMgr->GetBoolDefault("Debug.Arena",        false);
+
+    m_int_configs[CONFIG_GM_LEVEL_CHANNEL_MODERATION] = sConfigMgr->GetIntDefault("Channel.ModerationGMLevel", 1);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
@@ -1885,13 +1889,15 @@ void World::SetInitialWorldSettings()
     AddonMgr::LoadFromDB();
 
     // pussywizard:
-    sLog->outString("Deleting invalid mail items...\n");
+    sLog->outString("Deleting invalid mail items...");
+    sLog->outString();
     CharacterDatabase.Query("DELETE mi FROM mail_items mi LEFT JOIN item_instance ii ON mi.item_guid = ii.guid WHERE ii.guid IS NULL");
     CharacterDatabase.Query("DELETE mi FROM mail_items mi LEFT JOIN mail m ON mi.mail_id = m.id WHERE m.id IS NULL");
     CharacterDatabase.Query("UPDATE mail m LEFT JOIN mail_items mi ON m.id = mi.mail_id SET m.has_items=0 WHERE m.has_items<>0 AND mi.mail_id IS NULL");
 
     ///- Handle outdated emails (delete/return)
     sLog->outString("Returning old mails...");
+    sLog->outString();
     sObjectMgr->ReturnOrDeleteOldMails(false);
 
     ///- Load AutoBroadCast
@@ -1925,10 +1931,12 @@ void World::SetInitialWorldSettings()
     sCalendarMgr->LoadFromDB();
 
     sLog->outString("Initializing SpellInfo precomputed data..."); // must be called after loading items, professions, spells and pretty much anything
+    sLog->outString();
     sObjectMgr->InitializeSpellInfoPrecomputedData();
 
     ///- Initialize game time and timers
     sLog->outString("Initialize game time and timers");
+    sLog->outString();
     m_gameTime = time(nullptr);
     m_startTime = m_gameTime;
 
@@ -1959,9 +1967,11 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize MapManager
     sLog->outString("Starting Map System");
+    sLog->outString();
     sMapMgr->Initialize();
 
     sLog->outString("Starting Game Event system...");
+    sLog->outString();
     uint32 nextGameEvent = sGameEventMgr->StartSystem();
     m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
 
@@ -1972,6 +1982,7 @@ void World::SetInitialWorldSettings()
     Channel::CleanOldChannelsInDB();
 
     sLog->outString("Starting Arena Season...");
+    sLog->outString();
     sGameEventMgr->StartArenaSeason();
 
     sTicketMgr->Initialize();
@@ -2018,6 +2029,7 @@ void World::SetInitialWorldSettings()
     InitCalendarOldEventsDeletionTime();
 
     sLog->outString("Calculate Guild cap reset time...");
+    sLog->outString();
     InitGuildResetTime();
 
     sLog->outString("Load Petitions...");
@@ -2160,6 +2172,7 @@ void World::LoadAutobroadcasts()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u autobroadcast definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 /// Update the World !

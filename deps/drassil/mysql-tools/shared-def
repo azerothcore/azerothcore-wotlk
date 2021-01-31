@@ -8,6 +8,10 @@ MYSQLIMPORT="mysqlimport"
 MYSQLDUMP="mysqldump"
 DUMPPARSER=$MT_DIR"/bin/dump-parser"
 
+if [[ $(uname -s) == "Darwin" ]]; then
+    DUMPPARSER=$MT_DIR"/bin/dump-parser-mac"
+fi;
+
 #empty for bash commands
 WIN_BIN=0
 command -v mysql >/dev/null 2>&1 || { WIN_BIN=1; }
@@ -15,7 +19,7 @@ command -v mysqlimport >/dev/null 2>&1 || { WIN_BIN=1; }
 command -v mysqldump >/dev/null 2>&1 || { WIN_BIN=1; }
 
 WIN_BIN=1
-if [ `uname -s` == "Linux" ]; then
+if [[ $(uname -s) == "Linux") ]] || [[ $(uname -s) == "Darwin" ]]; then
    WIN_BIN=0
 else
    WIN_BIN=1 
