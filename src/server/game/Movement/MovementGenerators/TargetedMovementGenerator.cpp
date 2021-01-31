@@ -247,7 +247,7 @@ bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target, float rang
    if (owner->GetExactDistSq(target) > G3D::square(owner->GetCombatReach() + target->GetCombatReach() + range))
         return false;
 
-    return !angle || angle->IsAngleOkay(target->GetRelativeAngle(owner));
+    return !owner->IsPet() || !angle || angle->IsAngleOkay(target->GetRelativeAngle(owner));
 }
 
 template<class T>
@@ -272,7 +272,8 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
 
     bool followingMaster = false;
-    if (Pet* oPet = owner->ToPet())
+    Pet* oPet = owner->ToPet();
+    if (oPet)
     {
         if (target->GetGUID() == oPet->GetOwnerGUID())
             followingMaster = true;
@@ -315,19 +316,26 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     _lastTargetPosition = targetPosition;
 
-    if (PositionOkay(owner, target, _range + 1.0) && !owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE))
+    if (PositionOkay(owner, target, _range + PET_FOLLOW_DIST) && !owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE))
         return true;
 
     if (!i_path)
         i_path = new PathGenerator(owner);
 
     float x, y, z;
-
     // select angle
     float tAngle;
-    float const curAngle = target->GetRelativeAngle(owner);;
-    if (_angle.IsAngleOkay(curAngle))
+    float const curAngle = target->GetRelativeAngle(owner);
+    if (!oPet)
+    {
+        // for non pets, keep the relative angle
+        // decided during the summon
+        tAngle = _angle.RelativeAngle;
+    }
+    else if (_angle.IsAngleOkay(curAngle))
+    {
         tAngle = curAngle;
+    }
     else
     {
         float const diffUpper = Position::NormalizeOrientation(curAngle - _angle.UpperBound());
@@ -339,9 +347,6 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
 
     target->GetNearPoint(owner, x, y, z, _range, 0.f, target->ToAbsoluteAngle(tAngle));
-
-    if (owner->IsHovering())
-        owner->UpdateAllowedPositionZ(x, y, z);
 
     bool success = i_path->CalculatePath(x, y, z, forceDest);
     if (!success || i_path->GetPathType() & PATHFIND_NOPATH)

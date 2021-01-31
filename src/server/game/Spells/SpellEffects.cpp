@@ -2447,10 +2447,12 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
                         TempSummonType summonType = (duration <= 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
 
+                        uint32 currMinionsCount = m_caster->m_Controlled.size();
+                        uint32 totalNumGuardians = numSummons + currMinionsCount;
                         for (uint32 count = 0; count < numSummons; ++count)
                         {
                             Position pos;
-                            if (count == 0)
+                            if (totalNumGuardians == 1)
                                 pos = *destTarget;
                             else
                                 // randomize position for multiple summons
@@ -6076,9 +6078,8 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
     {
         Position pos;
 
-
-
-        // xinef: do not use precalculated position for effect summon pet in this function, it means it was cast by NPC and should have its position overridden
+        // xinef: do not use precalculated position for effect summon pet in this function
+        // it means it was cast by NPC and should have its position overridden
         if (totalNumGuardians == 1 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET)
         {
             pos = *destTarget;

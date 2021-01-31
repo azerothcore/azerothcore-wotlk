@@ -165,7 +165,7 @@ namespace Movement
         }
 
         args.flags = MoveSplineFlag::Done;
-        unit->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_SPLINE_ENABLED);
+        unit->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_SPLINE_ENABLED);
         move_spline.onTransport = transport;
         move_spline.Initialize(args);
 
