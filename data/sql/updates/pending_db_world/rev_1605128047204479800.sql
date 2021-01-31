@@ -20,6 +20,7 @@ CREATE TABLE `dungeon_access_requirements` (
   `requirement_hint` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
   `faction` tinyint unsigned NOT NULL DEFAULT 2 COMMENT '0 = Alliance, 1 = Horde, 2 = Both factions',
   `priority` tinyint unsigned NULL COMMENT 'Priority order for the requirement, sorted by type. 0 is the highest priority',
+  `leader_only` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'true = will pass the requirement met if the leader of the party meets it, false = only passes the requirement if the player meets it',
   `comment` varchar(255) COLLATE 'utf8_general_ci' NULL,
   PRIMARY KEY (`dungeon_access_id`, `requirement_type`, `requirement_id`)
 ) COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid' ENGINE='MyISAM' COLLATE 'utf8_general_ci';
@@ -67,13 +68,14 @@ INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_typ
 
 -- ------------------ QUESTS
 
-INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_type`, `requirement_id`, `faction`, `requirement_hint`)
+INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_type`, `requirement_id`, `faction`, `requirement_hint`, `leader_only`)
     -- Alliance quests only
     SELECT `id`,
             1 AS requirement_type,
             `quest_done_A`,
             0 AS faction,
-			quest_failed_text
+			quest_failed_text,
+			true as leader_only
     FROM `access_requirement`
     WHERE `quest_done_A` > 0 AND `quest_done_A` != `quest_done_H`
     UNION
@@ -82,7 +84,8 @@ INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_typ
             1 AS requirement_type,
             `quest_done_H`,
             1 AS faction,
-			quest_failed_text
+			quest_failed_text,
+			true as leader_only
     FROM `access_requirement`
     WHERE `quest_done_H` > 0 AND `quest_done_A` != `quest_done_H`
     UNION
@@ -91,7 +94,8 @@ INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_typ
             1 AS requirement_type,
             `quest_done_H`,
             2 AS faction,
-			quest_failed_text
+			quest_failed_text,
+			true as leader_only
     FROM `access_requirement`
     WHERE `quest_done_H` > 0 AND `quest_done_A` = `quest_done_H`
 ;
@@ -140,7 +144,10 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (885, '- Hint:'),
 (886, 'You cannot enter. Access requirements not met.'),
 (887, 'To be able to enter, your equipment\'s average item level must be superior or equal to %u. Your current equipment\'s average ilevel is: %u.'),
-(888, 'You must be below level %u to enter.');
+(888, 'You must be below level %u to enter.'),
+(889, 'To enter, the group leader must have complete the following quest(s):'),
+(890, 'To enter, the group leader must have complete the following achievement(s):'),
+(891, 'To enter, the group leader must have have the following item(s) in your inventory:');
 
 -- Update old command
 UPDATE `command` SET `name` = 'reload dungeon_access_template', `help` = 'Syntax: .reload dungeon_access_template\r Reload dungeon_access_template table.' WHERE `name` = 'reload access_requirement';

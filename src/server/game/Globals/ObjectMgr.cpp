@@ -6150,27 +6150,29 @@ void ObjectMgr::LoadAccessRequirements()
         ar->levelMax     = fields[4].GetUInt8();
         ar->reqItemLevel = fields[5].GetUInt16();
 
-        //                                                                          0                 1               2                 3        4        
-        QueryResult progression_requirements_results = WorldDatabase.PQuery("SELECT requirement_type, requirement_id, requirement_hint, faction, priority FROM dungeon_access_requirements where dungeon_access_id = %u", dungeon_access_id);
+        //                                                                              0                 1               2                 3        4         6  
+        QueryResult progression_requirements_results = WorldDatabase.PQuery("SELECT requirement_type, requirement_id, requirement_hint, faction, priority, leader_only FROM dungeon_access_requirements where dungeon_access_id = %u", dungeon_access_id);
         if (progression_requirements_results)
         {
             do
             {
                 Field* progression_requirement_row = progression_requirements_results->Fetch();
 
-                const uint8 requirement_type       = progression_requirement_row[0].GetUInt8();
-                const uint32 requirement_id        = progression_requirement_row[1].GetUInt32();
-                const std::string requirement_hint = progression_requirement_row[2].GetString();
-                const uint8 requirement_faction    = progression_requirement_row[3].GetUInt8();
-                const uint8 priorityOrder          = progression_requirement_row[4].IsNull() ? UINT8_MAX : progression_requirement_row[4].GetUInt8();
-                
-                ProgressionRequirement* progression_requirement = new ProgressionRequirement();
-                progression_requirement->id           = requirement_id;
-                progression_requirement->hint         = requirement_hint;
-                progression_requirement->faction      = (TeamId)requirement_faction;
-                progression_requirement->priority     = priorityOrder;
+                const uint8 requirement_type             = progression_requirement_row[0].GetUInt8();
+                const uint32 requirement_id              = progression_requirement_row[1].GetUInt32();
+                const std::string requirement_hint       = progression_requirement_row[2].GetString();
+                const uint8 requirement_faction          = progression_requirement_row[3].GetUInt8();
+                const uint8 requirement_priority         = progression_requirement_row[4].IsNull() ? UINT8_MAX : progression_requirement_row[4].GetUInt8();
+                const bool requirement_checkLeaderOnly   = progression_requirement_row[5].GetBool();
 
-                std::vector<ProgressionRequirement*>* currentRequirementVector = nullptr;
+                ProgressionRequirement* progression_requirement = new ProgressionRequirement();
+                progression_requirement->id              = requirement_id;
+                progression_requirement->hint            = requirement_hint;
+                progression_requirement->faction         = (TeamId)requirement_faction;
+                progression_requirement->priority        = requirement_priority;
+                progression_requirement->checkLeaderOnly = requirement_checkLeaderOnly;
+
+                std::vector<ProgressionRequirement*>* currentRequirementsList = nullptr;
 
                 switch (requirement_type)
                 {
@@ -6183,7 +6185,7 @@ void ObjectMgr::LoadAccessRequirements()
                         break;
                     }
 
-                    currentRequirementVector = &ar->achievements;
+                    currentRequirementsList = &ar->achievements;
                     break;
                 }
                 case 1:
@@ -6195,7 +6197,7 @@ void ObjectMgr::LoadAccessRequirements()
                         break;
                     }
 
-                    currentRequirementVector = &ar->quests;
+                    currentRequirementsList = &ar->quests;
                     break;
                 }
                 case 2:
@@ -6208,7 +6210,7 @@ void ObjectMgr::LoadAccessRequirements()
                         break;
                     }
 
-                    currentRequirementVector = &ar->items;
+                    currentRequirementsList = &ar->items;
                     break;
                 }
                 default:
@@ -6217,20 +6219,20 @@ void ObjectMgr::LoadAccessRequirements()
                 }
 
                 //Check if array is valid and delete the progression requirement
-                if (!currentRequirementVector)
+                if (!currentRequirementsList)
                 {
                     delete progression_requirement;
                     continue;
                 }
 
                 //Insert into the array
-                if (currentRequirementVector->size() > priorityOrder)
+                if (currentRequirementsList->size() > requirement_priority)
                 {
-                    currentRequirementVector->insert(currentRequirementVector->begin() + priorityOrder, progression_requirement);
+                    currentRequirementsList->insert(currentRequirementsList->begin() + requirement_priority, progression_requirement);
                 }
                 else
                 {
-                    currentRequirementVector->push_back(progression_requirement);
+                    currentRequirementsList->push_back(progression_requirement);
                 }
 
 

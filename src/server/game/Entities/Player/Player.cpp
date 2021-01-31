@@ -19537,6 +19537,114 @@ void Player::SendSavedInstances()
     }
 }
 
+void Player::PrettyPrintRequirementsQuestList(const std::vector<const ProgressionRequirement*>& missingQuests) const
+{
+    LocaleConstant loc_idx;
+    for (const ProgressionRequirement* missingReq : missingQuests)
+    {
+        Quest const* questTemplate = sObjectMgr->GetQuestTemplate(missingReq->id);
+        if (!questTemplate)
+        {
+            continue;
+        }
+
+        std::string questTitle = questTemplate->GetTitle();
+        if (QuestLocale const* questLocale = sObjectMgr->GetQuestLocale(questTemplate->GetQuestId()))
+        {
+            ObjectMgr::GetLocaleString(questLocale->Title, loc_idx, questTitle);
+        }
+
+        std::stringstream stream;
+        stream << "|cffff7c0a|Hquest:";
+        stream << questTemplate->GetQuestId();
+        stream << ":";
+        stream << questTemplate->GetQuestLevel();
+        stream << "|h[";
+        stream << questTitle;
+        stream << "]|h|r";
+
+        if (missingReq->hint.empty())
+        {
+            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+        }
+        else
+        {
+            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_HINT, loc_idx), missingReq->hint.c_str());
+        }
+    }
+}
+
+void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const ProgressionRequirement*>& missingAchievements) const
+{
+    LocaleConstant loc_idx;
+    for (const ProgressionRequirement* missingReq : missingAchievements)
+    {
+        AchievementEntry const* achievementEntry = sAchievementStore.LookupEntry(missingReq->id);
+        if (!achievementEntry)
+        {
+            continue;
+        }
+
+        std::string name = *achievementEntry->name;
+
+        std::stringstream stream;
+        stream << "|cffff7c0a|Hachievement:";
+        stream << missingReq->id;
+        stream << ":";
+        stream << std::hex << GetGUID() << std::dec;
+        stream << ":0:0:0:0:0:0:0:0|h[";
+        stream << name;
+        stream << "]|h|r";
+
+        if (missingReq->hint.empty())
+        {
+            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+        }
+        else
+        {
+            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_HINT, loc_idx), missingReq->hint.c_str());
+        }
+    }
+}
+
+void Player::PrettyPrintRequirementsItemsList(const std::vector<const ProgressionRequirement*>& missingItems) const 
+{
+    LocaleConstant loc_idx;
+    for (const ProgressionRequirement* missingReq : missingItems)
+    {
+        const ItemTemplate* itemTemplate = sObjectMgr->GetItemTemplate(missingReq->id);
+        if (!itemTemplate)
+        {
+            continue;
+        }
+
+        //Get the localised name
+        std::string name = itemTemplate->Name1;
+        if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemTemplate->ItemId))
+        {
+            ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+        }
+
+        std::stringstream stream;
+        stream << "|c";
+        stream << std::hex << ItemQualityColors[itemTemplate->Quality] << std::dec;
+        stream << "|Hitem:";
+        stream << itemTemplate->ItemId;
+        stream << ":0:0:0:0:0:0:0:0:0|h[";
+        stream << name;
+        stream << "]|h|r";
+
+        if (missingReq->hint.empty())
+        {
+            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+        }
+        else
+        {
+            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_HINT, loc_idx), missingReq->hint.c_str());
+        }
+    }
+}
+
 bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map, bool report)
 {
     if (!IsGameMaster() && ar)
@@ -19562,13 +19670,29 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
             return false;
         }
 
+        Player* partyLeader = this;
+        {
+            uint64 leaderGuid = GetGroup() ? GetGroup()->GetLeaderGUID() : GetGUID();
+            if (leaderGuid != GetGUID())
+                partyLeader = HashMapHolder<Player>::Find(leaderGuid);
+        }
+
         //Check all items
-        std::vector<const ProgressionRequirement*> missingItems;
+        std::vector<const ProgressionRequirement*> missingPlayerItems;
+        std::vector<const ProgressionRequirement*> missingLeaderItems;
         for (const ProgressionRequirement* itemRequirement : ar->items)
         {
-            if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == GetTeamId(true))
+            Player* checkPlayer = this;
+            std::vector<const ProgressionRequirement*>& missingItems = missingPlayerItems;
+            if (itemRequirement->checkLeaderOnly)
             {
-                if (!HasItemCount(itemRequirement->id, 1))
+                checkPlayer = partyLeader;
+                missingItems = missingLeaderItems;
+            }
+
+            if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == checkPlayer->GetTeamId(true))
+            {
+                if (!checkPlayer->HasItemCount(itemRequirement->id, 1))
                 {
                     missingItems.push_back(itemRequirement);
                 }
@@ -19576,17 +19700,21 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         }
 
         //Check all achievements
-        Player* leader = this;
-        uint64 leaderGuid = GetGroup() ? GetGroup()->GetLeaderGUID() : GetGUID();
-        if (leaderGuid != GetGUID())
-            leader = HashMapHolder<Player>::Find(leaderGuid);
-
-        std::vector<const ProgressionRequirement*> missingAchievements;
+        std::vector<const ProgressionRequirement*> missingPlayerAchievements;
+        std::vector<const ProgressionRequirement*> missingLeaderAchievements;
         for (const ProgressionRequirement* achievementRequirement : ar->achievements)
         {
+            Player* checkPlayer = this;
+            std::vector<const ProgressionRequirement*>& missingAchievements = missingPlayerAchievements;
+            if(achievementRequirement->checkLeaderOnly)
+            {
+                checkPlayer = partyLeader;
+                missingAchievements = missingLeaderAchievements;
+            }
+
             if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == GetTeamId(true))
             {
-                if (!leader || !leader->HasAchieved(achievementRequirement->id))
+                if (!checkPlayer || !checkPlayer->HasAchieved(achievementRequirement->id))
                 {
                     missingAchievements.push_back(achievementRequirement);
                 }
@@ -19594,12 +19722,21 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         }
 
         //Check all quests
-        std::vector<const ProgressionRequirement*> missingQuests;
+        std::vector<const ProgressionRequirement*> missingPlayerQuests;
+        std::vector<const ProgressionRequirement*> missingLeaderQuests;
         for (const ProgressionRequirement* questRequirement : ar->quests)
         {
-            if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == GetTeamId(true))
+            Player* checkPlayer = this;
+            std::vector<const ProgressionRequirement*>& missingQuests = missingPlayerQuests;
+            if (questRequirement->checkLeaderOnly)
             {
-                if (!GetQuestRewardStatus(questRequirement->id))
+                checkPlayer = partyLeader;
+                missingQuests = missingLeaderQuests;
+            }
+
+            if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == checkPlayer->GetTeamId(true))
+            {
+                if (!checkPlayer->GetQuestRewardStatus(questRequirement->id))
                 {
                     missingQuests.push_back(questRequirement);
                 }
@@ -19621,7 +19758,9 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         Difficulty target_difficulty = GetDifficulty(mapEntry->IsRaid());
         MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(target_map, target_difficulty);
         LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
-        if (LevelMin || LevelMax || minRequiredIlvl || missingItems.size() || missingQuests.size() || missingAchievements.size())
+        if (LevelMin || LevelMax || minRequiredIlvl
+            || missingPlayerItems.size() || missingPlayerQuests.size() || missingPlayerAchievements.size()
+            || missingLeaderItems.size() || missingLeaderQuests.size() || missingLeaderAchievements.size())
         {
             if (report)
             {
@@ -19635,17 +19774,17 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                 else if(requirementPrintMode == 1)
                 {
                     //Blizzlike method of printing out the requirements
-                    if (missingQuests.size() && !missingQuests[0]->hint.empty())
+                    if (missingLeaderQuests.size() && !missingLeaderQuests[0]->hint.empty())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage("%s", missingQuests[0]->hint.c_str());
+                        ChatHandler(GetSession()).PSendSysMessage("%s", missingLeaderQuests[0]->hint.c_str());
                     }
                     else if (mapDiff->hasErrorMessage)
                     { // if (missingAchievement) covered by this case
                         SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
                     }
-                    else if (missingItems.size())
+                    else if (missingPlayerItems.size())
                     {
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), LevelMin, sObjectMgr->GetItemTemplate(missingItems[0]->id)->Name1.c_str());
+                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), LevelMin, sObjectMgr->GetItemTemplate(missingPlayerItems[0]->id)->Name1.c_str());
                     }
                     else if (LevelMin)
                     {
@@ -19659,112 +19798,38 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                 else
                 {
                     //Pretty way of printing out requirements
-                    if (missingQuests.size())
+                    if (missingPlayerQuests.size())
                     {
                         ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_QUESTS);
-                        for (const ProgressionRequirement* missingReq : missingQuests)
-                        {
-                            Quest const* questTemplate = sObjectMgr->GetQuestTemplate(missingReq->id);
-                            if (!questTemplate)
-                            {
-                                continue;
-                            }
-
-                            std::string questTitle = questTemplate->GetTitle();
-                            if (QuestLocale const* questLocale = sObjectMgr->GetQuestLocale(questTemplate->GetQuestId()))
-                            {
-                                ObjectMgr::GetLocaleString(questLocale->Title, loc_idx, questTitle);
-                            }
-
-                            std::stringstream stream;
-                            stream << "|cffff7c0a|Hquest:";
-                            stream << questTemplate->GetQuestId();
-                            stream << ":";
-                            stream << questTemplate->GetQuestLevel();
-                            stream << "|h[";
-                            stream << questTitle;
-                            stream << "]|h|r";
-
-                            if (missingReq->hint.empty())
-                            {
-                                ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
-                            }
-                            else
-                            {
-                                ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_HINT, loc_idx), missingReq->hint.c_str());
-                            }
-                        }
+                        PrettyPrintRequirementsQuestList(missingPlayerQuests);
+                    }
+                    if (missingLeaderQuests.size())
+                    {
+                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS);
+                        PrettyPrintRequirementsQuestList(missingLeaderQuests);
                     }
 
-                    if (missingAchievements.size())
+                    if (missingPlayerAchievements.size())
                     {
                         ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_ACHIEVEMENTS);
-                        for (const ProgressionRequirement* missingReq : missingAchievements)
-                        {
-                            AchievementEntry const* achievementEntry = sAchievementStore.LookupEntry(missingReq->id);
-                            if (!achievementEntry)
-                            {
-                                continue;
-                            }
-
-                            std::string name = *achievementEntry->name;
-
-                            std::stringstream stream;
-                            stream << "|cffff7c0a|Hachievement:";
-                            stream << missingReq->id;
-                            stream << ":";
-                            stream << std::hex << GetGUID() << std::dec;
-                            stream << ":0:0:0:0:0:0:0:0|h[";
-                            stream << name;
-                            stream << "]|h|r";
-
-                            if (missingReq->hint.empty())
-                            {
-                                ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
-                            }
-                            else
-                            {
-                                ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_HINT, loc_idx), missingReq->hint.c_str());
-                            }
-                        }
+                        PrettyPrintRequirementsAchievementsList(missingPlayerAchievements);
+                    }
+                    if (missingLeaderAchievements.size())
+                    {
+                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS);
+                        PrettyPrintRequirementsAchievementsList(missingLeaderAchievements);
                     }
 
-                    if (missingItems.size())
+                    if (missingPlayerItems.size())
                     {
                         ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_OBTAIN_ITEMS);
-                        for (const ProgressionRequirement* missingReq : missingItems)
-                        {
-                            const ItemTemplate* itemTemplate = sObjectMgr->GetItemTemplate(missingReq->id);
-                            if (!itemTemplate)
-                            {
-                                continue;
-                            }
+                        PrettyPrintRequirementsItemsList(missingPlayerItems);
+                    }
 
-                            //Get the localised name
-                            std::string name = itemTemplate->Name1;
-                            if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemTemplate->ItemId))
-                            {
-                                ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
-                            }
-
-                            std::stringstream stream;
-                            stream << "|c";
-                            stream << std::hex << ItemQualityColors[itemTemplate->Quality] << std::dec;
-                            stream << "|Hitem:";
-                            stream << itemTemplate->ItemId;
-                            stream << ":0:0:0:0:0:0:0:0:0|h[";
-                            stream << name;
-                            stream << "]|h|r";
-
-                            if (missingReq->hint.empty())
-                            {
-                                ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
-                            }
-                            else
-                            {
-                                ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_HINT, loc_idx), missingReq->hint.c_str());
-                            }
-                        }
+                    if (missingLeaderItems.size())
+                    {
+                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS);
+                        PrettyPrintRequirementsItemsList(missingLeaderItems);
                     }
 
                     if (minRequiredIlvl)

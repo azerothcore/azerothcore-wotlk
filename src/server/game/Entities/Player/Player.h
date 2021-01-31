@@ -844,6 +844,7 @@ struct ProgressionRequirement
     TeamId faction;
     std::string hint;
     uint32 priority;
+    bool checkLeaderOnly;
 };
 
 struct DungeonProgressionRequirements
@@ -2451,6 +2452,9 @@ public:
     [[nodiscard]] uint32 GetPendingBind() const { return _pendingBindId; }
     void SendRaidInfo();
     void SendSavedInstances();
+    void PrettyPrintRequirementsQuestList(const std::vector<const ProgressionRequirement*>& missingQuests) const;
+    void PrettyPrintRequirementsAchievementsList(const std::vector<const ProgressionRequirement*>& missingAchievements) const;
+    void PrettyPrintRequirementsItemsList(const std::vector<const ProgressionRequirement*>& missingItems) const;
     bool Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map, bool report = false);
     bool CheckInstanceLoginValid();
     [[nodiscard]] bool CheckInstanceCount(uint32 instanceId) const;
