@@ -148,7 +148,7 @@ public:
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_BOSS_DIED, 0);
-            float h = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f);
+            float h = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
             if (h != INVALID_HEIGHT && me->GetPositionZ() - h > 3.0f)
             {
                 me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), h, me->GetOrientation(), true); // move to ground
