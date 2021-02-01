@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -13,13 +12,13 @@
 
 class WorldDatabaseConnection : public MySQLConnection
 {
-    public:
-        //- Constructors for sync and async connections
-        WorldDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) { }
-        WorldDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) { }
+public:
+    //- Constructors for sync and async connections
+    WorldDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) { }
+    WorldDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) { }
 
-        //- Loads database type specific prepared statements
-        void DoPrepareStatements();
+    //- Loads database type specific prepared statements
+    void DoPrepareStatements() override;
 };
 
 typedef DatabaseWorkerPool<WorldDatabaseConnection> WorldDatabaseWorkerPool;
@@ -51,7 +50,7 @@ enum WorldDatabaseStatements
     WORLD_UPD_CREATURE_FACTION,
     WORLD_UPD_CREATURE_NPCFLAG,
     WORLD_UPD_CREATURE_POSITION,
-    WORLD_UPD_CREATURE_SPAWN_DISTANCE,
+    WORLD_UPD_CREATURE_WANDER_DISTANCE,
     WORLD_UPD_CREATURE_SPAWN_TIME_SECS,
     WORLD_INS_CREATURE_FORMATION,
     WORLD_INS_WAYPOINT_DATA,
@@ -100,6 +99,9 @@ enum WorldDatabaseStatements
     WORLD_SEL_DISABLES,
     WORLD_INS_DISABLES,
     WORLD_DEL_DISABLES,
+    WORLD_UPD_CREATURE_ZONE_AREA_DATA,
+    WORLD_UPD_GAMEOBJECT_ZONE_AREA_DATA,
+    WORLD_SEL_REQ_XP,
 
     MAX_WORLDDATABASE_STATEMENTS
 };

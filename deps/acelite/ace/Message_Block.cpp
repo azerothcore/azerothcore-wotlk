@@ -845,9 +845,8 @@ ACE_Data_Block::release (ACE_Lock *lock)
   // since otherwise we'd be trying to "release" through a deleted
   // pointer!
   if (result == 0)
-    ACE_DES_FREE (this,
-                  allocator->free,
-                  ACE_Data_Block);
+    ACE_DES_FREE_THIS (allocator->free,
+                       ACE_Data_Block);
   return result;
 }
 
@@ -950,9 +949,8 @@ ACE_Message_Block::release_i (ACE_Lock *lock)
   else
     {
       ACE_Allocator *allocator = this->message_block_allocator_;
-      ACE_DES_FREE (this,
-                    allocator->free,
-                    ACE_Message_Block);
+      ACE_DES_FREE_THIS (allocator->free,
+                         ACE_Message_Block);
     }
 
   return result;

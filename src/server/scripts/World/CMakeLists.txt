@@ -1,4 +1,4 @@
-# Copyright (C) 
+# Copyright (C)
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -23,6 +23,7 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/World/npc_taxi.cpp
   ${AC_SCRIPTS_DIR}/World/npcs_special.cpp
   ${AC_SCRIPTS_DIR}/World/character_creation.cpp
+  ${AC_SCRIPTS_DIR}/World/action_ip_logger.cpp
 )
 
 AC_ADD_SCRIPT_LOADER("World" "ScriptLoader.h")

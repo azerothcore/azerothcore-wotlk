@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -12,7 +11,7 @@
 #include <string>
 
 ChunkedData::ChunkedData( FILE* stream, uint32 maxLength, uint32 chunksHint /*= 300*/ ) :
-Stream(stream)
+    Stream(stream)
 {
     if (!Stream)
         return;
@@ -67,7 +66,7 @@ Chunk* ChunkedData::GetChunkByName( const std::string& name )
     for (uint32 i = 0; i < Chunks.size(); ++i)
         if (Chunks[i]->Name == name)
             return Chunks[i];
-    return NULL;
+    return nullptr;
 }
 
 ChunkedData::~ChunkedData()

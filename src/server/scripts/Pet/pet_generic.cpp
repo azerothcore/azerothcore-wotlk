@@ -10,12 +10,15 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "Player.h"
 #include "Group.h"
 #include "CreatureTextMgr.h"
 #include "PetAI.h"
+#include "PassiveAI.h"
+#include "ScriptedGossip.h"
+#include "SpellScript.h"
+#include "SpellAuras.h"
 
 enum Mojo
 {
@@ -27,55 +30,55 @@ enum Mojo
 
 class npc_pet_gen_mojo : public CreatureScript
 {
-    public:
-        npc_pet_gen_mojo() : CreatureScript("npc_pet_gen_mojo") { }
+public:
+    npc_pet_gen_mojo() : CreatureScript("npc_pet_gen_mojo") { }
 
-        struct npc_pet_gen_mojoAI : public ScriptedAI
+    struct npc_pet_gen_mojoAI : public ScriptedAI
+    {
+        npc_pet_gen_mojoAI(Creature* creature) : ScriptedAI(creature) { }
+
+        void Reset() override
         {
-            npc_pet_gen_mojoAI(Creature* creature) : ScriptedAI(creature) { }
+            _victimGUID = 0;
 
-            void Reset()
-            {
-                _victimGUID = 0;
-
-                if (Unit* owner = me->GetOwner())
-                    me->GetMotionMaster()->MoveFollow(owner, 0.0f, 0.0f);
-            }
-
-            void EnterCombat(Unit* /*who*/) { }
-            void UpdateAI(uint32 /*diff*/) { }
-
-            void ReceiveEmote(Player* player, uint32 emote)
-            {
-                me->HandleEmoteCommand(emote);
-                Unit* owner = me->GetOwner();
-                if (emote != TEXT_EMOTE_KISS || !owner || owner->GetTypeId() != TYPEID_PLAYER ||
-                    owner->ToPlayer()->GetTeamId(true) != player->GetTeamId(true))
-                {
-                    return;
-                }
-
-                Talk(SAY_MOJO, player);
-
-                if (_victimGUID)
-                    if (Player* victim = ObjectAccessor::GetPlayer(*me, _victimGUID))
-                        victim->RemoveAura(SPELL_FEELING_FROGGY);
-
-                _victimGUID = player->GetGUID();
-
-                DoCast(player, SPELL_FEELING_FROGGY, true);
-                DoCast(me, SPELL_SEDUCTION_VISUAL, true);
-                me->GetMotionMaster()->MoveFollow(player, 0.0f, 0.0f);
-            }
-
-        private:
-            uint64 _victimGUID;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_pet_gen_mojoAI(creature);
+            if (Unit* owner = me->GetOwner())
+                me->GetMotionMaster()->MoveFollow(owner, 0.0f, 0.0f);
         }
+
+        void EnterCombat(Unit* /*who*/) override { }
+        void UpdateAI(uint32 /*diff*/) override { }
+
+        void ReceiveEmote(Player* player, uint32 emote) override
+        {
+            me->HandleEmoteCommand(emote);
+            Unit* owner = me->GetOwner();
+            if (emote != TEXT_EMOTE_KISS || !owner || owner->GetTypeId() != TYPEID_PLAYER ||
+                    owner->ToPlayer()->GetTeamId(true) != player->GetTeamId(true))
+            {
+                return;
+            }
+
+            Talk(SAY_MOJO, player);
+
+            if (_victimGUID)
+                if (Player* victim = ObjectAccessor::GetPlayer(*me, _victimGUID))
+                    victim->RemoveAura(SPELL_FEELING_FROGGY);
+
+            _victimGUID = player->GetGUID();
+
+            DoCast(player, SPELL_FEELING_FROGGY, true);
+            DoCast(me, SPELL_SEDUCTION_VISUAL, true);
+            me->GetMotionMaster()->MoveFollow(player, 0.0f, 0.0f);
+        }
+
+    private:
+        uint64 _victimGUID;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_pet_gen_mojoAI(creature);
+    }
 };
 
 enum soulTrader
@@ -99,7 +102,7 @@ public:
     {
         uint64 ownerGUID;
         EventMap events;
-        npc_pet_gen_soul_trader_beaconAI(Creature *c) : ScriptedAI(c) 
+        npc_pet_gen_soul_trader_beaconAI(Creature* c) : ScriptedAI(c)
         {
             events.Reset();
             events.ScheduleEvent(EVENT_INITIAL_TALK, 0);
@@ -113,7 +116,7 @@ public:
 
         Player* GetOwner() const { return ObjectAccessor::GetPlayer(*me, ownerGUID); }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_STEAL_ESSENCE_VISUAL && target == me)
             {
@@ -123,7 +126,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -140,12 +143,11 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_gen_soul_trader_beaconAI (creature);
     }
 };
-
 
 enum eArgentPony
 {
@@ -161,7 +163,7 @@ enum eArgentPony
     SPELL_AURA_SHOP_S               = 67377,
     SPELL_AURA_BANK_S               = 67368,
     SPELL_AURA_TIRED_S              = 67401,
-    
+
     SPELL_AURA_BANK_G               = 68849,
     SPELL_AURA_POSTMAN_G            = 68850,
     SPELL_AURA_SHOP_G               = 68851,
@@ -211,7 +213,7 @@ public:
 
     struct npc_pet_gen_argent_pony_bridleAI : public ScriptedAI
     {
-        npc_pet_gen_argent_pony_bridleAI(Creature *c) : ScriptedAI(c) 
+        npc_pet_gen_argent_pony_bridleAI(Creature* c) : ScriptedAI(c)
         {
             _state = ARGENT_PONY_STATE_NONE;
             _init = false;
@@ -220,7 +222,7 @@ public:
             memset(_banners, 0, sizeof(_banners));
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (Unit* owner = me->GetCharmerOrOwner())
             {
@@ -229,7 +231,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             if (_init)
                 return;
@@ -253,10 +255,10 @@ public:
                         {
                             if (player->GetTeamId(true) == TEAM_ALLIANCE)
                             {
-                                if (uint32 cooldown = player->GetSpellCooldownDelay(SPELL_AURA_POSTMAN_S+i))
+                                if (uint32 cooldown = player->GetSpellCooldownDelay(SPELL_AURA_POSTMAN_S + i))
                                 {
                                     duration = cooldown;
-                                    aura = SPELL_AURA_POSTMAN_S+i;
+                                    aura = SPELL_AURA_POSTMAN_S + i;
                                     _state = argentPonyService[TEAM_ALLIANCE][i];
                                     me->ToTempSummon()->UnSummon(duration);
                                     break;
@@ -264,10 +266,10 @@ public:
                             }
                             else
                             {
-                                if (uint32 cooldown = player->GetSpellCooldownDelay(SPELL_AURA_BANK_G+i))
+                                if (uint32 cooldown = player->GetSpellCooldownDelay(SPELL_AURA_BANK_G + i))
                                 {
-                                    duration = cooldown*IN_MILLISECONDS;
-                                    aura = SPELL_AURA_BANK_G+i;
+                                    duration = cooldown * IN_MILLISECONDS;
+                                    aura = SPELL_AURA_BANK_G + i;
                                     _state = argentPonyService[TEAM_HORDE][i];
                                     me->ToTempSummon()->UnSummon(duration);
                                     break;
@@ -278,7 +280,7 @@ public:
                         // Generate Banners
                         uint32 mask = player->GetTeamId(true) ? RACEMASK_HORDE : RACEMASK_ALLIANCE;
                         for (uint8 i = 1; i < MAX_RACES; ++i)
-                            if (mask & (1 << (i-1)) && player->HasAchieved(argentBanners[i].achievement))
+                            if (mask & (1 << (i - 1)) && player->HasAchieved(argentBanners[i].achievement))
                                 _banners[i] = true;
                     }
 
@@ -289,7 +291,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _mountTimer += diff;
             if (_mountTimer > 5000)
@@ -307,15 +309,15 @@ public:
             }
         }
 
-        uint32 GetData(uint32 param) const
+        uint32 GetData(uint32 param) const override
         {
             if (param == 0)
                 return _state;
-            
+
             return _banners[param];
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param > 60000)
             {
@@ -327,16 +329,16 @@ public:
 
             _state = param;
         }
-        
-        private:
-            bool _init;
-            uint8 _state;
-            int32 _mountTimer;
-            bool _banners[MAX_RACES];
-            uint32 _lastAura;
+
+    private:
+        bool _init;
+        uint8 _state;
+        int32 _mountTimer;
+        bool _banners[MAX_RACES];
+        uint32 _lastAura;
     };
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetGUID() != creature->GetOwnerGUID())
             return true;
@@ -345,24 +347,24 @@ public:
         {
             uint8 _state = creature->AI()->GetData(0 /*GET_DATA_STATE*/);
             if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_VENDOR)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, "Visit a trader.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, "Visit a trader.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
             if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_BANK)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_1, "Visit a bank.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_BANK);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "Visit a bank.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_BANK);
             if (_state == ARGENT_PONY_STATE_ENCH || _state == ARGENT_PONY_STATE_MAILBOX)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Visit a mailbox.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_MAILBOX);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Visit a mailbox.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_MAILBOX);
         }
 
         for (uint8 i = RACE_HUMAN; i < MAX_RACES; ++i)
             if (creature->AI()->GetData(i) == uint32(true))
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, argentBanners[i].text, GOSSIP_SENDER_MAIN, argentBanners[i].spell);
-        
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, argentBanners[i].text, GOSSIP_SENDER_MAIN, argentBanners[i].spell);
+
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 action) override
     {
-        player->CLOSE_GOSSIP_MENU();
+        CloseGossipMenuFor(player);
         uint32 spellId = 0;
         switch (action)
         {
@@ -379,13 +381,13 @@ public:
                 creature->AI()->DoAction(ARGENT_PONY_STATE_BANK);
                 break;
             case GOSSIP_ACTION_MAILBOX:
-            {
-                creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_MAILBOX);
-                player->GetSession()->SendShowMailBox(creature->GetGUID());
-                spellId = player->GetTeamId(true) ? SPELL_AURA_POSTMAN_G : SPELL_AURA_POSTMAN_S;
-                creature->AI()->DoAction(ARGENT_PONY_STATE_MAILBOX);
-                break;
-            }
+                {
+                    creature->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_MAILBOX);
+                    player->GetSession()->SendShowMailBox(creature->GetGUID());
+                    spellId = player->GetTeamId(true) ? SPELL_AURA_POSTMAN_G : SPELL_AURA_POSTMAN_S;
+                    creature->AI()->DoAction(ARGENT_PONY_STATE_MAILBOX);
+                    break;
+                }
             default:
                 if (action > 60000)
                 {
@@ -398,14 +400,14 @@ public:
         if (spellId && !creature->HasAura(spellId))
         {
             creature->CastSpell(creature, spellId, true);
-            player->AddSpellCooldown(spellId, 0, 3*MINUTE*IN_MILLISECONDS);
-            player->AddSpellCooldown(player->GetTeamId(true) ? SPELL_AURA_TIRED_G : SPELL_AURA_TIRED_S, 0, 3*MINUTE*IN_MILLISECONDS + 4*HOUR*IN_MILLISECONDS);
-            creature->DespawnOrUnsummon(3*MINUTE*IN_MILLISECONDS);
+            player->AddSpellCooldown(spellId, 0, 3 * MINUTE * IN_MILLISECONDS);
+            player->AddSpellCooldown(player->GetTeamId(true) ? SPELL_AURA_TIRED_G : SPELL_AURA_TIRED_S, 0, 3 * MINUTE * IN_MILLISECONDS + 4 * HOUR * IN_MILLISECONDS);
+            creature->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
         }
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_gen_argent_pony_bridleAI (creature);
     }
@@ -430,23 +432,29 @@ public:
 
     struct npc_pet_gen_target_following_bombAI : public NullCreatureAI
     {
-        npc_pet_gen_target_following_bombAI(Creature *c) : NullCreatureAI(c) 
+        npc_pet_gen_target_following_bombAI(Creature* c) : NullCreatureAI(c)
         {
             checkTimer = 0;
             bombSpellId = 0;
 
             switch (me->GetEntry())
             {
-                case NPC_EXPLOSIVE_SHEEP:       bombSpellId = SPELL_EXPLOSIVE_SHEEP;  break;
-                case NPC_GOBLIN_BOMB:           bombSpellId = SPELL_EXPLOSIVE_GOBLIN; break;
-                case NPC_HIGH_EXPLOSIVE_SHEEP:  bombSpellId = SPELL_HIGH_EXPLOSIVE_SHEEP; break;
+                case NPC_EXPLOSIVE_SHEEP:
+                    bombSpellId = SPELL_EXPLOSIVE_SHEEP;
+                    break;
+                case NPC_GOBLIN_BOMB:
+                    bombSpellId = SPELL_EXPLOSIVE_GOBLIN;
+                    break;
+                case NPC_HIGH_EXPLOSIVE_SHEEP:
+                    bombSpellId = SPELL_HIGH_EXPLOSIVE_SHEEP;
+                    break;
             }
         }
 
         uint32 bombSpellId;
         uint32 checkTimer;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             checkTimer += diff;
             if (checkTimer >= 1000)
@@ -472,7 +480,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_target_following_bombAI (pCreature);
     }
@@ -485,19 +493,19 @@ public:
 
     struct npc_pet_gen_gnomish_flame_turretAI : public ScriptedAI
     {
-        npc_pet_gen_gnomish_flame_turretAI(Creature *c) : ScriptedAI(c) 
+        npc_pet_gen_gnomish_flame_turretAI(Creature* c) : ScriptedAI(c)
         {
             checkTimer = 0;
         }
 
         uint32 checkTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->GetMotionMaster()->Clear(false);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!who)
                 return;
@@ -506,7 +514,7 @@ public:
                 DoStartNoMovement(who);
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (!me->GetVictim())
                 return;
@@ -519,7 +527,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_gen_gnomish_flame_turretAI (creature);
     }
@@ -532,7 +540,7 @@ public:
 
     struct npc_pet_gen_valkyr_guardianAI : public ScriptedAI
     {
-        npc_pet_gen_valkyr_guardianAI(Creature *c) : ScriptedAI(c)
+        npc_pet_gen_valkyr_guardianAI(Creature* c) : ScriptedAI(c)
         {
             me->SetReactState(REACT_DEFENSIVE);
             me->SetDisableGravity(true);
@@ -542,7 +550,7 @@ public:
 
         uint32 targetCheck;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                 if (Unit* target = owner->GetSelectedUnit())
@@ -550,7 +558,7 @@ public:
                         AttackStart(target);
         }
 
-        void OwnerAttacked(Unit* target)
+        void OwnerAttacked(Unit* target) override
         {
             if (!target || (me->GetVictim() && me->GetVictim()->IsAlive() && !me->GetVictim()->HasBreakableByDamageCrowdControlAura()))
                 return;
@@ -558,7 +566,7 @@ public:
             AttackStart(target);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
             {
@@ -579,7 +587,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_valkyr_guardianAI (pCreature);
     }
@@ -587,34 +595,34 @@ public:
 
 class spell_pet_gen_valkyr_guardian_smite : public SpellScriptLoader
 {
-    public:
-        spell_pet_gen_valkyr_guardian_smite() : SpellScriptLoader("spell_pet_gen_valkyr_guardian_smite") { }
+public:
+    spell_pet_gen_valkyr_guardian_smite() : SpellScriptLoader("spell_pet_gen_valkyr_guardian_smite") { }
 
-        class spell_pet_gen_valkyr_guardian_smite_SpellScript : public SpellScript
+    class spell_pet_gen_valkyr_guardian_smite_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_pet_gen_valkyr_guardian_smite_SpellScript);
+
+        void RecalculateDamage()
         {
-            PrepareSpellScript(spell_pet_gen_valkyr_guardian_smite_SpellScript);
-
-            void RecalculateDamage()
+            if (GetHitUnit() != GetCaster())
             {
-                if (GetHitUnit() != GetCaster())
-                {
-                    std::list<Spell::TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-                    for (std::list<Spell::TargetInfo>::iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
-                        if (ihit->targetGUID == GetCaster()->GetGUID())
-                            ihit->damage = -int32(GetHitDamage()*0.25f);
-                }
+                std::list<Spell::TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+                for (std::list<Spell::TargetInfo>::iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+                    if (ihit->targetGUID == GetCaster()->GetGUID())
+                        ihit->damage = -int32(GetHitDamage() * 0.25f);
             }
-
-            void Register()
-            {
-                OnHit += SpellHitFn(spell_pet_gen_valkyr_guardian_smite_SpellScript::RecalculateDamage);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_pet_gen_valkyr_guardian_smite_SpellScript();
         }
+
+        void Register() override
+        {
+            OnHit += SpellHitFn(spell_pet_gen_valkyr_guardian_smite_SpellScript::RecalculateDamage);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_pet_gen_valkyr_guardian_smite_SpellScript();
+    }
 };
 
 class npc_pet_gen_imp_in_a_bottle : public CreatureScript
@@ -624,7 +632,7 @@ public:
 
     struct npc_pet_gen_imp_in_a_bottleAI : public NullCreatureAI
     {
-        npc_pet_gen_imp_in_a_bottleAI(Creature *c) : NullCreatureAI(c)
+        npc_pet_gen_imp_in_a_bottleAI(Creature* c) : NullCreatureAI(c)
         {
             _talkTimer = 0;
             _ownerGUID = 0;
@@ -636,7 +644,7 @@ public:
         uint64 _ownerGUID;
         bool _hasParty;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             NullCreatureAI::InitializeAI();
 
@@ -658,14 +666,14 @@ public:
                             _data << uint32(me->GetName().size() + 1);
                             _data << me->GetName();
                             _data << uint64(0);
-                            _data << uint32(text.size()+1);
+                            _data << uint32(text.size() + 1);
                             _data << text.c_str();
                             _data << uint8(0);
                         }
                     }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _talkTimer += diff;
             if (_talkTimer >= 5000)
@@ -689,7 +697,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_imp_in_a_bottleAI (pCreature);
     }
@@ -702,9 +710,8 @@ public:
 
     struct npc_pet_gen_wind_rider_cubAI : public NullCreatureAI
     {
-        npc_pet_gen_wind_rider_cubAI(Creature *c) : NullCreatureAI(c)
+        npc_pet_gen_wind_rider_cubAI(Creature* c) : NullCreatureAI(c)
         {
-            allowMove = true;
             isFlying = true;
             checkTimer = 0;
             checkTimer2 = 2000;
@@ -712,17 +719,10 @@ public:
         }
 
         bool isFlying;
-        bool allowMove;
         uint32 checkTimer;
         uint32 checkTimer2;
 
-        void MovementInform(uint32 type, uint32 id)
-        {
-            if (type == POINT_MOTION_TYPE && id == 1)
-                allowMove = true;
-        }
-
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             checkTimer2 += diff;
             if (checkTimer2 > 2000)
@@ -730,7 +730,7 @@ public:
                 checkTimer2 = 0;
                 if (Unit* owner = me->GetOwner())
                 {
-                    if (owner->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+                    if (owner->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || owner->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED))
                     {
                         isFlying = true;
                         me->SetCanFly(true);
@@ -745,28 +745,10 @@ public:
                     }
                 }
             }
-
-            checkTimer += diff;
-            if (allowMove || checkTimer > 2000)
-            {
-                allowMove = false;
-                checkTimer = 0;
-                if (Unit* owner = me->GetOwner())
-                {
-                    if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == POINT_MOTION_TYPE ||
-                        me->GetDistance(owner) < 1.0f)
-                        return;
-                    float x, y, z;
-                    owner->GetNearPoint2D(x, y, 0.5f, owner->GetOrientation()+PET_FOLLOW_ANGLE);
-                    z = owner->GetPositionZ() + (isFlying ? 2.5f : 0.0f);
-
-                    me->GetMotionMaster()->MovePoint(1, x, y, z);
-                }
-            }
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_wind_rider_cubAI (pCreature);
     }
@@ -785,7 +767,7 @@ public:
 
     struct npc_pet_gen_plump_turkeyAI : public PassiveAI
     {
-        npc_pet_gen_plump_turkeyAI(Creature *c) : PassiveAI(c)
+        npc_pet_gen_plump_turkeyAI(Creature* c) : PassiveAI(c)
         {
             goGUID = 0;
             jumpTimer = 0;
@@ -798,7 +780,7 @@ public:
         uint32 checkTimer;
         bool jumping;
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == EFFECT_MOTION_TYPE && id == 1)
             {
@@ -807,7 +789,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (jumping)
                 return;
@@ -841,7 +823,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_plump_turkeyAI (pCreature);
     }
@@ -854,25 +836,25 @@ public:
 
     struct npc_pet_gen_toxic_wastelingAI : public PassiveAI
     {
-        npc_pet_gen_toxic_wastelingAI(Creature *c) : PassiveAI(c)
+        npc_pet_gen_toxic_wastelingAI(Creature* c) : PassiveAI(c)
         {
         }
 
         uint32 checkTimer;
 
-        void Reset() { checkTimer = 3000; }
+        void Reset() override { checkTimer = 3000; }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == EFFECT_MOTION_TYPE && id == 1)
                 checkTimer = 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (checkTimer)
             {
@@ -893,7 +875,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_toxic_wastelingAI (pCreature);
     }
@@ -906,14 +888,14 @@ public:
 
     struct npc_pet_gen_fetch_ballAI : public NullCreatureAI
     {
-        npc_pet_gen_fetch_ballAI(Creature *c) : NullCreatureAI(c)
+        npc_pet_gen_fetch_ballAI(Creature* c) : NullCreatureAI(c)
         {
         }
 
         uint32 checkTimer;
         uint64 targetGUID;
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner) override
         {
             if (!summoner)
                 return;
@@ -924,7 +906,7 @@ public:
             me->CastSpell(me, 48649 /*SPELL_PET_TOY_FETCH_BALL_COME_HERE*/, true);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == 48649 /*SPELL_PET_TOY_FETCH_BALL_COME_HERE*/)
             {
@@ -933,7 +915,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             checkTimer += diff;
             if (checkTimer >= 1000)
@@ -950,9 +932,30 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_fetch_ballAI (pCreature);
+    }
+};
+
+class npc_pet_gen_moth : public CreatureScript
+{
+public:
+    npc_pet_gen_moth() : CreatureScript("npc_pet_gen_moth") { }
+
+    struct npc_pet_gen_mothAI : public NullCreatureAI
+    {
+        npc_pet_gen_mothAI(Creature* c) : NullCreatureAI(c)
+        {
+            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+            me->SetCanFly(true);
+            me->SetDisableGravity(true);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* pCreature) const override
+    {
+        return new npc_pet_gen_mothAI (pCreature);
     }
 };
 
@@ -970,4 +973,5 @@ void AddSC_generic_pet_scripts()
     new npc_pet_gen_plump_turkey();
     new npc_pet_gen_toxic_wasteling();
     new npc_pet_gen_fetch_ball();
+    new npc_pet_gen_moth();
 }

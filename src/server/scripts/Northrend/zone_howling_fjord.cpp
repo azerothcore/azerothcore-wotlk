@@ -40,7 +40,7 @@ public:
                     me->GetMotionMaster()->MovePoint(0, *owner);
         }
 
-        void MovementInform(uint32  /*type*/, uint32  /*id*/)
+        void MovementInform(uint32  /*type*/, uint32  /*id*/) override
         {
             if (Creature* cow = me->FindNearestCreature(24797, 5.0f, true))
             {
@@ -53,15 +53,15 @@ public:
                         owner->CastSpell(owner, 44463, true);
             }
         }
-        
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
         {
             if (caster && spellInfo->Id == 44454)
                 me->GetMotionMaster()->MovePoint(0, *caster);
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_attracted_reef_bullAI(creature);
     }
@@ -79,13 +79,13 @@ public:
         uint32 timer;
         short phase;
 
-        void Reset()
+        void Reset() override
         {
             timer = 0;
             phase = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer >= 6000 && phase < 4)
             {
@@ -93,15 +93,15 @@ public:
                 setphase(phase);
                 timer = 0;
             }
-            
+
             timer += diff;
-            
+
             DoMeleeAttackIfReady();
         }
 
         void setphase(short phase)
         {
-            Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummoner() : NULL;
+            Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummoner() : nullptr;
             if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
                 return;
 
@@ -130,12 +130,11 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_your_inner_turmoilAI(creature);
     }
 };
-
 
 // Theirs
 /*######
@@ -157,7 +156,7 @@ class npc_apothecary_hanes : public CreatureScript
 public:
     npc_apothecary_hanes() : CreatureScript("npc_apothecary_hanes") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_TRAIL_OF_FIRE)
         {
@@ -169,22 +168,22 @@ public:
 
     struct npc_Apothecary_HanesAI : public npc_escortAI
     {
-        npc_Apothecary_HanesAI(Creature* creature) : npc_escortAI(creature){ }
+        npc_Apothecary_HanesAI(Creature* creature) : npc_escortAI(creature) { }
         uint32 PotTimer;
 
-        void Reset()
+        void Reset() override
         {
             SetDespawnAtFar(false);
             PotTimer = 10000; //10 sec cooldown on potion
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (Player* player = GetPlayerForEscort())
                 player->FailQuest(QUEST_TRAIL_OF_FIRE);
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             if (HealthBelowPct(75))
             {
@@ -192,13 +191,14 @@ public:
                 {
                     DoCast(me, SPELL_HEALING_POTION, true);
                     PotTimer = 10000;
-                } else PotTimer -= diff;
+                }
+                else PotTimer -= diff;
             }
             if (GetAttack() && UpdateVictim())
                 DoMeleeAttackIfReady();
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
             if (!player)
@@ -248,7 +248,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_Apothecary_HanesAI(creature);
     }
@@ -272,7 +272,7 @@ public:
     {
         npc_plaguehound_trackerAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             uint64 summonerGUID = 0;
 
@@ -288,7 +288,7 @@ public:
             Start(false, false, summonerGUID);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             if (waypointId != 26)
                 return;
@@ -297,7 +297,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_plaguehound_trackerAI(creature);
     }
@@ -326,7 +326,7 @@ class npc_razael_and_lyana : public CreatureScript
 public:
     npc_razael_and_lyana() : CreatureScript("npc_razael_and_lyana") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
@@ -337,35 +337,35 @@ public:
                 case NPC_RAZAEL:
                     if (!player->GetReqKillOrCastCurrentCount(QUEST_REPORTS_FROM_THE_FIELD, NPC_RAZAEL))
                     {
-                        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_RAZAEL_REPORT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                        player->SEND_GOSSIP_MENU(GOSSIP_TEXTID_RAZAEL1, creature->GetGUID());
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_RAZAEL_REPORT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                        SendGossipMenuFor(player, GOSSIP_TEXTID_RAZAEL1, creature->GetGUID());
                         return true;
                     }
-                break;
+                    break;
                 case NPC_LYANA:
                     if (!player->GetReqKillOrCastCurrentCount(QUEST_REPORTS_FROM_THE_FIELD, NPC_LYANA))
                     {
-                        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_LYANA_REPORT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                        player->SEND_GOSSIP_MENU(GOSSIP_TEXTID_LYANA1, creature->GetGUID());
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_LYANA_REPORT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                        SendGossipMenuFor(player, GOSSIP_TEXTID_LYANA1, creature->GetGUID());
                         return true;
                     }
-                break;
+                    break;
             }
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
-                player->SEND_GOSSIP_MENU(GOSSIP_TEXTID_RAZAEL2, creature->GetGUID());
+                SendGossipMenuFor(player, GOSSIP_TEXTID_RAZAEL2, creature->GetGUID());
                 player->TalkedToCreature(NPC_RAZAEL, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                player->SEND_GOSSIP_MENU(GOSSIP_TEXTID_LYANA2, creature->GetGUID());
+                SendGossipMenuFor(player, GOSSIP_TEXTID_LYANA2, creature->GetGUID());
                 player->TalkedToCreature(NPC_LYANA, creature->GetGUID());
                 break;
         }
@@ -383,4 +383,4 @@ void AddSC_howling_fjord()
     new npc_apothecary_hanes();
     new npc_plaguehound_tracker();
     new npc_razael_and_lyana();
- }
+}

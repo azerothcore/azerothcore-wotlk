@@ -5,7 +5,7 @@
 #ifndef DEF_RAZORFEN_DOWNS_H
 #define DEF_RAZORFEN_DOWNS_H
 
-#include "ScriptPCH.h"
+#include "PassiveAI.h"
 
 enum CreatureIds
 {

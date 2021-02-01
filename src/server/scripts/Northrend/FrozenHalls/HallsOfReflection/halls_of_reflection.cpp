@@ -2,7 +2,6 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptPCH.h"
 #include "halls_of_reflection.h"
 #include "MotionMaster.h"
 
@@ -77,7 +76,7 @@ class npc_hor_leader : public CreatureScript
 public:
     npc_hor_leader() : CreatureScript("npc_hor_leader") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
             return true;
@@ -95,24 +94,32 @@ public:
         {
             QuestStatus status = player->GetQuestStatus(creature->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_DELIVRANCE_FROM_THE_PIT_H2 : QUEST_DELIVRANCE_FROM_THE_PIT_A2);
             if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
-                player->ADD_GOSSIP_ITEM(0, "Can you remove the sword?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                AddGossipItemFor(player, 0, "Can you remove the sword?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
             // once last quest is completed, she offers this shortcut of the starting event
             status = player->GetQuestStatus(creature->GetEntry() == NPC_SYLVANAS_PART1 ? QUEST_WRATH_OF_THE_LICH_KING_H2 : QUEST_WRATH_OF_THE_LICH_KING_A2);
             if (status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_REWARDED)
             {
                 if (creature->GetEntry() == NPC_SYLVANAS_PART1)
-                    player->ADD_GOSSIP_ITEM(0, "Dark Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                    AddGossipItemFor(player, 0, "Dark Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                 else
-                    player->ADD_GOSSIP_ITEM(0, "My Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                    AddGossipItemFor(player, 0, "My Lady, I think I hear Arthas coming. Whatever you're going to do, do it quickly.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             }
         }
 
-        player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+        if (creature->GetEntry() == NPC_SYLVANAS_PART1)
+        {
+            SendGossipMenuFor(player, 15215, creature->GetGUID());
+        }
+        else if (creature->GetEntry() == NPC_JAINA_PART1)
+        {
+            SendGossipMenuFor(player, 15339, creature->GetGUID());
+        }
+
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
         if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
             return true;
@@ -127,17 +134,17 @@ public:
 
         instance->SetData(DATA_BATTERED_HILT, 1);
 
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         switch (uiAction)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 if (creature->AI())
                     creature->AI()->DoAction(ACTION_START_INTRO);
                 creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 if (creature->AI())
                     creature->AI()->DoAction(ACTION_SKIP_INTRO);
                 creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
@@ -147,7 +154,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_leaderAI(creature);
     }
@@ -167,7 +174,7 @@ public:
         bool first;
         bool shortver;
 
-        void Reset()
+        void Reset() override
         {
             shortver = false;
             events.Reset();
@@ -181,7 +188,7 @@ public:
             }
         }
 
-        void DoAction(int32 actionId)
+        void DoAction(int32 actionId) override
         {
             switch(actionId)
             {
@@ -194,7 +201,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch(events.ExecuteEvent())
@@ -239,7 +246,7 @@ public:
                     events.ScheduleEvent(EVENT_INTRO_LK_1, 0);
                     break;
 
-            // A2 Intro Events
+                // A2 Intro Events
                 case EVENT_INTRO_A2_1:
                     Talk(SAY_JAINA_INTRO_3);
                     events.ScheduleEvent(EVENT_INTRO_A2_2, 5000);
@@ -336,7 +343,7 @@ public:
                     events.ScheduleEvent(EVENT_INTRO_LK_1, 2000);
                     break;
 
-            // H2 Intro Events
+                // H2 Intro Events
                 case EVENT_INTRO_H2_2:
                     Talk(SAY_SYLVANAS_INTRO_2);
                     events.ScheduleEvent(EVENT_INTRO_H2_3, 6000);
@@ -412,7 +419,7 @@ public:
                     events.ScheduleEvent(EVENT_INTRO_LK_1, 2000);
                     break;
 
-            // Remaining Intro Events common for both faction
+                // Remaining Intro Events common for both faction
                 case EVENT_INTRO_LK_1:
                     if (Creature* pLichKing = pInstance->instance->GetCreature(pInstance->GetData64(NPC_LICH_KING_EVENT)))
                     {
@@ -649,7 +656,7 @@ class npc_ghostly_priest : public CreatureScript
 public:
     npc_ghostly_priest() : CreatureScript("npc_ghostly_priest") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ghostly_priestAI(creature);
     }
@@ -660,7 +667,7 @@ public:
 
         EventMap events;
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
             {
@@ -670,12 +677,12 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 5000);
             events.ScheduleEvent(EVENT_CIRCLE_OF_DESTRUCTION, 8000);
@@ -683,14 +690,14 @@ public:
             events.ScheduleEvent(EVENT_DARK_MENDING, 8000);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -731,7 +738,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
@@ -745,7 +752,7 @@ class npc_phantom_mage : public CreatureScript
 public:
     npc_phantom_mage() : CreatureScript("npc_phantom_mage") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_phantom_mageAI(creature);
     }
@@ -756,7 +763,7 @@ public:
 
         EventMap events;
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
             {
@@ -766,12 +773,12 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_FIREBALL, 3000);
             events.ScheduleEvent(EVENT_FLAMESTRIKE, 6000);
@@ -780,14 +787,14 @@ public:
             events.ScheduleEvent(EVENT_HALLUCINATION, 40000);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -820,14 +827,14 @@ public:
                 case EVENT_HALLUCINATION:
                     //me->CastSpell(me, SPELL_HALLUCINATION, false);
                     me->SummonCreature(NPC_PHANTOM_HALLUCINATION, *me, TEMPSUMMON_TIMED_DESPAWN, 30000);
-                    me->CastSpell(me, SPELL_HALLUCINATION+1, true);
+                    me->CastSpell(me, SPELL_HALLUCINATION + 1, true);
                     break;
             }
 
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
@@ -841,7 +848,7 @@ class npc_phantom_hallucination : public CreatureScript
 public:
     npc_phantom_hallucination() : CreatureScript("npc_phantom_hallucination") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_phantom_hallucinationAI(creature);
     }
@@ -855,12 +862,12 @@ public:
 
         uint8 numOfUpd;
 
-        void JustDied(Unit* /*who*/)
+        void JustDied(Unit* /*who*/) override
         {
             me->CastSpell((Unit*)NULL, SPELL_HALLUCINATION_2, false);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (numOfUpd)
             {
@@ -872,7 +879,7 @@ public:
             npc_phantom_mageAI::UpdateAI(diff);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (numOfUpd)
                 return;
@@ -882,7 +889,6 @@ public:
                 me->ToTempSummon()->DespawnOrUnsummon(1);
         }
     };
-
 };
 
 class npc_shadowy_mercenary : public CreatureScript
@@ -890,7 +896,7 @@ class npc_shadowy_mercenary : public CreatureScript
 public:
     npc_shadowy_mercenary() : CreatureScript("npc_shadowy_mercenary") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_shadowy_mercenaryAI(creature);
     }
@@ -901,7 +907,7 @@ public:
 
         EventMap events;
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
             {
@@ -911,12 +917,12 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SHADOW_STEP, 4000);
             events.ScheduleEvent(EVENT_DEADLY_POISON, 6000);
@@ -924,14 +930,14 @@ public:
             events.ScheduleEvent(EVENT_KIDNEY_SHOT, 5000);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -971,7 +977,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
@@ -985,7 +991,7 @@ class npc_spectral_footman : public CreatureScript
 public:
     npc_spectral_footman() : CreatureScript("npc_spectral_footman") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_spectral_footmanAI(creature);
     }
@@ -996,7 +1002,7 @@ public:
 
         EventMap events;
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
             {
@@ -1006,26 +1012,26 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_SPECTRAL_STRIKE, 5000);
             events.ScheduleEvent(EVENT_SHIELD_BASH, 6000);
             events.ScheduleEvent(EVENT_TORTURED_ENRAGE, 15000);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1054,7 +1060,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
@@ -1068,7 +1074,7 @@ class npc_tortured_rifleman : public CreatureScript
 public:
     npc_tortured_rifleman() : CreatureScript("npc_tortured_rifleman") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_tortured_riflemanAI(creature);
     }
@@ -1079,7 +1085,7 @@ public:
 
         EventMap events;
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
             {
@@ -1089,26 +1095,26 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_CURSED_ARROW, 10000);
             events.ScheduleEvent(EVENT_FROST_TRAP, 15000);
             events.ScheduleEvent(EVENT_ICE_SHOT, 15000);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!me->IsVisible() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                 return;
             ScriptedAI::AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1138,7 +1144,7 @@ public:
             DoSpellAttackIfReady(SPELL_SHOOT);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             if (me->GetInstanceScript()->GetData(DATA_WAVE_NUMBER))
@@ -1162,12 +1168,12 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_FROSTSWORN_GENERAL_AGGRO);
             events.ScheduleEvent(EVENT_ACTIVATE_REFLECTIONS, 8000);
@@ -1175,7 +1181,7 @@ public:
             pInstance->SetData(ACTION_SPIRITUAL_REFLECTIONS_COPY, 1);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1208,21 +1214,21 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_FROSTSWORN_GENERAL_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_FROSTSWORN_GENERAL, DONE);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             pInstance->SetData(ACTION_SPIRITUAL_REFLECTIONS_HIDE, 1);
             ScriptedAI::EnterEvadeMode();
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_frostsworn_generalAI(creature);
     }
@@ -1241,17 +1247,17 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_BALEFUL_STRIKE, urand(4000, 7000));
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1265,19 +1271,19 @@ public:
             {
                 case EVENT_BALEFUL_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_BALEFUL_STRIKE, false);
-                    events.ScheduleEvent(EVENT_BALEFUL_STRIKE, urand(4000,7000));
+                    events.ScheduleEvent(EVENT_BALEFUL_STRIKE, urand(4000, 7000));
                     break;
             }
 
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->CastSpell((Unit*)NULL, SPELL_SPIRIT_BURST, false);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             me->UpdatePosition(me->GetHomePosition(), true);
             ScriptedAI::EnterEvadeMode();
@@ -1285,7 +1291,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_spiritual_reflectionAI(creature);
     }
@@ -1293,23 +1299,23 @@ public:
 
 class at_hor_shadow_throne : public AreaTriggerScript
 {
-    public:
-        at_hor_shadow_throne() : AreaTriggerScript("at_hor_shadow_throne") { }
+public:
+    at_hor_shadow_throne() : AreaTriggerScript("at_hor_shadow_throne") { }
 
-        bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
-        {
-            if (player->IsGameMaster())
-                return false;
-
-            InstanceScript* inst = player->GetInstanceScript();
-            if (!inst)
-                return false;
-
-            if (inst->GetData(DATA_FROSTSWORN_GENERAL) && !inst->GetData(DATA_LK_INTRO))
-                inst->SetData(DATA_LK_INTRO, DONE);
-
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        if (player->IsGameMaster())
             return false;
-        }
+
+        InstanceScript* inst = player->GetInstanceScript();
+        if (!inst)
+            return false;
+
+        if (inst->GetData(DATA_FROSTSWORN_GENERAL) && !inst->GetData(DATA_LK_INTRO))
+            inst->SetData(DATA_LK_INTRO, DONE);
+
+        return false;
+    }
 };
 
 enum eFightEvents
@@ -1341,7 +1347,7 @@ class npc_hor_lich_king : public CreatureScript
 public:
     npc_hor_lich_king() : CreatureScript("npc_hor_lich_king") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_lich_kingAI(creature);
     }
@@ -1362,7 +1368,7 @@ public:
         uint8 reqKillCount;
         uint8 div2;
 
-        void Reset()
+        void Reset() override
         {
             currentWall = 0;
             reqKillCount = 0;
@@ -1370,7 +1376,7 @@ public:
             events.RescheduleEvent(EVENT_LK_CHECK_COMBAT, 1000);
         }
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == ACTION_START_LK_FIGHT_REAL)
                 events.ScheduleEvent(EVENT_LK_START_FOLLOWING, 1500);
@@ -1395,7 +1401,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32  /*id*/)
+        void MovementInform(uint32 type, uint32  /*id*/) override
         {
             // Xinef: dont use 0, it is no longer the last point
             // Xinef: if type is escort and spline is finalized, it means that we reached last point from the path
@@ -1419,41 +1425,41 @@ public:
             }
         }
 
-        void JustSummoned(Creature* s)
+        void JustSummoned(Creature* s) override
         {
             ++reqKillCount;
             if (events.GetNextEventTime(EVENT_DECREASE_REQ_COUNT_BY_100))
                 events.RescheduleEvent(EVENT_DECREASE_REQ_COUNT_BY_100, 10000);
             summons.Summon(s);
-            s->SetHomePosition(PathWaypoints[WP_STOP[currentWall+1]]);
-            s->GetMotionMaster()->MovePoint(0, PathWaypoints[WP_STOP[currentWall+1]]);
+            s->SetHomePosition(PathWaypoints[WP_STOP[currentWall + 1]]);
+            s->GetMotionMaster()->MovePoint(0, PathWaypoints[WP_STOP[currentWall + 1]]);
             s->SetInCombatWithZone();
             if (Unit* target = s->SelectNearestPlayer(350.0f))
             {
                 s->AddThreat(target, 1000.0f);
                 s->AI()->AttackStart(target);
             }
-            s->SetHomePosition(PathWaypoints[WP_STOP[currentWall+1]]);
+            s->SetHomePosition(PathWaypoints[WP_STOP[currentWall + 1]]);
         }
 
-        void SummonedCreatureDespawn(Creature* s)
+        void SummonedCreatureDespawn(Creature* s) override
         {
             summons.Despawn(s);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (target && target->IsAlive() && spell->Id == SPELL_LICH_KING_ZAP_PLAYER)
                 Unit::DealDamage(me, target, 10000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->HealthBelowPct(70))
-                me->SetHealth(me->GetMaxHealth()*3/4);
+                me->SetHealth(me->GetMaxHealth() * 3 / 4);
 
             events.Update(diff);
-            
+
             if (me->IsNonMeleeSpellCast(false, true, true))
                 return;
 
@@ -1510,10 +1516,10 @@ public:
                     break;
                 case EVENT_LK_START_FOLLOWING:
                     {
-                        me->SetSpeed(MOVE_RUN, 9.0f/7.0f);
+                        me->SetSpeed(MOVE_RUN, 9.0f / 7.0f);
                         Movement::PointsArray path;
                         path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                        for (uint8 i=0; i<=2; ++i)
+                        for (uint8 i = 0; i <= 2; ++i)
                             path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
                         me->GetMotionMaster()->MoveSplinePath(&path);
                     }
@@ -1525,7 +1531,7 @@ public:
                         me->CastSpell(me, SPELL_REMORSELESS_WINTER, true);
                         Movement::PointsArray path;
                         path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                        for (uint8 i=3; i<PATH_WP_COUNT-1; ++i)
+                        for (uint8 i = 3; i < PATH_WP_COUNT - 1; ++i)
                             path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
                         me->GetMotionMaster()->MoveSplinePath(&path);
                         me->GetMotionMaster()->propagateSpeedChange();
@@ -1571,7 +1577,7 @@ public:
                     }
                     break;
                 case EVENT_DECREASE_REQ_COUNT_BY_100:
-                    reqKillCount = (reqKillCount <= 100 ? 0 : reqKillCount-100);
+                    reqKillCount = (reqKillCount <= 100 ? 0 : reqKillCount - 100);
                     DoAction(ACTION_CHECK_TRASH_DIED);
                     break;
                 case EVENT_LK_SUMMON_GHOULS:
@@ -1584,8 +1590,8 @@ public:
                     me->CastSpell((Unit*)NULL, SPELL_SUMMON_LUMBERING_ABOMINATION, false);
                     break;
                 case EVENT_LK_SUMMON_NEXT_ICE_WALL:
-                    Talk(SAY_LK_IW_1+currentWall);
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(NPC_ICE_WALL_TARGET+currentWall)))
+                    Talk(SAY_LK_IW_1 + currentWall);
+                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(NPC_ICE_WALL_TARGET + currentWall)))
                         me->CastSpell(c, SPELL_SUMMON_ICE_WALL, false);
                     break;
             }
@@ -1598,12 +1604,12 @@ class npc_hor_leader_second : public CreatureScript
 public:
     npc_hor_leader_second() : CreatureScript("npc_hor_leader_second") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32  /*uiAction*/)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32  /*uiAction*/) override
     {
         if (!creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
             return true;
 
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
 
         if (InstanceScript* pInstance = creature->GetInstanceScript())
             if (!pInstance->GetData(DATA_LICH_KING))
@@ -1616,7 +1622,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_leader_secondAI(creature);
     }
@@ -1634,13 +1640,13 @@ public:
         EventMap events;
         uint8 currentStopPoint;
 
-        void Reset()
+        void Reset() override
         {
             currentStopPoint = 0;
             events.Reset();
         }
 
-        void DoAction(int32 actionId)
+        void DoAction(int32 actionId) override
         {
             switch(actionId)
             {
@@ -1658,10 +1664,10 @@ public:
             }
         }
 
-        void DamageTaken(Unit*, uint32& dmg, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& dmg, DamageEffectType, SpellSchoolMask) override
         {
             if (dmg >= me->GetHealth())
-                dmg = me->GetHealth()-1;
+                dmg = me->GetHealth() - 1;
         }
 
         void MoveToNextStopPoint()
@@ -1670,18 +1676,18 @@ public:
             ++currentStopPoint;
             Movement::PointsArray path;
             path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            for (uint8 i=WP_STOP[currentStopPoint-1]+(currentStopPoint == 1 ? 0 : 1); i<=WP_STOP[currentStopPoint]; ++i)
+            for (uint8 i = WP_STOP[currentStopPoint - 1] + (currentStopPoint == 1 ? 0 : 1); i <= WP_STOP[currentStopPoint]; ++i)
                 path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
             me->GetMotionMaster()->MoveSplinePath(&path);
         }
 
-        void MovementInform(uint32 type, uint32  /*id*/)
+        void MovementInform(uint32 type, uint32 /*id*/) override
         {
             if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
                 events.ScheduleEvent(EVENT_SAY_LEADER_STOP_TEXT, 1000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch(events.ExecuteEvent())
@@ -1750,11 +1756,21 @@ public:
                         int32 textId = 0;
                         switch (currentStopPoint)
                         {
-                            case 1: textId = SAY_SYLVANAS_IW_1; break;
-                            case 2: textId = SAY_SYLVANAS_IW_2; break;
-                            case 3: textId = SAY_SYLVANAS_IW_3; break;
-                            case 4: textId = SAY_SYLVANAS_IW_4; break;
-                            case 5: textId = SAY_SYLVANAS_END; break;
+                            case 1:
+                                textId = SAY_SYLVANAS_IW_1;
+                                break;
+                            case 2:
+                                textId = SAY_SYLVANAS_IW_2;
+                                break;
+                            case 3:
+                                textId = SAY_SYLVANAS_IW_3;
+                                break;
+                            case 4:
+                                textId = SAY_SYLVANAS_IW_4;
+                                break;
+                            case 5:
+                                textId = SAY_SYLVANAS_END;
+                                break;
                         }
                         if (me->GetEntry() == NPC_JAINA_PART2)
                             textId += 10;
@@ -1763,7 +1779,7 @@ public:
                             me->CastSpell((Unit*)NULL, (me->GetEntry() == NPC_JAINA_PART2 ? SPELL_DESTROY_WALL_JAINA : SPELL_DESTROY_WALL_SYLVANAS), false);
                         else
                         {
-                            me->SetFacingTo(PathWaypoints[PATH_WP_COUNT-1].GetOrientation());
+                            me->SetFacingTo(PathWaypoints[PATH_WP_COUNT - 1].GetOrientation());
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_READY1H);
                         }
                     }
@@ -1787,12 +1803,12 @@ public:
 
         bool leaped;
 
-        void Reset()
+        void Reset() override
         {
             leaped = false;
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (!UpdateVictim())
                 return;
@@ -1811,7 +1827,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->SetCorpseDelay(10);
             if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -1820,7 +1836,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_raging_ghoulAI(creature);
     }
@@ -1837,19 +1853,19 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(1, 10000);
             events.ScheduleEvent(2, 4500);
             events.ScheduleEvent(3, 9000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1880,7 +1896,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->SetCorpseDelay(10);
             if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -1889,7 +1905,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_risen_witch_doctorAI(creature);
     }
@@ -1906,17 +1922,17 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             events.ScheduleEvent(1, 5000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -1945,7 +1961,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             me->SetCorpseDelay(10);
             if (InstanceScript* pInstance = me->GetInstanceScript())
@@ -1954,7 +1970,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_hor_lumbering_abominationAI(creature);
     }
@@ -1969,21 +1985,21 @@ public:
     {
         PrepareAuraScript(spell_hor_gunship_cannon_fireAuraScript)
 
-        void HandleEffectPeriodic(AuraEffect const *  /*aurEff*/)
+        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
         {
             PreventDefaultAction();
             if (Unit* caster = GetCaster())
-                if (Creature* c = caster->SummonCreature(WORLD_TRIGGER, CannonFirePos[caster->GetEntry() == NPC_JAINA_PART2 ? 0 : 1][urand(0,2)], TEMPSUMMON_TIMED_DESPAWN, 1))
+                if (Creature* c = caster->SummonCreature(WORLD_TRIGGER, CannonFirePos[caster->GetEntry() == NPC_JAINA_PART2 ? 0 : 1][urand(0, 2)], TEMPSUMMON_TIMED_DESPAWN, 1))
                     c->CastSpell((Unit*)NULL, 70021, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_hor_gunship_cannon_fireAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript *GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_hor_gunship_cannon_fireAuraScript();
     }
@@ -1993,37 +2009,37 @@ public:
 
 class at_hor_battered_hilt_start : public AreaTriggerScript
 {
-    public:
-        at_hor_battered_hilt_start() : AreaTriggerScript("at_hor_battered_hilt_start") { }
+public:
+    at_hor_battered_hilt_start() : AreaTriggerScript("at_hor_battered_hilt_start") { }
 
-        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
-        {
-            if (player->HasAura(70013))
-                if (InstanceScript* instance = player->GetInstanceScript())
-                    instance->SetData(DATA_BATTERED_HILT, 2);
-            return true;
-        }
+    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+    {
+        if (player->HasAura(70013))
+            if (InstanceScript* instance = player->GetInstanceScript())
+                instance->SetData(DATA_BATTERED_HILT, 2);
+        return true;
+    }
 };
 
 class at_hor_battered_hilt_throw : public AreaTriggerScript
 {
-    public:
-        at_hor_battered_hilt_throw() : AreaTriggerScript("at_hor_battered_hilt_throw") { }
+public:
+    at_hor_battered_hilt_throw() : AreaTriggerScript("at_hor_battered_hilt_throw") { }
 
-        bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
-        {
-            if (player->HasAura(70013))
-                if (InstanceScript* instance = player->GetInstanceScript())
-                {
-                    uint32 bhd = instance->GetData(DATA_BATTERED_HILT);
-                    if (bhd == BHSF_NONE || bhd != BHSF_STARTED)
-                        return true;
-                    player->CastSpell(player, 70698, true);
-                    player->DestroyItemCount(49766, 1, true);
-                    instance->SetData(DATA_BATTERED_HILT, 3);
-                }
-            return true;
-        }
+    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
+    {
+        if (player->HasAura(70013))
+            if (InstanceScript* instance = player->GetInstanceScript())
+            {
+                uint32 bhd = instance->GetData(DATA_BATTERED_HILT);
+                if (bhd != BHSF_STARTED)
+                    return true;
+                player->CastSpell(player, 70698, true);
+                player->DestroyItemCount(49766, 1, true);
+                instance->SetData(DATA_BATTERED_HILT, 3);
+            }
+        return true;
+    }
 };
 
 void AddSC_halls_of_reflection()

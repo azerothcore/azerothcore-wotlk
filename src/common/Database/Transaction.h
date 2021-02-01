@@ -1,12 +1,13 @@
 /*
- * Copyright (C) 
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #ifndef _TRANSACTION_H
 #define _TRANSACTION_H
+
+#include <utility>
 
 #include "SQLOperation.h"
 
@@ -22,25 +23,25 @@ class Transaction
     template <typename T>
     friend class DatabaseWorkerPool;
 
-    public:
-        Transaction() : _cleanedUp(false) { }
-        ~Transaction() { Cleanup(); }
+public:
+    Transaction()  { }
+    ~Transaction() { Cleanup(); }
 
-        void Append(PreparedStatement* statement);
-        void Append(const char* sql);
-        void PAppend(const char* sql, ...);
+    void Append(PreparedStatement* statement);
+    void Append(const char* sql);
+    void PAppend(const char* sql, ...);
 
-        size_t GetSize() const { return m_queries.size(); }
+    [[nodiscard]] size_t GetSize() const { return m_queries.size(); }
 
-    protected:
-        void Cleanup();
-        std::list<SQLElementData> m_queries;
+protected:
+    void Cleanup();
+    std::list<SQLElementData> m_queries;
 
-    private:
-        bool _cleanedUp;
-
+private:
+    bool _cleanedUp{false};
 };
-typedef Trinity::AutoPtr<Transaction, ACE_Thread_Mutex> SQLTransaction;
+
+typedef std::shared_ptr<Transaction> SQLTransaction;
 
 /*! Low level class*/
 class TransactionTask : public SQLOperation
@@ -48,14 +49,14 @@ class TransactionTask : public SQLOperation
     template <class T> friend class DatabaseWorkerPool;
     friend class DatabaseWorker;
 
-    public:
-        TransactionTask(SQLTransaction trans) : m_trans(trans) { } ;
-        ~TransactionTask(){ };
+public:
+    TransactionTask(SQLTransaction trans) : m_trans(std::move(trans)) { } ;
+    ~TransactionTask() override = default;
 
-    protected:
-        bool Execute();
+protected:
+    bool Execute() override;
 
-        SQLTransaction m_trans;
+    SQLTransaction m_trans;
 };
 
 #endif

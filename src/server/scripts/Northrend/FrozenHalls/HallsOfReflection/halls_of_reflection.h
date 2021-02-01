@@ -5,7 +5,14 @@
 #ifndef DEF_HALLS_OF_REFLECTION_H
 #define DEF_HALLS_OF_REFLECTION_H
 
-#include "ScriptPCH.h"
+#include "Player.h"
+#include "SpellAuras.h"
+#include "SpellAuraEffects.h"
+#include "ScriptedCreature.h"
+#include "PassiveAI.h"
+#include "ScriptedGossip.h"
+#include "SpellScript.h"
+#include "ScriptMgr.h"
 
 enum Data
 {
@@ -312,7 +319,7 @@ const Position CannonFirePos[2][3] =
     }
 };
 
-const Position StairsPos[2][3] = 
+const Position StairsPos[2][3] =
 {
     {
         {5226.36f, 1640.87f, 785.737f, 5.56137f},

@@ -6,32 +6,26 @@
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
-enum Sounds
+enum Says
 {
-    SOUND_AGGRO_1                   = 8852,
-    SOUND_AGGRO_2                   = 8853,
-    SOUND_AGGRO_3                   = 8854,
-    SOUND_SLAY                      = 8861,
-    SOUND_COMMAND_1                 = 8855,
-    SOUND_COMMAND_2                 = 8856,
-    SOUND_COMMAND_3                 = 8858,
-    SOUND_COMMAND_4                 = 8859,
-    SOUND_COMMAND_5                 = 8861,
-    SOUND_DEATH                     = 8860,
+    SAY_AGGRO   = 0,
+    SAY_SLAY    = 1,
+    SAY_TAUNTED = 2,
+    SAY_DEATH   = 3,
+    SAY_SHOUT   = 4
 };
 
 enum Spells
 {
     SPELL_UNBALANCING_STRIKE        = 26613,
-    SPELL_DISRUPTING_SHOUT_10       = 29107, 
+    SPELL_DISRUPTING_SHOUT_10       = 29107,
     SPELL_DISRUPTING_SHOUT_25       = 55543,
     SPELL_JAGGED_KNIFE              = 55550,
     SPELL_HOPELESS                  = 29125,
 
     SPELL_BONE_BARRIER              = 29061,
-    SPELL_BLOOD_STRIKE              = 61696, 
+    SPELL_BLOOD_STRIKE              = 61696,
 };
-
 
 enum Events
 {
@@ -55,14 +49,14 @@ class boss_razuvious : public CreatureScript
 public:
     boss_razuvious() : CreatureScript("boss_razuvious") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_razuviousAI (pCreature);
     }
 
     struct boss_razuviousAI : public BossAI
     {
-        boss_razuviousAI(Creature *c) : BossAI(c, BOSS_RAZUVIOUS), summons(me)
+        explicit boss_razuviousAI(Creature* c) : BossAI(c, BOSS_RAZUVIOUS), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -82,9 +76,9 @@ public:
             }
         }
 
-        void JustSummoned(Creature* cr) { summons.Summon(cr); }
+        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             summons.DespawnAll();
@@ -92,55 +86,36 @@ public:
             SpawnHelpers();
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (!urand(0,3))
-            {
-                DoPlaySoundToSet(me, SOUND_SLAY);
-                me->MonsterYell("You should've stayed home!", LANG_UNIVERSAL, 0);
-            }
+            Talk(SAY_SLAY);
 
             if (pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             // Damage done by the controlled Death Knight understudies should also count toward damage done by players
             if(who && who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_DEATH_KNIGHT_UNDERSTUDY)
                 me->LowerPlayerDamageReq(damage);
         }
 
-        void JustDied(Unit*  killer)
+        void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
-            DoPlaySoundToSet(me, SOUND_DEATH);
-            me->MonsterYell("An honorable... death...", LANG_UNIVERSAL, 0);
-            
+            Talk(SAY_DEATH);
+
             me->CastSpell(me, SPELL_HOPELESS, true);
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
-            switch (urand(0,2))
-            {
-                case 0:
-                    DoPlaySoundToSet(me, SOUND_AGGRO_1);
-                    me->MonsterYell("Hah hah, I'm just getting warmed up!", LANG_UNIVERSAL, 0);
-                    break;
-                case 1:
-                    DoPlaySoundToSet(me, SOUND_AGGRO_2);
-                    me->MonsterYell("Stand and fight!", LANG_UNIVERSAL, 0);
-                    break;
-                case 2:
-                    DoPlaySoundToSet(me, SOUND_AGGRO_3);
-                    me->MonsterYell("Show me what you've got!", LANG_UNIVERSAL, 0);
-                    break;
-            }
+            Talk(SAY_AGGRO);
 
             events.ScheduleEvent(EVENT_SPELL_UNBALANCING_STRIKE, 30000);
             events.ScheduleEvent(EVENT_SPELL_DISRUPTING_SHOUT, 25000);
@@ -150,7 +125,7 @@ public:
             summons.DoZoneInCombat();
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -159,13 +134,14 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_UNBALANCING_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_UNBALANCING_STRIKE, false);
                     events.RepeatEvent(30000);
                     break;
                 case EVENT_SPELL_DISRUPTING_SHOUT:
+                    Talk(SAY_SHOUT);
                     me->CastSpell(me, RAID_MODE(SPELL_DISRUPTING_SHOUT_10, SPELL_DISRUPTING_SHOUT_25), false);
                     events.RepeatEvent(25000);
                     break;
@@ -176,21 +152,7 @@ public:
                     events.RepeatEvent(25000);
                     break;
                 case EVENT_PLAY_COMMAND:
-                    switch (urand(0,2))
-                    {
-                        case 0:
-                            DoPlaySoundToSet(me, SOUND_COMMAND_1);
-                            me->MonsterYell("Do as I taught you!", LANG_UNIVERSAL, 0);
-                            break;
-                        case 1:
-                            DoPlaySoundToSet(me, SOUND_COMMAND_2);
-                            me->MonsterYell("Show them no mercy!", LANG_UNIVERSAL, 0);
-                            break;
-                        case 2:
-                            DoPlaySoundToSet(me, SOUND_COMMAND_3);
-                            me->MonsterYell("You disappoint me, students!", LANG_UNIVERSAL, 0);
-                            break;
-                    }
+                    Talk(SAY_TAUNTED);
                     events.RepeatEvent(40000);
                     break;
             }
@@ -205,25 +167,23 @@ class boss_razuvious_minion : public CreatureScript
 public:
     boss_razuvious_minion() : CreatureScript("boss_razuvious_minion") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_razuvious_minionAI (pCreature);
     }
 
     struct boss_razuvious_minionAI : public ScriptedAI
     {
-        boss_razuvious_minionAI(Creature *c) : ScriptedAI(c)
-        {
-        }
+        explicit boss_razuvious_minionAI(Creature* c) : ScriptedAI(c) { }
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
@@ -232,7 +192,7 @@ public:
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void EnterCombat(Unit *who)
+        void EnterCombat(Unit* who) override
         {
             if (Creature* cr = me->FindNearestCreature(NPC_RAZUVIOUS, 100.0f))
             {
@@ -244,7 +204,7 @@ public:
             events.ScheduleEvent(EVENT_MINION_BONE_BARRIER, 9000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -253,7 +213,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING) || me->IsCharmed())
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_MINION_BLOOD_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_BLOOD_STRIKE, false);

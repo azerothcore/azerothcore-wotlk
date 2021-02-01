@@ -5,7 +5,12 @@
 #ifndef DEF_NEXUS_H
 #define DEF_NEXUS_H
 
-#include "ScriptPCH.h"
+#include "Player.h"
+#include "SpellScript.h"
+#include "PassiveAI.h"
+#include "SpellAuras.h"
+#include "GridNotifiers.h"
+#include "GameEventMgr.h"
 
 enum eTypes
 {

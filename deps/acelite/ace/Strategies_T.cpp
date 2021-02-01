@@ -436,7 +436,7 @@ ACE_Process_Strategy<SVC_HANDLER>::activate_svc_handler (SVC_HANDLER *svc_handle
   // If <flags_> is non-0 then we won't create zombies.
   switch (ACE::fork (ACE_TEXT ("child"), this->flags_))
     {
-    case -1:
+    case static_cast<pid_t>(-1):
       {
         ACE_Errno_Guard error (errno);
         svc_handler->close ();
@@ -1489,16 +1489,15 @@ ACE_NOOP_Concurrency_Strategy<SVC_HANDLER>::activate_svc_handler (SVC_HANDLER *,
   return 0;
 }
 
-
-ACE_ALLOC_HOOK_DEFINE(ACE_Creation_Strategy)
-ACE_ALLOC_HOOK_DEFINE(ACE_Singleton_Strategy)
-ACE_ALLOC_HOOK_DEFINE(ACE_DLL_Strategy)
-ACE_ALLOC_HOOK_DEFINE(ACE_Concurrency_Strategy)
-ACE_ALLOC_HOOK_DEFINE(ACE_Thread_Strategy)
-ACE_ALLOC_HOOK_DEFINE(ACE_Connect_Strategy)
-ACE_ALLOC_HOOK_DEFINE(ACE_Process_Strategy)
-ACE_ALLOC_HOOK_DEFINE(ACE_Accept_Strategy)
-ACE_ALLOC_HOOK_DEFINE(ACE_Thread_Strategy)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Creation_Strategy)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Singleton_Strategy)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_DLL_Strategy)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Concurrency_Strategy)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Reactive_Strategy)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Thread_Strategy)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Process_Strategy)
+ACE_ALLOC_HOOK_DEFINE_Tca(ACE_Accept_Strategy)
+ACE_ALLOC_HOOK_DEFINE_Tco(ACE_Connect_Strategy)
 
 ACE_END_VERSIONED_NAMESPACE_DECL
 

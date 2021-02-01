@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -13,13 +12,13 @@
 
 class CharacterDatabaseConnection : public MySQLConnection
 {
-    public:
-        //- Constructors for sync and async connections
-        CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
-        CharacterDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) {}
+public:
+    //- Constructors for sync and async connections
+    CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
+    CharacterDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) {}
 
-        //- Loads database type specific prepared statements
-        void DoPrepareStatements();
+    //- Loads database type specific prepared statements
+    void DoPrepareStatements() override;
 };
 
 typedef DatabaseWorkerPool<CharacterDatabaseConnection> CharacterDatabaseWorkerPool;
@@ -84,6 +83,8 @@ enum CharacterDatabaseStatements
     CHAR_SEL_CHARACTER_ACTIONS,
     CHAR_SEL_CHARACTER_ACTIONS_SPEC,
     CHAR_SEL_CHARACTER_MAILCOUNT,
+    CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD,
+    CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH,
     CHAR_SEL_CHARACTER_MAILDATE,
     CHAR_SEL_CHARACTER_SOCIALLIST,
     CHAR_SEL_CHARACTER_HOMEBIND,
@@ -144,6 +145,7 @@ enum CharacterDatabaseStatements
     CHAR_INS_GUILD_MEMBER,
     CHAR_DEL_GUILD_MEMBER,
     CHAR_DEL_GUILD_MEMBERS,
+    CHAR_SEL_GUILD_MEMBER_EXTENDED,
     CHAR_INS_GUILD_RANK,
     CHAR_DEL_GUILD_RANKS,
     CHAR_DEL_GUILD_LOWEST_RANK,
@@ -228,6 +230,7 @@ enum CharacterDatabaseStatements
     CHAR_UPD_ARENA_TEAM_MEMBER,
     CHAR_REP_CHARACTER_ARENA_STATS,
     CHAR_SEL_PLAYER_ARENA_TEAMS,
+    CHAR_UPD_ARENA_TEAM_NAME,
 
     CHAR_DEL_ALL_PETITION_SIGNATURES,
     CHAR_DEL_PETITION_SIGNATURE,
@@ -344,7 +347,7 @@ enum CharacterDatabaseStatements
     CHAR_SEL_CHAR_OLD_CHARS,
     CHAR_SEL_ARENA_TEAM_ID_BY_PLAYER_GUID,
     CHAR_SEL_MAIL,
-    CHAR_SEL_MAIL_ASYNCH,
+    CHAR_SEL_NEXT_MAIL_DELIVERYTIME,
     CHAR_DEL_CHAR_AURA_FROZEN,
     CHAR_SEL_CHAR_INVENTORY_COUNT_ITEM,
     CHAR_SEL_MAIL_COUNT_ITEM,
@@ -487,12 +490,21 @@ enum CharacterDatabaseStatements
     CHAR_INS_ITEMCONTAINER_SINGLE_ITEM,
     CHAR_DEL_ITEMCONTAINER_CONTAINER,
 
-    CHAR_SEL_PVPSTATS_MAXID, 
-    CHAR_INS_PVPSTATS_BATTLEGROUND, 
-    CHAR_INS_PVPSTATS_PLAYER, 
+    CHAR_SEL_PVPSTATS_MAXID,
+    CHAR_INS_PVPSTATS_BATTLEGROUND,
+    CHAR_INS_PVPSTATS_PLAYER,
     CHAR_SEL_PVPSTATS_FACTIONS_OVERALL,
+    CHAR_SEL_PVPSTATS_BRACKET_MONTH,
 
     CHAR_INS_DESERTER_TRACK,
+
+    CHAR_INS_QUEST_TRACK,
+    CHAR_UPD_QUEST_TRACK_GM_COMPLETE,
+    CHAR_UPD_QUEST_TRACK_COMPLETE_TIME,
+    CHAR_UPD_QUEST_TRACK_ABANDON_TIME,
+
+    CHAR_INS_RECOVERY_ITEM,
+    CHAR_DEL_RECOVERY_ITEM,
 
     MAX_CHARACTERDATABASE_STATEMENTS
 };

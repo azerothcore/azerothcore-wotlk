@@ -5,7 +5,7 @@
 #ifndef DEF_STEAM_VAULT_H
 #define DEF_STEAM_VAULT_H
 
-#include "ScriptPCH.h"
+#include "PassiveAI.h"
 
 enum steamVault
 {
@@ -26,4 +26,3 @@ enum steamVaultNPCGO
 };
 
 #endif
-

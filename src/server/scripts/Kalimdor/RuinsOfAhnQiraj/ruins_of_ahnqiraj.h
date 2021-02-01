@@ -7,8 +7,6 @@
 #ifndef DEF_RUINS_OF_AHNQIRAJ_H
 #define DEF_RUINS_OF_AHNQIRAJ_H
 
-#include "ScriptPCH.h"
-
 enum DataTypes
 {
     DATA_KURINNAXX          = 0,

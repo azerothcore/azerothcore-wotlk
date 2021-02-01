@@ -5,8 +5,6 @@
 #ifndef DEF_MARAUDON_H
 #define DEF_MARAUDON_H
 
-#include "ScriptPCH.h"
-
 enum DataTypes
 {
     TYPE_NOXXION                = 0,

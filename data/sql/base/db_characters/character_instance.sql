@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `character_instance`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `character_instance` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT '0',
-  `instance` int(10) unsigned NOT NULL DEFAULT '0',
-  `permanent` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `guid` int(10) unsigned NOT NULL DEFAULT 0,
+  `instance` int(10) unsigned NOT NULL DEFAULT 0,
+  `permanent` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `extended` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`guid`,`instance`),
   KEY `instance` (`instance`)

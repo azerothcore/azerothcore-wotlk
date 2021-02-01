@@ -7,8 +7,6 @@
 #ifndef DEF_ZULGURUB_H
 #define DEF_ZULGURUB_H
 
-#include "ScriptPCH.h"
-
 uint32 const EncounterCount = 13;
 
 #define ZGScriptName "instance_zulgurub"
@@ -47,7 +45,6 @@ enum CreatureIds
     NPC_OHGAN               = 14988, // Mandokir Event
     NPC_VILEBRANCH_SPEAKER  = 11391, // Mandokir Event
     NPC_CHAINED_SPIRT       = 15117  // Mandokir Event
-
 };
 
 enum GameobjectIds

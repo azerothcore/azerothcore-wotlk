@@ -4,7 +4,7 @@
 /**
  *  @file    Service_Config.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //====================================================================
 
@@ -252,19 +252,19 @@ public:
  * The ACE_Service_Config uses the Monostate pattern.  Therefore,
  * you can only have one of these instantiated per-process. It
  * represents the process-wide collection of services, which is
- * typicaly shared among all other configurable entities. The only
+ * typically shared among all other configurable entities. The only
  * ACE_Service_Config instance is registered with and owned by the
  * ACE_Object_Manager.
  *
  * By contrast, the ACE_Service_Gestalt represents the collection
- * of services, pertaining to a configurable entity. Typicaly, a
+ * of services, pertaining to a configurable entity. Typically, a
  * "configurable entity" is an instance, which owns an instance of
- * ACE_Service_Gestalt in order to ensure full controll over the
+ * ACE_Service_Gestalt in order to ensure full control over the
  * services it needs.
  *
  * Another facet of ACE_Service_Config is that for a given thread,
  * it provides access to its current, process-global
- * ACE_Service_Gestalt instance through its curent() method.
+ * ACE_Service_Gestalt instance through its current() method.
  *
  * @note The signal_handler_ static member is allocated by the
  * ACE_Object_Manager.  The ACE_Service_Config constructor
@@ -290,9 +290,6 @@ class ACE_Export ACE_Service_Config
   ACE_Threading_Helper<ACE_SYNCH_MUTEX> threadkey_;
 
 public:
-
-  // = Initialization and termination methods.
-
   /**
    * Initialize the Service Repository. Note that initialising @a
    * signum to a negative number will prevent a signal handler being
@@ -716,7 +713,7 @@ private:
  * @brief A guard class, designed to be instantiated on the stack.
  *
  * Instantiating it with a specific configuration ensures any references to
- * ACE_Service_Config::instance(), even when occuring in static constructors,
+ * ACE_Service_Config::instance(), even when occurring in static constructors,
  * will allways access the designated configuration instance.
  * This comes very handy when a dynamic service also registers any static
  * services of its own and their static factories.

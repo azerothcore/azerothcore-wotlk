@@ -5,11 +5,18 @@
 #ifndef ICECROWN_CITADEL_H_
 #define ICECROWN_CITADEL_H_
 
-#include "ScriptPCH.h"
+#include "Player.h"
+#include "Chat.h"
+#include "SpellAuras.h"
 #include "SpellScript.h"
 #include "Map.h"
 #include "Creature.h"
 #include "SpellMgr.h"
+#include "PassiveAI.h"
+#include "SpellAuraEffects.h"
+#include "InstanceScript.h"
+#include "ScriptedGossip.h"
+#include "ScriptedCreature.h"
 
 #define ICCScriptName "instance_icecrown_citadel"
 
@@ -339,7 +346,7 @@ enum CreaturesIds
     NPC_SPIRIT_BOMB                             = 39189,
     NPC_FROSTMOURNE_TRIGGER                     = 38584,
     NPC_TERENAS_MENETHIL_OUTRO                  = 38579,
-    
+
     // Generic
     NPC_INVISIBLE_STALKER                       = 30298,
     NPC_SPIRE_FROSTWYRM                         = 37230,
@@ -366,7 +373,7 @@ enum GameObjectsIds
     // Lady Deathwhisper
     GO_ORATORY_OF_THE_DAMNED_ENTRANCE       = 201563,
     GO_LADY_DEATHWHISPER_ELEVATOR           = 202220,
-  
+
     // Icecrown Gunship Battle - Horde raid
     GO_ORGRIMS_HAMMER_H                     = 201812,
     GO_THE_SKYBREAKER_H                     = 201811,
@@ -555,45 +562,50 @@ enum AreaIds
     AREA_THE_FROZEN_THRONE  = 4859,
 };
 
+enum ItemIds
+{
+    ITEM_GOBLIN_ROCKET_PACK = 49278
+};
+
 class spell_trigger_spell_from_caster : public SpellScriptLoader
 {
+public:
+    spell_trigger_spell_from_caster(char const* scriptName, uint32 triggerId) : SpellScriptLoader(scriptName), _triggerId(triggerId) { }
+
+    class spell_trigger_spell_from_caster_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_trigger_spell_from_caster_SpellScript);
+
     public:
-        spell_trigger_spell_from_caster(char const* scriptName, uint32 triggerId) : SpellScriptLoader(scriptName), _triggerId(triggerId) { }
+        spell_trigger_spell_from_caster_SpellScript(uint32 triggerId) : SpellScript(), _triggerId(triggerId) { }
 
-        class spell_trigger_spell_from_caster_SpellScript : public SpellScript
+        bool Validate(SpellInfo const* /*spell*/) override
         {
-            PrepareSpellScript(spell_trigger_spell_from_caster_SpellScript);
-
-        public:
-            spell_trigger_spell_from_caster_SpellScript(uint32 triggerId) : SpellScript(), _triggerId(triggerId) { }
-
-            bool Validate(SpellInfo const* /*spell*/)
-            {
-                if (!sSpellMgr->GetSpellInfo(_triggerId))
-                    return false;
-                return true;
-            }
-
-            void HandleTrigger()
-            {
-                GetCaster()->CastSpell(GetHitUnit(), _triggerId, true);
-            }
-
-            void Register()
-            {
-                AfterHit += SpellHitFn(spell_trigger_spell_from_caster_SpellScript::HandleTrigger);
-            }
-
-            uint32 _triggerId;
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_trigger_spell_from_caster_SpellScript(_triggerId);
+            if (!sSpellMgr->GetSpellInfo(_triggerId))
+                return false;
+            return true;
         }
 
-    private:
+        void HandleTrigger()
+        {
+            GetCaster()->CastSpell(GetHitUnit(), _triggerId, true);
+        }
+
+        void Register() override
+        {
+            AfterHit += SpellHitFn(spell_trigger_spell_from_caster_SpellScript::HandleTrigger);
+        }
+
         uint32 _triggerId;
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_trigger_spell_from_caster_SpellScript(_triggerId);
+    }
+
+private:
+    uint32 _triggerId;
 };
 
 template<class AI>
@@ -603,7 +615,7 @@ CreatureAI* GetIcecrownCitadelAI(Creature* creature)
         if (instance->GetInstanceScript())
             if (instance->GetScriptId() == sObjectMgr->GetScriptId(ICCScriptName))
                 return new AI(creature);
-    return NULL;
+    return nullptr;
 }
 
 #endif // ICECROWN_CITADEL_H_

@@ -4,12 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_CONDITIONMGR_H
-#define TRINITY_CONDITIONMGR_H
+#ifndef ACORE_CONDITIONMGR_H
+#define ACORE_CONDITIONMGR_H
 
 #include "Define.h"
 #include "Errors.h"
-#include <ace/Singleton.h>
 #include <list>
 #include <map>
 
@@ -20,7 +19,8 @@ class LootTemplate;
 struct Condition;
 
 enum ConditionTypes
-{                                                           // value1           value2         value3
+{
+    // value1           value2         value3
     CONDITION_NONE                  = 0,                    // 0                0              0                  always true
     CONDITION_AURA                  = 1,                    // spell_id         effindex       use target?        true if player (or target, if value3) has aura of spell_id with effect effindex
     CONDITION_ITEM                  = 2,                    // item_id          count          bank               true if has #count of item_ids (if 'bank' is set it searches in bank slots too)
@@ -62,18 +62,21 @@ enum ConditionTypes
     CONDITION_HP_PCT                = 38,                   // hpPct            ComparisonType 0                  true if unit's hp matches given pct
     CONDITION_REALM_ACHIEVEMENT     = 39,                   // achievement_id   0              0                  true if realm achievement is complete
     CONDITION_IN_WATER              = 40,                   // 0                0              0                  true if unit in water
-    // RESERVED                     = 41,
-    // RESERVED                     = 42,
-    // RESERVED                     = 43,
-    // RESERVED                     = 44,
-    // RESERVED                     = 45,
-    // RESERVED                     = 46,
-    // RESERVED                     = 47,
-    // RESERVED                     = 48,
-    // RESERVED                     = 49,
-    CONDITION_QUEST_SATISFY_EXCLUSIVE = 50,                 // quest_id         0              0                  true if satisfied exclusive group
-    CONDITION_HAS_AURA_TYPE         = 51,                   // aura_type        0              0                  true if has aura type
-    CONDITION_MAX                   = 52                    // MAX
+    CONDITION_TERRAIN_SWAP          = 41,                   // don't use on 3.3.5a
+    CONDITION_STAND_STATE           = 42,                   // TODO: NOT SUPPORTED YET
+    CONDITION_DAILY_QUEST_DONE      = 43,                   // quest id         0              0                  true if daily quest has been completed for the day
+    CONDITION_CHARMED               = 44,                   // TODO: NOT SUPPORTED YET
+    CONDITION_PET_TYPE              = 45,                   // TODO: NOT SUPPORTED YET
+    CONDITION_TAXI                  = 46,                   // TODO: NOT SUPPORTED YET
+    CONDITION_QUESTSTATE            = 47,                   // quest_id         state_mask     0                  true if player is in any of the provided quest states for the quest (1 = not taken, 2 = completed, 8 = in progress, 32 = failed, 64 = rewarded)
+    CONDITION_QUEST_OBJECTIVE_PROGRESS = 48,                // quest_id         objectiveIndex objectiveCount     true if player has reached the specified objectiveCount quest progress for the objectiveIndex for the specified quest
+    CONDITION_DIFFICULTY_ID            = 49,                // don't use on 3.3.5a
+    CONDITION_TC_END                   = 50,                // placeholder
+
+    CONDITION_AC_START                 = 100,
+    CONDITION_QUEST_SATISFY_EXCLUSIVE  = 101,                // quest_id         0              0                  true if satisfied exclusive group
+    CONDITION_HAS_AURA_TYPE            = 102,                // aura_type        0              0                  true if has aura type
+    CONDITION_AC_END                   = 103                 // placeholder
 };
 
 /*! Documentation on implementing a new ConditionSourceType:
@@ -124,14 +127,16 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE      = 16,
     CONDITION_SOURCE_TYPE_SPELL                          = 17,
     CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT              = 18,
-    CONDITION_SOURCE_TYPE_QUEST_ACCEPT                   = 19,
-    CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK                = 20,
+    CONDITION_SOURCE_TYPE_QUEST_AVAILABLE                = 19,
+    CONDITION_SOURCE_TYPE_UNUSED_20                      = 20, // placeholder
     CONDITION_SOURCE_TYPE_VEHICLE_SPELL                  = 21,
     CONDITION_SOURCE_TYPE_SMART_EVENT                    = 22,
     CONDITION_SOURCE_TYPE_NPC_VENDOR                     = 23,
     CONDITION_SOURCE_TYPE_SPELL_PROC                     = 24,
-    CONDITION_SOURCE_TYPE_PHASE_DEFINITION               = 25, // only 4.3.4
-    CONDITION_SOURCE_TYPE_MAX                            = 26  // MAX
+    CONDITION_SOURCE_TYPE_TERRAIN_SWAP                   = 25, // don't use on 3.3.5a
+    CONDITION_SOURCE_TYPE_PHASE                          = 26, // don't use on 3.3.5a
+    CONDITION_SOURCE_TYPE_GRAVEYARD                      = 27, // don't use on 3.3.5a
+    CONDITION_SOURCE_TYPE_MAX                            = 28  // placeholder
 };
 
 enum RelationType
@@ -161,12 +166,12 @@ struct ConditionSourceInfo
 {
     WorldObject* mConditionTargets[MAX_CONDITION_TARGETS]; // an array of targets available for conditions
     Condition* mLastFailedCondition;
-    ConditionSourceInfo(WorldObject* target0, WorldObject* target1 = NULL, WorldObject* target2 = NULL)
+    ConditionSourceInfo(WorldObject* target0, WorldObject* target1 = nullptr, WorldObject* target2 = nullptr)
     {
         mConditionTargets[0] = target0;
         mConditionTargets[1] = target1;
         mConditionTargets[2] = target2;
-        mLastFailedCondition = NULL;
+        mLastFailedCondition = nullptr;
     }
 };
 
@@ -209,7 +214,7 @@ struct Condition
 
     bool Meets(ConditionSourceInfo& sourceInfo);
     uint32 GetSearcherTypeMaskForCondition();
-    bool isLoaded() const { return ConditionType > CONDITION_NONE || ReferenceId; }
+    [[nodiscard]] bool isLoaded() const { return ConditionType > CONDITION_NONE || ReferenceId; }
     uint32 GetMaxAvailableConditionTargets();
 };
 
@@ -224,48 +229,48 @@ typedef std::map<uint32, ConditionList> ConditionReferenceContainer;//only used 
 
 class ConditionMgr
 {
-    friend class ACE_Singleton<ConditionMgr, ACE_Null_Mutex>;
+private:
+    ConditionMgr();
+    ~ConditionMgr();
 
-    private:
-        ConditionMgr();
-        ~ConditionMgr();
+public:
+    static ConditionMgr* instance();
 
-    public:
-        void LoadConditions(bool isReload = false);
-        bool isConditionTypeValid(Condition* cond);
-        ConditionList GetConditionReferences(uint32 refId);
+    void LoadConditions(bool isReload = false);
+    bool isConditionTypeValid(Condition* cond);
+    ConditionList GetConditionReferences(uint32 refId);
 
-        uint32 GetSearcherTypeMaskForConditionList(ConditionList const& conditions);
-        bool IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions);
-        bool IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions);
-        bool IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
-        bool CanHaveSourceGroupSet(ConditionSourceType sourceType) const;
-        bool CanHaveSourceIdSet(ConditionSourceType sourceType) const;
-        ConditionList GetConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry);
-        ConditionList GetConditionsForSpellClickEvent(uint32 creatureId, uint32 spellId);
-        ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
-        ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
-        ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
+    uint32 GetSearcherTypeMaskForConditionList(ConditionList const& conditions);
+    bool IsObjectMeetToConditions(WorldObject* object, ConditionList const& conditions);
+    bool IsObjectMeetToConditions(WorldObject* object1, WorldObject* object2, ConditionList const& conditions);
+    bool IsObjectMeetToConditions(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
+    [[nodiscard]] bool CanHaveSourceGroupSet(ConditionSourceType sourceType) const;
+    [[nodiscard]] bool CanHaveSourceIdSet(ConditionSourceType sourceType) const;
+    ConditionList GetConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry);
+    ConditionList GetConditionsForSpellClickEvent(uint32 creatureId, uint32 spellId);
+    ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
+    ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
+    ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
 
-    private:
-        bool isSourceTypeValid(Condition* cond);
-        bool addToLootTemplate(Condition* cond, LootTemplate* loot);
-        bool addToGossipMenus(Condition* cond);
-        bool addToGossipMenuItems(Condition* cond);
-        bool addToSpellImplicitTargetConditions(Condition* cond);
-        bool IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
+private:
+    bool isSourceTypeValid(Condition* cond);
+    bool addToLootTemplate(Condition* cond, LootTemplate* loot);
+    bool addToGossipMenus(Condition* cond);
+    bool addToGossipMenuItems(Condition* cond);
+    bool addToSpellImplicitTargetConditions(Condition* cond);
+    bool IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, ConditionList const& conditions);
 
-        void Clean(); // free up resources
-        std::list<Condition*> AllocatedMemoryStore; // some garbage collection :)
+    void Clean(); // free up resources
+    std::list<Condition*> AllocatedMemoryStore; // some garbage collection :)
 
-        ConditionContainer                ConditionStore;
-        ConditionReferenceContainer       ConditionReferenceStore;
-        CreatureSpellConditionContainer   VehicleSpellConditionStore;
-        CreatureSpellConditionContainer   SpellClickEventConditionStore;
-        NpcVendorConditionContainer       NpcVendorConditionContainerStore;
-        SmartEventConditionContainer      SmartEventConditionStore;
+    ConditionContainer                ConditionStore;
+    ConditionReferenceContainer       ConditionReferenceStore;
+    CreatureSpellConditionContainer   VehicleSpellConditionStore;
+    CreatureSpellConditionContainer   SpellClickEventConditionStore;
+    NpcVendorConditionContainer       NpcVendorConditionContainerStore;
+    SmartEventConditionContainer      SmartEventConditionStore;
 };
 
-#define sConditionMgr ACE_Singleton<ConditionMgr, ACE_Null_Mutex>::instance()
+#define sConditionMgr ConditionMgr::instance()
 
 #endif

@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -45,7 +44,7 @@ void Field::SetStructuredValue(char* newValue, enum_field_types newType)
     if (newValue)
     {
         size_t size = strlen(newValue);
-        data.value = new char [size+1];
+        data.value = new char [size + 1];
         strcpy((char*)data.value, newValue);
         data.length = size;
     }

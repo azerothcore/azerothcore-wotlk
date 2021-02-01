@@ -96,7 +96,8 @@ ACE_OS::gethostbyaddr_r (const char *addr,
   ACE_UNUSED_ARG (type);
   ACE_UNUSED_ARG (result);
   ACE_UNUSED_ARG (buffer);
-  ACE_UNUSED_ARG (h_errnop);
+  if (h_errnop)
+    *h_errnop = ENOTSUP;
   ACE_NOTSUP_RETURN (0);
 # elif defined (ACE_HAS_REENTRANT_FUNCTIONS)
 
@@ -272,7 +273,8 @@ ACE_OS::gethostbyname_r (const char *name,
   ACE_UNUSED_ARG (name);
   ACE_UNUSED_ARG (result);
   ACE_UNUSED_ARG (buffer);
-  ACE_UNUSED_ARG (h_errnop);
+  if (h_errnop)
+    *h_errnop = ENOTSUP;
   ACE_NOTSUP_RETURN (0);
 # elif defined (ACE_HAS_REENTRANT_FUNCTIONS)
 
@@ -731,6 +733,81 @@ ACE_OS::getservbyname_r (const char *svc,
                        0);
   //FUZZ: enable check_for_lack_ACE_OS
 #endif /* defined (ACE_HAS_REENTRANT_FUNCTIONS) */
+}
+
+
+ACE_INLINE int
+ACE_OS::getaddrinfo (const char *name, const char *service,
+                     const addrinfo *hints, addrinfo **result)
+{
+  ACE_OS_TRACE ("ACE_OS::getaddrinfo");
+#ifdef ACE_LACKS_GETADDRINFO
+  ACE_UNUSED_ARG (service);
+  ACE_UNUSED_ARG (hints);
+  return ACE_OS::getaddrinfo_emulation (name, result);
+#else
+  return ::getaddrinfo (name, service, hints, result);
+#endif
+}
+
+ACE_INLINE void
+ACE_OS::freeaddrinfo (addrinfo *result)
+{
+  ACE_OS_TRACE ("ACE_OS::freeaddrinfo");
+#ifdef ACE_LACKS_GETADDRINFO
+  ACE_OS::freeaddrinfo_emulation (result);
+#else
+  ::freeaddrinfo (result);
+#endif
+}
+
+ACE_INLINE const ACE_TCHAR *
+ACE_OS::gai_strerror (int errcode)
+{
+  ACE_OS_TRACE ("ACE_OS::gai_strerror");
+#ifdef ACE_LACKS_GAI_STRERROR
+  switch (errcode)
+    {
+    case EAI_NONAME:
+      return ACE_TEXT ("Name does not resolve to an address");
+    case EAI_AGAIN:
+      return ACE_TEXT ("Temporary failure, try again");
+    case EAI_FAIL:
+      return ACE_TEXT ("Name resolution failed");
+    case EAI_FAMILY:
+      return ACE_TEXT ("Address family not supported");
+    case EAI_MEMORY:
+      return ACE_TEXT ("Out of memory");
+    case EAI_SYSTEM:
+      return ACE_TEXT ("Other error, see errno");
+    case EAI_OVERFLOW:
+      return ACE_TEXT ("Buffer provided by caller was too small");
+    default:
+      return ACE_TEXT ("Unknown error");
+    }
+#elif defined ACE_WIN32
+  return ACE_TEXT_gai_strerror (errcode);
+#else
+  return ACE_TEXT_CHAR_TO_TCHAR (::gai_strerror (errcode));
+#endif
+}
+
+ACE_INLINE int
+ACE_OS::getnameinfo (const sockaddr *addr, ACE_SOCKET_LEN addr_len,
+                     char *host, ACE_SOCKET_LEN host_len,
+                     char *service, ACE_SOCKET_LEN service_len,
+                     unsigned int flags)
+{
+  ACE_OS_TRACE ("ACE_OS::getnameinfo");
+#ifdef ACE_LACKS_GETNAMEINFO
+  ACE_UNUSED_ARG (service);
+  ACE_UNUSED_ARG (service_len);
+  ACE_UNUSED_ARG (flags);
+  return ACE_OS::getnameinfo_emulation (addr, addr_len, host, host_len);
+#else
+  return ::getnameinfo (addr, addr_len, host, host_len,
+                        service, service_len, flags);
+#endif
 }
 
 ACE_END_VERSIONED_NAMESPACE_DECL

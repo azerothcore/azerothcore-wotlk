@@ -11,10 +11,16 @@
 
 enum Yells
 {
-    SAY_SPEECH                  = 0,
-    SAY_KILL                    = 1,
-    SAY_DEATH                   = 2,
-    SAY_TELEPORT                = 3
+    SAY_INTRO_1                 = 0,
+    SAY_INTRO_2                 = 1,
+    SAY_INTRO_3                 = 2,
+    SAY_INTRO_4                 = 3,
+    SAY_PHASE_TWO               = 4,
+    SAY_DEATH                   = 5,
+    SAY_KILL                    = 6,
+
+    EMOTE_PHASE_TWO             = 7,
+    EMOTE_GATE_OPENED           = 8
 };
 
 enum Spells
@@ -94,7 +100,11 @@ enum Events
     EVENT_SPELL_UNHOLY_FRENZY       = 19,
 
     // HORSE
-    EVENT_SPELL_STOMP               = 20
+    EVENT_SPELL_STOMP               = 20,
+
+    EVENT_INTRO_2                   = 21,
+    EVENT_INTRO_3                   = 22,
+    EVENT_INTRO_4                   = 23,
 };
 
 const uint32 gothikWaves[24][2] =
@@ -156,12 +166,12 @@ const Position PosPlatform         = {2640.5f, -3360.6f, 285.26f, 0.0f};
 #define IN_LIVE_SIDE(who) (who->GetPositionY() < POS_Y_GATE)
 
 // Predicate function to check that the r   efzr unit is NOT on the same side as the source.
-struct NotOnSameSide : public std::unary_function<Unit *, bool>
+struct NotOnSameSide : public acore::unary_function<Unit*, bool>
 {
     bool m_inLiveSide;
-    NotOnSameSide(Unit *pSource) : m_inLiveSide(IN_LIVE_SIDE(pSource)) {}
-    
-    bool operator() (const Unit *pTarget)
+    explicit NotOnSameSide(Unit* pSource) : m_inLiveSide(IN_LIVE_SIDE(pSource)) {}
+
+    bool operator() (const Unit* pTarget)
     {
         return (m_inLiveSide != IN_LIVE_SIDE(pTarget));
     }
@@ -172,14 +182,14 @@ class boss_gothik : public CreatureScript
 public:
     boss_gothik() : CreatureScript("boss_gothik") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_gothikAI (pCreature);
     }
 
     struct boss_gothikAI : public BossAI
     {
-        boss_gothikAI(Creature *c) : BossAI(c, BOSS_GOTHIK), summons(me)
+        explicit boss_gothikAI(Creature* c) : BossAI(c, BOSS_GOTHIK), summons(me)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -187,9 +197,9 @@ public:
         EventMap events;
         SummonList summons;
         InstanceScript* pInstance;
-        bool secondPhase;
-        bool gateOpened;
-        uint8 waveCount;
+        bool secondPhase{};
+        bool gateOpened{};
+        uint8 waveCount{};
 
         bool IsInRoom()
         {
@@ -202,12 +212,12 @@ public:
             return true;
         }
 
-        void Reset()
+        void Reset() override
         {
             BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_DISABLE_MOVE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_DISABLE_MOVE);
             me->SetReactState(REACT_PASSIVE);
             secondPhase = false;
             gateOpened = false;
@@ -224,17 +234,20 @@ public:
             }
         }
 
-        void EnterCombat(Unit * who)
+        void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
-            Talk(SAY_SPEECH);
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_DISABLE_MOVE);
+            Talk(SAY_INTRO_1);
+            events.ScheduleEvent(EVENT_INTRO_2, 4000);
+            events.ScheduleEvent(EVENT_INTRO_3, 9000);
+            events.ScheduleEvent(EVENT_INTRO_4, 14000);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
             me->NearTeleportTo(PosPlatform.GetPositionX(), PosPlatform.GetPositionY(), PosPlatform.GetPositionZ(), PosPlatform.GetOrientation());
-            
+
             events.ScheduleEvent(EVENT_SUMMON_ADDS, 30000);
             events.ScheduleEvent(EVENT_CHECK_PLAYERS, 120000);
-            
+
             if (pInstance)
             {
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_ENTER_GATE)))
@@ -244,30 +257,29 @@ public:
             }
         }
 
-        void JustSummoned(Creature *summon)
+        void JustSummoned(Creature* summon) override
         {
             if (gateOpened)
                 summon->AI()->DoAction(ACTION_GATE_OPEN);
-                
+
             summons.Summon(summon);
             summon->SetInCombatWithZone();
         }
 
-        void SummonedCreatureDespawn(Creature* cr) { summons.Despawn(cr); }
+        void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            if (!urand(0,3))
-                Talk(SAY_KILL);
+            Talk(SAY_KILL);
 
             if (pInstance)
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void JustDied(Unit*  killer)
+        void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
@@ -307,25 +319,25 @@ public:
 
         bool CheckGroupSplitted()
         {
-            Map::PlayerList const &PlayerList = me->GetMap()->GetPlayers();
+            Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
             if (!PlayerList.isEmpty())
             {
                 bool checklife = false;
                 bool checkdead = false;
-                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                for (const auto& i : PlayerList)
                 {
-                    Player* player = i->GetSource();
+                    Player* player = i.GetSource();
                     if (player->IsAlive() &&
-                        player->GetPositionX() <= POS_X_NORTH &&
-                        player->GetPositionX() >= POS_X_SOUTH &&
-                        player->GetPositionY() <= POS_Y_GATE &&
-                        player->GetPositionY() >= POS_Y_EAST)
+                            player->GetPositionX() <= POS_X_NORTH &&
+                            player->GetPositionX() >= POS_X_SOUTH &&
+                            player->GetPositionY() <= POS_Y_GATE &&
+                            player->GetPositionY() >= POS_Y_EAST)
                         checklife = true;
                     else if (player->IsAlive() &&
-                        player->GetPositionX() <= POS_X_NORTH &&
-                        player->GetPositionX() >= POS_X_SOUTH &&
-                        player->GetPositionY() >= POS_Y_GATE &&
-                        player->GetPositionY() <= POS_Y_WEST)
+                             player->GetPositionX() <= POS_X_NORTH &&
+                             player->GetPositionX() >= POS_X_SOUTH &&
+                             player->GetPositionY() >= POS_Y_GATE &&
+                             player->GetPositionY() <= POS_Y_WEST)
                         checkdead = true;
 
                     if (checklife && checkdead)
@@ -335,9 +347,9 @@ public:
             return false;
         }
 
-        void SpellHit(Unit * /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spellInfo) override
         {
-            uint8 pos = urand(0,4);
+            uint8 pos = urand(0, 4);
             switch (spellInfo->Id)
             {
                 case SPELL_INFORM_LIVING_TRAINEE:
@@ -355,13 +367,13 @@ public:
             me->HandleEmoteCommand(EMOTE_ONESHOT_SPELL_CAST);
         }
 
-        void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!secondPhase)
                 damage = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!IsInRoom())
                 return;
@@ -373,8 +385,20 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
+                case EVENT_INTRO_2:
+                    Talk(SAY_INTRO_2);
+
+                    break;
+                case EVENT_INTRO_3:
+                    Talk(SAY_INTRO_3);
+
+                    break;
+                case EVENT_INTRO_4:
+                    Talk(SAY_INTRO_4);
+
+                    break;
                 case EVENT_SPELL_SHADOW_BOLT:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_SHADOW_BOLT_10, SPELL_SHADOW_BOLT_25), false);
                     events.RepeatEvent(2000);
@@ -391,7 +415,7 @@ public:
                         me->NearTeleportTo(PosGroundLivingSide.GetPositionX(), PosGroundLivingSide.GetPositionY(), PosGroundLivingSide.GetPositionZ(), PosGroundLivingSide.GetOrientation());
 
                     me->getThreatManager().resetAggro(NotOnSameSide(me));
-                    if (Unit *pTarget = SelectTarget(SELECT_TARGET_NEAREST, 0))
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_NEAREST, 0))
                     {
                         me->getThreatManager().addThreat(pTarget, 100.0f);
                         AttackStart(pTarget);
@@ -405,7 +429,7 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
 
                         events.CancelEvent(EVENT_TELEPORT);
-                        events.PopEvent();
+
                         break;
                     }
                     events.RepeatEvent(1000);
@@ -419,18 +443,18 @@ public:
                     else
                     {
                         secondPhase = true;
-                        Talk(SAY_TELEPORT);
+                        Talk(SAY_PHASE_TWO);
+                        Talk(EMOTE_PHASE_TWO);
                         me->NearTeleportTo(PosGroundLivingSide.GetPositionX(), PosGroundLivingSide.GetPositionY(), PosGroundLivingSide.GetPositionZ(), PosGroundLivingSide.GetOrientation());
                         me->SetReactState(REACT_AGGRESSIVE);
-                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE|UNIT_FLAG_IMMUNE_TO_PC|UNIT_FLAG_DISABLE_MOVE);
-                        
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_DISABLE_MOVE);
+
                         summons.DoAction(ACTION_GATE_OPEN);
                         summons.DoZoneInCombat();
                         events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 1000);
-                        events.ScheduleEvent(EVENT_SPELL_HARVEST_SOUL, urand(5000,15000));
+                        events.ScheduleEvent(EVENT_SPELL_HARVEST_SOUL, urand(5000, 15000));
                         events.ScheduleEvent(EVENT_TELEPORT, 20000);
                         events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-                        events.PopEvent();
                     }
 
                     waveCount++;
@@ -444,8 +468,9 @@ public:
                         summons.DoAction(ACTION_GATE_OPEN);
                         summons.DoZoneInCombat();
                         gateOpened = true;
+                        Talk(EMOTE_GATE_OPENED);
                     }
-                    events.PopEvent();
+
                     break;
             }
 
@@ -459,14 +484,14 @@ class npc_boss_gothik_minion : public CreatureScript
 public:
     npc_boss_gothik_minion() : CreatureScript("npc_boss_gothik_minion") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_boss_gothik_minionAI (pCreature);
     }
 
     struct npc_boss_gothik_minionAI : public CombatAI
     {
-        npc_boss_gothik_minionAI(Creature *c) : CombatAI(c)
+        explicit npc_boss_gothik_minionAI(Creature* c) : CombatAI(c)
         {
             livingSide = IN_LIVE_SIDE(me);
             gateOpened = false;
@@ -477,10 +502,10 @@ public:
         bool gateOpened;
 
         bool IsOnSameSide(Unit const* who) const { return livingSide == IN_LIVE_SIDE(who); }
-        bool CanAIAttack(Unit const* target) const { return gateOpened || IsOnSameSide(target); }
+        bool CanAIAttack(Unit const* target) const override { return gateOpened || IsOnSameSide(target); }
 
-        void Reset() { events.Reset(); }
-        void EnterCombat(Unit*  /*who*/)
+        void Reset() override { events.Reset(); }
+        void EnterCombat(Unit*  /*who*/) override
         {
             me->SetInCombatWithZone();
 
@@ -504,7 +529,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_HYSTERIA, 10000);
                     events.ScheduleEvent(EVENT_SPELL_HASTE_AURA, 1000);
                     events.ScheduleEvent(EVENT_SPELL_INTIMIDATING_SHOUT, urand(4000, 9000));
-                    events.ScheduleEvent(EVENT_SPELL_VEIL_OF_DARKNESS, urand(5000,7000));
+                    events.ScheduleEvent(EVENT_SPELL_VEIL_OF_DARKNESS, urand(5000, 7000));
                     break;
                 case NPC_DEAD_RIDER:
                     events.ScheduleEvent(EVENT_SPELL_DRAIN_LIFE, urand(2000, 3500));
@@ -516,19 +541,19 @@ public:
                     break;
             }
         }
-        void DamageTaken(Unit* attacker, uint32 &damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!attacker || (!gateOpened && !IsOnSameSide(attacker)))
                 damage = 0;
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_GATE_OPEN)
                 gateOpened = true;
         }
 
-        void JustDied(Unit *)
+        void JustDied(Unit*) override
         {
             switch (me->GetEntry())
             {
@@ -544,24 +569,24 @@ public:
             }
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
             if (me->GetUnitState() == UNIT_STATE_CASTING)
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_DEATH_PLAGUE:
                     me->CastSpell(me->GetVictim(), SPELL_DEATH_PLAGUE, false);
-                    events.RepeatEvent(urand(15000,20000));
+                    events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_ARCANE_EXPLOSION:
                     if (Unit* victim = me->GetVictim())
@@ -630,36 +655,35 @@ public:
                     break;
             }
 
-			DoMeleeAttackIfReady();
+            DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class spell_gothik_shadow_bolt_volley : public SpellScriptLoader
 {
-    public:
-        spell_gothik_shadow_bolt_volley() : SpellScriptLoader("spell_gothik_shadow_bolt_volley") { }
+public:
+    spell_gothik_shadow_bolt_volley() : SpellScriptLoader("spell_gothik_shadow_bolt_volley") { }
 
-        class spell_gothik_shadow_bolt_volley_SpellScript : public SpellScript
+    class spell_gothik_shadow_bolt_volley_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gothik_shadow_bolt_volley_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
         {
-            PrepareSpellScript(spell_gothik_shadow_bolt_volley_SpellScript);
-
-            void FilterTargets(std::list<WorldObject*>& targets)
-            {
-                targets.remove_if(Trinity::UnitAuraCheck(false, SPELL_SHADOW_MARK));
-            }
-
-            void Register()
-            {
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gothik_shadow_bolt_volley_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            }
-        };
-
-        SpellScript* GetSpellScript() const
-        {
-            return new spell_gothik_shadow_bolt_volley_SpellScript();
+            targets.remove_if(acore::UnitAuraCheck(false, SPELL_SHADOW_MARK));
         }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gothik_shadow_bolt_volley_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_gothik_shadow_bolt_volley_SpellScript();
+    }
 };
 
 void AddSC_boss_gothik()

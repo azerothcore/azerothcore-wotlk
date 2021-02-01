@@ -25,7 +25,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
 
     if (GetPlayer()->getLevel() < sWorld->getIntConfig(CONFIG_TICKET_LEVEL_REQ))
     {
-        SendNotification(GetTrinityString(LANG_TICKET_REQ), sWorld->getIntConfig(CONFIG_TICKET_LEVEL_REQ));
+        SendNotification(GetAcoreString(LANG_TICKET_REQ), sWorld->getIntConfig(CONFIG_TICKET_LEVEL_REQ));
         return;
     }
 
@@ -108,7 +108,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
     SendPacket(&data);
 }
 
-void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
+void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket& recv_data)
 {
     std::string message;
     recv_data >> message;
@@ -116,7 +116,7 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
     GMTicketResponse response = GMTICKET_RESPONSE_UPDATE_ERROR;
     if (GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
     {
-        SQLTransaction trans = SQLTransaction(NULL);
+        SQLTransaction trans = SQLTransaction(nullptr);
         ticket->SetMessage(message);
         ticket->SaveToDB(trans);
 
@@ -130,7 +130,7 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket & recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket& /*recv_data*/)
 {
     if (GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
     {
@@ -141,11 +141,11 @@ void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket & /*recv_data*/)
         sWorld->SendGMText(LANG_COMMAND_TICKETPLAYERABANDON, GetPlayer()->GetName().c_str(), ticket->GetId());
 
         sTicketMgr->CloseTicket(ticket->GetId(), GetPlayer()->GetGUID());
-        sTicketMgr->SendTicket(this, NULL);
+        sTicketMgr->SendTicket(this, nullptr);
     }
 }
 
-void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket& /*recv_data*/)
 {
     SendQueryTimeResponse();
 
@@ -157,10 +157,10 @@ void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket & /*recv_data*/)
             sTicketMgr->SendTicket(this, ticket);
     }
     else
-        sTicketMgr->SendTicket(this, NULL);
+        sTicketMgr->SendTicket(this, nullptr);
 }
 
-void WorldSession::HandleGMTicketSystemStatusOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleGMTicketSystemStatusOpcode(WorldPacket& /*recv_data*/)
 {
     // Note: This only disables the ticket UI at client side and is not fully reliable
     // are we sure this is a uint32? Should ask Zor
@@ -176,7 +176,7 @@ void WorldSession::HandleGMSurveySubmit(WorldPacket& recv_data)
     uint32 mainSurvey; // GMSurveyCurrentSurvey.dbc, column 1 (all 9) ref to GMSurveySurveys.dbc
     recv_data >> mainSurvey;
 
-    UNORDERED_SET<uint32> surveyIds;
+    std::unordered_set<uint32> surveyIds;
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     // sub_survey1, r1, comment1, sub_survey2, r2, comment2, sub_survey3, r3, comment3, sub_survey4, r4, comment4, sub_survey5, r5, comment5, sub_survey6, r6, comment6, sub_survey7, r7, comment7, sub_survey8, r8, comment8, sub_survey9, r9, comment9, sub_survey10, r10, comment10,
     for (uint8 i = 0; i < 10; i++)
@@ -237,7 +237,7 @@ void WorldSession::HandleReportLag(WorldPacket& recv_data)
     stmt->setFloat (4, y);
     stmt->setFloat (5, z);
     stmt->setUInt32(6, GetLatency());
-    stmt->setUInt32(7, time(NULL));
+    stmt->setUInt32(7, time(nullptr));
     CharacterDatabase.Execute(stmt);
 }
 
@@ -259,6 +259,6 @@ void WorldSession::HandleGMResponseResolve(WorldPacket& /*recvPacket*/)
         SendPacket(&data2);
 
         sTicketMgr->CloseTicket(ticket->GetId(), GetPlayer()->GetGUID());
-        sTicketMgr->SendTicket(this, NULL);
+        sTicketMgr->SendTicket(this, nullptr);
     }
 }

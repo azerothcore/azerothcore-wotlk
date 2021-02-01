@@ -7,8 +7,6 @@
 #ifndef DEF_ARCHAVON_H
 #define DEF_ARCHAVON_H
 
-#include "ScriptPCH.h"
-
 enum Creatures
 {
     CREATURE_ARCHAVON                           = 31125,
@@ -26,7 +24,6 @@ enum Data
     MAX_ENCOUNTER           = 4,
     DATA_STONED             = 5,
 };
-
 
 enum AchievementCriteriaIds
 {

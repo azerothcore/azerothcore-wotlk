@@ -5,7 +5,7 @@
 #ifndef DEF_STRATHOLME_H
 #define DEF_STRATHOLME_H
 
-#include "ScriptPCH.h"
+#include "SpellAuras.h"
 
 enum DataTypes
 {
@@ -78,4 +78,3 @@ enum MiscIds
 };
 
 #endif
-

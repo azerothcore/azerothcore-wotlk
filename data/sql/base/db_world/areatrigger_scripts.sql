@@ -18,6 +18,8 @@ CREATE TABLE `areatrigger_scripts`
 LOCK TABLES `areatrigger_scripts` WRITE;
 /*!40000 ALTER TABLE `areatrigger_scripts` DISABLE KEYS */;
 INSERT INTO `areatrigger_scripts` VALUES 
+(171,'SmartTrigger'),
+(302,'at_sentry_point'),
 (962,'SmartTrigger'),
 (1447,'SmartTrigger'),
 (1526,'at_ring_of_law'),
@@ -50,6 +52,7 @@ INSERT INTO `areatrigger_scripts` VALUES
 (3766,'SmartTrigger'),
 (4016,'at_malfurion_stormrage'),
 (4017,'at_twilight_grove'),
+(4113,'at_thaddius_entrance'),
 (4356,'at_bring_your_orphan_to'),
 (4422,'at_area_52_entrance'),
 (4466,'at_area_52_entrance'),
@@ -95,6 +98,8 @@ INSERT INTO `areatrigger_scripts` VALUES
 (5108,'at_stormwright_shelf'),
 (5140,'SmartTrigger'),
 (5173,'SmartTrigger'),
+(5187,'SmartTrigger'),
+(5190,'SmartTrigger'),
 (5284,'SmartTrigger'),
 (5285,'SmartTrigger'),
 (5286,'SmartTrigger'),
@@ -130,6 +135,7 @@ INSERT INTO `areatrigger_scripts` VALUES
 (5704,'SmartTrigger'),
 (5705,'SmartTrigger'),
 (5706,'SmartTrigger'),
+(5709,'at_lady_deathwhisper_entrance'),
 (5718,'at_frozen_throne_teleport'),
 (5729,'at_icc_start_blood_quickening'),
 (5867,'at_baltharus_plateau');

@@ -1,5 +1,5 @@
 /* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * 
+ *
  *
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
@@ -69,19 +69,27 @@ enum eTradeskill
 };
 
 class Creature;
+
+// Clear menu
 void ClearGossipMenuFor(Player* player);
+
 // Using provided text, not from DB
-void AddGossipItemFor(Player* player, uint32 icon, const char* text, uint32 sender, uint32 action);
+void AddGossipItemFor(Player* player, uint32 icon, std::string const& text, uint32 sender, uint32 action);
+
 // Using provided texts, not from DB
-void AddGossipItemFor(Player* player, uint32 icon, const char* text, uint32 sender, uint32 action, const char* popupText, uint32 popupMoney, bool coded);
+void AddGossipItemFor(Player* player, uint32 icon, std::string const& text, uint32 sender, uint32 action, std::string const& popupText, uint32 popupMoney, bool coded);
+
 // Uses gossip item info from DB
 void AddGossipItemFor(Player* player, uint32 gossipMenuID, uint32 gossipMenuItemID, uint32 sender, uint32 action);
+
+// Send menu text
 void SendGossipMenuFor(Player* player, uint32 npcTextID, uint64 const& guid);
 void SendGossipMenuFor(Player* player, uint32 npcTextID, Creature const* creature);
+
+// Close menu
 void CloseGossipMenuFor(Player* player);
 
-// Defined fuctions to use with player.
-
+/// Old macro. Need delete later
 // This fuction add's a menu item,
 // a - Icon Id
 // b - Text
@@ -89,13 +97,13 @@ void CloseGossipMenuFor(Player* player);
 // d - Action (identifys this Menu Item)
 // e - Text to be displayed in pop up box
 // f - Money value in pop up box
-#define ADD_GOSSIP_ITEM(a, b, c, d)   PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, a, b, c, d, "", 0)
+#define ADD_GOSSIP_ITEM(a, b, c, d) PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, a, b, c, d, "", 0)
 #define ADD_GOSSIP_ITEM_EXTENDED(a, b, c, d, e, f, g)   PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, a, b, c, d, e, f, g)
 
 // This fuction Sends the current menu to show to client, a - NPCTEXTID(uint32), b - npc guid(uint64)
-#define SEND_GOSSIP_MENU(a, b)      PlayerTalkClass->SendGossipMenu(a, b)
+#define SEND_GOSSIP_MENU(a, b)  PlayerTalkClass->SendGossipMenu(a, b)
 
 // Closes the Menu
-#define CLOSE_GOSSIP_MENU()        PlayerTalkClass->SendCloseGossip()
+#define CLOSE_GOSSIP_MENU() PlayerTalkClass->SendCloseGossip()
 
 #endif

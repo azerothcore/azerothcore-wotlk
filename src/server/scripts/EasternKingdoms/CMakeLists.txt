@@ -1,4 +1,4 @@
-# Copyright (C) 
+# Copyright (C)
 #
 # This file is free software; as a special exception the author gives
 # unlimited permission to copy and/or distribute it, with or without
@@ -43,7 +43,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_pyroguard_emberseer.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_drakkisath.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_warmaster_voone.cpp
-  ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_mother_smolderweb.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_quartermaster_zigris.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_halycon.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/BlackrockSpire/boss_overlord_wyrmthalak.cpp
@@ -127,7 +126,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_duskwood.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/ScarletMonastery/instance_scarlet_monastery.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_undercity.cpp
-  ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_loch_modan.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/ShadowfangKeep/instance_shadowfang_keep.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/ShadowfangKeep/shadowfang_keep.h
   ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_burning_steppes.cpp

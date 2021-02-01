@@ -1,12 +1,12 @@
 REVOKE ALL PRIVILEGES ON * . * FROM 'acore'@'localhost';
 
-REVOKE ALL PRIVILEGES ON `world` . * FROM 'acore'@'localhost';
+REVOKE ALL PRIVILEGES ON `acore_world` . * FROM 'acore'@'localhost';
 
-REVOKE GRANT OPTION ON `world` . * FROM 'acore'@'localhost';
+REVOKE GRANT OPTION ON `acore_world` . * FROM 'acore'@'localhost';
 
-REVOKE ALL PRIVILEGES ON `characters` . * FROM 'acore'@'localhost';
+REVOKE ALL PRIVILEGES ON `acore_characters` . * FROM 'acore'@'localhost';
 
-REVOKE GRANT OPTION ON `characters` . * FROM 'acore'@'localhost';
+REVOKE GRANT OPTION ON `acore_characters` . * FROM 'acore'@'localhost';
 
 REVOKE ALL PRIVILEGES ON `auth` . * FROM 'acore'@'localhost';
 
@@ -14,8 +14,8 @@ REVOKE GRANT OPTION ON `auth` . * FROM 'acore'@'localhost';
 
 DROP USER 'acore'@'localhost';
 
-DROP DATABASE IF EXISTS `world`;
+DROP DATABASE IF EXISTS `acore_world`;
 
-DROP DATABASE IF EXISTS `characters`;
+DROP DATABASE IF EXISTS `acore_characters`;
 
-DROP DATABASE IF EXISTS `auth`;
+DROP DATABASE IF EXISTS `acore_auth`;

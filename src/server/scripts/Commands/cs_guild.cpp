@@ -72,7 +72,22 @@ public:
         if (target->GetGuildId())
         {
             handler->SendSysMessage(LANG_PLAYER_IN_GUILD);
-            return true;
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (sGuildMgr->GetGuildByName(guildName))
+        {
+            handler->SendSysMessage(LANG_GUILD_RENAME_ALREADY_EXISTS);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (sObjectMgr->IsReservedName(guildName) || !sObjectMgr->IsValidCharterName(guildName))
+        {
+            handler->SendSysMessage(LANG_BAD_VALUE);
+            handler->SetSentErrorMessage(true);
+            return false;
         }
 
         Guild* guild = new Guild;
@@ -209,7 +224,7 @@ public:
         char createdDateStr[20];
         time_t createdDate = guild->GetCreatedDate();
         tm localTm;
-        ACE_OS::localtime_r(&createdDate, &localTm);
+        localtime_r(&createdDate, &localTm);
         strftime(createdDateStr, 20, "%Y-%m-%d %H:%M:%S", &localTm);
 
         handler->PSendSysMessage(LANG_GUILD_INFO_CREATION_DATE, createdDateStr); // Creation Date

@@ -5,7 +5,8 @@
 #ifndef DEF_ZULFARRACK_H
 #define DEF_ZULFARRACK_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
+#include "CellImpl.h"
 
 enum ZulFarrakData
 {

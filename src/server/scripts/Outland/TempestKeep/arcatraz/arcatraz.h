@@ -5,7 +5,9 @@
 #ifndef ARCATRAZ_H
 #define ARCATRAZ_H
 
-#include "ScriptPCH.h"
+#include "SpellScript.h"
+#include "Player.h"
+#include "CreatureAI.h"
 
 enum DataTypes
 {

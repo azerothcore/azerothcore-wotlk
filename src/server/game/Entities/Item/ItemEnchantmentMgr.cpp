@@ -28,7 +28,7 @@ struct EnchStoreItem
 };
 
 typedef std::vector<EnchStoreItem> EnchStoreList;
-typedef UNORDERED_MAP<uint32, EnchStoreList> EnchantmentStore;
+typedef std::unordered_map<uint32, EnchStoreList> EnchantmentStore;
 
 static EnchantmentStore RandomItemEnch;
 
@@ -134,7 +134,7 @@ uint32 GenerateEnchSuffixFactor(uint32 item_id)
         case INVTYPE_QUIVER:
         case INVTYPE_RELIC:
             return 0;
-            // Select point coefficient
+        // Select point coefficient
         case INVTYPE_HEAD:
         case INVTYPE_BODY:
         case INVTYPE_CHEST:
@@ -188,4 +188,3 @@ uint32 GenerateEnchSuffixFactor(uint32 item_id)
     }
     return 0;
 }
-

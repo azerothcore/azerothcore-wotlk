@@ -56,7 +56,7 @@ void RARunnable::run()
 
     if (acceptor.open(listenAddress, m_Reactor) == -1)
     {
-        sLog->outError("Trinity RA can not bind to port %d on %s", raPort, stringIp.c_str());
+        sLog->outError("Trinity RA can not bind to port %d on %s (possible error: port already in use)", raPort, stringIp.c_str());
         return;
     }
 

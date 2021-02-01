@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef TRINITY_TYPELIST_H
-#define TRINITY_TYPELIST_H
+#ifndef ACORE_TYPELIST_H
+#define ACORE_TYPELIST_H
 
 /*
   @struct TypeList
@@ -29,4 +29,3 @@ struct TypeList
 #define TYPELIST_4(T1, T2, T3, T4)      TypeList<T1, TYPELIST_3(T2, T3, T4) >
 #define TYPELIST_5(T1, T2, T3, T4, T5)  TypeList<T1, TYPELIST_4(T2, T3, T4, T5) >
 #endif
-

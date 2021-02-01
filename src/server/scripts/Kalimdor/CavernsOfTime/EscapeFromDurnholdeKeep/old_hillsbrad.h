@@ -5,8 +5,6 @@
 #ifndef DEF_OLD_HILLSBRAD_H
 #define DEF_OLD_HILLSBRAD_H
 
-#include "ScriptPCH.h"
-
 enum DataIds
 {
     DATA_ESCORT_PROGRESS    = 0,
@@ -74,8 +72,6 @@ enum MiscIds
 
     INSTANCE_POSITIONS_COUNT        = 3,
     THRALL_POSITIONS_COUNT          = 5
-
 };
 
 #endif
-

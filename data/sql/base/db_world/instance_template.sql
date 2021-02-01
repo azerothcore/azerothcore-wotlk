@@ -12,7 +12,7 @@ CREATE TABLE `instance_template`
   `map` smallint(5) unsigned NOT NULL,
   `parent` smallint(5) unsigned NOT NULL,
   `script` varchar(128) NOT NULL DEFAULT '',
-  `allowMount` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `allowMount` tinyint(3) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`map`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -31,6 +31,7 @@ INSERT INTO `instance_template` VALUES
 (90,0,'instance_gnomeregan',0),
 (109,0,'instance_sunken_temple',0),
 (129,1,'instance_razorfen_downs',0),
+(169,0,'',1),
 (189,0,'instance_scarlet_monastery',0),
 (209,1,'instance_zulfarrak',1),
 (229,0,'instance_blackrock_spire',0),
@@ -57,8 +58,8 @@ INSERT INTO `instance_template` VALUES
 (543,530,'instance_ramparts',0),
 (544,530,'instance_magtheridons_lair',0),
 (545,530,'instance_steam_vault',0),
-(546,530,'',0),
-(547,530,'',0),
+(546,530,'instance_the_underbog',0),
+(547,530,'instance_the_slave_pens',0),
 (548,530,'instance_serpent_shrine',0),
 (550,530,'instance_the_eye',0),
 (552,530,'instance_arcatraz',0),
@@ -66,8 +67,8 @@ INSERT INTO `instance_template` VALUES
 (554,530,'instance_mechanar',0),
 (555,530,'instance_shadow_labyrinth',0),
 (556,530,'instance_sethekk_halls',0),
-(557,530,'',0),
-(558,530,'',0),
+(557,530,'instance_mana_tombs',0),
+(558,530,'instance_auchenai_crypts',0),
 (559,0,'',1),
 (560,1,'instance_old_hillsbrad',1),
 (562,0,'',1),

@@ -19,6 +19,12 @@ ACE_Service_Repository::current_size (void) const
   return this->service_array_.size ();
 }
 
+ACE_INLINE ACE_SYNCH_RECURSIVE_MUTEX&
+ACE_Service_Repository::lock (void) const
+{
+  return this->lock_;
+}
+
 ACE_INLINE int
 ACE_Service_Repository_Iterator::done (void) const
 {

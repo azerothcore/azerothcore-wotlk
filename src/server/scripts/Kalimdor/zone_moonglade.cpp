@@ -50,49 +50,48 @@ class npc_bunthen_plainswind : public CreatureScript
 public:
     npc_bunthen_plainswind() : CreatureScript("npc_bunthen_plainswind") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_HORDE)
                     player->ActivateTaxiPathTo(TAXI_PATH_ID_HORDE);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                player->SEND_GOSSIP_MENU(5373, creature->GetGUID());
+                SendGossipMenuFor(player, 5373, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 3:
-                player->SEND_GOSSIP_MENU(5376, creature->GetGUID());
+                SendGossipMenuFor(player, 5376, creature->GetGUID());
                 break;
         }
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->getClass() != CLASS_DRUID)
-            player->SEND_GOSSIP_MENU(4916, creature->GetGUID());
+            SendGossipMenuFor(player, 4916, creature->GetGUID());
         else if (player->GetTeamId() != TEAM_HORDE)
         {
             if (player->GetQuestStatus(QUEST_SEA_LION_ALLY) == QUEST_STATUS_INCOMPLETE)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_AQ_END, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AQ_END, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
-            player->SEND_GOSSIP_MENU(4917, creature->GetGUID());
+            SendGossipMenuFor(player, 4917, creature->GetGUID());
         }
         else if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_HORDE)
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_THUNDER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_THUNDER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
             if (player->GetQuestStatus(QUEST_SEA_LION_HORDE) == QUEST_STATUS_INCOMPLETE)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_AQ_END, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AQ_END, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
 
-            player->SEND_GOSSIP_MENU(4918, creature->GetGUID());
+            SendGossipMenuFor(player, 4918, creature->GetGUID());
         }
         return true;
     }
-
 };
 
 /*######
@@ -109,25 +108,25 @@ class npc_great_bear_spirit : public CreatureScript
 public:
     npc_great_bear_spirit() : CreatureScript("npc_great_bear_spirit") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BEAR2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                player->SEND_GOSSIP_MENU(4721, creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BEAR2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+                SendGossipMenuFor(player, 4721, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 1:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BEAR3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(4733, creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BEAR3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                SendGossipMenuFor(player, 4733, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BEAR4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                player->SEND_GOSSIP_MENU(4734, creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BEAR4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                SendGossipMenuFor(player, 4734, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 3:
-                player->SEND_GOSSIP_MENU(4735, creature->GetGUID());
+                SendGossipMenuFor(player, 4735, creature->GetGUID());
                 if (player->GetQuestStatus(5929) == QUEST_STATUS_INCOMPLETE)
                     player->AreaExploredOrEventHappens(5929);
                 if (player->GetQuestStatus(5930) == QUEST_STATUS_INCOMPLETE)
@@ -137,20 +136,19 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         //ally or horde quest
         if (player->GetQuestStatus(5929) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(5930) == QUEST_STATUS_INCOMPLETE)
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_BEAR1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-            player->SEND_GOSSIP_MENU(4719, creature->GetGUID());
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_BEAR1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            SendGossipMenuFor(player, 4719, creature->GetGUID());
         }
         else
-            player->SEND_GOSSIP_MENU(4718, creature->GetGUID());
+            SendGossipMenuFor(player, 4718, creature->GetGUID());
 
         return true;
     }
-
 };
 
 /*######
@@ -165,49 +163,48 @@ class npc_silva_filnaveth : public CreatureScript
 public:
     npc_silva_filnaveth() : CreatureScript("npc_silva_filnaveth") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_ALLIANCE)
                     player->ActivateTaxiPathTo(TAXI_PATH_ID_ALLY);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                player->SEND_GOSSIP_MENU(5374, creature->GetGUID());
+                SendGossipMenuFor(player, 5374, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF + 3:
-                player->SEND_GOSSIP_MENU(5375, creature->GetGUID());
+                SendGossipMenuFor(player, 5375, creature->GetGUID());
                 break;
         }
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->getClass() != CLASS_DRUID)
-            player->SEND_GOSSIP_MENU(4913, creature->GetGUID());
+            SendGossipMenuFor(player, 4913, creature->GetGUID());
         else if (player->GetTeamId() != TEAM_ALLIANCE)
         {
             if (player->GetQuestStatus(QUEST_SEA_LION_HORDE) == QUEST_STATUS_INCOMPLETE)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_AQ_AGI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AQ_AGI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
-            player->SEND_GOSSIP_MENU(4915, creature->GetGUID());
+            SendGossipMenuFor(player, 4915, creature->GetGUID());
         }
         else if (player->getClass() == CLASS_DRUID && player->GetTeamId() == TEAM_ALLIANCE)
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_RUTHERAN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_RUTHERAN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
             if (player->GetQuestStatus(QUEST_SEA_LION_ALLY) == QUEST_STATUS_INCOMPLETE)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_AQ_AGI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_AQ_AGI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
 
-            player->SEND_GOSSIP_MENU(4914, creature->GetGUID());
+            SendGossipMenuFor(player, 4914, creature->GetGUID());
         }
         return true;
     }
-
 };
 
 /*######
@@ -216,7 +213,7 @@ public:
 
 float const Clintar_spirit_WP[41][5] =
 {
-     //pos_x   pos_y    pos_z    orien waitTime
+    //pos_x   pos_y    pos_z    orien waitTime
     {7465.28f, -3115.46f, 439.327f, 0.83f, 4000},
     {7476.49f, -3101,    443.457f, 0.89f, 0},
     {7486.57f, -3085.59f, 439.478f, 1.07f, 0},
@@ -276,7 +273,7 @@ class npc_clintar_spirit : public CreatureScript
 public:
     npc_clintar_spirit() : CreatureScript("npc_clintar_spirit") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_clintar_spiritAI(creature);
     }
@@ -298,7 +295,7 @@ public:
 
         bool EventOnWait;
 
-        void Reset()
+        void Reset() override
         {
             if (!PlayerGUID)
             {
@@ -311,11 +308,11 @@ public:
             }
         }
 
-        void IsSummonedBy(Unit* /*summoner*/)
+        void IsSummonedBy(Unit* /*summoner*/) override
         {
             std::list<Player*> playerOnQuestList;
-            Trinity::AnyPlayerInObjectRangeCheck checker(me, 5.0f);
-            Trinity::PlayerListSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, playerOnQuestList, checker);
+            acore::AnyPlayerInObjectRangeCheck checker(me, 5.0f);
+            acore::PlayerListSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, playerOnQuestList, checker);
             me->VisitNearbyWorldObject(5.0f, searcher);
             for (std::list<Player*>::const_iterator itr = playerOnQuestList.begin(); itr != playerOnQuestList.end(); ++itr)
             {
@@ -333,7 +330,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (!PlayerGUID)
                 return;
@@ -347,7 +344,7 @@ public:
             }
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
             if (player && player->IsInCombat() && player->getAttackerForHelper())
@@ -372,7 +369,7 @@ public:
             return;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -390,7 +387,8 @@ public:
                     if (player && player->IsInCombat() && player->getAttackerForHelper())
                         AttackStart(player->getAttackerForHelper());
                     checkPlayerTimer = 1000;
-                } else checkPlayerTimer -= diff;
+                }
+                else checkPlayerTimer -= diff;
             }
 
             if (EventOnWait && EventTimer <= diff)
@@ -530,11 +528,11 @@ public:
                         EventOnWait = false;
                         break;
                 }
-
-            } else if (EventOnWait) EventTimer -= diff;
+            }
+            else if (EventOnWait) EventTimer -= diff;
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             CurrWP = waypointId;
             EventTimer = 0;
@@ -542,7 +540,6 @@ public:
             EventOnWait = true;
         }
     };
-
 };
 
 /*####
@@ -581,7 +578,7 @@ public:
 
         EventMap events;
 
-        void MovementInform(uint32 type, uint32 pointId)
+        void MovementInform(uint32 type, uint32 pointId) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -595,19 +592,19 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*attacker*/)
+        void EnterCombat(Unit* /*attacker*/) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_CAST_CLEAVE, urand(3000, 5000));
             events.ScheduleEvent(EVENT_CAST_STARFALL, urand(8000, 10000));
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             DoCast(SPELL_OMEN_SUMMON_SPOTLIGHT);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_ELUNE_CANDLE)
             {
@@ -618,7 +615,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -642,7 +639,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_omenAI(creature);
     }
@@ -659,13 +656,13 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_DESPAWN, 5*MINUTE*IN_MILLISECONDS);
+            events.ScheduleEvent(EVENT_DESPAWN, 5 * MINUTE * IN_MILLISECONDS);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -685,7 +682,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_giant_spotlightAI(creature);
     }

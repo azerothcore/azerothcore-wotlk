@@ -65,6 +65,12 @@ public:
             return false;
         }
 
+        if (player->IsActiveQuest(entry))
+        {
+            handler->PSendSysMessage("This quest is already active!");
+            return false;
+        }
+
         // check item starting quest (it can work incorrectly if added without item in inventory)
         ItemTemplateContainer const* itc = sObjectMgr->GetItemTemplateStore();
         ItemTemplateContainer::const_iterator result = find_if(itc->begin(), itc->end(), Finder<uint32, ItemTemplate>(entry, &ItemTemplate::StartQuest));
@@ -175,11 +181,11 @@ public:
             uint32 curItemCount = player->GetItemCount(id, true);
 
             ItemPosCountVec dest;
-            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, id, count-curItemCount);
+            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, id, count - curItemCount);
             if (msg == EQUIP_ERR_OK)
             {
                 Item* item = player->StoreNewItem(dest, id, true);
-                player->SendNewItem(item, count-curItemCount, true, false);
+                player->SendNewItem(item, count - curItemCount, true, false);
             }
         }
 
@@ -224,6 +230,18 @@ public:
         int32 ReqOrRewMoney = quest->GetRewOrReqMoney();
         if (ReqOrRewMoney < 0)
             player->ModifyMoney(-ReqOrRewMoney);
+
+        // check if Quest Tracker is enabled
+        if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
+        {
+            // prepare Quest Tracker datas
+            auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_GM_COMPLETE);
+            stmt->setUInt32(0, quest->GetQuestId());
+            stmt->setUInt32(1, player->GetGUIDLow());
+
+            // add to Quest Tracker
+            CharacterDatabase.Execute(stmt);
+        }
 
         player->CompleteQuest(entry);
         return true;

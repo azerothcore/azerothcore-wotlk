@@ -6,7 +6,7 @@ Xinef
 #define _PETITIONMGR_H
 
 #include "Common.h"
-#include <ace/Singleton.h>
+#include <map>
 
 typedef std::map<uint32, uint32> SignatureMap;
 
@@ -29,35 +29,36 @@ typedef std::map<uint32, Petition> PetitionContainer;
 
 class PetitionMgr
 {
-    friend class ACE_Singleton<PetitionMgr, ACE_Thread_Mutex>;
+private:
+    PetitionMgr();
+    ~PetitionMgr();
 
-    private:
-        PetitionMgr();
-        ~PetitionMgr();
+public:
+    static PetitionMgr* instance();
 
-    public:
-        void LoadPetitions();
-        void LoadSignatures();
-        
-        // Petitions
-        void AddPetition(uint32 petitionId, uint32 ownerGuid, std::string const& name, uint8 type);
-        void RemovePetition(uint32 petitionId);
-        void RemovePetitionByOwnerAndType(uint32 ownerGuid, uint8 type);
-        Petition const* GetPetition(uint32 petitionId) const;
-        Petition const* GetPetitionByOwnerWithType(uint32 ownerGuid, uint8 type) const;
-        PetitionContainer* GetPetitionStore() { return &PetitionStore; }
+    void LoadPetitions();
+    void LoadSignatures();
 
-        // Signatures
-        void AddSignature(uint32 petitionId, uint32 accountId, uint32 playerGuid);
-        void RemoveSignaturesByPlayer(uint32 playerGuid);
-        void RemoveSignaturesByPlayerAndType(uint32 playerGuid, uint8 type);
-        Signatures const* GetSignature(uint32 petitionId) const;
-        SignatureContainer* GetSignatureStore() { return &SignatureStore; }
+    // Petitions
+    void AddPetition(uint32 petitionId, uint32 ownerGuid, std::string const& name, uint8 type);
+    void RemovePetition(uint32 petitionId);
+    void RemovePetitionByOwnerAndType(uint32 ownerGuid, uint8 type);
+    Petition const* GetPetition(uint32 petitionId) const;
+    Petition const* GetPetitionByOwnerWithType(uint32 ownerGuid, uint8 type) const;
+    PetitionContainer* GetPetitionStore() { return &PetitionStore; }
 
-    protected:
-        PetitionContainer PetitionStore;
-        SignatureContainer SignatureStore;
+    // Signatures
+    void AddSignature(uint32 petitionId, uint32 accountId, uint32 playerGuid);
+    void RemoveSignaturesByPlayer(uint32 playerGuid);
+    void RemoveSignaturesByPlayerAndType(uint32 playerGuid, uint8 type);
+    Signatures const* GetSignature(uint32 petitionId) const;
+    SignatureContainer* GetSignatureStore() { return &SignatureStore; }
+
+protected:
+    PetitionContainer PetitionStore;
+    SignatureContainer SignatureStore;
 };
 
-#define sPetitionMgr ACE_Singleton<PetitionMgr, ACE_Thread_Mutex>::instance()
+#define sPetitionMgr PetitionMgr::instance()
+
 #endif

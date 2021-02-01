@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,7 +10,7 @@
 #include "Utils.h"
 #include "WorldModelHandler.h"
 
-WDT::WDT(std::string file) : IsGlobalModel(false), IsValid(false), Model(NULL)
+WDT::WDT(std::string file) : IsGlobalModel(false), IsValid(false), Model(nullptr)
 {
     Data = new ChunkedData(file, 2);
     ReadTileTable();
@@ -54,7 +53,6 @@ void WDT::ReadTileTable()
 
             if (flags & hasTileFlag)
                 TileTable.push_back(TilePos(x, y));
-
         }
     }
 }

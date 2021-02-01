@@ -8,6 +8,13 @@ if [ -f "./config.sh"  ]; then
     source "./config.sh" # should overwrite previous
 fi
 
+echo "This is a dev-only procedure to export the DB into the SQL base files. All base files will be overwritten."
+read -p "Are you sure you want to continue (y/N)? " choice
+case "$choice" in
+  y|Y ) echo "Exporting the DB into the SQL base files...";;
+  * ) return;;
+esac
+
 echo "===== STARTING PROCESS ====="
 
 
@@ -16,7 +23,7 @@ function export() {
     database=$1
 
     var_base_path="DB_"$database"_PATHS"
-    base_path=${!var_base_path}
+    base_path=${!var_base_path%/}
     
     base_conf="TPATH="$base_path";\
                CLEANFOLDER=1; \
@@ -34,7 +41,7 @@ function export() {
     base_name=${!var_base_name}
 
 
-    bash $AC_PATH_MODULES"/drassil/mysql-tools/mysql-tools" dump "" $base_name "" "$base_conf"
+    bash $AC_PATH_DEPS"/drassil/mysql-tools/mysql-tools" dump "" $base_name "" "$base_conf"
 }
 
 for db in ${DATABASES[@]}

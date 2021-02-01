@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 
- * Copyright (C) 
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -26,11 +25,11 @@
 #include "WorldModel.h"
 #include <G3D/Vector3.h>
 #include <ace/Null_Mutex.h>
-#include <ace/Singleton.h>
 #include "DisableMgr.h"
 #include "DBCStores.h"
 #include "Log.h"
 #include "VMapDefinitions.h"
+#include "GridDefines.h"
 
 using G3D::Vector3;
 
@@ -56,7 +55,7 @@ namespace VMAP
     Vector3 VMapManager2::convertPositionToInternalRep(float x, float y, float z) const
     {
         Vector3 pos;
-        const float mid = 0.5f * 64.0f * 533.33333333f;
+        const float mid = 0.5f * MAX_NUMBER_OF_GRIDS * SIZE_OF_GRIDS;
         pos.x = mid - x;
         pos.y = mid - y;
         pos.z = z;
@@ -97,10 +96,10 @@ namespace VMAP
             std::string mapFileName = getMapFileName(mapId);
             StaticMapTree* newTree = new StaticMapTree(mapId, basePath);
             if (!newTree->InitMap(mapFileName, this))
-			{
-				delete newTree;
+            {
+                delete newTree;
                 return false;
-			}
+            }
             instanceTree = iInstanceMapTrees.insert(InstanceTreeMap::value_type(mapId, newTree)).first;
         }
 
@@ -160,7 +159,7 @@ namespace VMAP
     get the hit position and return true if we hit something
     otherwise the result pos will be the dest pos
     */
-    bool VMapManager2::getObjectHitPos(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float &ry, float& rz, float modifyDist)
+    bool VMapManager2::getObjectHitPos(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_VMAP_CHECKS)
         if (isLineOfSightCalcEnabled() && !DisableMgr::IsDisabledFor(DISABLE_TYPE_VMAP, mapId, NULL, VMAP_DISABLE_LOS))
@@ -203,7 +202,7 @@ namespace VMAP
             {
                 Vector3 pos = convertPositionToInternalRep(x, y, z);
                 float height = instanceTree->second->getHeight(pos, maxSearchDist);
-                if (!(height < G3D::inf()))
+                if (!(height < G3D::finf()))
                     return height = VMAP_INVALID_HEIGHT_VALUE; // No height
 
                 return height;
@@ -263,7 +262,7 @@ namespace VMAP
     WorldModel* VMapManager2::acquireModelInstance(const std::string& basepath, const std::string& filename)
     {
         //! Critical section, thread safe access to iLoadedModelFiles
-        TRINITY_GUARD(ACE_Thread_Mutex, LoadedModelFilesLock);
+        ACORE_GUARD(ACE_Thread_Mutex, LoadedModelFilesLock);
 
         ModelFileMap::iterator model = iLoadedModelFiles.find(filename);
         if (model == iLoadedModelFiles.end())
@@ -285,10 +284,10 @@ namespace VMAP
         return model->second.getModel();
     }
 
-    void VMapManager2::releaseModelInstance(const std::string &filename)
+    void VMapManager2::releaseModelInstance(const std::string& filename)
     {
         //! Critical section, thread safe access to iLoadedModelFiles
-        TRINITY_GUARD(ACE_Thread_Mutex, LoadedModelFilesLock);
+        ACORE_GUARD(ACE_Thread_Mutex, LoadedModelFilesLock);
         ModelFileMap::iterator model = iLoadedModelFiles.find(filename);
         if (model == iLoadedModelFiles.end())
         {

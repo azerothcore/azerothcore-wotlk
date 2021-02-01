@@ -46,17 +46,18 @@ public:
 
         bool SummonedRend;
 
-        void Reset()
+        void Reset() override
         {
             SummonedRend = false;
             if (instance->GetBossState(DATA_GYTH) == IN_PROGRESS)
             {
-                instance->SetBossState(DATA_GYTH, DONE);
+                instance->SetBossState(DATA_GYTH, NOT_STARTED);
+                summons.DespawnAll();
                 me->DespawnOrUnsummon();
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
 
@@ -66,12 +67,12 @@ public:
             events.ScheduleEvent(EVENT_KNOCK_AWAY, urand(12000, 18000));
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             instance->SetBossState(DATA_GYTH, DONE);
         }
 
-        void SetData(uint32 /*type*/, uint32 data)
+        void SetData(uint32 /*type*/, uint32 data) override
         {
             switch (data)
             {
@@ -83,10 +84,15 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void JustSummoned(Creature* summon) override
         {
+            summons.Summon(summon);
+            summon->AI()->AttackStart(me->SelectVictim());
+        }
 
-            if (!SummonedRend && HealthBelowPct(5))
+        void UpdateAI(uint32 diff) override
+        {
+            if (!SummonedRend && HealthBelowPct(25))
             {
                 DoCast(me, SPELL_SUMMON_REND);
                 me->RemoveAura(SPELL_REND_MOUNTS);
@@ -149,7 +155,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_gythAI>(creature);
     }

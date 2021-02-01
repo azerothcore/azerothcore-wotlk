@@ -19,11 +19,12 @@ npc_tirion_fordring
 EndContentData */
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Player.h"
 #include "WorldSession.h"
+#include "PassiveAI.h"
+#include "SpellInfo.h"
 
 // Ours
 
@@ -51,12 +52,12 @@ class npc_eris_hevenfire : public CreatureScript
 public:
     npc_eris_hevenfire() : CreatureScript("npc_eris_hevenfire") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_eris_hevenfireAI(creature);
     }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_BALANCE_OF_LIGHT_AND_SHADOW)
         {
@@ -80,7 +81,7 @@ public:
         bool _spoken;
         uint32 _faction;
 
-        void Reset()
+        void Reset() override
         {
             _faction = 0;
             _spoken = false;
@@ -90,15 +91,15 @@ public:
             _playerGUID = 0;
             events.Reset();
             summons.DespawnAll();
-            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP|UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
 
-        void SetData(uint32 faction, uint32)
+        void SetData(uint32 faction, uint32) override
         {
             _faction = faction;
         }
 
-        void SetGUID(uint64 guid, int32)
+        void SetGUID(uint64 guid, int32) override
         {
             _playerGUID = guid;
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -110,7 +111,7 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_PEASANTS, 8000);
         }
 
-        bool CanBeSeen(Player const* player)
+        bool CanBeSeen(Player const* player) override
         {
             // requires this trinket to be seen
             return player->HasItemOrGemWithIdEquipped(ITEM_EYE_OF_DIVINITY, 1);
@@ -139,11 +140,11 @@ public:
                 float y = -3049 + frand(-6.0f, 6.0f);
                 float z = 165.25;
                 float o = 2.0;
-                me->SummonCreature(roll_chance_i(5) ? NPC_PLAGUED_PEASANT : NPC_INJURED_PEASANT, x, y, z, o, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 2*MINUTE*IN_MILLISECONDS);
+                me->SummonCreature(roll_chance_i(5) ? NPC_PLAGUED_PEASANT : NPC_INJURED_PEASANT, x, y, z, o, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
             }
         }
 
-        void JustSummoned(Creature* creature)
+        void JustSummoned(Creature* creature) override
         {
             summons.Summon(creature);
             if (creature->GetEntry() == NPC_INJURED_PEASANT || creature->GetEntry() == NPC_PLAGUED_PEASANT)
@@ -158,8 +159,8 @@ public:
                 if (creature->GetEntry() == NPC_PLAGUED_PEASANT)
                     creature->CastSpell(creature, SPELL_SEETHING_PLAGUE, true);
 
-                float x = 3324+frand(-3.0f, 3.0f);
-                float y = -2966+frand(-3.0f, 3.0f);
+                float x = 3324 + frand(-3.0f, 3.0f);
+                float y = -2966 + frand(-3.0f, 3.0f);
                 float z = 159.65f;
                 creature->SetWalk(true);
                 creature->GetMotionMaster()->MovePoint(0, x, y, z);
@@ -167,7 +168,7 @@ public:
             }
         }
 
-        void DoAction(int32 action)
+        void DoAction(int32 action) override
         {
             if (action == 1)
                 _savedCount++;
@@ -199,31 +200,30 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_CHECK_PLAYER:
-                {
-                    Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
-                    if (!player || me->GetDistance2d(player) > 100.0f)
                     {
-                        EnterEvadeMode();
-                        return;
+                        Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
+                        if (!player || me->GetDistance2d(player) > 100.0f)
+                        {
+                            EnterEvadeMode();
+                            return;
+                        }
+                        events.RepeatEvent(2000);
+                        break;
                     }
-                    events.RepeatEvent(2000);
-                    break;
-                }
                 case EVENT_SUMMON_ARCHERS:
                     SummonArchers();
-                    events.PopEvent();
                     break;
                 case EVENT_SUMMON_PEASANTS:
                     _spoken = false;
                     SummonPeasants();
                     _spoken = false;
-                    events.RepeatEvent(60*IN_MILLISECONDS);
+                    events.RepeatEvent(60 * IN_MILLISECONDS);
                     break;
             }
         }
@@ -235,7 +235,7 @@ class npc_balance_of_light_and_shadow : public CreatureScript
 public:
     npc_balance_of_light_and_shadow() : CreatureScript("npc_balance_of_light_and_shadow") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_balance_of_light_and_shadowAI (creature);
     }
@@ -244,7 +244,7 @@ public:
     {
         npc_balance_of_light_and_shadowAI(Creature* creature) : NullCreatureAI(creature) { timer = 0; _targetGUID = 0; }
 
-        bool CanBeSeen(Player const* player)
+        bool CanBeSeen(Player const* player) override
         {
             // requires this trinket to be seen
             return player->HasItemOrGemWithIdEquipped(ITEM_EYE_OF_DIVINITY, 1);
@@ -253,13 +253,13 @@ public:
         uint32 timer;
         uint64 _targetGUID;
 
-        void SpellHit(Unit*, const SpellInfo* spellInfo)
+        void SpellHit(Unit*, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_SHOOT && roll_chance_i(7))
                 me->CastSpell(me, SPELL_DEATHS_DOOR, true);
         }
 
-        void MovementInform(uint32 type, uint32  /*pointId*/)
+        void MovementInform(uint32 type, uint32  /*pointId*/) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -271,14 +271,14 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             if (TempSummon* summon = me->ToTempSummon())
                 if (Unit* creature = summon->GetSummoner())
                     creature->GetAI()->DoAction(2);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (me->GetEntry() != NPC_SCOURGE_ARCHER)
                 return;
@@ -286,7 +286,7 @@ public:
             timer += diff;
             if (timer >= 4000)
             {
-                Unit* target = _targetGUID ? ObjectAccessor::GetUnit(*me, _targetGUID) : NULL;
+                Unit* target = _targetGUID ? ObjectAccessor::GetUnit(*me, _targetGUID) : nullptr;
                 if (!target)
                     target = me->FindNearestCreature(NPC_INJURED_PEASANT, 60.0f);
 
@@ -296,12 +296,11 @@ public:
                     me->CastSpell(target, SPELL_SHOOT, true);
                 }
 
-                timer = urand(0,3000);
+                timer = urand(0, 3000);
             }
         }
     };
 };
-
 
 // Theirs
 class npc_ghoul_flayer : public CreatureScript
@@ -313,18 +312,18 @@ public:
     {
         npc_ghoul_flayerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             if (killer->GetTypeId() == TYPEID_PLAYER)
                 me->SummonCreature(11064, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_ghoul_flayerAI(creature);
     }
@@ -339,23 +338,23 @@ class npc_augustus_the_touched : public CreatureScript
 public:
     npc_augustus_the_touched() : CreatureScript("npc_augustus_the_touched") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         if (action == GOSSIP_ACTION_TRADE)
             player->GetSession()->SendListInventory(creature->GetGUID());
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (creature->IsVendor() && player->GetQuestRewardStatus(6164))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
         return true;
     }
 };
@@ -374,15 +373,15 @@ class npc_darrowshire_spirit : public CreatureScript
 public:
     npc_darrowshire_spirit() : CreatureScript("npc_darrowshire_spirit") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
-        player->SEND_GOSSIP_MENU(3873, creature->GetGUID());
+        SendGossipMenuFor(player, 3873, creature->GetGUID());
         player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
         creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_darrowshire_spiritAI(creature);
     }
@@ -391,67 +390,14 @@ public:
     {
         npc_darrowshire_spiritAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             DoCast(me, SPELL_SPIRIT_SPAWNIN);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
     };
-};
-
-/*######
-## npc_tirion_fordring
-######*/
-
-#define GOSSIP_HELLO    "I am ready to hear your tale, Tirion."
-#define GOSSIP_SELECT1  "Thank you, Tirion.  What of your identity?"
-#define GOSSIP_SELECT2  "That is terrible."
-#define GOSSIP_SELECT3  "I will, Tirion."
-
-class npc_tirion_fordring : public CreatureScript
-{
-public:
-    npc_tirion_fordring() : CreatureScript("npc_tirion_fordring") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
-    {
-        player->PlayerTalkClass->ClearMenus();
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SELECT1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                player->SEND_GOSSIP_MENU(4493, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SELECT2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                player->SEND_GOSSIP_MENU(4494, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+3:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SELECT3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                player->SEND_GOSSIP_MENU(4495, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+4:
-                player->CLOSE_GOSSIP_MENU();
-                player->AreaExploredOrEventHappens(5742);
-                break;
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature)
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(5742) == QUEST_STATUS_INCOMPLETE && player->getStandState() == UNIT_STAND_STATE_SIT)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELLO, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
 };
 
 void AddSC_eastern_plaguelands()
@@ -464,5 +410,4 @@ void AddSC_eastern_plaguelands()
     new npc_ghoul_flayer();
     new npc_augustus_the_touched();
     new npc_darrowshire_spirit();
-    new npc_tirion_fordring();
 }

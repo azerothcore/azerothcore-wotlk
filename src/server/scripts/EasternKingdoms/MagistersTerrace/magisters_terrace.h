@@ -5,7 +5,9 @@
 #ifndef DEF_MAGISTERS_TERRACE_H
 #define DEF_MAGISTERS_TERRACE_H
 
-#include "ScriptPCH.h"
+#include "Player.h"
+#include "CreatureAI.h"
+#include "SpellScript.h"
 
 enum MTData
 {
@@ -15,7 +17,6 @@ enum MTData
     DATA_KAELTHAS_EVENT         = 3,
     MAX_ENCOUNTER               = 4
 };
-
 
 enum MTCreatures
 {
@@ -35,6 +36,5 @@ enum MTGameObjects
     GO_KAEL_DOOR                = 188064,
     GO_ESCAPE_ORB               = 188173
 };
-
 
 #endif

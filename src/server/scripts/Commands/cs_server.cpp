@@ -19,6 +19,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "GitRevision.h"
 #include "AvgDiffTracker.h"
+#include "ServerMotd.h"
 
 class server_commandscript : public CommandScript
 {
@@ -30,25 +31,25 @@ public:
         static std::vector<ChatCommand> serverIdleRestartCommandTable =
         {
             { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerIdleRestartCommand,         "" }
+            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerIdleRestartCommand,         "" }
         };
 
         static std::vector<ChatCommand> serverIdleShutdownCommandTable =
         {
             { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerIdleShutDownCommand,        "" }
+            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerIdleShutDownCommand,        "" }
         };
 
         static std::vector<ChatCommand> serverRestartCommandTable =
         {
             { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "" }
+            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerRestartCommand,             "" }
         };
 
         static std::vector<ChatCommand> serverShutdownCommandTable =
         {
             { "cancel",         SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCancelCommand,      "" },
-            { ""   ,            SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCommand,            "" }
+            { "",            SEC_ADMINISTRATOR,  true,  &HandleServerShutDownCommand,            "" }
         };
 
         static std::vector<ChatCommand> serverSetCommandTable =
@@ -74,7 +75,7 @@ public:
             { "togglequerylog", SEC_CONSOLE,        true,  &HandleServerToggleQueryLogging,         "" }
         };
 
-         static std::vector<ChatCommand> commandTable =
+        static std::vector<ChatCommand> commandTable =
         {
             { "server",         SEC_PLAYER,         true,  nullptr,                                 "", serverCommandTable }
         };
@@ -122,7 +123,7 @@ public:
     // Display the 'Message of the day' for the realm
     static bool HandleServerMotdCommand(ChatHandler* handler, char const* /*args*/)
     {
-        handler->PSendSysMessage(LANG_MOTD_CURRENT, sWorld->GetMotd());
+        handler->PSendSysMessage(LANG_MOTD_CURRENT, Motd::GetMotd());
         return true;
     }
 
@@ -202,7 +203,7 @@ public:
         else
             sWorld->ShutdownServ(time, SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE);
 
-            return true;
+        return true;
     }
 
     static bool HandleServerIdleRestartCommand(ChatHandler* /*handler*/, char const* args)
@@ -272,7 +273,7 @@ public:
         }
         else
             sWorld->ShutdownServ(time, SHUTDOWN_MASK_IDLE, SHUTDOWN_EXIT_CODE);
-            return true;
+        return true;
     }
 
     // Exit the realm
@@ -286,7 +287,7 @@ public:
     // Define the 'Message of the day' for the realm
     static bool HandleServerSetMotdCommand(ChatHandler* handler, char const* args)
     {
-        sWorld->SetMotd(args);
+        Motd::SetMotd(args);
         handler->PSendSysMessage(LANG_MOTD_NEW, args);
         return true;
     }

@@ -1,7 +1,6 @@
 // Scripted by Xinef
 
 #include "ScriptMgr.h"
-#include "ScriptPCH.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
@@ -11,6 +10,8 @@
 #include "GameEventMgr.h"
 #include "Group.h"
 #include "LFGMgr.h"
+#include "PassiveAI.h"
+#include "CellImpl.h"
 
 ///////////////////////////////////////
 ////// GOS
@@ -28,7 +29,7 @@ public:
     struct npc_brewfest_revelerAI : public ScriptedAI
     {
         npc_brewfest_revelerAI(Creature* c) : ScriptedAI(c) {}
-        void ReceiveEmote(Player* player, uint32 emote)
+        void ReceiveEmote(Player* player, uint32 emote) override
         {
             if (!IsHolidayActive(HOLIDAY_BREWFEST))
                 return;
@@ -38,7 +39,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_brewfest_revelerAI(creature);
     }
@@ -84,22 +85,22 @@ class npc_coren_direbrew : public CreatureScript
 public:
     npc_coren_direbrew() : CreatureScript("npc_coren_direbrew") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_coren_direbrewAI (creature);
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         switch (uiAction)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_COREN2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-                player->SEND_GOSSIP_MENU(15859, creature->GetGUID());
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_COREN2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                SendGossipMenuFor(player, 15859, creature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 creature->AI()->DoAction(ACTION_START_FIGHT);
                 creature->MonsterSay("You'll pay for this insult, $C.", LANG_UNIVERSAL, player);
                 break;
@@ -107,20 +108,20 @@ public:
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_COREN1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-        player->SEND_GOSSIP_MENU(15858, creature->GetGUID());
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_COREN1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        SendGossipMenuFor(player, 15858, creature->GetGUID());
 
         return true;
     }
 
     struct npc_coren_direbrewAI : public ScriptedAI
     {
-        npc_coren_direbrewAI(Creature* c) : ScriptedAI(c), summons(me) 
+        npc_coren_direbrewAI(Creature* c) : ScriptedAI(c), summons(me)
         {
         }
 
@@ -128,7 +129,7 @@ public:
         SummonList summons;
         uint8 phase;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
@@ -136,16 +137,16 @@ public:
             phase = 0;
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_START_FIGHT)
             {
-                Creature* cr = NULL;
-                
+                Creature* cr = nullptr;
+
                 for (int i = 0; i < 3; ++i)
                 {
-                    float o = rand_norm()*2*M_PI;
-                    if ((cr = me->SummonCreature(NPC_ANTAGONIST, me->GetPositionX()+3*cos(o), me->GetPositionY()+3*sin(o), me->GetPositionZ(), me->GetOrientation())))
+                    float o = rand_norm() * 2 * M_PI;
+                    if ((cr = me->SummonCreature(NPC_ANTAGONIST, me->GetPositionX() + 3 * cos(o), me->GetPositionY() + 3 * sin(o), me->GetPositionZ(), me->GetOrientation())))
                     {
                         if (i == 0)
                             cr->MonsterSay("Time to die.", LANG_UNIVERSAL, 0);
@@ -155,7 +156,7 @@ public:
                     }
                 }
 
-                me->CastSpell(me, SPELL_PURPLE_VISUAL , true);
+                me->CastSpell(me, SPELL_PURPLE_VISUAL, true);
                 me->setFaction(FACTION_HOSTILE);
                 me->SetInCombatWithZone();
                 events.ScheduleEvent(EVENT_DIREBREW_DISARM, 10000);
@@ -167,7 +168,7 @@ public:
                 events.ScheduleEvent(EVENT_DIREBREW_RESPAWN2, 10000);
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             summons.DespawnAll();
             summons.DoAction(ACTION_RELEASE_LOOT);
@@ -193,15 +194,16 @@ public:
         void SummonSister(uint32 entry)
         {
             summons.DespawnEntry(entry);
-            float o = rand_norm()*2*M_PI;
-            if (Creature* cr = me->SummonCreature(entry, me->GetPositionX()+3*cos(o), me->GetPositionY()+3*sin(o), me->GetPositionZ(), me->GetOrientation()))
+            float o = rand_norm() * 2 * M_PI;
+            if (Creature* cr = me->SummonCreature(entry, me->GetPositionX() + 3 * cos(o), me->GetPositionY() + 3 * sin(o), me->GetPositionZ(), me->GetOrientation()))
             {
-                cr->CastSpell(cr, SPELL_PURPLE_VISUAL , true);
+                cr->CastSpell(cr, SPELL_PURPLE_VISUAL, true);
                 cr->SetInCombatWithZone();
                 summons.Summon(cr);
             }
         }
-        void UpdateAI(uint32 diff)
+
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -210,15 +212,13 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_DIREBREW_RESPAWN1:
                     SummonSister(NPC_ILSA_DIREBREW);
-                    events.PopEvent();
                     break;
                 case EVENT_DIREBREW_RESPAWN2:
                     SummonSister(NPC_URSULA_DIREBREW);
-                    events.PopEvent();
                     break;
                 case EVENT_DIREBREW_DISARM:
                     me->CastSpell(me->GetVictim(), SPELL_DIREBREW_DISARM, false);
@@ -233,7 +233,6 @@ public:
                     }
                     if (me->GetHealthPct() < 35 && phase == 1)
                     {
-                        events.PopEvent();
                         SummonSister(NPC_URSULA_DIREBREW);
                         return;
                     }
@@ -252,7 +251,7 @@ class npc_coren_direbrew_sisters : public CreatureScript
 public:
     npc_coren_direbrew_sisters() : CreatureScript("npc_coren_direbrew_sisters") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_coren_direbrew_sistersAI (creature);
     }
@@ -265,13 +264,13 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->setFaction(FACTION_HOSTILE);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_RELEASE_LOOT && me->GetEntry() == NPC_ILSA_DIREBREW)
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
@@ -283,10 +282,10 @@ public:
                 if (Unit* coren = me->ToTempSummon()->GetSummoner())
                     return coren->ToCreature();
 
-            return NULL;
+            return nullptr;
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             if (Creature* coren = GetSummoner())
             {
@@ -297,9 +296,8 @@ public:
                 }
             }
         }
-                
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             if (me->GetEntry() == NPC_URSULA_DIREBREW)
                 events.ScheduleEvent(EVENT_SISTERS_BARREL, 18000);
@@ -307,14 +305,14 @@ public:
             events.ScheduleEvent(EVENT_SISTERS_CHUCK_MUG, 12000);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_CHUCK_MUG)
                 if (target->ToPlayer())
                     target->ToPlayer()->AddItem(ITEM_DARK_BREW, 1);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -323,7 +321,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.GetEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SISTERS_BARREL:
                     me->CastSpell(me->GetVictim(), SPELL_BARRELED, false);
@@ -353,7 +351,6 @@ public:
     };
 };
 
-
 enum kegThrowers
 {
     QUEST_THERE_AND_BACK_AGAIN_A                = 11122,
@@ -373,42 +370,42 @@ enum kegThrowers
 
 class npc_brewfest_keg_thrower : public CreatureScript
 {
-    public:
-        npc_brewfest_keg_thrower() : CreatureScript("npc_brewfest_keg_thrower") { }
+public:
+    npc_brewfest_keg_thrower() : CreatureScript("npc_brewfest_keg_thrower") { }
 
-        struct npc_brewfest_keg_throwerAI : public ScriptedAI
+    struct npc_brewfest_keg_throwerAI : public ScriptedAI
+    {
+        npc_brewfest_keg_throwerAI(Creature* creature) : ScriptedAI(creature)
         {
-            npc_brewfest_keg_throwerAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
-
-            void MoveInLineOfSight(Unit* who)
-            {
-                if (me->GetDistance(who) < 10.0f && who->GetTypeId() == TYPEID_PLAYER && who->GetMountID() == RAM_DISPLAY_ID)
-                {
-                    if (!who->ToPlayer()->HasItemCount(ITEM_PORTABLE_BREWFEST_KEG)) // portable brewfest keg
-                        me->CastSpell(who, SPELL_THROW_KEG, true);          // throw keg
-                }
-            }
-
-            bool CanBeSeen(const Player* player)
-            {
-                if (player->GetMountID() == RAM_DISPLAY_ID)
-                    return true;
-
-                return false;
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_brewfest_keg_throwerAI(creature);
         }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (me->GetDistance(who) < 10.0f && who->GetTypeId() == TYPEID_PLAYER && who->GetMountID() == RAM_DISPLAY_ID)
+            {
+                if (!who->ToPlayer()->HasItemCount(ITEM_PORTABLE_BREWFEST_KEG)) // portable brewfest keg
+                    me->CastSpell(who, SPELL_THROW_KEG, true);          // throw keg
+            }
+        }
+
+        bool CanBeSeen(const Player* player) override
+        {
+            if (player->GetMountID() == RAM_DISPLAY_ID)
+                return true;
+
+            return false;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_brewfest_keg_throwerAI(creature);
+    }
 };
 
 class npc_brewfest_keg_reciver : public CreatureScript
 {
-    public:
+public:
     npc_brewfest_keg_reciver() : CreatureScript("npc_brewfest_keg_reciver") { }
 
     struct npc_brewfest_keg_reciverAI : public ScriptedAI
@@ -417,7 +414,7 @@ class npc_brewfest_keg_reciver : public CreatureScript
         {
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->GetDistance(who) < 10.0f && who->GetTypeId() == TYPEID_PLAYER && who->GetMountID() == RAM_DISPLAY_ID)
             {
@@ -429,16 +426,16 @@ class npc_brewfest_keg_reciver : public CreatureScript
                     player->DestroyItemCount(ITEM_PORTABLE_BREWFEST_KEG, 1, true);
 
                     // Additional Work
-                    uint32 spellCooldown = player->GetSpellCooldownDelay(SPELL_COOLDOWN_CHECKER)/IN_MILLISECONDS;
-                    if (spellCooldown > (HOUR*18 - 900)) // max aproximated time - 12 minutes
+                    uint32 spellCooldown = player->GetSpellCooldownDelay(SPELL_COOLDOWN_CHECKER) / IN_MILLISECONDS;
+                    if (spellCooldown > (HOUR * 18 - 900)) // max aproximated time - 12 minutes
                     {
                         if (Aura* aur = player->GetAura(SPELL_RAM_AURA))
                         {
-                            int32 diff = aur->GetApplyTime() - (time(NULL)-(HOUR*18)+spellCooldown);
+                            int32 diff = aur->GetApplyTime() - (time(nullptr) - (HOUR * 18) + spellCooldown);
                             if (diff > 10) // aura applied later
                                 return;
 
-                            aur->SetDuration(aur->GetDuration()+30000);
+                            aur->SetDuration(aur->GetDuration() + 30000);
                             player->CastSpell(player, SPELL_ADD_TOKENS, true);
                         }
                     }
@@ -447,18 +444,18 @@ class npc_brewfest_keg_reciver : public CreatureScript
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_brewfest_keg_reciverAI(creature);
     }
 
-    bool OnGossipSelect(Player* player, Creature*  /*creature*/, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*uiSender*/, uint32 uiAction) override
     {
         switch (uiAction)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                player->CLOSE_GOSSIP_MENU();
-                player->AddSpellCooldown(SPELL_COOLDOWN_CHECKER, 0, 18*HOUR*IN_MILLISECONDS);
+                CloseGossipMenuFor(player);
+                player->AddSpellCooldown(SPELL_COOLDOWN_CHECKER, 0, 18 * HOUR * IN_MILLISECONDS);
                 player->CastSpell(player, 43883, true);
                 player->CastSpell(player, 44262, true);
                 break;
@@ -466,15 +463,15 @@ class npc_brewfest_keg_reciver : public CreatureScript
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
         if (!player->HasSpellCooldown(SPELL_COOLDOWN_CHECKER) && player->GetQuestRewardStatus(player->GetTeamId() == TEAM_ALLIANCE ? QUEST_THERE_AND_BACK_AGAIN_A : QUEST_THERE_AND_BACK_AGAIN_H))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Do you have additional work?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-        
-        player->SEND_GOSSIP_MENU((creature->GetEntry() == NPC_NEILL_RAMSTEIN ? 8934 : 8976), creature->GetGUID());
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Do you have additional work?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+        SendGossipMenuFor(player, (creature->GetEntry() == NPC_NEILL_RAMSTEIN ? 8934 : 8976), creature->GetGUID());
         return true;
     }
 };
@@ -489,121 +486,121 @@ enum barkTrigger
 
 class npc_brewfest_bark_trigger : public CreatureScript
 {
-    public:
-        npc_brewfest_bark_trigger() : CreatureScript("npc_brewfest_bark_trigger") { }
+public:
+    npc_brewfest_bark_trigger() : CreatureScript("npc_brewfest_bark_trigger") { }
 
-        struct npc_brewfest_bark_triggerAI : public ScriptedAI
+    struct npc_brewfest_bark_triggerAI : public ScriptedAI
+    {
+        npc_brewfest_bark_triggerAI(Creature* creature) : ScriptedAI(creature)
         {
-            npc_brewfest_bark_triggerAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
-
-            void MoveInLineOfSight(Unit* who)
-            {
-                if (me->GetDistance(who) < 10.0f && who->GetTypeId() == TYPEID_PLAYER && who->GetMountID() == RAM_DISPLAY_ID)
-                {
-                    bool allow = false;
-                    uint32 quest = 0;
-                    Player* player = who->ToPlayer();
-                    // Kalimdor
-                    if (me->GetMapId() == 1)
-                    {
-                        if (player->GetQuestStatus(QUEST_BARK_FOR_DROHN) == QUEST_STATUS_INCOMPLETE)
-                        {
-                            allow = true;
-                            quest = QUEST_BARK_FOR_DROHN;
-                        }
-                        else if (player->GetQuestStatus(QUEST_BARK_FOR_VOODOO) == QUEST_STATUS_INCOMPLETE)
-                        {
-                            allow = true;
-                            quest = QUEST_BARK_FOR_VOODOO;
-                        }
-                    }
-                    else if (me->GetMapId() == 0)
-                    {
-                        if (player->GetQuestStatus(QUEST_BARK_FOR_BARLEY) == QUEST_STATUS_INCOMPLETE)
-                        {
-                            allow = true;
-                            quest = QUEST_BARK_FOR_BARLEY;
-                        }
-                        else if (player->GetQuestStatus(QUEST_BARK_FOR_THUNDERBREW) == QUEST_STATUS_INCOMPLETE)
-                        {
-                            allow = true;
-                            quest = QUEST_BARK_FOR_THUNDERBREW;
-                        }
-                    }
-
-                    if (allow)
-                    {
-                        QuestStatusMap::iterator itr = player->getQuestStatusMap().find(quest);
-                        if (itr == player->getQuestStatusMap().end())
-                            return;
-
-                        QuestStatusData &q_status = itr->second;
-                        if (q_status.CreatureOrGOCount[me->GetEntry()-24202] == 0)
-                        {
-                            player->KilledMonsterCredit(me->GetEntry(), 0);
-                            player->MonsterSay(GetTextFor(me->GetEntry(), quest).c_str(), LANG_UNIVERSAL, player);
-                        }
-                    }
-                }
-            }
-
-            std::string GetTextFor(uint32  /*entry*/, uint32 questId)
-            {
-                std::string str = "";
-                switch (questId)
-                {
-                    case QUEST_BARK_FOR_DROHN:
-                    case QUEST_BARK_FOR_VOODOO:
-                    {
-                        switch (urand(0,3))
-                        {
-                            case 0:
-                                str = "Join with your brothers and sisters at "+ std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") +" and drink for the horde!";
-                                break;
-                            case 1:
-                                str = "If you think an orc can hit hard, check out their brew, it hits even harder! See for yourself at "+ std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") +", only at Brewfest!";
-                                break;
-                            case 2:
-                                str = "Celebrate Brewfest with orcs that know what a good drink really is! Check out "+ std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") +" at Brewfest!";
-                                break;
-                            case 3:
-                                str = std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") +"  knows how to party hard! Check them out at Brewfest!";
-                                break;
-                        }
-                        break;
-                    }
-                    case QUEST_BARK_FOR_BARLEY:
-                    case QUEST_BARK_FOR_THUNDERBREW:
-                    {
-                        switch (urand(0,3))
-                        {
-                            case 0:
-                                str = "Join with your brothers and sisters at "+ std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") +" and drink for the alliance!";
-                                break;
-                            case 1:
-                                str = "If you think an dwarf can hit hard, check out their brew, it hits even harder! See for yourself at "+ std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") +", only at Brewfest!";
-                                break;
-                            case 2:
-                                str = "Celebrate Brewfest with dwarves that know what a good drink really is! Check out "+ std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") +" at Brewfest!";
-                                break;
-                            case 3:
-                                str = std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") +"  knows how to party hard! Check them out at Brewfest!";
-                                break;
-                        }
-                        break;
-                    }
-                }
-
-                return str;
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_brewfest_bark_triggerAI(creature);
         }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (me->GetDistance(who) < 10.0f && who->GetTypeId() == TYPEID_PLAYER && who->GetMountID() == RAM_DISPLAY_ID)
+            {
+                bool allow = false;
+                uint32 quest = 0;
+                Player* player = who->ToPlayer();
+                // Kalimdor
+                if (me->GetMapId() == 1)
+                {
+                    if (player->GetQuestStatus(QUEST_BARK_FOR_DROHN) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        allow = true;
+                        quest = QUEST_BARK_FOR_DROHN;
+                    }
+                    else if (player->GetQuestStatus(QUEST_BARK_FOR_VOODOO) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        allow = true;
+                        quest = QUEST_BARK_FOR_VOODOO;
+                    }
+                }
+                else if (me->GetMapId() == 0)
+                {
+                    if (player->GetQuestStatus(QUEST_BARK_FOR_BARLEY) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        allow = true;
+                        quest = QUEST_BARK_FOR_BARLEY;
+                    }
+                    else if (player->GetQuestStatus(QUEST_BARK_FOR_THUNDERBREW) == QUEST_STATUS_INCOMPLETE)
+                    {
+                        allow = true;
+                        quest = QUEST_BARK_FOR_THUNDERBREW;
+                    }
+                }
+
+                if (allow)
+                {
+                    QuestStatusMap::iterator itr = player->getQuestStatusMap().find(quest);
+                    if (itr == player->getQuestStatusMap().end())
+                        return;
+
+                    QuestStatusData& q_status = itr->second;
+                    if (q_status.CreatureOrGOCount[me->GetEntry() - 24202] == 0)
+                    {
+                        player->KilledMonsterCredit(me->GetEntry(), 0);
+                        player->MonsterSay(GetTextFor(me->GetEntry(), quest).c_str(), LANG_UNIVERSAL, player);
+                    }
+                }
+            }
+        }
+
+        std::string GetTextFor(uint32  /*entry*/, uint32 questId)
+        {
+            std::string str = "";
+            switch (questId)
+            {
+                case QUEST_BARK_FOR_DROHN:
+                case QUEST_BARK_FOR_VOODOO:
+                    {
+                        switch (urand(0, 3))
+                        {
+                            case 0:
+                                str = "Join with your brothers and sisters at " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + " and drink for the horde!";
+                                break;
+                            case 1:
+                                str = "If you think an orc can hit hard, check out their brew, it hits even harder! See for yourself at " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + ", only at Brewfest!";
+                                break;
+                            case 2:
+                                str = "Celebrate Brewfest with orcs that know what a good drink really is! Check out " + std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + " at Brewfest!";
+                                break;
+                            case 3:
+                                str = std::string(questId == QUEST_BARK_FOR_DROHN ? "Drohn's Distillery" : "T'chali's Voodoo Brewery") + "  knows how to party hard! Check them out at Brewfest!";
+                                break;
+                        }
+                        break;
+                    }
+                case QUEST_BARK_FOR_BARLEY:
+                case QUEST_BARK_FOR_THUNDERBREW:
+                    {
+                        switch (urand(0, 3))
+                        {
+                            case 0:
+                                str = "Join with your brothers and sisters at " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + " and drink for the alliance!";
+                                break;
+                            case 1:
+                                str = "If you think an dwarf can hit hard, check out their brew, it hits even harder! See for yourself at " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + ", only at Brewfest!";
+                                break;
+                            case 2:
+                                str = "Celebrate Brewfest with dwarves that know what a good drink really is! Check out " + std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + " at Brewfest!";
+                                break;
+                            case 3:
+                                str = std::string(questId == QUEST_BARK_FOR_BARLEY ? "Barleybrews" : "Thunderbrews") + "  knows how to party hard! Check them out at Brewfest!";
+                                break;
+                        }
+                        break;
+                    }
+            }
+
+            return str;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_brewfest_bark_triggerAI(creature);
+    }
 };
 
 enum darkIronAttack
@@ -655,55 +652,55 @@ enum darkIronAttack
 
 class npc_dark_iron_attack_generator : public CreatureScript
 {
-    public:
-        npc_dark_iron_attack_generator() : CreatureScript("npc_dark_iron_attack_generator") { }
+public:
+    npc_dark_iron_attack_generator() : CreatureScript("npc_dark_iron_attack_generator") { }
 
-        struct npc_dark_iron_attack_generatorAI : public ScriptedAI
+    struct npc_dark_iron_attack_generatorAI : public ScriptedAI
+    {
+        npc_dark_iron_attack_generatorAI(Creature* creature) : ScriptedAI(creature), summons(me)
         {
-            npc_dark_iron_attack_generatorAI(Creature* creature) : ScriptedAI(creature), summons(me)
+        }
+
+        EventMap events;
+        SummonList summons;
+        uint32 kegCounter, guzzlerCounter;
+        uint8 thrown;
+
+        void Reset() override
+        {
+            summons.DespawnAll();
+            events.Reset();
+            events.ScheduleEvent(EVENT_CHECK_HOUR, 2000);
+            kegCounter = 0;
+            guzzlerCounter = 0;
+            thrown = 0;
+        }
+
+        // DARK IRON ATTACK EVENT
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void EnterCombat(Unit*) override {}
+
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_REPORT_DEATH)
             {
-            }
-
-            EventMap events;
-            SummonList summons;
-            uint32 kegCounter, guzzlerCounter;
-            uint8 thrown;
-
-            void Reset()
-            {
-                summons.DespawnAll();
-                events.Reset();
-                events.ScheduleEvent(EVENT_CHECK_HOUR, 2000);
-                kegCounter = 0;
-                guzzlerCounter = 0;
-                thrown = 0;
-            }
-
-            // DARK IRON ATTACK EVENT
-            void MoveInLineOfSight(Unit*  /*who*/) {}
-            void EnterCombat(Unit*) {}
-
-            void SpellHit(Unit* caster, const SpellInfo* spellInfo)
-            {
-                if (spellInfo->Id == SPELL_REPORT_DEATH)
+                if (caster->GetEntry() == NPC_DARK_IRON_GUZZLER)
+                    guzzlerCounter++;
+                else
                 {
-                    if (caster->GetEntry() == NPC_DARK_IRON_GUZZLER)
-                        guzzlerCounter++;
-                    else
-                    {
-                        kegCounter++;
-                        if (kegCounter == 3)
-                            FinishEventDueToLoss();
-                    }
+                    kegCounter++;
+                    if (kegCounter == 3)
+                        FinishEventDueToLoss();
                 }
             }
+        }
 
-            void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+            switch (events.ExecuteEvent())
             {
-                events.Update(diff);
-                switch (events.GetEvent())
-                {
-                    case EVENT_CHECK_HOUR:
+                case EVENT_CHECK_HOUR:
                     {
                         // determine hour
                         if (AllowStart())
@@ -715,43 +712,42 @@ class npc_dark_iron_attack_generator : public CreatureScript
                         events.RepeatEvent(2000);
                         break;
                     }
-                    case EVENT_SPAWN_MOLE_MACHINE:
+                case EVENT_SPAWN_MOLE_MACHINE:
                     {
                         if (me->GetMapId() == 1) // Kalimdor
                         {
-                            float rand = 8+rand_norm()*12;
-                            float angle = rand_norm()*2*M_PI;
-                            float x = 1201.8f+rand*cos(angle);
-                            float y = -4299.6f+rand*sin(angle);
+                            float rand = 8 + rand_norm() * 12;
+                            float angle = rand_norm() * 2 * M_PI;
+                            float x = 1201.8f + rand * cos(angle);
+                            float y = -4299.6f + rand * sin(angle);
                             if (Creature* cr = me->SummonCreature(NPC_MOLE_MACHINE_TRIGGER, x, y, 21.3f, 0.0f))
                                 cr->CastSpell(cr, SPELL_SPAWN_MOLE_MACHINE, true);
                         }
                         else if (me->GetMapId() == 0) // EK
                         {
-                            float rand = rand_norm()*20;
-                            float angle = rand_norm()*2*M_PI;
-                            float x = -5157.1f+rand*cos(angle);
-                            float y = -598.98f+rand*sin(angle);
+                            float rand = rand_norm() * 20;
+                            float angle = rand_norm() * 2 * M_PI;
+                            float x = -5157.1f + rand * cos(angle);
+                            float y = -598.98f + rand * sin(angle);
                             if (Creature* cr = me->SummonCreature(NPC_MOLE_MACHINE_TRIGGER, x, y, 398.11f, 0.0f))
                                 cr->CastSpell(cr, SPELL_SPAWN_MOLE_MACHINE, true);
                         }
                         events.RepeatEvent(3000);
                         break;
                     }
-                    case EVENT_PRE_FINISH_ATTACK:
+                case EVENT_PRE_FINISH_ATTACK:
                     {
                         events.CancelEvent(EVENT_SPAWN_MOLE_MACHINE);
                         events.ScheduleEvent(EVENT_FINISH_ATTACK, 20000);
-                        events.PopEvent();
                         break;
                     }
-                    case EVENT_FINISH_ATTACK:
+                case EVENT_FINISH_ATTACK:
                     {
                         FinishAttackDueToWin();
                         events.RescheduleEvent(EVENT_CHECK_HOUR, 60000);
                         break;
                     }
-                    case EVENT_BARTENDER_SAY:
+                case EVENT_BARTENDER_SAY:
                     {
                         events.RepeatEvent(12000);
                         Creature* sayer = GetRandomBartender();
@@ -764,373 +760,371 @@ class npc_dark_iron_attack_generator : public CreatureScript
                             thrown = 0;
                             sayer->MonsterSay("SOMEONE TRY THIS SUPER BREW!", LANG_UNIVERSAL, 0);
                             //sayer->CastSpell(sayer, SPELL_CREATE_SUPER_BREW, true);
-                            sayer->SummonCreature(NPC_SUPER_BREW_TRIGGER, sayer->GetPositionX()+15*cos(sayer->GetOrientation()), sayer->GetPositionY()+15*sin(sayer->GetOrientation()), sayer->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
-                            
+                            sayer->SummonCreature(NPC_SUPER_BREW_TRIGGER, sayer->GetPositionX() + 15 * cos(sayer->GetOrientation()), sayer->GetPositionY() + 15 * sin(sayer->GetOrientation()), sayer->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
                         }
                         else
                         {
-                            if (urand(0,1))
+                            if (urand(0, 1))
                                 sayer->MonsterSay("Chug and chuck! Chug and chuck!", LANG_UNIVERSAL, 0);
                             else
                                 sayer->MonsterSay("Down the free brew and pelt the Guzzlers with your mug!", LANG_UNIVERSAL, 0);
                         }
-                        
+
                         break;
                     }
-                }
             }
-
-            void FinishEventDueToLoss()
-            {
-                if (Creature* herald = me->FindNearestCreature(NPC_DARK_IRON_HERALD, 100.0f))
-                {
-                    char amount[500];
-                    sprintf(amount, "We did it boys! Now back to the Grim Guzzler and we'll drink to the %u that were injured!", guzzlerCounter);
-                    herald->MonsterYell(amount, LANG_UNIVERSAL, 0);
-                }
-
-                Reset();
-                events.RescheduleEvent(EVENT_CHECK_HOUR, 60000);
-            }
-
-            void FinishAttackDueToWin()
-            {
-                if (Creature* herald = me->FindNearestCreature(NPC_DARK_IRON_HERALD, 100.0f))
-                {
-                    char amount[500];
-                    sprintf(amount, "RETREAT!! We've already lost %u and we can't afford to lose any more!!", guzzlerCounter);
-                    herald->MonsterYell(amount, LANG_UNIVERSAL, 0);
-                }
-
-                me->CastSpell(me, (me->GetMapId() == 1 ? SPELL_SUMMON_PLANS_H : SPELL_SUMMON_PLANS_A), true);
-                Reset();
-            }
-
-            void PrepareEvent()
-            {
-                Creature* cr;
-                if (me->GetMapId() == 1) // Kalimdor
-                {
-                    if ((cr = me->SummonCreature(NPC_DROHN_KEG, 1183.69f, -4315.15f, 21.1875f, 0.750492f)))
-                        summons.Summon(cr);
-                    if ((cr = me->SummonCreature(NPC_VOODOO_KEG, 1182.42f, -4272.45f, 21.1182f, -1.02974f)))
-                        summons.Summon(cr);
-                    if ((cr = me->SummonCreature(NPC_GORDOK_KEG, 1223.78f, -4296.48f, 21.1707f, -2.86234f)))
-                        summons.Summon(cr);
-                }
-                else if (me->GetMapId() == 0) // Eastern Kingdom
-                {
-                    if ((cr = me->SummonCreature(NPC_BARLEYBREW_KEG, -5187.23f, -599.779f, 397.176f, 0.017453f)))
-                        summons.Summon(cr);
-                    if ((cr = me->SummonCreature(NPC_THUNDERBREW_KEG, -5160.05f, -632.632f, 397.178f, 1.39626f)))
-                        summons.Summon(cr);
-                    if ((cr = me->SummonCreature(NPC_GORDOK_KEG, -5145.75f, -575.667f, 397.176f, -2.28638f)))
-                        summons.Summon(cr);
-                }
-
-                if ((cr = me->SummonCreature(NPC_DARK_IRON_HERALD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000)))
-                    summons.Summon(cr);
-
-                kegCounter = 0;
-                guzzlerCounter = 0;
-                thrown = 0;
-
-                events.ScheduleEvent(EVENT_SPAWN_MOLE_MACHINE, 1500);
-                events.ScheduleEvent(EVENT_PRE_FINISH_ATTACK, 280000);
-                events.ScheduleEvent(EVENT_BARTENDER_SAY, 5000);
-            }
-
-            bool AllowStart()
-            {
-                time_t curtime = time(NULL);
-                tm strDate;
-                ACE_OS::localtime_r(&curtime, &strDate);
-
-                if (strDate.tm_min == 0 || strDate.tm_min == 30)
-                    return true;
-
-                return false;
-            }
-
-            Creature* GetRandomBartender()
-            {
-                uint32 entry = 0;
-                switch (urand(0,2))
-                {
-                    case 0:
-                        entry = (me->GetMapId() == 1 ? NPC_NORMAL_DROHN : NPC_NORMAL_THUNDERBREW);
-                        break;
-                    case 1:
-                        entry = (me->GetMapId() == 1 ? NPC_NORMAL_VOODOO : NPC_NORMAL_BARLEYBREW);
-                        break;
-                    case 2:
-                        entry = NPC_NORMAL_GORDOK;
-                        break;
-                }
-
-                return me->FindNearestCreature(entry, 100.0f);
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_dark_iron_attack_generatorAI(creature);
         }
+
+        void FinishEventDueToLoss()
+        {
+            if (Creature* herald = me->FindNearestCreature(NPC_DARK_IRON_HERALD, 100.0f))
+            {
+                char amount[500];
+                sprintf(amount, "We did it boys! Now back to the Grim Guzzler and we'll drink to the %u that were injured!", guzzlerCounter);
+                herald->MonsterYell(amount, LANG_UNIVERSAL, 0);
+            }
+
+            Reset();
+            events.RescheduleEvent(EVENT_CHECK_HOUR, 60000);
+        }
+
+        void FinishAttackDueToWin()
+        {
+            if (Creature* herald = me->FindNearestCreature(NPC_DARK_IRON_HERALD, 100.0f))
+            {
+                char amount[500];
+                sprintf(amount, "RETREAT!! We've already lost %u and we can't afford to lose any more!!", guzzlerCounter);
+                herald->MonsterYell(amount, LANG_UNIVERSAL, 0);
+            }
+
+            me->CastSpell(me, (me->GetMapId() == 1 ? SPELL_SUMMON_PLANS_H : SPELL_SUMMON_PLANS_A), true);
+            Reset();
+        }
+
+        void PrepareEvent()
+        {
+            Creature* cr;
+            if (me->GetMapId() == 1) // Kalimdor
+            {
+                if ((cr = me->SummonCreature(NPC_DROHN_KEG, 1183.69f, -4315.15f, 21.1875f, 0.750492f)))
+                    summons.Summon(cr);
+                if ((cr = me->SummonCreature(NPC_VOODOO_KEG, 1182.42f, -4272.45f, 21.1182f, -1.02974f)))
+                    summons.Summon(cr);
+                if ((cr = me->SummonCreature(NPC_GORDOK_KEG, 1223.78f, -4296.48f, 21.1707f, -2.86234f)))
+                    summons.Summon(cr);
+            }
+            else if (me->GetMapId() == 0) // Eastern Kingdom
+            {
+                if ((cr = me->SummonCreature(NPC_BARLEYBREW_KEG, -5187.23f, -599.779f, 397.176f, 0.017453f)))
+                    summons.Summon(cr);
+                if ((cr = me->SummonCreature(NPC_THUNDERBREW_KEG, -5160.05f, -632.632f, 397.178f, 1.39626f)))
+                    summons.Summon(cr);
+                if ((cr = me->SummonCreature(NPC_GORDOK_KEG, -5145.75f, -575.667f, 397.176f, -2.28638f)))
+                    summons.Summon(cr);
+            }
+
+            if ((cr = me->SummonCreature(NPC_DARK_IRON_HERALD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000)))
+                summons.Summon(cr);
+
+            kegCounter = 0;
+            guzzlerCounter = 0;
+            thrown = 0;
+
+            events.ScheduleEvent(EVENT_SPAWN_MOLE_MACHINE, 1500);
+            events.ScheduleEvent(EVENT_PRE_FINISH_ATTACK, 280000);
+            events.ScheduleEvent(EVENT_BARTENDER_SAY, 5000);
+        }
+
+        bool AllowStart()
+        {
+            time_t curtime = time(nullptr);
+            tm strDate;
+            localtime_r(&curtime, &strDate);
+
+            if (strDate.tm_min == 0 || strDate.tm_min == 30)
+                return true;
+
+            return false;
+        }
+
+        Creature* GetRandomBartender()
+        {
+            uint32 entry = 0;
+            switch (urand(0, 2))
+            {
+                case 0:
+                    entry = (me->GetMapId() == 1 ? NPC_NORMAL_DROHN : NPC_NORMAL_THUNDERBREW);
+                    break;
+                case 1:
+                    entry = (me->GetMapId() == 1 ? NPC_NORMAL_VOODOO : NPC_NORMAL_BARLEYBREW);
+                    break;
+                case 2:
+                    entry = NPC_NORMAL_GORDOK;
+                    break;
+            }
+
+            return me->FindNearestCreature(entry, 100.0f);
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_dark_iron_attack_generatorAI(creature);
+    }
 };
 
 class npc_dark_iron_attack_mole_machine : public CreatureScript
 {
-    public:
-        npc_dark_iron_attack_mole_machine() : CreatureScript("npc_dark_iron_attack_mole_machine") { }
+public:
+    npc_dark_iron_attack_mole_machine() : CreatureScript("npc_dark_iron_attack_mole_machine") { }
 
-        struct npc_dark_iron_attack_mole_machineAI : public ScriptedAI
+    struct npc_dark_iron_attack_mole_machineAI : public ScriptedAI
+    {
+        npc_dark_iron_attack_mole_machineAI(Creature* creature) : ScriptedAI(creature)
         {
-            npc_dark_iron_attack_mole_machineAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
-
-            void EnterCombat(Unit*) {}
-            void MoveInLineOfSight(Unit*) {}
-            void AttackStart(Unit*) {}
-
-            uint32 goTimer, summonTimer;
-            void Reset()
-            {
-                goTimer = 1;
-                summonTimer = 0;
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                if (goTimer)
-                {
-                    goTimer += diff;
-                    if (goTimer >= 3000)
-                    {
-                        goTimer = 0;
-                        summonTimer++;
-                        if (GameObject* drill = me->SummonGameObject(GO_MOLE_MACHINE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), M_PI/4, 0.0f, 0.0f, 0.0f, 0.0f, 8)) 
-                        { 
-                            //drill->SetGoAnimProgress(0); 
-                            drill->SetLootState(GO_READY); 
-                            drill->UseDoorOrButton(8); 
-                        }
-                    }
-                }
-                if (summonTimer)
-                {
-                    summonTimer += diff;
-                    if (summonTimer >= 2000 && summonTimer < 10000)
-                    {
-                        me->SummonCreature(NPC_DARK_IRON_GUZZLER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
-                        summonTimer = 10000;
-                    }
-                    if (summonTimer >= 13000 && summonTimer < 20000)
-                    {
-                        me->SummonCreature(NPC_DARK_IRON_GUZZLER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
-                        summonTimer = 0;
-                        me->DespawnOrUnsummon(3000);
-                    }           
-                }
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_dark_iron_attack_mole_machineAI(creature);
         }
+
+        void EnterCombat(Unit*) override {}
+        void MoveInLineOfSight(Unit*) override {}
+        void AttackStart(Unit*) override {}
+
+        uint32 goTimer, summonTimer;
+        void Reset() override
+        {
+            goTimer = 1;
+            summonTimer = 0;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (goTimer)
+            {
+                goTimer += diff;
+                if (goTimer >= 3000)
+                {
+                    goTimer = 0;
+                    summonTimer++;
+                    if (GameObject* drill = me->SummonGameObject(GO_MOLE_MACHINE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), M_PI / 4, 0.0f, 0.0f, 0.0f, 0.0f, 8))
+                    {
+                        //drill->SetGoAnimProgress(0);
+                        drill->SetLootState(GO_READY);
+                        drill->UseDoorOrButton(8);
+                    }
+                }
+            }
+            if (summonTimer)
+            {
+                summonTimer += diff;
+                if (summonTimer >= 2000 && summonTimer < 10000)
+                {
+                    me->SummonCreature(NPC_DARK_IRON_GUZZLER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
+                    summonTimer = 10000;
+                }
+                if (summonTimer >= 13000 && summonTimer < 20000)
+                {
+                    me->SummonCreature(NPC_DARK_IRON_GUZZLER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
+                    summonTimer = 0;
+                    me->DespawnOrUnsummon(3000);
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_dark_iron_attack_mole_machineAI(creature);
+    }
 };
 
 class npc_dark_iron_guzzler : public CreatureScript
 {
-    public:
-        npc_dark_iron_guzzler() : CreatureScript("npc_dark_iron_guzzler") { }
+public:
+    npc_dark_iron_guzzler() : CreatureScript("npc_dark_iron_guzzler") { }
 
-        struct npc_dark_iron_guzzlerAI : public ScriptedAI
+    struct npc_dark_iron_guzzlerAI : public ScriptedAI
+    {
+        npc_dark_iron_guzzlerAI(Creature* creature) : ScriptedAI(creature)
         {
-            npc_dark_iron_guzzlerAI(Creature* creature) : ScriptedAI(creature)
-            {
-                me->SetReactState(REACT_PASSIVE);
-            }
-
-            uint32 timer;
-            uint64 targetGUID;
-            void EnterCombat(Unit*) {}
-            void MoveInLineOfSight(Unit*) {}
-            void AttackStart(Unit*) {}
-
-            void DamageTaken(Unit*, uint32 &damage, DamageEffectType, SpellSchoolMask)
-            {
-                damage = 0;
-            }
-
-            void FindNextKeg()
-            {
-                uint32 entry[3] = {0, 0, 0}; 
-                uint32 shuffled[3] = {0, 0, 0}; 
-
-                if (me->GetMapId() == 1) // Kalimdor
-                {
-                    entry[0] = NPC_DROHN_KEG;
-                    entry[1] = NPC_VOODOO_KEG;
-                    entry[2] = NPC_GORDOK_KEG;
-                }
-                else// if (me->GetMapId() == 0) // EK
-                {
-                    entry[0] = NPC_THUNDERBREW_KEG;
-                    entry[1] = NPC_BARLEYBREW_KEG;
-                    entry[2] = NPC_GORDOK_KEG;
-                }
-                
-                for (uint8 i = 0; i < 3; ++i) 
-                { 
-                    uint8 index=0; 
-                    do 
-                        index = urand(0,2);
-                    while (shuffled[index]); 
-
-                    shuffled[index] = entry[i]; 
-                }
-
-                for (uint8 i = 0; i < 3; ++i)
-                    if (Creature* cr = me->FindNearestCreature(shuffled[i], 100.0f))
-                    {
-                        me->GetMotionMaster()->MoveFollow(cr, 1.0f, cr->GetAngle(me));
-                        targetGUID = cr->GetGUID();
-                        return;
-                    }
-
-                // no kegs found
-                me->DisappearAndDie();
-            }
-
-            Unit* GetTarget() { return ObjectAccessor::GetUnit(*me, targetGUID); }
-
-            void Reset()
-            {
-                timer = 0;
-                targetGUID = 0;
-                me->SetWalk(true);
-                FindNextKeg();
-                me->ApplySpellImmune(SPELL_ATTACK_KEG, IMMUNITY_ID, SPELL_ATTACK_KEG, true);
-                SayText();
-                me->CastSpell(me, SPELL_KNOCKBACK_AURA, true);
-            }
-
-            void SayText()
-            {
-                if (!urand(0,20))
-                {
-                    switch (urand(0,4))
-                    {
-                        case 0: 
-                            me->MonsterSay("Drink it all boys!", LANG_UNIVERSAL, 0);
-                            break;
-                        case 1:
-                            me->MonsterSay("DRINK! BRAWL! DRINK! BRAWL!", LANG_UNIVERSAL, 0);
-                            break;
-                        case 2:
-                            me->MonsterSay("Did someone say, \"Free Brew\"?", LANG_UNIVERSAL, 0);
-                            break;
-                        case 3:
-                            me->MonsterSay("No one expects the Dark Iron dwarves!", LANG_UNIVERSAL, 0);
-                            break;
-                        case 4:
-                            me->MonsterSay("It's not a party without some crashers!", LANG_UNIVERSAL, 0);
-                            break;
-                    }
-                }
-            }
-
-            void KilledUnit(Unit* who)
-            {
-                who->CastSpell(who, SPELL_REPORT_DEATH, true);
-            }
-
-            void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
-            {
-                if (me->IsAlive() && spellInfo->Id == SPELL_PLAYER_MUG)
-                {
-                    me->CastSpell(me, SPELL_MUG_BOUNCE_BACK, true);
-                    Unit::Kill(me, me);
-                    me->CastSpell(me, SPELL_REPORT_DEATH, true);
-                }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                timer += diff;
-                if (timer < 2000)
-                    return;
-
-                timer = 0;
-                if (targetGUID)
-                {
-                    if (Unit* target = GetTarget())
-                        me->CastSpell(target, SPELL_ATTACK_KEG, false);
-                    else
-                        FindNextKeg();
-                }
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_dark_iron_guzzlerAI(creature);
+            me->SetReactState(REACT_PASSIVE);
         }
+
+        uint32 timer;
+        uint64 targetGUID;
+        void EnterCombat(Unit*) override {}
+        void MoveInLineOfSight(Unit*) override {}
+        void AttackStart(Unit*) override {}
+
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        {
+            damage = 0;
+        }
+
+        void FindNextKeg()
+        {
+            uint32 entry[3] = {0, 0, 0};
+            uint32 shuffled[3] = {0, 0, 0};
+
+            if (me->GetMapId() == 1) // Kalimdor
+            {
+                entry[0] = NPC_DROHN_KEG;
+                entry[1] = NPC_VOODOO_KEG;
+                entry[2] = NPC_GORDOK_KEG;
+            }
+            else// if (me->GetMapId() == 0) // EK
+            {
+                entry[0] = NPC_THUNDERBREW_KEG;
+                entry[1] = NPC_BARLEYBREW_KEG;
+                entry[2] = NPC_GORDOK_KEG;
+            }
+
+            for (uint8 i = 0; i < 3; ++i)
+            {
+                uint8 index = 0;
+                do
+                    index = urand(0, 2);
+                while (shuffled[index]);
+
+                shuffled[index] = entry[i];
+            }
+
+            for (uint8 i = 0; i < 3; ++i)
+                if (Creature* cr = me->FindNearestCreature(shuffled[i], 100.0f))
+                {
+                    me->GetMotionMaster()->MoveFollow(cr, 1.0f, cr->GetAngle(me));
+                    targetGUID = cr->GetGUID();
+                    return;
+                }
+
+            // no kegs found
+            me->DisappearAndDie();
+        }
+
+        Unit* GetTarget() { return ObjectAccessor::GetUnit(*me, targetGUID); }
+
+        void Reset() override
+        {
+            timer = 0;
+            targetGUID = 0;
+            me->SetWalk(true);
+            FindNextKeg();
+            me->ApplySpellImmune(SPELL_ATTACK_KEG, IMMUNITY_ID, SPELL_ATTACK_KEG, true);
+            SayText();
+            me->CastSpell(me, SPELL_KNOCKBACK_AURA, true);
+        }
+
+        void SayText()
+        {
+            if (!urand(0, 20))
+            {
+                switch (urand(0, 4))
+                {
+                    case 0:
+                        me->MonsterSay("Drink it all boys!", LANG_UNIVERSAL, 0);
+                        break;
+                    case 1:
+                        me->MonsterSay("DRINK! BRAWL! DRINK! BRAWL!", LANG_UNIVERSAL, 0);
+                        break;
+                    case 2:
+                        me->MonsterSay("Did someone say, \"Free Brew\"?", LANG_UNIVERSAL, 0);
+                        break;
+                    case 3:
+                        me->MonsterSay("No one expects the Dark Iron dwarves!", LANG_UNIVERSAL, 0);
+                        break;
+                    case 4:
+                        me->MonsterSay("It's not a party without some crashers!", LANG_UNIVERSAL, 0);
+                        break;
+                }
+            }
+        }
+
+        void KilledUnit(Unit* who) override
+        {
+            who->CastSpell(who, SPELL_REPORT_DEATH, true);
+        }
+
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
+        {
+            if (me->IsAlive() && spellInfo->Id == SPELL_PLAYER_MUG)
+            {
+                me->CastSpell(me, SPELL_MUG_BOUNCE_BACK, true);
+                Unit::Kill(me, me);
+                me->CastSpell(me, SPELL_REPORT_DEATH, true);
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            timer += diff;
+            if (timer < 2000)
+                return;
+
+            timer = 0;
+            if (targetGUID)
+            {
+                if (Unit* target = GetTarget())
+                    me->CastSpell(target, SPELL_ATTACK_KEG, false);
+                else
+                    FindNextKeg();
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_dark_iron_guzzlerAI(creature);
+    }
 };
 
 class npc_brewfest_super_brew_trigger : public CreatureScript
 {
-    public:
-        npc_brewfest_super_brew_trigger() : CreatureScript("npc_brewfest_super_brew_trigger") { }
+public:
+    npc_brewfest_super_brew_trigger() : CreatureScript("npc_brewfest_super_brew_trigger") { }
 
-        struct npc_brewfest_super_brew_triggerAI : public ScriptedAI
+    struct npc_brewfest_super_brew_triggerAI : public ScriptedAI
+    {
+        npc_brewfest_super_brew_triggerAI(Creature* creature) : ScriptedAI(creature)
         {
-            npc_brewfest_super_brew_triggerAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
+        }
 
-            uint32 timer;
-            void EnterCombat(Unit*) {}
-            void MoveInLineOfSight(Unit*  /*who*/)
-            {
-            }
+        uint32 timer;
+        void EnterCombat(Unit*) override {}
+        void MoveInLineOfSight(Unit*  /*who*/) override
+        {
+        }
 
-            void AttackStart(Unit*) {}
+        void AttackStart(Unit*) override {}
 
-            void Reset()
+        void Reset() override
+        {
+            timer = 0;
+            me->SummonGameObject(186478, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 30000);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            timer += diff;
+            if (timer >= 500)
             {
                 timer = 0;
-                me->SummonGameObject(186478, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 30000);
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                timer += diff;
-                if (timer >= 500)
+                Player* player = nullptr;
+                acore::AnyPlayerInObjectRangeCheck checker(me, 2.0f);
+                acore::PlayerSearcher<acore::AnyPlayerInObjectRangeCheck> searcher(me, player, checker);
+                me->VisitNearbyWorldObject(2.0f, searcher);
+                if (player)
                 {
-                    timer = 0;
-                    Player* player = NULL;
-                    Trinity::AnyPlayerInObjectRangeCheck checker(me, 2.0f);
-                    Trinity::PlayerSearcher<Trinity::AnyPlayerInObjectRangeCheck> searcher(me, player, checker);
-                    me->VisitNearbyWorldObject(2.0f, searcher);
-                    if (player)
-                    {
-                        player->CastSpell(player, SPELL_DRUNKEN_MASTER, true);
-                        me->RemoveAllGameObjects();
-                        Unit::Kill(me, me);
-                    }
+                    player->CastSpell(player, SPELL_DRUNKEN_MASTER, true);
+                    me->RemoveAllGameObjects();
+                    Unit::Kill(me, me);
                 }
             }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_brewfest_super_brew_triggerAI(creature);
         }
-};
+    };
 
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_brewfest_super_brew_triggerAI(creature);
+    }
+};
 
 ///////////////////////////////////////
 ////// SPELLS
@@ -1162,7 +1156,7 @@ public:
 
         uint8 privateLevel;
         uint32 questTick;
-        bool Load()
+        bool Load() override
         {
             questTick = 0;
             privateLevel = 0;
@@ -1202,65 +1196,65 @@ public:
             uint8 mode = 0;
             switch (privateLevel)
             {
-            case 0:
-                if (stack > 1)
-                {
-                    questTick = 0;
-                    caster->CastSpell(caster, SPELL_TROT, true);
-                    privateLevel++;
-                    mode = 1; // unapply
+                case 0:
+                    if (stack > 1)
+                    {
+                        questTick = 0;
+                        caster->CastSpell(caster, SPELL_TROT, true);
+                        privateLevel++;
+                        mode = 1; // unapply
+                        break;
+                    }
+                    // just walking, fatiuge handling
+                    if (Aura* aur = caster->GetAura(SPELL_RAM_FATIGUE))
+                        aur->ModStackAmount(-4);
                     break;
-                }
-                // just walking, fatiuge handling
-                if (Aura* aur = caster->GetAura(SPELL_RAM_FATIGUE))
-                    aur->ModStackAmount(-4);
-                break;
-            case 1:
-                // One click to maintain speed, more to increase
-                if (stack < 2)
-                {
-                    caster->RemoveAurasDueToSpell(SPELL_TROT);
-                    questTick = 0;
-                    privateLevel--;
-                    mode = 2; // apply
-                }
-                else if (stack > 2)
-                {
-                    questTick = 0;
-                    caster->CastSpell(caster, SPELL_CANTER, true);
-                    privateLevel++;
-                }
-                else if (questTick++ > 3)
-                    caster->ToPlayer()->KilledMonsterCredit(CREDIT_TROT, 0);
-                break;
-            case 2:
-                // Two - three clicks to maintains speed, less to decrease, more to increase
-                if (stack < 3)
-                {
-                    caster->CastSpell(caster, SPELL_TROT, true);
-                    privateLevel--;
-                    questTick = 0;
-                }
-                else if (stack > 4)
-                {
-                    caster->CastSpell(caster, SPELL_GALLOP, true);
-                    privateLevel++;
-                    questTick = 0;
-                }
-                else if (questTick++ > 3)
-                    caster->ToPlayer()->KilledMonsterCredit(CREDIT_CANTER, 0);
-                break;
-            case 3:
-                // Four or more clicks to maintains speed, less to decrease
-                if (stack < 5)
-                {
-                    caster->CastSpell(caster, SPELL_CANTER, true);
-                    privateLevel--;
-                    questTick = 0;
-                }
-                else if (questTick++ > 3)
-                    caster->ToPlayer()->KilledMonsterCredit(CREDIT_GALLOP, 0);
-                break;
+                case 1:
+                    // One click to maintain speed, more to increase
+                    if (stack < 2)
+                    {
+                        caster->RemoveAurasDueToSpell(SPELL_TROT);
+                        questTick = 0;
+                        privateLevel--;
+                        mode = 2; // apply
+                    }
+                    else if (stack > 2)
+                    {
+                        questTick = 0;
+                        caster->CastSpell(caster, SPELL_CANTER, true);
+                        privateLevel++;
+                    }
+                    else if (questTick++ > 3)
+                        caster->ToPlayer()->KilledMonsterCredit(CREDIT_TROT, 0);
+                    break;
+                case 2:
+                    // Two - three clicks to maintains speed, less to decrease, more to increase
+                    if (stack < 3)
+                    {
+                        caster->CastSpell(caster, SPELL_TROT, true);
+                        privateLevel--;
+                        questTick = 0;
+                    }
+                    else if (stack > 4)
+                    {
+                        caster->CastSpell(caster, SPELL_GALLOP, true);
+                        privateLevel++;
+                        questTick = 0;
+                    }
+                    else if (questTick++ > 3)
+                        caster->ToPlayer()->KilledMonsterCredit(CREDIT_CANTER, 0);
+                    break;
+                case 3:
+                    // Four or more clicks to maintains speed, less to decrease
+                    if (stack < 5)
+                    {
+                        caster->CastSpell(caster, SPELL_CANTER, true);
+                        privateLevel--;
+                        questTick = 0;
+                    }
+                    else if (questTick++ > 3)
+                        caster->ToPlayer()->KilledMonsterCredit(CREDIT_GALLOP, 0);
+                    break;
             }
 
             // Set to base amount
@@ -1282,14 +1276,14 @@ public:
                 target->RemoveAurasDueToSpell(SPELL_RAM_FATIGUE);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_brewfest_main_ram_buff_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
             OnEffectRemove += AuraEffectRemoveFn(spell_brewfest_main_ram_buff_AuraScript::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_brewfest_main_ram_buff_AuraScript();
     }
@@ -1309,15 +1303,15 @@ public:
             int8 fatigue = 0;
             switch (aurEff->GetId())
             {
-            case SPELL_TROT:
-                fatigue = -2;
-                break;
-            case SPELL_CANTER:
-                fatigue = 1;
-                break;
-            case SPELL_GALLOP:
-                fatigue = 5;
-                break;
+                case SPELL_TROT:
+                    fatigue = -2;
+                    break;
+                case SPELL_CANTER:
+                    fatigue = 1;
+                    break;
+                case SPELL_GALLOP:
+                    fatigue = 5;
+                    break;
             }
             if (Unit* target = GetTarget())
             {
@@ -1330,7 +1324,6 @@ public:
                 else
                     target->CastSpell(target, SPELL_RAM_FATIGUE, true);
             }
-
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1342,7 +1335,7 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             if (m_scriptSpellId != 43332)
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_brewfest_ram_fatigue_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
@@ -1351,7 +1344,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_brewfest_ram_fatigue_AuraScript();
     }
@@ -1373,13 +1366,13 @@ public:
                     aur->Remove();
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_brewfest_apple_trap_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_brewfest_apple_trap_SpellScript();
     };
@@ -1415,14 +1408,14 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnCheckCast += SpellCheckCastFn(spell_q11117_catch_the_wild_wolpertinger_SpellScript::CheckTarget);
             OnEffectHitTarget += SpellEffectFn(spell_q11117_catch_the_wild_wolpertinger_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q11117_catch_the_wild_wolpertinger_SpellScript();
     };
@@ -1456,11 +1449,11 @@ public:
                     {
                         case GREEN_EMPTY_KEG:
                         case BLUE_EMPTY_KEG:
-                            item = itemCaster->GetEntry()+urand(1,5); // 5 items, id in range empty+1-5
+                            item = itemCaster->GetEntry() + urand(1, 5); // 5 items, id in range empty+1-5
                             break;
                         case YELLOW_EMPTY_KEG:
-                            if (uint8 num = urand(0,4))
-                                item = 32916+num;
+                            if (uint8 num = urand(0, 4))
+                                item = 32916 + num;
                             else
                                 item = 32915;
                             break;
@@ -1469,20 +1462,20 @@ public:
                     if (item && player->AddItem(item, 1)) // ensure filled keg is stored
                     {
                         player->DestroyItemCount(itemCaster->GetEntry(), 1, true);
-                        GetSpell()->m_CastItem = NULL;
+                        GetSpell()->m_CastItem = nullptr;
                         GetSpell()->m_castItemGUID = 0;
                     }
                 }
             }
         }
 
-        void Register()
+        void Register() override
         {
             AfterHit += SpellHitFn(spell_brewfest_fill_keg_SpellScript::HandleAfterHit);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_brewfest_fill_keg_SpellScript();
     };
@@ -1520,7 +1513,7 @@ public:
                 case 32920:
                     return YELLOW_EMPTY_KEG;
             }
-            
+
             return 0;
         }
 
@@ -1536,20 +1529,20 @@ public:
                     if (item && player->AddItem(item, 1)) // ensure filled keg is stored
                     {
                         player->DestroyItemCount(itemCaster->GetEntry(), 1, true);
-                        GetSpell()->m_CastItem = NULL;
+                        GetSpell()->m_CastItem = nullptr;
                         GetSpell()->m_castItemGUID = 0;
                     }
                 }
             }
         }
 
-        void Register()
+        void Register() override
         {
             AfterHit += SpellHitFn(spell_brewfest_unfill_keg_SpellScript::HandleAfterHit);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_brewfest_unfill_keg_SpellScript();
     };
@@ -1568,8 +1561,8 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                float z = caster->GetMap()->GetHeight(caster->GetPositionX()+14*cos(caster->GetOrientation()), caster->GetPositionY()+14*sin(caster->GetOrientation()), MAX_HEIGHT);
-                WorldLocation pPosition = WorldLocation(caster->GetMapId(), caster->GetPositionX()+14*cos(caster->GetOrientation()), caster->GetPositionY()+14*sin(caster->GetOrientation()), z, caster->GetOrientation());
+                float z = caster->GetMapHeight(caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), caster->GetPositionZ());
+                WorldLocation pPosition = WorldLocation(caster->GetMapId(), caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), z, caster->GetOrientation());
                 SetExplTargetDest(pPosition);
             }
 
@@ -1582,7 +1575,7 @@ public:
             if (!caster)
                 return;
 
-            WorldObject* target = NULL;
+            WorldObject* target = nullptr;
             for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
                 if (caster->HasInLine((*itr), 2.0f))
                 {
@@ -1604,14 +1597,14 @@ public:
                 if (!GetCaster() || target->GetGUID() == GetCaster()->GetGUID())
                     return;
 
-                WorldLocation pPosition = WorldLocation(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()+4.0f, target->GetOrientation());
+                WorldLocation pPosition = WorldLocation(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 4.0f, target->GetOrientation());
                 SetExplTargetDest(pPosition);
             }
         }
 
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
-            Creature* cr = NULL;
+            Creature* cr = nullptr;
             Unit* caster = GetCaster();
             if (!caster)
                 return;
@@ -1637,10 +1630,9 @@ public:
                 else if ((cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
             }
-            
         }
 
-        void Register()
+        void Register() override
         {
             OnCheckCast += SpellCheckCastFn(spell_brewfest_toss_mug_SpellScript::CheckCast);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_brewfest_toss_mug_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
@@ -1649,7 +1641,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_brewfest_toss_mug_SpellScript();
     };
@@ -1670,13 +1662,13 @@ public:
                 target->CastSpell(target, SPELL_ADD_MUG, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_brewfest_add_mug_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_brewfest_add_mug_SpellScript();
     };
@@ -1690,71 +1682,71 @@ enum brewBubble
 
 class npc_brew_bubble : public CreatureScript
 {
-    public:
-        npc_brew_bubble() : CreatureScript("npc_brew_bubble") { }
+public:
+    npc_brew_bubble() : CreatureScript("npc_brew_bubble") { }
 
-        struct npc_brew_bubbleAI : public NullCreatureAI
+    struct npc_brew_bubbleAI : public NullCreatureAI
+    {
+        npc_brew_bubbleAI(Creature* creature) : NullCreatureAI(creature)
         {
-            npc_brew_bubbleAI(Creature* creature) : NullCreatureAI(creature)
-            {
-            }
-
-            uint32 timer;
-
-            void Reset()
-            {
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->GetMotionMaster()->MoveRandom(15.0f);
-                timer = 0;
-            }
-
-            void DoAction(int32)
-            {
-                timer = 0;
-            }
-
-            void MoveInLineOfSight(Unit* target)
-            {
-                if (target->GetEntry() == me->GetEntry())
-                    if (me->IsWithinDist(target, 1.0f))
-                    {
-                        uint8 stacksMe = me->GetAuraCount(SPELL_BUBBLE_BUILD_UP);
-                        uint8 stacksTarget = target->GetAuraCount(SPELL_BUBBLE_BUILD_UP);
-                        if (stacksMe >= stacksTarget)
-                        {
-                            if (Aura* aura = me->GetAura(SPELL_BUBBLE_BUILD_UP))
-                                aura->ModStackAmount(stacksTarget+1);
-                            else
-                                me->AddAura(SPELL_BUBBLE_BUILD_UP, me);
-                            
-                            target->ToCreature()->DespawnOrUnsummon();
-                            DoAction(0);
-                        }
-                        else if (Aura* aura = target->GetAura(SPELL_BUBBLE_BUILD_UP))
-                        {
-                            aura->ModStackAmount(stacksMe);
-                            
-                            target->ToCreature()->AI()->DoAction(0);
-                            me->DespawnOrUnsummon();
-                        }
-                    }
-            }
-
-            void UpdateAI(uint32 diff)
-            {
-                timer += diff;
-                if (timer >= 25000)
-                {
-                    timer = 0;
-                    me->DespawnOrUnsummon();
-                }
-            }
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_brew_bubbleAI(creature);
         }
+
+        uint32 timer;
+
+        void Reset() override
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->GetMotionMaster()->MoveRandom(15.0f);
+            timer = 0;
+        }
+
+        void DoAction(int32) override
+        {
+            timer = 0;
+        }
+
+        void MoveInLineOfSight(Unit* target) override
+        {
+            if (target->GetEntry() == me->GetEntry())
+                if (me->IsWithinDist(target, 1.0f))
+                {
+                    uint8 stacksMe = me->GetAuraCount(SPELL_BUBBLE_BUILD_UP);
+                    uint8 stacksTarget = target->GetAuraCount(SPELL_BUBBLE_BUILD_UP);
+                    if (stacksMe >= stacksTarget)
+                    {
+                        if (Aura* aura = me->GetAura(SPELL_BUBBLE_BUILD_UP))
+                            aura->ModStackAmount(stacksTarget + 1);
+                        else
+                            me->AddAura(SPELL_BUBBLE_BUILD_UP, me);
+
+                        target->ToCreature()->DespawnOrUnsummon();
+                        DoAction(0);
+                    }
+                    else if (Aura* aura = target->GetAura(SPELL_BUBBLE_BUILD_UP))
+                    {
+                        aura->ModStackAmount(stacksMe);
+
+                        target->ToCreature()->AI()->DoAction(0);
+                        me->DespawnOrUnsummon();
+                    }
+                }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            timer += diff;
+            if (timer >= 25000)
+            {
+                timer = 0;
+                me->DespawnOrUnsummon();
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_brew_bubbleAI(creature);
+    }
 };
 
 void AddSC_event_brewfest_scripts()

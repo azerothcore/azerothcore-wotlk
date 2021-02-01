@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 
- *
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -45,15 +44,15 @@ void Transaction::Cleanup()
 
     while (!m_queries.empty())
     {
-        SQLElementData const &data = m_queries.front();
+        SQLElementData const& data = m_queries.front();
         switch (data.type)
         {
             case SQL_ELEMENT_PREPARED:
                 delete data.element.stmt;
-            break;
+                break;
             case SQL_ELEMENT_RAW:
                 free((void*)(data.element.query));
-            break;
+                break;
         }
 
         m_queries.pop_front();

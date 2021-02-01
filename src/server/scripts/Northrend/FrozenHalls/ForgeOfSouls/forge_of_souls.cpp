@@ -28,7 +28,13 @@ enum Yells
     SAY_SYLVANAS_INTRO_6                        = 5,
 
     SAY_JAINA_OUTRO                             = 0,
-    SAY_SYLVANAS_OUTRO                          = 0,
+    SAY_SYLVANAS_OUTRO                          = 0
+};
+
+enum FOS_Gossip
+{
+    GOSSIP_JAINA_INTRO = 10943,
+    GOSSIP_SYLVANAS_INTRO = 10971
 };
 
 class npc_fos_leader : public CreatureScript
@@ -42,12 +48,12 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1)
                 if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
@@ -58,15 +64,15 @@ public:
                 }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.GetEvent())
+            switch(events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case 1:
-                    events.PopEvent();
+
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_1);
@@ -79,7 +85,7 @@ public:
                     }
                     break;
                 case 2:
-                    events.PopEvent();
+
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_2);
@@ -92,7 +98,7 @@ public:
                     }
                     break;
                 case 3:
-                    events.PopEvent();
+
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_3);
@@ -105,7 +111,7 @@ public:
                     }
                     break;
                 case 4:
-                    events.PopEvent();
+
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_4);
@@ -118,7 +124,7 @@ public:
                     }
                     break;
                 case 5:
-                    events.PopEvent();
+
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_5);
@@ -131,7 +137,7 @@ public:
                     }
                     break;
                 case 6:
-                    events.PopEvent();
+
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_6);
@@ -143,7 +149,7 @@ public:
                     }
                     break;
                 case 7:
-                    events.PopEvent();
+
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_7);
@@ -151,7 +157,7 @@ public:
                     }
                     break;
                 case 8:
-                    events.PopEvent();
+
                     if (me->GetEntry() == NPC_JAINA_PART1)
                     {
                         Talk(SAY_JAINA_INTRO_8);
@@ -166,7 +172,7 @@ public:
         }
     };
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
@@ -174,22 +180,22 @@ public:
         if (creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
         {
             if (creature->GetEntry() == NPC_JAINA_PART1)
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "What would you have of me, my lady?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                AddGossipItemFor(player, GOSSIP_JAINA_INTRO, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             else
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "What would you have of me, Banshee Queen?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                AddGossipItemFor(player, GOSSIP_SYLVANAS_INTRO, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
-        player->SEND_GOSSIP_MENU(15207, creature->GetGUID());
+        SendGossipMenuFor(player, 15207, creature->GetGUID());
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
-        player->PlayerTalkClass->ClearMenus();
+        ClearGossipMenuFor(player);
         switch(uiAction)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 if (creature->AI())
                     creature->AI()->DoAction(1);
                 break;
@@ -198,12 +204,11 @@ public:
         return true;
     }
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_fos_leaderAI(creature);
     }
 };
-
 
 class npc_fos_leader_second : public CreatureScript
 {
@@ -217,7 +222,7 @@ public:
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == 1)
             {
@@ -231,12 +236,11 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_fos_leader_secondAI(creature);
     }
 };
-
 
 class spell_shield_of_bones : public SpellScriptLoader
 {
@@ -250,17 +254,17 @@ public:
         int32 amount;
         bool fired;
 
-        bool Load()
+        bool Load() override
         {
             fired = false;
             amount = 0;
             return true;
         }
 
-        void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo & /*dmgInfo*/, uint32 & absorbAmount)
+        void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
         {
             amount += absorbAmount;
-            if (!fired && amount >= GetSpellInfo()->Effects[EFFECT_0].BasePoints+1)
+            if (!fired && amount >= GetSpellInfo()->Effects[EFFECT_0].BasePoints + 1)
                 if (Unit* caster = GetCaster())
                 {
                     fired = true;
@@ -268,13 +272,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectAbsorb += AuraEffectAbsorbFn(spell_shield_of_bones_AuraScript::HandleAfterEffectAbsorb, EFFECT_0);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_shield_of_bones_AuraScript();
     }

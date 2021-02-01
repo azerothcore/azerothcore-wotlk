@@ -5,10 +5,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#ifndef __TRINITY_LANGUAGE_H
-#define __TRINITY_LANGUAGE_H
+#ifndef __ACORE_LANGUAGE_H
+#define __ACORE_LANGUAGE_H
 
-enum TrinityStrings
+enum AcoreStrings
 {
     // for chat commands
     LANG_SELECT_CHAR_OR_CREATURE        = 1,
@@ -95,7 +95,6 @@ enum TrinityStrings
     LANG_PVPSTATS                       = 80,
     LANG_PVPSTATS_DISABLED              = 81,
     // Free 82 - 95
-
 
     LANG_GUILD_RENAME_ALREADY_EXISTS    = 96,
     LANG_GUILD_RENAME_DONE              = 97,
@@ -291,10 +290,10 @@ enum TrinityStrings
     LANG_COMMAND_WHISPERON              = 285,
     LANG_COMMAND_WHISPEROFF             = 286,
     LANG_COMMAND_CREATGUIDNOTFOUND      = 287,
-      // TICKET STRINGS NEED REWRITE // 288-296 FREE
+    // TICKET STRINGS NEED REWRITE // 288-296 FREE
 
-      // END
-    LANG_COMMAND_SPAWNDIST              = 297,
+    // END
+    LANG_COMMAND_WANDER_DISTANCE        = 297,
     LANG_COMMAND_SPAWNTIME              = 298,
     LANG_COMMAND_MODIFY_HONOR           = 299,
 
@@ -687,15 +686,15 @@ enum TrinityStrings
     LANG_PLAYER_DND_DEFAULT             = 709,
     LANG_PLAYER_AFK_DEFAULT             = 710,
 
-    LANG_BG_QUEUE_ANNOUNCE_STANDARD     = 711,
-    LANG_BG_QUEUE_ANNOUNCE_80_SPECIFIC  = 712,
-    LANG_BG_QUEUE_ANNOUNCE_80_RANDOM    = 713,
-//                                      = 714, see LANG_PINFO_MAP_ONLINE
+    LANG_BG_QUEUE_ANNOUNCE_SELF         = 711,
+    LANG_BG_QUEUE_ANNOUNCE_WORLD        = 712,
+    //                                      = 713, not used
+    //                                      = 714, see LANG_PINFO_MAP_ONLINE
     LANG_YOUR_BG_LEVEL_REQ_ERROR        = 715,
-//                                      = 716, see LANG_PINFO_MAP_OFFLINE
+    //                                      = 716, see LANG_PINFO_MAP_OFFLINE
     LANG_BG_STARTED_ANNOUNCE_WORLD      = 717,
-    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN= 718,
-    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT= 719,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN = 718,
+    LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT = 719,
 
     LANG_BG_GROUP_TOO_LARGE             = 720,              // "Your group is too large for this battleground. Please regroup to join."
     LANG_ARENA_GROUP_TOO_LARGE          = 721,              // "Your group is too large for this arena. Please regroup to join."
@@ -703,7 +702,7 @@ enum TrinityStrings
     LANG_ARENA_NOT_ENOUGH_PLAYERS       = 723,              // "Your group does not have enough players to join this match."
     LANG_ARENA_GOLD_WINS                = 724,              // "The Gold Team wins!"
     LANG_ARENA_GREEN_WINS               = 725,              // "The Green Team wins!"
-//                                      = 726, not used
+    //                                      = 726, not used
     LANG_BG_GROUP_OFFLINE_MEMBER        = 727,              // "Your group has an offline member. Please remove him before joining."
     LANG_BG_GROUP_MIXED_FACTION         = 728,              // "Your group has players from the opposing faction. You can't join the battleground as a group."
     LANG_BG_GROUP_MIXED_LEVELS          = 729,              // "Your group has players from different battleground brakets. You can't join as group."
@@ -727,13 +726,13 @@ enum TrinityStrings
     LANG_DIST_ARENA_POINTS_END          = 746,
     LANG_BG_DISABLED                    = 747,
     LANG_ARENA_DISABLED                 = 748,
-//                                      = 749, see LANG_PINFO_ACC_OS
+    //                                      = 749, see LANG_PINFO_ACC_OS
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING = 750,       // "Not enough players. This game will close in %u mins."
     LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS = 751,  // "Not enough players. This game will close in %u seconds."
-//                                      = 752, see LANG_PINFO_ACC_IP
-//  LANG_BG_WS_START_TWO_MINUTES        = 753, - defined above
-//  LANG_BG_AB_START_TWO_MINUTES        = 754, - defined above
-//  LANG_BG_EY_START_TWO_MINUTES        = 755, - defined above
+    //                                      = 752, see LANG_PINFO_ACC_IP
+    //  LANG_BG_WS_START_TWO_MINUTES        = 753, - defined above
+    //  LANG_BG_AB_START_TWO_MINUTES        = 754, - defined above
+    //  LANG_BG_EY_START_TWO_MINUTES        = 755, - defined above
 
     // Room for BG/ARENA                = 773-784, 788-799 not used
     LANG_ARENA_TESTING                  = 785,
@@ -876,8 +875,8 @@ enum TrinityStrings
     LANG_SQLDRIVER_QUERY_LOGGING_ENABLED  = 1027,
     LANG_SQLDRIVER_QUERY_LOGGING_DISABLED = 1028,
     // 1029-1030 used in other client versions
-
     // Room for more level 4              1031-1099 not used
+    LANG_ACCOUNT_PASS_TOO_LONG            = 1031,
 
     // Level 3 (continue)
     LANG_ACCOUNT_SETADDON               = 1100,
@@ -1097,7 +1096,7 @@ enum TrinityStrings
     LANG_BATTLEGROUND                   = 5015,
     LANG_ARENA                          = 5016,
     LANG_RAID                           = 5017,
-                                        //= 5018,
+    //= 5018,
     LANG_COMMAND_TEMP_FROZEN_PLAYER     = 5019,
     LANG_NPCINFO_PHASEMASK              = 5020,
     LANG_NPCINFO_ARMOR                  = 5021,
@@ -1146,7 +1145,7 @@ enum TrinityStrings
     LANG_COMMAND_MUTEHISTORY_EMPTY      = 5060,
     LANG_COMMAND_MUTEHISTORY_OUTPUT     = 5061,
 
-    // Room for more Trinity strings      5062-9999
+    // Room for more Trinity strings    5062-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1301,6 +1300,26 @@ enum TrinityStrings
     LANG_CREATURE_NOT_AI_ENABLED                  = 11015,
     LANG_SELECT_PLAYER_OR_PET                     = 11016,
 
+    // Continue show Ban in world (ip)
+    LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD            = 11017,
+    LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD        = 11018,
+
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
+
+    // Instant Flight
+    LANG_TOGGLE_INSTANT_FLIGHT                    = 30077,
+    LANG_INSTANT_FLIGHT_ON                        = 30078,
+    LANG_INSTANT_FLIGHT_OFF                       = 30079,
+
+    LANG_DEBUG_OPCODE_FILE_MISSING                = 30080,
+
+    LANG_REMOVEITEM_FAILURE                       = 30081,
+    LANG_REMOVEITEM_ERROR                         = 30082,
+
+    LANG_BG_SHARE_QUEST_ERROR                     = 30083,
+    LANG_BG_READY_CHECK_ERROR                     = 30084,
+
+    LANG_DEBUG_BG_CONF                            = 30085,
+    LANG_DEBUG_ARENA_CONF                         = 30086
 };
 #endif
