@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `areatrigger_tavern`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `areatrigger_tavern` 
 (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
-  `name` text,
+  `id` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
+  `name` text DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Trigger System';
 /*!40101 SET character_set_client = @saved_cs_client */;
