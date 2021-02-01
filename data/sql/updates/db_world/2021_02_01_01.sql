@@ -1,3 +1,19 @@
+-- DB update 2021_02_01_00 -> 2021_02_01_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_02_01_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_02_01_00 2021_02_01_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1611685103659442481'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1611685103659442481');
 
 DELETE FROM `gameobject` WHERE `guid` IN (241010, 241011, 241012, 241013, 241014, 241015);
@@ -58,3 +74,12 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,
 (22,6,180867,1,0,6,0,67,0,0,0,0,'','Lunar Festival SAI the player Must Must Be Horde'),
 (22,7,180867,1,0,29,0,15719,5,0,0,0,'','Lunar Festival Execute sai if near npc 15719'),
 (22,7,180867,1,0,6,0,67,0,0,0,0,'','Lunar Festival SAI the player Must Must Be Horde');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
