@@ -201,18 +201,16 @@ public:
         {
             if (!sindragosa->IsAlive())
                 return true;
+
             Position pos;
             _owner->GetPosition(&pos);
-            _owner->m_positionZ -= 1.0f; // +2.0f in UpdateGroundPositionZ, prevent going over GO model of another ice block, because new would be spawned on top of the old one xd
             _owner->UpdateGroundPositionZ(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-            if (pos.GetPositionZ() < 203.0f)
-                pos.m_positionZ = 203.0f;
+
             if (TempSummon* summon = sindragosa->SummonCreature(NPC_ICE_TOMB, pos))
             {
-                summon->m_positionZ = summon->GetPositionZ() + 5.0f;
                 summon->AI()->SetGUID(_owner->GetGUID(), DATA_TRAPPED_PLAYER);
                 _owner->CastSpell(_owner, SPELL_ICE_TOMB_UNTARGETABLE, true);
-                if (GameObject* go = summon->SummonGameObject(GO_ICE_BLOCK, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ() - 3.5f, pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                if (GameObject* go = summon->SummonGameObject(GO_ICE_BLOCK, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0))
                 {
                     go->SetSpellId(SPELL_ICE_TOMB_DAMAGE);
                     summon->AddGameObject(go);
@@ -661,7 +659,7 @@ public:
                     me->GetMotionMaster()->MoveLand(POINT_LAND_GROUND, SindragosaLandPos, 10.0f);
                     break;
                 case EVENT_THIRD_PHASE_CHECK:
-                    if (!me->HasByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER))
+                    if (!me->HasByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER))
                     {
                         Talk(SAY_PHASE_2);
                         events.ScheduleEvent(EVENT_ICE_TOMB, urand(7000, 10000));
@@ -1654,7 +1652,7 @@ public:
                         me->SetDisableGravity(true);
                         me->SetHover(true);
                         me->SendMovementFlagUpdate();
-                        float floorZ = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f);
+                        float floorZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         float destZ;
                         if (floorZ > 190.0f) destZ = floorZ + 25.0f;
                         else destZ = me->GetPositionZ() + 25.0f;
@@ -1676,7 +1674,7 @@ public:
                     }
                     else
                     {
-                        float floorZ = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f);
+                        float floorZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         float destZ;
                         if (floorZ > 190.0f) destZ = floorZ;
                         else destZ = me->GetPositionZ() - 25.0f;

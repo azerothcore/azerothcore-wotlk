@@ -5,6 +5,7 @@
  */
 
 #include "Common.h"
+#include "Physics.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
@@ -357,7 +358,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
             *data << object->GetPositionX();
             *data << object->GetPositionY();
-            *data << object->GetPositionZ() + (unit ? unit->GetHoverHeight() : 0.0f);
+            *data << object->GetPositionZ();
 
             if (transport)
             {
@@ -369,7 +370,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             {
                 *data << object->GetPositionX();
                 *data << object->GetPositionY();
-                *data << object->GetPositionZ() + (unit ? unit->GetHoverHeight() : 0.0f);
+                *data << object->GetPositionZ();
             }
 
             *data << object->GetOrientation();
@@ -386,7 +387,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
             {
                 *data << object->GetStationaryX();
                 *data << object->GetStationaryY();
-                *data << object->GetStationaryZ() + (unit ? unit->GetHoverHeight() : 0.0f);
+                *data << object->GetStationaryZ();
                 *data << object->GetStationaryO();
             }
         }
@@ -897,6 +898,15 @@ bool Object::PrintIndexError(uint32 index, bool set) const
     return false;
 }
 
+
+bool Position::operator==(Position const& a)
+{
+    return (G3D::fuzzyEq(a.m_positionX, m_positionX) &&
+        G3D::fuzzyEq(a.m_positionY, m_positionY) &&
+        G3D::fuzzyEq(a.m_positionZ, m_positionZ) &&
+        G3D::fuzzyEq(a.m_orientation, m_orientation));
+}
+
 void Position::RelocatePolarOffset(float angle, float dist, float z /*= 0.0f*/)
 {
     SetOrientation(GetOrientation() + angle);
@@ -988,7 +998,7 @@ WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
     elunaEvents(nullptr),
 #endif
     LastUsedScriptID(0), m_name(""), m_isActive(false), m_isVisibilityDistanceOverride(false), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
-    m_transport(nullptr), m_currMap(nullptr), m_InstanceId(0),
+    m_staticFloorZ(INVALID_HEIGHT), m_transport(nullptr), m_currMap(nullptr), m_InstanceId(0),
     m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
@@ -1139,7 +1149,7 @@ bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool
 
 Position WorldObject::GetHitSpherePointFor(Position const& dest) const
 {
-    G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ());
+    G3D::Vector3 vThis(GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight());
     G3D::Vector3 vObj(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
     G3D::Vector3 contactPoint = vThis + (vObj - vThis).directionOrZero() * std::min(dest.GetExactDist(this), GetObjectSize());
 
@@ -1150,29 +1160,47 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, LineOfSightChecks ch
 {
     if (IsInWorld())
     {
+        oz += GetCollisionHeight();
         float x, y, z;
         if (GetTypeId() == TYPEID_PLAYER)
+        {
             GetPosition(x, y, z);
+            z += GetCollisionHeight();
+        }
         else
+        {
             GetHitSpherePointFor({ ox, oy, oz }, x, y, z);
+        }
 
-        return GetMap()->isInLineOfSight(x, y, z + 2.0f, ox, oy, oz + 2.0f, GetPhaseMask(), checks);
+        return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks);
     }
     return true;
 }
 
 bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, LineOfSightChecks checks) const
 {
-    if (!IsInMap(obj))
+   if (!IsInMap(obj))
         return false;
 
-    float x, y, z;
+    float ox, oy, oz;
     if (obj->GetTypeId() == TYPEID_PLAYER)
-        obj->GetPosition(x, y, z);
+    {
+        obj->GetPosition(ox, oy, oz);
+        oz += GetCollisionHeight();
+    }
     else
-        obj->GetHitSpherePointFor(GetPosition(), x, y, z);
+        obj->GetHitSpherePointFor({ GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight() }, ox, oy, oz);
 
-    return IsWithinLOS(x, y, z, checks);
+    float x, y, z;
+    if (GetTypeId() == TYPEID_PLAYER)
+    {
+        GetPosition(x, y, z);
+        z += GetCollisionHeight();
+    }
+    else
+        GetHitSpherePointFor({ obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ() + obj->GetCollisionHeight() }, x, y, z);
+
+    return GetMap()->isInLineOfSight(x, y, z, ox, oy, oz, GetPhaseMask(), checks);
 }
 
 void WorldObject::GetHitSpherePointFor(Position const& dest, float& x, float& y, float& z) const
@@ -1302,12 +1330,7 @@ float Position::GetAngle(const Position* obj) const
 // Return angle in range 0..2*pi
 float Position::GetAngle(const float x, const float y) const
 {
-    float dx = x - GetPositionX();
-    float dy = y - GetPositionY();
-
-    float ang = atan2(dy, dx);
-    ang = (ang >= 0) ? ang : 2 * M_PI + ang;
-    return ang;
+    return getAngle(GetPositionX(), GetPositionY(), x, y);
 }
 
 void Position::GetSinCos(const float x, const float y, float& vsin, float& vcos) const
@@ -1446,78 +1469,95 @@ void WorldObject::GetRandomPoint(const Position& pos, float distance, float& ran
     UpdateGroundPositionZ(rand_x, rand_y, rand_z);            // update to LOS height if available
 }
 
-void WorldObject::UpdateGroundPositionZ(float x, float y, float& z) const
+void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
 {
-    float new_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z /*+ 2.0f*/, true); // pussywizard: +2.0f is added in all inner functions
+    float new_z = GetMapHeight(x, y, z);
     if (new_z > INVALID_HEIGHT)
-        z = new_z + 0.05f;                                   // just to be sure that we are not a few pixel under the surface
+        z = new_z + (isType(TYPEMASK_UNIT) ? static_cast<Unit const*>(this)->GetHoverHeight() : 0.0f);
 }
 
-void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z) const
+/**
+ * @brief Get the minimum height of a object that should be in water
+ * to start floating/swim
+ *
+ * @return float
+ */
+float WorldObject::GetMinHeightInWater() const
 {
-    // TODO: Allow transports to be part of dynamic vmap tree
-    //if (GetTransport())
-    //    return;
+    // have a fun with Archimedes' formula
+    auto height = GetCollisionHeight();
+    auto width = GetCollisionWidth();
+    auto weight = getWeight(height, width, 1040); // avg human specific weight
+    auto heightOutOfWater = getOutOfWater(width, weight, 10202) * 4.0f; // avg human density
+    auto heightInWater = height - heightOutOfWater;
+    return (height > heightInWater ? heightInWater : (height - (height / 3)));
+}
 
-    switch (GetTypeId())
+void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* groundZ) const
+{
+    if (GetTransport())
     {
-        case TYPEID_UNIT:
+        if (groundZ)
+            *groundZ = z;
+
+        return;
+    }
+
+    if (Unit const* unit = ToUnit())
+    {
+        if (!unit->CanFly())
+        {
+            Creature const* c = unit->ToCreature();
+            bool canSwim = c ? c->CanSwim() : true;
+            float ground_z = z;
+            float max_z;
+            if (canSwim)
+                max_z = GetMapWaterOrGroundLevel(x, y, z, &ground_z);
+            else
+                max_z = ground_z = GetMapHeight(x, y, z);
+
+            if (max_z > INVALID_HEIGHT)
             {
-                // non fly unit don't must be in air
-                // non swim unit must be at ground (mostly speedup, because it don't must be in water and water level check less fast
-                if (!ToCreature()->CanFly())
-                {
-                    bool canSwim = ToCreature()->CanSwim();
-                    float ground_z = z;
-                    float max_z = canSwim
-                                  ? GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK))
-                                  : ((ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true)));
-                    if (max_z > INVALID_HEIGHT)
-                    {
-                        if (z > max_z)
-                            z = max_z;
-                        else if (z < ground_z)
-                            z = ground_z;
-                    }
+                if (canSwim && unit->GetMap()->IsInWater(x, y, max_z - WATER_HEIGHT_TOLERANCE)) {
+                    // do not allow creatures to walk on
+                    // water level while swimming
+                    max_z = max_z - GetMinHeightInWater();
                 }
                 else
                 {
-                    float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
-                    if (z < ground_z)
-                        z = ground_z;
+                    // hovering units cannot go below their hover height
+                    float hoverOffset = unit->GetHoverHeight();
+                    max_z += hoverOffset;
+                    ground_z += hoverOffset;
                 }
-                break;
-            }
-        case TYPEID_PLAYER:
-            {
-                // for server controlled moves playr work same as creature (but it can always swim)
-                if (!ToPlayer()->CanFly())
-                {
-                    float ground_z = z;
-                    float max_z = GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, &ground_z, !ToUnit()->HasAuraType(SPELL_AURA_WATER_WALK));
-                    if (max_z > INVALID_HEIGHT)
-                    {
-                        if (z > max_z)
-                            z = max_z;
-                        else if (z < ground_z)
-                            z = ground_z;
-                    }
-                }
-                else
-                {
-                    float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
-                    if (z < ground_z)
-                        z = ground_z;
-                }
-                break;
-            }
-        default:
-            {
-                float ground_z = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true);
-                if (ground_z > INVALID_HEIGHT)
+
+                if (z > max_z)
+                    z = max_z;
+                else if (z < ground_z)
                     z = ground_z;
-                break;
             }
+
+            if (groundZ)
+                *groundZ = ground_z;
+        }
+        else
+        {
+            float ground_z = GetMapHeight(x, y, z) + unit->GetHoverHeight();
+            if (z < ground_z)
+                z = ground_z;
+
+            if (groundZ)
+               *groundZ = ground_z;
+        }
+    }
+    else
+    {
+        float ground_z = GetMapHeight(x, y, z);
+        if (ground_z > INVALID_HEIGHT)
+            z = ground_z;
+
+        if (groundZ)
+            *groundZ = ground_z;
     }
 }
 
@@ -2552,23 +2592,64 @@ namespace acore
 
 //===================================================================================================
 
-void WorldObject::GetNearPoint2D(float& x, float& y, float distance2d, float absAngle) const
+void WorldObject::GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance2d, float absAngle) const
 {
-    x = GetPositionX() + (GetObjectSize() + distance2d) * cos(absAngle);
-    y = GetPositionY() + (GetObjectSize() + distance2d) * sin(absAngle);
+    float effectiveReach = GetCombatReach();
+
+    if (searcher)
+    {
+        effectiveReach += searcher->GetCombatReach();
+
+        if (this != searcher)
+        {
+            float myHover = 0.0f, searcherHover = 0.0f;
+            if (Unit const* unit = ToUnit())
+                myHover = unit->GetHoverHeight();
+            if (Unit const* searchUnit = searcher->ToUnit())
+                searcherHover = searchUnit->GetHoverHeight();
+
+            float hoverDelta = myHover - searcherHover;
+            if (hoverDelta != 0.0f)
+                effectiveReach = std::sqrt(std::max(effectiveReach * effectiveReach - hoverDelta * hoverDelta, 0.0f));
+        }
+    }
+
+    x = GetPositionX() + (effectiveReach + distance2d) * std::cos(absAngle);
+    y = GetPositionY() + (effectiveReach + distance2d) * std::sin(absAngle);
 
     acore::NormalizeMapCoord(x);
     acore::NormalizeMapCoord(y);
+}
+
+void WorldObject::GetNearPoint2D(float& x, float& y, float distance2d, float absAngle) const
+{
+    GetNearPoint2D(nullptr, x, y, distance2d, absAngle);
 }
 
 void WorldObject::GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ) const
 {
     GetNearPoint2D(x, y, distance2d + searcher_size, absAngle);
     z = GetPositionZ();
-    if (searcher)
+
+    if (searcher) {
+        if (Unit const* unit = searcher->ToUnit(); Unit const* target = ToUnit())
+        {
+            if (unit && target && unit->IsInWater() && target->IsInWater())
+            {
+                // if the searcher is in water
+                // we have no ground so we can
+                // set the target height to the
+                // z-coord to keep the searcher
+                // at the correct height (face to face)
+                z += GetCollisionHeight() - unit->GetCollisionHeight();
+            }
+        }
         searcher->UpdateAllowedPositionZ(x, y, z);
+    }
     else
+    {
         UpdateAllowedPositionZ(x, y, z);
+    }
 
     // if detection disabled, return first point
     if (!sWorld->getBoolConfig(CONFIG_DETECT_POS_COLLISION))
@@ -2679,8 +2760,8 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
         return;
     }
 
-    ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-    floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
+    ground = GetMapHeight(destx, desty, MAX_HEIGHT);
+    floor = GetMapHeight(destx, desty, pos.m_positionZ);
     destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
 
     float step = dist / 10.0f;
@@ -2692,16 +2773,17 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
         {
             destx -= step * cos(angle);
             desty -= step * sin(angle);
-            ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-            floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
+            ground = GetMapHeight(destx, desty, MAX_HEIGHT);
+            floor = GetMapHeight(destx, desty, pos.m_positionZ);
             destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
         }
         // we have correct destz now
         else
+        {
+            pos.Relocate(destx, desty, destz);
             break;
+        }
     }
-
-    pos.Relocate(destx, desty, destz);
 
     acore::NormalizeMapCoord(pos.m_positionX);
     acore::NormalizeMapCoord(pos.m_positionY);
@@ -2709,198 +2791,56 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
     pos.m_orientation = m_orientation;
 }
 
+Position WorldObject::GetFirstCollisionPosition(float startX, float startY, float startZ, float destX, float destY)
+{
+    auto dx = destX - startX;
+    auto dy = destY - startY;
+
+    auto ang = atan2(dy, dx);
+    ang = (ang >= 0) ? ang : 2 * M_PI + ang;
+    Position pos = Position(startX, startY, startZ, ang);
+
+    auto distance = pos.GetExactDist2d(destX,destY);
+
+    MovePositionToFirstCollision(pos, distance, ang);
+    return pos;
+};
+
+Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float destZ)
+{
+    Position pos = GetPosition();
+    auto distance = GetExactDistSq(destX,destY,destZ);
+
+    auto dx = destX - pos.GetPositionX();
+    auto dy = destY - pos.GetPositionY();
+
+    auto ang = atan2(dy, dx);
+    ang = (ang >= 0) ? ang : 2 * M_PI + ang;
+
+    MovePositionToFirstCollision(pos, distance, ang);
+    return pos;
+};
+
+Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
+{
+    Position pos = GetPosition();
+    GetFirstCollisionPosition(pos, dist, angle);
+    return pos;
+}
+
 void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
 {
-    angle += m_orientation;
+    angle += GetOrientation();
     float destx, desty, destz;
     destx = pos.m_positionX + dist * cos(angle);
     desty = pos.m_positionY + dist * sin(angle);
     destz = pos.m_positionZ;
-    if (isType(TYPEMASK_UNIT | TYPEMASK_PLAYER) && !ToUnit()->IsInWater())
-        destz += 2.0f;
 
-    // Prevent invalid coordinates here, position is unchanged
-    if (!acore::IsValidMapCoord(destx, desty))
-    {
-        sLog->outCrash("WorldObject::MovePositionToFirstCollision invalid coordinates X: %f and Y: %f were passed!", destx, desty);
+    if (!GetMap()->CheckCollisionAndGetValidCoords(this, pos.m_positionX, pos.m_positionY, pos.m_positionZ, destx, desty, destz, false))
         return;
-    }
 
-    // Xinef: ugly hack for dalaran arena
-    float selfAddition = 1.5f;
-    float allowedDiff = 6.0f;
-    float newDist = dist;
-    if (GetMapId() == 617)
-    {
-        allowedDiff = 3.5f;
-        selfAddition = 1.0f;
-        destz = pos.m_positionZ + 1.0f;
-    }
-    else
-        UpdateAllowedPositionZ(destx, desty, destz);
-
-    bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetMapId(), pos.m_positionX, pos.m_positionY, pos.m_positionZ + selfAddition, destx, desty, destz + 0.5f, destx, desty, destz, -0.5f);
-
-    // collision occured
-    if (col)
-    {
-        // move back a bit
-        if (pos.GetExactDist2d(destx, desty) > CONTACT_DISTANCE)
-        {
-            destx -= CONTACT_DISTANCE * cos(angle);
-            desty -= CONTACT_DISTANCE * sin(angle);
-        }
-
-        newDist = sqrt((pos.m_positionX - destx) * (pos.m_positionX - destx) + (pos.m_positionY - desty) * (pos.m_positionY - desty));
-    }
-
-    // check dynamic collision
-    col = GetMap()->getObjectHitPos(GetPhaseMask(), pos.m_positionX, pos.m_positionY, pos.m_positionZ + selfAddition, destx, desty, destz + 0.5f, destx, desty, destz, -0.5f);
-
-    // Collided with a gameobject
-    if (col)
-    {
-        // move back a bit
-        if (pos.GetExactDist2d(destx, desty) > CONTACT_DISTANCE)
-        {
-            destx -= CONTACT_DISTANCE * cos(angle);
-            desty -= CONTACT_DISTANCE * sin(angle);
-        }
-        newDist = sqrt((pos.m_positionX - destx) * (pos.m_positionX - destx) + (pos.m_positionY - desty) * (pos.m_positionY - desty));
-    }
-
-    float step = newDist / 10.0f;
-
-    for (uint8 j = 0; j < 10; ++j)
-    {
-        // do not allow too big z changes
-        if (fabs(pos.m_positionZ - destz) > allowedDiff)
-        {
-            destx -= step * cos(angle);
-            desty -= step * sin(angle);
-            UpdateAllowedPositionZ(destx, desty, destz);
-        }
-        // we have correct destz now
-        else
-            break;
-    }
-
-    acore::NormalizeMapCoord(destx);
-    acore::NormalizeMapCoord(desty);
-    UpdateAllowedPositionZ(destx, desty, destz);
-
-    float ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-    float floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, destz, true);
-    ground = fabs(ground - destz) <= fabs(floor - pos.m_positionZ) ? ground : floor;
-    if (destz < ground)
-        destz = ground;
-
-    // Xinef: check if last z updates did not move z too far away
-    //newDist = pos.GetExactDist(destx, desty, destz);
-    //float ratio = newDist / dist;
-    //if (ratio > 1.3f)
-    //{
-    //  ratio = (1 / ratio) + (0.3f / ratio);
-    //  destx = pos.GetPositionX() + (fabs(destx - pos.GetPositionX()) * cos(angle) * ratio);
-    //  desty = pos.GetPositionY() + (fabs(desty - pos.GetPositionY()) * sin(angle) * ratio);
-    //  destz = pos.GetPositionZ() + (fabs(destz - pos.GetPositionZ()) * ratio * (destz < pos.GetPositionZ() ? -1.0f : 1.0f));
-    //}
-
+    pos.SetOrientation(GetOrientation());
     pos.Relocate(destx, desty, destz);
-    pos.m_orientation = m_orientation;
-}
-
-void WorldObject::MovePositionToFirstCollisionForTotem(Position& pos, float dist, float angle, bool forGameObject)
-{
-    angle += m_orientation;
-    float destx, desty, destz, ground, floor;
-    pos.m_positionZ += 2.0f;
-    destx = pos.m_positionX + dist * cos(angle);
-    desty = pos.m_positionY + dist * sin(angle);
-    destz = pos.GetPositionZ();
-
-    // Prevent invalid coordinates here, position is unchanged
-    if (!acore::IsValidMapCoord(destx, desty))
-    {
-        sLog->outCrash("WorldObject::MovePositionToFirstCollision invalid coordinates X: %f and Y: %f were passed!", destx, desty);
-        return;
-    }
-
-    bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetMapId(), pos.m_positionX, pos.m_positionY, pos.m_positionZ, destx, desty, destz, destx, desty, destz, -0.5f);
-
-    // collision occured
-    if (col)
-    {
-        // move back a bit
-        if (pos.GetExactDist2d(destx, desty) > CONTACT_DISTANCE)
-        {
-            destx -= CONTACT_DISTANCE * cos(angle);
-            desty -= CONTACT_DISTANCE * sin(angle);
-        }
-
-        dist = sqrt((pos.m_positionX - destx) * (pos.m_positionX - destx) + (pos.m_positionY - desty) * (pos.m_positionY - desty));
-    }
-
-    // check dynamic collision
-    col = GetMap()->getObjectHitPos(GetPhaseMask(), pos.m_positionX, pos.m_positionY, pos.m_positionZ + 0.5f, destx, desty, destz + 0.5f, destx, desty, destz, -0.5f);
-
-    // Collided with a gameobject
-    if (col)
-    {
-        // move back a bit
-        if (pos.GetExactDist2d(destx, desty) > CONTACT_DISTANCE)
-        {
-            destx -= CONTACT_DISTANCE * cos(angle);
-            desty -= CONTACT_DISTANCE * sin(angle);
-        }
-        dist = sqrt((pos.m_positionX - destx) * (pos.m_positionX - destx) + (pos.m_positionY - desty) * (pos.m_positionY - desty));
-    }
-
-    float prevdx = destx, prevdy = desty, prevdz = destz;
-    bool anyvalid = false;
-
-    ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-    floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
-    destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
-
-    // xinef: if we have gameobject, store last valid ground position
-    // xinef: I assume you wanted to spawn totem in air and allow it to fall down if no valid position was found
-    if (forGameObject)
-        prevdz = destz;
-
-    float step = dist / 10.0f;
-    for (uint8 j = 0; j < 10; ++j)
-    {
-        // do not allow too big z changes
-        if (fabs(pos.m_positionZ - destz) > 4.0f)
-        {
-            destx -= step * cos(angle);
-            desty -= step * sin(angle);
-            ground = GetMap()->GetHeight(GetPhaseMask(), destx, desty, MAX_HEIGHT, true);
-            floor = GetMap()->GetHeight(GetPhaseMask(), destx, desty, pos.m_positionZ, true);
-            destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
-            if (j == 9 && fabs(pos.m_positionZ - destz) <= 4.0f)
-                anyvalid = true;
-        }
-        // we have correct destz now
-        else
-        {
-            anyvalid = true;
-            break;
-        }
-    }
-    if (!anyvalid)
-    {
-        destx = prevdx;
-        desty = prevdy;
-        destz = prevdz;
-    }
-
-    acore::NormalizeMapCoord(destx);
-    acore::NormalizeMapCoord(desty);
-
-    pos.Relocate(destx, desty, destz);
-    pos.m_orientation = m_orientation;
 }
 
 void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
@@ -3115,4 +3055,27 @@ uint64 WorldObject::GetTransGUID() const
     if (GetTransport())
         return GetTransport()->GetGUID();
     return 0;
+}
+
+float WorldObject::GetMapHeight(float x, float y, float z, bool vmap/* = true*/, float distanceToSearch/* = DEFAULT_HEIGHT_SEARCH*/) const
+{
+    if (z != MAX_HEIGHT)
+        z += GetCollisionHeight();
+
+    return GetMap()->GetHeight(GetPhaseMask(), x, y, z, vmap, distanceToSearch);
+}
+
+float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* ground/* = nullptr*/) const
+{
+    return GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, ground,
+        isType(TYPEMASK_UNIT) ? !static_cast<Unit const*>(this)->HasAuraType(SPELL_AURA_WATER_WALK) : false,
+        GetCollisionHeight());
+}
+
+float WorldObject::GetFloorZ() const
+{
+    if (!IsInWorld())
+        return m_staticFloorZ;
+
+    return std::max<float>(m_staticFloorZ, GetMap()->GetGameObjectFloor(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight()));
 }
