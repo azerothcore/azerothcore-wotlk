@@ -28,7 +28,7 @@
 // setting is to use non-virtual functions, the actual implementations of the functions
 // are declared as inline for maximum speed. 
 
-//#define DT_VIRTUAL_QUERYFILTER 1
+#define DT_VIRTUAL_QUERYFILTER 1 // for acore
 
 /// Defines polygon filtering and traversal costs for navigation mesh query operations.
 /// @ingroup detour

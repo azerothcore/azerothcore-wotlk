@@ -1404,6 +1404,9 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER] = sConfigMgr->GetIntDefault("WaypointMovementStopTimeForPlayer", 120);
 
+    m_int_configs[CONFIG_NPC_EVADE_IF_NOT_REACHABLE] = sConfigMgr->GetIntDefault("NpcEvadeIfTargetIsUnreachable", 5);
+    m_bool_configs[CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID] = sConfigMgr->GetBoolDefault("NpcRegenHPIfTargetIsUnreachable", true);
+
     //Debug
     m_bool_configs[CONFIG_DEBUG_BATTLEGROUND] = sConfigMgr->GetBoolDefault("Debug.Battleground", false);
     m_bool_configs[CONFIG_DEBUG_ARENA]        = sConfigMgr->GetBoolDefault("Debug.Arena",        false);

@@ -715,11 +715,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_MARK_OF_NATURE))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_AURA_OF_NATURE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_MARK_OF_NATURE, SPELL_AURA_OF_NATURE });
         }
 
         void FilterTargets(std::list<WorldObject*>& targets)
