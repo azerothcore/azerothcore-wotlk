@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `gameobject_addon`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `gameobject_addon` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT '0',
-  `invisibilityType` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `invisibilityValue` int(10) unsigned NOT NULL DEFAULT '0',
+  `guid` int(10) unsigned NOT NULL DEFAULT 0,
+  `invisibilityType` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `invisibilityValue` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -19,6 +19,7 @@ CREATE TABLE `gameobject_addon`
 LOCK TABLES `gameobject_addon` WRITE;
 /*!40000 ALTER TABLE `gameobject_addon` DISABLE KEYS */;
 INSERT INTO `gameobject_addon` VALUES 
+(270,9,1000),
 (6134,9,1000),
 (6135,9,1000),
 (6342,8,1000),
@@ -32,7 +33,13 @@ INSERT INTO `gameobject_addon` VALUES
 (25120,0,0),
 (25256,0,0),
 (25257,0,0),
-(50347,0,0);
+(50347,0,0),
+(268853,8,1000),
+(268854,5,1000),
+(2133392,7,1000),
+(2133393,7,1000),
+(2133394,7,1000),
+(2133395,7,1000);
 /*!40000 ALTER TABLE `gameobject_addon` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

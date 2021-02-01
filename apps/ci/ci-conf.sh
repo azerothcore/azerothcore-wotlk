@@ -28,6 +28,12 @@ case $COMPILER in
     echo "CCOMPILERCXX=\"g++\"" >> ./conf/config.sh
     ;;
 
+  "gcc8" )
+    time sudo apt-get install -y gcc-8 g++-8
+    echo "CCOMPILERC=\"gcc-8\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"g++-8\"" >> ./conf/config.sh
+    ;;
+
   "gcc10" )
     time sudo apt-get install -y gcc-10 g++-10
     echo "CCOMPILERC=\"gcc-10\"" >> ./conf/config.sh

@@ -10,8 +10,8 @@ DROP TABLE IF EXISTS `game_event_npcflag`;
 CREATE TABLE `game_event_npcflag` 
 (
   `eventEntry` tinyint(3) unsigned NOT NULL COMMENT 'Entry of the game event',
-  `guid` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `npcflag` int(10) unsigned NOT NULL DEFAULT '0',
+  `guid` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `npcflag` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`eventEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
