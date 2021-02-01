@@ -9,17 +9,17 @@ DROP TABLE IF EXISTS `quest_offer_reward`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `quest_offer_reward` 
 (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `Emote1` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `Emote2` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `Emote3` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `Emote4` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `EmoteDelay1` int(10) unsigned NOT NULL DEFAULT '0',
-  `EmoteDelay2` int(10) unsigned NOT NULL DEFAULT '0',
-  `EmoteDelay3` int(10) unsigned NOT NULL DEFAULT '0',
-  `EmoteDelay4` int(10) unsigned NOT NULL DEFAULT '0',
-  `RewardText` text,
-  `VerifiedBuild` smallint(5) NOT NULL DEFAULT '0',
+  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `Emote1` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `Emote2` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `Emote3` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `Emote4` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `EmoteDelay1` int(10) unsigned NOT NULL DEFAULT 0,
+  `EmoteDelay2` int(10) unsigned NOT NULL DEFAULT 0,
+  `EmoteDelay3` int(10) unsigned NOT NULL DEFAULT 0,
+  `EmoteDelay4` int(10) unsigned NOT NULL DEFAULT 0,
+  `RewardText` text DEFAULT NULL,
+  `VerifiedBuild` smallint(5) NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1291,6 +1291,8 @@ INSERT INTO `quest_offer_reward` VALUES
 (1457,1,6,1,0,0,0,0,0,'Ah, the Karnitol business in Desolace. Excellent!$B$BSo, the chest was destroyed, but the items are all here, huh? Well, I\'ll let him be the judge of that. One good part about this business I got going on here is that if they\'re not satisfied, I can tell \'em to shove it! They\'re relyin\' on us to find their stuff... not make sure it\'s all pretty and in good shape when they get it back.$B$BGood work, $N. Let\'s see about gettin\' you paid.',12340),
 (1458,1,1,0,0,0,0,0,0,'Good good, $N. Not sure if these are of any good quality, but if Leftwitch wanted a specific type, he should have specified before sending the Reclaimers out here to begin with.$B$BWhat say you to getting on with the next item on his list?',12340),
 (1459,1,1,0,0,0,0,0,0,'Your help here\'s a boon, $N. You\'re cutting my time spent here in Desolace by half at least. I\'ll be back in Ironforge warming my feet in no time with your help.$B$BWhen we get this list taken care of, and I\'m back home, look me up, I\'ll buy you an ale for sure.$B$BBut until then, let\'s get the rest of these reagents gathered.',12340),
+(1462,0,0,0,0,0,0,0,0,'Take this and remember, it is sacred.',0),
+(1463,0,0,0,0,0,0,0,0,'I give you one in good faith. You already proved yourself once, but me tinkin\' you should be more careful in the future.',0),
 (1464,0,0,0,0,0,0,0,0,'May fire burn within your heart, $N.$B$BThe elements await you.',12340),
 (1465,5,1,6,1,0,0,0,0,'Infuriating! This entire fiasco!$B$BThe two of them were warned about how dangerous coming here would be. Now they\'re both missing... or worse.$B$BYou said you saw tracks heading to a fort nearby? That may be our best bet.$B$BFrom what the locals have said, that fortress is infested with members of the Burning Blade--orcs who have dedicated themselves to demon causes. They may not represent the majority of the Horde\'s beliefs, but they are evil and will slay you on sight if you\'re caught spying.',12340),
 (1466,1,1,0,0,0,0,0,0,'Honestly? I wouldn\'t have thought it. You\'re amazing, $N. Taking on demons for a mage\'s experiments, and coming back in one piece to boot. Great job!$B$BI\'m personally gonna tell Roetten about you when I get back to Ironforge.',12340),
@@ -2673,6 +2675,7 @@ INSERT INTO `quest_offer_reward` VALUES
 (6086,6,1,1,0,0,0,0,0,'A new recruit, eh? You\'re on your way to becoming a great $C, I see.$B$BYes, I can bestow you with the skills you need to train and guide your pet. Not only will you be able to teach your pet new abilities, you will now be able to feed your pet, as well as revive it, should it fall in battle.$B$BRemember that the key to getting the most from your new pet is to respect it and treat it well. In turn, your pet will be your most loyal friend.',12340),
 (6087,0,0,0,0,0,0,0,0,'Yes... The Earthmother believes that you are ready for the next lesson.',12340),
 (6088,0,0,0,0,0,0,0,0,'You have learned all I can teach you, $N. May the blessings of the Earthmother guide you in choosing a pet.$B$BHere you are, $N. I will now give you the power to tame a beast, as well as call it and dismiss it as you see fit. Use your new skills with pride and honor the Earthmother.',12340),
+(6089,1,0,0,0,0,0,0,0,'A young $c, I see. Yes, I can bestow you with the skills you need to train and guide your pet. Not only will you be able to teach your pet new abilities, you will now be able to feed your pet, as well as revive it, should it fall in battle.$B$BNow, go forth. May the Earthmother guide you on your path. We shall speak again, at a later date.',12340),
 (6101,0,0,0,0,0,0,0,0,'I see your commitment and that you have understood what I have taught you, $N.',12340),
 (6102,0,0,0,0,0,0,0,0,'You have learned all I can teach you, $N. May I offer you one more piece of advice: use discretion when choosing your first pet. Will you choose a creature of the land, of the water, or of the sky? Whatever it may be, without doubt, your pet will be with you for quite some time.$B$BHere you are, $N. I will now give you the power to tame a beast, as well as call it and dismiss it as you see fit. Use your new skills with pride; you have earned them.',12340),
 (6103,0,0,0,0,0,0,0,0,'A fledgling $C. I see. Yes. I can bestow you with the skills you need to train and guide your pet. Not only will you be able to teach your pet new abilities, you will now be able to feed your pet, as well as revive it, should it fall in battle.$B$BRemember, $N, always respect the balance and live in awe of nature around you. Now, go forth. We shall speak again, at a later date.',12340),
@@ -3464,7 +3467,7 @@ INSERT INTO `quest_offer_reward` VALUES
 (8471,2,0,0,0,0,0,0,0,'This thing... it is in the shape of a Winterfall Ritual Totem, but it has been twisted by forces I cannot begin to comprehend.  Whatever taint that has set the Winterfall against us is surely present in this object.$B$BDivine wisdom has brought both this and you to us, $N.  We will study this object intently; perhaps one day, the Winterfall will rage against us no longer.$B$BThank you, friend - please accept these offerings in exchange for your benevolence.',12340),
 (8472,0,0,0,0,0,0,0,0,'You\'ve done well, $N.  With our arcane sanctums not operating at full capacity, these power cores will go a long way in supplementing our needs.',12340),
 (8473,0,0,0,0,0,0,0,0,'So, it is done. Curse these times that have driven us to desperate measures... and curse our enemy, the Scourge!$B$BLearn this, $N. Our lands must be protected, no matter what the cost. We shall prevail!',12340),
-(8474,0,0,0,0,0,0,0,0,'This... this pendant.  I gave it to Old Whitebark after his people helped us rebuild our village.I guess this means he\'s...<clears her throat as she regains her composure.>I appreciate you bringing this to me, $N.  There is something I\'d like to ask of you.',12340),
+(8474,0,0,0,0,0,0,0,0,'This... this pendant.  I gave it to Old Whitebark after his people helped us rebuild our village.$B$BI guess this means he\'s...$B$B<The blood elf clears her throat as she regains her composure.>$B$BI appreciate you bringing this to me, $N.  There is something I\'d like to ask of you.',12340),
 (8475,0,0,0,0,0,0,0,0,'We don\'t anticipate the Scourge letting up on their attacks any time soon, but we still appreciate any help we get guarding the Scar.',12340),
 (8476,0,0,0,0,0,0,0,0,'Good work, $N. With more people like you we\'ll soon restore our lands to their former glory.',12340),
 (8477,0,0,0,0,0,0,0,0,'There\'s truth to the rumors! This hammer is light and strong at once; I shall manage to complete several of my unfinished projects.  And of course, I\'ll let you have first pick. ',12340),
@@ -4298,11 +4301,11 @@ INSERT INTO `quest_offer_reward` VALUES
 (9395,0,0,0,0,0,0,0,0,'Ah, good of Magistrix Dawnstrider to finally respond to my simple requests.  I should take up the matter of her attitude with the regent lord in Silvermoon. She\'s quite rude!$B$BNothing for you to concern yourself with though. Now that you\'re here, maybe I\'ll finally be able to get those party supplies that I\'ve been waiting for? ',12340),
 (9396,0,0,0,0,0,0,0,0,'Good work, $N.  Outland\'s secrets will not stay hidden from us for very long.$B$BIt\'s our destiny to become the masters of this world.',12340),
 (9397,0,0,0,0,0,0,0,0,'You did it!  You caught a female hatchling!$B$BShe\'s precious.  You have my thanks, $N.',12340),
-(9398,0,0,0,0,0,0,0,0,'You\'ve done well, $N.  It is always unfortunate to have to resort to taking a life, even when it\'s that of a dangerous beast such as the rock flayer.$B$BYou have my thanks for carrying out this grim task.',12340),
+(9398,0,0,0,0,0,0,0,0,'You\'ve done well, $N.  It is always unfortunate to have to resort to taking a life, even when it\'s that of a dangerous beast such as the rock flayer.$B$BYou have my thanks for carrying out this grim task.',12340);
+INSERT INTO `quest_offer_reward` VALUES 
 (9399,0,0,0,0,0,0,0,0,'You did it!  I\'m in your debt, $N.  Look at all the Dreghoods that are showing up.$B$BUnder my guidance they\'ll learn all about the old ways, you\'ll see.',12340),
 (9400,0,0,0,0,0,0,0,0,'The corpse matches the description of Krun Spinebreaker, Hellfire Citadel\'s assassin. As you turn the body over, you notice a stone axe protruding from his back.',12340),
-(9401,0,0,0,0,0,0,0,0,'He was killed by this weapon?  It can\'t be!$B$BHave we... found them?',12340);
-INSERT INTO `quest_offer_reward` VALUES 
+(9401,0,0,0,0,0,0,0,0,'He was killed by this weapon?  It can\'t be!$B$BHave we... found them?',12340),
 (9402,0,0,0,0,0,0,0,0,'Oh, well done...  I told you to jump in a pond, and you did.  I can only imagine what you\'d do if one of your good friends asked it of you.$B$BIf you want a reward for your efforts, it is this: never lift a finger without first knowing what\'s in it for you.  The $C\'s mind is his greatest weapon.  Remember that and try to use yours a bit more.',12340),
 (9403,0,0,0,0,0,0,0,0,'Let\'s see what you\'ve brought me...$B$B<He holds the phial up to the light and examines it closely.>$B$BYes, this will do. Well done, $N. ',12340),
 (9404,0,0,0,0,0,0,0,0,'You\'ve done as I\'ve asked, $N, and you may take your reward now. ',12340),
@@ -8539,7 +8542,7 @@ INSERT INTO `quest_offer_reward` VALUES
 (24711,0,0,0,0,0,0,0,0,'The Halls of Reflection. Finally.$B$BLet me know when you are ready. Arthas may not be here, but it would be naive to think that he would leave Frostmourne unguarded entirely.',12340),
 (24712,0,0,0,0,0,0,0,0,'The Halls of Reflection lie ahead. If what that vile gnome said is to be trusted, Frostmourne should be there, and with it, answers to confronting Arthas.',12340),
 (24713,0,0,0,0,0,0,0,0,'The Halls of Reflection. Finally.$B$BLet me know when you are ready, $c. I will not be so naive as to think that Arthas left his precious sword entirely unguarded.',12340),
-(24743,0,0,0,0,0,0,0,0,'Listen well, $C. In accepting this weapon your fate is sealed.$B$BOvercome or succumb.$B$BI have placed your feet upon this path. You are therefore my personal responsibility. Should you falter, I am duty-bound to deliver you from this life.$B$BRemember my words, $C, and do not fail.',12340),
+(24743,0,0,0,0,0,0,0,0,'Listen well, $c. In accepting this weapon your fate is sealed.$B$BOvercome or succumb.$B$BI have placed your feet upon this path. You are therefore my personal responsibility. Should you failter, I am duty-bound to deliver you from this life.$B$BRemember my words, $r, and do not fail.',12340),
 (24745,0,0,0,0,0,0,0,0,'What\'ve you got there?$B$BOh hey, this is big. Real big. Most of the crazy details in one little package. Thanks - you really helped us reel this all in. Good working with ya.',12340),
 (24748,0,0,0,0,0,0,0,0,'So, at last it is done.$b$bMay the people of Azeroth remember our deeds here forevermore. May the sacrifices of so many burn in their hearts eternally. May they never fail to risk mortal peril in the face of great evil.',12340),
 (24749,0,0,0,0,0,0,0,0,'Well done, $c.$b$bThe completion of our work draws near.',12340),

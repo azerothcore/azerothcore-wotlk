@@ -889,11 +889,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellEntry*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_LEECHING_SWARM_DMG))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_LEECHING_SWARM_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_LEECHING_SWARM_DMG, SPELL_LEECHING_SWARM_HEAL });
         }
 
         void HandleEffectPeriodic(AuraEffect const* aurEff)
