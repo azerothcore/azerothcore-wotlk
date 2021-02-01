@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `spell_mixology`;
 CREATE TABLE `spell_mixology` 
 (
   `entry` mediumint(8) unsigned NOT NULL,
-  `pctMod` float NOT NULL DEFAULT '30' COMMENT 'bonus multiplier',
+  `pctMod` float NOT NULL DEFAULT 30 COMMENT 'bonus multiplier',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;
