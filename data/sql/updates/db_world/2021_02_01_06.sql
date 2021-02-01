@@ -1,3 +1,19 @@
+-- DB update 2021_02_01_05 -> 2021_02_01_06
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_02_01_05';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_02_01_05 2021_02_01_06 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1611254109213696316'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1611254109213696316');
 
 -- Quest: Tomb of the Lightbringer
@@ -88,3 +104,12 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (17238, 29,  979.1897, -1820.734, 80.49, "anchorite_truuen_Q9446"),
 (17238, 30,  977.8632, -1823.1943, 80.49, "anchorite_truuen_Q9446"),
 (17238, 31,  976.0802, -1823.7548, 81.03, "anchorite_truuen_Q9446");
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
