@@ -11,6 +11,9 @@
 #include "DetourNavMesh.h"
 #include <cassert>
 
+float const GROUND_HEIGHT_TOLERANCE = 0.05f; // Extra tolerance to z position to check if it is in air or on ground.
+float const WATER_HEIGHT_TOLERANCE = 0.5f; // Extra tolerance to z position to check if it is in water
+
 enum SpellEffIndex
 {
     EFFECT_0 = 0,
