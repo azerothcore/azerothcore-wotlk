@@ -1014,9 +1014,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_BACKLASH))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_BACKLASH });
         }
 
         void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -1048,9 +1046,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ICY_GRIP_JUMP))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ICY_GRIP_JUMP });
         }
 
         void HandleScript(SpellEffIndex effIndex)
@@ -1126,9 +1122,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ICE_TOMB_DAMAGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ICE_TOMB_DAMAGE });
         }
 
         void PeriodicTick(AuraEffect const* /*aurEff*/)
@@ -1713,9 +1707,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ICY_BLAST_AREA))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ICY_BLAST_AREA });
         }
 
         void HandleTriggerMissile(SpellEffIndex effIndex)
@@ -1921,9 +1913,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_FOCUS_FIRE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_FOCUS_FIRE });
         }
 
         void FilterTargets(std::list<WorldObject*>& targets)
