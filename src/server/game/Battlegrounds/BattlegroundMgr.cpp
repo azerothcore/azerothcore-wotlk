@@ -742,7 +742,7 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
         else
         {
             return BattlegroundMgr::ArenaTypeToQueue.at(arenaType);
-        } 
+        }
     }
 
     if (BattlegroundMgr::bgToQueue.find(bgTypeId) == BattlegroundMgr::bgToQueue.end())
