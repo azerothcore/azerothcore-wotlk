@@ -735,14 +735,14 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
 {
     if (arenaType)
     {
-        if (BattlegroundMgr::ArenaTypeToQueue.find(arenaType) == BattlegroundMgr::ArenaTypeToQueue.end())
+        uint32 queueTypeID = BATTLEGROUND_QUEUE_NONE;
+
+        if (BattlegroundMgr::ArenaTypeToQueue.find(arenaType) != BattlegroundMgr::ArenaTypeToQueue.end())
         {
-            return BATTLEGROUND_QUEUE_NONE;
+            queueTypeID = BattlegroundMgr::ArenaTypeToQueue.at(arenaType);
         }
-        else
-        {
-            return BattlegroundMgr::ArenaTypeToQueue.at(arenaType);
-        }
+
+        sScriptMgr->OnArenaTypeIDToQueueID(bgTypeId, arenaType, queueTypeID);
     }
 
     if (BattlegroundMgr::bgToQueue.find(bgTypeId) == BattlegroundMgr::bgToQueue.end())
