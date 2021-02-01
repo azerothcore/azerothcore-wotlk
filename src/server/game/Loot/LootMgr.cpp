@@ -452,16 +452,26 @@ void Loot::AddItem(LootStoreItem const& item)
             if (Group* group = player->GetGroup())
             {
                 for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-                    if (Player* member = itr->GetSource())
+                {
+                    if (Player *member = itr->GetSource())
+                    {
                         if (generatedLoot.AllowedForPlayer(member))
+                        {
                             canSeeItemInLootWindow = true;
+                        }
+                    }
+                }
             }
             else if (generatedLoot.AllowedForPlayer(player))
+            {
                 canSeeItemInLootWindow = true;
+            }
         }
 
         if (!canSeeItemInLootWindow)
+        {
             continue;
+        }
 
         // non-conditional one-player only items are counted here,
         // free for all items are counted in FillFFALoot(),
