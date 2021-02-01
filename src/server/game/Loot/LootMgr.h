@@ -308,6 +308,7 @@ struct Loot
     uint32 gold;
     uint8 unlootedCount{0};
     uint64 roundRobinPlayer{0};                                // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
+    uint64 lootOwnerGUID{0};
     LootType loot_type{LOOT_NONE};                                     // required for achievement system
 
     // GUIDLow of container that holds this loot (item_instance.entry), set for items that can be looted
