@@ -13,8 +13,8 @@
 #include "Player.h"
 #include "WorldSession.h"
 #include "BattlegroundMgr.h"
-#include "Opcodes.h"
 #include "ScriptMgr.h"
+#include "Opcodes.h"
 #include "BattlegroundMgr.h"
 
 ArenaTeam::ArenaTeam()
@@ -621,7 +621,7 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
         return slot;
     }
 
-    uint8 slot = ArenaSlotByType[type];
+    slot = ArenaSlotByType[type];
 
     // Get the changed slot type
     sScriptMgr->OnGetSlotByType(type, slot);
