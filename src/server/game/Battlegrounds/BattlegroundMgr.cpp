@@ -738,7 +738,7 @@ bool BattlegroundMgr::IsArenaType(BattlegroundTypeId bgTypeId)
 BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgTypeId, uint8 arenaType)
 {
     uint32 queueTypeID = BATTLEGROUND_QUEUE_NONE;
-    
+
     if (arenaType)
     {
         if (BattlegroundMgr::ArenaTypeToQueue.find(arenaType) != BattlegroundMgr::ArenaTypeToQueue.end())
@@ -770,7 +770,7 @@ BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueue
 uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
 {
     uint8 arenaType = 0;
-    
+
     if (BattlegroundMgr::QueueToArenaType.find(bgQueueTypeId) != BattlegroundMgr::QueueToArenaType.end())
     {
         arenaType = BattlegroundMgr::QueueToArenaType.at(bgQueueTypeId);
