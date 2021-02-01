@@ -615,13 +615,14 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
 {
     uint8 slot = 0xFF;
 
-    if (!ArenaSlotByType.count(type))
+    auto const& itr = ArenaSlotByType.find(type);
+    if (itr == ArenaSlotByType.end())
     {
         sLog->outError("FATAL: Unknown arena team type %u for some arena team", type);
         return slot;
     }
 
-    slot = ArenaSlotByType[type];
+    slot = ArenaSlotByType.at(type);
 
     // Get the changed slot type
     sScriptMgr->OnGetSlotByType(type, slot);
