@@ -13,8 +13,8 @@
 #include "Player.h"
 #include "WorldSession.h"
 #include "BattlegroundMgr.h"
-#include "Opcodes.h"
 #include "ScriptMgr.h"
+#include "Opcodes.h"
 #include "BattlegroundMgr.h"
 
 ArenaTeam::ArenaTeam()

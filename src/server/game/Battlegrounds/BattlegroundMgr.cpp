@@ -468,7 +468,11 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
 
     // Set up correct min/max player counts for scoreboards
     if (bg->isArena())
-        bg->SetMaxPlayersPerTeam(ArenaTeam::GetReqPlayersForType(arenaType) / 2);
+    {
+        uint32 maxPlayersPerTeam = ArenaTeam::GetReqPlayersForType(arenaType) / 2;
+        sScriptMgr->OnSetArenaMaxPlayersPerTeam(arenaType, maxPlayersPerTeam);
+        bg->SetMaxPlayersPerTeam(maxPlayersPerTeam);
+    }
 
     return bg;
 }
@@ -733,10 +737,10 @@ bool BattlegroundMgr::IsArenaType(BattlegroundTypeId bgTypeId)
 
 BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgTypeId, uint8 arenaType)
 {
+    uint32 queueTypeID = BATTLEGROUND_QUEUE_NONE;
+    
     if (arenaType)
     {
-        uint32 queueTypeID = BATTLEGROUND_QUEUE_NONE;
-
         if (BattlegroundMgr::ArenaTypeToQueue.find(arenaType) != BattlegroundMgr::ArenaTypeToQueue.end())
         {
             queueTypeID = BattlegroundMgr::ArenaTypeToQueue.at(arenaType);
@@ -745,12 +749,12 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
         sScriptMgr->OnArenaTypeIDToQueueID(bgTypeId, arenaType, queueTypeID);
     }
 
-    if (BattlegroundMgr::bgToQueue.find(bgTypeId) == BattlegroundMgr::bgToQueue.end())
+    if (BattlegroundMgr::bgToQueue.find(bgTypeId) != BattlegroundMgr::bgToQueue.end())
     {
-        return BATTLEGROUND_QUEUE_NONE;
+        queueTypeID = BattlegroundMgr::bgToQueue.at(bgTypeId);
     }
 
-    return BattlegroundMgr::bgToQueue[bgTypeId];
+    return static_cast<BattlegroundQueueTypeId>(queueTypeID);
 }
 
 BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueueTypeId)
@@ -765,12 +769,16 @@ BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueue
 
 uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
 {
-    if (BattlegroundMgr::QueueToArenaType.find(bgQueueTypeId) == BattlegroundMgr::QueueToArenaType.end())
+    uint8 arenaType = 0;
+    
+    if (BattlegroundMgr::QueueToArenaType.find(bgQueueTypeId) != BattlegroundMgr::QueueToArenaType.end())
     {
-        return 0;
+        arenaType = BattlegroundMgr::QueueToArenaType.at(bgQueueTypeId);
     }
 
-    return BattlegroundMgr::QueueToArenaType[bgQueueTypeId];
+    sScriptMgr->OnArenaQueueIdToArenaType(bgQueueTypeId, arenaType);
+
+    return arenaType;
 }
 
 void BattlegroundMgr::ToggleTesting()
