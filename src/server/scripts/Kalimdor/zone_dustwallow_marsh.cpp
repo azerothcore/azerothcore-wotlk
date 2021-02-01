@@ -316,9 +316,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_OOZE_ZAP))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_OOZE_ZAP });
         }
 
         SpellCastResult CheckRequirement()
@@ -363,9 +361,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_OOZE_ZAP_CHANNEL_END))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_OOZE_ZAP_CHANNEL_END });
         }
 
         void HandleDummy(SpellEffIndex effIndex)
@@ -399,9 +395,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ENERGIZED))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ENERGIZED });
         }
 
         void FilterTargets(std::list<WorldObject*>& targets)

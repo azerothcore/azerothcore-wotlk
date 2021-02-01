@@ -12,6 +12,7 @@
 #include "SharedDefines.h"
 #include "Object.h"
 #include "Spline/MoveSpline.h"
+#include <optional>
 
 class MovementGenerator;
 class Unit;
@@ -64,6 +65,31 @@ enum RotateDirection
 {
     ROTATE_DIRECTION_LEFT,
     ROTATE_DIRECTION_RIGHT
+};
+
+struct ChaseRange
+{
+    ChaseRange(float range);
+    ChaseRange(float _minRange, float _maxRange);
+    ChaseRange(float _minRange, float _minTolerance, float _maxTolerance, float _maxRange);
+
+    // this contains info that informs how we should path!
+    float MinRange;     // we have to move if we are within this range...    (min. attack range)
+    float MinTolerance; // ...and if we are, we will move this far away
+    float MaxRange;     // we have to move if we are outside this range...   (max. attack range)
+    float MaxTolerance; // ...and if we are, we will move into this range
+};
+
+struct ChaseAngle
+{
+    ChaseAngle(float angle, float _tolerance = M_PI_4);
+
+    float RelativeAngle; // we want to be at this angle relative to the target (0 = front, M_PI = back)
+    float Tolerance;     // but we'll tolerate anything within +- this much
+
+    float UpperBound() const;
+    float LowerBound() const;
+    bool IsAngleOkay(float relativeAngle) const;
 };
 
 // assume it is 25 yard per 0.6 second
@@ -163,7 +189,11 @@ public:
     void MoveTargetedHome();
     void MoveRandom(float wanderDistance = 0.0f);
     void MoveFollow(Unit* target, float dist, float angle, MovementSlot slot = MOTION_SLOT_ACTIVE);
-    void MoveChase(Unit* target, float dist = 0.0f, float angle = 0.0f);
+    void MoveChase(Unit* target, std::optional<ChaseRange> dist = {}, std::optional<ChaseAngle> angle = {});
+    void MoveChase(Unit* target, float dist, float angle) { MoveChase(target, ChaseRange(dist), ChaseAngle(angle)); }
+    void MoveChase(Unit* target, float dist) { MoveChase(target, ChaseRange(dist)); }
+    void MoveCircleTarget(Unit* target);
+    void MoveBackwards(Unit* target, float dist);
     void MoveConfused();
     void MoveFleeing(Unit* enemy, uint32 time = 0);
     void MovePoint(uint32 id, const Position& pos, bool generatePath = true, bool forceDestination = true)
