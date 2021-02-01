@@ -736,13 +736,19 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
     if (arenaType)
     {
         if (BattlegroundMgr::ArenaTypeToQueue.find(arenaType) == BattlegroundMgr::ArenaTypeToQueue.end())
+        {
             return BATTLEGROUND_QUEUE_NONE;
+        }
         else
-            return BattlegroundMgr::ArenaTypeToQueue[arenaType];
+        {
+            return BattlegroundMgr::ArenaTypeToQueue.at(arenaType);
+        } 
     }
 
     if (BattlegroundMgr::bgToQueue.find(bgTypeId) == BattlegroundMgr::bgToQueue.end())
+    {
         return BATTLEGROUND_QUEUE_NONE;
+    }
 
     return BattlegroundMgr::bgToQueue[bgTypeId];
 }
@@ -760,7 +766,9 @@ BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueue
 uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
 {
     if (BattlegroundMgr::QueueToArenaType.find(bgQueueTypeId) == BattlegroundMgr::QueueToArenaType.end())
+    {
         return 0;
+    }
 
     return BattlegroundMgr::QueueToArenaType[bgQueueTypeId];
 }

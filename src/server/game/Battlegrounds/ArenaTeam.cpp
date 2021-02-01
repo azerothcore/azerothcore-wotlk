@@ -1006,20 +1006,21 @@ ArenaTeamMember* ArenaTeam::GetMember(uint64 guid)
 
 uint8 ArenaTeam::GetReqPlayersForType(uint32 type)
 {
-    if (!ArenaReqPlayersForType.count(type))
+    auto const& itr = ArenaReqPlayersForType.find(type);
+    if (itr == ArenaReqPlayersForType.end())
     {
         sLog->outError("FATAL: Unknown arena type %u!", type);
         return 0xFF;
     }
 
-    return ArenaReqPlayersForType[type];
+    return ArenaReqPlayersForType.at(type);
 }
 
 void ArenaTeam::CreateTempArenaTeam(std::vector<Player*> playerList, uint8 type, std::string const& teamName)
 {
-    auto PlayerCountInTeam = static_cast<uint32>(playerList.size());
+    auto playerCountInTeam = static_cast<uint32>(playerList.size());
 
-    ASSERT(PlayerCountInTeam == GetReqPlayersForType(type));
+    ASSERT(playerCountInTeam == GetReqPlayersForType(type));
 
     // Generate new arena team id
     TeamId = sArenaTeamMgr->GenerateTempArenaTeamId();
@@ -1060,11 +1061,11 @@ void ArenaTeam::CreateTempArenaTeam(std::vector<Player*> playerList, uint8 type,
         Members.push_back(newMember);
     }
 
-    Stats.WeekGames /= PlayerCountInTeam;
-    Stats.SeasonGames /= PlayerCountInTeam;
-    Stats.Rating /= PlayerCountInTeam;
-    Stats.WeekWins /= PlayerCountInTeam;
-    Stats.SeasonWins /= PlayerCountInTeam;
+    Stats.WeekGames /= playerCountInTeam;
+    Stats.SeasonGames /= playerCountInTeam;
+    Stats.Rating /= playerCountInTeam;
+    Stats.WeekWins /= playerCountInTeam;
+    Stats.SeasonWins /= playerCountInTeam;
 }
 
 // init/update unordered_map ArenaSlotByType
