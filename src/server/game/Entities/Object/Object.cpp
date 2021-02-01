@@ -902,7 +902,6 @@ bool Object::PrintIndexError(uint32 index, bool set) const
     return false;
 }
 
-
 bool Position::operator==(Position const& a)
 {
     return (G3D::fuzzyEq(a.m_positionX, m_positionX) &&

@@ -21,7 +21,6 @@
 #include "MoveSplineInit.h"
 #include <cassert>
 
-
  // ---- ChaseRange ---- //
 
 ChaseRange::ChaseRange(float range) : MinRange(range > CONTACT_DISTANCE ? 0 : range - CONTACT_DISTANCE), MinTolerance(range), MaxRange(range + CONTACT_DISTANCE), MaxTolerance(range) { }
