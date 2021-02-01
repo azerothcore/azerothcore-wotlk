@@ -23,8 +23,8 @@ CREATE TABLE `groups`
   `icon7` int(10) unsigned NOT NULL,
   `icon8` int(10) unsigned NOT NULL,
   `groupType` tinyint(3) unsigned NOT NULL,
-  `difficulty` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `raidDifficulty` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `difficulty` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `raidDifficulty` tinyint(3) unsigned NOT NULL DEFAULT 0,
   `masterLooterGuid` int(10) unsigned NOT NULL,
   PRIMARY KEY (`guid`),
   KEY `leaderGuid` (`leaderGuid`)

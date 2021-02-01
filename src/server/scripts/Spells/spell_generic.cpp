@@ -4243,6 +4243,48 @@ public:
     }
 };
 
+enum ParalyticPoison
+{
+    SPELL_PARALYSIS = 35202
+};
+
+// 35201 - Paralytic Poison
+class spell_gen_paralytic_poison : public SpellScriptLoader
+{
+public:
+    spell_gen_paralytic_poison() : SpellScriptLoader("spell_gen_paralytic_poison") { }
+
+    class spell_gen_paralytic_poison_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_gen_paralytic_poison_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return (sSpellMgr->GetSpellInfo(SPELL_PARALYSIS));
+        }
+
+        void HandleStun(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            {
+                return;
+            }
+
+            GetTarget()->CastSpell((Unit*)nullptr, SPELL_PARALYSIS, true, nullptr, aurEff);
+        }
+
+        void Register() override
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_gen_paralytic_poison_AuraScript::HandleStun, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_gen_paralytic_poison_AuraScript();
+    }
+};
+
 // Blade Warding - 64440
 enum BladeWarding
 {
@@ -5001,6 +5043,39 @@ public:
     }
 };
 
+// Used for some spells cast by vehicles or charmed creatures that do not send a cooldown event on their own
+class spell_gen_charmed_unit_spell_cooldown : public SpellScriptLoader
+{
+public:
+    spell_gen_charmed_unit_spell_cooldown() : SpellScriptLoader("spell_gen_charmed_unit_spell_cooldown") { }
+
+    class spell_gen_charmed_unit_spell_cooldown_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_charmed_unit_spell_cooldown_SpellScript);
+
+        void HandleCast()
+        {
+            Unit* caster = GetCaster();
+            if (Player* owner = caster->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                WorldPacket data;
+                caster->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, GetSpellInfo()->Id, GetSpellInfo()->RecoveryTime);
+                owner->SendDirectMessage(&data);
+            }
+        }
+
+        void Register() override
+        {
+            OnCast += SpellCastFn(spell_gen_charmed_unit_spell_cooldown_SpellScript::HandleCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_gen_charmed_unit_spell_cooldown_SpellScript();
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     // ours:
@@ -5103,6 +5178,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_count_pct_from_max_hp("spell_gen_100pct_count_pct_from_max_hp", 100);
     new spell_gen_despawn_self();
     new spell_gen_bandage();
+    new spell_gen_paralytic_poison();
     new spell_gen_blade_warding();
     new spell_gen_lifebloom("spell_hexlord_lifebloom", SPELL_HEXLORD_MALACRASS_LIFEBLOOM_FINAL_HEAL);
     new spell_gen_lifebloom("spell_tur_ragepaw_lifebloom", SPELL_TUR_RAGEPAW_LIFEBLOOM_FINAL_HEAL);
@@ -5128,4 +5204,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_whisper_gulch_yogg_saron_whisper();
     new spell_gen_eject_all_passengers();
     new spell_gen_eject_passenger();
+    new spell_gen_charmed_unit_spell_cooldown();
 }

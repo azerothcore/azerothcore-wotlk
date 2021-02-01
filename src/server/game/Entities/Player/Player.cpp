@@ -97,6 +97,9 @@
 #define SKILL_PERM_BONUS(x)    int16(PAIR32_HIPART(x))
 #define MAKE_SKILL_BONUS(t, p) MAKE_PAIR32(t, p)
 
+#define CINEMATIC_LOOKAHEAD (2 * IN_MILLISECONDS)
+#define CINEMATIC_UPDATEDIFF 500
+
 enum CharacterFlags
 {
     CHARACTER_FLAG_NONE                 = 0x00000000,
@@ -944,6 +947,13 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     _activeCheats = CHEAT_NONE;
 
+    m_cinematicDiff = 0;
+    m_lastCinematicCheck = 0;
+    m_activeCinematicCameraId = 0;
+    m_cinematicCamera = nullptr;
+    m_remoteSightPosition = Position(0.0f, 0.0f, 0.0f);
+    m_CinematicObject = nullptr;
+
     m_achievementMgr = new AchievementMgr(this);
     m_reputationMgr = new ReputationMgr(this);
 
@@ -1587,6 +1597,14 @@ void Player::Update(uint32 p_time)
 
         // It will be recalculate at mailbox open (for unReadMails important non-0 until mailbox open, it also will be recalculated)
         m_nextMailDelivereTime = 0;
+    }
+
+    // Update cinematic location, if 500ms have passed and we're doing a cinematic now.
+    m_cinematicDiff += p_time;
+    if (m_cinematicCamera && m_activeCinematicCameraId && GetMSTimeDiffToNow(m_lastCinematicCheck) > CINEMATIC_UPDATEDIFF)
+    {
+        m_lastCinematicCheck = getMSTime();
+        UpdateCinematicLocation(p_time);
     }
 
     //used to implement delayed far teleports
@@ -5147,6 +5165,7 @@ void Player::DeleteOldCharacters()
 void Player::DeleteOldCharacters(uint32 keepDays)
 {
     sLog->outString("Player::DeleteOldChars: Deleting all characters which have been deleted %u days before...", keepDays);
+    sLog->outString();
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_OLD_CHARS);
     stmt->setUInt32(0, uint32(time(nullptr) - time_t(keepDays * DAY)));
@@ -5245,7 +5264,7 @@ void Player::BuildPlayerRepop()
     StopMirrorTimers();                                     //disable timers(bars)
 
     // set and clear other
-    SetByteValue(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND);
+    SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND);
 
     sScriptMgr->OnPlayerReleasedGhost(this);
 }
@@ -5262,7 +5281,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     // speed change, land walk
 
     // remove death flag + set aura
-    SetByteValue(UNIT_FIELD_BYTES_1, 3, 0x00);
+    SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
     RemoveAurasDueToSpell(20584);                           // speed bonuses
     RemoveAurasDueToSpell(8326);                            // SPELL_AURA_GHOST
 
@@ -6980,6 +6999,10 @@ void Player::SendCinematicStart(uint32 CinematicSequenceId)
     WorldPacket data(SMSG_TRIGGER_CINEMATIC, 4);
     data << uint32(CinematicSequenceId);
     SendDirectMessage(&data);
+    if (const CinematicSequencesEntry* sequence = sCinematicSequencesStore.LookupEntry(CinematicSequenceId))
+    {
+        SetActiveCinematicCamera(sequence->cinematicCamera);
+    }
 }
 
 void Player::SendMovieStart(uint32 MovieId)
@@ -15876,7 +15899,7 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
     if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
     {
         // prepare Quest Tracker datas
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_TRACK);
+        auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_QUEST_TRACK);
         stmt->setUInt32(0, quest_id);
         stmt->setUInt32(1, GetGUIDLow());
         stmt->setString(2, _HASH);
@@ -15893,31 +15916,35 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
 
 void Player::CompleteQuest(uint32 quest_id)
 {
-    if (quest_id)
+    if (!quest_id)
     {
-        SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
-
-        uint16 log_slot = FindQuestSlot(quest_id);
-        if (log_slot < MAX_QUEST_LOG_SIZE)
-            SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
-
-        Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id);
-        if (qInfo && qInfo->HasFlag(QUEST_FLAGS_TRACKING))
-        {
-            RewardQuest(qInfo, 0, this, false);
-        }
-
-        // Xinef: area auras may change on quest completion!
-        UpdateZoneDependentAuras(GetZoneId());
-        UpdateAreaDependentAuras(GetAreaId());
-        AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD | ADDITIONAL_SAVING_QUEST_STATUS);
+        return;
     }
+
+    SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
+
+    auto log_slot = FindQuestSlot(quest_id);
+    if (log_slot < MAX_QUEST_LOG_SIZE)
+    {
+        SetQuestSlotState(log_slot, QUEST_STATE_COMPLETE);
+    }
+
+    Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id);
+    if (qInfo && qInfo->HasFlag(QUEST_FLAGS_TRACKING))
+    {
+        RewardQuest(qInfo, 0, this, false);
+    }
+
+    // Xinef: area auras may change on quest completion!
+    UpdateZoneDependentAuras(GetZoneId());
+    UpdateAreaDependentAuras(GetAreaId());
+    AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD | ADDITIONAL_SAVING_QUEST_STATUS);
 
     // check if Quest Tracker is enabled
     if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
     {
         // prepare Quest Tracker datas
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME);
+        auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_COMPLETE_TIME);
         stmt->setUInt32(0, quest_id);
         stmt->setUInt32(1, GetGUIDLow());
 
@@ -18368,8 +18395,8 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder* holder)
     _LoadTalents(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_TALENTS));
 
     _LoadGlyphs(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_GLYPHS));
-    _LoadAuras(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_AURAS), time_diff);
     _LoadGlyphAuras();
+    _LoadAuras(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_AURAS), time_diff);
     // add ghost flag (must be after aura load: PLAYER_FLAGS_GHOST set in aura)
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
     {
@@ -27689,6 +27716,142 @@ bool Player::SetFeatherFall(bool apply, bool packetOnly /*= false*/)
     BuildMovementPacket(&data);
     SendMessageToSet(&data, false);
     return true;
+}
+
+void Player::BeginCinematic()
+{
+    // Sanity check for active camera set
+    if (m_activeCinematicCameraId == 0)
+    {
+        return;
+    }
+
+    auto itr = sFlyByCameraStore.find(m_activeCinematicCameraId);
+    if (itr != sFlyByCameraStore.end())
+    {
+        // Initialize diff, and set camera
+        m_cinematicDiff = 0;
+        m_cinematicCamera = &itr->second;
+
+        auto camitr = m_cinematicCamera->begin();
+        if (camitr != m_cinematicCamera->end())
+        {
+            Position pos(camitr->locations.x, camitr->locations.y, camitr->locations.z, camitr->locations.w);
+            if (!pos.IsPositionValid())
+            {
+                return;
+            }
+
+            m_mapRef->LoadGrid(camitr->locations.x, camitr->locations.y);
+            m_CinematicObject = SummonCreature(VISUAL_WAYPOINT, pos.m_positionX, pos.m_positionY, pos.m_positionZ, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 120000);
+            if (m_CinematicObject)
+            {
+                m_CinematicObject->setActive(true);
+                SetViewpoint(m_CinematicObject, true);
+            }
+        }
+    }
+}
+
+void Player::EndCinematic()
+{
+    m_cinematicDiff = 0;
+    m_cinematicCamera = nullptr;
+    m_activeCinematicCameraId = 0;
+    if (m_CinematicObject)
+    {
+        if (m_seer && m_seer == m_CinematicObject)
+        {
+            SetViewpoint(m_CinematicObject, false);
+        }
+        m_CinematicObject->AddObjectToRemoveList();
+    }
+}
+
+void Player::UpdateCinematicLocation(uint32 /*diff*/)
+{
+    Position lastPosition;
+    uint32 lastTimestamp = 0;
+    Position nextPosition;
+    uint32 nextTimestamp = 0;
+
+    if (m_cinematicCamera->size() == 0)
+    {
+        return;
+    }
+
+    // Obtain direction of travel
+    for (FlyByCamera cam : *m_cinematicCamera)
+    {
+        if (cam.timeStamp > m_cinematicDiff)
+        {
+            nextPosition = Position(cam.locations.x, cam.locations.y, cam.locations.z, cam.locations.w);
+            nextTimestamp = cam.timeStamp;
+            break;
+        }
+        lastPosition = Position(cam.locations.x, cam.locations.y, cam.locations.z, cam.locations.w);
+        lastTimestamp = cam.timeStamp;
+    }
+    float angle = lastPosition.GetAngle(&nextPosition);
+    angle -= lastPosition.GetOrientation();
+    if (angle < 0)
+    {
+        angle += 2 * float(M_PI);
+    }
+
+    // Look for position around 2 second ahead of us.
+    int32 workDiff = m_cinematicDiff;
+
+    // Modify result based on camera direction (Humans for example, have the camera point behind)
+    workDiff += static_cast<int32>(float(CINEMATIC_LOOKAHEAD) * cos(angle));
+
+    // Get an iterator to the last entry in the cameras, to make sure we don't go beyond the end
+    FlyByCameraCollection::const_reverse_iterator endItr = m_cinematicCamera->rbegin();
+    if (endItr != m_cinematicCamera->rend() && workDiff > static_cast<int32>(endItr->timeStamp))
+    {
+        workDiff = endItr->timeStamp;
+    }
+
+    // Never try to go back in time before the start of cinematic!
+    if (workDiff < 0)
+    {
+        workDiff = m_cinematicDiff;
+    }
+
+    // Obtain the previous and next waypoint based on timestamp
+    for (FlyByCamera cam : *m_cinematicCamera)
+    {
+        if (static_cast<int32>(cam.timeStamp) >= workDiff)
+        {
+            nextPosition = Position(cam.locations.x, cam.locations.y, cam.locations.z, cam.locations.w);
+            nextTimestamp = cam.timeStamp;
+            break;
+        }
+        lastPosition = Position(cam.locations.x, cam.locations.y, cam.locations.z, cam.locations.w);
+        lastTimestamp = cam.timeStamp;
+    }
+
+    // Never try to go beyond the end of the cinematic
+    if (workDiff > static_cast<int32>(nextTimestamp))
+    {
+        workDiff = static_cast<int32>(nextTimestamp);
+    }
+
+    // Interpolate the position for this moment in time (or the adjusted moment in time)
+    uint32 timeDiff = nextTimestamp - lastTimestamp;
+    uint32 interDiff = workDiff - lastTimestamp;
+    float xDiff = nextPosition.m_positionX - lastPosition.m_positionX;
+    float yDiff = nextPosition.m_positionY - lastPosition.m_positionY;
+    float zDiff = nextPosition.m_positionZ - lastPosition.m_positionZ;
+    Position interPosition(lastPosition.m_positionX + (xDiff * (float(interDiff) / float (timeDiff))), lastPosition.m_positionY +
+                                                      (yDiff * (float(interDiff) / float (timeDiff))), lastPosition.m_positionZ + (zDiff * (float(interDiff) / float (timeDiff))));
+
+    // Advance (at speed) to this position. The remote sight object is used
+    // to send update information to player in cinematic
+    if (m_CinematicObject && interPosition.IsPositionValid())
+    {
+        m_CinematicObject->MonsterMoveWithSpeed(interPosition.m_positionX, interPosition.m_positionY, interPosition.m_positionZ, 200.0f);
+    }
 }
 
 Guild* Player::GetGuild() const
