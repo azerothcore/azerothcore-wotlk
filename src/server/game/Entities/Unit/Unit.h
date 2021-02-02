@@ -135,6 +135,14 @@ enum SpellFacingFlags
 #define BASE_MAXDAMAGE 2.0f
 #define BASE_ATTACK_TIME 2000
 
+enum UnitBytes1Offsets : uint8
+{
+    UNIT_BYTES_1_OFFSET_STAND_STATE = 0,
+    UNIT_BYTES_1_OFFSET_PET_TALENTS = 1,
+    UNIT_BYTES_1_OFFSET_VIS_FLAG    = 2,
+    UNIT_BYTES_1_OFFSET_ANIM_TIER   = 3
+};
+
 // byte value (UNIT_FIELD_BYTES_1, 0)
 enum UnitStandStateType
 {
@@ -164,9 +172,11 @@ enum UnitStandFlags
 // byte flags value (UNIT_FIELD_BYTES_1, 3)
 enum UnitBytes1_Flags
 {
+    UNIT_BYTE1_FLAG_GROUND          = 0x00,
     UNIT_BYTE1_FLAG_ALWAYS_STAND    = 0x01,
     UNIT_BYTE1_FLAG_HOVER           = 0x02,
-    UNIT_BYTE1_FLAG_UNK_3           = 0x04,
+    UNIT_BYTE1_FLAG_FLY             = 0x03,
+    UNIT_BYTE1_FLAG_SUBMERGED       = 0x04,
     UNIT_BYTE1_FLAG_ALL             = 0xFF
 };
 
@@ -586,8 +596,8 @@ enum UnitFlags
     UNIT_FLAG_PVP                   = 0x00001000,           // changed in 3.0.3
     UNIT_FLAG_SILENCED              = 0x00002000,           // silenced, 2.1.1
     UNIT_FLAG_CANNOT_SWIM           = 0x00004000,           // 2.0.8
-    UNIT_FLAG_UNK_15                = 0x00008000,
-    UNIT_FLAG_UNK_16                = 0x00010000,
+    UNIT_FLAG_SWIMMING              = 0x00008000,           // shows swim animation in water
+    UNIT_FLAG_NON_ATTACKABLE_2      = 0x00010000,           // removes attackable icon, if on yourself, cannot assist self but can cast TARGET_SELF spells - added by SPELL_AURA_MOD_UNATTACKABLE
     UNIT_FLAG_PACIFIED              = 0x00020000,           // 3.0.3 ok
     UNIT_FLAG_STUNNED               = 0x00040000,           // 3.0.3 ok
     UNIT_FLAG_IN_COMBAT             = 0x00080000,
@@ -602,7 +612,7 @@ enum UnitFlags
     UNIT_FLAG_UNK_28                = 0x10000000,
     UNIT_FLAG_UNK_29                = 0x20000000,           // used in Feing Death spell
     UNIT_FLAG_SHEATHE               = 0x40000000,
-    UNIT_FLAG_UNK_31                = 0x80000000
+    UNIT_FLAG_IMMUNE                = 0x80000000,           // Immune to damage
 };
 
 // Value masks for UNIT_FIELD_FLAGS_2
@@ -1426,7 +1436,8 @@ public:
     [[nodiscard]] float GetMeleeReach() const { float reach = m_floatValues[UNIT_FIELD_COMBATREACH]; return reach > MIN_MELEE_REACH ? reach : MIN_MELEE_REACH; }
     [[nodiscard]] bool IsWithinRange(Unit const* obj, float dist) const;
     bool IsWithinCombatRange(const Unit* obj, float dist2compare) const;
-    bool IsWithinMeleeRange(const Unit* obj, float dist = MELEE_RANGE) const;
+    bool IsWithinMeleeRange(const Unit* obj, float dist = 0.f) const;
+    float GetMeleeRange(Unit const* target) const;
     bool GetRandomContactPoint(const Unit* target, float& x, float& y, float& z, bool force = false) const;
     uint32 m_extraAttacks;
     bool m_canDualWield;
@@ -1592,8 +1603,8 @@ public:
     [[nodiscard]] bool IsStandState() const;
     void SetStandState(uint8 state);
 
-    void  SetStandFlags(uint8 flags) { SetByteFlag(UNIT_FIELD_BYTES_1, 2, flags); }
-    void  RemoveStandFlags(uint8 flags) { RemoveByteFlag(UNIT_FIELD_BYTES_1, 2, flags); }
+    void  SetStandFlags(uint8 flags) { SetByteFlag(UNIT_FIELD_BYTES_1,  UNIT_BYTES_1_OFFSET_VIS_FLAG, flags); }
+    void  RemoveStandFlags(uint8 flags) { RemoveByteFlag(UNIT_FIELD_BYTES_1,  UNIT_BYTES_1_OFFSET_VIS_FLAG, flags); }
 
     [[nodiscard]] bool IsMounted() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_MOUNT); }
     [[nodiscard]] uint32 GetMountID() const { return GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID); }
@@ -1811,8 +1822,6 @@ public:
     //void SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint8 type, uint32 MovementFlags, uint32 Time, Player* player = nullptr);
     void SendMovementFlagUpdate(bool self = false);
 
-    [[nodiscard]] bool IsLevitating() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY); }
-    [[nodiscard]] bool IsWalking() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_WALKING); }
     virtual bool SetWalk(bool enable);
     virtual bool SetDisableGravity(bool disable, bool packetOnly = false);
     virtual bool SetSwim(bool enable);
@@ -2387,6 +2396,8 @@ public:
     void BuildMovementPacket(ByteBuffer* data) const;
 
     [[nodiscard]] virtual bool CanSwim() const;
+    [[nodiscard]] bool IsLevitating() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY); }
+    [[nodiscard]] bool IsWalking() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_WALKING); }
     [[nodiscard]] bool isMoving() const   { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING); }
     [[nodiscard]] bool isTurning() const  { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_TURNING); }
     [[nodiscard]] bool IsHovering() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_HOVER); }
@@ -2395,6 +2406,7 @@ public:
     [[nodiscard]] bool IsFlying() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY); }
     [[nodiscard]] bool IsFalling() const;
     [[nodiscard]] float GetHoverHeight() const { return IsHovering() ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f; }
+    [[nodiscard]] virtual bool CanEnterWater() const = 0;
 
     void RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker);
 
@@ -2409,11 +2421,6 @@ public:
     TempSummon* ToTempSummon() { if (IsSummon()) return reinterpret_cast<TempSummon*>(this); else return nullptr; }
     [[nodiscard]] const TempSummon* ToTempSummon() const { if (IsSummon()) return reinterpret_cast<const TempSummon*>(this); else return nullptr; }
 
-    // pussywizard:
-    // MMaps
-    std::map<uint64, MMapTargetData> m_targetsNotAcceptable;
-    bool isTargetNotAcceptableByMMaps(uint64 guid, uint32 currTime, const Position* t = nullptr) const { std::map<uint64, MMapTargetData>::const_iterator itr = m_targetsNotAcceptable.find(guid); if (itr != m_targetsNotAcceptable.end() && (itr->second._endTime >= currTime || (t && !itr->second.PosChanged(*this, *t)))) return true; return false; }
-    uint32 m_mmapNotAcceptableStartTime;
     // Safe mover
     std::set<SafeUnitPointer*> SafeUnitPointerSet;
     void AddPointedBy(SafeUnitPointer* sup) { SafeUnitPointerSet.insert(sup); }
@@ -2473,6 +2480,8 @@ public:
     Movement::MoveSpline* movespline;
 
     [[nodiscard]] float GetCollisionHeight() const override;
+    [[nodiscard]] float GetCollisionWidth() const override;
+    [[nodiscard]] float GetCollisionRadius() const override;
 
 protected:
     explicit Unit (bool isWorldObject);

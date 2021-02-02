@@ -12,7 +12,7 @@ CREATE TABLE `instance_template`
   `map` smallint(5) unsigned NOT NULL,
   `parent` smallint(5) unsigned NOT NULL,
   `script` varchar(128) NOT NULL DEFAULT '',
-  `allowMount` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `allowMount` tinyint(3) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`map`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -31,6 +31,7 @@ INSERT INTO `instance_template` VALUES
 (90,0,'instance_gnomeregan',0),
 (109,0,'instance_sunken_temple',0),
 (129,1,'instance_razorfen_downs',0),
+(169,0,'',1),
 (189,0,'instance_scarlet_monastery',0),
 (209,1,'instance_zulfarrak',1),
 (229,0,'instance_blackrock_spire',0),

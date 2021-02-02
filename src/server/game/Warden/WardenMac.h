@@ -27,7 +27,7 @@ public:
     void InitializeModule() override;
     void RequestHash() override;
     void HandleHashResult(ByteBuffer& buff) override;
-    void RequestData() override;
+    void RequestChecks() override;
     void HandleData(ByteBuffer& buff) override;
 };
 
