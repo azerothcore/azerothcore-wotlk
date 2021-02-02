@@ -706,17 +706,17 @@ void GameObject::Update(uint32 diff)
                 //! The GetOwnerGUID() check is mostly for compatibility with hacky scripts - 99% of the time summoning should be done trough spells.
                 if (GetSpellId() || GetOwnerGUID())
                 {
-                	if (m_respawnTime > 0 && GetGoType() == GAMEOBJECT_TYPE_CHEST && !GetGOInfo()->IsDespawnAtAction())
-                    	{
-                    		UpdateObjectVisibility();
-                    		SetLootState(GO_READY);
-                    	}
-                    	else
-                    	{
-                    		SetRespawnTime(0);
-                    		Delete();
+                        if (m_respawnTime > 0 && GetGoType() == GAMEOBJECT_TYPE_CHEST && !GetGOInfo()->IsDespawnAtAction())
+                        {
+                                UpdateObjectVisibility();
+                                SetLootState(GO_READY);
                         }
-                    	return;
+                        else
+                        {
+                                SetRespawnTime(0);
+                                Delete();
+                        }
+                        return;
                 }
 
                 SetLootState(GO_READY);
