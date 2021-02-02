@@ -1561,7 +1561,7 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                float z = caster->GetMap()->GetHeight(caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), MAX_HEIGHT);
+                float z = caster->GetMapHeight(caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), caster->GetPositionZ());
                 WorldLocation pPosition = WorldLocation(caster->GetMapId(), caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), z, caster->GetOrientation());
                 SetExplTargetDest(pPosition);
             }

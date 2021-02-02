@@ -22,7 +22,7 @@ void EscortMovementGenerator<T>::DoInitialize(T* unit)
     Movement::MoveSplineInit init(unit);
 
     if (m_precomputedPath.size() == 2) // xinef: simple case, just call move to
-        init.MoveTo(m_precomputedPath[1].x, m_precomputedPath[1].y, m_precomputedPath[1].z);
+        init.MoveTo(m_precomputedPath[1].x, m_precomputedPath[1].y, m_precomputedPath[1].z, true);
     else if (m_precomputedPath.size())
         init.MovebyPath(m_precomputedPath);
 
@@ -66,7 +66,7 @@ bool EscortMovementGenerator<T>::DoUpdate(T* unit, uint32  /*diff*/)
             if (m_precomputedPath.size() > 2)
                 init.MovebyPath(m_precomputedPath);
             else if (m_precomputedPath.size() == 2)
-                init.MoveTo(m_precomputedPath[1].x, m_precomputedPath[1].y, m_precomputedPath[1].z);
+                init.MoveTo(m_precomputedPath[1].x, m_precomputedPath[1].y, m_precomputedPath[1].z, true);
         }
 
         init.Launch();

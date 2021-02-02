@@ -188,9 +188,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_METEOR_FISTS_DAMAGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_METEOR_FISTS_DAMAGE });
         }
 
         void TriggerFists(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -222,9 +220,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_FW_METEOR_FISTS_DAMAGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_FW_METEOR_FISTS_DAMAGE });
         }
 
         void TriggerFists(AuraEffect const* aurEff, ProcEventInfo& eventInfo)

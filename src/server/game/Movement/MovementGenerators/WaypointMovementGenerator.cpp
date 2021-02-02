@@ -158,9 +158,11 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
             trans->CalculatePassengerPosition(formationDest.x, formationDest.y, formationDest.z, &formationDest.orientation);
     }
 
+    float z = node->z;
+    creature->UpdateAllowedPositionZ(node->x, node->y, z);
     //! Do not use formationDest here, MoveTo requires transport offsets due to DisableTransportPathTransformations() call
     //! but formationDest contains global coordinates
-    init.MoveTo(node->x, node->y, node->z);
+    init.MoveTo(node->x, node->y, z, true, true);
 
     //! Accepts angles such as 0.00001 and -0.00001, 0 must be ignored, default value in waypoint table
     if (node->orientation && node->delay)
@@ -236,11 +238,11 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
             Stop(sWorld->getIntConfig(CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER) * IN_MILLISECONDS);
         else
         {
+            bool finished = creature->movespline->Finalized();
             // xinef: code to detect pre-empetively if we should start movement to next waypoint
             // xinef: do not start pre-empetive movement if current node has delay or we are ending waypoint movement
-            bool finished = creature->movespline->Finalized();
-            if (!finished && !i_path->at(i_currentNode)->delay && ((i_currentNode != i_path->size() - 1) || repeating))
-                finished = (creature->movespline->_Spline().length(creature->movespline->_currentSplineIdx() + 1) - creature->movespline->timePassed()) < 200;
+            //if (!finished && !i_path->at(i_currentNode)->delay && ((i_currentNode != i_path->size() - 1) || repeating))
+            //    finished = (creature->movespline->_Spline().length(creature->movespline->_currentSplineIdx() + 1) - creature->movespline->timePassed()) < 200;
 
             if (finished)
             {

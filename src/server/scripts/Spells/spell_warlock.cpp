@@ -605,9 +605,14 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_DEMONIC_EMPOWERMENT_SUCCUBUS) || !sSpellMgr->GetSpellInfo(SPELL_WARLOCK_DEMONIC_EMPOWERMENT_VOIDWALKER) || !sSpellMgr->GetSpellInfo(SPELL_WARLOCK_DEMONIC_EMPOWERMENT_FELGUARD) || !sSpellMgr->GetSpellInfo(SPELL_WARLOCK_DEMONIC_EMPOWERMENT_FELHUNTER) || !sSpellMgr->GetSpellInfo(SPELL_WARLOCK_DEMONIC_EMPOWERMENT_IMP))
-                return false;
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_WARLOCK_DEMONIC_EMPOWERMENT_SUCCUBUS,
+                    SPELL_WARLOCK_DEMONIC_EMPOWERMENT_VOIDWALKER,
+                    SPELL_WARLOCK_DEMONIC_EMPOWERMENT_FELGUARD,
+                    SPELL_WARLOCK_DEMONIC_EMPOWERMENT_FELHUNTER,
+                    SPELL_WARLOCK_DEMONIC_EMPOWERMENT_IMP
+                });
         }
 
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
@@ -670,9 +675,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_IMPROVED_HEALTHSTONE_R1) || !sSpellMgr->GetSpellInfo(SPELL_WARLOCK_IMPROVED_HEALTHSTONE_R2))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_WARLOCK_IMPROVED_HEALTHSTONE_R1, SPELL_WARLOCK_IMPROVED_HEALTHSTONE_R2 });
         }
 
         SpellCastResult CheckCast()
@@ -841,9 +844,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_SOULSHATTER))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_WARLOCK_SOULSHATTER });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -880,11 +881,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_SIPHON_LIFE_HEAL))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_GLYPH_OF_SIPHON_LIFE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_WARLOCK_SIPHON_LIFE_HEAL, SPELL_WARLOCK_GLYPH_OF_SIPHON_LIFE });
         }
 
         bool CheckProc(ProcEventInfo& eventInfo)
@@ -934,9 +931,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_LIFE_TAP_ENERGIZE) || !sSpellMgr->GetSpellInfo(SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_WARLOCK_LIFE_TAP_ENERGIZE, SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2 });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1088,9 +1083,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_FEL_SYNERGY_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_WARLOCK_FEL_SYNERGY_HEAL });
         }
 
         bool CheckProc(ProcEventInfo& eventInfo)
@@ -1149,9 +1142,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_HAUNT_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_WARLOCK_HAUNT_HEAL });
         }
 
         void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -1192,9 +1183,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL });
         }
 
         void HandleDispel(DispelInfo* dispelInfo)
@@ -1233,9 +1222,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_CURSE_OF_DOOM_EFFECT))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_WARLOCK_CURSE_OF_DOOM_EFFECT });
         }
 
         bool Load() override
@@ -1360,9 +1347,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_GLYPH_OF_SHADOWFLAME))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_WARLOCK_GLYPH_OF_SHADOWFLAME });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
