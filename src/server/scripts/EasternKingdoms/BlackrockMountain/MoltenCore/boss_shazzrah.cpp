@@ -117,9 +117,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_SHAZZRAH_GATE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_SHAZZRAH_GATE });
         }
 
         void FilterTargets(std::list<WorldObject*>& targets)

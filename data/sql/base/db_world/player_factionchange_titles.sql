@@ -10,7 +10,9 @@ DROP TABLE IF EXISTS `player_factionchange_titles`;
 CREATE TABLE `player_factionchange_titles` 
 (
   `alliance_id` int(8) NOT NULL,
+  `alliance_comment` text DEFAULT NULL,
   `horde_id` int(8) NOT NULL,
+  `horde_comment` text DEFAULT NULL,
   PRIMARY KEY (`alliance_id`,`horde_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -18,28 +20,28 @@ CREATE TABLE `player_factionchange_titles`
 LOCK TABLES `player_factionchange_titles` WRITE;
 /*!40000 ALTER TABLE `player_factionchange_titles` DISABLE KEYS */;
 INSERT INTO `player_factionchange_titles` VALUES 
-(1,15),
-(2,16),
-(3,17),
-(4,18),
-(5,19),
-(6,20),
-(7,21),
-(8,22),
-(9,23),
-(10,24),
-(11,25),
-(12,26),
-(13,27),
-(14,28),
-(48,47),
-(75,76),
-(113,153),
-(126,127),
-(146,152),
-(147,154),
-(148,151),
-(149,150);
+(1,'Private <name>',15,'Scout <name>'),
+(2,'Corporal <name>',16,'Grunt <name>'),
+(3,'Sergeant <name>',17,'Sergeant <name>'),
+(4,'Master Sergeant <name>',18,'Senior Sergeant <name>'),
+(5,'Sergeant Major <name>',19,'First Sergeant <name>'),
+(6,'Knight <name>',20,'Stone Guard'),
+(7,'Knight-Lieutenant <name>',21,'Blood Guard <name>'),
+(8,'Knight-Captain <name>',22,'Legionnaire <name>'),
+(9,'Knight-Champion <name>',23,'Centurion <name>'),
+(10,'Lieutenant Commander <name>',24,'Champion <name>'),
+(11,'Commander <name>',25,'Lieutenant General <name>'),
+(12,'Marshal  <name>',26,'General <name>'),
+(13,'Field Marshal <name>',27,'Warlord <name>'),
+(14,'Grand Marshal <name>',28,'High Warlord <name>'),
+(48,'Justicar <name>',47,'Conqueror <name>'),
+(75,'Flame Warden <name>',76,'Flame Keeper <name>'),
+(113,'<name> of Gnomeregan',153,'<name> of Thunder Bluff'),
+(126,'<name> of the Alliance',127,'<name> if the Horde'),
+(146,'<name> of the Exodar',152,'<name> of Silvermoon'),
+(147,'<name> of Darnassus',154,'<name> of the Undercity'),
+(148,'<name> of Ironforge',151,'<name> of Sen\'jin'),
+(149,'<name> of Stormwind',150,'<name> of Orgrimmar');
 /*!40000 ALTER TABLE `player_factionchange_titles` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

@@ -950,9 +950,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WL_UNSTABLE_AFFL_DISPEL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_WL_UNSTABLE_AFFL_DISPEL });
         }
 
         void HandleDispel(DispelInfo* dispelInfo)
