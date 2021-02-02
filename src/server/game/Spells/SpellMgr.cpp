@@ -3306,6 +3306,14 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->manaPerSecond = 0;
     });
 
+    // Elixir of Detect Undead
+    ApplySpellFix({ 11389 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->powerType = POWER_MANA;
+        spellInfo->manaCost = 0;
+        spellInfo->manaPerSecond = 0;
+    });
+
     // Evergrove Druid Transform Crow
     ApplySpellFix({ 38776 }, [](SpellEntry* spellInfo)
     {
