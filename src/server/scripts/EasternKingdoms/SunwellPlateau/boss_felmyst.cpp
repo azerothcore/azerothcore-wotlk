@@ -276,7 +276,7 @@ public:
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     break;
                 case EVENT_LAND:
-                    me->GetMotionMaster()->MovePoint(POINT_GROUND, me->GetPositionX(), me->GetPositionY(), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), false, true);
+                    me->GetMotionMaster()->MovePoint(POINT_GROUND, me->GetPositionX(), me->GetPositionY(), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), false, true);
                     break;
                 case EVENT_SPELL_BERSERK:
                     Talk(YELL_BERSERK);
