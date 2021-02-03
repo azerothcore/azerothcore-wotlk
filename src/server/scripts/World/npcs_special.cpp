@@ -1994,7 +1994,6 @@ public:
 ## npc_experience
 ######*/
 
-#define EXP_COST                100000 //10 00 00 copper (10golds)
 #define GOSSIP_TEXT_EXP         14736
 #define GOSSIP_XP_OFF           "I no longer wish to gain experience."
 #define GOSSIP_XP_ON            "I wish to start gaining experience again."
@@ -2017,6 +2016,7 @@ public:
         ClearGossipMenuFor(player);
         bool noXPGain = player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
         bool doSwitch = false;
+        auto toggleXpCost = sWorld->getIntConfig(CONFIG_TOGGLE_XP_COST);
 
         switch (action)
         {
@@ -2035,16 +2035,18 @@ public:
         }
         if (doSwitch)
         {
-            if (!player->HasEnoughMoney(EXP_COST))
+            if (!player->HasEnoughMoney(toggleXpCost))
+            {
                 player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+            }
             else if (noXPGain)
             {
-                player->ModifyMoney(-EXP_COST);
+                player->ModifyMoney(-toggleXpCost);
                 player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
             }
             else if (!noXPGain)
             {
-                player->ModifyMoney(-EXP_COST);
+                player->ModifyMoney(-toggleXpCost);
                 player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
             }
         }
