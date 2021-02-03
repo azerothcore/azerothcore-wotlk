@@ -1109,6 +1109,9 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 if (!player)
                     return false;
 
+                if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_ENABLE))
+                    return false;
+
                 Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
                 if (!Bf || player->GetTeamId() != Bf->GetDefenderTeam() || Bf->IsWarTime())
                     return false;
@@ -1767,6 +1770,7 @@ void SpellMgr::LoadSpellProcEvents()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u extra spell proc event conditions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void SpellMgr::LoadSpellProcs()
@@ -3139,18 +3143,20 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_POSITIVE_TAKEN_BONUS;
                 break;
             case 65280: // Ulduar, Hodir, Singed
-            case 65775: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles
-            case 67861:
-            case 67862:
-            case 67863:
+            case 65775: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (10 normal)
+            case 67861: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (25 normal)
+            case 67862: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (10 heroic)
+            case 67863: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (25 heroic)
+            case 55604: // Naxxramas, Unrelenting Trainee, Death Plague (10 mode)
+            case 55645: // Naxxramas, Unrelenting Trainee, Death Plague (25 mode)
             case 67721: // Anub'arak, Nerubian Burrower, Expose Weakness (normal)
             case 67847: // Anub'arak, Nerubian Burrower, Expose Weakness (heroic)
             case 64638: // Ulduar, Winter Jormungar, Acidic Bite
             case 71157: // Icecrown Citadel, Plagued Zombie, Infected Wound
-            case 72963: // Icecrown Citadel, Valithria Dreamwalker, Flesh Rot (Rot Worm)
-            case 72964:
-            case 72965:
-            case 72966:
+            case 72963: // Icecrown Citadel, Rot Worm, Flesh Rot (10 normal)
+            case 72964: // Icecrown Citadel, Rot Worm, Flesh Rot (25 normal)
+            case 72965: // Icecrown Citadel, Rot Worm, Flesh Rot (10 heroic)
+            case 72966: // Icecrown Citadel, Rot Worm, Flesh Rot (25 heroic)
             case 72465: // Icecrown Citadel, Sindragosa, Respite for a Tormented Soul (weekly quest)
             case 45271: // Sunwell, Eredar Twins encounter, Dark Strike
             case 45347: // Sunwell, Eredar Twins encounter, Dark Touched
@@ -3296,6 +3302,14 @@ void SpellMgr::LoadDbcDataCorrections()
     // Elixir of Minor Fortitude
     ApplySpellFix({ 2378 }, [](SpellEntry* spellInfo)
     {
+        spellInfo->manaCost = 0;
+        spellInfo->manaPerSecond = 0;
+    });
+
+    // Elixir of Detect Undead
+    ApplySpellFix({ 11389 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->powerType = POWER_MANA;
         spellInfo->manaCost = 0;
         spellInfo->manaPerSecond = 0;
     });
@@ -3907,7 +3921,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Kindred Spirits, damage aura
     ApplySpellFix({ 57458 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_UNK21;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_DONT_REMOVE_IN_ARENA;
     });
 
     // Chimera Shot - Serpent trigger
@@ -5493,6 +5507,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectTriggerSpell[0] = 68766;
     });
 
+    // Killing Spree (Off hand damage)
+    ApplySpellFix({ 57842 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->rangeIndex = 2; // Melee Range
+    });
+
     // Trial of the Crusader, Jaraxxus Intro spell
     ApplySpellFix({ 67888 }, [](SpellEntry* spellInfo)
     {
@@ -6754,10 +6774,58 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectBasePoints[0] = 1; // corrects seat id (points - 1 = seatId)
     });
 
-    // The Iron Colossus
-    ApplySpellFix({ 56513, 56524 }, [](SpellEntry* spellInfo)
+    // Jormungar Strike
+    ApplySpellFix({ 56513 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->RecoveryTime = (spellInfo->Id == 56524 ? 6000 : 2000);
+        spellInfo->RecoveryTime = 2000;
+    });
+
+    ApplySpellFix({
+    37851, // Tag Greater Felfire Diemetradon
+    37918  // Arcano-pince
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 3000;
+    });
+
+    ApplySpellFix({
+        54997, // Cast Net (tooltip says 10s but sniffs say 6s)
+        56524  // Acid Breath
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 6000;
+    });
+
+    ApplySpellFix({
+        47911, // EMP
+        48620, // Wing Buffet
+        51752  // Stampy's Stompy-Stomp
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 10000;
+    });
+
+    ApplySpellFix({
+        37727, // Touch of Darkness
+        54996  // Ice Slick (tooltip says 20s but sniffs say 12s)
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 12000;
+    });
+
+    // Signal Helmet to Attack
+    ApplySpellFix({ 51748 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 15000;
+    });
+
+    ApplySpellFix({
+        51756, // Charge
+        37919, //Arcano-dismantle
+        37917  //Arcano-Cloak
+        }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->RecoveryTime = 20000;
     });
 
     // Kaw the Mammoth Destroyer

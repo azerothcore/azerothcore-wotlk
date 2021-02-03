@@ -1242,6 +1242,7 @@ public:
     [[nodiscard]] Item* GetItemByPos(uint16 pos) const;
     [[nodiscard]] Item* GetItemByPos(uint8 bag, uint8 slot) const;
     [[nodiscard]] Bag*  GetBagByPos(uint8 slot) const;
+    [[nodiscard]] uint32 GetFreeInventorySpace() const;
     [[nodiscard]] inline Item* GetUseableItemByPos(uint8 bag, uint8 slot) const //Does additional check for disarmed weapons
     {
         if (!CanUseAttackType(GetAttackBySlot(slot)))
@@ -2558,6 +2559,7 @@ public:
     bool SetHover(bool enable, bool packetOnly = false) override;
 
     [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
+    [[nodiscard]] bool CanEnterWater() const override { return true; }
 
     // OURS
     // saving
@@ -2605,6 +2607,17 @@ public:
     [[nodiscard]] SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
 
     static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
+
+    // Cinematic camera data and remote sight functions
+    [[nodiscard]] uint32 GetActiveCinematicCamera() const { return m_activeCinematicCameraId; }
+    void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { m_activeCinematicCameraId = cinematicCameraId; }
+    [[nodiscard]] bool IsOnCinematic() const { return (m_cinematicCamera != nullptr); }
+    void BeginCinematic();
+    void EndCinematic();
+    void UpdateCinematicLocation(uint32 diff);
+
+    std::string GetMapAreaAndZoneString();
+    std::string GetCoordsMapAreaAndZoneString();
 
 protected:
     // Gamemaster whisper whitelist
@@ -2955,6 +2968,14 @@ private:
     uint32 manaBeforeDuel;
 
     bool m_isInstantFlightOn;
+
+    // Remote location information
+    uint32 m_cinematicDiff;
+    uint32 m_lastCinematicCheck;
+    uint32 m_activeCinematicCameraId;
+    FlyByCameraCollection* m_cinematicCamera;
+    Position m_remoteSightPosition;
+    Creature* m_CinematicObject;
 };
 
 void AddItemsSetItem(Player* player, Item* item);

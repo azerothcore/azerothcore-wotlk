@@ -9,16 +9,16 @@ DROP TABLE IF EXISTS `creature_summon_groups`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `creature_summon_groups` 
 (
-  `summonerId` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `summonerType` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `groupId` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `position_x` float NOT NULL DEFAULT '0',
-  `position_y` float NOT NULL DEFAULT '0',
-  `position_z` float NOT NULL DEFAULT '0',
-  `orientation` float NOT NULL DEFAULT '0',
-  `summonType` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `summonTime` int(10) unsigned NOT NULL DEFAULT '0'
+  `summonerId` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `summonerType` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `groupId` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `position_x` float NOT NULL DEFAULT 0,
+  `position_y` float NOT NULL DEFAULT 0,
+  `position_z` float NOT NULL DEFAULT 0,
+  `orientation` float NOT NULL DEFAULT 0,
+  `summonType` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `summonTime` int(10) unsigned NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -543,7 +543,15 @@ INSERT INTO `creature_summon_groups` VALUES
 (23434,0,1,23435,-4075.08,1078.48,32.4796,5.25591,4,30000),
 (23434,0,1,23435,-4072.8,1082.43,33.3564,5.25591,4,30000),
 (23434,0,1,23435,-4068.49,1082.18,33.0106,5.25591,4,30000),
-(23434,0,1,23435,-4067.44,1085.14,33.8085,5.25591,4,30000);
+(23434,0,1,23435,-4067.44,1085.14,33.8085,5.25591,4,30000),
+(25804,0,0,25988,3286.08,5655.42,52.98,1.25,1,20000),
+(25804,0,0,25988,3291.2,5650.54,53.09,1.35,1,20000),
+(25804,0,0,25989,3285.02,5648.22,51.93,1.35,1,20000),
+(25804,0,0,25989,3290.59,5643.01,51.6,1.35,1,20000),
+(25804,0,0,25989,3296.2,5645.08,52.65,1.35,1,20000),
+(25804,0,0,25990,3292.17,5639.34,51.06,1.35,1,20000),
+(25804,0,0,25990,3286.03,5640.44,50.38,1.35,1,20000),
+(25804,0,0,25990,3279.33,5644,50.23,1.35,1,20000);
 /*!40000 ALTER TABLE `creature_summon_groups` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

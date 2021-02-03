@@ -358,9 +358,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_MOUNTING_CHECK))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_MOUNTING_CHECK });
         }
 
         void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
@@ -406,11 +404,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_MOTIVATE_1))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_MOTIVATE_2))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_MOTIVATE_1, SPELL_MOTIVATE_2 });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -463,12 +457,16 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_BREW) || !sSpellMgr->GetSpellInfo(SPELL_GHOSTLY) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_HEX1) || !sSpellMgr->GetSpellInfo(SPELL_HEX2) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_HEX3) || !sSpellMgr->GetSpellInfo(SPELL_GROW) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_LAUNCH))
-                return false;
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_BREW,
+                    SPELL_GHOSTLY,
+                    SPELL_HEX1,
+                    SPELL_HEX2,
+                    SPELL_HEX3,
+                    SPELL_GROW,
+                    SPELL_LAUNCH
+                });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
