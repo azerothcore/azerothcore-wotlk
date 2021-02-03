@@ -149,16 +149,16 @@ public:
 
     bool HasSrc() const { return GetTargetMask() & TARGET_FLAG_SOURCE_LOCATION; }
     bool HasDst() const { return GetTargetMask() & TARGET_FLAG_DEST_LOCATION; }
-    bool HasTraj() const { return m_Speed != 0; }
+    bool HasTraj() const { return m_speed != 0; }
 
     float GetElevation() const { return m_elevation; }
     void SetElevation(float elevation) { m_elevation = elevation; }
-    float GetSpeed() const { return m_Speed; }
-    void SetSpeed(float Speed) { m_Speed = Speed; }
+    float GetSpeed() const { return m_speed; }
+    void SetSpeed(float Speed) { m_speed = Speed; }
 
     float GetDist2d() const { return m_src._position.GetExactDist2d(&m_dst._position); }
-    float GetSpeedXY() const { return m_Speed * cos(m_elevation); }
-    float GetSpeedZ() const { return m_Speed * sin(m_elevation); }
+    float GetSpeedXY() const { return m_speed * cos(m_elevation); }
+    float GetSpeedZ() const { return m_speed * sin(m_elevation); }
 
     void Update(Unit* caster);
     void OutDebug() const;
@@ -185,7 +185,7 @@ private:
     SpellDestination m_src;
     SpellDestination m_dst;
 
-    float m_elevation, m_Speed;
+    float m_elevation, m_speed;
     std::string m_strTarget;
 
     // Xinef: Save channel data

@@ -128,7 +128,7 @@ public:
     bool IsExpired() const { return !GetDuration();}
     bool IsPermanent() const { return GetMaxDuration() == -1; }
 
-    uint8 GetCharges() const { return m_ProcCharges; }
+    uint8 GetCharges() const { return m_procCharges; }
     void SetCharges(uint8 charges);
     uint8 CalcMaxCharges(Unit* caster) const;
     uint8 CalcMaxCharges() const { return CalcMaxCharges(GetCaster()); }
@@ -241,7 +241,7 @@ protected:
     int32 m_updateTargetMapInterval;                    // Timer for UpdateTargetMapOfEffect
 
     uint8 const m_casterLevel;                          // Aura level (store caster level for correct show level dep amount)
-    uint8 m_ProcCharges;                                // Aura charges (0 for infinite)
+    uint8 m_procCharges;                                // Aura charges (0 for infinite)
     uint8 m_stackAmount;                                // Aura stack amount
 
     AuraEffect* m_effects[3];

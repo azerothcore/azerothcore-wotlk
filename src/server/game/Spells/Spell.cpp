@@ -103,7 +103,7 @@ void SpellDestination::RelocateOffset(Position const& offset)
     _position.RelocateOffset(offset);
 }
 
-SpellCastTargets::SpellCastTargets() : m_elevation(0), m_Speed(0), m_strTarget()
+SpellCastTargets::SpellCastTargets() : m_elevation(0), m_speed(0), m_strTarget()
 {
     m_objectTarget = nullptr;
     m_itemTarget = nullptr;
@@ -526,7 +526,7 @@ void SpellCastTargets::OutDebug() const
         sLog->outString("Destination location: transport guid:" UI64FMTD " trans offset: %s position: %s", m_dst._transportGUID, m_dst._transportOffset.ToString().c_str(), m_dst._position.ToString().c_str());
     if (m_targetMask & TARGET_FLAG_STRING)
         sLog->outString("String: %s", m_strTarget.c_str());
-    sLog->outString("Speed: %f", m_Speed);
+    sLog->outString("Speed: %f", m_speed);
     sLog->outString("elevation: %f", m_elevation);
 }
 
