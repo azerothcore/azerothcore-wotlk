@@ -400,7 +400,7 @@ Aura::Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* 
     m_spellInfo(spellproto), m_casterGuid(casterGUID ? casterGUID : caster->GetGUID()),
     m_castItemGuid(castItem ? castItem->GetGUID() : 0), m_castItemEntry(castItem ? castItem->GetEntry() : 0), m_applyTime(time(nullptr)),
     m_owner(owner), m_timeCla(0), m_updateTargetMapInterval(0),
-    m_casterLevel(caster ? caster->getLevel() : m_spellInfo->SpellLevel), m_procCharges(0), m_stackAmount(1),
+    m_casterLevel(caster ? caster->getLevel() : m_spellInfo->SpellLevel), m_ProcCharges(0), m_stackAmount(1),
     m_isRemoved(false), m_isSingleTarget(false), m_isUsingCharges(false)
 {
     if ((m_spellInfo->ManaPerSecond || m_spellInfo->ManaPerSecondPerLevel) && !m_spellInfo->HasAttribute(SPELL_ATTR2_HEALTH_FUNNEL))
@@ -408,8 +408,8 @@ Aura::Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* 
 
     m_maxDuration = CalcMaxDuration(caster);
     m_duration = m_maxDuration;
-    m_procCharges = CalcMaxCharges(caster);
-    m_isUsingCharges = m_procCharges != 0;
+    m_ProcCharges = CalcMaxCharges(caster);
+    m_isUsingCharges = m_ProcCharges != 0;
     memset(m_effects, 0, sizeof(m_effects));
     // m_casterLevel = cast item level/caster level, caster level should be saved to db, confirmed with sniffs
 }
@@ -772,22 +772,22 @@ void Aura::Update(uint32 diff, Unit* caster)
         if (m_duration < 0)
             m_duration = 0;
 
-        // handle manaPerSecond/manaPerSecondPerLevel
+        // handle ManaPerSecond/ManaPerSecondPerLevel
         if (m_timeCla)
         {
             if (m_timeCla > int32(diff))
                 m_timeCla -= diff;
             else if (caster)
             {
-                if (int32 manaPerSecond = m_spellInfo->ManaPerSecond + m_spellInfo->ManaPerSecondPerLevel * caster->getLevel())
+                if (int32 ManaPerSecond = m_spellInfo->ManaPerSecond + m_spellInfo->ManaPerSecondPerLevel * caster->getLevel())
                 {
                     m_timeCla += 1000 - diff;
 
                     Powers powertype = Powers(m_spellInfo->PowerType);
                     if (powertype == POWER_HEALTH)
                     {
-                        if (int32(caster->GetHealth()) > manaPerSecond)
-                            caster->ModifyHealth(-manaPerSecond);
+                        if (int32(caster->GetHealth()) > ManaPerSecond)
+                            caster->ModifyHealth(-ManaPerSecond);
                         else
                         {
                             Remove();
@@ -796,8 +796,8 @@ void Aura::Update(uint32 diff, Unit* caster)
                     }
                     else
                     {
-                        if (int32(caster->GetPower(powertype)) >= manaPerSecond)
-                            caster->ModifyPower(powertype, -manaPerSecond);
+                        if (int32(caster->GetPower(powertype)) >= ManaPerSecond)
+                            caster->ModifyPower(powertype, -ManaPerSecond);
                         else
                         {
                             Remove();
@@ -884,10 +884,10 @@ void Aura::RefreshTimersWithMods()
 
 void Aura::SetCharges(uint8 charges)
 {
-    if (m_procCharges == charges)
+    if (m_ProcCharges == charges)
         return;
-    m_procCharges = charges;
-    m_isUsingCharges = m_procCharges != 0;
+    m_ProcCharges = charges;
+    m_isUsingCharges = m_ProcCharges != 0;
     SetNeedClientUpdateForTargets();
 }
 
@@ -907,7 +907,7 @@ bool Aura::ModCharges(int32 num, AuraRemoveMode removeMode)
 {
     if (IsUsingCharges())
     {
-        int32 charges = m_procCharges + num;
+        int32 charges = m_ProcCharges + num;
         int32 maxCharges = CalcMaxCharges();
 
         // limit charges (only on charges increase, charges may be changed manually)
@@ -1146,8 +1146,8 @@ void Aura::SetLoadedState(int32 maxduration, int32 duration, int32 charges, uint
 {
     m_maxDuration = maxduration;
     m_duration = duration;
-    m_procCharges = charges;
-    m_isUsingCharges = m_procCharges != 0;
+    m_ProcCharges = charges;
+    m_isUsingCharges = m_ProcCharges != 0;
     m_stackAmount = stackamount;
     Unit* caster = GetCaster();
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -2077,7 +2077,7 @@ void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInf
     // take one charge, aura expiration will be handled in Aura::TriggerProcOnEvent (if needed)
     if (IsUsingCharges())
     {
-        --m_procCharges;
+        --m_ProcCharges;
         SetNeedClientUpdateForTargets();
     }
 

@@ -781,10 +781,10 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     TargetAuraState = spellEntry->TargetAuraState;
     CasterAuraStateNot = spellEntry->CasterAuraStateNot;
     TargetAuraStateNot = spellEntry->TargetAuraStateNot;
-    CasterAuraSpell = spellEntry->casterAuraSpell;
-    TargetAuraSpell = spellEntry->targetAuraSpell;
-    ExcludeCasterAuraSpell = spellEntry->excludeCasterAuraSpell;
-    ExcludeTargetAuraSpell = spellEntry->excludeTargetAuraSpell;
+    CasterAuraSpell = spellEntry->CasterAuraSpell;
+    TargetAuraSpell = spellEntry->TargetAuraSpell;
+    ExcludeCasterAuraSpell = spellEntry->ExcludeCasterAuraSpell;
+    ExcludeTargetAuraSpell = spellEntry->ExcludeTargetAuraSpell;
     CastTimeEntry = spellEntry->CastingTimeIndex ? sSpellCastTimesStore.LookupEntry(spellEntry->CastingTimeIndex) : nullptr;
     RecoveryTime = spellEntry->RecoveryTime;
     CategoryRecoveryTime = spellEntry->CategoryRecoveryTime;
@@ -793,22 +793,22 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     InterruptFlags = spellEntry->InterruptFlags;
     AuraInterruptFlags = spellEntry->AuraInterruptFlags;
     ChannelInterruptFlags = spellEntry->ChannelInterruptFlags;
-    ProcFlags = spellEntry->procFlags;
-    ProcChance = spellEntry->procChance;
-    ProcCharges = spellEntry->procCharges;
-    MaxLevel = spellEntry->maxLevel;
-    BaseLevel = spellEntry->baseLevel;
-    SpellLevel = spellEntry->spellLevel;
+    ProcFlags = spellEntry->ProcFlags;
+    ProcChance = spellEntry->ProcChance;
+    ProcCharges = spellEntry->ProcCharges;
+    MaxLevel = spellEntry->MaxLevel;
+    BaseLevel = spellEntry->BaseLevel;
+    SpellLevel = spellEntry->SpellLevel;
     DurationEntry = spellEntry->DurationIndex ? sSpellDurationStore.LookupEntry(spellEntry->DurationIndex) : nullptr;
-    PowerType = spellEntry->powerType;
-    ManaCost = spellEntry->manaCost;
-    ManaCostPerlevel = spellEntry->manaCostPerlevel;
-    ManaPerSecond = spellEntry->manaPerSecond;
-    ManaPerSecondPerLevel = spellEntry->manaPerSecondPerLevel;
+    PowerType = spellEntry->PowerType;
+    ManaCost = spellEntry->ManaCost;
+    ManaCostPerlevel = spellEntry->ManaCostPerlevel;
+    ManaPerSecond = spellEntry->ManaPerSecond;
+    ManaPerSecondPerLevel = spellEntry->ManaPerSecondPerLevel;
     ManaCostPercentage = spellEntry->ManaCostPercentage;
-    RuneCostID = spellEntry->runeCostID;
-    RangeEntry = spellEntry->rangeIndex ? sSpellRangeStore.LookupEntry(spellEntry->rangeIndex) : nullptr;
-    Speed = spellEntry->speed;
+    RuneCostID = spellEntry->RuneCostID;
+    RangeEntry = spellEntry->RangeIndex ? sSpellRangeStore.LookupEntry(spellEntry->RangeIndex) : nullptr;
+    Speed = spellEntry->Speed;
     StackAmount = spellEntry->StackAmount;
     for (uint8 i = 0; i < 2; ++i)
         Totem[i] = spellEntry->Totem[i];
@@ -824,7 +824,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     for (uint8 i = 0; i < 2; ++i)
         SpellVisual[i] = spellEntry->SpellVisual[i];
     SpellIconID = spellEntry->SpellIconID;
-    ActiveIconID = spellEntry->activeIconID;
+    ActiveIconID = spellEntry->ActiveIconID;
     for (uint8 i = 0; i < 16; ++i)
         SpellName[i] = spellEntry->SpellName[i];
     for (uint8 i = 0; i < 16; ++i)
@@ -2392,19 +2392,19 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
     // Shiv - costs 20 + weaponSpeed*10 energy (apply only to non-triggered spell with energy cost)
     if (AttributesEx4 & SPELL_ATTR4_SPELL_VS_EXTEND_COST)
     {
-        uint32 speed = 0;
+        uint32 Speed = 0;
         if (SpellShapeshiftEntry const* ss = sSpellShapeshiftStore.LookupEntry(caster->GetShapeshiftForm()))
-            speed = ss->attackSpeed;
+            Speed = ss->attackSpeed;
         else
         {
             WeaponAttackType slot = BASE_ATTACK;
             if (AttributesEx3 & SPELL_ATTR3_REQ_OFFHAND)
                 slot = OFF_ATTACK;
 
-            speed = caster->GetAttackTime(slot);
+            Speed = caster->GetAttackTime(slot);
         }
 
-        powerCost += speed / 100;
+        powerCost += Speed / 100;
     }
 
     // Apply cost mod by spell

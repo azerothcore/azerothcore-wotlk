@@ -149,16 +149,16 @@ public:
 
     bool HasSrc() const { return GetTargetMask() & TARGET_FLAG_SOURCE_LOCATION; }
     bool HasDst() const { return GetTargetMask() & TARGET_FLAG_DEST_LOCATION; }
-    bool HasTraj() const { return m_speed != 0; }
+    bool HasTraj() const { return m_Speed != 0; }
 
     float GetElevation() const { return m_elevation; }
     void SetElevation(float elevation) { m_elevation = elevation; }
-    float GetSpeed() const { return m_speed; }
-    void SetSpeed(float speed) { m_speed = speed; }
+    float GetSpeed() const { return m_Speed; }
+    void SetSpeed(float Speed) { m_Speed = Speed; }
 
     float GetDist2d() const { return m_src._position.GetExactDist2d(&m_dst._position); }
-    float GetSpeedXY() const { return m_speed * cos(m_elevation); }
-    float GetSpeedZ() const { return m_speed * sin(m_elevation); }
+    float GetSpeedXY() const { return m_Speed * cos(m_elevation); }
+    float GetSpeedZ() const { return m_Speed * sin(m_elevation); }
 
     void Update(Unit* caster);
     void OutDebug() const;
@@ -185,7 +185,7 @@ private:
     SpellDestination m_src;
     SpellDestination m_dst;
 
-    float m_elevation, m_speed;
+    float m_elevation, m_Speed;
     std::string m_strTarget;
 
     // Xinef: Save channel data
@@ -427,7 +427,7 @@ public:
     SpellCastResult CheckSpellFocus();
     SpellCastResult CheckRange(bool strict);
     SpellCastResult CheckPower();
-    SpellCastResult CheckRuneCost(uint32 runeCostID);
+    SpellCastResult CheckRuneCost(uint32 RuneCostID);
     SpellCastResult CheckCasterAuras(bool preventionOnly) const;
 
     int32 CalculateSpellDamage(uint8 i, Unit const* target) const { return m_caster->CalculateSpellDamage(target, m_spellInfo, i, &m_spellValue->EffectBasePoints[i]); }
@@ -455,7 +455,7 @@ public:
     void SendSpellGo();
     void SendSpellCooldown();
     void SendLogExecute();
-    void ExecuteLogEffectTakeTargetPower(uint8 effIndex, Unit* target, uint32 powerType, uint32 powerTaken, float gainMultiplier);
+    void ExecuteLogEffectTakeTargetPower(uint8 effIndex, Unit* target, uint32 PowerType, uint32 powerTaken, float gainMultiplier);
     void ExecuteLogEffectExtraAttacks(uint8 effIndex, Unit* victim, uint32 attCount);
     void ExecuteLogEffectInterruptCast(uint8 effIndex, Unit* victim, uint32 spellId);
     void ExecuteLogEffectDurabilityDamage(uint8 effIndex, Unit* victim, int32 itemId, int32 slot);
