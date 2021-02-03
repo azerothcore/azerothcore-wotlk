@@ -154,7 +154,7 @@ public:
     float GetElevation() const { return m_elevation; }
     void SetElevation(float elevation) { m_elevation = elevation; }
     float GetSpeed() const { return m_speed; }
-    void SetSpeed(float Speed) { m_speed = Speed; }
+    void SetSpeed(float speed) { m_speed = speed; }
 
     float GetDist2d() const { return m_src._position.GetExactDist2d(&m_dst._position); }
     float GetSpeedXY() const { return m_speed * cos(m_elevation); }
