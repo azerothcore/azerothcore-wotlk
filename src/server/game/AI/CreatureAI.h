@@ -71,6 +71,9 @@ public:
 
     ~CreatureAI() override {}
 
+    void MoveCircleChecks();
+    void MoveBackwardsChecks();
+
     /// == Reactions At =================================
 
     // Called if IsVisible(Unit* who) is true at each who move, reaction at visibility zone enter
