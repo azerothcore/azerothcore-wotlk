@@ -1,4 +1,4 @@
-/*
+    /*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -2447,10 +2447,12 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
                         TempSummonType summonType = (duration <= 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
 
+                        uint32 currMinionsCount = m_caster->m_Controlled.size();
+                        uint32 totalNumGuardians = numSummons + currMinionsCount;
                         for (uint32 count = 0; count < numSummons; ++count)
                         {
                             Position pos;
-                            if (count == 0)
+                            if (totalNumGuardians == 1)
                                 pos = *destTarget;
                             else
                                 // randomize position for multiple summons
@@ -5070,7 +5072,7 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
                 m_caster->GetFirstCollisionPosition(pos, dist, angle);
             }
 
-            m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + 0.5f);
+            m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
         }
     }
 
@@ -6069,16 +6071,24 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
     Map* map = caster->GetMap();
     TempSummon* summon = nullptr;
 
+    uint32 currMinionsCount = m_caster->m_Controlled.size();
+    uint32 totalNumGuardians = numGuardians + currMinionsCount;
+
     for (uint32 count = 0; count < numGuardians; ++count)
     {
         Position pos;
 
-        // xinef: do not use precalculated position for effect summon pet in this function, it means it was cast by NPC and should have its position overridden
-        if (count == 0 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET)
+        // xinef: do not use precalculated position for effect summon pet in this function
+        // it means it was cast by NPC and should have its position overridden
+        if (totalNumGuardians == 1 && GetSpellInfo()->Effects[i].Effect != SPELL_EFFECT_SUMMON_PET)
+        {
             pos = *destTarget;
+        }
         else
-            // randomize position for multiple summons
+        {
+            // randomize position
             m_caster->GetRandomPoint(*destTarget, radius, pos);
+        }
 
         summon = map->SummonCreature(entry, pos, properties, duration, caster, m_spellInfo->Id);
         if (!summon)
@@ -6088,8 +6098,8 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
         summon->SetLevel(summonLevel);
 
         // xinef: if we have more than one guardian, change follow angle
-        if (summon->HasUnitTypeMask(UNIT_MASK_MINION) && numGuardians > 1)
-            ((Minion*)summon)->SetFollowAngle(PET_FOLLOW_ANGLE + (count * M_PI / (numGuardians - 1)));
+        if (summon->HasUnitTypeMask(UNIT_MASK_MINION) && totalNumGuardians > 1)
+            ((Minion*)summon)->SetFollowAngle(m_caster->GetAbsoluteAngle(pos.GetPositionX(), pos.GetPositionY()));
         //else if (summon->HasUnitTypeMask(UNIT_MASK_MINION) && m_targets.HasDst())
         //    ((Minion*)summon)->SetFollowAngle(m_caster->GetAngle(summon));
 
