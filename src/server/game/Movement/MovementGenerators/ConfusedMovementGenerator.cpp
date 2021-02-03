@@ -90,7 +90,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
 template<>
 void ConfusedMovementGenerator<Creature>::_InitSpecific(Creature* creature, bool& is_water_ok, bool& is_land_ok)
 {
-    is_water_ok = creature->CanSwim();
+    is_water_ok = creature->CanEnterWater();
     is_land_ok  = creature->CanWalk();
 }
 

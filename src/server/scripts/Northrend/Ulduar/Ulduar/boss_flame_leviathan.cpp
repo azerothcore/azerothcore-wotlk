@@ -1383,7 +1383,7 @@ public:
             {
                 float x, y, z;
                 me->GetPosition(x, y, z);
-                z = me->GetMap()->GetHeight(me->GetPhaseMask(), x, y, z);
+                z = me->GetMapHeight(x, y, z);
                 me->GetMotionMaster()->MovePoint(me->GetEntry(), x, y, z);
                 me->SetPosition(x, y, z, 0);
             }

@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `character_declinedname`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `character_declinedname` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
+  `guid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
   `genitive` varchar(15) NOT NULL DEFAULT '',
   `dative` varchar(15) NOT NULL DEFAULT '',
   `accusative` varchar(15) NOT NULL DEFAULT '',
