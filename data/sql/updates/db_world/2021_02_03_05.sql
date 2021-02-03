@@ -20,8 +20,8 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1610314669347459800');
 
 DELETE FROM `creature_loot_template` WHERE `Entry` IN (2956,2957,3068) AND `Item` IN (33009);
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(2956, 33009, 0, 50, 1, 1, 0, 1, 1, 'Adult Plainstrider - Tender Strider Meat');
-(2957, 33009, 0, 50, 1, 1, 0, 1, 1, 'Elder Plainstrider - Tender Strider Meat');
+(2956, 33009, 0, 50, 1, 1, 0, 1, 1, 'Adult Plainstrider - Tender Strider Meat'),
+(2957, 33009, 0, 50, 1, 1, 0, 1, 1, 'Elder Plainstrider - Tender Strider Meat'),
 (3068, 33009, 0, 50, 1, 1, 0, 1, 1, 'Mazzranache - Tender Strider Meat');
 
 -- Remove 'Get In' Icon on Refurbished Steam Tank
