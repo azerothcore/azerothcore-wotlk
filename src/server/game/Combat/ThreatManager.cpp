@@ -296,13 +296,12 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
     HostileReference* currentRef = nullptr;
     bool found = false;
     bool noPriorityTargetFound = false;
-    uint32 currTime = sWorld->GetGameTime();
 
     // pussywizard: currentVictim is needed to compare if threat was exceeded by 10%/30% for melee/range targets (only then switching current target)
     if (currentVictim)
     {
         Unit* cvUnit = currentVictim->getTarget();
-        if (!attacker->_CanDetectFeignDeathOf(cvUnit) || !attacker->CanCreatureAttack(cvUnit) || attacker->isTargetNotAcceptableByMMaps(cvUnit->GetGUID(), currTime, cvUnit)) // pussywizard: if currentVictim is not valid => don't compare the threat with it, just take the highest threat valid target
+        if (!attacker->_CanDetectFeignDeathOf(cvUnit) || !attacker->CanCreatureAttack(cvUnit)) // pussywizard: if currentVictim is not valid => don't compare the threat with it, just take the highest threat valid target
             currentVictim = nullptr;
         else if (cvUnit->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()) || cvUnit->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE)) // pussywizard: no 10%/30% if currentVictim is immune to damage or has auras breakable by damage
             currentVictim = nullptr;
@@ -337,7 +336,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
         }
 
         // pussywizard: skip not valid targets
-        if (attacker->_CanDetectFeignDeathOf(target) && attacker->CanCreatureAttack(target) && !attacker->isTargetNotAcceptableByMMaps(target->GetGUID(), currTime, target))
+        if (attacker->_CanDetectFeignDeathOf(target) && attacker->CanCreatureAttack(target))
         {
             if (currentVictim) // pussywizard: if not NULL then target must have 10%/30% more threat
             {
