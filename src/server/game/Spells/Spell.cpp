@@ -526,7 +526,7 @@ void SpellCastTargets::OutDebug() const
         sLog->outString("Destination location: transport guid:" UI64FMTD " trans offset: %s position: %s", m_dst._transportGUID, m_dst._transportOffset.ToString().c_str(), m_dst._position.ToString().c_str());
     if (m_targetMask & TARGET_FLAG_STRING)
         sLog->outString("String: %s", m_strTarget.c_str());
-    sLog->outString("Speed: %f", m_speed);
+    sLog->outString("speed: %f", m_speed);
     sLog->outString("elevation: %f", m_elevation);
 }
 
@@ -862,9 +862,9 @@ void Spell::SelectSpellTargets()
     {
         if (m_targets.HasTraj())
         {
-            float Speed = m_targets.GetSpeedXY();
-            if (Speed > 0.0f)
-                m_delayTrajectory = (uint64)floor(m_targets.GetDist2d() / Speed * 1000.0f);
+            float speed = m_targets.GetSpeedXY();
+            if (speed > 0.0f)
+                m_delayTrajectory = (uint64)floor(m_targets.GetDist2d() / speed * 1000.0f);
         }
         else if (m_spellInfo->Speed > 0.0f)
         {
@@ -2186,7 +2186,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     else
         targetInfo.missCondition = SPELL_MISS_EVADE; //SPELL_MISS_NONE;
 
-    // Spell have Speed - need calculate incoming time
+    // Spell have speed - need calculate incoming time
     // Incoming time is zero for self casts. At least I think so.
     if (m_spellInfo->Speed > 0.0f && m_caster != target)
     {
@@ -2288,7 +2288,7 @@ void Spell::AddGOTarget(GameObject* go, uint32 effectMask)
     target.effectMask = effectMask;
     target.processed  = false;                              // Effects not apply on target
 
-    // Spell have Speed - need calculate incoming time
+    // Spell have speed - need calculate incoming time
     if (m_spellInfo->Speed > 0.0f)
     {
         // calculate spell incoming interval
