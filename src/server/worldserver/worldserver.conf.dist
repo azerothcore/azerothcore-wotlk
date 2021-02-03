@@ -1950,6 +1950,22 @@ ListenRange.Yell = 300
 
 WaypointMovementStopTimeForPlayer = 120
 
+#    NpcEvadeIfTargetIsUnreachable
+#        Description: Specifies the time (in seconds) that a creature whom target
+#                     is unreachable to end up in evade mode.
+#        Default:     5
+
+NpcEvadeIfTargetIsUnreachable = 5
+
+#    NpcRegenHPIfTargetIsUnreachable
+#        Description: Regenerates HP for Creatures in Raids if they cannot reach the target.
+#                     Keep disabled if you are experiencing mmaps/pathing issues.
+#
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+NpcRegenHPIfTargetIsUnreachable = 1
+
 #
 ###################################################################################################
 
@@ -3225,15 +3241,13 @@ ItemDelete.ItemLevel = 80
 PlayerStart.AllReputation = 0
 
 #
-#    PlayerStart.AllSpells
-#        Description: If enabled, players will start with all their class spells (not talents).
-#                     You must populate playercreateinfo_spell_custom table with the spells you
-#                     want, or this will not work! The table has data for all classes / races up
-#                     to TBC expansion.
+#    PlayerStart.CustomSpells
+#        Description: If enabled, players will ignore spells from playercreateinfo_spellstart at character
+#                     creation and will start with spells from the table playercreateinfo_spell_custom instead.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-PlayerStart.AllSpells = 0
+PlayerStart.CustomSpells = 0
 
 #
 #    PlayerStart.MapsExplored
@@ -3301,6 +3315,14 @@ PvPToken.ItemCount = 1
 #                     1 - (Enabled)
 
 NoResetTalentsCost = 0
+
+#
+#    ToggleXP.Cost
+#        Description: Cost of locking/unlocking XP
+#        Default:     100000 - (10 Gold)
+#
+
+ToggleXP.Cost = 100000
 
 #
 #     Guild.AllowMultipleGuildMaster

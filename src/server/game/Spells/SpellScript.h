@@ -110,6 +110,20 @@ public:
     // Function called when script is destroyed
     // use for: deallocating memory allocated by script
     virtual void Unload() {}
+    // Helpers
+    static bool ValidateSpellInfo(std::initializer_list<uint32> spellIds)
+    {
+        return _ValidateSpellInfo(spellIds.begin(), spellIds.end());
+    }
+
+    template <class T>
+    static bool ValidateSpellInfo(T const& spellIds)
+    {
+        return _ValidateSpellInfo(std::begin(spellIds), std::end(spellIds));
+    }
+
+private:
+    static bool _ValidateSpellInfo(uint32 const* begin, uint32 const* end);
 };
 
 // SpellScript interface - enum used for runtime checks of script function calls

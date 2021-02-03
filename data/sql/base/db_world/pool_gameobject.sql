@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `pool_gameobject`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `pool_gameobject` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT '0',
-  `pool_entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `chance` float unsigned NOT NULL DEFAULT '0',
+  `guid` int(10) unsigned NOT NULL DEFAULT 0,
+  `pool_entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `chance` float unsigned NOT NULL DEFAULT 0,
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`guid`),
   KEY `idx_guid` (`guid`)
@@ -12540,7 +12540,6 @@ INSERT INTO `pool_gameobject` VALUES
 (64916,993,0,'Silverleaf zone 12, node 143'),
 (64918,969,0,'Silverleaf zone 3433, node 94'),
 (64921,993,0,'Silverleaf zone 12, node 144'),
-(64922,5217,5,'Saronite'),
 (64923,969,0,'Silverleaf zone 3433, node 95'),
 (64924,970,0,'Silverleaf zone 3430, node 118'),
 (64925,970,0,'Silverleaf zone 3430, node 119'),

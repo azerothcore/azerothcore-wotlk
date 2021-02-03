@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `pool_template`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `pool_template` 
 (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Pool entry',
-  `max_limit` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Max number of objects (0) is no limit',
+  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Pool entry',
+  `max_limit` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Max number of objects (0) is no limit',
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -467,7 +467,7 @@ INSERT INTO `pool_template` VALUES
 (978,35,'MASTER Herbs Blade\'s Edge Mountains zone 3522'),
 (979,15,'MASTER Herbs Wintergrasp zone 4197'),
 (980,40,'MASTER Herbs Icecrown zone 210'),
-(981,35,'MASTER Herbs Storm Peaks zone 67'),
+(981,70,'MASTER Herbs Storm Peaks zone 67'),
 (982,40,'MASTER Herbs Sholazar Basin zone 3711'),
 (983,40,'MASTER Herbs Zul\'drak zone 66'),
 (984,20,'MASTER Herbs Grizzly Hills zone 394'),
@@ -2148,6 +2148,10 @@ INSERT INTO `pool_template` VALUES
 (5253,1,'Cobalt Dragonblight'),
 (5254,1,'Cobalt Dragonblight'),
 (5255,1,'Cobalt Dragonblight'),
+(5450,1,'Icecrown 189980, node 3'),
+(5506,1,'Icecrown 189980, node 59'),
+(5517,1,'Icecrown 189981, node 70'),
+(5608,1,'Icecrown 189980, node 161'),
 (5617,1,'Wintergrasp mineral, node 1'),
 (5618,1,'Wintergrasp mineral, node 2'),
 (5619,1,'Wintergrasp mineral, node 3'),
@@ -3074,6 +3078,8 @@ INSERT INTO `pool_template` VALUES
 (60000,1,'Gondria (33776)'),
 (60001,1,'loquenahak (32517)'),
 (60003,1,'Lake Frog (33224)'),
+(201117,1,'Crystalweb Weaver Spawn (1 out of 3) - Attack Snowblind Digger camp'),
+(201212,1,'Serfex the Reaver Spawn (1 out 4)'),
 (202482,1,'Razormaw Matriarch\'s Nest (202083)');
 /*!40000 ALTER TABLE `pool_template` ENABLE KEYS */;
 UNLOCK TABLES;
