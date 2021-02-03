@@ -354,9 +354,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_ASPECT_OF_THE_BEAST_PET))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_HUNTER_ASPECT_OF_THE_BEAST_PET });
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -416,12 +414,13 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_ASPECT_OF_THE_VIPER_ENERGIZE) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_HUNTER_GLYPH_OF_ASPECT_OF_THE_VIPER) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_HUNTER_VIPER_ATTACK_SPEED) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_HUNTER_VICIOUS_VIPER))
-                return false;
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_HUNTER_ASPECT_OF_THE_VIPER_ENERGIZE,
+                    SPELL_HUNTER_GLYPH_OF_ASPECT_OF_THE_VIPER,
+                    SPELL_HUNTER_VIPER_ATTACK_SPEED,
+                    SPELL_HUNTER_VICIOUS_VIPER
+                });
         }
 
         bool CheckProc(ProcEventInfo& procInfo)
@@ -487,9 +486,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_CHIMERA_SHOT_SERPENT) || !sSpellMgr->GetSpellInfo(SPELL_HUNTER_CHIMERA_SHOT_VIPER) || !sSpellMgr->GetSpellInfo(SPELL_HUNTER_CHIMERA_SHOT_SCORPID))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_HUNTER_CHIMERA_SHOT_SERPENT, SPELL_HUNTER_CHIMERA_SHOT_VIPER, SPELL_HUNTER_CHIMERA_SHOT_SCORPID });
         }
 
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
@@ -584,9 +581,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_IMPROVED_MEND_PET))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_HUNTER_IMPROVED_MEND_PET });
         }
 
         bool CheckProc(ProcEventInfo& /*eventInfo*/)
@@ -624,9 +619,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_INVIGORATION_TRIGGERED))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_HUNTER_INVIGORATION_TRIGGERED });
         }
 
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
@@ -661,9 +654,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_PET_LAST_STAND_TRIGGERED))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_HUNTER_PET_LAST_STAND_TRIGGERED });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -695,11 +686,9 @@ public:
     {
         PrepareSpellScript(spell_hun_masters_call_SpellScript);
 
-        bool Validate(SpellInfo const* spellInfo) override
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_MASTERS_CALL_TRIGGERED) || !sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].CalcValue()) || !sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_1].CalcValue()))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_HUNTER_MASTERS_CALL_TRIGGERED });
         }
 
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
@@ -835,9 +824,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_SNIPER_TRAINING_R1) || !sSpellMgr->GetSpellInfo(SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_HUNTER_SNIPER_TRAINING_R1, SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1 });
         }
 
         void HandlePeriodic(AuraEffect const* aurEff)
@@ -900,9 +887,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_TRIGGERED) || !sSpellMgr->GetSpellInfo(SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_TRIGGERED, SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX_DEBUFF });
         }
 
         SpellCastResult CheckCast()
@@ -958,9 +943,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_PET_CARRION_FEEDER_TRIGGERED))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_HUNTER_PET_CARRION_FEEDER_TRIGGERED });
         }
 
         SpellCastResult CheckIfCorpseNear()
@@ -1008,9 +991,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_MISDIRECTION_PROC))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_HUNTER_MISDIRECTION_PROC });
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1185,10 +1166,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_HUNTER_ASPECT_OF_THE_VIPER) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_HUNTER_VICIOUS_VIPER))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_HUNTER_ASPECT_OF_THE_VIPER, SPELL_HUNTER_VICIOUS_VIPER });
         }
 
         void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
