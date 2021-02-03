@@ -511,16 +511,8 @@ void ObjectMgr::LoadCreatureTemplates()
         // lfm gossip from trinitycore
         if (creatureTemplate.GossipMenuId == 0)
         {
-            if (creatureTemplate.Entry == 234)
-            {
-                bool breakPoint = true;
-            }
             uint32 tcID = creatureTemplate.Entry + 100000;
             creatureTemplate.GossipMenuId = tcID;
-            //if (_gossipMenusStore.find(tcID) != _gossipMenusStore.end())
-            //{
-            //    creatureTemplate.GossipMenuId = tcID;
-            //}
         }
 
         creatureTemplate.minlevel = fields[14].GetUInt8();
