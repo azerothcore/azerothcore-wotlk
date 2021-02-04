@@ -15,7 +15,7 @@ DELETE FROM `creature` WHERE `guid` IN (247711);
 -- Inserting missing mob in pack 1 (this one is suppose to be here)
 DELETE FROM `creature` WHERE `guid`=247726;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`) VALUES 
-(247726, 13036, 429, 0, 0, 1, 1, 0, 0, 293.428,  22.3743, -3.91569, 1.70123, 86400, 0, 0, 3998, 0, 2, 0, 0, 0, '');
+(247726, 13036, 429, 0, 0, 1, 1, 0, 0, 293.428,  22.3743, -3.91569, 1.70123, 86400, 0, 0, 3998, 0, 0, 0, 0, 0, '');
 
 -- Corrected Spawn Position & Gave him MovementType id 2 (Waypoint id: 247709)
 UPDATE creature SET `position_x`= 307.35, `position_y`= -9.58133, `position_z`= -3.88598, `orientation`= 4.65288, `MovementType`= 2 WHERE guid = 247709;
