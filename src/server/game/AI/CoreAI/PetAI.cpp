@@ -603,7 +603,7 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
         if (chase)
         {
-            if (_canMeleeAttack())
+            if (_canMeleeAttack() || (isPet() && !isVictim())
             {
                 float angle = combatRange == 0.f && target->GetTypeId() != TYPEID_PLAYER && !target->IsPet() ? float(M_PI) : 0.f;
                 float tolerance = combatRange == 0.f ? float(M_PI_4) : float(M_PI * 2);
