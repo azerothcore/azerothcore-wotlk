@@ -19732,18 +19732,18 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         for (const ProgressionRequirement* itemRequirement : ar->items)
         {
             Player* checkPlayer = this;
-            std::vector<const ProgressionRequirement*>& missingItems = missingPlayerItems;
+            std::vector<const ProgressionRequirement*>* missingItems = &missingPlayerItems;
             if (itemRequirement->checkLeaderOnly)
             {
                 checkPlayer = partyLeader;
-                missingItems = missingLeaderItems;
+                missingItems = &missingLeaderItems;
             }
 
             if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == checkPlayer->GetTeamId(true))
             {
                 if (!checkPlayer->HasItemCount(itemRequirement->id, 1))
                 {
-                    missingItems.push_back(itemRequirement);
+                    missingItems->push_back(itemRequirement);
                 }
             }
         }
@@ -19754,18 +19754,18 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         for (const ProgressionRequirement* achievementRequirement : ar->achievements)
         {
             Player* checkPlayer = this;
-            std::vector<const ProgressionRequirement*>& missingAchievements = missingPlayerAchievements;
+            std::vector<const ProgressionRequirement*>* missingAchievements = &missingPlayerAchievements;
             if(achievementRequirement->checkLeaderOnly)
             {
                 checkPlayer = partyLeader;
-                missingAchievements = missingLeaderAchievements;
+                missingAchievements = &missingLeaderAchievements;
             }
 
             if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == GetTeamId(true))
             {
                 if (!checkPlayer || !checkPlayer->HasAchieved(achievementRequirement->id))
                 {
-                    missingAchievements.push_back(achievementRequirement);
+                    missingAchievements->push_back(achievementRequirement);
                 }
             }
         }
@@ -19776,18 +19776,18 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         for (const ProgressionRequirement* questRequirement : ar->quests)
         {
             Player* checkPlayer = this;
-            std::vector<const ProgressionRequirement*>& missingQuests = missingPlayerQuests;
+            std::vector<const ProgressionRequirement*>* missingQuests = &missingPlayerQuests;
             if (questRequirement->checkLeaderOnly)
             {
                 checkPlayer = partyLeader;
-                missingQuests = missingLeaderQuests;
+                missingQuests = &missingLeaderQuests;
             }
 
             if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == checkPlayer->GetTeamId(true))
             {
                 if (!checkPlayer->GetQuestRewardStatus(questRequirement->id))
                 {
-                    missingQuests.push_back(questRequirement);
+                    missingQuests->push_back(questRequirement);
                 }
             }
         }

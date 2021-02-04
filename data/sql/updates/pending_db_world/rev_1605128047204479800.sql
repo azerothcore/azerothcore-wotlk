@@ -146,7 +146,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (887, 'To be able to enter, your equipment\'s average item level must be superior or equal to %u. Your current equipment\'s average ilevel is: %u.'),
 (888, 'You must be below level %u to enter.'),
 (889, 'To enter, the group leader must have completed the following quest(s):'),
-(890, 'To enter, the group leader must have completed  the following achievement(s):'),
+(890, 'To enter, the group leader must have completed the following achievement(s):'),
 (891, 'To enter, the group leader must have have the following item(s) in their inventory:');
 
 -- Update old command
