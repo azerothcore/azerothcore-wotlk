@@ -131,3 +131,4 @@ INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event
 DELETE FROM conditions WHERE SourceTypeOrReferenceId = 22 AND SourceEntry = 14386 AND SourceId = 0;
 
 -- Dire Maul North end
+
