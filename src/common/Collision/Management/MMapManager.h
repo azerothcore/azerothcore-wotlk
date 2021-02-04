@@ -9,7 +9,7 @@
 
 #include "DetourAlloc.h"
 #include "DetourNavMesh.h"
-#include "DetourNavMeshQuery.h"
+#include "DetourExtended.h"
 #include "World.h"
 #include <unordered_map>
 

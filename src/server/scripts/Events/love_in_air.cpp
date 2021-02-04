@@ -737,9 +737,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_SERVICE_UNIFORM))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_SERVICE_UNIFORM });
         }
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
