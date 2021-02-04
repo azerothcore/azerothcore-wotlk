@@ -581,9 +581,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(_triggerId))
-                return false;
-            return true;
+            return ValidateSpellInfo({ _triggerId });
         }
 
         void HandleTrigger()
