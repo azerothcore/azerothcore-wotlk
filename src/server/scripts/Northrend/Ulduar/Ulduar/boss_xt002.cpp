@@ -152,7 +152,7 @@ public:
             _nerfAchievement = true;
             _gravityAchievement = true;
 
-            me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND); // emerge
+            me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
 
@@ -262,7 +262,7 @@ public:
                 me->SetLootMode(3); // hard mode + normal loot
                 me->SetMaxHealth(me->GetMaxHealth());
                 me->SetHealth(me->GetMaxHealth());
-                me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND); // emerge
+                me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
 
                 me->CastSpell(me, SPELL_HEARTBREAK, true);
 
@@ -314,7 +314,7 @@ public:
                     {
                         _healthCheck -= 25;
                         me->SetControlled(true, UNIT_STATE_STUNNED);
-                        me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_SUBMERGED); // submerge with animation
+                        me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_SUBMERGED); // submerge with animation
 
                         me->MonsterYell("So tired. I will rest for just a moment!", LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(XT_SOUND_HEART_OPEN);
@@ -373,7 +373,7 @@ public:
                     me->MonsterYell("I'm ready to play!", LANG_UNIVERSAL, 0);
                     me->PlayDirectSound(XT_SOUND_HEART_CLOSED);
 
-                    me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_STAND); // emerge
+                    me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
                     // Hide heart
                     if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
                         heart->GetAI()->DoAction(ACTION_HIDE_HEART);

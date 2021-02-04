@@ -147,9 +147,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_PRIEST_GLYPH_OF_CIRCLE_OF_HEALING))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_PRIEST_GLYPH_OF_CIRCLE_OF_HEALING });
         }
 
         void FilterTargets(std::list<WorldObject*>& targets)
@@ -189,9 +187,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_PRIEST_DIVINE_AEGIS))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_PRIEST_DIVINE_AEGIS });
         }
 
         bool CheckProc(ProcEventInfo& eventInfo)
@@ -274,9 +270,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_PRIEST_GLYPH_OF_PRAYER_OF_HEALING_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_PRIEST_GLYPH_OF_PRAYER_OF_HEALING_HEAL });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -314,9 +308,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_PRIEST_GUARDIAN_SPIRIT_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_PRIEST_GUARDIAN_SPIRIT_HEAL });
         }
 
         bool Load() override
@@ -405,9 +397,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_PRIEST_ITEM_EFFICIENCY))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_PRIEST_ITEM_EFFICIENCY });
         }
 
         bool CheckProc(ProcEventInfo& eventInfo)
@@ -510,9 +500,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_PRIEST_MANA_LEECH_PROC))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_PRIEST_MANA_LEECH_PROC });
         }
 
         bool Load() override
@@ -740,11 +728,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_PRIEST_REFLECTIVE_SHIELD_TRIGGERED))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_PRIEST_REFLECTIVE_SHIELD_R1))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_PRIEST_REFLECTIVE_SHIELD_TRIGGERED, SPELL_PRIEST_REFLECTIVE_SHIELD_R1 });
         }
 
         void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& canBeRecalculated)
@@ -940,9 +924,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL });
         }
 
         void HandleDispel(DispelInfo* /*dispelInfo*/)

@@ -358,7 +358,7 @@ public:
                     break;
                 case EVENT_AXE_RETURN:
                     if (Creature* c = ObjectAccessor::GetCreature(*me, ThrowGUID))
-                        c->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 0.5f);
+                        c->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                     events.RescheduleEvent(EVENT_AXE_PICKUP, 1500);
                     break;
                 case EVENT_AXE_PICKUP:
