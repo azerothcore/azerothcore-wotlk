@@ -1,9 +1,7 @@
-build*/
-var/*
-data/contrib/*
-data/doc/*
+data/*
+!data/sql
 conf/*
 !conf/dist
-docker/worldserver/data/*
+docker/server/data/*
 .idea
 cmake-build-debug/*

@@ -43,4 +43,3 @@ The total amount of RAM when running all AzerothCore docker containers is **less
 Usind Docker will have the same benefits as using virtual machines, but with much less overhead:
 
 ![Docker containers vs Virtual machines](https://user-images.githubusercontent.com/75517/51078179-d4fec680-16b1-11e9-8ce6-87b5053f55dd.png)
-

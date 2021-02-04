@@ -36,7 +36,7 @@ jobs:
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
       COMPILER: ${{ matrix.compiler }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'tony-engineering/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Checkout modules
@@ -77,7 +77,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     needs: [build]
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && success()
+    if: github.repository == 'tony-engineering/azerothcore-wotlk' && success()
     steps:
       - uses: actions/checkout@v2
       - name: Cache
@@ -102,7 +102,7 @@ jobs:
       fail-fast: false
     runs-on: windows-2019
     name: windows-2019-MSVC16
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'tony-engineering/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Configure OS
@@ -124,56 +124,63 @@ jobs:
           name: windows-2019-MSVC16-release
           path: build/bin/Release
 
-  docker-build:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+  server-build-test-push:
+    environment: Development
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Configure
+      - 
+        uses: actions/checkout@v2
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - 
+        name: Docker Cache
+        uses: pat-s/always-upload-cache@v2.1.3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      -
+        name: Build as testable
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: docker/server/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          target: testable
+          tags: azerothcore2/server:test
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+          push: false
+          load: true
+      -
+        name: Test
         run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          ./bin/acore-docker-build-no-scripts
-
-  docker-worldserver:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          docker build -t azerothcore/worldserver -f docker/worldserver/Dockerfile docker/worldserver
-
-  docker-authserver:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/authserver
+          docker run azerothcore2/server:test ./azerothcore/build/src/test/unit_tests
+      -
+        name: Build as runnable, Promote & Push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: docker/server/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          tags: azerothcore2/server:latest,azerothcore2/server:${{ github.sha }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
 
   docker-database:
     strategy:
       fail-fast: true
     runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'tony-engineering/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
       - name: Configure

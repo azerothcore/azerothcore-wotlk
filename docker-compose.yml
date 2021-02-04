@@ -1,4 +1,4 @@
-version: '3.2'
+version: '3.4'
 
 services:
 
@@ -22,12 +22,13 @@ services:
   ac-worldserver:
     stdin_open: true
     tty: true
-    image: azerothcore/worldserver
+    image: azerothcore2/server
     restart: unless-stopped
     privileged: true
     build:
-      context: ./docker/worldserver
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: docker/server/Dockerfile
+      target: testable
     networks:
       - ac-network
     ports:
@@ -35,40 +36,24 @@ services:
       - ${SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
       - type: bind
-        source: ./docker/worldserver/bin
-        target: /azeroth-server/bin
-      - type: bind
-        source: ${WORLDSERVER_ETC:-./docker/worldserver/etc}
-        target: /azeroth-server/etc
-      - type: bind
-        source: ${WORLDSERVER_LOGS:-./docker/worldserver/logs}
-        target: /azeroth-server/logs
-      - type: bind
-        source: ${WORLDSERVER_DATA:-./docker/worldserver/data}
+        source: ./docker/server/data
         target: /azeroth-server/data
     depends_on:
       - ac-database
 
   ac-authserver:
-    image: azerothcore/authserver
+    image: azerothcore2/server
     restart: unless-stopped
     build:
-      context: ./docker/authserver
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: docker/server/Dockerfile
+      target: testable
+    environment:
+      START_AS_AUTHSERVER: "true"
     networks:
       - ac-network
     ports:
       - ${AUTH_EXTERNAL_PORT:-3724}:3724
-    volumes:
-      - type: bind
-        source: ./docker/authserver/bin
-        target: /azeroth-server/bin
-      - type: bind
-        source: ${AUTHSERVER_ETC:-./docker/authserver/etc}
-        target: /azeroth-server/etc
-      - type: bind
-        source: ${AUTHSERVER_LOGS:-./docker/authserver/logs}
-        target: /azeroth-server/logs
     depends_on:
       - ac-database
 
