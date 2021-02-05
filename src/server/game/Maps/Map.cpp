@@ -2303,7 +2303,6 @@ bool Map::HasEnoughWater(WorldObject const* searcher, LiquidData liquidData) con
     return liquidData.level > INVALID_HEIGHT && liquidData.level > liquidData.depth_level && liquidData.level - liquidData.depth_level >= minHeightInWater;
 }
 
-
 char const* Map::GetMapName() const
 {
     return i_mapEntry ? i_mapEntry->name[sWorld->GetDefaultDbcLocale()] : "UNNAMEDMAP\x0";

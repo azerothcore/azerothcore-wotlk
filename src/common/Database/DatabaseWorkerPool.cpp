@@ -52,7 +52,7 @@ uint32 DatabaseWorkerPool<T>::Open()
 
     if (!error)
     {
-        sLog->outSQLDriver("DatabasePool '%s' opened successfully. %u total connections running.", 
+        sLog->outSQLDriver("DatabasePool '%s' opened successfully. %u total connections running.",
         GetDatabaseName(), (_connectionCount[IDX_SYNCH] + _connectionCount[IDX_ASYNC]));
     }
 
@@ -160,7 +160,7 @@ bool DatabaseWorkerPool<T>::PrepareStatements()
             else
                 t->Unlock();
         }
-    }  
+    }
 
     return true;
 }
