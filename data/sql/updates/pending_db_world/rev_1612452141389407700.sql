@@ -1,13 +1,13 @@
 -- Dire Maul start
 
 -- Decreased Guard Slip'kik's speed by 55%
-UPDATE creature_template SET `speed_walk`= 1.76 WHERE entry = 14323;
+UPDATE `creature_template` SET `speed_walk`= 1.76 WHERE entry = 14323;
 
 -- Gordok's Spirits are not suppose to be attack-able / But they still should be in order to trigger the Smart_Scripts 
-UPDATE creature_template SET `unit_flags`= 131076 WHERE entry = 11446;
+UPDATE `creature_template` SET `unit_flags`= 131076 WHERE entry = 11446;
 
 -- Netherwalker is not suppose to grant XP when killed. As this is very abusable
-UPDATE creature_template SET `flags_extra`= 64 WHERE entry = 14389;
+UPDATE `creature_template` SET `flags_extra`= 64 WHERE entry = 14389;
 
 -- Deleting mobs from pack 1 (they are not suppose to be there)
 DELETE FROM `creature` WHERE `guid` IN (247711);
@@ -18,7 +18,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 (247726, 13036, 429, 0, 0, 1, 1, 0, 0, 293.428,  22.3743, -3.91569, 1.70123, 86400, 0, 0, 3998, 0, 0, 0, 0, 0, '');
 
 -- Corrected Spawn Position & Gave him MovementType id 2 (Waypoint id: 247709)
-UPDATE creature SET `position_x`= 307.35, `position_y`= -9.58133, `position_z`= -3.88598, `orientation`= 4.65288, `MovementType`= 2 WHERE guid = 247709;
+UPDATE `creature` SET `position_x`= 307.35, `position_y`= -9.58133, `position_z`= -3.88598, `orientation`= 4.65288, `MovementType`= 2 WHERE guid = 247709;
 
 DELETE FROM `creature_addon` WHERE `guid`=247709;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`) VALUES 
@@ -104,15 +104,13 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (2480800, 19, 558.422, 549.764, -25.4004, 0, 0, 0, 0, 100, 0),
 (2480800, 20, 548.623, 525.998, -25.4018, 0, 0, 0, 0, 100, 0);
 
-DELETE FROM conditions WHERE SourceTypeOrReferenceId = 22 AND SourceEntry = 14386 AND SourceId = 0;
-DELETE FROM conditions WHERE SourceTypeOrReferenceId = 22 AND SourceEntry = 11450 AND SourceId = 0;
-DELETE FROM conditions WHERE SourceTypeOrReferenceId = 22 AND SourceEntry = 11446 AND SourceId = 0;
+DELETE FROM `conditions` WHERE SourceTypeOrReferenceId = 22 AND SourceEntry IN (14386, 11446, 11450) AND SourceId = 0;
 
 -- Wandering Eye of Kilrogg should summon Netherwalkers and Despawn.
 SET @ENTRY := 14386;
-DELETE FROM smart_scripts WHERE entryOrGuid = 14386 AND source_type = 0;
-UPDATE creature_template SET AIName="SmartAI" WHERE entry= @ENTRY;
-INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
+DELETE FROM `smart_scripts` WHERE entryOrGuid = 14386 AND source_type = 0;
+UPDATE `creature_template` SET AIName="SmartAI" WHERE entry= @ENTRY;
+INSERT INTO `smart_scripts` (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
 (@ENTRY, 0, 0, 1, 4, 0, 100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "On aggro - Self: Talk 0 to invoker"),
 (@ENTRY, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 204, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "On link - None: Set unit movement flags to 0"),
 (@ENTRY, 0, 2, 0, 4, 0, 100, 0, 1000, 2000, 0, 0, 11, 22876, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "On aggro - Self: Cast spell 22876 on Self"),
@@ -120,9 +118,9 @@ INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event
 
 -- Captain Kromcrush's Guards should despawn relatively quickly if the fight ends. They now despawn after 10 seconds after fight has ended.
 SET @ENTRY := 11450;
-DELETE FROM smart_scripts WHERE entryOrGuid = 11450 AND source_type = 0;
-UPDATE creature_template SET AIName="SmartAI" WHERE entry= @ENTRY;
-INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
+DELETE FROM `smart_scripts` WHERE entryOrGuid = 11450 AND source_type = 0;
+UPDATE `creature_template` SET AIName="SmartAI" WHERE entry= @ENTRY;
+INSERT INTO `smart_scripts` (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
 (@ENTRY, 0, 0, 0, 4, 0, 20, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, "On aggro - Self: Talk 0 to invoker"),
 (@ENTRY, 0, 1, 0, 0, 0, 100, 0, 5000, 7000, 8000, 12000, 11, 15284, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "Every 8 - 12 seconds (5 - 7s initially)  - Self: Cast spell 15284 on Victim"),
 (@ENTRY, 0, 2, 0, 0, 0, 100, 0, 8000, 12000, 14000, 21000, 11, 13737, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "Every 14 - 21 seconds (8 - 12s initially)  - Self: Cast spell 13737 on Victim"),
@@ -133,9 +131,9 @@ INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event
 
 -- Gordok Spirit is also suppose to do a knockback mechanic if player is 5 Yards or closer. (This is limited to when the player attacks the Ogre but still works better than what it used to. Creature also evades after casting the spell)
 SET @ENTRY := 11446;
-DELETE FROM smart_scripts WHERE entryOrGuid = 11446 AND source_type = 0;
-UPDATE creature_template SET AIName="SmartAI" WHERE entry= @ENTRY;
-INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
+DELETE FROM `smart_scripts` WHERE entryOrGuid = 11446 AND source_type = 0;
+UPDATE `creature_template` SET AIName="SmartAI" WHERE entry= @ENTRY;
+INSERT INTO `smart_scripts` (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
 (@ENTRY, 0, 0, 1, 4, 0, 100, 0, 0, 0, 0, 0, 11, 22893, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "On aggro - Self: Cast spell 22893 on Victim"),
 (@ENTRY, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "On link - None: Evade"),
 (@ENTRY, 0, 2, 0, 4, 0, 20, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, "On aggro - Self: Talk 0 to invoker"),
