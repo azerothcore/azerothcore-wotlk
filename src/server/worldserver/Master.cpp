@@ -404,6 +404,9 @@ bool Master::_StartDB()
         .AddDatabase(CharacterDatabase, "Character")
         .AddDatabase(WorldDatabase, "World");
 
+    if (!loader.Load())
+        return false;
+
     ///- Get the realm Id from the configuration file
     realmID = sConfigMgr->GetIntDefault("RealmID", 0);
     if (!realmID)
