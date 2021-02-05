@@ -18,7 +18,7 @@ static bool IsMutualChase(Unit* owner, Unit* target)
     if (target->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
         return false;
 
-    return target->GetVictim() == owner->GetVictim();
+    return target->GetVictim() == owner;
 }
 
 template<class T>
@@ -43,8 +43,10 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (!owner || !owner->IsAlive())
         return false;
 
+	Creature* cOwner = owner->ToCreature();
+
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
-    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsMovementPreventedByCasting()))
+    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || (cOwner && owner->ToCreature()->IsMovementPreventedByCasting()))
     {
         i_path = nullptr;
         owner->StopMoving();
@@ -56,8 +58,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
         return true;
     }
-
-    Creature* cOwner = owner->ToCreature();
 
     bool forceDest =
         //(cOwner && (cOwner->isWorldBoss() || cOwner->IsDungeonBoss())) || // force for all bosses, even not in instances
@@ -96,8 +96,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         }
     }
 
-    bool hasMoveState = owner->HasUnitState(UNIT_STATE_CHASE_MOVE) || owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE);
-    if (hasMoveState && owner->movespline->Finalized())
+    if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE) && owner->movespline->Finalized())
     {
         i_recalculateTravel = false;
         i_path = nullptr;
