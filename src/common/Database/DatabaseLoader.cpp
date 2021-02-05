@@ -48,36 +48,36 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
 
         if (uint32 error = pool.Open())
         {
-            //// Try reconnect
-            //if (error == CR_CONNECTION_ERROR)
-            //{
-            //    // Possible improvement for future: make ATTEMPTS and SECONDS configurable values
-            //    uint32 const ATTEMPTS = 5;
-            //    Seconds durationSecs = 5s;
-            //    uint32 count = 1;
+            // Try reconnect
+            if (error == CR_CONNECTION_ERROR)
+            {
+                // Possible improvement for future: make ATTEMPTS and SECONDS configurable values
+                uint32 const ATTEMPTS = 5;
+                Seconds durationSecs = 5s;
+                uint32 count = 1;
 
-            //    auto _log = [&]()
-            //    {
-            //        sLog->outSQLDriver("> Retrying after %u seconds", durationSecs.count());
-            //        std::this_thread::sleep_for(durationSecs);
-            //    };
+                auto sleepThread = [&]()
+                {
+                    sLog->outSQLDriver("> Retrying after %u seconds", durationSecs.count());
+                    std::this_thread::sleep_for(durationSecs);
+                };
 
-            //    _log();
+                sleepThread();
 
-            //    do
-            //    {
-            //        error = pool.Open();
+                do
+                {
+                    error = pool.Open();
 
-            //        if (error == CR_CONNECTION_ERROR)
-            //        {
-            //            _log();
-            //            count++;
-            //        }
-            //        else
-            //            break;
+                    if (error == CR_CONNECTION_ERROR)
+                    {
+                        sleepThread();
+                        count++;
+                    }
+                    else
+                        break;
 
-            //    } while (count < ATTEMPTS);
-            //}
+                } while (count < ATTEMPTS);
+            }
 
             // If the error wasn't handled quit
             if (error)
