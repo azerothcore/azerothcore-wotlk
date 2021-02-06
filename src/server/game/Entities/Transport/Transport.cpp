@@ -296,7 +296,7 @@ void MotionTransport::RemovePassenger(WorldObject* passenger, bool withAll)
             passenger->m_movementInfo.transport.pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
             if (passenger->ToUnit())
             {
-                passenger->ToUnit()->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
+                passenger->ToUnit()->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
             }
         }
     }
