@@ -19720,10 +19720,14 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         }
 
         Player* partyLeader = this;
+        std::string leaderName = m_session->GetAcoreString(LANG_YOU);
         {
             uint64 leaderGuid = GetGroup() ? GetGroup()->GetLeaderGUID() : GetGUID();
             if (leaderGuid != GetGUID())
+            {
                 partyLeader = HashMapHolder<Player>::Find(leaderGuid);
+                leaderName = partyLeader->GetName();
+            }
         }
 
         //Check all items
@@ -19853,7 +19857,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     }
                     if (missingLeaderQuests.size())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS, partyLeader->GetName());
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS, leaderName.c_str());
                         PrettyPrintRequirementsQuestList(missingLeaderQuests);
                     }
 
@@ -19864,7 +19868,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     }
                     if (missingLeaderAchievements.size())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS, partyLeader->GetName());
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS, leaderName.c_str());
                         PrettyPrintRequirementsAchievementsList(missingLeaderAchievements);
                     }
 
@@ -19876,7 +19880,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
 
                     if (missingLeaderItems.size())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS, partyLeader->GetName());
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS, leaderName.c_str());
                         PrettyPrintRequirementsItemsList(missingLeaderItems);
                     }
 
