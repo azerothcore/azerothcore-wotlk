@@ -113,6 +113,8 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     _lastTargetPosition = i_target->GetPosition();
 
+    bool hasMoveState = owner->HasUnitState(UNIT_STATE_CHASE_MOVE) || owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE);
+
     if (PositionOkay(owner, target, maxRange, angle) && !hasMoveState)
         return true;
 
