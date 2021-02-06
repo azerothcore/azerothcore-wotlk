@@ -43,7 +43,6 @@ public:
         boss_amanitarAI(Creature* c) : ScriptedAI(c), summons(me)
         {
             pInstance = c->GetInstanceScript();
-            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
         }
 
         InstanceScript* pInstance;
