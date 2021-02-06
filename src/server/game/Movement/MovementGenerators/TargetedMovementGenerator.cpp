@@ -144,8 +144,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
     else
     {
-        if (target->GetTypeId() == TYPEID_PLAYER)
-            shortenPath = false;
         // otherwise, we fall back to nearpoint finding
         target->GetNearPoint(owner, x, y, z, (moveToward ? maxTarget : minTarget) - hitboxSum, 0, angle ? target->ToAbsoluteAngle(angle->RelativeAngle) : target->GetAngle(owner));
         shortenPath = false;
