@@ -19853,7 +19853,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     }
                     if (missingLeaderQuests.size())
                     {
-                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS);
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS, partyLeader->GetName());
                         PrettyPrintRequirementsQuestList(missingLeaderQuests);
                     }
 
@@ -19864,7 +19864,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     }
                     if (missingLeaderAchievements.size())
                     {
-                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS);
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS, partyLeader->GetName());
                         PrettyPrintRequirementsAchievementsList(missingLeaderAchievements);
                     }
 
@@ -19876,7 +19876,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
 
                     if (missingLeaderItems.size())
                     {
-                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS);
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS, partyLeader->GetName());
                         PrettyPrintRequirementsItemsList(missingLeaderItems);
                     }
 
