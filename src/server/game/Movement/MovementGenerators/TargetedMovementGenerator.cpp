@@ -43,7 +43,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (!owner || !owner->IsAlive())
         return false;
 
-	Creature* cOwner = owner->ToCreature();
+    Creature* cOwner = owner->ToCreature();
 
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || (cOwner && owner->ToCreature()->IsMovementPreventedByCasting()))
