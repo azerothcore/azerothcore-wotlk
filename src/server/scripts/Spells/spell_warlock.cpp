@@ -915,7 +915,7 @@ public:
 };
 
 // -1454 - Life Tap
-+ #define LIFE_TAP_COEFFICIENT 0.9F;
+#define LIFE_TAP_COEFFICIENT 0.9F;
 class spell_warl_life_tap : public SpellScriptLoader
 {
 public:
