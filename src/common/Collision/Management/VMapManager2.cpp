@@ -29,6 +29,7 @@
 #include "DBCStores.h"
 #include "Log.h"
 #include "VMapDefinitions.h"
+#include "GridDefines.h"
 
 using G3D::Vector3;
 
@@ -54,7 +55,7 @@ namespace VMAP
     Vector3 VMapManager2::convertPositionToInternalRep(float x, float y, float z) const
     {
         Vector3 pos;
-        const float mid = 0.5f * 64.0f * 533.33333333f;
+        const float mid = 0.5f * MAX_NUMBER_OF_GRIDS * SIZE_OF_GRIDS;
         pos.x = mid - x;
         pos.y = mid - y;
         pos.z = z;
@@ -201,7 +202,7 @@ namespace VMAP
             {
                 Vector3 pos = convertPositionToInternalRep(x, y, z);
                 float height = instanceTree->second->getHeight(pos, maxSearchDist);
-                if (!(height < G3D::inf()))
+                if (!(height < G3D::finf()))
                     return height = VMAP_INVALID_HEIGHT_VALUE; // No height
 
                 return height;

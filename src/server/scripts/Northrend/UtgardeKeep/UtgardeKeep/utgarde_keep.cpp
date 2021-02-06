@@ -207,7 +207,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellEntry*/) override
         {
-            return (bool) sSpellMgr->GetSpellInfo(SPELL_TICKING_TIME_BOMB_EXPLODE);
+            return ValidateSpellInfo({ SPELL_TICKING_TIME_BOMB_EXPLODE });
         }
 
         void HandleOnEffectRemove(AuraEffect const* /* aurEff */, AuraEffectHandleModes /* mode */)

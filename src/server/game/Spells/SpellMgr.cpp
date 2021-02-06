@@ -3306,6 +3306,14 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->manaPerSecond = 0;
     });
 
+    // Elixir of Detect Undead
+    ApplySpellFix({ 11389 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->powerType = POWER_MANA;
+        spellInfo->manaCost = 0;
+        spellInfo->manaPerSecond = 0;
+    });
+
     // Evergrove Druid Transform Crow
     ApplySpellFix({ 38776 }, [](SpellEntry* spellInfo)
     {
@@ -3913,7 +3921,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Kindred Spirits, damage aura
     ApplySpellFix({ 57458 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_UNK21;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_DONT_REMOVE_IN_ARENA;
     });
 
     // Chimera Shot - Serpent trigger
