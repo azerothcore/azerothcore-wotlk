@@ -113,9 +113,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     _lastTargetPosition = i_target->GetPosition();
 
-    bool hasMoveState = owner->HasUnitState(UNIT_STATE_CHASE_MOVE) || owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE);
-
-    if (PositionOkay(owner, target, maxRange, angle) && !hasMoveState)
+    if (PositionOkay(owner, target, maxRange, angle) && !owner->HasUnitState(UNIT_STATE_CHASE_MOVE))
         return true;
 
     bool moveToward = !owner->IsInDist(target, maxRange);
@@ -238,7 +236,7 @@ bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target, float rang
     if (owner->GetExactDistSq(target) > G3D::square(owner->GetCombatReach() + target->GetCombatReach() + range))
         return false;
 
-    return !owner->IsPet() || !angle || angle->IsAngleOkay(target->GetRelativeAngle(owner));
+    return !owner->IsPet() || !angle || angle->IsAngleOkay(target->GetRelativeAngle(owner)); // need to check - dont think we need !pet exception here because there are scripts with MoveFollow that require angle
 }
 
 template<class T>
