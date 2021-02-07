@@ -2880,10 +2880,9 @@ void SpellMgr::LoadSpellCustomAttr()
             }
         }
 
-        // spells ignoring hit result should not be binary
+        // Xinef: spells ignoring hit result should not be binary
         if (!spellInfo->HasAttribute(SPELL_ATTR3_IGNORE_HIT_RESULT))
         {
-            bool setFlag = false;
             for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
             {
                 if (spellInfo->Effects[j].Effect)
@@ -2925,7 +2924,7 @@ void SpellMgr::LoadSpellCustomAttr()
                                                 break;
                                             }
                             continue;
-                            }
+                    }
                 }
             }
         }
