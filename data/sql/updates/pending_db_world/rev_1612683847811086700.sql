@@ -7,4 +7,4 @@ UPDATE `creature_template` SET `skinloot` = 0 WHERE `entry` IN (1512,721,883,890
 DELETE FROM `skinning_loot_template` WHERE `entry` IN (1933,12299,100000);
 
 -- Remove lootid that does not exist
-UPDATE `creature_template` SET `lootid` = 0 WHERE `entry` IN (240,246,3388)
+UPDATE `creature_template` SET `lootid` = 0 WHERE `entry` IN (240,246,3388);
