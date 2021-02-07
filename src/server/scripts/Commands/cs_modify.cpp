@@ -58,7 +58,7 @@ public:
             { "standstate",     SEC_GAMEMASTER,      false, &HandleModifyStandStateCommand,    "" },
             { "phase",          SEC_GAMEMASTER,      false, &HandleModifyPhaseCommand,         "" },
             { "gender",         SEC_GAMEMASTER,      false, &HandleModifyGenderCommand,        "" },
-            { "speed",          SEC_GAMEMASTER,      false, nullptr,                    "", modifyspeedCommandTable }
+            { "speed",          SEC_GAMEMASTER,      false, nullptr,                           "", modifyspeedCommandTable }
         };
 
         static std::vector<ChatCommand> morphCommandTable =
