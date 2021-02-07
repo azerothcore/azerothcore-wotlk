@@ -6,5 +6,4 @@ UPDATE `command` SET `security` = 3 WHERE `name` IN ('cometome', 'wpgps');
 
 INSERT IGNORE INTO  `command` (`name`, `security`, `help`) VALUES
 ('bank', 2, 'Syntax: .bank Show your bank inventory.'),
-('debug Mod32Value', 3, 'Syntax: .debug Mod32Value #field #value Add #value to field #field of your character.'),
-
+('debug Mod32Value', 3, 'Syntax: .debug Mod32Value #field #value Add #value to field #field of your character.');
