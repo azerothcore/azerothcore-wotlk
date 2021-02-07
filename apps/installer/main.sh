@@ -17,10 +17,9 @@ options=(
     "module-update (mu): Module Update by name"    # 9
     "module-remove: (mr): Module Remove by name"   # 10
     "client-data: (gd): download client data from github repository (beta)"   # 11
-    "client-data-docker: (gdd): download client data for docker from github repository (beta)"   # 12
-    "run-worldserver (rw): execute a simple restarter for worldserver" # 13
-    "run-authserver (ra): execute a simple restarter for authserver" # 14
-    "quit: Exit from this menu"                     # 15
+    "run-worldserver (rw): execute a simple restarter for worldserver" # 12
+    "run-authserver (ra): execute a simple restarter for authserver" # 13
+    "quit: Exit from this menu"                     # 14
     )
 
 function _switch() {
@@ -59,18 +58,15 @@ function _switch() {
             inst_module_remove "$_opt"
             ;;
         ""|"gd"|"client-data"|"11")
-            inst_download_client_data
+            inst_download_client_data "$_opt"
             ;;
-        ""|"gdd"|"client-data-docker"|"12")
-            DOCKER=true inst_download_client_data
-            ;;
-        ""|"rw"|"run-worldserver"|"13")
+        ""|"rw"|"run-worldserver"|"12")
             inst_simple_restarter worldserver
             ;;
-        ""|"ra"|"run-authserver"|"14")
+        ""|"ra"|"run-authserver"|"13")
             inst_simple_restarter authserver
             ;;
-        ""|"quit"|"15")
+        ""|"quit"|"14")
             echo "Goodbye!"
             exit
             ;;
