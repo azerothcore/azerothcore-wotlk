@@ -316,7 +316,7 @@ public:
                     victim->AddAura(SPELL_SHADOW_FLAME_DOT, victim);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_bwl_shadowflame_SpellScript::HandleEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
         }
