@@ -168,8 +168,8 @@ public:
             { "whisper",        SEC_GAMEMASTER,     false, &HandleNpcWhisperCommand,           "" },
             { "yell",           SEC_GAMEMASTER,     false, &HandleNpcYellCommand,              "" },
             { "tame",           SEC_GAMEMASTER,     false, &HandleNpcTameCommand,              "" },
-            { "add",            SEC_ADMINISTRATOR,     false, nullptr,                            "", npcAddCommandTable },
-            { "delete",         SEC_ADMINISTRATOR,     false, nullptr,                            "", npcDeleteCommandTable },
+            { "add",            SEC_ADMINISTRATOR,     false, nullptr,                         "", npcAddCommandTable },
+            { "delete",         SEC_ADMINISTRATOR,     false, nullptr,                         "", npcDeleteCommandTable },
             { "follow",         SEC_GAMEMASTER,     false, nullptr,                            "", npcFollowCommandTable },
             { "set",            SEC_ADMINISTRATOR,  false, nullptr,                            "", npcSetCommandTable }
         };
