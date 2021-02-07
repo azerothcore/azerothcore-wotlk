@@ -11,7 +11,7 @@ ENV TZ=Etc/UTC
 ENV DEBIAN_FRONTEND=noninteractive
 
 # install essentials
-RUN apt-get update && apt-get install -y git lsb-core
+RUN apt-get update && apt-get install -y git lsb-core sudo
 
 # copy needed files to run our scripts
 COPY ./conf /azerothcore/conf
