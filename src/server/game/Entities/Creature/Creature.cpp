@@ -437,7 +437,9 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     uint32 previousHealth = GetHealth();
     SelectLevel(changelevel);
     if (previousHealth > 0)
+    {
         SetHealth(previousHealth);
+    }
 
     SetMeleeDamageSchool(SpellSchools(cInfo->dmgschool));
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(getLevel(), cInfo->unit_class);
