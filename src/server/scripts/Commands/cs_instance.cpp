@@ -30,10 +30,10 @@ public:
         static std::vector<ChatCommand> instanceCommandTable =
         {
             { "listbinds",      SEC_MODERATOR,      false,  &HandleInstanceListBindsCommand,    "" },
-            { "unbind",         SEC_MODERATOR,      false,  &HandleInstanceUnbindCommand,       "" },
+            { "unbind",         SEC_GAMEMASTER,      false,  &HandleInstanceUnbindCommand,       "" },
             { "stats",          SEC_MODERATOR,      true,   &HandleInstanceStatsCommand,        "" },
             { "savedata",       SEC_ADMINISTRATOR,  false,  &HandleInstanceSaveDataCommand,     "" },
-            { "setbossstate",   SEC_MODERATOR,      true,   &HandleInstanceSetBossStateCommand, "" },
+            { "setbossstate",   SEC_GAMEMASTER,      true,   &HandleInstanceSetBossStateCommand, "" },
             { "getbossstate",   SEC_MODERATOR,      true,   &HandleInstanceGetBossStateCommand, "" }
         };
 
