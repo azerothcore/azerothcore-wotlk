@@ -220,7 +220,7 @@ function inst_simple_restarter {
 
 function inst_download_client_data {
     if [[ $CI_DOCKER ]] | [[ $DOCKER ]]; then
-      local path="./docker/worldserver/data"
+      local path="$AC_PATH_ROOT/docker/worldserver/data"
     else
       local path="$AC_BINPATH_FULL"
     fi
