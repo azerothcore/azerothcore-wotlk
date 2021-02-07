@@ -3,7 +3,6 @@ version: '3.2'
 services:
 
   ac-database:
-    image: azerothcore/database
     restart: unless-stopped
     build:
       context: .
@@ -22,12 +21,11 @@ services:
   ac-worldserver:
     stdin_open: true
     tty: true
-    image: azerothcore/worldserver
     restart: unless-stopped
     privileged: true
     build:
-      context: ./docker/worldserver
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./docker/worldserver/Dockerfile
     networks:
       - ac-network
     ports:
@@ -36,25 +34,24 @@ services:
     volumes:
       - type: bind
         source: ./docker/worldserver/bin
-        target: /azeroth-server/bin
+        target: /azerothcore/env/dist/bin
       - type: bind
         source: ${WORLDSERVER_ETC:-./docker/worldserver/etc}
-        target: /azeroth-server/etc
+        target: /azerothcore/env/dist/etc
       - type: bind
         source: ${WORLDSERVER_LOGS:-./docker/worldserver/logs}
-        target: /azeroth-server/logs
+        target: /azerothcore/env/dist/logs
       - type: bind
         source: ${WORLDSERVER_DATA:-./docker/worldserver/data}
-        target: /azeroth-server/data
+        target: /azerothcore/env/dist/data
     depends_on:
       - ac-database
 
   ac-authserver:
-    image: azerothcore/authserver
     restart: unless-stopped
     build:
-      context: ./docker/authserver
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./docker/authserver/Dockerfile
     networks:
       - ac-network
     ports:
@@ -62,13 +59,13 @@ services:
     volumes:
       - type: bind
         source: ./docker/authserver/bin
-        target: /azeroth-server/bin
+        target: /azerothcore/env/dist/bin
       - type: bind
         source: ${AUTHSERVER_ETC:-./docker/authserver/etc}
-        target: /azeroth-server/etc
+        target: /azerothcore/env/dist/etc
       - type: bind
         source: ${AUTHSERVER_LOGS:-./docker/authserver/logs}
-        target: /azeroth-server/logs
+        target: /azerothcore/env/dist/logs
     depends_on:
       - ac-database
 

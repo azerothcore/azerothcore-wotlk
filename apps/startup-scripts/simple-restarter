@@ -11,7 +11,7 @@ _restart_count=0
 
 if [ "$#" -ne 2 ]; then
     echo "Usage:    $0 path filename"
-    echo "Example:  $0 $HOME/azeroth-server/bin worldserver"
+    echo "Example:  $0 $HOME/azerothcore/bin worldserver"
     exit 1
 fi
 

@@ -1,0 +1,32 @@
+version: "3.2"
+services:
+  ac-worldserver:
+    tty: true
+    #command: /azerothcore/env/dist/bin/worldserver
+    security_opt:
+      - seccomp:unconfined
+    build:
+      context: .
+      dockerfile: ./docker/worldserver/Dockerfile.gdb
+      args:
+        USER_ID: 1000
+        GROUP_ID: 1000
+    volumes:
+      - type: bind
+        source: ./
+        target: /azerothcore/
+      - type: bind
+        source: ./docker/worldserver/bin
+        target: /azerothcore/env/dist/bin
+      - type: bind
+        source: ${WORLDSERVER_ETC:-./docker/worldserver/etc}
+        target: /azerothcore/env/dist/etc
+      - type: bind
+        source: ${WORLDSERVER_LOGS:-./docker/worldserver/logs}
+        target: /azerothcore/env/dist/logs
+      - type: bind
+        source: ${WORLDSERVER_DATA:-./docker/worldserver/data}
+        target: /azerothcore/env/dist/data
+    ports:
+      - ${WORLD_EXTERNAL_PORT:-8085}:8085
+      - ${SOAP_EXTERNAL_PORT:-7878}:7878

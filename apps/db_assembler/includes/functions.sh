@@ -57,7 +57,7 @@ function dbasm_mysqlExec() {
 
                 eval $_confs
                 echo "Grant permissions for ${MYSQL_USER}'@'${MYSQL_HOST} to ${_dbname}"
-                "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -P "$MYSQL_PORT" -e "GRANT ALL PRIVILEGES ON ${_dbname}.* TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION;"
+                "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -P "$MYSQL_PORT" -e "GRANT ALL PRIVILEGES ON ${_dbname}.* TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION; FLUSH PRIVILEGES;"
             done
 		else
 			exit
@@ -109,9 +109,13 @@ function dbasm_createDB() {
         echo "$dbname database exists"
     else
 		echo "Creating DB ${dbname} ..."
-        dbasm_mysqlExec "$confs" "CREATE DATABASE \`${dbname}\`" ""
+        dbasm_mysqlExec "$confs" "CREATE DATABASE \`${dbname}\`;" ""
+        echo "Creating User ${CONF_USER}@${MYSQL_HOST} identified by ${CONF_PASS}..."
         dbasm_mysqlExec "$confs" "CREATE USER IF NOT EXISTS '${CONF_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${CONF_PASS}';"
-        dbasm_mysqlExec "$confs" "GRANT ALL PRIVILEGES ON \`${dbname}\`.* TO '${CONF_USER}'@'${MYSQL_HOST}' WITH GRANT OPTION;"
+        echo "Granting user privileges on: ${dbname} ..."
+        dbasm_mysqlExec "$confs" "GRANT ALL PRIVILEGES ON \`${dbname}\`.* TO '${CONF_USER}'@'${MYSQL_HOST}'"
+        echo "Flush privileges"
+        dbasm_mysqlExec "$confs" "FLUSH PRIVILEGES;"
     fi
 }
 

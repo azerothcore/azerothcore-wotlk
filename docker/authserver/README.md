@@ -28,9 +28,9 @@ docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/au
 
 ```
 docker run --name ac-authserver \
-    --mount type=bind,source="$(pwd)"/docker/authserver/bin/,target=/azeroth-server/bin \
-    --mount type=bind,source="$(pwd)"/docker/authserver/etc/,target=/azeroth-server/etc \
-    --mount type=bind,source="$(pwd)"/docker/authserver/logs/,target=/azeroth-server/logs \
+    --mount type=bind,source="$(pwd)"/docker/authserver/bin/,target=/azerothcore/env/dist/bin \
+    --mount type=bind,source="$(pwd)"/docker/authserver/etc/,target=/azerothcore/env/dist/etc \
+    --mount type=bind,source="$(pwd)"/docker/authserver/logs/,target=/azerothcore/env/dist/logs \
     -p 127.0.0.1:3724:3724 \
     --network ac-network \
     -it azerothcore/authserver
