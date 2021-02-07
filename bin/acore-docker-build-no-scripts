@@ -3,6 +3,10 @@
 docker build --build-arg ENABLE_SCRIPTS=0 -t acbuild -f docker/build/Dockerfile .
 
 docker run \
+    -e CCACHE_CPP2=true \
+    -e CCACHE_MAXSIZE='500MB' \
+    -e CCACHE_COMPRESS=1 \
+    -e CCACHE_DIR="/azerothcore/build/.ccache" \
     -v /"$(pwd)"/docker/build/cache:/azerothcore/build \
     -v /"$(pwd)"/docker/worldserver/bin:/binworldserver \
     -v /"$(pwd)"/docker/authserver/bin:/binauthserver \
