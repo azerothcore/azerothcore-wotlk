@@ -29,11 +29,12 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_CREATE_MISTLETOE) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_CREATE_HOLLY) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_CREATE_SNOWFLAKES))
-                return false;
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_CREATE_MISTLETOE,
+                    SPELL_CREATE_HOLLY,
+                    SPELL_CREATE_SNOWFLAKES
+                });
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)

@@ -57,259 +57,259 @@ enum Misc
 
 class boss_anub_arak : public CreatureScript
 {
-public:
-    boss_anub_arak() : CreatureScript("boss_anub_arak") { }
+    public:
+        boss_anub_arak() : CreatureScript("boss_anub_arak") { }
 
-    struct boss_anub_arakAI : public BossAI
-    {
-        boss_anub_arakAI(Creature* creature) : BossAI(creature, DATA_ANUBARAK_EVENT)
+        struct boss_anub_arakAI : public BossAI
         {
-            me->m_SightDistance = 120.0f;
-            intro = false;
-        }
-
-        bool intro;
-
-        void EnterEvadeMode() override
-        {
-            me->DisableRotate(false);
-            BossAI::EnterEvadeMode();
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (!intro && who->GetTypeId() == TYPEID_PLAYER)
+            boss_anub_arakAI(Creature* creature) : BossAI(creature, DATA_ANUBARAK_EVENT)
             {
-                intro = true;
-                Talk(SAY_INTRO);
+                me->m_SightDistance = 120.0f;
+                intro = false;
             }
-            BossAI::MoveInLineOfSight(who);
-        }
 
-        void JustDied(Unit* killer) override
-        {
-            Talk(SAY_DEATH);
-            BossAI::JustDied(killer);
-        }
+            bool intro;
 
-        void KilledUnit(Unit*  /*victim*/) override
-        {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            void EnterEvadeMode() override
             {
-                Talk(SAY_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                me->DisableRotate(false);
+                BossAI::EnterEvadeMode();
             }
-        }
 
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-            if (!summon->IsTrigger())
-                summon->SetInCombatWithZone();
-        }
-
-        void Reset() override
-        {
-            BossAI::Reset();
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-            instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
-        }
-
-        void EnterCombat(Unit* ) override
-        {
-            Talk(SAY_AGGRO);
-            instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
-
-            events.ScheduleEvent(EVENT_CARRION_BEETELS, 6500);
-            events.ScheduleEvent(EVENT_LEECHING_SWARM, 20000);
-            events.ScheduleEvent(EVENT_POUND, 15000);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH_75, 1000);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH_50, 1000);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH_25, 1000);
-            events.ScheduleEvent(EVENT_CLOSE_DOORS, 5000);
-        }
-
-        void SummonHelpers(float x, float y, float z, uint32 spellId)
-        {
-            const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-            me->SummonCreature(spellInfo->Effects[EFFECT_0].MiscValue, x, y, z);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (uint32 eventId = events.ExecuteEvent())
+            void MoveInLineOfSight(Unit* who) override
             {
-                case EVENT_CLOSE_DOORS:
-                    _EnterCombat();
-                    break;
-                case EVENT_CARRION_BEETELS:
-                    me->CastSpell(me, SPELL_CARRION_BEETLES, false);
-                    events.ScheduleEvent(EVENT_CARRION_BEETELS, 25000);
-                    break;
-                case EVENT_LEECHING_SWARM:
-                    Talk(SAY_LOCUST);
-                    me->CastSpell(me, SPELL_LEECHING_SWARM, false);
-                    events.ScheduleEvent(EVENT_LEECHING_SWARM, 20000);
-                    break;
-                case EVENT_POUND:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f))
-                    {
-                        me->CastSpell(me, SPELL_SELF_ROOT, true);
-                        me->DisableRotate(true);
-                        me->SendMovementFlagUpdate();
-                        events.ScheduleEvent(EVENT_ENABLE_ROTATE, 3300);
-                        me->CastSpell(target, SPELL_POUND, false);
-                    }
-                    events.ScheduleEvent(EVENT_POUND, 18000);
-                    break;
-                case EVENT_ENABLE_ROTATE:
-                    me->RemoveAurasDueToSpell(SPELL_SELF_ROOT);
-                    me->DisableRotate(false);
-                    break;
-                case EVENT_CHECK_HEALTH_25:
-                case EVENT_CHECK_HEALTH_50:
-                case EVENT_CHECK_HEALTH_75:
-                    if (me->HealthBelowPct(eventId * 25))
-                    {
-                        Talk(SAY_SUBMERGE);
-                        me->CastSpell(me, SPELL_IMPALE_PERIODIC, true);
-                        me->CastSpell(me, SPELL_SUBMERGE, false);
-                        me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                if (!intro && who->GetTypeId() == TYPEID_PLAYER)
+                {
+                    intro = true;
+                    Talk(SAY_INTRO);
+                }
+                BossAI::MoveInLineOfSight(who);
+            }
 
-                        events.DelayEvents(46000, 0);
-                        events.ScheduleEvent(EVENT_EMERGE, 45000);
-                        events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 2000);
-                        events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4000);
-                        events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 15000);
-                        events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 20000);
-                        events.ScheduleEvent(EVENT_SUMMON_DARTER, 30000);
-                        events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 35000);
+            void JustDied(Unit* killer) override
+            {
+                Talk(SAY_DEATH);
+                BossAI::JustDied(killer);
+            }
+
+            void KilledUnit(Unit*  /*victim*/) override
+            {
+                if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+                {
+                    Talk(SAY_SLAY);
+                    events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                }
+            }
+
+            void JustSummoned(Creature* summon) override
+            {
+                summons.Summon(summon);
+                if (!summon->IsTrigger())
+                    summon->SetInCombatWithZone();
+            }
+
+            void Reset() override
+            {
+                BossAI::Reset();
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+                instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
+            }
+
+            void EnterCombat(Unit* ) override
+            {
+                Talk(SAY_AGGRO);
+                instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
+
+                events.ScheduleEvent(EVENT_CARRION_BEETELS, 6500);
+                events.ScheduleEvent(EVENT_LEECHING_SWARM, 20000);
+                events.ScheduleEvent(EVENT_POUND, 15000);
+                events.ScheduleEvent(EVENT_CHECK_HEALTH_75, 1000);
+                events.ScheduleEvent(EVENT_CHECK_HEALTH_50, 1000);
+                events.ScheduleEvent(EVENT_CHECK_HEALTH_25, 1000);
+                events.ScheduleEvent(EVENT_CLOSE_DOORS, 5000);
+            }
+
+            void SummonHelpers(float x, float y, float z, uint32 spellId)
+            {
+                const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                me->SummonCreature(spellInfo->Effects[EFFECT_0].MiscValue, x, y, z);
+            }
+
+            void UpdateAI(uint32 diff) override
+            {
+                if (!UpdateVictim())
+                    return;
+
+                events.Update(diff);
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
+
+                switch (uint32 eventId = events.ExecuteEvent())
+                {
+                    case EVENT_CLOSE_DOORS:
+                        _EnterCombat();
                         break;
-                    }
-                    events.ScheduleEvent(eventId, 500);
-                    break;
-                case EVENT_EMERGE:
-                    me->CastSpell(me, SPELL_EMERGE, true);
-                    me->RemoveAura(SPELL_SUBMERGE);
-                    me->RemoveAura(SPELL_IMPALE_PERIODIC);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                    break;
-                case EVENT_SUMMON_ASSASSINS:
-                    SummonHelpers(509.32f, 247.42f, 239.48f, SPELL_SUMMON_ASSASSIN);
-                    SummonHelpers(589.51f, 240.19f, 236.0f, SPELL_SUMMON_ASSASSIN);
-                    break;
-                case EVENT_SUMMON_DARTER:
-                    SummonHelpers(509.32f, 247.42f, 239.48f, SPELL_SUMMON_DARTER);
-                    SummonHelpers(589.51f, 240.19f, 236.0f, SPELL_SUMMON_DARTER);
-                    break;
-                case EVENT_SUMMON_GUARDIAN:
-                    SummonHelpers(550.34f, 316.00f, 234.30f, SPELL_SUMMON_GUARDIAN);
-                    break;
-                case EVENT_SUMMON_VENOMANCER:
-                    SummonHelpers(550.34f, 316.00f, 234.30f, SPELL_SUMMON_VENOMANCER);
-                    break;
+                    case EVENT_CARRION_BEETELS:
+                        me->CastSpell(me, SPELL_CARRION_BEETLES, false);
+                        events.ScheduleEvent(EVENT_CARRION_BEETELS, 25000);
+                        break;
+                    case EVENT_LEECHING_SWARM:
+                        Talk(SAY_LOCUST);
+                        me->CastSpell(me, SPELL_LEECHING_SWARM, false);
+                        events.ScheduleEvent(EVENT_LEECHING_SWARM, 20000);
+                        break;
+                    case EVENT_POUND:
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 10.0f))
+                        {
+                            me->CastSpell(me, SPELL_SELF_ROOT, true);
+                            me->DisableRotate(true);
+                            me->SendMovementFlagUpdate();
+                            events.ScheduleEvent(EVENT_ENABLE_ROTATE, 3300);
+                            me->CastSpell(target, SPELL_POUND, false);
+                        }
+                        events.ScheduleEvent(EVENT_POUND, 18000);
+                        break;
+                    case EVENT_ENABLE_ROTATE:
+                        me->RemoveAurasDueToSpell(SPELL_SELF_ROOT);
+                        me->DisableRotate(false);
+                        break;
+                    case EVENT_CHECK_HEALTH_25:
+                    case EVENT_CHECK_HEALTH_50:
+                    case EVENT_CHECK_HEALTH_75:
+                        if (me->HealthBelowPct(eventId*25))
+                        {
+                            Talk(SAY_SUBMERGE);
+                            me->CastSpell(me, SPELL_IMPALE_PERIODIC, true);
+                            me->CastSpell(me, SPELL_SUBMERGE, false);
+                            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+
+                            events.DelayEvents(46000, 0);
+                            events.ScheduleEvent(EVENT_EMERGE, 45000);
+                            events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 2000);
+                            events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4000);
+                            events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 15000);
+                            events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 20000);
+                            events.ScheduleEvent(EVENT_SUMMON_DARTER, 30000);
+                            events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 35000);
+                            break;
+                        }
+                        events.ScheduleEvent(eventId, 500);
+                        break;
+                    case EVENT_EMERGE:
+                        me->CastSpell(me, SPELL_EMERGE, true);
+                        me->RemoveAura(SPELL_SUBMERGE);
+                        me->RemoveAura(SPELL_IMPALE_PERIODIC);
+                        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+                        break;
+                    case EVENT_SUMMON_ASSASSINS:
+                        SummonHelpers(509.32f, 247.42f, 239.48f, SPELL_SUMMON_ASSASSIN);
+                        SummonHelpers(589.51f, 240.19f, 236.0f, SPELL_SUMMON_ASSASSIN);
+                        break;
+                    case EVENT_SUMMON_DARTER:
+                        SummonHelpers(509.32f, 247.42f, 239.48f, SPELL_SUMMON_DARTER);
+                        SummonHelpers(589.51f, 240.19f, 236.0f, SPELL_SUMMON_DARTER);
+                        break;
+                    case EVENT_SUMMON_GUARDIAN:
+                        SummonHelpers(550.34f, 316.00f, 234.30f, SPELL_SUMMON_GUARDIAN);
+                        break;
+                    case EVENT_SUMMON_VENOMANCER:
+                        SummonHelpers(550.34f, 316.00f, 234.30f, SPELL_SUMMON_VENOMANCER);
+                        break;
+                }
+
+                if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
+                    DoMeleeAttackIfReady();
             }
+        };
 
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
-                DoMeleeAttackIfReady();
+        CreatureAI* GetAI(Creature* creature) const override
+        {
+            return new boss_anub_arakAI(creature);
         }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new boss_anub_arakAI(creature);
-    }
 };
 
 class spell_azjol_nerub_carrion_beetels : public SpellScriptLoader
 {
-public:
-    spell_azjol_nerub_carrion_beetels() : SpellScriptLoader("spell_azjol_nerub_carrion_beetels") { }
+    public:
+        spell_azjol_nerub_carrion_beetels() : SpellScriptLoader("spell_azjol_nerub_carrion_beetels") { }
 
-    class spell_azjol_nerub_carrion_beetelsAuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_azjol_nerub_carrion_beetelsAuraScript)
-
-        void HandleEffectPeriodic(AuraEffect const*  /*aurEff*/)
+        class spell_azjol_nerub_carrion_beetelsAuraScript : public AuraScript
         {
-            // Xinef: 2 each second
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_CARRION_BEETLES, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_CARRION_BEETLES, true);
-        }
+            PrepareAuraScript(spell_azjol_nerub_carrion_beetelsAuraScript)
 
-        void Register() override
+            void HandleEffectPeriodic(AuraEffect const*  /*aurEff*/)
+            {
+                // Xinef: 2 each second
+                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_CARRION_BEETLES, true);
+                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_CARRION_BEETLES, true);
+            }
+
+            void Register() override
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_azjol_nerub_carrion_beetelsAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            }
+        };
+
+        AuraScript *GetAuraScript() const override
         {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_azjol_nerub_carrion_beetelsAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            return new spell_azjol_nerub_carrion_beetelsAuraScript();
         }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_azjol_nerub_carrion_beetelsAuraScript();
-    }
 };
 
 class spell_azjol_nerub_pound : public SpellScriptLoader
 {
-public:
-    spell_azjol_nerub_pound() : SpellScriptLoader("spell_azjol_nerub_pound") { }
+    public:
+        spell_azjol_nerub_pound() : SpellScriptLoader("spell_azjol_nerub_pound") { }
 
-    class spell_azjol_nerub_pound_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_azjol_nerub_pound_SpellScript);
-
-        void HandleApplyAura(SpellEffIndex  /*effIndex*/)
+        class spell_azjol_nerub_pound_SpellScript : public SpellScript
         {
-            if (Unit* unitTarget = GetHitUnit())
-                GetCaster()->CastSpell(unitTarget, SPELL_POUND_DAMAGE, true);
-        }
+            PrepareSpellScript(spell_azjol_nerub_pound_SpellScript);
 
-        void Register() override
+            void HandleApplyAura(SpellEffIndex  /*effIndex*/)
+            {
+                if (Unit* unitTarget = GetHitUnit())
+                    GetCaster()->CastSpell(unitTarget, SPELL_POUND_DAMAGE, true);
+            }
+
+            void Register() override
+            {
+                OnEffectHitTarget += SpellEffectFn(spell_azjol_nerub_pound_SpellScript::HandleApplyAura, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
         {
-            OnEffectHitTarget += SpellEffectFn(spell_azjol_nerub_pound_SpellScript::HandleApplyAura, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+            return new spell_azjol_nerub_pound_SpellScript();
         }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_azjol_nerub_pound_SpellScript();
-    }
 };
 
 class spell_azjol_nerub_impale_summon : public SpellScriptLoader
 {
-public:
-    spell_azjol_nerub_impale_summon() : SpellScriptLoader("spell_azjol_nerub_impale_summon") { }
+    public:
+        spell_azjol_nerub_impale_summon() : SpellScriptLoader("spell_azjol_nerub_impale_summon") { }
 
-    class spell_azjol_nerub_impale_summon_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_azjol_nerub_impale_summon_SpellScript);
-
-        void SetDest(SpellDestination& dest)
+        class spell_azjol_nerub_impale_summon_SpellScript : public SpellScript
         {
-            // Adjust effect summon position
-            float floorZ = GetCaster()->GetMap()->GetHeight(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), true);
-            if (floorZ > INVALID_HEIGHT)
-                dest._position.m_positionZ = floorZ;
-        }
+            PrepareSpellScript(spell_azjol_nerub_impale_summon_SpellScript);
 
-        void Register() override
+            void SetDest(SpellDestination& dest)
+            {
+                // Adjust effect summon position
+                float floorZ = GetCaster()->GetMapHeight(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), true);
+                if (floorZ > INVALID_HEIGHT)
+                    dest._position.m_positionZ = floorZ;
+            }
+
+            void Register() override
+            {
+                OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_azjol_nerub_impale_summon_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER);
+            }
+        };
+
+        SpellScript* GetSpellScript() const override
         {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_azjol_nerub_impale_summon_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER);
+            return new spell_azjol_nerub_impale_summon_SpellScript();
         }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_azjol_nerub_impale_summon_SpellScript();
-    }
 };
 
 void AddSC_boss_anub_arak()
