@@ -867,7 +867,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             AddAura(SPELL_MAGE_PET_SCALING_02, this);
                             AddAura(SPELL_MAGE_PET_SCALING_03, this);
                             AddAura(SPELL_MAGE_PET_SCALING_04, this);
-                            ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                             break;
                         }
                 }
@@ -939,7 +938,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             AddAura(SPELL_MAGE_PET_SCALING_02, this);
                             AddAura(SPELL_MAGE_PET_SCALING_03, this);
                             AddAura(SPELL_MAGE_PET_SCALING_04, this);
-                            ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                             break;
                         }
                     case NPC_TREANT: //force of nature

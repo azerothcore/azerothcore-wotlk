@@ -1550,6 +1550,52 @@ public:
     }
 };
 
+enum InstantStatue
+{
+    CREATURE_INSTANT_STATUE_PEDESTAL = 40246,
+    SPELL_INSTANT_STATUE = 75731
+};
+
+class spell_item_instant_statue : public SpellScriptLoader
+{
+public:
+    spell_item_instant_statue() : SpellScriptLoader("spell_item_instant_statue") { }
+
+    class spell_item_instant_stature_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_item_instant_stature_AuraScript);
+
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_INSTANT_STATUE });
+        }
+
+        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+            {
+                return;
+            }
+
+            if (Creature* creature = caster->FindNearestCreature(CREATURE_INSTANT_STATUE_PEDESTAL, 0.0f, true))
+            {
+                creature->RemoveAurasDueToSpell(SPELL_INSTANT_STATUE);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectRemove += AuraEffectRemoveFn(spell_item_instant_stature_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_item_instant_stature_AuraScript();
+    }
+};
+
 // Theirs
 // Generic script for handling item dummy effects which trigger another spell.
 class spell_item_trigger_spell : public SpellScriptLoader
@@ -4241,6 +4287,7 @@ void AddSC_item_spell_scripts()
     new spell_item_direbrew_remote();
     new spell_item_eye_of_gruul_healing_discount();
     new spell_item_summon_argent_knight();
+    new spell_item_instant_statue();
 
     // Theirs
     // 23074 Arcanite Dragonling
