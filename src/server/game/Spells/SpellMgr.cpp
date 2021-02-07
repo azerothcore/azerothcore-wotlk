@@ -4518,12 +4518,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->SpellFamilyFlags = flag96(0, 0x10, 0);
     });
 
-    // Clearcasting
-    ApplySpellFix({ 16870 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->DurationIndex = 31; // 8 secs
-    });
-
     // Owlkin Frenzy
     ApplySpellFix({ 48391 }, [](SpellEntry* spellInfo)
     {
