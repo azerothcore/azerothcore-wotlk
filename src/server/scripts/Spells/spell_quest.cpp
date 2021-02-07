@@ -1205,7 +1205,6 @@ public:
                     }
                     if (newEntry)
                     {
-                        creatureTarget->RemoveAllAuras();
                         creatureTarget->UpdateEntry(newEntry);
                         creatureTarget->DespawnOrUnsummon(DESPAWN_TIME);
                         caster->KilledMonsterCredit(newEntry, 0);
