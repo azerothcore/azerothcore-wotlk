@@ -132,7 +132,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Cache
-        uses: actions/cache@v1.1.2
+        uses: actions/cache@v2
         with:
            path: ./docker/build/cache/.ccache
            key: ccache:ubuntu-20.04:${{ github.ref }}:${{ github.sha }}
