@@ -1,11 +1,18 @@
+# syntax = docker/dockerfile:1.2
+
 FROM ubuntu:20.04 as testable
 
 # install the required dependencies to compile AzerothCore
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt install -y git cmake make gcc g++ clang libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev libace-6.4.5 libace-dev
+RUN apt update && \
+    apt install -y git \
+                   cmake make gcc g++ clang ccache \
+                   libmysqlclient-dev libssl-dev \
+                   libbz2-dev libreadline-dev \
+                   libncurses-dev libace-6.4.5 \
+                   libace-dev
 
 # copy the sources from the host machine to the Docker container
-#ADD .git /azerothcore/.git // used in genrev.cmake
 ADD deps /azerothcore/deps
 ADD conf/dist /azerothcore/conf/dist
 ADD src /azerothcore/src
@@ -15,22 +22,27 @@ ADD CMakeLists.txt /azerothcore/CMakeLists.txt
 ARG ENABLE_SCRIPTS=1
 ENV ENABLE_SCRIPTS=$ENABLE_SCRIPTS
 
-#COPY docker/build/cache azerothcore/build
-
-RUN mkdir azerothcore/build && \
+RUN --mount=type=cache,target=/root/.ccache \
+    mkdir azerothcore/build && \
     cd azerothcore/build && \
     # run cmake
     cmake ../ -DCMAKE_INSTALL_PREFIX=/azeroth-server \
               -DCMAKE_C_COMPILER=/usr/bin/clang \
               -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
-              -DTOOLS=0 -DSCRIPTS=$ENABLE_SCRIPTS \
+              -DTOOLS=0 \
+              -DSCRIPTS=$ENABLE_SCRIPTS \
               -DWITH_WARNINGS=1 \
               -DCMAKE_C_FLAGS="-Werror" \
               -DCMAKE_CXX_FLAGS="-Werror" \
-              -DBUILD_TESTING=1 && \
+              -DBUILD_TESTING=1 \
+              -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+              -DCMAKE_CXX_COMPILER_LAUNCHER=ccache && \
     # calculate the optimal number of threads
     MTHREADS=`grep -c ^processor /proc/cpuinfo`; MTHREADS=$(($MTHREADS + 2)) && \
     # run compilation
+    CCACHE_CPP2=true \
+    CCACHE_MAXSIZE='500MB' \
+    CCACHE_COMPRESS=1 \
     make -j $MTHREADS && \
     make install -j $MTHREADS && \
     # copy the binary files "authserver" and "worldserver" files back to the host
