@@ -154,7 +154,22 @@ jobs:
           docker-compose --version
       - name: Build
         run: |
-          docker build -t azerothcore/worldserver -f docker/worldserver/Dockerfile docker/worldserver
+          docker-compose build ac-worldserver
+
+  docker-worldserver-dev:
+    strategy:
+      fail-fast: true
+    runs-on: ubuntu-20.04
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure
+        run: |
+          docker --version
+          docker-compose --version
+      - name: Build
+        run: |
+          docker-compose build ac-worldserver-dev
 
   docker-authserver:
     strategy:
@@ -169,7 +184,7 @@ jobs:
           docker-compose --version
       - name: Build
         run: |
-          docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/authserver
+          docker-compose build ac-authserver
 
   docker-database:
     strategy:
@@ -184,4 +199,4 @@ jobs:
           docker-compose --version
       - name: Build
         run: |
-          docker build -t azerothcore/database -f docker/database/Dockerfile .
+          docker-compose build ac-database
