@@ -156,9 +156,7 @@ jobs:
         run: |
           docker build -t azerothcore/database -f docker/database/Dockerfile .
       - name: Add assets
-        run: source ./acore.sh client-data
-        env:
-          CI_DOCKER: true
+        run: source ./acore.sh client-data-docker
       - name: Generate configs
         run: source ./bin/acore-docker-generate-etc
       - name: Dry Run
