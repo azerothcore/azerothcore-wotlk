@@ -2907,11 +2907,11 @@ void SpellMgr::LoadSpellCustomAttr()
                         case SPELL_EFFECT_APPLY_AREA_AURA_PET:
                         case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
                             if (spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE ||
-                                spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE_PERCENT ||
-                                spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_DUMMY ||
-                                spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_LEECH ||
-                                spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_HEALTH_FUNNEL ||
-                                spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DUMMY)
+                                    spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE_PERCENT ||
+                                    spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_DUMMY ||
+                                    spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_LEECH ||
+                                    spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_HEALTH_FUNNEL ||
+                                    spellInfo->Effects[j].ApplyAuraName == SPELL_AURA_PERIODIC_DUMMY)
                                 continue;
                             [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                         default:
@@ -2925,6 +2925,7 @@ void SpellMgr::LoadSpellCustomAttr()
                                                 break;
                                             }
                             continue;
+                            }
                 }
             }
         }
