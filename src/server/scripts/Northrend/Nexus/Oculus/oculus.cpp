@@ -525,9 +525,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
         }
 
         void Apply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -565,9 +563,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_RUBY_EVASIVE_CHARGES))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_RUBY_EVASIVE_CHARGES });
         }
 
         void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
@@ -602,9 +598,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
         }
 
         void CalcDamage()
@@ -644,9 +638,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
