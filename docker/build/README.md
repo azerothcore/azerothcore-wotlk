@@ -14,22 +14,16 @@ Note: every time you update your AzerothCore sources, you **must** run again the
 
 ## Usage
 
-To build the container image you have to be in the **main** folder of your local AzerothCore sources directory and run:
+To build the container image and AC you have to be in the **main** folder of your local AzerothCore sources directory and run:
 
 ```
-docker build -t acbuild -f docker/build/Dockerfile .
-```
-
-Then you can launch the container to rebuild AC using:
-
-```
-docker run \
-    -v /$(pwd)/docker/build/cache:/azerothcore/build \
-    -v /$(pwd)/docker/worldserver/bin:/binworldserver \
-    -v /$(pwd)/docker/authserver/bin:/binauthserver \
-    acbuild
+docker-compose --profile build up --build ac-build
 ```
 
 ### Clearing the cache
 
-To clear the build cache, delete all files contained under the `docker/build/cache` directory.
+To clear the build cache, run the following command:
+
+```
+docker-compose --profile build run --user root ac-build rm -rf /azerothcore/var/build/
+```

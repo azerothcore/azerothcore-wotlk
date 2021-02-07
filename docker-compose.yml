@@ -1,9 +1,8 @@
-version: '3.2'
+version: '3.9'
 
 services:
-
   ac-database:
-    image: azerothcore/database
+    image: local/azerothcore/database # name of the generated image after built locally
     restart: unless-stopped
     build:
       context: .
@@ -22,58 +21,111 @@ services:
   ac-worldserver:
     stdin_open: true
     tty: true
-    image: azerothcore/worldserver
+    image: local/azerothcore/worldserver # name of the generated image after built locally
     restart: unless-stopped
     privileged: true
     build:
-      context: ./docker/worldserver
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./docker/worldserver/Dockerfile
     networks:
       - ac-network
     ports:
       - ${WORLD_EXTERNAL_PORT:-8085}:8085
       - ${SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
-      - type: bind
-        source: ./docker/worldserver/bin
-        target: /azeroth-server/bin
+      - ac-dist:/azerothcore/env/dist
       - type: bind
         source: ${WORLDSERVER_ETC:-./docker/worldserver/etc}
-        target: /azeroth-server/etc
+        target: /azerothcore/env/dist/etc
       - type: bind
         source: ${WORLDSERVER_LOGS:-./docker/worldserver/logs}
-        target: /azeroth-server/logs
+        target: /azerothcore/env/dist/logs
       - type: bind
         source: ${WORLDSERVER_DATA:-./docker/worldserver/data}
-        target: /azeroth-server/data
+        target: /azerothcore/env/dist/data
     depends_on:
       - ac-database
 
   ac-authserver:
-    image: azerothcore/authserver
+    image: local/azerothcore/authserver # name of the generated image after built locally
     restart: unless-stopped
     build:
-      context: ./docker/authserver
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./docker/authserver/Dockerfile
     networks:
       - ac-network
     ports:
       - ${AUTH_EXTERNAL_PORT:-3724}:3724
     volumes:
-      - type: bind
-        source: ./docker/authserver/bin
-        target: /azeroth-server/bin
+      - ac-dist:/azerothcore/env/dist
       - type: bind
         source: ${AUTHSERVER_ETC:-./docker/authserver/etc}
-        target: /azeroth-server/etc
+        target: /azerothcore/env/dist/etc
       - type: bind
         source: ${AUTHSERVER_LOGS:-./docker/authserver/logs}
-        target: /azeroth-server/logs
+        target: /azerothcore/env/dist/logs
     depends_on:
       - ac-database
 
+  ac-build:
+    image: local/azerothcore/build
+    networks:
+      - ac-network
+    build:
+      context: .
+      dockerfile: ./docker/build/Dockerfile
+      args:
+        ENABLE_SCRIPTS: ${ENABLE_SCRIPTS:-1}
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    volumes:
+      - ac-build:/azerothcore/var/build
+      - ac-dist:/azerothcore/env/dist
+      - ./docker/config-docker.sh:/azerothcore/conf/dist/config.sh
+      - ./conf/dist/config.sh:/azerothcore/conf/dist/config-default.sh
+    profiles:
+      - build
+
+  ac-worldserver-dev:
+    networks:
+      - ac-network
+    tty: true
+    image: local/azerothcore/worldserver-dev
+    security_opt:
+      - seccomp:unconfined
+    build:
+      context: .
+      dockerfile: ./docker/worldserver/Dockerfile.gdb
+      args:
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
+    volumes:
+      - type: bind
+        source: ./
+        target: /azerothcore/
+      - ac-dist:/azerothcore/env/dist
+      - ac-build:/azerothcore/var/build
+      - type: bind
+        source: ${WORLDSERVER_ETC:-./docker/worldserver/etc}
+        target: /azerothcore/env/dist/etc
+      - type: bind
+        source: ${WORLDSERVER_LOGS:-./docker/worldserver/logs}
+        target: /azerothcore/env/dist/logs
+      - type: bind
+        source: ${WORLDSERVER_DATA:-./docker/worldserver/data}
+        target: /azerothcore/env/dist/data
+      - ./docker/config-docker.sh:/azerothcore/conf/dist/config.sh
+      - ./conf/dist/config.sh:/azerothcore/conf/dist/config-default.sh
+    ports:
+      - ${WORLD_EXTERNAL_PORT:-8085}:8085
+      - ${SOAP_EXTERNAL_PORT:-7878}:7878
+    profiles:
+      - dev
+
 volumes:
   ac-database:
+  ac-dist:
+  ac-build:
 
 networks:
   ac-network:

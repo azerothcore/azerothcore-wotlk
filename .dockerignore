@@ -2,8 +2,6 @@ build*/
 var/*
 data/contrib/*
 data/doc/*
-conf/*
-!conf/dist
 docker/worldserver/data/*
 docker/build/cache
 .idea

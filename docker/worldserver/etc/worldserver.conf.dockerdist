@@ -5,8 +5,8 @@
 
 # Do NOT change those Dir configs
 # Files in LogsDir will reflect on your host directory: docker/worldserver/logs
-LogsDir = "/azeroth-server/logs"
-DataDir = "/azeroth-server/data"
+LogsDir = "/azerothcore/env/dist/logs"
+DataDir = "/azerothcore/env/dist/data"
 
 # Change this configuration accordingly with your docker setup
 # The format is "hostname;port;username;password;database":
