@@ -147,7 +147,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (888, 'You must be below level %u to enter.'),
 (889, 'To enter, the group leader (%s) must have completed the following quest(s):'),
 (890, 'To enter, the group leader (%s) must have completed the following achievement(s):'),
-(891, 'To enter, the group leader (%s) must have have the following item(s) in their inventory:');
+(891, 'To enter, the group leader (%s) must have the following item(s) in his/her inventory:');
 
 -- Update old command
 UPDATE `command` SET `name` = 'reload dungeon_access_template', `help` = 'Syntax: .reload dungeon_access_template\r Reload dungeon_access_template table.' WHERE `name` = 'reload access_requirement';
