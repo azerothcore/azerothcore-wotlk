@@ -63,8 +63,8 @@ public:
 
         static std::vector<ChatCommand> morphCommandTable =
         {
-            { "reset",      SEC_GAMEMASTER,     false, &HandleMorphResetCommand, "" },
-            { "target",     SEC_GAMEMASTER,     false, &HandleMorphTargetCommand, "" }
+            { "reset",      SEC_MODERATOR,     false, &HandleMorphResetCommand, "" },
+            { "target",     SEC_MODERATOR,     false, &HandleMorphTargetCommand, "" }
         };
 
         static std::vector<ChatCommand> commandTable =
