@@ -591,9 +591,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE });
         }
 
         // this is an additional effect to be executed
@@ -718,9 +716,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_TWILIGHT_BLOODBOLT_FROM_WHIRL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_TWILIGHT_BLOODBOLT_FROM_WHIRL });
         }
 
         bool Load() override
@@ -814,9 +810,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_HEAL });
         }
 
         void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -849,13 +843,12 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_FRENZIED_BLOODTHIRST))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY))
-                return false;
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR,
+                    SPELL_FRENZIED_BLOODTHIRST,
+                    SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY
+                });
         }
 
         SpellCastResult CheckTarget()

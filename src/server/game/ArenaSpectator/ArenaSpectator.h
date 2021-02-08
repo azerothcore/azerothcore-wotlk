@@ -197,7 +197,7 @@ namespace ArenaSpectator
         if (aura->GetSpellInfo()->SpellIconID == 1 || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR1_DONT_DISPLAY_IN_AURA_BAR))
             return false;
 
-        if (remove || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH) || aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_GENERIC)
+        if (remove || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_AURA_CC) || aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_GENERIC)
             return true;
 
         for(uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)

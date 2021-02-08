@@ -1091,11 +1091,11 @@ public:
         {
             if (Player* target = handler->getSelectedPlayer())
             {
-                target->SaveToDB(true, false);
+                target->SaveToDB(false, false);
             }
             else
             {
-                player->SaveToDB(true, false);
+                player->SaveToDB(false, false);
             }
             handler->SendSysMessage(LANG_PLAYER_SAVED);
             return true;
@@ -1105,7 +1105,7 @@ public:
         uint32 saveInterval = sWorld->getIntConfig(CONFIG_INTERVAL_SAVE);
         if (saveInterval == 0 || (saveInterval > 20 * IN_MILLISECONDS && player->GetSaveTimer() <= saveInterval - 20 * IN_MILLISECONDS))
         {
-            player->SaveToDB(true, false);
+            player->SaveToDB(false, false);
         }
 
         return true;
