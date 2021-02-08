@@ -3588,15 +3588,13 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
         bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(source->GetMapId(),
             startX, startY, startZ + halfHeight,
             destX, destY, destZ + halfHeight,
-            destX, destY, destZ, -0.5f);
+            destX, destY, destZ, -CONTACT_DISTANCE);
 
         destZ -= halfHeight;
 
         // Collided with static LOS object, move back to collision point
         if (col)
         {
-            destX -= CONTACT_DISTANCE * std::cos(angle);
-            destY -= CONTACT_DISTANCE * std::sin(angle);
             collided = true;
         }
     }
@@ -3605,15 +3603,13 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
     bool col = source->GetMap()->getObjectHitPos(source->GetPhaseMask(),
         startX, startY, startZ + halfHeight,
         destX, destY, destZ + halfHeight,
-        destX, destY, destZ, -0.5f);
+        destX, destY, destZ, -CONTACT_DISTANCE);
 
     destZ -= halfHeight;
 
     // Collided with a gameobject, move back to collision point
     if (col)
     {
-        destX -= CONTACT_DISTANCE * std::cos(angle);
-        destY -= CONTACT_DISTANCE * std::sin(angle);
         collided = true;
     }
 

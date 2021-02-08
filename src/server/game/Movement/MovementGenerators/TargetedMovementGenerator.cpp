@@ -126,6 +126,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         {
             cOwner->SetCannotReachTarget(true);
             cOwner->StopMoving();
+            i_path = nullptr;
             return true;
         }
     }
