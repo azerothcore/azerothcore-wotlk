@@ -28,7 +28,6 @@ services:
     build:
       context: .
       dockerfile: docker/server/Dockerfile
-      target: testable
     networks:
       - ac-network
     ports:
@@ -47,7 +46,6 @@ services:
     build:
       context: .
       dockerfile: docker/server/Dockerfile
-      target: testable
     environment:
       START_AS_AUTHSERVER: "true"
     networks:

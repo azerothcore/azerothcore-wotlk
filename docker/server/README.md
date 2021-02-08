@@ -26,4 +26,8 @@ It should look like this:
 *Inside the root folder of this repository.*
 
 1. Optionnally run `docker-compose pull` to pull already built images and get started quickly
-2. Run `docker-compose up --build`
+2. Run `COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose up --build`
+
+## Notes
+
+Use `COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose build --progress plain` if you need build output for debugging purpose.
