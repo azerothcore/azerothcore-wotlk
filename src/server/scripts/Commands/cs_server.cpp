@@ -111,7 +111,7 @@ public:
 
         if (handler->GetSession())
             if (Player* p = handler->GetSession()->GetPlayer())
-                if (p->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER))
+                if (p->IsDeveloper())
                     handler->PSendSysMessage("DEV wavg: %ums, nsmax: %ums, nsavg: %ums. LFG avg: %ums, max: %ums.", avgDiffTracker.getTimeWeightedAverage(), devDiffTracker.getMax(), devDiffTracker.getAverage(), lfgDiffTracker.getAverage(), lfgDiffTracker.getMax());
 
         //! Can't use sWorld->ShutdownMsg here in case of console command
