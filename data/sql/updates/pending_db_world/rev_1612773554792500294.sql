@@ -9,4 +9,3 @@ UPDATE `gameobject` SET `spawntimesecs`=2 WHERE `guid` IN
 43223, -- The Deed to Southshore
 43224 -- The Deed to Tarren Mill
 );
-
