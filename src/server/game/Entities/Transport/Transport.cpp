@@ -269,6 +269,10 @@ void MotionTransport::AddPassenger(WorldObject* passenger, bool withAll)
             passenger->m_movementInfo.flags |= MOVEMENTFLAG_ONTRANSPORT;
             passenger->m_movementInfo.transport.guid = GetGUID();
             passenger->m_movementInfo.transport.pos.Relocate(x, y, z, o);
+            if (passenger->ToUnit())
+            {
+                passenger->ToUnit()->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
+            }
         }
     }
 }
@@ -290,6 +294,10 @@ void MotionTransport::RemovePassenger(WorldObject* passenger, bool withAll)
             passenger->m_movementInfo.flags &= ~MOVEMENTFLAG_ONTRANSPORT;
             passenger->m_movementInfo.transport.guid = 0;
             passenger->m_movementInfo.transport.pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
+            if (passenger->ToUnit())
+            {
+                passenger->ToUnit()->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
+            }
         }
     }
 }

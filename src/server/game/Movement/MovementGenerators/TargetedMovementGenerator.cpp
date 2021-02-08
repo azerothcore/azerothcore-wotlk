@@ -18,7 +18,7 @@ static bool IsMutualChase(Unit* owner, Unit* target)
     if (target->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
         return false;
 
-    return target->GetVictim() == owner->GetVictim();
+    return target->GetVictim() == owner;
 }
 
 template<class T>
@@ -43,8 +43,10 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (!owner || !owner->IsAlive())
         return false;
 
+    Creature* cOwner = owner->ToCreature();
+
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
-    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsMovementPreventedByCasting()))
+    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || (cOwner && cOwner->IsMovementPreventedByCasting()))
     {
         i_path = nullptr;
         owner->StopMoving();
@@ -56,8 +58,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
         return true;
     }
-
-    Creature* cOwner = owner->ToCreature();
 
     bool forceDest =
         //(cOwner && (cOwner->isWorldBoss() || cOwner->IsDungeonBoss())) || // force for all bosses, even not in instances
@@ -96,8 +96,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         }
     }
 
-    bool hasMoveState = owner->HasUnitState(UNIT_STATE_CHASE_MOVE) || owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE);
-    if (hasMoveState && owner->movespline->Finalized())
+    if (owner->HasUnitState(UNIT_STATE_CHASE_MOVE) && owner->movespline->Finalized())
     {
         i_recalculateTravel = false;
         i_path = nullptr;
@@ -114,7 +113,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     _lastTargetPosition = i_target->GetPosition();
 
-    if (PositionOkay(owner, target, maxRange, angle) && !hasMoveState)
+    if (PositionOkay(owner, target, maxRange, angle) && !owner->HasUnitState(UNIT_STATE_CHASE_MOVE))
         return true;
 
     bool moveToward = !owner->IsInDist(target, maxRange);
@@ -145,8 +144,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
     else
     {
-        if (target->GetTypeId() == TYPEID_PLAYER)
-            shortenPath = false;
         // otherwise, we fall back to nearpoint finding
         target->GetNearPoint(owner, x, y, z, (moveToward ? maxTarget : minTarget) - hitboxSum, 0, angle ? target->ToAbsoluteAngle(angle->RelativeAngle) : target->GetAngle(owner));
         shortenPath = false;
@@ -237,7 +234,7 @@ bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target, float rang
     if (owner->GetExactDistSq(target) > G3D::square(owner->GetCombatReach() + target->GetCombatReach() + range))
         return false;
 
-    return !owner->IsPet() || !angle || angle->IsAngleOkay(target->GetRelativeAngle(owner));
+    return !owner->IsPet() || !angle || angle->IsAngleOkay(target->GetRelativeAngle(owner)); // need to check - dont think we need !pet exception here because there are scripts with MoveFollow that require angle
 }
 
 template<class T>
