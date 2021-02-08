@@ -19,7 +19,7 @@ command -v mysqlimport >/dev/null 2>&1 || { WIN_BIN=1; }
 command -v mysqldump >/dev/null 2>&1 || { WIN_BIN=1; }
 
 WIN_BIN=1
-if [[ $(uname -s) == "Linux") ]] || [[ $(uname -s) == "Darwin" ]]; then
+if [[ $(uname -s) == "Linux" ]] || [[ $(uname -s) == "Darwin" ]]; then
    WIN_BIN=0
 else
    WIN_BIN=1 
