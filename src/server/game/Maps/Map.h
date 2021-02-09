@@ -7,11 +7,6 @@
 #ifndef ACORE_MAP_H
 #define ACORE_MAP_H
 
-// Pathfinding
-#include "DetourAlloc.h"
-#include "DetourNavMesh.h"
-#include "DetourNavMeshQuery.h"
-
 #include "Define.h"
 #include <ace/RW_Thread_Mutex.h>
 #include <ace/Thread_Mutex.h>
@@ -27,7 +22,6 @@
 #include "GameObjectModel.h"
 #include "PathGenerator.h"
 #include "ObjectDefines.h"
-#include "Log.h"
 #include "DataMap.h"
 #include <bitset>
 #include <list>
