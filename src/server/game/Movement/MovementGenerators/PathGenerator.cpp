@@ -332,7 +332,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
             // we can hit offmesh connection as last poly - closestPointOnPoly() don't like that
             // try to recover by using prev polyref
             --prefixPolyLength;
-            suffixStartPoly = _pathPolyRefs[prefixPolyLength-1];
+            suffixStartPoly = _pathPolyRefs[prefixPolyLength - 1];
             if (dtStatusFailed(_navMeshQuery->closestPointOnPoly(suffixStartPoly, endPoint, suffixEndPoint, nullptr)))
             {
                 // suffixStartPoly is still invalid, error state
@@ -502,9 +502,9 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
     BuildPointPath(startPoint, endPoint);
 }
 
-void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoint)
+void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoint)
 {
-    float pathPoints[MAX_POINT_PATH_LENGTH*VERTEX_SIZE];
+    float pathPoints[MAX_POINT_PATH_LENGTH * VERTEX_SIZE];
     uint32 pointCount = 0;
     dtStatus dtResult = DT_FAILURE;
     if (_useRaycast)
@@ -613,7 +613,7 @@ void PathGenerator::BuildPointPath(const float *startPoint, const float *endPoin
         if (Dist3DSqr(GetActualEndPosition(), GetEndPosition()) < 0.3f * Dist3DSqr(GetStartPosition(), GetEndPosition()))
         {
             SetActualEndPosition(GetEndPosition());
-            _pathPoints[_pathPoints.size()-1] = GetEndPosition();
+            _pathPoints[_pathPoints.size() - 1] = GetEndPosition();
         }
         else
         {
@@ -707,14 +707,14 @@ NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
 
     switch (data.type_flags)
     {
-        case MAP_LIQUID_TYPE_WATER:
-        case MAP_LIQUID_TYPE_OCEAN:
-            return NAV_WATER;
-        case MAP_LIQUID_TYPE_MAGMA:
-        case MAP_LIQUID_TYPE_SLIME:
-            return NAV_MAGMA;
-        default:
-            return NAV_GROUND;
+    case MAP_LIQUID_TYPE_WATER:
+    case MAP_LIQUID_TYPE_OCEAN:
+        return NAV_WATER;
+    case MAP_LIQUID_TYPE_MAGMA:
+    case MAP_LIQUID_TYPE_SLIME:
+        return NAV_MAGMA;
+    default:
+        return NAV_GROUND;
     }
 }
 
@@ -740,10 +740,10 @@ uint32 PathGenerator::FixupCorridor(dtPolyRef* path, uint32 npath, uint32 maxPat
     int32 furthestVisited = -1;
 
     // Find furthest common polygon.
-    for (int32 i = npath-1; i >= 0; --i)
+    for (int32 i = npath - 1; i >= 0; --i)
     {
         bool found = false;
-        for (int32 j = nvisited-1; j >= 0; --j)
+        for (int32 j = nvisited - 1; j >= 0; --j)
         {
             if (path[i] == visited[j])
             {
@@ -767,7 +767,7 @@ uint32 PathGenerator::FixupCorridor(dtPolyRef* path, uint32 npath, uint32 maxPat
     uint32 orig = uint32(furthestPath + 1) < npath ? furthestPath + 1 : npath;
     uint32 size = npath > orig ? npath - orig : 0;
     if (req + size > maxPath)
-        size = maxPath-req;
+        size = maxPath - req;
 
     if (size)
         memmove(path + req, path + orig, size * sizeof(dtPolyRef));
@@ -776,7 +776,7 @@ uint32 PathGenerator::FixupCorridor(dtPolyRef* path, uint32 npath, uint32 maxPat
     for (uint32 i = 0; i < req; ++i)
         path[i] = visited[(nvisited - 1) - i];
 
-    return req+size;
+    return req + size;
 }
 
 bool PathGenerator::GetSteerTarget(float const* startPos, float const* endPos,
@@ -785,7 +785,7 @@ bool PathGenerator::GetSteerTarget(float const* startPos, float const* endPos,
 {
     // Find steer target.
     static const uint32 MAX_STEER_POINTS = 3;
-    float steerPath[MAX_STEER_POINTS*VERTEX_SIZE];
+    float steerPath[MAX_STEER_POINTS * VERTEX_SIZE];
     unsigned char steerPathFlags[MAX_STEER_POINTS];
     dtPolyRef steerPathPolys[MAX_STEER_POINTS];
     uint32 nsteerPath = 0;
@@ -809,7 +809,7 @@ bool PathGenerator::GetSteerTarget(float const* startPos, float const* endPos,
     if (ns >= nsteerPath)
         return false;
 
-    dtVcopy(steerPos, &steerPath[ns*VERTEX_SIZE]);
+    dtVcopy(steerPos, &steerPath[ns * VERTEX_SIZE]);
     steerPos[1] = startPos[1];  // keep Z value
     steerPosFlag = steerPathFlags[ns];
     steerPosRef = steerPathPolys[ns];
@@ -850,7 +850,7 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
         dtVcopy(targetPos, endPos);
     }
 
-    dtVcopy(&smoothPath[nsmoothPath*VERTEX_SIZE], iterPos);
+    dtVcopy(&smoothPath[nsmoothPath * VERTEX_SIZE], iterPos);
     nsmoothPath++;
 
     // Move towards target a small advancement at a time until target reached or
@@ -912,7 +912,7 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
             dtVcopy(iterPos, targetPos);
             if (nsmoothPath < maxSmoothPathSize)
             {
-                dtVcopy(&smoothPath[nsmoothPath*VERTEX_SIZE], iterPos);
+                dtVcopy(&smoothPath[nsmoothPath * VERTEX_SIZE], iterPos);
                 nsmoothPath++;
             }
             break;
@@ -931,7 +931,7 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
             }
 
             for (uint32 i = npos; i < npolys; ++i)
-                polys[i-npos] = polys[i];
+                polys[i - npos] = polys[i];
 
             npolys -= npos;
 
@@ -955,7 +955,7 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
         // Store results.
         if (nsmoothPath < maxSmoothPathSize)
         {
-            dtVcopy(&smoothPath[nsmoothPath*VERTEX_SIZE], iterPos);
+            dtVcopy(&smoothPath[nsmoothPath * VERTEX_SIZE], iterPos);
             nsmoothPath++;
         }
     }

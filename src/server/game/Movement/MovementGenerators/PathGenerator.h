@@ -18,7 +18,7 @@
 class Unit;
 class WorldObject;
 
-// 74*4.0f=296y  number_of_points*interval = max_path_len
+// 74*4.0f=296y number_of_points*interval = max_path_len
 // this is way more than actual evade range
 // I think we can safely cut those down even more
 #define MAX_PATH_LENGTH             74
@@ -65,7 +65,7 @@ public:
 
     // option setters - use optional
 
-        // when set, it skips paths with too high slopes (doesn't work with StraightPath enabled)
+    // when set, it skips paths with too high slopes (doesn't work with StraightPath enabled)
     void SetSlopeCheck(bool checkSlope) { _slopeCheck = checkSlope; }
     void SetUseStraightPath(bool useStraightPath) { _useStraightPath = useStraightPath; }
     void SetPathLengthLimit(float distance) { _pointPathLimit = std::min<uint32>(uint32(distance / SMOOTH_PATH_STEP_SIZE), MAX_POINT_PATH_LENGTH); }
@@ -156,6 +156,7 @@ private:
     void BuildPointPath(float const* startPoint, float const* endPoint);
     void BuildShortcut();
 
+    NavTerrain GetNavTerrain(float x, float y, float z) const;
     void CreateFilter();
     void UpdateFilter();
 
