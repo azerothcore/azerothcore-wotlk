@@ -641,7 +641,7 @@ void Creature::Update(uint32 diff)
                         // regenerate health if not in combat or if polymorphed)
                         if (!IsInCombat() || IsPolymorphed())
                             RegenerateHealth();
-                        else if (IsNotReachable())
+                        else if (IsNotReachableAndNeedRegen())
                         {
                             // regenerate health if cannot reach the target and the setting is set to do so.
                             // this allows to disable the health regen of raid bosses if pathfinding has issues for whatever reason
