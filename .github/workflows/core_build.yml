@@ -36,7 +36,10 @@ jobs:
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
       COMPILER: ${{ matrix.compiler }}
+<<<<<<< HEAD
     if: github.repository == 'azerothcore/azerothcore-wotlk'
+=======
+>>>>>>> e0b7a0c5fcc3114be9db6a2785da625133c64baf
     steps:
       - uses: actions/checkout@v2
       - name: Checkout modules
@@ -79,7 +82,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     needs: [build]
+<<<<<<< HEAD
     if: github.repository == 'azerothcore/azerothcore-wotlk'
+=======
+>>>>>>> e0b7a0c5fcc3114be9db6a2785da625133c64baf
     steps:
       - uses: actions/checkout@v2
       - name: Cache
@@ -104,7 +110,10 @@ jobs:
       fail-fast: false
     runs-on: windows-2019
     name: windows-2019-MSVC16
+<<<<<<< HEAD
     if: github.repository == 'azerothcore/azerothcore-wotlk'
+=======
+>>>>>>> e0b7a0c5fcc3114be9db6a2785da625133c64baf
     steps:
       - uses: actions/checkout@v2
       - name: Configure OS
