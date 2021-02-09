@@ -112,7 +112,7 @@ namespace Movement
 
         bool onTransport;
         [[nodiscard]] std::string ToString() const;
-         bool HasStarted() const
+        [[nodiscard]] bool HasStarted() const
         {
             return time_passed > 0;
         }
