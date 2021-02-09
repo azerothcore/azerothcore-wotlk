@@ -3577,8 +3577,6 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
     // collision check
     bool collided = false;
 
-    float angle = getAngle(destX, destY, startX, startY);
-
     // check static LOS
     float halfHeight = source->GetCollisionHeight() * 0.5f;
 

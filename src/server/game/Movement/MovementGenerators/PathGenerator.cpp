@@ -707,14 +707,14 @@ NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
 
     switch (data.type_flags)
     {
-    case MAP_LIQUID_TYPE_WATER:
-    case MAP_LIQUID_TYPE_OCEAN:
-        return NAV_WATER;
-    case MAP_LIQUID_TYPE_MAGMA:
-    case MAP_LIQUID_TYPE_SLIME:
-        return NAV_MAGMA;
-    default:
-        return NAV_GROUND;
+        case MAP_LIQUID_TYPE_WATER:
+        case MAP_LIQUID_TYPE_OCEAN:
+            return NAV_WATER;
+        case MAP_LIQUID_TYPE_MAGMA:
+        case MAP_LIQUID_TYPE_SLIME:
+            return NAV_MAGMA;
+        default:
+            return NAV_GROUND;
     }
 }
 
