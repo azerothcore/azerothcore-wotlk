@@ -819,6 +819,7 @@ ChatLogs.Guild = 0
 ChatLogs.Public = 0
 
 #
+#    WARNING: enabling this might cause issues to your addon channel
 #    ChatLogs.Addon
 #        Description: Log addon messages.
 #        Default:     0 - (Disabled)
