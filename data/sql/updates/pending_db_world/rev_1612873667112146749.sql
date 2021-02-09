@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1612873667112146749');
 
 -- Illusion of Jandice Barov, immunity to all spell schools but normal and use SAI
-UPDATE `creature_template` SET `spell_school_immune_mask` = 126, `AIName`="SmartAI" WHERE `entry` = 11439;
+UPDATE `creature_template` SET `speed_walk` = 1, `spell_school_immune_mask` = 126, `AIName`="SmartAI" WHERE `entry` = 11439;
 
 -- Illusion of Jandice Barov, SAI
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 11439 AND `source_type` = 0;
