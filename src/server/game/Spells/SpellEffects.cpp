@@ -1368,9 +1368,9 @@ void Spell::EffectPowerDrain(SpellEffIndex effIndex)
     if (m_spellInfo->Effects[effIndex].MiscValue < 0 || m_spellInfo->Effects[effIndex].MiscValue >= int8(MAX_POWERS))
         return;
 
-    Powers powerType = Powers(m_spellInfo->Effects[effIndex].MiscValue);
+    Powers PowerType = Powers(m_spellInfo->Effects[effIndex].MiscValue);
 
-    if (!unitTarget || !unitTarget->IsAlive() || unitTarget->getPowerType() != powerType || damage < 0)
+    if (!unitTarget || !unitTarget->IsAlive() || unitTarget->getPowerType() != PowerType || damage < 0)
         return;
 
     // add spell damage bonus
@@ -1379,10 +1379,10 @@ void Spell::EffectPowerDrain(SpellEffIndex effIndex)
 
     // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
     int32 power = damage;
-    if (powerType == POWER_MANA)
+    if (PowerType == POWER_MANA)
         power -= unitTarget->GetSpellCritDamageReduction(power);
 
-    int32 newDamage = -(unitTarget->ModifyPower(powerType, -int32(power)));
+    int32 newDamage = -(unitTarget->ModifyPower(PowerType, -int32(power)));
 
     float gainMultiplier = 0.0f;
 
@@ -1393,9 +1393,9 @@ void Spell::EffectPowerDrain(SpellEffIndex effIndex)
 
         int32 gain = int32(newDamage * gainMultiplier);
 
-        m_caster->EnergizeBySpell(m_caster, m_spellInfo->Id, gain, powerType);
+        m_caster->EnergizeBySpell(m_caster, m_spellInfo->Id, gain, PowerType);
     }
-    ExecuteLogEffectTakeTargetPower(effIndex, unitTarget, powerType, newDamage, gainMultiplier);
+    ExecuteLogEffectTakeTargetPower(effIndex, unitTarget, PowerType, newDamage, gainMultiplier);
 }
 
 void Spell::EffectSendEvent(SpellEffIndex effIndex)
@@ -1449,16 +1449,16 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
     if (m_spellInfo->Effects[effIndex].MiscValue < 0 || m_spellInfo->Effects[effIndex].MiscValue >= int8(MAX_POWERS))
         return;
 
-    Powers powerType = Powers(m_spellInfo->Effects[effIndex].MiscValue);
+    Powers PowerType = Powers(m_spellInfo->Effects[effIndex].MiscValue);
 
-    if (!unitTarget || !unitTarget->IsAlive() || unitTarget->getPowerType() != powerType || damage < 0)
+    if (!unitTarget || !unitTarget->IsAlive() || unitTarget->getPowerType() != PowerType || damage < 0)
         return;
 
     // burn x% of target's mana, up to maximum of 2x% of caster's mana (Mana Burn)
     if (m_spellInfo->Id == 8129)
     {
-        int32 maxDamage = int32(CalculatePct(m_caster->GetMaxPower(powerType), damage * 2));
-        damage = int32(CalculatePct(unitTarget->GetMaxPower(powerType), damage));
+        int32 maxDamage = int32(CalculatePct(m_caster->GetMaxPower(PowerType), damage * 2));
+        damage = int32(CalculatePct(unitTarget->GetMaxPower(PowerType), damage));
         damage = std::min(damage, maxDamage);
 
         // Remove fear
@@ -1467,16 +1467,16 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
 
     int32 power = damage;
     // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
-    if (powerType == POWER_MANA)
+    if (PowerType == POWER_MANA)
         power -= unitTarget->GetSpellCritDamageReduction(power);
 
-    int32 newDamage = -(unitTarget->ModifyPower(powerType, -power));
+    int32 newDamage = -(unitTarget->ModifyPower(PowerType, -power));
 
     // NO - Not a typo - EffectPowerBurn uses effect value multiplier - not effect damage multiplier
     float dmgMultiplier = m_spellInfo->Effects[effIndex].CalcValueMultiplier(m_originalCaster, this);
 
     // add log data before multiplication (need power amount, not damage)
-    ExecuteLogEffectTakeTargetPower(effIndex, unitTarget, powerType, newDamage, 0.0f);
+    ExecuteLogEffectTakeTargetPower(effIndex, unitTarget, PowerType, newDamage, 0.0f);
 
     newDamage = int32(newDamage * dmgMultiplier);
 

@@ -427,7 +427,7 @@ public:
     SpellCastResult CheckSpellFocus();
     SpellCastResult CheckRange(bool strict);
     SpellCastResult CheckPower();
-    SpellCastResult CheckRuneCost(uint32 runeCostID);
+    SpellCastResult CheckRuneCost(uint32 RuneCostID);
     SpellCastResult CheckCasterAuras(bool preventionOnly) const;
 
     int32 CalculateSpellDamage(uint8 i, Unit const* target) const { return m_caster->CalculateSpellDamage(target, m_spellInfo, i, &m_spellValue->EffectBasePoints[i]); }
@@ -455,7 +455,7 @@ public:
     void SendSpellGo();
     void SendSpellCooldown();
     void SendLogExecute();
-    void ExecuteLogEffectTakeTargetPower(uint8 effIndex, Unit* target, uint32 powerType, uint32 powerTaken, float gainMultiplier);
+    void ExecuteLogEffectTakeTargetPower(uint8 effIndex, Unit* target, uint32 PowerType, uint32 powerTaken, float gainMultiplier);
     void ExecuteLogEffectExtraAttacks(uint8 effIndex, Unit* victim, uint32 attCount);
     void ExecuteLogEffectInterruptCast(uint8 effIndex, Unit* victim, uint32 spellId);
     void ExecuteLogEffectDurabilityDamage(uint8 effIndex, Unit* victim, int32 itemId, int32 slot);
