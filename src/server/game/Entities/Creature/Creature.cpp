@@ -488,6 +488,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
     UpdateEnvironmentIfNeeded(3);
 
+    LoadSpellTemplateImmunity();
     return true;
 }
 
@@ -640,7 +641,7 @@ void Creature::Update(uint32 diff)
                         // regenerate health if not in combat or if polymorphed)
                         if (!IsInCombat() || IsPolymorphed())
                             RegenerateHealth();
-                        else if (CanNotReachTarget())
+                        else if (IsNotReachableAndNeedRegen())
                         {
                             // regenerate health if cannot reach the target and the setting is set to do so.
                             // this allows to disable the health regen of raid bosses if pathfinding has issues for whatever reason
@@ -665,7 +666,7 @@ void Creature::Update(uint32 diff)
                 if (CanNotReachTarget() && !IsInEvadeMode() && !GetMap()->IsRaid())
                 {
                     m_cannotReachTimer += diff;
-                    if (m_cannotReachTimer >= (sWorld->getIntConfig(CONFIG_NPC_EVADE_IF_NOT_REACHABLE)*IN_MILLISECONDS) && IsAIEnabled)
+                    if (IsNotReachable() && IsAIEnabled)
                     {
                         AI()->EnterEvadeMode();
                     }
@@ -1803,6 +1804,37 @@ bool Creature::HasMechanicTemplateImmunity(uint32 mask) const
 {
     return !IS_PLAYER_GUID(GetOwnerGUID()) && (GetCreatureTemplate()->MechanicImmuneMask & mask);
 }
+
+void Creature::LoadSpellTemplateImmunity()
+{
+    // uint32 max used for "spell id", the immunity system will not perform SpellInfo checks against invalid spells
+    // used so we know which immunities were loaded from template
+    static uint32 const placeholderSpellId = std::numeric_limits<uint32>::max();
+
+    // unapply template immunities (in case we're updating entry)
+    for (uint8 i = SPELL_SCHOOL_NORMAL; i <= SPELL_SCHOOL_ARCANE; ++i)
+    {
+        ApplySpellImmune(placeholderSpellId, IMMUNITY_SCHOOL, i, false);
+    }
+
+    // don't inherit immunities for hunter pets
+    if (IS_PLAYER_GUID(GetOwnerGUID()) && IsHunterPet())
+    {
+        return;
+    }
+
+    if (uint8 mask = GetCreatureTemplate()->SpellSchoolImmuneMask)
+    {
+        for (uint8 i = SPELL_SCHOOL_NORMAL; i <= SPELL_SCHOOL_ARCANE; ++i)
+        {
+            if (mask & (1 << i))
+            {
+                ApplySpellImmune(placeholderSpellId, IMMUNITY_SCHOOL, 1 << i, true);
+            }
+        }
+    }
+}
+
 
 bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo)
 {

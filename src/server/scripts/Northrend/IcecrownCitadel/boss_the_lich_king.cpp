@@ -1912,9 +1912,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_NECROTIC_PLAGUE_JUMP))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_NECROTIC_PLAGUE_JUMP });
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -2160,9 +2158,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ICE_BURST))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ICE_BURST });
         }
 
         void CheckTargetCount(std::list<WorldObject*>& unitList)
@@ -2476,9 +2472,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_SOUL_REAPER_BUFF))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_SOUL_REAPER_BUFF });
         }
 
         void OnPeriodic(AuraEffect const* /*aurEff*/)
@@ -2897,9 +2891,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_LIFE_SIPHON_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_LIFE_SIPHON_HEAL });
         }
 
         void TriggerHeal()
@@ -3524,9 +3516,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DARK_HUNGER_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DARK_HUNGER_HEAL });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
