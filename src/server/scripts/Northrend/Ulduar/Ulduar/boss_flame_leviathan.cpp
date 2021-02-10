@@ -121,7 +121,6 @@ enum Texts
     FLAME_LEVIATHAN_EMOTE_PURSUE,
     FLAME_LEVIATHAN_EMOTE_OVERLOAD,
     FLAME_LEVIATHAN_EMOTE_REPAIR
-
 };
 
 enum Sounds
@@ -1092,7 +1091,6 @@ public:
             }
         }
     };
-
 };
 
 class npc_thorims_hammer : public CreatureScript
@@ -1385,7 +1383,7 @@ public:
             {
                 float x, y, z;
                 me->GetPosition(x, y, z);
-                z = me->GetMap()->GetHeight(me->GetPhaseMask(), x, y, z);
+                z = me->GetMapHeight(x, y, z);
                 me->GetMotionMaster()->MovePoint(me->GetEntry(), x, y, z);
                 me->SetPosition(x, y, z, 0);
             }

@@ -152,7 +152,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class spell_mark_of_kazrogal : public SpellScriptLoader
@@ -181,9 +180,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_MARK_DAMAGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_MARK_DAMAGE });
         }
 
         void OnPeriodic(AuraEffect const* aurEff)

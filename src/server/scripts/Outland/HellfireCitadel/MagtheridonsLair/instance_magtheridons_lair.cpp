@@ -210,7 +210,6 @@ public:
         std::set<uint64> _wardersSet;
         std::set<uint64> _cubesSet;
         std::set<uint64> _columnSet;
-
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

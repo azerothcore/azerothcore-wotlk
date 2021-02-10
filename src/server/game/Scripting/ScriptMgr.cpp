@@ -70,7 +70,6 @@ template class ScriptRegistry<MailScript>;
 ScriptMgr::ScriptMgr()
     : _scriptCount(0), _scheduledScripts(0)
 {
-
 }
 
 ScriptMgr::~ScriptMgr()
@@ -498,7 +497,6 @@ void ScriptMgr::OnGroupRateCalculation(float& rate, uint32 count, bool isRaid)
                 continue; \
             if (C->MapID == V->GetId()) \
             {
-
 #define SCR_MAP_END \
                 return; \
             } \
@@ -720,7 +718,6 @@ bool ScriptMgr::OnItemRemove(Player* player, Item* item)
 #endif
     GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, false);
     return tmpscript->OnRemove(player, item);
-
 }
 
 bool ScriptMgr::OnCastItemCombatSpell(Player* player, Unit* victim, SpellInfo const* spellInfo, Item* item)
@@ -1713,6 +1710,17 @@ bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGu
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
     if (!itr->second->CanJoinInBattlegroundQueue(player, BattlemasterGuid, BGTypeID, joinAsGroup, err))
         ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::ShouldBeRewardedWithMoneyInsteadOfExp(Player* player)
+{
+    bool ret = false; // return false by default if not scripts
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret)
+        if (itr->second->ShouldBeRewardedWithMoneyInsteadOfExp(player))
+            ret = true; // we change ret value only when a script returns true
 
     return ret;
 }

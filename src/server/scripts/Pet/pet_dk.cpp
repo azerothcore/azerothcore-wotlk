@@ -67,11 +67,12 @@ public:
                         if (aur->GetEffect(0))
                             aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
 
-            float tz = me->GetMap()->GetHeight(me->GetPhaseMask(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, MAX_FALL_DISTANCE);
-            me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), tz, 7.0f, 1);
-            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
+
+            float tz = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, MAX_FALL_DISTANCE);
+            me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), tz, 7.0f, 1);
+            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             _selectionTimer = 2000;
             _initialCastTimer = 0;
         }

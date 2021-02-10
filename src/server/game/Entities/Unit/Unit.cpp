@@ -265,7 +265,6 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
 
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
 
-    m_mmapNotAcceptableStartTime = 0;
     m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
     m_last_notify_mstime = 0;
     m_delayed_unit_relocation_timer = 0;
@@ -464,7 +463,7 @@ void Unit::SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint32 T
     data.append(GetPackGUID());
 
     data << uint8(0);                                       // new in 3.1
-    data << GetPositionX() << GetPositionY() << GetPositionZ() + GetHoverHeight();
+    data << GetPositionX() << GetPositionY() << GetPositionZ();
     data << World::GetGameTimeMS();
     data << uint8(0);
     data << uint32(sf);
@@ -554,7 +553,7 @@ void Unit::UpdateSplinePosition()
 
 void Unit::DisableSpline()
 {
-    m_movementInfo.RemoveMovementFlag(MovementFlags(MOVEMENTFLAG_SPLINE_ENABLED | MOVEMENTFLAG_FORWARD));
+    m_movementInfo.RemoveMovementFlag(MovementFlags(MOVEMENTFLAG_SPLINE_ENABLED | MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD));
     movespline->_Interrupt();
 }
 
@@ -590,10 +589,15 @@ bool Unit::IsWithinMeleeRange(const Unit* obj, float dist) const
     float dz = GetPositionZ() - obj->GetPositionZ();
     float distsq = dx * dx + dy * dy + dz * dz;
 
-    float sizefactor = GetMeleeReach() + obj->GetMeleeReach();
-    float maxdist = dist + sizefactor;
+    float maxdist = dist + GetMeleeRange(obj);
 
     return distsq < maxdist * maxdist;
+}
+
+float Unit::GetMeleeRange(Unit const* target) const
+{
+    float range = GetCombatReach() + target->GetCombatReach() + 4.0f / 3.0f;
+    return std::max(range, NOMINAL_MELEE_RANGE);
 }
 
 bool Unit::IsWithinRange(Unit const* obj, float dist) const
@@ -629,14 +633,14 @@ bool Unit::GetRandomContactPoint(const Unit* obj, float& x, float& y, float& z, 
                  GetAngle(obj) + (attacker_number ? (static_cast<float>(M_PI / 2) - static_cast<float>(M_PI) * (float)rand_norm()) * float(attacker_number) / combat_reach * 0.3f : 0));
 
     // pussywizard
-    if (fabs(this->GetPositionZ() - z) > 3.0f || !IsWithinLOS(x, y, z))
+    if (fabs(this->GetPositionZ() - z) > this->GetCollisionHeight() || !IsWithinLOS(x, y, z))
     {
         x = this->GetPositionX();
         y = this->GetPositionY();
         z = this->GetPositionZ();
         obj->UpdateAllowedPositionZ(x, y, z);
     }
-    float maxDist = MELEE_RANGE + GetMeleeReach() + obj->GetMeleeReach();
+    float maxDist = GetMeleeRange(obj);
     if (GetExactDistSq(x, y, z) >= maxDist * maxDist)
     {
         if (force)
@@ -964,7 +968,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             }
         }
 
-        if (damagetype != NODAMAGE && damage && (!spellProto || !(spellProto->HasAttribute(SPELL_ATTR3_NO_PUSHBACK) || spellProto->HasAttribute(SPELL_ATTR7_NO_PUSHBACK_ON_DAMAGE))))
+        if (damagetype != NODAMAGE && damage && (!spellProto || !(spellProto->HasAttribute(SPELL_ATTR3_TREAT_AS_PERIODIC) || spellProto->HasAttribute(SPELL_ATTR7_NO_PUSHBACK_ON_DAMAGE))))
         {
             if (victim != attacker && victim->GetTypeId() == TYPEID_PLAYER) // does not support creature push_back
             {
@@ -2175,7 +2179,7 @@ void Unit::CalcHealAbsorb(Unit const* victim, const SpellInfo* healSpell, uint32
     healAmount = RemainingHeal;
 }
 
-void Unit::AttackerStateUpdate (Unit* victim, WeaponAttackType attType, bool extra)
+void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extra)
 {
     if (HasUnitState(UNIT_STATE_CANNOT_AUTOATTACK) || HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
         return;
@@ -2224,7 +2228,7 @@ void Unit::AttackerStateUpdate (Unit* victim, WeaponAttackType attType, bool ext
 
 Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 {
-    if (!attacker) // only player & pets to save CPU
+    if (!attacker)
     {
         return nullptr;
     }
@@ -2236,16 +2240,17 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
         return nullptr;
     }
 
-    float meleeReach = attacker->GetMeleeReach();
-
+    float meleeReach = GetExactDist2d(attacker);
     if (meleeReach <= 0)
     {
         return nullptr;
     }
 
-    float currentAngle, minDistance = 0;
+    float minAngle = 0;
     Unit *refUnit = nullptr;
-    uint32 validAttackers=0;
+    uint32 validAttackers = 0;
+
+    double attackerSize = attacker->GetCollisionRadius();
 
     for (const auto& otherAttacker: attackers)
     {
@@ -2259,80 +2264,49 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
             continue;
         }
 
-        float tempDist = attacker->GetExactDist2d(otherAttacker) - (attacker->GetObjectSize()/2) - (otherAttacker->GetObjectSize()/2);
+        float curretAngle = atan(attacker->GetExactDist2d(otherAttacker) / meleeReach);
 
-        if (tempDist == 0 || minDistance == 0 || tempDist < minDistance)
+        if (minAngle == 0 || curretAngle < minAngle)
         {
-            minDistance = tempDist;
-            currentAngle = GetAngle(otherAttacker);
+            minAngle = curretAngle;
             refUnit = otherAttacker;
         }
 
         validAttackers++;
     }
 
-    auto attackerSize = attacker->GetObjectSize();
+    if (!validAttackers || !refUnit)
+        return nullptr;
+
+    float contactDist = attackerSize + refUnit->GetCollisionRadius();
+    float requiredAngle = atan(contactDist / meleeReach);
+    float attackersAngle = atan(attacker->GetExactDist2d(refUnit) / meleeReach);
 
     // in instance: the more attacker there are, the higher will be the tollerance
     // outside: creatures should not intersecate
-    float distanceTollerance = attacker->GetMap()->IsDungeon() ? -attackerSize * tanh(validAttackers / 5.0f) : 0.0f;
+    float angleTollerance = attacker->GetMap()->IsDungeon() ? requiredAngle - requiredAngle * tanh(validAttackers / 5.0f) : requiredAngle;
 
-    if (!refUnit || minDistance > distanceTollerance)
+    if (attackersAngle > angleTollerance)
     {
         return nullptr;
     }
 
-    double ray = attackerSize > refUnit->GetObjectSize() ? attackerSize / 2.0f : refUnit->GetObjectSize() / 2.0f;
-    double angle = 0;
+    double angle = atan(contactDist / meleeReach);
 
-    // Equation of tangent point to get the ideal angle to
-    // move away from collisions with another unit during combat
-    // NOTE: it works only when there's enough space between the
-    // attacker and the victim. We use a simpler one otherwise.
-    if (GetExactDist2d(refUnit) > ray)
-    {
-        double refUnitX = refUnit->GetPositionX();
-        double refUnitY = refUnit->GetPositionY();
-        double victimX = GetPositionX();
-        double victimY = GetPositionY();
-
-        // calculate tangent star
-        double a = 4.0f * ( pow(ray,2.0f) - pow(refUnitX,2.0f) + (2.0f * refUnitX * victimX) - pow(victimX,2.0f) );
-        double b = 8.0f * ( (refUnitX * refUnitY) + (victimX * victimY) - (victimX * refUnitY) - (refUnitX * victimY) );
-        double c = 4.0f * (- pow(victimY,2.0f) - pow(refUnitY,2.0f) + (2.0f*victimY*refUnitY) + pow(ray,2.0f));
-
-        double sq = sqrt(pow(b,2.0f)-4.0f*a*c);
-
-        double m1 = (-b + sq) / (2.0f*a);
-        double m2 = (-b - sq) / (2.0f*a);
-
-        // tangents
-        double xT1 = ((-1.0f) * (m1*(victimY - m1*victimX - refUnitY) - refUnitX) ) / (1.0f + pow(m1,2.0f));
-        double xT2 = ((-1.0f) * (m2*(victimY - m2*victimX - refUnitY) - refUnitX) ) / (1.0f + pow(m2,2.0f));
-
-        double yT1 = m1*(xT1 - victimX) + victimY;
-        double yT2 = m2*(xT2 - victimX) + victimY;
-
-        double distance = sqrt(pow(yT2-yT1,2.0f) + pow(xT2-xT1,2.0f));
-        double exactDist = GetExactDist2d(xT1, yT1);
-
-        double ortDist = sqrt(pow(exactDist,2.0f) - pow(distance/2.0f,2.0f));
-
-        angle = 2.0f * atan(distance / (2.0f * ortDist));
-    }
-
-    int8 direction =  (urand(0, 1) ? -1 : 1);
-
-    angle = frand(0.1f,0.3f) + (angle && !isnan(angle) ? angle : atan(attackerSize / (meleeReach))); // or fallback to the simpler method
+    float angularRadius = frand(0.1f, 0.3f) + angle;
+    int8 direction = (urand(0, 1) ? -1 : 1);
+    float currentAngle = GetAngle(refUnit);
+    float absAngle = currentAngle + angularRadius * direction;
 
     float x, y, z;
-    GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * direction);
+    float distance = meleeReach - GetObjectSize();
+    GetNearPoint(attacker, x, y, z, distance, 0.0f, absAngle);
 
-    if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z))
+    if (!GetMap()->CanReachPositionAndGetValidCoords(this, x, y, z, true, true))
     {
-        GetNearPoint(attacker, x, y, z, attackerSize, 0.0f, currentAngle + angle * (direction * -1)); // try the other side
+        GetNearPoint(attacker, x, y, z, distance, 0.0f, absAngle * -1); // try the other side
 
-        if (!GetMap()->CanReachPositionAndGetCoords(this, x, y, z))
+        if (!GetMap()->CanReachPositionAndGetValidCoords(this, x, y, z, true, true))
         {
             return nullptr;
         }
@@ -2375,7 +2349,6 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
 
 MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackType attType, int32 crit_chance, int32 miss_chance, int32 dodge_chance, int32 parry_chance, int32 block_chance) const
 {
-
     if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsEvadingAttacks())
         return MELEE_HIT_EVADE;
 
@@ -3668,7 +3641,7 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
     }
 
     if (IsInWater())
-        return IsUnderWater() ? c->CanSwim() : (c->CanSwim() || c->CanFly());
+        return IsUnderWater() ? c->CanEnterWater() : (c->CanEnterWater() || c->CanFly());
     else
         return c->CanWalk() || c->CanFly() || (c->CanSwim() && IsInWater(true));
 }
@@ -3688,33 +3661,38 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         return;
     }
 
-    if (option <= 1 && GetExactDistSq(&m_last_environment_position) < 2.5f * 2.5f)
+    // run environment checks everytime the unit moves
+    // more than it's average radius
+    // TODO: find better solution here
+    float radiusWidth = GetCollisionRadius();
+    float radiusHeight = GetCollisionHeight() / 2;
+    float radiusAvg = (radiusWidth + radiusHeight) / 2;
+    if (option <= 1 && GetExactDistSq(&m_last_environment_position) < radiusAvg*radiusAvg)
         return;
+
     m_last_environment_position.Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
+    m_staticFloorZ = GetMap()->GetHeight(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ());
 
     m_is_updating_environment = true;
 
     bool changed = false;
-    Creature* c = this->ToCreature();
     Map* baseMap = const_cast<Map*>(GetBaseMap());
+    Creature* c = this->ToCreature();
     if (!c || !baseMap)
     {
         m_is_updating_environment = false;
         return;
     }
-
-    bool canChangeFlying = option == 3 || ((c->GetScriptId() == 0 || GetInstanceId() == 0) && GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE);
+    bool canChangeFlying = option == 3 || GetMotionMaster()->GetCurrentMovementGeneratorType() != WAYPOINT_MOTION_TYPE;
     bool canFallGround = option == 0 && canChangeFlying && GetInstanceId() == 0 && !IsInCombat() && !GetVehicle() && !GetTransport() && !HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && !c->IsTrigger() && !c->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && GetMotionMaster()->GetCurrentMovementGeneratorType() <= RANDOM_MOTION_TYPE && !HasUnitState(UNIT_STATE_EVADE) && !IsControlledByPlayer();
     float x = GetPositionX(), y = GetPositionY(), z = GetPositionZ();
     bool isInAir = true;
     float ground_z = z;
     LiquidData liquidData;
     liquidData.level = INVALID_HEIGHT;
-
     ZLiquidStatus liquidStatus = baseMap->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquidData);
-
     // IsInWater
-    bool enoughWater = (liquidData.level > INVALID_HEIGHT && liquidData.level > liquidData.depth_level && liquidData.level - liquidData.depth_level >= 1.5f); // also check if theres enough water - at least 2yd
+    bool enoughWater = baseMap->HasEnoughWater(this, liquidData);
     m_last_isinwater_status = (liquidStatus & (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER)) && enoughWater;
     m_last_islittleabovewater_status = (liquidData.level > INVALID_HEIGHT && liquidData.level > liquidData.depth_level && liquidData.level <= z + 3.0f && liquidData.level > z - 1.0f);
 
@@ -3769,12 +3747,12 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
     // Refresh being in water
     if (m_last_isinwater_status)
     {
-        if (!c->CanFly() || z < liquidData.level - 2.0f)
+        if (!c->CanFly() || enoughWater)
         {
             if (!HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD) && c->CanSwim() && (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY)))
             {
                 SetSwim(true);
-                SetDisableGravity(true);
+                // SetDisableGravity(true);
                 changed = true;
             }
             isInAir = false;
@@ -3802,11 +3780,12 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
     {
         if (GetMap()->GetGrid(x, y))
         {
-            float temp = GetMap()->GetHeight(GetPhaseMask(), x, y, z, true, 100.0f);
+            float temp = GetFloorZ();
             if (temp > INVALID_HEIGHT)
             {
                 ground_z = (c->CanSwim() && liquidData.level > INVALID_HEIGHT) ? liquidData.level : temp;
-                isInAir = flyingBarelyInWater || G3D::fuzzyGt(z, ground_z + 0.75f) || G3D::fuzzyLt(z, ground_z - 0.5f);
+                bool canHover = c->CanHover();
+                isInAir = flyingBarelyInWater || (G3D::fuzzyGt(GetPositionZ(), ground_z + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + GROUND_HEIGHT_TOLERANCE) || G3D::fuzzyLt(GetPositionZ(), ground_z - GROUND_HEIGHT_TOLERANCE)); // Can be underground too, prevent the falling
             }
             else
                 isInAir = true;
@@ -3839,24 +3818,26 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         }
         else if (c->CanFly() && isInAir)
         {
-            if (!c->IsFalling() && (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) /*|| !HasUnitMovementFlag(MOVEMENTFLAG_HOVER)*/))
+            if (!c->IsFalling() && (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) || !HasUnitMovementFlag(MOVEMENTFLAG_HOVER)))
             {
                 SetCanFly(true);
                 SetDisableGravity(true);
-                //SetHover(true);
+                if (IsAlive() && (c->CanHover() || HasAuraType(SPELL_AURA_HOVER)))
+                    SetHover(true);
                 changed = true;
             }
         }
         else
         {
-            if (HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || HasUnitMovementFlag(MOVEMENTFLAG_FLYING) /*|| HasUnitMovementFlag(MOVEMENTFLAG_HOVER)*/)
+            if (HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || HasUnitMovementFlag(MOVEMENTFLAG_FLYING) || HasUnitMovementFlag(MOVEMENTFLAG_HOVER))
             {
                 SetCanFly(false);
                 RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
-                //SetHover(false);
+                if (!HasAuraType(SPELL_AURA_HOVER))
+                    SetHover(false);
                 changed = true;
             }
-            if (HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) && !HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) /*&& !HasUnitMovementFlag(MOVEMENTFLAG_HOVER)*/)
+            if (HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) && !HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && !HasUnitMovementFlag(MOVEMENTFLAG_HOVER))
             {
                 SetDisableGravity(false);
                 changed = true;
@@ -4787,7 +4768,7 @@ void Unit::RemoveAurasByShapeShift()
     {
         Aura const* aura = iter->second->GetBase();
         if ((aura->GetSpellInfo()->GetAllEffectsMechanicMask() & mechanic_mask) &&
-                (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH) || (aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARRIOR && (aura->GetSpellInfo()->SpellFamilyFlags[1] & 0x20))))
+            (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_AURA_CC) || (aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARRIOR && (aura->GetSpellInfo()->SpellFamilyFlags[1] & 0x20))))
         {
             RemoveAura(iter);
             continue;
@@ -4853,7 +4834,7 @@ void Unit::RemoveArenaAuras()
     {
         AuraApplication const* aurApp = iter->second;
         Aura const* aura = aurApp->GetBase();
-        if (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR4_UNK21) // don't remove stances, shadowform, pally/hunter auras
+        if (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR4_DONT_REMOVE_IN_ARENA) // don't remove stances, shadowform, pally/hunter auras
                 && !aura->IsPassive()                               // don't remove passive auras
                 && !aura->IsArea()                                  // don't remove area auras, eg pet talents affecting owner
                 && (aurApp->IsPositive() || IsPet() || !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR3_DEATH_PERSISTENT))) // not negative death persistent auras
@@ -9724,6 +9705,13 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     if (GetTypeId() == TYPEID_PLAYER && IsMounted())
         return false;
 
+    // creatures cannot attack while evading
+    Creature* creature = ToCreature();
+    if (creature && creature->IsInEvadeMode())
+    {
+        return false;
+    }
+
     //if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED)) // pussywizard: wtf? why having this flag prevents from entering combat? it should just prevent melee attack
     //    return false;
 
@@ -9792,7 +9780,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     //if (GetTypeId() == TYPEID_UNIT)
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
 
-    if (GetTypeId() == TYPEID_UNIT && !IsPet())
+    if (creature && !IsPet())
     {
         // should not let player enter combat by right clicking target - doesn't helps
         SetInCombatWith(victim);
@@ -9800,8 +9788,8 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
             victim->SetInCombatWith(this);
         AddThreat(victim, 0.0f);
 
-        ToCreature()->SendAIReaction(AI_REACTION_HOSTILE);
-        ToCreature()->CallAssistance();
+        creature->SendAIReaction(AI_REACTION_HOSTILE);
+        creature->CallAssistance();
     }
 
     // delay offhand weapon attack to next attack time
@@ -9813,7 +9801,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
 
     // Let the pet know we've started attacking someting. Handles melee attacks only
     // Spells such as auto-shot and others handled in WorldSession::HandleCastSpellOpcode
-    if (this->GetTypeId() == TYPEID_PLAYER && !m_Controlled.empty())
+    if (GetTypeId() == TYPEID_PLAYER && !m_Controlled.empty())
         for (Unit::ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
             if (Unit* pet = *itr)
                 if (pet->IsAlive() && pet->GetTypeId() == TYPEID_UNIT)
@@ -9929,7 +9917,6 @@ void Unit::ModifyAuraState(AuraStateType flag, bool apply)
                     if( AuraApplication* aurApp = (*itr).second->GetApplicationOfTarget(GetGUID()) )
                         (*itr).second->HandleAllEffects(aurApp, AURA_EFFECT_HANDLE_REAL, true);
             }
-
         }
     }
     else
@@ -11297,7 +11284,6 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
         for (AuraEffectList::const_iterator i = mDamageDonebyAP.begin(); i != mDamageDonebyAP.end(); ++i)
             if ((*i)->GetMiscValue() & schoolMask)
                 DoneAdvertisedBenefit += int32(CalculatePct(GetTotalAttackPowerValue(BASE_ATTACK), (*i)->GetAmount()));
-
     }
     return DoneAdvertisedBenefit;
 }
@@ -12766,7 +12752,6 @@ void Unit::Dismount()
 
 void Unit::SetInCombatWith(Unit* enemy, uint32 duration)
 {
-
     // Xinef: Dont allow to start combat with triggers
     if (enemy->GetTypeId() == TYPEID_UNIT && enemy->ToCreature()->IsTrigger())
         return;
@@ -12793,7 +12778,6 @@ void Unit::SetInCombatWith(Unit* enemy, uint32 duration)
 
 void Unit::CombatStart(Unit* target, bool initialAggro)
 {
-
     // Xinef: Dont allow to start combat with triggers
     if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsTrigger())
         return;
@@ -12886,7 +12870,6 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
 
     if (Creature* creature = ToCreature())
     {
-        creature->m_targetsNotAcceptable.clear();
         creature->UpdateEnvironmentIfNeeded(2);
 
         // Set home position at place of engaging combat for escorted creatures
@@ -12903,6 +12886,8 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
             if (creature->GetFormation())
                 creature->GetFormation()->MemberAttackStart(creature, enemy);
         }
+
+        creature->RefreshSwimmingFlag();
 
         if (IsPet())
         {
@@ -13038,7 +13023,7 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
             return false;
     }
     // check flags
-    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_UNK_16)
+    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2)
             || (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
             || (!target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC))
             || (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC))
@@ -13078,7 +13063,6 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
                         if (FactionState const* repState = player->GetReputationMgr().GetState(factionEntry))
                             if (!(repState->Flags & FACTION_FLAG_AT_WAR))
                                 return false;
-
             }
         }
     }
@@ -13701,6 +13685,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
         // remove aurastates allowing special moves
         ClearAllReactives();
         ClearDiminishings();
+
         GetMotionMaster()->Clear(false);
         GetMotionMaster()->MoveIdle();
 
@@ -13907,33 +13892,15 @@ Unit* Creature::SelectVictim()
 
     if (target && _CanDetectFeignDeathOf(target) && CanCreatureAttack(target))
     {
-        if (m_mmapNotAcceptableStartTime) m_mmapNotAcceptableStartTime = 0; // pussywizard: finding any valid target resets timer
         SetInFront(target);
         return target;
     }
 
-    // pussywizard: if victim is not acceptable only due to mmaps, it may be for example a knockback, wait for a few secs before evading
-    if (!target && !isWorldBoss() && !GetInstanceId() && IsAlive() && (!CanHaveThreatList() || !getThreatManager().isThreatListEmpty()))
-        if (Unit* v = GetVictim())
-            if (isTargetNotAcceptableByMMaps(v->GetGUID(), sWorld->GetGameTime(), v))
-                if (_CanDetectFeignDeathOf(v) && CanCreatureAttack(v))
-                {
-                    if (m_mmapNotAcceptableStartTime)
-                    {
-                        if (sWorld->GetGameTime() <= m_mmapNotAcceptableStartTime + 4)
-                            return nullptr;
-                    }
-                    else
-                    {
-                        m_mmapNotAcceptableStartTime = sWorld->GetGameTime();
-                        return nullptr;
-                    }
-                }
-
-    // pussywizard: not sure why it's here
-    // pussywizard: if some npc (not player pet) is attacking us and we can't fight back - don't evade o_O
+    // last case when creature must not go to evade mode:
+    // it in combat but attacker not make any damage and not enter to aggro radius to have record in threat list
+    // Note: creature does not have targeted movement generator but has attacker in this case
     for (AttackerSet::const_iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
-        if ((*itr) && !CanCreatureAttack(*itr) && (*itr)->GetTypeId() != TYPEID_PLAYER && !(*itr)->ToCreature()->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
+        if ((*itr) && CanCreatureAttack(*itr) && (*itr)->GetTypeId() != TYPEID_PLAYER && !(*itr)->ToCreature()->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
             return nullptr;
 
     if (GetVehicle())
@@ -14081,7 +14048,6 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
     {
         // else positive mods here, there are no currently
         // when there will be, change GetTotalAuraModifierByMiscValue to GetTotalPositiveAuraModifierByMiscValue
-
     }
 
     // Glyphs which increase duration of selfcasted buffs
@@ -15762,7 +15728,6 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
                                 takeCharges = true;
                             else if (triggeredByAura->GetAmount()) // aura must have amount
                             {
-
                                 int32 damageLeft = triggeredByAura->GetAmount();
                                 // No damage left
                                 if (damageLeft < int32(damage))
@@ -15786,7 +15751,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         // Remove charge (aura can be removed by triggers)
         // xinef: take into account attribute6 of proc spell
         if (prepare && useCharges && takeCharges)
-            if (!procSpell || isVictim || !procSpell->HasAttribute(SPELL_ATTR6_DONT_CONSUME_CHARGES))
+            if (!procSpell || isVictim || !procSpell->HasAttribute(SPELL_ATTR6_DONT_CONSUME_PROC_CHARGES))
                 i->aura->DropCharge();
 
         i->aura->CallScriptAfterProcHandlers(aurApp, eventInfo);
@@ -15930,6 +15895,10 @@ void Unit::StopMoving()
     if (movespline->Finalized())
         return;
 
+    // Update position now since Stop does not start a new movement that can be updated later
+    if (movespline->HasStarted())
+        UpdateSplinePosition();
+
     Movement::MoveSplineInit init(this);
     init.Stop();
 }
@@ -15973,7 +15942,7 @@ bool Unit::IsStandState() const
 
 void Unit::SetStandState(uint8 state)
 {
-    SetByteValue(UNIT_FIELD_BYTES_1, 0, state);
+    SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, state);
 
     if (IsStandState())
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_SEATED);
@@ -16339,7 +16308,6 @@ float Unit::CalculateDefaultCoefficient(SpellInfo const* spellInfo, DamageEffect
     float DotFactor = 1.0f;
     if (damagetype == DOT)
     {
-
         int32 DotDuration = spellInfo->GetDuration();
         if (!spellInfo->IsChanneled() && DotDuration > 0)
             DotFactor = DotDuration / 15000.0f;
@@ -16740,7 +16708,6 @@ bool Unit::HandleAuraRaidProcFromChargeWithValue(AuraEffect* triggeredByAura)
     // heal
     CastCustomSpell(this, 33110, &heal, nullptr, nullptr, true, nullptr, nullptr, caster_guid);
     return true;
-
 }
 bool Unit::HandleAuraRaidProcFromCharge(AuraEffect* triggeredByAura)
 {
@@ -17604,6 +17571,9 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
 
     CombatStop();
     DeleteThreatList();
+
+    if (Creature* creature = ToCreature())
+        creature->RefreshSwimmingFlag();
 
     if (GetTypeId() == TYPEID_PLAYER)
         sScriptMgr->OnPlayerBeingCharmed(ToPlayer(), charmer, _oldFactionId, charmer->getFaction());
@@ -18797,7 +18767,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     {
         float x = pos.GetPositionX() + 2.0f * cos(pos.GetOrientation() - M_PI / 2.0f);
         float y = pos.GetPositionY() + 2.0f * sin(pos.GetOrientation() - M_PI / 2.0f);
-        float z = GetMap()->GetHeight(GetPhaseMask(), x, y, pos.GetPositionZ()) + 0.1f;
+        float z = GetMapHeight(x, y, pos.GetPositionZ());
         if (z > INVALID_HEIGHT)
             pos.Relocate(x, y, z);
     }
@@ -18881,15 +18851,12 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
 void Unit::BuildMovementPacket(ByteBuffer* data) const
 {
-    if (GetTypeId() == TYPEID_UNIT && GetHoverHeight() >= 2.0f && !HasUnitMovementFlag(MOVEMENTFLAG_FALLING) && !movespline->isFalling()) // pussywizard: add disable gravity to hover (artifically, not to spoil speed and other things)
-        *data << uint32(GetUnitMovementFlags() | MOVEMENTFLAG_DISABLE_GRAVITY);            // movement flags
-    else
-        *data << uint32(GetUnitMovementFlags());            // movement flags
+    *data << uint32(GetUnitMovementFlags());            // movement flags
     *data << uint16(GetExtraUnitMovementFlags());       // 2.3.0
     *data << uint32(World::GetGameTimeMS());                       // time / counter
     *data << GetPositionX();
     *data << GetPositionY();
-    *data << GetPositionZ() + GetHoverHeight();
+    *data << GetPositionZ();
     *data << GetOrientation();
 
     // 0x00000200
@@ -18939,6 +18906,13 @@ bool Unit::IsFalling() const
     return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FALLING | MOVEMENTFLAG_FALLING_FAR) || movespline->isFalling();
 }
 
+/**
+ * @brief this method checks the current flag of a unit
+ *
+ * These flags can be set within the database or dynamically changed at runtime
+ * UNIT_FLAG_SWIMMING must be updated when a unit enters a swimmable area
+ *
+ */
 bool Unit::CanSwim() const
 {
     // Mirror client behavior, if this method returns false then client will not use swimming animation and for players will apply gravity as if there was no water
@@ -18950,7 +18924,7 @@ bool Unit::CanSwim() const
         return false;
     if (IsPet() && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT))
         return true;
-    return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_RENAME | UNIT_FLAG_UNK_15);
+    return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_RENAME | UNIT_FLAG_SWIMMING);
 }
 
 void Unit::NearTeleportTo(float x, float y, float z, float orientation, bool casting /*= false*/, bool vehicleTeleport /*= false*/, bool withPet /*= false*/, bool removeTransport /*= false*/)
@@ -19659,9 +19633,15 @@ bool Unit::SetSwim(bool enable)
         return false;
 
     if (enable)
+    {
         AddUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
+        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
+    }
     else
+    {
         RemoveUnitMovementFlag(MOVEMENTFLAG_SWIMMING);
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
+    }
 
     return true;
 }
@@ -19733,13 +19713,23 @@ bool Unit::SetHover(bool enable, bool /*packetOnly = false*/)
     if (enable == HasUnitMovementFlag(MOVEMENTFLAG_HOVER))
         return false;
 
+    float hoverHeight = GetFloatValue(UNIT_FIELD_HOVERHEIGHT);
+
     if (enable)
     {
         AddUnitMovementFlag(MOVEMENTFLAG_HOVER);
+        if (hoverHeight && GetPositionZ() - GetFloorZ() < hoverHeight)
+            UpdateHeight(GetPositionZ() + hoverHeight);
     }
     else
     {
         RemoveUnitMovementFlag(MOVEMENTFLAG_HOVER);
+        if (hoverHeight && (!isDying() || GetTypeId() != TYPEID_UNIT))
+        {
+            float newZ = std::max<float>(GetFloorZ(), GetPositionZ() - hoverHeight);
+            UpdateAllowedPositionZ(GetPositionX(), GetPositionY(), newZ);
+            UpdateHeight(newZ);
+        }
         SendMovementFlagUpdate(); // pussywizard: needed for falling after death (instead of falling onto air at hover height)
     }
 
@@ -19999,31 +19989,77 @@ bool Unit::IsInCombatWith(Unit const* who) const
     return false;
 }
 
-//! Return collision height sent to client
-float Unit::GetCollisionHeight() const
+/**
+ * @brief this method gets the diameter of a Unit by DB if any value is defined, otherwise it gets the value by the DBC
+ *
+ * If the player is mounted the diameter also takes in consideration the mount size
+ *
+ * @return float The diameter of a unit
+ */
+float Unit::GetCollisionWidth() const
 {
-    uint32 nativeDisplayId = GetNativeDisplayId();
+    if (GetTypeId() == TYPEID_PLAYER)
+        return GetObjectSize();
+
+    float scaleMod = GetObjectScale(); // 99% sure about this
+    float objectSize = GetObjectSize();
+    float defaultSize = DEFAULT_WORLD_OBJECT_SIZE * scaleMod;
+
+    //! Dismounting case - use basic default model data
+    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
+    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
+
     if (IsMounted())
     {
-        if (CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID));
-            CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId))
+        if (CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID)))
         {
-            CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(nativeDisplayId);
-            ASSERT(displayInfo);
-            CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayInfo->ModelId);
-            ASSERT(modelData);
-
-            float scaleMod = GetFloatValue(OBJECT_FIELD_SCALE_X); // 99% sure about this
-
-            return scaleMod * mountModelData->MountHeight + modelData->CollisionHeight * 0.5f;
+            if (CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId))
+            {
+                if (G3D::fuzzyGt(mountModelData->CollisionWidth, modelData->CollisionWidth))
+                    modelData = mountModelData;
+            }
         }
     }
 
-    //! Dismounting case - use basic default model data
-    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(nativeDisplayId);
-    ASSERT(displayInfo);
-    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayInfo->ModelId);
-    ASSERT(modelData);
+    float collisionWidth = scaleMod * modelData->CollisionWidth * modelData->Scale * displayInfo->scale * 2;
+    // if the objectSize is the default value or the creature is mounted and we have a DBC value, then we can retrieve DBC value instead
+    return G3D::fuzzyGt(collisionWidth, 0.0f) && (G3D::fuzzyEq(objectSize,defaultSize) || IsMounted())  ? collisionWidth : objectSize;
+}
 
-    return modelData->CollisionHeight;
+/**
+ * @brief this method gets the radius of a Unit by DB if any value is defined, otherwise it gets the value by the DBC
+ *
+ * If the player is mounted the radius also takes in consideration the mount size
+ *
+ * @return float The radius of a unit
+ */
+float Unit::GetCollisionRadius() const
+{
+    return GetCollisionWidth() / 2;
+}
+
+//! Return collision height sent to client
+float Unit::GetCollisionHeight() const
+{
+    float scaleMod = GetObjectScale(); // 99% sure about this
+    float defaultHeight = DEFAULT_WORLD_OBJECT_SIZE * scaleMod;
+
+    CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
+    CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);
+    float collisionHeight = 0.0f;
+
+    if (IsMounted())
+    {
+        if (CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID)))
+        {
+            if (CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId))
+            {
+                collisionHeight = scaleMod * (mountModelData->MountHeight + modelData->CollisionHeight * modelData->Scale * displayInfo->scale * 0.5f);
+            }
+        }
+    }
+    else
+        collisionHeight = scaleMod * modelData->CollisionHeight * modelData->Scale * displayInfo->scale;
+
+    return collisionHeight == 0.0f ? defaultHeight : collisionHeight;
 }

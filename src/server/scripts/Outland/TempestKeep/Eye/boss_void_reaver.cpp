@@ -27,7 +27,6 @@ enum voidReaver
 class boss_void_reaver : public CreatureScript
 {
 public:
-
     boss_void_reaver() : CreatureScript("boss_void_reaver") { }
 
     struct boss_void_reaverAI : public BossAI

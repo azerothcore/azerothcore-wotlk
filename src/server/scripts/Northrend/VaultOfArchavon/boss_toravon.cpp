@@ -35,7 +35,6 @@ enum Events
     EVENT_FROZEN_ORB_STALKER            = 2,
     EVENT_CAST_WHITEOUT                 = 3,
     EVENT_CAST_WHITEOUT_GROUND_EFFECT   = 4,
-
 };
 
 enum Misc

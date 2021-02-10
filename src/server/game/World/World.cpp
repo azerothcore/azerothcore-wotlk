@@ -1075,6 +1075,14 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_GUILD_RESET_HOUR] = 6;
     }
 
+    m_int_configs[CONFIG_GUILD_BANK_INITIAL_TABS] = sConfigMgr->GetIntDefault("Guild.BankInitialTabs", 0);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_0] = sConfigMgr->GetIntDefault("Guild.BankTabCost0", 1000000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_1] = sConfigMgr->GetIntDefault("Guild.BankTabCost1", 2500000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_2] = sConfigMgr->GetIntDefault("Guild.BankTabCost2", 5000000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_3] = sConfigMgr->GetIntDefault("Guild.BankTabCost3", 10000000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_4] = sConfigMgr->GetIntDefault("Guild.BankTabCost4", 25000000);
+    m_int_configs[CONFIG_GUILD_BANK_TAB_COST_5] = sConfigMgr->GetIntDefault("Guild.BankTabCost5", 50000000);
+
     m_bool_configs[CONFIG_DETECT_POS_COLLISION] = sConfigMgr->GetBoolDefault("DetectPosCollision", true);
 
     m_bool_configs[CONFIG_RESTRICTED_LFG_CHANNEL]      = sConfigMgr->GetBoolDefault("Channel.RestrictedLfg", true);
@@ -1271,9 +1279,7 @@ void World::LoadConfigSettings(bool reload)
     sLog->outString("WORLD: VMap support included. LineOfSight:%i, getHeight:%i, indoorCheck:%i PetLOS:%i", enableLOS, enableHeight, enableIndoor, enablePetLOS);
 
     m_bool_configs[CONFIG_PET_LOS]          = sConfigMgr->GetBoolDefault("vmap.petLOS", true);
-    m_bool_configs[CONFIG_START_ALL_SPELLS] = sConfigMgr->GetBoolDefault("PlayerStart.AllSpells", false);
-    if (m_bool_configs[CONFIG_START_ALL_SPELLS])
-        sLog->outString("WORLD: WARNING: PlayerStart.AllSpells enabled - may not function as intended!");
+    m_bool_configs[CONFIG_START_ALL_SPELLS]   = sConfigMgr->GetBoolDefault("PlayerStart.CustomSpells", false);
     m_int_configs[CONFIG_HONOR_AFTER_DUEL]    = sConfigMgr->GetIntDefault("HonorPointsAfterDuel", 0);
     m_bool_configs[CONFIG_START_ALL_EXPLORED] = sConfigMgr->GetBoolDefault("PlayerStart.MapsExplored", false);
     m_bool_configs[CONFIG_START_ALL_REP]      = sConfigMgr->GetBoolDefault("PlayerStart.AllReputation", false);
@@ -1286,6 +1292,7 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_PVP_TOKEN_COUNT] = 1;
 
     m_bool_configs[CONFIG_NO_RESET_TALENT_COST]       = sConfigMgr->GetBoolDefault("NoResetTalentsCost", false);
+    m_int_configs[CONFIG_TOGGLE_XP_COST]              = sConfigMgr->GetIntDefault("ToggleXP.Cost", 100000);
     m_bool_configs[CONFIG_SHOW_KICK_IN_WORLD]         = sConfigMgr->GetBoolDefault("ShowKickInWorld", false);
     m_bool_configs[CONFIG_SHOW_MUTE_IN_WORLD]         = sConfigMgr->GetBoolDefault("ShowMuteInWorld", false);
     m_bool_configs[CONFIG_SHOW_BAN_IN_WORLD]          = sConfigMgr->GetBoolDefault("ShowBanInWorld", false);
@@ -1308,6 +1315,7 @@ void World::LoadConfigSettings(bool reload)
     // Warden
     m_bool_configs[CONFIG_WARDEN_ENABLED]              = sConfigMgr->GetBoolDefault("Warden.Enabled", false);
     m_int_configs[CONFIG_WARDEN_NUM_MEM_CHECKS]        = sConfigMgr->GetIntDefault("Warden.NumMemChecks", 3);
+    m_int_configs[CONFIG_WARDEN_NUM_LUA_CHECKS]        = sConfigMgr->GetIntDefault("Warden.NumLuaChecks", 1);
     m_int_configs[CONFIG_WARDEN_NUM_OTHER_CHECKS]      = sConfigMgr->GetIntDefault("Warden.NumOtherChecks", 7);
     m_int_configs[CONFIG_WARDEN_CLIENT_BAN_DURATION]   = sConfigMgr->GetIntDefault("Warden.BanDuration", 86400);
     m_int_configs[CONFIG_WARDEN_CLIENT_CHECK_HOLDOFF]  = sConfigMgr->GetIntDefault("Warden.ClientCheckHoldOff", 30);
@@ -1395,9 +1403,15 @@ void World::LoadConfigSettings(bool reload)
 
     m_int_configs[CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER] = sConfigMgr->GetIntDefault("WaypointMovementStopTimeForPlayer", 120);
 
+    m_int_configs[CONFIG_NPC_EVADE_IF_NOT_REACHABLE] = sConfigMgr->GetIntDefault("NpcEvadeIfTargetIsUnreachable", 5);
+    m_int_configs[CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID] = sConfigMgr->GetIntDefault("NpcRegenHPTimeIfTargetIsUnreachable", 10);
+    m_bool_configs[CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID] = sConfigMgr->GetBoolDefault("NpcRegenHPIfTargetIsUnreachable", true);
+
     //Debug
     m_bool_configs[CONFIG_DEBUG_BATTLEGROUND] = sConfigMgr->GetBoolDefault("Debug.Battleground", false);
     m_bool_configs[CONFIG_DEBUG_ARENA]        = sConfigMgr->GetBoolDefault("Debug.Arena",        false);
+
+    m_int_configs[CONFIG_GM_LEVEL_CHANNEL_MODERATION] = sConfigMgr->GetIntDefault("Channel.ModerationGMLevel", 1);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
@@ -1873,13 +1887,15 @@ void World::SetInitialWorldSettings()
     AddonMgr::LoadFromDB();
 
     // pussywizard:
-    sLog->outString("Deleting invalid mail items...\n");
+    sLog->outString("Deleting invalid mail items...");
+    sLog->outString();
     CharacterDatabase.Query("DELETE mi FROM mail_items mi LEFT JOIN item_instance ii ON mi.item_guid = ii.guid WHERE ii.guid IS NULL");
     CharacterDatabase.Query("DELETE mi FROM mail_items mi LEFT JOIN mail m ON mi.mail_id = m.id WHERE m.id IS NULL");
     CharacterDatabase.Query("UPDATE mail m LEFT JOIN mail_items mi ON m.id = mi.mail_id SET m.has_items=0 WHERE m.has_items<>0 AND mi.mail_id IS NULL");
 
     ///- Handle outdated emails (delete/return)
     sLog->outString("Returning old mails...");
+    sLog->outString();
     sObjectMgr->ReturnOrDeleteOldMails(false);
 
     ///- Load AutoBroadCast
@@ -1913,10 +1929,12 @@ void World::SetInitialWorldSettings()
     sCalendarMgr->LoadFromDB();
 
     sLog->outString("Initializing SpellInfo precomputed data..."); // must be called after loading items, professions, spells and pretty much anything
+    sLog->outString();
     sObjectMgr->InitializeSpellInfoPrecomputedData();
 
     ///- Initialize game time and timers
     sLog->outString("Initialize game time and timers");
+    sLog->outString();
     m_gameTime = time(nullptr);
     m_startTime = m_gameTime;
 
@@ -1947,9 +1965,11 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize MapManager
     sLog->outString("Starting Map System");
+    sLog->outString();
     sMapMgr->Initialize();
 
     sLog->outString("Starting Game Event system...");
+    sLog->outString();
     uint32 nextGameEvent = sGameEventMgr->StartSystem();
     m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
 
@@ -1960,6 +1980,7 @@ void World::SetInitialWorldSettings()
     Channel::CleanOldChannelsInDB();
 
     sLog->outString("Starting Arena Season...");
+    sLog->outString();
     sGameEventMgr->StartArenaSeason();
 
     sTicketMgr->Initialize();
@@ -2006,6 +2027,7 @@ void World::SetInitialWorldSettings()
     InitCalendarOldEventsDeletionTime();
 
     sLog->outString("Calculate Guild cap reset time...");
+    sLog->outString();
     InitGuildResetTime();
 
     sLog->outString("Load Petitions...");
@@ -2148,6 +2170,7 @@ void World::LoadAutobroadcasts()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u autobroadcast definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 /// Update the World !

@@ -56,7 +56,6 @@ enum Misc
 class boss_high_astromancer_solarian : public CreatureScript
 {
 public:
-
     boss_high_astromancer_solarian() : CreatureScript("boss_high_astromancer_solarian") { }
 
     struct boss_high_astromancer_solarianAI : public BossAI
@@ -212,7 +211,6 @@ public:
                     me->CastSpell(me, SPELL_PSYCHIC_SCREAM, false);
                     events.ScheduleEvent(EVENT_SPELL_PSYCHIC_SCREAM, 12000);
                     break;
-
             }
 
             DoMeleeAttackIfReady();

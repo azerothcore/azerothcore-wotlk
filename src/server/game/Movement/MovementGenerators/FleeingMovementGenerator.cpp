@@ -30,18 +30,7 @@ void FleeingMovementGenerator<T>::_setTargetLocation(T* owner)
         return;
 
     float x, y, z;
-    if (!_getPoint(owner, x, y, z))
-        return;
-
-    // Add LOS check for target point
-    bool isInLOS = VMAP::VMapFactory::createOrGetVMapManager()->isInLineOfSight(owner->GetMapId(),
-                   owner->GetPositionX(),
-                   owner->GetPositionY(),
-                   owner->GetPositionZ() + 2.0f,
-                   x, y, z + 2.0f);
-
-    if (!isInLOS)
-    {
+    if (!_getPoint(owner, x, y, z)) {
         i_nextCheckTime.Reset(100);
         return;
     }
@@ -154,20 +143,22 @@ bool FleeingMovementGenerator<T>::_getPoint(T* owner, float& x, float& y, float&
         temp_y = y + distance * sin(angle);
         float temp_z = z;
 
-        if (_map->CanReachPositionAndGetCoords(owner, temp_x, temp_y, temp_z, true, 3.0f, M_PI/4))
+        if (!_map->CanReachPositionAndGetValidCoords(owner, temp_x, temp_y, temp_z, true, true))
         {
-            if (!(temp_z - z) || distance / fabs(temp_z - z) > 1.0f)
+            break;
+        }
+
+        if (!(temp_z - z) || distance / fabs(temp_z - z) > 1.0f)
+        {
+            float temp_z_left = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle + static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle + static_cast<float>(M_PI / 2)), z, true);
+            float temp_z_right = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle - static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle - static_cast<float>(M_PI / 2)), z, true);
+            if (fabs(temp_z_left - temp_z) < 1.2f && fabs(temp_z_right - temp_z) < 1.2f)
             {
-                float temp_z_left = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle + static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle + static_cast<float>(M_PI / 2)), z, true);
-                float temp_z_right = _map->GetHeight(owner->GetPhaseMask(), temp_x + 1.0f * cos(angle - static_cast<float>(M_PI / 2)), temp_y + 1.0f * sin(angle - static_cast<float>(M_PI / 2)), z, true);
-                if (fabs(temp_z_left - temp_z) < 1.2f && fabs(temp_z_right - temp_z) < 1.2f)
-                {
-                    // use new values
-                    x = temp_x;
-                    y = temp_y;
-                    z = temp_z;
-                    return true;
-                }
+                // use new values
+                x = temp_x;
+                y = temp_y;
+                z = temp_z;
+                return true;
             }
         }
     }
@@ -306,7 +297,7 @@ void FleeingMovementGenerator<Creature>::_Init(Creature* owner)
         return;
 
     //owner->SetTargetGuid(ObjectGuid());
-    is_water_ok = owner->CanSwim();
+    is_water_ok = owner->CanEnterWater();
     is_land_ok  = owner->CanWalk();
 }
 
