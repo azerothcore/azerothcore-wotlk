@@ -936,6 +936,7 @@ public:
     virtual void OnFirstLogin(Player* /*player*/) { }
 
     virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, uint64 /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
+    virtual bool ShouldBeRewardedWithMoneyInsteadOfExp(Player* /*player*/) { return false; }
 
     // Called before the player's temporary summoned creature has initialized it's stats
     virtual void OnBeforeTempSummonInitStats(Player* /*player*/, TempSummon* /*tempSummon*/, uint32& /*duration*/) { }
@@ -1394,6 +1395,7 @@ public: /* PlayerScript */
     void OnFirstLogin(Player* player);
     void OnPlayerCompleteQuest(Player* player, Quest const* quest);
     bool CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
+    bool ShouldBeRewardedWithMoneyInsteadOfExp(Player* player);
     void OnBeforeTempSummonInitStats(Player* player, TempSummon* tempSummon, uint32& duration);
     void OnBeforeGuardianInitStatsForLevel(Player* player, Guardian* guardian, CreatureTemplate const* cinfo, PetType& petType);
     void OnAfterGuardianInitStatsForLevel(Player* player, Guardian* guardian);
