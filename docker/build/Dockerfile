@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y git cmake make gcc g++ clang mysql-clie
 # copy the sources from the host machine to the Docker container
 ADD .git /azerothcore/.git
 ADD acore.sh /azerothcore/acore.sh
+ADD acore.json /azerothcore/acore.json
 ADD apps /azerothcore/apps
 ADD deps /azerothcore/deps
 ADD conf /azerothcore/conf
