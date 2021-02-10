@@ -553,7 +553,7 @@ void Unit::UpdateSplinePosition()
 
 void Unit::DisableSpline()
 {
-    m_movementInfo.RemoveMovementFlag(MovementFlags(MOVEMENTFLAG_SPLINE_ENABLED | MOVEMENTFLAG_FORWARD));
+    m_movementInfo.RemoveMovementFlag(MovementFlags(MOVEMENTFLAG_SPLINE_ENABLED | MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD));
     movespline->_Interrupt();
 }
 
@@ -4768,7 +4768,7 @@ void Unit::RemoveAurasByShapeShift()
     {
         Aura const* aura = iter->second->GetBase();
         if ((aura->GetSpellInfo()->GetAllEffectsMechanicMask() & mechanic_mask) &&
-                (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH) || (aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARRIOR && (aura->GetSpellInfo()->SpellFamilyFlags[1] & 0x20))))
+            (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_AURA_CC) || (aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARRIOR && (aura->GetSpellInfo()->SpellFamilyFlags[1] & 0x20))))
         {
             RemoveAura(iter);
             continue;
@@ -13685,6 +13685,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
         // remove aurastates allowing special moves
         ClearAllReactives();
         ClearDiminishings();
+
         GetMotionMaster()->Clear(false);
         GetMotionMaster()->MoveIdle();
 
@@ -15893,6 +15894,10 @@ void Unit::StopMoving()
 
     if (movespline->Finalized())
         return;
+
+    // Update position now since Stop does not start a new movement that can be updated later
+    if (movespline->HasStarted())
+        UpdateSplinePosition();
 
     Movement::MoveSplineInit init(this);
     init.Stop();

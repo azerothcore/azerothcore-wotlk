@@ -29,7 +29,7 @@ class ChaseMovementGenerator : public MovementGeneratorMedium<T, ChaseMovementGe
 {
 public:
     ChaseMovementGenerator(Unit* target, std::optional<ChaseRange> range = {}, std::optional<ChaseAngle> angle = {})
-        : TargetedMovementGeneratorBase(target),  i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle) {}
+        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle) {}
     ~ChaseMovementGenerator() {}
 
     MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }
@@ -45,7 +45,7 @@ public:
     void unitSpeedChanged() { _lastTargetPosition.reset(); }
     Unit* GetTarget() const { return i_target.getTarget(); }
 
-    bool EnableWalking() const { return false;}
+    bool EnableWalking() const { return false; }
     bool HasLostTarget(Unit* unit) const { return unit->GetVictim() != this->GetTarget(); }
 
 private:
@@ -83,7 +83,7 @@ public:
     bool PositionOkay(T* owner, Unit* target, float range, std::optional<ChaseAngle> angle = {});
 
     static void _clearUnitStateMove(T* u) { u->ClearUnitState(UNIT_STATE_FOLLOW_MOVE); }
-    static void _addUnitStateMove(T* u)  { u->AddUnitState(UNIT_STATE_FOLLOW_MOVE); }
+    static void _addUnitStateMove(T* u) { u->AddUnitState(UNIT_STATE_FOLLOW_MOVE); }
 
     void _updateSpeed(T* owner);
 
