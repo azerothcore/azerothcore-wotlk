@@ -153,7 +153,7 @@ public:
                         float o = rand_norm() * 2.0f * M_PI;
                         float x = me->GetPositionX() + 5.0f * _spikesCount * cos(o);
                         float y = me->GetPositionY() + 5.0f * _spikesCount * sin(o);
-                        float h = me->GetMap()->GetHeight(x, y, me->GetPositionZ() + 5.0f);
+                        float h = me->GetMapHeight(x, y, me->GetPositionZ());
 
                         if (h != INVALID_HEIGHT)
                             me->SummonCreature(NPC_CRYSTAL_SPIKE, x, y, h, 0, TEMPSUMMON_TIMED_DESPAWN, 7000);
