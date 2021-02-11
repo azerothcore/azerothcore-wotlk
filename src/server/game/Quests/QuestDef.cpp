@@ -216,7 +216,7 @@ uint32 Quest::GetRewMoneyMaxLevel() const
     if (HasFlag(QUEST_FLAGS_NO_MONEY_FROM_XP))
         return 0;
 
-    return static_cast<int32>(RewardBonusMoney * sWorld->getRate(RATE_REW_MONEY_MAX_LEVEL) * sWorld->getRate(RATE_DROP_MONEY));
+    return static_cast<int32>(RewardBonusMoney * sWorld->getRate(RATE_REWARD_BONUS_MONEY) * sWorld->getRate(RATE_DROP_MONEY));
 }
 
 bool Quest::IsAutoAccept() const
