@@ -50,24 +50,22 @@ jobs:
           restore-keys: |
             ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
             ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
-      - name: Run Core Build Action
-        id: build-action
-        uses: azerothcore/acore-core-build-action@main
-        continue-on-error: true
       - name: Configure OS
-        run: echo "${{ steps.build-action.outputs.configure-os }}"
+        run: source ./acore.sh install-deps
+        env:
+          CONTINUOUS_INTEGRATION: true
       - name: Create conf/config.sh
-        run: echo "${{ steps.build-action.outputs.config-sh }}"
-      - name: Import DB
-        run: echo "${{ steps.build-action.outputs.import-db }}"
+        run: source ./apps/ci/ci-conf.sh
+      - name: Import db
+        run: source ./apps/ci/ci-import-db.sh
       - name: Build
-        run: echo "${{ steps.build-action.outputs.build }}"
-      - name: Dry Run
-        run: echo "${{ steps.build-action.outputs.dry-run }}"
-      - name: Check Startup Errors
-        run: echo "${{ steps.build-action.outputs.startup-errors }}"
-      - name: Run Unit Tests
-        run: echo "${{ steps.build-action.outputs.unit-tests }}"
+        run: source ./apps/ci/ci-compile.sh
+      - name: Dry run
+        run: source ./apps/ci/ci-worldserver-dry-run.sh
+      - name: Check startup errors
+        run: source ./apps/ci/ci-error-check.sh
+      - name: Run unit tests
+        run: source ./apps/ci/ci-run-unit-tests.sh
 
   mac-build:
     strategy:
