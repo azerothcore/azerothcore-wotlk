@@ -1454,7 +1454,7 @@ public:
             me->SetHover(false);
             me->SetHomePosition(SpinestalkerLandPos);
             me->SetFacingTo(SpinestalkerLandPos.GetOrientation());
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1533,7 +1533,6 @@ public:
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
                 me->SetHover(true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
         }
 
