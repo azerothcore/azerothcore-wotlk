@@ -2758,6 +2758,16 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
     if (!packetOnly && !Unit::SetDisableGravity(disable))
         return false;
 
+    if (IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
+    {
+        if (IsLevitating())
+            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
+        else if (IsHovering())
+            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
+        else
+            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
+    }
+
     if (!movespline->Initialized())
         return true;
 
@@ -2873,11 +2883,15 @@ bool Creature::SetHover(bool enable, bool packetOnly /*= false*/)
     if (!packetOnly && !Unit::SetHover(enable))
         return false;
 
-    //! Unconfirmed for players:
-    if (enable)
-        SetByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
-    else
-        RemoveByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
+   if (IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
+    {
+        if (IsLevitating())
+            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
+        else if (IsHovering())
+            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
+        else
+            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
+    }
 
     if (!movespline->Initialized())
         return true;
