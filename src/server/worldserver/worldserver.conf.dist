@@ -819,6 +819,7 @@ ChatLogs.Guild = 0
 ChatLogs.Public = 0
 
 #
+#    WARNING: enabling this might cause issues to your addon channel
 #    ChatLogs.Addon
 #        Description: Log addon messages.
 #        Default:     0 - (Disabled)
@@ -1965,6 +1966,14 @@ NpcEvadeIfTargetIsUnreachable = 5
 #                     0 - (Disabled)
 
 NpcRegenHPIfTargetIsUnreachable = 1
+
+
+#    NpcRegenHPTimeIfTargetIsUnreachable
+#        Description: Specifies the time (in seconds) that a creature whom target
+#                     is unreachable in raid to end up regenerate health.
+#        Default:     10
+
+NpcRegenHPTimeIfTargetIsUnreachable = 10
 
 #
 ###################################################################################################
