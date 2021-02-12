@@ -1404,9 +1404,9 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER] = sConfigMgr->GetIntDefault("WaypointMovementStopTimeForPlayer", 120);
 
     m_int_configs[CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PRINT_MODE]              = sConfigMgr->GetIntDefault("DungeonAccessRequirements.PrintMode", 1);
-    m_bool_configs[CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PORTAL_CHECK_ILVL]      = sConfigMgr->GetBoolDefault("DungeonAccessRequirement.PortalAvgIlevelCheck", false);
-    m_bool_configs[CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE] = sConfigMgr->GetBoolDefault("DungeonAccessRequirement.LFGLevelDBCOverride", false);
-    m_int_configs[CONFIG_DUNGEON_ACCESS_REQUIREMENTS_OPTIONAL_STRING_ID]      = sConfigMgr->GetIntDefault("DungeonAccessRequirement.OptionalStringID", 0);
+    m_bool_configs[CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PORTAL_CHECK_ILVL]      = sConfigMgr->GetBoolDefault("DungeonAccessRequirements.PortalAvgIlevelCheck", false);
+    m_bool_configs[CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE] = sConfigMgr->GetBoolDefault("DungeonAccessRequirements.LFGLevelDBCOverride", false);
+    m_int_configs[CONFIG_DUNGEON_ACCESS_REQUIREMENTS_OPTIONAL_STRING_ID]      = sConfigMgr->GetIntDefault("DungeonAccessRequirements.OptionalStringID", 0);
     m_int_configs[CONFIG_NPC_EVADE_IF_NOT_REACHABLE] = sConfigMgr->GetIntDefault("NpcEvadeIfTargetIsUnreachable", 5);
     m_bool_configs[CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID] = sConfigMgr->GetBoolDefault("NpcRegenHPIfTargetIsUnreachable", true);
 

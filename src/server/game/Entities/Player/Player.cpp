@@ -19722,7 +19722,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         Player* partyLeader = this;
         std::string leaderName = m_session->GetAcoreString(LANG_YOU);
         {
-            uint64 leaderGuid = GetGroup() ? GetGroup()->GetLeaderGUID() : GetGUID();
+            const uint64 leaderGuid = GetGroup() ? GetGroup()->GetLeaderGUID() : GetGUID();
             if (leaderGuid != GetGUID())
             {
                 partyLeader = HashMapHolder<Player>::Find(leaderGuid);
@@ -19797,20 +19797,20 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         }
 
         //Check if avg ILVL requirement is allowed
-        uint16 minRequiredIlvl = 0;
+        bool ilvlRequirementNotMet = false;
         if (sWorld->getBoolConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PORTAL_CHECK_ILVL))
         {
-            uint16 currentIlvl = (uint16)GetAverageItemLevelForDF();
+            const int32 currentIlvl = (int32)GetAverageItemLevelForDF();
             if (ar->reqItemLevel > currentIlvl)
             {
-                minRequiredIlvl = currentIlvl;
+                ilvlRequirementNotMet = true;
             }
         }
 
 
         Difficulty target_difficulty = GetDifficulty(mapEntry->IsRaid());
         MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(target_map, target_difficulty);
-        if (LevelMin || LevelMax || minRequiredIlvl
+        if (LevelMin || LevelMax || ilvlRequirementNotMet
             || missingPlayerItems.size() || missingPlayerQuests.size() || missingPlayerAchievements.size()
             || missingLeaderItems.size() || missingLeaderQuests.size() || missingLeaderAchievements.size())
         {
@@ -19842,64 +19842,71 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     {
                         GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
                     }
-                    else if (minRequiredIlvl)
+                    else if (ilvlRequirementNotMet)
                     {
-                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, minRequiredIlvl);
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, (uint16)GetAverageItemLevelForDF());
                     }
                 }
                 else
                 {
+                    bool errorAlreadyPrinted = false;
                     //Pretty way of printing out requirements
                     if (missingPlayerQuests.size())
                     {
                         ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_QUESTS);
                         PrettyPrintRequirementsQuestList(missingPlayerQuests);
+                        errorAlreadyPrinted = true;
                     }
                     if (missingLeaderQuests.size())
                     {
                         ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS, leaderName.c_str());
                         PrettyPrintRequirementsQuestList(missingLeaderQuests);
+                        errorAlreadyPrinted = true;
                     }
 
                     if (missingPlayerAchievements.size())
                     {
                         ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_ACHIEVEMENTS);
                         PrettyPrintRequirementsAchievementsList(missingPlayerAchievements);
+                        errorAlreadyPrinted = true;
                     }
                     if (missingLeaderAchievements.size())
                     {
                         ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS, leaderName.c_str());
                         PrettyPrintRequirementsAchievementsList(missingLeaderAchievements);
+                        errorAlreadyPrinted = true;
                     }
 
                     if (missingPlayerItems.size())
                     {
                         ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_OBTAIN_ITEMS);
                         PrettyPrintRequirementsItemsList(missingPlayerItems);
+                        errorAlreadyPrinted = true;
                     }
 
                     if (missingLeaderItems.size())
                     {
                         ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS, leaderName.c_str());
                         PrettyPrintRequirementsItemsList(missingLeaderItems);
+                        errorAlreadyPrinted = true;
                     }
 
-                    if (minRequiredIlvl)
+                    if (ilvlRequirementNotMet)
                     {
-                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, minRequiredIlvl);
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, (uint16)GetAverageItemLevelForDF());
                     }
 
-                    if (mapDiff->hasErrorMessage)
-                    {
-                        SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
-                    }
-                    else if (LevelMin)
+                    if (LevelMin)
                     {
                         GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
                     }
                     else if (LevelMax)
                     {
                         GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_ACCESS_REQUIREMENT_MAX_LEVEL), LevelMax);
+                    }
+                    else if (mapDiff->hasErrorMessage && !errorAlreadyPrinted)
+                    {
+                        SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
                     }
                 }
 

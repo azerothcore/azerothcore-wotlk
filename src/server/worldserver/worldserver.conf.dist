@@ -3605,32 +3605,32 @@ LFG.Location.All = 0
 DungeonAccessRequirements.PrintMode = 1
 
 #
-#    DungeonAccessRequirement.PortalAvgIlevelCheck
+#    DungeonAccessRequirements.PortalAvgIlevelCheck
 #
 #        Description: Enable average item level requirement when entering a dungeon/raid's portal (= deny the entry if player has too low average ilevel, like in LFG).
 #        Default:     0 - (Disabled  -> Blizzlike)
 #                     1 - (Enabled)
 
-DungeonAccessRequirement.PortalAvgIlevelCheck = 0
+DungeonAccessRequirements.PortalAvgIlevelCheck = 0
 
 #
-#    DungeonAccessRequirement.LFGLevelDBCOverride
+#    DungeonAccessRequirements.LFGLevelDBCOverride
 #
 #        Description: If enabled, use `min_level` and `max_level` values from table `dungeon_access_requirements` to list or to hide a dungeon from the LFG window.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-DungeonAccessRequirement.LFGLevelDBCOverride = 0
+DungeonAccessRequirements.LFGLevelDBCOverride = 0
 
 #
-#    DungeonAccessRequirement.OptionalStringID
+#    DungeonAccessRequirements.OptionalStringID
 #
 #        Description: Display an extra message from acore_strings in the chat after printing the dungeon access requirements.
 #                     To enable it set the ID of your desired string from the table acore_strings
 #        Default:     0 - (Disabled)
 #                     1+ - (Enabled)
 
-DungeonAccessRequirement.OptionalStringID = 0
+DungeonAccessRequirements.OptionalStringID = 0
 
 #
 #    ICC Buff

@@ -141,7 +141,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (882, 'To enter, you must complete the following quest(s):'),
 (883, 'To enter, you must complete the following achievement(s):'),
 (884, 'To enter, you must have the following item(s) in your inventory:'),
-(885, '- Hint:'),
+(885, '- Note:'),
 (886, 'You cannot enter. Access requirements not met.'),
 (887, 'To be able to enter, your equipment\'s average item level must be superior or equal to %u. Your current equipment\'s average ilevel is: %u.'),
 (888, 'You must be below level %u to enter.'),
