@@ -641,7 +641,7 @@ void Creature::Update(uint32 diff)
                         // regenerate health if not in combat or if polymorphed)
                         if (!IsInCombat() || IsPolymorphed())
                             RegenerateHealth();
-                        else if (CanNotReachTarget())
+                        else if (IsNotReachableAndNeedRegen())
                         {
                             // regenerate health if cannot reach the target and the setting is set to do so.
                             // this allows to disable the health regen of raid bosses if pathfinding has issues for whatever reason
@@ -666,7 +666,7 @@ void Creature::Update(uint32 diff)
                 if (CanNotReachTarget() && !IsInEvadeMode() && !GetMap()->IsRaid())
                 {
                     m_cannotReachTimer += diff;
-                    if (m_cannotReachTimer >= (sWorld->getIntConfig(CONFIG_NPC_EVADE_IF_NOT_REACHABLE)*IN_MILLISECONDS) && IsAIEnabled)
+                    if (IsNotReachable() && IsAIEnabled)
                     {
                         AI()->EnterEvadeMode();
                     }
