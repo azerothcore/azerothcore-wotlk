@@ -96,7 +96,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
         return true;
     });
 
-    _prepare.push([this, name, &pool]() -> bool
+    _prepare.push([name, &pool]() -> bool
     {
         if (!pool.PrepareStatements())
         {
