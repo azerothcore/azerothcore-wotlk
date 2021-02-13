@@ -3330,16 +3330,16 @@ void SpellMgr::LoadDbcDataCorrections()
     // Elixir of Minor Fortitude
     ApplySpellFix({ 2378 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->manaCost = 0;
-        spellInfo->manaPerSecond = 0;
+        spellInfo->ManaCost = 0;
+        spellInfo->ManaPerSecond = 0;
     });
 
     // Elixir of Detect Undead
     ApplySpellFix({ 11389 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->powerType = POWER_MANA;
-        spellInfo->manaCost = 0;
-        spellInfo->manaPerSecond = 0;
+        spellInfo->PowerType = POWER_MANA;
+        spellInfo->ManaCost = 0;
+        spellInfo->ManaPerSecond = 0;
     });
 
     // Evergrove Druid Transform Crow
@@ -3417,7 +3417,7 @@ void SpellMgr::LoadDbcDataCorrections()
         42821   // Headless Horseman - Wisp Flight Missile
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 6; // 100 yards
+        spellInfo->RangeIndex = 6; // 100 yards
     });
 
     //They Must Burn Bomb Aura (self)
@@ -3429,7 +3429,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Mana Shield (rank 2)
     ApplySpellFix({ 8494 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->procChance = 0; // because of bug in dbc
+        spellInfo->ProcChance = 0; // because of bug in dbc
     });
 
     ApplySpellFix({
@@ -3521,13 +3521,13 @@ void SpellMgr::LoadDbcDataCorrections()
         18820   // Insight
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->procCharges = 1;
+        spellInfo->ProcCharges = 1;
     });
 
     // Tidal Wave
     ApplySpellFix({ 53390 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->procCharges = 2;
+        spellInfo->ProcCharges = 2;
     });
 
     // Oscillation Field
@@ -3539,7 +3539,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Ascendance (Talisman of Ascendance trinket)
     ApplySpellFix({ 28200 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->procCharges = 6;
+        spellInfo->ProcCharges = 6;
     });
 
     // The Eye of Acherus (no spawn in phase 2 in db)
@@ -3633,7 +3633,7 @@ void SpellMgr::LoadDbcDataCorrections()
         27937   // Anchor to Skulls
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 13;
+        spellInfo->RangeIndex = 13;
     });
 
     // Wrath of the Plaguebringer
@@ -3810,8 +3810,8 @@ void SpellMgr::LoadDbcDataCorrections()
     // Seal of Light trigger
     ApplySpellFix({ 20167 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->spellLevel = 0;
-        spellInfo->baseLevel = 0;
+        spellInfo->SpellLevel = 0;
+        spellInfo->BaseLevel = 0;
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
     });
 
@@ -3917,7 +3917,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Silencing Shot
     ApplySpellFix({ 34490, 41084, 42671 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->speed = 0.0f;
+        spellInfo->Speed = 0.0f;
     });
 
     // Monstrous Bite
@@ -3936,14 +3936,14 @@ void SpellMgr::LoadDbcDataCorrections()
     // Cobra Strikes
     ApplySpellFix({ 53257 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->procCharges = 2;
+        spellInfo->ProcCharges = 2;
         spellInfo->StackAmount = 0;
     });
 
     // Kill Command
     ApplySpellFix({ 34027 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->procCharges = 0;
+        spellInfo->ProcCharges = 0;
     });
 
     // Kindred Spirits, damage aura
@@ -4025,7 +4025,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Killing Spree (teleport)
     ApplySpellFix({ 57840 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 6; // 100 yards
+        spellInfo->RangeIndex = 6; // 100 yards
     });
 
     // Killing Spree
@@ -4039,7 +4039,7 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->Effect[2] = 0;
         spellInfo->Effect[1] = 0;
-        spellInfo->runeCostID = 442;
+        spellInfo->RuneCostID = 442;
     });
 
     // Chains of Ice
@@ -4066,7 +4066,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Magic Suppression
     ApplySpellFix({ 49224, 49610, 49611 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->procCharges = 0;
+        spellInfo->ProcCharges = 0;
     });
 
     // Wandering Plague
@@ -4080,7 +4080,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 49028 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Effect[2] = 0;
-        spellInfo->procFlags |= PROC_FLAG_DONE_MELEE_AUTO_ATTACK;
+        spellInfo->ProcFlags |= PROC_FLAG_DONE_MELEE_AUTO_ATTACK;
     });
 
     // Death and Decay
@@ -4182,22 +4182,22 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 55166, 55198 }, [](SpellEntry* spellInfo)
     {
         spellInfo->DurationIndex = 18;
-        spellInfo->procCharges = 0;
+        spellInfo->ProcCharges = 0;
     });
 
     // Healing Stream Totem
     ApplySpellFix({ 52042 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->spellLevel = 0;
-        spellInfo->baseLevel = 0;
+        spellInfo->SpellLevel = 0;
+        spellInfo->BaseLevel = 0;
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
     });
 
     // Earth Shield
     ApplySpellFix({ 379 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->spellLevel = 0;
-        spellInfo->baseLevel = 0;
+        spellInfo->SpellLevel = 0;
+        spellInfo->BaseLevel = 0;
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_DONE_BONUS;
     });
@@ -4246,14 +4246,14 @@ void SpellMgr::LoadDbcDataCorrections()
     // Heroism
     ApplySpellFix({ 32182 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 57723; // Exhaustion
+        spellInfo->ExcludeTargetAuraSpell = 57723; // Exhaustion
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
     });
 
     // Bloodlust
     ApplySpellFix({ 2825 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 57724; // Sated
+        spellInfo->ExcludeTargetAuraSpell = 57724; // Sated
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
     });
 
@@ -4318,7 +4318,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Rain of Fire (Doomguard)
     ApplySpellFix({ 42227 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->speed = 0.0f;
+        spellInfo->Speed = 0.0f;
     });
 
     // Ritual Enslavement
@@ -4336,7 +4336,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Magic Absorption
     ApplySpellFix({ 29441, 29444 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->spellLevel = 0;
+        spellInfo->SpellLevel = 0;
     });
 
     // Living Bomb
@@ -4421,7 +4421,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Fingers of Frost visual buff
     ApplySpellFix({ 74396 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->procCharges = 2;
+        spellInfo->ProcCharges = 2;
         spellInfo->StackAmount = 0;
     });
 
@@ -4441,7 +4441,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 59653 }, [](SpellEntry* spellInfo)
     {
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-        spellInfo->spellLevel = 0;
+        spellInfo->SpellLevel = 0;
     });
 
     ApplySpellFix({
@@ -4505,7 +4505,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 64844 }, [](SpellEntry* spellInfo)
     {
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-        spellInfo->spellLevel = 0;
+        spellInfo->SpellLevel = 0;
     });
 
     ApplySpellFix({
@@ -4542,7 +4542,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 33778 }, [](SpellEntry* spellInfo)
     {
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-        spellInfo->spellLevel = 0;
+        spellInfo->SpellLevel = 0;
         spellInfo->SpellFamilyFlags = flag96(0, 0x10, 0);
     });
 
@@ -4649,7 +4649,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 66551 }, [](SpellEntry* spellInfo)
     {
         // Teleport in, missing range
-        spellInfo->rangeIndex = 13; // 50000yd
+        spellInfo->RangeIndex = 13; // 50000yd
     });
 
     // A'dal's Song of Battle
@@ -4698,7 +4698,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // WintergraspCatapult - Spell Plague Barrell - Range
     ApplySpellFix({ 57606 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 164; // "Catapult Range"
+        spellInfo->RangeIndex = 164; // "Catapult Range"
     });
 
     // Boulder (Demolisher)
@@ -4785,7 +4785,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Crystal Channel
     ApplySpellFix({ 34156 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 35; // 35yd;
+        spellInfo->RangeIndex = 35; // 35yd;
         spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_MOVE;
     });
 
@@ -4810,7 +4810,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Activate Sunblade Protecto
     ApplySpellFix({ 46475, 46476 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 14; // 60yd
+        spellInfo->RangeIndex = 14; // 60yd
     });
 
     // Break Ice
@@ -4822,13 +4822,13 @@ void SpellMgr::LoadDbcDataCorrections()
     // Sinister Reflection Clone
     ApplySpellFix({ 45785 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->speed = 0.0f;
+        spellInfo->Speed = 0.0f;
     });
 
     // Armageddon
     ApplySpellFix({ 45909 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->speed = 8.0f;
+        spellInfo->Speed = 8.0f;
     });
 
     // Spell Absorption
@@ -4864,7 +4864,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Teleport Maiev
     ApplySpellFix({ 41221 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 13; // 0-50000yd
+        spellInfo->RangeIndex = 13; // 0-50000yd
     });
 
     // Watery Grave Explosion
@@ -4970,7 +4970,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Charged Chaotic rift aura, trigger
     ApplySpellFix({ 47737 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 37; // 50yd
+        spellInfo->RangeIndex = 37; // 50yd
     });
 
     // Vanish
@@ -5004,7 +5004,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Skarvald, Charge
     ApplySpellFix({ 43651 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 13; // 0-50000yd
+        spellInfo->RangeIndex = 13; // 0-50000yd
     });
 
     // Ingvar the Plunderer, Woe Strike
@@ -5091,7 +5091,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Pyrobuffet
     ApplySpellFix({ 57557 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 56911;
+        spellInfo->ExcludeTargetAuraSpell = 56911;
     });
 
     // Arcane Barrage
@@ -5119,7 +5119,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
     });
 
-    // Haste (Nexus Lord, increase run speed of the disk)
+    // Haste (Nexus Lord, increase run Speed of the disk)
     ApplySpellFix({ 57060 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_VEHICLE;
@@ -5190,7 +5190,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetB[1] = TARGET_UNIT_SRC_AREA_ALLY;
         spellInfo->EffectPointsPerComboPoint[1] = 2500;
         spellInfo->EffectBasePoints[1] = 2499;
-        spellInfo->rangeIndex = 1;
+        spellInfo->RangeIndex = 1;
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
     });
 
@@ -5322,7 +5322,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Lightning Pillar
     ApplySpellFix({ 62976 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 6;
+        spellInfo->RangeIndex = 6;
         spellInfo->DurationIndex = 28;
     });
 
@@ -5368,7 +5368,7 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
         spellInfo->EffectRadiusIndex[0] = 12; // 100yd
-        spellInfo->rangeIndex = 13;  // 50000yd
+        spellInfo->RangeIndex = 13;  // 50000yd
     });
 
     // Constellation Phase Effect
@@ -5408,7 +5408,7 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
         spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
-        spellInfo->rangeIndex = 13;
+        spellInfo->RangeIndex = 13;
         spellInfo->DurationIndex = 5;
     });
 
@@ -5454,7 +5454,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 49838 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
-        spellInfo->excludeTargetAuraSpell = 51162; // exclude planar shift
+        spellInfo->ExcludeTargetAuraSpell = 51162; // exclude planar shift
         spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_150_YARDS;
     });
 
@@ -5532,7 +5532,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Killing Spree (Off hand damage)
     ApplySpellFix({ 57842 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 2; // Melee Range
+        spellInfo->RangeIndex = 2; // Melee Range
     });
 
     // Trial of the Crusader, Jaraxxus Intro spell
@@ -5556,7 +5556,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectApplyAuraName[0] = SPELL_AURA_SET_VEHICLE_ID;
         spellInfo->EffectMiscValue[0] = 496;
         spellInfo->DurationIndex = 21;
-        spellInfo->rangeIndex = 13;
+        spellInfo->RangeIndex = 13;
         spellInfo->EffectImplicitTargetA[0] = 25;
         spellInfo->EffectImplicitTargetB[0] = 0;
         spellInfo->AuraInterruptFlags = AURA_INTERRUPT_FLAG_CHANGE_MAP;
@@ -5583,7 +5583,7 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_TARGET_ANY;
         spellInfo->EffectImplicitTargetB[0] = 0;
-        spellInfo->speed = 14.0f;
+        spellInfo->Speed = 14.0f;
         spellInfo->Attributes |= SPELL_ATTR0_STOP_ATTACK_TARGET;
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_NO_INITIAL_AGGRO;
@@ -5604,7 +5604,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Trial of the Crusader, Jaraxxus, Curse of the Nether
     ApplySpellFix({ 66211 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 66209; // exclude Touch of Jaraxxus
+        spellInfo->ExcludeTargetAuraSpell = 66209; // exclude Touch of Jaraxxus
     });
 
     // Trial of the Crusader, Jaraxxus, Summon Volcano
@@ -5696,7 +5696,7 @@ void SpellMgr::LoadDbcDataCorrections()
         65767   // light surge 0
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 65686;
+        spellInfo->ExcludeTargetAuraSpell = 65686;
     });
 
     ApplySpellFix({
@@ -5714,7 +5714,7 @@ void SpellMgr::LoadDbcDataCorrections()
         67274   // light surge 1
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 67222;
+        spellInfo->ExcludeTargetAuraSpell = 67222;
     });
 
     ApplySpellFix({
@@ -5732,7 +5732,7 @@ void SpellMgr::LoadDbcDataCorrections()
         67275   // light surge 2
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 67223;
+        spellInfo->ExcludeTargetAuraSpell = 67223;
     });
 
     ApplySpellFix({
@@ -5750,7 +5750,7 @@ void SpellMgr::LoadDbcDataCorrections()
         67276   // light surge 3
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 67224;
+        spellInfo->ExcludeTargetAuraSpell = 67224;
     });
 
     ApplySpellFix({
@@ -5768,7 +5768,7 @@ void SpellMgr::LoadDbcDataCorrections()
         65769   // dark surge 0
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 65684;
+        spellInfo->ExcludeTargetAuraSpell = 65684;
     });
 
     ApplySpellFix({
@@ -5786,7 +5786,7 @@ void SpellMgr::LoadDbcDataCorrections()
         67265   // dark surge 1
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 67176;
+        spellInfo->ExcludeTargetAuraSpell = 67176;
     });
 
     ApplySpellFix({
@@ -5804,7 +5804,7 @@ void SpellMgr::LoadDbcDataCorrections()
         67266   // dark surge 2
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 67177;
+        spellInfo->ExcludeTargetAuraSpell = 67177;
     });
 
     ApplySpellFix({
@@ -5822,7 +5822,7 @@ void SpellMgr::LoadDbcDataCorrections()
         67267   // dark surge 3
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 67178;
+        spellInfo->ExcludeTargetAuraSpell = 67178;
     });
 
     // Trial of the Crusader, Twin Valkyr, Twin's Pact
@@ -5940,7 +5940,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Frost Nova
     ApplySpellFix({ 68198 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 13;
+        spellInfo->RangeIndex = 13;
         spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
     });
 
@@ -5973,7 +5973,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetB[1] = 0;
         spellInfo->EffectImplicitTargetA[2] = TARGET_UNIT_CASTER;
         spellInfo->EffectImplicitTargetB[2] = 0;
-        spellInfo->rangeIndex = 6; // 100yd
+        spellInfo->RangeIndex = 6; // 100yd
         spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
     });
 
@@ -5991,8 +5991,8 @@ void SpellMgr::LoadDbcDataCorrections()
     // Overlord's Brand
     ApplySpellFix({ 69172 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->procFlags = DONE_HIT_PROC_FLAG_MASK & ~PROC_FLAG_DONE_PERIODIC;
-        spellInfo->procChance = 100;
+        spellInfo->ProcFlags = DONE_HIT_PROC_FLAG_MASK & ~PROC_FLAG_DONE_PERIODIC;
+        spellInfo->ProcChance = 100;
     });
 
     // Icy Blast
@@ -6064,7 +6064,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Essence of the Captured
     ApplySpellFix({ 73035, 70719 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 13;
+        spellInfo->RangeIndex = 13;
     });
 
     // Achievement Check
@@ -6181,7 +6181,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Death Plague (Rotting Frost Giant)
     ApplySpellFix({ 72864 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 0;
+        spellInfo->ExcludeTargetAuraSpell = 0;
     });
 
     // Gunship Battle, spell Below Zero
@@ -6389,7 +6389,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Frost Bomb
     ApplySpellFix({ 69846 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->speed = 0.0f;    // This spell's summon happens instantly
+        spellInfo->Speed = 0.0f;    // This spell's summon happens instantly
     });
 
     // Mystic Buffet (Sindragosa)
@@ -6460,7 +6460,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Jump
     ApplySpellFix({ 71809 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 5; // 40yd
+        spellInfo->RangeIndex = 5; // 40yd
         spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS; // 10yd
         spellInfo->EffectMiscValue[0] = 190;
     });
@@ -6498,7 +6498,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Raging Spirit Visual
     ApplySpellFix({ 69198 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 13; // 50000yd
+        spellInfo->RangeIndex = 13; // 50000yd
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
     });
@@ -6507,7 +6507,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 72762 }, [](SpellEntry* spellInfo)
     {
         spellInfo->DurationIndex = 559; // 53 seconds
-        spellInfo->excludeCasterAuraSpell = 0;
+        spellInfo->ExcludeCasterAuraSpell = 0;
         spellInfo->Attributes |= SPELL_ATTR0_UNAFFECTED_BY_INVULNERABILITY;
         spellInfo->AttributesEx6 |= (SPELL_ATTR6_CAN_TARGET_INVISIBLE | SPELL_ATTR6_CAN_TARGET_UNTARGETABLE);
     });
@@ -6599,7 +6599,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Leap to a Random Location
     ApplySpellFix({ 70485 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 6; // 100yd
+        spellInfo->RangeIndex = 6; // 100yd
         spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_10_YARDS;
         spellInfo->EffectMiscValue[0] = 100;
     });
@@ -6684,7 +6684,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Meteor Strike
     ApplySpellFix({ 74637 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->speed = 0;
+        spellInfo->Speed = 0;
     });
 
     //Blazing Aura
@@ -6720,7 +6720,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Rallying the Troops
     ApplySpellFix({ 47394 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->excludeTargetAuraSpell = 47394;
+        spellInfo->ExcludeTargetAuraSpell = 47394;
     });
 
     // A Tangled Skein
@@ -7079,7 +7079,7 @@ void SpellMgr::LoadDbcDataCorrections()
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-        spellInfo->spellLevel = 0;
+        spellInfo->SpellLevel = 0;
     });
 
     // Drain Life - Bryntroll
@@ -7132,7 +7132,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Dragon Kite, Tuskarr Kite - Kite String
     ApplySpellFix({ 45192 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 6; // 100yd
+        spellInfo->RangeIndex = 6; // 100yd
     });
 
     // Frigid Frostling, Infrigidate
@@ -7175,7 +7175,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
         spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENTRY;
         spellInfo->MaxAffectedTargets = 0;
-        spellInfo->excludeCasterAuraSpell = 42299;
+        spellInfo->ExcludeCasterAuraSpell = 42299;
     });
 
     // Catch the Wild Wolpertinger!
@@ -7299,9 +7299,9 @@ void SpellMgr::LoadDbcDataCorrections()
                 case SPELL_EFFECT_JUMP:
                 case SPELL_EFFECT_JUMP_DEST:
                 case SPELL_EFFECT_LEAP_BACK:
-                    if (!spellInfo->speed && !spellInfo->SpellFamilyName)
+                    if (!spellInfo->Speed && !spellInfo->SpellFamilyName)
                     {
-                        spellInfo->speed = SPEED_CHARGE;
+                        spellInfo->Speed = SPEED_CHARGE;
                     }
                     break;
             }
@@ -7316,16 +7316,16 @@ void SpellMgr::LoadDbcDataCorrections()
         // Xinef: Fix range for trajectories and triggered spells
         for (uint8 j = 0; j < 3; ++j)
         {
-            if (spellInfo->rangeIndex == 1 && (spellInfo->EffectImplicitTargetA[j] == TARGET_DEST_TRAJ || spellInfo->EffectImplicitTargetB[j] == TARGET_DEST_TRAJ))
+            if (spellInfo->RangeIndex == 1 && (spellInfo->EffectImplicitTargetA[j] == TARGET_DEST_TRAJ || spellInfo->EffectImplicitTargetB[j] == TARGET_DEST_TRAJ))
             {
                 if (SpellEntry* spellInfo2 = (SpellEntry*)sSpellStore.LookupEntry(spellInfo->EffectTriggerSpell[j]))
                 {
-                    spellInfo2->rangeIndex = 187; // 300yd
+                    spellInfo2->RangeIndex = 187; // 300yd
                 }
             }
         }
 
-        if (spellInfo->activeIconID == 2158)  // flight
+        if (spellInfo->ActiveIconID == 2158)  // flight
         {
             spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
         }
