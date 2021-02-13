@@ -646,7 +646,7 @@ void Creature::Update(uint32 diff)
                         // regenerate health if not in combat or if polymorphed)
                         if (!IsInCombat() || IsPolymorphed())
                             RegenerateHealth();
-                        else if (CanNotReachTarget())
+                        else if (IsNotReachableAndNeedRegen())
                         {
                             // regenerate health if cannot reach the target and the setting is set to do so.
                             // this allows to disable the health regen of raid bosses if pathfinding has issues for whatever reason
@@ -671,7 +671,7 @@ void Creature::Update(uint32 diff)
                 if (CanNotReachTarget() && !IsInEvadeMode() && !GetMap()->IsRaid())
                 {
                     m_cannotReachTimer += diff;
-                    if (m_cannotReachTimer >= (sWorld->getIntConfig(CONFIG_NPC_EVADE_IF_NOT_REACHABLE)*IN_MILLISECONDS) && IsAIEnabled)
+                    if (IsNotReachable() && IsAIEnabled)
                     {
                         AI()->EnterEvadeMode();
                     }
@@ -2763,6 +2763,8 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
     if (!packetOnly && !Unit::SetDisableGravity(disable))
         return false;
 
+    applyInhabitFlags();
+
     if (!movespline->Initialized())
         return true;
 
@@ -2770,6 +2772,26 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
     data.append(GetPackGUID());
     SendMessageToSet(&data, false);
     return true;
+}
+
+void Creature::applyInhabitFlags()
+{
+    if (IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
+    {
+        if (IsLevitating())
+        {
+            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
+            return;
+        }
+
+        if (IsHovering())
+        {
+            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
+            return;
+        }
+
+        SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
+    }
 }
 
 bool Creature::SetSwim(bool enable)
@@ -2878,11 +2900,7 @@ bool Creature::SetHover(bool enable, bool packetOnly /*= false*/)
     if (!packetOnly && !Unit::SetHover(enable))
         return false;
 
-    //! Unconfirmed for players:
-    if (enable)
-        SetByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
-    else
-        RemoveByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
+   applyInhabitFlags();
 
     if (!movespline->Initialized())
         return true;
