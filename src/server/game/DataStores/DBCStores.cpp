@@ -402,7 +402,7 @@ void LoadDBCStores(const std::string& dataPath)
                 if (skillLine->skillId != cFamily->skillLine[0] && skillLine->skillId != cFamily->skillLine[1])
                     continue;
 
-                if (spellInfo->spellLevel)
+                if (spellInfo->SpellLevel)
                     continue;
 
                 if (skillLine->learnOnGetSkill != ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL)

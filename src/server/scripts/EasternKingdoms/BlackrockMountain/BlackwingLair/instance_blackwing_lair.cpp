@@ -287,6 +287,12 @@ public:
     }
 };
 
+enum ShadowFlame
+{
+    SPELL_ONYXIA_SCALE_CLOAK = 22683,
+    SPELL_SHADOW_FLAME_DOT = 22682
+};
+
 // 22539 - Shadowflame (used in Blackwing Lair)
 class spell_bwl_shadowflame : public SpellScriptLoader
 {
@@ -297,17 +303,22 @@ public:
     {
         PrepareSpellScript(spell_bwl_shadowflame_SpellScript);
 
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_ONYXIA_SCALE_CLOAK, SPELL_SHADOW_FLAME_DOT });
+        }
+
         void HandleEffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             // If the victim of the spell does not have "Onyxia Scale Cloak" - add the Shadow Flame DoT (22682)
             if (Unit* victim = GetHitUnit())
-                if(!victim->HasAura(22683))
-                    victim->AddAura(22682, victim);
+                if (!victim->HasAura(SPELL_ONYXIA_SCALE_CLOAK))
+                    victim->AddAura(SPELL_SHADOW_FLAME_DOT, victim);
         }
 
-        void Register()
+        void Register() override
         {
-            OnEffectHitTarget += SpellEffectFn(spell_bwl_shadowflame_SpellScript::HandleEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            OnEffectHitTarget += SpellEffectFn(spell_bwl_shadowflame_SpellScript::HandleEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
         }
     };
 
