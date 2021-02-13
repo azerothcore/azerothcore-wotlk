@@ -152,3 +152,53 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 -- Update old command
 UPDATE `command` SET `name` = 'reload dungeon_access_template', `help` = 'Syntax: .reload dungeon_access_template\r Reload dungeon_access_template table.' WHERE `name` = 'reload access_requirement';
 REPLACE INTO `command` (`name`, `security`, `help`) VALUES ('reload dungeon_access_requirements', 3, 'Syntax: .reload dungeon_access_requirements\r Reload dungeon_access_requirements table.');
+
+
+-- Improve a big part of the comments
+-- TODO: Still need to differentiate normal from heroic in the comments and also add the correct raid number for anything above level 60, I didn't want to make any mistake and i was tired.
+-- Also can add the whole zone for Hellfire Citadel, Coilfang Reservoir, etc...
+UPDATE `dungeon_access_template` SET `comment` = 'Deadmines (DM)' WHERE `id` = 3;
+UPDATE `dungeon_access_template` SET `comment` = 'Wailing Caverns (WC)' WHERE `id` = 4;
+UPDATE `dungeon_access_template` SET `comment` = 'Blackfathom Deeps Entrance' WHERE `id` = 6;
+UPDATE `dungeon_access_template` SET `comment` = 'Sunken Temple (of Atal''Hakkar) Entrance' WHERE `id` = 9;
+UPDATE `dungeon_access_template` SET `comment` = 'Ahn''Qiraj Ruins (AQ20) - 20man' WHERE `id` = 27;
+UPDATE `dungeon_access_template` SET `comment` = 'Blackwing Lair (BWL) - 40man' WHERE `id` = 26;
+UPDATE `dungeon_access_template` SET `comment` = 'Blackrock Spire - Both Lower (LBRS) & Upper (UBRS) - 5/10man' WHERE `id` = 13;
+UPDATE `dungeon_access_template` SET `comment` = 'Blackrock Depths (BRD)' WHERE `id` = 14;
+UPDATE `dungeon_access_template` SET `comment` = 'Ahn''Qiraj Temple (AQ40) - 40man' WHERE `id` = 28;
+UPDATE `dungeon_access_template` SET `comment` = 'Ulduar' WHERE `id` = 88;
+UPDATE `dungeon_access_template` SET `comment` = 'Ulduar' WHERE `id` = 89;
+UPDATE `dungeon_access_template` SET `comment` = 'Gundrak (North entrance)' WHERE `id` = 90;
+UPDATE `dungeon_access_template` SET `comment` = 'Gundrak (North entrance)' WHERE `id` = 91;
+
+UPDATE dungeon_access_template SET `comment` = replace(comment, ' (Entrance)', '');
+UPDATE dungeon_access_template SET `comment` = replace(comment, ' (entrance)', '');
+UPDATE dungeon_access_template SET `comment` = replace(comment, ' Entrance', '');
+
+UPDATE `dungeon_access_template` SET `comment` = 'Zul''Farrak (ZF)' WHERE `id` = 12;
+UPDATE `dungeon_access_template` SET `comment` = 'Zul''Gurub (ZG) - 20man' WHERE `id` = 20;
+UPDATE `dungeon_access_template` SET `comment` = 'Ragefire Chasm (RF)' WHERE `id` = 23;
+UPDATE `dungeon_access_template` SET `comment` = 'Karazhan - 10man' WHERE `comment` LIKE '%karaz%' AND `id` = 29;
+UPDATE `dungeon_access_template` SET `comment` = 'Onyxia''s Lair - 10man' WHERE `id` = 15;
+UPDATE `dungeon_access_template` SET `comment` = 'Onyxia''s Lair - 25man' WHERE `id` = 16;
+UPDATE `dungeon_access_template` SET `comment` = 'The Obsidian Sanctum - 10man' WHERE `id` = 94;
+UPDATE `dungeon_access_template` SET `comment` = 'Naxxramas - 10man' WHERE `id` = 30;
+UPDATE `dungeon_access_template` SET `comment` = 'The Eye of Eternity (Malygos) - 10man' WHERE `id` = 96;
+UPDATE `dungeon_access_template` SET `comment` = 'Vault of Archavon - 10man' WHERE `id` = 100;
+UPDATE `dungeon_access_template` SET `comment` = 'Ulduar - 10man' WHERE `id` = 88;
+UPDATE `dungeon_access_template` SET `comment` = 'Trial of the Crusader - 10man Normal' WHERE `id` = 108;
+UPDATE `dungeon_access_template` SET `comment` = 'Icecrown Citadel - 10man Normal' WHERE `id` = 102;
+UPDATE `dungeon_access_template` SET `comment` = 'The Ruby Sanctum - 10man Normal' WHERE `id` = 118;
+UPDATE `dungeon_access_template` SET `comment` = 'Scarlet Monastery (SM) - All wings' WHERE `id` = 11;
+UPDATE `dungeon_access_template` SET `comment` = 'Maraudon - All wings' WHERE `id` = 22;
+UPDATE `dungeon_access_template` SET `comment` = 'Dire Maul - All wings' WHERE `id` = 25;
+UPDATE `dungeon_access_template` SET `comment` = 'Molten Core - 40man' WHERE `id` = 24;
+UPDATE `dungeon_access_template` SET `comment` = 'Stratholme' WHERE `id` = 21;
+UPDATE `dungeon_access_template` SET `comment` = 'Caverns Of Time: Old Hillsbrad Foothills/Escape from Durnholde - Normal' WHERE `id` = 62;
+UPDATE `dungeon_access_template` SET `comment` = 'Caverns Of Time: Old Hillsbrad Foothills/Escape from Durnholde - Heroic' WHERE `id` = 63;
+UPDATE `dungeon_access_template` SET `comment` = 'Caverns Of Time: Black Morass/Opening the Dark Portal - Normal' WHERE `id` = 17;
+UPDATE `dungeon_access_template` SET `comment` = 'Caverns Of Time: Black Morass/Opening the Dark Portal - Heroic' WHERE `id` = 18;
+UPDATE `dungeon_access_template` SET `comment` = 'Hellfire Citadel: Magtheridon''s Lair - 25man' WHERE `id` = 39;
+UPDATE `dungeon_access_template` SET `comment` = 'Coilfang Reservoir: Serpentshrine Cavern - 25man' WHERE `id` = 46;
+UPDATE `dungeon_access_template` SET `comment` = 'Magisters'' Terrace - Normal' WHERE `id` = 76;
+UPDATE `dungeon_access_template` SET `comment` = 'Magisters'' Terrace - Heroic' WHERE `id` = 77;
