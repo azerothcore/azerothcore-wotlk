@@ -16073,7 +16073,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     int32 moneyRew = 0;
     if (getLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(this))
     {
-        moneyRew = int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY));
+        moneyRew = quest->GetRewMoneyMaxLevel();
     }
     else
     {
@@ -17587,7 +17587,7 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP)
     else
     {
         data << uint32(0);
-        data << uint32(quest->GetRewOrReqMoney() + int32(quest->GetRewMoneyMaxLevel() * sWorld->getRate(RATE_DROP_MONEY)));
+        data << uint32(quest->GetRewOrReqMoney() + quest->GetRewMoneyMaxLevel());
     }
 
     data << uint32(10 * quest->CalculateHonorGain(GetQuestLevel(quest)));
@@ -18597,6 +18597,9 @@ bool Player::isAllowedToLoot(const Creature* creature)
 
     const Loot* loot = &creature->loot;
     if (loot->isLooted()) // nothing to loot or everything looted.
+        return false;
+
+    if (!loot->hasItemForAll() && !loot->hasItemFor(this)) // no loot in creature for this player
         return false;
 
     Group* thisGroup = GetGroup();
