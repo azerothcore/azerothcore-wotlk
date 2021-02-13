@@ -11,7 +11,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (8383, 210, 0, 'You\'re pushing it $N.', 12, 0, 100, 0, 0, 0, 1402, 0, 'Master Wood - Say on Receive Emote 3'),
 (8383, 211, 0, '%s is not impressed.', 16, 0, 100, 11, 0, 0, 1401, 0, 'Master Wood - Emote on Receive Emote');
 
-UPDATE `broadcast_text` SET `EmoteID0`='11' WHERE  `ID`=1401;
+UPDATE `broadcast_text` SET `EmoteID0`=11 WHERE  `ID`=1401;
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 8383;
 
