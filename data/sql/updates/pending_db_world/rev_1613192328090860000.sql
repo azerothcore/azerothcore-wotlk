@@ -5,11 +5,11 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1613192328090860000');
 */
 
 DELETE FROM `creature_text` WHERE `CreatureID`=8383;
-INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
-(8383, 211, 0, 'Master Wood is not impressed.', 16, 0, 100, 0, 0, 0, 0, 0, 'Master Wood - Emote on Receive Emote'), 
-(8383, 210, 2, 'Don\'t make me go medieval on you.', 12, 0, 100, 0, 0, 0, 0, 0, 'Master Wood - Say on Receive Emote'), 
-(8383, 210, 1, 'Keep it up, $N, and I\'ll beat some manners into you.', 12, 0, 100, 0, 0, 0, 0, 0, 'Master Wood - Say on Receive Emote 2'), 
-(8383, 210, 0, 'You\'re pushing it $N.', 12, 0, 100, 0, 0, 0, 0, 0, 'Master Wood - Say on Receive Emote 3');
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(8383, 210, 2, 'Don\'t make me go medieval on you.', 12, 0, 100, 0, 0, 0, 1403, 0, 'Master Wood - Say on Receive Emote'),
+(8383, 210, 1, 'Keep it up, $N, and I\'ll beat some manners into you.', 12, 0, 100, 0, 0, 0, 1404, 0, 'Master Wood - Say on Receive Emote 2'),
+(8383, 210, 0, 'You\'re pushing it $N.', 12, 0, 100, 0, 0, 0, 1402, 0, 'Master Wood - Say on Receive Emote 3'),
+(8383, 211, 0, '%s is not impressed.', 16, 0, 100, 0, 0, 0, 1401, 0, 'Master Wood - Emote on Receive Emote');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 8383;
 
