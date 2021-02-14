@@ -832,6 +832,8 @@ private:
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
 
     bool _isMissingSwimmingFlagOutOfCombat;
+
+    void applyInhabitFlags();
 };
 
 class AssistDelayEvent : public BasicEvent
