@@ -86,8 +86,8 @@ UPDATE `creature_template` SET `mindmg` = 17815, `maxdmg` = 23905, `DamageModifi
 UPDATE `creature_template` SET `mindmg` = 35630, `maxdmg` = 47810, `DamageModifier` = 1.01 WHERE `entry` = 29718;
 
 /* THE MILITARY QUARTER */
-UPDATE `creature_template` SET `mindmg` = 17815, `maxdmg` = 23905, `DamageModifier` = 1.01 WHERE `entry` = 16061;
-UPDATE `creature_template` SET `mindmg` = 35630, `maxdmg` = 47810, `DamageModifier` = 1.01 WHERE `entry` = 29940;
+UPDATE `creature_template` SET `mindmg` = 27860, `maxdmg` = 38650, `DamageModifier` = 1.01 WHERE `entry` = 16061;
+UPDATE `creature_template` SET `mindmg` = 55720, `maxdmg` = 77300, `DamageModifier` = 1.01 WHERE `entry` = 29940;
 UPDATE `creature_template` SET `mindmg` = 17815, `maxdmg` = 23905, `DamageModifier` = 1.01 WHERE `entry` = 16060;
 UPDATE `creature_template` SET `mindmg` = 35630, `maxdmg` = 47810, `DamageModifier` = 1.01 WHERE `entry` = 29955;
 UPDATE `creature_template` SET `mindmg` = 17815, `maxdmg` = 23905, `DamageModifier` = 1.01 WHERE `entry` = 16064;
