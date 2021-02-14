@@ -546,24 +546,24 @@ void ObjectMgr::LoadCreatureTemplates()
         for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
             creatureTemplate.spells[i] = 0;
 
-        creatureTemplate.PetSpellDataId     = fields[47].GetUInt32();
-        creatureTemplate.VehicleId          = fields[48].GetUInt32();
-        creatureTemplate.mingold            = fields[49].GetUInt32();
-        creatureTemplate.maxgold            = fields[50].GetUInt32();
-        creatureTemplate.AIName             = fields[51].GetString();
-        creatureTemplate.MovementType       = uint32(fields[52].GetUInt8());
-        creatureTemplate.InhabitType        = uint32(fields[53].GetUInt8());
-        creatureTemplate.HoverHeight        = fields[54].GetFloat();
-        creatureTemplate.ModHealth          = fields[55].GetFloat();
-        creatureTemplate.ModMana            = fields[56].GetFloat();
-        creatureTemplate.ModArmor           = fields[57].GetFloat();
-        creatureTemplate.RacialLeader       = fields[58].GetBool();
-        creatureTemplate.movementId         = fields[59].GetUInt32();
-        creatureTemplate.RegenHealth        = fields[60].GetBool();
-        creatureTemplate.MechanicImmuneMask = fields[61].GetUInt32();
+        creatureTemplate.PetSpellDataId        = fields[47].GetUInt32();
+        creatureTemplate.VehicleId             = fields[48].GetUInt32();
+        creatureTemplate.mingold               = fields[49].GetUInt32();
+        creatureTemplate.maxgold               = fields[50].GetUInt32();
+        creatureTemplate.AIName                = fields[51].GetString();
+        creatureTemplate.MovementType          = uint32(fields[52].GetUInt8());
+        creatureTemplate.InhabitType           = uint32(fields[53].GetUInt8());
+        creatureTemplate.HoverHeight           = fields[54].GetFloat();
+        creatureTemplate.ModHealth             = fields[55].GetFloat();
+        creatureTemplate.ModMana               = fields[56].GetFloat();
+        creatureTemplate.ModArmor              = fields[57].GetFloat();
+        creatureTemplate.RacialLeader          = fields[58].GetBool();
+        creatureTemplate.movementId            = fields[59].GetUInt32();
+        creatureTemplate.RegenHealth           = fields[60].GetBool();
+        creatureTemplate.MechanicImmuneMask    = fields[61].GetUInt32();
         creatureTemplate.SpellSchoolImmuneMask = fields[62].GetUInt8();
-        creatureTemplate.flags_extra        = fields[63].GetUInt32();
-        creatureTemplate.ScriptID           = GetScriptId(fields[64].GetCString());
+        creatureTemplate.flags_extra           = fields[63].GetUInt32();
+        creatureTemplate.ScriptID              = GetScriptId(fields[64].GetCString());
 
         ++count;
     } while (result->NextRow());
