@@ -1012,7 +1012,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            return sSpellMgr->GetSpellInfo(SPELL_DESPAWN_RIFT);
+            return ValidateSpellInfo({ SPELL_DESPAWN_RIFT });
         }
 
         void HandlePeriodic(AuraEffect const* /* aurEff */)

@@ -470,8 +470,8 @@ void ObjectMgr::LoadCreatureTemplates()
                          "dynamicflags, family, trainer_type, trainer_spell, trainer_class, trainer_race, minrangedmg, maxrangedmg, rangedattackpower, type, "
 //                        43          44      45              46        47              48         49       50       51      52
                          "type_flags, lootid, pickpocketloot, skinloot, PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, "
-//                        53           54           55              56            57             58            59          60           61                    62           63
-                         "InhabitType, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, flags_extra, ScriptName "
+//                        53           54           55              56            57             58            59          60           61                    62                        63           64
+                         "InhabitType, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, spell_school_immune_mask, flags_extra, ScriptName "
                          "FROM creature_template;");
 
     if (!result)
@@ -561,8 +561,9 @@ void ObjectMgr::LoadCreatureTemplates()
         creatureTemplate.movementId         = fields[59].GetUInt32();
         creatureTemplate.RegenHealth        = fields[60].GetBool();
         creatureTemplate.MechanicImmuneMask = fields[61].GetUInt32();
-        creatureTemplate.flags_extra        = fields[62].GetUInt32();
-        creatureTemplate.ScriptID           = GetScriptId(fields[63].GetCString());
+        creatureTemplate.SpellSchoolImmuneMask = fields[62].GetUInt8();
+        creatureTemplate.flags_extra        = fields[63].GetUInt32();
+        creatureTemplate.ScriptID           = GetScriptId(fields[64].GetCString());
 
         ++count;
     } while (result->NextRow());

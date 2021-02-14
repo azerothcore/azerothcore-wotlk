@@ -1376,7 +1376,7 @@ public:
             me->GetPosition(x, y, z);
             _x = x;
             _y = y;
-            _groundZ = me->GetMap()->GetHeight(me->GetPhaseMask(), x, y, z, true, 500.0f);
+            _groundZ = me->GetMapHeight(x, y, z, true, 500.0f);
             me->GetMotionMaster()->MoveCharge(_x, _y, _groundZ, me->GetSpeed(MOVE_WALK));
         }
 
@@ -1748,7 +1748,7 @@ public:
                     float destY = summoner->GetPositionY() + sin(angle + a * M_PI) * i * 10.0f;
                     if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ() + 10.0f, destX, destY, summoner->GetPositionZ() + 10.0f, summoner->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS) && destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
                     {
-                        float destZ = summoner->GetMap()->GetHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ() + 10.0f);
+                        float destZ = summoner->GetMapHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ());
                         if (fabs(destZ - summoner->GetPositionZ()) < 10.0f) // valid z found
                         {
                             dest._position.Relocate(destX, destY, destZ);

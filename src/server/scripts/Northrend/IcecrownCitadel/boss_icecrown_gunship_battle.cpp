@@ -1938,11 +1938,11 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ROCKET_PACK_DAMAGE) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_ROCKET_BURST))
-                return false;
-
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_ROCKET_PACK_DAMAGE,
+                    SPELL_ROCKET_BURST
+                });
         }
 
         void HandlePeriodic(AuraEffect const* /*aurEff*/)
@@ -2532,7 +2532,8 @@ public:
 
     bool operator()(WorldObject* unit)
     {
-        return unit->GetTypeId() != TYPEID_PLAYER || unit->GetPositionZ() > 478.0f || !unit->GetTransport() || unit->GetTransport()->GetEntry() != _entry || unit->GetMap()->GetHeight(unit->GetPhaseMask(), unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ()) < 465.0f;
+        return unit->GetTypeId() != TYPEID_PLAYER || unit->GetPositionZ() > 478.0f || !unit->GetTransport() || unit->GetTransport()->GetEntry() != _entry
+        || unit->GetMapHeight(unit->GetPhaseMask(), unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ()) < 465.0f;
     }
 
 private:
@@ -2566,7 +2567,9 @@ public:
         void HandleScript(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastSpell(GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetMap()->GetHeight(GetCaster()->GetPhaseMask(), GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetPositionZ()), uint32(GetEffectValue()), TRIGGERED_NONE);
+            GetCaster()->CastSpell(GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(),
+                GetHitUnit()->GetMapHeight(GetCaster()->GetPhaseMask(), GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetPositionZ()),
+                uint32(GetEffectValue()), TRIGGERED_NONE);
         }
 
         void Register() override
