@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/azerothcore/bash-lib
+	branch = master
+	commit = 157ec939c81cea7ee92dba40ddd2cc1d2563d248
+	parent = 1045b96eeb69fdb553933bf1f2f292de8ccd825f
+	method = merge
+	cmdver = 0.4.1

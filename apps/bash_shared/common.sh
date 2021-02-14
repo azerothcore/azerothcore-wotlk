@@ -1,5 +1,5 @@
-function registerHooks() { hwc_event_register_hooks "$@"; }
-function runHooks() { hwc_event_run_hooks "$@"; }
+function registerHooks() { acore_event_registerHooks "$@"; }
+function runHooks() { acore_event_runHooks "$@"; }
 
 source "$AC_PATH_CONF/dist/config.sh" # include dist to avoid missing conf variables
 
@@ -15,7 +15,7 @@ fi
 
 for entry in "$AC_PATH_MODULES/"*/include.sh
 do
-    if [ -e "$entry" ]; then 
+    if [ -e "$entry" ]; then
         source "$entry"
     fi
 done

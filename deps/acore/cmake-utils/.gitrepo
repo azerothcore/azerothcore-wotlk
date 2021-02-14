@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/azerothcore/cmake-utils
+	branch = master
+	commit = 341a719b0620a2cf6769c45863969d79b9c51a72
+	method = merge
+	cmdver = 0.4.1
+	parent = e8c4624f74c71a2c5f735a30b0c2d68469b16749
