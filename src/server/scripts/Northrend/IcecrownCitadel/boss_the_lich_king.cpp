@@ -268,7 +268,6 @@ enum Events
     EVENT_DESTROY_SOUL,
     EVENT_TELEPORT_BACK,
     EVENT_SOUL_RIP,
-
 };
 
 enum EventGroups
@@ -358,7 +357,6 @@ void SendPacketToPlayers(WorldPacket const* data, Unit* source)
                     player->GetSession()->SendPacket(data);
 }
 
-
 struct ShadowTrapLKTargetSelector : public acore::unary_function<Unit*, bool>
 {
 public:
@@ -384,8 +382,6 @@ private:
     bool _reqLOS;
     float _maxDist;
 };
-
-
 
 struct NonTankLKTargetSelector : public acore::unary_function<Unit*, bool>
 {
@@ -420,7 +416,6 @@ private:
     uint32 _exclude1;
     uint32 _exclude2;
 };
-
 
 struct DefileTargetSelector : public acore::unary_function<Unit*, bool>
 {
@@ -612,7 +607,6 @@ private:
     bool _reverse;
 };
 
-
 class boss_the_lich_king : public CreatureScript
 {
 public:
@@ -699,7 +693,6 @@ public:
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
             me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_SIT);
-
         }
 
         bool CanAIAttack(Unit const* target) const override
@@ -805,13 +798,13 @@ public:
 
             if (_phase == PHASE_OUTRO)
             {
-                if (!me->HasByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER))
+                if (!me->HasByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER))
                     damage = me->GetHealth() > 1 ? 1 : 0;
                 else if (damage >= me->GetHealth()) // dying...
                 {
                     damage = me->GetHealth() - 1;
                     me->SetDisableGravity(false);
-                    me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+                    me->RemoveByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
                     me->SendMonsterMove(me->GetPositionX() + 0.25f, me->GetPositionY(), 840.86f, 300, SPLINEFLAG_FALLING);
                     me->m_positionZ = 840.86f;
                     me->SetOrientation(0.0f);
@@ -833,7 +826,6 @@ public:
                         tirion->PlayDirectSound(17389);
                     }
                 }
-
             }
             else if (damage >= me->GetHealth())
                 damage = me->GetHealth() - 1;
@@ -1459,7 +1451,6 @@ public:
                     }
                     break;
 
-
                 case EVENT_OUTRO_LK_TALK_1:
                     if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
                     {
@@ -1555,7 +1546,7 @@ public:
                         theLichKing->CastSpell((Unit*)NULL, SPELL_SOUL_BARRAGE, TRIGGERED_IGNORE_CAST_IN_PROGRESS);
                         sCreatureTextMgr->SendSound(theLichKing, SOUND_PAIN, CHAT_MSG_MONSTER_YELL, 0, TEXT_RANGE_NORMAL, TEAM_NEUTRAL, false);
                         theLichKing->SetDisableGravity(true);
-                        theLichKing->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
+                        theLichKing->SetByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
                         theLichKing->GetMotionMaster()->MovePoint(0, OutroFlying);
 
                         _events.ScheduleEvent(EVENT_OUTRO_AFTER_SOUL_BARRAGE, 3000);
@@ -1626,7 +1617,6 @@ public:
                 case EVENT_OUTRO_FORDRING_JUMP:
                     me->CastSpell((Unit*)NULL, SPELL_JUMP, false);
                     break;
-
 
                 default:
                     break;
@@ -1922,9 +1912,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_NECROTIC_PLAGUE_JUMP))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_NECROTIC_PLAGUE_JUMP });
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -2145,7 +2133,6 @@ public:
                 a->SetDuration(0);
             if (GetCaster()->GetTypeId() == TYPEID_UNIT)
                 GetCaster()->ToCreature()->DespawnOrUnsummon(3000);
-
         }
 
         void Register() override
@@ -2171,9 +2158,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ICE_BURST))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ICE_BURST });
         }
 
         void CheckTargetCount(std::list<WorldObject*>& unitList)
@@ -2487,9 +2472,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_SOUL_REAPER_BUFF))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_SOUL_REAPER_BUFF });
         }
 
         void OnPeriodic(AuraEffect const* /*aurEff*/)
@@ -2908,9 +2891,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_LIFE_SIPHON_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_LIFE_SIPHON_HEAL });
         }
 
         void TriggerHeal()
@@ -3535,9 +3516,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DARK_HUNGER_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DARK_HUNGER_HEAL });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)

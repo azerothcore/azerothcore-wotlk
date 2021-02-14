@@ -146,14 +146,14 @@ public:
                 for (uint8 j = 0; j < 8; ++j)
                 {
                     float angle = M_PI * 2 / 8 * j;
-                    me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonPositions[i].GetPositionX() + 6 * cos(angle), SummonPositions[i].GetPositionY() + 6 * sin(angle), SummonPositions[i].GetPositionZ() + 0.5f, SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonPositions[i].GetPositionX() + 6 * cos(angle), SummonPositions[i].GetPositionY() + 6 * sin(angle), SummonPositions[i].GetPositionZ(), SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
             for (uint8 i = 6; i < 12; ++i)
                 for (uint8 j = 1; j < 4; ++j)
                 {
                     float dist = j == 2 ? 0.0f : 8.0f; // second in middle
                     float angle = SummonPositions[i].GetOrientation() + M_PI * 2 / 4 * j;
-                    me->SummonCreature(NPC_UNSTOPPABLE_ABOMINATION, SummonPositions[i].GetPositionX() + dist * cos(angle), SummonPositions[i].GetPositionY() + dist * sin(angle), SummonPositions[i].GetPositionZ() + 0.5f, SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    me->SummonCreature(NPC_UNSTOPPABLE_ABOMINATION, SummonPositions[i].GetPositionX() + dist * cos(angle), SummonPositions[i].GetPositionY() + dist * sin(angle), SummonPositions[i].GetPositionZ(), SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
             for (uint8 i = 6; i < 12; ++i)
                 for (uint8 j = 0; j < 1; ++j)
@@ -183,7 +183,6 @@ public:
                     go->SetGoState(GO_STATE_ACTIVE);
             }
             _justSpawned = false;
-
         }
 
         void EnterEvadeMode() override
@@ -277,7 +276,7 @@ public:
                             go->SetPhaseMask(2, true);
                         }
                     }
-                    
+
                     break;
                 case EVENT_SUMMON_SOLDIER:
                     if (Creature* cr = me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonPositions[urand(0, 5)], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
@@ -527,7 +526,7 @@ public:
                     if (me->HealthBelowPct(35))
                     {
                         me->CastSpell(me, SPELL_FRENZY, true);
-                        
+
                         break;
                     }
                     events.RepeatEvent(1000);
@@ -591,7 +590,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            return sSpellMgr->GetSpellInfo(SPELL_MANA_DETONATION_DAMAGE) != nullptr;
+            return ValidateSpellInfo({ SPELL_MANA_DETONATION_DAMAGE });
         }
 
         void HandleScript(AuraEffect const* aurEff)
@@ -617,7 +616,6 @@ public:
         return new spell_kelthuzad_detonate_mana_AuraScript();
     }
 };
-
 
 void AddSC_boss_kelthuzad()
 {

@@ -304,8 +304,6 @@ public:
     }
 };
 
-
-
 enum eTrainingDummy
 {
     SPELL_STUN_PERMANENT        = 61204
@@ -424,7 +422,6 @@ public:
         return new npc_target_dummyAI(creature);
     }
 };
-
 
 // Theirs
 /*########
@@ -1300,7 +1297,7 @@ public:
 
             RunAwayTimer = 5000;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            me->SetPvP(true);
             me->SetStandState(UNIT_STAND_STATE_KNEEL);
             // expect database to have RegenHealth=0
             me->SetHealth(me->CountPctFromMaxHealth(70));
@@ -1420,7 +1417,6 @@ public:
 
         void WaypointReached(uint32 /*waypointId*/) override
         {
-
         }
 
         void UpdateAI(uint32 diff) override
@@ -1845,7 +1841,6 @@ public:
         }
     };
 
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_trainerAI(creature);
@@ -1999,7 +1994,6 @@ public:
 ## npc_experience
 ######*/
 
-#define EXP_COST                100000 //10 00 00 copper (10golds)
 #define GOSSIP_TEXT_EXP         14736
 #define GOSSIP_XP_OFF           "I no longer wish to gain experience."
 #define GOSSIP_XP_ON            "I wish to start gaining experience again."
@@ -2022,6 +2016,7 @@ public:
         ClearGossipMenuFor(player);
         bool noXPGain = player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
         bool doSwitch = false;
+        auto toggleXpCost = sWorld->getIntConfig(CONFIG_TOGGLE_XP_COST);
 
         switch (action)
         {
@@ -2040,16 +2035,18 @@ public:
         }
         if (doSwitch)
         {
-            if (!player->HasEnoughMoney(EXP_COST))
+            if (!player->HasEnoughMoney(toggleXpCost))
+            {
                 player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+            }
             else if (noXPGain)
             {
-                player->ModifyMoney(-EXP_COST);
+                player->ModifyMoney(-toggleXpCost);
                 player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
             }
             else if (!noXPGain)
             {
-                player->ModifyMoney(-EXP_COST);
+                player->ModifyMoney(-toggleXpCost);
                 player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
             }
         }

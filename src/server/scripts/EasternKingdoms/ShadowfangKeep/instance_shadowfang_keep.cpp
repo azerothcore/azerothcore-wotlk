@@ -7,7 +7,6 @@
 #include "shadowfang_keep.h"
 #include "TemporarySummon.h"
 
-
 enum Creatures
 {
     NPC_ASH                 = 3850,
@@ -15,7 +14,6 @@ enum Creatures
     NPC_ARCHMAGE_ARUGAL     = 4275,
     NPC_ARUGAL_VOIDWALKER   = 4627
 };
-
 
 class instance_shadowfang_keep : public InstanceMapScript
 {
@@ -99,7 +97,6 @@ public:
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
     };
-
 };
 
 class spell_shadowfang_keep_haunting_spirits : public SpellScriptLoader

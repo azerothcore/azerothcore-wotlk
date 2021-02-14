@@ -159,7 +159,7 @@ public:
                     me->CastSpell(me, SPELL_SOULSTORM, false);
                     me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
                     me->CastSpell(me, SPELL_SOULSTORM_VISUAL, true);
-                    
+
                     break;
             }
 
@@ -197,7 +197,6 @@ public:
         return new boss_bronjahmAI(creature);
     }
 };
-
 
 class npc_fos_corrupted_soul_fragment : public CreatureScript
 {
@@ -241,7 +240,6 @@ public:
                     else
                         timer -= diff;
                 }
-
         }
     };
 
@@ -250,7 +248,6 @@ public:
         return new npc_fos_corrupted_soul_fragmentAI(creature);
     }
 };
-
 
 class spell_bronjahm_magic_bane : public SpellScriptLoader
 {
@@ -289,7 +286,6 @@ public:
     }
 };
 
-
 class spell_bronjahm_soulstorm_channel_ooc : public SpellScriptLoader
 {
 public:
@@ -316,7 +312,6 @@ public:
         return new spell_bronjahm_soulstorm_channel_ooc_AuraScript();
     }
 };
-
 
 class spell_bronjahm_soulstorm_visual : public SpellScriptLoader
 {
@@ -361,7 +356,6 @@ public:
     }
 };
 
-
 class spell_bronjahm_soulstorm_targeting : public SpellScriptLoader
 {
 public:
@@ -387,7 +381,6 @@ public:
         return new spell_bronjahm_soulstorm_targeting_SpellScript();
     }
 };
-
 
 void AddSC_boss_bronjahm()
 {

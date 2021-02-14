@@ -96,4 +96,3 @@ private:
     VISITOR& i_visitor;
 };
 #endif
-

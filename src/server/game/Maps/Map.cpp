@@ -5,6 +5,7 @@
  */
 
 #include "Map.h"
+#include "Geometry.h"
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "DynamicTree.h"
@@ -14,7 +15,6 @@
 #include "Group.h"
 #include "InstanceScript.h"
 #include "MapInstanced.h"
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
@@ -399,7 +399,6 @@ void Map::DeleteFromWorld(Player* player)
     delete player;
 }
 
-
 void Map::EnsureGridCreated(const GridCoord& p)
 {
     if (getNGrid(p.x_coord, p.y_coord)) // pussywizard
@@ -627,7 +626,6 @@ bool Map::IsGridLoaded(const GridCoord& p) const
     return (getNGrid(p.x_coord, p.y_coord) && isGridObjectDataLoaded(p.x_coord, p.y_coord));
 }
 
-
 void Map::VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
                                    TypeContainerVisitor<acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
                                    TypeContainerVisitor<acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
@@ -710,7 +708,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 {
     if (t_diff)
         _dynamicTree.update(t_diff);
-    
+
     /// update worldsessions for existing players
     for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
     {
@@ -786,6 +784,19 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         player->Update(s_diff);
 
         VisitNearbyCellsOfPlayer(player, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
+
+        // If player is using far sight, visit that object too
+        if (WorldObject* viewPoint = player->GetViewpoint())
+        {
+            if (Creature* viewCreature = viewPoint->ToCreature())
+            {
+                VisitNearbyCellsOf(viewCreature, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
+            }
+            else if (DynamicObject* viewObject = viewPoint->ToDynObject())
+            {
+                VisitNearbyCellsOf(viewObject, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
+            }
+        }
 
         // handle updates for creatures in combat with player and are more than X yards away
         if (player->IsInCombat())
@@ -1897,19 +1908,27 @@ GridMap* Map::GetGrid(float x, float y)
     return GridMaps[gx][gy];
 }
 
-float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground /*= NULL*/, bool /*swim = false*/, float maxSearchDist /*= 50.0f*/) const
+float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground /*= NULL*/, bool /*swim = false*/, float collisionHeight) const
 {
     if (const_cast<Map*>(this)->GetGrid(x, y))
     {
         // we need ground level (including grid height version) for proper return water level in point
-        float ground_z = GetHeight(phasemask, x, y, z, true, maxSearchDist);
+        float ground_z = GetHeight(phasemask, x, y, z + collisionHeight, true, 50.0f);
         if (ground)
             *ground = ground_z;
 
         LiquidData liquid_status;
 
-        ZLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status);
-        return res ? liquid_status.level : ground_z;
+        ZLiquidStatus res = getLiquidStatus(x, y, ground_z, MAP_ALL_LIQUIDS, &liquid_status, collisionHeight);
+        switch (res)
+        {
+            case LIQUID_MAP_ABOVE_WATER:
+                return std::max<float>(liquid_status.level, ground_z);
+            case LIQUID_MAP_NO_WATER:
+                return ground_z;
+            default:
+                return liquid_status.level;
+        }
     }
 
     return VMAP_INVALID_HEIGHT_VALUE;
@@ -1946,20 +1965,15 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
 {
     // find raw .map surface under Z coordinates
     float mapHeight = VMAP_INVALID_HEIGHT_VALUE;
-    if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
-    {
-        float gridHeight = gmap->getHeight(x, y);
-        // look from a bit higher pos to find the floor, ignore under surface case
-        if (z + 2.0f > gridHeight)
-            mapHeight = gridHeight;
-    }
+    float gridHeight = GetGridHeight(x, y);
+    if (G3D::fuzzyGe(z, gridHeight - GROUND_HEIGHT_TOLERANCE))
+        mapHeight = gridHeight;
 
     float vmapHeight = VMAP_INVALID_HEIGHT_VALUE;
     if (checkVMap)
     {
         VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
-        //if (vmgr->isHeightCalcEnabled()) // pussywizard: optimization
-        vmapHeight = vmgr->getHeight(GetId(), x, y, z + 2.0f, maxSearchDist);   // look from a bit higher pos to find the floor
+        vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);   // look from a bit higher pos to find the floor
     }
 
     // mapHeight set for any above raw ground Z or <= INVALID_HEIGHT
@@ -1984,6 +1998,14 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
     return mapHeight;                               // explicitly use map data
 }
 
+float Map::GetGridHeight(float x, float y) const
+{
+    if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
+        return gmap->getHeight(x, y);
+
+    return VMAP_INVALID_HEIGHT_VALUE;
+}
+
 float Map::GetMinHeight(float x, float y) const
 {
     if (GridMap const* grid = const_cast<Map*>(this)->GetGrid(x, y))
@@ -1991,7 +2013,6 @@ float Map::GetMinHeight(float x, float y) const
 
     return -500.0f;
 }
-
 
 inline bool IsOutdoorWMO(uint32 mogpFlags, int32 /*adtId*/, int32 /*rootId*/, int32 /*groupId*/, WMOAreaTableEntry const* wmoEntry, AreaTableEntry const* atEntry)
 {
@@ -2049,7 +2070,7 @@ bool Map::GetAreaInfo(float x, float y, float z, uint32& flags, int32& adtId, in
         {
             float _mapheight = gmap->getHeight(x, y);
             // z + 2.0f condition taken from GetHeight(), not sure if it's such a great choice...
-            if (z + 2.0f > _mapheight &&  _mapheight > vmap_z)
+            if (z + 2.0f > _mapheight && _mapheight > vmap_z)
                 return false;
         }
         return true;
@@ -2127,7 +2148,7 @@ uint8 Map::GetTerrainType(float x, float y) const
         return 0;
 }
 
-ZLiquidStatus Map::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data) const
+ZLiquidStatus Map::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data, float collisionHeight) const
 {
     ZLiquidStatus result = LIQUID_MAP_NO_WATER;
     VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
@@ -2183,7 +2204,7 @@ ZLiquidStatus Map::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidTyp
             float delta = liquid_level - z;
 
             // Get position delta
-            if (delta > 2.0f)                   // Under water
+            if (delta > collisionHeight)                   // Under water
                 return LIQUID_MAP_UNDER_WATER;
             if (delta > 0.0f)                   // In water
                 return LIQUID_MAP_IN_WATER;
@@ -2247,7 +2268,7 @@ bool Map::getObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float 
     return result;
 }
 
-float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap/*=true*/, float maxSearchDist/*=DEFAULT_HEIGHT_SEARCH*/) const
+float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap/*=true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
 {
     float h1, h2;
     h1 = GetHeight(x, y, z, vmap, maxSearchDist);
@@ -2267,9 +2288,46 @@ bool Map::IsUnderWater(float x, float y, float z) const
     return getLiquidStatus(x, y, z, MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_OCEAN) & LIQUID_MAP_UNDER_WATER;
 }
 
+bool Map::HasEnoughWater(WorldObject const* searcher, float x, float y, float z) const
+{
+    LiquidData liquidData;
+    liquidData.level = INVALID_HEIGHT;
+    ZLiquidStatus liquidStatus = getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquidData);
+    return (liquidStatus & (LIQUID_MAP_IN_WATER | LIQUID_MAP_UNDER_WATER)) && HasEnoughWater(searcher, liquidData);
+}
+
+bool Map::HasEnoughWater(WorldObject const* searcher, LiquidData liquidData) const
+{
+    float minHeightInWater = searcher->GetMinHeightInWater();
+    return liquidData.level > INVALID_HEIGHT && liquidData.level > liquidData.depth_level && liquidData.level - liquidData.depth_level >= minHeightInWater;
+}
+
+
 char const* Map::GetMapName() const
 {
     return i_mapEntry ? i_mapEntry->name[sWorld->GetDefaultDbcLocale()] : "UNNAMEDMAP\x0";
+}
+
+void Map::UpdateObjectVisibility(WorldObject* obj, Cell cell, CellCoord cellpair)
+{
+    cell.SetNoCreate();
+    acore::VisibleChangesNotifier notifier(*obj);
+    TypeContainerVisitor<acore::VisibleChangesNotifier, WorldTypeMapContainer > player_notifier(notifier);
+    cell.Visit(cellpair, player_notifier, *this, *obj, obj->GetVisibilityRange());
+}
+
+void Map::UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair)
+{
+    acore::VisibleNotifier notifier(*player, false, false);
+
+    cell.SetNoCreate();
+    TypeContainerVisitor<acore::VisibleNotifier, WorldTypeMapContainer > world_notifier(notifier);
+    TypeContainerVisitor<acore::VisibleNotifier, GridTypeMapContainer  > grid_notifier(notifier);
+    cell.Visit(cellpair, world_notifier, *this, *player->m_seer, player->GetSightRange());
+    cell.Visit(cellpair, grid_notifier, *this, *player->m_seer, player->GetSightRange());
+
+    // send data
+    notifier.SendToSelf();
 }
 
 void Map::SendInitSelf(Player* player)
@@ -3390,4 +3448,183 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
                 if (player->GetZoneId() == zoneId)
                     player->SendDirectMessage(&data);
     }
+}
+
+/**
+ * @brief Check if a given source can reach a specific point following a path
+ * and normalize the coords. Use this method for long paths, otherwise use the
+ * overloaded method with the start coords when you need to do a quick check on small segments
+ *
+ */
+bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
+{
+    G3D::Vector3 prevPath = path->GetStartPosition();
+    for (auto & vector : path->GetPath())
+    {
+        float x = vector.x;
+        float y = vector.y;
+        float z = vector.z;
+
+        if (!CanReachPositionAndGetValidCoords(source, prevPath.x, prevPath.y, prevPath.z, x, y, z, failOnCollision, failOnSlopes))
+        {
+            destX = x;
+            destY = y;
+            destZ = z;
+            return false;
+        }
+
+        prevPath = vector;
+    }
+
+    destX = prevPath.x;
+    destY = prevPath.y;
+    destZ = prevPath.z;
+
+    return true;
+}
+
+bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
+{
+    return CanReachPositionAndGetValidCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, failOnCollision, failOnSlopes);
+}
+
+/**
+ * @brief validate the new destination and set reachable coords
+ * Check if a given unit can reach a specific point on a segment
+ * and set the correct dest coords
+ * NOTE: use this method with small segments.
+ *
+ * @param failOnCollision if true, the methods will return false when a collision occurs
+ * @param failOnSlopes if true, the methods will return false when a non walkable slope is found
+ *
+ * @return true if the destination is valid, false otherwise
+ *
+ **/
+bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
+{
+    float tempX=destX, tempY=destY, tempZ=destZ;
+    if (!CheckCollisionAndGetValidCoords(source, startX, startY, startZ, destX, destY, destZ, failOnCollision))
+    {
+        return false;
+    }
+
+    destX = tempX, destY = tempY, destZ = tempZ;
+
+    const Unit* unit = source->ToUnit();
+    // if it's not an unit (Object) then we do not have to continue
+    // with walkable checks
+    if (!unit)
+    {
+        return true;
+    }
+
+    /*
+     * Walkable checks
+     */
+    bool isWaterNext = HasEnoughWater(unit, destX, destY, destZ);
+    const Creature* creature = unit->ToCreature();
+    bool cannotEnterWater = isWaterNext && (creature && !creature->CanEnterWater());
+    bool cannotWalkOrFly = !isWaterNext && !source->ToPlayer() && !unit->CanFly() && (creature && !creature->CanWalk());
+    if (cannotEnterWater || cannotWalkOrFly ||
+        (failOnSlopes && !PathGenerator::IsWalkableClimb(startX, startY, startZ, destX, destY, destZ, source->GetCollisionHeight())))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief validate the new destination and set coords
+ * Check if a given unit can face collisions in a specific segment
+ *
+ * @return true if the destination is valid, false otherwise
+ *
+ **/
+bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision) const
+{
+    // Prevent invalid coordinates here, position is unchanged
+    if (!acore::IsValidMapCoord(startX, startY, startZ) || !acore::IsValidMapCoord(destX, destY, destZ))
+    {
+        sLog->outCrash("Map::CheckCollisionAndGetValidCoords invalid coordinates startX: %f, startY: %f, startZ: %f, destX: %f, destY: %f, destZ: %f", startX, startY, startZ, destX, destY, destZ);
+        return false;
+    }
+
+    bool isWaterNext = IsInWater(destX, destY, destZ);
+
+    PathGenerator* path = new PathGenerator(source);
+
+    // Use a detour raycast to get our first collision point
+    path->SetUseRaycast(true);
+    bool result = path->CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
+
+    const Unit* unit = source->ToUnit();
+    bool notOnGround = path->GetPathType() & PATHFIND_NOT_USING_PATH
+        || isWaterNext || (unit && unit->IsFlying());
+
+    // Check for valid path types before we proceed
+    if (!result || (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)))
+    {
+        return false;
+    }
+
+    G3D::Vector3 endPos = path->GetPath().back();
+    destX = endPos.x;
+    destY = endPos.y;
+    destZ = endPos.z;
+
+    // collision check
+    bool collided = false;
+
+    // check static LOS
+    float halfHeight = source->GetCollisionHeight() * 0.5f;
+
+    // Unit is not on the ground, check for potential collision via vmaps
+    if (notOnGround)
+    {
+        bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(source->GetMapId(),
+            startX, startY, startZ + halfHeight,
+            destX, destY, destZ + halfHeight,
+            destX, destY, destZ, -CONTACT_DISTANCE);
+
+        destZ -= halfHeight;
+
+        // Collided with static LOS object, move back to collision point
+        if (col)
+        {
+            collided = true;
+        }
+    }
+
+    // check dynamic collision
+    bool col = source->GetMap()->getObjectHitPos(source->GetPhaseMask(),
+        startX, startY, startZ + halfHeight,
+        destX, destY, destZ + halfHeight,
+        destX, destY, destZ, -CONTACT_DISTANCE);
+
+    destZ -= halfHeight;
+
+    // Collided with a gameobject, move back to collision point
+    if (col)
+    {
+        collided = true;
+    }
+
+    float groundZ = VMAP_INVALID_HEIGHT_VALUE;
+    source->UpdateAllowedPositionZ(destX, destY, destZ, &groundZ);
+
+    // position has no ground under it (or is too far away)
+    if (groundZ <= INVALID_HEIGHT && unit && unit->CanFly())
+    {
+        // fall back to gridHeight if any
+        float gridHeight = GetGridHeight(destX, destY);
+        if (gridHeight > INVALID_HEIGHT)
+        {
+            destZ = gridHeight + unit->GetHoverHeight();
+        } else {
+            return false;
+        }
+    }
+
+    return failOnCollision ? !collided : true;
 }

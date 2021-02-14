@@ -53,4 +53,3 @@ inline void EndianConvertReverse(uint8&) { }
 inline void EndianConvertReverse( int8&) { }
 
 #endif
-

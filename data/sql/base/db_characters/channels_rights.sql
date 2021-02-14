@@ -14,7 +14,7 @@ CREATE TABLE `channels_rights`
   `speakdelay` int(10) unsigned NOT NULL,
   `joinmessage` varchar(255) NOT NULL DEFAULT '',
   `delaymessage` varchar(255) NOT NULL DEFAULT '',
-  `moderators` text,
+  `moderators` text DEFAULT NULL,
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

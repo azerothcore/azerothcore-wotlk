@@ -385,10 +385,9 @@ void ObjectMgr::LoadCreatureLocales()
 
         AddLocaleString(Name, locale, data.Name);
         AddLocaleString(Title, locale, data.Title);
-
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %lu Сreature Locale strings in %u ms", (unsigned long)_creatureLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %lu Creature Locale strings in %u ms", (unsigned long)_creatureLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadGossipMenuItemsLocales()
@@ -420,7 +419,6 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
 
         AddLocaleString(OptionText, locale, data.OptionText);
         AddLocaleString(BoxText, locale, data.BoxText);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u Gossip Menu Option Locale strings in %u ms", (uint32)_gossipMenuItemsLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -452,7 +450,6 @@ void ObjectMgr::LoadPointOfInterestLocales()
             continue;
 
         AddLocaleString(Name, locale, data.Name);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u Points Of Interest Locale strings in %u ms", (uint32)_pointOfInterestLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -462,20 +459,20 @@ void ObjectMgr::LoadCreatureTemplates()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                 0              1                 2                  3                 4            5           6        7         8
+//                                                   0      1                   2                   3                   4            5            6         7         8
     QueryResult result = WorldDatabase.Query("SELECT entry, difficulty_entry_1, difficulty_entry_2, difficulty_entry_3, KillCredit1, KillCredit2, modelid1, modelid2, modelid3, "
-                         //                                           9       10      11       12           13           14        15     16      17          18       19         20         21
+//                        9         10    11       12        13              14        15        16   17       18       19          20
                          "modelid4, name, subname, IconName, gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, "
-                         //                                         22      23     24     25        26          27             28              29                30           31          32          33
+//                        21      22     23      24      25         26           27              28              29               30          31          32
                          "scale, `rank`, mindmg, maxdmg, dmgschool, attackpower, DamageModifier, BaseAttackTime, RangeAttackTime, unit_class, unit_flags, unit_flags2, "
-                         //                                             34         35         36             37             38             39          40           41              42           43
+//                        33            34      35            36             37             38            39           40           41                 42
                          "dynamicflags, family, trainer_type, trainer_spell, trainer_class, trainer_race, minrangedmg, maxrangedmg, rangedattackpower, type, "
-                         //                                            44        45          46           47          48          49           50           51           52           53         54
+//                        43          44      45              46        47           48           49           50           51           52           53
                          "type_flags, lootid, pickpocketloot, skinloot, resistance1, resistance2, resistance3, resistance4, resistance5, resistance6, spell1, "
-                         //                                          55      56      57      58      59      60      61          62            63       64       65       66         67
+//                        54      55      56      57      58      59      60      61              62         63       64       65      66
                          "spell2, spell3, spell4, spell5, spell6, spell7, spell8, PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, "
-                         //                                             68          69             70             71             72            73           74           75                76               77           78
-                         "InhabitType, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, flags_extra, ScriptName "
+//                        67           68           69              70            71             72            73          74           75                    76                        77           78
+                         "InhabitType, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, spell_school_immune_mask, flags_extra, ScriptName "
                          "FROM creature_template;");
 
     if (!result)
@@ -491,7 +488,6 @@ void ObjectMgr::LoadCreatureTemplates()
         Field* fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
-
 
         CreatureTemplate& creatureTemplate = _creatureTemplateStore[entry];
 
@@ -551,23 +547,24 @@ void ObjectMgr::LoadCreatureTemplates()
         for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
             creatureTemplate.spells[i] = fields[53 + i].GetUInt32();
 
-        creatureTemplate.PetSpellDataId     = fields[61].GetUInt32();
-        creatureTemplate.VehicleId          = fields[62].GetUInt32();
-        creatureTemplate.mingold            = fields[63].GetUInt32();
-        creatureTemplate.maxgold            = fields[64].GetUInt32();
-        creatureTemplate.AIName             = fields[65].GetString();
-        creatureTemplate.MovementType       = uint32(fields[66].GetUInt8());
-        creatureTemplate.InhabitType        = uint32(fields[67].GetUInt8());
-        creatureTemplate.HoverHeight        = fields[68].GetFloat();
-        creatureTemplate.ModHealth          = fields[69].GetFloat();
-        creatureTemplate.ModMana            = fields[70].GetFloat();
-        creatureTemplate.ModArmor           = fields[71].GetFloat();
-        creatureTemplate.RacialLeader       = fields[72].GetBool();
-        creatureTemplate.movementId         = fields[73].GetUInt32();
-        creatureTemplate.RegenHealth        = fields[74].GetBool();
-        creatureTemplate.MechanicImmuneMask = fields[75].GetUInt32();
-        creatureTemplate.flags_extra        = fields[76].GetUInt32();
-        creatureTemplate.ScriptID           = GetScriptId(fields[77].GetCString());
+        creatureTemplate.PetSpellDataId        = fields[61].GetUInt32();
+        creatureTemplate.VehicleId             = fields[62].GetUInt32();
+        creatureTemplate.mingold               = fields[63].GetUInt32();
+        creatureTemplate.maxgold               = fields[64].GetUInt32();
+        creatureTemplate.AIName                = fields[65].GetString();
+        creatureTemplate.MovementType          = uint32(fields[66].GetUInt8());
+        creatureTemplate.InhabitType           = uint32(fields[67].GetUInt8());
+        creatureTemplate.HoverHeight           = fields[68].GetFloat();
+        creatureTemplate.ModHealth             = fields[69].GetFloat();
+        creatureTemplate.ModMana               = fields[70].GetFloat();
+        creatureTemplate.ModArmor              = fields[71].GetFloat();
+        creatureTemplate.RacialLeader          = fields[72].GetBool();
+        creatureTemplate.movementId            = fields[73].GetUInt32();
+        creatureTemplate.RegenHealth           = fields[74].GetBool();
+        creatureTemplate.MechanicImmuneMask    = fields[75].GetUInt32();
+        creatureTemplate.SpellSchoolImmuneMask = fields[76].GetUInt8();
+        creatureTemplate.flags_extra           = fields[77].GetUInt32();
+        creatureTemplate.ScriptID              = GetScriptId(fields[78].GetCString());
 
         ++count;
     } while (result->NextRow());
@@ -595,6 +592,7 @@ void ObjectMgr::LoadCreatureTemplates()
     }
 
     sLog->outString(">> Loaded %u creature definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void ObjectMgr::LoadCreatureTemplateAddons()
@@ -1700,10 +1698,10 @@ void ObjectMgr::LoadTempSummons()
         _tempSummonDataStore[key].push_back(data);
 
         ++count;
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u temp summons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void ObjectMgr::LoadCreatures()
@@ -1863,7 +1861,6 @@ void ObjectMgr::LoadCreatures()
             AddCreatureToGrid(guid, &data);
 
         ++count;
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u creatures in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -2307,7 +2304,6 @@ void ObjectMgr::LoadItemLocales()
 
         AddLocaleString(Name, locale, data.Name);
         AddLocaleString(Description, locale, data.Description);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u Item Locale strings in %u ms", (uint32)_itemLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -2932,7 +2928,6 @@ void ObjectMgr::LoadItemSetNameLocales()
             continue;
 
         AddLocaleString(Name, locale, data.Name);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u Item Set Name Locale strings in %u ms", uint32(_itemSetNameLocaleStore.size()), GetMSTimeDiffToNow(oldMSTime));
@@ -3347,6 +3342,7 @@ void ObjectMgr::LoadPlayerInfo()
             } while (result->NextRow());
 
             sLog->outString(">> Loaded %u player create definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            sLog->outString();
         }
     }
 
@@ -3480,6 +3476,7 @@ void ObjectMgr::LoadPlayerInfo()
             } while (result->NextRow());
 
             sLog->outString(">> Loaded %u player create spells in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            sLog->outString();
         }
     }
 
@@ -4668,7 +4665,6 @@ void ObjectMgr::LoadQuestLocales()
 
         for (uint8 i = 0; i < 4; ++i)
             AddLocaleString(fields[i + 7].GetString(), locale, data.ObjectiveText[i]);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u Quest Locale strings in %u ms", (uint32)_questLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -5101,7 +5097,6 @@ void ObjectMgr::LoadSpellScriptNames()
 
     do
     {
-
         Field* fields = result->Fetch();
 
         int32 spellId          = fields[0].GetInt32();
@@ -5247,7 +5242,6 @@ void ObjectMgr::LoadPageTexts()
             PageTextContainer::const_iterator itr2 = _pageTextStore.find(itr->second.NextPage);
             if (itr2 == _pageTextStore.end())
                 sLog->outErrorDb("Page text (Id: %u) has not existing next page (Id: %u)", itr->first, itr->second.NextPage);
-
         }
     }
 
@@ -5288,7 +5282,6 @@ void ObjectMgr::LoadPageTextLocales()
         LocaleConstant locale   = GetLocaleByName(LocaleName);
 
         AddLocaleString(Text, locale, data.Text);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u Page Text Locale strings in %u ms", (uint32)_pageTextLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -5467,7 +5460,6 @@ void ObjectMgr::LoadGossipText()
 
     do
     {
-
         cic = 0;
 
         Field* fields = result->Fetch();
@@ -5509,7 +5501,6 @@ void ObjectMgr::LoadGossipText()
         }
 
         count++;
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u npc texts in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -5547,7 +5538,6 @@ void ObjectMgr::LoadNpcTextLocales()
             AddLocaleString(fields[2 + i * 2].GetString(), locale, data.Text_0[i]);
             AddLocaleString(fields[3 + i * 2].GetString(), locale, data.Text_1[i]);
         }
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u Npc Text Locale strings in %u ms", (uint32)_npcTextLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -5729,7 +5719,6 @@ void ObjectMgr::LoadQuestAreaTriggers()
         }
 
         _questAreaTriggerStore[trigger_ID] = quest_ID;
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u quest trigger points in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -5760,7 +5749,6 @@ void ObjectMgr::LoadQuestOfferRewardLocale()
 
         QuestOfferRewardLocale& data = _questOfferRewardLocaleStore[id];
         AddLocaleString(fields[2].GetString(), locale, data.RewardText);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %lu Quest Offer Reward locale strings in %u ms", _questOfferRewardLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -5790,7 +5778,6 @@ void ObjectMgr::LoadQuestRequestItemsLocale()
 
         QuestRequestItemsLocale& data = _questRequestItemsLocaleStore[id];
         AddLocaleString(fields[2].GetString(), locale, data.CompletionText);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %lu Quest Request Items locale strings in %u ms", _questRequestItemsLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -6021,7 +6008,6 @@ void ObjectMgr::LoadAreaTriggers()
         }
 
         _areaTriggerStore[at.entry] = at;
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u area trigger definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -6083,7 +6069,6 @@ void ObjectMgr::LoadAreaTriggerTeleports()
         }
 
         _areaTriggerTeleportStore[Trigger_ID] = at;
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u area trigger teleport definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -6453,7 +6438,6 @@ void ObjectMgr::LoadGameObjectLocales()
 
         AddLocaleString(Name, locale, data.Name);
         AddLocaleString(CastBarCaption, locale, data.CastBarCaption);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u Gameobject Locale strings in %u ms", (uint32)_gameObjectLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -7002,6 +6986,7 @@ void ObjectMgr::LoadReputationRewardRate()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u reputation_reward_rate in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void ObjectMgr::LoadReputationOnKill()
@@ -7818,7 +7803,6 @@ bool ObjectMgr::LoadAcoreStrings()
 
         for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
             AddLocaleString(fields[i + 1].GetString(), LocaleConstant(i), data.Content);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u acore strings in %u ms", (uint32)_acoreStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -8425,7 +8409,6 @@ void ObjectMgr::LoadGossipMenu()
         }
 
         _gossipMenusStore.insert(GossipMenusContainer::value_type(gMenu.MenuID, gMenu));
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u gossip_menu entries in %u ms", (uint32)_gossipMenusStore.size(), GetMSTimeDiffToNow(oldMSTime));
@@ -8498,7 +8481,6 @@ void ObjectMgr::LoadGossipMenuItems()
         }
 
         _gossipMenuItemsStore.insert(GossipMenuItemsContainer::value_type(gMenuItem.MenuID, gMenuItem));
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u gossip_menu_option entries in %u ms", uint32(_gossipMenuItemsStore.size()), GetMSTimeDiffToNow(oldMSTime));
@@ -8773,7 +8755,6 @@ void ObjectMgr::LoadBroadcastTexts()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded " SZFMTD " broadcast texts in %u ms", _broadcastTextStore.size(), GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
 }
 
 void ObjectMgr::LoadBroadcastTextLocales()
@@ -9233,6 +9214,7 @@ void ObjectMgr::LoadGameObjectQuestItems()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u gameobject quest items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void ObjectMgr::LoadCreatureQuestItems()
@@ -9262,4 +9244,5 @@ void ObjectMgr::LoadCreatureQuestItems()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u creature quest items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }

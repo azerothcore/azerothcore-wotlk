@@ -24,26 +24,6 @@ class ElunaEventProcessor;
 #include <string>
 #include <sstream>
 
-#define CONTACT_DISTANCE            0.5f
-#define INTERACTION_DISTANCE        5.5f
-#define ATTACK_DISTANCE             5.0f
-#define MAX_SEARCHER_DISTANCE       150.0f // pussywizard: replace the use of MAX_VISIBILITY_DISTANCE in searchers, because MAX_VISIBILITY_DISTANCE is quite too big for this purpose
-#define MAX_VISIBILITY_DISTANCE     250.0f // max distance for visible objects, experimental
-#define VISIBILITY_INC_FOR_GOBJECTS 30.0f // pussywizard
-#define VISIBILITY_COMPENSATION     15.0f // increase searchers
-#define SPELL_SEARCHER_COMPENSATION 30.0f // increase searchers size in case we have large npc near cell border
-#define VISIBILITY_DIST_WINTERGRASP 175.0f
-#define SIGHT_RANGE_UNIT            50.0f
-#define DEFAULT_VISIBILITY_DISTANCE 90.0f // default visible distance, 90 yards on continents
-#define DEFAULT_VISIBILITY_INSTANCE 120.0f // default visible distance in instances, 120 yards
-#define DEFAULT_VISIBILITY_BGARENAS 150.0f // default visible distance in BG/Arenas, 150 yards
-
-#define DEFAULT_WORLD_OBJECT_SIZE   0.388999998569489f      // player size, also currently used (correctly?) for any non Unit world objects
-#define DEFAULT_COMBAT_REACH        1.5f
-#define MIN_MELEE_REACH             2.0f
-#define NOMINAL_MELEE_RANGE         5.0f
-#define MELEE_RANGE                 (NOMINAL_MELEE_RANGE - MIN_MELEE_REACH * 2) //center to center for players
-
 enum TypeMask
 {
     TYPEMASK_OBJECT         = 0x0001,
@@ -138,6 +118,7 @@ public:
     [[nodiscard]] uint32 GetEntry() const { return GetUInt32Value(OBJECT_FIELD_ENTRY); }
     void SetEntry(uint32 entry) { SetUInt32Value(OBJECT_FIELD_ENTRY, entry); }
 
+    float GetObjectScale() const { return GetFloatValue(OBJECT_FIELD_SCALE_X); }
     virtual void SetObjectScale(float scale) { SetFloatValue(OBJECT_FIELD_SCALE_X, scale); }
 
     [[nodiscard]] TypeID GetTypeId() const { return m_objectTypeId; }
@@ -328,7 +309,6 @@ public:
     DataMap CustomData;
 
 protected:
-
     Object();
 
     void _InitValues();
@@ -485,7 +465,6 @@ struct Position
 
     [[nodiscard]] Position GetPosition() const { return *this; }
 
-
     Position::PositionXYZStreamer PositionXYZStream()
     {
         return PositionXYZStreamer(*this);
@@ -542,11 +521,23 @@ struct Position
 
     float GetAngle(const Position* pos) const;
     [[nodiscard]] float GetAngle(float x, float y) const;
+    [[nodiscard]] float GetAbsoluteAngle(float x, float y) const
+    {
+        return NormalizeOrientation(std::atan2(
+            static_cast<float>(y - m_positionY),
+            static_cast<float>(x - m_positionX))
+            );
+    }
+    [[nodiscard]] float GetAbsoluteAngle(Position const& pos) const { return GetAbsoluteAngle(pos.m_positionX, pos.m_positionY); }
+    [[nodiscard]] float GetAbsoluteAngle(Position const* pos) const { return GetAbsoluteAngle(*pos); }
+
     float GetRelativeAngle(const Position* pos) const
     {
         return GetAngle(pos) - m_orientation;
     }
     [[nodiscard]] float GetRelativeAngle(float x, float y) const { return GetAngle(x, y) - m_orientation; }
+    float ToAbsoluteAngle(float relAngle) const { return NormalizeOrientation(relAngle + m_orientation); }
+
     void GetSinCos(float x, float y, float& vsin, float& vcos) const;
 
     [[nodiscard]] bool IsInDist2d(float x, float y, float dist) const
@@ -593,7 +584,6 @@ ByteBuffer& operator >> (ByteBuffer& buf, Position::PositionXYZStreamer const& s
 ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& streamer);
 ByteBuffer& operator >> (ByteBuffer& buf, Position::PositionXYZOStreamer const& streamer);
 
-
 struct MovementInfo
 {
     // common
@@ -637,13 +627,12 @@ struct MovementInfo
         }
 
         float zspeed, sinAngle, cosAngle, xyspeed;
-
     } jump;
 
     // spline
     float splineElevation{0.0f};
 
-    MovementInfo()  
+    MovementInfo()
     {
         pos.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
         transport.Reset();
@@ -786,6 +775,7 @@ public:
     ElunaEventProcessor* elunaEvents;
 #endif
 
+    void GetNearPoint2D(WorldObject const* searcher, float& x, float& y, float distance, float absAngle) const;
     void GetNearPoint2D(float& x, float& y, float distance, float absAngle) const;
     void GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ = 0) const;
     void GetVoidClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float relAngle = 0, float controlZ = 0) const;
@@ -797,16 +787,13 @@ public:
         MovePosition(pos, dist, angle);
     }
     void MovePositionToFirstCollision(Position& pos, float dist, float angle);
+    Position GetFirstCollisionPosition(float startX, float startY, float startZ, float destX, float destY);
+    Position GetFirstCollisionPosition(float destX, float destY, float destZ);
+    Position GetFirstCollisionPosition(float dist, float angle);
     void GetFirstCollisionPosition(Position& pos, float dist, float angle)
     {
         GetPosition(&pos);
         MovePositionToFirstCollision(pos, dist, angle);
-    }
-    void MovePositionToFirstCollisionForTotem(Position& pos, float dist, float angle, bool forGameObject);
-    void GetFirstCollisionPositionForTotem(Position& pos, float dist, float angle, bool forGameObject)
-    {
-        GetPosition(&pos);
-        MovePositionToFirstCollisionForTotem(pos, dist, angle, forGameObject);
     }
     void GetRandomNearPosition(Position& pos, float radius)
     {
@@ -819,12 +806,12 @@ public:
 
     [[nodiscard]] float GetObjectSize() const
     {
-        return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? m_floatValues[UNIT_FIELD_COMBATREACH] : DEFAULT_WORLD_OBJECT_SIZE;
+        return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? m_floatValues[UNIT_FIELD_COMBATREACH] : DEFAULT_WORLD_OBJECT_SIZE * GetObjectScale();
     }
 
     [[nodiscard]] virtual float GetCombatReach() const { return 0.0f; } // overridden (only) in Unit
     void UpdateGroundPositionZ(float x, float y, float& z) const;
-    void UpdateAllowedPositionZ(float x, float y, float& z) const;
+    void UpdateAllowedPositionZ(float x, float y, float& z, float* groundZ = nullptr) const;
 
     void GetRandomPoint(const Position& srcPos, float distance, float& rand_x, float& rand_y, float& rand_z) const;
     void GetRandomPoint(const Position& srcPos, float distance, Position& pos) const
@@ -1061,12 +1048,24 @@ public:
     [[nodiscard]] virtual float GetStationaryZ() const { return GetPositionZ(); }
     [[nodiscard]] virtual float GetStationaryO() const { return GetOrientation(); }
 
+    [[nodiscard]] float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr) const;
+    [[nodiscard]] float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
+
+    [[nodiscard]] float GetFloorZ() const;
+    [[nodiscard]] float GetMinHeightInWater() const;
+
+    [[nodiscard]] virtual float GetCollisionHeight() const { return 0.0f; }
+    [[nodiscard]] virtual float GetCollisionWidth() const { return GetObjectSize(); }
+    [[nodiscard]] virtual float GetCollisionRadius() const { return GetObjectSize() / 2; }
+
 protected:
     std::string m_name;
     bool m_isActive;
     bool m_isVisibilityDistanceOverride;
     const bool m_isWorldObject;
     ZoneScript* m_zoneScript;
+
+    float m_staticFloorZ;
 
     // transports
     Transport* m_transport;

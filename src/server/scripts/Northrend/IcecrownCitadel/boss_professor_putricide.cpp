@@ -1085,11 +1085,7 @@ public:
 
         bool Validate(SpellInfo const* spell) override
         {
-            if (!spell->ExcludeTargetAuraSpell)
-                return false;
-            if (!sSpellMgr->GetSpellInfo(spell->ExcludeTargetAuraSpell))
-                return false;
-            return true;
+            return ValidateSpellInfo({ spell->ExcludeTargetAuraSpell });
         }
 
         // set up initial variables and check if caster is creature
@@ -1247,11 +1243,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_UNBOUND_PLAGUE))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_UNBOUND_PLAGUE_SEARCHER))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_UNBOUND_PLAGUE, SPELL_UNBOUND_PLAGUE_SEARCHER });
         }
 
         void FilterTargets(std::list<WorldObject*>& targets)
@@ -1264,7 +1256,6 @@ public:
                     return;
                 }
             }
-
 
             targets.remove_if(acore::UnitAuraCheck(true, sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster())));
             acore::Containers::RandomResizeList(targets, 1);

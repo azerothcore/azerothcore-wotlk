@@ -7,11 +7,6 @@
 #ifndef ACORE_MAP_H
 #define ACORE_MAP_H
 
-// Pathfinding
-#include "DetourAlloc.h"
-#include "DetourNavMesh.h"
-#include "DetourNavMeshQuery.h"
-
 #include "Define.h"
 #include <ace/RW_Thread_Mutex.h>
 #include <ace/Thread_Mutex.h>
@@ -25,7 +20,8 @@
 #include "MapRefManager.h"
 #include "DynamicTree.h"
 #include "GameObjectModel.h"
-#include "Log.h"
+#include "PathGenerator.h"
+#include "ObjectDefines.h"
 #include "DataMap.h"
 #include <bitset>
 #include <list>
@@ -50,6 +46,7 @@ class BattlegroundMap;
 class Transport;
 class StaticTransport;
 class MotionTransport;
+class PathGenerator;
 namespace acore
 {
     struct ObjectUpdater;
@@ -189,7 +186,6 @@ class GridMap
     uint8 _liquidWidth;
     uint8 _liquidHeight;
 
-
     bool loadAreaData(FILE* in, uint32 offset, uint32 size);
     bool loadHeightData(FILE* in, uint32 offset, uint32 size);
     bool loadLiquidData(FILE* in, uint32 offset, uint32 size);
@@ -255,7 +251,7 @@ struct ZoneDynamicInfo
 #define MAX_HEIGHT            100000.0f                     // can be use for find ground height at surface
 #define INVALID_HEIGHT       -100000.0f                     // for check, must be equal to VMAP_INVALID_HEIGHT, real value for unknown height is VMAP_INVALID_HEIGHT_VALUE
 #define MAX_FALL_DISTANCE     250000.0f                     // "unlimited fall" to find VMap ground if it is available, just larger than MAX_HEIGHT - INVALID_HEIGHT
-#define DEFAULT_HEIGHT_SEARCH     70.0f                     // default search distance to find height at nearby locations
+#define DEFAULT_HEIGHT_SEARCH     50.0f                     // default search distance to find height at nearby locations
 #define MIN_UNLOAD_DELAY      1                             // immediate unload
 
 typedef std::map<uint32/*leaderDBGUID*/, CreatureGroup*>        CreatureGroupHolderType;
@@ -353,10 +349,11 @@ public:
     // some calls like isInWater should not use vmaps due to processor power
     // can return INVALID_HEIGHT if under z+2 z coord not found height
     [[nodiscard]] float GetHeight(float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
+    [[nodiscard]] float GetGridHeight(float x, float y) const;
     [[nodiscard]] float GetMinHeight(float x, float y) const;
     Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr);
 
-    ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = nullptr) const;
+    ZLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data = nullptr, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const;
 
     uint32 GetAreaId(float x, float y, float z, bool* isOutdoors) const;
     bool GetAreaInfo(float x, float y, float z, uint32& mogpflags, int32& adtId, int32& rootId, int32& groupId) const;
@@ -370,6 +367,8 @@ public:
     [[nodiscard]] float GetWaterLevel(float x, float y) const;
     bool IsInWater(float x, float y, float z, LiquidData* data = nullptr) const;
     [[nodiscard]] bool IsUnderWater(float x, float y, float z) const;
+    [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, float x, float y, float z) const;
+    [[nodiscard]] bool HasEnoughWater(WorldObject const* searcher, LiquidData liquidData) const;
 
     void MoveAllCreaturesInMoveList();
     void MoveAllGameObjectsInMoveList();
@@ -408,8 +407,8 @@ public:
     void AddObjectToSwitchList(WorldObject* obj, bool on);
     virtual void DelayedUpdate(const uint32 diff);
 
-    //void UpdateObjectVisibility(WorldObject* obj, Cell cell, CellCoord cellpair);
-    //void UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair);
+    void UpdateObjectVisibility(WorldObject* obj, Cell cell, CellCoord cellpair);
+    void UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpair);
 
     void resetMarkedCells() { marked_cells.reset(); }
     bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
@@ -470,16 +469,23 @@ public:
     BattlegroundMap* ToBattlegroundMap() { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap*>(this); else return nullptr;  }
     [[nodiscard]] const BattlegroundMap* ToBattlegroundMap() const { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap const*>(this); return nullptr; }
 
-    float GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = nullptr, bool swim = false, float maxSearchDist = 50.0f) const;
+    float GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = nullptr, bool swim = false, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const;
     [[nodiscard]] float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
     [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks) const;
+    bool CanReachPositionAndGetValidCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
+    bool CanReachPositionAndGetValidCoords(const WorldObject* source, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
+    bool CanReachPositionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
+    bool CheckCollisionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true) const;
     void Balance() { _dynamicTree.balance(); }
     void RemoveGameObjectModel(const GameObjectModel& model) { _dynamicTree.remove(model); }
     void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }
     [[nodiscard]] bool ContainsGameObjectModel(const GameObjectModel& model) const { return _dynamicTree.contains(model);}
     [[nodiscard]] DynamicMapTree const& GetDynamicMapTree() const { return _dynamicTree; }
     bool getObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist);
-
+    [[nodiscard]] float GetGameObjectFloor(uint32 phasemask, float x, float y, float z, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const
+    {
+        return _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
+    }
     /*
         RESPAWN TIMES
     */
@@ -575,7 +581,6 @@ private:
     void UpdateActiveCells(const float& x, const float& y, const uint32 t_diff);
 
 protected:
-
     ACE_Thread_Mutex Lock;
     ACE_Thread_Mutex GridLock;
     ACE_RW_Thread_Mutex MMapLock;
@@ -660,7 +665,6 @@ private:
     ZoneDynamicInfoMap _zoneDynamicInfo;
     uint32 _defaultLight;
 };
-
 
 enum InstanceResetMethod
 {

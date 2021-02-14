@@ -377,14 +377,14 @@ public:
                     {
                         EntryCheckPredicate pred(NPC_APOTHECARY_BAXTER);
                         summons.DoAction(ACTION_RELEASE_HELPER, pred);
-                        
+
                         break;
                     }
                 case EVENT_CALL_FRYE:
                     {
                         EntryCheckPredicate pred(NPC_APOTHECARY_FRYE);
                         summons.DoAction(ACTION_RELEASE_HELPER, pred);
-                        
+
                         break;
                     }
                 case EVENT_SPELL_PERFUME_SPRAY:
@@ -737,9 +737,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_SERVICE_UNIFORM))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_SERVICE_UNIFORM });
         }
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

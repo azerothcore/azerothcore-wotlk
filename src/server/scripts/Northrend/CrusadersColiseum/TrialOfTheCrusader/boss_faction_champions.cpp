@@ -967,7 +967,7 @@ public:
                     break;
                 case EVENT_SPELL_SUMMON_FELHUNTER:
                     DoSummon(35465, *me);
-                    
+
                     break;
                 case EVENT_SPELL_HELLFIRE:
                     if( EnemiesInRange(9.0f) >= 3 )
@@ -1258,7 +1258,7 @@ public:
                     break;
                 case EVENT_SPELL_CALL_PET:
                     DoSummon(35610, *me);
-                    
+
                     break;
                 case EVENT_SPELL_AIMED_SHOT:
                     if( me->GetVictim() )
@@ -1987,7 +1987,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 enum eEnhShamanSpells
@@ -2114,7 +2113,6 @@ public:
                     events.RepeatEvent(30000);
                     EventMapGCD(events, 1500);
                     break;
-
             }
 
             DoMeleeAttackIfReady();
@@ -2362,7 +2360,6 @@ public:
             me->DespawnOrUnsummon();
         }
     };
-
 };
 
 enum eHunterPetSpells
@@ -2471,9 +2468,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_UNSTABLE_AFFLICTION_DISPEL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_UNSTABLE_AFFLICTION_DISPEL });
         }
 
         void HandleDispel(DispelInfo* dispelInfo)

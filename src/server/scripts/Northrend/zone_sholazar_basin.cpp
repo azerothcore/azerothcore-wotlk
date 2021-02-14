@@ -260,7 +260,6 @@ public:
     }
 };
 
-
 /******
 quest Still At It (12644)
 ******/
@@ -539,7 +538,6 @@ public:
         return false;
     }
 };
-
 
 // Theirs
 /*######
@@ -1291,7 +1289,7 @@ public:
 
                             Unit::Kill(bird, bird);
                             crunchy->GetMotionMaster()->MovePoint(0, bird->GetPositionX(), bird->GetPositionY(),
-                                                                  bird->GetMap()->GetWaterOrGroundLevel(bird->GetPhaseMask(), bird->GetPositionX(), bird->GetPositionY(), bird->GetPositionZ()));
+                                                                  bird->GetMapWaterOrGroundLevel(bird->GetPositionX(), bird->GetPositionY(), bird->GetPositionZ()));
                             /// @todo Make crunchy perform emote eat when he reaches the bird
 
                             break;

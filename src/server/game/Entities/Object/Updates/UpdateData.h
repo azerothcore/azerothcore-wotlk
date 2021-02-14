@@ -55,4 +55,3 @@ protected:
     void Compress(void* dst, uint32* dst_size, void* src, int src_size);
 };
 #endif
-

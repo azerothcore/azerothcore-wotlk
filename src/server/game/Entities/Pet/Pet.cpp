@@ -81,7 +81,6 @@ void Pet::AddToWorld()
         GetCharmInfo()->SetIsFollowing(false);
         GetCharmInfo()->SetIsReturning(false);
     }
-
 }
 
 void Pet::RemoveFromWorld()
@@ -839,7 +838,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             }
         case SUMMON_PET:
             {
-
                 if (pInfo)
                 {
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->min_dmg));
@@ -869,7 +867,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             AddAura(SPELL_MAGE_PET_SCALING_02, this);
                             AddAura(SPELL_MAGE_PET_SCALING_03, this);
                             AddAura(SPELL_MAGE_PET_SCALING_04, this);
-                            ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                             break;
                         }
                 }
@@ -941,7 +938,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             AddAura(SPELL_MAGE_PET_SCALING_02, this);
                             AddAura(SPELL_MAGE_PET_SCALING_03, this);
                             AddAura(SPELL_MAGE_PET_SCALING_04, this);
-                            ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                             break;
                         }
                     case NPC_TREANT: //force of nature
@@ -1192,7 +1188,6 @@ void Pet::_SaveSpellCooldowns(SQLTransaction& trans, bool logout)
             stmt->setUInt32(1, itr2->first);
             stmt->setUInt32(2, cooldown);
             trans->Append(stmt);
-
         }
     }
 }
@@ -2155,7 +2150,6 @@ void Pet::HandleAsynchLoadSucceed()
         if (spell->GetSpellInfo()->HasEffect(SPELL_EFFECT_SUMMON_PET))
             CastSpell(this, 32752, true, nullptr, nullptr, GetGUID());
 
-
     if (owner->NeedSendSpectatorData() && GetCreatureTemplate()->family)
     {
         ArenaSpectator::SendCommand_UInt32Value(owner->FindMap(), owner->GetGUID(), "PHP", (uint32)GetHealthPct());
@@ -2330,7 +2324,6 @@ void Pet::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
 
     if (update)
     {
-
         if (Player* playerOwner = GetCharmerOrOwnerPlayerOrPlayerItself())
         {
             WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);

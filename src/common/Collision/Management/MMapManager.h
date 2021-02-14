@@ -9,7 +9,7 @@
 
 #include "DetourAlloc.h"
 #include "DetourNavMesh.h"
-#include "DetourNavMeshQuery.h"
+#include "DetourExtended.h"
 #include "World.h"
 #include <unordered_map>
 
@@ -49,7 +49,6 @@ namespace MMAP
         NavMeshQuerySet navMeshQueries;     // instanceId to query
         MMapTileSet mmapLoadedTiles;        // maps [map grid coords] to [dtTile]
     };
-
 
     typedef std::unordered_map<uint32, MMapData*> MMapDataSet;
 
