@@ -85,6 +85,8 @@ services:
       - ./conf/dist/config.sh:/azerothcore/conf/dist/config-default.sh
     profiles:
       - build
+    depends_on:
+      - ac-database
 
   ac-worldserver-dev:
     networks:
