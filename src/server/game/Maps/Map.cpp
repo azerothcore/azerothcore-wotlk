@@ -15,7 +15,6 @@
 #include "Group.h"
 #include "InstanceScript.h"
 #include "MapInstanced.h"
-#include "MapManager.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
@@ -3577,8 +3576,6 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
     // collision check
     bool collided = false;
 
-    float angle = getAngle(destX, destY, startX, startY);
-
     // check static LOS
     float halfHeight = source->GetCollisionHeight() * 0.5f;
 
@@ -3588,15 +3585,13 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
         bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(source->GetMapId(),
             startX, startY, startZ + halfHeight,
             destX, destY, destZ + halfHeight,
-            destX, destY, destZ, -0.5f);
+            destX, destY, destZ, -CONTACT_DISTANCE);
 
         destZ -= halfHeight;
 
         // Collided with static LOS object, move back to collision point
         if (col)
         {
-            destX -= CONTACT_DISTANCE * std::cos(angle);
-            destY -= CONTACT_DISTANCE * std::sin(angle);
             collided = true;
         }
     }
@@ -3605,15 +3600,13 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
     bool col = source->GetMap()->getObjectHitPos(source->GetPhaseMask(),
         startX, startY, startZ + halfHeight,
         destX, destY, destZ + halfHeight,
-        destX, destY, destZ, -0.5f);
+        destX, destY, destZ, -CONTACT_DISTANCE);
 
     destZ -= halfHeight;
 
     // Collided with a gameobject, move back to collision point
     if (col)
     {
-        destX -= CONTACT_DISTANCE * std::cos(angle);
-        destY -= CONTACT_DISTANCE * std::sin(angle);
         collided = true;
     }
 

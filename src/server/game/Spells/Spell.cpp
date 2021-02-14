@@ -4576,12 +4576,12 @@ void Spell::SendLogExecute()
     m_caster->SendMessageToSet(&data, true);
 }
 
-void Spell::ExecuteLogEffectTakeTargetPower(uint8 effIndex, Unit* target, uint32 powerType, uint32 powerTaken, float gainMultiplier)
+void Spell::ExecuteLogEffectTakeTargetPower(uint8 effIndex, Unit* target, uint32 PowerType, uint32 powerTaken, float gainMultiplier)
 {
     InitEffectExecuteData(effIndex);
     m_effectExecuteData[effIndex]->append(target->GetPackGUID());
     *m_effectExecuteData[effIndex] << uint32(powerTaken);
-    *m_effectExecuteData[effIndex] << uint32(powerType);
+    *m_effectExecuteData[effIndex] << uint32(PowerType);
     *m_effectExecuteData[effIndex] << float(gainMultiplier);
 }
 
@@ -4794,11 +4794,11 @@ void Spell::TakePower()
         if (m_caster->ToPlayer()->GetCommandStatus(CHEAT_POWER))
             return;
 
-    Powers powerType = Powers(m_spellInfo->PowerType);
+    Powers PowerType = Powers(m_spellInfo->PowerType);
     bool hit = true;
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
-        if (powerType == POWER_RAGE || powerType == POWER_ENERGY || powerType == POWER_RUNE || powerType == POWER_RUNIC_POWER)
+        if (PowerType == POWER_RAGE || PowerType == POWER_ENERGY || PowerType == POWER_RUNE || PowerType == POWER_RUNIC_POWER)
             if (uint64 targetGUID = m_targets.GetUnitTargetGUID())
                 for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
                     if (ihit->targetGUID == targetGUID)
@@ -4814,7 +4814,7 @@ void Spell::TakePower()
                     }
     }
 
-    if (powerType == POWER_RUNE)
+    if (PowerType == POWER_RUNE)
     {
         TakeRunePower(hit);
         return;
@@ -4824,25 +4824,25 @@ void Spell::TakePower()
         return;
 
     // health as power used
-    if (powerType == POWER_HEALTH)
+    if (PowerType == POWER_HEALTH)
     {
         m_caster->ModifyHealth(-(int32)m_powerCost);
         return;
     }
 
-    if (powerType >= MAX_POWERS)
+    if (PowerType >= MAX_POWERS)
     {
-        sLog->outError("Spell::TakePower: Unknown power type '%d'", powerType);
+        sLog->outError("Spell::TakePower: Unknown power type '%d'", PowerType);
         return;
     }
 
     if (hit)
-        m_caster->ModifyPower(powerType, -m_powerCost);
+        m_caster->ModifyPower(PowerType, -m_powerCost);
     else
-        m_caster->ModifyPower(powerType, -irand(0, m_powerCost / 4));
+        m_caster->ModifyPower(PowerType, -irand(0, m_powerCost / 4));
 
     // Set the five second timer
-    if (powerType == POWER_MANA && m_powerCost > 0)
+    if (PowerType == POWER_MANA && m_powerCost > 0)
         m_caster->SetLastManaUse(World::GetGameTimeMS());
 }
 
@@ -4875,9 +4875,9 @@ void Spell::TakeAmmo()
     }
 }
 
-SpellCastResult Spell::CheckRuneCost(uint32 runeCostID)
+SpellCastResult Spell::CheckRuneCost(uint32 RuneCostID)
 {
-    if (m_spellInfo->PowerType != POWER_RUNE || !runeCostID)
+    if (m_spellInfo->PowerType != POWER_RUNE || !RuneCostID)
         return SPELL_CAST_OK;
 
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -4888,7 +4888,7 @@ SpellCastResult Spell::CheckRuneCost(uint32 runeCostID)
     if (player->getClass() != CLASS_DEATH_KNIGHT)
         return SPELL_CAST_OK;
 
-    SpellRuneCostEntry const* src = sSpellRuneCostStore.LookupEntry(runeCostID);
+    SpellRuneCostEntry const* src = sSpellRuneCostStore.LookupEntry(RuneCostID);
 
     if (!src)
         return SPELL_CAST_OK;
@@ -5234,7 +5234,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         if (m_spellInfo->CasterAuraStateNot && m_caster->HasAuraState(AuraStateType(m_spellInfo->CasterAuraStateNot), m_spellInfo, m_caster))
             return SPELL_FAILED_CASTER_AURASTATE;
 
-        // Note: spell 62473 requres casterAuraSpell = triggering spell
+        // Note: spell 62473 requres CasterAuraSpell = triggering spell
         if (m_spellInfo->CasterAuraSpell && !m_caster->HasAura(sSpellMgr->GetSpellIdForDifficulty(m_spellInfo->CasterAuraSpell, m_caster)))
             return SPELL_FAILED_CASTER_AURASTATE;
         if (m_spellInfo->ExcludeCasterAuraSpell && m_caster->HasAura(sSpellMgr->GetSpellIdForDifficulty(m_spellInfo->ExcludeCasterAuraSpell, m_caster)))
@@ -6034,7 +6034,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_AURA_MOUNTED:
                 {
-                    // Xinef: disallow casting in water for mounts not increasing water movement speed
+                    // Xinef: disallow casting in water for mounts not increasing water movement Speed
                     if (m_caster->IsInWater() && !m_spellInfo->HasAura(SPELL_AURA_MOD_INCREASE_SWIM_SPEED))
                         return SPELL_FAILED_ONLY_ABOVEWATER;
 
@@ -6486,8 +6486,8 @@ SpellCastResult Spell::CheckPower()
     }
 
     // Check power amount
-    Powers powerType = Powers(m_spellInfo->PowerType);
-    if (int32(m_caster->GetPower(powerType)) < m_powerCost)
+    Powers PowerType = Powers(m_spellInfo->PowerType);
+    if (int32(m_caster->GetPower(PowerType)) < m_powerCost)
         return SPELL_FAILED_NO_POWER;
     else
         return SPELL_CAST_OK;
