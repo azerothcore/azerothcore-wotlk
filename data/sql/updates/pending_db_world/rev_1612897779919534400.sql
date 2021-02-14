@@ -256,13 +256,13 @@ DELETE FROM `creature_text` WHERE `CreatureID` = 468;
 DELETE FROM `creature_text` WHERE `CreatureID` = 263 AND `GroupID` > 0; -- Mayor Ello
 DELETE FROM `creature_text` WHERE `CreatureID` = 264 AND `GroupID` IN (1,2); -- Commander Althea
 INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES
-(263,1,0,"This is grim news,and I fear it is linked to the dealings $n had with the Embalmer.",12,7,100,1,0,0,270,0,"Lord Ello Ebonlocke"),
-(263,2,0,"Watcher,inform Althea that a dire threat is marshalling against our town.  We must prepare!",12,7,100,25,0,0,271,0,"Lord Ello Ebonlocke"),
+(263,1,0,"This is grim news, and I fear it is linked to the dealings $n had with the Embalmer.",12,7,100,1,0,0,270,0,"Lord Ello Ebonlocke"),
+(263,2,0,"Watcher, inform Althea that a dire threat is marshalling against our town.  We must prepare!",12,7,100,25,0,0,271,0,"Lord Ello Ebonlocke"),
 (264,1,0,"This doesn't bode well.  Send scouts to gather more intelligence,and stay on alert.",12,7,100,1,0,0,273,0,"Commander Althea"),
 (264,2,0,"It'll take more than a rotting corpse to stop us!",12,7,100,1,0,0,107,0,"Commander Althea"),
-(468,1,0,"Rouse and to arms,citizens of Darkshire! An abomination of the undead approaches along the road!",14,7,100,22,0,0,89,2,"Town Crier"),
-(468,2,0,"The abomination has overrun the Night Watch camp! Quickly,we must intercept it before it reaches town!",14,7,100,22,0,0,90,2,"Town Crier"),
-(468,3,0,"It isn't enough! Defenders,gather in the center of town. Together we will stand against the undead monster!",14,7,100,22,0,0,91,2,"Town Crier"),
+(468,1,0,"Rouse and to arms, citizens of Darkshire! An abomination of the undead approaches along the road!",14,7,100,22,0,0,89,2,"Town Crier"),
+(468,2,0,"The abomination has overrun the Night Watch camp! Quickly, we must intercept it before it reaches town!",14,7,100,22,0,0,90,2,"Town Crier"),
+(468,3,0,"It isn't enough! Defenders, gather in the center of town. Together we will stand against the undead monster!",14,7,100,22,0,0,91,2,"Town Crier"),
 (468,4,0,"The abomination has come! Forward!",14,7,100,22,0,0,92,2,"Town Crier"),
 (468,5,0,"The beast is slain! All's well in Darkshire!",14,7,100,22,0,0,93,2,"Town Crier");
 
@@ -395,11 +395,11 @@ INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language
 (1436,1,0,"Lord Mayor!  Our scouts report strange activity to the west.",12,7,100,5,0,0,265,0,"Watcher Cutford"),
 (1436,1,1,"Mayor Ello!  Our graveyard scouts return with ominous reports...",12,7,100,5,0,0,266,0,"Watcher Cutford"),
 (1436,2,0,"Hideous bellows and growls are heard coming from that old hermit's shack!",12,7,100,1,0,0,267,0,"Watcher Cutford"),
-(1436,3,0,"Wolves head this way,as if fleeing from...something.",12,7,100,1,0,0,268,0,"Watcher Cutford"),
-(1436,4,0,"Yes,Lord Mayor.",12,7,100,66,0,0,269,0,"Watcher Cutford"),
-(1436,5,0,"Althea,there are reports of strange happenings at the graveyard.  Ello believes it portends an attack on Darkshire.",12,7,100,1,0,0,272,0,"Watcher Cutford"),
-(1436,6,0,"Yes,commander!",12,7,100,66,0,0,275,0,"Watcher Cutford"),
-(1436,7,0,"Beware!  Beware!  A threat lurks in the wild!  Night Watchers,be on the alert!",14,7,100,0,0,0,276,2,"Watcher Cutford");
+(1436,3,0,"Wolves head this way, as if fleeing from... something.",12,7,100,1,0,0,268,0,"Watcher Cutford"),
+(1436,4,0,"Yes, Lord Mayor.",12,7,100,66,0,0,269,0,"Watcher Cutford"),
+(1436,5,0,"Althea, there are reports of strange happenings at the graveyard.  Ello believes it portends an attack on Darkshire.",12,7,100,1,0,0,272,0,"Watcher Cutford"),
+(1436,6,0,"Yes, commander!",12,7,100,66,0,0,275,0,"Watcher Cutford"),
+(1436,7,0,"Beware!  Beware!  A threat lurks in the wild!  Night Watchers, be on the alert!",14,7,100,0,0,0,276,2,"Watcher Cutford");
 
 
 -- Watcher Brownell - extra_flags
