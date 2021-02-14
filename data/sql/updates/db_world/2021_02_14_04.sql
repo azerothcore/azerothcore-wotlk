@@ -1,3 +1,19 @@
+-- DB update 2021_02_14_03 -> 2021_02_14_04
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_02_14_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_02_14_03 2021_02_14_04 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1613192328090860000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1613192328090860000');
 
 /* Script Master Wood Emotes and Responses
@@ -22,3 +38,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (8383, 0, 2, 0, 22, 0, 100, 0, 17, 5000, 10000, 0, 0, 5, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Master Wood - Received Emote 17 - Play Emote 2'),
 (8383, 0, 3, 0, 22, 0, 100, 0, 101, 5000, 10000, 0, 0, 5, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Master Wood - Received Emote 101 - Play Emote 3'),
 (8383, 0, 4, 0, 22, 0, 100, 0, 78, 5000, 10000, 0, 0, 5, 66, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Master Wood - Received Emote 78 - Play Emote 66');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
