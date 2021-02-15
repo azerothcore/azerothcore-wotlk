@@ -63,5 +63,6 @@
         "cfenv": "cpp",
         "typeinfo": "cpp",
         "codecvt": "cpp"
-    }
+    },
+    "deno.enable": true,
 }

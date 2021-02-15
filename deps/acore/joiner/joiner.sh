@@ -436,7 +436,6 @@ function Joiner:menu() {
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     Joiner:menu $@
 else
-    echo "Installing: $(basename `dirname ${0}`)"
     Joiner:_checkOptions $@
 fi
 

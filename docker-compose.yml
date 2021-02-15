@@ -1,5 +1,4 @@
 version: '3.9'
-
 services:
   ac-database:
     image: local/azerothcore/database # name of the generated image after built locally
@@ -43,6 +42,9 @@ services:
       - type: bind
         source: ${WORLDSERVER_DATA:-./docker/worldserver/data}
         target: /azerothcore/env/dist/data
+      - ./apps:/azerothcore/apps
+      - ./acore.sh:/azerothcore/acore.sh
+    working_dir: /azerothcore
     depends_on:
       - ac-database
 
