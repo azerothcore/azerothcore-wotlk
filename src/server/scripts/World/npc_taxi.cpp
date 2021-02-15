@@ -12,10 +12,10 @@ SDCategory: NPCs
 EndScriptData
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 #define GOSSIP_SUSURRUS         "I am ready."

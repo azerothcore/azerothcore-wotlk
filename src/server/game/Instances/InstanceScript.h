@@ -7,11 +7,11 @@
 #ifndef ACORE_INSTANCE_DATA_H
 #define ACORE_INSTANCE_DATA_H
 
-#include "ZoneScript.h"
-#include "World.h"
-#include "ObjectMgr.h"
 //#include "GameObject.h"
 //#include "Map.h"
+#include "ObjectMgr.h"
+#include "World.h"
+#include "ZoneScript.h"
 
 #define OUT_SAVE_INST_DATA             sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Saving Instance Data for Instance %s (Map %d, Instance Id %d)", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
 #define OUT_SAVE_INST_DATA_COMPLETE    sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Saving Instance Data for Instance %s (Map %d, Instance Id %d) completed.", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())

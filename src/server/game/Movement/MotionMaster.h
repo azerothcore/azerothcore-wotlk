@@ -8,11 +8,11 @@
 #define ACORE_MOTIONMASTER_H
 
 #include "Common.h"
-#include <vector>
-#include "SharedDefines.h"
 #include "Object.h"
+#include "SharedDefines.h"
 #include "Spline/MoveSpline.h"
 #include <optional>
+#include <vector>
 
 class MovementGenerator;
 class Unit;

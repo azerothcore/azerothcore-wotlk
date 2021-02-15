@@ -10,13 +10,13 @@
  * Scriptnames of files in this file should be prefixed with "spell_item_".
  */
 
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
-#include "SkillDiscovery.h"
 #include "Battleground.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SkillDiscovery.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 class spell_item_massive_seaforium_charge : public SpellScriptLoader
 {

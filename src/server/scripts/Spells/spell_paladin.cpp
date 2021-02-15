@@ -10,11 +10,11 @@
  * Scriptnames of files in this file should be prefixed with "spell_pal_".
  */
 
+#include "Group.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "SpellScript.h"
 #include "SpellAuraEffects.h"
-#include "Group.h"
+#include "SpellScript.h"
 #include "UnitAI.h"
 
 enum PaladinSpells

@@ -4,14 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "GridNotifiers.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
-#include "PassiveAI.h"
-#include "GridNotifiers.h"
+#include "SpellScript.h"
 
 //
 //  Emerald Dragon NPCs and IDs (kept here for reference)

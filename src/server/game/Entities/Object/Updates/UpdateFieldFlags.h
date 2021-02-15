@@ -7,8 +7,8 @@
 #ifndef _UPDATEFIELDFLAGS_H
 #define _UPDATEFIELDFLAGS_H
 
-#include "UpdateFields.h"
 #include "Define.h"
+#include "UpdateFields.h"
 
 enum UpdatefieldFlags
 {

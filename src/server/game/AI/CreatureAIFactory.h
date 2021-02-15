@@ -6,9 +6,9 @@
 #ifndef ACORE_CREATUREAIFACTORY_H
 #define ACORE_CREATUREAIFACTORY_H
 
-#include "ObjectRegistry.h"
 #include "FactoryHolder.h"
 #include "GameObjectAI.h"
+#include "ObjectRegistry.h"
 
 struct SelectableAI : public FactoryHolder<CreatureAI>, public Permissible<Creature>
 {

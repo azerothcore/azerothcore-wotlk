@@ -4,34 +4,33 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include <ace/Message_Block.h>
-#include <ace/OS_NS_string.h>
-#include <ace/OS_NS_unistd.h>
-#include <ace/os_include/arpa/os_inet.h>
-#include <ace/os_include/netinet/os_tcp.h>
-#include <ace/os_include/sys/os_types.h>
-#include <ace/os_include/sys/os_socket.h>
-#include <ace/OS_NS_string.h>
-#include <ace/Reactor.h>
-
-#include "WorldSocket.h"
+#include "AccountMgr.h"
+#include "BigNumber.h"
+#include "ByteBuffer.h"
 #include "Common.h"
+#include "DatabaseEnv.h"
+#include "Log.h"
+#include "Opcodes.h"
+#include "PacketLog.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+#include "SHA1.h"
+#include "SharedDefines.h"
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "SharedDefines.h"
-#include "ByteBuffer.h"
-#include "Opcodes.h"
-#include "DatabaseEnv.h"
-#include "BigNumber.h"
-#include "SHA1.h"
 #include "WorldSession.h"
+#include "WorldSocket.h"
 #include "WorldSocketMgr.h"
-#include "Log.h"
-#include "PacketLog.h"
-#include "ScriptMgr.h"
-#include "AccountMgr.h"
+#include <ace/Message_Block.h>
+#include <ace/os_include/arpa/os_inet.h>
+#include <ace/os_include/netinet/os_tcp.h>
+#include <ace/os_include/sys/os_socket.h>
+#include <ace/os_include/sys/os_types.h>
+#include <ace/OS_NS_string.h>
+#include <ace/OS_NS_string.h>
+#include <ace/OS_NS_unistd.h>
+#include <ace/Reactor.h>
 #include <thread>
 
 #ifdef ELUNA

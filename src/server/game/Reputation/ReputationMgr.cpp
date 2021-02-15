@@ -5,13 +5,13 @@
  */
 
 #include "DatabaseEnv.h"
-#include "ReputationMgr.h"
 #include "DBCStores.h"
-#include "Player.h"
-#include "WorldPacket.h"
-#include "World.h"
 #include "ObjectMgr.h"
+#include "Player.h"
+#include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "World.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
 
 const int32 ReputationMgr::PointsInRank[MAX_REPUTATION_RANK] = {36000, 3000, 3000, 3000, 6000, 12000, 21000, 1000};

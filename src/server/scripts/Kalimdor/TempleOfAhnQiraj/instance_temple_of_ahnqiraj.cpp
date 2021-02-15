@@ -11,8 +11,8 @@ SDComment:
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
+#include "ScriptMgr.h"
 #include "temple_of_ahnqiraj.h"
 
 class instance_temple_of_ahnqiraj : public InstanceMapScript

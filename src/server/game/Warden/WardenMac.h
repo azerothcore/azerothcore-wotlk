@@ -7,11 +7,11 @@
 #ifndef _WARDEN_MAC_H
 #define _WARDEN_MAC_H
 
-#include "Cryptography/ARC4.h"
-#include <map>
-#include "Cryptography/BigNumber.h"
 #include "ByteBuffer.h"
+#include "Cryptography/ARC4.h"
+#include "Cryptography/BigNumber.h"
 #include "Warden.h"
+#include <map>
 
 class WorldSession;
 class Warden;

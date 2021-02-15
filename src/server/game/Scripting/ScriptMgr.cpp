@@ -4,28 +4,28 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
+#include "Chat.h"
 #include "Config.h"
+#include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "GossipDef.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
+#include "Player.h"
+#include "ScriptedGossip.h"
 #include "ScriptLoader.h"
+#include "ScriptMgr.h"
 #include "ScriptSystem.h"
-#include "Transport.h"
-#include "Vehicle.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "GossipDef.h"
-#include "ScriptedGossip.h"
-#include "CreatureAI.h"
-#include "Player.h"
+#include "Transport.h"
+#include "Vehicle.h"
 #include "WorldPacket.h"
-#include "Chat.h"
 
 #ifdef ELUNA
-#include "LuaEngine.h"
 #include "ElunaUtility.h"
+#include "LuaEngine.h"
 #endif
 
 // Specialize for each script type class like so:

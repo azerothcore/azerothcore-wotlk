@@ -6,9 +6,9 @@
 
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
-#include "WaypointManager.h"
-#include "MapManager.h"
 #include "Log.h"
+#include "MapManager.h"
+#include "WaypointManager.h"
 
 WaypointMgr::WaypointMgr()
 {

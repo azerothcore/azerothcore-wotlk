@@ -4,25 +4,24 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "ObjectMgr.h"
-#include "World.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "DatabaseEnv.h"
-
 #include "AccountMgr.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "ChatLink.h"
+#include "Common.h"
+#include "DatabaseEnv.h"
 #include "GridNotifiersImpl.h"
 #include "Language.h"
 #include "Log.h"
+#include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "UpdateMask.h"
-#include "SpellMgr.h"
 #include "ScriptMgr.h"
-#include "ChatLink.h"
+#include "SpellMgr.h"
+#include "UpdateMask.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"

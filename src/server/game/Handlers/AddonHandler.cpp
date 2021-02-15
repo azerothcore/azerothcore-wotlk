@@ -4,11 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "zlib.h"
 #include "AddonHandler.h"
 #include "DatabaseEnv.h"
-#include "Opcodes.h"
 #include "Log.h"
+#include "Opcodes.h"
+#include "zlib.h"
 
 AddonHandler::AddonHandler()
 {

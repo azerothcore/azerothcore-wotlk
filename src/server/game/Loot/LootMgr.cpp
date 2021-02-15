@@ -4,18 +4,18 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "LootMgr.h"
-#include "Log.h"
-#include "ObjectMgr.h"
-#include "World.h"
-#include "Util.h"
-#include "SharedDefines.h"
-#include "SpellMgr.h"
-#include "SpellInfo.h"
-#include "Group.h"
-#include "Player.h"
 #include "Containers.h"
+#include "Group.h"
+#include "Log.h"
+#include "LootMgr.h"
+#include "ObjectMgr.h"
+#include "Player.h"
 #include "ScriptMgr.h"
+#include "SharedDefines.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "Util.h"
+#include "World.h"
 
 static Rates const qualityToRate[MAX_ITEM_QUALITY] =
 {

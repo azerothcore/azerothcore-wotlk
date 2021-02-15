@@ -8,10 +8,9 @@
 #define _THREATMANAGER
 
 #include "Common.h"
-#include "SharedDefines.h"
 #include "LinkedReference/Reference.h"
+#include "SharedDefines.h"
 #include "UnitEvents.h"
-
 #include <list>
 
 //==============================================================

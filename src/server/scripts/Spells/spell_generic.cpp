@@ -11,14 +11,13 @@
  * Scriptnames of files in this file should be prefixed with "spell_gen_"
  */
 
-#include <array>
-#include "ScriptMgr.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "Chat.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
@@ -26,11 +25,12 @@
 #include "LFGMgr.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
+#include "ScriptMgr.h"
 #include "SkillDiscovery.h"
-#include "SpellScript.h"
 #include "SpellAuraEffects.h"
-#include "Chat.h"
+#include "SpellScript.h"
 #include "Vehicle.h"
+#include <array>
 
 // Ours
 class spell_gen_model_visible : public SpellScriptLoader

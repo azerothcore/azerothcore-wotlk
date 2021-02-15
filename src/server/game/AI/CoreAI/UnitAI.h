@@ -7,9 +7,9 @@
 #ifndef ACORE_UNITAI_H
 #define ACORE_UNITAI_H
 
+#include "Containers.h"
 #include "Define.h"
 #include "Unit.h"
-#include "Containers.h"
 #include <list>
 
 class Player;

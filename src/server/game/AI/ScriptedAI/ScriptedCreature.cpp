@@ -5,14 +5,14 @@
  * This program is free software licensed under GPL version 2
  * Please see the included DOCS/LICENSE.TXT for more information */
 
-#include "ScriptedCreature.h"
-#include "Item.h"
-#include "Spell.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "Item.h"
 #include "ObjectMgr.h"
+#include "ScriptedCreature.h"
+#include "Spell.h"
 #include "TemporarySummon.h"
 
 // Spell summary for ScriptedAI::SelectSpell
