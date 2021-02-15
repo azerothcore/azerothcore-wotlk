@@ -6,7 +6,7 @@
 
 #include "ByteBuffer.h"
 #include "Common.h"
-#include "Cryptography/WardenKeyGeneration.h"
+#include "WardenKeyGeneration.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"

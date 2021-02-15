@@ -8,8 +8,8 @@
 #define _WARDEN_MAC_H
 
 #include "ByteBuffer.h"
-#include "Cryptography/ARC4.h"
-#include "Cryptography/BigNumber.h"
+#include "ARC4.h"
+#include "BigNumber.h"
 #include "Warden.h"
 #include <map>
 

@@ -17,7 +17,6 @@
 #include "TotemAI.h"
 #include "WaypointMovementGenerator.h"
 
-//#include "CreatureAIImpl.h"
 namespace AIRegistry
 {
     void Initialize()
