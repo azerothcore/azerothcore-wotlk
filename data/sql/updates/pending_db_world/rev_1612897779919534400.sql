@@ -295,6 +295,7 @@ UPDATE `creature` SET `position_x` = -10558.4,`position_y` = -1242.58,`position_
 UPDATE `creature` SET `position_x` = -10629.4,`position_y` = -1156.63,`position_z` = 26.0944,`orientation` = 3.6647 WHERE `guid` = 4244; -- Watcher Mocarski
 UPDATE `creature` SET `position_x` = -10552.771,`position_y` = -1235.21,`position_z` = 28.572,`orientation` = 4.24204 WHERE `guid` = 4247; -- Watcher Petras
 UPDATE `creature` SET `position_x` = -10583.7,`position_y` = -1184.22,`position_z` = 27.2057,`orientation` = 2.8019 WHERE `guid` = 5960; -- Watcher Frazier
+UPDATE `creature` SET `position_x` = -10611.14,`position_y` = -1181.46,`position_z` = 28.446,`orientation` = 3.43 WHERE `guid` = 5941; -- Watcher Jordan
 UPDATE `creature` SET `orientation` = 4.09 WHERE `guid` = 4181; -- Watcher Keller
 
 
@@ -351,16 +352,16 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 (1436,22,-10559.3,-1151.77,28.034,'Watcher Cutford'),
 (1436,23,-10568.3,-1154.32,27.412,'Watcher Cutford'),
 (1436,24,-10582.2,-1173.28,28.53,'Watcher Cutford'),
-(1436,25,-10623,-1184.54,28.819,'Watcher Cutford'),
-(1436,26,-10641.6,-1189.92,28.5594,'Watcher Cutford'),
-(1436,27,-10662.5,-1193.06,28.2884,'Watcher Cutford'),
-(1436,28,-10682.3,-1190.45,27.2793,'Watcher Cutford'),
-(1436,29,-10705.3,-1179.29,26.3723,'Watcher Cutford'),
-(1436,30,-10738,-1158.02,26.4475,'Watcher Cutford'),
-(1436,31,-10763.6,-1138.91,27.0977,'Watcher Cutford'),
-(1436,32,-10781.2,-1112.66,30.3863,'Watcher Cutford'),
-(1436,33,-10783.3,-1095.07,33.6488,'Watcher Cutford'),
-(1436,34,-10787.8,-1074.49,37.7652,'Watcher Cutford'),
+(1436,25,-10623,-1183.54,28.819,'Watcher Cutford'),
+(1436,26,-10641.6,-1188.92,28.5594,'Watcher Cutford'),
+(1436,27,-10662.5,-1192.06,28.2884,'Watcher Cutford'),
+(1436,28,-10682.3,-1189.45,27.2793,'Watcher Cutford'),
+(1436,29,-10705.3,-1176.29,26.3723,'Watcher Cutford'),
+(1436,30,-10738,-1155.52,26.4475,'Watcher Cutford'),
+(1436,31,-10764.6,-1138.91,27.0977,'Watcher Cutford'),
+(1436,32,-10780.2,-1112.66,30.3863,'Watcher Cutford'),
+(1436,33,-10782.3,-1095.07,33.6488,'Watcher Cutford'),
+(1436,34,-10786.8,-1074.49,37.7652,'Watcher Cutford'),
 (1436,35,-10801.3,-1047.26,44.0233,'Watcher Cutford'),
 (1436,36,-10804.6,-1030.41,47.0768,'Watcher Cutford'),
 (1436,37,-10806.8,-992.166,53.8349,'Watcher Cutford'),
@@ -430,6 +431,33 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 (828,13,-10547.153,-1270.14,34.751,'Watcher Petras'),
 (828,14,-10551.01,-1259.55,33.033,'Watcher Petras'),
 (828,15,-10552.771,-1235.21,28.572,'Watcher Petras');
+
+
+-- Watcher Jordan
+DELETE FROM `waypoint_data` WHERE `id` = 59410;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES 
+(59410,1,-10611.14,-1181.46,28.446,0,0,0,0,100,0),
+(59410,2,-10623,-1184.54,28.819,0,0,0,0,100,0),
+(59410,3,-10641.6,-1189.92,28.5594,0,0,0,0,100,0),
+(59410,4,-10662.5,-1193.06,28.2884,0,0,0,0,100,0),
+(59410,5,-10682.3,-1190.45,27.2793,0,0,0,0,100,0),
+(59410,6,-10705.3,-1179.29,26.3723,0,0,0,0,100,0),
+(59410,7,-10738,-1158.02,26.4475,0,0,0,0,100,0),
+(59410,8,-10763.6,-1138.91,27.0977,0,0,0,0,100,0),
+(59410,9,-10781.2,-1112.66,30.3863,0,0,0,0,100,0),
+(59410,10,-10783.3,-1095.07,33.6488,0,0,0,0,100,0),
+(59410,11,-10787.8,-1074.49,37.7652,0,0,0,0,100,0),
+(59410,12,-10789.49,-1067.8,39.138,0,0,0,0,100,0),
+(59410,13,-10787.8,-1074.49,37.7652,0,0,0,0,100,0),
+(59410,14,-10783.3,-1095.07,33.6488,0,0,0,0,100,0),
+(59410,15,-10781.2,-1112.66,30.3863,0,0,0,0,100,0),
+(59410,16,-10763.6,-1138.91,27.0977,0,0,0,0,100,0),
+(59410,17,-10738,-1158.02,26.4475,0,0,0,0,100,0),
+(59410,18,-10705.3,-1179.29,26.3723,0,0,0,0,100,0),
+(59410,19,-10682.3,-1190.45,27.2793,0,0,0,0,100,0),
+(59410,20,-10662.5,-1193.06,28.2884,0,0,0,0,100,0),
+(59410,21,-10641.6,-1189.92,28.5594,0,0,0,0,100,0),
+(59410,22,-10623,-1184.54,28.819,0,0,0,0,100,0);
 
 
 /*Night Watch Camp Defenders*/
@@ -636,9 +664,9 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (1203,0,0,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Sarys - On Spawn - React State Aggressive'),
 (1203,0,1,2,38,0,100,0,1,1,0,0,0,53,1,1203,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Sarys - On Data Set - Start Waypoint (No Repeat)'),
 (1203,0,2,0,61,0,100,0,0,0,0,0,0,17,333,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Sarys - On Data Set - Continuous Attack Emote"),
-(1203,0,3,3,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10536.224,-1159.281,28.088,0.083,"Watcher Sarys - On Data Set - Set Home POS"),
-(1203,0,4,5,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Sarys - On Data Set - Evade"),
-(1203,0,5,0,61,0,100,0,0,0,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Sarys - On Data Set - Normal Emote"),
+(1203,0,3,4,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10536.224,-1159.281,28.088,0.083,"Watcher Sarys - On Data Set - Set Home POS"),
+(1203,0,4,5,61,0,100,0,0,0,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Sarys - On Data Set - Normal Emote"),
+(1203,0,5,0,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Sarys - On Data Set - Evade"),
 (1203,0,6,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Sarys - On Game Event \'Stitches\' End - Respawn");
 
 DELETE FROM `creature_addon` WHERE `guid` = 6127;
