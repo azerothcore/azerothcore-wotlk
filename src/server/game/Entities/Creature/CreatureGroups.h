@@ -8,6 +8,7 @@
 #define _FORMATIONS_H
 
 #include "Define.h"
+#include "Unit.h"
 #include <map>
 #include <unordered_map>
 
