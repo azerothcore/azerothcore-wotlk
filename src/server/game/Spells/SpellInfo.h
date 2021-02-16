@@ -10,6 +10,7 @@
 #include "DBCStructure.h"
 #include "Object.h"
 #include "SharedDefines.h"
+#include "SpellAuraDefines.h"
 #include "Util.h"
 
 class Unit;
