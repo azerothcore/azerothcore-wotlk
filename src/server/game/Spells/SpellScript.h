@@ -10,7 +10,6 @@
 #include "SharedDefines.h"
 #include "Spell.h"
 #include "SpellAuraDefines.h"
-#include "SpellInfo.h"
 #include "Util.h"
 #include <stack>
 
