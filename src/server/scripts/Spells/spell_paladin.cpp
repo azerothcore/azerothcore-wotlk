@@ -62,6 +62,7 @@ enum PaladinSpells
     SPELL_PALADIN_CONCENTRACTION_AURA            = 19746,
     SPELL_PALADIN_SANCTIFIED_RETRIBUTION_R1      = 31869,
     SPELL_PALADIN_SWIFT_RETRIBUTION_R1           = 53379,
+    SPELL_PALADIN_HEART_OF_THE_CRUSADER_EFF_R1   = 21183,
 
     SPELL_PALADIN_IMPROVED_CONCENTRACTION_AURA   = 63510,
     SPELL_PALADIN_IMPROVED_DEVOTION_AURA         = 63514,
@@ -933,6 +934,41 @@ public:
     }
 };
 
+// -20335 - Heart of the Crusader
+class spell_pal_heart_of_the_crusader : public SpellScriptLoader
+{
+    public:
+        spell_pal_heart_of_the_crusader() : SpellScriptLoader("spell_pal_heart_of_the_crusader") { }
+
+        class spell_pal_heart_of_the_crusader_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_pal_heart_of_the_crusader_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/) override
+            {
+                return ValidateSpellInfo({ SPELL_PALADIN_HEART_OF_THE_CRUSADER_EFF_R1 });
+            }
+
+            void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+            {
+                PreventDefaultAction();
+
+                uint32 spellId = sSpellMgr->GetSpellWithRank(SPELL_PALADIN_HEART_OF_THE_CRUSADER_EFF_R1, GetSpellInfo()->GetRank());
+                eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), spellId, aurEff);
+            }
+
+            void Register() override
+            {
+                OnEffectProc += AuraEffectProcFn(spell_pal_heart_of_the_crusader_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_pal_heart_of_the_crusader_AuraScript();
+        }
+};
+
 // -20473 - Holy Shock
 class spell_pal_holy_shock : public SpellScriptLoader
 {
@@ -1317,6 +1353,7 @@ void AddSC_paladin_spell_scripts()
     new spell_pal_guarded_by_the_light();
     new spell_pal_hand_of_sacrifice();
     new spell_pal_hand_of_salvation();
+    new spell_pal_heart_of_the_crusader();
     new spell_pal_holy_shock();
     new spell_pal_judgement("spell_pal_judgement_of_justice", SPELL_PALADIN_JUDGEMENT_OF_JUSTICE);
     new spell_pal_judgement("spell_pal_judgement_of_light", SPELL_PALADIN_JUDGEMENT_OF_LIGHT);
