@@ -42,46 +42,47 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (412,0,0,0,0,0,100,0,6000,12000,6000,12000,0,11,3106,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Stitches - In Combat - Cast \'Aura of Rot\''),
 (412,0,1,2,11,0,100,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stitches - On Respawn - Set Active On'),
 (412,0,2,0,61,0,100,0,0,0,0,0,0,62,0,0,0,0,0,2,1,0,0,0,0,-10290.2,72.7811,38.8811,4.8015,'Stitches - On Respawn - Teleport'),
-(412,0,3,0,1,0,100,0,5000,5000,0,0,0,53,0,412,0,0,0,2,1,0,0,0,0,0,0,0,0,'Stitches - OOC - Start Waypoint'),
-(412,0,4,0,40,0,100,0,36,412,0,0,0,2,93,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stitches - On Waypoint 36 Reached - Set Faction 93'),
-(412,0,5,0,40,0,100,0,36,412,0,0,0,45,2,1,0,0,0,0,10,4185,468,1,0,0,0,0,0,'Stitches - On Waypoint 36 Reached - Say Line 1 (Town Crier)'),
-(412,0,6,0,40,0,100,0,51,412,0,0,0,45,2,2,0,0,0,0,10,4185,468,1,0,0,0,0,0,'Stitches - On Waypoint 51 Reached - Say Line 2 (Town Crier)'),
-(412,0,7,0,40,0,100,0,68,412,0,0,0,45,2,3,0,0,0,0,10,4185,468,1,0,0,0,0,0,'Stitches - On Waypoint 68 Reached - Say Line 3 (Town Crier)'),
-(412,0,8,0,40,0,100,0,85,412,0,0,0,45,2,4,0,0,0,0,10,4185,468,1,0,0,0,0,0,'Stitches - On Waypoint 85 Reached - Say Line 4 (Town Crier)'),
-(412,0,9,0,40,0,100,0,68,412,0,0,0,45,1,1,0,0,0,0,10,4180,826,1,0,0,0,0,0,'Stitches - On Waypoint 68 Reached - Move Watcher Jan'),
-(412,0,10,0,40,0,100,0,72,412,0,0,0,45,1,3,0,0,0,0,10,4180,826,1,0,0,0,0,0,'Stitches - On Waypoint 72 Reached - Set Orientation Watcher Jan'),
-(412,0,11,0,40,0,100,0,68,412,0,0,0,45,1,1,0,0,0,0,10,4182,494,1,0,0,0,0,0,'Stitches - On Waypoint 68 Reached - Move Watcher Bukouris'),
-(412,0,12,0,40,0,100,0,68,412,0,0,0,45,1,1,0,0,0,0,10,5960,2470,1,0,0,0,0,0,'Stitches - On Waypoint 68 Reached - Move Watcher Frazier'),
-(412,0,13,0,40,0,100,0,70,412,0,0,0,45,1,3,0,0,0,0,10,5960,2470,1,0,0,0,0,0,'Stitches - On Waypoint 70 Reached - Set Orientation Watcher Frazier'),
-(412,0,14,0,40,0,100,0,68,412,0,0,0,45,1,1,0,0,0,0,10,6133,1204,1,0,0,0,0,0,'Stitches - On Waypoint 68 Reached - Move Watcher Corwin'),
-(412,0,15,0,40,0,100,0,68,412,0,0,0,45,1,1,0,0,0,0,10,6127,1203,1,0,0,0,0,0,'Stitches - On Waypoint 68 Reached - Move Watcher Sarys'),
-(412,0,16,0,40,0,100,0,90,412,0,0,0,89,5,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stitches - On Waypoint 90 Reached - Start Random Movement'),
-(412,0,17,0,6,0,100,0,0,0,0,0,0,45,2,5,0,0,0,0,10,4185,468,1,0,0,0,0,0,'Stitches - On Just Died - Say Line 5 (Town Crier)'),
-(412,0,18,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,4180,826,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Jan back '),
-(412,0,19,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,4182,494,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Bukouris back'),
-(412,0,20,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,5960,2470,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Frazier back'),
-(412,0,21,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,6133,1204,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Corwin back'),
-(412,0,22,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,6127,1203,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Sarys back'),
-(412,0,23,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,300002,1001,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Hutchins back'),
-(412,0,24,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,300001,28987,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Blomberg back'),
-(412,0,25,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,300003,1098,1,0,0,0,0,0,'Stitches - On Just Died - Make Watcher Merant invisible'),
-(412,0,26,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,300004,1099,1,0,0,0,0,0,'Stitches - On Just Died - Make Watcher Gelwin invisible'),
-(412,0,27,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,300006,1101,1,0,0,0,0,0,'Stitches - On Just Died - Make Watcher Thayer invisible'),
-(412,0,28,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,300005,1100,1,0,0,0,0,0,'Stitches - On Just Died - Make Watcher Selkin invisible'),
-(412,0,29,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,5938,499,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Paige back'),
-(412,0,30,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,5937,888,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Dodds back'),
-(412,0,31,0,1,0,100,0,30000,40000,90000,120000,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stitches - Update - Say Line 0'),
-(412,0,32,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stitches - - On Game Event \'Stitches\' End - Respawn In 2 secs'),
-(412,0,33,0,40,0,100,0,36,412,0,0,0,45,1,1,0,0,0,0,10,5938,499,1,0,0,0,0,0,'Stitches - On Waypoint 36 Reached - Set Data (Watcher Paige)'),
-(412,0,34,0,40,0,100,0,36,412,0,0,0,45,1,1,0,0,0,0,10,5937,888,1,0,0,0,0,0,'Stitches - On Waypoint 36 Reached - Set Data (Watcher Dodds)'),
-(412,0,35,0,40,0,100,0,51,412,0,0,0,45,1,1,0,0,0,0,10,300003,1098,1,0,0,0,0,0,'Stitches - On Waypoint 51 Reached - Set Data (Watcher Merant)'),
-(412,0,36,0,40,0,100,0,51,412,0,0,0,45,1,1,0,0,0,0,10,300004,1099,1,0,0,0,0,0,'Stitches - On Waypoint 51 Reached - Set Data (Watcher Gelwin)'),
-(412,0,37,0,40,0,100,0,51,412,0,0,0,45,1,1,0,0,0,0,10,300006,1101,1,0,0,0,0,0,'Stitches - On Waypoint 51 Reached - Set Data (Watcher Thayer)'),
-(412,0,38,0,40,0,100,0,51,412,0,0,0,45,1,1,0,0,0,0,10,300005,1100,1,0,0,0,0,0,'Stitches - On Waypoint 51 Reached - Set Data (Watcher Selkin)'),
-(412,0,39,0,40,0,100,0,66,412,0,0,0,49,0,0,0,0,0,0,10,300003,1098,1,0,0,0,0,0,'Stitches - On Waypoint 66 Reached - Set Data (Watcher Merant)'),
-(412,0,40,0,40,0,100,0,36,412,0,0,0,45,1,1,0,0,0,0,10,300001,28987,1,0,0,0,0,0,'Stitches - On Waypoint 36 Reached - Set Data (Watcher Blomberg)'),
-(412,0,41,0,40,0,100,0,36,412,0,0,0,45,1,1,0,0,0,0,10,300002,1001,1,0,0,0,0,0,'Stitches - On Waypoint 36 Reached - Set Data (Watcher Hutchins)'),
-(412,0,42,0,40,0,100,0,85,412,0,0,0,45,1,2,0,0,0,0,10,4194,264,1,0,0,0,0,0,'Stitches - On Waypoint 85 Reached - Say Line 42(Commander Althea)');
+(412,0,3,0,1,0,100,0,5000,5000,0,0,0,53,1,412,0,0,0,2,1,0,0,0,0,0,0,0,0,'Stitches - OOC - Start Waypoint'),
+(412,0,4,5,40,0,100,0,36,412,0,0,0,2,93,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stitches - On Waypoint 36 Reached - Set Faction 93'),
+(412,0,5,0,61,0,100,0,0,0,0,0,0,59,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stitches - On Waypoint 36 Reached - Set Walk'),
+(412,0,6,0,40,0,100,0,36,412,0,0,0,45,2,1,0,0,0,0,10,4185,468,1,0,0,0,0,0,'Stitches - On Waypoint 36 Reached - Say Line 1 (Town Crier)'),
+(412,0,7,0,40,0,100,0,51,412,0,0,0,45,2,2,0,0,0,0,10,4185,468,1,0,0,0,0,0,'Stitches - On Waypoint 51 Reached - Say Line 2 (Town Crier)'),
+(412,0,8,0,40,0,100,0,68,412,0,0,0,45,2,3,0,0,0,0,10,4185,468,1,0,0,0,0,0,'Stitches - On Waypoint 68 Reached - Say Line 3 (Town Crier)'),
+(412,0,9,0,40,0,100,0,85,412,0,0,0,45,2,4,0,0,0,0,10,4185,468,1,0,0,0,0,0,'Stitches - On Waypoint 85 Reached - Say Line 4 (Town Crier)'),
+(412,0,10,0,40,0,100,0,68,412,0,0,0,45,1,1,0,0,0,0,10,4180,826,1,0,0,0,0,0,'Stitches - On Waypoint 68 Reached - Move Watcher Jan'),
+(412,0,11,0,40,0,100,0,72,412,0,0,0,45,1,3,0,0,0,0,10,4180,826,1,0,0,0,0,0,'Stitches - On Waypoint 72 Reached - Set Orientation Watcher Jan'),
+(412,0,12,0,40,0,100,0,68,412,0,0,0,45,1,1,0,0,0,0,10,4182,494,1,0,0,0,0,0,'Stitches - On Waypoint 68 Reached - Move Watcher Bukouris'),
+(412,0,13,0,40,0,100,0,68,412,0,0,0,45,1,1,0,0,0,0,10,5960,2470,1,0,0,0,0,0,'Stitches - On Waypoint 68 Reached - Move Watcher Frazier'),
+(412,0,14,0,40,0,100,0,70,412,0,0,0,45,1,3,0,0,0,0,10,5960,2470,1,0,0,0,0,0,'Stitches - On Waypoint 70 Reached - Set Orientation Watcher Frazier'),
+(412,0,15,0,40,0,100,0,68,412,0,0,0,45,1,1,0,0,0,0,10,6133,1204,1,0,0,0,0,0,'Stitches - On Waypoint 68 Reached - Move Watcher Corwin'),
+(412,0,16,0,40,0,100,0,68,412,0,0,0,45,1,1,0,0,0,0,10,6127,1203,1,0,0,0,0,0,'Stitches - On Waypoint 68 Reached - Move Watcher Sarys'),
+(412,0,17,0,40,0,100,0,90,412,0,0,0,89,5,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stitches - On Waypoint 90 Reached - Start Random Movement'),
+(412,0,18,0,6,0,100,0,0,0,0,0,0,45,2,5,0,0,0,0,10,4185,468,1,0,0,0,0,0,'Stitches - On Just Died - Say Line 5 (Town Crier)'),
+(412,0,19,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,4180,826,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Jan back '),
+(412,0,20,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,4182,494,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Bukouris back'),
+(412,0,21,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,5960,2470,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Frazier back'),
+(412,0,22,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,6133,1204,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Corwin back'),
+(412,0,23,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,6127,1203,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Sarys back'),
+(412,0,24,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,300002,1001,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Hutchins back'),
+(412,0,25,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,300001,28987,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Blomberg back'),
+(412,0,26,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,300003,1098,1,0,0,0,0,0,'Stitches - On Just Died - Make Watcher Merant invisible'),
+(412,0,27,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,300004,1099,1,0,0,0,0,0,'Stitches - On Just Died - Make Watcher Gelwin invisible'),
+(412,0,28,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,300006,1101,1,0,0,0,0,0,'Stitches - On Just Died - Make Watcher Thayer invisible'),
+(412,0,29,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,300005,1100,1,0,0,0,0,0,'Stitches - On Just Died - Make Watcher Selkin invisible'),
+(412,0,30,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,5938,499,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Paige back'),
+(412,0,31,0,6,0,100,0,0,0,0,0,0,45,1,2,0,0,0,0,10,5937,888,1,0,0,0,0,0,'Stitches - On Just Died - Move Watcher Dodds back'),
+(412,0,32,0,1,0,100,0,30000,40000,90000,120000,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stitches - Update - Say Line 0'),
+(412,0,33,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stitches - - On Game Event \'Stitches\' End - Respawn In 2 secs'),
+(412,0,34,0,40,0,100,0,36,412,0,0,0,45,1,1,0,0,0,0,10,5938,499,1,0,0,0,0,0,'Stitches - On Waypoint 36 Reached - Set Data (Watcher Paige)'),
+(412,0,35,0,40,0,100,0,36,412,0,0,0,45,1,1,0,0,0,0,10,5937,888,1,0,0,0,0,0,'Stitches - On Waypoint 36 Reached - Set Data (Watcher Dodds)'),
+(412,0,36,0,40,0,100,0,51,412,0,0,0,45,1,1,0,0,0,0,10,300003,1098,1,0,0,0,0,0,'Stitches - On Waypoint 51 Reached - Set Data (Watcher Merant)'),
+(412,0,37,0,40,0,100,0,51,412,0,0,0,45,1,1,0,0,0,0,10,300004,1099,1,0,0,0,0,0,'Stitches - On Waypoint 51 Reached - Set Data (Watcher Gelwin)'),
+(412,0,38,0,40,0,100,0,51,412,0,0,0,45,1,1,0,0,0,0,10,300006,1101,1,0,0,0,0,0,'Stitches - On Waypoint 51 Reached - Set Data (Watcher Thayer)'),
+(412,0,39,0,40,0,100,0,51,412,0,0,0,45,1,1,0,0,0,0,10,300005,1100,1,0,0,0,0,0,'Stitches - On Waypoint 51 Reached - Set Data (Watcher Selkin)'),
+(412,0,40,0,40,0,100,0,66,412,0,0,0,49,0,0,0,0,0,0,10,300003,1098,1,0,0,0,0,0,'Stitches - On Waypoint 66 Reached - Set Data (Watcher Merant)'),
+(412,0,41,0,40,0,100,0,36,412,0,0,0,45,1,1,0,0,0,0,10,300001,28987,1,0,0,0,0,0,'Stitches - On Waypoint 36 Reached - Set Data (Watcher Blomberg)'),
+(412,0,42,0,40,0,100,0,36,412,0,0,0,45,1,1,0,0,0,0,10,300002,1001,1,0,0,0,0,0,'Stitches - On Waypoint 36 Reached - Set Data (Watcher Hutchins)'),
+(412,0,43,0,40,0,100,0,85,412,0,0,0,45,1,2,0,0,0,0,10,4194,264,1,0,0,0,0,0,'Stitches - On Waypoint 85 Reached - Say Line 42(Commander Althea)');
 
 -- Stitches Waypoints 
 DELETE FROM `waypoints` WHERE entry = 412;
@@ -282,9 +283,9 @@ INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMa
 (300001,28987,0,0,0,1,1,0,1,-10895.8,-381.028,40.125,2.669,300,0,0,0,0,0,0,0,0,'',0), -- Watcher Blomberg - New GUID 300001
 (300002,1001,0,0,0,1,1,0,1,-10912,-388,40.632,0.812,300,0,0,0,0,0,0,0,0,'',0), -- Watcher Hutchins  - New GUID 300002
 (300003,1098,0,0,0,1,1,0,1,-10776.7,-975.54,56.4,1.915,300,0,0,0,0,0,0,0,0,'',0), -- Watcher Merant - New GUID 300003
-(300004,1099,0,0,0,1,1,0,1,-10778.6,-976.131,55.73,1.915,300,0,0,0,0,0,0,0,0,'',0), -- Watcher Gelwin - New GUID 300004
+(300004,1099,0,0,0,1,1,0,1,-10777.7,-975.9,56.09,1.915,300,0,0,0,0,0,0,0,0,'',0), -- Watcher Gelwin - New GUID 300004
 (300005,1100,0,0,0,1,1,0,1,-10775.7,-975.187,56.72,1.915,300,0,0,0,0,0,0,0,0,'',0), -- Watch Selkin - New GUID 300005
-(300006,1101,0,0,0,1,1,0,1,-10777.7,-975.9,56.09,1.915,300,0,0,0,0,0,0,0,0,'',0), -- Watcher Thayer - New GUID 300006
+(300006,1101,0,0,0,1,1,0,1,-10778.6,-976.131,55.73,1.915,300,0,0,0,0,0,0,0,0,'',0), -- Watcher Thayer - New GUID 300006
 (6127,1203,0,0,0,1,1,0,1,-10531.8,-1155.32,28.102,4.723,300,0,0,0,0,0,0,0,0,'',0), -- Watcher Sarys - Reused GUID 6127
 (6133,1204,0,0,0,1,1,0,1,-10585.8,-1158.41,30.059,4.059,300,0,0,0,0,0,0,0,0,'',0); -- Watcher Corwin - Reused GUID 6133
 
@@ -436,11 +437,13 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` = 499;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 499 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
-(499,0,0,0,38,0,100,0,1,1,0,0,0,53,1,499,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Paige - On Data Set - Start Waypoint (No Repeat)'),
-(499,0,1,2,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10934.5,-381.812988,40.197601,0.174533,"Watcher Paige - On Data Set - Set Home POS"),
-(499,0,2,0,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Paige - On Data Set - Evade"),
-(499,0,3,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,19,499,0,1,0,0,0,0,0,"Watcher Paige - On Game Event \'Stitches\' End - Respawn"),
-(499,0,4,0,68,0,100,0,85,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Paige - On Game Event \'Stitches\' Start - React State Aggressive');
+(499,0,0,1,38,0,100,0,1,1,0,0,0,53,1,499,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Paige - On Data Set - Start Waypoint (No Repeat)'),
+(499,0,1,0,61,0,100,0,0,0,0,0,0,17,333,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Paige - On Data Set - Continuous Attack Emote"),
+(499,0,2,3,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10934.5,-381.812988,40.197601,0.174533,"Watcher Paige - On Data Set - Set Home POS"),
+(499,0,3,4,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Paige - On Data Set - Evade"),
+(499,0,4,0,61,0,100,0,0,0,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Paige - On Data Set - Normal Emote"),
+(499,0,5,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,19,499,0,1,0,0,0,0,0,"Watcher Paige - On Game Event \'Stitches\' End - Respawn"),
+(499,0,6,0,68,0,100,0,85,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Paige - On Game Event \'Stitches\' Start - React State Aggressive');
 
 DELETE FROM `waypoints` WHERE `entry` = 499;
 INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`point_comment`) VALUES
@@ -452,10 +455,12 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 UPDATE `creature_template` SET `AIName` = "SmartAI",`unit_flags` = 4096,`flags_extra` = 0 WHERE `entry` = 888;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 888 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
-(888,0,0,0,38,0,100,0,1,1,0,0,0,53,1,888,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Dodds - On Data Set - Start Waypoint (No Repeat)'),
-(888,0,1,2,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10923.200195,-384.928009,39.434399,0.942478,"Watcher Dodds - On Data Set - Set Home POS"),
-(888,0,2,0,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Dodds - On Data Set - Evade"),
-(888,0,3,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,19,888,0,1,0,0,0,0,0,"Watcher Dodds - On Game Event \'Stitches\' End - Respawn");
+(888,0,0,1,38,0,100,0,1,1,0,0,0,53,1,888,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Dodds - On Data Set - Start Waypoint (No Repeat)'),
+(888,0,1,0,61,0,100,0,0,0,0,0,0,17,333,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Dodds - On Data Set - Continuous Attack Emote"),
+(888,0,2,3,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10923.200195,-384.928009,39.434399,0.942478,"Watcher Dodds - On Data Set - Set Home POS"),
+(888,0,3,4,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Dodds - On Data Set - Evade"),
+(888,0,4,0,61,0,100,0,0,0,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Dodds - On Data Set - Normal Emote"),
+(888,0,5,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,19,888,0,1,0,0,0,0,0,"Watcher Dodds - On Game Event \'Stitches\' End - Respawn");
 
 DELETE FROM `waypoints` WHERE `entry` = 888;
 INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`point_comment`) VALUES
@@ -467,15 +472,13 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` = 1001;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 1001 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
-(1001,0,0,0,38,0,100,0,1,1,0,0,0,53,1,1001,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Hutchins - On Data Set - Start Waypoint (No Repeat)'),
-(1001,0,1,2,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10912,-388,40.632,0.812,"Watcher Hutchins - On Data Set - Set Home POS"),
-(1001,0,2,0,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher hutchins - On Data Set - Evade"),
--- (1001,0,2,3,61,0,100,0,0,0,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,-10912,-388,40.632,0.812,"Watcher Hutchins - On Data Set - Move to POS"),
--- (1001,0,3,0,61,0,100,0,0,0,0,0,0,22,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Hutchins - On Data Set - Set Phase 2'),
--- (1001,0,4,6,1,2,100,0,2000,2000,2000,2000,0,66,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0.988,'Watcher Hutchins - OOC (Phase 2) - Set Orientation'),
--- (1001,0,5,0,61,0,100,0,0,0,0,0,0,22,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Hutchins - OOC (Phase 2) - Set Phase 0'),
-(1001,0,3,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Hutchins - On Game Event \'Stitches\' End - Respawn"),
-(1001,0,4,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Hutchins - On Spawn - React State Aggressive');
+(1001,0,0,1,38,0,100,0,1,1,0,0,0,53,1,1001,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Hutchins - On Data Set - Start Waypoint (No Repeat)'),
+(1001,0,1,0,61,0,100,0,0,0,0,0,0,17,333,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Hutchins - On Data Set - Continuous Attack Emote"),
+(1001,0,2,3,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10912,-388,40.632,0.812,"Watcher Hutchins - On Data Set - Set Home POS"),
+(1001,0,3,4,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Hutchins - On Data Set - Evade"),
+(1001,0,4,0,61,0,100,0,0,0,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Hutchins - On Data Set - Normal Emote"),
+(1001,0,5,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Hutchins - On Game Event \'Stitches\' End - Respawn"),
+(1001,0,6,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Hutchins - On Spawn - React State Aggressive');
 
 DELETE FROM `creature_addon` WHERE `guid` = 300002;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`,`auras`) VALUES
@@ -492,11 +495,13 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` = 28987;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 28987 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
-(28987,0,0,0,38,0,100,0,1,1,0,0,0,53,1,28987,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Blomberg - On Data Set - Start Waypoint (No Repeat)'),
-(28987,0,1,2,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10895.825,-381.028,40.125,2.669,"Watcher Blomberg - On Data Set - Set Home POS"),
-(28987,0,2,0,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Blomberg - On Data Set - Evade"),
-(28987,0,3,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Blomberg - On Game Event \'Stitches\' End - Respawn"),
-(28987,0,4,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Blomberg - On Spawn - React State Aggressive');
+(28987,0,0,1,38,0,100,0,1,1,0,0,0,53,1,28987,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Blomberg - On Data Set - Start Waypoint (No Repeat)'),
+(28987,0,1,0,61,0,100,0,0,0,0,0,0,17,333,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Blomberg - On Data Set - Continuous Attack Emote"),
+(28987,0,2,3,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10895.825,-381.028,40.125,2.669,"Watcher Blomberg - On Data Set - Set Home POS"),
+(28987,0,3,4,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Blomberg - On Data Set - Evade"),
+(28987,0,4,0,61,0,100,0,0,0,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Blomberg - On Data Set - Normal Emote"),
+(28987,0,5,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Blomberg - On Game Event \'Stitches\' End - Respawn"),
+(28987,0,6,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Blomberg - On Spawn - React State Aggressive');
 
 DELETE FROM `creature_addon` WHERE `guid` = 300001;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`,`auras`) VALUES
@@ -517,12 +522,14 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (1098,0,0,1,11,0,100,0,0,0,0,0,0,11,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Merant - On Spawn - Invisible'),
 (1098,0,1,0,61,0,100,0,0,0,0,0,0,48,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Merant - On Respawn - Set Active On'),
 (1098,0,2,3,38,0,100,0,1,1,0,0,0,53,1,1098,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Merant - On Data Set - Start Waypoint (No Repeat)'),
-(1098,0,3,0,61,0,100,0,0,0,0,0,0,28,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Merant - On move - Remove Invisiblility'),
-(1098,0,4,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Merant - On Game Event \'Stitches\' End - Respawn"),
-(1098,0,5,0,6,0,100,0,0,0,0,0,0,48,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Merant - On Death - Set Active Off'),
-(1098,0,6,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Merant - On Spawn - React State Aggressive'),
-(1098,0,7,0,38,0,100,0,1,2,0,0,0,48,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Merant - On Data Set - Active Off'),
-(1098,0,8,0,38,0,100,0,1,2,0,0,0,11,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Merant - On Data Set - Invisible');
+(1098,0,3,4,61,0,100,0,0,0,0,0,0,28,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Merant - On move - Remove Invisiblility'),
+(1098,0,4,0,61,0,100,0,0,0,0,0,0,17,333,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Merant - On Data Set - Continuous Attack Emote"),
+(1098,0,5,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Merant - On Game Event \'Stitches\' End - Respawn"),
+(1098,0,6,0,6,0,100,0,0,0,0,0,0,48,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Merant - On Death - Set Active Off'),
+(1098,0,7,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Merant - On Spawn - React State Aggressive'),
+(1098,0,8,9,38,0,100,0,1,2,0,0,0,48,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Merant - On Data Set - Active Off'),
+(1098,0,9,10,61,0,100,0,0,0,0,0,0,11,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Merant - On Data Set - Invisible'),
+(1098,0,10,0,61,0,100,0,0,0,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Merant - On Data Set - Normal Emote");
 
 DELETE FROM `creature_addon` WHERE `guid` = 300003;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`,`auras`) VALUES
@@ -532,7 +539,7 @@ DELETE FROM `waypoints` WHERE `entry` = 1098;
 INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`point_comment`) VALUES
 (1098,1,-10776.661,-975.54,56.4,'Watcher Merant'),
 (1098,2,-10805.693,-878.18,55.87,'Watcher Merant'),
-(1098,3,-10825.9,-830.622,55.5523,'Watcher Merant');
+(1098,3,-10827.266,-828.594,55.547,'Watcher Merant');
 
 
 -- Watcher Gelwin
@@ -542,9 +549,11 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (1099,0,0,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Gelwin - On Game Event \'Stitches\' End - Respawn"),
 (1099,0,1,0,11,0,100,0,0,0,0,0,0,11,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Gelwin - On Spawn - Invisible'),
 (1099,0,2,3,38,0,100,0,1,1,0,0,0,53,1,1099,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Gelwin - On Data Set - Start Waypoint (No Repeat)'),
-(1099,0,3,0,61,0,100,0,0,0,0,0,0,28,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Gelwin - On move - Remove Invisiblility'),
-(1099,0,4,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Gelwin - On Spawn - React State Aggressive'),
-(1099,0,5,0,38,0,100,0,1,2,0,0,0,11,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Gelwin - On Data Set - Invisible');
+(1099,0,3,4,61,0,100,0,0,0,0,0,0,28,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Gelwin - On move - Remove Invisiblility'),
+(1099,0,4,0,61,0,100,0,0,0,0,0,0,17,333,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Gelwin - On Data Set - Continuous Attack Emote"),
+(1099,0,5,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Gelwin - On Spawn - React State Aggressive'),
+(1099,0,6,7,38,0,100,0,1,2,0,0,0,11,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Gelwin - On Data Set - Invisible'),
+(1099,0,7,0,61,0,100,0,0,0,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Gelwin - On Data Set - Normal Emote");
 
 DELETE FROM `creature_addon` WHERE `guid` = 300004;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`,`auras`) VALUES
@@ -552,9 +561,9 @@ INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`
 
 DELETE FROM `waypoints` WHERE `entry` = 1099;
 INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`point_comment`) VALUES
-(1099,1,-10778.641,-976.131,55.73,'Watcher Gelwin'),
-(1099,2,-10808.76,-879.42,55.75,'Watcher Gelwin'),
-(1099,3,-10830.042,-829.286,55.7114,'Watcher Gelwin');
+(1099,1,-10777.65,-975.9,56.09,'Watcher Gelwin'),
+(1099,2,-10806.98,-878.849,55.75,'Watcher Gelwin'),
+(1099,3,-10827.5996,-831.325,55.638,'Watcher Gelwin');
 
 
 -- Watcher Selkin
@@ -564,9 +573,11 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (1100,0,0,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Selkin - On Game Event \'Stitches\' End - Respawn"),
 (1100,0,1,0,11,0,100,0,0,0,0,0,0,11,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Selkin - On Spawn - Invisible'),
 (1100,0,2,3,38,0,100,0,1,1,0,0,0,53,1,1100,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Selkin - On Data Set - Start Waypoint (No Repeat)'),
-(1100,0,3,0,61,0,100,0,0,0,0,0,0,28,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Selkin - On move - Remove Invisiblility'),
-(1100,0,4,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Selkin - On Spawn - React State Aggressive'),
-(1100,0,5,0,38,0,100,0,1,2,0,0,0,11,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Selkin - On Data Set - Invisible');
+(1100,0,3,4,61,0,100,0,0,0,0,0,0,28,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Selkin - On move - Remove Invisiblility'),
+(1100,0,4,0,61,0,100,0,0,0,0,0,0,17,333,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Selkins - On Data Set - Continuous Attack Emote"),
+(1100,0,5,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Selkin - On Spawn - React State Aggressive'),
+(1100,0,6,7,38,0,100,0,1,2,0,0,0,11,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Selkin - On Data Set - Invisible'),
+(1100,0,7,0,61,0,100,0,0,0,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Selkin - On Data Set - Normal Emote");
 
 DELETE FROM `creature_addon` WHERE `guid` = 300005;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`,`auras`) VALUES
@@ -576,7 +587,7 @@ DELETE FROM `waypoints` WHERE `entry` = 1100;
 INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`point_comment`) VALUES
 (1100,1,-10775.67,-975.187,56.72,'Watcher Selkin'),
 (1100,2,-10804.816,-877.659,55.896,'Watcher Selkin'),
-(1100,3,-10824.9,-827.806,55.5331,'Watcher Selkin');
+(1100,3,-10825.556,-830.715,55.539,'Watcher Selkin');
 
 
 -- Watcher Thayer
@@ -586,9 +597,11 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (1101,0,0,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Thayer - On Game Event \'Stitches\' End - Respawn"),
 (1101,0,1,0,11,0,100,0,0,0,0,0,0,11,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Thayer - On Spawn - Invisible'),
 (1101,0,2,3,38,0,100,0,1,1,0,0,0,53,1,1101,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Thayer - On Data Set - Start Waypoint (No Repeat)'),
-(1101,0,3,0,61,0,100,0,0,0,0,0,0,28,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Thayer - On Move - Remove Invisiblility'),
-(1101,0,4,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Thayer - On Spawn - React State Aggressive'),
-(1101,0,5,0,38,0,100,0,1,2,0,0,0,11,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Thayer - On Data Set - Invisible');
+(1101,0,3,4,61,0,100,0,0,0,0,0,0,28,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Thayer - On Move - Remove Invisiblility'),
+(1101,0,4,0,61,0,100,0,0,0,0,0,0,17,333,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Thayer - On Data Set - Continuous Attack Emote"),
+(1101,0,5,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Thayer - On Spawn - React State Aggressive'),
+(1101,0,6,7,38,0,100,0,1,2,0,0,0,11,16380,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Thayer - On Data Set - Invisible'),
+(1101,0,7,0,61,0,100,0,0,0,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Thayer - On Data Set - Normal Emote");
 
 DELETE FROM `creature_addon` WHERE `guid` = 300006;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`,`auras`) VALUES
@@ -596,59 +609,37 @@ INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`
 
 DELETE FROM `waypoints` WHERE `entry` = 1101;
 INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`point_comment`) VALUES
-(1101,1,-10777.65,-975.9,56.09,'Watcher Thayer'),
-(1101,2,-10806.98,-878.849,55.75,'Watcher Thayer'),
-(1101,3,-10827.5996,-831.325,55.638,'Watcher Thayer');
+(1101,1,-10778.641,-976.131,55.73,'Watcher Thayer'),
+(1101,2,-10808.76,-879.42,55.75,'Watcher Thayer'),
+(1101,3,-10829.408,-829.255,55.609,'Watcher Thayer');
 
 
 /*-- Watchers Defending Darkshire */
--- Watcher Jan
-UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` = 826; 
-DELETE FROM `smart_scripts` WHERE `entryorguid` = 826 AND `source_type` = 0;
-INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
-(826,0,0,0,38,0,100,0,1,1,0,0,0,53,1,826,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Jan - On Data Set - Start Waypoint (No Repeat)'),
-(826,0,1,2,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10558.4,-1242.58,30.2119,4.9233,"Watcher Jan - On Data Set - Set Home POS"),
-(826,0,2,0,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Jan - On Data Set - Evade"),
-(826,0,3,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,19,826,0,1,0,0,0,0,0,"Watcher Jan - On Game Event \'Stitches\' End - Respawn");
-
-DELETE FROM `waypoints` WHERE `entry` = 826;
-INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`,`point_comment`) VALUES
-(826,1,-10558.625,-1241.694,29.977,'Watcher Jan'),
-(826,2,-10556.89,-1226.341,27.455,'Watcher Jan'),
-(826,3,-10576.798,-1173.664,28.287,'Watcher Jan'),
-(826,4,-10580.785,-1174.364,28.538,'Watcher Jan');
-
-
 -- Watcher Frazier
 UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` = 2470; 
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 2470 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
-(2470,0,0,1,38,0,100,0,1,1,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,-10583.076,-1177.739,28.501,3.445,"Watcher Frazier - On Data Set - Move to POS"),
+(2470,0,0,1,38,0,100,0,1,1,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,-10591.564,-1177.667,28.381,3.38,"Watcher Frazier - On Data Set - Move to POS"),
 (2470,0,1,0,61,0,100,0,0,0,0,0,0,22,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Frazier - On Data Set - Set Phase 2'),
 (2470,0,2,3,1,2,100,0,2000,2000,2000,2000,0,66,0,0,0,0,0,0,8,0,0,0,0,0,0,0,3.4,'Watcher Frazier - OOC (Phase 2) - Set Orientation'),
-(2470,0,3,0,61,0,100,0,0,0,0,0,0,22,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Frazier - OOC (Phase 2) - Set Phase 0'),
-(2470,0,4,0,38,0,100,0,1,2,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Frazier - On Data Set - Evade"),
-(2470,0,5,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,19,2470,0,1,0,0,0,0,0,"Watcher Frazier- On Game Event \'Stitches\' End - Respawn");
-
-
--- Watcher Bukouris
-UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` = 494;
-DELETE FROM `smart_scripts` WHERE `entryorguid` = 494 AND `source_type` = 0;
-INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
-(494,0,0,0,38,0,100,0,1,1,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,-10580.56,-1175.99,28.57,3.28,"Watcher Bukouris - On Data Set - Move to POS"),
-(494,0,1,0,38,0,100,0,1,2,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Bukouris - On Data Set - Evade"),
-(494,0,2,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,19,494,0,1,0,0,0,0,0,"Watcher Bukouris - On Game Event \'Stitches\' End - Respawn");
+(2470,0,3,4,61,0,100,0,0,0,0,0,0,17,333,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Frazier - OOC (Phase 2) - Continuous Attack Emote"),
+(2470,0,4,0,61,0,100,0,0,0,0,0,0,22,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Frazier - OOC (Phase 2) - Set Phase 0'),
+(2470,0,5,6,38,0,100,0,1,2,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Frazier - On Data Set - Evade"),
+(2470,0,6,0,61,0,100,0,0,0,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Frazier - On Data Set - Normal Emote"),
+(2470,0,7,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,19,2470,0,1,0,0,0,0,0,"Watcher Frazier- On Game Event \'Stitches\' End - Respawn");
 
 
 -- Watcher Sarys
-UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` = 1203;
+UPDATE `creature_template` SET `AIName` = "SmartAI", `DamageModifier` = 3.5 WHERE `entry` = 1203;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 1203 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
 (1203,0,0,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Sarys - On Spawn - React State Aggressive'),
-(1203,0,1,0,38,0,100,0,1,1,0,0,0,53,1,1203,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Sarys - On Data Set - Start Waypoint (No Repeat)'),
-(1203,0,2,3,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10536.224,-1159.281,28.088,0.083,"Watcher Sarys - On Data Set - Set Home POS"),
-(1203,0,3,0,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Sarys - On Data Set - Evade"),
-(1203,0,4,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Sarys - On Game Event \'Stitches\' End - Respawn");
+(1203,0,1,2,38,0,100,0,1,1,0,0,0,53,1,1203,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Sarys - On Data Set - Start Waypoint (No Repeat)'),
+(1203,0,2,0,61,0,100,0,0,0,0,0,0,17,333,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Sarys - On Data Set - Continuous Attack Emote"),
+(1203,0,3,3,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10536.224,-1159.281,28.088,0.083,"Watcher Sarys - On Data Set - Set Home POS"),
+(1203,0,4,5,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Sarys - On Data Set - Evade"),
+(1203,0,5,0,61,0,100,0,0,0,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Sarys - On Data Set - Normal Emote"),
+(1203,0,6,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Sarys - On Game Event \'Stitches\' End - Respawn");
 
 DELETE FROM `creature_addon` WHERE `guid` = 6127;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`,`auras`) VALUES
@@ -661,18 +652,20 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 (1203,3,-10536.224,-1159.281,28.088,'Watcher Sarys'),
 (1203,4,-10564.808,-1161.135,27.475,'Watcher Sarys'),
 (1203,5,-10577.798,-1174.569,28.353,'Watcher Sarys'),
-(1203,6,-10578.8,-1174.75,28.4745,'Watcher Sarys');
+(1203,6,-10592.168,-1175.163,28.566,'Watcher Sarys');
 
 
 -- Watcher Corwin
-UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` = 1204;
+UPDATE `creature_template` SET `AIName` = "SmartAI", `DamageModifier` = 4 WHERE `entry` = 1204;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 1204 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
 (1204,0,0,0,11,0,100,0,0,0,0,0,0,8,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Watcher Corwin - On Spawn - React State Aggressive'),
-(1204,0,1,0,38,0,100,0,1,1,0,0,0,53,1,1204,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Corwin - On Data Set - Start Waypoint (No Repeat)'),
-(1204,0,2,3,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10585.755,-1158.408,30.059,4.059,"Watcher Corwin - On Data Set - Set Home POS"),
-(1204,0,3,0,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Corwin - On Data Set - Evade"),
-(1204,0,4,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Corwin - On Game Event \'Stitches\' End - Respawn");
+(1204,0,1,2,38,0,100,0,1,1,0,0,0,53,1,1204,0,0,0,2,1,0,0,0,0,0,0,0,0,'Watcher Corwin - On Data Set - Start Waypoint (No Repeat)'),
+(1204,0,2,0,61,0,100,0,0,0,0,0,0,17,333,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Corwin - On Data Set - Continuous Attack Emote"),
+(1204,0,3,4,38,0,100,0,1,2,0,0,0,101,1,0,0,0,0,0,8,0,0,0,0,-10585.755,-1158.408,30.059,4.059,"Watcher Corwin - On Data Set - Set Home POS"),
+(1204,0,4,5,61,0,100,0,0,0,0,0,0,24,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Corwin - On Data Set - Evade"),
+(1204,0,5,0,61,0,100,0,0,0,0,0,0,17,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Corwin - On Data Set - Normal Emote"),
+(1204,0,6,0,69,0,100,0,85,0,0,0,0,70,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Watcher Corwin - On Game Event \'Stitches\' End - Respawn");
 
 DELETE FROM `creature_addon` WHERE `guid` = 6133;
 INSERT INTO `creature_addon` (`guid`,`path_id`,`mount`,`bytes1`,`bytes2`,`emote`,`isLarge`,`auras`) VALUES
@@ -683,4 +676,4 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 (1204,1,-10585.852,-1164.043,30.017,'Watcher Corwin'),
 (1204,2,-10580.443,-1170.46,28.386,'Watcher Corwin'),
 (1204,3,-10581.109,-1173.567,28.497,'Watcher Corwin'),
-(1204,4,-10583.756,-1173.659,28.622,'Watcher Corwin');
+(1204,4,-10594.054,-1176.725,28.432,'Watcher Corwin');
