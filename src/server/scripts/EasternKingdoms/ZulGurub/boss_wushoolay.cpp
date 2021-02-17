@@ -86,7 +86,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_wushoolayAI(creature);
+        return GetZulGurubAI<boss_wushoolayAI>(creature);
     }
 };
 

@@ -687,7 +687,9 @@ public:
     void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
     bool Reset(uint8 method, std::list<uint32>* globalSkipList = nullptr);
     uint32 GetScriptId() { return i_script_id; }
-    InstanceScript* GetInstanceScript() { return instance_script; }
+    std::string const& GetScriptName() const;
+    InstanceScript* GetInstanceScript() { return i_data; }
+    InstanceScript const* GetInstanceScript() const { return i_data; }
     void PermBindAllPlayers();
     void UnloadAll() override;
     bool CanEnter(Player* player, bool loginCheck = false) override;
@@ -700,7 +702,7 @@ public:
 private:
     bool m_resetAfterUnload;
     bool m_unloadWhenEmpty;
-    InstanceScript* instance_script;
+    InstanceScript* i_data;
     uint32 i_script_id;
 };
 

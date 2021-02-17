@@ -105,7 +105,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_magmadarAI(creature);
+        return GetMoltenCoreAI<boss_magmadarAI>(creature);
     }
 };
 
@@ -239,7 +239,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_magmadar_core_houndAI(creature);
+        return GetMoltenCoreAI<npc_magmadar_core_houndAI>(creature);
     }
 };
 

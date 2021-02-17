@@ -8,6 +8,9 @@
 #include "SpellScript.h"
 #include "SpellAuras.h"
 #include "SpellAuraEffects.h"
+#include "CreatureAIImpl.h"
+
+#define AzjolNerubScriptName "instance_azjol_nerub"
 
 enum ANData
 {
@@ -34,5 +37,11 @@ enum ANIds
 
     SPELL_WEB_WRAP_TRIGGER              = 52087
 };
+
+template <class AI, class T>
+inline AI* GetAzjolNerubAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, AzjolNerubScriptName);
+}
 
 #endif

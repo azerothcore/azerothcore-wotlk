@@ -54,7 +54,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_ormorokAI>(creature);
+        return GetNexusAI<boss_ormorokAI>(creature);
     }
 
     struct boss_ormorokAI : public BossAI
@@ -174,7 +174,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return GetInstanceAI<npc_crystal_spikeAI>(pCreature);
+        return GetNexusAI<npc_crystal_spikeAI>(pCreature);
     }
 
     struct npc_crystal_spikeAI : public NullCreatureAI

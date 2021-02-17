@@ -231,7 +231,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_sartharionAI (pCreature);
+        return GetObsidianSanctumAI<boss_sartharionAI> (pCreature);
     }
 
     struct boss_sartharionAI : public BossAI
@@ -1009,7 +1009,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_sartharion_tenebronAI (pCreature);
+        return GetObsidianSanctumAI<boss_sartharion_tenebronAI>(pCreature);
     }
 
     struct boss_sartharion_tenebronAI : public boss_sartharion_dragonAI
@@ -1192,7 +1192,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_sartharion_shadronAI (pCreature);
+        return GetObsidianSanctumAI<boss_sartharion_shadronAI>(pCreature);
     }
 
     struct boss_sartharion_shadronAI : public boss_sartharion_dragonAI
@@ -1317,7 +1317,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_sartharion_vesperonAI (pCreature);
+        return GetObsidianSanctumAI<boss_sartharion_vesperonAI>(pCreature);
     }
 
     struct boss_sartharion_vesperonAI : public boss_sartharion_dragonAI
@@ -1439,7 +1439,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_twilight_summonAI (pCreature);
+        return GetObsidianSanctumAI<npc_twilight_summonAI>(pCreature);
     }
 
     struct npc_twilight_summonAI : public ScriptedAI

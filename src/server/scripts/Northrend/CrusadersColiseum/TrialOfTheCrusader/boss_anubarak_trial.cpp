@@ -137,7 +137,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_anubarak_trialAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_anubarak_trialAI>(pCreature);
     };
 
     struct boss_anubarak_trialAI : public ScriptedAI
@@ -434,7 +434,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_swarm_scarabAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_swarm_scarabAI>(pCreature);
     };
 
     struct npc_swarm_scarabAI : public ScriptedAI
@@ -523,7 +523,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_frost_sphereAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_frost_sphereAI>(pCreature);
     };
 
     struct npc_frost_sphereAI : public NullCreatureAI
@@ -612,7 +612,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_nerubian_burrowerAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_nerubian_burrowerAI>(pCreature);
     };
 
     struct npc_nerubian_burrowerAI : public ScriptedAI
@@ -731,7 +731,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_anubarak_spikeAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_anubarak_spikeAI>(pCreature);
     };
 
     struct npc_anubarak_spikeAI : public ScriptedAI

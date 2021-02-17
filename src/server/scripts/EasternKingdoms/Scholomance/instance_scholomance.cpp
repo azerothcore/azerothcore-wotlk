@@ -13,7 +13,7 @@
 class instance_scholomance : public InstanceMapScript
 {
 public:
-    instance_scholomance() : InstanceMapScript("instance_scholomance", 289) { }
+    instance_scholomance() : InstanceMapScript(ScholomanceScriptName, 289) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

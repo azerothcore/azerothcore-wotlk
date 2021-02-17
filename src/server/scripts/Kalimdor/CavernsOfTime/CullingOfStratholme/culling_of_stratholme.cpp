@@ -356,7 +356,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_arthasAI(creature);
+        return GetCullingOfStratholmeAI<npc_arthasAI>(creature);
     }
 
     struct npc_arthasAI : public npc_escortAI
@@ -1377,7 +1377,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_crate_helperAI(creature);
+        return GetCullingOfStratholmeAI<npc_crate_helperAI>(creature);
     }
 };
 
@@ -1588,7 +1588,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_cos_stratholme_citizienAI(creature);
+        return GetCullingOfStratholmeAI<npc_cos_stratholme_citizienAI>(creature);
     }
 };
 

@@ -1784,7 +1784,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_frostwing_vrykulAI(creature);
+        return GetIcecrownCitadelAI<npc_frostwing_vrykulAI>(creature);
     }
 };
 
@@ -1822,7 +1822,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_impaling_spearAI(creature);
+        return GetIcecrownCitadelAI<npc_impaling_spearAI>(creature);
     }
 };
 
@@ -2614,7 +2614,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_icc_skybreaker_hierophantAI(creature);
+        return GetIcecrownCitadelAI<npc_icc_skybreaker_hierophantAI>(creature);
     }
 };
 
@@ -2668,7 +2668,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_icc_skybreaker_marksmanAI(creature);
+        return GetIcecrownCitadelAI<npc_icc_skybreaker_marksmanAI>(creature);
     }
 };
 
@@ -2729,7 +2729,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_icc_skybreaker_vicarAI(creature);
+        return GetIcecrownCitadelAI<npc_icc_skybreaker_vicarAI>(creature);
     }
 };
 
@@ -2796,7 +2796,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_icc_skybreaker_luminaryAI(creature);
+        return GetIcecrownCitadelAI<npc_icc_skybreaker_luminaryAI>(creature);
     }
 };
 
@@ -2909,7 +2909,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_icc_valkyr_heraldAI(creature);
+        return GetIcecrownCitadelAI<npc_icc_valkyr_heraldAI>(creature);
     }
 };
 
@@ -3035,7 +3035,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_icc_severed_essenceAI(creature);
+        return GetIcecrownCitadelAI<npc_icc_severed_essenceAI>(creature);
     }
 };
 
@@ -3128,7 +3128,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_icc_spire_frostwyrmAI(creature);
+        return GetIcecrownCitadelAI<npc_icc_spire_frostwyrmAI>(creature);
     }
 };
 
@@ -3274,7 +3274,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_icc_vengeful_fleshreaperAI(creature);
+        return GetIcecrownCitadelAI<npc_icc_vengeful_fleshreaperAI>(creature);
     }
 };
 
@@ -3418,7 +3418,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_icc_nerubar_broodkeeperAI(creature);
+        return GetIcecrownCitadelAI<npc_icc_nerubar_broodkeeperAI>(creature);
     }
 };
 
@@ -3607,7 +3607,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_icc_gauntlet_controllerAI>(creature);
+        return GetIcecrownCitadelAI<npc_icc_gauntlet_controllerAI>(creature);
     }
 };
 
@@ -3707,7 +3707,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_icc_putricades_trapAI>(creature);
+        return GetIcecrownCitadelAI<npc_icc_putricades_trapAI>(creature);
     }
 };
 

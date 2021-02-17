@@ -42,7 +42,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_talon_king_ikissAI (creature);
+        return GetSethekkHallsAI<boss_talon_king_ikissAI>(creature);
     }
 
     struct boss_talon_king_ikissAI : public ScriptedAI
@@ -178,7 +178,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_anzuAI (creature);
+        return GetSethekkHallsAI<boss_anzuAI>(creature);
     }
 
     struct boss_anzuAI : public ScriptedAI

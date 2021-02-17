@@ -222,7 +222,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_tyrannusAI(creature);
+        return GetPitOfSaronAI<boss_tyrannusAI>(creature);
     }
 };
 

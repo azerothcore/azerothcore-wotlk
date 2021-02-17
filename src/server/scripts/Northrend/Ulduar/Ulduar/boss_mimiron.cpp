@@ -279,7 +279,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_mimironAI (pCreature);
+        return GetUlduarAI<boss_mimironAI>(pCreature);
     }
 
     struct boss_mimironAI : public ScriptedAI
@@ -987,7 +987,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_leviathan_mkiiAI (pCreature);
+        return GetUlduarAI<npc_ulduar_leviathan_mkiiAI>(pCreature);
     }
 
     struct npc_ulduar_leviathan_mkiiAI : public ScriptedAI
@@ -1269,7 +1269,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_vx001AI (pCreature);
+        return GetUlduarAI<npc_ulduar_vx001AI>(pCreature);
     }
 
     struct npc_ulduar_vx001AI : public ScriptedAI
@@ -1607,7 +1607,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_aerial_command_unitAI (pCreature);
+        return GetUlduarAI<npc_ulduar_aerial_command_unitAI>(pCreature);
     }
 
     struct npc_ulduar_aerial_command_unitAI : public ScriptedAI
@@ -1936,7 +1936,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_proximity_mineAI (pCreature);
+        return GetUlduarAI<npc_ulduar_proximity_mineAI>(pCreature);
     }
 
     struct npc_ulduar_proximity_mineAI : public ScriptedAI
@@ -2001,7 +2001,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_mimiron_rocketAI (pCreature);
+        return GetUlduarAI<npc_ulduar_mimiron_rocketAI>(pCreature);
     }
 
     struct npc_ulduar_mimiron_rocketAI : public NullCreatureAI
@@ -2044,7 +2044,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_magnetic_coreAI (pCreature);
+        return GetUlduarAI<npc_ulduar_magnetic_coreAI>(pCreature);
     }
 
     struct npc_ulduar_magnetic_coreAI : public NullCreatureAI
@@ -2093,7 +2093,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_bot_summon_triggerAI (pCreature);
+        return GetUlduarAI<npc_ulduar_bot_summon_triggerAI>(pCreature);
     }
 
     struct npc_ulduar_bot_summon_triggerAI : public NullCreatureAI
@@ -2269,7 +2269,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_flames_initialAI (pCreature);
+        return GetUlduarAI<npc_ulduar_flames_initialAI>(pCreature);
     }
 
     struct npc_ulduar_flames_initialAI : public NullCreatureAI
@@ -2389,7 +2389,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_flames_spreadAI (pCreature);
+        return GetUlduarAI<npc_ulduar_flames_spreadAI>(pCreature);
     }
 
     struct npc_ulduar_flames_spreadAI : public NullCreatureAI
@@ -2431,7 +2431,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_emergency_fire_botAI (pCreature);
+        return GetUlduarAI<npc_ulduar_emergency_fire_botAI>(pCreature);
     }
 
     struct npc_ulduar_emergency_fire_botAI : public ScriptedAI
@@ -2488,7 +2488,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_rocket_strike_triggerAI (pCreature);
+        return GetUlduarAI<npc_ulduar_rocket_strike_triggerAI>(pCreature);
     }
 
     struct npc_ulduar_rocket_strike_triggerAI : public NullCreatureAI

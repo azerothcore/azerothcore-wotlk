@@ -7,6 +7,7 @@
 #include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "PassiveAI.h"
+#include "gnomeregan.h"
 
 class instance_gnomeregan : public InstanceMapScript
 {
@@ -38,7 +39,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_kernobeeAI(creature);
+        return GetGnomereganAI<npc_kernobeeAI>(creature);
     }
 
     bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override

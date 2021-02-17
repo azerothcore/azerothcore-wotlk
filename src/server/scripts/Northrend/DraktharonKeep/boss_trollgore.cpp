@@ -153,7 +153,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_trollgoreAI>(creature);
+        return GetDraktharonKeepAI<boss_trollgoreAI>(creature);
     }
 };
 

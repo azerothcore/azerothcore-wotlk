@@ -184,7 +184,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_gothikAI (pCreature);
+        return GetNaxxramasAI<boss_gothikAI>(pCreature);
     }
 
     struct boss_gothikAI : public BossAI
@@ -486,7 +486,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_boss_gothik_minionAI (pCreature);
+        return GetNaxxramasAI<npc_boss_gothik_minionAI>(pCreature);
     }
 
     struct npc_boss_gothik_minionAI : public CombatAI

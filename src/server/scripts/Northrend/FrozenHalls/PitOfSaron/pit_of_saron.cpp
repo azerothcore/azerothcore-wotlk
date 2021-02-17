@@ -364,7 +364,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_leaderAI(creature);
+        return GetPitOfSaronAI<npc_pos_leaderAI>(creature);
     }
 };
 
@@ -479,7 +479,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_deathwhisper_necrolyteAI(creature);
+        return GetPitOfSaronAI<npc_pos_deathwhisper_necrolyteAI>(creature);
     }
 };
 
@@ -560,7 +560,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_after_first_bossAI(creature);
+        return GetPitOfSaronAI<npc_pos_after_first_bossAI>(creature);
     }
 };
 
@@ -809,7 +809,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_tyrannus_eventsAI(creature);
+        return GetPitOfSaronAI<npc_pos_tyrannus_eventsAI>(creature);
     }
 };
 
@@ -846,7 +846,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_icicle_triggerAI(creature);
+        return GetPitOfSaronAI<npc_pos_icicle_triggerAI>(creature);
     }
 };
 
@@ -897,7 +897,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_collapsing_icicleAI(creature);
+        return GetPitOfSaronAI<npc_pos_collapsing_icicleAI>(creature);
     }
 };
 
@@ -1084,7 +1084,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_martin_or_gorkun_secondAI(creature);
+        return GetPitOfSaronAI<npc_pos_martin_or_gorkun_secondAI>(creature);
     }
 };
 
@@ -1125,7 +1125,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_freed_slaveAI(creature);
+        return GetPitOfSaronAI<npc_pos_freed_slaveAI>(creature);
     }
 };
 
@@ -1285,7 +1285,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_leader_secondAI(creature);
+        return GetPitOfSaronAI<npc_pos_leader_secondAI>(creature);
     }
 };
 
@@ -1327,7 +1327,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_frostbite_invisible_stalkerAI(creature);
+        return GetPitOfSaronAI<npc_frostbite_invisible_stalkerAI>(creature);
     }
 };
 

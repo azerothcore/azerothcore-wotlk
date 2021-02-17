@@ -13,6 +13,9 @@
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "ScriptMgr.h"
+#include "CreatureAIImpl.h"
+
+#define HallsOfReflectionScriptName "instance_halls_of_reflection"
 
 enum Data
 {
@@ -332,5 +335,11 @@ const Position StairsPos[2][3] =
         {5243.42f, 1624.8f, 784.361f, 5.76592f}
     }
 };
+
+template <class AI, class T>
+inline AI* GetHallsOfReflectionAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, HallsOfReflectionScriptName);
+}
 
 #endif

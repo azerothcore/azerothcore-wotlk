@@ -7,6 +7,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Player.h"
+#include "mana_tombs.h"
 
 enum Texts
 {
@@ -35,7 +36,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_pandemoniusAI(creature);
+        return GetManaTombsAI<boss_pandemoniusAI>(creature);
     }
 
     struct boss_pandemoniusAI : public ScriptedAI

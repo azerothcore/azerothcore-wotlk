@@ -7,6 +7,9 @@
 
 #include "SpellScript.h"
 #include "PassiveAI.h"
+#include "CreatureAIImpl.h"
+
+#define TheBlackMorassScriptName "instance_the_black_morass"
 
 enum DataTypes
 {
@@ -71,5 +74,11 @@ enum Misc
 
     ACTION_OUTRO                        = 1
 };
+
+template <class AI, class T>
+inline AI* GetTheBlackMorassAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, TheBlackMorassScriptName);
+}
 
 #endif

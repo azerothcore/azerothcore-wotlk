@@ -384,7 +384,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_vilebranch_speakerAI>(creature);
+        return GetZulGurubAI<npc_vilebranch_speakerAI>(creature);
     }
 };
 

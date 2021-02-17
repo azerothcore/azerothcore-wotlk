@@ -7,6 +7,10 @@
 #ifndef DEF_MOLTEN_CORE_H
 #define DEF_MOLTEN_CORE_H
 
+#include "CreatureAIImpl.h"
+
+#define MCScriptName "instance_molten_core"
+
 enum Encounters
 {
     BOSS_LUCIFRON                   = 0,
@@ -65,5 +69,11 @@ enum Data
 {
     DATA_RAGNAROS_ADDS  = 0,
 };
+
+template <class AI, class T>
+inline AI* GetMoltenCoreAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, MCScriptName);
+}
 
 #endif

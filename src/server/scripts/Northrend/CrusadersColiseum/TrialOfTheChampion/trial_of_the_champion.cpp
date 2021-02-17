@@ -82,7 +82,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_announcer_toc5AI(creature);
+        return GetTrialOfTheChampionAI<npc_announcer_toc5AI>(creature);
     }
 
     struct npc_announcer_toc5AI : public CreatureAI

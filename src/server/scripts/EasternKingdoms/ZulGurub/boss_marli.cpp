@@ -204,7 +204,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_marliAI(creature);
+        return GetZulGurubAI<boss_marliAI>(creature);
     }
 };
 
@@ -249,7 +249,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_spawn_of_marliAI(creature);
+        return GetZulGurubAI<npc_spawn_of_marliAI>(creature);
     }
 };
 

@@ -161,7 +161,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_dalliah_the_doomsayerAI(creature);
+        return GetArcatrazAI<boss_dalliah_the_doomsayerAI>(creature);
     }
 };
 

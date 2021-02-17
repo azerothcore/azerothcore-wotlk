@@ -8,6 +8,9 @@
 #include "SpellScript.h"
 #include "SpellAuras.h"
 #include "SpellAuraEffects.h"
+#include "CreatureAIImpl.h"
+
+#define OculusScriptName "instance_oculus"
 
 Position const VerdisaPOS = { 949.056f, 1032.97f, 359.967f, 1.035795f };
 Position const BelgaristraszPOS = { 941.355f, 1044.26f,  359.967f, 0.222459f };
@@ -91,4 +94,11 @@ enum MISC
 {
     POINT_MOVE_DRAKES
 };
+
+template <class AI, class T>
+inline AI* GetOculusAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, OculusScriptName);
+}
+
 #endif

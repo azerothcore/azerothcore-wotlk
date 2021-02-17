@@ -231,7 +231,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_millhouse_manastormAI(creature);
+        return GetArcatrazAI<npc_millhouse_manastormAI>(creature);
     }
 };
 
@@ -560,7 +560,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_warden_mellicharAI(creature);
+        return GetArcatrazAI<npc_warden_mellicharAI>(creature);
     }
 };
 

@@ -100,7 +100,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_warp_splinterAI(creature);
+        return GetTheBotanicaAI<boss_warp_splinterAI>(creature);
     }
 };
 

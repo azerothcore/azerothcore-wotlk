@@ -65,7 +65,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_gurtogg_bloodboilAI>(creature);
+        return GetBlackTempleAI<boss_gurtogg_bloodboilAI>(creature);
     }
 
     struct boss_gurtogg_bloodboilAI : public BossAI

@@ -281,7 +281,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_chromaggusAI>(creature);
+        return GetBlackwingLairAI<boss_chromaggusAI>(creature);
     }
 };
 
@@ -319,7 +319,7 @@ class go_chromaggus_lever : public GameObjectScript
 
         GameObjectAI* GetAI(GameObject* go) const override
         {
-            return GetInstanceAI<go_chromaggus_leverAI>(go);
+            return GetBlackwingLairAI<go_chromaggus_leverAI>(go);
         }
 };
 

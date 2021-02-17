@@ -30,7 +30,7 @@ gets instead the deserter debuff.
 class instance_the_underbog : public InstanceMapScript
 {
 public:
-    instance_the_underbog() : InstanceMapScript(TheUndebogScriptName, 546) { }
+    instance_the_underbog() : InstanceMapScript(TheUnderbogScriptName, 546) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

@@ -195,7 +195,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_majordomoAI>(creature);
+        return GetMoltenCoreAI<boss_majordomoAI>(creature);
     }
 };
 

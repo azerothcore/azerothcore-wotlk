@@ -129,7 +129,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc5_player_vehicleAI(pCreature);
+        return GetTrialOfTheChampionAI<npc_toc5_player_vehicleAI>(pCreature);
     }
 
     struct npc_toc5_player_vehicleAI : public NullCreatureAI
@@ -210,7 +210,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_toc5_grand_champion_minionAI(pCreature);
+        return GetTrialOfTheChampionAI<npc_toc5_grand_champion_minionAI>(pCreature);
     }
 
     struct npc_toc5_grand_champion_minionAI : public ScriptedAI
@@ -929,7 +929,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_grand_championAI(pCreature);
+        return GetTrialOfTheChampionAI<boss_grand_championAI>(pCreature);
     }
 };
 

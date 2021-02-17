@@ -291,7 +291,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_ragnarosAI>(creature);
+        return GetMoltenCoreAI<boss_ragnarosAI>(creature);
     }
 };
 
@@ -323,7 +323,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_son_of_flameAI>(creature);
+        return GetMoltenCoreAI<npc_son_of_flameAI>(creature);
     }
 };
 

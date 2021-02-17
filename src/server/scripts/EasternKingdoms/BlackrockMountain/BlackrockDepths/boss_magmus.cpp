@@ -6,16 +6,12 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "blackrock_depths.h"
 
 enum Spells
 {
     SPELL_FIERYBURST                                       = 13900,
     SPELL_WARSTOMP                                         = 24375
-};
-
-enum Misc
-{
-    DATA_THRONE_DOOR                                       = 24 // not id or guid of doors but number of enum in blackrock_depths.h
 };
 
 class boss_magmus : public CreatureScript
@@ -25,7 +21,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_magmusAI(creature);
+        return GetBlackrockDepthsAI<boss_magmusAI>(creature);
     }
 
     struct boss_magmusAI : public ScriptedAI

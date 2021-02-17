@@ -142,7 +142,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_brutallusAI>(creature);
+        return GetSunwellPlateauAI<boss_brutallusAI>(creature);
     }
 };
 
@@ -386,7 +386,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_madrigosaAI>(creature);
+        return GetSunwellPlateauAI<npc_madrigosaAI>(creature);
     }
 };
 

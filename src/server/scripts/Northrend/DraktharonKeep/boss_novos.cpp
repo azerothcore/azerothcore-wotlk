@@ -248,7 +248,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_novosAI>(creature);
+        return GetDraktharonKeepAI<boss_novosAI>(creature);
     }
 };
 

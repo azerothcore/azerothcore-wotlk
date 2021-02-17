@@ -4,6 +4,7 @@
 
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "auchenai_crypts.h"
 
 enum ExarchMaladaar
 {
@@ -35,7 +36,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_exarch_maladaarAI (creature);
+        return GetAuchenaiCryptsAI<boss_exarch_maladaarAI>(creature);
     }
 
     struct boss_exarch_maladaarAI : public ScriptedAI
@@ -162,7 +163,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_stolen_soulAI (creature);
+        return GetAuchenaiCryptsAI<npc_stolen_soulAI>(creature);
     }
 
     struct npc_stolen_soulAI : public ScriptedAI

@@ -211,7 +211,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_warbringer_omroggAI>(creature);
+        return GetShatteredHallsAI<boss_warbringer_omroggAI>(creature);
     }
 };
 
@@ -248,7 +248,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_omrogg_headsAI>(creature);
+        return GetShatteredHallsAI<npc_omrogg_headsAI>(creature);
     }
 };
 

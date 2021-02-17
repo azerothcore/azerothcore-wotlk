@@ -7,6 +7,9 @@
 
 #include "SpellScript.h"
 #include "PassiveAI.h"
+#include "CreatureAIImpl.h"
+
+#define ShatteredHallsLairScriptName "instance_shattered_halls"
 
 enum DataTypes
 {
@@ -50,5 +53,11 @@ enum SpellIds
     SPELL_KARGATHS_EXECUTIONER_2    = 39289,
     SPELL_KARGATHS_EXECUTIONER_3    = 39290
 };
+
+template <class AI, class T>
+inline AI* GetShatteredHallsAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, ShatteredHallsLairScriptName);
+}
 
 #endif
