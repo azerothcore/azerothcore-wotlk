@@ -954,7 +954,10 @@ class spell_pal_heart_of_the_crusader : public SpellScriptLoader
                 PreventDefaultAction();
 
                 uint32 spellId = sSpellMgr->GetSpellWithRank(SPELL_PALADIN_HEART_OF_THE_CRUSADER_EFF_R1, GetSpellInfo()->GetRank());
-                eventInfo.GetActor()->CastSpell(eventInfo.GetProcTarget(), spellId, aurEff);
+                if (auto actor = eventInfo.GetActor())
+                {
+                    actor->CastSpell(eventInfo.GetProcTarget(), spellId, aurEff);
+                }
             }
 
             void Register() override
