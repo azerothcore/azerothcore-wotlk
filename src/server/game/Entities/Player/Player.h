@@ -1173,6 +1173,9 @@ public:
     void CleanupAfterTaxiFlight();
     void ContinueTaxiFlight();
     // mount_id can be used in scripting calls
+
+    [[nodiscard]] bool IsDeveloper() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER); }
+    void SetDeveloper(bool on) { ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER, on); }
     [[nodiscard]] bool isAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
     void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
     [[nodiscard]] bool IsGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
@@ -2559,40 +2562,7 @@ public:
     bool SetHover(bool enable, bool packetOnly = false) override;
 
     [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
-
-    //! Return collision height sent to client
-    float GetCollisionHeight(bool mounted)
-    {
-        if (mounted)
-        {
-            CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID));
-            if (!mountDisplayInfo)
-                return GetCollisionHeight(false);
-
-            CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId);
-            if (!mountModelData)
-                return GetCollisionHeight(false);
-
-            CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId());
-            ASSERT(displayInfo);
-            CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayInfo->ModelId);
-            ASSERT(modelData);
-
-            float scaleMod = GetFloatValue(OBJECT_FIELD_SCALE_X); // 99% sure about this
-
-            return scaleMod * mountModelData->MountHeight + modelData->CollisionHeight * 0.5f;
-        }
-        else
-        {
-            //! Dismounting case - use basic default model data
-            CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId());
-            ASSERT(displayInfo);
-            CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayInfo->ModelId);
-            ASSERT(modelData);
-
-            return modelData->CollisionHeight;
-        }
-    }
+    [[nodiscard]] bool CanEnterWater() const override { return true; }
 
     // OURS
     // saving

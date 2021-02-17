@@ -24,7 +24,7 @@ enum Spells
     SPELL_CHANNEL           = 45537,
     SPELL_EGG_DESTROY       = 19873,
 
-    SPELL_CLEAVE            = 22540,
+    SPELL_CLEAVE            = 19632,
     SPELL_WARSTOMP          = 24375,
     SPELL_FIREBALLVOLLEY    = 22425,
     SPELL_CONFLAGRATION     = 23023
@@ -56,7 +56,7 @@ public:
 
     struct boss_razorgoreAI : public BossAI
     {
-        boss_razorgoreAI(Creature* creature) : BossAI(creature, BOSS_RAZORGORE) { }
+        boss_razorgoreAI(Creature* creature) : BossAI(creature, DATA_RAZORGORE_THE_UNTAMED) { }
 
         void Reset() override
         {
@@ -90,6 +90,9 @@ public:
         {
             if (action == ACTION_PHASE_TWO)
                 DoChangePhase();
+
+            if (action == TALK_EGG_BROKEN_RAND)
+                Talk(urand(SAY_EGGS_BROKEN1, SAY_EGGS_BROKEN3));
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -176,7 +179,18 @@ public:
         void HandleOnHit()
         {
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            {
                 instance->SetData(DATA_EGG_EVENT, SPECIAL);
+            }
+            if (GameObject* egg = GetCaster()->FindNearestGameObject(GO_EGG, 100))
+                {
+                    if (!egg)
+                        return;
+
+                    GetCaster()->GetAI()->DoAction(TALK_EGG_BROKEN_RAND);
+                    egg->SetLootState(GO_READY);
+                    egg->UseDoorOrButton(10000);
+                }
         }
 
         void Register() override

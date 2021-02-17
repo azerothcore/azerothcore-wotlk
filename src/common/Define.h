@@ -32,6 +32,7 @@
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #  define ACORE_PATH_MAX MAX_PATH
+#  define _USE_MATH_DEFINES
 #  ifndef DECLSPEC_NORETURN
 #    define DECLSPEC_NORETURN __declspec(noreturn)
 #  endif //DECLSPEC_NORETURN

@@ -257,6 +257,40 @@ bool CreatureAI::_EnterEvadeMode()
     return true;
 }
 
+void CreatureAI::MoveCircleChecks()
+{
+    Unit *victim = me->GetVictim();
+
+    if (
+        !victim ||
+        !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
+        !me->IsWithinMeleeRange(victim) || me == victim->GetVictim() ||
+        (victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet())  // only player & pets to save CPU
+    )
+    {
+        return;
+    }
+
+    me->GetMotionMaster()->MoveCircleTarget(me->GetVictim());
+}
+
+void CreatureAI::MoveBackwardsChecks() {
+    Unit *victim = me->GetVictim();
+
+    if (
+        !victim ||
+        !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
+        (victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet())
+    )
+    {
+        return;
+    }
+
+    float moveDist = me->GetMeleeRange(victim) / 2;
+
+    me->GetMotionMaster()->MoveBackwards(victim, moveDist);
+}
+
 Creature* CreatureAI::DoSummon(uint32 entry, const Position& pos, uint32 despawnTime, TempSummonType summonType)
 {
     return me->SummonCreature(entry, pos, summonType, despawnTime);
