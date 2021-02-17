@@ -451,7 +451,7 @@ void Loot::AddItem(LootStoreItem const& item)
         {
             if (Group* group = player->GetGroup())
             {
-                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                for (auto itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
                     if (Player *member = itr->GetSource())
                     {
