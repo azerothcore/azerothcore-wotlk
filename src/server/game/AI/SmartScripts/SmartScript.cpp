@@ -749,7 +749,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     if (go)
                     {
-                        // Xinef: may be NULL!
+                        // Xinef: may be nullptr!
                         go->CastSpell((*itr)->ToUnit(), e.action.cast.spell);
                     }
 
@@ -2104,7 +2104,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 break;
             }
         case SMART_ACTION_TRIGGER_TIMED_EVENT:
-            ProcessEventsFor((SMART_EVENT)SMART_EVENT_TIMED_EVENT_TRIGGERED, NULL, e.action.timeEvent.id);
+            ProcessEventsFor((SMART_EVENT)SMART_EVENT_TIMED_EVENT_TRIGGERED, nullptr, e.action.timeEvent.id);
 
             // xinef: remove this event if not repeatable
             if (e.event.event_flags & SMART_EVENT_FLAG_NOT_REPEATABLE)
@@ -2987,7 +2987,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         case SMART_ACTION_TRIGGER_RANDOM_TIMED_EVENT:
             {
                 uint32 eventId = urand(e.action.randomTimedEvent.minId, e.action.randomTimedEvent.maxId);
-                ProcessEventsFor((SMART_EVENT)SMART_EVENT_TIMED_EVENT_TRIGGERED, NULL, eventId);
+                ProcessEventsFor((SMART_EVENT)SMART_EVENT_TIMED_EVENT_TRIGGERED, nullptr, eventId);
                 break;
             }
         case SMART_ACTION_SET_HOVER:
@@ -3427,7 +3427,7 @@ SmartScriptHolder SmartScript::CreateSmartEvent(SMART_EVENT e, uint32 event_flag
     return script;
 }
 
-ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*= NULL*/)
+ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*= nullptr*/)
 {
     Unit* scriptTrigger = nullptr;
     if (invoker)
@@ -4297,7 +4297,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if (e.event.gameEvent.gameEventId != var0)
                     return;
-                ProcessAction(e, NULL, var0);
+                ProcessAction(e, nullptr, var0);
                 break;
             }
         case SMART_EVENT_GO_STATE_CHANGED:
@@ -4311,7 +4311,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if (e.event.eventInform.eventId != var0)
                     return;
-                ProcessAction(e, NULL, var0);
+                ProcessAction(e, nullptr, var0);
                 break;
             }
         case SMART_EVENT_ACTION_DONE:
@@ -4518,7 +4518,7 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
     if (e.GetEventType() == SMART_EVENT_UPDATE_IC && (!me || !me->IsInCombat()))
         return;
 
-    if (e.GetEventType() == SMART_EVENT_UPDATE_OOC && (me && me->IsInCombat()))//can be used with me=NULL (go script)
+    if (e.GetEventType() == SMART_EVENT_UPDATE_OOC && (me && me->IsInCombat()))//can be used with me=nullptr (go script)
         return;
 
     if (e.timer < diff)
@@ -4654,7 +4654,7 @@ void SmartScript::OnUpdate(uint32 const diff)
             mTalkerEntry = 0;
             mTextTimer = 0;
             mUseTextTimer = false;
-            ProcessEventsFor(SMART_EVENT_TEXT_OVER, NULL, textID, entry);
+            ProcessEventsFor(SMART_EVENT_TEXT_OVER, nullptr, textID, entry);
         }
         else mTextTimer -= diff;
     }
@@ -4717,7 +4717,7 @@ void SmartScript::GetScript()
     else if (trigger)
     {
         e = sSmartScriptMgr->GetScript((int32)trigger->entry, mScriptType);
-        FillScript(e, NULL, trigger);
+        FillScript(e, nullptr, trigger);
     }
 }
 
@@ -4756,7 +4756,7 @@ void SmartScript::OnInitialize(WorldObject* obj, AreaTrigger const* at)
     }
     else
     {
-        sLog->outError("SmartScript::OnInitialize: !WARNING! Initialized objects are NULL.");
+        sLog->outError("SmartScript::OnInitialize: !WARNING! Initialized objects are nullptr.");
         return;
     }
 

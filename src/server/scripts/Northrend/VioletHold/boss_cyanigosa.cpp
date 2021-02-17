@@ -109,7 +109,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_ARCANE_VACUUM:
-                    me->CastSpell((Unit*)NULL, SPELL_ARCANE_VACUUM, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_ARCANE_VACUUM, false);
                     DoResetThreat();
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->setAttackTimer(BASE_ATTACK, 3000);

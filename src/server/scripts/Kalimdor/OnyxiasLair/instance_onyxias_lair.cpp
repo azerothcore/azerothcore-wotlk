@@ -63,7 +63,7 @@ public:
             switch( go->GetEntry() )
             {
                 case GO_WHELP_SPAWNER:
-                    go->CastSpell((Unit*)NULL, 17646);
+                    go->CastSpell((Unit*)nullptr, 17646);
                     if( Creature* onyxia = instance->GetCreature(m_uiOnyxiasGUID) )
                         onyxia->AI()->DoAction(-1);
                     break;

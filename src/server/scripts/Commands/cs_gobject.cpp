@@ -236,7 +236,7 @@ public:
         else
         {
             std::ostringstream eventFilter;
-            eventFilter << " AND (eventEntry IS NULL ";
+            eventFilter << " AND (eventEntry IS nullptr ";
             bool initString = true;
 
             for (GameEventMgr::ActiveEvents::const_iterator itr = activeEventsList.begin(); itr != activeEventsList.end(); ++itr)

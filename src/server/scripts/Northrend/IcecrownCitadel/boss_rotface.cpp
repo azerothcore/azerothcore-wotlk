@@ -233,7 +233,7 @@ public:
                     {
                         uint32 index = getOozeFloodSpellIndex(spell->Id);
                         if (target->GetGUID() == _oozeFloodDummyGUIDs[index][0] || target->GetGUID() == _oozeFloodDummyGUIDs[index][1])
-                            target->CastSpell((Unit*)NULL, spell->Effects[0].CalcValue(), false);
+                            target->CastSpell((Unit*)nullptr, spell->Effects[0].CalcValue(), false);
                     }
                     break;
             }
@@ -281,14 +281,14 @@ public:
                     }
                     break;
                 case EVENT_MUTATED_INFECTION:
-                    me->CastCustomSpell(SPELL_MUTATED_INFECTION, SPELLVALUE_MAX_TARGETS, 1, NULL, false);
+                    me->CastCustomSpell(SPELL_MUTATED_INFECTION, SPELLVALUE_MAX_TARGETS, 1, nullptr, false);
                     events.ScheduleEvent(EVENT_MUTATED_INFECTION, infectionCooldown);
                     break;
                 case EVENT_ROTFACE_OOZE_FLOOD:
                     if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
                     {
                         professor->AI()->Talk(SAY_ROTFACE_OOZE_FLOOD);
-                        me->CastSpell((Unit*)NULL, oozeFloodSpells[_oozeFloodStage], true);
+                        me->CastSpell((Unit*)nullptr, oozeFloodSpells[_oozeFloodStage], true);
                         if (++_oozeFloodStage == 4)
                             _oozeFloodStage = 0;
                     }

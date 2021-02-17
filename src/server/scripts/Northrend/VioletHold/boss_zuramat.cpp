@@ -108,7 +108,7 @@ public:
                     events.RepeatEvent(urand(18000, 22000));
                     break;
                 case EVENT_SPELL_SUMMON_VOID_SENTRY:
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_VOID_SENTRY, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOID_SENTRY, false);
                     events.RepeatEvent(12000);
                     break;
             }

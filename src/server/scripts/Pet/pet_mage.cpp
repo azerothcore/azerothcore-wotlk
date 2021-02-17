@@ -90,7 +90,7 @@ public:
             me->SetReactState(REACT_DEFENSIVE);
 
             // Xinef: Inherit Master's Threat List (not yet implemented)
-            //owner->CastSpell((Unit*)NULL, SPELL_MAGE_MASTERS_THREAT_LIST, true);
+            //owner->CastSpell((Unit*)nullptr, SPELL_MAGE_MASTERS_THREAT_LIST, true);
             HostileReference* ref = owner->getHostileRefManager().getFirst();
             while (ref)
             {

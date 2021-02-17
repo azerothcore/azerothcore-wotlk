@@ -48,12 +48,12 @@ public:
         };
         static std::vector<ChatCommand> disableCommandTable =
         {
-            { "add",    SEC_ADMINISTRATOR,  true, NULL, "", addDisableCommandTable },
-            { "remove", SEC_ADMINISTRATOR,  true, NULL, "", removeDisableCommandTable },
+            { "add",    SEC_ADMINISTRATOR,  true, nullptr, "", addDisableCommandTable },
+            { "remove", SEC_ADMINISTRATOR,  true, nullptr, "", removeDisableCommandTable },
         };
         static std::vector<ChatCommand> commandTable =
         {
-            { "disable", SEC_ADMINISTRATOR, false, NULL, "", disableCommandTable },
+            { "disable", SEC_ADMINISTRATOR, false, nullptr, "", disableCommandTable },
         };
         return commandTable;
     }

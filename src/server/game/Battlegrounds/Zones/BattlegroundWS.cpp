@@ -70,18 +70,18 @@ void BattlegroundWS::PostUpdateImpl(uint32 diff)
                 RespawnFlagAfterDrop(TEAM_HORDE);
                 break;
             case BG_WS_EVENT_BOTH_FLAGS_KEPT10:
-                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)NULL))
+                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)nullptr))
                     player->CastSpell(player, BG_WS_SPELL_FOCUSED_ASSAULT, true);
-                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)NULL))
+                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)nullptr))
                     player->CastSpell(player, BG_WS_SPELL_FOCUSED_ASSAULT, true);
                 break;
             case BG_WS_EVENT_BOTH_FLAGS_KEPT15:
-                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)NULL))
+                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)nullptr))
                 {
                     player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
                     player->CastSpell(player, BG_WS_SPELL_BRUTAL_ASSAULT, true);
                 }
-                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)NULL))
+                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)nullptr))
                 {
                     player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
                     player->CastSpell(player, BG_WS_SPELL_BRUTAL_ASSAULT, true);
@@ -540,12 +540,12 @@ uint32 BattlegroundWS::GetAssaultSpellId() const
 
 void BattlegroundWS::RemoveAssaultAuras()
 {
-    if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)NULL))
+    if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)nullptr))
     {
         player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
         player->RemoveAurasDueToSpell(BG_WS_SPELL_BRUTAL_ASSAULT);
     }
-    if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)NULL))
+    if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)nullptr))
     {
         player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
         player->RemoveAurasDueToSpell(BG_WS_SPELL_BRUTAL_ASSAULT);

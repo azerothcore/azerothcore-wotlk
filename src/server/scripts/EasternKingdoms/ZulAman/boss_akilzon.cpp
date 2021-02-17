@@ -202,7 +202,7 @@ public:
                 me->InterruptNonMeleeSpells(false);
                 CloudGUID = 0;
                 if (Cloud)
-                    Unit::DealDamage(Cloud, Cloud, Cloud->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    Unit::DealDamage(Cloud, Cloud, Cloud->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                 SetWeather(WEATHER_STATE_FINE, 0.0f);
                 isRaining = false;
             }

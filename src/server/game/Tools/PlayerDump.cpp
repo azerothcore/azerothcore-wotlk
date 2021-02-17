@@ -392,11 +392,11 @@ DumpReturn PlayerDumpWriter::WriteDump(const std::string& file, uint32 guid)
 
 void fixNULLfields(std::string& line)
 {
-    std::string nullString("'NULL'");
+    std::string nullString("'nullptr'");
     size_t pos = line.find(nullString);
     while (pos != std::string::npos)
     {
-        line.replace(pos, nullString.length(), "NULL");
+        line.replace(pos, nullString.length(), "nullptr");
         pos = line.find(nullString);
     }
 }

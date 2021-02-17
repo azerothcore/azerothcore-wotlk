@@ -228,7 +228,7 @@ public:
             {
                 if (uiWaterBoltVolleyTimer <= uiDiff)
                 {
-                    me->CastSpell((Unit*)NULL, SPELL_WATER_BOLT_VOLLEY, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_WATER_BOLT_VOLLEY, false);
                     uiWaterBoltVolleyTimer = urand(10000, 15000);
                 }
                 else uiWaterBoltVolleyTimer -= uiDiff;

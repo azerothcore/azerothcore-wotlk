@@ -189,7 +189,7 @@ public:
 
             if (target->GetPower(POWER_MANA) == 0)
             {
-                target->CastSpell(target, SPELL_MARK_OF_KAZZAK_DAMAGE, true, NULL, aurEff);
+                target->CastSpell(target, SPELL_MARK_OF_KAZZAK_DAMAGE, true, nullptr, aurEff);
                 // Remove aura
                 SetDuration(0);
             }

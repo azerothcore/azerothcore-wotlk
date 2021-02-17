@@ -36,7 +36,7 @@ public:
             {
                 faction = me->getFaction();
                 me->Respawn();
-                me->UpdateEntry(NPC_BROKEN_KEEP_CANNON, NULL, false);
+                me->UpdateEntry(NPC_BROKEN_KEEP_CANNON, nullptr, false);
                 me->RemoveVehicleKit();
                 me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK);
             }
@@ -46,7 +46,7 @@ public:
         {
             if (spellInfo->Id == SPELL_REPAIR_TURRET_DUMMY && me->GetEntry() == NPC_BROKEN_KEEP_CANNON)
             {
-                me->UpdateEntry(NPC_KEEP_CANNON, NULL, false);
+                me->UpdateEntry(NPC_KEEP_CANNON, nullptr, false);
                 if (faction)
                     me->setFaction(faction);
                 me->CreateVehicleKit(510, NPC_KEEP_CANNON);

@@ -134,7 +134,7 @@ public:
     template<class T> static T* GetObjectInMap(uint64 guid, Map* map, T* /*typeSpecifier*/)
     {
         ASSERT(map);
-        if (T* obj = GetObjectInWorld(guid, (T*)NULL))
+        if (T* obj = GetObjectInWorld(guid, (T*)nullptr))
             if (obj->GetMap() == map)
                 return obj;
         return nullptr;

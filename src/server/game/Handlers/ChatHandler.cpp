@@ -433,7 +433,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 #endif
                 WorldPacket data;
-                ChatHandler::BuildChatPacket(data, ChatMsg(type), Language(lang), sender, NULL, msg);
+                ChatHandler::BuildChatPacket(data, ChatMsg(type), Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false, group->GetMemberGroup(GetPlayer()->GetGUID()));
             }
             break;
@@ -488,7 +488,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 #endif
                 WorldPacket data;
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID, Language(lang), sender, NULL, msg);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
             break;
@@ -509,7 +509,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 #endif
                 WorldPacket data;
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_LEADER, Language(lang), sender, NULL, msg);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_LEADER, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
             break;
@@ -526,7 +526,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 #endif
                 WorldPacket data;
                 //in battleground, raid warning is sent only to players in battleground - code is ok
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_WARNING, Language(lang), sender, NULL, msg);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_WARNING, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
             break;
@@ -543,7 +543,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 #endif
                 WorldPacket data;
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND, Language(lang), sender, NULL, msg);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
             break;
@@ -560,7 +560,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 #endif
                 WorldPacket data;
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND_LEADER, Language(lang), sender, NULL, msg);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND_LEADER, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
             break;

@@ -585,7 +585,7 @@ public:
                 EnterEvadeMode(); //We make sure that the npc is not attacking the player!
                 me->SetReactState(REACT_PASSIVE);
                 StartFollow(pCaster->ToPlayer(), 0, nullptr);
-                me->UpdateEntry(NPC_CAPTURED_BERLY_SORCERER, NULL, false);
+                me->UpdateEntry(NPC_CAPTURED_BERLY_SORCERER, nullptr, false);
                 DoCast(me, SPELL_COSMETIC_ENSLAVE_CHAINS_SELF, true);
                 me->DespawnOrUnsummon(45000);
 

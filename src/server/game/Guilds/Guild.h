@@ -330,7 +330,7 @@ public: // pussywizard: public class Member
         int32 GetBankWithdrawValue(uint8 tabId) const;
         void ResetValues();
 
-        inline Player* FindPlayer() const { return ObjectAccessor::GetObjectInOrOutOfWorld(m_guid, (Player*)NULL); }
+        inline Player* FindPlayer() const { return ObjectAccessor::GetObjectInOrOutOfWorld(m_guid, (Player*)nullptr); }
 
     private:
         uint32 m_guildId;
@@ -841,8 +841,8 @@ private:
     void _SendBankMoneyUpdate(WorldSession* session) const;
     void _SendBankContentUpdate(MoveItemData* pSrc, MoveItemData* pDest) const;
     void _SendBankContentUpdate(uint8 tabId, SlotIds slots) const;
-    void _SendBankList(WorldSession* session = NULL, uint8 tabId = 0, bool sendFullSlots = false, SlotIds* slots = nullptr) const;
+    void _SendBankList(WorldSession* session = nullptr, uint8 tabId = 0, bool sendFullSlots = false, SlotIds* slots = nullptr) const;
 
-    void _BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* param1 = NULL, const char* param2 = NULL, const char* param3 = nullptr) const;
+    void _BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* param1 = nullptr, const char* param2 = nullptr, const char* param3 = nullptr) const;
 };
 #endif

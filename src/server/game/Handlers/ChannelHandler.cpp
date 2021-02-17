@@ -341,7 +341,7 @@ void WorldSession::HandleSetChannelWatch(WorldPacket& recvPacket)
         return;
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, NULL, false))
+        if (Channel* channel = cMgr->GetChannel(channelName, nullptr, false))
             channel->AddWatching(GetPlayer());
 }
 
@@ -354,6 +354,6 @@ void WorldSession::HandleClearChannelWatch(WorldPacket& recvPacket)
         return;
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, NULL, false))
+        if (Channel* channel = cMgr->GetChannel(channelName, nullptr, false))
             channel->RemoveWatching(GetPlayer());
 }

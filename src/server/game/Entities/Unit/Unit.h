@@ -1274,11 +1274,11 @@ struct AttackPosition {
     {
         if (!val)
         {
-            // _pos = NULL;
+            // _pos = nullptr;
             _taken = false;
-            return 0; // NULL
+            return 0; // nullptr
         }
-        return 0; // NULL
+        return 0; // nullptr
     };
     Position _pos;
     bool _taken;

@@ -232,14 +232,14 @@ public:
                 case EVENT_SUMMON_NETHER_PORTAL:
                     Talk(EMOTE_NETHER_PORTAL);
                     Talk(SAY_MISTRESS_OF_PAIN);
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_NETHER_PORTAL, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_NETHER_PORTAL, false);
 
                     events.RescheduleEvent(EVENT_SUMMON_VOLCANO, 60000);
                     break;
                 case EVENT_SUMMON_VOLCANO:
                     Talk(EMOTE_INFERNAL_ERUPTION);
                     Talk(SAY_INFERNAL_ERUPTION);
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_VOLCANO, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOLCANO, false);
 
                     events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 60000);
                     break;
@@ -410,7 +410,7 @@ public:
                     events.RepeatEvent(urand(25000, 30000));
                     break;
                 case EVENT_SPELL_MISTRESS_KISS:
-                    me->CastSpell((Unit*)NULL, SPELL_MISTRESS_KISS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_MISTRESS_KISS, false);
                     events.RepeatEvent(urand(25000, 35000));
                     break;
             }

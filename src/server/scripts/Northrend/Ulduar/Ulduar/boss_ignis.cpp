@@ -343,7 +343,7 @@ public:
                 case 0:
                     break;
                 case EVENT_ACTIVATE_CONSTRUCT:
-                    me->CastCustomSpell(SPELL_ACTIVATE_CONSTRUCT, SPELLVALUE_MAX_TARGETS, 1, (Unit*)NULL, false);
+                    me->CastCustomSpell(SPELL_ACTIVATE_CONSTRUCT, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
                     if (++counter >= 20)
                     {
                         me->MonsterYell(TEXT_BERSERK, LANG_UNIVERSAL, 0);

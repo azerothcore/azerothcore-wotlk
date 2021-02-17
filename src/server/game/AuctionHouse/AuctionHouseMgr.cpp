@@ -477,7 +477,7 @@ void AuctionHouseObject::Update()
     time_t checkTime = sWorld->GetGameTime() + 60;
     ///- Handle expired auctions
 
-    // If storage is empty, no need to update. next == NULL in this case.
+    // If storage is empty, no need to update. next == nullptr in this case.
     if (AuctionsMap.empty())
         return;
 

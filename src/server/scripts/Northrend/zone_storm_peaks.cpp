@@ -1018,7 +1018,7 @@ public:
         void HandlePeriodic(AuraEffect const* /* aurEff */)
         {
             if (++_counter == 5)
-                GetTarget()->CastSpell((Unit*)NULL, SPELL_DESPAWN_RIFT, true);
+                GetTarget()->CastSpell((Unit*)nullptr, SPELL_DESPAWN_RIFT, true);
         }
 
         void Register() override

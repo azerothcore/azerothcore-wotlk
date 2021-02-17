@@ -170,7 +170,7 @@ public:
                     break;
                 case EVENT_SPELL_COLDFLAME:
                     if (!me->HasAura(SPELL_BONE_STORM))
-                        me->CastSpell((Unit*)NULL, SPELL_COLDFLAME_NORMAL, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_COLDFLAME_NORMAL, false);
                     events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_COLDFLAME_BONE_STORM:

@@ -108,11 +108,11 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_BLOODLUST:
-                    me->CastSpell((Unit*)NULL, SPELL_BLOODLUST, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_BLOODLUST, false);
                     events.RepeatEvent(urand(35000, 45000));
                     break;
                 case EVENT_SPELL_BREAK_BONDS:
-                    me->CastSpell((Unit*)NULL, SPELL_BREAK_BONDS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_BREAK_BONDS, false);
                     events.RepeatEvent(urand(16000, 22000));
                     break;
                 case EVENT_SPELL_CHAIN_HEAL:

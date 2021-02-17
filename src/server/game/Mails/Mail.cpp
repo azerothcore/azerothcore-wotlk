@@ -177,7 +177,7 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
     if (!sendMail) // can be changed in the hook
         return;
 
-    Player* pReceiver = receiver.GetPlayer();               // can be NULL
+    Player* pReceiver = receiver.GetPlayer();               // can be nullptr
     Player* pSender = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(sender.GetSenderId(), 0, HIGHGUID_PLAYER));
 
     if (pReceiver)

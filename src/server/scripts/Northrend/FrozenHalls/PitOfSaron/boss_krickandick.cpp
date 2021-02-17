@@ -108,7 +108,7 @@ public:
             {
                 WorldPacket data;
 
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, NULL, EMOTE_ICK_CHASING);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, EMOTE_ICK_CHASING);
                 target->ToPlayer()->GetSession()->SendPacket(&data);
 
                 AttackStart(target);
@@ -122,7 +122,7 @@ public:
             if (Vehicle* v = me->GetVehicleKit())
                 if (Unit* p = v->GetPassenger(0))
                     return p->ToCreature();
-            return (Creature*)NULL;
+            return (Creature*)nullptr;
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
