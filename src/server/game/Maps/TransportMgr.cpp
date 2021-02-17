@@ -80,6 +80,7 @@ void TransportMgr::LoadTransportTemplates()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u transport templates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 class SplineRawInitializer
@@ -428,11 +429,11 @@ void TransportMgr::SpawnContinentTransports()
                     if (!tInfo->inInstance)
                         if (CreateTransport(entry, guid))
                             ++count;
-
             } while (result->NextRow());
         }
 
         sLog->outString(">> Spawned %u continent motion transports in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        sLog->outString();
 
         if (sWorld->getBoolConfig(CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING))
         {
@@ -456,7 +457,6 @@ void TransportMgr::SpawnContinentTransports()
                             map->LoadGrid(x, y);
                             ++count;
                         }
-
                 } while (result->NextRow());
             }
 

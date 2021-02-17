@@ -42,7 +42,6 @@ enum FreyaSpells
     SPELL_UNSTABLE_SUN_FREYA_DAMAGE_25          = 62865,
     SPELL_UNSTABLE_SUN_VISUAL                   = 62216,
 
-
     // ELDERS
     SPELL_DRAINED_OF_POWER                      = 62467,
     SPELL_STONEBARK_ESSENCE                     = 62483,
@@ -163,6 +162,7 @@ enum FreyaEvents
 
     // SUMMONS
     EVENT_ANCIENT_CONSERVATOR_NATURE_FURY       = 40,
+    EVENT_ANCIENT_CONSERVATOR_GRIP              = 41,
     EVENT_WATER_SPIRIT_CHARGE                   = 45,
     EVENT_WATER_SPIRIT_DAMAGE                   = 46,
     EVENT_STORM_LASHER_LIGHTNING_LASH           = 50,
@@ -387,16 +387,16 @@ public:
             {
                 me->MonsterYell("Children, assist me!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_TRIO);
-                me->SummonCreature(NPC_ANCIENT_WATER_SPIRIT, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT));
-                me->SummonCreature(NPC_STORM_LASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT));
-                me->SummonCreature(NPC_SNAPLASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT));
+                me->SummonCreature(NPC_ANCIENT_WATER_SPIRIT, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                me->SummonCreature(NPC_STORM_LASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                me->SummonCreature(NPC_SNAPLASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
             }
             // Ancient Conservator
             else if (_waveNumber == 2)
             {
                 me->MonsterYell("Eonar, your servant requires aid!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_CONSERVATOR);
-                me->SummonCreature(NPC_ANCIENT_CONSERVATOR, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_CORPSE_DESPAWN);
+                me->SummonCreature(NPC_ANCIENT_CONSERVATOR, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
             }
             // Detonating Lashers
             else if (_waveNumber == 3)
@@ -404,7 +404,7 @@ public:
                 me->MonsterYell("The swarm of the elements shall overtake you!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_DETONATING);
                 for (uint8 i = 0; i < 10; ++i)
-                    me->SummonCreature(NPC_DETONATING_LASHER, me->GetPositionX() + urand(5, 20), me->GetPositionY() + urand(5, 20), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_CORPSE_DESPAWN);
+                    me->SummonCreature(NPC_DETONATING_LASHER, me->GetPositionX() + urand(5, 20), me->GetPositionY() + urand(5, 20), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
             }
         }
 
@@ -586,7 +586,7 @@ public:
                         {
                             x = me->GetPositionX() + urand(7, 25);
                             y = me->GetPositionY() + urand(7, 25);
-                            z = me->GetMap()->GetHeight(x, y, MAX_HEIGHT) + 0.5f;
+                            z = me->GetMapHeight(x, y, me->GetPositionZ());
                             if (me->IsWithinLOS(x, y, z))
                             {
                                 me->CastSpell(x, y, z, SPELL_SUMMON_LIFEBINDER, true);
@@ -641,11 +641,11 @@ public:
                     events.RepeatEvent(45000 + urand(0, 10000));
                     break;
                 case EVENT_FREYA_UNSTABLE_SUN_BEAM:
-                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
                     if (Is25ManRaid())
                     {
-                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
                     }
                     events.RepeatEvent(38000 + urand(0, 10000));
                     break;
@@ -1055,7 +1055,6 @@ public:
     };
 };
 
-
 class boss_freya_healthy_spore : public CreatureScript
 {
 public:
@@ -1159,7 +1158,7 @@ public:
             if (me->GetEntry() == NPC_ANCIENT_CONSERVATOR)
             {
                 me->CastSpell(me, SPELL_HEALTHY_SPORE_SUMMON, true);
-                me->CastSpell(me, SPELL_CONSERVATOR_GRIP, true);
+                events.ScheduleEvent(EVENT_ANCIENT_CONSERVATOR_GRIP, 6000);
                 events.ScheduleEvent(EVENT_ANCIENT_CONSERVATOR_NATURE_FURY, 14000);
                 _stackCount = ACTION_REMOVE_25_STACK;
             }
@@ -1201,6 +1200,9 @@ public:
                     me->CastSpell(me->GetVictim(), SPELL_NATURE_FURY, false);
                     events.RepeatEvent(14000);
                     break;
+                case EVENT_ANCIENT_CONSERVATOR_GRIP:
+                   me->CastSpell(me, SPELL_CONSERVATOR_GRIP, true);
+                   break;
                 case EVENT_WATER_SPIRIT_CHARGE:
                     me->CastSpell(me, SPELL_TIDAL_WAVE_AURA, true);
                     me->CastSpell(me->GetVictim(), SPELL_TIDAL_WAVE, false);

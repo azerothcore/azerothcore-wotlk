@@ -759,7 +759,6 @@ public:
                     (go->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_ALLIANCE] && passenger->getRaceMask() & RACEMASK_ALLIANCE));
         }
 
-
         Creature* IsValidVehicle(Creature* cVeh)
         {
             if (!cVeh->HasAura(SPELL_VEHICLE_TELEPORT))
@@ -810,12 +809,13 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_BUILD_CATAPULT_FORCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_BUILD_DEMOLISHER_FORCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE))
-                return false;
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_BUILD_CATAPULT_FORCE,
+                    SPELL_BUILD_DEMOLISHER_FORCE,
+                    SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE,
+                    SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE
+                });
         }
 
         void HandleScript(SpellEffIndex effIndex)
@@ -1035,7 +1035,6 @@ public:
         return new spell_wg_reduce_damage_by_distance_SpellScript();
     }
 };
-
 
 ////////////////////////////////////////////////
 /////// ACHIEVEMENTs

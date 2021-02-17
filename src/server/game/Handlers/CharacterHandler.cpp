@@ -433,7 +433,6 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
                     return;
                 }
 
-
                 ASSERT(_charCreateCallback.GetParam() == createInfo);
 
                 PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_SUM_CHARS);
@@ -897,7 +896,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     data << pCurrChar->GetMapId();
     data << pCurrChar->GetPositionX();
     data << pCurrChar->GetPositionY();
-    data << pCurrChar->GetPositionZ() + pCurrChar->GetHoverHeight();
+    data << pCurrChar->GetPositionZ();
     data << pCurrChar->GetOrientation();
     SendPacket(&data);
 
@@ -945,7 +944,6 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         pCurrChar->SetInGuild(0);
         pCurrChar->SetRank(0);
     }
-
 
     data.Initialize(SMSG_LEARNED_DANCE_MOVES, 4 + 4);
     data << uint32(0);
@@ -1139,7 +1137,6 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
 
     m_playerLoading = false;
 
-
     // Handle Login-Achievements (should be handled after loading)
     _player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_ON_LOGIN, 1);
 
@@ -1217,7 +1214,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     data << pCurrChar->GetMapId();
     data << pCurrChar->GetPositionX();
     data << pCurrChar->GetPositionY();
-    data << pCurrChar->GetPositionZ() + pCurrChar->GetHoverHeight();
+    data << pCurrChar->GetPositionZ();
     data << pCurrChar->GetOrientation();
     SendPacket(&data);
 

@@ -85,7 +85,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         return;
     }
 
-    GetPlayer()->Relocate(loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetOrientation());
+    float z = loc.GetPositionZ() + GetPlayer()->GetHoverHeight();
+    GetPlayer()->Relocate(loc.GetPositionX(), loc.GetPositionY(), z, loc.GetOrientation());
 
     GetPlayer()->ResetMap();
     GetPlayer()->SetMap(newMap);
@@ -476,7 +477,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     // Xinef: interrupt parachutes upon falling or landing in water
     if (opcode == MSG_MOVE_FALL_LAND || opcode == MSG_MOVE_START_SWIM)
         mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // Parachutes
-
 
     if (plrMover)                                            // nothing is charmed, or player charmed
     {

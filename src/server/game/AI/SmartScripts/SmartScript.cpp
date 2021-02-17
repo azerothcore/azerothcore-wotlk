@@ -1304,7 +1304,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                     if (IsCreature(*itr))
-                        (*itr)->ToCreature()->UpdateEntry(e.action.updateTemplate.creature, NULL, e.action.updateTemplate.updateLevel != 0);
+                        (*itr)->ToCreature()->UpdateEntry(e.action.updateTemplate.creature, nullptr, e.action.updateTemplate.updateLevel != 0);
 
                 delete targets;
                 break;
@@ -2630,7 +2630,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             }
                             else
                                 (*itr)->ToCreature()->SetHomePosition((*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation());
-
                         }
                     delete targets;
                 }

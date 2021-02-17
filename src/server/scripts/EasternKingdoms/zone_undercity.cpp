@@ -481,7 +481,6 @@ enum ThrallMisc
     THRALL_SAY_THRONE_10 = 34,
     THRALL_SAY_THRONE_11 = 35,
 
-
     // Sounds
     SOUND_THRALL_1 = 16212,
     SOUND_THRALL_2 = 16214,
@@ -2237,9 +2236,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_INGEST))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_INGEST });
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)

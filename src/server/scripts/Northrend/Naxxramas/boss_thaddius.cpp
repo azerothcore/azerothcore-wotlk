@@ -262,7 +262,7 @@ public:
                     StartEvent();
                     break;
                 case EVENT_THADDIUS_START_2:
-                    
+
                     Talk(SAY_AGGRO);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
@@ -276,7 +276,7 @@ public:
                     return;
                 case EVENT_THADDIUS_SPELL_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    
+
                     break;
                 case EVENT_THADDIUS_SPELL_CHAIN_LIGHTNING:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_CHAIN_LIGHTNING_10, SPELL_CHAIN_LIGHTNING_25), false);
@@ -288,7 +288,7 @@ public:
                     break;
                 case EVENT_ACTIVATE_BALL_LIGHTNING:
                     ballLightningEnabled = true;
-                    
+
                     break;
             }
 
@@ -594,9 +594,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_POSITIVE_POLARITY) || !sSpellMgr->GetSpellInfo(SPELL_NEGATIVE_POLARITY))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_POSITIVE_POLARITY, SPELL_NEGATIVE_POLARITY });
         }
 
         void HandleDummy(SpellEffIndex /* effIndex */)

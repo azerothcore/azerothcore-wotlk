@@ -69,7 +69,6 @@ public:
                     go->SendCustomAnim(1);
                 }
             }
-
         }
     };
 
@@ -196,7 +195,6 @@ public:
     }
 };
 
-
 ///////////////////////////////
 // SPELLS
 ///////////////////////////////
@@ -219,9 +217,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_CRAB_DISGUISE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_CRAB_DISGUISE });
         }
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -231,7 +227,6 @@ public:
                 caster->CastSpell(caster, SPELL_APPLY_DIGUISE, true);
                 caster->setFaction(88);
             }
-
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

@@ -691,7 +691,7 @@ public:
                         me->CastSpell(me, SPELL_EXPOSE_WEAKNESS, true);
                         me->CastSpell(me, SPELL_SPIDER_FRENZY, true);
                         me->CastSpell(me, SPELL_SUBMERGE, false);
-                        
+
                         events.DelayEvents(15000);
                         events.RescheduleEvent(EVENT_EMERGE, 10000);
                     }
@@ -704,7 +704,7 @@ public:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_EMERGE, false);
                     me->RemoveAura(SPELL_SUBMERGE);
-                    
+
                     events.RescheduleEvent(EVENT_SUBMERGE, 30000);
                     break;
             }
@@ -813,12 +813,12 @@ public:
                     break;
                 case 1:
                     me->CastSpell(me, SPELL_SPIKE_SPEED2, true);
-                    
+
                     events.RescheduleEvent(2, 7000);
                     break;
                 case 2:
                     me->CastSpell(me, SPELL_SPIKE_SPEED3, true);
-                    
+
                     break;
                 case 3:
                     Reset();
@@ -889,11 +889,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellEntry*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_LEECHING_SWARM_DMG))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_LEECHING_SWARM_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_LEECHING_SWARM_DMG, SPELL_LEECHING_SWARM_HEAL });
         }
 
         void HandleEffectPeriodic(AuraEffect const* aurEff)
@@ -939,7 +935,6 @@ public:
                     caster->CastCustomSpell(caster, SPELL_LEECHING_SWARM_HEAL, &damage, 0, 0, true);
                 }
         }
-
 
         void Register() override
         {

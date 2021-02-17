@@ -1033,7 +1033,6 @@ public:
     }
 };
 
-
 // Theirs
 // 50462 - Anti-Magic Shell (on raid member)
 class spell_dk_anti_magic_shell_raid : public SpellScriptLoader
@@ -1097,9 +1096,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_RUNIC_POWER_ENERGIZE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DK_RUNIC_POWER_ENERGIZE });
         }
 
         void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
@@ -1169,9 +1166,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DK_ANTI_MAGIC_SHELL_TALENT });
         }
 
         void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
@@ -1214,9 +1209,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_BLOOD_BOIL_TRIGGERED))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DK_BLOOD_BOIL_TRIGGERED });
         }
 
         bool Load() override
@@ -1260,9 +1253,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_BLOOD_GORGED_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DK_BLOOD_GORGED_HEAL });
         }
 
         bool Load() override
@@ -1333,14 +1324,14 @@ public:
     {
         PrepareSpellScript(spell_dk_corpse_explosion_SpellScript);
 
-        bool Validate(SpellInfo const* spellInfo) override
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_CORPSE_EXPLOSION_TRIGGERED)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_GHOUL_EXPLODE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_CORPSE_EXPLOSION_VISUAL)
-                    || !sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_1].CalcValue()))
-                return false;
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_DK_CORPSE_EXPLOSION_TRIGGERED,
+                    SPELL_DK_GHOUL_EXPLODE,
+                    SPELL_DK_CORPSE_EXPLOSION_VISUAL,
+                });
         }
 
         bool Load() override
@@ -1439,9 +1430,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_COIL_DAMAGE) || !sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_COIL_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DK_DEATH_COIL_DAMAGE, SPELL_DK_DEATH_COIL_HEAL });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1738,9 +1727,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_DEATH_STRIKE_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DK_DEATH_STRIKE_HEAL });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1761,7 +1748,6 @@ public:
         {
             OnEffectHitTarget += SpellEffectFn(spell_dk_death_strike_SpellScript::HandleDummy, EFFECT_2, SPELL_EFFECT_DUMMY);
         }
-
     };
 
     SpellScript* GetSpellScript() const override
@@ -1780,12 +1766,9 @@ public:
     {
         PrepareSpellScript(spell_dk_ghoul_explode_SpellScript);
 
-        bool Validate(SpellInfo const* spellInfo) override
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_CORPSE_EXPLOSION_TRIGGERED)
-                    || spellInfo->Effects[EFFECT_2].CalcValue() <= 0)
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DK_CORPSE_EXPLOSION_TRIGGERED });
         }
 
         void HandleDamage(SpellEffIndex /*effIndex*/)
@@ -1879,12 +1862,13 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_BLOOD_PRESENCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_FROST_PRESENCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_UNHOLY_PRESENCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_IMPROVED_BLOOD_PRESENCE_TRIGGERED))
-                return false;
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_DK_BLOOD_PRESENCE,
+                    SPELL_DK_FROST_PRESENCE,
+                    SPELL_DK_UNHOLY_PRESENCE,
+                    SPELL_DK_IMPROVED_BLOOD_PRESENCE_TRIGGERED
+                });
         }
 
         void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -1926,12 +1910,13 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_BLOOD_PRESENCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_FROST_PRESENCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_UNHOLY_PRESENCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_FROST_PRESENCE_TRIGGERED))
-                return false;
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_DK_BLOOD_PRESENCE,
+                    SPELL_DK_FROST_PRESENCE,
+                    SPELL_DK_UNHOLY_PRESENCE,
+                    SPELL_DK_FROST_PRESENCE_TRIGGERED
+                });
         }
 
         void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -1973,13 +1958,14 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_BLOOD_PRESENCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_FROST_PRESENCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_UNHOLY_PRESENCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_IMPROVED_UNHOLY_PRESENCE_TRIGGERED)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_UNHOLY_PRESENCE_TRIGGERED))
-                return false;
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_DK_BLOOD_PRESENCE,
+                    SPELL_DK_FROST_PRESENCE,
+                    SPELL_DK_UNHOLY_PRESENCE,
+                    SPELL_DK_IMPROVED_UNHOLY_PRESENCE_TRIGGERED,
+                    SPELL_DK_UNHOLY_PRESENCE_TRIGGERED
+                });
         }
 
         void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -2079,19 +2065,19 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_BLOOD_PRESENCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_FROST_PRESENCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_UNHOLY_PRESENCE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_IMPROVED_BLOOD_PRESENCE_R1)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_IMPROVED_FROST_PRESENCE_R1)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_IMPROVED_UNHOLY_PRESENCE_R1)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_IMPROVED_BLOOD_PRESENCE_TRIGGERED)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_IMPROVED_UNHOLY_PRESENCE_TRIGGERED)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_FROST_PRESENCE_TRIGGERED)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_UNHOLY_PRESENCE_TRIGGERED))
-                return false;
-
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_DK_BLOOD_PRESENCE,
+                    SPELL_DK_FROST_PRESENCE,
+                    SPELL_DK_UNHOLY_PRESENCE,
+                    SPELL_DK_IMPROVED_BLOOD_PRESENCE_R1,
+                    SPELL_DK_IMPROVED_FROST_PRESENCE_R1,
+                    SPELL_DK_IMPROVED_UNHOLY_PRESENCE_R1,
+                    SPELL_DK_IMPROVED_BLOOD_PRESENCE_TRIGGERED,
+                    SPELL_DK_IMPROVED_UNHOLY_PRESENCE_TRIGGERED,
+                    SPELL_DK_FROST_PRESENCE_TRIGGERED,
+                    SPELL_DK_UNHOLY_PRESENCE_TRIGGERED
+                });
         }
 
         void HandleImprovedBloodPresence(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -2193,14 +2179,13 @@ public:
     {
         PrepareSpellScript(spell_dk_raise_dead_SpellScript);
 
-        bool Validate(SpellInfo const* spellInfo) override
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_1].CalcValue())
-                    || !sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_2].CalcValue())
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_RAISE_DEAD_USE_REAGENT)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DK_MASTER_OF_GHOULS))
-                return false;
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_DK_RAISE_DEAD_USE_REAGENT,
+                    SPELL_DK_MASTER_OF_GHOULS
+                });
         }
 
         bool Load() override
@@ -2356,9 +2341,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_SCENT_OF_BLOOD))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DK_SCENT_OF_BLOOD });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
@@ -2401,9 +2384,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DK_SCOURGE_STRIKE_TRIGGERED))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DK_SCOURGE_STRIKE_TRIGGERED });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)

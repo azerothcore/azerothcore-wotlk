@@ -31,7 +31,6 @@ enum DruidSpells
     SPELL_DRUID_GLYPH_OF_BARKSKIN           = 63057,
     SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER   = 63058,
 
-
     // Theirs
     SPELL_DRUID_ENRAGE_MOD_DAMAGE           = 51185,
     SPELL_DRUID_GLYPH_OF_TYPHOON            = 62135,
@@ -365,7 +364,6 @@ public:
     }
 };
 
-
 // Theirs
 // -1850 - Dash
 class spell_dru_dash : public SpellScriptLoader
@@ -408,10 +406,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_KING_OF_THE_JUNGLE)
-                    || !sSpellMgr->GetSpellInfo(SPELL_DRUID_ENRAGE_MOD_DAMAGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DRUID_KING_OF_THE_JUNGLE, SPELL_DRUID_ENRAGE_MOD_DAMAGE });
         }
 
         void OnHit()
@@ -444,9 +439,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_INCREASED_MOONFIRE_DURATION) || !sSpellMgr->GetSpellInfo(SPELL_DRUID_NATURES_SPLENDOR))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DRUID_INCREASED_MOONFIRE_DURATION, SPELL_DRUID_NATURES_SPLENDOR });
         }
 
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
@@ -591,11 +584,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_ENERGIZE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DRUID_LIFEBLOOM_FINAL_HEAL, SPELL_DRUID_LIFEBLOOM_ENERGIZE });
         }
 
         void AfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -669,9 +658,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_LIVING_SEED_PROC))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DRUID_LIVING_SEED_PROC });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -705,9 +692,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_LIVING_SEED_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DRUID_LIVING_SEED_HEAL });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
@@ -994,9 +979,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_SAVAGE_ROAR))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DRUID_SAVAGE_ROAR });
         }
 
         void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -1132,9 +1115,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DRUID_SURVIVAL_INSTINCTS))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DRUID_SURVIVAL_INSTINCTS });
         }
 
         void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)

@@ -126,7 +126,6 @@ public:
     }
 };
 
-
 // Theirs
 /*#####
 # npc_invis_infernal_caster
@@ -157,7 +156,7 @@ public:
 
         void Reset() override
         {
-            ground = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+            ground = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
             SummonInfernal();
             events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, urand(1000, 3000));
         }
@@ -429,7 +428,6 @@ enum EnshlavedNetherwingDrake
     // Creatures
     NPC_DRAGONMAW_SUBJUGATOR        = 21718,
     NPC_ESCAPE_DUMMY                = 22317
-
 };
 
 class npc_enslaved_netherwing_drake : public CreatureScript
@@ -1829,4 +1827,3 @@ void AddSC_shadowmoon_valley()
     new npc_enraged_spirit();
     new npc_shadowmoon_tuber_node();
 }
-

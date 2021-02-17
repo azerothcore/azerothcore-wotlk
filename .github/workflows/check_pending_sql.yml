@@ -1,4 +1,4 @@
-name: Check pending sql for Procedure/Function
+name: Check pending SQL
 on:
   pull_request:
 
@@ -20,7 +20,7 @@ jobs:
         run: |
          for i in `find data/sql/updates/pending* -name "*.sql" -type f`; do
          if [[ $(cat "$i"|sed 's/ --.*$//'|tr -d '\n'|tail -c 1) != ";"  ]]; then
-            echo "Missing Semicolon at the end of the file. (;)"
+            echo "Missing Semicolon (;) or multiple newlines at the end of the file."
             exit 1
          else
             exit 0

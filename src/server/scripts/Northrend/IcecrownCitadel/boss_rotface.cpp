@@ -756,9 +756,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_UNSTABLE_OOZE_EXPLOSION_TRIGGER))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_UNSTABLE_OOZE_EXPLOSION_TRIGGER });
         }
 
         void HandleCast(SpellEffIndex effIndex)
@@ -855,7 +853,6 @@ public:
         return new spell_rotface_unstable_ooze_explosion_suicide_AuraScript();
     }
 };
-
 
 class npc_precious_icc : public CreatureScript
 {

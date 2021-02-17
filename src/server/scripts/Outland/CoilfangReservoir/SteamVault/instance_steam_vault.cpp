@@ -33,7 +33,6 @@ public:
 
         return true;
     }
-
 };
 
 class instance_steam_vault : public InstanceMapScript

@@ -5,9 +5,13 @@
  */
 
 #include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "Player.h"
 #include "blackwing_lair.h"
+#include "InstanceScript.h"
+#include "GameObject.h"
+#include "GameObjectAI.h"
+#include "Map.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
 
 enum Emotes
 {
@@ -59,8 +63,13 @@ public:
 
     struct boss_chromaggusAI : public BossAI
     {
-        boss_chromaggusAI(Creature* creature) : BossAI(creature, BOSS_CHROMAGGUS)
+        boss_chromaggusAI(Creature* creature) : BossAI(creature, DATA_CHROMAGGUS)
         {
+            Initialize();
+
+            Breath1_Spell = 0;
+            Breath2_Spell = 0;
+
             // Select the 2 breaths that we are going to use until despawned
             // 5 possiblities for the first breath, 4 for the second, 20 total possiblites
             // This way we don't end up casting 2 of the same breath
@@ -85,7 +94,7 @@ public:
                     Breath2_Spell = SPELL_FROSTBURN;
                     break;
 
-                // B1 - TL
+                    // B1 - TL
                 case 4:
                     Breath1_Spell = SPELL_TIMELAPSE;
                     Breath2_Spell = SPELL_INCINERATE;
@@ -103,7 +112,7 @@ public:
                     Breath2_Spell = SPELL_FROSTBURN;
                     break;
 
-                //B1 - Acid
+                    //B1 - Acid
                 case 8:
                     Breath1_Spell = SPELL_CORROSIVEACID;
                     Breath2_Spell = SPELL_INCINERATE;
@@ -121,7 +130,7 @@ public:
                     Breath2_Spell = SPELL_FROSTBURN;
                     break;
 
-                //B1 - Ignite
+                    //B1 - Ignite
                 case 12:
                     Breath1_Spell = SPELL_IGNITEFLESH;
                     Breath2_Spell = SPELL_INCINERATE;
@@ -139,7 +148,7 @@ public:
                     Breath2_Spell = SPELL_FROSTBURN;
                     break;
 
-                //B1 - Frost
+                    //B1 - Frost
                 case 16:
                     Breath1_Spell = SPELL_FROSTBURN;
                     Breath2_Spell = SPELL_INCINERATE;
@@ -161,24 +170,24 @@ public:
             EnterEvadeMode();
         }
 
-        void Reset() override
+        void Initialize()
         {
-            _Reset();
-
             CurrentVurln_Spell = 0;     // We use this to store our last vulnerabilty spell so we can remove it later
             Enraged = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void Reset() override
         {
-            if (instance->GetBossState(BOSS_FLAMEGOR) != DONE)
-            {
-                EnterEvadeMode();
-                return;
-            }
-            _EnterCombat();
+            _Reset();
 
-            events.ScheduleEvent(EVENT_SHIMMER, 0);
+            Initialize();
+        }
+
+        void EnterCombat(Unit* victim) override
+        {
+            BossAI::EnterCombat(victim);
+
+            events.ScheduleEvent(EVENT_SHIMMER, 1000);
             events.ScheduleEvent(EVENT_BREATH_1, 30000);
             events.ScheduleEvent(EVENT_BREATH_2, 60000);
             events.ScheduleEvent(EVENT_AFFLICTION, 10000);
@@ -214,13 +223,13 @@ public:
                             break;
                         }
                     case EVENT_BREATH_1:
-                        DoCastVictim(Breath1_Spell);
-                        events.ScheduleEvent(EVENT_BREATH_1, 60000);
-                        break;
+                            DoCastVictim(Breath1_Spell);
+                            events.ScheduleEvent(EVENT_BREATH_1, 60000);
+                            break;
                     case EVENT_BREATH_2:
-                        DoCastVictim(Breath2_Spell);
-                        events.ScheduleEvent(EVENT_BREATH_2, 60000);
-                        break;
+                            DoCastVictim(Breath2_Spell);
+                            events.ScheduleEvent(EVENT_BREATH_2, 60000);
+                            break;
                     case EVENT_AFFLICTION:
                         {
                             Map::PlayerList const& players = me->GetMap()->GetPlayers();
@@ -230,15 +239,14 @@ public:
                                 {
                                     DoCast(player, RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN), true);
 
-                                    if (player->HasAura(SPELL_BROODAF_BLUE) &&
+                                        if (player->HasAura(SPELL_BROODAF_BLUE) &&
                                             player->HasAura(SPELL_BROODAF_BLACK) &&
                                             player->HasAura(SPELL_BROODAF_RED) &&
                                             player->HasAura(SPELL_BROODAF_BRONZE) &&
                                             player->HasAura(SPELL_BROODAF_GREEN))
-                                    {
-                                        DoCast(player, SPELL_CHROMATIC_MUT_1);
-                                    }
-
+                                        {
+                                            DoCast(player, SPELL_CHROMATIC_MUT_1);
+                                        }
                                 }
                             }
                         }
@@ -246,9 +254,12 @@ public:
                         break;
                     case EVENT_FRENZY:
                         DoCast(me, SPELL_FRENZY);
-                        events.ScheduleEvent(EVENT_FRENZY, urand(10000, 15000));
+                        events.ScheduleEvent(EVENT_FRENZY, 10000, 15000);
                         break;
                 }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                    return;
             }
 
             // Enrage if not already enraged and below 20%
@@ -274,7 +285,46 @@ public:
     }
 };
 
+class go_chromaggus_lever : public GameObjectScript
+{
+    public:
+        go_chromaggus_lever() : GameObjectScript("go_chromaggus_lever") { }
+
+        struct go_chromaggus_leverAI : public GameObjectAI
+        {
+            go_chromaggus_leverAI(GameObject* go) : GameObjectAI(go), _instance(go->GetInstanceScript()) { }
+
+            bool OnGossipHello(Player* player)
+            {
+                if (_instance->GetBossState(DATA_CHROMAGGUS) != DONE && _instance->GetBossState(DATA_CHROMAGGUS) != IN_PROGRESS)
+                {
+                    _instance->SetBossState(DATA_CHROMAGGUS, IN_PROGRESS);
+
+                    if (Creature* creature = _instance->instance->GetCreature(DATA_CHROMAGGUS))
+                        creature->AI()->AttackStart(player);
+
+                    if (GameObject* go = _instance->instance->GetGameObject(DATA_GO_CHROMAGGUS_DOOR))
+                        _instance->HandleGameObject(0, true, go);
+                }
+
+                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
+                go->SetGoState(GO_STATE_ACTIVE);
+
+                return true;
+            }
+
+        private:
+            InstanceScript* _instance;
+        };
+
+        GameObjectAI* GetAI(GameObject* go) const override
+        {
+            return GetInstanceAI<go_chromaggus_leverAI>(go);
+        }
+};
+
 void AddSC_boss_chromaggus()
 {
     new boss_chromaggus();
+    new go_chromaggus_lever();
 }

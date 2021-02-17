@@ -50,7 +50,6 @@ void Graveyard::LoadGraveyardFromDB()
         _graveyardStore[ID] = Graveyard;
 
         ++Count;
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %i graveyard in %u ms", Count, GetMSTimeDiffToNow(oldMSTime));
@@ -347,7 +346,6 @@ void Graveyard::LoadGraveyardZones()
 
         if (!AddGraveyardLink(safeLocId, zoneId, teamId, false))
             sLog->outErrorDb("Table `graveyard_zone` has a duplicate record for Graveyard (ID: %u) and Zone (ID: %u), skipped.", safeLocId, zoneId);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u graveyard-zone links in %u ms", count, GetMSTimeDiffToNow(oldMSTime));

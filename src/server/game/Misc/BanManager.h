@@ -19,7 +19,6 @@ enum BanReturn
 class BanManager
 {
 public:
-
     static BanManager* instance();
 
     BanReturn BanAccount(std::string const& AccountName, std::string const& Duration, std::string const& Reason, std::string const& Author);

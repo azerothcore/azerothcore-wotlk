@@ -212,7 +212,6 @@ public:
                                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
                                 return;
                             }
-
                         }
                         events.RepeatEvent(5000);
                         return;

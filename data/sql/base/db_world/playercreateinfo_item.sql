@@ -9,10 +9,11 @@ DROP TABLE IF EXISTS `playercreateinfo_item`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `playercreateinfo_item` 
 (
-  `race` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `class` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `itemid` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `amount` tinyint(4) NOT NULL DEFAULT '1',
+  `race` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `class` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `itemid` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `amount` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `Note` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`race`,`class`,`itemid`),
   KEY `playercreateinfo_race_class_index` (`race`,`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -20,8 +21,6 @@ CREATE TABLE `playercreateinfo_item`
 
 LOCK TABLES `playercreateinfo_item` WRITE;
 /*!40000 ALTER TABLE `playercreateinfo_item` DISABLE KEYS */;
-INSERT INTO `playercreateinfo_item` VALUES 
-(0,6,40582,-1);
 /*!40000 ALTER TABLE `playercreateinfo_item` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

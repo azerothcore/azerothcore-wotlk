@@ -117,7 +117,6 @@ enum ForestFrog
 class npc_forest_frog : public CreatureScript
 {
 public:
-
     npc_forest_frog() : CreatureScript("npc_forest_frog") { }
 
     struct npc_forest_frogAI : public ScriptedAI
@@ -584,7 +583,6 @@ enum Weapons
 class npc_harrison_jones : public CreatureScript
 {
 public:
-
     npc_harrison_jones() : CreatureScript("npc_harrison_jones")
     {
     }
@@ -632,7 +630,7 @@ public:
                 me->SetEntry(NPC_HARRISON_JONES_2);
                 me->SetDisplayId(MODEL_HARRISON_JONES_2);
                 me->SetTarget(0);
-                me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_DEAD);
+                me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_DEAD);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                 instance->SetData(DATA_GONGEVENT, DONE);
             }

@@ -51,7 +51,6 @@ enum Creatures
     NPC_PORTAL                  = 17265
 };
 
-
 class npc_kilrek : public CreatureScript
 {
 public:
@@ -142,7 +141,6 @@ public:
         void AttackStart(Unit* /*who*/) override { }
         void MoveInLineOfSight(Unit* /*who*/) override { }
 
-
         void JustDied(Unit* /*killer*/) override
         {
             if (SacrificeGUID)
@@ -208,8 +206,6 @@ public:
         void Reset() override
         {
             FireboltTimer = 2000;
-
-            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -364,7 +360,6 @@ public:
                     SummonKilrekTimer = 45000;
                 }
             }
-
 
             if (SummonKilrekTimer <= diff)
             {

@@ -138,7 +138,6 @@ public:
 
                     ++speechCounter;
                     DoCastAOE(SPELL_THREAT_PULSE, true);
-
                 }
                 else
                     speechTimer -= diff;
@@ -149,7 +148,6 @@ public:
             CombatAI::UpdateAI(diff);
         }
     };
-
 };
 
 /*######
@@ -227,7 +225,6 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 me->LoadEquipment(0, true);
                 me->RemoveAllAuras();
-                me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ALL, true);
                 summons.DespawnAll();
             }
         }
@@ -390,7 +387,6 @@ public:
             }
         }
     };
-
 };
 
 //Scarlet courier
@@ -479,7 +475,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 //Koltira & Valroth- Breakout
@@ -568,7 +563,6 @@ public:
             killer->CastSpell(me, SPELL_SUMMON_VALROTH_REMAINS, true);
         }
     };
-
 };
 
 /*######

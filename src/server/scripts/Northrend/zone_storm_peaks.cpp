@@ -438,7 +438,6 @@ public:
                 }
                 else
                     Talk(2);
-
             }
         }
 
@@ -683,7 +682,6 @@ public:
         return new spell_q13007_iron_colossus_SpellScript();
     };
 };
-
 
 // Theirs
 /*######
@@ -1014,7 +1012,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            return sSpellMgr->GetSpellInfo(SPELL_DESPAWN_RIFT);
+            return ValidateSpellInfo({ SPELL_DESPAWN_RIFT });
         }
 
         void HandlePeriodic(AuraEffect const* /* aurEff */)
@@ -1030,7 +1028,6 @@ public:
 
     private:
         uint8 _counter;
-
     };
 
     AuraScript* GetAuraScript() const override
