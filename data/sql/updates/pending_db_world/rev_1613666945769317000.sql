@@ -101,8 +101,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (17130,0,1,0,54,0,100,0,0,0,0,0,0,80,1713000,0,0,0,0,0,1,0,0,0,0,0,0,0,"Talbuk Stag - Just Summoned - Run Script"),
 (1713000,9,0,0,0,0,100,0,0,0,0,0,0,2,14,0,0,0,0,0,1,0,0,0,0,0,0,0,"Talbuk Stag - On Script - Set Faction 14"),
 (1713000,9,1,0,0,0,100,0,0,0,0,0,0,89,5,0,0,0,0,0,1,0,0,0,0,0,0,0,"Talbuk Stag - On Script - Start Random Movement"),
-(1713000,9,2,0,0,0,100,0,0,0,0,0,0,117,1,0,0,0,0,0,1,0,0,0,0,0,0,0,"Talbuk Stag - On Script - Disable Evade"),
-(1713000,9,3,0,0,0,100,0,10000,10000,0,0,0,49,0,0,0,0,0,0,23,0,0,0,0,0,0,0,"Talbuk Stag - On Script - Start Attacking");
+(1713000,9,2,0,0,0,100,0,10000,10000,0,0,0,49,0,0,0,0,0,0,23,0,0,0,0,0,0,0,"Talbuk Stag - On Script - Start Attacking");
 -- Texts
 DELETE FROM `creature_text` WHERE (`CreatureID` IN (18294, 18297, 18218, 18180, 18200));
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
