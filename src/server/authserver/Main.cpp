@@ -39,6 +39,20 @@
 #define _ACORE_REALM_CONFIG "authserver.conf"
 #endif
 
+#ifdef _WIN32
+#include "ServiceWin32.h"
+char serviceName[] = "authserver";
+char serviceLongName[] = "AzerothCore authentication service";
+char serviceDescription[] = "AzerothCore World of Warcraft emulator authentication service";
+/*
+ * -1 - not in service mode
+ *  0 - stopped
+ *  1 - running
+ *  2 - paused
+ */
+int m_ServiceStatus = -1;
+#endif
+
 bool StartDB();
 void StopDB();
 
@@ -55,8 +69,14 @@ public:
         switch (sigNum)
         {
             case SIGINT:
-            case SIGTERM:
                 stopEvent = true;
+                break;
+            case SIGTERM:
+#ifdef _WIN32
+            case SIGBREAK:
+                if (m_ServiceStatus != 1)
+#endif
+                    stopEvent = true;
                 break;
         }
     }
@@ -65,9 +85,15 @@ public:
 /// Print out the usage string for this program on the console.
 void usage(const char* prog)
 {
-    sLog->outString("Usage: \n %s [<options>]\n"
-                    "    -c config_file           use config_file as configuration file\n\r",
-                    prog);
+    sLog->outString("Usage:\n"
+                    " %s [<options>]\n"
+                    "    -c config_file           use config_file as configuration file\n\r", prog);
+#ifdef _WIN32
+    sLog->outString("    Running as service functions:\n"
+                    "    --service                run as service\n"
+                    "    -s install               install service\n"
+                    "    -s uninstall             uninstall service\n\r");
+#endif
 }
 
 /// Launch the auth server
@@ -89,6 +115,40 @@ extern int main(int argc, char** argv)
             else
                 configFile = argv[count];
         }
+
+#ifdef _WIN32
+        if (strcmp(argv[count], "-s") == 0) // Services
+        {
+            if (++count >= argc)
+            {
+                printf("Runtime-Error: -s option requires an input argument\n");
+                usage(argv[0]);
+                return 1;
+            }
+
+            if (strcmp(argv[count], "install") == 0)
+            {
+                if (WinServiceInstall())
+                    printf("Installing service\n");
+                return 1;
+            }
+            else if (strcmp(argv[count], "uninstall") == 0)
+            {
+                if (WinServiceUninstall())
+                    printf("Uninstalling service\n");
+                return 1;
+            }
+            else
+            {
+                printf("Runtime-Error: unsupported option %s\n", argv[count]);
+                usage(argv[0]);
+                return 1;
+            }
+        }
+
+        if (strcmp(argv[count], "--service") == 0)
+            WinServiceRun();
+#endif
         ++count;
     }
 
@@ -181,10 +241,17 @@ extern int main(int argc, char** argv)
     // Initialize the signal handlers
     AuthServerSignalHandler SignalINT, SignalTERM;
 
+#ifdef _WIN32
+    AuthServerSignalHandler SignalBREAK;
+#endif /* _WIN32 */
+
     // Register authservers's signal handlers
     ACE_Sig_Handler Handler;
     Handler.register_handler(SIGINT, &SignalINT);
     Handler.register_handler(SIGTERM, &SignalTERM);
+#ifdef _WIN32
+    Handler.register_handler(SIGBREAK, &SignalBREAK);
+#endif
 
 #if defined(_WIN32) || defined(__linux__)
 
@@ -280,6 +347,14 @@ extern int main(int argc, char** argv)
             sLog->outDetail("Ping MySQL to keep connection alive");
             LoginDatabase.KeepAlive();
         }
+
+#ifdef _WIN32
+        if (m_ServiceStatus == 0)
+            break;
+
+        while (m_ServiceStatus == 2)
+            Sleep(1000);
+#endif
     }
 
     // Close the Database Pool and library
