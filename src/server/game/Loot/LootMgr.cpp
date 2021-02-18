@@ -458,6 +458,7 @@ void Loot::AddItem(LootStoreItem const& item)
                         if (generatedLoot.AllowedForPlayer(member))
                         {
                             canSeeItemInLootWindow = true;
+                            break;
                         }
                     }
                 }
