@@ -162,14 +162,14 @@ public:
             { "info",           SEC_MODERATOR,      false, &HandleNpcInfoCommand,              "" },
             { "near",           SEC_GAMEMASTER,     false, &HandleNpcNearCommand,              "" },
             { "move",           SEC_ADMINISTRATOR,  false, &HandleNpcMoveCommand,              "" },
-            { "playemote",      SEC_ADMINISTRATOR,  false, &HandleNpcPlayEmoteCommand,         "" },
+            { "playemote",      SEC_GAMEMASTER,  false, &HandleNpcPlayEmoteCommand,         "" },
             { "say",            SEC_GAMEMASTER,     false, &HandleNpcSayCommand,               "" },
             { "textemote",      SEC_GAMEMASTER,     false, &HandleNpcTextEmoteCommand,         "" },
             { "whisper",        SEC_GAMEMASTER,     false, &HandleNpcWhisperCommand,           "" },
             { "yell",           SEC_GAMEMASTER,     false, &HandleNpcYellCommand,              "" },
             { "tame",           SEC_GAMEMASTER,     false, &HandleNpcTameCommand,              "" },
-            { "add",            SEC_GAMEMASTER,     false, nullptr,                            "", npcAddCommandTable },
-            { "delete",         SEC_GAMEMASTER,     false, nullptr,                            "", npcDeleteCommandTable },
+            { "add",            SEC_ADMINISTRATOR,     false, nullptr,                         "", npcAddCommandTable },
+            { "delete",         SEC_ADMINISTRATOR,     false, nullptr,                         "", npcDeleteCommandTable },
             { "follow",         SEC_GAMEMASTER,     false, nullptr,                            "", npcFollowCommandTable },
             { "set",            SEC_ADMINISTRATOR,  false, nullptr,                            "", npcSetCommandTable }
         };
