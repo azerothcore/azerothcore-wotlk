@@ -25470,6 +25470,23 @@ uint32 Player::CalculateTalentsPoints() const
 {
     uint32 base_talent = getLevel() < 10 ? 0 : getLevel() - 9;
 
+    // * * * jake's edit start  * * *//
+
+    uint32 extra_talents_per_threshhold = 2;  //extra 2 talent points per threshold
+    uint32 threshold = 5; //every 5 levels
+    uint32 extra_talents = ((getLevel() - 10)/threshold) * extra_talents_per_threshhold;
+
+    // gives extra_talents_per_threshold at lvl 10
+    extra_talents += getLevel() < 10 ? 0 : extra_talents_per_threshhold;
+    
+    // gives 1 extra talent point at level 80
+    extra_talents += getLevel() < 80 ? 0 : 1;
+    base_talent += extra_talents;
+
+    //probably doesnt work for DK
+    
+    // * * * jake's edit end  * * *//
+
     if (getClass() != CLASS_DEATH_KNIGHT || GetMapId() != 609)
         return uint32(base_talent * sWorld->getRate(RATE_TALENT));
 
