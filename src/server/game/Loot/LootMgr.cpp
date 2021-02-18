@@ -447,13 +447,13 @@ void Loot::AddItem(LootStoreItem const& item)
 
         // In some cases, a dropped item should be visible/lootable only for some players in group
         bool canSeeItemInLootWindow = false;
-        if (Player* player = ObjectAccessor::FindPlayer(lootOwnerGUID))
+        if (auto player = ObjectAccessor::FindPlayer(lootOwnerGUID))
         {
-            if (Group* group = player->GetGroup())
+            if (auto group = player->GetGroup())
             {
                 for (auto itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
-                    if (Player *member = itr->GetSource())
+                    if (auto member = itr->GetSource())
                     {
                         if (generatedLoot.AllowedForPlayer(member))
                         {
