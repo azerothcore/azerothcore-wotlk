@@ -238,4 +238,3 @@ WardenCheckResult const* WardenCheckMgr::GetWardenResultById(uint16 Id)
 
     return nullptr;
 }
-

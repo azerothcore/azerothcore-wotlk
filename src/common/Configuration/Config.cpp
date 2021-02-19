@@ -147,7 +147,7 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
             sLog->outError("> Config: Bad value defined for name '%s', going to use '%s' instead",
                 name.c_str(), acore::ToString(def).c_str());
         }
-        
+
         return def;
     }
 

@@ -23,7 +23,6 @@ protected:
     FollowerReference i_target;
 };
 
-
 template<class T>
 class ChaseMovementGenerator : public MovementGeneratorMedium<T, ChaseMovementGenerator<T>>, public TargetedMovementGeneratorBase
 {
