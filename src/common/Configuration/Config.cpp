@@ -218,7 +218,7 @@ std::string const ConfigMgr::GetConfigPath()
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
     return "configs/";
 #else
-    return std::string(CONF_DIR) + "/";
+    return std::string(_CONF_DIR) + "/";
 #endif
 }
 
