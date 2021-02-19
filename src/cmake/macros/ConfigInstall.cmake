@@ -77,7 +77,7 @@ endfunction()
 
 #
 # Use it like:
-# CollectModulesConfig(${CMAKE_CURRENT_SOURCE_DIR})
+# CollectModulesConfig()
 #
 
 function(CollectModulesConfig)
