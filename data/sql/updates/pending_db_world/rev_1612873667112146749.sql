@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1612873667112146749');
 
--- Illusion of Jandice Barov, immunity to all spell schools but normal, slower walking and use SAI
+-- Illusion of Jandice Barov, immunity to all magic schools (not melee), slower walking and use SAI
 UPDATE `creature_template` SET `speed_walk` = 1, `spell_school_immune_mask` = 126, `AIName`="SmartAI" WHERE `entry` = 11439;
 
 -- Illusion of Jandice Barov, SAI
