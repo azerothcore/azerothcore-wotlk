@@ -292,7 +292,7 @@ bool ConfigMgr::LoadModulesConfigs()
     for (auto const& itr : moduleConfigFiles)
         sLog->outString("> %s", itr.c_str());
 
-    sLog->outString("config", "");
+    sLog->outString("");
 
     return true;
 }
