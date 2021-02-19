@@ -308,26 +308,37 @@ bool ConfigMgr::LoadModulesConfigs()
     return true;
 }
 
-// Deprecated geters
+/*
+ * Deprecated geters. This geters will be deleted
+ */
+
+// @deprecated DO NOT USE - use GetOption<std::string> instead.
 std::string ConfigMgr::GetStringDefault(std::string const& name, const std::string& def, bool showLogs /*= true*/)
 {
     return GetOption<std::string>(name, def, showLogs);
 }
 
+// @deprecated DO NOT USE - use GetOption<bool> instead.
 bool ConfigMgr::GetBoolDefault(std::string const& name, bool def, bool showLogs /*= true*/)
 {
     return GetOption<bool>(name, def, showLogs);
 }
 
+// @deprecated DO NOT USE - use GetOption<int32> instead.
 int ConfigMgr::GetIntDefault(std::string const& name, int def, bool showLogs /*= true*/)
 {
     return GetOption<int32>(name, def, showLogs);
 }
 
+// @deprecated DO NOT USE - use GetOption<float> instead.
 float ConfigMgr::GetFloatDefault(std::string const& name, float def, bool showLogs /*= true*/)
 {
     return GetOption<float>(name, def, showLogs);
 }
+
+/*
+ * End deprecated geters
+ */
 
 #define TEMPLATE_CONFIG_OPTION(__typename) \
     template __typename ConfigMgr::GetOption<__typename>(std::string const& name, __typename const& def, bool showLogs /*= true*/) const;
