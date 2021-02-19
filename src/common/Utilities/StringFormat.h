@@ -8,7 +8,6 @@
 #ifndef _STRING_FORMAT_H_
 #define _STRING_FORMAT_H_
 
-#include "Common.h"
 #include <fmt/printf.h>
 
 namespace acore
