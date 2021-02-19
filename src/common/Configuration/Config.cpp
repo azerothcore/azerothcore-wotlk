@@ -211,6 +211,17 @@ std::vector<std::string> ConfigMgr::GetKeysByString(std::string const& name)
     return keys;
 }
 
+std::string const& ConfigMgr::GetFilename()
+{
+    std::lock_guard<std::mutex> lock(_configLock);
+    return _filename;
+}
+
+std::vector<std::string> const& ConfigMgr::GetArguments() const
+{
+    return _args;
+}
+
 std::string const ConfigMgr::GetConfigPath()
 {
     std::lock_guard<std::mutex> lock(_configLock);
