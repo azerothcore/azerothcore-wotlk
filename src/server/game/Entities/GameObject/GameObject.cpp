@@ -486,6 +486,14 @@ void GameObject::Update(uint32 diff)
             }
         case GO_READY:
             {
+                // lfm auto fishing
+                if (GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE)
+                {
+                    Unit* caster = GetOwner();
+                    Use(caster);
+                    break;
+                }
+
                 if (m_respawnTime > 0)                          // timer on
                 {
                     time_t now = time(nullptr);
@@ -1589,10 +1597,21 @@ void GameObject::Use(Unit* user)
                         }
                 }
 
+                // lfm auto fishing
+                uint32 maxSlot = loot.GetMaxSlotInLootFor(player);
+                for (uint32 checkSlot = 0; checkSlot < maxSlot; checkSlot++)
+                {
+                    player->StoreLootItem(checkSlot, &loot);
+                }
+
+                player->FinishSpell(CURRENT_CHANNELED_SPELL);
                 if(tmpfish)
                     player->FinishSpell(CURRENT_CHANNELED_SPELL, true);
                 else
                     player->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
+
+                player->fishingDelay = 200;
+
                 return;
             }
 

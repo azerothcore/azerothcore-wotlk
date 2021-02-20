@@ -974,6 +974,9 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_applyResilience = true;
 
     m_isInstantFlightOn = true;
+
+    // lfm auto fishing
+    fishingDelay = 0;
 }
 
 Player::~Player()
@@ -1956,6 +1959,17 @@ void Player::Update(uint32 p_time)
         UpdateObjectVisibility(true, true);
         m_delayed_unit_relocation_timer = 0;
         RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
+    }
+
+    // lfm auto fishing
+    if (fishingDelay > 0)
+    {
+        fishingDelay -= p_time;
+        if (fishingDelay <= 0)
+        {
+            CastSpell(this, 7620);
+            fishingDelay = 0;
+        }
     }
 }
 

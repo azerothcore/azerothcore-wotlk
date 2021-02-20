@@ -2539,25 +2539,6 @@ public:
                 {
                 case 1:
                 {
-                    if (me->SelectNearestPlayer(45.0f))
-                    {
-                        events.ScheduleEvent(2, 5000);
-                        events.ScheduleEvent(3, 14000);
-                        events.ScheduleEvent(4, 22000);
-                        events.ScheduleEvent(5, 26000);
-                        events.ScheduleEvent(6, 28000);
-                        events.ScheduleEvent(7, 28500);
-                        events.ScheduleEvent(8, 33000);
-                        events.ScheduleEvent(9, 33500);
-                    }
-                    else
-                    {
-                        events.RepeatEvent(1000);
-                    }
-                    break;
-                }
-                case 2:
-                {
                     std::list<Creature*> list;
                     me->GetCreatureListWithEntryInGrid(list, LFM_Creature_Entry::LFM_Creature_Entry_Deathstalker_Vincent, 10.0f);
                     if (list.size() > 0)
@@ -2568,7 +2549,48 @@ public:
                             {
                                 // handle only one
                                 me->SetFacingToObject(vincent);
-                                vincent->AI()->SetData(1, 0);
+                                vincent->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
+                                vincent->ClearUnitState(UNIT_STATE_DIED);
+                                vincent->SetStandState(UnitStandStateType::UNIT_STAND_STATE_STAND);
+                                vincent->SetFacingToObject(me);
+                                events.ScheduleEvent(2, 1000);
+                                break;
+                            }
+                        }
+                    }
+                    events.RepeatEvent(1000);
+                    break;
+                }
+                case 2:
+                {
+                    if (me->SelectNearestPlayer(45.0f))
+                    {
+                        events.ScheduleEvent(3, 1000);
+                        events.ScheduleEvent(4, 10000);
+                        events.ScheduleEvent(5, 18000);
+                        events.ScheduleEvent(6, 22000);
+                        events.ScheduleEvent(7, 24000);
+                        events.ScheduleEvent(8, 24500);
+                        events.ScheduleEvent(9, 29000);
+                        events.ScheduleEvent(10, 29500);
+                    }
+                    else
+                    {
+                        events.RepeatEvent(1000);
+                    }
+                    break;
+                }
+                case 3:
+                {
+                    std::list<Creature*> list;
+                    me->GetCreatureListWithEntryInGrid(list, LFM_Creature_Entry::LFM_Creature_Entry_Deathstalker_Vincent, 10.0f);
+                    if (list.size() > 0)
+                    {
+                        for (std::list<Creature*>::iterator cIT = list.begin(); cIT != list.end(); cIT++)
+                        {
+                            if (Creature* vincent = *cIT)
+                            {
+                                // handle only one
                                 me->AI()->Talk(0);
                                 me->HandleEmoteCommand(Emote::EMOTE_ONESHOT_TALK_NO_SHEATHE);
                                 break;
@@ -2583,18 +2605,18 @@ public:
                     }
                     break;
                 }
-                case 3:
+                case 4:
                 {
                     me->AI()->Talk(1);
                     me->HandleEmoteCommand(Emote::EMOTE_ONESHOT_POINT_NO_SHEATHE);
                     break;
                 }
-                case 4:
+                case 5:
                 {
                     me->AI()->Talk(2);
                     break;
                 }
-                case 5:
+                case 6:
                 {
                     std::list<Creature*> list;
                     me->GetCreatureListWithEntryInGrid(list, LFM_Creature_Entry::LFM_Creature_Entry_Deathstalker_Vincent, 10.0f);
@@ -2619,7 +2641,7 @@ public:
                     }
                     break;
                 }
-                case 6:
+                case 7:
                 {
                     if (Player* targetPlayer = me->SelectNearestPlayer(45.0f))
                     {
@@ -2627,18 +2649,18 @@ public:
                     }
                     break;
                 }
-                case 7:
+                case 8:
                 {
                     me->AI()->Talk(3);
                     me->HandleEmoteCommand(Emote::EMOTE_ONESHOT_LAUGH_NO_SHEATHE);
                     break;
                 }
-                case 8:
+                case 9:
                 {
                     me->CastSpell(me, 4801);
                     break;
                 }
-                case 9:
+                case 10:
                 {
                     me->SetRespawnDelay(7 * TimeConstants::DAY);
                     me->DespawnOrUnsummon();
@@ -2668,31 +2690,11 @@ public:
 
         void Reset() override
         {
-            me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
-            me->ClearUnitState(UNIT_STATE_DIED);
-            me->SetStandState(UnitStandStateType::UNIT_STAND_STATE_STAND);
         }
 
         void SetData(uint32 type, uint32 data) override
         {
-            if (type == 1 && data == 0)
-            {
-                std::list<Creature*> list;
-                me->GetCreatureListWithEntryInGrid(list, LFM_Creature_Entry::LFM_Creature_Entry_Arugal, 10.0f);
-                if (list.size() > 0)
-                {
-                    for (std::list<Creature*>::iterator cIT = list.begin(); cIT != list.end(); cIT++)
-                    {
-                        if (Creature* arugal = *cIT)
-                        {
-                            // handle only one
-                            me->SetFacingToObject(arugal);
-                            break;
-                        }
-                    }
-                }
-            }
-            else if (type == 1 && data == 1)
+            if (type == 1 && data == 1)
             {
                 me->AI()->Talk(0);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);

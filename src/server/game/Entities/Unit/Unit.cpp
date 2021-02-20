@@ -396,7 +396,7 @@ void Unit::Update(uint32 p_time)
         }
     }
 
-    _UpdateSpells( p_time );
+    _UpdateSpells(p_time);
 
     if (CanHaveThreatList() && getThreatManager().isNeedUpdateToClient(p_time))
         SendThreatListUpdate();
@@ -439,6 +439,44 @@ void Unit::Update(uint32 p_time)
 
     UpdateSplineMovement(p_time);
     GetMotionMaster()->UpdateMotion(p_time);
+
+    // lfm melee delay
+    if (cdiBase.delay > 0)
+    {
+        cdiBase.delay -= p_time;
+        if (cdiBase.delay <= 0)
+        {
+            DealMeleeDamage(&cdiBase, true);
+            ProcDamageAndSpell(cdiBase.target, cdiBase.procAttacker, cdiBase.procVictim, cdiBase.procEx, cdiBase.damage, cdiBase.attackType);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            if (GetTypeId() == TYPEID_PLAYER)
+                sLog->outStaticDebug("AttackerStateUpdate: (Player) %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
+                    GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
+            else
+                sLog->outStaticDebug("AttackerStateUpdate: (NPC)    %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
+                    GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
+#endif
+            cdiBase.delay = 0;
+        }
+    }
+    if (cdiOff.delay > 0)
+    {
+        cdiOff.delay -= p_time;
+        if (cdiOff.delay <= 0)
+        {
+            DealMeleeDamage(&cdiOff, true);
+            ProcDamageAndSpell(cdiOff.target, cdiOff.procAttacker, cdiOff.procVictim, cdiOff.procEx, cdiOff.damage, cdiOff.attackType);
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+            if (GetTypeId() == TYPEID_PLAYER)
+                sLog->outStaticDebug("AttackerStateUpdate: (Player) %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
+                    GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
+            else
+                sLog->outStaticDebug("AttackerStateUpdate: (NPC)    %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
+                    GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
+#endif
+            cdiOff.delay = 0;
+        }
+    }
 }
 
 bool Unit::haveOffhandWeapon() const
@@ -2212,17 +2250,49 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
 
         //TriggerAurasProcOnEvent(damageInfo);
 
-        DealMeleeDamage(&damageInfo, true);
-        ProcDamageAndSpell(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.damage, damageInfo.attackType);
-
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        if (GetTypeId() == TYPEID_PLAYER)
-            sLog->outStaticDebug("AttackerStateUpdate: (Player) %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
-                                 GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
+        // lfm melee delay 
+//        DealMeleeDamage(&damageInfo, true);
+//        ProcDamageAndSpell(damageInfo.target, damageInfo.procAttacker, damageInfo.procVictim, damageInfo.procEx, damageInfo.damage, damageInfo.attackType);
+//
+//#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+//        if (GetTypeId() == TYPEID_PLAYER)
+//            sLog->outStaticDebug("AttackerStateUpdate: (Player) %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
+//                GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
+//        else
+//            sLog->outStaticDebug("AttackerStateUpdate: (NPC)    %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
+//                GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
+//#endif
+        int delay = 500;
+        if (GetTypeId() == TypeID::TYPEID_PLAYER)
+        {
+            if (Player* attackerPlayer = ToPlayer())
+            {
+                if (Item* weapon = attackerPlayer->GetWeaponForAttack(damageInfo.attackType))
+                {
+                    if (const ItemTemplate* it = weapon->GetTemplate())
+                    {
+                        if (it->SubClass == ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_AXE2 || it->SubClass == ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_EXOTIC2 || it->SubClass == ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_MACE2 || it->SubClass == ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_POLEARM || it->SubClass == ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_SPEAR || it->SubClass == ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_STAFF || it->SubClass == ItemSubclassWeapon::ITEM_SUBCLASS_WEAPON_SWORD2)
+                        {
+                            delay = 700;
+                        }
+                    }
+                }
+            }
+        }
         else
-            sLog->outStaticDebug("AttackerStateUpdate: (NPC)    %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
-                                 GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
-#endif
+        {
+
+        }
+        if (damageInfo.attackType == WeaponAttackType::BASE_ATTACK)
+        {
+            cdiBase = damageInfo;
+            cdiBase.delay = delay;
+        }
+        else if (damageInfo.attackType == WeaponAttackType::OFF_ATTACK)
+        {
+            cdiOff = damageInfo;
+            cdiOff.delay = delay;
+        }
     }
 }
 

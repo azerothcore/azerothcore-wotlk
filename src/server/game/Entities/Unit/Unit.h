@@ -991,6 +991,9 @@ struct CalcDamageInfo
     uint32 procEx;
     uint32 cleanDamage;          // Used only for rage calculation
     MeleeHitOutcome hitOutCome;  // TODO: remove this field (need use TargetState)
+
+    // lfm melee delay
+    int delay = 0;
 };
 
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
@@ -1403,6 +1406,11 @@ public:
     typedef std::map<uint8, AuraApplication*> VisibleAuraMap;
 
     ~Unit() override;
+
+    // lfm melee damage delay
+public:
+    CalcDamageInfo cdiBase;
+    CalcDamageInfo cdiOff;
 
     UnitAI* GetAI() { return i_AI; }
     void SetAI(UnitAI* newAI) { i_AI = newAI; }
