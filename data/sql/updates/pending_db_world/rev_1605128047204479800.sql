@@ -17,7 +17,7 @@ CREATE TABLE `dungeon_access_requirements` (
   `dungeon_access_id` tinyint unsigned NOT NULL COMMENT 'ID from dungeon_access_template',
   `requirement_type` tinyint unsigned NOT NULL COMMENT '0 = achiev, 1 = quest, 2 = item',
   `requirement_id` mediumint unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
-  `requirement_hint` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
+  `requirement_note` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
   `faction` tinyint unsigned NOT NULL DEFAULT 2 COMMENT '0 = Alliance, 1 = Horde, 2 = Both factions',
   `priority` tinyint unsigned NULL COMMENT 'Priority order for the requirement, sorted by type. 0 is the highest priority',
   `leader_only` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '0 = check the requirement for the player trying to enter, 1 = check the requirement for the party leader',
@@ -28,7 +28,7 @@ CREATE TABLE `dungeon_access_requirements` (
 -- Transfer from old table to new table:
 -- ------------------- ITEMS
 
-INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_type`, `requirement_id`, `requirement_hint`, `faction`)
+INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_type`, `requirement_id`, `requirement_note`, `faction`)
     SELECT `id`,
             2 AS requirement_type,
             `item`,
@@ -68,7 +68,7 @@ INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_typ
 
 -- ------------------ QUESTS
 
-INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_type`, `requirement_id`, `faction`, `requirement_hint`, `leader_only`)
+INSERT INTO `dungeon_access_requirements` (`dungeon_access_id`, `requirement_type`, `requirement_id`, `faction`, `requirement_note`, `leader_only`)
     -- Alliance quests only
     SELECT `id`,
             1 AS requirement_type,

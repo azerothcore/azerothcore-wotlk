@@ -842,7 +842,7 @@ struct ProgressionRequirement
 {
     uint32 id;
     TeamId faction;
-    std::string hint;
+    std::string note;
     uint32 priority;
     bool checkLeaderOnly;
 };

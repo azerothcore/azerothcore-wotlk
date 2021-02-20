@@ -6156,7 +6156,7 @@ void ObjectMgr::LoadAccessRequirements()
         ar->reqItemLevel = fields[5].GetUInt16();
 
         //                                                                              0                 1               2                 3        4         6
-        QueryResult progression_requirements_results = WorldDatabase.PQuery("SELECT requirement_type, requirement_id, requirement_hint, faction, priority, leader_only FROM dungeon_access_requirements where dungeon_access_id = %u", dungeon_access_id);
+        QueryResult progression_requirements_results = WorldDatabase.PQuery("SELECT requirement_type, requirement_id, requirement_note, faction, priority, leader_only FROM dungeon_access_requirements where dungeon_access_id = %u", dungeon_access_id);
         if (progression_requirements_results)
         {
             do
@@ -6165,14 +6165,14 @@ void ObjectMgr::LoadAccessRequirements()
 
                 const uint8 requirement_type             = progression_requirement_row[0].GetUInt8();
                 const uint32 requirement_id              = progression_requirement_row[1].GetUInt32();
-                const std::string requirement_hint       = progression_requirement_row[2].GetString();
+                const std::string requirement_note       = progression_requirement_row[2].GetString();
                 const uint8 requirement_faction          = progression_requirement_row[3].GetUInt8();
                 const uint8 requirement_priority         = progression_requirement_row[4].IsNull() ? UINT8_MAX : progression_requirement_row[4].GetUInt8();
                 const bool requirement_checkLeaderOnly   = progression_requirement_row[5].GetBool();
 
                 ProgressionRequirement* progression_requirement = new ProgressionRequirement();
                 progression_requirement->id              = requirement_id;
-                progression_requirement->hint            = requirement_hint;
+                progression_requirement->note            = requirement_note;
                 progression_requirement->faction         = (TeamId)requirement_faction;
                 progression_requirement->priority        = requirement_priority;
                 progression_requirement->checkLeaderOnly = requirement_checkLeaderOnly;
