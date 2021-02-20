@@ -686,7 +686,7 @@ public:
     void Update(const uint32, const uint32, bool thread = true) override;
     void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
     bool Reset(uint8 method, std::list<uint32>* globalSkipList = nullptr);
-    uint32 GetScriptId() { return i_script_id; }
+    uint32 GetScriptId() const { return i_script_id; }
     std::string const& GetScriptName() const;
     InstanceScript* GetInstanceScript() { return i_data; }
     InstanceScript const* GetInstanceScript() const { return i_data; }
