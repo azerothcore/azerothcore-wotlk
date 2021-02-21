@@ -1,3 +1,19 @@
+-- DB update 2021_02_21_01 -> 2021_02_21_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_02_21_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_02_21_01 2021_02_21_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1613600380697311600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1613600380697311600');
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 180771;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 180771) AND (`source_type` = 1) AND (`id` IN (1, 2, 3, 4, 5, 6));
@@ -8,3 +24,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (180771, 1, 4, 0, 60, 0, 100, 0, 4000, 4000, 15000, 15000, 0, 11, 26354, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework Launcher - SE: Update + SA: Cast Spell: Rocket RED BIG on Self'),
 (180771, 1, 5, 0, 60, 0, 100, 0, 5000, 5000, 15000, 15000, 0, 11, 26355, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework Launcher - SE: Update + SA: Cast Spell: Rocket WHITE BIG on Self'),
 (180771, 1, 6, 0, 60, 0, 100, 0, 6000, 6000, 15000, 15000, 0, 11, 26356, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Firework Launcher - SE: Update + SA: Cast Spell: Rocket YELLOW BIG on Self');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
