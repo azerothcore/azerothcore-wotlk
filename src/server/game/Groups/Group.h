@@ -176,6 +176,10 @@ public:
     Group();
     ~Group();
 
+    // lfm group target icon
+    int GetTargetIconByOG(uint64 pmOG);
+    uint64 GetOGByTargetIcon(int pmTargetIcon);
+
     // group manipulation methods
     bool   Create(Player* leader);
     bool   LoadGroupFromDB(Field* field);

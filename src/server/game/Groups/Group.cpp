@@ -2341,3 +2341,26 @@ void Group::ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply)
     else
         slot->flags &= ~flag;
 }
+
+int  Group::GetTargetIconByOG(uint64 pmOG)
+{
+    int result = -1;
+    for (int i = 0; i < TARGETICONCOUNT; ++i)
+    {
+        if (pmOG == m_targetIcons[i])
+        {
+            result = i;
+        }
+    }
+    return result;
+}
+
+uint64  Group::GetOGByTargetIcon(int pmTargetIcon)
+{
+    uint64 result;
+    if (pmTargetIcon >= 0 && pmTargetIcon <= 7)
+    {
+        result = m_targetIcons[pmTargetIcon];
+    }
+    return result;
+}

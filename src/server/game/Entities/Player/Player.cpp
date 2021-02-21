@@ -977,6 +977,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     // lfm auto fishing
     fishingDelay = 0;
+    robotAI = nullptr;
 }
 
 Player::~Player()
@@ -1969,6 +1970,15 @@ void Player::Update(uint32 p_time)
         {
             CastSpell(this, 7620);
             fishingDelay = 0;
+        }
+    }
+
+    // lfm robot
+    if (m_session->isRobotSession)
+    {
+        if (robotAI)
+        {
+            robotAI->Update(p_time);
         }
     }
 }
@@ -28071,4 +28081,44 @@ void Player::RemoveRestFlag(RestFlag restFlag)
         _restTime = 0;
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
     }
+}
+
+// lfm get talents
+uint32 Player::GetMaxTalentCountTab()
+{
+    std::unordered_map<uint32, uint32> tabCountMap;
+    const PlayerTalentMap& talentMap = GetTalentMap();
+    for (PlayerTalentMap::const_iterator ptIT = talentMap.begin(); ptIT != talentMap.end(); ++ptIT)
+    {
+        for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+        {
+            if (TalentEntry const* te = sTalentStore.LookupEntry(i))
+            {
+                if (TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(te->TalentTab))
+                {
+                    if ((getClassMask() & talentTabInfo->ClassMask) != 0)
+                    {
+                        for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
+                        {
+                            if (te->RankID[rank] == ptIT->first)
+                            {
+                                tabCountMap[talentTabInfo->tabpage] += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    uint32 maxValue = 0;
+    uint32 result = 0;
+    for (std::unordered_map<uint32, uint32>::iterator tcIT = tabCountMap.begin(); tcIT != tabCountMap.end(); tcIT++)
+    {
+        if (tcIT->second > maxValue)
+        {
+            maxValue = tcIT->second;
+            result = tcIT->first;
+        }
+    }
+    return result;
 }

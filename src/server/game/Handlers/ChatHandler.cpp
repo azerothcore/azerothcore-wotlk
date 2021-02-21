@@ -33,8 +33,8 @@
 #include "LuaEngine.h"
 #endif
 
-// lfm define
-#define enum_to_string(x) #x
+ // lfm robot 
+#include "RobotManager.h"
 
 void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 {
@@ -370,82 +370,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             else if (type == CHAT_MSG_YELL)
                 sender->Yell(msg, lang);
 
-            // lfm handle player say debug
-            char* cmd_title = strtok((char*)msg.c_str(), " ");
-            if (std::strcmp(cmd_title, "$cast") == 0)
+            // lfm robot
+            if (!isRobotSession)
             {
-                char* cguid = strtok(nullptr, " ");
-                uint32 casterGUIDLow = atoi(cguid);
-                if (casterGUIDLow > 0)
-                {
-                    char* centry = strtok(nullptr, " ");
-                    uint32 casterEntry = atoi(centry);
-                    if (casterEntry > 0)
-                    {
-                        char* tguid = strtok(nullptr, " ");
-                        uint32 targetGUIDLow = atoi(tguid);
-                        if (targetGUIDLow > 0)
-                        {
-                            char* tentry = strtok(nullptr, " ");
-                            uint32 targetEntry = atoi(tentry);
-                            if (targetEntry > 0)
-                            {
-                                char* sid = strtok(nullptr, " ");
-                                uint32 spellID = atoi(sid);
-                                if (spellID > 0)
-                                {
-                                    if (Map* senderMap = sender->GetMap())
-                                    {
-                                        uint64 casterGUID = MAKE_NEW_GUID(casterGUIDLow, casterEntry, HighGuid::HIGHGUID_UNIT);
-                                        uint64 targetGUID = MAKE_NEW_GUID(targetGUIDLow, targetEntry, HighGuid::HIGHGUID_UNIT);
-                                        if (Creature* caster = senderMap->GetCreature(casterGUID))
-                                        {
-                                            if (Creature* target = senderMap->GetCreature(targetGUID))
-                                            {
-                                                SpellCastResult scr = caster->CastSpell(target, spellID, TriggerCastFlags::TRIGGERED_CAST_DIRECTLY);
-                                                sWorld->SendServerMessage(ServerMessageType::SERVER_MSG_STRING, enum_to_string(scr), sender);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            else if (std::strcmp(cmd_title, "$castself") == 0)
-            {
-                if (Unit* senderTarget = sender->GetSelectedUnit())
-                {
-                    char* sid = strtok(nullptr, " ");
-                    uint32 spellID = atoi(sid);
-                    if (spellID > 0)
-                    {
-                        SpellCastResult scr = senderTarget->CastSpell(senderTarget, spellID);
-                        sWorld->SendServerMessage(ServerMessageType::SERVER_MSG_STRING, enum_to_string(scr), sender);
-                    }
-                }
-            }
-            else if (std::strcmp(cmd_title, "$aura") == 0)
-            {
-                if (Unit* senderTarget = sender->GetSelectedUnit())
-                {
-                    char* cmd_type = strtok(nullptr, " ");
-                    if (std::strcmp(cmd_type, "has") == 0)
-                    {
-                        char* sid = strtok(nullptr, " ");
-                        uint32 spellID = atoi(sid);
-                        if (spellID > 0)
-                        {
-                            std::string hasAura = "no";
-                            if (senderTarget->HasAura(spellID))
-                            {
-                                hasAura = "yes";
-                            }
-                            sWorld->SendServerMessage(ServerMessageType::SERVER_MSG_STRING, hasAura.c_str(), sender);
-                        }
-                    }
-                }
+                sRobotManager->HandlePlayerSay(GetPlayer(), msg);
             }
         }
             break;
@@ -491,6 +419,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     sender->AddWhisperWhiteList(receiver->GetGUID());
 
                 GetPlayer()->Whisper(msg, lang, receiver->GetGUID());
+
+                // lfm robot 
+                sRobotManager->HandleChatCommand(GetPlayer(), msg, receiver);
             }
             break;
         case CHAT_MSG_PARTY:
@@ -516,6 +447,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 WorldPacket data;
                 ChatHandler::BuildChatPacket(data, ChatMsg(type), Language(lang), sender, NULL, msg);
                 group->BroadcastPacket(&data, false, group->GetMemberGroup(GetPlayer()->GetGUID()));
+
+                // lfm robot 
+                sRobotManager->HandleChatCommand(GetPlayer(), msg);
             }
             break;
         case CHAT_MSG_GUILD:
@@ -592,6 +526,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 WorldPacket data;
                 ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_LEADER, Language(lang), sender, NULL, msg);
                 group->BroadcastPacket(&data, false);
+
+                // lfm robot 
+                sRobotManager->HandleChatCommand(GetPlayer(), msg);
             }
             break;
         case CHAT_MSG_RAID_WARNING:

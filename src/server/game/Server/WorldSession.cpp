@@ -134,6 +134,9 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     }
 
     InitializeQueryCallbackParameters();
+
+    // lfm robot robot session
+    isRobotSession = false;
 }
 
 /// WorldSession destructor
@@ -193,6 +196,14 @@ uint32 WorldSession::GetGuidLow() const
 /// Send a packet to the client
 void WorldSession::SendPacket(WorldPacket const* packet)
 {
+    // lfm robot    
+    if (isRobotSession)
+    {
+        WorldPacket eachCopy(*packet);
+        sRobotManager->HandlePacket(this, eachCopy);
+        return;
+    }
+
     if (!m_Socket)
         return;
 
@@ -252,6 +263,31 @@ void WorldSession::QueuePacket(WorldPacket* new_packet)
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 {
+    // lfm robot 
+    if (isRobotSession)
+    {
+        ProcessQueryCallbacks();
+        if (_player)
+        {
+            if (_player->IsBeingTeleportedNear())
+            {
+                if (Player* plMover = GetPlayer()->m_mover->ToPlayer())
+                {
+                    WorldPacket pkt(MSG_MOVE_TELEPORT_ACK, 20);
+                    pkt.append(plMover->GetPackGUID());
+                    pkt << uint32(0); // flags
+                    pkt << uint32(0); // time
+                    HandleMoveTeleportAck(pkt);
+                }
+            }
+            else if (_player->IsBeingTeleportedFar())
+            {
+                HandleMoveWorldportAckOpcode();
+            }
+        }
+        return true;
+    }
+
     if (updater.ProcessLogout())
     {
         UpdateTimeOutTime(diff);

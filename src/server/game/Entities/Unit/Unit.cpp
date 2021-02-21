@@ -450,13 +450,10 @@ void Unit::Update(uint32 p_time)
         cdiBase.delay -= p_time;
         if (cdiBase.delay <= 0)
         {
-            if (Map* myMap = GetMap())
+            if (Unit* cdiTarget = ObjectAccessor::GetUnit(*this, cdiTargetGUIDBase))
             {
-                if (Unit* cdiTarget = myMap->GetCreature(cdiTargetGUIDBase))
-                {
-                    DealMeleeDamage(&cdiBase, true);
-                    ProcDamageAndSpell(cdiBase.target, cdiBase.procAttacker, cdiBase.procVictim, cdiBase.procEx, cdiBase.damage, cdiBase.attackType);
-                }
+                DealMeleeDamage(&cdiBase, true);
+                ProcDamageAndSpell(cdiBase.target, cdiBase.procAttacker, cdiBase.procVictim, cdiBase.procEx, cdiBase.damage, cdiBase.attackType);
             }
             cdiBase.delay = 0;
         }
@@ -466,13 +463,10 @@ void Unit::Update(uint32 p_time)
         cdiOff.delay -= p_time;
         if (cdiOff.delay <= 0)
         {
-            if (Map* myMap = GetMap())
+            if (Unit* cdiTarget = ObjectAccessor::GetUnit(*this, cdiTargetGUIDOff))
             {
-                if (Unit* cdiTarget = myMap->GetCreature(cdiTargetGUIDOff))
-                {
-                    DealMeleeDamage(&cdiOff, true);
-                    ProcDamageAndSpell(cdiOff.target, cdiOff.procAttacker, cdiOff.procVictim, cdiOff.procEx, cdiOff.damage, cdiOff.attackType);
-                }
+                DealMeleeDamage(&cdiOff, true);
+                ProcDamageAndSpell(cdiOff.target, cdiOff.procAttacker, cdiOff.procVictim, cdiOff.procEx, cdiOff.damage, cdiOff.attackType);
             }
             cdiOff.delay = 0;
         }

@@ -764,11 +764,15 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
     uint64 playerGuid = 0;
     recvData >> playerGuid;
 
-    if (!IsLegitCharacterForAccount(GUID_LOPART(playerGuid)))
+    // lfm robot is legit to login 
+    if (!isRobotSession)
     {
-        sLog->outError("Account (%u) can't login with that character (%u).", GetAccountId(), GUID_LOPART(playerGuid));
-        KickPlayer("Account can't login with this character");
-        return;
+        if (!IsLegitCharacterForAccount(GUID_LOPART(playerGuid)))
+        {
+            sLog->outError("Account (%u) can't login with that character (%u).", GetAccountId(), GUID_LOPART(playerGuid));
+            KickPlayer("Account can't login with this character");
+            return;
+        }
     }
 
     // pussywizard:
@@ -1201,6 +1205,15 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     }
 
     delete holder;
+
+    // lfm robot logged in 
+    pCurrChar->robotAI = new AI_Base(pCurrChar);
+    if (isRobotSession)
+    {
+        std::ostringstream serverStream;
+        serverStream << "robot " << pCurrChar->GetName() << "logged in";
+        sWorld->SendServerMessage(ServerMessageType::SERVER_MSG_STRING, serverStream.str().c_str());
+    }
 }
 
 void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)

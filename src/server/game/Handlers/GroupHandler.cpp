@@ -141,6 +141,38 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
             player->GetSession()->SendPacket(&data);
         }
 
+        // lfm robot group recheck
+        if (player->GetSession()->isRobotSession)
+        {
+            if (Group* checkGroup = player->GetGroup())
+            {
+                if (Player* leader = ObjectAccessor::FindConnectedPlayer(checkGroup->GetLeaderGUID()))
+                {
+                    if (leader->GetSession()->isRobotSession)
+                    {
+                        player->RemoveFromGroup();
+                    }
+                }
+                else
+                {
+                    player->RemoveFromGroup();
+                }
+            }
+            else if (Group* groupInvite = player->GetGroupInvite())
+            {
+                if (Player* leader = ObjectAccessor::FindConnectedPlayer(groupInvite->GetLeaderGUID()))
+                {
+                    if (leader->GetSession()->isRobotSession)
+                    {
+                        player->RemoveFromGroup();
+                    }
+                }
+                else
+                {
+                    player->RemoveFromGroup();
+                }
+            }
+        }
         return;
     }
 

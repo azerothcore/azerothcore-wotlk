@@ -24,6 +24,10 @@
 #include <string>
 #include <vector>
 
+ // lfm robot
+#include "AI_Base.h"
+class AI_Base;
+
 struct CreatureTemplate;
 struct Mail;
 struct TrainerSpell;
@@ -1102,6 +1106,7 @@ public:
 
     // lfm auto fishing
     int fishingDelay;
+    AI_Base* robotAI;
 
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
@@ -1722,6 +1727,9 @@ public:
     void _removeTalentAurasAndSpells(uint32 spellId);
     void _addTalentAurasAndSpells(uint32 spellId);
     [[nodiscard]] bool HasTalent(uint32 spell_id, uint8 spec) const;
+
+    // lfm get talents
+    uint32 GetMaxTalentCountTab();
 
     [[nodiscard]] uint32 CalculateTalentsPoints() const;
 

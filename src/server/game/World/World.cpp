@@ -83,6 +83,10 @@
 #include "LuaEngine.h"
 #endif
 
+// lfm robot 
+#include "RobotConfig.h"
+#include "RobotManager.h"
+
 std::atomic_long World::m_stopEvent = false;
 uint8 World::m_ExitCode = SHUTDOWN_EXIT_CODE;
 uint32 World::m_worldLoopCounter = 0;
@@ -2094,6 +2098,13 @@ void World::SetInitialWorldSettings()
         sLog->outString("AzerothCore dry run completed, terminating.");
         exit(0);
     }
+
+    // lfm robot initial
+    if (sRobotConfig->StartRobotSystem())
+    {
+        sRobotManager->InitializeManager();
+        sLog->outString("Robot system ready.");
+    }
 }
 
 void World::DetectDBCLang()
@@ -2368,6 +2379,9 @@ void World::Update(uint32 diff)
     sScriptMgr->OnWorldUpdate(diff);
 
     SavingSystemMgr::Update(diff);
+
+    // lfm robot update
+    sRobotManager->UpdateRobotManager(diff);
 }
 
 void World::ForceGameEventUpdate()
@@ -2603,6 +2617,14 @@ void World::_UpdateGameTime()
 /// Shutdown the server
 void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode)
 {
+    // lfm robot 
+    sRobotManager->LogoutRobots();
+    uint32 shutdownTime = time;
+    if (shutdownTime < 11)
+    {
+        shutdownTime = 11;
+    }
+
     // ignore if server shutdown at next tick
     if (IsStopped())
         return;
