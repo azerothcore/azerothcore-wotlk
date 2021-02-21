@@ -25720,7 +25720,9 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 
                 // Divine Protection
                 if (HasAura(498))
+                {
                     damage /= 2;
+                }
 
                 final_damage = EnvironmentalDamage(DAMAGE_FALL, damage);
             }
