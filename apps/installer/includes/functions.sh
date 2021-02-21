@@ -9,7 +9,7 @@ function inst_configureOS() {
                 DISTRO=$OSDISTRO
             # If available, use LSB to identify distribution
             elif [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
-                DISTRO=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
+                DISTRO=$(lsb_release -is)
             # Otherwise, use release info file
             else
                 DISTRO=$(ls -d /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -v "lsb" | cut -d'/' -f3 | cut -d'-' -f1 | cut -d'_' -f1)
