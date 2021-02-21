@@ -49,6 +49,9 @@ private:
     uint32 m_timer;
     uint32 m_lifetime;
     uint64 m_summonerGUID;
+
+    // lfm despawn delay
+    int despawnDelay;
 };
 
 class Minion : public TempSummon

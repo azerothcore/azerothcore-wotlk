@@ -1540,6 +1540,9 @@ void GameObject::Use(Unit* user)
                             if (!zone_skill)
                                 sLog->outErrorDb("Fishable areaId %u are not properly defined in `skill_fishing_base_level`.", subzone);
 
+                            // lfm fishing skill
+                            zone_skill += 50;
+
                             int32 skill = player->GetSkillValue(SKILL_FISHING);
 
                             int32 chance;
@@ -1558,11 +1561,10 @@ void GameObject::Use(Unit* user)
                             sLog->outStaticDebug("Fishing check (skill: %i zone min skill: %i chance %i roll: %i", skill, zone_skill, chance, roll);
 #endif
 
+                            player->UpdateFishingSkill();
                             // but you will likely cause junk in areas that require a high fishing skill (not yet implemented)
                             if (chance >= roll)
                             {
-                                player->UpdateFishingSkill();
-
                                 //TODO: I do not understand this hack. Need some explanation.
                                 // prevent removing GO at spell cancel
                                 RemoveFromOwner();
@@ -1597,7 +1599,7 @@ void GameObject::Use(Unit* user)
                         }
                 }
 
-                // lfm auto fishing
+                // lfm auto fishing 
                 uint32 maxSlot = loot.GetMaxSlotInLootFor(player);
                 for (uint32 checkSlot = 0; checkSlot < maxSlot; checkSlot++)
                 {
@@ -1605,12 +1607,12 @@ void GameObject::Use(Unit* user)
                 }
 
                 player->FinishSpell(CURRENT_CHANNELED_SPELL);
-                if(tmpfish)
-                    player->FinishSpell(CURRENT_CHANNELED_SPELL, true);
-                else
-                    player->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
+                //if(tmpfish)
+                //    player->FinishSpell(CURRENT_CHANNELED_SPELL, true);
+                //else
+                //    player->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
 
-                player->fishingDelay = 200;
+                player->fishingDelay = urand(500, 1000);
 
                 return;
             }

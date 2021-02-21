@@ -568,13 +568,6 @@ void ObjectMgr::LoadCreatureTemplates()
         creatureTemplate.mingold               = fields[63].GetUInt32();
         creatureTemplate.maxgold               = fields[64].GetUInt32();
         creatureTemplate.AIName                = fields[65].GetString();
-
-        // EJ lfm scripts
-        if (creatureTemplate.Entry == 10000 || creatureTemplate.Entry == 4444)
-        {
-            creatureTemplate.AIName = "";
-        }
-
         creatureTemplate.MovementType          = uint32(fields[66].GetUInt8());
         creatureTemplate.InhabitType           = uint32(fields[67].GetUInt8());
         creatureTemplate.HoverHeight           = fields[68].GetFloat();
@@ -587,18 +580,29 @@ void ObjectMgr::LoadCreatureTemplates()
         creatureTemplate.MechanicImmuneMask    = fields[75].GetUInt32();
         creatureTemplate.SpellSchoolImmuneMask = fields[76].GetUInt8();
         creatureTemplate.flags_extra           = fields[77].GetUInt32();
+        creatureTemplate.ScriptID = GetScriptId(fields[78].GetCString());
         
-        std::string scriptName                 = GetScriptId(fields[78].GetCString());        
-        // EJ lfm scripts
-        if (creatureTemplate.Entry == 10000)
+        // lfm scripts
+        if (creatureTemplate.Entry == 10000 || creatureTemplate.Entry == 4444)
         {
-            scriptName = "npc_arugal_10000";
+            creatureTemplate.AIName = "";
+            std::string scriptName = fields[78].GetCString();
+            if (creatureTemplate.Entry == 10000)
+            {
+                scriptName = "npc_arugal_10000";
+            }
+            else if (creatureTemplate.Entry == 4444)
+            {
+                scriptName = "npc_deathstalker_vincent_4444";
+            }
+            creatureTemplate.ScriptID = GetScriptId(scriptName.c_str());
         }
-        else if (creatureTemplate.Entry == 4444)
+
+        // lfm creature fix
+        if (creatureTemplate.Entry == 28576 || creatureTemplate.Entry == 28577 || creatureTemplate.Entry == 28660 || creatureTemplate.Entry == 28662 || creatureTemplate.Entry == 28557 || creatureTemplate.Entry == 28892)
         {
-            scriptName = "npc_deathstalker_vincent_4444";
+            creatureTemplate.flags_extra |= CreatureFlagsExtra::CREATURE_FLAG_EXTRA_CIVILIAN;
         }
-        creatureTemplate.ScriptID = GetScriptId(scriptName.c_str());
 
         ++count;
     } while (result->NextRow());

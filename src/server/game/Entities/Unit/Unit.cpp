@@ -289,6 +289,10 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     _lastLiquid = nullptr;
 
     _oldFactionId = 0;
+
+    // lfm melee delay
+    cdiTargetGUIDBase = 0;
+    cdiTargetGUIDOff = 0;
 }
 
 ////////////////////////////////////////////////////////////
@@ -446,16 +450,14 @@ void Unit::Update(uint32 p_time)
         cdiBase.delay -= p_time;
         if (cdiBase.delay <= 0)
         {
-            DealMeleeDamage(&cdiBase, true);
-            ProcDamageAndSpell(cdiBase.target, cdiBase.procAttacker, cdiBase.procVictim, cdiBase.procEx, cdiBase.damage, cdiBase.attackType);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            if (GetTypeId() == TYPEID_PLAYER)
-                sLog->outStaticDebug("AttackerStateUpdate: (Player) %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
-                    GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
-            else
-                sLog->outStaticDebug("AttackerStateUpdate: (NPC)    %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
-                    GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
-#endif
+            if (Map* myMap = GetMap())
+            {
+                if (Unit* cdiTarget = myMap->GetCreature(cdiTargetGUIDBase))
+                {
+                    DealMeleeDamage(&cdiBase, true);
+                    ProcDamageAndSpell(cdiBase.target, cdiBase.procAttacker, cdiBase.procVictim, cdiBase.procEx, cdiBase.damage, cdiBase.attackType);
+                }
+            }
             cdiBase.delay = 0;
         }
     }
@@ -464,16 +466,14 @@ void Unit::Update(uint32 p_time)
         cdiOff.delay -= p_time;
         if (cdiOff.delay <= 0)
         {
-            DealMeleeDamage(&cdiOff, true);
-            ProcDamageAndSpell(cdiOff.target, cdiOff.procAttacker, cdiOff.procVictim, cdiOff.procEx, cdiOff.damage, cdiOff.attackType);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            if (GetTypeId() == TYPEID_PLAYER)
-                sLog->outStaticDebug("AttackerStateUpdate: (Player) %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
-                    GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
-            else
-                sLog->outStaticDebug("AttackerStateUpdate: (NPC)    %u attacked %u (TypeId: %u) for %u dmg, absorbed %u, blocked %u, resisted %u.",
-                    GetGUIDLow(), victim->GetGUIDLow(), victim->GetTypeId(), damageInfo.damage, damageInfo.absorb, damageInfo.blocked_amount, damageInfo.resist);
-#endif
+            if (Map* myMap = GetMap())
+            {
+                if (Unit* cdiTarget = myMap->GetCreature(cdiTargetGUIDOff))
+                {
+                    DealMeleeDamage(&cdiOff, true);
+                    ProcDamageAndSpell(cdiOff.target, cdiOff.procAttacker, cdiOff.procVictim, cdiOff.procEx, cdiOff.damage, cdiOff.attackType);
+                }
+            }
             cdiOff.delay = 0;
         }
     }
@@ -2287,11 +2287,19 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
         {
             cdiBase = damageInfo;
             cdiBase.delay = delay;
+            if (damageInfo.target)
+            {
+                cdiTargetGUIDBase = damageInfo.target->GetGUID();
+            }
         }
         else if (damageInfo.attackType == WeaponAttackType::OFF_ATTACK)
         {
             cdiOff = damageInfo;
             cdiOff.delay = delay;
+            if (damageInfo.target)
+            {
+                cdiTargetGUIDOff = damageInfo.target->GetGUID();
+            }
         }
     }
 }

@@ -19,6 +19,9 @@ TempSummon::TempSummon(SummonPropertiesEntry const* properties, uint64 owner, bo
 {
     m_summonerGUID = owner;
     m_unitTypeMask |= UNIT_MASK_SUMMON;
+
+    // lfm despawn delay
+    despawnDelay = 5000;
 }
 
 Unit* TempSummon::GetSummoner() const
@@ -29,6 +32,17 @@ Unit* TempSummon::GetSummoner() const
 void TempSummon::Update(uint32 diff)
 {
     Creature::Update(diff);
+
+    // lfm despawn delay 
+    if (m_deathState == DEAD || m_deathState == DeathState::CORPSE)
+    {
+        // lfm despawn delay
+        if (despawnDelay > 0)
+        {
+            despawnDelay -= diff;
+            return;
+        }
+    }
 
     if (m_deathState == DEAD)
     {

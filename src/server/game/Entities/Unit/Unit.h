@@ -1411,6 +1411,8 @@ public:
 public:
     CalcDamageInfo cdiBase;
     CalcDamageInfo cdiOff;
+    uint64 cdiTargetGUIDBase;
+    uint64 cdiTargetGUIDOff;
 
     UnitAI* GetAI() { return i_AI; }
     void SetAI(UnitAI* newAI) { i_AI = newAI; }
