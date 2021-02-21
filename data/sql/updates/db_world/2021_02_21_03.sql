@@ -1,3 +1,19 @@
+-- DB update 2021_02_21_02 -> 2021_02_21_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_02_21_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_02_21_02 2021_02_21_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1613748522727071400'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1613748522727071400');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 3701;
@@ -43,3 +59,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (216400, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 33, 11836, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Rabid Thistle Bear - Actionlist - Quest Credit \'null\''),
 (216400, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 29, 0, 180, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Rabid Thistle Bear - Actionlist - Start Follow [unsupported target type]'),
 (216400, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 36, 11836, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Rabid Thistle Bear - Actionlist - Update Template To \'Captured Rabid Thistle Bear\'');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
