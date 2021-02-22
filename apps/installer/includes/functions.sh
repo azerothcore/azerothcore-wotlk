@@ -8,7 +8,7 @@ function inst_configureOS() {
             if [ ! -z "$OSDISTRO" ]; then
                 DISTRO=$OSDISTRO
             # If available, use LSB to identify distribution
-            elif [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
+            elif command -v lsb_release >/dev/null 2>&1 ; then
                 DISTRO=$(lsb_release -is)
             # Otherwise, use release info file
             else
