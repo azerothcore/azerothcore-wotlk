@@ -7088,9 +7088,9 @@ void SpellMgr::LoadDbcDataCorrections()
         17925, // Warlock - Death Coil (Rank 2)
         17926, // Warlock - Death Coil (Rank 3)
         27223, // Warlock - Death Coil (Rank 4)
-        47859, // Warlock - Death Coil (Rank 5)        
-        71838,  // N
-        71839   // H
+        47859, // Warlock - Death Coil (Rank 5)
+        71838, // Drain Life - Bryntroll Normal
+        71839  // Drain Life - Bryntroll Heroic
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
