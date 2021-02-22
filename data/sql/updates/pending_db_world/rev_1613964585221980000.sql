@@ -80,7 +80,7 @@ INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event
 -- TODO : add them the chance to despawn 
 -- TODO : check and update their stats
 
-DELETE FROM `creature` WHERE `guid` IN (300627, 56961, 300376, 300742, 300768, 160358, 160355);
+DELETE FROM `creature` WHERE `guid` IN (300627, 56961, 300376, 300742, 300768, 160358, 160355, 300452);
 DELETE FROM `creature_addon` WHERE `guid` IN (300627, 56961, 300376, 300742, 300768, 160358, 160355);
 DELETE FROM `waypoint_data` WHERE `id` IN (3000627, 3000376, 3000768);
 
@@ -215,7 +215,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 -- todo : spells 
 
 -- Trigore the Lasher
--- This guy is also missing on vmangos, waiting for data
+INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (300452, 3652, 1, 0, 0, 1, 1, 0, 0, -621.612, -2270.82, 18.8419, 2.67112, 216000, 0, 0, 483, 0, 0, 0, 0, 0, '', 0);
 
 -- Veyzhak the Cannibal
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (160358, 5399, 0, 0, 0, 1, 1, 0, 1, -10301, -4028.2, -74.8377, 2.79036, 28800, 0, 0, 3093, 0, 0, 0, 0, 0, '', 0);
