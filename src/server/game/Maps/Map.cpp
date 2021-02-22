@@ -2901,7 +2901,7 @@ bool InstanceMap::Reset(uint8 method, std::list<uint32>* globalResetSkipList)
 
 std::string const& InstanceMap::GetScriptName() const
 {
-    return sObjectMgr->GetScriptName(i_script_id);
+    return sObjectMgr->GetScriptName(GetScriptId());
 }
 
 void InstanceMap::PermBindAllPlayers()
