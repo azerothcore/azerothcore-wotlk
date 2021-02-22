@@ -7082,7 +7082,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->SpellLevel = 0;
     });
 
-    // Drain Life - Bryntroll & Death Coil Warlock
     ApplySpellFix({
         6789,  // Warlock - Death Coil (Rank 1)
         17925, // Warlock - Death Coil (Rank 2)
