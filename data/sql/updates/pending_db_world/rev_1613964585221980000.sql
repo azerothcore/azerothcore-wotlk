@@ -87,7 +87,7 @@ DELETE FROM `waypoint_data` WHERE `id` IN (3000627, 3000376, 3000768);
 -- BRD : Panzor the Invincible
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (300627, 8923, 230, 0, 0, 1, 1, 0, 0, 1135.47, -163.023, -74.9241, 1.82485, 86400, 0, 0, 13495, 0, 2, 0, 0, 0, '', 0);
 -- creature addon
-INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES (300627, 3000627, 0, 0, 0, 0, 0, NULL);
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES (300627, 3000627, 0, 0, 0, 0, 0, '9941');
 -- waypoints
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES 
 (3000627, 1, 1135.47, -163.023, -74.9241, 4.04912, 0),
