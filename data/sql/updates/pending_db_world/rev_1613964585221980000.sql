@@ -212,7 +212,12 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (3000768, 54, -1393.99, 2851.21, 77.72, 0),
 (3000768, 55, -1367.46, 2863.52, 76.9984, 0),
 (3000768, 56, -1351.69, 2867.27, 76.8984, 0);
--- todo : spells 
+-- missing spell : curse of the tribes
+SET @ENTRY := 11688;
+DELETE FROM smart_scripts WHERE entryOrGuid = 11688 AND source_type = 0;
+UPDATE creature_template SET AIName="SmartAI" WHERE entry= @ENTRY;
+INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
+(@ENTRY, 0, 0, 0, 0, 0, 100, 0, 9000, 14000, 25000, 35000, 11, 21048, 32, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, "Every 25 - 35 seconds (9 - 14s initially)  - Self: Cast spell Curse of the Tribes (21048) on Random hostile (flags: aura not present)");
 
 -- Trigore the Lasher
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (300452, 3652, 1, 0, 0, 1, 1, 0, 0, -621.612, -2270.82, 18.8419, 2.67112, 216000, 0, 0, 483, 0, 0, 0, 0, 0, '', 0);
