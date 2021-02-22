@@ -2053,7 +2053,7 @@ void World::SetInitialWorldSettings()
     mgr = ChannelMgr::forTeam(TEAM_HORDE);
     mgr->LoadChannels();
 
-    sLog->outString("Start QuestTracker system...");
+    sLog->outString("Initialising QuestTracker system...");
     sQuestTracker->InitSystem();
 
 #ifdef ELUNA

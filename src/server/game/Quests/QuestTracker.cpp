@@ -37,7 +37,7 @@ void QuestTracker::InitSystem()
 {
     if (!sWorld->getBoolConfig(CONFIG_QUEST_TRACKER_ENABLE))
     {
-        sLog->outString(">> System disabled");
+        sLog->outString(">> The QuestTracker System is disabled");
         return;
     }
 
