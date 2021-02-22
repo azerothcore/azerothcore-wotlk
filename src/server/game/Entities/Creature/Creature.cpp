@@ -434,7 +434,12 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     SetAttackTime(OFF_ATTACK,    cInfo->BaseAttackTime);
     SetAttackTime(RANGED_ATTACK, cInfo->RangeAttackTime);
 
+    uint32 previousHealth = GetHealth();
     SelectLevel(changelevel);
+    if (previousHealth > 0)
+    {
+        SetHealth(previousHealth);
+    }
 
     SetMeleeDamageSchool(SpellSchools(cInfo->dmgschool));
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(getLevel(), cInfo->unit_class);
@@ -488,6 +493,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
     UpdateEnvironmentIfNeeded(3);
 
+    LoadSpellTemplateImmunity();
     return true;
 }
 
@@ -640,7 +646,7 @@ void Creature::Update(uint32 diff)
                         // regenerate health if not in combat or if polymorphed)
                         if (!IsInCombat() || IsPolymorphed())
                             RegenerateHealth();
-                        else if (CanNotReachTarget())
+                        else if (IsNotReachableAndNeedRegen())
                         {
                             // regenerate health if cannot reach the target and the setting is set to do so.
                             // this allows to disable the health regen of raid bosses if pathfinding has issues for whatever reason
@@ -665,7 +671,7 @@ void Creature::Update(uint32 diff)
                 if (CanNotReachTarget() && !IsInEvadeMode() && !GetMap()->IsRaid())
                 {
                     m_cannotReachTimer += diff;
-                    if (m_cannotReachTimer >= (sWorld->getIntConfig(CONFIG_NPC_EVADE_IF_NOT_REACHABLE)*IN_MILLISECONDS) && IsAIEnabled)
+                    if (IsNotReachable() && IsAIEnabled)
                     {
                         AI()->EnterEvadeMode();
                     }
@@ -1804,6 +1810,37 @@ bool Creature::HasMechanicTemplateImmunity(uint32 mask) const
     return !IS_PLAYER_GUID(GetOwnerGUID()) && (GetCreatureTemplate()->MechanicImmuneMask & mask);
 }
 
+void Creature::LoadSpellTemplateImmunity()
+{
+    // uint32 max used for "spell id", the immunity system will not perform SpellInfo checks against invalid spells
+    // used so we know which immunities were loaded from template
+    static uint32 const placeholderSpellId = std::numeric_limits<uint32>::max();
+
+    // unapply template immunities (in case we're updating entry)
+    for (uint8 i = SPELL_SCHOOL_NORMAL; i <= SPELL_SCHOOL_ARCANE; ++i)
+    {
+        ApplySpellImmune(placeholderSpellId, IMMUNITY_SCHOOL, i, false);
+    }
+
+    // don't inherit immunities for hunter pets
+    if (IS_PLAYER_GUID(GetOwnerGUID()) && IsHunterPet())
+    {
+        return;
+    }
+
+    if (uint8 mask = GetCreatureTemplate()->SpellSchoolImmuneMask)
+    {
+        for (uint8 i = SPELL_SCHOOL_NORMAL; i <= SPELL_SCHOOL_ARCANE; ++i)
+        {
+            if (mask & (1 << i))
+            {
+                ApplySpellImmune(placeholderSpellId, IMMUNITY_SCHOOL, 1 << i, true);
+            }
+        }
+    }
+}
+
+
 bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo)
 {
     if (!spellInfo)
@@ -2726,6 +2763,8 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
     if (!packetOnly && !Unit::SetDisableGravity(disable))
         return false;
 
+    applyInhabitFlags();
+
     if (!movespline->Initialized())
         return true;
 
@@ -2733,6 +2772,26 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly/*=false*/)
     data.append(GetPackGUID());
     SendMessageToSet(&data, false);
     return true;
+}
+
+void Creature::applyInhabitFlags()
+{
+    if (IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
+    {
+        if (IsLevitating())
+        {
+            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
+            return;
+        }
+
+        if (IsHovering())
+        {
+            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
+            return;
+        }
+
+        SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
+    }
 }
 
 bool Creature::SetSwim(bool enable)
@@ -2841,11 +2900,7 @@ bool Creature::SetHover(bool enable, bool packetOnly /*= false*/)
     if (!packetOnly && !Unit::SetHover(enable))
         return false;
 
-    //! Unconfirmed for players:
-    if (enable)
-        SetByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
-    else
-        RemoveByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
+   applyInhabitFlags();
 
     if (!movespline->Initialized())
         return true;

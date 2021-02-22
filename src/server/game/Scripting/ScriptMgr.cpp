@@ -1359,6 +1359,11 @@ void ScriptMgr::OnPlayerCompleteQuest(Player* player, Quest const* quest)
     FOREACH_SCRIPT(PlayerScript)->OnPlayerCompleteQuest(player, quest);
 }
 
+void ScriptMgr::OnBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBattlegroundDesertion(player, desertionType);
+}
+
 void ScriptMgr::OnPlayerReleasedGhost(Player* player)
 {
     FOREACH_SCRIPT(PlayerScript)->OnPlayerReleasedGhost(player);
@@ -1730,6 +1735,17 @@ bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGu
     FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
     if (!itr->second->CanJoinInBattlegroundQueue(player, BattlemasterGuid, BGTypeID, joinAsGroup, err))
         ret = false; // we change ret value only when scripts return false
+
+    return ret;
+}
+
+bool ScriptMgr::ShouldBeRewardedWithMoneyInsteadOfExp(Player* player)
+{
+    bool ret = false; // return false by default if not scripts
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret)
+        if (itr->second->ShouldBeRewardedWithMoneyInsteadOfExp(player))
+            ret = true; // we change ret value only when a script returns true
 
     return ret;
 }

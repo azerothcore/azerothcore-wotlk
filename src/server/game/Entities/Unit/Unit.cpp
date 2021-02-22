@@ -553,7 +553,7 @@ void Unit::UpdateSplinePosition()
 
 void Unit::DisableSpline()
 {
-    m_movementInfo.RemoveMovementFlag(MovementFlags(MOVEMENTFLAG_SPLINE_ENABLED | MOVEMENTFLAG_FORWARD));
+    m_movementInfo.RemoveMovementFlag(MovementFlags(MOVEMENTFLAG_SPLINE_ENABLED | MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD));
     movespline->_Interrupt();
 }
 
@@ -3816,28 +3816,39 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
                 changed = true;
             }
         }
-        else if (c->CanFly() && isInAir)
+        else if (c->CanFly() && isInAir && !c->IsFalling())
         {
-            if (!c->IsFalling() && (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) || !HasUnitMovementFlag(MOVEMENTFLAG_HOVER)))
+
+            if (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
             {
                 SetCanFly(true);
                 SetDisableGravity(true);
-                if (IsAlive() && (c->CanHover() || HasAuraType(SPELL_AURA_HOVER)))
-                    SetHover(true);
                 changed = true;
             }
+
+            if (IsHovering() && !HasAuraType(SPELL_AURA_HOVER))
+            {
+                SetHover(false);
+                changed = true;
+            }
+
         }
         else
         {
-            if (HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || HasUnitMovementFlag(MOVEMENTFLAG_FLYING) || HasUnitMovementFlag(MOVEMENTFLAG_HOVER))
+            if (HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || HasUnitMovementFlag(MOVEMENTFLAG_FLYING))
             {
                 SetCanFly(false);
                 RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
-                if (!HasAuraType(SPELL_AURA_HOVER))
-                    SetHover(false);
                 changed = true;
             }
-            if (HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) && !HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && !HasUnitMovementFlag(MOVEMENTFLAG_HOVER))
+
+            if (!IsHovering() && IsAlive() && (c->CanHover() || HasAuraType(SPELL_AURA_HOVER)))
+            {
+                SetHover(true);
+                changed = true;
+            }
+
+            if (HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY) && !HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
             {
                 SetDisableGravity(false);
                 changed = true;
@@ -4770,7 +4781,7 @@ void Unit::RemoveAurasByShapeShift()
     {
         Aura const* aura = iter->second->GetBase();
         if ((aura->GetSpellInfo()->GetAllEffectsMechanicMask() & mechanic_mask) &&
-                (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH) || (aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARRIOR && (aura->GetSpellInfo()->SpellFamilyFlags[1] & 0x20))))
+            (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_AURA_CC) || (aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_WARRIOR && (aura->GetSpellInfo()->SpellFamilyFlags[1] & 0x20))))
         {
             RemoveAura(iter);
             continue;
@@ -13703,6 +13714,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
         // remove aurastates allowing special moves
         ClearAllReactives();
         ClearDiminishings();
+
         GetMotionMaster()->Clear(false);
         GetMotionMaster()->MoveIdle();
 
@@ -15911,6 +15923,10 @@ void Unit::StopMoving()
 
     if (movespline->Finalized())
         return;
+
+    // Update position now since Stop does not start a new movement that can be updated later
+    if (movespline->HasStarted())
+        UpdateSplinePosition();
 
     Movement::MoveSplineInit init(this);
     init.Stop();

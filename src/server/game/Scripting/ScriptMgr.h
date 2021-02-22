@@ -7,6 +7,7 @@
 #ifndef SC_SCRIPTMGR_H
 #define SC_SCRIPTMGR_H
 
+#include "Battleground.h"
 #include "Common.h"
 #include "ObjectMgr.h"
 #include "DBCStores.h"
@@ -763,6 +764,9 @@ protected:
 public:
     virtual void OnPlayerReleasedGhost(Player* /*player*/) { }
 
+    // Called when a player does a desertion action (see BattlegroundDesertionType)
+    virtual void OnBattlegroundDesertion(Player* /*player*/, BattlegroundDesertionType const /*desertionType*/) { }
+
     // Called when a player completes a quest
     virtual void OnPlayerCompleteQuest(Player* /*player*/, Quest const* /*quest_id*/) { }
 
@@ -964,6 +968,7 @@ public:
     virtual void OnFirstLogin(Player* /*player*/) { }
 
     [[nodiscard]] virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, uint64 /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
+    virtual bool ShouldBeRewardedWithMoneyInsteadOfExp(Player* /*player*/) { return false; }
 
     // Called before the player's temporary summoned creature has initialized it's stats
     virtual void OnBeforeTempSummonInitStats(Player* /*player*/, TempSummon* /*tempSummon*/, uint32& /*duration*/) { }
@@ -1665,7 +1670,9 @@ public: /* PlayerScript */
     void OnBeforeInitTalentForLevel(Player* player, uint8& level, uint32& talentPointsForLevel);
     void OnFirstLogin(Player* player);
     void OnPlayerCompleteQuest(Player* player, Quest const* quest);
+    void OnBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType);
     bool CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
+    bool ShouldBeRewardedWithMoneyInsteadOfExp(Player* player);
     void OnBeforeTempSummonInitStats(Player* player, TempSummon* tempSummon, uint32& duration);
     void OnBeforeGuardianInitStatsForLevel(Player* player, Guardian* guardian, CreatureTemplate const* cinfo, PetType& petType);
     void OnAfterGuardianInitStatsForLevel(Player* player, Guardian* guardian);
