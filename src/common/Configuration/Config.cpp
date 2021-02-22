@@ -263,7 +263,7 @@ bool ConfigMgr::LoadAppConfigs()
 bool ConfigMgr::LoadModulesConfigs()
 {
     if (_additonalFiles.empty())
-        return false;
+        return true;
 
     // Start loading module configs
     std::vector<std::string /*config variant*/> moduleConfigFiles;
