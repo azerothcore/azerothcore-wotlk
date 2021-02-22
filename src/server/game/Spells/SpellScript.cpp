@@ -14,10 +14,26 @@ bool _SpellScript::_Validate(SpellInfo const* entry)
 {
     if (!Validate(entry))
     {
-        sLog->outError("TSCR: Spell `%u` did not pass Validate() function of script `%s` - script will be not added to the spell", entry->Id, m_scriptName->c_str());
+        sLog->outError("_SpellScript::_Validate: Spell `%u` did not pass Validate() function of script `%s` - script will not be added to the spell", entry->Id, m_scriptName->c_str());
         return false;
     }
     return true;
+}
+
+bool _SpellScript::_ValidateSpellInfo(uint32 const* begin, uint32 const* end)
+{
+    bool allValid = true;
+    while (begin != end)
+    {
+        if (!sSpellMgr->GetSpellInfo(*begin))
+        {
+            sLog->outError("_SpellScript::_ValidateSpellInfo: Spell %u does not exist.", *begin);
+            allValid = false;
+        }
+
+        ++begin;
+    }
+    return allValid;
 }
 
 void _SpellScript::_Register()

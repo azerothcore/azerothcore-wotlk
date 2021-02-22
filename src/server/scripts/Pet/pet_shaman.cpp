@@ -46,10 +46,7 @@ public:
             _events.ScheduleEvent(EVENT_SHAMAN_ANGEREDEARTH, 0);
         }
 
-        void InitializeAI() override
-        {
-            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
-        }
+        void InitializeAI() override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -97,10 +94,7 @@ public:
     {
         npc_pet_shaman_fire_elementalAI(Creature* creature) : ScriptedAI(creature), _initAttack(true) { }
 
-        void InitializeAI() override
-        {
-            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
-        }
+        void InitializeAI() override { }
 
         void EnterCombat(Unit*) override
         {
