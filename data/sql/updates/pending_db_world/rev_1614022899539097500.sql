@@ -26,3 +26,4 @@ UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 
 UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 1742);
 UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 10665);
 UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 10666);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 7 WHERE (`entry` = 727);
