@@ -89,38 +89,39 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 -- creature addon
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES (300627, 3000627, 0, 0, 0, 0, 0, NULL);
 -- waypoints
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 1, 1135.47, -163.023, -74.9241, 4.04912, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 2, 1151.34, -149.749, -74.9109, 0.577659, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 3, 1174.82, -157.929, -74.3609, 5.78171, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 4, 1185.95, -150.753, -74.3652, 0.672688, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 5, 1171.12, -136.046, -74.3652, 2.59848, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 6, 1158.67, -131.772, -74.3652, 3.14984, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 7, 1133.39, -127.555, -74.3622, 3.11213, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 8, 1111.74, -136.947, -74.3463, 3.78758, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 9, 1098.5, -150.236, -65.3899, 3.97372, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 10, 1083.84, -166.332, -65.3101, 3.97372, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 11, 1068.86, -185.53, -64.1101, 3.97372, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 12, 1055.53, -197.829, -62.8376, 3.86298, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 13, 1045.28, -208.278, -61.8399, 0.815619, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 14, 1061.09, -194.831, -63.2302, 0.888661, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 15, 1075.18, -178.83, -65.0597, 0.888661, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 16, 1084.06, -168.537, -65.3082, 0.667178, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 17, 1094.07, -167.277, -65.3082, 5.77227, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 18, 1113.1, -187.895, -65.4175, 5.59948, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 19, 1126.49, -198.759, -65.4502, 5.8186, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 20, 1140.48, -202.571, -65.3502, 0.086769, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 21, 1153.21, -201.446, -65.374, 0.343594, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 22, 1172.86, -191.437, -65.4455, 0.786559, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 23, 1159.8, -203.03, -65.4447, 3.6352, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 24, 1144.47, -202.718, -65.3172, 3.01081, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 25, 1124.53, -196.103, -65.4567, 2.5702, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 26, 1114.1, -185.864, -65.3084, 2.31102, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 27, 1100.52, -171.005, -65.3084, 2.31102, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 28, 1099.18, -151.247, -65.3098, 1.07166, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 29, 1110.93, -139.12, -74.253, 0.800697, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 30, 1128.29, -136.767, -74.3582, 5.57121, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 31, 1135.2, -148.836, -74.3582, 4.87142, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000627, 32, 1136.29, -155.672, -74.9172, 4.87142, 0);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES 
+(3000627, 1, 1135.47, -163.023, -74.9241, 4.04912, 0),
+(3000627, 2, 1151.34, -149.749, -74.9109, 0.577659, 0),
+(3000627, 3, 1174.82, -157.929, -74.3609, 5.78171, 0),
+(3000627, 4, 1185.95, -150.753, -74.3652, 0.672688, 0),
+(3000627, 5, 1171.12, -136.046, -74.3652, 2.59848, 0),
+(3000627, 6, 1158.67, -131.772, -74.3652, 3.14984, 0),
+(3000627, 7, 1133.39, -127.555, -74.3622, 3.11213, 0),
+(3000627, 8, 1111.74, -136.947, -74.3463, 3.78758, 0),
+(3000627, 9, 1098.5, -150.236, -65.3899, 3.97372, 0),
+(3000627, 10, 1083.84, -166.332, -65.3101, 3.97372, 0),
+(3000627, 11, 1068.86, -185.53, -64.1101, 3.97372, 0),
+(3000627, 12, 1055.53, -197.829, -62.8376, 3.86298, 0),
+(3000627, 13, 1045.28, -208.278, -61.8399, 0.815619, 0),
+(3000627, 14, 1061.09, -194.831, -63.2302, 0.888661, 0),
+(3000627, 15, 1075.18, -178.83, -65.0597, 0.888661, 0),
+(3000627, 16, 1084.06, -168.537, -65.3082, 0.667178, 0),
+(3000627, 17, 1094.07, -167.277, -65.3082, 5.77227, 0),
+(3000627, 18, 1113.1, -187.895, -65.4175, 5.59948, 0),
+(3000627, 19, 1126.49, -198.759, -65.4502, 5.8186, 0),
+(3000627, 20, 1140.48, -202.571, -65.3502, 0.086769, 0),
+(3000627, 21, 1153.21, -201.446, -65.374, 0.343594, 0),
+(3000627, 22, 1172.86, -191.437, -65.4455, 0.786559, 0),
+(3000627, 23, 1159.8, -203.03, -65.4447, 3.6352, 0),
+(3000627, 24, 1144.47, -202.718, -65.3172, 3.01081, 0),
+(3000627, 25, 1124.53, -196.103, -65.4567, 2.5702, 0),
+(3000627, 26, 1114.1, -185.864, -65.3084, 2.31102, 0),
+(3000627, 27, 1100.52, -171.005, -65.3084, 2.31102, 0),
+(3000627, 28, 1099.18, -151.247, -65.3098, 1.07166, 0),
+(3000627, 29, 1110.93, -139.12, -74.253, 0.800697, 0),
+(3000627, 30, 1128.29, -136.767, -74.3582, 5.57121, 0),
+(3000627, 31, 1135.2, -148.836, -74.3582, 4.87142, 0),
+(3000627, 32, 1136.29, -155.672, -74.9172, 4.87142, 0);
 -- TODO : script panzor spells 
 
 -- Dire maul : Tsu'Zee
@@ -131,18 +132,19 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (300376, 6228, 90, 0, 0, 1, 1, 0, 1, -718.106, 565.242, -289.116, 6.03311, 86400, 0, 0, 3660, 0, 2, 0, 0, 0, '', 0);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES (300376, 3000376, 0, 0, 1, 0, 0, '');
 -- waypoints
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000376, 1, -698.351, 559.918, -282.06, 6.01478, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000376, 2, -736.867, 569.914, -291.06, 4.36542, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000376, 3, -743.754, 581.403, -291.06, 2.05638, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000376, 4, -734.431, 619.357, -300.06, 1.31614, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000376, 5, -726.929, 649.513, -309.06, 1.34361, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000376, 6, -717.134, 687.832, -318.06, 1.26506, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000376, 7, -705.253, 694.829, -318.06, 0.471789, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000376, 8, -717.059, 687.506, -318.06, 4.36151, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000376, 9, -726.776, 650.171, -309.06, 4.389, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000376, 10, -734.225, 619.203, -300.06, 1.31416, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000376, 11, -743.649, 581.74, -291.06, 4.92503, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3000376, 12, -736.919, 569.825, -291.06, 5.79487, 0);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES 
+(3000376, 1, -698.351, 559.918, -282.06, 6.01478, 0),
+(3000376, 2, -736.867, 569.914, -291.06, 4.36542, 0),
+(3000376, 3, -743.754, 581.403, -291.06, 2.05638, 0),
+(3000376, 4, -734.431, 619.357, -300.06, 1.31614, 0),
+(3000376, 5, -726.929, 649.513, -309.06, 1.34361, 0),
+(3000376, 6, -717.134, 687.832, -318.06, 1.26506, 0),
+(3000376, 7, -705.253, 694.829, -318.06, 0.471789, 0),
+(3000376, 8, -717.059, 687.506, -318.06, 4.36151, 0),
+(3000376, 9, -726.776, 650.171, -309.06, 4.389, 0),
+(3000376, 10, -734.225, 619.203, -300.06, 1.31416, 0),
+(3000376, 11, -743.649, 581.74, -291.06, 4.92503, 0),
+(3000376, 12, -736.919, 569.825, -291.06, 5.79487, 0);
 
 -- LBRS : Ghok Bashguud
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (300742, 9718, 229, 0, 0, 1, 1, 0, 1, -89.99, -291.27, 70.9524, 3.86922, 86400, 0, 0, 9321, 0, 0, 0, 0, 0, '', 0);
@@ -153,69 +155,70 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (300768, 11688, 1, 0, 0, 1, 1, 0, 0, -1367.46, 2863.52, 76.9984, 4.55409, 27000, 0, 0, 2060, 0, 2, 0, 0, 0, '', 0);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES (300768, 3000768, 0, 0, 0, 0, 0, '');
 
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 1, -1367.46, 2863.52, 76.9984, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 2, -1393.99, 2851.21, 77.72, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 3, -1426.31, 2868.61, 86.2046, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 4, -1427.88, 2884.84, 89.9063, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 5, -1420.99, 2906.7, 94.5393, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 6, -1418.45, 2928.4, 94.7818, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 7, -1433.51, 2944.64, 94.8155, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 8, -1432.78, 2965.33, 98.78, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 9, -1428.64, 2976.88, 100.431, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 10, -1417.76, 2980.47, 100.451, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 11, -1396.98, 2982, 106.209, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 12, -1398.01, 2992.11, 106.395, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 13, -1430.1, 2989.54, 115.13, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 14, -1437.65, 3005.34, 115.32, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 15, -1450.26, 2993.12, 114.956, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 16, -1477.64, 2978.38, 117.61, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 17, -1493.41, 2968.92, 119.813, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 18, -1495.62, 2957.85, 120.792, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 19, -1486.37, 2950.08, 121.468, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 20, -1469.83, 2953.44, 121.791, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 21, -1441.3, 2962, 123.975, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 22, -1418.32, 2959.49, 123.981, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 23, -1401.41, 2956.93, 126.774, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 24, -1404.8, 2983.21, 130.022, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 25, -1425.63, 2982.74, 133.145, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 26, -1425.4, 2963, 134.552, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 27, -1426.04, 2946.67, 134.535, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 28, -1423.48, 2933.21, 135.64, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 29, -1426.04, 2946.67, 134.535, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 30, -1425.4, 2963, 134.552, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 31, -1425.63, 2982.74, 133.145, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 32, -1404.87, 2983.71, 130.018, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 33, -1401.17, 2956.9, 126.803, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 34, -1418.32, 2959.49, 123.981, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 35, -1441.02, 2961.97, 123.979, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 36, -1469.83, 2953.44, 121.791, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 37, -1486.37, 2950.08, 121.468, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 38, -1495.62, 2957.85, 120.792, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 39, -1493.41, 2968.92, 119.813, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 40, -1477.64, 2978.38, 117.61, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 41, -1450.26, 2993.12, 114.956, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 42, -1437.65, 3005.34, 115.32, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 43, -1430.1, 2989.54, 115.13, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 44, -1398.01, 2992.11, 106.395, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 45, -1396.98, 2982, 106.209, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 46, -1417.5, 2980.56, 100.429, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 47, -1428.64, 2976.88, 100.431, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 48, -1432.78, 2965.33, 98.78, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 49, -1433.51, 2944.64, 94.8155, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 50, -1418.45, 2928.4, 94.7818, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 51, -1420.99, 2906.7, 94.5393, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 52, -1427.88, 2884.84, 89.9063, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 53, -1426.31, 2868.61, 86.2046, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 54, -1393.99, 2851.21, 77.72, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 55, -1367.46, 2863.52, 76.9984, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES (3000768, 56, -1351.69, 2867.27, 76.8984, 0);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`) VALUES 
+(3000768, 1, -1367.46, 2863.52, 76.9984, 0),
+(3000768, 2, -1393.99, 2851.21, 77.72, 0),
+(3000768, 3, -1426.31, 2868.61, 86.2046, 0),
+(3000768, 4, -1427.88, 2884.84, 89.9063, 0),
+(3000768, 5, -1420.99, 2906.7, 94.5393, 0),
+(3000768, 6, -1418.45, 2928.4, 94.7818, 0),
+(3000768, 7, -1433.51, 2944.64, 94.8155, 0),
+(3000768, 8, -1432.78, 2965.33, 98.78, 0),
+(3000768, 9, -1428.64, 2976.88, 100.431, 0),
+(3000768, 10, -1417.76, 2980.47, 100.451, 0),
+(3000768, 11, -1396.98, 2982, 106.209, 0),
+(3000768, 12, -1398.01, 2992.11, 106.395, 0),
+(3000768, 13, -1430.1, 2989.54, 115.13, 0),
+(3000768, 14, -1437.65, 3005.34, 115.32, 0),
+(3000768, 15, -1450.26, 2993.12, 114.956, 0),
+(3000768, 16, -1477.64, 2978.38, 117.61, 0),
+(3000768, 17, -1493.41, 2968.92, 119.813, 0),
+(3000768, 18, -1495.62, 2957.85, 120.792, 0),
+(3000768, 19, -1486.37, 2950.08, 121.468, 0),
+(3000768, 20, -1469.83, 2953.44, 121.791, 0),
+(3000768, 21, -1441.3, 2962, 123.975, 0),
+(3000768, 22, -1418.32, 2959.49, 123.981, 0),
+(3000768, 23, -1401.41, 2956.93, 126.774, 0),
+(3000768, 24, -1404.8, 2983.21, 130.022, 0),
+(3000768, 25, -1425.63, 2982.74, 133.145, 0),
+(3000768, 26, -1425.4, 2963, 134.552, 0),
+(3000768, 27, -1426.04, 2946.67, 134.535, 0),
+(3000768, 28, -1423.48, 2933.21, 135.64, 0),
+(3000768, 29, -1426.04, 2946.67, 134.535, 0),
+(3000768, 30, -1425.4, 2963, 134.552, 0),
+(3000768, 31, -1425.63, 2982.74, 133.145, 0),
+(3000768, 32, -1404.87, 2983.71, 130.018, 0),
+(3000768, 33, -1401.17, 2956.9, 126.803, 0),
+(3000768, 34, -1418.32, 2959.49, 123.981, 0),
+(3000768, 35, -1441.02, 2961.97, 123.979, 0),
+(3000768, 36, -1469.83, 2953.44, 121.791, 0),
+(3000768, 37, -1486.37, 2950.08, 121.468, 0),
+(3000768, 38, -1495.62, 2957.85, 120.792, 0),
+(3000768, 39, -1493.41, 2968.92, 119.813, 0),
+(3000768, 40, -1477.64, 2978.38, 117.61, 0),
+(3000768, 41, -1450.26, 2993.12, 114.956, 0),
+(3000768, 42, -1437.65, 3005.34, 115.32, 0),
+(3000768, 43, -1430.1, 2989.54, 115.13, 0),
+(3000768, 44, -1398.01, 2992.11, 106.395, 0),
+(3000768, 45, -1396.98, 2982, 106.209, 0),
+(3000768, 46, -1417.5, 2980.56, 100.429, 0),
+(3000768, 47, -1428.64, 2976.88, 100.431, 0),
+(3000768, 48, -1432.78, 2965.33, 98.78, 0),
+(3000768, 49, -1433.51, 2944.64, 94.8155, 0),
+(3000768, 50, -1418.45, 2928.4, 94.7818, 0),
+(3000768, 51, -1420.99, 2906.7, 94.5393, 0),
+(3000768, 52, -1427.88, 2884.84, 89.9063, 0),
+(3000768, 53, -1426.31, 2868.61, 86.2046, 0),
+(3000768, 54, -1393.99, 2851.21, 77.72, 0),
+(3000768, 55, -1367.46, 2863.52, 76.9984, 0),
+(3000768, 56, -1351.69, 2867.27, 76.8984, 0);
 -- todo : spells 
+
+-- Trigore the Lasher
+-- This guy is also missing on vmangos, waiting for data
 
 -- Veyzhak the Cannibal
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (160358, 5399, 0, 0, 0, 1, 1, 0, 1, -10301, -4028.2, -74.8377, 2.79036, 28800, 0, 0, 3093, 0, 0, 0, 0, 0, '', 0);
 
 -- zekkis
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (160355, 5400, 0, 0, 0, 1, 1, 0, 1, -10250.9, -4006.4, -99.7118, 0.401091, 28800, 0, 0, 3093, 0, 0, 0, 0, 0, '', 0);
-
--- Trigore the Lasher
--- This guy is also missing on vmangos, waiting for data
