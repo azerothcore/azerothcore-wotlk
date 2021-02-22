@@ -19,10 +19,10 @@ function inst_configureOS() {
             # add here distro that are debian or ubuntu based
             # TODO: find a better way, maybe checking the existance
             # of a package manager
-                "neon" | "ubuntu")
+                "neon" | "ubuntu" | "Ubuntu")
                     DISTRO="ubuntu"
                 ;;
-                "debian")
+                "debian" | "Debian")
                     DISTRO="debian"
                 ;;
                 *)
