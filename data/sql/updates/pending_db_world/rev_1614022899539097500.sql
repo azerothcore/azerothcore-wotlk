@@ -1,0 +1,28 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1614022899539097500');
+
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 1735);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 5725);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 3547);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 2314);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 1743);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 1515);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 2114);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 1518);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 10055);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 1745);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 2309);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 4773);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 4731);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 2311);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 2137);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 33996);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 1746);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 1652);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 2135);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 2136);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 2118);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 2134);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 1738);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 1742);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 10665);
+UPDATE `creature_template` SET `unit_flags` = 4608, `type` = 6 WHERE (`entry` = 10666);
