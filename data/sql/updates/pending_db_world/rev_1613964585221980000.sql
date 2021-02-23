@@ -91,7 +91,6 @@ INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event
 (@ENTRY, 0, 6, 0, 0, 0, 100, 2, 3000, 4000, 65000, 70000, 11, 15044, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Every 65 - 70 seconds (3 - 4s initially)  - Self: Cast spell Frost Ward (15044) on Self (flags: interrupt previous)"),
 (@ENTRY, 0, 7, 0, 2, 0, 100, 3, 0, 15, 0, 0, 25, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "When health between 0 and 15 (check every 0 - 0 ms) - Self: Flee for assist");
 
-
 -- Adding missing spawns
 -- TODO : add them the chance to despawn 
 
@@ -140,7 +139,8 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 
 -- Dire maul : Tsu'Zee
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (56961, 11467, 429, 0, 0, 1, 1, 0, 1, 128.643, 561.759, -4.31221, 3.12414, 86400, 0, 0, 18642, 0, 0, 0, 0, 0, '', 0);
--- todo : equipment and spells 
+-- update tsu'zee to have her daggers drawn (blizzlike)
+UPDATE `creature_template_addon` SET `bytes2`='1' WHERE  `entry`=11467;
 
 -- Dark Iron Ambassador
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (300376, 6228, 90, 0, 0, 1, 1, 0, 1, -718.106, 565.242, -289.116, 6.03311, 86400, 0, 0, 3660, 0, 2, 0, 0, 0, '', 0);
