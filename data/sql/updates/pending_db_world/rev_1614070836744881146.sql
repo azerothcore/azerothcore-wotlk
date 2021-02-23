@@ -1,0 +1,85 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1614070836744881146');
+
+-- Create pooling for Copper and Tin Veins in Ghostlands
+
+DELETE FROM `pool_template` WHERE `entry`=11645;
+INSERT INTO `pool_template` (`entry`,`max_limit`,`description`) VALUES
+(11645,25,"Copper and Tin Veins - Ghostlands");
+
+-- Add gameobjects to pools
+DELETE FROM `pool_gameobject` WHERE `guid` IN (75000,75003,75006,75009,75012,75015,75018,75021,75027,75030,75033,75036,75039,75042,75045,75048,75054,75057,75060,75063,75066,75069,75072,75075,75078,75081,75084,75087,75093,75096,75102,75108,75111,75114,75117,120324,120325,120363,75001,75004,75007,75010,75013,75016,75019,75022,75028,75031,75034,75037,75040,75043,75046,75049,75055,75058,75061,75064,75067,75070,75073,75076,75079,75082,75085,75088,75094,75097,75103,75109,75112,75115,75118);
+
+INSERT INTO `pool_gameobject` (`guid`,`pool_entry`,`chance`,`description`) VALUES
+(75000,11645,0,"Ghostlands, Copper Vein, spawn 1"),
+(75003,11645,0,"Ghostlands, Copper Vein, spawn 2"),
+(75006,11645,0,"Ghostlands, Copper Vein, spawn 3"),
+(75009,11645,0,"Ghostlands, Copper Vein, spawn 4"),
+(75012,11645,0,"Ghostlands, Copper Vein, spawn 5"),
+(75015,11645,0,"Ghostlands, Copper Vein, spawn 6"),
+(75018,11645,0,"Ghostlands, Copper Vein, spawn 7"),
+(75021,11645,0,"Ghostlands, Copper Vein, spawn 8"),
+(75027,11645,0,"Ghostlands, Copper Vein, spawn 9"),
+(75030,11645,0,"Ghostlands, Copper Vein, spawn 10"),
+(75033,11645,0,"Ghostlands, Copper Vein, spawn 11"),
+(75036,11645,0,"Ghostlands, Copper Vein, spawn 12"),
+(75039,11645,0,"Ghostlands, Copper Vein, spawn 13"),
+(75042,11645,0,"Ghostlands, Copper Vein, spawn 14"),
+(75045,11645,0,"Ghostlands, Copper Vein, spawn 15"),
+(75048,11645,0,"Ghostlands, Copper Vein, spawn 16"),
+(75054,11645,0,"Ghostlands, Copper Vein, spawn 17"),
+(75057,11645,0,"Ghostlands, Copper Vein, spawn 18"),
+(75060,11645,0,"Ghostlands, Copper Vein, spawn 19"),
+(75063,11645,0,"Ghostlands, Copper Vein, spawn 20"),
+(75066,11645,0,"Ghostlands, Copper Vein, spawn 21"),
+(75069,11645,0,"Ghostlands, Copper Vein, spawn 22"),
+(75072,11645,0,"Ghostlands, Copper Vein, spawn 23"),
+(75075,11645,0,"Ghostlands, Copper Vein, spawn 24"),
+(75078,11645,0,"Ghostlands, Copper Vein, spawn 25"),
+(75081,11645,0,"Ghostlands, Copper Vein, spawn 26"),
+(75084,11645,0,"Ghostlands, Copper Vein, spawn 27"),
+(75087,11645,0,"Ghostlands, Copper Vein, spawn 28"),
+(75093,11645,0,"Ghostlands, Copper Vein, spawn 29"),
+(75096,11645,0,"Ghostlands, Copper Vein, spawn 30"),
+(75102,11645,0,"Ghostlands, Copper Vein, spawn 31"),
+(75108,11645,0,"Ghostlands, Copper Vein, spawn 32"),
+(75111,11645,0,"Ghostlands, Copper Vein, spawn 33"),
+(75114,11645,0,"Ghostlands, Copper Vein, spawn 34"),
+(75117,11645,0,"Ghostlands, Copper Vein, spawn 35"),
+(75001,11645,0,"Ghostlands, Tin Vein, spawn 1"),
+(75004,11645,0,"Ghostlands, Tin Vein, spawn 2"),
+(75007,11645,0,"Ghostlands, Tin Vein, spawn 3"),
+(75010,11645,0,"Ghostlands, Tin Vein, spawn 4"),
+(75013,11645,0,"Ghostlands, Tin Vein, spawn 5"),
+(75016,11645,0,"Ghostlands, Tin Vein, spawn 6"),
+(75019,11645,0,"Ghostlands, Tin Vein, spawn 7"),
+(75022,11645,0,"Ghostlands, Tin Vein, spawn 8"),
+(75028,11645,0,"Ghostlands, Tin Vein, spawn 9"),
+(75031,11645,0,"Ghostlands, Tin Vein, spawn 10"),
+(75034,11645,0,"Ghostlands, Tin Vein, spawn 11"),
+(75037,11645,0,"Ghostlands, Tin Vein, spawn 12"),
+(75040,11645,0,"Ghostlands, Tin Vein, spawn 13"),
+(75043,11645,0,"Ghostlands, Tin Vein, spawn 14"),
+(75046,11645,0,"Ghostlands, Tin Vein, spawn 15"),
+(75049,11645,0,"Ghostlands, Tin Vein, spawn 16"),
+(75055,11645,0,"Ghostlands, Tin Vein, spawn 17"),
+(75058,11645,0,"Ghostlands, Tin Vein, spawn 18"),
+(75061,11645,0,"Ghostlands, Tin Vein, spawn 19"),
+(75064,11645,0,"Ghostlands, Tin Vein, spawn 20"),
+(75067,11645,0,"Ghostlands, Tin Vein, spawn 21"),
+(75070,11645,0,"Ghostlands, Tin Vein, spawn 22"),
+(75073,11645,0,"Ghostlands, Tin Vein, spawn 23"),
+(75076,11645,0,"Ghostlands, Tin Vein, spawn 24"),
+(75079,11645,0,"Ghostlands, Tin Vein, spawn 25"),
+(75082,11645,0,"Ghostlands, Tin Vein, spawn 26"),
+(75085,11645,0,"Ghostlands, Tin Vein, spawn 27"),
+(75088,11645,0,"Ghostlands, Tin Vein, spawn 28"),
+(75094,11645,0,"Ghostlands, Tin Vein, spawn 29"),
+(75097,11645,0,"Ghostlands, Tin Vein, spawn 30"),
+(75103,11645,0,"Ghostlands, Tin Vein, spawn 31"),
+(75109,11645,0,"Ghostlands, Tin Vein, spawn 32"),
+(75112,11645,0,"Ghostlands, Tin Vein, spawn 33"),
+(75115,11645,0,"Ghostlands, Tin Vein, spawn 34"),
+(75118,11645,0,"Ghostlands, Tin Vein, spawn 35");
+
+-- Lower respawn of veins to 1 minute
+UPDATE `gameobject` SET `spawntimesecs`=60 WHERE `guid` IN (75000,75003,75006,75009,75012,75015,75018,75021,75027,75030,75033,75036,75039,75042,75045,75048,75054,75057,75060,75063,75066,75069,75072,75075,75078,75081,75084,75087,75093,75096,75102,75108,75111,75114,75117,120324,120325,120363,75001,75004,75007,75010,75013,75016,75019,75022,75028,75031,75034,75037,75040,75043,75046,75049,75055,75058,75061,75064,75067,75070,75073,75076,75079,75082,75085,75088,75094,75097,75103,75109,75112,75115,75118);
