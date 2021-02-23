@@ -156,7 +156,8 @@ enum SpellSpecificType
     SPELL_SPECIFIC_SCROLL                        = 24,
     SPELL_SPECIFIC_MAGE_ARCANE_BRILLANCE         = 25,
     SPELL_SPECIFIC_PRIEST_DIVINE_SPIRIT          = 26,
-    SPELL_SPECIFIC_HAND                          = 27,
+    SPELL_SPECIFIC_HAND                          = 28,
+    SPELL_SPECIFIC_WARRIOR_ENRAGE                = 29,
 };
 
 enum SpellCustomAttributes
