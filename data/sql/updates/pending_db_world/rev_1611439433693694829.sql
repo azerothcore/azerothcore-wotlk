@@ -1,5 +1,8 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1611439433693694829');
 
+-- useless spawns in AC of Goblin Commoner
+DELETE FROM creature_addon WHERE guid IN (91115, 91116, 91117, 91118, 91579, 91580, 91581, 91582, 91583, 91584, 91704, 91705, 91706, 91707, 91749, 91750, 91751, 91752, 91753, 91754, 91755, 91756, 91757, 91758, 91759, 91760, 91761, 91762, 91763, 91764, 91765, 91766, 91767, 91768, 91769, 91770, 91771, 91772, 91773, 91774, 91775, 91776, 91777, 91778, 91779, 91794, 91801, 92568, 93587, 93610, 93639, 93646, 93652, 93695, 93734, 93762, 93763, 93764, 93913);
+
 DELETE FROM `creature` WHERE `id`=20102;
 INSERT INTO `creature` (`guid`,`id`,`map`,`zoneId`,`areaId`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`wander_distance`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`,`ScriptName`,`VerifiedBuild`) VALUES
 (727,20102,0,0,0,1,1,0,0,-14469.6,462.223,36.9248,0.279253,300,0,0,42,0,0,0,0,0,'',0),
