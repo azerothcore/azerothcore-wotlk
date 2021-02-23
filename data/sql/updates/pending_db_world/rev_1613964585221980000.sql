@@ -76,9 +76,24 @@ INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event
 (@ENTRY, 0, 2, 0, 0, 0, 100, 2, 5000, 10000, 20000, 20000, 11, 16172, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "Every 20 - 20 seconds (5 - 10s initially)  - Self: Cast spell Head Crack (16172) on Victim"),
 (@ENTRY, 0, 3, 0, 0, 0, 100, 2, 10000, 10000, 10000, 10000, 11, 6253, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "Every 10 seconds  - Self: Cast spell Backhand (6253) on Victim");
 
+-- warder stilgiss and Verek
+-- verek is his pet, give the warder a command to despawn his pet with himself, added some waits otherwise it doesn't work.
+SET @ENTRY := 9041;
+DELETE FROM smart_scripts WHERE entryOrGuid = 9041 AND source_type = 0;
+UPDATE creature_template SET AIName="SmartAI" WHERE entry= @ENTRY;
+INSERT INTO smart_scripts (entryorguid, source_type, id, link, event_type, event_phase_mask, event_chance, event_flags, event_param1, event_param2, event_param3, event_param4, action_type, action_param1, action_param2, action_param3, action_param4, action_param5, action_param6, target_type, target_param1, target_param2, target_param3, target_x, target_y, target_z, target_o, comment) VALUES
+(@ENTRY, 0, 0, 0, 37, 0, 80, 0, 0, 0, 0, 0, 67, 1, 500, 500, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "On AI initialize - Trigger timed event #1 in 500 - 500 ms // -meta_wait"),
+(@ENTRY, 0, 1, 2, 59, 0, 100, 0, 1, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 10, 47775, 9042, 0, 0, 0, 0, 0, "On timed event 1 triggered - None: Despawn in 0.5 s"),
+(@ENTRY, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 41, 1000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "On link - None: Despawn in 1 s"),
+(@ENTRY, 0, 3, 0, 1, 0, 100, 2, 1000, 1000, 1800000, 1800000, 11, 12544, 33, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Every 1800 seconds (1s initially)  - Self: Cast spell Frost Armor (12544) on Self (flags: interrupt previous, aura not present)"),
+(@ENTRY, 0, 4, 0, 0, 0, 100, 2, 0, 0, 2400, 3800, 11, 12675, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, "Every 2.4 - 3.8 seconds (0 - 0s initially)  - Self: Cast spell Frostbolt (12675) on Victim (flags: combat move)"),
+(@ENTRY, 0, 5, 0, 0, 0, 100, 2, 7000, 9000, 14000, 18000, 11, 12674, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Every 14 - 18 seconds (7 - 9s initially)  - Self: Cast spell Frost Nova (12674) on Self (flags: interrupt previous)"),
+(@ENTRY, 0, 6, 0, 0, 0, 100, 2, 3000, 4000, 65000, 70000, 11, 15044, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "Every 65 - 70 seconds (3 - 4s initially)  - Self: Cast spell Frost Ward (15044) on Self (flags: interrupt previous)"),
+(@ENTRY, 0, 7, 0, 2, 0, 100, 3, 0, 15, 0, 0, 25, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "When health between 0 and 15 (check every 0 - 0 ms) - Self: Flee for assist");
+
+
 -- Adding missing spawns
 -- TODO : add them the chance to despawn 
--- TODO : check and update their stats
 
 DELETE FROM `creature` WHERE `guid` IN (300627, 56961, 300376, 300742, 300768, 160358, 160355, 300452);
 DELETE FROM `creature_addon` WHERE `guid` IN (300627, 56961, 300376, 300742, 300768, 160358, 160355);
@@ -122,7 +137,6 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (3000627, 30, 1128.29, -136.767, -74.3582, 5.57121, 0),
 (3000627, 31, 1135.2, -148.836, -74.3582, 4.87142, 0),
 (3000627, 32, 1136.29, -155.672, -74.9172, 4.87142, 0);
--- TODO : script panzor spells 
 
 -- Dire maul : Tsu'Zee
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (56961, 11467, 429, 0, 0, 1, 1, 0, 1, 128.643, 561.759, -4.31221, 3.12414, 86400, 0, 0, 18642, 0, 0, 0, 0, 0, '', 0);
@@ -148,7 +162,6 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 
 -- LBRS : Ghok Bashguud
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES (300742, 9718, 229, 0, 0, 1, 1, 0, 1, -89.99, -291.27, 70.9524, 3.86922, 86400, 0, 0, 9321, 0, 0, 0, 0, 0, '', 0);
--- todo : spells 
 
 -- Maraudon entrance : Cursed centaur
 -- TODO : his speed is bugged
