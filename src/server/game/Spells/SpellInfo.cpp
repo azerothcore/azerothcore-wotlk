@@ -2161,7 +2161,7 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
                 if (Id == 12292) // Death Wish
                     return SPELL_SPECIFIC_WARRIOR_ENRAGE;
                 break;
-            }      
+            }
         case SPELLFAMILY_WARLOCK:
             {
                 // only warlock curses have this
