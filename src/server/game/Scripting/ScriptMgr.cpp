@@ -1339,6 +1339,11 @@ void ScriptMgr::OnPlayerCompleteQuest(Player* player, Quest const* quest)
     FOREACH_SCRIPT(PlayerScript)->OnPlayerCompleteQuest(player, quest);
 }
 
+void ScriptMgr::OnBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBattlegroundDesertion(player, desertionType);
+}
+
 void ScriptMgr::OnPlayerReleasedGhost(Player* player)
 {
     FOREACH_SCRIPT(PlayerScript)->OnPlayerReleasedGhost(player);
