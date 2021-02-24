@@ -14,19 +14,19 @@ EndScriptData */
 /* ContentData
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "SpellScript.h"
-#include "Player.h"
-#include "Vehicle.h"
+#include "CellImpl.h"
+#include "Chat.h"
+#include "CombatAI.h"
 #include "CreatureTextMgr.h"
 #include "PassiveAI.h"
-#include "CombatAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
-#include "Chat.h"
-#include "CellImpl.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 /********

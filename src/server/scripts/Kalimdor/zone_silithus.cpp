@@ -16,15 +16,15 @@ npcs_rutgar_and_frankal
 quest_a_pawn_on_the_eternal_pawn
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
+#include "AccountMgr.h"
+#include "BanManager.h"
 #include "Group.h"
 #include "Player.h"
-#include "AccountMgr.h"
-#include "SpellInfo.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
-#include "BanManager.h"
+#include "SpellInfo.h"
 
 /*###
 ## npcs_rutgar_and_frankal

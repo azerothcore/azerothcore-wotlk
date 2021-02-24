@@ -4,22 +4,22 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "Transport.h"
-#include "MapManager.h"
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "WorldPacket.h"
-#include "DBCStores.h"
-#include "World.h"
-#include "GameObjectAI.h"
-#include "Vehicle.h"
-#include "MapReference.h"
-#include "Player.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "WorldModel.h"
+#include "Common.h"
+#include "DBCStores.h"
+#include "GameObjectAI.h"
+#include "MapManager.h"
+#include "MapReference.h"
+#include "ObjectMgr.h"
+#include "Player.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
+#include "Transport.h"
+#include "Vehicle.h"
+#include "World.h"
+#include "WorldModel.h"
+#include "WorldPacket.h"
 
 MotionTransport::MotionTransport() : Transport(), _transportInfo(nullptr), _isMoving(true), _pendingStop(false), _triggeredArrivalEvent(false), _triggeredDepartureEvent(false), _passengersLoaded(false), _delayedTeleport(false)
 {

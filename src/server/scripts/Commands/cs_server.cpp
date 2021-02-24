@@ -11,14 +11,14 @@ Comment: All server related commands
 Category: commandscripts
 EndScriptData */
 
+#include "AvgDiffTracker.h"
 #include "Chat.h"
 #include "Config.h"
+#include "GitRevision.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "GitRevision.h"
-#include "AvgDiffTracker.h"
 #include "ServerMotd.h"
 
 class server_commandscript : public CommandScript

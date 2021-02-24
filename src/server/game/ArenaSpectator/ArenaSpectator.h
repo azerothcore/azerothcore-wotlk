@@ -2,15 +2,15 @@
 #ifndef AZEROTHCORE_ARENASPECTATOR_H
 #define AZEROTHCORE_ARENASPECTATOR_H
 
-#include "Player.h"
-#include "World.h"
-#include "Map.h"
 #include "Battleground.h"
-#include "Pet.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
 #include "Chat.h"
 #include "LFGMgr.h"
+#include "Map.h"
+#include "Pet.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "World.h"
 
 #define SPECTATOR_ADDON_VERSION 27
 #define SPECTATOR_BUFFER_LEN 150

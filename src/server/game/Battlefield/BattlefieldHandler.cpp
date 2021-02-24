@@ -4,16 +4,15 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Battlefield.h"
+#include "BattlefieldMgr.h"
 #include "Common.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-
-#include "Battlefield.h"
-#include "BattlefieldMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 //This send to player windows for invite player to join the war
 //Param1:(BattleId) the BattleId of Bf

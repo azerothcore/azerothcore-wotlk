@@ -30,15 +30,15 @@ go_hive_pod
 go_veil_skith_cage
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "CellImpl.h"
+#include "GameObjectAI.h"
+#include "GridNotifiersImpl.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "GameObjectAI.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
-#include "Player.h"
 #include "WorldSession.h"
-#include "GridNotifiersImpl.h"
-#include "CellImpl.h"
 
 // Ours
 /*######

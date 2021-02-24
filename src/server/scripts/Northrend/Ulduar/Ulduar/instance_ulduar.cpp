@@ -2,14 +2,14 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Transport.h"
 #include "ulduar.h"
 #include "Vehicle.h"
-#include "Player.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Transport.h"
 
 class instance_ulduar : public InstanceMapScript
 {

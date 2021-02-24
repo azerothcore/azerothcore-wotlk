@@ -4,17 +4,17 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Chat.h"
 #include "Common.h"
-#include "TicketMgr.h"
 #include "DatabaseEnv.h"
 #include "Language.h"
 #include "Log.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "TicketMgr.h"
+#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Chat.h"
-#include "World.h"
-#include "Player.h"
-#include "Opcodes.h"
 
 inline float GetAge(uint64 t) { return float(time(nullptr) - t) / DAY; }
 

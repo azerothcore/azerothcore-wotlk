@@ -23,9 +23,9 @@ at_brewfest
 at_area_52_entrance
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellMgr.h"
 
 // Ours

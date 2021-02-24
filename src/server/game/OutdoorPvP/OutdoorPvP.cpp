@@ -4,19 +4,19 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "OutdoorPvP.h"
-#include "OutdoorPvPMgr.h"
-#include "ObjectAccessor.h"
-#include "ObjectMgr.h"
+#include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "GridNotifiersImpl.h"
+#include "Group.h"
 #include "Map.h"
 #include "MapManager.h"
-#include "Group.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "OutdoorPvP.h"
+#include "OutdoorPvPMgr.h"
 #include "WorldPacket.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "CellImpl.h"
 
 OPvPCapturePoint::OPvPCapturePoint(OutdoorPvP* pvp):
     m_capturePointGUID(0), m_capturePoint(nullptr), m_maxValue(0.0f), m_minValue(0.0f), m_maxSpeed(0),

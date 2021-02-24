@@ -9,30 +9,27 @@
 *  \author Derex <derex101@gmail.com>
 */
 
-#include "WorldSocketMgr.h"
-
-#include <ace/ACE.h>
-#include <ace/Log_Msg.h>
-#include <ace/Reactor.h>
-#include <ace/Reactor_Impl.h>
-#include <ace/TP_Reactor.h>
-#include <ace/Dev_Poll_Reactor.h>
-#include <atomic>
-#include <ace/os_include/arpa/os_inet.h>
-#include <ace/os_include/netinet/os_tcp.h>
-#include <ace/os_include/sys/os_types.h>
-#include <ace/os_include/sys/os_socket.h>
-
-#include <atomic>
-#include <set>
-
-#include "Log.h"
 #include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
+#include "Log.h"
+#include "ScriptMgr.h"
 #include "WorldSocket.h"
 #include "WorldSocketAcceptor.h"
-#include "ScriptMgr.h"
+#include "WorldSocketMgr.h"
+#include <ace/ACE.h>
+#include <ace/Dev_Poll_Reactor.h>
+#include <ace/Log_Msg.h>
+#include <ace/os_include/arpa/os_inet.h>
+#include <ace/os_include/netinet/os_tcp.h>
+#include <ace/os_include/sys/os_socket.h>
+#include <ace/os_include/sys/os_types.h>
+#include <ace/Reactor_Impl.h>
+#include <ace/Reactor.h>
+#include <ace/TP_Reactor.h>
+#include <atomic>
+#include <atomic>
+#include <set>
 
 /**
 * This is a helper class to WorldSocketMgr, that manages

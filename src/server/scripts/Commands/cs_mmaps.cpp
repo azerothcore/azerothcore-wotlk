@@ -23,19 +23,19 @@
 * mmap sub-commands
 */
 
-#include "ScriptMgr.h"
+#include "CellImpl.h"
 #include "Chat.h"
 #include "DisableMgr.h"
-#include "ObjectMgr.h"
-#include "Player.h"
-#include "PointMovementGenerator.h"
-#include "PathGenerator.h"
-#include "MMapFactory.h"
-#include "Map.h"
-#include "TargetedMovementGenerator.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CellImpl.h"
+#include "Map.h"
+#include "MMapFactory.h"
+#include "ObjectMgr.h"
+#include "PathGenerator.h"
+#include "Player.h"
+#include "PointMovementGenerator.h"
+#include "ScriptMgr.h"
+#include "TargetedMovementGenerator.h"
 
 class mmaps_commandscript : public CommandScript
 {

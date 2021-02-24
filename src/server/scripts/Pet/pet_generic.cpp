@@ -9,16 +9,16 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_gen_".
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "Player.h"
-#include "Group.h"
 #include "CreatureTextMgr.h"
-#include "PetAI.h"
+#include "Group.h"
 #include "PassiveAI.h"
+#include "PetAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
 
 enum Mojo
 {

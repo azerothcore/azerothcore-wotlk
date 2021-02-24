@@ -8,11 +8,11 @@
     \ingroup world
 */
 
-#include "WeatherMgr.h"
-#include "Weather.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "Weather.h"
+#include "WeatherMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include <memory>
