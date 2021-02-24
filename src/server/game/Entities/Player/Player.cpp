@@ -19731,10 +19731,13 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         {
             const uint64 leaderGuid = GetGroup() ? GetGroup()->GetLeaderGUID() : GetGUID();
             Player* tempLeader = HashMapHolder<Player>::Find(leaderGuid);
-            if (leaderGuid != GetGUID() && tempLeader != nullptr)
+            if (leaderGuid != GetGUID())
             {
-                partyLeader = tempLeader;
-                leaderName = partyLeader->GetName();
+                if (tempLeader != nullptr)
+                {
+                    partyLeader = tempLeader;
+                }
+                leaderName = GetGroup()->GetLeaderName();
             }
         }
 
