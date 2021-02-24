@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1614138891078013900');
 
-UPDATE `smart_scripts` SET `event_type` =67, `event_param1` =15000, `event_param2` =15000, `event_flags` =0 WHERE `entryorguid` =3,36,92,114,822,1128,1199,1201,1537,1543,1547,1548,1549,1770,1869,1934,1935,1972,2248,2347,2473,2474,2723,2735,2736,2780,2781,2782,4130,4872,5246,5253,5292,5293,5300,5461,5850,5853,7032,8447,9218,9219,11698,15655 AND (`source_type` =0);
+UPDATE `smart_scripts` SET `event_type` =67, `event_param1` =15000, `event_param2` =15000, `event_flags` =0 WHERE `entryorguid` IN (3,36,92,114,822,1128,1199,1201,1537,1543,1547,1548,1549,1770,1869,1934,1935,1972,2248,2347,2473,2474,2723,2735,2736,2780,2781,2782,4130,4872,5246,5253,5292,5293,5300,5461,5850,5853,7032,8447,9218,9219,11698,15655) AND (`source_type` =0);
 
 UPDATE `smart_scripts` SET `comment` ='Flesh Eater - On Behind Target - Cast \'Dazed\'' WHERE `entryorguid` =3 AND `source_type` =0;
 UPDATE `smart_scripts` SET `comment` ='Harvest Golem - On Behind Target - Cast \'Dazed\'' WHERE `entryorguid` =36 AND `source_type` =0;
