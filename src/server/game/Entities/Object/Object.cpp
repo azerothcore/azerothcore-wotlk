@@ -16,7 +16,6 @@
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "Log.h"
-#include "Log.h"
 #include "MapManager.h"
 #include "MovementPacketBuilder.h"
 #include "Object.h"

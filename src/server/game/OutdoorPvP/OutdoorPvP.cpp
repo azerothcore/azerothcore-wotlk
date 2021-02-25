@@ -6,8 +6,6 @@
 
 #include "CellImpl.h"
 #include "GridNotifiers.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "Map.h"

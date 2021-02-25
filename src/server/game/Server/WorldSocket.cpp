@@ -28,7 +28,6 @@
 #include <ace/os_include/sys/os_socket.h>
 #include <ace/os_include/sys/os_types.h>
 #include <ace/OS_NS_string.h>
-#include <ace/OS_NS_string.h>
 #include <ace/OS_NS_unistd.h>
 #include <ace/Reactor.h>
 #include <thread>

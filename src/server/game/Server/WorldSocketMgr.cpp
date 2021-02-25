@@ -28,7 +28,6 @@
 #include <ace/Reactor.h>
 #include <ace/TP_Reactor.h>
 #include <atomic>
-#include <atomic>
 #include <set>
 
 /**
