@@ -745,6 +745,9 @@ protected:
 public:
     virtual void OnPlayerReleasedGhost(Player* /*player*/) { }
 
+    // Called on Send Initial Packets Before Add To Map
+    virtual void OnSendInitialPacketsBeforeAddToMap(Player* /*player*/, WorldPacket& /*data*/) {}
+
     // Called when a player does a desertion action (see BattlegroundDesertionType)
     virtual void OnBattlegroundDesertion(Player* /*player*/, BattlegroundDesertionType const /*desertionType*/) { }
 
@@ -1331,6 +1334,7 @@ public: /* AchievementCriteriaScript */
 
 public: /* PlayerScript */
     void OnBeforePlayerUpdate(Player* player, uint32 p_time);
+    void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerReleasedGhost(Player* player);
     void OnPVPKill(Player* killer, Player* killed);
     void OnCreatureKill(Player* killer, Creature* killed);
