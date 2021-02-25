@@ -134,9 +134,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8413718 WHERE `entry`=1160
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=1244;
 
 -- 'Archbishop Benedictus', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Thysta', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=1 WHERE `entry`=1387;
@@ -193,9 +194,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8388624 WHERE `entry`=1717
 UPDATE `creature_template` SET `mechanic_immune_mask`=8388624 WHERE `entry`=1720;
 
 -- 'Highlord Bolvar Fordragon', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Gilnid', mechanic_immune_mask was 76234719
 UPDATE `creature_template` SET `mechanic_immune_mask`=608908883 WHERE `entry`=1763;
@@ -355,9 +357,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=646016863 WHERE `entry`=23
 UPDATE `creature_template` SET `mechanic_immune_mask`=1 WHERE `entry`=2409;
 
 -- 'Varimathras', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Darla Harris', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=1 WHERE `entry`=2432;
@@ -432,11 +435,12 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=2762;
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=2776;
 
 -- 'King Magni Bronzebeard', mechanic_immune_mask was 617299967
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Enraged Rock Elemental', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=646016863 WHERE `entry`=2791;
@@ -478,11 +482,12 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8602131 WHERE `entry`=2946
 UPDATE `creature_template` SET `mechanic_immune_mask`=1 WHERE `entry`=2995;
 
 -- 'Cairne Bloodhoof', mechanic_immune_mask was 617299967
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Unseen', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=3094;
@@ -500,11 +505,12 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1 WHERE `entry`=3310;
 UPDATE `creature_template` SET `mechanic_immune_mask`=25094 WHERE `entry`=3417;
 
 -- 'Arch Druid Fandral Staghelm', mechanic_immune_mask was 617299967
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Blackmoss the Fetid', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=3535;
@@ -801,21 +807,23 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=4945
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=4946;
 
 -- 'Thrall', mechanic_immune_mask was 617299967
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Theramore Combat Dummy', mechanic_immune_mask was 16384
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=4952;
 
 -- 'Lady Jaina Proudmoore', mechanic_immune_mask was 617299967
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Aku'mai Servant', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=4978;
@@ -887,9 +895,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=5723
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=5761;
 
 -- 'Guardian of Blizzard', mechanic_immune_mask was 0
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1073741825, will not update
+-- WARNING: Remainder vmangos mask: 1, will not update
 
 -- 'Verdan the Everliving', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=5775;
@@ -1292,9 +1301,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1 WHERE `entry`=7823;
 UPDATE `creature_template` SET `mechanic_immune_mask`=1 WHERE `entry`=7824;
 
 -- 'Teremus the Devourer', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Mobile Alert System', mechanic_immune_mask was 16384
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=7849;
@@ -1309,23 +1319,26 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=7897
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=7915;
 
 -- 'High Tinker Mekkatorque', mechanic_immune_mask was 617299967
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Tyrande Whisperwind', mechanic_immune_mask was 617299967
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Sen'jin Guardian', mechanic_immune_mask was 0
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1073741825, will not update
+-- WARNING: Remainder vmangos mask: 1, will not update
 
 -- 'Guthrum Thunderfist', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=1 WHERE `entry`=8018;
@@ -1444,9 +1457,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=8615
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=8667;
 
 -- 'Massive Infernal', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Felguard Elite', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=17 WHERE `entry`=8717;
@@ -1623,9 +1637,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=612449875 WHERE `entry`=92
 UPDATE `creature_template` SET `mechanic_immune_mask`=612449875 WHERE `entry`=9219;
 
 -- 'Shadow Hunter Vosh'gajin', mechanic_immune_mask was 0
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1686847452, will not update
+-- WARNING: Remainder vmangos mask: 613105628, will not update
 
 -- 'War Master Voone', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -1694,9 +1709,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=613105499 WHERE `entry`=95
 UPDATE `creature_template` SET `mechanic_immune_mask`=613105499 WHERE `entry`=9543;
 
 -- 'Overlord Wyrmthalak', mechanic_immune_mask was 0
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1686847452, will not update
+-- WARNING: Remainder vmangos mask: 613105628, will not update
 
 -- 'Arei Transformed', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=9599;
@@ -1718,9 +1734,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=612449875 WHERE `entry`=97
 UPDATE `creature_template` SET `mechanic_immune_mask`=613105499 WHERE `entry`=9736;
 
 -- 'Pyroguard Emberseer', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1686863836, will not update
+-- WARNING: Remainder vmangos mask: 613122012, will not update
 
 -- 'Entropic Beast', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=25094 WHERE `entry`=9878;
@@ -1752,22 +1769,25 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=1011
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=10120;
 
 -- 'Lord Victor Nefarius', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Lady Sylvanas Windrunner', mechanic_immune_mask was 617299967
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Onyxia', mechanic_immune_mask was 650854271
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1720401756, will not update
+-- WARNING: Remainder vmangos mask: 646659932, will not update
 
 -- 'Azurous', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16 WHERE `entry`=10202;
@@ -1787,17 +1807,19 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=646655835 WHERE `entry`=10
 UPDATE `creature_template` SET `mechanic_immune_mask`=613105499 WHERE `entry`=10268;
 
 -- 'Gyth', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1686847452, will not update
+-- WARNING: Remainder vmangos mask: 613105628, will not update
 
 -- 'Fellicent's Shade', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=8413718 WHERE `entry`=10358;
 
 -- 'General Drakkisath', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1686847452, will not update
+-- WARNING: Remainder vmangos mask: 613105628, will not update
 
 -- 'Crystal Fang', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -1837,14 +1859,16 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8602131 WHERE `entry`=1039
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=10411;
 
 -- 'Warchief Rend Blackhand', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1686847452, will not update
+-- WARNING: Remainder vmangos mask: 613105628, will not update
 
 -- 'The Beast', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1686847452, will not update
+-- WARNING: Remainder vmangos mask: 613105628, will not update
 
 -- 'Vectus', mechanic_immune_mask was 8388624
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -1951,11 +1975,12 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=613105499 WHERE `entry`=10
 UPDATE `creature_template` SET `mechanic_immune_mask`=646675226 WHERE `entry`=10516;
 
 -- 'Vol'jin', mechanic_immune_mask was 617299967
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Hearthsinger Forresten', mechanic_immune_mask was 8388624
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -2157,14 +2182,16 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=0 WHERE `entry`=11355;
 UPDATE `creature_template` SET `mechanic_immune_mask`=608908883 WHERE `entry`=11356;
 
 -- 'Jin'do the Hexxer', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Bloodlord Mandokir', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041632, will not update
+-- WARNING: Remainder vmangos mask: 617299808, will not update
 
 -- 'Illusion of Jandice Barov', mechanic_immune_mask was 8388624
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -2245,9 +2272,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=613105499 WHERE `entry`=11
 UPDATE `creature_template` SET `mechanic_immune_mask`=613105499 WHERE `entry`=11501;
 
 -- 'Ragnaros', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1719893856, will not update
+-- WARNING: Remainder vmangos mask: 646152032, will not update
 
 -- 'Oggleflint', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=8388624 WHERE `entry`=11517;
@@ -2280,9 +2308,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=11577;
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=11578;
 
 -- 'Nefarian', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1724596064, will not update
+-- WARNING: Remainder vmangos mask: 650854240, will not update
 
 -- 'Risen Guardian', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=11598;
@@ -2310,9 +2339,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=646135647 WHERE `entry`=11
 UPDATE `creature_template` SET `mechanic_immune_mask`=646135647 WHERE `entry`=11661;
 
 -- 'Flamewaker Priest', mechanic_immune_mask was 0
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1686847456, will not update
+-- WARNING: Remainder vmangos mask: 613105632, will not update
 
 -- 'Flamewaker Healer', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -2410,34 +2440,40 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1 WHERE `entry`=11900;
 UPDATE `creature_template` SET `mechanic_immune_mask`=1 WHERE `entry`=11901;
 
 -- 'Flamegor', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1686847328, will not update
+-- WARNING: Remainder vmangos mask: 613105504, will not update
 
 -- 'Firemaw', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1686847328, will not update
+-- WARNING: Remainder vmangos mask: 613105504, will not update
 
 -- 'Golemagg the Incinerator', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1719877472, will not update
+-- WARNING: Remainder vmangos mask: 646135648, will not update
 
 -- 'Majordomo Executus', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1720401760, will not update
+-- WARNING: Remainder vmangos mask: 646659936, will not update
 
 -- 'Baron Geddon', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1719893792, will not update
+-- WARNING: Remainder vmangos mask: 646151968, will not update
 
 -- 'Garr', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1719893856, will not update
+-- WARNING: Remainder vmangos mask: 646152032, will not update
 
 -- 'Lava Elemental', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=646020959 WHERE `entry`=12076;
@@ -2449,9 +2485,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1011483136 WHERE `entry`=1
 UPDATE `creature_template` SET `mechanic_immune_mask`=1011483136 WHERE `entry`=12097;
 
 -- 'Sulfuron Harbinger', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1719877472, will not update
+-- WARNING: Remainder vmangos mask: 646135648, will not update
 
 -- 'Firesworn', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=646020959 WHERE `entry`=12099;
@@ -2463,9 +2500,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=646020959 WHERE `entry`=12
 UPDATE `creature_template` SET `mechanic_immune_mask`=646020959 WHERE `entry`=12101;
 
 -- 'Lucifron', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1719877472, will not update
+-- WARNING: Remainder vmangos mask: 646135648, will not update
 
 -- 'Flamewaker Protector', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
@@ -2479,9 +2517,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=617299803 WHERE `entry`=12
 UPDATE `creature_template` SET `mechanic_immune_mask`=16400 WHERE `entry`=12143;
 
 -- 'Korrak the Bloodrager', mechanic_immune_mask was 0
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694812, will not update
+-- WARNING: Remainder vmangos mask: 1019952988, will not update
 
 -- 'Tortured Druid', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=8413718 WHERE `entry`=12178;
@@ -2526,14 +2565,16 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=608925267 WHERE `entry`=12
 UPDATE `creature_template` SET `mechanic_immune_mask`=608925267 WHERE `entry`=12258;
 
 -- 'Gehennas', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1719877472, will not update
+-- WARNING: Remainder vmangos mask: 646135648, will not update
 
 -- 'Shazzrah', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1719877472, will not update
+-- WARNING: Remainder vmangos mask: 646135648, will not update
 
 -- 'Lava Spawn', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=646152031 WHERE `entry`=12265;
@@ -2579,18 +2620,20 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8413718 WHERE `entry`=1237
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=12385;
 
 -- 'Lord Kazzak', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1724596060, will not update
+-- WARNING: Remainder vmangos mask: 650854236, will not update
 
 -- 'Death Talon Dragonspawn', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
 UPDATE `creature_template` SET `mechanic_immune_mask`=613104973 WHERE `entry`=12422;
 
 -- 'Razorgore the Untamed', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1124073472, will not update
+-- WARNING: Remainder vmangos mask: 50331648, will not update
 
 -- 'Blackwing Spellbinder', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -2672,17 +2715,19 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=1287
 UPDATE `creature_template` SET `mechanic_immune_mask`=617299547 WHERE `entry`=12899;
 
 -- 'Somnus', mechanic_immune_mask was 2147483647
+-- MECHANIC_ENRAGED from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
-UPDATE `creature_template` SET `mechanic_immune_mask`=617299675 WHERE `entry`=12900;
+UPDATE `creature_template` SET `mechanic_immune_mask`=1691041499 WHERE `entry`=12900;
 
 -- 'Lorgus Jett', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=608908883 WHERE `entry`=12902;
 
 -- 'Vaelastrasz the Corrupt', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041632, will not update
+-- WARNING: Remainder vmangos mask: 617299808, will not update
 
 -- 'Warpwood Crusher', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=608925267 WHERE `entry`=13021;
@@ -2897,9 +2942,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1011483136 WHERE `entry`=1
 UPDATE `creature_template` SET `mechanic_immune_mask`=8 WHERE `entry`=13996;
 
 -- 'Chromaggus', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1724596064, will not update
+-- WARNING: Remainder vmangos mask: 650854240, will not update
 
 -- 'Phase Lasher (Fire)', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=14061;
@@ -3021,9 +3067,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=646016862 WHERE `entry`=14
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=14424;
 
 -- 'Prince Thunderaan', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691058012, will not update
+-- WARNING: Remainder vmangos mask: 617316188, will not update
 
 -- 'Molt Thorn', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=14448;
@@ -3085,35 +3132,40 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=650346335 WHERE `entry`=14
 UPDATE `creature_template` SET `mechanic_immune_mask`=613105499 WHERE `entry`=14506;
 
 -- 'High Priest Venoxis', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'High Priest Thekal', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'High Priestess Mar'li', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Banal Spirit', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=14514;
 
 -- 'High Priestess Arlokk', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Death Knight Darkreaver', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=0 WHERE `entry`=14516;
 
 -- 'High Priestess Jeklik', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Swift Yellow Mechanostrider', mechanic_immune_mask was 16384
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=14551;
@@ -3140,9 +3192,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=1456
 UPDATE `creature_template` SET `mechanic_immune_mask`=8413718 WHERE `entry`=14564;
 
 -- 'Ebonroc', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1686847328, will not update
+-- WARNING: Remainder vmangos mask: 613105504, will not update
 
 -- 'Sever', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=8388688 WHERE `entry`=14682;
@@ -3211,48 +3264,56 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1019952987 WHERE `entry`=1
 UPDATE `creature_template` SET `mechanic_immune_mask`=1019952987 WHERE `entry`=14777;
 
 -- 'Hakkar', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Blood Steward of Kirtonos', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
 UPDATE `creature_template` SET `mechanic_immune_mask`=617299803 WHERE `entry`=14861;
 
 -- 'Emissary Roman'khan', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1724612576, will not update
+-- WARNING: Remainder vmangos mask: 650870752, will not update
 
 -- 'Parasitic Serpent', mechanic_immune_mask was 0
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1073741825, will not update
+-- WARNING: Remainder vmangos mask: 1, will not update
 
 -- 'Ysondre', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1723940864, will not update
+-- WARNING: Remainder vmangos mask: 650199040, will not update
 
 -- 'Lethon', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1723940864, will not update
+-- WARNING: Remainder vmangos mask: 650199040, will not update
 
 -- 'Emeriss', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1723940864, will not update
+-- WARNING: Remainder vmangos mask: 650199040, will not update
 
 -- 'Taerar', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1723940864, will not update
+-- WARNING: Remainder vmangos mask: 650199040, will not update
 
 -- 'High Priestess Jeklik Transform Visual', mechanic_immune_mask was 0
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1073741825, will not update
+-- WARNING: Remainder vmangos mask: 1, will not update
 
 -- 'Guse's War Rider', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=1019952987 WHERE `entry`=14943;
@@ -3277,32 +3338,37 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1019952987 WHERE `entry`=1
 UPDATE `creature_template` SET `mechanic_immune_mask`=113457951 WHERE `entry`=14987;
 
 -- 'Ohgan', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Gurubashi', mechanic_immune_mask was 0
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2147483648, will not update
+-- WARNING: Remainder vmangos mask: 1073741824, will not update
 
 -- 'Fishbot 5000', mechanic_immune_mask was 16384
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=15079;
 
 -- 'Gri'lek', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Hazza'rah', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Wushoolay', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Swift Zulian Tiger', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15104;
@@ -3311,9 +3377,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15104;
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15108;
 
 -- 'Gahz'ranka', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Portal of Madness', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=646135135 WHERE `entry`=15141;
@@ -3325,9 +3392,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=131072 WHERE `entry`=15146
 UPDATE `creature_template` SET `mechanic_immune_mask`=1 WHERE `entry`=15178;
 
 -- 'Anachronos', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'The Banshee Queen', mechanic_immune_mask was 617299803
 UPDATE `creature_template` SET `mechanic_immune_mask`=617316187 WHERE `entry`=15193;
@@ -3409,14 +3477,16 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=617299807 WHERE `entry`=15
 UPDATE `creature_template` SET `mechanic_immune_mask`=613105499 WHERE `entry`=15264;
 
 -- 'Emperor Vek'nilash', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041632, will not update
+-- WARNING: Remainder vmangos mask: 617299808, will not update
 
 -- 'Emperor Vek'lor', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041632, will not update
+-- WARNING: Remainder vmangos mask: 617299808, will not update
 
 -- 'Anubisath Defender', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -3435,9 +3505,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=646938463 WHERE `entry`=15
 UPDATE `creature_template` SET `mechanic_immune_mask`=646938463 WHERE `entry`=15290;
 
 -- 'Viscidus', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Anubisath Warder', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -3478,27 +3549,31 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1019950875 WHERE `entry`=1
 UPDATE `creature_template` SET `mechanic_immune_mask`=1019969371 WHERE `entry`=15338;
 
 -- 'Ossirian the Unscarred', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694812, will not update
+-- WARNING: Remainder vmangos mask: 1019952988, will not update
 
 -- 'Moam', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694812, will not update
+-- WARNING: Remainder vmangos mask: 1019952988, will not update
 
 -- 'General Rajaxx', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694812, will not update
+-- WARNING: Remainder vmangos mask: 1019952988, will not update
 
 -- 'Qiraji Swarmguard', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=1019952987 WHERE `entry`=15343;
 
 -- 'Kurinnaxx', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'RC Blimp <PH>', mechanic_immune_mask was 16384
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=15349;
@@ -3507,9 +3582,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=1534
 UPDATE `creature_template` SET `mechanic_immune_mask`=1019952987 WHERE `entry`=15355;
 
 -- 'Malfurion Stormrage', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'RC Mortar Tank <PH>', mechanic_immune_mask was 16384
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=15364;
@@ -3518,42 +3594,49 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=1536
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=15368;
 
 -- 'Ayamiss the Hunter', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Buru the Gorger', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Halloween Male Ghost', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=15376;
 
 -- 'Merithra of the Dream', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Caelestrasz', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Arygos', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Anachronos the Ancient', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Fandral Staghelm', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Colonel Zerran', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=1019952987 WHERE `entry`=15385;
@@ -3577,29 +3660,34 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1019952987 WHERE `entry`=1
 UPDATE `creature_template` SET `mechanic_immune_mask`=1019952987 WHERE `entry`=15392;
 
 -- 'Anachronos Dragon Form', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Arygos Dragon Form', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Caelestrasz Dragon Form', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Merithra Dragon Form', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Merithra's Wake', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Sand Vortex', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15428;
@@ -3608,65 +3696,76 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15428;
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15429;
 
 -- 'Omen', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1724596224, will not update
+-- WARNING: Remainder vmangos mask: 650854400, will not update
 
 -- 'Spirit of Azuregos', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Eranikus', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Buru the Gorger Transform Visual', mechanic_immune_mask was 0
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1073741825, will not update
+-- WARNING: Remainder vmangos mask: 1, will not update
 
 -- 'Princess Huhuran', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Fankriss the Unyielding', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Lord Kri', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Buru Egg', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=617299803 WHERE `entry`=15514;
 
 -- 'Battleguard Sartura', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691039584, will not update
+-- WARNING: Remainder vmangos mask: 617297760, will not update
 
 -- 'Ouro', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Mana Fiend', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15527;
 
 -- 'Princess Yauj', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Vem', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Doctor Weavil', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -3680,14 +3779,16 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8466295 WHERE `entry`=1555
 UPDATE `creature_template` SET `mechanic_immune_mask`=1019952987 WHERE `entry`=15555;
 
 -- 'Maws', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Eye of C'Thun', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1724596060, will not update
+-- WARNING: Remainder vmangos mask: 650854236, will not update
 
 -- 'Hive'Regal Hunter-Killer', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
@@ -3695,14 +3796,16 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1019952987 WHERE `entry`=1
 UPDATE `creature_template` SET `mechanic_immune_mask`=1071628159 WHERE `entry`=15620;
 
 -- 'Twilight Corrupter', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Eranikus the Redeemed', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Spawn of Fankriss', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
@@ -3713,9 +3816,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=113981311 WHERE `entry`=15
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15631;
 
 -- 'Tyrande', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Glob of Viscidus', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=617299803 WHERE `entry`=15667;
@@ -3727,24 +3831,28 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15698;
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15706;
 
 -- 'C'Thun', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1724596060, will not update
+-- WARNING: Remainder vmangos mask: 650854236, will not update
 
 -- 'Colossus of Zora', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1724596064, will not update
+-- WARNING: Remainder vmangos mask: 650854240, will not update
 
 -- 'Colossus of Regal', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1724596064, will not update
+-- WARNING: Remainder vmangos mask: 650854240, will not update
 
 -- 'Colossus of Ashi', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1724596064, will not update
+-- WARNING: Remainder vmangos mask: 650854240, will not update
 
 -- 'Colossal Anubisath Warbringer', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -3823,9 +3931,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=646659935 WHERE `entry`=15
 UPDATE `creature_template` SET `mechanic_immune_mask`=646659935 WHERE `entry`=15817;
 
 -- 'Lieutenant General Nokhor', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1720401888, will not update
+-- WARNING: Remainder vmangos mask: 646660064, will not update
 
 -- 'Tentacle Portal', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15904;
@@ -3839,69 +3948,80 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15910;
 UPDATE `creature_template` SET `mechanic_immune_mask`=1071644543 WHERE `entry`=15922;
 
 -- 'Thaddius', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Stalagg', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Feugen', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Grobbulus', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Gluth', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Heigan the Unclean', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Maexxna', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Grand Widow Faerlina', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Noth the Plaguebringer', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Anub'Rekhan', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'The Master's Eye', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Buru Egg Trigger', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15964;
@@ -3950,22 +4070,25 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1021294203 WHERE `entry`=1
 UPDATE `creature_template` SET `mechanic_immune_mask`=113981311 WHERE `entry`=15984;
 
 -- 'Sapphiron', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Kel'Thuzad', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Loatheb', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Patchwork Golem', mechanic_immune_mask was 8388624
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
@@ -4010,9 +4133,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1019945489 WHERE `entry`=1
 UPDATE `creature_template` SET `mechanic_immune_mask`=1019945491 WHERE `entry`=16037;
 
 -- 'Lord Valthalak', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1686847452, will not update
+-- WARNING: Remainder vmangos mask: 613105628, will not update
 
 -- 'Magma Lord Bokk', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=16043;
@@ -4029,39 +4153,45 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1019945489 WHERE `entry`=1
 UPDATE `creature_template` SET `mechanic_immune_mask`=8388624 WHERE `entry`=16059;
 
 -- 'Gothik the Harvester', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Instructor Razuvious', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Highlord Mograine', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Sir Zeliek', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Thane Korth'azz', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Lady Blaumeux', mechanic_immune_mask was 617299839
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2093694844, will not update
+-- WARNING: Remainder vmangos mask: 1019953020, will not update
 
 -- 'Mor Grayhoof', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -4207,9 +4337,10 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8602131 WHERE `entry`=1638
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=16383;
 
 -- 'Atiesh', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 2113912828, will not update
+-- WARNING: Remainder vmangos mask: 1040171004, will not update
 
 -- 'Deathchill Servant', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=1015751184 WHERE `entry`=16390;
@@ -4285,24 +4416,28 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1021296250 WHERE `entry`=1
 UPDATE `creature_template` SET `mechanic_immune_mask`=1019945489 WHERE `entry`=16698;
 
 -- 'Spirit of Mograine', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Spirit of Blaumeux', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Spirit of Zeliek', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Spirit of Korth'azz', mechanic_immune_mask was 617299803
+-- MECHANIC_SLOW_CAST_SPEED from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
--- WARNING: Remainder vmangos mask: 1691041628, will not update
+-- WARNING: Remainder vmangos mask: 617299804, will not update
 
 -- 'Plagued Guardian', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=1015751184 WHERE `entry`=16981;
