@@ -116,22 +116,24 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 
 -- teldrassil
 -- grimmaw
+DELETE FROM `creature` WHERE `guid`=300777;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`) VALUES (300777, 14429, 1, 9132.61, 1651.7, 1322.14, 4.25837, 9000, 0, 2);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES (300777, 3007770, 0, 0, 1, 0, 0, '');
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 1, 9132.81, 1664.76, 1320.77, 4.74146, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 2, 9141.27, 1690.01, 1320.05, 1.23858, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 3, 9141.58, 1727.6, 1319.16, 1.73339, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 4, 9137.61, 1753.82, 1319.01, 1.808, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 5, 9116, 1771.33, 1321.66, 2.04362, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 6, 9109.14, 1808.41, 1325.54, 1.66663, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 7, 9111.24, 1823.84, 1328.53, 4.67864, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 8, 9108.77, 1809.06, 1325.75, 4.86517, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 9, 9115.99, 1771.94, 1321.74, 5.14595, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 10, 9136.82, 1754.07, 1318.87, 4.75914, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 11, 9141.64, 1726.7, 1319.16, 4.60991, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 12, 9141.35, 1689.69, 1320.03, 4.60991, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 13, 9131.44, 1665.16, 1320.95, 4.71202, 0);
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES (3007770, 14, 9132.59, 1646.61, 1322.61, 4.6806, 0);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES
+(3007770, 1, 9132.81, 1664.76, 1320.77, 4.74146, 0),
+(3007770, 2, 9141.27, 1690.01, 1320.05, 1.23858, 0),
+(3007770, 3, 9141.58, 1727.6, 1319.16, 1.73339, 0),
+(3007770, 4, 9137.61, 1753.82, 1319.01, 1.808, 0),
+(3007770, 5, 9116, 1771.33, 1321.66, 2.04362, 0),
+(3007770, 6, 9109.14, 1808.41, 1325.54, 1.66663, 0),
+(3007770, 7, 9111.24, 1823.84, 1328.53, 4.67864, 0),
+(3007770, 8, 9108.77, 1809.06, 1325.75, 4.86517, 0),
+(3007770, 9, 9115.99, 1771.94, 1321.74, 5.14595, 0),
+(3007770, 10, 9136.82, 1754.07, 1318.87, 4.75914, 0),
+(3007770, 11, 9141.64, 1726.7, 1319.16, 4.60991, 0),
+(3007770, 12, 9141.35, 1689.69, 1320.03, 4.60991, 0),
+(3007770, 13, 9131.44, 1665.16, 1320.95, 4.71202, 0),
+(3007770, 14, 9132.59, 1646.61, 1322.61, 4.6806, 0);
 -- add missing spell vicious bite
 SET @ENTRY := 14429;
 DELETE FROM smart_scripts WHERE entryOrGuid = 14429 AND source_type = 0;
