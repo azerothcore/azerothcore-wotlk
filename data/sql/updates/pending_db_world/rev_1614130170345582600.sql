@@ -105,8 +105,10 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`) VALUES
 (300775, 14233, 1, -3969.57, -3182.07, 28.8974, 3.08685, 38000, 10, 1),
 (300776, 14233, 1, -4040.93, -3557.63, 28.5225, 5.65789, 38000, 10, 1);
-INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (300775, 43157, 0, 'Dustwallow Marsh: Ripscale');
-INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES (300776, 43157, 0, 'Dustwallow Marsh: Ripscale');
+DELETE FROM `pool_creature` WHERE `guid` IN (300775,300776);
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
+(300775, 43157, 0, 'Dustwallow Marsh: Ripscale'),
+(300776, 43157, 0, 'Dustwallow Marsh: Ripscale');
 -- The rot
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`) VALUES (300773, 14235, 1, -4042.09, -3753.6, 43.2492, 6.26622, 108000, 5, 1);
 -- lord angler
