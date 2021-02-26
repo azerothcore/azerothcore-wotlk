@@ -118,7 +118,6 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 
 -- teldrassil
 -- grimmaw
-DELETE FROM `creature` WHERE `guid`=300777;
 INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`) VALUES (300777, 14429, 1, 9132.61, 1651.7, 1322.14, 4.25837, 9000, 0, 2);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES (300777, 3007770, 0, 0, 1, 0, 0, '');
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`) VALUES
