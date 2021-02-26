@@ -1,8 +1,8 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1613997950982437928');
 
--- Convert a load of mechanic_immune_mask's from vmangos.
-
--- Some debug information is included here, it can be removed before a merge.
+-- Convert a load of mechanic_immune_mask's from vmangos, see
+-- https://github.com/azerothcore/azerothcore-wotlk/pull/4630
+-- for a long explanation of the reasoning behind
 
 -- 'Harvest Golem', mechanic_immune_mask was 16384
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=36;
@@ -2649,10 +2649,11 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=617299547 WHERE `entry`=12
 
 -- 'Somnus', mechanic_immune_mask was 2147483647
 -- MECHANIC_ENRAGED from AC is enabled, adding
+-- MECHANIC_INFECTED from AC is enabled, adding
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1693138651 WHERE `entry`=12900;
+UPDATE `creature_template` SET `mechanic_immune_mask`=1695235803 WHERE `entry`=12900;
 
 -- 'Lorgus Jett', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=608908883 WHERE `entry`=12902;
