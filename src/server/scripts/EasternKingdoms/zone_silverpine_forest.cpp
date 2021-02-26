@@ -291,7 +291,7 @@ public:
                     SummonCreatureWithRandomTarget(2065, 0);
                     break;
                 case 4:
-                     SummonCreatureWithRandomTarget(2066, 1);
+                    SummonCreatureWithRandomTarget(2066, 1);
                     SummonCreatureWithRandomTarget(2066, 1);
                     SummonCreatureWithRandomTarget(2067, 0);
                     SummonCreatureWithRandomTarget(2068, 2);
