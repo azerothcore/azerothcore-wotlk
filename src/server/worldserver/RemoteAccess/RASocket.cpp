@@ -8,17 +8,17 @@
     \ingroup Trinityd
 */
 
+#include "AccountMgr.h"
 #include "Common.h"
 #include "Configuration/Config.h"
 #include "Database/DatabaseEnv.h"
-#include "AccountMgr.h"
+#include "Duration.h"
 #include "Log.h"
 #include "RASocket.h"
-#include "Util.h"
-#include "Duration.h"
-#include "World.h"
-#include "SHA1.h"
 #include "ServerMotd.h"
+#include "SHA1.h"
+#include "Util.h"
+#include "World.h"
 #include <thread>
 
 RASocket::RASocket()

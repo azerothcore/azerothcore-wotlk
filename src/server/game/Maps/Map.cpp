@@ -4,17 +4,19 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Map.h"
-#include "Geometry.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "Chat.h"
 #include "DynamicTree.h"
+#include "Geometry.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "Object.h"
 #include "Group.h"
 #include "InstanceScript.h"
+#include "LFGMgr.h"
+#include "Map.h"
 #include "MapInstanced.h"
+#include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
@@ -22,8 +24,7 @@
 #include "Transport.h"
 #include "Vehicle.h"
 #include "VMapFactory.h"
-#include "LFGMgr.h"
-#include "Chat.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif

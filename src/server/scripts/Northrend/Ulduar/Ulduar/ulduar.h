@@ -5,10 +5,10 @@
 #ifndef DEF_ULDUAR_H
 #define DEF_ULDUAR_H
 
+#include "CellImpl.h"
 #include "Chat.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CellImpl.h"
 
 enum UlduarEncounters
 {

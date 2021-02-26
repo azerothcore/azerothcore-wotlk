@@ -4,14 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "TargetedMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "MoveSplineInit.h"
+#include "Pet.h"
 #include "Player.h"
 #include "Spell.h"
+#include "TargetedMovementGenerator.h"
 #include "Transport.h"
-#include "Pet.h"
 
 static bool IsMutualChase(Unit* owner, Unit* target)
 {

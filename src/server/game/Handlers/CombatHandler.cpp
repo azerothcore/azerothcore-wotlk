@@ -5,16 +5,16 @@
  */
 
 #include "Common.h"
-#include "Log.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "ObjectAccessor.h"
 #include "CreatureAI.h"
+#include "Log.h"
+#include "ObjectAccessor.h"
 #include "ObjectDefines.h"
+#include "Opcodes.h"
+#include "Player.h"
 #include "Vehicle.h"
 #include "VehicleDefines.h"
-#include "Player.h"
-#include "Opcodes.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
 {

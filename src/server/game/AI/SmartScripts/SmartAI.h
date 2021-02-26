@@ -10,12 +10,11 @@
 #include "Common.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "Unit.h"
-#include "Spell.h"
-
+#include "GameObjectAI.h"
 #include "SmartScript.h"
 #include "SmartScriptMgr.h"
-#include "GameObjectAI.h"
+#include "Spell.h"
+#include "Unit.h"
 
 enum SmartEscortState
 {

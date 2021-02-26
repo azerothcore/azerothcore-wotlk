@@ -12,14 +12,14 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
-#include "ScriptMgr.h"
-#include "ObjectMgr.h"
 #include "Language.h"
-#include "SpellMgr.h"
-#include "SpellInfo.h"
-#include "Player.h"
+#include "ObjectMgr.h"
 #include "Pet.h"
+#include "Player.h"
 #include "PlayerCommand.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
 
 class learn_commandscript : public CommandScript, public PlayerCommand
 {

@@ -8,16 +8,14 @@
 /// @{
 /// \file
 
-#include <openssl/opensslv.h>
-#include <openssl/crypto.h>
-#include <ace/Version.h>
-
 #include "Common.h"
-#include "Database/DatabaseEnv.h"
 #include "Configuration/Config.h"
-
+#include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "Master.h"
+#include <ace/Version.h>
+#include <openssl/crypto.h>
+#include <openssl/opensslv.h>
 
 #ifndef _ACORE_CORE_CONFIG
 #define _ACORE_CORE_CONFIG "worldserver.conf"

@@ -11,14 +11,14 @@ Comment: All go related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ObjectMgr.h"
-#include "MapManager.h"
-#include "TicketMgr.h"
 #include "Chat.h"
-#include "Language.h"
-#include "Player.h"
 #include "GameGraveyard.h"
+#include "Language.h"
+#include "MapManager.h"
+#include "ObjectMgr.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "TicketMgr.h"
 
 class go_commandscript : public CommandScript
 {

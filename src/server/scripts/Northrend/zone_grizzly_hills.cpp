@@ -4,16 +4,16 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
+#include "CombatAI.h"
+#include "CreatureTextMgr.h"
+#include "Pet.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "Vehicle.h"
-#include "CombatAI.h"
-#include "Player.h"
-#include "Pet.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
-#include "CreatureTextMgr.h"
 #include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 enum qRedRocket

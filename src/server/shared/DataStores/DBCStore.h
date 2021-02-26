@@ -10,9 +10,9 @@
 #include "Common.h"
 #include "DBCStorageIterator.h"
 #include "Errors.h"
-#include <vector>
-#include <G3D/Vector3.h>
 #include <G3D/AABox.h>
+#include <G3D/Vector3.h>
+#include <vector>
 
  // Structures for M4 file. Source: https://wowdev.wiki
 template<typename T>

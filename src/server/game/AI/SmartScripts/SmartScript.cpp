@@ -4,9 +4,9 @@
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 */
 
-#include "Chat.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "Chat.h"
 #include "CreatureTextMgr.h"
 #include "DatabaseEnv.h"
 #include "GameEventMgr.h"

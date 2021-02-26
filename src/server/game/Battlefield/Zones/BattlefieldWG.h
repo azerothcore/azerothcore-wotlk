@@ -7,10 +7,10 @@
 #ifndef BATTLEFIELD_WG_
 #define BATTLEFIELD_WG_
 
-#include "ObjectAccessor.h"
-#include "WorldPacket.h"
 #include "Battlefield.h"
+#include "ObjectAccessor.h"
 #include "World.h"
+#include "WorldPacket.h"
 
 class Group;
 class BattlefieldWG;

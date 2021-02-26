@@ -8,28 +8,27 @@
     \ingroup Trinityd
 */
 
+#include "ACSoap.h"
+#include "BigNumber.h"
+#include "CliRunnable.h"
 #include "Common.h"
+#include "Config.h"
+#include "DatabaseEnv.h"
+#include "DatabaseWorkerPool.h"
 #include "GitRevision.h"
+#include "Log.h"
+#include "Master.h"
+#include "OpenSSLCrypto.h"
+#include "RARunnable.h"
+#include "RealmList.h"
+#include "ScriptMgr.h"
 #include "SignalHandler.h"
+#include "Timer.h"
+#include "Util.h"
 #include "World.h"
 #include "WorldRunnable.h"
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
-#include "Config.h"
-#include "DatabaseEnv.h"
-#include "DatabaseWorkerPool.h"
-
-#include "CliRunnable.h"
-#include "Log.h"
-#include "Master.h"
-#include "RARunnable.h"
-#include "ACSoap.h"
-#include "Timer.h"
-#include "Util.h"
-#include "RealmList.h"
-#include "ScriptMgr.h"
-#include "BigNumber.h"
-#include "OpenSSLCrypto.h"
 #include <ace/Sig_Handler.h>
 
 #ifdef _WIN32

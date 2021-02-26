@@ -7,8 +7,8 @@
 #ifndef _MAPREFERENCE_H
 #define _MAPREFERENCE_H
 
-#include "Reference.h"
 #include "Map.h"
+#include "Reference.h"
 
 class MapReference : public Reference<Map, Player>
 {

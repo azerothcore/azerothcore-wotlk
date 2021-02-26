@@ -7,9 +7,9 @@
 #ifndef ACORE_COMBATAI_H
 #define ACORE_COMBATAI_H
 
+#include "ConditionMgr.h"
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
-#include "ConditionMgr.h"
 
 class Creature;
 

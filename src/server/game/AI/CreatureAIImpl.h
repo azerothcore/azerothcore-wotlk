@@ -7,11 +7,10 @@
 #define CREATUREAIIMPL_H
 
 #include "Common.h"
-#include "Define.h"
-#include "TemporarySummon.h"
 #include "CreatureAI.h"
+#include "Define.h"
 #include "SpellMgr.h"
-
+#include "TemporarySummon.h"
 #include <functional>
 #include <type_traits>
 

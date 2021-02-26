@@ -4,7 +4,7 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "zlib.h"
+#include "Chat.h"
 #include "Common.h"
 #include "Language.h"
 #include "ObjectMgr.h"
@@ -14,8 +14,8 @@
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "Chat.h"
 #include "WorldSession.h"
+#include "zlib.h"
 
 void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
 {

@@ -10,12 +10,10 @@
 #include "Common.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "Unit.h"
-#include "Spell.h"
 #include "GridNotifiers.h"
-
 #include "SmartScriptMgr.h"
-//#include "SmartAI.h"
+#include "Spell.h"
+#include "Unit.h"
 
 class SmartScript
 {

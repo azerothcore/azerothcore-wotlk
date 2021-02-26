@@ -5,16 +5,16 @@
  */
 
 #include "Common.h"
+#include "Item.h"
+#include "Log.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "SpellInfo.h"
+#include "UpdateData.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Opcodes.h"
-#include "Log.h"
-#include "ObjectMgr.h"
-#include "Player.h"
-#include "Item.h"
-#include "UpdateData.h"
-#include "ObjectAccessor.h"
-#include "SpellInfo.h"
 
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
 {

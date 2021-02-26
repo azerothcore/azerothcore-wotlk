@@ -11,14 +11,14 @@ Comment: All gm related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ObjectMgr.h"
-#include "Chat.h"
 #include "AccountMgr.h"
+#include "Chat.h"
 #include "Language.h"
-#include "World.h"
-#include "Player.h"
+#include "ObjectMgr.h"
 #include "Opcodes.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "World.h"
 
 class gm_commandscript : public CommandScript
 {
