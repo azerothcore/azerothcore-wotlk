@@ -7,10 +7,9 @@
 #ifndef ACORE_CELL_H
 #define ACORE_CELL_H
 
+#include "GridDefines.h"
 #include "TypeContainer.h"
 #include "TypeContainerVisitor.h"
-
-#include "GridDefines.h"
 
 class Map;
 class WorldObject;

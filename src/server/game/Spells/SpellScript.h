@@ -7,10 +7,10 @@
 #ifndef __SPELL_SCRIPT_H
 #define __SPELL_SCRIPT_H
 
-#include "Util.h"
 #include "SharedDefines.h"
-#include "SpellAuraDefines.h"
 #include "Spell.h"
+#include "SpellAuraDefines.h"
+#include "Util.h"
 #include <stack>
 
 class Unit;

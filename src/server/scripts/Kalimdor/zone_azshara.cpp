@@ -17,10 +17,10 @@ npc_rizzle_sprysprocket
 npc_depth_charge
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 /*######

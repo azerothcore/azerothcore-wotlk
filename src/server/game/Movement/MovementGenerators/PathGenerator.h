@@ -7,13 +7,13 @@
 #ifndef _PATH_GENERATOR_H
 #define _PATH_GENERATOR_H
 
-#include "SharedDefines.h"
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
-#include "MoveSplineInitArgs.h"
-#include <G3D/Vector3.h>
 #include "MMapFactory.h"
 #include "MMapManager.h"
+#include "MoveSplineInitArgs.h"
+#include "SharedDefines.h"
+#include <G3D/Vector3.h>
 
 class Unit;
 class WorldObject;

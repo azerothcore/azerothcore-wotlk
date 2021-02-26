@@ -4,20 +4,20 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "DBCStores.h"
+#include "BattlegroundMgr.h"
 #include "DBCFileLoader.h"
 #include "DBCfmt.h"
+#include "DBCStores.h"
 #include "Errors.h"
 #include "Log.h"
 #include "SharedDefines.h"
 #include "SpellMgr.h"
 #include "TransportMgr.h"
-#include "BattlegroundMgr.h"
 #include "World.h"
-#include <map>
 #include <fstream>
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <map>
 
 typedef std::map<uint16, uint32> AreaFlagByAreaID;
 typedef std::map<uint32, uint32> AreaFlagByMapID;

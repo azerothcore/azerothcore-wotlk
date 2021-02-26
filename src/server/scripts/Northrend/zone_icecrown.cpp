@@ -15,18 +15,18 @@ EndScriptData */
 npc_arete
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellAuras.h"
-#include "Player.h"
 #include "CombatAI.h"
 #include "MoveSplineInit.h"
-#include "ScriptedEscortAI.h"
-#include "Vehicle.h"
-#include "SmartScriptMgr.h"
-#include "SpellScript.h"
 #include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SmartScriptMgr.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 enum eBKG

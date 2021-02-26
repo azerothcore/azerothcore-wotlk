@@ -4,17 +4,17 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ThreatManager.h"
-#include "Unit.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "Map.h"
-#include "Player.h"
 #include "ObjectAccessor.h"
-#include "UnitEvents.h"
+#include "Player.h"
 #include "SpellAuras.h"
-#include "SpellMgr.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "ThreatManager.h"
+#include "Unit.h"
+#include "UnitEvents.h"
 
 //==============================================================
 //================= ThreatCalcHelper ===========================

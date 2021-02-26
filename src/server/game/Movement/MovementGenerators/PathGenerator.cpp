@@ -4,15 +4,15 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PathGenerator.h"
-#include "Map.h"
 #include "Creature.h"
+#include "DetourCommon.h"
+#include "DisableMgr.h"
+#include "Geometry.h"
+#include "Log.h"
+#include "Map.h"
 #include "MMapFactory.h"
 #include "MMapManager.h"
-#include "Log.h"
-#include "DisableMgr.h"
-#include "DetourCommon.h"
-#include "Geometry.h"
+#include "PathGenerator.h"
 
  ////////////////// PathGenerator //////////////////
 PathGenerator::PathGenerator(WorldObject const* owner) :

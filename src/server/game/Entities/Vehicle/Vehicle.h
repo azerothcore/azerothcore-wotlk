@@ -7,10 +7,10 @@
 #ifndef __ACORE_VEHICLE_H
 #define __ACORE_VEHICLE_H
 
-#include "ObjectDefines.h"
-#include "VehicleDefines.h"
 #include "EventProcessor.h"
+#include "ObjectDefines.h"
 #include "Unit.h"
+#include "VehicleDefines.h"
 
 struct VehicleEntry;
 class Unit;

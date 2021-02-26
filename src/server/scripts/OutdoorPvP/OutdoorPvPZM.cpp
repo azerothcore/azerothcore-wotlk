@@ -4,17 +4,17 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "OutdoorPvPZM.h"
+#include "Creature.h"
+#include "GameGraveyard.h"
+#include "GossipDef.h"
+#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
+#include "OutdoorPvPZM.h"
 #include "Player.h"
-#include "Creature.h"
-#include "ObjectAccessor.h"
-#include "WorldPacket.h"
-#include "GossipDef.h"
+#include "ScriptMgr.h"
 #include "World.h"
-#include "GameGraveyard.h"
+#include "WorldPacket.h"
 
 OPvPCapturePointZM_Beacon::OPvPCapturePointZM_Beacon(OutdoorPvP* pvp, ZM_BeaconType type)
     : OPvPCapturePoint(pvp), m_TowerType(type), m_TowerState(ZM_TOWERSTATE_N)

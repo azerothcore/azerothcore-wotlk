@@ -6,8 +6,8 @@
 #ifndef __ACORE_CHANNELMGR_H
 #define __ACORE_CHANNELMGR_H
 
-#include "Common.h"
 #include "Channel.h"
+#include "Common.h"
 #include "World.h"
 #include <map>
 #include <string>

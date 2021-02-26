@@ -8,8 +8,8 @@
 #define AZEROTHCORE_GOSSIP_H
 
 #include "Common.h"
-#include "QuestDef.h"
 #include "NPCHandler.h"
+#include "QuestDef.h"
 
 class WorldSession;
 

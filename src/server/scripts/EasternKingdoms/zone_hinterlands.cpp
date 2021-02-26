@@ -16,10 +16,10 @@ npc_oox09hl
 npc_rinji
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 
 /*######
 ## npc_oox09hl

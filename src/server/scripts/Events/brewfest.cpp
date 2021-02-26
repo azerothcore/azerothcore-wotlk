@@ -1,17 +1,17 @@
 // Scripted by Xinef
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
-#include "GridNotifiers.h"
-#include "SpellScript.h"
+#include "CellImpl.h"
 #include "GameEventMgr.h"
+#include "GridNotifiers.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
-#include "CellImpl.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 ///////////////////////////////////////
 ////// GOS

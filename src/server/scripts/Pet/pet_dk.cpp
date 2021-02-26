@@ -9,14 +9,14 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_dk_".
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "CombatAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CombatAI.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 
 enum DeathKnightSpells

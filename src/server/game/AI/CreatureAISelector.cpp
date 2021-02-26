@@ -5,14 +5,13 @@
  */
 
 #include "Creature.h"
-#include "CreatureAISelector.h"
-#include "PassiveAI.h"
-
-#include "MovementGenerator.h"
-#include "Pet.h"
-#include "TemporarySummon.h"
 #include "CreatureAIFactory.h"
+#include "CreatureAISelector.h"
+#include "MovementGenerator.h"
+#include "PassiveAI.h"
+#include "Pet.h"
 #include "ScriptMgr.h"
+#include "TemporarySummon.h"
 
 namespace FactorySelector
 {

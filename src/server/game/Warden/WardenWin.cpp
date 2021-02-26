@@ -4,23 +4,23 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "AccountMgr.h"
+#include "ByteBuffer.h"
+#include "Common.h"
 #include "Cryptography/HMACSHA1.h"
 #include "Cryptography/WardenKeyGeneration.h"
-#include "Common.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
+#include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "Opcodes.h"
-#include "ByteBuffer.h"
-#include <openssl/md5.h>
-#include "Database/DatabaseEnv.h"
-#include "World.h"
 #include "Player.h"
 #include "Util.h"
-#include "WardenWin.h"
-#include "WardenModuleWin.h"
 #include "WardenCheckMgr.h"
-#include "AccountMgr.h"
+#include "WardenModuleWin.h"
+#include "WardenWin.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
+#include <openssl/md5.h>
 
 // GUILD is the shortest string that has no client validation (RAID only sends if in a raid group)
 static constexpr char _luaEvalPrefix[] = "local S,T,R=SendAddonMessage,function()";

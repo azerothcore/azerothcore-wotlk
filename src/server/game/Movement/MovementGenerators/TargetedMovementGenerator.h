@@ -7,11 +7,11 @@
 #ifndef ACORE_TARGETEDMOVEMENTGENERATOR_H
 #define ACORE_TARGETEDMOVEMENTGENERATOR_H
 
-#include "MovementGenerator.h"
 #include "FollowerReference.h"
+#include "MovementGenerator.h"
+#include "PathGenerator.h"
 #include "Timer.h"
 #include "Unit.h"
-#include "PathGenerator.h"
 #include <optional>
 
 class TargetedMovementGeneratorBase

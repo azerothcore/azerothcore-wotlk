@@ -5,12 +5,12 @@
  */
 
 #include "Common.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
 #include "Log.h"
 #include "Opcodes.h"
-#include "UpdateData.h"
 #include "Player.h"
+#include "UpdateData.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 {

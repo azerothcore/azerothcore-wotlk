@@ -10,8 +10,8 @@
 #include "Define.h"
 #include "Map.h"
 #include "Object.h"
-#include <vector>
 #include <map>
+#include <vector>
 
 struct VehicleSeatEntry;
 

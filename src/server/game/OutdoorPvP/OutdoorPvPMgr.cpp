@@ -4,10 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "OutdoorPvPMgr.h"
-#include "ObjectMgr.h"
-#include "Player.h"
 #include "DisableMgr.h"
+#include "ObjectMgr.h"
+#include "OutdoorPvPMgr.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 
 OutdoorPvPMgr::OutdoorPvPMgr()

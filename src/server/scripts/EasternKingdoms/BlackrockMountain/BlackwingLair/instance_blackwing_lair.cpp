@@ -4,7 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
 #include "blackwing_lair.h"
 #include "GameObject.h"
 #include "InstanceScript.h"
@@ -12,9 +11,10 @@
 #include "MotionMaster.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "TemporarySummon.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "TemporarySummon.h"
 
 DoorData const doorData[] =
 {
