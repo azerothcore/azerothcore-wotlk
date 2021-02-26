@@ -10,8 +10,6 @@
 #include "CreatureTextMgr.h"
 #include "GameGraveyard.h"
 #include "GridNotifiers.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "GroupMgr.h"

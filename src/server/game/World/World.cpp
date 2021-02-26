@@ -56,7 +56,6 @@
 #include "PoolMgr.h"
 #include "SavingSystem.h"
 #include "ScriptMgr.h"
-#include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "SkillDiscovery.h"
 #include "SkillExtraItems.h"

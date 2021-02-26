@@ -5,7 +5,6 @@
  */
 
 #include "AccountMgr.h"
-#include "AccountMgr.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
