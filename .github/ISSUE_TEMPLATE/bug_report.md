@@ -1,35 +1,32 @@
 ---
-name: Bug report
-about: Create a report to help us improve.
-title: ''
-labels: ''
+name: 🐛 Bug report
+about: Report any bug or defect you've come across when using AzerothCore.
+title: '🐛 [Bug]'
+labels: 'bug'
 assignees: ''
 
 ---
-
 <!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE! -->
 
-<!-- This template is for problem reports, for feature suggestion etc... feel free to edit it.
- If this is a crash report, upload the crashlog on https://gist.github.com/
- For issues containing a fix, please create a Pull Request following this tutorial: http://www.azerothcore.org/wiki/Contribute#how-to-create-a-pull-request -->
-
+<!-- For issues containing a fix, please create a Pull Request following this tutorial: http://www.azerothcore.org/wiki/Contribute#how-to-create-a-pull-request -->
+## 🐛 Bug report
 
 <!-- WRITE A RELEVANT TITLE -->
 
 
-##### CURRENT BEHAVIOUR:
-<!-- Describe the bug in detail. Database to link spells, NPCs, quests etc https://wowgaming.altervista.org/aowow/ -->
+### Current behaviour
+<!-- Describe the bug in detail. Do not forget to include screenshots. Database to link spells, NPCs, quests etc https://wowgaming.altervista.org/aowow/ -->
 
 
 
 
-##### EXPECTED BLIZZLIKE BEHAVIOUR:
+### Expected blizzlike behaviour
 <!-- Describe how it should be working without the bug. -->
 
 
 
 
-##### STEPS TO REPRODUCE THE PROBLEM:
+### Steps to reproduce the problem
 <!-- Describe precisely how to reproduce the bug so we can fix it or confirm its existence:
  - Which commands to use? Which NPC to teleport to?
  - Do we need to have debug flags on Cmake?
@@ -40,38 +37,43 @@ assignees: ''
 1. 
 2. 
 3. 
+4. ...
+5. Profit
 
-##### EXTRA NOTES:
+### Extra notes
 <!--
 Any information that can help the developers to identify and fix the issue should be put here.
 Examples:
 - was this bug always present in AzerothCore? if it was introduced after a change, please mention it
 - the code line(s) that cause the issue
 - does this feature work in other server applications (e.g. CMaNGOS, TrinityCore, etc...) ?
+- If this is a crash report, upload the crashlog on https://gist.github.com/
 -->
 
 
 
 
+### Version & Environment
 
-
-##### AC HASH/COMMIT:
+#### AzerothCore commit hash
 <!-- IF YOU DO NOT FILL THIS OUT, WE WILL CLOSE YOUR ISSUE! NEVER WRITE "LATEST", ALWAYS PUT THE ACTUAL VALUE INSTEAD.
 Find the commit hash (unique identifier) by running "git log" on your own clone of AzerothCore or by looking at here https://github.com/azerothcore/azerothcore-wotlk/commits/master -->
 
+Commit Hash:
 
-
-##### OPERATING SYSTEM:
+#### Operating system
 <!-- Windows 7/10, Debian 8/9/10, Ubuntu 16/18 etc... -->
 
+OS Client:
+OS Server:
 
-
-##### MODULES:
+#### Modules
 <!-- Are you using modules? If yes, list them (note them down in a .txt for opening future issues) -->
 
 
 
-##### OTHER CUSTOMIZATIONS:
+
+#### Other customizations
 <!-- Are you using any extra script?
  - Did you apply any core patch/diff?
  - Did you modify your database?

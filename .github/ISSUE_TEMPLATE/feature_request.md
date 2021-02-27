@@ -1,24 +1,33 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
-title: 'Feature: '
-labels: Suggestion
+name: 🚀 Feature Request
+about: Suggest an idea for AzerothCore
+title: '🚀 [Feature]'
+labels: 'feature'
 assignees: ''
 
 ---
+## 🚀 Feature
+<!-- Describe your feature request or suggestion in detail. A clear and concise description of what you want to happen. -->
 
-<!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE! -->
 
-<!-- This template is made for feature requests or suggestions on the project only. -->
 
-**Describe your feature request or suggestion in detail**
-<!-- A clear and concise description of what you want to happen. -->
 
-**Describe a possible solution to your Feature or Suggestion in detail**
-<!-- A clear and concise description of any alternative solutions or features you've considered. -->
+### Visualization
+<!-- Attach Screenshots and Drawings. Use https://draw.io -->
 
-**Additional context**
+
+
+
+### Benefits, Purpose
+<!-- Specify why this feature should be added and what benefits it holds to AzerothCore. -->
+
+
+
+
+### Additional context
 <!-- Add any other context or screenshots about the feature request here. -->
+
+
 
 
 <!-- ------------------------- THE END ------------------------------
