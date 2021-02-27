@@ -6,7 +6,7 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 356801) AND (`source_type` = 
 
 DELETE FROM `creature_template` WHERE (`entry` = 3568);
 INSERT INTO `creature_template` VALUES
-(3568, 0, 0, 0, 0, 0, 599, 0, 0, 0, 'Mist', '', '', 0, 10, 10, 0, 80, 2, 1, 1.2, 1, 0, 11, 14, 0, 10, 1, 1500, 1500, 1, 4608, 2048, 0, 2, 0, 0, 0, 0, 7, 10, 5, 1, 4096, 0, 0, 100001, 150, 150, 150, 150, 150, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SmartAI', 0, 3, 1, 1, 1, 1, 0, 0, 1, 0, 0, '', 12340);
+(3568, 0, 0, 0, 0, 0, 599, 0, 0, 0, 'Mist', '', '', 0, 10, 10, 0, 80, 2, 1, 1.2, 1, 0, 11, 14, 0, 10, 1, 1500, 1500, 1, 4608, 2048, 0, 2, 0, 0, 0, 0, 7, 10, 5, 1, 4096, 0, 0, 100001, 150, 150, 150, 150, 150, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'SmartAI', 0, 3, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, '', 12340);
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 3568);
 INSERT INTO `smart_scripts` VALUES
