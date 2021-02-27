@@ -1,14 +1,14 @@
 ---
-name: 🐛 Bug Report - 🐞 Spell
+name: 🐛 Bug Report - 🧙‍♂️ Spell
 about: Report any bug or defect regarding a spell.
 labels: 'bug, spell'
-title: '🐞 [Bug][Spell] '
+title: '🧙‍♂️ [Bug][Spell] '
 assignees: ''
 ---
 <!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE! -->
 
 <!-- For issues containing a fix, please create a Pull Request following this tutorial: http://www.azerothcore.org/wiki/Contribute#how-to-create-a-pull-request -->
-## 🐞 Bug report - Spell 
+## 🧙‍♂️ Bug report - Spell 
 
 <!-- WRITE A RELEVANT TITLE -->
 

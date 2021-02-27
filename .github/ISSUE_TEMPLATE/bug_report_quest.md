@@ -1,14 +1,14 @@
 ---
-name: 🐛 Bug Report - 🐝 Quest
+name: 🐛 Bug Report - ❓ Quest
 about: Report any bug or defect regarding a quest.
 labels: 'bug, quest'
-title: '🐝 [Bug] '
+title: '❓ [Bug][Quest] '
 assignees: ''
 ---
 <!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE! -->
 
 <!-- For issues containing a fix, please create a Pull Request following this tutorial: http://www.azerothcore.org/wiki/Contribute#how-to-create-a-pull-request -->
-## 🐝 Bug report - Quest
+## ❓ Bug report - Quest
 
 <!-- WRITE A RELEVANT TITLE -->
 
