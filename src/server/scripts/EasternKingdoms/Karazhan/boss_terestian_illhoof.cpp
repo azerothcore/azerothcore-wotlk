@@ -11,10 +11,10 @@ SDComment: Complete! Needs adjustments to use spell though.
 SDCategory: Karazhan
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "karazhan.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum TerestianIllhoof
 {
@@ -206,8 +206,6 @@ public:
         void Reset() override
         {
             FireboltTimer = 2000;
-
-            me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FIRE, true);
         }
 
         void EnterCombat(Unit* /*who*/) override { }

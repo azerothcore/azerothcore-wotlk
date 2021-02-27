@@ -4,13 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ConfusedMovementGenerator.h"
 #include "Creature.h"
 #include "MapManager.h"
-#include "ConfusedMovementGenerator.h"
-#include "VMapFactory.h"
-#include "MoveSplineInit.h"
 #include "MoveSpline.h"
+#include "MoveSplineInit.h"
 #include "Player.h"
+#include "VMapFactory.h"
 
 #ifdef MAP_BASED_RAND_GEN
 #define rand_norm() unit.rand_norm()
@@ -90,7 +90,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
 template<>
 void ConfusedMovementGenerator<Creature>::_InitSpecific(Creature* creature, bool& is_water_ok, bool& is_land_ok)
 {
-    is_water_ok = creature->CanSwim();
+    is_water_ok = creature->CanEnterWater();
     is_land_ok  = creature->CanWalk();
 }
 

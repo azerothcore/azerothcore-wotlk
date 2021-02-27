@@ -4,10 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
 #include "molten_core.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 enum Spells
 {
@@ -117,9 +117,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_SHAZZRAH_GATE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_SHAZZRAH_GATE });
         }
 
         void FilterTargets(std::list<WorldObject*>& targets)

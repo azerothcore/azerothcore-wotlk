@@ -6,13 +6,13 @@
 
 #include "Battleground.h"
 #include "BattlegroundRV.h"
-#include "ObjectAccessor.h"
+#include "GameObject.h"
 #include "Language.h"
+#include "ObjectAccessor.h"
+#include "Pet.h"
 #include "Player.h"
 #include "WorldPacket.h"
-#include "GameObject.h"
 #include "WorldSession.h"
-#include "Pet.h"
 
 BattlegroundRV::BattlegroundRV()
 {

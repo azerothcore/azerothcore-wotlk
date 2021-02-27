@@ -2,21 +2,21 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "CombatAI.h"
+#include "GridNotifiers.h"
+#include "Opcodes.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
 #include "SpellScript.h"
 #include "ulduar.h"
 #include "Vehicle.h"
-#include "ScriptedEscortAI.h"
-#include "SpellAuras.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
-#include "ScriptedGossip.h"
-#include "CombatAI.h"
-#include "Spell.h"
-#include "GridNotifiers.h"
-#include "Player.h"
-#include "Opcodes.h"
 
 enum LeviathanSpells
 {
@@ -1383,7 +1383,7 @@ public:
             {
                 float x, y, z;
                 me->GetPosition(x, y, z);
-                z = me->GetMap()->GetHeight(me->GetPhaseMask(), x, y, z);
+                z = me->GetMapHeight(x, y, z);
                 me->GetMotionMaster()->MovePoint(me->GetEntry(), x, y, z);
                 me->SetPosition(x, y, z, 0);
             }

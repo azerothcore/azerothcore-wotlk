@@ -4,9 +4,9 @@
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 */
 
-#include "Chat.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "Chat.h"
 #include "CreatureTextMgr.h"
 #include "DatabaseEnv.h"
 #include "GameEventMgr.h"
@@ -1304,7 +1304,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                     if (IsCreature(*itr))
-                        (*itr)->ToCreature()->UpdateEntry(e.action.updateTemplate.creature, NULL, e.action.updateTemplate.updateLevel != 0);
+                        (*itr)->ToCreature()->UpdateEntry(e.action.updateTemplate.creature, nullptr, e.action.updateTemplate.updateLevel != 0);
 
                 delete targets;
                 break;

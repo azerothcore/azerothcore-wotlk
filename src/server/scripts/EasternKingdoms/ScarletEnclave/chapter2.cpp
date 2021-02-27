@@ -4,13 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
+#include "CombatAI.h"
+#include "CreatureTextMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
-#include "CreatureTextMgr.h"
-#include "CombatAI.h"
 #include "SpellScript.h"
 
 //How to win friends and influence enemies
@@ -225,7 +225,6 @@ public:
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 me->LoadEquipment(0, true);
                 me->RemoveAllAuras();
-                me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ALL, true);
                 summons.DespawnAll();
             }
         }

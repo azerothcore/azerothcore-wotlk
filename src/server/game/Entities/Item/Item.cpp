@@ -5,16 +5,16 @@
  */
 
 #include "Common.h"
-#include "Item.h"
-#include "ObjectMgr.h"
-#include "WorldPacket.h"
-#include "DatabaseEnv.h"
-#include "ItemEnchantmentMgr.h"
-#include "SpellMgr.h"
-#include "SpellInfo.h"
-#include "ScriptMgr.h"
 #include "ConditionMgr.h"
+#include "DatabaseEnv.h"
+#include "Item.h"
+#include "ItemEnchantmentMgr.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
 
 void AddItemsSetItem(Player* player, Item* item)

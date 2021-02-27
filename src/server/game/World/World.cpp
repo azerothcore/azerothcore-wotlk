@@ -8,75 +8,74 @@
     \ingroup world
 */
 
-#include "Common.h"
-#include "DatabaseEnv.h"
-#include "Config.h"
-#include "GitRevision.h"
-#include "Log.h"
-#include "Opcodes.h"
-#include "WorldSession.h"
-#include "WorldPacket.h"
-#include "Player.h"
-#include "Vehicle.h"
-#include "SkillExtraItems.h"
-#include "SkillDiscovery.h"
-#include "World.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
-#include "AuctionHouseMgr.h"
-#include "ObjectMgr.h"
-#include "ArenaTeamMgr.h"
-#include "GuildMgr.h"
-#include "TicketMgr.h"
-#include "SpellMgr.h"
-#include "GroupMgr.h"
-#include "Chat.h"
-#include "DBCStores.h"
-#include "LootMgr.h"
-#include "ItemEnchantmentMgr.h"
-#include "MapManager.h"
-#include "CreatureAIRegistry.h"
-#include "BattlegroundMgr.h"
-#include "BattlefieldMgr.h"
-#include "OutdoorPvPMgr.h"
-#include "TemporarySummon.h"
-#include "WaypointMovementGenerator.h"
-#include "VMapFactory.h"
-#include "MMapFactory.h"
-#include "GameEventMgr.h"
-#include "PoolMgr.h"
-#include "GridNotifiersImpl.h"
-#include "CellImpl.h"
-#include "InstanceSaveMgr.h"
-#include "Util.h"
-#include "Language.h"
-#include "CreatureGroups.h"
-#include "Transport.h"
-#include "ScriptMgr.h"
 #include "AddonMgr.h"
-#include "LFGMgr.h"
-#include "ConditionMgr.h"
-#include "DisableMgr.h"
-#include "CharacterDatabaseCleaner.h"
-#include "ScriptMgr.h"
-#include "WeatherMgr.h"
-#include "CreatureTextMgr.h"
-#include "SmartAI.h"
+#include "ArenaTeamMgr.h"
+#include "AsyncAuctionListing.h"
+#include "AuctionHouseMgr.h"
+#include "AvgDiffTracker.h"
+#include "BattlefieldMgr.h"
+#include "BattlegroundMgr.h"
+#include "CalendarMgr.h"
+#include "CellImpl.h"
 #include "Channel.h"
 #include "ChannelMgr.h"
-#include "WardenCheckMgr.h"
-#include "Warden.h"
-#include "CalendarMgr.h"
-#include "PetitionMgr.h"
-#include "LootItemStorage.h"
-#include "TransportMgr.h"
-#include "AvgDiffTracker.h"
+#include "CharacterDatabaseCleaner.h"
+#include "Chat.h"
+#include "Common.h"
+#include "ConditionMgr.h"
+#include "Config.h"
+#include "CreatureAIRegistry.h"
+#include "CreatureGroups.h"
+#include "CreatureTextMgr.h"
+#include "DatabaseEnv.h"
+#include "DBCStores.h"
+#include "DisableMgr.h"
 #include "DynamicVisibility.h"
-#include "WhoListCache.h"
-#include "AsyncAuctionListing.h"
-#include "SavingSystem.h"
-#include "ServerMotd.h"
+#include "GameEventMgr.h"
 #include "GameGraveyard.h"
+#include "GitRevision.h"
+#include "GridNotifiersImpl.h"
+#include "GroupMgr.h"
+#include "GuildMgr.h"
+#include "InstanceSaveMgr.h"
+#include "ItemEnchantmentMgr.h"
+#include "Language.h"
+#include "LFGMgr.h"
+#include "Log.h"
+#include "LootItemStorage.h"
+#include "LootMgr.h"
+#include "MapManager.h"
+#include "MMapFactory.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "OutdoorPvPMgr.h"
+#include "PetitionMgr.h"
+#include "Player.h"
+#include "PoolMgr.h"
+#include "SavingSystem.h"
+#include "ScriptMgr.h"
+#include "ServerMotd.h"
+#include "SkillDiscovery.h"
+#include "SkillExtraItems.h"
+#include "SmartAI.h"
+#include "SpellMgr.h"
+#include "TemporarySummon.h"
+#include "TicketMgr.h"
+#include "Transport.h"
+#include "TransportMgr.h"
+#include "Util.h"
+#include "Vehicle.h"
+#include "VMapFactory.h"
+#include "Warden.h"
+#include "WardenCheckMgr.h"
+#include "WaypointMovementGenerator.h"
+#include "WeatherMgr.h"
+#include "WhoListCache.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 #include <VMapManager2.h>
 
 #ifdef ELUNA
@@ -500,6 +499,7 @@ void World::LoadConfigSettings(bool reload)
     rate_values[RATE_DROP_ITEM_REFERENCED]        = sConfigMgr->GetFloatDefault("Rate.Drop.Item.Referenced", 1.0f);
     rate_values[RATE_DROP_ITEM_REFERENCED_AMOUNT] = sConfigMgr->GetFloatDefault("Rate.Drop.Item.ReferencedAmount", 1.0f);
     rate_values[RATE_DROP_MONEY]                  = sConfigMgr->GetFloatDefault("Rate.Drop.Money", 1.0f);
+    rate_values[RATE_REWARD_BONUS_MONEY]          = sConfigMgr->GetFloatDefault("Rate.RewardBonusMoney", 1.0f);
     rate_values[RATE_XP_KILL]                     = sConfigMgr->GetFloatDefault("Rate.XP.Kill", 1.0f);
     rate_values[RATE_XP_BG_KILL]                  = sConfigMgr->GetFloatDefault("Rate.XP.BattlegroundKill", 1.0f);
     rate_values[RATE_XP_QUEST]                    = sConfigMgr->GetFloatDefault("Rate.XP.Quest", 1.0f);
@@ -1279,9 +1279,7 @@ void World::LoadConfigSettings(bool reload)
     sLog->outString("WORLD: VMap support included. LineOfSight:%i, getHeight:%i, indoorCheck:%i PetLOS:%i", enableLOS, enableHeight, enableIndoor, enablePetLOS);
 
     m_bool_configs[CONFIG_PET_LOS]          = sConfigMgr->GetBoolDefault("vmap.petLOS", true);
-    m_bool_configs[CONFIG_START_ALL_SPELLS] = sConfigMgr->GetBoolDefault("PlayerStart.AllSpells", false);
-    if (m_bool_configs[CONFIG_START_ALL_SPELLS])
-        sLog->outString("WORLD: WARNING: PlayerStart.AllSpells enabled - may not function as intended!");
+    m_bool_configs[CONFIG_START_ALL_SPELLS]   = sConfigMgr->GetBoolDefault("PlayerStart.CustomSpells", false);
     m_int_configs[CONFIG_HONOR_AFTER_DUEL]    = sConfigMgr->GetIntDefault("HonorPointsAfterDuel", 0);
     m_bool_configs[CONFIG_START_ALL_EXPLORED] = sConfigMgr->GetBoolDefault("PlayerStart.MapsExplored", false);
     m_bool_configs[CONFIG_START_ALL_REP]      = sConfigMgr->GetBoolDefault("PlayerStart.AllReputation", false);
@@ -1294,6 +1292,7 @@ void World::LoadConfigSettings(bool reload)
         m_int_configs[CONFIG_PVP_TOKEN_COUNT] = 1;
 
     m_bool_configs[CONFIG_NO_RESET_TALENT_COST]       = sConfigMgr->GetBoolDefault("NoResetTalentsCost", false);
+    m_int_configs[CONFIG_TOGGLE_XP_COST]              = sConfigMgr->GetIntDefault("ToggleXP.Cost", 100000);
     m_bool_configs[CONFIG_SHOW_KICK_IN_WORLD]         = sConfigMgr->GetBoolDefault("ShowKickInWorld", false);
     m_bool_configs[CONFIG_SHOW_MUTE_IN_WORLD]         = sConfigMgr->GetBoolDefault("ShowMuteInWorld", false);
     m_bool_configs[CONFIG_SHOW_BAN_IN_WORLD]          = sConfigMgr->GetBoolDefault("ShowBanInWorld", false);
@@ -1403,6 +1402,10 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_BG_REWARD_LOSER_HONOR_LAST]   = sConfigMgr->GetIntDefault("Battleground.RewardLoserHonorLast", 5);
 
     m_int_configs[CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER] = sConfigMgr->GetIntDefault("WaypointMovementStopTimeForPlayer", 120);
+
+    m_int_configs[CONFIG_NPC_EVADE_IF_NOT_REACHABLE] = sConfigMgr->GetIntDefault("NpcEvadeIfTargetIsUnreachable", 5);
+    m_int_configs[CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID] = sConfigMgr->GetIntDefault("NpcRegenHPTimeIfTargetIsUnreachable", 10);
+    m_bool_configs[CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID] = sConfigMgr->GetBoolDefault("NpcRegenHPIfTargetIsUnreachable", true);
 
     //Debug
     m_bool_configs[CONFIG_DEBUG_BATTLEGROUND] = sConfigMgr->GetBoolDefault("Debug.Battleground", false);

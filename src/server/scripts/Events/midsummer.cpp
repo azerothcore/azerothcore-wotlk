@@ -1,12 +1,12 @@
 // Scripted by Xinef
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "Player.h"
 
 enum eBonfire
 {
@@ -217,9 +217,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_CRAB_DISGUISE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_CRAB_DISGUISE });
         }
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

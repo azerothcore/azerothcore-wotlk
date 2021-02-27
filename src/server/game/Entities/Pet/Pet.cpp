@@ -4,24 +4,24 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ArenaSpectator.h"
+#include "Battleground.h"
 #include "Common.h"
-#include "DatabaseEnv.h"
-#include "Log.h"
-#include "WorldPacket.h"
-#include "ObjectMgr.h"
-#include "SpellMgr.h"
-#include "Pet.h"
-#include "Formulas.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
 #include "CreatureAI.h"
+#include "DatabaseEnv.h"
+#include "Formulas.h"
+#include "Group.h"
+#include "InstanceScript.h"
+#include "Log.h"
+#include "ObjectMgr.h"
+#include "Pet.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "Unit.h"
 #include "Util.h"
-#include "Group.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Battleground.h"
-#include "InstanceScript.h"
-#include "ArenaSpectator.h"
 
 Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID() : 0, true),
     m_usedTalentCount(0), m_removed(false), m_owner(owner),
@@ -867,7 +867,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             AddAura(SPELL_MAGE_PET_SCALING_02, this);
                             AddAura(SPELL_MAGE_PET_SCALING_03, this);
                             AddAura(SPELL_MAGE_PET_SCALING_04, this);
-                            ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                             break;
                         }
                 }
@@ -939,7 +938,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             AddAura(SPELL_MAGE_PET_SCALING_02, this);
                             AddAura(SPELL_MAGE_PET_SCALING_03, this);
                             AddAura(SPELL_MAGE_PET_SCALING_04, this);
-                            ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                             break;
                         }
                     case NPC_TREANT: //force of nature

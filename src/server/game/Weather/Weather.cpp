@@ -8,14 +8,14 @@
     \ingroup world
 */
 
-#include "Weather.h"
-#include "WorldPacket.h"
-#include "Player.h"
-#include "World.h"
 #include "Log.h"
 #include "ObjectMgr.h"
-#include "Util.h"
+#include "Player.h"
 #include "ScriptMgr.h"
+#include "Util.h"
+#include "Weather.h"
+#include "World.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
 
 /// Create the Weather object

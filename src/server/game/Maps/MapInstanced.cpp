@@ -4,16 +4,16 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "MapInstanced.h"
-#include "ObjectMgr.h"
-#include "MapManager.h"
 #include "Battleground.h"
-#include "VMapFactory.h"
-#include "MMapFactory.h"
-#include "InstanceSaveMgr.h"
-#include "World.h"
 #include "Group.h"
+#include "InstanceSaveMgr.h"
+#include "MapInstanced.h"
+#include "MapManager.h"
+#include "MMapFactory.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "VMapFactory.h"
+#include "World.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"

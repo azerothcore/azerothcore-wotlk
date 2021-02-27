@@ -9,13 +9,13 @@
  */
 
 #include "Common.h"
-#include "SharedDefines.h"
-#include "Player.h"
 #include "Group.h"
-#include "LFGScripts.h"
 #include "LFGMgr.h"
-#include "ScriptMgr.h"
+#include "LFGScripts.h"
 #include "ObjectAccessor.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "SharedDefines.h"
 #include "WorldSession.h"
 
 namespace lfg

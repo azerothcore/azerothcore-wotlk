@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
+#include "hyjal_trash.h"
+#include "hyjal.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "hyjal.h"
-#include "hyjal_trash.h"
 
 enum Spells
 {
@@ -180,9 +180,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_MARK_DAMAGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_MARK_DAMAGE });
         }
 
         void OnPeriodic(AuraEffect const* aurEff)

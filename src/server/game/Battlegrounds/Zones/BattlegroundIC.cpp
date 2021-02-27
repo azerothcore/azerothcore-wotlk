@@ -4,18 +4,18 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Player.h"
 #include "Battleground.h"
 #include "BattlegroundIC.h"
-#include "Language.h"
-#include "WorldPacket.h"
-#include "GameObject.h"
-#include "ObjectMgr.h"
-#include "Vehicle.h"
-#include "Transport.h"
-#include "WorldSession.h"
-#include "ScriptedCreature.h"
 #include "GameGraveyard.h"
+#include "GameObject.h"
+#include "Language.h"
+#include "ObjectMgr.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "Transport.h"
+#include "Vehicle.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 BattlegroundIC::BattlegroundIC()
 {

@@ -2,15 +2,15 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
-#include "Group.h"
-#include "Spell.h"
-#include "icecrown_citadel.h"
-#include "Vehicle.h"
 #include "GridNotifiers.h"
+#include "Group.h"
+#include "icecrown_citadel.h"
+#include "ObjectMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
+#include "SpellAuraEffects.h"
+#include "Vehicle.h"
 
 enum ScriptTexts
 {
@@ -1085,11 +1085,7 @@ public:
 
         bool Validate(SpellInfo const* spell) override
         {
-            if (!spell->ExcludeTargetAuraSpell)
-                return false;
-            if (!sSpellMgr->GetSpellInfo(spell->ExcludeTargetAuraSpell))
-                return false;
-            return true;
+            return ValidateSpellInfo({ spell->ExcludeTargetAuraSpell });
         }
 
         // set up initial variables and check if caster is creature
@@ -1247,11 +1243,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_UNBOUND_PLAGUE))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_UNBOUND_PLAGUE_SEARCHER))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_UNBOUND_PLAGUE, SPELL_UNBOUND_PLAGUE_SEARCHER });
         }
 
         void FilterTargets(std::list<WorldObject*>& targets)

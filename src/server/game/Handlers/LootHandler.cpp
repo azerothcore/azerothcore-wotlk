@@ -5,21 +5,21 @@
  */
 
 #include "Common.h"
-#include "Log.h"
 #include "Corpse.h"
 #include "Creature.h"
 #include "GameObject.h"
 #include "Group.h"
+#include "Log.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
-#include "ObjectAccessor.h"
 #include "Object.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -392,13 +392,10 @@ void WorldSession::DoLootRelease(uint64 lguid)
                 loot->roundRobinPlayer = 0;
 
                 if (Group* group = player->GetGroup())
-                {
                     group->SendLooter(creature, nullptr);
-
-                    // force update of dynamic flags, otherwise other group's players still not able to loot.
-                    creature->ForceValuesUpdateAtIndex(UNIT_DYNAMIC_FLAGS);
-                }
             }
+            // force dynflag update to update looter and lootable info
+            creature->ForceValuesUpdateAtIndex(UNIT_DYNAMIC_FLAGS);
         }
     }
 

@@ -4,14 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "GridNotifiers.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
-#include "PassiveAI.h"
-#include "GridNotifiers.h"
+#include "SpellScript.h"
 
 //
 //  Emerald Dragon NPCs and IDs (kept here for reference)
@@ -715,11 +715,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_MARK_OF_NATURE))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_AURA_OF_NATURE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_MARK_OF_NATURE, SPELL_AURA_OF_NATURE });
         }
 
         void FilterTargets(std::list<WorldObject*>& targets)

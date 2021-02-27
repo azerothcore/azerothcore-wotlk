@@ -4,16 +4,16 @@
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 */
 
+#include "Creature.h"
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
-#include "Creature.h"
-#include "World.h"
-#include "SpellMgr.h"
-#include "Vehicle.h"
+#include "CreatureTextMgr.h"
 #include "Log.h"
 #include "MapReference.h"
 #include "Player.h"
-#include "CreatureTextMgr.h"
+#include "SpellMgr.h"
+#include "Vehicle.h"
+#include "World.h"
 
 //Disable CreatureAI when charmed
 void CreatureAI::OnCharmed(bool /*apply*/)
@@ -255,6 +255,40 @@ bool CreatureAI::_EnterEvadeMode()
         return false;
 
     return true;
+}
+
+void CreatureAI::MoveCircleChecks()
+{
+    Unit *victim = me->GetVictim();
+
+    if (
+        !victim ||
+        !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
+        !me->IsWithinMeleeRange(victim) || me == victim->GetVictim() ||
+        (victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet())  // only player & pets to save CPU
+    )
+    {
+        return;
+    }
+
+    me->GetMotionMaster()->MoveCircleTarget(me->GetVictim());
+}
+
+void CreatureAI::MoveBackwardsChecks() {
+    Unit *victim = me->GetVictim();
+
+    if (
+        !victim ||
+        !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
+        (victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet())
+    )
+    {
+        return;
+    }
+
+    float moveDist = me->GetMeleeRange(victim) / 2;
+
+    me->GetMotionMaster()->MoveBackwards(victim, moveDist);
 }
 
 Creature* CreatureAI::DoSummon(uint32 entry, const Position& pos, uint32 despawnTime, TempSummonType summonType)

@@ -4,19 +4,19 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "Vehicle.h"
-#include "ObjectMgr.h"
-#include "ScriptedEscortAI.h"
 #include "CombatAI.h"
-#include "PassiveAI.h"
-#include "Player.h"
-#include "SpellInfo.h"
 #include "CreatureTextMgr.h"
+#include "ObjectMgr.h"
+#include "PassiveAI.h"
 #include "PetAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
 #include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 enum eyeOfAcherus
@@ -190,7 +190,7 @@ public:
                 return true;
 
             creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_15);
+            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
 
             player->CastSpell(creature, SPELL_DUEL, false);
             player->CastSpell(player, SPELL_DUEL_FLAG, true);
@@ -246,7 +246,7 @@ public:
             me->RestoreFaction();
             CombatAI::Reset();
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_15);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
         }
 
         void SpellHit(Unit* caster, const SpellInfo* pSpell) override

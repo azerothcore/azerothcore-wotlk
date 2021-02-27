@@ -8,20 +8,19 @@
 /// @{
 /// \file
 
-#include "Common.h"
-#include "ObjectMgr.h"
-#include "World.h"
-#include "WorldSession.h"
-#include "Configuration/Config.h"
-
 #include "AccountMgr.h"
 #include "Chat.h"
 #include "CliRunnable.h"
+#include "Common.h"
+#include "Configuration/Config.h"
 #include "Language.h"
 #include "Log.h"
 #include "MapManager.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "Util.h"
+#include "World.h"
+#include "WorldSession.h"
 
 #if AC_PLATFORM != AC_PLATFORM_WINDOWS
 #include <readline/readline.h>

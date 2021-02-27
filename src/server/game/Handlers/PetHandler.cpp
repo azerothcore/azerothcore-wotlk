@@ -4,23 +4,23 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Chat.h"
 #include "Common.h"
+#include "CreatureAI.h"
+#include "Group.h"
+#include "Log.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Pet.h"
+#include "Player.h"
+#include "Spell.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "Util.h"
+#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
-#include "SpellMgr.h"
-#include "Log.h"
-#include "Opcodes.h"
-#include "Spell.h"
-#include "ObjectAccessor.h"
-#include "CreatureAI.h"
-#include "Util.h"
-#include "Pet.h"
-#include "World.h"
-#include "Group.h"
-#include "SpellInfo.h"
-#include "Player.h"
-#include "Chat.h"
 
 class LoadPetFromDBQueryHolder : public SQLQueryHolder
 {
@@ -553,7 +553,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid
 
                         // pussywizard:
                         if (Creature* creaturePet = pet->ToCreature())
-                            if (!creaturePet->_CanDetectFeignDeathOf(TargetUnit) || !creaturePet->CanCreatureAttack(TargetUnit) || creaturePet->isTargetNotAcceptableByMMaps(TargetUnit->GetGUID(), sWorld->GetGameTime(), TargetUnit))
+                            if (!creaturePet->_CanDetectFeignDeathOf(TargetUnit) || !creaturePet->CanCreatureAttack(TargetUnit))
                                 return;
 
                         // Not let attack through obstructions

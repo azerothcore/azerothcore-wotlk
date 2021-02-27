@@ -2,19 +2,19 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "CombatAI.h"
 #include "InstanceScript.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
+#include "oculus.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "oculus.h"
-#include "Vehicle.h"
-#include "CombatAI.h"
-#include "Player.h"
-#include "SpellInfo.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
+#include "SpellInfo.h"
 #include "SpellScript.h"
+#include "Vehicle.h"
 #include <unordered_map>
 
 enum Drakes
@@ -525,9 +525,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
         }
 
         void Apply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -565,9 +563,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_RUBY_EVASIVE_CHARGES))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_RUBY_EVASIVE_CHARGES });
         }
 
         void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
@@ -602,9 +598,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
         }
 
         void CalcDamage()
@@ -644,9 +638,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_AMBER_SHOCK_CHARGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)

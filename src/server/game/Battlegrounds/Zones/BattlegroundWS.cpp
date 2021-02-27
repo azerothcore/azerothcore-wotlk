@@ -2,17 +2,17 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
+#include "BattlegroundMgr.h"
 #include "BattlegroundWS.h"
 #include "Creature.h"
+#include "GameGraveyard.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "Object.h"
 #include "ObjectMgr.h"
-#include "BattlegroundMgr.h"
 #include "Player.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "GameGraveyard.h"
 
 BattlegroundWS::BattlegroundWS()
 {

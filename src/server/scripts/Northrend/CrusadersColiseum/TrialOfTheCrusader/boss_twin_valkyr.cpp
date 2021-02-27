@@ -3,14 +3,14 @@
 (!) ACTUALLY FJOLA CONTROLLS THE WHOLE FIGHT (SPECIAL ABILITIES, SHARED HEALTH, ETC.) SINCE THEY DIE SIMULTANEOUSLY
 */
 
-#include "ScriptMgr.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "trial_of_the_crusader.h"
-#include "SpellScript.h"
-#include "PassiveAI.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
-#include "Player.h"
+#include "SpellScript.h"
+#include "trial_of_the_crusader.h"
 
 enum Yells
 {

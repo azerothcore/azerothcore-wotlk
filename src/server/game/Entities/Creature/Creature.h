@@ -7,14 +7,13 @@
 #ifndef AZEROTHCORE_CREATURE_H
 #define AZEROTHCORE_CREATURE_H
 
+#include "Cell.h"
 #include "Common.h"
-#include "Unit.h"
-#include "UpdateMask.h"
+#include "DatabaseEnv.h"
 #include "ItemTemplate.h"
 #include "LootMgr.h"
-#include "DatabaseEnv.h"
-#include "Cell.h"
-
+#include "Unit.h"
+#include "UpdateMask.h"
 #include <list>
 
 class SpellInfo;
@@ -141,6 +140,7 @@ struct CreatureTemplate
     uint32  movementId;
     bool    RegenHealth;
     uint32  MechanicImmuneMask;
+    uint8   SpellSchoolImmuneMask;
     uint32  flags_extra;
     uint32  ScriptID;
     WorldPacket queryData; // pussywizard
@@ -465,8 +465,10 @@ public:
     [[nodiscard]] bool IsTrigger() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER; }
     [[nodiscard]] bool IsGuard() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_GUARD; }
     [[nodiscard]] bool CanWalk() const { return GetCreatureTemplate()->InhabitType & INHABIT_GROUND; }
-    [[nodiscard]] bool CanSwim() const override { return (GetCreatureTemplate()->InhabitType & INHABIT_WATER) || IS_PLAYER_GUID(GetOwnerGUID()); }
-    [[nodiscard]] bool CanFly()  const override { return GetCreatureTemplate()->InhabitType & INHABIT_AIR; }
+    [[nodiscard]] bool CanSwim() const override;
+    [[nodiscard]] bool CanEnterWater() const override;
+    [[nodiscard]] bool CanFly()  const override;
+    [[nodiscard]] bool CanHover() const { return m_originalAnimTier & UNIT_BYTE1_FLAG_HOVER || IsHovering(); }
 
     void SetReactState(ReactStates st) { m_reactState = st; }
     [[nodiscard]] ReactStates GetReactState() const { return m_reactState; }
@@ -477,6 +479,7 @@ public:
     bool isCanInteractWithBattleMaster(Player* player, bool msg) const;
     bool isCanTrainingAndResetTalentsOf(Player* player) const;
     bool CanCreatureAttack(Unit const* victim, bool skipDistCheck = false) const;
+    void LoadSpellTemplateImmunity();
     bool IsImmunedToSpell(SpellInfo const* spellInfo) override;
 
     [[nodiscard]] bool HasMechanicTemplateImmunity(uint32 mask) const;
@@ -521,6 +524,15 @@ public:
     bool SetWaterWalking(bool enable, bool packetOnly = false) override;
     bool SetFeatherFall(bool enable, bool packetOnly = false) override;
     bool SetHover(bool enable, bool packetOnly = false) override;
+    bool HasSpellFocus(Spell const* focusSpell = nullptr) const;
+
+    struct
+    {
+        ::Spell const* Spell = nullptr;
+        uint32 Delay = 0;         // ms until the creature's target should snap back (0 = no snapback scheduled)
+        uint64 Target;            // the creature's "real" target while casting
+        float Orientation = 0.0f; // the creature's "real" orientation while casting
+    } _spellFocusInfo;
 
     [[nodiscard]] uint32 GetShieldBlockValue() const override
     {
@@ -673,8 +685,10 @@ public:
             return m_charmInfo->GetCharmSpell(pos)->GetAction();
     }
 
-    void SetCannotReachTarget(bool cannotReach) { if (cannotReach == m_cannotReachTarget) return; m_cannotReachTarget = cannotReach; m_cannotReachTimer = 0; }
+    void SetCannotReachTarget(bool cannotReach);
     [[nodiscard]] bool CanNotReachTarget() const { return m_cannotReachTarget; }
+    [[nodiscard]] bool IsNotReachable() const { return (m_cannotReachTimer >= (sWorld->getIntConfig(CONFIG_NPC_EVADE_IF_NOT_REACHABLE) * IN_MILLISECONDS)) && m_cannotReachTarget; }
+    [[nodiscard]] bool IsNotReachableAndNeedRegen() const { return (m_cannotReachTimer >= (sWorld->getIntConfig(CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID) * IN_MILLISECONDS)) && m_cannotReachTarget; }
 
     void SetPosition(float x, float y, float z, float o);
     void SetPosition(const Position& pos) { SetPosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); }
@@ -725,10 +739,23 @@ public:
     void SetTarget(uint64 guid) override;
     void FocusTarget(Spell const* focusSpell, WorldObject const* target);
     void ReleaseFocus(Spell const* focusSpell);
+    bool IsMovementPreventedByCasting() const;
 
     // Part of Evade mechanics
     [[nodiscard]] time_t GetLastDamagedTime() const { return _lastDamagedTime; }
     void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
+
+    bool IsFreeToMove();
+    static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
+    static constexpr uint32 MOVE_BACKWARDS_CHECK_INTERVAL = 2000;
+    uint32 m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
+    uint32 m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
+
+    bool HasSwimmingFlagOutOfCombat() const
+    {
+        return !_isMissingSwimmingFlagOutOfCombat;
+    }
+    void RefreshSwimmingFlag(bool recheck = false);
 
 protected:
     bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
@@ -758,6 +785,8 @@ protected:
     uint32 m_DBTableGuid;                               ///< For new or temporary creatures is 0 for saved it is lowguid
     uint8 m_equipmentId;
     int8 m_originalEquipmentId; // can be -1
+
+    uint8 m_originalAnimTier;
 
     bool m_AlreadyCallAssistance;
     bool m_AlreadySearchedAssistance;
@@ -800,6 +829,10 @@ private:
     uint32 m_cannotReachTimer;
 
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
+
+    bool _isMissingSwimmingFlagOutOfCombat;
+
+    void applyInhabitFlags();
 };
 
 class AssistDelayEvent : public BasicEvent

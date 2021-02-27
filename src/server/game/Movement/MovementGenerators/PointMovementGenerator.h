@@ -7,8 +7,8 @@
 #ifndef ACORE_POINTMOVEMENTGENERATOR_H
 #define ACORE_POINTMOVEMENTGENERATOR_H
 
-#include "MovementGenerator.h"
 #include "FollowerReference.h"
+#include "MovementGenerator.h"
 
 template<class T>
 class PointMovementGenerator : public MovementGeneratorMedium< T, PointMovementGenerator<T> >

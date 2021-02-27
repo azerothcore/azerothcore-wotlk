@@ -5,9 +5,9 @@
  */
 
 #include "ACSoap.h"
+#include "Log.h"
 #include "soapH.h"
 #include "soapStub.h"
-#include "Log.h"
 #include "World.h"
 
 void ACSoapRunnable::run()

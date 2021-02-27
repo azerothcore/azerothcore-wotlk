@@ -1,15 +1,15 @@
 // Scripted by Xinef
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "SpellScript.h"
-#include "LFGMgr.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
+#include "LFGMgr.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 ///////////////////////////////////////
 ////// GOS
@@ -737,9 +737,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_SERVICE_UNIFORM))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_SERVICE_UNIFORM });
         }
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

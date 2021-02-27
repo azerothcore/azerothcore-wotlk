@@ -83,7 +83,7 @@ jobs:
       - name: Cache
         uses: actions/cache@v1.1.2
         with:
-          path: /Users/runner/.ccache
+          path: ~/.ccache
           key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
             ccache:${{ matrix.os }}:${{ github.ref }}

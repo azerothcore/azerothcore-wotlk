@@ -5,8 +5,8 @@
  */
 
 #include "Opcodes.h"
-#include "WorldSession.h"
 #include "WorldPacket.h"
+#include "WorldSession.h"
 
 void WorldSession::SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos)
 {

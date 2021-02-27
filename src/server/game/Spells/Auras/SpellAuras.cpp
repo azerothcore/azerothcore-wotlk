@@ -4,26 +4,26 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ArenaSpectator.h"
+#include "CellImpl.h"
 #include "Common.h"
-#include "WorldPacket.h"
-#include "Opcodes.h"
-#include "Log.h"
-#include "ObjectMgr.h"
-#include "SpellMgr.h"
-#include "Player.h"
-#include "Unit.h"
-#include "Spell.h"
-#include "SpellAuraEffects.h"
 #include "DynamicObject.h"
-#include "ObjectAccessor.h"
-#include "Util.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CellImpl.h"
+#include "Log.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Player.h"
 #include "ScriptMgr.h"
+#include "Spell.h"
+#include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
+#include "Unit.h"
+#include "Util.h"
 #include "Vehicle.h"
-#include "ArenaSpectator.h"
+#include "WorldPacket.h"
 
 // update aura target map every 500 ms instead of every update - reduce amount of grid searcher calls
 static constexpr int32 UPDATE_TARGET_MAP_INTERVAL = 500;
@@ -772,22 +772,22 @@ void Aura::Update(uint32 diff, Unit* caster)
         if (m_duration < 0)
             m_duration = 0;
 
-        // handle manaPerSecond/manaPerSecondPerLevel
+        // handle ManaPerSecond/ManaPerSecondPerLevel
         if (m_timeCla)
         {
             if (m_timeCla > int32(diff))
                 m_timeCla -= diff;
             else if (caster)
             {
-                if (int32 manaPerSecond = m_spellInfo->ManaPerSecond + m_spellInfo->ManaPerSecondPerLevel * caster->getLevel())
+                if (int32 ManaPerSecond = m_spellInfo->ManaPerSecond + m_spellInfo->ManaPerSecondPerLevel * caster->getLevel())
                 {
                     m_timeCla += 1000 - diff;
 
                     Powers powertype = Powers(m_spellInfo->PowerType);
                     if (powertype == POWER_HEALTH)
                     {
-                        if (int32(caster->GetHealth()) > manaPerSecond)
-                            caster->ModifyHealth(-manaPerSecond);
+                        if (int32(caster->GetHealth()) > ManaPerSecond)
+                            caster->ModifyHealth(-ManaPerSecond);
                         else
                         {
                             Remove();
@@ -796,8 +796,8 @@ void Aura::Update(uint32 diff, Unit* caster)
                     }
                     else
                     {
-                        if (int32(caster->GetPower(powertype)) >= manaPerSecond)
-                            caster->ModifyPower(powertype, -manaPerSecond);
+                        if (int32(caster->GetPower(powertype)) >= ManaPerSecond)
+                            caster->ModifyPower(powertype, -ManaPerSecond);
                         else
                         {
                             Remove();
@@ -968,7 +968,7 @@ bool Aura::ModStackAmount(int32 num, AuraRemoveMode removeMode, bool periodicRes
         return true;
     }
 
-    bool refresh = stackAmount >= GetStackAmount();
+    bool refresh = stackAmount >= GetStackAmount() && (m_spellInfo->StackAmount || !m_spellInfo->HasAttribute(SPELL_ATTR1_DONT_REFRESH_DURATION_ON_RECAST));
 
     // Update stack amount
     if (refresh)

@@ -13,6 +13,7 @@
 #include "Chat.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
+#include "GitRevision.h"
 #include "Group.h"
 #include "Guild.h"
 #include "GuildMgr.h"
@@ -23,22 +24,22 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Pet.h"
-#include "PlayerDump.h"
 #include "Player.h"
+#include "PlayerDump.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
 #include "SharedDefines.h"
 #include "SocialMgr.h"
-#include "SpellAuras.h"
 #include "SpellAuraEffects.h"
-#include "GitRevision.h"
+#include "SpellAuras.h"
+#include "Transport.h"
 #include "UpdateMask.h"
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Transport.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -896,7 +897,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     data << pCurrChar->GetMapId();
     data << pCurrChar->GetPositionX();
     data << pCurrChar->GetPositionY();
-    data << pCurrChar->GetPositionZ() + pCurrChar->GetHoverHeight();
+    data << pCurrChar->GetPositionZ();
     data << pCurrChar->GetOrientation();
     SendPacket(&data);
 
@@ -1214,7 +1215,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     data << pCurrChar->GetMapId();
     data << pCurrChar->GetPositionX();
     data << pCurrChar->GetPositionY();
-    data << pCurrChar->GetPositionZ() + pCurrChar->GetHoverHeight();
+    data << pCurrChar->GetPositionZ();
     data << pCurrChar->GetOrientation();
     SendPacket(&data);
 

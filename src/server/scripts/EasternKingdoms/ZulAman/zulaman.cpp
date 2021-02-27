@@ -15,13 +15,13 @@ EndScriptData */
 npc_forest_frog
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "zulaman.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "zulaman.h"
 
 /*######
 ## npc_forest_frog
@@ -630,7 +630,7 @@ public:
                 me->SetEntry(NPC_HARRISON_JONES_2);
                 me->SetDisplayId(MODEL_HARRISON_JONES_2);
                 me->SetTarget(0);
-                me->SetByteValue(UNIT_FIELD_BYTES_1, 0, UNIT_STAND_STATE_DEAD);
+                me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_DEAD);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                 instance->SetData(DATA_GONGEVENT, DONE);
             }

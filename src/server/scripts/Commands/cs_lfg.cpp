@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
+#include "Group.h"
 #include "Language.h"
 #include "LFGMgr.h"
-#include "Group.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 
 void GetPlayerInfo(ChatHandler*  handler, Player* player)
 {

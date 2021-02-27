@@ -11,8 +11,8 @@ SDComment: No model for submerging. Currently just invisible.
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells

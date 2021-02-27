@@ -7,8 +7,8 @@
 #ifndef TRINITYSERVER_MOVEPLINE_H
 #define TRINITYSERVER_MOVEPLINE_H
 
-#include "Spline.h"
 #include "MoveSplineInitArgs.h"
+#include "Spline.h"
 
 namespace Movement
 {
@@ -112,6 +112,10 @@ namespace Movement
 
         bool onTransport;
         [[nodiscard]] std::string ToString() const;
+        [[nodiscard]] bool HasStarted() const
+        {
+            return time_passed > 0;
+        }
     };
 }
 #endif // TRINITYSERVER_MOVEPLINE_H

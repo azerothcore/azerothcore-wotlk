@@ -26,13 +26,13 @@ go_crystal_prison
 npc_enraged_spirit
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Group.h"
-#include "SpellScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 #include "WorldSession.h"
 
 // Ours
@@ -156,7 +156,7 @@ public:
 
         void Reset() override
         {
-            ground = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+            ground = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
             SummonInfernal();
             events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, urand(1000, 3000));
         }

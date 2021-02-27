@@ -5,16 +5,15 @@
 #ifndef AZEROTHCORE_IWORLD_H
 #define AZEROTHCORE_IWORLD_H
 
-#include "Common.h"
-#include "Timer.h"
-#include "SharedDefines.h"
-#include "QueryResult.h"
 #include "Callback.h"
-
+#include "Common.h"
+#include "QueryResult.h"
+#include "SharedDefines.h"
+#include "Timer.h"
+#include <atomic>
+#include <list>
 #include <map>
 #include <set>
-#include <list>
-#include <atomic>
 
 class WorldSession;
 class Player;
@@ -164,6 +163,7 @@ enum WorldBoolConfigs
     CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE,
     CONFIG_DEBUG_BATTLEGROUND,
     CONFIG_DEBUG_ARENA,
+    CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -370,6 +370,9 @@ enum WorldIntConfigs
     CONFIG_GUILD_BANK_TAB_COST_4,
     CONFIG_GUILD_BANK_TAB_COST_5,
     CONFIG_GM_LEVEL_CHANNEL_MODERATION,
+    CONFIG_TOGGLE_XP_COST,
+    CONFIG_NPC_EVADE_IF_NOT_REACHABLE,
+    CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -412,6 +415,7 @@ enum Rates
     RATE_BUYVALUE_ITEM_ARTIFACT,
     RATE_BUYVALUE_ITEM_HEIRLOOM,
     RATE_DROP_MONEY,
+    RATE_REWARD_BONUS_MONEY,
     RATE_XP_KILL,
     RATE_XP_BG_KILL,
     RATE_XP_QUEST,

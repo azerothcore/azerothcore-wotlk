@@ -7,10 +7,11 @@
 #ifndef _SPELLINFO_H
 #define _SPELLINFO_H
 
-#include "SharedDefines.h"
-#include "Util.h"
 #include "DBCStructure.h"
 #include "Object.h"
+#include "SharedDefines.h"
+#include "SpellAuraDefines.h"
+#include "Util.h"
 
 class Unit;
 class Player;
@@ -166,7 +167,7 @@ enum SpellCustomAttributes
     SPELL_ATTR0_CU_CONE_LINE                     = 0x00000004,
     SPELL_ATTR0_CU_SHARE_DAMAGE                  = 0x00000008,
     SPELL_ATTR0_CU_NO_INITIAL_THREAT             = 0x00000010,
-    SPELL_ATTR0_CU_NONE2                         = 0x00000020,   // UNUSED
+    SPELL_ATTR0_CU_AURA_CC                       = 0x00000020,
     SPELL_ATTR0_CU_DONT_BREAK_STEALTH            = 0x00000040,
     SPELL_ATTR0_CU_NONE3                         = 0x00000080,   // UNUSED
     SPELL_ATTR0_CU_DIRECT_DAMAGE                 = 0x00000100,
@@ -437,6 +438,7 @@ public:
     bool IsPositive() const;
     bool IsPositiveEffect(uint8 effIndex) const;
     bool IsChanneled() const;
+    [[nodiscard]] bool IsMoveAllowedChannel() const;
     bool NeedsComboPoints() const;
     bool IsBreakingStealth() const;
     bool IsRangedWeaponSpell() const;

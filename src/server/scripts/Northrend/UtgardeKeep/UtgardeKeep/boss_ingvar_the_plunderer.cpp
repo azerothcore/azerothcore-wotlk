@@ -2,8 +2,8 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "utgarde_keep.h"
 
 enum eDisplayId
@@ -358,7 +358,7 @@ public:
                     break;
                 case EVENT_AXE_RETURN:
                     if (Creature* c = ObjectAccessor::GetCreature(*me, ThrowGUID))
-                        c->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 0.5f);
+                        c->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                     events.RescheduleEvent(EVENT_AXE_PICKUP, 1500);
                     break;
                 case EVENT_AXE_PICKUP:

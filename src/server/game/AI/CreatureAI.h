@@ -7,9 +7,9 @@
 #ifndef ACORE_CREATUREAI_H
 #define ACORE_CREATUREAI_H
 
+#include "Common.h"
 #include "Creature.h"
 #include "UnitAI.h"
-#include "Common.h"
 
 class WorldObject;
 class Unit;
@@ -70,6 +70,9 @@ public:
     explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), m_MoveInLineOfSight_locked(false) {}
 
     ~CreatureAI() override {}
+
+    void MoveCircleChecks();
+    void MoveBackwardsChecks();
 
     /// == Reactions At =================================
 
