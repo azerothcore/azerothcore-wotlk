@@ -1,10 +1,9 @@
 ---
 name: 🐛 Bug report
 about: Report any bug or defect you've come across when using AzerothCore.
-title: '🐛 [Bug]'
+title: '🐛 [Bug] '
 labels: 'bug'
 assignees: ''
-
 ---
 <!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE! -->
 
