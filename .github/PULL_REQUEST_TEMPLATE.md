@@ -2,8 +2,8 @@
  Please fill this template unless your PR is very simple/straightforward.
  Do not forget to have a look at our Pull Request tutorial: http://www.azerothcore.org/wiki/Contribute#how-to-create-a-pull-request
 -->
-## 🍰 Pullrequest
-<!-- Describe the Pullrequest. What changes do you propose? -->
+## 🍰 Pull request
+<!-- Describe the Pull request. What changes do you propose? -->
 
 
 
