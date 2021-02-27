@@ -1,7 +1,7 @@
 ---
 name: 🐛 Bug Report - 💾 Data
 about: Report missing or wrong data.
-labels: 'bug, npc'
+labels: 'bug, data'
 title: '💾 [Bug][Data] '
 assignees: ''
 ---
