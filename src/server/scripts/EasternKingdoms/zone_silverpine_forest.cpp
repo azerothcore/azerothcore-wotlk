@@ -144,9 +144,9 @@ static float PyrewoodSpawnPoints[3][4] =
     {-397.44f, 1511.09f, 18.67f, 0},
     */
     //door
-    {-396.17f, 1505.86f, 19.77f, 0},
-    {-396.91f, 1505.77f, 19.77f, 0},
-    {-397.94f, 1504.74f, 19.77f, 0},
+    {-397.018219f, 1510.208740f, 18.868748f, 4.731330f},
+    {-397.018219f, 1510.208740f, 18.868748f, 4.731330f},
+    {-397.018219f, 1510.208740f, 18.868748f, 4.731330f},
 };
 
 #define WAIT_SECS 6000
@@ -229,7 +229,7 @@ public:
                 if (!target)
                     target = me;
 
-                summoned->setFaction(168);
+                summoned->setFaction(123);
                 summoned->AddThreat(target, 32.0f);
                 summoned->AI()->AttackStart(target);
             }
@@ -291,6 +291,7 @@ public:
                     SummonCreatureWithRandomTarget(2065, 0);
                     break;
                 case 4:
+                    SummonCreatureWithRandomTarget(2066, 1);
                     SummonCreatureWithRandomTarget(2066, 1);
                     SummonCreatureWithRandomTarget(2067, 0);
                     SummonCreatureWithRandomTarget(2068, 2);
