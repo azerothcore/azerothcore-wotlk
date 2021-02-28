@@ -1131,7 +1131,6 @@ bool PathGenerator::IsSwimmableSegment(float const* v1, float const* v2, bool ch
     return IsSwimmableSegment(v1[2], v1[0], v1[1], v2[2], v2[0], v2[1], checkSwim);
 }
 
-
 /**
  * @brief predict if a certain segment is underwater and the unit can swim
  * Must only be used for very short segments since this check doesn't work on

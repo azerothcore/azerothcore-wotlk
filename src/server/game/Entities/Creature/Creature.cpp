@@ -1839,7 +1839,6 @@ void Creature::LoadSpellTemplateImmunity()
     }
 }
 
-
 bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo)
 {
     if (!spellInfo)
