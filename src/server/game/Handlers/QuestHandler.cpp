@@ -18,6 +18,9 @@
 #include "Player.h"
 #include "QuestDef.h"
 #include "ScriptMgr.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 #include "QuestTracker.h"
 
 #ifdef ELUNA
