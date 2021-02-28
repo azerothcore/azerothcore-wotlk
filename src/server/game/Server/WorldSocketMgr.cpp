@@ -222,9 +222,9 @@ WorldSocketMgr* WorldSocketMgr::instance()
 int
 WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 {
-    m_UseNoDelay = sConfigMgr->GetBoolDefault ("Network.TcpNodelay", true);
+    m_UseNoDelay = sConfigMgr->GetOption<bool> ("Network.TcpNodelay", true);
 
-    int num_threads = sConfigMgr->GetIntDefault ("Network.Threads", 1);
+    int num_threads = sConfigMgr->GetOption<int32> ("Network.Threads", 1);
 
     if (num_threads <= 0)
     {
@@ -239,9 +239,9 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
     sLog->outBasic ("Max allowed socket connections %d", ACE::max_handles());
 
     // -1 means use default
-    m_SockOutKBuff = sConfigMgr->GetIntDefault ("Network.OutKBuff", -1);
+    m_SockOutKBuff = sConfigMgr->GetOption<int32> ("Network.OutKBuff", -1);
 
-    m_SockOutUBuff = sConfigMgr->GetIntDefault ("Network.OutUBuff", 65536);
+    m_SockOutUBuff = sConfigMgr->GetOption<int32> ("Network.OutUBuff", 65536);
 
     if (m_SockOutUBuff <= 0)
     {

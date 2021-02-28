@@ -1,13 +1,15 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "Common.h"
+#include "Define.h"
+#include <string>
+#include <vector>
+#include <stdexcept>
 
 class ConfigMgr
 {
@@ -17,40 +19,60 @@ class ConfigMgr
     ~ConfigMgr() = default;
 
 public:
+    bool LoadAppConfigs();
+    bool LoadModulesConfigs();
+    void Configure(std::string const& initFileName, std::vector<std::string> args, std::string const& modulesConfigList = "");
+
     static ConfigMgr* instance();
-
-    /// Method used only for loading main configuration files (authserver.conf and worldserver.conf)
-    bool LoadInitial(std::string const& file);
-
-    /**
-     * This method loads additional configuration files
-     * It is recommended to use this method in WorldScript::OnConfigLoad hooks
-     *
-     * @return true if loading was successful
-     */
-    bool LoadMore(std::string const& file);
 
     bool Reload();
 
-    bool LoadAppConfigs(std::string const& applicationName = "worldserver");
-    bool LoadModulesConfigs();
+    std::string const& GetFilename();
+    std::string const GetConfigPath();
+    std::vector<std::string> const& GetArguments() const;
+    std::vector<std::string> GetKeysByString(std::string const& name);
 
-    std::string GetStringDefault(std::string const& name, const std::string& def, bool logUnused = true);
-    bool GetBoolDefault(std::string const& name, bool def, bool logUnused = true);
-    int GetIntDefault(std::string const& name, int def, bool logUnused = true);
-    float GetFloatDefault(std::string const& name, float def, bool logUnused = true);
+    template<class T>
+    T GetOption(std::string const& name, T const& def, bool showLogs = true) const;
 
-    std::list<std::string> GetKeysByString(std::string const& name);
+    /*
+     * Deprecated geters. This geters will be deleted
+     */
+
+    // @deprecated DO NOT USE - use GetOption<std::string> instead.
+    std::string GetStringDefault(std::string const& name, const std::string& def, bool showLogs = true);
+
+    // @deprecated DO NOT USE - use GetOption<bool> instead.
+    bool GetBoolDefault(std::string const& name, bool def, bool showLogs = true);
+
+    // @deprecated DO NOT USE - use GetOption<int32> instead.
+    int GetIntDefault(std::string const& name, int def, bool showLogs = true);
+
+    // @deprecated DO NOT USE - use GetOption<float> instead.
+    float GetFloatDefault(std::string const& name, float def, bool showLogs = true);
+
+    /*
+     * End deprecated geters
+     */
 
     bool isDryRun() { return dryRun; }
     void setDryRun(bool mode) { dryRun = mode; }
 
-    void SetConfigList(std::string const& fileName, std::string const& modulesConfigList = "");
-
 private:
-    bool dryRun = false;
+    /// Method used only for loading main configuration files (authserver.conf and worldserver.conf)
+    bool LoadInitial(std::string const& file);
+    bool LoadAdditionalFile(std::string file);
 
-    bool LoadData(std::string const& file);
+    template<class T>
+    T GetValueDefault(std::string const& name, T const& def, bool showLogs = true) const;
+
+    bool dryRun = false;
+};
+
+class ConfigException : public std::length_error
+{
+public:
+    explicit ConfigException(std::string const& message) : std::length_error(message) { }
 };
 
 #define sConfigMgr ConfigMgr::instance()
