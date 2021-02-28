@@ -4,10 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "MapUpdater.h"
-#include "Map.h"
-#include "LFGMgr.h"
 #include "AvgDiffTracker.h"
+#include "LFGMgr.h"
+#include "Map.h"
+#include "MapUpdater.h"
 
 class UpdateRequest
 {

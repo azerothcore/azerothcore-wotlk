@@ -5,11 +5,10 @@
  */
 
 #include "Creature.h"
-#include "CreatureGroups.h"
-#include "ObjectMgr.h"
-
 #include "CreatureAI.h"
+#include "CreatureGroups.h"
 #include "MoveSplineInit.h"
+#include "ObjectMgr.h"
 
 FormationMgr::~FormationMgr()
 {

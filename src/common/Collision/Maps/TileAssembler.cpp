@@ -9,9 +9,7 @@
 #include "BoundingIntervalHierarchy.h"
 #include "VMapDefinitions.h"
 #include "SharedDefines.h"
-
 #include <set>
-#include <iomanip>
 #include <sstream>
 #include <iomanip>
 

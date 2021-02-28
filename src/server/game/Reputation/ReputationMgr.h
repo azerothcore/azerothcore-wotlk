@@ -8,10 +8,10 @@
 #define __ACORE_REPUTATION_MGR_H
 
 #include "Common.h"
-#include "SharedDefines.h"
-#include "Language.h"
 #include "DBCStructure.h"
+#include "Language.h"
 #include "QueryResult.h"
+#include "SharedDefines.h"
 #include <map>
 
 static uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =

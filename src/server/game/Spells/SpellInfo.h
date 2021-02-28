@@ -7,10 +7,11 @@
 #ifndef _SPELLINFO_H
 #define _SPELLINFO_H
 
-#include "SharedDefines.h"
-#include "Util.h"
 #include "DBCStructure.h"
 #include "Object.h"
+#include "SharedDefines.h"
+#include "SpellAuraDefines.h"
+#include "Util.h"
 
 class Unit;
 class Player;

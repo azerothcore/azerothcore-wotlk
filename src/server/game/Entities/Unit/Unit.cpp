@@ -4,17 +4,19 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Unit.h"
-#include "Common.h"
+#include "AccountMgr.h"
+#include "ArenaSpectator.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "Common.h"
 #include "ConditionMgr.h"
+#include "Creature.h"
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
 #include "CreatureGroups.h"
-#include "Creature.h"
+#include "DynamicVisibility.h"
 #include "Formulas.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
@@ -29,36 +31,33 @@
 #include "Opcodes.h"
 #include "OutdoorPvP.h"
 #include "PassiveAI.h"
-#include "PetAI.h"
 #include "Pet.h"
+#include "PetAI.h"
 #include "Player.h"
 #include "QuestDef.h"
 #include "ReputationMgr.h"
+#include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
-#include "Spell.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "TemporarySummon.h"
 #include "Totem.h"
 #include "TotemAI.h"
 #include "Transport.h"
+#include "Unit.h"
 #include "UpdateFieldFlags.h"
 #include "Util.h"
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "ArenaSpectator.h"
-#include "DynamicVisibility.h"
-#include "AccountMgr.h"
+#include <math.h>
 
 #ifdef ELUNA
 #include "LuaEngine.h"
 #include "ElunaEventMgr.h"
 #endif
-
-#include <math.h>
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
 {

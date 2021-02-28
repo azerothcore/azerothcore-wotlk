@@ -4,16 +4,16 @@
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 */
 
+#include "Creature.h"
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
-#include "Creature.h"
-#include "World.h"
-#include "SpellMgr.h"
-#include "Vehicle.h"
+#include "CreatureTextMgr.h"
 #include "Log.h"
 #include "MapReference.h"
 #include "Player.h"
-#include "CreatureTextMgr.h"
+#include "SpellMgr.h"
+#include "Vehicle.h"
+#include "World.h"
 
 //Disable CreatureAI when charmed
 void CreatureAI::OnCharmed(bool /*apply*/)

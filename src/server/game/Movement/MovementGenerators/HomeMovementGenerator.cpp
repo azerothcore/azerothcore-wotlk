@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "HomeMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "WorldPacket.h"
-#include "MoveSplineInit.h"
+#include "HomeMovementGenerator.h"
 #include "MoveSpline.h"
+#include "MoveSplineInit.h"
+#include "WorldPacket.h"
 
 void HomeMovementGenerator<Creature>::DoInitialize(Creature* owner)
 {

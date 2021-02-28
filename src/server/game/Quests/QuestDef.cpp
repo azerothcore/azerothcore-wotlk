@@ -4,11 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "QuestDef.h"
-#include "Player.h"
-#include "World.h"
-#include "Opcodes.h"
 #include "Formulas.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "QuestDef.h"
+#include "World.h"
 
 Quest::Quest(Field* questRecord)
 {

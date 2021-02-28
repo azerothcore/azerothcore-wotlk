@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PacketLog.h"
-#include "Config.h"
 #include "ByteBuffer.h"
+#include "Config.h"
+#include "PacketLog.h"
 #include "WorldPacket.h"
 
 PacketLog::PacketLog() : _file(nullptr)

@@ -11,9 +11,9 @@ SDComment: Quest Support:8735
 SDCategory: Duskwood
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum TwilightCorrupter
 {

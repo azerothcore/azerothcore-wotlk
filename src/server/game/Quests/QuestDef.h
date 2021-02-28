@@ -7,12 +7,11 @@
 #ifndef AZEROTHCORE_QUEST_H
 #define AZEROTHCORE_QUEST_H
 
-#include "Define.h"
 #include "DatabaseEnv.h"
+#include "DBCEnums.h"
+#include "Define.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
-#include "DBCEnums.h"
-
 #include <string>
 #include <vector>
 

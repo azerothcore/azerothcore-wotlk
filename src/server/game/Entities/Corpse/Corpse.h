@@ -7,10 +7,10 @@
 #ifndef AZEROTHCORE_CORPSE_H
 #define AZEROTHCORE_CORPSE_H
 
-#include "Object.h"
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
 #include "LootMgr.h"
+#include "Object.h"
 
 enum CorpseType
 {

@@ -7,9 +7,8 @@
 #ifndef _ACSOAP_H
 #define _ACSOAP_H
 
-#include "Define.h"
 #include "AccountMgr.h"
-
+#include "Define.h"
 #include <ace/Semaphore.h>
 #include <ace/Task.h>
 #include <Threading.h>

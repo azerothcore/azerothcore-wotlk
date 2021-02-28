@@ -5,16 +5,15 @@
 #ifndef AZEROTHCORE_IWORLD_H
 #define AZEROTHCORE_IWORLD_H
 
-#include "Common.h"
-#include "Timer.h"
-#include "SharedDefines.h"
-#include "QueryResult.h"
 #include "Callback.h"
-
+#include "Common.h"
+#include "QueryResult.h"
+#include "SharedDefines.h"
+#include "Timer.h"
+#include <atomic>
+#include <list>
 #include <map>
 #include <set>
-#include <list>
-#include <atomic>
 
 class WorldSession;
 class Player;
