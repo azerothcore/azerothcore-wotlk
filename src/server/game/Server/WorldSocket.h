@@ -13,20 +13,19 @@
 #ifndef _WORLDSOCKET_H
 #define _WORLDSOCKET_H
 
-#include <ace/Synch_Traits.h>
-#include <ace/Svc_Handler.h>
+#include "AuthCrypt.h"
+#include "Common.h"
+#include "Duration.h"
+#include <ace/Message_Block.h>
 #include <ace/SOCK_Stream.h>
+#include <ace/Svc_Handler.h>
+#include <ace/Synch_Traits.h>
 #include <ace/Thread_Mutex.h>
 #include <ace/Unbounded_Queue.h>
-#include <ace/Message_Block.h>
 
 #if !defined (ACE_LACKS_PRAGMA_ONCE)
 #pragma once
 #endif /* ACE_LACKS_PRAGMA_ONCE */
-
-#include "Common.h"
-#include "AuthCrypt.h"
-#include "Duration.h"
 
 class ACE_Message_Block;
 class WorldPacket;

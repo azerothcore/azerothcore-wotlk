@@ -14,9 +14,8 @@
  */
 
 #include "MovementGenerator.h"
-#include "WaypointManager.h"
-
 #include "Player.h"
+#include "WaypointManager.h"
 
 #define FLIGHT_TRAVEL_UPDATE  100
 #define TIMEDIFF_NEXT_WP      250

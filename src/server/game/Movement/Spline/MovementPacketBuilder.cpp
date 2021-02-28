@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ByteBuffer.h"
 #include "MovementPacketBuilder.h"
 #include "MoveSpline.h"
-#include "ByteBuffer.h"
 
 namespace Movement
 {

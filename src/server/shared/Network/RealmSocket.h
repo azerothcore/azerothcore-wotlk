@@ -7,11 +7,11 @@
 #ifndef __REALMSOCKET_H__
 #define __REALMSOCKET_H__
 
-#include <ace/Synch_Traits.h>
-#include <ace/Svc_Handler.h>
-#include <ace/SOCK_Stream.h>
-#include <ace/Message_Block.h>
 #include "Common.h"
+#include <ace/Message_Block.h>
+#include <ace/SOCK_Stream.h>
+#include <ace/Svc_Handler.h>
+#include <ace/Synch_Traits.h>
 
 class RealmSocket : public ACE_Svc_Handler<ACE_SOCK_STREAM, ACE_NULL_SYNCH>
 {

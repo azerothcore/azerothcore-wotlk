@@ -15,10 +15,10 @@ EndScriptData */
 npcs_riverbreeze_and_silversky
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 
 /*######
 ## npcs_riverbreeze_and_silversky

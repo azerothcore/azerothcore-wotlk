@@ -9,7 +9,6 @@
 
 #include "SharedDefines.h"
 #include "WorldSession.h"
-
 #include <vector>
 
 class ChatHandler;

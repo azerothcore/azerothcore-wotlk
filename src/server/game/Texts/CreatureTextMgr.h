@@ -10,8 +10,8 @@
 #include "Creature.h"
 #include "GridNotifiers.h"
 #include "ObjectAccessor.h"
-#include "SharedDefines.h"
 #include "Opcodes.h"
+#include "SharedDefines.h"
 
 enum CreatureTextRange
 {

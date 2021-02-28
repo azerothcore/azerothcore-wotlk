@@ -9,12 +9,12 @@ Blasted_Lands
 Quest support: 3628. Teleporter to Rise of the Defiler.
 */
 
-#include "ScriptMgr.h"
+#include "Group.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
-#include "Player.h"
-#include "Group.h"
 
 /*#####
 # spell_razelikh_teleport_group

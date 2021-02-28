@@ -4,14 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "TargetedMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "MoveSplineInit.h"
+#include "Pet.h"
 #include "Player.h"
 #include "Spell.h"
+#include "TargetedMovementGenerator.h"
 #include "Transport.h"
-#include "Pet.h"
 
 static bool IsMutualChase(Unit* owner, Unit* target)
 {
@@ -64,7 +64,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) || // for .npc follow
         (owner->CanFly())
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
-
 
     Unit* target = i_target.getTarget();
 
@@ -271,7 +270,6 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         (followingMaster) || // allow pets following their master to cheat while generating paths
         (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) // for .npc follow
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
-
 
     i_recheckDistance.Update(time_diff);
     if (i_recheckDistance.Passed())

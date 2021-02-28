@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "LFGPlayerData.h"
 #include "LFGMgr.h"
+#include "LFGPlayerData.h"
 
 namespace lfg
 {

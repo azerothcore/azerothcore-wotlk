@@ -11,8 +11,8 @@ SDComment: sound not implemented
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 #define SOUND_SENTENCE_YOU 8588
 #define SOUND_SERVE_TO     8589

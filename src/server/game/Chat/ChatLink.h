@@ -8,8 +8,8 @@
 #define AZEROTHCORE_CHATLINK_H
 
 #include "SharedDefines.h"
-#include <sstream>
 #include <list>
+#include <sstream>
 
 struct ItemLocale;
 struct ItemTemplate;

@@ -11,12 +11,12 @@ SDComment:
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
+#include "Item.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
 #include "temple_of_ahnqiraj.h"
 #include "WorldPacket.h"
-#include "Item.h"
-#include "Spell.h"
 
 enum Spells
 {

@@ -4,14 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "AccountMgr.h"
 #include "ChannelMgr.h"
 #include "Chat.h"
+#include "DatabaseEnv.h"
 #include "ObjectMgr.h"
+#include "Player.h"
 #include "SocialMgr.h"
 #include "World.h"
-#include "DatabaseEnv.h"
-#include "AccountMgr.h"
-#include "Player.h"
 
 Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, TeamId teamId, bool announce, bool ownership):
     _announce(announce),

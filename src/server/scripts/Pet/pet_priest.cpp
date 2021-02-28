@@ -9,10 +9,10 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_pri_".
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "PassiveAI.h"
 #include "PetAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "TotemAI.h"
 
 enum PriestSpells

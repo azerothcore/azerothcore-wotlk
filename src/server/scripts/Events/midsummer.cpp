@@ -1,12 +1,12 @@
 // Scripted by Xinef
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "Player.h"
 
 enum eBonfire
 {

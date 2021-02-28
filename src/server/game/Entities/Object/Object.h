@@ -9,20 +9,19 @@
 
 #include "Common.h"
 #include "DataMap.h"
-#include "UpdateMask.h"
-#include "UpdateData.h"
-#include "GridReference.h"
-#include "ObjectDefines.h"
 #include "GridDefines.h"
+#include "GridReference.h"
 #include "Map.h"
+#include "ObjectDefines.h"
+#include "UpdateData.h"
+#include "UpdateMask.h"
+#include <set>
+#include <string>
+#include <sstream>
 
 #ifdef ELUNA
 class ElunaEventProcessor;
 #endif
-
-#include <set>
-#include <string>
-#include <sstream>
 
 enum TypeMask
 {

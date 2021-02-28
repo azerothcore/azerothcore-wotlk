@@ -4,17 +4,17 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "CellImpl.h"
 #include "Common.h"
-#include "UpdateMask.h"
-#include "Opcodes.h"
-#include "World.h"
-#include "ObjectAccessor.h"
 #include "DatabaseEnv.h"
 #include "GridNotifiers.h"
-#include "CellImpl.h"
 #include "GridNotifiersImpl.h"
+#include "ObjectAccessor.h"
+#include "Opcodes.h"
 #include "ScriptMgr.h"
 #include "Transport.h"
+#include "UpdateMask.h"
+#include "World.h"
 
 DynamicObject::DynamicObject(bool isWorldObject) : WorldObject(isWorldObject), MovableMapObject(),
     _aura(nullptr), _removedAura(nullptr), _caster(nullptr), _duration(0), _isViewpoint(false)

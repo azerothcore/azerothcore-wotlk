@@ -7,9 +7,9 @@
 #ifndef TRANSPORTMGR_H
 #define TRANSPORTMGR_H
 
-#include <G3D/Quat.h>
-#include "Spline.h"
 #include "DBCStores.h"
+#include "Spline.h"
+#include <G3D/Quat.h>
 
 struct KeyFrame;
 struct GameObjectTemplate;

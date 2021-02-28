@@ -7,8 +7,8 @@
 #ifndef TRINITYSERVER_MOVEPLINE_H
 #define TRINITYSERVER_MOVEPLINE_H
 
-#include "Spline.h"
 #include "MoveSplineInitArgs.h"
+#include "Spline.h"
 
 namespace Movement
 {

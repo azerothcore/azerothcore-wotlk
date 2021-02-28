@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "ruins_of_ahnqiraj.h"
+#include "ScriptMgr.h"
 
 class instance_ruins_of_ahnqiraj : public InstanceMapScript
 {

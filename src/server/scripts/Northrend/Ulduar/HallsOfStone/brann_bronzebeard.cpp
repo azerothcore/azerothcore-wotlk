@@ -2,13 +2,13 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "halls_of_stone.h"
-#include "ScriptedEscortAI.h"
-#include "SpellScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 #define GOSSIP_ITEM_1       "Brann, it would be our honor!"
 #define GOSSIP_ITEM_2       "Let's move Brann, enough of the history lessons!"

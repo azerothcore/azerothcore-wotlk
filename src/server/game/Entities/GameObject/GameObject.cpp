@@ -4,13 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include <G3D/Quat.h>
-#include "GameObjectAI.h"
+#include "AccountMgr.h"
 #include "BattlegroundAV.h"
 #include "CellImpl.h"
 #include "CreatureAISelector.h"
 #include "DisableMgr.h"
 #include "DynamicTree.h"
+#include "GameObjectAI.h"
 #include "GameObjectModel.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
@@ -20,10 +20,11 @@
 #include "PoolMgr.h"
 #include "ScriptMgr.h"
 #include "SpellMgr.h"
+#include "Transport.h"
 #include "UpdateFieldFlags.h"
 #include "World.h"
-#include "Transport.h"
-#include "AccountMgr.h"
+#include <G3D/Quat.h>
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif

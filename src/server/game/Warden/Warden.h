@@ -7,11 +7,11 @@
 #ifndef _WARDEN_BASE_H
 #define _WARDEN_BASE_H
 
-#include <map>
+#include "ByteBuffer.h"
 #include "Cryptography/ARC4.h"
 #include "Cryptography/BigNumber.h"
-#include "ByteBuffer.h"
 #include "WardenCheckMgr.h"
+#include <map>
 
 enum WardenOpcodes
 {

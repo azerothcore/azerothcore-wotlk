@@ -8,10 +8,10 @@
 #define __SPELL_H
 
 #include "GridDefines.h"
-#include "SharedDefines.h"
 #include "ObjectMgr.h"
-#include "SpellInfo.h"
 #include "PathGenerator.h"
+#include "SharedDefines.h"
+#include "SpellInfo.h"
 
 class Unit;
 class Player;
