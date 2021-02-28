@@ -1413,9 +1413,9 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_GM_LEVEL_CHANNEL_MODERATION] = sConfigMgr->GetOption<int32>("Channel.ModerationGMLevel", 1);
 
     // Quest Tracker
-    m_bool_configs[CONFIG_QUEST_TRACKER_ENABLE] = sConfigMgr->GetBoolDefault("QuestTracker.Enable", false);
-    m_bool_configs[CONFIG_QUEST_TRACKER_QUEUE_ENABLE] = sConfigMgr->GetBoolDefault("QuestTracker.Queue.Enable", false);
-    m_int_configs[CONFIG_QUEST_TRACKER_QUEUE_DELAY] = sConfigMgr->GetIntDefault("QuestTracker.Queue.Delay", 10);
+    m_bool_configs[CONFIG_QUEST_TRACKER_ENABLE] = sConfigMgr->GetOption<bool>("QuestTracker.Enable", false);
+    m_bool_configs[CONFIG_QUEST_TRACKER_QUEUE_ENABLE] = sConfigMgr->GetOption<bool>("QuestTracker.Queue.Enable", false);
+    m_int_configs[CONFIG_QUEST_TRACKER_QUEUE_DELAY] = sConfigMgr->GetOption<int32>("QuestTracker.Queue.Delay", 10);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
