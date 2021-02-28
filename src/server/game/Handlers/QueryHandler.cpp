@@ -5,19 +5,19 @@
  */
 
 #include "Common.h"
-#include "Language.h"
 #include "DatabaseEnv.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "Opcodes.h"
+#include "Language.h"
 #include "Log.h"
-#include "World.h"
+#include "MapManager.h"
+#include "NPCHandler.h"
 #include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Pet.h"
 #include "Player.h"
 #include "UpdateMask.h"
-#include "NPCHandler.h"
-#include "Pet.h"
-#include "MapManager.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 void WorldSession::SendNameQueryOpcode(uint64 guid)
 {

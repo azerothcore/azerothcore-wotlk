@@ -7,14 +7,14 @@
 #ifndef ACORE_GRIDNOTIFIERSIMPL_H
 #define ACORE_GRIDNOTIFIERSIMPL_H
 
-#include "GridNotifiers.h"
-#include "WorldPacket.h"
 #include "Corpse.h"
-#include "Player.h"
-#include "UpdateData.h"
 #include "CreatureAI.h"
-#include "SpellAuras.h"
+#include "GridNotifiers.h"
 #include "Opcodes.h"
+#include "Player.h"
+#include "SpellAuras.h"
+#include "UpdateData.h"
+#include "WorldPacket.h"
 
 template<class T>
 inline void acore::VisibleNotifier::Visit(GridRefManager<T>& m)

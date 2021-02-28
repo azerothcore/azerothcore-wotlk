@@ -4,23 +4,23 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "AccountMgr.h"
+#include "AsyncAuctionListing.h"
+#include "AuctionHouseMgr.h"
+#include "AvgDiffTracker.h"
 #include "Common.h"
-#include "ObjectMgr.h"
-#include "Player.h"
-#include "World.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
-#include "ScriptMgr.h"
-#include "AccountMgr.h"
-#include "AuctionHouseMgr.h"
 #include "Item.h"
 #include "Language.h"
 #include "Logging/Log.h"
+#include "ObjectMgr.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 #include <vector>
-#include "AvgDiffTracker.h"
-#include "AsyncAuctionListing.h"
 
 enum eAuctionHouse
 {

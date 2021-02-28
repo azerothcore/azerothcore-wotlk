@@ -5,16 +5,16 @@
  */
 
 #include "Common.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "World.h"
-#include "ObjectMgr.h"
+#include "GossipDef.h"
+#include "Guild.h"
 #include "GuildMgr.h"
 #include "Log.h"
+#include "ObjectMgr.h"
 #include "Opcodes.h"
-#include "Guild.h"
-#include "GossipDef.h"
 #include "SocialMgr.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 // Cleanup bad characters
 void cleanStr(std::string& str)

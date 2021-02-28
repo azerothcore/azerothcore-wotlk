@@ -7,13 +7,13 @@
 #ifndef BATTLEFIELD_H_
 #define BATTLEFIELD_H_
 
-#include "Utilities/Util.h"
-#include "SharedDefines.h"
-#include "ZoneScript.h"
-#include "WorldPacket.h"
-#include "GameObject.h"
 #include "Battleground.h"
+#include "GameObject.h"
 #include "ObjectAccessor.h"
+#include "SharedDefines.h"
+#include "Utilities/Util.h"
+#include "WorldPacket.h"
+#include "ZoneScript.h"
 
 enum BattlefieldTypes
 {

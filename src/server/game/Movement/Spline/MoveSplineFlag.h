@@ -6,8 +6,8 @@
 
 #ifndef TRINITYSERVER_MOVESPLINEFLAG_H
 #define TRINITYSERVER_MOVESPLINEFLAG_H
-#include "MovementTypedefs.h"
 
+#include "MovementTypedefs.h"
 #include <string>
 
 namespace Movement

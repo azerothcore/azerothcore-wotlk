@@ -4,14 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PointMovementGenerator.h"
-#include "Errors.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "World.h"
-#include "MoveSplineInit.h"
+#include "Errors.h"
 #include "MoveSpline.h"
+#include "MoveSplineInit.h"
 #include "Player.h"
+#include "PointMovementGenerator.h"
+#include "World.h"
 
 //----- Point Movement Generator
 template<class T>

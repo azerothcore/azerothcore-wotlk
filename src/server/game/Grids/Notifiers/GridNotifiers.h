@@ -7,19 +7,18 @@
 #ifndef ACORE_GRIDNOTIFIERS_H
 #define ACORE_GRIDNOTIFIERS_H
 
-#include "ObjectGridLoader.h"
-#include "UpdateData.h"
-#include <iostream>
-
 #include "Corpse.h"
-#include "Object.h"
+#include "CreatureAI.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
+#include "Object.h"
+#include "ObjectGridLoader.h"
 #include "Player.h"
-#include "Unit.h"
-#include "CreatureAI.h"
 #include "Spell.h"
+#include "Unit.h"
+#include "UpdateData.h"
 #include "WorldSession.h"
+#include <iostream>
 
 class Player;
 //class Map;

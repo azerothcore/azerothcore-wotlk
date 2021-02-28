@@ -14,17 +14,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ObjectDefines.h"
 #include "Containers.h"
-#include "DBCStructure.h"
 #include "DBCStores.h"
+#include "DBCStructure.h"
 #include "Group.h"
-#include "LFGQueue.h"
+#include "GroupMgr.h"
 #include "LFGMgr.h"
+#include "LFGQueue.h"
 #include "Log.h"
+#include "ObjectDefines.h"
 #include "ObjectMgr.h"
 #include "World.h"
-#include "GroupMgr.h"
 
 namespace lfg
 {

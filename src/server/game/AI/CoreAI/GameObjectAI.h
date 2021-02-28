@@ -7,12 +7,12 @@
 #ifndef ACORE_GAMEOBJECTAI_H
 #define ACORE_GAMEOBJECTAI_H
 
+#include "CreatureAI.h"
 #include "Define.h"
-#include <list>
+#include "GameObject.h"
 #include "Object.h"
 #include "QuestDef.h"
-#include "GameObject.h"
-#include "CreatureAI.h"
+#include <list>
 
 class GameObjectAI
 {

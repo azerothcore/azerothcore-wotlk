@@ -4,10 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
 #include "Channel.h"
-#include "Guild.h"
 #include "Group.h"
+#include "Guild.h"
+#include "ScriptMgr.h"
 
 class ChatLogScript : public PlayerScript
 {

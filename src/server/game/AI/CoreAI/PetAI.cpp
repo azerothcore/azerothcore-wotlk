@@ -4,20 +4,20 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PetAI.h"
-#include "Errors.h"
-#include "Pet.h"
-#include "Player.h"
-#include "DBCStores.h"
-#include "Spell.h"
-#include "ObjectAccessor.h"
-#include "SpellMgr.h"
 #include "Creature.h"
-#include "World.h"
-#include "Util.h"
+#include "DBCStores.h"
+#include "Errors.h"
 #include "Group.h"
-#include "SpellInfo.h"
+#include "ObjectAccessor.h"
+#include "Pet.h"
+#include "PetAI.h"
+#include "Player.h"
+#include "Spell.h"
 #include "SpellAuraEffects.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "Util.h"
+#include "World.h"
 #include "WorldSession.h"
 
 int PetAI::Permissible(const Creature* creature)

@@ -7,20 +7,20 @@
 #ifndef SC_SCRIPTMGR_H
 #define SC_SCRIPTMGR_H
 
+#include "AchievementMgr.h"
+#include "ArenaTeam.h"
+#include "AuctionHouseMgr.h"
 #include "Battleground.h"
 #include "Common.h"
-#include "ObjectMgr.h"
 #include "DBCStores.h"
+#include "DynamicObject.h"
+#include "GameEventMgr.h"
+#include "ObjectMgr.h"
+#include "PetDefines.h"
 #include "QuestDef.h"
 #include "SharedDefines.h"
-#include "World.h"
 #include "Weather.h"
-#include "AchievementMgr.h"
-#include "DynamicObject.h"
-#include "ArenaTeam.h"
-#include "GameEventMgr.h"
-#include "PetDefines.h"
-#include "AuctionHouseMgr.h"
+#include "World.h"
 #include <atomic>
 
 class AuctionHouseObject;

@@ -15,10 +15,10 @@ EndScriptData */
 npc_professor_phizzlethorpe
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 
 /*######
 ## npc_professor_phizzlethorpe

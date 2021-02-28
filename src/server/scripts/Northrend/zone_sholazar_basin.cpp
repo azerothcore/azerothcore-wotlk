@@ -17,18 +17,18 @@ npc_vekjik
 avatar_of_freya
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "SpellScript.h"
-#include "SpellAuras.h"
+
+#include "CombatAI.h"
+#include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 #include "Vehicle.h"
 #include "WaypointManager.h"
-#include "PassiveAI.h"
-#include "CombatAI.h"
-
 // Ours
 enum songOfWindandWater
 {

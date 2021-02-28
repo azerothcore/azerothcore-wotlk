@@ -5,13 +5,13 @@
  */
 
 #include "Common.h"
+#include "Database/DatabaseEnv.h"
+#include "Log.h"
+#include "Util.h"
+#include "Warden.h"
+#include "WardenCheckMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Log.h"
-#include "Database/DatabaseEnv.h"
-#include "Util.h"
-#include "WardenCheckMgr.h"
-#include "Warden.h"
 
 WardenCheckMgr::WardenCheckMgr()
 {

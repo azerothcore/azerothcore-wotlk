@@ -10,13 +10,13 @@
  * Scriptnames of files in this file should be prefixed with "spell_mage_".
  */
 
-#include "ScriptMgr.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
-#include "Player.h"
-#include "SpellMgr.h"
-#include "TemporarySummon.h"
 #include "Pet.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
+#include "TemporarySummon.h"
 
 enum MageSpells
 {

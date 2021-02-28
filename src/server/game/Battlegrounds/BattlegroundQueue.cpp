@@ -8,13 +8,13 @@
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "BattlegroundQueue.h"
+#include "Channel.h"
 #include "Chat.h"
 #include "Group.h"
-#include "Log.h"
 #include "Language.h"
+#include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "Channel.h"
 #include "ScriptMgr.h"
 #include <unordered_map>
 

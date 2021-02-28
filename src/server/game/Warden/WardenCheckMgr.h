@@ -7,8 +7,8 @@
 #ifndef _WARDENCHECKMGR_H
 #define _WARDENCHECKMGR_H
 
-#include <map>
 #include "Cryptography/BigNumber.h"
+#include <map>
 
 enum WardenActions
 {

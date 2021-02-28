@@ -7,9 +7,9 @@
 #ifndef ACORE_MAP_INSTANCED_H
 #define ACORE_MAP_INSTANCED_H
 
-#include "Map.h"
-#include "InstanceSaveMgr.h"
 #include "DBCEnums.h"
+#include "InstanceSaveMgr.h"
+#include "Map.h"
 
 class MapInstanced : public Map
 {

@@ -11,14 +11,14 @@ SDComment: Instance Data Scripts and functions to acquire mobs and set encounter
 SDCategory: Caverns of Time, Mount Hyjal
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
-#include "ScriptedCreature.h"
-#include "hyjal_trash.h"
-#include "Player.h"
-#include "WorldPacket.h"
-#include "Opcodes.h"
 #include "Chat.h"
+#include "hyjal_trash.h"
+#include "InstanceScript.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "WorldPacket.h"
 
 /* Battle of Mount Hyjal encounters:
 0 - Rage Winterchill event

@@ -7,15 +7,14 @@
 #ifndef ACORE_LOOTMGR_H
 #define ACORE_LOOTMGR_H
 
-#include "ItemEnchantmentMgr.h"
 #include "ByteBuffer.h"
+#include "ConditionMgr.h"
+#include "ItemEnchantmentMgr.h"
 #include "RefManager.h"
 #include "SharedDefines.h"
-#include "ConditionMgr.h"
-
+#include <list>
 #include <map>
 #include <vector>
-#include <list>
 
 enum RollType
 {

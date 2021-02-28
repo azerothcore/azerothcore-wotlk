@@ -4,26 +4,27 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "BattlegroundMgr.h"
 #include "GameEventMgr.h"
-#include "World.h"
-#include "ObjectMgr.h"
-#include "WorldPacket.h"
-#include "PoolMgr.h"
+#include "GameObjectAI.h"
+#include "GossipDef.h"
 #include "Language.h"
 #include "Log.h"
 #include "MapManager.h"
-#include "GossipDef.h"
+#include "ObjectMgr.h"
 #include "Player.h"
-#include "BattlegroundMgr.h"
-#include "UnitAI.h"
-#include "GameObjectAI.h"
-#include "Transport.h"
+#include "PoolMgr.h"
 #include "ScriptMgr.h"
+#include "Transport.h"
+#include "UnitAI.h"
+#include "Util.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include <time.h>
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
-#include <time.h>
-#include "Util.h"
 
 GameEventMgr* GameEventMgr::instance()
 {
