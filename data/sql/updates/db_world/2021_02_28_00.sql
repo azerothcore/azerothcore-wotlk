@@ -1,3 +1,19 @@
+-- DB update 2021_02_27_00 -> 2021_02_28_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_02_27_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_02_27_00 2021_02_28_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1614138891078013900'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1614138891078013900');
 
 UPDATE `smart_scripts` 
@@ -51,3 +67,12 @@ UPDATE `smart_scripts` SET `comment` ='Spirestone Battle Lord - On Behind Target
 UPDATE `smart_scripts` SET `comment` ='Spirestone Butcher - On Behind Target - Cast \'Dazed\'' WHERE `entryorguid` =9219 AND `source_type` =0;
 UPDATE `smart_scripts` SET `comment` ='Hive Ashi Stinger - On Behind Target - Cast \'Dazed\'' WHERE `entryorguid` =11698 AND `source_type` =0;
 UPDATE `smart_scripts` SET `comment` ='Rotlimb Cannibal - On Behind Target - Cast \'Dazed\'' WHERE `entryorguid` =15655 AND `source_type` =0;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

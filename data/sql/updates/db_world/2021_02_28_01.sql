@@ -1,3 +1,19 @@
+-- DB update 2021_02_28_00 -> 2021_02_28_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_02_28_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_02_28_00 2021_02_28_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1614294683092657800'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1614294683092657800');
 
 UPDATE `creature_template` SET `faction` = 123, `AIName` = 'SmartAI' WHERE `entry` IN (2060,2061,2062,2063,2064,2065,2066,2067,2068);
@@ -69,3 +85,12 @@ INSERT INTO `smart_scripts` VALUES
 (2068, 0, 4, 0, 0, 1, 100, 0, 800, 800, 60000, 60000, 0, 11, 13730, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Lord Mayor Morrison - In Combat - Cast \'Demoralizing Shout\' (Phase 1)'),
 (2068, 0, 5, 0, 7, 1, 100, 0, 0, 0, 0, 0, 0, 41, 1500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lord Mayor Morrison - On Evade - Despawn In 1500 ms (Phase 1)'),
 (2068, 0, 6, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 41, 1500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lord Mayor Morrison - On Evade - Despawn In 1500 ms');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
