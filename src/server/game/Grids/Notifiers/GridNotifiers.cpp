@@ -25,7 +25,7 @@ void VisibleNotifier::Visit(GameObjectMapType& m)
         if (i_largeOnly != iter->GetSource()->IsVisibilityOverridden())
             continue;
         vis_guids.erase(iter->GetSource()->GetGUID());
-        i_player.UpdateVisibilityOf(iter->GetSource(), instance_data, i_visibleNow);
+        i_player.UpdateVisibilityOf(iter->GetSource(), i_data, i_visibleNow);
     }
 }
 
@@ -46,14 +46,14 @@ void VisibleNotifier::SendToSelf()
                 switch ((*itr)->GetTypeId())
                 {
                     case TYPEID_GAMEOBJECT:
-                        i_player.UpdateVisibilityOf((*itr)->ToGameObject(), instance_data, i_visibleNow);
+                        i_player.UpdateVisibilityOf((*itr)->ToGameObject(), i_data, i_visibleNow);
                         break;
                     case TYPEID_PLAYER:
-                        i_player.UpdateVisibilityOf((*itr)->ToPlayer(), instance_data, i_visibleNow);
+                        i_player.UpdateVisibilityOf((*itr)->ToPlayer(), i_data, i_visibleNow);
                         (*itr)->ToPlayer()->UpdateVisibilityOf(&i_player);
                         break;
                     case TYPEID_UNIT:
-                        i_player.UpdateVisibilityOf((*itr)->ToCreature(), instance_data, i_visibleNow);
+                        i_player.UpdateVisibilityOf((*itr)->ToCreature(), i_data, i_visibleNow);
                         break;
                     default:
                         break;
@@ -74,7 +74,7 @@ void VisibleNotifier::SendToSelf()
                     continue;
 
         i_player.m_clientGUIDs.erase(*it);
-        instance_data.AddOutOfRangeGUID(*it);
+        i_data.AddOutOfRangeGUID(*it);
 
         if (IS_PLAYER_GUID(*it))
         {
@@ -84,11 +84,11 @@ void VisibleNotifier::SendToSelf()
         }
     }
 
-    if (!instance_data.HasData())
+    if (!i_data.HasData())
         return;
 
     WorldPacket packet;
-    instance_data.BuildPacket(&packet);
+    i_data.BuildPacket(&packet);
     i_player.GetSession()->SendPacket(&packet);
 
     for (std::vector<Unit*>::const_iterator it = i_visibleNow.begin(); it != i_visibleNow.end(); ++it)
@@ -159,7 +159,7 @@ void PlayerRelocationNotifier::Visit(PlayerMapType& m)
     {
         Player* player = iter->GetSource();
         vis_guids.erase(player->GetGUID());
-        i_player.UpdateVisibilityOf(player, instance_data, i_visibleNow);
+        i_player.UpdateVisibilityOf(player, i_data, i_visibleNow);
         player->UpdateVisibilityOf(&i_player); // this notifier with different Visit(PlayerMapType&) than VisibleNotifier is needed to update visibility of self for other players when we move (eg. stealth detection changes)
     }
 }
