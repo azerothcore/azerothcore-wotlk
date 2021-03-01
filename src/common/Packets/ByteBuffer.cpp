@@ -29,7 +29,7 @@ ByteBufferSourceException::ByteBufferSourceException(size_t pos, size_t size,
     std::ostringstream ss;
 
     ss << "Attempted to put a "
-       << (valueSize > 0 ? "nullptr-pointer" : "zero-sized value")
+       << (valueSize > 0 ? "NULL-pointer" : "zero-sized value")
        << " in ByteBuffer (pos: " << pos << " size: " << size << ")";
 
     message().assign(ss.str());
