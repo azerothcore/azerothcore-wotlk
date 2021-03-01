@@ -5,9 +5,9 @@
 #ifndef GRUULS_LAIR_H_
 #define GRUULS_LAIR_H_
 
-#include "SpellAuraEffects.h"
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
+#include "SpellAuraEffects.h"
 
 #define GruulsLairScriptName "instance_gruuls_lair"
 

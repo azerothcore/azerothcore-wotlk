@@ -7,10 +7,10 @@
 #include "DisableMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
-#include "SpellMgr.h"
-#include "VMapManager2.h"
 #include "Player.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "VMapManager2.h"
 
 namespace DisableMgr
 {

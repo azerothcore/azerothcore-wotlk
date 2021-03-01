@@ -10,8 +10,8 @@
 #include "Common.h"
 #include "DBCEnums.h"
 #include "Define.h"
-#include "Util.h"
 #include "SharedDefines.h"
+#include "Util.h"
 
 // Structures using to access raw DBC data and required packing to portability
 

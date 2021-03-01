@@ -11,12 +11,12 @@ SDComment: Correct spawning and Event NYI
 SDCategory: Molten Core
 EndScriptData */
 
+#include "molten_core.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "molten_core.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 
 enum Texts
 {

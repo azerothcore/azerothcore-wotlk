@@ -5,12 +5,12 @@
  */
 
 #include "CalendarMgr.h"
-#include "QueryResult.h"
-#include "Log.h"
-#include "Player.h"
 #include "GuildMgr.h"
+#include "Log.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
+#include "Player.h"
+#include "QueryResult.h"
 
 CalendarInvite::~CalendarInvite()
 {

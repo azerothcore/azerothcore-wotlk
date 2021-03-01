@@ -5,9 +5,9 @@
 #ifndef DEF_THEBLACKMORASS_H
 #define DEF_THEBLACKMORASS_H
 
-#include "SpellScript.h"
-#include "PassiveAI.h"
 #include "CreatureAIImpl.h"
+#include "PassiveAI.h"
+#include "SpellScript.h"
 
 #define TheBlackMorassScriptName "instance_the_black_morass"
 

@@ -11,11 +11,11 @@ SDComment:
 SDCategory: Zul'Aman
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
-#include "zulaman.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "TemporarySummon.h"
+#include "zulaman.h"
 
 enum Misc
 {

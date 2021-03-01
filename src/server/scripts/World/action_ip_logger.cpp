@@ -3,10 +3,10 @@
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  */
 
-#include "ScriptMgr.h"
 #include "Channel.h"
-#include "Guild.h"
 #include "Group.h"
+#include "Guild.h"
+#include "ScriptMgr.h"
 
 enum IPLoggingTypes
 {

@@ -5,13 +5,15 @@
 #ifndef BLACK_TEMPLE_H_
 #define BLACK_TEMPLE_H_
 
+#include "CreatureAIImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiers.h"
+#include "PassiveAI.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedGossip.h"
-#include "SpellScript.h"
 #include "SpellAuraEffects.h"
-#include "PassiveAI.h"
-#include "GridNotifiers.h"
-#include "CreatureAIImpl.h"
+#include "SpellScript.h"
 
 #define BlackTempleScriptName "instance_black_temple"
 

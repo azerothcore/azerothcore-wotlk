@@ -17,10 +17,10 @@ guard_shattrath_aldor
 guard_shattrath_scryer
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "GuardAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum GuardShattrath

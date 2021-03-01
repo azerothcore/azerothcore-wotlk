@@ -5,18 +5,19 @@
 #ifndef ICECROWN_CITADEL_H_
 #define ICECROWN_CITADEL_H_
 
-#include "Player.h"
 #include "Chat.h"
-#include "SpellAuras.h"
-#include "SpellScript.h"
-#include "Map.h"
 #include "Creature.h"
-#include "SpellMgr.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
 #include "InstanceScript.h"
-#include "ScriptedGossip.h"
+#include "Map.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
 
 #define ICCScriptName "instance_icecrown_citadel"
 

@@ -4,14 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "MoveSplineInit.h"
-#include "MoveSpline.h"
 #include "MovementPacketBuilder.h"
-#include "Unit.h"
+#include "MoveSpline.h"
+#include "MoveSplineInit.h"
+#include "Opcodes.h"
 #include "Transport.h"
+#include "Unit.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
-#include "Opcodes.h"
 
 namespace Movement
 {

@@ -4,21 +4,21 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ArenaTeam.h"
+#include "ArenaTeamMgr.h"
 #include "Common.h"
+#include "GossipDef.h"
+#include "Guild.h"
+#include "GuildMgr.h"
 #include "Language.h"
+#include "Log.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "PetitionMgr.h"
+#include "SocialMgr.h"
+#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "World.h"
-#include "ObjectMgr.h"
-#include "ArenaTeamMgr.h"
-#include "GuildMgr.h"
-#include "Log.h"
-#include "Opcodes.h"
-#include "Guild.h"
-#include "ArenaTeam.h"
-#include "GossipDef.h"
-#include "SocialMgr.h"
-#include "PetitionMgr.h"
 
 #define CHARTER_DISPLAY_ID 16161
 

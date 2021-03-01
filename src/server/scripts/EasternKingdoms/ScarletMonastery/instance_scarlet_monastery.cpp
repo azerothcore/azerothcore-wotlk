@@ -4,11 +4,11 @@
 REWRITTEN BY XINEF
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SmartAI.h"
-#include "ScriptedGossip.h"
 #include "scarletmonastery.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SmartAI.h"
 
 enum AshbringerEventMisc
 {

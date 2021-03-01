@@ -11,8 +11,8 @@ SDComment: Mind Control not working because of core bug. Shades visible for all.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "zulgurub.h"
 
 enum Say

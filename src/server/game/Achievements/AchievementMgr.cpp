@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "AchievementMgr.h"
 #include "AccountMgr.h"
+#include "AchievementMgr.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
-#include "BattlegroundAB.h"
 #include "Battleground.h"
+#include "BattlegroundAB.h"
 #include "CellImpl.h"
 #include "Chat.h"
 #include "Common.h"

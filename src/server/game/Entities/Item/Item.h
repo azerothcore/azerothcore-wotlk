@@ -8,10 +8,10 @@
 #define AZEROTHCORE_ITEM_H
 
 #include "Common.h"
-#include "Object.h"
-#include "LootMgr.h"
-#include "ItemTemplate.h"
 #include "DatabaseEnv.h"
+#include "ItemTemplate.h"
+#include "LootMgr.h"
+#include "Object.h"
 
 class SpellInfo;
 class Bag;

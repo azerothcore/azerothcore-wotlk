@@ -9,11 +9,11 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_mag_".
  */
 
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "CombatAI.h"
 #include "Pet.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
 
 enum MageSpells

@@ -5,10 +5,10 @@
 #ifndef ARCATRAZ_H
 #define ARCATRAZ_H
 
-#include "SpellScript.h"
-#include "Player.h"
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
+#include "Player.h"
+#include "SpellScript.h"
 
 #define ArcatrazScriptName "instance_arcatraz"
 

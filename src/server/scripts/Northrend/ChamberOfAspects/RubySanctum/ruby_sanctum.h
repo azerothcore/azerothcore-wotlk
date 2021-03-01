@@ -5,14 +5,14 @@
 #ifndef RUBY_SANCTUM_H_
 #define RUBY_SANCTUM_H_
 
+#include "Creature.h"
+#include "CreatureAIImpl.h"
+#include "GameObjectAI.h"
+#include "Map.h"
+#include "Opcodes.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "SpellScript.h"
-#include "Map.h"
-#include "Creature.h"
-#include "GameObjectAI.h"
-#include "PassiveAI.h"
-#include "Opcodes.h"
-#include "CreatureAIImpl.h"
 
 #define RubySanctumScriptName "instance_ruby_sanctum"
 

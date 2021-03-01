@@ -5,13 +5,15 @@
 #ifndef DEF_NEXUS_H
 #define DEF_NEXUS_H
 
-#include "Player.h"
-#include "SpellScript.h"
-#include "PassiveAI.h"
-#include "SpellAuras.h"
-#include "GridNotifiers.h"
-#include "GameEventMgr.h"
 #include "CreatureAIImpl.h"
+#include "GameEventMgr.h"
+#include "GameEventMgr.h"
+#include "GridNotifiers.h"
+#include "GridNotifiers.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 #define NexusScriptName "instance_nexus"
 

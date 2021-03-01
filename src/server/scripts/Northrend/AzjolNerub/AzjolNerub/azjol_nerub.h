@@ -5,10 +5,10 @@
 #ifndef DEF_AZJOL_NERUB_H
 #define DEF_AZJOL_NERUB_H
 
-#include "SpellScript.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
 #include "CreatureAIImpl.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 #define AzjolNerubScriptName "instance_azjol_nerub"
 

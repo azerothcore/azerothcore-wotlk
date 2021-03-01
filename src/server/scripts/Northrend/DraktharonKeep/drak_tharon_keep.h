@@ -5,9 +5,9 @@
 #ifndef DEF_DRAK_THARON_H
 #define DEF_DRAK_THARON_H
 
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
 #include "CreatureAIImpl.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 #define DraktharonKeepScriptName "instance_drak_tharon_keep"
 

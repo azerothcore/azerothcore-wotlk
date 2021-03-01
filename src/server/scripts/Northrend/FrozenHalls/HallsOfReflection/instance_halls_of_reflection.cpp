@@ -3,8 +3,8 @@
 */
 
 #include "halls_of_reflection.h"
-#include "Transport.h"
 #include "MapManager.h"
+#include "Transport.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {

@@ -5,10 +5,10 @@
 #ifndef DEF_SHADOW_LABYRINTH_H
 #define DEF_SHADOW_LABYRINTH_H
 
-#include "SpellScript.h"
 #include "CreatureAI.h"
-#include "GridNotifiers.h"
 #include "CreatureAIImpl.h"
+#include "GridNotifiers.h"
+#include "SpellScript.h"
 
 #define ShadowLabyrinthScriptName "instance_shadow_labyrinth"
 
