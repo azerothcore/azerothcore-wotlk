@@ -8658,6 +8658,12 @@ void ObjectMgr::LoadScriptNames()
     sLog->outString();
 }
 
+std::string const& ObjectMgr::GetScriptName(uint32 id) const
+{
+    static std::string const empty = "";
+    return (id < _scriptNamesStore.size()) ? _scriptNamesStore[id] : empty;
+}
+
 uint32 ObjectMgr::GetScriptId(const char* name)
 {
     // use binary search to find the script name in the sorted vector
