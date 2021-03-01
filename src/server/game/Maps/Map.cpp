@@ -2818,8 +2818,8 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
         return;
 #ifdef ELUNA
     bool isElunaAI = false;
-    instance_script = sEluna->GetInstanceData(this);
-    if (instance_script)
+    i_data = sEluna->GetInstanceData(this);
+    if (i_data)
         isElunaAI = true;
 
     // if Eluna AI was fetched succesfully we should not call CreateInstanceData nor set the unused scriptID
