@@ -4,11 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "WorldSession.h"
-#include "Player.h"
+#include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
-#include "Log.h"
+#include "Player.h"
+#include "WorldSession.h"
 
 void WorldSession::HandleGrantLevel(WorldPacket& recvData)
 {

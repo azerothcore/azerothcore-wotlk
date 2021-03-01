@@ -15,10 +15,10 @@ EndScriptData */
 npc_mist
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedFollowerAI.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 
 void AddSC_teldrassil()
 {

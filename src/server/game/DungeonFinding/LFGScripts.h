@@ -9,8 +9,8 @@
  */
 
 #include "Common.h"
-#include "SharedDefines.h"
 #include "ScriptMgr.h"
+#include "SharedDefines.h"
 
 class Player;
 class Group;

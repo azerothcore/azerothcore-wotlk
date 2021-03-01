@@ -74,7 +74,7 @@ void usage(const char* prog)
 extern int main(int argc, char** argv)
 {
     // Command line parsing to get the configuration file name
-    char const* configFile = _ACORE_REALM_CONFIG;
+    std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_REALM_CONFIG);
     int count = 1;
     while (count < argc)
     {
@@ -92,9 +92,10 @@ extern int main(int argc, char** argv)
         ++count;
     }
 
-    sConfigMgr->SetConfigList(std::string(configFile));
+    // Add file and args in config
+    sConfigMgr->Configure(configFile, std::vector<std::string>(argv, argv + argc));
 
-    if (!sConfigMgr->LoadAppConfigs("authserver"))
+    if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
     sLog->outString("%s (authserver)", GitRevision::GetFullVersion());
@@ -115,7 +116,7 @@ extern int main(int argc, char** argv)
 
     sLog->outString("     AzerothCore 3.3.5a  -  www.azerothcore.org\n");
 
-    sLog->outString("Using configuration file %s.", configFile);
+    sLog->outString("Using configuration file %s.", configFile.c_str());
 
     sLog->outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
 
@@ -128,7 +129,7 @@ extern int main(int argc, char** argv)
     sLog->outBasic("Max allowed open files is %d", ACE::max_handles());
 
     // authserver PID file creation
-    std::string pidFile = sConfigMgr->GetStringDefault("PidFile", "");
+    std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
@@ -149,7 +150,7 @@ extern int main(int argc, char** argv)
     sLog->SetRealmID(0);                                               // ensure we've set realm to 0 (authserver realmid)
 
     // Get the list of realms for the server
-    sRealmList->Initialize(sConfigMgr->GetIntDefault("RealmsStateUpdateDelay", 20));
+    sRealmList->Initialize(sConfigMgr->GetOption<int32>("RealmsStateUpdateDelay", 20));
     if (sRealmList->size() == 0)
     {
         sLog->outError("No valid realms specified.");
@@ -159,14 +160,14 @@ extern int main(int argc, char** argv)
     // Launch the listening network socket
     RealmAcceptor acceptor;
 
-    int32 rmport = sConfigMgr->GetIntDefault("RealmServerPort", 3724);
+    int32 rmport = sConfigMgr->GetOption<int32>("RealmServerPort", 3724);
     if (rmport < 0 || rmport > 0xFFFF)
     {
         sLog->outError("The specified RealmServerPort (%d) is out of the allowed range (1-65535)", rmport);
         return 1;
     }
 
-    std::string bind_ip = sConfigMgr->GetStringDefault("BindIP", "0.0.0.0");
+    std::string bind_ip = sConfigMgr->GetOption<std::string>("BindIP", "0.0.0.0");
 
     ACE_INET_Addr bind_addr(uint16(rmport), bind_ip.c_str());
 
@@ -189,8 +190,8 @@ extern int main(int argc, char** argv)
 #if defined(_WIN32) || defined(__linux__)
 
     ///- Handle affinity for multiple processors and process priority
-    uint32 affinity = sConfigMgr->GetIntDefault("UseProcessors", 0);
-    bool highPriority = sConfigMgr->GetBoolDefault("ProcessPriority", false);
+    uint32 affinity = sConfigMgr->GetOption<int32>("UseProcessors", 0);
+    bool highPriority = sConfigMgr->GetOption<bool>("ProcessPriority", false);
 
 #ifdef _WIN32 // Windows
 
@@ -255,11 +256,11 @@ extern int main(int argc, char** argv)
 #endif
 
     // maximum counter for next ping
-    uint32 numLoops = (sConfigMgr->GetIntDefault("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));
+    uint32 numLoops = (sConfigMgr->GetOption<int32>("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));
     uint32 loopCounter = 0;
 
     // possibly enable db logging; avoid massive startup spam by doing it here.
-    if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
+    if (sConfigMgr->GetOption<bool>("EnableLogDB", false))
     {
         sLog->outString("Enabling database logging...");
         sLog->SetLogDB(true);
@@ -294,21 +295,21 @@ bool StartDB()
 {
     MySQL::Library_Init();
 
-    std::string dbstring = sConfigMgr->GetStringDefault("LoginDatabaseInfo", "");
+    std::string dbstring = sConfigMgr->GetOption<std::string>("LoginDatabaseInfo", "");
     if (dbstring.empty())
     {
         sLog->outError("Database not specified");
         return false;
     }
 
-    int32 worker_threads = sConfigMgr->GetIntDefault("LoginDatabase.WorkerThreads", 1);
+    int32 worker_threads = sConfigMgr->GetOption<int32>("LoginDatabase.WorkerThreads", 1);
     if (worker_threads < 1 || worker_threads > 32)
     {
         sLog->outError("Improper value specified for LoginDatabase.WorkerThreads, defaulting to 1.");
         worker_threads = 1;
     }
 
-    int32 synch_threads = sConfigMgr->GetIntDefault("LoginDatabase.SynchThreads", 1);
+    int32 synch_threads = sConfigMgr->GetOption<int32>("LoginDatabase.SynchThreads", 1);
     if (synch_threads < 1 || synch_threads > 32)
     {
         sLog->outError("Improper value specified for LoginDatabase.SynchThreads, defaulting to 1.");

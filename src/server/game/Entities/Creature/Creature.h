@@ -7,14 +7,13 @@
 #ifndef AZEROTHCORE_CREATURE_H
 #define AZEROTHCORE_CREATURE_H
 
+#include "Cell.h"
 #include "Common.h"
-#include "Unit.h"
-#include "UpdateMask.h"
+#include "DatabaseEnv.h"
 #include "ItemTemplate.h"
 #include "LootMgr.h"
-#include "DatabaseEnv.h"
-#include "Cell.h"
-
+#include "Unit.h"
+#include "UpdateMask.h"
 #include <list>
 
 class SpellInfo;
@@ -832,6 +831,8 @@ private:
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
 
     bool _isMissingSwimmingFlagOutOfCombat;
+
+    void applyInhabitFlags();
 };
 
 class AssistDelayEvent : public BasicEvent

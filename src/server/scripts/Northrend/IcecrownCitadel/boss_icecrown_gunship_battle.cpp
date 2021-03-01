@@ -3,14 +3,14 @@
 */
 
 #include "CreatureTextMgr.h"
+#include "icecrown_citadel.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
-#include "SpellScript.h"
 #include "ScriptMgr.h"
+#include "SpellScript.h"
 #include "Transport.h"
 #include "TransportMgr.h"
 #include "Vehicle.h"
-#include "icecrown_citadel.h"
 
 enum Texts
 {

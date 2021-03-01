@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "PlayerDump.h"
-#include "DatabaseEnv.h"
-#include "UpdateFields.h"
-#include "ObjectMgr.h"
 #include "AccountMgr.h"
+#include "Common.h"
+#include "DatabaseEnv.h"
+#include "ObjectMgr.h"
+#include "PlayerDump.h"
+#include "UpdateFields.h"
 #include "World.h"
 
 #define DUMP_TABLE_COUNT 27

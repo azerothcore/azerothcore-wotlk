@@ -4,7 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ObjectAccessor.h"
 #include "CellImpl.h"
 #include "Corpse.h"
 #include "Creature.h"
@@ -16,6 +15,7 @@
 #include "Map.h"
 #include "MapInstanced.h"
 #include "MapManager.h"
+#include "ObjectAccessor.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -24,7 +24,6 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-
 #include <cmath>
 
 ObjectAccessor::ObjectAccessor()

@@ -7,12 +7,12 @@
 #ifndef ACORE_MAPMANAGER_H
 #define ACORE_MAPMANAGER_H
 
-#include "Define.h"
-#include <ace/Thread_Mutex.h>
 #include "Common.h"
+#include "Define.h"
 #include "Map.h"
-#include "Object.h"
 #include "MapUpdater.h"
+#include "Object.h"
+#include <ace/Thread_Mutex.h>
 
 class Transport;
 class StaticTransport;

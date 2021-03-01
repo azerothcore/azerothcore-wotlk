@@ -4,11 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include <string>
 #include "Spell.h"
 #include "SpellAuras.h"
-#include "SpellScript.h"
 #include "SpellMgr.h"
+#include "SpellScript.h"
+#include <string>
 
 bool _SpellScript::_Validate(SpellInfo const* entry)
 {

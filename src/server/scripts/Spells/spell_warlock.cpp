@@ -10,11 +10,11 @@
  * Scriptnames of files in this file should be prefixed with "spell_warl_".
  */
 
-#include "ScriptMgr.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 #include "TemporarySummon.h"
 
 enum WarlockSpells
@@ -915,6 +915,7 @@ public:
 };
 
 // -1454 - Life Tap
+#define LIFE_TAP_COEFFICIENT 0.9F
 class spell_warl_life_tap : public SpellScriptLoader
 {
 public:
@@ -939,7 +940,7 @@ public:
             Player* caster = GetCaster()->ToPlayer();
             if (Unit* target = GetHitUnit())
             {
-                int32 damage = GetEffectValue() + 1.0f + (caster->GetStat(STAT_SPIRIT) * 1.5f);
+                int32 damage = GetEffectValue() + LIFE_TAP_COEFFICIENT;
                 int32 damage2Mana = GetEffectValue();
                 int32 mana = int32(damage2Mana + (caster->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + SPELL_SCHOOL_SHADOW) * 0.5f));
 
@@ -967,7 +968,7 @@ public:
 
         SpellCastResult CheckCast()
         {
-            if ((int32(GetCaster()->GetHealth()) > int32(GetSpellInfo()->Effects[EFFECT_0].CalcValue() + (6.3875 * GetSpellInfo()->BaseLevel) + (GetCaster()->GetStat(STAT_SPIRIT) * 1.5f) + 1.0f )))
+            if ((int32(GetCaster()->GetHealth()) > int32(GetSpellInfo()->Effects[EFFECT_0].CalcValue() + (3.1 * GetSpellInfo()->BaseLevel) + LIFE_TAP_COEFFICIENT )))
                 return SPELL_CAST_OK;
             return SPELL_FAILED_FIZZLE;
         }

@@ -3,17 +3,17 @@
 */
 
 #include "BattlegroundEY.h"
-#include "ObjectMgr.h"
-#include "World.h"
-#include "WorldPacket.h"
 #include "BattlegroundMgr.h"
 #include "Creature.h"
+#include "GameGraveyard.h"
 #include "Language.h"
 #include "Object.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "Util.h"
+#include "World.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
-#include "GameGraveyard.h"
 
 BattlegroundEY::BattlegroundEY()
 {

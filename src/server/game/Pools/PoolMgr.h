@@ -7,8 +7,8 @@
 #ifndef ACORE_POOLHANDLER_H
 #define ACORE_POOLHANDLER_H
 
-#include "Define.h"
 #include "Creature.h"
+#include "Define.h"
 #include "GameObject.h"
 #include "QuestDef.h"
 

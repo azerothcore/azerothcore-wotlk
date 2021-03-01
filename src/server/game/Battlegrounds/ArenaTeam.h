@@ -7,8 +7,8 @@
 #ifndef AZEROTHCORE_ARENATEAM_H
 #define AZEROTHCORE_ARENATEAM_H
 
-#include "QueryResult.h"
 #include "Map.h"
+#include "QueryResult.h"
 #include <list>
 #include <map>
 

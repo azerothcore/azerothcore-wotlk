@@ -7,11 +7,11 @@
 #ifndef AZEROTHCORE_GUILD_H
 #define AZEROTHCORE_GUILD_H
 
-#include "World.h"
 #include "Item.h"
-#include "WorldPacket.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "World.h"
+#include "WorldPacket.h"
 
 class Item;
 

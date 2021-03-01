@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "GridNotifiers.h"
 #include "icecrown_citadel.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Texts
 {
@@ -282,7 +282,6 @@ public:
             if (!_summoned)
             {
                 me->SetDisableGravity(true);
-                me->SetHover(true);
                 me->SetCanFly(true);
             }
         }
@@ -355,7 +354,6 @@ public:
             if (_summoned)
             {
                 me->SetDisableGravity(false);
-                me->SetHover(false);
                 me->SetCanFly(false);
             }
         }
@@ -452,8 +450,8 @@ public:
                     break;
                 case POINT_LAND_GROUND:
                     {
+                        _isInAirPhase = false;
                         me->SetDisableGravity(false);
-                        me->SetHover(false);
                         me->SetCanFly(false);
                         me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                         me->SetReactState(REACT_AGGRESSIVE);
@@ -594,6 +592,7 @@ public:
                         me->SetControlled(false, UNIT_STATE_ROOT);
                     }
 
+                    _isInAirPhase = true;
                     _didFirstFlyPhase = true;
                     Talk(SAY_AIR_PHASE);
                     me->SetReactState(REACT_PASSIVE);
@@ -659,7 +658,7 @@ public:
                     me->GetMotionMaster()->MoveLand(POINT_LAND_GROUND, SindragosaLandPos, 10.0f);
                     break;
                 case EVENT_THIRD_PHASE_CHECK:
-                    if (!me->HasByteFlag(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER))
+                    if (!_isInAirPhase)
                     {
                         Talk(SAY_PHASE_2);
                         events.ScheduleEvent(EVENT_ICE_TOMB, urand(7000, 10000));
@@ -697,6 +696,7 @@ public:
         bool _didFirstFlyPhase;
         bool _isBelow20Pct;
         bool _isThirdPhase;
+        bool _isInAirPhase;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
