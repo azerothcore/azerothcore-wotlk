@@ -32,7 +32,7 @@ namespace acore
         std::vector<Unit*>& i_visibleNow;
         bool i_gobjOnly;
         bool i_largeOnly;
-        UpdateData i_data;
+        UpdateData instance_data;
 
         VisibleNotifier(Player& player, bool gobjOnly, bool largeOnly) : i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
         {
