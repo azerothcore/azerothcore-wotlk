@@ -165,7 +165,7 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
             uint32 newInstanceId = sMapMgr->GenerateInstanceId();
             ASSERT(!FindInstanceMap(newInstanceId)); // pussywizard: instance with new id can't exist
             Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(IsRaid()) : player->GetDifficulty(IsRaid());
-            map = CreateInstance(newInstanceId, NULL, diff);
+            map = CreateInstance(newInstanceId, nullptr, diff);
         }
     }
 

@@ -133,8 +133,8 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
     {
         ItemPosCountVec traderDst;
         ItemPosCountVec playerDst;
-        bool traderCanTrade = (myItems[i] == NULL || trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, myItems[i], false) == EQUIP_ERR_OK);
-        bool playerCanTrade = (hisItems[i] == NULL || _player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, hisItems[i], false) == EQUIP_ERR_OK);
+        bool traderCanTrade = (myItems[i] == nullptr || trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, myItems[i], false) == EQUIP_ERR_OK);
+        bool playerCanTrade = (hisItems[i] == nullptr || _player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, hisItems[i], false) == EQUIP_ERR_OK);
         if (traderCanTrade && playerCanTrade)
         {
             // Ok, if trade item exists and can be stored
@@ -209,7 +209,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item * *
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outStaticDebug("player trade item %u bag: %u slot: %u", item->GetGUIDLow(), item->GetBagSlot(), item->GetSlot());
 #endif
-            //Can return NULL
+            //Can return nullptr
             myItems[i] = item;
             myItems[i]->SetInTrade();
         }
@@ -280,14 +280,14 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
 
     if (_player->GetMoney() >= uint32(MAX_MONEY_AMOUNT) - his_trade->GetMoney())
     {
-        _player->SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, NULL, nullptr);
+        _player->SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, nullptr, nullptr);
         my_trade->SetAccepted(false, true);
         return;
     }
 
     if (trader->GetMoney() >= uint32(MAX_MONEY_AMOUNT) - my_trade->GetMoney())
     {
-        trader->SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, NULL, nullptr);
+        trader->SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, nullptr, nullptr);
         his_trade->SetAccepted(false, true);
         return;
     }

@@ -23,7 +23,7 @@ int DatabaseWorker::svc()
     if (!m_queue)
         return -1;
 
-    SQLOperation* request = NULL;
+    SQLOperation* request = nullptr;
     while (1)
     {
         request = (SQLOperation*)(m_queue->dequeue());

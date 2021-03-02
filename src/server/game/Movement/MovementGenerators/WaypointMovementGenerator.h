@@ -44,7 +44,7 @@ class WaypointMovementGenerator<Creature> : public MovementGeneratorMedium< Crea
 {
 public:
     WaypointMovementGenerator(uint32 _path_id = 0, bool _repeating = true)
-        : PathMovementBase((WaypointPath const*)NULL), i_nextMoveTime(0), m_isArrivalDone(false), path_id(_path_id), repeating(_repeating)  {}
+        : PathMovementBase((WaypointPath const*)nullptr), i_nextMoveTime(0), m_isArrivalDone(false), path_id(_path_id), repeating(_repeating)  {}
     ~WaypointMovementGenerator() { i_path = nullptr; }
     void DoInitialize(Creature*);
     void DoFinalize(Creature*);
