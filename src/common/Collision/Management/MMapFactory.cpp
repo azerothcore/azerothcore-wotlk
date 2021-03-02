@@ -12,12 +12,12 @@ namespace MMAP
 {
     // ######################## MMapFactory ########################
     // our global singleton copy
-    MMapManager* g_MMapManager = NULL;
+    MMapManager* g_MMapManager = nullptr;
     bool MMapFactory::forbiddenMaps[1000] = {0};
 
     MMapManager* MMapFactory::createOrGetMMapManager()
     {
-        if (g_MMapManager == NULL)
+        if (g_MMapManager == nullptr)
             g_MMapManager = new MMapManager();
 
         return g_MMapManager;
@@ -43,7 +43,7 @@ namespace MMAP
         if (g_MMapManager)
         {
             delete g_MMapManager;
-            g_MMapManager = NULL;
+            g_MMapManager = nullptr;
         }
     }
 }

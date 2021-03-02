@@ -4,10 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "zulaman.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "zulaman.h"
 
 enum Spells
 {

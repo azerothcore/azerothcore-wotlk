@@ -4,16 +4,15 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "TotemAI.h"
-#include "Totem.h"
+#include "CellImpl.h"
 #include "Creature.h"
 #include "DBCStores.h"
-#include "ObjectAccessor.h"
-#include "SpellMgr.h"
-
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CellImpl.h"
+#include "ObjectAccessor.h"
+#include "SpellMgr.h"
+#include "Totem.h"
+#include "TotemAI.h"
 
 int TotemAI::Permissible(Creature const* creature)
 {

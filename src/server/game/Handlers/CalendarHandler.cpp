@@ -22,19 +22,19 @@ Copied events should probably have a new owner
 
 */
 
+#include "ArenaTeamMgr.h"
+#include "CalendarMgr.h"
+#include "DatabaseEnv.h"
+#include "GameEventMgr.h"
+#include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
 #include "Log.h"
+#include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "SocialMgr.h"
-#include "CalendarMgr.h"
-#include "ObjectAccessor.h"
-#include "DatabaseEnv.h"
-#include "GuildMgr.h"
-#include "ArenaTeamMgr.h"
-#include "WorldSession.h"
-#include "GameEventMgr.h"
 #include "utf8.h"
+#include "WorldSession.h"
 
 void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
 {

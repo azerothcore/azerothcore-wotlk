@@ -4,15 +4,15 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Define.h"
 #include "ArenaTeamMgr.h"
-#include "World.h"
-#include "Log.h"
 #include "DatabaseEnv.h"
+#include "Define.h"
 #include "Language.h"
+#include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "World.h"
 
 ArenaTeamMgr::ArenaTeamMgr()
 {

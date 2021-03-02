@@ -4,19 +4,19 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "AccountMgr.h"
 #include "DatabaseEnv.h"
-#include "Mail.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "Opcodes.h"
-#include "Log.h"
-#include "World.h"
-#include "ObjectMgr.h"
-#include "Player.h"
-#include "Language.h"
 #include "DBCStores.h"
 #include "Item.h"
-#include "AccountMgr.h"
+#include "Language.h"
+#include "Log.h"
+#include "Mail.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 #define MAX_INBOX_CLIENT_CAPACITY 50
 

@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Group.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "trial_of_the_champion.h"
 #include "Vehicle.h"
-#include "Player.h"
-#include "Group.h"
 
 const Position SpawnPosition = {746.67f, 684.08f, 412.5f, 4.65f};
 #define CLEANUP_CHECK_INTERVAL  5000
@@ -605,7 +605,7 @@ public:
                                 c->GetMotionMaster()->MovePoint(9, 747.36f, 670.07f, 411.9f);
                                 if (!creditCasted)
                                 {
-                                    c->CastSpell((Unit*)NULL, 68572, true);
+                                    c->CastSpell((Unit*)nullptr, 68572, true);
                                     creditCasted = true;
                                 }
                             }

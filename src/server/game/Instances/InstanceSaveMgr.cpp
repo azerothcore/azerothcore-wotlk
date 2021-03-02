@@ -4,24 +4,24 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "Player.h"
-#include "GridNotifiers.h"
-#include "Log.h"
 #include "CellImpl.h"
-#include "Map.h"
-#include "MapManager.h"
-#include "MapInstanced.h"
-#include "InstanceSaveMgr.h"
-#include "Timer.h"
-#include "GridNotifiersImpl.h"
+#include "Common.h"
 #include "Config.h"
-#include "Transport.h"
-#include "ObjectMgr.h"
-#include "World.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
+#include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
+#include "Log.h"
+#include "Map.h"
+#include "MapInstanced.h"
+#include "MapManager.h"
+#include "ObjectMgr.h"
+#include "Player.h"
 #include "ScriptMgr.h"
+#include "Timer.h"
+#include "Transport.h"
+#include "World.h"
 
 uint16 InstanceSaveManager::ResetTimeDelay[] = {3600, 900, 300, 60, 0};
 PlayerBindStorage InstanceSaveManager::playerBindStorage;
@@ -459,7 +459,7 @@ void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator& itr)
     for (InstanceSave::PlayerListType::iterator iter = pList.begin(), iter2; iter != pList.end(); )
     {
         iter2 = iter++;
-        PlayerUnbindInstanceNotExtended(*iter2, itr->second->GetMapId(), itr->second->GetDifficulty(), ObjectAccessor::GetObjectInOrOutOfWorld(MAKE_NEW_GUID(*iter2, 0, HIGHGUID_PLAYER), (Player*)NULL));
+        PlayerUnbindInstanceNotExtended(*iter2, itr->second->GetMapId(), itr->second->GetDifficulty(), ObjectAccessor::GetObjectInOrOutOfWorld(MAKE_NEW_GUID(*iter2, 0, HIGHGUID_PLAYER), (Player*)nullptr));
     }
 
     // delete stuff if no players left (noone extended id)
@@ -576,7 +576,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
     }
 }
 
-InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(uint32 guidLow, InstanceSave* save, bool permanent, Player* player /*= NULL*/)
+InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(uint32 guidLow, InstanceSave* save, bool permanent, Player* player /*= nullptr*/)
 {
     InstancePlayerBind& bind = playerBindStorage[guidLow]->m[save->GetDifficulty()][save->GetMapId()];
     ASSERT(!bind.perm || permanent); // ensure there's no changing permanent to temporary, this can be done only by unbinding
@@ -645,7 +645,7 @@ InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(uint32 guidLow, In
     return &bind;
 }
 
-void InstanceSaveManager::PlayerUnbindInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player /*= NULL*/)
+void InstanceSaveManager::PlayerUnbindInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player /*= nullptr*/)
 {
     BoundInstancesMapWrapper* w = playerBindStorage[guidLow];
     BoundInstancesMap::iterator itr = w->m[difficulty].find(mapid);
@@ -668,7 +668,7 @@ void InstanceSaveManager::PlayerUnbindInstance(uint32 guidLow, uint32 mapid, Dif
     }
 }
 
-void InstanceSaveManager::PlayerUnbindInstanceNotExtended(uint32 guidLow, uint32 mapid, Difficulty difficulty, Player* player /*= NULL*/)
+void InstanceSaveManager::PlayerUnbindInstanceNotExtended(uint32 guidLow, uint32 mapid, Difficulty difficulty, Player* player /*= nullptr*/)
 {
     BoundInstancesMapWrapper* w = playerBindStorage[guidLow];
     BoundInstancesMap::iterator itr = w->m[difficulty].find(mapid);
@@ -773,5 +773,5 @@ void InstanceSaveManager::UnbindAllFor(InstanceSave* save)
 {
     InstanceSave::PlayerListType& pList = save->m_playerList;
     while (!pList.empty())
-        PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), true, ObjectAccessor::GetObjectInOrOutOfWorld(MAKE_NEW_GUID(*(pList.begin()), 0, HIGHGUID_PLAYER), (Player*)NULL));
+        PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), true, ObjectAccessor::GetObjectInOrOutOfWorld(MAKE_NEW_GUID(*(pList.begin()), 0, HIGHGUID_PLAYER), (Player*)nullptr));
 }

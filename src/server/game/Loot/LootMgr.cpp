@@ -4,18 +4,18 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "LootMgr.h"
-#include "Log.h"
-#include "ObjectMgr.h"
-#include "World.h"
-#include "Util.h"
-#include "SharedDefines.h"
-#include "SpellMgr.h"
-#include "SpellInfo.h"
-#include "Group.h"
-#include "Player.h"
 #include "Containers.h"
+#include "Group.h"
+#include "Log.h"
+#include "LootMgr.h"
+#include "ObjectMgr.h"
+#include "Player.h"
 #include "ScriptMgr.h"
+#include "SharedDefines.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "Util.h"
+#include "World.h"
 
 static Rates const qualityToRate[MAX_ITEM_QUALITY] =
 {
@@ -98,7 +98,7 @@ private:
     LootStoreItemList ExplicitlyChanced;                // Entries with chances defined in DB
     LootStoreItemList EqualChanced;                     // Zero chances - every entry takes the same chance
 
-    LootStoreItem const* Roll(Loot& loot, Player const* player, LootStore const& store, uint16 lootMode) const;   // Rolls an item from the group, returns NULL if all miss their chances
+    LootStoreItem const* Roll(Loot& loot, Player const* player, LootStore const& store, uint16 lootMode) const;   // Rolls an item from the group, returns nullptr if all miss their chances
 
     // This class must never be copied - storing pointers
     LootGroup(LootGroup const&);
@@ -1119,7 +1119,7 @@ void LootTemplate::LootGroup::AddEntry(LootStoreItem* item)
         EqualChanced.push_back(item);
 }
 
-// Rolls an item from the group, returns NULL if all miss their chances
+// Rolls an item from the group, returns nullptr if all miss their chances
 LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* player, LootStore const& store, uint16 lootMode) const
 {
     LootStoreItemList possibleLoot = ExplicitlyChanced;

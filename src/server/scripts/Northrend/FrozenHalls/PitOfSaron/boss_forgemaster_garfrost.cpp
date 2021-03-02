@@ -2,15 +2,15 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "pit_of_saron.h"
-#include "SpellScript.h"
-#include "SpellAuras.h"
-#include "Player.h"
-#include "WorldSession.h"
-#include "Opcodes.h"
 #include "CreatureGroups.h"
+#include "Opcodes.h"
+#include "pit_of_saron.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "WorldSession.h"
 
 enum Yells
 {
@@ -232,7 +232,7 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 140.0f, true))
                     {
                         WorldPacket data;
-                        ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, NULL, EMOTE_THROW_SARONITE);
+                        ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, EMOTE_THROW_SARONITE);
                         target->ToPlayer()->GetSession()->SendPacket(&data);
                         me->CastSpell(target, SPELL_THROW_SARONITE, false);
                     }

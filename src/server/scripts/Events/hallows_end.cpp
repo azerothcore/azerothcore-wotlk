@@ -1,15 +1,15 @@
 // Scripted by Xinef
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
-#include "GridNotifiers.h"
+#include "CellImpl.h"
 #include "GossipDef.h"
-#include "SpellScript.h"
+#include "GridNotifiers.h"
+#include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
-#include "Group.h"
-#include "CellImpl.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 ///////////////////////////////////////
 ////// ITEMS FIXES, BASIC STUFF

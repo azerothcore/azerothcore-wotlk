@@ -11,8 +11,8 @@ Comment: Blood siphon spell buggy cause of Core Issue.
 Category: Zul'Gurub
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "zulgurub.h"
 
 enum Says

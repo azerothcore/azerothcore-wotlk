@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
-#include "utgarde_keep.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "PassiveAI.h"
+#include "utgarde_keep.h"
 
 enum eTexts
 {
@@ -64,7 +64,7 @@ public:
                     if( me->GetInstanceScript() && me->GetInstanceScript()->instance->IsHeroic() )
                     {
                         const int32 dmg = 2000;
-                        c->CastCustomSpell(s, SPELL_FROST_TOMB_AURA, NULL, &dmg, NULL, true);
+                        c->CastCustomSpell(s, SPELL_FROST_TOMB_AURA, nullptr, &dmg, nullptr, true);
                     }
                     else
                         c->CastSpell(s, SPELL_FROST_TOMB_AURA, true);
@@ -304,7 +304,7 @@ public:
                     break;
                 case EVENT_SPELL_BONE_ARMOR:
                     if( !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) )
-                        me->CastSpell((Unit*)NULL, SPELL_BONE_ARMOR, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_BONE_ARMOR, false);
                     events.RepeatEvent(urand(40000, 120000));
                     break;
                 case EVENT_RESURRECT:
@@ -343,7 +343,7 @@ public:
             PreventDefaultAction();
             if (aurEff->GetTickNumber() == 1)
                 if( Unit* target = GetTarget() )
-                    target->CastSpell((Unit*)NULL, SPELL_FROST_TOMB_SUMMON, true);
+                    target->CastSpell((Unit*)nullptr, SPELL_FROST_TOMB_SUMMON, true);
         }
 
         void Register() override

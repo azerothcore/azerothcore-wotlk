@@ -5,8 +5,8 @@
 #ifndef DEF_MAGISTERS_TERRACE_H
 #define DEF_MAGISTERS_TERRACE_H
 
-#include "Player.h"
 #include "CreatureAI.h"
+#include "Player.h"
 #include "SpellScript.h"
 
 enum MTData
