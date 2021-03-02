@@ -92,7 +92,7 @@ public:
                     events.RepeatEvent(urand(14000, 20000));
                     break;
                 case EVENT_SPELL_CAUTERIZING_FLAMES:
-                    me->CastSpell((Unit*)NULL, SPELL_FLAME_BREATH, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_FLAME_BREATH, false);
                     events.RepeatEvent(urand(10000, 16000));
                     break;
             }

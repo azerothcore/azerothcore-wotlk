@@ -309,7 +309,7 @@ public:
             sLog->outError("Invalid MapScript for %u; no such map ID.", _mapId);
     }
 
-    // Gets the MapEntry structure associated with this script. Can return NULL.
+    // Gets the MapEntry structure associated with this script. Can return nullptr.
     MapEntry const* GetEntry() { return _mapEntry; }
 
     // Called when the map is created.
@@ -431,7 +431,7 @@ public:
     virtual void OnDamage(Unit* /*attacker*/, Unit* /*victim*/, uint32& /*damage*/) { }
 
     // Called when DoT's Tick Damage is being Dealt
-    // Attacker can be NULL if he is despawned while the aura still exists on target
+    // Attacker can be nullptr if he is despawned while the aura still exists on target
     virtual void ModifyPeriodicDamageAurasTick(Unit* /*target*/, Unit* /*attacker*/, uint32& /*damage*/) { }
 
     // Called when Melee Damage is being Dealt

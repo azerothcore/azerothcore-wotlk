@@ -360,7 +360,7 @@ struct violet_hold_trashAI : public npc_escortAI
     {
         RemoveEscortState(STATE_ESCORT_ESCORTING | STATE_ESCORT_RETURNING | STATE_ESCORT_PAUSED);
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-        me->CastSpell((Unit*)NULL, SPELL_DESTROY_DOOR_SEAL, true);
+        me->CastSpell((Unit*)nullptr, SPELL_DESTROY_DOOR_SEAL, true);
     }
 
     void EnterEvadeMode() override

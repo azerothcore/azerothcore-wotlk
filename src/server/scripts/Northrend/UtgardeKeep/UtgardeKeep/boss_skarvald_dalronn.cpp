@@ -150,7 +150,7 @@ public:
                 }
             }
 
-            me->CastSpell((Unit*)NULL, SPELL_SUMMON_SKARVALD_GHOST, true);
+            me->CastSpell((Unit*)nullptr, SPELL_SUMMON_SKARVALD_GHOST, true);
         }
 
         void UpdateAI(uint32 diff) override
@@ -303,7 +303,7 @@ public:
                     }
                 }
             }
-            me->CastSpell((Unit*)NULL, SPELL_SUMMON_DALRONN_GHOST, true);
+            me->CastSpell((Unit*)nullptr, SPELL_SUMMON_DALRONN_GHOST, true);
         }
 
         void UpdateAI(uint32 diff) override
@@ -341,7 +341,7 @@ public:
                         events.RepeatEvent(3000);
                     break;
                 case EVENT_SPELL_SUMMON_SKELETONS:
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_SKELETONS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_SKELETONS, false);
                     events.RepeatEvent(urand(20000, 30000));
                     break;
             }
