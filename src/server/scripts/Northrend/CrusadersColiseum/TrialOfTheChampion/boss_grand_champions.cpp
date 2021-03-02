@@ -781,7 +781,7 @@ public:
                     events.RepeatEvent(5000);
                     break;
                 case EVEMT_MAGE_SPELL_BLAST_WAVE:
-                    me->CastSpell((Unit*)NULL, SPELL_BLAST_WAVE, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_BLAST_WAVE, false);
                     events.RepeatEvent(13000);
                     break;
                 case EVEMT_MAGE_SPELL_HASTE:
@@ -832,7 +832,7 @@ public:
 
                     break;
                 case EVENT_HUNTER_SPELL_LIGHTNING_ARROWS:
-                    me->CastSpell((Unit*)NULL, SPELL_LIGHTNING_ARROWS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_LIGHTNING_ARROWS, false);
                     events.RepeatEvent(urand(20000, 25000));
                     break;
                 case EVENT_HUNTER_SPELL_MULTI_SHOT:
@@ -879,7 +879,7 @@ public:
                     events.RepeatEvent(8000);
                     break;
                 case EVENT_ROGUE_SPELL_FAN_OF_KNIVES:
-                    me->CastSpell((Unit*)NULL, SPELL_FAN_OF_KNIVES, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_FAN_OF_KNIVES, false);
                     events.RepeatEvent(14000);
                     break;
                 case EVENT_ROGUE_SPELL_POISON_BOTTLE:

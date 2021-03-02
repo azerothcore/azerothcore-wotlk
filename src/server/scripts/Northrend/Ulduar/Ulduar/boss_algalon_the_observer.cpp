@@ -523,9 +523,9 @@ public:
                     me->CastSpell(summon, SPELL_REORIGINATION, true);
                     break;
                 case NPC_BLACK_HOLE:
-                    summon->CastSpell((Unit*)NULL, SPELL_BLACK_HOLE_TRIGGER, true);
+                    summon->CastSpell((Unit*)nullptr, SPELL_BLACK_HOLE_TRIGGER, true);
                     summon->CastSpell(summon, SPELL_CONSTELLATION_PHASE_TRIGGER, true);
-                    summon->CastSpell((Unit*)NULL, SPELL_BLACK_HOLE_EXPLOSION, false);
+                    summon->CastSpell((Unit*)nullptr, SPELL_BLACK_HOLE_EXPLOSION, false);
                     summon->CastSpell(summon, SPELL_SUMMON_VOID_ZONE_VISUAL, true);
                     break;
                 case NPC_ALGALON_VOID_ZONE_VISUAL_STALKER:
@@ -612,7 +612,7 @@ public:
                     Talk(SAY_ALGALON_INTRO_1);
                     break;
                 case EVENT_INTRO_2:
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_AZEROTH, true);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_AZEROTH, true);
                     Talk(SAY_ALGALON_INTRO_2);
                     break;
                 case EVENT_INTRO_3:
@@ -634,7 +634,7 @@ public:
                     break;
                 case EVENT_INTRO_TIMER_DONE:
                     events.SetPhase(PHASE_NORMAL);
-                    me->CastSpell((Unit*)NULL, SPELL_SUPERMASSIVE_FAIL, true);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUPERMASSIVE_FAIL, true);
                     // Hack: _IsValidTarget failed earlier due to flags, call AttackStart again
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->setFaction(14);
@@ -662,7 +662,7 @@ public:
                     break;
                 case EVENT_COSMIC_SMASH:
                     Talk(EMOTE_ALGALON_COSMIC_SMASH);
-                    me->CastCustomSpell(SPELL_COSMIC_SMASH, SPELLVALUE_MAX_TARGETS, RAID_MODE(1, 3), (Unit*)NULL);
+                    me->CastCustomSpell(SPELL_COSMIC_SMASH, SPELLVALUE_MAX_TARGETS, RAID_MODE(1, 3), (Unit*)nullptr);
                     events.RepeatEvent(25500);
                     break;
                 case EVENT_ACTIVATE_LIVING_CONSTELLATION:
@@ -685,13 +685,13 @@ public:
                         EntryCheckPredicate pred(NPC_LIVING_CONSTELLATION);
                         summons.DoAction(ACTION_BIG_BANG, pred);
 
-                        me->CastSpell((Unit*)NULL, SPELL_BIG_BANG, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_BIG_BANG, false);
                         events.RepeatEvent(90500);
                         break;
                     }
                 case EVENT_ASCEND_TO_THE_HEAVENS:
                     Talk(SAY_ALGALON_ASCEND);
-                    me->CastSpell((Unit*)NULL, SPELL_ASCEND_TO_THE_HEAVENS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_ASCEND_TO_THE_HEAVENS, false);
                     events.ScheduleEvent(EVENT_EVADE, 2500);
                     break;
                 case EVENT_EVADE:
@@ -714,13 +714,13 @@ public:
                     me->GetMotionMaster()->MovePoint(POINT_ALGALON_OUTRO, AlgalonOutroPos);
                     break;
                 case EVENT_OUTRO_3:
-                    me->CastSpell((Unit*)NULL, SPELL_KILL_CREDIT);
+                    me->CastSpell((Unit*)nullptr, SPELL_KILL_CREDIT);
                     // Summon Chest
                     if (GameObject* go = me->SummonGameObject(RAID_MODE(GO_ALGALON_CHEST, GO_ALGALON_CHEST_HERO), 1632.1f, -306.561f, 417.321f, 4.69494f, 0, 0, 0, 1, 0))
                         go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
                     break;
                 case EVENT_OUTRO_4:
-                    me->CastSpell((Unit*)NULL, SPELL_SUPERMASSIVE_FAIL);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUPERMASSIVE_FAIL);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     break;
                 case EVENT_OUTRO_5:
@@ -758,7 +758,7 @@ public:
                     Talk(SAY_ALGALON_DESPAWN_3);
                     break;
                 case EVENT_DESPAWN_ALGALON_4:
-                    me->CastSpell((Unit*)NULL, SPELL_ASCEND_TO_THE_HEAVENS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_ASCEND_TO_THE_HEAVENS, false);
                     break;
                 case EVENT_DESPAWN_ALGALON_5:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -974,7 +974,7 @@ public:
             if (InstanceScript* instance = me->GetInstanceScript())
                 instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, EVENT_ID_SUPERMASSIVE_START);
 
-            caster->CastSpell((Unit*)NULL, SPELL_BLACK_HOLE_CREDIT, TRIGGERED_FULL_MASK);
+            caster->CastSpell((Unit*)nullptr, SPELL_BLACK_HOLE_CREDIT, TRIGGERED_FULL_MASK);
             caster->ToCreature()->DespawnOrUnsummon(1);
             me->DespawnOrUnsummon(1);
             if (Creature* voidZone = caster->FindNearestCreature(NPC_ALGALON_VOID_ZONE_VISUAL_STALKER, 10.0f))
@@ -990,7 +990,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_ARCANE_BARRAGE:
-                    me->CastCustomSpell(SPELL_ARCANE_BARRAGE, SPELLVALUE_MAX_TARGETS, 1, (Unit*)NULL, true);
+                    me->CastCustomSpell(SPELL_ARCANE_BARRAGE, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, true);
                     events.RepeatEvent(2500);
                     break;
                 case EVENT_RESUME_UPDATING:
@@ -1031,7 +1031,7 @@ public:
             _summonTimer += diff;
             if (_summonTimer >= 30000)
             {
-                me->CastSpell((Unit*)NULL, SPELL_SUMMON_UNLEASHED_DARK_MATTER, true);
+                me->CastSpell((Unit*)nullptr, SPELL_SUMMON_UNLEASHED_DARK_MATTER, true);
                 _summonTimer = 0;
             }
         }
@@ -1173,7 +1173,7 @@ public:
         void HandlePeriodic(AuraEffect const* /*aurEff*/)
         {
             PreventDefaultAction();
-            Unit::DealDamage(GetTarget(), GetTarget(), GetTarget()->CountPctFromMaxHealth(1), NULL, NODAMAGE);
+            Unit::DealDamage(GetTarget(), GetTarget(), GetTarget()->CountPctFromMaxHealth(1), nullptr, NODAMAGE);
         }
 
         void Register() override

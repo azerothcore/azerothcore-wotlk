@@ -364,7 +364,7 @@ public:
             switch (eventId)
             {
                 case EVENT_SHADOW_BOLT_WHIRL:
-                    me->CastSpell((Unit*)NULL, SPELL_SHADOW_BOLT_WHIRL, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SHADOW_BOLT_WHIRL, false);
                     events.ScheduleEvent(EVENT_SHADOW_BOLT_WHIRL, urand(15000, 30000));
                     break;
                 default:
@@ -407,7 +407,7 @@ public:
         {
             if (moveType == FOLLOW_MOTION_TYPE && data == _summonerGuid)
             {
-                me->CastSpell((Unit*)NULL, SPELL_DARK_OFFERING, false);
+                me->CastSpell((Unit*)nullptr, SPELL_DARK_OFFERING, false);
                 me->DespawnOrUnsummon(1000);
             }
         }

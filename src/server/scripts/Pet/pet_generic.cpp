@@ -686,7 +686,7 @@ public:
                 {
                     uint8 limit = 0;
                     if (player->GetGroup())
-                        for (GroupReference* itr = player->GetGroup()->GetFirstMember(); itr != NULL && limit < 4; itr = itr->next(), ++limit)
+                        for (GroupReference* itr = player->GetGroup()->GetFirstMember(); itr != nullptr && limit < 4; itr = itr->next(), ++limit)
                             if (Player* groupPlayer = itr->GetSource())
                                 if (groupPlayer != player)
                                     groupPlayer->GetSession()->SendPacket(&_data);

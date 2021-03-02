@@ -463,7 +463,7 @@ void Battlefield::SendWarningToAllInZone(uint32 entry)
 {
     if (Unit* unit = ObjectAccessor::FindUnit(StalkerGuid))
         if (Creature* stalker = unit->ToCreature())
-            sCreatureTextMgr->SendChat(stalker, (uint8)entry, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+            sCreatureTextMgr->SendChat(stalker, (uint8)entry, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
 }
 
 void Battlefield::SendWarningToPlayer(Player* player, uint32 entry)

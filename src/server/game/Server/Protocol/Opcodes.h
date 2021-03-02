@@ -1333,9 +1333,9 @@ enum Opcodes
 /// Player state
 enum SessionStatus
 {
-    STATUS_AUTHED = 0,                                      // Player authenticated (_player == NULL, m_GUID has garbage)
-    STATUS_LOGGEDIN,                                        // Player in game (_player != NULL, m_GUID == _player->GetGUID(), inWorld())
-    STATUS_TRANSFER,                                        // Player transferring to another map (_player != NULL, m_GUID == _player->GetGUID(), !inWorld())
+    STATUS_AUTHED = 0,                                      // Player authenticated (_player == nullptr, m_GUID has garbage)
+    STATUS_LOGGEDIN,                                        // Player in game (_player != nullptr, m_GUID == _player->GetGUID(), inWorld())
+    STATUS_TRANSFER,                                        // Player transferring to another map (_player != nullptr, m_GUID == _player->GetGUID(), !inWorld())
     STATUS_NEVER,                                           // Opcode not accepted from client (deprecated or server side only)
     STATUS_UNHANDLED,                                       // Opcode not handled yet
 };
