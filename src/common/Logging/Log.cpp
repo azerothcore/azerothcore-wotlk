@@ -18,7 +18,7 @@
 #include <chrono>
 #include <sstream>
 
-Log::Log() : AppenderId(0), lowestLogLevel(LOG_LEVEL_FATAL)
+Log::Log() : AppenderId(0), highestLogLevel(LOG_LEVEL_FATAL)
 {
     m_logsTimestamp = "_" + GetTimestampStr();
     RegisterAppender<AppenderConsole>();
@@ -142,8 +142,8 @@ void Log::CreateLoggerFromConfig(std::string const& appenderName)
         return;
     }
 
-    if (level < lowestLogLevel)
-        lowestLogLevel = level;
+    if (level > highestLogLevel)
+        highestLogLevel = level;
 
     logger = std::make_unique<Logger>(name, level);
     //fprintf(stdout, "Log::CreateLoggerFromConfig: Created Logger %s, Level %u\n", name.c_str(), level);
@@ -270,8 +270,8 @@ bool Log::SetLogLevel(std::string const& name, int32 newLeveli, bool isLogger /*
 
         it->second->setLogLevel(newLevel);
 
-        if (newLevel != LOG_LEVEL_DISABLED && newLevel < lowestLogLevel)
-            lowestLogLevel = newLevel;
+        if (newLevel != LOG_LEVEL_DISABLED && newLevel > highestLogLevel)
+            highestLogLevel = newLevel;
     }
     else
     {
@@ -321,8 +321,8 @@ bool Log::ShouldLog(std::string const& type, LogLevel level) const
     // Speed up in cases where requesting "Type.sub1.sub2" but only configured
     // Logger "Type"
 
-    // Don't even look for a logger if the LogLevel is lower than lowest log levels across all loggers
-    if (level < lowestLogLevel)
+    // Don't even look for a logger if the LogLevel is higher than the highest log levels across all loggers
+    if (level > highestLogLevel)
         return false;
 
     Logger const* logger = GetLoggerByType(type);
@@ -330,7 +330,7 @@ bool Log::ShouldLog(std::string const& type, LogLevel level) const
         return false;
 
     LogLevel logLevel = logger->getLogLevel();
-    return logLevel != LOG_LEVEL_DISABLED && logLevel <= level;
+    return logLevel != LOG_LEVEL_DISABLED && logLevel >= level;
 }
 
 Log* Log::instance()
@@ -348,7 +348,7 @@ void Log::LoadFromConfig()
 {
     Close();
 
-    lowestLogLevel = LOG_LEVEL_FATAL;
+    highestLogLevel = LOG_LEVEL_FATAL;
     AppenderId = 0;
     m_logsDir = sConfigMgr->GetOption<std::string>("LogsDir", "");
 

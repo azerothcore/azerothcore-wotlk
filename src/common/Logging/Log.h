@@ -99,7 +99,7 @@ private:
     std::unordered_map<uint8, std::unique_ptr<Appender>> appenders;
     std::unordered_map<std::string, std::unique_ptr<Logger>> loggers;
     uint8 AppenderId;
-    LogLevel lowestLogLevel;
+    LogLevel highestLogLevel;
 
     std::string m_logsDir;
     std::string m_logsTimestamp;

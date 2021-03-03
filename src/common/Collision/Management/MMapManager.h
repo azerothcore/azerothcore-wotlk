@@ -10,7 +10,6 @@
 #include "DetourAlloc.h"
 #include "DetourNavMesh.h"
 #include "DetourExtended.h"
-#include "World.h"
 #include <unordered_map>
 
 //  memory management

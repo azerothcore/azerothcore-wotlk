@@ -40,7 +40,7 @@ void Appender::setLogLevel(LogLevel _level)
 
 void Appender::write(LogMessage* message)
 {
-    if (!level || level > message->level)
+    if (!level || level < message->level)
         return;
 
     std::ostringstream ss;

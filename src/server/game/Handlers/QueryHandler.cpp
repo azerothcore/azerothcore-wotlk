@@ -61,7 +61,7 @@ void WorldSession::HandleNameQueryOpcode(WorldPacket& recvData)
     recvData >> guid;
 
     // This is disable by default to prevent lots of console spam
-    // sLog->outString("HandleNameQueryOpcode %u", guid);
+    // LOG_INFO("server", "HandleNameQueryOpcode %u", guid);
 
     SendNameQueryOpcode(guid);
 }
@@ -138,13 +138,13 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recvData)
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_CREATURE_QUERY - NO CREATURE INFO! (GUID: %u, ENTRY: %u)", GUID_LOPART(guid), entry);
+        LOG_DEBUG("network", "WORLD: CMSG_CREATURE_QUERY - NO CREATURE INFO! (GUID: %u, ENTRY: %u)", GUID_LOPART(guid), entry);
 #endif
         WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 4);
         data << uint32(entry | 0x80000000);
         SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
+        LOG_DEBUG("network", "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
 #endif
     }
 }
@@ -177,7 +177,7 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recvData)
             }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_GAMEOBJECT_QUERY '%s' - Entry: %u. ", info->name.c_str(), entry);
+        LOG_DEBUG("network", "WORLD: CMSG_GAMEOBJECT_QUERY '%s' - Entry: %u. ", info->name.c_str(), entry);
 #endif
         WorldPacket data (SMSG_GAMEOBJECT_QUERY_RESPONSE, 150);
         data << uint32(entry);
@@ -201,20 +201,20 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recvData)
 
         SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
+        LOG_DEBUG("network", "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
 #endif
     }
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_GAMEOBJECT_QUERY - Missing gameobject info for (GUID: %u, ENTRY: %u)",
+        LOG_DEBUG("network", "WORLD: CMSG_GAMEOBJECT_QUERY - Missing gameobject info for (GUID: %u, ENTRY: %u)",
                        GUID_LOPART(guid), entry);
 #endif
         WorldPacket data (SMSG_GAMEOBJECT_QUERY_RESPONSE, 4);
         data << uint32(entry | 0x80000000);
         SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
+        LOG_DEBUG("network", "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
 #endif
     }
 }
@@ -222,7 +222,7 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recvData)
 void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received MSG_CORPSE_QUERY");
+    LOG_DEBUG("network", "WORLD: Received MSG_CORPSE_QUERY");
 #endif
 
     Corpse* corpse = GetPlayer()->GetCorpse();
@@ -279,7 +279,7 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
 
     recvData >> textID;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_NPC_TEXT_QUERY TextId: %u", textID);
+    LOG_DEBUG("network", "WORLD: CMSG_NPC_TEXT_QUERY TextId: %u", textID);
 #endif
 
     recvData >> guid;
@@ -358,7 +358,7 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
     SendPacket(&data);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_NPC_TEXT_UPDATE");
+    LOG_DEBUG("network", "WORLD: Sent SMSG_NPC_TEXT_UPDATE");
 #endif
 }
 
@@ -366,7 +366,7 @@ void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
 void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_PAGE_TEXT_QUERY");
+    LOG_DEBUG("network", "WORLD: Received CMSG_PAGE_TEXT_QUERY");
 #endif
 
     uint32 pageID;
@@ -402,7 +402,7 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recvData)
         SendPacket(&data);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_PAGE_TEXT_QUERY_RESPONSE");
+        LOG_DEBUG("network", "WORLD: Sent SMSG_PAGE_TEXT_QUERY_RESPONSE");
 #endif
     }
 }
@@ -410,7 +410,7 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recvData)
 void WorldSession::HandleCorpseMapPositionQuery(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recv CMSG_CORPSE_MAP_POSITION_QUERY");
+    LOG_DEBUG("network", "WORLD: Recv CMSG_CORPSE_MAP_POSITION_QUERY");
 #endif
 
     uint32 unk;

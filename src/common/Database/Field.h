@@ -31,7 +31,7 @@ public:
 #ifdef ACORE_DEBUG
         if (!IsType(MYSQL_TYPE_TINY))
         {
-            sLog->outSQLDriver("Warning: GetUInt8() on non-tinyint field. Using type: %s.", FieldTypeToString(data.type));
+            LOG_INFO("sql.driver", "Warning: GetUInt8() on non-tinyint field. Using type: %s.", FieldTypeToString(data.type));
             return 0;
         }
 #endif
@@ -49,7 +49,7 @@ public:
 #ifdef ACORE_DEBUG
         if (!IsType(MYSQL_TYPE_TINY))
         {
-            sLog->outSQLDriver("Warning: GetInt8() on non-tinyint field. Using type: %s.", FieldTypeToString(data.type));
+            LOG_INFO("sql.driver", "Warning: GetInt8() on non-tinyint field. Using type: %s.", FieldTypeToString(data.type));
             return 0;
         }
 #endif
@@ -74,7 +74,7 @@ public:
 #ifdef ACORE_DEBUG
         if (!IsType(MYSQL_TYPE_SHORT) && !IsType(MYSQL_TYPE_YEAR))
         {
-            sLog->outSQLDriver("Warning: GetUInt16() on non-smallint field. Using type: %s.", FieldTypeToString(data.type));
+            LOG_INFO("sql.driver", "Warning: GetUInt16() on non-smallint field. Using type: %s.", FieldTypeToString(data.type));
             return 0;
         }
 #endif
@@ -92,7 +92,7 @@ public:
 #ifdef ACORE_DEBUG
         if (!IsType(MYSQL_TYPE_SHORT) && !IsType(MYSQL_TYPE_YEAR))
         {
-            sLog->outSQLDriver("Warning: GetInt16() on non-smallint field. Using type: %s.", FieldTypeToString(data.type));
+            LOG_INFO("sql.driver", "Warning: GetInt16() on non-smallint field. Using type: %s.", FieldTypeToString(data.type));
             return 0;
         }
 #endif
@@ -110,7 +110,7 @@ public:
 #ifdef ACORE_DEBUG
         if (!IsType(MYSQL_TYPE_INT24) && !IsType(MYSQL_TYPE_LONG))
         {
-            sLog->outSQLDriver("Warning: GetUInt32() on non-(medium)int field. Using type: %s.", FieldTypeToString(data.type));
+            LOG_INFO("sql.driver", "Warning: GetUInt32() on non-(medium)int field. Using type: %s.", FieldTypeToString(data.type));
             return 0;
         }
 #endif
@@ -128,7 +128,7 @@ public:
 #ifdef ACORE_DEBUG
         if (!IsType(MYSQL_TYPE_INT24) && !IsType(MYSQL_TYPE_LONG))
         {
-            sLog->outSQLDriver("Warning: GetInt32() on non-(medium)int field. Using type: %s.", FieldTypeToString(data.type));
+            LOG_INFO("sql.driver", "Warning: GetInt32() on non-(medium)int field. Using type: %s.", FieldTypeToString(data.type));
             return 0;
         }
 #endif
@@ -146,7 +146,7 @@ public:
 #ifdef ACORE_DEBUG
         if (!IsType(MYSQL_TYPE_LONGLONG) && !IsType(MYSQL_TYPE_BIT))
         {
-            sLog->outSQLDriver("Warning: GetUInt64() on non-bigint field. Using type: %s.", FieldTypeToString(data.type));
+            LOG_INFO("sql.driver", "Warning: GetUInt64() on non-bigint field. Using type: %s.", FieldTypeToString(data.type));
             return 0;
         }
 #endif
@@ -164,7 +164,7 @@ public:
 #ifdef ACORE_DEBUG
         if (!IsType(MYSQL_TYPE_LONGLONG) && !IsType(MYSQL_TYPE_BIT))
         {
-            sLog->outSQLDriver("Warning: GetInt64() on non-bigint field. Using type: %s.", FieldTypeToString(data.type));
+            LOG_INFO("sql.driver", "Warning: GetInt64() on non-bigint field. Using type: %s.", FieldTypeToString(data.type));
             return 0;
         }
 #endif
@@ -182,7 +182,7 @@ public:
 #ifdef ACORE_DEBUG
         if (!IsType(MYSQL_TYPE_FLOAT))
         {
-            sLog->outSQLDriver("Warning: GetFloat() on non-float field. Using type: %s.", FieldTypeToString(data.type));
+            LOG_INFO("sql.driver", "Warning: GetFloat() on non-float field. Using type: %s.", FieldTypeToString(data.type));
             return 0.0f;
         }
 #endif
@@ -200,7 +200,7 @@ public:
 #ifdef ACORE_DEBUG
         if (!IsType(MYSQL_TYPE_DOUBLE))
         {
-            sLog->outSQLDriver("Warning: GetDouble() on non-double field. Using type: %s.", FieldTypeToString(data.type));
+            LOG_INFO("sql.driver", "Warning: GetDouble() on non-double field. Using type: %s.", FieldTypeToString(data.type));
             return 0.0f;
         }
 #endif
@@ -218,7 +218,7 @@ public:
 #ifdef ACORE_DEBUG
         if (IsNumeric())
         {
-            sLog->outSQLDriver("Error: GetCString() on numeric field. Using type: %s.", FieldTypeToString(data.type));
+            LOG_INFO("sql.driver", "Error: GetCString() on numeric field. Using type: %s.", FieldTypeToString(data.type));
             return nullptr;
         }
 #endif
@@ -321,7 +321,7 @@ protected:
             MYSQL_TYPE_SET:
             */
             default:
-                sLog->outSQLDriver("SQL::SizeForType(): invalid field type %u", uint32(field->type));
+                LOG_INFO("sql.driver", "SQL::SizeForType(): invalid field type %u", uint32(field->type));
                 return 0;
         }
     }

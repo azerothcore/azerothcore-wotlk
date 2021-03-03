@@ -14,6 +14,7 @@
 #include "LootMgr.h"
 #include "Unit.h"
 #include "UpdateMask.h"
+#include "World.h"
 #include <list>
 
 class SpellInfo;

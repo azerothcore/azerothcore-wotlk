@@ -47,7 +47,7 @@ PreparedResultSet::PreparedResultSet(MYSQL_STMT* stmt, MYSQL_RES* result, uint64
     //- This is where we store the (entire) resultset
     if (mysql_stmt_store_result(m_stmt))
     {
-        sLog->outSQLDriver("%s:mysql_stmt_store_result, cannot bind result from MySQL server. Error: %s", __FUNCTION__, mysql_stmt_error(m_stmt));
+        LOG_INFO("sql.driver", "%s:mysql_stmt_store_result, cannot bind result from MySQL server. Error: %s", __FUNCTION__, mysql_stmt_error(m_stmt));
         delete[] m_rBind;
         delete[] m_isNull;
         delete[] m_length;
@@ -77,7 +77,7 @@ PreparedResultSet::PreparedResultSet(MYSQL_STMT* stmt, MYSQL_RES* result, uint64
     //- This is where we bind the bind the buffer to the statement
     if (mysql_stmt_bind_result(m_stmt, m_rBind))
     {
-        sLog->outSQLDriver("%s:mysql_stmt_bind_result, cannot bind result from MySQL server. Error: %s", __FUNCTION__, mysql_stmt_error(m_stmt));
+        LOG_INFO("sql.driver", "%s:mysql_stmt_bind_result, cannot bind result from MySQL server. Error: %s", __FUNCTION__, mysql_stmt_error(m_stmt));
         delete[] m_rBind;
         delete[] m_isNull;
         delete[] m_length;

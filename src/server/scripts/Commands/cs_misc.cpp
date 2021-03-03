@@ -1460,7 +1460,7 @@ public:
             playerTarget = player;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDetail(handler->GetAcoreString(LANG_ADDITEM), itemId, count);
+        LOG_DEBUG("server", handler->GetAcoreString(LANG_ADDITEM), itemId, count);
 #endif
 
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
@@ -1564,7 +1564,7 @@ public:
             playerTarget = player;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDetail(handler->GetAcoreString(LANG_ADDITEMSET), itemSetId);
+        LOG_DEBUG("server", handler->GetAcoreString(LANG_ADDITEMSET), itemSetId);
 #endif
 
         bool found = false;
@@ -2871,7 +2871,7 @@ public:
 
         if (!pet->InitStatsForLevel(creatureTarget->getLevel()))
         {
-            sLog->outError("InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
+            LOG_ERROR("server", "InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
             handler->PSendSysMessage("Error 2");
             delete pet;
             return false;

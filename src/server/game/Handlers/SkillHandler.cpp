@@ -27,7 +27,7 @@ void WorldSession::HandleLearnTalentOpcode(WorldPacket& recvData)
 void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LEARN_PREVIEW_TALENTS");
+    LOG_DEBUG("network", "CMSG_LEARN_PREVIEW_TALENTS");
 #endif
 
     uint32 talentsCount;
@@ -53,7 +53,7 @@ void WorldSession::HandleLearnPreviewTalents(WorldPacket& recvPacket)
 void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_TALENT_WIPE_CONFIRM");
+    LOG_DEBUG("network", "MSG_TALENT_WIPE_CONFIRM");
 #endif
     uint64 guid;
     recvData >> guid;
@@ -62,7 +62,7 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTalentWipeConfirmOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
+        LOG_DEBUG("network", "WORLD: HandleTalentWipeConfirmOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
 #endif
         return;
     }
