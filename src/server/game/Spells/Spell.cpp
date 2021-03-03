@@ -2650,7 +2650,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
             // Unsure if there are more spells that are not supposed to stop enemy from
             // regenerating HP from food, so for now it stays as an ID.
-            int premeditation_spell_id = 14183;
+            const uint32 premeditation_spell_id = 14183;
             if (m_spellInfo->Id != premeditation_spell_id)
             {
                 if (!effectUnit->IsStandState())
