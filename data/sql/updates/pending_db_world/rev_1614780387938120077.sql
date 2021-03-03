@@ -1,10 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1614780387938120077');
 
 -- Rewrite positions for treasures for zone: Bloodmyst Isle
-
--- Before: 0 locations
--- After: 28 locations
-
 SET
 @POOL            = '11647',
 @POOLSIZE        = '10',
