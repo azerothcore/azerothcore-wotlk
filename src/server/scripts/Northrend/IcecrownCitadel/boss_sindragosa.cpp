@@ -178,7 +178,7 @@ public:
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
-        _owner->CastSpell((Unit*)NULL, SPELL_FROST_BOMB, false, nullptr, nullptr, _sindragosaGUID);
+        _owner->CastSpell((Unit*)nullptr, SPELL_FROST_BOMB, false, nullptr, nullptr, _sindragosaGUID);
         _owner->RemoveAurasDueToSpell(SPELL_FROST_BOMB_VISUAL);
         return true;
     }
@@ -560,11 +560,11 @@ public:
                     break;
                 case EVENT_UNCHAINED_MAGIC:
                     Talk(SAY_UNCHAINED_MAGIC);
-                    me->CastSpell((Unit*)NULL, SPELL_UNCHAINED_MAGIC, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_UNCHAINED_MAGIC, false);
                     events.ScheduleEvent(EVENT_UNCHAINED_MAGIC, urand(30000, 35000), EVENT_GROUP_LAND_PHASE);
                     break;
                 case EVENT_ICY_GRIP:
-                    me->CastSpell((Unit*)NULL, SPELL_ICY_GRIP, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_ICY_GRIP, false);
                     events.DelayEventsToMax(1001, 0);
                     events.ScheduleEvent(EVENT_BLISTERING_COLD, 1000, EVENT_GROUP_LAND_PHASE);
                     if (uint32 evTime = events.GetNextEventTime(EVENT_ICE_TOMB))
@@ -1020,7 +1020,7 @@ public:
         void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
             if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
-                GetTarget()->CastCustomSpell(SPELL_BACKLASH, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, NULL, aurEff, GetCasterGUID());
+                GetTarget()->CastCustomSpell(SPELL_BACKLASH, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, nullptr, aurEff, GetCasterGUID());
         }
 
         void Register() override
