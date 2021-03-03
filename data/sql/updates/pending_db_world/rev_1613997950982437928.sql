@@ -395,7 +395,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=2667;
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=2671;
 
 -- 'Explosive Sheep', mechanic_immune_mask was 0
-UPDATE `creature_template` SET `mechanic_immune_mask`=902267455 WHERE `entry`=2675;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=902267423 WHERE `entry`=2675;
 
 -- 'Compact Harvest Reaper', mechanic_immune_mask was 16384
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=2676;
@@ -440,7 +441,7 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=2776;
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=619397083 WHERE `entry`=2784;
+UPDATE `creature_template` SET `mechanic_immune_mask`=617299963 WHERE `entry`=2784;
 
 -- 'Enraged Rock Elemental', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=646016863 WHERE `entry`=2791;
@@ -485,7 +486,7 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1 WHERE `entry`=2995;
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=619397083 WHERE `entry`=3057;
+UPDATE `creature_template` SET `mechanic_immune_mask`=617299963 WHERE `entry`=3057;
 
 -- 'Unseen', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=3094;
@@ -506,7 +507,7 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=25094 WHERE `entry`=3417;
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=619397083 WHERE `entry`=3516;
+UPDATE `creature_template` SET `mechanic_immune_mask`=617299963 WHERE `entry`=3516;
 
 -- 'Blackmoss the Fetid', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=3535;
@@ -687,7 +688,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=608908883 WHERE `entry`=42
 UPDATE `creature_template` SET `mechanic_immune_mask`=608908883 WHERE `entry`=4275;
 
 -- 'Eye of Kilrogg', mechanic_immune_mask was 0
-UPDATE `creature_template` SET `mechanic_immune_mask`=902267455 WHERE `entry`=4277;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=902267423 WHERE `entry`=4277;
 
 -- 'Commander Springvale', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=608908883 WHERE `entry`=4278;
@@ -806,7 +808,7 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=4946
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=619397083 WHERE `entry`=4949;
+UPDATE `creature_template` SET `mechanic_immune_mask`=617299963 WHERE `entry`=4949;
 
 -- 'Theramore Combat Dummy', mechanic_immune_mask was 16384
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=4952;
@@ -815,7 +817,7 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=4952
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=619397083 WHERE `entry`=4968;
+UPDATE `creature_template` SET `mechanic_immune_mask`=617299963 WHERE `entry`=4968;
 
 -- 'Aku'mai Servant', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=4978;
@@ -1305,19 +1307,19 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=7897
 
 -- 'Walking Bomb', mechanic_immune_mask was 650854271
 -- MECHANIC_GRIP from AC is enabled, adding
-UPDATE `creature_template` SET `mechanic_immune_mask`=10502160 WHERE `entry`=7915;
+UPDATE `creature_template` SET `mechanic_immune_mask`=8405040 WHERE `entry`=7915;
 
 -- 'High Tinker Mekkatorque', mechanic_immune_mask was 617299967
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=619397083 WHERE `entry`=7937;
+UPDATE `creature_template` SET `mechanic_immune_mask`=617299963 WHERE `entry`=7937;
 
 -- 'Tyrande Whisperwind', mechanic_immune_mask was 617299967
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=619397083 WHERE `entry`=7999;
+UPDATE `creature_template` SET `mechanic_immune_mask`=617299963 WHERE `entry`=7999;
 
 -- 'Sen'jin Guardian', mechanic_immune_mask was 0
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
@@ -1347,7 +1349,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=25094 WHERE `entry`=8281;
 -- 'Atal'ai Deathwalker's Spirit', mechanic_immune_mask was 8388624
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=650870655 WHERE `entry`=8317;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=650870623 WHERE `entry`=8317;
 
 -- 'Nightmare Whelp', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=512 WHERE `entry`=8319;
@@ -1490,7 +1493,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=612466259 WHERE `entry`=89
 UPDATE `creature_template` SET `mechanic_immune_mask`=613103451 WHERE `entry`=8929;
 
 -- 'Pet Bomb', mechanic_immune_mask was 0
-UPDATE `creature_template` SET `mechanic_immune_mask`=902267455 WHERE `entry`=8937;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=902267423 WHERE `entry`=8937;
 
 -- 'Malfunctioning Reaver', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=8981;
@@ -1754,12 +1758,12 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=617299803 WHERE `entry`=10
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=619397083 WHERE `entry`=10181;
+UPDATE `creature_template` SET `mechanic_immune_mask`=617299963 WHERE `entry`=10181;
 
 -- 'Onyxia', mechanic_immune_mask was 650854271
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=648757083 WHERE `entry`=10184;
+UPDATE `creature_template` SET `mechanic_immune_mask`=646659963 WHERE `entry`=10184;
 
 -- 'Azurous', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16 WHERE `entry`=10202;
@@ -1946,7 +1950,7 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=646675226 WHERE `entry`=10
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=619397083 WHERE `entry`=10540;
+UPDATE `creature_template` SET `mechanic_immune_mask`=617299963 WHERE `entry`=10540;
 
 -- 'Hearthsinger Forresten', mechanic_immune_mask was 8388624
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -2449,7 +2453,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=646135647 WHERE `entry`=12
 -- 'Flamewaker Protector', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1071644543 WHERE `entry`=12119;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1071644511 WHERE `entry`=12119;
 
 -- 'Onyxian Warder', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=617299803 WHERE `entry`=12129;
@@ -2516,7 +2521,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=646152031 WHERE `entry`=12
 
 -- 'Demetria', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=537083775 WHERE `entry`=12339;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=537083743 WHERE `entry`=12339;
 
 -- 'Blue Skeletal Horse', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=8602131 WHERE `entry`=12341;
@@ -2566,7 +2572,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=613104973 WHERE `entry`=12
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=48234367 WHERE `entry`=12435;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=48234335 WHERE `entry`=12435;
 
 -- 'Blackwing Spellbinder', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -2653,7 +2660,7 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=617299547 WHERE `entry`=12
 -- MECHANIC_SLOW_ATTACK from AC is enabled, adding
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1695235803 WHERE `entry`=12900;
+UPDATE `creature_template` SET `mechanic_immune_mask`=1693138683 WHERE `entry`=12900;
 
 -- 'Lorgus Jett', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=608908883 WHERE `entry`=12902;
@@ -2683,12 +2690,14 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1011483136 WHERE `entry`=1
 -- 'Alliance Spirit Guide', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1071644543 WHERE `entry`=13116;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1071644511 WHERE `entry`=13116;
 
 -- 'Horde Spirit Guide', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1071644543 WHERE `entry`=13117;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1071644511 WHERE `entry`=13117;
 
 -- 'Lieutenant Rugba', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=1011483136 WHERE `entry`=13137;
@@ -2927,7 +2936,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=14269;
 -- 'Chromatic Drakonid', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1071644543 WHERE `entry`=14302;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1071644511 WHERE `entry`=14302;
 
 -- 'Petrified Guardian', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=14303;
@@ -3200,22 +3210,26 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=0 WHERE `entry`=14884;
 -- 'Ysondre', mechanic_immune_mask was 617299803
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=650198911 WHERE `entry`=14887;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=650198879 WHERE `entry`=14887;
 
 -- 'Lethon', mechanic_immune_mask was 617299803
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=650198911 WHERE `entry`=14888;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=650198879 WHERE `entry`=14888;
 
 -- 'Emeriss', mechanic_immune_mask was 617299803
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=650198911 WHERE `entry`=14889;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=650198879 WHERE `entry`=14889;
 
 -- 'Taerar', mechanic_immune_mask was 617299803
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=650198911 WHERE `entry`=14890;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=650198879 WHERE `entry`=14890;
 
 -- 'High Priestess Jeklik Transform Visual', mechanic_immune_mask was 0
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
@@ -3251,7 +3265,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=617299803 WHERE `entry`=14
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1071644543 WHERE `entry`=15047;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1071644511 WHERE `entry`=15047;
 
 -- 'Fishbot 5000', mechanic_immune_mask was 16384
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=15079;
@@ -3309,7 +3324,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=650854239 WHERE `entry`=15
 -- 'Dream Fog', mechanic_immune_mask was 617299803
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1071644543 WHERE `entry`=15224;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1071644511 WHERE `entry`=15224;
 
 -- 'Vekniss Soldier', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -3357,7 +3373,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=613105499 WHERE `entry`=15
 
 -- 'Spirit Shade', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=651116415 WHERE `entry`=15261;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=651116383 WHERE `entry`=15261;
 
 -- 'Obsidian Eradicator', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -3552,7 +3569,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15429;
 -- 'Omen', mechanic_immune_mask was 617299803
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=650854271 WHERE `entry`=15467;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=650854239 WHERE `entry`=15467;
 
 -- 'Spirit of Azuregos', mechanic_immune_mask was 617299803
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
@@ -3606,7 +3624,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=617299805 WHERE `entry`=15
 
 -- 'Number Two', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=8466295 WHERE `entry`=15554;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=8466263 WHERE `entry`=15554;
 
 -- 'Hive'Zara Larva', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=1019952987 WHERE `entry`=15555;
@@ -3622,7 +3641,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=650854235 WHERE `entry`=15
 -- 'Hive'Regal Hunter-Killer', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1071628159 WHERE `entry`=15620;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1071628127 WHERE `entry`=15620;
 
 -- 'Twilight Corrupter', mechanic_immune_mask was 617299803
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
@@ -3635,7 +3655,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=617299803 WHERE `entry`=15
 -- 'Spawn of Fankriss', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=113981311 WHERE `entry`=15630;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=113981279 WHERE `entry`=15630;
 
 -- 'Spotlight', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15631;
@@ -3759,57 +3780,68 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15910;
 -- 'Viscidus Trigger', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1071644543 WHERE `entry`=15922;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1071644511 WHERE `entry`=15922;
 
 -- 'Thaddius', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=15928;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=15928;
 
 -- 'Stalagg', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=15929;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=15929;
 
 -- 'Feugen', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=15930;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=15930;
 
 -- 'Grobbulus', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=15931;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=15931;
 
 -- 'Gluth', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=15932;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=15932;
 
 -- 'Heigan the Unclean', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=15936;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=15936;
 
 -- 'Maexxna', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=15952;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=15952;
 
 -- 'Grand Widow Faerlina', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=15953;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=15953;
 
 -- 'Noth the Plaguebringer', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=15954;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=15954;
 
 -- 'Anub'Rekhan', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=15956;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=15956;
 
 -- 'The Master's Eye', mechanic_immune_mask was 617299803
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
@@ -3824,67 +3856,80 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=15973;
 -- 'Dread Creeper', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1021294202 WHERE `entry`=15974;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1021294170 WHERE `entry`=15974;
 
 -- 'Carrion Spinner', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1021294202 WHERE `entry`=15975;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1021294170 WHERE `entry`=15975;
 
 -- 'Venom Stalker', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1021296251 WHERE `entry`=15976;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1021296219 WHERE `entry`=15976;
 
 -- 'Crypt Reaver', mechanic_immune_mask was 8388624
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1021296251 WHERE `entry`=15978;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1021296219 WHERE `entry`=15978;
 
 -- 'Tomb Horror', mechanic_immune_mask was 8388624
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1021296251 WHERE `entry`=15979;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1021296219 WHERE `entry`=15979;
 
 -- 'Naxxramas Cultist', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1021294203 WHERE `entry`=15980;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1021294171 WHERE `entry`=15980;
 
 -- 'Naxxramas Acolyte', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1021294203 WHERE `entry`=15981;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1021294171 WHERE `entry`=15981;
 
 -- 'Sartura's Royal Guard', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=113981311 WHERE `entry`=15984;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=113981279 WHERE `entry`=15984;
 
 -- 'Sapphiron', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=15989;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=15989;
 
 -- 'Kel'Thuzad', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=15990;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=15990;
 
 -- 'Loatheb', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=16011;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=16011;
 
 -- 'Patchwork Golem', mechanic_immune_mask was 8388624
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1019969394 WHERE `entry`=16017;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019969362 WHERE `entry`=16017;
 
 -- 'Bile Retcher', mechanic_immune_mask was 8388624
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1019969394 WHERE `entry`=16018;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019969362 WHERE `entry`=16018;
 
 -- 'Mad Scientist', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=1015758352 WHERE `entry`=16020;
@@ -3904,7 +3949,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1015751186 WHERE `entry`=1
 -- 'Sludge Belcher', mechanic_immune_mask was 8388624
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1019969394 WHERE `entry`=16029;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019969362 WHERE `entry`=16029;
 
 -- 'Plague Beast', mechanic_immune_mask was 8388624
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
@@ -3940,31 +3986,37 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8388624 WHERE `entry`=1605
 -- 'Gothik the Harvester', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=16060;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=16060;
 
 -- 'Instructor Razuvious', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=16061;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=16061;
 
 -- 'Highlord Mograine', mechanic_immune_mask was 617299803
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=16062;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019952987 WHERE `entry`=16062;
 
 -- 'Sir Zeliek', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=16063;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=16063;
 
 -- 'Thane Korth'azz', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=16064;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=16064;
 
 -- 'Lady Blaumeux', mechanic_immune_mask was 617299839
 -- MECHANIC_GRIP from AC is enabled, adding
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1022050171 WHERE `entry`=16065;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019953019 WHERE `entry`=16065;
 
 -- 'Mor Grayhoof', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -3987,7 +4039,7 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=617299803 WHERE `entry`=16
 
 -- 'Love Fool', mechanic_immune_mask was 32
 -- MECHANIC_GRIP from AC is enabled, adding
-UPDATE `creature_template` SET `mechanic_immune_mask`=10502160 WHERE `entry`=16111;
+UPDATE `creature_template` SET `mechanic_immune_mask`=8405040 WHERE `entry`=16111;
 
 -- 'Kormok', mechanic_immune_mask was 0
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
@@ -3999,7 +4051,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1006764032 WHERE `entry`=1
 -- 'Unrelenting Rider', mechanic_immune_mask was 8388624
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1020936063 WHERE `entry`=16126;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1020936031 WHERE `entry`=16126;
 
 -- 'Spectral Trainee', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=1006632960 WHERE `entry`=16127;
@@ -4007,7 +4060,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1006632960 WHERE `entry`=1
 -- 'Bile Sludge', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1021296251 WHERE `entry`=16142;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1021296219 WHERE `entry`=16142;
 
 -- 'Shadow of Doom', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=8413718 WHERE `entry`=16143;
@@ -4017,7 +4071,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1006764050 WHERE `entry`=1
 
 -- 'Spectral Rider', mechanic_immune_mask was 8388624
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1015693183 WHERE `entry`=16150;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1015693151 WHERE `entry`=16150;
 
 -- 'Dark Touched Warrior', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=1006830096 WHERE `entry`=16156;
@@ -4040,7 +4095,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1015756368 WHERE `entry`=1
 -- 'Stoneskin Gargoyle', mechanic_immune_mask was 8388624
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1071628159 WHERE `entry`=16168;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1071628127 WHERE `entry`=16168;
 
 -- 'Skeletal Smith', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=646016863 WHERE `entry`=16193;
@@ -4073,7 +4129,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1015226896 WHERE `entry`=1
 
 -- 'Fallout Slime', mechanic_immune_mask was 8388624
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1015758718 WHERE `entry`=16290;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1015758686 WHERE `entry`=16290;
 
 -- 'Mutated Grub', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
@@ -4099,7 +4156,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1015226896 WHERE `entry`=1
 UPDATE `creature_template` SET `mechanic_immune_mask`=1019952723 WHERE `entry`=16368;
 
 -- 'Sewage Slime', mechanic_immune_mask was 8388624
-UPDATE `creature_template` SET `mechanic_immune_mask`=1015758450 WHERE `entry`=16375;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1015758418 WHERE `entry`=16375;
 
 -- 'Spirit of the Damned', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=8413718 WHERE `entry`=16379;
@@ -4114,7 +4172,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=1638
 -- MECHANIC_BIT32 from vmangos is enabled, ignoring
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1038073723 WHERE `entry`=16387;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1038073691 WHERE `entry`=16387;
 
 -- 'Deathchill Servant', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=1015751184 WHERE `entry`=16390;
@@ -4129,10 +4188,12 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8413718 WHERE `entry`=1642
 UPDATE `creature_template` SET `mechanic_immune_mask`=1015226896 WHERE `entry`=16427;
 
 -- 'Unstoppable Abomination', mechanic_immune_mask was 8388624
-UPDATE `creature_template` SET `mechanic_immune_mask`=1019952754 WHERE `entry`=16428;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019952722 WHERE `entry`=16428;
 
 -- 'Soul Weaver', mechanic_immune_mask was 8388624
-UPDATE `creature_template` SET `mechanic_immune_mask`=1019952754 WHERE `entry`=16429;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019952722 WHERE `entry`=16429;
 
 -- 'Spectral Spirit', mechanic_immune_mask was 8388624
 UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=16437;
@@ -4141,12 +4202,14 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=8405008 WHERE `entry`=1643
 UPDATE `creature_template` SET `mechanic_immune_mask`=8602131 WHERE `entry`=16438;
 
 -- 'Guardian of Icecrown', mechanic_immune_mask was 8388624
-UPDATE `creature_template` SET `mechanic_immune_mask`=1019427442 WHERE `entry`=16441;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1019427410 WHERE `entry`=16441;
 
 -- 'Plagued Gargoyle', mechanic_immune_mask was 8388624
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1071628159 WHERE `entry`=16446;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1071628127 WHERE `entry`=16446;
 
 -- 'Plagued Ghoul', mechanic_immune_mask was 8388624
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
@@ -4165,17 +4228,20 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=1019952723 WHERE `entry`=1
 -- 'Necro Stalker', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1021296251 WHERE `entry`=16453;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1021296219 WHERE `entry`=16453;
 
 -- 'Naxxramas Follower', mechanic_immune_mask was 65536
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1021294202 WHERE `entry`=16505;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1021294170 WHERE `entry`=16505;
 
 -- 'Naxxramas Worshipper', mechanic_immune_mask was 65537
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1021294202 WHERE `entry`=16506;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1021294170 WHERE `entry`=16506;
 
 -- 'Argent Mount', mechanic_immune_mask was 0
 UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=16511;
@@ -4183,7 +4249,8 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=16384 WHERE `entry`=16511;
 -- 'Crypt Guard', mechanic_immune_mask was 8388624
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 -- MECHANIC_PACIFY from vmangos is enabled, ignoring
-UPDATE `creature_template` SET `mechanic_immune_mask`=1021296250 WHERE `entry`=16573;
+-- MECHANIC_FUMBLE from vmangos is enabled, ignoring
+UPDATE `creature_template` SET `mechanic_immune_mask`=1021296218 WHERE `entry`=16573;
 
 -- 'Corpse Scarab', mechanic_immune_mask was 0
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
