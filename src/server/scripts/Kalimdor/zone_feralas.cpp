@@ -23,8 +23,6 @@ EndScriptData */
 ## npc_gregan_brewspewer
 ######*/
 
-#define GOSSIP_HELLO "Buy somethin', will ya?"
-
 class npc_gregan_brewspewer : public CreatureScript
 {
 public:
@@ -33,13 +31,19 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
+
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, 1801, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             SendGossipMenuFor(player, 2434, creature->GetGUID());
         }
+
+        if (action == GOSSIP_ACTION_INFO_DEF + 2)
+            SendGossipMenuFor(player, 2570, creature->GetGUID());
+
         if (action == GOSSIP_ACTION_TRADE)
             player->GetSession()->SendListInventory(creature->GetGUID());
+
         return true;
     }
 
@@ -48,8 +52,11 @@ public:
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        if (creature->IsVendor() && player->GetQuestStatus(3909) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HELLO, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        if (player->GetQuestStatus(3909) == QUEST_STATUS_INCOMPLETE)
+            AddGossipItemFor(player, 1802, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+        if (creature->IsVendor())
+            AddGossipItemFor(player, 1802, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
         SendGossipMenuFor(player, 2433, creature->GetGUID());
         return true;
