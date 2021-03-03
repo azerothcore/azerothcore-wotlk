@@ -11,8 +11,8 @@ SDComment: Ohgan function needs improvements.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -105,7 +105,6 @@ public:
         {
             if (me->GetPositionZ() > 140.0f)
             {
-
                 killCount = 0;
                 events.ScheduleEvent(EVENT_CHECK_START, 1000);
                 if (Creature* speaker = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_VILEBRANCH_SPEAKER)))
@@ -175,7 +174,6 @@ public:
                 {
                     me->SetHomePosition(PosMandokir[0]);
                     instance->SetBossState(DATA_MANDOKIR, NOT_STARTED);
-
                 }
             }
         }

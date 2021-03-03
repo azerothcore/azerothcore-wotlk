@@ -22,17 +22,17 @@ npc_lurgglbr
 npc_nexus_drake_hatchling
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
-#include "Player.h"
-#include "SpellInfo.h"
-#include "WorldSession.h"
-#include "SpellScript.h"
-#include "PassiveAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellInfo.h"
+#include "SpellScript.h"
+#include "WorldSession.h"
 
 // Ours
 enum eDrakeHunt
@@ -84,7 +84,6 @@ public:
         return new spell_q11919_q11940_drake_hunt_AuraScript();
     }
 };
-
 
 // Theirs
 /*######
@@ -198,9 +197,7 @@ public:
                 }
             }
             else phaseTimer -= diff;
-
         }
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -297,7 +294,6 @@ public:
 
             player->CastSpell(player, SPELL_SUMMON_WYRMREST_SKYTALON, true);
             player->CastSpell(player, SPELL_WYRMREST_SKYTALON_RIDE_PERIODIC, true);
-
         }
 
         return true;
@@ -378,9 +374,12 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            Player* player = killer->ToPlayer();
-            if (!player)
+            if (!killer || killer->GetTypeId() != TYPEID_PLAYER)
+            {
                 return;
+            }
+
+            Player* player = killer->ToPlayer();
 
             if (player->GetQuestStatus(QUEST_TAKEN_BY_THE_SCOURGE) == QUEST_STATUS_INCOMPLETE)
             {
@@ -391,7 +390,9 @@ public:
                     player->KilledMonsterCredit(NPC_WARSONG_PEON, 0);
                 }
                 else if (uiRand < 80)
+                {
                     player->CastSpell(me, nerubarVictims[urand(0, 2)], true);
+                }
             }
         }
     };
@@ -584,7 +585,7 @@ public:
                 EnterEvadeMode(); //We make sure that the npc is not attacking the player!
                 me->SetReactState(REACT_PASSIVE);
                 StartFollow(pCaster->ToPlayer(), 0, nullptr);
-                me->UpdateEntry(NPC_CAPTURED_BERLY_SORCERER, NULL, false);
+                me->UpdateEntry(NPC_CAPTURED_BERLY_SORCERER, nullptr, false);
                 DoCast(me, SPELL_COSMETIC_ENSLAVE_CHAINS_SELF, true);
                 me->DespawnOrUnsummon(45000);
 
@@ -1271,7 +1272,6 @@ public:
 
         return true;
     }
-
 };
 
 enum BloodsporeRuination

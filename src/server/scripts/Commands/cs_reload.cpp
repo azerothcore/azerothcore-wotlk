@@ -17,6 +17,7 @@ EndScriptData */
 #include "Chat.h"
 #include "CreatureTextMgr.h"
 #include "DisableMgr.h"
+#include "GameGraveyard.h"
 #include "Language.h"
 #include "LFGMgr.h"
 #include "MapManager.h"
@@ -29,7 +30,6 @@ EndScriptData */
 #include "TicketMgr.h"
 #include "WardenCheckMgr.h"
 #include "WaypointManager.h"
-#include "GameGraveyard.h"
 
 class reload_commandscript : public CommandScript
 {
@@ -930,6 +930,7 @@ public:
         sLog->outString("Re-Loading Page Texts...");
         sObjectMgr->LoadPageTexts();
         handler->SendGlobalGMSysMessage("DB table `page_texts` reloaded.");
+        handler->GetSession()->SendNotification("You need to delete your client cache or change the cache number in config in order for your players see the changes.");
         return true;
     }
 
@@ -1131,6 +1132,7 @@ public:
         sLog->outString("Re-Loading Page Text Locale ... ");
         sObjectMgr->LoadPageTextLocales();
         handler->SendGlobalGMSysMessage("DB table `page_text_locale` reloaded.");
+        handler->GetSession()->SendNotification("You need to delete your client cache or change the cache number in config in order for your players see the changes.");
         return true;
     }
 

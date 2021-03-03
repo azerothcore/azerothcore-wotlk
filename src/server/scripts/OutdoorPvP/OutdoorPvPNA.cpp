@@ -4,15 +4,15 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "OutdoorPvPNA.h"
-#include "Player.h"
+#include "GameGraveyard.h"
+#include "Language.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
-#include "WorldPacket.h"
-#include "Language.h"
+#include "OutdoorPvPNA.h"
+#include "Player.h"
+#include "ScriptMgr.h"
 #include "World.h"
-#include "GameGraveyard.h"
+#include "WorldPacket.h"
 
 OutdoorPvPNA::OutdoorPvPNA()
 {
@@ -650,7 +650,6 @@ void OPvPCapturePointNA::UpdateWyvernRoostWorldState(uint32 roost)
 class OutdoorPvP_nagrand : public OutdoorPvPScript
 {
 public:
-
     OutdoorPvP_nagrand()
         : OutdoorPvPScript("outdoorpvp_na")
     {

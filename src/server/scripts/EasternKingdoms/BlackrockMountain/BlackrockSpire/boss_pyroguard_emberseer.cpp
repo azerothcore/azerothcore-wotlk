@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "Player.h"
-#include "Spell.h"
 #include "blackrock_spire.h"
+#include "ObjectMgr.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
 
 enum Text
 {
@@ -367,8 +367,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-
-
             if (!UpdateVictim())
             {
                 _events.Update(diff);
@@ -384,7 +382,6 @@ public:
                                         if (Creature* Emberseer = me->FindNearestCreature(NPC_PYROGAURD_EMBERSEER, 30.0f, true))
                                             DoCast(Emberseer, SPELL_ENCAGE_EMBERSEER);
                                 break;
-
                             }
                     }
                 }

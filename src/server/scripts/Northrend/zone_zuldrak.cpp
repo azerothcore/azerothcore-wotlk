@@ -4,16 +4,16 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "Player.h"
 #include "CombatAI.h"
 #include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "Vehicle.h"
-#include "SpellAuras.h"
 
 // Ours
 enum AlchemistItemRequirements
@@ -30,7 +30,6 @@ const char*  AA_ITEM_NAME[24]  = {"Crystallized Hogsnot", "Ghoul Drool", "Trollb
                                   "Withered Batwing", "Abomination Guts", "Blight Crystal", "Chilled Serpent Mucus", "Crushed Basilisk Crystals",
                                   "Frozen Spider Ichor", "Prismatic Mojo", "Raptor Claw"
                                  };
-
 
 class npc_finklestein : public CreatureScript
 {
@@ -160,7 +159,6 @@ public:
         uint32 GetTaskAura(uint32 itemcode)      { return AA_AURA_ID[itemcode % 100]; }
         uint32 GetTaskItemEntry(uint32 itemcode) { return AA_ITEM_ENTRY[itemcode % 100]; }
         const char* GetTaskItemName(uint32 itemcode)  { return AA_ITEM_NAME[itemcode % 100]; }
-
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
@@ -568,7 +566,6 @@ public:
                     playerGUID = 0;
                     EnterEvadeMode();
                     break;
-
             }
 
             if (me->getFaction() == 35 || me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
@@ -744,7 +741,6 @@ public:
     }
 };
 
-
 // Theirs
 /*####
 ## npc_released_offspring_harkoa
@@ -893,8 +889,6 @@ public:
         return true;
     }
 };
-
-
 
 enum StormCloud
 {

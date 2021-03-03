@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "blackrock_spire.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -92,7 +92,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-
             if (!SummonedRend && HealthBelowPct(25))
             {
                 DoCast(me, SPELL_SUMMON_REND);

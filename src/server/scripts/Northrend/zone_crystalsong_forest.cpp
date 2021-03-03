@@ -12,13 +12,13 @@ SDComment:
 SDCategory: CrystalsongForest
 Script Data End */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
+#include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SmartScriptMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
-#include "PassiveAI.h"
 
 enum ePreparationsForWar
 {
@@ -204,12 +204,10 @@ public:
                 if (!targetGUID)
                     if (Creature* pOrb = GetClosestCreatureWithEntry(me, NPC_TRANSITUS_SHIELD_DUMMY, 32.0f))
                         targetGUID = pOrb->GetGUID();
-
             }
 
             if (Creature* pOrb = ObjectAccessor::GetCreature(*me, targetGUID))
                 DoCast(pOrb, SPELL_TRANSITUS_SHIELD_BEAM);
-
         }
     };
 

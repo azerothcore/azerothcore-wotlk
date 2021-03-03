@@ -4,12 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "ChannelMgr.h"
+#include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "Player.h"
-
-#include <cctype>
 #include "utf8.h"
+#include <cctype>
 
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 {
@@ -277,11 +276,26 @@ void WorldSession::HandleChannelAnnouncements(WorldPacket& recvPacket)
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_ANNOUNCEMENTS %s Channel: %s",
-                   GetPlayerInfo().c_str(), channelName.c_str());
+        GetPlayerInfo().c_str(), channelName.c_str());
 #endif
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
         if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
             channel->Announce(GetPlayer());
+}
+
+void WorldSession::HandleChannelModerateOpcode(WorldPacket& recvPacket)
+{
+    std::string channelName;
+    recvPacket >> channelName;
+
+#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    sLog->outDebug(LOG_FILTER_CHATSYS, "CMSG_CHANNEL_MODERATE %s Channel: %s",
+        GetPlayerInfo().c_str(), channelName.c_str());
+#endif
+
+    if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
+        if (Channel* chn = cMgr->GetChannel(channelName, GetPlayer()))
+            chn->ToggleModeration(GetPlayer());
 }
 
 void WorldSession::HandleChannelDisplayListQuery(WorldPacket& recvPacket)
@@ -326,7 +340,7 @@ void WorldSession::HandleSetChannelWatch(WorldPacket& recvPacket)
         return;
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, NULL, false))
+        if (Channel* channel = cMgr->GetChannel(channelName, nullptr, false))
             channel->AddWatching(GetPlayer());
 }
 
@@ -339,6 +353,6 @@ void WorldSession::HandleClearChannelWatch(WorldPacket& recvPacket)
         return;
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-        if (Channel* channel = cMgr->GetChannel(channelName, NULL, false))
+        if (Channel* channel = cMgr->GetChannel(channelName, nullptr, false))
             channel->RemoveWatching(GetPlayer());
 }

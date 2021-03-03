@@ -11,9 +11,9 @@ SDComment: Should be replaced with core based AI
 SDCategory: Creatures
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 #define GENERIC_CREATURE_COOLDOWN   5000
 
@@ -139,7 +139,6 @@ public:
 
                         //Set our global cooldown
                         GlobalCooldown = GENERIC_CREATURE_COOLDOWN;
-
                     }//If no spells available and we arn't moving run to target
                     else if (IsSelfRooted)
                     {

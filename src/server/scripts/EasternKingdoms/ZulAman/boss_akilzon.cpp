@@ -13,14 +13,14 @@ SQLUpdate:
 
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "zulaman.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "Weather.h"
+#include "zulaman.h"
 
 enum Spells
 {
@@ -202,7 +202,7 @@ public:
                 me->InterruptNonMeleeSpells(false);
                 CloudGUID = 0;
                 if (Cloud)
-                    Unit::DealDamage(Cloud, Cloud, Cloud->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    Unit::DealDamage(Cloud, Cloud, Cloud->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                 SetWeather(WEATHER_STATE_FINE, 0.0f);
                 isRaining = false;
             }
@@ -395,7 +395,6 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
 
-
         void MovementInform(uint32, uint32) override
         {
             arrived = true;
@@ -454,4 +453,3 @@ void AddSC_boss_akilzon()
     new boss_akilzon();
     new npc_akilzon_eagle();
 }
-

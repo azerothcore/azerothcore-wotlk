@@ -12,7 +12,6 @@
 #include "G3D/Set.h"
 #include "BoundingIntervalHierarchy.h"
 
-
 template<class T, class BoundsFunc = BoundsTrait<T>>
 class BIHWrap
 {
@@ -68,7 +67,7 @@ public:
         uint32 Idx = 0;
         const T* temp;
         if (m_obj2Idx.getRemove(&obj, temp, Idx))
-            m_objects[Idx] = NULL;
+            m_objects[Idx] = nullptr;
         else
             m_objects_to_push.remove(&obj);
     }

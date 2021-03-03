@@ -26,29 +26,27 @@ npc_locksmith            75%    list of keys needs to be confirmed
 npc_firework            100%    NPC's summoned by rockets and rocket clusters, for making them cast visual
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "World.h"
+#include "Cell.h"
+#include "CellImpl.h"
+#include "Chat.h"
+#include "CombatAI.h"
 #include "CreatureTextMgr.h"
-#include "PassiveAI.h"
+#include "DBCStructure.h"
 #include "GameEventMgr.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "Cell.h"
-#include "CellImpl.h"
-#include "SpellAuras.h"
-#include "CombatAI.h"
+#include "Group.h"
+#include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
-#include "Chat.h"
-#include "Group.h"
-#include "WaypointManager.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SmartAI.h"
-#include "DBCStructure.h"
+#include "SpellAuras.h"
+#include "WaypointManager.h"
+#include "World.h"
 
 enum elderClearwater
 {
@@ -304,8 +302,6 @@ public:
     }
 };
 
-
-
 enum eTrainingDummy
 {
     SPELL_STUN_PERMANENT        = 61204
@@ -424,7 +420,6 @@ public:
         return new npc_target_dummyAI(creature);
     }
 };
-
 
 // Theirs
 /*########
@@ -567,7 +562,7 @@ public:
                 if (!playerTarget)
                     return;
 
-                Creature* lastSpawnedGuard = SpawnedGUID == 0 ? NULL : GetSummonedGuard();
+                Creature* lastSpawnedGuard = SpawnedGUID == 0 ? nullptr : GetSummonedGuard();
 
                 // prevent calling ObjectAccessor::GetUnit at next MoveInLineOfSight call - speedup
                 if (!lastSpawnedGuard)
@@ -1300,7 +1295,7 @@ public:
 
             RunAwayTimer = 5000;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            me->SetPvP(true);
             me->SetStandState(UNIT_STAND_STATE_KNEEL);
             // expect database to have RegenHealth=0
             me->SetHealth(me->CountPctFromMaxHealth(70));
@@ -1420,7 +1415,6 @@ public:
 
         void WaypointReached(uint32 /*waypointId*/) override
         {
-
         }
 
         void UpdateAI(uint32 diff) override
@@ -1845,7 +1839,6 @@ public:
         }
     };
 
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_trainerAI(creature);
@@ -1999,7 +1992,6 @@ public:
 ## npc_experience
 ######*/
 
-#define EXP_COST                100000 //10 00 00 copper (10golds)
 #define GOSSIP_TEXT_EXP         14736
 #define GOSSIP_XP_OFF           "I no longer wish to gain experience."
 #define GOSSIP_XP_ON            "I wish to start gaining experience again."
@@ -2022,6 +2014,7 @@ public:
         ClearGossipMenuFor(player);
         bool noXPGain = player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
         bool doSwitch = false;
+        auto toggleXpCost = sWorld->getIntConfig(CONFIG_TOGGLE_XP_COST);
 
         switch (action)
         {
@@ -2040,16 +2033,18 @@ public:
         }
         if (doSwitch)
         {
-            if (!player->HasEnoughMoney(EXP_COST))
+            if (!player->HasEnoughMoney(toggleXpCost))
+            {
                 player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+            }
             else if (noXPGain)
             {
-                player->ModifyMoney(-EXP_COST);
+                player->ModifyMoney(-toggleXpCost);
                 player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
             }
             else if (!noXPGain)
             {
-                player->ModifyMoney(-EXP_COST);
+                player->ModifyMoney(-toggleXpCost);
                 player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
             }
         }

@@ -10,14 +10,13 @@
 #include <iostream>
 #include <list>
 #include <vector>
+#include <sys/stat.h>
 
 #ifdef WIN32
 #include <Windows.h>
 #include <sys/stat.h>
 #include <direct.h>
 #define mkdir _mkdir
-#else
-#include <sys/stat.h>
 #endif
 
 #undef min
@@ -433,7 +432,6 @@ bool processArgv(int argc, char** argv, const char* versionString)
     return result;
 }
 
-
 //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 // Main
 //
@@ -517,7 +515,6 @@ int main(int argc, char** argv)
             strcpy(map_ids[x].name, dbc->getRecord(x).getString(1));
             printf("Map - %s\n", map_ids[x].name);
         }
-
 
         delete dbc;
         ParsMapFiles();

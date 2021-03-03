@@ -11,17 +11,16 @@
 #ifndef __WORLD_H
 #define __WORLD_H
 
-#include "IWorld.h"
-#include "Common.h"
-#include "Timer.h"
-#include "SharedDefines.h"
-#include "QueryResult.h"
 #include "Callback.h"
-
+#include "Common.h"
+#include "IWorld.h"
+#include "QueryResult.h"
+#include "SharedDefines.h"
+#include "Timer.h"
+#include <atomic>
+#include <list>
 #include <map>
 #include <set>
-#include <list>
-#include <atomic>
 
 class Object;
 class WorldPacket;
@@ -441,7 +440,7 @@ private:
     std::string m_newCharString;
 
     float rate_values[MAX_RATES];
-    uint32 m_int_configs[INT_CONFIG_VALUE_COUNT];
+    uint64 m_int_configs[INT_CONFIG_VALUE_COUNT];
     bool m_bool_configs[BOOL_CONFIG_VALUE_COUNT];
     float m_float_configs[FLOAT_CONFIG_VALUE_COUNT];
     typedef std::map<uint32, uint64> WorldStatesMap;

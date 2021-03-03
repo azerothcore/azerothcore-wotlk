@@ -4,28 +4,28 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Battleground.h"
+#include "BattlegroundMgr.h"
 #include "Common.h"
-#include "Language.h"
+#include "Creature.h"
+#include "CreatureAI.h"
 #include "DatabaseEnv.h"
+#include "GameGraveyard.h"
+#include "GossipDef.h"
+#include "Language.h"
+#include "Log.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Pet.h"
+#include "Player.h"
+#include "ReputationMgr.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "UpdateMask.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Opcodes.h"
-#include "Log.h"
-#include "ObjectMgr.h"
-#include "SpellMgr.h"
-#include "Player.h"
-#include "GossipDef.h"
-#include "UpdateMask.h"
-#include "ObjectAccessor.h"
-#include "Creature.h"
-#include "Pet.h"
-#include "ReputationMgr.h"
-#include "BattlegroundMgr.h"
-#include "Battleground.h"
-#include "ScriptMgr.h"
-#include "CreatureAI.h"
-#include "SpellInfo.h"
-#include "GameGraveyard.h"
 
 enum StableResultCode
 {
@@ -618,7 +618,6 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
 
     data.put<uint8>(wpos, num);                             // set real data to placeholder
     SendPacket(&data);
-
 }
 
 void WorldSession::SendStableResult(uint8 res)
@@ -1038,4 +1037,3 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
         _player->DurabilityRepairAll(true, discountMod, guildBank);
     }
 }
-

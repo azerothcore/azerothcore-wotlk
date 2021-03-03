@@ -17,11 +17,11 @@ npc_ranshalla
 go_elune_fire
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 // Ours
@@ -209,7 +209,6 @@ public:
         }
     };
 };
-
 
 // Theirs
 /*######
@@ -736,7 +735,6 @@ public:
                 default:
                     return nullptr;
             }
-
         }
 
         void UpdateEscortAI(uint32 diff) override

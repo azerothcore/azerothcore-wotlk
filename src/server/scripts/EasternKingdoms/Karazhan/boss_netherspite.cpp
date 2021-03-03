@@ -11,10 +11,10 @@ SDComment: Not sure about timing and portals placing
 SDCategory: Karazhan
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "karazhan.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Netherspite
 {
@@ -30,7 +30,6 @@ enum Netherspite
     SPELL_EMPOWERMENT           = 38549,
     SPELL_NETHERSPITE_ROAR      = 38684,
 };
-
 
 const float PortalCoord[3][3] =
 {

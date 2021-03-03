@@ -4,17 +4,17 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
-#include "Vehicle.h"
 #include "CombatAI.h"
 #include "Player.h"
-#include "WorldSession.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 #include "WaypointManager.h"
+#include "WorldSession.h"
 
 // Ours
 enum qSniffing
@@ -438,7 +438,6 @@ public:
                 }
                 else
                     Talk(2);
-
             }
         }
 
@@ -683,7 +682,6 @@ public:
         return new spell_q13007_iron_colossus_SpellScript();
     };
 };
-
 
 // Theirs
 /*######
@@ -1014,13 +1012,13 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            return sSpellMgr->GetSpellInfo(SPELL_DESPAWN_RIFT);
+            return ValidateSpellInfo({ SPELL_DESPAWN_RIFT });
         }
 
         void HandlePeriodic(AuraEffect const* /* aurEff */)
         {
             if (++_counter == 5)
-                GetTarget()->CastSpell((Unit*)NULL, SPELL_DESPAWN_RIFT, true);
+                GetTarget()->CastSpell((Unit*)nullptr, SPELL_DESPAWN_RIFT, true);
         }
 
         void Register() override
@@ -1030,7 +1028,6 @@ public:
 
     private:
         uint8 _counter;
-
     };
 
     AuraScript* GetAuraScript() const override

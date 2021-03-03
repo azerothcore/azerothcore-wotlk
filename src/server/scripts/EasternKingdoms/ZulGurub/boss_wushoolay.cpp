@@ -11,8 +11,8 @@ SDComment:
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "zulgurub.h"
 
 enum Spells
@@ -94,4 +94,3 @@ void AddSC_boss_wushoolay()
 {
     new boss_wushoolay();
 }
-

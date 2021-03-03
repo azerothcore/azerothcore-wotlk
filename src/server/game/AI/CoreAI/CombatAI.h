@@ -7,9 +7,9 @@
 #ifndef ACORE_COMBATAI_H
 #define ACORE_COMBATAI_H
 
+#include "ConditionMgr.h"
 #include "CreatureAI.h"
 #include "CreatureAIImpl.h"
-#include "ConditionMgr.h"
 
 class Creature;
 
@@ -60,7 +60,6 @@ public:
     explicit ArcherAI(Creature* c);
     void AttackStart(Unit* who) override;
     void UpdateAI(uint32 diff) override;
-
 
     static int Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
 

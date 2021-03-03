@@ -18,13 +18,13 @@ npc_darrowshire_spirit
 npc_tirion_fordring
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "Player.h"
-#include "WorldSession.h"
-#include "PassiveAI.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "WorldSession.h"
 
 // Ours
 
@@ -301,7 +301,6 @@ public:
         }
     };
 };
-
 
 // Theirs
 class npc_ghoul_flayer : public CreatureScript

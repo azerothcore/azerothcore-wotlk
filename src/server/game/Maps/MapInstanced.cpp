@@ -4,16 +4,16 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "MapInstanced.h"
-#include "ObjectMgr.h"
-#include "MapManager.h"
 #include "Battleground.h"
-#include "VMapFactory.h"
-#include "MMapFactory.h"
-#include "InstanceSaveMgr.h"
-#include "World.h"
 #include "Group.h"
+#include "InstanceSaveMgr.h"
+#include "MapInstanced.h"
+#include "MapManager.h"
+#include "MMapFactory.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "VMapFactory.h"
+#include "World.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -165,7 +165,7 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
             uint32 newInstanceId = sMapMgr->GenerateInstanceId();
             ASSERT(!FindInstanceMap(newInstanceId)); // pussywizard: instance with new id can't exist
             Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(IsRaid()) : player->GetDifficulty(IsRaid());
-            map = CreateInstance(newInstanceId, NULL, diff);
+            map = CreateInstance(newInstanceId, nullptr, diff);
         }
     }
 

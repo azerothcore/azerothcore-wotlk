@@ -172,7 +172,6 @@ void stripLineInvisibleChars(std::string& str)
         str.erase(wpos, str.size());
     if (str.find("|TInterface") != std::string::npos)
         str.clear();
-
 }
 
 std::string secsToTimeString(uint64 timeInSecs, bool shortText)
@@ -683,15 +682,13 @@ void HexStrToByteArray(std::string const& str, uint8* out, bool reverse /*= fals
     }
 }
 
-bool StringToBool(std::string const& str)
-{
-    std::string lowerStr = str;
-    std::transform(str.begin(), str.end(), lowerStr.begin(), ::tolower);
-    return lowerStr == "1" || lowerStr == "true" || lowerStr == "yes";
-}
-
 bool StringContainsStringI(std::string const& haystack, std::string const& needle)
 {
     return haystack.end() !=
     std::search(haystack.begin(), haystack.end(), needle.begin(), needle.end(), [](char c1, char c2) { return std::toupper(c1) == std::toupper(c2); });
+}
+
+bool StringEqualI(std::string_view a, std::string_view b)
+{
+    return std::equal(a.begin(), a.end(), b.begin(), b.end(), [](char c1, char c2) { return std::tolower(c1) == std::tolower(c2); });
 }

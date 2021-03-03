@@ -8,6 +8,7 @@
 #define __UPDATEDATA_H
 
 #include "ByteBuffer.h"
+
 class WorldPacket;
 
 enum OBJECT_UPDATE_TYPE
@@ -55,4 +56,3 @@ protected:
     void Compress(void* dst, uint32* dst_size, void* src, int src_size);
 };
 #endif
-

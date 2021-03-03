@@ -20,11 +20,11 @@ npc_marzon_silent_blade
 npc_lord_gregor_lescovar
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 
 /*######
 ## npc_bartleby
@@ -434,7 +434,10 @@ public:
                             break;
                         case 2:
                             if (Creature* pTyrion = me->FindNearestCreature(NPC_TYRION, 10.0f))
-                                pTyrion->AI()->Talk(SAY_TYRION_1);
+                            {
+                                if (Player* player = GetPlayerForEscort())
+                                    pTyrion->AI()->Talk(SAY_TYRION_1, player);
+                            }
                             uiTimer = 3000;
                             uiPhase = 3;
                             break;

@@ -12,13 +12,13 @@ Category: commandscripts
 EndScriptData */
 
 #include "AccountMgr.h"
+#include "BanManager.h"
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "BanManager.h"
 
 /// Ban function modes
 enum BanMode
@@ -372,7 +372,6 @@ public:
         handler->PSendSysMessage(LANG_BANINFO_IPENTRY,
                                  fields[0].GetCString(), fields[1].GetCString(), permanent ? handler->GetAcoreString(LANG_BANINFO_NEVER) : fields[2].GetCString(),
                                  permanent ? handler->GetAcoreString(LANG_BANINFO_INFINITE) : secsToTimeString(fields[3].GetUInt64(), true).c_str(), fields[4].GetCString(), fields[5].GetCString());
-
 
         return true;
     }

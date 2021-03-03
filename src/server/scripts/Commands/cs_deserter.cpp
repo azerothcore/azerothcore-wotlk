@@ -5,11 +5,11 @@
  */
 
 #include "Chat.h"
-#include "Player.h"
 #include "Language.h"
+#include "Player.h"
 #include "ScriptMgr.h"
-#include "SpellAuras.h"
 #include "SpellAuraEffects.h"
+#include "SpellAuras.h"
 
 enum Spells
 {

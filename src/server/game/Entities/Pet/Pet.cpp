@@ -4,24 +4,24 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ArenaSpectator.h"
+#include "Battleground.h"
 #include "Common.h"
-#include "DatabaseEnv.h"
-#include "Log.h"
-#include "WorldPacket.h"
-#include "ObjectMgr.h"
-#include "SpellMgr.h"
-#include "Pet.h"
-#include "Formulas.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
 #include "CreatureAI.h"
+#include "DatabaseEnv.h"
+#include "Formulas.h"
+#include "Group.h"
+#include "InstanceScript.h"
+#include "Log.h"
+#include "ObjectMgr.h"
+#include "Pet.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "Unit.h"
 #include "Util.h"
-#include "Group.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Battleground.h"
-#include "InstanceScript.h"
-#include "ArenaSpectator.h"
 
 Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID() : 0, true),
     m_usedTalentCount(0), m_removed(false), m_owner(owner),
@@ -81,7 +81,6 @@ void Pet::AddToWorld()
         GetCharmInfo()->SetIsFollowing(false);
         GetCharmInfo()->SetIsReturning(false);
     }
-
 }
 
 void Pet::RemoveFromWorld()
@@ -839,7 +838,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             }
         case SUMMON_PET:
             {
-
                 if (pInfo)
                 {
                     SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->min_dmg));
@@ -869,7 +867,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             AddAura(SPELL_MAGE_PET_SCALING_02, this);
                             AddAura(SPELL_MAGE_PET_SCALING_03, this);
                             AddAura(SPELL_MAGE_PET_SCALING_04, this);
-                            ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                             break;
                         }
                 }
@@ -941,7 +938,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             AddAura(SPELL_MAGE_PET_SCALING_02, this);
                             AddAura(SPELL_MAGE_PET_SCALING_03, this);
                             AddAura(SPELL_MAGE_PET_SCALING_04, this);
-                            ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                             break;
                         }
                     case NPC_TREANT: //force of nature
@@ -1192,7 +1188,6 @@ void Pet::_SaveSpellCooldowns(SQLTransaction& trans, bool logout)
             stmt->setUInt32(1, itr2->first);
             stmt->setUInt32(2, cooldown);
             trans->Append(stmt);
-
         }
     }
 }
@@ -1273,7 +1268,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             int32 baseDamage[3];
             Field* fields = result->Fetch();
             uint64 caster_guid = fields[0].GetUInt64();
-            // NULL guid stored - pet is the caster of the spell - see Pet::_SaveAuras
+            // nullptr guid stored - pet is the caster of the spell - see Pet::_SaveAuras
             if (!caster_guid)
                 caster_guid = GetGUID();
             uint32 spellid = fields[1].GetUInt32();
@@ -1324,7 +1319,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             else
                 remaincharges = 0;
 
-            if (Aura* aura = Aura::TryCreate(spellInfo, effmask, this, NULL, &baseDamage[0], NULL, caster_guid))
+            if (Aura* aura = Aura::TryCreate(spellInfo, effmask, this, nullptr, &baseDamage[0], nullptr, caster_guid))
             {
                 if (!aura->CanBeSaved())
                 {
@@ -1786,7 +1781,7 @@ bool Pet::resetTalents()
     return true;
 }
 
-void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= NULL*/)
+void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= nullptr*/)
 {
     // not need after this call
     if (owner->ToPlayer()->HasAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS))
@@ -2155,7 +2150,6 @@ void Pet::HandleAsynchLoadSucceed()
         if (spell->GetSpellInfo()->HasEffect(SPELL_EFFECT_SUMMON_PET))
             CastSpell(this, 32752, true, nullptr, nullptr, GetGUID());
 
-
     if (owner->NeedSendSpectatorData() && GetCreatureTemplate()->family)
     {
         ArenaSpectator::SendCommand_UInt32Value(owner->FindMap(), owner->GetGUID(), "PHP", (uint32)GetHealthPct());
@@ -2243,7 +2237,7 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
         // we are almost at home...
         if (asynchLoadType == PET_LOAD_SUMMON_PET)
         {
-            Unit* caster = ObjectAccessor::GetObjectInMap(info->m_casterGUID, map, (Unit*)NULL);
+            Unit* caster = ObjectAccessor::GetObjectInMap(info->m_casterGUID, map, (Unit*)nullptr);
             if (!caster)
                 caster = player;
 
@@ -2330,7 +2324,6 @@ void Pet::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
 
     if (update)
     {
-
         if (Player* playerOwner = GetCharmerOrOwnerPlayerOrPlayerItself())
         {
             WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);

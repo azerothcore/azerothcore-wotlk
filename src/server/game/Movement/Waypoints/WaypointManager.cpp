@@ -6,9 +6,9 @@
 
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
-#include "WaypointManager.h"
-#include "MapManager.h"
 #include "Log.h"
+#include "MapManager.h"
+#include "WaypointManager.h"
 
 WaypointMgr::WaypointMgr()
 {
@@ -145,6 +145,5 @@ void WaypointMgr::ReloadPath(uint32 id)
         wp->event_chance = fields[8].GetUInt8();
 
         path.push_back(wp);
-
     } while (result->NextRow());
 }

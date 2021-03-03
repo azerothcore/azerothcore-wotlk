@@ -7,8 +7,8 @@
 #ifndef _MAPREFERENCE_H
 #define _MAPREFERENCE_H
 
-#include "Reference.h"
 #include "Map.h"
+#include "Reference.h"
 
 class MapReference : public Reference<Map, Player>
 {
@@ -38,4 +38,3 @@ public:
     [[nodiscard]] MapReference const* nocheck_prev() const { return (MapReference const*)Reference<Map, Player>::nocheck_prev(); }
 };
 #endif
-

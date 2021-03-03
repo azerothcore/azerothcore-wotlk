@@ -4,20 +4,20 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PetAI.h"
-#include "Errors.h"
-#include "Pet.h"
-#include "Player.h"
-#include "DBCStores.h"
-#include "Spell.h"
-#include "ObjectAccessor.h"
-#include "SpellMgr.h"
 #include "Creature.h"
-#include "World.h"
-#include "Util.h"
+#include "DBCStores.h"
+#include "Errors.h"
 #include "Group.h"
-#include "SpellInfo.h"
+#include "ObjectAccessor.h"
+#include "Pet.h"
+#include "PetAI.h"
+#include "Player.h"
+#include "Spell.h"
 #include "SpellAuraEffects.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "Util.h"
+#include "World.h"
 #include "WorldSession.h"
 
 int PetAI::Permissible(const Creature* creature)
@@ -49,9 +49,6 @@ bool PetAI::_needToStop()
             return true;
 
     if (!me->_CanDetectFeignDeathOf(me->GetVictim()))
-        return true;
-
-    if (me->isTargetNotAcceptableByMMaps(me->GetVictim()->GetGUID(), sWorld->GetGameTime(), me->GetVictim()))
         return true;
 
     return !me->CanCreatureAttack(me->GetVictim());
@@ -338,6 +335,11 @@ void PetAI::UpdateAI(uint32 diff)
         for (TargetSpellList::const_iterator itr = targetSpellStore.begin(); itr != targetSpellStore.end(); ++itr)
             delete itr->second;
     }
+
+    // Update speed as needed to prevent dropping too far behind and despawning
+    me->UpdateSpeed(MOVE_RUN, true);
+    me->UpdateSpeed(MOVE_WALK, true);
+    me->UpdateSpeed(MOVE_FLIGHT, true);
 }
 
 void PetAI::UpdateAllies()
@@ -441,7 +443,7 @@ void PetAI::OwnerAttacked(Unit* target)
     // Called when owner attacks something. Allows defensive pets to know
     //  that they need to assist
 
-    // Target might be NULL if called from spell with invalid cast targets
+    // Target might be nullptr if called from spell with invalid cast targets
     if (!target)
         return;
 
@@ -470,7 +472,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
 
     // Check pet attackers first so we don't drag a bunch of targets to the owner
     if (Unit* myAttacker = me->getAttackerForHelper())
-        if (!myAttacker->HasBreakableByDamageCrowdControlAura() && me->_CanDetectFeignDeathOf(myAttacker) && me->CanCreatureAttack(myAttacker) && !me->isTargetNotAcceptableByMMaps(myAttacker->GetGUID(), sWorld->GetGameTime(), myAttacker))
+        if (!myAttacker->HasBreakableByDamageCrowdControlAura() && me->_CanDetectFeignDeathOf(myAttacker) && me->CanCreatureAttack(myAttacker))
             return myAttacker;
 
     // Check pet's attackers first to prevent dragging mobs back to owner
@@ -491,13 +493,13 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
 
     // Check owner attackers
     if (Unit* ownerAttacker = owner->getAttackerForHelper())
-        if (!ownerAttacker->HasBreakableByDamageCrowdControlAura() && me->_CanDetectFeignDeathOf(ownerAttacker) && me->CanCreatureAttack(ownerAttacker) && !me->isTargetNotAcceptableByMMaps(ownerAttacker->GetGUID(), sWorld->GetGameTime(), ownerAttacker))
+        if (!ownerAttacker->HasBreakableByDamageCrowdControlAura() && me->_CanDetectFeignDeathOf(ownerAttacker) && me->CanCreatureAttack(ownerAttacker))
             return ownerAttacker;
 
     // Check owner victim
     // 3.0.2 - Pets now start attacking their owners victim in defensive mode as soon as the hunter does
     if (Unit* ownerVictim = owner->GetVictim())
-        if (me->_CanDetectFeignDeathOf(ownerVictim) && me->CanCreatureAttack(ownerVictim) && !me->isTargetNotAcceptableByMMaps(ownerVictim->GetGUID(), sWorld->GetGameTime(), ownerVictim))
+        if (me->_CanDetectFeignDeathOf(ownerVictim) && me->CanCreatureAttack(ownerVictim))
             return ownerVictim;
 
     // Neither pet or owner had a target and aggressive pets can pick any target
@@ -601,7 +603,11 @@ void PetAI::DoAttack(Unit* target, bool chase)
         if (chase)
         {
             if (_canMeleeAttack())
-                me->GetMotionMaster()->MoveChase(target, combatRange, float(M_PI));
+            {
+                float angle = combatRange == 0.f && target->GetTypeId() != TYPEID_PLAYER && !target->IsPet() ? float(M_PI) : 0.f;
+                float tolerance = combatRange == 0.f ? float(M_PI_4) : float(M_PI * 2);
+                me->GetMotionMaster()->MoveChase(target, ChaseRange(0.f, combatRange), ChaseAngle(angle, tolerance));
+            }
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
         {

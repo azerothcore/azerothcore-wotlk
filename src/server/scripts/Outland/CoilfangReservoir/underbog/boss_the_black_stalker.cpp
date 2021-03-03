@@ -11,8 +11,8 @@ SDComment: Timers may be incorrect
 SDCategory: Coilfang Resevoir, Underbog
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
 
 enum eBlackStalker
@@ -72,7 +72,6 @@ public:
             if (IsHeroic())
                 events.ScheduleEvent(EVENT_SPELL_SPORES, urand(10000, 15000));
         }
-
 
         void JustSummoned(Creature* summon) override
         {

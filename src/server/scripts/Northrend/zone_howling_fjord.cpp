@@ -16,12 +16,12 @@ npc_plaguehound_tracker
 npc_apothecary_hanes
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 // Ours
@@ -135,7 +135,6 @@ public:
         return new npc_your_inner_turmoilAI(creature);
     }
 };
-
 
 // Theirs
 /*######

@@ -4,10 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "InstanceScript.h"
 #include "blackrock_depths.h"
+#include "InstanceScript.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 #define TIMER_TOMBOFTHESEVEN    15000
 #define MAX_ENCOUNTER           6

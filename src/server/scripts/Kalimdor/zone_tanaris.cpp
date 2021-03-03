@@ -20,12 +20,12 @@ npc_OOX17
 npc_tooga
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
-#include "Player.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 /*######
@@ -136,7 +136,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 /*######
@@ -269,7 +268,6 @@ public:
             npc_escortAI::UpdateAI(diff);
         }
     };
-
 };
 
 /*######
@@ -315,7 +313,6 @@ public:
 
         return true;
     }
-
 };
 
 /*######
@@ -379,7 +376,6 @@ public:
 
         return true;
     }
-
 };
 
 /*######
@@ -632,7 +628,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_tanaris()

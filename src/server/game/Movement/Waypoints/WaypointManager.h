@@ -8,8 +8,8 @@
 #define ACORE_WAYPOINTMANAGER_H
 
 #include "Common.h"
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 enum WaypointMoveType
 {

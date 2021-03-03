@@ -15,10 +15,10 @@ EndScriptData */
 npc_ruul_snowhoof
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 
 /*####
 # npc_ruul_snowhoof
@@ -293,7 +293,6 @@ public:
         uint8  waveId;
     public:
         bool   _isBrazierExtinguished;
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override

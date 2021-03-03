@@ -7,11 +7,11 @@
 #ifndef _WARDEN_WIN_H
 #define _WARDEN_WIN_H
 
-#include <map>
+#include "ByteBuffer.h"
 #include "Cryptography/ARC4.h"
 #include "Cryptography/BigNumber.h"
-#include "ByteBuffer.h"
 #include "Warden.h"
+#include <map>
 
 #if defined(__GNUC__)
 #pragma pack(1)
@@ -69,14 +69,15 @@ public:
     void InitializeModule() override;
     void RequestHash() override;
     void HandleHashResult(ByteBuffer& buff) override;
-    void RequestData() override;
+    void RequestChecks() override;
     void HandleData(ByteBuffer& buff) override;
 
 private:
     uint32 _serverTicks;
-    std::list<uint16> _otherChecksTodo;
-    std::list<uint16> _memChecksTodo;
-    std::list<uint16> _currentChecks;
+    std::list<uint16> _ChecksTodo[MAX_WARDEN_CHECK_TYPES];
+
+    std::list<uint16> _CurrentChecks;
+    std::list<uint16> _PendingChecks;
 };
 
-#endif
+#endif // _WARDEN_WIN_H

@@ -13,9 +13,9 @@
 #include "GuildMgr.h"
 #include "Language.h"
 #include "Log.h"
+#include "Opcodes.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
-#include "Opcodes.h"
 
 #define MAX_GUILD_BANK_TAB_TEXT_LEN 500
 #define EMBLEM_PRICE 10 * GOLD
@@ -75,17 +75,17 @@ inline uint32 _GetGuildBankTabPrice(uint8 tabId)
     switch (tabId)
     {
         case 0:
-            return 100;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_0);
         case 1:
-            return 250;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_1);
         case 2:
-            return 500;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_2);
         case 3:
-            return 1000;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_3);
         case 4:
-            return 2500;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_4);
         case 5:
-            return 5000;
+            return sWorld->getIntConfig(CONFIG_GUILD_BANK_TAB_COST_5);
         default:
             return 0;
     }
@@ -471,7 +471,6 @@ bool Guild::BankTab::WriteSlotPacket(WorldPacket& data, uint8 slotId, bool ignor
     {
         data << uint32(0);                                  // 3.3.0 (0x00018020, 0x00018000)
 
-
         if (uint32 random = pItem->GetItemRandomPropertyId())
         {
             data << uint32(random);                         // Random item property id
@@ -532,7 +531,7 @@ void Guild::BankTab::SetText(std::string const& text)
 }
 
 // Sets/removes contents of specified slot.
-// If pItem == NULL contents are removed.
+// If pItem == nullptr contents are removed.
 bool Guild::BankTab::SetItem(SQLTransaction& trans, uint8 slotId, Item* item)
 {
     if (slotId >= GUILD_BANK_MAX_SLOTS)
@@ -1204,6 +1203,11 @@ bool Guild::Create(Player* pLeader, std::string const& name)
     _CreateDefaultGuildRanks(pLeaderSession->GetSessionDbLocaleIndex()); // Create default ranks
     bool ret = AddMember(m_leaderGuid, GR_GUILDMASTER);                  // Add guildmaster
 
+    for (short i = 0; i < static_cast<short>(sWorld->getIntConfig(CONFIG_GUILD_BANK_INITIAL_TABS)); i++)
+    {
+        _CreateNewBankTab();
+    }
+
     if (ret)
         sScriptMgr->OnGuildCreate(this, pLeader, name);
 
@@ -1305,7 +1309,6 @@ void Guild::HandleRoster(WorldSession* session)
 
     for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
         itr->second->WritePacket(data, _HasRankRight(session->GetPlayer(), GR_RIGHT_VIEWOFFNOTE));
-
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "SMSG_GUILD_ROSTER [%s]", session->GetPlayerInfo().c_str());
@@ -1486,7 +1489,7 @@ void Guild::HandleBuyBankTab(WorldSession* session, uint8 tabId)
     if (tabId != _GetPurchasedTabsSize())
         return;
 
-    uint32 tabCost = _GetGuildBankTabPrice(tabId) * GOLD;
+    uint32 tabCost = _GetGuildBankTabPrice(tabId);
     if (!tabCost)
         return;
 
@@ -2137,7 +2140,7 @@ bool Guild::Validate()
         _SetLeaderGUID(pLeader);
 
     // Check config if multiple guildmasters are allowed
-    if (!sConfigMgr->GetBoolDefault("Guild.AllowMultipleGuildMaster", 0))
+    if (!sConfigMgr->GetOption<bool>("Guild.AllowMultipleGuildMaster", 0))
         for (Members::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
             if (itr->second->GetRankId() == GR_GUILDMASTER && !itr->second->IsSamePlayer(m_leaderGuid))
                 itr->second->ChangeRank(GR_OFFICER);
@@ -2152,7 +2155,7 @@ void Guild::BroadcastToGuild(WorldSession* session, bool officerOnly, std::strin
     if (session && session->GetPlayer() && _HasRankRight(session->GetPlayer(), officerOnly ? GR_RIGHT_OFFCHATSPEAK : GR_RIGHT_GCHATSPEAK))
     {
         WorldPacket data;
-        ChatHandler::BuildChatPacket(data, officerOnly ? CHAT_MSG_OFFICER : CHAT_MSG_GUILD, Language(language), session->GetPlayer(), NULL, msg);
+        ChatHandler::BuildChatPacket(data, officerOnly ? CHAT_MSG_OFFICER : CHAT_MSG_GUILD, Language(language), session->GetPlayer(), nullptr, msg);
         for (Members::const_iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
             if (Player* player = itr->second->FindPlayer())
                 if (_HasRankRight(player, officerOnly ? GR_RIGHT_OFFCHATLISTEN : GR_RIGHT_GCHATLISTEN) && !player->GetSocial()->HasIgnore(session->GetPlayer()->GetGUIDLow()))
@@ -2870,7 +2873,7 @@ void Guild::_BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* par
 #endif
 }
 
-void Guild::_SendBankList(WorldSession* session /* = NULL*/, uint8 tabId /*= 0*/, bool sendAllSlots /*= false*/, SlotIds* slots /*= NULL*/) const
+void Guild::_SendBankList(WorldSession* session /* = nullptr*/, uint8 tabId /*= 0*/, bool sendAllSlots /*= false*/, SlotIds* slots /*= nullptr*/) const
 {
     WorldPacket data(SMSG_GUILD_BANK_LIST, 500);
     data << uint64(m_bankMoney);

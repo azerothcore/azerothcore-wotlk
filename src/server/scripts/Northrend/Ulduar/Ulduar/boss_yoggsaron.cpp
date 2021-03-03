@@ -2,17 +2,17 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "ulduar.h"
-#include "ScriptedEscortAI.h"
-#include "SpellAuras.h"
-#include "PassiveAI.h"
-#include "Opcodes.h"
-#include "Player.h"
 #include "CreatureAI.h"
 #include "Object.h"
+#include "Opcodes.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "ulduar.h"
 
 enum YoggSpells
 {
@@ -285,7 +285,6 @@ enum Misc
     ACTION_ILLUSION_ICECROWN            = 2,
     ACTION_ILLUSION_STORMWIND           = 3,
 
-
     EVENT_PHASE_ONE                     = 1,
     EVENT_PHASE_TWO                     = 2,
     EVENT_PHASE_THREE                   = 3,
@@ -318,7 +317,6 @@ static LocationsXY yoggPortalLoc[] =
 };
 
 const Position Middle = {1980.28f, -25.5868f, 329.397f, M_PI * 1.5f};
-
 
 class boss_yoggsaron_sara : public CreatureScript
 {
@@ -661,7 +659,7 @@ public:
 
             // Illusion shatters (param - stun time)
             WorldPacket data;
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, NULL, "Illusion shatters and a path to the central chamber opens!");
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, "Illusion shatters and a path to the central chamber opens!");
             me->SendMessageToSetInRange(&data, 500, false);
 
             uint32 timer = events.GetNextEventTime(EVENT_SARA_P2_OPEN_PORTALS);
@@ -988,7 +986,7 @@ public:
 
         void JustDied(Unit*) override
         {
-            me->CastSpell((Unit*)NULL, SPELL_SHADOW_NOVA, true);
+            me->CastSpell((Unit*)nullptr, SPELL_SHADOW_NOVA, true);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1906,12 +1904,12 @@ public:
             WorldPacket data;
             if (creature->GetGUID() != _yoggGUID)
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 creature->SendMessageToSetInRange(&data, 90, true);
             }
             else if (Creature* cr = me->SummonTrigger(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 5, 0, 5000))
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 cr->SendMessageToSetInRange(&data, 90, true);
             }
             else
@@ -1975,7 +1973,6 @@ public:
     };
 };
 
-
 class boss_yoggsaron_llane : public CreatureScript
 {
 public:
@@ -2021,12 +2018,12 @@ public:
             WorldPacket data;
             if (creature->GetGUID() != _yoggGUID)
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 creature->SendMessageToSetInRange(&data, 90, true);
             }
             else if (Creature* cr = me->SummonTrigger(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 5, 0, 5000))
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 cr->SendMessageToSetInRange(&data, 90, true);
             }
             else
@@ -2141,12 +2138,12 @@ public:
             WorldPacket data;
             if (creature->GetGUID() != _yoggGUID)
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 creature->SendMessageToSetInRange(&data, 90, true);
             }
             else if (Creature* cr = me->SummonTrigger(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 5, 0, 5000))
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 cr->SendMessageToSetInRange(&data, 90, true);
             }
             else
@@ -2534,7 +2531,6 @@ public:
     {
         PrepareAuraScript(spell_yogg_saron_protective_gaze_AuraScript);
 
-
         void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
         {
             // Set absorbtion amount to unlimited
@@ -2891,15 +2887,13 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_GRIM_REPRISAL_DAMAGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_GRIM_REPRISAL_DAMAGE });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             int32 damage = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), 60);
-            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetDamageInfo()->GetAttacker(), true, NULL, aurEff);
+            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetDamageInfo()->GetAttacker(), true, nullptr, aurEff);
         }
 
         void Register() override
@@ -2966,7 +2960,6 @@ public:
 private:
     uint8 const _requiredIllusion;
 };
-
 
 class achievement_yogg_saron_kiss_and_make_up : public AchievementCriteriaScript
 {

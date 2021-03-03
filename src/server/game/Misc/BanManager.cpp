@@ -2,13 +2,13 @@
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
-#include "BanManager.h"
 #include "AccountMgr.h"
+#include "BanManager.h"
 #include "DatabaseEnv.h"
+#include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "Language.h"
 #include "ScriptMgr.h"
 #include "World.h"
 #include "WorldSession.h"
@@ -198,7 +198,6 @@ BanReturn BanManager::BanIP(std::string const& IP, std::string const& Duration, 
         if (WorldSession* session = sWorld->FindOfflineSession(AccountID))
             if (session->GetPlayerName() != Author)
                 session->KickPlayer("Ban IP at condition 'FindOfflineSession(account)->GetPlayerName() != author'");
-
     } while (resultAccounts->NextRow());
 
     LoginDatabase.CommitTransaction(trans);

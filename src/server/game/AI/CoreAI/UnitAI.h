@@ -7,9 +7,9 @@
 #ifndef ACORE_UNITAI_H
 #define ACORE_UNITAI_H
 
+#include "Containers.h"
 #include "Define.h"
 #include "Unit.h"
-#include "Containers.h"
 #include <list>
 
 class Player;
@@ -110,7 +110,6 @@ struct PowerUsersSelector : public acore::unary_function<Unit*, bool>
     Powers const _power;
     float const _dist;
     bool const _playerOnly;
-
 
     PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly) { }
 

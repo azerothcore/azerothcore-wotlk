@@ -4,18 +4,18 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "OutdoorPvPSI.h"
-#include "WorldPacket.h"
-#include "Player.h"
 #include "GameObject.h"
+#include "Language.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
+#include "OutdoorPvPSI.h"
+#include "Player.h"
 #include "ReputationMgr.h"
-#include "Language.h"
-#include "World.h"
+#include "ScriptMgr.h"
 #include "Transport.h"
+#include "World.h"
+#include "WorldPacket.h"
 
 OutdoorPvPSI::OutdoorPvPSI()
 {
@@ -234,7 +234,6 @@ bool OutdoorPvPSI::HandleCustomSpell(Player* player, uint32 spellId, GameObject*
 class OutdoorPvP_silithus : public OutdoorPvPScript
 {
 public:
-
     OutdoorPvP_silithus()
         : OutdoorPvPScript("outdoorpvp_si")
     {

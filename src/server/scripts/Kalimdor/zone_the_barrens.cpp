@@ -20,11 +20,11 @@ npc_twiggy_flathead
 npc_wizzlecrank_shredder
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 /*######
@@ -62,7 +62,6 @@ public:
         SendGossipMenuFor(player, 3557, creature->GetGUID());
         return true;
     }
-
 };
 
 /*######
@@ -160,7 +159,6 @@ public:
             }
         }
     };
-
 };
 
 /*######
@@ -262,7 +260,6 @@ public:
             }
         }
     };
-
 };
 
 /*#####
@@ -485,7 +482,6 @@ public:
             }
         }
     };
-
 };
 
 /*#####
@@ -649,7 +645,6 @@ public:
     {
         return new npc_wizzlecrank_shredderAI(creature);
     }
-
 };
 
 void AddSC_the_barrens()

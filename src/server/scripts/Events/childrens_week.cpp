@@ -4,10 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuras.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
 
 enum Orphans
 {
@@ -218,7 +218,6 @@ public:
         int8 phase;
         uint64 playerGUID;
         uint64 orphanGUID;
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -404,7 +403,6 @@ public:
         uint8 phase;
         uint64 playerGUID;
         uint64 orphanGUID;
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -492,7 +490,6 @@ public:
         int8 phase;
         uint64 playerGUID;
         uint64 orphanGUID;
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -579,7 +576,6 @@ public:
         int8 phase;
         uint64 playerGUID;
         uint64 orphanGUID;
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -675,7 +671,6 @@ public:
         int8 phase;
         uint64 playerGUID;
         uint64 orphanGUID;
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -835,7 +830,6 @@ public:
         uint32 timer;
         uint64 playerGUID;
         uint64 orphanGUID;
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override

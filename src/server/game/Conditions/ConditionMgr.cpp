@@ -13,9 +13,9 @@
 #include "ReputationMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
-#include "Spell.h"
 
 // Checks if object meets the condition
 // Can have CONDITION_SOURCE_TYPE_NONE && !mReferenceId if called from a special event (ie: eventAI)
@@ -717,7 +717,6 @@ bool ConditionMgr::IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, 
                     sLog->outDebug(LOG_FILTER_CONDITIONSYS, "IsPlayerMeetToConditionList: Reference template -%u not found", (*i)->ReferenceId);
 #endif
                 }
-
             }
             else //handle normal condition
             {
@@ -919,7 +918,6 @@ void ConditionMgr::LoadConditions(bool isReload)
 
     do
     {
-
         Field* fields = result->Fetch();
 
         Condition* cond = new Condition();

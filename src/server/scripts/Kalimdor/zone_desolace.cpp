@@ -17,11 +17,11 @@ npc_dalinda_malem
 go_demon_portal
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 // Ours
@@ -54,7 +54,6 @@ enum Caravan
     NPC_LESSER_INFERNAL                 = 4676,
     NPC_DOOMWARDER                      = 4677,
     NPC_NETHER                          = 4684,
-
 };
 
 class npc_cork_gizelton : public CreatureScript
@@ -376,7 +375,6 @@ public:
                 case 282:
                     events.ScheduleEvent(EVENT_RESTART_ESCORT, 1000);
                     break;
-
             }
         }
 
@@ -412,7 +410,6 @@ public:
     };
 };
 
-
 // Theirs
 enum DyingKodo
 {
@@ -430,7 +427,6 @@ enum DyingKodo
     SPELL_KODO_KOMBO_PLAYER_BUFF    = 18172,
     SPELL_KODO_KOMBO_DESPAWN_BUFF   = 18377,
     SPELL_KODO_KOMBO_GOSSIP         = 18362
-
 };
 
 class npc_aged_dying_ancient_kodo : public CreatureScript
@@ -444,7 +440,7 @@ public:
 
         void JustRespawned() override
         {
-            me->UpdateEntry(RAND(NPC_AGED_KODO, NPC_DYING_KODO, NPC_ANCIENT_KODO), NULL, false);
+            me->UpdateEntry(RAND(NPC_AGED_KODO, NPC_DYING_KODO, NPC_ANCIENT_KODO), nullptr, false);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -467,7 +463,7 @@ public:
                 if (!(caster->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF) || me->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
                         && (me->GetEntry() == NPC_AGED_KODO || me->GetEntry() == NPC_DYING_KODO || me->GetEntry() == NPC_ANCIENT_KODO))
                 {
-                    me->UpdateEntry(NPC_TAMED_KODO, NULL, false);
+                    me->UpdateEntry(NPC_TAMED_KODO, nullptr, false);
                     EnterEvadeMode();
                     me->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, me->GetFollowAngle());
 
@@ -499,7 +495,6 @@ public:
     {
         return new npc_aged_dying_ancient_kodoAI(creature);
     }
-
 };
 
 /*######

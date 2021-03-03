@@ -16,11 +16,11 @@ npc_braug_dimspirit
 npc_kaya_flathoof
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 
 /*######
 ## npc_braug_dimspirit
@@ -44,7 +44,6 @@ public:
         {
             CloseGossipMenuFor(player);
             creature->CastSpell(player, 6766, false);
-
         }
         if (action == GOSSIP_ACTION_INFO_DEF + 2)
         {
@@ -74,7 +73,6 @@ public:
 
         return true;
     }
-
 };
 
 /*######
@@ -153,7 +151,6 @@ public:
     {
         return new npc_kaya_flathoofAI(creature);
     }
-
 };
 
 /*######

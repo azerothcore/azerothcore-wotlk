@@ -15,8 +15,8 @@ EndScriptData */
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
-#include "Player.h"
 #include "Pet.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 
 class reset_commandscript : public CommandScript
@@ -28,7 +28,7 @@ public:
     {
         static std::vector<ChatCommand> resetCommandTable =
         {
-            { "achievements",   SEC_ADMINISTRATOR,  true,  &HandleResetAchievementsCommand,     "" },
+            { "achievements",   SEC_CONSOLE,        true,  &HandleResetAchievementsCommand,     "" },
             { "honor",          SEC_ADMINISTRATOR,  true,  &HandleResetHonorCommand,            "" },
             { "level",          SEC_ADMINISTRATOR,  true,  &HandleResetLevelCommand,            "" },
             { "spells",         SEC_ADMINISTRATOR,  true,  &HandleResetSpellsCommand,           "" },

@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "LFG.h"
 #include "Language.h"
+#include "LFG.h"
 #include "ObjectMgr.h"
 
 namespace lfg
@@ -95,4 +95,3 @@ namespace lfg
     }
 
 } // namespace lfg
-

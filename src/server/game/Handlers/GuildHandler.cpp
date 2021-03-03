@@ -5,16 +5,16 @@
  */
 
 #include "Common.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "World.h"
-#include "ObjectMgr.h"
+#include "GossipDef.h"
+#include "Guild.h"
 #include "GuildMgr.h"
 #include "Log.h"
+#include "ObjectMgr.h"
 #include "Opcodes.h"
-#include "Guild.h"
-#include "GossipDef.h"
 #include "SocialMgr.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 // Cleanup bad characters
 void cleanStr(std::string& str)
@@ -563,7 +563,6 @@ void WorldSession::HandleGuildBankBuyTab(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_BUY_TAB [%s]: Go: [" UI64FMTD "], TabId: %u", GetPlayerInfo().c_str(), guid, tabId);
 #endif
-
 
     if (GetPlayer()->GetGameObjectIfCanInteractWith(guid, GAMEOBJECT_TYPE_GUILD_BANK))
         if (Guild* guild = GetPlayer()->GetGuild())

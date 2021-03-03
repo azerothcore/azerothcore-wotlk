@@ -11,8 +11,8 @@ SDComment:
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
@@ -122,7 +122,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class boss_vem : public CreatureScript
@@ -214,7 +213,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class boss_yauj : public CreatureScript
@@ -326,7 +324,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_bug_trio()

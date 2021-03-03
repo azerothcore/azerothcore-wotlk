@@ -4,10 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "hyjal.h"
 #include "hyjal_trash.h"
+#include "hyjal.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -168,7 +168,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_lesser_doomguard : public CreatureScript
@@ -265,7 +264,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_azgalor()

@@ -2,12 +2,12 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "ulduar.h"
-#include "SpellAuraEffects.h"
-#include "Player.h"
 
 enum AssemblySpells
 {
@@ -65,7 +65,6 @@ enum AssemblySpells
 #define SPELL_OVERLOAD              RAID_MODE(SPELL_OVERLOAD_10, SPELL_OVERLOAD_25)
 #define SPELL_LIGHTNING_WHIRL       RAID_MODE(SPELL_LIGHTNING_WHIRL_10, SPELL_LIGHTNING_WHIRL_25)
 #define SPELL_LIGHTNING_TENDRILS    RAID_MODE(SPELL_LIGHTNING_TENDRILS_10, SPELL_LIGHTNING_TENDRILS_25)
-
 
 enum eEnums
 {
@@ -176,7 +175,6 @@ void RestoreAssemblyHealth(uint64 guid1, uint64 guid2, Creature* me)
     if(Creature* cr2 = ObjectAccessor::GetCreature(*me, guid2))
         if(cr2->IsAlive())
             cr2->SetHealth(cr2->GetMaxHealth());
-
 }
 
 class boss_steelbreaker : public CreatureScript
@@ -830,7 +828,6 @@ public:
         }
     };
 };
-
 
 class spell_shield_of_runes : public SpellScriptLoader
 {

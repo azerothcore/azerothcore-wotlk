@@ -4,29 +4,30 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "ObjectAccessor.h"
-#include "ObjectMgr.h"
-#include "GuildMgr.h"
-#include "World.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "DatabaseEnv.h"
+#include "AccountMgr.h"
 #include "CellImpl.h"
-#include "Chat.h"
 #include "ChannelMgr.h"
+#include "Chat.h"
+#include "Common.h"
+#include "DatabaseEnv.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "Guild.h"
+#include "GuildMgr.h"
 #include "Language.h"
 #include "Log.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
-#include "Util.h"
 #include "ScriptMgr.h"
-#include "AccountMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "Util.h"
+#include "Warden.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -280,6 +281,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     if (lang != LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHAT_FAKE_MESSAGE_PREVENTING))
         stripLineInvisibleChars(msg);
 
+    // Our Warden module also uses SendAddonMessage as a way to communicate Lua check results to the server, see if this is that
+    if ((type == CHAT_MSG_GUILD) && (lang == LANG_ADDON) && _warden && _warden->ProcessLuaCheckResponse(msg))
+    {
+        return;
+    }
+
     // pussywizard:
     if (msg.length() > 255 || (lang != LANG_ADDON && msg.find("|0") != std::string::npos))
         return;
@@ -426,7 +433,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 #endif
                 WorldPacket data;
-                ChatHandler::BuildChatPacket(data, ChatMsg(type), Language(lang), sender, NULL, msg);
+                ChatHandler::BuildChatPacket(data, ChatMsg(type), Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false, group->GetMemberGroup(GetPlayer()->GetGUID()));
             }
             break;
@@ -481,7 +488,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 #endif
                 WorldPacket data;
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID, Language(lang), sender, NULL, msg);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
             break;
@@ -502,7 +509,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 #endif
                 WorldPacket data;
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_LEADER, Language(lang), sender, NULL, msg);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_LEADER, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
             break;
@@ -519,7 +526,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 #endif
                 WorldPacket data;
                 //in battleground, raid warning is sent only to players in battleground - code is ok
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_WARNING, Language(lang), sender, NULL, msg);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_WARNING, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
             break;
@@ -536,7 +543,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 #endif
                 WorldPacket data;
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND, Language(lang), sender, NULL, msg);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
             break;
@@ -553,7 +560,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 #endif
                 WorldPacket data;
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND_LEADER, Language(lang), sender, NULL, msg);
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND_LEADER, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
             break;

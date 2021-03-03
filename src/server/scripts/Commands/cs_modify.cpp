@@ -11,6 +11,7 @@ Comment: All modify related commands
 Category: commandscripts
 EndScriptData */
 
+#include "AccountMgr.h"
 #include "Chat.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -18,7 +19,6 @@ EndScriptData */
 #include "Player.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
-#include "AccountMgr.h"
 
 class modify_commandscript : public CommandScript
 {
@@ -63,8 +63,8 @@ public:
 
         static std::vector<ChatCommand> morphCommandTable =
         {
-            { "reset",      SEC_GAMEMASTER,     false, &HandleMorphResetCommand, "" },
-            { "target",     SEC_GAMEMASTER,     false, &HandleMorphTargetCommand, "" }
+            { "reset",      SEC_MODERATOR,     false, &HandleMorphResetCommand, "" },
+            { "target",     SEC_MODERATOR,     false, &HandleMorphTargetCommand, "" }
         };
 
         static std::vector<ChatCommand> commandTable =

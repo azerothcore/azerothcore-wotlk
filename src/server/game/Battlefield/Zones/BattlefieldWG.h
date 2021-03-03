@@ -7,10 +7,10 @@
 #ifndef BATTLEFIELD_WG_
 #define BATTLEFIELD_WG_
 
-#include "ObjectAccessor.h"
-#include "WorldPacket.h"
 #include "Battlefield.h"
+#include "ObjectAccessor.h"
 #include "World.h"
+#include "WorldPacket.h"
 
 class Group;
 class BattlefieldWG;
@@ -25,13 +25,11 @@ typedef std::set<WGWorkshop*> Workshop;
 typedef std::set<Group*> GroupSet;
 //typedef std::set<WintergraspCapturePoint *> CapturePointSet; unused ?
 
-
 const uint32 VehNumWorldState[2] = { 3680, 3490 };
 const uint32 MaxVehNumWorldState[2] = { 3681, 3491 };
 const uint32 ClockWorldState[2] = { 3781, 4354 };
 const uint32 WintergraspFaction[3] = { 1, 2, 35 };
 float const WintergraspStalkerPos[4]    = { 4948.985f, 2937.789f, 550.5172f, 1.815142f };
-
 
 enum WintergraspSpells
 {
@@ -375,7 +373,7 @@ public:
     bool SetupBattlefield() override;
 
     /// Return pointer to relic object
-    GameObject* GetRelic() { return ObjectAccessor::GetObjectInWorld(m_titansRelic, (GameObject*)NULL); }
+    GameObject* GetRelic() { return ObjectAccessor::GetObjectInWorld(m_titansRelic, (GameObject*)nullptr); }
 
     /// Define relic object
     //void SetRelic(GameObject* relic) { m_titansRelic = relic; }
@@ -1138,11 +1136,11 @@ struct BfWGGameObjectBuilding
                 break;
         }
 
-        GameObject* go = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL);
+        GameObject* go = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)nullptr);
         if (go)
         {
             // Rebuild gameobject
-            go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
+            go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
             go->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[m_Team]);
         }
 
@@ -1192,7 +1190,7 @@ struct BfWGGameObjectBuilding
         {
             // Inform the global wintergrasp script of the destruction of this object
             case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
-                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL));
+                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)nullptr));
                 break;
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
                 m_WG->SetRelicInteractible(true);
@@ -1204,7 +1202,7 @@ struct BfWGGameObjectBuilding
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
             case BATTLEFIELD_WG_OBJECTTYPE_WALL:
             case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
-                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL));
+                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)nullptr));
                 break;
         }
 
@@ -1249,7 +1247,7 @@ struct BfWGGameObjectBuilding
             {
                 case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT:
                 case BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT:
-                    gobj->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
+                    gobj->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
                     break;
                 case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DESTROY:
                 case BATTLEFIELD_WG_OBJECTSTATE_HORDE_DESTROY:
@@ -1381,7 +1379,7 @@ struct BfWGGameObjectBuilding
 
     void UpdateTurretAttack(bool disable)
     {
-        GameObject* build = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)NULL);
+        GameObject* build = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)nullptr);
         if (!build)
             return;
 

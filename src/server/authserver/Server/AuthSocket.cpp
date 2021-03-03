@@ -580,7 +580,6 @@ bool AuthSocket::_HandleLogonChallenge()
                     for (int i = 0; i < 4; ++i)
                         _localizationName[i] = ch->country[4 - i - 1];
 
-
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                     sLog->outDebug( LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str (), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName) );
 #endif
@@ -777,10 +776,10 @@ bool AuthSocket::_HandleLogonProof()
         sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] account %s tried to login with invalid password!", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str());
 #endif
 
-        uint32 MaxWrongPassCount = sConfigMgr->GetIntDefault("WrongPass.MaxCount", 0);
+        uint32 MaxWrongPassCount = sConfigMgr->GetOption<int32>("WrongPass.MaxCount", 0);
 
         // We can not include the failed account login hook. However, this is a workaround to still log this.
-        if (sConfigMgr->GetBoolDefault("WrongPass.Logging", false))
+        if (sConfigMgr->GetOption<bool>("WrongPass.Logging", false))
         {
             PreparedStatement* logstmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FALP_IP_LOGGING);
             logstmt->setString(0, _login);
@@ -806,8 +805,8 @@ bool AuthSocket::_HandleLogonProof()
 
                 if (failed_logins >= MaxWrongPassCount)
                 {
-                    uint32 WrongPassBanTime = sConfigMgr->GetIntDefault("WrongPass.BanTime", 600);
-                    bool WrongPassBanType = sConfigMgr->GetBoolDefault("WrongPass.BanType", false);
+                    uint32 WrongPassBanTime = sConfigMgr->GetOption<int32>("WrongPass.BanTime", 600);
+                    bool WrongPassBanType = sConfigMgr->GetOption<bool>("WrongPass.BanType", false);
 
                     if (WrongPassBanType)
                     {

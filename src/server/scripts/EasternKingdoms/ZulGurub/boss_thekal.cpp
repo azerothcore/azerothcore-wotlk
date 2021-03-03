@@ -11,8 +11,8 @@ SDComment: Almost finished.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "zulgurub.h"
 
 enum Says
@@ -400,7 +400,6 @@ public:
 class npc_zealot_zath : public CreatureScript
 {
 public:
-
     npc_zealot_zath()
         : CreatureScript("npc_zealot_zath")
     {

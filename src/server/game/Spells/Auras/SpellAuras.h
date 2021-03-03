@@ -48,7 +48,6 @@ private:
     void _InitFlags(Unit* caster, uint8 effMask);
     void _HandleEffect(uint8 effIndex, bool apply);
 public:
-
     Unit* GetTarget() const { return _target; }
     Aura* GetBase() const { return _base; }
 
@@ -81,8 +80,8 @@ public:
     typedef std::map<uint64, AuraApplication*> ApplicationMap;
 
     static uint8 BuildEffectMaskForOwner(SpellInfo const* spellProto, uint8 avalibleEffectMask, WorldObject* owner);
-    static Aura* TryRefreshStackOrCreate(SpellInfo const* spellproto, uint8 tryEffMask, WorldObject* owner, Unit* caster, int32* baseAmount = NULL, Item* castItem = NULL, uint64 casterGUID = 0, bool* refresh = NULL, bool periodicReset = false);
-    static Aura* TryCreate(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount = NULL, Item* castItem = NULL, uint64 casterGUID = 0);
+    static Aura* TryRefreshStackOrCreate(SpellInfo const* spellproto, uint8 tryEffMask, WorldObject* owner, Unit* caster, int32* baseAmount = nullptr, Item* castItem = nullptr, uint64 casterGUID = 0, bool* refresh = nullptr, bool periodicReset = false);
+    static Aura* TryCreate(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount = nullptr, Item* castItem = nullptr, uint64 casterGUID = 0);
     static Aura* Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, uint64 casterGUID);
     explicit Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* castItem, uint64 casterGUID);
     void _InitEffects(uint8 effMask, Unit* caster, int32* baseAmount);

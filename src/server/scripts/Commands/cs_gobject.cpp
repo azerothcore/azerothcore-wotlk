@@ -11,17 +11,17 @@ Comment: All gobject related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "GameEventMgr.h"
-#include "ObjectMgr.h"
-#include "PoolMgr.h"
-#include "MapManager.h"
 #include "Chat.h"
-#include "Language.h"
-#include "Player.h"
-#include "Opcodes.h"
-#include "Transport.h"
+#include "GameEventMgr.h"
 #include "GameObject.h"
+#include "Language.h"
+#include "MapManager.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "PoolMgr.h"
+#include "ScriptMgr.h"
+#include "Transport.h"
 
 class gobject_commandscript : public CommandScript
 {
@@ -655,7 +655,6 @@ public:
 
         if (!object)
         {
-
             handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, abs(guidLow));
             handler->SetSentErrorMessage(true);
             return false;

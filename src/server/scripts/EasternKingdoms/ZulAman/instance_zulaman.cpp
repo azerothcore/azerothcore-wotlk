@@ -11,11 +11,11 @@ SDComment:
 SDCategory: Zul'Aman
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
-#include "zulaman.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "TemporarySummon.h"
+#include "zulaman.h"
 
 enum Misc
 {
@@ -392,7 +392,6 @@ public:
 
             return 0;
         }
-
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
@@ -405,4 +404,3 @@ void AddSC_instance_zulaman()
 {
     new instance_zulaman();
 }
-

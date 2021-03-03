@@ -2,14 +2,14 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Transport.h"
 #include "ulduar.h"
 #include "Vehicle.h"
-#include "Player.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Transport.h"
 
 class instance_ulduar : public InstanceMapScript
 {
@@ -100,7 +100,6 @@ public:
         uint64 m_mimironTramGUID;
         uint64 m_keepersgateGUID;
         uint64 m_keepersGossipGUID[4];
-
 
         void Initialize() override
         {
@@ -610,7 +609,7 @@ public:
                 case TYPE_THORIM:
                 case TYPE_FREYA:
                     m_auiEncounter[type] = data;
-                    ShowKeeperGossip(type, NULL, m_keepersGossipGUID[type - TYPE_FREYA]);
+                    ShowKeeperGossip(type, nullptr, m_keepersGossipGUID[type - TYPE_FREYA]);
                     if (GetData(TYPE_MIMIRON) == DONE && GetData(TYPE_FREYA) == DONE && GetData(TYPE_HODIR) == DONE && GetData(TYPE_THORIM) == DONE)
                     {
                         if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
@@ -1017,7 +1016,6 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-
         void Update(uint32 diff) override
         {
             if (_events.Empty())
@@ -1138,7 +1136,6 @@ const Position vehiclePositions[30] =
     {119.8f, -102.37f, 409.803f, 0.0f},
     {119.8f, -112.37f, 409.803f, 0.0f},
 };
-
 
 void instance_ulduar::instance_ulduar_InstanceMapScript::SpawnLeviathanEncounterVehicles(uint8 mode)
 {

@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "blood_furnace.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum eEnums
 {
@@ -26,7 +26,6 @@ enum eEnums
 class boss_the_maker : public CreatureScript
 {
 public:
-
     boss_the_maker() : CreatureScript("boss_the_maker")
     {
     }
@@ -82,7 +81,6 @@ public:
             instance->SetData(DATA_THE_MAKER, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_DOOR2), true);
             instance->HandleGameObject(instance->GetData64(DATA_DOOR3), true);
-
         }
 
         void UpdateAI(uint32 diff) override
@@ -130,4 +128,3 @@ void AddSC_boss_the_maker()
 {
     new boss_the_maker();
 }
-

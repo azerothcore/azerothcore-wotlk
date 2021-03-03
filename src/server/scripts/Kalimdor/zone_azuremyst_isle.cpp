@@ -20,14 +20,14 @@ go_ravager_cage
 npc_death_ravager
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Cell.h"
+#include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "Cell.h"
-#include "CellImpl.h"
-#include "GridNotifiersImpl.h"
-#include "GridNotifiers.h"
+#include "ScriptMgr.h"
 
 /*######
 ## npc_draenei_survivor
@@ -70,7 +70,7 @@ public:
 
             DoCast(me, SPELL_IRRIDATION, true);
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            me->SetPvP(true);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
             me->SetHealth(me->CountPctFromMaxHealth(10));
             me->SetStandState(UNIT_STAND_STATE_SLEEP);

@@ -10,7 +10,7 @@
 #include "MMapManager.h"
 #include "DetourAlloc.h"
 #include "DetourNavMesh.h"
-#include "DetourNavMeshQuery.h"
+#include "Navigation/DetourExtended.h"
 #include "Map.h"
 #include <unordered_map>
 
@@ -38,4 +38,3 @@ namespace MMAP
 }
 
 #endif
-

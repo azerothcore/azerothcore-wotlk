@@ -4,14 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "ObjectMgr.h"
-#include "DatabaseEnv.h"
-
 #include "Bag.h"
+#include "Common.h"
+#include "DatabaseEnv.h"
 #include "Log.h"
-#include "UpdateData.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "UpdateData.h"
 
 Bag::Bag(): Item()
 {
@@ -230,4 +229,3 @@ Item* Bag::GetItemByPos(uint8 slot) const
 
     return nullptr;
 }
-

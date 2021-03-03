@@ -11,12 +11,12 @@ SDComment: Quest support: 3520, 2767, Special vendor Gregan Brewspewer
 SDCategory: Feralas
 EndScriptData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
-#include "Player.h"
 #include "WorldSession.h"
 
 /*######
@@ -54,7 +54,6 @@ public:
         SendGossipMenuFor(player, 2433, creature->GetGUID());
         return true;
     }
-
 };
 
 /*######
@@ -101,7 +100,6 @@ public:
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_oox22fe::npc_oox22feAI, creature->AI()))
                 pEscortAI->Start(true, false, player->GetGUID());
-
         }
         return true;
     }
@@ -168,7 +166,6 @@ public:
             summoned->AI()->AttackStart(me);
         }
     };
-
 };
 
 enum GordunniTrap

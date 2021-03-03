@@ -4,15 +4,15 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "DatabaseEnv.h"
-#include "ObjectMgr.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "Common.h"
+#include "CreatureTextMgr.h"
+#include "DatabaseEnv.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CreatureTextMgr.h"
+#include "ObjectMgr.h"
 
 class CreatureTextBuilder
 {
@@ -183,14 +183,13 @@ void CreatureTextMgr::LoadCreatureTextLocales()
             continue;
 
         ObjectMgr::AddLocaleString(Text, locale, data.Text);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u Creature Text Locale in %u ms", uint32(mLocaleTextMap.size()), GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
-uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject const* whisperTarget /*= NULL*/, ChatMsg msgType /*= CHAT_MSG_ADDON*/, Language language /*= LANG_ADDON*/, CreatureTextRange range /*= TEXT_RANGE_NORMAL*/, uint32 sound /*= 0*/, TeamId teamId /*= TEAM_NEUTRAL*/, bool gmOnly /*= false*/, Player* srcPlr /*= NULL*/)
+uint32 CreatureTextMgr::SendChat(Creature* source, uint8 textGroup, WorldObject const* whisperTarget /*= nullptr*/, ChatMsg msgType /*= CHAT_MSG_ADDON*/, Language language /*= LANG_ADDON*/, CreatureTextRange range /*= TEXT_RANGE_NORMAL*/, uint32 sound /*= 0*/, TeamId teamId /*= TEAM_NEUTRAL*/, bool gmOnly /*= false*/, Player* srcPlr /*= nullptr*/)
 {
     if (!source)
         return 0;

@@ -18,7 +18,6 @@ class Field
     friend class PreparedResultSet;
 
 public:
-
     [[nodiscard]] bool GetBool() const // Wrapper, actually gets integer
     {
         return (GetUInt8() == 1);
@@ -220,11 +219,10 @@ public:
         if (IsNumeric())
         {
             sLog->outSQLDriver("Error: GetCString() on numeric field. Using type: %s.", FieldTypeToString(data.type));
-            return NULL;
+            return nullptr;
         }
 #endif
         return static_cast<char const*>(data.value);
-
     }
 
     [[nodiscard]] std::string GetString() const
@@ -383,7 +381,7 @@ private:
             case MYSQL_TYPE_NEWDATE:
                 return "NEWDATE";
             case MYSQL_TYPE_NULL:
-                return "NULL";
+                return "nullptr";
             case MYSQL_TYPE_SET:
                 return "SET";
             case MYSQL_TYPE_SHORT:
@@ -410,4 +408,3 @@ private:
 };
 
 #endif
-

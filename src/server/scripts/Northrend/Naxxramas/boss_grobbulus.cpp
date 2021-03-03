@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "naxxramas.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
 
 enum Spells
@@ -148,7 +148,7 @@ public:
                     break;
                 case EVENT_SPELL_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    
+
                     break;
                 case EVENT_SPELL_SLIME_SPRAY:
                     Talk(EMOTE_SLIME);
@@ -217,7 +217,6 @@ public:
             me->SetFloatValue(UNIT_FIELD_COMBATREACH, 2.0f + (0.00025f * sizeTimer));
         }
     };
-
 };
 
 class spell_grobbulus_poison : public SpellScriptLoader

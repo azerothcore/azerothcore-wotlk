@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "HomeMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "WorldPacket.h"
-#include "MoveSplineInit.h"
+#include "HomeMovementGenerator.h"
 #include "MoveSpline.h"
+#include "MoveSplineInit.h"
+#include "WorldPacket.h"
 
 void HomeMovementGenerator<Creature>::DoInitialize(Creature* owner)
 {
@@ -26,7 +26,10 @@ void HomeMovementGenerator<Creature>::DoFinalize(Creature* owner)
         owner->LoadCreaturesAddon(true);
         owner->AI()->JustReachedHome();
     }
-    owner->m_targetsNotAcceptable.clear();
+
+    if (!owner->HasSwimmingFlagOutOfCombat())
+        owner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SWIMMING);
+
     owner->UpdateEnvironmentIfNeeded(2);
 }
 
@@ -51,6 +54,7 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature* owner)
         init.SetFacing(o);
     }
 
+    owner->UpdateAllowedPositionZ(x, y, z);
     init.MoveTo(x, y, z, MMAP::MMapFactory::IsPathfindingEnabled(owner->FindMap()), true);
     init.SetWalk(false);
     init.Launch();

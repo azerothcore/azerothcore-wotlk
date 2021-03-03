@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
 #include "CharacterDatabaseCleaner.h"
-#include "World.h"
+#include "Common.h"
 #include "Database/DatabaseEnv.h"
-#include "SpellMgr.h"
 #include "DBCStores.h"
+#include "SpellMgr.h"
+#include "World.h"
 
 void CharacterDatabaseCleaner::CleanDatabase()
 {
@@ -142,4 +142,3 @@ void CharacterDatabaseCleaner::CleanCharacterQuestStatus()
 {
     CharacterDatabase.DirectExecute("DELETE FROM character_queststatus WHERE status = 0");
 }
-

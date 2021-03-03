@@ -7,8 +7,8 @@
 #ifndef AZEROTHCORE_ARENATEAM_H
 #define AZEROTHCORE_ARENATEAM_H
 
-#include "QueryResult.h"
 #include "Map.h"
+#include "QueryResult.h"
 #include <list>
 #include <map>
 
@@ -175,7 +175,6 @@ public:
     void FinishGame(int32 mod, const Map* bgMap);
 
 protected:
-
     uint32      TeamId;
     uint8       Type;
     std::string TeamName;
@@ -191,4 +190,3 @@ protected:
     ArenaTeamStats Stats;
 };
 #endif
-

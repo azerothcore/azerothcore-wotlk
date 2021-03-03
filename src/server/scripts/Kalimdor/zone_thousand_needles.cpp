@@ -19,11 +19,11 @@ npc_enraged_panther
 go_panther_cage
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 
 /*######
 # npc_lakota_windsong
@@ -114,7 +114,6 @@ public:
                 me->SummonCreature(NPC_GRIM_BANDIT, BanditLoc[i + AmbushId], TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
         }
     };
-
 };
 
 /*######
@@ -310,7 +309,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 enum PantherCage
@@ -368,7 +366,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_thousand_needles()

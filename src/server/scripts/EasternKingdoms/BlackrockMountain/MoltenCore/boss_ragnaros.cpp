@@ -11,9 +11,9 @@ SDComment: some spells doesnt work correctly
 SDCategory: Molten Core
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "molten_core.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Texts
 {
@@ -60,7 +60,6 @@ enum Events
     EVENT_INTRO_4               = 11,
     EVENT_INTRO_5               = 12
 };
-
 
 class boss_ragnaros : public CreatureScript
 {
@@ -255,7 +254,6 @@ public:
                                         _hasSubmergedOnce = true;
                                         _isBanished = true;
                                         _emergeTimer = 90000;
-
                                     }
                                     else
                                     {

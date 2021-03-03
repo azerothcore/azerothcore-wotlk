@@ -8,12 +8,12 @@
 #define AZEROTHCORE_GAMEOBJECT_H
 
 #include "Common.h"
-#include "SharedDefines.h"
-#include "Unit.h"
-#include "Object.h"
-#include "LootMgr.h"
 #include "DatabaseEnv.h"
 #include "G3D/Quat.h"
+#include "LootMgr.h"
+#include "Object.h"
+#include "SharedDefines.h"
+#include "Unit.h"
 
 class GameObjectAI;
 class Transport;

@@ -2,14 +2,14 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "ulduar.h"
-#include "ScriptedEscortAI.h"
-#include "SpellAuraEffects.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "ulduar.h"
 
 enum ThorimSpells
 {
@@ -300,7 +300,6 @@ enum Misc
 const Position Middle = {2134.68f, -263.13f, 419.44f, M_PI * 1.5f};
 
 const uint32 RollTable[3] = { 32877, 32878, 32876 };
-
 
 class boss_thorim : public CreatureScript
 {

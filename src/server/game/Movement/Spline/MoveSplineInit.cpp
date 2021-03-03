@@ -4,14 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "MoveSplineInit.h"
-#include "MoveSpline.h"
 #include "MovementPacketBuilder.h"
-#include "Unit.h"
+#include "MoveSpline.h"
+#include "MoveSplineInit.h"
+#include "Opcodes.h"
 #include "Transport.h"
+#include "Unit.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
-#include "Opcodes.h"
 
 namespace Movement
 {
@@ -104,7 +104,13 @@ namespace Movement
                 moveFlagsForSpeed &= ~MOVEMENTFLAG_WALKING;
 
             args.velocity = unit->GetSpeed(SelectSpeedType(moveFlagsForSpeed));
+            if (Creature* creature = unit->ToCreature())
+                if (creature->HasSearchedAssistance())
+                    args.velocity *= 0.66f;
         }
+
+        // limit the speed in the same way the client does
+        args.velocity = std::min(args.velocity, args.flags.catmullrom || args.flags.flying ? 50.0f : std::max(28.0f, unit->GetSpeed(MOVE_RUN) * 4.0f));
 
         if (!args.Validate(unit))
             return 0;
@@ -124,10 +130,7 @@ namespace Movement
         Movement::SplineBase::ControlArray* visualPoints = const_cast<Movement::SplineBase::ControlArray*>(move_spline._Spline().allocateVisualPoints());
         visualPoints->resize(move_spline._Spline().getPointCount());
         // Xinef: Apply hover in creature movement packet
-        if (unit->IsHovering())
-            std::transform(move_spline._Spline().getPoints(false).begin(), move_spline._Spline().getPoints(false).end(), visualPoints->begin(), HoverMovementTransform(unit->GetHoverHeight()));
-        else
-            std::copy(move_spline._Spline().getPoints(false).begin(), move_spline._Spline().getPoints(false).end(), visualPoints->begin());
+        std::copy(move_spline._Spline().getPoints(false).begin(), move_spline._Spline().getPoints(false).end(), visualPoints->begin());
 
         PacketBuilder::WriteMonsterMove(move_spline, data);
         unit->SendMessageToSet(&data, true);
@@ -162,7 +165,7 @@ namespace Movement
         }
 
         args.flags = MoveSplineFlag::Done;
-        unit->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_SPLINE_ENABLED);
+        unit->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_SPLINE_ENABLED);
         move_spline.onTransport = transport;
         move_spline.Initialize(args);
 
@@ -175,11 +178,10 @@ namespace Movement
             data << int8(unit->GetTransSeat());
         }
 
-        // Xinef: increase z position in packet
-        loc.z += unit->GetHoverHeight();
         PacketBuilder::WriteStopMovement(loc, args.splineId, data);
         unit->SendMessageToSet(&data, true);
     }
+
     MoveSplineInit::MoveSplineInit(Unit* m) : unit(m)
     {
         args.splineId = splineIdGen.NewId();

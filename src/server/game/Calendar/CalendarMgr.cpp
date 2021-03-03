@@ -5,12 +5,12 @@
  */
 
 #include "CalendarMgr.h"
-#include "QueryResult.h"
-#include "Log.h"
-#include "Player.h"
 #include "GuildMgr.h"
+#include "Log.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
+#include "Player.h"
+#include "QueryResult.h"
 
 CalendarInvite::~CalendarInvite()
 {
@@ -103,6 +103,7 @@ void CalendarMgr::LoadFromDB()
         } while (result->NextRow());
 
     sLog->outString(">> Loaded %u calendar invites", count);
+    sLog->outString();
 
     for (uint64 i = 1; i < _maxEventId; ++i)
         if (!GetEvent(i))
@@ -400,7 +401,7 @@ CalendarEventStore CalendarMgr::GetPlayerEvents(uint64 guid)
     for (CalendarEventInviteStore::const_iterator itr = _invites.begin(); itr != _invites.end(); ++itr)
         for (CalendarInviteStore::const_iterator itr2 = itr->second.begin(); itr2 != itr->second.end(); ++itr2)
             if ((*itr2)->GetInviteeGUID() == guid)
-                if (CalendarEvent* event = GetEvent(itr->first)) // NULL check added as attempt to fix #11512
+                if (CalendarEvent* event = GetEvent(itr->first)) // nullptr check added as attempt to fix #11512
                     events.insert(event);
 
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
@@ -664,7 +665,7 @@ void CalendarMgr::SendCalendarClearPendingAction(uint64 guid)
     }
 }
 
-void CalendarMgr::SendCalendarCommandResult(uint64 guid, CalendarError err, char const* param /*= NULL*/)
+void CalendarMgr::SendCalendarCommandResult(uint64 guid, CalendarError err, char const* param /*= nullptr*/)
 {
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
     {

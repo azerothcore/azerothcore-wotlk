@@ -4,15 +4,15 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Unit.h"
-#include "Player.h"
-#include "Pet.h"
 #include "Creature.h"
-#include "SharedDefines.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
-#include "SpellMgr.h"
+#include "Pet.h"
+#include "Player.h"
 #include "ScriptMgr.h"
+#include "SharedDefines.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellMgr.h"
+#include "Unit.h"
 
 inline bool _ModifyUInt32(bool apply, uint32& baseValue, int32& amount)
 {
@@ -1100,8 +1100,6 @@ void Creature::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, 
 ########    PETS STAT SYSTEM     ########
 ########                         ########
 #######################################*/
-
-
 
 bool Guardian::UpdateStats(Stats stat)
 {

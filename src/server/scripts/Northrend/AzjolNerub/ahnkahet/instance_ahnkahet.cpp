@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "Player.h"
 #include "ahnkahet.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 class instance_ahnkahet : public InstanceMapScript
 {
@@ -243,7 +243,6 @@ public:
                         m_auiEncounter[i] = NOT_STARTED;
 
                 spheres = data5;
-
             }
             else OUT_LOAD_INST_DATA_FAIL;
 
@@ -283,7 +282,6 @@ public:
 
                 if (!PlayerList.empty())
                     caster->CastSpell(acore::Containers::SelectRandomContainerElement(PlayerList), caster->GetMap()->IsHeroic() ? SPELL_SHADOW_SICKLE_H : SPELL_SHADOW_SICKLE, true);
-
             }
         }
 

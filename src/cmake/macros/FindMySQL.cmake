@@ -1,6 +1,6 @@
 #
 # Find the MySQL client includes and library
-# 
+#
 
 # This module defines
 # MYSQL_INCLUDE_DIR, where to find mysql.h
@@ -154,13 +154,14 @@ find_path(MYSQL_INCLUDE_DIR
     "$ENV{ProgramFiles}/MySQL/*/include"
     "$ENV{SystemDrive}/MySQL/*/include"
     "c:/msys/local/include"
+    "$ENV{MYSQL_INCLUDE_DIR}"
   DOC
     "Specify the directory containing mysql.h."
 )
 
 if( UNIX )
   foreach(LIB ${MYSQL_ADD_LIBRARIES})
-    find_library( MYSQL_LIBRARY 
+    find_library( MYSQL_LIBRARY
       NAMES
         mysql libmysql ${LIB}
       PATHS
@@ -176,7 +177,7 @@ if( UNIX )
 endif( UNIX )
 
 if( WIN32 )
-  find_library( MYSQL_LIBRARY 
+  find_library( MYSQL_LIBRARY
     NAMES
       libmysql
     PATHS
@@ -197,6 +198,7 @@ if( WIN32 )
       "$ENV{ProgramFiles}/MySQL/*/lib/opt"
       "$ENV{SystemDrive}/MySQL/*/lib/opt"
       "c:/msys/local/include"
+      "$ENV{MYSQL_LIBRARY}"
     DOC "Specify the location of the mysql library here."
   )
 endif( WIN32 )

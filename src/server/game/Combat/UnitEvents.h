@@ -36,7 +36,7 @@ enum UNIT_EVENT_TYPE
     // New target should be fetched, could tbe the current target as well
     UEV_THREAT_SET_NEXT_TARGET          = 1 << 5,
 
-    // A new victim (target) was set. Could be NULL
+    // A new victim (target) was set. Could be nullptr
     UEV_THREAT_VICTIM_CHANGED           = 1 << 6,
 
     // Future use
@@ -65,7 +65,6 @@ public:
     [[nodiscard]] bool matchesTypeMask(uint32 pMask) const { return iType & pMask; }
 
     void setType(uint32 pType) { iType = pType; }
-
 };
 
 //==============================================================
@@ -122,4 +121,3 @@ public:
 
 //==============================================================
 #endif
-

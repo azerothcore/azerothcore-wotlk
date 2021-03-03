@@ -4,16 +4,16 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
+#include "CombatAI.h"
+#include "CreatureTextMgr.h"
+#include "Pet.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "Vehicle.h"
-#include "CombatAI.h"
-#include "Player.h"
-#include "Pet.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
-#include "CreatureTextMgr.h"
 #include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 enum qRedRocket
@@ -21,7 +21,6 @@ enum qRedRocket
     SPELL_TORPEDO_EXPLODE                       = 49290,
     SPELL_ALLIANCE_TORPEDO_KILL_CREDIT          = 49510,
     SPELL_HORDE_TORPEDO_KILL_CREDIT             = 49340,
-
 };
 
 class npc_riding_the_red_rocket : public CreatureScript
@@ -71,7 +70,6 @@ public:
         return new npc_riding_the_red_rocketAI(creature);
     }
 };
-
 
 // Theirs
 
@@ -304,7 +302,6 @@ public:
         }
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
-
 
         void UpdateAI(uint32 /*diff*/) override
         {

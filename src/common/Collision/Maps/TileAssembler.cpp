@@ -9,9 +9,7 @@
 #include "BoundingIntervalHierarchy.h"
 #include "VMapDefinitions.h"
 #include "SharedDefines.h"
-
 #include <set>
-#include <iomanip>
 #include <sstream>
 #include <iomanip>
 
@@ -43,7 +41,7 @@ namespace VMAP
     //=================================================================
 
     TileAssembler::TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName)
-        : iDestDir(pDestDirName), iSrcDir(pSrcDirName), iFilterMethod(NULL), iCurrentUniqueNameId(0)
+        : iDestDir(pDestDirName), iSrcDir(pSrcDirName), iFilterMethod(nullptr), iCurrentUniqueNameId(0)
     {
         //mkdir(iDestDir);
         //init();
@@ -408,7 +406,6 @@ namespace VMAP
         READ_OR_RETURN(&mogpflags, sizeof(uint32));
         READ_OR_RETURN(&GroupWMOID, sizeof(uint32));
 
-
         Vector3 vec1, vec2;
         READ_OR_RETURN(&vec1, sizeof(Vector3));
 
@@ -481,7 +478,6 @@ namespace VMAP
 
         return true;
     }
-
 
     GroupModel_Raw::~GroupModel_Raw()
     {

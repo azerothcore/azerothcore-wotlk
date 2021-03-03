@@ -4,27 +4,27 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ArenaSpectator.h"
+#include "Battleground.h"
+#include "BattlegroundMgr.h"
+#include "CellImpl.h"
+#include "Chat.h"
 #include "Common.h"
+#include "Corpse.h"
+#include "GameGraveyard.h"
+#include "InstanceSaveMgr.h"
+#include "Log.h"
+#include "MapManager.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Pet.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "Transport.h"
+#include "WaypointMovementGenerator.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Opcodes.h"
-#include "Log.h"
-#include "Corpse.h"
-#include "Player.h"
-#include "SpellAuras.h"
-#include "MapManager.h"
-#include "Transport.h"
-#include "Battleground.h"
-#include "WaypointMovementGenerator.h"
-#include "InstanceSaveMgr.h"
-#include "ObjectMgr.h"
-#include "CellImpl.h"
-#include "Pet.h"
-#include "ArenaSpectator.h"
-#include "Chat.h"
-#include "BattlegroundMgr.h"
-#include "ScriptMgr.h"
-#include "GameGraveyard.h"
 
 #define MOVEMENT_PACKET_TIME_DELAY 0
 
@@ -85,7 +85,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         return;
     }
 
-    GetPlayer()->Relocate(loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetOrientation());
+    float z = loc.GetPositionZ() + GetPlayer()->GetHoverHeight();
+    GetPlayer()->Relocate(loc.GetPositionX(), loc.GetPositionY(), z, loc.GetOrientation());
 
     GetPlayer()->ResetMap();
     GetPlayer()->SetMap(newMap);
@@ -476,7 +477,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     // Xinef: interrupt parachutes upon falling or landing in water
     if (opcode == MSG_MOVE_FALL_LAND || opcode == MSG_MOVE_START_SWIM)
         mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // Parachutes
-
 
     if (plrMover)                                            // nothing is charmed, or player charmed
     {

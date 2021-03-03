@@ -10,10 +10,10 @@ SD%Complete: 85%
 SDComment:
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "zulaman.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "zulaman.h"
 
 enum Says
 {
@@ -114,7 +114,6 @@ static TransformStruct Transform[4] =
 class boss_zuljin : public CreatureScript
 {
 public:
-
     boss_zuljin()
         : CreatureScript("boss_zuljin")
     {
@@ -560,7 +559,6 @@ public:
 class npc_zuljin_vortex : public CreatureScript
 {
 public:
-
     npc_zuljin_vortex()
         : CreatureScript("npc_zuljin_vortex")
     {
@@ -599,4 +597,3 @@ void AddSC_boss_zuljin()
     new boss_zuljin();
     new npc_zuljin_vortex();
 }
-

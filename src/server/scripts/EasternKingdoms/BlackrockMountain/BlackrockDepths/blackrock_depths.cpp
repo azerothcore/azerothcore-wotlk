@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
+#include "blackrock_depths.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "blackrock_depths.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 uint32 braziersUsed = 0;
@@ -430,7 +430,6 @@ public:
 
         if (creature->IsVendor() && player->GetReputationRank(59) >= REP_FRIENDLY)
             AddGossipItemFor(player, 4781, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
 
         if (player->GetQuestRewardStatus(QUEST_A_BINDING_CONTRACT) != 1 &&
                 !player->HasItemCount(ITEM_THRORIUM_BROTHERHOOD_CONTRACT, 1, true) &&

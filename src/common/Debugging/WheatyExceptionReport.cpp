@@ -35,11 +35,11 @@ inline LPTSTR ErrorMessage(DWORD dw)
     DWORD formatResult = FormatMessage(
                              FORMAT_MESSAGE_ALLOCATE_BUFFER |
                              FORMAT_MESSAGE_FROM_SYSTEM,
-                             NULL,
+                             nullptr,
                              dw,
                              MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                              (LPTSTR) &lpMsgBuf,
-                             0, NULL);
+                             0, nullptr);
     if (formatResult != 0)
         return (LPTSTR)lpMsgBuf;
     else
@@ -48,7 +48,6 @@ inline LPTSTR ErrorMessage(DWORD dw)
         sprintf(msgBuf, "Unknown error: %u", dw);
         return msgBuf;
     }
-
 }
 
 //============================== Global Variables =============================
@@ -69,7 +68,6 @@ bool WheatyExceptionReport::stackOverflowException;
 bool WheatyExceptionReport::alreadyCrashed;
 std::mutex WheatyExceptionReport::alreadyCrashedLock;
 WheatyExceptionReport::pRtlGetVersion WheatyExceptionReport::RtlGetVersion;
-
 
 // Declare global instance of class
 WheatyExceptionReport g_WheatyExceptionReport;
@@ -132,7 +130,7 @@ LONG WINAPI WheatyExceptionReport::WheatyUnhandledExceptionFilter(
 
     TCHAR crash_folder_path[MAX_PATH];
     sprintf_s(crash_folder_path, "%s\\%s", module_folder_name, CrashFolder);
-    if (!CreateDirectory(crash_folder_path, NULL))
+    if (!CreateDirectory(crash_folder_path, nullptr))
     {
         if (GetLastError() != ERROR_ALREADY_EXISTS)
             return 0;
@@ -222,7 +220,7 @@ BOOL WheatyExceptionReport::_GetProcessorName(TCHAR* sProcessorName, DWORD maxco
         return FALSE;
     TCHAR szTmp[2048];
     DWORD cntBytes = sizeof(szTmp);
-    lRet = ::RegQueryValueEx(hKey, _T("ProcessorNameString"), NULL, NULL,
+    lRet = ::RegQueryValueEx(hKey, _T("ProcessorNameString"), nullptr, nullptr,
                              (LPBYTE)szTmp, &cntBytes);
     if (lRet != ERROR_SUCCESS)
         return FALSE;
@@ -584,7 +582,7 @@ void WheatyExceptionReport::GenerateExceptionReport(
 
         CONTEXT trashableContext = *pCtx;
 
-        WriteStackDetails(&trashableContext, false, NULL);
+        WriteStackDetails(&trashableContext, false, nullptr);
         printTracesForAllThreads(false);
 
         //    #ifdef _M_IX86                                          // X86 Only!
@@ -593,7 +591,7 @@ void WheatyExceptionReport::GenerateExceptionReport(
         Log(_T("Local Variables And Parameters\r\n"));
 
         trashableContext = *pCtx;
-        WriteStackDetails(&trashableContext, true, NULL);
+        WriteStackDetails(&trashableContext, true, nullptr);
         printTracesForAllThreads(true);
 
         SymCleanup(GetCurrentProcess());
@@ -766,7 +764,7 @@ void WheatyExceptionReport::WriteStackDetails(
         // Get the next stack frame
         if (! StackWalk64(dwMachineType,
                           m_hProcess,
-                          pThreadHandle != NULL ? pThreadHandle : GetCurrentThread(),
+                          pThreadHandle != nullptr ? pThreadHandle : GetCurrentThread(),
                           &sf,
                           pContext,
                           0,
@@ -795,7 +793,6 @@ void WheatyExceptionReport::WriteStackDetails(
                     &sip.si))                                       // Address of the SYMBOL_INFO structure (inside "sip" object)
         {
             Log(_T("%hs+%I64X"), sip.si.Name, symDisplacement);
-
         }
         else                                                // No symbol found.  Print out the logical address instead.
         {
@@ -838,7 +835,6 @@ void WheatyExceptionReport::WriteStackDetails(
             Log(_T("\r\n"));
         }
     }
-
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -854,7 +850,6 @@ BOOL CALLBACK WheatyExceptionReport::EnumerateSymbolsCallback(
     {
         ClearSymbols();
         FormatSymbolValue(pSymInfo, (STACKFRAME64*)UserContext);
-
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
@@ -974,7 +969,7 @@ void WheatyExceptionReport::DumpTypeIndex(
             char buffer[50];
             FormatOutputValue(buffer, btStdString, 0, (PVOID)offset, sizeof(buffer));
             symbolDetails.top().Value = buffer;
-            if (Name != NULL && Name[0] != '\0')
+            if (Name != nullptr && Name[0] != '\0')
                 symbolDetails.top().Name = Name;
             bHandled = true;
             return;
@@ -983,7 +978,7 @@ void WheatyExceptionReport::DumpTypeIndex(
         char buffer[WER_SMALL_BUFFER_SIZE];
         wcstombs(buffer, pwszTypeName, sizeof(buffer));
         buffer[WER_SMALL_BUFFER_SIZE - 1] = '\0';
-        if (Name != NULL && Name[0] != '\0')
+        if (Name != nullptr && Name[0] != '\0')
         {
             symbolDetails.top().Type = buffer;
             symbolDetails.top().Name = Name;
@@ -993,7 +988,7 @@ void WheatyExceptionReport::DumpTypeIndex(
 
         LocalFree(pwszTypeName);
     }
-    else if (Name != NULL && Name[0] != '\0')
+    else if (Name != nullptr && Name[0] != '\0')
         symbolDetails.top().Name = Name;
 
     if (!StoreSymbol(dwTypeIndex, offset))
@@ -1010,7 +1005,7 @@ void WheatyExceptionReport::DumpTypeIndex(
         case SymTagPointerType:
             if (SymGetTypeInfo(m_hProcess, modBase, dwTypeIndex, TI_GET_TYPEID, &innerTypeID))
             {
-                if (Name != NULL && Name[0] != '\0')
+                if (Name != nullptr && Name[0] != '\0')
                     symbolDetails.top().Name = Name;
 
                 BOOL isReference;
@@ -1088,7 +1083,7 @@ void WheatyExceptionReport::DumpTypeIndex(
                                       offset, bHandled, symbolDetails.top().Name.c_str(), "", false, logChildren);
                         break;
                     case SymTagPointerType:
-                        if (Name != NULL && Name[0] != '\0')
+                        if (Name != nullptr && Name[0] != '\0')
                             symbolDetails.top().Name = Name;
                         DumpTypeIndex(modBase, innerTypeID,
                                       offset, bHandled, symbolDetails.top().Name.c_str(), "", false, logChildren);
@@ -1229,7 +1224,6 @@ void WheatyExceptionReport::DumpTypeIndex(
                 dataKind == DataIsGlobal ||
                 dataKind == DataIsStaticMember)
             continue;
-
 
         symbolDetails.top().HasChildren = true;
         if (!logChildren)

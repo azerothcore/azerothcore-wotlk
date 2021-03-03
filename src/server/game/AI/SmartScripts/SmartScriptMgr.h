@@ -10,11 +10,10 @@
 #include "Common.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "Unit.h"
 #include "Spell.h"
-
-//#include "SmartScript.h"
 //#include "SmartAI.h"
+//#include "SmartScript.h"
+#include "Unit.h"
 
 struct WayPoint
 {
@@ -702,7 +701,6 @@ struct SmartAction
 
         struct
         {
-
             uint32 emote1;
             uint32 emote2;
             uint32 emote3;
@@ -1697,7 +1695,6 @@ public:
     bool active;
     bool runOnce;
     bool enableTimed;
-
 };
 
 typedef std::unordered_map<uint32, WayPoint*> WPPath;
@@ -1852,7 +1849,7 @@ private:
     {
         if (!data)
         {
-            sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u Parameter can not be NULL, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+            sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u Parameter can not be nullptr, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             return false;
         }
         return true;

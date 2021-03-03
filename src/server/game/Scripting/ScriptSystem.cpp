@@ -4,10 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptSystem.h"
-#include "ObjectMgr.h"
 #include "DatabaseEnv.h"
+#include "ObjectMgr.h"
 #include "ScriptMgr.h"
+#include "ScriptSystem.h"
 
 ScriptPointVector const SystemMgr::_empty;
 
@@ -74,5 +74,4 @@ void SystemMgr::LoadScriptWaypoints()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u Script Waypoint nodes in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
 }

@@ -17,18 +17,18 @@ npc_vekjik
 avatar_of_freya
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "SpellScript.h"
-#include "SpellAuras.h"
+
+#include "CombatAI.h"
+#include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 #include "Vehicle.h"
 #include "WaypointManager.h"
-#include "PassiveAI.h"
-#include "CombatAI.h"
-
 // Ours
 enum songOfWindandWater
 {
@@ -259,7 +259,6 @@ public:
         return new npc_artruis_the_hearthlessAI(creature);
     }
 };
-
 
 /******
 quest Still At It (12644)
@@ -539,7 +538,6 @@ public:
         return false;
     }
 };
-
 
 // Theirs
 /*######
@@ -1291,7 +1289,7 @@ public:
 
                             Unit::Kill(bird, bird);
                             crunchy->GetMotionMaster()->MovePoint(0, bird->GetPositionX(), bird->GetPositionY(),
-                                                                  bird->GetMap()->GetWaterOrGroundLevel(bird->GetPhaseMask(), bird->GetPositionX(), bird->GetPositionY(), bird->GetPositionZ()));
+                                                                  bird->GetMapWaterOrGroundLevel(bird->GetPositionX(), bird->GetPositionY(), bird->GetPositionZ()));
                             /// @todo Make crunchy perform emote eat when he reaches the bird
 
                             break;

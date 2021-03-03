@@ -124,7 +124,7 @@ inline float finiteAlways(float f) { return isfinite(f) ? f : 0.0f; }
 
 inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
 
-#define atol(a) strtoul( a, NULL, 10)
+#define atol(a) strtoul( a, nullptr, 10)
 
 #define STRINGIZE(a) #a
 
@@ -183,10 +183,6 @@ typedef std::vector<std::string> StringVector;
 
 #ifdef min
 #undef min
-#endif
-
-#ifndef M_PI
-#define M_PI            3.14159265358979323846f
 #endif
 
 #define MAX_QUERY_LEN 32*1024

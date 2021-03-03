@@ -12,8 +12,8 @@ class AuraEffect;
 class Aura;
 class SpellInfo;
 
-#include "SpellAuras.h"
 #include "Spell.h"
+#include "SpellAuras.h"
 
 typedef void(AuraEffect::*pAuraEffectHandler)(AuraApplication const* aurApp, uint8 mode, bool apply) const;
 
@@ -115,7 +115,6 @@ private:
     bool m_isAuraEnabled;
     // xinef: channel information for channel triggering
     ChannelTargetData* m_channelData;
-
 
     SpellModifier* m_spellmod;
 
