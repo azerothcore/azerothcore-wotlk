@@ -1,10 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1614780210274517793');
 
 -- Rewrite positions for minerals for zone: Bloodmyst Isle
-
--- Before: 3 locations
--- After: 122 locations
-
 SET
 @POOL            = '11646',
 @POOLSIZE        = '30',
