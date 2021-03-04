@@ -4,17 +4,19 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Map.h"
-#include "Geometry.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "Chat.h"
 #include "DynamicTree.h"
+#include "Geometry.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "Object.h"
 #include "Group.h"
 #include "InstanceScript.h"
+#include "LFGMgr.h"
+#include "Map.h"
 #include "MapInstanced.h"
+#include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
@@ -22,8 +24,7 @@
 #include "Transport.h"
 #include "Vehicle.h"
 #include "VMapFactory.h"
-#include "LFGMgr.h"
-#include "Chat.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -184,11 +185,11 @@ void Map::LoadMap(int gx, int gy, bool reload)
         sScriptMgr->OnUnloadGridMap(this, GridMaps[gx][gy], gx, gy);
 
         delete (GridMaps[gx][gy]);
-        GridMaps[gx][gy] = NULL;
+        GridMaps[gx][gy] = nullptr;
     }
 
     // map file name
-    char* tmp = NULL;
+    char* tmp = nullptr;
     int len = sWorld->GetDataPath().length() + strlen("maps/%03u%02u%02u.map") + 1;
     tmp = new char[len];
     snprintf(tmp, len, (char*)(sWorld->GetDataPath() + "maps/%03u%02u%02u.map").c_str(), GetId(), gx, gy);
@@ -228,7 +229,7 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
         for (unsigned int j = 0; j < MAX_NUMBER_OF_GRIDS; ++j)
         {
             //z code
-            GridMaps[idx][j] = NULL;
+            GridMaps[idx][j] = nullptr;
             setNGrid(nullptr, idx, j);
         }
     }
@@ -1908,7 +1909,7 @@ GridMap* Map::GetGrid(float x, float y)
     return GridMaps[gx][gy];
 }
 
-float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground /*= NULL*/, bool /*swim = false*/, float collisionHeight) const
+float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground /*= nullptr*/, bool /*swim = false*/, float collisionHeight) const
 {
     if (const_cast<Map*>(this)->GetGrid(x, y))
     {
@@ -2301,7 +2302,6 @@ bool Map::HasEnoughWater(WorldObject const* searcher, LiquidData liquidData) con
     float minHeightInWater = searcher->GetMinHeightInWater();
     return liquidData.level > INVALID_HEIGHT && liquidData.level > liquidData.depth_level && liquidData.level - liquidData.depth_level >= minHeightInWater;
 }
-
 
 char const* Map::GetMapName() const
 {
@@ -3056,17 +3056,17 @@ void BattlegroundMap::RemoveAllPlayers()
 
 Player* Map::GetPlayer(uint64 guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (Player*)NULL);
+    return ObjectAccessor::GetObjectInMap(guid, this, (Player*)nullptr);
 }
 
 Creature* Map::GetCreature(uint64 guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (Creature*)NULL);
+    return ObjectAccessor::GetObjectInMap(guid, this, (Creature*)nullptr);
 }
 
 GameObject* Map::GetGameObject(uint64 guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (GameObject*)NULL);
+    return ObjectAccessor::GetObjectInMap(guid, this, (GameObject*)nullptr);
 }
 
 Transport* Map::GetTransport(uint64 guid)
@@ -3080,17 +3080,17 @@ Transport* Map::GetTransport(uint64 guid)
 
 DynamicObject* Map::GetDynamicObject(uint64 guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (DynamicObject*)NULL);
+    return ObjectAccessor::GetObjectInMap(guid, this, (DynamicObject*)nullptr);
 }
 
 Pet* Map::GetPet(uint64 guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (Pet*)NULL);
+    return ObjectAccessor::GetObjectInMap(guid, this, (Pet*)nullptr);
 }
 
 Corpse* Map::GetCorpse(uint64 guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (Corpse*)NULL);
+    return ObjectAccessor::GetObjectInMap(guid, this, (Corpse*)nullptr);
 }
 
 void Map::UpdateIteratorBack(Player* player)

@@ -1,50 +1,113 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
 #include "Config.h"
-#include "Errors.h"
 #include "Log.h"
+#include "StringConvert.h"
+#include "StringFormat.h"
 #include "Util.h"
-#include <ace/Configuration_Import_Export.h>
-#include <memory>
 #include <mutex>
+#include <fstream>
+#include <unordered_map>
 
 namespace
 {
-    std::unique_ptr<ACE_Configuration_Heap> _config;
-    std::vector<std::string> _modulesConfigFiles;
-    std::string _initConfigFile;
+    std::string _filename;
+    std::vector<std::string> _additonalFiles;
+    std::vector<std::string> _args;
+    std::unordered_map<std::string /*name*/, std::string /*value*/> _configOptions;
     std::mutex _configLock;
 
-    // Defined here as it must not be exposed to end-users.
-    bool GetValueHelper(const char* name, ACE_TString& result)
+    void AddKey(std::string const& optionName, std::string const& optionKey, bool replace = true)
     {
-        std::lock_guard<std::mutex> guard(_configLock);
-
-        if (!_config.get())
-            return false;
-
-        ACE_TString section_name;
-        ACE_Configuration_Section_Key section_key;
-        const ACE_Configuration_Section_Key& root_key = _config->root_section();
-
-        int i = 0;
-
-        while (!_config->enumerate_sections(root_key, i, section_name))
+        auto const& itr = _configOptions.find(optionName);
+        if (itr != _configOptions.end())
         {
-            _config->open_section(root_key, section_name.c_str(), 0, section_key);
+            if (!replace)
+            {
+                sLog->outError("> Config: Option '%s' is exist! Option key - '%s'", optionName.c_str(), itr->second.c_str());
+                return;
+            }
 
-            if (!_config->get_string_value(section_key, name, result))
-                return true;
+            _configOptions.erase(optionName);
+        }
 
-            ++i;
+        _configOptions.emplace(optionName, optionKey);
+
+        //sLog->outError("> Config: Add '%s' - '%s'\n", optionName.c_str(), optionKey.c_str());
+    }
+
+    void ParseFile(std::string const& file)
+    {
+        std::ifstream in(file);
+
+        if (in.fail())
+            throw ConfigException(acore::StringFormat("Config::LoadFile: Failed open file '%s'", file.c_str()));
+
+        uint32 count = 0;
+
+        while (in.good())
+        {
+            std::string line;
+            std::getline(in, line);
+
+            if (line.empty())
+                continue;
+
+            line = acore::String::Reduce(line);
+
+            // comments
+            if (line[0] == '#' || line[0] == '[')
+                continue;
+
+            auto const equal_pos = line.find('=');
+
+            if (equal_pos == std::string::npos || equal_pos == line.length())
+                return;
+
+            auto entry = acore::String::Reduce(line.substr(0, equal_pos));
+            auto value = acore::String::Reduce(line.substr(equal_pos + 1));
+
+            value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
+
+            AddKey(entry, value);
+
+            count++;
+        }
+
+        if (!count)
+            throw ConfigException(acore::StringFormat("Config::LoadFile: Empty file '%s'", file.c_str()));
+    }
+
+    bool LoadFile(std::string const& file)
+    {
+        try
+        {
+            ParseFile(file);
+            return true;
+        }
+        catch (const std::exception& e)
+        {
+            sLog->outError("> Config: %s", e.what());
         }
 
         return false;
     }
+}
+
+bool ConfigMgr::LoadInitial(std::string const& file)
+{
+    std::lock_guard<std::mutex> lock(_configLock);
+    _configOptions.clear();
+    return LoadFile(file);
+}
+
+bool ConfigMgr::LoadAdditionalFile(std::string file)
+{
+    std::lock_guard<std::mutex> lock(_configLock);
+    return LoadFile(file);
 }
 
 ConfigMgr* ConfigMgr::instance()
@@ -53,232 +116,180 @@ ConfigMgr* ConfigMgr::instance()
     return &instance;
 }
 
-bool ConfigMgr::LoadInitial(std::string const& file)
-{
-    ASSERT(file.c_str());
-
-    std::lock_guard<std::mutex> guard(_configLock);
-
-    _config.reset(new ACE_Configuration_Heap());
-    if (!_config->open())
-        if (LoadData(file))
-            return true;
-
-    _config.reset();
-    return false;
-}
-
-bool ConfigMgr::LoadMore(std::string const& file)
-{
-    ASSERT(file.c_str());
-    ASSERT(_config);
-
-    std::lock_guard<std::mutex> guard(_configLock);
-
-    return LoadData(file);
-}
-
 bool ConfigMgr::Reload()
 {
     if (!LoadAppConfigs())
         return false;
 
-    LoadModulesConfigs();
-
-    return true;
+    return LoadModulesConfigs();
 }
 
-bool ConfigMgr::LoadData(std::string const& file)
+template<class T>
+T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLogs /*= true*/) const
 {
-    ACE_Ini_ImpExp config_importer(*_config.get());
-    if (!config_importer.import_config(file.c_str()))
-        return true;
-
-    return false;
-}
-
-std::string ConfigMgr::GetStringDefault(std::string const& name, const std::string& def, bool logUnused /*= true*/)
-{
-    ACE_TString val;
-
-    if (GetValueHelper(name.c_str(), val))
+    auto const& itr = _configOptions.find(name);
+    if (itr == _configOptions.end())
     {
-        std::string value = val.c_str();
-        value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
-        return value;
-    }
-    else
-    {
-        if (logUnused)
-            sLog->outError("-> Not found option '%s'. The default value is used (%s)", name.c_str(), def.c_str());
-
-        return def;
-    }
-}
-
-bool ConfigMgr::GetBoolDefault(std::string const& name, bool def, bool logUnused /*= true*/)
-{
-    ACE_TString val;
-
-    if (!GetValueHelper(name.c_str(), val))
-    {
-        if (logUnused)
-            def ? sLog->outError("-> Not found option '%s'. The default value is used (Yes)", name.c_str()) : sLog->outError("-> Not found option '%s'. The default value is used (No)", name.c_str());
-
-        return def;
-    }
-
-    return StringToBool(val.c_str());
-}
-
-int ConfigMgr::GetIntDefault(std::string const& name, int def, bool logUnused /*= true*/)
-{
-    ACE_TString val;
-
-    if (GetValueHelper(name.c_str(), val))
-        return std::stoi(val.c_str());
-    else
-    {
-        if (logUnused)
-            sLog->outError("-> Not found option '%s'. The default value is used (%i)", name.c_str(), def);
-
-        return def;
-    }
-}
-
-float ConfigMgr::GetFloatDefault(std::string const& name, float def, bool logUnused /*= true*/)
-{
-    ACE_TString val;
-
-    if (GetValueHelper(name.c_str(), val))
-        return std::stof(val.c_str());
-    else
-    {
-        if (logUnused)
-            sLog->outError("-> Not found option '%s'. The default value is used (%f)", name.c_str(), def);
-
-        return def;
-    }
-}
-
-std::list<std::string> ConfigMgr::GetKeysByString(std::string const& name)
-{
-    std::lock_guard<std::mutex> guard(_configLock);
-
-    std::list<std::string> keys;
-    if (!_config.get())
-        return keys;
-
-    ACE_TString section_name;
-    ACE_Configuration_Section_Key section_key;
-    const ACE_Configuration_Section_Key& root_key = _config->root_section();
-
-    int i = 0;
-
-    while (!_config->enumerate_sections(root_key, i++, section_name))
-    {
-        _config->open_section(root_key, section_name.c_str(), 0, section_key);
-
-        ACE_TString key_name;
-        ACE_Configuration::VALUETYPE type;
-
-        int j = 0;
-
-        while (!_config->enumerate_values(section_key, j++, key_name, type))
+        if (showLogs)
         {
-            std::string temp = key_name.c_str();
-
-            if (temp.find(name) != std::string::npos)
-                keys.push_back(temp);
+            sLog->outError("> Config: Missing name %s in config, add \"%s = %s\"",
+                name.c_str(), name.c_str(), acore::ToString(def).c_str());
         }
+
+        return def;
     }
+
+    auto value = acore::StringTo<T>(itr->second);
+    if (!value)
+    {
+        if (showLogs)
+        {
+            sLog->outError("> Config: Bad value defined for name '%s', going to use '%s' instead",
+                name.c_str(), acore::ToString(def).c_str());
+        }
+
+        return def;
+    }
+
+    return *value;
+}
+
+template<>
+std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std::string const& def, bool showLogs /*= true*/) const
+{
+    auto const& itr = _configOptions.find(name);
+    if (itr == _configOptions.end())
+    {
+        if (showLogs)
+        {
+            sLog->outError("> Config: Missing name %s in config, add \"%s = %s\"",
+                name.c_str(), name.c_str(), def.c_str());
+        }
+
+        return def;
+    }
+
+    return itr->second;
+}
+
+template<class T>
+T ConfigMgr::GetOption(std::string const& name, T const& def, bool showLogs /*= true*/) const
+{
+    return GetValueDefault<T>(name, def, showLogs);
+}
+
+template<>
+bool ConfigMgr::GetOption<bool>(std::string const& name, bool const& def, bool showLogs /*= true*/) const
+{
+    std::string val = GetValueDefault(name, std::string(def ? "1" : "0"), showLogs);
+
+    auto boolVal = acore::StringTo<bool>(val);
+    if (!boolVal)
+    {
+        if (showLogs)
+        {
+            sLog->outError("> Config: Bad value defined for name '%s', going to use '%s' instead",
+                name.c_str(), def ? "true" : "false");
+        }
+
+        return def;
+    }
+
+    return *boolVal;
+}
+
+std::vector<std::string> ConfigMgr::GetKeysByString(std::string const& name)
+{
+    std::lock_guard<std::mutex> lock(_configLock);
+
+    std::vector<std::string> keys;
+
+    for (auto const& [optionName, key] : _configOptions)
+        if (!optionName.compare(0, name.length(), name))
+            keys.emplace_back(optionName);
 
     return keys;
 }
 
-void ConfigMgr::SetConfigList(std::string const& fileName, std::string const& modulesConfigList /*= ""*/)
+std::string const& ConfigMgr::GetFilename()
 {
-    _initConfigFile = fileName;
-
-    if (modulesConfigList.empty())
-        return;
-
-    // Clean config list before load
-    _modulesConfigFiles.clear();
-
-    Tokenizer configFileList(modulesConfigList, ',');
-    for (auto const& itr : configFileList)
-        _modulesConfigFiles.push_back(itr);
+    std::lock_guard<std::mutex> lock(_configLock);
+    return _filename;
 }
 
-bool ConfigMgr::LoadAppConfigs(std::string const& applicationName /*= "worldserver"*/)
+std::vector<std::string> const& ConfigMgr::GetArguments() const
+{
+    return _args;
+}
+
+std::string const ConfigMgr::GetConfigPath()
+{
+    std::lock_guard<std::mutex> lock(_configLock);
+
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
+    return "configs/";
+#else
+    return std::string(_CONF_DIR) + "/";
+#endif
+}
+
+void ConfigMgr::Configure(std::string const& initFileName, std::vector<std::string> args, std::string const& modulesConfigList /*= ""*/)
+{
+    _filename = initFileName;
+    _args = std::move(args);
+
+    // Add modules config if exist
+    if (!modulesConfigList.empty())
+    {
+        Tokenizer configFileList(modulesConfigList, ',');
+        for (auto const& itr : configFileList)
+            _additonalFiles.emplace_back(std::string(itr));
+    }
+}
+
+bool ConfigMgr::LoadAppConfigs()
 {
     // #1 - Load init config file .conf.dist
-    if (!sConfigMgr->LoadInitial(_initConfigFile + ".dist"))
-    {
-        printf("Load config error. Invalid or missing dist configuration file: %s", std::string(_initConfigFile + ".dist").c_str());
-        printf("Verify that the file exists and has \'[%s]' written in the top of the file!", applicationName.c_str());
+    if (!LoadInitial(_filename + ".dist"))
         return false;
-    }
 
     // #2 - Load .conf file
-    if (!sConfigMgr->LoadMore(_initConfigFile))
-    {
-        sLog->outString();
-        sLog->outString("Load config error. Invalid or missing configuration file: %s", _initConfigFile.c_str());
-        sLog->outString("Verify that the file exists and has \'[%s]' written in the top of the file!", applicationName.c_str());
+    if (!LoadAdditionalFile(_filename))
         return false;
-    }
 
     return true;
 }
 
 bool ConfigMgr::LoadModulesConfigs()
 {
-    // If not modules config - load failed
-    if (_modulesConfigFiles.empty())
-        return false;
+    if (_additonalFiles.empty())
+        return true;
 
     // Start loading module configs
-    std::unordered_map<std::string /*module name*/, std::string /*config variant*/> moduleConfigFiles;
+    std::vector<std::string /*config variant*/> moduleConfigFiles;
+    std::string const& moduleConfigPath = GetConfigPath() + "modules/";
+    bool isExistDefaultConfig = true;
+    bool isExistDistConfig = true;
 
-    moduleConfigFiles.clear();
-
-    std::string configPath = _CONF_DIR;
-
-    for (auto const& itr : _modulesConfigFiles)
+    for (auto const& distFileName : _additonalFiles)
     {
-        bool IsExistDefaultConfig = true;
-        bool IsExistDistConfig = true;
+        std::string defaultFileName = distFileName;
 
-        std::string moduleName = itr;
-        std::string configFile = std::string(itr) + std::string(".conf");
-        std::string defaultConfig = configPath + "/" + configFile;
-
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-        defaultConfig = configFile;
-#endif
-
-        std::string ConfigFileDist = defaultConfig + std::string(".dist");
+        if (!defaultFileName.empty())
+            defaultFileName.erase(defaultFileName.end() - 5, defaultFileName.end());
 
         // Load .conf.dist config
-        if (!sConfigMgr->LoadMore(ConfigFileDist.c_str()))
-        {
-            sLog->outError("> Invalid or missing dist configuration file: %s", ConfigFileDist.c_str());
-            IsExistDistConfig = false;
-        }
+        if (!LoadAdditionalFile(moduleConfigPath + distFileName))
+            isExistDistConfig = false;
 
         // Load .conf config
-        if (!sConfigMgr->LoadMore(defaultConfig.c_str()))
-            IsExistDefaultConfig = false;
+        if (!LoadAdditionalFile(moduleConfigPath + defaultFileName))
+            isExistDefaultConfig = false;
 
-        // #1 - Not exist .conf and exist .conf.dist
-        if (!IsExistDefaultConfig && IsExistDistConfig)
-            moduleConfigFiles.insert(std::make_pair(moduleName, ConfigFileDist));
-        else if (!IsExistDefaultConfig && !IsExistDistConfig) // #2 - Not exist .conf and not exist .conf.dist
-            moduleConfigFiles.insert(std::make_pair(moduleName, "default hardcoded settings"));
-        else if (IsExistDefaultConfig && IsExistDistConfig)
-            moduleConfigFiles.insert(std::make_pair(moduleName, defaultConfig));
+        if (isExistDefaultConfig && isExistDistConfig)
+            moduleConfigFiles.emplace_back(defaultFileName);
+        else if (!isExistDefaultConfig && isExistDistConfig)
+            moduleConfigFiles.emplace_back(distFileName);
     }
 
     // If module configs not exist - no load
@@ -287,12 +298,60 @@ bool ConfigMgr::LoadModulesConfigs()
 
     // Print modules configurations
     sLog->outString();
-    sLog->outString("Using configuration for modules:");
+    sLog->outString("Using modules configuration:");
 
     for (auto const& itr : moduleConfigFiles)
-        sLog->outString("> Module (%s) using (%s)", itr.first.c_str(), itr.second.c_str());
+        sLog->outString("> %s", itr.c_str());
 
-    sLog->outString();
+    sLog->outString("");
 
     return true;
 }
+
+/*
+ * Deprecated geters. This geters will be deleted
+ */
+
+// @deprecated DO NOT USE - use GetOption<std::string> instead.
+std::string ConfigMgr::GetStringDefault(std::string const& name, const std::string& def, bool showLogs /*= true*/)
+{
+    return GetOption<std::string>(name, def, showLogs);
+}
+
+// @deprecated DO NOT USE - use GetOption<bool> instead.
+bool ConfigMgr::GetBoolDefault(std::string const& name, bool def, bool showLogs /*= true*/)
+{
+    return GetOption<bool>(name, def, showLogs);
+}
+
+// @deprecated DO NOT USE - use GetOption<int32> instead.
+int ConfigMgr::GetIntDefault(std::string const& name, int def, bool showLogs /*= true*/)
+{
+    return GetOption<int32>(name, def, showLogs);
+}
+
+// @deprecated DO NOT USE - use GetOption<float> instead.
+float ConfigMgr::GetFloatDefault(std::string const& name, float def, bool showLogs /*= true*/)
+{
+    return GetOption<float>(name, def, showLogs);
+}
+
+/*
+ * End deprecated geters
+ */
+
+#define TEMPLATE_CONFIG_OPTION(__typename) \
+    template __typename ConfigMgr::GetOption<__typename>(std::string const& name, __typename const& def, bool showLogs /*= true*/) const;
+
+TEMPLATE_CONFIG_OPTION(std::string)
+TEMPLATE_CONFIG_OPTION(uint8)
+TEMPLATE_CONFIG_OPTION(int8)
+TEMPLATE_CONFIG_OPTION(uint16)
+TEMPLATE_CONFIG_OPTION(int16)
+TEMPLATE_CONFIG_OPTION(uint32)
+TEMPLATE_CONFIG_OPTION(int32)
+TEMPLATE_CONFIG_OPTION(uint64)
+TEMPLATE_CONFIG_OPTION(int64)
+TEMPLATE_CONFIG_OPTION(float)
+
+#undef TEMPLATE_CONFIG_OPTION

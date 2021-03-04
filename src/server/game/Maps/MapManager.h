@@ -7,12 +7,12 @@
 #ifndef ACORE_MAPMANAGER_H
 #define ACORE_MAPMANAGER_H
 
-#include "Define.h"
-#include <ace/Thread_Mutex.h>
 #include "Common.h"
+#include "Define.h"
 #include "Map.h"
-#include "Object.h"
 #include "MapUpdater.h"
+#include "Object.h"
+#include <ace/Thread_Mutex.h>
 
 class Transport;
 class StaticTransport;
@@ -32,7 +32,7 @@ public:
     Map* FindBaseMap(uint32 mapId) const // pussywizard: need this public for movemaps (mmaps)
     {
         MapMapType::const_iterator iter = i_maps.find(mapId);
-        return (iter == i_maps.end() ? NULL : iter->second);
+        return (iter == i_maps.end() ? nullptr : iter->second);
     }
 
     uint32 GetAreaId(uint32 mapid, float x, float y, float z) const

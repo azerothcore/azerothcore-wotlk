@@ -4,18 +4,18 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "AuctionHouseMgr.h"
+#include "BattlegroundMgr.h"
+#include "CalendarMgr.h"
 #include "DatabaseEnv.h"
-#include "Mail.h"
+#include "Item.h"
 #include "Log.h"
-#include "World.h"
+#include "Mail.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "Unit.h"
-#include "BattlegroundMgr.h"
-#include "Item.h"
-#include "AuctionHouseMgr.h"
-#include "CalendarMgr.h"
 #include "ScriptMgr.h"
+#include "Unit.h"
+#include "World.h"
 
 MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery(stationery)
 {
@@ -177,7 +177,7 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
     if (!sendMail) // can be changed in the hook
         return;
 
-    Player* pReceiver = receiver.GetPlayer();               // can be NULL
+    Player* pReceiver = receiver.GetPlayer();               // can be nullptr
     Player* pSender = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(sender.GetSenderId(), 0, HIGHGUID_PLAYER));
 
     if (pReceiver)

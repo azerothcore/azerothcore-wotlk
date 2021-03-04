@@ -5,13 +5,13 @@
  */
 
 #include "BattlegroundSA.h"
-#include "Language.h"
-#include "Player.h"
+#include "GameGraveyard.h"
 #include "GameObject.h"
+#include "Language.h"
 #include "ObjectMgr.h"
+#include "Player.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "GameGraveyard.h"
 
 BattlegroundSA::BattlegroundSA()
 {

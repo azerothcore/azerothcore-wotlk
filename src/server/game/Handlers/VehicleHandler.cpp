@@ -4,13 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "Opcodes.h"
-#include "Vehicle.h"
-#include "Player.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "Vehicle.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 void WorldSession::HandleDismissControlledVehicle(WorldPacket& recvData)
 {

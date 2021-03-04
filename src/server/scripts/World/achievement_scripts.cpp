@@ -4,16 +4,15 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-
 #include "BattlegroundAB.h"
-#include "BattlegroundWS.h"
-#include "BattlegroundIC.h"
 #include "BattlegroundAV.h"
+#include "BattlegroundIC.h"
 #include "BattlegroundSA.h"
-#include "Vehicle.h"
-#include "Player.h"
+#include "BattlegroundWS.h"
 #include "Creature.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "Vehicle.h"
 
 class achievement_resilient_victory : public AchievementCriteriaScript
 {

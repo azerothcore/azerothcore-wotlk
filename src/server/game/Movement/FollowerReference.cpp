@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Unit.h"
-#include "TargetedMovementGenerator.h"
 #include "FollowerReference.h"
+#include "TargetedMovementGenerator.h"
+#include "Unit.h"
 
 void FollowerReference::targetObjectBuildLink()
 {

@@ -1,14 +1,14 @@
 
-#include "ScriptMgr.h"
-#include "ObjectMgr.h"
-#include "Chat.h"
 #include "AccountMgr.h"
-#include "World.h"
-#include "Player.h"
-#include "Opcodes.h"
 #include "ArenaSpectator.h"
-#include "LFGMgr.h"
 #include "BattlegroundMgr.h"
+#include "Chat.h"
+#include "LFGMgr.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "World.h"
 
 class spectator_commandscript : public CommandScript
 {

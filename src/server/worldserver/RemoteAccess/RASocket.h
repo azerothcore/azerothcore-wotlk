@@ -12,11 +12,10 @@
 #define _RASOCKET_H
 
 #include "Common.h"
-
-#include <ace/Synch_Traits.h>
-#include <ace/Svc_Handler.h>
-#include <ace/SOCK_Stream.h>
 #include <ace/SOCK_Acceptor.h>
+#include <ace/SOCK_Stream.h>
+#include <ace/Svc_Handler.h>
+#include <ace/Synch_Traits.h>
 #include <atomic>
 
 /// Remote Administration socket

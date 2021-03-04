@@ -1,8 +1,8 @@
-#include "GameGraveyard.h"
-#include "MapManager.h"
-#include "DBCStores.h"
 #include "DatabaseEnv.h"
+#include "DBCStores.h"
+#include "GameGraveyard.h"
 #include "Log.h"
+#include "MapManager.h"
 
 Graveyard* Graveyard::instance()
 {
@@ -368,7 +368,7 @@ GraveyardStruct const* Graveyard::GetGraveyard(const std::string& name) const
     {
         if (itr->second.wnameLow == wname)
             return &itr->second;
-        else if (alt == NULL && itr->second.wnameLow.find(wname) != std::wstring::npos)
+        else if (alt == nullptr && itr->second.wnameLow.find(wname) != std::wstring::npos)
             alt = &itr->second;
     }
 

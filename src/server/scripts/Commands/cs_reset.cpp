@@ -15,8 +15,8 @@ EndScriptData */
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
-#include "Player.h"
 #include "Pet.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 
 class reset_commandscript : public CommandScript
