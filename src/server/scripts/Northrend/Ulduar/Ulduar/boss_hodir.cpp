@@ -437,16 +437,13 @@ public:
                             (*itr)->m_positionZ = prevZ;
                         }
 
-<<<<<<< HEAD
                         me->CastSpell((Unit*)nullptr, SPELL_FLASH_FREEZE_CAST, false);
                         me->MonsterTextEmote("Hodir begins to cast Flash Freeze!", 0, true);
-                        me->MonsterYell(TEXT_HODIR_FLASH_FREEZE, LANG_UNIVERSAL, 0);
+                        me->MonsterYell(TEXT_FLASH_FREEZE, LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
-=======
                         me->CastSpell(me, SPELL_FLASH_FREEZE_CAST);
                         Talk(TEXT_FLASH_FREEZE);
                         Talk(TEXT_EMOTE_FREEZE);
->>>>>>> 370e26213ce820f6703c1d1a3a0f65cd0976b9e9
                         SmallIcicles(false);
                         events.ScheduleEvent(EVENT_FLASH_FREEZE, urand(48000, 49000));
                         events.ScheduleEvent(EVENT_SMALL_ICICLES_ENABLE, Is25ManRaid() ? 12000 : 24000);
