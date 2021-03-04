@@ -4314,7 +4314,7 @@ void AddSC_item_spell_scripts()
     new spell_item_feast();
     new spell_item_gnomish_universal_remote();
     new spell_item_strong_anti_venom();
-	new spell_item_anti_venom();
+    new spell_item_anti_venom();
     new spell_item_gnomish_shrink_ray();
     new spell_item_goblin_weather_machine();
     new spell_item_light_lamp();
