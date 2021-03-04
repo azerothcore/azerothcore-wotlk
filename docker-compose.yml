@@ -38,7 +38,7 @@ services:
         source: ./docker/worldserver/bin
         target: /azeroth-server/bin
       - type: bind
-        source: ${WORLDSERVER_ETC:-./docker/worldserver/etc}
+        source: ${CONFIGS_ETC:-./etc}
         target: /azeroth-server/etc
       - type: bind
         source: ${WORLDSERVER_LOGS:-./docker/worldserver/logs}
@@ -64,7 +64,7 @@ services:
         source: ./docker/authserver/bin
         target: /azeroth-server/bin
       - type: bind
-        source: ${AUTHSERVER_ETC:-./docker/authserver/etc}
+        source: ${CONFIGS_ETC:-./etc}
         target: /azeroth-server/etc
       - type: bind
         source: ${AUTHSERVER_LOGS:-./docker/authserver/logs}
