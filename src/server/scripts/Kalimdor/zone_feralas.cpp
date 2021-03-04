@@ -23,33 +23,17 @@ EndScriptData */
 ## npc_gregan_brewspewer
 ######*/
 
+#define GOSSIP_MENU_GREGAN_BREWSPEWER_INTRO 1802
+#define GOSSIP_MENU_GREGAN_BREWSPEWER_EVOROOT_INFO 1801
+#define NPC_TEXT_GREGAN_BREWSPEWER_INTRO 2433
+#define NPC_TEXT_GREGAN_BREWSPEWER_EVOROOT_INFO_1 2434
+#define NPC_TEXT_GREGAN_BREWSPEWER_EVOROOT_INFO_2 2570
+#define QUEST_THE_VIDERE_ELIXIR 3909
+
 class npc_gregan_brewspewer : public CreatureScript
 {
 public:
     npc_gregan_brewspewer() : CreatureScript("npc_gregan_brewspewer") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            AddGossipItemFor(player, 1801, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            SendGossipMenuFor(player, 2434, creature->GetGUID());
-        }
-
-        if (action == GOSSIP_ACTION_INFO_DEF + 2)
-        {
-            SendGossipMenuFor(player, 2570, creature->GetGUID());
-        }
-
-        if (action == GOSSIP_ACTION_TRADE)
-        {
-            player->GetSession()->SendListInventory(creature->GetGUID());
-        }
-
-        return true;
-    }
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
@@ -58,17 +42,40 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
         }
 
-        if (player->GetQuestStatus(3909) == QUEST_STATUS_INCOMPLETE)
+        if (player->GetQuestStatus(QUEST_THE_VIDERE_ELIXIR) == QUEST_STATUS_INCOMPLETE)
         {
-            AddGossipItemFor(player, 1802, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_MENU_GREGAN_BREWSPEWER_INTRO, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
         if (creature->IsVendor())
         {
-            AddGossipItemFor(player, 1802, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            AddGossipItemFor(player, GOSSIP_MENU_GREGAN_BREWSPEWER_INTRO, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
         }
 
-        SendGossipMenuFor(player, 2433, creature->GetGUID());
+        SendGossipMenuFor(player, NPC_TEXT_GREGAN_BREWSPEWER_INTRO, creature->GetGUID());
+        return true;
+    }
+
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    {
+        ClearGossipMenuFor(player);
+
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
+        {
+            AddGossipItemFor(player, GOSSIP_MENU_GREGAN_BREWSPEWER_EVOROOT_INFO, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            SendGossipMenuFor(player, NPC_TEXT_GREGAN_BREWSPEWER_EVOROOT_INFO_1, creature->GetGUID());
+        }
+
+        if (action == GOSSIP_ACTION_INFO_DEF + 2)
+        {
+            SendGossipMenuFor(player, NPC_TEXT_GREGAN_BREWSPEWER_EVOROOT_INFO_2, creature->GetGUID());
+        }
+
+        if (action == GOSSIP_ACTION_TRADE)
+        {
+            player->GetSession()->SendListInventory(creature->GetGUID());
+        }
+
         return true;
     }
 };
