@@ -20,4 +20,4 @@ RUN dos2unix /azeroth-server/etc/*
 HEALTHCHECK --interval=5s --timeout=15s --start-period=30s --retries=3 CMD netstat -lnpt | grep :3724 || exit 1
 
 # run the authserver located in the directory "docker/authserver/bin" of the host machine
-CMD ["/azeroth-server/bin/authserver"]
+CMD ["dos2unix /azeroth-server/etc/* && /azeroth-server/bin/authserver"]
