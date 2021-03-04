@@ -39,10 +39,14 @@ public:
         }
 
         if (action == GOSSIP_ACTION_INFO_DEF + 2)
+        {
             SendGossipMenuFor(player, 2570, creature->GetGUID());
+        }
 
         if (action == GOSSIP_ACTION_TRADE)
+        {
             player->GetSession()->SendListInventory(creature->GetGUID());
+        }
 
         return true;
     }
@@ -50,13 +54,19 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (creature->IsQuestGiver())
+        {
             player->PrepareQuestMenu(creature->GetGUID());
+        }
 
         if (player->GetQuestStatus(3909) == QUEST_STATUS_INCOMPLETE)
+        {
             AddGossipItemFor(player, 1802, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        }
 
         if (creature->IsVendor())
+        {
             AddGossipItemFor(player, 1802, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+        }
 
         SendGossipMenuFor(player, 2433, creature->GetGUID());
         return true;
