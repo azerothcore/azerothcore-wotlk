@@ -140,8 +140,8 @@ private:
     BattlegroundQueue m_BattlegroundQueues[MAX_BATTLEGROUND_QUEUE_TYPES];
 
     std::vector<uint64> m_ArenaQueueUpdateScheduler;
-    bool   m_ArenaTesting { return sWorld->getBoolConfig(CONFIG_DEBUG_ARENA); }
-    bool   m_Testing { return sWorld->getBoolConfig(CONFIG_DEBUG_BATTLEGROUND); }
+    bool   m_ArenaTesting = sWorld->getBoolConfig(CONFIG_DEBUG_ARENA);
+    bool   m_Testing = sWorld->getBoolConfig(CONFIG_DEBUG_BATTLEGROUND);
     uint32 m_lastClientVisibleInstanceId;
     time_t m_NextAutoDistributionTime;
     uint32 m_AutoDistributionTimeChecker;
