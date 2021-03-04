@@ -451,7 +451,7 @@ void WardenWin::RequestChecks()
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     std::stringstream stream;
     stream << "Sent check id's: ";
-    for (uint16 checkId : _currentChecks)
+    for (uint16 checkId : _CurrentChecks)
     {
         stream << checkId << " ";
     }
