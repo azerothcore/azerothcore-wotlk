@@ -3406,6 +3406,14 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetB[0] = 0;
     });
 
+    // Flash Freeze Radius - Avoid FPS Drops
+    ApplySpellFix({ 62148 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;
+        spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_200_YARDS;
+        spellInfo->EffectRadiusIndex[2] = EFFECT_RADIUS_200_YARDS;
+    });
+
     // Howl of Azgalor
     ApplySpellFix({ 31344 }, [](SpellEntry* spellInfo)
     {
