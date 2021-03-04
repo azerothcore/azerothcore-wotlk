@@ -2,9 +2,11 @@
 * text=auto
 
 # End of line rules
-*.sh      eol=lf
-*.sh.dist eol=lf
-bin/*     eol=lf
+*.sh         eol=lf
+*.sh.dist    eol=lf
+bin/*        eol=lf
+*.dist       eol=lf
+*.dockerdist eol=lf
 
 # Whitespace rules
 # strict (no trailing, no tabs)
