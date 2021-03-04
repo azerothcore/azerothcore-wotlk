@@ -11,17 +11,16 @@ Comment: All debug related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ObjectMgr.h"
 #include "BattlegroundMgr.h"
-#include "Chat.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "Chat.h"
+#include "GossipDef.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "GossipDef.h"
 #include "Language.h"
-
+#include "ObjectMgr.h"
+#include "ScriptMgr.h"
 #include <fstream>
 
 class debug_commandscript : public CommandScript

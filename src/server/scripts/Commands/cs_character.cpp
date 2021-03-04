@@ -13,12 +13,12 @@ EndScriptData */
 
 #include "AccountMgr.h"
 #include "Chat.h"
+#include "Implementation/CharacterDatabase.h"
 #include "ObjectMgr.h"
-#include "PlayerDump.h"
 #include "Player.h"
+#include "PlayerDump.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
-#include "Implementation/CharacterDatabase.h"
 
 class character_commandscript : public CommandScript
 {

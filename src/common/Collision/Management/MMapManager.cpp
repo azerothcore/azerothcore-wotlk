@@ -218,7 +218,7 @@ namespace MMAP
         dtStatus status;
         {
             ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
-            status = mmap->navMesh->removeTile(tileRef, NULL, NULL);
+            status = mmap->navMesh->removeTile(tileRef, nullptr, nullptr);
         }
 
         // unload, and mark as non loaded
@@ -266,7 +266,7 @@ namespace MMAP
             dtStatus status;
             {
                 ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
-                status = mmap->navMesh->removeTile(i->second, NULL, NULL);
+                status = mmap->navMesh->removeTile(i->second, nullptr, nullptr);
             }
 
             if (status != DT_SUCCESS)
@@ -329,7 +329,7 @@ namespace MMAP
         //ACORE_READ_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
-            return NULL;
+            return nullptr;
 
         return loadedMMaps[mapId]->navMesh;
     }
@@ -340,7 +340,7 @@ namespace MMAP
         //ACORE_READ_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
-            return NULL;
+            return nullptr;
 
         MMapData* mmap = loadedMMaps[mapId];
         if (mmap->navMeshQueries.find(instanceId) == mmap->navMeshQueries.end())
@@ -357,7 +357,7 @@ namespace MMAP
                 {
                     dtFreeNavMeshQuery(query);
                     sLog->outError("MMAP:GetNavMeshQuery: Failed to initialize dtNavMeshQuery for mapId %03u instanceId %u", mapId, instanceId);
-                    return NULL;
+                    return nullptr;
                 }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)

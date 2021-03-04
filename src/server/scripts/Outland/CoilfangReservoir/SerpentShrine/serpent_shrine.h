@@ -5,11 +5,11 @@
 #ifndef DEF_SERPENT_SHRINE_H
 #define DEF_SERPENT_SHRINE_H
 
-#include "Player.h"
-#include "SpellScript.h"
 #include "CreatureAI.h"
-#include "SpellAuraEffects.h"
 #include "GridNotifiers.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum DataTypes
 {

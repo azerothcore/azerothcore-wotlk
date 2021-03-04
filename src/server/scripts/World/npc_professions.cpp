@@ -11,10 +11,10 @@ SDComment: Provides learn/unlearn/relearn-options for professions. Not supported
 SDCategory: NPCs
 EndScriptData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "WorldSession.h"
 
@@ -414,7 +414,7 @@ void ProcessUnlearnAction(Player* player, Creature* creature, uint32 spellId, ui
             player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, creature, 0, 0);
     }
     else
-        player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, NULL, nullptr);
+        player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, nullptr, nullptr);
     CloseGossipMenuFor(player);
 }
 
@@ -1208,19 +1208,19 @@ public:
         {
             // Learn Goblin
             case GOSSIP_ACTION_INFO_DEF + 1:
-                ProcessCastaction(player, NULL, S_GOBLIN, S_LEARN_GOBLIN, DoLearnCost(player));
+                ProcessCastaction(player, nullptr, S_GOBLIN, S_LEARN_GOBLIN, DoLearnCost(player));
                 break;
             // Learn Gnomish
             case GOSSIP_ACTION_INFO_DEF + 2:
-                ProcessCastaction(player, NULL, S_GNOMISH, S_LEARN_GNOMISH, DoLearnCost(player));
+                ProcessCastaction(player, nullptr, S_GNOMISH, S_LEARN_GNOMISH, DoLearnCost(player));
                 break;
             //Unlearn Goblin
             case GOSSIP_ACTION_INFO_DEF + 3:
-                ProcessUnlearnAction(player, NULL, S_UNLEARN_GOBLIN, 0, DoHighUnlearnCost(player));
+                ProcessUnlearnAction(player, nullptr, S_UNLEARN_GOBLIN, 0, DoHighUnlearnCost(player));
                 break;
             //Unlearn Gnomish
             case GOSSIP_ACTION_INFO_DEF + 4:
-                ProcessUnlearnAction(player, NULL, S_UNLEARN_GNOMISH, 0, DoHighUnlearnCost(player));
+                ProcessUnlearnAction(player, nullptr, S_UNLEARN_GNOMISH, 0, DoHighUnlearnCost(player));
                 break;
         }
     }

@@ -9,16 +9,16 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_gen_".
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "Player.h"
-#include "Group.h"
 #include "CreatureTextMgr.h"
-#include "PetAI.h"
+#include "Group.h"
 #include "PassiveAI.h"
+#include "PetAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
 
 enum Mojo
 {
@@ -686,7 +686,7 @@ public:
                 {
                     uint8 limit = 0;
                     if (player->GetGroup())
-                        for (GroupReference* itr = player->GetGroup()->GetFirstMember(); itr != NULL && limit < 4; itr = itr->next(), ++limit)
+                        for (GroupReference* itr = player->GetGroup()->GetFirstMember(); itr != nullptr && limit < 4; itr = itr->next(), ++limit)
                             if (Player* groupPlayer = itr->GetSource())
                                 if (groupPlayer != player)
                                     groupPlayer->GetSession()->SendPacket(&_data);

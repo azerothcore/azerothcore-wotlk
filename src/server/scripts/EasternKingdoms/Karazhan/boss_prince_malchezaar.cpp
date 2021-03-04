@@ -5,9 +5,9 @@
 * Rescripted By Lee (Talamortis)
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "karazhan.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum PrinceSay

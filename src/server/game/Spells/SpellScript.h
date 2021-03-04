@@ -7,10 +7,10 @@
 #ifndef __SPELL_SCRIPT_H
 #define __SPELL_SCRIPT_H
 
-#include "Util.h"
 #include "SharedDefines.h"
-#include "SpellAuraDefines.h"
 #include "Spell.h"
+#include "SpellAuraDefines.h"
+#include "Util.h"
 #include <stack>
 
 class Unit;
@@ -352,38 +352,38 @@ public:
     // examples:
     // -shadowstep - explicit target is the unit you want to go behind of
     // -chain heal - explicit target is the unit to be healed first
-    // -holy nova/arcane explosion - explicit target = NULL because target you are selecting doesn't affect how spell targets are selected
+    // -holy nova/arcane explosion - explicit target = nullptr because target you are selecting doesn't affect how spell targets are selected
     // you can determine if spell requires explicit targets by dbc columns:
     // - Targets - mask of explicit target types
     // - ImplicitTargetXX set to TARGET_XXX_TARGET_YYY, _TARGET_ here means that explicit target is used by the effect, so spell needs one too
 
-    // returns: WorldLocation which was selected as a spell destination or NULL
+    // returns: WorldLocation which was selected as a spell destination or nullptr
     WorldLocation const* GetExplTargetDest();
 
     void SetExplTargetDest(WorldLocation& loc);
 
-    // returns: WorldObject which was selected as an explicit spell target or NULL if there's no target
+    // returns: WorldObject which was selected as an explicit spell target or nullptr if there's no target
     WorldObject* GetExplTargetWorldObject();
 
-    // returns: Unit which was selected as an explicit spell target or NULL if there's no target
+    // returns: Unit which was selected as an explicit spell target or nullptr if there's no target
     Unit* GetExplTargetUnit();
 
-    // returns: GameObject which was selected as an explicit spell target or NULL if there's no target
+    // returns: GameObject which was selected as an explicit spell target or nullptr if there's no target
     GameObject* GetExplTargetGObj();
 
-    // returns: Item which was selected as an explicit spell target or NULL if there's no target
+    // returns: Item which was selected as an explicit spell target or nullptr if there's no target
     Item* GetExplTargetItem();
 
     // methods useable only during spell hit on target, or during spell launch on target:
-    // returns: target of current effect if it was Unit otherwise NULL
+    // returns: target of current effect if it was Unit otherwise nullptr
     Unit* GetHitUnit();
-    // returns: target of current effect if it was Creature otherwise NULL
+    // returns: target of current effect if it was Creature otherwise nullptr
     Creature* GetHitCreature();
-    // returns: target of current effect if it was Player otherwise NULL
+    // returns: target of current effect if it was Player otherwise nullptr
     Player* GetHitPlayer();
-    // returns: target of current effect if it was Item otherwise NULL
+    // returns: target of current effect if it was Item otherwise nullptr
     Item* GetHitItem();
-    // returns: target of current effect if it was GameObject otherwise NULL
+    // returns: target of current effect if it was GameObject otherwise nullptr
     GameObject* GetHitGObj();
     // returns: destination of current effect
     WorldLocation* GetHitDest();
@@ -802,13 +802,13 @@ public:
 
     // returns guid of object which casted the aura (m_originalCaster of the Spell class)
     uint64 GetCasterGUID() const;
-    // returns unit which casted the aura or NULL if not avalible (caster logged out for example)
+    // returns unit which casted the aura or nullptr if not avalible (caster logged out for example)
     Unit* GetCaster() const;
     // returns object on which aura was casted, target for non-area auras, area aura source for area auras
     WorldObject* GetOwner() const;
-    // returns owner if it's unit or unit derived object, NULL otherwise (only for persistent area auras NULL is returned)
+    // returns owner if it's unit or unit derived object, nullptr otherwise (only for persistent area auras nullptr is returned)
     Unit* GetUnitOwner() const;
-    // returns owner if it's dynobj, NULL otherwise
+    // returns owner if it's dynobj, nullptr otherwise
     DynamicObject* GetDynobjOwner() const;
 
     // removes aura with remove mode (see AuraRemoveMode enum)
@@ -853,7 +853,7 @@ public:
 
     // check if aura has effect of given effindex
     bool HasEffect(uint8 effIndex) const;
-    // returns aura effect of given effect index or NULL
+    // returns aura effect of given effect index or nullptr
     AuraEffect* GetEffect(uint8 effIndex) const;
 
     // check if aura has effect of given aura type
@@ -863,8 +863,8 @@ public:
     // Do not call these in hooks in which AuraApplication is not avalible, otherwise result will differ from expected (the functions will return nullptr)
 
     // returns currently processed target of an aura
-    // Return value does not need to be NULL-checked, the only situation this will (always)
-    // return NULL is when the call happens in an unsupported hook, in other cases, it is always valid
+    // Return value does not need to be nullptr-checked, the only situation this will (always)
+    // return nullptr is when the call happens in an unsupported hook, in other cases, it is always valid
     Unit* GetTarget() const;
     // returns AuraApplication object of currently processed target
     AuraApplication const* GetTargetApplication() const;

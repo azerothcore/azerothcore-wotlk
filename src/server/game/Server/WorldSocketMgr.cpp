@@ -9,30 +9,26 @@
 *  \author Derex <derex101@gmail.com>
 */
 
-#include "WorldSocketMgr.h"
-
-#include <ace/ACE.h>
-#include <ace/Log_Msg.h>
-#include <ace/Reactor.h>
-#include <ace/Reactor_Impl.h>
-#include <ace/TP_Reactor.h>
-#include <ace/Dev_Poll_Reactor.h>
-#include <atomic>
-#include <ace/os_include/arpa/os_inet.h>
-#include <ace/os_include/netinet/os_tcp.h>
-#include <ace/os_include/sys/os_types.h>
-#include <ace/os_include/sys/os_socket.h>
-
-#include <atomic>
-#include <set>
-
-#include "Log.h"
 #include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
+#include "Log.h"
+#include "ScriptMgr.h"
 #include "WorldSocket.h"
 #include "WorldSocketAcceptor.h"
-#include "ScriptMgr.h"
+#include "WorldSocketMgr.h"
+#include <ace/ACE.h>
+#include <ace/Dev_Poll_Reactor.h>
+#include <ace/Log_Msg.h>
+#include <ace/os_include/arpa/os_inet.h>
+#include <ace/os_include/netinet/os_tcp.h>
+#include <ace/os_include/sys/os_socket.h>
+#include <ace/os_include/sys/os_types.h>
+#include <ace/Reactor_Impl.h>
+#include <ace/Reactor.h>
+#include <ace/TP_Reactor.h>
+#include <atomic>
+#include <set>
 
 /**
 * This is a helper class to WorldSocketMgr, that manages
@@ -226,9 +222,9 @@ WorldSocketMgr* WorldSocketMgr::instance()
 int
 WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 {
-    m_UseNoDelay = sConfigMgr->GetBoolDefault ("Network.TcpNodelay", true);
+    m_UseNoDelay = sConfigMgr->GetOption<bool> ("Network.TcpNodelay", true);
 
-    int num_threads = sConfigMgr->GetIntDefault ("Network.Threads", 1);
+    int num_threads = sConfigMgr->GetOption<int32> ("Network.Threads", 1);
 
     if (num_threads <= 0)
     {
@@ -243,9 +239,9 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
     sLog->outBasic ("Max allowed socket connections %d", ACE::max_handles());
 
     // -1 means use default
-    m_SockOutKBuff = sConfigMgr->GetIntDefault ("Network.OutKBuff", -1);
+    m_SockOutKBuff = sConfigMgr->GetOption<int32> ("Network.OutKBuff", -1);
 
-    m_SockOutUBuff = sConfigMgr->GetIntDefault ("Network.OutUBuff", 65536);
+    m_SockOutUBuff = sConfigMgr->GetOption<int32> ("Network.OutUBuff", 65536);
 
     if (m_SockOutUBuff <= 0)
     {

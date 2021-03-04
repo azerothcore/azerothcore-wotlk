@@ -4,20 +4,19 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PassiveAI.h"
-#include "ReactorAI.h"
 #include "CombatAI.h"
-#include "GuardAI.h"
-#include "PetAI.h"
-#include "TotemAI.h"
-#include "RandomMovementGenerator.h"
-#include "MovementGeneratorImpl.h"
-#include "CreatureAIRegistry.h"
-#include "WaypointMovementGenerator.h"
 #include "CreatureAIFactory.h"
+#include "CreatureAIRegistry.h"
+#include "GuardAI.h"
+#include "MovementGeneratorImpl.h"
+#include "PassiveAI.h"
+#include "PetAI.h"
+#include "RandomMovementGenerator.h"
+#include "ReactorAI.h"
 #include "SmartAI.h"
+#include "TotemAI.h"
+#include "WaypointMovementGenerator.h"
 
-//#include "CreatureAIImpl.h"
 namespace AIRegistry
 {
     void Initialize()

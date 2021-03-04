@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
 #include "icecrown_citadel.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
 
 enum Texts
 {
@@ -992,7 +992,7 @@ public:
                         next->SetHealth(current->GetHealth());
                         current->AI()->DoAction(ACTION_REMOVE_INVOCATION);
                         current->SetHealth(1);
-                        current->CastSpell((Unit*)NULL, visualSpellId, true);
+                        current->CastSpell((Unit*)nullptr, visualSpellId, true);
                         next->AI()->Talk(1);
                     }
                     events.ScheduleEvent(EVENT_INVOCATION_OF_BLOOD, 46000);
@@ -1437,7 +1437,7 @@ public:
         {
             if (GetTarget()->GetTypeId() == TYPEID_PLAYER && GetTarget()->isMoving())
             {
-                GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_PRISON_DAMAGE, true, NULL, aurEff);
+                GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_PRISON_DAMAGE, true, nullptr, aurEff);
             }
         }
 

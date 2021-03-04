@@ -9,11 +9,11 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_mag_".
  */
 
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "CombatAI.h"
 #include "Pet.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
 
 enum MageSpells
@@ -90,7 +90,7 @@ public:
             me->SetReactState(REACT_DEFENSIVE);
 
             // Xinef: Inherit Master's Threat List (not yet implemented)
-            //owner->CastSpell((Unit*)NULL, SPELL_MAGE_MASTERS_THREAT_LIST, true);
+            //owner->CastSpell((Unit*)nullptr, SPELL_MAGE_MASTERS_THREAT_LIST, true);
             HostileReference* ref = owner->getHostileRefManager().getFirst();
             while (ref)
             {

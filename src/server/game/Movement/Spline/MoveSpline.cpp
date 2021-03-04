@@ -4,10 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Creature.h"
+#include "Log.h"
 #include "MoveSpline.h"
 #include <sstream>
-#include "Log.h"
-#include "Creature.h"
 
 namespace Movement
 {

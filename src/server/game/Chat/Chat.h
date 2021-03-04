@@ -9,7 +9,6 @@
 
 #include "SharedDefines.h"
 #include "WorldSession.h"
-
 #include <vector>
 
 class ChatHandler;
@@ -94,7 +93,7 @@ public:
     char*     extractKeyFromLink(char* text, char const* linkType, char** something1 = nullptr);
     char*     extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = nullptr);
 
-    // if args have single value then it return in arg2 and arg1 == NULL
+    // if args have single value then it return in arg2 and arg1 == nullptr
     void      extractOptFirstArg(char* args, char** arg1, char** arg2);
     char*     extractQuotedArg(char* args);
 
@@ -104,7 +103,7 @@ public:
     bool GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, uint64& guid, bool offline = false);
     std::string extractPlayerNameFromLink(char* text);
     // select by arg (name/link) or in-game selection online/offline player
-    bool extractPlayerTarget(char* args, Player** player, uint64* player_guid = NULL, std::string* player_name = nullptr);
+    bool extractPlayerTarget(char* args, Player** player, uint64* player_guid = nullptr, std::string* player_name = nullptr);
 
     std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:" + name + "|h[" + name + "]|h|r" : name; }
     std::string GetNameLink(Player* chr) const;
@@ -124,7 +123,7 @@ protected:
     bool ShowHelpForSubCommands(std::vector<ChatCommand> const& table, char const* cmd, char const* subcmd);
 
 private:
-    WorldSession* m_session;                           // != NULL for chat command call and NULL for CLI command
+    WorldSession* m_session;                           // != nullptr for chat command call and nullptr for CLI command
 
     // common global flag
     static bool load_command_table;

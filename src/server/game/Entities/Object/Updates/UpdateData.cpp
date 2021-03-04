@@ -4,13 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
 #include "ByteBuffer.h"
-#include "WorldPacket.h"
-#include "UpdateData.h"
+#include "Common.h"
 #include "Log.h"
 #include "Opcodes.h"
+#include "UpdateData.h"
 #include "World.h"
+#include "WorldPacket.h"
 #include "zlib.h"
 
 UpdateData::UpdateData() : m_blockCount(0)

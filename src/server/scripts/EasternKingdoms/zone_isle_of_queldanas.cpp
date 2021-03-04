@@ -16,12 +16,12 @@ npc_converted_sentry
 npc_greengill_slave
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "Player.h"
-#include "Pet.h"
-#include "SpellInfo.h"
 #include "PassiveAI.h"
+#include "Pet.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
 #include "SpellScript.h"
 
 /*###### OUR: ######*/

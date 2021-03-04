@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
 #include "shadow_labyrinth.h"
 
 enum eEnums
@@ -53,7 +53,7 @@ public:
 
             me->RemoveAurasDueToSpell(SPELL_BANISH);
             Talk(SAY_INTRO);
-            Start(true, false, 0, NULL, false, true);
+            Start(true, false, 0, nullptr, false, true);
             isBanished = false;
         }
 
@@ -70,7 +70,7 @@ public:
                     me->CastSpell(me, SPELL_BANISH, true);
                 }
                 else
-                    Start(true, false, 0, NULL, false, true);
+                    Start(true, false, 0, nullptr, false, true);
             }
         }
 

@@ -6,12 +6,12 @@
 
 #include "DatabaseEnv.h"
 #include "Log.h"
-#include "World.h"
-#include "Util.h"
-#include "SkillDiscovery.h"
-#include "SpellMgr.h"
 #include "Player.h"
+#include "SkillDiscovery.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "Util.h"
+#include "World.h"
 #include <map>
 
 struct SkillDiscoveryEntry
