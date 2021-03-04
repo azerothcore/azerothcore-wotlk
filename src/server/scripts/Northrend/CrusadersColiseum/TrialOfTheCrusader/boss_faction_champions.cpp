@@ -446,9 +446,9 @@ public:
                     break;
                 case EVENT_SPELL_HEROISM_OR_BLOODLUST:
                     if( me->GetEntry() == NPC_ALLIANCE_SHAMAN_RESTORATION )
-                        me->CastSpell((Unit*)NULL, SPELL_HEROISM, true);
+                        me->CastSpell((Unit*)nullptr, SPELL_HEROISM, true);
                     else
-                        me->CastSpell((Unit*)NULL, SPELL_BLOODLUST, true);
+                        me->CastSpell((Unit*)nullptr, SPELL_BLOODLUST, true);
                     events.RepeatEvent(600000);
                     EventMapGCD(events, 1500);
                     break;
@@ -719,7 +719,7 @@ public:
                 case EVENT_SPELL_PSYCHIC_SCREAM:
                     if( HealthBelowPct(50) && EnemiesInRange(8.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_PSYCHIC_SCREAM, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_PSYCHIC_SCREAM, false);
                         events.RepeatEvent(30000);
                         EventMapGCD(events, 1500);
                     }
@@ -869,7 +869,7 @@ public:
                 case EVENT_SPELL_PSYCHIC_SCREAM:
                     if( EnemiesInRange(8.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_PSYCHIC_SCREAM, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_PSYCHIC_SCREAM, false);
                         events.RepeatEvent(30000);
                         EventMapGCD(events, 1500);
                     }
@@ -972,7 +972,7 @@ public:
                 case EVENT_SPELL_HELLFIRE:
                     if( EnemiesInRange(9.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_HELLFIRE, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_HELLFIRE, false);
                         events.RepeatEvent(30000);
                         EventMapGCD(events, 1500);
                     }
@@ -1117,7 +1117,7 @@ public:
                 case EVENT_SPELL_ARCANE_EXPLOSION:
                     if( EnemiesInRange(9.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_ARCANE_EXPLOSION, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_ARCANE_EXPLOSION, false);
                         events.RepeatEvent(6000);
                         EventMapGCD(events, 1500);
                     }
@@ -1127,7 +1127,7 @@ public:
                 case EVENT_SPELL_BLINK:
                     if( HealthBelowPct(50) && EnemiesInRange(10.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_FROST_NOVA, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_FROST_NOVA, false);
                         events.RepeatEvent(15000);
                         EventMapGCD(events, 1500);
                         // blink disabled, fucking movement shit not working
@@ -1462,7 +1462,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_FORCE_OF_NATURE:
-                    me->CastSpell((Unit*)NULL, SPELL_FORCE_OF_NATURE, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_FORCE_OF_NATURE, false);
                     events.RepeatEvent(180000);
                     EventMapGCD(events, 1500);
                     break;
@@ -1566,7 +1566,7 @@ public:
                 case EVENT_SPELL_INTIMIDATING_SHOUT:
                     if( EnemiesInRange(8.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_INTIMIDATING_SHOUT, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_INTIMIDATING_SHOUT, false);
                         events.RepeatEvent(120000);
                         EventMapGCD(events, 1500);
                     }
@@ -2102,14 +2102,14 @@ public:
                     break;
                 case EVENT_SPELL_HEROISM_OR_BLOODLUST:
                     if( me->GetEntry() == NPC_ALLIANCE_SHAMAN_RESTORATION )
-                        me->CastSpell((Unit*)NULL, SPELL_HEROISM, true);
+                        me->CastSpell((Unit*)nullptr, SPELL_HEROISM, true);
                     else
-                        me->CastSpell((Unit*)NULL, SPELL_BLOODLUST, true);
+                        me->CastSpell((Unit*)nullptr, SPELL_BLOODLUST, true);
                     events.RepeatEvent(600000);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SUMMON_TOTEM:
-                    me->CastSpell((Unit*)NULL, RAND(SPELL_GROUNDING_TOTEM, SPELL_WINDFURY_TOTEM, SPELL_TREMOR_TOTEM), false);
+                    me->CastSpell((Unit*)nullptr, RAND(SPELL_GROUNDING_TOTEM, SPELL_WINDFURY_TOTEM, SPELL_TREMOR_TOTEM), false);
                     events.RepeatEvent(30000);
                     EventMapGCD(events, 1500);
                     break;
@@ -2231,7 +2231,7 @@ public:
                     }
                     if( EnemiesInRange(5.0f) >= 3 )
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_DIVINE_STORM, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_DIVINE_STORM, false);
                         events.RepeatEvent(urand(10000, 15000));
                         EventMapGCD(events, 1500);
                     }
@@ -2474,7 +2474,7 @@ public:
         void HandleDispel(DispelInfo* dispelInfo)
         {
             if (Unit* caster = GetCaster())
-                caster->CastSpell(dispelInfo->GetDispeller(), SPELL_UNSTABLE_AFFLICTION_DISPEL, true, NULL, GetEffect(EFFECT_0));
+                caster->CastSpell(dispelInfo->GetDispeller(), SPELL_UNSTABLE_AFFLICTION_DISPEL, true, nullptr, GetEffect(EFFECT_0));
         }
 
         void Register() override

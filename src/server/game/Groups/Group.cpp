@@ -497,7 +497,7 @@ bool Group::AddMember(Player* player)
     return true;
 }
 
-bool Group::RemoveMember(uint64 guid, const RemoveMethod& method /*= GROUP_REMOVEMETHOD_DEFAULT*/, uint64 kicker /*= 0*/, const char* reason /*= NULL*/)
+bool Group::RemoveMember(uint64 guid, const RemoveMethod& method /*= GROUP_REMOVEMETHOD_DEFAULT*/, uint64 kicker /*= 0*/, const char* reason /*= nullptr*/)
 {
     BroadcastGroupUpdate();
 
@@ -1355,7 +1355,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                     continue;
 
                 player = ObjectAccessor::FindPlayer(itr->first);
-                if (!player || (allowedMap != NULL && player->FindMap() != allowedMap))
+                if (!player || (allowedMap != nullptr && player->FindMap() != allowedMap))
                 {
                     --roll->totalNeed;
                     continue;
@@ -1419,7 +1419,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                     continue;
 
                 player = ObjectAccessor::FindPlayer(itr->first);
-                if (!player || (allowedMap != NULL && player->FindMap() != allowedMap))
+                if (!player || (allowedMap != nullptr && player->FindMap() != allowedMap))
                 {
                     --roll->totalGreed;
                     continue;

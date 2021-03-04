@@ -65,7 +65,7 @@ private:
     void InitMovementInfoForBase();
 
     /// This method transforms supplied transport offsets into global coordinates
-    void CalculatePassengerPosition(float& x, float& y, float& z, float* o /*= NULL*/) const override
+    void CalculatePassengerPosition(float& x, float& y, float& z, float* o /*= nullptr*/) const override
     {
         TransportBase::CalculatePassengerPosition(x, y, z, o,
                 GetBase()->GetPositionX(), GetBase()->GetPositionY(),
@@ -73,7 +73,7 @@ private:
     }
 
     /// This method transforms supplied global coordinates into local offsets
-    void CalculatePassengerOffset(float& x, float& y, float& z, float* o /*= NULL*/) const override
+    void CalculatePassengerOffset(float& x, float& y, float& z, float* o /*= nullptr*/) const override
     {
         TransportBase::CalculatePassengerOffset(x, y, z, o,
                                                 GetBase()->GetPositionX(), GetBase()->GetPositionY(),

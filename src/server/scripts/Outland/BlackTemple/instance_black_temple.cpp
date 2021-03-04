@@ -465,7 +465,7 @@ public:
         void Update(AuraEffect const* effect)
         {
             PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->SelectNearbyNoTotemTarget((Unit*)NULL, 50.0f))
+            if (Unit* target = GetUnitOwner()->SelectNearbyNoTotemTarget((Unit*)nullptr, 50.0f))
                 GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
         }
 
