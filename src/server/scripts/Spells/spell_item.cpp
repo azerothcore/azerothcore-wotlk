@@ -927,13 +927,17 @@ public:
                 {
                     Aura* aura = itr->second;
                     if (aura->GetSpellInfo()->SpellLevel > 25 || aura->GetSpellInfo()->Dispel != DISPEL_POISON)
+                    {
                         continue;
+                    }
 
                     removeList.push_back(aura->GetId());
                 }
 
                 for (std::list<uint32>::const_iterator itr = removeList.begin(); itr != removeList.end(); ++itr)
+                {
                     target->RemoveAurasDueToSpell(*itr);
+                }
             }
         }
 
