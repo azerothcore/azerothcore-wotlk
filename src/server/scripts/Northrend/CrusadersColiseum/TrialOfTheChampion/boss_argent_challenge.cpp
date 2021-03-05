@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "trial_of_the_champion.h"
 #include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "trial_of_the_champion.h"
 
 enum EadricSpells
 {
@@ -137,7 +137,7 @@ public:
                 damage = me->GetHealth() - 1;
                 if( me->getFaction() != 35 )
                 {
-                    me->CastSpell((Unit*)NULL, 68575, true); // achievements
+                    me->CastSpell((Unit*)nullptr, 68575, true); // achievements
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, 68574, me); // paletress' spell credits encounter, but shouldn't credit achievements
                     me->setFaction(35);
                     events.Reset();
@@ -167,7 +167,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_RADIANCE:
-                    me->CastSpell((Unit*)NULL, SPELL_RADIANCE, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_RADIANCE, false);
                     me->MonsterTextEmote(TEXT_RADIATE, 0, true);
                     events.RepeatEvent(16000);
                     break;
@@ -285,7 +285,7 @@ public:
 
                 if( me->getFaction() != 35 )
                 {
-                    me->CastSpell((Unit*)NULL, 68574, true); // achievements
+                    me->CastSpell((Unit*)nullptr, 68574, true); // achievements
                     me->setFaction(35);
                     events.Reset();
                     Talk(TEXT_PALETRESS_DEATH);
@@ -327,11 +327,11 @@ public:
             {
                 me->InterruptNonMeleeSpells(true);
                 Talk(TEXT_PALETRESS_MEMORY_SUMMON);
-                me->CastSpell((Unit*)NULL, SPELL_HOLY_NOVA, false);
+                me->CastSpell((Unit*)nullptr, SPELL_HOLY_NOVA, false);
                 me->CastSpell(me, SPELL_SHIELD, false);
-                me->CastSpell((Unit*)NULL, SPELL_SUMMON_MEMORY, false);
+                me->CastSpell((Unit*)nullptr, SPELL_SUMMON_MEMORY, false);
                 SummonMemory();
-                me->CastSpell((Unit*)NULL, SPELL_CONFESS, false);
+                me->CastSpell((Unit*)nullptr, SPELL_CONFESS, false);
                 events.ScheduleEvent(EVENT_SPELL_RENEW, urand(6000, 8000));
                 summoned = true;
                 return;
@@ -610,7 +610,7 @@ public:
                 damage = me->GetHealth() - 1;
                 events.DelayEvents(10000);
                 me->CastSpell(me, SPELL_DIVINE_SHIELD_H, true);
-                me->CastSpell((Unit*)NULL, SPELL_FINAL_MEDITATION_H, true);
+                me->CastSpell((Unit*)nullptr, SPELL_FINAL_MEDITATION_H, true);
             }
         }
 
@@ -678,7 +678,7 @@ public:
                     events.RepeatEvent(urand(12000, 15000));
                     break;
                 case EVENT_PRIESTESS_SPELL_FOUNTAIN_OF_LIGHT:
-                    me->CastSpell((Unit*)NULL, SPELL_FOUNTAIN_OF_LIGHT, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_FOUNTAIN_OF_LIGHT, false);
                     events.RepeatEvent(urand(35000, 45000));
                     break;
                 case EVENT_PRIESTESS_SPELL_MIND_CONTROL_H:

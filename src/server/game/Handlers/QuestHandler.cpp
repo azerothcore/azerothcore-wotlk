@@ -4,23 +4,24 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "Log.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "Opcodes.h"
-#include "World.h"
-#include "ObjectMgr.h"
-#include "Player.h"
-#include "GossipDef.h"
-#include "QuestDef.h"
-#include "ObjectAccessor.h"
-#include "Group.h"
 #include "Battleground.h"
 #include "BattlegroundAV.h"
-#include "ScriptMgr.h"
+#include "Common.h"
 #include "GameObjectAI.h"
+#include "GossipDef.h"
+#include "Group.h"
 #include "Language.h"
+#include "Log.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "QuestDef.h"
+#include "ScriptMgr.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -478,7 +479,7 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recvData)
                     return;
 
         if (_player->CanAddQuest(quest, true))
-            _player->AddQuestAndCheckCompletion(quest, nullptr); // NULL, this prevent DB script from duplicate running
+            _player->AddQuestAndCheckCompletion(quest, nullptr); // nullptr, this prevent DB script from duplicate running
 
         _player->SetDivider(0);
     }

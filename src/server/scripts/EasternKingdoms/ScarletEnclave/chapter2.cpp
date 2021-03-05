@@ -4,13 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
+#include "CombatAI.h"
+#include "CreatureTextMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
-#include "CreatureTextMgr.h"
-#include "CombatAI.h"
 #include "SpellScript.h"
 
 //How to win friends and influence enemies
@@ -81,7 +81,7 @@ public:
                         me->SetReactState(REACT_PASSIVE);
                         DoCastAOE(SPELL_THREAT_PULSE, true);
 
-                        sCreatureTextMgr->SendChat(me, SAY_PERSUADE_RAND, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
+                        sCreatureTextMgr->SendChat(me, SAY_PERSUADE_RAND, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
                         Talk(SAY_CRUSADER);
                     }
                 }
@@ -124,7 +124,7 @@ public:
                             break;
 
                         case 5:
-                            sCreatureTextMgr->SendChat(me, SAY_PERSUADED5, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
+                            sCreatureTextMgr->SendChat(me, SAY_PERSUADED5, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
                             speechTimer = 8000;
                             break;
 

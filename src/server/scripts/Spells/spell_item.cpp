@@ -10,13 +10,13 @@
  * Scriptnames of files in this file should be prefixed with "spell_item_".
  */
 
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
-#include "SkillDiscovery.h"
 #include "Battleground.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SkillDiscovery.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 class spell_item_massive_seaforium_charge : public SpellScriptLoader
 {
@@ -1491,7 +1491,7 @@ public:
                         return; // ignore for non-healing classes
                 }
 
-                unitTarget->CastSpell(unitTarget, spell_id, true, NULL, aurEff);
+                unitTarget->CastSpell(unitTarget, spell_id, true, nullptr, aurEff);
             }
         }
 
@@ -1662,7 +1662,7 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
         {
             PreventDefaultAction();
-            GetTarget()->CastSpell(GetTarget(), SPELL_AEGIS_HEAL, true, NULL, aurEff);
+            GetTarget()->CastSpell(GetTarget(), SPELL_AEGIS_HEAL, true, nullptr, aurEff);
         }
 
         void Register() override
@@ -1777,7 +1777,7 @@ public:
                 protEff->GetBase()->RefreshDuration();
             }
             else
-                GetTarget()->CastCustomSpell(SPELL_PROTECTION_OF_ANCIENT_KINGS, SPELLVALUE_BASE_POINT0, absorb, eventInfo.GetProcTarget(), true, NULL, aurEff);
+                GetTarget()->CastCustomSpell(SPELL_PROTECTION_OF_ANCIENT_KINGS, SPELLVALUE_BASE_POINT0, absorb, eventInfo.GetProcTarget(), true, nullptr, aurEff);
         }
 
         void Register() override
@@ -1874,7 +1874,7 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
         {
             PreventDefaultAction();
-            GetTarget()->CastSpell(GetTarget(), SPELL_DESPERATE_RAGE, true, NULL, aurEff);
+            GetTarget()->CastSpell(GetTarget(), SPELL_DESPERATE_RAGE, true, nullptr, aurEff);
         }
 
         void Register() override
@@ -2322,7 +2322,7 @@ public:
         {
             PreventDefaultAction();
             int32 bp = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), aurEff->GetAmount());
-            GetTarget()->CastCustomSpell(SPELL_ITEM_NECROTIC_TOUCH_PROC, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetProcTarget(), true, NULL, aurEff);
+            GetTarget()->CastCustomSpell(SPELL_ITEM_NECROTIC_TOUCH_PROC, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetProcTarget(), true, nullptr, aurEff);
         }
 
         void Register() override
@@ -2794,14 +2794,14 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            GetTarget()->CastSpell(GetTarget(), SPELL_SHADOWMOURNE_SOUL_FRAGMENT, true, NULL, aurEff);
+            GetTarget()->CastSpell(GetTarget(), SPELL_SHADOWMOURNE_SOUL_FRAGMENT, true, nullptr, aurEff);
 
             // this can't be handled in AuraScript of SoulFragments because we need to know victim
             if (Aura* soulFragments = GetTarget()->GetAura(SPELL_SHADOWMOURNE_SOUL_FRAGMENT))
             {
                 if (soulFragments->GetStackAmount() >= 10)
                 {
-                    GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_SHADOWMOURNE_CHAOS_BANE_DAMAGE, true, NULL, aurEff);
+                    GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_SHADOWMOURNE_CHAOS_BANE_DAMAGE, true, nullptr, aurEff);
                     soulFragments->Remove();
                 }
             }
@@ -3034,7 +3034,7 @@ public:
                     spellId = SPELL_UNDERBELLY_ELIXIR_TRIGGERED3;
                     break;
             }
-            caster->CastSpell(caster, spellId, true, GetCastItem(), NULL, caster->GetGUID());
+            caster->CastSpell(caster, spellId, true, GetCastItem(), nullptr, caster->GetGUID());
         }
 
         void Register() override

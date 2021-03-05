@@ -12,9 +12,9 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
-#include "Language.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "Language.h"
 #include "ObjectAccessor.h"
 #include "ScriptMgr.h"
 

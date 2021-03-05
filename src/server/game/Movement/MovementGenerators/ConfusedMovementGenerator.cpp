@@ -4,13 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ConfusedMovementGenerator.h"
 #include "Creature.h"
 #include "MapManager.h"
-#include "ConfusedMovementGenerator.h"
-#include "VMapFactory.h"
-#include "MoveSplineInit.h"
 #include "MoveSpline.h"
+#include "MoveSplineInit.h"
 #include "Player.h"
+#include "VMapFactory.h"
 
 #ifdef MAP_BASED_RAND_GEN
 #define rand_norm() unit.rand_norm()

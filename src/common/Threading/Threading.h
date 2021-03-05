@@ -10,9 +10,6 @@
 #include <thread>
 #include <atomic>
 
-#include <thread>
-#include <atomic>
-
 namespace acore
 {
     class Runnable

@@ -7,13 +7,13 @@
 #ifndef BATTLEFIELD_H_
 #define BATTLEFIELD_H_
 
-#include "Utilities/Util.h"
-#include "SharedDefines.h"
-#include "ZoneScript.h"
-#include "WorldPacket.h"
-#include "GameObject.h"
 #include "Battleground.h"
+#include "GameObject.h"
 #include "ObjectAccessor.h"
+#include "SharedDefines.h"
+#include "Utilities/Util.h"
+#include "WorldPacket.h"
+#include "ZoneScript.h"
 
 enum BattlefieldTypes
 {
@@ -98,7 +98,7 @@ public:
     virtual void SendChangePhase();
 
     bool SetCapturePointData(GameObject* capturePoint);
-    GameObject* GetCapturePointGo() { return ObjectAccessor::GetObjectInWorld(m_capturePoint, (GameObject*)NULL); }
+    GameObject* GetCapturePointGo() { return ObjectAccessor::GetObjectInWorld(m_capturePoint, (GameObject*)nullptr); }
     GameObject* GetCapturePointGo(WorldObject* obj) { return ObjectAccessor::GetGameObject(*obj, m_capturePoint); }
 
     TeamId GetTeamId() { return m_team; }

@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
 #include "black_temple.h"
+#include "InstanceScript.h"
+#include "ScriptMgr.h"
 
 DoorData const doorData[] =
 {
@@ -465,7 +465,7 @@ public:
         void Update(AuraEffect const* effect)
         {
             PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->SelectNearbyNoTotemTarget((Unit*)NULL, 50.0f))
+            if (Unit* target = GetUnitOwner()->SelectNearbyNoTotemTarget((Unit*)nullptr, 50.0f))
                 GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
         }
 

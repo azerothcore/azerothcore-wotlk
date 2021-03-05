@@ -4,19 +4,19 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "Vehicle.h"
-#include "ObjectMgr.h"
-#include "ScriptedEscortAI.h"
 #include "CombatAI.h"
-#include "PassiveAI.h"
-#include "Player.h"
-#include "SpellInfo.h"
 #include "CreatureTextMgr.h"
+#include "ObjectMgr.h"
+#include "PassiveAI.h"
 #include "PetAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
 #include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 enum eyeOfAcherus

@@ -5,23 +5,24 @@
  */
 
 #include "Common.h"
+#include "CreatureAI.h"
 #include "DBCStores.h"
+#include "GameObjectAI.h"
+#include "Log.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellMgr.h"
+#include "TemporarySummon.h"
+#include "Totem.h"
+#include "Vehicle.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
-#include "SpellMgr.h"
-#include "Log.h"
-#include "Opcodes.h"
-#include "Spell.h"
-#include "Vehicle.h"
-#include "Totem.h"
-#include "TemporarySummon.h"
-#include "SpellAuras.h"
-#include "CreatureAI.h"
-#include "ScriptMgr.h"
-#include "GameObjectAI.h"
-#include "SpellAuraEffects.h"
-#include "Player.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -68,20 +69,20 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     if (glyphIndex >= MAX_GLYPH_SLOT_INDEX)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, nullptr);
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
     }
 
     Item* pItem = pUser->GetUseableItemByPos(bagIndex, slot);
     if (!pItem)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, nullptr);
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
     }
 
     if (pItem->GetGUID() != itemGUID)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, nullptr);
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
     }
 
@@ -176,7 +177,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     // xinef: additional check, client outputs message on its own
     if (!pUser->IsAlive())
     {
-        pUser->SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, NULL, nullptr);
+        pUser->SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, nullptr, nullptr);
         return;
     }
 
@@ -191,7 +192,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     Item* item = pUser->GetItemByPos(bagIndex, slot);
     if (!item)
     {
-        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, NULL, nullptr);
+        pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
     }
 
@@ -436,7 +437,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     {
         SpellInfo const* actualSpellInfo = spellInfo->GetAuraRankForLevel(targets.GetUnitTarget()->getLevel());
 
-        // if rank not found then function return NULL but in explicit cast case original spell can be casted and later failed with appropriate error message
+        // if rank not found then function return nullptr but in explicit cast case original spell can be casted and later failed with appropriate error message
         if (actualSpellInfo)
             spellInfo = actualSpellInfo;
     }
@@ -619,7 +620,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
     recvData >> guid;
 
     // Get unit for which data is needed by client
-    Unit* unit = ObjectAccessor::GetObjectInWorld(guid, (Unit*)NULL);
+    Unit* unit = ObjectAccessor::GetObjectInWorld(guid, (Unit*)nullptr);
     if (!unit)
         return;
 

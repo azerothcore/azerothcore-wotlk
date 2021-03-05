@@ -7,9 +7,9 @@
 #ifndef _PLAYER_DUMP_H
 #define _PLAYER_DUMP_H
 
-#include <string>
 #include <map>
 #include <set>
+#include <string>
 
 enum DumpTableType
 {

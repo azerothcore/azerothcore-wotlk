@@ -2,14 +2,14 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "ulduar.h"
-#include "SpellAuraEffects.h"
-#include "SpellAuras.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "ulduar.h"
 
 enum HodirSpellData
 {
@@ -430,7 +430,7 @@ public:
                             (*itr)->m_positionZ = prevZ;
                         }
 
-                        me->CastSpell((Unit*)NULL, SPELL_FLASH_FREEZE_CAST, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_FLASH_FREEZE_CAST, false);
                         me->MonsterTextEmote("Hodir begins to cast Flash Freeze!", 0, true);
                         me->MonsterYell(TEXT_HODIR_FLASH_FREEZE, LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
@@ -803,7 +803,7 @@ public:
                     }
                     break;
                 case EVENT_PRIEST_DISPELL_MAGIC:
-                    me->CastCustomSpell(SPELL_PRIEST_DISPELL_MAGIC, SPELLVALUE_MAX_TARGETS, 1, (Unit*)NULL, false);
+                    me->CastCustomSpell(SPELL_PRIEST_DISPELL_MAGIC, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
                     events.RepeatEvent(7000);
                     break;
                 case EVENT_PRIEST_GREAT_HEAL:
@@ -1415,7 +1415,7 @@ public:
         {
             PreventDefaultAction();
             if (Unit* target = GetTarget())
-                target->CastSpell((Unit*)NULL, (GetId() == SPELL_SHAMAN_STORM_CLOUD_10 ? SPELL_SHAMAN_STORM_POWER_10 : SPELL_SHAMAN_STORM_POWER_25), true);
+                target->CastSpell((Unit*)nullptr, (GetId() == SPELL_SHAMAN_STORM_CLOUD_10 ? SPELL_SHAMAN_STORM_POWER_10 : SPELL_SHAMAN_STORM_POWER_25), true);
         }
 
         void Register() override

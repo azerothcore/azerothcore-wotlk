@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "GuardAI.h"
-#include "Errors.h"
-#include "Player.h"
-#include "ObjectAccessor.h"
-#include "World.h"
 #include "CreatureAIImpl.h"
+#include "Errors.h"
+#include "GuardAI.h"
+#include "ObjectAccessor.h"
+#include "Player.h"
+#include "World.h"
 
 int GuardAI::Permissible(Creature const* creature)
 {

@@ -10,11 +10,10 @@
 #include "Common.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "Unit.h"
 #include "Spell.h"
-
-//#include "SmartScript.h"
 //#include "SmartAI.h"
+//#include "SmartScript.h"
+#include "Unit.h"
 
 struct WayPoint
 {
@@ -1850,7 +1849,7 @@ private:
     {
         if (!data)
         {
-            sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u Parameter can not be NULL, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+            sLog->outErrorDb("SmartAIMgr: Entry %d SourceType %u Event %u Action %u Parameter can not be nullptr, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             return false;
         }
         return true;

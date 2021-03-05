@@ -5,24 +5,24 @@
  */
 
 #include "Common.h"
-#include "SharedDefines.h"
 #include "DBCStores.h"
 #include "DisableMgr.h"
-#include "ObjectMgr.h"
-#include "SocialMgr.h"
+#include "GameEventMgr.h"
+#include "Group.h"
+#include "GroupMgr.h"
 #include "Language.h"
-#include "LFGMgr.h"
-#include "LFGScripts.h"
 #include "LFGGroupData.h"
+#include "LFGMgr.h"
 #include "LFGPlayerData.h"
 #include "LFGQueue.h"
-#include "Group.h"
-#include "SpellAuras.h"
-#include "Player.h"
-#include "GroupMgr.h"
-#include "GameEventMgr.h"
-#include "WorldSession.h"
+#include "LFGScripts.h"
+#include "ObjectMgr.h"
 #include "Opcodes.h"
+#include "Player.h"
+#include "SharedDefines.h"
+#include "SocialMgr.h"
+#include "SpellAuras.h"
+#include "WorldSession.h"
 
 namespace lfg
 {
@@ -570,7 +570,7 @@ namespace lfg
                 else
                 {
                     uint8 memberCount = 0;
-                    for (GroupReference* itr = grp->GetFirstMember(); itr != NULL && joinData.result == LFG_JOIN_OK; itr = itr->next())
+                    for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr && joinData.result == LFG_JOIN_OK; itr = itr->next())
                     {
                         if (Player* plrg = itr->GetSource())
                         {
@@ -598,7 +598,7 @@ namespace lfg
                     joinData.result = LFG_JOIN_RANDOM_COOLDOWN;
                 else if (grp)
                 {
-                    for (GroupReference* itr = grp->GetFirstMember(); itr != NULL && joinData.result == LFG_JOIN_OK; itr = itr->next())
+                    for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr && joinData.result == LFG_JOIN_OK; itr = itr->next())
                         if (Player* plrg = itr->GetSource())
                             if (plrg->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)) // xinef: added !isContinue
                                 joinData.result = LFG_JOIN_PARTY_RANDOM_COOLDOWN;
@@ -733,7 +733,7 @@ namespace lfg
 
     /**
         Leaves Dungeon System. Player/Group is removed from queue, rolechecks, proposals
-        or votekicks. Player or group needs to be not NULL and using Dungeon System
+        or votekicks. Player or group needs to be not nullptr and using Dungeon System
 
        @param[in]     guid Player or group guid
     */
@@ -2085,7 +2085,7 @@ namespace lfg
 
             // if we can take the quest, means that we haven't done this kind of "run", IE: First Heroic Random of Day.
             if (player->CanRewardQuest(quest, false))
-                player->RewardQuest(quest, 0, NULL, false);
+                player->RewardQuest(quest, 0, nullptr, false);
             else
             {
                 done = true;
@@ -2093,7 +2093,7 @@ namespace lfg
                 if (!quest)
                     continue;
                 // we give reward without informing client (retail does this)
-                player->RewardQuest(quest, 0, NULL, false);
+                player->RewardQuest(quest, 0, nullptr, false);
             }
 
             // Give rewards

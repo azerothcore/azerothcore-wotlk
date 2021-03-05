@@ -4,18 +4,18 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ObjectGridLoader.h"
-#include "ObjectAccessor.h"
-#include "ObjectMgr.h"
-#include "Creature.h"
-#include "Vehicle.h"
-#include "GameObject.h"
-#include "DynamicObject.h"
-#include "Corpse.h"
-#include "World.h"
 #include "CellImpl.h"
+#include "Corpse.h"
+#include "Creature.h"
 #include "CreatureAI.h"
+#include "DynamicObject.h"
+#include "GameObject.h"
+#include "ObjectAccessor.h"
+#include "ObjectGridLoader.h"
+#include "ObjectMgr.h"
 #include "Transport.h"
+#include "Vehicle.h"
+#include "World.h"
 
 // for loading world object at grid loading (Corpses)
 //TODO: to implement npc on transport, also need to load npcs at grid loading

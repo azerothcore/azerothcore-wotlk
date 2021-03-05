@@ -10,14 +10,13 @@
 #include <iostream>
 #include <list>
 #include <vector>
+#include <sys/stat.h>
 
 #ifdef WIN32
 #include <Windows.h>
 #include <sys/stat.h>
 #include <direct.h>
 #define mkdir _mkdir
-#else
-#include <sys/stat.h>
 #endif
 
 #undef min

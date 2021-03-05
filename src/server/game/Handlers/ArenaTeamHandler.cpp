@@ -4,19 +4,18 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ArenaTeam.h"
+#include "ArenaTeamMgr.h"
+#include "BattlegroundMgr.h"
+#include "DatabaseEnv.h"
+#include "Log.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
 #include "Player.h"
+#include "SocialMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "DatabaseEnv.h"
-
-#include "ArenaTeam.h"
-#include "Log.h"
-#include "ObjectMgr.h"
-#include "SocialMgr.h"
-#include "ArenaTeamMgr.h"
-#include "BattlegroundMgr.h"
-#include "Opcodes.h"
 
 void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket& recvData)
 {

@@ -7,9 +7,9 @@
 #ifndef ACORE_CREATUREAI_H
 #define ACORE_CREATUREAI_H
 
+#include "Common.h"
 #include "Creature.h"
 #include "UnitAI.h"
-#include "Common.h"
 
 class WorldObject;
 class Unit;
@@ -125,7 +125,7 @@ public:
     // Called at reaching home after evade
     virtual void JustReachedHome() {}
 
-    void DoZoneInCombat(Creature* creature = NULL, float maxRangeToNearestTarget = 50.0f);
+    void DoZoneInCombat(Creature* creature = nullptr, float maxRangeToNearestTarget = 50.0f);
 
     // Called at text emote receive from player
     virtual void ReceiveEmote(Player* /*player*/, uint32 /*emoteId*/) {}

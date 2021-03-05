@@ -15,18 +15,18 @@ EndScriptData */
 npc_arete
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellAuras.h"
-#include "Player.h"
 #include "CombatAI.h"
 #include "MoveSplineInit.h"
-#include "ScriptedEscortAI.h"
-#include "Vehicle.h"
-#include "SmartScriptMgr.h"
-#include "SpellScript.h"
 #include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SmartScriptMgr.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 enum eBKG
@@ -232,7 +232,7 @@ public:
                                 break;
                             case QUEST_BFV_SIGRID:
                                 PrepareSummons();
-                                me->MonsterTextEmote("Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!", NULL, true);
+                                me->MonsterTextEmote("Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!", nullptr, true);
                                 break;
                             case QUEST_BFV_CARNAGE:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
@@ -258,20 +258,20 @@ public:
                         {
                             case QUEST_BFV_FALLEN_HEROES:
                                 me->MonsterYell("There can only be one outcome to such a battle: death for one side or the other. Let $n prove himself upon the bones of these outsiders who have fallen before!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                                me->MonsterTextEmote("The fallen heroes of Valhalas emerge from the ground to do battle once more!", NULL, true);
+                                me->MonsterTextEmote("The fallen heroes of Valhalas emerge from the ground to do battle once more!", nullptr, true);
                                 break;
                             case QUEST_BFV_DARK_MASTER:
-                                me->MonsterTextEmote("Khit'rix the Dark Master skitters into Valhalas from the southeast!", NULL, true);
+                                me->MonsterTextEmote("Khit'rix the Dark Master skitters into Valhalas from the southeast!", nullptr, true);
                                 break;
                             case QUEST_BFV_CARNAGE:
-                                me->MonsterTextEmote("Lumbering in from the south, the smell of Carnage precedes him!", NULL, true);
+                                me->MonsterTextEmote("Lumbering in from the south, the smell of Carnage precedes him!", nullptr, true);
                                 break;
                             case QUEST_BFV_THANE:
-                                me->MonsterTextEmote("Thane Banahogg appears upon the overlook to the southeast!", NULL, true);
+                                me->MonsterTextEmote("Thane Banahogg appears upon the overlook to the southeast!", nullptr, true);
                                 break;
                             case QUEST_BFV_FINAL:
                                 me->MonsterYell("Warriors of Jotunheim, I present to you, Blood Prince Sandoval!", LANG_UNIVERSAL, nullptr);
-                                me->MonsterTextEmote("Without warning, Prince Sandoval magically appears within Valhalas!", NULL, true);
+                                me->MonsterTextEmote("Without warning, Prince Sandoval magically appears within Valhalas!", nullptr, true);
                                 break;
                         }
 
@@ -1368,7 +1368,7 @@ public:
                                         fireCount++;
 
                         if (fireCount)
-                            Unit::DealDamage(me, me, 3000 * fireCount, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_FIRE);
+                            Unit::DealDamage(me, me, 3000 * fireCount, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_FIRE);
                         else // Heal
                             me->ModifyHealth(2000);
 

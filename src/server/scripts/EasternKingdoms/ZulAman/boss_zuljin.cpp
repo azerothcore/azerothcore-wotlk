@@ -10,10 +10,10 @@ SD%Complete: 85%
 SDComment:
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "zulaman.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "zulaman.h"
 
 enum Says
 {

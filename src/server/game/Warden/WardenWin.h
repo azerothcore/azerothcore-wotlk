@@ -7,11 +7,11 @@
 #ifndef _WARDEN_WIN_H
 #define _WARDEN_WIN_H
 
-#include <map>
+#include "ByteBuffer.h"
 #include "Cryptography/ARC4.h"
 #include "Cryptography/BigNumber.h"
-#include "ByteBuffer.h"
 #include "Warden.h"
+#include <map>
 
 #if defined(__GNUC__)
 #pragma pack(1)

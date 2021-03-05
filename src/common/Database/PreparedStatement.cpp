@@ -9,7 +9,7 @@
 #include "Log.h"
 
 PreparedStatement::PreparedStatement(uint32 index) :
-    m_stmt(NULL),
+    m_stmt(nullptr),
     m_index(index)
 {
 }
@@ -192,9 +192,9 @@ void PreparedStatement::setNull(const uint8 index)
 }
 
 MySQLPreparedStatement::MySQLPreparedStatement(MYSQL_STMT* stmt) :
-    m_stmt(NULL),
+    m_stmt(nullptr),
     m_Mstmt(stmt),
-    m_bind(NULL)
+    m_bind(nullptr)
 {
     /// Initialize variable parameters
     m_paramCount = mysql_stmt_param_count(stmt);
@@ -224,9 +224,9 @@ void MySQLPreparedStatement::ClearParameters()
     for (uint32 i = 0; i < m_paramCount; ++i)
     {
         delete m_bind[i].length;
-        m_bind[i].length = NULL;
+        m_bind[i].length = nullptr;
         delete[] (char*) m_bind[i].buffer;
-        m_bind[i].buffer = NULL;
+        m_bind[i].buffer = nullptr;
         m_paramsSet[i] = false;
     }
 }
@@ -356,11 +356,11 @@ void MySQLPreparedStatement::setNull(const uint8 index)
     MYSQL_BIND* param = &m_bind[index];
     param->buffer_type = MYSQL_TYPE_NULL;
     delete [] static_cast<char*>(param->buffer);
-    param->buffer = NULL;
+    param->buffer = nullptr;
     param->buffer_length = 0;
     param->is_null_value = 1;
     delete param->length;
-    param->length = NULL;
+    param->length = nullptr;
 }
 
 void MySQLPreparedStatement::setValue(MYSQL_BIND* param, enum_field_types type, const void* value, uint32 len, bool isUnsigned)
@@ -370,7 +370,7 @@ void MySQLPreparedStatement::setValue(MYSQL_BIND* param, enum_field_types type, 
     param->buffer = new char[len];
     param->buffer_length = 0;
     param->is_null_value = 0;
-    param->length = NULL;               // Only != NULL for strings
+    param->length = nullptr;               // Only != nullptr for strings
     param->is_unsigned = isUnsigned;
 
     memcpy(param->buffer, value, len);
@@ -425,7 +425,7 @@ std::string MySQLPreparedStatement::getQueryString(std::string const& sqlPattern
                 ss << '\'' << m_stmt->statement_data[i].str << '\'';
                 break;
             case TYPE_NULL:
-                ss << "NULL";
+                ss << "nullptr";
                 break;
         }
 
@@ -464,7 +464,7 @@ bool PreparedStatementTask::Execute()
         if (!result || !result->GetRowCount())
         {
             delete result;
-            m_result.set(PreparedQueryResult(NULL));
+            m_result.set(PreparedQueryResult(nullptr));
             return false;
         }
         m_result.set(PreparedQueryResult(result));

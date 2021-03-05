@@ -6,10 +6,10 @@ Xinef
 #define ACORE_LOOTITEMSTORAGE_H
 
 #include "Common.h"
-#include "LootMgr.h"
 #include "Item.h"
-#include <map>
+#include "LootMgr.h"
 #include <list>
+#include <map>
 
 struct StoredLootItem
 {
