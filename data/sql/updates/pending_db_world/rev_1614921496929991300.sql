@@ -20,6 +20,10 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (496300,9,0,0,0,0,100,0,10000,10000,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Mikhail - On Script - Say Line 0"),
 (496300,9,1,0,0,0,100,0,0,0,0,0,0,81,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Mikhail - On Script - Set Npc Flag Questgiver");
 
+DELETE FROM `creature_text` WHERE `CreatureID` = 4963;
+INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES 
+(4963,0,0,'I\'m glad the commotions died down some around here. The last thing this place needs is another brawl.',12,7,100,0,0,0,4169,0,'Mikhail');
+
 
 -- Tapoke "Slim" Jahn
 UPDATE `creature` SET `spawntimesecs`=10 WHERE `guid`=10873;
@@ -61,6 +65,12 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 (4962,6,-3738.63,-830.997,11.0574,"Tapoke \"Slim\" Jahn"),
 (4962,7,-3690.22,-862.262,9.96045,"Tapoke \"Slim\" Jahn");
 
+DELETE FROM `creature_text` WHERE `CreatureID` = 4962;
+INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES 
+(4962,0,0,'Oh, it\'s on now! Bet you thought I\'d be alone too, huh?!',12,7,100,0,0,0,5827,0,'Tapoke \"Slim\" Jahn'),
+(4962,1,0,'Okay, okay! No need to get all violent. I\'ll talk. I\'ll talk!',12,7,100,0,0,0,1743,0,'Tapoke \"Slim\" Jahn'),
+(4962,2,0,'I have a few notes from the job back at my place. I\'ll get them and then meet you back in the inn.',12,7,100,0,0,0,1744,0,'Tapoke \"Slim\" Jahn');
+
 
 -- Slim's Friend
 DELETE FROM `smart_scripts` WHERE `entryorguid`=4971 AND `source_type`=0;
@@ -74,6 +84,10 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (497100,9,1,0,0,0,100,0,0,0,0,0,0,2,123,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Slim's Friend - On Script - Set Faction 123"),
 (497100,9,2,0,0,0,100,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Slim's Friend - On Script - Say Line 0"),
 (497100,9,3,0,0,0,100,0,6000,6000,0,0,0,41,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,"Slim's Friend - On Script - Despawn");
+
+DELETE FROM `creature_text` WHERE `CreatureID` = 4971;
+INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES 
+(4971,0,0,'Whoa! This is way more than what I bargained for, you\'re on your own, Slim!',12,7,100,0,0,0,5828,0,'Slim\'s Friend');
 
 
 -- --------------------------------------------Missing Diplomat Part 14 - 16 ------------------------------------------
@@ -159,6 +173,14 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (496700,9,10,0,0,0,100,0,1000,1000,0,0,0,1,3,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Archmage Tervosh - On Script - Say Line 2'),
 (496700,9,11,0,0,0,100,0,6000,6000,0,0,0,1,4,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Archmage Tervosh - On Script - Say Line 3');
 
+DELETE FROM `creature_text` WHERE `CreatureID` = 4967;
+INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES 
+(4967,0,0,'Go with grace, and may the Lady\'s magic protect you.',12,0,100,0,0,0,1751,0,'Archmage Tervosh - On Quest \'The Missing Diplomat\' Finished'),
+(4967,1,0,'Ah, Private Hendel. A pleasure to meet one of the men who would betray his kingdom for pride.',12,7,100,0,0,0,1657,0,'Archmage Tervosh'),
+(4967,2,0,'Why don\'t we deal with you now, Hendel? Lady Proudmoore will speak to you back in the tower.',12,7,100,0,0,0,1663,0,'Archmage Tervosh'),
+(4967,3,0,'I apologize for taking so long to get here. I wanted Lady Proudmoore to be present also.',12,7,100,0,0,0,1761,0,'Archmage Tervosh'),
+(4967,4,0,'We can only stay a few moments before returning to the tower. If you wish to speak to us more you may find us there.',12,7,100,0,0,0,1808,0,'Archmage Tervosh');
+
 
 -- Theramore Sentry
 UPDATE `creature` SET `modelid` = 0,`wander_distance` = 5,`MovementType` = 1 WHERE `guid` IN (31271,31268);
@@ -190,6 +212,14 @@ INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z
 (518401,1,-2897.26,-3330.35,33.442,'Theramore Sentry'),
 (518401,2,-2908.55,-3336.71,32.0493,'Theramore Sentry'),
 (518401,3,-2914.51,-3346.08,30.843,'Theramore Sentry');
+
+DELETE FROM `creature_text` WHERE `CreatureID` = 5184;
+INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES 
+(5184,0,0,'It\'s Proudmoore! Get out of here!',12,7,100,0,0,0,7325,0,'Theramore Sentry'),
+(5184,1,0,'Run!',12,7,100,0,0,0,7324,0,'Theramore Sentry'),
+(5184,1,1,'Get out of here!',12,7,100,0,0,0,7340,0,'Theramore Sentry'),
+(5184,1,2,'Don\'t let them catch you!',12,7,100,0,0,0,7341,0,'Theramore Sentry'),
+(5184,1,3,'She\'ll have our heads if we\'re caught!',12,7,100,0,0,0,7342,0,'Theramore Sentry');
 
 
 -- Sentry Point Guard
