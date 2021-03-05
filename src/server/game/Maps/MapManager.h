@@ -32,7 +32,7 @@ public:
     Map* FindBaseMap(uint32 mapId) const // pussywizard: need this public for movemaps (mmaps)
     {
         MapMapType::const_iterator iter = i_maps.find(mapId);
-        return (iter == i_maps.end() ? NULL : iter->second);
+        return (iter == i_maps.end() ? nullptr : iter->second);
     }
 
     uint32 GetAreaId(uint32 mapid, float x, float y, float z) const

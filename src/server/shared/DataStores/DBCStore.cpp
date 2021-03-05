@@ -37,7 +37,7 @@ bool DBCStorageBase::Load(char const* path, char**& indexTable)
     if (char* stringBlock = dbc.AutoProduceStrings(_fileFormat, _dataTable))
         _stringPool.push_back(stringBlock);
 
-    // error in dbc file at loading if NULL
+    // error in dbc file at loading if nullptr
     return indexTable != nullptr;
 }
 

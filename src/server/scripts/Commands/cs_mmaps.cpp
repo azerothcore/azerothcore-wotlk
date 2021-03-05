@@ -55,7 +55,7 @@ public:
 
         static std::vector<ChatCommand> commandTable =
         {
-            { "mmap", SEC_ADMINISTRATOR, true, NULL, "", mmapCommandTable },
+            { "mmap", SEC_ADMINISTRATOR, true, nullptr, "", mmapCommandTable },
         };
         return commandTable;
     }

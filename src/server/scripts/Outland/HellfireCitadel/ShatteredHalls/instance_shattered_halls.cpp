@@ -126,7 +126,7 @@ public:
                 instance->LoadGrid(230, -80);
 
                 if (Creature* kargath = instance->GetCreature(warchiefKargathGUID))
-                    sCreatureTextMgr->SendChat(kargath, TeamIdInInstance == TEAM_ALLIANCE ? 3 : 4, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
+                    sCreatureTextMgr->SendChat(kargath, TeamIdInInstance == TEAM_ALLIANCE ? 3 : 4, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
 
                 RescueTimer = 80 * MINUTE * IN_MILLISECONDS;
             }

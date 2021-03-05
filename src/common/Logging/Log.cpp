@@ -18,8 +18,8 @@ extern LoginDatabaseWorkerPool LoginDatabase;
 #include <stdio.h>
 
 Log::Log() :
-    raLogfile(NULL), logfile(NULL), gmLogfile(NULL), charLogfile(NULL),
-    dberLogfile(NULL), chatLogfile(NULL), sqlLogFile(NULL), sqlDevLogFile(NULL), miscLogFile(NULL),
+    raLogfile(nullptr), logfile(nullptr), gmLogfile(nullptr), charLogfile(nullptr),
+    dberLogfile(nullptr), chatLogfile(nullptr), sqlLogFile(nullptr), sqlDevLogFile(nullptr), miscLogFile(nullptr),
     m_gmlog_per_account(false), m_enableLogDB(false), m_colored(false)
 {
     Initialize();
@@ -27,41 +27,41 @@ Log::Log() :
 
 Log::~Log()
 {
-    if (logfile != NULL)
+    if (logfile != nullptr)
         fclose(logfile);
-    logfile = NULL;
+    logfile = nullptr;
 
-    if (gmLogfile != NULL)
+    if (gmLogfile != nullptr)
         fclose(gmLogfile);
-    gmLogfile = NULL;
+    gmLogfile = nullptr;
 
-    if (charLogfile != NULL)
+    if (charLogfile != nullptr)
         fclose(charLogfile);
-    charLogfile = NULL;
+    charLogfile = nullptr;
 
-    if (dberLogfile != NULL)
+    if (dberLogfile != nullptr)
         fclose(dberLogfile);
-    dberLogfile = NULL;
+    dberLogfile = nullptr;
 
-    if (raLogfile != NULL)
+    if (raLogfile != nullptr)
         fclose(raLogfile);
-    raLogfile = NULL;
+    raLogfile = nullptr;
 
-    if (chatLogfile != NULL)
+    if (chatLogfile != nullptr)
         fclose(chatLogfile);
-    chatLogfile = NULL;
+    chatLogfile = nullptr;
 
-    if (sqlLogFile != NULL)
+    if (sqlLogFile != nullptr)
         fclose(sqlLogFile);
-    sqlLogFile = NULL;
+    sqlLogFile = nullptr;
 
-    if (sqlDevLogFile != NULL)
+    if (sqlDevLogFile != nullptr)
         fclose(sqlDevLogFile);
-    sqlDevLogFile = NULL;
+    sqlDevLogFile = nullptr;
 
-    if (miscLogFile != NULL)
+    if (miscLogFile != nullptr)
         fclose(miscLogFile);
-    miscLogFile = NULL;
+    miscLogFile = nullptr;
 }
 
 std::unique_ptr<ILog>& getLogInstance()
@@ -93,16 +93,16 @@ void Log::SetLogFileLevel(char* Level)
 void Log::Initialize()
 {
     /// Check whether we'll log GM commands/RA events/character outputs/chat stuffs
-    m_dbChar = sConfigMgr->GetBoolDefault("LogDB.Char", false, false);
-    m_dbRA = sConfigMgr->GetBoolDefault("LogDB.RA", false, false);
-    m_dbGM = sConfigMgr->GetBoolDefault("LogDB.GM", false, false);
-    m_dbChat = sConfigMgr->GetBoolDefault("LogDB.Chat", false, false);
+    m_dbChar = sConfigMgr->GetOption<bool>("LogDB.Char", false, false);
+    m_dbRA = sConfigMgr->GetOption<bool>("LogDB.RA", false, false);
+    m_dbGM = sConfigMgr->GetOption<bool>("LogDB.GM", false, false);
+    m_dbChat = sConfigMgr->GetOption<bool>("LogDB.Chat", false, false);
 
     /// Realm must be 0 by default
     SetRealmID(0);
 
     /// Common log files data
-    m_logsDir = sConfigMgr->GetStringDefault("LogsDir", "", false);
+    m_logsDir = sConfigMgr->GetOption<std::string>("LogsDir", "", false);
     if (!m_logsDir.empty())
         if ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\'))
             m_logsDir.push_back('/');
@@ -111,18 +111,18 @@ void Log::Initialize()
 
     /// Open specific log files
     logfile = openLogFile("LogFile", "LogTimestamp", "w");
-    InitColors(sConfigMgr->GetStringDefault("LogColors", "", false));
+    InitColors(sConfigMgr->GetOption<std::string>("LogColors", "", false));
 
-    m_gmlog_per_account = sConfigMgr->GetBoolDefault("GmLogPerAccount", false, false);
+    m_gmlog_per_account = sConfigMgr->GetOption<bool>("GmLogPerAccount", false, false);
     if (!m_gmlog_per_account)
         gmLogfile = openLogFile("GMLogFile", "GmLogTimestamp", "a");
     else
     {
         // GM log settings for per account case
-        m_gmlog_filename_format = sConfigMgr->GetStringDefault("GMLogFile", "", false);
+        m_gmlog_filename_format = sConfigMgr->GetOption<std::string>("GMLogFile", "", false);
         if (!m_gmlog_filename_format.empty())
         {
-            bool m_gmlog_timestamp = sConfigMgr->GetBoolDefault("GmLogTimestamp", false, false);
+            bool m_gmlog_timestamp = sConfigMgr->GetOption<bool>("GmLogTimestamp", false, false);
 
             size_t dot_pos = m_gmlog_filename_format.find_last_of('.');
             if (dot_pos != m_gmlog_filename_format.npos)
@@ -145,27 +145,27 @@ void Log::Initialize()
     }
 
     charLogfile = openLogFile("CharLogFile", "CharLogTimestamp", "a");
-    dberLogfile = openLogFile("DBErrorLogFile", NULL, "a");
-    raLogfile = openLogFile("RaLogFile", NULL, "a");
+    dberLogfile = openLogFile("DBErrorLogFile", nullptr, "a");
+    raLogfile = openLogFile("RaLogFile", nullptr, "a");
     chatLogfile = openLogFile("ChatLogFile", "ChatLogTimestamp", "a");
-    sqlLogFile = openLogFile("SQLDriverLogFile", NULL, "a");
-    sqlDevLogFile = openLogFile("SQLDeveloperLogFile", NULL, "a");
+    sqlLogFile = openLogFile("SQLDriverLogFile", nullptr, "a");
+    sqlDevLogFile = openLogFile("SQLDeveloperLogFile", nullptr, "a");
     miscLogFile = fopen((m_logsDir + "Misc.log").c_str(), "a");
 
     // Main log file settings
-    m_logLevel     = sConfigMgr->GetIntDefault("LogLevel", LOGL_NORMAL, false);
-    m_logFileLevel = sConfigMgr->GetIntDefault("LogFileLevel", LOGL_NORMAL, false);
-    m_dbLogLevel   = sConfigMgr->GetIntDefault("DBLogLevel", LOGL_NORMAL, false);
-    m_sqlDriverQueryLogging  = sConfigMgr->GetBoolDefault("SQLDriverQueryLogging", false, false);
+    m_logLevel     = sConfigMgr->GetOption<int32>("LogLevel", LOGL_NORMAL, false);
+    m_logFileLevel = sConfigMgr->GetOption<int32>("LogFileLevel", LOGL_NORMAL, false);
+    m_dbLogLevel   = sConfigMgr->GetOption<int32>("DBLogLevel", LOGL_NORMAL, false);
+    m_sqlDriverQueryLogging  = sConfigMgr->GetOption<bool>("SQLDriverQueryLogging", false, false);
 
-    m_DebugLogMask = DebugLogFilters(sConfigMgr->GetIntDefault("DebugLogMask", LOG_FILTER_NONE, false));
+    m_DebugLogMask = DebugLogFilters(sConfigMgr->GetOption<int32>("DebugLogMask", LOG_FILTER_NONE, false));
 
     // Char log settings
-    m_charLog_Dump = sConfigMgr->GetBoolDefault("CharLogDump", false, false);
-    m_charLog_Dump_Separate = sConfigMgr->GetBoolDefault("CharLogDump.Separate", false, false);
+    m_charLog_Dump = sConfigMgr->GetOption<bool>("CharLogDump", false, false);
+    m_charLog_Dump_Separate = sConfigMgr->GetOption<bool>("CharLogDump.Separate", false, false);
     if (m_charLog_Dump_Separate)
     {
-        m_dumpsDir = sConfigMgr->GetStringDefault("CharLogDump.SeparateDir", "", false);
+        m_dumpsDir = sConfigMgr->GetOption<std::string>("CharLogDump.SeparateDir", "", false);
         if (!m_dumpsDir.empty())
             if ((m_dumpsDir.at(m_dumpsDir.length() - 1) != '/') && (m_dumpsDir.at(m_dumpsDir.length() - 1) != '\\'))
                 m_dumpsDir.push_back('/');
@@ -174,20 +174,20 @@ void Log::Initialize()
 
 void Log::ReloadConfig()
 {
-    m_logLevel     = sConfigMgr->GetIntDefault("LogLevel", LOGL_NORMAL);
-    m_logFileLevel = sConfigMgr->GetIntDefault("LogFileLevel", LOGL_NORMAL);
-    m_dbLogLevel   = sConfigMgr->GetIntDefault("DBLogLevel", LOGL_NORMAL);
+    m_logLevel     = sConfigMgr->GetOption<int32>("LogLevel", LOGL_NORMAL);
+    m_logFileLevel = sConfigMgr->GetOption<int32>("LogFileLevel", LOGL_NORMAL);
+    m_dbLogLevel   = sConfigMgr->GetOption<int32>("DBLogLevel", LOGL_NORMAL);
 
-    m_DebugLogMask = DebugLogFilters(sConfigMgr->GetIntDefault("DebugLogMask", LOG_FILTER_NONE));
+    m_DebugLogMask = DebugLogFilters(sConfigMgr->GetOption<int32>("DebugLogMask", LOG_FILTER_NONE));
 }
 
 FILE* Log::openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode)
 {
-    std::string logfn = sConfigMgr->GetStringDefault(configFileName, "", false);
+    std::string logfn = sConfigMgr->GetOption<std::string>(configFileName, "", false);
     if (logfn.empty())
-        return NULL;
+        return nullptr;
 
-    if (configTimeStampFlag && sConfigMgr->GetBoolDefault(configTimeStampFlag, false, false))
+    if (configTimeStampFlag && sConfigMgr->GetOption<bool>(configTimeStampFlag, false, false))
     {
         size_t dot_pos = logfn.find_last_of(".");
         if (dot_pos != logfn.npos)
@@ -202,7 +202,7 @@ FILE* Log::openLogFile(char const* configFileName, char const* configTimeStampFl
 FILE* Log::openGmlogPerAccount(uint32 account)
 {
     if (m_gmlog_filename_format.empty())
-        return NULL;
+        return nullptr;
 
     char namebuf[ACORE_PATH_MAX];
     snprintf(namebuf, ACORE_PATH_MAX, m_gmlog_filename_format.c_str(), account);
@@ -211,7 +211,7 @@ FILE* Log::openGmlogPerAccount(uint32 account)
 
 void Log::outTimestamp(FILE* file)
 {
-    time_t t = time(NULL);
+    time_t t = time(nullptr);
     tm* aTm = localtime(&t);
     //       YYYY   year
     //       MM     month (2 digits 01-12)
@@ -337,7 +337,7 @@ void Log::ResetColor(bool stdout_stream)
 
 std::string Log::GetTimestampStr()
 {
-    time_t t = time(NULL);
+    time_t t = time(nullptr);
     tm aTm;
     localtime_r(&t, &aTm);
     //       YYYY   year
@@ -918,7 +918,7 @@ void Log::outChar(const char* str, ...)
 
 void Log::outCharDump(const char* str, uint32 account_id, uint32 guid, const char* name)
 {
-    FILE* file = NULL;
+    FILE* file = nullptr;
     if (m_charLog_Dump_Separate)
     {
         char fileName[29]; // Max length: name(12) + guid(11) + _.log (5) + \0

@@ -36,11 +36,6 @@ add_executable(authserver
 
 add_dependencies(authserver revision.h)
 
-if(NOT WIN32)
-  set_target_properties(authserver PROPERTIES
-    COMPILE_DEFINITIONS _ACORE_REALM_CONFIG="${CONF_DIR}/authserver.conf")
-endif()
-
 target_link_libraries(authserver
   PUBLIC
     shared)
@@ -62,27 +57,14 @@ set_target_properties(authserver
     FOLDER
       "server")
 
-if( WIN32 )
-  if ( MSVC )
-    add_custom_command(TARGET authserver
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/authserver.conf.dist ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
-    )
-  elseif ( MINGW )
-    add_custom_command(TARGET authserver
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/authserver.conf.dist ${CMAKE_BINARY_DIR}/bin/
-    )
-  endif()
-endif()
+# Install config
+CopyDefaultConfig(authserver)
 
-if( UNIX )
+if ( UNIX )
   install(TARGETS authserver DESTINATION bin)
-elseif( WIN32 )
+elseif ( WIN32 )
   install(TARGETS authserver DESTINATION "${CMAKE_INSTALL_PREFIX}")
 endif()
-
-install(FILES  authserver.conf.dist DESTINATION ${CONF_DIR})
 
 # Generate precompiled header
 if (USE_COREPCH)

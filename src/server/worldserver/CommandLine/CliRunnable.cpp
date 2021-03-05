@@ -53,7 +53,7 @@ char* command_finder(const char* text, int state)
             return strdup(ret);
     }
 
-    return ((char*)NULL);
+    return ((char*)nullptr);
 }
 
 char** cli_completion(const char* text, int start, int /*end*/)
@@ -126,7 +126,7 @@ void CliRunnable::run()
     rl_event_hook = cli_hook_func;
 #endif
 
-    if (sConfigMgr->GetBoolDefault("BeepAtStart", true))
+    if (sConfigMgr->GetOption<bool>("BeepAtStart", true))
         printf("\a");                                       // \a = Alert
 
     // print this here the first time

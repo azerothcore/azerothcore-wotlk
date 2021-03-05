@@ -43,13 +43,13 @@ RARunnable::~RARunnable()
 
 void RARunnable::run()
 {
-    if (!sConfigMgr->GetBoolDefault("Ra.Enable", false))
+    if (!sConfigMgr->GetOption<bool>("Ra.Enable", false))
         return;
 
     ACE_Acceptor<RASocket, ACE_SOCK_ACCEPTOR> acceptor;
 
-    uint16 raPort = uint16(sConfigMgr->GetIntDefault("Ra.Port", 3443));
-    std::string stringIp = sConfigMgr->GetStringDefault("Ra.IP", "0.0.0.0");
+    uint16 raPort = uint16(sConfigMgr->GetOption<int32>("Ra.Port", 3443));
+    std::string stringIp = sConfigMgr->GetOption<std::string>("Ra.IP", "0.0.0.0");
     ACE_INET_Addr listenAddress(raPort, stringIp.c_str());
 
     if (acceptor.open(listenAddress, m_Reactor) == -1)
