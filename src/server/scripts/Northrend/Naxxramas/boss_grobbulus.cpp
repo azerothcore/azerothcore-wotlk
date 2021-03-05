@@ -17,8 +17,7 @@ enum Spells
     SPELL_POISON_CLOUD_DAMAGE_AURA_10       = 28158,
     SPELL_POISON_CLOUD_DAMAGE_AURA_25       = 54362,
     SPELL_BERSERK                           = 26662,
-
-    SPELL_BOMBARD_SLIME                     = 28280, // Spawn slime when hit by slime spray
+    SPELL_BOMBARD_SLIME                     = 28280
 };
 
 enum Emotes
@@ -31,7 +30,7 @@ enum Events
     EVENT_SPELL_BERSERK                     = 1,
     EVENT_SPELL_POISON_CLOUD                = 2,
     EVENT_SPELL_SLIME_SPRAY                 = 3,
-    EVENT_SPELL_MUTATING_INJECTION          = 4,
+    EVENT_SPELL_MUTATING_INJECTION          = 4
 };
 
 enum Misc
@@ -78,7 +77,9 @@ public:
             for (std::list<Creature*>::const_iterator itr = StichedGiants.begin(); itr != StichedGiants.end(); ++itr)
             {
                 if ((*itr)->GetGUID())
+                {
                     (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
+                }
             }
         }
 
@@ -90,24 +91,30 @@ public:
             events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 15000);
             events.ScheduleEvent(EVENT_SPELL_MUTATING_INJECTION, 20000);
             events.ScheduleEvent(EVENT_SPELL_SLIME_SPRAY, 10000);
-            events.ScheduleEvent(EVENT_SPELL_BERSERK, RAID_MODE(12 * MINUTE * IN_MILLISECONDS, 9 * MINUTE * IN_MILLISECONDS));
+            events.ScheduleEvent(EVENT_SPELL_BERSERK, RAID_MODE(720000, 540000));
         }
 
         void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == RAID_MODE(SPELL_SLIME_SPRAY_10, SPELL_SLIME_SPRAY_25) && target->GetTypeId() == TYPEID_PLAYER)
+            {
                 me->SummonCreature(NPC_FALLOUT_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+            }
         }
 
         void JustSummoned(Creature* cr) override
         {
             if (cr->GetEntry() == NPC_FALLOUT_SLIME)
+            {
                 cr->SetInCombatWithZone();
-
+            }
             summons.Summon(cr);
         }
 
-        void SummonedCreatureDespawn(Creature* summon) override { summons.Despawn(summon); }
+        void SummonedCreatureDespawn(Creature* summon) override
+        {
+            summons.Despawn(summon);
+        }
 
         void JustDied(Unit*  killer) override
         {
@@ -118,18 +125,20 @@ public:
         void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
+            {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            // Some nice visuals
             dropSludgeTimer += diff;
             if (!me->IsInCombat() && dropSludgeTimer >= 5000)
             {
                 if (me->IsWithinDist3d(3178, -3305, 319, 5.0f) && !summons.HasEntry(NPC_SEWAGE_SLIME))
+                {
                     me->CastSpell(3128.96f + irand(-20, 20), -3312.96f + irand(-20, 20), 293.25f, SPELL_BOMBARD_SLIME, false);
-
+                }
                 dropSludgeTimer = 0;
             }
 
@@ -148,7 +157,6 @@ public:
                     break;
                 case EVENT_SPELL_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-
                     break;
                 case EVENT_SPELL_SLIME_SPRAY:
                     Talk(EMOTE_SLIME);
@@ -157,12 +165,12 @@ public:
                     break;
                 case EVENT_SPELL_MUTATING_INJECTION:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true, -SPELL_MUTATING_INJECTION))
+                    {
                         me->CastSpell(target, SPELL_MUTATING_INJECTION, false);
-
+                    }
                     events.RepeatEvent(8000 + uint32(120 * me->GetHealthPct()));
                     break;
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -190,19 +198,20 @@ public:
             sizeTimer = 0;
             auraVisualTimer = 1;
             me->SetFloatValue(UNIT_FIELD_COMBATREACH, 2.0f);
-            me->setFaction(21); // Grobbulus one
+            me->setFaction(21);
         }
 
         void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
+            {
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            // this has to be delayed to be visible :/
-            if (auraVisualTimer)
+            if (auraVisualTimer) // this has to be delayed to be visible
             {
                 auraVisualTimer += diff;
                 if (auraVisualTimer >= 1000)
@@ -211,9 +220,7 @@ public:
                     auraVisualTimer = 0;
                 }
             }
-
-            sizeTimer += diff;
-            // increase size to 15yd in 60 seconds, 0.00025 is the growth of size in 1ms
+            sizeTimer += diff; // increase size to 15yd in 60 seconds, 0.00025 is the growth of size in 1ms
             me->SetFloatValue(UNIT_FIELD_COMBATREACH, 2.0f + (0.00025f * sizeTimer));
         }
     };
@@ -232,12 +239,17 @@ public:
         {
             std::list<WorldObject*> tmplist;
             for (auto& target : targets)
+            {
                 if (GetCaster()->IsWithinDist3d(target, 0.0f))
+                {
                     tmplist.push_back(target);
-
+                }
+            }
             targets.clear();
             for (auto& itr : tmplist)
+            {
                 targets.push_back(itr);
+            }
         }
 
         void Register() override
