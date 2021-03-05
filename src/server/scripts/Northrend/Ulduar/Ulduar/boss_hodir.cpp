@@ -109,7 +109,6 @@ enum HodirGOs
 enum HodirEvents
 {
     // Hodir:
-    EVENT_FAIL_HM                       = 0,
     EVENT_FLASH_FREEZE                  = 1,
     EVENT_FROZEN_BLOWS                  = 2,
     EVENT_BERSERK                       = 3,
@@ -117,6 +116,7 @@ enum HodirEvents
     EVENT_SMALL_ICICLES_ENABLE          = 5,
     EVENT_HARD_MODE_MISSED              = 6,
     EVENT_DESPAWN_CHEST                 = 7,
+    EVENT_FAIL_HM                       = 8,
 
     EVENT_TRY_FREE_HELPER               = 10,
     EVENT_PRIEST_DISPELL_MAGIC          = 11,
@@ -266,7 +266,6 @@ public:
             events.ScheduleEvent(EVENT_FREEZE, urand(17000,20000));
             events.ScheduleEvent(EVENT_BERSERK, 480000);
             events.ScheduleEvent(EVENT_HARD_MODE_MISSED, 180000);
-
             Talk(TEXT_AGGRO);
 
             if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
@@ -413,7 +412,7 @@ public:
                 case EVENT_HARD_MODE_MISSED:
                     {
                         Talk(TEXT_HM_MISS);
-                        me->CastSpell(me, SPELL_SHATTER_CHEST);
+                        me->CastSpell(me->FindNearestGameObject(GO_HODIR_CHEST_HARD, 400.0f), SPELL_SHATTER_CHEST, false);
                     }
                     break;
                 case EVENT_DESPAWN_CHEST:
@@ -438,8 +437,6 @@ public:
                         }
 
                         me->CastSpell((Unit*)nullptr, SPELL_FLASH_FREEZE_CAST, false);
-                        me->MonsterTextEmote("Hodir begins to cast Flash Freeze!", 0, true);
-                        me->MonsterYell(TEXT_FLASH_FREEZE, LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
                         me->CastSpell(me, SPELL_FLASH_FREEZE_CAST);
                         Talk(TEXT_FLASH_FREEZE);
@@ -1156,7 +1153,7 @@ public:
 
         void Register() override
         {
-            OnEffectHitTarget += SpellEffectFn(spell_hodir_shatter_chestSpellScript::destroyWinterCache, EffectIndexSpecifier, EffectNameSpecifier);
+            AfterHit += SpellHitFn(spell_hodir_shatter_chestSpellScript::destroyWinterCache);
         };
     };
 

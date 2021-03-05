@@ -3409,9 +3409,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Flash Freeze Radius - Avoid FPS Drops
     ApplySpellFix({ 62148 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_200_YARDS;
-        spellInfo->EffectRadiusIndex[1] = EFFECT_RADIUS_200_YARDS;
-        spellInfo->EffectRadiusIndex[2] = EFFECT_RADIUS_200_YARDS;
+        spellInfo->RangeIndex = 100;
     });
 
     // Howl of Azgalor
@@ -5253,6 +5251,13 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->EffectRadiusIndex[0] = 16; // 1yd
     });
+
+    // Hodir Shatter Cache
+    ApplySpellFix({ 62502 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_SRC_AREA_ENTRY;
+    });
+        
 
     // Ulduar, General Vezax, Mark of the Faceless
     ApplySpellFix({ 63278 }, [](SpellEntry* spellInfo)
