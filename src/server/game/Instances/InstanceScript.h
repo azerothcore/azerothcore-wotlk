@@ -193,7 +193,7 @@ public:
 
     // Achievement criteria additional requirements check
     // NOTE: not use this if same can be checked existed requirement types from AchievementCriteriaRequirementType
-    virtual bool CheckAchievementCriteriaMeet(uint32 /*criteria_id*/, Player const* /*source*/, Unit const* /*target*/ = NULL, uint32 /*miscvalue1*/ = 0);
+    virtual bool CheckAchievementCriteriaMeet(uint32 /*criteria_id*/, Player const* /*source*/, Unit const* /*target*/ = nullptr, uint32 /*miscvalue1*/ = 0);
 
     // Checks boss requirements (one boss required to kill other)
     virtual bool CheckRequiredBosses(uint32 /*bossId*/, Player const* /*player*/ = nullptr) const { return true; }
@@ -203,7 +203,7 @@ public:
     // Returns completed encounters mask for packets
     uint32 GetCompletedEncounterMask() const { return completedEncounters; }
 
-    void SendEncounterUnit(uint32 type, Unit* unit = NULL, uint8 param1 = 0, uint8 param2 = 0);
+    void SendEncounterUnit(uint32 type, Unit* unit = nullptr, uint8 param1 = 0, uint8 param2 = 0);
 
     virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
 

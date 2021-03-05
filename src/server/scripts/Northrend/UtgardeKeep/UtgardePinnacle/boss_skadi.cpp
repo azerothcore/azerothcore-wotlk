@@ -505,7 +505,7 @@ public:
 
                     grauf->AI()->DoAction(ACTION_MYGIRL_ACHIEVEMENT);
                 }
-                go->CastSpell((Unit*)NULL, SPELL_LAUNCH_HARPOON);
+                go->CastSpell((Unit*)nullptr, SPELL_LAUNCH_HARPOON);
             }
 
         return true;

@@ -219,7 +219,7 @@ public:
                         me->DisableSpline();
                         me->SetFacingTo(ZapAngle);
                         me->SetControlled(true, UNIT_STATE_ROOT);
-                        me->CastSpell((Unit*)NULL, SPELL_ENERGIZE_CORES, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_ENERGIZE_CORES, false);
                         ZapAngle += M_PI / 2;
                         if( ZapAngle >= 2 * M_PI )
                             ZapAngle -= 2 * M_PI;

@@ -149,7 +149,7 @@ public:
                     {
                         Talk(SAY_FLESH);
                         me->getThreatManager().resetAllAggro();
-                        me->CastSpell((Unit*)NULL, SPELL_TURN_FLESH, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_TURN_FLESH, false);
 
                         events.Reset();
                         events.ScheduleEvent(EVENT_TURN_FLESH_REAL, 3000);
@@ -246,7 +246,7 @@ public:
             PreventDefaultAction();
             GetUnitOwner()->getThreatManager().resetAllAggro();
             GetUnitOwner()->GetMotionMaster()->Clear();
-            GetUnitOwner()->CastSpell((Unit*)NULL, SPELL_TURN_BONES, false);
+            GetUnitOwner()->CastSpell((Unit*)nullptr, SPELL_TURN_BONES, false);
             GetUnitOwner()->GetAI()->DoAction(ACTION_TURN_BONES);
         }
 

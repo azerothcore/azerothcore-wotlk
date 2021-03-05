@@ -210,7 +210,7 @@ public:
             if (Unit* target = GetHitUnit())
             {
                 target->RemoveAurasDueToSpell(SPELL_STONED);
-                target->CastSpell((Unit*)NULL, SPELL_SHATTER_EFFECT, true);
+                target->CastSpell((Unit*)nullptr, SPELL_SHATTER_EFFECT, true);
             }
         }
 

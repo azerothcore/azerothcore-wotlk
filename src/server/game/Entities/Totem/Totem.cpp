@@ -126,7 +126,7 @@ void Totem::UnSummon(uint32 msTime)
         player->SendAutoRepeatCancel(this);
 
         if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(GetUInt32Value(UNIT_CREATED_BY_SPELL)))
-            player->SendCooldownEvent(spell, 0, NULL, false);
+            player->SendCooldownEvent(spell, 0, nullptr, false);
 
         if (Group* group = player->GetGroup())
         {

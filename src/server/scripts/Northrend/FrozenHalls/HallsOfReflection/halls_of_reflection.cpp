@@ -864,7 +864,7 @@ public:
 
         void JustDied(Unit* /*who*/) override
         {
-            me->CastSpell((Unit*)NULL, SPELL_HALLUCINATION_2, false);
+            me->CastSpell((Unit*)nullptr, SPELL_HALLUCINATION_2, false);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1131,7 +1131,7 @@ public:
                     events.ScheduleEvent(EVENT_CURSED_ARROW, 10000);
                     break;
                 case EVENT_FROST_TRAP:
-                    me->CastSpell((Unit*)NULL, SPELL_FROST_TRAP, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_FROST_TRAP, false);
                     events.ScheduleEvent(EVENT_FROST_TRAP, 30000);
                     break;
                 case EVENT_ICE_SHOT:
@@ -1201,7 +1201,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_ACTIVATE_REFLECTIONS:
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_REFLECTIONS_DUMMY, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_REFLECTIONS_DUMMY, false);
                     pInstance->SetData(ACTION_SPIRITUAL_REFLECTIONS_ACTIVATE, 1);
                     break;
                 case EVENT_THROW_SHIELD:
@@ -1280,7 +1280,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->CastSpell((Unit*)NULL, SPELL_SPIRIT_BURST, false);
+            me->CastSpell((Unit*)nullptr, SPELL_SPIRIT_BURST, false);
         }
 
         void EnterEvadeMode() override
@@ -1511,7 +1511,7 @@ public:
                         leader->CastSpell(leader, SPELL_HOR_SUICIDE, true);
                         Unit::Kill(me, leader);
                         me->InterruptNonMeleeSpells(true);
-                        me->CastSpell((Unit*)NULL, SPELL_FURY_OF_FROSTMOURNE, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_FURY_OF_FROSTMOURNE, false);
                     }
                     break;
                 case EVENT_LK_START_FOLLOWING:
@@ -1581,13 +1581,13 @@ public:
                     DoAction(ACTION_CHECK_TRASH_DIED);
                     break;
                 case EVENT_LK_SUMMON_GHOULS:
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_RAGING_GHOULS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_RAGING_GHOULS, false);
                     break;
                 case EVENT_LK_SUMMON_RWD:
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_RISEN_WITCH_DOCTOR, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_RISEN_WITCH_DOCTOR, false);
                     break;
                 case EVENT_LK_SUMMON_LA:
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_LUMBERING_ABOMINATION, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_LUMBERING_ABOMINATION, false);
                     break;
                 case EVENT_LK_SUMMON_NEXT_ICE_WALL:
                     Talk(SAY_LK_IW_1 + currentWall);
@@ -1776,7 +1776,7 @@ public:
                             textId += 10;
                         Talk(textId);
                         if (currentStopPoint <= 4)
-                            me->CastSpell((Unit*)NULL, (me->GetEntry() == NPC_JAINA_PART2 ? SPELL_DESTROY_WALL_JAINA : SPELL_DESTROY_WALL_SYLVANAS), false);
+                            me->CastSpell((Unit*)nullptr, (me->GetEntry() == NPC_JAINA_PART2 ? SPELL_DESTROY_WALL_JAINA : SPELL_DESTROY_WALL_SYLVANAS), false);
                         else
                         {
                             me->SetFacingTo(PathWaypoints[PATH_WP_COUNT - 1].GetOrientation());
@@ -1990,7 +1990,7 @@ public:
             PreventDefaultAction();
             if (Unit* caster = GetCaster())
                 if (Creature* c = caster->SummonCreature(WORLD_TRIGGER, CannonFirePos[caster->GetEntry() == NPC_JAINA_PART2 ? 0 : 1][urand(0, 2)], TEMPSUMMON_TIMED_DESPAWN, 1))
-                    c->CastSpell((Unit*)NULL, 70021, true);
+                    c->CastSpell((Unit*)nullptr, 70021, true);
         }
 
         void Register() override

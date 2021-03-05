@@ -114,7 +114,7 @@ public:
                     break;
                 case EVENT_CORRUPTED_FLESH:
                     Talk(RAND(SAY_CORRUPTED_FLESH_1, SAY_CORRUPTED_FLESH_2));
-                    me->CastSpell((Unit*)NULL, SPELL_CORRUPTED_FLESH, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_CORRUPTED_FLESH, false);
                     events.ScheduleEvent(EVENT_CORRUPTED_FLESH, 20000);
                     break;
                 case EVENT_SHARED_SUFFERING:
@@ -180,7 +180,7 @@ public:
                                         ++count;
                             ticks = (a->GetDuration() / int32(a->GetSpellInfo()->Effects[0].Amplitude)) + 1;
                             int32 dmg = (ticks * dmgPerTick) / count;
-                            caster->CastCustomSpell(GetTarget(), 72373, NULL, &dmg, NULL, true);
+                            caster->CastCustomSpell(GetTarget(), 72373, nullptr, &dmg, nullptr, true);
                         }
         }
 

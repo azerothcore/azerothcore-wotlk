@@ -232,7 +232,7 @@ public:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 140.0f, true))
                     {
                         WorldPacket data;
-                        ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, NULL, EMOTE_THROW_SARONITE);
+                        ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, EMOTE_THROW_SARONITE);
                         target->ToPlayer()->GetSession()->SendPacket(&data);
                         me->CastSpell(target, SPELL_THROW_SARONITE, false);
                     }

@@ -288,7 +288,7 @@ public:
 
         void HandleDummyApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetUnitOwner()->CastSpell((Unit*)NULL, SPELL_SHADOW_GRASP_VISUAL, false);
+            GetUnitOwner()->CastSpell((Unit*)nullptr, SPELL_SHADOW_GRASP_VISUAL, false);
         }
 
         void HandleDummyRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

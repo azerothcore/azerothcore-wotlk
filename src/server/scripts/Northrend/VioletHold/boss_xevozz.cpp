@@ -96,7 +96,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_ARCANE_BARRAGE_VOLLEY:
-                    me->CastSpell((Unit*)NULL, SPELL_ARCANE_BARRAGE_VOLLEY, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_ARCANE_BARRAGE_VOLLEY, false);
                     events.RepeatEvent(20000);
                     break;
                 case EVENT_SPELL_ARCANE_BUFFET:
@@ -107,13 +107,13 @@ public:
                         Talk(SAY_SUMMON_ENERGY);
                         spheres.DespawnAll();
                         uint32 entry1 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3);
-                        me->CastSpell((Unit*)NULL, entry1, true);
+                        me->CastSpell((Unit*)nullptr, entry1, true);
                         if (IsHeroic())
                         {
                             uint32 entry2;
                             do { entry2 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3); }
                             while (entry1 == entry2);
-                            me->CastSpell((Unit*)NULL, entry2, true);
+                            me->CastSpell((Unit*)nullptr, entry2, true);
                         }
                         events.RepeatEvent(45000);
                         events.RescheduleEvent(EVENT_SPELL_ARCANE_BUFFET, 5000);

@@ -18,8 +18,8 @@ extern LoginDatabaseWorkerPool LoginDatabase;
 #include <stdio.h>
 
 Log::Log() :
-    raLogfile(NULL), logfile(NULL), gmLogfile(NULL), charLogfile(NULL),
-    dberLogfile(NULL), chatLogfile(NULL), sqlLogFile(NULL), sqlDevLogFile(NULL), miscLogFile(NULL),
+    raLogfile(nullptr), logfile(nullptr), gmLogfile(nullptr), charLogfile(nullptr),
+    dberLogfile(nullptr), chatLogfile(nullptr), sqlLogFile(nullptr), sqlDevLogFile(nullptr), miscLogFile(nullptr),
     m_gmlog_per_account(false), m_enableLogDB(false), m_colored(false)
 {
     Initialize();
@@ -27,41 +27,41 @@ Log::Log() :
 
 Log::~Log()
 {
-    if (logfile != NULL)
+    if (logfile != nullptr)
         fclose(logfile);
-    logfile = NULL;
+    logfile = nullptr;
 
-    if (gmLogfile != NULL)
+    if (gmLogfile != nullptr)
         fclose(gmLogfile);
-    gmLogfile = NULL;
+    gmLogfile = nullptr;
 
-    if (charLogfile != NULL)
+    if (charLogfile != nullptr)
         fclose(charLogfile);
-    charLogfile = NULL;
+    charLogfile = nullptr;
 
-    if (dberLogfile != NULL)
+    if (dberLogfile != nullptr)
         fclose(dberLogfile);
-    dberLogfile = NULL;
+    dberLogfile = nullptr;
 
-    if (raLogfile != NULL)
+    if (raLogfile != nullptr)
         fclose(raLogfile);
-    raLogfile = NULL;
+    raLogfile = nullptr;
 
-    if (chatLogfile != NULL)
+    if (chatLogfile != nullptr)
         fclose(chatLogfile);
-    chatLogfile = NULL;
+    chatLogfile = nullptr;
 
-    if (sqlLogFile != NULL)
+    if (sqlLogFile != nullptr)
         fclose(sqlLogFile);
-    sqlLogFile = NULL;
+    sqlLogFile = nullptr;
 
-    if (sqlDevLogFile != NULL)
+    if (sqlDevLogFile != nullptr)
         fclose(sqlDevLogFile);
-    sqlDevLogFile = NULL;
+    sqlDevLogFile = nullptr;
 
-    if (miscLogFile != NULL)
+    if (miscLogFile != nullptr)
         fclose(miscLogFile);
-    miscLogFile = NULL;
+    miscLogFile = nullptr;
 }
 
 std::unique_ptr<ILog>& getLogInstance()
@@ -145,11 +145,11 @@ void Log::Initialize()
     }
 
     charLogfile = openLogFile("CharLogFile", "CharLogTimestamp", "a");
-    dberLogfile = openLogFile("DBErrorLogFile", NULL, "a");
-    raLogfile = openLogFile("RaLogFile", NULL, "a");
+    dberLogfile = openLogFile("DBErrorLogFile", nullptr, "a");
+    raLogfile = openLogFile("RaLogFile", nullptr, "a");
     chatLogfile = openLogFile("ChatLogFile", "ChatLogTimestamp", "a");
-    sqlLogFile = openLogFile("SQLDriverLogFile", NULL, "a");
-    sqlDevLogFile = openLogFile("SQLDeveloperLogFile", NULL, "a");
+    sqlLogFile = openLogFile("SQLDriverLogFile", nullptr, "a");
+    sqlDevLogFile = openLogFile("SQLDeveloperLogFile", nullptr, "a");
     miscLogFile = fopen((m_logsDir + "Misc.log").c_str(), "a");
 
     // Main log file settings
@@ -185,7 +185,7 @@ FILE* Log::openLogFile(char const* configFileName, char const* configTimeStampFl
 {
     std::string logfn = sConfigMgr->GetOption<std::string>(configFileName, "", false);
     if (logfn.empty())
-        return NULL;
+        return nullptr;
 
     if (configTimeStampFlag && sConfigMgr->GetOption<bool>(configTimeStampFlag, false, false))
     {
@@ -202,7 +202,7 @@ FILE* Log::openLogFile(char const* configFileName, char const* configTimeStampFl
 FILE* Log::openGmlogPerAccount(uint32 account)
 {
     if (m_gmlog_filename_format.empty())
-        return NULL;
+        return nullptr;
 
     char namebuf[ACORE_PATH_MAX];
     snprintf(namebuf, ACORE_PATH_MAX, m_gmlog_filename_format.c_str(), account);
@@ -211,7 +211,7 @@ FILE* Log::openGmlogPerAccount(uint32 account)
 
 void Log::outTimestamp(FILE* file)
 {
-    time_t t = time(NULL);
+    time_t t = time(nullptr);
     tm* aTm = localtime(&t);
     //       YYYY   year
     //       MM     month (2 digits 01-12)
@@ -337,7 +337,7 @@ void Log::ResetColor(bool stdout_stream)
 
 std::string Log::GetTimestampStr()
 {
-    time_t t = time(NULL);
+    time_t t = time(nullptr);
     tm aTm;
     localtime_r(&t, &aTm);
     //       YYYY   year
@@ -918,7 +918,7 @@ void Log::outChar(const char* str, ...)
 
 void Log::outCharDump(const char* str, uint32 account_id, uint32 guid, const char* name)
 {
-    FILE* file = NULL;
+    FILE* file = nullptr;
     if (m_charLog_Dump_Separate)
     {
         char fileName[29]; // Max length: name(12) + guid(11) + _.log (5) + \0

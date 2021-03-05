@@ -319,7 +319,7 @@ public:
         void HandleScript(SpellEffIndex /*effIndex*/)
         {
             for (uint8 i = 0; i < 4; ++i)
-                GetCaster()->CastSpell((Unit*)NULL, SPELL_COPY_OF_SUMMON_MINIONS, true);
+                GetCaster()->CastSpell((Unit*)nullptr, SPELL_COPY_OF_SUMMON_MINIONS, true);
         }
 
         void Register() override

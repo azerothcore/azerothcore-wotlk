@@ -1050,7 +1050,7 @@ bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 
     Battleground* bg = sBattlegroundMgr->GetBattleground(m_BgInstanceGUID);
 
-    // battleground can be already deleted, bg may be NULL!
+    // battleground can be already deleted, bg may be nullptr!
 
     // check if still in queue for this battleground
     uint32 queueSlot = player->GetBattlegroundQueueIndex(m_BgQueueTypeId);

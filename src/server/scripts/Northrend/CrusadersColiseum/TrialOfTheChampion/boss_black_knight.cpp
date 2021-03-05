@@ -161,7 +161,7 @@ public:
 
                 pInstance->SetData(BOSS_BLACK_KNIGHT, IN_PROGRESS);
                 Talk(TEXT_BK_AGGRO);
-                me->CastSpell((Unit*)NULL, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
+                me->CastSpell((Unit*)nullptr, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
                 if( Creature* announcer = pInstance->instance->GetCreature(pInstance->GetData64(DATA_ANNOUNCER)) )
                     announcer->DespawnOrUnsummon();
 
@@ -265,7 +265,7 @@ public:
                     events.RepeatEvent(urand(14000, 17000));
                     break;
                 case EVENT_SPELL_DEATH_BITE:
-                    me->CastSpell((Unit*)NULL, SPELL_DEATH_BITE, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_DEATH_BITE, false);
                     events.RepeatEvent(urand(2000, 4000));
                     break;
                 case EVENT_SPELL_MARKED_DEATH:
@@ -301,7 +301,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->CastSpell((Unit*)NULL, SPELL_BK_KILL_CREDIT, true);
+            me->CastSpell((Unit*)nullptr, SPELL_BK_KILL_CREDIT, true);
             Talk(TEXT_BK_DEATH);
             if( pInstance )
                 pInstance->SetData(BOSS_BLACK_KNIGHT, DONE);
@@ -327,7 +327,7 @@ public:
 
         void Reset() override
         {
-            Start(false, true, 0, NULL);
+            Start(false, true, 0, nullptr);
             SetDespawnAtEnd(true);
         }
 

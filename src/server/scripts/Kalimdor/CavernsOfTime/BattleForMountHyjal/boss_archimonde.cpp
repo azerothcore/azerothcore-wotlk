@@ -623,7 +623,7 @@ public:
                     // If there are more than 30 Wisps then kill Archimonde
                     if (WispCount >= 30)
                     {
-                        Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                        Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                         return;     // Finish the encounter and no more event repeat
                     }
                     DoSpawnCreature(CREATURE_ANCIENT_WISP, float(rand() % 40), float(rand() % 40), 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
