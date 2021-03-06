@@ -44,3 +44,10 @@ else()
     INTERFACE
       -D_BUILD_DIRECTIVE="${CMAKE_BUILD_TYPE}")
 endif()
+
+if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1.0)
+  message(STATUS "UNIX: Older stdc++ library requires stdc++fs, too")
+  target_link_libraries(acore-default-interface
+    INTERFACE
+      stdc++fs)
+endif()
