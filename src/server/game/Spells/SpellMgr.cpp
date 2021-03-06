@@ -3406,12 +3406,6 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetB[0] = 0;
     });
 
-    // Flash Freeze Radius - Avoid FPS Drops
-    ApplySpellFix({ 62148 }, [](SpellEntry* spellInfo)
-    {
-        spellInfo->RangeIndex = 100;
-    });
-
     // Howl of Azgalor
     ApplySpellFix({ 31344 }, [](SpellEntry* spellInfo)
     {

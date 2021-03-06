@@ -11,6 +11,14 @@
 #include "SpellScript.h"
 #include "ulduar.h"
 
+/* This type of enums are used along all the bosses for all type of things.
+ * Using enums for integers produces warning messages due to unscoped types.
+ * Should look for a solution to swap these enums to prevent type conversion bugs
+ * due to missuse. One solution would be instead of using the spell name as a var,
+ * by using the ID and leaving a comment above with the spell name. Most of the IDs
+ * are only used once anyways so this avoid warning usage. Leaving this as a reminder
+ * that a better solution should be thought.
+ */
 enum HodirSpellData
 {
     SPELL_BERSERK                       = 26662,
@@ -97,13 +105,6 @@ enum HodirNPCs
     NPC_ICICLE_PACKED                   = 33173,
     NPC_TOASTY_FIRE                     = 33342,
     NPC_RARE_WINTER_CACHE_TRIGGER       = 88101,
-};
-
-enum HodirGOs
-{
-    GO_HODIR_SNOWDRIFT                  = 194173,
-    // GO_HODIR_FROZEN_DOOR             = 194441,
-    // GO_HODIR_DOOR                    = 194634,
 };
 
 enum HodirEvents
@@ -216,12 +217,12 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 Helpers[8];
-        bool berserk;
-        bool bAchievCheese;
-        bool bAchievGettingCold;
-        bool bAchievCoolestFriends;
-        uint16 addSpawnTimer;
+        uint64 Helpers[8]{ };
+        bool berserk{ false };
+        bool bAchievCheese{ true };
+        bool bAchievGettingCold{ true };
+        bool bAchievCoolestFriends{ true };
+        uint16 addSpawnTimer{ 0 };
 
         void Reset() override
         {
@@ -1204,15 +1205,8 @@ public:
     {
         PrepareAuraScript(spell_hodir_biting_cold_player_aura_AuraScript)
 
-        uint8 counter;
-        bool prev;
-
-        bool Load() override
-        {
-            counter = 0;
-            prev = false;
-            return true;
-        }
+        uint8 counter {0};
+        bool prev {false};
 
         void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
         {

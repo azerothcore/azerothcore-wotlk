@@ -11,12 +11,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-enum class raidDifficulty
-{
-    DIFFICULTY_10MAN = 0,
-    DIFFICULTY_25MAN = 1,
-};
-
 class instance_ulduar : public InstanceMapScript
 {
 public:
@@ -32,13 +26,15 @@ public:
         instance_ulduar_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
             Initialize();
-            m_difficulty = (pMap->Is25ManRaid() ? raidDifficulty::DIFFICULTY_25MAN : raidDifficulty::DIFFICULTY_10MAN);
+            // 0: 10 man difficulty
+            // 1: 25 man difficulty
+            m_difficulty = (pMap->Is25ManRaid() ? 0 : 1);
         };
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         uint32 C_of_Ulduar_MASK;
 
-        raidDifficulty m_difficulty;
+        bool m_difficulty;
 
         // Bosses
         uint64 m_uiLeviathanGUID;
@@ -257,13 +253,13 @@ public:
                 SetData(eventId, 0);
         }
 
-        void SpawnHodirChests(raidDifficulty rd)
+        void SpawnHodirChests(bool rd)
         {
             if (Creature* cr = instance->GetCreature(m_uiHodirGUID))
             {
                 switch (rd)
                 {
-                    case raidDifficulty::DIFFICULTY_10MAN:
+                    case 0: // 10 man chest
                     {
                         if (!m_hodirNormalChest)
                         {
@@ -294,7 +290,7 @@ public:
                         }
                         break;
                     }
-                    case raidDifficulty::DIFFICULTY_25MAN:
+                    case 1: // 25 man chest
                     {
                         if (!m_hodirNormalChest)
                         {
@@ -735,7 +731,8 @@ public:
                     break;
 
                 case TYPE_SPAWN_HODIR_CACHE:
-                    SpawnHodirChests(m_difficulty == raidDifficulty::DIFFICULTY_10MAN ? m_difficulty : raidDifficulty::DIFFICULTY_25MAN);
+                    // Is the difficulty 10 man(0) ? return 10 man : return 25 man;
+                    SpawnHodirChests(m_difficulty == 0 ? 0 : 1);
                     break;
                 case TYPE_HODIR_HM_FAIL:
                     if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
@@ -1055,7 +1052,7 @@ public:
             }
             else if (unit->GetTypeId() == TYPEID_UNIT && unit->GetAreaId() == 4656 /*Conservatory of Life*/)
             {
-                if (time(nullptr) > (m_conspeedatoryAttempt + DAY))
+                if (time(nullptr) > (static_cast<uint64>(m_conspeedatoryAttempt) + DAY))
                 {
                     DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, 21597 /*CON-SPEED-ATORY_TIMED_CRITERIA*/);
                     m_conspeedatoryAttempt = time(nullptr);
