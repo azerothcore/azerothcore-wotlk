@@ -11,19 +11,18 @@
 #ifndef __WORLDSESSION_H
 #define __WORLDSESSION_H
 
-#include <utility>
-
-#include "Common.h"
-#include "SharedDefines.h"
+#include "AccountMgr.h"
 #include "AddonMgr.h"
+#include "BanManager.h"
+#include "Common.h"
+#include "Cryptography/BigNumber.h"
 #include "DatabaseEnv.h"
+#include "GossipDef.h"
+#include "Opcodes.h"
+#include "SharedDefines.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "GossipDef.h"
-#include "Cryptography/BigNumber.h"
-#include "AccountMgr.h"
-#include "BanManager.h"
-#include "Opcodes.h"
+#include <utility>
 
 class Creature;
 class GameObject;
@@ -1019,7 +1018,7 @@ private:
     typedef std::list<AddonInfo> AddonsList;
 
     // Warden
-    Warden* _warden;                                    // Remains NULL if Warden system is not enabled by config
+    Warden* _warden;                                    // Remains nullptr if Warden system is not enabled by config
 
     time_t _logoutTime;
     bool m_inQueue;                                     // session wait in auth.queue

@@ -9,8 +9,8 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "Util.h"
 #include "SHA1.h"
+#include "Util.h"
 #include "WorldSession.h"
 
 namespace AccountMgr

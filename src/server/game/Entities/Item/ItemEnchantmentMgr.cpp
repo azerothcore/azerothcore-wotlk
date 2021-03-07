@@ -4,16 +4,16 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include <stdlib.h>
-#include <functional>
-#include "ItemEnchantmentMgr.h"
 #include "DatabaseEnv.h"
+#include "DBCStores.h"
+#include "ItemEnchantmentMgr.h"
 #include "Log.h"
 #include "ObjectMgr.h"
-#include <list>
-#include <vector>
 #include "Util.h"
-#include "DBCStores.h"
+#include <functional>
+#include <list>
+#include <stdlib.h>
+#include <vector>
 
 struct EnchStoreItem
 {

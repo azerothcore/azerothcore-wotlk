@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "trial_of_the_crusader.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
+#include "trial_of_the_crusader.h"
 
 enum JaraxxusTexts
 {
@@ -232,14 +232,14 @@ public:
                 case EVENT_SUMMON_NETHER_PORTAL:
                     Talk(EMOTE_NETHER_PORTAL);
                     Talk(SAY_MISTRESS_OF_PAIN);
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_NETHER_PORTAL, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_NETHER_PORTAL, false);
 
                     events.RescheduleEvent(EVENT_SUMMON_VOLCANO, 60000);
                     break;
                 case EVENT_SUMMON_VOLCANO:
                     Talk(EMOTE_INFERNAL_ERUPTION);
                     Talk(SAY_INFERNAL_ERUPTION);
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_VOLCANO, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOLCANO, false);
 
                     events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 60000);
                     break;
@@ -410,7 +410,7 @@ public:
                     events.RepeatEvent(urand(25000, 30000));
                     break;
                 case EVENT_SPELL_MISTRESS_KISS:
-                    me->CastSpell((Unit*)NULL, SPELL_MISTRESS_KISS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_MISTRESS_KISS, false);
                     events.RepeatEvent(urand(25000, 35000));
                     break;
             }

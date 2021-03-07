@@ -2,14 +2,14 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "violet_hold.h"
 #include "PassiveAI.h"
-#include "SpellScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
+#include "violet_hold.h"
 
 /***********
 ** DEFENSE SYSTEM CRYSTAL
@@ -360,7 +360,7 @@ struct violet_hold_trashAI : public npc_escortAI
     {
         RemoveEscortState(STATE_ESCORT_ESCORTING | STATE_ESCORT_RETURNING | STATE_ESCORT_PAUSED);
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
-        me->CastSpell((Unit*)NULL, SPELL_DESTROY_DOOR_SEAL, true);
+        me->CastSpell((Unit*)nullptr, SPELL_DESTROY_DOOR_SEAL, true);
     }
 
     void EnterEvadeMode() override

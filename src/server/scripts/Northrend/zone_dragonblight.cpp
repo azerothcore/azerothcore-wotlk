@@ -14,19 +14,19 @@ EndScriptData */
 /* ContentData
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "SpellScript.h"
-#include "Player.h"
-#include "Vehicle.h"
+#include "CellImpl.h"
+#include "Chat.h"
+#include "CombatAI.h"
 #include "CreatureTextMgr.h"
 #include "PassiveAI.h"
-#include "CombatAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
-#include "Chat.h"
-#include "CellImpl.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 /********
@@ -902,7 +902,7 @@ public:
                     events.ScheduleEvent(7, 11000);
                     break;
                 case 6: // repel hammer
-                    me->CastSpell((Unit*)NULL, SPELL_SAC_REPEL_HAMMER, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SAC_REPEL_HAMMER, false);
                     if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE_VEH_1, 150.0f, true))
                         c->CastSpell(c, SPELL_SAC_BLUE_EXPLOSION, true);
 
@@ -921,7 +921,7 @@ public:
                     events.ScheduleEvent(9, 11500);
                     break;
                 case 8: // summon ghouls
-                    me->CastSpell((Unit*)NULL, SPELL_SAC_SUMMON_GHOULS_AURA, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SAC_SUMMON_GHOULS_AURA, false);
                     break;
                 case 9: // talk 3
                     Talk(3);
@@ -1030,7 +1030,7 @@ public:
         {
             if (spell->Id == SPELL_SAC_REPEL_HAMMER && target->GetTypeId() == TYPEID_UNIT)
             {
-                target->CastSpell((Unit*)NULL, SPELL_SAC_THROW_HAMMER, true);
+                target->CastSpell((Unit*)nullptr, SPELL_SAC_THROW_HAMMER, true);
                 target->ToCreature()->DespawnOrUnsummon(1);
                 if (Unit* c = target->GetVehicleBase())
                     c->RemoveAurasDueToSpell(SPELL_SAC_HOLY_ZONE_AURA);
@@ -1304,7 +1304,7 @@ public:
                         AttackStart(t);
                     break;
                 case 2:
-                    me->CastSpell((Unit*)NULL, 70866, false);
+                    me->CastSpell((Unit*)nullptr, 70866, false);
                     events.RepeatEvent(urand(30000, 35000));
                     break;
                 case 3:

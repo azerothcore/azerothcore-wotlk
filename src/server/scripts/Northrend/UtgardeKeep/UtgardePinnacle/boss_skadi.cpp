@@ -2,13 +2,13 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "utgarde_pinnacle.h"
-#include "Vehicle.h"
 #include "CombatAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "utgarde_pinnacle.h"
+#include "Vehicle.h"
 
 enum Misc
 {
@@ -505,7 +505,7 @@ public:
 
                     grauf->AI()->DoAction(ACTION_MYGIRL_ACHIEVEMENT);
                 }
-                go->CastSpell((Unit*)NULL, SPELL_LAUNCH_HARPOON);
+                go->CastSpell((Unit*)nullptr, SPELL_LAUNCH_HARPOON);
             }
 
         return true;

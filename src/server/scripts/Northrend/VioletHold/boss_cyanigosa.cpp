@@ -2,10 +2,10 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "violet_hold.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "violet_hold.h"
 
 enum Yells
 {
@@ -109,7 +109,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_ARCANE_VACUUM:
-                    me->CastSpell((Unit*)NULL, SPELL_ARCANE_VACUUM, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_ARCANE_VACUUM, false);
                     DoResetThreat();
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->setAttackTimer(BASE_ATTACK, 3000);

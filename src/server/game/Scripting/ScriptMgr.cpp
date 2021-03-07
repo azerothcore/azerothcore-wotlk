@@ -4,28 +4,28 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
+#include "Chat.h"
 #include "Config.h"
+#include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "GossipDef.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
+#include "Player.h"
+#include "ScriptedGossip.h"
 #include "ScriptLoader.h"
+#include "ScriptMgr.h"
 #include "ScriptSystem.h"
-#include "Transport.h"
-#include "Vehicle.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "GossipDef.h"
-#include "ScriptedGossip.h"
-#include "CreatureAI.h"
-#include "Player.h"
+#include "Transport.h"
+#include "Vehicle.h"
 #include "WorldPacket.h"
-#include "Chat.h"
 
 #ifdef ELUNA
-#include "LuaEngine.h"
 #include "ElunaUtility.h"
+#include "LuaEngine.h"
 #endif
 
 // Specialize for each script type class like so:
@@ -1327,7 +1327,7 @@ void ScriptMgr::OnShutdown()
 bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target)
 {
     ASSERT(source);
-    // target can be NULL.
+    // target can be nullptr.
 
     GET_SCRIPT_RET(AchievementCriteriaScript, scriptId, tmpscript, false);
     return tmpscript->OnCheck(source, target);
@@ -1337,6 +1337,11 @@ bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target)
 void ScriptMgr::OnPlayerCompleteQuest(Player* player, Quest const* quest)
 {
     FOREACH_SCRIPT(PlayerScript)->OnPlayerCompleteQuest(player, quest);
+}
+
+void ScriptMgr::OnBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBattlegroundDesertion(player, desertionType);
 }
 
 void ScriptMgr::OnPlayerReleasedGhost(Player* player)

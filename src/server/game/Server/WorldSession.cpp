@@ -9,32 +9,33 @@
 */
 
 #include "WorldSocket.h"                                    // must be first to make ACE happy with ACE includes in it
+#include "AccountMgr.h"
+#include "BattlegroundMgr.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "Log.h"
-#include "Opcodes.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "Pet.h"
-#include "Player.h"
-#include "Vehicle.h"
-#include "ObjectMgr.h"
-#include "GuildMgr.h"
 #include "Group.h"
 #include "Guild.h"
-#include "World.h"
-#include "ObjectAccessor.h"
-#include "BattlegroundMgr.h"
-#include "OutdoorPvPMgr.h"
+#include "GuildMgr.h"
+#include "Log.h"
 #include "MapManager.h"
-#include "SocialMgr.h"
-#include "zlib.h"
-#include "ScriptMgr.h"
-#include "Transport.h"
-#include "WardenWin.h"
-#include "WardenMac.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "OutdoorPvPMgr.h"
+#include "Pet.h"
+#include "Player.h"
 #include "SavingSystem.h"
-#include "AccountMgr.h"
+#include "ScriptMgr.h"
+#include "SocialMgr.h"
+#include "Transport.h"
+#include "Vehicle.h"
+#include "WardenMac.h"
+#include "WardenWin.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
+#include "zlib.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -170,7 +171,7 @@ WorldSession::~WorldSession()
 
 std::string const& WorldSession::GetPlayerName() const
 {
-    return _player != NULL ? _player->GetName() : DefaultPlayerName;
+    return _player != nullptr ? _player->GetName() : DefaultPlayerName;
 }
 
 std::string WorldSession::GetPlayerInfo() const
@@ -178,7 +179,7 @@ std::string WorldSession::GetPlayerInfo() const
     std::ostringstream ss;
 
     ss << "[Player: " << GetPlayerName()
-       << " (Guid: " << (_player != NULL ? _player->GetGUID() : 0)
+       << " (Guid: " << (_player != nullptr ? _player->GetGUID() : 0)
        << ", Account: " << GetAccountId() << ")]";
 
     return ss.str();
@@ -513,12 +514,16 @@ void WorldSession::LogoutPlayer(bool save)
                 _player->RemoveBattlegroundQueueId(bgQueueTypeId);
                 sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(_player->GetGUID(), false, i);
                 // track if player logs out after invited to join BG
-                if (_player->IsInvitedForBattlegroundInstance() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
+                if (_player->IsInvitedForBattlegroundInstance())
                 {
-                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
-                    stmt->setUInt32(0, _player->GetGUIDLow());
-                    stmt->setUInt8(1, BG_DESERTION_TYPE_INVITE_LOGOUT);
-                    CharacterDatabase.Execute(stmt);
+                    if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
+                    {
+                        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
+                        stmt->setUInt32(0, _player->GetGUIDLow());
+                        stmt->setUInt8(1, BG_DESERTION_TYPE_INVITE_LOGOUT);
+                        CharacterDatabase.Execute(stmt);
+                    }
+                    sScriptMgr->OnBattlegroundDesertion(_player, BG_DESERTION_TYPE_INVITE_LOGOUT);
                 }
             }
 
@@ -760,7 +765,7 @@ void WorldSession::SetAccountData(AccountDataType type, time_t tm, std::string c
     }
     else
     {
-        // _player can be NULL and packet received after logout but m_GUID still store correct guid
+        // _player can be nullptr and packet received after logout but m_GUID still store correct guid
         if (!m_GUIDLow)
             return;
 
@@ -1155,7 +1160,7 @@ void WorldSession::SetPlayer(Player* player)
 void WorldSession::InitializeQueryCallbackParameters()
 {
     // Callback parameters that have pointers in them should be properly
-    // initialized to NULL here.
+    // initialized to nullptr here.
     _charCreateCallback.SetParam(nullptr);
     _loadPetFromDBFirstCallback.SetFirstParam(0);
     _loadPetFromDBFirstCallback.SetSecondParam(nullptr);

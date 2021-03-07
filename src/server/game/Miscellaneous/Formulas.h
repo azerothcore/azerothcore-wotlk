@@ -7,11 +7,11 @@
 #ifndef ACORE_FORMULAS_H
 #define ACORE_FORMULAS_H
 
-#include "World.h"
-#include "SharedDefines.h"
-#include "ScriptMgr.h"
-#include "Player.h"
 #include "Creature.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "SharedDefines.h"
+#include "World.h"
 
 namespace acore
 {

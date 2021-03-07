@@ -1,8 +1,8 @@
-#include "WhoListCache.h"
-#include "World.h"
+#include "GuildMgr.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
-#include "GuildMgr.h"
+#include "WhoListCache.h"
+#include "World.h"
 
 std::vector<WhoListPlayerInfo> WhoListCacheMgr::m_whoOpcodeList;
 

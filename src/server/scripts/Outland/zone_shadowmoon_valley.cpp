@@ -26,13 +26,13 @@ go_crystal_prison
 npc_enraged_spirit
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Group.h"
-#include "SpellScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 #include "WorldSession.h"
 
 // Ours
@@ -497,7 +497,7 @@ public:
             {
                 me->SetVisible(false);
                 me->SetDisableGravity(false);
-                Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                 me->RemoveCorpse();
             }
             me->DespawnOrUnsummon(1);
@@ -667,7 +667,7 @@ public:
                         events.ScheduleEvent(EVENT_KILL, 5000);
                         break;
                     case EVENT_KILL:
-                        Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                        Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                         break;
                 }
                 return;

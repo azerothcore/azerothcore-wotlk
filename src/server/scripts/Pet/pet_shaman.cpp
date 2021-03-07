@@ -10,8 +10,8 @@
  */
 
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum ShamanSpells
 {

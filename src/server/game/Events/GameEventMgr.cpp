@@ -4,26 +4,27 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "BattlegroundMgr.h"
 #include "GameEventMgr.h"
-#include "World.h"
-#include "ObjectMgr.h"
-#include "WorldPacket.h"
-#include "PoolMgr.h"
+#include "GameObjectAI.h"
+#include "GossipDef.h"
 #include "Language.h"
 #include "Log.h"
 #include "MapManager.h"
-#include "GossipDef.h"
+#include "ObjectMgr.h"
 #include "Player.h"
-#include "BattlegroundMgr.h"
-#include "UnitAI.h"
-#include "GameObjectAI.h"
-#include "Transport.h"
+#include "PoolMgr.h"
 #include "ScriptMgr.h"
+#include "Transport.h"
+#include "UnitAI.h"
+#include "Util.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include <time.h>
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
-#include <time.h>
-#include "Util.h"
 
 GameEventMgr* GameEventMgr::instance()
 {
@@ -1360,7 +1361,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         {
             sObjectMgr->RemoveCreatureFromGrid(*itr, data);
 
-            if (Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_UNIT), (Creature*)NULL))
+            if (Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_UNIT), (Creature*)nullptr))
                 creature->AddObjectToRemoveList();
         }
     }
@@ -1382,7 +1383,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         {
             sObjectMgr->RemoveGameobjectFromGrid(*itr, data);
 
-            if (GameObject* pGameobject = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_GAMEOBJECT), (GameObject*)NULL))
+            if (GameObject* pGameobject = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_GAMEOBJECT), (GameObject*)nullptr))
                 pGameobject->AddObjectToRemoveList();
         }
     }
@@ -1408,7 +1409,7 @@ void GameEventMgr::ChangeEquipOrModel(int16 event_id, bool activate)
             continue;
 
         // Update if spawned
-        Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(itr->first, data->id, HIGHGUID_UNIT), (Creature*)NULL);
+        Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(itr->first, data->id, HIGHGUID_UNIT), (Creature*)nullptr);
         if (creature)
         {
             if (activate)

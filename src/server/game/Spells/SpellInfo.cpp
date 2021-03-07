@@ -4,16 +4,16 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "SpellAuraDefines.h"
-#include "SpellInfo.h"
-#include "SpellMgr.h"
-#include "Spell.h"
-#include "DBCStores.h"
-#include "ConditionMgr.h"
-#include "SpellAuraEffects.h"
-#include "Player.h"
 #include "Battleground.h"
 #include "Chat.h"
+#include "ConditionMgr.h"
+#include "DBCStores.h"
+#include "Player.h"
+#include "Spell.h"
+#include "SpellAuraDefines.h"
+#include "SpellAuraEffects.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType)
 {
@@ -1275,7 +1275,7 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
             return false;
 
     SpellInfo const* affectSpell = sSpellMgr->GetSpellInfo(mod->spellId);
-    // False if affect_spell == NULL or spellFamily not equal
+    // False if affect_spell == nullptr or spellFamily not equal
     if (!affectSpell || affectSpell->SpellFamilyName != SpellFamilyName)
         return false;
 

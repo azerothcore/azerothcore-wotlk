@@ -2,18 +2,18 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
+#include "CombatAI.h"
 #include "eye_of_eternity.h"
-#include "Vehicle.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
-#include "SpellScript.h"
-#include "PassiveAI.h"
-#include "CombatAI.h"
-#include "Player.h"
-#include "WorldSession.h"
 #include "Opcodes.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
+#include "WorldSession.h"
 
 enum MovementInformPoints
 {
