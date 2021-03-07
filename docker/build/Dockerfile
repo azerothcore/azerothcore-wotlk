@@ -40,7 +40,7 @@ RUN chown -R acore:acore \
 
 USER acore
 
-ADD docker/build/my.cnf /home/acore/my.cnf
+ADD docker/build/.my.cnf /home/acore/.my.cnf
 
 WORKDIR /azerothcore/
 
