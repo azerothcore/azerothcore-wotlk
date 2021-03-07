@@ -18,6 +18,7 @@ COPY ./conf /azerothcore/conf
 COPY ./deps /azerothcore/deps
 COPY ./apps /azerothcore/apps
 COPY ./acore.sh /azerothcore/acore.sh
+COPY ./acore.json /azerothcore/acore.json
 
 # install the required dependencies to run the worldserver
 RUN /azerothcore/acore.sh install-deps
