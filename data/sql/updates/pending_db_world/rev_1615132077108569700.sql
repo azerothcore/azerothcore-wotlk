@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1615132077108569700');
 
---Draenei Commoner BloodElf Commoner-->
+-- Draenei Commoner BloodElf Commoner -->
 DELETE FROM `creature` WHERE (`id` = 19171) AND (`guid` IN (91587));
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (91587, 19171, 530, 0, 0, 1, 1, 18842, 1, -3807.906738, -11710.348633, -106.454651, 3.477165, 180, 0, 0, 42, 0, 0, 0, 0, 0, '', 0);
