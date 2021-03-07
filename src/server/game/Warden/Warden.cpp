@@ -4,21 +4,21 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "Log.h"
-#include "Opcodes.h"
-#include "ByteBuffer.h"
-#include <openssl/md5.h>
-#include <openssl/sha.h>
-#include "World.h"
-#include "Player.h"
-#include "Util.h"
-#include "Warden.h"
 #include "AccountMgr.h"
 #include "BanManager.h"
+#include "ByteBuffer.h"
+#include "Common.h"
+#include "Log.h"
+#include "Opcodes.h"
+#include "Player.h"
 #include "SharedDefines.h"
+#include "Util.h"
+#include "Warden.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
+#include <openssl/md5.h>
+#include <openssl/sha.h>
 
 Warden::Warden() : _session(nullptr), _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
     _dataSent(false), _module(nullptr), _initialized(false)

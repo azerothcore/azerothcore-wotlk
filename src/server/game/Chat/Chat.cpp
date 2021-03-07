@@ -4,25 +4,24 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "ObjectMgr.h"
-#include "World.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "DatabaseEnv.h"
-
 #include "AccountMgr.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "ChatLink.h"
+#include "Common.h"
+#include "DatabaseEnv.h"
 #include "GridNotifiersImpl.h"
 #include "Language.h"
 #include "Log.h"
+#include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "UpdateMask.h"
-#include "SpellMgr.h"
 #include "ScriptMgr.h"
-#include "ChatLink.h"
+#include "SpellMgr.h"
+#include "UpdateMask.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -117,7 +116,7 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
     else if (target_account)
         target_sec = AccountMgr::GetSecurity(target_account, realmID);
     else
-        return true;                                        // caller must report error for (target == NULL && target_account == 0)
+        return true;                                        // caller must report error for (target == nullptr && target_account == 0)
 
     AccountTypes target_ac_sec = AccountTypes(target_sec);
     if (m_session->GetSecurity() < target_ac_sec || (strong && m_session->GetSecurity() <= target_ac_sec))
@@ -277,7 +276,7 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
             if (!ExecuteCommandInTable(table[i].ChildCommands, text, fullcmd.c_str()))
             {
 #ifdef ELUNA
-                if (!sEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : NULL, oldtext))
+                if (!sEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : nullptr, oldtext))
                     return true;
 #endif
                 if (text[0] != '\0')
@@ -430,7 +429,7 @@ bool ChatHandler::ParseCommands(char const* text)
     if (!ExecuteCommandInTable(getCommandTable(), text, fullcmd))
     {
 #ifdef ELUNA
-        if (!sEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : NULL, text))
+        if (!sEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : nullptr, text))
             return true;
 #endif
         if (m_session && AccountMgr::IsPlayerAccount(m_session->GetSecurity()))
@@ -1085,7 +1084,7 @@ std::string ChatHandler::extractPlayerNameFromLink(char* text)
     return name;
 }
 
-bool ChatHandler::extractPlayerTarget(char* args, Player** player, uint64* player_guid /*=NULL*/, std::string* player_name /*= NULL*/)
+bool ChatHandler::extractPlayerTarget(char* args, Player** player, uint64* player_guid /*=nullptr*/, std::string* player_name /*= nullptr*/)
 {
     if (args && *args)
     {
@@ -1172,7 +1171,7 @@ char* ChatHandler::extractQuotedArg(char* args)
             continue;
         }
 
-        // return NULL if we reached the end of the string
+        // return nullptr if we reached the end of the string
         if (!*args)
             return nullptr;
 

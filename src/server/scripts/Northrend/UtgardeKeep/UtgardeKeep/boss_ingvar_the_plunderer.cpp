@@ -2,8 +2,8 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "utgarde_keep.h"
 
 enum eDisplayId
@@ -309,9 +309,9 @@ public:
                     me->_AddCreatureSpellCooldown(SPELL_DREADFUL_ROAR, 0);
 
                     if (me->GetDisplayId() == DISPLAYID_DEFAULT)
-                        me->CastSpell((Unit*)NULL, SPELL_STAGGERING_ROAR, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_STAGGERING_ROAR, false);
                     else
-                        me->CastSpell((Unit*)NULL, SPELL_DREADFUL_ROAR, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_DREADFUL_ROAR, false);
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_CLEAVE_OR_WOE_STRIKE:
@@ -336,9 +336,9 @@ public:
                     me->DisableRotate(true);
                     me->SendMovementFlagUpdate();
                     if (me->GetDisplayId() == DISPLAYID_DEFAULT)
-                        me->CastSpell((Unit*)NULL, SPELL_SMASH, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_SMASH, false);
                     else
-                        me->CastSpell((Unit*)NULL, SPELL_DARK_SMASH, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_DARK_SMASH, false);
                     events.RepeatEvent(urand(9000, 11000));
                     events.RescheduleEvent(EVENT_UNROOT, 3750);
                     break;
@@ -350,7 +350,7 @@ public:
                     }
                     else
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_SHADOW_AXE, true);
+                        me->CastSpell((Unit*)nullptr, SPELL_SHADOW_AXE, true);
                         SetEquipmentSlots(false, EQUIP_UNEQUIP, EQUIP_NO_CHANGE, EQUIP_NO_CHANGE);
                         events.RepeatEvent(35000);
                         events.RescheduleEvent(EVENT_AXE_RETURN, 10000);

@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "halls_of_lightning.h"
+#include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
 
 enum BjarngrimSpells
 {
@@ -125,7 +125,7 @@ public:
             AddWaypoint(13, 1281.2f, -26.8f, 33.5f, 0);
             AddWaypoint(14, 1262, -26.9f, 33.5f, 0);
 
-            Start(true, false, 0, NULL, false, true);
+            Start(true, false, 0, nullptr, false, true);
         }
 
         InstanceScript* m_pInstance;

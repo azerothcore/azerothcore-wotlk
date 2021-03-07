@@ -5,14 +5,14 @@
 #ifndef DEF_HALLS_OF_REFLECTION_H
 #define DEF_HALLS_OF_REFLECTION_H
 
-#include "Player.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
-#include "ScriptedCreature.h"
 #include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "SpellScript.h"
 #include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 enum Data
 {

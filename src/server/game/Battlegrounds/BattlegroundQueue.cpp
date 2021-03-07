@@ -8,13 +8,13 @@
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
 #include "BattlegroundQueue.h"
+#include "Channel.h"
 #include "Chat.h"
 #include "Group.h"
-#include "Log.h"
 #include "Language.h"
+#include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "Channel.h"
 #include "ScriptMgr.h"
 #include <unordered_map>
 
@@ -1050,7 +1050,7 @@ bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 
     Battleground* bg = sBattlegroundMgr->GetBattleground(m_BgInstanceGUID);
 
-    // battleground can be already deleted, bg may be NULL!
+    // battleground can be already deleted, bg may be nullptr!
 
     // check if still in queue for this battleground
     uint32 queueSlot = player->GetBattlegroundQueueIndex(m_BgQueueTypeId);
@@ -1061,13 +1061,17 @@ bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
         if (bgQueue.IsPlayerInvited(m_PlayerGuid, m_BgInstanceGUID, m_RemoveTime))
         {
             // track if player leaves the BG by not clicking enter button
-            if (bg && bg->isBattleground() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS) &&
-                    (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN))
+            if (bg && bg->isBattleground() && (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN))
             {
-                PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
-                stmt->setUInt32(0, player->GetGUIDLow());
-                stmt->setUInt8(1, BG_DESERTION_TYPE_NO_ENTER_BUTTON);
-                CharacterDatabase.Execute(stmt);
+                if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
+                {
+                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
+                    stmt->setUInt32(0, player->GetGUIDLow());
+                    stmt->setUInt8(1, BG_DESERTION_TYPE_NO_ENTER_BUTTON);
+                    CharacterDatabase.Execute(stmt);
+                }
+
+                sScriptMgr->OnBattlegroundDesertion(player, BG_DESERTION_TYPE_NO_ENTER_BUTTON);
             }
             player->RemoveBattlegroundQueueId(m_BgQueueTypeId);
             bgQueue.RemovePlayer(m_PlayerGuid, false, queueSlot);

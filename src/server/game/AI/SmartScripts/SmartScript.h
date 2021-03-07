@@ -10,12 +10,10 @@
 #include "Common.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "Unit.h"
-#include "Spell.h"
 #include "GridNotifiers.h"
-
 #include "SmartScriptMgr.h"
-//#include "SmartAI.h"
+#include "Spell.h"
+#include "Unit.h"
 
 class SmartScript
 {
@@ -27,14 +25,14 @@ public:
     void GetScript();
     void FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger const* at);
 
-    void ProcessEventsFor(SMART_EVENT e, Unit* unit = NULL, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = NULL, GameObject* gob = nullptr);
-    void ProcessEvent(SmartScriptHolder& e, Unit* unit = NULL, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = NULL, GameObject* gob = nullptr);
+    void ProcessEventsFor(SMART_EVENT e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = nullptr, GameObject* gob = nullptr);
+    void ProcessEvent(SmartScriptHolder& e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = nullptr, GameObject* gob = nullptr);
     bool CheckTimer(SmartScriptHolder const& e) const;
     void RecalcTimer(SmartScriptHolder& e, uint32 min, uint32 max);
     void UpdateTimer(SmartScriptHolder& e, uint32 const diff);
     void InitTimer(SmartScriptHolder& e);
-    void ProcessAction(SmartScriptHolder& e, Unit* unit = NULL, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = NULL, GameObject* gob = nullptr);
-    void ProcessTimedAction(SmartScriptHolder& e, uint32 const& min, uint32 const& max, Unit* unit = NULL, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = NULL, GameObject* gob = nullptr);
+    void ProcessAction(SmartScriptHolder& e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = nullptr, GameObject* gob = nullptr);
+    void ProcessTimedAction(SmartScriptHolder& e, uint32 const& min, uint32 const& max, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, const SpellInfo* spell = nullptr, GameObject* gob = nullptr);
     ObjectList* GetTargets(SmartScriptHolder const& e, Unit* invoker = nullptr);
     ObjectList* GetWorldObjectsInDist(float dist);
     void InstallTemplate(SmartScriptHolder const& e);
@@ -147,7 +145,7 @@ public:
         else
             mCounterList.insert(std::make_pair(id, value));
 
-        ProcessEventsFor(SMART_EVENT_COUNTER_SET, NULL, id);
+        ProcessEventsFor(SMART_EVENT_COUNTER_SET, nullptr, id);
     }
 
     uint32 GetCounterValue(uint32 id)

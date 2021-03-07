@@ -4,22 +4,22 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "BattlefieldWG.h"
 #include "Common.h"
+#include "CreatureAI.h"
 #include "Log.h"
+#include "MoveSplineInit.h"
 #include "ObjectMgr.h"
-#include "Vehicle.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "TemporarySummon.h"
 #include "Unit.h"
 #include "Util.h"
+#include "Vehicle.h"
 #include "WorldPacket.h"
-#include "ScriptMgr.h"
-#include "CreatureAI.h"
 #include "ZoneScript.h"
-#include "SpellMgr.h"
-#include "SpellInfo.h"
-#include "MoveSplineInit.h"
-#include "TemporarySummon.h"
-#include "Player.h"
-#include "BattlefieldWG.h"
 
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
     _me(unit), _vehicleInfo(vehInfo), _usableSeatNum(0), _creatureEntry(creatureEntry), _status(STATUS_NONE)

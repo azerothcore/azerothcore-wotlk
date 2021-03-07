@@ -11,17 +11,16 @@
 #ifndef __WORLD_H
 #define __WORLD_H
 
-#include "IWorld.h"
-#include "Common.h"
-#include "Timer.h"
-#include "SharedDefines.h"
-#include "QueryResult.h"
 #include "Callback.h"
-
+#include "Common.h"
+#include "IWorld.h"
+#include "QueryResult.h"
+#include "SharedDefines.h"
+#include "Timer.h"
+#include <atomic>
+#include <list>
 #include <map>
 #include <set>
-#include <list>
-#include <atomic>
 
 class Object;
 class WorldPacket;

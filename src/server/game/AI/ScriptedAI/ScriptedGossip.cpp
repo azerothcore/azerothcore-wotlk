@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptedGossip.h"
-#include "Player.h"
 #include "Creature.h"
+#include "Player.h"
+#include "ScriptedGossip.h"
 
 void ClearGossipMenuFor(Player* player)
 {

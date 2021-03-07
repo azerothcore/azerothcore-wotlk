@@ -5,16 +5,16 @@
  */
 
 #include "Common.h"
-#include "Item.h"
-#include "ObjectMgr.h"
-#include "WorldPacket.h"
-#include "DatabaseEnv.h"
-#include "ItemEnchantmentMgr.h"
-#include "SpellMgr.h"
-#include "SpellInfo.h"
-#include "ScriptMgr.h"
 #include "ConditionMgr.h"
+#include "DatabaseEnv.h"
+#include "Item.h"
+#include "ItemEnchantmentMgr.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
 
 void AddItemsSetItem(Player* player, Item* item)
@@ -91,7 +91,7 @@ void AddItemsSetItem(Player* player, Item* item)
                 }
 
                 // spell casted only if fit form requirement, in other case will casted at form change
-                player->ApplyEquipSpell(spellInfo, NULL, true);
+                player->ApplyEquipSpell(spellInfo, nullptr, true);
                 eff->spells[y] = spellInfo;
                 break;
             }
@@ -142,8 +142,8 @@ void RemoveItemsSetItem(Player* player, ItemTemplate const* proto)
             if (eff->spells[z] && eff->spells[z]->Id == set->spells[x])
             {
                 // spell can be not active if not fit form requirement
-                player->ApplyEquipSpell(eff->spells[z], NULL, false);
-                eff->spells[z] = NULL;
+                player->ApplyEquipSpell(eff->spells[z], nullptr, false);
+                eff->spells[z] = nullptr;
                 break;
             }
         }
@@ -1075,7 +1075,7 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, bool clo
 
 Item* Item::CloneItem(uint32 count, Player const* player) const
 {
-    // player CAN be NULL in which case we must not update random properties because that accesses player's item update queue
+    // player CAN be nullptr in which case we must not update random properties because that accesses player's item update queue
     Item* newItem = CreateItem(GetEntry(), count, player, true, player ? GetItemRandomPropertyId() : 0);
     if (!newItem)
         return nullptr;
@@ -1143,7 +1143,7 @@ void Item::DeleteRefundDataFromDB(SQLTransaction* trans)
     }
 }
 
-void Item::SetNotRefundable(Player* owner, bool changestate /*=true*/, SQLTransaction* trans /*=NULL*/)
+void Item::SetNotRefundable(Player* owner, bool changestate /*=true*/, SQLTransaction* trans /*=nullptr*/)
 {
     if (!HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
         return;

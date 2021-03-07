@@ -4,13 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ruins_of_ahnqiraj.h"
+#include "Opcodes.h"
 #include "Player.h"
+#include "ruins_of_ahnqiraj.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "WorldPacket.h"
-#include "Opcodes.h"
 
 enum Texts
 {
