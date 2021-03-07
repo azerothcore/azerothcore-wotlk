@@ -44,6 +44,7 @@ services:
         target: /azerothcore/env/dist/data
       - ./apps:/azerothcore/apps
       - ./acore.sh:/azerothcore/acore.sh
+      - ./acore.json:/azerothcore/acore.json
     working_dir: /azerothcore
     depends_on:
       - ac-database
@@ -120,6 +121,7 @@ services:
         target: /azerothcore/env/dist/data
       - ./docker/config-docker.sh:/azerothcore/conf/dist/config.sh
       - ./conf/dist/config.sh:/azerothcore/conf/dist/config-default.sh
+      - ./acore.json:/azerothcore/acore.json
     ports:
       - ${WORLD_EXTERNAL_PORT:-8085}:8085
       - ${SOAP_EXTERNAL_PORT:-7878}:7878
