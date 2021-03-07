@@ -91,7 +91,7 @@ inline Player* Map::_GetScriptPlayerSourceOrTarget(Object* source, Object* targe
 {
     Player* player = nullptr;
     if (!source && !target)
-        sLog->outError("%s source and target objects are NULL.", scriptInfo->GetDebugInfo().c_str());
+        sLog->outError("%s source and target objects are nullptr.", scriptInfo->GetDebugInfo().c_str());
     else
     {
         // Check target first, then source.
@@ -113,7 +113,7 @@ inline Creature* Map::_GetScriptCreatureSourceOrTarget(Object* source, Object* t
 {
     Creature* creature = nullptr;
     if (!source && !target)
-        sLog->outError("%s source and target objects are NULL.", scriptInfo->GetDebugInfo().c_str());
+        sLog->outError("%s source and target objects are nullptr.", scriptInfo->GetDebugInfo().c_str());
     else
     {
         if (bReverse)
@@ -146,7 +146,7 @@ inline Unit* Map::_GetScriptUnit(Object* obj, bool isSource, const ScriptInfo* s
 {
     Unit* unit = nullptr;
     if (!obj)
-        sLog->outError("%s %s object is NULL.", scriptInfo->GetDebugInfo().c_str(), isSource ? "source" : "target");
+        sLog->outError("%s %s object is nullptr.", scriptInfo->GetDebugInfo().c_str(), isSource ? "source" : "target");
     else if (!obj->isType(TYPEMASK_UNIT))
         sLog->outError("%s %s object is not unit (TypeId: %u, Entry: %u, GUID: %u), skipping.",
                        scriptInfo->GetDebugInfo().c_str(), isSource ? "source" : "target", obj->GetTypeId(), obj->GetEntry(), obj->GetGUIDLow());
@@ -164,7 +164,7 @@ inline Player* Map::_GetScriptPlayer(Object* obj, bool isSource, const ScriptInf
 {
     Player* player = nullptr;
     if (!obj)
-        sLog->outError("%s %s object is NULL.", scriptInfo->GetDebugInfo().c_str(), isSource ? "source" : "target");
+        sLog->outError("%s %s object is nullptr.", scriptInfo->GetDebugInfo().c_str(), isSource ? "source" : "target");
     else
     {
         player = obj->ToPlayer();
@@ -179,7 +179,7 @@ inline Creature* Map::_GetScriptCreature(Object* obj, bool isSource, const Scrip
 {
     Creature* creature = nullptr;
     if (!obj)
-        sLog->outError("%s %s object is NULL.", scriptInfo->GetDebugInfo().c_str(), isSource ? "source" : "target");
+        sLog->outError("%s %s object is nullptr.", scriptInfo->GetDebugInfo().c_str(), isSource ? "source" : "target");
     else
     {
         creature = obj->ToCreature();
@@ -194,7 +194,7 @@ inline WorldObject* Map::_GetScriptWorldObject(Object* obj, bool isSource, const
 {
     WorldObject* pWorldObject = nullptr;
     if (!obj)
-        sLog->outError("%s %s object is NULL.",
+        sLog->outError("%s %s object is nullptr.",
                        scriptInfo->GetDebugInfo().c_str(), isSource ? "source" : "target");
     else
     {
@@ -225,7 +225,7 @@ inline void Map::_ScriptProcessDoor(Object* source, Object* target, const Script
     if (!guid)
         sLog->outError("%s door guid is not specified.", scriptInfo->GetDebugInfo().c_str());
     else if (!source)
-        sLog->outError("%s source object is NULL.", scriptInfo->GetDebugInfo().c_str());
+        sLog->outError("%s source object is nullptr.", scriptInfo->GetDebugInfo().c_str());
     else if (!source->isType(TYPEMASK_UNIT))
         sLog->outError("%s source object is not unit (TypeId: %u, Entry: %u, GUID: %u), skipping.", scriptInfo->GetDebugInfo().c_str(),
                        source->GetTypeId(), source->GetEntry(), source->GetGUIDLow());
@@ -530,12 +530,12 @@ void Map::ScriptsProcess()
                 {
                     if (!source)
                     {
-                        sLog->outError("%s source object is NULL.", step.script->GetDebugInfo().c_str());
+                        sLog->outError("%s source object is nullptr.", step.script->GetDebugInfo().c_str());
                         break;
                     }
                     if (!target)
                     {
-                        sLog->outError("%s target object is NULL.", step.script->GetDebugInfo().c_str());
+                        sLog->outError("%s target object is nullptr.", step.script->GetDebugInfo().c_str());
                         break;
                     }
 
@@ -674,7 +674,7 @@ void Map::ScriptsProcess()
                     // Target must be GameObject.
                     if (!target)
                     {
-                        sLog->outError("%s target object is NULL.", step.script->GetDebugInfo().c_str());
+                        sLog->outError("%s target object is nullptr.", step.script->GetDebugInfo().c_str());
                         break;
                     }
 
@@ -704,7 +704,7 @@ void Map::ScriptsProcess()
                     // TODO: Allow gameobjects to be targets and casters
                     if (!source && !target)
                     {
-                        sLog->outError("%s source and target objects are NULL.", step.script->GetDebugInfo().c_str());
+                        sLog->outError("%s source and target objects are nullptr.", step.script->GetDebugInfo().c_str());
                         break;
                     }
 

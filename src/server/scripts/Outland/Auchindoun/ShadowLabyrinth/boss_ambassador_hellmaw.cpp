@@ -53,7 +53,7 @@ public:
 
             me->RemoveAurasDueToSpell(SPELL_BANISH);
             Talk(SAY_INTRO);
-            Start(true, false, 0, NULL, false, true);
+            Start(true, false, 0, nullptr, false, true);
             isBanished = false;
         }
 
@@ -70,7 +70,7 @@ public:
                     me->CastSpell(me, SPELL_BANISH, true);
                 }
                 else
-                    Start(true, false, 0, NULL, false, true);
+                    Start(true, false, 0, nullptr, false, true);
             }
         }
 

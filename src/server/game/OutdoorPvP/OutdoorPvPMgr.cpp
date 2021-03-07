@@ -86,7 +86,7 @@ void OutdoorPvPMgr::InitOutdoorPvP()
         pvp = sScriptMgr->CreateOutdoorPvP(iter->second);
         if (!pvp)
         {
-            sLog->outError("Could not initialize OutdoorPvP object for type ID %u; got NULL pointer from script.", uint32(i));
+            sLog->outError("Could not initialize OutdoorPvP object for type ID %u; got nullptr pointer from script.", uint32(i));
             continue;
         }
 

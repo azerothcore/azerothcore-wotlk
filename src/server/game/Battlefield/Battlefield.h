@@ -98,7 +98,7 @@ public:
     virtual void SendChangePhase();
 
     bool SetCapturePointData(GameObject* capturePoint);
-    GameObject* GetCapturePointGo() { return ObjectAccessor::GetObjectInWorld(m_capturePoint, (GameObject*)NULL); }
+    GameObject* GetCapturePointGo() { return ObjectAccessor::GetObjectInWorld(m_capturePoint, (GameObject*)nullptr); }
     GameObject* GetCapturePointGo(WorldObject* obj) { return ObjectAccessor::GetGameObject(*obj, m_capturePoint); }
 
     TeamId GetTeamId() { return m_team; }

@@ -2886,7 +2886,7 @@ public:
                     return;
             }
 
-            GetCaster()->CastSpell((Unit*)NULL, spellId, true);
+            GetCaster()->CastSpell((Unit*)nullptr, spellId, true);
         }
 
         void Register() override
@@ -2915,7 +2915,7 @@ public:
         {
             PreventDefaultAction();
             if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, NULL, aurEff);
+                caster->CastSpell(caster, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, nullptr, aurEff);
         }
 
         void Register() override

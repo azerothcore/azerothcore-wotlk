@@ -56,20 +56,20 @@ namespace acore
 
     template<class SPECIFIC_TYPE> SPECIFIC_TYPE* Insert(ContainerMapList<TypeNull>& /*elements*/, SPECIFIC_TYPE* /*obj*/)
     {
-        return NULL;
+        return nullptr;
     }
 
     // this is a missed
     template<class SPECIFIC_TYPE, class T> SPECIFIC_TYPE* Insert(ContainerMapList<T>& /*elements*/, SPECIFIC_TYPE* /*obj*/)
     {
-        return NULL;                                        // a missed
+        return nullptr;                                        // a missed
     }
 
     // Recursion
     template<class SPECIFIC_TYPE, class H, class T> SPECIFIC_TYPE* Insert(ContainerMapList<TypeList<H, T>>& elements, SPECIFIC_TYPE* obj)
     {
         SPECIFIC_TYPE* t = Insert(elements._elements, obj);
-        return (t != NULL ? t : Insert(elements._TailElements, obj));
+        return (t != nullptr ? t : Insert(elements._TailElements, obj));
     }
 
     //// non-const remove method
@@ -81,20 +81,20 @@ namespace acore
 
     //template<class SPECIFIC_TYPE> SPECIFIC_TYPE* Remove(ContainerMapList<TypeNull> &/*elements*/, SPECIFIC_TYPE * /*obj*/)
     //{
-    //    return NULL;
+    //    return nullptr;
     //}
 
     //// this is a missed
     //template<class SPECIFIC_TYPE, class T> SPECIFIC_TYPE* Remove(ContainerMapList<T> &/*elements*/, SPECIFIC_TYPE * /*obj*/)
     //{
-    //    return NULL;                                        // a missed
+    //    return nullptr;                                        // a missed
     //}
 
     //template<class SPECIFIC_TYPE, class T, class H> SPECIFIC_TYPE* Remove(ContainerMapList<TypeList<H, T> > &elements, SPECIFIC_TYPE *obj)
     //{
     //    // The head element is bad
     //    SPECIFIC_TYPE* t = Remove(elements._elements, obj);
-    //    return ( t != NULL ? t : Remove(elements._TailElements, obj) );
+    //    return ( t != nullptr ? t : Remove(elements._TailElements, obj) );
     //}
 }
 #endif

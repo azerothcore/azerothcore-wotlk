@@ -33,7 +33,7 @@ public:
     // Create new link
     void link(TO* toObj, FROM* fromObj)
     {
-        ASSERT(fromObj);                                // fromObj MUST not be NULL
+        ASSERT(fromObj);                                // fromObj MUST not be nullptr
         if (isValid())
             unlink();
         if (toObj != nullptr)

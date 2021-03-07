@@ -115,7 +115,7 @@ public:
                     break;
                 case EVENT_DEFILING_HORROR:
                     Talk(SAY_DEFILING_HORROR);
-                    me->CastSpell((Unit*)NULL, SPELL_DEFILING_HORROR, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_DEFILING_HORROR, false);
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     events.DelayEventsToMax(5000, 0);
                     events.ScheduleEvent(EVENT_UNROOT, 4000);
@@ -130,7 +130,7 @@ public:
             {
                 if (uiHopelessnessCount)
                     me->RemoveOwnedAura(hopelessnessId[uiHopelessnessCount - 1][DUNGEON_MODE(0, 1)]);
-                me->CastSpell((Unit*)NULL, hopelessnessId[uiHopelessnessCount][DUNGEON_MODE(0, 1)], true);
+                me->CastSpell((Unit*)nullptr, hopelessnessId[uiHopelessnessCount][DUNGEON_MODE(0, 1)], true);
                 ++uiHopelessnessCount;
             }
 

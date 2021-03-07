@@ -238,7 +238,7 @@ void ThreatContainer::clearReferences()
 }
 
 //============================================================
-// Return the HostileReference of NULL, if not found
+// Return the HostileReference of nullptr, if not found
 HostileReference* ThreatContainer::getReferenceByTarget(Unit* victim) const
 {
     if (!victim)
@@ -338,7 +338,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
         // pussywizard: skip not valid targets
         if (attacker->_CanDetectFeignDeathOf(target) && attacker->CanCreatureAttack(target))
         {
-            if (currentVictim) // pussywizard: if not NULL then target must have 10%/30% more threat
+            if (currentVictim) // pussywizard: if not nullptr then target must have 10%/30% more threat
             {
                 if (currentVictim == currentRef) // pussywizard: nothing found previously was good and enough, currentRef passed all necessary tests, so end now
                 {
@@ -460,7 +460,7 @@ Unit* ThreatManager::getHostilTarget()
     iThreatContainer.update();
     HostileReference* nextVictim = iThreatContainer.selectNextVictim(GetOwner()->ToCreature(), getCurrentVictim());
     setCurrentVictim(nextVictim);
-    return getCurrentVictim() != NULL ? getCurrentVictim()->getTarget() : nullptr;
+    return getCurrentVictim() != nullptr ? getCurrentVictim()->getTarget() : nullptr;
 }
 
 //============================================================

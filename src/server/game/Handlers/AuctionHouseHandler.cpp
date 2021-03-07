@@ -564,7 +564,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
     {
         SendAuctionCommandResult(0, AUCTION_CANCEL, ERR_AUCTION_DATABASE_ERROR);
         //this code isn't possible ... maybe there should be assert
-        sLog->outError("CHEATER : %u, he tried to cancel auction (id: %u) of another player, or auction is NULL", player->GetGUIDLow(), auctionId);
+        sLog->outError("CHEATER : %u, he tried to cancel auction (id: %u) of another player, or auction is nullptr", player->GetGUIDLow(), auctionId);
         return;
     }
 
