@@ -10,7 +10,7 @@ sudo apt-get update -y
 # shared deps
 sudo apt-get -y install make cmake clang curl unzip libmysqlclient-dev libace-dev
 
-if [[ $CONTINUOUS_INTEGRATION ]]; then
+if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   sudo apt-get -y install build-essential libtool cmake-data openssl libgoogle-perftools-dev \
   libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client \
   libncurses5-dev ccache

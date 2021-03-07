@@ -6,7 +6,7 @@ LABEL description="AC Worldserver Debug Container for use with Visual Studio"
 
 # List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
-ENV CONTINUOUS_INTEGRATION=1
+ENV DOCKER=1
 
 # set timezone environment variable
 ENV TZ=Etc/UTC
