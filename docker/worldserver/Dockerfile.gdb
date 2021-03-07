@@ -15,7 +15,7 @@ ENV TZ=Etc/UTC
 ENV DEBIAN_FRONTEND=noninteractive
 
 # install essentials
-RUN apt-get update && apt-get install -y gdb gdbserver git lsb-core sudo
+RUN apt-get update && apt-get install -y gdb gdbserver git lsb-core sudo curl unzip
 
 # copy needed files to run our scripts
 COPY ./conf /azerothcore/conf
