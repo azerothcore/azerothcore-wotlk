@@ -436,7 +436,6 @@ public:
 
             Field* fields = result->Fetch();
 
-            cInfo->Entry                    = fields[0].GetUInt32();
             cInfo->DifficultyEntry[0]       = fields[1].GetUInt32();
             cInfo->DifficultyEntry[1]       = fields[2].GetUInt32();
             cInfo->DifficultyEntry[2]       = fields[3].GetUInt32();
