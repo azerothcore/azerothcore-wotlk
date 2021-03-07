@@ -40,6 +40,8 @@ RUN chown -R acore:acore \
 
 USER acore
 
+ADD docker/build/my.cnf /home/acore/my.cnf
+
 WORKDIR /azerothcore/
 
 CMD bash acore.sh compiler build && bash acore.sh db-assembler import-all
