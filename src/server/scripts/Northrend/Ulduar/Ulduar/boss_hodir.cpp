@@ -369,8 +369,23 @@ public:
             }
         }
 
+        bool IsInRoom()
+        {
+            // Calculate the distance between his home position to the gate
+            if (me->GetExactDist(me->GetHomePosition().GetPositionX(),
+                me->GetHomePosition().GetPositionY(),
+                me->GetHomePosition().GetPositionZ()) > 80.0f)
+            {
+                EnterEvadeMode();
+                return false;
+            }
+            return true;
+        }
+
         void UpdateAI(uint32 diff) override
         {
+            if (!IsInRoom()) { return; }
+
             if (!UpdateVictim())
             {
                 if (me->IsInCombat())
