@@ -59,8 +59,7 @@ program.command("client-data")
 
     const cmd = run({
       cmd: [
-        "DOCKER=1",
-        "acore.sh",
+        "../acore.sh",
         "client-data",
       ],
     });
