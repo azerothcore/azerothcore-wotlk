@@ -11,14 +11,6 @@
 #include "SpellScript.h"
 #include "ulduar.h"
 
-/* This type of enums are used along all the bosses for all type of things.
- * Using enums for integers produces warning messages due to unscoped types.
- * Should look for a solution to swap these enums to prevent type conversion bugs
- * due to missuse. One solution would be instead of using the spell name as a var,
- * by using the ID and leaving a comment above with the spell name. Most of the IDs
- * are only used once anyways so this avoid warning usage. Leaving this as a reminder
- * that a better solution should be thought.
- */
 enum HodirSpellData
 {
     SPELL_BERSERK                       = 26662,
@@ -439,7 +431,6 @@ public:
 
                         me->CastSpell((Unit*)nullptr, SPELL_FLASH_FREEZE_CAST, false);
                         me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
-                        me->CastSpell(me, SPELL_FLASH_FREEZE_CAST);
                         Talk(TEXT_FLASH_FREEZE);
                         Talk(TEXT_EMOTE_FREEZE);
                         SmallIcicles(false);
@@ -458,7 +449,7 @@ public:
                     {
                         Talk(TEXT_EMOTE_BLOW);
                         Talk(TEXT_STALACTITE);
-                        me->CastSpell(me, SPELL_FROZEN_BLOWS, true);
+                        me->CastSpell(me, Is25ManRaid()? SPELL_FROZEN_BLOWS_25 : SPELL_FROZEN_BLOWS_10, true);
                     }
                     break;
                 case EVENT_FREEZE:

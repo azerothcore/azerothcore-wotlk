@@ -34,7 +34,7 @@ public:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         uint32 C_of_Ulduar_MASK;
 
-        bool m_difficulty;
+        int m_difficulty;
 
         // Bosses
         uint64 m_uiLeviathanGUID;
@@ -253,7 +253,7 @@ public:
                 SetData(eventId, 0);
         }
 
-        void SpawnHodirChests(bool rd)
+        void SpawnHodirChests(int rd)
         {
             if (Creature* cr = instance->GetCreature(m_uiHodirGUID))
             {
