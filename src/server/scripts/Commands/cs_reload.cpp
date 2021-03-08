@@ -480,14 +480,9 @@ public:
             for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
                 cInfo->resistance[i] = fields[40 + i - 1].GetUInt16();
 
-            cInfo->spells[0]                = fields[46].GetUInt32();
-            cInfo->spells[1]                = fields[47].GetUInt32();
-            cInfo->spells[2]                = fields[48].GetUInt32();
-            cInfo->spells[3]                = fields[49].GetUInt32();
-            cInfo->spells[4]                = fields[50].GetUInt32();
-            cInfo->spells[5]                = fields[51].GetUInt32();
-            cInfo->spells[6]                = fields[52].GetUInt32();
-            cInfo->spells[7]                = fields[53].GetUInt32();
+            for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+                cInfo->spells[i] = fields[46 + i].GetUInt32();
+
             cInfo->PetSpellDataId           = fields[54].GetUInt32();
             cInfo->VehicleId                = fields[55].GetUInt32();
             cInfo->mingold                  = fields[56].GetUInt32();
