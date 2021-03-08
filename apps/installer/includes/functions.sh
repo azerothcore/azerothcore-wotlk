@@ -219,7 +219,11 @@ function inst_simple_restarter {
 }
 
 function inst_download_client_data {
-    local path="$AC_BINPATH_FULL"
+    if [[ $DOCKER ]]; then
+        local path="/azerothcore/env/dist/data"
+    else
+        local path="$AC_BINPATH_FULL"
+    fi
 
     echo "Downloading client data in: $path/data.zip ..."
     curl -L https://github.com/wowgaming/client-data/releases/download/v9/data.zip > "$path/data.zip" \
