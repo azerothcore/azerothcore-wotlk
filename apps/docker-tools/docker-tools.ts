@@ -49,4 +49,25 @@ program.command("client-data")
     cmd.close();
   });
 
+  program.command("client-data-test")
+  .description(
+    "Download client data inside docker/worldserver/data",
+  )
+  .action(async (args: any[]) => {
+    console.log("Downloading client data");
+    const { run } = Deno;
+
+    const cmd = run({
+      cmd: [
+        "DOCKER=1",
+        "acore.sh",
+        "client-data",
+      ],
+    });
+
+    await cmd.status();
+
+    cmd.close();
+  });
+
 program.parse(Deno.args);

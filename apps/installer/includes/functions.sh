@@ -220,7 +220,7 @@ function inst_simple_restarter {
 
 function inst_download_client_data {
     if [[ $DOCKER ]]; then
-        local path="/azerothcore/env/dist/data"
+        local path="docker/worldserver/data"
     else
         local path="$AC_BINPATH_FULL"
     fi
