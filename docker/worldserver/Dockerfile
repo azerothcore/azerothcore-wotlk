@@ -23,9 +23,6 @@ COPY ./acore.json /azerothcore/acore.json
 # install the required dependencies to run the worldserver
 RUN /azerothcore/acore.sh install-deps
 
-# download client data
-RUN /azerothcore/acore.sh client-data
-
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
