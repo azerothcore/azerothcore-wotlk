@@ -3154,5 +3154,5 @@ ALTER TABLE creature_template DROP minrangedmg;
 ALTER TABLE creature_template DROP maxrangedmg;
 ALTER TABLE creature_template DROP attackpower;
 ALTER TABLE creature_template DROP rangedattackpower;
-ADD COLUMN BaseVariance FLOAT DEFAULT 1 NOT NULL AFTER RangeAttackTime;
-ADD COLUMN RangeVariance FLOAT DEFAULT 1 NOT NULL AFTER BaseVariance;
+ALTER TABLE creature_template ADD COLUMN BaseVariance FLOAT DEFAULT 1 NOT NULL AFTER RangeAttackTime;
+ALTER TABLE creature_template ADD COLUMN RangeVariance FLOAT DEFAULT 1 NOT NULL AFTER BaseVariance;
