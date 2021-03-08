@@ -100,7 +100,6 @@ struct CreatureTemplate
     float   scale;
     uint32  rank;
     uint32  dmgschool;
-    uint32  attackpower;
     float   DamageModifier;
     uint32  BaseAttackTime;
     uint32  RangeAttackTime;
@@ -113,7 +112,6 @@ struct CreatureTemplate
     uint32  trainer_spell;
     uint32  trainer_class;
     uint32  trainer_race;
-    uint32  rangedattackpower;
     uint32  type;                                           // enum CreatureType values
     uint32  type_flags;                                     // enum CreatureTypeFlags mask values
     uint32  lootid;

@@ -3152,3 +3152,5 @@ ALTER TABLE creature_template DROP mindmg;
 ALTER TABLE creature_template DROP maxdmg;
 ALTER TABLE creature_template DROP minrangedmg;
 ALTER TABLE creature_template DROP maxrangedmg;
+ALTER TABLE creature_template DROP attackpower;
+ALTER TABLE creature_template DROP rangedattackpower;
