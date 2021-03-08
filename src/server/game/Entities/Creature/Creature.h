@@ -103,6 +103,8 @@ struct CreatureTemplate
     float   DamageModifier;
     uint32  BaseAttackTime;
     uint32  RangeAttackTime;
+    float   BaseVariance;
+    float   RangeVariance;
     uint32  unit_class;                                     // enum Classes. Note only 4 classes are known for creatures.
     uint32  unit_flags;                                     // enum UnitFlags mask values
     uint32  unit_flags2;                                    // enum UnitFlags2 mask values

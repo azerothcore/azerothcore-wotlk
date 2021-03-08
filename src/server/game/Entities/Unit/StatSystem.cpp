@@ -1045,16 +1045,20 @@ void Creature::UpdateAttackPowerAndDamage(bool ranged)
 void Creature::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage)
 {
     UnitMods unitMod;
+    float variance = 1.0f;
     switch (attType)
     {
         case BASE_ATTACK:
         default:
+            variance = GetCreatureTemplate()->BaseVariance;
             unitMod = UNIT_MOD_DAMAGE_MAINHAND;
             break;
         case OFF_ATTACK:
+            variance = GetCreatureTemplate()->BaseVariance;
             unitMod = UNIT_MOD_DAMAGE_OFFHAND;
             break;
         case RANGED_ATTACK:
+            variance = GetCreatureTemplate()->RangeVariance;
             unitMod = UNIT_MOD_DAMAGE_RANGED;
             break;
     }
@@ -1077,7 +1081,7 @@ void Creature::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, 
 
     float attackPower      = GetTotalAttackPowerValue(attType);
     float attackSpeedMulti = GetAPMultiplier(attType, normalized);
-    float baseValue        = GetModifierValue(unitMod, BASE_VALUE) + (attackPower / 14.0f);
+    float baseValue        = GetModifierValue(unitMod, BASE_VALUE) + (attackPower / 14.0f) * variance;
     float basePct          = GetModifierValue(unitMod, BASE_PCT) * attackSpeedMulti;
     float totalValue       = GetModifierValue(unitMod, TOTAL_VALUE);
     float totalPct         = addTotalPct ? GetModifierValue(unitMod, TOTAL_PCT) : 1.0f;
