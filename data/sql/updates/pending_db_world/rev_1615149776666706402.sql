@@ -3,8 +3,6 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1615149776666706402');
 -- Align resistances with vmangos for creatures level 21-30
 UPDATE `creature_template` SET `resistance1`=0   WHERE `entry`=521;   -- 'Lupos'' level 23, resistance1 was 80 (Holy)
 UPDATE `creature_template` SET `resistance3`=5   WHERE `entry`=2275;  -- 'Enraged Stanley' level 24, resistance3 was 0 (Nature)
-UPDATE `creature_template` SET `resistance6`=96  WHERE `entry`=3899;  -- 'Balizar the Umbrage' level 24, resistance6 was 0 (Arcane)
-UPDATE `creature_template` SET `resistance4`=0   WHERE `entry`=3917;  -- 'Befouled Water Elemental' level 25, resistance4 was 75 (Frost)
 UPDATE `creature_template` SET `resistance1`=0   WHERE `entry`=4028;  -- 'Charred Ancient'' level 26, resistance1 was 26 (Holy)
 UPDATE `creature_template` SET `resistance1`=0   WHERE `entry`=4029;  -- 'Blackened Ancient'' level 28, resistance1 was 28 (Holy)
 UPDATE `creature_template` SET `resistance1`=0   WHERE `entry`=4034;  -- 'Enraged Stone Spirit'' level 25, resistance1 was 25 (Holy)
@@ -13,11 +11,7 @@ UPDATE `creature_template` SET `resistance3`=15  WHERE `entry`=4035;  -- 'Furiou
 UPDATE `creature_template` SET `resistance3`=15  WHERE `entry`=4120;  -- 'Thundering Boulderkin' level 29, resistance3 was 0 (Nature)
 UPDATE `creature_template` SET `resistance3`=15  WHERE `entry`=4528;  -- 'Stone Rumbler' level 23, resistance3 was 0 (Nature)
 UPDATE `creature_template` SET `resistance1`=0   WHERE `entry`=4535;  -- 'Tamed Battleboar'' level 23, resistance1 was 20 (Holy)
-UPDATE `creature_template` SET `resistance2`=130 WHERE `entry`=4978;  -- 'Aku'mai Servant' level 23, resistance2 was 0 (Fire)
-UPDATE `creature_template` SET `resistance3`=26  WHERE `entry`=4978;  -- 'Aku'mai Servant' level 23, resistance3 was 0 (Nature)
-UPDATE `creature_template` SET `resistance5`=26  WHERE `entry`=4978;  -- 'Aku'mai Servant' level 23, resistance5 was 0 (Shadow)
-UPDATE `creature_template` SET `resistance6`=26  WHERE `entry`=4978;  -- 'Aku'mai Servant' level 23, resistance6 was 0 (Arcane)
-UPDATE `creature_template` SET `resistance1`=0   WHERE `entry`=5806;  -- 'Treant Ally'' level 25, resistance1 was 23 (Holy)
+UPDATE `creature_template` SET `resistance1`=0   WHERE `entry`=5806;  -- 'Treant Ally' level 25, resistance1 was 23 (Holy)
 UPDATE `creature_template` SET `resistance1`=0   WHERE `entry`=5834;  -- 'Azzere the Skyblade'' level 25, resistance1 was 55 (Holy)
 UPDATE `creature_template` SET `resistance1`=0   WHERE `entry`=6220;  -- 'Irradiated Horror'' level 27, resistance1 was 145 (Holy)
 UPDATE `creature_template` SET `resistance4`=0   WHERE `entry`=6220;  -- 'Irradiated Horror' level 27, resistance4 was 29 (Frost)
@@ -25,10 +19,8 @@ UPDATE `creature_template` SET `resistance1`=0   WHERE `entry`=7768;  -- 'Wither
 UPDATE `creature_template` SET `resistance1`=0   WHERE `entry`=10641; -- 'Branch Snapper'' level 25, resistance1 was 250 (Holy)
 UPDATE `creature_template` SET `resistance4`=0   WHERE `entry`=10642; -- 'Eck'alom' level 27, resistance4 was 75 (Frost)
 UPDATE `creature_template` SET `resistance1`=0   WHERE `entry`=10882; -- 'Arikara'' level 28, resistance1 was 2 (Holy)
-UPDATE `creature_template` SET `resistance1`=0   WHERE `entry`=11862; -- 'Tsunaman'' level 25, resistance1 was 25 (Holy)
 UPDATE `creature_template` SET `resistance4`=0   WHERE `entry`=11862; -- 'Tsunaman' level 25, resistance4 was 25 (Frost)
-UPDATE `creature_template` SET `resistance4`=0   WHERE `entry`=12759; -- 'Tideress' level 27, resistance4 was 75 (Frost)
 
 -- Updated according to book
-UPDATE `creature_template` SET `resistance2`=87  WHERE `entry`=10756; -- 'Scalding Elemental' level 29, resistance2 was 0 (Fire)
+UPDATE `creature_template` SET `resistance2`=87  WHERE `entry`=10756; -- 'Scalding Elemental' level 29' resistance2 was 0 (Fire)
 UPDATE `creature_template` SET `resistance2`=84  WHERE `entry`=10757; -- 'Boiling Elemental' level 28, resistance2 was 0 (Fire)
