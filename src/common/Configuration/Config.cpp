@@ -35,8 +35,6 @@ namespace
         }
 
         _configOptions.emplace(optionName, optionKey);
-
-        //sLog->outError("> Config: Add '%s' - '%s'\n", optionName.c_str(), optionKey.c_str());
     }
 
     void ParseFile(std::string const& file)
@@ -56,19 +54,23 @@ namespace
             if (line.empty())
                 continue;
 
-            line = acore::String::Reduce(line);
+            line = acore::String::Trim(line, in.getloc());
 
             // comments
             if (line[0] == '#' || line[0] == '[')
                 continue;
+
+            size_t found = line.find_first_of('#');
+            if (found != std::string::npos)
+                line = line.substr(0, found);
 
             auto const equal_pos = line.find('=');
 
             if (equal_pos == std::string::npos || equal_pos == line.length())
                 return;
 
-            auto entry = acore::String::Reduce(line.substr(0, equal_pos));
-            auto value = acore::String::Reduce(line.substr(equal_pos + 1));
+            auto entry = acore::String::Trim(line.substr(0, equal_pos), in.getloc());
+            auto value = acore::String::Trim(line.substr(equal_pos + 1), in.getloc());
 
             value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
 
