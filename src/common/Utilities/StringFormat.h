@@ -42,8 +42,8 @@ namespace acore
 
 namespace acore::String
 {
-    std::string Trim(std::string const& str, std::string_view whitespace = " \t");
-    std::string Reduce(std::string const& str, std::string_view fill = " ", std::string_view whitespace = " \t");
+    template<class Str>
+    Str Trim(const Str& s, const std::locale& loc = std::locale());
 }
 
 #endif
