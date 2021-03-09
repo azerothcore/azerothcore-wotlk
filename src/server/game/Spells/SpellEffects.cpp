@@ -4245,26 +4245,6 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
     if (!unitTarget)
         return;
 
-    if (unitTarget->GetInstanceScript() && unitTarget->GetInstanceScript()->IsEncounterInProgress())
-    {
-        unitTarget->getHostileRefManager().UpdateVisibility(true);
-        // Xinef: replaced with CombatStop(false)
-        unitTarget->AttackStop();
-        unitTarget->RemoveAllAttackers();
-
-        // Night Elf: Shadowmeld only resets threat temporarily
-        if (m_spellInfo->Id != 58984)
-            unitTarget->getHostileRefManager().addThreatPercent(-100);
-
-        if (unitTarget->GetTypeId() == TYPEID_PLAYER)
-            unitTarget->ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel
-    }
-    else
-    {
-        unitTarget->getHostileRefManager().UpdateVisibility(m_spellInfo->Id == 58984); // Night Elf: Shadowmeld
-        unitTarget->CombatStop(true);
-    }
-
     UnitList targets;
     acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(unitTarget, unitTarget, unitTarget->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
     acore::UnitListSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(unitTarget, targets, u_check);
