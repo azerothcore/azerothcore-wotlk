@@ -4253,7 +4253,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
         unitTarget->RemoveAllAttackers();
 
         // Night Elf: Shadowmeld only resets threat temporarily
-        if (m_spellInfo->Id != 59646)
+        if (m_spellInfo->Id != 58984)
             unitTarget->getHostileRefManager().addThreatPercent(-100);
 
         if (unitTarget->GetTypeId() == TYPEID_PLAYER)
@@ -4261,7 +4261,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
     }
     else
     {
-        unitTarget->getHostileRefManager().UpdateVisibility(m_spellInfo->Id == 59646); // Night Elf: Shadowmeld
+        unitTarget->getHostileRefManager().UpdateVisibility(m_spellInfo->Id == 58984); // Night Elf: Shadowmeld
         unitTarget->CombatStop(true);
     }
 
