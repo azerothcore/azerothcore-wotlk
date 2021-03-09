@@ -60,6 +60,10 @@ namespace
             if (line[0] == '#' || line[0] == '[')
                 continue;
 
+            size_t found = line.find_first_of('#');
+            if (found != std::string::npos)
+                line = line.substr(0, found);
+
             auto const equal_pos = line.find('=');
 
             if (equal_pos == std::string::npos || equal_pos == line.length())
