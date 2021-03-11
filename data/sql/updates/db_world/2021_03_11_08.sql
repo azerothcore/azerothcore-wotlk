@@ -1,3 +1,19 @@
+-- DB update 2021_03_11_07 -> 2021_03_11_08
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_03_11_07';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_03_11_07 2021_03_11_08 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1615422389307373600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1615422389307373600');
 
 UPDATE `creature_template` SET `speed_walk` = 0.9, `speed_run` = 1, `mindmg` = 40, `maxdmg` = 54, `BaseAttackTime` = 1700, `RangeAttackTime` = 1700, `minrangedmg` = 28, `maxrangedmg` = 42, `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` = 12818);
@@ -895,3 +911,12 @@ REPLACE INTO `factiontemplate_dbc` VALUES
 (2230,1106,72,0,0,0,1107,20,0,0,1106,0,0,0),
 (2235,1160,0,0,5,2,0,0,0,0,1160,0,0,0),
 (2236,1159,0,0,3,4,0,0,0,0,1159,0,0,0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
