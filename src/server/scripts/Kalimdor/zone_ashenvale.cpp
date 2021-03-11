@@ -15,7 +15,6 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptMgr.h"
-#include <Kalimdor/zone_azuremyst_isle.cpp>
 
 enum Muglash
 {
