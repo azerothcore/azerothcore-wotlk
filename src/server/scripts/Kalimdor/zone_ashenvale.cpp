@@ -16,8 +16,10 @@ EndScriptData */
 #include "ScriptedEscortAI.h"
 #include "ScriptMgr.h"
 
+
 enum Muglash
 {
+    FACTION_QUEST           = 113,
     SAY_MUG_START1          = 0,
     SAY_MUG_START2          = 1,
     SAY_MUG_BRAZIER         = 2,
