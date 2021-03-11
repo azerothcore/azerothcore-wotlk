@@ -1,0 +1,5 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1615212672744788600');
+
+DELETE FROM `gameobject` WHERE (`id` = 19017) AND (`guid` IN (34017));
+INSERT INTO `gameobject` VALUES
+(34017, 19017, 530, 0, 0, 1, 1, 6828.494141, -5699.43457, -54.572094, 5.24845, 0, 0, 0.996917, -0.078459, 180, 100, 1, '', 0);
