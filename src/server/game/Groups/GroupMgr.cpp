@@ -110,7 +110,7 @@ void GroupMgr::LoadGroups()
         if (!result)
         {
             LOG_INFO("server", ">> Loaded 0 group definitions. DB table `groups` is empty!");
-            LOG_INFO("server", "");
+            LOG_INFO("server", " ");
         }
         else
         {
@@ -132,7 +132,7 @@ void GroupMgr::LoadGroups()
             } while (result->NextRow());
 
             LOG_INFO("server", ">> Loaded %u group definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", "");
+            LOG_INFO("server", " ");
         }
     }
 
@@ -150,7 +150,7 @@ void GroupMgr::LoadGroups()
         if (!result)
         {
             LOG_INFO("server", ">> Loaded 0 group members. DB table `group_member` is empty!");
-            LOG_INFO("server", "");
+            LOG_INFO("server", " ");
         }
         else
         {
@@ -169,7 +169,7 @@ void GroupMgr::LoadGroups()
             } while (result->NextRow());
 
             LOG_INFO("server", ">> Loaded %u group members in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", "");
+            LOG_INFO("server", " ");
         }
     }
 }

@@ -19164,17 +19164,17 @@ void Unit::OutDebugInfo() const
     LOG_INFO("server", "Summon Slot: ");
     for (uint32 i = 0; i < MAX_SUMMON_SLOT; ++i)
         LOG_INFO("server", UI64FMTD", ", m_SummonSlot[i]);
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 
     LOG_INFO("server", "Controlled List: ");
     for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
         LOG_INFO("server", UI64FMTD", ", (*itr)->GetGUID());
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 
     LOG_INFO("server", "Aura List: ");
     for (AuraApplicationMap::const_iterator itr = m_appliedAuras.begin(); itr != m_appliedAuras.end(); ++itr)
         LOG_INFO("server", "%u, ", itr->first);
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 
     if (IsVehicle())
     {
@@ -19182,7 +19182,7 @@ void Unit::OutDebugInfo() const
         for (SeatMap::iterator itr = GetVehicleKit()->Seats.begin(); itr != GetVehicleKit()->Seats.end(); ++itr)
             if (Unit* passenger = ObjectAccessor::GetUnit(*GetVehicleBase(), itr->second.Passenger.Guid))
                 LOG_INFO("server", UI64FMTD", ", passenger->GetGUID());
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
     }
 
     if (GetVehicle())

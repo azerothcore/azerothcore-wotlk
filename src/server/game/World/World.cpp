@@ -1470,7 +1470,7 @@ void World::SetInitialWorldSettings()
     sGameEventMgr->Initialize();
 
     ///- Loading strings. Getting no records means core load has to be canceled because no error message can be output.
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
     LOG_INFO("server", "Loading acore strings...");
     if (!sObjectMgr->LoadAcoreStrings())
         exit(1);                                            // Error message displayed in function already
@@ -1560,7 +1560,7 @@ void World::SetInitialWorldSettings()
 
     sObjectMgr->SetDBCLocaleIndex(GetDefaultDbcLocale());        // Get once for all the locale index of DBC language (console/broadcasts)
     LOG_INFO("server", ">> Localization strings loaded in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 
     LOG_INFO("server", "Loading Page Texts...");
     sObjectMgr->LoadPageTexts();
@@ -1885,14 +1885,14 @@ void World::SetInitialWorldSettings()
 
     // pussywizard:
     LOG_INFO("server", "Deleting invalid mail items...");
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
     CharacterDatabase.Query("DELETE mi FROM mail_items mi LEFT JOIN item_instance ii ON mi.item_guid = ii.guid WHERE ii.guid IS NULL");
     CharacterDatabase.Query("DELETE mi FROM mail_items mi LEFT JOIN mail m ON mi.mail_id = m.id WHERE m.id IS NULL");
     CharacterDatabase.Query("UPDATE mail m LEFT JOIN mail_items mi ON m.id = mi.mail_id SET m.has_items=0 WHERE m.has_items<>0 AND mi.mail_id IS NULL");
 
     ///- Handle outdated emails (delete/return)
     LOG_INFO("server", "Returning old mails...");
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
     sObjectMgr->ReturnOrDeleteOldMails(false);
 
     ///- Load AutoBroadCast
@@ -1926,12 +1926,12 @@ void World::SetInitialWorldSettings()
     sCalendarMgr->LoadFromDB();
 
     LOG_INFO("server", "Initializing SpellInfo precomputed data..."); // must be called after loading items, professions, spells and pretty much anything
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
     sObjectMgr->InitializeSpellInfoPrecomputedData();
 
     ///- Initialize game time and timers
     LOG_INFO("server", "Initialize game time and timers");
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
     m_gameTime = time(nullptr);
     m_startTime = m_gameTime;
 
@@ -1962,11 +1962,11 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize MapManager
     LOG_INFO("server", "Starting Map System");
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
     sMapMgr->Initialize();
 
     LOG_INFO("server", "Starting Game Event system...");
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
     uint32 nextGameEvent = sGameEventMgr->StartSystem();
     m_timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
 
@@ -1977,7 +1977,7 @@ void World::SetInitialWorldSettings()
     Channel::CleanOldChannelsInDB();
 
     LOG_INFO("server", "Starting Arena Season...");
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
     sGameEventMgr->StartArenaSeason();
 
     sTicketMgr->Initialize();
@@ -2024,7 +2024,7 @@ void World::SetInitialWorldSettings()
     InitCalendarOldEventsDeletionTime();
 
     LOG_INFO("server", "Calculate Guild cap reset time...");
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
     InitGuildResetTime();
 
     LOG_INFO("server", "Load Petitions...");
@@ -2074,9 +2074,9 @@ void World::SetInitialWorldSettings()
     }
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
     LOG_INFO("server", "WORLD: World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000)); // outError for red color in console
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 
     // possibly enable db logging; avoid massive startup spam by doing it here.
     if (sConfigMgr->GetOption<bool>("EnableLogDB", false))
@@ -2134,7 +2134,7 @@ void World::DetectDBCLang()
     m_defaultDbcLocale = LocaleConstant(default_locale);
 
     LOG_INFO("server", "Using %s DBC Locale as default. All available DBC locales: %s", localeNames[GetDefaultDbcLocale()], availableLocalsStr.empty() ? "<none>" : availableLocalsStr.c_str());
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 void World::LoadAutobroadcasts()
@@ -2169,7 +2169,7 @@ void World::LoadAutobroadcasts()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u autobroadcast definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 /// Update the World !
@@ -3129,7 +3129,7 @@ void World::LoadWorldStates()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 world states. DB table `worldstates` is empty!");
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -3143,7 +3143,7 @@ void World::LoadWorldStates()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u world states in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 // Setting a worldstate will save it to DB
@@ -3249,7 +3249,7 @@ void World::LoadGlobalPlayerDataStore()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %d Players data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 void World::AddGlobalPlayerData(uint32 guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId)

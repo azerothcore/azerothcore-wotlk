@@ -593,7 +593,7 @@ void LoadDBCStores(const std::string& dataPath)
     LoadM2Cameras(dataPath);
 
     LOG_INFO("server", ">> Initialized %d data stores in %u ms", DBCFileCount, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 // Convert the geomoetry from a spline value, to an actual WoW XYZ

@@ -52,7 +52,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
     sWorld->SetCleaningFlags(flags);
 
     LOG_INFO("server", ">> Cleaned character database in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 void CharacterDatabaseCleaner::CheckUnique(const char* column, const char* table, bool (*check)(uint32))

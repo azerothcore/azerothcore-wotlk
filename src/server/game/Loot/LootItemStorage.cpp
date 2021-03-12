@@ -31,7 +31,7 @@ void LootItemStorage::LoadStorageFromDB()
     if (!result)
     {
         LOG_INFO("server", ">>  Loaded 0 stored items!");
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -47,7 +47,7 @@ void LootItemStorage::LoadStorageFromDB()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %d stored items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 void LootItemStorage::RemoveEntryFromDB(uint32 containerId, uint32 itemid, uint32 count)

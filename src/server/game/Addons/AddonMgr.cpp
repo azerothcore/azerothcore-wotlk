@@ -34,7 +34,7 @@ namespace AddonMgr
         if (!result)
         {
             LOG_INFO("server", ">> Loaded 0 known addons. DB table `addons` is empty!");
-            LOG_INFO("server", "");
+            LOG_INFO("server", " ");
             return;
         }
 
@@ -53,7 +53,7 @@ namespace AddonMgr
         } while (result->NextRow());
 
         LOG_INFO("server", ">> Loaded %u known addons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
 
         oldMSTime = getMSTime();
         result = CharacterDatabase.Query("SELECT id, name, version, UNIX_TIMESTAMP(timestamp) FROM banned_addons");
@@ -82,7 +82,7 @@ namespace AddonMgr
             } while (result->NextRow());
 
             LOG_INFO("server", ">> Loaded %u banned addons in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server", "");
+            LOG_INFO("server", " ");
         }
     }
 

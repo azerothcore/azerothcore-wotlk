@@ -79,7 +79,7 @@ void ChannelMgr::LoadChannels()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u channels for %s in %ums", count, _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde", GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 Channel* ChannelMgr::GetJoinChannel(std::string const& name, uint32 channelId)
@@ -136,7 +136,7 @@ void ChannelMgr::LoadChannelRights()
     if (!result)
     {
         LOG_INFO("server", ">>  Loaded 0 Channel Rights!");
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -163,7 +163,7 @@ void ChannelMgr::LoadChannelRights()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %d Channel Rights in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 const ChannelRights& ChannelMgr::GetChannelRightsFor(const std::string& name)

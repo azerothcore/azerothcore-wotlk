@@ -2422,7 +2422,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
     if (sAchievementCriteriaStore.GetNumRows() == 0)
     {
         LOG_INFO("sql.sql", ">> Loaded 0 achievement criteria.");
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -2561,7 +2561,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
     }
 
     LOG_INFO("server", ">> Loaded %u achievement criteria in %u ms", loaded, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 void AchievementGlobalMgr::LoadAchievementReferenceList()
@@ -2571,7 +2571,7 @@ void AchievementGlobalMgr::LoadAchievementReferenceList()
     if (sAchievementStore.GetNumRows() == 0)
     {
         LOG_INFO("server", ">> Loaded 0 achievement references.");
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -2588,7 +2588,7 @@ void AchievementGlobalMgr::LoadAchievementReferenceList()
     }
 
     LOG_INFO("server", ">> Loaded %u achievement references in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 void AchievementGlobalMgr::LoadAchievementCriteriaData()
@@ -2602,7 +2602,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 additional achievement criteria data. DB table `achievement_criteria_data` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -2723,7 +2723,7 @@ void AchievementGlobalMgr::LoadAchievementCriteriaData()
     }
 
     LOG_INFO("server", ">> Loaded %u additional achievement criteria data in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 void AchievementGlobalMgr::LoadCompletedAchievements()
@@ -2743,7 +2743,7 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 completed achievements. DB table `character_achievement` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -2771,7 +2771,7 @@ void AchievementGlobalMgr::LoadCompletedAchievements()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %lu completed achievements in %u ms", (unsigned long)m_allCompletedAchievements.size(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 void AchievementGlobalMgr::LoadRewards()
@@ -2786,7 +2786,7 @@ void AchievementGlobalMgr::LoadRewards()
     if (!result)
     {
         LOG_INFO("sql.sql", ">> Loaded 0 achievement rewards. DB table `achievement_reward` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -2892,7 +2892,7 @@ void AchievementGlobalMgr::LoadRewards()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u achievement rewards in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 void AchievementGlobalMgr::LoadRewardLocales()
@@ -2907,7 +2907,7 @@ void AchievementGlobalMgr::LoadRewardLocales()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 achievement reward locale strings.  DB table `achievement_reward_locale` is empty");
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -2936,5 +2936,5 @@ void AchievementGlobalMgr::LoadRewardLocales()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %lu Achievement Reward Locale strings in %u ms", (unsigned long)m_achievementRewardLocales.size(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }

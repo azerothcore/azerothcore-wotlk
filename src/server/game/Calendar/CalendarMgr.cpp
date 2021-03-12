@@ -103,7 +103,7 @@ void CalendarMgr::LoadFromDB()
         } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u calendar invites", count);
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 
     for (uint64 i = 1; i < _maxEventId; ++i)
         if (!GetEvent(i))

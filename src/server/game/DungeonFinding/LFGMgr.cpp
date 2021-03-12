@@ -150,7 +150,7 @@ namespace lfg
         } while (result->NextRow());
 
         LOG_INFO("server", ">> Loaded %u lfg dungeon rewards in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
     }
 
     LFGDungeonData const* LFGMgr::GetLFGDungeon(uint32 id)
@@ -193,7 +193,7 @@ namespace lfg
         if (!result)
         {
             LOG_ERROR("server", ">> Loaded 0 lfg entrance positions. DB table `lfg_dungeon_template` is empty!");
-            LOG_INFO("server", "");
+            LOG_INFO("server", " ");
             return;
         }
 
@@ -220,7 +220,7 @@ namespace lfg
         } while (result->NextRow());
 
         LOG_INFO("server", ">> Loaded %u lfg entrance positions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
 
         // Fill all other teleport coords from areatriggers
         for (LFGDungeonContainer::iterator itr = LfgDungeonStore.begin(); itr != LfgDungeonStore.end(); ++itr)

@@ -5160,7 +5160,7 @@ void Player::DeleteOldCharacters()
 void Player::DeleteOldCharacters(uint32 keepDays)
 {
     LOG_INFO("server", "Player::DeleteOldChars: Deleting all characters which have been deleted %u days before...", keepDays);
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_OLD_CHARS);
     stmt->setUInt32(0, uint32(time(nullptr) - time_t(keepDays * DAY)));

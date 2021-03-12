@@ -20,7 +20,7 @@ void Graveyard::LoadGraveyardFromDB()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 graveyard. Table `game_graveyard` is empty!");
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -53,7 +53,7 @@ void Graveyard::LoadGraveyardFromDB()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %i graveyard in %u ms", Count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 GraveyardStruct const* Graveyard::GetGraveyard(uint32 ID) const
@@ -301,7 +301,7 @@ void Graveyard::LoadGraveyardZones()
     if (!result)
     {
         LOG_INFO("server", ">> Loaded 0 graveyard-zone links. DB table `graveyard_zone` is empty.");
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -349,7 +349,7 @@ void Graveyard::LoadGraveyardZones()
     } while (result->NextRow());
 
     LOG_INFO("server", ">> Loaded %u graveyard-zone links in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 GraveyardStruct const* Graveyard::GetGraveyard(const std::string& name) const

@@ -299,13 +299,13 @@ bool ConfigMgr::LoadModulesConfigs()
         return false;
 
     // Print modules configurations
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
     LOG_INFO("server", "Using modules configuration:");
 
     for (auto const& itr : moduleConfigFiles)
         LOG_INFO("server", "> %s", itr.c_str());
 
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 
     return true;
 }

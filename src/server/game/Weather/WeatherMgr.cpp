@@ -85,7 +85,7 @@ namespace WeatherMgr
         if (!result)
         {
             LOG_INFO("sql.sql", ">> Loaded 0 weather definitions. DB table `game_weather` is empty.");
-            LOG_INFO("server", "");
+            LOG_INFO("server", " ");
             return;
         }
 
@@ -128,7 +128,7 @@ namespace WeatherMgr
         } while (result->NextRow());
 
         LOG_INFO("server", ">> Loaded %u weather definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-        LOG_INFO("server", "");
+        LOG_INFO("server", " ");
     }
 
     void SendFineWeatherUpdateToPlayer(Player* player)

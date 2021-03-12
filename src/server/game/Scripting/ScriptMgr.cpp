@@ -159,7 +159,7 @@ void ScriptMgr::LoadDatabase()
     CheckIfScriptsInDatabaseExist();
 
     LOG_INFO("server", ">> Loaded %u C++ scripts in %u ms", GetScriptCount(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", "");
+    LOG_INFO("server", " ");
 }
 
 struct TSpellSummary
