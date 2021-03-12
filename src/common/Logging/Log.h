@@ -140,6 +140,18 @@ public:
         outMessage("server", LOG_LEVEL_INFO, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
+    template<typename Format, typename... Args>
+    void outDebug(DebugLogFilters filter, Format&& fmt, Args&& ... args)
+    {
+        if (!(_debugLogMask & filter))
+            return;
+
+        if (!ShouldLog(LOGGER_SERVER, LOG_LEVEL_DEBUG))
+            return;
+
+        outMessage(LOGGER_SERVER, LOG_LEVEL_DEBUG, ACORE::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
+
 private:
     static std::string GetTimestampStr();
     void write(std::unique_ptr<LogMessage>&& msg) const;
@@ -163,6 +175,9 @@ private:
 
     std::string m_logsDir;
     std::string m_logsTimestamp;
+
+    // Deprecated debug filter logs
+    DebugLogFilters _debugLogMask;
 };
 
 #define sLog Log::instance()

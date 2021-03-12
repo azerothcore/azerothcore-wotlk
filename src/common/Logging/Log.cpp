@@ -350,7 +350,7 @@ void Log::LoadFromConfig()
 
     highestLogLevel = LOG_LEVEL_FATAL;
     AppenderId = 0;
-    m_logsDir = sConfigMgr->GetOption<std::string>("LogsDir", "");
+    m_logsDir = sConfigMgr->GetOption<std::string>("LogsDir", "", false);
 
     if (!m_logsDir.empty())
         if ((m_logsDir.at(m_logsDir.length() - 1) != '/') && (m_logsDir.at(m_logsDir.length() - 1) != '\\'))
@@ -358,4 +358,6 @@ void Log::LoadFromConfig()
 
     ReadAppendersFromConfig();
     ReadLoggersFromConfig();
+
+    _debugLogMask = DebugLogFilters(sConfigMgr->GetOption<uint32>("DebugLogMask", LOG_FILTER_NONE, false));
 }
