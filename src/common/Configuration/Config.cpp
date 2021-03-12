@@ -60,7 +60,7 @@ namespace
             if (line[0] == '#' || line[0] == '[')
                 continue;
 
-            size_t found = line.find_first_of('#');
+            size_t found = line.find_last_of('#');
             if (found != std::string::npos)
                 line = line.substr(0, found);
 
