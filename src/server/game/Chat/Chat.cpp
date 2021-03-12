@@ -317,16 +317,16 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
                 }
 
                 LOG_GM(m_session->GetAccountId(), "Command: %s [Player: %s (%u) (Account: %u) X: %f Y: %f Z: %f Map: %u (%s) Area: %u (%s) Zone: %s Selected: %s (%ul)]",
-                    fullcmd.c_str(), 
-                    player->GetName().c_str(), 
+                    fullcmd.c_str(),
+                    player->GetName().c_str(),
                     GUID_LOPART(player->GetGUID()),
-                    m_session->GetAccountId(), 
-                    player->GetPositionX(), 
+                    m_session->GetAccountId(),
+                    player->GetPositionX(),
                     player->GetPositionY(),
-                    player->GetPositionZ(), 
+                    player->GetPositionZ(),
                     player->GetMapId(),
                     player->GetMap()->GetMapName(),
-                    areaId, areaName.c_str(), 
+                    areaId, areaName.c_str(),
                     zoneName.c_str(),
                     (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
                     GUID_LOPART(guid));

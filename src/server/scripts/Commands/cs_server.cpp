@@ -78,7 +78,7 @@ public:
         {
             { "server",         SEC_PLAYER,         true,  nullptr,                                 "", serverCommandTable }
         };
-        
+
         return commandTable;
     }
 

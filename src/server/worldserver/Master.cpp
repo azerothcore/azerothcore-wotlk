@@ -486,7 +486,7 @@ bool Master::_StartDB()
         LOG_ERROR("server", "Realm ID must range from 1 to 255");
         return false;
     }
- 
+
     LOG_INFO("server", "Realm running as realm ID %d", realmID);
 
     ///- Clean the database before starting

@@ -6711,7 +6711,7 @@ void ObjectMgr::LoadGameObjectTemplateAddons()
         GameObjectTemplate const* got = sObjectMgr->GetGameObjectTemplate(entry);
         if (!got)
         {
-            LOG_INFO("sql.sql", 
+            LOG_INFO("sql.sql",
                 "GameObject template (Entry: %u) does not exist but has a record in `gameobject_template_addon`",
                 entry);
             continue;
@@ -6725,7 +6725,7 @@ void ObjectMgr::LoadGameObjectTemplateAddons()
 
         // checks
         if (gameObjectAddon.faction && !sFactionTemplateStore.LookupEntry(gameObjectAddon.faction))
-            LOG_INFO("sql.sql", 
+            LOG_INFO("sql.sql",
                 "GameObject (Entry: %u) has invalid faction (%u) defined in `gameobject_template_addon`.",
                 entry, gameObjectAddon.faction);
 
@@ -6737,7 +6737,7 @@ void ObjectMgr::LoadGameObjectTemplateAddons()
                 case GAMEOBJECT_TYPE_FISHINGHOLE:
                     break;
                 default:
-                    LOG_INFO("sql.sql", 
+                    LOG_INFO("sql.sql",
                         "GameObject (Entry %u GoType: %u) cannot be looted but has maxgold set in `gameobject_template_addon`.",
                         entry, got->type);
                     break;

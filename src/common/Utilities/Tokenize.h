@@ -3,7 +3,6 @@
  * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
-
 #ifndef _WARHEAD_TOKENIZE_H_
 #define _WARHEAD_TOKENIZE_H_
 

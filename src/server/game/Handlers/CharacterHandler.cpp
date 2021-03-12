@@ -983,7 +983,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         else
             pCurrChar->TeleportTo(pCurrChar->m_homebindMapId, pCurrChar->m_homebindX, pCurrChar->m_homebindY, pCurrChar->m_homebindZ, pCurrChar->GetOrientation());
     }
-    
+
     // pussywizard: optimization
     std::string charName = pCurrChar->GetName();
     std::transform(charName.begin(), charName.end(), charName.begin(), ::tolower);

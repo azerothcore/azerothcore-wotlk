@@ -2702,7 +2702,7 @@ void Guild::_MoveItems(MoveItemData* pSrc, MoveItemData* pDest, uint32 splitedAm
     // 2. Check source item
     if (!pSrc->CheckItem(splitedAmount))
         return; // Source item or splited amount is invalid
-    
+
     // 3. Check destination rights
     if (!pDest->HasStoreRights(pSrc))
         return; // Player has no rights to store item in destination

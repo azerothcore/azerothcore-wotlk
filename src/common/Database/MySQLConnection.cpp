@@ -149,7 +149,7 @@ bool MySQLConnection::Open()
         }
     } while (!m_Mysql && count < ATTEMPTS);
 
-    LOG_ERROR("server", 
+    LOG_ERROR("server",
         "Could not connect to MySQL database at %s: %s after %d attempts\n",
         m_connectionInfo.host.c_str(),
         mysql_error(mysqlInit),
