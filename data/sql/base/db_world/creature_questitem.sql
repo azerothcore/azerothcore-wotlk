@@ -7,7 +7,7 @@
 DROP TABLE IF EXISTS `creature_questitem`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `creature_questitem` 
+CREATE TABLE `creature_questitem`
 (
   `CreatureEntry` int(10) unsigned NOT NULL DEFAULT 0,
   `Idx` int(10) unsigned NOT NULL DEFAULT 0,
@@ -19,7 +19,7 @@ CREATE TABLE `creature_questitem`
 
 LOCK TABLES `creature_questitem` WRITE;
 /*!40000 ALTER TABLE `creature_questitem` DISABLE KEYS */;
-INSERT INTO `creature_questitem` VALUES 
+INSERT INTO `creature_questitem` VALUES
 (3,0,884,0),
 (3,1,1129,0),
 (38,0,752,0),
@@ -1719,6 +1719,7 @@ INSERT INTO `creature_questitem` VALUES
 (6140,0,10599,0),
 (6140,1,10598,0),
 (6140,2,10600,0),
+(6141,0,5808,0),
 (6146,0,11405,0),
 (6147,0,11405,0),
 (6148,0,11405,0),
@@ -4433,4 +4434,3 @@ UNLOCK TABLES;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
