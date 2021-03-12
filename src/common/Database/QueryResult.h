@@ -7,10 +7,9 @@
 #ifndef QUERYRESULT_H
 #define QUERYRESULT_H
 
-#include <ace/Thread_Mutex.h>
-
 #include "Errors.h"
 #include "Field.h"
+#include <mutex>
 
 #ifdef _WIN32
 #include <winsock2.h>

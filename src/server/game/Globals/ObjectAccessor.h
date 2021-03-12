@@ -11,8 +11,9 @@
 #include "GridDefines.h"
 #include "Object.h"
 #include "UpdateData.h"
-#include <ace/Thread_Mutex.h>
+#include <mutex>
 #include <set>
+#include <shared_mutex>
 #include <unordered_map>
 
 class Creature;
@@ -33,43 +34,24 @@ class HashMapHolder
 {
 public:
     typedef std::unordered_map<uint64, T*> MapType;
-    typedef ACE_RW_Thread_Mutex LockType;
 
-    static void Insert(T* o)
-    {
-        ACORE_WRITE_GUARD(LockType, i_lock);
-        m_objectMap[o->GetGUID()] = o;
-    }
-
-    static void Remove(T* o)
-    {
-        ACORE_WRITE_GUARD(LockType, i_lock);
-        m_objectMap.erase(o->GetGUID());
-    }
-
-    static T* Find(uint64 guid)
-    {
-        ACORE_READ_GUARD(LockType, i_lock);
-        typename MapType::iterator itr = m_objectMap.find(guid);
-        return (itr != m_objectMap.end()) ? itr->second : nullptr;
-    }
+    static void Insert(T* o);
+    static void Remove(T* o);
+    static T* Find(uint64 guid);
 
     static MapType& GetContainer() { return m_objectMap; }
-
-    static LockType* GetLock() { return &i_lock; }
+    static std::shared_mutex* GetLock();
 
 private:
     //Non instanceable only static
     HashMapHolder() = default;
 
-    static LockType i_lock;
-    static MapType  m_objectMap;
+    static MapType m_objectMap;
 };
 
 /// Define the static members of HashMapHolder
 
 template <class T> std::unordered_map< uint64, T* > HashMapHolder<T>::m_objectMap;
-template <class T> typename HashMapHolder<T>::LockType HashMapHolder<T>::i_lock;
 
 // pussywizard:
 class DelayedCorpseAction
@@ -226,7 +208,7 @@ public:
     //non-static functions
     void AddUpdateObject(Object* obj)
     {
-        ACORE_GUARD(ACE_Thread_Mutex, i_objectLock);
+        std::lock_guard<std::mutex> guard(i_objectLock);
         if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
             i_objects.insert(obj);
         else
@@ -235,7 +217,7 @@ public:
 
     void RemoveUpdateObject(Object* obj)
     {
-        ACORE_GUARD(ACE_Thread_Mutex, i_objectLock);
+        std::lock_guard<std::mutex> guard(i_objectLock);
         if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
             i_objects.erase(obj);
         else
@@ -270,10 +252,10 @@ private:
     Player2CorpsesMapType i_player2corpse;
     std::list<uint64> i_playerBones;
 
-    ACE_Thread_Mutex i_objectLock;
-    ACE_RW_Thread_Mutex i_corpseLock;
+    std::mutex i_objectLock;
+    std::shared_mutex i_corpseLock;
     std::list<DelayedCorpseAction> i_delayedCorpseActions;
-    mutable ACE_Thread_Mutex DelayedCorpseLock;
+    mutable std::mutex DelayedCorpseLock;
 };
 
 #define sObjectAccessor ObjectAccessor::instance()

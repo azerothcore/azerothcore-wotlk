@@ -7,8 +7,6 @@
 #ifndef _DATABASEWORKERPOOL_H
 #define _DATABASEWORKERPOOL_H
 
-#include <ace/Thread_Mutex.h>
-
 #include "Common.h"
 #include "Callback.h"
 #include "MySQLConnection.h"
@@ -20,6 +18,7 @@
 #include "QueryHolder.h"
 #include "AdhocStatement.h"
 #include "StringFormat.h"
+#include <mutex>
 
 class PingOperation : public SQLOperation
 {

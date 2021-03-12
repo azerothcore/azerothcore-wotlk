@@ -12,7 +12,7 @@
 #include "Map.h"
 #include "MapUpdater.h"
 #include "Object.h"
-#include <ace/Thread_Mutex.h>
+#include <mutex>
 
 class Transport;
 class StaticTransport;
@@ -130,7 +130,7 @@ private:
     MapManager(const MapManager&);
     MapManager& operator=(const MapManager&);
 
-    ACE_Thread_Mutex Lock;
+    std::mutex Lock;
     MapMapType i_maps;
     IntervalTimer i_timer[4]; // continents, bgs/arenas, instances, total from the beginning
     uint8 mapUpdateStep;

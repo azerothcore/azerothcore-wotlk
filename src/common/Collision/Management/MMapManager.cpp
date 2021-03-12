@@ -80,7 +80,7 @@ namespace MMAP
         return uint32(x << 16 | y);
     }
 
-    ACE_RW_Thread_Mutex& MMapManager::GetMMapLock(uint32 mapId)
+    std::shared_mutex& MMapManager::GetMMapLock(uint32 mapId)
     {
         Map* map = sMapMgr->FindBaseMap(mapId);
         if (!map)
@@ -88,12 +88,13 @@ namespace MMAP
             sLog->outMisc("ZOMG! MoveMaps: BaseMap not found!");
             return this->MMapLock;
         }
+
         return map->GetMMapLock();
     }
 
     bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
     {
-        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
+        std::unique_lock<std::shared_mutex> guard(MMapManagerLock);
 
         // make sure the mmap is loaded and ready to load tiles
         if (!loadMapData(mapId))
@@ -161,7 +162,7 @@ namespace MMAP
 
         dtStatus stat;
         {
-            ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
+            std::unique_lock<std::shared_mutex> guard(GetMMapLock(mapId));
             stat = mmap->navMesh->addTile(data, fileHeader.size, DT_TILE_FREE_DATA, 0, &tileRef);
         }
 
@@ -188,7 +189,7 @@ namespace MMAP
 
     bool MMapManager::unloadMap(uint32 mapId, int32 x, int32 y)
     {
-        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
+        std::unique_lock<std::shared_mutex> guard(MMapManagerLock);
 
         // check if we have this map loaded
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
@@ -217,7 +218,7 @@ namespace MMAP
 
         dtStatus status;
         {
-            ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
+            std::unique_lock<std::shared_mutex> guard(GetMMapLock(mapId));
             status = mmap->navMesh->removeTile(tileRef, nullptr, nullptr);
         }
 
@@ -245,7 +246,7 @@ namespace MMAP
 
     bool MMapManager::unloadMap(uint32 mapId)
     {
-        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
+        std::unique_lock<std::shared_mutex> guard(MMapManagerLock);
 
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
         {
@@ -265,7 +266,7 @@ namespace MMAP
 
             dtStatus status;
             {
-                ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
+                std::unique_lock<std::shared_mutex> guard(GetMMapLock(mapId));
                 status = mmap->navMesh->removeTile(i->second, nullptr, nullptr);
             }
 
@@ -291,7 +292,7 @@ namespace MMAP
 
     bool MMapManager::unloadMapInstance(uint32 mapId, uint32 instanceId)
     {
-        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
+        std::unique_lock<std::shared_mutex> guard(MMapManagerLock);
 
         // check if we have this map loaded
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
@@ -325,9 +326,6 @@ namespace MMAP
 
     dtNavMesh const* MMapManager::GetNavMesh(uint32 mapId)
     {
-        // pussywizard: moved to calling function
-        //ACORE_READ_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
-
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
             return nullptr;
 
@@ -336,9 +334,6 @@ namespace MMAP
 
     dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId, uint32 instanceId)
     {
-        // pussywizard: moved to calling function
-        //ACORE_READ_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
-
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
             return nullptr;
 
@@ -346,7 +341,7 @@ namespace MMAP
         if (mmap->navMeshQueries.find(instanceId) == mmap->navMeshQueries.end())
         {
             // pussywizard: different instances of the same map shouldn't access this simultaneously
-            ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
+            std::unique_lock<std::shared_mutex> guard(GetMMapLock(mapId));
             // check again after acquiring mutex
             if (mmap->navMeshQueries.find(instanceId) == mmap->navMeshQueries.end())
             {

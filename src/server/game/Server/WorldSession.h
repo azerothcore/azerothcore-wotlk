@@ -1035,7 +1035,7 @@ private:
     AddonsList m_addonsList;
     uint32 recruiterId;
     bool isRecruiter;
-    ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue;
+    LockedQueue<WorldPacket*> _recvQueue;
     uint32 m_currentVendorEntry;
     uint64 m_currentBankerGUID;
     time_t timeWhoCommandAllowed;
