@@ -26548,6 +26548,21 @@ void Player::SetMap(Map* map)
     m_mapRef.link(map, this);
 }
 
+bool loadFishingStepsState(uint32 guid)
+{
+    /*
+    * Check PET_SAVE_NOT_IN_SLOT means the pet is dismissed. If someone ever
+    * Changes the slot flag, they will break this validation.
+    */
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_FISHINGSTEPS);
+    stmt->setUInt32(0, guid);
+
+    if (PreparedQueryResult result = CharacterDatabase.AsyncQuery(stmt))
+        return true;
+
+    return false;
+}
+
 void Player::_SaveCharacter(bool create, SQLTransaction& trans)
 {
     PreparedStatement* stmt = nullptr;
@@ -27960,21 +27975,6 @@ bool Player::IsPetDismissed()
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT);
     stmt->setUInt32(0, GetGUIDLow());
     stmt->setUInt8(1, uint8(PET_SAVE_NOT_IN_SLOT));
-
-    if (PreparedQueryResult result = CharacterDatabase.AsyncQuery(stmt))
-        return true;
-
-    return false;
-}
-
-bool loadFishingStepsState(uint32 guid)
-{
-    /*
-    * Check PET_SAVE_NOT_IN_SLOT means the pet is dismissed. If someone ever
-    * Changes the slot flag, they will break this validation.
-    */
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_FISHINGSTEPS);
-    stmt->setUInt32(0, guid);
 
     if (PreparedQueryResult result = CharacterDatabase.AsyncQuery(stmt))
         return true;

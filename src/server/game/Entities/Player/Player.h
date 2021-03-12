@@ -2121,7 +2121,12 @@ public:
 
     // After a skill up on fishing, reset the steps to 0
     void resetFishingSteps() { m_fishingSteps = 0; };
-    bool hasFishingSteps() { m_hasFishingSteps ? true : false; };
+    bool hasFishingSteps()
+    {
+        if (m_hasFishingSteps) { return true; }
+        else { return false; }
+    };
+
     void setFishingStepsState(bool state) { m_hasFishingSteps = state; };
 
     int32 CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, int32 rep, int32 faction, bool noQuestBonus = false);
