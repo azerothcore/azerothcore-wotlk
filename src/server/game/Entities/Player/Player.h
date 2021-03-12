@@ -2119,6 +2119,11 @@ public:
     void RewardReputation(Unit* victim, float rate);
     void RewardReputation(Quest const* quest);
 
+    // After a skill up on fishing, reset the steps to 0
+    void resetFishingSteps() { m_fishingSteps = 0; };
+    bool hasFishingSteps() { m_hasFishingSteps ? true : false; };
+    void setFishingStepsState(bool state) { m_hasFishingSteps = state; };
+
     int32 CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, int32 rep, int32 faction, bool noQuestBonus = false);
 
     void UpdateSkillsForLevel();
@@ -2895,6 +2900,9 @@ protected:
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
 
     uint8 m_grantableLevels;
+
+    uint8 m_fishingSteps;
+    bool m_hasFishingSteps;
 
     [[nodiscard]] AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
 

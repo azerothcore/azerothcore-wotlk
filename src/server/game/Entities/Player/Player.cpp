@@ -920,6 +920,8 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_lastFallZ = 0;
 
     m_grantableLevels = 0;
+    m_fishingSteps = 0;
+    m_hasFishingSteps = false;
 
     m_ControlledByPlayer = true;
 
@@ -5125,6 +5127,10 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                 stmt->setUInt32(0, guid);
                 trans->Append(stmt);
 
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_FISHINGSTEPS);
+                stmt->setUInt32(0, guid);
+                trans->Append(stmt);
+
                 CharacterDatabase.CommitTransaction(trans);
                 break;
             }
@@ -6364,6 +6370,35 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLeve
     return false;
 }
 
+uint8 GetFishingStepsNeededToLevelUp(uint32 SkillValue)
+{
+    // These formulas are guessed to be as close as possible to how the skill difficulty curve for fishing was on Retail.
+    if (SkillValue < 75)
+        return 1;
+
+    if (SkillValue <= 300)
+        return SkillValue / 44;
+
+    return SkillValue / 31;
+}
+
+void resetFishingStepsDB(uint32 guid)
+{
+    try
+    {
+        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        PreparedStatement* stmt = nullptr;
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_FISHINGSTEPS);
+        stmt->setUInt32(0, guid);
+        trans->Append(stmt);
+        CharacterDatabase.CommitTransaction(trans);
+    }
+    catch (...)
+    {
+        sLog->outError("Couldn't update fishing steps for character guid: #%u", guid);
+    }
+}
+
 bool Player::UpdateFishingSkill()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -6372,11 +6407,21 @@ bool Player::UpdateFishingSkill()
 
     uint32 SkillValue = GetPureSkillValue(SKILL_FISHING);
 
-    int32 chance = SkillValue < 75 ? 100 : 2500 / (SkillValue - 50);
+    if (SkillValue >= GetMaxSkillValue(SKILL_FISHING))
+        return false;
 
-    uint32 gathering_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
+    uint8 stepsNeededToLevelUp = GetFishingStepsNeededToLevelUp(SkillValue);
+    ++m_fishingSteps;
 
-    return UpdateSkillPro(SKILL_FISHING, chance * 10, gathering_skill_gain);
+    if (m_fishingSteps >= stepsNeededToLevelUp)
+    {
+        resetFishingStepsDB(this->GetGUID());
+        this->resetFishingSteps();
+        uint32 gathering_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
+        return UpdateSkillPro(SKILL_FISHING, 100 * 10, gathering_skill_gain);
+    }
+
+    return false;
 }
 
 // levels sync. with spell requirement for skill levels to learn
@@ -17919,8 +17964,8 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder* holder)
     //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, instance_mode_mask, "
     // 44           45                46                 47                    48          49          50              51           52               53              54
     //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk, "
-    // 55      56      57      58      59      60      61      62      63           64                 65                 66             67              68      69           70          71
-    //"health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels FROM characters WHERE guid = '%u'", guid);
+    // 55      56      57      58      59      60      61      62      63           64                 65                 66             67              68      69           70          71          72
+    //"health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels, fishing_steps FROM characters WHERE guid = '%u'", guid);
     PreparedQueryResult result = holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_FROM);
 
     if (!result)
@@ -17932,6 +17977,8 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder* holder)
     Field* fields = result->Fetch();
 
     uint32 dbAccountId = fields[1].GetUInt32();
+
+    m_fishingSteps = fields[72].GetUInt8();
 
     // check if the character's account in the db and the logged in account match.
     // player should be able to load/delete character only with correct account!
@@ -26757,6 +26804,24 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
     }
 
     trans->Append(stmt);
+
+    if (!hasFishingSteps())
+    {
+        uint32 guid = this->GetGUID();
+        if (!loadFishingStepsState(guid))
+        {
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_FISHINGSTEPS);
+            index = 0;
+            stmt->setUInt32(index++, guid);
+            stmt->setUInt32(index++, m_fishingSteps);
+            trans->Append(stmt);
+            setFishingStepsState(true);
+        }
+        else
+        {
+            setFishingStepsState(true);
+        }
+    }
 }
 
 void Player::_LoadGlyphs(PreparedQueryResult result)
@@ -27895,6 +27960,21 @@ bool Player::IsPetDismissed()
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT);
     stmt->setUInt32(0, GetGUIDLow());
     stmt->setUInt8(1, uint8(PET_SAVE_NOT_IN_SLOT));
+
+    if (PreparedQueryResult result = CharacterDatabase.AsyncQuery(stmt))
+        return true;
+
+    return false;
+}
+
+bool loadFishingStepsState(uint32 guid)
+{
+    /*
+    * Check PET_SAVE_NOT_IN_SLOT means the pet is dismissed. If someone ever
+    * Changes the slot flag, they will break this validation.
+    */
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_FISHINGSTEPS);
+    stmt->setUInt32(0, guid);
 
     if (PreparedQueryResult result = CharacterDatabase.AsyncQuery(stmt))
         return true;
