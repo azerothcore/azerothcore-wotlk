@@ -7,6 +7,7 @@
 #ifndef _MMAP_MANAGER_H
 #define _MMAP_MANAGER_H
 
+#include "Common.h"
 #include "DetourAlloc.h"
 #include "DetourNavMesh.h"
 #include "DetourExtended.h"
