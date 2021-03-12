@@ -10,9 +10,9 @@
 #include "DBCStructure.h"
 #include "Field.h"
 #include "LFG.h"
-#include "LFGQueue.h"
 #include "LFGGroupData.h"
 #include "LFGPlayerData.h"
+#include "LFGQueue.h"
 #include "Map.h"
 
 class Group;

@@ -20,14 +20,14 @@ go_ravager_cage
 npc_death_ravager
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Cell.h"
+#include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "Cell.h"
-#include "CellImpl.h"
-#include "GridNotifiersImpl.h"
-#include "GridNotifiers.h"
+#include "ScriptMgr.h"
 
 /*######
 ## npc_draenei_survivor

@@ -7,20 +7,19 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
+
+#include "Battleground.h"
 #include "DBCStores.h"
 #include "GroupReference.h"
-#include "MapReference.h"
 #include "InstanceSaveMgr.h"
-
 #include "Item.h"
+#include "MapReference.h"
+#include "ObjectMgr.h"
 #include "PetDefines.h"
 #include "QuestDef.h"
 #include "SpellMgr.h"
 #include "Unit.h"
-#include "Battleground.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
-
 #include <string>
 #include <vector>
 

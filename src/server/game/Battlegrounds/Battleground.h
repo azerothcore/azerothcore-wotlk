@@ -8,9 +8,9 @@
 #define __BATTLEGROUND_H
 
 #include "Common.h"
-#include "SharedDefines.h"
 #include "DBCEnums.h"
 #include "GameObject.h"
+#include "SharedDefines.h"
 
 class Creature;
 class GameObject;

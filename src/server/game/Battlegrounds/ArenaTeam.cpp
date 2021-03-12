@@ -4,17 +4,17 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ObjectMgr.h"
-#include "WorldPacket.h"
 #include "ArenaTeam.h"
-#include "World.h"
-#include "Group.h"
 #include "ArenaTeamMgr.h"
-#include "Player.h"
-#include "WorldSession.h"
-#include "Opcodes.h"
-#include "ScriptMgr.h"
 #include "BattlegroundMgr.h"
+#include "Group.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 ArenaTeam::ArenaTeam()
     : TeamId(0), Type(0), TeamName(), CaptainGuid(0), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),

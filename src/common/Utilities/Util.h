@@ -343,9 +343,10 @@ std::string GetAddressString(ACE_INET_Addr const& addr);
 uint32 CreatePIDFile(const std::string& filename);
 uint32 GetPID();
 
+bool StringEqualI(std::string_view str1, std::string_view str2);
+
 std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
 void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
-bool StringToBool(std::string const& str);
 
 bool StringContainsStringI(std::string const& haystack, std::string const& needle);
 template <typename T>

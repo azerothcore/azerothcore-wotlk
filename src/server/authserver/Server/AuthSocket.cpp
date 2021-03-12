@@ -776,10 +776,10 @@ bool AuthSocket::_HandleLogonProof()
         sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] account %s tried to login with invalid password!", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str());
 #endif
 
-        uint32 MaxWrongPassCount = sConfigMgr->GetIntDefault("WrongPass.MaxCount", 0);
+        uint32 MaxWrongPassCount = sConfigMgr->GetOption<int32>("WrongPass.MaxCount", 0);
 
         // We can not include the failed account login hook. However, this is a workaround to still log this.
-        if (sConfigMgr->GetBoolDefault("WrongPass.Logging", false))
+        if (sConfigMgr->GetOption<bool>("WrongPass.Logging", false))
         {
             PreparedStatement* logstmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FALP_IP_LOGGING);
             logstmt->setString(0, _login);
@@ -805,8 +805,8 @@ bool AuthSocket::_HandleLogonProof()
 
                 if (failed_logins >= MaxWrongPassCount)
                 {
-                    uint32 WrongPassBanTime = sConfigMgr->GetIntDefault("WrongPass.BanTime", 600);
-                    bool WrongPassBanType = sConfigMgr->GetBoolDefault("WrongPass.BanType", false);
+                    uint32 WrongPassBanTime = sConfigMgr->GetOption<int32>("WrongPass.BanTime", 600);
+                    bool WrongPassBanType = sConfigMgr->GetOption<bool>("WrongPass.BanType", false);
 
                     if (WrongPassBanType)
                     {

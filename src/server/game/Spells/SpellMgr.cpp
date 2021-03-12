@@ -4,25 +4,25 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "SpellMgr.h"
-#include "SpellInfo.h"
-#include "ObjectMgr.h"
-#include "SpellAuras.h"
-#include "SpellAuraDefines.h"
-#include "SharedDefines.h"
-#include "DBCStores.h"
-#include "World.h"
-#include "Chat.h"
-#include "Spell.h"
-#include "BattlegroundMgr.h"
-#include "CreatureAI.h"
-#include "MapManager.h"
-#include "BattlegroundIC.h"
-#include "BattlefieldWG.h"
 #include "BattlefieldMgr.h"
-#include "InstanceScript.h"
-#include "Player.h"
+#include "BattlefieldWG.h"
+#include "BattlegroundIC.h"
+#include "BattlegroundMgr.h"
+#include "Chat.h"
+#include "CreatureAI.h"
+#include "DBCStores.h"
 #include "GameGraveyard.h"
+#include "InstanceScript.h"
+#include "MapManager.h"
+#include "ObjectMgr.h"
+#include "Player.h"
+#include "SharedDefines.h"
+#include "Spell.h"
+#include "SpellAuraDefines.h"
+#include "SpellAuras.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
 {
@@ -508,7 +508,7 @@ uint32 SpellMgr::GetSpellIdForDifficulty(uint32 spellId, Unit const* caster) con
     if (difficultyEntry->SpellID[mode] <= 0 && mode > DUNGEON_DIFFICULTY_HEROIC)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SpellMgr::GetSpellIdForDifficulty: spell %u mode %u spell is NULL, using mode %u", spellId, mode, mode - 2);
+        sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SpellMgr::GetSpellIdForDifficulty: spell %u mode %u spell is nullptr, using mode %u", spellId, mode, mode - 2);
 #endif
         mode -= 2;
     }

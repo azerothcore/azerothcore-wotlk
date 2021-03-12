@@ -4,7 +4,6 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ObjectAccessor.h"
 #include "CellImpl.h"
 #include "Corpse.h"
 #include "Creature.h"
@@ -16,6 +15,7 @@
 #include "Map.h"
 #include "MapInstanced.h"
 #include "MapManager.h"
+#include "ObjectAccessor.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -24,7 +24,6 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-
 #include <cmath>
 
 ObjectAccessor::ObjectAccessor()
@@ -111,12 +110,12 @@ Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const& p, uint64 guid, u
 
 Corpse* ObjectAccessor::GetCorpse(WorldObject const& u, uint64 guid)
 {
-    return GetObjectInMap(guid, u.GetMap(), (Corpse*)NULL);
+    return GetObjectInMap(guid, u.GetMap(), (Corpse*)nullptr);
 }
 
 GameObject* ObjectAccessor::GetGameObject(WorldObject const& u, uint64 guid)
 {
-    return GetObjectInMap(guid, u.GetMap(), (GameObject*)NULL);
+    return GetObjectInMap(guid, u.GetMap(), (GameObject*)nullptr);
 }
 
 Transport* ObjectAccessor::GetTransport(WorldObject const& u, uint64 guid)
@@ -130,27 +129,27 @@ Transport* ObjectAccessor::GetTransport(WorldObject const& u, uint64 guid)
 
 DynamicObject* ObjectAccessor::GetDynamicObject(WorldObject const& u, uint64 guid)
 {
-    return GetObjectInMap(guid, u.GetMap(), (DynamicObject*)NULL);
+    return GetObjectInMap(guid, u.GetMap(), (DynamicObject*)nullptr);
 }
 
 Unit* ObjectAccessor::GetUnit(WorldObject const& u, uint64 guid)
 {
-    return GetObjectInMap(guid, u.GetMap(), (Unit*)NULL);
+    return GetObjectInMap(guid, u.GetMap(), (Unit*)nullptr);
 }
 
 Creature* ObjectAccessor::GetCreature(WorldObject const& u, uint64 guid)
 {
-    return GetObjectInMap(guid, u.GetMap(), (Creature*)NULL);
+    return GetObjectInMap(guid, u.GetMap(), (Creature*)nullptr);
 }
 
 Pet* ObjectAccessor::GetPet(WorldObject const& u, uint64 guid)
 {
-    return GetObjectInMap(guid, u.GetMap(), (Pet*)NULL);
+    return GetObjectInMap(guid, u.GetMap(), (Pet*)nullptr);
 }
 
 Player* ObjectAccessor::GetPlayer(WorldObject const& u, uint64 guid)
 {
-    return GetObjectInMap(guid, u.GetMap(), (Player*)NULL);
+    return GetObjectInMap(guid, u.GetMap(), (Player*)nullptr);
 }
 
 Creature* ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const& u, uint64 guid)
@@ -166,22 +165,22 @@ Creature* ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const& u, uint64
 
 Pet* ObjectAccessor::FindPet(uint64 guid)
 {
-    return GetObjectInWorld(guid, (Pet*)NULL);
+    return GetObjectInWorld(guid, (Pet*)nullptr);
 }
 
 Player* ObjectAccessor::FindPlayer(uint64 guid)
 {
-    return GetObjectInWorld(guid, (Player*)NULL);
+    return GetObjectInWorld(guid, (Player*)nullptr);
 }
 
 Player* ObjectAccessor::FindPlayerInOrOutOfWorld(uint64 guid)
 {
-    return GetObjectInOrOutOfWorld(guid, (Player*)NULL);
+    return GetObjectInOrOutOfWorld(guid, (Player*)nullptr);
 }
 
 Unit* ObjectAccessor::FindUnit(uint64 guid)
 {
-    return GetObjectInWorld(guid, (Unit*)NULL);
+    return GetObjectInWorld(guid, (Unit*)nullptr);
 }
 
 Player* ObjectAccessor::FindConnectedPlayer(uint64 const& guid)
@@ -335,7 +334,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
     sLog->outStaticDebug("Deleting Corpse and spawned bones.");
 #endif
 
-    // Map can be NULL
+    // Map can be nullptr
     Map* map = corpse->FindMap();
     bool inWorld = corpse->IsInWorld();
 
@@ -420,7 +419,7 @@ void ObjectAccessor::RemoveOldCorpses()
         next2 = itr;
         ++next2;
 
-        Corpse* c = GetObjectInWorld((*itr), (Corpse*)NULL);
+        Corpse* c = GetObjectInWorld((*itr), (Corpse*)nullptr);
         if (c)
         {
             if (!c->IsExpired(now))

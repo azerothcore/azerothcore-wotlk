@@ -7,11 +7,10 @@
 #ifndef ACORE_CELLIMPL_H
 #define ACORE_CELLIMPL_H
 
-#include <cmath>
-
 #include "Cell.h"
 #include "Map.h"
 #include "Object.h"
+#include <cmath>
 
 inline Cell::Cell(CellCoord const& p)
 {

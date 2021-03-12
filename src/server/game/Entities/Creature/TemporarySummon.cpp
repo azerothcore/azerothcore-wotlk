@@ -4,14 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "CreatureAI.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
-#include "CreatureAI.h"
 #include "ObjectMgr.h"
-#include "TemporarySummon.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "TemporarySummon.h"
 
 TempSummon::TempSummon(SummonPropertiesEntry const* properties, uint64 owner, bool isWorldObject) :
     Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),

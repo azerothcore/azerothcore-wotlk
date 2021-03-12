@@ -4,8 +4,8 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "DBCStore.h"
 #include "DBCDatabaseLoader.h"
+#include "DBCStore.h"
 
 DBCStorageBase::DBCStorageBase(char const* fmt) : _fieldCount(0), _fileFormat(fmt), _dataTable(nullptr), _indexTableSize(0)
 {
@@ -37,7 +37,7 @@ bool DBCStorageBase::Load(char const* path, char**& indexTable)
     if (char* stringBlock = dbc.AutoProduceStrings(_fileFormat, _dataTable))
         _stringPool.push_back(stringBlock);
 
-    // error in dbc file at loading if NULL
+    // error in dbc file at loading if nullptr
     return indexTable != nullptr;
 }
 

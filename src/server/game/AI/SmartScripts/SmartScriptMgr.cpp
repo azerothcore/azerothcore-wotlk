@@ -4,21 +4,20 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "DatabaseEnv.h"
-#include "ObjectMgr.h"
-#include "ObjectDefines.h"
-#include "GridDefines.h"
-#include "GridNotifiers.h"
-#include "SpellMgr.h"
-#include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "InstanceScript.h"
-#include "ScriptedCreature.h"
-#include "GameEventMgr.h"
 #include "CreatureTextMgr.h"
-
+#include "DatabaseEnv.h"
+#include "GameEventMgr.h"
+#include "GridDefines.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "InstanceScript.h"
+#include "ObjectDefines.h"
+#include "ObjectMgr.h"
+#include "ScriptedCreature.h"
 #include "SmartScriptMgr.h"
+#include "SpellMgr.h"
 
 SmartWaypointMgr* SmartWaypointMgr::instance()
 {

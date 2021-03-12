@@ -2,16 +2,16 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "MapManager.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "ulduar.h"
 #include "Vehicle.h"
-#include "Spell.h"
-#include "MapManager.h"
-#include "SpellAuraEffects.h"
-#include "PassiveAI.h"
-#include "Player.h"
 
 enum SpellData
 {
@@ -1525,7 +1525,7 @@ public:
                     events.RepeatEvent(10000);
                     break;
                 case EVENT_FROST_BOMB:
-                    me->CastCustomSpell(SPELL_VX001_FROST_BOMB, SPELLVALUE_MAX_TARGETS, 1, (Unit*)NULL, false);
+                    me->CastCustomSpell(SPELL_VX001_FROST_BOMB, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
                     events.RepeatEvent(45000);
                     break;
             }
@@ -2167,7 +2167,7 @@ public:
             if (Unit* c = GetCaster())
             {
                 uint32 id = ( c->GetMap()->Is25ManRaid() ? ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_25_2 : SPELL_RAPID_BURST_DAMAGE_25_1) : ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_10_2 : SPELL_RAPID_BURST_DAMAGE_10_1) );
-                c->CastSpell((Unit*)NULL, id, true);
+                c->CastSpell((Unit*)nullptr, id, true);
             }
         }
 
@@ -2219,8 +2219,8 @@ public:
                 lastOrientation = new_o;
                 c->SetOrientation(new_o);
                 c->SetFacingTo(new_o);
-                c->CastSpell((Unit*)NULL, 63297, true);
-                c->CastSpell((Unit*)NULL, 64042, true);
+                c->CastSpell((Unit*)nullptr, 63297, true);
+                c->CastSpell((Unit*)nullptr, 64042, true);
             }
         }
 
@@ -2473,7 +2473,7 @@ public:
                     }
                     break;
                 case EVENT_EMERGENCY_BOT_ATTACK:
-                    me->CastSpell((Unit*)NULL, SPELL_WATER_SPRAY, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_WATER_SPRAY, false);
                     events.RescheduleEvent(EVENT_EMERGENCY_BOT_CHECK, 5000);
                     break;
             }

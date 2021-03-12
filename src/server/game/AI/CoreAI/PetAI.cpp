@@ -4,20 +4,20 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PetAI.h"
-#include "Errors.h"
-#include "Pet.h"
-#include "Player.h"
-#include "DBCStores.h"
-#include "Spell.h"
-#include "ObjectAccessor.h"
-#include "SpellMgr.h"
 #include "Creature.h"
-#include "World.h"
-#include "Util.h"
+#include "DBCStores.h"
+#include "Errors.h"
 #include "Group.h"
-#include "SpellInfo.h"
+#include "ObjectAccessor.h"
+#include "Pet.h"
+#include "PetAI.h"
+#include "Player.h"
+#include "Spell.h"
 #include "SpellAuraEffects.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "Util.h"
+#include "World.h"
 #include "WorldSession.h"
 
 int PetAI::Permissible(const Creature* creature)
@@ -336,7 +336,6 @@ void PetAI::UpdateAI(uint32 diff)
             delete itr->second;
     }
 
-
     // Update speed as needed to prevent dropping too far behind and despawning
     me->UpdateSpeed(MOVE_RUN, true);
     me->UpdateSpeed(MOVE_WALK, true);
@@ -444,7 +443,7 @@ void PetAI::OwnerAttacked(Unit* target)
     // Called when owner attacks something. Allows defensive pets to know
     //  that they need to assist
 
-    // Target might be NULL if called from spell with invalid cast targets
+    // Target might be nullptr if called from spell with invalid cast targets
     if (!target)
         return;
 
