@@ -529,7 +529,7 @@ void ObjectAccessor::UnloadAll()
 }
 
 template<class T>
-/*static*/ T* ObjectAccessor<T>::GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/)
+/*static*/ T* ObjectAccessor::GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/)
 {
     T* obj = HashMapHolder<T>::Find(guid);
     if (!obj || obj->GetMapId() != mapid)
