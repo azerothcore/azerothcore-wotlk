@@ -88,3 +88,4 @@ UPDATE `creature_template` SET `BaseAttackTime`=2500  WHERE `entry`=15728; -- Gi
 UPDATE `creature_template` SET `BaseAttackTime`=2400  WHERE `entry`=15742; -- Colossus of Ashi, was 1500
 UPDATE `creature_template` SET `BaseAttackTime`=2000  WHERE `entry`=15802; -- Flesh Tentacle, was 1500
 UPDATE `creature_template` SET `BaseAttackTime`=1800  WHERE `entry`=15952; -- Maexxna, was 2000
+UPDATE `creature_template` SET `BaseAttackTime`=750   WHERE `entry`=16028; -- Patchwerk, was 1200
