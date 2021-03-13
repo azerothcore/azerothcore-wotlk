@@ -7,3 +7,4 @@ INSERT INTO `gameobject` VALUES
 DELETE FROM `gameobject` WHERE (`id` = 1731) AND (`guid` IN (120595));
 INSERT INTO `gameobject` VALUES
 (120595, 1731, 0, 0, 0, 1, 1, -9892.582031, 1420.489136, 40.933098, 1.36136, 0, 0, 0, 1, 3600, 255, 1, '', 0);
+                                                             
