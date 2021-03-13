@@ -69,3 +69,8 @@ INSERT INTO `creature_template_addon` (`entry`,`mount`,`auras`) VALUES
 (16150, 0, '55606 10848'),
 (29988, 0, '55608 10848');
 
+
+/* Grobbulus */
+
+-- Fix: emote -> boss emote
+UPDATE `creature_text` SET `Type`=41 WHERE `CreatureID`=15931 AND `GroupID`=0 AND `ID`=0;
