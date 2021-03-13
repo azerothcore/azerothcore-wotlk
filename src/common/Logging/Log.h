@@ -146,10 +146,10 @@ public:
         if (!(_debugLogMask & filter))
             return;
 
-        if (!ShouldLog(LOGGER_SERVER, LOG_LEVEL_DEBUG))
+        if (!ShouldLog("server", LOG_LEVEL_DEBUG))
             return;
 
-        outMessage(LOGGER_SERVER, LOG_LEVEL_DEBUG, ACORE::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+        outMessage("server", LOG_LEVEL_DEBUG, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
     }
 
 private:
