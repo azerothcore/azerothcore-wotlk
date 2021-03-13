@@ -103,16 +103,6 @@ void WardenCheckMgr::LoadWardenChecks()
         {
             WardenCheckResult wr;
             wr.Result.SetHexStr(checkResult.c_str());
-            int len = static_cast<int>(checkResult.size()) / 2;
-            if (wr.Result.GetNumBytes() < len)
-            {
-                uint8* temp = new uint8[len];
-                memset(temp, 0, len);
-                memcpy(temp, wr.Result.AsByteArray().get(), wr.Result.GetNumBytes());
-                std::reverse(temp, temp + len);
-                wr.Result.SetBinary((uint8*)temp, len);
-                delete [] temp;
-            }
             CheckResultStore[id] = wr;
         }
 
@@ -148,19 +138,7 @@ void WardenCheckMgr::LoadWardenChecks()
             default:
             {
                 if (checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == DRIVER_CHECK)
-                {
                     wardenCheck.Data.SetHexStr(data.c_str());
-                    int len = static_cast<int>(data.size()) / 2;
-
-                    if (wardenCheck.Data.GetNumBytes() < len)
-                    {
-                        uint8 temp[24];
-                        memset(temp, 0, len);
-                        memcpy(temp, wardenCheck.Data.AsByteArray().get(), wardenCheck.Data.GetNumBytes());
-                        std::reverse(temp, temp + len);
-                        wardenCheck.Data.SetBinary((uint8*)temp, len);
-                    }
-                }
 
                 CheckIdPool[WARDEN_CHECK_OTHER_TYPE].push_back(id);
                 break;

@@ -15,7 +15,7 @@ enum AccountOpResult
     AOR_OK,
     AOR_NAME_TOO_LONG,
     AOR_PASS_TOO_LONG,
-    AOR_NAME_ALREDY_EXIST,
+    AOR_NAME_ALREADY_EXIST,
     AOR_NAME_NOT_EXIST,
     AOR_DB_INTERNAL_ERROR
 };
@@ -36,7 +36,6 @@ namespace AccountMgr
     uint32 GetSecurity(uint32 accountId, int32 realmId);
     bool GetName(uint32 accountId, std::string& name);
     uint32 GetCharactersCount(uint32 accountId);
-    std::string CalculateShaPassHash(std::string const& name, std::string const& password);
 
     bool IsPlayerAccount(uint32 gmlevel);
     bool IsGMAccount(uint32 gmlevel);

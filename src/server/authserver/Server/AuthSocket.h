@@ -8,8 +8,9 @@
 #define _AUTHSOCKET_H
 
 #include "Common.h"
-#include "BigNumber.h"
+#include "CryptoHash.h"
 #include "RealmSocket.h"
+#include "SRP6.h"
 
 class ACE_INET_Addr;
 struct Realm;
@@ -50,8 +51,6 @@ public:
     bool _HandleXferCancel();
     bool _HandleXferAccept();
 
-    void _SetVSFields(const std::string& rI);
-
     FILE* pPatch;
     ACE_Thread_Mutex patcherLock;
 
@@ -59,10 +58,9 @@ private:
     RealmSocket& socket_;
     RealmSocket& socket() { return socket_; }
 
-    BigNumber N, s, g, v;
-    BigNumber b, B;
-    BigNumber K;
-    BigNumber _reconnectProof;
+    std::optional<acore::Crypto::SRP6> _srp6;
+    SessionKey _sessionKey = {};
+    std::array<uint8, 16> _reconnectProof = {};
 
     eStatus _status;
 

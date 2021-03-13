@@ -9,7 +9,6 @@
 
 #include "ByteBuffer.h"
 #include "ARC4.h"
-#include "BigNumber.h"
 #include "Warden.h"
 #include <map>
 
@@ -22,7 +21,7 @@ public:
     WardenMac();
     ~WardenMac() override;
 
-    void Init(WorldSession* session, BigNumber* k) override;
+    void Init(WorldSession* session, SessionKey const& k) override;
     ClientWardenModule* GetModuleForClient() override;
     void InitializeModule() override;
     void RequestHash() override;
