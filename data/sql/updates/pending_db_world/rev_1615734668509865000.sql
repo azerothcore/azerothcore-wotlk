@@ -9,3 +9,6 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (15, 1802, 1, 0, 0, 47, 0, 3909, 8, 0, 0, 0, 0, '', '');
 
 UPDATE `creature_template` SET `IconName` = 'Speak' WHERE (`entry` = 7775);
+
+-- Removing his script name
+UPDATE `creature_template` SET `ScriptName` = '' WHERE (`entry` = 7775);
