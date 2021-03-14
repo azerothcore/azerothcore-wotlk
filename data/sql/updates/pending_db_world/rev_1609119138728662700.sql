@@ -72,5 +72,6 @@ INSERT INTO `creature_template_addon` (`entry`,`mount`,`auras`) VALUES
 
 /* Grobbulus */
 
--- Fix: emote -> boss emote
+-- Fix 'Slime spray' message: emote -> boss emote
 UPDATE `creature_text` SET `Type`=41 WHERE `CreatureID`=15931 AND `GroupID`=0 AND `ID`=0;
+
