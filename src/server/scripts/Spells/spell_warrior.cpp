@@ -105,7 +105,7 @@ public:
         void HandleApplyAura(SpellEffIndex /*effIndex*/)
         {
             if (Unit* target = GetHitUnit())
-                target->CastSpell((Unit*)NULL, SPELL_WARRIOR_INTERVENE_TRIGGER, true);
+                target->CastSpell((Unit*)nullptr, SPELL_WARRIOR_INTERVENE_TRIGGER, true);
         }
 
         void Register() override
@@ -399,7 +399,7 @@ public:
 
             // % of amount blocked
             int32 damage = CalculatePct(int32(GetTarget()->GetShieldBlockValue()), aurEff->GetAmount());
-            GetTarget()->CastCustomSpell(SPELL_WARRIOR_DAMAGE_SHIELD_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetProcTarget(), true, NULL, aurEff);
+            GetTarget()->CastCustomSpell(SPELL_WARRIOR_DAMAGE_SHIELD_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetProcTarget(), true, nullptr, aurEff);
         }
 
         void Register() override
@@ -738,7 +738,7 @@ public:
         {
             PreventDefaultAction();
             int32 damage = eventInfo.GetDamageInfo()->GetDamage();
-            GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK, &damage, 0, 0, true, NULL, aurEff);
+            GetTarget()->CastCustomSpell(_procTarget, SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK, &damage, 0, 0, true, nullptr, aurEff);
         }
 
         void Register() override
@@ -827,7 +827,7 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
         {
             PreventDefaultAction();
-            GetTarget()->CastSpell(_procTarget, SPELL_WARRIOR_VIGILANCE_PROC, true, NULL, aurEff);
+            GetTarget()->CastSpell(_procTarget, SPELL_WARRIOR_VIGILANCE_PROC, true, nullptr, aurEff);
         }
 
         void Register() override
@@ -940,7 +940,7 @@ public:
         void HandleEffectProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_WARRIOR_RETALIATION_DAMAGE, true, NULL, aurEff);
+            GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_WARRIOR_RETALIATION_DAMAGE, true, nullptr, aurEff);
         }
 
         void Register() override

@@ -28,7 +28,6 @@
 #include <ace/os_include/sys/os_socket.h>
 #include <ace/os_include/sys/os_types.h>
 #include <ace/OS_NS_string.h>
-#include <ace/OS_NS_string.h>
 #include <ace/OS_NS_unistd.h>
 #include <ace/Reactor.h>
 #include <thread>
@@ -583,7 +582,7 @@ int WorldSocket::handle_input_missing_data(void)
         // hope this is not hack, as proper m_RecvWPct is asserted around
         if (!m_RecvWPct)
         {
-            sLog->outError("Forcing close on input m_RecvWPct = NULL");
+            sLog->outError("Forcing close on input m_RecvWPct = nullptr");
             errno = EINVAL;
             return -1;
         }

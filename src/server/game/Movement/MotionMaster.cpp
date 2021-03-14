@@ -72,7 +72,7 @@ void MotionMaster::InitDefault()
     if (_owner->GetTypeId() == TYPEID_UNIT && _owner->IsAlive())
     {
         MovementGenerator* movement = FactorySelector::selectMovementGenerator(_owner->ToCreature());
-        Mutate(movement == NULL ? &si_idleMovement : movement, MOTION_SLOT_IDLE);
+        Mutate(movement == nullptr ? &si_idleMovement : movement, MOTION_SLOT_IDLE);
     }
     else
     {

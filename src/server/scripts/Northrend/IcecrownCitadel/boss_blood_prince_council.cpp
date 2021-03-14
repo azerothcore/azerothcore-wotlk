@@ -992,7 +992,7 @@ public:
                         next->SetHealth(current->GetHealth());
                         current->AI()->DoAction(ACTION_REMOVE_INVOCATION);
                         current->SetHealth(1);
-                        current->CastSpell((Unit*)NULL, visualSpellId, true);
+                        current->CastSpell((Unit*)nullptr, visualSpellId, true);
                         next->AI()->Talk(1);
                     }
                     events.ScheduleEvent(EVENT_INVOCATION_OF_BLOOD, 46000);
@@ -1437,7 +1437,7 @@ public:
         {
             if (GetTarget()->GetTypeId() == TYPEID_PLAYER && GetTarget()->isMoving())
             {
-                GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_PRISON_DAMAGE, true, NULL, aurEff);
+                GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_PRISON_DAMAGE, true, nullptr, aurEff);
             }
         }
 

@@ -440,7 +440,7 @@ public:
 
         void JustRespawned() override
         {
-            me->UpdateEntry(RAND(NPC_AGED_KODO, NPC_DYING_KODO, NPC_ANCIENT_KODO), NULL, false);
+            me->UpdateEntry(RAND(NPC_AGED_KODO, NPC_DYING_KODO, NPC_ANCIENT_KODO), nullptr, false);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -463,7 +463,7 @@ public:
                 if (!(caster->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF) || me->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
                         && (me->GetEntry() == NPC_AGED_KODO || me->GetEntry() == NPC_DYING_KODO || me->GetEntry() == NPC_ANCIENT_KODO))
                 {
-                    me->UpdateEntry(NPC_TAMED_KODO, NULL, false);
+                    me->UpdateEntry(NPC_TAMED_KODO, nullptr, false);
                     EnterEvadeMode();
                     me->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, me->GetFollowAngle());
 

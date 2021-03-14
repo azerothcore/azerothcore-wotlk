@@ -907,6 +907,52 @@ public:
     }
 };
 
+class spell_item_anti_venom : public SpellScriptLoader
+{
+public:
+    spell_item_anti_venom() : SpellScriptLoader("spell_item_anti_venom") {}
+
+    class spell_item_anti_venom_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_anti_venom_SpellScript);
+
+        void HandleDummy(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            if (Unit* target = GetHitUnit())
+            {
+                std::list<uint32> removeList;
+                Unit::AuraMap const& auras = target->GetOwnedAuras();
+                for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                {
+                    Aura* aura = itr->second;
+                    if (aura->GetSpellInfo()->SpellLevel > 25 || aura->GetSpellInfo()->Dispel != DISPEL_POISON)
+                    {
+                        continue;
+                    }
+
+                    removeList.push_back(aura->GetId());
+                }
+
+                for (std::list<uint32>::const_iterator itr = removeList.begin(); itr != removeList.end(); ++itr)
+                {
+                    target->RemoveAurasDueToSpell(*itr);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_item_anti_venom_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_item_anti_venom_SpellScript();
+    }
+};
+
 enum GnomishShrinkRay
 {
     SPELL_GNOMISH_SHRINK_RAY_SELF = 13004,
@@ -1491,7 +1537,7 @@ public:
                         return; // ignore for non-healing classes
                 }
 
-                unitTarget->CastSpell(unitTarget, spell_id, true, NULL, aurEff);
+                unitTarget->CastSpell(unitTarget, spell_id, true, nullptr, aurEff);
             }
         }
 
@@ -1662,7 +1708,7 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
         {
             PreventDefaultAction();
-            GetTarget()->CastSpell(GetTarget(), SPELL_AEGIS_HEAL, true, NULL, aurEff);
+            GetTarget()->CastSpell(GetTarget(), SPELL_AEGIS_HEAL, true, nullptr, aurEff);
         }
 
         void Register() override
@@ -1777,7 +1823,7 @@ public:
                 protEff->GetBase()->RefreshDuration();
             }
             else
-                GetTarget()->CastCustomSpell(SPELL_PROTECTION_OF_ANCIENT_KINGS, SPELLVALUE_BASE_POINT0, absorb, eventInfo.GetProcTarget(), true, NULL, aurEff);
+                GetTarget()->CastCustomSpell(SPELL_PROTECTION_OF_ANCIENT_KINGS, SPELLVALUE_BASE_POINT0, absorb, eventInfo.GetProcTarget(), true, nullptr, aurEff);
         }
 
         void Register() override
@@ -1874,7 +1920,7 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
         {
             PreventDefaultAction();
-            GetTarget()->CastSpell(GetTarget(), SPELL_DESPERATE_RAGE, true, NULL, aurEff);
+            GetTarget()->CastSpell(GetTarget(), SPELL_DESPERATE_RAGE, true, nullptr, aurEff);
         }
 
         void Register() override
@@ -2322,7 +2368,7 @@ public:
         {
             PreventDefaultAction();
             int32 bp = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), aurEff->GetAmount());
-            GetTarget()->CastCustomSpell(SPELL_ITEM_NECROTIC_TOUCH_PROC, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetProcTarget(), true, NULL, aurEff);
+            GetTarget()->CastCustomSpell(SPELL_ITEM_NECROTIC_TOUCH_PROC, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetProcTarget(), true, nullptr, aurEff);
         }
 
         void Register() override
@@ -2794,14 +2840,14 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            GetTarget()->CastSpell(GetTarget(), SPELL_SHADOWMOURNE_SOUL_FRAGMENT, true, NULL, aurEff);
+            GetTarget()->CastSpell(GetTarget(), SPELL_SHADOWMOURNE_SOUL_FRAGMENT, true, nullptr, aurEff);
 
             // this can't be handled in AuraScript of SoulFragments because we need to know victim
             if (Aura* soulFragments = GetTarget()->GetAura(SPELL_SHADOWMOURNE_SOUL_FRAGMENT))
             {
                 if (soulFragments->GetStackAmount() >= 10)
                 {
-                    GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_SHADOWMOURNE_CHAOS_BANE_DAMAGE, true, NULL, aurEff);
+                    GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_SHADOWMOURNE_CHAOS_BANE_DAMAGE, true, nullptr, aurEff);
                     soulFragments->Remove();
                 }
             }
@@ -3034,7 +3080,7 @@ public:
                     spellId = SPELL_UNDERBELLY_ELIXIR_TRIGGERED3;
                     break;
             }
-            caster->CastSpell(caster, spellId, true, GetCastItem(), NULL, caster->GetGUID());
+            caster->CastSpell(caster, spellId, true, GetCastItem(), nullptr, caster->GetGUID());
         }
 
         void Register() override
@@ -4272,6 +4318,7 @@ void AddSC_item_spell_scripts()
     new spell_item_feast();
     new spell_item_gnomish_universal_remote();
     new spell_item_strong_anti_venom();
+    new spell_item_anti_venom();
     new spell_item_gnomish_shrink_ray();
     new spell_item_goblin_weather_machine();
     new spell_item_light_lamp();

@@ -95,7 +95,7 @@ enum GroupUpdateFlags
     GROUP_UPDATE_FLAG_POSITION          = 0x00000100,       // uint16, uint16
     GROUP_UPDATE_FLAG_AURAS             = 0x00000200,       // uint64 mask, for each bit set uint32 spellid + uint8 unk
     GROUP_UPDATE_FLAG_PET_GUID          = 0x00000400,       // uint64 pet guid
-    GROUP_UPDATE_FLAG_PET_NAME          = 0x00000800,       // pet name, NULL terminated string
+    GROUP_UPDATE_FLAG_PET_NAME          = 0x00000800,       // pet name, nullptr terminated string
     GROUP_UPDATE_FLAG_PET_MODEL_ID      = 0x00001000,       // uint16, model id
     GROUP_UPDATE_FLAG_PET_CUR_HP        = 0x00002000,       // uint32 pet cur health
     GROUP_UPDATE_FLAG_PET_MAX_HP        = 0x00004000,       // uint32 pet max health

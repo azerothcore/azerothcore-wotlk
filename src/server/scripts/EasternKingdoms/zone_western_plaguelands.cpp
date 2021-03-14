@@ -170,7 +170,7 @@ public:
         void DoDie()
         {
             //summoner dies here
-            Unit::DealDamage(me, me, me->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+            Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             //override any database `spawntimesecs` to prevent duplicated summons
             uint32 rTime = me->GetRespawnDelay();
             if (rTime < 600)

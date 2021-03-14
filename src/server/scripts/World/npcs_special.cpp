@@ -38,12 +38,10 @@ EndContentData */
 #include "Group.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
-#include "PassiveAI.h"
 #include "Pet.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptMgr.h"
 #include "ScriptMgr.h"
 #include "SmartAI.h"
 #include "SpellAuras.h"
@@ -564,7 +562,7 @@ public:
                 if (!playerTarget)
                     return;
 
-                Creature* lastSpawnedGuard = SpawnedGUID == 0 ? NULL : GetSummonedGuard();
+                Creature* lastSpawnedGuard = SpawnedGUID == 0 ? nullptr : GetSummonedGuard();
 
                 // prevent calling ObjectAccessor::GetUnit at next MoveInLineOfSight call - speedup
                 if (!lastSpawnedGuard)
@@ -680,8 +678,7 @@ public:
 
 enum ChickenCluck
 {
-    EMOTE_HELLO_A       = 0,
-    EMOTE_HELLO_H       = 1,
+    EMOTE_HELLO         = 0,
     EMOTE_CLUCK_TEXT    = 2,
 
     QUEST_CLUCK         = 3861,
@@ -736,7 +733,7 @@ public:
                     {
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                         me->setFaction(FACTION_FRIENDLY);
-                        Talk(player->GetTeamId() == TEAM_HORDE ? EMOTE_HELLO_H : EMOTE_HELLO_A);
+                        Talk(EMOTE_HELLO);
                     }
                     break;
                 case TEXT_EMOTE_CHEER:

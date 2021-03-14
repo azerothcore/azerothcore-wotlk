@@ -519,7 +519,7 @@ public:
         }
         uint32 itemId = atol(pitem);
 
-        char* addMulti = strtok(NULL, " ");
+        char* addMulti = strtok(nullptr, " ");
         if (!sObjectMgr->RemoveVendorItem(addMulti ? handler->GetSession()->GetCurrentVendor() : vendor->GetEntry(), itemId))
         {
             handler->PSendSysMessage(LANG_ITEM_NOT_IN_LIST, itemId);
