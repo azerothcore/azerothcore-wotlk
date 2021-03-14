@@ -1,3 +1,19 @@
+-- DB update 2021_03_14_12 -> 2021_03_14_13
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_03_14_12';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_03_14_12 2021_03_14_13 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1614205452159319100'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1614205452159319100');
 
 DELETE FROM `quest_request_items_locale` WHERE `ID` IN (8697, 9248, 8705, 9023, 8689, 8277, 8278, 8282, 8286, 8288, 8301, 8302, 8284, 8285, 8279, 8323, 8324, 8287, 9422, 9419, 8507, 8508, 8304, 8306, 8791, 8801, 8789, 8790, 8802, 8318, 8319, 8361, 8362, 8320, 8321, 8332, 8333, 8348, 8363, 8341, 8342, 8352, 8364, 8574, 8548, 8572, 8573, 9338, 8283, 8731, 8732, 8738, 8501, 8502, 8770, 8771, 8737, 8785, 8538, 8539, 8687, 8772, 8773, 8537, 8536, 8740, 8498, 8534, 8739, 8535) AND `locale` IN ('esES');
@@ -307,3 +323,12 @@ INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `Verified
 (8534,'esMX','Sus esfuerzos son muy apreciados $N. Voy a leer estos informes de exploración inmediatamente, ahora siéntase libre de ir hasta su próxima misión.',18019),
 (8739,'esMX','Sus esfuerzos son muy apreciados $N. Voy a leer estos informes de exploración inmediatamente, ahora siéntase libre de ir hasta su próxima misión.',18019),
 (8535,'esMX','Buen trabajo $N. Aquí está su siguiente misión.',18019);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
