@@ -19803,6 +19803,11 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
 
                     if (!target->CanSeeSpellClickOn(creature))
                         appendValue &= ~UNIT_NPC_FLAG_SPELLCLICK;
+
+                    if (!creature->IsValidTrainerForPlayer(target, &appendValue))
+                    {
+                        appendValue &= ~UNIT_NPC_FLAG_TRAINER;
+                    }
                 }
 
                 fieldBuffer << uint32(appendValue);
