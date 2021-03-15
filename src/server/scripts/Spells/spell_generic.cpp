@@ -5079,11 +5079,13 @@ public:
 
             if (!caster->GetInstanceScript() || !caster->GetInstanceScript()->IsEncounterInProgress()) //Don't leave combat if you are in combat with a boss
             {
-                if (!instant_exit) {
-                    caster->getHostileRefManager().deleteReferences(); // exit combat after 6 seconds
+                if (instant_exit) {
+                    caster->getHostileRefManager().deleteReferences();
                 }
-                else caster->CombatStop(); // isn't necessary to call AttackStop because is just called in CombatStop
+
+                caster->CombatStop();
             }
+
         }
 
         void Register() override
