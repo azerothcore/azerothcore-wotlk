@@ -74,4 +74,8 @@ INSERT INTO `creature_template_addon` (`entry`,`mount`,`auras`) VALUES
 
 -- Fix 'Slime spray' message: emote -> boss emote
 UPDATE `creature_text` SET `Type`=41 WHERE `CreatureID`=15931 AND `GroupID`=0 AND `ID`=0;
+-- Add spell script for 'mutating injection/explosion'
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (28169, 'spell_grobbulus_mutating_injection');
+-- Remove 'mutating injection' from DB as now has script)
+DELETE FROM `acore_world`.`spell_linked_spell` WHERE  `spell_trigger`=-28169 AND `spell_effect`=28206 AND `type`=0;
 
