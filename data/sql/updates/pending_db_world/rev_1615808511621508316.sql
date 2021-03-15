@@ -4,7 +4,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1615808511621508316');
 SET @Spirit := 12144;
 SET @menu   := 3862;
 
-DELETE FROM `gossip_menu_option` WHERE `menu_id` = @menu;
+DELETE FROM `gossip_menu_option` WHERE `MenuID` = @menu;
 INSERT INTO `gossip_menu_option` (`MenuID`,`OptionID`,`OptionIcon`,`OptionText`,`OptionBroadcastTextID`,`OptionType`,`OptionNpcFlag`,`ActionMenuID`,`ActionPoiID`,`BoxCoded`,`BoxMoney`,`BoxText`,`BoxBroadcastTextID`,`VerifiedBuild`) VALUES
 (@menu,0,0,'You have fought well, spirit.  I ask you to grant me the strength of your body and the strength of your heart.',7405,1,1,3863,0,0,0,'',0,0),
 (@menu,1,0,'You have fought well, spirit.  I ask you to grant me the strength of your body and the strength of your heart.',7405,1,1,3863,0,0,0,'',0,0);
