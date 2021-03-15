@@ -2461,7 +2461,6 @@ void AddSC_npcs_special()
 
     // Theirs
     new npc_air_force_bots();
-    new npc_lunaclaw_spirit();
     new npc_chicken_cluck();
     new npc_dancing_flames();
     new npc_doctor();
