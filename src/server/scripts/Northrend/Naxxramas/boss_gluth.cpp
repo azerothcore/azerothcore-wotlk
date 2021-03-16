@@ -17,7 +17,7 @@ enum Spells
     SPELL_DECIMATE_25                   = 54426,
     SPELL_BERSERK                       = 26662,
     SPELL_INFECTED_WOUND                = 29306,
-    SPELL_CHOW_SEARCHER                 = 28404,
+    SPELL_CHOW_SEARCHER                 = 28404
 };
 
 enum Events
@@ -27,12 +27,12 @@ enum Events
     EVENT_SPELL_DECIMATE                = 3,
     EVENT_SPELL_BERSERK                 = 4,
     EVENT_SUMMON_ZOMBIE                 = 5,
-    EVENT_CAN_EAT_ZOMBIE                = 6,
+    EVENT_CAN_EAT_ZOMBIE                = 6
 };
 
 enum Misc
 {
-    NPC_ZOMBIE_CHOW                     = 16360,
+    NPC_ZOMBIE_CHOW                     = 16360
 };
 
 enum Emotes
@@ -48,7 +48,7 @@ const Position zombiePos[3] =
 {
     {3267.9f, -3172.1f, 297.42f, 0.94f},
     {3253.2f, -3132.3f, 297.42f, 0},
-    {3308.3f, -3185.8f, 297.42f, 1.58f},
+    {3308.3f, -3185.8f, 297.42f, 1.58f}
 };
 
 class boss_gluth : public CreatureScript
@@ -91,7 +91,9 @@ public:
                     Talk(EMOTE_SPOTS_ONE);
                 }
                 else
+                {
                     ScriptedAI::MoveInLineOfSight(who);
+                }
             }
         }
 
@@ -110,8 +112,9 @@ public:
         void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_ZOMBIE_CHOW)
+            {
                 summon->AI()->AttackStart(me);
-
+            }
             summons.Summon(summon);
         }
 
@@ -120,10 +123,13 @@ public:
         void KilledUnit(Unit* who) override
         {
             if (me->IsAlive() && who->GetEntry() == NPC_ZOMBIE_CHOW)
+            {
                 me->ModifyHealth(int32(me->GetMaxHealth() * 0.05f));
-
+            }
             if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
+            {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
+            }
         }
 
         void JustDied(Unit*  killer) override
@@ -149,7 +155,6 @@ public:
                 AttackStart(player);
                 return true;
             }
-
             return false;
         }
 
@@ -166,7 +171,6 @@ public:
             {
                 case EVENT_SPELL_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-
                     break;
                 case EVENT_SPELL_ENRAGE:
                     Talk(EMOTE_ENRAGE);
@@ -191,12 +195,15 @@ public:
                             // \1 |0 /2 pos
                             // In 25 man raid - should spawn from all 3 gates
                             if (me->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL)
+                            {
                                 me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[0]);
+                            }
                             else
+                            {
                                 me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[urand(0, 2)]);
+                            }
                             (rand == 2 ? rand = 0 : rand++);
                         }
-
                         events.RepeatEvent(10000);
                         break;
                     }
@@ -210,7 +217,6 @@ public:
                     }
                     break;
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -241,7 +247,6 @@ public:
                     Unit::DealDamage(GetCaster(), cTarget, damage);
                     return;
                 }
-
                 GetCaster()->CastCustomSpell(28375, SPELLVALUE_BASE_POINT0, damage, unitTarget);
             }
         }
