@@ -281,13 +281,17 @@ class spell_grobbulus_mutating_injection : public SpellScriptLoader
 
             void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
             {
-                AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
-                if (removeMode != AURA_REMOVE_BY_ENEMY_SPELL && removeMode != AURA_REMOVE_BY_EXPIRE)
-                    return;
-
-                if (Unit* caster = GetCaster())
+                switch (GetTargetApplication()->GetRemoveMode())
                 {
-                    caster->CastSpell(GetTarget(), SPELL_MUTATING_EXPLOSION, true);
+                    case AURA_REMOVE_BY_ENEMY_SPELL:
+                    case AURA_REMOVE_BY_EXPIRE:
+                        if (auto caster = GetCaster())
+                        {
+                            caster->CastSpell(GetTarget(), SPELL_MUTATING_EXPLOSION, true);
+                        }
+                        break;
+                    default:
+                        return;
                 }
             }
 
