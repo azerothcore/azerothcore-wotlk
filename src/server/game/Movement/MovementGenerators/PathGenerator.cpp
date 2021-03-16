@@ -4,15 +4,15 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PathGenerator.h"
-#include "Map.h"
 #include "Creature.h"
+#include "DetourCommon.h"
+#include "DisableMgr.h"
+#include "Geometry.h"
+#include "Log.h"
+#include "Map.h"
 #include "MMapFactory.h"
 #include "MMapManager.h"
-#include "Log.h"
-#include "DisableMgr.h"
-#include "DetourCommon.h"
-#include "Geometry.h"
+#include "PathGenerator.h"
 
  ////////////////// PathGenerator //////////////////
 PathGenerator::PathGenerator(WorldObject const* owner) :
@@ -1130,7 +1130,6 @@ bool PathGenerator::IsSwimmableSegment(float const* v1, float const* v2, bool ch
 {
     return IsSwimmableSegment(v1[2], v1[0], v1[1], v2[2], v2[0], v2[1], checkSwim);
 }
-
 
 /**
  * @brief predict if a certain segment is underwater and the unit can swim

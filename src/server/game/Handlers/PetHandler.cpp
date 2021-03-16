@@ -4,23 +4,23 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Chat.h"
 #include "Common.h"
+#include "CreatureAI.h"
+#include "Group.h"
+#include "Log.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Pet.h"
+#include "Player.h"
+#include "Spell.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "Util.h"
+#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
-#include "SpellMgr.h"
-#include "Log.h"
-#include "Opcodes.h"
-#include "Spell.h"
-#include "ObjectAccessor.h"
-#include "CreatureAI.h"
-#include "Util.h"
-#include "Pet.h"
-#include "World.h"
-#include "Group.h"
-#include "SpellInfo.h"
-#include "Player.h"
-#include "Chat.h"
 
 class LoadPetFromDBQueryHolder : public SQLQueryHolder
 {
@@ -92,7 +92,7 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
     uint8 petSlot = fields[7].GetUInt8();
     bool current = petSlot == PET_SAVE_AS_CURRENT;
     uint32 summon_spell_id = fields[15].GetUInt32();
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(summon_spell_id); // CANT BE NULL
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(summon_spell_id); // CANT BE nullptr
     bool is_temporary_summoned = spellInfo && spellInfo->GetDuration() > 0;
     uint32 pet_number = fields[0].GetUInt32();
     uint32 savedhealth = fields[10].GetUInt32();
@@ -293,7 +293,7 @@ void WorldSession::HandleLoadPetFromDBSecondCallback(LoadPetFromDBQueryHolder* h
     pet->_LoadAuras(holder->GetPreparedResult(PET_LOAD_QUERY_LOADAURAS), holder->GetDiffTime());
     bool current = holder->GetCurrent();
     uint32 summon_spell_id = pet->GetUInt32Value(UNIT_CREATED_BY_SPELL);
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(summon_spell_id); // CANT BE NULL
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(summon_spell_id); // CANT BE nullptr
     bool is_temporary_summoned = spellInfo && spellInfo->GetDuration() > 0;
 
     // load action bar, if data broken will fill later by default spells.
@@ -835,7 +835,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid
                                 pet->SendPetAIReaction(guid1);
                             }
 
-                            pet->ToPet()->CastWhenWillAvailable(spellid, unit_target, NULL, tempspellIsPositive);
+                            pet->ToPet()->CastWhenWillAvailable(spellid, unit_target, nullptr, tempspellIsPositive);
                         }
                     }
                     else if (haspositiveeffect)

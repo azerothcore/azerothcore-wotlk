@@ -7,6 +7,7 @@
 #define SC_ESCORTAI_H
 
 #include "ScriptSystem.h"
+#include "ScriptedCreature.h"
 
 #define DEFAULT_MAX_PLAYER_DISTANCE 50
 
@@ -77,7 +78,7 @@ public:
     virtual void WaypointReached(uint32 pointId) = 0;
     virtual void WaypointStart(uint32 /*pointId*/) {}
 
-    void Start(bool isActiveAttacker = true, bool run = false, uint64 playerGUID = 0, Quest const* quest = NULL, bool instantRespawn = false, bool canLoopPath = false, bool resetWaypoints = true);
+    void Start(bool isActiveAttacker = true, bool run = false, uint64 playerGUID = 0, Quest const* quest = nullptr, bool instantRespawn = false, bool canLoopPath = false, bool resetWaypoints = true);
 
     void SetRun(bool on = true);
     void SetEscortPaused(bool on);

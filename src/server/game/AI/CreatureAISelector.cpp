@@ -5,14 +5,13 @@
  */
 
 #include "Creature.h"
-#include "CreatureAISelector.h"
-#include "PassiveAI.h"
-
-#include "MovementGenerator.h"
-#include "Pet.h"
-#include "TemporarySummon.h"
 #include "CreatureAIFactory.h"
+#include "CreatureAISelector.h"
+#include "MovementGenerator.h"
+#include "PassiveAI.h"
+#include "Pet.h"
 #include "ScriptMgr.h"
+#include "TemporarySummon.h"
 
 namespace FactorySelector
 {
@@ -87,7 +86,7 @@ namespace FactorySelector
         ainame = (ai_factory == nullptr) ? "NullCreatureAI" : ai_factory->key();
         sLog->outDebug(LOG_FILTER_TSCR, "Creature %u used AI is %s.", creature->GetGUIDLow(), ainame.c_str());
 #endif
-        return (ai_factory == NULL ? new NullCreatureAI(creature) : ai_factory->Create(creature));
+        return (ai_factory == nullptr ? new NullCreatureAI(creature) : ai_factory->Create(creature));
     }
 
     MovementGenerator* selectMovementGenerator(Creature* creature)
@@ -115,7 +114,7 @@ namespace FactorySelector
             }
         }*/
 
-        return (mv_factory == NULL ? NULL : mv_factory->Create(creature));
+        return (mv_factory == nullptr ? nullptr : mv_factory->Create(creature));
     }
 
     GameObjectAI* SelectGameObjectAI(GameObject* go)
@@ -131,10 +130,10 @@ namespace FactorySelector
         //future goAI types go here
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        std::string ainame = (ai_factory == NULL || go->GetScriptId()) ? "NullGameObjectAI" : ai_factory->key();
+        std::string ainame = (ai_factory == nullptr || go->GetScriptId()) ? "NullGameObjectAI" : ai_factory->key();
         sLog->outDebug(LOG_FILTER_TSCR, "GameObject %u used AI is %s.", go->GetGUIDLow(), ainame.c_str());
 #endif
 
-        return (ai_factory == NULL ? new NullGameObjectAI(go) : ai_factory->Create(go));
+        return (ai_factory == nullptr ? new NullGameObjectAI(go) : ai_factory->Create(go));
     }
 }

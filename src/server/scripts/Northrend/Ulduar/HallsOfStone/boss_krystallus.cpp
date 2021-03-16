@@ -1,11 +1,11 @@
 /* Xinef
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
 #include "halls_of_stone.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 enum spells
 {
@@ -136,7 +136,7 @@ public:
                     }
                 case EVENT_SHATTER:
                     {
-                        me->CastSpell((Unit*)NULL, DUNGEON_MODE(SHATTER, SHATTER_H), false);
+                        me->CastSpell((Unit*)nullptr, DUNGEON_MODE(SHATTER, SHATTER_H), false);
                         Talk(SAY_SHATTER);
                         events.RescheduleEvent(EVENT_REMOVE_STONED, 1500);
                         break;
@@ -179,7 +179,7 @@ public:
             if (Unit* target = GetHitUnit())
             {
                 target->RemoveAurasDueToSpell(GROUND_SLAM_STONED_EFFECT);
-                target->CastSpell((Unit*)NULL, SPELL_SHATTER_EFFECT, true);
+                target->CastSpell((Unit*)nullptr, SPELL_SHATTER_EFFECT, true);
             }
         }
 

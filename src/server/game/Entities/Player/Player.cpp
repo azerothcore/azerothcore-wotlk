@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Player.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
+#include "ArenaSpectator.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "Battlefield.h"
@@ -27,6 +27,9 @@
 #include "DisableMgr.h"
 #include "Formulas.h"
 #include "GameEventMgr.h"
+#include "GameGraveyard.h"
+#include "GameObjectAI.h"
+#include "GitRevision.h"
 #include "GossipDef.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -34,8 +37,6 @@
 #include "GroupMgr.h"
 #include "Guild.h"
 #include "GuildMgr.h"
-#include "GitRevision.h"
-#include "revision.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
 #include "Language.h"
@@ -51,14 +52,20 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "PetitionMgr.h"
+#include "Player.h"
+#include "PoolMgr.h"
 #include "QuestDef.h"
 #include "ReputationMgr.h"
+#include "revision.h"
+#include "SavingSystem.h"
+#include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SocialMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
+#include "TicketMgr.h"
 #include "Transport.h"
 #include "UpdateData.h"
 #include "UpdateFieldFlags.h"
@@ -70,13 +77,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "ArenaSpectator.h"
-#include "GameObjectAI.h"
-#include "PoolMgr.h"
-#include "SavingSystem.h"
-#include "TicketMgr.h"
-#include "ScriptMgr.h"
-#include "GameGraveyard.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -15109,14 +15109,14 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                 if (!optionBroadcastText)
                 {
                     /// Find localizations from database.
-                    if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, menuId)))
+                    if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
                         ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, locale, strOptionText);
                 }
 
                 if (!boxBroadcastText)
                 {
                     /// Find localizations from database.
-                    if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, menuId)))
+                    if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
                         ObjectMgr::GetLocaleString(gossipMenuLocale->BoxText, locale, strBoxText);
                 }
             }
@@ -23362,6 +23362,8 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // SMSG_POWER_UPDATE
 
     SetMover(this);
+
+    sScriptMgr->OnSendInitialPacketsBeforeAddToMap(this, data);
 }
 
 void Player::SendInitialPacketsAfterAddToMap()

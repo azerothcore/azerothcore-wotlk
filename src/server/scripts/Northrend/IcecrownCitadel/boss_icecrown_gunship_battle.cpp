@@ -3,14 +3,14 @@
 */
 
 #include "CreatureTextMgr.h"
+#include "icecrown_citadel.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
-#include "SpellScript.h"
 #include "ScriptMgr.h"
+#include "SpellScript.h"
 #include "Transport.h"
 #include "TransportMgr.h"
 #include "Vehicle.h"
-#include "icecrown_citadel.h"
 
 enum Texts
 {
@@ -1445,7 +1445,7 @@ void TriggerBurningPitch(Creature* c)
     uint32 spellId = i->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_BURNING_PITCH_A : SPELL_BURNING_PITCH_H;
     if (!c->HasSpellCooldown(spellId))
     {
-        c->CastSpell((Unit*)NULL, spellId, false);
+        c->CastSpell((Unit*)nullptr, spellId, false);
         c->_AddCreatureSpellCooldown(spellId, urand(3000, 4000));
     }
 }
@@ -1763,11 +1763,11 @@ public:
                             me->SetInCombatWithZone();
                             me->AddThreat(player, 1.0f);
                         }
-                        me->CastSpell((Unit*)NULL, SPELL_BELOW_ZERO, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_BELOW_ZERO, false);
                         break;
                     case SLOT_MAGE_1:
                     case SLOT_MAGE_2:
-                        me->CastSpell((Unit*)NULL, SPELL_SHADOW_CHANNELING, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_SHADOW_CHANNELING, false);
                         break;
                     default:
                         break;
@@ -1911,7 +1911,7 @@ public:
             if (me->HasSpellCooldown(spellId))
                 return;
 
-            me->CastSpell((Unit*)NULL, spellId, true);
+            me->CastSpell((Unit*)nullptr, spellId, true);
             me->_AddCreatureSpellCooldown(spellId, 9000);
         }
 
@@ -1954,8 +1954,8 @@ public:
         void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
             SpellInfo const* damageInfo = sSpellMgr->GetSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
-            GetTarget()->CastCustomSpell(SPELL_ROCKET_PACK_DAMAGE, SPELLVALUE_BASE_POINT0, 2 * (damageInfo->Effects[EFFECT_0].CalcValue() + aurEff->GetTickNumber() * aurEff->GetAmplitude()), NULL, true);
-            GetTarget()->CastSpell((Unit*)NULL, SPELL_ROCKET_BURST, true);
+            GetTarget()->CastCustomSpell(SPELL_ROCKET_PACK_DAMAGE, SPELLVALUE_BASE_POINT0, 2 * (damageInfo->Effects[EFFECT_0].CalcValue() + aurEff->GetTickNumber() * aurEff->GetAmplitude()), nullptr, true);
+            GetTarget()->CastSpell((Unit*)nullptr, SPELL_ROCKET_BURST, true);
         }
 
         void Register() override
@@ -2509,7 +2509,7 @@ public:
         void HandleDummy(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastCustomSpell(uint32(GetEffectValue()), SPELLVALUE_BASE_POINT0, 8000, NULL, TRIGGERED_FULL_MASK);
+            GetCaster()->CastCustomSpell(uint32(GetEffectValue()), SPELLVALUE_BASE_POINT0, 8000, nullptr, TRIGGERED_FULL_MASK);
             GetHitUnit()->CastSpell(GetHitUnit(), SPELL_BURNING_PITCH, TRIGGERED_FULL_MASK);
         }
 
@@ -2597,7 +2597,7 @@ public:
         void DamageGunship(SpellEffIndex /*effIndex*/)
         {
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                GetCaster()->CastCustomSpell(instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_BURNING_PITCH_DAMAGE_A : SPELL_BURNING_PITCH_DAMAGE_H, SPELLVALUE_BASE_POINT0, 5000, NULL, TRIGGERED_FULL_MASK);
+                GetCaster()->CastCustomSpell(instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_BURNING_PITCH_DAMAGE_A : SPELL_BURNING_PITCH_DAMAGE_H, SPELLVALUE_BASE_POINT0, 5000, nullptr, TRIGGERED_FULL_MASK);
         }
 
         void Register() override

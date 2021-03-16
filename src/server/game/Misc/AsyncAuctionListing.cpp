@@ -1,9 +1,9 @@
 #include "AsyncAuctionListing.h"
-#include "Player.h"
-#include "Creature.h"
 #include "AuctionHouseMgr.h"
+#include "Creature.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
+#include "Player.h"
 #include "SpellAuraEffects.h"
 
 uint32 AsyncAuctionListingMgr::auctionListingDiff = 0;

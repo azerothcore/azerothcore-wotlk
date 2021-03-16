@@ -8,12 +8,12 @@
 #define ACORE_OBJECTACCESSOR_H
 
 #include "Define.h"
-#include "UpdateData.h"
 #include "GridDefines.h"
 #include "Object.h"
+#include "UpdateData.h"
 #include <ace/Thread_Mutex.h>
-#include <unordered_map>
 #include <set>
+#include <unordered_map>
 
 class Creature;
 class Corpse;
@@ -134,7 +134,7 @@ public:
     template<class T> static T* GetObjectInMap(uint64 guid, Map* map, T* /*typeSpecifier*/)
     {
         ASSERT(map);
-        if (T* obj = GetObjectInWorld(guid, (T*)NULL))
+        if (T* obj = GetObjectInWorld(guid, (T*)nullptr))
             if (obj->GetMap() == map)
                 return obj;
         return nullptr;

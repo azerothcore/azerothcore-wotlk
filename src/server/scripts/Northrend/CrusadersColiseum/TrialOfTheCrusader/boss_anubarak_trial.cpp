@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "trial_of_the_crusader.h"
-#include "SpellScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
+#include "trial_of_the_crusader.h"
 
 enum AnubTexts
 {
@@ -246,7 +246,7 @@ public:
                 events.CancelEvent(EVENT_EMERGE_2);
                 if( !IsHeroic() )
                     events.CancelEvent(EVENT_SUMMON_NERUBIAN);
-                me->CastSpell((Unit*)NULL, SPELL_LEECHING_SWARM, false);
+                me->CastSpell((Unit*)nullptr, SPELL_LEECHING_SWARM, false);
                 Talk(EMOTE_LEECHING_SWARM);
                 Talk(SAY_LEECHING_SWARM);
                 return;
@@ -855,7 +855,7 @@ public:
                     Remove();
                     return;
                 }
-                target->CastSpell((Unit*)NULL, SPELL_IMPALE, true);
+                target->CastSpell((Unit*)nullptr, SPELL_IMPALE, true);
             }
         }
 

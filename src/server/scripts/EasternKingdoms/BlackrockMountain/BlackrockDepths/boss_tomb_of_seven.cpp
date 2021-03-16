@@ -4,11 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "blackrock_depths.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {

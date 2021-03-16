@@ -4,11 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "TransportMgr.h"
-#include "Transport.h"
 #include "InstanceScript.h"
-#include "MoveSpline.h"
 #include "MapManager.h"
+#include "MoveSpline.h"
+#include "Transport.h"
+#include "TransportMgr.h"
 
 TransportTemplate::~TransportTemplate()
 {
@@ -344,7 +344,7 @@ void TransportMgr::AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg,
     animNode.Path[timeSeg] = node;
 }
 
-MotionTransport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map* map /*= NULL*/)
+MotionTransport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map* map /*= nullptr*/)
 {
     // instance case, execute GetGameObjectEntry hook
     if (map)

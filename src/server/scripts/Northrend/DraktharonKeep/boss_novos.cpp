@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "drak_tharon_keep.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Yells
 {
@@ -319,7 +319,7 @@ public:
         void HandleScript(SpellEffIndex /*effIndex*/)
         {
             for (uint8 i = 0; i < 4; ++i)
-                GetCaster()->CastSpell((Unit*)NULL, SPELL_COPY_OF_SUMMON_MINIONS, true);
+                GetCaster()->CastSpell((Unit*)nullptr, SPELL_COPY_OF_SUMMON_MINIONS, true);
         }
 
         void Register() override

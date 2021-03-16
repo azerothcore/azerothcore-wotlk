@@ -4,15 +4,14 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "SocialMgr.h"
-
-#include "DatabaseEnv.h"
-#include "WorldSession.h"
-#include "WorldPacket.h"
-#include "Player.h"
-#include "ObjectMgr.h"
-#include "Util.h"
 #include "AccountMgr.h"
+#include "DatabaseEnv.h"
+#include "ObjectMgr.h"
+#include "Player.h"
+#include "SocialMgr.h"
+#include "Util.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 PlayerSocial::PlayerSocial(): m_playerGUID() { }
 

@@ -6,6 +6,7 @@
 #define DEF_PIT_OF_SARON_H
 
 #include "Chat.h"
+#include "CreatureAIImpl.h"
 
 enum DataTypes
 {

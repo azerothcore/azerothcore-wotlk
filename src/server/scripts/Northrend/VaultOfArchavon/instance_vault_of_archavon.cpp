@@ -4,13 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "vault_of_archavon.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
-#include "SpellAuras.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "vault_of_archavon.h"
 
 /* Vault of Archavon encounters:
 1 - Archavon the Stone Watcher event

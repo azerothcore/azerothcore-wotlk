@@ -11,14 +11,14 @@ Comment: All instance related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
+#include "Language.h"
 #include "MapManager.h"
 #include "Player.h"
-#include "Language.h"
+#include "ScriptMgr.h"
 
 class instance_commandscript : public CommandScript
 {

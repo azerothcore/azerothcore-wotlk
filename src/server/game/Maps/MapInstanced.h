@@ -7,9 +7,9 @@
 #ifndef ACORE_MAP_INSTANCED_H
 #define ACORE_MAP_INSTANCED_H
 
-#include "Map.h"
-#include "InstanceSaveMgr.h"
 #include "DBCEnums.h"
+#include "InstanceSaveMgr.h"
+#include "Map.h"
 
 class MapInstanced : public Map
 {
@@ -31,7 +31,7 @@ public:
     Map* FindInstanceMap(uint32 instanceId) const
     {
         InstancedMaps::const_iterator i = m_InstancedMaps.find(instanceId);
-        return(i == m_InstancedMaps.end() ? NULL : i->second);
+        return(i == m_InstancedMaps.end() ? nullptr : i->second);
     }
     bool DestroyInstance(InstancedMaps::iterator& itr);
 

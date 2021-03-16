@@ -7,11 +7,10 @@
 #ifndef _INSTANCESAVEMGR_H
 #define _INSTANCESAVEMGR_H
 
-#include "Define.h"
 #include "DatabaseEnv.h"
 #include "DBCEnums.h"
+#include "Define.h"
 #include "ObjectDefines.h"
-
 #include <ace/Null_Mutex.h>
 #include <ace/Thread_Mutex.h>
 #include <list>

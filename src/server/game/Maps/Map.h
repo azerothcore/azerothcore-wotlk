@@ -7,22 +7,21 @@
 #ifndef ACORE_MAP_H
 #define ACORE_MAP_H
 
-#include "Define.h"
-#include <ace/RW_Thread_Mutex.h>
-#include <ace/Thread_Mutex.h>
-
-#include "DBCStructure.h"
-#include "GridDefines.h"
 #include "Cell.h"
-#include "Timer.h"
-#include "SharedDefines.h"
-#include "GridRefManager.h"
-#include "MapRefManager.h"
+#include "DataMap.h"
+#include "DBCStructure.h"
+#include "Define.h"
 #include "DynamicTree.h"
 #include "GameObjectModel.h"
-#include "PathGenerator.h"
+#include "GridDefines.h"
+#include "GridRefManager.h"
+#include "MapRefManager.h"
 #include "ObjectDefines.h"
-#include "DataMap.h"
+#include "PathGenerator.h"
+#include "SharedDefines.h"
+#include "Timer.h"
+#include <ace/RW_Thread_Mutex.h>
+#include <ace/Thread_Mutex.h>
 #include <bitset>
 #include <list>
 
