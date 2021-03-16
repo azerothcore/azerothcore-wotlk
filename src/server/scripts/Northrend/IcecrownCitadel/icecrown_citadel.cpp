@@ -1691,7 +1691,7 @@ public:
                 case 0:
                     break;
                 case 1: // Ice Trap
-                    me->CastSpell((Unit*)NULL, 71249, false);
+                    me->CastSpell((Unit*)nullptr, 71249, false);
                     events.RepeatEvent(urand(35000, 40000));
                     break;
                 case 2: // Rapid Shot
@@ -1734,7 +1734,7 @@ public:
                     events.RepeatEvent(urand(40000, 50000));
                     break;
                 case 33: // Twisted Winds
-                    me->CastSpell((Unit*)NULL, 71306, false);
+                    me->CastSpell((Unit*)nullptr, 71306, false);
                     events.RepeatEvent(urand(35000, 50000));
                     break;
                 case 41: // Empowered Shadow Bolt
@@ -2536,7 +2536,7 @@ public:
         void HandleDummy()
         {
             for (uint8 i = 0; i < 10; ++i)
-                GetCaster()->CastSpell((Unit*)NULL, 70963, true);
+                GetCaster()->CastSpell((Unit*)nullptr, 70963, true);
         }
 
         void Register() override

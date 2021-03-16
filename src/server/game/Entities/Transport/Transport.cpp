@@ -837,7 +837,7 @@ void StaticTransport::Update(uint32 diff)
 
 void StaticTransport::RelocateToProgress(uint32 progress)
 {
-    TransportAnimationEntry const* curr = NULL, *next = nullptr;
+    TransportAnimationEntry const* curr = nullptr, *next = nullptr;
     float percPos;
     if (m_goValue.Transport.AnimationInfo->GetAnimNode(progress, curr, next, percPos))
     {

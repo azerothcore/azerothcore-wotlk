@@ -219,7 +219,7 @@ public:
         if (IsNumeric())
         {
             sLog->outSQLDriver("Error: GetCString() on numeric field. Using type: %s.", FieldTypeToString(data.type));
-            return NULL;
+            return nullptr;
         }
 #endif
         return static_cast<char const*>(data.value);
@@ -381,7 +381,7 @@ private:
             case MYSQL_TYPE_NEWDATE:
                 return "NEWDATE";
             case MYSQL_TYPE_NULL:
-                return "NULL";
+                return "nullptr";
             case MYSQL_TYPE_SET:
                 return "SET";
             case MYSQL_TYPE_SHORT:

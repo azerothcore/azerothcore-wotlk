@@ -333,7 +333,7 @@ public:
                 _instance->DoRemoveAurasDueToSpellOnPlayers(70766);
                 me->RemoveAurasDueToSpell(SPELL_CORRUPTION_VALITHRIA);
                 me->CastSpell(me, SPELL_ACHIEVEMENT_CHECK, true);
-                me->CastSpell((Unit*)NULL, SPELL_DREAMWALKERS_RAGE, false);
+                me->CastSpell((Unit*)nullptr, SPELL_DREAMWALKERS_RAGE, false);
                 _events.Reset();
                 _events.ScheduleEvent(EVENT_DREAM_SLIP, 3500);
                 _instance->SetBossState(DATA_VALITHRIA_DREAMWALKER, DONE);
@@ -977,7 +977,7 @@ public:
                 return;
 
             if (!me->HasUnitState(UNIT_STATE_CASTING) && !me->isMoving() && me->IsWithinMeleeRange(me->GetVictim()))
-                me->CastSpell((Unit*)NULL, SPELL_SUPPRESSION, false);
+                me->CastSpell((Unit*)nullptr, SPELL_SUPPRESSION, false);
         }
     };
 
@@ -1169,7 +1169,7 @@ public:
                 return;
 
             if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
-                GetHitUnit()->CastSpell((Unit*)NULL, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetData64(DATA_VALITHRIA_DREAMWALKER));
+                GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetData64(DATA_VALITHRIA_DREAMWALKER));
         }
 
         void Register() override
