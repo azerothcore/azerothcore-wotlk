@@ -526,8 +526,10 @@ enum eWGText
     BATTLEFIELD_WG_TEXT_WORKSHOP_NW_TAKEN        = 12, // Ally, horde +2
     BATTLEFIELD_WG_TEXT_WORKSHOP_SE_TAKEN        = 16, // Ally, horde +2
     BATTLEFIELD_WG_TEXT_WORKSHOP_SW_TAKEN        = 24, // Ally, horde +2
-    BATTLEFIELD_WG_TEXT_DEFEND_KEEP              = 29, // Ally, horde +2
-    BATTLEFIELD_WG_TEXT_WIN_KEEP                 = 30, // Ally, horde +2
+    BATTLEFIELD_WG_TEXT_ALLIANCE_DEFENDED        = 29,
+    BATTLEFIELD_WG_TEXT_ALLIANCE_CAPTURED        = 30,
+    BATTLEFIELD_WG_TEXT_HORDE_DEFENDED           = 31,
+    BATTLEFIELD_WG_TEXT_HORDE_CAPTURED           = 32,
     BATTLEFIELD_WG_TEXT_WILL_START               = 27,
     BATTLEFIELD_WG_TEXT_FIRSTRANK                = 37,
     BATTLEFIELD_WG_TEXT_SECONDRANK               = 38,
@@ -1494,6 +1496,17 @@ struct WGWorkshop
             bf->UpdateCounterVehicle(false);
             bf->CapturePointTaken(bf->GetAreaByGraveyardId(workshopId));
         }
+    }
+
+    /*
+     * When Wintergrasp is successfully captured the Workshops must
+     * swap their team ownership to the defeated team. So if Alliance
+     * was defending, now Hord will be the ones defending. Must update
+     * map and all the gameobjects on the new defending team.
+     */
+    void OnWintergraspCaptured(TeamId team)
+    {
+
     }
 
     void UpdateGraveyardAndWorkshop()

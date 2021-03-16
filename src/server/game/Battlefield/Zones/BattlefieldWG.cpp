@@ -474,10 +474,39 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     m_PlayersInWar[TEAM_ALLIANCE].clear();
     m_PlayersInWar[TEAM_HORDE].clear();
 
-    if (!endByTimer) // win alli/horde
-        SendWarningToAllInZone((GetDefenderTeam() == TEAM_ALLIANCE) ? BATTLEFIELD_WG_TEXT_WIN_KEEP : (BATTLEFIELD_WG_TEXT_WIN_KEEP + 2));
-    else // defend alli/horde
-        SendWarningToAllInZone((GetDefenderTeam() == TEAM_ALLIANCE) ? BATTLEFIELD_WG_TEXT_DEFEND_KEEP : (BATTLEFIELD_WG_TEXT_DEFEND_KEEP + 2));
+    /* When the time is over and the capturing team succeeded
+     * on winning Wintergrasp before time runs out, pass them
+     * the Wintergrasp ownership and display winning message
+     * ---
+     * Otherwise, the graveyard and workshop control will
+     * remain under the sucessfull defending team
+     */
+    if (!endByTimer)
+    {
+        switch (GetAttackerTeam())
+        {
+            case TEAM_ALLIANCE:
+                SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_ALLIANCE_CAPTURED);
+                // TO DO: SWAP GRAVEYARD AND WORKSHOP OWNERSHIP
+                break;
+            case TEAM_HORDE:
+                SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_HORDE_CAPTURED);
+                // TO DO: SWAP GRAVEYARD AND WORKSHOP OWNERSHIP
+                break;
+        }
+    }
+    else
+    {
+        switch (GetDefenderTeam())
+        {
+            case TEAM_ALLIANCE:
+                SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_ALLIANCE_DEFENDED);
+                break;
+            case TEAM_HORDE:
+                SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_HORDE_DEFENDED);
+                break;
+        }
+    }
 }
 
 // *******************************************************
