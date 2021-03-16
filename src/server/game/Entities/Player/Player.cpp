@@ -12925,6 +12925,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
             case EQUIPMENT_SLOT_OFFHAND:
             case EQUIPMENT_SLOT_RANGED:
                 RecalculateRating(CR_ARMOR_PENETRATION);
+                [[fallthrough]];
             default:
                 break;
         }
@@ -13090,6 +13091,7 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update, bool swap)
                         case EQUIPMENT_SLOT_OFFHAND:
                         case EQUIPMENT_SLOT_RANGED:
                             RecalculateRating(CR_ARMOR_PENETRATION);
+                            [[fallthrough]];
                         default:
                             break;
                     }
@@ -15031,7 +15033,6 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                 }
                     break;
                 case GOSSIP_OPTION_LEARNDUALSPEC:
-                    [[fallthrough]];
                 case GOSSIP_OPTION_DUALSPEC_INFO:
                     if (!(GetSpecsCount() == 1 && creature->isCanTrainingAndResetTalentsOf(this) && !(getLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))))
                         canTalk = false;
@@ -20104,6 +20105,7 @@ void Player::_SaveInventory(SQLTransaction& trans)
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
                 stmt->setUInt32(0, item->GetGUIDLow());
                 trans->Append(stmt);
+                [[fallthrough]];
             case ITEM_UNCHANGED:
                 break;
         }
@@ -28011,6 +28013,7 @@ bool Player::HasMeleeSpec()
         case TALENT_TREE_DRUID_FERAL_COMBAT:
             if (GetShapeshiftForm() == FORM_CAT)
                 return true;
+            [[fallthrough]];
         default:
             break;
     }
