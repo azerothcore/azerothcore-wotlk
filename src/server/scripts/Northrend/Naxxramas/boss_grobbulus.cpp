@@ -281,7 +281,7 @@ class spell_grobbulus_mutating_injection : public SpellScriptLoader
                 return ValidateSpellInfo({ SPELL_MUTATING_EXPLOSION });
             }
 
-            void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+            void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
             {
                 switch (GetTargetApplication()->GetRemoveMode())
                 {
