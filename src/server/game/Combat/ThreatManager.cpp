@@ -4,17 +4,17 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ThreatManager.h"
-#include "Unit.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "Map.h"
-#include "Player.h"
 #include "ObjectAccessor.h"
-#include "UnitEvents.h"
+#include "Player.h"
 #include "SpellAuras.h"
-#include "SpellMgr.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "ThreatManager.h"
+#include "Unit.h"
+#include "UnitEvents.h"
 
 //==============================================================
 //================= ThreatCalcHelper ===========================
@@ -171,11 +171,11 @@ void HostileReference::updateOnlineStatus()
     // target is no player or not gamemaster
     // target is not in flight
     if (isValid()
-        && (getTarget()->GetTypeId() != TYPEID_PLAYER || !getTarget()->ToPlayer()->IsGameMaster())
-        && !getTarget()->IsInFlight()
-        && getTarget()->IsInMap(GetSourceUnit())
-        && getTarget()->InSamePhase(GetSourceUnit())
-        )
+            && (getTarget()->GetTypeId() != TYPEID_PLAYER || !getTarget()->ToPlayer()->IsGameMaster())
+            && !getTarget()->IsInFlight()
+            && getTarget()->IsInMap(GetSourceUnit())
+            && getTarget()->InSamePhase(GetSourceUnit())
+       )
     {
         Creature* creature = GetSourceUnit()->ToCreature();
         online = getTarget()->isInAccessiblePlaceFor(creature);
@@ -238,7 +238,7 @@ void ThreatContainer::clearReferences()
 }
 
 //============================================================
-// Return the HostileReference of NULL, if not found
+// Return the HostileReference of nullptr, if not found
 HostileReference* ThreatContainer::getReferenceByTarget(Unit* victim) const
 {
     if (!victim)
@@ -247,7 +247,7 @@ HostileReference* ThreatContainer::getReferenceByTarget(Unit* victim) const
     uint64 const guid = victim->GetGUID();
     for (ThreatContainer::StorageType::const_iterator i = iThreatList.begin(); i != iThreatList.end(); ++i)
     {
-        HostileReference *ref = (*i);
+        HostileReference* ref = (*i);
         if (ref && ref->getUnitGuid() == guid)
             return ref;
     }
@@ -296,13 +296,12 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
     HostileReference* currentRef = nullptr;
     bool found = false;
     bool noPriorityTargetFound = false;
-    uint32 currTime = sWorld->GetGameTime();
 
     // pussywizard: currentVictim is needed to compare if threat was exceeded by 10%/30% for melee/range targets (only then switching current target)
     if (currentVictim)
     {
         Unit* cvUnit = currentVictim->getTarget();
-        if (!attacker->_CanDetectFeignDeathOf(cvUnit) || !attacker->CanCreatureAttack(cvUnit) || attacker->isTargetNotAcceptableByMMaps(cvUnit->GetGUID(), currTime, cvUnit)) // pussywizard: if currentVictim is not valid => don't compare the threat with it, just take the highest threat valid target
+        if (!attacker->_CanDetectFeignDeathOf(cvUnit) || !attacker->CanCreatureAttack(cvUnit)) // pussywizard: if currentVictim is not valid => don't compare the threat with it, just take the highest threat valid target
             currentVictim = nullptr;
         else if (cvUnit->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()) || cvUnit->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE)) // pussywizard: no 10%/30% if currentVictim is immune to damage or has auras breakable by damage
             currentVictim = nullptr;
@@ -337,9 +336,9 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* attacker, HostileR
         }
 
         // pussywizard: skip not valid targets
-        if (attacker->_CanDetectFeignDeathOf(target) && attacker->CanCreatureAttack(target) && !attacker->isTargetNotAcceptableByMMaps(target->GetGUID(), currTime, target))
+        if (attacker->_CanDetectFeignDeathOf(target) && attacker->CanCreatureAttack(target))
         {
-            if (currentVictim) // pussywizard: if not NULL then target must have 10%/30% more threat
+            if (currentVictim) // pussywizard: if not nullptr then target must have 10%/30% more threat
             {
                 if (currentVictim == currentRef) // pussywizard: nothing found previously was good and enough, currentRef passed all necessary tests, so end now
                 {
@@ -438,7 +437,7 @@ void ThreatManager::_addThreat(Unit* victim, float threat)
 
     if (!ref) // there was no ref => create a new one
     {
-                                                            // threat has to be 0 here
+        // threat has to be 0 here
         HostileReference* hostileRef = new HostileReference(victim, this, 0);
         iThreatContainer.addReference(hostileRef);
         hostileRef->addThreat(threat); // now we add the real threat
@@ -461,7 +460,7 @@ Unit* ThreatManager::getHostilTarget()
     iThreatContainer.update();
     HostileReference* nextVictim = iThreatContainer.selectNextVictim(GetOwner()->ToCreature(), getCurrentVictim());
     setCurrentVictim(nextVictim);
-    return getCurrentVictim() != NULL ? getCurrentVictim()->getTarget() : nullptr;
+    return getCurrentVictim() != nullptr ? getCurrentVictim()->getTarget() : nullptr;
 }
 
 //============================================================
@@ -535,8 +534,8 @@ void ThreatManager::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStat
     switch (threatRefStatusChangeEvent->getType())
     {
         case UEV_THREAT_REF_THREAT_CHANGE:
-            if ((getCurrentVictim() == hostilRef && threatRefStatusChangeEvent->getFValue()<0.0f) ||
-                (getCurrentVictim() != hostilRef && threatRefStatusChangeEvent->getFValue()>0.0f))
+            if ((getCurrentVictim() == hostilRef && threatRefStatusChangeEvent->getFValue() < 0.0f) ||
+                    (getCurrentVictim() != hostilRef && threatRefStatusChangeEvent->getFValue() > 0.0f))
                 setDirty(true);                             // the order in the threat list might have changed
             break;
         case UEV_THREAT_REF_ONLINE_STATUS:
@@ -594,7 +593,7 @@ bool ThreatManager::isNeedUpdateToClient(uint32 time)
 // Reset all aggro without modifying the threatlist.
 void ThreatManager::resetAllAggro()
 {
-    ThreatContainer::StorageType &threatList = iThreatContainer.iThreatList;
+    ThreatContainer::StorageType& threatList = iThreatContainer.iThreatList;
     if (threatList.empty())
         return;
 

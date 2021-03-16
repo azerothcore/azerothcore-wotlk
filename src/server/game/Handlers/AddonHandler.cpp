@@ -4,11 +4,11 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "zlib.h"
 #include "AddonHandler.h"
 #include "DatabaseEnv.h"
-#include "Opcodes.h"
 #include "Log.h"
+#include "Opcodes.h"
+#include "zlib.h"
 
 AddonHandler::AddonHandler()
 {
@@ -47,7 +47,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 
     AddOnPacked.resize(AddonRealSize);                      // resize target for zlib action
 
-    if (uncompress(const_cast<uint8*>(AddOnPacked.contents()), &AddonRealSize, const_cast<uint8*>((*Source).contents() + CurrentPosition), (*Source).size() - CurrentPosition)== Z_OK)
+    if (uncompress(const_cast<uint8*>(AddOnPacked.contents()), &AddonRealSize, const_cast<uint8*>((*Source).contents() + CurrentPosition), (*Source).size() - CurrentPosition) == Z_OK)
     {
         Target->Initialize(SMSG_ADDON_INFO);
 
@@ -61,13 +61,13 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
             uint32 crc, unk2;
 
             // check next addon data format correctness
-            if (AddOnPacked.rpos()+1 > AddOnPacked.size())
+            if (AddOnPacked.rpos() + 1 > AddOnPacked.size())
                 return false;
 
             AddOnPacked >> addonName;
 
             // recheck next addon data format correctness
-            if (AddOnPacked.rpos()+1+4+4 > AddOnPacked.size())
+            if (AddOnPacked.rpos() + 1 + 4 + 4 > AddOnPacked.size())
                 return false;
 
             AddOnPacked >> enabled >> crc >> unk2;

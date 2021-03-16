@@ -4,12 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "DBCStructure.h"
 #include "HostileRefManager.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "ThreatManager.h"
 #include "Unit.h"
-#include "DBCStructure.h"
-#include "SpellMgr.h"
-#include "SpellInfo.h"
 
 HostileRefManager::~HostileRefManager()
 {
@@ -155,7 +155,7 @@ void HostileRefManager::deleteReference(Unit* creature)
 void HostileRefManager::deleteReferencesOutOfRange(float range)
 {
     HostileReference* ref = getFirst();
-    range = range*range;
+    range = range * range;
     while (ref)
     {
         HostileReference* nextRef = ref->next();
@@ -195,8 +195,8 @@ void HostileRefManager::UpdateVisibility(bool checkThreat)
     while (ref)
     {
         HostileReference* nextRef = ref->next();
-        if ((!checkThreat || ref->GetSource()->getThreatList().size() <= 1) && 
-            !ref->GetSource()->GetOwner()->CanSeeOrDetect(GetOwner()))
+        if ((!checkThreat || ref->GetSource()->getThreatList().size() <= 1) &&
+                !ref->GetSource()->GetOwner()->CanSeeOrDetect(GetOwner()))
         {
             nextRef = ref->next();
             ref->removeReference();

@@ -20,26 +20,26 @@ namespace VMAP
     // maybe add MapBuilder as friend to all of the below classes would be better?
 
     // declared in src/common/vmap/MapTree.h
-    void StaticMapTree::getModelInstances(ModelInstance* &models, uint32 &count)
+    void StaticMapTree::getModelInstances(ModelInstance*& models, uint32& count)
     {
         models = iTreeValues;
         count = iNTreeValues;
     }
 
     // declared in src/common/vmap/VMapManager2.h
-    void VMapManager2::getInstanceMapTree(InstanceTreeMap &instanceMapTree)
+    void VMapManager2::getInstanceMapTree(InstanceTreeMap& instanceMapTree)
     {
         instanceMapTree = iInstanceMapTrees;
     }
 
     // declared in src/common/vmap/WorldModel.h
-    void WorldModel::getGroupModels(std::vector<GroupModel> &groupModels)
+    void WorldModel::getGroupModels(std::vector<GroupModel>& groupModels)
     {
         groupModels = this->groupModels;
     }
 
     // declared in src/common/vmap/WorldModel.h
-    void GroupModel::getMeshData(std::vector<G3D::Vector3> &vertices, std::vector<MeshTriangle> &triangles, WmoLiquid* &liquid)
+    void GroupModel::getMeshData(std::vector<G3D::Vector3>& vertices, std::vector<MeshTriangle>& triangles, WmoLiquid*& liquid)
     {
         vertices = this->vertices;
         triangles = this->triangles;
@@ -53,7 +53,7 @@ namespace VMAP
     }
 
     // declared in src/common/vmap/WorldModel.h
-    void WmoLiquid::getPosInfo(uint32 &tilesX, uint32 &tilesY, G3D::Vector3 &corner) const
+    void WmoLiquid::getPosInfo(uint32& tilesX, uint32& tilesY, G3D::Vector3& corner) const
     {
         tilesX = iTilesX;
         tilesY = iTilesY;

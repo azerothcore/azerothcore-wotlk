@@ -14,7 +14,7 @@ ACE_INLINE void
 closedir (ACE_DIR *d)
 {
 #if defined (ACE_HAS_DIRENT)
-# if defined (ACE_WIN32) && defined (ACE_LACKS_CLOSEDIR)
+# if (defined (ACE_WIN32) || defined (ACE_MQX)) && defined (ACE_LACKS_CLOSEDIR)
   ACE_OS::closedir_emulation (d);
   delete [] d->directory_name_;
   delete d;
@@ -33,7 +33,7 @@ ACE_INLINE ACE_DIR *
 opendir (const ACE_TCHAR *filename)
 {
 #if defined (ACE_HAS_DIRENT)
-#    if defined (ACE_WIN32) && defined (ACE_LACKS_OPENDIR)
+#    if (defined (ACE_WIN32) || defined(ACE_MQX)) && defined (ACE_LACKS_OPENDIR)
   return ::ACE_OS::opendir_emulation (filename);
 #  elif defined (ACE_HAS_WOPENDIR) && defined (ACE_USES_WCHAR)
   return ::wopendir (filename);
@@ -52,7 +52,7 @@ ACE_INLINE struct ACE_DIRENT *
 readdir (ACE_DIR *d)
 {
 #if defined (ACE_HAS_DIRENT)
-#  if defined (ACE_WIN32) && defined (ACE_LACKS_READDIR)
+#  if (defined (ACE_WIN32) || defined (ACE_MQX)) && defined (ACE_LACKS_READDIR)
      return ACE_OS::readdir_emulation (d);
 #  elif defined (ACE_HAS_WREADDIR) && defined (ACE_USES_WCHAR)
      return ::wreaddir (d);

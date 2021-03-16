@@ -4,25 +4,25 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Chat.h"
 #include "Common.h"
-#include "TicketMgr.h"
 #include "DatabaseEnv.h"
 #include "Language.h"
 #include "Log.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "TicketMgr.h"
+#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Chat.h"
-#include "World.h"
-#include "Player.h"
-#include "Opcodes.h"
 
 inline float GetAge(uint64 t) { return float(time(nullptr) - t) / DAY; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // GM ticket
 GmTicket::GmTicket() : _id(0), _playerGuid(0), _type(TICKET_TYPE_OPEN), _posX(0), _posY(0), _posZ(0), _mapId(0), _createTime(0), _lastModifiedTime(0),
-                       _closedBy(0), _resolvedBy(0), _assignedTo(0), _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false),
-                       _needResponse(false), _needMoreHelp(false) { }
+    _closedBy(0), _resolvedBy(0), _assignedTo(0), _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false),
+    _needResponse(false), _needMoreHelp(false) { }
 
 GmTicket::GmTicket(Player* player) : _type(TICKET_TYPE_OPEN), _createTime(time(nullptr)), _lastModifiedTime(time(nullptr)), _closedBy(0), _resolvedBy(0), _assignedTo(0), _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false), _needMoreHelp(false)
 {
@@ -191,8 +191,12 @@ void GmTicket::SetUnassigned()
     _assignedTo = 0;
     switch (_escalatedStatus)
     {
-        case TICKET_ASSIGNED: _escalatedStatus = TICKET_UNASSIGNED; break;
-        case TICKET_ESCALATED_ASSIGNED: _escalatedStatus = TICKET_IN_ESCALATION_QUEUE; break;
+        case TICKET_ASSIGNED:
+            _escalatedStatus = TICKET_UNASSIGNED;
+            break;
+        case TICKET_ESCALATED_ASSIGNED:
+            _escalatedStatus = TICKET_IN_ESCALATION_QUEUE;
+            break;
         case TICKET_UNASSIGNED:
         case TICKET_IN_ESCALATION_QUEUE:
         default:
@@ -315,7 +319,7 @@ void TicketMgr::LoadTickets()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u GM tickets in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-
+    sLog->outString();
 }
 
 void TicketMgr::LoadSurveys()
@@ -328,7 +332,7 @@ void TicketMgr::LoadSurveys()
         _lastSurveyId = (*result)[0].GetUInt32();
 
     sLog->outString(">> Loaded GM Survey count from database in %u ms", GetMSTimeDiffToNow(oldMSTime));
-
+    sLog->outString();
 }
 
 void TicketMgr::AddTicket(GmTicket* ticket)
@@ -374,7 +378,6 @@ void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, int64 source)
         ticket->SaveToDB(trans);
     }
 }
-
 
 void TicketMgr::ShowList(ChatHandler& handler, bool onlineOnly) const
 {

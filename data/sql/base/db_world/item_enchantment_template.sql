@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `item_enchantment_template`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `item_enchantment_template` 
 (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `ench` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `chance` float unsigned NOT NULL DEFAULT '0',
+  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ench` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `chance` float unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`entry`,`ench`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Item Random Enchantment System';
 /*!40101 SET character_set_client = @saved_cs_client */;

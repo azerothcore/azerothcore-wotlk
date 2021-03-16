@@ -5,10 +5,10 @@
  */
 
 #include "Common.h"
-#include "RealmList.h"
 #include "DatabaseEnv.h"
+#include "RealmList.h"
 
-RealmList::RealmList() : m_UpdateInterval(0), m_NextUpdateTime(time(nullptr)) { }
+RealmList::RealmList() :  m_NextUpdateTime(time(nullptr)) { }
 
 RealmList* RealmList::instance()
 {
@@ -94,7 +94,6 @@ void RealmList::UpdateRealms(bool init)
 
             if (init)
                 sLog->outString("Added realm \"%s\" at %s:%u.", name.c_str(), m_realms[name].ExternalAddress.get_host_addr(), port);
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 }

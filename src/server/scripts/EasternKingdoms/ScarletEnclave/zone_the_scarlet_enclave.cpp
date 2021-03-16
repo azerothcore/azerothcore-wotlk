@@ -4,10 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 /*####
 ## npc_valkyr_battle_maiden
@@ -108,10 +108,10 @@ public:
                         break;
                 }
                 ++phase;
-            } else FlyBackTimer-=diff;
+            }
+            else FlyBackTimer -= diff;
         }
     };
-
 };
 
 void AddSC_the_scarlet_enclave()

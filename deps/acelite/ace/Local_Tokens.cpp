@@ -119,11 +119,11 @@ ACE_TPQ_Entry::ACE_TPQ_Entry (const ACE_Token_Proxy *new_proxy,
 
       // The cast is an attempt to get this to compile (and run,
       // hopefully) regardless of the type of ACE_thread_t.
-      ACE_OS::sprintf (name,
-                       ACE_TEXT ("/%s/%u/%lu"),
-                       host_name,
-                       static_cast<u_int> (ACE_OS::getpid ()),
-                       *reinterpret_cast<u_long *> (&thread_id));
+      ACE_OS::snprintf (name, sizeof name / sizeof name[0],
+                        ACE_TEXT ("/%s/%u/%lu"),
+                        host_name,
+                        static_cast<u_int> (ACE_OS::getpid ()),
+                        *reinterpret_cast<u_long *> (&thread_id));
 
       this->client_id (name);
     }
@@ -1188,8 +1188,8 @@ ACE_Token_Proxy::open (const ACE_TCHAR *token_name,
   // We must have a name.
   if (token_name == 0)
     {
-      ACE_OS::sprintf (name, ACE_TEXT ("token %lx"),
-                       reinterpret_cast<long> (this));
+      ACE_OS::snprintf (name, BUFSIZ, ACE_TEXT ("token %lx"),
+                        reinterpret_cast<long> (this));
       token_name = name;
     }
 

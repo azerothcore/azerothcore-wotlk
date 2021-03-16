@@ -7,28 +7,28 @@
 #ifndef _WARDEN_MAC_H
 #define _WARDEN_MAC_H
 
-#include "Cryptography/ARC4.h"
-#include <map>
-#include "Cryptography/BigNumber.h"
 #include "ByteBuffer.h"
+#include "ARC4.h"
+#include "BigNumber.h"
 #include "Warden.h"
+#include <map>
 
 class WorldSession;
 class Warden;
 
 class WardenMac : public Warden
 {
-    public:
-        WardenMac();
-        ~WardenMac();
+public:
+    WardenMac();
+    ~WardenMac() override;
 
-        void Init(WorldSession* session, BigNumber* k);
-        ClientWardenModule* GetModuleForClient();
-        void InitializeModule();
-        void RequestHash();
-        void HandleHashResult(ByteBuffer& buff);
-        void RequestData();
-        void HandleData(ByteBuffer& buff);
+    void Init(WorldSession* session, BigNumber* k) override;
+    ClientWardenModule* GetModuleForClient() override;
+    void InitializeModule() override;
+    void RequestHash() override;
+    void HandleHashResult(ByteBuffer& buff) override;
+    void RequestChecks() override;
+    void HandleData(ByteBuffer& buff) override;
 };
 
 #endif

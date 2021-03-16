@@ -5,9 +5,9 @@
  */
 
 #include "BattlefieldMgr.h"
-#include "Zones/BattlefieldWG.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "Zones/BattlefieldWG.h"
 
 BattlefieldMgr::BattlefieldMgr()
 {
@@ -36,6 +36,7 @@ void BattlefieldMgr::InitBattlefield()
     {
         sLog->outString();
         sLog->outString("Battlefield : Wintergrasp init failed.");
+        sLog->outString();
         delete pBf;
     }
     else
@@ -43,6 +44,7 @@ void BattlefieldMgr::InitBattlefield()
         m_BattlefieldSet.push_back(pBf);
         sLog->outString();
         sLog->outString("Battlefield : Wintergrasp successfully initiated.");
+        sLog->outString();
     }
 
     /* For Cataclysm: Tol Barad
@@ -50,26 +52,26 @@ void BattlefieldMgr::InitBattlefield()
        // respawn, init variables
        if(!pBf->SetupBattlefield())
        {
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
        sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Battlefield : Tol Barad init failed.");
-#endif
+    #endif
        delete pBf;
        }
        else
        {
        m_BattlefieldSet.push_back(pBf);
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
+    #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
        sLog->outDebug(LOG_FILTER_BATTLEFIELD, "Battlefield : Tol Barad successfully initiated.");
-#endif
+    #endif
        } */
 }
 
-void BattlefieldMgr::AddZone(uint32 zoneid, Battlefield *handle)
+void BattlefieldMgr::AddZone(uint32 zoneid, Battlefield* handle)
 {
     m_BattlefieldMap[zoneid] = handle;
 }
 
-void BattlefieldMgr::HandlePlayerEnterZone(Player * player, uint32 zoneid)
+void BattlefieldMgr::HandlePlayerEnterZone(Player* player, uint32 zoneid)
 {
     BattlefieldMap::iterator itr = m_BattlefieldMap.find(zoneid);
     if (itr == m_BattlefieldMap.end())
@@ -84,7 +86,7 @@ void BattlefieldMgr::HandlePlayerEnterZone(Player * player, uint32 zoneid)
 #endif
 }
 
-void BattlefieldMgr::HandlePlayerLeaveZone(Player * player, uint32 zoneid)
+void BattlefieldMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneid)
 {
     BattlefieldMap::iterator itr = m_BattlefieldMap.find(zoneid);
     if (itr == m_BattlefieldMap.end())
@@ -99,7 +101,7 @@ void BattlefieldMgr::HandlePlayerLeaveZone(Player * player, uint32 zoneid)
 #endif
 }
 
-Battlefield *BattlefieldMgr::GetBattlefieldToZoneId(uint32 zoneid)
+Battlefield* BattlefieldMgr::GetBattlefieldToZoneId(uint32 zoneid)
 {
     BattlefieldMap::iterator itr = m_BattlefieldMap.find(zoneid);
     if (itr == m_BattlefieldMap.end())
@@ -112,7 +114,7 @@ Battlefield *BattlefieldMgr::GetBattlefieldToZoneId(uint32 zoneid)
     return itr->second;
 }
 
-Battlefield *BattlefieldMgr::GetBattlefieldByBattleId(uint32 battleid)
+Battlefield* BattlefieldMgr::GetBattlefieldByBattleId(uint32 battleid)
 {
     for (BattlefieldSet::iterator itr = m_BattlefieldSet.begin(); itr != m_BattlefieldSet.end(); ++itr)
     {
@@ -129,12 +131,12 @@ void BattlefieldMgr::Update(uint32 diff)
     {
         for (BattlefieldSet::iterator itr = m_BattlefieldSet.begin(); itr != m_BattlefieldSet.end(); ++itr)
             //if ((*itr)->IsEnabled())
-                (*itr)->Update(m_UpdateTimer);
+            (*itr)->Update(m_UpdateTimer);
         m_UpdateTimer = 0;
     }
 }
 
-ZoneScript *BattlefieldMgr::GetZoneScript(uint32 zoneId)
+ZoneScript* BattlefieldMgr::GetZoneScript(uint32 zoneId)
 {
     BattlefieldMap::iterator itr = m_BattlefieldMap.find(zoneId);
     if (itr != m_BattlefieldMap.end())

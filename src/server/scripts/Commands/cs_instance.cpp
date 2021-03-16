@@ -11,14 +11,14 @@ Comment: All instance related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
+#include "Language.h"
 #include "MapManager.h"
 #include "Player.h"
-#include "Language.h"
+#include "ScriptMgr.h"
 
 class instance_commandscript : public CommandScript
 {
@@ -30,10 +30,10 @@ public:
         static std::vector<ChatCommand> instanceCommandTable =
         {
             { "listbinds",      SEC_MODERATOR,      false,  &HandleInstanceListBindsCommand,    "" },
-            { "unbind",         SEC_MODERATOR,      false,  &HandleInstanceUnbindCommand,       "" },
+            { "unbind",         SEC_GAMEMASTER,      false,  &HandleInstanceUnbindCommand,       "" },
             { "stats",          SEC_MODERATOR,      true,   &HandleInstanceStatsCommand,        "" },
             { "savedata",       SEC_ADMINISTRATOR,  false,  &HandleInstanceSaveDataCommand,     "" },
-            { "setbossstate",   SEC_MODERATOR,      true,   &HandleInstanceSetBossStateCommand, "" },
+            { "setbossstate",   SEC_GAMEMASTER,      true,   &HandleInstanceSetBossStateCommand, "" },
             { "getbossstate",   SEC_MODERATOR,      true,   &HandleInstanceGetBossStateCommand, "" }
         };
 
@@ -136,7 +136,10 @@ public:
         uint32 dungeon = 0, battleground = 0, arena = 0, spectators = 0;
         sMapMgr->GetNumInstances(dungeon, battleground, arena);
         handler->PSendSysMessage("instances loaded: dungeons (%d), battlegrounds (%d), arenas (%d)", dungeon, battleground, arena);
-        dungeon = 0; battleground = 0; arena = 0; spectators = 0;
+        dungeon = 0;
+        battleground = 0;
+        arena = 0;
+        spectators = 0;
         sMapMgr->GetNumPlayersInInstances(dungeon, battleground, arena, spectators);
         handler->PSendSysMessage("players in instances: dungeons (%d), battlegrounds (%d), arenas (%d + %d spect)", dungeon, battleground, arena, spectators);
 

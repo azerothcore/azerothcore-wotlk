@@ -40,7 +40,7 @@ else()
   message("* Build map/vmap tools            : No  (default)")
 endif()
 
-if( UNIT_TESTS )
+if( BUILD_TESTING )
   message("* Build unit tests                : Yes")
 else()
   message("* Build unit tests                : No  (default)")
@@ -145,4 +145,3 @@ else()
 endif()
 
 message("")
-

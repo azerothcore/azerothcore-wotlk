@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PacketLog.h"
-#include "Config.h"
 #include "ByteBuffer.h"
+#include "Config.h"
+#include "PacketLog.h"
 #include "WorldPacket.h"
 
 PacketLog::PacketLog() : _file(nullptr)
@@ -30,20 +30,20 @@ PacketLog* PacketLog::instance()
 
 void PacketLog::Initialize()
 {
-    std::string logsDir = sConfigMgr->GetStringDefault("LogsDir", "");
+    std::string logsDir = sConfigMgr->GetOption<std::string>("LogsDir", "");
 
     if (!logsDir.empty())
-        if ((logsDir.at(logsDir.length()-1) != '/') && (logsDir.at(logsDir.length()-1) != '\\'))
+        if ((logsDir.at(logsDir.length() - 1) != '/') && (logsDir.at(logsDir.length() - 1) != '\\'))
             logsDir.push_back('/');
 
-    std::string logname = sConfigMgr->GetStringDefault("PacketLogFile", "");
+    std::string logname = sConfigMgr->GetOption<std::string>("PacketLogFile", "");
     if (!logname.empty())
         _file = fopen((logsDir + logname).c_str(), "wb");
 }
 
 void PacketLog::LogPacket(WorldPacket const& packet, Direction direction)
 {
-    ByteBuffer data(4+4+4+1+packet.size());
+    ByteBuffer data(4 + 4 + 4 + 1 + packet.size());
     data << int32(packet.GetOpcode());
     data << int32(packet.size());
     data << uint32(time(nullptr));

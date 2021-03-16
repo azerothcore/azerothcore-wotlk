@@ -4,9 +4,9 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "IdleMovementGenerator.h"
-#include "CreatureAI.h"
 #include "Creature.h"
+#include "CreatureAI.h"
+#include "IdleMovementGenerator.h"
 
 IdleMovementGenerator si_idleMovement;
 
@@ -64,7 +64,7 @@ void RotateMovementGenerator::Finalize(Unit* unit)
 {
     unit->ClearUnitState(UNIT_STATE_ROTATING);
     if (unit->GetTypeId() == TYPEID_UNIT)
-      unit->ToCreature()->AI()->MovementInform(ROTATE_MOTION_TYPE, 0);
+        unit->ToCreature()->AI()->MovementInform(ROTATE_MOTION_TYPE, 0);
 }
 
 void DistractMovementGenerator::Initialize(Unit* owner)

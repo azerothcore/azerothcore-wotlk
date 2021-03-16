@@ -12,14 +12,14 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
-#include "ScriptMgr.h"
-#include "ObjectMgr.h"
 #include "Language.h"
-#include "SpellMgr.h"
-#include "SpellInfo.h"
-#include "Player.h"
+#include "ObjectMgr.h"
 #include "Pet.h"
+#include "Player.h"
 #include "PlayerCommand.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
 
 class learn_commandscript : public CommandScript, public PlayerCommand
 {
@@ -248,7 +248,7 @@ public:
             // search highest talent rank
             uint32 spellId = 0;
 
-            for (int8 rank = MAX_TALENT_RANK-1; rank >= 0; --rank)
+            for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
             {
                 if (talentInfo->RankID[rank] != 0)
                 {
@@ -306,7 +306,7 @@ public:
                 continue;
 
             if ((skillInfo->categoryId == SKILL_CATEGORY_PROFESSION || skillInfo->categoryId == SKILL_CATEGORY_SECONDARY) &&
-                skillInfo->canLink)                             // only prof. with recipes have
+                    skillInfo->canLink)                             // only prof. with recipes have
             {
                 HandleLearnSkillRecipesHelper(handler->GetSession()->GetPlayer(), skillInfo->id);
             }
@@ -349,8 +349,8 @@ public:
                 continue;
 
             if ((skillInfo->categoryId != SKILL_CATEGORY_PROFESSION &&
-                skillInfo->categoryId != SKILL_CATEGORY_SECONDARY) ||
-                !skillInfo->canLink)                            // only prof with recipes have set
+                    skillInfo->categoryId != SKILL_CATEGORY_SECONDARY) ||
+                    !skillInfo->canLink)                            // only prof with recipes have set
                 continue;
 
             int locale = handler->GetSessionDbcLocale();

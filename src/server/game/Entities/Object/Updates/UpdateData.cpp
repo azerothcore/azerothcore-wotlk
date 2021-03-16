@@ -4,13 +4,13 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
 #include "ByteBuffer.h"
-#include "WorldPacket.h"
-#include "UpdateData.h"
+#include "Common.h"
 #include "Log.h"
 #include "Opcodes.h"
+#include "UpdateData.h"
 #include "World.h"
+#include "WorldPacket.h"
 #include "zlib.h"
 
 UpdateData::UpdateData() : m_blockCount(0)
@@ -23,19 +23,19 @@ void UpdateData::AddOutOfRangeGUID(uint64 guid)
     m_outOfRangeGUIDs.push_back(guid);
 }
 
-void UpdateData::AddUpdateBlock(const ByteBuffer &block)
+void UpdateData::AddUpdateBlock(const ByteBuffer& block)
 {
     m_data.append(block);
     ++m_blockCount;
 }
 
-void UpdateData::AddUpdateBlock(const UpdateData &block)
+void UpdateData::AddUpdateBlock(const UpdateData& block)
 {
     m_data.append(block.m_data);
     m_blockCount += block.m_blockCount;
 }
 
-void UpdateData::Compress(void* dst, uint32 *dst_size, void* src, int src_size)
+void UpdateData::Compress(void* dst, uint32* dst_size, void* src, int src_size)
 {
     z_stream c_stream;
 
@@ -142,4 +142,3 @@ void UpdateData::Clear()
     m_outOfRangeGUIDs.clear();
     m_blockCount = 0;
 }
-

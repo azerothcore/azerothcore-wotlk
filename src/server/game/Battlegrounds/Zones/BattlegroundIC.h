@@ -434,8 +434,8 @@ enum BannersTypes
 
 enum BG_IC_MaxSpawns
 {
-    MAX_NORMAL_GAMEOBJECTS_SPAWNS                       = BG_IC_GO_DOODAD_ND_WINTERORC_WALL_GATEFX_DOOR03+1,
-    MAX_NORMAL_NPCS_SPAWNS                              = BG_IC_NPC_KEEP_CANNON_25+1,
+    MAX_NORMAL_GAMEOBJECTS_SPAWNS                       = BG_IC_GO_DOODAD_ND_WINTERORC_WALL_GATEFX_DOOR03 + 1,
+    MAX_NORMAL_NPCS_SPAWNS                              = BG_IC_NPC_KEEP_CANNON_25 + 1,
     MAX_WORKSHOP_SPAWNS                                 = 10,
     MAX_DOCKS_SPAWNS                                    = 12,
     MAX_SPIRIT_GUIDES_SPAWNS                            = 7,
@@ -828,9 +828,9 @@ enum ICNodeState
     NODE_STATE_CONTROLLED_H
 };
 
-const uint32 BG_IC_GraveyardIds[MAX_NODE_TYPES+2] = {0, 0, 1480, 1481, 1482, 1485, 1486, 1483, 1484};
+const uint32 BG_IC_GraveyardIds[MAX_NODE_TYPES + 2] = {0, 0, 1480, 1481, 1482, 1485, 1486, 1483, 1484};
 
-const float BG_IC_SpiritGuidePos[MAX_NODE_TYPES+2][4] =
+const float BG_IC_SpiritGuidePos[MAX_NODE_TYPES + 2][4] =
 {
     {0.0f, 0.0f, 0.0f, 0.0f},                     // no grave
     {0.0f, 0.0f, 0.0f, 0.0f},                     // no grave
@@ -879,117 +879,129 @@ enum HonorRewards
 struct BattlegroundICScore : public BattlegroundScore
 {
     BattlegroundICScore(Player* player) : BattlegroundScore(player), BasesAssaulted(0), BasesDefended(0) { }
-    ~BattlegroundICScore() { }
+    ~BattlegroundICScore() override { }
     uint32 BasesAssaulted;
     uint32 BasesDefended;
 
-    uint32 GetAttr1() const final override { return BasesAssaulted; }
-    uint32 GetAttr2() const final override { return BasesDefended; }
+    uint32 GetAttr1() const final { return BasesAssaulted; }
+    uint32 GetAttr2() const final { return BasesDefended; }
 };
 
 class BattlegroundIC : public Battleground
 {
-    public:
-        BattlegroundIC();
-        ~BattlegroundIC();
+public:
+    BattlegroundIC();
+    ~BattlegroundIC() override;
 
-        /* inherited from BattlegroundClass */
-        void AddPlayer(Player* player);
-        void StartingEventCloseDoors();
-        void StartingEventOpenDoors();
-        void PostUpdateImpl(uint32 diff);
+    /* inherited from BattlegroundClass */
+    void AddPlayer(Player* player) override;
+    void StartingEventCloseDoors() override;
+    void StartingEventOpenDoors() override;
+    void PostUpdateImpl(uint32 diff) override;
 
-        void RemovePlayer(Player* player);
-        void HandleAreaTrigger(Player* player, uint32 trigger);
-        bool SetupBattleground();
-        void SpawnLeader(uint32 teamid);
-        void HandleKillUnit(Creature* unit, Player* killer);
-        void HandleKillPlayer(Player* player, Player* killer);
-        void EndBattleground(TeamId winnerTeamId);
-        void EventPlayerClickedOnFlag(Player* source, GameObject* /*gameObject*/);
+    void RemovePlayer(Player* player) override;
+    void HandleAreaTrigger(Player* player, uint32 trigger) override;
+    bool SetupBattleground() override;
+    void SpawnLeader(uint32 teamid);
+    void HandleKillUnit(Creature* unit, Player* killer) override;
+    void HandleKillPlayer(Player* player, Player* killer) override;
+    void EndBattleground(TeamId winnerTeamId) override;
+    void EventPlayerClickedOnFlag(Player* source, GameObject* /*gameObject*/) override;
 
-        void EventPlayerDamagedGO(Player* /*player*/, GameObject* go, uint32 eventType);
-        void DestroyGate(Player* player, GameObject* go);
+    void EventPlayerDamagedGO(Player* /*player*/, GameObject* go, uint32 eventType) override;
+    void DestroyGate(Player* player, GameObject* go) override;
 
-        GraveyardStruct const* GetClosestGraveyard(Player* player);
+    GraveyardStruct const* GetClosestGraveyard(Player* player) override;
 
-        /* Scorekeeping */
-        void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
+    /* Scorekeeping */
+    void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
 
-        void FillInitialWorldStates(WorldPacket& data);
+    void FillInitialWorldStates(WorldPacket& data) override;
 
-        void HandlePlayerResurrect(Player* player);
+    void HandlePlayerResurrect(Player* player) override;
 
-        uint32 GetNodeState(uint8 nodeType) const { return (uint8)nodePoint[nodeType].nodeState; }
+    uint32 GetNodeState(uint8 nodeType) const { return (uint8)nodePoint[nodeType].nodeState; }
 
-        bool AllNodesConrolledByTeam(TeamId teamId) const;  // overwrited
-        bool IsResourceGlutAllowed(TeamId teamId) const;
-        void DoAction(uint32 action, uint64 guid);
-    private:
-        uint32 closeFortressDoorsTimer;
-        bool doorsClosed;
-        uint32 docksTimer;
-        uint32 resourceTimer;
-        uint32 siegeEngineWorkshopTimer;
-        uint16 factionReinforcements[2];
-        BG_IC_GateState GateStatus[6];
-        ICNodePoint nodePoint[7];
+    bool AllNodesConrolledByTeam(TeamId teamId) const override;  // overwrited
+    bool IsResourceGlutAllowed(TeamId teamId) const;
+    void DoAction(uint32 action, uint64 guid) override;
+private:
+    uint32 closeFortressDoorsTimer;
+    bool doorsClosed;
+    uint32 docksTimer;
+    uint32 resourceTimer;
+    uint32 siegeEngineWorkshopTimer;
+    uint16 factionReinforcements[2];
+    BG_IC_GateState GateStatus[6];
+    ICNodePoint nodePoint[7];
 
-        typedef std::map<uint32, uint32> RespawnMap;
-        RespawnMap respawnMap;
+    typedef std::map<uint32, uint32> RespawnMap;
+    RespawnMap respawnMap;
 
-        MotionTransport* gunshipAlliance;
-        MotionTransport* gunshipHorde;
+    MotionTransport* gunshipAlliance;
+    MotionTransport* gunshipHorde;
 
-        uint32 GetNextBanner(ICNodePoint* nodePoint, uint32 team, bool returnDefinitve);
+    uint32 GetNextBanner(ICNodePoint* nodePoint, uint32 team, bool returnDefinitve);
 
-        uint32 GetGateIDFromEntry(uint32 id)
+    uint32 GetGateIDFromEntry(uint32 id)
+    {
+        uint32 i = 0;
+        switch (id)
         {
-            uint32 i = 0;
-            switch (id)
-            {
-                case GO_HORDE_GATE_1: i = BG_IC_H_FRONT; break;
-                case GO_HORDE_GATE_2: i = BG_IC_H_EAST; break;
-                case GO_HORDE_GATE_3: i = BG_IC_H_WEST; break;
-                case GO_ALLIANCE_GATE_3: i = BG_IC_A_FRONT; break;
-                case GO_ALLIANCE_GATE_1: i = BG_IC_A_WEST; break;
-                case GO_ALLIANCE_GATE_2: i = BG_IC_A_EAST; break;
-            }
-            return i;
+            case GO_HORDE_GATE_1:
+                i = BG_IC_H_FRONT;
+                break;
+            case GO_HORDE_GATE_2:
+                i = BG_IC_H_EAST;
+                break;
+            case GO_HORDE_GATE_3:
+                i = BG_IC_H_WEST;
+                break;
+            case GO_ALLIANCE_GATE_3:
+                i = BG_IC_A_FRONT;
+                break;
+            case GO_ALLIANCE_GATE_1:
+                i = BG_IC_A_WEST;
+                break;
+            case GO_ALLIANCE_GATE_2:
+                i = BG_IC_A_EAST;
+                break;
         }
+        return i;
+    }
 
-        uint32 GetWorldStateFromGateEntry(uint32 id, bool open)
+    uint32 GetWorldStateFromGateEntry(uint32 id, bool open)
+    {
+        uint32 uws = 0;
+
+        switch (id)
         {
-            uint32 uws = 0;
-
-            switch (id)
-            {
-                case GO_HORDE_GATE_1:
-                    uws = (open ? BG_IC_GATE_FRONT_H_WS_OPEN : BG_IC_GATE_FRONT_H_WS_CLOSED);
-                    break;
-                case GO_HORDE_GATE_2:
-                    uws = (open ? BG_IC_GATE_EAST_H_WS_OPEN : BG_IC_GATE_EAST_H_WS_CLOSED);
-                    break;
-                case GO_HORDE_GATE_3:
-                    uws = (open ? BG_IC_GATE_WEST_H_WS_OPEN : BG_IC_GATE_WEST_H_WS_CLOSED);
-                    break;
-                case GO_ALLIANCE_GATE_3:
-                    uws = (open ? BG_IC_GATE_FRONT_A_WS_OPEN : BG_IC_GATE_FRONT_A_WS_CLOSED);
-                    break;
-                case GO_ALLIANCE_GATE_1:
-                    uws = (open ? BG_IC_GATE_WEST_A_WS_OPEN : BG_IC_GATE_WEST_A_WS_CLOSED);
-                    break;
-                case GO_ALLIANCE_GATE_2:
-                    uws = (open ? BG_IC_GATE_EAST_A_WS_OPEN : BG_IC_GATE_EAST_A_WS_CLOSED);
-                    break;
-            }
-            return uws;
+            case GO_HORDE_GATE_1:
+                uws = (open ? BG_IC_GATE_FRONT_H_WS_OPEN : BG_IC_GATE_FRONT_H_WS_CLOSED);
+                break;
+            case GO_HORDE_GATE_2:
+                uws = (open ? BG_IC_GATE_EAST_H_WS_OPEN : BG_IC_GATE_EAST_H_WS_CLOSED);
+                break;
+            case GO_HORDE_GATE_3:
+                uws = (open ? BG_IC_GATE_WEST_H_WS_OPEN : BG_IC_GATE_WEST_H_WS_CLOSED);
+                break;
+            case GO_ALLIANCE_GATE_3:
+                uws = (open ? BG_IC_GATE_FRONT_A_WS_OPEN : BG_IC_GATE_FRONT_A_WS_CLOSED);
+                break;
+            case GO_ALLIANCE_GATE_1:
+                uws = (open ? BG_IC_GATE_WEST_A_WS_OPEN : BG_IC_GATE_WEST_A_WS_CLOSED);
+                break;
+            case GO_ALLIANCE_GATE_2:
+                uws = (open ? BG_IC_GATE_EAST_A_WS_OPEN : BG_IC_GATE_EAST_A_WS_CLOSED);
+                break;
         }
+        return uws;
+    }
 
-        void UpdateNodeWorldState(ICNodePoint* nodePoint);
-        void HandleCapturedNodes(ICNodePoint* nodePoint, bool recapture);
-        void HandleContestedNodes(ICNodePoint* nodePoint);
-        void TurnBosses(bool on);
+    void UpdateNodeWorldState(ICNodePoint* nodePoint);
+    void HandleCapturedNodes(ICNodePoint* nodePoint, bool recapture);
+    void HandleContestedNodes(ICNodePoint* nodePoint);
+    void TurnBosses(bool on);
 };
 
 #endif

@@ -36,6 +36,17 @@ ACE_Process_Mutex::unique_name (void)
   return this->name_;
 }
 
+int
+ACE_Process_Mutex::unlink (const ACE_TCHAR *name)
+{
+#if defined (_ACE_USE_SV_SEM)
+  ACE_UNUSED_ARG (name);
+  return 0;
+#else
+  return ACE_Mutex::unlink (name);
+#endif
+}
+
 ACE_Process_Mutex::ACE_Process_Mutex (const char *name, void *arg, mode_t mode)
 #if defined (_ACE_USE_SV_SEM)
   : lock_ (name ? name : ACE_TEXT_ALWAYS_CHAR (this->unique_name ()),

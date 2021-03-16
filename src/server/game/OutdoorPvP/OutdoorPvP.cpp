@@ -4,19 +4,17 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "OutdoorPvP.h"
-#include "OutdoorPvPMgr.h"
-#include "ObjectAccessor.h"
-#include "ObjectMgr.h"
+#include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "Group.h"
 #include "Map.h"
 #include "MapManager.h"
-#include "Group.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "OutdoorPvP.h"
+#include "OutdoorPvPMgr.h"
 #include "WorldPacket.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "CellImpl.h"
 
 OPvPCapturePoint::OPvPCapturePoint(OutdoorPvP* pvp):
     m_capturePointGUID(0), m_capturePoint(nullptr), m_maxValue(0.0f), m_minValue(0.0f), m_maxSpeed(0),
@@ -394,7 +392,7 @@ void OutdoorPvP::SendUpdateWorldState(uint32 field, uint32 value)
     if (m_sendUpdate)
         for (int i = 0; i < 2; ++i)
             for (PlayerSet::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
-                if (Player * const player = ObjectAccessor::FindPlayer(*itr))
+                if (Player* const player = ObjectAccessor::FindPlayer(*itr))
                     player->SendUpdateWorldState(field, value);
 }
 
@@ -404,7 +402,7 @@ void OPvPCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
     {
         // send to all players present in the area
         for (PlayerSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end(); ++itr)
-            if (Player * const player = ObjectAccessor::FindPlayer(*itr))
+            if (Player* const player = ObjectAccessor::FindPlayer(*itr))
                 player->SendUpdateWorldState(field, value);
     }
 }
@@ -414,19 +412,19 @@ void OPvPCapturePoint::SendObjectiveComplete(uint32 id, uint64 guid)
     uint32 team;
     switch (m_State)
     {
-    case OBJECTIVESTATE_ALLIANCE:
-        team = 0;
-        break;
-    case OBJECTIVESTATE_HORDE:
-        team = 1;
-        break;
-    default:
-        return;
+        case OBJECTIVESTATE_ALLIANCE:
+            team = 0;
+            break;
+        case OBJECTIVESTATE_HORDE:
+            team = 1;
+            break;
+        default:
+            return;
     }
 
     // send to all players present in the area
     for (PlayerSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end(); ++itr)
-        if (Player * const player = ObjectAccessor::FindPlayer(*itr))
+        if (Player* const player = ObjectAccessor::FindPlayer(*itr))
             player->KilledMonsterCredit(id, guid);
 }
 
@@ -474,7 +472,7 @@ bool OutdoorPvP::IsInsideObjective(Player* player) const
 
 bool OPvPCapturePoint::IsInsideObjective(Player* player) const
 {
-    PlayerSet const &plSet = m_activePlayers[player->GetTeamId()];
+    PlayerSet const& plSet = m_activePlayers[player->GetTeamId()];
     return plSet.find(player->GetGUID()) != plSet.end();
 }
 
@@ -560,12 +558,12 @@ bool OutdoorPvP::HandleAreaTrigger(Player* /*player*/, uint32 /*trigger*/)
     return false;
 }
 
-void OutdoorPvP::BroadcastPacket(WorldPacket &data) const
+void OutdoorPvP::BroadcastPacket(WorldPacket& data) const
 {
     // This is faster than sWorld->SendZoneMessage
     for (uint32 team = 0; team < 2; ++team)
         for (PlayerSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
-            if (Player * const player = ObjectAccessor::FindPlayer(*itr))
+            if (Player* const player = ObjectAccessor::FindPlayer(*itr))
                 player->GetSession()->SendPacket(&data);
 }
 
@@ -576,7 +574,7 @@ void OutdoorPvP::RegisterZone(uint32 zoneId)
 
 bool OutdoorPvP::HasPlayer(Player const* player) const
 {
-    PlayerSet const &plSet = m_players[player->GetTeamId()];
+    PlayerSet const& plSet = m_players[player->GetTeamId()];
     return plSet.find(player->GetGUID()) != plSet.end();
 }
 
@@ -585,16 +583,16 @@ void OutdoorPvP::TeamCastSpell(TeamId team, int32 spellId, Player* sameMapPlr)
     if (spellId > 0)
     {
         for (PlayerSet::iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
-            if (Player * const player = ObjectAccessor::FindPlayer(*itr))
+            if (Player* const player = ObjectAccessor::FindPlayer(*itr))
                 if (!sameMapPlr || sameMapPlr->FindMap() == player->FindMap())
                     player->CastSpell(player, (uint32)spellId, true);
     }
     else
     {
         for (PlayerSet::iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
-            if (Player * const player = ObjectAccessor::FindPlayer(*itr))
+            if (Player* const player = ObjectAccessor::FindPlayer(*itr))
                 if (!sameMapPlr || sameMapPlr->FindMap() == player->FindMap())
-                    player->RemoveAura((uint32)-spellId); // by stack?
+                    player->RemoveAura((uint32) - spellId); // by stack?
     }
 }
 
@@ -609,7 +607,7 @@ void OutdoorPvP::OnGameObjectCreate(GameObject* go)
     if (go->GetGoType() != GAMEOBJECT_TYPE_CAPTURE_POINT)
         return;
 
-    if (OPvPCapturePoint *cp = GetCapturePoint(go->GetDBTableGUIDLow()))
+    if (OPvPCapturePoint* cp = GetCapturePoint(go->GetDBTableGUIDLow()))
         cp->m_capturePoint = go;
 }
 
@@ -618,6 +616,6 @@ void OutdoorPvP::OnGameObjectRemove(GameObject* go)
     if (go->GetGoType() != GAMEOBJECT_TYPE_CAPTURE_POINT)
         return;
 
-    if (OPvPCapturePoint *cp = GetCapturePoint(go->GetDBTableGUIDLow()))
+    if (OPvPCapturePoint* cp = GetCapturePoint(go->GetDBTableGUIDLow()))
         cp->m_capturePoint = nullptr;
 }

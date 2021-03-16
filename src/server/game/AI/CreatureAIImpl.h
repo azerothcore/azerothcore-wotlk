@@ -7,16 +7,15 @@
 #define CREATUREAIIMPL_H
 
 #include "Common.h"
-#include "Define.h"
-#include "TemporarySummon.h"
 #include "CreatureAI.h"
+#include "Define.h"
 #include "SpellMgr.h"
-
+#include "TemporarySummon.h"
 #include <functional>
 #include <type_traits>
 
 template<typename First, typename Second, typename... Rest>
-static inline First const& RAND(First const& first, Second const& second, Rest const&... rest)
+static inline First const& RAND(First const& first, Second const& second, Rest const& ... rest)
 {
     std::reference_wrapper<typename std::add_const<First>::type> const pack[] = { first, second, rest... };
     return pack[urand(0, sizeof...(rest) + 1)].get();
@@ -44,7 +43,7 @@ enum AICondition
 struct AISpellInfoType
 {
     AISpellInfoType() : target(AITARGET_SELF), condition(AICOND_COMBAT)
-        , cooldown(AI_DEFAULT_COOLDOWN), realCooldown(0), maxRange(0.0f){}
+        , cooldown(AI_DEFAULT_COOLDOWN), realCooldown(0), maxRange(0.0f) {}
     AITarget target;
     AICondition condition;
     uint32 cooldown;
@@ -55,4 +54,3 @@ struct AISpellInfoType
 AISpellInfoType* GetAISpellInfo(uint32 i);
 
 #endif
-

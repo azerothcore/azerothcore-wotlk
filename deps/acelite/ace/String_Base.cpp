@@ -4,7 +4,6 @@
 #include "ace/ACE.h"
 #include "ace/Malloc_Base.h"
 #include "ace/String_Base.h"
-#include "ace/Auto_Ptr.h"
 #include "ace/OS_NS_string.h"
 
 #include <algorithm>  // For std::swap<>
@@ -15,7 +14,7 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE(ACE_String_Base)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_String_Base)
 
 template <class ACE_CHAR_T>
 ACE_CHAR_T ACE_String_Base<ACE_CHAR_T>::NULL_String_ = 0;
@@ -371,7 +370,11 @@ ACE_String_Base<ACE_CHAR_T>::rep (void) const
   ACE_TRACE ("ACE_String_Base<ACE_CHAR_T>::rep");
 
   ACE_CHAR_T *new_string;
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_ALLOCATOR_RETURN (new_string, static_cast<ACE_CHAR_T*>(ACE_Allocator::instance()->malloc(sizeof(ACE_CHAR_T) * (this->len_ + 1))), 0);
+#else
   ACE_NEW_RETURN (new_string, ACE_CHAR_T[this->len_ + 1], 0);
+#endif
   ACE_OS::strsncpy (new_string, this->rep_, this->len_+1);
 
   return new_string;

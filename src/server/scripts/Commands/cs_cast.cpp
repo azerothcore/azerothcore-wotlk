@@ -11,11 +11,11 @@ Comment: All cast related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Creature.h"
 #include "Language.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 class cast_commandscript : public CommandScript
@@ -26,7 +26,7 @@ public:
     std::vector<ChatCommand> GetCommands() const override
     {
         static std::vector<ChatCommand> castCommandTable =
-        {   
+        {
             { "back",           SEC_GAMEMASTER,  false, &HandleCastBackCommand,              "" },
             { "dist",           SEC_GAMEMASTER,  false, &HandleCastDistCommand,              "" },
             { "self",           SEC_GAMEMASTER,  false, &HandleCastSelfCommand,              "" },

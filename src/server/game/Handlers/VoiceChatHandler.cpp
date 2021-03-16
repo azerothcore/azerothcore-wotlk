@@ -5,10 +5,10 @@
  */
 
 #include "Common.h"
+#include "Log.h"
+#include "Opcodes.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Opcodes.h"
-#include "Log.h"
 
 void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
 {
@@ -36,4 +36,3 @@ void WorldSession::HandleSetActiveVoiceChannel(WorldPacket& recvData)
     recvData.read_skip<uint32>();
     recvData.read_skip<char*>();
 }
-

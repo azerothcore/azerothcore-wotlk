@@ -8,19 +8,19 @@
     \ingroup Trinityd
 */
 
-#include "Common.h"
-#include "ObjectAccessor.h"
-#include "World.h"
-#include "WorldSocketMgr.h"
-#include "Database/DatabaseEnv.h"
-#include "ScriptMgr.h"
-#include "BattlegroundMgr.h"
-#include "MapManager.h"
-#include "Timer.h"
-#include "WorldRunnable.h"
-#include "OutdoorPvPMgr.h"
-#include "AvgDiffTracker.h"
 #include "AsyncAuctionListing.h"
+#include "AvgDiffTracker.h"
+#include "BattlegroundMgr.h"
+#include "Common.h"
+#include "Database/DatabaseEnv.h"
+#include "MapManager.h"
+#include "ObjectAccessor.h"
+#include "OutdoorPvPMgr.h"
+#include "ScriptMgr.h"
+#include "Timer.h"
+#include "World.h"
+#include "WorldRunnable.h"
+#include "WorldSocketMgr.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -53,15 +53,15 @@ void WorldRunnable::run()
         avgDiffTracker.Update(executionTimeDiff > WORLD_SLEEP_CONST ? executionTimeDiff : WORLD_SLEEP_CONST);
 
         if (executionTimeDiff < WORLD_SLEEP_CONST)
-            acore::Thread::Sleep(WORLD_SLEEP_CONST-executionTimeDiff);
+            acore::Thread::Sleep(WORLD_SLEEP_CONST - executionTimeDiff);
 
-        #ifdef _WIN32
-            if (m_ServiceStatus == 0)
-                World::StopNow(SHUTDOWN_EXIT_CODE);
+#ifdef _WIN32
+        if (m_ServiceStatus == 0)
+            World::StopNow(SHUTDOWN_EXIT_CODE);
 
-            while (m_ServiceStatus == 2)
-                Sleep(1000);
-        #endif
+        while (m_ServiceStatus == 2)
+            Sleep(1000);
+#endif
     }
 
     sLog->SetLogDB(false);

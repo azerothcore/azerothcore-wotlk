@@ -7,19 +7,18 @@
 #include "DatabaseWorkerPool.h"
 #include "DatabaseEnv.h"
 
-#define MIN_MYSQL_SERVER_VERSION 50600u
-#define MIN_MYSQL_CLIENT_VERSION 50600u
+#define MIN_MYSQL_SERVER_VERSION 50700u
+#define MIN_MYSQL_CLIENT_VERSION 50700u
 
-template <class T>
-DatabaseWorkerPool<T>::DatabaseWorkerPool() :
-_mqueue(new ACE_Message_Queue<ACE_SYNCH>(2*1024*1024, 2*1024*1024)),
-_queue(new ACE_Activation_Queue(_mqueue))
+template <class T> DatabaseWorkerPool<T>::DatabaseWorkerPool() :
+    _mqueue(new ACE_Message_Queue<ACE_SYNCH>(2 * 1024 * 1024, 2 * 1024 * 1024)),
+    _queue(new ACE_Activation_Queue(_mqueue))
 {
     memset(_connectionCount, 0, sizeof(_connectionCount));
     _connections.resize(IDX_SIZE);
 
     WPFatal(mysql_thread_safe(), "Used MySQL library isn't thread-safe.");
-    WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "AzerothCore does not support MySQL versions below 5.6");
+    WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "AzerothCore does not support MySQL versions below 5.7");
 }
 
 template <class T>
@@ -29,7 +28,7 @@ bool DatabaseWorkerPool<T>::Open(const std::string& infoString, uint8 async_thre
     _connectionInfo = MySQLConnectionInfo(infoString);
 
     sLog->outSQLDriver("Opening DatabasePool '%s'. Asynchronous connections: %u, synchronous connections: %u.",
-        GetDatabaseName(), async_threads, synch_threads);
+                       GetDatabaseName(), async_threads, synch_threads);
 
     //! Open asynchronous connections (delayed operations)
     _connections[IDX_ASYNC].resize(async_threads);
@@ -38,8 +37,8 @@ bool DatabaseWorkerPool<T>::Open(const std::string& infoString, uint8 async_thre
         T* t = new T(_queue, _connectionInfo);
         res &= t->Open();
         if (res) // only check mysql version if connection is valid
-            WPFatal(mysql_get_server_version(t->GetHandle()) >= MIN_MYSQL_SERVER_VERSION, "AzerothCore does not support MySQL versions below 5.6");
-        
+            WPFatal(mysql_get_server_version(t->GetHandle()) >= MIN_MYSQL_SERVER_VERSION, "AzerothCore does not support MySQL versions below 5.7");
+
         _connections[IDX_ASYNC][i] = t;
         ++_connectionCount[IDX_ASYNC];
     }
@@ -56,11 +55,11 @@ bool DatabaseWorkerPool<T>::Open(const std::string& infoString, uint8 async_thre
 
     if (res)
         sLog->outSQLDriver("DatabasePool '%s' opened successfully. %u total connections running.", GetDatabaseName(),
-            (_connectionCount[IDX_SYNCH] + _connectionCount[IDX_ASYNC]));
+                           (_connectionCount[IDX_SYNCH] + _connectionCount[IDX_ASYNC]));
     else
         sLog->outError("DatabasePool %s NOT opened. There were errors opening the MySQL connections. Check your SQLDriverLogFile "
-            "for specific errors.", GetDatabaseName());
-    
+                       "for specific errors.", GetDatabaseName());
+
     return res;
 }
 
@@ -84,7 +83,7 @@ void DatabaseWorkerPool<T>::Close()
     }
 
     sLog->outSQLDriver("Asynchronous connections on DatabasePool '%s' terminated. Proceeding with synchronous connections.",
-        GetDatabaseName());
+                       GetDatabaseName());
 
     //! Shut down the synchronous connections
     //! There's no need for locking the connection, because DatabaseWorkerPool<>::Close
@@ -150,7 +149,7 @@ QueryResult DatabaseWorkerPool<T>::Query(const char* sql, T* conn /* = nullptr*/
     if (!result || !result->GetRowCount())
     {
         delete result;
-        return QueryResult(NULL);
+        return QueryResult(nullptr);
     }
 
     result->NextRow();
@@ -170,7 +169,7 @@ PreparedQueryResult DatabaseWorkerPool<T>::Query(PreparedStatement* stmt)
     if (!ret || !ret->GetRowCount())
     {
         delete ret;
-        return PreparedQueryResult(NULL);
+        return PreparedQueryResult(nullptr);
     }
 
     return PreparedQueryResult(ret);
@@ -212,7 +211,7 @@ SQLTransaction DatabaseWorkerPool<T>::BeginTransaction()
 template <class T>
 void DatabaseWorkerPool<T>::CommitTransaction(SQLTransaction transaction)
 {
-    #ifdef ACORE_DEBUG
+#ifdef ACORE_DEBUG
     //! Only analyze transaction weaknesses in Debug mode.
     //! Ideally we catch the faults in Debug mode and then correct them,
     //! so there's no need to waste these CPU cycles in Release mode.
@@ -227,7 +226,7 @@ void DatabaseWorkerPool<T>::CommitTransaction(SQLTransaction transaction)
         default:
             break;
     }
-    #endif // ACORE_DEBUG
+#endif // ACORE_DEBUG
 
     Enqueue(new TransactionTask(transaction));
 }
@@ -263,7 +262,7 @@ void DatabaseWorkerPool<T>::DirectCommitTransaction(SQLTransaction& transaction)
 template <class T>
 void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, PreparedStatement* stmt)
 {
-    if (trans.null())
+    if (!trans)
         Execute(stmt);
     else
         trans->Append(stmt);
@@ -272,7 +271,7 @@ void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, PreparedState
 template <class T>
 void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, const char* sql)
 {
-    if (trans.null())
+    if (!trans)
         Execute(sql);
     else
         trans->Append(sql);
@@ -311,7 +310,7 @@ T* DatabaseWorkerPool<T>::GetFreeConnection()
     uint8 i = 0;
     size_t num_cons = _connectionCount[IDX_SYNCH];
     T* t = nullptr;
-    
+
     //! Block forever until a connection is free
     for (;;)
     {

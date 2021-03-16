@@ -36,9 +36,9 @@ ModelList model_list;
 
 void LoadGameObjectModelList()
 {
-//#ifndef NO_CORE_FUNCS
+    //#ifndef NO_CORE_FUNCS
     uint32 oldMSTime = getMSTime();
-//#endif
+    //#endif
 
     FILE* model_list_file = fopen((sWorld->GetDataPath() + "vmaps/" + VMAP::GAMEOBJECT_MODELS).c_str(), "rb");
     if (!model_list_file)
@@ -57,10 +57,10 @@ void LoadGameObjectModelList()
                 break;
 
         if (fread(&name_length, sizeof(uint32), 1, model_list_file) != 1
-            || name_length >= sizeof(buff)
-            || fread(&buff, sizeof(char), name_length, model_list_file) != name_length
-            || fread(&v1, sizeof(Vector3), 1, model_list_file) != 1
-            || fread(&v2, sizeof(Vector3), 1, model_list_file) != 1)
+                || name_length >= sizeof(buff)
+                || fread(&buff, sizeof(char), name_length, model_list_file) != name_length
+                || fread(&v1, sizeof(Vector3), 1, model_list_file) != 1
+                || fread(&v2, sizeof(Vector3), 1, model_list_file) != 1)
         {
             sLog->outError("File '%s' seems to be corrupted!", VMAP::GAMEOBJECT_MODELS);
             break;
@@ -108,7 +108,7 @@ bool GameObjectModel::initialize(const GameObject& go, const GameObjectDisplayIn
     //ID = 0;
     iPos = Vector3(go.GetPositionX(), go.GetPositionY(), go.GetPositionZ());
 
-    // pussywizard: 
+    // pussywizard:
     phasemask = (go.GetGoState() == GO_STATE_READY || go.IsTransport()) ? go.GetPhaseMask() : 0;
 
     iScale = go.GetFloatValue(OBJECT_FIELD_SCALE_X);
@@ -140,13 +140,13 @@ GameObjectModel* GameObjectModel::Create(const GameObject& go)
 {
     const GameObjectDisplayInfoEntry* info = sGameObjectDisplayInfoStore.LookupEntry(go.GetDisplayId());
     if (!info)
-        return NULL;
+        return nullptr;
 
     GameObjectModel* mdl = new GameObjectModel();
     if (!mdl->initialize(go, *info))
     {
         delete mdl;
-        return NULL;
+        return nullptr;
     }
 
     return mdl;

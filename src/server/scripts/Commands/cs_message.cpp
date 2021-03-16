@@ -11,11 +11,11 @@ Comment: All message related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "Chat.h"
 #include "ChannelMgr.h"
+#include "Chat.h"
 #include "Language.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 
 class message_commandscript : public CommandScript
 {
@@ -91,7 +91,7 @@ public:
         std::string str = handler->GetAcoreString(LANG_GLOBAL_NOTIFY);
         str += args;
 
-        WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
+        WorldPacket data(SMSG_NOTIFICATION, (str.size() + 1));
         data << str;
         sWorld->SendGlobalMessage(&data);
 
@@ -106,7 +106,7 @@ public:
         std::string str = handler->GetAcoreString(LANG_GM_NOTIFY);
         str += args;
 
-        WorldPacket data(SMSG_NOTIFICATION, (str.size()+1));
+        WorldPacket data(SMSG_NOTIFICATION, (str.size() + 1));
         data << str;
         sWorld->SendGlobalGMMessage(&data);
 

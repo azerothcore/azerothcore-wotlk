@@ -9,8 +9,8 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "Util.h"
 #include "SHA1.h"
+#include "Util.h"
 #include "WorldSession.h"
 
 namespace AccountMgr
@@ -112,7 +112,7 @@ namespace AccountMgr
         stmt->setUInt32(0, accountId);
         trans->Append(stmt);
 
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_MUTEDEL);
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_MUTED);
         stmt->setUInt32(0, accountId);
         trans->Append(stmt);
 
@@ -120,7 +120,6 @@ namespace AccountMgr
 
         return AOR_OK;
     }
-
 
     AccountOpResult ChangeUsername(uint32 accountId, std::string newUsername, std::string newPassword)
     {
@@ -240,7 +239,7 @@ namespace AccountMgr
         stmt->setString(1, CalculateShaPassHash(username, password));
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
-        return (result) ? true : false;
+        return !!result;
     }
 
     uint32 GetCharactersCount(uint32 accountId)

@@ -6,16 +6,16 @@
 
 #include "Common.h"
 #include "DatabaseEnv.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "Opcodes.h"
 #include "Log.h"
 #include "ObjectMgr.h"
+#include "Opcodes.h"
 #include "Player.h"
 #include "UpdateMask.h"
 #include "WaypointMovementGenerator.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
-void WorldSession::HandleTaxiNodeStatusQueryOpcode(WorldPacket & recvData)
+void WorldSession::HandleTaxiNodeStatusQueryOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TAXINODE_STATUS_QUERY");
@@ -58,7 +58,7 @@ void WorldSession::SendTaxiStatus(uint64 guid)
 #endif
 }
 
-void WorldSession::HandleTaxiQueryAvailableNodes(WorldPacket & recvData)
+void WorldSession::HandleTaxiQueryAvailableNodes(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TAXIQUERYAVAILABLENODES");
@@ -166,7 +166,7 @@ void WorldSession::SendDiscoverNewTaxiNode(uint32 nodeid)
     }
 }
 
-void WorldSession::HandleActivateTaxiExpressOpcode (WorldPacket & recvData)
+void WorldSession::HandleActivateTaxiExpressOpcode (WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ACTIVATETAXIEXPRESS");
@@ -228,7 +228,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     recvData.read_skip<uint32>();                          // spline id
 }
 
-void WorldSession::HandleActivateTaxiOpcode(WorldPacket & recvData)
+void WorldSession::HandleActivateTaxiOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ACTIVATETAXI");

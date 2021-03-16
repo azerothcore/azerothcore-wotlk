@@ -16,17 +16,17 @@
 class RealmAcceptor : public ACE_Acceptor<RealmSocket, ACE_SOCK_Acceptor>
 {
 public:
-    RealmAcceptor(void) { }
-    virtual ~RealmAcceptor(void)
+    RealmAcceptor() = default;
+    virtual ~RealmAcceptor()
     {
         if (reactor())
             reactor()->cancel_timer(this, 1);
     }
 
 protected:
-    virtual int make_svc_handler(RealmSocket* &sh)
+    virtual int make_svc_handler(RealmSocket*& sh)
     {
-        if (sh == 0)
+        if (sh == nullptr)
             ACE_NEW_RETURN(sh, RealmSocket, -1);
 
         sh->reactor(reactor());
@@ -41,14 +41,14 @@ protected:
         return reactor()->register_handler(this, ACE_Event_Handler::ACCEPT_MASK);
     }
 
-    virtual int handle_accept_error(void)
+    virtual int handle_accept_error()
     {
 #if defined(ENFILE) && defined(EMFILE)
         if (errno == ENFILE || errno == EMFILE)
         {
             sLog->outError("Out of file descriptors, suspending incoming connections for 10 seconds");
             reactor()->remove_handler(this, ACE_Event_Handler::ACCEPT_MASK | ACE_Event_Handler::DONT_CALL);
-            reactor()->schedule_timer(this, NULL, ACE_Time_Value(10));
+            reactor()->schedule_timer(this, nullptr, ACE_Time_Value(10));
         }
 #endif
         return 0;

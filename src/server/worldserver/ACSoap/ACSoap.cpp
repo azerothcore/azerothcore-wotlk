@@ -5,9 +5,9 @@
  */
 
 #include "ACSoap.h"
+#include "Log.h"
 #include "soapH.h"
 #include "soapStub.h"
-#include "Log.h"
 #include "World.h"
 
 void ACSoapRunnable::run()
@@ -35,7 +35,7 @@ void ACSoapRunnable::run()
             continue;   // ran into an accept timeout
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: accepted connection from IP=%d.%d.%d.%d", (int)(soap.ip>>24)&0xFF, (int)(soap.ip>>16)&0xFF, (int)(soap.ip>>8)&0xFF, (int)soap.ip&0xFF);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ACSoap: accepted connection from IP=%d.%d.%d.%d", (int)(soap.ip >> 24) & 0xFF, (int)(soap.ip >> 16) & 0xFF, (int)(soap.ip >> 8) & 0xFF, (int)soap.ip & 0xFF);
 #endif
         struct soap* thread_soap = soap_copy(&soap);// make a safe copy
 
@@ -151,10 +151,11 @@ void SOAPCommand::commandFinished(void* soapconnection, bool success)
 ////////////////////////////////////////////////////////////////////////////////
 
 struct Namespace namespaces[] =
-{   { "SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/", nullptr, nullptr }, // must be first
+{
+    { "SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/", nullptr, nullptr }, // must be first
     { "SOAP-ENC", "http://schemas.xmlsoap.org/soap/encoding/", nullptr, nullptr }, // must be second
-    { "xsi", "http://www.w3.org/1999/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", NULL },
-    { "xsd", "http://www.w3.org/1999/XMLSchema",          "http://www.w3.org/*/XMLSchema", NULL },
+    { "xsi", "http://www.w3.org/1999/XMLSchema-instance", "http://www.w3.org/*/XMLSchema-instance", nullptr },
+    { "xsd", "http://www.w3.org/1999/XMLSchema",          "http://www.w3.org/*/XMLSchema", nullptr },
     { "ns1", "urn:AC", nullptr, nullptr },     // "ns1" namespace prefix
     { nullptr, nullptr, nullptr, nullptr }
 };

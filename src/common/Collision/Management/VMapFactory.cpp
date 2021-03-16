@@ -9,14 +9,14 @@
 
 namespace VMAP
 {
-    IVMapManager* gVMapManager = NULL;
+    IVMapManager* gVMapManager = nullptr;
 
     //===============================================
     // just return the instance
     IVMapManager* VMapFactory::createOrGetVMapManager()
     {
         if (gVMapManager == 0)
-            gVMapManager= new VMapManager2();                // should be taken from config ... Please change if you like :-)
+            gVMapManager = new VMapManager2();               // should be taken from config ... Please change if you like :-)
         return gVMapManager;
     }
 
@@ -25,6 +25,6 @@ namespace VMAP
     void VMapFactory::clear()
     {
         delete gVMapManager;
-        gVMapManager = NULL;
+        gVMapManager = nullptr;
     }
 }

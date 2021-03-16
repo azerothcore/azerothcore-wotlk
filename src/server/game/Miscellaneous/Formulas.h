@@ -7,11 +7,11 @@
 #ifndef ACORE_FORMULAS_H
 #define ACORE_FORMULAS_H
 
-#include "World.h"
-#include "SharedDefines.h"
-#include "ScriptMgr.h"
-#include "Player.h"
 #include "Creature.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "SharedDefines.h"
+#include "World.h"
 
 namespace acore
 {
@@ -152,7 +152,7 @@ namespace acore
             uint32 gain = 0;
 
             if (!creature || (!creature->IsTotem() && !creature->IsPet() && !creature->IsCritter() &&
-                !(creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL)))
+                              !(creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL)))
             {
                 float xpMod = 1.0f;
 

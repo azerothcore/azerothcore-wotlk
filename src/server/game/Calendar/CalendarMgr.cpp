@@ -5,12 +5,12 @@
  */
 
 #include "CalendarMgr.h"
-#include "QueryResult.h"
-#include "Log.h"
-#include "Player.h"
 #include "GuildMgr.h"
+#include "Log.h"
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
+#include "Player.h"
+#include "QueryResult.h"
 
 CalendarInvite::~CalendarInvite()
 {
@@ -74,8 +74,7 @@ void CalendarMgr::LoadFromDB()
             _maxEventId = std::max(_maxEventId, eventId);
 
             ++count;
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
 
     sLog->outString(">> Loaded %u calendar events", count);
     count = 0;
@@ -101,10 +100,10 @@ void CalendarMgr::LoadFromDB()
             _maxInviteId = std::max(_maxInviteId, inviteId);
 
             ++count;
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
 
     sLog->outString(">> Loaded %u calendar invites", count);
+    sLog->outString();
 
     for (uint64 i = 1; i < _maxEventId; ++i)
         if (!GetEvent(i))
@@ -402,7 +401,7 @@ CalendarEventStore CalendarMgr::GetPlayerEvents(uint64 guid)
     for (CalendarEventInviteStore::const_iterator itr = _invites.begin(); itr != _invites.end(); ++itr)
         for (CalendarInviteStore::const_iterator itr2 = itr->second.begin(); itr2 != itr->second.end(); ++itr2)
             if ((*itr2)->GetInviteeGUID() == guid)
-                if (CalendarEvent* event = GetEvent(itr->first)) // NULL check added as attempt to fix #11512
+                if (CalendarEvent* event = GetEvent(itr->first)) // nullptr check added as attempt to fix #11512
                     events.insert(event);
 
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
@@ -510,7 +509,7 @@ void CalendarMgr::SendCalendarEventInvite(CalendarInvite const& invite)
 void CalendarMgr::SendCalendarEventUpdateAlert(CalendarEvent const& calendarEvent, time_t oldEventTime)
 {
     WorldPacket data(SMSG_CALENDAR_EVENT_UPDATED_ALERT, 1 + 8 + 4 + 4 + 4 + 1 + 4 +
-        calendarEvent.GetTitle().size() + calendarEvent.GetDescription().size() + 1 + 4 + 4);
+                     calendarEvent.GetTitle().size() + calendarEvent.GetDescription().size() + 1 + 4 + 4);
     data << uint8(1);       // unk
     data << uint64(calendarEvent.GetEventId());
     data.AppendPackedTime(oldEventTime);
@@ -593,9 +592,8 @@ void CalendarMgr::SendCalendarEventInviteAlert(CalendarEvent const& calendarEven
         if (Guild* guild = sGuildMgr->GetGuildById(calendarEvent.GetGuildId()))
             guild->BroadcastPacket(&data);
     }
-    else
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(invite.GetInviteeGUID()))
-            player->SendDirectMessage(&data);
+    else if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(invite.GetInviteeGUID()))
+        player->SendDirectMessage(&data);
 }
 
 void CalendarMgr::SendCalendarEvent(uint64 guid, CalendarEvent const& calendarEvent, CalendarSendEventType sendType)
@@ -667,7 +665,7 @@ void CalendarMgr::SendCalendarClearPendingAction(uint64 guid)
     }
 }
 
-void CalendarMgr::SendCalendarCommandResult(uint64 guid, CalendarError err, char const* param /*= NULL*/)
+void CalendarMgr::SendCalendarCommandResult(uint64 guid, CalendarError err, char const* param /*= nullptr*/)
 {
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
     {

@@ -7,25 +7,25 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 
-ResultSet::ResultSet(MYSQL_RES *result, MYSQL_FIELD *fields, uint64 rowCount, uint32 fieldCount) :
-_rowCount(rowCount),
-_fieldCount(fieldCount),
-_result(result),
-_fields(fields)
+ResultSet::ResultSet(MYSQL_RES* result, MYSQL_FIELD* fields, uint64 rowCount, uint32 fieldCount) :
+    _rowCount(rowCount),
+    _fieldCount(fieldCount),
+    _result(result),
+    _fields(fields)
 {
     _currentRow = new Field[_fieldCount];
     ASSERT(_currentRow);
 }
 
-PreparedResultSet::PreparedResultSet(MYSQL_STMT* stmt, MYSQL_RES *result, uint64 rowCount, uint32 fieldCount) :
-m_rowCount(rowCount),
-m_rowPosition(0),
-m_fieldCount(fieldCount),
-m_rBind(NULL),
-m_stmt(stmt),
-m_res(result),
-m_isNull(NULL),
-m_length(NULL)
+PreparedResultSet::PreparedResultSet(MYSQL_STMT* stmt, MYSQL_RES* result, uint64 rowCount, uint32 fieldCount) :
+    m_rowCount(rowCount),
+    m_rowPosition(0),
+    m_fieldCount(fieldCount),
+    m_rBind(nullptr),
+    m_stmt(stmt),
+    m_res(result),
+    m_isNull(nullptr),
+    m_length(nullptr)
 {
     if (!m_res)
         return;
@@ -67,7 +67,7 @@ m_length(NULL)
         m_rBind[i].buffer_length = size;
         m_rBind[i].length = &m_length[i];
         m_rBind[i].is_null = &m_isNull[i];
-        m_rBind[i].error = NULL;
+        m_rBind[i].error = nullptr;
         m_rBind[i].is_unsigned = field->flags & UNSIGNED_FLAG;
 
         ++i;
@@ -94,9 +94,9 @@ m_length(NULL)
         {
             if (!*m_rBind[fIndex].is_null)
                 m_rows[uint32(m_rowPosition)][fIndex].SetByteValue( m_rBind[fIndex].buffer,
-                                                            m_rBind[fIndex].buffer_length,
-                                                            m_rBind[fIndex].buffer_type,
-                                                           *m_rBind[fIndex].length );
+                        m_rBind[fIndex].buffer_length,
+                        m_rBind[fIndex].buffer_type,
+                        *m_rBind[fIndex].length );
             else
                 switch (m_rBind[fIndex].buffer_type)
                 {
@@ -106,16 +106,16 @@ m_length(NULL)
                     case MYSQL_TYPE_BLOB:
                     case MYSQL_TYPE_STRING:
                     case MYSQL_TYPE_VAR_STRING:
-                    m_rows[uint32(m_rowPosition)][fIndex].SetByteValue( "",
-                                                            m_rBind[fIndex].buffer_length,
-                                                            m_rBind[fIndex].buffer_type,
-                                                           *m_rBind[fIndex].length );
-                    break;
+                        m_rows[uint32(m_rowPosition)][fIndex].SetByteValue( "",
+                                m_rBind[fIndex].buffer_length,
+                                m_rBind[fIndex].buffer_type,
+                                *m_rBind[fIndex].length );
+                        break;
                     default:
-                    m_rows[uint32(m_rowPosition)][fIndex].SetByteValue( 0,
-                                                            m_rBind[fIndex].buffer_length,
-                                                            m_rBind[fIndex].buffer_type,
-                                                           *m_rBind[fIndex].length );
+                        m_rows[uint32(m_rowPosition)][fIndex].SetByteValue( 0,
+                                m_rBind[fIndex].buffer_length,
+                                m_rBind[fIndex].buffer_type,
+                                *m_rBind[fIndex].length );
                 }
         }
         m_rowPosition++;
@@ -198,13 +198,13 @@ void ResultSet::CleanUp()
     if (_currentRow)
     {
         delete [] _currentRow;
-        _currentRow = NULL;
+        _currentRow = nullptr;
     }
 
     if (_result)
     {
         mysql_free_result(_result);
-        _result = NULL;
+        _result = nullptr;
     }
 }
 

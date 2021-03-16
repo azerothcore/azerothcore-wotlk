@@ -8,16 +8,14 @@
 /// @{
 /// \file
 
-#include <openssl/opensslv.h>
-#include <openssl/crypto.h>
-#include <ace/Version.h>
-
 #include "Common.h"
-#include "Database/DatabaseEnv.h"
 #include "Configuration/Config.h"
-
+#include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "Master.h"
+#include <ace/Version.h>
+#include <openssl/crypto.h>
+#include <openssl/opensslv.h>
 
 #ifndef _ACORE_CORE_CONFIG
 #define _ACORE_CORE_CONFIG "worldserver.conf"
@@ -61,7 +59,7 @@ void usage(const char* prog)
 extern int main(int argc, char** argv)
 {
     ///- Command line parsing to get the configuration file name
-    char const* configFile = _ACORE_CORE_CONFIG;
+    std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_CORE_CONFIG);
     int c = 1;
     while (c < argc)
     {
@@ -82,7 +80,7 @@ extern int main(int argc, char** argv)
                 configFile = argv[c];
         }
 
-        #ifdef _WIN32
+#ifdef _WIN32
         if (strcmp(argv[c], "-s") == 0) // Services
         {
             if (++c >= argc)
@@ -114,16 +112,17 @@ extern int main(int argc, char** argv)
 
         if (strcmp(argv[c], "--service") == 0)
             WinServiceRun();
-        #endif
+#endif
         ++c;
     }
 
-    sConfigMgr->SetConfigList(std::string(configFile), std::string(CONFIG_FILE_LIST));
+    // Add file and args in config
+    sConfigMgr->Configure(configFile, std::vector<std::string>(argv, argv + argc), CONFIG_FILE_LIST);
 
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
-    sLog->outString("Using configuration file %s.", configFile);
+    sLog->outString("Using configuration file %s.", configFile.c_str());
     sLog->outString("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
     sLog->outString("Using ACE version: %s", ACE_VERSION);
 
