@@ -7,6 +7,8 @@
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "SpellAuras.h"
+#include "SpellAuraEffects.h"
 
 enum Spells
 {
