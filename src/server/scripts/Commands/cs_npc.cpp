@@ -925,7 +925,7 @@ public:
 
         if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
         {
-            handler->PSendSysMessage(LANG_COMMAND_INVALID_PARAM, std::to_string(displayId).c_str());
+            handler->PSendSysMessage(LANG_COMMAND_FACTION_INVPARAM, std::to_string(displayId).c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
