@@ -19798,6 +19798,11 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
 
                 if (creature)
                 {
+                    if (!creature->isVendorWithIconSpeak())
+                    {
+                        appendValue &= ~UNIT_NPC_FLAG_VENDOR;
+                    }
+                    
                     if (sWorld->getIntConfig(CONFIG_INSTANT_TAXI) == 2 && appendValue & UNIT_NPC_FLAG_FLIGHTMASTER)
                         appendValue |= UNIT_NPC_FLAG_GOSSIP; // flight masters need NPC gossip flag to show instant flight toggle option
 

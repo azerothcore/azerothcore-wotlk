@@ -985,6 +985,17 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
     return true;
 }
 
+// Creatures that have White Chat baloon but also vendor items
+bool Creature::isVendorWithIconSpeak() const
+{
+    if (m_creatureInfo->IconName == "Speak" && m_creatureData->npcflag & UNIT_NPC_FLAG_VENDOR)
+    {
+        return true;
+    }
+
+    return false;
+}
+
 bool Creature::isCanInteractWithBattleMaster(Player* player, bool msg) const
 {
     if (!IsBattleMaster())
