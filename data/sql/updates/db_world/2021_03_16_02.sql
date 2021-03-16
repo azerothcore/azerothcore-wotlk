@@ -1,3 +1,19 @@
+-- DB update 2021_03_16_01 -> 2021_03_16_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_03_16_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_03_16_01 2021_03_16_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1613997950982437928'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1613997950982437928');
 
 -- Convert a load of mechanic_immune_mask's from vmangos, see
@@ -4293,3 +4309,12 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=646016863 WHERE `entry`=17
 -- MECHANIC_PERSUADE from vmangos is enabled, ignoring
 UPDATE `creature_template` SET `mechanic_immune_mask`=1019945489 WHERE `entry`=17055;
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
