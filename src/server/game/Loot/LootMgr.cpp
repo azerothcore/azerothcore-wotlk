@@ -413,8 +413,9 @@ bool LootItem::AllowedForPlayer(Player const* player) const
         return false;
 
     // check for shields
-    if ((pProto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD) && !(player->getClass() == CLASS_PALADIN || player->getClass() == CLASS_WARRIOR || player->getClass() == CLASS_SHAMAN))
+    if ((pProto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD) && !(player->getClass() == CLASS_PALADIN || player->getClass() == CLASS_WARRIOR || player->getClass() == CLASS_SHAMAN)) {
         return false;
+    }
 
     return true;
 }
