@@ -451,7 +451,7 @@ void WorldSession::HandleTeleportTimeout(bool updateInSessions)
                     if (!plMover)
                         break;
                     WorldPacket pkt(MSG_MOVE_TELEPORT_ACK, 20);
-                    pkt.append(plMover->GetPackGUID());
+                    pkt << plMover->GetPackGUID();
                     pkt << uint32(0); // flags
                     pkt << uint32(0); // time
                     HandleMoveTeleportAck(pkt);
@@ -845,7 +845,7 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
 
     if (mi->HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
     {
-        data.readPackGUID(mi->transport.guid);
+        data >> mi->transport.guid.ReadAsPacked();
 
         data >> mi->transport.pos.PositionXYZOStream();
         data >> mi->transport.time;
@@ -952,7 +952,7 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
 
 void WorldSession::WriteMovementInfo(WorldPacket* data, MovementInfo* mi)
 {
-    data->appendPackGUID(mi->guid);
+    data << mi->guid.WriteAsPacked();
 
     *data << mi->flags;
     *data << mi->flags2;
@@ -961,7 +961,7 @@ void WorldSession::WriteMovementInfo(WorldPacket* data, MovementInfo* mi)
 
     if (mi->HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
     {
-        data->appendPackGUID(mi->transport.guid);
+        *data << mi->transport.guid.WriteAsPacked();
 
         *data << mi->transport.pos.PositionXYZOStream();
         *data << mi->transport.time;

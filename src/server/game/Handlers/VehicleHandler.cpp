@@ -26,9 +26,8 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket& recvData)
         return;
     }
 
-    uint64 guid;
-
-    recvData.readPackGUID(guid);
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
 
     // pussywizard: typical check for incomming movement packets
     if (!_player->m_mover || !_player->m_mover->IsInWorld() || _player->m_mover->IsDuringRemoveFromWorld() || guid != _player->m_mover->GetGUID())
@@ -79,8 +78,8 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
             break;
         case CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE:
             {
-                uint64 guid;        // current vehicle guid
-                recvData.readPackGUID(guid);
+                ObjectGuid guid;        // current vehicle guid
+                recvData >> guid.ReadAsPacked();
 
                 // pussywizard:
                 if (vehicle_base->GetGUID() != guid)
@@ -94,8 +93,8 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
                 ReadMovementInfo(recvData, &movementInfo);
                 vehicle_base->m_movementInfo = movementInfo;
 
-                uint64 accessory;        //  accessory guid
-                recvData.readPackGUID(accessory);
+                ObjectGuid accessory;        //  accessory guid
+                recvData >> accessory.ReadAsPacked();
 
                 int8 seatId;
                 recvData >> seatId;
@@ -112,8 +111,8 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
             }
         case CMSG_REQUEST_VEHICLE_SWITCH_SEAT:
             {
-                uint64 guid;        // current vehicle guid
-                recvData.readPackGUID(guid);
+                ObjectGuid guid;        // current vehicle guid
+                recvData >> guid.ReadAsPacked();
 
                 int8 seatId;
                 recvData >> seatId;

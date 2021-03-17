@@ -229,9 +229,9 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_MOVE_TELEPORT_ACK");
 #endif
-    uint64 guid;
 
-    recvData.readPackGUID(guid);
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
 
     uint32 flags, time;
     recvData >> flags >> time; // unused
@@ -316,9 +316,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     }
 
     /* extract packet */
-    uint64 guid;
-
-    recvData.readPackGUID(guid);
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
 
     // prevent tampered movement data
     if (!guid || guid != mover->GetGUID())
@@ -519,11 +518,11 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
 #endif
 
     /* extract packet */
-    uint64 guid;
+    ObjectGuid guid;
     uint32 unk1;
     float  newspeed;
 
-    recvData.readPackGUID(guid);
+    recvData >> guid.ReadAsPacked();
 
     // pussywizard: special check, only player mover allowed here
     if (guid != _player->m_mover->GetGUID() || guid != _player->GetGUID())
@@ -641,8 +640,8 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
 #endif
 
-    uint64 old_mover_guid;
-    recvData.readPackGUID(old_mover_guid);
+    ObjectGuid old_mover_guid;
+    recvData >> old_mover_guid.ReadAsPacked();
 
     // pussywizard: typical check for incomming movement packets
     if (!_player->m_mover || !_player->m_mover->IsInWorld() || _player->m_mover->IsDuringRemoveFromWorld() || old_mover_guid != _player->m_mover->GetGUID())
@@ -672,8 +671,8 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_KNOCK_BACK_ACK");
 #endif
 
-    uint64 guid;
-    recvData.readPackGUID(guid);
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
 
     // pussywizard: typical check for incomming movement packets
     if (!_player->m_mover || !_player->m_mover->IsInWorld() || _player->m_mover->IsDuringRemoveFromWorld() || guid != _player->m_mover->GetGUID())
@@ -691,7 +690,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     _player->m_mover->m_movementInfo = movementInfo;
 
     WorldPacket data(MSG_MOVE_KNOCK_BACK, 66);
-    data.appendPackGUID(guid);
+    data << guid.WriteAsPacked();
     _player->m_mover->BuildMovementPacket(&data);
 
     // knockback specific info
@@ -709,8 +708,8 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_HOVER_ACK");
 #endif
 
-    uint64 guid;                                            // guid - unused
-    recvData.readPackGUID(guid);
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
 
     recvData.read_skip<uint32>();                          // unk
 
@@ -727,8 +726,8 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_MOVE_WATER_WALK_ACK");
 #endif
 
-    uint64 guid;                                            // guid - unused
-    recvData.readPackGUID(guid);
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
 
     recvData.read_skip<uint32>();                          // unk
 
@@ -769,9 +768,9 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_MOVE_TIME_SKIPPED");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     uint32 timeSkipped;
-    recvData.readPackGUID(guid);
+    recvData >> guid.ReadAsPacked();
     recvData >> timeSkipped;
 
     Unit* mover = GetPlayer()->m_mover;
@@ -792,7 +791,7 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
     mover->m_movementInfo.time += timeSkipped;
 
     WorldPacket data(MSG_MOVE_TIME_SKIPPED, recvData.size());
-    data.appendPackGUID(guid);
+    data << guid.WriteAsPacked();
     data << timeSkipped;
     GetPlayer()->SendMessageToSet(&data, false);
 }

@@ -57,12 +57,12 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
         if (CalendarEvent* calendarEvent = sCalendarMgr->GetEvent((*itr)->GetEventId()))
         {
             data << uint8(calendarEvent->IsGuildEvent());
-            data.appendPackGUID(calendarEvent->GetCreatorGUID());
+            data << calendarEvent->GetCreatorGUID().WriteAsPacked();
         }
         else
         {
             data << uint8(0);
-            data.appendPackGUID((*itr)->GetSenderGUID());
+            data << (*itr)->GetSenderGUID().WriteAsPacked();
         }
     }
 
@@ -78,7 +78,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
         data.AppendPackedTime(calendarEvent->GetEventTime());
         data << uint32(calendarEvent->GetFlags());
         data << int32(calendarEvent->GetDungeonId());
-        data.appendPackGUID(calendarEvent->GetCreatorGUID());
+        data << calendarEvent->GetCreatorGUID().WriteAsPacked();
     }
 
     data << uint32(currTime);                              // server time
@@ -305,11 +305,10 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
     else
     {
         uint32 inviteCount;
-        uint64 invitee[CALENDAR_MAX_INVITES];
+        ObjectGuid invitee[CALENDAR_MAX_INVITES];
         uint8 status[CALENDAR_MAX_INVITES];
         uint8 rank[CALENDAR_MAX_INVITES];
 
-        memset(invitee, 0, sizeof(invitee));
         memset(status, 0, sizeof(status));
         memset(rank, 0, sizeof(rank));
 
@@ -319,7 +318,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
 
             for (uint32 i = 0; i < inviteCount && i < CALENDAR_MAX_INVITES; ++i)
             {
-                recvData.readPackGUID(invitee[i]);
+                recvData >> invitee[i].ReadAsPacked();
                 recvData >> status[i] >> rank[i];
             }
         }
@@ -509,7 +508,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_CALENDAR_EVENT_INVITE");
 
-    uint64 playerGuid = _player->GetGUID();
+    ObjectGuid playerGuid = _player->GetGUID();
 
     uint64 eventId;
     uint64 inviteId;
@@ -664,13 +663,13 @@ void WorldSession::HandleCalendarEventRsvp(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventRemoveInvite(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
-    uint64 invitee;
+    ObjectGuid guid = _player->GetGUID();
+    ObjectGuid invitee;
     uint64 eventId;
     uint64 ownerInviteId; // isn't it sender's inviteId?
     uint64 inviteId;
 
-    recvData.readPackGUID(invitee);
+    recvData>> invitee.ReadAsPacked();
     recvData >> inviteId >> ownerInviteId >> eventId;
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_CALENDAR_EVENT_REMOVE_INVITE ["
@@ -695,13 +694,13 @@ void WorldSession::HandleCalendarEventRemoveInvite(WorldPacket& recvData)
 void WorldSession::HandleCalendarEventStatus(WorldPacket& recvData)
 {
     uint64 guid = _player->GetGUID();
-    uint64 invitee;
+    ObjectGuid invitee;
     uint64 eventId;
     uint64 inviteId;
     uint64 ownerInviteId; // isn't it sender's inviteId?
     uint8 status;
 
-    recvData.readPackGUID(invitee);
+    recvData >> invitee.ReadAsPacked();
     recvData >> eventId >> inviteId >> ownerInviteId >> status;
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_CALENDAR_EVENT_STATUS [" UI64FMTD"] EventId ["
                    UI64FMTD "] ownerInviteId [" UI64FMTD "], Invitee ([" UI64FMTD "] id: ["
@@ -729,13 +728,13 @@ void WorldSession::HandleCalendarEventStatus(WorldPacket& recvData)
 void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
 {
     uint64 guid = _player->GetGUID();
-    uint64 invitee;
+    ObjectGuid invitee;
     uint64 eventId;
     uint64 inviteId;
     uint64 ownerInviteId; // isn't it sender's inviteId?
     uint8 rank;
 
-    recvData.readPackGUID(invitee);
+    recvData>> invitee.ReadAsPacked();
     recvData >> eventId >>  inviteId >> ownerInviteId >> rank;
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_CALENDAR_EVENT_MODERATOR_STATUS [" UI64FMTD "] EventId ["
                    UI64FMTD "] ownerInviteId [" UI64FMTD "], Invitee ([" UI64FMTD "] id: ["

@@ -1228,8 +1228,8 @@ void WorldSession::HandleSetAmmoOpcode(WorldPacket& recvData)
 void WorldSession::SendEnchantmentLog(uint64 target, uint64 caster, uint32 itemId, uint32 enchantId)
 {
     WorldPacket data(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4)); // last check 2.0.10
-    data.appendPackGUID(target);
-    data.appendPackGUID(caster);
+    data << target.WriteAsPacked();
+    data << caster.WriteAsPacked();
     data << uint32(itemId);
     data << uint32(enchantId);
     GetPlayer()->SendMessageToSet(&data, true);

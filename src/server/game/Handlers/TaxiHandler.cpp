@@ -218,8 +218,8 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_MOVE_SPLINE_DONE");
 #endif
 
-    uint64 guid; // used only for proper packet read
-    recvData.readPackGUID(guid);
+    ObjectGuid guid; // used only for proper packet read
+    recvData >> guid.ReadAsPacked();
 
     MovementInfo movementInfo;                              // used only for proper packet read
     movementInfo.guid = guid;

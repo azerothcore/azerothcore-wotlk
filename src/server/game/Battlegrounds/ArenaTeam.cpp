@@ -599,7 +599,7 @@ void ArenaTeam::MassInviteToEvent(WorldSession* session)
     {
         if (itr->Guid != session->GetPlayer()->GetGUID())
         {
-            data.appendPackGUID(itr->Guid);
+            data << itr->Guid.WriteAsPacked();
             data << uint8(0); // unk
         }
     }
