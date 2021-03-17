@@ -79,3 +79,24 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (28169, 'spel
 -- Remove 'mutating injection' from DB as now has script)
 DELETE FROM `spell_linked_spell` WHERE  `spell_trigger`=-28169 AND `spell_effect`=28206 AND `type`=0;
 
+
+/* Thaddius */
+
+-- tesla coil search ignores LoS
+DELETE FROM `disables` WHERE `sourceType`=0 AND `entry` IN (28096,28098,28110,28111);
+INSERT INTO `disables` (`sourceType`,`entry`,`flags`,`comment`) VALUES
+(0,28098,64,"Stalagg Tesla Periodic - Ignore LoS"),
+(0,28096,64,"Stalagg Tesla Visual - Ignore LoS"),
+(0,28110,64,"Feugen Tesla Periodic - Ignore LoS"),
+(0,28111,64,"Feugen Tesla Visual - Ignore LoS");
+-- tesla coil shock visual needs implicit target
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry` IN (28096,28111,28159);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`Comment`) VALUES
+(13,1,28096,0,0,31,0,3,15929,0,0,"Stalagg Chain Visual - Target Stalagg"),
+(13,1,28111,0,0,31,0,3,15930,0,0,"Feugen Chain Visual - Target Feugen"),
+(13,1,28159,0,0,31,0,3,15928,0,0,"Thaddius Shock Visual - Target Thaddius");
+-- tesla coil visual
+DELETE FROM `gameobject` WHERE `id` IN (181477,181478);
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES 
+(268049, 181478, 533, 0, 0, 3, 1, 3487.32, -2911.38, 318.898, 3.14159, 0, 0, -1, 0, 0, 0, 0, 0),
+(268050, 181477, 533, 0, 0, 3, 1, 3527.94, -2952.26, 318.898, 3.14159, 0, 0, -1, 0, 0, 0, 0, 0);
