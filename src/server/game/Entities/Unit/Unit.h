@@ -2376,7 +2376,7 @@ public:
     bool IsOnVehicle(const Unit* vehicle) const { return m_vehicle && m_vehicle == vehicle->GetVehicleKit(); }
     [[nodiscard]] Unit* GetVehicleBase()  const;
     [[nodiscard]] Creature* GetVehicleCreatureBase() const;
-    [[nodiscard]] uint64 GetTransGUID() const override;
+    [[nodiscard]] ObjectGuid GetTransGUID() const override;
     /// Returns the transport this unit is on directly (if on vehicle and transport, return vehicle)
     [[nodiscard]] TransportBase* GetDirectTransport() const;
 

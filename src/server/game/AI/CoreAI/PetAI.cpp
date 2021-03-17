@@ -537,7 +537,7 @@ void PetAI::HandleReturnMovement()
                     ClearCharmInfoFlags();
                     me->GetCharmInfo()->SetIsReturning(true);
                     me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(me->GetUInt32Value(OBJECT_FIELD_GUID), x, y, z);
+                    me->GetMotionMaster()->MovePoint(me->GetGUID().GetCounter(), x, y, z);
                 }
             }
         }

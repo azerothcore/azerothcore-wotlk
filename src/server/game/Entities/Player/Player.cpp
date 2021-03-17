@@ -17963,7 +17963,7 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder* holder)
     }
 
     // overwrite possible wrong/corrupted guid
-    SetUInt64Value(OBJECT_FIELD_GUID, MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER));
+    SetGuidValue(OBJECT_FIELD_GUID, guid);
 
     uint8 Gender = fields[5].GetUInt8();
     if (!IsValidGender(Gender))
@@ -24872,7 +24872,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
         sLog->outDebug(LOG_FILTER_MAPS, "Player::CreateViewpoint: Player %s create seer %u (TypeId: %u).", GetName().c_str(), target->GetEntry(), target->GetTypeId());
 #endif
 
-        if (!AddUInt64Value(PLAYER_FARSIGHT, target->GetGUID()))
+        if (!AddGuidValue(PLAYER_FARSIGHT, target->GetGUID()))
         {
             sLog->outCrash("Player::CreateViewpoint: Player %s cannot add new viewpoint!", GetName().c_str());
             return;
@@ -24896,7 +24896,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
         if (target->isType(TYPEMASK_UNIT) && !GetVehicle())
             ((Unit*)target)->RemovePlayerFromVision(this);
 
-        if (!RemoveUInt64Value(PLAYER_FARSIGHT, target->GetGUID()))
+        if (!RemoveGuidValue(PLAYER_FARSIGHT, target->GetGUID()))
         {
             sLog->outCrash("Player::CreateViewpoint: Player %s cannot remove current viewpoint!", GetName().c_str());
             return;
