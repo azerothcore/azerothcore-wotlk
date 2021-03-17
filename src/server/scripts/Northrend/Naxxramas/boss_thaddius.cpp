@@ -41,6 +41,7 @@ enum Spells
 {
     SPELL_MAGNETIC_PULL                 = 28337,
     SPELL_TESLA_SHOCK                   = 28099,
+    SPELL_SHOCK_VISUAL                  = 28159,
 
     // Stalagg
     SPELL_POWER_SURGE_10                = 54529,
@@ -90,6 +91,8 @@ enum Misc
     ACTION_MAGNETIC_PULL                = 1,
     ACTION_SUMMON_DIED                  = 2,
     ACTION_RESTORE                      = 3,
+    GO_TESLA_COIL_LEFT                  = 181478,
+    GO_TESLA_COIL_RIGHT                 = 181477,
     NPC_TESLA_COIL                      = 16218
 };
 
@@ -123,7 +126,7 @@ public:
             me->RemoveAllAuras();
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->CastSpell(me, SPELL_THADDIUS_VISUAL_LIGHTNING, true);
-            events.ScheduleEvent(EVENT_THADDIUS_START_2, 5000);
+            events.ScheduleEvent(EVENT_THADDIUS_START_2, 2000);
             me->MonsterTextEmote("StartEvent", 0, true);
         }
 
@@ -227,7 +230,6 @@ public:
                 if (reviveTimer >= 12000)
                 {
                     events.ScheduleEvent(EVENT_THADDIUS_START, 10000);
-                    me->MonsterTextEmote("if (reviveTimer >= 12000)", 0, true);
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     {
                         if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
