@@ -7082,10 +7082,14 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->SpellLevel = 0;
     });
 
-    // Drain Life - Bryntroll
     ApplySpellFix({
-        71838,  // N
-        71839   // H
+        6789,  // Warlock - Death Coil (Rank 1)
+        17925, // Warlock - Death Coil (Rank 2)
+        17926, // Warlock - Death Coil (Rank 3)
+        27223, // Warlock - Death Coil (Rank 4)
+        47859, // Warlock - Death Coil (Rank 5)
+        71838, // Drain Life - Bryntroll Normal
+        71839  // Drain Life - Bryntroll Heroic
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;

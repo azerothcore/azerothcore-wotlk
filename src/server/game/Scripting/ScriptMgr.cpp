@@ -1339,6 +1339,11 @@ void ScriptMgr::OnPlayerCompleteQuest(Player* player, Quest const* quest)
     FOREACH_SCRIPT(PlayerScript)->OnPlayerCompleteQuest(player, quest);
 }
 
+void ScriptMgr::OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnSendInitialPacketsBeforeAddToMap(player, data);
+}
+
 void ScriptMgr::OnBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType)
 {
     FOREACH_SCRIPT(PlayerScript)->OnBattlegroundDesertion(player, desertionType);

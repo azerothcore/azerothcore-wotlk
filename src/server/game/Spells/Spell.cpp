@@ -2648,8 +2648,16 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         {
             m_caster->CombatStart(effectUnit, !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_NO_INITIAL_AGGRO));
 
-            if (!effectUnit->IsStandState())
-                effectUnit->SetStandState(UNIT_STAND_STATE_STAND);
+            // Unsure if there are more spells that are not supposed to stop enemy from
+            // regenerating HP from food, so for now it stays as an ID.
+            const uint32 SPELL_PREMEDITATION = 14183;
+            if (m_spellInfo->Id != SPELL_PREMEDITATION)
+            {
+                if (!effectUnit->IsStandState())
+                {
+                    effectUnit->SetStandState(UNIT_STAND_STATE_STAND);
+                }
+            }
         }
     }
 
