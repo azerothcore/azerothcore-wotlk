@@ -103,8 +103,8 @@ public:
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_SPELL_MORTAL_WOUND, 10000);
             events.ScheduleEvent(EVENT_SPELL_ENRAGE, 22000);
-            events.ScheduleEvent(EVENT_SPELL_DECIMATE, 105000);
-            events.ScheduleEvent(EVENT_SPELL_BERSERK, 8 * 60000);
+            events.ScheduleEvent(EVENT_SPELL_DECIMATE, RAID_MODE(110000, 90000));
+            events.ScheduleEvent(EVENT_SPELL_BERSERK, 360000);
             events.ScheduleEvent(EVENT_SUMMON_ZOMBIE, 10000);
             events.ScheduleEvent(EVENT_CAN_EAT_ZOMBIE, 1000);
         }
@@ -184,7 +184,7 @@ public:
                 case EVENT_SPELL_DECIMATE:
                     Talk(EMOTE_DECIMATE);
                     me->CastSpell(me, RAID_MODE(SPELL_DECIMATE_10, SPELL_DECIMATE_25), false);
-                    events.RepeatEvent(105000);
+                    events.RepeatEvent(RAID_MODE(110000, 90000));
                     break;
                 case EVENT_SUMMON_ZOMBIE:
                     {
