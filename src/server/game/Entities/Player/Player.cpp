@@ -6382,14 +6382,15 @@ uint8 GetFishingStepsNeededToLevelUp(uint32 SkillValue)
     return SkillValue / 31;
 }
 
-void resetFishingStepsDB(uint32 guid)
+void updateFishingStepsDB(uint32 guid, uint32 steps)
 {
     try
     {
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
         PreparedStatement* stmt = nullptr;
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_FISHINGSTEPS);
-        stmt->setUInt32(0, guid);
+        stmt->setUInt8(0, steps);
+        stmt->setUInt32(1, guid);
         trans->Append(stmt);
         CharacterDatabase.CommitTransaction(trans);
     }
@@ -6413,12 +6414,28 @@ bool Player::UpdateFishingSkill()
     uint8 stepsNeededToLevelUp = GetFishingStepsNeededToLevelUp(SkillValue);
     ++m_fishingSteps;
 
+    /* Whenever the player clicks on the fishing gameobject the
+     * core will decide based on how many steps the player is
+     * into leveling up fishing, if the skill raises or not.
+     * Example: from 160 to 190 the player needs 4 steps to
+     * advance his fishing skill by 1 point.
+     */
     if (m_fishingSteps >= stepsNeededToLevelUp)
     {
-        resetFishingStepsDB(this->GetGUID());
+        // Whenever a level up occurs, reset the steps on the database
+        updateFishingStepsDB(this->GetGUID(), 0);
         this->resetFishingSteps();
         uint32 gathering_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
         return UpdateSkillPro(SKILL_FISHING, 100 * 10, gathering_skill_gain);
+    }
+    else
+    {
+        /* No skill level up but save a new step on the DB in case
+         * the player logs out or server crashes and progress isn't lost
+         * since on higher fishing levels it takes 11 steps to progress
+         * on fishing, which can delay the level up by several steps
+         */
+        updateFishingStepsDB(this->GetGUID(), m_fishingSteps);
     }
 
     return false;

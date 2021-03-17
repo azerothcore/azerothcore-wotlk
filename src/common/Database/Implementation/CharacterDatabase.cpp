@@ -226,7 +226,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     // Fishing steps
     PrepareStatement(CHAR_INS_CHAR_FISHINGSTEPS, "INSERT INTO character_fishingsteps (guid, fishingSteps) VALUES (?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_CHAR_FISHINGSTEPS, "DELETE FROM character_fishingsteps WHERE guid = ?", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_UDP_CHAR_FISHINGSTEPS, "UPDATE character_fishingsteps SET fishingsteps = 0 WHERE guid = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_UDP_CHAR_FISHINGSTEPS, "UPDATE character_fishingsteps SET fishingsteps = ? WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_CHAR_FISHINGSTEPS, "SELECT fishingsteps FROM character_fishingsteps WHERE guid = ?", CONNECTION_SYNCH);
 
     // Account data
