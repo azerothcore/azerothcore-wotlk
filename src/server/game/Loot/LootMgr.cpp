@@ -412,10 +412,6 @@ bool LootItem::AllowedForPlayer(Player const* player) const
     if (!(pProto->FlagsCu & ITEM_FLAGS_CU_IGNORE_QUEST_STATUS) && ((needs_quest || (pProto->StartQuest && player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE)) && !player->HasQuestForItem(itemid)))
         return false;
 
-    // check for shields
-    if ((pProto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD) && !(player->getClass() == CLASS_PALADIN || player->getClass() == CLASS_WARRIOR || player->getClass() == CLASS_SHAMAN))
-        return false;
-
     return true;
 }
 
