@@ -102,7 +102,7 @@ public:
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_SPELL_MORTAL_WOUND, 10000);
-            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 30000);
+            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 22000);
             events.ScheduleEvent(EVENT_SPELL_DECIMATE, 105000);
             events.ScheduleEvent(EVENT_SPELL_BERSERK, 8 * 60000);
             events.ScheduleEvent(EVENT_SUMMON_ZOMBIE, 10000);
@@ -175,7 +175,7 @@ public:
                 case EVENT_SPELL_ENRAGE:
                     Talk(EMOTE_ENRAGE);
                     me->CastSpell(me, RAID_MODE(SPELL_ENRAGE_10, SPELL_ENRAGE_25), true);
-                    events.RepeatEvent(30000);
+                    events.RepeatEvent(22000);
                     break;
                 case EVENT_SPELL_MORTAL_WOUND:
                     me->CastSpell(me->GetVictim(), SPELL_MORTAL_WOUND, false);
