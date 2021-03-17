@@ -23362,6 +23362,8 @@ void Player::SendInitialPacketsBeforeAddToMap()
     // SMSG_POWER_UPDATE
 
     SetMover(this);
+
+    sScriptMgr->OnSendInitialPacketsBeforeAddToMap(this, data);
 }
 
 void Player::SendInitialPacketsAfterAddToMap()
