@@ -206,7 +206,7 @@ public:
             if (target->GetTypeId() == TYPEID_UNIT && GetAura()->GetStackAmount() >= 10)
             {
                 target->CastSpell(target, SPELL_OVERCHARGED_BLAST, true);
-                target->ToCreature()->DespawnOrUnsummon(500);
+                Unit::Kill(target, target, false);
             }
 
             PreventDefaultAction();
