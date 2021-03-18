@@ -2,14 +2,14 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Transport.h"
 #include "ulduar.h"
 #include "Vehicle.h"
-#include "Player.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Transport.h"
 
 class instance_ulduar : public InstanceMapScript
 {
@@ -609,7 +609,7 @@ public:
                 case TYPE_THORIM:
                 case TYPE_FREYA:
                     m_auiEncounter[type] = data;
-                    ShowKeeperGossip(type, NULL, m_keepersGossipGUID[type - TYPE_FREYA]);
+                    ShowKeeperGossip(type, nullptr, m_keepersGossipGUID[type - TYPE_FREYA]);
                     if (GetData(TYPE_MIMIRON) == DONE && GetData(TYPE_FREYA) == DONE && GetData(TYPE_HODIR) == DONE && GetData(TYPE_THORIM) == DONE)
                     {
                         if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))

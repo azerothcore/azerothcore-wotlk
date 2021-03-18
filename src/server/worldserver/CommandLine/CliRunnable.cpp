@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,20 +8,19 @@
 /// @{
 /// \file
 
-#include "Common.h"
-#include "ObjectMgr.h"
-#include "World.h"
-#include "WorldSession.h"
-#include "Configuration/Config.h"
-
 #include "AccountMgr.h"
 #include "Chat.h"
 #include "CliRunnable.h"
+#include "Common.h"
+#include "Configuration/Config.h"
 #include "Language.h"
 #include "Log.h"
 #include "MapManager.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "Util.h"
+#include "World.h"
+#include "WorldSession.h"
 
 #if AC_PLATFORM != AC_PLATFORM_WINDOWS
 #include <readline/readline.h>
@@ -54,7 +53,7 @@ char* command_finder(const char* text, int state)
             return strdup(ret);
     }
 
-    return ((char*)NULL);
+    return ((char*)nullptr);
 }
 
 char** cli_completion(const char* text, int start, int /*end*/)
@@ -127,7 +126,7 @@ void CliRunnable::run()
     rl_event_hook = cli_hook_func;
 #endif
 
-    if (sConfigMgr->GetBoolDefault("BeepAtStart", true))
+    if (sConfigMgr->GetOption<bool>("BeepAtStart", true))
         printf("\a");                                       // \a = Alert
 
     // print this here the first time

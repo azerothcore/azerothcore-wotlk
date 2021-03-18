@@ -1,21 +1,21 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Player.h"
 #include "Battleground.h"
 #include "BattlegroundIC.h"
-#include "Language.h"
-#include "WorldPacket.h"
-#include "GameObject.h"
-#include "ObjectMgr.h"
-#include "Vehicle.h"
-#include "Transport.h"
-#include "WorldSession.h"
-#include "ScriptedCreature.h"
 #include "GameGraveyard.h"
+#include "GameObject.h"
+#include "Language.h"
+#include "ObjectMgr.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "Transport.h"
+#include "Vehicle.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 BattlegroundIC::BattlegroundIC()
 {
@@ -234,7 +234,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                 UpdateNodeWorldState(&nodePoint[i]);
                 HandleCapturedNodes(&nodePoint[i], false);
 
-                SendMessage2ToAll(LANG_BG_IC_TEAM_HAS_TAKEN_NODE, CHAT_MSG_BG_SYSTEM_NEUTRAL, NULL, (nodePoint[i].faction == TEAM_ALLIANCE ? LANG_BG_IC_ALLIANCE : LANG_BG_IC_HORDE), nodePoint[i].string);
+                SendMessage2ToAll(LANG_BG_IC_TEAM_HAS_TAKEN_NODE, CHAT_MSG_BG_SYSTEM_NEUTRAL, nullptr, (nodePoint[i].faction == TEAM_ALLIANCE ? LANG_BG_IC_ALLIANCE : LANG_BG_IC_HORDE), nodePoint[i].string);
 
                 nodePoint[i].needChange = false;
                 nodePoint[i].timer = BANNER_STATE_CHANGE_TIME;
@@ -543,7 +543,7 @@ void BattlegroundIC::HandleKillPlayer(Player* player, Player* killer)
 
 void BattlegroundIC::EndBattleground(TeamId winnerTeamId)
 {
-    SendMessage2ToAll(LANG_BG_IC_TEAM_WINS, CHAT_MSG_BG_SYSTEM_NEUTRAL, NULL, (winnerTeamId == TEAM_ALLIANCE ? LANG_BG_IC_ALLIANCE : LANG_BG_IC_HORDE));
+    SendMessage2ToAll(LANG_BG_IC_TEAM_WINS, CHAT_MSG_BG_SYSTEM_NEUTRAL, nullptr, (winnerTeamId == TEAM_ALLIANCE ? LANG_BG_IC_ALLIANCE : LANG_BG_IC_HORDE));
     Battleground::EndBattleground(winnerTeamId);
 }
 
@@ -944,7 +944,7 @@ void BattlegroundIC::DestroyGate(Player*  /*player*/, GameObject* go)
     }
 
     TurnBosses(true);
-    SendMessage2ToAll(lang_entry, CHAT_MSG_BG_SYSTEM_NEUTRAL, NULL, (teamId == TEAM_ALLIANCE ? LANG_BG_IC_HORDE_KEEP : LANG_BG_IC_ALLIANCE_KEEP));
+    SendMessage2ToAll(lang_entry, CHAT_MSG_BG_SYSTEM_NEUTRAL, nullptr, (teamId == TEAM_ALLIANCE ? LANG_BG_IC_HORDE_KEEP : LANG_BG_IC_ALLIANCE_KEEP));
 }
 
 void BattlegroundIC::EventPlayerDamagedGO(Player* /*player*/, GameObject* /*go*/, uint32 /*eventType*/)

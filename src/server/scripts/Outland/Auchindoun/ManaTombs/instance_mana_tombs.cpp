@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
 #include "mana_tombs.h"
 #include "Map.h"
+#include "ScriptMgr.h"
 
 class instance_mana_tombs : public InstanceMapScript
 {
