@@ -9,7 +9,6 @@
 #include "VMapManager2.h"
 #include "WorldModel.h"
 #include "ModelInstance.h"
-#include "DatabaseEnv.h"
 
 namespace VMAP
 {
