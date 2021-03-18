@@ -688,8 +688,6 @@ public:
                         VX001->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
                         VX001->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
                         VX001->EnterVehicle(LMK2, 3);
-                        LMK2->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
-                        LMK2->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
                         events.ScheduleEvent(EVENT_JOIN_TOGETHER, 3000);
                     }
                     break;
@@ -703,6 +701,7 @@ public:
                             return;
                         }
 
+                        ACU->SetDisableGravity(false);
                         ACU->EnterVehicle(VX001, 3);
                         me->EnterVehicle(VX001, 1);
                         me->MonsterYell(TEXT_VOLTRON_ACTIVATE, LANG_UNIVERSAL, 0);
@@ -1339,7 +1338,7 @@ public:
                         events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 3000);
                         events.ScheduleEvent(EVENT_SPELL_ROCKET_STRIKE, 16000);
                         events.ScheduleEvent(EVENT_HAND_PULSE, 1);
-                        //events.ScheduleEvent(EVENT_SPELL_SPINNING_UP, 30000);
+                        events.ScheduleEvent(EVENT_SPELL_SPINNING_UP, 30000);
                         if (Creature* c = GetMimiron())
                             if (c->AI()->GetData(1))
                                 events.ScheduleEvent(EVENT_FROST_BOMB, 1000);
@@ -1419,8 +1418,8 @@ public:
                 if (spinningUpTimer <= diff)
                 {
                     float angle = (spinningUpOrientation * 2 * M_PI) / 100.0f;
-                    me->SetOrientation(angle);
                     me->SetFacingTo(angle);
+
                     spinningUpTimer = 0;
                 }
                 else
@@ -1485,12 +1484,12 @@ public:
                 case EVENT_HAND_PULSE:
                     if (Player* p = SelectTargetFromPlayerList(80.0f))
                     {
-                        me->SetOrientation(me->GetAngle(p));
-                        me->SetFacingTo(me->GetAngle(p));
+                        me->SetFacingToObject(p);
                         if (Unit* vb = me->GetVehicleBase())
                         {
                             vb->SendMeleeAttackStop();
-                            vb->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+                            vb->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+
                             if( !leftarm )
                             {
                                 vb->HandleEmoteCommand(EMOTE_ONESHOT_CUSTOM_SPELL_03);
@@ -1512,9 +1511,16 @@ public:
                     if (Player* p = SelectTargetFromPlayerList(80.0f))
                     {
                         float angle = me->GetAngle(p);
+
+                        if (Unit* vehicle = me->GetVehicleBase())
+                        {
+                            vehicle->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+                            vehicle->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+                            angle -= vehicle->GetOrientation();
+                        }
+
                         spinningUpOrientation = (uint32)((angle * 100.0f) / (2 * M_PI));
                         spinningUpTimer = 1500;
-                        me->SetOrientation(angle);
                         me->SetFacingTo(angle);
                         me->CastSpell(p, SPELL_SPINNING_UP, true);
                         events.RescheduleEvent((Phase == 2 ? EVENT_SPELL_RAPID_BURST : EVENT_HAND_PULSE), 14500);
@@ -1801,7 +1807,7 @@ public:
                         {
                             if (Unit* victim = SelectTarget(SELECT_TARGET_RANDOM, 0, 27.5f, true))
                             {
-                                me->SetFacingTo(me->GetAngle(victim));
+                                me->SetFacingToObject(victim);
                                 me->CastSpell(victim, SPELL_PLASMA_BALL, false);
                             }
                         }
@@ -2217,8 +2223,8 @@ public:
                 float new_o = Position::NormalizeOrientation(lastOrientation - (M_PI / 60) * (diff / 250.0f));
                 lastMSTime = World::GetGameTimeMS();
                 lastOrientation = new_o;
-                c->SetOrientation(new_o);
                 c->SetFacingTo(new_o);
+
                 c->CastSpell((Unit*)nullptr, 63297, true);
                 c->CastSpell((Unit*)nullptr, 64042, true);
             }
