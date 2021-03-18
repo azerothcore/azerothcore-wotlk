@@ -45,8 +45,6 @@ void StopDB();
 
 bool stopEvent = false;                                     // Setting it to true stops the server
 
-LoginDatabaseWorkerPool LoginDatabase;                      // Accessor to the authserver database
-
 /// Handle authserver's termination signals
 class AuthServerSignalHandler : public acore::SignalHandler
 {

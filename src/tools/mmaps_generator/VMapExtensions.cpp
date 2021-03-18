@@ -9,10 +9,7 @@
 #include "VMapManager2.h"
 #include "WorldModel.h"
 #include "ModelInstance.h"
-
-#include "Database/DatabaseEnv.h"
-LoginDatabaseWorkerPool LoginDatabase;
-WorldDatabaseWorkerPool WorldDatabase;
+#include "DatabaseEnv.h"
 
 namespace VMAP
 {
