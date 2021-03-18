@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -18,7 +18,6 @@ EndScriptData
 #include "ScriptMgr.h"
 #include "WorldSession.h"
 
-#define GOSSIP_SUSURRUS         "I am ready."
 #define GOSSIP_NETHER_DRAKE     "I'm ready to fly! Take me up, dragon!"
 #define GOSSIP_IRONWING         "I'd like to take a flight around Stormwind Harbor."
 #define GOSSIP_DABIREE1         "Fly me to Murketh and Shaadraz Gateways"
@@ -55,10 +54,6 @@ public:
 
         switch (creature->GetEntry())
         {
-            case 17435: // Azuremyst Isle - Susurrus
-                if (player->HasItemCount(23843, 1, true))
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_SUSURRUS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                break;
             case 20903: // Netherstorm - Protectorate Nether Drake
                 if (player->GetQuestStatus(10438) == QUEST_STATUS_INCOMPLETE && player->HasItemCount(29778))
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_NETHER_DRAKE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
@@ -150,11 +145,6 @@ public:
         ClearGossipMenuFor(player);
         switch (action)
         {
-            case GOSSIP_ACTION_INFO_DEF:
-                //spellId is correct, however it gives flight a somewhat funny effect //TaxiPath 506.
-                CloseGossipMenuFor(player);
-                player->CastSpell(player, 32474, true);
-                break;
             case GOSSIP_ACTION_INFO_DEF + 1:
                 CloseGossipMenuFor(player);
                 player->ActivateTaxiPathTo(627);                  //TaxiPath 627 (possibly 627+628(152->153->154->155))
