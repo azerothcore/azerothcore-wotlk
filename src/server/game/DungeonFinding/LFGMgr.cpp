@@ -56,7 +56,7 @@ namespace lfg
         if (!fields)
             return;
 
-        if (!IS_GROUP_GUID(guid))
+        if (!guid.IsGroup())
             return;
 
         SetLeader(guid, MAKE_NEW_GUID(fields[0].GetUInt32(), 0, HIGHGUID_PLAYER));
@@ -82,7 +82,7 @@ namespace lfg
 
     void LFGMgr::_SaveToDB(uint64 guid)
     {
-        if (!IS_GROUP_GUID(guid))
+        if (!guid.IsGroup())
             return;
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_LFG_DATA);
@@ -489,7 +489,7 @@ namespace lfg
         switch (state)
         {
             case LFG_STATE_ROLECHECK: // if joining again during rolecheck (eg. many players clicked continue inside instance)
-                if (IS_GROUP_GUID(gguid))
+                if (gguid.IsGroup())
                     UpdateRoleCheck(gguid); // abort role check and remove from RoleChecksStore
                 break;
             case LFG_STATE_QUEUED: // joining again while in a queue
@@ -740,7 +740,7 @@ namespace lfg
     void LFGMgr::LeaveLfg(uint64 guid)
     {
         sLog->outDebug(LOG_FILTER_LFG, "LFGMgr::Leave: [" UI64FMTD "]", guid);
-        uint64 gguid = IS_GROUP_GUID(guid) ? guid : GetGroup(guid);
+        uint64 gguid = guid.IsGroup() ? guid : GetGroup(guid);
         LfgState state = GetState(guid);
         switch (state)
         {
@@ -1250,9 +1250,9 @@ namespace lfg
     void LFGMgr::LeaveAllLfgQueues(uint64 guid, bool allowgroup, uint64 groupguid)
     {
         uint64 pguid = 0, gguid = 0;
-        if (IS_GROUP_GUID(guid))
+        if (guid.IsGroup())
             gguid = guid;
-        else if (groupguid && IS_GROUP_GUID(groupguid))
+        else if (groupguid && groupguid.IsGroup())
         {
             pguid = guid;
             gguid = groupguid;
@@ -2160,7 +2160,7 @@ namespace lfg
     LfgState LFGMgr::GetState(uint64 guid)
     {
         LfgState state;
-        if (IS_GROUP_GUID(guid))
+        if (guid.IsGroup())
             state = GroupsStore[guid].GetState();
         else
             state = PlayersStore[guid].GetState();
@@ -2174,7 +2174,7 @@ namespace lfg
     LfgState LFGMgr::GetOldState(uint64 guid)
     {
         LfgState state;
-        if (IS_GROUP_GUID(guid))
+        if (guid.IsGroup())
             state = GroupsStore[guid].GetOldState();
         else
             state = PlayersStore[guid].GetOldState();
@@ -2252,7 +2252,7 @@ namespace lfg
 
     void LFGMgr::RestoreState(uint64 guid, char const*  /*debugMsg*/)
     {
-        if (IS_GROUP_GUID(guid))
+        if (guid.IsGroup())
         {
             LfgGroupData& data = GroupsStore[guid];
             /*if (sLog->ShouldLog(LOG_FILTER_LFG, LOG_LEVEL_DEBUG))
@@ -2281,7 +2281,7 @@ namespace lfg
 
     void LFGMgr::SetState(uint64 guid, LfgState state)
     {
-        if (IS_GROUP_GUID(guid))
+        if (guid.IsGroup())
         {
             LfgGroupData& data = GroupsStore[guid];
             std::string ns = GetStateString(state);
@@ -2514,13 +2514,13 @@ namespace lfg
 
     bool LFGMgr::IsLfgGroup(uint64 guid)
     {
-        return guid && IS_GROUP_GUID(guid) && GroupsStore[guid].IsLfgGroup();
+        return guid && guid.IsGroup() && GroupsStore[guid].IsLfgGroup();
     }
 
     LFGQueue& LFGMgr::GetQueue(uint64 guid)
     {
         uint8 queueId = 0;
-        if (IS_GROUP_GUID(guid))
+        if (guid.IsGroup())
         {
             LfgGuidSet const& players = GetPlayers(guid);
             uint64 pguid = players.empty() ? 0 : (*players.begin());
@@ -2626,7 +2626,7 @@ namespace lfg
 
     bool LFGMgr::inLfgDungeonMap(uint64 guid, uint32 map, Difficulty difficulty)
     {
-        if (!IS_GROUP_GUID(guid))
+        if (!guid.IsGroup())
             guid = GetGroup(guid);
 
         if (uint32 dungeonId = GetDungeon(guid, true))

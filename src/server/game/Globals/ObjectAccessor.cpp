@@ -154,10 +154,10 @@ Player* ObjectAccessor::GetPlayer(WorldObject const& u, uint64 guid)
 
 Creature* ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const& u, uint64 guid)
 {
-    if (IS_PET_GUID(guid))
+    if (guid.IsPet())
         return GetPet(u, guid);
 
-    if (IS_CRE_OR_VEH_GUID(guid))
+    if (guid.IsCreatureOrVehicle())
         return GetCreature(u, guid);
 
     return nullptr;

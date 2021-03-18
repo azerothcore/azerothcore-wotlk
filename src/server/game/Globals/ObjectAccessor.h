@@ -101,10 +101,10 @@ public:
 
     static Unit* GetObjectInOrOutOfWorld(uint64 guid, Unit* /*typeSpecifier*/)
     {
-        if (IS_PLAYER_GUID(guid))
+        if (guid.IsPlayer())
             return (Unit*)GetObjectInOrOutOfWorld(guid, (Player*)nullptr);
 
-        if (IS_PET_GUID(guid))
+        if (guid.IsPet())
             return (Unit*)GetObjectInOrOutOfWorld(guid, (Pet*)nullptr);
 
         return (Unit*)GetObjectInOrOutOfWorld(guid, (Creature*)nullptr);
@@ -121,10 +121,10 @@ public:
 
     static Unit* GetObjectInWorld(uint64 guid, Unit* /*typeSpecifier*/)
     {
-        if (IS_PLAYER_GUID(guid))
+        if (guid.IsPlayer())
             return (Unit*)GetObjectInWorld(guid, (Player*)nullptr);
 
-        if (IS_PET_GUID(guid))
+        if (guid.IsPet())
             return (Unit*)GetObjectInWorld(guid, (Pet*)nullptr);
 
         return (Unit*)GetObjectInWorld(guid, (Creature*)nullptr);

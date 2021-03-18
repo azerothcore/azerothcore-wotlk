@@ -486,7 +486,7 @@ KillRewarder::KillRewarder(Player* killer, Unit* victim, bool isBattleGround) :
     if (victim->GetTypeId() == TYPEID_PLAYER)
         _isPvP = true;
     // or if its owned by player and its not a vehicle
-    else if (IS_PLAYER_GUID(victim->GetCharmerOrOwnerGUID()))
+    else if (victim->GetCharmerOrOwnerGUID().IsPlayer())
         _isPvP = !victim->IsVehicle();
 
     _InitGroupData();
@@ -9120,10 +9120,10 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_LOOT, "Player::SendLoot");
 #endif
-    if (IS_GAMEOBJECT_GUID(guid))
+    if (guid.IsGameObject())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_LOOT, "IS_GAMEOBJECT_GUID(guid)");
+        sLog->outDebug(LOG_FILTER_LOOT, "guid.IsGameObject");
 #endif
         GameObject* go = GetMap()->GetGameObject(guid);
 
@@ -9233,7 +9233,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                 permission = ALL_PERMISSION;
         }
     }
-    else if (IS_ITEM_GUID(guid))
+    else if (guid.IsItem())
     {
         Item* item = GetItemByGuid(guid);
 
@@ -9278,7 +9278,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
             }
         }
     }
-    else if (IS_CORPSE_GUID(guid))                          // remove insignia
+    else if (guid.IsCorpse())                          // remove insignia
     {
         Corpse* bones = ObjectAccessor::GetCorpse(*this, guid);
 
@@ -9486,7 +9486,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
         // add 'this' player as one of the players that are looting 'loot'
         loot->AddLooter(GetGUID());
 
-        if (loot_type == LOOT_CORPSE && !IS_ITEM_GUID(guid))
+        if (loot_type == LOOT_CORPSE && !guid.IsItem())
             SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
     }
     else
@@ -20873,7 +20873,7 @@ Pet* Player::GetPet() const
 {
     if (uint64 pet_guid = GetPetGUID())
     {
-        if (!IS_PET_GUID(pet_guid))
+        if (!pet_guid.IsPet())
             return nullptr;
 
         Pet* pet = ObjectAccessor::GetPet(*this, pet_guid);
@@ -23076,7 +23076,7 @@ void Player::UpdateTriggerVisibility()
     WorldPacket packet;
     for (ClientGUIDs::iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
     {
-        if (IS_VEHICLE_GUID(*itr) || IS_CREATURE_GUID(*itr))
+        if ((*itr).IsVehicleOrCreature())
         {
             Creature* creature = GetMap()->GetCreature(*itr);
             // Update fields of triggers, transformed units or unselectable units (values dependent on GM state)
@@ -23087,7 +23087,7 @@ void Player::UpdateTriggerVisibility()
             creature->BuildValuesUpdateBlockForPlayer(&udata, this);
             creature->RemoveFieldNotifyFlag(UF_FLAG_PUBLIC);
         }
-        else if (IS_GAMEOBJECT_GUID((*itr)))
+        else if ((*itr).IsGameObject())
         {
             GameObject* go = GetMap()->GetGameObject(*itr);
             if (!go)
@@ -23941,12 +23941,12 @@ void Player::UpdateForQuestWorldObjects()
     WorldPacket packet;
     for (ClientGUIDs::iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
     {
-        if (IS_GAMEOBJECT_GUID(*itr))
+        if ((*itr).IsGameObject())
         {
             if (GameObject* obj = HashMapHolder<GameObject>::Find(*itr))
                 obj->BuildValuesUpdateBlockForPlayer(&udata, this);
         }
-        else if (IS_CRE_OR_VEH_GUID(*itr))
+        else if ((*itr).IsCreatureOrVehicle())
         {
             Creature* obj = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, *itr);
             if (!obj)
@@ -24425,7 +24425,7 @@ void Player::SetClientControl(Unit* target, bool allowMove, bool packetOnly /*= 
         if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
         {
             // Xinef: restore original orientation, important for shooting vehicles!
-            Position pos = target->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && target->GetTransGUID() && IS_MO_TRANSPORT_GUID(target->GetTransGUID()) ? target->ToCreature()->GetTransportHomePosition() : target->ToCreature()->GetHomePosition();
+            Position pos = target->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && target->GetTransGUID() && target->GetTransGUID().IsMOTransport() ? target->ToCreature()->GetTransportHomePosition() : target->ToCreature()->GetHomePosition();
             target->SetOrientation(pos.GetOrientation());
             target->SetFacingTo(pos.GetOrientation());
             target->DisableSpline();
@@ -25382,7 +25382,7 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
 
     // Xinef: exploit protection, dont allow to loot normal items if player is not master loot
     // Xinef: only quest, ffa and conditioned items
-    if (!IS_ITEM_GUID(GetLootGUID()) && GetGroup() && GetGroup()->GetLootMethod() == MASTER_LOOT && GetGUID() != GetGroup()->GetMasterLooterGuid())
+    if (!GetLootGUID().IsItem() && GetGroup() && GetGroup()->GetLootMethod() == MASTER_LOOT && GetGUID() != GetGroup()->GetMasterLooterGuid())
         if (qitem == nullptr && ffaitem == nullptr && conditem == nullptr)
         {
             SendLootRelease(GetLootGUID());

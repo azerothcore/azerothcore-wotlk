@@ -2380,7 +2380,7 @@ void Map::SendRemoveTransports(Player* player)
     // pussywizard: remove static transports from client
     for (Player::ClientGUIDs::const_iterator it = player->m_clientGUIDs.begin(); it != player->m_clientGUIDs.end(); )
     {
-        if (IS_TRANSPORT_GUID(*it))
+        if ((*it).IsTransport())
         {
             transData.AddOutOfRangeGUID(*it);
             it = player->m_clientGUIDs.erase(it);

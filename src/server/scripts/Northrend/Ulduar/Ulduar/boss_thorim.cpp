@@ -1130,7 +1130,7 @@ public:
 
         void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
         {
-            if (!_playerAttack && who && (who->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(who->GetOwnerGUID())))
+            if (!_playerAttack && who && (who->GetTypeId() == TYPEID_PLAYER || who->GetOwnerGUID().IsPlayer()))
             {
                 if (me->GetInstanceScript())
                     if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_THORIM)))

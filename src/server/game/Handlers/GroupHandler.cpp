@@ -591,7 +591,7 @@ void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
         uint64 guid;
         recvData >> guid;
 
-        if (IS_PLAYER_GUID(guid))
+        if (guid.IsPlayer())
         {
             Player* target = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
 

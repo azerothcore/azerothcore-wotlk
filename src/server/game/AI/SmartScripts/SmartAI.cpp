@@ -616,7 +616,7 @@ void SmartAI::EnterEvadeMode()
     if (!me->IsAlive() || me->IsInEvadeMode())
         return;
 
-    if (IS_PLAYER_GUID(me->GetCharmerGUID()) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+    if (me->GetCharmerGUID().IsPlayer() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
     {
         me->AttackStop();
         return;
@@ -688,7 +688,7 @@ bool SmartAI::CanAIAttack(const Unit* /*who*/) const
 bool SmartAI::AssistPlayerInCombat(Unit* who)
 {
     // Xinef: if unit has no victim, or victim is player controlled thing
-    if (!who->GetVictim() || IS_PLAYER_GUID(who->GetCharmerOrOwnerOrOwnGUID()))
+    if (!who->GetVictim() || who->GetCharmerOrOwnerOrOwnGUID().IsPlayer())
         return false;
 
     //experimental (unknown) flag not present
@@ -696,7 +696,7 @@ bool SmartAI::AssistPlayerInCombat(Unit* who)
         return false;
 
     // Xinef: victim of unit has to be a player controlled unit
-    if (!IS_PLAYER_GUID(who->GetVictim()->GetCharmerOrOwnerOrOwnGUID()))
+    if (!who->GetVictim()->GetCharmerOrOwnerOrOwnGUID().IsPlayer())
         return false;
 
     // Xinef: Check if victim can be assisted

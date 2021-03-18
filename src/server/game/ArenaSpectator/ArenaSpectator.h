@@ -90,7 +90,7 @@ namespace ArenaSpectator
     template<class T>
     void SendCommand_String(T* o, uint64 targetGUID, const char* prefix, const char* c)
     {
-        if (!IS_PLAYER_GUID(targetGUID))
+        if (!targetGUID.IsPlayer())
             return;
         SendCommand(o, "%s0x%016llX;%s=%s;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, c);
     }
@@ -98,7 +98,7 @@ namespace ArenaSpectator
     template<class T>
     void SendCommand_UInt32Value(T* o, uint64 targetGUID, const char* prefix, uint32 t)
     {
-        if (!IS_PLAYER_GUID(targetGUID))
+        if (!targetGUID.IsPlayer())
             return;
         SendCommand(o, "%s0x%016llX;%s=%u;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, t);
     }
@@ -106,7 +106,7 @@ namespace ArenaSpectator
     template<class T>
     void SendCommand_GUID(T* o, uint64 targetGUID, const char* prefix, uint64 t)
     {
-        if (!IS_PLAYER_GUID(targetGUID))
+        if (!targetGUID.IsPlayer())
             return;
         SendCommand(o, "%s0x%016llX;%s=0x%016llX;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, (unsigned long long)t);
     }
@@ -114,7 +114,7 @@ namespace ArenaSpectator
     template<class T>
     void SendCommand_Spell(T* o, uint64 targetGUID, const char* prefix, uint32 id, int32 casttime)
     {
-        if (!IS_PLAYER_GUID(targetGUID))
+        if (!targetGUID.IsPlayer())
             return;
         SendCommand(o, "%s0x%016llX;%s=%u,%i;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, id, casttime);
     }
@@ -122,7 +122,7 @@ namespace ArenaSpectator
     template<class T>
     void SendCommand_Cooldown(T* o, uint64 targetGUID, const char* prefix, uint32 id, uint32 dur, uint32 maxdur)
     {
-        if (!IS_PLAYER_GUID(targetGUID))
+        if (!targetGUID.IsPlayer())
             return;
         if (const SpellInfo* si = sSpellMgr->GetSpellInfo(id))
             if (si->SpellIconID == 1)
@@ -133,7 +133,7 @@ namespace ArenaSpectator
     template<class T>
     void SendCommand_Aura(T* o, uint64 targetGUID, const char* prefix, uint64 caster, uint32 id, bool isDebuff, uint32 dispel, int32 dur, int32 maxdur, uint32 stack, bool remove)
     {
-        if (!IS_PLAYER_GUID(targetGUID))
+        if (!targetGUID.IsPlayer())
             return;
         SendCommand(o, "%s0x%016llX;%s=%u,%u,%i,%i,%u,%u,%u,0x%016llX;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, remove ? 1 : 0, stack, dur, maxdur, id, dispel, isDebuff ? 1 : 0, (unsigned long long)caster);
     }

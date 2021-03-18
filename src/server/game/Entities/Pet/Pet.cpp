@@ -59,7 +59,7 @@ void Pet::AddToWorld()
     }
 
     // pussywizard: apply ICC buff to pets
-    if (IS_PLAYER_GUID(GetOwnerGUID()) && GetMapId() == 631 && FindMap() && FindMap()->ToInstanceMap() && FindMap()->ToInstanceMap()->GetInstanceScript() && FindMap()->ToInstanceMap()->GetInstanceScript()->GetData(251 /*DATA_BUFF_AVAILABLE*/))
+    if (GetOwnerGUID().IsPlayer() && GetMapId() == 631 && FindMap() && FindMap()->ToInstanceMap() && FindMap()->ToInstanceMap()->GetInstanceScript() && FindMap()->ToInstanceMap()->GetInstanceScript()->GetData(251 /*DATA_BUFF_AVAILABLE*/))
         if (Unit* owner = GetOwner())
             if (Player* plr = owner->ToPlayer())
             {
@@ -203,7 +203,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry, ui
 void Pet::SavePetToDB(PetSaveMode mode, bool logout)
 {
     // not save not player pets
-    if (!IS_PLAYER_GUID(GetOwnerGUID()))
+    if (!GetOwnerGUID().IsPlayer())
         return;
 
     // dont allow to save pet when it is loaded, possibly bugs action bar!, save only fully controlled creature

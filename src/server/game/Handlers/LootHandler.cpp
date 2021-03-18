@@ -37,7 +37,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 
     recvData >> lootSlot;
 
-    if (IS_GAMEOBJECT_GUID(lguid))
+    if (lguid.IsGameObject())
     {
         GameObject* go = player->GetMap()->GetGameObject(lguid);
         // xinef: cheating protection
@@ -53,7 +53,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 
         loot = &go->loot;
     }
-    else if (IS_ITEM_GUID(lguid))
+    else if (lguid.IsItem())
     {
         Item* pItem = player->GetItemByGuid(lguid);
 
@@ -65,7 +65,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 
         loot = &pItem->loot;
     }
-    else if (IS_CORPSE_GUID(lguid))
+    else if (lguid.IsCorpse())
     {
         Corpse* bones = ObjectAccessor::GetCorpse(*player, lguid);
         if (!bones)
@@ -93,7 +93,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
     player->StoreLootItem(lootSlot, loot);
 
     // If player is removing the last LootItem, delete the empty container.
-    if (loot->isLooted() && IS_ITEM_GUID(lguid))
+    if (loot->isLooted() && lguid.IsItem())
         DoLootRelease(lguid);
 }
 
@@ -214,7 +214,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
             sLootItemStorage->RemoveStoredLootMoney(loot->containerId, loot);
 
         // Delete container if empty
-        if (loot->isLooted() && IS_ITEM_GUID(guid))
+        if (loot->isLooted() && guid.IsItem())
             DoLootRelease(guid);
     }
 }
@@ -229,7 +229,7 @@ void WorldSession::HandleLootOpcode(WorldPacket& recvData)
     recvData >> guid;
 
     // Check possible cheat
-    if (!GetPlayer()->IsAlive() || !IS_CRE_OR_VEH_GUID(guid))
+    if (!GetPlayer()->IsAlive() || !guid.IsCreatureOrVehicle())
         return;
 
     GetPlayer()->SendLoot(guid, LOOT_CORPSE);
@@ -268,7 +268,7 @@ void WorldSession::DoLootRelease(uint64 lguid)
     if (!player->IsInWorld())
         return;
 
-    if (IS_GAMEOBJECT_GUID(lguid))
+    if (lguid.IsGameObject())
     {
         GameObject* go = GetPlayer()->GetMap()->GetGameObject(lguid);
 
@@ -322,7 +322,7 @@ void WorldSession::DoLootRelease(uint64 lguid)
                 loot->roundRobinPlayer = 0;
         }
     }
-    else if (IS_CORPSE_GUID(lguid))        // ONLY remove insignia at BG
+    else if (lguid.IsCorpse())        // ONLY remove insignia at BG
     {
         Corpse* corpse = ObjectAccessor::GetCorpse(*player, lguid);
         if (!corpse || !corpse->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
@@ -337,7 +337,7 @@ void WorldSession::DoLootRelease(uint64 lguid)
             corpse->RemoveFlag(CORPSE_FIELD_DYNAMIC_FLAGS, CORPSE_DYNFLAG_LOOTABLE);
         }
     }
-    else if (IS_ITEM_GUID(lguid))
+    else if ((lguid.IsItem())
     {
         Item* pItem = player->GetItemByGuid(lguid);
         if (!pItem)
@@ -442,7 +442,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 
     Loot* loot = nullptr;
 
-    if (IS_CRE_OR_VEH_GUID(GetPlayer()->GetLootGUID()))
+    if (GetPlayer()->GetLootGUID().IsCreatureOrVehicle())
     {
         Creature* creature = GetPlayer()->GetMap()->GetCreature(lootguid);
         if (!creature)
@@ -450,7 +450,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 
         loot = &creature->loot;
     }
-    else if (IS_GAMEOBJECT_GUID(GetPlayer()->GetLootGUID()))
+    else if (GetPlayer()->GetLootGUID().IsGameObject())
     {
         GameObject* pGO = GetPlayer()->GetMap()->GetGameObject(lootguid);
         if (!pGO)

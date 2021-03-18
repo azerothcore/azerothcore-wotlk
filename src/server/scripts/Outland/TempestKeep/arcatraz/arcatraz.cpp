@@ -362,7 +362,7 @@ public:
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (attacker && IS_PLAYER_GUID(attacker->GetCharmerOrOwnerOrOwnGUID()) && damage > 0 && !me->isActiveObject())
+            if (attacker && attacker->GetCharmerOrOwnerOrOwnGUID().IsPlayer() && damage > 0 && !me->isActiveObject())
             {
                 me->setActive(true);
                 me->InterruptNonMeleeSpells(false);

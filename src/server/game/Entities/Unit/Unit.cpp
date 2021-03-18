@@ -934,7 +934,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         if (victim->GetTypeId() != TYPEID_PLAYER)
         {
             // Part of Evade mechanics. DoT's and Thorns / Retribution Aura do not contribute to this
-            if (damagetype != DOT && damage > 0 && !IS_PLAYER_GUID(victim->GetOwnerGUID()) && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
+            if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer() && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
                 victim->ToCreature()->SetLastDamagedTime(sWorld->GetGameTime() + MAX_AGGRO_RESET_TIME);
 
             if (attacker)
@@ -3611,7 +3611,7 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
             return false;
 
         // special handling for ICC (map 631), for non-flying pets in Gunship Battle, for trash npcs this is done via CanAIAttack
-        if (IS_PLAYER_GUID(c->GetOwnerGUID()) && !c->CanFly())
+        if (c->GetOwnerGUID().IsPlayer() && !c->CanFly())
         {
             if (c->GetTransport() != this->GetTransport())
                 return false;
@@ -3806,7 +3806,7 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         if (c->IsTrigger() && c->CanFly())
             isInAir = true;
 
-        if (IS_PLAYER_GUID(c->GetOwnerGUID()) && c->CanFly() && IsVehicle() && !c->GetDBTableGUIDLow()) // mainly for oculus drakes
+        if (c->GetOwnerGUID().IsPlayer() && c->CanFly() && IsVehicle() && !c->GetDBTableGUIDLow()) // mainly for oculus drakes
         {
             if (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
             {
@@ -4952,7 +4952,7 @@ void Unit::RemoveEvadeAuras()
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
     {
         Aura const* aura = iter->second->GetBase();
-        if (aura->GetSpellInfo()->HasAura(SPELL_AURA_CONTROL_VEHICLE) || aura->GetSpellInfo()->HasAura(SPELL_AURA_CLONE_CASTER) || (aura->IsPassive() && IS_PLAYER_GUID(GetOwnerGUID())))
+        if (aura->GetSpellInfo()->HasAura(SPELL_AURA_CONTROL_VEHICLE) || aura->GetSpellInfo()->HasAura(SPELL_AURA_CLONE_CASTER) || (aura->IsPassive() && GetOwnerGUID().IsPlayer()))
             ++iter;
         else
             _UnapplyAura(iter, AURA_REMOVE_BY_DEFAULT);
@@ -4961,7 +4961,7 @@ void Unit::RemoveEvadeAuras()
     for (AuraMap::iterator iter = m_ownedAuras.begin(); iter != m_ownedAuras.end();)
     {
         Aura* aura = iter->second;
-        if (aura->GetSpellInfo()->HasAura(SPELL_AURA_CONTROL_VEHICLE) || aura->GetSpellInfo()->HasAura(SPELL_AURA_CLONE_CASTER) || (aura->IsPassive() && IS_PLAYER_GUID(GetOwnerGUID())))
+        if (aura->GetSpellInfo()->HasAura(SPELL_AURA_CONTROL_VEHICLE) || aura->GetSpellInfo()->HasAura(SPELL_AURA_CLONE_CASTER) || (aura->IsPassive() && GetOwnerGUID().IsPlayer()))
             ++iter;
         else
             RemoveOwnedAura(iter, AURA_REMOVE_BY_DEFAULT);
@@ -9995,7 +9995,7 @@ void Unit::SetOwnerGUID(uint64 owner)
     if (!owner)
         return;
 
-    m_applyResilience = !IsVehicle() && IS_PLAYER_GUID(owner);
+    m_applyResilience = !IsVehicle() && owner.IsPlayer();
 
     // Update owner dependent fields
     Player* player = ObjectAccessor::GetPlayer(*this, owner);
@@ -10032,7 +10032,7 @@ Unit* Unit::GetCharmer() const
 Player* Unit::GetCharmerOrOwnerPlayerOrPlayerItself() const
 {
     uint64 guid = GetCharmerOrOwnerGUID();
-    if (IS_PLAYER_GUID(guid))
+    if (guid.IsPlayer())
         return ObjectAccessor::GetPlayer(*this, guid);
 
     return const_cast<Unit*>(this)->ToPlayer();
@@ -13748,7 +13748,7 @@ bool Unit::CanHaveThreatList() const
         return false;
 
     // summons can not have a threat list, unless they are controlled by a creature
-    if (HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN) && IS_PLAYER_GUID(((Pet*)this)->GetOwnerGUID()))
+    if (HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN) && ((Pet*)this)->GetOwnerGUID().IsPlayer())
         return false;
 
     return true;
@@ -16808,7 +16808,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
     }
 
     // Exploit fix
-    if (creature && creature->IsPet() && IS_PLAYER_GUID(creature->GetOwnerGUID()))
+    if (creature && creature->IsPet() && creature->GetOwnerGUID().IsPlayer())
         isRewardAllowed = false;
 
     // Reward player, his pets, and group/raid members
@@ -18147,7 +18147,7 @@ void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)
         WorldObject::UpdateObjectVisibility(true);
 
         // pussywizard: generally this is not needed here, delayed notifier will handle this, call only for pets
-        if ((IsGuardian() || IsPet()) && IS_PLAYER_GUID(GetOwnerGUID()))
+        if ((IsGuardian() || IsPet()) && GetOwnerGUID().IsPlayer())
         {
             acore::AIRelocationNotifier notifier(*this);
             float radius = 60.0f;

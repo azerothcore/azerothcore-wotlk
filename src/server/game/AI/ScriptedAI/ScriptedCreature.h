@@ -149,7 +149,7 @@ public:
     bool operator() (WorldObject* unit) const
     {
         if (unit->GetTypeId() != TYPEID_PLAYER)
-            if (!IS_PLAYER_GUID(unit->ToUnit()->GetOwnerGUID()))
+            if (!unit->ToUnit()->GetOwnerGUID().IsPlayer())
                 return true;
 
         return false;

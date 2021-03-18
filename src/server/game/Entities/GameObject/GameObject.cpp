@@ -122,9 +122,9 @@ void GameObject::RemoveFromOwner()
 
     // Xinef: not needed
     /*const char * ownerType = "creature";
-    if (IS_PLAYER_GUID(ownerGUID))
+    if (ownerGUID.IsPlayer())
         ownerType = "player";
-    else if (IS_PET_GUID(ownerGUID))
+    else if (ownerGUID.IsPet())
         ownerType = "pet";
 
     sLog->outCrash("Delete GameObject (GUID: %u Entry: %u SpellId %u LinkedGO %u) that lost references to owner (GUID %u Type '%s') GO list. Crash possible later.",

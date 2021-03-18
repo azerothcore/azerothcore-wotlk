@@ -361,7 +361,7 @@ void Guardian::InitSummon()
 
 Puppet::Puppet(SummonPropertiesEntry const* properties, uint64 owner) : Minion(properties, owner, false), m_owner(owner) //maybe true?
 {
-    ASSERT(IS_PLAYER_GUID(owner));
+    ASSERT(owner.IsPlayer());
     m_unitTypeMask |= UNIT_MASK_PUPPET;
 }
 

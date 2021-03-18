@@ -1250,7 +1250,7 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPacket& recvPacket)
     if (!_player->GetGuardianPet() && !_player->GetCharm())
         return;
 
-    if (IS_PLAYER_GUID(guid))
+    if (guid.IsPlayer())
         return;
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);

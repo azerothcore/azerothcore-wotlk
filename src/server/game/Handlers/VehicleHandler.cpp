@@ -165,7 +165,7 @@ void WorldSession::HandleEjectPassenger(WorldPacket& data)
     uint64 guid;
     data >> guid;
 
-    if (IS_PLAYER_GUID(guid))
+    if (guid.IsPlayer())
     {
         Player* player = ObjectAccessor::GetPlayer(*_player, guid);
         if (!player)
@@ -187,8 +187,7 @@ void WorldSession::HandleEjectPassenger(WorldPacket& data)
         else
             sLog->outError("Player %u attempted to eject player %u from non-ejectable seat.", GetPlayer()->GetGUIDLow(), GUID_LOPART(guid));
     }
-
-    else if (IS_CREATURE_GUID(guid))
+    else if (guid.IsCreature())
     {
         Unit* unit = ObjectAccessor::GetUnit(*_player, guid);
         if (!unit) // creatures can be ejected too from player mounts

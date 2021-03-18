@@ -619,7 +619,7 @@ size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Languag
             data << senderName;
             receiverGUIDPos = data.wpos();
             data << uint64(receiverGUID);
-            if (receiverGUID && !IS_PLAYER_GUID(receiverGUID) && !IS_PET_GUID(receiverGUID))
+            if (receiverGUID && !receiverGUID) && !receiverGUID.IsPet())
             {
                 data << uint32(receiverName.length() + 1);
                 data << receiverName;
@@ -636,7 +636,7 @@ size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Languag
         case CHAT_MSG_BG_SYSTEM_HORDE:
             receiverGUIDPos = data.wpos();
             data << uint64(receiverGUID);
-            if (receiverGUID && !IS_PLAYER_GUID(receiverGUID))
+            if (receiverGUID && !receiverGUID))
             {
                 data << uint32(receiverName.length() + 1);
                 data << receiverName;

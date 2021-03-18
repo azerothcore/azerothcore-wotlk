@@ -393,7 +393,7 @@ void Map::ScriptsProcess()
                             case CHAT_MSG_RAID_BOSS_WHISPER:
                                 {
                                     uint64 targetGUID = target ? target->GetGUID() : 0;
-                                    if (!targetGUID || !IS_PLAYER_GUID(targetGUID))
+                                    if (!targetGUID || !targetGUID.IsPlayer())
                                         sLog->outError("%s attempt to whisper to non-player unit, skipping.", step.script->GetDebugInfo().c_str());
                                     else
                                         player->Whisper(text, LANG_UNIVERSAL, targetGUID);
@@ -425,13 +425,13 @@ void Map::ScriptsProcess()
                                 cSource->MonsterTextEmote(step.script->Talk.TextID, target, true);
                                 break;
                             case CHAT_TYPE_WHISPER:
-                                if (!targetGUID || !IS_PLAYER_GUID(targetGUID))
+                                if (!targetGUID || !targetGUID.IsPlayer())
                                     sLog->outError("%s attempt to whisper to non-player unit, skipping.", step.script->GetDebugInfo().c_str());
                                 else
                                     cSource->MonsterWhisper(step.script->Talk.TextID, target->ToPlayer());
                                 break;
                             case CHAT_MSG_RAID_BOSS_WHISPER:
-                                if (!targetGUID || !IS_PLAYER_GUID(targetGUID))
+                                if (!targetGUID || !targetGUID.IsPlayer())
                                     sLog->outError("%s attempt to raidbosswhisper to non-player unit, skipping.", step.script->GetDebugInfo().c_str());
                                 else
                                     cSource->MonsterWhisper(step.script->Talk.TextID, target->ToPlayer(), true);

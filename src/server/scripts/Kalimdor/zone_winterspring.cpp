@@ -108,7 +108,7 @@ public:
         {
             if (!damaged)
             {
-                if (who && who->GetGUID() != playerGUID && (who->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(who->GetOwnerGUID())))
+                if (who && who->GetGUID() != playerGUID && (who->GetTypeId() == TYPEID_PLAYER || who->GetOwnerGUID().IsPlayer()))
                 {
                     damaged = true;
                     me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);

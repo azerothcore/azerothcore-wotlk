@@ -685,7 +685,7 @@ void Creature::Update(uint32 diff)
     if (IsInWorld() && !IsDuringRemoveFromWorld())
     {
         // pussywizard:
-        if (IS_PLAYER_GUID(GetOwnerGUID()))
+        if (GetOwnerGUID().IsPlayer())
         {
             if (m_transportCheckTimer <= diff)
             {
@@ -729,7 +729,7 @@ void Creature::Regenerate(Powers power)
     uint32 maxValue = GetMaxPower(power);
 
     // Xinef: implement power regeneration flag
-    if (!HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER) && !IS_PLAYER_GUID(GetOwnerGUID()))
+    if (!HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_REGENERATE_POWER) && !GetOwnerGUID().IsPlayer())
         return;
 
     if (curValue >= maxValue)
@@ -1806,7 +1806,7 @@ void Creature::InitializeReactState()
 
 bool Creature::HasMechanicTemplateImmunity(uint32 mask) const
 {
-    return !IS_PLAYER_GUID(GetOwnerGUID()) && (GetCreatureTemplate()->MechanicImmuneMask & mask);
+    return !GetOwnerGUID().IsPlayer() && (GetCreatureTemplate()->MechanicImmuneMask & mask);
 }
 
 void Creature::LoadSpellTemplateImmunity()
@@ -1822,7 +1822,7 @@ void Creature::LoadSpellTemplateImmunity()
     }
 
     // don't inherit immunities for hunter pets
-    if (IS_PLAYER_GUID(GetOwnerGUID()) && IsHunterPet())
+    if (GetOwnerGUID().IsPlayer() && IsHunterPet())
     {
         return;
     }
@@ -2248,7 +2248,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
     if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsInEvadeMode())
         return false;
 
-    if (!IS_PLAYER_GUID(GetCharmerOrOwnerGUID()))
+    if (!GetCharmerOrOwnerGUID().IsPlayer())
     {
         if (GetMap()->IsDungeon())
             return true;
@@ -2727,7 +2727,7 @@ void Creature::SetPosition(float x, float y, float z, float o)
 
 bool Creature::IsDungeonBoss() const
 {
-    if (IS_PLAYER_GUID(GetOwnerGUID()))
+    if (GetOwnerGUID().IsPlayer())
         return false;
 
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(GetEntry());
@@ -2736,7 +2736,7 @@ bool Creature::IsDungeonBoss() const
 
 bool Creature::IsImmuneToKnockback() const
 {
-    if (IS_PLAYER_GUID(GetOwnerGUID()))
+    if (GetOwnerGUID().IsPlayer())
         return false;
 
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(GetEntry());
@@ -2818,7 +2818,7 @@ bool Creature::CanSwim() const
     if (Unit::CanSwim())
         return true;
 
-    if (IsPet() || IS_PLAYER_GUID(GetOwnerGUID()))
+    if (IsPet() || GetOwnerGUID().IsPlayer())
         return true;
 
     return false;

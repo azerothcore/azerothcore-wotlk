@@ -1877,7 +1877,7 @@ public:
             return guid;
         return GetGUID();
     }
-    [[nodiscard]] bool IsCharmedOwnedByPlayerOrPlayer() const { return IS_PLAYER_GUID(GetCharmerOrOwnerOrOwnGUID()); }
+    [[nodiscard]] bool IsCharmedOwnedByPlayerOrPlayer() const { return GetCharmerOrOwnerOrOwnGUID().IsPlayer(); }
 
     [[nodiscard]] Player* GetSpellModOwner() const;
 
@@ -1912,7 +1912,7 @@ public:
 
     [[nodiscard]] bool IsCharmed() const { return GetCharmerGUID() != 0; }
     [[nodiscard]] bool isPossessed() const { return HasUnitState(UNIT_STATE_POSSESSED); }
-    [[nodiscard]] bool isPossessedByPlayer() const { return HasUnitState(UNIT_STATE_POSSESSED) && IS_PLAYER_GUID(GetCharmerGUID()); }
+    [[nodiscard]] bool isPossessedByPlayer() const { return HasUnitState(UNIT_STATE_POSSESSED) && GetCharmerGUID().IsPlayer(); }
     [[nodiscard]] bool isPossessing() const
     {
         if (Unit* u = GetCharm())
