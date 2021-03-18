@@ -1,23 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PetAI.h"
-#include "Errors.h"
-#include "Pet.h"
-#include "Player.h"
-#include "DBCStores.h"
-#include "Spell.h"
-#include "ObjectAccessor.h"
-#include "SpellMgr.h"
 #include "Creature.h"
-#include "World.h"
-#include "Util.h"
+#include "DBCStores.h"
+#include "Errors.h"
 #include "Group.h"
-#include "SpellInfo.h"
+#include "ObjectAccessor.h"
+#include "Pet.h"
+#include "PetAI.h"
+#include "Player.h"
+#include "Spell.h"
 #include "SpellAuraEffects.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "Util.h"
+#include "World.h"
 #include "WorldSession.h"
 
 int PetAI::Permissible(const Creature* creature)
@@ -443,7 +443,7 @@ void PetAI::OwnerAttacked(Unit* target)
     // Called when owner attacks something. Allows defensive pets to know
     //  that they need to assist
 
-    // Target might be NULL if called from spell with invalid cast targets
+    // Target might be nullptr if called from spell with invalid cast targets
     if (!target)
         return;
 

@@ -2,16 +2,16 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
-#include "Spell.h"
-#include "Vehicle.h"
-#include "MapManager.h"
 #include "GameObjectAI.h"
-#include "ScriptedCreature.h"
-#include "ruby_sanctum.h"
+#include "MapManager.h"
 #include "Player.h"
+#include "ruby_sanctum.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
 enum Texts
 {
@@ -650,7 +650,7 @@ public:
                     }
                     break;
                 case EVENT_TWILIGHT_MENDING:
-                    me->CastSpell((Unit*)NULL, SPELL_TWILIGHT_MENDING, true);
+                    me->CastSpell((Unit*)nullptr, SPELL_TWILIGHT_MENDING, true);
                     break;
                 case EVENT_CHECK_CORPOREALITY:
                     UpdateCorporeality();
@@ -751,7 +751,7 @@ public:
         void UpdateAI(uint32 /*diff*/) override
         {
             if (!me->HasUnitState(UNIT_STATE_CASTING))
-                me->CastSpell((Unit*)NULL, SPELL_TRACK_ROTATION, false);
+                me->CastSpell((Unit*)nullptr, SPELL_TRACK_ROTATION, false);
         }
 
         void DoAction(int32 action) override
@@ -1122,7 +1122,7 @@ public:
         {
             Unit* caster = GetCaster();
             caster->CastSpell(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), SPELL_SUMMON_TWILIGHT_PORTAL, true);
-            caster->GetMap()->SummonCreature(NPC_TWILIGHT_HALION, caster->ToCreature()->GetHomePosition(), NULL, 0, caster);
+            caster->GetMap()->SummonCreature(NPC_TWILIGHT_HALION, caster->ToCreature()->GetHomePosition(), nullptr, 0, caster);
         }
 
         void Register() override
@@ -1258,7 +1258,7 @@ public:
         void HandlePeriodic(AuraEffect const* aurEff)
         {
             PreventDefaultAction();
-            GetUnitOwner()->CastSpell((Unit*)NULL, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+            GetUnitOwner()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
         }
 
         void Register() override

@@ -2,9 +2,9 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "oculus.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -219,7 +219,7 @@ public:
                         me->DisableSpline();
                         me->SetFacingTo(ZapAngle);
                         me->SetControlled(true, UNIT_STATE_ROOT);
-                        me->CastSpell((Unit*)NULL, SPELL_ENERGIZE_CORES, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_ENERGIZE_CORES, false);
                         ZapAngle += M_PI / 2;
                         if( ZapAngle >= 2 * M_PI )
                             ZapAngle -= 2 * M_PI;

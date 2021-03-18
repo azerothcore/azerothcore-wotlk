@@ -297,15 +297,15 @@ bool MySQLConnection::_Query(PreparedStatement* stmt, MYSQL_RES** pResult, uint6
 ResultSet* MySQLConnection::Query(const char* sql)
 {
     if (!sql)
-        return NULL;
+        return nullptr;
 
-    MYSQL_RES* result = NULL;
-    MYSQL_FIELD* fields = NULL;
+    MYSQL_RES* result = nullptr;
+    MYSQL_FIELD* fields = nullptr;
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
     if (!_Query(sql, &result, &fields, &rowCount, &fieldCount))
-        return NULL;
+        return nullptr;
 
     return new ResultSet(result, fields, rowCount, fieldCount);
 }
@@ -444,7 +444,7 @@ void MySQLConnection::PrepareStatement(uint32 index, const char* sql, Connection
     // to save memory that will not be used.
     if (!(m_connectionFlags & flags))
     {
-        m_stmts[index] = NULL;
+        m_stmts[index] = nullptr;
         return;
     }
 
@@ -474,12 +474,12 @@ void MySQLConnection::PrepareStatement(uint32 index, const char* sql, Connection
 
 PreparedResultSet* MySQLConnection::Query(PreparedStatement* stmt)
 {
-    MYSQL_RES* result = NULL;
+    MYSQL_RES* result = nullptr;
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
     if (!_Query(stmt, &result, &rowCount, &fieldCount))
-        return NULL;
+        return nullptr;
 
     if (mysql_more_results(m_Mysql))
     {

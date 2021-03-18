@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "trial_of_the_crusader.h"
 #include "Group.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "trial_of_the_crusader.h"
 
 #define CLEANUP_CHECK_INTERVAL  5000
 std::map<uint32, bool> validDedicatedInsanityItems;
@@ -324,7 +324,7 @@ public:
                 case TYPE_GORMOK:
                     if( data == DONE )
                     {
-                        if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], NULL, 25000))
+                        if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], nullptr, 25000))
                         {
                             trigger->SetDisplayId(11686);
                             trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -346,7 +346,7 @@ public:
                     {
                         if( ++Counter == 2 )
                         {
-                            if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], NULL, 25000))
+                            if (Creature* trigger = instance->SummonCreature(WORLD_TRIGGER, Locs[LOC_CENTER], nullptr, 25000))
                             {
                                 trigger->SetDisplayId(11686);
                                 trigger->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -533,7 +533,7 @@ public:
                             events.RescheduleEvent(EVENT_SCENE_501, 20000);
                         }
                         if( GameObject* floor = instance->GetGameObject(GO_FloorGUID) )
-                            floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
+                            floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
                     }
                     break;
             }
@@ -1327,7 +1327,7 @@ public:
                         {
                             if( GameObject* floor = instance->GetGameObject(GO_FloorGUID) )
                                 floor->SetDestructibleState(GO_DESTRUCTIBLE_DAMAGED);//floor->ModifyHealth(-10000000, c);
-                            c->CastSpell((Unit*)NULL, 68193, true);
+                            c->CastSpell((Unit*)nullptr, 68193, true);
                             c->SetVisible(false);
                             c->SetDisplayId(11686);
                             if( Creature* t = c->FindNearestCreature(NPC_WORLD_TRIGGER, 500.0f, true) )
@@ -1539,7 +1539,7 @@ public:
                 case INSTANCE_PROGRESS_VALKYR_DEAD:
                 case INSTANCE_PROGRESS_ANUB_ARAK:
                     /*if( GameObject* floor = instance->GetGameObject(GO_FloorGUID) )
-                        floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);*/
+                        floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);*/
                     if (Creature* c = instance->GetCreature(NPC_BarrettGUID))
                     {
                         if (InstanceProgress == INSTANCE_PROGRESS_ANUB_ARAK)
@@ -1570,7 +1570,7 @@ public:
                     break;
                 case INSTANCE_PROGRESS_DONE:
                     if( GameObject* floor = instance->GetGameObject(GO_FloorGUID) )
-                        floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
+                        floor->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                     {
                         c->SetVisible(false);

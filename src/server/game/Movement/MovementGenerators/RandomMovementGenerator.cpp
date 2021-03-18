@@ -3,15 +3,15 @@
 */
 
 #include "Creature.h"
-#include "MapManager.h"
-#include "RandomMovementGenerator.h"
-#include "ObjectAccessor.h"
-#include "Map.h"
-#include "Util.h"
 #include "CreatureGroups.h"
-#include "MoveSplineInit.h"
+#include "Map.h"
+#include "MapManager.h"
 #include "MoveSpline.h"
+#include "MoveSplineInit.h"
+#include "ObjectAccessor.h"
+#include "RandomMovementGenerator.h"
 #include "Spell.h"
+#include "Util.h"
 
 template<>
 void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)

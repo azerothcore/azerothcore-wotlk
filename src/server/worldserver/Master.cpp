@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,27 +8,27 @@
     \ingroup Trinityd
 */
 
+#include "ACSoap.h"
+#include "BigNumber.h"
+#include "CliRunnable.h"
 #include "Common.h"
+#include "Config.h"
+#include "DatabaseEnv.h"
+#include "DatabaseWorkerPool.h"
 #include "GitRevision.h"
+#include "Log.h"
+#include "Master.h"
+#include "OpenSSLCrypto.h"
+#include "RARunnable.h"
+#include "RealmList.h"
+#include "ScriptMgr.h"
 #include "SignalHandler.h"
+#include "Timer.h"
+#include "Util.h"
 #include "World.h"
 #include "WorldRunnable.h"
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
-#include "Config.h"
-#include "DatabaseEnv.h"
-#include "DatabaseWorkerPool.h"
-#include "CliRunnable.h"
-#include "Log.h"
-#include "Master.h"
-#include "RARunnable.h"
-#include "ACSoap.h"
-#include "Timer.h"
-#include "Util.h"
-#include "RealmList.h"
-#include "ScriptMgr.h"
-#include "BigNumber.h"
-#include "OpenSSLCrypto.h"
 #include "DatabaseLoader.h"
 #include <ace/Sig_Handler.h>
 
@@ -137,7 +137,7 @@ int Master::Run()
     sLog->outString("     AzerothCore 3.3.5a  -  www.azerothcore.org\n");
 
     /// worldserver PID file creation
-    std::string pidFile = sConfigMgr->GetStringDefault("PidFile", "");
+    std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
@@ -186,9 +186,9 @@ int Master::Run()
     acore::Thread* cliThread = nullptr;
 
 #ifdef _WIN32
-    if (sConfigMgr->GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
+    if (sConfigMgr->GetOption<bool>("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
 #else
-    if (sConfigMgr->GetBoolDefault("Console.Enable", true))
+    if (sConfigMgr->GetOption<bool>("Console.Enable", true))
 #endif
     {
         ///- Launch CliRunnable thread
@@ -204,8 +204,8 @@ int Master::Run()
 #if defined(_WIN32) || defined(__linux__)
 
     ///- Handle affinity for multiple processors and process priority
-    uint32 affinity = sConfigMgr->GetIntDefault("UseProcessors", 0);
-    bool highPriority = sConfigMgr->GetBoolDefault("ProcessPriority", false);
+    uint32 affinity = sConfigMgr->GetOption<int32>("UseProcessors", 0);
+    bool highPriority = sConfigMgr->GetOption<bool>("ProcessPriority", false);
 
 #ifdef _WIN32 // Windows
 
@@ -271,16 +271,16 @@ int Master::Run()
 
     // Start soap serving thread
     acore::Thread* soapThread = nullptr;
-    if (sConfigMgr->GetBoolDefault("SOAP.Enabled", false))
+    if (sConfigMgr->GetOption<bool>("SOAP.Enabled", false))
     {
         ACSoapRunnable* runnable = new ACSoapRunnable();
-        runnable->SetListenArguments(sConfigMgr->GetStringDefault("SOAP.IP", "127.0.0.1"), uint16(sConfigMgr->GetIntDefault("SOAP.Port", 7878)));
+        runnable->SetListenArguments(sConfigMgr->GetOption<std::string>("SOAP.IP", "127.0.0.1"), uint16(sConfigMgr->GetOption<int32>("SOAP.Port", 7878)));
         soapThread = new acore::Thread(runnable);
     }
 
     // Start up freeze catcher thread
     acore::Thread* freezeThread = nullptr;
-    if (uint32 freezeDelay = sConfigMgr->GetIntDefault("MaxCoreStuckTime", 0))
+    if (uint32 freezeDelay = sConfigMgr->GetOption<int32>("MaxCoreStuckTime", 0))
     {
         FreezeDetectorRunnable* runnable = new FreezeDetectorRunnable(freezeDelay * 1000);
         freezeThread = new acore::Thread(runnable);
@@ -289,7 +289,7 @@ int Master::Run()
 
     ///- Launch the world listener socket
     uint16 worldPort = uint16(sWorld->getIntConfig(CONFIG_PORT_WORLD));
-    std::string bindIp = sConfigMgr->GetStringDefault("BindIP", "0.0.0.0");
+    std::string bindIp = sConfigMgr->GetOption<std::string>("BindIP", "0.0.0.0");
     if (sWorldSocketMgr->StartNetwork(worldPort, bindIp.c_str()) == -1)
     {
         sLog->outError("Failed to start network");
@@ -408,7 +408,7 @@ bool Master::_StartDB()
         return false;
 
     ///- Get the realm Id from the configuration file
-    realmID = sConfigMgr->GetIntDefault("RealmID", 0);
+    realmID = sConfigMgr->GetOption<int32>("RealmID", 0);
     if (!realmID)
     {
         sLog->outError("Realm ID not defined in configuration file");

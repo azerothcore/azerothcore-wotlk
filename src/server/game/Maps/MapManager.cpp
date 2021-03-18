@@ -1,32 +1,33 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "MapManager.h"
-#include "InstanceSaveMgr.h"
-#include "DatabaseEnv.h"
-#include "Log.h"
-#include "ObjectAccessor.h"
-#include "Transport.h"
-#include "GridDefines.h"
-#include "MapInstanced.h"
-#include "InstanceScript.h"
-#include "Config.h"
-#include "World.h"
-#include "CellImpl.h"
-#include "Corpse.h"
-#include "ObjectMgr.h"
-#include "Language.h"
-#include "WorldPacket.h"
-#include "Group.h"
-#include "Player.h"
-#include "WorldSession.h"
-#include "Opcodes.h"
-#include "LFGMgr.h"
-#include "Chat.h"
 #include "AvgDiffTracker.h"
+#include "CellImpl.h"
+#include "Chat.h"
+#include "Config.h"
+#include "Corpse.h"
+#include "DatabaseEnv.h"
+#include "GridDefines.h"
+#include "Group.h"
+#include "InstanceSaveMgr.h"
+#include "InstanceScript.h"
+#include "Language.h"
+#include "LFGMgr.h"
+#include "Log.h"
+#include "MapInstanced.h"
+#include "MapManager.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Player.h"
+#include "Transport.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif

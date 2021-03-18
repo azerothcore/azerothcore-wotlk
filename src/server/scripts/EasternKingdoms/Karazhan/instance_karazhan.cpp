@@ -1,13 +1,13 @@
 
-#include "ScriptMgr.h"
 #include "Creature.h"
 #include "GameObject.h"
 #include "InstanceScript.h"
 #include "karazhan.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
 #include "Map.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 const Position OptionalSpawn[] =
 {

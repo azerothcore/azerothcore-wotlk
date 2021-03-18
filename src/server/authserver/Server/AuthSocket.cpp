@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -776,10 +776,10 @@ bool AuthSocket::_HandleLogonProof()
         sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' [AuthChallenge] account %s tried to login with invalid password!", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str());
 #endif
 
-        uint32 MaxWrongPassCount = sConfigMgr->GetIntDefault("WrongPass.MaxCount", 0);
+        uint32 MaxWrongPassCount = sConfigMgr->GetOption<int32>("WrongPass.MaxCount", 0);
 
         // We can not include the failed account login hook. However, this is a workaround to still log this.
-        if (sConfigMgr->GetBoolDefault("WrongPass.Logging", false))
+        if (sConfigMgr->GetOption<bool>("WrongPass.Logging", false))
         {
             PreparedStatement* logstmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_FALP_IP_LOGGING);
             logstmt->setString(0, _login);
@@ -805,8 +805,8 @@ bool AuthSocket::_HandleLogonProof()
 
                 if (failed_logins >= MaxWrongPassCount)
                 {
-                    uint32 WrongPassBanTime = sConfigMgr->GetIntDefault("WrongPass.BanTime", 600);
-                    bool WrongPassBanType = sConfigMgr->GetBoolDefault("WrongPass.BanType", false);
+                    uint32 WrongPassBanTime = sConfigMgr->GetOption<int32>("WrongPass.BanTime", 600);
+                    bool WrongPassBanType = sConfigMgr->GetOption<bool>("WrongPass.BanType", false);
 
                     if (WrongPassBanType)
                     {

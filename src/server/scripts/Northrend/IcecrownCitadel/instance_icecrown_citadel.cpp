@@ -2,19 +2,19 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
-#include "ScriptedCreature.h"
-#include "Map.h"
 #include "AccountMgr.h"
+#include "CreatureTextMgr.h"
+#include "Group.h"
 #include "icecrown_citadel.h"
+#include "InstanceScript.h"
+#include "Map.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Transport.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Transport.h"
-#include "Group.h"
-#include "CreatureTextMgr.h"
 
 enum EventIds
 {
@@ -1590,7 +1590,7 @@ public:
                         return;
 
                     stalkers.sort(acore::ObjectDistanceOrderPred(teleporter));
-                    stalkers.front()->CastSpell((Unit*)NULL, SPELL_ARTHAS_TELEPORTER_CEREMONY, false);
+                    stalkers.front()->CastSpell((Unit*)nullptr, SPELL_ARTHAS_TELEPORTER_CEREMONY, false);
                     stalkers.pop_front();
                     for (std::list<Creature*>::iterator itr = stalkers.begin(); itr != stalkers.end(); ++itr)
                         (*itr)->AI()->Reset();
@@ -1749,7 +1749,7 @@ public:
                         }
                     case EVENT_REBUILD_PLATFORM:
                         if (GameObject* platform = instance->GetGameObject(ArthasPlatformGUID))
-                            platform->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
+                            platform->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
                         if (GameObject* edge = instance->GetGameObject(FrozenThroneEdgeGUID))
                             edge->SetGoState(GO_STATE_READY);
                         if (GameObject* wind = instance->GetGameObject(FrozenThroneWindGUID))
@@ -1815,7 +1815,7 @@ public:
                     }
                     break;
                 case EVENT_TELEPORT_TO_FROSMOURNE: // Harvest Soul (normal mode)
-                    if (Creature* terenas = instance->SummonCreature(NPC_TERENAS_MENETHIL_FROSTMOURNE, TerenasSpawn, NULL, 65000))
+                    if (Creature* terenas = instance->SummonCreature(NPC_TERENAS_MENETHIL_FROSTMOURNE, TerenasSpawn, nullptr, 65000))
                     {
                         terenas->AI()->DoAction(ACTION_FROSTMOURNE_INTRO);
                         std::list<Creature*> triggers;
@@ -1827,7 +1827,7 @@ public:
                             visual->CastSpell(visual, SPELL_FROSTMOURNE_TELEPORT_VISUAL, true);
                         }
 
-                        if (Creature* warden = instance->SummonCreature(NPC_SPIRIT_WARDEN, SpiritWardenSpawn, NULL, 65000))
+                        if (Creature* warden = instance->SummonCreature(NPC_SPIRIT_WARDEN, SpiritWardenSpawn, nullptr, 65000))
                         {
                             terenas->AI()->AttackStart(warden);
                             warden->AddThreat(terenas, 300000.0f);

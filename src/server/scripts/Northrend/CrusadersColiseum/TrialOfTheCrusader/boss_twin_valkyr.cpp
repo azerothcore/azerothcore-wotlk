@@ -3,14 +3,14 @@
 (!) ACTUALLY FJOLA CONTROLLS THE WHOLE FIGHT (SPECIAL ABILITIES, SHARED HEALTH, ETC.) SINCE THEY DIE SIMULTANEOUSLY
 */
 
-#include "ScriptMgr.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "trial_of_the_crusader.h"
-#include "SpellScript.h"
-#include "PassiveAI.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
-#include "Player.h"
+#include "SpellScript.h"
+#include "trial_of_the_crusader.h"
 
 enum Yells
 {
@@ -402,7 +402,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     switch( s )
                     {
                         case 0: // light vortex
-                            me->CastSpell((Unit*)NULL, SPELL_LIGHT_VORTEX, false);
+                            me->CastSpell((Unit*)nullptr, SPELL_LIGHT_VORTEX, false);
                             Talk(EMOTE_VORTEX);
                             Talk(SAY_LIGHT);
                             if( Creature* twin = GetSister() )
@@ -411,7 +411,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                         case 1: // dark vortex
                             if( Creature* twin = GetSister() )
                             {
-                                twin->CastSpell((Unit*)NULL, SPELL_DARK_VORTEX, false);
+                                twin->CastSpell((Unit*)nullptr, SPELL_DARK_VORTEX, false);
                                 twin->AI()->Talk(EMOTE_VORTEX);
                                 twin->AI()->Talk(SAY_NIGHT);
                                 Talk(SAY_NIGHT);
@@ -835,7 +835,7 @@ public:
                             CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
                             int32 dmg = urand(2925, 3075) * (caster->GetMap()->GetDifficulty() - 1);
                             if (caster->CanApplyResilience())
-                                Unit::ApplyResilience(plr, NULL, &dmg, false, CR_CRIT_TAKEN_SPELL);
+                                Unit::ApplyResilience(plr, nullptr, &dmg, false, CR_CRIT_TAKEN_SPELL);
                             uint32 damage = dmg;
                             Unit::CalcAbsorbResist(caster, plr, GetSpellInfo()->GetSchoolMask(), DOT, damage, &absorb, &resist, GetSpellInfo());
                             Unit::DealDamageMods(plr, damage, &absorb);
@@ -880,7 +880,7 @@ public:
                             {
                                 me->AI()->DoAction(1); // despawning = true;
                                 me->GetMotionMaster()->MoveIdle();
-                                me->CastSpell((Unit*)NULL, me->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
+                                me->CastSpell((Unit*)nullptr, me->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
                                 me->SetDisplayId(11686);
                                 me->DespawnOrUnsummon(1500);
                             }
