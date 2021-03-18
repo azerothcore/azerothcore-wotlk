@@ -77,6 +77,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include <cmath>
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -1262,6 +1263,35 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
     CheckAllAchievementCriteria();
 
     return true;
+}
+
+bool Player::hasFishingStepsDB(uint32 guid)
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_FISHINGSTEPS);
+    stmt->setUInt32(0, guid);
+
+    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+    {
+        return true;
+    }
+
+    return false;
+}
+
+void Player::InitFishingSteps(uint32 guid)
+{
+    // Initializing Fishing steps
+    if (!hasFishingStepsDB(guid))
+    {
+        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_FISHINGSTEPS);
+        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        stmt->setUInt32(0, guid);
+        stmt->setUInt32(1, m_fishingSteps);
+        trans->Append(stmt);
+        CharacterDatabase.CommitTransaction(trans);
+        setFishingStepsState(true);
+        setFishingStepsState(true);
+    }
 }
 
 bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
@@ -6372,14 +6402,25 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLeve
 
 uint8 GetFishingStepsNeededToLevelUp(uint32 SkillValue)
 {
-    // These formulas are guessed to be as close as possible to how the skill difficulty curve for fishing was on Retail.
+    /* The formula is calculated in order to reproduce
+     * a blizzlike behaviour. It was only guessed by
+     * the Trinitycore developers and improved by AC
+     */
+    float stepsNeeded = static_cast<float>(SkillValue);
     if (SkillValue < 75)
+    {
         return 1;
-
-    if (SkillValue <= 300)
-        return SkillValue / 44;
-
-    return SkillValue / 31;
+    }
+    else if (SkillValue <= 300)
+    {
+        stepsNeeded = round(stepsNeeded / 44);
+        return static_cast<uint8>(stepsNeeded);
+    }
+    else
+    {
+        stepsNeeded = round(stepsNeeded / 31);
+        return static_cast<uint8>(stepsNeeded);
+    }
 }
 
 void updateFishingStepsDB(uint32 guid, uint32 steps)
@@ -17995,7 +18036,8 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder* holder)
 
     uint32 dbAccountId = fields[1].GetUInt32();
 
-    m_fishingSteps = fields[72].GetUInt8();
+    InitFishingSteps(guid);
+    m_fishingSteps = loadFishingSteps(guid);
 
     // check if the character's account in the db and the logged in account match.
     // player should be able to load/delete character only with correct account!
@@ -26567,19 +26609,18 @@ void Player::SetMap(Map* map)
     m_mapRef.link(map, this);
 }
 
-bool loadFishingStepsState(uint32 guid)
+int Player::loadFishingSteps(uint32 guid)
 {
-    /*
-    * Check PET_SAVE_NOT_IN_SLOT means the pet is dismissed. If someone ever
-    * Changes the slot flag, they will break this validation.
-    */
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_FISHINGSTEPS);
     stmt->setUInt32(0, guid);
 
-    if (PreparedQueryResult result = CharacterDatabase.AsyncQuery(stmt))
-        return true;
+    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+    {
+        Field* fields = result->Fetch();
+        return fields[0].GetUInt8();
+    }
 
-    return false;
+    return 0;
 }
 
 void Player::_SaveCharacter(bool create, SQLTransaction& trans)
@@ -26838,24 +26879,6 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
     }
 
     trans->Append(stmt);
-
-    if (!hasFishingSteps())
-    {
-        uint32 guid = this->GetGUID();
-        if (!loadFishingStepsState(guid))
-        {
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_FISHINGSTEPS);
-            index = 0;
-            stmt->setUInt32(index++, guid);
-            stmt->setUInt32(index++, m_fishingSteps);
-            trans->Append(stmt);
-            setFishingStepsState(true);
-        }
-        else
-        {
-            setFishingStepsState(true);
-        }
-    }
 }
 
 void Player::_LoadGlyphs(PreparedQueryResult result)

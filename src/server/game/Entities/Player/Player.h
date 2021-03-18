@@ -1118,6 +1118,10 @@ public:
     }
     bool TeleportToEntryPoint();
 
+    int loadFishingSteps(uint32 guid);
+    bool hasFishingStepsDB(uint32 guid);
+    void InitFishingSteps(uint32 guid);
+
     void SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay = 0, bool asSpectator = false)
     {
         m_summon_expire = time(nullptr) + (delay ? delay : MAX_PLAYER_SUMMON_DELAY);
