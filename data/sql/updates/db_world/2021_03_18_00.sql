@@ -1,3 +1,19 @@
+-- DB update 2021_03_17_05 -> 2021_03_18_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_03_17_05';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_03_17_05 2021_03_18_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1615808511621508316'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1615808511621508316');
 
 -- NPC entry: 12144 Lunaclaw Spirit. Druid quest: Body and Heart (Alliance: 6001, Horde: 6002)
@@ -26,3 +42,12 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,
 (15,@menu,0,0,1,28,0,6001,0,0,1,0,0,'','Show gossip menu 3862 option id 0 if quest Body and Heart has not been completed.'),
 (15,@menu,1,0,2, 6,0,  67,0,0,0,0,0,'','Show gossip menu 3862 option id 1 if player is on the Horde team. -AND-'),
 (15,@menu,1,0,2,28,0,6002,0,0,1,0,0,'','Show gossip menu 3862 option id 1 if quest Body and Heart has not been completed.');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
