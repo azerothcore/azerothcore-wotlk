@@ -3,8 +3,8 @@
  * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
-#ifndef _WARHEAD_TOKENIZE_H_
-#define _WARHEAD_TOKENIZE_H_
+#ifndef _ACORE_TOKENIZE_H_
+#define _ACORE_TOKENIZE_H_
 
 #include "Common.h"
 #include <string_view>
@@ -21,4 +21,4 @@ namespace acore
     inline std::vector<std::string_view> Tokenize(char const* str, char sep, bool keepEmpty) { return Tokenize(std::string_view(str ? str : ""), sep, keepEmpty); }
 }
 
-#endif //_WARHEAD_TOKENIZE_H_
+#endif // _ACORE_TOKENIZE_H_
