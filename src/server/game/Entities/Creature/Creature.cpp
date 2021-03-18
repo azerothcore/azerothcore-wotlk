@@ -2250,7 +2250,9 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 
     // cannot attack if is during 5 second grace period, unless being attacked
     if ((time(nullptr) - m_respawnedTime) < 5 && victim->getAttackers().empty())
+    {
         return false;
+    }
 
     if (!IS_PLAYER_GUID(GetCharmerOrOwnerGUID()))
     {
