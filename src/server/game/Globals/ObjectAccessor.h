@@ -268,7 +268,7 @@ private:
 
     std::unordered_set<Object*> i_objects;
     Player2CorpsesMapType i_player2corpse;
-    std::list<uint64> i_playerBones;
+    GuidList i_playerBones;
 
     ACE_Thread_Mutex i_objectLock;
     ACE_RW_Thread_Mutex i_corpseLock;

@@ -964,7 +964,7 @@ protected:
     std::list<uint32> m_SkillupList;
 
     uint32 m_ritualOwnerGUIDLow;                              // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
-    std::set<uint64> m_unique_users;
+    GuidSet m_unique_users;
     uint32 m_usetimes;
 
     typedef std::map<uint32, uint64> ChairSlotAndUser;

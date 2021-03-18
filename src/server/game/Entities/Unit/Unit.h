@@ -2514,7 +2514,7 @@ protected:
     typedef std::list<DynamicObject*> DynObjectList;
     DynObjectList m_dynObj;
 
-    typedef std::list<uint64> GameObjectList;
+    typedef GuidList GameObjectList;
     GameObjectList m_gameObj;
     uint32 m_transform;
 

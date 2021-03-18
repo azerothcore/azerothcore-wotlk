@@ -42,7 +42,7 @@ public:
         bool bAchiev;
         bool bDefensesUsed;
 
-        std::vector<uint64> GO_ActivationCrystalGUID;
+        GuidVector GO_ActivationCrystalGUID;
         uint64 GO_MainGateGUID;
 
         uint64 GO_MoraggCellGUID;
@@ -54,7 +54,7 @@ public:
         uint64 GO_XevozzCellGUID;
         uint64 GO_ZuramatCellGUID;
 
-        std::set<uint64> trashMobs;
+        GuidSet trashMobs;
         uint64 NPC_SinclariGUID;
         uint64 NPC_GuardGUID[4];
         uint64 NPC_PortalGUID;
@@ -458,8 +458,8 @@ public:
                         DoUpdateWorldState(WORLD_STATE_VH_PRISON_STATE, (uint32)GateHealth);
                         DoUpdateWorldState(WORLD_STATE_VH_WAVE_COUNT, (uint32)WaveCount);
 
-                        for (std::vector<uint64>::iterator itr = GO_ActivationCrystalGUID.begin(); itr != GO_ActivationCrystalGUID.end(); ++itr)
-                            if (GameObject* go = instance->GetGameObject(*itr))
+                        for (ObjectGuid guid : GO_ActivationCrystalGUIDr)
+                            if (GameObject* go = instance->GetGameObject(guid))
                             {
                                 HandleGameObject(0, false, go); // not used yet
                                 go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // make it useable
@@ -552,8 +552,8 @@ public:
             CLEANED = true;
 
             // reset defense crystals
-            for (std::vector<uint64>::iterator itr = GO_ActivationCrystalGUID.begin(); itr != GO_ActivationCrystalGUID.end(); ++itr)
-                if (GameObject* go = instance->GetGameObject(*itr))
+            for (ObjectGuid guid : GO_ActivationCrystalGUID)
+                if (GameObject* go = instance->GetGameObject(guid))
                 {
                     HandleGameObject(0, false, go); // not used yet
                     go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
@@ -579,9 +579,10 @@ public:
             NPC_PortalGUID = 0;
 
             // remove trash
-            for (std::set<uint64>::iterator itr = trashMobs.begin(); itr != trashMobs.end(); ++itr)
-                if (Creature* c = instance->GetCreature(*itr))
+            for (ObjectGuid guid : trashMobs)
+                if (Creature* c = instance->GetCreature(guid))
                     c->DespawnOrUnsummon();
+
             trashMobs.clear();
 
             // clear door seal damaging auras:

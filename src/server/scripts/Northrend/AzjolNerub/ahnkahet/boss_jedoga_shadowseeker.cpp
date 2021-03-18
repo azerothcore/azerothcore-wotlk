@@ -144,7 +144,7 @@ public:
 
             uint8 rnd = urand(0, summons.size() - 1);
             uint8 loop = 0;
-            for (std::list<uint64>::iterator i = summons.begin(); i != summons.end();)
+            for (GuidList::iterator i = summons.begin(); i != summons.end();)
             {
                 Creature* summon = ObjectAccessor::GetCreature(*me, *i);
                 if (summon && summon->GetEntry() == NPC_INITIATE && loop >= rnd)

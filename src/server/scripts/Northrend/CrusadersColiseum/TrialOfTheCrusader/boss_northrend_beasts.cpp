@@ -161,7 +161,7 @@ public:
                     {
                         if( t->GetTypeId() != TYPEID_PLAYER && pInstance )
                         {
-                            std::vector<uint64> validPlayers;
+                            GuidVector validPlayers;
                             Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                             Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_GORMOK));
 
@@ -298,7 +298,7 @@ public:
                         for( uint8 i = 0; i < 4; ++i )
                             if( Unit* snobold = vk->GetPassenger(i) )
                             {
-                                std::vector<uint64> validPlayers;
+                                GuidVector validPlayers;
                                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                                 {

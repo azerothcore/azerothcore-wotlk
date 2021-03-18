@@ -156,7 +156,7 @@ typedef std::unordered_map<uint32, PlayerTalent*> PlayerTalentMap;
 typedef std::unordered_map<uint32, PlayerSpell*> PlayerSpellMap;
 typedef std::list<SpellModifier*> SpellModList;
 
-typedef std::list<uint64> WhisperListContainer;
+typedef GuidList WhisperListContainer;
 
 struct SpellCooldown
 {

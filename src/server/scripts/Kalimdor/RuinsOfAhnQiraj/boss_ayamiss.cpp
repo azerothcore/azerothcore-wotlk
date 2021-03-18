@@ -187,8 +187,8 @@ public:
                         events.ScheduleEvent(EVENT_PARALYZE, 15000);
                         break;
                     case EVENT_SWARMER_ATTACK:
-                        for (std::list<uint64>::iterator i = _swarmers.begin(); i != _swarmers.end(); ++i)
-                            if (Creature* swarmer = me->GetMap()->GetCreature(*i))
+                        for (ObjectGuid guid : _swarmers)
+                            if (Creature* swarmer = me->GetMap()->GetCreature(guid))
                                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                                     swarmer->AI()->AttackStart(target);
 
@@ -215,7 +215,7 @@ public:
             }
         }
     private:
-        std::list<uint64> _swarmers;
+        GuidList _swarmers;
         uint8 _phase;
         bool _enraged;
     };

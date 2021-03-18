@@ -50,7 +50,7 @@ public:
         uint64 m_RepairSGUID[2];
         uint64 m_lightningWalls[2];
         bool m_leviathanTowers[4];
-        std::list<uint64> _leviathanVehicles;
+        GuidList _leviathanVehicles;
         uint32 m_unbrokenAchievement;
         uint32 m_mageBarrier;
 
@@ -1141,8 +1141,8 @@ void instance_ulduar::instance_ulduar_InstanceMapScript::SpawnLeviathanEncounter
 {
     if (!_leviathanVehicles.empty())
     {
-        for (std::list<uint64>::iterator itr = _leviathanVehicles.begin(); itr != _leviathanVehicles.end(); ++itr)
-            if (Creature* cr = instance->GetCreature(*itr))
+        for (ObjectGuid guid : _leviathanVehicles)
+            if (Creature* cr = instance->GetCreature(guid))
                 if (Vehicle* veh = cr->GetVehicleKit())
                     veh->Dismiss();
 

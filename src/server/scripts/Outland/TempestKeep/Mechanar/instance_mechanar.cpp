@@ -240,7 +240,7 @@ public:
         uint64 _pathaleonGUID;
         uint32 _passageTimer;
         uint32 _passageEncounter;
-        std::set<uint64> _passageGUIDs;
+        GuidSet _passageGUIDs;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

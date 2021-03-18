@@ -34,7 +34,7 @@ public:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string str_data;
 
-        std::list<uint64> VehicleList;
+        GuidList VehicleList;
         EventMap events;
         uint8 Counter;
         uint8 temp1, temp2;
@@ -291,8 +291,8 @@ public:
                 case INSTANCE_PROGRESS_CHAMPION_GROUP_DIED_3:
                     // revert to INSTANCE_PROGRESS_INITIAL
                     {
-                        for( std::list<uint64>::const_iterator itr = VehicleList.begin(); itr != VehicleList.end(); ++itr )
-                            if( Creature* veh = instance->GetCreature(*itr) )
+                        for (ObjectGuid const guid : VehicleList)
+                            if (Creature* veh = instance->GetCreature(guid))
                             {
                                 veh->DespawnOrUnsummon();
                                 veh->SetRespawnTime(3);
@@ -579,8 +579,8 @@ public:
                             {
                                 Counter = 0;
                                 InstanceProgress = INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED;
-                                for( std::list<uint64>::const_iterator itr = VehicleList.begin(); itr != VehicleList.end(); ++itr )
-                                    if( Creature* veh = instance->GetCreature(*itr) )
+                                for (ObjectGuid const guid : VehicleList)
+                                    if (Creature* veh = instance->GetCreature(guid))
                                         veh->DespawnOrUnsummon();
                                 events.ScheduleEvent(EVENT_GRAND_CHAMPIONS_MOVE_SIDE, 0);
                             }

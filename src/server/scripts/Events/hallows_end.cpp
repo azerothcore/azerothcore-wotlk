@@ -606,7 +606,7 @@ public:
         bool Unmount;
         EventMap events;
         uint32 counter;
-        std::list<uint64> unitList;
+        GuidList unitList;
         int32 pos;
         void EnterCombat(Unit*) override {}
         void MoveInLineOfSight(Unit*  /*who*/) override {}
@@ -699,8 +699,8 @@ public:
                             if (counter > 12)
                             {
                                 bool failed = false;
-                                for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                                    if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
+                                for (ObjectGuid const guid : unitList)
+                                    if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                                         if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
                                         {
                                             failed = true;
@@ -753,8 +753,8 @@ public:
         Unit* getTrigger()
         {
             std::list<Unit*> tmpList;
-            for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
+            for (ObjectGuid const guid : unitList)
+                if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                     if (!c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
                         tmpList.push_back(c);
 
@@ -772,8 +772,8 @@ public:
             {
                 me->MonsterYell("Fire consumes! You've tried and failed. Let there be no doubt, justice prevailed!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(11967);
-                for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                    if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
+                for (ObjectGuid const guid : unitList)
+                    if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                         c->RemoveAllAuras();
 
                 me->DespawnOrUnsummon(1);

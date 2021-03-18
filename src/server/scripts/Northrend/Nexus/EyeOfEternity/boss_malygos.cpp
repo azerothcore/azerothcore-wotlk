@@ -1172,7 +1172,7 @@ public:
                     break;
                 case EVENT_SCION_OF_ETERNITY_ARCANE_BARRAGE:
                     {
-                        std::vector<uint64> guids;
+                        GuidVector guids;
                         Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
                         if (!PlayerList.isEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)

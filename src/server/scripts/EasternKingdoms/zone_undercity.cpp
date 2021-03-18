@@ -1003,7 +1003,7 @@ public:
         uint64 generatorGUID[GENERATOR_MAXCOUNT];
         uint64 allianceForcesGUID[ALLIANCE_FORCE_MAXCOUNT];
         uint64 hordeForcesGUID[HORDE_FORCE_MAXCOUNT];
-        std::vector<uint64> allianceGuardsGUID;
+        GuidVector allianceGuardsGUID;
 
         EventMap _events;
 
@@ -1091,8 +1091,8 @@ public:
                     }
                 }
 
-                for (std::vector<uint64>::const_iterator i = allianceGuardsGUID.begin(); i != allianceGuardsGUID.end(); ++i)
-                    if (Creature* temp = ObjectAccessor::GetCreature(*me, *i))
+                for (ObjectGuid const guid : allianceGuardsGUID)
+                    if (Creature* temp = ObjectAccessor::GetCreature(*me, guid))
                         temp->DespawnOrUnsummon();
 
                 allianceGuardsGUID.clear();
@@ -2346,7 +2346,7 @@ public:
         uint64 WrynnGUID;
         uint64 JainaGUID;
         uint64 SaurfangGUID;
-        std::vector<uint64> hordeGuardsGUID;
+        GuidVector hordeGuardsGUID;
 
         EventMap _events;
 
@@ -2421,8 +2421,8 @@ public:
                     SaurfangGUID = 0;
                 }
 
-                for (std::vector<uint64>::const_iterator i = hordeGuardsGUID.begin(); i != hordeGuardsGUID.end(); ++i)
-                    if (Creature* temp = ObjectAccessor::GetCreature(*me, *i))
+                for (ObjectGuid const guid : hordeGuardsGUID)
+                    if (Creature* temp = ObjectAccessor::GetCreature(*me, guid))
                         temp->DespawnOrUnsummon();
 
                 hordeGuardsGUID.clear();

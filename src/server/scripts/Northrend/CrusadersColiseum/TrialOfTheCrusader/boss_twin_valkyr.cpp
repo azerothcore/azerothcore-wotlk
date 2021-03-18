@@ -372,7 +372,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     events.RepeatEvent(urand(45000,50000));
                     */
 
-                    std::vector<uint64> tList;
+                    GuidVector tList;
                     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
                     if (pList.getSize())
                     {

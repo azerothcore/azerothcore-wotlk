@@ -99,9 +99,9 @@ public:
                     }
                     break;
                 case DATA_ERANIKUS_FIGHT:
-                    for (std::list<uint64>::const_iterator itr = _dragonkinList.begin(); itr != _dragonkinList.end(); ++itr)
+                    for (ObjectGuid const guid : _dragonkinList)
                     {
-                        if (Creature* creature = instance->GetCreature(*itr))
+                        if (Creature* creature = instance->GetCreature(guid))
                             if (instance->IsGridLoaded(creature->GetPositionX(), creature->GetPositionY()))
                                 creature->SetInCombatWithZone();
                     }
@@ -182,7 +182,7 @@ public:
 
         uint64 _forcefieldGUID;
         uint64 _jammalanGUID;
-        std::list<uint64> _dragonkinList;
+        GuidList _dragonkinList;
         EventMap _events;
     };
 

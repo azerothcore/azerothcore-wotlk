@@ -437,7 +437,7 @@ public:
         }
 
     private:
-        std::list<uint64> _targets;
+        GuidList _targets;
     };
 
     AuraScript* GetAuraScript() const override

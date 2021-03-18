@@ -45,7 +45,7 @@ public:
         uint64 NPC_AcidmawGUID;
         uint64 NPC_IcehowlGUID;
         uint64 NPC_JaraxxusGUID;
-        std::vector<uint64> NPC_ChampionGUIDs;
+        GuidVector NPC_ChampionGUIDs;
         uint64 NPC_LightbaneGUID;
         uint64 NPC_DarkbaneGUID;
         uint64 NPC_LichKingGUID;
@@ -425,8 +425,8 @@ public:
                             InstanceProgress = INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD;
                             events.RescheduleEvent(EVENT_SCENE_FACTION_CHAMPIONS_DEAD, 2500);
 
-                            for( std::vector<uint64>::iterator itr = NPC_ChampionGUIDs.begin(); itr != NPC_ChampionGUIDs.end(); ++itr )
-                                if( Creature* c = instance->GetCreature(*itr) )
+                            for (ObjectGuid guid : NPC_ChampionGUIDs)
+                                if (Creature* c = instance->GetCreature(guid))
                                     c->DespawnOrUnsummon(15000);
                             NPC_ChampionGUIDs.clear();
 
@@ -478,10 +478,10 @@ public:
                     {
                         EncounterStatus = IN_PROGRESS;
                         AchievementTimer = 0;
-                        for( std::vector<uint64>::iterator itr = NPC_ChampionGUIDs.begin(); itr != NPC_ChampionGUIDs.end(); ++itr )
-                            if( Creature* c = instance->GetCreature(*itr) )
-                                if( !c->IsInCombat() )
-                                    if( Unit* target = c->SelectNearestTarget(200.0f) )
+                        for (ObjectGuid guid : NPC_ChampionGUIDs)
+                            if (Creature* c = instance->GetCreature(guid))
+                                if (!c->IsInCombat())
+                                    if (Unit* target = c->SelectNearestTarget(200.0f))
                                         c->AI()->AttackStart(target);
                     }
                     break;
@@ -1115,8 +1115,8 @@ public:
                     }
                 case EVENT_CHAMPIONS_ATTACK:
                     {
-                        for( std::vector<uint64>::iterator itr = NPC_ChampionGUIDs.begin(); itr != NPC_ChampionGUIDs.end(); ++itr )
-                            if( Creature* c = instance->GetCreature(*itr) )
+                        for (ObjectGuid guid : NPC_ChampionGUIDs)
+                            if (Creature* c = instance->GetCreature(guid))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -1515,8 +1515,8 @@ public:
                 case INSTANCE_PROGRESS_JARAXXUS_DEAD:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                         c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    for( std::vector<uint64>::iterator itr = NPC_ChampionGUIDs.begin(); itr != NPC_ChampionGUIDs.end(); ++itr )
-                        if( Creature* c = instance->GetCreature(*itr) )
+                    for (ObjectGuid guid : NPC_ChampionGUIDs)
+                        if (Creature* c = instance->GetCreature(guid))
                             c->DespawnOrUnsummon();
                     NPC_ChampionGUIDs.clear();
                     break;

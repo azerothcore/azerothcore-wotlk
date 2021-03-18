@@ -169,8 +169,8 @@ public:
                 case DATA_RAZORGORE_THE_UNTAMED:
                     if (state == DONE)
                     {
-                        for (std::list<uint64>::const_iterator itr = EggList.begin(); itr != EggList.end(); ++itr)
-                            if (GameObject* egg = instance->GetGameObject((*itr)))
+                        for (ObjectGuid const guid : EggList)
+                            if (GameObject* egg = instance->GetGameObject(guid))
                                 egg->SetPhaseMask(2, true);
                     }
                     SetData(DATA_EGG_EVENT, NOT_STARTED);
@@ -278,7 +278,7 @@ public:
         // Razorgore
         uint8 EggCount;
         uint32 EggEvent;
-        std::list<uint64> EggList;
+        GuidList EggList;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const

@@ -63,8 +63,8 @@ public:
         {
             BossAI::EnterEvadeMode();
 
-            for (std::list<uint64>::iterator i = Eggs.begin(); i != Eggs.end(); ++i)
-                if (Creature* egg = me->GetMap()->GetCreature(*Eggs.begin()))
+            for (ObjectGuid guid : Eggs)
+                if (Creature* egg = me->GetMap()->GetCreature(guid))
                     egg->Respawn();
 
             Eggs.clear();
@@ -171,7 +171,7 @@ public:
         }
     private:
         uint8 _phase;
-        std::list<uint64> Eggs;
+        GuidList Eggs;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

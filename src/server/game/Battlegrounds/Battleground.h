@@ -550,8 +550,8 @@ public:
     void SetHoliday(bool is_holiday);
 
     // TODO: make this protected:
-    typedef std::vector<uint64> BGObjects;
-    typedef std::vector<uint64> BGCreatures;
+    typedef GuidVector BGObjects;
+    typedef GuidVector BGCreatures;
     BGObjects BgObjects;
     BGCreatures BgCreatures;
     void SpawnBGObject(uint32 type, uint32 respawntime);
@@ -637,9 +637,9 @@ protected:
     virtual void RemovePlayer(Player* /*player*/) {}
 
     // Player lists, those need to be accessible by inherited classes
-    BattlegroundPlayerMap  m_Players;
+    BattlegroundPlayerMap m_Players;
     // Spirit Guide guid + Player list GUIDS
-    std::map<uint64, std::vector<uint64> >  m_ReviveQueue;
+    std::map<uint64, GuidVector> m_ReviveQueue;
 
     // these are important variables used for starting messages
     uint8 m_Events;
@@ -708,8 +708,8 @@ private:
     virtual void PostUpdateImpl(uint32 /* diff */) { }
 
     // Player lists
-    std::vector<uint64> m_ResurrectQueue;               // Player GUID
-    std::deque<uint64> m_OfflineQueue;                  // Player GUID
+    GuidVector m_ResurrectQueue;                // Player GUID
+    GuidDeque m_OfflineQueue;                   // Player GUID
 
     // Invited counters are useful for player invitation to BG - do not allow, if BG is started to one faction to have 2 more players than another faction
     // Invited counters will be changed only when removing already invited player from queue, removing player from battleground and inviting player to BG

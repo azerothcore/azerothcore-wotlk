@@ -846,7 +846,7 @@ private:
     AssistDelayEvent();
 
     uint64            m_victim;
-    std::list<uint64> m_assistants;
+    GuidList          m_assistants;
     Unit&             m_owner;
 };
 

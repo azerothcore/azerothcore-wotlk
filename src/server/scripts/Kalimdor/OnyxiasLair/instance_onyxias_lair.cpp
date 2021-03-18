@@ -24,7 +24,7 @@ public:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string str_data;
         uint16 ManyWhelpsCounter;
-        std::vector<uint64> minions;
+        GuidVector minions;
         bool bDeepBreath;
 
         void Initialize() override
@@ -80,8 +80,8 @@ public:
                     bDeepBreath = true;
                     if( uiData == NOT_STARTED )
                     {
-                        for( std::vector<uint64>::iterator itr = minions.begin(); itr != minions.end(); ++itr )
-                            if( Creature* c = instance->GetCreature(*itr) )
+                        for (ObjectGuid guid : minions)
+                            if (Creature* c = instance->GetCreature(guid))
                                 c->DespawnOrUnsummon();
                         minions.clear();
                     }

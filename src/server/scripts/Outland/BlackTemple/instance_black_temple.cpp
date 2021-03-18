@@ -198,8 +198,8 @@ public:
 
             if (type == DATA_SHADE_OF_AKAMA && state == DONE)
             {
-                for (std::list<uint64>::const_iterator itr = ashtongueGUIDs.begin(); itr != ashtongueGUIDs.end(); ++itr)
-                    if (Creature* ashtongue = instance->GetCreature(*itr))
+                for (ObjectGuid const guid : ashtongueGUIDs)
+                    if (Creature* ashtongue = instance->GetCreature(guid))
                         ashtongue->setFaction(FACTION_ASHTONGUE);
             }
             else if (type == DATA_ILLIDARI_COUNCIL && state == DONE)
@@ -259,7 +259,7 @@ public:
         uint64 AkamaShadeGUID;
         uint64 TeronGorefiendGUID;
         uint64 ReliquaryGUID;
-        std::list<uint64> ashtongueGUIDs;
+        GuidList ashtongueGUIDs;
         uint64 GathiosTheShattererGUID;
         uint64 HighNethermancerZerevorGUID;
         uint64 LadyMalandeGUID;
@@ -304,8 +304,8 @@ public:
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            for (std::set<uint64>::const_iterator itr = _turtleSet.begin(); itr != _turtleSet.end(); ++itr)
-                if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), *itr))
+            for (ObjectGuid const guid : _turtleSetr)
+                if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
                 {
                     turtle->TauntFadeOut(GetUnitOwner());
                     turtle->AddThreat(GetUnitOwner(), -10000000.0f);
@@ -319,7 +319,7 @@ public:
         }
 
     private:
-        std::set<uint64> _turtleSet;
+        GuidSet _turtleSet;
     };
 
     AuraScript* GetAuraScript() const override

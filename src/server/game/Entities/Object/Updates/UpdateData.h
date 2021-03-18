@@ -50,7 +50,7 @@ public:
 
 protected:
     uint32 m_blockCount;
-    std::vector<uint64> m_outOfRangeGUIDs;
+    GuidVector m_outOfRangeGUIDs;
     ByteBuffer m_data;
 
     void Compress(void* dst, uint32* dst_size, void* src, int src_size);

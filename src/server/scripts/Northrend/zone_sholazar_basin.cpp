@@ -177,9 +177,9 @@ public:
                 if (action == ACTION_BIND_MINIONS)
                     me->CastSpell(me, SPELL_ARTRUIS_BINDING, true);
 
-                for (std::list<uint64>::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                for (ObjectGuid const guid : summons)
                 {
-                    Creature* minion = ObjectAccessor::GetCreature(*me, *itr);
+                    Creature* minion = ObjectAccessor::GetCreature(*me, guid);
                     if (minion && minion->IsAlive())
                     {
                         if (action == ACTION_BIND_MINIONS)

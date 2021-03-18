@@ -178,7 +178,7 @@ public:
         uint32 enfeeble_health[5];
         uint64 enfeeble_targets[5];
 
-        std::vector<uint64> infernals;
+        GuidVector infernals;
         std::vector<InfernalPoint*> positions;
 
         void Initialize()

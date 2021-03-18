@@ -142,7 +142,7 @@ public:
         uint64 _abomEyePortalGUID;
 
         // NPCs
-        std::list<uint64> PatchwerkRoomTrash;
+        GuidList PatchwerkRoomTrash;
         uint64 _patchwerkGUID;
         uint64 _thaddiusGUID;
         uint64 _stalaggGUID;

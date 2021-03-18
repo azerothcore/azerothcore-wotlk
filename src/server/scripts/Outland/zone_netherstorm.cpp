@@ -1098,8 +1098,8 @@ public:
         {
             if (!summons.empty())
             {
-                for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
+                for (ObjectGuid guid : summons)
+                    if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     {
                         float x, y, z, o;
                         cr->GetRespawnPosition(x, y, z, &o);
@@ -1175,7 +1175,7 @@ public:
         void SummonsAction(Unit* who)
         {
             float i = 0;
-            for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr, i += 1.0f)
+            for (GuidList::iterator itr = summons.begin(); itr != summons.end(); ++itr, i += 1.0f)
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
                 {
                     if (who == nullptr)

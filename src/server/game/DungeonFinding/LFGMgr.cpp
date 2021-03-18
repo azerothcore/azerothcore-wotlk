@@ -911,7 +911,7 @@ namespace lfg
         uint32 deletedCounter, groupCounter, playerCounter;
         ByteBuffer buffer_deleted, buffer_groups, buffer_players;
         std::string emptyComment;
-        std::set<uint64> deletedGroups, deletedGroupsToErase;
+        GuidSet deletedGroups, deletedGroupsToErase;
         RBInternalInfoMap copy;
 
         for (uint8 team = 0; team < 2; ++team)
@@ -1099,14 +1099,14 @@ namespace lfg
                 }
 
                 if (!deletedGroupsToErase.empty())
-                    for (std::set<uint64>::const_iterator sitr = deletedGroupsToErase.begin(); sitr != deletedGroupsToErase.end(); ++sitr)
-                        deletedGroups.erase(*sitr);
+                    for (ObjectGuid const guid : deletedGroupsToEraser)
+                        deletedGroups.erase(guid);
 
                 if (!deletedGroups.empty())
-                    for (std::set<uint64>::const_iterator sitr = deletedGroups.begin(); sitr != deletedGroups.end(); ++sitr)
+                    for (ObjectGuid const guid : deletedGroups)
                     {
                         ++deletedCounter;
-                        buffer_deleted << (*sitr);
+                        buffer_deleted << guid;
                     }
 
                 WorldPacket differencePacket(SMSG_UPDATE_LFG_LIST, 1000);

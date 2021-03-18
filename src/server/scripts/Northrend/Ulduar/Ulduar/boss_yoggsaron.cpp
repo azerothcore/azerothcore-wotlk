@@ -2222,7 +2222,7 @@ public:
         }
 
         EventMap events;
-        std::vector<uint64> _targets;
+        GuidVector _targets;
         uint32 _current;
 
         void Reset() override

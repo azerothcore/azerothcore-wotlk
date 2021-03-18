@@ -200,9 +200,9 @@ public:
             if( !IsHeroic() )
                 events.RescheduleEvent(EVENT_RESPAWN_SPHERE, 4000);
 
-            for( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
+            for (ObjectGuid guid : summons)
                 if (pInstance)
-                    if(Creature* c = pInstance->instance->GetCreature(*itr) )
+                    if (Creature* c = pInstance->instance->GetCreature(guid))
                     {
                         c->GetMotionMaster()->MoveIdle();
                         c->StopMoving();

@@ -385,7 +385,7 @@ public:
                         std::list<Creature*> icl;
                         me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
 
-                        std::vector<uint64> playerGUIDs;
+                        GuidVector playerGUIDs;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         Player* temp = nullptr;
 

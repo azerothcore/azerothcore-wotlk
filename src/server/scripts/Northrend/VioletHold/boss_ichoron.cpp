@@ -209,8 +209,8 @@ public:
                         bool bIsWaterElementsAlive = false;
                         if (!globules.empty())
                         {
-                            for (std::list<uint64>::const_iterator itr = globules.begin(); itr != globules.end(); ++itr)
-                                if (Creature* pTemp = ObjectAccessor::GetCreature(*me, *itr))
+                            for (ObjectGuid const guid : globules)
+                                if (Creature* pTemp = ObjectAccessor::GetCreature(*me, guid))
                                     if (pTemp->IsAlive())
                                     {
                                         bIsWaterElementsAlive = true;

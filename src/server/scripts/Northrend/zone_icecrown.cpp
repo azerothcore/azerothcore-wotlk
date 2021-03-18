@@ -172,8 +172,8 @@ public:
         void CheckSummons()
         {
             bool allow = true;
-            for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
+            for (ObjectGuid guid : summons)
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     if (cr->IsAlive())
                         allow = false;
 

@@ -88,7 +88,7 @@ public:
         InstanceScript* pInstance;
         uint8 iceboltCount{};
         uint32 spawnTimer{};
-        std::list<uint64> blockList;
+        GuidList blockList;
         uint64 currentTarget{};
 
         void InitializeAI() override
@@ -188,12 +188,12 @@ public:
 
         bool IsValidExplosionTarget(WorldObject* target)
         {
-            for (std::list<uint64>::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
+            for (ObjectGuid const guid : blockList)
             {
-                if (target->GetGUID() == (*itr))
+                if (target->GetGUID() == guid)
                     return false;
 
-                if (Unit* block = ObjectAccessor::GetUnit(*me, *itr))
+                if (Unit* block = ObjectAccessor::GetUnit(*me, guid))
                 {
                     if (block->IsInBetween(me, target, 2.0f) && block->IsWithinDist(target, 10.0f))
                         return false;
@@ -301,8 +301,8 @@ public:
                             {
                                 bool inList = false;
                                 if (!blockList.empty())
-                                    for (std::list<uint64>::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
-                                        if ((*i)->getTarget()->GetGUID() == *itr)
+                                    for (ObjectGuid const guid : blockList)
+                                        if ((*i)->getTarget()->GetGUID() == guid)
                                         {
                                             inList = true;
                                             break;
@@ -338,8 +338,8 @@ public:
                     return;
                 case EVENT_FLIGHT_START_LAND:
                     if (!blockList.empty())
-                        for (std::list<uint64>::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
-                            if (Unit* block = ObjectAccessor::GetUnit(*me, *itr))
+                        for (ObjectGuid const guid : blockList)
+                            if (Unit* block = ObjectAccessor::GetUnit(*me, guid))
                                 block->RemoveAurasDueToSpell(SPELL_ICEBOLT_TRIGGER);
 
                     blockList.clear();

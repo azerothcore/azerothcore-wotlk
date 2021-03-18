@@ -412,9 +412,9 @@ void ObjectAccessor::RemoveOldCorpses()
     }
 
     // pussywizard: for deleting bones
-    std::list<uint64>::iterator next2;
+    GuidList::iterator next2;
     ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
-    for (std::list<uint64>::iterator itr = i_playerBones.begin(); itr != i_playerBones.end(); itr = next2)
+    for (GuidList::iterator itr = i_playerBones.begin(); itr != i_playerBones.end(); itr = next2)
     {
         next2 = itr;
         ++next2;

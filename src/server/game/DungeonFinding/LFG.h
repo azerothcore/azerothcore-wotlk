@@ -94,8 +94,8 @@ namespace lfg
     typedef std::set<uint32> LfgDungeonSet;
     typedef std::map<uint32, uint32> LfgLockMap;
     typedef std::map<uint64, LfgLockMap> LfgLockPartyMap;
-    typedef std::set<uint64> LfgGuidSet;
-    typedef std::list<uint64> LfgGuidList;
+    typedef GuidSet LfgGuidSet;
+    typedef GuidList LfgGuidList;
     typedef std::map<uint64, uint8> LfgRolesMap;
     typedef std::map<uint64, uint64> LfgGroupsMap;
 

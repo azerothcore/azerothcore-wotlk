@@ -291,8 +291,8 @@ public:
                             events.RepeatEvent(30000);
                         else
                         {
-                            for( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
-                                if( Creature* sv = ObjectAccessor::GetCreature(*me, *itr) )
+                            for (ObjectGuid guid : summons)
+                                if (Creature* sv = ObjectAccessor::GetCreature(*me, guid))
                                 {
                                     sv->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                                     sv->GetMotionMaster()->MoveIdle();

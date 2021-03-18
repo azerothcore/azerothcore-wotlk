@@ -183,13 +183,15 @@ void GameObject::CheckRitualList()
 {
     if (m_unique_users.empty())
         return;
-    for (std::set<uint64>::iterator itr = m_unique_users.begin(); itr != m_unique_users.end();)
+
+    for (GuidSet::iterator itr = m_unique_users.begin(); itr != m_unique_users.end();)
     {
         if (*itr == GetOwnerGUID())
         {
             ++itr;
             continue;
         }
+
         bool erase = true;
         if (Player* channeler = ObjectAccessor::GetPlayer(*this, *itr))
             if (Spell* spell = channeler->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
@@ -208,9 +210,10 @@ void GameObject::ClearRitualList()
     uint32 animSpell = GetGOInfo()->summoningRitual.animSpell;
     if (!animSpell || m_unique_users.empty())
         return;
-    for (std::set<uint64>::iterator itr = m_unique_users.begin(); itr != m_unique_users.end(); ++itr)
+
+    for (ObjectGuid const guid : m_unique_users)
     {
-        if (Player* channeler = ObjectAccessor::GetPlayer(*this, *itr))
+        if (Player* channeler = ObjectAccessor::GetPlayer(*this, guid))
             if (Spell* spell = channeler->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
                 if (spell->m_spellInfo->Id == animSpell)
                 {
@@ -218,6 +221,7 @@ void GameObject::ClearRitualList()
                     spell->finish();
                 }
     }
+
     m_unique_users.clear();
 }
 

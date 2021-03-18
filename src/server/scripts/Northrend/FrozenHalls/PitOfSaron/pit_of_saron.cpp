@@ -962,8 +962,8 @@ public:
 
                 TSSpawnPos.GetAngle(&TSMidPos);
 
-                for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                    if (Creature* c = pInstance->instance->GetCreature(*itr))
+                for (ObjectGuid guid : summons)
+                    if (Creature* c = pInstance->instance->GetCreature(guid))
                     {
                         float hx, hy, hz, ho;
                         c->GetHomePosition(hx, hy, hz, ho);
@@ -978,8 +978,8 @@ public:
                 if (pInstance)
                     if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SINDRAGOSA_GUID)))
                     {
-                        for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                            if (Creature* s = pInstance->instance->GetCreature(*itr))
+                        for (ObjectGuid guid : summons)
+                            if (Creature* s = pInstance->instance->GetCreature(guid))
                                 if (s->IsAlive())
                                     Unit::Kill(c, s);
                         if (me->IsAlive())
@@ -1030,8 +1030,8 @@ public:
                     me->SetFacingTo(5.26f);
                     me->SetOrientation(5.26f);
                     me->SetHomePosition(*me);
-                    for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                        if (Creature* c = pInstance->instance->GetCreature(*itr))
+                    for (ObjectGuid guid : summons)
+                        if (Creature* c = pInstance->instance->GetCreature(guid))
                         {
                             c->SetFacingTo(5.26f);
                             c->SetOrientation(5.26f);
@@ -1060,8 +1060,8 @@ public:
                             float offset = frand(0.0f, 10.0f);
                             c->GetMotionMaster()->MovePoint(0, 1047.0f + offset, 118.0f + offset, 628.2f);
                             c->SetHomePosition(*me);
-                            for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                                if (Creature* s = pInstance->instance->GetCreature(*itr))
+                            for (ObjectGuid guid : summons)
+                                if (Creature* s = pInstance->instance->GetCreature(guid))
                                 {
                                     if (s->GetEntry() == NPC_FALLEN_WARRIOR)
                                         continue;

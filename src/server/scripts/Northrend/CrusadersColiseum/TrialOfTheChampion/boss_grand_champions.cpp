@@ -263,7 +263,7 @@ public:
                     break;
                 case EVENT_MOUNT_CHARGE:
                     {
-                        std::vector<uint64> LIST;
+                        GuidVector LIST;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if( Player* plr = itr->GetSource() )
@@ -294,7 +294,7 @@ public:
                     break;
                 case EVENT_SHIELD_BREAKER:
                     {
-                        std::vector<uint64> LIST;
+                        GuidVector LIST;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if( Player* plr = itr->GetSource() )
@@ -716,7 +716,7 @@ public:
                     break;
                 case EVENT_MOUNT_CHARGE:
                     {
-                        std::vector<uint64> LIST;
+                        GuidVector LIST;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if( Player* plr = itr->GetSource() )
@@ -747,7 +747,7 @@ public:
                     break;
                 case EVENT_SHIELD_BREAKER:
                     {
-                        std::vector<uint64> LIST;
+                        GuidVector LIST;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if( Player* plr = itr->GetSource() )
