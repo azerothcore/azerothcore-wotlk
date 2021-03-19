@@ -23,7 +23,6 @@ typedef std::set<GameObject*> GameObjectSet;
 typedef std::set<BfWGGameObjectBuilding*> GameObjectBuilding;
 typedef std::set<WGWorkshop*> Workshop;
 typedef std::set<Group*> GroupSet;
-//typedef std::set<WintergraspCapturePoint *> CapturePointSet; unused ?
 
 const uint32 VehNumWorldState[2] = { 3680, 3490 };
 const uint32 MaxVehNumWorldState[2] = { 3681, 3491 };
