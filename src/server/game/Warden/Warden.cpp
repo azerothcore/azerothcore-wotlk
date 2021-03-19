@@ -1,24 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "WorldPacket.h"
-#include "WorldSession.h"
-#include "Log.h"
-#include "Opcodes.h"
-#include "ByteBuffer.h"
-#include <openssl/md5.h>
-#include <openssl/sha.h>
-#include "World.h"
-#include "Player.h"
-#include "Util.h"
-#include "Warden.h"
 #include "AccountMgr.h"
 #include "BanManager.h"
+#include "ByteBuffer.h"
+#include "Common.h"
+#include "Log.h"
+#include "Opcodes.h"
+#include "Player.h"
 #include "SharedDefines.h"
+#include "Util.h"
+#include "Warden.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
+#include <openssl/md5.h>
+#include <openssl/sha.h>
 
 Warden::Warden() : _session(nullptr), _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
     _dataSent(false), _module(nullptr), _initialized(false)
