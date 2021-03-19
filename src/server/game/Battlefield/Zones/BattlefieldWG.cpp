@@ -100,15 +100,25 @@ bool BattlefieldWG::SetupBattlefield()
         m_GraveyardList[i] = graveyard;
     }
 
-    // Spawn workshop creatures and gameobjects
-    for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
+    // Spawn Workshops
+    for (uint8 workshopAmount = 0; workshopAmount < WG_MAX_WORKSHOP; workshopAmount++)
     {
-        WGWorkshop* workshop = new WGWorkshop(this, i);
-        if (i < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
-            workshop->GiveControlTo(GetAttackerTeam(), true);
-        else
-            workshop->GiveControlTo(GetDefenderTeam(), true);
+        WGWorkshop* workshop = new WGWorkshop(this, workshopAmount);
 
+        /* The only workshops that belong to the attackers when the
+         * battle begins are the southern workshops. Every other workshop
+         * belongs to the defending side.
+         */
+        switch (workshopAmount)
+        {
+            case BATTLEFIELD_WG_WORKSHOP_SE:
+            case BATTLEFIELD_WG_WORKSHOP_SW:
+                workshop->GiveControlTo(GetAttackerTeam(), true);
+                break;
+            default:
+                workshop->GiveControlTo(GetDefenderTeam(), true);
+                break;
+        }
         // Note: Capture point is added once the gameobject is created.
         WorkshopsList.insert(workshop);
     }
