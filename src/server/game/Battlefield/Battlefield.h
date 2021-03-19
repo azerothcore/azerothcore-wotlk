@@ -87,7 +87,6 @@ public:
     // Used when player is activated/inactivated in the area
     virtual bool HandlePlayerEnter(Player* player);
     virtual GuidSet::iterator HandlePlayerLeave(Player* player);
-    //virtual void HandlePlayerActivityChanged(Player* player);
 
     // Checks if player is in range of a capture credit marker
     bool IsInsideObjective(Player* player) const;
