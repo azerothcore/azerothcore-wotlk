@@ -318,6 +318,8 @@ public:
      */
     void OnPlayerEnterZone(Player* player) override;
 
+    void SpawnCreatures();
+
     /**
      * \brief Called for update battlefield data
      * - Save battle timer in database every minutes
@@ -470,8 +472,7 @@ protected:
 const uint8 WG_MAX_OBJ = 32;
 const uint8 WG_MAX_TURRET = 16;
 const uint8 WG_MAX_KEEP_NPC = 45;
-const uint8 WG_MAX_OUTSIDE_NPC = 14;
-const uint8 WG_OUTSIDE_ALLIANCE_NPC = 7;
+const uint8 WG_MAX_OUTSIDE_NPC = 7;
 const uint8 WG_MAX_TELEPORTER = 12;
 
 enum WintergraspGameObjectBuildingType
@@ -727,7 +728,7 @@ const WintergraspObjectPositionData WGKeepNPC[WG_MAX_KEEP_NPC] =
     { 5316.770996f, 2619.430176f, 409.027740f, 5.363431f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A }        // Standing Guard
 };
 
-const WintergraspObjectPositionData WGOutsideNPC[WG_MAX_OUTSIDE_NPC] =
+const WintergraspObjectPositionData WGOutsideNPCHorde[WG_MAX_OUTSIDE_NPC] =
 {
     { 5032.04f, 3681.79f, 362.980f, 4.210f, BATTLEFIELD_WG_NPC_VIERON_BLAZEFEATHER, 0 },
     { 5020.71f, 3626.19f, 360.150f, 4.640f, BATTLEFIELD_WG_NPC_HOODOO_MASTER_FU_JIN, 0 },
@@ -736,6 +737,10 @@ const WintergraspObjectPositionData WGOutsideNPC[WG_MAX_OUTSIDE_NPC] =
     { 5031.12f, 3663.77f, 363.500f, 3.110f, BATTLEFIELD_WG_NPC_SIEGESMITH_STRONGHOOF, 0 },
     { 5042.74f, 3675.82f, 363.060f, 3.358f, BATTLEFIELD_WG_NPC_PRIMALIST_MULFORT, 0 },
     { 5014.45f, 3640.87f, 361.390f, 3.280f, BATTLEFIELD_WG_NPC_LIEUTENANT_MURP, 0 },
+};
+
+const WintergraspObjectPositionData WGOutsideNPCAlliance[WG_MAX_OUTSIDE_NPC] =
+{
     { 5100.07f, 2168.89f, 365.779f, 1.972f, 0, BATTLEFIELD_WG_NPC_BOWYER_RANDOLPH },
     { 5081.70f, 2173.73f, 365.878f, 0.855f, 0, BATTLEFIELD_WG_NPC_SORCERESS_KAYLANA },
     { 5078.28f, 2183.70f, 365.029f, 1.466f, 0, BATTLEFIELD_WG_NPC_COMMANDER_ZANNETH },

@@ -123,38 +123,7 @@ bool BattlefieldWG::SetupBattlefield()
         WorkshopsList.insert(workshop);
     }
 
-    // Spawn NPCs in the defender's keep, both Horde and Alliance
-    for (uint8 i = 0; i < WG_MAX_KEEP_NPC; i++)
-    {
-        // Horde npc
-        if (Creature* creature = SpawnCreature(WGKeepNPC[i].entryHorde, WGKeepNPC[i].x, WGKeepNPC[i].y, WGKeepNPC[i].z, WGKeepNPC[i].o, TEAM_HORDE))
-            KeepCreature[TEAM_HORDE].insert(creature->GetGUID());
-        // Alliance npc
-        if (Creature* creature = SpawnCreature(WGKeepNPC[i].entryAlliance, WGKeepNPC[i].x, WGKeepNPC[i].y, WGKeepNPC[i].z, WGKeepNPC[i].o, TEAM_ALLIANCE))
-            KeepCreature[TEAM_ALLIANCE].insert(creature->GetGUID());
-    }
-
-    // Hide NPCs from the Attacker's team in the keep
-    for (GuidSet::const_iterator itr = KeepCreature[GetAttackerTeam()].begin(); itr != KeepCreature[GetAttackerTeam()].end(); ++itr)
-        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-            if (Creature* creature = unit->ToCreature())
-                HideNpc(creature);
-
-    // Spawn Horde NPCs outside the keep
-    for (uint8 i = 0; i < WG_OUTSIDE_ALLIANCE_NPC; i++)
-        if (Creature* creature = SpawnCreature(WGOutsideNPC[i].entryHorde, WGOutsideNPC[i].x, WGOutsideNPC[i].y, WGOutsideNPC[i].z, WGOutsideNPC[i].o, TEAM_HORDE))
-            OutsideCreature[TEAM_HORDE].insert(creature->GetGUID());
-
-    // Spawn Alliance NPCs outside the keep
-    for (uint8 i = WG_OUTSIDE_ALLIANCE_NPC; i < WG_MAX_OUTSIDE_NPC; i++)
-        if (Creature* creature = SpawnCreature(WGOutsideNPC[i].entryAlliance, WGOutsideNPC[i].x, WGOutsideNPC[i].y, WGOutsideNPC[i].z, WGOutsideNPC[i].o, TEAM_ALLIANCE))
-            OutsideCreature[TEAM_ALLIANCE].insert(creature->GetGUID());
-
-    // Hide units outside the keep that are defenders
-    for (GuidSet::const_iterator itr = OutsideCreature[GetDefenderTeam()].begin(); itr != OutsideCreature[GetDefenderTeam()].end(); ++itr)
-        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-            if (Creature* creature = unit->ToCreature())
-                HideNpc(creature);
+    SpawnCreatures();
 
     // Spawn turrets and hide them per default
     for (uint8 i = 0; i < WG_MAX_TURRET; i++)
@@ -187,6 +156,100 @@ bool BattlefieldWG::SetupBattlefield()
 
     UpdateCounterVehicle(true);
     return true;
+}
+
+/* All creatures are spawned at worldserver start to avoid performance issues
+ * when changing teams after Attackers win the battle. We hide the unwanted
+ * NPCs and then unhide them whenever needed.
+ */
+void BattlefieldWG::SpawnCreatures()
+{
+    /* WGKeepNPC stores both the position and the entry for each faction.
+     * there is a maximum amount of 45 NPCs inside the keep. The way the
+     * Keep NPCs are spawned is cycling through every position on this array
+     * and spawning both an Alliance and a Horde NPC. By spawning both faction
+     * units on server start we avoid overloading the core when running with
+     * unecessary function calls every 3 hours.
+     */
+    for (uint8 pos = 0; pos < WG_MAX_KEEP_NPC; pos++)
+    {
+        // Horde npc
+        if (Creature* creature = SpawnCreature(
+            WGKeepNPC[pos].entryHorde,
+            WGKeepNPC[pos].x,
+            WGKeepNPC[pos].y,
+            WGKeepNPC[pos].z,
+            WGKeepNPC[pos].o,
+            TEAM_HORDE))
+        {
+            KeepCreature[TEAM_HORDE].insert(creature->GetGUID());
+        }
+
+        // Alliance npc
+        if (Creature* creature = SpawnCreature(
+            WGKeepNPC[pos].entryAlliance,
+            WGKeepNPC[pos].x,
+            WGKeepNPC[pos].y,
+            WGKeepNPC[pos].z,
+            WGKeepNPC[pos].o,
+            TEAM_ALLIANCE))
+        {
+            KeepCreature[TEAM_ALLIANCE].insert(creature->GetGUID());
+        }
+    }
+
+    // Hide NPCs from the Attacker's team in the keep
+    for (GuidSet::const_iterator itr = KeepCreature[GetAttackerTeam()].begin(); itr != KeepCreature[GetAttackerTeam()].end(); ++itr)
+    {
+        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+        {
+            if (Creature* creature = unit->ToCreature())
+            {
+                HideNpc(creature);
+            }
+        }
+    }
+
+    /* Just like we did for the Keep NPCs, we do the same for the ones
+     * standing outside the Keep, where the Attacking faction is teleported
+     * to whenever Wintergrasp begins.
+     */
+    for (uint8 i = 0; i < WG_MAX_OUTSIDE_NPC; i++)
+    {
+        if (Creature* creature = SpawnCreature(
+            WGOutsideNPCHorde[i].entryHorde,
+            WGOutsideNPCHorde[i].x,
+            WGOutsideNPCHorde[i].y,
+            WGOutsideNPCHorde[i].z,
+            WGOutsideNPCHorde[i].o,
+            TEAM_HORDE))
+        {
+            OutsideCreature[TEAM_HORDE].insert(creature->GetGUID());
+        }
+
+        if (Creature* creature = SpawnCreature(
+            WGOutsideNPCAlliance[i].entryAlliance,
+            WGOutsideNPCAlliance[i].x,
+            WGOutsideNPCAlliance[i].y,
+            WGOutsideNPCAlliance[i].z,
+            WGOutsideNPCAlliance[i].o,
+            TEAM_ALLIANCE))
+        {
+            OutsideCreature[TEAM_ALLIANCE].insert(creature->GetGUID());
+        }
+    }
+
+    // Hide units outside the keep that are defenders
+    for (GuidSet::const_iterator itr = OutsideCreature[GetDefenderTeam()].begin(); itr != OutsideCreature[GetDefenderTeam()].end(); ++itr)
+    {
+        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+        {
+            if (Creature* creature = unit->ToCreature())
+            {
+                HideNpc(creature);
+            }
+        }
+    }
 }
 
 bool BattlefieldWG::Update(uint32 diff)
