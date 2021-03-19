@@ -95,8 +95,9 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,
 (13,1,28096,0,0,31,0,3,15929,0,0,"Stalagg Chain Visual - Target Stalagg"),
 (13,1,28111,0,0,31,0,3,15930,0,0,"Feugen Chain Visual - Target Feugen"),
 (13,1,28159,0,0,31,0,3,15928,0,0,"Thaddius Shock Visual - Target Thaddius");
--- tesla coil visual
+-- tesla coil visual GOs
 DELETE FROM `gameobject` WHERE `id` IN (181477,181478);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES 
 (268049, 181478, 533, 0, 0, 3, 1, 3487.32, -2911.38, 318.898, 3.14159, 0, 0, -1, 0, 0, 0, 0, 0),
 (268050, 181477, 533, 0, 0, 3, 1, 3527.94, -2952.26, 318.898, 3.14159, 0, 0, -1, 0, 0, 0, 0, 0);
+
