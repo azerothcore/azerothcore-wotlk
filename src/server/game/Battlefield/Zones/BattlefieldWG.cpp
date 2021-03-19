@@ -51,7 +51,11 @@ bool BattlefieldWG::SetupBattlefield()
     m_tenacityStack = 0;
     m_titansRelic = 0;
 
-    KickPosition.Relocate(5728.117f, 2714.346f, 697.733f, 0);
+    KickPosition.Relocate(
+            kicked_position.GetPositionX(),
+            kicked_position.GetPositionY(),
+            kicked_position.GetPositionZ(),
+            kicked_position.GetOrientation());
     KickPosition.m_mapId = m_MapId;
 
     RegisterZone(m_ZoneId);
@@ -817,19 +821,34 @@ void BattlefieldWG::RemoveAurasFromPlayer(Player* player)
 
 void BattlefieldWG::OnPlayerJoinWar(Player* player)
 {
+    if (!player)
+    {
+        return;
+    }
+
     RemoveAurasFromPlayer(player);
 
     player->CastSpell(player, SPELL_RECRUIT, true);
     AddUpdateTenacity(player);
 
+    /* Depending on which team is attacking or defending the player
+     * will be teleported to their respective starting position.
+     */
     if (player->GetTeamId() == GetDefenderTeam())
-        player->TeleportTo(571, 5345, 2842, 410, 3.14f);
+    {
+        player->TeleportTo(BATTLEFIELD_WG_MAPID,
+            defending_position.GetPositionX(),
+            defending_position.GetPositionY(),
+            defending_position.GetPositionZ(),
+            defending_position.GetOrientation());
+    }
     else
     {
-        if (player->GetTeamId() == TEAM_HORDE)
-            player->TeleportTo(571, 5025.857422f, 3674.628906f, 362.737122f, 4.135169f);
-        else
-            player->TeleportTo(571, 5101.284f, 2186.564f, 373.549f, 3.812f);
+        player->TeleportTo(BATTLEFIELD_WG_MAPID,
+            attacking_position.GetPositionX(),
+            attacking_position.GetPositionY(),
+            attacking_position.GetPositionZ(),
+            attacking_position.GetOrientation());
     }
 
     if (player->GetTeamId() == GetAttackerTeam())

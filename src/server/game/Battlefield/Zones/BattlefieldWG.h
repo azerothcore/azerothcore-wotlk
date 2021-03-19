@@ -460,6 +460,11 @@ protected:
     uint32 m_saveTimer;
 
     uint64 m_titansRelic;
+
+    // Position for Defenders, Attackers and Removing players
+    Position kicked_position { 5728.117f, 2714.346f, 697.733f, 0.0f };
+    Position attacking_position{ 5101.284180f, 2186.563965f, 365.620117f, 3.812000f };
+    Position defending_position{ 5345.0f, 2842.0f, 410.0f, 3.14f };
 };
 
 const uint8 WG_MAX_OBJ = 32;
