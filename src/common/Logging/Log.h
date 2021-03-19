@@ -86,7 +86,7 @@ public:
 
     inline void outString()
     {
-        outMessage("server", LOG_LEVEL_INFO, "");
+        outMessage("server", LOG_LEVEL_INFO, " ");
     }
 
     template<typename Format, typename... Args>

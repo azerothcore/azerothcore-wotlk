@@ -103,7 +103,7 @@ extern int main(int argc, char** argv)
 
     LOG_INFO("server.authserver", "%s (authserver)", GitRevision::GetFullVersion());
     LOG_INFO("server.authserver", "<Ctrl-C> to stop.");
-    LOG_INFO("server.authserver", "");
+    LOG_INFO("server.authserver", " ");
     LOG_INFO("server.authserver", "   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");
     LOG_INFO("server.authserver", "  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");
     LOG_INFO("server.authserver", "  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");
@@ -117,7 +117,7 @@ extern int main(int argc, char** argv)
     LOG_INFO("server.authserver", "                                ╚██████╗╚██████╔╝██║  ██║███████╗");
     LOG_INFO("server.authserver", "                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
     LOG_INFO("server.authserver", "     AzerothCore 3.3.5a  -  www.azerothcore.org");
-    LOG_INFO("server.authserver", "");
+    LOG_INFO("server.authserver", " ");
     LOG_INFO("server.authserver", "Using configuration file %s.", configFile.c_str());
     LOG_INFO("server.authserver", "%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
 
