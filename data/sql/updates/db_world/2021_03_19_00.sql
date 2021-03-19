@@ -1,3 +1,19 @@
+-- DB update 2021_03_18_04 -> 2021_03_19_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_03_18_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_03_18_04 2021_03_19_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1614187202428005763'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1614187202428005763');
 
 -- Modify run and walk speed of multiple creatures
@@ -815,3 +831,12 @@ UPDATE `creature_template` SET `speed_walk`=1 WHERE `entry`=14500; -- J'eevee, s
 UPDATE `creature_template` SET `speed_walk`=1 WHERE `entry`=14362; -- Thornling, speed_walk=0.25, speed_run=1.14286
 UPDATE `creature_template` SET `speed_walk`=1 WHERE `entry`=15741; -- Colossus of Regal, speed_walk=8.8, speed_run=1.14286
 UPDATE `creature_template` SET `speed_walk`=1, `speed_run`=2.14286 WHERE `entry`=11583; -- Nefarian, speed_walk=3.9, speed_run=1.14286
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
