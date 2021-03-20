@@ -151,7 +151,7 @@ public:
             BossAI::EnterCombat(who);
             EnterCombatSelfFunction();
             me->CastSpell(me, RAID_MODE(SPELL_FROST_AURA_10, SPELL_FROST_AURA_25), true);
-            events.ScheduleEvent(EVENT_BERSERK, 15 * 60000);
+            events.ScheduleEvent(EVENT_BERSERK, 900000);
             events.ScheduleEvent(EVENT_SPELL_CLEAVE, 5000);
             events.ScheduleEvent(EVENT_SPELL_TAIL_SWEEP, 10000);
             events.ScheduleEvent(EVENT_SPELL_LIFE_DRAIN, 17000);
@@ -289,6 +289,7 @@ public:
                     me->GetMotionMaster()->MovePoint(POINT_CENTER, x, y, z);
                     return;
                 case EVENT_FLIGHT_LIFTOFF:
+                    Talk(EMOTE_AIR_PHASE);
                     me->GetMotionMaster()->MoveIdle();
                     me->SendMeleeAttackStop(me->GetVictim());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
@@ -382,6 +383,7 @@ public:
                     events.ScheduleEvent(EVENT_GROUND, 1500);
                     return;
                 case EVENT_GROUND:
+                    Talk(EMOTE_GROUND_PHASE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetInCombatWithZone();
                     return;
