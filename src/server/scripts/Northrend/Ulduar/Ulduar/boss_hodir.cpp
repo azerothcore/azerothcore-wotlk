@@ -28,6 +28,7 @@ enum HodirSpellData
     SPELL_FLASH_FREEZE_VISUAL           = 62148,
     SPELL_SAFE_AREA                     = 65705,
     SPELL_SAFE_AREA_TRIGGERED           = 62464,
+    SPELL_SHATTER_CHEST                 = 62501,
 
     SPELL_ICICLE_BOSS_AURA              = 62227,
     SPELL_ICICLE_TBBA                   = 63545,
@@ -95,13 +96,7 @@ enum HodirNPCs
     NPC_ICICLE_UNPACKED                 = 33169,
     NPC_ICICLE_PACKED                   = 33173,
     NPC_TOASTY_FIRE                     = 33342,
-};
-
-enum HodirGOs
-{
-    GO_HODIR_SNOWDRIFT                  = 194173,
-    // GO_HODIR_FROZEN_DOOR             = 194441,
-    // GO_HODIR_DOOR                    = 194634,
+    NPC_RARE_WINTER_CACHE_TRIGGER       = 88101,
 };
 
 enum HodirEvents
@@ -113,6 +108,8 @@ enum HodirEvents
     EVENT_FREEZE                        = 4,
     EVENT_SMALL_ICICLES_ENABLE          = 5,
     EVENT_HARD_MODE_MISSED              = 6,
+    EVENT_DESPAWN_CHEST                 = 7,
+    EVENT_FAIL_HM                       = 8,
 
     EVENT_TRY_FREE_HELPER               = 10,
     EVENT_PRIEST_DISPELL_MAGIC          = 11,
@@ -127,17 +124,21 @@ enum HodirEvents
     EVENT_MAGE_MELT_ICE                 = 20,
 };
 
+enum HodirText
+{
+    TEXT_AGGRO          = 0,
+    TEXT_SLAY           = 1,
+    TEXT_FLASH_FREEZE   = 2,
+    TEXT_STALACTITE     = 3,
+    TEXT_DEATH          = 4,
+    TEXT_BERSERK        = 5,
+    TEXT_HM_MISS        = 6,
+    TEXT_EMOTE_FREEZE   = 7,
+    TEXT_EMOTE_BLOW     = 8,
+};
+
 #define SPELL_FROZEN_BLOWS              RAID_MODE(SPELL_FROZEN_BLOWS_10, SPELL_FROZEN_BLOWS_25)
 #define SPELL_SHAMAN_STORM_CLOUD        RAID_MODE(SPELL_SHAMAN_STORM_CLOUD_10, SPELL_SHAMAN_STORM_CLOUD_25)
-
-#define TEXT_HODIR_AGGRO                "You will suffer for this trespass!"
-#define TEXTEMOTE_HODIR_FROZEN_BLOWS    "Hodir roars furious."
-#define TEXT_HODIR_FLASH_FREEZE         "Winds of the north consume you!"
-#define TEXTEMOTE_HODIR_HARD_MODE_MISSED "Hodir shatters the Rare Cache of Hodir!"
-#define TEXT_HODIR_SLAIN_1              "Tragic. To come so far, only to fail."
-#define TEXT_HODIR_SLAIN_2              "Welcome to the endless winter."
-#define TEXT_HODIR_BERSERK              "Enough! This ends now!"
-#define TEXT_HODIR_DEFEATED             "I... I am released from his grasp... at last."
 
 enum HodirSounds
 {
@@ -208,24 +209,26 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 Helpers[8];
-        bool berserk;
-        bool hardmode;
-        bool bAchievCheese;
-        bool bAchievGettingCold;
-        bool bAchievCoolestFriends;
-        uint16 addSpawnTimer;
+        uint64 Helpers[8]{ };
+        bool berserk{ false };
+        bool bAchievCheese{ true };
+        bool bAchievGettingCold{ true };
+        bool bAchievCoolestFriends{ true };
+        uint16 addSpawnTimer{ 0 };
 
         void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
             berserk = false;
-            hardmode = true;
             bAchievCheese = true;
             bAchievGettingCold = true;
             bAchievCoolestFriends = true;
-            addSpawnTimer = 5000;
+            me->SetSheath(SHEATH_STATE_MELEE);
+
+            // Reset the spells cast after wipe
+            me->RemoveAllAuras();
+            pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BITING_COLD_PLAYER_AURA);
 
             if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
             {
@@ -236,26 +239,27 @@ public:
             {
                 go->SetGoState(GO_STATE_ACTIVE);
             }
+
+            if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
+            {
+                pInstance->SetData(TYPE_SPAWN_HODIR_CACHE, 0);
+            }
+
+            // Reset helpers
+            if (!summons.size())
+                SpawnHelpers();
         }
 
         void EnterCombat(Unit*  /*pWho*/) override
         {
-            if (summons.size() != uint32(RAID_MODE(8, 16)))
-            {
-                EnterEvadeMode();
-                return;
-            }
-            me->setActive(true);
             me->CastSpell(me, SPELL_BITING_COLD_BOSS_AURA, true);
             SmallIcicles(true);
             events.Reset();
-            events.RescheduleEvent(EVENT_FLASH_FREEZE, 60000);
-            events.RescheduleEvent(EVENT_FREEZE, 15000);
-            events.RescheduleEvent(EVENT_BERSERK, 480000);
-            events.RescheduleEvent(EVENT_HARD_MODE_MISSED, 180000);
-
-            me->MonsterYell(TEXT_HODIR_AGGRO, LANG_UNIVERSAL, 0);
-            me->PlayDirectSound(SOUND_HODIR_AGGRO, 0);
+            events.ScheduleEvent(EVENT_FLASH_FREEZE, urand(48000, 49000));
+            events.ScheduleEvent(EVENT_FREEZE, urand(17000,20000));
+            events.ScheduleEvent(EVENT_BERSERK, 480000);
+            events.ScheduleEvent(EVENT_HARD_MODE_MISSED, 180000);
+            Talk(TEXT_AGGRO);
 
             if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
             {
@@ -268,7 +272,22 @@ public:
             }
         }
 
-        void JustReachedHome() override { me->setActive(false); }
+        void DoAction(int action) override
+        {
+            if (action)
+            {
+                switch (action)
+                {
+                    case EVENT_FAIL_HM:
+                        if (GameObject* go = me->FindNearestGameObject(GO_HODIR_CHEST_HARD, 500.0f))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                            events.ScheduleEvent(EVENT_DESPAWN_CHEST, 3000);
+                        }
+                        break;
+                }
+            }
+        }
 
         void SmallIcicles(bool enable)
         {
@@ -344,36 +363,28 @@ public:
                         go->SetGoState(GO_STATE_ACTIVE);
                     }
 
-                    me->MonsterYell(TEXT_HODIR_DEFEATED, LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_HODIR_DEFEATED, 0);
+                    Talk(TEXT_DEATH);
                     me->DespawnOrUnsummon(10000);
-
-                    // spawn appropriate chests
-                    uint32 chestId = me->GetMap()->Is25ManRaid() ? GO_HODIR_CHEST_NORMAL_HERO : GO_HODIR_CHEST_NORMAL;
-                    if( GameObject* go = me->SummonGameObject(chestId, 1969.115f, -212.94f, 432.687f, 3 * M_PI / 2, 0, 0, 0, 0, 0) )
-                        go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
-
-                    if( hardmode )
-                    {
-                        uint32 chestId2 = me->GetMap()->Is25ManRaid() ? GO_HODIR_CHEST_HARD_HERO : GO_HODIR_CHEST_HARD;
-                        if( GameObject* go = me->SummonGameObject(chestId2, 2031.207f, -213.236f, 432.687f, 3 * M_PI / 2, 0, 0, 0, 0, 0) )
-                            go->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
-                    }
                 }
             }
         }
 
+        bool IsInRoom()
+        {
+            // Calculate the distance between his home position to the gate
+            if (me->GetExactDist(me->GetHomePosition().GetPositionX(),
+                me->GetHomePosition().GetPositionY(),
+                me->GetHomePosition().GetPositionZ()) > 80.0f)
+            {
+                EnterEvadeMode();
+                return false;
+            }
+            return true;
+        }
+
         void UpdateAI(uint32 diff) override
         {
-            if (addSpawnTimer <= diff)
-            {
-                addSpawnTimer = 5000;
-                if (!me->IsInCombat() && !summons.size() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
-                    if (SelectTargetFromPlayerList(135.0f))
-                        SpawnHelpers();
-            }
-            else
-                addSpawnTimer -= diff;
+            if (!IsInRoom()) { return; }
 
             if (!UpdateVictim())
             {
@@ -403,15 +414,18 @@ public:
                     {
                         berserk = true;
                         me->CastSpell(me, SPELL_BERSERK, true);
-                        me->MonsterYell(TEXT_HODIR_BERSERK, LANG_UNIVERSAL, 0);
-                        me->PlayDirectSound(SOUND_HODIR_BERSERK, 0);
+                        Talk(TEXT_BERSERK);
                     }
                     break;
                 case EVENT_HARD_MODE_MISSED:
                     {
-                        hardmode = false;
-                        me->MonsterTextEmote(TEXTEMOTE_HODIR_HARD_MODE_MISSED, 0);
+                        Talk(TEXT_HM_MISS);
+                        me->CastSpell(me->FindNearestGameObject(GO_HODIR_CHEST_HARD, 400.0f), SPELL_SHATTER_CHEST, false);
                     }
+                    break;
+                case EVENT_DESPAWN_CHEST:
+                    if (pInstance && pInstance->GetData(TYPE_HODIR) != DONE)
+                        pInstance->SetData(TYPE_HODIR_HM_FAIL, 0);
                     break;
                 case EVENT_FLASH_FREEZE:
                     {
@@ -431,14 +445,14 @@ public:
                         }
 
                         me->CastSpell((Unit*)nullptr, SPELL_FLASH_FREEZE_CAST, false);
-                        me->MonsterTextEmote("Hodir begins to cast Flash Freeze!", 0, true);
-                        me->MonsterYell(TEXT_HODIR_FLASH_FREEZE, LANG_UNIVERSAL, 0);
                         me->PlayDirectSound(SOUND_HODIR_FLASH_FREEZE, 0);
+                        Talk(TEXT_FLASH_FREEZE);
+                        Talk(TEXT_EMOTE_FREEZE);
                         SmallIcicles(false);
-                        events.RepeatEvent(55000 + urand(0, 10000));
+                        events.ScheduleEvent(EVENT_FLASH_FREEZE, urand(48000, 49000));
                         events.ScheduleEvent(EVENT_SMALL_ICICLES_ENABLE, Is25ManRaid() ? 12000 : 24000);
                         events.ScheduleEvent(EVENT_FROZEN_BLOWS, 15000);
-                        events.RescheduleEvent(EVENT_FREEZE, 20000);
+                        events.RescheduleEvent(EVENT_FREEZE, urand(17000, 20000));
                     }
                     break;
                 case EVENT_SMALL_ICICLES_ENABLE:
@@ -448,10 +462,9 @@ public:
                     break;
                 case EVENT_FROZEN_BLOWS:
                     {
-                        me->MonsterTextEmote("Hodir gains Frozen Blows!", 0, true);
-                        me->MonsterTextEmote(TEXTEMOTE_HODIR_FROZEN_BLOWS, 0);
-                        me->PlayDirectSound(SOUND_HODIR_FROZEN_BLOWS, 0);
-                        me->CastSpell(me, SPELL_FROZEN_BLOWS, true);
+                        Talk(TEXT_EMOTE_BLOW);
+                        Talk(TEXT_STALACTITE);
+                        me->CastSpell(me, Is25ManRaid()? SPELL_FROZEN_BLOWS_25 : SPELL_FROZEN_BLOWS_10, true);
                     }
                     break;
                 case EVENT_FREEZE:
@@ -459,7 +472,7 @@ public:
                         me->CastSpell(plr, SPELL_FREEZE, false);
                     else if (Unit* plr = SelectTarget(SELECT_TARGET_RANDOM, 0, 50.0f, true))
                         me->CastSpell(plr, SPELL_FREEZE, false);
-                    events.RepeatEvent(15000);
+                    events.RescheduleEvent(EVENT_FREEZE, urand(17000, 20000));
                     break;
             }
 
@@ -516,19 +529,8 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
-            {
-                if( urand(0, 1) )
-                {
-                    me->MonsterYell(TEXT_HODIR_SLAIN_1, LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_HODIR_SLAIN_1, 0);
-                }
-                else
-                {
-                    me->MonsterYell(TEXT_HODIR_SLAIN_2, LANG_UNIVERSAL, 0);
-                    me->PlayDirectSound(SOUND_HODIR_SLAIN_2, 0);
-                }
-            }
+            if (who->GetTypeId() == TYPEID_PLAYER)
+                Talk(TEXT_SLAY);
         }
 
         void JustSummoned(Creature* s) override
@@ -576,8 +578,6 @@ public:
                     return (bAchievCheese ? 1 : 0);
                 case 2:
                     return (bAchievGettingCold ? 1 : 0);
-                case 3:
-                    return (hardmode ? 1 : 0);
                 case 4:
                     return (bAchievCoolestFriends ? 1 : 0);
             }
@@ -1143,6 +1143,33 @@ public:
     };
 };
 
+class spell_hodir_shatter_chest : public SpellScriptLoader
+{
+public:
+    spell_hodir_shatter_chest() : SpellScriptLoader("spell_hodir_shatter_chest") { }
+
+    class spell_hodir_shatter_chestSpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_hodir_shatter_chestSpellScript)
+
+        void destroyWinterCache()
+        {
+            if (Unit* hodir = GetCaster())
+                hodir->GetAI()->DoAction(EVENT_FAIL_HM);
+        }
+
+        void Register() override
+        {
+            AfterHit += SpellHitFn(spell_hodir_shatter_chestSpellScript::destroyWinterCache);
+        };
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_hodir_shatter_chestSpellScript();
+    }
+};
+
 class spell_hodir_biting_cold_main_aura : public SpellScriptLoader
 {
 public:
@@ -1156,7 +1183,10 @@ public:
         {
             if ((aurEff->GetTickNumber() % 4) == 0)
                 if (Unit* target = GetTarget())
-                    if (target->GetTypeId() == TYPEID_PLAYER && !target->isMoving() && !target->HasAura(SPELL_BITING_COLD_PLAYER_AURA))
+                    if (target->GetTypeId() == TYPEID_PLAYER
+                        && !target->isMoving()
+                        && !target->HasAura(SPELL_BITING_COLD_PLAYER_AURA)
+                        && !target->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA))
                         target->CastSpell(target, SPELL_BITING_COLD_PLAYER_AURA, true);
         }
 
@@ -1181,15 +1211,8 @@ public:
     {
         PrepareAuraScript(spell_hodir_biting_cold_player_aura_AuraScript)
 
-        uint8 counter;
-        bool prev;
-
-        bool Load() override
-        {
-            counter = 0;
-            prev = false;
-            return true;
-        }
+        uint8 counter {0};
+        bool prev {false};
 
         void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
         {
@@ -1570,6 +1593,7 @@ void AddSC_boss_hodir()
     new spell_hodir_flash_freeze();
     new spell_hodir_storm_power();
     new spell_hodir_storm_cloud();
+    new spell_hodir_shatter_chest();
 
     new achievement_cheese_the_freeze();
     new achievement_getting_cold_in_here();
