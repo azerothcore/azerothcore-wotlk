@@ -36,7 +36,7 @@ enum Spells
     SPELL_FROST_EXPLOSION           = 28524,
 
     // Visuals
-    SPELL_SAPPHIRON_DIES            = 29357,
+    SPELL_SAPPHIRON_DIES            = 29357
 };
 
 enum Misc
@@ -45,26 +45,25 @@ enum Misc
     NPC_BLIZZARD                    = 16474,
 
     POINT_CENTER                    = 1,
-    FAKE_POINTER                    = 1,
+    FAKE_POINTER                    = 1
 };
 
 enum Events
 {
-    //EVENT_SAPPHIRON_BIRTH         = 1,
-    EVENT_BERSERK                   = 2,
-    EVENT_SPELL_CLEAVE              = 3,
-    EVENT_SPELL_TAIL_SWEEP          = 4,
-    EVENT_SPELL_LIFE_DRAIN          = 5,
-    EVENT_SPELL_BLIZZARD            = 6,
-    EVENT_FLIGHT_START              = 7,
-    EVENT_FLIGHT_LIFTOFF            = 8,
-    EVENT_FLIGHT_ICEBOLT            = 9,
-    EVENT_FLIGHT_BREATH             = 10,
-    EVENT_FLIGHT_SPELL_EXPLOSION    = 11,
-    EVENT_FLIGHT_START_LAND         = 12,
-    EVENT_LAND                      = 13,
-    EVENT_GROUND                    = 14,
-    EVENT_HUNDRED_CLUB              = 15,
+    EVENT_BERSERK                   = 1,
+    EVENT_SPELL_CLEAVE              = 2,
+    EVENT_SPELL_TAIL_SWEEP          = 3,
+    EVENT_SPELL_LIFE_DRAIN          = 4,
+    EVENT_SPELL_BLIZZARD            = 5,
+    EVENT_FLIGHT_START              = 6,
+    EVENT_FLIGHT_LIFTOFF            = 7,
+    EVENT_FLIGHT_ICEBOLT            = 8,
+    EVENT_FLIGHT_BREATH             = 9,
+    EVENT_FLIGHT_SPELL_EXPLOSION    = 10,
+    EVENT_FLIGHT_START_LAND         = 11,
+    EVENT_LAND                      = 12,
+    EVENT_GROUND                    = 13,
+    EVENT_HUNDRED_CLUB              = 14
 };
 
 class boss_sapphiron : public CreatureScript
@@ -107,7 +106,6 @@ public:
                 EnterEvadeMode();
                 return false;
             }
-
             return true;
         }
 
@@ -115,8 +113,9 @@ public:
         {
             BossAI::Reset();
             if (me->IsVisible())
+            {
                 me->SetReactState(REACT_AGGRESSIVE);
-
+            }
             events.Reset();
             iceboltCount = 0;
             spawnTimer = 0;
@@ -129,12 +128,14 @@ public:
             Map::PlayerList const& PlList = me->GetMap()->GetPlayers();
             if (PlList.isEmpty())
                 return;
+
             for (const auto& i : PlList)
             {
                 if (Player* player = i.GetSource())
                 {
                     if (player->IsGameMaster())
                         continue;
+
                     if (player->IsAlive() && me->GetDistance(player) < 80.0f)
                     {
                         me->SetInCombatWith(player);
@@ -150,7 +151,6 @@ public:
             BossAI::EnterCombat(who);
             EnterCombatSelfFunction();
             me->CastSpell(me, RAID_MODE(SPELL_FROST_AURA_10, SPELL_FROST_AURA_25), true);
-
             events.ScheduleEvent(EVENT_BERSERK, 15 * 60000);
             events.ScheduleEvent(EVENT_SPELL_CLEAVE, 5000);
             events.ScheduleEvent(EVENT_SPELL_TAIL_SWEEP, 10000);
@@ -169,13 +169,17 @@ public:
         void DoAction(int32 param) override
         {
             if (param == ACTION_SAPPHIRON_BIRTH)
+            {
                 spawnTimer = 1;
+            }
         }
 
         void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == POINT_CENTER)
+            {
                 events.ScheduleEvent(EVENT_FLIGHT_LIFTOFF, 500);
+            }
         }
 
         void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
@@ -199,14 +203,15 @@ public:
                         return false;
                 }
             }
-
             return true;
         }
 
         void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
+            {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -256,12 +261,17 @@ public:
                     {
                         Creature* cr;
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
+                        {
                             cr = me->SummonCreature(NPC_BLIZZARD, *target, TEMPSUMMON_TIMED_DESPAWN, 16000);
+                        }
                         else
+                        {
                             cr = me->SummonCreature(NPC_BLIZZARD, *me, TEMPSUMMON_TIMED_DESPAWN, 16000);
-
+                        }
                         if (cr)
+                        {
                             cr->GetMotionMaster()->MoveRandom(40);
+                        }
                         events.RepeatEvent(RAID_MODE(8000, 6500));
                         return;
                     }
@@ -291,26 +301,38 @@ public:
                 case EVENT_FLIGHT_ICEBOLT:
                     {
                         if (currentTarget)
+                        {
                             if (Unit* target = ObjectAccessor::GetUnit(*me, currentTarget))
+                            {
                                 me->SummonGameObject(GO_ICE_BLOCK, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 0);
+                            }
+                        }
 
                         std::vector<Unit*> targets;
                         auto i = me->getThreatManager().getThreatList().begin();
                         for (; i != me->getThreatManager().getThreatList().end(); ++i)
+                        {
                             if ((*i)->getTarget()->GetTypeId() == TYPEID_PLAYER)
                             {
                                 bool inList = false;
                                 if (!blockList.empty())
+                                {
                                     for (std::list<uint64>::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
+                                    {
                                         if ((*i)->getTarget()->GetGUID() == *itr)
                                         {
                                             inList = true;
                                             break;
                                         }
+                                    }
+                                }
 
                                 if (!inList)
+                                {
                                     targets.push_back((*i)->getTarget());
+                                }
                             }
+                        }
 
                         if (!targets.empty() && iceboltCount)
                         {
@@ -323,7 +345,9 @@ public:
                             events.ScheduleEvent(EVENT_FLIGHT_ICEBOLT, (me->GetExactDist(*itr) / 13.0f)*IN_MILLISECONDS);
                         }
                         else
+                        {
                             events.ScheduleEvent(EVENT_FLIGHT_BREATH, 1000);
+                        }
                         return;
                     }
                 case EVENT_FLIGHT_BREATH:
@@ -338,10 +362,15 @@ public:
                     return;
                 case EVENT_FLIGHT_START_LAND:
                     if (!blockList.empty())
+                    {
                         for (std::list<uint64>::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
+                        {
                             if (Unit* block = ObjectAccessor::GetUnit(*me, *itr))
+                            {
                                 block->RemoveAurasDueToSpell(SPELL_ICEBOLT_TRIGGER);
-
+                            }
+                        }
+                    }
                     blockList.clear();
                     me->RemoveAllGameObjects();
                     events.ScheduleEvent(EVENT_LAND, 1000);
@@ -349,9 +378,7 @@ public:
                 case EVENT_LAND:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
                     me->SetDisableGravity(false);
-
                     me->SetHover(false);
-
                     events.ScheduleEvent(EVENT_GROUND, 1500);
                     return;
                 case EVENT_GROUND:
@@ -373,7 +400,6 @@ public:
                         return;
                     }
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -398,12 +424,15 @@ public:
             for (auto& target : targets)
             {
                 if (CAST_AI(boss_sapphiron::boss_sapphironAI, caster->ToCreature()->AI())->IsValidExplosionTarget(target))
+                {
                     tmplist.push_back(target);
+                }
             }
-
             targets.clear();
             for (auto& itr : tmplist)
+            {
                 targets.push_back(itr);
+            }
         }
 
         void Register() override
