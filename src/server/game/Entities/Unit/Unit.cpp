@@ -19798,7 +19798,7 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
 
                 if (creature)
                 {
-                    if (!creature->isVendorWithIconSpeak())
+                    if (creature->isVendorWithIconSpeak())
                     {
                         appendValue &= ~UNIT_NPC_FLAG_VENDOR;
                     }
