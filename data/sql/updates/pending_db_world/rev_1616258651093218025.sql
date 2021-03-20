@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1616258651093218025');
 
-DELETE FROM `gameobject_addon` WHERE `guid` IN (5141, 5205, 5382, 5398, 5405, 5425);
+DELETE FROM `gameobject_addon` WHERE `guid` IN (5141, 5193, 5205, 5382, 5398, 5405, 5425);
 INSERT INTO `gameobject_addon` (`guid`, `invisibilityType`, `invisibilityValue`) VALUES 
 (5141, 0, 0),
 (5193, 0, 0),
