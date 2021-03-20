@@ -96,6 +96,7 @@ public:
                 _init = true;
 
                 CreatureTemplate const* Info = me->GetCreatureTemplate();
+                CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(me->getLevel(), Info->unit_class);
                 uint32 health = uint32(107 * (me->getLevel() - 40) * 0.025f);
                 me->SetCreateHealth(health);
 
@@ -110,7 +111,7 @@ public:
                 //Add delta to make them not all hit the same time
                 uint32 delta = urand(0, 700);
                 me->SetAttackTime(BASE_ATTACK, Info->BaseAttackTime + delta);
-                me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER, float(Info->attackpower));
+                me->SetStatFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER, float(stats->AttackPower));
                 me->CastSpell(me, SPELL_HUNTER_DEADLY_POISON_PASSIVE, true);
 
                 // Glyph of Snake Trap
