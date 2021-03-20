@@ -45,7 +45,7 @@ INSERT INTO `smart_scripts` VALUES
 (17359, 0, 10, 0, 7, 1, 100, 0, 0, 0, 0, 0, 0, 41, 1000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tel\'athion the Impure - On Evade - Despawn In 1000 ms (Phase 1)'),
 (17359, 0, 11, 0, 6, 1, 100, 0, 0, 0, 0, 0, 0, 41, 60000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tel\'athion the Impure - On Just Died - Despawn In 60000 ms (Phase 1)');
 
-UPDATE `creature_template` SET `faction` = 1655, `AIName` = 'SmartAI', `mindmg` = 18, `maxdmg` = 28, `attackpower` = 51, `type_flags` = 0, `resistance1` = 10, `resistance2` = 60, `resistance3` = 50, `resistance4` = 60, `resistance5` = 10, `resistance6` = 10 WHERE (`entry` = 6748);
+UPDATE `creature_template` SET `faction` = 1655, `AIName` = 'SmartAI', `type_flags` = 0, `resistance1` = 10, `resistance2` = 60, `resistance3` = 50, `resistance4` = 60, `resistance5` = 10, `resistance6` = 10 WHERE (`entry` = 6748);
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 6748);
 INSERT INTO `smart_scripts` VALUES
