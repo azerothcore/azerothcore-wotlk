@@ -197,6 +197,66 @@ struct ScriptedAI : public CreatureAI
     // Called when AI is temporarily replaced or put back when possess is applied or removed
     void OnPossess(bool /*apply*/) {}
 
+    enum Axis
+    {
+        AXIS_X,
+        AXIS_Y
+    };
+
+    /* This is called for bosses whenever they leave the room
+     * in order to reset. Position is usually the position of a door
+     * Axis is the X or Y axis that the boss uses to reset and superiorPos
+     * means if the value of the boss position is bigger or lesser in
+     * order to reset.
+     * Example:
+     * Hodir position in regards of the door is < the Y position of the door
+     * IsInRoom(doorPosition, AXIS_Y, false);
+     */
+    bool IsInRoom(Position pos, int axis, bool superiorPos)
+    {
+        switch (axis)
+        {
+            case AXIS_X:
+                if (!superiorPos)
+                {
+                    if (me->GetPositionX() < pos.GetPositionX())
+                    {
+                        EnterEvadeMode();
+                        return false;
+                    }
+                }
+                else if (superiorPos)
+                {
+                    if (me->GetPositionX() > pos.GetPositionX())
+                    {
+                        EnterEvadeMode();
+                        return false;
+                    }
+                }
+                break;
+            case AXIS_Y:
+                if (!superiorPos)
+                {
+                    if (me->GetPositionY() < pos.GetPositionY())
+                    {
+                        EnterEvadeMode();
+                        return false;
+                    }
+                }
+                else if (superiorPos)
+                {
+                    if (me->GetPositionY() > pos.GetPositionY())
+                    {
+                        EnterEvadeMode();
+                        return false;
+                    }
+                }
+                break;
+        }
+
+        return true;
+    }
+
     // *************
     // Variables
     // *************
