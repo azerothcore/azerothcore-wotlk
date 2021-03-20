@@ -3483,11 +3483,6 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, PathGener
     return true;
 }
 
-bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
-{
-    return CanReachPositionAndGetValidCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, failOnCollision, failOnSlopes);
-}
-
 /**
  * @brief validate the new destination and set reachable coords
  * Check if a given unit can reach a specific point on a segment
