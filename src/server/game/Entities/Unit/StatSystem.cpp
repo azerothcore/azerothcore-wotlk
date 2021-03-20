@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -1045,16 +1045,20 @@ void Creature::UpdateAttackPowerAndDamage(bool ranged)
 void Creature::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage)
 {
     UnitMods unitMod;
+    float variance = 1.0f;
     switch (attType)
     {
         case BASE_ATTACK:
         default:
+            variance = GetCreatureTemplate()->BaseVariance;
             unitMod = UNIT_MOD_DAMAGE_MAINHAND;
             break;
         case OFF_ATTACK:
+            variance = GetCreatureTemplate()->BaseVariance;
             unitMod = UNIT_MOD_DAMAGE_OFFHAND;
             break;
         case RANGED_ATTACK:
+            variance = GetCreatureTemplate()->RangeVariance;
             unitMod = UNIT_MOD_DAMAGE_RANGED;
             break;
     }
@@ -1075,10 +1079,10 @@ void Creature::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, 
         weaponMaxDamage = 0.0f;
     }
 
-    // pussywizard: subtract value from database till its fixed (the way it worked before creature_levelstats damage implementation)
-    float attackPower      = GetTotalAttackPowerValue(attType) - (attType == RANGED_ATTACK ? GetCreatureTemplate()->rangedattackpower : GetCreatureTemplate()->attackpower);
-    float baseValue        = GetModifierValue(unitMod, BASE_VALUE) + (attackPower * GetAPMultiplier(attType, normalized) / 14.0f);
-    float basePct          = GetModifierValue(unitMod, BASE_PCT);
+    float attackPower      = GetTotalAttackPowerValue(attType);
+    float attackSpeedMulti = GetAPMultiplier(attType, normalized);
+    float baseValue        = GetModifierValue(unitMod, BASE_VALUE) + (attackPower / 14.0f) * variance;
+    float basePct          = GetModifierValue(unitMod, BASE_PCT) * attackSpeedMulti;
     float totalValue       = GetModifierValue(unitMod, TOTAL_VALUE);
     float totalPct         = addTotalPct ? GetModifierValue(unitMod, TOTAL_PCT) : 1.0f;
     float dmgMultiplier    = GetCreatureTemplate()->DamageModifier; // = DamageModifier * _GetDamageMod(rank);
