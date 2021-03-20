@@ -3451,6 +3451,44 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, uint32 fadeInTime)
 }
 
 /**
+ * @brief Check if a given source can reach a specific point following a path
+ * and normalize the coords. Use this method for long paths, otherwise use the
+ * overloaded method with the start coords when you need to do a quick check on small segments
+ *
+ */
+bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
+{
+    G3D::Vector3 prevPath = path->GetStartPosition();
+    for (auto & vector : path->GetPath())
+    {
+        float x = vector.x;
+        float y = vector.y;
+        float z = vector.z;
+
+        if (!CanReachPositionAndGetValidCoords(source, prevPath.x, prevPath.y, prevPath.z, x, y, z, failOnCollision, failOnSlopes))
+        {
+            destX = x;
+            destY = y;
+            destZ = z;
+            return false;
+        }
+
+        prevPath = vector;
+    }
+
+    destX = prevPath.x;
+    destY = prevPath.y;
+    destZ = prevPath.z;
+
+    return true;
+}
+
+bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
+{
+    return CanReachPositionAndGetValidCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, failOnCollision, failOnSlopes);
+}
+
+/**
  * @brief validate the new destination and set reachable coords
  * Check if a given unit can reach a specific point on a segment
  * and set the correct dest coords
