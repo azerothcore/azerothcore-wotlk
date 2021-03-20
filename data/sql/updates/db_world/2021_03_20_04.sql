@@ -1,3 +1,19 @@
+-- DB update 2021_03_20_03 -> 2021_03_20_04
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_03_20_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_03_20_03 2021_03_20_04 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1615883540984618200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1615883540984618200');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 11711);
@@ -19,3 +35,12 @@ INSERT INTO `smart_scripts` VALUES
 (1171100, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 26, 5713, 0, 0, 0, 0, 0, 21, 40, 0, 0, 0, 0, 0, 0, 0, 'Sentinel Aynasha - Actionlist - Quest Credit \'One Shot.  One Kill.\''),
 (1171100, 9, 9, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sentinel Aynasha - Actionlist - Say Line 3'),
 (1171100, 9, 10, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sentinel Aynasha - Actionlist - Say Line 4');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

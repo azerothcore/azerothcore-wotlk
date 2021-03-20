@@ -1,3 +1,19 @@
+-- DB update 2021_03_20_05 -> 2021_03_20_06
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_03_20_05';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_03_20_05 2021_03_20_06 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1616012094656299200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1616012094656299200');
 
 DELETE FROM `event_scripts` WHERE (`id` = 10685) and (`datalong` IN (17359, 6748));
@@ -29,7 +45,7 @@ INSERT INTO `smart_scripts` VALUES
 (17359, 0, 10, 0, 7, 1, 100, 0, 0, 0, 0, 0, 0, 41, 1000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tel\'athion the Impure - On Evade - Despawn In 1000 ms (Phase 1)'),
 (17359, 0, 11, 0, 6, 1, 100, 0, 0, 0, 0, 0, 0, 41, 60000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tel\'athion the Impure - On Just Died - Despawn In 60000 ms (Phase 1)');
 
-UPDATE `creature_template` SET `faction` = 1655, `AIName` = 'SmartAI', `mindmg` = 18, `maxdmg` = 28, `attackpower` = 51, `type_flags` = 0, `resistance1` = 10, `resistance2` = 60, `resistance3` = 50, `resistance4` = 60, `resistance5` = 10, `resistance6` = 10 WHERE (`entry` = 6748);
+UPDATE `creature_template` SET `faction` = 1655, `AIName` = 'SmartAI', `type_flags` = 0, `resistance1` = 10, `resistance2` = 60, `resistance3` = 50, `resistance4` = 60, `resistance5` = 10, `resistance6` = 10 WHERE (`entry` = 6748);
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 6748);
 INSERT INTO `smart_scripts` VALUES
@@ -72,3 +88,12 @@ INSERT INTO `smart_scripts` VALUES
 (181699, 1, 20, 0, 60, 1, 100, 0, 2500, 2500, 4500, 4500, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Barrel of Filth - On Update - Set Event Phase 0 (Phase 1)'),
 (181699, 1, 21, 0, 61, 1, 100, 0, 1, 0, 0, 0, 0, 11, 69657, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Barrel of Filth - On Gameobject State Changed - Cast \'Water Splash (Self)\''),
 (181699, 1, 22, 0, 63, 0, 100, 0, 0, 0, 0, 0, 0, 11, 69657, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Barrel of Filth - On Just Created - Cast \'Water Splash (Self)\'');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
