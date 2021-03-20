@@ -7,7 +7,7 @@
 #ifndef VMAPEXPORT_H
 #define VMAPEXPORT_H
 
-#include "loadlib\loadlib.h"
+#include "loadlib/loadlib.h"
 #include <string>
 #include <unordered_map>
 

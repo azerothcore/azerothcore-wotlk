@@ -7,9 +7,11 @@
 #ifndef WMO_H
 #define WMO_H
 
+#include <memory>
 #include <string>
 #include <unordered_set>
 #include <vector>
+
 #include "vec3d.h"
 #include "loadlib/loadlib.h"
 
