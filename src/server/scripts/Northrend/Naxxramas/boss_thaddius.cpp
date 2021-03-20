@@ -59,7 +59,6 @@ enum Spells
     SPELL_CHAIN_LIGHTNING_10            = 28167,
     SPELL_CHAIN_LIGHTNING_25            = 54531,
     SPELL_BERSERK                       = 27680,
-
     SPELL_THADDIUS_VISUAL_LIGHTNING     = 28136,
     SPELL_THADDIUS_SPAWN_STUN           = 28160,
 
@@ -78,12 +77,12 @@ enum Events
     EVENT_MINION_CHECK_DISTANCE         = 3,
     EVENT_MINION_SPELL_STATIC_FIELD     = 4,
 
-    EVENT_THADDIUS_START                = 10,
-    EVENT_THADDIUS_SPELL_CHAIN_LIGHTNING = 11,
-    EVENT_THADDIUS_SPELL_BERSERK        = 12,
-    EVENT_THADDIUS_POLARITY_SHIFT       = 13,
-    EVENT_THADDIUS_START_2              = 14,
-    EVENT_ACTIVATE_BALL_LIGHTNING       = 15
+    EVENT_THADDIUS_INIT                 = 5,
+    EVENT_THADDIUS_ENTER_COMBAT         = 6,
+    EVENT_THADDIUS_SPELL_CHAIN_LIGHTNING = 7,
+    EVENT_THADDIUS_SPELL_BERSERK        = 8,
+    EVENT_THADDIUS_POLARITY_SHIFT       = 9,
+    EVENT_ALLOW_BALL_LIGHTNING          = 10
 };
 
 enum Misc
@@ -93,7 +92,8 @@ enum Misc
     ACTION_RESTORE                      = 3,
     GO_TESLA_COIL_LEFT                  = 181478,
     GO_TESLA_COIL_RIGHT                 = 181477,
-    NPC_TESLA_COIL                      = 16218
+    NPC_TESLA_COIL                      = 16218,
+    THADDIUS_ROOM_DOOR                  = 181121
 };
 
 class boss_thaddius : public CreatureScript
@@ -121,15 +121,6 @@ public:
         uint32 resetTimer{};
         bool ballLightningEnabled;
 
-        void StartEvent()
-        {
-            me->RemoveAllAuras();
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->CastSpell(me, SPELL_THADDIUS_VISUAL_LIGHTNING, true);
-            events.ScheduleEvent(EVENT_THADDIUS_START_2, 2000);
-            me->MonsterTextEmote("StartEvent", 0, true);
-        }
-
         void DoAction(int32 param) override
         {
             if (param == ACTION_SUMMON_DIED)
@@ -150,6 +141,7 @@ public:
             events.Reset();
             summons.DespawnAll();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            me->SetControlled(false, UNIT_STATE_ROOT);
             summonTimer = 0;
             reviveTimer = 0;
             resetTimer = 1;
@@ -165,6 +157,7 @@ public:
                 cr->CastSpell(cr, SPELL_FEUGEN_CHAIN, false);
                 cr->SetDisableGravity(true);
                 cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                cr->SetControlled(true, UNIT_STATE_ROOT);
             }
             if (Creature* cr = me->SummonCreature(NPC_TESLA_COIL, 3487.04f, -2911.68f, 318.75f, 0.0f))
             {
@@ -173,6 +166,20 @@ public:
                 cr->CastSpell(cr, SPELL_STALAGG_CHAIN, false);
                 cr->SetDisableGravity(true);
                 cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                cr->SetControlled(true, UNIT_STATE_ROOT);
+            }
+
+            if (GameObject* go = me->FindNearestGameObject(GO_TESLA_COIL_LEFT, 100.0f))
+            {
+                go->SetGoState(GO_STATE_ACTIVE);
+            }
+            if (GameObject* go = me->FindNearestGameObject(GO_TESLA_COIL_RIGHT, 100.0f))
+            {
+                go->SetGoState(GO_STATE_ACTIVE);
+            }
+            if (GameObject* go = me->FindNearestGameObject(THADDIUS_ROOM_DOOR, 200.0f))
+            {
+                go->SetGoState(GO_STATE_ACTIVE);
             }
         }
 
@@ -196,6 +203,10 @@ public:
             {
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(28059);
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(28084);
+            }
+            if (GameObject* go = me->FindNearestGameObject(THADDIUS_ROOM_DOOR, 200.0f))
+            {
+                go->SetGoState(GO_STATE_ACTIVE);
             }
         }
 
@@ -229,7 +240,6 @@ public:
                 reviveTimer += diff;
                 if (reviveTimer >= 12000)
                 {
-                    events.ScheduleEvent(EVENT_THADDIUS_START, 10000);
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     {
                         if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
@@ -237,12 +247,12 @@ public:
                             if (cr->GetEntry() == NPC_TESLA_COIL)
                             {
                                 cr->AI()->Talk(EMOTE_TESLA_OVERLOAD);
-                                cr->CastSpell(me, SPELL_TESLA_SHOCK, true);
-                                Unit::Kill(cr, cr);
+                                cr->CastSpell(me, SPELL_SHOCK_VISUAL, true);
                             }
                         }
                     }
                     reviveTimer = 0;
+                    events.ScheduleEvent(EVENT_THADDIUS_INIT, 750);
                 }
                 return;
             }
@@ -266,21 +276,41 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_THADDIUS_START:
-                    StartEvent();
-                    me->MonsterTextEmote("EVENT_THADDIUS_START", 0, true);
+                case EVENT_THADDIUS_INIT:
+                {
+                    me->RemoveAllAuras();
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    {
+                        if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
+                        {
+                            if (cr->GetEntry() == NPC_TESLA_COIL)
+                            {
+                                Unit::Kill(cr, cr);
+                            }
+                        }
+                    }
+                    if (GameObject* go = me->FindNearestGameObject(GO_TESLA_COIL_LEFT, 100.0f))
+                    {
+                        go->SetGoState(GO_STATE_READY);
+                    }
+                    if (GameObject* go = me->FindNearestGameObject(GO_TESLA_COIL_RIGHT, 100.0f))
+                    {
+                        go->SetGoState(GO_STATE_READY);
+                    }
+                    me->CastSpell(me, SPELL_THADDIUS_VISUAL_LIGHTNING, true);
+                    events.ScheduleEvent(EVENT_THADDIUS_ENTER_COMBAT, 1000);
                     break;
-                case EVENT_THADDIUS_START_2:
+                }
+                case EVENT_THADDIUS_ENTER_COMBAT:
                     Talk(SAY_AGGRO);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    me->setAttackTimer(BASE_ATTACK, 4000);
                     events.ScheduleEvent(EVENT_THADDIUS_SPELL_CHAIN_LIGHTNING, 14000);
                     events.ScheduleEvent(EVENT_THADDIUS_SPELL_BERSERK, 360000);
                     events.ScheduleEvent(EVENT_THADDIUS_POLARITY_SHIFT, 30000);
-                    events.ScheduleEvent(EVENT_ACTIVATE_BALL_LIGHTNING, 5000);
-                    me->MonsterTextEmote("EVENT_THADDIUS_START_2", 0, true);
+                    events.ScheduleEvent(EVENT_ALLOW_BALL_LIGHTNING, 5000);
                     return;
                 case EVENT_THADDIUS_SPELL_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
@@ -293,8 +323,9 @@ public:
                     me->CastSpell(me, SPELL_POLARITY_SHIFT, false);
                     events.RepeatEvent(30000);
                     break;
-                case EVENT_ACTIVATE_BALL_LIGHTNING:
+                case EVENT_ALLOW_BALL_LIGHTNING:
                     ballLightningEnabled = true;
+                    me->SetControlled(true, UNIT_STATE_ROOT);
                     break;
             }
 
@@ -304,9 +335,9 @@ public:
             }
             else if (ballLightningEnabled)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
                 {
-                    DoCast(target, SPELL_BALL_LIGHTNING);
+                    me->CastSpell(target, SPELL_BALL_LIGHTNING, false);
                 }
             }
         }
@@ -363,6 +394,10 @@ public:
         void EnterCombat(Unit* pWho) override
         {
             me->SetInCombatWithZone();
+            if (GameObject* go = me->FindNearestGameObject(THADDIUS_ROOM_DOOR, 200.0f))
+            {
+                go->SetGoState(GO_STATE_READY);
+            }
             if (Creature* cr = me->FindNearestCreature(NPC_TESLA_COIL, 150.f, true))
             {
                 myCoil = cr->GetGUID();
@@ -511,13 +546,12 @@ public:
                             me->CastSpell(tankFeugen, SPELL_MAGNETIC_PULL, true);
                             DoAction(ACTION_MAGNETIC_PULL);
                         }
-                        me->MonsterTextEmote("EVENT_MINION_SPELL_MAGNETIC_PULL", 0, true);
                     }
                     break;
                 case EVENT_MINION_CHECK_DISTANCE:
                     if (Creature* cr = ObjectAccessor::GetCreature(*me, myCoil))
                     {
-                        if (!me->GetHomePosition().IsInDist(me, 28) && me->IsInCombat())
+                        if (!me->GetHomePosition().IsInDist(me, 28) /*&& me->IsInCombat()*/)
                         {
                             if (!overload)
                             {
