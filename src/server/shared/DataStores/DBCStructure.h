@@ -522,6 +522,17 @@ struct AreaTableEntry
             return true;
         return (flags & AREA_FLAG_SANCTUARY);
     }
+
+    [[nodiscard]] bool IsFlyable() const
+    {
+        if (flags & AREA_FLAG_OUTLAND)
+        {
+            if (!(flags & AREA_FLAG_NO_FLY_ZONE))
+                return true;
+        }
+
+        return false;
+    }
 };
 
 #define MAX_GROUP_AREA_IDS 6
