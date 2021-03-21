@@ -213,3 +213,39 @@ UPDATE `creature_template` SET `DamageModifier`='1.7' WHERE  `entry`=4525;
 UPDATE `creature_template` SET `DamageModifier`='2.85' WHERE  `entry`=4542;
 UPDATE `creature_template` SET `DamageModifier`='1.7' WHERE  `entry`=4543;
 UPDATE `creature_template` SET `DamageModifier`='1' WHERE  `entry`=4625;
+
+-- update creatures that had modifier 7.5 (placeholder value). 
+-- Just chose some names that are important(mostly dungeon bosses/mobs), there are 1051 total to fix.
+-- SELECT  `entry`,  `name`, baseattacktime, unit_class,  `DamageModifier`, maxlevel FROM `creature_template` WHERE DamageModifier = '7.5' AND lootid > 1 ORDER BY entry
+-- stitches
+UPDATE `creature_template` SET `DamageModifier`='3.25' WHERE  `entry`=412;
+-- edwin van cleef
+UPDATE `creature_template` SET `DamageModifier`='2.45' WHERE  `entry`=639;
+-- negolash
+UPDATE `creature_template` SET `DamageModifier`='4.5' WHERE  `entry`=1494;
+-- Sneed
+UPDATE `creature_template` SET `DamageModifier`='3.3' WHERE  `entry`=643;
+-- sneed's shredder
+UPDATE `creature_template` SET `DamageModifier`='3.3' WHERE  `entry`=642;
+-- Grand Inquisitor Isillien
+UPDATE `creature_template` SET `DamageModifier`='8' WHERE  `entry`=1840;
+-- Weaver
+UPDATE `creature_template` SET `DamageModifier`='2' WHERE  `entry`=5720;
+-- dreamscythe
+UPDATE `creature_template` SET `DamageModifier`='3.5' WHERE  `entry`=5721;
+-- Gahz'rilla
+UPDATE `creature_template` SET `DamageModifier`='3.5' WHERE  `entry`=7273;
+-- Warchief Rend Blackhand
+UPDATE `creature_template` SET `DamageModifier`='6.5' WHERE  `entry`=10429;
+-- Ramstein the Gorger
+UPDATE `creature_template` SET `DamageModifier`='9' WHERE  `entry`=10439;
+-- the unforgiven
+UPDATE `creature_template` SET `DamageModifier`='3.7' WHERE  `entry`=10516;
+-- timmy the cruel
+UPDATE `creature_template` SET `DamageModifier`='13' WHERE  `entry`=10808;
+-- balnazzar
+UPDATE `creature_template` SET `DamageModifier`='9' WHERE  `entry`=10813;
+-- somnus
+UPDATE `creature_template` SET `DamageModifier`='9' WHERE  `entry`=12900;
+-- Panzor the Invincible
+UPDATE `creature_template` SET `DamageModifier`='6' WHERE  `entry`=8923;
