@@ -22,7 +22,7 @@ CREATE TABLE `creature_text`
   `BroadcastTextId` MEDIUMINT NOT NULL DEFAULT 0,
   `TextRange` TINYINT unsigned NOT NULL DEFAULT 0,
   `comment` varchar(255) DEFAULT '',
-  CHECK (`Probability`>0),
+  CHECK (`Probability`>=0),
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

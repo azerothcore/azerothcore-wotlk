@@ -40,7 +40,7 @@ CREATE TABLE `character_stats`
   `rangedAttackPower` INT unsigned NOT NULL DEFAULT 0,
   `spellPower` INT unsigned NOT NULL DEFAULT 0,
   `resilience` INT unsigned NOT NULL DEFAULT 0,
-  CHECK (`blockPct`>0 AND `dodgePct`>0 AND `parryPct`>0 AND `critPct`>0 AND `rangedCritPct`>0 AND `spellCritPct`>0),
+  CHECK (`blockPct`>=0 AND `dodgePct`>=0 AND `parryPct`>=0 AND `critPct`>=0 AND `rangedCritPct`>=0 AND `spellCritPct`>=0),
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

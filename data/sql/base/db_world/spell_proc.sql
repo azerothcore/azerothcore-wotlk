@@ -24,7 +24,7 @@ CREATE TABLE `spell_proc`
   `chance` FLOAT NOT NULL DEFAULT 0,
   `cooldown` FLOAT NOT NULL DEFAULT 0,
   `charges` INT unsigned NOT NULL DEFAULT 0,
-  CHECK (`cooldown`>0),
+  CHECK (`cooldown`>=0),
   PRIMARY KEY (`spellId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

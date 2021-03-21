@@ -12,7 +12,7 @@ CREATE TABLE `item_enchantment_template`
   `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `ench` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `chance` FLOAT NOT NULL DEFAULT 0,
-  CHECK (`chance`>0),
+  CHECK (`chance`>=0),
   PRIMARY KEY (`entry`,`ench`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED COMMENT='Item Random Enchantment System';
 /*!40101 SET character_set_client = @saved_cs_client */;

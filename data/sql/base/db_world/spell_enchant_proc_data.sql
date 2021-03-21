@@ -13,7 +13,7 @@ CREATE TABLE `spell_enchant_proc_data`
   `customChance` INT unsigned NOT NULL DEFAULT 0,
   `PPMChance` FLOAT NOT NULL DEFAULT 0,
   `procEx` INT unsigned NOT NULL DEFAULT 0,
-  CHECK (`PPMChance`>0),
+  CHECK (`PPMChance`>=0),
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=DYNAMIC COMMENT='Spell enchant proc data';
 /*!40101 SET character_set_client = @saved_cs_client */;
