@@ -15,7 +15,7 @@ CREATE TABLE `creature_addon`
   `bytes1` int(10) unsigned NOT NULL DEFAULT 0,
   `bytes2` int(10) unsigned NOT NULL DEFAULT 0,
   `emote` int(10) unsigned NOT NULL DEFAULT 0,
-  `isLarge` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `isLarge` TINYINT unsigned NOT NULL DEFAULT 0,
   `auras` text DEFAULT NULL,
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

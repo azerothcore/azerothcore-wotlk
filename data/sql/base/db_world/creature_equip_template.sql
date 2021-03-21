@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `creature_equip_template`;
 CREATE TABLE `creature_equip_template` 
 (
   `CreatureID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `ID` tinyint(3) unsigned NOT NULL DEFAULT 1,
+  `ID` TINYINT unsigned NOT NULL DEFAULT 1,
   `ItemID1` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `ItemID2` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `ItemID3` mediumint(8) unsigned NOT NULL DEFAULT 0,

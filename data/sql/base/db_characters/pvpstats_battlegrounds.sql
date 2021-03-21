@@ -10,9 +10,9 @@ DROP TABLE IF EXISTS `pvpstats_battlegrounds`;
 CREATE TABLE `pvpstats_battlegrounds` 
 (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `winner_faction` tinyint(4) NOT NULL,
-  `bracket_id` tinyint(3) unsigned NOT NULL,
-  `type` tinyint(3) unsigned NOT NULL,
+  `winner_faction` TINYINT NOT NULL,
+  `bracket_id` TINYINT unsigned NOT NULL,
+  `type` TINYINT unsigned NOT NULL,
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

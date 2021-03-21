@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `game_event_condition_save`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `game_event_condition_save` 
 (
-  `eventEntry` tinyint(3) unsigned NOT NULL,
+  `eventEntry` TINYINT unsigned NOT NULL,
   `condition_id` int(10) unsigned NOT NULL DEFAULT 0,
   `done` float DEFAULT 0,
   PRIMARY KEY (`eventEntry`,`condition_id`)

@@ -10,9 +10,9 @@ DROP TABLE IF EXISTS `access_requirement`;
 CREATE TABLE `access_requirement` 
 (
   `mapId` mediumint(8) unsigned NOT NULL,
-  `difficulty` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `level_min` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `level_max` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `difficulty` TINYINT unsigned NOT NULL DEFAULT 0,
+  `level_min` TINYINT unsigned NOT NULL DEFAULT 0,
+  `level_max` TINYINT unsigned NOT NULL DEFAULT 0,
   `item_level` smallint(5) unsigned NOT NULL DEFAULT 0,
   `item` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `item2` mediumint(8) unsigned NOT NULL DEFAULT 0,

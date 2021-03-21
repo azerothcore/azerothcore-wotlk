@@ -12,7 +12,7 @@ CREATE TABLE `npc_vendor`
   `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `slot` smallint(6) NOT NULL DEFAULT 0,
   `item` mediumint(8) NOT NULL DEFAULT 0,
-  `maxcount` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `maxcount` TINYINT unsigned NOT NULL DEFAULT 0,
   `incrtime` int(10) unsigned NOT NULL DEFAULT 0,
   `ExtendedCost` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `VerifiedBuild` smallint(5) DEFAULT 0,

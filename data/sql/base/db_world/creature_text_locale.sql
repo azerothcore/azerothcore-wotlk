@@ -10,8 +10,8 @@ DROP TABLE IF EXISTS `creature_text_locale`;
 CREATE TABLE `creature_text_locale` 
 (
   `CreatureID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `GroupID` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `ID` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `GroupID` TINYINT unsigned NOT NULL DEFAULT 0,
+  `ID` TINYINT unsigned NOT NULL DEFAULT 0,
   `Locale` varchar(4) NOT NULL,
   `Text` text DEFAULT NULL,
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`,`Locale`)

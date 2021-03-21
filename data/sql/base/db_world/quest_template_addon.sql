@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `quest_template_addon`;
 CREATE TABLE `quest_template_addon` 
 (
   `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `MaxLevel` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `MaxLevel` TINYINT unsigned NOT NULL DEFAULT 0,
   `AllowableClasses` int(10) unsigned NOT NULL DEFAULT 0,
   `SourceSpellID` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `PrevQuestID` mediumint(8) NOT NULL DEFAULT 0,
@@ -24,8 +24,8 @@ CREATE TABLE `quest_template_addon`
   `RequiredMaxRepFaction` smallint(5) unsigned NOT NULL DEFAULT 0,
   `RequiredMinRepValue` mediumint(8) NOT NULL DEFAULT 0,
   `RequiredMaxRepValue` mediumint(8) NOT NULL DEFAULT 0,
-  `ProvidedItemCount` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `SpecialFlags` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `ProvidedItemCount` TINYINT unsigned NOT NULL DEFAULT 0,
+  `SpecialFlags` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

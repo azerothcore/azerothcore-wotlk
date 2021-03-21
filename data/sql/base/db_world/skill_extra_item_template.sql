@@ -12,7 +12,7 @@ CREATE TABLE `skill_extra_item_template`
   `spellId` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'SpellId of the item creation spell',
   `requiredSpecialization` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Specialization spell id',
   `additionalCreateChance` float NOT NULL DEFAULT 0 COMMENT 'chance to create add',
-  `additionalMaxNum` tinyint(3) NOT NULL DEFAULT 0,
+  `additionalMaxNum` TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`spellId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED COMMENT='Skill Specialization System';
 /*!40101 SET character_set_client = @saved_cs_client */;

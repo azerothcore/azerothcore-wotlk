@@ -11,7 +11,7 @@ CREATE TABLE `character_equipmentsets`
 (
   `guid` int(10) NOT NULL DEFAULT 0,
   `setguid` bigint(20) NOT NULL AUTO_INCREMENT,
-  `setindex` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `setindex` TINYINT unsigned NOT NULL DEFAULT 0,
   `name` varchar(31) NOT NULL,
   `iconname` varchar(100) NOT NULL,
   `ignore_mask` int(11) unsigned NOT NULL DEFAULT 0,

@@ -11,7 +11,7 @@ CREATE TABLE `lag_reports`
 (
   `reportId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `guid` int(10) unsigned NOT NULL DEFAULT 0,
-  `lagType` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `lagType` TINYINT unsigned NOT NULL DEFAULT 0,
   `mapId` smallint(5) unsigned NOT NULL DEFAULT 0,
   `posX` float NOT NULL DEFAULT 0,
   `posY` float NOT NULL DEFAULT 0,

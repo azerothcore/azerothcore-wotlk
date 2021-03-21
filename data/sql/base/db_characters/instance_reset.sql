@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `instance_reset`;
 CREATE TABLE `instance_reset` 
 (
   `mapid` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `difficulty` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `difficulty` TINYINT unsigned NOT NULL DEFAULT 0,
   `resettime` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`mapid`,`difficulty`),
   KEY `difficulty` (`difficulty`)

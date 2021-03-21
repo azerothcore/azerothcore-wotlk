@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `character_arena_stats`;
 CREATE TABLE `character_arena_stats` 
 (
   `guid` int(10) unsigned NOT NULL DEFAULT 0,
-  `slot` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `slot` TINYINT unsigned NOT NULL DEFAULT 0,
   `matchMakerRating` smallint(5) unsigned NOT NULL DEFAULT 0,
   `maxMMR` smallint(5) NOT NULL,
   PRIMARY KEY (`guid`,`slot`)

@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `game_event_pool`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `game_event_pool` 
 (
-  `eventEntry` tinyint(4) NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
+  `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event. Put negative entry to remove during event.',
   `pool_entry` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Id of the pool',
   PRIMARY KEY (`pool_entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

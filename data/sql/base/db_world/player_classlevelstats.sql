@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `player_classlevelstats`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `player_classlevelstats` 
 (
-  `class` tinyint(3) unsigned NOT NULL,
-  `level` tinyint(3) unsigned NOT NULL,
+  `class` TINYINT unsigned NOT NULL,
+  `level` TINYINT unsigned NOT NULL,
   `basehp` smallint(5) unsigned NOT NULL,
   `basemana` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`class`,`level`)

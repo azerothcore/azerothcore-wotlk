@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `spell_proc_event`;
 CREATE TABLE `spell_proc_event` 
 (
   `entry` mediumint(8) NOT NULL DEFAULT 0,
-  `SchoolMask` tinyint(4) NOT NULL DEFAULT 0,
+  `SchoolMask` TINYINT NOT NULL DEFAULT 0,
   `SpellFamilyName` smallint(5) unsigned NOT NULL DEFAULT 0,
   `SpellFamilyMask0` int(10) unsigned NOT NULL DEFAULT 0,
   `SpellFamilyMask1` int(10) unsigned NOT NULL DEFAULT 0,

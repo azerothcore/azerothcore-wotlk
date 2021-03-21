@@ -14,7 +14,7 @@ CREATE TABLE `npc_trainer`
   `MoneyCost` int(10) unsigned NOT NULL DEFAULT 0,
   `ReqSkillLine` smallint(5) unsigned NOT NULL DEFAULT 0,
   `ReqSkillRank` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `ReqLevel` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `ReqLevel` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`,`SpellID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

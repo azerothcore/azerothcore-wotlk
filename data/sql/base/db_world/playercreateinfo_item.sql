@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `playercreateinfo_item`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `playercreateinfo_item` 
 (
-  `race` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `class` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `race` TINYINT unsigned NOT NULL DEFAULT 0,
+  `class` TINYINT unsigned NOT NULL DEFAULT 0,
   `itemid` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `amount` smallint(5) unsigned NOT NULL DEFAULT 1,
   `Note` varchar(255) DEFAULT NULL,

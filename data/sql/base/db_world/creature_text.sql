@@ -10,17 +10,17 @@ DROP TABLE IF EXISTS `creature_text`;
 CREATE TABLE `creature_text` 
 (
   `CreatureID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `GroupID` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `ID` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `GroupID` TINYINT unsigned NOT NULL DEFAULT 0,
+  `ID` TINYINT unsigned NOT NULL DEFAULT 0,
   `Text` longtext DEFAULT NULL,
-  `Type` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `Language` tinyint(3) NOT NULL DEFAULT 0,
+  `Type` TINYINT unsigned NOT NULL DEFAULT 0,
+  `Language` TINYINT NOT NULL DEFAULT 0,
   `Probability` float unsigned NOT NULL DEFAULT 0,
   `Emote` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `Duration` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `Sound` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `BroadcastTextId` mediumint(6) NOT NULL DEFAULT 0,
-  `TextRange` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `TextRange` TINYINT unsigned NOT NULL DEFAULT 0,
   `comment` varchar(255) DEFAULT '',
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

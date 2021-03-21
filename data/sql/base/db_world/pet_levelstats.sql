@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `pet_levelstats`;
 CREATE TABLE `pet_levelstats` 
 (
   `creature_entry` mediumint(8) unsigned NOT NULL,
-  `level` tinyint(3) unsigned NOT NULL,
+  `level` TINYINT unsigned NOT NULL,
   `hp` smallint(5) unsigned NOT NULL,
   `mana` smallint(5) unsigned NOT NULL,
   `armor` int(10) unsigned NOT NULL DEFAULT 0,

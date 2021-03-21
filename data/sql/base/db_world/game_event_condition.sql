@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `game_event_condition`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `game_event_condition` 
 (
-  `eventEntry` tinyint(3) unsigned NOT NULL COMMENT 'Entry of the game event',
+  `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
   `condition_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `req_num` float DEFAULT 0,
   `max_world_state_field` smallint(5) unsigned NOT NULL DEFAULT 0,

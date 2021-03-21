@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `character_glyphs`;
 CREATE TABLE `character_glyphs` 
 (
   `guid` int(10) unsigned NOT NULL,
-  `talentGroup` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `talentGroup` TINYINT unsigned NOT NULL DEFAULT 0,
   `glyph1` smallint(5) unsigned DEFAULT 0,
   `glyph2` smallint(5) unsigned DEFAULT 0,
   `glyph3` smallint(5) unsigned DEFAULT 0,

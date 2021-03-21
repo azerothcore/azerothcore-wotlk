@@ -12,7 +12,7 @@ CREATE TABLE `arena_team`
   `arenaTeamId` int(10) unsigned NOT NULL DEFAULT 0,
   `name` varchar(24) NOT NULL,
   `captainGuid` int(10) unsigned NOT NULL DEFAULT 0,
-  `type` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `type` TINYINT unsigned NOT NULL DEFAULT 0,
   `rating` smallint(5) unsigned NOT NULL DEFAULT 0,
   `seasonGames` smallint(5) unsigned NOT NULL DEFAULT 0,
   `seasonWins` smallint(5) unsigned NOT NULL DEFAULT 0,
@@ -20,9 +20,9 @@ CREATE TABLE `arena_team`
   `weekWins` smallint(5) unsigned NOT NULL DEFAULT 0,
   `rank` int(10) unsigned NOT NULL DEFAULT 0,
   `backgroundColor` int(10) unsigned NOT NULL DEFAULT 0,
-  `emblemStyle` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `emblemStyle` TINYINT unsigned NOT NULL DEFAULT 0,
   `emblemColor` int(10) unsigned NOT NULL DEFAULT 0,
-  `borderStyle` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `borderStyle` TINYINT unsigned NOT NULL DEFAULT 0,
   `borderColor` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`arenaTeamId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

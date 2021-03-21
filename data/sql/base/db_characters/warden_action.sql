@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `warden_action`;
 CREATE TABLE `warden_action` 
 (
   `wardenId` smallint(5) unsigned NOT NULL,
-  `action` tinyint(3) unsigned DEFAULT NULL,
+  `action` TINYINT unsigned DEFAULT NULL,
   PRIMARY KEY (`wardenId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

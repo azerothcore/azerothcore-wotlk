@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `game_event_gameobject_quest`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `game_event_gameobject_quest` 
 (
-  `eventEntry` tinyint(3) unsigned NOT NULL COMMENT 'Entry of the game event',
+  `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
   `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `quest` mediumint(8) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`,`quest`,`eventEntry`)

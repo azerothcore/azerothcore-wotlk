@@ -11,8 +11,8 @@ CREATE TABLE `character_instance`
 (
   `guid` int(10) unsigned NOT NULL DEFAULT 0,
   `instance` int(10) unsigned NOT NULL DEFAULT 0,
-  `permanent` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `extended` tinyint(3) unsigned NOT NULL,
+  `permanent` TINYINT unsigned NOT NULL DEFAULT 0,
+  `extended` TINYINT unsigned NOT NULL,
   PRIMARY KEY (`guid`,`instance`),
   KEY `instance` (`instance`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

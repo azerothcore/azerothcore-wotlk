@@ -11,7 +11,7 @@ CREATE TABLE `item_set_names`
 (
   `entry` mediumint(8) unsigned NOT NULL,
   `name` varchar(255) NOT NULL DEFAULT '',
-  `InventoryType` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `InventoryType` TINYINT unsigned NOT NULL DEFAULT 0,
   `VerifiedBuild` smallint(5) DEFAULT 0,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

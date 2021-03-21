@@ -11,7 +11,7 @@ CREATE TABLE `guild_member`
 (
   `guildid` int(10) unsigned NOT NULL COMMENT 'Guild Identificator',
   `guid` int(10) unsigned NOT NULL,
-  `rank` tinyint(3) unsigned NOT NULL,
+  `rank` TINYINT unsigned NOT NULL,
   `pnote` varchar(31) NOT NULL DEFAULT '',
   `offnote` varchar(31) NOT NULL DEFAULT '',
   UNIQUE KEY `guid_key` (`guid`),

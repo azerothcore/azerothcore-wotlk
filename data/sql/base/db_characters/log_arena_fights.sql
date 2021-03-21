@@ -11,7 +11,7 @@ CREATE TABLE `log_arena_fights`
 (
   `fight_id` int(10) unsigned NOT NULL,
   `time` datetime NOT NULL,
-  `type` tinyint(3) unsigned NOT NULL,
+  `type` TINYINT unsigned NOT NULL,
   `duration` int(10) unsigned NOT NULL,
   `winner` int(10) unsigned NOT NULL,
   `loser` int(10) unsigned NOT NULL,

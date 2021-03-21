@@ -9,14 +9,14 @@ DROP TABLE IF EXISTS `player_levelstats`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `player_levelstats` 
 (
-  `race` tinyint(3) unsigned NOT NULL,
-  `class` tinyint(3) unsigned NOT NULL,
-  `level` tinyint(3) unsigned NOT NULL,
-  `str` tinyint(3) unsigned NOT NULL,
-  `agi` tinyint(3) unsigned NOT NULL,
-  `sta` tinyint(3) unsigned NOT NULL,
-  `inte` tinyint(3) unsigned NOT NULL,
-  `spi` tinyint(3) unsigned NOT NULL,
+  `race` TINYINT unsigned NOT NULL,
+  `class` TINYINT unsigned NOT NULL,
+  `level` TINYINT unsigned NOT NULL,
+  `str` TINYINT unsigned NOT NULL,
+  `agi` TINYINT unsigned NOT NULL,
+  `sta` TINYINT unsigned NOT NULL,
+  `inte` TINYINT unsigned NOT NULL,
+  `spi` TINYINT unsigned NOT NULL,
   PRIMARY KEY (`race`,`class`,`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 PACK_KEYS=0 COMMENT='Stores levels stats.';
 /*!40101 SET character_set_client = @saved_cs_client */;

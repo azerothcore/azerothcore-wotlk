@@ -13,9 +13,9 @@ CREATE TABLE `character_aura`
   `casterGuid` bigint(20) unsigned NOT NULL DEFAULT 0 COMMENT 'Full Global Unique Identifier',
   `itemGuid` bigint(20) unsigned NOT NULL DEFAULT 0,
   `spell` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `effectMask` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `recalculateMask` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `stackCount` tinyint(3) unsigned NOT NULL DEFAULT 1,
+  `effectMask` TINYINT unsigned NOT NULL DEFAULT 0,
+  `recalculateMask` TINYINT unsigned NOT NULL DEFAULT 0,
+  `stackCount` TINYINT unsigned NOT NULL DEFAULT 1,
   `amount0` int(11) NOT NULL DEFAULT 0,
   `amount1` int(11) NOT NULL DEFAULT 0,
   `amount2` int(11) NOT NULL DEFAULT 0,
@@ -24,7 +24,7 @@ CREATE TABLE `character_aura`
   `base_amount2` int(11) NOT NULL DEFAULT 0,
   `maxDuration` int(11) NOT NULL DEFAULT 0,
   `remainTime` int(11) NOT NULL DEFAULT 0,
-  `remainCharges` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `remainCharges` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`casterGuid`,`itemGuid`,`spell`,`effectMask`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Player System';
 /*!40101 SET character_set_client = @saved_cs_client */;

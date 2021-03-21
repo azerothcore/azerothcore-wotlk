@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `holiday_dates`;
 CREATE TABLE `holiday_dates` 
 (
   `id` int(10) unsigned NOT NULL,
-  `date_id` tinyint(3) unsigned NOT NULL,
+  `date_id` TINYINT unsigned NOT NULL,
   `date_value` int(10) unsigned NOT NULL,
   `holiday_duration` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`,`date_id`)

@@ -13,7 +13,7 @@ CREATE TABLE `character_spell_cooldown`
   `spell` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Spell Identifier',
   `item` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Item Identifier',
   `time` int(10) unsigned NOT NULL DEFAULT 0,
-  `needSend` tinyint(3) unsigned NOT NULL DEFAULT 1,
+  `needSend` TINYINT unsigned NOT NULL DEFAULT 1,
   PRIMARY KEY (`guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

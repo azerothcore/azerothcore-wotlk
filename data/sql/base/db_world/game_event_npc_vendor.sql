@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `game_event_npc_vendor`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `game_event_npc_vendor` 
 (
-  `eventEntry` tinyint(4) NOT NULL COMMENT 'Entry of the game event.',
+  `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event.',
   `guid` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `slot` smallint(6) NOT NULL DEFAULT 0,
   `item` mediumint(8) unsigned NOT NULL DEFAULT 0,

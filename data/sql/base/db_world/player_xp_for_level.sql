@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `player_xp_for_level`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `player_xp_for_level` 
 (
-  `Level` tinyint(3) unsigned NOT NULL,
+  `Level` TINYINT unsigned NOT NULL,
   `Experience` int(10) unsigned NOT NULL,
   PRIMARY KEY (`Level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

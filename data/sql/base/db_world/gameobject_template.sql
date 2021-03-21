@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `gameobject_template`;
 CREATE TABLE `gameobject_template` 
 (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `type` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `type` TINYINT unsigned NOT NULL DEFAULT 0,
   `displayId` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `name` varchar(100) NOT NULL DEFAULT '',
   `IconName` varchar(100) NOT NULL DEFAULT '',

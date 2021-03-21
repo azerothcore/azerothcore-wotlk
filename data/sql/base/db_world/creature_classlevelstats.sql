@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `creature_classlevelstats`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creature_classlevelstats` 
 (
-  `level` tinyint(3) unsigned NOT NULL,
-  `class` tinyint(3) unsigned NOT NULL,
+  `level` TINYINT unsigned NOT NULL,
+  `class` TINYINT unsigned NOT NULL,
   `basehp0` smallint(5) unsigned NOT NULL DEFAULT 1,
   `basehp1` smallint(5) unsigned NOT NULL DEFAULT 1,
   `basehp2` smallint(5) unsigned NOT NULL DEFAULT 1,

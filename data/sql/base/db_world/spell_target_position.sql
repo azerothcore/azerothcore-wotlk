@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `spell_target_position`;
 CREATE TABLE `spell_target_position` 
 (
   `ID` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
-  `EffectIndex` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `EffectIndex` TINYINT unsigned NOT NULL DEFAULT 0,
   `MapID` smallint(5) unsigned NOT NULL DEFAULT 0,
   `PositionX` float NOT NULL DEFAULT 0,
   `PositionY` float NOT NULL DEFAULT 0,

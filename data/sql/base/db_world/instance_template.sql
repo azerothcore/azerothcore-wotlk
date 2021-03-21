@@ -12,7 +12,7 @@ CREATE TABLE `instance_template`
   `map` smallint(5) unsigned NOT NULL,
   `parent` smallint(5) unsigned NOT NULL,
   `script` varchar(128) NOT NULL DEFAULT '',
-  `allowMount` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `allowMount` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`map`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

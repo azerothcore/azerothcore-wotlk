@@ -11,7 +11,7 @@ CREATE TABLE `pet_spell`
 (
   `guid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
   `spell` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Spell Identifier',
-  `active` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `active` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Pet System';
 /*!40101 SET character_set_client = @saved_cs_client */;

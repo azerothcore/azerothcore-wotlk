@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `gm_ticket`;
 CREATE TABLE `gm_ticket` 
 (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `type` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '0 open, 1 closed, 2 character deleted',
+  `type` TINYINT unsigned NOT NULL DEFAULT 0 COMMENT '0 open, 1 closed, 2 character deleted',
   `playerGuid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier of ticket creator',
   `name` varchar(12) NOT NULL COMMENT 'Name of ticket creator',
   `description` text NOT NULL,
@@ -24,10 +24,10 @@ CREATE TABLE `gm_ticket`
   `assignedTo` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'GUID of admin to whom ticket is assigned',
   `comment` text NOT NULL,
   `response` text NOT NULL,
-  `completed` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `escalated` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `viewed` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `needMoreHelp` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `completed` TINYINT unsigned NOT NULL DEFAULT 0,
+  `escalated` TINYINT unsigned NOT NULL DEFAULT 0,
+  `viewed` TINYINT unsigned NOT NULL DEFAULT 0,
+  `needMoreHelp` TINYINT unsigned NOT NULL DEFAULT 0,
   `resolvedBy` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'GUID of GM who resolved the ticket',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Player System';

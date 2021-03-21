@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `outdoorpvp_template`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `outdoorpvp_template` 
 (
-  `TypeId` tinyint(3) unsigned NOT NULL,
+  `TypeId` TINYINT unsigned NOT NULL,
   `ScriptName` char(64) NOT NULL DEFAULT '',
   `comment` text DEFAULT NULL,
   PRIMARY KEY (`TypeId`)

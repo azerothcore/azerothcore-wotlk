@@ -10,10 +10,10 @@ DROP TABLE IF EXISTS `charstartoutfit_dbc`;
 CREATE TABLE `charstartoutfit_dbc` 
 (
   `ID` int(11) NOT NULL DEFAULT 0,
-  `RaceID` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `ClassID` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `SexID` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `OutfitID` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `RaceID` TINYINT unsigned NOT NULL DEFAULT 0,
+  `ClassID` TINYINT unsigned NOT NULL DEFAULT 0,
+  `SexID` TINYINT unsigned NOT NULL DEFAULT 0,
+  `OutfitID` TINYINT unsigned NOT NULL DEFAULT 0,
   `ItemID_1` int(11) NOT NULL DEFAULT 0,
   `ItemID_2` int(11) NOT NULL DEFAULT 0,
   `ItemID_3` int(11) NOT NULL DEFAULT 0,

@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `spell_group_stack_rules`;
 CREATE TABLE `spell_group_stack_rules` 
 (
   `group_id` int(11) unsigned NOT NULL DEFAULT 0,
-  `stack_rule` tinyint(3) NOT NULL DEFAULT 0,
+  `stack_rule` TINYINT NOT NULL DEFAULT 0,
   `description` varchar(150) NOT NULL DEFAULT '',
   PRIMARY KEY (`group_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

@@ -12,9 +12,9 @@ CREATE TABLE `powerdisplay_dbc`
   `ID` int(11) NOT NULL DEFAULT 0,
   `ActualType` int(11) NOT NULL DEFAULT 0,
   `GlobalstringBaseTag` varchar(100) DEFAULT NULL,
-  `Red` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `Green` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `Blue` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `Red` TINYINT unsigned NOT NULL DEFAULT 0,
+  `Green` TINYINT unsigned NOT NULL DEFAULT 0,
+  `Blue` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

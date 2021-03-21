@@ -10,8 +10,8 @@ DROP TABLE IF EXISTS `guild_bank_item`;
 CREATE TABLE `guild_bank_item` 
 (
   `guildid` int(10) unsigned NOT NULL DEFAULT 0,
-  `TabId` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `SlotId` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `TabId` TINYINT unsigned NOT NULL DEFAULT 0,
+  `SlotId` TINYINT unsigned NOT NULL DEFAULT 0,
   `item_guid` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guildid`,`TabId`,`SlotId`),
   KEY `guildid_key` (`guildid`),

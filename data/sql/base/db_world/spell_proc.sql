@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `spell_proc`;
 CREATE TABLE `spell_proc` 
 (
   `spellId` mediumint(8) NOT NULL DEFAULT 0,
-  `schoolMask` tinyint(4) NOT NULL DEFAULT 0,
+  `schoolMask` TINYINT NOT NULL DEFAULT 0,
   `spellFamilyName` smallint(5) unsigned NOT NULL DEFAULT 0,
   `spellFamilyMask0` int(10) unsigned NOT NULL DEFAULT 0,
   `spellFamilyMask1` int(10) unsigned NOT NULL DEFAULT 0,

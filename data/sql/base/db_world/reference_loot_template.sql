@@ -13,11 +13,11 @@ CREATE TABLE `reference_loot_template`
   `Item` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `Reference` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `Chance` float NOT NULL DEFAULT 100,
-  `QuestRequired` tinyint(1) NOT NULL DEFAULT 0,
+  `QuestRequired` TINYINT NOT NULL DEFAULT 0,
   `LootMode` smallint(5) unsigned NOT NULL DEFAULT 1,
-  `GroupId` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `MinCount` tinyint(3) unsigned NOT NULL DEFAULT 1,
-  `MaxCount` tinyint(3) unsigned NOT NULL DEFAULT 1,
+  `GroupId` TINYINT unsigned NOT NULL DEFAULT 0,
+  `MinCount` TINYINT unsigned NOT NULL DEFAULT 1,
+  `MaxCount` TINYINT unsigned NOT NULL DEFAULT 1,
   `Comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED COMMENT='Loot System';

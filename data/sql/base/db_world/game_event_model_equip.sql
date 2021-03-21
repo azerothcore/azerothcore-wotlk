@@ -9,10 +9,10 @@ DROP TABLE IF EXISTS `game_event_model_equip`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `game_event_model_equip` 
 (
-  `eventEntry` tinyint(4) NOT NULL COMMENT 'Entry of the game event.',
+  `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event.',
   `guid` int(10) unsigned NOT NULL DEFAULT 0,
   `modelid` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `equipment_id` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `equipment_id` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

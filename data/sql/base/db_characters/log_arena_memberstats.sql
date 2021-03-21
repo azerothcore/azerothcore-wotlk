@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `log_arena_memberstats`;
 CREATE TABLE `log_arena_memberstats` 
 (
   `fight_id` int(10) unsigned NOT NULL,
-  `member_id` tinyint(3) unsigned NOT NULL,
+  `member_id` TINYINT unsigned NOT NULL,
   `name` char(20) NOT NULL,
   `guid` int(10) unsigned NOT NULL,
   `team` int(10) unsigned NOT NULL,
