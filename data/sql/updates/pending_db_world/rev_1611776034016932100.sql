@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_resistance` (
   `School` TINYINT UNSIGNED NOT NULL,
   `Resistance` SMALLINT DEFAULT NULL,
   `VerifiedBuild` SMALLINT DEFAULT 0,
+  CHECK (`School`>=1 AND `School`<=6),
   PRIMARY KEY (`CreatureID`, `School`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
@@ -15,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_spell` (
   `Index` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   `Spell` MEDIUMINT UNSIGNED DEFAULT NULL,
   `VerifiedBuild` SMALLINT DEFAULT 0,
+  CHECK (`Spell`>=0 AND `Spell`<=7),
   PRIMARY KEY (`CreatureID`, `Index`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
