@@ -61,6 +61,51 @@ UPDATE `creature_template` SET `DamageModifier`='25' WHERE  `entry`=11981;
 UPDATE `creature_template` SET `DamageModifier`='30' WHERE  `entry`=14020;
 -- nefarian 35 : no change
 
+-- BWL trash (was 7.5 for all)
+-- blackwing guardsman
+UPDATE `creature_template` SET `DamageModifier`='14' WHERE  `entry`=14456;
+-- Blackwing Legionnaire
+UPDATE `creature_template` SET `DamageModifier`='7' WHERE  `entry`=12416;
+-- blackwing mage
+UPDATE `creature_template` SET `DamageModifier`='4' WHERE  `entry`=12420;
+-- Blackwing Spellbinder
+UPDATE `creature_template` SET `DamageModifier`='15' WHERE  `entry`=12457;
+-- blackwing taskmaster
+UPDATE `creature_template` SET `DamageModifier`='15' WHERE  `entry`=12458;
+-- blackwing technician
+UPDATE `creature_template` SET `DamageModifier`='5' WHERE  `entry`=13996;
+-- Blackwing Warlock
+UPDATE `creature_template` SET `DamageModifier`='15' WHERE  `entry`=12459;
+-- Death Talon Captain
+UPDATE `creature_template` SET `DamageModifier`='24' WHERE  `entry`=12467;
+-- Death Talon Dragonspawn
+UPDATE `creature_template` SET `DamageModifier`='14' WHERE  `entry`=12422;
+-- Death Talon Wyrmguard
+UPDATE `creature_template` SET `DamageModifier`='25' WHERE  `entry`=12460;
+-- death talon overseer
+UPDATE `creature_template` SET `DamageModifier`='22' WHERE  `entry`=12461;
+-- Death Talon Flamescale
+UPDATE `creature_template` SET `DamageModifier`='18' WHERE  `entry`=12463;
+-- Death Talon Seether
+UPDATE `creature_template` SET `DamageModifier`='20' WHERE  `entry`=12464;
+-- death talon wyrmkin
+UPDATE `creature_template` SET `DamageModifier`='18' WHERE  `entry`=12465;
+-- Death Talon Hatcher
+UPDATE `creature_template` SET `DamageModifier`='20' WHERE  `entry`=12468;
+-- nefarian drakonids
+UPDATE `creature_template` SET `DamageModifier`='5' WHERE  `entry`=14261;
+UPDATE `creature_template` SET `DamageModifier`='5' WHERE  `entry`=14262;
+UPDATE `creature_template` SET `DamageModifier`='5' WHERE  `entry`=14263;
+UPDATE `creature_template` SET `DamageModifier`='5' WHERE  `entry`=14264;
+UPDATE `creature_template` SET `DamageModifier`='5' WHERE  `entry`=14265;
+-- Chromatic Drakonid
+UPDATE `creature_template` SET `DamageModifier`='6' WHERE  `entry`=14302;
+-- corrupted whelps (was 1)
+UPDATE `creature_template` SET `DamageModifier`='3' WHERE  `entry`=14022;
+UPDATE `creature_template` SET `DamageModifier`='3' WHERE  `entry`=14023;
+UPDATE `creature_template` SET `DamageModifier`='3' WHERE  `entry`=14024;
+UPDATE `creature_template` SET `DamageModifier`='3' WHERE  `entry`=14025;
+
 -- Temple Of Ahn Quiraj (AQ 40)
 -- The Prophet Skeram 35->20
 UPDATE `creature_template` SET `DamageModifier`='20' WHERE  `entry`=15263;
