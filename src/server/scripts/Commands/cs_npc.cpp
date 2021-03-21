@@ -21,6 +21,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 #include "Transport.h"
+#include <string>
 
 struct NpcFlagText
 {
@@ -918,6 +919,13 @@ public:
         if (!creature || creature->IsPet())
         {
             handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_FACTION_INVPARAM, std::to_string(displayId).c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
