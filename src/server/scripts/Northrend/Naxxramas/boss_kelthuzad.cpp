@@ -10,19 +10,19 @@
 
 enum Yells
 {
-    SAY_TAUNT                                              = 6,
-    SAY_AGGRO                                              = 7,
-    SAY_SLAY                                               = 8,
-    SAY_DEATH                                              = 9,
-    SAY_CHAIN                                              = 10,
-    SAY_FROST_BLAST                                        = 11,
-    SAY_REQUEST_AID                                        = 12,
-    SAY_ANSWER_REQUEST                                     = 3,
-    SAY_SUMMON_MINIONS                                     = 14,
-    SAY_SPECIAL                                            = 15,
+    SAY_TAUNT                               = 6,
+    SAY_AGGRO                               = 7,
+    SAY_SLAY                                = 8,
+    SAY_DEATH                               = 9,
+    SAY_CHAIN                               = 10,
+    SAY_FROST_BLAST                         = 11,
+    SAY_REQUEST_AID                         = 12,
+    SAY_ANSWER_REQUEST                      = 3,
+    SAY_SUMMON_MINIONS                      = 14,
+    SAY_SPECIAL                             = 15,
 
-    EMOTE_GUARDIAN_FLEE                                    = 0,
-    EMOTE_GUARDIAN_APPEAR                                  = 1
+    EMOTE_GUARDIAN_FLEE                     = 0,
+    EMOTE_GUARDIAN_APPEAR                   = 1
 };
 
 enum Spells
