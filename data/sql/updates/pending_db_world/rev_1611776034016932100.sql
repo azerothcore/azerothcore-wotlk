@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_spell` (
   `Index` TINYINT UNSIGNED NOT NULL DEFAULT 0,
   `Spell` MEDIUMINT UNSIGNED DEFAULT NULL,
   `VerifiedBuild` SMALLINT DEFAULT 0,
-  CHECK (`Spell`>=0 AND `Spell`<=7),
+  CHECK (`Index`>=0 AND `Index`<=7),
   PRIMARY KEY (`CreatureID`, `Index`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
