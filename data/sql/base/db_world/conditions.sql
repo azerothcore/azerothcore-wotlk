@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `conditions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `conditions` 
 (
   `SourceTypeOrReferenceId` mediumint(8) NOT NULL DEFAULT 0,
@@ -25,7 +25,7 @@ CREATE TABLE `conditions`
   `ScriptName` char(64) NOT NULL DEFAULT '',
   `Comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Condition System';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 COMMENT='Condition System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `conditions` WRITE;

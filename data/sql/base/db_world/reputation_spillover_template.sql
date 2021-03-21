@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `reputation_spillover_template`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `reputation_spillover_template` 
 (
   `faction` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'faction entry',
@@ -23,7 +23,7 @@ CREATE TABLE `reputation_spillover_template`
   `rate_4` float NOT NULL DEFAULT 0,
   `rank_4` tinyint(3) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`faction`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Reputation spillover reputation gain';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=DYNAMIC COMMENT='Reputation spillover reputation gain';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `reputation_spillover_template` WRITE;

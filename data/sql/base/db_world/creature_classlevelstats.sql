@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creature_classlevelstats`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creature_classlevelstats` 
 (
   `level` tinyint(3) unsigned NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE `creature_classlevelstats`
   `damage_exp2` float NOT NULL DEFAULT 0,
   `comment` text DEFAULT NULL,
   PRIMARY KEY (`level`,`class`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creature_classlevelstats` WRITE;

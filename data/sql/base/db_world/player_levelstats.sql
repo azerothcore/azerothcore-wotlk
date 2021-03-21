@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `player_levelstats`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `player_levelstats` 
 (
   `race` tinyint(3) unsigned NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE `player_levelstats`
   `inte` tinyint(3) unsigned NOT NULL,
   `spi` tinyint(3) unsigned NOT NULL,
   PRIMARY KEY (`race`,`class`,`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores levels stats.';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 PACK_KEYS=0 COMMENT='Stores levels stats.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `player_levelstats` WRITE;

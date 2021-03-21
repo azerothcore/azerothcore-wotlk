@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `instance_template`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `instance_template` 
 (
   `map` smallint(5) unsigned NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE `instance_template`
   `script` varchar(128) NOT NULL DEFAULT '',
   `allowMount` tinyint(3) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`map`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `instance_template` WRITE;

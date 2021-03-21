@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `groups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `groups` 
 (
   `guid` int(10) unsigned NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE `groups`
   `masterLooterGuid` int(10) unsigned NOT NULL,
   PRIMARY KEY (`guid`),
   KEY `leaderGuid` (`leaderGuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Groups';
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Groups';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `groups` WRITE;

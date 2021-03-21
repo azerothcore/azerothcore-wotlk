@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `character_aura`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `character_aura` 
 (
   `guid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
@@ -26,7 +26,7 @@ CREATE TABLE `character_aura`
   `remainTime` int(11) NOT NULL DEFAULT 0,
   `remainCharges` tinyint(3) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`casterGuid`,`itemGuid`,`spell`,`effectMask`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Player System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `character_aura` WRITE;

@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `access_requirement`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `access_requirement` 
 (
   `mapId` mediumint(8) unsigned NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE `access_requirement`
   `quest_failed_text` text DEFAULT NULL,
   `comment` text DEFAULT NULL,
   PRIMARY KEY (`mapId`,`difficulty`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Access Requirements';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=DYNAMIC COMMENT='Access Requirements';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `access_requirement` WRITE;

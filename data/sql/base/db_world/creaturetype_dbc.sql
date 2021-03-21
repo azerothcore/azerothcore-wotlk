@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creaturetype_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creaturetype_dbc` 
 (
   `ID` int(11) NOT NULL DEFAULT 0,
@@ -29,7 +29,7 @@ CREATE TABLE `creaturetype_dbc`
   `Name_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
   `Flags` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creaturetype_dbc` WRITE;

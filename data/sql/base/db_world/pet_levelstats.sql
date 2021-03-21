@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `pet_levelstats`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `pet_levelstats` 
 (
   `creature_entry` mediumint(8) unsigned NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE `pet_levelstats`
   `min_dmg` smallint(5) unsigned NOT NULL DEFAULT 0,
   `max_dmg` smallint(5) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`creature_entry`,`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores pet levels stats.';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 PACK_KEYS=0 COMMENT='Stores pet levels stats.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `pet_levelstats` WRITE;

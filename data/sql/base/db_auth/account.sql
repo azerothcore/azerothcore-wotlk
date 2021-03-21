@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `account`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `account` 
 (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
@@ -36,7 +36,7 @@ CREATE TABLE `account`
   `totaltime` int(10) unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 COMMENT='Account System';
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=UTF8MB4 COMMENT='Account System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `account` WRITE;

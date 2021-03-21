@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `log_arena_fights`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `log_arena_fights` 
 (
   `fight_id` int(10) unsigned NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE `log_arena_fights`
   `loser_tr_change` smallint(6) NOT NULL,
   `currOnline` int(10) unsigned NOT NULL,
   PRIMARY KEY (`fight_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `log_arena_fights` WRITE;

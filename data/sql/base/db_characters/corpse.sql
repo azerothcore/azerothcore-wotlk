@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `corpse`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `corpse` 
 (
   `corpseGuid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
@@ -32,7 +32,7 @@ CREATE TABLE `corpse`
   KEY `idx_instance` (`instanceId`),
   KEY `idx_player` (`guid`),
   KEY `idx_time` (`time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Death System';
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Death System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `corpse` WRITE;

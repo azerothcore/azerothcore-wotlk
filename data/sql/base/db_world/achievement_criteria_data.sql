@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `achievement_criteria_data`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `achievement_criteria_data` 
 (
   `criteria_id` mediumint(8) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE `achievement_criteria_data`
   `value2` mediumint(8) unsigned NOT NULL DEFAULT 0,
   `ScriptName` char(64) NOT NULL DEFAULT '',
   PRIMARY KEY (`criteria_id`,`type`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Achievment system';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED COMMENT='Achievment system';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `achievement_criteria_data` WRITE;

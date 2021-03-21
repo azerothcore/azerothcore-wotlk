@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `spell_target_position`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spell_target_position` 
 (
   `ID` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
@@ -18,7 +18,7 @@ CREATE TABLE `spell_target_position`
   `Orientation` float NOT NULL DEFAULT 0,
   `VerifiedBuild` smallint(5) DEFAULT 0,
   PRIMARY KEY (`ID`,`EffectIndex`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Spell System';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED COMMENT='Spell System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `spell_target_position` WRITE;
