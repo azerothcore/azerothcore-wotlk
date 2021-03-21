@@ -2,21 +2,21 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1611776034016932100');
 
 DROP TABLE IF EXISTS `creature_template_resistance`;
 CREATE TABLE IF NOT EXISTS `creature_template_resistance` (
-  `CreatureID` MEDIUMINT(8) UNSIGNED NOT NULL,
-  `School` TINYINT(6) UNSIGNED NOT NULL,
-  `Resistance` SMALLINT(6) DEFAULT NULL,
-  `VerifiedBuild` SMALLINT(5) DEFAULT 0,
+  `CreatureID` MEDIUMINT UNSIGNED NOT NULL,
+  `School` TINYINT UNSIGNED NOT NULL,
+  `Resistance` SMALLINT DEFAULT NULL,
+  `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`CreatureID`, `School`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 DROP TABLE IF EXISTS `creature_template_spell`;
 CREATE TABLE IF NOT EXISTS `creature_template_spell` (
-  `CreatureID` MEDIUMINT(8) UNSIGNED NOT NULL,
-  `Index` TINYINT(6) UNSIGNED NOT NULL DEFAULT 0,
-  `Spell` MEDIUMINT(8) UNSIGNED DEFAULT NULL,
-  `VerifiedBuild` SMALLINT(5) DEFAULT 0,
+  `CreatureID` MEDIUMINT UNSIGNED NOT NULL,
+  `Index` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `Spell` MEDIUMINT UNSIGNED DEFAULT NULL,
+  `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`CreatureID`, `Index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 
 INSERT INTO `creature_template_resistance` SELECT `entry`, 1, `resistance1`, `VerifiedBuild` FROM `creature_template` WHERE `resistance1` <> 0;
 INSERT INTO `creature_template_resistance` SELECT `entry`, 2, `resistance2`, `VerifiedBuild` FROM `creature_template` WHERE `resistance2` <> 0;
