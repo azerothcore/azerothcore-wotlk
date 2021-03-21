@@ -64,7 +64,7 @@ public:
     WardenWin();
     ~WardenWin() override;
 
-    void Init(WorldSession* session, BigNumber* K) override;
+    void Init(WorldSession* session, SessionKey const& K) override;
     ClientWardenModule* GetModuleForClient() override;
     void InitializeModule() override;
     void RequestHash() override;
