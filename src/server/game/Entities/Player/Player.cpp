@@ -2726,7 +2726,7 @@ void Player::Regenerate(Powers power)
     if (!maxValue)
         return;
 
-    //If .cheat power is on alwas have the max power
+    //If .cheat power is on always have the max power
     if (GetCommandStatus(CHEAT_POWER))
     {
         if (m_regenTimerCount >= 2000)

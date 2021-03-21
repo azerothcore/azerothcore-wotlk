@@ -739,8 +739,12 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 
     //Dont deal damage to unit if .cheat god is enable.
     if (victim->GetTypeId() == TYPEID_PLAYER)
+    {
         if (victim->ToPlayer()->GetCommandStatus(CHEAT_GOD))
+        {
             return 0;
+        }
+    }
 
     // Signal the pet it was attacked so the AI can respond if needed
     if (victim->GetTypeId() == TYPEID_UNIT && attacker != victim && victim->IsPet() && victim->IsAlive())
@@ -5842,22 +5846,22 @@ void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo)
         case SPELL_AURA_PERIODIC_DAMAGE:
         case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
             {
-            //IF we are in cheat mode we swap absorb with damage and set damage to 0, this way we can still debug damage but our hp bar will not drop
-            uint32 damage = pInfo->damage;
-            uint32 absorb = pInfo->absorb;
-            if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetCommandStatus(CHEAT_GOD))
-            {
-                absorb = damage;
-                damage = 0;
-            }
+                //IF we are in cheat mode we swap absorb with damage and set damage to 0, this way we can still debug damage but our hp bar will not drop
+                uint32 damage = pInfo->damage;
+                uint32 absorb = pInfo->absorb;
+                if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->GetCommandStatus(CHEAT_GOD))
+                {
+                    absorb = damage;
+                    damage = 0;
+                }
 
 
-            data << uint32(damage);                         // damage
-            data << uint32(pInfo->overDamage);              // overkill?
-            data << uint32(aura->GetSpellInfo()->GetSchoolMask());
-            data << uint32(absorb);                         // absorb
-            data << uint32(pInfo->resist);                  // resist
-            data << uint8(pInfo->critical);                 // new 3.1.2 critical tick
+                data << uint32(damage);                         // damage
+                data << uint32(pInfo->overDamage);              // overkill?
+                data << uint32(aura->GetSpellInfo()->GetSchoolMask());
+                data << uint32(absorb);                         // absorb
+                data << uint32(pInfo->resist);                  // resist
+                data << uint8(pInfo->critical);                 // new 3.1.2 critical tick
             }
             break;
         case SPELL_AURA_PERIODIC_HEAL:
