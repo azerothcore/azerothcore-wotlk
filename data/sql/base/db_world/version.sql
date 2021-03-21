@@ -14,7 +14,7 @@ CREATE TABLE `version`
   `db_version` varchar(120) DEFAULT NULL COMMENT 'Version of world DB.',
   `cache_id` INT DEFAULT 0,
   PRIMARY KEY (`core_version`)
-) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED COMMENT='Version Notes';
+) ENGINE=INNODB DEFAULT CHARSET=UTF8MB4 COMMENT='Version Notes';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `version` WRITE;
