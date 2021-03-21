@@ -50,7 +50,7 @@ void GroupMgr::RegisterGroupId(uint32 groupId)
         ++_nextGroupId;
 }
 
-uint32 GroupMgr::GenerateGroupId()
+ObjectGuid::LowType GroupMgr::GenerateGroupId()
 {
     uint32 newGroupId = _nextGroupId;
 

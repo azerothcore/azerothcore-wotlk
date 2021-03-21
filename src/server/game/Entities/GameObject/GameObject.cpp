@@ -120,15 +120,9 @@ void GameObject::RemoveFromOwner()
         return;
     }
 
-    // Xinef: not needed
-    /*const char * ownerType = "creature";
-    if (ownerGUID.IsPlayer())
-        ownerType = "player";
-    else if (ownerGUID.IsPet())
-        ownerType = "pet";
+    /*sLog->outCrash("Delete GameObject (%s Entry: %u SpellId %u LinkedGO %u) that lost references to owner %s GO list. Crash possible later.",
+        GetGUID().ToString().c_str(), GetGOInfo()->entry, m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), ownerGUID.ToString().c_str());*/
 
-    sLog->outCrash("Delete GameObject (GUID: %u Entry: %u SpellId %u LinkedGO %u) that lost references to owner (GUID %u Type '%s') GO list. Crash possible later.",
-        GetGUIDLow(), GetGOInfo()->entry, m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), GUID_LOPART(ownerGUID), ownerType);*/
     SetOwnerGUID(0);
 }
 
@@ -434,7 +428,7 @@ void GameObject::Update(uint32 diff)
 
                             bool triggered = info->summoningRitual.animSpell;
                             Unit* owner = GetOwner();
-                            Unit* spellCaster = owner ? owner : ObjectAccessor::GetPlayer(*this, MAKE_NEW_GUID(m_ritualOwnerGUIDLow, 0, HIGHGUID_PLAYER));
+                            Unit* spellCaster = owner ? owner : ObjectAccessor::GetPlayer(*this, m_ritualOwnerGUID);
                             if (!spellCaster)
                             {
                                 SetLootState(GO_JUST_DEACTIVATED);
@@ -496,7 +490,7 @@ void GameObject::Update(uint32 diff)
                     time_t now = time(nullptr);
                     if (m_respawnTime <= now)            // timer expired
                     {
-                        uint64 dbtableHighGuid = MAKE_NEW_GUID(m_DBTableGuid, GetEntry(), HIGHGUID_GAMEOBJECT);
+                        uint64 dbtableHighGuid = ObjectGuid::Create<HighGuid::GameObject>(GetEntry(), m_DBTableGuid);
                         time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
                         if (linkedRespawntime)             // Can't respawn, the master is dead
                         {
@@ -856,11 +850,14 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
         return;
 
     if (!m_DBTableGuid)
-        m_DBTableGuid = GetGUIDLow();
-    // update in loaded data (changing data only in this place)
-    GameObjectData& data = sObjectMgr->NewGOData(m_DBTableGuid);
+        m_spawnId = sObjectMgr->GenerateGameObjectSpawnId();
 
-    // data->guid = guid must not be updated at save
+    // update in loaded data (changing data only in this place)
+    GameObjectData& data = sObjectMgr->NewGOData(m_spawnId);
+
+    if (!data.spawnId)
+        data.spawnId = m_spawnId;
+    ASSERT(data.spawnId == m_spawnId);
     data.id = GetEntry();
     data.mapid = mapid;
     data.phaseMask = phaseMask;
@@ -929,7 +926,8 @@ bool GameObject::LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap)
     uint32 artKit = data->artKit;
 
     m_DBTableGuid = guid;
-    if (map->GetInstanceId() != 0) guid = sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT);
+    if (map->GetInstanceId() != 0)
+        guid = map->GenerateLowGuid<HighGuid::GameObject>();
 
     if (!Create(guid, entry, map, phaseMask, x, y, z, ang, data->rotation, animprogress, go_state, artKit))
         return false;
@@ -1629,7 +1627,7 @@ void GameObject::Use(Unit* user)
                 }
                 else
                 {
-                    Player* ritualOwner = ObjectAccessor::GetPlayer(*this, MAKE_NEW_GUID(m_ritualOwnerGUIDLow, 0, HIGHGUID_PLAYER));
+                    Player* ritualOwner = ObjectAccessor::GetPlayer(*this, m_ritualOwnerGUID);
                     if (!ritualOwner)
                         return;
                     if (player != ritualOwner && (info->summoningRitual.castersGrouped && !player->IsInSameRaidWith(ritualOwner)))

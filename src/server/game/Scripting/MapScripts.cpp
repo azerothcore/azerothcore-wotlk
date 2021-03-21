@@ -290,7 +290,7 @@ void Map::ScriptsProcess()
         Object* source = nullptr;
         if (step.sourceGUID)
         {
-            switch (GUID_HIPART(step.sourceGUID))
+            switch (step.sourceGUID.GetHigh())
             {
                 case HIGHGUID_ITEM: // as well as HIGHGUID_CONTAINER
                     if (Player* player = GetPlayer(step.ownerGUID))
@@ -320,8 +320,8 @@ void Map::ScriptsProcess()
                         break;
                     }
                 default:
-                    sLog->outError("%s source with unsupported high guid (GUID: " UI64FMTD ", high guid: %u).",
-                                   step.script->GetDebugInfo().c_str(), step.sourceGUID, GUID_HIPART(step.sourceGUID));
+                    sLog->outError("%s source with unsupported high guid (%s).",
+                                   step.script->GetDebugInfo().c_str(), step.sourceGUID.ToString().c_str());
                     break;
             }
         }
@@ -329,7 +329,7 @@ void Map::ScriptsProcess()
         WorldObject* target = nullptr;
         if (step.targetGUID)
         {
-            switch (GUID_HIPART(step.targetGUID))
+            switch (step.targetGUID.GetHigh())
             {
                 case HIGHGUID_UNIT:
                 case HIGHGUID_VEHICLE:
@@ -355,8 +355,8 @@ void Map::ScriptsProcess()
                         break;
                     }
                 default:
-                    sLog->outError("%s target with unsupported high guid (GUID: " UI64FMTD ", high guid: %u).",
-                                   step.script->GetDebugInfo().c_str(), step.targetGUID, GUID_HIPART(step.targetGUID));
+                    sLog->outError("%s target with unsupported high guid (%s).",
+                                   step.script->GetDebugInfo().c_str(), step.targetGUID.ToString().c_str());
                     break;
             }
         }
@@ -838,7 +838,7 @@ void Map::ScriptsProcess()
                     else //check hashmap holders
                     {
                         if (CreatureData const* data = sObjectMgr->GetCreatureData(step.script->CallScript.CreatureEntry))
-                            cTarget = ObjectAccessor::GetObjectInWorld<Creature>(data->mapid, data->posX, data->posY, MAKE_NEW_GUID(step.script->CallScript.CreatureEntry, data->id, HIGHGUID_UNIT), cTarget);
+                            cTarget = ObjectAccessor::GetObjectInWorld<Creature>(data->mapid, data->posX, data->posY, ObjectGuid::Create<HighGuid::Unit>(data->id, step.script->CallScript.CreatureEntry), cTarget);
                     }
 
                     if (!cTarget)

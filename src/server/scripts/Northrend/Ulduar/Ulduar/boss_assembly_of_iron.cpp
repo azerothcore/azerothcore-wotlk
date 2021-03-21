@@ -788,7 +788,7 @@ public:
                         me->CombatStop();
                         me->StopMoving();
                         me->SetReactState(REACT_PASSIVE);
-                        me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+                        me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
                         me->SendMonsterMove(_flyTarget->GetPositionX(), _flyTarget->GetPositionY(), _flyTarget->GetPositionZ() + 15, 1500, SPLINEFLAG_FLYING);
 

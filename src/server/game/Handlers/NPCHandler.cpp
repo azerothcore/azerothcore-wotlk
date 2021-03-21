@@ -46,7 +46,7 @@ void WorldSession::HandleTabardVendorActivateOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTabardVendorActivateOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTabardVendorActivateOpcode - Unit (%s) not found or you can not interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -79,7 +79,7 @@ void WorldSession::HandleBankerActivateOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleBankerActivateOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleBankerActivateOpcode - Unit (%s) not found or you can not interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -130,7 +130,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendTrainerList - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendTrainerList - Unit (%s) not found or you can not interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -144,7 +144,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
     if (!ci)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendTrainerList - (GUID: %u) NO CREATUREINFO!", GUID_LOPART(guid));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendTrainerList - (%s) NO CREATUREINFO!", guid.ToString().c_str());
 #endif
         return;
     }
@@ -153,7 +153,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
     if (!trainer_spells)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendTrainerList - Training spells not found for creature (GUID: %u Entry: %u)", GUID_LOPART(guid), unit->GetEntry());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendTrainerList - Training spells not found for creature (%s)", guid.ToString().c_str());
 #endif
         return;
     }
@@ -248,14 +248,14 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
 
     recvData >> guid >> spellId;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TRAINER_BUY_SPELL NpcGUID=%u, learn spell id is: %u", uint32(GUID_LOPART(guid)), spellId);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TRAINER_BUY_SPELL Npc %s, learn spell id is: %u", guid.ToString().c_str(), spellId);
 #endif
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTrainerBuySpellOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTrainerBuySpellOpcode - Unit (%s) not found or you can not interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -315,7 +315,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleGossipHelloOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleGossipHelloOpcode - Unit (%s) not found or you can not interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -393,7 +393,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_PACKETIO, "WORLD: HandleGossipSelectOptionOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
+        sLog->outDebug(LOG_FILTER_PACKETIO, "WORLD: HandleGossipSelectOptionOpcode - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -428,7 +428,7 @@ void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleSpiritHealerActivateOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleSpiritHealerActivateOpcode - Unit (%s) not found or you can not interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -483,7 +483,7 @@ void WorldSession::HandleBinderActivateOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleBinderActivateOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(npcGUID)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleBinderActivateOpcode - Unit (%s) not found or you can not interact with him.", npcGUID.ToString().c_str());
 #endif
         return;
     }
@@ -1007,7 +1007,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleRepairItemOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(npcGUID)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleRepairItemOpcode - Unit (%s) not found or you can not interact with him.", npcGUID.ToString().c_str());
 #endif
         return;
     }
@@ -1022,7 +1022,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
     if (itemGUID)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "ITEM: Repair item, itemGUID = %u, npcGUID = %u", GUID_LOPART(itemGUID), GUID_LOPART(npcGUID));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ITEM: Repair item, item %s, npc %s", itemGUID.ToString().c_str(), npcGUID.ToString().c_str());
 #endif
 
         Item* item = _player->GetItemByGuid(itemGUID);
@@ -1032,7 +1032,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "ITEM: Repair all items, npcGUID = %u", GUID_LOPART(npcGUID));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ITEM: Repair all items, npc %s", npcGUID.ToString().c_str());
 #endif
         _player->DurabilityRepairAll(true, discountMod, guildBank);
     }

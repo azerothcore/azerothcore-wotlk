@@ -77,7 +77,7 @@ bool Corpse::Create(uint32 guidlow, Player* owner)
     WorldObject::_Create(guidlow, HIGHGUID_CORPSE, owner->GetPhaseMask());
 
     SetObjectScale(1);
-    SetUInt64Value(CORPSE_FIELD_OWNER, owner->GetGUID());
+    SetGuidValue(CORPSE_FIELD_OWNER, owner->GetGUID());
 
     _gridCoord = acore::ComputeGridCoord(GetPositionX(), GetPositionY());
 
@@ -92,7 +92,7 @@ void Corpse::SaveToDB()
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CORPSE);
     stmt->setUInt32(0, GetGUIDLow());                                           // corpseGuid
-    stmt->setUInt32(1, GUID_LOPART(GetOwnerGUID()));                            // guid
+    stmt->setUInt32(1, GetOwnerGUID().GetCounter());                            // guid
     stmt->setFloat (2, GetPositionX());                                         // posX
     stmt->setFloat (3, GetPositionY());                                         // posY
     stmt->setFloat (4, GetPositionZ());                                         // posZ
@@ -127,7 +127,7 @@ void Corpse::DeleteFromDB(SQLTransaction& trans)
     {
         // all corpses (not bones)
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_CORPSES);
-        stmt->setUInt32(0, GUID_LOPART(GetOwnerGUID()));
+        stmt->setUInt32(0, GetOwnerGUID().GetCounter());
     }
     trans->Append(stmt);
 }
@@ -153,7 +153,7 @@ bool Corpse::LoadCorpseFromDB(uint32 guid, Field* fields)
     SetUInt32Value(CORPSE_FIELD_GUILD, fields[9].GetUInt32());
     SetUInt32Value(CORPSE_FIELD_FLAGS, fields[10].GetUInt8());
     SetUInt32Value(CORPSE_FIELD_DYNAMIC_FLAGS, fields[11].GetUInt8());
-    SetUInt64Value(CORPSE_FIELD_OWNER, MAKE_NEW_GUID(ownerGuid, 0, HIGHGUID_PLAYER));
+    SetGuidValue(CORPSE_FIELD_OWNER, ObjectGuid::Create<HighGuid::Player>(ownerGuid));
 
     m_time = time_t(fields[12].GetUInt32());
 
@@ -168,8 +168,8 @@ bool Corpse::LoadCorpseFromDB(uint32 guid, Field* fields)
 
     if (!IsPositionValid())
     {
-        sLog->outError("Corpse (guid: %u, owner: %u) is not created, given coordinates are not valid (X: %f, Y: %f, Z: %f)",
-                       GetGUIDLow(), GUID_LOPART(GetOwnerGUID()), posX, posY, posZ);
+        sLog->outError("Corpse ( %s, owner: %s) is not created, given coordinates are not valid (X: %f, Y: %f, Z: %f)",
+                       GetGUID().ToString().c_str(), GetOwnerGUID().ToString().c_str(), posX, posY, posZ);
         return false;
     }
 

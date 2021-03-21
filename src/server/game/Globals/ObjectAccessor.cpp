@@ -46,9 +46,9 @@ Player* ObjectAccessor::GetObjectInWorld(uint64 guid, Player* /*typeSpecifier*/)
     return player && player->IsInWorld() ? player : nullptr;
 }
 
-WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, uint64 guid)
+WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, ObjectGuid guid)
 {
-    switch (GUID_HIPART(guid))
+    switch (guid.GetHigh())
     {
         case HIGHGUID_PLAYER:
             return GetPlayer(p, guid);
@@ -70,9 +70,9 @@ WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, uint64 guid)
     }
 }
 
-Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const& p, uint64 guid, uint32 typemask)
+Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const& p, ObjectGuid guid, uint32 typemask)
 {
-    switch (GUID_HIPART(guid))
+    switch (guid.GetHigh())
     {
         case HIGHGUID_ITEM:
             if (typemask & TYPEMASK_ITEM && p.GetTypeId() == TYPEID_PLAYER)
@@ -118,9 +118,9 @@ GameObject* ObjectAccessor::GetGameObject(WorldObject const& u, uint64 guid)
     return GetObjectInMap(guid, u.GetMap(), (GameObject*)nullptr);
 }
 
-Transport* ObjectAccessor::GetTransport(WorldObject const& u, uint64 guid)
+Transport* ObjectAccessor::GetTransport(WorldObject const& u, ObjectGuid guid)
 {
-    if (GUID_HIPART(guid) != HIGHGUID_MO_TRANSPORT && GUID_HIPART(guid) != HIGHGUID_TRANSPORT)
+    if (guid.GetHigh() != HIGHGUID_MO_TRANSPORT && guid.GetHigh() != HIGHGUID_TRANSPORT)
         return nullptr;
 
     GameObject* go = GetGameObject(u, guid);
@@ -273,7 +273,7 @@ void ObjectAccessor::RemoveCorpse(Corpse* corpse, bool final)
 
         // build mapid*cellid -> guid_set map
         CellCoord cellCoord = acore::ComputeCellCoord(corpse->GetPositionX(), corpse->GetPositionY());
-        sObjectMgr->DeleteCorpseCellData(corpse->GetMapId(), cellCoord.GetId(), GUID_LOPART(corpse->GetOwnerGUID()));
+        sObjectMgr->DeleteCorpseCellData(corpse->GetMapId(), cellCoord.GetId(), corpse->GetOwnerGUID());
     }
 
     delete corpse; // pussywizard: as it is delayed now, delete is moved here (previously in ConvertCorpseForPlayer)
@@ -292,7 +292,7 @@ void ObjectAccessor::AddCorpse(Corpse* corpse)
 
         // build mapid*cellid -> guid_set map
         CellCoord cellCoord = acore::ComputeCellCoord(corpse->GetPositionX(), corpse->GetPositionY());
-        sObjectMgr->AddCorpseCellData(corpse->GetMapId(), cellCoord.GetId(), GUID_LOPART(corpse->GetOwnerGUID()), corpse->GetInstanceId());
+        sObjectMgr->AddCorpseCellData(corpse->GetMapId(), cellCoord.GetId(), corpse->GetOwnerGUID(), corpse->GetInstanceId());
     }
 }
 
@@ -356,7 +356,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
     {
         // Create bones, don't change Corpse
         bones = new Corpse;
-        bones->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_CORPSE), map);
+        bones->Create(map->GenerateLowGuid<HighGuid::Corpse>(), map);
 
         for (uint8 i = OBJECT_FIELD_TYPE + 1; i < CORPSE_END; ++i)                    // don't overwrite guid and object type
             bones->SetUInt32Value(i, corpse->GetUInt32Value(i));
@@ -368,7 +368,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
         bones->SetPhaseMask(corpse->GetPhaseMask(), false);
 
         bones->SetUInt32Value(CORPSE_FIELD_FLAGS, CORPSE_FLAG_UNK2 | CORPSE_FLAG_BONES);
-        bones->SetUInt64Value(CORPSE_FIELD_OWNER, 0);
+        bones->SetGuidValue(CORPSE_FIELD_OWNER, ObjectGuid::Empty);
 
         for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i)
         {

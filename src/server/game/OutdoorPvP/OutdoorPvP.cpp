@@ -62,7 +62,7 @@ void OPvPCapturePoint::AddGO(uint32 type, uint32 guid, uint32 entry)
             return;
         entry = data->id;
     }
-    m_Objects[type] = MAKE_NEW_GUID(guid, entry, HIGHGUID_GAMEOBJECT);
+    m_Objects[type] = ObjectGuid::Create<HighGuid::GameObject>(entry, guid);
     m_ObjectTypes[m_Objects[type]] = type;
 }
 
@@ -75,7 +75,7 @@ void OPvPCapturePoint::AddCre(uint32 type, uint32 guid, uint32 entry)
             return;
         entry = data->id;
     }
-    m_Creatures[type] = MAKE_NEW_GUID(guid, entry, HIGHGUID_UNIT);
+    m_Creatures[type] = ObjectGuid::Create<HighGuid::Unit>(entry, guid);
     m_CreatureTypes[m_Creatures[type]] = type;
 }
 
@@ -118,7 +118,8 @@ bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, fl
     uint32 lowguid = sObjectMgr->AddGOData(entry, map, x, y, z, o, 0, rotation0, rotation1, rotation2, rotation3);
     if (!lowguid)
         return false;
-    m_capturePointGUID = MAKE_NEW_GUID(lowguid, entry, HIGHGUID_GAMEOBJECT);
+
+    m_capturePointGUID = ObjectGuid::Create<HighGuid::GameObject>(entry, lowguid);
 
     // get the needed values from goinfo
     m_maxValue = (float)goinfo->capturePoint.maxTime;
@@ -193,7 +194,7 @@ bool OPvPCapturePoint::DelObject(uint32 type)
 
 bool OPvPCapturePoint::DelCapturePoint()
 {
-    sObjectMgr->DeleteGOData(GUID_LOPART(m_capturePointGUID));
+    sObjectMgr->DeleteGOData(m_capturePointGUID);
     m_capturePointGUID = 0;
 
     if (m_capturePoint)

@@ -3275,7 +3275,7 @@ void World::AddGlobalPlayerData(uint32 guid, uint32 accountId, std::string const
     _globalPlayerNameStore[name] = guid;
 }
 
-void World::UpdateGlobalPlayerData(uint32 guid, uint8 mask, std::string const& name, uint8 level, uint8 gender, uint8 race, uint8 playerClass)
+void World::UpdateGlobalPlayerData(ObjectGuid guid, uint8 mask, std::string const& name, uint8 level, uint8 gender, uint8 race, uint8 playerClass)
 {
     GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
     if (itr == _globalPlayerDataStore.end())
@@ -3293,7 +3293,7 @@ void World::UpdateGlobalPlayerData(uint32 guid, uint8 mask, std::string const& n
         itr->second.name = name;
 
     WorldPacket data(SMSG_INVALIDATE_PLAYER, 8);
-    data << MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER);
+    data << guid;
     SendGlobalMessage(&data);
 }
 

@@ -273,7 +273,7 @@ void WorldSession::HandleOpenWrappedItemCallback(PreparedQueryResult result, uin
     uint32 entry = fields[0].GetUInt32();
     uint32 flags = fields[1].GetUInt32();
 
-    item->SetUInt64Value(ITEM_FIELD_GIFTCREATOR, 0);
+    item->SetGuidValue(ITEM_FIELD_GIFTCREATOR, ObjectGuid::Empty);
     item->SetEntry(entry);
     item->SetUInt32Value(ITEM_FIELD_FLAGS, flags);
     item->SetUInt32Value(ITEM_FIELD_MAXDURABILITY, item->GetTemplate()->MaxDurability);
@@ -294,7 +294,7 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recvData)
     recvData >> guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_GAMEOBJ_USE Message [guid=%u]", GUID_LOPART(guid));
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_GAMEOBJ_USE Message [%s]", guid.ToString().c_str());
 #endif
 
     if (GameObject* obj = GetPlayer()->GetMap()->GetGameObject(guid))
@@ -317,7 +317,7 @@ void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
     recvPacket >> guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_GAMEOBJ_REPORT_USE Message [in game guid: %u]", GUID_LOPART(guid));
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_GAMEOBJ_REPORT_USE Message [%s]", guid.ToString().c_str());
 #endif
 
     // ignore for remote control state
@@ -504,13 +504,13 @@ void WorldSession::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
 
     if (!pet)
     {
-        sLog->outError("HandlePetCancelAura: Attempt to cancel an aura for non-existant pet %u by player '%s'", uint32(GUID_LOPART(guid)), GetPlayer()->GetName().c_str());
+        sLog->outError("HandlePetCancelAura: Attempt to cancel an aura for non-existant pet %s by player %s", guid.ToString().c_str(), GetPlayer()->GetName().c_str());
         return;
     }
 
     if (pet != GetPlayer()->GetGuardianPet() && pet != GetPlayer()->GetCharm())
     {
-        sLog->outError("HandlePetCancelAura: Pet %u is not a pet of player '%s'", uint32(GUID_LOPART(guid)), GetPlayer()->GetName().c_str());
+        sLog->outError("HandlePetCancelAura: Pet %s is not a pet of player %s", guid.ToString().c_str(), GetPlayer()->GetName().c_str());
         return;
     }
 

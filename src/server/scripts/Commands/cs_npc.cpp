@@ -212,7 +212,7 @@ public:
         if (Transport* tt = chr->GetTransport())
             if (MotionTransport* trans = tt->ToMotionTransport())
             {
-                uint32 guid = sObjectMgr->GenerateRecycledLowGuid(HIGHGUID_UNIT);
+                ObjectGuid::LowType guid = sObjectMgr->GenerateCreatureSpawnId();
                 CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
                 data.id = id;
                 data.phaseMask = chr->GetPhaseMaskForSpawn();
@@ -230,7 +230,7 @@ public:
             }
 
         Creature* creature = new Creature();
-        if (!creature->Create(sObjectMgr->GenerateRecycledLowGuid(HIGHGUID_UNIT), map, chr->GetPhaseMaskForSpawn(), id, 0, x, y, z, o))
+        if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, chr->GetPhaseMaskForSpawn(), id, 0, x, y, z, o))
         {
             delete creature;
             return false;
@@ -474,7 +474,7 @@ public:
                 return false;
 
             if (CreatureData const* cr_data = sObjectMgr->GetCreatureData(lowguid))
-                unit = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(MAKE_NEW_GUID(lowguid, cr_data->id, HIGHGUID_UNIT));
+                unit = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(ObjectGuid::Create<HighGuid::Unit>(cr_data->id, lowguid));
         }
         else
             unit = handler->getSelectedCreature();

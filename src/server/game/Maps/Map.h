@@ -17,6 +17,7 @@
 #include "GridRefManager.h"
 #include "MapRefManager.h"
 #include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "PathGenerator.h"
 #include "SharedDefines.h"
 #include "Timer.h"
@@ -539,6 +540,13 @@ public:
 
     DataMap CustomData;
 
+    template<HighGuid high>
+    inline ObjectGuid::LowType GenerateLowGuid()
+    {
+        static_assert(ObjectGuidTraits<high>::MapSpecific, "Only map specific guid can be generated in Map context");
+        return GetGuidSequenceGenerator<high>().Generate();
+    }
+
 private:
     void LoadMapAndVMap(int gx, int gy);
     void LoadVMap(int gx, int gy);
@@ -663,6 +671,24 @@ private:
 
     ZoneDynamicInfoMap _zoneDynamicInfo;
     uint32 _defaultLight;
+
+    template<HighGuid high>
+    inline ObjectGuidGeneratorBase& GetGuidSequenceGenerator()
+    {
+        auto itr = _guidGenerators.find(high);
+        if (itr == _guidGenerators.end())
+            itr = _guidGenerators.insert(std::make_pair(high, std::unique_ptr<ObjectGuidGenerator<high>>(new ObjectGuidGenerator<high>()))).first;
+
+        return *itr->second;
+    }
+
+    std::map<HighGuid, std::unique_ptr<ObjectGuidGeneratorBase>> _guidGenerators;
+    MapStoredObjectTypesContainer _objectsStore;
+    CreatureBySpawnIdContainer _creatureBySpawnIdStore;
+    GameObjectBySpawnIdContainer _gameobjectBySpawnIdStore;
+    std::unordered_map<uint32/*cellId*/, std::unordered_set<Corpse*>> _corpsesByCell;
+    std::unordered_map<ObjectGuid, Corpse*> _corpsesByPlayer;
+    std::unordered_set<Corpse*> _corpseBones;
 };
 
 enum InstanceResetMethod

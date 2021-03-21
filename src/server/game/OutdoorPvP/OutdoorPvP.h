@@ -117,7 +117,7 @@ public:
 
     virtual void DeleteSpawns();
 
-    uint64 m_capturePointGUID;
+    ObjectGuid::LowType m_capturePointSpawnId;
 
     GameObject* m_capturePoint;
 
@@ -254,7 +254,7 @@ protected:
 
     void AddCapturePoint(OPvPCapturePoint* cp)
     {
-        m_capturePoints[GUID_LOPART(cp->m_capturePointGUID)] = cp;
+        m_capturePoints[cp->m_capturePointGUID] = cp;
     }
 
     OPvPCapturePoint* GetCapturePoint(uint32 lowguid) const

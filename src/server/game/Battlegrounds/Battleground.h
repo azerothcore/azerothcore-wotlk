@@ -413,7 +413,7 @@ public:
     [[nodiscard]] bool isBattleground() const { return !m_IsArena; }
     [[nodiscard]] bool isRated() const        { return m_IsRated; }
 
-    typedef std::map<uint64, Player*> BattlegroundPlayerMap;
+    typedef std::map<ObjectGuid, Player*> BattlegroundPlayerMap;
     [[nodiscard]] BattlegroundPlayerMap const& GetPlayers() const { return m_Players; }
     [[nodiscard]] uint32 GetPlayersSize() const { return m_Players.size(); }
 

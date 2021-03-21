@@ -1854,19 +1854,19 @@ public:
     DeathState getDeathState() { return m_deathState; };
     virtual void setDeathState(DeathState s, bool despawn = false);           // overwrited in Creature/Player/Pet
 
-    [[nodiscard]] uint64 GetOwnerGUID() const { return  GetUInt64Value(UNIT_FIELD_SUMMONEDBY); }
+    [[nodiscard]] uint64 GetOwnerGUID() const { return  GetGuidValue(UNIT_FIELD_SUMMONEDBY); }
     void SetOwnerGUID(uint64 owner);
-    [[nodiscard]] uint64 GetCreatorGUID() const { return GetUInt64Value(UNIT_FIELD_CREATEDBY); }
-    void SetCreatorGUID(uint64 creator) { SetUInt64Value(UNIT_FIELD_CREATEDBY, creator); }
-    [[nodiscard]] uint64 GetMinionGUID() const { return GetUInt64Value(UNIT_FIELD_SUMMON); }
-    void SetMinionGUID(uint64 guid) { SetUInt64Value(UNIT_FIELD_SUMMON, guid); }
-    [[nodiscard]] uint64 GetCharmerGUID() const { return GetUInt64Value(UNIT_FIELD_CHARMEDBY); }
-    void SetCharmerGUID(uint64 owner) { SetUInt64Value(UNIT_FIELD_CHARMEDBY, owner); }
-    [[nodiscard]] uint64 GetCharmGUID() const { return  GetUInt64Value(UNIT_FIELD_CHARM); }
+    [[nodiscard]] uint64 GetCreatorGUID() const { return GetGuidValue(UNIT_FIELD_CREATEDBY); }
+    void SetCreatorGUID(uint64 creator) { SetGuidValue(UNIT_FIELD_CREATEDBY, creator); }
+    [[nodiscard]] uint64 GetMinionGUID() const { return GetGuidValue(UNIT_FIELD_SUMMON); }
+    void SetMinionGUID(uint64 guid) { SetGuidValue(UNIT_FIELD_SUMMON, guid); }
+    [[nodiscard]] uint64 GetCharmerGUID() const { return GetGuidValue(UNIT_FIELD_CHARMEDBY); }
+    void SetCharmerGUID(uint64 owner) { SetGuidValue(UNIT_FIELD_CHARMEDBY, owner); }
+    [[nodiscard]] uint64 GetCharmGUID() const { return  GetGuidValue(UNIT_FIELD_CHARM); }
     void SetPetGUID(uint64 guid) { m_SummonSlot[SUMMON_SLOT_PET] = guid; }
     [[nodiscard]] uint64 GetPetGUID() const { return m_SummonSlot[SUMMON_SLOT_PET]; }
-    void SetCritterGUID(uint64 guid) { SetUInt64Value(UNIT_FIELD_CRITTER, guid); }
-    [[nodiscard]] uint64 GetCritterGUID() const { return GetUInt64Value(UNIT_FIELD_CRITTER); }
+    void SetCritterGUID(uint64 guid) { SetGuidValue(UNIT_FIELD_CRITTER, guid); }
+    [[nodiscard]] uint64 GetCritterGUID() const { return GetGuidValue(UNIT_FIELD_CRITTER); }
 
     [[nodiscard]] bool IsControlledByPlayer() const { return m_ControlledByPlayer; }
     [[nodiscard]] bool IsCreatedByPlayer() const { return m_CreatedByPlayer; }
@@ -2470,7 +2470,7 @@ public:
 
     int32 CalculateAOEDamageReduction(int32 damage, uint32 schoolMask, Unit* caster) const;
 
-    [[nodiscard]] uint64 GetTarget() const { return GetUInt64Value(UNIT_FIELD_TARGET); }
+    [[nodiscard]] uint64 GetTarget() const { return GetGuidValue(UNIT_FIELD_TARGET); }
     virtual void SetTarget(uint64 /*guid*/) = 0;
 
     void SetInstantCast(bool set) { _instantCast = set; }

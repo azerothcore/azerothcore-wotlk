@@ -301,7 +301,7 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
     me->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_TSCR, "TSCR: FollowerAI start follow %s (GUID " UI64FMTD ")", player->GetName().c_str(), m_uiLeaderGUID);
+    sLog->outDebug(LOG_FILTER_TSCR, "TSCR: FollowerAI start follow %s (%s)", player->GetName().c_str(), m_uiLeaderGUID.ToString().c_str());
 #endif
 }
 

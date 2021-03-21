@@ -8,24 +8,24 @@ Xinef
 #include "Common.h"
 #include <map>
 
-typedef std::map<uint32, uint32> SignatureMap;
+typedef std::map<ObjectGuid, ObjectGuid> SignatureMap;
 
 struct Petition
 {
-    uint32 petitionGuid;
-    uint32 ownerGuid;
+    ObjectGuid petitionGuid;
+    ObjectGuid ownerGuid;
     uint8  petitionType;
     std::string petitionName;
 };
 
 struct Signatures
 {
-    uint32 petitionGuid;
+    ObjectGuid petitionGuid;
     SignatureMap signatureMap;
 };
 
-typedef std::map<uint32, Signatures> SignatureContainer;
-typedef std::map<uint32, Petition> PetitionContainer;
+typedef std::map<ObjectGuid, Signatures> SignatureContainer;
+typedef std::map<ObjectGuid, Petition> PetitionContainer;
 
 class PetitionMgr
 {

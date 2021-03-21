@@ -90,7 +90,7 @@ bool Group::Create(Player* leader)
     uint64 leaderGuid = leader->GetGUID();
     uint32 lowguid = sGroupMgr->GenerateGroupId();
 
-    m_guid = MAKE_NEW_GUID(lowguid, 0, HIGHGUID_GROUP);
+    m_guid = ObjectGuid::Create<HighGuid::Group>(lowguid);
     m_leaderGuid = leaderGuid;
     m_leaderName = leader->GetName();
     leader->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER);
@@ -122,9 +122,9 @@ bool Group::Create(Player* leader)
         uint8 index = 0;
 
         stmt->setUInt32(index++, lowguid);
-        stmt->setUInt32(index++, GUID_LOPART(m_leaderGuid));
+        stmt->setUInt32(index++, m_leaderGuid.GetCounter());
         stmt->setUInt8(index++, uint8(m_lootMethod));
-        stmt->setUInt32(index++, GUID_LOPART(m_looterGuid));
+        stmt->setUInt32(index++, m_looterGuid.GetCounter());
         stmt->setUInt8(index++, uint8(m_lootThreshold));
         stmt->setUInt32(index++, uint32(m_targetIcons[0]));
         stmt->setUInt32(index++, uint32(m_targetIcons[1]));
@@ -137,7 +137,7 @@ bool Group::Create(Player* leader)
         stmt->setUInt8(index++, uint8(m_groupType));
         stmt->setUInt32(index++, uint8(m_dungeonDifficulty));
         stmt->setUInt32(index++, uint8(m_raidDifficulty));
-        stmt->setUInt32(index++, GUID_LOPART(m_masterLooterGuid));
+        stmt->setUInt32(index++, m_masterLooterGuid.GetCounter());
 
         CharacterDatabase.Execute(stmt);
 
@@ -151,8 +151,8 @@ bool Group::Create(Player* leader)
 
 bool Group::LoadGroupFromDB(Field* fields)
 {
-    m_guid = MAKE_NEW_GUID(fields[16].GetUInt32(), 0, HIGHGUID_GROUP);
-    m_leaderGuid = MAKE_NEW_GUID(fields[0].GetUInt32(), 0, HIGHGUID_PLAYER);
+    m_guid = ObjectGuid::Create<HighGuid::Group>(fields[16].GetUInt32());
+    m_leaderGuid = ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32());
 
     // group leader not exist
     if (!sObjectMgr->GetPlayerNameByGUID(fields[0].GetUInt32(), m_leaderName))
@@ -173,7 +173,7 @@ bool Group::LoadGroupFromDB(Field* fields)
     }
 
     m_lootMethod = LootMethod(fields[1].GetUInt8());
-    m_looterGuid = MAKE_NEW_GUID(fields[2].GetUInt32(), 0, HIGHGUID_PLAYER);
+    m_looterGuid = ObjectGuid::Create<HighGuid::Player>(fields[2].GetUInt32());
     m_lootThreshold = ItemQualities(fields[3].GetUInt8());
 
     for (uint8 i = 0; i < TARGETICONCOUNT; ++i)
@@ -195,7 +195,7 @@ bool Group::LoadGroupFromDB(Field* fields)
     else
         m_raidDifficulty = Difficulty(r_diff);
 
-    m_masterLooterGuid = MAKE_NEW_GUID(fields[15].GetUInt32(), 0, HIGHGUID_PLAYER);
+    m_masterLooterGuid = ObjectGuid::Create<HighGuid::Player>(fields[15].GetUInt32());
 
     if (m_groupType & GROUPTYPE_LFG)
         sLFGMgr->_LoadFromDB(fields, GetGUID());
@@ -206,7 +206,7 @@ bool Group::LoadGroupFromDB(Field* fields)
 void Group::LoadMemberFromDB(uint32 guidLow, uint8 memberFlags, uint8 subgroup, uint8 roles)
 {
     MemberSlot member;
-    member.guid = MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
+    member.guid = ObjectGuid::Create<HighGuid::Player>(guidLow);
 
     // skip non-existed member
     if (!sObjectMgr->GetPlayerNameByGUID(member.guid, member.name))
@@ -405,7 +405,7 @@ bool Group::AddMember(Player* player)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_GROUP_MEMBER);
         stmt->setUInt32(0, GetLowGUID());
-        stmt->setUInt32(1, GUID_LOPART(member.guid));
+        stmt->setUInt32(1, member.guid.GetCounter());
         stmt->setUInt8(2, member.flags);
         stmt->setUInt8(3, member.group);
         stmt->setUInt8(4, member.roles);
@@ -548,7 +548,7 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod& method /*= GROUP_REMOV
         if (!isBGGroup() && !isBFGroup())
         {
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP_MEMBER);
-            stmt->setUInt32(0, GUID_LOPART(guid));
+            stmt->setUInt32(0, guid.GetCounter());
             stmt->setUInt32(1, GetLowGUID());
             CharacterDatabase.Execute(stmt);
         }
@@ -595,7 +595,7 @@ bool Group::RemoveMember(uint64 guid, const RemoveMethod& method /*= GROUP_REMOV
             SubGroupCounterDecrease(slot->group);
             m_memberSlots.erase(slot);
             if (!isBGGroup() && !isBFGroup())
-                sWorld->UpdateGlobalPlayerGroup(GUID_LOPART(guid), 0);
+                sWorld->UpdateGlobalPlayerGroup(guid), 0);
         }
 
         // Pick new leader if necessary
@@ -707,7 +707,7 @@ void Group::Disband(bool hideDestroy /* = false */)
     for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
     {
         if (!isBGGroup() && !isBFGroup())
-            sWorld->UpdateGlobalPlayerGroup(GUID_LOPART(citr->guid), 0);
+            sWorld->UpdateGlobalPlayerGroup(citr->guid, 0);
 
         player = ObjectAccessor::FindPlayerInOrOutOfWorld(citr->guid);
 
@@ -942,7 +942,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
         //roll for over-threshold item if it's one-player loot
         if (item->Quality >= uint32(m_lootThreshold))
         {
-            uint64 newitemGUID = MAKE_NEW_GUID(sObjectMgr->GenerateLowGuid(HIGHGUID_ITEM), 0, HIGHGUID_ITEM);
+            uint64 newitemGUID = ObjectGuid::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
             Roll* r = new Roll(newitemGUID, *i);
 
             //a vector is filled with only near party members
@@ -1026,7 +1026,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
             continue;
         }
 
-        uint64 newitemGUID = MAKE_NEW_GUID(sObjectMgr->GenerateLowGuid(HIGHGUID_ITEM), 0, HIGHGUID_ITEM);
+        uint64 newitemGUID = ObjectGuid::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
         Roll* r = new Roll(newitemGUID, *i);
 
         //a vector is filled with only near party members
@@ -1087,7 +1087,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
         //roll for over-threshold item if it's one-player loot
         if (item->Quality >= uint32(m_lootThreshold))
         {
-            uint64 newitemGUID = MAKE_NEW_GUID(sObjectMgr->GenerateLowGuid(HIGHGUID_ITEM), 0, HIGHGUID_ITEM);
+            uint64 newitemGUID = ObjectGuid::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
             Roll* r = new Roll(newitemGUID, *i);
 
             for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -1161,7 +1161,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
             continue;
 
         item = sObjectMgr->GetItemTemplate(i->itemid);
-        uint64 newitemGUID = MAKE_NEW_GUID(sObjectMgr->GenerateLowGuid(HIGHGUID_ITEM), 0, HIGHGUID_ITEM);
+        uint64 newitemGUID = ObjectGuid::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
         Roll* r = new Roll(newitemGUID, *i);
 
         for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -1711,7 +1711,7 @@ void Group::ChangeMembersGroup(uint64 guid, uint8 group)
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_MEMBER_SUBGROUP);
 
         stmt->setUInt8(0, group);
-        stmt->setUInt32(1, GUID_LOPART(guid));
+        stmt->setUInt32(1, guid.GetCounter());
 
         CharacterDatabase.Execute(stmt);
     }
@@ -2117,11 +2117,6 @@ uint64 Group::GetGUID() const
     return m_guid;
 }
 
-uint32 Group::GetLowGUID() const
-{
-    return GUID_LOPART(m_guid);
-}
-
 const char* Group::GetLeaderName() const
 {
     return m_leaderName.c_str();
@@ -2245,7 +2240,7 @@ void Group::SetGroupMemberFlag(uint64 guid, bool apply, GroupMemberFlags flag)
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_MEMBER_FLAG);
 
     stmt->setUInt8(0, slot->flags);
-    stmt->setUInt32(1, GUID_LOPART(guid));
+    stmt->setUInt32(1, guid.GetCounter());
 
     CharacterDatabase.Execute(stmt);
 

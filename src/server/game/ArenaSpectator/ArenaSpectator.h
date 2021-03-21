@@ -148,11 +148,11 @@ namespace ArenaSpectator
         Battleground::BattlegroundPlayerMap const& pl = bg->GetPlayers();
         for (Battleground::BattlegroundPlayerMap::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
         {
-            if (p->HasReceivedSpectatorResetFor(GUID_LOPART(itr->first)))
+            if (p->HasReceivedSpectatorResetFor(itr->first))
                 continue;
 
             Player* plr = itr->second;
-            p->AddReceivedSpectatorResetFor(GUID_LOPART(itr->first));
+            p->AddReceivedSpectatorResetFor(itr->first);
 
             SendCommand_String(p, itr->first, "NME", plr->GetName().c_str());
             // Xinef: addon compatibility

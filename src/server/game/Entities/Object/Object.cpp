@@ -72,7 +72,7 @@ WorldObject::~WorldObject()
     {
         if (GetTypeId() == TYPEID_CORPSE)
         {
-            sLog->outCrash("Object::~Object Corpse guid=" UI64FMTD ", type=%d, entry=%u deleted but still in map!!", GetGUID(), ((Corpse*)this)->GetType(), GetEntry());
+            sLog->outCrash("Object::~Object Corpse %s, type=%d deleted but still in map!!", GetGUID().ToString().c_str(), ((Corpse*)this)->GetType());
             ABORT();
         }
         ResetMap();
@@ -83,7 +83,7 @@ Object::~Object()
 {
     if (IsInWorld())
     {
-        sLog->outCrash("Object::~Object - guid=" UI64FMTD ", typeid=%d, entry=%u deleted but still in world!!", GetGUID(), GetTypeId(), GetEntry());
+        sLog->outCrash("Object::~Object - %s deleted but still in world!!", GetGUID().ToString().c_str());
         if (isType(TYPEMASK_ITEM))
             sLog->outCrash("Item slot %u", ((Item*)this)->GetSlot());
         ABORT();
@@ -92,7 +92,7 @@ Object::~Object()
 
     if (m_objectUpdated)
     {
-        sLog->outCrash("Object::~Object - guid=" UI64FMTD ", typeid=%d, entry=%u deleted but still in update list!!", GetGUID(), GetTypeId(), GetEntry());
+        sLog->outCrash("Object::~Object - %s deleted but still in update list!!", GetGUID().ToString().c_str());
         ABORT();
         sObjectAccessor->RemoveUpdateObject(this);
     }
@@ -950,7 +950,7 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& st
 void MovementInfo::OutDebug()
 {
     sLog->outString("MOVEMENT INFO");
-    sLog->outString("guid " UI64FMTD, guid);
+    sLog->outString("guid %s", guid.ToString().c_str());
     sLog->outString("flags %u", flags);
     sLog->outString("flags2 %u", flags2);
     sLog->outString("time %u current time " UI64FMTD "", flags2, uint64(::time(nullptr)));
@@ -958,7 +958,7 @@ void MovementInfo::OutDebug()
     if (flags & MOVEMENTFLAG_ONTRANSPORT)
     {
         sLog->outString("TRANSPORT:");
-        sLog->outString("guid: " UI64FMTD, transport.guid);
+        sLog->outString("guid: %s", transport.guid.ToString().c_str());
         sLog->outString("position: `%s`", transport.pos.ToString().c_str());
         sLog->outString("seat: %i", transport.seat);
         sLog->outString("time: %u", transport.time);
@@ -2265,7 +2265,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     }
 
     EnsureGridLoaded(Cell(pos.GetPositionX(), pos.GetPositionY()));
-    if (!summon->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), this, phase, entry, vehId, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()))
+    if (!summon->Create(map->GenerateLowGuid<HighGuid::Unit>(), this, phase, entry, vehId, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()))
     {
         delete summon;
         return nullptr;
@@ -2313,7 +2313,7 @@ GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float
     }
 
     GameObject* go = sObjectMgr->IsGameObjectStaticTransport(entry) ? new StaticTransport() : new GameObject();
-    if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, this, PHASEMASK_NORMAL, x, y, z, ang, G3D::Quat(rotation0, rotation1, rotation2, rotation3), 100, GO_STATE_READY))
+    if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, this, PHASEMASK_NORMAL, x, y, z, ang, G3D::Quat(rotation0, rotation1, rotation2, rotation3), 100, GO_STATE_READY))
     {
         delete go;
         return nullptr;
@@ -2374,7 +2374,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
 
     Map* map = GetMap();
     GameObject* go = sObjectMgr->IsGameObjectStaticTransport(entry) ? new StaticTransport() : new GameObject();
-    if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, map, GetPhaseMask(), x, y, z, ang, G3D::Quat(rotation0, rotation1, rotation2, rotation3), 100, GO_STATE_READY))
+    if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, GetPhaseMask(), x, y, z, ang, G3D::Quat(rotation0, rotation1, rotation2, rotation3), 100, GO_STATE_READY))
     {
         delete go;
         return nullptr;
@@ -2985,7 +2985,7 @@ struct WorldObjectChangeAccumulator
             {
                 //Caster may be nullptr if DynObj is in removelist
                 if (Player* caster = ObjectAccessor::FindPlayer(guid))
-                    if (caster->GetUInt64Value(PLAYER_FARSIGHT) == source->GetGUID())
+                    if (caster->GetGuidValue(PLAYER_FARSIGHT) == source->GetGUID())
                         BuildPacket(caster);
             }
         }

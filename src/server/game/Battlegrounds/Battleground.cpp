@@ -1513,7 +1513,7 @@ bool Battleground::AddObject(uint32 type, uint32 entry, float x, float y, float 
     // and when loading it (in go::LoadFromDB()), a new guid would be assigned to the object, and a new object would be created
     // So we must create it specific for this instance
     GameObject* go = sObjectMgr->IsGameObjectStaticTransport(entry) ? new StaticTransport() : new GameObject();
-    if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, GetBgMap(),
+    if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, GetBgMap(),
                     PHASEMASK_NORMAL, x, y, z, o, G3D::Quat(rotation0, rotation1, rotation2, rotation3), 100, goState))
     {
         sLog->outErrorDb("Battleground::AddObject: cannot create gameobject (entry: %u) for BG (map: %u, instance id: %u)!",
@@ -1569,8 +1569,8 @@ void Battleground::DoorClose(uint32 type)
         }
     }
     else
-        sLog->outError("Battleground::DoorClose: door gameobject (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
-                       type, GUID_LOPART(BgObjects[type]), m_MapId, m_InstanceID);
+        sLog->outError("Battleground::DoorClose: door gameobject (type: %u, %s) not found for BG (map: %u, instance id: %u)!",
+                       type, BgObjects[type].ToString().c_str(), m_MapId, m_InstanceID);
 }
 
 void Battleground::DoorOpen(uint32 type)
@@ -1581,16 +1581,16 @@ void Battleground::DoorOpen(uint32 type)
         obj->SetGoState(GO_STATE_ACTIVE);
     }
     else
-        sLog->outError("Battleground::DoorOpen: door gameobject (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
-                       type, GUID_LOPART(BgObjects[type]), m_MapId, m_InstanceID);
+        sLog->outError("Battleground::DoorOpen: door gameobject (type: %u, %s) not found for BG (map: %u, instance id: %u)!",
+                       type, BgObjects[type].ToString().c_str(), m_MapId, m_InstanceID);
 }
 
 GameObject* Battleground::GetBGObject(uint32 type)
 {
     GameObject* obj = GetBgMap()->GetGameObject(BgObjects[type]);
     if (!obj)
-        sLog->outError("Battleground::GetBGObject: gameobject (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
-                       type, GUID_LOPART(BgObjects[type]), m_MapId, m_InstanceID);
+        sLog->outError("Battleground::GetBGObject: gameobject (type: %u, %s) not found for BG (map: %u, instance id: %u)!",
+                       type, BgObjects[type].ToString().c_str(), m_MapId, m_InstanceID);
     return obj;
 }
 
@@ -1598,8 +1598,8 @@ Creature* Battleground::GetBGCreature(uint32 type)
 {
     Creature* creature = GetBgMap()->GetCreature(BgCreatures[type]);
     if (!creature)
-        sLog->outError("Battleground::GetBGCreature: creature (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
-                       type, GUID_LOPART(BgCreatures[type]), m_MapId, m_InstanceID);
+        sLog->outError("Battleground::GetBGCreature: creature (type: %u, %s) not found for BG (map: %u, instance id: %u)!",
+                       type, BgCreatures[type].ToString().c_str(), m_MapId, m_InstanceID);
     return creature;
 }
 
@@ -1641,7 +1641,7 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
     }
 
     Creature* creature = new Creature();
-    if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, PHASEMASK_NORMAL, entry, 0, x, y, z, o))
+    if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, entry, 0, x, y, z, o))
     {
         sLog->outError("Battleground::AddCreature: cannot create creature (entry: %u) for BG (map: %u, instance id: %u)!",
                        entry, m_MapId, m_InstanceID);
@@ -1689,13 +1689,14 @@ bool Battleground::DelCreature(uint32 type)
     if (Creature* creature = GetBgMap()->GetCreature(BgCreatures[type]))
     {
         creature->AddObjectToRemoveList();
-        BgCreatures[type] = 0;
+        BgCreatures[type].Clear();
         return true;
     }
 
-    sLog->outError("Battleground::DelCreature: creature (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
-                   type, GUID_LOPART(BgCreatures[type]), m_MapId, m_InstanceID);
-    BgCreatures[type] = 0;
+    sLog->outError("Battleground::DelCreature: creature (type: %u, %s) not found for BG (map: %u, instance id: %u)!",
+                   type, BgCreatures[type].ToString().c_str(), m_MapId, m_InstanceID);
+
+    BgCreatures[type].Clear();
     return false;
 }
 
@@ -1708,12 +1709,14 @@ bool Battleground::DelObject(uint32 type)
     {
         obj->SetRespawnTime(0);                                 // not save respawn time
         obj->Delete();
-        BgObjects[type] = 0;
+        BgObjects[type].Clear();
         return true;
     }
-    sLog->outError("Battleground::DelObject: gameobject (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
-                   type, GUID_LOPART(BgObjects[type]), m_MapId, m_InstanceID);
-    BgObjects[type] = 0;
+
+    sLog->outError("Battleground::DelObject: gameobject (type: %u, %s) not found for BG (map: %u, instance id: %u)!",
+                   type, BgObjects[type].ToString().c_str(), m_MapId, m_InstanceID);
+
+    BgObjects[type].Clear();
     return false;
 }
 
@@ -1724,7 +1727,7 @@ bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float 
     if (Creature* creature = AddCreature(entry, type, x, y, z, o))
     {
         creature->setDeathState(DEAD);
-        creature->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, creature->GetGUID());
+        creature->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, creature->GetGUID());
         // aura
         // TODO: Fix display here
         // creature->SetVisibleAura(0, SPELL_SPIRIT_HEAL_CHANNEL);
@@ -1923,8 +1926,10 @@ int32 Battleground::GetObjectType(uint64 guid)
     for (uint32 i = 0; i < BgObjects.size(); ++i)
         if (BgObjects[i] == guid)
             return i;
-    sLog->outError("Battleground::GetObjectType: player used gameobject (GUID: %u) which is not in internal data for BG (map: %u, instance id: %u), cheating?",
-                   GUID_LOPART(guid), m_MapId, m_InstanceID);
+
+    sLog->outError("Battleground::GetObjectType: player used gameobject (%s) which is not in internal data for BG (map: %u, instance id: %u), cheating?",
+                   guid.ToString().c_str(), m_MapId, m_InstanceID);
+
     return -1;
 }
 

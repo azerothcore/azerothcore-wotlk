@@ -53,23 +53,22 @@ enum MailAuctionAnswers
 struct AuctionEntry
 {
     uint32 Id;
-    uint32 auctioneer;                                      // creature low guid
-    uint32 item_guidlow;
+    uint8 houseId;
+    ObjectGuid item_guid;
     uint32 item_template;
     uint32 itemCount;
-    uint32 owner;
+    ObjectGuid owner;
     uint32 startbid;                                        //maybe useless
     uint32 bid;
     uint32 buyout;
     time_t expire_time;
-    uint32 bidder;
+    ObjectGuid bidder;
     uint32 deposit;                                         //deposit can be calculated only when creating auction
     AuctionHouseEntry const* auctionHouseEntry;             // in AuctionHouse.dbc
     uint32 factionTemplateId;
 
     // helpers
-    [[nodiscard]] uint32 GetHouseId() const { return auctionHouseEntry->houseId; }
-    [[nodiscard]] uint32 GetHouseFaction() const { return auctionHouseEntry->faction; }
+    [[nodiscard]] uint8 GetHouseId() const { return houseId; }
     [[nodiscard]] uint32 GetAuctionCut() const;
     [[nodiscard]] uint32 GetAuctionOutBid() const;
     bool BuildAuctionInfo(WorldPacket& data) const;

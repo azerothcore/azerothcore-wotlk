@@ -428,7 +428,7 @@ public:
                                      aurApp->GetEffectMask(), aura->GetCharges(), aura->GetStackAmount(), aurApp->GetSlot(),
                                      aura->GetDuration(), aura->GetMaxDuration(), (aura->IsPassive() ? passiveStr : ""),
                                      (talent ? talentStr : ""), aura->GetCasterGUID().IsPlayer() ? "player" : "creature",
-                                     GUID_LOPART(aura->GetCasterGUID()));
+                                     aura->GetCasterGUID().GetCounter());
         }
 
         if (!args || std::string(args) != "all")

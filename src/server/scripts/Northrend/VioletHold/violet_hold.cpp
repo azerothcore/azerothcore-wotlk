@@ -1167,7 +1167,7 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if (GameObject* gate = go->GetMap()->GetGameObject(MAKE_NEW_GUID(61606, 193019, HIGHGUID_GAMEOBJECT)))
+        if (GameObject* gate = go->GetMap()->GetGameObject(ObjectGuid::Create<HighGuid::GameObject>(193019, 61606)))
             if (gate->getLootState() == GO_READY)
                 gate->UseDoorOrButton(0, false, player);
 

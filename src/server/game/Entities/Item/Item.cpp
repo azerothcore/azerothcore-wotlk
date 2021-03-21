@@ -250,8 +250,8 @@ bool Item::Create(uint32 guidlow, uint32 itemid, Player const* owner)
     SetEntry(itemid);
     SetObjectScale(1.0f);
 
-    SetUInt64Value(ITEM_FIELD_OWNER, owner ? owner->GetGUID() : 0);
-    SetUInt64Value(ITEM_FIELD_CONTAINED, owner ? owner->GetGUID() : 0);
+    SetGuidValue(ITEM_FIELD_OWNER, owner ? owner->GetGUID() : ObjectGuid::Empty);
+    SetGuidValue(ITEM_FIELD_CONTAINED, owner ? owner->GetGUID() : ObjectGuid::Empty);
 
     ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(itemid);
     if (!itemProto)
@@ -313,9 +313,9 @@ void Item::SaveToDB(SQLTransaction& trans)
                 uint8 index = 0;
                 PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(uState == ITEM_NEW ? CHAR_REP_ITEM_INSTANCE : CHAR_UPD_ITEM_INSTANCE);
                 stmt->setUInt32(  index, GetEntry());
-                stmt->setUInt32(++index, GUID_LOPART(GetOwnerGUID()));
-                stmt->setUInt32(++index, GUID_LOPART(GetUInt64Value(ITEM_FIELD_CREATOR)));
-                stmt->setUInt32(++index, GUID_LOPART(GetUInt64Value(ITEM_FIELD_GIFTCREATOR)));
+                stmt->setUInt32(++index, GetOwnerGUID().GetCounter());
+                stmt->setUInt32(++index, GetGuidValue(ITEM_FIELD_CREATOR).GetCounter());
+                stmt->setUInt32(++index, GetGuidValue(ITEM_FIELD_GIFTCREATOR).GetCounter());
                 stmt->setUInt32(++index, GetCount());
                 stmt->setUInt32(++index, GetUInt32Value(ITEM_FIELD_DURATION));
 
@@ -346,7 +346,7 @@ void Item::SaveToDB(SQLTransaction& trans)
                 if ((uState == ITEM_CHANGED) && HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
                 {
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GIFT_OWNER);
-                    stmt->setUInt32(0, GUID_LOPART(GetOwnerGUID()));
+                    stmt->setUInt32(0, GetOwnerGUID().GetCounter());
                     stmt->setUInt32(1, guid);
                     trans->Append(stmt);
                 }
@@ -403,8 +403,8 @@ bool Item::LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entr
         SetOwnerGUID(owner_guid);
 
     bool need_save = false;                                 // need explicit save data at load fixes
-    SetUInt64Value(ITEM_FIELD_CREATOR, MAKE_NEW_GUID(fields[0].GetUInt32(), 0, HIGHGUID_PLAYER));
-    SetUInt64Value(ITEM_FIELD_GIFTCREATOR, MAKE_NEW_GUID(fields[1].GetUInt32(), 0, HIGHGUID_PLAYER));
+    SetGuidValue(ITEM_FIELD_CREATOR, ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32()));
+    SetGuidValue(ITEM_FIELD_GIFTCREATOR, ObjectGuid::Create<HighGuid::Player>(fields[1].GetUInt32()));
     SetCount(fields[2].GetUInt32());
 
     uint32 duration = fields[3].GetUInt32();
@@ -701,7 +701,7 @@ void Item::AddToUpdateQueueOf(Player* player)
     if (player->GetGUID() != GetOwnerGUID())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item::AddToUpdateQueueOf - Owner's guid (%u) and player's guid (%u) don't match!", GUID_LOPART(GetOwnerGUID()), player->GetGUIDLow());
+        sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item::AddToUpdateQueueOf - Owner's guid (%s) and player's guid (%s) don't match!", GetOwnerGUID().ToString().c_str(), player->GetGUID().ToString().c_str());
 #endif
         return;
     }
@@ -723,7 +723,7 @@ void Item::RemoveFromUpdateQueueOf(Player* player)
     if (player->GetGUID() != GetOwnerGUID())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item::RemoveFromUpdateQueueOf - Owner's guid (%u) and player's guid (%u) don't match!", GUID_LOPART(GetOwnerGUID()), player->GetGUIDLow());
+        sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item::RemoveFromUpdateQueueOf - Owner's guid (%s) and player's guid (%s) don't match!", GetOwnerGUID().ToString().c_str(), player->GetGUID().ToString().c_str());
 #endif
         return;
     }
@@ -1056,7 +1056,7 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, bool clo
         ASSERT(count != 0 && "pProto->Stackable == 0 but checked at loading already");
 
         Item* pItem = NewItemOrBag(pProto);
-        if (pItem->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_ITEM), item, player))
+        if (pItem->Create(sObjectMgr->GetGenerator<HighGuid::Item>().Generate(), item, player))
         {
             pItem->SetCount(count);
             if (!clone)

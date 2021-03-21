@@ -525,7 +525,7 @@ void Creature::Update(uint32 diff)
                     if (!allowed)                                               // Will be rechecked on next Update call
                         break;
 
-                    uint64 dbtableHighGuid = MAKE_NEW_GUID(m_DBTableGuid, GetEntry(), HIGHGUID_UNIT);
+                    uint64 dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(GetEntry(), m_DBTableGuid);
                     time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
                     if (!linkedRespawntime)             // Can respawn
                         Respawn();
@@ -1112,9 +1112,10 @@ void Creature::SaveToDB()
 void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
 {
     // update in loaded data
-    if (!m_DBTableGuid)
-        m_DBTableGuid = GetGUIDLow();
-    CreatureData& data = sObjectMgr->NewOrExistCreatureData(m_DBTableGuid);
+    if (!m_spawnId)
+        m_spawnId = sObjectMgr->GenerateCreatureSpawnId();
+
+    CreatureData& data = sObjectMgr->NewOrExistCreatureData(m_spawnId);
 
     uint32 displayId = GetNativeDisplayId();
     uint32 npcflag = GetUInt32Value(UNIT_NPC_FLAGS);
@@ -1139,7 +1140,9 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
             dynamicflags = 0;
     }
 
-    // data->guid = guid must not be updated at save
+    if (!data.spawnId)
+        data.spawnId = m_spawnId;
+    ASSERT(data.spawnId == m_spawnId);
     data.id = GetEntry();
     data.mapid = mapid;
     data.phaseMask = phaseMask;
@@ -1422,11 +1425,11 @@ bool Creature::LoadCreatureFromDB(uint32 guid, Map* map, bool addToMap, bool gri
 
     if (map->GetInstanceId() == 0)
     {
-        if (map->GetCreature(MAKE_NEW_GUID(guid, data->id, HIGHGUID_UNIT)))
+        if (map->GetCreature(ObjectGuid::Create<HighGuid::Unit>(data->id, guid)))
             return false;
     }
     else
-        guid = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT);
+        guid = map->GenerateLowGuid<HighGuid::Unit>();
 
     if (!Create(guid, map, data->phaseMask, data->id, 0, data->posX, data->posY, data->posZ, data->orientation, data))
         return false;
@@ -1725,7 +1728,7 @@ void Creature::Respawn(bool force)
             GetMap()->RemoveCreatureRespawnTime(m_DBTableGuid);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Respawning creature %s (GuidLow: %u, Full GUID: " UI64FMTD " Entry: %u)", GetName().c_str(), GetGUIDLow(), GetGUID(), GetEntry());
+        sLog->outStaticDebug("Respawning creature %s (SpawnId: %u, %s)", GetName().c_str(), GetSpawnId(), GetGUID().ToString().c_str(), GetEntry());
 #endif
         m_respawnTime = 0;
         ResetPickPocketLootTime();
@@ -2993,7 +2996,7 @@ void Creature::SetDisplayId(uint32 modelId)
 void Creature::SetTarget(uint64 guid)
 {
     if (!_focusSpell)
-        SetUInt64Value(UNIT_FIELD_TARGET, guid);
+        SetGuidValue(UNIT_FIELD_TARGET, guid);
 }
 
 void Creature::FocusTarget(Spell const* focusSpell, WorldObject const* target)
@@ -3003,7 +3006,7 @@ void Creature::FocusTarget(Spell const* focusSpell, WorldObject const* target)
         return;
 
     _focusSpell = focusSpell;
-    SetUInt64Value(UNIT_FIELD_TARGET, this == target ? 0 : target->GetGUID());
+    SetGuidValue(UNIT_FIELD_TARGET, this == target ? ObjectGuid::Empty : target->GetGUID());
     if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_DONT_TURN_DURING_CAST))
         AddUnitState(UNIT_STATE_ROTATING);
 
@@ -3032,9 +3035,9 @@ void Creature::ReleaseFocus(Spell const* focusSpell)
 
     _focusSpell = nullptr;
     if (Unit* victim = GetVictim())
-        SetUInt64Value(UNIT_FIELD_TARGET, victim->GetGUID());
+        SetGuidValue(UNIT_FIELD_TARGET, victim->GetGUID());
     else
-        SetUInt64Value(UNIT_FIELD_TARGET, 0);
+        SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
 
     if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_DONT_TURN_DURING_CAST))
         ClearUnitState(UNIT_STATE_ROTATING);

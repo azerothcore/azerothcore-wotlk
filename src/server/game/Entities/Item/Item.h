@@ -208,8 +208,8 @@ public:
 
     [[nodiscard]] ItemTemplate const* GetTemplate() const;
 
-    [[nodiscard]] uint64 GetOwnerGUID()    const { return GetUInt64Value(ITEM_FIELD_OWNER); }
-    void SetOwnerGUID(uint64 guid) { SetUInt64Value(ITEM_FIELD_OWNER, guid); }
+    [[nodiscard]] uint64 GetOwnerGUID() const { return GetGuidValue(ITEM_FIELD_OWNER); }
+    void SetOwnerGUID(uint64 guid) { SetGuidValue(ITEM_FIELD_OWNER, guid); }
     [[nodiscard]] Player* GetOwner() const;
 
     void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND, val); }

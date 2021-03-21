@@ -469,7 +469,7 @@ namespace lfg
         std::string toString() const // for debugging
         {
             std::ostringstream o;
-            o << GUID_LOPART(guid[0]) << "," << GUID_LOPART(guid[1]) << "," << GUID_LOPART(guid[2]) << "," << GUID_LOPART(guid[3]) << "," << GUID_LOPART(guid[4]) << ":" << (roles ? 1 : 0);
+            o << guid[0].ToString().c_str() << "," << guid[1].ToString().c_str() << "," << guid[2].ToString().c_str() << "," << guid[3].ToString().c_str() << "," << guid[4].ToString().c_str() << ":" << (roles ? 1 : 0);
             return o.str();
         }
     };

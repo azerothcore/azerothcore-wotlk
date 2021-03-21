@@ -773,9 +773,9 @@ public:
             ABORT();
         }
         m_spawnedByDefault = false;                     // all object with owner is despawned after delay
-        SetUInt64Value(OBJECT_FIELD_CREATED_BY, owner);
+        SetGuidValue(OBJECT_FIELD_CREATED_BY, owner);
     }
-    [[nodiscard]] uint64 GetOwnerGUID() const { return GetUInt64Value(OBJECT_FIELD_CREATED_BY); }
+    [[nodiscard]] uint64 GetOwnerGUID() const { return GetGuidValue(OBJECT_FIELD_CREATED_BY); }
     [[nodiscard]] Unit* GetOwner() const;
 
     void SetSpellId(uint32 id)

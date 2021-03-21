@@ -121,7 +121,8 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDetail("Player %u is sending mail to %s (GUID: %u) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u", player->GetGUIDLow(), receiver.c_str(), GUID_LOPART(rc), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
+    sLog->outDetail("Player %s is sending mail to %s (%s) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
+        player->GetGUID().ToString().c_str(), receiver.c_str(), rc.ToString().c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
 #endif
 
     if (player->GetGUID() == rc)
@@ -167,7 +168,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     else
     {
         // xinef: get data from global storage
-        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(rc)))
+        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(rc))
         {
             rc_teamId = Player::TeamIdForRace(playerData->race);
             mails_count = playerData->mailCount;
@@ -311,7 +312,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     draft
     .AddMoney(money)
     .AddCOD(COD)
-    .SendMailTo(trans, MailReceiver(receive, GUID_LOPART(rc)), MailSender(player), body.empty() ? MAIL_CHECK_MASK_COPIED : MAIL_CHECK_MASK_HAS_BODY, deliver_delay);
+    .SendMailTo(trans, MailReceiver(receive, rc), MailSender(player), body.empty() ? MAIL_CHECK_MASK_COPIED : MAIL_CHECK_MASK_HAS_BODY, deliver_delay);
 
     player->SaveInventoryAndGoldToDB(trans);
     CharacterDatabase.CommitTransaction(trans);
@@ -488,7 +489,6 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
 
         if (m->COD > 0) // if there is COD, take COD money from player and send them to sender by mail
         {
-            uint64 sender_guid = MAKE_NEW_GUID(m->sender, 0, HIGHGUID_PLAYER);
             uint32 sender_accId = 0;
             Player* sender = ObjectAccessor::FindPlayerInOrOutOfWorld(sender_guid);
             if (sender)
@@ -621,7 +621,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
         switch ((*itr)->messageType)
         {
             case MAIL_NORMAL:                               // sender guid
-                data << uint64(MAKE_NEW_GUID((*itr)->sender, 0, HIGHGUID_PLAYER));
+                data << (*itr)->sender;
                 break;
             case MAIL_CREATURE:
             case MAIL_GAMEOBJECT:
@@ -719,7 +719,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
     }
 
     Item* bodyItem = new Item;                              // This is not bag and then can be used new Item.
-    if (!bodyItem->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_ITEM), MAIL_BODY_ITEM_TEMPLATE, player))
+    if (!bodyItem->Create(sObjectMgr->GetGenerator<HighGuid::Item>().Generate(), MAIL_BODY_ITEM_TEMPLATE, player))
     {
         delete bodyItem;
         return;

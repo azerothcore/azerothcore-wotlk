@@ -51,7 +51,7 @@ public:
 
     void DeleteFromDB(SQLTransaction& trans);
 
-    [[nodiscard]] uint64 GetOwnerGUID() const { return GetUInt64Value(CORPSE_FIELD_OWNER); }
+    [[nodiscard]] uint64 GetOwnerGUID() const { return GetGuidValue(CORPSE_FIELD_OWNER); }
 
     [[nodiscard]] time_t const& GetGhostTime() const { return m_time; }
     void ResetGhostTime() { m_time = time(nullptr); }

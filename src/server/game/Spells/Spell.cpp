@@ -212,9 +212,9 @@ void SpellCastTargets::Write(ByteBuffer& data)
         data << m_strTarget;
 }
 
-uint64 SpellCastTargets::GetUnitTargetGUID() const
+ObjectGuid SpellCastTargets::GetUnitTargetGUID() const
 {
-    switch (GUID_HIPART(m_objectTargetGUID))
+    switch (m_objectTargetGUID.GetHigh())
     {
         case HIGHGUID_PLAYER:
         case HIGHGUID_VEHICLE:
@@ -222,8 +222,10 @@ uint64 SpellCastTargets::GetUnitTargetGUID() const
         case HIGHGUID_PET:
             return m_objectTargetGUID;
         default:
-            return 0LL;
+            break;
     }
+
+    return ObjectGuid::Empty;
 }
 
 Unit* SpellCastTargets::GetUnitTarget() const
@@ -245,7 +247,7 @@ void SpellCastTargets::SetUnitTarget(Unit* target)
 
 uint64 SpellCastTargets::GetGOTargetGUID() const
 {
-    switch (GUID_HIPART(m_objectTargetGUID))
+    switch (m_objectTargetGUID.GetHigh())
     {
         case HIGHGUID_TRANSPORT:
         case HIGHGUID_MO_TRANSPORT:
@@ -275,7 +277,7 @@ void SpellCastTargets::SetGOTarget(GameObject* target)
 
 uint64 SpellCastTargets::GetCorpseTargetGUID() const
 {
-    switch (GUID_HIPART(m_objectTargetGUID))
+    switch (m_objectTargetGUID.GetHigh())
     {
         case HIGHGUID_CORPSE:
             return m_objectTargetGUID;
@@ -515,15 +517,17 @@ void SpellCastTargets::OutDebug() const
 
     sLog->outString("target mask: %u", m_targetMask);
     if (m_targetMask & (TARGET_FLAG_UNIT_MASK | TARGET_FLAG_CORPSE_MASK | TARGET_FLAG_GAMEOBJECT_MASK))
-        sLog->outString("Object target: " UI64FMTD, m_objectTargetGUID);
+        sLog->outString("Object target: %s", m_objectTargetGUID.ToString().c_str());
     if (m_targetMask & TARGET_FLAG_ITEM)
-        sLog->outString("Item target: " UI64FMTD, m_itemTargetGUID);
+        sLog->outString("Item target: %s", m_itemTargetGUID.ToString().c_str());
     if (m_targetMask & TARGET_FLAG_TRADE_ITEM)
-        sLog->outString("Trade item target: " UI64FMTD, m_itemTargetGUID);
+        sLog->outString("Trade item target: %s", m_itemTargetGUID.ToString().c_str());
     if (m_targetMask & TARGET_FLAG_SOURCE_LOCATION)
-        sLog->outString("Source location: transport guid:" UI64FMTD " trans offset: %s position: %s", m_src._transportGUID, m_src._transportOffset.ToString().c_str(), m_src._position.ToString().c_str());
+        sLog->outString("Source location: transport guid: %s trans offset: %s position: %s",
+            m_src._transportGUID.ToString().c_str(), m_src._transportOffset.ToString().c_str(), m_src._position.ToString().c_str());
     if (m_targetMask & TARGET_FLAG_DEST_LOCATION)
-        sLog->outString("Destination location: transport guid:" UI64FMTD " trans offset: %s position: %s", m_dst._transportGUID, m_dst._transportOffset.ToString().c_str(), m_dst._position.ToString().c_str());
+        sLog->outString("Destination location: transport guid: %s trans offset: %s position: %s",
+            m_dst._transportGUID.ToString().c_str(), m_dst._transportOffset.ToString().c_str(), m_dst._position.ToString().c_str());
     if (m_targetMask & TARGET_FLAG_STRING)
         sLog->outString("String: %s", m_strTarget.c_str());
     sLog->outString("speed: %f", m_speed);
@@ -4672,7 +4676,7 @@ void Spell::SendChannelUpdate(uint32 time)
 {
     if (time == 0)
     {
-        m_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
+        m_caster->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, ObjectGuid::Empty);
         m_caster->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
     }
 
@@ -4702,7 +4706,7 @@ void Spell::SendChannelStart(uint32 duration)
 
     m_timer = duration;
     if (channelTarget)
-        m_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, channelTarget);
+        m_caster->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, channelTarget);
 
     m_caster->SetUInt32Value(UNIT_CHANNEL_SPELL, m_spellInfo->Id);
 }

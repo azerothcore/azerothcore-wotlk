@@ -236,7 +236,7 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
     uint32 flags, time;
     recvData >> flags >> time; // unused
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("Guid " UI64FMTD, guid);
+    sLog->outStaticDebug("Guid %s", guid.ToString().c_str());
 #endif
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outStaticDebug("Flags %u, time %u", flags, time / IN_MILLISECONDS);
@@ -630,7 +630,8 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
     if (GetPlayer()->IsInWorld() && _player->m_mover && _player->m_mover->IsInWorld())
     {
         if (_player->m_mover->GetGUID() != guid)
-            sLog->outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is " UI64FMTD " (%s - Entry: %u) and should be " UI64FMTD, guid, guid.GetTypeName(), GUID_ENPART(guid), _player->m_mover->GetGUID());
+            sLog->outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is %s and should be %s,
+                guid.ToString().c_str(), _player->m_mover->GetGUID().ToString().c_str());
     }
 }
 
@@ -777,14 +778,14 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
 
     if (!mover)
     {
-        sLog->outError("WorldSession::HandleMoveTimeSkippedOpcode wrong mover state from the unit moved by the player [" UI64FMTD "]", GetPlayer()->GetGUID());
+        sLog->outError("WorldSession::HandleMoveTimeSkippedOpcode wrong mover state from the unit moved by the player [%s]", GetPlayer()->GetGUID().ToString().c_str());
         return;
     }
 
     // prevent tampered movement data
     if (guid != mover->GetGUID())
     {
-        sLog->outError("WorldSession::HandleMoveTimeSkippedOpcode wrong guid from the unit moved by the player [" UI64FMTD "]", GetPlayer()->GetGUID());
+        sLog->outError("WorldSession::HandleMoveTimeSkippedOpcode wrong guid from the unit moved by the player [%s]", GetPlayer()->GetGUID().ToString().c_str());
         return;
     }
 

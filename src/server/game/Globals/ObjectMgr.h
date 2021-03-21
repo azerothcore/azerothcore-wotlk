@@ -1057,12 +1057,20 @@ public:
     CreatureBaseStats const* GetCreatureBaseStats(uint8 level, uint8 unitClass);
 
     void SetHighestGuids();
-    uint32 GenerateLowGuid(HighGuid guidhigh);
-    uint32 GenerateRecycledLowGuid(HighGuid guidHigh);
+
+    template<HighGuid type>
+    inline ObjectGuidGeneratorBase& GetGenerator()
+    {
+        static_assert(ObjectGuidTraits<type>::Global, "Only global guid can be generated in ObjectMgr context");
+        return GetGuidSequenceGenerator<type>();
+    }
+
     uint32 GenerateAuctionID();
     uint64 GenerateEquipmentSetGuid();
     uint32 GenerateMailID();
     uint32 GeneratePetNumber();
+    ObjectGuid::LowType GenerateCreatureSpawnId();
+    ObjectGuid::LowType GenerateGameObjectSpawnId();
 
     typedef std::multimap<int32, uint32> ExclusiveQuestGroups;
     typedef std::pair<ExclusiveQuestGroups::const_iterator, ExclusiveQuestGroups::const_iterator> ExclusiveQuestGroupsBounds;
@@ -1341,35 +1349,26 @@ private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread
     uint64 _equipmentSetGuid; // pussywizard: accessed by a single thread
-    uint32 _itemTextId; // pussywizard: unused? xD
     uint32 _mailId;
     ACE_Thread_Mutex _mailIdMutex;
     uint32 _hiPetNumber;
     ACE_Thread_Mutex _hiPetNumberMutex;
 
-    // first free low guid for selected guid type
-    uint32 _hiCharGuid; // pussywizard: accessed by a single thread
-    uint32 _hiCreatureGuid;
-    ACE_Thread_Mutex _hiCreatureGuidMutex;
-    uint32 _hiPetGuid;
-    ACE_Thread_Mutex _hiPetGuidMutex;
-    uint32 _hiVehicleGuid;
-    ACE_Thread_Mutex _hiVehicleGuidMutex;
-    uint32 _hiItemGuid;
-    ACE_Thread_Mutex _hiItemGuidMutex;
-    uint32 _hiGoGuid;
-    ACE_Thread_Mutex _hiGoGuidMutex;
-    uint32 _hiDoGuid;
-    ACE_Thread_Mutex _hiDoGuidMutex;
-    uint32 _hiCorpseGuid;
-    ACE_Thread_Mutex _hiCorpseGuidMutex;
-    uint32 _hiMoTransGuid;
-    ACE_Thread_Mutex _hiMoTransGuidMutex;
+    ObjectGuid::LowType _creatureSpawnId;
+    ObjectGuid::LowType _gameObjectSpawnId;
 
-    uint32 _hiCreatureRecycledGuidMax;
-    uint32 _hiCreatureRecycledGuid;
-    uint32 _hiGoRecycledGuidMax;
-    uint32 _hiGoRecycledGuid;
+    // first free low guid for selected guid type
+    template<HighGuid high>
+    inline ObjectGuidGeneratorBase& GetGuidSequenceGenerator()
+    {
+        auto itr = _guidGenerators.find(high);
+        if (itr == _guidGenerators.end())
+            itr = _guidGenerators.insert(std::make_pair(high, std::unique_ptr<ObjectGuidGenerator<high>>(new ObjectGuidGenerator<high>()))).first;
+
+        return *itr->second;
+    }
+
+    std::map<HighGuid, std::unique_ptr<ObjectGuidGeneratorBase>> _guidGenerators;
 
     QuestMap _questTemplates;
     std::vector<Quest*> _questTemplatesFast; // pussywizard

@@ -67,8 +67,8 @@ namespace lfg
             uint64 gguid2 = group->GetGUID();
             if (gguid != gguid2)
             {
-                //sLog->outError("%s on group %u but LFG has group %u saved... Fixing.",
-                //    player->GetSession()->GetPlayerInfo().c_str(), GUID_LOPART(gguid2), GUID_LOPART(gguid));
+                //sLog->outError("%s on group %s but LFG has group %s saved... Fixing.",
+                //    player->GetSession()->GetPlayerInfo().c_str(), gguid2.ToString().c_str(), gguid.ToString().c_str());
                 sLFGMgr->SetupGroupMember(guid, group->GetGUID());
             }
         }
@@ -141,7 +141,7 @@ namespace lfg
         if (leader == guid)
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnAddMember [" UI64FMTD "]: added [" UI64FMTD "] leader " UI64FMTD "]", gguid, guid, leader);
+            sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnAddMember [%s]: added [%s] leader [%s]", gguid.ToString().c_str(), guid.ToString().c_str(), leader.ToString().c_str());
 #endif
             sLFGMgr->SetLeader(gguid, guid);
         }
@@ -150,7 +150,8 @@ namespace lfg
             LfgState gstate = sLFGMgr->GetState(gguid);
             LfgState state = sLFGMgr->GetState(guid);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnAddMember [" UI64FMTD "]: added [" UI64FMTD "] leader " UI64FMTD "] gstate: %u, state: %u", gguid, guid, leader, gstate, state);
+            sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnAddMember [%s]: added [%s] leader [%s] gstate: %u, state: %u",
+                gguid.ToString().c_str(), guid.ToString().c_str(), leader.ToString().c_str(), gstate, state);
 #endif
 
             if (state == LFG_STATE_QUEUED)
@@ -185,7 +186,8 @@ namespace lfg
 
         uint64 gguid = group->GetGUID();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnRemoveMember [" UI64FMTD "]: remove [" UI64FMTD "] Method: %d Kicker: [" UI64FMTD "] Reason: %s", gguid, guid, method, kicker, (reason ? reason : ""));
+        sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnRemoveMember [%s]: remove [%s] Method: %d Kicker: [%s] Reason: %s",
+            gguid.ToString().c_str(), guid.ToString().c_str(), method, kicker.ToString().c_str(), (reason ? reason : ""));
 #endif
 
         bool isLFG = group->isLFGGroup();
@@ -246,7 +248,7 @@ namespace lfg
 
         uint64 gguid = group->GetGUID();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnDisband [" UI64FMTD "]", gguid);
+        sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnDisband [%s]", gguid.ToString().c_str());
 #endif
 
         // pussywizard: after all necessary actions handle raid browser
@@ -264,7 +266,8 @@ namespace lfg
         uint64 gguid = group->GetGUID();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnChangeLeader [" UI64FMTD "]: old [" UI64FMTD "] new [" UI64FMTD "]", gguid, newLeaderGuid, oldLeaderGuid);
+        sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnChangeLeader [%s]: old [%s] new [%s]",
+            gguid.ToString().c_str(), newLeaderGuid.ToString().c_str(), oldLeaderGuid.ToString().c_str());
 #endif
         sLFGMgr->SetLeader(gguid, newLeaderGuid);
 
@@ -284,7 +287,7 @@ namespace lfg
         uint64 gguid = group->GetGUID();
         uint64 leader = group->GetLeaderGUID();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnInviteMember [" UI64FMTD "]: invite [" UI64FMTD "] leader [" UI64FMTD "]", gguid, guid, leader);
+        sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnInviteMember [%s]: invite [%s] leader [%s]", gguid.ToString().c_str(), guid.ToString().c_str(), leader.ToString().c_str());
 #endif
         // No gguid ==  new group being formed
         // No leader == after group creation first invite is new leader

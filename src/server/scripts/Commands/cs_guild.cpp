@@ -159,7 +159,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid))
             return false;
 
-        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(GUID_LOPART(targetGuid));
+        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(targetGuid);
         if (!guildId)
             return false;
 
@@ -185,7 +185,7 @@ public:
         if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &target_name))
             return false;
 
-        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(GUID_LOPART(targetGuid));
+        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(targetGuid);
         if (!guildId)
             return false;
 
@@ -218,7 +218,7 @@ public:
         handler->PSendSysMessage(LANG_GUILD_INFO_NAME, guild->GetName().c_str(), guild->GetId()); // Guild Id + Name
         std::string guildMasterName;
         if (sObjectMgr->GetPlayerNameByGUID(guild->GetLeaderGUID(), guildMasterName))
-            handler->PSendSysMessage(LANG_GUILD_INFO_GUILD_MASTER, guildMasterName.c_str(), GUID_LOPART(guild->GetLeaderGUID())); // Guild Master
+            handler->PSendSysMessage(LANG_GUILD_INFO_GUILD_MASTER, guildMasterName.c_str(), guild->GetLeaderGUID().GetCounter()); // Guild Master
 
         // Format creation date
         char createdDateStr[20];

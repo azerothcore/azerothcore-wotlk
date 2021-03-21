@@ -91,7 +91,6 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& 
     if (!pItem)
         return;
 
-    uint64 bidder_guid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
     uint32 bidder_accId = 0;
     Player* bidder = ObjectAccessor::FindPlayerInOrOutOfWorld(bidder_guid);
     if (bidder)
@@ -130,7 +129,6 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& 
 
 void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, SQLTransaction& trans, bool sendMail)
 {
-    uint64 owner_guid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
     Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(owner_guid);
     uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(owner_guid);
     // owner exist (online or offline)
@@ -146,7 +144,6 @@ void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, SQLTrans
 //call this method to send mail to auction owner, when auction is successful, it does not clear ram
 void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransaction& trans, bool sendNotification, bool updateAchievementCriteria, bool sendMail)
 {
-    uint64 owner_guid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
     Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(owner_guid);
     uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(owner_guid);
     // owner exist
@@ -175,7 +172,6 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, SQLTransa
         if (auction->bid >= 500 * GOLD)
             if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(auction->bidder))
             {
-                uint64 bidder_guid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
                 Player* bidder = ObjectAccessor::FindPlayerInOrOutOfWorld(bidder_guid);
                 std::string owner_name = "";
                 uint8 owner_level = 0;
@@ -197,7 +193,6 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, SQLTransacti
     if (!pItem)
         return;
 
-    uint64 owner_guid = MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER);
     Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(owner_guid);
     uint32 owner_accId = sObjectMgr->GetPlayerAccountIdByGUID(owner_guid);
 
@@ -221,7 +216,6 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, SQLTransacti
 //this function sends mail to old bidder
 void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, SQLTransaction& trans, bool sendNotification, bool sendMail)
 {
-    uint64 oldBidder_guid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
     Player* oldBidder = ObjectAccessor::FindPlayerInOrOutOfWorld(oldBidder_guid);
 
     uint32 oldBidder_accId = 0;
@@ -246,7 +240,6 @@ void AuctionHouseMgr::SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 new
 //this function sends mail, when auction is cancelled to old bidder
 void AuctionHouseMgr::SendAuctionCancelledToBidderMail(AuctionEntry* auction, SQLTransaction& trans, bool sendMail)
 {
-    uint64 bidder_guid = MAKE_NEW_GUID(auction->bidder, 0, HIGHGUID_PLAYER);
     Player* bidder = ObjectAccessor::FindPlayerInOrOutOfWorld(bidder_guid);
 
     uint32 bidder_accId = 0;
@@ -864,7 +857,7 @@ std::string AuctionEntry::BuildAuctionMailBody(uint32 lowGuid, uint32 bid, uint3
 {
     std::ostringstream strm;
     strm.width(16);
-    strm << std::right << std::hex << MAKE_NEW_GUID(lowGuid, 0, HIGHGUID_PLAYER);   // HIGHGUID_PLAYER always present, even for empty guids
+    strm << ObjectGuid::Create<HighGuid::Player>(lowGuid).ToString();
     strm << std::dec << ':' << bid << ':' << buyout;
     strm << ':' << deposit << ':' << cut;
     return strm.str();

@@ -157,8 +157,8 @@ struct Mail
     uint8 messageType;
     uint8 stationery;
     uint16 mailTemplateId;
-    uint32 sender;
-    uint32 receiver;
+    ObjectGuid sender;
+    ObjectGuid receiver;
     std::string subject;
     std::string body;
     std::vector<MailItemInfo> items;

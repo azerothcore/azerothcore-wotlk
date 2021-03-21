@@ -40,7 +40,7 @@ bool GmTicket::LoadFromDB(Field* fields)
     uint8 index = 0;
     _id                 = fields[  index].GetUInt32();
     _type               = TicketType(fields[++index].GetUInt8());
-    _playerGuid         = MAKE_NEW_GUID(fields[++index].GetUInt32(), 0, HIGHGUID_PLAYER);
+    _playerGuid         = ObjectGuid::Create<HighGuid::Player>(fields[++index].GetUInt32());
     _playerName         = fields[++index].GetString();
     _message            = fields[++index].GetString();
     _createTime         = fields[++index].GetUInt32();
@@ -50,7 +50,7 @@ bool GmTicket::LoadFromDB(Field* fields)
     _posZ               = fields[++index].GetFloat();
     _lastModifiedTime   = fields[++index].GetUInt32();
     _closedBy           = fields[++index].GetInt32();
-    _assignedTo         = MAKE_NEW_GUID(fields[++index].GetUInt32(), 0, HIGHGUID_PLAYER);
+    _assignedTo         = ObjectGuid::Create<HighGuid::Player>(fields[++index].GetUInt32());
     _comment            = fields[++index].GetString();
     _response           = fields[++index].GetString();
     _completed          = fields[++index].GetBool();
@@ -70,7 +70,7 @@ void GmTicket::SaveToDB(SQLTransaction& trans) const
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_GM_TICKET);
     stmt->setUInt32(  index, _id);
     stmt->setUInt8 (++index, uint8(_type));
-    stmt->setUInt32(++index, GUID_LOPART(_playerGuid));
+    stmt->setUInt32(++index, _playerGuid.GetCounter());
     stmt->setString(++index, _playerName);
     stmt->setString(++index, _message);
     stmt->setUInt32(++index, uint32(_createTime));
@@ -79,15 +79,15 @@ void GmTicket::SaveToDB(SQLTransaction& trans) const
     stmt->setFloat (++index, _posY);
     stmt->setFloat (++index, _posZ);
     stmt->setUInt32(++index, uint32(_lastModifiedTime));
-    stmt->setInt32 (++index, GUID_LOPART(_closedBy));
-    stmt->setUInt32(++index, GUID_LOPART(_assignedTo));
+    stmt->setInt32 (++index, _closedBy.GetCounter());
+    stmt->setUInt32(++index, _assignedTo.GetCounter());
     stmt->setString(++index, _comment);
     stmt->setString(++index, _response);
     stmt->setBool  (++index, _completed);
     stmt->setUInt8 (++index, uint8(_escalatedStatus));
     stmt->setBool  (++index, _viewed);
     stmt->setBool  (++index, _needMoreHelp);
-    stmt->setInt32 (++index, GUID_LOPART(_resolvedBy));
+    stmt->setInt32 (++index, _resolvedBy.GetCounter());
 
     CharacterDatabase.ExecuteOrAppend(trans, stmt);
 }

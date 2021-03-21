@@ -9991,7 +9991,7 @@ void Unit::SetOwnerGUID(uint64 owner)
     if (GetOwnerGUID() == owner)
         return;
 
-    SetUInt64Value(UNIT_FIELD_SUMMONEDBY, owner);
+    SetGuidValue(UNIT_FIELD_SUMMONEDBY, owner);
     if (!owner)
         return;
 
@@ -10057,7 +10057,7 @@ Minion* Unit::GetFirstMinion() const
             if (pet->HasUnitTypeMask(UNIT_MASK_MINION))
                 return (Minion*)pet;
 
-        sLog->outError("Unit::GetFirstMinion: Minion %u not exist.", GUID_LOPART(pet_guid));
+        sLog->outError("Unit::GetFirstMinion: Minion %s not exist.", pet_guid.ToString().c_str());
         const_cast<Unit*>(this)->SetMinionGUID(0);
     }
 
@@ -10072,7 +10072,7 @@ Guardian* Unit::GetGuardianPet() const
             if (pet->HasUnitTypeMask(UNIT_MASK_GUARDIAN))
                 return (Guardian*)pet;
 
-        sLog->outCrash("Unit::GetGuardianPet: Guardian " UI64FMTD " not exist.", pet_guid);
+        sLog->outCrash("Unit::GetGuardianPet: Guardian %s not exist.", pet_guid.ToString().c_str());
         const_cast<Unit*>(this)->SetPetGUID(0);
     }
 
@@ -10086,8 +10086,8 @@ Unit* Unit::GetCharm() const
         if (Unit* pet = ObjectAccessor::GetUnit(*this, charm_guid))
             return pet;
 
-        sLog->outError("Unit::GetCharm: Charmed creature %u not exist.", GUID_LOPART(charm_guid));
-        const_cast<Unit*>(this)->SetUInt64Value(UNIT_FIELD_CHARM, 0);
+        sLog->outError("Unit::GetCharm: Charmed creature %s not exist.", charm_guid.ToString().c_str());
+        const_cast<Unit*>(this)->SetGuidValue(UNIT_FIELD_CHARM, ObjectGuid::Empty);
     }
 
     return nullptr;
@@ -10293,7 +10293,7 @@ void Unit::SetCharm(Unit* charm, bool apply)
         if (GetTypeId() == TYPEID_PLAYER)
         {
             if (!AddGuidValue(UNIT_FIELD_CHARM, charm->GetGUID()))
-                sLog->outCrash("Player %s is trying to charm unit %u, but it already has a charmed unit " UI64FMTD "", GetName().c_str(), charm->GetEntry(), GetCharmGUID());
+                sLog->outCrash("Player %s is trying to charm unit %u, but it already has a charmed unit %s", GetName().c_str(), charm->GetEntry(), GetCharmGUID().ToString().c_str());
 
             charm->m_ControlledByPlayer = true;
             // TODO: maybe we can use this flag to check if controlled by player
@@ -10306,7 +10306,7 @@ void Unit::SetCharm(Unit* charm, bool apply)
         charm->SetByteValue(UNIT_FIELD_BYTES_2, 1, GetByteValue(UNIT_FIELD_BYTES_2, 1));
 
         if (!charm->AddGuidValue(UNIT_FIELD_CHARMEDBY, GetGUID()))
-            sLog->outCrash("Unit %u is being charmed, but it already has a charmer " UI64FMTD "", charm->GetEntry(), charm->GetCharmerGUID());
+            sLog->outCrash("Unit %u is being charmed, but it already has a charmer %s", charm->GetEntry(), charm->GetCharmerGUID().ToString().c_str());
 
         if (charm->HasUnitMovementFlag(MOVEMENTFLAG_WALKING))
             charm->SetWalk(false);
@@ -10318,11 +10318,11 @@ void Unit::SetCharm(Unit* charm, bool apply)
         if (GetTypeId() == TYPEID_PLAYER)
         {
             if (!RemoveGuidValue(UNIT_FIELD_CHARM, charm->GetGUID()))
-                sLog->outCrash("Player %s is trying to uncharm unit %u, but it has another charmed unit " UI64FMTD "", GetName().c_str(), charm->GetEntry(), GetCharmGUID());
+                sLog->outCrash("Player %s is trying to uncharm unit %u, but it has another charmed unit %s", GetName().c_str(), charm->GetEntry(), GetCharmGUID().ToString().c_str());
         }
 
         if (!charm->RemoveGuidValue(UNIT_FIELD_CHARMEDBY, GetGUID()))
-            sLog->outCrash("Unit %u is being uncharmed, but it has another charmer " UI64FMTD "", charm->GetEntry(), charm->GetCharmerGUID());
+            sLog->outCrash("Unit %u is being uncharmed, but it has another charmer %s", charm->GetEntry(), charm->GetCharmerGUID().ToString().c_str());
 
         if (charm->GetTypeId() == TYPEID_PLAYER)
         {
@@ -10504,11 +10504,11 @@ void Unit::RemoveAllControlled()
             sLog->outError("Unit %u is trying to release unit %u which is neither charmed nor owned by it", GetEntry(), target->GetEntry());
     }
     if (GetPetGUID())
-        sLog->outCrash("Unit %u is not able to release its pet " UI64FMTD, GetEntry(), GetPetGUID());
+        sLog->outCrash("Unit %u is not able to release its pet %s", GetEntry(), GetPetGUID().ToString().c_str());
     if (GetMinionGUID())
-        sLog->outCrash("Unit %u is not able to release its minion " UI64FMTD, GetEntry(), GetMinionGUID());
+        sLog->outCrash("Unit %u is not able to release its minion %s", GetEntry(), GetMinionGUID().ToString().c_str());
     if (GetCharmGUID())
-        sLog->outCrash("Unit %u is not able to release its charm " UI64FMTD, GetEntry(), GetCharmGUID());
+        sLog->outCrash("Unit %u is not able to release its charm %s", GetEntry(), GetCharmGUID().ToString().c_str());
 }
 
 Unit* Unit::GetNextRandomRaidMemberOrPet(float radius)
@@ -16041,7 +16041,7 @@ void Unit::ClearComboPointHolders()
     {
         uint32 lowguid = *m_ComboPointHolders.begin();
 
-        Player* player = ObjectAccessor::GetPlayer(*this, MAKE_NEW_GUID(lowguid, 0, HIGHGUID_PLAYER));
+        Player* player = ObjectAccessor::GetPlayer(*this, guid);
         if (player && player->GetComboTarget() == GetGUID())         // recheck for safe
             player->ClearComboPoints();                        // remove also guid from m_ComboPointHolders;
         else
@@ -17600,8 +17600,8 @@ void Unit::RemoveCharmedBy(Unit* charmer)
         charmer = GetCharmer();
     if (charmer != GetCharmer()) // one aura overrides another?
     {
-        //        sLog->outCrash("Unit::RemoveCharmedBy: this: " UI64FMTD " true charmer: " UI64FMTD " false charmer: " UI64FMTD,
-        //            GetGUID(), GetCharmerGUID(), charmer->GetGUID());
+        //        sLog->outCrash("Unit::RemoveCharmedBy: this: %s true charmer: %s false charmer: %s",
+        //            GetGUID().ToString().c_str(), GetCharmerGUID().ToString().c_str(), charmer->GetGUID().ToString().c_str());
         //        ABORT();
         return;
     }
@@ -17685,7 +17685,7 @@ void Unit::RemoveCharmedBy(Unit* charmer)
                         if (GetCharmInfo())
                             GetCharmInfo()->SetPetNumber(0, true);
                         else
-                            sLog->outError("Aura::HandleModCharm: target=" UI64FMTD " with typeid=%d has a charm aura but no charm info!", GetGUID(), GetTypeId());
+                            sLog->outError("Aura::HandleModCharm: target=%s has a charm aura but no charm info!", GetGUID().ToString().c_str());
                     }
                 }
                 break;
@@ -19156,20 +19156,21 @@ void Unit::StopAttackFaction(uint32 faction_id)
 void Unit::OutDebugInfo() const
 {
     sLog->outError("Unit::OutDebugInfo");
-    sLog->outString("GUID " UI64FMTD ", entry %u, type %u, name %s", GetGUID(), GetEntry(), (uint32)GetTypeId(), GetName().c_str());
-    sLog->outString("OwnerGUID " UI64FMTD ", MinionGUID " UI64FMTD ", CharmerGUID " UI64FMTD ", CharmedGUID " UI64FMTD, GetOwnerGUID(), GetMinionGUID(), GetCharmerGUID(), GetCharmGUID());
+    sLog->outString("GUID %s, name %s", GetGUID().ToString().c_str(), GetName().c_str());
+    sLog->outString("OwnerGUID %s, MinionGUID %s, CharmerGUID %s, CharmedGUID %s",
+        GetOwnerGUID().ToString().c_str(), GetMinionGUID().ToString().c_str(), GetCharmerGUID().ToString().c_str(), GetCharmGUID().ToString().c_str());
     sLog->outString("In world %u, unit type mask %u", (uint32)(IsInWorld() ? 1 : 0), m_unitTypeMask);
     if (IsInWorld())
         sLog->outString("Mapid %u", GetMapId());
 
     sLog->outStringInLine("Summon Slot: ");
     for (uint32 i = 0; i < MAX_SUMMON_SLOT; ++i)
-        sLog->outStringInLine(UI64FMTD", ", m_SummonSlot[i]);
+        sLog->outStringInLine("%s, ", m_SummonSlot[i].ToString().c_str());
     sLog->outString();
 
     sLog->outStringInLine("Controlled List: ");
     for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
-        sLog->outStringInLine(UI64FMTD", ", (*itr)->GetGUID());
+        sLog->outStringInLine("%s, ", (*itr)->GetGUID().ToString().c_str());
     sLog->outString();
 
     sLog->outStringInLine("Aura List: ");
@@ -19182,7 +19183,7 @@ void Unit::OutDebugInfo() const
         sLog->outStringInLine("Passenger List: ");
         for (SeatMap::iterator itr = GetVehicleKit()->Seats.begin(); itr != GetVehicleKit()->Seats.end(); ++itr)
             if (Unit* passenger = ObjectAccessor::GetUnit(*GetVehicleBase(), itr->second.Passenger.Guid))
-                sLog->outStringInLine(UI64FMTD", ", passenger->GetGUID());
+                sLog->outStringInLine("%s, ", passenger->GetGUID().ToString().c_str());
         sLog->outString();
     }
 

@@ -265,7 +265,7 @@ public:
         // Else, this script isn't loaded in the first place: We require no config check.
 
         // We declare all the required variables
-        uint32 characterGuid = GUID_LOPART(guid); // We have no access to any member function of Player* or WorldSession*. So use old-fashioned way.
+        uint32 characterGuid = guid.GetCounter(); // We have no access to any member function of Player* or WorldSession*. So use old-fashioned way.
         // Query playerGuid/accountId, as we only have characterGuid
         std::string systemNote = "ERROR"; // "ERROR" is a placeholder here. We change it later.
 

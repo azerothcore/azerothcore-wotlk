@@ -32,7 +32,7 @@ ArenaTeam::~ArenaTeam()
 {
 }
 
-bool ArenaTeam::Create(uint64 captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor)
+bool ArenaTeam::Create(ObjectGuid captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor)
 {
     // Check if captain is present
     if (!ObjectAccessor::FindPlayerInOrOutOfWorld(captainGuid))
@@ -54,13 +54,12 @@ bool ArenaTeam::Create(uint64 captainGuid, uint8 type, std::string const& teamNa
     EmblemColor = emblemColor;
     BorderStyle = borderStyle;
     BorderColor = borderColor;
-    uint32 captainLowGuid = GUID_LOPART(captainGuid);
 
     // Save arena team to db
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM);
     stmt->setUInt32(0, TeamId);
     stmt->setString(1, TeamName);
-    stmt->setUInt32(2, captainLowGuid);
+    stmt->setUInt32(2, captainLowGuid.GetCounter());
     stmt->setUInt8(3, Type);
     stmt->setUInt16(4, Stats.Rating);
     stmt->setUInt32(5, BackgroundColor);
@@ -75,7 +74,7 @@ bool ArenaTeam::Create(uint64 captainGuid, uint8 type, std::string const& teamNa
     return true;
 }
 
-bool ArenaTeam::AddMember(uint64 playerGuid)
+bool ArenaTeam::AddMember(ObjectGuid playerGuid)
 {
     std::string playerName;
     uint8 playerClass;
@@ -93,7 +92,7 @@ bool ArenaTeam::AddMember(uint64 playerGuid)
     }
     else
     {
-        GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(playerGuid));
+        GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(playerGuid);
         if (!playerData)
             return false;
 
@@ -102,9 +101,9 @@ bool ArenaTeam::AddMember(uint64 playerGuid)
     }
 
     // Check if player is already in a similar arena team
-    if ((player && player->GetArenaTeamId(GetSlot())) || Player::GetArenaTeamIdFromStorage(GUID_LOPART(playerGuid), GetSlot()) != 0)
+    if ((player && player->GetArenaTeamId(GetSlot())) || Player::GetArenaTeamIdFromStorage(playerGuid, GetSlot()) != 0)
     {
-        sLog->outError("Arena: Player %s (guid: %u) already has an arena team of type %u", playerName.c_str(), GUID_LOPART(playerGuid), GetType());
+        sLog->outError("Arena: Player %s (%s) already has an arena team of type %u", playerName.c_str(), playerGuid.ToString().c_str(), GetType());
         return false;
     }
 
@@ -119,7 +118,7 @@ bool ArenaTeam::AddMember(uint64 playerGuid)
     // xinef: zomg! sync query
     // Try to get player's match maker rating from db and fall back to config setting if not found
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MATCH_MAKER_RATING);
-    stmt->setUInt32(0, GUID_LOPART(playerGuid));
+    stmt->setUInt32(0, playerGuid.GetCounter());
     stmt->setUInt8(1, GetSlot());
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -155,12 +154,12 @@ bool ArenaTeam::AddMember(uint64 playerGuid)
     newMember.MaxMMR           = maxMMR;
 
     Members.push_back(newMember);
-    sWorld->UpdateGlobalPlayerArenaTeam(GUID_LOPART(playerGuid), GetSlot(), GetId());
+    sWorld->UpdateGlobalPlayerArenaTeam(playerGuid, GetSlot(), GetId());
 
     // Save player's arena team membership to db
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM_MEMBER);
     stmt->setUInt32(0, TeamId);
-    stmt->setUInt32(1, GUID_LOPART(playerGuid));
+    stmt->setUInt32(1, playerGuid.GetCounter());
     CharacterDatabase.Execute(stmt);
 
     // Inform player if online
@@ -186,7 +185,7 @@ bool ArenaTeam::LoadArenaTeamFromDB(QueryResult result)
 
     TeamId            = fields[0].GetUInt32();
     TeamName          = fields[1].GetString();
-    CaptainGuid       = MAKE_NEW_GUID(fields[2].GetUInt32(), 0, HIGHGUID_PLAYER);
+    CaptainGuid       = ObjectGuid::Create<HighGuid::Player>(fields[2].GetUInt32());
     Type              = fields[3].GetUInt8();
     BackgroundColor   = fields[4].GetUInt32();
     EmblemStyle       = fields[5].GetUInt8();
@@ -225,7 +224,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
             break;
 
         ArenaTeamMember newMember;
-        newMember.Guid             = MAKE_NEW_GUID(fields[1].GetUInt32(), 0, HIGHGUID_PLAYER);
+        newMember.Guid             = ObjectGuid::Create<HighGuid::Player>(fields[1].GetUInt32());
         newMember.WeekGames        = fields[2].GetUInt16();
         newMember.WeekWins         = fields[3].GetUInt16();
         newMember.SeasonGames      = fields[4].GetUInt16();
@@ -239,7 +238,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
         // Delete member if character information is missing
         if (fields[6].GetString().empty())
         {
-            sLog->outErrorDb("ArenaTeam %u has member with empty name - probably player %u doesn't exist, deleting him from memberlist!", arenaTeamId, GUID_LOPART(newMember.Guid));
+            sLog->outErrorDb("ArenaTeam %u has member with empty name - probably player %s doesn't exist, deleting him from memberlist!", arenaTeamId, newMember.Guid.ToString().c_str());
             this->DelMember(newMember.Guid, true);
             continue;
         }
@@ -250,7 +249,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
 
         // Put the player in the team
         Members.push_back(newMember);
-        sWorld->UpdateGlobalPlayerArenaTeam(GUID_LOPART(newMember.Guid), GetSlot(), GetId());
+        sWorld->UpdateGlobalPlayerArenaTeam(newMember.Guid, GetSlot(), GetId());
     } while (result->NextRow());
 
     if (Empty() || !captainPresentInTeam)
@@ -290,7 +289,7 @@ void ArenaTeam::SetCaptain(uint64 guid)
 
     // Update database
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ARENA_TEAM_CAPTAIN);
-    stmt->setUInt32(0, GUID_LOPART(guid));
+    stmt->setUInt32(0, guid.GetCounter());
     stmt->setUInt32(1, GetId());
     CharacterDatabase.Execute(stmt);
 
@@ -342,7 +341,7 @@ void ArenaTeam::DelMember(uint64 guid, bool cleanDb)
         if (itr->Guid == guid)
         {
             Members.erase(itr);
-            sWorld->UpdateGlobalPlayerArenaTeam(GUID_LOPART(guid), GetSlot(), 0);
+            sWorld->UpdateGlobalPlayerArenaTeam(guid, GetSlot(), 0);
             break;
         }
     }
@@ -361,7 +360,7 @@ void ArenaTeam::DelMember(uint64 guid, bool cleanDb)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ARENA_TEAM_MEMBER);
         stmt->setUInt32(0, GetId());
-        stmt->setUInt32(1, GUID_LOPART(guid));
+        stmt->setUInt32(1, guid.GetCounter());
         CharacterDatabase.Execute(stmt);
     }
 }
@@ -890,7 +889,7 @@ void ArenaTeam::MemberWon(Player* player, uint32 againstMatchmakerRating, int32 
     }
 }
 
-void ArenaTeam::UpdateArenaPointsHelper(std::map<uint32, uint32>& playerPoints)
+void ArenaTeam::UpdateArenaPointsHelper(std::map<ObjectGuid, uint32>& playerPoints)
 {
     // Called after a match has ended and the stats are already modified
     // Helper function for arena point distribution (this way, when distributing, no actual calculation is required, just a few comparisons)
@@ -908,15 +907,15 @@ void ArenaTeam::UpdateArenaPointsHelper(std::map<uint32, uint32>& playerPoints)
         if (itr->WeekGames >= requiredGames)
             pointsToAdd = GetPoints(itr->PersonalRating);
 
-        std::map<uint32, uint32>::iterator plr_itr = playerPoints.find(GUID_LOPART(itr->Guid));
+        std::map<ObjectGuid, uint32>::iterator plr_itr = playerPoints.find(itr->Guid);
         if (plr_itr != playerPoints.end())
         {
             // Check if there is already more points
             if (plr_itr->second < pointsToAdd)
-                playerPoints[GUID_LOPART(itr->Guid)] = pointsToAdd;
+                playerPoints[itr->Guid] = pointsToAdd;
         }
         else
-            playerPoints[GUID_LOPART(itr->Guid)] = pointsToAdd;
+            playerPoints[itr->Guid] = pointsToAdd;
     }
 }
 
@@ -946,11 +945,11 @@ void ArenaTeam::SaveToDB()
         stmt->setUInt16(3, itr->SeasonGames);
         stmt->setUInt16(4, itr->SeasonWins);
         stmt->setUInt32(5, GetId());
-        stmt->setUInt32(6, GUID_LOPART(itr->Guid));
+        stmt->setUInt32(6, itr->Guid.GetCounter());
         trans->Append(stmt);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHARACTER_ARENA_STATS);
-        stmt->setUInt32(0, GUID_LOPART(itr->Guid));
+        stmt->setUInt32(0, itr->Guid.GetCounter());
         stmt->setUInt8(1, GetSlot());
         stmt->setUInt16(2, itr->MatchMakerRating);
         stmt->setUInt16(3, itr->MaxMMR);

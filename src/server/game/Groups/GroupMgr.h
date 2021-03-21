@@ -24,7 +24,7 @@ public:
 
     void InitGroupIds();
     void RegisterGroupId(uint32 groupId);
-    uint32 GenerateGroupId();
+    ObjectGuid::LowType GenerateGroupId();
 
     void LoadGroups();
     void AddGroup(Group* group);

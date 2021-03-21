@@ -459,7 +459,7 @@ void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator& itr)
     for (InstanceSave::PlayerListType::iterator iter = pList.begin(), iter2; iter != pList.end(); )
     {
         iter2 = iter++;
-        PlayerUnbindInstanceNotExtended(*iter2, itr->second->GetMapId(), itr->second->GetDifficulty(), ObjectAccessor::GetObjectInOrOutOfWorld(MAKE_NEW_GUID(*iter2, 0, HIGHGUID_PLAYER), (Player*)nullptr));
+        PlayerUnbindInstanceNotExtended(*iter2, itr->second->GetMapId(), itr->second->GetDifficulty(), ObjectAccessor::GetObjectInOrOutOfWorld(*iter2, (Player*)nullptr));
     }
 
     // delete stuff if no players left (noone extended id)
@@ -748,7 +748,7 @@ uint32 InstanceSaveManager::PlayerGetDestinationInstanceId(Player* player, uint3
         return ipb->save->GetInstanceId();
     if (Group* g = player->GetGroup())
     {
-        if (InstancePlayerBind* ilb = PlayerGetBoundInstance(GUID_LOPART(g->GetLeaderGUID()), mapid, difficulty)) // 2. leader temp/perm
+        if (InstancePlayerBind* ilb = PlayerGetBoundInstance(g->GetLeaderGUID(), mapid, difficulty)) // 2. leader temp/perm
             return ilb->save->GetInstanceId();
         return 0; // 3. in group, no leader bind
     }
@@ -773,5 +773,5 @@ void InstanceSaveManager::UnbindAllFor(InstanceSave* save)
 {
     InstanceSave::PlayerListType& pList = save->m_playerList;
     while (!pList.empty())
-        PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), true, ObjectAccessor::GetObjectInOrOutOfWorld(MAKE_NEW_GUID(*(pList.begin()), 0, HIGHGUID_PLAYER), (Player*)nullptr));
+        PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), true, ObjectAccessor::GetObjectInOrOutOfWorld(*(pList.begin()), (Player*)nullptr));
 }

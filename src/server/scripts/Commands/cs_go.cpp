@@ -127,7 +127,7 @@ public:
         uint32 id = fields[6].GetUInt32();
 
         // if creature is in same map with caster go at its current location
-        if (Creature* creature = ObjectAccessor::GetCreature(*player, MAKE_NEW_GUID(guid, id, HIGHGUID_UNIT)))
+        if (Creature* creature = ObjectAccessor::GetCreature(*player, ObjectGuid::Create<HighGuid::Unit>(id, guid)))
         {
             x = creature->GetPositionX();
             y = creature->GetPositionY();

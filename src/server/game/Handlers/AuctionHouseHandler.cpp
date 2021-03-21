@@ -29,7 +29,7 @@ void WorldSession::HandleAuctionHelloOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionHelloOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionHelloOpcode - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -153,7 +153,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionSellItem - Unit (GUID: %u) not found or you can't interact with him.", GUID_LOPART(auctioneer));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionSellItem - Unit (%s) not found or you can't interact with him.", auctioneer.ToString().c_str());
 #endif
         return;
     }
@@ -162,7 +162,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
     if (!auctionHouseEntry)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionSellItem - Unit (GUID: %u) has wrong faction.", GUID_LOPART(auctioneer));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionSellItem - Unit (%s) has wrong faction.", auctioneer.ToString().c_str());
 #endif
         return;
     }
@@ -269,10 +269,10 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
         // Required stack size of auction matches to current item stack size, just move item to auctionhouse
         if (itemsCount == 1 && item->GetCount() == count[i])
         {
-            AH->item_guidlow = item->GetGUIDLow();
+            AH->item_guid = item->GetGUID();
             AH->item_template = item->GetEntry();
             AH->itemCount = item->GetCount();
-            AH->owner = _player->GetGUIDLow();
+            AH->owner = _player->GetGUID();
             AH->startbid = bid;
             AH->bidder = 0;
             AH->bid = 0;
@@ -391,7 +391,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionPlaceBid - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(auctioneer)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionPlaceBid - Unit (%s) not found or you can't interact with him.", auctioneer.ToString().c_str());
 #endif
         return;
     }
@@ -413,8 +413,8 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
     }
 
     // impossible have online own another character (use this for speedup check in case online owner)
-    Player* auction_owner = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER));
-    if (!auction_owner && sObjectMgr->GetPlayerAccountIdByGUID(MAKE_NEW_GUID(auction->owner, 0, HIGHGUID_PLAYER)) == GetAccountId())
+    Player* auction_owner = ObjectAccessor::FindPlayerInOrOutOfWorld(auction->owner);
+    if (!auction_owner && sObjectMgr->GetPlayerAccountIdByGUID(auction->owner) == GetAccountId())
     {
         //you cannot bid your another character auction:
         SendAuctionCommandResult(0, AUCTION_PLACE_BID, ERR_AUCTION_BID_OWN);
@@ -518,7 +518,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionRemoveItem - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(auctioneer)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionRemoveItem - Unit (%s) not found or you can't interact with him.", auctioneer.ToString().c_str());
 #endif
         return;
     }
@@ -605,7 +605,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recvData)
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionListBidderItems - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionListBidderItems - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
 #endif
         recvData.rfinish();
         return;
@@ -677,7 +677,7 @@ void WorldSession::HandleAuctionListOwnerItemsEvent(uint64 creatureGuid)
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionListOwnerItems - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(creatureGuid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionListOwnerItems - Unit (%s) not found or you can't interact with him.", creatureGuid.ToString().c_str());
 #endif
         return;
     }

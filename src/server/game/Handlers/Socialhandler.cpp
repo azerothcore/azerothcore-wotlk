@@ -48,7 +48,7 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
     if (!playerData)
         return;
 
-    uint64 friendGuid = MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
+    uint64 friendGuid = ObjectGuid::Create<HighGuid::Player>(guidLow);
     uint32 friendAccountId = playerData->accountId;
     TeamId teamId = Player::TeamIdForRace(playerData->race);
     FriendsResult friendResult = FRIEND_NOT_FOUND;
@@ -89,9 +89,9 @@ void WorldSession::HandleDelFriendOpcode(WorldPacket& recv_data)
     uint64 FriendGUID;
     recv_data >> FriendGUID;
 
-    _player->GetSocial()->RemoveFromSocialList(GUID_LOPART(FriendGUID), SOCIAL_FLAG_FRIEND);
+    _player->GetSocial()->RemoveFromSocialList(FriendGUID, SOCIAL_FLAG_FRIEND);
 
-    sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_REMOVED, GUID_LOPART(FriendGUID), false);
+    sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_REMOVED, FriendGUID, false);
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent motd (SMSG_FRIEND_STATUS)");
 }
@@ -111,7 +111,7 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recv_data)
     if (!lowGuid)
         return;
 
-    uint64 IgnoreGuid = MAKE_NEW_GUID(lowGuid, 0, HIGHGUID_PLAYER);
+    uint64 IgnoreGuid = ObjectGuid::Create<HighGuid::Player>(lowGuid);
     FriendsResult ignoreResult;
 
     if (IgnoreGuid == GetPlayer()->GetGUID())              //not add yourself
@@ -137,8 +137,8 @@ void WorldSession::HandleDelIgnoreOpcode(WorldPacket& recv_data)
     uint64 IgnoreGUID;
     recv_data >> IgnoreGUID;
 
-    _player->GetSocial()->RemoveFromSocialList(GUID_LOPART(IgnoreGUID), SOCIAL_FLAG_IGNORED);
-    sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_IGNORE_REMOVED, GUID_LOPART(IgnoreGUID), false);
+    _player->GetSocial()->RemoveFromSocialList(IgnoreGUID, SOCIAL_FLAG_IGNORED);
+    sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_IGNORE_REMOVED, IgnoreGUID, false);
 }
 
 void WorldSession::HandleSetContactNotesOpcode(WorldPacket& recv_data)
@@ -146,5 +146,5 @@ void WorldSession::HandleSetContactNotesOpcode(WorldPacket& recv_data)
     uint64 guid;
     std::string note;
     recv_data >> guid >> note;
-    _player->GetSocial()->SetFriendNote(GUID_LOPART(guid), note);
+    _player->GetSocial()->SetFriendNote(guid, note);
 }

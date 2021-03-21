@@ -232,7 +232,7 @@ public:
                         {
                             me->setAttackTimer(BASE_ATTACK, 2000);
                             Player* target = players.at(urand(0, players.size() - 1));
-                            me->SetUInt64Value(UNIT_FIELD_TARGET, target->GetGUID());
+                            me->SetGuidValue(UNIT_FIELD_TARGET, target->GetGUID());
                             me->CastSpell(target, SPELL_VEZAX_SHADOW_CRASH, false);
                             events.ScheduleEvent(EVENT_RESTORE_TARGET, 750);
                         }
@@ -240,7 +240,7 @@ public:
                     break;
                 case EVENT_RESTORE_TARGET:
                     if (me->GetVictim())
-                        me->SetUInt64Value(UNIT_FIELD_TARGET, me->GetVictim()->GetGUID());
+                        me->SetGuidValue(UNIT_FIELD_TARGET, me->GetVictim()->GetGUID());
                     break;
                 case EVENT_SPELL_SEARING_FLAMES:
                     if(!me->HasAura(SPELL_SARONITE_BARRIER))

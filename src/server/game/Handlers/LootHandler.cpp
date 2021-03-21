@@ -111,7 +111,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
     Loot* loot = nullptr;
     bool shareMoney = true;
 
-    switch (GUID_HIPART(guid))
+    switch (guid.GetHigh())
     {
         case HIGHGUID_GAMEOBJECT:
             {
@@ -416,7 +416,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
-    Player* target = ObjectAccessor::GetPlayer(*_player, MAKE_NEW_GUID(target_playerguid, 0, HIGHGUID_PLAYER));
+    Player* target = ObjectAccessor::GetPlayer(*_player, target_playerguid));
     if (!target)
     {
         _player->SendLootError(lootguid, LOOT_ERROR_PLAYER_NOT_FOUND);

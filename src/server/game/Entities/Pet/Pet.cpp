@@ -241,7 +241,7 @@ void Pet::SavePetToDB(PetSaveMode mode, bool logout)
     // current/stable/not_in_slot
     if (mode >= PET_SAVE_AS_CURRENT)
     {
-        uint32 ownerLowGUID = GUID_LOPART(GetOwnerGUID());
+        uint32 ownerLowGUID = GetOwnerGUID().GetCounter();
         trans = CharacterDatabase.BeginTransaction();
         // remove current data
 
@@ -683,7 +683,7 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_PETS, "Pet::CreateBaseForTamed");
 #endif
-    uint32 guid = sObjectMgr->GenerateLowGuid(HIGHGUID_PET);
+    ObjectGuid::LowType guid = map->GenerateLowGuid<HighGuid::Pet>();
     uint32 pet_number = sObjectMgr->GeneratePetNumber();
     if (!Create(guid, map, phaseMask, cinfo->Entry, pet_number))
         return false;
@@ -2174,7 +2174,7 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
 
         Map* map = player->GetMap();
         uint32 pet_number = sObjectMgr->GeneratePetNumber();
-        if (!pet->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_PET), map, player->GetPhaseMask(), info->m_entry, pet_number))
+        if (!pet->Create(map->GenerateLowGuid<HighGuid::Pet>(), map, player->GetPhaseMask(), info->m_entry, pet_number))
         {
             sLog->outError("no such creature entry %u", info->m_entry);
             delete pet;

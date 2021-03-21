@@ -433,7 +433,7 @@ public:
                     trigger->GetMotionMaster()->MoveChase(me);
 
                     //DoCast(target, SPELL_SIPHON_SOUL, true);
-                    //me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, target->GetGUID());
+                    //me->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, target->GetGUID());
                     //me->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_SIPHON_SOUL);
 
                     PlayerGUID = target->GetGUID();

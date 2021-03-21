@@ -133,7 +133,7 @@ public:
                     }
             }
 
-            me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+            me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
             me->RemoveAllAuras();
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);

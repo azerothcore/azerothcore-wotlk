@@ -38,16 +38,6 @@ inline uint32 MAKE_PAIR32(uint16 l, uint16 h);
 inline uint16 PAIR32_HIPART(uint32 x);
 inline uint16 PAIR32_LOPART(uint32 x);
 
-// l - OBJECT_FIELD_GUID
-// e - OBJECT_FIELD_ENTRY for GO (except GAMEOBJECT_TYPE_MO_TRANSPORT) and creatures or UNIT_FIELD_PETNUMBER for pets
-// h - OBJECT_FIELD_GUID + 1
-inline uint64 MAKE_NEW_GUID(uint32 l, uint32 e, uint32 h);
-
-//#define GUID_HIPART(x)   (uint32)((uint64(x) >> 52)) & 0x0000FFFF)
-inline uint32 GUID_HIPART(uint64 guid);
-inline uint32 GUID_ENPART(uint64 x);
-inline uint32 GUID_LOPART(uint64 x);
-
 uint32 PAIR64_HIPART(uint64 x)
 {
     return (uint32)((x >> 32) & UI64LIT(0x00000000FFFFFFFF));
@@ -76,30 +66,6 @@ uint16 PAIR32_HIPART(uint32 x)
 uint16 PAIR32_LOPART(uint32 x)
 {
     return (uint16)(x & 0x0000FFFF);
-}
-
-uint64 MAKE_NEW_GUID(uint32 l, uint32 e, uint32 h)
-{
-    return uint64(uint64(l) | (uint64(e) << 24) | (uint64(h) << 48));
-}
-
-uint32 GUID_HIPART(uint64 guid)
-{
-    return (uint32)((uint64(guid) >> 48) & 0x0000FFFF);
-}
-
-uint32 GUID_ENPART(uint64 x)
-{
-    return IsGuidHaveEnPart(x)
-           ? (uint32)((x >> 24) & UI64LIT(0x0000000000FFFFFF))
-           : 0;
-}
-
-uint32 GUID_LOPART(uint64 x)
-{
-    return IsGuidHaveEnPart(x)
-           ? (uint32)(x & UI64LIT(0x0000000000FFFFFF))
-           : (uint32)(x & UI64LIT(0x00000000FFFFFFFF));
 }
 
 #endif

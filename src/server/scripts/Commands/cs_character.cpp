@@ -246,11 +246,11 @@ public:
             // Update level and reset XP, everything else will be updated at login
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_LEVEL);
             stmt->setUInt8(0, uint8(newLevel));
-            stmt->setUInt32(1, GUID_LOPART(playerGuid));
+            stmt->setUInt32(1, playerGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
 
             // xinef: update global storage
-            sWorld->UpdateGlobalPlayerData(GUID_LOPART(playerGuid), PLAYER_UPDATE_DATA_LEVEL, "", newLevel);
+            sWorld->UpdateGlobalPlayerData(playerGuid, PLAYER_UPDATE_DATA_LEVEL, "", newLevel);
         }
     }
 
@@ -324,11 +324,11 @@ public:
                 return false;
 
             std::string oldNameLink = handler->playerLink(targetName);
-            handler->PSendSysMessage(LANG_RENAME_PLAYER_GUID, oldNameLink.c_str(), GUID_LOPART(targetGuid));
+            handler->PSendSysMessage(LANG_RENAME_PLAYER_GUID, oldNameLink.c_str(), targetGuid.GetCounter());
 
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
             stmt->setUInt16(0, uint16(AT_LOGIN_RENAME));
-            stmt->setUInt32(1, GUID_LOPART(targetGuid));
+            stmt->setUInt32(1, targetGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
         }
 
@@ -395,8 +395,8 @@ public:
         else
         {
             std::string oldNameLink = handler->playerLink(targetName);
-            stmt->setUInt32(1, GUID_LOPART(targetGuid));
-            handler->PSendSysMessage(LANG_CUSTOMIZE_PLAYER_GUID, oldNameLink.c_str(), GUID_LOPART(targetGuid));
+            stmt->setUInt32(1, targetGuid.GetCounter());
+            handler->PSendSysMessage(LANG_CUSTOMIZE_PLAYER_GUID, oldNameLink.c_str(), targetGuid.GetCounter());
         }
         CharacterDatabase.Execute(stmt);
 
@@ -423,8 +423,8 @@ public:
         else
         {
             std::string oldNameLink = handler->playerLink(targetName);
-            handler->PSendSysMessage(LANG_CUSTOMIZE_PLAYER_GUID, oldNameLink.c_str(), GUID_LOPART(targetGuid));
-            stmt->setUInt32(1, GUID_LOPART(targetGuid));
+            handler->PSendSysMessage(LANG_CUSTOMIZE_PLAYER_GUID, oldNameLink.c_str(), targetGuid.GetCounter());
+            stmt->setUInt32(1, targetGuid.GetCounter());
         }
         CharacterDatabase.Execute(stmt);
 
@@ -452,8 +452,8 @@ public:
         {
             std::string oldNameLink = handler->playerLink(targetName);
             // TODO : add text into database
-            handler->PSendSysMessage(LANG_CUSTOMIZE_PLAYER_GUID, oldNameLink.c_str(), GUID_LOPART(targetGuid));
-            stmt->setUInt32(1, GUID_LOPART(targetGuid));
+            handler->PSendSysMessage(LANG_CUSTOMIZE_PLAYER_GUID, oldNameLink.c_str(), targetGuid.GetCounter());
+            stmt->setUInt32(1, targetGuid.GetCounter());
         }
         CharacterDatabase.Execute(stmt);
 
@@ -912,10 +912,10 @@ public:
         if (!fileStr || !playerStr)
             return false;
 
-        uint64 guid;
+        ObjectGuid guid;
         // character name can't start from number
         if (isNumeric(playerStr))
-            guid = MAKE_NEW_GUID(atoi(playerStr), 0, HIGHGUID_PLAYER);
+            guid = ObjectGuid::Create<HighGuid::Player>(atoi(playerStr));
         else
         {
             std::string name = handler->extractPlayerNameFromLink(playerStr);

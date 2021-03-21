@@ -145,7 +145,7 @@ public:
 
 private:
     uint32 _id;
-    uint64 _playerGuid;
+    ObjectGuid _playerGuid;
     TicketType _type; // 0 = Open, 1 = Closed, 2 = Character deleted
     std::string _playerName;
     float _posX;
@@ -155,9 +155,9 @@ private:
     std::string _message;
     uint64 _createTime;
     uint64 _lastModifiedTime;
-    int64 _closedBy; // 0 = Open or Closed by Console (if type = 1), playerGuid = GM who closed it or player abandoned ticket or read the GM response message.
-    int64 _resolvedBy; // 0 = Open, -1 = Resolved by Console, GM who resolved it by closing or completing the ticket.
-    uint64 _assignedTo;
+    ObjectGuid _closedBy; // 0 = Open or Closed by Console (if type = 1), playerGuid = GM who closed it or player abandoned ticket or read the GM response message.
+    ObjectGuid _resolvedBy; // 0 = Open, -1 = Resolved by Console, GM who resolved it by closing or completing the ticket.
+    ObjectGuid _assignedTo;
     std::string _comment;
     bool _completed;
     GMTicketEscalationStatus _escalatedStatus;

@@ -28,7 +28,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
     uint64 guid;
     recvData >> guid;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (GUID: %u TypeId:%u)", GUID_LOPART(guid), GuidHigh2TypeId(GUID_HIPART(guid)));
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (%s)", guid.ToString());
 #endif
 
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);

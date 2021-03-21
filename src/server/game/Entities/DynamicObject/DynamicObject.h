@@ -45,7 +45,7 @@ public:
     void BindToCaster();
     void UnbindFromCaster();
     [[nodiscard]] uint32 GetSpellId() const {  return GetUInt32Value(DYNAMICOBJECT_SPELLID); }
-    [[nodiscard]] uint64 GetCasterGUID() const { return GetUInt64Value(DYNAMICOBJECT_CASTER); }
+    [[nodiscard]] uint64 GetCasterGUID() const { return GetGuidValue(DYNAMICOBJECT_CASTER); }
     [[nodiscard]] float GetRadius() const { return GetFloatValue(DYNAMICOBJECT_RADIUS); }
     [[nodiscard]] bool IsViewpoint() const { return _isViewpoint; }
 

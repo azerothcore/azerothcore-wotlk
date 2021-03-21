@@ -81,9 +81,9 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
     }
 }
 
-bool Channel::IsBanned(uint64 guid) const
+bool Channel::IsBanned(ObjectGuid guid) const
 {
-    BannedContainer::const_iterator itr = bannedStore.find(GUID_LOPART(guid));
+    BannedContainer::const_iterator itr = bannedStore.find(guid);
     return itr != bannedStore.end() && itr->second > time(nullptr);
 }
 
@@ -332,7 +332,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
     bool banOffline = false; // pussywizard
     bool isGoodConstantModerator = _channelRights.moderators.find(player->GetSession()->GetAccountId()) != _channelRights.moderators.end();
 
-    uint64 victim = 0;
+    ObjectGuid victim;
     uint32 badAccId = 0;
     uint32 badSecurity = 0;
     Player* bad = ObjectAccessor::FindPlayerByName(badname, false);
@@ -354,7 +354,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
                     if (Player::TeamIdForRace(gpd->race) == Player::TeamIdForRace(player->getRace()))
                     {
                         banOffline = true;
-                        victim = MAKE_NEW_GUID(lowGuid, 0, HIGHGUID_PLAYER);
+                        victim = ObjectGuid::Create<HighGuid::Player>(lowGuid);
                         badAccId = gpd->accountId;
                     }
                     else
@@ -417,8 +417,8 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
     {
         if (!IsBanned(victim))
         {
-            bannedStore[GUID_LOPART(victim)] = time(nullptr) + CHANNEL_BAN_DURATION;
-            AddChannelBanToDB(GUID_LOPART(victim), time(nullptr) + CHANNEL_BAN_DURATION);
+            bannedStore[victim] = time(nullptr) + CHANNEL_BAN_DURATION;
+            AddChannelBanToDB(victim, time(nullptr) + CHANNEL_BAN_DURATION);
 
             if (notify)
             {
@@ -484,9 +484,9 @@ void Channel::UnBan(Player const* player, std::string const& badname)
         return;
     }
 
-    uint64 victim = 0;
+    ObjectGuid victim;
     if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(badname))
-        victim = MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
+        victim = ObjectGuid::Create<HighGuid::Player>(guidLow);
 
     if (!victim || !IsBanned(victim))
     {
@@ -509,10 +509,12 @@ void Channel::UnBan(Player const* player, std::string const& badname)
     }
 
     if (_channelRights.flags & CHANNEL_RIGHT_CANT_BAN)
-        sLog->outCommand(player->GetSession()->GetAccountId(), "Command: /unban %s %s (Moderator %s [guid: %u, account: %u] unbanned %s [guid: %u])", GetName().c_str(), badname.c_str(), player->GetName().c_str(), player->GetGUIDLow(), player->GetSession()->GetAccountId(), badname.c_str(), GUID_LOPART(victim));
+        sLog->outCommand(player->GetSession()->GetAccountId(), "Command: /unban %s %s (Moderator %s [%s, account: %u] unbanned %s [%s])",
+            GetName().c_str(), badname.c_str(), player->GetName().c_str(), player->GetGUID().ToString().c_str(), player->GetSession()->GetAccountId(),
+            badname.c_str(), victim.ToString().c_str());
 
-    bannedStore.erase(GUID_LOPART(victim));
-    RemoveChannelBanFromDB(GUID_LOPART(victim));
+    bannedStore.erase(victim);
+    RemoveChannelBanFromDB(victim);
 
     WorldPacket data;
     MakePlayerUnbanned(&data, victim, good);
@@ -523,8 +525,8 @@ void Channel::UnBan(uint64 guid)
 {
     if (!IsBanned(guid))
         return;
-    bannedStore.erase(GUID_LOPART(guid));
-    RemoveChannelBanFromDB(GUID_LOPART(guid));
+    bannedStore.erase(guid);
+    RemoveChannelBanFromDB(guid);
 }
 
 void Channel::Password(Player const* player, std::string const& pass)
@@ -888,7 +890,7 @@ void Channel::Invite(Player const* player, std::string const& newname)
         return;
     }
 
-    if (!newp->GetSocial()->HasIgnore(GUID_LOPART(guid)))
+    if (!newp->GetSocial()->HasIgnore(guid))
     {
         WorldPacket data;
         MakeInvite(&data, guid);
@@ -953,7 +955,7 @@ void Channel::SetOwner(uint64 guid, bool exclaim)
 void Channel::SendToAll(WorldPacket* data, uint64 guid)
 {
     for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
-        if (!guid || !i->second.plrPtr->GetSocial()->HasIgnore(GUID_LOPART(guid)))
+        if (!guid || !i->second.plrPtr->GetSocial()->HasIgnore(guid))
             i->second.plrPtr->GetSession()->SendPacket(data);
 }
 

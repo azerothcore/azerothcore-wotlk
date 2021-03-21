@@ -55,7 +55,7 @@ void CalendarMgr::LoadFromDB()
             Field* fields = result->Fetch();
 
             uint64 eventId          = fields[0].GetUInt64();
-            uint64 creatorGUID      = MAKE_NEW_GUID(fields[1].GetUInt32(), 0, HIGHGUID_PLAYER);
+            ObjectGuid creatorGUID  = ObjectGuid::Create<HighGuid::Player>(fields[1].GetUInt32());
             std::string title       = fields[2].GetString();
             std::string description = fields[3].GetString();
             CalendarEventType type  = CalendarEventType(fields[4].GetUInt8());
@@ -66,7 +66,7 @@ void CalendarMgr::LoadFromDB()
             uint32 guildId = 0;
 
             if (flags & CALENDAR_FLAG_GUILD_EVENT || flags & CALENDAR_FLAG_WITHOUT_INVITES)
-                guildId = Player::GetGuildIdFromStorage(GUID_LOPART(creatorGUID));
+                guildId = Player::GetGuildIdFromStorage(creatorGUID);
 
             CalendarEvent* calendarEvent = new CalendarEvent(eventId, creatorGUID, guildId, type, dungeonId, time_t(eventTime), flags, time_t(timezoneTime), title, description);
             _events.insert(calendarEvent);
@@ -87,8 +87,8 @@ void CalendarMgr::LoadFromDB()
 
             uint64 inviteId             = fields[0].GetUInt64();
             uint64 eventId              = fields[1].GetUInt64();
-            uint64 invitee              = MAKE_NEW_GUID(fields[2].GetUInt32(), 0, HIGHGUID_PLAYER);
-            uint64 senderGUID           = MAKE_NEW_GUID(fields[3].GetUInt32(), 0, HIGHGUID_PLAYER);
+            uint64 invitee              = ObjectGuid::Create<HighGuid::Player>(fields[2].GetUInt32());
+            uint64 senderGUID           = ObjectGuid::Create<HighGuid::Player>(fields[3].GetUInt32());
             CalendarInviteStatus status = CalendarInviteStatus(fields[4].GetUInt8());
             uint32 statusTime           = fields[5].GetUInt32();
             CalendarModerationRank rank = CalendarModerationRank(fields[6].GetUInt8());
@@ -236,7 +236,7 @@ void CalendarMgr::UpdateEvent(CalendarEvent* calendarEvent)
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CALENDAR_EVENT);
     stmt->setUInt64(0, calendarEvent->GetEventId());
-    stmt->setUInt32(1, GUID_LOPART(calendarEvent->GetCreatorGUID()));
+    stmt->setUInt32(1, calendarEvent->GetCreatorGUID().GetCounter());
     stmt->setString(2, calendarEvent->GetTitle());
     stmt->setString(3, calendarEvent->GetDescription());
     stmt->setUInt8(4, calendarEvent->GetType());
@@ -258,8 +258,8 @@ void CalendarMgr::UpdateInvite(CalendarInvite* invite, SQLTransaction& trans)
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CALENDAR_INVITE);
     stmt->setUInt64(0, invite->GetInviteId());
     stmt->setUInt64(1, invite->GetEventId());
-    stmt->setUInt32(2, GUID_LOPART(invite->GetInviteeGUID()));
-    stmt->setUInt32(3, GUID_LOPART(invite->GetSenderGUID()));
+    stmt->setUInt32(2, invite->GetInviteeGUID().GetCounter());
+    stmt->setUInt32(3, invite->GetSenderGUID().GetCounter());
     stmt->setUInt8(4, invite->GetStatus());
     stmt->setUInt32(5, uint32(invite->GetStatusTime()));
     stmt->setUInt8(6, invite->GetRank());
@@ -623,11 +623,11 @@ void CalendarMgr::SendCalendarEvent(uint64 guid, CalendarEvent const& calendarEv
     for (CalendarInviteStore::const_iterator itr = eventInviteeList.begin(); itr != eventInviteeList.end(); ++itr)
     {
         CalendarInvite const* calendarInvite = (*itr);
-        uint64 inviteeGuid = calendarInvite->GetInviteeGUID();
+        ObjectGuid inviteeGuid = calendarInvite->GetInviteeGUID();
         Player* invitee = ObjectAccessor::FindPlayerInOrOutOfWorld(inviteeGuid);
 
         uint8 inviteeLevel = invitee ? invitee->getLevel() : Player::GetLevelFromStorage(inviteeGuid);
-        uint32 inviteeGuildId = invitee ? invitee->GetGuildId() : Player::GetGuildIdFromStorage(GUID_LOPART(inviteeGuid));
+        uint32 inviteeGuildId = invitee ? invitee->GetGuildId() : Player::GetGuildIdFromStorage(inviteeGuid);
 
         data << inviteeGuid.WriteAsPacked();
         data << uint8(inviteeLevel);

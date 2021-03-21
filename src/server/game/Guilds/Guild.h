@@ -355,12 +355,12 @@ public: // pussywizard: public class Member
     // pussywizard: public GetMember
     inline const Member* GetMember(uint64 guid) const
     {
-        Members::const_iterator itr = m_members.find(GUID_LOPART(guid));
+        Members::const_iterator itr = m_members.find(guid);
         return itr != m_members.end() ? itr->second : nullptr;
     }
     inline Member* GetMember(uint64 guid)
     {
-        Members::iterator itr = m_members.find(GUID_LOPART(guid));
+        Members::iterator itr = m_members.find(guid);
         return itr != m_members.end() ? itr->second : nullptr;
     }
     inline Member* GetMember(std::string const& name)
@@ -410,8 +410,8 @@ private:
 
     private:
         GuildEventLogTypes m_eventType;
-        uint32 m_playerGuid1;
-        uint32 m_playerGuid2;
+        ObjectGuid m_playerGuid1;
+        ObjectGuid m_playerGuid2;
         uint8  m_newRank;
     };
 
@@ -443,7 +443,7 @@ private:
     private:
         GuildBankEventLogTypes m_eventType;
         uint8  m_bankTabId;
-        uint32 m_playerGuid;
+        ObjectGuid m_playerGuid;
         uint32 m_itemOrMoney;
         uint16 m_itemStackCount;
         uint8  m_destTabId;

@@ -930,7 +930,7 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_OBJECT_GUID, GUID_LOPART(guid), GUID_HIPART(guid));
+        handler->PSendSysMessage(LANG_OBJECT_GUID, guid.GetCounter(), uint32(guid.GetHigh()));
         return true;
     }
 
@@ -1723,15 +1723,15 @@ public:
     static bool HandlePInfoCommand(ChatHandler* handler, char const* args)
     {
         Player* target;
-        uint64 targetGuid;
+        ObjectGuid targetGuid;
         std::string targetName;
         PreparedStatement* stmt = nullptr;
 
-        uint32 parseGUID = MAKE_NEW_GUID(atol((char*)args), 0, HIGHGUID_PLAYER);
+        ObjectGuid parseGUID = ObjectGuid::Create<HighGuid::Player>(atol((char*)args));
 
         if (sObjectMgr->GetPlayerNameByGUID(parseGUID, targetName))
         {
-            target = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(parseGUID, 0, HIGHGUID_PLAYER));
+            target = ObjectAccessor::FindPlayerInOrOutOfWorld(parseGUID);
             targetGuid = parseGUID;
         }
         else if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
@@ -1739,7 +1739,7 @@ public:
 
         // Account data print variables
         std::string userName          = handler->GetAcoreString(LANG_ERROR);
-        uint32 lowguid                = GUID_LOPART(targetGuid);
+        uint32 lowguid                = targetGuid.GetCounter();
         uint32 accId                  = 0;
         std::string eMail             = handler->GetAcoreString(LANG_ERROR);
         std::string regMail           = handler->GetAcoreString(LANG_ERROR);
@@ -1819,7 +1819,7 @@ public:
 
             // Query informations from the DB
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PINFO);
-            stmt->setUInt32(0, GUID_LOPART(targetGuid));
+            stmt->setUInt32(0, lowguid);
             PreparedQueryResult charInfoResult = CharacterDatabase.Query(stmt);
 
             if (!charInfoResult)
@@ -1915,7 +1915,7 @@ public:
         {
             banType = handler->GetAcoreString(LANG_CHARACTER);
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_BANS);
-            stmt->setUInt32(0, GUID_LOPART(targetGuid));
+            stmt->setUInt32(0, lowguid);
             accBannedResult = CharacterDatabase.Query(stmt);
         }
 
@@ -1968,7 +1968,7 @@ public:
 
         // Initiate output
         // Output I. LANG_PINFO_PLAYER
-        handler->PSendSysMessage(LANG_PINFO_PLAYER, target ? "" : handler->GetAcoreString(LANG_OFFLINE), nameLink.c_str(), GUID_LOPART(targetGuid));
+        handler->PSendSysMessage(LANG_PINFO_PLAYER, target ? "" : handler->GetAcoreString(LANG_OFFLINE), nameLink.c_str(), targetGuid.GetCounter());
 
         // Output II. LANG_PINFO_GM_ACTIVE if character is gamemaster
         if (target && target->IsGameMaster())
@@ -2127,7 +2127,7 @@ public:
         // Mail Data - an own query, because it may or may not be useful.
         // SQL: "SELECT SUM(CASE WHEN (checked & 1) THEN 1 ELSE 0 END) AS 'readmail', COUNT(*) AS 'totalmail' FROM mail WHERE `receiver` = ?"
         PreparedStatement* mailQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_MAILS);
-        mailQuery->setUInt32(0, GUID_LOPART(targetGuid));
+        mailQuery->setUInt32(0, lowguid);
         PreparedQueryResult mailInfoResult = CharacterDatabase.Query(mailQuery);
         if (mailInfoResult)
         {
@@ -2631,7 +2631,7 @@ public:
         //- TODO: Fix poor design
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
         MailDraft(subject, text)
-        .SendMailTo(trans, MailReceiver(target, GUID_LOPART(targetGuid)), sender);
+        .SendMailTo(trans, MailReceiver(target, targetGuid), sender);
 
         CharacterDatabase.CommitTransaction(trans);
 
@@ -2740,7 +2740,7 @@ public:
             }
         }
 
-        draft.SendMailTo(trans, MailReceiver(receiver, GUID_LOPART(receiverGuid)), sender);
+        draft.SendMailTo(trans, MailReceiver(receiver, receiverGuid), sender);
         CharacterDatabase.CommitTransaction(trans);
 
         std::string nameLink = handler->playerLink(receiverName);
@@ -2790,7 +2790,7 @@ public:
 
         MailDraft(subject, text)
         .AddMoney(money)
-        .SendMailTo(trans, MailReceiver(receiver, GUID_LOPART(receiverGuid)), sender);
+        .SendMailTo(trans, MailReceiver(receiver, receiverGuid), sender);
 
         CharacterDatabase.CommitTransaction(trans);
 
@@ -2866,7 +2866,7 @@ public:
         creatureTarget->RemoveCorpse();
         creatureTarget->SetHealth(0); // just for nice GM-mode view
 
-        pet->SetUInt64Value(UNIT_FIELD_CREATEDBY, player->GetGUID());
+        pet->SetGuidValue(UNIT_FIELD_CREATEDBY, player->GetGUID());
         pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, player->getFaction());
 
         if (!pet->InitStatsForLevel(creatureTarget->getLevel()))
@@ -3051,7 +3051,7 @@ public:
             if (uint64 playerGUID = sWorld->GetGlobalPlayerGUID(name))
             {
                 PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA_FROZEN);
-                stmt->setUInt32(0, GUID_LOPART(playerGUID));
+                stmt->setUInt32(0, playerGUID.GetCounter());
                 CharacterDatabase.Execute(stmt);
                 handler->PSendSysMessage(LANG_COMMAND_UNFREEZE, name.c_str());
                 return true;
@@ -3165,14 +3165,14 @@ public:
     static bool HandleGroupListCommand(ChatHandler* handler, char const* args)
     {
         Player* playerTarget;
-        uint64 guidTarget = 0;
+        ObjectGuid guidTarge;
         std::string nameTarget;
 
-        uint32 parseGUID = MAKE_NEW_GUID(atol((char*)args), 0, HIGHGUID_PLAYER);
+        ObjectGuid parseGUID = ObjectGuid::Create<HighGuid::Player>(atol((char*)args));
 
         if (sObjectMgr->GetPlayerNameByGUID(parseGUID, nameTarget))
         {
-            playerTarget = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(parseGUID, 0, HIGHGUID_PLAYER));
+            playerTarget = ObjectAccessor::FindPlayerInOrOutOfWorld(parseGUID);
             guidTarget = parseGUID;
         }
         else if (!handler->extractPlayerTarget((char*)args, &playerTarget, &guidTarget, &nameTarget))
@@ -3183,8 +3183,8 @@ public:
             groupTarget = playerTarget->GetGroup();
 
         if (!groupTarget && guidTarget)
-            if (uint32 groupId = Player::GetGroupIdFromStorage(GUID_LOPART(guidTarget)))
-                groupTarget = sGroupMgr->GetGroupByGUID(groupId);
+            if (ObjectGuid groupGUID = Player::GetGroupIdFromStorage(guidTarget))
+                groupTarget = sGroupMgr->GetGroupByGUID(groupGUID);
 
         if (groupTarget)
         {
@@ -3219,7 +3219,7 @@ public:
                 const char* onlineState = p ? "online" : "offline";
 
                 handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,
-                    GUID_LOPART(slot.guid), flags.c_str(), lfg::GetRolesString(slot.roles).c_str());*/
+                    slot.guid.GetCounter(), flags.c_str(), lfg::GetRolesString(slot.roles).c_str());*/
             }
         }
         else

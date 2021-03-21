@@ -641,17 +641,13 @@ enum EquipmentSetUpdateState
 
 struct EquipmentSet
 {
-    EquipmentSet()
-    {
-        for (unsigned int & Item : Items)
-            Item = 0;
-    }
+    EquipmentSet() { }
 
-    uint64 Guid{0};
+    uint64 Guid;
     std::string Name;
     std::string IconName;
     uint32 IgnoreMask{0};
-    uint32 Items[EQUIPMENT_SLOT_END];
+    ObjectGuid Items[EQUIPMENT_SLOT_END];
     EquipmentSetUpdateState state{EQUIPMENT_SET_NEW};
 };
 
@@ -2906,7 +2902,7 @@ private:
     Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
     Item* _LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, Field* fields);
 
-    typedef std::set<uint32> RefundableItemsSet;
+    typedef GuidSet RefundableItemsSet;
     RefundableItemsSet m_refundableItems;
     void SendRefundInfo(Item* item);
     void RefundItem(Item* item);

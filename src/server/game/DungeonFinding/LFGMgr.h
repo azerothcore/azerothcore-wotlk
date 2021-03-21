@@ -336,8 +336,8 @@ namespace lfg
         uint32 id;                                             ///< Proposal Id
         uint32 dungeonId;                                      ///< Dungeon to join
         LfgProposalState state;                                ///< State of the proposal
-        uint64 group;                                          ///< Proposal group (0 if new)
-        uint64 leader;                                         ///< Leader guid.
+        ObjectGuid group;                                      ///< Proposal group (0 if new)
+        ObjectGuid leader;                                     ///< Leader guid.
         time_t cancelTime;                                     ///< Time when we will cancel this proposal
         uint32 encounters;                                     ///< Dungeon Encounters
         bool isNew;                                            ///< Determines if it's new group or not

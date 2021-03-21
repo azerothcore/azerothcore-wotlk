@@ -882,7 +882,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
                     me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), 40.0f, 12.0f);
-                    me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+                    me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                     events.Reset();
                     events.RescheduleEvent(EVENT_SPELL_MASSIVE_CRASH, 2000);
                     break;
@@ -893,10 +893,10 @@ public:
                     events.RescheduleEvent(EVENT_GAZE, 2000);
                     break;
                 case EVENT_GAZE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true) )
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 500.0f, true) )
                     {
                         TargetGUID = target->GetGUID();
-                        me->SetUInt64Value(UNIT_FIELD_TARGET, TargetGUID);
+                        me->SetGuidValue(UNIT_FIELD_TARGET, TargetGUID);
                         me->SetFacingToObject(target);
                         Talk(EMOTE_TRAMPLE_STARE, target);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
@@ -958,7 +958,7 @@ public:
                     me->DisableSpline();
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveCharge(destX, destY, destZ + 1.0f, 65.0f);
-                    me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+                    me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                     events.RescheduleEvent(EVENT_CHECK_TRAMPLE_PLAYERS, 100);
 
                     break;

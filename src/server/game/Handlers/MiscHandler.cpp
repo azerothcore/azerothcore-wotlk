@@ -109,7 +109,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
         if (!unit)
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleGossipSelectOptionOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleGossipSelectOptionOpcode - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
 #endif
             return;
         }
@@ -120,7 +120,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
         if (!go)
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleGossipSelectOptionOpcode - GameObject (GUID: %u) not found.", uint32(GUID_LOPART(guid)));
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleGossipSelectOptionOpcode - GameObject (%s) not found.", guid.ToString().c_str());
 #endif
             return;
         }
@@ -145,7 +145,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleGossipSelectOptionOpcode - unsupported GUID type for highguid %u. lowpart %u.", uint32(GUID_HIPART(guid)), uint32(GUID_LOPART(guid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleGossipSelectOptionOpcode - unsupported GUID type for %s.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -1086,7 +1086,7 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
     if (!player)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_INSPECT: No player found from GUID: " UI64FMTD, guid);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_INSPECT: No player found from %s", guid.ToString().c_str());
 #endif
         return;
     }
@@ -1120,7 +1120,7 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     if (!player)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_INSPECT_HONOR_STATS: No player found from GUID: " UI64FMTD, guid);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_INSPECT_HONOR_STATS: No player found from %s", guid.ToString().c_str());
 #endif
         return;
     }
@@ -1277,7 +1277,8 @@ void WorldSession::HandleComplainOpcode(WorldPacket& recv_data)
     SendPacket(&data);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "REPORT SPAM: type %u, guid %u, unk1 %u, unk2 %u, unk3 %u, unk4 %u, message %s", spam_type, GUID_LOPART(spammer_guid), unk1, unk2, unk3, unk4, description.c_str());
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "REPORT SPAM: type %u, %s, unk1 %u, unk2 %u, unk3 %u, unk4 %u, message %s",
+        spam_type, spammer_guid.ToString().c_str(), unk1, unk2, unk3, unk4, description.c_str());
 #endif
 }
 
@@ -1315,14 +1316,14 @@ void WorldSession::HandleFarSightOpcode(WorldPacket& recvData)
     if (apply)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "Added FarSight " UI64FMTD " to player %u", _player->GetUInt64Value(PLAYER_FARSIGHT), _player->GetGUIDLow());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "Added FarSight %s to player %u", _player->GetGuidValue(PLAYER_FARSIGHT).ToString().c_str(), _player->GetGUIDLow());
 #endif
         if (WorldObject* target = _player->GetViewpoint())
             _player->SetSeer(target);
         else
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outError("Player %s requests non-existing seer " UI64FMTD, _player->GetName().c_str(), _player->GetUInt64Value(PLAYER_FARSIGHT));
+            sLog->outError("Player %s requests non-existing seer %s", _player->GetName().c_str(), _player->GetGuidValue(PLAYER_FARSIGHT).ToString().c_str());
 #endif
         }
     }

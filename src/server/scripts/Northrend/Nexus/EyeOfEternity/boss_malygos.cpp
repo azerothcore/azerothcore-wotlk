@@ -331,7 +331,7 @@ public:
 
             if (me->GetVictim() && me->GetVictim()->GetGUID() == victim->GetGUID() && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
             {
-                if (!me->GetUInt64Value(UNIT_FIELD_TARGET))
+                if (!me->GetGuidValue(UNIT_FIELD_TARGET))
                     me->SetTarget(victim->GetGUID());
             }
             else if (me->Attack(victim, true))
@@ -525,7 +525,7 @@ public:
                                             data << pPlayer->GetPackGUID();
                                             pPlayer->SendMessageToSet(&data, true);
 
-                                            pPlayer->SetUInt64Value(PLAYER_FARSIGHT, vp->GetGUID());
+                                            pPlayer->SetGuidValue(PLAYER_FARSIGHT, vp->GetGUID());
                                             c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                         }
                                     }
@@ -887,7 +887,7 @@ public:
                 plr->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
                 plr->RemoveAura(SPELL_FREEZE_ANIM);
                 plr->SetDisableGravity(false, true);
-                plr->SetUInt64Value(PLAYER_FARSIGHT, 0);;
+                plr->SetGuidValue(PLAYER_FARSIGHT, ObjectGuid::Empty);
             }
         }
 

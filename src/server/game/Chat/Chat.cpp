@@ -316,14 +316,14 @@ bool ChatHandler::ExecuteCommandInTable(std::vector<ChatCommand> const& table, c
                         zoneName = zone->area_name[locale];
                 }
 
-                sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (%ul) (Account: %u) X: %f Y: %f Z: %f Map: %u (%s) Area: %u (%s) Zone: %s Selected: %s (%ul)]",
-                                 fullcmd.c_str(), player->GetName().c_str(), GUID_LOPART(player->GetGUID()),
+                sLog->outCommand(m_session->GetAccountId(), "Command: %s [Player: %s (%s) (Account: %u) X: %f Y: %f Z: %f Map: %u (%s) Area: %u (%s) Zone: %s Selected: %s (%s)]",
+                                 fullcmd.c_str(), player->GetName().c_str(), player->GetGUID().ToString().c_str(),
                                  m_session->GetAccountId(), player->GetPositionX(), player->GetPositionY(),
                                  player->GetPositionZ(), player->GetMapId(),
                                  player->GetMap()->GetMapName(),
                                  areaId, areaName.c_str(), zoneName.c_str(),
                                  (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "",
-                                 GUID_LOPART(guid));
+                                 guid.ToString().c_str());
             }
         }
         // some commands have custom error messages. Don't send the default one in these cases.
@@ -898,7 +898,7 @@ GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid
 
     Player* pl = m_session->GetPlayer();
 
-    GameObject* obj = pl->GetMap()->GetGameObject(MAKE_NEW_GUID(lowguid, entry, HIGHGUID_GAMEOBJECT));
+    GameObject* obj = pl->GetMap()->GetGameObject(ObjectGuid::Create<HighGuid::GameObject>(entry, lowguid));
 
     if (!obj && sObjectMgr->GetGOData(lowguid))                   // guid is DB guid of object
     {
@@ -1051,7 +1051,7 @@ uint64 ChatHandler::extractGuidFromLink(char* text)
                 uint32 lowguid = (uint32)atol(idS);
 
                 if (CreatureData const* data = sObjectMgr->GetCreatureData(lowguid))
-                    return MAKE_NEW_GUID(lowguid, data->id, HIGHGUID_UNIT);
+                    return ObjectGuid::Create<HighGuid::Player>(data->id, lowguid);
                 else
                     return 0;
             }
@@ -1060,7 +1060,7 @@ uint64 ChatHandler::extractGuidFromLink(char* text)
                 uint32 lowguid = (uint32)atol(idS);
 
                 if (GameObjectData const* data = sObjectMgr->GetGOData(lowguid))
-                    return MAKE_NEW_GUID(lowguid, data->id, HIGHGUID_GAMEOBJECT);
+                    return ObjectGuid::Create<HighGuid::Player>(data->id, lowguid);
                 else
                     return 0;
             }

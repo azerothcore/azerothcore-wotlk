@@ -389,7 +389,7 @@ void PetAI::KilledUnit(Unit* victim)
         return;
 
     // Xinef: if pet is channeling a spell and owner killed something different, dont interrupt it
-    if (me->HasUnitState(UNIT_STATE_CASTING) && me->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT) && me->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT) != victim->GetGUID())
+    if (me->HasUnitState(UNIT_STATE_CASTING) && me->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT) && me->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT) != victim->GetGUID())
         return;
 
     // Clear target just in case. May help problem where health / focus / mana
@@ -681,7 +681,7 @@ bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
     // pussywizard: ZOMG! TEMP!
     if (!me->GetCharmInfo())
     {
-        sLog->outMisc("PetAI::CanAttack (A1) - %u, %u", me->GetEntry(), GUID_LOPART(me->GetOwnerGUID()));
+        sLog->outMisc("PetAI::CanAttack (A1) - %u, %s", me->GetEntry(), me->GetOwnerGUID().ToString().c_str());
         return false;
     }
 

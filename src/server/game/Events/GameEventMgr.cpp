@@ -1230,7 +1230,7 @@ void GameEventMgr::UpdateEventNPCFlags(uint16 event_id)
         // get the creature data from the low guid to get the entry, to be able to find out the whole guid
         if (CreatureData const* data = sObjectMgr->GetCreatureData(itr->first))
         {
-            Creature* cr = HashMapHolder<Creature>::Find(MAKE_NEW_GUID(itr->first, data->id, HIGHGUID_UNIT));
+            Creature* cr = HashMapHolder<Creature>::Find(ObjectGuid::Create<HighGuid::Unit>(data->id, itr->first));
             // if we found the creature, modify its npcflag
             if (cr)
             {
@@ -1356,12 +1356,13 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         // check if it's needed by another event, if so, don't remove
         if (event_id > 0 && hasCreatureActiveEventExcept(*itr, event_id))
             continue;
+
         // Remove the creature from grid
         if (CreatureData const* data = sObjectMgr->GetCreatureData(*itr))
         {
             sObjectMgr->RemoveCreatureFromGrid(*itr, data);
 
-            if (Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_UNIT), (Creature*)nullptr))
+            if (Creature* creature = ObjectAccessor::GetObjectInWorld(ObjectGuid::Create<HighGuid::Unit>(data->id, *itr), (Creature*)nullptr))
                 creature->AddObjectToRemoveList();
         }
     }
@@ -1383,7 +1384,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         {
             sObjectMgr->RemoveGameobjectFromGrid(*itr, data);
 
-            if (GameObject* pGameobject = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_GAMEOBJECT), (GameObject*)nullptr))
+            if (GameObject* pGameobject = ObjectAccessor::GetObjectInWorld(ObjectGuid::Create<HighGuid::GameObject>(data->id, *itr), (GameObject*)nullptr))
                 pGameobject->AddObjectToRemoveList();
         }
     }
@@ -1409,7 +1410,7 @@ void GameEventMgr::ChangeEquipOrModel(int16 event_id, bool activate)
             continue;
 
         // Update if spawned
-        Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(itr->first, data->id, HIGHGUID_UNIT), (Creature*)nullptr);
+        Creature* creature = ObjectAccessor::GetObjectInWorld(ObjectGuid::Create<HighGuid::Unit>(data->id, itr->first), (Creature*)nullptr);
         if (creature)
         {
             if (activate)

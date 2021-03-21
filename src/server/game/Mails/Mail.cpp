@@ -129,13 +129,13 @@ void MailDraft::deleteIncludedItems(SQLTransaction& trans, bool inDB /*= false*/
     m_items.clear();
 }
 
-void MailDraft::SendReturnToSender(uint32  /*sender_acc*/, uint32 sender_guid, uint32 receiver_guid, SQLTransaction& trans)
+void MailDraft::SendReturnToSender(uint32  /*sender_acc*/, ObjectGuid sender_guid, ObjectGuid receiver_guid, SQLTransaction& trans)
 {
-    Player* receiver = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(receiver_guid, 0, HIGHGUID_PLAYER));
+    Player* receiver = ObjectAccessor::FindPlayerInOrOutOfWorld(receiver_guid);
 
     uint32 rc_account = 0;
     if (!receiver)
-        rc_account = sObjectMgr->GetPlayerAccountIdByGUID(MAKE_NEW_GUID(receiver_guid, 0, HIGHGUID_PLAYER));
+        rc_account = sObjectMgr->GetPlayerAccountIdByGUID(receiver_guid);
 
     if (!receiver && !rc_account)                            // sender not exist
     {
@@ -178,7 +178,7 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
         return;
 
     Player* pReceiver = receiver.GetPlayer();               // can be nullptr
-    Player* pSender = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(sender.GetSenderId(), 0, HIGHGUID_PLAYER));
+    Player* pSender = ObjectAccessor::FindPlayerInOrOutOfWorld(ObjectGuid::Create<HighGuid::Player>(sender.GetSenderId()));
 
     if (pReceiver)
         prepareItems(pReceiver, trans);                            // generate mail template items

@@ -312,7 +312,8 @@ void Map::SwitchGridContainers(Creature* obj, bool on)
     CellCoord p = acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
     if (!p.IsCoordValid())
     {
-        sLog->outError("Map::SwitchGridContainers: Object " UI64FMTD " has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUID(), obj->GetPositionX(), obj->GetPositionY(), p.x_coord, p.y_coord);
+        sLog->outError("Map::SwitchGridContainers: Object %s has invalid coordinates X:%f Y:%f grid cell [%u:%u]",
+            obj->GetGUID().ToString().c_str(), obj->GetPositionX(), obj->GetPositionY(), p.x_coord, p.y_coord);
         return;
     }
 
@@ -321,7 +322,7 @@ void Map::SwitchGridContainers(Creature* obj, bool on)
         return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("Switch object " UI64FMTD " from grid[%u, %u] %u", obj->GetGUID(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
+    sLog->outStaticDebug("Switch object %s from grid[%u, %u] %u", obj->GetGUID().ToString().c_str(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
 #endif
     NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
     ASSERT(ngrid != nullptr);
@@ -351,7 +352,8 @@ void Map::SwitchGridContainers(GameObject* obj, bool on)
     CellCoord p = acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
     if (!p.IsCoordValid())
     {
-        sLog->outError("Map::SwitchGridContainers: Object " UI64FMTD " has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUID(), obj->GetPositionX(), obj->GetPositionY(), p.x_coord, p.y_coord);
+        sLog->outError("Map::SwitchGridContainers: Object %s has invalid coordinates X:%f Y:%f grid cell [%u:%u]",
+            obj->GetGUID().ToString().c_str(), obj->GetPositionX(), obj->GetPositionY(), p.x_coord, p.y_coord);
         return;
     }
 
@@ -359,7 +361,7 @@ void Map::SwitchGridContainers(GameObject* obj, bool on)
     if (!IsGridLoaded(GridCoord(cell.data.Part.grid_x, cell.data.Part.grid_y)))
         return;
 
-    //TC_LOG_DEBUG(LOG_FILTER_MAPS, "Switch object " UI64FMTD " from grid[%u, %u] %u", obj->GetGUID(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
+    //TC_LOG_DEBUG(LOG_FILTER_MAPS, "Switch object %s from grid[%u, %u] %u", obj->GetGUID().ToString().c_str(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
     NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
     ASSERT(ngrid != nullptr);
 
@@ -540,7 +542,8 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     ASSERT(cellCoord.IsCoordValid());
     if (!cellCoord.IsCoordValid())
     {
-        sLog->outError("Map::Add: Object " UI64FMTD " has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUID(), obj->GetPositionX(), obj->GetPositionY(), cellCoord.x_coord, cellCoord.y_coord);
+        sLog->outError("Map::Add: Object %s has invalid coordinates X:%f Y:%f grid cell [%u:%u]",
+            obj->GetGUID().ToString().c_str(), obj->GetPositionX(), obj->GetPositionY(), cellCoord.x_coord, cellCoord.y_coord);
         return false; //Should delete object
     }
 
@@ -588,7 +591,8 @@ bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
     CellCoord cellCoord = acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
     if (!cellCoord.IsCoordValid())
     {
-        sLog->outError("Map::Add: Object " UI64FMTD " has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUID(), obj->GetPositionX(), obj->GetPositionY(), cellCoord.x_coord, cellCoord.y_coord);
+        sLog->outError("Map::Add: Object %s has invalid coordinates X:%f Y:%f grid cell [%u:%u]",
+            obj->GetGUID().ToString().c_str(), obj->GetPositionX(), obj->GetPositionY(), cellCoord.x_coord, cellCoord.y_coord);
         return false; //Should delete object
     }
 
@@ -2752,10 +2756,10 @@ bool InstanceMap::AddPlayerToMap(Player* player)
             // pussywizard: bind lider also if not yet bound
             if (Group* g = player->GetGroup())
                 if (g->GetLeaderGUID() != player->GetGUID())
-                    if (!sInstanceSaveMgr->PlayerGetBoundInstance(GUID_LOPART(g->GetLeaderGUID()), mapSave->GetMapId(), mapSave->GetDifficulty()))
+                    if (!sInstanceSaveMgr->PlayerGetBoundInstance(g->GetLeaderGUID(), mapSave->GetMapId(), mapSave->GetDifficulty()))
                     {
-                        sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(GUID_LOPART(g->GetLeaderGUID()));
-                        sInstanceSaveMgr->PlayerBindToInstance(GUID_LOPART(g->GetLeaderGUID()), mapSave, false, ObjectAccessor::FindPlayerInOrOutOfWorld(g->GetLeaderGUID()));
+                        sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(g->GetLeaderGUID());
+                        sInstanceSaveMgr->PlayerBindToInstance(g->GetLeaderGUID(), mapSave, false, ObjectAccessor::FindPlayerInOrOutOfWorld(g->GetLeaderGUID()));
                     }
         }
 
@@ -3071,7 +3075,7 @@ GameObject* Map::GetGameObject(uint64 guid)
 
 Transport* Map::GetTransport(uint64 guid)
 {
-    if (GUID_HIPART(guid) != HIGHGUID_MO_TRANSPORT && GUID_HIPART(guid) != HIGHGUID_TRANSPORT)
+    if (guid.GetHigh() != HIGHGUID_MO_TRANSPORT && guid.GetHigh() != HIGHGUID_TRANSPORT)
         return nullptr;
 
     GameObject* go = GetGameObject(guid);
@@ -3318,15 +3322,15 @@ void Map::AllTransportsRemovePassengers()
             (*itr)->RemovePassenger(*((*itr)->GetPassengers().begin()), true);
 }
 
-time_t Map::GetLinkedRespawnTime(uint64 guid) const
+time_t Map::GetLinkedRespawnTime(ObjectGuid guid) const
 {
-    uint64 linkedGuid = sObjectMgr->GetLinkedRespawnGuid(guid);
-    switch (GUID_HIPART(linkedGuid))
+    ObjectGuid linkedGuid = sObjectMgr->GetLinkedRespawnGuid(guid);
+    switch (linkedGuid.GetHigh())
     {
         case HIGHGUID_UNIT:
-            return GetCreatureRespawnTime(GUID_LOPART(linkedGuid));
+            return GetCreatureRespawnTime(linkedGuid);
         case HIGHGUID_GAMEOBJECT:
-            return GetGORespawnTime(GUID_LOPART(linkedGuid));
+            return GetGORespawnTime(linkedGuid);
         default:
             break;
     }

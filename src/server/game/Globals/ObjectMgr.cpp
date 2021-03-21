@@ -280,18 +280,10 @@ bool SpellClickInfo::IsFitToRequirements(Unit const* clicker, Unit const* clicke
 ObjectMgr::ObjectMgr():
     _auctionId(1),
     _equipmentSetGuid(1),
-    _itemTextId(1),
     _mailId(1),
     _hiPetNumber(1),
-    _hiCharGuid(1),
-    _hiCreatureGuid(1),
-    _hiPetGuid(1),
-    _hiVehicleGuid(1),
-    _hiItemGuid(1),
-    _hiGoGuid(1),
-    _hiDoGuid(1),
-    _hiCorpseGuid(1),
-    _hiMoTransGuid(1),
+    _creatureSpawnId(1),
+    _gameObjectSpawnId(1),
     DBCLocaleIndex(LOCALE_enUS)
 {
     for (uint8 i = 0; i < MAX_CLASSES; ++i)
@@ -1446,8 +1438,8 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = MAKE_NEW_GUID(guidLow, slave->id, HIGHGUID_UNIT);
-                    linkedGuid = MAKE_NEW_GUID(linkedGuidLow, master->id, HIGHGUID_UNIT);
+                    guid = ObjectGuid::Create<HighGuid::Unit>(slave->id, guidLow);
+                    linkedGuid = ObjectGuid::Create<HighGuid::Unit>(master->id, linkedGuidLow);
                     break;
                 }
             case CREATURE_TO_GO:
@@ -1483,8 +1475,8 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = MAKE_NEW_GUID(guidLow, slave->id, HIGHGUID_UNIT);
-                    linkedGuid = MAKE_NEW_GUID(linkedGuidLow, master->id, HIGHGUID_GAMEOBJECT);
+                    guid = ObjectGuid::Create<HighGuid::Unit>(slave->id, guidLow);
+                    linkedGuid = ObjectGuid::Create<HighGuid::GameObject>(master->id, linkedGuidLow);
                     break;
                 }
             case GO_TO_GO:
@@ -1520,8 +1512,8 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = MAKE_NEW_GUID(guidLow, slave->id, HIGHGUID_GAMEOBJECT);
-                    linkedGuid = MAKE_NEW_GUID(linkedGuidLow, master->id, HIGHGUID_GAMEOBJECT);
+                    guid = ObjectGuid::Create<HighGuid::GameObject>(slave->id, guidlow);
+                    linkedGuid = ObjectGuid::Create<HighGuid::GameObject>(master->id, linkedGuidLow);
                     break;
                 }
             case GO_TO_CREATURE:
@@ -1557,8 +1549,8 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = MAKE_NEW_GUID(guidLow, slave->id, HIGHGUID_GAMEOBJECT);
-                    linkedGuid = MAKE_NEW_GUID(linkedGuidLow, master->id, HIGHGUID_UNIT);
+                    guid = ObjectGuid::Create<HighGuid::GameObject>(slave->id, guidLow);
+                    linkedGuid = ObjectGuid::Create<HighGuid::Unit>(master->id, linkedGuidLow);
                     break;
                 }
         }
@@ -1576,8 +1568,8 @@ bool ObjectMgr::SetCreatureLinkedRespawn(uint32 guidLow, uint32 linkedGuidLow)
     if (!guidLow)
         return false;
 
-    const CreatureData* master = GetCreatureData(guidLow);
-    uint64 guid = MAKE_NEW_GUID(guidLow, master->id, HIGHGUID_UNIT);
+    CreatureData const* master = GetCreatureData(guidLow);
+    ObjectGuid guid = ObjectGuid::Create<HighGuid::Unit>(master->id, guidLow);
 
     if (!linkedGuidLow) // we're removing the linking
     {
@@ -1588,14 +1580,14 @@ bool ObjectMgr::SetCreatureLinkedRespawn(uint32 guidLow, uint32 linkedGuidLow)
         return true;
     }
 
-    const CreatureData* slave = GetCreatureData(linkedGuidLow);
+    CreatureData const* slave = GetCreatureData(linkedGuidLow);
     if (!slave)
     {
         // sLog->outError("sql.sql", "Creature '%u' linking to non-existent creature '%u'.", guidLow, linkedGuidLow);
         return false;
     }
 
-    const MapEntry* const map = sMapStore.LookupEntry(master->mapid);
+    MapEntry const* map = sMapStore.LookupEntry(master->mapid);
     if (!map || !map->Instanceable() || (master->mapid != slave->mapid))
     {
         sLog->outErrorDb("Creature '%u' linking to '%u' on an unpermitted map.", guidLow, linkedGuidLow);
@@ -1608,7 +1600,7 @@ bool ObjectMgr::SetCreatureLinkedRespawn(uint32 guidLow, uint32 linkedGuidLow)
         return false;
     }
 
-    uint64 linkedGuid = MAKE_NEW_GUID(linkedGuidLow, slave->id, HIGHGUID_UNIT);
+    ObjectGuid linkedGuid = ObjectGuid::Create<HighGuid::Unit>(slave->id, linkedGuidLow);
 
     _linkedRespawnStore[guid] = linkedGuid;
     PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_REP_CREATURE_LINKED_RESPAWN);
@@ -1905,8 +1897,10 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     if (!map)
         return 0;
 
-    uint32 guid = GenerateLowGuid(HIGHGUID_GAMEOBJECT);
-    GameObjectData& data = NewGOData(guid);
+    ObjectGuid::LowType spawnId = GenerateGameObjectSpawnId();
+
+    GameObjectData& data = NewGOData(spawnId);
+    data.spawnId        = spawnId;
     data.id             = entry;
     data.mapid          = mapId;
     data.posX           = x;
@@ -1989,8 +1983,9 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     uint32 level = cInfo->minlevel == cInfo->maxlevel ? cInfo->minlevel : urand(cInfo->minlevel, cInfo->maxlevel); // Only used for extracting creature base stats
     CreatureBaseStats const* stats = GetCreatureBaseStats(level, cInfo->unit_class);
 
-    uint32 guid = GenerateLowGuid(HIGHGUID_UNIT);
-    CreatureData& data = NewOrExistCreatureData(guid);
+    ObjectGuid::LowType spawnId = sObjectMgr->GenerateCreatureSpawnId();
+    CreatureData& data = NewOrExistCreatureData(spawnId);
+    data.spawnMask = spawnId;
     data.id = entry;
     data.mapid = mapId;
     data.displayid = 0;
@@ -2232,7 +2227,7 @@ uint64 ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
 {
     // Get data from global storage
     if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(name))
-        return MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
+        return ObjectGuid::Create<HighGuid::Player>(guidLow);
 
     // No player found
     return 0;
@@ -2241,7 +2236,7 @@ uint64 ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
 bool ObjectMgr::GetPlayerNameByGUID(uint64 guid, std::string& name) const
 {
     // Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(guid)))
+    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
     {
         name = playerData->name;
         return true;
@@ -2253,7 +2248,7 @@ bool ObjectMgr::GetPlayerNameByGUID(uint64 guid, std::string& name) const
 TeamId ObjectMgr::GetPlayerTeamIdByGUID(uint64 guid) const
 {
     // xinef: Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(guid)))
+    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
         return Player::TeamIdForRace(playerData->race);
 
     return TEAM_NEUTRAL;
@@ -2262,7 +2257,7 @@ TeamId ObjectMgr::GetPlayerTeamIdByGUID(uint64 guid) const
 uint32 ObjectMgr::GetPlayerAccountIdByGUID(uint64 guid) const
 {
     // xinef: Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(GUID_LOPART(guid)))
+    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
         return playerData->accountId;
 
     return 0;
@@ -5580,7 +5575,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         m->messageID      = fields[0].GetUInt32();
         m->messageType    = fields[1].GetUInt8();
         m->sender         = fields[2].GetUInt32();
-        m->receiver       = fields[3].GetUInt32();
+        m->receiver       = ObjectGuid::Create<HighGuid::Player>(fields[3].GetUInt32());
         bool has_items    = fields[4].GetBool();
         m->expire_time    = time_t(fields[5].GetUInt32());
         m->deliver_time   = 0;
@@ -5590,7 +5585,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
 
         Player* player = nullptr;
         if (serverUp)
-            player = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(m->receiver, 0, HIGHGUID_PLAYER));
+            player = ObjectAccessor::FindPlayerInOrOutOfWorld(m->receiver);
 
         if (player) // don't modify mails of a logged in player
         {
@@ -6229,39 +6224,21 @@ void ObjectMgr::SetHighestGuids()
 {
     QueryResult result = CharacterDatabase.Query("SELECT MAX(guid) FROM characters");
     if (result)
-        _hiCharGuid = (*result)[0].GetUInt32() + 1;
-
-    result = WorldDatabase.Query("SELECT MAX(guid) FROM creature");
-    if (result)
-    {
-        _hiCreatureGuid = (*result)[0].GetUInt32() + 1;
-        _hiCreatureRecycledGuid = _hiCreatureGuid;
-        _hiCreatureRecycledGuidMax = _hiCreatureRecycledGuid + 10000;
-        _hiCreatureGuid = _hiCreatureRecycledGuidMax + 1;
-    }
+        GetGuidSequenceGenerator<HighGuid::Player>().Set((*result)[0].GetUInt32() + 1);
 
     result = CharacterDatabase.Query("SELECT MAX(guid) FROM item_instance");
     if (result)
-        _hiItemGuid = (*result)[0].GetUInt32() + 1;
+        GetGuidSequenceGenerator<HighGuid::Item>().Set((*result)[0].GetUInt32() + 1);
 
     // Cleanup other tables from not existed guids ( >= _hiItemGuid)
-    CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item >= '%u'", _hiItemGuid);      // One-time query
-    CharacterDatabase.PExecute("DELETE FROM mail_items WHERE item_guid >= '%u'", _hiItemGuid);          // One-time query
-    CharacterDatabase.PExecute("DELETE FROM auctionhouse WHERE itemguid >= '%u'", _hiItemGuid);         // One-time query
-    CharacterDatabase.PExecute("DELETE FROM guild_bank_item WHERE item_guid >= '%u'", _hiItemGuid);     // One-time query
-
-    result = WorldDatabase.Query("SELECT MAX(guid) FROM gameobject");
-    if (result)
-    {
-        _hiGoGuid = (*result)[0].GetUInt32() + 1;
-        _hiGoRecycledGuid = _hiGoGuid;
-        _hiGoRecycledGuidMax = _hiGoRecycledGuid + 1;
-        _hiGoGuid = _hiGoRecycledGuidMax + 1;
-    }
+    CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item >= '%u'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());     // One-time query
+    CharacterDatabase.PExecute("DELETE FROM mail_items WHERE item_guid >= '%u'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());         // One-time query
+    CharacterDatabase.PExecute("DELETE FROM auctionhouse WHERE itemguid >= '%u'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());        // One-time query
+    CharacterDatabase.PExecute("DELETE FROM guild_bank_item WHERE item_guid >= '%u'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());    // One-time query
 
     result = WorldDatabase.Query("SELECT MAX(guid) FROM transports");
     if (result)
-        _hiMoTransGuid = (*result)[0].GetUInt32() + 1;
+        GetGuidSequenceGenerator<HighGuid::Mo_Transport>().Set((*result)[0].GetUInt32() + 1);
 
     result = CharacterDatabase.Query("SELECT MAX(id) FROM auctionhouse");
     if (result)
@@ -6270,10 +6247,6 @@ void ObjectMgr::SetHighestGuids()
     result = CharacterDatabase.Query("SELECT MAX(id) FROM mail");
     if (result)
         _mailId = (*result)[0].GetUInt32() + 1;
-
-    result = CharacterDatabase.Query("SELECT MAX(corpseGuid) FROM corpse");
-    if (result)
-        _hiCorpseGuid = (*result)[0].GetUInt32() + 1;
 
     result = CharacterDatabase.Query("SELECT MAX(arenateamid) FROM arena_team");
     if (result)
@@ -6290,6 +6263,14 @@ void ObjectMgr::SetHighestGuids()
     result = CharacterDatabase.Query("SELECT MAX(guildId) FROM guild");
     if (result)
         sGuildMgr->SetNextGuildId((*result)[0].GetUInt32() + 1);
+
+    result = WorldDatabase.Query("SELECT MAX(guid) FROM creature");
+    if (result)
+        _creatureSpawnId = (*result)[0].GetUInt32() + 1;
+
+    result = WorldDatabase.Query("SELECT MAX(guid) FROM gameobject");
+    if (result)
+        _gameObjectSpawnId = (*result)[0].GetUInt32() + 1;
 }
 
 uint32 ObjectMgr::GenerateAuctionID()
@@ -6323,92 +6304,24 @@ uint32 ObjectMgr::GenerateMailID()
     return _mailId++;
 }
 
-uint32 ObjectMgr::GenerateLowGuid(HighGuid guidhigh)
+uint32 ObjectMgr::GenerateCreatureSpawnId()
 {
-    switch (guidhigh)
+    if (_creatureSpawnId >= uint32(0xFFFFFF))
     {
-        case HIGHGUID_ITEM:
-            {
-                ASSERT(_hiItemGuid < 0xFFFFFFFE && "Item guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiItemGuidMutex);
-                return _hiItemGuid++;
-            }
-        case HIGHGUID_UNIT:
-            {
-                ASSERT(_hiCreatureGuid < 0x00FFFFFE && "Creature guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiCreatureGuidMutex);
-                return _hiCreatureGuid++;
-            }
-        case HIGHGUID_PET:
-            {
-                ASSERT(_hiPetGuid < 0x00FFFFFE && "Pet guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiPetGuidMutex);
-                return _hiPetGuid++;
-            }
-        case HIGHGUID_VEHICLE:
-            {
-                ASSERT(_hiVehicleGuid < 0x00FFFFFF && "Vehicle guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiVehicleGuidMutex);
-                return _hiVehicleGuid++;
-            }
-        case HIGHGUID_PLAYER:
-            {
-                ASSERT(_hiCharGuid < 0xFFFFFFFE && "Player guid overflow!");
-                return _hiCharGuid++;
-            }
-        case HIGHGUID_GAMEOBJECT:
-            {
-                ASSERT(_hiGoGuid < 0x00FFFFFE && "Gameobject guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiGoGuidMutex);
-                return _hiGoGuid++;
-            }
-        case HIGHGUID_CORPSE:
-            {
-                ASSERT(_hiCorpseGuid < 0xFFFFFFFE && "Corpse guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiCorpseGuidMutex);
-                return _hiCorpseGuid++;
-            }
-        case HIGHGUID_DYNAMICOBJECT:
-            {
-                ASSERT(_hiDoGuid < 0xFFFFFFFE && "DynamicObject guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiDoGuidMutex);
-                return _hiDoGuid++;
-            }
-        case HIGHGUID_MO_TRANSPORT:
-            {
-                ASSERT(_hiMoTransGuid < 0xFFFFFFFE && "MO Transport guid overflow!");
-                ACORE_GUARD(ACE_Thread_Mutex, _hiMoTransGuidMutex);
-                return _hiMoTransGuid++;
-            }
-        default:
-            ASSERT(false && "ObjectMgr::GenerateLowGuid - Unknown HIGHGUID type");
-            return 0;
+        sLog->outError("Creature spawn id overflow!! Can't continue, shutting down server. Search on forum for TCE00007 for more info.");
+        World::StopNow(ERROR_EXIT_CODE);
     }
+    return _creatureSpawnId++;
 }
 
-uint32 ObjectMgr::GenerateRecycledLowGuid(HighGuid guidHigh)
+uint32 ObjectMgr::GenerateGameObjectSpawnId()
 {
-    switch (guidHigh)
+    if (_gameObjectSpawnId >= uint32(0xFFFFFF))
     {
-        case HIGHGUID_UNIT:
-            {
-                ASSERT(_hiCreatureRecycledGuid < 0x00FFFFFE && "Creature recycled guid overflow!");
-                if (_hiCreatureRecycledGuid < _hiCreatureRecycledGuidMax)
-                    return _hiCreatureRecycledGuid++;
-                break;
-            }
-        case HIGHGUID_GAMEOBJECT:
-            {
-                ASSERT(_hiGoRecycledGuid < 0x00FFFFFE && "Gameobject recycled guid overflow!");
-                if (_hiGoRecycledGuid < _hiGoRecycledGuidMax)
-                    return _hiGoRecycledGuid++;
-                break;
-            }
-        default: // Default case is not handled by the recycler
-            break;
+        sLog->outError("GameObject spawn id overflow!! Can't continue, shutting down server. Search on forum for TCE00007 for more info. ");
+        World::StopNow(ERROR_EXIT_CODE);
     }
-
-    return GenerateLowGuid(guidHigh);
+    return _gameObjectSpawnId++;
 }
 
 void ObjectMgr::LoadGameObjectLocales()
@@ -9134,8 +9047,7 @@ GameObjectTemplate const* ObjectMgr::GetGameObjectTemplate(uint32 entry)
 
 Player* ObjectMgr::GetPlayerByLowGUID(uint32 lowguid) const
 {
-    uint64 guid = MAKE_NEW_GUID(lowguid, 0, HIGHGUID_PLAYER);
-    return ObjectAccessor::FindPlayer(guid);
+    return ObjectAccessor::FindPlayer(ObjectGuid::Create<HighGuid::Player>(lowguid));
 }
 
 bool ObjectMgr::IsGameObjectStaticTransport(uint32 entry)
