@@ -11,8 +11,8 @@ CREATE TABLE `playercreateinfo_item`
 (
   `race` TINYINT unsigned NOT NULL DEFAULT 0,
   `class` TINYINT unsigned NOT NULL DEFAULT 0,
-  `itemid` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `amount` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `itemid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `amount` SMALLINT unsigned NOT NULL DEFAULT 1,
   `Note` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`race`,`class`,`itemid`),
   KEY `playercreateinfo_race_class_index` (`race`,`class`)

@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `worldstates`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `worldstates` 
 (
-  `entry` int(10) unsigned NOT NULL DEFAULT 0,
-  `value` int(10) unsigned NOT NULL DEFAULT 0,
+  `entry` INT unsigned NOT NULL DEFAULT 0,
+  `value` INT unsigned NOT NULL DEFAULT 0,
   `comment` tinytext DEFAULT NULL,
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Variable Saves';

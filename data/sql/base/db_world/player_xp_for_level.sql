@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `player_xp_for_level`;
 CREATE TABLE `player_xp_for_level` 
 (
   `Level` TINYINT unsigned NOT NULL,
-  `Experience` int(10) unsigned NOT NULL,
+  `Experience` INT unsigned NOT NULL,
   PRIMARY KEY (`Level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

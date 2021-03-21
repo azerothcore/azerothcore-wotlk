@@ -9,17 +9,17 @@ DROP TABLE IF EXISTS `wmoareatable_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `wmoareatable_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `WMOID` int(11) NOT NULL DEFAULT 0,
-  `NameSetID` int(11) NOT NULL DEFAULT 0,
-  `WMOGroupID` int(11) NOT NULL DEFAULT 0,
-  `SoundProviderPref` int(11) NOT NULL DEFAULT 0,
-  `SoundProviderPrefUnderwater` int(11) NOT NULL DEFAULT 0,
-  `AmbienceID` int(11) NOT NULL DEFAULT 0,
-  `ZoneMusic` int(11) NOT NULL DEFAULT 0,
-  `IntroSound` int(11) NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
-  `AreaTableID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `WMOID` INT NOT NULL DEFAULT 0,
+  `NameSetID` INT NOT NULL DEFAULT 0,
+  `WMOGroupID` INT NOT NULL DEFAULT 0,
+  `SoundProviderPref` INT NOT NULL DEFAULT 0,
+  `SoundProviderPrefUnderwater` INT NOT NULL DEFAULT 0,
+  `AmbienceID` INT NOT NULL DEFAULT 0,
+  `ZoneMusic` INT NOT NULL DEFAULT 0,
+  `IntroSound` INT NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
+  `AreaTableID` INT NOT NULL DEFAULT 0,
   `AreaName_Lang_enUS` varchar(100) DEFAULT NULL,
   `AreaName_Lang_enGB` varchar(100) DEFAULT NULL,
   `AreaName_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE `wmoareatable_dbc`
   `AreaName_Lang_ptBR` varchar(100) DEFAULT NULL,
   `AreaName_Lang_itIT` varchar(100) DEFAULT NULL,
   `AreaName_Lang_Unk` varchar(100) DEFAULT NULL,
-  `AreaName_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `AreaName_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

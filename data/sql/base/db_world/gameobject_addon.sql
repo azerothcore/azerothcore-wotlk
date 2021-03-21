@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `gameobject_addon`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `gameobject_addon` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT 0,
+  `guid` INT unsigned NOT NULL DEFAULT 0,
   `invisibilityType` TINYINT unsigned NOT NULL DEFAULT 0,
-  `invisibilityValue` int(10) unsigned NOT NULL DEFAULT 0,
+  `invisibilityValue` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

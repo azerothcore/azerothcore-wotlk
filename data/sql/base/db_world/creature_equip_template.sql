@@ -9,12 +9,12 @@ DROP TABLE IF EXISTS `creature_equip_template`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creature_equip_template` 
 (
-  `CreatureID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `CreatureID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `ID` TINYINT unsigned NOT NULL DEFAULT 1,
-  `ItemID1` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `ItemID2` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `ItemID3` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `VerifiedBuild` smallint(5) DEFAULT 0,
+  `ItemID1` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ItemID2` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ItemID3` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`CreatureID`,`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

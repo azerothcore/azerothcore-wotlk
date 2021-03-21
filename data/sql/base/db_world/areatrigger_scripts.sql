@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `areatrigger_scripts`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `areatrigger_scripts` 
 (
-  `entry` mediumint(8) NOT NULL,
+  `entry` MEDIUMINT NOT NULL,
   `ScriptName` char(64) NOT NULL,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

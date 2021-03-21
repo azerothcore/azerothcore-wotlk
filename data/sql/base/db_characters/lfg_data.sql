@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `lfg_data`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `lfg_data` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `dungeon` int(10) unsigned NOT NULL DEFAULT 0,
+  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
+  `dungeon` INT unsigned NOT NULL DEFAULT 0,
   `state` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='LFG Data';

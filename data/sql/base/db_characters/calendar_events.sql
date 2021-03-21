@@ -9,15 +9,15 @@ DROP TABLE IF EXISTS `calendar_events`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `calendar_events` 
 (
-  `id` bigint(20) unsigned NOT NULL DEFAULT 0,
-  `creator` int(10) unsigned NOT NULL DEFAULT 0,
+  `id` BIGINT unsigned NOT NULL DEFAULT 0,
+  `creator` INT unsigned NOT NULL DEFAULT 0,
   `title` varchar(255) NOT NULL DEFAULT '',
   `description` varchar(255) NOT NULL DEFAULT '',
   `type` TINYINT unsigned NOT NULL DEFAULT 4,
-  `dungeon` int(10) NOT NULL DEFAULT -1,
-  `eventtime` int(10) unsigned NOT NULL DEFAULT 0,
-  `flags` int(10) unsigned NOT NULL DEFAULT 0,
-  `time2` int(10) unsigned NOT NULL DEFAULT 0,
+  `dungeon` INT NOT NULL DEFAULT -1,
+  `eventtime` INT unsigned NOT NULL DEFAULT 0,
+  `flags` INT unsigned NOT NULL DEFAULT 0,
+  `time2` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

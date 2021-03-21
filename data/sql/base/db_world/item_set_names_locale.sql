@@ -9,10 +9,10 @@ DROP TABLE IF EXISTS `item_set_names_locale`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `item_set_names_locale` 
 (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `locale` varchar(4) NOT NULL,
   `Name` text DEFAULT NULL,
-  `VerifiedBuild` smallint(5) DEFAULT 0,
+  `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`ID`,`locale`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;

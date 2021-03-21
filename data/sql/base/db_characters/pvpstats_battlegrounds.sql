@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `pvpstats_battlegrounds`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `pvpstats_battlegrounds` 
 (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id` BIGINT unsigned NOT NULL AUTO_INCREMENT,
   `winner_faction` TINYINT NOT NULL,
   `bracket_id` TINYINT unsigned NOT NULL,
   `type` TINYINT unsigned NOT NULL,

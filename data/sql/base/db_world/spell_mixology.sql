@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `spell_mixology`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spell_mixology` 
 (
-  `entry` mediumint(8) unsigned NOT NULL,
+  `entry` MEDIUMINT unsigned NOT NULL,
   `pctMod` float NOT NULL DEFAULT 30 COMMENT 'bonus multiplier',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED;

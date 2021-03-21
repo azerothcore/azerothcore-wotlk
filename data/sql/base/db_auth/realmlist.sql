@@ -9,18 +9,18 @@ DROP TABLE IF EXISTS `realmlist`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `realmlist` 
 (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` INT unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(32) NOT NULL DEFAULT '',
   `address` varchar(255) NOT NULL DEFAULT '127.0.0.1',
   `localAddress` varchar(255) NOT NULL DEFAULT '127.0.0.1',
   `localSubnetMask` varchar(255) NOT NULL DEFAULT '255.255.255.0',
-  `port` smallint(5) unsigned NOT NULL DEFAULT 8085,
+  `port` SMALLINT unsigned NOT NULL DEFAULT 8085,
   `icon` TINYINT unsigned NOT NULL DEFAULT 0,
   `flag` TINYINT unsigned NOT NULL DEFAULT 2,
   `timezone` TINYINT unsigned NOT NULL DEFAULT 0,
   `allowedSecurityLevel` TINYINT unsigned NOT NULL DEFAULT 0,
   `population` float unsigned NOT NULL DEFAULT 0,
-  `gamebuild` int(10) unsigned NOT NULL DEFAULT 12340,
+  `gamebuild` INT unsigned NOT NULL DEFAULT 12340,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=UTF8MB4 COMMENT='Realm System';

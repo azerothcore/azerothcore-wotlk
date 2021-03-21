@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `waypoints`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `waypoints` 
 (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `pointid` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `pointid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `position_x` float NOT NULL DEFAULT 0,
   `position_y` float NOT NULL DEFAULT 0,
   `position_z` float NOT NULL DEFAULT 0,

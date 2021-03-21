@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `account_banned`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `account_banned` 
 (
-  `id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Account id',
-  `bandate` int(10) unsigned NOT NULL DEFAULT 0,
-  `unbandate` int(10) unsigned NOT NULL DEFAULT 0,
+  `id` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Account id',
+  `bandate` INT unsigned NOT NULL DEFAULT 0,
+  `unbandate` INT unsigned NOT NULL DEFAULT 0,
   `bannedby` varchar(50) NOT NULL,
   `banreason` varchar(255) NOT NULL,
   `active` TINYINT unsigned NOT NULL DEFAULT 1,

@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `mailtemplate_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `mailtemplate_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `Subject_Lang_enUS` varchar(100) DEFAULT NULL,
   `Subject_Lang_enGB` varchar(100) DEFAULT NULL,
   `Subject_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE `mailtemplate_dbc`
   `Subject_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Subject_Lang_itIT` varchar(100) DEFAULT NULL,
   `Subject_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Subject_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Subject_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   `Body_Lang_enUS` varchar(500) DEFAULT NULL,
   `Body_Lang_enGB` varchar(500) DEFAULT NULL,
   `Body_Lang_koKR` varchar(500) DEFAULT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE `mailtemplate_dbc`
   `Body_Lang_ptBR` varchar(500) DEFAULT NULL,
   `Body_Lang_itIT` varchar(500) DEFAULT NULL,
   `Body_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Body_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Body_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

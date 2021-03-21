@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `spell_script_names`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spell_script_names` 
 (
-  `spell_id` int(11) NOT NULL,
+  `spell_id` INT NOT NULL,
   `ScriptName` char(64) NOT NULL,
   UNIQUE KEY `spell_id` (`spell_id`,`ScriptName`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

@@ -9,11 +9,11 @@ DROP TABLE IF EXISTS `gemproperties_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `gemproperties_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Enchant_Id` int(11) NOT NULL DEFAULT 0,
-  `Maxcount_Inv` int(11) NOT NULL DEFAULT 0,
-  `Maxcount_Item` int(11) NOT NULL DEFAULT 0,
-  `Type` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Enchant_Id` INT NOT NULL DEFAULT 0,
+  `Maxcount_Inv` INT NOT NULL DEFAULT 0,
+  `Maxcount_Item` INT NOT NULL DEFAULT 0,
+  `Type` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

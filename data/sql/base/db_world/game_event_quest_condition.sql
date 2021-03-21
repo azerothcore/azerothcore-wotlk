@@ -10,8 +10,8 @@ DROP TABLE IF EXISTS `game_event_quest_condition`;
 CREATE TABLE `game_event_quest_condition` 
 (
   `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event.',
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `condition_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `quest` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `condition_id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `num` float DEFAULT 0,
   PRIMARY KEY (`quest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

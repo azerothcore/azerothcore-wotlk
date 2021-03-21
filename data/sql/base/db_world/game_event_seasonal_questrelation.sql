@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `game_event_seasonal_questrelation`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `game_event_seasonal_questrelation` 
 (
-  `questId` int(10) unsigned NOT NULL COMMENT 'Quest Identifier',
-  `eventEntry` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Entry of the game event',
+  `questId` INT unsigned NOT NULL COMMENT 'Quest Identifier',
+  `eventEntry` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Entry of the game event',
   PRIMARY KEY (`questId`,`eventEntry`),
   KEY `idx_quest` (`questId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 COMMENT='Player System';

@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `instance_template`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `instance_template` 
 (
-  `map` smallint(5) unsigned NOT NULL,
-  `parent` smallint(5) unsigned NOT NULL,
+  `map` SMALLINT unsigned NOT NULL,
+  `parent` SMALLINT unsigned NOT NULL,
   `script` varchar(128) NOT NULL DEFAULT '',
   `allowMount` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`map`)

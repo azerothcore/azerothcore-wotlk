@@ -9,13 +9,13 @@ DROP TABLE IF EXISTS `arena_team_member`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `arena_team_member` 
 (
-  `arenaTeamId` int(10) unsigned NOT NULL DEFAULT 0,
-  `guid` int(10) unsigned NOT NULL DEFAULT 0,
-  `weekGames` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `weekWins` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `seasonGames` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `seasonWins` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `personalRating` smallint(5) NOT NULL DEFAULT 0,
+  `arenaTeamId` INT unsigned NOT NULL DEFAULT 0,
+  `guid` INT unsigned NOT NULL DEFAULT 0,
+  `weekGames` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `weekWins` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `seasonGames` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `seasonWins` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `personalRating` SMALLINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`arenaTeamId`,`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

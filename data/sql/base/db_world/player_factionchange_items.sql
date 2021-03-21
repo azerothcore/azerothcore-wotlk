@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `player_factionchange_items`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `player_factionchange_items` 
 (
-  `alliance_id` int(10) unsigned NOT NULL,
+  `alliance_id` INT unsigned NOT NULL,
   `alliance_comment` text NOT NULL,
-  `horde_id` int(10) unsigned NOT NULL,
+  `horde_id` INT unsigned NOT NULL,
   `horde_comment` text NOT NULL,
   PRIMARY KEY (`alliance_id`,`horde_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
@@ -854,12 +854,12 @@ INSERT INTO `player_factionchange_items` VALUES
 (47193,'Misery\'s End(245)',47322,'Suffering\'s End(245)'),
 (47194,'Footpads of the Icy Floe(245)',47321,'Boots of the Icy Floe(245)'),
 (47195,'Belt of the Forgotten Martyr(245)',47323,'Girdle of the Forgotten Martyr(245)'),
-(47203,'Armbands of the Ashen Saint(245)',47324,'Bindings of the Ashen Saint(245)'),
+(47203,'Armbands of the Ashen SaINT',47324,'Bindings of the Ashen SaINT'),
 (47204,'Chestguard of Flowing Elements(245)',47325,'Cuirass of Flowing Elements(245)'),
 (47205,'Footpads of the Icy Floe(258)',47482,'Boots of the Icy Floe(258)'),
 (47206,'Misery\'s End(258)',47483,'Suffering\'s End(258)'),
 (47207,'Belt of the Forgotten Martyr(258)',47484,'Girdle of the Forgotten Martyr(258)'),
-(47208,'Armbands of the Ashen Saint(258)',47485,'Bindings of the Ashen Saint(258)'),
+(47208,'Armbands of the Ashen SaINT',47485,'Bindings of the Ashen SaINT'),
 (47209,'Chestguard of Flowing Elements(258)',47486,'Cuirass of Flowing Elements(258)'),
 (47223,'Ring of the Darkmender(245)',47278,'Circle of the Darkmender(245)'),
 (47224,'Ring of the Darkmender(258)',47439,'Circle of the Darkmender(258)'),

@@ -9,10 +9,10 @@ DROP TABLE IF EXISTS `character_spell_cooldown`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `character_spell_cooldown` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier, Low part',
-  `spell` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Spell Identifier',
-  `item` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Item Identifier',
-  `time` int(10) unsigned NOT NULL DEFAULT 0,
+  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier, Low part',
+  `spell` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Spell Identifier',
+  `item` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Item Identifier',
+  `time` INT unsigned NOT NULL DEFAULT 0,
   `needSend` TINYINT unsigned NOT NULL DEFAULT 1,
   PRIMARY KEY (`guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

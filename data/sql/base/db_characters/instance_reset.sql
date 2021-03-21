@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `instance_reset`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `instance_reset` 
 (
-  `mapid` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `mapid` SMALLINT unsigned NOT NULL DEFAULT 0,
   `difficulty` TINYINT unsigned NOT NULL DEFAULT 0,
-  `resettime` int(10) unsigned NOT NULL DEFAULT 0,
+  `resettime` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`mapid`,`difficulty`),
   KEY `difficulty` (`difficulty`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

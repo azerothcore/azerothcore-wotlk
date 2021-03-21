@@ -9,18 +9,18 @@ DROP TABLE IF EXISTS `overridespelldata_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `overridespelldata_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Spells_1` int(11) NOT NULL DEFAULT 0,
-  `Spells_2` int(11) NOT NULL DEFAULT 0,
-  `Spells_3` int(11) NOT NULL DEFAULT 0,
-  `Spells_4` int(11) NOT NULL DEFAULT 0,
-  `Spells_5` int(11) NOT NULL DEFAULT 0,
-  `Spells_6` int(11) NOT NULL DEFAULT 0,
-  `Spells_7` int(11) NOT NULL DEFAULT 0,
-  `Spells_8` int(11) NOT NULL DEFAULT 0,
-  `Spells_9` int(11) NOT NULL DEFAULT 0,
-  `Spells_10` int(11) NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Spells_1` INT NOT NULL DEFAULT 0,
+  `Spells_2` INT NOT NULL DEFAULT 0,
+  `Spells_3` INT NOT NULL DEFAULT 0,
+  `Spells_4` INT NOT NULL DEFAULT 0,
+  `Spells_5` INT NOT NULL DEFAULT 0,
+  `Spells_6` INT NOT NULL DEFAULT 0,
+  `Spells_7` INT NOT NULL DEFAULT 0,
+  `Spells_8` INT NOT NULL DEFAULT 0,
+  `Spells_9` INT NOT NULL DEFAULT 0,
+  `Spells_10` INT NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

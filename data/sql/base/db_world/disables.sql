@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `disables`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `disables` 
 (
-  `sourceType` int(10) unsigned NOT NULL,
-  `entry` int(10) unsigned NOT NULL,
+  `sourceType` INT unsigned NOT NULL,
+  `entry` INT unsigned NOT NULL,
   `flags` TINYINT unsigned NOT NULL DEFAULT 0,
   `params_0` varchar(255) NOT NULL DEFAULT '',
   `params_1` varchar(255) NOT NULL DEFAULT '',

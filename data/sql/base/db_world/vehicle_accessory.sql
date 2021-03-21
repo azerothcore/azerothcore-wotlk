@@ -9,13 +9,13 @@ DROP TABLE IF EXISTS `vehicle_accessory`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `vehicle_accessory` 
 (
-  `guid` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `accessory_entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `guid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `accessory_entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `seat_id` TINYINT NOT NULL DEFAULT 0,
   `minion` TINYINT unsigned NOT NULL DEFAULT 0,
   `description` text NOT NULL,
   `summontype` TINYINT unsigned NOT NULL DEFAULT 6 COMMENT 'see enum TempSummonType',
-  `summontimer` int(10) unsigned NOT NULL DEFAULT 30000 COMMENT 'timer, only relevant for certain summontypes',
+  `summontimer` INT unsigned NOT NULL DEFAULT 30000 COMMENT 'timer, only relevant for certain summontypes',
   PRIMARY KEY (`guid`,`seat_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED;
 /*!40101 SET character_set_client = @saved_cs_client */;

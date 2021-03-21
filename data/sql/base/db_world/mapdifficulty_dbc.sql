@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `mapdifficulty_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `mapdifficulty_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `MapID` int(11) NOT NULL DEFAULT 0,
-  `Difficulty` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `MapID` INT NOT NULL DEFAULT 0,
+  `Difficulty` INT NOT NULL DEFAULT 0,
   `Message_Lang_enUS` varchar(200) DEFAULT NULL,
   `Message_Lang_enGB` varchar(200) DEFAULT NULL,
   `Message_Lang_koKR` varchar(200) DEFAULT NULL,
@@ -28,9 +28,9 @@ CREATE TABLE `mapdifficulty_dbc`
   `Message_Lang_ptBR` varchar(200) DEFAULT NULL,
   `Message_Lang_itIT` varchar(200) DEFAULT NULL,
   `Message_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Message_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
-  `RaidDuration` int(11) NOT NULL DEFAULT 0,
-  `MaxPlayers` int(11) NOT NULL DEFAULT 0,
+  `Message_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
+  `RaidDuration` INT NOT NULL DEFAULT 0,
+  `MaxPlayers` INT NOT NULL DEFAULT 0,
   `Difficultystring` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

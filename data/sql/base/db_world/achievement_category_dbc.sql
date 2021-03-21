@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `achievement_category_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `achievement_category_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Parent` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Parent` INT NOT NULL DEFAULT 0,
   `Name_Lang_enUS` varchar(100) DEFAULT NULL,
   `Name_Lang_enGB` varchar(100) DEFAULT NULL,
   `Name_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -27,8 +27,8 @@ CREATE TABLE `achievement_category_dbc`
   `Name_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Name_Lang_itIT` varchar(100) DEFAULT NULL,
   `Name_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Name_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
-  `Ui_Order` int(11) NOT NULL DEFAULT 0,
+  `Name_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
+  `Ui_Order` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;

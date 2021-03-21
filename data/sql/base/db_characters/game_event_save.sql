@@ -11,7 +11,7 @@ CREATE TABLE `game_event_save`
 (
   `eventEntry` TINYINT unsigned NOT NULL,
   `state` TINYINT unsigned NOT NULL DEFAULT 1,
-  `next_start` int(10) unsigned NOT NULL DEFAULT 0,
+  `next_start` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`eventEntry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

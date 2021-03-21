@@ -9,10 +9,10 @@ DROP TABLE IF EXISTS `page_text`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `page_text` 
 (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Text` longtext NOT NULL,
-  `NextPageID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `VerifiedBuild` smallint(5) DEFAULT 0,
+  `NextPageID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 COMMENT='Item System';
 /*!40101 SET character_set_client = @saved_cs_client */;

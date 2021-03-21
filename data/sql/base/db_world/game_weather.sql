@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `game_weather`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `game_weather` 
 (
-  `zone` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `zone` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `spring_rain_chance` TINYINT unsigned NOT NULL DEFAULT 25,
   `spring_snow_chance` TINYINT unsigned NOT NULL DEFAULT 25,
   `spring_storm_chance` TINYINT unsigned NOT NULL DEFAULT 25,

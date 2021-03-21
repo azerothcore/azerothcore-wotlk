@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `realmcharacters`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `realmcharacters` 
 (
-  `realmid` int(10) unsigned NOT NULL DEFAULT 0,
-  `acctid` int(10) unsigned NOT NULL,
+  `realmid` INT unsigned NOT NULL DEFAULT 0,
+  `acctid` INT unsigned NOT NULL,
   `numchars` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`realmid`,`acctid`),
   KEY `acctid` (`acctid`)

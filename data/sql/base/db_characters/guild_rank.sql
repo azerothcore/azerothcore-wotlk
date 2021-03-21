@@ -9,11 +9,11 @@ DROP TABLE IF EXISTS `guild_rank`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `guild_rank` 
 (
-  `guildid` int(10) unsigned NOT NULL DEFAULT 0,
+  `guildid` INT unsigned NOT NULL DEFAULT 0,
   `rid` TINYINT unsigned NOT NULL,
   `rname` varchar(20) NOT NULL DEFAULT '',
-  `rights` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `BankMoneyPerDay` int(10) unsigned NOT NULL DEFAULT 0,
+  `rights` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `BankMoneyPerDay` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guildid`,`rid`),
   KEY `Idx_rid` (`rid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Guild System';

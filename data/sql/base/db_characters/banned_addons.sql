@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `banned_addons`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `banned_addons` 
 (
-  `Id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Id` INT unsigned NOT NULL AUTO_INCREMENT,
   `Name` varchar(255) NOT NULL,
   `Version` varchar(255) NOT NULL DEFAULT '',
   `Timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),

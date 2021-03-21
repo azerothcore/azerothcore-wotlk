@@ -9,10 +9,10 @@ DROP TABLE IF EXISTS `character_action`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `character_action` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT 0,
+  `guid` INT unsigned NOT NULL DEFAULT 0,
   `spec` TINYINT unsigned NOT NULL DEFAULT 0,
   `button` TINYINT unsigned NOT NULL DEFAULT 0,
-  `action` int(10) unsigned NOT NULL DEFAULT 0,
+  `action` INT unsigned NOT NULL DEFAULT 0,
   `type` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`spec`,`button`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

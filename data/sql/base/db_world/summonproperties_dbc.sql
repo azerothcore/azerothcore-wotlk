@@ -9,12 +9,12 @@ DROP TABLE IF EXISTS `summonproperties_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `summonproperties_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Control` int(11) NOT NULL DEFAULT 0,
-  `Faction` int(11) NOT NULL DEFAULT 0,
-  `Title` int(11) NOT NULL DEFAULT 0,
-  `Slot` int(11) NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Control` INT NOT NULL DEFAULT 0,
+  `Faction` INT NOT NULL DEFAULT 0,
+  `Title` INT NOT NULL DEFAULT 0,
+  `Slot` INT NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

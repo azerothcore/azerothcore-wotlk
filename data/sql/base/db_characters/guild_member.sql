@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `guild_member`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `guild_member` 
 (
-  `guildid` int(10) unsigned NOT NULL COMMENT 'Guild Identificator',
-  `guid` int(10) unsigned NOT NULL,
+  `guildid` INT unsigned NOT NULL COMMENT 'Guild Identificator',
+  `guid` INT unsigned NOT NULL,
   `rank` TINYINT unsigned NOT NULL,
   `pnote` varchar(31) NOT NULL DEFAULT '',
   `offnote` varchar(31) NOT NULL DEFAULT '',

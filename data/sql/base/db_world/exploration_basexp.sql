@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `exploration_basexp`;
 CREATE TABLE `exploration_basexp` 
 (
   `level` TINYINT unsigned NOT NULL DEFAULT 0,
-  `basexp` mediumint(8) NOT NULL DEFAULT 0,
+  `basexp` MEDIUMINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED COMMENT='Exploration System';
 /*!40101 SET character_set_client = @saved_cs_client */;

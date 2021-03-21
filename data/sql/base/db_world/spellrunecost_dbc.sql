@@ -9,11 +9,11 @@ DROP TABLE IF EXISTS `spellrunecost_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spellrunecost_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Blood` int(11) NOT NULL DEFAULT 0,
-  `Unholy` int(11) NOT NULL DEFAULT 0,
-  `Frost` int(11) NOT NULL DEFAULT 0,
-  `RunicPower` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Blood` INT NOT NULL DEFAULT 0,
+  `Unholy` INT NOT NULL DEFAULT 0,
+  `Frost` INT NOT NULL DEFAULT 0,
+  `RunicPower` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

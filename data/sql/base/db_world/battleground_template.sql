@@ -9,14 +9,14 @@ DROP TABLE IF EXISTS `battleground_template`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `battleground_template` 
 (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `MinPlayersPerTeam` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `MaxPlayersPerTeam` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `MinPlayersPerTeam` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `MaxPlayersPerTeam` SMALLINT unsigned NOT NULL DEFAULT 0,
   `MinLvl` TINYINT unsigned NOT NULL DEFAULT 0,
   `MaxLvl` TINYINT unsigned NOT NULL DEFAULT 0,
-  `AllianceStartLoc` mediumint(8) unsigned NOT NULL,
+  `AllianceStartLoc` MEDIUMINT unsigned NOT NULL,
   `AllianceStartO` float NOT NULL,
-  `HordeStartLoc` mediumint(8) unsigned NOT NULL,
+  `HordeStartLoc` MEDIUMINT unsigned NOT NULL,
   `HordeStartO` float NOT NULL,
   `StartMaxDist` float NOT NULL DEFAULT 0,
   `Weight` TINYINT unsigned NOT NULL DEFAULT 1,

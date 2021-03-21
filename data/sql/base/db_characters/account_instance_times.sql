@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `account_instance_times`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `account_instance_times` 
 (
-  `accountId` int(10) unsigned NOT NULL,
-  `instanceId` int(10) unsigned NOT NULL DEFAULT 0,
-  `releaseTime` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `accountId` INT unsigned NOT NULL,
+  `instanceId` INT unsigned NOT NULL DEFAULT 0,
+  `releaseTime` BIGINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`accountId`,`instanceId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

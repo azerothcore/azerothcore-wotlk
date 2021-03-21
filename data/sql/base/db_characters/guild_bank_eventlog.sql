@@ -9,15 +9,15 @@ DROP TABLE IF EXISTS `guild_bank_eventlog`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `guild_bank_eventlog` 
 (
-  `guildid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Guild Identificator',
-  `LogGuid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Log record identificator - auxiliary column',
+  `guildid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Guild Identificator',
+  `LogGuid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Log record identificator - auxiliary column',
   `TabId` TINYINT unsigned NOT NULL DEFAULT 0 COMMENT 'Guild bank TabId',
   `EventType` TINYINT unsigned NOT NULL DEFAULT 0 COMMENT 'Event type',
-  `PlayerGuid` int(10) unsigned NOT NULL DEFAULT 0,
-  `ItemOrMoney` int(10) unsigned NOT NULL DEFAULT 0,
-  `ItemStackCount` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `PlayerGuid` INT unsigned NOT NULL DEFAULT 0,
+  `ItemOrMoney` INT unsigned NOT NULL DEFAULT 0,
+  `ItemStackCount` SMALLINT unsigned NOT NULL DEFAULT 0,
   `DestTabId` TINYINT unsigned NOT NULL DEFAULT 0 COMMENT 'Destination Tab Id',
-  `TimeStamp` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Event UNIX time',
+  `TimeStamp` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Event UNIX time',
   PRIMARY KEY (`guildid`,`LogGuid`,`TabId`),
   KEY `guildid_key` (`guildid`),
   KEY `Idx_PlayerGuid` (`PlayerGuid`),

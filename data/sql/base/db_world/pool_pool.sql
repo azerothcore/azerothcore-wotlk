@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `pool_pool`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `pool_pool` 
 (
-  `pool_id` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `mother_pool` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `pool_id` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `mother_pool` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `chance` float NOT NULL DEFAULT 0,
   `description` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`pool_id`)

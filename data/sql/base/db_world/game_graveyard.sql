@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `game_graveyard`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `game_graveyard` 
 (
-  `ID` int(10) NOT NULL DEFAULT 0,
-  `Map` int(10) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Map` INT NOT NULL DEFAULT 0,
   `x` float NOT NULL DEFAULT 0,
   `y` float NOT NULL DEFAULT 0,
   `z` float NOT NULL DEFAULT 0,

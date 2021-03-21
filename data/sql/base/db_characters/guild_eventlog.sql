@@ -9,13 +9,13 @@ DROP TABLE IF EXISTS `guild_eventlog`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `guild_eventlog` 
 (
-  `guildid` int(10) unsigned NOT NULL COMMENT 'Guild Identificator',
-  `LogGuid` int(10) unsigned NOT NULL COMMENT 'Log record identificator - auxiliary column',
+  `guildid` INT unsigned NOT NULL COMMENT 'Guild Identificator',
+  `LogGuid` INT unsigned NOT NULL COMMENT 'Log record identificator - auxiliary column',
   `EventType` TINYINT unsigned NOT NULL COMMENT 'Event type',
-  `PlayerGuid1` int(10) unsigned NOT NULL COMMENT 'Player 1',
-  `PlayerGuid2` int(10) unsigned NOT NULL COMMENT 'Player 2',
+  `PlayerGuid1` INT unsigned NOT NULL COMMENT 'Player 1',
+  `PlayerGuid2` INT unsigned NOT NULL COMMENT 'Player 2',
   `NewRank` TINYINT unsigned NOT NULL COMMENT 'New rank(in case promotion/demotion)',
-  `TimeStamp` int(10) unsigned NOT NULL COMMENT 'Event UNIX time',
+  `TimeStamp` INT unsigned NOT NULL COMMENT 'Event UNIX time',
   PRIMARY KEY (`guildid`,`LogGuid`),
   KEY `Idx_PlayerGuid1` (`PlayerGuid1`),
   KEY `Idx_PlayerGuid2` (`PlayerGuid2`),

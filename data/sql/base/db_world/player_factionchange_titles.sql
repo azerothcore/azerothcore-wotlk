@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `player_factionchange_titles`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `player_factionchange_titles` 
 (
-  `alliance_id` int(8) NOT NULL,
+  `alliance_id` INT NOT NULL,
   `alliance_comment` text DEFAULT NULL,
-  `horde_id` int(8) NOT NULL,
+  `horde_id` INT NOT NULL,
   `horde_comment` text DEFAULT NULL,
   PRIMARY KEY (`alliance_id`,`horde_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

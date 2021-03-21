@@ -9,11 +9,11 @@ DROP TABLE IF EXISTS `item_loot_storage`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `item_loot_storage` 
 (
-  `containerGUID` int(10) unsigned NOT NULL,
-  `itemid` int(10) unsigned NOT NULL,
-  `count` int(10) unsigned NOT NULL,
-  `randomPropertyId` int(10) NOT NULL,
-  `randomSuffix` int(10) unsigned NOT NULL
+  `containerGUID` INT unsigned NOT NULL,
+  `itemid` INT unsigned NOT NULL,
+  `count` INT unsigned NOT NULL,
+  `randomPropertyId` INT NOT NULL,
+  `randomSuffix` INT unsigned NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `character_talent`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `character_talent` 
 (
-  `guid` int(10) unsigned NOT NULL,
-  `spell` mediumint(8) unsigned NOT NULL,
+  `guid` INT unsigned NOT NULL,
+  `spell` MEDIUMINT unsigned NOT NULL,
   `specMask` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

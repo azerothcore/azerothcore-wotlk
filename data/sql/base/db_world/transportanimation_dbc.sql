@@ -9,13 +9,13 @@ DROP TABLE IF EXISTS `transportanimation_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `transportanimation_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `TransportID` int(11) NOT NULL DEFAULT 0,
-  `TimeIndex` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `TransportID` INT NOT NULL DEFAULT 0,
+  `TimeIndex` INT NOT NULL DEFAULT 0,
   `PosX` float NOT NULL DEFAULT 0,
   `PosY` float NOT NULL DEFAULT 0,
   `PosZ` float NOT NULL DEFAULT 0,
-  `SequenceID` int(11) NOT NULL DEFAULT 0,
+  `SequenceID` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

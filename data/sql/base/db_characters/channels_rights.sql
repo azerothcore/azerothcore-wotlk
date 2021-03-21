@@ -10,8 +10,8 @@ DROP TABLE IF EXISTS `channels_rights`;
 CREATE TABLE `channels_rights` 
 (
   `name` varchar(128) NOT NULL,
-  `flags` int(10) unsigned NOT NULL,
-  `speakdelay` int(10) unsigned NOT NULL,
+  `flags` INT unsigned NOT NULL,
+  `speakdelay` INT unsigned NOT NULL,
   `joinmessage` varchar(255) NOT NULL DEFAULT '',
   `delaymessage` varchar(255) NOT NULL DEFAULT '',
   `moderators` text DEFAULT NULL,

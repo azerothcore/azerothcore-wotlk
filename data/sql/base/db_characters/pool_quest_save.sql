@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `pool_quest_save`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `pool_quest_save` 
 (
-  `pool_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `quest_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `pool_id` INT unsigned NOT NULL DEFAULT 0,
+  `quest_id` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`pool_id`,`quest_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `character_spell`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `character_spell` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `spell` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Spell Identifier',
+  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
+  `spell` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Spell Identifier',
   `specMask` TINYINT unsigned NOT NULL DEFAULT 1,
   PRIMARY KEY (`guid`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Player System';

@@ -9,10 +9,10 @@ DROP TABLE IF EXISTS `item_refund_instance`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `item_refund_instance` 
 (
-  `item_guid` int(10) unsigned NOT NULL COMMENT 'Item GUID',
-  `player_guid` int(10) unsigned NOT NULL COMMENT 'Player GUID',
-  `paidMoney` int(10) unsigned NOT NULL DEFAULT 0,
-  `paidExtendedCost` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `item_guid` INT unsigned NOT NULL COMMENT 'Item GUID',
+  `player_guid` INT unsigned NOT NULL COMMENT 'Player GUID',
+  `paidMoney` INT unsigned NOT NULL DEFAULT 0,
+  `paidExtendedCost` SMALLINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`item_guid`,`player_guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Item Refund System';
 /*!40101 SET character_set_client = @saved_cs_client */;

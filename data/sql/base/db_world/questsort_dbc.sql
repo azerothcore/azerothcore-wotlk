@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `questsort_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `questsort_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `SortName_Lang_enUS` varchar(100) DEFAULT NULL,
   `SortName_Lang_enGB` varchar(100) DEFAULT NULL,
   `SortName_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE `questsort_dbc`
   `SortName_Lang_ptBR` varchar(100) DEFAULT NULL,
   `SortName_Lang_itIT` varchar(100) DEFAULT NULL,
   `SortName_Lang_Unk` varchar(100) DEFAULT NULL,
-  `SortName_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `SortName_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `group_member`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `group_member` 
 (
-  `guid` int(10) unsigned NOT NULL,
-  `memberGuid` int(10) unsigned NOT NULL,
+  `guid` INT unsigned NOT NULL,
+  `memberGuid` INT unsigned NOT NULL,
   `memberFlags` TINYINT unsigned NOT NULL DEFAULT 0,
   `subgroup` TINYINT unsigned NOT NULL DEFAULT 0,
   `roles` TINYINT unsigned NOT NULL DEFAULT 0,

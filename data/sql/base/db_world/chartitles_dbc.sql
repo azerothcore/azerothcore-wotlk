@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `chartitles_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `chartitles_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Condition_ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Condition_ID` INT NOT NULL DEFAULT 0,
   `Name_Lang_enUS` varchar(100) DEFAULT NULL,
   `Name_Lang_enGB` varchar(100) DEFAULT NULL,
   `Name_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE `chartitles_dbc`
   `Name_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Name_Lang_itIT` varchar(100) DEFAULT NULL,
   `Name_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Name_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Name_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   `Name1_Lang_enUS` varchar(100) DEFAULT NULL,
   `Name1_Lang_enGB` varchar(100) DEFAULT NULL,
   `Name1_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -44,8 +44,8 @@ CREATE TABLE `chartitles_dbc`
   `Name1_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Name1_Lang_itIT` varchar(100) DEFAULT NULL,
   `Name1_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Name1_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
-  `Mask_ID` int(11) NOT NULL DEFAULT 0,
+  `Name1_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
+  `Mask_ID` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

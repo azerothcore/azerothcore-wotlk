@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `spell_bonus_data`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spell_bonus_data` 
 (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `direct_bonus` float NOT NULL DEFAULT 0,
   `dot_bonus` float NOT NULL DEFAULT 0,
   `ap_bonus` float NOT NULL DEFAULT 0,

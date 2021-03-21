@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `linked_respawn`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `linked_respawn` 
 (
-  `guid` int(10) unsigned NOT NULL COMMENT 'dependent creature',
-  `linkedGuid` int(10) unsigned NOT NULL COMMENT 'master creature',
+  `guid` INT unsigned NOT NULL COMMENT 'dependent creature',
+  `linkedGuid` INT unsigned NOT NULL COMMENT 'master creature',
   `linkType` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`linkType`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=DYNAMIC COMMENT='Creature Respawn Link System';

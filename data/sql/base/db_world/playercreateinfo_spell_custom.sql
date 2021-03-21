@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `playercreateinfo_spell_custom`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `playercreateinfo_spell_custom` 
 (
-  `racemask` int(10) unsigned NOT NULL DEFAULT 0,
-  `classmask` int(10) unsigned NOT NULL DEFAULT 0,
-  `Spell` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `racemask` INT unsigned NOT NULL DEFAULT 0,
+  `classmask` INT unsigned NOT NULL DEFAULT 0,
+  `Spell` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Note` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`racemask`,`classmask`,`Spell`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

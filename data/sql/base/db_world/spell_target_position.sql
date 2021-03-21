@@ -9,14 +9,14 @@ DROP TABLE IF EXISTS `spell_target_position`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spell_target_position` 
 (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Identifier',
   `EffectIndex` TINYINT unsigned NOT NULL DEFAULT 0,
-  `MapID` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `MapID` SMALLINT unsigned NOT NULL DEFAULT 0,
   `PositionX` float NOT NULL DEFAULT 0,
   `PositionY` float NOT NULL DEFAULT 0,
   `PositionZ` float NOT NULL DEFAULT 0,
   `Orientation` float NOT NULL DEFAULT 0,
-  `VerifiedBuild` smallint(5) DEFAULT 0,
+  `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`ID`,`EffectIndex`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED COMMENT='Spell System';
 /*!40101 SET character_set_client = @saved_cs_client */;

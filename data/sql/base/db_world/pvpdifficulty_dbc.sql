@@ -9,12 +9,12 @@ DROP TABLE IF EXISTS `pvpdifficulty_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `pvpdifficulty_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `MapID` int(11) NOT NULL DEFAULT 0,
-  `RangeIndex` int(11) NOT NULL DEFAULT 0,
-  `MinLevel` int(11) NOT NULL DEFAULT 0,
-  `MaxLevel` int(11) NOT NULL DEFAULT 0,
-  `Difficulty` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `MapID` INT NOT NULL DEFAULT 0,
+  `RangeIndex` INT NOT NULL DEFAULT 0,
+  `MinLevel` INT NOT NULL DEFAULT 0,
+  `MaxLevel` INT NOT NULL DEFAULT 0,
+  `Difficulty` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `transportrotation_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `transportrotation_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `GameObjectsID` int(11) NOT NULL DEFAULT 0,
-  `TimeIndex` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `GameObjectsID` INT NOT NULL DEFAULT 0,
+  `TimeIndex` INT NOT NULL DEFAULT 0,
   `RotX` float NOT NULL DEFAULT 0,
   `RotY` float NOT NULL DEFAULT 0,
   `RotZ` float NOT NULL DEFAULT 0,

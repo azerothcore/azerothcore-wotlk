@@ -10,10 +10,10 @@ DROP TABLE IF EXISTS `log_encounter`;
 CREATE TABLE `log_encounter` 
 (
   `time` datetime NOT NULL,
-  `map` smallint(5) unsigned NOT NULL,
+  `map` SMALLINT unsigned NOT NULL,
   `difficulty` TINYINT unsigned NOT NULL,
   `creditType` TINYINT unsigned NOT NULL,
-  `creditEntry` int(10) unsigned NOT NULL,
+  `creditEntry` INT unsigned NOT NULL,
   `playersInfo` text NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

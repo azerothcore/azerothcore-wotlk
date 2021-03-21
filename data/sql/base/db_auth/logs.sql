@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `logs`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `logs` 
 (
-  `time` int(10) unsigned NOT NULL,
-  `realm` int(10) unsigned NOT NULL,
+  `time` INT unsigned NOT NULL,
+  `realm` INT unsigned NOT NULL,
   `type` varchar(250) NOT NULL,
   `level` TINYINT unsigned NOT NULL DEFAULT 0,
   `string` text CHARACTER SET latin1 DEFAULT NULL

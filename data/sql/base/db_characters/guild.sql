@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `guild`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `guild` 
 (
-  `guildid` int(10) unsigned NOT NULL DEFAULT 0,
+  `guildid` INT unsigned NOT NULL DEFAULT 0,
   `name` varchar(24) NOT NULL DEFAULT '',
-  `leaderguid` int(10) unsigned NOT NULL DEFAULT 0,
+  `leaderguid` INT unsigned NOT NULL DEFAULT 0,
   `EmblemStyle` TINYINT unsigned NOT NULL DEFAULT 0,
   `EmblemColor` TINYINT unsigned NOT NULL DEFAULT 0,
   `BorderStyle` TINYINT unsigned NOT NULL DEFAULT 0,
@@ -19,8 +19,8 @@ CREATE TABLE `guild`
   `BackgroundColor` TINYINT unsigned NOT NULL DEFAULT 0,
   `info` varchar(500) NOT NULL DEFAULT '',
   `motd` varchar(128) NOT NULL DEFAULT '',
-  `createdate` int(10) unsigned NOT NULL DEFAULT 0,
-  `BankMoney` bigint(20) unsigned NOT NULL DEFAULT 0,
+  `createdate` INT unsigned NOT NULL DEFAULT 0,
+  `BankMoney` BIGINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guildid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Guild System';
 /*!40101 SET character_set_client = @saved_cs_client */;

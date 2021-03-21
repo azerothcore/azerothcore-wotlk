@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `autobroadcast`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `autobroadcast` 
 (
-  `realmid` int(11) NOT NULL DEFAULT -1,
+  `realmid` INT NOT NULL DEFAULT -1,
   `id` TINYINT unsigned NOT NULL AUTO_INCREMENT,
   `weight` TINYINT unsigned DEFAULT 1,
   `text` longtext NOT NULL,

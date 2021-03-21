@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `account_access`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `account_access` 
 (
-  `id` int(10) unsigned NOT NULL,
+  `id` INT unsigned NOT NULL,
   `gmlevel` TINYINT unsigned NOT NULL,
-  `RealmID` int(11) NOT NULL DEFAULT -1,
+  `RealmID` INT NOT NULL DEFAULT -1,
   `comment` varchar(255) DEFAULT '',
   PRIMARY KEY (`id`,`RealmID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

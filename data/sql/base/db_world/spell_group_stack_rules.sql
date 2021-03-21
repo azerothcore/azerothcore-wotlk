@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `spell_group_stack_rules`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spell_group_stack_rules` 
 (
-  `group_id` int(11) unsigned NOT NULL DEFAULT 0,
+  `group_id` INT unsigned NOT NULL DEFAULT 0,
   `stack_rule` TINYINT NOT NULL DEFAULT 0,
   `description` varchar(150) NOT NULL DEFAULT '',
   PRIMARY KEY (`group_id`)

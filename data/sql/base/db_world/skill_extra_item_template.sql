@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `skill_extra_item_template`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `skill_extra_item_template` 
 (
-  `spellId` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'SpellId of the item creation spell',
-  `requiredSpecialization` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Specialization spell id',
+  `spellId` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'SpellId of the item creation spell',
+  `requiredSpecialization` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Specialization spell id',
   `additionalCreateChance` float NOT NULL DEFAULT 0 COMMENT 'chance to create add',
   `additionalMaxNum` TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`spellId`)

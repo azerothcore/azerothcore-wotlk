@@ -9,17 +9,17 @@ DROP TABLE IF EXISTS `worldmaparea_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `worldmaparea_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `MapID` int(11) NOT NULL DEFAULT 0,
-  `AreaID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `MapID` INT NOT NULL DEFAULT 0,
+  `AreaID` INT NOT NULL DEFAULT 0,
   `AreaName` varchar(100) DEFAULT NULL,
   `LocLeft` float NOT NULL DEFAULT 0,
   `LocRight` float NOT NULL DEFAULT 0,
   `LocTop` float NOT NULL DEFAULT 0,
   `LocBottom` float NOT NULL DEFAULT 0,
-  `DisplayMapID` int(11) NOT NULL DEFAULT 0,
-  `DefaultDungeonFloor` int(11) NOT NULL DEFAULT 0,
-  `ParentWorldMapID` int(11) NOT NULL DEFAULT 0,
+  `DisplayMapID` INT NOT NULL DEFAULT 0,
+  `DefaultDungeonFloor` INT NOT NULL DEFAULT 0,
+  `ParentWorldMapID` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

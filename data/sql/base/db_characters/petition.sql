@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `petition`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `petition` 
 (
-  `ownerguid` int(10) unsigned NOT NULL,
-  `petitionguid` int(10) unsigned DEFAULT 0,
+  `ownerguid` INT unsigned NOT NULL,
+  `petitionguid` INT unsigned DEFAULT 0,
   `name` varchar(24) NOT NULL,
   `type` TINYINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ownerguid`,`type`),

@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `achievement_reward_locale`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `achievement_reward_locale` 
 (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Locale` varchar(4) NOT NULL,
   `Subject` text DEFAULT NULL,
   `Text` text DEFAULT NULL,

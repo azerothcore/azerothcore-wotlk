@@ -9,10 +9,10 @@ DROP TABLE IF EXISTS `guild_bank_item`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `guild_bank_item` 
 (
-  `guildid` int(10) unsigned NOT NULL DEFAULT 0,
+  `guildid` INT unsigned NOT NULL DEFAULT 0,
   `TabId` TINYINT unsigned NOT NULL DEFAULT 0,
   `SlotId` TINYINT unsigned NOT NULL DEFAULT 0,
-  `item_guid` int(10) unsigned NOT NULL DEFAULT 0,
+  `item_guid` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guildid`,`TabId`,`SlotId`),
   KEY `guildid_key` (`guildid`),
   KEY `Idx_item_guid` (`item_guid`)

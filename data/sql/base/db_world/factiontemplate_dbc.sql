@@ -9,20 +9,20 @@ DROP TABLE IF EXISTS `factiontemplate_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `factiontemplate_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Faction` int(11) NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
-  `FactionGroup` int(11) NOT NULL DEFAULT 0,
-  `FriendGroup` int(11) NOT NULL DEFAULT 0,
-  `EnemyGroup` int(11) NOT NULL DEFAULT 0,
-  `Enemies_1` int(11) NOT NULL DEFAULT 0,
-  `Enemies_2` int(11) NOT NULL DEFAULT 0,
-  `Enemies_3` int(11) NOT NULL DEFAULT 0,
-  `Enemies_4` int(11) NOT NULL DEFAULT 0,
-  `Friend_1` int(11) NOT NULL DEFAULT 0,
-  `Friend_2` int(11) NOT NULL DEFAULT 0,
-  `Friend_3` int(11) NOT NULL DEFAULT 0,
-  `Friend_4` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Faction` INT NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
+  `FactionGroup` INT NOT NULL DEFAULT 0,
+  `FriendGroup` INT NOT NULL DEFAULT 0,
+  `EnemyGroup` INT NOT NULL DEFAULT 0,
+  `Enemies_1` INT NOT NULL DEFAULT 0,
+  `Enemies_2` INT NOT NULL DEFAULT 0,
+  `Enemies_3` INT NOT NULL DEFAULT 0,
+  `Enemies_4` INT NOT NULL DEFAULT 0,
+  `Friend_1` INT NOT NULL DEFAULT 0,
+  `Friend_2` INT NOT NULL DEFAULT 0,
+  `Friend_3` INT NOT NULL DEFAULT 0,
+  `Friend_4` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

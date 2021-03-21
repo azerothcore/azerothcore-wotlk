@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `taxinodes_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `taxinodes_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `ContinentID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `ContinentID` INT NOT NULL DEFAULT 0,
   `X` float NOT NULL DEFAULT 0,
   `Y` float NOT NULL DEFAULT 0,
   `Z` float NOT NULL DEFAULT 0,
@@ -30,9 +30,9 @@ CREATE TABLE `taxinodes_dbc`
   `Name_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Name_Lang_itIT` varchar(100) DEFAULT NULL,
   `Name_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Name_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
-  `MountCreatureID_1` int(11) NOT NULL DEFAULT 0,
-  `MountCreatureID_2` int(11) NOT NULL DEFAULT 0,
+  `Name_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
+  `MountCreatureID_1` INT NOT NULL DEFAULT 0,
+  `MountCreatureID_2` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

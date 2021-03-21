@@ -9,15 +9,15 @@ DROP TABLE IF EXISTS `quest_poi`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `quest_poi` 
 (
-  `QuestID` int(10) unsigned NOT NULL DEFAULT 0,
-  `id` int(10) unsigned NOT NULL DEFAULT 0,
-  `ObjectiveIndex` int(11) NOT NULL DEFAULT 0,
-  `MapID` int(10) unsigned NOT NULL DEFAULT 0,
-  `WorldMapAreaId` int(10) unsigned NOT NULL DEFAULT 0,
-  `Floor` int(10) unsigned NOT NULL DEFAULT 0,
-  `Priority` int(10) unsigned NOT NULL DEFAULT 0,
-  `Flags` int(10) unsigned NOT NULL DEFAULT 0,
-  `VerifiedBuild` smallint(5) DEFAULT 0,
+  `QuestID` INT unsigned NOT NULL DEFAULT 0,
+  `id` INT unsigned NOT NULL DEFAULT 0,
+  `ObjectiveIndex` INT NOT NULL DEFAULT 0,
+  `MapID` INT unsigned NOT NULL DEFAULT 0,
+  `WorldMapAreaId` INT unsigned NOT NULL DEFAULT 0,
+  `Floor` INT unsigned NOT NULL DEFAULT 0,
+  `Priority` INT unsigned NOT NULL DEFAULT 0,
+  `Flags` INT unsigned NOT NULL DEFAULT 0,
+  `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`QuestID`,`id`),
   KEY `idx` (`QuestID`,`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

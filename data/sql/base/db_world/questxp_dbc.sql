@@ -9,17 +9,17 @@ DROP TABLE IF EXISTS `questxp_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `questxp_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Difficulty_1` int(11) NOT NULL DEFAULT 0,
-  `Difficulty_2` int(11) NOT NULL DEFAULT 0,
-  `Difficulty_3` int(11) NOT NULL DEFAULT 0,
-  `Difficulty_4` int(11) NOT NULL DEFAULT 0,
-  `Difficulty_5` int(11) NOT NULL DEFAULT 0,
-  `Difficulty_6` int(11) NOT NULL DEFAULT 0,
-  `Difficulty_7` int(11) NOT NULL DEFAULT 0,
-  `Difficulty_8` int(11) NOT NULL DEFAULT 0,
-  `Difficulty_9` int(11) NOT NULL DEFAULT 0,
-  `Difficulty_10` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Difficulty_1` INT NOT NULL DEFAULT 0,
+  `Difficulty_2` INT NOT NULL DEFAULT 0,
+  `Difficulty_3` INT NOT NULL DEFAULT 0,
+  `Difficulty_4` INT NOT NULL DEFAULT 0,
+  `Difficulty_5` INT NOT NULL DEFAULT 0,
+  `Difficulty_6` INT NOT NULL DEFAULT 0,
+  `Difficulty_7` INT NOT NULL DEFAULT 0,
+  `Difficulty_8` INT NOT NULL DEFAULT 0,
+  `Difficulty_9` INT NOT NULL DEFAULT 0,
+  `Difficulty_10` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

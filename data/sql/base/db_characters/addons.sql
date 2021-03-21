@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `addons`;
 CREATE TABLE `addons` 
 (
   `name` varchar(120) NOT NULL DEFAULT '',
-  `crc` int(10) unsigned NOT NULL DEFAULT 0,
+  `crc` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Addons';
 /*!40101 SET character_set_client = @saved_cs_client */;

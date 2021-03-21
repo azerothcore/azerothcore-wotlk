@@ -9,15 +9,15 @@ DROP TABLE IF EXISTS `creaturespelldata_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creaturespelldata_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Spells_1` int(11) NOT NULL DEFAULT 0,
-  `Spells_2` int(11) NOT NULL DEFAULT 0,
-  `Spells_3` int(11) NOT NULL DEFAULT 0,
-  `Spells_4` int(11) NOT NULL DEFAULT 0,
-  `Availability_1` int(11) NOT NULL DEFAULT 0,
-  `Availability_2` int(11) NOT NULL DEFAULT 0,
-  `Availability_3` int(11) NOT NULL DEFAULT 0,
-  `Availability_4` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Spells_1` INT NOT NULL DEFAULT 0,
+  `Spells_2` INT NOT NULL DEFAULT 0,
+  `Spells_3` INT NOT NULL DEFAULT 0,
+  `Spells_4` INT NOT NULL DEFAULT 0,
+  `Availability_1` INT NOT NULL DEFAULT 0,
+  `Availability_2` INT NOT NULL DEFAULT 0,
+  `Availability_3` INT NOT NULL DEFAULT 0,
+  `Availability_4` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

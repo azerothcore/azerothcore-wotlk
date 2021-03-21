@@ -9,16 +9,16 @@ DROP TABLE IF EXISTS `creature_summon_groups`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creature_summon_groups` 
 (
-  `summonerId` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `summonerId` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `summonerType` TINYINT unsigned NOT NULL DEFAULT 0,
   `groupId` TINYINT unsigned NOT NULL DEFAULT 0,
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `position_x` float NOT NULL DEFAULT 0,
   `position_y` float NOT NULL DEFAULT 0,
   `position_z` float NOT NULL DEFAULT 0,
   `orientation` float NOT NULL DEFAULT 0,
   `summonType` TINYINT unsigned NOT NULL DEFAULT 0,
-  `summonTime` int(10) unsigned NOT NULL DEFAULT 0
+  `summonTime` INT unsigned NOT NULL DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

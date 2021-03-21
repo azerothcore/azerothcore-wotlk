@@ -9,10 +9,10 @@ DROP TABLE IF EXISTS `item_set_names`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `item_set_names` 
 (
-  `entry` mediumint(8) unsigned NOT NULL,
+  `entry` MEDIUMINT unsigned NOT NULL,
   `name` varchar(255) NOT NULL DEFAULT '',
   `InventoryType` TINYINT unsigned NOT NULL DEFAULT 0,
-  `VerifiedBuild` smallint(5) DEFAULT 0,
+  `VerifiedBuild` SMALLINT DEFAULT 0,
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -9,11 +9,11 @@ DROP TABLE IF EXISTS `guild_bank_right`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `guild_bank_right` 
 (
-  `guildid` int(10) unsigned NOT NULL DEFAULT 0,
+  `guildid` INT unsigned NOT NULL DEFAULT 0,
   `TabId` TINYINT unsigned NOT NULL DEFAULT 0,
   `rid` TINYINT unsigned NOT NULL DEFAULT 0,
   `gbright` TINYINT unsigned NOT NULL DEFAULT 0,
-  `SlotPerDay` int(10) unsigned NOT NULL DEFAULT 0,
+  `SlotPerDay` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guildid`,`TabId`,`rid`),
   KEY `guildid_key` (`guildid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

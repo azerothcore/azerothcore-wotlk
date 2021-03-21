@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `quest_mail_sender`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `quest_mail_sender` 
 (
-  `QuestId` int(5) unsigned NOT NULL DEFAULT 0,
-  `RewardMailSenderEntry` int(5) unsigned NOT NULL DEFAULT 0,
+  `QuestId` INT unsigned NOT NULL DEFAULT 0,
+  `RewardMailSenderEntry` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`QuestId`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=COMPACT;
 /*!40101 SET character_set_client = @saved_cs_client */;

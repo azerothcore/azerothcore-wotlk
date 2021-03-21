@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `reputation_reward_rate`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `reputation_reward_rate` 
 (
-  `faction` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `faction` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `quest_rate` float NOT NULL DEFAULT 1,
   `quest_daily_rate` float NOT NULL DEFAULT 1,
   `quest_weekly_rate` float NOT NULL DEFAULT 1,

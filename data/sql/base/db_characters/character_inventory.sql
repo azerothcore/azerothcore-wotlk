@@ -9,10 +9,10 @@ DROP TABLE IF EXISTS `character_inventory`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `character_inventory` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `bag` int(10) unsigned NOT NULL DEFAULT 0,
+  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
+  `bag` INT unsigned NOT NULL DEFAULT 0,
   `slot` TINYINT unsigned NOT NULL DEFAULT 0,
-  `item` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Item Global Unique Identifier',
+  `item` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Item Global Unique Identifier',
   PRIMARY KEY (`item`),
   UNIQUE KEY `guid` (`guid`,`bag`,`slot`),
   KEY `idx_guid` (`guid`)

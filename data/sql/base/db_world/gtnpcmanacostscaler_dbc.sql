@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `gtnpcmanacostscaler_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `gtnpcmanacostscaler_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `Data` float NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED;

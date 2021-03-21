@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `areatrigger_teleport`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `areatrigger_teleport` 
 (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Name` text DEFAULT NULL,
-  `target_map` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `target_map` SMALLINT unsigned NOT NULL DEFAULT 0,
   `target_position_x` float NOT NULL DEFAULT 0,
   `target_position_y` float NOT NULL DEFAULT 0,
   `target_position_z` float NOT NULL DEFAULT 0,

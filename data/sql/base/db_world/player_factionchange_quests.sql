@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `player_factionchange_quests`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `player_factionchange_quests` 
 (
-  `alliance_id` int(10) unsigned NOT NULL,
-  `horde_id` int(10) unsigned NOT NULL,
+  `alliance_id` INT unsigned NOT NULL,
+  `horde_id` INT unsigned NOT NULL,
   PRIMARY KEY (`alliance_id`,`horde_id`),
   UNIQUE KEY `alliance_uniq` (`alliance_id`),
   UNIQUE KEY `horde_uniq` (`horde_id`)

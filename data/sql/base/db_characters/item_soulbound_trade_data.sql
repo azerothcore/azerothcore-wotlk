@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `item_soulbound_trade_data`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `item_soulbound_trade_data` 
 (
-  `itemGuid` int(10) unsigned NOT NULL COMMENT 'Item GUID',
+  `itemGuid` INT unsigned NOT NULL COMMENT 'Item GUID',
   `allowedPlayers` text NOT NULL COMMENT 'Space separated GUID list of players who can receive this item in trade',
   PRIMARY KEY (`itemGuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Item Refund System';

@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `talenttab_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `talenttab_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `Name_Lang_enUS` varchar(100) DEFAULT NULL,
   `Name_Lang_enGB` varchar(100) DEFAULT NULL,
   `Name_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -26,12 +26,12 @@ CREATE TABLE `talenttab_dbc`
   `Name_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Name_Lang_itIT` varchar(100) DEFAULT NULL,
   `Name_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Name_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
-  `SpellIconID` int(11) NOT NULL DEFAULT 0,
-  `RaceMask` int(11) NOT NULL DEFAULT 0,
-  `ClassMask` int(11) NOT NULL DEFAULT 0,
-  `PetTalentMask` int(11) NOT NULL DEFAULT 0,
-  `OrderIndex` int(11) NOT NULL DEFAULT 0,
+  `Name_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
+  `SpellIconID` INT NOT NULL DEFAULT 0,
+  `RaceMask` INT NOT NULL DEFAULT 0,
+  `ClassMask` INT NOT NULL DEFAULT 0,
+  `PetTalentMask` INT NOT NULL DEFAULT 0,
+  `OrderIndex` INT NOT NULL DEFAULT 0,
   `BackgroundFile` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

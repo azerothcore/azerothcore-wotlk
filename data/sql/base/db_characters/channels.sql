@@ -9,13 +9,13 @@ DROP TABLE IF EXISTS `channels`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `channels` 
 (
-  `channelId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `channelId` INT unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(128) NOT NULL,
-  `team` int(10) unsigned NOT NULL,
+  `team` INT unsigned NOT NULL,
   `announce` TINYINT unsigned NOT NULL DEFAULT 1,
   `ownership` TINYINT unsigned NOT NULL DEFAULT 1,
   `password` varchar(32) DEFAULT NULL,
-  `lastUsed` int(10) unsigned NOT NULL,
+  `lastUsed` INT unsigned NOT NULL,
   PRIMARY KEY (`channelId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Channel System';
 /*!40101 SET character_set_client = @saved_cs_client */;

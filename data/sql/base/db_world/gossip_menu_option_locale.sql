@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `gossip_menu_option_locale`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `gossip_menu_option_locale` 
 (
-  `MenuID` smallint(6) unsigned NOT NULL DEFAULT 0,
-  `OptionID` smallint(6) unsigned NOT NULL DEFAULT 0,
+  `MenuID` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `OptionID` SMALLINT unsigned NOT NULL DEFAULT 0,
   `Locale` varchar(4) NOT NULL,
   `OptionText` text DEFAULT NULL,
   `BoxText` text DEFAULT NULL,

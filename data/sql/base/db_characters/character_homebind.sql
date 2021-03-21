@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `character_homebind`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `character_homebind` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `mapId` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'Map Identifier',
-  `zoneId` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'Zone Identifier',
+  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
+  `mapId` SMALLINT unsigned NOT NULL DEFAULT 0 COMMENT 'Map Identifier',
+  `zoneId` SMALLINT unsigned NOT NULL DEFAULT 0 COMMENT 'Zone Identifier',
   `posX` float NOT NULL DEFAULT 0,
   `posY` float NOT NULL DEFAULT 0,
   `posZ` float NOT NULL DEFAULT 0,

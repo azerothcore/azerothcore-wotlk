@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `areatrigger`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `areatrigger` 
 (
-  `entry` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `map` int(10) unsigned NOT NULL DEFAULT 0,
+  `entry` INT unsigned NOT NULL AUTO_INCREMENT,
+  `map` INT unsigned NOT NULL DEFAULT 0,
   `x` float NOT NULL DEFAULT 0,
   `y` float NOT NULL DEFAULT 0,
   `z` float NOT NULL DEFAULT 0,

@@ -9,12 +9,12 @@ DROP TABLE IF EXISTS `creature_template_addon`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creature_template_addon` 
 (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `path_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `mount` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `bytes1` int(10) unsigned NOT NULL DEFAULT 0,
-  `bytes2` int(10) unsigned NOT NULL DEFAULT 0,
-  `emote` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `path_id` INT unsigned NOT NULL DEFAULT 0,
+  `mount` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `bytes1` INT unsigned NOT NULL DEFAULT 0,
+  `bytes2` INT unsigned NOT NULL DEFAULT 0,
+  `emote` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `isLarge` TINYINT unsigned NOT NULL DEFAULT 0,
   `auras` text DEFAULT NULL,
   PRIMARY KEY (`entry`)

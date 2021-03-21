@@ -9,12 +9,12 @@ DROP TABLE IF EXISTS `game_tele`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `game_tele` 
 (
-  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `id` MEDIUMINT unsigned NOT NULL AUTO_INCREMENT,
   `position_x` float NOT NULL DEFAULT 0,
   `position_y` float NOT NULL DEFAULT 0,
   `position_z` float NOT NULL DEFAULT 0,
   `orientation` float NOT NULL DEFAULT 0,
-  `map` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `map` SMALLINT unsigned NOT NULL DEFAULT 0,
   `name` varchar(100) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1491 DEFAULT CHARSET=UTF8MB4 COMMENT='Tele Command';

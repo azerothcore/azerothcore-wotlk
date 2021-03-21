@@ -9,10 +9,10 @@ DROP TABLE IF EXISTS `auctionhouse_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `auctionhouse_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `FactionID` int(11) NOT NULL DEFAULT 0,
-  `DepositRate` int(11) NOT NULL DEFAULT 0,
-  `ConsignmentRate` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `FactionID` INT NOT NULL DEFAULT 0,
+  `DepositRate` INT NOT NULL DEFAULT 0,
+  `ConsignmentRate` INT NOT NULL DEFAULT 0,
   `Name_Lang_enUS` varchar(100) DEFAULT NULL,
   `Name_Lang_enGB` varchar(100) DEFAULT NULL,
   `Name_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE `auctionhouse_dbc`
   `Name_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Name_Lang_itIT` varchar(100) DEFAULT NULL,
   `Name_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Name_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Name_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

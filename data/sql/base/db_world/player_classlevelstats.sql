@@ -11,8 +11,8 @@ CREATE TABLE `player_classlevelstats`
 (
   `class` TINYINT unsigned NOT NULL,
   `level` TINYINT unsigned NOT NULL,
-  `basehp` smallint(5) unsigned NOT NULL,
-  `basemana` smallint(5) unsigned NOT NULL,
+  `basehp` SMALLINT unsigned NOT NULL,
+  `basemana` SMALLINT unsigned NOT NULL,
   PRIMARY KEY (`class`,`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 PACK_KEYS=0 COMMENT='Stores levels stats.';
 /*!40101 SET character_set_client = @saved_cs_client */;

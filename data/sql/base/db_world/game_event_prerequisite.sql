@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS `game_event_prerequisite`;
 CREATE TABLE `game_event_prerequisite` 
 (
   `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
-  `prerequisite_event` mediumint(8) unsigned NOT NULL,
+  `prerequisite_event` MEDIUMINT unsigned NOT NULL,
   PRIMARY KEY (`eventEntry`,`prerequisite_event`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

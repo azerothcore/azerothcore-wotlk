@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `cinematiccamera_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `cinematiccamera_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `model` varchar(100) DEFAULT NULL,
-  `soundEntry` int(11) NOT NULL DEFAULT 0,
+  `soundEntry` INT NOT NULL DEFAULT 0,
   `locationX` float NOT NULL DEFAULT 0,
   `locationY` float NOT NULL DEFAULT 0,
   `locationZ` float NOT NULL DEFAULT 0,

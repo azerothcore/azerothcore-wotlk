@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `bugreport`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `bugreport` 
 (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
+  `id` INT unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
   `type` longtext NOT NULL,
   `content` longtext NOT NULL,
   PRIMARY KEY (`id`)

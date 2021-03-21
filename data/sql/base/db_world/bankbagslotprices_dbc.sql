@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `bankbagslotprices_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `bankbagslotprices_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Cost` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Cost` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

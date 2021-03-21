@@ -11,8 +11,8 @@ CREATE TABLE `playercreateinfo`
 (
   `race` TINYINT unsigned NOT NULL DEFAULT 0,
   `class` TINYINT unsigned NOT NULL DEFAULT 0,
-  `map` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `zone` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `map` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `zone` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `position_x` float NOT NULL DEFAULT 0,
   `position_y` float NOT NULL DEFAULT 0,
   `position_z` float NOT NULL DEFAULT 0,

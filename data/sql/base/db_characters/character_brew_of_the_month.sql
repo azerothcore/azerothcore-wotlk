@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `character_brew_of_the_month`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `character_brew_of_the_month` 
 (
-  `guid` int(10) unsigned NOT NULL,
-  `lastEventId` int(10) unsigned NOT NULL DEFAULT 0,
+  `guid` INT unsigned NOT NULL,
+  `lastEventId` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -9,14 +9,14 @@ DROP TABLE IF EXISTS `guild_member_withdraw`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `guild_member_withdraw` 
 (
-  `guid` int(10) unsigned NOT NULL,
-  `tab0` int(10) unsigned NOT NULL DEFAULT 0,
-  `tab1` int(10) unsigned NOT NULL DEFAULT 0,
-  `tab2` int(10) unsigned NOT NULL DEFAULT 0,
-  `tab3` int(10) unsigned NOT NULL DEFAULT 0,
-  `tab4` int(10) unsigned NOT NULL DEFAULT 0,
-  `tab5` int(10) unsigned NOT NULL DEFAULT 0,
-  `money` int(10) unsigned NOT NULL DEFAULT 0,
+  `guid` INT unsigned NOT NULL,
+  `tab0` INT unsigned NOT NULL DEFAULT 0,
+  `tab1` INT unsigned NOT NULL DEFAULT 0,
+  `tab2` INT unsigned NOT NULL DEFAULT 0,
+  `tab3` INT unsigned NOT NULL DEFAULT 0,
+  `tab4` INT unsigned NOT NULL DEFAULT 0,
+  `tab5` INT unsigned NOT NULL DEFAULT 0,
+  `money` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Guild Member Daily Withdraws';
 /*!40101 SET character_set_client = @saved_cs_client */;

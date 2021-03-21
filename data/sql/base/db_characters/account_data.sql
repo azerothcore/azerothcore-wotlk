@@ -9,9 +9,9 @@ DROP TABLE IF EXISTS `account_data`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `account_data` 
 (
-  `accountId` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Account Identifier',
+  `accountId` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Account Identifier',
   `type` TINYINT unsigned NOT NULL DEFAULT 0,
-  `time` int(10) unsigned NOT NULL DEFAULT 0,
+  `time` INT unsigned NOT NULL DEFAULT 0,
   `data` blob NOT NULL,
   PRIMARY KEY (`accountId`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

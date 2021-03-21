@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS `guild_bank_tab`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `guild_bank_tab` 
 (
-  `guildid` int(10) unsigned NOT NULL DEFAULT 0,
+  `guildid` INT unsigned NOT NULL DEFAULT 0,
   `TabId` TINYINT unsigned NOT NULL DEFAULT 0,
   `TabName` varchar(16) NOT NULL DEFAULT '',
   `TabIcon` varchar(100) NOT NULL DEFAULT '',

@@ -9,17 +9,17 @@ DROP TABLE IF EXISTS `taxipathnode_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `taxipathnode_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `PathID` int(11) NOT NULL DEFAULT 0,
-  `NodeIndex` int(11) NOT NULL DEFAULT 0,
-  `ContinentID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `PathID` INT NOT NULL DEFAULT 0,
+  `NodeIndex` INT NOT NULL DEFAULT 0,
+  `ContinentID` INT NOT NULL DEFAULT 0,
   `LocX` float NOT NULL DEFAULT 0,
   `LocY` float NOT NULL DEFAULT 0,
   `LocZ` float NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
-  `Delay` int(11) NOT NULL DEFAULT 0,
-  `ArrivalEventID` int(11) NOT NULL DEFAULT 0,
-  `DepartureEventID` int(11) NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
+  `Delay` INT NOT NULL DEFAULT 0,
+  `ArrivalEventID` INT NOT NULL DEFAULT 0,
+  `DepartureEventID` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

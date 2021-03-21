@@ -9,12 +9,12 @@ DROP TABLE IF EXISTS `gameobject_loot_template`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `gameobject_loot_template` 
 (
-  `Entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Item` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `Reference` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `Entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Item` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `Reference` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Chance` float NOT NULL DEFAULT 100,
   `QuestRequired` TINYINT NOT NULL DEFAULT 0,
-  `LootMode` smallint(5) unsigned NOT NULL DEFAULT 1,
+  `LootMode` SMALLINT unsigned NOT NULL DEFAULT 1,
   `GroupId` TINYINT unsigned NOT NULL DEFAULT 0,
   `MinCount` TINYINT unsigned NOT NULL DEFAULT 1,
   `MaxCount` TINYINT unsigned NOT NULL DEFAULT 1,

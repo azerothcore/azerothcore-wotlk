@@ -9,13 +9,13 @@ DROP TABLE IF EXISTS `itemrandomproperties_dbc`;
 /*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `itemrandomproperties_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `Name` varchar(100) DEFAULT NULL,
-  `Enchantment_1` int(11) NOT NULL DEFAULT 0,
-  `Enchantment_2` int(11) NOT NULL DEFAULT 0,
-  `Enchantment_3` int(11) NOT NULL DEFAULT 0,
-  `Enchantment_4` int(11) NOT NULL DEFAULT 0,
-  `Enchantment_5` int(11) NOT NULL DEFAULT 0,
+  `Enchantment_1` INT NOT NULL DEFAULT 0,
+  `Enchantment_2` INT NOT NULL DEFAULT 0,
+  `Enchantment_3` INT NOT NULL DEFAULT 0,
+  `Enchantment_4` INT NOT NULL DEFAULT 0,
+  `Enchantment_5` INT NOT NULL DEFAULT 0,
   `Name_Lang_enUS` varchar(100) DEFAULT NULL,
   `Name_Lang_enGB` varchar(100) DEFAULT NULL,
   `Name_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE `itemrandomproperties_dbc`
   `Name_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Name_Lang_itIT` varchar(100) DEFAULT NULL,
   `Name_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Name_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Name_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
