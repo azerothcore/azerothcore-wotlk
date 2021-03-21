@@ -29,6 +29,7 @@ SET(_OPENSSL_ROOT_HINTS
   "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\OpenSSL (32-bit)_is1;Inno Setup: App Path]"
   "[HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\OpenSSL (64-bit)_is1;Inno Setup: App Path]"
   "$ENV{OPENSSL_ROOT_DIR}"
+  "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}"
   )
 
 IF(PLATFORM EQUAL 64)
@@ -89,30 +90,34 @@ IF(WIN32 AND NOT CYGWIN)
 
     FIND_LIBRARY(LIB_EAY_DEBUG
       NAMES
-        libcrypto${_OPENSSL_MSVC_ARCH_SUFFIX}MDd libeay32MDd libeay32
+        libcrypto${_OPENSSL_MSVC_ARCH_SUFFIX}MDd libcrypto libeay32MDd libeay32
       PATHS
         ${OPENSSL_ROOT_DIR}/lib/VC
+        ${OPENSSL_ROOT_DIR}/debug/lib
     )
 
     FIND_LIBRARY(LIB_EAY_RELEASE
       NAMES
-        libcrypto${_OPENSSL_MSVC_ARCH_SUFFIX}MD libeay32MD libeay32
+        libcrypto${_OPENSSL_MSVC_ARCH_SUFFIX}MD libcrypto libeay32MD libeay32
       PATHS
         ${OPENSSL_ROOT_DIR}/lib/VC
+        ${OPENSSL_ROOT_DIR}/lib
     )
 
     FIND_LIBRARY(SSL_EAY_DEBUG
       NAMES
-        libssl${_OPENSSL_MSVC_ARCH_SUFFIX}MDd ssleay32MDd ssleay32 ssl
+        libssl${_OPENSSL_MSVC_ARCH_SUFFIX}MDd libssl ssleay32MDd ssleay32 ssl
       PATHS
         ${OPENSSL_ROOT_DIR}/lib/VC
+        ${OPENSSL_ROOT_DIR}/debug/lib
     )
 
     FIND_LIBRARY(SSL_EAY_RELEASE
       NAMES
-        libssl${_OPENSSL_MSVC_ARCH_SUFFIX}MD ssleay32MD ssleay32 ssl
+        libssl${_OPENSSL_MSVC_ARCH_SUFFIX}MD libssl ssleay32MD ssleay32 ssl
       PATHS
         ${OPENSSL_ROOT_DIR}/lib/VC
+        ${OPENSSL_ROOT_DIR}/lib
     )
 
     if( CMAKE_CONFIGURATION_TYPES OR CMAKE_BUILD_TYPE )
