@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -46,7 +46,7 @@ public:
     typedef std::map<std::string, Realm> RealmMap;
 
     RealmList();
-    ~RealmList() { }
+    ~RealmList() = default;
 
     static RealmList* instance();
 
@@ -54,16 +54,16 @@ public:
     void UpdateIfNeed();
     void AddRealm(const Realm& NewRealm) { m_realms[NewRealm.name] = NewRealm; }
 
-    RealmMap::const_iterator begin() const { return m_realms.begin(); }
-    RealmMap::const_iterator end() const { return m_realms.end(); }
-    uint32 size() const { return m_realms.size(); }
+    [[nodiscard]] RealmMap::const_iterator begin() const { return m_realms.begin(); }
+    [[nodiscard]] RealmMap::const_iterator end() const { return m_realms.end(); }
+    [[nodiscard]] uint32 size() const { return m_realms.size(); }
 
 private:
     void UpdateRealms(bool init = false);
     void UpdateRealm(uint32 id, const std::string& name, ACE_INET_Addr const& address, ACE_INET_Addr const& localAddr, ACE_INET_Addr const& localSubmask, uint8 icon, RealmFlags flag, uint8 timezone, AccountTypes allowedSecurityLevel, float popu, uint32 build);
 
     RealmMap m_realms;
-    uint32   m_UpdateInterval;
+    uint32   m_UpdateInterval{0};
     time_t   m_NextUpdateTime;
 };
 

@@ -4,7 +4,7 @@
 /**
  *  @file     MMAP_Memory_Pool.h
  *
- *  @author Dougls C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Dougls C. Schmidt <d.schmidt@vanderbilt.edu>
  *  @author Prashant Jain <pjain@cs.wustl.edu>
  */
 //=============================================================================
@@ -136,8 +136,6 @@ class ACE_Export ACE_MMAP_Memory_Pool : public ACE_Event_Handler
 public:
   typedef ACE_MMAP_Memory_Pool_Options OPTIONS;
 
-  // = Initialization and termination methods.
-
   /// Initialize the pool.
   ACE_MMAP_Memory_Pool (const ACE_TCHAR *backing_store_name = 0,
                         const OPTIONS *options = 0);
@@ -247,9 +245,9 @@ protected:
    * SIGSEGV) will be triggered.  At that point, the ACE_Sig_Handler
    * (which is part of the ACE_Reactor) will catch the signal and
    * dispatch the handle_signal() method defined here.  If the SIGSEGV
-   * signal occurred due to the fact that the mapping wasn't uptodate
+   * signal occurred due to the fact that the mapping wasn't up to date
    * with respect to the backing store, the handler method below will
-   * update the mapping accordingly.  When the signal handler returns,
+   * update the mapping accordingly. When the signal handler returns,
    * the instruction should be restarted and the operation should work.
    */
   virtual int handle_signal (int signum, siginfo_t *, ucontext_t *);
@@ -333,6 +331,10 @@ public:
 
   /// Overwrite the default sync behavior with no-op
   virtual int sync (void *addr, size_t len, int flags = MS_SYNC);
+
+  /// Declare the dynamic allocation hooks.
+  ACE_ALLOC_HOOK_DECLARE;
+
 };
 
 ACE_END_VERSIONED_NAMESPACE_DECL

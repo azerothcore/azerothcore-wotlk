@@ -157,7 +157,7 @@ void ExtractGameobjectModels()
             if (numTris > 0)
             {
                 uint32 i = 0;
-                for (std::vector<Triangle<uint16> >::iterator itr2 = model.Triangles.begin(); itr2 != model.Triangles.end(); ++itr2, ++i)
+                for (std::vector<Triangle<uint16>>::iterator itr2 = model.Triangles.begin(); itr2 != model.Triangles.end(); ++itr2, ++i)
                 {
                     indices[i * 3 + 0] = itr2->V0;
                     indices[i * 3 + 1] = itr2->V1;
@@ -165,7 +165,6 @@ void ExtractGameobjectModels()
                 }
                 fwrite(indices, sizeof(uint16), numTris, output);
             }
-
 
             fwrite("VERT", 4, 1, output);
             wsize = sizeof(int) + sizeof(float) * 3 * numVerts;
@@ -229,7 +228,7 @@ void ExtractGameobjectModels()
                 uint32 mobaBatch = itr2->MOBALength / 12;
                 uint32* MobaEx = new uint32[mobaBatch * 4];
 
-                for(uint32 i = 8; i < itr2->MOBALength; i += 12)
+                for (uint32 i = 8; i < itr2->MOBALength; i += 12)
                     MobaEx[k++] = itr2->MOBA[i];
 
                 int mobaSizeGrp = mobaBatch * 4 + 4;
@@ -400,7 +399,7 @@ int main(int argc, char* argv[])
         m_epos[2] = -end[0];
 
         //
-        dtQueryFilter m_filter;
+        dtQueryFilterExt m_filter;
         m_filter.setIncludeFlags(Constants::POLY_AREA_ROAD | Constants::POLY_AREA_TERRAIN);
         m_filter.setExcludeFlags(Constants::POLY_AREA_WATER);
 

@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "karazhan.h"
 #include "GameObject.h"
+#include "karazhan.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum ShadeOfAran
@@ -92,7 +92,7 @@ public:
         bool ElementalsSpawned;
         bool Drinking;
         bool DrinkInturrupted;
-        void Reset()
+        void Reset() override
         {
             SecondarySpellTimer = 5000;
             NormalCastTimer = 0;
@@ -121,28 +121,26 @@ public:
             instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), true);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
 
             instance->SetData(DATA_ARAN, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), true);
-
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
 
             instance->SetData(DATA_ARAN, IN_PROGRESS);
             instance->HandleGameObject(instance->GetData64(DATA_GO_LIBRARY_DOOR), false);
             DoZoneInCombat();
-
         }
 
         void FlameWreathEffect()
@@ -180,7 +178,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -412,7 +410,6 @@ public:
                     ElementalOne->CombatStart(target);
                     ElementalOne->setFaction(me->getFaction());
                     ElementalOne->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                    ElementalOne->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                     ElementalOne->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
 
@@ -427,7 +424,6 @@ public:
                     ElementalTwo->CombatStart(target);
                     ElementalTwo->setFaction(me->getFaction());
                     ElementalTwo->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                    ElementalTwo->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                     ElementalTwo->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
 
@@ -442,7 +438,6 @@ public:
                     ElementalThree->CombatStart(target);
                     ElementalThree->setFaction(me->getFaction());
                     ElementalThree->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                    ElementalThree->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                     ElementalThree->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
 
@@ -457,7 +452,6 @@ public:
                     ElementalFour->CombatStart(target);
                     ElementalFour->setFaction(me->getFaction());
                     ElementalFour->SetUnitMovementFlags(MOVEMENTFLAG_ROOT);
-                    ElementalFour->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_FROST, true);
                     ElementalFour->SetModifierValue(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, 0);
                 }
 
@@ -515,13 +509,13 @@ public:
                 DoMeleeAttackIfReady();
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!DrinkInturrupted && Drinking && damage)
                 DrinkInturrupted = true;
         }
 
-        void SpellHit(Unit* /*pAttacker*/, const SpellInfo* Spell)
+        void SpellHit(Unit* /*pAttacker*/, const SpellInfo* Spell) override
         {
             //We only care about interrupt effects and only if they are durring a spell currently being cast
             if ((Spell->Effects[0].Effect != SPELL_EFFECT_INTERRUPT_CAST &&
@@ -550,7 +544,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_aranAI>(creature);
     }
@@ -561,7 +555,7 @@ class npc_aran_elemental : public CreatureScript
 public:
     npc_aran_elemental() : CreatureScript("npc_aran_elemental") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new water_elementalAI(creature);
     }
@@ -570,19 +564,18 @@ public:
     {
         water_elementalAI(Creature* creature) : ScriptedAI(creature)
         {
-
         }
 
         uint32 CastTimer;
 
-        void Reset()
+        void Reset() override
         {
             CastTimer = 2000 + (rand() % 3000);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -14,15 +14,14 @@ EndScriptData */
 /* ContentData
 npc_kerlonian
 npc_prospector_remtravel
-npc_threshwackonator
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
-#include "Player.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 // Ours
@@ -44,7 +43,7 @@ class npc_murkdeep : public CreatureScript
 public:
     npc_murkdeep() : CreatureScript("npc_murkdeep") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_murkdeepAI(creature);
     }
@@ -57,7 +56,7 @@ public:
         uint32 spawnTimer;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             spawnTimer = 0;
             phase = 0;
@@ -65,14 +64,14 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.Reset();
             events.ScheduleEvent(EVENT_SPELL_SUNDER_ARMOR, 5000);
             events.ScheduleEvent(EVENT_SPELL_NET, 10000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             spawnTimer += diff;
             if (spawnTimer >= 5000)
@@ -149,7 +148,6 @@ public:
     };
 };
 
-
 // Theirs
 /*####
 # npc_kerlonian
@@ -183,12 +181,12 @@ public:
 
         uint32 FallAsleepTimer;
 
-        void Reset()
+        void Reset() override
         {
             FallAsleepTimer = urand(10000, 45000);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
 
         {
             FollowerAI::MoveInLineOfSight(who);
@@ -210,7 +208,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*pCaster*/, const SpellInfo* pSpell)
+        void SpellHit(Unit* /*pCaster*/, const SpellInfo* pSpell) override
         {
             if (HasFollowState(STATE_FOLLOW_INPROGRESS | STATE_FOLLOW_PAUSED) && pSpell->Id == SPELL_AWAKEN)
                 ClearSleeping();
@@ -238,7 +236,7 @@ public:
             SetFollowPaused(false);
         }
 
-        void UpdateFollowerAI(uint32 diff)
+        void UpdateFollowerAI(uint32 diff) override
         {
             if (!UpdateVictim())
             {
@@ -263,7 +261,7 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_SLEEPER_AWAKENED)
         {
@@ -278,7 +276,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_kerlonianAI(creature);
     }
@@ -320,21 +318,21 @@ public:
     {
         npc_prospector_remtravelAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             if (urand(0, 1))
                 Talk(SAY_REM_AGGRO, who);
         }
 
-        void JustSummoned(Creature* /*pSummoned*/)
+        void JustSummoned(Creature* /*pSummoned*/) override
         {
             //unsure if it should be any
             //pSummoned->AI()->AttackStart(me);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             if (Player* player = GetPlayerForEscort())
             {
@@ -396,7 +394,7 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
     {
         if (quest->GetQuestId() == QUEST_ABSENT_MINDED_PT2)
         {
@@ -409,92 +407,9 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
-    {
-        return new npc_prospector_remtravelAI(creature);
-    }
-};
-
-/*####
-# npc_threshwackonator
-####*/
-
-enum Threshwackonator
-{
-    EMOTE_START             = 0,
-    SAY_AT_CLOSE            = 1,
-    QUEST_GYROMAST_REV      = 2078,
-    NPC_GELKAK              = 6667,
-    FACTION_HOSTILE         = 14
-};
-
-#define GOSSIP_ITEM_INSERT_KEY  "[PH] Insert key"
-
-class npc_threshwackonator : public CreatureScript
-{
-public:
-    npc_threshwackonator() : CreatureScript("npc_threshwackonator") { }
-
-    struct npc_threshwackonatorAI : public FollowerAI
-    {
-        npc_threshwackonatorAI(Creature* creature) : FollowerAI(creature) { }
-
-        void Reset() override { }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            FollowerAI::MoveInLineOfSight(who);
-
-            if (!me->GetVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && who->GetEntry() == NPC_GELKAK)
-            {
-                if (me->IsWithinDistInMap(who, 10.0f))
-                {
-                    Talk(SAY_AT_CLOSE, who);
-                    DoAtEnd();
-                }
-            }
-        }
-
-        void DoAtEnd()
-        {
-            me->setFaction(FACTION_HOSTILE);
-
-            if (Player* pHolder = GetLeaderForFollower())
-                AttackStart(pHolder);
-
-            SetFollowComplete(true);
-        }
-    };
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            CloseGossipMenuFor(player);
-
-            if (npc_threshwackonatorAI* pThreshAI = CAST_AI(npc_threshwackonator::npc_threshwackonatorAI, creature->AI()))
-            {
-                creature->AI()->Talk(EMOTE_START);
-                pThreshAI->StartFollow(player);
-            }
-        }
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_GYROMAST_REV) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_INSERT_KEY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_threshwackonatorAI(creature);
+        return new npc_prospector_remtravelAI(creature);
     }
 };
 
@@ -506,5 +421,4 @@ void AddSC_darkshore()
     // Theirs
     new npc_kerlonian();
     new npc_prospector_remtravel();
-    new npc_threshwackonator();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -68,18 +68,17 @@ struct AuctionEntry
     uint32 factionTemplateId;
 
     // helpers
-    uint32 GetHouseId() const { return auctionHouseEntry->houseId; }
-    uint32 GetHouseFaction() const { return auctionHouseEntry->faction; }
-    uint32 GetAuctionCut() const;
-    uint32 GetAuctionOutBid() const;
+    [[nodiscard]] uint32 GetHouseId() const { return auctionHouseEntry->houseId; }
+    [[nodiscard]] uint32 GetHouseFaction() const { return auctionHouseEntry->faction; }
+    [[nodiscard]] uint32 GetAuctionCut() const;
+    [[nodiscard]] uint32 GetAuctionOutBid() const;
     bool BuildAuctionInfo(WorldPacket& data) const;
     void DeleteFromDB(SQLTransaction& trans) const;
     void SaveToDB(SQLTransaction& trans) const;
     bool LoadFromDB(Field* fields);
     bool LoadFromFieldList(Field* fields);
-    std::string BuildAuctionMailSubject(MailAuctionAnswers response) const;
+    [[nodiscard]] std::string BuildAuctionMailSubject(MailAuctionAnswers response) const;
     static std::string BuildAuctionMailBody(uint32 lowGuid, uint32 bid, uint32 buyout, uint32 deposit, uint32 cut);
-
 };
 
 //this class is used as auctionhouse instance
@@ -90,18 +89,18 @@ public:
     AuctionHouseObject() { next = AuctionsMap.begin(); }
     ~AuctionHouseObject()
     {
-        for (AuctionEntryMap::iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
-            delete itr->second;
+        for (auto & itr : AuctionsMap)
+            delete itr.second;
     }
 
     typedef std::map<uint32, AuctionEntry*> AuctionEntryMap;
 
-    uint32 Getcount() const { return AuctionsMap.size(); }
+    [[nodiscard]] uint32 Getcount() const { return AuctionsMap.size(); }
 
     AuctionEntryMap::iterator GetAuctionsBegin() {return AuctionsMap.begin();}
     AuctionEntryMap::iterator GetAuctionsEnd() {return AuctionsMap.end();}
 
-    AuctionEntry* GetAuction(uint32 id) const
+    [[nodiscard]] AuctionEntry* GetAuction(uint32 id) const
     {
         AuctionEntryMap::const_iterator itr = AuctionsMap.find(id);
         return itr != AuctionsMap.end() ? itr->second : nullptr;
@@ -134,7 +133,6 @@ private:
     ~AuctionHouseMgr();
 
 public:
-
     typedef std::unordered_map<uint32, Item*> ItemMap;
 
     static AuctionHouseMgr* instance();
@@ -163,7 +161,6 @@ public:
     static AuctionHouseEntry const* GetAuctionHouseEntry(uint32 factionTemplateId);
 
 public:
-
     //load first auction items, because of check if item exists, when loading
     void LoadAuctionItems();
     void LoadAuctions();
@@ -174,7 +171,6 @@ public:
     void Update();
 
 private:
-
     AuctionHouseObject mHordeAuctions;
     AuctionHouseObject mAllianceAuctions;
     AuctionHouseObject mNeutralAuctions;

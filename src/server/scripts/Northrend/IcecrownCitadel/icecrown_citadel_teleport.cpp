@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
+#include "icecrown_citadel.h"
+#include "InstanceScript.h"
+#include "Player.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
-#include "InstanceScript.h"
-#include "icecrown_citadel.h"
 #include "Spell.h"
-#include "Player.h"
 
 #define GOSSIP_SENDER_ICC_PORT 631
 
@@ -95,7 +95,7 @@ class at_frozen_throne_teleport : public AreaTriggerScript
 public:
     at_frozen_throne_teleport() : AreaTriggerScript("at_frozen_throne_teleport") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
         if (player->IsInCombat())
         {

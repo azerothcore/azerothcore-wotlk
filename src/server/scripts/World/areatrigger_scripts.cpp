@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -23,22 +23,21 @@ at_brewfest
 at_area_52_entrance
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellMgr.h"
 
 // Ours
 class AreaTrigger_at_voltarus_middle : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_voltarus_middle()
         : AreaTriggerScript("at_voltarus_middle")
     {
     }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (player->IsAlive() && !player->IsInCombat())
             if (player->HasItemCount(39319)) // Scepter of Domination
@@ -50,7 +49,6 @@ public:
         return false;
     }
 };
-
 
 // Theirs
 /*######
@@ -65,13 +63,12 @@ enum CoilfangGOs
 class AreaTrigger_at_coilfang_waterfall : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_coilfang_waterfall()
         : AreaTriggerScript("at_coilfang_waterfall")
     {
     }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (GameObject* go = GetClosestGameObjectWithEntry(player, GO_COILFANG_WATERFALL, 35.0f))
             if (go->getLootState() == GO_READY)
@@ -97,13 +94,12 @@ enum LegionTeleporter
 class AreaTrigger_at_legion_teleporter : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_legion_teleporter()
         : AreaTriggerScript("at_legion_teleporter")
     {
     }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (player->IsAlive() && !player->IsInCombat())
         {
@@ -139,13 +135,12 @@ enum StormwrightShelf
 class AreaTrigger_at_stormwright_shelf : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_stormwright_shelf()
         : AreaTriggerScript("at_stormwright_shelf")
     {
     }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (!player->isDead() && player->GetQuestStatus(QUEST_STRENGTH_OF_THE_TEMPEST) == QUEST_STATUS_INCOMPLETE)
             player->CastSpell(player, SPELL_CREATE_TRUE_POWER_OF_THE_TEMPEST, false);
@@ -167,13 +162,12 @@ enum ScentLarkorwi
 class AreaTrigger_at_scent_larkorwi : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_scent_larkorwi()
         : AreaTriggerScript("at_scent_larkorwi")
     {
     }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (!player->isDead() && player->GetQuestStatus(QUEST_SCENT_OF_LARKORWI) == QUEST_STATUS_INCOMPLETE)
         {
@@ -198,13 +192,12 @@ enum AtLastRites
 class AreaTrigger_at_last_rites : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_last_rites()
         : AreaTriggerScript("at_last_rites")
     {
     }
 
-    bool OnTrigger(Player* player, AreaTrigger const* trigger)
+    bool OnTrigger(Player* player, AreaTrigger const* trigger) override
     {
         QuestStatus QLR = player->GetQuestStatus(QUEST_LAST_RITES);
         QuestStatus QBT = player->GetQuestStatus(QUEST_BREAKING_THROUGH);
@@ -260,10 +253,9 @@ enum Waygate
 class AreaTrigger_at_sholazar_waygate : public AreaTriggerScript
 {
 public:
-
     AreaTrigger_at_sholazar_waygate() : AreaTriggerScript("at_sholazar_waygate") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* trigger)
+    bool OnTrigger(Player* player, AreaTrigger const* trigger) override
     {
         if (!player->isDead() && (player->GetQuestStatus(QUEST_MEETING_A_GREAT_ONE) != QUEST_STATUS_NONE ||
                                   (player->GetQuestStatus(QUEST_THE_MAKERS_OVERLOOK) == QUEST_STATUS_REWARDED && player->GetQuestStatus(QUEST_THE_MAKERS_PERCH) == QUEST_STATUS_REWARDED)))
@@ -300,7 +292,7 @@ class AreaTrigger_at_nats_landing : public AreaTriggerScript
 public:
     AreaTrigger_at_nats_landing() : AreaTriggerScript("at_nats_landing") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (!player->IsAlive() || !player->HasAura(SPELL_FISH_PASTE))
             return false;
@@ -335,7 +327,7 @@ class AreaTrigger_at_sentry_point : public AreaTriggerScript
 public:
     AreaTrigger_at_sentry_point() : AreaTriggerScript("at_sentry_point") { }
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/)
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         auto quest_status = player->GetQuestStatus(QUEST_MISSING_DIPLO_PT14);
         if (!player->IsAlive() || quest_status == QUEST_STATUS_NONE || quest_status == QUEST_STATUS_REWARDED)
@@ -350,7 +342,6 @@ public:
         return true;
     }
 };
-
 
 /*######
 ## at_brewfest
@@ -378,7 +369,7 @@ public:
         _triggerTimes[AT_BREWFEST_DUROTAR] = _triggerTimes[AT_BREWFEST_DUN_MOROGH] = 0;
     }
 
-    bool OnTrigger(Player* player, AreaTrigger const* trigger)
+    bool OnTrigger(Player* player, AreaTrigger const* trigger) override
     {
         uint32 triggerId = trigger->entry;
         // Second trigger happened too early after first, skip for now
@@ -431,7 +422,7 @@ public:
         _triggerTimes[AT_AREA_52_SOUTH] = _triggerTimes[AT_AREA_52_NORTH] = _triggerTimes[AT_AREA_52_WEST] = _triggerTimes[AT_AREA_52_EAST] = 0;
     }
 
-    bool OnTrigger(Player* player, AreaTrigger const* trigger)
+    bool OnTrigger(Player* player, AreaTrigger const* trigger) override
     {
         float x = 0.0f, y = 0.0f, z = 0.0f;
 

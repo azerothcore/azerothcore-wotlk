@@ -2,8 +2,8 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "violet_hold.h"
 
 enum eSpells
@@ -34,7 +34,6 @@ enum Yells
     SAY_BOTH_ADDS_KILLED                        = 5
 };
 
-
 enum eEvents
 {
     EVENT_SPELL_BLOODLUST = 1,
@@ -51,7 +50,7 @@ class boss_erekem : public CreatureScript
 public:
     boss_erekem() : CreatureScript("boss_erekem") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_erekemAI (pCreature);
     }
@@ -66,12 +65,12 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             DoZoneInCombat();
             Talk(SAY_AGGRO);
@@ -94,7 +93,7 @@ public:
                     c->AI()->AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -109,11 +108,11 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_BLOODLUST:
-                    me->CastSpell((Unit*)NULL, SPELL_BLOODLUST, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_BLOODLUST, false);
                     events.RepeatEvent(urand(35000, 45000));
                     break;
                 case EVENT_SPELL_BREAK_BONDS:
-                    me->CastSpell((Unit*)NULL, SPELL_BREAK_BONDS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_BREAK_BONDS, false);
                     events.RepeatEvent(urand(16000, 22000));
                     break;
                 case EVENT_SPELL_CHAIN_HEAL:
@@ -160,23 +159,23 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_BOSS_DIED, 0);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim && victim->GetGUID() == me->GetGUID())
                 return;
             Talk(SAY_SLAY);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
             events.Reset();
@@ -220,13 +219,12 @@ enum eGuardEvents
     EVENT_SPELL_STRIKE
 };
 
-
 class npc_erekem_guard : public CreatureScript
 {
 public:
     npc_erekem_guard() : CreatureScript("npc_erekem_guard") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_erekem_guardAI (pCreature);
     }
@@ -241,12 +239,12 @@ public:
         InstanceScript* pInstance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* who) override
         {
             DoZoneInCombat();
             events.Reset();
@@ -259,7 +257,7 @@ public:
                     c->AI()->AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -290,7 +288,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*who*/) override {}
     };
 };
 

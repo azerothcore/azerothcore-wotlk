@@ -26,9 +26,9 @@
 MySQLConnection::MySQLConnection(MySQLConnectionInfo& connInfo) :
     m_reconnecting(false),
     m_prepareError(false),
-    m_queue(NULL),
-    m_worker(NULL),
-    m_Mysql(NULL),
+    m_queue(nullptr),
+    m_worker(nullptr),
+    m_Mysql(nullptr),
     m_connectionInfo(connInfo),
     m_connectionFlags(CONNECTION_SYNCH)
 {
@@ -38,7 +38,7 @@ MySQLConnection::MySQLConnection(ACE_Activation_Queue* queue, MySQLConnectionInf
     m_reconnecting(false),
     m_prepareError(false),
     m_queue(queue),
-    m_Mysql(NULL),
+    m_Mysql(nullptr),
     m_connectionInfo(connInfo),
     m_connectionFlags(CONNECTION_ASYNC)
 {
@@ -64,7 +64,7 @@ void MySQLConnection::Close()
 bool MySQLConnection::Open()
 {
     MYSQL* mysqlInit;
-    mysqlInit = mysql_init(NULL);
+    mysqlInit = mysql_init(nullptr);
     if (!mysqlInit)
     {
         sLog->outError("Could not initialize Mysql connection to database `%s`", m_connectionInfo.database.c_str());
@@ -307,22 +307,21 @@ bool MySQLConnection::_Query(PreparedStatement* stmt, MYSQL_RES** pResult, uint6
         *pFieldCount = mysql_stmt_field_count(msql_STMT);
 
         return true;
-
     }
 }
 
 ResultSet* MySQLConnection::Query(const char* sql)
 {
     if (!sql)
-        return NULL;
+        return nullptr;
 
-    MYSQL_RES* result = NULL;
-    MYSQL_FIELD* fields = NULL;
+    MYSQL_RES* result = nullptr;
+    MYSQL_FIELD* fields = nullptr;
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
     if (!_Query(sql, &result, &fields, &rowCount, &fieldCount))
-        return NULL;
+        return nullptr;
 
     return new ResultSet(result, fields, rowCount, fieldCount);
 }
@@ -402,29 +401,29 @@ bool MySQLConnection::ExecuteTransaction(SQLTransaction& transaction)
         switch (itr->type)
         {
             case SQL_ELEMENT_PREPARED:
+            {
+                PreparedStatement* stmt = data.element.stmt;
+                ASSERT(stmt);
+                if (!Execute(stmt))
                 {
-                    PreparedStatement* stmt = data.element.stmt;
-                    ASSERT(stmt);
-                    if (!Execute(stmt))
-                    {
-                        sLog->outSQLDriver("[Warning] Transaction aborted. %u queries not executed.", (uint32)queries.size());
-                        RollbackTransaction();
-                        return false;
-                    }
+                    sLog->outSQLDriver("[Warning] Transaction aborted. %u queries not executed.", (uint32)queries.size());
+                    RollbackTransaction();
+                    return false;
                 }
-                break;
+            }
+            break;
             case SQL_ELEMENT_RAW:
+            {
+                const char* sql = data.element.query;
+                ASSERT(sql);
+                if (!Execute(sql))
                 {
-                    const char* sql = data.element.query;
-                    ASSERT(sql);
-                    if (!Execute(sql))
-                    {
-                        sLog->outSQLDriver("[Warning] Transaction aborted. %u queries not executed.", (uint32)queries.size());
-                        RollbackTransaction();
-                        return false;
-                    }
+                    sLog->outSQLDriver("[Warning] Transaction aborted. %u queries not executed.", (uint32)queries.size());
+                    RollbackTransaction();
+                    return false;
                 }
-                break;
+            }
+            break;
         }
     }
 
@@ -461,7 +460,7 @@ void MySQLConnection::PrepareStatement(uint32 index, const char* sql, Connection
     // to save memory that will not be used.
     if (!(m_connectionFlags & flags))
     {
-        m_stmts[index] = NULL;
+        m_stmts[index] = nullptr;
         return;
     }
 
@@ -491,12 +490,12 @@ void MySQLConnection::PrepareStatement(uint32 index, const char* sql, Connection
 
 PreparedResultSet* MySQLConnection::Query(PreparedStatement* stmt)
 {
-    MYSQL_RES* result = NULL;
+    MYSQL_RES* result = nullptr;
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
     if (!_Query(stmt, &result, &rowCount, &fieldCount))
-        return NULL;
+        return nullptr;
 
     if (mysql_more_results(m_Mysql))
     {
@@ -515,26 +514,26 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo)
 #if !(MARIADB_VERSION_ID >= 100200)
         case CR_INVALID_CONN_HANDLE:
 #endif
+        {
+            m_reconnecting = true;
+            uint64 oldThreadId = mysql_thread_id(GetHandle());
+            mysql_close(GetHandle());
+            if (this->Open())                           // Don't remove 'this' pointer unless you want to skip loading all prepared statements....
             {
-                m_reconnecting = true;
-                uint64 oldThreadId = mysql_thread_id(GetHandle());
-                mysql_close(GetHandle());
-                if (this->Open())                           // Don't remove 'this' pointer unless you want to skip loading all prepared statements....
-                {
-                    sLog->outSQLDriver("Connection to the MySQL server is active.");
-                    if (oldThreadId != mysql_thread_id(GetHandle()))
-                        sLog->outSQLDriver("Successfully reconnected to %s @%s:%s (%s).",
-                                           m_connectionInfo.database.c_str(), m_connectionInfo.host.c_str(), m_connectionInfo.port_or_socket.c_str(),
-                                           (m_connectionFlags & CONNECTION_ASYNC) ? "asynchronous" : "synchronous");
+                sLog->outSQLDriver("Connection to the MySQL server is active.");
+                if (oldThreadId != mysql_thread_id(GetHandle()))
+                    sLog->outSQLDriver("Successfully reconnected to %s @%s:%s (%s).",
+                                       m_connectionInfo.database.c_str(), m_connectionInfo.host.c_str(), m_connectionInfo.port_or_socket.c_str(),
+                                       (m_connectionFlags & CONNECTION_ASYNC) ? "asynchronous" : "synchronous");
 
-                    m_reconnecting = false;
-                    return true;
-                }
-
-                uint32 lErrno = mysql_errno(GetHandle());   // It's possible this attempted reconnect throws 2006 at us. To prevent crazy recursive calls, sleep here.
-                std::this_thread::sleep_for(3s);            // Sleep 3 seconds
-                return _HandleMySQLErrno(lErrno);           // Call self (recursive)
+                m_reconnecting = false;
+                return true;
             }
+
+            uint32 lErrno = mysql_errno(GetHandle());   // It's possible this attempted reconnect throws 2006 at us. To prevent crazy recursive calls, sleep here.
+            std::this_thread::sleep_for(3s);            // Sleep 3 seconds
+            return _HandleMySQLErrno(lErrno);           // Call self (recursive)
+        }
 
         case ER_LOCK_DEADLOCK:
             return false;    // Implemented in TransactionTask::Execute and DatabaseWorkerPool<T>::DirectCommitTransaction

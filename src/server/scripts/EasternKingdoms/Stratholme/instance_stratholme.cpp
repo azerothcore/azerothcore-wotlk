@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "InstanceScript.h"
-#include "stratholme.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "stratholme.h"
 
 const Position BlackGuardPos[10] =
 {
@@ -49,7 +49,7 @@ public:
         {
         }
 
-        void Initialize()
+        void Initialize() override
         {
             _baronRunProgress = 0;
             _baronRunTime = 0;
@@ -75,14 +75,14 @@ public:
             events.Reset();
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             if (_baronRunTime > 0)
                 if (Aura* aura = player->AddAura(SPELL_BARON_ULTIMATUM, player))
                     aura->SetDuration(_baronRunTime * MINUTE * IN_MILLISECONDS);
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -137,11 +137,10 @@ public:
                     baron->AI()->Talk(SAY_BARON_GUARD_DEAD);
                 if (GameObject* gate = instance->GetGameObject(_zigguratDoorsGUID5))
                     gate->SetGoState(GO_STATE_ACTIVE);
-
             }
         }
 
-        void OnUnitDeath(Unit* unit)
+        void OnUnitDeath(Unit* unit) override
         {
             switch (unit->GetEntry())
             {
@@ -160,7 +159,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -238,7 +237,6 @@ public:
             if (!player)
                 return;
 
-
             uint32 uiEntry = aPlaguedCritters[urand(0, 2)];
             for (uint8 i = 0; i < 30; ++i)
             {
@@ -250,7 +248,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -319,14 +317,14 @@ public:
             SaveToDB();
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             std::ostringstream saveStream;
             saveStream << "S T " << _baronRunProgress << ' ' << _baronRunTime << ' ' << _zigguratState1 << ' ' << _zigguratState2 << ' ' << _zigguratState3 << ' ' << _slaughterProgress << ' ' << _postboxesOpened;
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
                 return;
@@ -352,7 +350,7 @@ public:
                 events.ScheduleEvent(EVENT_FORCE_SLAUGHTER_EVENT, 5000);
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -368,7 +366,7 @@ public:
             return 0;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             events.Update(diff);
 
@@ -379,7 +377,6 @@ public:
                 // if the gate is in cooldown, skip the other checks
                 if (_gateTrapsCooldown[i])
                     break;
-
 
                 // Check that the trap is not on cooldown, if so check if player/pet is in range
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -586,8 +583,7 @@ public:
         }
     };
 
-
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_stratholme_InstanceMapScript(map);
     }

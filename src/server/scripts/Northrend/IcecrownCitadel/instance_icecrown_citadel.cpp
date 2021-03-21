@@ -2,19 +2,19 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
-#include "ScriptedCreature.h"
-#include "Map.h"
 #include "AccountMgr.h"
+#include "CreatureTextMgr.h"
+#include "Group.h"
 #include "icecrown_citadel.h"
+#include "InstanceScript.h"
+#include "Map.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Transport.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Transport.h"
-#include "Group.h"
-#include "CreatureTextMgr.h"
 
 enum EventIds
 {
@@ -109,12 +109,18 @@ Position const MuradinSpawnPos  = { -47.34549f, 2208.087f, 27.98586f, 3.106686f 
 Position const UtherSpawnPos    = { -26.58507f, 2211.524f, 30.19898f, 3.124139f };
 Position const SylvanasSpawnPos = { -41.45833f, 2222.891f, 27.98586f, 3.647738f };
 
+// Set position traps Spirit Alarm
+std::vector<Position> GoSpiritAlarm_1 = { { -160.96f, 2210.46f, 35.24f, 0.0f }, { -176.27f, 2201.93f, 35.24f, 0.0f}, { -207.83f, 2207.38f, 35.24f, 0.0f } };
+std::vector<Position> GoSpiritAlarm_2 = { { -178.41f, 2225.11f, 35.24f, 0.0f }, { -195.23f, 2221.55f, 35.24f, 0.0f}, { -209.94f, 2250.34f, 37.99f, 0.0f } };
+std::vector<Position> GoSpiritAlarm_3 = { { -289.80f, 2216.60f, 42.39f, 0.0f }, { -317.76f, 2216.11f, 42.57f, 0.0f}, { -301.07f, 2216.62f, 42.0f, 0.0f } };
+std::vector<Position> GoSpiritAlarm_4 = { { -276.07f, 2206.76f, 42.57f, 0.0f }, { -304.44f, 2199.11f, 41.99f, 0.0f}, { -292.82f, 2204.61f, 42.02f, 0.0f } };
+
 class RespawnEvent : public BasicEvent
 {
 public:
     RespawnEvent(Creature& owner) : _owner(owner) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         _owner.RemoveCorpse(false);
         _owner.Respawn();
@@ -130,7 +136,7 @@ class DelayedCastMincharEvent : public BasicEvent
 public:
     DelayedCastMincharEvent(Creature* trigger, uint32 spellId) : _trigger(trigger), _spellId(spellId) {}
 
-    bool Execute(uint64 /*time*/, uint32 /*diff*/)
+    bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
         if (Creature* minchar = _trigger->FindNearestCreature(NPC_INFILTRATOR_MINCHAR_BQ, 50.0f, true))
             _trigger->CastSpell(minchar, _spellId, true);
@@ -221,7 +227,7 @@ public:
             BloodPrinceTrashCount = 0;
         }
 
-        void FillInitialWorldStates(WorldPacket& data)
+        void FillInitialWorldStates(WorldPacket& data) override
         {
             if (instance->IsHeroic())
             {
@@ -233,7 +239,7 @@ public:
             }
         }
 
-        void OnPlayerAreaUpdate(Player* player, uint32  /*oldArea*/, uint32 newArea)
+        void OnPlayerAreaUpdate(Player* player, uint32  /*oldArea*/, uint32 newArea) override
         {
             if (newArea == 4890 /*Putricide's Laboratory of Alchemical Horrors and Fun*/ ||
                     newArea == 4891 /*The Sanctum of Blood*/ ||
@@ -249,7 +255,7 @@ public:
             }
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
                 TeamIdInInstance = player->GetTeamId();
@@ -262,7 +268,7 @@ public:
                 SpawnGunship();
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -503,13 +509,13 @@ public:
             }
         }
 
-        void OnCreatureRemove(Creature* creature)
+        void OnCreatureRemove(Creature* creature) override
         {
             if (creature->GetEntry() == NPC_SINDRAGOSA)
                 SindragosaGUID = 0;
         }
 
-        uint32 GetCreatureEntry(uint32 /*guidLow*/, CreatureData const* data)
+        uint32 GetCreatureEntry(uint32 /*guidLow*/, CreatureData const* data) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -554,7 +560,7 @@ public:
             return entry;
         }
 
-        uint32 GetGameObjectEntry(uint32 /*guidLow*/, uint32 entry)
+        uint32 GetGameObjectEntry(uint32 /*guidLow*/, uint32 entry) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -585,7 +591,7 @@ public:
             return entry;
         }
 
-        void OnUnitDeath(Unit* unit)
+        void OnUnitDeath(Unit* unit) override
         {
             Creature* creature = unit->ToCreature();
             if (!creature)
@@ -658,7 +664,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -674,14 +680,7 @@ public:
                 case GO_SPIRIT_ALARM_2:
                 case GO_SPIRIT_ALARM_3:
                 case GO_SPIRIT_ALARM_4:
-                    {
-                        Position pos[4 * 3] = {{-160.96f, 2210.46f, 35.24f, 0.0f}, {-176.27f, 2201.93f, 35.24f, 0.0f}, {-207.83f, 2207.38f, 35.24f, 0.0f},
-                            {-178.41f, 2225.11f, 35.24f, 0.0f}, {-195.23f, 2221.55f, 35.24f, 0.0f}, {-209.94f, 2250.34f, 37.99f, 0.0f},
-                            {-289.80f, 2216.60f, 42.39f, 0.0f}, {-317.76f, 2216.11f, 42.57f, 0.0f}, {-301.07f, 2216.62f, 42.0f, 0.0f},
-                            {-276.07f, 2206.76f, 42.57f, 0.0f}, {-304.44f, 2199.11f, 41.99f, 0.0f}, {-292.82f, 2204.61f, 42.02f, 0.0f}
-                        };
-                        go->SetPosition(pos[3 * (go->GetEntry() - GO_SPIRIT_ALARM_1) + urand(0, 2)]);
-                    }
+                    SetPositionTraps(go);
                     break;
                 case GO_GEIST_ALARM_1:
                 case GO_GEIST_ALARM_2:
@@ -862,7 +861,7 @@ public:
             }
         }
 
-        void OnGameObjectRemove(GameObject* go)
+        void OnGameObjectRemove(GameObject* go) override
         {
             switch (go->GetEntry())
             {
@@ -901,7 +900,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 type) const
+        uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
@@ -942,7 +941,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const
+        uint64 GetData64(uint32 type) const override
         {
             switch (type)
             {
@@ -1052,7 +1051,7 @@ public:
                     _player->DestroyItemCount(ITEM_GOBLIN_ROCKET_PACK, _player->GetItemCount(ITEM_GOBLIN_ROCKET_PACK), true);
         }
 
-        bool SetBossState(uint32 type, EncounterState state)
+        bool SetBossState(uint32 type, EncounterState state) override
         {
             if (!InstanceScript::SetBossState(type, state))
                 return false;
@@ -1224,7 +1223,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -1391,7 +1390,7 @@ public:
             }
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/, uint32 /*miscvalue1*/) override
         {
             switch (criteria_id)
             {
@@ -1427,7 +1426,7 @@ public:
             return false;
         }
 
-        bool CheckRequiredBosses(uint32 bossId, Player const*  /*player*/) const
+        bool CheckRequiredBosses(uint32 bossId, Player const*  /*player*/) const override
         {
             switch (bossId)
             {
@@ -1591,7 +1590,7 @@ public:
                         return;
 
                     stalkers.sort(acore::ObjectDistanceOrderPred(teleporter));
-                    stalkers.front()->CastSpell((Unit*)NULL, SPELL_ARTHAS_TELEPORTER_CEREMONY, false);
+                    stalkers.front()->CastSpell((Unit*)nullptr, SPELL_ARTHAS_TELEPORTER_CEREMONY, false);
                     stalkers.pop_front();
                     for (std::list<Creature*>::iterator itr = stalkers.begin(); itr != stalkers.end(); ++itr)
                         (*itr)->AI()->Reset();
@@ -1599,7 +1598,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -1608,12 +1607,11 @@ public:
                        << ColdflameJetsState << ' ' << BloodQuickeningState << ' ' << BloodQuickeningMinutes << ' ' << WeeklyQuestId10 << ' ' << PutricideEventProgress << ' '
                        << uint32(LichKingHeroicAvailable ? 1 : 0) << ' ' << BloodPrinceTrashCount << ' ' << uint32(IsBuffAvailable ? 1 : 0);
 
-
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();
         }
 
-        void Load(const char* str)
+        void Load(const char* str) override
         {
             if (!str)
             {
@@ -1669,7 +1667,7 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             // Xinef: A Feast of Souls (24547) whispers
             if (LichKingRandomWhisperTimer <= diff)
@@ -1751,7 +1749,7 @@ public:
                         }
                     case EVENT_REBUILD_PLATFORM:
                         if (GameObject* platform = instance->GetGameObject(ArthasPlatformGUID))
-                            platform->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, NULL, true);
+                            platform->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
                         if (GameObject* edge = instance->GetGameObject(FrozenThroneEdgeGUID))
                             edge->SetGoState(GO_STATE_READY);
                         if (GameObject* wind = instance->GetGameObject(FrozenThroneWindGUID))
@@ -1766,7 +1764,7 @@ public:
             }
         }
 
-        void ProcessEvent(WorldObject* source, uint32 eventId)
+        void ProcessEvent(WorldObject* source, uint32 eventId) override
         {
             switch (eventId)
             {
@@ -1817,7 +1815,7 @@ public:
                     }
                     break;
                 case EVENT_TELEPORT_TO_FROSMOURNE: // Harvest Soul (normal mode)
-                    if (Creature* terenas = instance->SummonCreature(NPC_TERENAS_MENETHIL_FROSTMOURNE, TerenasSpawn, NULL, 65000))
+                    if (Creature* terenas = instance->SummonCreature(NPC_TERENAS_MENETHIL_FROSTMOURNE, TerenasSpawn, nullptr, 65000))
                     {
                         terenas->AI()->DoAction(ACTION_FROSTMOURNE_INTRO);
                         std::list<Creature*> triggers;
@@ -1829,7 +1827,7 @@ public:
                             visual->CastSpell(visual, SPELL_FROSTMOURNE_TELEPORT_VISUAL, true);
                         }
 
-                        if (Creature* warden = instance->SummonCreature(NPC_SPIRIT_WARDEN, SpiritWardenSpawn, NULL, 65000))
+                        if (Creature* warden = instance->SummonCreature(NPC_SPIRIT_WARDEN, SpiritWardenSpawn, nullptr, 65000))
                         {
                             terenas->AI()->AttackStart(warden);
                             warden->AddThreat(terenas, 300000.0f);
@@ -1871,6 +1869,31 @@ public:
                     }
                     break;
             }
+        }
+
+        void SetPositionTraps(GameObject* go)
+        {
+            std::vector<Position> trapPositions;
+
+            switch (go->GetEntry())
+            {
+                case GO_SPIRIT_ALARM_1:
+                    trapPositions = GoSpiritAlarm_1;
+                    break;
+                case GO_SPIRIT_ALARM_2:
+                    trapPositions = GoSpiritAlarm_2;
+                    break;
+                case GO_SPIRIT_ALARM_3:
+                    trapPositions = GoSpiritAlarm_3;
+                    break;
+                case GO_SPIRIT_ALARM_4:
+                    trapPositions = GoSpiritAlarm_4;
+                    break;
+                default:
+                    return;
+            }
+
+            go->Relocate(acore::Containers::SelectRandomContainerElement(trapPositions));
         }
 
     protected:
@@ -1949,7 +1972,7 @@ public:
         bool IsOrbWhispererEligible;
     };
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_icecrown_citadel_InstanceMapScript(map);
     }

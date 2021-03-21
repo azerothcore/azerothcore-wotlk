@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -41,21 +41,21 @@ typedef std::map<uint32 /*condition id*/, GameEventFinishCondition> GameEventCon
 
 struct GameEventData
 {
-    GameEventData() : start(1), end(0), nextstart(0), occurence(0), length(0), holiday_id(HOLIDAY_NONE), state(GAMEEVENT_NORMAL) { }
-    time_t start;           // occurs after this time
-    time_t end;             // occurs before this time
-    time_t nextstart;       // after this time the follow-up events count this phase completed
-    uint32 occurence;       // time between end and start
-    uint32 length;          // length of the event (minutes) after finishing all conditions
-    HolidayIds holiday_id;
+    GameEventData()  { }
+    time_t start{1};           // occurs after this time
+    time_t end{0};             // occurs before this time
+    time_t nextstart{0};       // after this time the follow-up events count this phase completed
+    uint32 occurence{0};       // time between end and start
+    uint32 length{0};          // length of the event (minutes) after finishing all conditions
+    HolidayIds holiday_id{HOLIDAY_NONE};
     uint8 holidayStage;
-    GameEventState state;   // state of the game event, these are saved into the game_event table on change!
+    GameEventState state{GAMEEVENT_NORMAL};   // state of the game event, these are saved into the game_event table on change!
     GameEventConditionMap conditions;  // conditions to finish
     std::set<uint16 /*gameevent id*/> prerequisite_events;  // events that must be completed before starting this event
     std::string description;
     uint8 announce;         // if 0 dont announce, if 1 announce, if 2 take config value
 
-    bool isValid() const { return length > 0 || state > GAMEEVENT_NORMAL; }
+    [[nodiscard]] bool isValid() const { return length > 0 || state > GAMEEVENT_NORMAL; }
 };
 
 struct ModelEquip
@@ -83,17 +83,17 @@ class GameEventMgr
 {
 private:
     GameEventMgr();
-    ~GameEventMgr() {};
+    ~GameEventMgr() = default;;
 
 public:
     static GameEventMgr* instance();
 
     typedef std::set<uint16> ActiveEvents;
     typedef std::vector<GameEventData> GameEventDataMap;
-    ActiveEvents const& GetActiveEventList() const { return m_ActiveEvents; }
-    GameEventDataMap const& GetEventMap() const { return mGameEvent; }
-    bool CheckOneGameEvent(uint16 entry) const;
-    uint32 NextCheck(uint16 entry) const;
+    [[nodiscard]] ActiveEvents const& GetActiveEventList() const { return m_ActiveEvents; }
+    [[nodiscard]] GameEventDataMap const& GetEventMap() const { return mGameEvent; }
+    [[nodiscard]] bool CheckOneGameEvent(uint16 entry) const;
+    [[nodiscard]] uint32 NextCheck(uint16 entry) const;
     void LoadFromDB();
     void LoadHolidayDates();
     uint32 Update();
@@ -171,4 +171,3 @@ bool IsHolidayActive(HolidayIds id);
 bool IsEventActive(uint16 event_id);
 
 #endif
-

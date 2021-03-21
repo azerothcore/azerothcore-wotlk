@@ -1,37 +1,36 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include <ace/Message_Block.h>
-#include <ace/OS_NS_string.h>
-#include <ace/OS_NS_unistd.h>
-#include <ace/os_include/arpa/os_inet.h>
-#include <ace/os_include/netinet/os_tcp.h>
-#include <ace/os_include/sys/os_types.h>
-#include <ace/os_include/sys/os_socket.h>
-#include <ace/OS_NS_string.h>
-#include <ace/Reactor.h>
-
-#include "WorldSocket.h"
+#include "AccountMgr.h"
+#include "BigNumber.h"
+#include "ByteBuffer.h"
 #include "Common.h"
+#include "CryptoHash.h"
+#include "CryptoRandom.h"
+#include "DatabaseEnv.h"
+#include "Log.h"
+#include "Opcodes.h"
+#include "PacketLog.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+#include "SharedDefines.h"
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "SharedDefines.h"
-#include "ByteBuffer.h"
-#include "Opcodes.h"
-#include "DatabaseEnv.h"
-#include "BigNumber.h"
-#include "SHA1.h"
 #include "WorldSession.h"
+#include "WorldSocket.h"
 #include "WorldSocketMgr.h"
-#include "Log.h"
-#include "PacketLog.h"
-#include "ScriptMgr.h"
-#include "AccountMgr.h"
+#include <ace/Message_Block.h>
+#include <ace/os_include/arpa/os_inet.h>
+#include <ace/os_include/netinet/os_tcp.h>
+#include <ace/os_include/sys/os_socket.h>
+#include <ace/os_include/sys/os_types.h>
+#include <ace/OS_NS_string.h>
+#include <ace/OS_NS_unistd.h>
+#include <ace/Reactor.h>
 #include <thread>
 
 #ifdef ELUNA
@@ -94,9 +93,10 @@ struct ClientPktHeader
 WorldSocket::WorldSocket(void): WorldHandler(),
     m_LastPingTime(SystemTimePoint::min()), m_OverSpeedPings(0), m_Session(0),
     m_RecvWPct(0), m_RecvPct(), m_Header(sizeof (ClientPktHeader)),
-    m_OutBuffer(0), m_OutBufferSize(65536), m_OutActive(false),
-    m_Seed(static_cast<uint32> (rand32()))
+    m_OutBuffer(0), m_OutBufferSize(65536), m_OutActive(false)
 {
+    acore::Crypto::GetRandomBytes(m_Seed);
+
     reference_counting_policy().value (ACE_Event_Handler::Reference_Counting_Policy::ENABLED);
 
     msg_queue()->high_water_mark(8 * 1024 * 1024);
@@ -159,7 +159,9 @@ int WorldSocket::SendPacket(WorldPacket const& pct)
         sPacketLog->LogPacket(pct, SERVER_TO_CLIENT);
 
     ServerPktHeader header(pct.size() + 2, pct.GetOpcode());
-    m_Crypt.EncryptSend ((uint8*)header.header, header.getHeaderLength());
+
+    if (m_Crypt.IsInitialized())
+        m_Crypt.EncryptSend((uint8*)header.header, header.getHeaderLength());
 
     if (m_OutBuffer->space() >= pct.size() + header.getHeaderLength() && msg_queue()->is_empty())
     {
@@ -237,15 +239,8 @@ int WorldSocket::open(void* a)
     // Send startup packet.
     WorldPacket packet (SMSG_AUTH_CHALLENGE, 24);
     packet << uint32(1);                                    // 1...31
-    packet << m_Seed;
-
-    BigNumber seed1;
-    seed1.SetRand(16 * 8);
-    packet.append(seed1.AsByteArray(16).get(), 16);               // new encryption seeds
-
-    BigNumber seed2;
-    seed2.SetRand(16 * 8);
-    packet.append(seed2.AsByteArray(16).get(), 16);               // new encryption seeds
+    packet.append(m_Seed);
+    packet.append(acore::Crypto::GetRandomBytes<32>()); // new encryption seeds
 
     if (SendPacket(packet) == -1)
         return -1;
@@ -472,7 +467,8 @@ int WorldSocket::handle_input_header(void)
 
     ACE_ASSERT (m_Header.length() == sizeof(ClientPktHeader));
 
-    m_Crypt.DecryptRecv ((uint8*) m_Header.rd_ptr(), sizeof(ClientPktHeader));
+    if (m_Crypt.IsInitialized())
+        m_Crypt.DecryptRecv((uint8*) m_Header.rd_ptr(), sizeof(ClientPktHeader));
 
     ClientPktHeader& header = *((ClientPktHeader*) m_Header.rd_ptr());
 
@@ -584,7 +580,7 @@ int WorldSocket::handle_input_missing_data(void)
         // hope this is not hack, as proper m_RecvWPct is asserted around
         if (!m_RecvWPct)
         {
-            sLog->outError("Forcing close on input m_RecvWPct = NULL");
+            sLog->outError("Forcing close on input m_RecvWPct = nullptr");
             errno = EINVAL;
             return -1;
         }
@@ -738,8 +734,6 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
 int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 {
     // NOTE: ATM the socket is singlethread, have this in mind ...
-    uint8 digest[20];
-    uint32 clientSeed;
     uint32 loginServerID, loginServerType, regionID, battlegroupID, realm;
     uint64 DosResponse;
     uint32 BuiltNumberClient;
@@ -749,10 +743,10 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     //uint8 expansion = 0;
     LocaleConstant locale;
     std::string account;
-    SHA1Hash sha;
     WorldPacket packet, SendAddonPacked;
+    std::array<uint8, 4> clientSeed;
+    acore::Crypto::SHA1::Digest digest;
 
-    BigNumber k;
     bool wardenActive = sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED);
 
     if (sWorld->IsClosed())
@@ -770,12 +764,12 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket >> loginServerID;
     recvPacket >> account;
     recvPacket >> loginServerType;
-    recvPacket >> clientSeed;
+    recvPacket.read(clientSeed);
     recvPacket >> regionID;
     recvPacket >> battlegroupID;
     recvPacket >> realm;
     recvPacket >> DosResponse;
-    recvPacket.read(digest, 20);
+    recvPacket.read(digest);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outStaticDebug ("WorldSocket::HandleAuthSession: client %u, loginServerID %u, account %s, loginServerType %u, clientseed %u", BuiltNumberClient, loginServerID, account.c_str(), loginServerType, clientSeed);
@@ -845,7 +839,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         security = SEC_ADMINISTRATOR;
         */
 
-    k.SetHexStr (fields[1].GetCString());
+    SessionKey sessionKey = fields[1].GetBinary<SESSION_KEY_LENGTH>();
 
     int64 mutetime = fields[6].GetInt64();
     //! Negative mutetime indicates amount of seconds to be muted effective on next login - which is now.
@@ -936,17 +930,17 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     }
 
     // Check that Key and account name are the same on client and server
-    uint32 t = 0;
-    uint32 seed = m_Seed;
+    uint8 t[4] = { 0x00, 0x00, 0x00, 0x00 };
 
+    acore::Crypto::SHA1 sha;
     sha.UpdateData (account);
-    sha.UpdateData ((uint8*) & t, 4);
-    sha.UpdateData ((uint8*) & clientSeed, 4);
-    sha.UpdateData ((uint8*) & seed, 4);
-    sha.UpdateBigNumbers (&k, nullptr);
+    sha.UpdateData(t);
+    sha.UpdateData(clientSeed);
+    sha.UpdateData(m_Seed);
+    sha.UpdateData(sessionKey);
     sha.Finalize();
 
-    if (memcmp (sha.GetDigest(), digest, 20))
+    if (sha.GetDigest() != digest)
     {
         packet.Initialize (SMSG_AUTH_RESPONSE, 1);
         packet << uint8 (AUTH_FAILED);
@@ -981,10 +975,12 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     LoginDatabase.Execute(stmt);
 
+    sScriptMgr->OnLastIpUpdate(id, address);
+
     // NOTE ATM the socket is single-threaded, have this in mind ...
     ACE_NEW_RETURN(m_Session, WorldSession(id, this, AccountTypes(security), expansion, mutetime, locale, recruiter, isRecruiter, skipQueue, TotalTime), -1);
 
-    m_Crypt.Init(&k);
+    m_Crypt.Init(sessionKey);
 
     // First reject the connection if packet contains invalid data or realm state doesn't allow logging in
     if (sWorld->IsClosed())
@@ -1019,7 +1015,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     // Initialize Warden system only if it is enabled by config
     if (wardenActive)
-        m_Session->InitWarden(&k, os);
+        m_Session->InitWarden(sessionKey, os);
 
     // Sleep this Network thread for
     uint32 sleepTime = sWorld->getIntConfig(CONFIG_SESSION_ADD_DELAY);

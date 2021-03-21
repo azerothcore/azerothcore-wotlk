@@ -2,16 +2,16 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SmartAI.h"
-#include "pit_of_saron.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
-#include "Player.h"
 #include "CreatureGroups.h"
 #include "MapManager.h"
+#include "PassiveAI.h"
+#include "pit_of_saron.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SmartAI.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 class npc_pos_leader : public CreatureScript
 {
@@ -30,7 +30,7 @@ public:
         InstanceScript* pInstance;
         uint8 counter;
 
-        void Reset()
+        void Reset() override
         {
             counter = 0;
             events.Reset();
@@ -46,7 +46,7 @@ public:
                 }
         }
 
-        void SetData(uint32 type, uint32  /*val*/)
+        void SetData(uint32 type, uint32  /*val*/) override
         {
             if (type == DATA_START_INTRO && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE && counter == 0 && !me->IsVisible())
             {
@@ -55,7 +55,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch(events.ExecuteEvent())
@@ -88,7 +88,6 @@ public:
                         }
                         else
                         {
-                            
                             events.RescheduleEvent(2, 2500);
                         }
                     }
@@ -100,14 +99,14 @@ public:
                             c->setActive(true);
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_1);
                         }
-                    
+
                     events.RescheduleEvent(3, 7000);
                     break;
                 case 3:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_2);
-                    
+
                     events.RescheduleEvent(4, 14000);
                     break;
                 case 4:
@@ -148,19 +147,19 @@ public:
                                 }
                         }
                     }
-                    
+
                     events.RescheduleEvent(5, 1);
                     break;
                 case 5:
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_1 : SAY_SYLVANAS_INTRO_1);
-                    
+
                     events.RescheduleEvent(6, 1000);
                     break;
                 case 6:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_3);
-                    
+
                     events.RescheduleEvent(7, 5000);
                     break;
                 case 7:
@@ -190,14 +189,14 @@ public:
                                 c->GetMotionMaster()->MoveTakeoff(0, c->GetPositionX() + dist * cos(angle), c->GetPositionY() + dist * sin(angle), c->GetPositionZ() + 6.0f + (float)urand(0, 4), 1.5f + frand(0.0f, 1.5f));
                             }
                     }
-                    
+
                     events.RescheduleEvent(8, 7000);
                     break;
                 case 8:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
                             c->CastSpell(c, 69753, false);
-                    
+
                     events.RescheduleEvent(9, 400);
                     break;
                 case 9:
@@ -211,12 +210,12 @@ public:
                                 c->RemoveAllAuras();
                                 c->GetMotionMaster()->MoveFall(0, true);
                             }
-                    
+
                     events.RescheduleEvent(10, 1000);
                     break;
                 case 10:
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_2 : SAY_SYLVANAS_INTRO_2);
-                    
+
                     events.RescheduleEvent(11, 1000);
                     break;
                 case 11:
@@ -232,7 +231,7 @@ public:
                                 c->SendMovementFlagUpdate();
                                 c->CastSpell(c, 69350, true);
                             }
-                    
+
                     events.RescheduleEvent(12, 2000);
                     break;
                 case 12:
@@ -253,7 +252,7 @@ public:
                                 c->SetReactState(REACT_PASSIVE);
                             }
                     }
-                    
+
                     events.RescheduleEvent(13, 3000);
                     break;
                 case 13:
@@ -273,7 +272,7 @@ public:
                                 c->SetHomePosition(me->GetPositionX() + dist * cos(angle), me->GetPositionY() + dist * sin(angle), me->GetPositionZ(), 0.0f);
                             }
                     }
-                    
+
                     events.RescheduleEvent(14, 2000);
                     break;
                 case 14:
@@ -292,7 +291,7 @@ public:
                                     c->CastSpell(c, 70513, false);
                         }
                     }
-                    
+
                     events.RescheduleEvent(15, 2000);
                     break;
                 case 15:
@@ -308,7 +307,7 @@ public:
                                     c->CastSpell(c, 70464, false);
                         }
                     }
-                    
+
                     events.RescheduleEvent(16, 3000);
                     break;
                 case 16:
@@ -333,13 +332,13 @@ public:
                             }
                         pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_FINISHED_INTRO);
                     }
-                    
+
                     events.RescheduleEvent(17, 5000);
                     break;
                 case 17:
                     me->setActive(false);
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_5 : SAY_SYLVANAS_INTRO_4);
-                    
+
                     break;
             }
 
@@ -349,21 +348,21 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustSummoned(Creature* s)
+        void JustSummoned(Creature* s) override
         {
             summons.Summon(s);
         }
 
-        void SummonedCreatureDespawn(Creature* s)
+        void SummonedCreatureDespawn(Creature* s) override
         {
             summons.Despawn(s);
         }
 
-        void AttackStart(Unit*  /*who*/) {}
-        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void AttackStart(Unit*  /*who*/) override {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_leaderAI(creature);
     }
@@ -386,12 +385,12 @@ public:
         InstanceScript* pInstance;
         bool isInvincible;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             if (pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) == INSTANCE_PROGRESS_NONE)
             {
@@ -416,13 +415,13 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == 1)
                 me->SetFacingTo(M_PI);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             // TODO This spell check is invalid
             //            if (SPELL_NECROLYTE_CHANNELING)
@@ -435,19 +434,19 @@ public:
                 c->AI()->SetData(DATA_START_INTRO, 0);
         }
 
-        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (isInvincible && damage >= me->GetHealth())
                 damage = me->GetHealth() - 1;
         }
 
-        void DoAction(int32 a)
+        void DoAction(int32 a) override
         {
             if (a == 1337)
                 isInvincible = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -475,10 +474,10 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_deathwhisper_necrolyteAI(creature);
     }
@@ -500,12 +499,12 @@ public:
         EventMap events;
         InstanceScript* pInstance;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != POINT_MOTION_TYPE)
                 return;
@@ -517,7 +516,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch(events.ExecuteEvent())
@@ -548,18 +547,18 @@ public:
                 case 2:
                     if (Creature* c = me->SummonCreature(NPC_TYRANNUS_VOICE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 10.0f, me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 1))
                         c->AI()->Talk(SAY_TYRANNUS_GARFROST);
-                    
+
                     events.RescheduleEvent(3, 4000);
                     break;
                 case 3:
                     Talk(SAY_GENERAL_GARFROST);
-                    
+
                     break;
             }
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_after_first_bossAI(creature);
     }
@@ -585,7 +584,7 @@ public:
         uint32 killsLeft;
         uint64 deathbringerGUID[2];
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE)
             {
@@ -609,7 +608,7 @@ public:
                 events.ScheduleEvent(6, 0);
         }
 
-        void SetData(uint32 type, uint32 id)
+        void SetData(uint32 type, uint32 id) override
         {
             if (!me->IsAlive() || pInstance->GetData(DATA_GARFROST) != DONE || pInstance->GetData(DATA_ICK) != DONE)
                 return;
@@ -658,7 +657,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -808,7 +807,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_tyrannus_eventsAI(creature);
     }
@@ -830,7 +829,7 @@ public:
         InstanceScript* pInstance;
         uint16 timer;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!pInstance)
                 return;
@@ -845,7 +844,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_icicle_triggerAI(creature);
     }
@@ -869,13 +868,13 @@ public:
         uint16 timer1;
         uint16 timer2;
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (target && spell && target->GetTypeId() == TYPEID_PLAYER && spell->Id == 70827 && pInstance)
                 pInstance->SetData(DATA_ACHIEV_DONT_LOOK_UP, 0);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer1 <= diff)
             {
@@ -896,7 +895,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_collapsing_icicleAI(creature);
     }
@@ -938,7 +937,7 @@ public:
         SummonList summons;
         uint8 i;
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == 2)
             {
@@ -946,7 +945,7 @@ public:
             }
         }
 
-        void DoAction(int32 p)
+        void DoAction(int32 p) override
         {
             if (p == 1)
                 summons.DespawnAll();
@@ -989,17 +988,17 @@ public:
             }
         }
 
-        void JustSummoned(Creature* s)
+        void JustSummoned(Creature* s) override
         {
             summons.Summon(s);
         }
 
-        void SummonedCreatureDespawn(Creature* s)
+        void SummonedCreatureDespawn(Creature* s) override
         {
             summons.Despawn(s);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -1083,7 +1082,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_martin_or_gorkun_secondAI(creature);
     }
@@ -1104,12 +1103,12 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_ID, 70827, true);
         }
 
-        bool CanAIAttack(const Unit* who) const
+        bool CanAIAttack(const Unit* who) const override
         {
             return who->GetEntry() == NPC_FALLEN_WARRIOR;
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (!me->IsAlive() || me->IsInEvadeMode())
                 return;
@@ -1124,7 +1123,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_freed_slaveAI(creature);
     }
@@ -1164,7 +1163,7 @@ public:
         EventMap events;
         uint64 barrierGUID;
 
-        void DoAction(int32 p)
+        void DoAction(int32 p) override
         {
             if (p == 1)
             {
@@ -1173,7 +1172,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if ((spell->Id == SPELL_TELEPORT_JAINA || spell->Id == SPELL_TELEPORT_SYLVANAS) && target && target->GetTypeId() == TYPEID_PLAYER)
             {
@@ -1183,7 +1182,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type != WAYPOINT_MOTION_TYPE)
                 return;
@@ -1205,7 +1204,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 
@@ -1222,26 +1221,26 @@ public:
                             c->SetHover(true);
                             c->GetMotionMaster()->MovePoint(0, TSSindragosaPos2);
                         }
-                    
+
                     break;
                 case 2:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MARTIN_OR_GORKUN_GUID)))
                             c->AI()->Talk(SAY_GENERAL_OUTRO_2);
-                    
+
                     events.RescheduleEvent(3, me->GetEntry() == NPC_JAINA_PART2 ? 7000 : 8000);
                     break;
                 case 3:
                     Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_OUTRO_1 : SAY_SYLVANAS_OUTRO_1);
                     me->CastSpell(me, me->GetEntry() == NPC_JAINA_PART2 ? SPELL_TELEPORT_JAINA_VISUAL : SPELL_TELEPORT_SYLVANAS_VISUAL, true);
-                    
+
                     events.RescheduleEvent(4, 2000);
                     break;
                 case 4:
                     me->CastSpell(me, me->GetEntry() == NPC_JAINA_PART2 ? SPELL_TELEPORT_JAINA : SPELL_TELEPORT_SYLVANAS, true);
                     if (GameObject* barrier = me->SummonGameObject(203005, 1055.49f, 115.03f, 628.15f, 2.08f, 0.0f, 0.0f, 0.0f, 0.0f, 86400, false))
                         barrierGUID = barrier->GetGUID();
-                    
+
                     events.RescheduleEvent(5, 1500);
                     break;
                 case 5:
@@ -1251,7 +1250,7 @@ public:
                             if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SINDRAGOSA_GUID)))
                                 c->CastSpell(x->GetPositionX(), x->GetPositionY(), x->GetPositionZ(), SPELL_SINDRAGOSA_FROST_BOMB_POS, true);
                         }
-                    
+
                     events.RescheduleEvent(6, 5000);
                     events.RescheduleEvent(10, 2000);
                     break;
@@ -1259,7 +1258,7 @@ public:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SINDRAGOSA_GUID)))
                             c->GetMotionMaster()->MovePoint(0, TSSindragosaPos1);
-                    
+
                     events.RescheduleEvent(7, 4500);
                     break;
                 case 7:
@@ -1269,7 +1268,7 @@ public:
                     if (GameObject* barrier = pInstance->instance->GetGameObject(barrierGUID))
                         barrier->Delete();
                     barrierGUID = 0;
-                    
+
                     events.RescheduleEvent(8, 2000);
                     break;
                 case 8:
@@ -1278,13 +1277,13 @@ public:
                 case 10:
                     if (Creature* x = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MARTIN_OR_GORKUN_GUID)))
                         x->AI()->DoAction(3);
-                    
+
                     break;
             }
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pos_leader_secondAI(creature);
     }
@@ -1310,7 +1309,7 @@ public:
 
         uint16 timer;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (timer)
             {
@@ -1326,7 +1325,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_frostbite_invisible_stalkerAI(creature);
     }
@@ -1348,13 +1347,13 @@ public:
                 caster->CastSpell((float)urand(447, 480), (float)urand(200, 235), 528.71f, 70131, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_empowered_blizzardAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_pos_empowered_blizzardAuraScript();
     }
@@ -1373,7 +1372,7 @@ class SlaveRunEvent : public BasicEvent
 public:
     SlaveRunEvent(Creature& owner) : _owner(owner) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         uint32 pointId = 0;
         float minDist = _owner.GetExactDist2dSq(&slaveFreePos[pointId]);
@@ -1402,7 +1401,6 @@ public:
 
     class spell_pos_slave_trigger_closestSpellScript : public SpellScript
     {
-
         PrepareSpellScript(spell_pos_slave_trigger_closestSpellScript);
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1427,13 +1425,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_pos_slave_trigger_closestSpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_pos_slave_trigger_closestSpellScript();
     }
@@ -1459,13 +1457,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_pos_rimefang_frost_novaSpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_pos_rimefang_frost_novaSpellScript();
     }
@@ -1487,13 +1485,13 @@ public:
                     target->CastSpell(target, 69604, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_blightAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_pos_blightAuraScript();
     }
@@ -1519,13 +1517,13 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_glacial_strikeAuraScript::HandleEffectPeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_pos_glacial_strikeAuraScript();
     }
@@ -1536,7 +1534,7 @@ class at_tyrannus_event_starter : public AreaTriggerScript
 public:
     at_tyrannus_event_starter() : AreaTriggerScript("at_tyrannus_event_starter") { }
 
-    bool OnTrigger(Player* player, const AreaTrigger* /*at*/)
+    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
     {
         InstanceScript* inst = player->GetInstanceScript();
         if (!inst)

@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "blood_furnace.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum eEnums
 {
@@ -26,7 +26,6 @@ enum eEnums
 class boss_the_maker : public CreatureScript
 {
 public:
-
     boss_the_maker() : CreatureScript("boss_the_maker")
     {
     }
@@ -41,7 +40,7 @@ public:
         InstanceScript* instance;
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             if (!instance)
@@ -51,7 +50,7 @@ public:
             instance->HandleGameObject(instance->GetData64(DATA_DOOR2), true);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_SPELL_ACID, 15000);
@@ -66,13 +65,13 @@ public:
             instance->HandleGameObject(instance->GetData64(DATA_DOOR2), false);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
                 Talk(SAY_KILL);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DIE);
 
@@ -82,10 +81,9 @@ public:
             instance->SetData(DATA_THE_MAKER, DONE);
             instance->HandleGameObject(instance->GetData64(DATA_DOOR2), true);
             instance->HandleGameObject(instance->GetData64(DATA_DOOR3), true);
-
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -120,7 +118,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new boss_the_makerAI(creature);
     }
@@ -130,4 +128,3 @@ void AddSC_boss_the_maker()
 {
     new boss_the_maker();
 }
-

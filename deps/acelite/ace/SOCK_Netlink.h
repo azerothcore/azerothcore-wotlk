@@ -37,9 +37,9 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
  * This code was created so one could use ACE reactor
  * as a gateway to a linux kernel.
  */
-class ACE_Export ACE_SOCK_Netlink : public ACE_SOCK {
+class ACE_Export ACE_SOCK_Netlink : public ACE_SOCK
+{
 public:
-  // = Initialization and termination methods.
   /// Default constructor.
   ACE_SOCK_Netlink(void);
   ~ACE_SOCK_Netlink(void);

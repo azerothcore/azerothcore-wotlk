@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,17 +11,18 @@
 #ifndef __WORLDSESSION_H
 #define __WORLDSESSION_H
 
-#include "Common.h"
-#include "SharedDefines.h"
+#include "AccountMgr.h"
+#include "AuthDefines.h"
 #include "AddonMgr.h"
+#include "BanManager.h"
+#include "Common.h"
 #include "DatabaseEnv.h"
+#include "GossipDef.h"
+#include "Opcodes.h"
+#include "SharedDefines.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "GossipDef.h"
-#include "Cryptography/BigNumber.h"
-#include "AccountMgr.h"
-#include "BanManager.h"
-#include "Opcodes.h"
+#include <utility>
 
 class Creature;
 class GameObject;
@@ -75,9 +76,9 @@ enum AccountDataType
 
 struct AccountData
 {
-    AccountData() : Time(0), Data("") {}
+    AccountData() :  Data("") {}
 
-    time_t Time;
+    time_t Time{0};
     std::string Data;
 };
 
@@ -120,10 +121,10 @@ class PacketFilter
 {
 public:
     explicit PacketFilter(WorldSession* pSession) : m_pSession(pSession) {}
-    virtual ~PacketFilter() {}
+    virtual ~PacketFilter() = default;
 
     virtual bool Process(WorldPacket* /*packet*/) { return true; }
-    virtual bool ProcessLogout() const { return true; }
+    [[nodiscard]] virtual bool ProcessLogout() const { return true; }
 
 protected:
     WorldSession* const m_pSession;
@@ -133,11 +134,11 @@ class MapSessionFilter : public PacketFilter
 {
 public:
     explicit MapSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
-    ~MapSessionFilter() {}
+    ~MapSessionFilter() override = default;
 
-    virtual bool Process(WorldPacket* packet);
+    bool Process(WorldPacket* packet) override;
     //in Map::Update() we do not process player logout!
-    virtual bool ProcessLogout() const { return false; }
+    [[nodiscard]] bool ProcessLogout() const override { return false; }
 };
 
 //class used to filer only thread-unsafe packets from queue
@@ -146,9 +147,9 @@ class WorldSessionFilter : public PacketFilter
 {
 public:
     explicit WorldSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
-    ~WorldSessionFilter() {}
+    ~WorldSessionFilter() override = default;
 
-    virtual bool Process(WorldPacket* packet);
+    bool Process(WorldPacket* packet) override;
 };
 
 // Proxy structure to contain data passed to callback function,
@@ -159,8 +160,8 @@ class CharacterCreateInfo
     friend class Player;
 
 protected:
-    CharacterCreateInfo(std::string const& name, uint8 race, uint8 cclass, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId,
-                        WorldPacket& data) : Name(name), Race(race), Class(cclass), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair),
+    CharacterCreateInfo(std::string  name, uint8 race, uint8 cclass, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId,
+                        WorldPacket& data) : Name(std::move(name)), Race(race), Class(cclass), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair),
         OutfitId(outfitId), Data(data), CharCount(0)
     {}
 
@@ -181,7 +182,7 @@ protected:
     uint8 CharCount;
 
 private:
-    virtual ~CharacterCreateInfo() {};
+    virtual ~CharacterCreateInfo() = default;;
 };
 
 struct PacketCounter
@@ -238,7 +239,7 @@ public:
     void SetTotalTime(uint32 TotalTime) { m_total_time = TotalTime; }
     uint32 GetTotalTime() const { return m_total_time; }
 
-    void InitWarden(BigNumber* k, std::string const& os);
+    void InitWarden(SessionKey const&, std::string const& os);
 
     /// Session in auth.queue currently
     void SetInQueue(bool state) { m_inQueue = state; }
@@ -387,7 +388,6 @@ public:
     void SetCalendarEventCreationCooldown(time_t cooldown) { _calendarEventCreationCooldown = cooldown; }
 
 public:                                                 // opcodes handlers
-
     void Handle_NULL(WorldPacket& recvPacket);          // not used
     void Handle_EarlyProccess(WorldPacket& recvPacket); // just mark packets processed in WorldSocket::OnRead
     void Handle_ServerSide(WorldPacket& recvPacket);    // sever side only, can't be accepted from client
@@ -522,6 +522,7 @@ public:                                                 // opcodes handlers
     void HandleLootMethodOpcode(WorldPacket& recvPacket);
     void HandleLootRoll(WorldPacket& recvData);
     void HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData);
+    void HandleGroupSwapSubGroupOpcode(WorldPacket& recvData);
     void HandleRaidTargetUpdateOpcode(WorldPacket& recvData);
     void HandleRaidReadyCheckOpcode(WorldPacket& recvData);
     void HandleRaidReadyCheckFinishedOpcode(WorldPacket& recvData);
@@ -712,6 +713,7 @@ public:                                                 // opcodes handlers
     void HandleChannelBan(WorldPacket& recvPacket);
     void HandleChannelUnban(WorldPacket& recvPacket);
     void HandleChannelAnnouncements(WorldPacket& recvPacket);
+    void HandleChannelModerateOpcode(WorldPacket& recvPacket);
     void HandleChannelDeclineInvite(WorldPacket& recvPacket);
     void HandleChannelDisplayListQuery(WorldPacket& recvPacket);
     void HandleGetChannelMemberCount(WorldPacket& recvPacket);
@@ -1016,7 +1018,7 @@ private:
     typedef std::list<AddonInfo> AddonsList;
 
     // Warden
-    Warden* _warden;                                    // Remains NULL if Warden system is not enabled by config
+    Warden* _warden;                                    // Remains nullptr if Warden system is not enabled by config
 
     time_t _logoutTime;
     bool m_inQueue;                                     // session wait in auth.queue

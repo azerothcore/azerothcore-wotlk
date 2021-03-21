@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -13,9 +13,9 @@
 #include "ReputationMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
-#include "Spell.h"
 
 // Checks if object meets the condition
 // Can have CONDITION_SOURCE_TYPE_NONE && !mReferenceId if called from a special event (ie: eventAI)
@@ -361,6 +361,32 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                     condMeets = unit->IsInWater();
                 break;
             }
+        case CONDITION_QUESTSTATE:
+            {
+                if (Player* player = object->ToPlayer())
+                {
+                    uint32 queststateConditionValue1 = player->GetQuestStatus(ConditionValue1);
+                    if (
+                        ((ConditionValue2 & (1 << QUEST_STATUS_NONE))       && (queststateConditionValue1 == QUEST_STATUS_NONE)) ||
+                        ((ConditionValue2 & (1 << QUEST_STATUS_COMPLETE))   && (queststateConditionValue1 == QUEST_STATUS_COMPLETE)) ||
+                        ((ConditionValue2 & (1 << QUEST_STATUS_INCOMPLETE)) && (queststateConditionValue1 == QUEST_STATUS_INCOMPLETE)) ||
+                        ((ConditionValue2 & (1 << QUEST_STATUS_FAILED))     && (queststateConditionValue1 == QUEST_STATUS_FAILED)) ||
+                        ((ConditionValue2 & (1 << QUEST_STATUS_REWARDED))   && player->GetQuestRewardStatus(ConditionValue1))
+                        )
+                    {
+                        condMeets = true;
+                    }
+                }
+                break;
+            }
+        case CONDITION_DAILY_QUEST_DONE:
+            {
+                if (Player* player = object->ToPlayer())
+                {
+                    condMeets = player->IsDailyQuestDone(ConditionValue1);
+                }
+                break;
+            }
         case CONDITION_QUEST_OBJECTIVE_PROGRESS:
             {
                 if (Player* player = object->ToPlayer())
@@ -553,6 +579,12 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         case CONDITION_IN_WATER:
             mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
             break;
+        case CONDITION_QUESTSTATE:
+            mask |= GRID_MAP_TYPE_MASK_PLAYER;
+            break;
+        case CONDITION_DAILY_QUEST_DONE:
+            mask |= GRID_MAP_TYPE_MASK_PLAYER;
+            break;
         case CONDITION_QUEST_OBJECTIVE_PROGRESS:
             mask |= GRID_MAP_TYPE_MASK_PLAYER;
             break;
@@ -685,7 +717,6 @@ bool ConditionMgr::IsObjectMeetToConditionList(ConditionSourceInfo& sourceInfo, 
                     sLog->outDebug(LOG_FILTER_CONDITIONSYS, "IsPlayerMeetToConditionList: Reference template -%u not found", (*i)->ReferenceId);
 #endif
                 }
-
             }
             else //handle normal condition
             {
@@ -887,7 +918,6 @@ void ConditionMgr::LoadConditions(bool isReload)
 
     do
     {
-
         Field* fields = result->Fetch();
 
         Condition* cond = new Condition();
@@ -1619,11 +1649,9 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
                              cond->SourceEntry, uint32(cond->ConditionType));
             return false;
         case CONDITION_STAND_STATE:
-        case CONDITION_DAILY_QUEST_DONE:
         case CONDITION_CHARMED:
         case CONDITION_PET_TYPE:
         case CONDITION_TAXI:
-        case CONDITION_QUESTSTATE:
             sLog->outErrorDb("SourceEntry %u in `condition` table has a ConditionType that is not yet supported on AzerothCore (%u), ignoring.",
                              cond->SourceEntry, uint32(cond->ConditionType));
             return false;
@@ -1756,6 +1784,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         case CONDITION_QUESTTAKEN:
         case CONDITION_QUEST_NONE:
         case CONDITION_QUEST_COMPLETE:
+        case CONDITION_DAILY_QUEST_DONE:
         case CONDITION_QUEST_SATISFY_EXCLUSIVE:
             {
                 if (!sObjectMgr->GetQuestTemplate(cond->ConditionValue1))
@@ -1765,11 +1794,22 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
                 }
 
                 if (cond->ConditionValue2 > 1)
+                {
                     sLog->outErrorDb("Quest condition has useless data in value2 (%u)!", cond->ConditionValue2);
+                }
                 if (cond->ConditionValue3)
+                {
                     sLog->outErrorDb("Quest condition has useless data in value3 (%u)!", cond->ConditionValue3);
+                }
                 break;
             }
+        case CONDITION_QUESTSTATE:
+            if (cond->ConditionValue2 >= (1 << MAX_QUEST_STATUS))
+            {
+                sLog->outErrorDb("ConditionType (%u) has invalid state mask (%u), skipped.", cond->ConditionType, cond->ConditionValue2);
+                return false;
+            }
+            break;
         case CONDITION_ACTIVE_EVENT:
             {
                 GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();

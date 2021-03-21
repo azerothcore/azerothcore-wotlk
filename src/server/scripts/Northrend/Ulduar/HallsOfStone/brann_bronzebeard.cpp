@@ -2,13 +2,13 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "halls_of_stone.h"
-#include "ScriptedEscortAI.h"
-#include "SpellScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 #define GOSSIP_ITEM_1       "Brann, it would be our honor!"
 #define GOSSIP_ITEM_2       "Let's move Brann, enough of the history lessons!"
@@ -179,7 +179,6 @@ public:
                 default:
                     break;
             }
-
         }
         SendGossipMenuFor(player, TEXT_ID_START, creature->GetGUID());
         return true;
@@ -223,7 +222,6 @@ public:
 
     struct brann_bronzebeardAI : public npc_escortAI
     {
-
         brann_bronzebeardAI(Creature* c) : npc_escortAI(c), summons(me)
         {
             AbedneumGUID = MarnakGUID = KaddrakGUID = 0;
@@ -497,7 +495,6 @@ public:
 
                         me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
-
                         // Spawn Chest and quest credit
                         if (Player* plr = SelectTargetFromPlayerList(200.0f))
                         {
@@ -516,7 +513,6 @@ public:
                     }
                 case EVENT_GO_TO_SJONNIR:
                     {
-
                         if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
                             door->SetGoState(GO_STATE_ACTIVE);
                         SetEscortPaused(false);
@@ -693,7 +689,7 @@ class dark_rune_protectors : public CreatureScript
 public:
     dark_rune_protectors() : CreatureScript("dark_rune_protectors") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new dark_rune_protectorsAI (creature);
     }
@@ -703,18 +699,18 @@ public:
         dark_rune_protectorsAI(Creature* c) : ScriptedAI(c) { }
 
         EventMap events;
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_DRP_CHARGE, 10000);
             events.ScheduleEvent(EVENT_DRP_CLEAVE, 7000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -751,7 +747,7 @@ class dark_rune_stormcaller : public CreatureScript
 public:
     dark_rune_stormcaller() : CreatureScript("dark_rune_stormcaller") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new dark_rune_stormcallerAI (creature);
     }
@@ -761,18 +757,18 @@ public:
         dark_rune_stormcallerAI(Creature* c) : ScriptedAI(c) { }
 
         EventMap events;
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_DRS_LIGHTNING_BOLD, 5000);
             events.ScheduleEvent(EVENT_DRS_SHADOW_WORD_PAIN, 12000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -807,7 +803,7 @@ class iron_golem_custodian : public CreatureScript
 public:
     iron_golem_custodian() : CreatureScript("iron_golem_custodian") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new iron_golem_custodianAI (creature);
     }
@@ -816,17 +812,17 @@ public:
     {
         iron_golem_custodianAI(Creature* c) : ScriptedAI(c) { }
         EventMap events;
-        void Reset()
+        void Reset() override
         {
             events.Reset();
         }
 
-        void EnterCombat(Unit*)
+        void EnterCombat(Unit*) override
         {
             events.ScheduleEvent(EVENT_IGC_CRUSH, 6000);
             events.ScheduleEvent(EVENT_IGC_GROUND_SMASH, 4000);
         }
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -871,13 +867,13 @@ public:
                 caster->CastSpell(caster, caster->GetMap()->IsHeroic() ? SPELL_DARK_MATTER_H : SPELL_DARK_MATTER, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectRemove += AuraEffectRemoveFn(spell_hos_dark_matter_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_hos_dark_matter_AuraScript();
     }

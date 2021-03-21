@@ -45,6 +45,7 @@ enum PreparedStatementValueType
     TYPE_FLOAT,
     TYPE_DOUBLE,
     TYPE_STRING,
+    TYPE_BINARY,
     TYPE_NULL
 };
 
@@ -52,7 +53,7 @@ struct PreparedStatementData
 {
     PreparedStatementDataUnion data;
     PreparedStatementValueType type;
-    std::string str;
+    std::vector<uint8> binary;
 };
 
 //- Forward declare
@@ -81,6 +82,13 @@ public:
     void setFloat(const uint8 index, const float value);
     void setDouble(const uint8 index, const double value);
     void setString(const uint8 index, const std::string& value);
+    void setBinary(const uint8 index, const std::vector<uint8>& value);
+    template<size_t Size>
+    void setBinary(const uint8 index, std::array<uint8, Size> const& value)
+    {
+        std::vector<uint8> vec(value.begin(), value.end());
+        setBinary(index, vec);
+    }
     void setNull(const uint8 index);
 
 protected:
@@ -115,7 +123,7 @@ public:
     void setInt64(const uint8 index, const int64 value);
     void setFloat(const uint8 index, const float value);
     void setDouble(const uint8 index, const double value);
-    void setString(const uint8 index, const char* value);
+    void setBinary(const uint8 index, const std::vector<uint8>& value, bool isString);
     void setNull(const uint8 index);
 
 protected:
@@ -124,7 +132,7 @@ protected:
     PreparedStatement* m_stmt;
     void ClearParameters();
     bool CheckValidIndex(uint8 index);
-    std::string getQueryString(std::string const& sqlPattern) const;
+    [[nodiscard]] std::string getQueryString(std::string const& sqlPattern) const;
 
 private:
     void setValue(MYSQL_BIND* param, enum_field_types type, const void* value, uint32 len, bool isUnsigned);
@@ -144,9 +152,9 @@ class PreparedStatementTask : public SQLOperation
 public:
     PreparedStatementTask(PreparedStatement* stmt);
     PreparedStatementTask(PreparedStatement* stmt, PreparedQueryResultFuture result);
-    ~PreparedStatementTask();
+    ~PreparedStatementTask() override;
 
-    bool Execute();
+    bool Execute() override;
 
 protected:
     PreparedStatement* m_stmt;

@@ -14,6 +14,7 @@
 #include <utility>
 #include <list>
 #include <vector>
+#include <type_traits>
 
 //! Because circular includes are bad
 extern uint32 urand(uint32 min, uint32 max);
@@ -49,7 +50,7 @@ namespace acore
         CheckedBufferOutputIterator& operator++() { check(); ++_buf; return *this; }
         CheckedBufferOutputIterator operator++(int) { CheckedBufferOutputIterator v = *this; operator++(); return v; }
 
-        size_t remaining() const { return (_end - _buf); }
+        [[nodiscard]] size_t remaining() const { return (_end - _buf); }
 
     private:
         T* _buf;
@@ -106,6 +107,40 @@ namespace acore
             typename C::const_iterator it = container.begin();
             std::advance(it, urandweighted(weights.size(), weights.data()));
             return *it;
+        }
+
+        template <typename Container, typename Predicate>
+        std::enable_if_t<std::is_move_assignable_v<decltype(*std::declval<Container>().begin())>, void> EraseIf(Container& c, Predicate p)
+        {
+            auto wpos = c.begin();
+            for (auto rpos = c.begin(), end = c.end(); rpos != end; ++rpos)
+            {
+                if (!p(*rpos))
+                {
+                    if (rpos != wpos)
+                    {
+                        std::swap(*rpos, *wpos);
+                    }
+                    ++wpos;
+                }
+            }
+            c.erase(wpos, c.end());
+        }
+
+        template <typename Container, typename Predicate>
+        std::enable_if_t<!std::is_move_assignable_v<decltype(*std::declval<Container>().begin())>, void> EraseIf(Container& c, Predicate p)
+        {
+            for (auto it = c.begin(); it != c.end();)
+            {
+                if (p(*it))
+                {
+                    it = c.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
+            }
         }
     }
     //! namespace Containers

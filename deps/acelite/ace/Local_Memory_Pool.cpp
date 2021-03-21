@@ -53,9 +53,15 @@ ACE_Local_Memory_Pool::acquire (size_t nbytes,
   rounded_bytes = this->round_up (nbytes);
 
   char *temp = 0;
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_ALLOCATOR_RETURN (temp,
+                        static_cast<char*>(ACE_Allocator::instance()->malloc(sizeof(char) * rounded_bytes)),
+                        0);
+#else
   ACE_NEW_RETURN (temp,
                   char[rounded_bytes],
                   0);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
   ACE_Auto_Basic_Array_Ptr<char> cp (temp);
 
@@ -76,7 +82,12 @@ ACE_Local_Memory_Pool::release (int)
   for (ACE_Unbounded_Set<char *>::iterator i = this->allocated_chunks_.begin ();
        i != this->allocated_chunks_.end ();
        ++i)
+#if defined (ACE_HAS_ALLOC_HOOKS)
+    ACE_Allocator::instance()->free(*i);
+#else
     delete [] *i;
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
   this->allocated_chunks_.reset ();
   return 0;
 }

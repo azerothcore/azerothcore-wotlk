@@ -18,7 +18,7 @@ public:
     LoginDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) { }
 
     //- Loads database type specific prepared statements
-    void DoPrepareStatements();
+    void DoPrepareStatements() override;
 };
 
 typedef DatabaseWorkerPool<LoginDatabaseConnection> LoginDatabaseWorkerPool;
@@ -42,7 +42,7 @@ enum LoginDatabaseStatements
     LOGIN_INS_ACCOUNT_AUTO_BANNED,
     LOGIN_DEL_ACCOUNT_BANNED,
     LOGIN_SEL_SESSIONKEY,
-    LOGIN_UPD_VS,
+    LOGIN_UPD_LOGON,
     LOGIN_UPD_LOGONPROOF,
     LOGIN_SEL_LOGONCHALLENGE,
     LOGIN_SEL_LOGON_COUNTRY,
@@ -71,7 +71,6 @@ enum LoginDatabaseStatements
     LOGIN_UPD_ACCOUNT_LOCK,
     LOGIN_UPD_ACCOUNT_LOCK_CONTRY,
     LOGIN_UPD_USERNAME,
-    LOGIN_UPD_PASSWORD,
     LOGIN_UPD_MUTE_TIME,
     LOGIN_UPD_MUTE_TIME_LOGIN,
     LOGIN_UPD_LAST_IP,
@@ -110,7 +109,7 @@ enum LoginDatabaseStatements
 
     LOGIN_INS_ACCOUNT_MUTE,
     LOGIN_SEL_ACCOUNT_MUTE_INFO,
-    LOGIN_DEL_ACCOUNT_MUTEDEL,
+    LOGIN_DEL_ACCOUNT_MUTED,
 
     MAX_LOGINDATABASE_STATEMENTS
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,11 +17,11 @@ npc_dalinda_malem
 go_demon_portal
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 // Ours
@@ -54,7 +54,6 @@ enum Caravan
     NPC_LESSER_INFERNAL                 = 4676,
     NPC_DOOMWARDER                      = 4677,
     NPC_NETHER                          = 4684,
-
 };
 
 class npc_cork_gizelton : public CreatureScript
@@ -62,7 +61,7 @@ class npc_cork_gizelton : public CreatureScript
 public:
     npc_cork_gizelton() : CreatureScript("npc_cork_gizelton") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_BODYGUARD_FOR_HIRE)
             creature->AI()->SetGUID(player->GetGUID(), player->getFaction());
@@ -70,7 +69,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_cork_gizeltonAI(creature);
     }
@@ -98,25 +97,25 @@ public:
             events.ScheduleEvent(EVENT_RESTART_ESCORT, 0);
         }
 
-        void JustRespawned()
+        void JustRespawned() override
         {
             npc_escortAI::JustRespawned();
             Initialize();
         }
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             npc_escortAI::InitializeAI();
             Initialize();
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             RemoveSummons();
             npc_escortAI::JustDied(killer);
         }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             SummonsFollow();
             ImmuneFlagSet(false, 35);
@@ -135,7 +134,7 @@ public:
             ImmuneFlagSet(false, _faction);
         }
 
-        void SetGUID(uint64 playerGUID, int32 faction)
+        void SetGUID(uint64 playerGUID, int32 faction) override
         {
             _playerGUID = playerGUID;
             _faction = faction;
@@ -145,7 +144,7 @@ public:
             events.CancelEvent(EVENT_WAIT_FOR_ASSIST);
         }
 
-        void SetData(uint32 field, uint32 data)
+        void SetData(uint32 field, uint32 data) override
         {
             if (field == 1 && data == 1)
                 if (Player* player = me->SelectNearestPlayer(50.0f))
@@ -202,7 +201,7 @@ public:
             SummonsFollow();
         }
 
-        void SummonedCreatureDies(Creature* creature, Unit*)
+        void SummonedCreatureDies(Creature* creature, Unit*) override
         {
             if (creature->GetGUID() == summons[0])
                 summons[0] = 0;
@@ -212,7 +211,7 @@ public:
                 summons[2] = 0;
         }
 
-        void SummonedCreatureDespawn(Creature* creature)
+        void SummonedCreatureDespawn(Creature* creature) override
         {
             if (creature->GetGUID() == summons[0])
                 summons[0] = 0;
@@ -260,7 +259,7 @@ public:
             me->setFaction(faction);
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             RelocateSummons();
             switch (waypointId)
@@ -376,11 +375,10 @@ public:
                 case 282:
                     events.ScheduleEvent(EVENT_RESTART_ESCORT, 1000);
                     break;
-
             }
         }
 
-        void UpdateEscortAI(uint32 diff)
+        void UpdateEscortAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -412,7 +410,6 @@ public:
     };
 };
 
-
 // Theirs
 enum DyingKodo
 {
@@ -430,7 +427,6 @@ enum DyingKodo
     SPELL_KODO_KOMBO_PLAYER_BUFF    = 18172,
     SPELL_KODO_KOMBO_DESPAWN_BUFF   = 18377,
     SPELL_KODO_KOMBO_GOSSIP         = 18362
-
 };
 
 class npc_aged_dying_ancient_kodo : public CreatureScript
@@ -444,7 +440,7 @@ public:
 
         void JustRespawned() override
         {
-            me->UpdateEntry(RAND(NPC_AGED_KODO, NPC_DYING_KODO, NPC_ANCIENT_KODO), NULL, false);
+            me->UpdateEntry(RAND(NPC_AGED_KODO, NPC_DYING_KODO, NPC_ANCIENT_KODO), nullptr, false);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -467,7 +463,7 @@ public:
                 if (!(caster->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF) || me->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
                         && (me->GetEntry() == NPC_AGED_KODO || me->GetEntry() == NPC_DYING_KODO || me->GetEntry() == NPC_ANCIENT_KODO))
                 {
-                    me->UpdateEntry(NPC_TAMED_KODO, NULL, false);
+                    me->UpdateEntry(NPC_TAMED_KODO, nullptr, false);
                     EnterEvadeMode();
                     me->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, me->GetFollowAngle());
 
@@ -499,7 +495,6 @@ public:
     {
         return new npc_aged_dying_ancient_kodoAI(creature);
     }
-
 };
 
 /*######
@@ -520,18 +515,18 @@ public:
     {
         npc_dalindaAI(Creature* creature) : npc_escortAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (Player* player = GetPlayerForEscort())
                 player->FailQuest(QUEST_RETURN_TO_VAHLARRIEL);
             return;
         }
 
-        void WaypointReached(uint32 waypointId)
+        void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
 
@@ -547,7 +542,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             npc_escortAI::UpdateAI(diff);
 
@@ -558,7 +553,7 @@ public:
         }
     };
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_RETURN_TO_VAHLARRIEL)
         {
@@ -571,7 +566,7 @@ public:
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dalindaAI(creature);
     }

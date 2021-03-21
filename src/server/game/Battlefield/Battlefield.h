@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,13 +7,13 @@
 #ifndef BATTLEFIELD_H_
 #define BATTLEFIELD_H_
 
-#include "Utilities/Util.h"
-#include "SharedDefines.h"
-#include "ZoneScript.h"
-#include "WorldPacket.h"
-#include "GameObject.h"
 #include "Battleground.h"
+#include "GameObject.h"
 #include "ObjectAccessor.h"
+#include "SharedDefines.h"
+#include "Utilities/Util.h"
+#include "WorldPacket.h"
+#include "ZoneScript.h"
 
 enum BattlefieldTypes
 {
@@ -48,7 +48,6 @@ enum BattlefieldTimers
 {
     BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL        = 1000
 };
-
 
 const uint32 BattlefieldFactions[BG_TEAMS_COUNT] =
 {
@@ -99,7 +98,7 @@ public:
     virtual void SendChangePhase();
 
     bool SetCapturePointData(GameObject* capturePoint);
-    GameObject* GetCapturePointGo() { return ObjectAccessor::GetObjectInWorld(m_capturePoint, (GameObject*)NULL); }
+    GameObject* GetCapturePointGo() { return ObjectAccessor::GetObjectInWorld(m_capturePoint, (GameObject*)nullptr); }
     GameObject* GetCapturePointGo(WorldObject* obj) { return ObjectAccessor::GetGameObject(*obj, m_capturePoint); }
 
     TeamId GetTeamId() { return m_team; }
@@ -203,7 +202,7 @@ public:
     /// Constructor
     Battlefield();
     /// Destructor
-    virtual ~Battlefield();
+    ~Battlefield() override;
 
     /// typedef of map witch store capturepoint and the associate gameobject entry
     typedef std::map<uint32 /*lowguid */, BfCapturePoint*> BfCapturePointMap;
@@ -258,12 +257,12 @@ public:
     void HandlePlayerLeaveZone(Player* player, uint32 zone);
 
     // All-purpose data storage 64 bit
-    virtual uint64 GetData64(uint32 dataId) const { return m_Data64[dataId]; }
-    virtual void SetData64(uint32 dataId, uint64 value) { m_Data64[dataId] = value; }
+    uint64 GetData64(uint32 dataId) const override { return m_Data64[dataId]; }
+    void SetData64(uint32 dataId, uint64 value) override { m_Data64[dataId] = value; }
 
     // All-purpose data storage 32 bit
-    virtual uint32 GetData(uint32 dataId) const { return m_Data32[dataId]; }
-    virtual void SetData(uint32 dataId, uint32 value) { m_Data32[dataId] = value; }
+    uint32 GetData(uint32 dataId) const override { return m_Data32[dataId]; }
+    void SetData(uint32 dataId, uint32 value) override { m_Data32[dataId] = value; }
     virtual void UpdateData(uint32 index, int32 pad) { m_Data32[index] += pad; }
 
     // Battlefield - generic methods

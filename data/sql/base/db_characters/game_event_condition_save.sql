@@ -10,8 +10,8 @@ DROP TABLE IF EXISTS `game_event_condition_save`;
 CREATE TABLE `game_event_condition_save` 
 (
   `eventEntry` tinyint(3) unsigned NOT NULL,
-  `condition_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `done` float DEFAULT '0',
+  `condition_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `done` float DEFAULT 0,
   PRIMARY KEY (`eventEntry`,`condition_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

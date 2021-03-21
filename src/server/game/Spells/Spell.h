@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,10 +8,10 @@
 #define __SPELL_H
 
 #include "GridDefines.h"
-#include "SharedDefines.h"
 #include "ObjectMgr.h"
-#include "SpellInfo.h"
 #include "PathGenerator.h"
+#include "SharedDefines.h"
+#include "SpellInfo.h"
 
 class Unit;
 class Player;
@@ -241,7 +241,6 @@ class Spell
     friend void Unit::SetCurrentCastedSpell(Spell* pSpell);
     friend class SpellScript;
 public:
-
     void EffectNULL(SpellEffIndex effIndex);
     void EffectUnused(SpellEffIndex effIndex);
     void EffectDistract(SpellEffIndex effIndex);
@@ -399,7 +398,7 @@ public:
     void SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList);
     void SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, SpellTargetSelectionCategories selectCategory, ConditionList* condList, bool isChainHeal);
 
-    void prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura = nullptr);
+    SpellCastResult prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura = nullptr);
     void cancel(bool bySelf = false);
     void update(uint32 difftime);
     void cast(bool skipCheck = false);
@@ -428,7 +427,7 @@ public:
     SpellCastResult CheckSpellFocus();
     SpellCastResult CheckRange(bool strict);
     SpellCastResult CheckPower();
-    SpellCastResult CheckRuneCost(uint32 runeCostID);
+    SpellCastResult CheckRuneCost(uint32 RuneCostID);
     SpellCastResult CheckCasterAuras(bool preventionOnly) const;
 
     int32 CalculateSpellDamage(uint8 i, Unit const* target) const { return m_caster->CalculateSpellDamage(target, m_spellInfo, i, &m_spellValue->EffectBasePoints[i]); }
@@ -456,7 +455,7 @@ public:
     void SendSpellGo();
     void SendSpellCooldown();
     void SendLogExecute();
-    void ExecuteLogEffectTakeTargetPower(uint8 effIndex, Unit* target, uint32 powerType, uint32 powerTaken, float gainMultiplier);
+    void ExecuteLogEffectTakeTargetPower(uint8 effIndex, Unit* target, uint32 PowerType, uint32 powerTaken, float gainMultiplier);
     void ExecuteLogEffectExtraAttacks(uint8 effIndex, Unit* victim, uint32 attCount);
     void ExecuteLogEffectInterruptCast(uint8 effIndex, Unit* victim, uint32 spellId);
     void ExecuteLogEffectDurabilityDamage(uint8 effIndex, Unit* victim, int32 itemId, int32 slot);
@@ -789,11 +788,11 @@ class SpellEvent : public BasicEvent
 {
 public:
     SpellEvent(Spell* spell);
-    virtual ~SpellEvent();
+    ~SpellEvent() override;
 
-    virtual bool Execute(uint64 e_time, uint32 p_time);
-    virtual void Abort(uint64 e_time);
-    virtual bool IsDeletable() const;
+    bool Execute(uint64 e_time, uint32 p_time) override;
+    void Abort(uint64 e_time) override;
+    bool IsDeletable() const override;
 protected:
     Spell* m_Spell;
 };
@@ -802,7 +801,7 @@ class ReflectEvent : public BasicEvent
 {
 public:
     ReflectEvent(uint64 casterGUID, uint64 targetGUID, const SpellInfo* spellInfo) : _casterGUID(casterGUID), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
-    virtual bool Execute(uint64 e_time, uint32 p_time);
+    bool Execute(uint64 e_time, uint32 p_time) override;
 
 protected:
     uint64 _casterGUID;

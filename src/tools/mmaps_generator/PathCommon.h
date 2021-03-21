@@ -12,7 +12,7 @@
 #include <vector>
 
 #ifndef _WIN32
-#include <stddef.h>
+#include <cstddef>
 #include <dirent.h>
 #endif
 
@@ -108,7 +108,7 @@ namespace MMAP
             if ((dp = readdir(dirp)) != nullptr)
             {
                 if (matchWildcardFilter(filter.c_str(), dp->d_name))
-                    fileList.push_back(std::string(dp->d_name));
+                    fileList.emplace_back(dp->d_name);
             }
             else
                 break;

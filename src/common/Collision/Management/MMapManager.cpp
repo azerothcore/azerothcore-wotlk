@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -96,7 +96,7 @@ namespace MMAP
         ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         // make sure the mmap is loaded and ready to load tiles
-        if(!loadMapData(mapId))
+        if (!loadMapData(mapId))
             return false;
 
         // get this mmap data
@@ -148,7 +148,7 @@ namespace MMAP
         ASSERT(data);
 
         size_t result = fread(data, fileHeader.size, 1, file);
-        if(!result)
+        if (!result)
         {
             sLog->outError("MMAP:loadMap: Bad header or data in mmap %03u%02i%02i.mmtile", mapId, x, y);
             fclose(file);
@@ -218,7 +218,7 @@ namespace MMAP
         dtStatus status;
         {
             ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
-            status = mmap->navMesh->removeTile(tileRef, NULL, NULL);
+            status = mmap->navMesh->removeTile(tileRef, nullptr, nullptr);
         }
 
         // unload, and mark as non loaded
@@ -266,7 +266,7 @@ namespace MMAP
             dtStatus status;
             {
                 ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, GetMMapLock(mapId));
-                status = mmap->navMesh->removeTile(i->second, NULL, NULL);
+                status = mmap->navMesh->removeTile(i->second, nullptr, nullptr);
             }
 
             if (status != DT_SUCCESS)
@@ -329,7 +329,7 @@ namespace MMAP
         //ACORE_READ_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
-            return NULL;
+            return nullptr;
 
         return loadedMMaps[mapId]->navMesh;
     }
@@ -340,7 +340,7 @@ namespace MMAP
         //ACORE_READ_GUARD(ACE_RW_Thread_Mutex, MMapManagerLock);
 
         if (loadedMMaps.find(mapId) == loadedMMaps.end())
-            return NULL;
+            return nullptr;
 
         MMapData* mmap = loadedMMaps[mapId];
         if (mmap->navMeshQueries.find(instanceId) == mmap->navMeshQueries.end())
@@ -357,7 +357,7 @@ namespace MMAP
                 {
                     dtFreeNavMeshQuery(query);
                     sLog->outError("MMAP:GetNavMeshQuery: Failed to initialize dtNavMeshQuery for mapId %03u instanceId %u", mapId, instanceId);
-                    return NULL;
+                    return nullptr;
                 }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)

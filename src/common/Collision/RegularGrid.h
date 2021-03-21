@@ -1,7 +1,6 @@
 #ifndef _REGULAR_GRID_H
 #define _REGULAR_GRID_H
 
-
 #include <G3D/Ray.h>
 #include <G3D/Table.h>
 #include <G3D/BoundsTrait.h>
@@ -43,7 +42,6 @@ template<class T,
 class RegularGrid2D
 {
 public:
-
     enum
     {
         CELL_NUMBER = 64,
@@ -52,7 +50,7 @@ public:
 #define HGRID_MAP_SIZE  (533.33333f * 64.f)     // shouldn't be changed
 #define CELL_SIZE       float(HGRID_MAP_SIZE/(float)CELL_NUMBER)
 
-    typedef G3D::Table<const T*, NodeArray<Node> > MemberTable;
+    typedef G3D::Table<const T*, NodeArray<Node>> MemberTable;
 
     MemberTable memberTable;
     Node* nodes[CELL_NUMBER][CELL_NUMBER];
@@ -142,7 +140,6 @@ public:
 
         bool isValid() const { return x >= 0 && x < CELL_NUMBER && y >= 0 && y < CELL_NUMBER;}
     };
-
 
     Node& getGridFor(float fx, float fy)
     {

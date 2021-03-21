@@ -27,13 +27,13 @@ namespace MMAP
 {
     struct MapTiles
     {
-        MapTiles() : m_mapId(uint32(-1)), m_tiles(nullptr) {}
+        MapTiles() : m_mapId(uint32(-1)) {}
 
         MapTiles(uint32 id, std::set<uint32>* tiles) : m_mapId(id), m_tiles(tiles) {}
-        ~MapTiles() {}
+        ~MapTiles() = default;
 
         uint32 m_mapId;
-        std::set<uint32>* m_tiles;
+        std::set<uint32>* m_tiles{nullptr};
 
         bool operator==(uint32 id)
         {
@@ -45,7 +45,7 @@ namespace MMAP
 
     struct Tile
     {
-        Tile() : chf(nullptr), solid(nullptr), cset(nullptr), pmesh(nullptr), dmesh(nullptr) {}
+        Tile()  {}
         ~Tile()
         {
             rcFreeCompactHeightfield(chf);
@@ -54,17 +54,17 @@ namespace MMAP
             rcFreePolyMesh(pmesh);
             rcFreePolyMeshDetail(dmesh);
         }
-        rcCompactHeightfield* chf;
-        rcHeightfield* solid;
-        rcContourSet* cset;
-        rcPolyMesh* pmesh;
-        rcPolyMeshDetail* dmesh;
+        rcCompactHeightfield* chf{nullptr};
+        rcHeightfield* solid{nullptr};
+        rcContourSet* cset{nullptr};
+        rcPolyMesh* pmesh{nullptr};
+        rcPolyMeshDetail* dmesh{nullptr};
     };
 
     class MapBuilder
     {
     public:
-        MapBuilder(float maxWalkableAngle   = 70.f,
+        MapBuilder(float maxWalkableAngle   = 60.f,
                    bool skipLiquid          = false,
                    bool skipContinents      = false,
                    bool skipJunkMaps        = true,
@@ -116,7 +116,7 @@ namespace MMAP
         // percentageDone - method to calculate percentage
         uint32 percentageDone(uint32 totalTiles, uint32 totalTilesDone);
 
-        TerrainBuilder* m_terrainBuilder;
+        TerrainBuilder* m_terrainBuilder{nullptr};
         TileList m_tiles;
 
         bool m_debugOutput;
@@ -133,7 +133,7 @@ namespace MMAP
         std::atomic<uint32> m_totalTilesBuilt;
 
         // build performance - not really used for now
-        rcContext* m_rcContext;
+        rcContext* m_rcContext{nullptr};
 
         std::vector<std::thread> _workerThreads;
         ProducerConsumerQueue<uint32> _queue;

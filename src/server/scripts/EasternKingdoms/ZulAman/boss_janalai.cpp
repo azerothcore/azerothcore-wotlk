@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,11 +11,11 @@ SDComment:
 SDCategory: Zul'Aman
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "zulaman.h"
-#include "GridNotifiers.h"
 #include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "zulaman.h"
 
 enum Yells
 {
@@ -99,7 +99,6 @@ float hatcherway[2][5][3] =
 class boss_janalai : public CreatureScript
 {
 public:
-
     boss_janalai()
         : CreatureScript("boss_janalai")
     {
@@ -129,7 +128,7 @@ public:
 
         uint64 FireBombGUIDs[40];
 
-        void Reset()
+        void Reset() override
         {
             instance->SetData(DATA_JANALAIEVENT, NOT_STARTED);
 
@@ -152,19 +151,19 @@ public:
             HatchAllEggs(1);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
 
             instance->SetData(DATA_JANALAIEVENT, DONE);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*victim*/) override
         {
             Talk(SAY_SLAY);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             instance->SetData(DATA_JANALAIEVENT, IN_PROGRESS);
 
@@ -172,7 +171,7 @@ public:
             //        DoZoneInCombat();
         }
 
-        void DamageDealt(Unit* target, uint32& damage, DamageEffectType /*damagetype*/)
+        void DamageDealt(Unit* target, uint32& damage, DamageEffectType /*damagetype*/) override
         {
             if (isFlameBreathing)
             {
@@ -306,7 +305,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (isFlameBreathing)
             {
@@ -429,13 +428,13 @@ public:
             else FireBreathTimer -= diff;
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const
+        bool CheckEvadeIfOutOfCombatArea() const override
         {
             return me->GetPositionZ() <= 12.0f;
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<boss_janalaiAI>(creature);
     }
@@ -444,7 +443,6 @@ public:
 class npc_janalai_firebomb : public CreatureScript
 {
 public:
-
     npc_janalai_firebomb()
         : CreatureScript("npc_janalai_firebomb")
     {
@@ -454,25 +452,24 @@ public:
     {
         npc_janalai_firebombAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_FIRE_BOMB_THROW)
                 DoCast(me, SPELL_FIRE_BOMB_DUMMY, true);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
-        void AttackStart(Unit* /*who*/) { }
+        void AttackStart(Unit* /*who*/) override { }
 
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
-
-        void UpdateAI(uint32 /*diff*/) { }
+        void UpdateAI(uint32 /*diff*/) override { }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_janalai_firebombAI(creature);
     }
@@ -481,7 +478,6 @@ public:
 class npc_janalai_hatcher : public CreatureScript
 {
 public:
-
     npc_janalai_hatcher()
         : CreatureScript("npc_janalai_hatcher")
     {
@@ -504,7 +500,7 @@ public:
         bool hasChangedSide;
         bool isHatching;
 
-        void Reset()
+        void Reset() override
         {
             me->SetWalk(true);
             side = (me->GetPositionY() < 1150);
@@ -546,11 +542,11 @@ public:
             return num == 0;   // if num == 0, no more templist
         }
 
-        void EnterCombat(Unit* /*who*/) { }
-        void AttackStart(Unit* /*who*/) { }
-        void MoveInLineOfSight(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
+        void AttackStart(Unit* /*who*/) override { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
-        void MovementInform(uint32, uint32)
+        void MovementInform(uint32, uint32) override
         {
             if (waypoint == 5)
             {
@@ -562,7 +558,7 @@ public:
                 WaitTimer = 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!instance || !(instance->GetData(DATA_JANALAIEVENT) == IN_PROGRESS))
             {
@@ -599,14 +595,13 @@ public:
                     }
                     else
                         me->DisappearAndDie();
-
                 }
                 else WaitTimer -= diff;
             }
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_janalai_hatcherAI>(creature);
     }
@@ -615,7 +610,6 @@ public:
 class npc_janalai_hatchling : public CreatureScript
 {
 public:
-
     npc_janalai_hatchling()
         : CreatureScript("npc_janalai_hatchling")
     {
@@ -631,7 +625,7 @@ public:
         InstanceScript* instance;
         uint32 BuffetTimer;
 
-        void Reset()
+        void Reset() override
         {
             BuffetTimer = 7000;
             if (me->GetPositionY() > 1150)
@@ -642,9 +636,9 @@ public:
             me->SetDisableGravity(true);
         }
 
-        void EnterCombat(Unit* /*who*/) {/*DoZoneInCombat();*/ }
+        void EnterCombat(Unit* /*who*/) override {/*DoZoneInCombat();*/ }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!instance || !(instance->GetData(DATA_JANALAIEVENT) == IN_PROGRESS))
             {
@@ -666,7 +660,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return GetInstanceAI<npc_janalai_hatchlingAI>(creature);
     }
@@ -677,7 +671,7 @@ class npc_janalai_egg : public CreatureScript
 public:
     npc_janalai_egg(): CreatureScript("npc_janalai_egg") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_janalai_eggAI(creature);
     }
@@ -686,11 +680,11 @@ public:
     {
         npc_janalai_eggAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset() { }
+        void Reset() override { }
 
-        void UpdateAI(uint32 /*diff*/) { }
+        void UpdateAI(uint32 /*diff*/) override { }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo* spell)
+        void SpellHit(Unit* /*caster*/, const SpellInfo* spell) override
         {
             if (spell->Id == SPELL_HATCH_EGG)
             {
@@ -698,7 +692,6 @@ public:
             }
         }
     };
-
 };
 
 void AddSC_boss_janalai()
@@ -709,4 +702,3 @@ void AddSC_boss_janalai()
     new npc_janalai_hatchling();
     new npc_janalai_egg();
 }
-

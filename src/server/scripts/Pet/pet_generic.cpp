@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -9,16 +9,16 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_gen_".
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "Player.h"
-#include "Group.h"
 #include "CreatureTextMgr.h"
-#include "PetAI.h"
+#include "Group.h"
 #include "PassiveAI.h"
+#include "PetAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
 
 enum Mojo
 {
@@ -37,7 +37,7 @@ public:
     {
         npc_pet_gen_mojoAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void Reset()
+        void Reset() override
         {
             _victimGUID = 0;
 
@@ -45,10 +45,10 @@ public:
                 me->GetMotionMaster()->MoveFollow(owner, 0.0f, 0.0f);
         }
 
-        void EnterCombat(Unit* /*who*/) { }
-        void UpdateAI(uint32 /*diff*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
+        void UpdateAI(uint32 /*diff*/) override { }
 
-        void ReceiveEmote(Player* player, uint32 emote)
+        void ReceiveEmote(Player* player, uint32 emote) override
         {
             me->HandleEmoteCommand(emote);
             Unit* owner = me->GetOwner();
@@ -75,7 +75,7 @@ public:
         uint64 _victimGUID;
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_gen_mojoAI(creature);
     }
@@ -116,7 +116,7 @@ public:
 
         Player* GetOwner() const { return ObjectAccessor::GetPlayer(*me, ownerGUID); }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_STEAL_ESSENCE_VISUAL && target == me)
             {
@@ -126,7 +126,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -143,12 +143,11 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_gen_soul_trader_beaconAI (creature);
     }
 };
-
 
 enum eArgentPony
 {
@@ -455,7 +454,7 @@ public:
         uint32 bombSpellId;
         uint32 checkTimer;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             checkTimer += diff;
             if (checkTimer >= 1000)
@@ -481,7 +480,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_target_following_bombAI (pCreature);
     }
@@ -501,12 +500,12 @@ public:
 
         uint32 checkTimer;
 
-        void Reset()
+        void Reset() override
         {
             me->GetMotionMaster()->Clear(false);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* who) override
         {
             if (!who)
                 return;
@@ -515,7 +514,7 @@ public:
                 DoStartNoMovement(who);
         }
 
-        void UpdateAI(uint32  /*diff*/)
+        void UpdateAI(uint32  /*diff*/) override
         {
             if (!me->GetVictim())
                 return;
@@ -528,7 +527,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_gen_gnomish_flame_turretAI (creature);
     }
@@ -551,7 +550,7 @@ public:
 
         uint32 targetCheck;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             if (Player* owner = me->GetCharmerOrOwnerPlayerOrPlayerItself())
                 if (Unit* target = owner->GetSelectedUnit())
@@ -559,7 +558,7 @@ public:
                         AttackStart(target);
         }
 
-        void OwnerAttacked(Unit* target)
+        void OwnerAttacked(Unit* target) override
         {
             if (!target || (me->GetVictim() && me->GetVictim()->IsAlive() && !me->GetVictim()->HasBreakableByDamageCrowdControlAura()))
                 return;
@@ -567,7 +566,7 @@ public:
             AttackStart(target);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
             {
@@ -588,7 +587,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_valkyr_guardianAI (pCreature);
     }
@@ -614,13 +613,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnHit += SpellHitFn(spell_pet_gen_valkyr_guardian_smite_SpellScript::RecalculateDamage);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_pet_gen_valkyr_guardian_smite_SpellScript();
     }
@@ -645,7 +644,7 @@ public:
         uint64 _ownerGUID;
         bool _hasParty;
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             NullCreatureAI::InitializeAI();
 
@@ -674,7 +673,7 @@ public:
                     }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             _talkTimer += diff;
             if (_talkTimer >= 5000)
@@ -687,7 +686,7 @@ public:
                 {
                     uint8 limit = 0;
                     if (player->GetGroup())
-                        for (GroupReference* itr = player->GetGroup()->GetFirstMember(); itr != NULL && limit < 4; itr = itr->next(), ++limit)
+                        for (GroupReference* itr = player->GetGroup()->GetFirstMember(); itr != nullptr && limit < 4; itr = itr->next(), ++limit)
                             if (Player* groupPlayer = itr->GetSource())
                                 if (groupPlayer != player)
                                     groupPlayer->GetSession()->SendPacket(&_data);
@@ -698,7 +697,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_imp_in_a_bottleAI (pCreature);
     }
@@ -723,7 +722,7 @@ public:
         uint32 checkTimer;
         uint32 checkTimer2;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             checkTimer2 += diff;
             if (checkTimer2 > 2000)
@@ -749,7 +748,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_wind_rider_cubAI (pCreature);
     }
@@ -781,7 +780,7 @@ public:
         uint32 checkTimer;
         bool jumping;
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == EFFECT_MOTION_TYPE && id == 1)
             {
@@ -790,7 +789,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (jumping)
                 return;
@@ -824,7 +823,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_plump_turkeyAI (pCreature);
     }
@@ -843,19 +842,19 @@ public:
 
         uint32 checkTimer;
 
-        void Reset() { checkTimer = 3000; }
+        void Reset() override { checkTimer = 3000; }
 
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == EFFECT_MOTION_TYPE && id == 1)
                 checkTimer = 1;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (checkTimer)
             {
@@ -876,7 +875,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_toxic_wastelingAI (pCreature);
     }
@@ -896,7 +895,7 @@ public:
         uint32 checkTimer;
         uint64 targetGUID;
 
-        void IsSummonedBy(Unit* summoner)
+        void IsSummonedBy(Unit* summoner) override
         {
             if (!summoner)
                 return;
@@ -907,7 +906,7 @@ public:
             me->CastSpell(me, 48649 /*SPELL_PET_TOY_FETCH_BALL_COME_HERE*/, true);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == 48649 /*SPELL_PET_TOY_FETCH_BALL_COME_HERE*/)
             {
@@ -916,7 +915,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             checkTimer += diff;
             if (checkTimer >= 1000)
@@ -933,7 +932,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_fetch_ballAI (pCreature);
     }
@@ -954,7 +953,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_pet_gen_mothAI (pCreature);
     }

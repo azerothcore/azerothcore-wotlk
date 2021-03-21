@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -16,15 +16,15 @@ npcs_rutgar_and_frankal
 quest_a_pawn_on_the_eternal_pawn
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
+#include "AccountMgr.h"
+#include "BanManager.h"
 #include "Group.h"
 #include "Player.h"
-#include "AccountMgr.h"
-#include "SpellInfo.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
-#include "BanManager.h"
+#include "SpellInfo.h"
 
 /*###
 ## npcs_rutgar_and_frankal
@@ -140,7 +140,6 @@ public:
 
         return true;
     }
-
 };
 
 /*####
@@ -384,7 +383,6 @@ static WaveData WavesInfo[5] =
     {12, 38, 15414, 0, 0, 24000, 0},    // Qiraji Wasps
     { 6, 50, 15422, 0, 0, 24000, 0},    // Qiraji Tanks
     {15, 15, 15423, 0, 0, 24000, 0}     // Kaldorei Soldier
-
 };
 
 struct SpawnSpells
@@ -407,7 +405,7 @@ class npc_anachronos_the_ancient : public CreatureScript
 public:
     npc_anachronos_the_ancient() : CreatureScript("npc_anachronos_the_ancient") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_anachronos_the_ancientAI(creature);
     }
@@ -427,7 +425,7 @@ public:
         uint64 PlayerGUID;
         bool eventEnd;
 
-        void Reset()
+        void Reset() override
         {
             AnimationTimer = 1500;
             AnimationCount = 0;
@@ -709,7 +707,7 @@ public:
             }
             ++AnimationCount;
         }
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (AnimationTimer)
             {
@@ -723,7 +721,6 @@ public:
                 EnterEvadeMode();
         }
     };
-
 };
 
 /*######
@@ -735,7 +732,7 @@ class npc_qiraj_war_spawn : public CreatureScript
 public:
     npc_qiraj_war_spawn() : CreatureScript("npc_qiraj_war_spawn") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_qiraj_war_spawnAI(creature);
     }
@@ -750,7 +747,7 @@ public:
         bool Timers;
         bool hasTarget;
 
-        void Reset()
+        void Reset() override
         {
             MobGUID = 0;
             PlayerGUID = 0;
@@ -758,10 +755,10 @@ public:
             hasTarget = false;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
-        void JustDied(Unit* /*slayer*/);
+        void EnterCombat(Unit* /*who*/) override { }
+        void JustDied(Unit* /*slayer*/) override;
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!Timers)
             {
@@ -840,7 +837,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 /*#####
@@ -852,7 +848,7 @@ class npc_anachronos_quest_trigger : public CreatureScript
 public:
     npc_anachronos_quest_trigger() : CreatureScript("npc_anachronos_quest_trigger") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_anachronos_quest_triggerAI(creature);
     }
@@ -873,7 +869,7 @@ public:
         bool Announced;
         bool Failed;
 
-        void Reset()
+        void Reset() override
         {
             PlayerGUID = 0;
 
@@ -966,7 +962,7 @@ public:
                 Announced = false;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!PlayerGUID || !EventStarted)
                 return;
@@ -989,7 +985,6 @@ public:
                 EnterEvadeMode();
         };
     };
-
 };
 
 void npc_qiraj_war_spawn::npc_qiraj_war_spawnAI::JustDied(Unit* /*slayer*/)
@@ -1002,7 +997,6 @@ void npc_qiraj_war_spawn::npc_qiraj_war_spawnAI::JustDied(Unit* /*slayer*/)
     if (Creature* mob = ObjectAccessor::GetCreature(*me, MobGUID))
         if (npc_anachronos_quest_trigger::npc_anachronos_quest_triggerAI* triggerAI = CAST_AI(npc_anachronos_quest_trigger::npc_anachronos_quest_triggerAI, mob->AI()))
             triggerAI->LiveCounter();
-
 };
 
 /*#####
@@ -1014,7 +1008,7 @@ class go_crystalline_tear : public GameObjectScript
 public:
     go_crystalline_tear() : GameObjectScript("go_crystalline_tear") { }
 
-    bool OnQuestAccept(Player* player, GameObject* go, Quest const* quest)
+    bool OnQuestAccept(Player* player, GameObject* go, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_A_PAWN_ON_THE_ETERNAL_BOARD)
         {
@@ -1067,7 +1061,6 @@ public:
         }
         return true;
     }
-
 };
 
 /*###

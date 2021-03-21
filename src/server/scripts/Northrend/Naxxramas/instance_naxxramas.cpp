@@ -2,13 +2,13 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "naxxramas.h"
+#include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CellImpl.h"
+#include "naxxramas.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 const float HeiganPos[2] = {2796, -3707};
 const float HeiganEruptionSlope[3] =
@@ -109,7 +109,6 @@ public:
             sapphironAchievement = true;
             heiganAchievement = true;
             immortalAchievement = 1;
-
         }
 
         std::set<GameObject*> HeiganEruption[4];
@@ -620,7 +619,6 @@ public:
                     _horsemanTimer = 0;
             }
 
-
             if (!InstanceScript::SetBossState(bossId, state))
                 return false;
 
@@ -822,7 +820,7 @@ public:
                     if (Creature* kelthuzad = instance->GetCreature(_kelthuzadGUID))
                         kelthuzad->AI()->Talk(_currentWingTaunt);
                     ++_currentWingTaunt;
-                    
+
                     break;
             }
         }
@@ -910,7 +908,6 @@ public:
             else
                 OUT_LOAD_INST_DATA_FAIL;
         }
-
     };
 };
 class boss_naxxramas_misc : public CreatureScript

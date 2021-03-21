@@ -2,18 +2,18 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "GameObjectAI.h"
-#include "Vehicle.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "utgarde_keep.h"
+#include "Vehicle.h"
 
 class npc_dragonflayer_forge_master : public CreatureScript
 {
 public:
     npc_dragonflayer_forge_master() : CreatureScript("npc_dragonflayer_forge_master") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_dragonflayer_forge_masterAI(pCreature);
     }
@@ -47,20 +47,20 @@ public:
         uint32 dataId;
         uint32 prevDataId;
 
-        void Reset()
+        void Reset() override
         {
             if (pInstance)
                 pInstance->SetData(dataId, NOT_STARTED);
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
                 pInstance->SetData(dataId, DONE);
             me->SaveRespawnTime();
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*who*/) override
         {
             if (pInstance)
             {
@@ -108,7 +108,7 @@ public:
             _setData = false;
         }
 
-        void Reset()
+        void Reset() override
         {
             _events.Reset();
             _events.ScheduleEvent(EVENT_REND, urand(2000, 3000));
@@ -116,7 +116,7 @@ public:
             _events.ScheduleEvent(EVENT_KNOCKAWAY, urand(3500, 6000));
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if (type == WAYPOINT_MOTION_TYPE && id == POINT_LAST)
             {
@@ -134,7 +134,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             if (type == TYPE_PROTODRAKE_AT && data == DATA_PROTODRAKE_MOVE && !_setData && me->IsAlive() && me->GetDistance(protodrakeCheckPos) < 10.0f)
             {
@@ -146,7 +146,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -183,10 +183,9 @@ public:
     private:
         bool _setData;
         EventMap _events;
-
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_enslaved_proto_drakeAI(creature);
     }
@@ -206,9 +205,9 @@ public:
     {
         PrepareAuraScript(spell_ticking_time_bomb_AuraScript);
 
-        bool Validate(SpellInfo const* /*spellEntry*/)
+        bool Validate(SpellInfo const* /*spellEntry*/) override
         {
-            return (bool) sSpellMgr->GetSpellInfo(SPELL_TICKING_TIME_BOMB_EXPLODE);
+            return ValidateSpellInfo({ SPELL_TICKING_TIME_BOMB_EXPLODE });
         }
 
         void HandleOnEffectRemove(AuraEffect const* /* aurEff */, AuraEffectHandleModes /* mode */)
@@ -219,13 +218,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectRemove += AuraEffectRemoveFn(spell_ticking_time_bomb_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_ticking_time_bomb_AuraScript();
     }

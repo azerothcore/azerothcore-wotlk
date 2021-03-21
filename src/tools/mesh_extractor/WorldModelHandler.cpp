@@ -34,7 +34,6 @@ WorldModelDefinition WorldModelDefinition::Read( FILE* file )
     return ret;
 }
 
-
 WorldModelHandler::WorldModelHandler( ADT* adt ) : ObjectDataHandler(adt), _definitions(nullptr), _paths(nullptr)
 {
     ReadModelPaths();
@@ -85,7 +84,7 @@ void WorldModelHandler::ProcessInternal( MapChunk* mcnk )
     fseek(stream, mcnk->Source->Offset, SEEK_SET);
 }
 
-void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::vector<Triangle<uint32> >& tris, const WorldModelDefinition& def, WorldModelRoot* root, bool translate )
+void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::vector<Triangle<uint32>>& tris, const WorldModelDefinition& def, WorldModelRoot* root, bool translate )
 {
     for (std::vector<WorldModelGroup>::iterator group =  root->Groups.begin(); group != root->Groups.end(); ++group)
     {
@@ -136,7 +135,7 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
                 Vector3 v = Utils::TransformDoodadVertex(def, Utils::TransformWmoDoodad(*instance, def, *itr2, false), translate);
                 verts.push_back(translate ? v : Utils::ToRecast(v));
             }
-            for (std::vector<Triangle<uint16> >::iterator itr2 = model->Triangles.begin(); itr2 != model->Triangles.end(); ++itr2)
+            for (std::vector<Triangle<uint16>>::iterator itr2 = model->Triangles.begin(); itr2 != model->Triangles.end(); ++itr2)
                 tris.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_WMO, itr2->V0 + vertOffset, itr2->V1 + vertOffset, itr2->V2 + vertOffset));
         }
 
@@ -152,7 +151,6 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
             {
                 for (uint32 x = 0; x < liquidHeader.Width; x++)
                 {
-
                     if (!liquidDataGeometry.ShouldRender(x, y))
                         continue;
 
@@ -174,7 +172,6 @@ void WorldModelHandler::InsertModelGeometry( std::vector<Vector3>& verts, std::v
 
                     tris.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_WATER, vertOffset, vertOffset + 2, vertOffset + 1));
                     tris.push_back(Triangle<uint32>(Constants::TRIANGLE_TYPE_WATER, vertOffset + 2, vertOffset + 3, vertOffset + 1));
-
                 }
             }
         }

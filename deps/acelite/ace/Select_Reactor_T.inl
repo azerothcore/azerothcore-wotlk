@@ -70,7 +70,6 @@ ACE_Select_Reactor_T<ACE_SELECT_REACTOR_TOKEN>::register_handler (int signum,
 }
 
 #if defined (ACE_WIN32)
-
 template <class ACE_SELECT_REACTOR_TOKEN>
 ACE_INLINE int
 ACE_Select_Reactor_T<ACE_SELECT_REACTOR_TOKEN>::register_handler (ACE_Event_Handler *,
@@ -79,7 +78,6 @@ ACE_Select_Reactor_T<ACE_SELECT_REACTOR_TOKEN>::register_handler (ACE_Event_Hand
   // Don't have an implementation for this yet...
   ACE_NOTSUP_RETURN (-1);
 }
-
 #endif /* ACE_WIN32 */
 
 template <class ACE_SELECT_REACTOR_TOKEN>

@@ -3,14 +3,13 @@
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  */
 
-#include "ScriptMgr.h"
 #include "Channel.h"
-#include "Guild.h"
 #include "Group.h"
+#include "Guild.h"
+#include "ScriptMgr.h"
 
 enum IPLoggingTypes
 {
-
     // AccountActionIpLogger();
     ACCOUNT_LOGIN = 0,
     ACCOUNT_FAIL_LOGIN = 1,
@@ -302,7 +301,6 @@ public:
         return;
     }
 };
-
 
 void AddSC_action_ip_logger()
 {

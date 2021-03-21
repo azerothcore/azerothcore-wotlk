@@ -1,18 +1,18 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Define.h"
 #include "ArenaTeamMgr.h"
-#include "World.h"
-#include "Log.h"
 #include "DatabaseEnv.h"
+#include "Define.h"
 #include "Language.h"
+#include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "World.h"
 
 ArenaTeamMgr::ArenaTeamMgr()
 {
@@ -51,7 +51,29 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(const std::string& arenaTeamName) co
         std::string teamName = itr->second->GetName();
         std::transform(teamName.begin(), teamName.end(), teamName.begin(), ::toupper);
         if (search == teamName)
+        {
             return itr->second;
+        }
+    }
+    return nullptr;
+}
+
+ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(std::string const& arenaTeamName, const uint32 type) const
+{
+    std::string search = arenaTeamName;
+    std::transform(search.begin(), search.end(), search.begin(), ::toupper);
+    for (auto itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
+    {
+        if (itr->second->GetType() != type)
+        {
+            continue;
+        }
+        std::string teamName = itr->second->GetName();
+        std::transform(teamName.begin(), teamName.end(), teamName.begin(), ::toupper);
+        if (search == teamName)
+        {
+            return itr->second;
+        }
     }
     return nullptr;
 }
@@ -59,9 +81,24 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(const std::string& arenaTeamName) co
 ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid) const
 {
     for (ArenaTeamContainer::const_iterator itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
+    {
         if (itr->second->GetCaptain() == guid)
+        {
             return itr->second;
+        }
+    }
+    return nullptr;
+}
 
+ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid, const uint32 type) const
+{
+    for (ArenaTeamContainer::const_iterator itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
+    {
+        if (itr->second->GetCaptain() == guid && itr->second->GetType() == type)
+        {
+            return itr->second;
+        }
+    }
     return nullptr;
 }
 
