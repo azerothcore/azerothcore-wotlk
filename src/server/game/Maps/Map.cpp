@@ -3483,11 +3483,6 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, PathGener
     return true;
 }
 
-bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
-{
-    return CanReachPositionAndGetValidCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, failOnCollision, failOnSlopes);
-}
-
 /**
  * @brief validate the new destination and set reachable coords
  * Check if a given unit can reach a specific point on a segment
@@ -3500,15 +3495,18 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float &de
  * @return true if the destination is valid, false otherwise
  *
  **/
+
+bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float& destX, float& destY, float& destZ, bool failOnCollision, bool failOnSlopes) const
+{
+    return CanReachPositionAndGetValidCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, failOnCollision, failOnSlopes);
+}
+
 bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
 {
-    float tempX=destX, tempY=destY, tempZ=destZ;
     if (!CheckCollisionAndGetValidCoords(source, startX, startY, startZ, destX, destY, destZ, failOnCollision))
     {
         return false;
     }
-
-    destX = tempX, destY = tempY, destZ = tempZ;
 
     const Unit* unit = source->ToUnit();
     // if it's not an unit (Object) then we do not have to continue
@@ -3614,7 +3612,7 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
     source->UpdateAllowedPositionZ(destX, destY, destZ, &groundZ);
 
     // position has no ground under it (or is too far away)
-    if (groundZ <= INVALID_HEIGHT && unit && unit->CanFly())
+    if (groundZ <= INVALID_HEIGHT && unit && !unit->CanFly())
     {
         // fall back to gridHeight if any
         float gridHeight = GetGridHeight(destX, destY);

@@ -802,6 +802,8 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_deathTimer = 0;
     m_deathExpireTime = 0;
 
+    m_flightSpellActivated = 0;
+
     m_swingErrorMsg = 0;
 
     for (uint8 j = 0; j < PLAYER_MAX_BATTLEGROUND_QUEUES; ++j)
@@ -21928,6 +21930,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     }
     else
     {
+        m_flightSpellActivated = spellid;
         GetSession()->SendActivateTaxiReply(ERR_TAXIOK);
         GetSession()->SendDoFlight(mount_display_id, sourcepath);
     }
@@ -21951,6 +21954,12 @@ bool Player::ActivateTaxiPathTo(uint32 taxi_path_id, uint32 spellid /*= 1*/)
 
 void Player::CleanupAfterTaxiFlight()
 {
+    // For spells that trigger flying paths remove them at arrival
+    if (m_flightSpellActivated)
+    {
+        this->RemoveAurasDueToSpell(m_flightSpellActivated);
+        m_flightSpellActivated = 0;
+    }
     m_taxi.ClearTaxiDestinations();        // not destinations, clear source node
     Dismount();
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
