@@ -11,11 +11,12 @@ CREATE TABLE `creature_formations`
 (
   `leaderGUID` INT unsigned NOT NULL DEFAULT 0,
   `memberGUID` INT unsigned NOT NULL DEFAULT 0,
-  `dist` float unsigned NOT NULL,
-  `angle` float unsigned NOT NULL,
+  `dist` FLOAT NOT NULL,
+  `angle` FLOAT NOT NULL,
   `groupAI` INT unsigned NOT NULL,
   `point_1` SMALLINT unsigned NOT NULL DEFAULT 0,
   `point_2` SMALLINT unsigned NOT NULL DEFAULT 0,
+  CHECK (`dist`>0 AND `angle`>0),
   PRIMARY KEY (`memberGUID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

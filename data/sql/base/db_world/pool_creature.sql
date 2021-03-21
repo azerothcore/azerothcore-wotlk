@@ -11,8 +11,9 @@ CREATE TABLE `pool_creature`
 (
   `guid` INT unsigned NOT NULL DEFAULT 0,
   `pool_entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
-  `chance` float unsigned NOT NULL DEFAULT 0,
+  `chance` FLOAT NOT NULL DEFAULT 0,
   `description` varchar(255) DEFAULT NULL,
+  CHECK (`chance`>0),
   PRIMARY KEY (`guid`),
   KEY `idx_guid` (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;

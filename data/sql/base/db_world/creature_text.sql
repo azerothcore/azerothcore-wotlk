@@ -15,13 +15,14 @@ CREATE TABLE `creature_text`
   `Text` longtext DEFAULT NULL,
   `Type` TINYINT unsigned NOT NULL DEFAULT 0,
   `Language` TINYINT NOT NULL DEFAULT 0,
-  `Probability` float unsigned NOT NULL DEFAULT 0,
+  `Probability` FLOAT NOT NULL DEFAULT 0,
   `Emote` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Duration` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `Sound` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   `BroadcastTextId` MEDIUMINT NOT NULL DEFAULT 0,
   `TextRange` TINYINT unsigned NOT NULL DEFAULT 0,
   `comment` varchar(255) DEFAULT '',
+  CHECK (`Probability`>0),
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

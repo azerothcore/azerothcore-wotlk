@@ -30,16 +30,17 @@ CREATE TABLE `character_stats`
   `resFrost` INT unsigned NOT NULL DEFAULT 0,
   `resShadow` INT unsigned NOT NULL DEFAULT 0,
   `resArcane` INT unsigned NOT NULL DEFAULT 0,
-  `blockPct` float unsigned NOT NULL DEFAULT 0,
-  `dodgePct` float unsigned NOT NULL DEFAULT 0,
-  `parryPct` float unsigned NOT NULL DEFAULT 0,
-  `critPct` float unsigned NOT NULL DEFAULT 0,
-  `rangedCritPct` float unsigned NOT NULL DEFAULT 0,
-  `spellCritPct` float unsigned NOT NULL DEFAULT 0,
+  `blockPct` FLOAT NOT NULL DEFAULT 0,
+  `dodgePct` FLOAT NOT NULL DEFAULT 0,
+  `parryPct` FLOAT NOT NULL DEFAULT 0,
+  `critPct` FLOAT NOT NULL DEFAULT 0,
+  `rangedCritPct` FLOAT NOT NULL DEFAULT 0,
+  `spellCritPct` FLOAT NOT NULL DEFAULT 0,
   `attackPower` INT unsigned NOT NULL DEFAULT 0,
   `rangedAttackPower` INT unsigned NOT NULL DEFAULT 0,
   `spellPower` INT unsigned NOT NULL DEFAULT 0,
   `resilience` INT unsigned NOT NULL DEFAULT 0,
+  CHECK (`blockPct`>0 AND `dodgePct`>0 AND `parryPct`>0 AND `critPct`>0 AND `rangedCritPct`>0 AND `spellCritPct`>0),
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

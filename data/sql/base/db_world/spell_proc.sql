@@ -20,10 +20,11 @@ CREATE TABLE `spell_proc`
   `spellPhaseMask` INT NOT NULL DEFAULT 0,
   `hitMask` INT NOT NULL DEFAULT 0,
   `attributesMask` INT unsigned NOT NULL DEFAULT 0,
-  `ratePerMinute` float NOT NULL DEFAULT 0,
-  `chance` float NOT NULL DEFAULT 0,
-  `cooldown` float unsigned NOT NULL DEFAULT 0,
+  `ratePerMinute` FLOAT NOT NULL DEFAULT 0,
+  `chance` FLOAT NOT NULL DEFAULT 0,
+  `cooldown` FLOAT NOT NULL DEFAULT 0,
   `charges` INT unsigned NOT NULL DEFAULT 0,
+  CHECK (`cooldown`>0),
   PRIMARY KEY (`spellId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;

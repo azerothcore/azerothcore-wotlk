@@ -19,8 +19,9 @@ CREATE TABLE `realmlist`
   `flag` TINYINT unsigned NOT NULL DEFAULT 2,
   `timezone` TINYINT unsigned NOT NULL DEFAULT 0,
   `allowedSecurityLevel` TINYINT unsigned NOT NULL DEFAULT 0,
-  `population` float unsigned NOT NULL DEFAULT 0,
+  `population` FLOAT NOT NULL DEFAULT 0,
   `gamebuild` INT unsigned NOT NULL DEFAULT 12340,
+  CHECK (`population`>0),
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_name` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=UTF8MB4 COMMENT='Realm System';
