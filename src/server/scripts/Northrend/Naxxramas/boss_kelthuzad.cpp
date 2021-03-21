@@ -16,9 +16,9 @@ enum Yells
     SAY_DEATH                                              = 9,
     SAY_CHAIN                                              = 10,
     SAY_FROST_BLAST                                        = 11,
-    SAY_REQUEST_AID                                        = 12, //start of phase 3
-    SAY_ANSWER_REQUEST                                     = 3, //lich king answer
-    SAY_SUMMON_MINIONS                                     = 14, //start of phase 1
+    SAY_REQUEST_AID                                        = 12,
+    SAY_ANSWER_REQUEST                                     = 3,
+    SAY_SUMMON_MINIONS                                     = 14,
     SAY_SPECIAL                                            = 15,
 
     EMOTE_GUARDIAN_FLEE                                    = 0,
@@ -27,6 +27,7 @@ enum Yells
 
 enum Spells
 {
+    // Kel'Thzuad
     SPELL_FROST_BOLT_SINGLE_10              = 28478,
     SPELL_FROST_BOLT_SINGLE_25              = 55802,
     SPELL_FROST_BOLT_MULTI_10               = 28479,
@@ -42,7 +43,7 @@ enum Spells
     // Minions
     SPELL_FRENZY                            = 28468,
     SPELL_MORTAL_WOUND                      = 28467,
-    SPELL_BLOOD_TAP                         = 28470,
+    SPELL_BLOOD_TAP                         = 28470
 };
 
 enum Misc
@@ -54,7 +55,7 @@ enum Misc
 
     ACTION_CALL_HELP_ON                     = 1,
     ACTION_CALL_HELP_OFF                    = 2,
-    ACTION_SECOND_PHASE                     = 3,
+    ACTION_SECOND_PHASE                     = 3
 };
 
 enum Event
@@ -76,28 +77,20 @@ enum Event
     EVENT_FLOOR_CHANGE                      = 14,
 
     // Minions
-    EVENT_MINION_SPELL_FRENZY               = 100,
-    EVENT_MINION_SPELL_MORTAL_WOUND         = 101,
-    EVENT_MINION_SPELL_BLOOD_TAP            = 102,
+    EVENT_MINION_SPELL_FRENZY               = 15,
+    EVENT_MINION_SPELL_MORTAL_WOUND         = 16,
+    EVENT_MINION_SPELL_BLOOD_TAP            = 17
 };
 
 const Position SummonPositions[12] =
 {
     // Portals
-    {3783.272705f, -5062.697266f, 143.711203f, 3.617599f},     //LEFT_FAR
-    {3730.291260f, -5027.239258f, 143.956909f, 4.461900f},     //LEFT_MIDDLE
-    {3683.868652f, -5057.281250f, 143.183884f, 5.237086f},     //LEFT_NEAR
-    {3759.355225f, -5174.128418f, 143.802383f, 2.170104f},     //RIGHT_FAR
-    {3700.724365f, -5185.123047f, 143.928024f, 1.309310f},     //RIGHT_MIDDLE
-    {3665.121094f, -5138.679199f, 143.183212f, 0.604023f},     //RIGHT_NEAR
-
-    // Edges
-    //{3754.431396f, -5080.727734f, 142.036316f, 3.736189f},     //LEFT_FAR
-    // {3724.396484f, -5061.330566f, 142.032700f, 4.564785f},     //LEFT_MIDDLE
-    //{3687.158424f, -5076.834473f, 142.017319f, 5.237086f},     //LEFT_NEAR
-    //{3687.571777f, -5126.831055f, 142.017807f, 0.604023f},     //RIGHT_FAR
-    //{3707.990733f, -5151.450195f, 142.032562f, 1.376855f},     //RIGHT_MIDDLE
-    // {3739.500000f, -5141.883989f, 142.014113f, 2.121412f}      //RIGHT_NEAR
+    {3783.272705f, -5062.697266f, 143.711203f, 3.617599f}, //LEFT_FAR
+    {3730.291260f, -5027.239258f, 143.956909f, 4.461900f}, //LEFT_MIDDLE
+    {3683.868652f, -5057.281250f, 143.183884f, 5.237086f}, //LEFT_NEAR
+    {3759.355225f, -5174.128418f, 143.802383f, 2.170104f}, //RIGHT_FAR
+    {3700.724365f, -5185.123047f, 143.928024f, 1.309310f}, //RIGHT_MIDDLE
+    {3665.121094f, -5138.679199f, 143.183212f, 0.604023f}, //RIGHT_NEAR
 
     // Middle
     {3769.34f, -5071.80f, 143.2082f, 3.658f},
@@ -133,34 +126,38 @@ public:
 
         float NormalizeOrientation(float o)
         {
-            // Only positive values will be passed
-            return fmod(o, 2.0f * static_cast<float>(M_PI));
+            return fmod(o, 2.0f * static_cast<float>(M_PI)); // Only positive values will be passed
         }
 
         void SpawnHelpers()
         {
-            // Ehhh...
-            // in short: 6 rooms, 8 soldiers, 3 abominations and 1 weaver in each room
+            // 6 rooms, 8 soldiers, 3 abominations and 1 weaver in each room
             // middle positions in table starts from 6
             for (uint8 i = 6; i < 12; ++i)
+            {
                 for (uint8 j = 0; j < 8; ++j)
                 {
                     float angle = M_PI * 2 / 8 * j;
                     me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonPositions[i].GetPositionX() + 6 * cos(angle), SummonPositions[i].GetPositionY() + 6 * sin(angle), SummonPositions[i].GetPositionZ(), SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
+            }
             for (uint8 i = 6; i < 12; ++i)
+            {
                 for (uint8 j = 1; j < 4; ++j)
                 {
                     float dist = j == 2 ? 0.0f : 8.0f; // second in middle
                     float angle = SummonPositions[i].GetOrientation() + M_PI * 2 / 4 * j;
                     me->SummonCreature(NPC_UNSTOPPABLE_ABOMINATION, SummonPositions[i].GetPositionX() + dist * cos(angle), SummonPositions[i].GetPositionY() + dist * sin(angle), SummonPositions[i].GetPositionZ(), SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
+            }
             for (uint8 i = 6; i < 12; ++i)
+            {
                 for (uint8 j = 0; j < 1; ++j)
                 {
                     float angle = SummonPositions[i].GetOrientation() + M_PI;
                     me->SummonCreature(NPC_SOUL_WEAVER, SummonPositions[i].GetPositionX() + 6 * cos(angle), SummonPositions[i].GetPositionY() + 6 * sin(angle), SummonPositions[i].GetPositionZ() + 0.5f, SummonPositions[i].GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 }
+            }
         }
 
         void Reset() override
@@ -170,17 +167,17 @@ public:
             summons.DespawnAll();
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
             me->SetReactState(REACT_AGGRESSIVE);
-
             if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_FLOOR)))
             {
                 go->SetPhaseMask(1, true);
                 go->SetGoState(GO_STATE_READY);
             }
-
             if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
             {
-                if(!_justSpawned) /* Don't open the door if we just spawned and are still doing the RP */
+                if(!_justSpawned) // Don't open the door if we just spawned and are still doing the conversation
+                {
                     go->SetGoState(GO_STATE_ACTIVE);
+                }
             }
             _justSpawned = false;
         }
@@ -197,9 +194,10 @@ public:
                 return;
 
             Talk(SAY_SLAY);
-
             if (pInstance)
+            {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
+            }
         }
 
         void JustDied(Unit*  killer) override
@@ -211,11 +209,12 @@ public:
             }
             summons.DespawnAll();
             Talk(SAY_DEATH);
-
             if (pInstance)
             {
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
+                {
                     go->SetGoState(GO_STATE_ACTIVE);
+                }
             }
         }
 
@@ -233,10 +232,7 @@ public:
             me->RemoveAllAttackers();
             me->SetTarget(0);
             me->SetReactState(REACT_PASSIVE);
-
-            // Spawn helpers
             SpawnHelpers();
-
             events.ScheduleEvent(EVENT_SUMMON_SOLDIER, 3200);
             events.ScheduleEvent(EVENT_SUMMON_UNSTOPPABLE_ABOMINATION, 10000);
             events.ScheduleEvent(EVENT_SUMMON_SOUL_WEAVER, 24000);
@@ -250,10 +246,15 @@ public:
                 }
             }
             if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
+            {
                 go->SetGoState(GO_STATE_READY);
+            }
         }
 
-        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
+        void JustSummoned(Creature* cr) override
+        {
+            summons.Summon(cr);
+        }
 
         void UpdateAI(uint32 diff) override
         {
@@ -276,7 +277,6 @@ public:
                             go->SetPhaseMask(2, true);
                         }
                     }
-
                     break;
                 case EVENT_SUMMON_SOLDIER:
                     if (Creature* cr = me->SummonCreature(NPC_SOLDIER_OF_THE_FROZEN_WASTES, SummonPositions[urand(0, 5)], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
@@ -287,7 +287,6 @@ public:
                             cr->AI()->AttackStart(target);
                         }
                     }
-
                     events.RepeatEvent(3200);
                     break;
                 case EVENT_SUMMON_UNSTOPPABLE_ABOMINATION:
@@ -299,7 +298,6 @@ public:
                             cr->AI()->AttackStart(target);
                         }
                     }
-
                     events.RepeatEvent(30000);
                     break;
                 case EVENT_SUMMON_SOUL_WEAVER:
@@ -311,13 +309,11 @@ public:
                             cr->AI()->AttackStart(target);
                         }
                     }
-
                     events.RepeatEvent(30000);
                     break;
                 case EVENT_START_SECOND_PHASE:
-                    // same as pop
                     Talk(SAY_AGGRO);
-                    events.Reset();
+                    events.Reset(); // same as pop
                     summons.DoAction(ACTION_SECOND_PHASE);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
@@ -329,7 +325,9 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_SHADOW_FISSURE, 25000);
                     events.ScheduleEvent(EVENT_SPELL_FROST_BLAST, 45000);
                     if (Is25ManRaid())
+                    {
                         events.ScheduleEvent(EVENT_SPELL_CHAINS, 50000);
+                    }
                     break;
                 case EVENT_SPELL_FROST_BOLT_SINGLE:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_FROST_BOLT_SINGLE_10, SPELL_FROST_BOLT_SINGLE_25), false);
@@ -346,16 +344,20 @@ public:
                     break;
                 case EVENT_SPELL_FROST_BLAST:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, RAID_MODE(1, 0), 0, true))
+                    {
                         me->CastSpell(target, SPELL_FROST_BLAST, false);
-
+                    }
                     Talk(SAY_FROST_BLAST);
                     events.RepeatEvent(45000);
                     break;
                 case EVENT_SPELL_CHAINS:
                     for (uint8 i = 0; i < 3; ++i)
+                    {
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 200, true, -SPELL_CHAINS_OF_KELTHUZAD))
+                        {
                             me->CastSpell(target, SPELL_CHAINS_OF_KELTHUZAD, true);
-
+                        }
+                    }
                     Talk(SAY_CHAIN);
                     events.RepeatEvent(50000);
                     break;
@@ -368,9 +370,10 @@ public:
                             if (itr->getTarget()->GetTypeId() == TYPEID_PLAYER
                                     && itr->getTarget()->getPowerType() == POWER_MANA
                                     && itr->getTarget()->GetPower(POWER_MANA))
-                                unitList.push_back(itr->getTarget());
+                                    {
+                                        unitList.push_back(itr->getTarget());
+                                    }
                         }
-
                         if (!unitList.empty())
                         {
                             auto itr = unitList.begin();
@@ -378,7 +381,6 @@ public:
                             me->CastSpell(*itr, SPELL_DETONATE_MANA, false);
                             Talk(SAY_SPECIAL);
                         }
-
                         events.RepeatEvent(30000);
                         break;
                     }
@@ -394,12 +396,16 @@ public:
                     break;
                 case EVENT_THIRD_PHASE_LICH_KING_SAY:
                     if (pInstance)
+                    {
                         if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_LICH_KING_BOSS)))
+                        {
                             cr->AI()->Talk(SAY_ANSWER_REQUEST);
-
+                        }
+                    }
                     for (uint8 i = 0 ; i < RAID_MODE(2, 4); ++i)
+                    {
                         events.ScheduleEvent(EVENT_SUMMON_GUARDIAN_OF_ICECROWN, 10000 + (i * 5000));
-
+                    }
                     break;
                 case EVENT_SUMMON_GUARDIAN_OF_ICECROWN:
                     if (Creature* cr = me->SummonCreature(NPC_GUARDIAN_OF_ICECROWN, SummonPositions[RAND(0, 1, 3, 4)]))
@@ -407,10 +413,8 @@ public:
                         cr->AI()->Talk(EMOTE_GUARDIAN_APPEAR);
                         cr->AI()->AttackStart(me->GetVictim());
                     }
-
                     break;
             }
-
             if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
                 DoMeleeAttackIfReady();
         }
@@ -444,13 +448,19 @@ public:
         void DoAction(int32 param) override
         {
             if (param == ACTION_CALL_HELP_ON)
+            {
                 callHelp = true;
+            }
             else if (param == ACTION_CALL_HELP_OFF)
+            {
                 callHelp = false;
+            }
             else if (param == ACTION_SECOND_PHASE)
             {
                 if (!me->IsInCombat())
+                {
                     me->DespawnOrUnsummon(500);
+                }
             }
         }
 
@@ -465,7 +475,9 @@ public:
         void JustDied(Unit* ) override
         {
             if (me->GetEntry() == NPC_UNSTOPPABLE_ABOMINATION && me->GetInstanceScript())
+            {
                 me->GetInstanceScript()->SetData(DATA_ABOMINATION_KILLED, 0);
+            }
         }
 
         void AttackStart(Unit* who) override
@@ -486,7 +498,9 @@ public:
             }
 
             if (me->GetEntry() != NPC_UNSTOPPABLE_ABOMINATION && me->GetEntry() != NPC_GUARDIAN_OF_ICECROWN)
+            {
                 me->AddThreat(who, 1000000.0f);
+            }
         }
 
         void EnterCombat(Unit*  /*who*/) override
@@ -498,13 +512,17 @@ public:
                 events.ScheduleEvent(EVENT_MINION_SPELL_MORTAL_WOUND, 5000);
             }
             else if (me->GetEntry() == NPC_GUARDIAN_OF_ICECROWN)
+            {
                 events.ScheduleEvent(EVENT_MINION_SPELL_BLOOD_TAP, 15000);
+            }
         }
 
         void KilledUnit(Unit* who) override
         {
             if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
+            {
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -526,7 +544,6 @@ public:
                     if (me->HealthBelowPct(35))
                     {
                         me->CastSpell(me, SPELL_FRENZY, true);
-
                         break;
                     }
                     events.RepeatEvent(1000);
@@ -536,7 +553,6 @@ public:
                     events.RepeatEvent(15000);
                     break;
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -559,12 +575,17 @@ public:
 
             std::list<WorldObject*> tmplist;
             for (auto& target : targets)
+            {
                 if (!target->ToUnit()->HasAura(SPELL_FROST_BLAST))
+                {
                     tmplist.push_back(target);
-
+                }
+            }
             targets.clear();
             for (auto& itr : tmplist)
+            {
                 targets.push_back(itr);
+            }
         }
 
         void Register() override
@@ -596,7 +617,6 @@ public:
         void HandleScript(AuraEffect const* aurEff)
         {
             PreventDefaultAction();
-
             Unit* target = GetTarget();
             if (auto mana = int32(target->GetMaxPower(POWER_MANA) / 10))
             {
