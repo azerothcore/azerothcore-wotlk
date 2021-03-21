@@ -727,8 +727,7 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
                         break;
                     case BOSS_SAPPHIRON:
-                        if (GameObject* go = instance->GetGameObject(_sapphironGateGUID))
-                            go->SetGoState(GO_STATE_ACTIVE);
+                        events.ScheduleEvent(EVENT_FROSTWYRM_WATERFALL_DOOR, 5000);
                         break;
                     case BOSS_THADDIUS:
                         if (GameObject* go = instance->GetGameObject(_thaddiusPortalGUID))
@@ -820,7 +819,12 @@ public:
                     if (Creature* kelthuzad = instance->GetCreature(_kelthuzadGUID))
                         kelthuzad->AI()->Talk(_currentWingTaunt);
                     ++_currentWingTaunt;
-
+                    break;
+                case EVENT_FROSTWYRM_WATERFALL_DOOR:
+                    if (GameObject* go = instance->GetGameObject(_sapphironGateGUID))
+                    {
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
             }
         }
