@@ -11,7 +11,7 @@ CREATE TABLE `characters`
 (
   `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
   `account` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Account Identifier',
-  `name` varchar(12) CHARACTER SET UTF8MB4 COLLATE utf8_bin NOT NULL,
+  `name` varchar(12) CHARACTER SET UTF8MB4 COLLATE utf8mb4_bin NOT NULL,
   `race` TINYINT unsigned NOT NULL DEFAULT 0,
   `class` TINYINT unsigned NOT NULL DEFAULT 0,
   `gender` TINYINT unsigned NOT NULL DEFAULT 0,
