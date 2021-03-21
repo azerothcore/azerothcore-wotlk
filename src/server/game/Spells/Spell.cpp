@@ -7374,7 +7374,7 @@ bool Spell::IsAutoActionResetSpell() const
     {
         return false;
     }
-    
+
     return true;
 }
 
