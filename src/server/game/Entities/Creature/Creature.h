@@ -120,7 +120,7 @@ struct CreatureTemplate
     uint32  pickpocketLootId;
     uint32  SkinLootId;
     int32   resistance[MAX_SPELL_SCHOOL];
-    uint32  spells[CREATURE_MAX_SPELLS];
+    uint32  spells[MAX_CREATURE_SPELLS];
     uint32  PetSpellDataId;
     uint32  VehicleId;
     uint32  mingold;
@@ -474,6 +474,7 @@ public:
     ///// TODO RENAME THIS!!!!!
     bool isCanInteractWithBattleMaster(Player* player, bool msg) const;
     bool isCanTrainingAndResetTalentsOf(Player* player) const;
+    [[nodiscard]] bool IsValidTrainerForPlayer(Player* player, uint32* npcFlags = nullptr) const;
     bool CanCreatureAttack(Unit const* victim, bool skipDistCheck = false) const;
     void LoadSpellTemplateImmunity();
     bool IsImmunedToSpell(SpellInfo const* spellInfo) override;
@@ -613,7 +614,7 @@ public:
     SpellInfo const* reachWithSpellAttack(Unit* victim);
     SpellInfo const* reachWithSpellCure(Unit* victim);
 
-    uint32 m_spells[CREATURE_MAX_SPELLS];
+    uint32 m_spells[MAX_CREATURE_SPELLS];
     CreatureSpellCooldowns m_CreatureSpellCooldowns;
     uint32 m_ProhibitSchoolTime[7];
 
@@ -768,6 +769,7 @@ protected:
     /// Timers
     time_t m_corpseRemoveTime;                          // (msecs)timer for death or corpse disappearance
     time_t m_respawnTime;                               // (secs) time of next respawn
+    time_t m_respawnedTime;                             // (secs) time when creature respawned
     uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning
     uint32 m_corpseDelay;                               // (secs) delay between death and corpse disappearance
     float m_wanderDistance;
