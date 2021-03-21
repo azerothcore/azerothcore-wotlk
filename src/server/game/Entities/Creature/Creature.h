@@ -769,6 +769,7 @@ protected:
     /// Timers
     time_t m_corpseRemoveTime;                          // (msecs)timer for death or corpse disappearance
     time_t m_respawnTime;                               // (secs) time of next respawn
+    time_t m_respawnedTime;                             // (secs) time when creature respawned
     uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning
     uint32 m_corpseDelay;                               // (secs) delay between death and corpse disappearance
     float m_wanderDistance;

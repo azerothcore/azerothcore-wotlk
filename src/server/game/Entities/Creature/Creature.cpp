@@ -1791,7 +1791,7 @@ void Creature::Respawn(bool force)
         //Re-initialize reactstate that could be altered by movementgenerators
         InitializeReactState();
     }
-
+    m_respawnedTime = time(nullptr);
     // xinef: relocate notifier, fixes npc appearing in corpse position after forced respawn (instead of spawn)
     m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
     UpdateObjectVisibility(false);
@@ -2275,6 +2275,12 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
     // pussywizard: or if enemy is in evade mode
     if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsInEvadeMode())
         return false;
+
+    // cannot attack if is during 5 second grace period, unless being attacked
+    if ((time(nullptr) - m_respawnedTime) < 5 && victim->getAttackers().empty())
+    {
+        return false;
+    }
 
     if (!IS_PLAYER_GUID(GetCharmerOrOwnerGUID()))
     {
