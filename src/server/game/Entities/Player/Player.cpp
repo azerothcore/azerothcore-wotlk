@@ -3041,7 +3041,7 @@ bool Player::IsInWater(bool allowAbove) const
 bool Player::IsUnderWater() const
 {
     return IsInWater() &&
-           GetPositionZ() < (GetBaseMap()->GetWaterLevel(GetPositionX(), GetPositionY()) - 2);
+           GetPositionZ() < GetBaseMap()->GetWaterLevel(GetPositionX(), GetPositionY()) - GetCollisionHeight();
 }
 
 bool Player::IsFalling() const
@@ -24769,13 +24769,14 @@ void Player::UpdateUnderwaterState(Map* m, float x, float y, float z)
     // pussywizard: optimization
     if (GetExactDistSq(&m_last_underwaterstate_position) < 3.0f * 3.0f)
         return;
+
     m_last_underwaterstate_position.Relocate(m_positionX, m_positionY, m_positionZ);
 
     if (!IsPositionValid()) // pussywizard: crashfix if calculated grid coords would be out of range 0-64
         return;
 
     LiquidData liquid_status;
-    ZLiquidStatus res = m->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status);
+    ZLiquidStatus res = m->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status, GetCollisionHeight());
     if (!res)
     {
         m_MirrorTimerFlags &= ~(UNDERWATER_INWATER | UNDERWATER_INLAVA | UNDERWATER_INSLIME | UNDERWARER_INDARKWATER);
