@@ -252,12 +252,12 @@ UPDATE `creature_template` SET `DamageModifier`='6' WHERE  `entry`=8923;
 
 -- dire maul north
 -- king gordok 5->6
-UPDATE `acore_world`.`creature_template` SET `DamageModifier`='6' WHERE  `entry`=11501;
+UPDATE `creature_template` SET `DamageModifier`='6' WHERE  `entry`=11501;
 -- hyenas 1->3.5
-UPDATE `acore_world`.`creature_template` SET `DamageModifier`='3.9' WHERE  `entry`=13036;
+UPDATE `creature_template` SET `DamageModifier`='3.9' WHERE  `entry`=13036;
 -- gordok brute 5->6.5
-UPDATE `acore_world`.`creature_template` SET `DamageModifier`='6.5' WHERE  `entry`=11441;
+UPDATE `creature_template` SET `DamageModifier`='6.5' WHERE  `entry`=11441;
 -- captain
-UPDATE `acore_world`.`creature_template` SET `DamageModifier`='6' WHERE  `entry`=11445;
+UPDATE `creature_template` SET `DamageModifier`='6' WHERE  `entry`=11445;
 -- gordok mauler 5->1 (outside)
-UPDATE `acore_world`.`creature_template` SET `DamageModifier`='1' WHERE  `entry`=11442;
+UPDATE `creature_template` SET `DamageModifier`='1' WHERE  `entry`=11442;
