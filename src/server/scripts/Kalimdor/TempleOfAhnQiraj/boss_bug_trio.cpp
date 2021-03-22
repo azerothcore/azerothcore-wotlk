@@ -29,6 +29,28 @@ enum Spells
     SPELL_FEAR         = 19408
 };
 
+struct boss_bug_trioAI : public ScriptedAI
+{
+public:
+    boss_bug_trioAI(Creature* creature) : ScriptedAI(creature) { instance = me->GetInstanceScript(); }
+
+    void RespawnTrio()
+    {
+        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VEM)))
+            if (!vem->IsAlive())
+                vem->Respawn();
+        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KRI)))
+            if (!kri->IsAlive())
+                kri->Respawn();
+        if (Creature* yauj = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_YAUJ)))
+            if (!yauj->IsAlive())
+                yauj->Respawn();
+    }
+
+private:
+    InstanceScript* instance;
+};
+
 class boss_kri : public CreatureScript
 {
 public:
@@ -63,6 +85,8 @@ public:
 
             VemDead = false;
             Death = false;
+            
+            RespawnTrio();
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -156,6 +180,8 @@ public:
             Enrage_Timer = 120000;
 
             Enraged = false;
+            
+            RespawnTrio();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -247,6 +273,8 @@ public:
             Check_Timer = 2000;
 
             VemDead = false;
+            
+            RespawnTrio();
         }
 
         void JustDied(Unit* /*killer*/) override
