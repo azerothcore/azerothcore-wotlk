@@ -1239,15 +1239,6 @@ Warden.NumLuaChecks = 1
 Warden.NumOtherChecks = 7
 
 #
-#    Warden.LogFile
-#        Description: Client check fails will be logged here.
-#        Default:     ""           - (Disabled)
-#                     "Warden.log" - (Enabled)
-#
-
-Warden.LogFile = ""
-
-#
 #    Warden.ClientResponseDelay
 #        Description: Time (in seconds) before client is getting disconnecting for not responding.
 #        Default:     600 - (10 Minutes)
