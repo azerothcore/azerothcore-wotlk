@@ -6385,10 +6385,10 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLeve
 
 float getProbabilityOfLevelUp(uint32 SkillValue)
 {
-    /* According to El's Extreme Angling page, the probability of a skill
-     * level up is 100% since 100/1 = 100. From 115 - 135 should average
-     * 2 catches per skill up so that means 100/2 = 50%. The if statement
-     * returns the probability the range of skill on 
+    /* According to El's Extreme Angling page, from 1 to 115 the probability of a skill
+     * level up is 100% since 100/1 = 100. From 115 - 135 should average 2 catches per
+     * skill up so that means 100/2 = 50%. The if statement returns the probability
+     * depending on the player's SkillValue.
      */
     if (SkillValue > 115 && SkillValue <= 135)
     {
@@ -6427,7 +6427,7 @@ float getProbabilityOfLevelUp(uint32 SkillValue)
         return 100 / 12;
     }
 
-    // Below 115 Sillvalue only needs 1 step
+    // There's a 100% chance of level up until 115 Fishing
     return 100;
 }
 
