@@ -225,7 +225,7 @@ int RASocket::check_password(const std::string& user, const std::string& pass)
             return 0;
     }
 
-    sLog->outRemote("Wrong password for user: %s", user.c_str());
+    LOG_INFO("commands.ra", "Wrong password for user: %s", user.c_str());
     return -1;
 }
 
