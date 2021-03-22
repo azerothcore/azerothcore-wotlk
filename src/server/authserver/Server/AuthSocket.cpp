@@ -395,7 +395,7 @@ bool AuthSocket::_HandleLogonChallenge()
             bool locked = false;
             if (fields[1].GetUInt8() == 1)                  // if ip is locked
             {
-                LOG_DEBUG("network", "[AuthChallenge] Account '%s' is locked to IP - '%s'", _login.c_str(), fields[3].GetCString());
+                LOG_DEBUG("network", "[AuthChallenge] Account '%s' is locked to IP - '%s'", _login.c_str(), fields[2].GetCString());
                 LOG_DEBUG("network", "[AuthChallenge] Player address is '%s'", ip_address.c_str());
 
                 if (strcmp(fields[3].GetCString(), ip_address.c_str()) != 0)
