@@ -111,3 +111,10 @@ UPDATE `creature_text` SET `comment`='Sapphiron EMOTE_GROUND_PHASE' WHERE `Creat
 UPDATE `creature_text` SET `comment`='Sapphiron EMOTE_BREATH' WHERE `CreatureID`=15989 AND `GroupID`=2 AND `ID`=0;
 UPDATE `creature_text` SET `comment`='Sapphiron EMOTE_ENRAGE' WHERE `CreatureID`=15989 AND `GroupID`=3 AND `ID`=0;
 
+
+/* Kel'Thuzad */
+
+-- Guardians of Icecrown should be immune to all CC
+UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|1|2|4|8|32|64|256|512|1024|2048|4096|8192|65536|131072|524288|4194304|67108864|536870912 WHERE `entry` IN 
+(16441, 30057);
+

@@ -68,6 +68,10 @@ public:
             _horsemanGateGUID = 0;
             _kelthuzadfloorGUID = 0;
             _kelthuzadgateGUID = 0;
+            _kelthuzadportal1GUID = 0;
+            _kelthuzadportal2GUID = 0;
+            _kelthuzadportal3GUID = 0;
+            _kelthuzadportal4GUID = 0;
             _sapphironGateGUID = 0;
             _horsemanPortalGUID = 0;
             _loathebPortalGUID = 0;
@@ -131,6 +135,10 @@ public:
         uint64 _horsemanGateGUID;
         uint64 _kelthuzadfloorGUID;
         uint64 _kelthuzadgateGUID;
+        uint64 _kelthuzadportal1GUID;
+        uint64 _kelthuzadportal2GUID;
+        uint64 _kelthuzadportal3GUID;
+        uint64 _kelthuzadportal4GUID;
         uint64 _sapphironGateGUID;
         uint64 _horsemanPortalGUID;
         uint64 _loathebPortalGUID;
@@ -347,6 +355,18 @@ public:
                     _kelthuzadgateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_SAPPHIRON) == DONE && _speakTimer == 0)
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case GO_KELTHUZAD_PORTAL_1:
+                    _kelthuzadportal1GUID = pGo->GetGUID();
+                    break;
+                case GO_KELTHUZAD_PORTAL_2:
+                    _kelthuzadportal2GUID = pGo->GetGUID();
+                    break;
+                case GO_KELTHUZAD_PORTAL_3:
+                    _kelthuzadportal3GUID = pGo->GetGUID();
+                    break;
+                case GO_KELTHUZAD_PORTAL_4:
+                    _kelthuzadportal4GUID = pGo->GetGUID();
                     break;
                 case GO_SAPPHIRON_GATE:
                     _sapphironGateGUID = pGo->GetGUID();
@@ -852,6 +872,14 @@ public:
                     return _kelthuzadfloorGUID;
                 case DATA_KELTHUZAD_GATE:
                     return _kelthuzadgateGUID;
+                case DATA_KELTHUZAD_PORTAL_1:
+                    return _kelthuzadportal1GUID;
+                case DATA_KELTHUZAD_PORTAL_2:
+                    return _kelthuzadportal2GUID;
+                case DATA_KELTHUZAD_PORTAL_3:
+                    return _kelthuzadportal3GUID;
+                case DATA_KELTHUZAD_PORTAL_4:
+                    return _kelthuzadportal4GUID;
 
                 // NPCs
                 case DATA_THADDIUS_BOSS:

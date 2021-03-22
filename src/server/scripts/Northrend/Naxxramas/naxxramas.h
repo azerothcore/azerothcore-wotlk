@@ -51,6 +51,10 @@ enum NXData
     DATA_IMMORTAL_FAIL              = 119,
     DATA_KELTHUZAD_GATE             = 120,
     DATA_HAD_THADDIUS_GREET         = 121,
+    DATA_KELTHUZAD_PORTAL_1         = 122,
+    DATA_KELTHUZAD_PORTAL_2         = 123,
+    DATA_KELTHUZAD_PORTAL_3         = 124,
+    DATA_KELTHUZAD_PORTAL_4         = 125
 };
 
 enum NXGOs
@@ -78,6 +82,10 @@ enum NXGOs
     GO_SAPPHIRON_BIRTH              = 181356,
     GO_KELTHUZAD_FLOOR              = 181444,
     GO_KELTHUZAD_GATE               = 181228,
+    GO_KELTHUZAD_PORTAL_1           = 181402,
+    GO_KELTHUZAD_PORTAL_2           = 181403,
+    GO_KELTHUZAD_PORTAL_3           = 181404,
+    GO_KELTHUZAD_PORTAL_4           = 181405,
 
     GO_DEATHKNIGHT_WING             = 181577, //Loatheb portal
     GO_THADDIUS_PORTAL              = 181576, //Thadius portal

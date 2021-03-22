@@ -10,6 +10,7 @@
 
 enum Yells
 {
+    SAY_ANSWER_REQUEST                      = 3,
     SAY_TAUNT                               = 6,
     SAY_AGGRO                               = 7,
     SAY_SLAY                                = 8,
@@ -17,7 +18,7 @@ enum Yells
     SAY_CHAIN                               = 10,
     SAY_FROST_BLAST                         = 11,
     SAY_REQUEST_AID                         = 12,
-    SAY_ANSWER_REQUEST                      = 3,
+    EMOTE_PHASE_TWO                         = 13,
     SAY_SUMMON_MINIONS                      = 14,
     SAY_SPECIAL                             = 15,
 
@@ -37,7 +38,7 @@ enum Spells
     SPELL_DETONATE_MANA                     = 27819,
     SPELL_MANA_DETONATION_DAMAGE            = 27820,
     SPELL_FROST_BLAST                       = 27808,
-    SPELL_CHAINS_OF_KELTHUZAD               = 28410, //28408 script effect
+    SPELL_CHAINS_OF_KELTHUZAD               = 28410, // 28408 script effect
     SPELL_BERSERK                           = 28498,
     SPELL_KELTHUZAD_CHANNEL                 = 29423,
 
@@ -56,7 +57,10 @@ enum Misc
 
     ACTION_CALL_HELP_ON                     = 1,
     ACTION_CALL_HELP_OFF                    = 2,
-    ACTION_SECOND_PHASE                     = 3
+    ACTION_SECOND_PHASE                     = 3,
+    ACTION_GUARDIANS_OFF                    = 4,
+
+    POINT_PORTAL                            = 5
 };
 
 enum Event
@@ -80,9 +84,9 @@ enum Event
     EVENT_SPAWN_POOL                        = 16,
 
     // Minions
-    EVENT_MINION_SPELL_FRENZY               = 16,
-    EVENT_MINION_SPELL_MORTAL_WOUND         = 17,
-    EVENT_MINION_SPELL_BLOOD_TAP            = 18
+    EVENT_MINION_SPELL_FRENZY               = 17,
+    EVENT_MINION_SPELL_MORTAL_WOUND         = 18,
+    EVENT_MINION_SPELL_BLOOD_TAP            = 19
 };
 
 const Position SummonGroups[12] =
@@ -221,6 +225,22 @@ public:
                 }
             }
             _justSpawned = false;
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_PORTAL_1)))
+            {
+                go->SetGoState(GO_STATE_READY);
+            }
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_PORTAL_2)))
+            {
+                go->SetGoState(GO_STATE_READY);
+            }
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_PORTAL_3)))
+            {
+                go->SetGoState(GO_STATE_READY);
+            }
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_PORTAL_4)))
+            {
+                go->SetGoState(GO_STATE_READY);
+            }
         }
 
         void EnterEvadeMode() override
@@ -244,11 +264,11 @@ public:
         void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
+            summons.DoAction(ACTION_GUARDIANS_OFF);
             if (Creature* guardian = summons.GetCreatureWithEntry(NPC_GUARDIAN_OF_ICECROWN))
             {
                 guardian->AI()->Talk(EMOTE_GUARDIAN_FLEE);
             }
-            summons.DespawnAll();
             Talk(SAY_DEATH);
             if (pInstance)
             {
@@ -278,7 +298,7 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_SOLDIER, 6400);
             events.ScheduleEvent(EVENT_SUMMON_UNSTOPPABLE_ABOMINATION, 10000);
             events.ScheduleEvent(EVENT_SUMMON_SOUL_WEAVER, 24000);
-            events.ScheduleEvent(EVENT_START_SECOND_PHASE, 228000);
+            events.ScheduleEvent(EVENT_START_SECOND_PHASE, 10000); // 228000
             events.ScheduleEvent(EVENT_ENRAGE, 900000);
             if (pInstance)
             {
@@ -300,6 +320,10 @@ public:
             if (!cr->IsInCombat())
             {
                 cr->GetMotionMaster()->MoveRandom(5);
+            }
+            if (cr->GetEntry() == NPC_GUARDIAN_OF_ICECROWN)
+            {
+                cr->SetHomePosition(cr->GetPositionX(), cr->GetPositionY(), cr->GetPositionZ(), cr->GetOrientation());
             }
         }
 
@@ -344,11 +368,13 @@ public:
                     events.RepeatEvent(30000);
                     break;
                 case EVENT_START_SECOND_PHASE:
+                    Talk(EMOTE_PHASE_TWO);
                     Talk(SAY_AGGRO);
                     events.Reset(); // same as pop
                     summons.DoAction(ACTION_SECOND_PHASE);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    me->RemoveAura(SPELL_KELTHUZAD_CHANNEL);
                     me->SetReactState(REACT_AGGRESSIVE);
                     events.ScheduleEvent(EVENT_SPELL_FROST_BOLT_SINGLE, 2000);
                     events.ScheduleEvent(EVENT_SPELL_FROST_BOLT_MULTI, 15000);
@@ -374,7 +400,9 @@ public:
                     break;
                 case EVENT_SPELL_SHADOW_FISSURE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
+                    {
                         me->CastSpell(target, SPELL_SHADOW_FISURE, false);
+                    }
                     events.RepeatEvent(25000);
                     break;
                 case EVENT_SPELL_FROST_BLAST:
@@ -425,6 +453,22 @@ public:
                         Talk(SAY_REQUEST_AID);
                         events.DelayEvents(5500);
                         events.ScheduleEvent(EVENT_THIRD_PHASE_LICH_KING_SAY, 5000);
+                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_PORTAL_1)))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        }
+                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_PORTAL_2)))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        }
+                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_PORTAL_3)))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        }
+                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_PORTAL_4)))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         break;
                     }
                     events.RepeatEvent(1000);
@@ -497,6 +541,14 @@ public:
                     me->DespawnOrUnsummon(500);
                 }
             }
+            if (param == ACTION_GUARDIANS_OFF)
+            {
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveAllAuras();
+                EnterEvadeMode();
+                me->SetPosition(me->GetHomePosition());
+            }
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -557,6 +609,15 @@ public:
             if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
             {
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
+            }
+        }
+
+        void JustReachedHome() override
+        {
+            if (me->GetEntry() == NPC_GUARDIAN_OF_ICECROWN)
+            {
+                me->DespawnOrUnsummon();
+                me->MonsterTextEmote("JustReachedHome();", 0, true);
             }
         }
 
