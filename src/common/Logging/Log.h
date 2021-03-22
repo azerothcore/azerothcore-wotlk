@@ -3,8 +3,8 @@
  * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
  */
 
-#ifndef TRINITYCORE_LOG_H
-#define TRINITYCORE_LOG_H
+#ifndef _LOG_H__
+#define _LOG_H__
 
 #include "Define.h"
 #include "LogCommon.h"
@@ -253,4 +253,4 @@ void check_args(std::string const&, ...);
 #define LOG_GM(accountId__, ...) \
     sLog->outCommand(accountId__, __VA_ARGS__)
 
-#endif
+#endif // _LOG_H__
