@@ -6402,25 +6402,53 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLeve
 
 uint8 GetFishingStepsNeededToLevelUp(uint32 SkillValue)
 {
-    /* The formula is calculated in order to reproduce
-     * a blizzlike behaviour. It was only guessed by
-     * the Trinitycore developers and improved by AC
+    /* The Trinity core formula was wrong, making people within
+     * 420 and 450 needing 14 steps to level up fishing instead
+     * of 12. Due to the steps needs to level up being so random
+     * accross all Skill ranges (the difference of 115 to 135 is 20
+     * but the difference from 215 to 295 is 80 so) I wasn't able
+     * to come up with a formula that simulates completely this
+     * behaviour. For now this solution will simulate it.
      */
-    float stepsNeeded = static_cast<float>(SkillValue);
-    if (SkillValue < 75)
+    if (SkillValue > 115 && SkillValue <= 135)
     {
-        return 1;
+        return 2;
     }
-    else if (SkillValue <= 300)
+    else if (SkillValue > 135 && SkillValue <= 160)
     {
-        stepsNeeded = round(stepsNeeded / 44);
-        return static_cast<uint8>(stepsNeeded);
+        return 3;
     }
-    else
+    else if (SkillValue > 160 && SkillValue <= 190)
     {
-        stepsNeeded = round(stepsNeeded / 31);
-        return static_cast<uint8>(stepsNeeded);
+        return 4;
     }
+    else if (SkillValue > 190 && SkillValue <= 215)
+    {
+        return 5;
+    }
+    else if (SkillValue > 215 && SkillValue <= 295)
+    {
+        return 6;
+    }
+    else if (SkillValue > 295 && SkillValue <= 315)
+    {
+        return 9;
+    }
+    else if (SkillValue > 315 && SkillValue <= 355)
+    {
+        return 10;
+    }
+    else if (SkillValue > 355 && SkillValue <= 425)
+    {
+        return 11;
+    }
+    else if (SkillValue > 425 && SkillValue < 450)
+    {
+        return 12;
+    }
+
+    // Below 115 Sillvalue only needs 1 step
+    return 1;
 }
 
 void updateFishingStepsDB(uint32 guid, uint32 steps)
