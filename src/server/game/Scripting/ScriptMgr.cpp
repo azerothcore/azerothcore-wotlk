@@ -1761,6 +1761,11 @@ void ScriptMgr::OnAccountLogin(uint32 accountId)
     FOREACH_SCRIPT(AccountScript)->OnAccountLogin(accountId);
 }
 
+void ScriptMgr::OnLastIpUpdate(uint32 accountId, std::string ip)
+{
+    FOREACH_SCRIPT(AccountScript)->OnLastIpUpdate(accountId, ip);
+}
+
 void ScriptMgr::OnFailedAccountLogin(uint32 accountId)
 {
     FOREACH_SCRIPT(AccountScript)->OnFailedAccountLogin(accountId);
