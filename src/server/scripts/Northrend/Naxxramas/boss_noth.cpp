@@ -8,15 +8,15 @@
 
 enum Says
 {
-    SAY_AGGRO                       = 0,
-    SAY_SUMMON                      = 1,
-    SAY_SLAY                        = 2,
-    SAY_DEATH                       = 3,
-    EMOTE_SUMMON                    = 4,
-    EMOTE_SUMMON_WAVE               = 5,
-    EMOTE_TELEPORT_BALCONY          = 6,
-    EMOTE_TELEPORT_BACK             = 7,
-    EMOTE_BLINK                     = 8
+    SAY_AGGRO                               = 0,
+    SAY_SUMMON                              = 1,
+    SAY_SLAY                                = 2,
+    SAY_DEATH                               = 3,
+    EMOTE_SUMMON                            = 4,
+    EMOTE_SUMMON_WAVE                       = 5,
+    EMOTE_TELEPORT_BALCONY                  = 6,
+    EMOTE_TELEPORT_BACK                     = 7,
+    EMOTE_BLINK                             = 8
 };
 
 enum Spells
@@ -34,11 +34,11 @@ enum Spells
 
 enum Events
 {
-    EVENT_SPELL_CURSE                       = 1,
-    EVENT_SPELL_CRIPPLE                     = 2,
+    EVENT_CURSE                             = 1,
+    EVENT_CRIPPLE                           = 2,
     EVENT_SUMMON_PLAGUED_WARRIOR_ANNOUNCE   = 3,
     EVENT_MOVE_TO_BALCONY                   = 4,
-    EVENT_SPELL_BLINK                       = 5,
+    EVENT_BLINK                             = 5,
     EVENT_MOVE_TO_GROUND                    = 6,
     EVENT_SUMMON_PLAGUED_WARRIOR_REAL       = 7,
     EVENT_BALCONY_SUMMON_ANNOUNCE           = 8,
@@ -94,11 +94,11 @@ public:
             me->SetControlled(false, UNIT_STATE_ROOT);
             events.Reset();
             events.ScheduleEvent(EVENT_MOVE_TO_BALCONY, 110000);
-            events.ScheduleEvent(EVENT_SPELL_CURSE, 15000);
+            events.ScheduleEvent(EVENT_CURSE, 15000);
             events.ScheduleEvent(EVENT_SUMMON_PLAGUED_WARRIOR_ANNOUNCE, 10000);
             if (Is25ManRaid())
             {
-                events.ScheduleEvent(EVENT_SPELL_BLINK, 26000);
+                events.ScheduleEvent(EVENT_BLINK, 26000);
             }
         }
 
@@ -211,7 +211,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 // GROUND
-                case EVENT_SPELL_CURSE:
+                case EVENT_CURSE:
                     if (events.GetPhaseMask() == 0)
                     {
                         me->CastCustomSpell(RAID_MODE(SPELL_CURSE_OF_THE_PLAGUEBRINGER_10, SPELL_CURSE_OF_THE_PLAGUEBRINGER_25), SPELLVALUE_MAX_TARGETS, RAID_MODE(3, 10), me, false);
@@ -233,7 +233,7 @@ public:
                     me->CastSpell(me, SPELL_TELEPORT, true);
                     StartBalconyPhase();
                     break;
-                case EVENT_SPELL_BLINK:
+                case EVENT_BLINK:
                     DoResetThreat();
                     me->CastSpell(me, RAID_MODE(SPELL_CRIPPLE_10, SPELL_CRIPPLE_25), false);
                     me->CastSpell(me, SPELL_BLINK, true);

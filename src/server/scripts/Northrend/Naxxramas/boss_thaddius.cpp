@@ -11,30 +11,30 @@
 enum Says
 {
     // Stalagg
-    SAY_STAL_AGGRO          = 0,
-    SAY_STAL_SLAY           = 1,
-    SAY_STAL_DEATH          = 2,
-    EMOTE_STAL_DEATH        = 3,
-    EMOTE_STAL_REVIVE       = 4,
+    SAY_STAL_AGGRO                      = 0,
+    SAY_STAL_SLAY                       = 1,
+    SAY_STAL_DEATH                      = 2,
+    EMOTE_STAL_DEATH                    = 3,
+    EMOTE_STAL_REVIVE                   = 4,
 
     // Feugen
-    SAY_FEUG_AGGRO          = 0,
-    SAY_FEUG_SLAY           = 1,
-    SAY_FEUG_DEATH          = 2,
-    EMOTE_FEUG_DEATH        = 3,
-    EMOTE_FEUG_REVIVE       = 4,
+    SAY_FEUG_AGGRO                      = 0,
+    SAY_FEUG_SLAY                       = 1,
+    SAY_FEUG_DEATH                      = 2,
+    EMOTE_FEUG_DEATH                    = 3,
+    EMOTE_FEUG_REVIVE                   = 4,
 
     // Thaddius
-    SAY_GREET               = 0,
-    SAY_AGGRO               = 1,
-    SAY_SLAY                = 2,
-    SAY_ELECT               = 3,
-    SAY_DEATH               = 4,
-    EMOTE_POLARITY_SHIFTED  = 6,
+    SAY_GREET                           = 0,
+    SAY_AGGRO                           = 1,
+    SAY_SLAY                            = 2,
+    SAY_ELECT                           = 3,
+    SAY_DEATH                           = 4,
+    EMOTE_POLARITY_SHIFTED              = 6,
 
     // Tesla Coil
-    EMOTE_TESLA_LINK_BREAKS = 0,
-    EMOTE_TESLA_OVERLOAD    = 1
+    EMOTE_TESLA_LINK_BREAKS             = 0,
+    EMOTE_TESLA_OVERLOAD                = 1
 };
 
 enum Spells
@@ -72,15 +72,15 @@ enum Spells
 
 enum Events
 {
-    EVENT_MINION_SPELL_POWER_SURGE      = 1,
-    EVENT_MINION_SPELL_MAGNETIC_PULL    = 2,
+    EVENT_MINION_POWER_SURGE            = 1,
+    EVENT_MINION_MAGNETIC_PULL          = 2,
     EVENT_MINION_CHECK_DISTANCE         = 3,
-    EVENT_MINION_SPELL_STATIC_FIELD     = 4,
+    EVENT_MINION_STATIC_FIELD           = 4,
 
     EVENT_THADDIUS_INIT                 = 5,
     EVENT_THADDIUS_ENTER_COMBAT         = 6,
-    EVENT_THADDIUS_SPELL_CHAIN_LIGHTNING = 7,
-    EVENT_THADDIUS_SPELL_BERSERK        = 8,
+    EVENT_THADDIUS_CHAIN_LIGHTNING      = 7,
+    EVENT_THADDIUS_BERSERK              = 8,
     EVENT_THADDIUS_POLARITY_SHIFT       = 9,
     EVENT_ALLOW_BALL_LIGHTNING          = 10
 };
@@ -264,7 +264,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            if (summonTimer) // Revive code!
+            if (summonTimer) // Revive
             {
                 summonTimer += diff;
                 if (summonTimer >= 5000)
@@ -307,15 +307,15 @@ public:
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    events.ScheduleEvent(EVENT_THADDIUS_SPELL_CHAIN_LIGHTNING, 14000);
-                    events.ScheduleEvent(EVENT_THADDIUS_SPELL_BERSERK, 360000);
+                    events.ScheduleEvent(EVENT_THADDIUS_CHAIN_LIGHTNING, 14000);
+                    events.ScheduleEvent(EVENT_THADDIUS_BERSERK, 360000);
                     events.ScheduleEvent(EVENT_THADDIUS_POLARITY_SHIFT, 30000);
                     events.ScheduleEvent(EVENT_ALLOW_BALL_LIGHTNING, 5000);
                     return;
-                case EVENT_THADDIUS_SPELL_BERSERK:
+                case EVENT_THADDIUS_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
-                case EVENT_THADDIUS_SPELL_CHAIN_LIGHTNING:
+                case EVENT_THADDIUS_CHAIN_LIGHTNING:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_CHAIN_LIGHTNING_10, SPELL_CHAIN_LIGHTNING_25), false);
                     events.RepeatEvent(15000);
                     break;
@@ -404,20 +404,19 @@ public:
             }
             if (me->GetEntry() == NPC_STALAGG)
             {
-                events.ScheduleEvent(EVENT_MINION_SPELL_POWER_SURGE, 10000);
+                events.ScheduleEvent(EVENT_MINION_POWER_SURGE, 10000);
                 Talk(SAY_STAL_AGGRO);
             }
             else
             {
-                events.ScheduleEvent(EVENT_MINION_SPELL_STATIC_FIELD, 5000);
+                events.ScheduleEvent(EVENT_MINION_STATIC_FIELD, 5000);
                 Talk(SAY_FEUG_AGGRO);
             }
             events.ScheduleEvent(EVENT_MINION_CHECK_DISTANCE, 5000);
 
-            // This event needs synchronisation, called for stalagg only
-            if (me->GetEntry() == NPC_STALAGG)
+            if (me->GetEntry() == NPC_STALAGG) // This event needs synchronisation, called for stalagg only
             {
-                events.ScheduleEvent(EVENT_MINION_SPELL_MAGNETIC_PULL, 20000);
+                events.ScheduleEvent(EVENT_MINION_MAGNETIC_PULL, 20000);
             }
             if (pInstance)
             {
@@ -514,15 +513,15 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_MINION_SPELL_POWER_SURGE:
+                case EVENT_MINION_POWER_SURGE:
                     me->CastSpell(me, RAID_MODE(SPELL_POWER_SURGE_10, SPELL_POWER_SURGE_25), false);
                     events.RepeatEvent(19000);
                     break;
-                case EVENT_MINION_SPELL_STATIC_FIELD:
+                case EVENT_MINION_STATIC_FIELD:
                     me->CastSpell(me, RAID_MODE(SPELL_STATIC_FIELD_10, SPELL_STATIC_FIELD_25), false);
                     events.RepeatEvent(3000);
                     break;
-                case EVENT_MINION_SPELL_MAGNETIC_PULL:
+                case EVENT_MINION_MAGNETIC_PULL:
                     events.RepeatEvent(20000);
                     if (pInstance)
                     {

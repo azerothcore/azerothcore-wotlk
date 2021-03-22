@@ -87,10 +87,10 @@ enum NXGOs
     GO_KELTHUZAD_PORTAL_3           = 181404,
     GO_KELTHUZAD_PORTAL_4           = 181405,
 
-    GO_DEATHKNIGHT_WING             = 181577, //Loatheb portal
-    GO_THADDIUS_PORTAL              = 181576, //Thadius portal
-    GO_MAEXXNA_PORTAL               = 181575, //Maexxna portal
-    GO_HORSEMAN_PORTAL              = 181578, //Four Horseman portal
+    GO_DEATHKNIGHT_WING             = 181577,
+    GO_THADDIUS_PORTAL              = 181576,
+    GO_MAEXXNA_PORTAL               = 181575,
+    GO_HORSEMAN_PORTAL              = 181578,
 
     GO_DEATHKNIGHT_EYE_PORTAL       = 181210,
     GO_PLAGUE_EYE_PORTAL            = 181211,
@@ -138,14 +138,11 @@ enum NXNPCs
 
 enum NXMisc
 {
-    // Spells
     SPELL_ERUPTION                  = 29371,
     SPELL_FROGGER_EXPLODE           = 28433,
 
-    // Actions
     ACTION_SAPPHIRON_BIRTH          = 1,
 
-    // Sounds
     // Background screams in instance if Thaddius still alive, four of them from 8873 to 8876
     SOUND_SCREAM                    = 8873
 };
@@ -164,9 +161,9 @@ enum NXSays
 
 enum NXEvents
 {
-    EVENT_THADDIUS_SCREAMS = 0,
-    EVENT_KELTHUZAD_WING_TAUNT,
-    EVENT_FROSTWYRM_WATERFALL_DOOR
+    EVENT_THADDIUS_SCREAMS          = 0,
+    EVENT_KELTHUZAD_WING_TAUNT      = 1,
+    EVENT_FROSTWYRM_WATERFALL_DOOR  = 2
 };
 
 #endif

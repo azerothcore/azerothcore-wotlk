@@ -44,17 +44,16 @@ enum Misc
     GO_ICE_BLOCK                    = 181247,
     NPC_BLIZZARD                    = 16474,
 
-    POINT_CENTER                    = 1,
-    FAKE_POINTER                    = 1
+    POINT_CENTER                    = 1
 };
 
 enum Events
 {
     EVENT_BERSERK                   = 1,
-    EVENT_SPELL_CLEAVE              = 2,
-    EVENT_SPELL_TAIL_SWEEP          = 3,
-    EVENT_SPELL_LIFE_DRAIN          = 4,
-    EVENT_SPELL_BLIZZARD            = 5,
+    EVENT_CLEAVE                    = 2,
+    EVENT_TAIL_SWEEP                = 3,
+    EVENT_LIFE_DRAIN                = 4,
+    EVENT_BLIZZARD                  = 5,
     EVENT_FLIGHT_START              = 6,
     EVENT_FLIGHT_LIFTOFF            = 7,
     EVENT_FLIGHT_ICEBOLT            = 8,
@@ -152,10 +151,10 @@ public:
             EnterCombatSelfFunction();
             me->CastSpell(me, RAID_MODE(SPELL_FROST_AURA_10, SPELL_FROST_AURA_25), true);
             events.ScheduleEvent(EVENT_BERSERK, 900000);
-            events.ScheduleEvent(EVENT_SPELL_CLEAVE, 5000);
-            events.ScheduleEvent(EVENT_SPELL_TAIL_SWEEP, 10000);
-            events.ScheduleEvent(EVENT_SPELL_LIFE_DRAIN, 17000);
-            events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 17000);
+            events.ScheduleEvent(EVENT_CLEAVE, 5000);
+            events.ScheduleEvent(EVENT_TAIL_SWEEP, 10000);
+            events.ScheduleEvent(EVENT_LIFE_DRAIN, 17000);
+            events.ScheduleEvent(EVENT_BLIZZARD, 17000);
             events.ScheduleEvent(EVENT_FLIGHT_START, 45000);
             events.ScheduleEvent(EVENT_HUNDRED_CLUB, 5000);
         }
@@ -245,19 +244,19 @@ public:
                     Talk(EMOTE_ENRAGE);
                     me->CastSpell(me, SPELL_BERSERK, true);
                     return;
-                case EVENT_SPELL_CLEAVE:
+                case EVENT_CLEAVE:
                     me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
                     events.RepeatEvent(10000);
                     return;
-                case EVENT_SPELL_TAIL_SWEEP:
+                case EVENT_TAIL_SWEEP:
                     me->CastSpell(me, RAID_MODE(SPELL_TAIL_SWEEP_10, SPELL_TAIL_SWEEP_25), false);
                     events.RepeatEvent(10000);
                     return;
-                case EVENT_SPELL_LIFE_DRAIN:
+                case EVENT_LIFE_DRAIN:
                     me->CastCustomSpell(RAID_MODE(SPELL_LIFE_DRAIN_10, SPELL_LIFE_DRAIN_25), SPELLVALUE_MAX_TARGETS, RAID_MODE(2, 5), me, false);
                     events.RepeatEvent(24000);
                     return;
-                case EVENT_SPELL_BLIZZARD:
+                case EVENT_BLIZZARD:
                     {
                         Creature* cr;
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
@@ -327,7 +326,6 @@ public:
                                         }
                                     }
                                 }
-
                                 if (!inList)
                                 {
                                     targets.push_back((*i)->getTarget());

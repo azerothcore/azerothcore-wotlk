@@ -8,10 +8,10 @@
 
 enum Says
 {
-    SAY_AGGRO   = 0,
-    SAY_SLAY    = 1,
-    SAY_TAUNTED = 2,
-    SAY_DEATH   = 3
+    SAY_AGGRO                       = 0,
+    SAY_SLAY                        = 1,
+    SAY_TAUNTED                     = 2,
+    SAY_DEATH                       = 3
 };
 
 enum Spells
@@ -27,9 +27,9 @@ enum Spells
 
 enum Events
 {
-    EVENT_SPELL_UNBALANCING_STRIKE  = 1,
-    EVENT_SPELL_DISRUPTING_SHOUT    = 2,
-    EVENT_SPELL_JAGGED_KNIFE        = 3
+    EVENT_UNBALANCING_STRIKE        = 1,
+    EVENT_DISRUPTING_SHOUT          = 2,
+    EVENT_JAGGED_KNIFE              = 3
 };
 
 enum Misc
@@ -126,9 +126,9 @@ public:
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
-            events.ScheduleEvent(EVENT_SPELL_UNBALANCING_STRIKE, 20000);
-            events.ScheduleEvent(EVENT_SPELL_DISRUPTING_SHOUT, 15000);
-            events.ScheduleEvent(EVENT_SPELL_JAGGED_KNIFE, 10000);
+            events.ScheduleEvent(EVENT_UNBALANCING_STRIKE, 20000);
+            events.ScheduleEvent(EVENT_DISRUPTING_SHOUT, 15000);
+            events.ScheduleEvent(EVENT_JAGGED_KNIFE, 10000);
             summons.DoZoneInCombat();
         }
 
@@ -143,15 +143,15 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_SPELL_UNBALANCING_STRIKE:
+                case EVENT_UNBALANCING_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_UNBALANCING_STRIKE, false);
                     events.RepeatEvent(20000);
                     break;
-                case EVENT_SPELL_DISRUPTING_SHOUT:
+                case EVENT_DISRUPTING_SHOUT:
                     me->CastSpell(me, RAID_MODE(SPELL_DISRUPTING_SHOUT_10, SPELL_DISRUPTING_SHOUT_25), false);
                     events.RepeatEvent(15000);
                     break;
-                case EVENT_SPELL_JAGGED_KNIFE:
+                case EVENT_JAGGED_KNIFE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f))
                     {
                         me->CastSpell(target, SPELL_JAGGED_KNIFE, false);

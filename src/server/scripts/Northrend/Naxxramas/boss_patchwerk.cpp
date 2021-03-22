@@ -27,9 +27,9 @@ enum Spells
 enum Events
 {
     EVENT_HEALTH_CHECK              = 1,
-    EVENT_SPELL_HATEFUL_STRIKE      = 2,
-    EVENT_SPELL_SLIME_BOLT          = 3,
-    EVENT_SPELL_BERSERK             = 4
+    EVENT_HATEFUL_STRIKE            = 2,
+    EVENT_SLIME_BOLT                = 3,
+    EVENT_BERSERK                   = 4
 };
 
 enum Misc
@@ -89,8 +89,8 @@ public:
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
             me->SetInCombatWithZone();
-            events.ScheduleEvent(EVENT_SPELL_HATEFUL_STRIKE, 1500);
-            events.ScheduleEvent(EVENT_SPELL_BERSERK, 360000);
+            events.ScheduleEvent(EVENT_HATEFUL_STRIKE, 1500);
+            events.ScheduleEvent(EVENT_BERSERK, 360000);
             events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
             if (pInstance)
             {
@@ -109,7 +109,7 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_SPELL_HATEFUL_STRIKE:
+                case EVENT_HATEFUL_STRIKE:
                     {
                         // Cast Hateful strike on the player with the highest amount of HP within melee distance, and second threat amount
                         std::list<Unit*> meleeRangeTargets;
@@ -157,12 +157,12 @@ public:
                         events.RepeatEvent(1000);
                         break;
                     }
-                case EVENT_SPELL_BERSERK:
+                case EVENT_BERSERK:
                     Talk(EMOTE_BERSERK);
                     me->CastSpell(me, SPELL_BERSERK, true);
-                    events.ScheduleEvent(EVENT_SPELL_SLIME_BOLT, 3000);
+                    events.ScheduleEvent(EVENT_SLIME_BOLT, 3000);
                     break;
-                case EVENT_SPELL_SLIME_BOLT:
+                case EVENT_SLIME_BOLT:
                     me->CastSpell(me, SPELL_SLIME_BOLT, false);
                     events.RepeatEvent(3000);
                     break;

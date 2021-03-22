@@ -20,9 +20,9 @@ enum Spells
 enum Events
 {
     EVENT_NECROTIC_AURA                         = 1,
-    EVENT_SPELL_DEATHBLOOM                      = 2,
-    EVENT_SPELL_INEVITABLE_DOOM                 = 3,
-    EVENT_SPELL_BERSERK                         = 4,
+    EVENT_DEATHBLOOM                            = 2,
+    EVENT_INEVITABLE_DOOM                       = 3,
+    EVENT_BERSERK                               = 4,
     EVENT_SUMMON_SPORE                          = 5,
     EVENT_NECROTIC_AURA_FADING                  = 6,
     EVENT_NECROTIC_AURA_REMOVED                 = 7
@@ -30,9 +30,9 @@ enum Events
 
 enum Texts
 {
-    SAY_NECROTIC_AURA_APPLIED       = 0,
-    SAY_NECROTIC_AURA_REMOVED       = 1,
-    SAY_NECROTIC_AURA_FADING        = 2
+    SAY_NECROTIC_AURA_APPLIED                   = 0,
+    SAY_NECROTIC_AURA_REMOVED                   = 1,
+    SAY_NECROTIC_AURA_FADING                    = 2
 };
 
 class boss_loatheb : public CreatureScript
@@ -101,10 +101,10 @@ public:
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_NECROTIC_AURA, 10000);
-            events.ScheduleEvent(EVENT_SPELL_DEATHBLOOM, 5000);
-            events.ScheduleEvent(EVENT_SPELL_INEVITABLE_DOOM, 120000);
+            events.ScheduleEvent(EVENT_DEATHBLOOM, 5000);
+            events.ScheduleEvent(EVENT_INEVITABLE_DOOM, 120000);
             events.ScheduleEvent(EVENT_SUMMON_SPORE, 15000);
-            events.ScheduleEvent(EVENT_SPELL_BERSERK, 720000);
+            events.ScheduleEvent(EVENT_BERSERK, 720000);
             if (pInstance)
             {
                 pInstance->SetData(BOSS_LOATHEB, IN_PROGRESS);
@@ -147,11 +147,11 @@ public:
                     events.ScheduleEvent(EVENT_NECROTIC_AURA_REMOVED, 17000);
                     events.RepeatEvent(20000);
                     break;
-                case EVENT_SPELL_DEATHBLOOM:
+                case EVENT_DEATHBLOOM:
                     me->CastSpell(me, RAID_MODE(SPELL_DEATHBLOOM_10, SPELL_DEATHBLOOM_25), false);
                     events.RepeatEvent(30000);
                     break;
-                case EVENT_SPELL_INEVITABLE_DOOM:
+                case EVENT_INEVITABLE_DOOM:
                     me->CastSpell(me, RAID_MODE(SPELL_INEVITABLE_DOOM_10, SPELL_INEVITABLE_DOOM_25), false);
                     doomCounter++;
                     if (doomCounter < 6)
@@ -163,7 +163,7 @@ public:
                         events.RepeatEvent(15000);
                     }
                     break;
-                case EVENT_SPELL_BERSERK:
+                case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
                 case EVENT_NECROTIC_AURA_FADING:

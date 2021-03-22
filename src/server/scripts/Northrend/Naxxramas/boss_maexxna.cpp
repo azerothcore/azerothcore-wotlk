@@ -22,9 +22,9 @@ enum Spells
 
 enum Events
 {
-    EVENT_SPELL_WEB_SPRAY               = 1,
-    EVENT_SPELL_POISON_SHOCK            = 2,
-    EVENT_SPELL_NECROTIC_POISON         = 3,
+    EVENT_WEB_SPRAY                     = 1,
+    EVENT_POISON_SHOCK                  = 2,
+    EVENT_NECROTIC_POISON               = 3,
     EVENT_WEB_WRAP                      = 4,
     EVENT_HEALTH_CHECK                  = 5,
     EVENT_SUMMON_SPIDERLINGS            = 6
@@ -32,9 +32,9 @@ enum Events
 
 enum Emotes
 {
-    EMOTE_SPIDERS   = 0,
-    EMOTE_WEB_WRAP  = 1,
-    EMOTE_WEB_SPRAY = 2
+    EMOTE_SPIDERS                       = 0,
+    EMOTE_WEB_WRAP                      = 1,
+    EMOTE_WEB_SPRAY                     = 2
 };
 
 enum Misc
@@ -100,9 +100,9 @@ public:
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
             events.ScheduleEvent(EVENT_WEB_WRAP, 20000);
-            events.ScheduleEvent(EVENT_SPELL_WEB_SPRAY, 40000);
-            events.ScheduleEvent(EVENT_SPELL_POISON_SHOCK, 10000);
-            events.ScheduleEvent(EVENT_SPELL_NECROTIC_POISON, 5000);
+            events.ScheduleEvent(EVENT_WEB_SPRAY, 40000);
+            events.ScheduleEvent(EVENT_POISON_SHOCK, 10000);
+            events.ScheduleEvent(EVENT_NECROTIC_POISON, 5000);
             events.ScheduleEvent(EVENT_HEALTH_CHECK, 1000);
             events.ScheduleEvent(EVENT_SUMMON_SPIDERLINGS, 30000);
             if (pInstance)
@@ -155,16 +155,16 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_SPELL_WEB_SPRAY:
+                case EVENT_WEB_SPRAY:
                     Talk(EMOTE_WEB_SPRAY);
                     me->CastSpell(me, RAID_MODE(SPELL_WEB_SPRAY_10, SPELL_WEB_SPRAY_25), true);
                     events.RepeatEvent(40000);
                     break;
-                case EVENT_SPELL_POISON_SHOCK:
+                case EVENT_POISON_SHOCK:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_POISON_SHOCK_10, SPELL_POISON_SHOCK_25), false);
                     events.RepeatEvent(10000);
                     break;
-                case EVENT_SPELL_NECROTIC_POISON:
+                case EVENT_NECROTIC_POISON:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_NECROTIC_POISON_10, SPELL_NECROTIC_POISON_25), false);
                     events.RepeatEvent(30000);
                     break;
@@ -180,7 +180,6 @@ public:
                     if (me->GetHealthPct() < 30)
                     {
                         me->CastSpell(me, RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25), true);
-
                         break;
                     }
                     events.RepeatEvent(1000);
