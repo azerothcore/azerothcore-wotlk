@@ -295,7 +295,7 @@ public:
             events.ScheduleEvent(EVENT_SPAWN_POOL, 5000);
             events.ScheduleEvent(EVENT_SUMMON_SOLDIER, 6400);
             events.ScheduleEvent(EVENT_SUMMON_UNSTOPPABLE_ABOMINATION, 10000);
-            events.ScheduleEvent(EVENT_SUMMON_SOUL_WEAVER, 24000);
+            events.ScheduleEvent(EVENT_SUMMON_SOUL_WEAVER, 12000);
             events.ScheduleEvent(EVENT_START_SECOND_PHASE, 228000);
             events.ScheduleEvent(EVENT_ENRAGE, 900000);
             if (pInstance)
@@ -355,15 +355,15 @@ public:
                     break;
                 case EVENT_SUMMON_SOLDIER:
                     SummonHelper(NPC_SOLDIER_OF_THE_FROZEN_WASTES, 1);
-                    events.RepeatEvent(3200);
+                    events.RepeatEvent(3100);
                     break;
                 case EVENT_SUMMON_UNSTOPPABLE_ABOMINATION:
-                    SummonHelper(NPC_UNSTOPPABLE_ABOMINATION, 1);
-                    events.RepeatEvent(30000);
+                    /*SummonHelper(NPC_UNSTOPPABLE_ABOMINATION, 1);
+                    events.RepeatEvent(18500);*/
                     break;
                 case EVENT_SUMMON_SOUL_WEAVER:
-                    SummonHelper(NPC_SOUL_WEAVER, 1);
-                    events.RepeatEvent(30000);
+                    /*SummonHelper(NPC_SOUL_WEAVER, 1);
+                    events.RepeatEvent(30000);*/
                     break;
                 case EVENT_START_SECOND_PHASE:
                     Talk(EMOTE_PHASE_TWO);
@@ -374,15 +374,15 @@ public:
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     me->RemoveAura(SPELL_KELTHUZAD_CHANNEL);
                     me->SetReactState(REACT_AGGRESSIVE);
-                    events.ScheduleEvent(EVENT_SPELL_FROST_BOLT_SINGLE, 2000);
-                    events.ScheduleEvent(EVENT_SPELL_FROST_BOLT_MULTI, 15000);
-                    events.ScheduleEvent(EVENT_SPELL_DETONATE_MANA, 20000);
+                    events.ScheduleEvent(EVENT_SPELL_FROST_BOLT_SINGLE, urand(2000, 10000));
+                    events.ScheduleEvent(EVENT_SPELL_FROST_BOLT_MULTI, urand(15000, 30000));
+                    events.ScheduleEvent(EVENT_SPELL_DETONATE_MANA, 30000);
                     events.ScheduleEvent(EVENT_SECOND_PHASE_HEALTH_CHECK, 1000);
                     events.ScheduleEvent(EVENT_SPELL_SHADOW_FISSURE, 25000);
                     events.ScheduleEvent(EVENT_SPELL_FROST_BLAST, 45000);
                     if (Is25ManRaid())
                     {
-                        events.ScheduleEvent(EVENT_SPELL_CHAINS, 50000);
+                        events.ScheduleEvent(EVENT_SPELL_CHAINS, 90000);
                     }
                     break;
                 case EVENT_ENRAGE:
@@ -390,11 +390,11 @@ public:
                     break;
                 case EVENT_SPELL_FROST_BOLT_SINGLE:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_FROST_BOLT_SINGLE_10, SPELL_FROST_BOLT_SINGLE_25), false);
-                    events.RepeatEvent(urand(2000, 15000));
+                    events.RepeatEvent(urand(2000, 10000));
                     break;
                 case EVENT_SPELL_FROST_BOLT_MULTI:
                     me->CastSpell(me, RAID_MODE(SPELL_FROST_BOLT_MULTI_10, SPELL_FROST_BOLT_MULTI_25), false);
-                    events.RepeatEvent(24000);
+                    events.RepeatEvent(urand(15000, 30000));
                     break;
                 case EVENT_SPELL_SHADOW_FISSURE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100.0f, true))
@@ -420,7 +420,7 @@ public:
                         }
                     }
                     Talk(SAY_CHAIN);
-                    events.RepeatEvent(50000);
+                    events.RepeatEvent(90000);
                     break;
                 case EVENT_SPELL_DETONATE_MANA:
                     {
