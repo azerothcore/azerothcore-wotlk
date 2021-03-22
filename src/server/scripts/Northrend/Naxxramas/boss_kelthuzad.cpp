@@ -58,9 +58,7 @@ enum Misc
     ACTION_CALL_HELP_ON                     = 1,
     ACTION_CALL_HELP_OFF                    = 2,
     ACTION_SECOND_PHASE                     = 3,
-    ACTION_GUARDIANS_OFF                    = 4,
-
-    POINT_PORTAL                            = 5
+    ACTION_GUARDIANS_OFF                    = 4
 };
 
 enum Event
@@ -298,7 +296,7 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_SOLDIER, 6400);
             events.ScheduleEvent(EVENT_SUMMON_UNSTOPPABLE_ABOMINATION, 10000);
             events.ScheduleEvent(EVENT_SUMMON_SOUL_WEAVER, 24000);
-            events.ScheduleEvent(EVENT_START_SECOND_PHASE, 10000); // 228000
+            events.ScheduleEvent(EVENT_START_SECOND_PHASE, 228000);
             events.ScheduleEvent(EVENT_ENRAGE, 900000);
             if (pInstance)
             {
@@ -617,7 +615,6 @@ public:
             if (me->GetEntry() == NPC_GUARDIAN_OF_ICECROWN)
             {
                 me->DespawnOrUnsummon();
-                me->MonsterTextEmote("JustReachedHome();", 0, true);
             }
         }
 
