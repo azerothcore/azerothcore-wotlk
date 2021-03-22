@@ -23,10 +23,18 @@ public:
 
     struct instance_ulduar_InstanceMapScript : public InstanceScript
     {
-        instance_ulduar_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
+        instance_ulduar_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
+        {
+            Initialize();
+            // 0: 10 man difficulty
+            // 1: 25 man difficulty
+            m_difficulty = (pMap->Is25ManRaid() ? 0 : 1);
+        };
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         uint32 C_of_Ulduar_MASK;
+
+        int m_difficulty;
 
         // Bosses
         uint64 m_uiLeviathanGUID;
@@ -69,6 +77,13 @@ public:
 
         // Thorim
         uint64 m_thorimGameobjectsGUID[5];
+
+        // Hodir's chests
+        bool hmHodir;
+        uint64 m_hodirNormalChest;
+        uint64 m_hodirHardmodeChest;
+        Position normalChestPosition = { 1967.152588f, -204.188461f, 432.686951f, 5.50957f };
+        Position hardChestPosition = { 2035.94600f, -202.084885f, 432.686859f, 3.164077f };
 
         // Mimiron
         uint64 m_MimironDoor[3];
@@ -145,6 +160,11 @@ public:
 
             // Thorim
             memset(&m_thorimGameobjectsGUID, 0, sizeof(m_thorimGameobjectsGUID));
+
+            // Hodir
+            m_hodirNormalChest = 0;
+            m_hodirHardmodeChest = 0;
+            hmHodir = true; // If players fail the Hardmode then becomes false
 
             // Mimiron
             memset(&m_MimironDoor, 0, sizeof(m_MimironDoor));
@@ -231,6 +251,78 @@ public:
             // destory towers
             if (eventId >= EVENT_TOWER_OF_LIFE_DESTROYED && eventId <= EVENT_TOWER_OF_FLAMES_DESTROYED)
                 SetData(eventId, 0);
+        }
+
+        void SpawnHodirChests(int rd)
+        {
+            if (Creature* cr = instance->GetCreature(m_uiHodirGUID))
+            {
+                switch (rd)
+                {
+                    case 0: // 10 man chest
+                    {
+                        if (!m_hodirNormalChest)
+                        {
+                            if (GameObject* go = cr->SummonGameObject(
+                                GO_HODIR_CHEST_NORMAL,
+                                normalChestPosition.GetPositionX(),
+                                normalChestPosition.GetPositionY(),
+                                normalChestPosition.GetPositionZ(),
+                                normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
+                            {
+                                m_hodirNormalChest = go->GetGUID();
+                                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            }
+                        }
+                        if (!m_hodirHardmodeChest)
+                        {
+                            if (GameObject* go = cr->SummonGameObject(
+                                GO_HODIR_CHEST_HARD,
+                                hardChestPosition.GetPositionX(),
+                                hardChestPosition.GetPositionY(),
+                                hardChestPosition.GetPositionZ(),
+                                hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
+                            {
+                                m_hodirHardmodeChest = go->GetGUID();
+                                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                hmHodir = true;
+                            }
+                        }
+                        break;
+                    }
+                    case 1: // 25 man chest
+                    {
+                        if (!m_hodirNormalChest)
+                        {
+                            if (GameObject* go = cr->SummonGameObject(
+                                GO_HODIR_CHEST_NORMAL_HERO,
+                                normalChestPosition.GetPositionX(),
+                                normalChestPosition.GetPositionY(),
+                                normalChestPosition.GetPositionZ(),
+                                normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
+                            {
+                                m_hodirNormalChest = go->GetGUID();
+                                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                            }
+                        }
+                        if (!m_hodirHardmodeChest)
+                        {
+                            if (GameObject* go = cr->SummonGameObject(
+                                GO_HODIR_CHEST_HARD_HERO,
+                                hardChestPosition.GetPositionX(),
+                                hardChestPosition.GetPositionY(),
+                                hardChestPosition.GetPositionZ(),
+                                hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
+                            {
+                                m_hodirHardmodeChest = go->GetGUID();
+                                go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                                hmHodir = true;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -573,6 +665,23 @@ public:
             }
         }
 
+        void setChestsLootable(uint32 boss)
+        {
+            if (boss)
+            {
+                switch (boss)
+                {
+                    case TYPE_HODIR:
+                        if (hmHodir)
+                            if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
+                                go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        if (GameObject* go = instance->GetGameObject(m_hodirNormalChest))
+                            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
+                        break;
+                }
+            }
+        }
+
         void SetData(uint32 type, uint32 data) override
         {
             switch(type)
@@ -617,8 +726,22 @@ public:
                     }
                     if (type == TYPE_MIMIRON && data == IN_PROGRESS) // after reaching him without tram and starting the fight
                         m_mimironTramUsed = true;
+                    if (GetData(TYPE_HODIR) == DONE)
+                        setChestsLootable(TYPE_HODIR);
                     break;
 
+                case TYPE_SPAWN_HODIR_CACHE:
+                    // Is the difficulty 10 man(0) ? return 10 man : return 25 man;
+                    SpawnHodirChests(m_difficulty == 0 ? 0 : 1);
+                    break;
+                case TYPE_HODIR_HM_FAIL:
+                    if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
+                    {
+                        hmHodir = false;
+                        go->Delete();
+                        m_hodirHardmodeChest = 0;
+                    }
+                    break;
                 case TYPE_WATCHERS:
                     m_auiEncounter[type] |= 1 << data;
                     break;
@@ -821,6 +944,14 @@ public:
                 case DATA_THORIM_SECOND_DOORS:
                     return m_thorimGameobjectsGUID[data - DATA_THORIM_LEVER_GATE];
                     break;
+
+                // Hodir chests
+                case GO_HODIR_CHEST_HARD:
+                case GO_HODIR_CHEST_HARD_HERO:
+                    return m_hodirHardmodeChest;
+                case GO_HODIR_CHEST_NORMAL:
+                case GO_HODIR_CHEST_NORMAL_HERO:
+                    return m_hodirNormalChest;
 
                 // Freya Elders
                 case NPC_ELDER_IRONBRANCH:
