@@ -32,7 +32,6 @@
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "SHA1.h"
 #include "SocialMgr.h"
 #include "Spell.h"
 #include "UpdateData.h"
