@@ -358,17 +358,17 @@ public:
                     events.RepeatEvent(3100);
                     break;
                 case EVENT_SUMMON_UNSTOPPABLE_ABOMINATION:
-                    /*SummonHelper(NPC_UNSTOPPABLE_ABOMINATION, 1);
-                    events.RepeatEvent(18500);*/
+                    SummonHelper(NPC_UNSTOPPABLE_ABOMINATION, 1);
+                    events.RepeatEvent(18500);
                     break;
                 case EVENT_SUMMON_SOUL_WEAVER:
-                    /*SummonHelper(NPC_SOUL_WEAVER, 1);
-                    events.RepeatEvent(30000);*/
+                    SummonHelper(NPC_SOUL_WEAVER, 1);
+                    events.RepeatEvent(30000);
                     break;
                 case EVENT_START_SECOND_PHASE:
                     Talk(EMOTE_PHASE_TWO);
                     Talk(SAY_AGGRO);
-                    events.Reset(); // same as pop
+                    events.Reset();
                     summons.DoAction(ACTION_SECOND_PHASE);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
