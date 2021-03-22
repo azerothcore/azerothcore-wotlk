@@ -972,6 +972,8 @@ public:
     void LoadCreatureLocales();
     void LoadCreatureTemplates();
     void LoadCreatureTemplateAddons();
+    void LoadCreatureTemplateResistances();
+    void LoadCreatureTemplateSpells();
     void CheckCreatureTemplate(CreatureTemplate const* cInfo);
     void LoadGameObjectQuestItems();
     void LoadCreatureQuestItems();

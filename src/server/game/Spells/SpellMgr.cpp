@@ -5246,6 +5246,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectRadiusIndex[0] = 16; // 1yd
     });
 
+    // Hodir Shatter Cache
+    ApplySpellFix({ 62502 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_SRC_AREA_ENTRY;
+    });
+
     // Ulduar, General Vezax, Mark of the Faceless
     ApplySpellFix({ 63278 }, [](SpellEntry* spellInfo)
     {

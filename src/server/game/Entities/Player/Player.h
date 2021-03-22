@@ -2970,6 +2970,8 @@ private:
 
     bool m_isInstantFlightOn;
 
+    uint32 m_flightSpellActivated;
+
     // Remote location information
     uint32 m_cinematicDiff;
     uint32 m_lastCinematicCheck;
