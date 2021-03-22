@@ -77,7 +77,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include <cmath>
 
 #ifdef ELUNA
 #include "LuaEngine.h"
