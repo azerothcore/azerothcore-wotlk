@@ -36,6 +36,7 @@ public:
         uint64 SkeramGUID;
         uint64 VemGUID;
         uint64 KriGUID;
+        uint64 YaujGUID;
         uint64 VeklorGUID;
         uint64 VeknilashGUID;
         uint64 ViscidusGUID;
@@ -53,6 +54,7 @@ public:
             SkeramGUID = 0;
             VemGUID = 0;
             KriGUID = 0;
+            YaujGUID = 0;
             VeklorGUID = 0;
             VeknilashGUID = 0;
             ViscidusGUID = 0;
@@ -71,6 +73,9 @@ public:
                     break;
                 case NPC_VEM:
                     VemGUID = creature->GetGUID();
+                    break;
+                case NPC_YAUJ:
+                    YaujGUID = creature->GetGUID();
                     break;
                 case NPC_KRI:
                     KriGUID = creature->GetGUID();
@@ -131,6 +136,8 @@ public:
                     return VemGUID;
                 case DATA_KRI:
                     return KriGUID;
+                case DATA_YAUJ:
+                    return YaujGUID;
                 case DATA_VEKLOR:
                     return VeklorGUID;
                 case DATA_VEKNILASH:
