@@ -650,7 +650,7 @@ public:
                 caster->ApplySpellImmune(SPELL_COLOSSUS_GROUND_SLAM, IMMUNITY_ID, SPELL_COLOSSUS_GROUND_SLAM, true);
                 caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
                 caster->SetControlled(false, UNIT_STATE_ROOT);
-                for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+                for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
                     caster->m_spells[i] = 0;
 
                 caster->m_spells[0] = SPELL_JORMUNGAR_EMERGE;
@@ -663,7 +663,7 @@ public:
                 caster->SetControlled(true, UNIT_STATE_ROOT);
 
                 if (CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(caster->GetEntry()))
-                    for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+                    for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
                         caster->m_spells[i] = ct->spells[i];
             }
 

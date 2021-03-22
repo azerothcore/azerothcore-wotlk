@@ -57,7 +57,7 @@ public:
                 {
                     player->KilledMonsterCredit(cr->GetDisplayId() == NPC_SOWAW_WATER_MODEL ? 29008 : 29009, 0);
                     CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(cr->GetDisplayId() == NPC_SOWAW_WIND_MODEL ? NPC_SOWAW_WIND_ELEMENTAL : NPC_SOWAW_WATER_ELEMENTAL);
-                    for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+                    for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
                         cr->m_spells[i] = ct->spells[i];
 
                     player->VehicleSpellInitialize();

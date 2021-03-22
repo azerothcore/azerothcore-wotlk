@@ -38,7 +38,7 @@ void FleeingMovementGenerator<T>::_setTargetLocation(T* owner)
     owner->AddUnitState(UNIT_STATE_FLEEING_MOVE);
 
     Movement::MoveSplineInit init(owner);
-    init.MoveTo(x, y, z);
+    init.MoveTo(x, y, z, true);
     init.SetWalk(false);
     init.Launch();
 }
