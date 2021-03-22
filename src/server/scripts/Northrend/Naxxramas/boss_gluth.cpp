@@ -22,10 +22,10 @@ enum Spells
 
 enum Events
 {
-    EVENT_SPELL_MORTAL_WOUND            = 1,
-    EVENT_SPELL_ENRAGE                  = 2,
-    EVENT_SPELL_DECIMATE                = 3,
-    EVENT_SPELL_BERSERK                 = 4,
+    EVENT_MORTAL_WOUND                  = 1,
+    EVENT_ENRAGE                        = 2,
+    EVENT_DECIMATE                      = 3,
+    EVENT_BERSERK                       = 4,
     EVENT_SUMMON_ZOMBIE                 = 5,
     EVENT_CAN_EAT_ZOMBIE                = 6
 };
@@ -37,11 +37,11 @@ enum Misc
 
 enum Emotes
 {
-    EMOTE_SPOTS_ONE   = 0,
-    EMOTE_DECIMATE    = 1,
-    EMOTE_ENRAGE      = 2,
-    EMOTE_DEVOURS_ALL = 3,
-    EMOTE_BERSERK     = 4
+    EMOTE_SPOTS_ONE                     = 0,
+    EMOTE_DECIMATE                      = 1,
+    EMOTE_ENRAGE                        = 2,
+    EMOTE_DEVOURS_ALL                   = 3,
+    EMOTE_BERSERK                       = 4
 };
 
 const Position zombiePos[3] =
@@ -101,10 +101,10 @@ public:
         {
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
-            events.ScheduleEvent(EVENT_SPELL_MORTAL_WOUND, 10000);
-            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 22000);
-            events.ScheduleEvent(EVENT_SPELL_DECIMATE, RAID_MODE(110000, 90000));
-            events.ScheduleEvent(EVENT_SPELL_BERSERK, 360000);
+            events.ScheduleEvent(EVENT_MORTAL_WOUND, 10000);
+            events.ScheduleEvent(EVENT_ENRAGE, 22000);
+            events.ScheduleEvent(EVENT_DECIMATE, RAID_MODE(110000, 90000));
+            events.ScheduleEvent(EVENT_BERSERK, 360000);
             events.ScheduleEvent(EVENT_SUMMON_ZOMBIE, 10000);
             events.ScheduleEvent(EVENT_CAN_EAT_ZOMBIE, 1000);
         }
@@ -149,6 +149,7 @@ public:
                 Player* player = itr.GetSource();
                 if (!player || !player->IsAlive())
                     continue;
+
                 if (player->GetPositionZ() > 300.0f || me->GetExactDist(player) > 50.0f)
                     continue;
 
@@ -169,19 +170,19 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_SPELL_BERSERK:
+                case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
-                case EVENT_SPELL_ENRAGE:
+                case EVENT_ENRAGE:
                     Talk(EMOTE_ENRAGE);
                     me->CastSpell(me, RAID_MODE(SPELL_ENRAGE_10, SPELL_ENRAGE_25), true);
                     events.RepeatEvent(22000);
                     break;
-                case EVENT_SPELL_MORTAL_WOUND:
+                case EVENT_MORTAL_WOUND:
                     me->CastSpell(me->GetVictim(), SPELL_MORTAL_WOUND, false);
                     events.RepeatEvent(10000);
                     break;
-                case EVENT_SPELL_DECIMATE:
+                case EVENT_DECIMATE:
                     Talk(EMOTE_DECIMATE);
                     me->CastSpell(me, RAID_MODE(SPELL_DECIMATE_10, SPELL_DECIMATE_25), false);
                     events.RepeatEvent(RAID_MODE(110000, 90000));

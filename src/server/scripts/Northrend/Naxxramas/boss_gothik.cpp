@@ -11,16 +11,16 @@
 
 enum Yells
 {
-    SAY_INTRO_1                 = 0,
-    SAY_INTRO_2                 = 1,
-    SAY_INTRO_3                 = 2,
-    SAY_INTRO_4                 = 3,
-    SAY_PHASE_TWO               = 4,
-    SAY_DEATH                   = 5,
-    SAY_KILL                    = 6,
+    SAY_INTRO_1                     = 0,
+    SAY_INTRO_2                     = 1,
+    SAY_INTRO_3                     = 2,
+    SAY_INTRO_4                     = 3,
+    SAY_PHASE_TWO                   = 4,
+    SAY_DEATH                       = 5,
+    SAY_KILL                        = 6,
 
-    EMOTE_PHASE_TWO             = 7,
-    EMOTE_GATE_OPENED           = 8
+    EMOTE_PHASE_TWO                 = 7,
+    EMOTE_GATE_OPENED               = 8
 };
 
 enum Spells
@@ -41,7 +41,7 @@ enum Spells
     SPELL_INFORM_DEAD_RIDER         = 27937,
     /*SPELL_ANCHOR_2_TRAINEE          = 27893,
     SPELL_ANCHOR_2_DK               = 27929,
-    SPELL_ANCHOR_2_RIDER            = 27936,*/
+    SPELL_ANCHOR_2_RIDER            = 27936, fix me */
     // Living trainee
     SPELL_DEATH_PLAGUE              = 55604,
     // Dead trainee
@@ -68,33 +68,33 @@ enum Misc
     NPC_DEAD_KNIGHT                 = 16148,
     NPC_DEAD_HORSE                  = 16149,
     NPC_DEAD_RIDER                  = 16150,
-    //NPC_TRIGGER                     = 16137
+    //NPC_TRIGGER                     = 16137, fix me
 };
 
 enum Events
 {
     // Gothik
     EVENT_SUMMON_ADDS               = 1,
-    EVENT_SPELL_HARVEST_SOUL        = 2,
-    EVENT_SPELL_SHADOW_BOLT         = 3,
+    EVENT_HARVEST_SOUL              = 2,
+    EVENT_SHADOW_BOLT               = 3,
     EVENT_TELEPORT                  = 4,
     EVENT_CHECK_HEALTH              = 5,
     EVENT_CHECK_PLAYERS             = 6,
     // Living trainee
-    EVENT_SPELL_DEATH_PLAGUE        = 7,
+    EVENT_DEATH_PLAGUE              = 7,
     // Dead trainee
-    EVENT_SPELL_ARCANE_EXPLOSION    = 8,
+    EVENT_ARCANE_EXPLOSION          = 8,
     // Living knight
-    EVENT_SPELL_SHADOW_MARK         = 9,
+    EVENT_SHADOW_MARK               = 9,
     // Dead knight
-    EVENT_SPELL_WHIRLWIND           = 10,
+    EVENT_WHIRLWIND                 = 10,
     // Living rider
-    EVENT_SPELL_SHADOW_BOLT_VOLLEY  = 11,
+    EVENT_SHADOW_BOLT_VOLLEY        = 11,
     // Dead rider
-    EVENT_SPELL_DRAIN_LIFE          = 12,
-    EVENT_SPELL_UNHOLY_FRENZY       = 13,
+    EVENT_DRAIN_LIFE                = 12,
+    EVENT_UNHOLY_FRENZY             = 13,
     // HORSE
-    EVENT_SPELL_STOMP               = 14,
+    EVENT_STOMP                     = 14,
     // Intro
     EVENT_INTRO_2                   = 15,
     EVENT_INTRO_3                   = 16,
@@ -421,11 +421,11 @@ public:
                 case EVENT_INTRO_4:
                     Talk(SAY_INTRO_4);
                     break;
-                case EVENT_SPELL_SHADOW_BOLT:
+                case EVENT_SHADOW_BOLT:
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_SHADOW_BOLT_10, SPELL_SHADOW_BOLT_25), false);
                     events.RepeatEvent(1010);
                     break;
-                case EVENT_SPELL_HARVEST_SOUL:
+                case EVENT_HARVEST_SOUL:
                     me->CastSpell(me, SPELL_HARVEST_SOUL, false);
                     events.RepeatEvent(15000);
                     break;
@@ -455,7 +455,6 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
                         events.CancelEvent(EVENT_TELEPORT);
-
                         break;
                     }
                     events.RepeatEvent(1000);
@@ -476,8 +475,8 @@ public:
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_DISABLE_MOVE);
                         me->RemoveAllAuras();
                         summons.DoZoneInCombat();
-                        events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 1000);
-                        events.ScheduleEvent(EVENT_SPELL_HARVEST_SOUL, urand(5000, 15000));
+                        events.ScheduleEvent(EVENT_SHADOW_BOLT, 1000);
+                        events.ScheduleEvent(EVENT_HARVEST_SOUL, urand(5000, 15000));
                         events.ScheduleEvent(EVENT_TELEPORT, 20000);
                         events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
                     }
@@ -533,26 +532,26 @@ public:
             switch (me->GetEntry())
             {
                 case NPC_LIVING_TRAINEE:
-                    events.ScheduleEvent(EVENT_SPELL_DEATH_PLAGUE, 3000);
+                    events.ScheduleEvent(EVENT_DEATH_PLAGUE, 3000);
                     break;
                 case NPC_DEAD_TRAINEE:
-                    events.ScheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, 2500);
+                    events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 2500);
                     break;
                 case NPC_LIVING_KNIGHT:
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_MARK, 3000);
+                    events.ScheduleEvent(EVENT_SHADOW_MARK, 3000);
                     break;
                 case NPC_DEAD_KNIGHT:
-                    events.ScheduleEvent(EVENT_SPELL_WHIRLWIND, 2000);
+                    events.ScheduleEvent(EVENT_WHIRLWIND, 2000);
                     break;
                 case NPC_LIVING_RIDER:
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT_VOLLEY, 3000);
+                    events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 3000);
                     break;
                 case NPC_DEAD_RIDER:
-                    events.ScheduleEvent(EVENT_SPELL_DRAIN_LIFE, urand(2000, 3500));
-                    events.ScheduleEvent(EVENT_SPELL_UNHOLY_FRENZY, urand(5000, 9000));
+                    events.ScheduleEvent(EVENT_DRAIN_LIFE, urand(2000, 3500));
+                    events.ScheduleEvent(EVENT_UNHOLY_FRENZY, urand(5000, 9000));
                     break;
                 case NPC_DEAD_HORSE:
-                    events.ScheduleEvent(EVENT_SPELL_STOMP, urand(2000, 5000));
+                    events.ScheduleEvent(EVENT_STOMP, urand(2000, 5000));
                     break;
             }
         }
@@ -602,11 +601,11 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_SPELL_DEATH_PLAGUE:
+                case EVENT_DEATH_PLAGUE:
                     me->CastSpell(me->GetVictim(), SPELL_DEATH_PLAGUE, false);
-                    events.RepeatEvent(urand(2500, 5000));
+                    events.RepeatEvent(urand(4000, 7000));
                     break;
-                case EVENT_SPELL_ARCANE_EXPLOSION:
+                case EVENT_ARCANE_EXPLOSION:
                     if (Unit* victim = me->GetVictim())
                     {
                         if (victim->IsWithinDist(me, 20))
@@ -616,7 +615,7 @@ public:
                     }
                     events.RepeatEvent(2500);
                     break;
-                case EVENT_SPELL_SHADOW_MARK:
+                case EVENT_SHADOW_MARK:
                     if (Unit* victim = me->GetVictim())
                     {
                         if (!victim->HasAura(SPELL_SHADOW_MARK))
@@ -626,7 +625,7 @@ public:
                     }
                     events.RepeatEvent(urand(5000, 7000));
                     break;
-                case EVENT_SPELL_WHIRLWIND:
+                case EVENT_WHIRLWIND:
                     if (Unit* victim = me->GetVictim())
                     {
                         if (victim->IsWithinDist(me, 10))
@@ -636,11 +635,11 @@ public:
                     }
                     events.RepeatEvent(urand(4000, 6000));
                     break;
-                case EVENT_SPELL_SHADOW_BOLT_VOLLEY:
+                case EVENT_SHADOW_BOLT_VOLLEY:
                     me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT_VOLLEY, false);
                     events.RepeatEvent(5000);
                     break;
-                case EVENT_SPELL_DRAIN_LIFE:
+                case EVENT_DRAIN_LIFE:
                     if (Unit* victim = me->GetVictim())
                     {
                         if (victim->IsWithinDist(me, 20))
@@ -650,11 +649,11 @@ public:
                     }
                     events.RepeatEvent(urand(8000, 12000));
                     break;
-                case EVENT_SPELL_UNHOLY_FRENZY:
+                case EVENT_UNHOLY_FRENZY:
                     me->AddAura(SPELL_UNHOLY_FRENZY, me);
                     events.RepeatEvent(urand(15000, 17000));
                     break;
-                case EVENT_SPELL_STOMP:
+                case EVENT_STOMP:
                     if (Unit* victim = me->GetVictim())
                     {
                         if (victim->IsWithinDist(me, 10))

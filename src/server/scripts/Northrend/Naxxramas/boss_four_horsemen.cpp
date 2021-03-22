@@ -40,10 +40,10 @@ enum Spells
 
 enum Events
 {
-    EVENT_SPELL_MARK_CAST               = 1,
-    EVENT_SPELL_PRIMARY                 = 2,
-    EVENT_SPELL_SECONDARY               = 3,
-    EVENT_SPELL_PUNISH                  = 4,
+    EVENT_MARK_CAST                     = 1,
+    EVENT_PRIMARY_SPELL                 = 2,
+    EVENT_SECONDARY_SPELL               = 3,
+    EVENT_PUNISH                        = 4,
     EVENT_BERSERK                       = 5
 };
 
@@ -73,14 +73,14 @@ enum FourHorsemen
 // MARKS
 const uint32 TABLE_SPELL_MARK[4] = {SPELL_MARK_OF_ZELIEK, SPELL_MARK_OF_BLAUMEUX, SPELL_MARK_OF_RIVENDARE, SPELL_MARK_OF_KORTHAZZ};
 
-// SPELL PRIMARY
+// PRIMARY SPELL
 const uint32 TABLE_SPELL_PRIMARY_10[4] = {SPELL_ZELIEK_HOLY_BOLT_10, SPELL_BLAUMEUX_SHADOW_BOLT_10, SPELL_RIVENDARE_UNHOLY_SHADOW_10, SPELL_KORTHAZZ_METEOR_10};
 const uint32 TABLE_SPELL_PRIMARY_25[4] = {SPELL_ZELIEK_HOLY_BOLT_25, SPELL_BLAUMEUX_SHADOW_BOLT_25, SPELL_RIVENDARE_UNHOLY_SHADOW_25, SPELL_KORTHAZZ_METEOR_25};
 
 // PUNISH
 const uint32 TABLE_SPELL_PUNISH[4] = {SPELL_ZELIEK_CONDEMNATION, SPELL_BLAUMEUX_UNYIELDING_PAIN, 0, 0};
 
-// SPELL SECONDARY
+// SECONDARY SPELL
 const uint32 TABLE_SPELL_SECONDARY_10[4] = {SPELL_ZELIEK_HOLY_WRATH_10, SPELL_BLAUMEUX_VOID_ZONE_10, 0, 0};
 const uint32 TABLE_SPELL_SECONDARY_25[4] = {SPELL_ZELIEK_HOLY_WRATH_25, SPELL_BLAUMEUX_VOID_ZONE_25, 0, 0};
 
@@ -180,17 +180,16 @@ public:
             currentWaypoint = 0;
             me->SetReactState(REACT_AGGRESSIVE);
             events.Reset();
-            // Schedule Events
-            events.RescheduleEvent(EVENT_SPELL_MARK_CAST, 24000);
+            events.RescheduleEvent(EVENT_MARK_CAST, 24000);
             events.RescheduleEvent(EVENT_BERSERK, 600000);
             if ((me->GetEntry() != NPC_LADY_BLAUMEUX && me->GetEntry() != NPC_SIR_ZELIEK))
             {
-                events.RescheduleEvent(EVENT_SPELL_PRIMARY, 10000 + rand() % 5000);
+                events.RescheduleEvent(EVENT_PRIMARY_SPELL, 10000 + rand() % 5000);
             }
             else
             {
-                events.RescheduleEvent(EVENT_SPELL_PUNISH, 5000);
-                events.RescheduleEvent(EVENT_SPELL_SECONDARY, 15000);
+                events.RescheduleEvent(EVENT_PUNISH, 5000);
+                events.RescheduleEvent(EVENT_SECONDARY_SPELL, 15000);
             }
         }
 
@@ -299,7 +298,7 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_SPELL_MARK_CAST:
+                case EVENT_MARK_CAST:
                     me->CastSpell(me, TABLE_SPELL_MARK[horsemanId], false);
                     events.RepeatEvent((me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK) ? 15000 : 12000);
                     return;
@@ -307,12 +306,12 @@ public:
                     Talk(SAY_SPECIAL);
                     me->CastSpell(me, SPELL_BERSERK, true);
                     return;
-                case EVENT_SPELL_PRIMARY:
+                case EVENT_PRIMARY_SPELL:
                     Talk(SAY_TAUNT);
                     me->CastSpell(me->GetVictim(), RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]), false);
                     events.RepeatEvent(15000);
                     return;
-                case EVENT_SPELL_PUNISH:
+                case EVENT_PUNISH:
                     if (!SelectTarget(SELECT_TARGET_NEAREST, 0, 45.0f, true))
                     {
                         me->CastSpell(me, TABLE_SPELL_PUNISH[horsemanId], false);
@@ -320,7 +319,7 @@ public:
                     }
                     events.RepeatEvent(2010);
                     return;
-                case EVENT_SPELL_SECONDARY:
+                case EVENT_SECONDARY_SPELL:
                     me->CastSpell(me->GetVictim(), RAID_MODE(TABLE_SPELL_SECONDARY_10[horsemanId], TABLE_SPELL_SECONDARY_25[horsemanId]), false);
                     events.RepeatEvent(15000);
                     return;

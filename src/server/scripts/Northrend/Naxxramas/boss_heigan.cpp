@@ -9,13 +9,13 @@
 
 enum Says
 {
-    SAY_AGGRO                   = 0,
-    SAY_SLAY                    = 1,
-    SAY_TAUNT                   = 2,
-    EMOTE_DEATH                 = 3,
-    EMOTE_DANCE                 = 4,
-    EMOTE_DANCE_END             = 5,
-    SAY_DANCE                   = 6
+    SAY_AGGRO                       = 0,
+    SAY_SLAY                        = 1,
+    SAY_TAUNT                       = 2,
+    EMOTE_DEATH                     = 3,
+    EMOTE_DANCE                     = 4,
+    EMOTE_DANCE_END                 = 5,
+    SAY_DANCE                       = 6
 };
 
 enum Spells
@@ -29,8 +29,8 @@ enum Spells
 
 enum Events
 {
-    EVENT_SPELL_SPELL_DISRUPTION    = 1,
-    EVENT_SPELL_DECEPIT_FEVER       = 2,
+    EVENT_DISRUPTION                = 1,
+    EVENT_DECEPIT_FEVER             = 2,
     EVENT_ERUPT_SECTION             = 3,
     EVENT_SWITCH_PHASE              = 4,
     EVENT_SAFETY_DANCE              = 5,
@@ -125,8 +125,8 @@ public:
                 me->CastStop();
                 me->SetReactState(REACT_AGGRESSIVE);
                 DoZoneInCombat();
-                events.ScheduleEvent(EVENT_SPELL_SPELL_DISRUPTION, urand(12000, 15000));
-                events.ScheduleEvent(EVENT_SPELL_DECEPIT_FEVER, 17000);
+                events.ScheduleEvent(EVENT_DISRUPTION, urand(12000, 15000));
+                events.ScheduleEvent(EVENT_DECEPIT_FEVER, 17000);
                 events.ScheduleEvent(EVENT_ERUPT_SECTION, 15000);
                 events.ScheduleEvent(EVENT_SWITCH_PHASE, 90000);
             }
@@ -170,11 +170,11 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_SPELL_SPELL_DISRUPTION:
+                case EVENT_DISRUPTION:
                     me->CastSpell(me, SPELL_SPELL_DISRUPTION, false);
                     events.RepeatEvent(10000);
                     break;
-                case EVENT_SPELL_DECEPIT_FEVER:
+                case EVENT_DECEPIT_FEVER:
                     me->CastSpell(me, RAID_MODE(SPELL_DECREPIT_FEVER_10, SPELL_DECREPIT_FEVER_25), false);
                     events.RepeatEvent(urand(22000, 25000));
                     break;
@@ -189,7 +189,7 @@ public:
                     else
                     {
                         StartFightPhase(PHASE_SLOW_DANCE);
-                        Talk(EMOTE_DANCE_END); // avoid play the emote on aggro.
+                        Talk(EMOTE_DANCE_END); // avoid play the emote on aggro
                     }
                     break;
                 case EVENT_ERUPT_SECTION:

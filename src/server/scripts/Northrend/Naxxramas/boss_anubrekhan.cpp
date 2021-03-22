@@ -33,9 +33,9 @@ enum Spells
 
 enum Events
 {
-    EVENT_SPELL_IMPALE              = 1,
-    EVENT_SPELL_LOCUST_SWARM        = 2,
-    EVENT_SPELL_BERSERK             = 3,
+    EVENT_IMPALE                    = 1,
+    EVENT_LOCUST_SWARM              = 2,
+    EVENT_BERSERK                   = 3,
     EVENT_SPAWN_GUARD               = 4
 };
 
@@ -156,9 +156,9 @@ public:
                     go->SetGoState(GO_STATE_READY);
                 }
             }
-            events.ScheduleEvent(EVENT_SPELL_IMPALE, 15000);
-            events.ScheduleEvent(EVENT_SPELL_LOCUST_SWARM, urand(70000, 120000));
-            events.ScheduleEvent(EVENT_SPELL_BERSERK, 600000);
+            events.ScheduleEvent(EVENT_IMPALE, 15000);
+            events.ScheduleEvent(EVENT_LOCUST_SWARM, urand(70000, 120000));
+            events.ScheduleEvent(EVENT_BERSERK, 600000);
             if (!summons.HasEntry(NPC_CRYPT_GUARD))
             {
                 SummonCryptGuards();
@@ -205,14 +205,14 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_SPELL_IMPALE:
+                case EVENT_IMPALE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     {
                         me->CastSpell(target, RAID_MODE(SPELL_IMPALE_10, SPELL_IMPALE_25), false);
                     }
                     events.RepeatEvent(20000);
                     break;
-                case EVENT_SPELL_LOCUST_SWARM:
+                case EVENT_LOCUST_SWARM:
                     Talk(EMOTE_LOCUST);
                     me->CastSpell(me, RAID_MODE(SPELL_LOCUST_SWARM_10, SPELL_LOCUST_SWARM_25), false);
                     events.ScheduleEvent(EVENT_SPAWN_GUARD, 3000);
@@ -221,9 +221,8 @@ public:
                 case EVENT_SPAWN_GUARD:
                     me->SummonCreature(NPC_CRYPT_GUARD, 3331.217f, -3476.607f, 287.074f, 3.269f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
                     break;
-                case EVENT_SPELL_BERSERK:
+                case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-
                     break;
             }
             DoMeleeAttackIfReady();

@@ -25,15 +25,15 @@ enum Spells
 
 enum Emotes
 {
-    EMOTE_SLIME = 0
+    EMOTE_SLIME                             = 0
 };
 
 enum Events
 {
-    EVENT_SPELL_BERSERK                     = 1,
-    EVENT_SPELL_POISON_CLOUD                = 2,
-    EVENT_SPELL_SLIME_SPRAY                 = 3,
-    EVENT_SPELL_MUTATING_INJECTION          = 4
+    EVENT_BERSERK                           = 1,
+    EVENT_POISON_CLOUD                      = 2,
+    EVENT_SLIME_SPRAY                       = 3,
+    EVENT_MUTATING_INJECTION                = 4
 };
 
 enum Misc
@@ -91,10 +91,10 @@ public:
             BossAI::EnterCombat(who);
             PullChamberAdds();
             me->SetInCombatWithZone();
-            events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 15000);
-            events.ScheduleEvent(EVENT_SPELL_MUTATING_INJECTION, 20000);
-            events.ScheduleEvent(EVENT_SPELL_SLIME_SPRAY, 10000);
-            events.ScheduleEvent(EVENT_SPELL_BERSERK, RAID_MODE(720000, 540000));
+            events.ScheduleEvent(EVENT_POISON_CLOUD, 15000);
+            events.ScheduleEvent(EVENT_MUTATING_INJECTION, 20000);
+            events.ScheduleEvent(EVENT_SLIME_SPRAY, 10000);
+            events.ScheduleEvent(EVENT_BERSERK, RAID_MODE(720000, 540000));
         }
 
         void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
@@ -154,19 +154,19 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_SPELL_POISON_CLOUD:
+                case EVENT_POISON_CLOUD:
                     me->CastSpell(me, SPELL_POISON_CLOUD, true);
                     events.RepeatEvent(15000);
                     break;
-                case EVENT_SPELL_BERSERK:
+                case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
-                case EVENT_SPELL_SLIME_SPRAY:
+                case EVENT_SLIME_SPRAY:
                     Talk(EMOTE_SLIME);
                     me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_SLIME_SPRAY_10, SPELL_SLIME_SPRAY_25), false);
                     events.RepeatEvent(20000);
                     break;
-                case EVENT_SPELL_MUTATING_INJECTION:
+                case EVENT_MUTATING_INJECTION:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100.0f, true, -SPELL_MUTATING_INJECTION))
                     {
                         me->CastSpell(target, SPELL_MUTATING_INJECTION, false);
