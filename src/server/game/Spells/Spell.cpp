@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -2648,8 +2648,16 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         {
             m_caster->CombatStart(effectUnit, !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_NO_INITIAL_AGGRO));
 
-            if (!effectUnit->IsStandState())
-                effectUnit->SetStandState(UNIT_STAND_STATE_STAND);
+            // Unsure if there are more spells that are not supposed to stop enemy from
+            // regenerating HP from food, so for now it stays as an ID.
+            const uint32 SPELL_PREMEDITATION = 14183;
+            if (m_spellInfo->Id != SPELL_PREMEDITATION)
+            {
+                if (!effectUnit->IsStandState())
+                {
+                    effectUnit->SetStandState(UNIT_STAND_STATE_STAND);
+                }
+            }
         }
     }
 
@@ -4884,6 +4892,11 @@ SpellCastResult Spell::CheckRuneCost(uint32 RuneCostID)
         return SPELL_CAST_OK;
 
     Player* player = m_caster->ToPlayer();
+    //If we are in .cheat power mode we dont need to check the cost as we are expected to be able to use it anyways (infinite power)
+    if (player->GetCommandStatus(CHEAT_POWER))
+    {
+        return SPELL_CAST_OK;
+    }
 
     if (player->getClass() != CLASS_DEATH_KNIGHT)
         return SPELL_CAST_OK;
@@ -6462,6 +6475,16 @@ SpellCastResult Spell::CheckPower()
     // item cast not used power
     if (m_CastItem)
         return SPELL_CAST_OK;
+
+    //While .cheat power is enabled dont check if we need power to cast the spell
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (m_caster->ToPlayer()->GetCommandStatus(CHEAT_POWER))
+        {
+            return SPELL_CAST_OK;
+        }
+    }
+
 
     // health as power used - need check health amount
     if (m_spellInfo->PowerType == POWER_HEALTH)
