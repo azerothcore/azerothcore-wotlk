@@ -1802,7 +1802,7 @@ uint8 GridMap::getTerrainType(float x, float y) const
 }
 
 // Get water state on map
-inline ZLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data)
+inline ZLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, float collisionHeight, LiquidData* data)
 {
     // Check water type (if no water return)
     if (!_liquidType && !_liquidFlags)
@@ -1887,11 +1887,11 @@ inline ZLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 R
     // For speed check as int values
     float delta = liquid_level - z;
 
-    if (delta > 2.0f)                   // Under water
+    if (delta > collisionHeight)        // Under water
         return LIQUID_MAP_UNDER_WATER;
     if (delta > 0.0f)                   // In water
         return LIQUID_MAP_IN_WATER;
-    if (delta > -0.1f)                   // Walk on water
+    if (delta > -0.1f)                  // Walk on water
         return LIQUID_MAP_WATER_WALK;
     // Above water
     return LIQUID_MAP_ABOVE_WATER;
@@ -1914,7 +1914,7 @@ float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, fl
     if (const_cast<Map*>(this)->GetGrid(x, y))
     {
         // we need ground level (including grid height version) for proper return water level in point
-        float ground_z = GetHeight(phasemask, x, y, z + collisionHeight, true, 50.0f);
+        float ground_z = GetHeight(phasemask, x, y, z + Z_OFFSET_FIND_HEIGHT, true, 50.0f);
         if (ground)
             *ground = ground_z;
 
@@ -2218,7 +2218,7 @@ ZLiquidStatus Map::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidTyp
     if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
     {
         LiquidData map_data;
-        ZLiquidStatus map_result = gmap->getLiquidStatus(x, y, z, ReqLiquidType, &map_data);
+        ZLiquidStatus map_result = gmap->getLiquidStatus(x, y, z, ReqLiquidType, collisionHeight, &map_data);
         // Not override LIQUID_MAP_ABOVE_WATER with LIQUID_MAP_NO_WATER:
         if (map_result != LIQUID_MAP_NO_WATER && (map_data.level > ground_level))
         {
