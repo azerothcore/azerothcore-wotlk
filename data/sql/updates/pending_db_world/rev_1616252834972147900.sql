@@ -39,11 +39,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21205, 0, 0, 0, 0, 0, 100, 0, 2500, 5000, 15000, 20000, 11, 38363, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Ravenous Flayer Matriarch - In Combat - Cast \'38363\''),
 (21205, 0, 1, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 36464, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Ravenous Flayer Matriarch - Between 20-80% Health - Cast \'36464\' (No Repeat)');
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21044;
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21044);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(21044, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 54617, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Coilskar Assassin - On Aggro - Cast \'54617\' (No Repeat)');
-
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21196;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21196);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -60,11 +55,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21663, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 12550, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Oronu the Elder - On Aggro - Cast \'12550\' (No Repeat)'),
 (21663, 0, 1, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 34079, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Oronu the Elder - Between 20-80% Health - Cast \'34079\' (No Repeat)'),
 (21663, 0, 2, 0, 2, 0, 100, 1, 10, 30, 0, 0, 11, 11986, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Oronu the Elder - Between 10-30% Health - Cast \'11986\' (No Repeat)');
-
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21454;
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21454);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(21454, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 42332, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Ashtongue Warrior - On Aggro - Cast \'42332\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21803;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21803);
@@ -203,11 +193,6 @@ DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21520);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (21520, 0, 0, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 38051, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Illidari Jailor - Between 20-80% Health - Cast \'38051\' (No Repeat)');
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21477;
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21477);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(21477, 0, 0, 0, 0, 0, 100, 0, 5000, 10000, 15000, 20000, 11, 3391, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Rocknail Flayer - In Combat - Cast \'3391\'');
-
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21478;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21478);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -290,11 +275,6 @@ DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21450);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (21450, 0, 0, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 38254, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Skethyl Owl - Between 20-80% Health - Cast \'38254\' (No Repeat)'),
 (21450, 0, 1, 0, 2, 0, 100, 1, 10, 30, 0, 0, 11, 38021, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Skethyl Owl - Between 10-30% Health - Cast \'38021\' (No Repeat)');
-
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 22115;
-DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 22115);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(22115, 0, 0, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 33840, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Enraged Earth Shard - Between 20-80% Health - Cast \'33840\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 19757;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 19757);
