@@ -1118,10 +1118,6 @@ public:
     }
     bool TeleportToEntryPoint();
 
-    int loadFishingSteps(uint32 guid);
-    bool hasFishingStepsDB(uint32 guid);
-    void InitFishingSteps(uint32 guid);
-
     void SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay = 0, bool asSpectator = false)
     {
         m_summon_expire = time(nullptr) + (delay ? delay : MAX_PLAYER_SUMMON_DELAY);
@@ -2123,16 +2119,6 @@ public:
     void RewardReputation(Unit* victim, float rate);
     void RewardReputation(Quest const* quest);
 
-    // After a skill up on fishing, reset the steps to 0
-    void resetFishingSteps() { m_fishingSteps = 0; };
-    bool hasFishingSteps()
-    {
-        if (m_hasFishingSteps) { return true; }
-        else { return false; }
-    };
-
-    void setFishingStepsState(bool state) { m_hasFishingSteps = state; };
-
     int32 CalculateReputationGain(ReputationSource source, uint32 creatureOrQuestLevel, int32 rep, int32 faction, bool noQuestBonus = false);
 
     void UpdateSkillsForLevel();
@@ -2909,9 +2895,6 @@ protected:
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
 
     uint8 m_grantableLevels;
-
-    uint8 m_fishingSteps;
-    bool m_hasFishingSteps;
 
     [[nodiscard]] AchievementMgr* GetAchievementMgr() const { return m_achievementMgr; }
 

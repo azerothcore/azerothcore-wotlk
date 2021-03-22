@@ -923,8 +923,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_lastFallZ = 0;
 
     m_grantableLevels = 0;
-    m_fishingSteps = 0;
-    m_hasFishingSteps = false;
 
     m_ControlledByPlayer = true;
 
@@ -1265,35 +1263,6 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
     CheckAllAchievementCriteria();
 
     return true;
-}
-
-bool Player::hasFishingStepsDB(uint32 guid)
-{
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_FISHINGSTEPS);
-    stmt->setUInt32(0, guid);
-
-    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
-    {
-        return true;
-    }
-
-    return false;
-}
-
-void Player::InitFishingSteps(uint32 guid)
-{
-    // Initializing Fishing steps
-    if (!hasFishingStepsDB(guid))
-    {
-        PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_FISHINGSTEPS);
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
-        stmt->setUInt32(0, guid);
-        stmt->setUInt32(1, m_fishingSteps);
-        trans->Append(stmt);
-        CharacterDatabase.CommitTransaction(trans);
-        setFishingStepsState(true);
-        setFishingStepsState(true);
-    }
 }
 
 bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
@@ -5176,10 +5145,6 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                 stmt->setUInt32(0, guid);
                 trans->Append(stmt);
 
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_FISHINGSTEPS);
-                stmt->setUInt32(0, guid);
-                trans->Append(stmt);
-
                 CharacterDatabase.CommitTransaction(trans);
                 break;
             }
@@ -6419,73 +6384,52 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLeve
     return false;
 }
 
-uint8 GetFishingStepsNeededToLevelUp(uint32 SkillValue)
+float getProbabilityOfLevelUp(uint32 SkillValue)
 {
-    /* The Trinity core formula was wrong, making people within
-     * 420 and 450 needing 14 steps to level up fishing instead
-     * of 12. Due to the steps needs to level up being so random
-     * accross all Skill ranges (the difference of 115 to 135 is 20
-     * but the difference from 215 to 295 is 80 so) I wasn't able
-     * to come up with a formula that simulates completely this
-     * behaviour. For now this solution will simulate it.
+    /* According to El's Extreme Angling page, the probability of a skill
+     * level up is 100% since 100/1 = 100. From 115 - 135 should average
+     * 2 catches per skill up so that means 100/2 = 50%. The if statement
+     * returns the probability the range of skill on 
      */
     if (SkillValue > 115 && SkillValue <= 135)
     {
-        return 2;
+        return 100 / 2;
     }
     else if (SkillValue > 135 && SkillValue <= 160)
     {
-        return 3;
+        return 100 / 3;
     }
     else if (SkillValue > 160 && SkillValue <= 190)
     {
-        return 4;
+        return 100 / 4;
     }
     else if (SkillValue > 190 && SkillValue <= 215)
     {
-        return 5;
+        return 100 / 5;
     }
     else if (SkillValue > 215 && SkillValue <= 295)
     {
-        return 6;
+        return 100 / 6;
     }
     else if (SkillValue > 295 && SkillValue <= 315)
     {
-        return 9;
+        return 100 / 9;
     }
     else if (SkillValue > 315 && SkillValue <= 355)
     {
-        return 10;
+        return 100 / 10;
     }
     else if (SkillValue > 355 && SkillValue <= 425)
     {
-        return 11;
+        return 100 / 11;
     }
     else if (SkillValue > 425 && SkillValue < 450)
     {
-        return 12;
+        return 100 / 12;
     }
 
     // Below 115 Sillvalue only needs 1 step
-    return 1;
-}
-
-void updateFishingStepsDB(uint32 guid, uint32 steps)
-{
-    try
-    {
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
-        PreparedStatement* stmt = nullptr;
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_FISHINGSTEPS);
-        stmt->setUInt8(0, steps);
-        stmt->setUInt32(1, guid);
-        trans->Append(stmt);
-        CharacterDatabase.CommitTransaction(trans);
-    }
-    catch (...)
-    {
-        sLog->outError("Couldn't update fishing steps for character guid: #%u", guid);
-    }
+    return 100;
 }
 
 bool Player::UpdateFishingSkill()
@@ -6499,34 +6443,14 @@ bool Player::UpdateFishingSkill()
     if (SkillValue >= GetMaxSkillValue(SKILL_FISHING))
         return false;
 
-    uint8 stepsNeededToLevelUp = GetFishingStepsNeededToLevelUp(SkillValue);
-    ++m_fishingSteps;
+    float chanceOfLevelUp = getProbabilityOfLevelUp(SkillValue);
 
     /* Whenever the player clicks on the fishing gameobject the
      * core will decide based on how many steps the player is
      * into leveling up fishing, if the skill raises or not.
-     * Example: from 160 to 190 the player needs 4 steps to
-     * advance his fishing skill by 1 point.
      */
-    if (m_fishingSteps >= stepsNeededToLevelUp)
-    {
-        // Whenever a level up occurs, reset the steps on the database
-        updateFishingStepsDB(this->GetGUID(), 0);
-        this->resetFishingSteps();
-        uint32 gathering_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
-        return UpdateSkillPro(SKILL_FISHING, 100 * 10, gathering_skill_gain);
-    }
-    else
-    {
-        /* No skill level up but save a new step on the DB in case
-         * the player logs out or server crashes and progress isn't lost
-         * since on higher fishing levels it takes 11 steps to progress
-         * on fishing, which can delay the level up by several steps
-         */
-        updateFishingStepsDB(this->GetGUID(), m_fishingSteps);
-    }
-
-    return false;
+    uint32 gathering_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
+    return UpdateSkillPro(SKILL_FISHING, static_cast<int32>(chanceOfLevelUp) * 10, gathering_skill_gain);
 }
 
 // levels sync. with spell requirement for skill levels to learn
@@ -18074,8 +17998,8 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder* holder)
     //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, instance_mode_mask, "
     // 44           45                46                 47                    48          49          50              51           52               53              54
     //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk, "
-    // 55      56      57      58      59      60      61      62      63           64                 65                 66             67              68      69           70          71          72
-    //"health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels, fishing_steps FROM characters WHERE guid = '%u'", guid);
+    // 55      56      57      58      59      60      61      62      63           64                 65                 66             67              68      69           70          71
+    //"health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles, actionBars, grantableLevels, FROM characters WHERE guid = '%u'", guid);
     PreparedQueryResult result = holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_FROM);
 
     if (!result)
@@ -18087,9 +18011,6 @@ bool Player::LoadFromDB(uint32 guid, SQLQueryHolder* holder)
     Field* fields = result->Fetch();
 
     uint32 dbAccountId = fields[1].GetUInt32();
-
-    InitFishingSteps(guid);
-    m_fishingSteps = loadFishingSteps(guid);
 
     // check if the character's account in the db and the logged in account match.
     // player should be able to load/delete character only with correct account!
@@ -26667,20 +26588,6 @@ void Player::SetMap(Map* map)
 {
     Unit::SetMap(map);
     m_mapRef.link(map, this);
-}
-
-int Player::loadFishingSteps(uint32 guid)
-{
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_FISHINGSTEPS);
-    stmt->setUInt32(0, guid);
-
-    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
-    {
-        Field* fields = result->Fetch();
-        return fields[0].GetUInt8();
-    }
-
-    return 0;
 }
 
 void Player::_SaveCharacter(bool create, SQLTransaction& trans)
