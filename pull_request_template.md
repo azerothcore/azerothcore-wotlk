@@ -17,7 +17,7 @@
 <!-- If this report is linked with in-game content, please include any evidence/documentation/video or further proof in order to guarantee that the behavior described above is the correct one.
  - If it is described in a guide/post or Wowhead comment, please include the link.
  - Can you link a video that confirms it?
- - Please list/share the source which states how it should work.
+ - Please share the source which states how it should work.
 -->
 
 
