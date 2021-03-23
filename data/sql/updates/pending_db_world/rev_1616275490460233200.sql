@@ -263,3 +263,11 @@ UPDATE `creature_template` SET `DamageModifier`='6.5' WHERE  `entry`=11441;
 UPDATE `creature_template` SET `DamageModifier`='6' WHERE  `entry`=11445;
 -- gordok mauler 5->1 (outside)
 UPDATE `creature_template` SET `DamageModifier`='1' WHERE  `entry`=11442;
+
+-- some deadmines bosses
+-- ogre
+UPDATE `creature_template` SET `DamageModifier`='2.5' WHERE  `entry`=644;
+-- greenskin
+UPDATE `creature_template` SET `DamageModifier`='2.45' WHERE  `entry`=647;
+-- cookie
+UPDATE `creature_template` SET `DamageModifier`='2.45' WHERE  `entry`=645;
