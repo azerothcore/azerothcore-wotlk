@@ -374,7 +374,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!IsInRoom(POSITION_ROOM_DOOR, AXIS_Y, false)) { return; }
+            if (!IsInRoom(&POSITION_ROOM_DOOR, Axis::AXIS_Y, false)) { return; }
 
             if (!UpdateVictim())
             {

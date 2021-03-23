@@ -197,55 +197,56 @@ struct ScriptedAI : public CreatureAI
     // Called when AI is temporarily replaced or put back when possess is applied or removed
     void OnPossess(bool /*apply*/) {}
 
-    enum Axis
+    enum class Axis
     {
         AXIS_X,
         AXIS_Y
     };
 
-    /* This is called for bosses whenever they leave the room
-     * in order to reset. Position is usually the position of a door
-     * Axis is the X or Y axis that the boss uses to reset and superiorPos
-     * means if the value of the boss position is bigger or lesser in
-     * order to reset.
+    /* This is called for bosses whenever an encounter is happening.
+     * - Arguments:
+     * - Position has to be passed as a constant pointer (&Position)
+     * - Axis is the X or Y axis that is used to decide the position threshold
+     * - Above decides if the boss position should be above the passed position
+     *   or below.
      * Example:
-     * Hodir position in regards of the door is < the Y position of the door
+     * Hodir is in room until his Y position is below the Door position:
      * IsInRoom(doorPosition, AXIS_Y, false);
      */
-    bool IsInRoom(Position pos, int axis, bool superiorPos)
+    bool IsInRoom(const Position* pos, Axis axis, bool above)
     {
         switch (axis)
         {
-            case AXIS_X:
-                if (!superiorPos)
+            case Axis::AXIS_X:
+                if (!above)
                 {
-                    if (me->GetPositionX() < pos.GetPositionX())
+                    if (me->GetPositionX() < pos->GetPositionX())
                     {
                         EnterEvadeMode();
                         return false;
                     }
                 }
-                else if (superiorPos)
+                else if (above)
                 {
-                    if (me->GetPositionX() > pos.GetPositionX())
+                    if (me->GetPositionX() > pos->GetPositionX())
                     {
                         EnterEvadeMode();
                         return false;
                     }
                 }
                 break;
-            case AXIS_Y:
-                if (!superiorPos)
+            case Axis::AXIS_Y:
+                if (!above)
                 {
-                    if (me->GetPositionY() < pos.GetPositionY())
+                    if (me->GetPositionY() < pos->GetPositionY())
                     {
                         EnterEvadeMode();
                         return false;
                     }
                 }
-                else if (superiorPos)
+                else if (above)
                 {
-                    if (me->GetPositionY() > pos.GetPositionY())
+                    if (me->GetPositionY() > pos->GetPositionY())
                     {
                         EnterEvadeMode();
                         return false;
