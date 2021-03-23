@@ -215,6 +215,11 @@ struct ScriptedAI : public CreatureAI
      */
     bool IsInRoom(const Position* pos, Axis axis, bool above)
     {
+        if (!pos)
+        {
+            return true;
+        }
+
         switch (axis)
         {
             case Axis::AXIS_X:
