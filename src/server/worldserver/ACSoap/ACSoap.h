@@ -7,49 +7,30 @@
 #ifndef _ACSOAP_H
 #define _ACSOAP_H
 
-#include "AccountMgr.h"
 #include "Define.h"
-#include <ace/Semaphore.h>
-#include <ace/Task.h>
-#include <Threading.h>
+#include <future>
+#include <mutex>
 
-class ACSoapRunnable : public acore::Runnable
-{
-public:
-    ACSoapRunnable() : _port(0) { }
-
-    void run() override;
-
-    void SetListenArguments(const std::string& host, uint16 port)
-    {
-        _host = host;
-        _port = port;
-    }
-
-private:
-    void process_message(ACE_Message_Block* mb);
-
-    std::string _host;
-    uint16 _port;
-};
+void process_message(struct soap* soap_message);
+void ACSoapThread(const std::string& host, uint16 port);
 
 class SOAPCommand
 {
 public:
-    SOAPCommand(): pendingCommands(0, USYNC_THREAD, "pendingCommands"), m_success(false) {}
+    SOAPCommand() :
+        m_success(false) { }
 
     ~SOAPCommand() { }
 
-    void appendToPrintBuffer(const char* msg)
+    void appendToPrintBuffer(char const* msg)
     {
         m_printBuffer += msg;
     }
 
-    ACE_Semaphore pendingCommands;
-
     void setCommandSuccess(bool val)
     {
         m_success = val;
+        finishedPromise.set_value();
     }
 
     bool hasCommandSucceeded() const
@@ -57,7 +38,7 @@ public:
         return m_success;
     }
 
-    static void print(void* callbackArg, const char* msg)
+    static void print(void* callbackArg, char const* msg)
     {
         ((SOAPCommand*)callbackArg)->appendToPrintBuffer(msg);
     }
@@ -66,6 +47,7 @@ public:
 
     bool m_success;
     std::string m_printBuffer;
+    std::promise<void> finishedPromise;
 };
 
 #endif
