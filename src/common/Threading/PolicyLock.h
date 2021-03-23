@@ -9,7 +9,7 @@
 
 #include <mutex>
 
-#define RETURN_GUARD(mutex, retval) if (!mutex.try_lock())    \
+#define GUARD_RETURN(mutex, retval) if (!mutex.try_lock())    \
                                         return retval;        \
                                     std::lock_guard<decltype(mutex)> guard(mutex, std::adopt_lock)
 
