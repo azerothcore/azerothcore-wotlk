@@ -268,15 +268,6 @@ int Master::Run()
 #endif
 #endif
 
-    //// Start soap serving thread
-    //acore::Thread* soapThread = nullptr;
-    //if (sConfigMgr->GetOption<bool>("SOAP.Enabled", false))
-    //{
-    //    ACSoapRunnable* runnable = new ACSoapRunnable();
-    //    runnable->SetListenArguments(sConfigMgr->GetOption<std::string>("SOAP.IP", "127.0.0.1"), uint16(sConfigMgr->GetOption<int32>("SOAP.Port", 7878)));
-    //    soapThread = new acore::Thread(runnable);
-    //}
-
     // Start soap serving thread if enabled
     std::shared_ptr<std::thread> soapThread;
     if (sConfigMgr->GetOption<bool>("SOAP.Enabled", false))
