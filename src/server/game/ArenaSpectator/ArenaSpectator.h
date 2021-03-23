@@ -2,15 +2,15 @@
 #ifndef AZEROTHCORE_ARENASPECTATOR_H
 #define AZEROTHCORE_ARENASPECTATOR_H
 
-#include "Player.h"
-#include "World.h"
-#include "Map.h"
 #include "Battleground.h"
-#include "Pet.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
 #include "Chat.h"
 #include "LFGMgr.h"
+#include "Map.h"
+#include "Pet.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "World.h"
 
 #define SPECTATOR_ADDON_VERSION 27
 #define SPECTATOR_BUFFER_LEN 150
@@ -197,7 +197,7 @@ namespace ArenaSpectator
         if (aura->GetSpellInfo()->SpellIconID == 1 || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR1_DONT_DISPLAY_IN_AURA_BAR))
             return false;
 
-        if (remove || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH) || aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_GENERIC)
+        if (remove || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_AURA_CC) || aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_GENERIC)
             return true;
 
         for(uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  * Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -16,7 +16,7 @@
 
     @brief This file contains definitions of functions used for reporting critical application errors
 
-    It is very important that (std::)abort is NEVER called in place of *((volatile int*)NULL) = 0;
+    It is very important that (std::)abort is NEVER called in place of *((volatile int*)nullptr) = 0;
     Calling abort() on Windows does not invoke unhandled exception filters - a mechanism used by WheatyExceptionReport
     to log crashes. exit(1) calls here are for static analysis tools to indicate that calling functions defined in this file
     terminates the application.

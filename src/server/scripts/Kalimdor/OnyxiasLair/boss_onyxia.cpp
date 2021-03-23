@@ -2,10 +2,10 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "onyxias_lair.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum // Spells
@@ -100,7 +100,7 @@ class boss_onyxia : public CreatureScript
 public:
     boss_onyxia() : CreatureScript("boss_onyxia") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new boss_onyxiaAI (pCreature);
     }
@@ -146,7 +146,7 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             CurrentWP = 0;
             SetPhase(0);
@@ -168,7 +168,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if( me->GetVictim() || me->GetDistance(who) > 30.0f )
                 return;
@@ -177,7 +177,7 @@ public:
                 AttackStart(who);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             switch( param )
             {
@@ -193,7 +193,7 @@ public:
             me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
         }
 
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
@@ -208,13 +208,13 @@ public:
             BindPlayers();
         }
 
-        void JustDied(Unit*  /*killer*/)
+        void JustDied(Unit*  /*killer*/) override
         {
             if( m_pInstance )
                 m_pInstance->SetData(DATA_ONYXIA, DONE);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
             switch( Phase )
             {
@@ -232,7 +232,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* pSummoned)
+        void JustSummoned(Creature* pSummoned) override
         {
             if( !pSummoned )
                 return;
@@ -245,7 +245,7 @@ public:
             }
         }
 
-        void MovementInform(uint32 type, uint32 id)
+        void MovementInform(uint32 type, uint32 id) override
         {
             if( type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE )
                 return;
@@ -310,7 +310,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -373,7 +373,7 @@ public:
                         me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(11, OnyxiaMoveData[1].x + 1.0f, OnyxiaMoveData[1].y, OnyxiaMoveData[1].z, 12.0f);
                         bManyWhelpsAvailable = true;
-                        
+
                         events.RescheduleEvent(EVENT_END_MANY_WHELPS_TIME, 10000);
                     }
                     break;
@@ -384,7 +384,7 @@ public:
                     {
                         me->SetSpeed(MOVE_RUN, 2.95f, false);
                         me->GetMotionMaster()->MovePoint(5, OnyxiaMoveData[5].x, OnyxiaMoveData[5].y, OnyxiaMoveData[5].z);
-                        
+
                         whelpSpam = true;
                         events.ScheduleEvent(EVENT_WHELP_SPAM, 90000);
                         events.ScheduleEvent(EVENT_SUMMON_LAIR_GUARD, 30000);
@@ -417,7 +417,7 @@ public:
                             me->SetFacingToObject(v);
                             me->CastSpell(v, SPELL_FIREBALL, false);
                         }
-                        
+
                         events.ScheduleEvent(EVENT_SPELL_FIREBALL_SECOND, 4000);
                     }
                     break;
@@ -459,7 +459,7 @@ public:
                         me->SetFacingTo(OnyxiaMoveData[CurrentWP].o);
                         me->MonsterTextEmote("Onyxia takes in a deep breath...", 0, true);
                         me->CastSpell(me, OnyxiaMoveData[CurrentWP].spellId, false);
-                        
+
                         events.ScheduleEvent(EVENT_SPELL_BREATH, 8250);
                     }
                     break;
@@ -516,7 +516,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spell)
+        void SpellHitTarget(Unit* target, const SpellInfo* spell) override
         {
             if (target->GetTypeId() == TYPEID_PLAYER && spell->DurationEntry && spell->DurationEntry->ID == 328 && spell->Effects[EFFECT_1].TargetA.GetTarget() == 1 && (spell->Effects[EFFECT_1].Amplitude == 50 || spell->Effects[EFFECT_1].Amplitude == 215)) // Deep Breath
                 if (m_pInstance)
@@ -530,7 +530,7 @@ class npc_onyxian_lair_guard : public CreatureScript
 public:
     npc_onyxian_lair_guard() : CreatureScript("npc_onyxian_lair_guard") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_onyxian_lair_guardAI (pCreature);
     }
@@ -546,7 +546,7 @@ public:
 
         EventMap events;
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if( me->GetVictim() || me->GetDistance(who) > 20.0f )
                 return;
@@ -555,7 +555,7 @@ public:
                 AttackStart(who);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if( !UpdateVictim() )
                 return;
@@ -599,7 +599,7 @@ class npc_onyxia_whelp : public CreatureScript
 public:
     npc_onyxia_whelp() : CreatureScript("npc_onyxia_whelp") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_onyxia_whelpAI (pCreature);
     }
@@ -608,7 +608,7 @@ public:
     {
         npc_onyxia_whelpAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if( me->GetVictim() || me->GetDistance(who) > 20.0f )
                 return;
@@ -624,7 +624,7 @@ class npc_onyxia_trigger : public CreatureScript
 public:
     npc_onyxia_trigger() : CreatureScript("npc_onyxia_trigger") { }
 
-    CreatureAI* GetAI(Creature* pCreature) const
+    CreatureAI* GetAI(Creature* pCreature) const override
     {
         return new npc_onyxia_triggerAI (pCreature);
     }
@@ -633,8 +633,8 @@ public:
     {
         npc_onyxia_triggerAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void UpdateAI(uint32  /*diff*/) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void UpdateAI(uint32  /*diff*/) override {}
     };
 };
 

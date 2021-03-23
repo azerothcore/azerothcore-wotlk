@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,8 +7,8 @@
 #ifndef ACORE_POINTMOVEMENTGENERATOR_H
 #define ACORE_POINTMOVEMENTGENERATOR_H
 
-#include "MovementGenerator.h"
 #include "FollowerReference.h"
+#include "MovementGenerator.h"
 
 template<class T>
 class PointMovementGenerator : public MovementGeneratorMedium< T, PointMovementGenerator<T> >
@@ -59,11 +59,11 @@ class EffectMovementGenerator : public MovementGenerator
 {
 public:
     explicit EffectMovementGenerator(uint32 Id) : m_Id(Id) {}
-    void Initialize(Unit*) {}
-    void Finalize(Unit*);
-    void Reset(Unit*) {}
-    bool Update(Unit*, uint32);
-    MovementGeneratorType GetMovementGeneratorType() { return EFFECT_MOTION_TYPE; }
+    void Initialize(Unit*) override {}
+    void Finalize(Unit*) override;
+    void Reset(Unit*) override {}
+    bool Update(Unit*, uint32) override;
+    MovementGeneratorType GetMovementGeneratorType() override { return EFFECT_MOTION_TYPE; }
 private:
     uint32 m_Id;
 };

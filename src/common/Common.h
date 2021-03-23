@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -49,16 +49,16 @@
 
 #include "Define.h"
 
+#include <cassert>
+#include <cerrno>
+#include <cmath>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <unordered_map>
 #include <unordered_set>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <math.h>
-#include <errno.h>
-#include <signal.h>
-#include <assert.h>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #define STRCASECMP stricmp
@@ -79,8 +79,6 @@
 #include "Threading/LockedQueue.h"
 #include "Threading/Threading.h"
 
-#include <ace/Basic_Types.h>
-#include <ace/Guard_T.h>
 #include <ace/RW_Thread_Mutex.h>
 #include <ace/Thread_Mutex.h>
 #include <ace/Stack_Trace.h>
@@ -126,7 +124,7 @@ inline float finiteAlways(float f) { return isfinite(f) ? f : 0.0f; }
 
 inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
 
-#define atol(a) strtoul( a, NULL, 10)
+#define atol(a) strtoul( a, nullptr, 10)
 
 #define STRINGIZE(a) #a
 
@@ -185,10 +183,6 @@ typedef std::vector<std::string> StringVector;
 
 #ifdef min
 #undef min
-#endif
-
-#ifndef M_PI
-#define M_PI            3.14159265358979323846f
 #endif
 
 #define MAX_QUERY_LEN 32*1024

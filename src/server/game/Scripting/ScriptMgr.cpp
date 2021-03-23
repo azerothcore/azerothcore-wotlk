@@ -1,31 +1,31 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
+#include "Chat.h"
 #include "Config.h"
+#include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "GossipDef.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
+#include "Player.h"
+#include "ScriptedGossip.h"
 #include "ScriptLoader.h"
+#include "ScriptMgr.h"
 #include "ScriptSystem.h"
-#include "Transport.h"
-#include "Vehicle.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "GossipDef.h"
-#include "ScriptedGossip.h"
-#include "CreatureAI.h"
-#include "Player.h"
+#include "Transport.h"
+#include "Vehicle.h"
 #include "WorldPacket.h"
-#include "Chat.h"
 
 #ifdef ELUNA
-#include "LuaEngine.h"
 #include "ElunaUtility.h"
+#include "LuaEngine.h"
 #endif
 
 // Specialize for each script type class like so:
@@ -59,6 +59,7 @@ template class ScriptRegistry<AllCreatureScript>;
 template class ScriptRegistry<AllMapScript>;
 template class ScriptRegistry<MovementHandlerScript>;
 template class ScriptRegistry<BGScript>;
+template class ScriptRegistry<ArenaTeamScript>;
 template class ScriptRegistry<SpellSC>;
 template class ScriptRegistry<AccountScript>;
 template class ScriptRegistry<GameEventScript>;
@@ -69,7 +70,6 @@ template class ScriptRegistry<MailScript>;
 ScriptMgr::ScriptMgr()
     : _scriptCount(0), _scheduledScripts(0)
 {
-
 }
 
 ScriptMgr::~ScriptMgr()
@@ -124,6 +124,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR(GlobalScript);
     SCR_CLEAR(ModuleScript);
     SCR_CLEAR(BGScript);
+    SCR_CLEAR(ArenaTeamScript);
     SCR_CLEAR(SpellSC);
     SCR_CLEAR(GameEventScript);
     SCR_CLEAR(MailScript);
@@ -197,6 +198,7 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                     !ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
                     !ScriptRegistry<GuildScript>::GetScriptById(sid) &&
                     !ScriptRegistry<BGScript>::GetScriptById(sid) &&
+                    !ScriptRegistry<ArenaTeamScript>::GetScriptById(sid) &&
                     !ScriptRegistry<SpellSC>::GetScriptById(sid) &&
                     !ScriptRegistry<GroupScript>::GetScriptById(sid))
                 sLog->outErrorDb("Script named '%s' is assigned in the database, but has no code!", (*itr).c_str());
@@ -389,7 +391,6 @@ void ScriptMgr::OnPacketSend(WorldSession* session, WorldPacket const& packet)
     FOREACH_SCRIPT(ServerScript)->OnPacketSend(session, copy);
 }
 
-
 void ScriptMgr::OnOpenStateChange(bool open)
 {
 #ifdef ELUNA
@@ -397,7 +398,6 @@ void ScriptMgr::OnOpenStateChange(bool open)
 #endif
     FOREACH_SCRIPT(WorldScript)->OnOpenStateChange(open);
 }
-
 
 void ScriptMgr::OnLoadCustomDatabaseTable()
 {
@@ -497,7 +497,6 @@ void ScriptMgr::OnGroupRateCalculation(float& rate, uint32 count, bool isRaid)
                 continue; \
             if (C->MapID == V->GetId()) \
             {
-
 #define SCR_MAP_END \
                 return; \
             } \
@@ -719,7 +718,6 @@ bool ScriptMgr::OnItemRemove(Player* player, Item* item)
 #endif
     GET_SCRIPT_RET(ItemScript, item->GetScriptId(), tmpscript, false);
     return tmpscript->OnRemove(player, item);
-
 }
 
 bool ScriptMgr::OnCastItemCombatSpell(Player* player, Unit* victim, SpellInfo const* spellInfo, Item* item)
@@ -1329,7 +1327,7 @@ void ScriptMgr::OnShutdown()
 bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target)
 {
     ASSERT(source);
-    // target can be NULL.
+    // target can be nullptr.
 
     GET_SCRIPT_RET(AchievementCriteriaScript, scriptId, tmpscript, false);
     return tmpscript->OnCheck(source, target);
@@ -1339,6 +1337,16 @@ bool ScriptMgr::OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target)
 void ScriptMgr::OnPlayerCompleteQuest(Player* player, Quest const* quest)
 {
     FOREACH_SCRIPT(PlayerScript)->OnPlayerCompleteQuest(player, quest);
+}
+
+void ScriptMgr::OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnSendInitialPacketsBeforeAddToMap(player, data);
+}
+
+void ScriptMgr::OnBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBattlegroundDesertion(player, desertionType);
 }
 
 void ScriptMgr::OnPlayerReleasedGhost(Player* player)
@@ -1667,6 +1675,21 @@ void ScriptMgr::OnPlayerJoinArena(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinArena(player);
 }
 
+void ScriptMgr::GetCustomGetArenaTeamId(const Player* player, uint8 slot, uint32& teamID) const
+{
+    FOREACH_SCRIPT(PlayerScript)->GetCustomGetArenaTeamId(player, slot, teamID);
+}
+
+void ScriptMgr::GetCustomArenaPersonalRating(const Player* player, uint8 slot, uint32& rating) const
+{
+    FOREACH_SCRIPT(PlayerScript)->GetCustomArenaPersonalRating(player, slot, rating);
+}
+
+void ScriptMgr::OnGetMaxPersonalArenaRatingRequirement(const Player* player, uint32 minSlot, uint32& maxArenaRating) const
+{
+    FOREACH_SCRIPT(PlayerScript)->OnGetMaxPersonalArenaRatingRequirement(player, minSlot, maxArenaRating);
+}
+
 void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid)
 {
     FOREACH_SCRIPT(PlayerScript)->OnLootItem(player, item, count, lootguid);
@@ -1701,6 +1724,17 @@ bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGu
     return ret;
 }
 
+bool ScriptMgr::ShouldBeRewardedWithMoneyInsteadOfExp(Player* player)
+{
+    bool ret = false; // return false by default if not scripts
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret)
+        if (itr->second->ShouldBeRewardedWithMoneyInsteadOfExp(player))
+            ret = true; // we change ret value only when a script returns true
+
+    return ret;
+}
+
 void ScriptMgr::OnBeforeTempSummonInitStats(Player* player, TempSummon* tempSummon, uint32& duration)
 {
     FOREACH_SCRIPT(PlayerScript)->OnBeforeTempSummonInitStats(player, tempSummon, duration);
@@ -1725,6 +1759,11 @@ void ScriptMgr::OnBeforeLoadPetFromDB(Player* player, uint32& petentry, uint32& 
 void ScriptMgr::OnAccountLogin(uint32 accountId)
 {
     FOREACH_SCRIPT(AccountScript)->OnAccountLogin(accountId);
+}
+
+void ScriptMgr::OnLastIpUpdate(uint32 accountId, std::string ip)
+{
+    FOREACH_SCRIPT(AccountScript)->OnLastIpUpdate(accountId, ip);
 }
 
 void ScriptMgr::OnFailedAccountLogin(uint32 accountId)
@@ -2108,6 +2147,31 @@ bool ScriptMgr::CanSendMessageQueue(BattlegroundQueue* queue, Player* leader, Ba
     return ret;
 }
 
+void ScriptMgr::OnGetSlotByType(const uint32 type, uint8& slot)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnGetSlotByType(type, slot);
+}
+
+void ScriptMgr::OnGetArenaPoints(ArenaTeam* at, float& points)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnGetArenaPoints(at, points);
+}
+
+void ScriptMgr::OnArenaTypeIDToQueueID(const BattlegroundTypeId bgTypeId, const uint8 arenaType, uint32& queueTypeID)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnTypeIDToQueueID(bgTypeId, arenaType, queueTypeID);
+}
+
+void ScriptMgr::OnArenaQueueIdToArenaType(const BattlegroundQueueTypeId bgQueueTypeId, uint8& ArenaType)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnQueueIdToArenaType(bgQueueTypeId, ArenaType);
+}
+
+void ScriptMgr::OnSetArenaMaxPlayersPerTeam(const uint8 arenaType, uint32& maxPlayerPerTeam)
+{
+    FOREACH_SCRIPT(ArenaTeamScript)->OnSetArenaMaxPlayersPerTeam(arenaType, maxPlayerPerTeam);
+}
+
 // SpellSC
 void ScriptMgr::OnCalcMaxDuration(Aura const* aura, int32& maxDuration)
 {
@@ -2323,6 +2387,12 @@ BGScript::BGScript(char const* name)
     ScriptRegistry<BGScript>::AddScript(this);
 }
 
+ArenaTeamScript::ArenaTeamScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<ArenaTeamScript>::AddScript(this);
+}
+
 SpellSC::SpellSC(char const* name)
     : ScriptObject(name)
 {
@@ -2346,4 +2416,3 @@ MailScript::MailScript(const char* name)
 {
     ScriptRegistry<MailScript>::AddScript(this);
 }
-

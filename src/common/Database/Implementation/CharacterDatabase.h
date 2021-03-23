@@ -18,7 +18,7 @@ public:
     CharacterDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) {}
 
     //- Loads database type specific prepared statements
-    void DoPrepareStatements();
+    void DoPrepareStatements() override;
 };
 
 typedef DatabaseWorkerPool<CharacterDatabaseConnection> CharacterDatabaseWorkerPool;
@@ -494,6 +494,7 @@ enum CharacterDatabaseStatements
     CHAR_INS_PVPSTATS_BATTLEGROUND,
     CHAR_INS_PVPSTATS_PLAYER,
     CHAR_SEL_PVPSTATS_FACTIONS_OVERALL,
+    CHAR_SEL_PVPSTATS_BRACKET_MONTH,
 
     CHAR_INS_DESERTER_TRACK,
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,12 +8,12 @@
 #define ACORE_OBJECTACCESSOR_H
 
 #include "Define.h"
-#include "UpdateData.h"
 #include "GridDefines.h"
 #include "Object.h"
+#include "UpdateData.h"
 #include <ace/Thread_Mutex.h>
-#include <unordered_map>
 #include <set>
+#include <unordered_map>
 
 class Creature;
 class Corpse;
@@ -32,7 +32,6 @@ template <class T>
 class HashMapHolder
 {
 public:
-
     typedef std::unordered_map<uint64, T*> MapType;
     typedef ACE_RW_Thread_Mutex LockType;
 
@@ -60,9 +59,8 @@ public:
     static LockType* GetLock() { return &i_lock; }
 
 private:
-
     //Non instanceable only static
-    HashMapHolder() {}
+    HashMapHolder() = default;
 
     static LockType i_lock;
     static MapType  m_objectMap;
@@ -104,12 +102,12 @@ public:
     static Unit* GetObjectInOrOutOfWorld(uint64 guid, Unit* /*typeSpecifier*/)
     {
         if (IS_PLAYER_GUID(guid))
-            return (Unit*)GetObjectInOrOutOfWorld(guid, (Player*)NULL);
+            return (Unit*)GetObjectInOrOutOfWorld(guid, (Player*)nullptr);
 
         if (IS_PET_GUID(guid))
-            return (Unit*)GetObjectInOrOutOfWorld(guid, (Pet*)NULL);
+            return (Unit*)GetObjectInOrOutOfWorld(guid, (Pet*)nullptr);
 
-        return (Unit*)GetObjectInOrOutOfWorld(guid, (Creature*)NULL);
+        return (Unit*)GetObjectInOrOutOfWorld(guid, (Creature*)nullptr);
     }
 
     // returns object if is in world
@@ -124,19 +122,19 @@ public:
     static Unit* GetObjectInWorld(uint64 guid, Unit* /*typeSpecifier*/)
     {
         if (IS_PLAYER_GUID(guid))
-            return (Unit*)GetObjectInWorld(guid, (Player*)NULL);
+            return (Unit*)GetObjectInWorld(guid, (Player*)nullptr);
 
         if (IS_PET_GUID(guid))
-            return (Unit*)GetObjectInWorld(guid, (Pet*)NULL);
+            return (Unit*)GetObjectInWorld(guid, (Pet*)nullptr);
 
-        return (Unit*)GetObjectInWorld(guid, (Creature*)NULL);
+        return (Unit*)GetObjectInWorld(guid, (Creature*)nullptr);
     }
 
     // returns object if is in map
     template<class T> static T* GetObjectInMap(uint64 guid, Map* map, T* /*typeSpecifier*/)
     {
         ASSERT(map);
-        if (T* obj = GetObjectInWorld(guid, (T*)NULL))
+        if (T* obj = GetObjectInWorld(guid, (T*)nullptr))
             if (obj->GetMap() == map)
                 return obj;
         return nullptr;

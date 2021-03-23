@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,6 +17,7 @@
 #include <list>
 #include <map>
 #include <ace/INET_Addr.h>
+#include <array>
 
 // Searcher for map of structs
 template<typename T, class S> struct Finder
@@ -43,10 +44,10 @@ public:
     Tokenizer(const std::string& src, char const sep, uint32 vectorReserve = 0);
     ~Tokenizer() { delete[] m_str; }
 
-    const_iterator begin() const { return m_storage.begin(); }
-    const_iterator end() const { return m_storage.end(); }
+    [[nodiscard]] const_iterator begin() const { return m_storage.begin(); }
+    [[nodiscard]] const_iterator end() const { return m_storage.end(); }
 
-    size_type size() const { return m_storage.size(); }
+    [[nodiscard]] size_type size() const { return m_storage.size(); }
 
     reference operator [] (size_type i) { return m_storage[i]; }
     const_reference operator [] (size_type i) const { return m_storage[i]; }
@@ -239,32 +240,32 @@ inline bool isNumericOrSpace(wchar_t wchar)
 
 inline bool isBasicLatinString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isBasicLatinCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isBasicLatinCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
             return false;
     return true;
 }
 
 inline bool isExtendedLatinString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isExtendedLatinCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isExtendedLatinCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
             return false;
     return true;
 }
 
 inline bool isCyrillicString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isCyrillicCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isCyrillicCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
             return false;
     return true;
 }
 
 inline bool isEastAsianString(const std::wstring& wstr, bool numericOrSpace)
 {
-    for (size_t i = 0; i < wstr.size(); ++i)
-        if (!isEastAsianCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
+    for (wchar_t i : wstr)
+        if (!isEastAsianCharacter(i) && (!numericOrSpace || !isNumericOrSpace(i)))
             return false;
     return true;
 }
@@ -343,9 +344,32 @@ std::string GetAddressString(ACE_INET_Addr const& addr);
 uint32 CreatePIDFile(const std::string& filename);
 uint32 GetPID();
 
-std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
-void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
-bool StringToBool(std::string const& str);
+bool StringEqualI(std::string_view str1, std::string_view str2);
+
+namespace acore::Impl
+{
+    std::string ByteArrayToHexStr(uint8 const* bytes, size_t length, bool reverse = false);
+    void HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse = false);
+}
+
+template<typename Container>
+std::string ByteArrayToHexStr(Container const& c, bool reverse = false)
+{
+    return acore::Impl::ByteArrayToHexStr(std::data(c), std::size(c), reverse);
+}
+
+template<size_t Size>
+void HexStrToByteArray(std::string const& str, std::array<uint8, Size>& buf, bool reverse = false)
+{
+    acore::Impl::HexStrToByteArray(str, buf.data(), Size, reverse);
+}
+template<size_t Size>
+std::array<uint8, Size> HexStrToByteArray(std::string const& str, bool reverse = false)
+{
+    std::array<uint8, Size> arr;
+    HexStrToByteArray(str, arr, reverse);
+    return arr;
+}
 
 bool StringContainsStringI(std::string const& haystack, std::string const& needle);
 template <typename T>
@@ -404,12 +428,12 @@ public:
         part[2] = p3;
     }
 
-    inline bool IsEqual(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
+    [[nodiscard]] inline bool IsEqual(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
     {
         return (part[0] == p1 && part[1] == p2 && part[2] == p3);
     }
 
-    inline bool HasFlag(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
+    [[nodiscard]] inline bool HasFlag(uint32 p1 = 0, uint32 p2 = 0, uint32 p3 = 0) const
     {
         return (part[0] & p1 || part[1] & p2 || part[2] & p3);
     }
@@ -578,7 +602,7 @@ class EventMap
     typedef std::multimap<uint32, uint32> EventStore;
 
 public:
-    EventMap() : _time(0), _phase(0), _lastEvent(0) { }
+    EventMap()  { }
 
     /**
     * @name Reset
@@ -605,7 +629,7 @@ public:
     * @name GetTimer
     * @return Current timer value.
     */
-    uint32 GetTimer() const
+    [[nodiscard]] uint32 GetTimer() const
     {
         return _time;
     }
@@ -619,7 +643,7 @@ public:
     * @name GetPhaseMask
     * @return Active phases as mask.
     */
-    uint8 GetPhaseMask() const
+    [[nodiscard]] uint8 GetPhaseMask() const
     {
         return _phase;
     }
@@ -628,7 +652,7 @@ public:
     * @name Empty
     * @return True, if there are no events scheduled.
     */
-    bool Empty() const
+    [[nodiscard]] bool Empty() const
     {
         return _eventMap.empty();
     }
@@ -869,7 +893,7 @@ public:
     * @param eventId Wanted event id.
     * @return Time of found event.
     */
-    uint32 GetNextEventTime(uint32 eventId) const
+    [[nodiscard]] uint32 GetNextEventTime(uint32 eventId) const
     {
         if (Empty())
         {
@@ -891,7 +915,7 @@ public:
      * @name GetNextEventTime
      * @return Time of next event.
      */
-    uint32 GetNextEventTime() const
+    [[nodiscard]] uint32 GetNextEventTime() const
     {
         return Empty() ? 0 : _eventMap.begin()->first;
     }
@@ -908,9 +932,9 @@ public:
     }
 
 private:
-    uint32 _time;
-    uint32 _phase;
-    uint32 _lastEvent;
+    uint32 _time{0};
+    uint32 _phase{0};
+    uint32 _lastEvent{0};
 
     EventStore _eventMap;
 };

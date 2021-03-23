@@ -11,6 +11,7 @@
 #include "Log.h"
 
 #include <mysql.h>
+#include <array>
 
 class Field
 {
@@ -18,13 +19,12 @@ class Field
     friend class PreparedResultSet;
 
 public:
-
-    bool GetBool() const // Wrapper, actually gets integer
+    [[nodiscard]] bool GetBool() const // Wrapper, actually gets integer
     {
         return (GetUInt8() == 1);
     }
 
-    uint8 GetUInt8() const
+    [[nodiscard]] uint8 GetUInt8() const
     {
         if (!data.value)
             return 0;
@@ -42,7 +42,7 @@ public:
         return static_cast<uint8>(atol((char*)data.value));
     }
 
-    int8 GetInt8() const
+    [[nodiscard]] int8 GetInt8() const
     {
         if (!data.value)
             return 0;
@@ -67,7 +67,7 @@ public:
     }
 #endif
 
-    uint16 GetUInt16() const
+    [[nodiscard]] uint16 GetUInt16() const
     {
         if (!data.value)
             return 0;
@@ -85,7 +85,7 @@ public:
         return static_cast<uint16>(atol((char*)data.value));
     }
 
-    int16 GetInt16() const
+    [[nodiscard]] int16 GetInt16() const
     {
         if (!data.value)
             return 0;
@@ -103,7 +103,7 @@ public:
         return static_cast<int16>(atol((char*)data.value));
     }
 
-    uint32 GetUInt32() const
+    [[nodiscard]] uint32 GetUInt32() const
     {
         if (!data.value)
             return 0;
@@ -121,7 +121,7 @@ public:
         return static_cast<uint32>(atol((char*)data.value));
     }
 
-    int32 GetInt32() const
+    [[nodiscard]] int32 GetInt32() const
     {
         if (!data.value)
             return 0;
@@ -139,7 +139,7 @@ public:
         return static_cast<int32>(atol((char*)data.value));
     }
 
-    uint64 GetUInt64() const
+    [[nodiscard]] uint64 GetUInt64() const
     {
         if (!data.value)
             return 0;
@@ -157,7 +157,7 @@ public:
         return static_cast<uint64>(atol((char*)data.value));
     }
 
-    int64 GetInt64() const
+    [[nodiscard]] int64 GetInt64() const
     {
         if (!data.value)
             return 0;
@@ -172,10 +172,10 @@ public:
 
         if (data.raw)
             return *reinterpret_cast<int64*>(data.value);
-        return static_cast<int64>(strtol((char*)data.value, NULL, 10));
+        return static_cast<int64>(strtol((char*)data.value, nullptr, 10));
     }
 
-    float GetFloat() const
+    [[nodiscard]] float GetFloat() const
     {
         if (!data.value)
             return 0.0f;
@@ -193,7 +193,7 @@ public:
         return static_cast<float>(atof((char*)data.value));
     }
 
-    double GetDouble() const
+    [[nodiscard]] double GetDouble() const
     {
         if (!data.value)
             return 0.0f;
@@ -211,23 +211,22 @@ public:
         return static_cast<double>(atof((char*)data.value));
     }
 
-    char const* GetCString() const
+    [[nodiscard]] char const* GetCString() const
     {
         if (!data.value)
-            return NULL;
+            return nullptr;
 
 #ifdef ACORE_DEBUG
         if (IsNumeric())
         {
             sLog->outSQLDriver("Error: GetCString() on numeric field. Using type: %s.", FieldTypeToString(data.type));
-            return NULL;
+            return nullptr;
         }
 #endif
         return static_cast<char const*>(data.value);
-
     }
 
-    std::string GetString() const
+    [[nodiscard]] std::string GetString() const
     {
         if (!data.value)
             return "";
@@ -242,9 +241,18 @@ public:
         return std::string((char*)data.value);
     }
 
-    bool IsNull() const
+    [[nodiscard]] bool IsNull() const
     {
-        return data.value == NULL;
+        return data.value == nullptr;
+    }
+
+    [[nodiscard]] std::vector<uint8> GetBinary() const;
+    template<size_t S>
+    [[nodiscard]] std::array<uint8, S> GetBinary() const
+    {
+        std::array<uint8, S> buf;
+        GetBinarySizeChecked(buf.data(), S);
+        return buf;
     }
 
 protected:
@@ -270,12 +278,12 @@ protected:
 #endif
 
     void SetByteValue(void const* newValue, size_t const newSize, enum_field_types newType, uint32 length);
-    void SetStructuredValue(char* newValue, enum_field_types newType);
+    void SetStructuredValue(char* newValue, enum_field_types newType, uint32 length);
 
     void CleanUp()
     {
         delete[] ((char*)data.value);
-        data.value = NULL;
+        data.value = nullptr;
     }
 
     static size_t SizeForType(MYSQL_FIELD* field)
@@ -328,12 +336,12 @@ protected:
         }
     }
 
-    bool IsType(enum_field_types type) const
+    [[nodiscard]] bool IsType(enum_field_types type) const
     {
         return data.type == type;
     }
 
-    bool IsNumeric() const
+    [[nodiscard]] bool IsNumeric() const
     {
         return (data.type == MYSQL_TYPE_TINY ||
                 data.type == MYSQL_TYPE_SHORT ||
@@ -343,6 +351,8 @@ protected:
                 data.type == MYSQL_TYPE_DOUBLE ||
                 data.type == MYSQL_TYPE_LONGLONG );
     }
+
+    void GetBinarySizeChecked(uint8* buf, size_t size) const;
 
 private:
 #ifdef ACORE_DEBUG
@@ -383,7 +393,7 @@ private:
             case MYSQL_TYPE_NEWDATE:
                 return "NEWDATE";
             case MYSQL_TYPE_NULL:
-                return "NULL";
+                return "nullptr";
             case MYSQL_TYPE_SET:
                 return "SET";
             case MYSQL_TYPE_SHORT:
@@ -410,4 +420,3 @@ private:
 };
 
 #endif
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,17 +17,18 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include <array>
 
 // Root of ByteBuffer exception hierarchy
 class ByteBufferException : public std::exception
 {
 public:
-    ~ByteBufferException() throw() { }
+    ~ByteBufferException() noexcept override = default;
 
-    char const* what() const throw() { return msg_.c_str(); }
+    [[nodiscard]] char const* what() const noexcept override { return msg_.c_str(); }
 
 protected:
-    std::string& message() throw() { return msg_; }
+    std::string& message() noexcept { return msg_; }
 
 private:
     std::string msg_;
@@ -37,16 +38,14 @@ class ByteBufferPositionException : public ByteBufferException
 {
 public:
     ByteBufferPositionException(bool add, size_t pos, size_t size, size_t valueSize);
-
-    ~ByteBufferPositionException() throw() { }
+    ~ByteBufferPositionException() noexcept override = default;
 };
 
 class ByteBufferSourceException : public ByteBufferException
 {
 public:
     ByteBufferSourceException(size_t pos, size_t size, size_t valueSize);
-
-    ~ByteBufferSourceException() throw() { }
+    ~ByteBufferSourceException() noexcept override = default;
 };
 
 class ByteBuffer
@@ -55,7 +54,7 @@ public:
     const static size_t DEFAULT_SIZE = 0x1000;
 
     // constructor
-    ByteBuffer() : _rpos(0), _wpos(0)
+    ByteBuffer()
     {
         _storage.reserve(DEFAULT_SIZE);
     }
@@ -277,7 +276,7 @@ public:
         return _storage[pos];
     }
 
-    size_t rpos() const { return _rpos; }
+    [[nodiscard]] size_t rpos() const { return _rpos; }
 
     size_t rpos(size_t rpos_)
     {
@@ -290,7 +289,7 @@ public:
         _rpos = wpos();
     }
 
-    size_t wpos() const { return _wpos; }
+    [[nodiscard]] size_t wpos() const { return _wpos; }
 
     size_t wpos(size_t wpos_)
     {
@@ -315,7 +314,7 @@ public:
         return r;
     }
 
-    template <typename T> T read(size_t pos) const
+    template <typename T> [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] [[nodiscard]] T read(size_t pos) const
     {
         if (pos + sizeof(T) > size())
             throw ByteBufferPositionException(false, pos, sizeof(T), size());
@@ -330,6 +329,12 @@ public:
             throw ByteBufferPositionException(false, _rpos, len, size());
         std::memcpy(dest, &_storage[_rpos], len);
         _rpos += len;
+    }
+
+    template<size_t Size>
+    void read(std::array<uint8, Size>& arr)
+    {
+        read(arr.data(), Size);
     }
 
     void readPackGUID(uint64& guid)
@@ -369,7 +374,6 @@ public:
         lt.tm_year = ((packedDate >> 24) & 0x1F) + 100;
 
         return uint32(mktime(&lt));
-
     }
 
     ByteBuffer& ReadPackedTime(uint32& time)
@@ -385,15 +389,15 @@ public:
         return &_storage[0];
     }
 
-    const uint8* contents() const
+    [[nodiscard]] const uint8* contents() const
     {
         if (_storage.empty())
             throw ByteBufferException();
         return &_storage[0];
     }
 
-    size_t size() const { return _storage.size(); }
-    bool empty() const { return _storage.empty(); }
+    [[nodiscard]] size_t size() const { return _storage.size(); }
+    [[nodiscard]] bool empty() const { return _storage.empty(); }
 
     void resize(size_t newsize)
     {
@@ -455,6 +459,12 @@ public:
             append(buffer.contents(), buffer.wpos());
     }
 
+    template<size_t Size>
+    void append(std::array<uint8, Size> const& arr)
+    {
+        append(arr.data(), Size);
+    }
+
     // can be used in SMSG_MONSTER_MOVE opcode
     void appendPackXYZ(float x, float y, float z)
     {
@@ -505,7 +515,7 @@ public:
     void hexlike(bool outString = false) const;
 
 protected:
-    size_t _rpos, _wpos;
+    size_t _rpos{0}, _wpos{0};
     std::vector<uint8> _storage;
 };
 

@@ -35,7 +35,7 @@ public:
 
     static void Library_Init()
     {
-        mysql_library_init(-1, NULL, NULL);
+        mysql_library_init(-1, nullptr, nullptr);
     }
 
     static void Library_End()

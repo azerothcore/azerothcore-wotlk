@@ -1,12 +1,12 @@
 // Scripted by Xinef
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "Player.h"
 
 enum eBonfire
 {
@@ -50,7 +50,7 @@ public:
 
         uint64 goGUID;
 
-        void SpellHit(Unit*, SpellInfo const* spellInfo)
+        void SpellHit(Unit*, SpellInfo const* spellInfo) override
         {
             if (!goGUID)
                 return;
@@ -69,11 +69,10 @@ public:
                     go->SendCustomAnim(1);
                 }
             }
-
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_midsummer_bonfireAI(creature);
     }
@@ -110,12 +109,12 @@ public:
             maxCount = cnt;
         }
 
-        bool CanBeSeen(Player const* seer)
+        bool CanBeSeen(Player const* seer) override
         {
             return seer->GetGUID() == playerGUID;
         }
 
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo)
+        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
             if (posVec.empty())
                 return;
@@ -134,7 +133,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (startTimer)
             {
@@ -190,12 +189,11 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_midsummer_torch_targetAI(creature);
     }
 };
-
 
 ///////////////////////////////
 // SPELLS
@@ -217,11 +215,9 @@ public:
     {
         PrepareAuraScript(spell_gen_crab_disguise_AuraScript);
 
-        bool Validate(SpellInfo const* /*spell*/)
+        bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_CRAB_DISGUISE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_CRAB_DISGUISE });
         }
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -231,7 +227,6 @@ public:
                 caster->CastSpell(caster, SPELL_APPLY_DIGUISE, true);
                 caster->setFaction(88);
             }
-
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -243,14 +238,14 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             AfterEffectApply += AuraEffectRemoveFn(spell_gen_crab_disguise_AuraScript::OnApply, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
             AfterEffectRemove += AuraEffectRemoveFn(spell_gen_crab_disguise_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_FORCE_REACTION, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_gen_crab_disguise_AuraScript();
     }
@@ -311,14 +306,14 @@ public:
             ar->CastSpell(ar, SPELL_RIBBON_POLE_CHANNEL_VISUAL, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_midsummer_ribbon_pole_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_midsummer_ribbon_pole_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_midsummer_ribbon_pole_AuraScript();
     }
@@ -333,7 +328,7 @@ public:
     {
         PrepareAuraScript(spell_midsummer_torch_quest_AuraScript)
 
-        bool Load()
+        bool Load() override
         {
             torchGUID = 0;
             return true;
@@ -357,14 +352,14 @@ public:
                 cr->DespawnOrUnsummon(1);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectApply += AuraEffectApplyFn(spell_midsummer_torch_quest_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL);
             OnEffectRemove += AuraEffectRemoveFn(spell_midsummer_torch_quest_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_midsummer_torch_quest_AuraScript();
     }
@@ -390,7 +385,7 @@ public:
         PrepareSpellScript(spell_midsummer_fling_torch_SpellScript);
 
         bool handled;
-        bool Load() { handled = false; return true; }
+        bool Load() override { handled = false; return true; }
 
         void ThrowNextTorch(Unit* caster)
         {
@@ -472,7 +467,7 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             AfterCast += SpellCastFn(spell_midsummer_fling_torch_SpellScript::HandleFinish);
             if (m_scriptSpellId == 45671)
@@ -480,7 +475,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_midsummer_fling_torch_SpellScript();
     }
@@ -508,7 +503,7 @@ public:
         PrepareSpellScript(spell_midsummer_juggling_torch_SpellScript);
 
         bool handled;
-        bool Load() { handled = false; return true; }
+        bool Load() override { handled = false; return true; }
         void HandleFinish()
         {
             Unit* caster = GetCaster();
@@ -545,7 +540,7 @@ public:
                 }
         }
 
-        void Register()
+        void Register() override
         {
             if (m_scriptSpellId == SPELL_TORCH_CHECK)
                 OnEffectHitTarget += SpellEffectFn(spell_midsummer_juggling_torch_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
@@ -554,7 +549,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_midsummer_juggling_torch_SpellScript();
     }

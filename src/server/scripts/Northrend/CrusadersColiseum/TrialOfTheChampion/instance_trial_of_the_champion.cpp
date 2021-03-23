@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Group.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "trial_of_the_champion.h"
 #include "Vehicle.h"
-#include "Player.h"
-#include "Group.h"
 
 const Position SpawnPosition = {746.67f, 684.08f, 412.5f, 4.65f};
 #define CLEANUP_CHECK_INTERVAL  5000
@@ -19,7 +19,7 @@ class instance_trial_of_the_champion : public InstanceMapScript
 public:
     instance_trial_of_the_champion() : InstanceMapScript("instance_trial_of_the_champion", 650) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
         return new instance_trial_of_the_champion_InstanceMapScript(pMap);
     }
@@ -53,7 +53,7 @@ public:
         uint64 GO_MainGateGUID;
         uint64 GO_EnterGateGUID;
 
-        void Initialize()
+        void Initialize() override
         {
             TeamIdInInstance = TEAM_NEUTRAL;
             InstanceProgress = 0;
@@ -82,7 +82,7 @@ public:
             GO_EnterGateGUID = 0;
         }
 
-        bool IsEncounterInProgress() const
+        bool IsEncounterInProgress() const override
         {
             for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
                 if( m_auiEncounter[i] == IN_PROGRESS )
@@ -91,7 +91,7 @@ public:
             return false;
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -185,7 +185,7 @@ public:
                         creature->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, ca->mount);
         }
 
-        void OnGameObjectCreate(GameObject* go)
+        void OnGameObjectCreate(GameObject* go) override
         {
             switch( go->GetEntry() )
             {
@@ -204,7 +204,7 @@ public:
             }
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
             std::ostringstream saveStream;
@@ -214,7 +214,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             CLEANED = false;
             events.Reset();
@@ -245,7 +245,6 @@ public:
                 for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
                     if( m_auiEncounter[i] == IN_PROGRESS )
                         m_auiEncounter[i] = NOT_STARTED;
-
             }
             else
                 OUT_LOAD_INST_DATA_FAIL;
@@ -255,7 +254,7 @@ public:
 
         // EVENT STUFF BELOW:
 
-        void OnPlayerEnter(Player*)
+        void OnPlayerEnter(Player*) override
         {
             if( DoNeedCleanup(true) )
                 InstanceCleanup();
@@ -432,7 +431,7 @@ public:
             CLEANED = true;
         }
 
-        uint32 GetData(uint32 uiData) const
+        uint32 GetData(uint32 uiData) const override
         {
             switch( uiData )
             {
@@ -445,7 +444,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 uiData) const
+        uint64 GetData64(uint32 uiData) const override
         {
             switch( uiData )
             {
@@ -458,7 +457,7 @@ public:
             return 0;
         }
 
-        void SetData(uint32 uiType, uint32 uiData)
+        void SetData(uint32 uiType, uint32 uiData) override
         {
             switch( uiType )
             {
@@ -606,7 +605,7 @@ public:
                                 c->GetMotionMaster()->MovePoint(9, 747.36f, 670.07f, 411.9f);
                                 if (!creditCasted)
                                 {
-                                    c->CastSpell((Unit*)NULL, 68572, true);
+                                    c->CastSpell((Unit*)nullptr, 68572, true);
                                     creditCasted = true;
                                 }
                             }
@@ -743,7 +742,6 @@ public:
                         pAdd->GetMotionMaster()->MoveFollow(pBoss, 2.0f, (i + 1)*M_PI / 2);
                         pAdd->SetReactState(REACT_PASSIVE);
                     }
-
             }
 
             if (!shortver)
@@ -756,7 +754,7 @@ public:
                 }
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             events.Update(diff);
             switch( events.ExecuteEvent() )
@@ -962,7 +960,7 @@ public:
                     {
                         if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
                             tirion->AI()->Talk(TEXT_GRATZ_SLAIN_CHAMPIONS);
-                        
+
                         HandleGameObject(GO_EnterGateGUID, true);
                     }
                     break;
@@ -1219,7 +1217,7 @@ public:
             }
         }
 
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/)
+        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch(criteria_id)
             {

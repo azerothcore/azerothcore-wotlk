@@ -9,8 +9,8 @@ DROP TABLE IF EXISTS `gameobject_questender`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `gameobject_questender` 
 (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
+  `id` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `quest` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`,`quest`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

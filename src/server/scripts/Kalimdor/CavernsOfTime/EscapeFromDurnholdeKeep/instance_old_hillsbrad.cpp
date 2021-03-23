@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "InstanceScript.h"
 #include "old_hillsbrad.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 const Position instancePositions[INSTANCE_POSITIONS_COUNT] =
 {
@@ -22,7 +22,6 @@ const Position thrallPositions[THRALL_POSITIONS_COUNT] =
     {2062.9f, 229.93f, 64.454f, 2.45f},     // After Captain Skarloc death
     {2486.91f, 626.356f, 58.0761f, 0.0f},   // Arrived at Tarren Mill
     {2660.47f, 659.223f, 62.0f, 5.78f}      // Taretha Met
-
 };
 
 class instance_old_hillsbrad : public InstanceMapScript
@@ -30,7 +29,7 @@ class instance_old_hillsbrad : public InstanceMapScript
 public:
     instance_old_hillsbrad() : InstanceMapScript("instance_old_hillsbrad", 560) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* map) const
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
         return new instance_old_hillsbrad_InstanceMapScript(map);
     }
@@ -39,7 +38,7 @@ public:
     {
         instance_old_hillsbrad_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        void Initialize()
+        void Initialize() override
         {
             _encounterProgress = 0;
             _barrelCount = 0;
@@ -54,7 +53,7 @@ public:
             _events.Reset();
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* player) override
         {
             if (instance->GetPlayersCountExceptGMs() == 1)
                 CleanupInstance();
@@ -79,7 +78,7 @@ public:
                 SetData(DATA_THRALL_REPOSITION, 2);
         }
 
-        void OnCreatureCreate(Creature* creature)
+        void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
@@ -101,7 +100,7 @@ public:
             }
         }
 
-        void OnGameObjectCreate(GameObject* gameobject)
+        void OnGameObjectCreate(GameObject* gameobject) override
         {
             switch (gameobject->GetEntry())
             {
@@ -123,7 +122,7 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data)
+        void SetData(uint32 type, uint32 data) override
         {
             switch (type)
             {
@@ -158,7 +157,7 @@ public:
             }
         }
 
-        uint32 GetData(uint32 data) const
+        uint32 GetData(uint32 data) const override
         {
             if (data == DATA_ESCORT_PROGRESS)
                 return _encounterProgress;
@@ -167,7 +166,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 data) const
+        uint64 GetData64(uint32 data) const override
         {
             if (data == DATA_THRALL_GUID)
                 return _thrallGUID;
@@ -176,7 +175,7 @@ public:
             return 0;
         }
 
-        void Update(uint32 diff)
+        void Update(uint32 diff) override
         {
             _events.Update(diff);
             switch (_events.ExecuteEvent())
@@ -288,7 +287,7 @@ public:
                 instance->LoadGrid(thrallPositions[i].GetPositionX(), thrallPositions[i].GetPositionY());
         }
 
-        std::string GetSaveData()
+        std::string GetSaveData() override
         {
             OUT_SAVE_INST_DATA;
 
@@ -299,7 +298,7 @@ public:
             return saveStream.str();
         }
 
-        void Load(const char* in)
+        void Load(const char* in) override
         {
             if (!in)
             {
@@ -339,7 +338,6 @@ public:
 
         EventMap _events;
     };
-
 };
 
 void AddSC_instance_old_hillsbrad()

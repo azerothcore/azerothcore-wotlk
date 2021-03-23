@@ -1,42 +1,41 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Common.h"
-#include "ObjectMgr.h"
-#include "ArenaTeamMgr.h"
-#include "World.h"
-#include "WorldPacket.h"
-
 #include "ArenaTeam.h"
-#include "BattlegroundMgr.h"
-#include "BattlegroundAV.h"
+#include "ArenaTeamMgr.h"
 #include "BattlegroundAB.h"
-#include "BattlegroundEY.h"
-#include "BattlegroundWS.h"
-#include "BattlegroundNA.h"
+#include "BattlegroundAV.h"
 #include "BattlegroundBE.h"
-#include "BattlegroundRL.h"
-#include "BattlegroundSA.h"
 #include "BattlegroundDS.h"
-#include "BattlegroundRV.h"
+#include "BattlegroundEY.h"
 #include "BattlegroundIC.h"
+#include "BattlegroundMgr.h"
+#include "BattlegroundNA.h"
+#include "BattlegroundQueue.h"
+#include "BattlegroundRL.h"
+#include "BattlegroundRV.h"
+#include "BattlegroundSA.h"
+#include "BattlegroundWS.h"
 #include "Chat.h"
+#include "Common.h"
+#include "DisableMgr.h"
+#include "Formulas.h"
+#include "GameEventMgr.h"
+#include "GameGraveyard.h"
 #include "Map.h"
 #include "MapInstanced.h"
 #include "MapManager.h"
-#include "Player.h"
-#include "GameEventMgr.h"
-#include "SharedDefines.h"
-#include "Formulas.h"
-#include "DisableMgr.h"
+#include "ObjectMgr.h"
 #include "Opcodes.h"
-#include "BattlegroundQueue.h"
-#include "GameGraveyard.h"
-#include <unordered_map>
+#include "Player.h"
+#include "SharedDefines.h"
+#include "World.h"
+#include "WorldPacket.h"
 #include <random>
+#include <unordered_map>
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -482,7 +481,7 @@ Battleground* BattlegroundMgr::CreateNewBattleground(BattlegroundTypeId original
                 maxPlayersPerTeam = 5;
                 break;
         }
-
+        sScriptMgr->OnSetArenaMaxPlayersPerTeam(arenaType, maxPlayersPerTeam);
         bg->SetMaxPlayersPerTeam(maxPlayersPerTeam);
     }
 
@@ -638,6 +637,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u battlegrounds in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 void BattlegroundMgr::InitAutomaticArenaPointDistribution()
@@ -748,19 +748,23 @@ bool BattlegroundMgr::IsArenaType(BattlegroundTypeId bgTypeId)
 
 BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgTypeId, uint8 arenaType)
 {
-    if (arenaType)
-    {
-        switch (arenaType)
-        {
+    if (arenaType) {
+        uint32 queueTypeID = BATTLEGROUND_QUEUE_NONE;
+        switch (arenaType) {
             case ARENA_TYPE_2v2:
-                return BATTLEGROUND_QUEUE_2v2;
+                queueTypeID = BATTLEGROUND_QUEUE_2v2;
+                break;
             case ARENA_TYPE_3v3:
-                return BATTLEGROUND_QUEUE_3v3;
+                queueTypeID = BATTLEGROUND_QUEUE_3v3;
+                break;
             case ARENA_TYPE_5v5:
-                return BATTLEGROUND_QUEUE_5v5;
+                queueTypeID = BATTLEGROUND_QUEUE_5v5;
+                break;
             default:
-                return BATTLEGROUND_QUEUE_NONE;
+                break;
         }
+        sScriptMgr->OnArenaTypeIDToQueueID(bgTypeId, arenaType, queueTypeID);
+        return BattlegroundQueueTypeId(queueTypeID);
     }
 
     if (BattlegroundMgr::bgToQueue.find(bgTypeId) == BattlegroundMgr::bgToQueue.end())
@@ -783,17 +787,23 @@ BattlegroundTypeId BattlegroundMgr::BGTemplateId(BattlegroundQueueTypeId bgQueue
 
 uint8 BattlegroundMgr::BGArenaType(BattlegroundQueueTypeId bgQueueTypeId)
 {
+    uint8 arenaType = 0;
     switch (bgQueueTypeId)
     {
         case BATTLEGROUND_QUEUE_2v2:
-            return ARENA_TYPE_2v2;
+            arenaType = ARENA_TYPE_2v2;
+            break;
         case BATTLEGROUND_QUEUE_3v3:
-            return ARENA_TYPE_3v3;
+            arenaType = ARENA_TYPE_3v3;
+            break;
         case BATTLEGROUND_QUEUE_5v5:
-            return ARENA_TYPE_5v5;
+            arenaType = ARENA_TYPE_5v5;
+            break;
         default:
-            return 0;
+            break;
     }
+    sScriptMgr->OnArenaQueueIdToArenaType(bgQueueTypeId, arenaType);
+    return arenaType;
 }
 
 void BattlegroundMgr::ToggleTesting()

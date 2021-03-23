@@ -1,17 +1,17 @@
 // Scripted by Xinef
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
-#include "GridNotifiers.h"
-#include "SpellScript.h"
+#include "CellImpl.h"
 #include "GameEventMgr.h"
+#include "GridNotifiers.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
-#include "CellImpl.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 ///////////////////////////////////////
 ////// GOS
@@ -29,7 +29,7 @@ public:
     struct npc_brewfest_revelerAI : public ScriptedAI
     {
         npc_brewfest_revelerAI(Creature* c) : ScriptedAI(c) {}
-        void ReceiveEmote(Player* player, uint32 emote)
+        void ReceiveEmote(Player* player, uint32 emote) override
         {
             if (!IsHolidayActive(HOLIDAY_BREWFEST))
                 return;
@@ -39,7 +39,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_brewfest_revelerAI(creature);
     }
@@ -183,7 +183,7 @@ public:
                 if (Player* player = itr->GetSource())
                 {
                     if (player->CanRewardQuest(qReward, false))
-                        player->RewardQuest(qReward, 0, NULL, false);
+                        player->RewardQuest(qReward, 0, nullptr, false);
                 }
 
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
@@ -251,7 +251,7 @@ class npc_coren_direbrew_sisters : public CreatureScript
 public:
     npc_coren_direbrew_sisters() : CreatureScript("npc_coren_direbrew_sisters") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_coren_direbrew_sistersAI (creature);
     }
@@ -264,13 +264,13 @@ public:
 
         EventMap events;
 
-        void Reset()
+        void Reset() override
         {
             events.Reset();
             me->setFaction(FACTION_HOSTILE);
         }
 
-        void DoAction(int32 param)
+        void DoAction(int32 param) override
         {
             if (param == ACTION_RELEASE_LOOT && me->GetEntry() == NPC_ILSA_DIREBREW)
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
@@ -285,7 +285,7 @@ public:
             return nullptr;
         }
 
-        void JustDied(Unit*)
+        void JustDied(Unit*) override
         {
             if (Creature* coren = GetSummoner())
             {
@@ -297,8 +297,7 @@ public:
             }
         }
 
-
-        void EnterCombat(Unit*  /*who*/)
+        void EnterCombat(Unit*  /*who*/) override
         {
             if (me->GetEntry() == NPC_URSULA_DIREBREW)
                 events.ScheduleEvent(EVENT_SISTERS_BARREL, 18000);
@@ -306,14 +305,14 @@ public:
             events.ScheduleEvent(EVENT_SISTERS_CHUCK_MUG, 12000);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo)
+        void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_CHUCK_MUG)
                 if (target->ToPlayer())
                     target->ToPlayer()->AddItem(ITEM_DARK_BREW, 1);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
                 return;
@@ -352,7 +351,6 @@ public:
     };
 };
 
-
 enum kegThrowers
 {
     QUEST_THERE_AND_BACK_AGAIN_A                = 11122,
@@ -381,7 +379,7 @@ public:
         {
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->GetDistance(who) < 10.0f && who->GetTypeId() == TYPEID_PLAYER && who->GetMountID() == RAM_DISPLAY_ID)
             {
@@ -390,7 +388,7 @@ public:
             }
         }
 
-        bool CanBeSeen(const Player* player)
+        bool CanBeSeen(const Player* player) override
         {
             if (player->GetMountID() == RAM_DISPLAY_ID)
                 return true;
@@ -399,7 +397,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_brewfest_keg_throwerAI(creature);
     }
@@ -497,7 +495,7 @@ public:
         {
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (me->GetDistance(who) < 10.0f && who->GetTypeId() == TYPEID_PLAYER && who->GetMountID() == RAM_DISPLAY_ID)
             {
@@ -599,7 +597,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_brewfest_bark_triggerAI(creature);
     }
@@ -668,7 +666,7 @@ public:
         uint32 kegCounter, guzzlerCounter;
         uint8 thrown;
 
-        void Reset()
+        void Reset() override
         {
             summons.DespawnAll();
             events.Reset();
@@ -679,10 +677,10 @@ public:
         }
 
         // DARK IRON ATTACK EVENT
-        void MoveInLineOfSight(Unit*  /*who*/) {}
-        void EnterCombat(Unit*) {}
+        void MoveInLineOfSight(Unit*  /*who*/) override {}
+        void EnterCombat(Unit*) override {}
 
-        void SpellHit(Unit* caster, const SpellInfo* spellInfo)
+        void SpellHit(Unit* caster, const SpellInfo* spellInfo) override
         {
             if (spellInfo->Id == SPELL_REPORT_DEATH)
             {
@@ -697,7 +695,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             switch (events.ExecuteEvent())
@@ -763,7 +761,6 @@ public:
                             sayer->MonsterSay("SOMEONE TRY THIS SUPER BREW!", LANG_UNIVERSAL, 0);
                             //sayer->CastSpell(sayer, SPELL_CREATE_SUPER_BREW, true);
                             sayer->SummonCreature(NPC_SUPER_BREW_TRIGGER, sayer->GetPositionX() + 15 * cos(sayer->GetOrientation()), sayer->GetPositionY() + 15 * sin(sayer->GetOrientation()), sayer->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
-
                         }
                         else
                         {
@@ -870,7 +867,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dark_iron_attack_generatorAI(creature);
     }
@@ -887,18 +884,18 @@ public:
         {
         }
 
-        void EnterCombat(Unit*) {}
-        void MoveInLineOfSight(Unit*) {}
-        void AttackStart(Unit*) {}
+        void EnterCombat(Unit*) override {}
+        void MoveInLineOfSight(Unit*) override {}
+        void AttackStart(Unit*) override {}
 
         uint32 goTimer, summonTimer;
-        void Reset()
+        void Reset() override
         {
             goTimer = 1;
             summonTimer = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             if (goTimer)
             {
@@ -933,7 +930,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dark_iron_attack_mole_machineAI(creature);
     }
@@ -953,11 +950,11 @@ public:
 
         uint32 timer;
         uint64 targetGUID;
-        void EnterCombat(Unit*) {}
-        void MoveInLineOfSight(Unit*) {}
-        void AttackStart(Unit*) {}
+        void EnterCombat(Unit*) override {}
+        void MoveInLineOfSight(Unit*) override {}
+        void AttackStart(Unit*) override {}
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask)
+        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             damage = 0;
         }
@@ -1004,7 +1001,7 @@ public:
 
         Unit* GetTarget() { return ObjectAccessor::GetUnit(*me, targetGUID); }
 
-        void Reset()
+        void Reset() override
         {
             timer = 0;
             targetGUID = 0;
@@ -1040,12 +1037,12 @@ public:
             }
         }
 
-        void KilledUnit(Unit* who)
+        void KilledUnit(Unit* who) override
         {
             who->CastSpell(who, SPELL_REPORT_DEATH, true);
         }
 
-        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo)
+        void SpellHit(Unit*  /*caster*/, const SpellInfo* spellInfo) override
         {
             if (me->IsAlive() && spellInfo->Id == SPELL_PLAYER_MUG)
             {
@@ -1055,7 +1052,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             timer += diff;
             if (timer < 2000)
@@ -1072,7 +1069,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_dark_iron_guzzlerAI(creature);
     }
@@ -1090,20 +1087,20 @@ public:
         }
 
         uint32 timer;
-        void EnterCombat(Unit*) {}
-        void MoveInLineOfSight(Unit*  /*who*/)
+        void EnterCombat(Unit*) override {}
+        void MoveInLineOfSight(Unit*  /*who*/) override
         {
         }
 
-        void AttackStart(Unit*) {}
+        void AttackStart(Unit*) override {}
 
-        void Reset()
+        void Reset() override
         {
             timer = 0;
             me->SummonGameObject(186478, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 30000);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             timer += diff;
             if (timer >= 500)
@@ -1123,12 +1120,11 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_brewfest_super_brew_triggerAI(creature);
     }
 };
-
 
 ///////////////////////////////////////
 ////// SPELLS
@@ -1160,7 +1156,7 @@ public:
 
         uint8 privateLevel;
         uint32 questTick;
-        bool Load()
+        bool Load() override
         {
             questTick = 0;
             privateLevel = 0;
@@ -1280,14 +1276,14 @@ public:
                 target->RemoveAurasDueToSpell(SPELL_RAM_FATIGUE);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_brewfest_main_ram_buff_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
             OnEffectRemove += AuraEffectRemoveFn(spell_brewfest_main_ram_buff_AuraScript::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_brewfest_main_ram_buff_AuraScript();
     }
@@ -1328,7 +1324,6 @@ public:
                 else
                     target->CastSpell(target, SPELL_RAM_FATIGUE, true);
             }
-
         }
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1340,7 +1335,7 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             if (m_scriptSpellId != 43332)
                 OnEffectPeriodic += AuraEffectPeriodicFn(spell_brewfest_ram_fatigue_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
@@ -1349,7 +1344,7 @@ public:
         }
     };
 
-    AuraScript* GetAuraScript() const
+    AuraScript* GetAuraScript() const override
     {
         return new spell_brewfest_ram_fatigue_AuraScript();
     }
@@ -1371,13 +1366,13 @@ public:
                     aur->Remove();
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_brewfest_apple_trap_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_brewfest_apple_trap_SpellScript();
     };
@@ -1413,14 +1408,14 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             OnCheckCast += SpellCheckCastFn(spell_q11117_catch_the_wild_wolpertinger_SpellScript::CheckTarget);
             OnEffectHitTarget += SpellEffectFn(spell_q11117_catch_the_wild_wolpertinger_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_q11117_catch_the_wild_wolpertinger_SpellScript();
     };
@@ -1474,13 +1469,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             AfterHit += SpellHitFn(spell_brewfest_fill_keg_SpellScript::HandleAfterHit);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_brewfest_fill_keg_SpellScript();
     };
@@ -1541,13 +1536,13 @@ public:
             }
         }
 
-        void Register()
+        void Register() override
         {
             AfterHit += SpellHitFn(spell_brewfest_unfill_keg_SpellScript::HandleAfterHit);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_brewfest_unfill_keg_SpellScript();
     };
@@ -1566,7 +1561,7 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                float z = caster->GetMap()->GetHeight(caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), MAX_HEIGHT);
+                float z = caster->GetMapHeight(caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), caster->GetPositionZ());
                 WorldLocation pPosition = WorldLocation(caster->GetMapId(), caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), z, caster->GetOrientation());
                 SetExplTargetDest(pPosition);
             }
@@ -1635,10 +1630,9 @@ public:
                 else if ((cr = caster->FindNearestCreature(NPC_NORMAL_GORDOK, 40.0f)))
                     cr->CastSpell(caster, SPELL_THROW_MUG_TO_PLAYER, true);
             }
-
         }
 
-        void Register()
+        void Register() override
         {
             OnCheckCast += SpellCheckCastFn(spell_brewfest_toss_mug_SpellScript::CheckCast);
             OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_brewfest_toss_mug_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
@@ -1647,7 +1641,7 @@ public:
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_brewfest_toss_mug_SpellScript();
     };
@@ -1668,13 +1662,13 @@ public:
                 target->CastSpell(target, SPELL_ADD_MUG, true);
         }
 
-        void Register()
+        void Register() override
         {
             OnEffectHitTarget += SpellEffectFn(spell_brewfest_add_mug_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const
+    SpellScript* GetSpellScript() const override
     {
         return new spell_brewfest_add_mug_SpellScript();
     };
@@ -1699,19 +1693,19 @@ public:
 
         uint32 timer;
 
-        void Reset()
+        void Reset() override
         {
             me->SetReactState(REACT_AGGRESSIVE);
             me->GetMotionMaster()->MoveRandom(15.0f);
             timer = 0;
         }
 
-        void DoAction(int32)
+        void DoAction(int32) override
         {
             timer = 0;
         }
 
-        void MoveInLineOfSight(Unit* target)
+        void MoveInLineOfSight(Unit* target) override
         {
             if (target->GetEntry() == me->GetEntry())
                 if (me->IsWithinDist(target, 1.0f))
@@ -1738,7 +1732,7 @@ public:
                 }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             timer += diff;
             if (timer >= 25000)
@@ -1749,7 +1743,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_brew_bubbleAI(creature);
     }

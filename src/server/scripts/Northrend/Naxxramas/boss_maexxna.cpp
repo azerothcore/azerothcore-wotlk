@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "naxxramas.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -93,7 +93,6 @@ public:
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_MAEXXNA_GATE)))
                     go->SetGoState(GO_STATE_ACTIVE);
             }
-
         }
 
         void EnterCombat(Unit* who) override
@@ -169,7 +168,7 @@ public:
                     if (me->GetHealthPct() < 30)
                     {
                         me->CastSpell(me, RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25), true);
-                        
+
                         break;
                     }
 
@@ -197,7 +196,6 @@ public:
         }
     };
 };
-
 
 class boss_maexxna_webwrap : public CreatureScript
 {
@@ -236,4 +234,3 @@ void AddSC_boss_maexxna()
     new boss_maexxna();
     new boss_maexxna_webwrap();
 }
-

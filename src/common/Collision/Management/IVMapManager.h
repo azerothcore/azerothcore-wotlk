@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -33,13 +33,13 @@ namespace VMAP
     class IVMapManager
     {
     private:
-        bool iEnableLineOfSightCalc;
-        bool iEnableHeightCalc;
+        bool iEnableLineOfSightCalc{true};
+        bool iEnableHeightCalc{true};
 
     public:
-        IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true) { }
+        IVMapManager()  { }
 
-        virtual ~IVMapManager(void) { }
+        virtual ~IVMapManager() = default;
 
         virtual int loadMap(const char* pBasePath, unsigned int pMapId, int x, int y) = 0;
 
@@ -71,11 +71,11 @@ namespace VMAP
         */
         void setEnableHeightCalc(bool pVal) { iEnableHeightCalc = pVal; }
 
-        bool isLineOfSightCalcEnabled() const { return (iEnableLineOfSightCalc); }
-        bool isHeightCalcEnabled() const { return (iEnableHeightCalc); }
-        bool isMapLoadingEnabled() const { return (iEnableLineOfSightCalc || iEnableHeightCalc  ); }
+        [[nodiscard]] bool isLineOfSightCalcEnabled() const { return (iEnableLineOfSightCalc); }
+        [[nodiscard]] bool isHeightCalcEnabled() const { return (iEnableHeightCalc); }
+        [[nodiscard]] bool isMapLoadingEnabled() const { return (iEnableLineOfSightCalc || iEnableHeightCalc  ); }
 
-        virtual std::string getDirFileName(unsigned int pMapId, int x, int y) const = 0;
+        [[nodiscard]] virtual std::string getDirFileName(unsigned int pMapId, int x, int y) const = 0;
         /**
         Query world model area info.
         \param z gets adjusted to the ground height for which this are info is valid

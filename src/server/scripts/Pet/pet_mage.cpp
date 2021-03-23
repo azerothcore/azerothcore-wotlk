@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -9,11 +9,11 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_mag_".
  */
 
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "CombatAI.h"
 #include "Pet.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
 
 enum MageSpells
@@ -32,7 +32,7 @@ class DeathEvent : public BasicEvent
 public:
     DeathEvent(Creature& owner) : BasicEvent(), _owner(owner) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*diff*/)
+    bool Execute(uint64 /*eventTime*/, uint32 /*diff*/) override
     {
         Unit::Kill(&_owner, &_owner);
         return true;
@@ -56,7 +56,7 @@ public:
         uint32 checktarget;
         uint32 dist = urand(1, 5);
 
-        void InitializeAI()
+        void InitializeAI() override
         {
             CasterAI::InitializeAI();
             Unit* owner = me->GetOwner();
@@ -90,7 +90,7 @@ public:
             me->SetReactState(REACT_DEFENSIVE);
 
             // Xinef: Inherit Master's Threat List (not yet implemented)
-            //owner->CastSpell((Unit*)NULL, SPELL_MAGE_MASTERS_THREAT_LIST, true);
+            //owner->CastSpell((Unit*)nullptr, SPELL_MAGE_MASTERS_THREAT_LIST, true);
             HostileReference* ref = owner->getHostileRefManager().getFirst();
             while (ref)
             {
@@ -127,7 +127,7 @@ public:
         }
 
         // Do not reload Creature templates on evade mode enter - prevent visual lost
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             if (me->IsInEvadeMode() || !me->IsAlive())
                 return;
@@ -170,13 +170,13 @@ public:
             }
         }
 
-        void Reset()
+        void Reset() override
         {
             selectionTimer = 0;
             checktarget = 0;
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
             if (events.GetTimer() < 1200)
@@ -211,7 +211,7 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_pet_mage_mirror_imageAI(creature);
     }
