@@ -18,6 +18,9 @@ jobs:
         # we can include specific combinations here
         include:
           - os: ubuntu-20.04
+            compiler: clang11
+            modules: without
+          - os: ubuntu-20.04
             compiler: clang9
             modules: without
           - os: ubuntu-18.04
