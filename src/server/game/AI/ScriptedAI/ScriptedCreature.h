@@ -226,7 +226,7 @@ struct ScriptedAI : public CreatureAI
                         return false;
                     }
                 }
-                else if (above)
+                else
                 {
                     if (me->GetPositionX() > pos->GetPositionX())
                     {
@@ -244,7 +244,7 @@ struct ScriptedAI : public CreatureAI
                         return false;
                     }
                 }
-                else if (above)
+                else
                 {
                     if (me->GetPositionY() > pos->GetPositionY())
                     {
