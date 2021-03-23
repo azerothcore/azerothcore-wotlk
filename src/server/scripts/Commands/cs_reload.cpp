@@ -482,7 +482,7 @@ public:
             for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
                 cInfo->resistance[i] = fields[42 + i - 1].GetUInt16();
 
-            for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+            for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
                 cInfo->spells[i] = fields[48 + i].GetUInt32();
 
             cInfo->PetSpellDataId           = fields[56].GetUInt32();
