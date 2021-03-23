@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,6 +8,8 @@
 #include <openssl/md5.h>
 
 #include "Common.h"
+#include "CryptoRandom.h"
+#include "CryptoHash.h"
 #include "Database/DatabaseEnv.h"
 #include "ByteBuffer.h"
 #include "Configuration/Config.h"
@@ -16,7 +18,6 @@
 #include "AuthSocket.h"
 #include "AuthCodes.h"
 #include "TOTP.h"
-#include "SHA1.h"
 #include "openssl/crypto.h"
 
 #define ChunkSize 2048
@@ -64,9 +65,9 @@ typedef struct AUTH_LOGON_CHALLENGE_C
 typedef struct AUTH_LOGON_PROOF_C
 {
     uint8   cmd;
-    uint8   A[32];
-    uint8   M1[20];
-    uint8   crc_hash[20];
+    acore::Crypto::SRP6::EphemeralKey A;
+    acore::Crypto::SHA1::Digest clientM;
+    acore::Crypto::SHA1::Digest crc_hash;
     uint8   number_of_keys;
     uint8   securityFlags;                                  // 0x00-0x04
 } sAuthLogonProof_C;
@@ -75,7 +76,7 @@ typedef struct AUTH_LOGON_PROOF_S
 {
     uint8   cmd;
     uint8   error;
-    uint8   M2[20];
+    acore::Crypto::SHA1::Digest M2;
     uint32  unk1;
     uint32  unk2;
     uint16  unk3;
@@ -85,7 +86,7 @@ typedef struct AUTH_LOGON_PROOF_S_OLD
 {
     uint8   cmd;
     uint8   error;
-    uint8   M2[20];
+    acore::Crypto::SHA1::Digest M2;
     uint32  unk2;
 } sAuthLogonProof_S_Old;
 
@@ -93,8 +94,7 @@ typedef struct AUTH_RECONNECT_PROOF_C
 {
     uint8   cmd;
     uint8   R1[16];
-    uint8   R2[20];
-    uint8   R3[20];
+    acore::Crypto::SHA1::Digest R2, R3;
     uint8   number_of_keys;
 } sAuthReconnectProof_C;
 
@@ -183,8 +183,6 @@ AuthSocket::AuthSocket(RealmSocket& socket) :
     pPatch(nullptr), socket_(socket), _status(STATUS_CHALLENGE), _build(0),
     _expversion(0), _accountSecurityLevel(SEC_PLAYER)
 {
-    N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
-    g.SetDword(7);
 }
 
 // Close patch file descriptor before leaving
@@ -271,45 +269,6 @@ void AuthSocket::OnRead()
             return;
         }
     }
-}
-
-// Make the SRP6 calculation from hash in dB
-void AuthSocket::_SetVSFields(const std::string& rI)
-{
-    s.SetRand(s_BYTE_SIZE * 8);
-
-    BigNumber I;
-    I.SetHexStr(rI.c_str());
-
-    // In case of leading zeros in the rI hash, restore them
-    uint8 mDigest[SHA_DIGEST_LENGTH];
-    memset(mDigest, 0, SHA_DIGEST_LENGTH);
-    if (I.GetNumBytes() <= SHA_DIGEST_LENGTH)
-        memcpy(mDigest, I.AsByteArray().get(), I.GetNumBytes());
-
-    std::reverse(mDigest, mDigest + SHA_DIGEST_LENGTH);
-
-    SHA1Hash sha;
-    sha.UpdateData(s.AsByteArray().get(), s.GetNumBytes());
-    sha.UpdateData(mDigest, SHA_DIGEST_LENGTH);
-    sha.Finalize();
-    BigNumber x;
-    x.SetBinary(sha.GetDigest(), sha.GetLength());
-    v = g.ModExp(x, N);
-
-    // No SQL injection (username escaped)
-    char* v_hex, *s_hex;
-    v_hex = v.AsHexStr();
-    s_hex = s.AsHexStr();
-
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_VS);
-    stmt->setString(0, v_hex);
-    stmt->setString(1, s_hex);
-    stmt->setString(2, _login);
-    LoginDatabase.Execute(stmt);
-
-    OPENSSL_free(v_hex);
-    OPENSSL_free(s_hex);
 }
 
 std::map<std::string, uint32> LastLoginAttemptTimeForIP;
@@ -434,12 +393,12 @@ bool AuthSocket::_HandleLogonChallenge()
 
             // If the IP is 'locked', check that the player comes indeed from the correct IP address
             bool locked = false;
-            if (fields[2].GetUInt8() == 1)                  // if ip is locked
+            if (fields[1].GetUInt8() == 1)                  // if ip is locked
             {
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is locked to IP - '%s'", _login.c_str(), fields[3].GetCString());
+                sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is locked to IP - '%s'", _login.c_str(), fields[2].GetCString());
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Player address is '%s'", ip_address.c_str());
 
-                if (strcmp(fields[4].GetCString(), ip_address.c_str()) != 0)
+                if (strcmp(fields[3].GetCString(), ip_address.c_str()) != 0)
                 {
                     sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account IP differs");
                     pkt << uint8(WOW_FAIL_LOCKED_ENFORCED);
@@ -451,7 +410,7 @@ bool AuthSocket::_HandleLogonChallenge()
             else
             {
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is not locked to ip", _login.c_str());
-                std::string accountCountry = fields[3].GetString();
+                std::string accountCountry = fields[2].GetString();
                 if (accountCountry.empty() || accountCountry == "00")
                     sLog->outDebug(LOG_FILTER_NETWORKIO, "[AuthChallenge] Account '%s' is not locked to country", _login.c_str());
                 else if (!accountCountry.empty())
@@ -486,7 +445,7 @@ bool AuthSocket::_HandleLogonChallenge()
 
                 // If the account is banned, reject the logon attempt
                 stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
-                stmt->setUInt32(0, fields[1].GetUInt32());
+                stmt->setUInt32(0, fields[0].GetUInt32());
                 PreparedQueryResult banresult = LoginDatabase.Query(stmt);
                 if (banresult)
                 {
@@ -503,31 +462,7 @@ bool AuthSocket::_HandleLogonChallenge()
                 }
                 else
                 {
-                    // Get the password from the account table, upper it, and make the SRP6 calculation
-                    std::string rI = fields[0].GetString();
-
-                    // Don't calculate (v, s) if there are already some in the database
-                    std::string databaseV = fields[6].GetString();
-                    std::string databaseS = fields[7].GetString();
-
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_NETWORKIO, "database authentication values: v='%s' s='%s'", databaseV.c_str(), databaseS.c_str());
-#endif
-
-                    // multiply with 2 since bytes are stored as hexstring
-                    if (databaseV.size() != s_BYTE_SIZE * 2 || databaseS.size() != s_BYTE_SIZE * 2)
-                        _SetVSFields(rI);
-                    else
-                    {
-                        s.SetHexStr(databaseS.c_str());
-                        v.SetHexStr(databaseV.c_str());
-                    }
-
-                    b.SetRand(19 * 8);
-                    BigNumber gmod = g.ModExp(b, N);
-                    B = ((v * 3) + gmod) % N;
-
-                    ASSERT(gmod.GetNumBytes() <= 32);
+                    _srp6.emplace(_login, fields[5].GetBinary<acore::Crypto::SRP6::SALT_LENGTH>(), fields[6].GetBinary<acore::Crypto::SRP6::VERIFIER_LENGTH>());
 
                     BigNumber unk3;
                     unk3.SetRand(16 * 8);
@@ -539,17 +474,17 @@ bool AuthSocket::_HandleLogonChallenge()
                         pkt << uint8(WOW_FAIL_VERSION_INVALID);
 
                     // B may be calculated < 32B so we force minimal length to 32B
-                    pkt.append(B.AsByteArray(32).get(), 32);      // 32 bytes
+                    pkt.append(_srp6->B);
                     pkt << uint8(1);
-                    pkt.append(g.AsByteArray().get(), 1);
+                    pkt.append(_srp6->g);
                     pkt << uint8(32);
-                    pkt.append(N.AsByteArray(32).get(), 32);
-                    pkt.append(s.AsByteArray().get(), s.GetNumBytes());   // 32 bytes
-                    pkt.append(unk3.AsByteArray(16).get(), 16);
+                    pkt.append(_srp6->N);
+                    pkt.append(_srp6->s);
+                    pkt.append(unk3.ToByteArray<16>());
                     uint8 securityFlags = 0;
 
                     // Check if token is used
-                    _tokenKey = fields[8].GetString();
+                    _tokenKey = fields[7].GetString();
                     if (!_tokenKey.empty())
                         securityFlags = 4;
 
@@ -573,7 +508,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     if (securityFlags & 0x04)               // Security token input
                         pkt << uint8(1);
 
-                    uint8 secLevel = fields[5].GetUInt8();
+                    uint8 secLevel = fields[4].GetUInt8();
                     _accountSecurityLevel = secLevel <= SEC_ADMINISTRATOR ? AccountTypes(secLevel) : SEC_ADMINISTRATOR;
 
                     _localizationName.resize(4);
@@ -622,107 +557,25 @@ bool AuthSocket::_HandleLogonProof()
         return true;
     }
 
-    // Continue the SRP6 calculation based on data received from the client
-    BigNumber A;
-
-    A.SetBinary(lp.A, 32);
-
-    // SRP safeguard: abort if A == 0
-    if ((A % N).isZero())
+    if (std::optional<SessionKey> K = _srp6->VerifyChallengeResponse(lp.A, lp.clientM))
     {
-        socket().shutdown();
-        return true;
-    }
-
-    SHA1Hash sha;
-    sha.UpdateBigNumbers(&A, &B, nullptr);
-    sha.Finalize();
-    BigNumber u;
-    u.SetBinary(sha.GetDigest(), 20);
-    BigNumber S = (A * (v.ModExp(u, N))).ModExp(b, N);
-
-    uint8 t[32];
-    uint8 t1[16];
-    uint8 vK[40];
-    memcpy(t, S.AsByteArray(32).get(), 32);
-
-    for (int i = 0; i < 16; ++i)
-        t1[i] = t[i * 2];
-
-    sha.Initialize();
-    sha.UpdateData(t1, 16);
-    sha.Finalize();
-
-    for (int i = 0; i < 20; ++i)
-        vK[i * 2] = sha.GetDigest()[i];
-
-    for (int i = 0; i < 16; ++i)
-        t1[i] = t[i * 2 + 1];
-
-    sha.Initialize();
-    sha.UpdateData(t1, 16);
-    sha.Finalize();
-
-    for (int i = 0; i < 20; ++i)
-        vK[i * 2 + 1] = sha.GetDigest()[i];
-
-    K.SetBinary(vK, 40);
-
-    uint8 hash[20];
-
-    sha.Initialize();
-    sha.UpdateBigNumbers(&N, nullptr);
-    sha.Finalize();
-    memcpy(hash, sha.GetDigest(), 20);
-    sha.Initialize();
-    sha.UpdateBigNumbers(&g, nullptr);
-    sha.Finalize();
-
-    for (int i = 0; i < 20; ++i)
-        hash[i] ^= sha.GetDigest()[i];
-
-    BigNumber t3;
-    t3.SetBinary(hash, 20);
-
-    sha.Initialize();
-    sha.UpdateData(_login);
-    sha.Finalize();
-    uint8 t4[SHA_DIGEST_LENGTH];
-    memcpy(t4, sha.GetDigest(), SHA_DIGEST_LENGTH);
-
-    sha.Initialize();
-    sha.UpdateBigNumbers(&t3, nullptr);
-    sha.UpdateData(t4, SHA_DIGEST_LENGTH);
-    sha.UpdateBigNumbers(&s, &A, &B, &K, nullptr);
-    sha.Finalize();
-    BigNumber M;
-    M.SetBinary(sha.GetDigest(), 20);
-
-    // Check if SRP6 results match (password is correct), else send an error
-    if (!memcmp(M.AsByteArray().get(), lp.M1, 20))
-    {
+        _sessionKey = *K;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_NETWORKIO, "'%s:%d' User '%s' successfully authenticated", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str());
 #endif
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
-        const char* K_hex = K.AsHexStr();
-
         PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LOGONPROOF);
-        stmt->setString(0, K_hex);
+        stmt->setBinary(0, _sessionKey);
         stmt->setString(1, socket().getRemoteAddress().c_str());
         stmt->setUInt32(2, GetLocaleByName(_localizationName));
         stmt->setString(3, _os);
         stmt->setString(4, _login);
         LoginDatabase.DirectExecute(stmt);
 
-        OPENSSL_free((void*)K_hex);
-
         // Finish SRP6 and send the final result to the client
-        sha.Initialize();
-        sha.UpdateBigNumbers(&A, &M, &K, nullptr);
-        sha.Finalize();
+        acore::Crypto::SHA1::Digest M2 = acore::Crypto::SRP6::GetSessionVerifier(lp.A, lp.clientM, _sessionKey);
 
         // Check auth token
         if ((lp.securityFlags & 0x04) || !_tokenKey.empty())
@@ -746,7 +599,7 @@ bool AuthSocket::_HandleLogonProof()
         if (_expversion & POST_BC_EXP_FLAG)                 // 2.x and 3.x clients
         {
             sAuthLogonProof_S proof;
-            memcpy(proof.M2, sha.GetDigest(), 20);
+            proof.M2 = M2;
             proof.cmd = AUTH_LOGON_PROOF;
             proof.error = 0;
             proof.unk1 = 0x00800000;    // Accountflags. 0x01 = GM, 0x08 = Trial, 0x00800000 = Pro pass (arena tournament)
@@ -757,7 +610,7 @@ bool AuthSocket::_HandleLogonProof()
         else
         {
             sAuthLogonProof_S_Old proof;
-            memcpy(proof.M2, sha.GetDigest(), 20);
+            proof.M2 = M2;
             proof.cmd = AUTH_LOGON_PROOF;
             proof.error = 0;
             proof.unk2 = 0x00;
@@ -909,7 +762,8 @@ bool AuthSocket::_HandleReconnectChallenge()
     uint8 secLevel = fields[2].GetUInt8();
     _accountSecurityLevel = secLevel <= SEC_ADMINISTRATOR ? AccountTypes(secLevel) : SEC_ADMINISTRATOR;
 
-    K.SetHexStr ((*result)[0].GetCString());
+    _sessionKey = fields[0].GetBinary<SESSION_KEY_LENGTH>();
+    acore::Crypto::GetRandomBytes(_reconnectProof);
 
     ///- All good, await client's proof
     _status = STATUS_RECON_PROOF;
@@ -918,8 +772,7 @@ bool AuthSocket::_HandleReconnectChallenge()
     ByteBuffer pkt;
     pkt << uint8(AUTH_RECONNECT_CHALLENGE);
     pkt << uint8(0x00);
-    _reconnectProof.SetRand(16 * 8);
-    pkt.append(_reconnectProof.AsByteArray(16).get(), 16);        // 16 bytes random
+    pkt.append(_reconnectProof);        // 16 bytes random
     pkt << uint64(0x00) << uint64(0x00);                    // 16 bytes zeros
     socket().send((char const*)pkt.contents(), pkt.size());
     return true;
@@ -938,19 +791,20 @@ bool AuthSocket::_HandleReconnectProof()
 
     _status = STATUS_CLOSED;
 
-    if (_login.empty() || !_reconnectProof.GetNumBytes() || !K.GetNumBytes())
+    if (_login.empty())
         return false;
 
     BigNumber t1;
     t1.SetBinary(lp.R1, 16);
 
-    SHA1Hash sha;
-    sha.Initialize();
+    acore::Crypto::SHA1 sha;
     sha.UpdateData(_login);
-    sha.UpdateBigNumbers(&t1, &_reconnectProof, &K, nullptr);
+    sha.UpdateData(t1.ToByteArray<16>());
+    sha.UpdateData(_reconnectProof);
+    sha.UpdateData(_sessionKey);
     sha.Finalize();
 
-    if (!memcmp(sha.GetDigest(), lp.R2, SHA_DIGEST_LENGTH))
+    if (sha.GetDigest() == lp.R2)
     {
         // Sending response
         ByteBuffer pkt;
