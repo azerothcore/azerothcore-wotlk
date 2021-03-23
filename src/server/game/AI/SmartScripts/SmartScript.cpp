@@ -772,7 +772,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.cast.spell);
                             int32 currentPower = me->GetPower(GetCasterPowerType());
 
-                            if ((spellInfo && (currentPower < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
+                            if ((spellInfo && (currentPower < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()) || me->IsSpellProhibited(spellInfo->GetSchoolMask()))) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
                             {
                                 SetCasterActualDist(0);
                                 CAST_AI(SmartAI, me->AI())->SetForcedCombatMove(0);

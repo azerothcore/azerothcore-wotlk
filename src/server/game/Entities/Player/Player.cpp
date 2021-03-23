@@ -2726,6 +2726,23 @@ void Player::Regenerate(Powers power)
     if (!maxValue)
         return;
 
+    //If .cheat power is on always have the max power
+    if (GetCommandStatus(CHEAT_POWER))
+    {
+        if (m_regenTimerCount >= 2000)
+        {
+            //Set the value to 0 first then set it to max to force resend of packet as for range clients keeps removing rage
+            if (power == POWER_RAGE || power == POWER_RUNIC_POWER)
+            {
+                UpdateUInt32Value(UNIT_FIELD_POWER1 + power, 0);
+            }
+
+            SetPower(power, maxValue);
+            return;
+        }
+    }
+
+
     uint32 curValue = GetPower(power);
 
     // TODO: possible use of miscvalueb instead of amount
@@ -3024,7 +3041,7 @@ bool Player::IsInWater(bool allowAbove) const
 bool Player::IsUnderWater() const
 {
     return IsInWater() &&
-           GetPositionZ() < (GetBaseMap()->GetWaterLevel(GetPositionX(), GetPositionY()) - 2);
+           GetPositionZ() < GetBaseMap()->GetWaterLevel(GetPositionX(), GetPositionY()) - GetCollisionHeight();
 }
 
 bool Player::IsFalling() const
@@ -15057,6 +15074,11 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                     canTalk = false;
                     break;
                 case GOSSIP_OPTION_TRAINER:
+                    if (!creature->IsValidTrainerForPlayer(this))
+                    {
+                        canTalk = false;
+                    }
+                    break;
                 case GOSSIP_OPTION_GOSSIP:
                 case GOSSIP_OPTION_SPIRITGUIDE:
                 case GOSSIP_OPTION_INNKEEPER:
@@ -21210,7 +21232,7 @@ void Player::VehicleSpellInitialize()
     data << uint8(0);                                       // Command State
     data << uint16(0x800);                                  // DisableActions (set for all vehicles)
 
-    for (uint32 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+    for (uint32 i = 0; i < MAX_CREATURE_SPELLS; ++i)
     {
         uint32 spellId = vehicle->m_spells[i];
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
@@ -21236,7 +21258,7 @@ void Player::VehicleSpellInitialize()
         data << uint32(MAKE_UNIT_ACTION_BUTTON(spellId, i + 8));
     }
 
-    for (uint32 i = CREATURE_MAX_SPELLS; i < MAX_SPELL_CONTROL_BAR; ++i)
+    for (uint32 i = MAX_CREATURE_SPELLS; i < MAX_SPELL_CONTROL_BAR; ++i)
         data << uint32(0);
 
     data << uint8(0); // Auras?
@@ -24747,13 +24769,14 @@ void Player::UpdateUnderwaterState(Map* m, float x, float y, float z)
     // pussywizard: optimization
     if (GetExactDistSq(&m_last_underwaterstate_position) < 3.0f * 3.0f)
         return;
+
     m_last_underwaterstate_position.Relocate(m_positionX, m_positionY, m_positionZ);
 
     if (!IsPositionValid()) // pussywizard: crashfix if calculated grid coords would be out of range 0-64
         return;
 
     LiquidData liquid_status;
-    ZLiquidStatus res = m->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status);
+    ZLiquidStatus res = m->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status, GetCollisionHeight());
     if (!res)
     {
         m_MirrorTimerFlags &= ~(UNDERWATER_INWATER | UNDERWATER_INLAVA | UNDERWATER_INSLIME | UNDERWARER_INDARKWATER);
@@ -25705,7 +25728,7 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 
     //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
     // 14.57 can be calculated by resolving damageperc formula below to 0
-    if (z_diff >= 14.57f && !isDead() && !IsGameMaster() &&
+    if (z_diff >= 14.57f && !isDead() && !IsGameMaster() && !GetCommandStatus(CHEAT_GOD) &&
             !HasAuraType(SPELL_AURA_HOVER) && !HasAuraType(SPELL_AURA_FEATHER_FALL) &&
             !HasAuraType(SPELL_AURA_FLY))
     {
