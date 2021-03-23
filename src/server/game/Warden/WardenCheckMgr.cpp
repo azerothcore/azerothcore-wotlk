@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -103,16 +103,6 @@ void WardenCheckMgr::LoadWardenChecks()
         {
             WardenCheckResult wr;
             wr.Result.SetHexStr(checkResult.c_str());
-            int len = static_cast<int>(checkResult.size()) / 2;
-            if (wr.Result.GetNumBytes() < len)
-            {
-                uint8* temp = new uint8[len];
-                memset(temp, 0, len);
-                memcpy(temp, wr.Result.AsByteArray().get(), wr.Result.GetNumBytes());
-                std::reverse(temp, temp + len);
-                wr.Result.SetBinary((uint8*)temp, len);
-                delete [] temp;
-            }
             CheckResultStore[id] = wr;
         }
 
@@ -148,19 +138,7 @@ void WardenCheckMgr::LoadWardenChecks()
             default:
             {
                 if (checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == DRIVER_CHECK)
-                {
                     wardenCheck.Data.SetHexStr(data.c_str());
-                    int len = static_cast<int>(data.size()) / 2;
-
-                    if (wardenCheck.Data.GetNumBytes() < len)
-                    {
-                        uint8 temp[24];
-                        memset(temp, 0, len);
-                        memcpy(temp, wardenCheck.Data.AsByteArray().get(), wardenCheck.Data.GetNumBytes());
-                        std::reverse(temp, temp + len);
-                        wardenCheck.Data.SetBinary((uint8*)temp, len);
-                    }
-                }
 
                 CheckIdPool[WARDEN_CHECK_OTHER_TYPE].push_back(id);
                 break;

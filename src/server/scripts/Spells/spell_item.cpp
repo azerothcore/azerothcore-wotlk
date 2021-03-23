@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -907,6 +907,52 @@ public:
     }
 };
 
+class spell_item_anti_venom : public SpellScriptLoader
+{
+public:
+    spell_item_anti_venom() : SpellScriptLoader("spell_item_anti_venom") {}
+
+    class spell_item_anti_venom_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_item_anti_venom_SpellScript);
+
+        void HandleDummy(SpellEffIndex effIndex)
+        {
+            PreventHitDefaultEffect(effIndex);
+            if (Unit* target = GetHitUnit())
+            {
+                std::list<uint32> removeList;
+                Unit::AuraMap const& auras = target->GetOwnedAuras();
+                for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                {
+                    Aura* aura = itr->second;
+                    if (aura->GetSpellInfo()->SpellLevel > 25 || aura->GetSpellInfo()->Dispel != DISPEL_POISON)
+                    {
+                        continue;
+                    }
+
+                    removeList.push_back(aura->GetId());
+                }
+
+                for (std::list<uint32>::const_iterator itr = removeList.begin(); itr != removeList.end(); ++itr)
+                {
+                    target->RemoveAurasDueToSpell(*itr);
+                }
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_item_anti_venom_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_item_anti_venom_SpellScript();
+    }
+};
+
 enum GnomishShrinkRay
 {
     SPELL_GNOMISH_SHRINK_RAY_SELF = 13004,
@@ -1718,10 +1764,6 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* spellInfo = eventInfo.GetHealInfo()->GetSpellInfo();
-            if (!spellInfo || !spellInfo->HasEffect(SPELL_EFFECT_HEAL))
-                return false;
-
             return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetHeal() > 0;
         }
 
@@ -4272,6 +4314,7 @@ void AddSC_item_spell_scripts()
     new spell_item_feast();
     new spell_item_gnomish_universal_remote();
     new spell_item_strong_anti_venom();
+    new spell_item_anti_venom();
     new spell_item_gnomish_shrink_ray();
     new spell_item_goblin_weather_machine();
     new spell_item_light_lamp();
