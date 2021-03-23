@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Group.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "trial_of_the_champion.h"
 #include "Vehicle.h"
-#include "Player.h"
-#include "Group.h"
 
 const Position SpawnPosition = {746.67f, 684.08f, 412.5f, 4.65f};
 #define CLEANUP_CHECK_INTERVAL  5000
@@ -245,7 +245,6 @@ public:
                 for( uint8 i = 0; i < MAX_ENCOUNTER; ++i )
                     if( m_auiEncounter[i] == IN_PROGRESS )
                         m_auiEncounter[i] = NOT_STARTED;
-
             }
             else
                 OUT_LOAD_INST_DATA_FAIL;
@@ -606,7 +605,7 @@ public:
                                 c->GetMotionMaster()->MovePoint(9, 747.36f, 670.07f, 411.9f);
                                 if (!creditCasted)
                                 {
-                                    c->CastSpell((Unit*)NULL, 68572, true);
+                                    c->CastSpell((Unit*)nullptr, 68572, true);
                                     creditCasted = true;
                                 }
                             }
@@ -743,7 +742,6 @@ public:
                         pAdd->GetMotionMaster()->MoveFollow(pBoss, 2.0f, (i + 1)*M_PI / 2);
                         pAdd->SetReactState(REACT_PASSIVE);
                     }
-
             }
 
             if (!shortver)
@@ -962,7 +960,7 @@ public:
                     {
                         if( Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
                             tirion->AI()->Talk(TEXT_GRATZ_SLAIN_CHAMPIONS);
-                        
+
                         HandleGameObject(GO_EnterGateGUID, true);
                     }
                     break;

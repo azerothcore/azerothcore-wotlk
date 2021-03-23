@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,10 +11,10 @@ SDComment: Darkglare tracking issue
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "temple_of_ahnqiraj.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "temple_of_ahnqiraj.h"
 
 /*
  * This is a 2 phases events. Here follows an explanation of the main events and transition between phases and sub-phases.
@@ -438,7 +438,6 @@ public:
             }
         }
     };
-
 };
 
 class boss_cthun : public CreatureScript
@@ -891,7 +890,6 @@ public:
             }
         }
     };
-
 };
 
 class npc_eye_tentacle : public CreatureScript
@@ -969,7 +967,6 @@ public:
             else MindflayTimer -= diff;
         }
     };
-
 };
 
 class npc_claw_tentacle : public CreatureScript
@@ -1083,7 +1080,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_giant_claw_tentacle : public CreatureScript
@@ -1207,7 +1203,6 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 class npc_giant_eye_tentacle : public CreatureScript
@@ -1273,7 +1268,6 @@ public:
             else BeamTimer -= diff;
         }
     };
-
 };
 
 class npc_giant_flesh_tentacle : public CreatureScript
@@ -1301,7 +1295,6 @@ public:
                         summoner->GetAI()->DoAction(ACTION_FLESH_TENTACLE_KILLED);
         }
     };
-
 };
 
 //GetAIs

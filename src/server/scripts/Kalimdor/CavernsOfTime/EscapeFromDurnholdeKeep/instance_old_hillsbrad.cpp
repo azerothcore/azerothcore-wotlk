@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "InstanceScript.h"
 #include "old_hillsbrad.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 const Position instancePositions[INSTANCE_POSITIONS_COUNT] =
 {
@@ -22,7 +22,6 @@ const Position thrallPositions[THRALL_POSITIONS_COUNT] =
     {2062.9f, 229.93f, 64.454f, 2.45f},     // After Captain Skarloc death
     {2486.91f, 626.356f, 58.0761f, 0.0f},   // Arrived at Tarren Mill
     {2660.47f, 659.223f, 62.0f, 5.78f}      // Taretha Met
-
 };
 
 class instance_old_hillsbrad : public InstanceMapScript
@@ -339,7 +338,6 @@ public:
 
         EventMap _events;
     };
-
 };
 
 void AddSC_instance_old_hillsbrad()

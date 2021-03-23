@@ -1,13 +1,13 @@
 // Scripted by Xinef
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
 #include "CombatAI.h"
-#include "SpellScript.h"
-#include "Player.h"
-#include "Vehicle.h"
 #include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
 ///////////////////////////////////////
 ////// TABLE EVENT
@@ -325,7 +325,6 @@ public:
             {
                 switch (passSpell)
                 {
-
                     case SPELL_PASS_TURKEY:
                         return SPELL_VISUAL_BOUNCE_TURKEY;
                     case SPELL_PASS_STUFFING:
@@ -342,7 +341,6 @@ public:
             {
                 switch (passSpell)
                 {
-
                     case SPELL_PASS_TURKEY:
                         return SPELL_VISUAL_THROW_TURKEY;
                     case SPELL_PASS_STUFFING:

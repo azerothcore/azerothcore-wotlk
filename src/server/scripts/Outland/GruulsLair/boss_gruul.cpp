@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
 #include "gruuls_lair.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 enum Yells
 {
@@ -210,7 +210,7 @@ public:
             if (Unit* target = GetHitUnit())
             {
                 target->RemoveAurasDueToSpell(SPELL_STONED);
-                target->CastSpell((Unit*)NULL, SPELL_SHATTER_EFFECT, true);
+                target->CastSpell((Unit*)nullptr, SPELL_SHATTER_EFFECT, true);
             }
         }
 

@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "obsidian_sanctum.h"
-#include "SpellScript.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
 
 enum Says
 {
@@ -656,7 +656,7 @@ public:
         }
 
         void RespawnDragons(bool checkCombat)
-        {          
+        {
             for (uint8 i = 0; i < MAX_DRAGONS; ++i)
             {
                 if (instance->GetBossState(dragons[i]) == DONE)

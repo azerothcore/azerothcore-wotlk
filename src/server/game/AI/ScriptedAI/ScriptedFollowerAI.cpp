@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  */
 
@@ -10,10 +10,10 @@ SDComment: This AI is under development
 SDCategory: Npc
 EndScriptData */
 
-#include "ScriptedCreature.h"
-#include "ScriptedFollowerAI.h"
 #include "Group.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedFollowerAI.h"
 
 const float MAX_PLAYER_DISTANCE = 100.0f;
 

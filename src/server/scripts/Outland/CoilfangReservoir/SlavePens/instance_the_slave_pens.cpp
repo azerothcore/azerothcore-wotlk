@@ -22,10 +22,10 @@ Without it, the party doing random dungeon won't get satchel of spoils and
 gets instead the deserter debuff.
 */
 
-#include "ScriptMgr.h"
 #include "Creature.h"
 #include "InstanceScript.h"
 #include "Map.h"
+#include "ScriptMgr.h"
 #include "the_slave_pens.h"
 
 class instance_the_slave_pens : public InstanceMapScript
