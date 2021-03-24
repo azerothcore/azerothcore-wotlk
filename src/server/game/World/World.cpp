@@ -1415,6 +1415,8 @@ void World::LoadConfigSettings(bool reload)
 
     m_bool_configs[CONFIG_SET_SHAPASSHASH] = sConfigMgr->GetBoolDefault("SetDeprecatedExternalPasswords", false);
 
+    m_bool_configs[CONFIG_SET_BOP_ITEM_TRADEABLE] = sConfigMgr->GetOption<bool>("Item.SetItemTradeable", true);
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }
