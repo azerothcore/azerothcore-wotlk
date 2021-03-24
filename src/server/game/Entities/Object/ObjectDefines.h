@@ -18,7 +18,7 @@
 #define VISIBILITY_INC_FOR_WGUNITS  320.0f // max visibility distance for wg units like cannons, vehicles etc
 #define VISIBILITY_COMPENSATION     15.0f // increase searchers
 #define SPELL_SEARCHER_COMPENSATION 30.0f // increase searchers size in case we have large npc near cell border
-#define VISIBILITY_DIST_WINTERGRASP 175.0f
+#define VISIBILITY_DIST_WINTERGRASP 275.0f
 #define SIGHT_RANGE_UNIT            50.0f
 #define DEFAULT_VISIBILITY_DISTANCE 90.0f // default visible distance, 90 yards on continents
 #define DEFAULT_VISIBILITY_INSTANCE 120.0f // default visible distance in instances, 120 yards
