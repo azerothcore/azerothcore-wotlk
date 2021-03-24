@@ -1,3 +1,19 @@
+-- DB update 2021_03_23_00 -> 2021_03_24_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_03_23_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_03_23_00 2021_03_24_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1600196312407384300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1600196312407384300');
 
 -- Archavon Warder, for some reason Shield Crush doesn't appear in sniffs
@@ -71,3 +87,12 @@ UPDATE `creature_template` SET `mingold` = 8112, `maxgold` = 13520 WHERE `entry`
 DELETE FROM `spelldifficulty_dbc` WHERE `id` = 66809;
 INSERT INTO `spelldifficulty_dbc` (`id`,`DifficultySpellID_1`,`DifficultySpellID_2`,`DifficultySpellID_3`,`DifficultySpellID_4`) VALUES
 (66809,66809,67331,0,0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
