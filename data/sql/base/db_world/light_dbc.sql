@@ -6,26 +6,26 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `light_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `light_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `ContinentID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `ContinentID` INT NOT NULL DEFAULT 0,
   `X` float NOT NULL DEFAULT 0,
   `Y` float NOT NULL DEFAULT 0,
   `Z` float NOT NULL DEFAULT 0,
   `FalloffStart` float NOT NULL DEFAULT 0,
   `FalloffEnd` float NOT NULL DEFAULT 0,
-  `LightParamsID_1` int(11) NOT NULL DEFAULT 0,
-  `LightParamsID_2` int(11) NOT NULL DEFAULT 0,
-  `LightParamsID_3` int(11) NOT NULL DEFAULT 0,
-  `LightParamsID_4` int(11) NOT NULL DEFAULT 0,
-  `LightParamsID_5` int(11) NOT NULL DEFAULT 0,
-  `LightParamsID_6` int(11) NOT NULL DEFAULT 0,
-  `LightParamsID_7` int(11) NOT NULL DEFAULT 0,
-  `LightParamsID_8` int(11) NOT NULL DEFAULT 0,
+  `LightParamsID_1` INT NOT NULL DEFAULT 0,
+  `LightParamsID_2` INT NOT NULL DEFAULT 0,
+  `LightParamsID_3` INT NOT NULL DEFAULT 0,
+  `LightParamsID_4` INT NOT NULL DEFAULT 0,
+  `LightParamsID_5` INT NOT NULL DEFAULT 0,
+  `LightParamsID_6` INT NOT NULL DEFAULT 0,
+  `LightParamsID_7` INT NOT NULL DEFAULT 0,
+  `LightParamsID_8` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `light_dbc` WRITE;

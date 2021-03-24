@@ -6,16 +6,16 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `gameobject_template_addon`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `gameobject_template_addon` 
 (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `faction` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `flags` int(10) unsigned NOT NULL DEFAULT 0,
-  `mingold` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `maxgold` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `entry` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `faction` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `flags` INT unsigned NOT NULL DEFAULT 0,
+  `mingold` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `maxgold` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `gameobject_template_addon` WRITE;
