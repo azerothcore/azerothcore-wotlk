@@ -6,24 +6,24 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `battleground_template`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `battleground_template` 
 (
-  `ID` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `MinPlayersPerTeam` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `MaxPlayersPerTeam` smallint(5) unsigned NOT NULL DEFAULT 0,
-  `MinLvl` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `MaxLvl` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `AllianceStartLoc` mediumint(8) unsigned NOT NULL,
+  `ID` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `MinPlayersPerTeam` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `MaxPlayersPerTeam` SMALLINT unsigned NOT NULL DEFAULT 0,
+  `MinLvl` TINYINT unsigned NOT NULL DEFAULT 0,
+  `MaxLvl` TINYINT unsigned NOT NULL DEFAULT 0,
+  `AllianceStartLoc` MEDIUMINT unsigned NOT NULL,
   `AllianceStartO` float NOT NULL,
-  `HordeStartLoc` mediumint(8) unsigned NOT NULL,
+  `HordeStartLoc` MEDIUMINT unsigned NOT NULL,
   `HordeStartO` float NOT NULL,
   `StartMaxDist` float NOT NULL DEFAULT 0,
-  `Weight` tinyint(3) unsigned NOT NULL DEFAULT 1,
+  `Weight` TINYINT unsigned NOT NULL DEFAULT 1,
   `ScriptName` char(64) NOT NULL DEFAULT '',
   `Comment` char(38) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `battleground_template` WRITE;
