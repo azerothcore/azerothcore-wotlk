@@ -251,6 +251,8 @@ UPDATE `creature_template` SET `DamageModifier`='9' WHERE  `entry`=12900;
 UPDATE `creature_template` SET `DamageModifier`='6' WHERE  `entry`=8923;
 -- mr. smite, 1.7->2.45 plus correct attack speed
 UPDATE `creature_template` SET `DamageModifier`='2.45', `BaseAttackTime`='2000' WHERE  `entry`=646;
+-- defias miner 1.7->1
+UPDATE `creature_template` SET `DamageModifier`='1' WHERE  `entry`=598;
 
 -- dire maul north
 -- king gordok 5->6
