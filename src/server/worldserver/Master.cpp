@@ -43,20 +43,17 @@ extern int m_ServiceStatus;
 #endif
 
 /// Handle worldservers's termination signals
-class WorldServerSignalHandler : public acore::SignalHandler
+void HandleSignal(int sigNum)
 {
-public:
-    void HandleSignal(int sigNum) override
+    switch (sigNum)
     {
-        switch (sigNum)
-        {
-            case SIGINT:
-                World::StopNow(RESTART_EXIT_CODE);
-                break;
-            case SIGTERM:
-#ifdef _WIN32
-            case SIGBREAK:
-                if (m_ServiceStatus != 1)
+        case SIGINT:
+            World::StopNow(RESTART_EXIT_CODE);
+            break;
+        case SIGTERM:
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
+        case SIGBREAK:
+            if (m_ServiceStatus != 1)
 #endif
                     World::StopNow(SHUTDOWN_EXIT_CODE);
                 break;
@@ -66,7 +63,7 @@ public:
                     break;*/
         }
     }
-};
+}
 
 class FreezeDetectorRunnable : public acore::Runnable
 {
@@ -164,19 +161,14 @@ int Master::Run()
     sScriptMgr->OnStartup();
 
     ///- Initialize the signal handlers
-    WorldServerSignalHandler signalINT, signalTERM; //, signalSEGV
-#ifdef _WIN32
-    WorldServerSignalHandler signalBREAK;
-#endif /* _WIN32 */
+    acore::SignalHandler signalHandler;
 
-    ///- Register worldserver's signal handlers
-    ACE_Sig_Handler handle;
-    handle.register_handler(SIGINT, &signalINT);
-    handle.register_handler(SIGTERM, &signalTERM);
-#ifdef _WIN32
-    handle.register_handler(SIGBREAK, &signalBREAK);
+    signalHandler.handle_signal(SIGINT, &HandleSignal);
+    signalHandler.handle_signal(SIGTERM, &HandleSignal);
+
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
+    signalHandler.handle_signal(SIGBREAK, &HandleSignal);
 #endif
-    //handle.register_handler(SIGSEGV, &signalSEGV);
 
     ///- Launch WorldRunnable thread
     acore::Thread worldThread(new WorldRunnable);
