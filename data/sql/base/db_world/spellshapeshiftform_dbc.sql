@@ -6,11 +6,11 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `spellshapeshiftform_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spellshapeshiftform_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `BonusActionBar` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `BonusActionBar` INT NOT NULL DEFAULT 0,
   `Name_Lang_enUS` varchar(100) DEFAULT NULL,
   `Name_Lang_enGB` varchar(100) DEFAULT NULL,
   `Name_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -27,25 +27,25 @@ CREATE TABLE `spellshapeshiftform_dbc`
   `Name_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Name_Lang_itIT` varchar(100) DEFAULT NULL,
   `Name_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Name_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
-  `CreatureType` int(11) NOT NULL DEFAULT 0,
-  `AttackIconID` int(11) NOT NULL DEFAULT 0,
-  `CombatRoundTime` int(11) NOT NULL DEFAULT 0,
-  `CreatureDisplayID_1` int(11) NOT NULL DEFAULT 0,
-  `CreatureDisplayID_2` int(11) NOT NULL DEFAULT 0,
-  `CreatureDisplayID_3` int(11) NOT NULL DEFAULT 0,
-  `CreatureDisplayID_4` int(11) NOT NULL DEFAULT 0,
-  `PresetSpellID_1` int(11) NOT NULL DEFAULT 0,
-  `PresetSpellID_2` int(11) NOT NULL DEFAULT 0,
-  `PresetSpellID_3` int(11) NOT NULL DEFAULT 0,
-  `PresetSpellID_4` int(11) NOT NULL DEFAULT 0,
-  `PresetSpellID_5` int(11) NOT NULL DEFAULT 0,
-  `PresetSpellID_6` int(11) NOT NULL DEFAULT 0,
-  `PresetSpellID_7` int(11) NOT NULL DEFAULT 0,
-  `PresetSpellID_8` int(11) NOT NULL DEFAULT 0,
+  `Name_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
+  `CreatureType` INT NOT NULL DEFAULT 0,
+  `AttackIconID` INT NOT NULL DEFAULT 0,
+  `CombatRoundTime` INT NOT NULL DEFAULT 0,
+  `CreatureDisplayID_1` INT NOT NULL DEFAULT 0,
+  `CreatureDisplayID_2` INT NOT NULL DEFAULT 0,
+  `CreatureDisplayID_3` INT NOT NULL DEFAULT 0,
+  `CreatureDisplayID_4` INT NOT NULL DEFAULT 0,
+  `PresetSpellID_1` INT NOT NULL DEFAULT 0,
+  `PresetSpellID_2` INT NOT NULL DEFAULT 0,
+  `PresetSpellID_3` INT NOT NULL DEFAULT 0,
+  `PresetSpellID_4` INT NOT NULL DEFAULT 0,
+  `PresetSpellID_5` INT NOT NULL DEFAULT 0,
+  `PresetSpellID_6` INT NOT NULL DEFAULT 0,
+  `PresetSpellID_7` INT NOT NULL DEFAULT 0,
+  `PresetSpellID_8` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `spellshapeshiftform_dbc` WRITE;
