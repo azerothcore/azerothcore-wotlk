@@ -440,7 +440,7 @@ private:
     std::string m_newCharString;
 
     float rate_values[MAX_RATES];
-    uint64 m_int_configs[INT_CONFIG_VALUE_COUNT];
+    uint32 m_int_configs[INT_CONFIG_VALUE_COUNT];
     bool m_bool_configs[BOOL_CONFIG_VALUE_COUNT];
     float m_float_configs[FLOAT_CONFIG_VALUE_COUNT];
     typedef std::map<uint32, uint64> WorldStatesMap;

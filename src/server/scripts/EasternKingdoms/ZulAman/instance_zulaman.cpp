@@ -229,18 +229,18 @@ public:
                 return;
 
             std::istringstream ss(load);
-            //sLog->outError("Zul'aman loaded, %s.", ss.str().c_str());
+            //LOG_ERROR("server", "Zul'aman loaded, %s.", ss.str().c_str());
             char dataHead; // S
             uint16 data1, data2, data3;
             ss >> dataHead >> data1 >> data2 >> data3;
-            //sLog->outError("Zul'aman loaded, %d %d %d.", data1, data2, data3);
+            //LOG_ERROR("server", "Zul'aman loaded, %d %d %d.", data1, data2, data3);
             if (dataHead == 'S')
             {
                 BossKilled = data1;
                 ChestLooted = data2;
                 QuestMinute = data3;
             }
-            else sLog->outError("Zul'aman: corrupted save data.");
+            else LOG_ERROR("server", "Zul'aman: corrupted save data.");
         }
 
         void SetData(uint32 type, uint32 data) override

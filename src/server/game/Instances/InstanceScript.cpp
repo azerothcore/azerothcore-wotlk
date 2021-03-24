@@ -45,7 +45,7 @@ void InstanceScript::HandleGameObject(uint64 GUID, bool open, GameObject* go)
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_TSCR, "TSCR: InstanceScript: HandleGameObject failed");
+        LOG_DEBUG("scripts.ai", "TSCR: InstanceScript: HandleGameObject failed");
 #endif
     }
 }
@@ -69,7 +69,7 @@ void InstanceScript::LoadMinionData(const MinionData* data)
         ++data;
     }
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_TSCR, "InstanceScript::LoadMinionData: " UI64FMTD " minions loaded.", uint64(minions.size()));
+    LOG_DEBUG("scripts.ai", "InstanceScript::LoadMinionData: " UI64FMTD " minions loaded.", uint64(minions.size()));
 #endif
 }
 
@@ -83,7 +83,7 @@ void InstanceScript::LoadDoorData(const DoorData* data)
         ++data;
     }
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_TSCR, "InstanceScript::LoadDoorData: " UI64FMTD " doors loaded.", uint64(doors.size()));
+    LOG_DEBUG("scripts.ai", "InstanceScript::LoadDoorData: " UI64FMTD " doors loaded.", uint64(doors.size()));
 #endif
 }
 
@@ -202,7 +202,7 @@ bool InstanceScript::SetBossState(uint32 id, EncounterState state)
         if (bossInfo->state == TO_BE_DECIDED) // loading
         {
             bossInfo->state = state;
-            //sLog->outError("Inialize boss %u state as %u.", id, (uint32)state);
+            //LOG_ERROR("server", "Inialize boss %u state as %u.", id, (uint32)state);
             return false;
         }
         else
@@ -272,7 +272,7 @@ void InstanceScript::DoUseDoorOrButton(uint64 uiGuid, uint32 uiWithRestoreTime, 
                 go->ResetDoorOrButton();
         }
         else
-            sLog->outError("SD2: Script call DoUseDoorOrButton, but gameobject entry %u is type %u.", go->GetEntry(), go->GetGoType());
+            LOG_ERROR("server", "SD2: Script call DoUseDoorOrButton, but gameobject entry %u is type %u.", go->GetEntry(), go->GetGoType());
     }
 }
 
@@ -305,7 +305,7 @@ void InstanceScript::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_TSCR, "TSCR: DoUpdateWorldState attempt send data but no players in map.");
+        LOG_DEBUG("scripts.ai", "TSCR: DoUpdateWorldState attempt send data but no players in map.");
 #endif
     }
 }
@@ -392,7 +392,7 @@ void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
 
 bool InstanceScript::CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* /*source*/, Unit const* /*target*/ /*= nullptr*/, uint32 /*miscvalue1*/ /*= 0*/)
 {
-    sLog->outError("Achievement system call InstanceScript::CheckAchievementCriteriaMeet but instance script for map %u not have implementation for achievement criteria %u",
+    LOG_ERROR("server", "Achievement system call InstanceScript::CheckAchievementCriteriaMeet but instance script for map %u not have implementation for achievement criteria %u",
                    instance->GetId(), criteria_id);
     return false;
 }

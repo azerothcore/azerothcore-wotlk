@@ -32,9 +32,6 @@ bool AuctionListItemsDelayEvent::Execute()
 
     AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->getFaction());
 
-    //sLog->outDebug("Auctionhouse search (GUID: %u TypeId: %u)",, list from: %u, searchedname: %s, levelmin: %u, levelmax: %u, auctionSlotID: %u, auctionMainCategory: %u, auctionSubCategory: %u, quality: %u, usable: %u",
-    //  GUID_LOPART(guid), GuidHigh2TypeId(GUID_HIPART(guid)), listfrom, searchedname.c_str(), levelmin, levelmax, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, usable);
-
     WorldPacket data(SMSG_AUCTION_LIST_RESULT, (4 + 4 + 4) + 50 * ((16 + MAX_INSPECTED_ENCHANTMENT_SLOT * 3) * 4));
     uint32 count = 0;
     uint32 totalcount = 0;

@@ -229,7 +229,7 @@ public:
         void PrepareEncounter()
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
+            LOG_DEBUG("scripts.ai", "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
 #endif
             uint8 index = 0;
             uint8 count = 0;
