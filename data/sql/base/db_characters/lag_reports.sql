@@ -6,20 +6,20 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `lag_reports`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `lag_reports` 
 (
-  `reportId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `guid` int(10) unsigned NOT NULL DEFAULT 0,
-  `lagType` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `mapId` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `reportId` INT unsigned NOT NULL AUTO_INCREMENT,
+  `guid` INT unsigned NOT NULL DEFAULT 0,
+  `lagType` TINYINT unsigned NOT NULL DEFAULT 0,
+  `mapId` SMALLINT unsigned NOT NULL DEFAULT 0,
   `posX` float NOT NULL DEFAULT 0,
   `posY` float NOT NULL DEFAULT 0,
   `posZ` float NOT NULL DEFAULT 0,
-  `latency` int(10) unsigned NOT NULL DEFAULT 0,
-  `createTime` int(10) unsigned NOT NULL DEFAULT 0,
+  `latency` INT unsigned NOT NULL DEFAULT 0,
+  `createTime` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`reportId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Player System';
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Player System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `lag_reports` WRITE;
