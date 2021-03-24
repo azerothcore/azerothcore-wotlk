@@ -6,28 +6,28 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `worldmapoverlay_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `worldmapoverlay_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `MapAreaID` int(11) NOT NULL DEFAULT 0,
-  `AreaID_1` int(11) NOT NULL DEFAULT 0,
-  `AreaID_2` int(11) NOT NULL DEFAULT 0,
-  `AreaID_3` int(11) NOT NULL DEFAULT 0,
-  `AreaID_4` int(11) NOT NULL DEFAULT 0,
-  `MapPointX` int(11) NOT NULL DEFAULT 0,
-  `MapPointY` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `MapAreaID` INT NOT NULL DEFAULT 0,
+  `AreaID_1` INT NOT NULL DEFAULT 0,
+  `AreaID_2` INT NOT NULL DEFAULT 0,
+  `AreaID_3` INT NOT NULL DEFAULT 0,
+  `AreaID_4` INT NOT NULL DEFAULT 0,
+  `MapPointX` INT NOT NULL DEFAULT 0,
+  `MapPointY` INT NOT NULL DEFAULT 0,
   `TextureName` varchar(100) DEFAULT NULL,
-  `TextureWidth` int(11) NOT NULL DEFAULT 0,
-  `TextureHeight` int(11) NOT NULL DEFAULT 0,
-  `OffsetX` int(11) NOT NULL DEFAULT 0,
-  `OffsetY` int(11) NOT NULL DEFAULT 0,
-  `HitRectTop` int(11) NOT NULL DEFAULT 0,
-  `HitRectLeft` int(11) NOT NULL DEFAULT 0,
-  `HitRectBottom` int(11) NOT NULL DEFAULT 0,
-  `HitRectRight` int(11) NOT NULL DEFAULT 0,
+  `TextureWidth` INT NOT NULL DEFAULT 0,
+  `TextureHeight` INT NOT NULL DEFAULT 0,
+  `OffsetX` INT NOT NULL DEFAULT 0,
+  `OffsetY` INT NOT NULL DEFAULT 0,
+  `HitRectTop` INT NOT NULL DEFAULT 0,
+  `HitRectLeft` INT NOT NULL DEFAULT 0,
+  `HitRectBottom` INT NOT NULL DEFAULT 0,
+  `HitRectRight` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `worldmapoverlay_dbc` WRITE;
