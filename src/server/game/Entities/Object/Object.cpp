@@ -2320,7 +2320,7 @@ GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo)
     {
-        LOG_INFO("sql.sql", "Gameobject template %u not found in database!", entry);
+        LOG_ERROR("sql.sql", "Gameobject template %u not found in database!", entry);
         return nullptr;
     }
 
@@ -2380,7 +2380,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo)
     {
-        LOG_INFO("sql.sql", "Gameobject template %u not found in database!", entry);
+        LOG_ERROR("sql.sql", "Gameobject template %u not found in database!", entry);
         return nullptr;
     }
 

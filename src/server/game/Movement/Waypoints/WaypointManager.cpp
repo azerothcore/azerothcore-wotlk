@@ -42,7 +42,7 @@ void WaypointMgr::Load()
 
     if (!result)
     {
-        LOG_INFO("sql.sql", ">> Loaded 0 waypoints. DB table `waypoint_data` is empty!");
+        LOG_ERROR("sql.sql", ">> Loaded 0 waypoints. DB table `waypoint_data` is empty!");
         LOG_INFO("server", " ");
         return;
     }

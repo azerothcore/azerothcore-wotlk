@@ -152,7 +152,7 @@ bool BattlegroundBE::SetupBattleground()
             || !AddObject(BG_BE_OBJECT_READY_MARKER_1, ARENA_READY_MARKER_ENTRY, 6189.47f, 235.54f, 5.52f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
             || !AddObject(BG_BE_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 6287.19f, 288.25f, 5.33f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
     {
-        LOG_INFO("sql.sql", "BatteGroundBE: Failed to spawn some object!");
+        LOG_ERROR("sql.sql", "BatteGroundBE: Failed to spawn some object!");
         return false;
     }
 

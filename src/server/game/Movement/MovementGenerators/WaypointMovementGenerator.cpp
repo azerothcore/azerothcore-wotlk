@@ -27,7 +27,7 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature* creature)
     if (!i_path)
     {
         // No movement found for entry
-        LOG_INFO("sql.sql", "WaypointMovementGenerator::LoadPath: creature %s (Entry: %u GUID: %u) doesn't have waypoint path id: %u", creature->GetName().c_str(), creature->GetEntry(), creature->GetGUIDLow(), path_id);
+        LOG_ERROR("sql.sql", "WaypointMovementGenerator::LoadPath: creature %s (Entry: %u GUID: %u) doesn't have waypoint path id: %u", creature->GetName().c_str(), creature->GetEntry(), creature->GetGUIDLow(), path_id);
         return;
     }
 

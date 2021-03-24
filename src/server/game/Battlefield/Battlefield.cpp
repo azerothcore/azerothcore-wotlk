@@ -805,7 +805,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(entry);
     if (!cinfo)
     {
-        LOG_INFO("sql.sql", "Battlefield::SpawnCreature: entry %u does not exist.", entry);
+        LOG_ERROR("sql.sql", "Battlefield::SpawnCreature: entry %u does not exist.", entry);
         return nullptr;
     }
     // force using DB speeds -- do we really need this?
@@ -830,7 +830,7 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
     GameObject* go = sObjectMgr->IsGameObjectStaticTransport(entry) ? new StaticTransport() : new GameObject();
     if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, map, PHASEMASK_NORMAL, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
     {
-        LOG_INFO("sql.sql", "Battlefield::SpawnGameObject: Gameobject template %u not found in database! Battlefield not created!", entry);
+        LOG_ERROR("sql.sql", "Battlefield::SpawnGameObject: Gameobject template %u not found in database! Battlefield not created!", entry);
         LOG_ERROR("server", "Battlefield::SpawnGameObject: Cannot create gameobject template %u! Battlefield not created!", entry);
         delete go;
         return nullptr;

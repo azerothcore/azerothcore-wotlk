@@ -41,7 +41,7 @@ void OutdoorPvPMgr::InitOutdoorPvP()
 
     if (!result)
     {
-        LOG_INFO("sql.sql", ">> Loaded 0 outdoor PvP definitions. DB table `outdoorpvp_template` is empty.");
+        LOG_ERROR("sql.sql", ">> Loaded 0 outdoor PvP definitions. DB table `outdoorpvp_template` is empty.");
         LOG_INFO("server", " ");
         return;
     }
@@ -60,7 +60,7 @@ void OutdoorPvPMgr::InitOutdoorPvP()
 
         if (typeId >= MAX_OUTDOORPVP_TYPES)
         {
-            LOG_INFO("sql.sql", "Invalid OutdoorPvPTypes value %u in outdoorpvp_template; skipped.", typeId);
+            LOG_ERROR("sql.sql", "Invalid OutdoorPvPTypes value %u in outdoorpvp_template; skipped.", typeId);
             continue;
         }
 
@@ -79,7 +79,7 @@ void OutdoorPvPMgr::InitOutdoorPvP()
         OutdoorPvPDataMap::iterator iter = m_OutdoorPvPDatas.find(OutdoorPvPTypes(i));
         if (iter == m_OutdoorPvPDatas.end())
         {
-            LOG_INFO("sql.sql", "Could not initialize OutdoorPvP object for type ID %u; no entry in database.", uint32(i));
+            LOG_ERROR("sql.sql", "Could not initialize OutdoorPvP object for type ID %u; no entry in database.", uint32(i));
             continue;
         }
 

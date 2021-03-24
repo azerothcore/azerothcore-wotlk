@@ -130,7 +130,7 @@ bool BattlegroundNA::SetupBattleground()
             || !AddObject(BG_NA_OBJECT_READY_MARKER_1, ARENA_READY_MARKER_ENTRY, 4090.46f, 2875.43f, 12.16f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
             || !AddObject(BG_NA_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 4022.82f, 2966.61f, 12.17f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
     {
-        LOG_INFO("sql.sql", "BatteGroundNA: Failed to spawn some object!");
+        LOG_ERROR("sql.sql", "BatteGroundNA: Failed to spawn some object!");
         return false;
     }
 

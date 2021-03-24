@@ -201,7 +201,7 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                     !ScriptRegistry<ArenaTeamScript>::GetScriptById(sid) &&
                     !ScriptRegistry<SpellSC>::GetScriptById(sid) &&
                     !ScriptRegistry<GroupScript>::GetScriptById(sid))
-                LOG_INFO("sql.sql", "Script named '%s' is assigned in the database, but has no code!", (*itr).c_str());
+                LOG_ERROR("sql.sql", "Script named '%s' is assigned in the database, but has no code!", (*itr).c_str());
         }
 }
 

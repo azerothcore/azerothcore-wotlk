@@ -307,7 +307,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     CreatureTemplate const* normalInfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!normalInfo)
     {
-        LOG_INFO("sql.sql", "Creature::InitEntry creature entry %u does not exist.", Entry);
+        LOG_ERROR("sql.sql", "Creature::InitEntry creature entry %u does not exist.", Entry);
         return false;
     }
 
@@ -346,7 +346,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     // Cancel load if no model defined
     if (!(cinfo->GetFirstValidModelId()))
     {
-        LOG_INFO("sql.sql", "Creature (Entry: %u) has no model defined in table `creature_template`, can't load. ", Entry);
+        LOG_ERROR("sql.sql", "Creature (Entry: %u) has no model defined in table `creature_template`, can't load. ", Entry);
         return false;
     }
 
@@ -354,7 +354,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelRandomGender(&displayID);
     if (!minfo)                                             // Cancel load if no model defined
     {
-        LOG_INFO("sql.sql", "Creature (Entry: %u) has no model defined in table `creature_template`, can't load. ", Entry);
+        LOG_ERROR("sql.sql", "Creature (Entry: %u) has no model defined in table `creature_template`, can't load. ", Entry);
         return false;
     }
 
@@ -911,7 +911,7 @@ bool Creature::Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, 
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!cinfo)
     {
-        LOG_INFO("sql.sql", "Creature::Create(): creature template (guidlow: %u, entry: %u) does not exist.", guidlow, Entry);
+        LOG_ERROR("sql.sql", "Creature::Create(): creature template (guidlow: %u, entry: %u) does not exist.", guidlow, Entry);
         return false;
     }
 
@@ -1380,7 +1380,7 @@ bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const
     CreatureTemplate const* normalInfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!normalInfo)
     {
-        LOG_INFO("sql.sql", "Creature::CreateFromProto(): creature template (guidlow: %u, entry: %u) does not exist.", guidlow, Entry);
+        LOG_ERROR("sql.sql", "Creature::CreateFromProto(): creature template (guidlow: %u, entry: %u) does not exist.", guidlow, Entry);
         return false;
     }
 
@@ -1430,7 +1430,7 @@ bool Creature::LoadCreatureFromDB(uint32 guid, Map* map, bool addToMap, bool gri
 
     if (!data)
     {
-        LOG_INFO("sql.sql", "Creature (GUID: %u) not found in table `creature`, can't load. ", guid);
+        LOG_ERROR("sql.sql", "Creature (GUID: %u) not found in table `creature`, can't load. ", guid);
         return false;
     }
 
@@ -2393,7 +2393,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
             SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(*itr);
             if (!AdditionalSpellInfo)
             {
-                LOG_INFO("sql.sql", "Creature (GUID: %u Entry: %u) has wrong spell %u defined in `auras` field.", GetGUIDLow(), GetEntry(), *itr);
+                LOG_ERROR("sql.sql", "Creature (GUID: %u Entry: %u) has wrong spell %u defined in `auras` field.", GetGUIDLow(), GetEntry(), *itr);
                 continue;
             }
 
@@ -2401,7 +2401,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
             if (HasAura(*itr))
             {
                 if (!reload)
-                    LOG_INFO("sql.sql", "Creature (GUID: %u Entry: %u) has duplicate aura (spell %u) in `auras` field.", GetGUIDLow(), GetEntry(), *itr);
+                    LOG_ERROR("sql.sql", "Creature (GUID: %u Entry: %u) has duplicate aura (spell %u) in `auras` field.", GetGUIDLow(), GetEntry(), *itr);
 
                 continue;
             }

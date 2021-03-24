@@ -239,7 +239,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
         // Delete member if character information is missing
         if (fields[6].GetString().empty())
         {
-            LOG_INFO("sql.sql", "ArenaTeam %u has member with empty name - probably player %u doesn't exist, deleting him from memberlist!", arenaTeamId, GUID_LOPART(newMember.Guid));
+            LOG_ERROR("sql.sql", "ArenaTeam %u has member with empty name - probably player %u doesn't exist, deleting him from memberlist!", arenaTeamId, GUID_LOPART(newMember.Guid));
             this->DelMember(newMember.Guid, true);
             continue;
         }

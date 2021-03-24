@@ -2822,7 +2822,7 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
         CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(creatureEntry);
         if (!ci)
         {
-            LOG_INFO("sql.sql", "AuraMounted: `creature_template`='%u' not found in database (only need its modelid)", GetMiscValue());
+            LOG_ERROR("sql.sql", "AuraMounted: `creature_template`='%u' not found in database (only need its modelid)", GetMiscValue());
             return;
         }
 
