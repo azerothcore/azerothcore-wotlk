@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,22 +8,22 @@
     \ingroup Trinityd
 */
 
+#include "AccountMgr.h"
 #include "Common.h"
 #include "Configuration/Config.h"
 #include "Database/DatabaseEnv.h"
-#include "AccountMgr.h"
+#include "Duration.h"
 #include "Log.h"
 #include "RASocket.h"
-#include "Util.h"
-#include "Duration.h"
-#include "World.h"
-#include "SHA1.h"
 #include "ServerMotd.h"
+#include "SRP6.h"
+#include "Util.h"
+#include "World.h"
 #include <thread>
 
 RASocket::RASocket()
 {
-    _minLevel = uint8(sConfigMgr->GetIntDefault("RA.MinLevel", 3));
+    _minLevel = uint8(sConfigMgr->GetOption<int32>("RA.MinLevel", 3));
     _commandExecuting = false;
 }
 
@@ -212,22 +212,21 @@ int RASocket::check_password(const std::string& user, const std::string& pass)
     std::string safe_pass = pass;
     Utf8ToUpperOnlyLatin(safe_pass);
 
-    std::string hash = AccountMgr::CalculateShaPassHash(safe_user, safe_pass);
-
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_CHECK_PASSWORD_BY_NAME);
 
     stmt->setString(0, safe_user);
-    stmt->setString(1, hash);
 
-    PreparedQueryResult result = LoginDatabase.Query(stmt);
-
-    if (!result)
+    if (PreparedQueryResult result = LoginDatabase.Query(stmt))
     {
-        sLog->outRemote("Wrong password for user: %s", user.c_str());
-        return -1;
+        acore::Crypto::SRP6::Salt salt = (*result)[0].GetBinary<acore::Crypto::SRP6::SALT_LENGTH>();
+        acore::Crypto::SRP6::Verifier verifier = (*result)[1].GetBinary<acore::Crypto::SRP6::VERIFIER_LENGTH>();
+
+        if (acore::Crypto::SRP6::CheckLogin(safe_user, safe_pass, salt, verifier))
+            return 0;
     }
 
-    return 0;
+    sLog->outRemote("Wrong password for user: %s", user.c_str());
+    return -1;
 }
 
 int RASocket::authenticate()

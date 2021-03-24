@@ -5,8 +5,8 @@
 #ifndef GRUULS_LAIR_H_
 #define GRUULS_LAIR_H_
 
-#include "SpellAuraEffects.h"
 #include "CreatureAI.h"
+#include "SpellAuraEffects.h"
 
 enum DataTypes
 {

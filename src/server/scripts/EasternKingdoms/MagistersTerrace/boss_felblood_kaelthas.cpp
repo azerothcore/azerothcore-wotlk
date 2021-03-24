@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "magisters_terrace.h"
-#include "WorldPacket.h"
 #include "Opcodes.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "WorldPacket.h"
 
 enum Says
 {
@@ -220,7 +220,7 @@ public:
                     break;
                 case EVENT_SPELL_SHOCK_BARRIER:
                     me->CastSpell(me, SPELL_SHOCK_BARRIER, true);
-                    me->CastCustomSpell(SPELL_PYROBLAST, SPELLVALUE_MAX_TARGETS, 1, (Unit*)NULL, false);
+                    me->CastCustomSpell(SPELL_PYROBLAST, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
                     events.ScheduleEvent(EVENT_SPELL_SHOCK_BARRIER, 50000);
                     break;
                 case EVENT_SPELL_PHOENIX:

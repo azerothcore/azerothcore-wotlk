@@ -5,10 +5,10 @@
 #ifndef DEF_THE_EYE_H
 #define DEF_THE_EYE_H
 
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
-#include "Player.h"
 #include "GridNotifiers.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum EyeData
 {

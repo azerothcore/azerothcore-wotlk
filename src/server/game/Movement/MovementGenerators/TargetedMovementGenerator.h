@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,11 +7,11 @@
 #ifndef ACORE_TARGETEDMOVEMENTGENERATOR_H
 #define ACORE_TARGETEDMOVEMENTGENERATOR_H
 
-#include "MovementGenerator.h"
 #include "FollowerReference.h"
+#include "MovementGenerator.h"
+#include "PathGenerator.h"
 #include "Timer.h"
 #include "Unit.h"
-#include "PathGenerator.h"
 #include <optional>
 
 class TargetedMovementGeneratorBase
@@ -23,13 +23,12 @@ protected:
     FollowerReference i_target;
 };
 
-
 template<class T>
 class ChaseMovementGenerator : public MovementGeneratorMedium<T, ChaseMovementGenerator<T>>, public TargetedMovementGeneratorBase
 {
 public:
     ChaseMovementGenerator(Unit* target, std::optional<ChaseRange> range = {}, std::optional<ChaseAngle> angle = {})
-        : TargetedMovementGeneratorBase(target),  i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle) {}
+        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle) {}
     ~ChaseMovementGenerator() {}
 
     MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }
@@ -45,7 +44,7 @@ public:
     void unitSpeedChanged() { _lastTargetPosition.reset(); }
     Unit* GetTarget() const { return i_target.getTarget(); }
 
-    bool EnableWalking() const { return false;}
+    bool EnableWalking() const { return false; }
     bool HasLostTarget(Unit* unit) const { return unit->GetVictim() != this->GetTarget(); }
 
 private:
@@ -83,7 +82,7 @@ public:
     bool PositionOkay(T* owner, Unit* target, float range, std::optional<ChaseAngle> angle = {});
 
     static void _clearUnitStateMove(T* u) { u->ClearUnitState(UNIT_STATE_FOLLOW_MOVE); }
-    static void _addUnitStateMove(T* u)  { u->AddUnitState(UNIT_STATE_FOLLOW_MOVE); }
+    static void _addUnitStateMove(T* u) { u->AddUnitState(UNIT_STATE_FOLLOW_MOVE); }
 
     void _updateSpeed(T* owner);
 
