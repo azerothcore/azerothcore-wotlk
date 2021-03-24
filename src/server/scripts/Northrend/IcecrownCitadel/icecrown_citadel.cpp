@@ -3,19 +3,19 @@
 */
 
 #include "AccountMgr.h"
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "PassiveAI.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "SpellAuraEffects.h"
-#include "SmartAI.h"
 #include "Group.h"
 #include "icecrown_citadel.h"
+#include "ObjectMgr.h"
+#include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
+#include "SmartAI.h"
+#include "SpellAuraEffects.h"
 
 enum Texts
 {
@@ -1691,7 +1691,7 @@ public:
                 case 0:
                     break;
                 case 1: // Ice Trap
-                    me->CastSpell((Unit*)NULL, 71249, false);
+                    me->CastSpell((Unit*)nullptr, 71249, false);
                     events.RepeatEvent(urand(35000, 40000));
                     break;
                 case 2: // Rapid Shot
@@ -1734,7 +1734,7 @@ public:
                     events.RepeatEvent(urand(40000, 50000));
                     break;
                 case 33: // Twisted Winds
-                    me->CastSpell((Unit*)NULL, 71306, false);
+                    me->CastSpell((Unit*)nullptr, 71306, false);
                     events.RepeatEvent(urand(35000, 50000));
                     break;
                 case 41: // Empowered Shadow Bolt
@@ -1772,7 +1772,6 @@ public:
                 c->getThreatManager().resetAllAggro();
                 for (ThreatContainer::StorageType::const_iterator iter = me_tl.begin(); iter != me_tl.end(); ++iter)
                     c->getThreatManager().addThreat((*iter)->getTarget(), (*iter)->getThreat());
-
             }
         }
 
@@ -2346,7 +2345,6 @@ public:
     }
 };
 
-
 // pussywizard below:
 
 class spell_icc_web_wrap : public SpellScriptLoader
@@ -2538,7 +2536,7 @@ public:
         void HandleDummy()
         {
             for (uint8 i = 0; i < 10; ++i)
-                GetCaster()->CastSpell((Unit*)NULL, 70963, true);
+                GetCaster()->CastSpell((Unit*)nullptr, 70963, true);
         }
 
         void Register() override
@@ -2991,7 +2989,6 @@ public:
                 else
                     break;
             }
-
         }
 
         bool CanAIAttack(Unit const* target) const override
@@ -3319,8 +3316,6 @@ public:
         npc_icc_nerubar_broodkeeperAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetDisableGravity(true);
-            me->SetCanFly(true);
-            me->SetHover(true);
             _didWebBeam = false;
             me->m_SightDistance = 100.0f; // for MoveInLineOfSight distance
         }
@@ -3341,16 +3336,18 @@ public:
             if (!_didWebBeam && who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2d(who) < 70.0f)
             {
                 _didWebBeam = true;
-                float nx = me->GetPositionX() + cos(me->GetOrientation()) * 2.0f;
-                float ny = me->GetPositionY() + sin(me->GetOrientation()) * 2.0f;
-                float nz = me->GetMap()->GetHeight(nx, ny, 50.0f);
+                float nx = me->GetPositionX();
+                float ny = me->GetPositionY();
+                float nz = me->GetFloorZ();
                 me->SetHomePosition(nx, ny, nz, me->GetOrientation());
                 me->CastSpell(me, SPELL_WEB_BEAM, false);
                 me->GetMotionMaster()->MovePoint(1, nx, ny, nz, false);
                 return;
             }
-            if (me->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY))
+
+            if (me->IsLevitating())
                 return;
+
             ScriptedAI::MoveInLineOfSight(who);
         }
 
@@ -3361,11 +3358,9 @@ public:
 
         void JustReachedHome() override
         {
-            if (me->IsHovering())
+            if (me->IsLevitating())
             {
                 me->SetDisableGravity(false);
-                me->SetCanFly(false);
-                me->SetHover(false);
                 me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
             }
         }
@@ -3374,11 +3369,10 @@ public:
         {
             if (type == POINT_MOTION_TYPE && id == 1)
             {
-                if (me->IsHovering())
+                if (me->IsLevitating())
                 {
                     me->SetDisableGravity(false);
-                    me->SetCanFly(false);
-                    me->SetHover(false);
+                    me->SetOrientation(0.0f);
                     me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
                 }
             }
@@ -3386,7 +3380,7 @@ public:
 
         bool CanAIAttack(const Unit*  /*target*/) const override
         {
-            return !me->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY);
+            return !me->IsLevitating();
         }
 
         void UpdateAI(uint32 diff) override
@@ -3461,7 +3455,6 @@ public:
             for (uint8 i = 0; i < 30; ++i)
                 events.ScheduleEvent(EVENT_SUMMON_BROODLING, 10000 + i * 350);
         }
-
 
         void SummonBroodling()
         {

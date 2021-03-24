@@ -344,7 +344,6 @@ void ModelHeader::Read(FILE* stream)
 
     if (count != 51)
         printf("ModelHeader::Read: Failed to read some data expected 51, read %d\n", count);
-
 }
 
 WorldModelHeader WorldModelHeader::Read(FILE* stream)

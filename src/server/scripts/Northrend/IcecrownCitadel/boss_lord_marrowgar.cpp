@@ -2,14 +2,14 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuras.h"
-#include "MapManager.h"
 #include "icecrown_citadel.h"
+#include "MapManager.h"
+#include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
 #include "Vehicle.h"
 #include <random>
 
@@ -42,7 +42,6 @@ enum Spells
     SPELL_COLDFLAME_PASSIVE     = 69145,
     SPELL_COLDFLAME_SUMMON      = 69147,
 };
-
 
 enum Events
 {
@@ -171,7 +170,7 @@ public:
                     break;
                 case EVENT_SPELL_COLDFLAME:
                     if (!me->HasAura(SPELL_BONE_STORM))
-                        me->CastSpell((Unit*)NULL, SPELL_COLDFLAME_NORMAL, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_COLDFLAME_NORMAL, false);
                     events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_COLDFLAME_BONE_STORM:

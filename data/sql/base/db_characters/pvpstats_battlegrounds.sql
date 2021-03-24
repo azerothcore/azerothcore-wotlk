@@ -6,13 +6,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `pvpstats_battlegrounds`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `pvpstats_battlegrounds` 
 (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `winner_faction` tinyint(4) NOT NULL,
-  `bracket_id` tinyint(3) unsigned NOT NULL,
-  `type` tinyint(3) unsigned NOT NULL,
+  `id` BIGINT unsigned NOT NULL AUTO_INCREMENT,
+  `winner_faction` TINYINT NOT NULL,
+  `bracket_id` TINYINT unsigned NOT NULL,
+  `type` TINYINT unsigned NOT NULL,
   `date` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

@@ -6,6 +6,7 @@
 #define DEF_EYE_OF_ETERNITY_H
 
 #include "Chat.h"
+#include "CreatureAIImpl.h"
 
 enum Objects
 {

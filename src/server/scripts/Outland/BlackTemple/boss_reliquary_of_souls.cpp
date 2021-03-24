@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "black_temple.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 
 enum Says
@@ -192,7 +192,6 @@ public:
         }
 
         void AttackStart(Unit*) override { }
-
 
         void JustDied(Unit* killer) override
         {
@@ -561,7 +560,6 @@ public:
                     }
                     events.ScheduleEvent(EVENT_ANGER_SEETHE, 1000);
                     break;
-
             }
 
             DoMeleeAttackIfReady();

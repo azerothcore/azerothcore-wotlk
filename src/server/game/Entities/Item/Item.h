@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -8,10 +8,10 @@
 #define AZEROTHCORE_ITEM_H
 
 #include "Common.h"
-#include "Object.h"
-#include "LootMgr.h"
-#include "ItemTemplate.h"
 #include "DatabaseEnv.h"
+#include "ItemTemplate.h"
+#include "LootMgr.h"
+#include "Object.h"
 
 class SpellInfo;
 class Bag;
@@ -132,12 +132,15 @@ enum BuyResult
 
 enum SellResult
 {
-    SELL_ERR_CANT_FIND_ITEM                      = 1,
-    SELL_ERR_CANT_SELL_ITEM                      = 2,       // merchant doesn't like that item
-    SELL_ERR_CANT_FIND_VENDOR                    = 3,       // merchant doesn't like you
-    SELL_ERR_YOU_DONT_OWN_THAT_ITEM              = 4,       // you don't own that item
-    SELL_ERR_UNK                                 = 5,       // nothing appears...
-    SELL_ERR_ONLY_EMPTY_BAG                      = 6        // can only do with empty bags
+    SELL_ERR_CANT_FIND_ITEM                      = 1,       // The item was not found.
+    SELL_ERR_CANT_SELL_ITEM                      = 2,       // The merchant doesn't want that item.
+    SELL_ERR_CANT_FIND_VENDOR                    = 3,       // The merchant doesn't like you.
+    SELL_ERR_YOU_DONT_OWN_THAT_ITEM              = 4,       // You don't own that item.
+    SELL_ERR_UNK                                 = 5,       // Nothing appears...
+    SELL_ERR_ONLY_EMPTY_BAG                      = 6,       // You can only do that with empty bags.
+    SELL_ERR_CANT_SELL_TO_THIS_MERCHANT          = 7,       // You cannot sell items to this merchant.
+    SELL_ERR_MUST_REPAIR_ITEM_DURABILITY_TO_USE  = 8,       // You must repair that item's durability to use it.
+    SELL_INTERNAL_BAG_ERROR                      = 9        // Internal Bag Error
 };
 
 // -1 from client enchantment slot number

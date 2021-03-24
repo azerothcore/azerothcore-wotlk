@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -9,6 +9,7 @@
 
 #include "Common.h"
 #include <map>
+#include <utility>
 
 struct AuctionEntry;
 struct CalendarEvent;
@@ -110,8 +111,8 @@ public:                                                 // Constructors
     explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
         : m_mailTemplateId(mailTemplateId), m_mailTemplateItemsNeed(need_items), m_money(0), m_COD(0)
     {}
-    MailDraft(std::string const& subject, std::string const& body)
-        : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(subject), m_body(body), m_money(0), m_COD(0) {}
+    MailDraft(std::string  subject, std::string  body)
+        : m_mailTemplateId(0), m_mailTemplateItemsNeed(false), m_subject(std::move(subject)), m_body(std::move(body)), m_money(0), m_COD(0) {}
 public:                                                 // Accessors
     [[nodiscard]] uint16 GetMailTemplateId() const { return m_mailTemplateId; }
     [[nodiscard]] std::string const& GetSubject() const { return m_subject; }

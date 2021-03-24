@@ -3,10 +3,10 @@
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  */
 
-#include "ServerMotd.h"
 #include "Common.h"
-#include "ScriptMgr.h"
 #include "Opcodes.h"
+#include "ScriptMgr.h"
+#include "ServerMotd.h"
 #include "Util.h"
 #include "WorldPacket.h"
 #include <iterator>

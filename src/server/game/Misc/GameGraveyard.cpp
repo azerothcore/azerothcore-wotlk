@@ -1,8 +1,8 @@
-#include "GameGraveyard.h"
-#include "MapManager.h"
-#include "DBCStores.h"
 #include "DatabaseEnv.h"
+#include "DBCStores.h"
+#include "GameGraveyard.h"
 #include "Log.h"
+#include "MapManager.h"
 
 Graveyard* Graveyard::instance()
 {
@@ -50,7 +50,6 @@ void Graveyard::LoadGraveyardFromDB()
         _graveyardStore[ID] = Graveyard;
 
         ++Count;
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %i graveyard in %u ms", Count, GetMSTimeDiffToNow(oldMSTime));
@@ -347,7 +346,6 @@ void Graveyard::LoadGraveyardZones()
 
         if (!AddGraveyardLink(safeLocId, zoneId, teamId, false))
             sLog->outErrorDb("Table `graveyard_zone` has a duplicate record for Graveyard (ID: %u) and Zone (ID: %u), skipped.", safeLocId, zoneId);
-
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u graveyard-zone links in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -370,7 +368,7 @@ GraveyardStruct const* Graveyard::GetGraveyard(const std::string& name) const
     {
         if (itr->second.wnameLow == wname)
             return &itr->second;
-        else if (alt == NULL && itr->second.wnameLow.find(wname) != std::wstring::npos)
+        else if (alt == nullptr && itr->second.wnameLow.find(wname) != std::wstring::npos)
             alt = &itr->second;
     }
 

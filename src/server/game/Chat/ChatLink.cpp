@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "ChatLink.h"
-#include "SpellMgr.h"
+#include "DBCStores.h"
 #include "ObjectMgr.h"
 #include "SpellInfo.h"
-#include "DBCStores.h"
+#include "SpellMgr.h"
 
 // Supported shift-links (client generated and server side)
 // |color|Hachievement:achievement_id:player_guid:0:0:0:0:0:0:0:0|h[name]|h|r
@@ -173,7 +173,7 @@ bool ItemChatLink::Initialize(std::istringstream& iss)
 inline std::string ItemChatLink::FormatName(uint8 index, ItemLocale const* locale, char* const* suffixStrings) const
 {
     std::stringstream ss;
-    if (locale == NULL || index >= locale->Name.size())
+    if (locale == nullptr || index >= locale->Name.size())
         ss << _item->Name1;
     else
         ss << locale->Name[index];
@@ -188,7 +188,7 @@ bool ItemChatLink::ValidateName(char* buffer, const char* context)
 
     char* const* suffixStrings = _suffix ? _suffix->nameSuffix : (_property ? _property->nameSuffix : nullptr);
 
-    bool res = (FormatName(LOCALE_enUS, NULL, suffixStrings) == buffer);
+    bool res = (FormatName(LOCALE_enUS, nullptr, suffixStrings) == buffer);
 
     if (!res)
     {

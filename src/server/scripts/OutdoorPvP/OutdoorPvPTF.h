@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -113,7 +113,6 @@ enum TFTowerStates
 class OPvPCapturePointTF : public OPvPCapturePoint
 {
 public:
-
     OPvPCapturePointTF(OutdoorPvP* pvp, OutdoorPvPTF_TowerType type);
 
     bool Update(uint32 diff) override;
@@ -131,7 +130,6 @@ public:
     void UpdateTowerState();
 
 protected:
-
     OutdoorPvPTF_TowerType m_TowerType;
 
     uint32 m_TowerState;
@@ -140,7 +138,6 @@ protected:
 class OutdoorPvPTF : public OutdoorPvP
 {
 public:
-
     OutdoorPvPTF();
 
     bool SetupOutdoorPvP() override;
@@ -163,7 +160,6 @@ public:
     bool IsLocked() const;
 
 private:
-
     bool m_IsLocked;
     uint32 m_LockTimer;
     uint32 m_LockTimerUpdate;

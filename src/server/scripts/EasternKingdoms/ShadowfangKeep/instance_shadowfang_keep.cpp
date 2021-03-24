@@ -2,11 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
+#include "ScriptMgr.h"
 #include "shadowfang_keep.h"
 #include "TemporarySummon.h"
-
 
 enum Creatures
 {
@@ -15,7 +14,6 @@ enum Creatures
     NPC_ARCHMAGE_ARUGAL     = 4275,
     NPC_ARUGAL_VOIDWALKER   = 4627
 };
-
 
 class instance_shadowfang_keep : public InstanceMapScript
 {
@@ -99,7 +97,6 @@ public:
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
     };
-
 };
 
 class spell_shadowfang_keep_haunting_spirits : public SpellScriptLoader
@@ -119,7 +116,7 @@ public:
 
         void HandleDummyTick(AuraEffect const* aurEff)
         {
-            GetTarget()->CastSpell((Unit*)NULL, aurEff->GetAmount(), true);
+            GetTarget()->CastSpell((Unit*)nullptr, aurEff->GetAmount(), true);
         }
 
         void HandleUpdatePeriodic(AuraEffect* aurEff)

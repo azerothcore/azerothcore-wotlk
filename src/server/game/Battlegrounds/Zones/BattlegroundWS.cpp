@@ -2,17 +2,17 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
+#include "BattlegroundMgr.h"
 #include "BattlegroundWS.h"
 #include "Creature.h"
+#include "GameGraveyard.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "Object.h"
 #include "ObjectMgr.h"
-#include "BattlegroundMgr.h"
 #include "Player.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "GameGraveyard.h"
 
 BattlegroundWS::BattlegroundWS()
 {
@@ -70,18 +70,18 @@ void BattlegroundWS::PostUpdateImpl(uint32 diff)
                 RespawnFlagAfterDrop(TEAM_HORDE);
                 break;
             case BG_WS_EVENT_BOTH_FLAGS_KEPT10:
-                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)NULL))
+                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)nullptr))
                     player->CastSpell(player, BG_WS_SPELL_FOCUSED_ASSAULT, true);
-                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)NULL))
+                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)nullptr))
                     player->CastSpell(player, BG_WS_SPELL_FOCUSED_ASSAULT, true);
                 break;
             case BG_WS_EVENT_BOTH_FLAGS_KEPT15:
-                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)NULL))
+                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)nullptr))
                 {
                     player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
                     player->CastSpell(player, BG_WS_SPELL_BRUTAL_ASSAULT, true);
                 }
-                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)NULL))
+                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)nullptr))
                 {
                     player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
                     player->CastSpell(player, BG_WS_SPELL_BRUTAL_ASSAULT, true);
@@ -405,7 +405,6 @@ bool BattlegroundWS::SetupBattleground()
     AddObject(BG_WS_OBJECT_DOOR_H_3, BG_OBJECT_DOOR_H_3_WS_ENTRY, 949.9523f, 1422.751f, 344.9273f, 0.0f, 0, 0, 0, 1, RESPAWN_IMMEDIATELY);
     AddObject(BG_WS_OBJECT_DOOR_H_4, BG_OBJECT_DOOR_H_4_WS_ENTRY, 950.7952f, 1459.583f, 342.1523f, 0.05235988f, 0, 0, 0.02617695f, 0.9996573f, RESPAWN_IMMEDIATELY);
 
-
     GraveyardStruct const* sg = sGraveyard->GetGraveyard(WS_GRAVEYARD_MAIN_ALLIANCE);
     AddSpiritGuide(WS_SPIRIT_MAIN_ALLIANCE, sg->x, sg->y, sg->z, 3.124139f, TEAM_ALLIANCE);
 
@@ -541,12 +540,12 @@ uint32 BattlegroundWS::GetAssaultSpellId() const
 
 void BattlegroundWS::RemoveAssaultAuras()
 {
-    if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)NULL))
+    if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)nullptr))
     {
         player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
         player->RemoveAurasDueToSpell(BG_WS_SPELL_BRUTAL_ASSAULT);
     }
-    if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)NULL))
+    if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)nullptr))
     {
         player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
         player->RemoveAurasDueToSpell(BG_WS_SPELL_BRUTAL_ASSAULT);

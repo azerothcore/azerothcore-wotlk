@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
+#include "icecrown_citadel.h"
+#include "InstanceScript.h"
+#include "Player.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
-#include "InstanceScript.h"
-#include "icecrown_citadel.h"
 #include "Spell.h"
-#include "Player.h"
 
 #define GOSSIP_SENDER_ICC_PORT 631
 

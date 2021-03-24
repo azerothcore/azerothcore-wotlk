@@ -5,11 +5,11 @@
 #ifndef SUNWELL_PLATEAU_H
 #define SUNWELL_PLATEAU_H
 
-#include "Player.h"
-#include "SpellScript.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
 #include "CreatureAIImpl.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum DataTypes
 {
@@ -52,7 +52,6 @@ enum CreatureIds
     NPC_DARKNESS                            = 25879,
     NPC_VOID_SENTINEL                       = 25772,
     NPC_VOID_SPAWN                          = 25824,
-
 
     NPC_KILJAEDEN_CONTROLLER                = 25608,
     NPC_KILJAEDEN                           = 25315,

@@ -7,19 +7,18 @@
 #ifndef MPQ_H
 #define MPQ_H
 
-#include "loadlib/loadlib.h"
 #include "libmpq/mpq.h"
-#include <string.h>
-#include <ctype.h>
-#include <vector>
-#include <iostream>
+#include "loadlib/loadlib.h"
+#include <cctype>
+#include <cstring>
 #include <deque>
+#include <iostream>
+#include <vector>
 
 using namespace std;
 
 class MPQArchive
 {
-
 public:
     mpq_archive_s* mpq_a;
 
