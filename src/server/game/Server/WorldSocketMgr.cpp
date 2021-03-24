@@ -12,7 +12,6 @@
 #include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
-// #include "Errors.h"
 #include "Log.h"
 #include "ScriptMgr.h"
 #include "WorldSocket.h"
