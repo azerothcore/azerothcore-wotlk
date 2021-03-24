@@ -407,71 +407,37 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 (21504,22,0,'esMX','Me aburro en tu intento de curar la tierra y sofocar las energías que convocan y vuelven locos a los colosos. ¡Goliathon rey de los colosos, el príncipe Kael’thas y yo exigimos que defiendas el cristal!'),
 (21504,23,0,'esMX','Nos volveremos a encontrar, pronto.');
 
-UPDATE `quest_template_locale` SET `ObjectiveText1` = "Jules vengado" WHERE `ID` = 10909 AND `locale` IN ('esES');
-UPDATE `quest_template_locale` SET `ObjectiveText1` = "Jules vengado" WHERE `ID` = 10909 AND `locale` IN ('esMX');
+UPDATE `quest_template_locale` SET `ObjectiveText1` = "Jules vengado" WHERE `ID` = 10909 AND `locale` IN ('esES','esMX');
 
-UPDATE `quest_template_locale` SET `ObjectiveText1` = "Esqueleto pisoteado purificado" WHERE `ID` = 10047 AND `locale` IN ('esES');
-UPDATE `quest_template_locale` SET `ObjectiveText1` = "Esqueleto pisoteado purificado" WHERE `ID` = 10047 AND `locale` IN ('esMX');
-
+UPDATE `quest_template_locale` SET `ObjectiveText1` = "Esqueleto pisoteado purificado" WHERE `ID` = 10047 AND `locale` IN ('esES','esMX');
 
 UPDATE `quest_template_locale` SET
 `ObjectiveText1` = "Torre norte marcada",
 `ObjectiveText2` = "Torre sur marcada",
 `ObjectiveText3` = "Torre de forja marcada",
 `ObjectiveText4` = "Torre falda de la colina marcada"
-WHERE `ID` = 10895 AND `locale` IN ('esES');
+WHERE `ID` = 10895 AND `locale` IN ('esES,esMX');
 
+UPDATE `quest_template_locale` SET `ObjectiveText1` = "Presencia de Aggonar limpiada" WHERE `ID` = 9427 AND `locale` IN ('esES','esMX');
 
-UPDATE `quest_template_locale` SET
-`ObjectiveText1` = "Torre norte marcada",
-`ObjectiveText2` = "Torre sur marcada",
-`ObjectiveText3` = "Torre de forja marcada",
-`ObjectiveText4` = "Torre falda de la colina marcada"
-WHERE `ID` = 10895 AND `locale` IN ('esMX');
+UPDATE `quest_template_locale` SET `ObjectiveText1` = "Visión concedida" WHERE `ID` = 9545 AND `locale` IN ('esES','esMX');
 
+UPDATE `quest_template_locale` SET `ObjectiveText1` = "Administrar antídoto" WHERE `ID` = 10255 AND `locale` IN ('esES','esMX');
 
-UPDATE `quest_template_locale` SET `ObjectiveText1` = "Presencia de Aggonar limpiada" WHERE `ID` = 9427 AND `locale` IN ('esES');
-UPDATE `quest_template_locale` SET `ObjectiveText1` = "Presencia de Aggonar limpiada" WHERE `ID` = 9427 AND `locale` IN ('esMX');
-
-UPDATE `quest_template_locale` SET `ObjectiveText1` = "Visión concedida" WHERE `ID` = 9545 AND `locale` IN ('esES');
-UPDATE `quest_template_locale` SET `ObjectiveText1` = "Visión concedida" WHERE `ID` = 9545 AND `locale` IN ('esMX');
-
-UPDATE `quest_template_locale` SET `ObjectiveText1` = "Administrar antídoto" WHERE `ID` = 10255 AND `locale` IN ('esES');
-UPDATE `quest_template_locale` SET `ObjectiveText1` = "Administrar antídoto" WHERE `ID` = 10255 AND `locale` IN ('esMX');
-
-UPDATE `quest_template_locale` SET `ObjectiveText1` = "Cresta Cielo Estrellado revitalizada" WHERE `ID` = 10351 AND `locale` IN ('esES');
-UPDATE `quest_template_locale` SET `ObjectiveText1` = "Cresta Cielo Estrellado revitalizada" WHERE `ID` = 10351 AND `locale` IN ('esMX');
+UPDATE `quest_template_locale` SET `ObjectiveText1` = "Cresta Cielo Estrellado revitalizada" WHERE `ID` = 10351 AND `locale` IN ('esES','esMX');
 
 UPDATE `quest_template_locale` SET
 `ObjectiveText1` = "Morod liberado",
 `ObjectiveText2` = "Akoru liberado",
 `ObjectiveText3` = "Aylaan liberado"
-WHERE `ID` = 10368 AND `locale` IN ('esES');
+WHERE `ID` = 10368 AND `locale` IN ('esES','esMX');
 
-
-UPDATE `quest_template_locale` SET
-`ObjectiveText1` = "Morod liberado",
-`ObjectiveText2` = "Akoru liberado",
-`ObjectiveText3` = "Aylaan liberado"
-WHERE `ID` = 10368 AND `locale` IN ('esMX');
-
-
-UPDATE `quest_template_locale` SET `ObjectiveText2` = "Cerrar la Puerta de la Legión Ardiente" WHERE `ID` = 10397 AND `locale` IN ('esES');
-UPDATE `quest_template_locale` SET `ObjectiveText2` = "Cerrar la Puerta de la Legión Ardiente" WHERE `ID` = 10397 AND `locale` IN ('esMX');
-
+UPDATE `quest_template_locale` SET `ObjectiveText2` = "Cerrar la Puerta de la Legión Ardiente" WHERE `ID` = 10397 AND `locale` IN ('esES','esMX');
 
 UPDATE `quest_template_locale` SET
 `ObjectiveText1` = "Manni Salvado",
 `ObjectiveText2` = "Moh Salvado",
 `ObjectiveText3` = "Jakk Salvado"
-WHERE `ID` = 10238 AND `locale` IN ('esES');
+WHERE `ID` = 10238 AND `locale` IN ('esES','esMX');
 
-UPDATE `quest_template_locale` SET
-`ObjectiveText1` = "Manni Salvado",
-`ObjectiveText2` = "Moh Salvado",
-`ObjectiveText3` = "Jakk Salvado"
-WHERE `ID` = 10238 AND `locale` IN ('esMX');
-
-
-UPDATE `creature_template_locale` SET `Title` = "Bibliotecario" WHERE `entry` = 951 AND `locale` IN ('esES');
-UPDATE `creature_template_locale` SET `Title` = "Bibliotecario" WHERE `entry` = 951 AND `locale` IN ('esMX');
+UPDATE `creature_template_locale` SET `Title` = "Bibliotecario" WHERE `entry` = 951 AND `locale` IN ('esES','esMX');
