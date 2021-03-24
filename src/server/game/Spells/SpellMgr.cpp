@@ -4698,7 +4698,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // WintergraspCannon - Spell Fire Cannon - RangeIndex
     ApplySpellFix({ 51422 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->rangeIndex = 187; // "300yd"
+        spellInfo->RangeIndex = 187; // "300yd"
     });
 
     // WintergraspCatapult - Spell Plague Barrell - Range
