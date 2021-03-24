@@ -15,6 +15,7 @@
 #define MAX_SEARCHER_DISTANCE       150.0f // pussywizard: replace the use of MAX_VISIBILITY_DISTANCE in searchers, because MAX_VISIBILITY_DISTANCE is quite too big for this purpose
 #define MAX_VISIBILITY_DISTANCE     250.0f // max distance for visible objects, experimental
 #define VISIBILITY_INC_FOR_GOBJECTS 30.0f // pussywizard
+#define VISIBILITY_INC_FOR_WGUNITS  320.0f // max visibility distance for wg units like cannons, vehicles etc
 #define VISIBILITY_COMPENSATION     15.0f // increase searchers
 #define SPELL_SEARCHER_COMPENSATION 30.0f // increase searchers size in case we have large npc near cell border
 #define VISIBILITY_DIST_WINTERGRASP 175.0f

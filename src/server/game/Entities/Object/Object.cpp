@@ -1588,8 +1588,13 @@ float WorldObject::GetGridActivationRange() const
 
 float WorldObject::GetVisibilityRange() const
 {
-    if (IsVisibilityOverridden() && GetTypeId() == TYPEID_UNIT)
-        return MAX_VISIBILITY_DISTANCE;
+    if (GetTypeId() == TYPEID_UNIT)
+    {
+        if (IsInWintergrasp() && IsVisibilityOverridden())
+            return VISIBILITY_INC_FOR_WGUNITS;
+        else if (IsVisibilityOverridden())
+            return MAX_VISIBILITY_DISTANCE;
+    }
     else if (GetTypeId() == TYPEID_GAMEOBJECT)
     {
         if (IsInWintergrasp())
@@ -1611,9 +1616,12 @@ float WorldObject::GetSightRange(const WorldObject* target) const
         {
             if (target)
             {
-                if (target->IsVisibilityOverridden() && target->GetTypeId() == TYPEID_UNIT)
+                if (target->GetTypeId() == TYPEID_UNIT)
                 {
-                    return MAX_VISIBILITY_DISTANCE;
+                    if (IsInWintergrasp() && target->IsInWintergrasp() && target->IsVisibilityOverridden())
+                        return VISIBILITY_INC_FOR_WGUNITS;
+                    else if (target->IsVisibilityOverridden())
+                        return MAX_VISIBILITY_DISTANCE;
                 }
                 else if (target->GetTypeId() == TYPEID_GAMEOBJECT)
                 {
