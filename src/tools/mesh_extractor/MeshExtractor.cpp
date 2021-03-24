@@ -166,7 +166,6 @@ void ExtractGameobjectModels()
                 fwrite(indices, sizeof(uint16), numTris, output);
             }
 
-
             fwrite("VERT", 4, 1, output);
             wsize = sizeof(int) + sizeof(float) * 3 * numVerts;
             fwrite(&wsize, sizeof(int), 1, output);
@@ -400,7 +399,7 @@ int main(int argc, char* argv[])
         m_epos[2] = -end[0];
 
         //
-        dtQueryFilter m_filter;
+        dtQueryFilterExt m_filter;
         m_filter.setIncludeFlags(Constants::POLY_AREA_ROAD | Constants::POLY_AREA_TERRAIN);
         m_filter.setExcludeFlags(Constants::POLY_AREA_WATER);
 

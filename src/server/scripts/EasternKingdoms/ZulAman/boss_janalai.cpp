@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,11 +11,11 @@ SDComment:
 SDCategory: Zul'Aman
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "zulaman.h"
-#include "GridNotifiers.h"
 #include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "zulaman.h"
 
 enum Yells
 {
@@ -99,7 +99,6 @@ float hatcherway[2][5][3] =
 class boss_janalai : public CreatureScript
 {
 public:
-
     boss_janalai()
         : CreatureScript("boss_janalai")
     {
@@ -444,7 +443,6 @@ public:
 class npc_janalai_firebomb : public CreatureScript
 {
 public:
-
     npc_janalai_firebomb()
         : CreatureScript("npc_janalai_firebomb")
     {
@@ -468,7 +466,6 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
 
-
         void UpdateAI(uint32 /*diff*/) override { }
     };
 
@@ -481,7 +478,6 @@ public:
 class npc_janalai_hatcher : public CreatureScript
 {
 public:
-
     npc_janalai_hatcher()
         : CreatureScript("npc_janalai_hatcher")
     {
@@ -599,7 +595,6 @@ public:
                     }
                     else
                         me->DisappearAndDie();
-
                 }
                 else WaitTimer -= diff;
             }
@@ -615,7 +610,6 @@ public:
 class npc_janalai_hatchling : public CreatureScript
 {
 public:
-
     npc_janalai_hatchling()
         : CreatureScript("npc_janalai_hatchling")
     {
@@ -698,7 +692,6 @@ public:
             }
         }
     };
-
 };
 
 void AddSC_boss_janalai()
@@ -709,4 +702,3 @@ void AddSC_boss_janalai()
     new npc_janalai_hatchling();
     new npc_janalai_egg();
 }
-

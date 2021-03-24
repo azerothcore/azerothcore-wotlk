@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * This program is free software you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation either version 2 of the License, or (at your
@@ -14,17 +14,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ObjectDefines.h"
 #include "Containers.h"
-#include "DBCStructure.h"
 #include "DBCStores.h"
+#include "DBCStructure.h"
 #include "Group.h"
-#include "LFGQueue.h"
+#include "GroupMgr.h"
 #include "LFGMgr.h"
+#include "LFGQueue.h"
 #include "Log.h"
+#include "ObjectDefines.h"
 #include "ObjectMgr.h"
 #include "World.h"
-#include "GroupMgr.h"
 
 namespace lfg
 {

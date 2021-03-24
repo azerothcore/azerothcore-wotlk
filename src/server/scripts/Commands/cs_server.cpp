@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,14 +11,14 @@ Comment: All server related commands
 Category: commandscripts
 EndScriptData */
 
+#include "AvgDiffTracker.h"
 #include "Chat.h"
 #include "Config.h"
+#include "GitRevision.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "GitRevision.h"
-#include "AvgDiffTracker.h"
 #include "ServerMotd.h"
 
 class server_commandscript : public CommandScript
@@ -58,15 +58,15 @@ public:
             { "loglevel",       SEC_CONSOLE,        true,  &HandleServerSetLogLevelCommand,         "" },
             { "logfilelevel",   SEC_CONSOLE,        true,  &HandleServerSetLogFileLevelCommand,     "" },
             { "motd",           SEC_ADMINISTRATOR,  true,  &HandleServerSetMotdCommand,             "" },
-            { "closed",         SEC_ADMINISTRATOR,  true,  &HandleServerSetClosedCommand,           "" }
+            { "closed",         SEC_CONSOLE,        true,  &HandleServerSetClosedCommand,           "" }
         };
 
         static std::vector<ChatCommand> serverCommandTable =
         {
             { "corpses",        SEC_GAMEMASTER,     true,  &HandleServerCorpsesCommand,             "" },
             { "exit",           SEC_CONSOLE,        true,  &HandleServerExitCommand,                "" },
-            { "idlerestart",    SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverIdleRestartCommandTable },
-            { "idleshutdown",   SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverIdleShutdownCommandTable },
+            { "idlerestart",    SEC_CONSOLE,        true,  nullptr,                                 "", serverIdleRestartCommandTable },
+            { "idleshutdown",   SEC_CONSOLE,        true,  nullptr,                                 "", serverIdleShutdownCommandTable },
             { "info",           SEC_PLAYER,         true,  &HandleServerInfoCommand,                "" },
             { "motd",           SEC_PLAYER,         true,  &HandleServerMotdCommand,                "" },
             { "restart",        SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverRestartCommandTable },
@@ -111,7 +111,7 @@ public:
 
         if (handler->GetSession())
             if (Player* p = handler->GetSession()->GetPlayer())
-                if (p->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER))
+                if (p->IsDeveloper())
                     handler->PSendSysMessage("DEV wavg: %ums, nsmax: %ums, nsavg: %ums. LFG avg: %ums, max: %ums.", avgDiffTracker.getTimeWeightedAverage(), devDiffTracker.getMax(), devDiffTracker.getAverage(), lfgDiffTracker.getAverage(), lfgDiffTracker.getMax());
 
         //! Can't use sWorld->ShutdownMsg here in case of console command

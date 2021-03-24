@@ -2,12 +2,12 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "sunwell_plateau.h"
 
 enum Yells
@@ -156,7 +156,6 @@ public:
                 events2.ScheduleEvent(EVENT_INTRO_2, 3000);
         }
 
-
         void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))
@@ -277,7 +276,7 @@ public:
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     break;
                 case EVENT_LAND:
-                    me->GetMotionMaster()->MovePoint(POINT_GROUND, me->GetPositionX(), me->GetPositionY(), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), false, true);
+                    me->GetMotionMaster()->MovePoint(POINT_GROUND, me->GetPositionX(), me->GetPositionY(), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), false, true);
                     break;
                 case EVENT_SPELL_BERSERK:
                     Talk(YELL_BERSERK);
@@ -365,7 +364,6 @@ public:
                 case EVENT_LAND_FIGHT:
                     me->GetMotionMaster()->MovePoint(POINT_GROUND, 1500.0f, 552.8f, 26.52f, false, true);
                     break;
-
             }
 
             if (!me->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -242,7 +242,6 @@ class OutdoorPvPNA;
 class OPvPCapturePointNA : public OPvPCapturePoint
 {
 public:
-
     OPvPCapturePointNA(OutdoorPvP* pvp);
 
     bool Update(uint32 diff) override;
@@ -265,7 +264,6 @@ public:
     TeamId GetControllingFaction() const;
 
 protected:
-
     // called when a faction takes control
     void FactionTakeOver(TeamId teamId);
 
@@ -279,7 +277,6 @@ protected:
     void UpdateHalaaWorldState();
 
 private:
-
     bool m_capturable;
 
     uint32 m_GuardsAlive;
@@ -301,7 +298,6 @@ private:
 class OutdoorPvPNA : public OutdoorPvP
 {
 public:
-
     OutdoorPvPNA();
 
     bool SetupOutdoorPvP() override;
@@ -318,7 +314,6 @@ public:
     void HandleKillImpl(Player* player, Unit* killed) override;
 
 private:
-
     OPvPCapturePointNA* m_obj;
 };
 

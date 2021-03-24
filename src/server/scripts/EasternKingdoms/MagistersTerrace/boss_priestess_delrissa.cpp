@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "magisters_terrace.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Yells
 {
@@ -385,7 +385,6 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
                 RecalculateThreat();
                 events.ScheduleEvent(EVENT_HELPER_RESET_THREAT, urand(8000, 10000));
                 break;
-
         }
     }
 };
@@ -520,7 +519,6 @@ public:
 
     struct boss_ellris_duskhallowAI : public boss_priestess_lackey_commonAI
     {
-
         boss_ellris_duskhallowAI(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) { }
 
         void EnterCombat(Unit* who) override

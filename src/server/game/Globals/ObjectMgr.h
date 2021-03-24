@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,28 +7,28 @@
 #ifndef _OBJECTMGR_H
 #define _OBJECTMGR_H
 
-#include "Log.h"
-#include "Object.h"
 #include "Bag.h"
+#include "ConditionMgr.h"
+#include "Corpse.h"
 #include "Creature.h"
+#include "DatabaseEnv.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
-#include "TemporarySummon.h"
-#include "Corpse.h"
-#include "QuestDef.h"
 #include "ItemTemplate.h"
-#include "NPCHandler.h"
-#include "DatabaseEnv.h"
+#include "Log.h"
 #include "Mail.h"
 #include "Map.h"
+#include "NPCHandler.h"
+#include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectDefines.h"
+#include "QuestDef.h"
+#include "TemporarySummon.h"
 #include "VehicleDefines.h"
-#include <string>
-#include <map>
-#include <limits>
-#include "ConditionMgr.h"
 #include <functional>
+#include <limits>
+#include <map>
+#include <string>
 
 class Item;
 struct AccessRequirement;
@@ -421,7 +421,7 @@ struct AreaTrigger
 
 struct BroadcastText
 {
-    BroadcastText()  
+    BroadcastText()
     {
         MaleText.resize(DEFAULT_LOCALE + 1);
         FemaleText.resize(DEFAULT_LOCALE + 1);
@@ -972,6 +972,8 @@ public:
     void LoadCreatureLocales();
     void LoadCreatureTemplates();
     void LoadCreatureTemplateAddons();
+    void LoadCreatureTemplateResistances();
+    void LoadCreatureTemplateSpells();
     void CheckCreatureTemplate(CreatureTemplate const* cInfo);
     void LoadGameObjectQuestItems();
     void LoadCreatureQuestItems();

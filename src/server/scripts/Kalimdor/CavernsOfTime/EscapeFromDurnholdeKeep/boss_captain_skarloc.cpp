@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "old_hillsbrad.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum CaptainSkarloc
 {
@@ -198,13 +198,11 @@ public:
                     me->CastSpell(me, SPELL_CONSECRATION, false);
                     events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 20000);
                     break;
-
             }
 
             DoMeleeAttackIfReady();
         }
     };
-
 };
 
 void AddSC_boss_captain_skarloc()

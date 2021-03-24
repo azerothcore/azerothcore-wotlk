@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -51,9 +51,8 @@ inline uint32 GetMSTimeDiffToNow(uint32 oldMSTime)
 struct IntervalTimer
 {
 public:
-
     IntervalTimer()
-         
+
     {
     }
 
@@ -96,7 +95,6 @@ public:
     }
 
 private:
-
     time_t _interval{0};
     time_t _current{0};
 };
@@ -104,7 +102,6 @@ private:
 struct TimeTracker
 {
 public:
-
     TimeTracker(time_t expiry)
         : i_expiryTime(expiry)
     {
@@ -131,14 +128,12 @@ public:
     }
 
 private:
-
     time_t i_expiryTime;
 };
 
 struct TimeTrackerSmall
 {
 public:
-
     TimeTrackerSmall(uint32 expiry = 0)
         : i_expiryTime(expiry)
     {
@@ -165,14 +160,12 @@ public:
     }
 
 private:
-
     int32 i_expiryTime;
 };
 
 struct PeriodicTimer
 {
 public:
-
     PeriodicTimer(int32 period, int32 start_time)
         : i_period(period), i_expireTime(start_time)
     {
@@ -199,7 +192,6 @@ public:
     void TReset(int32 diff, int32 period)  { i_expireTime += period > diff ? period : diff; }
 
 private:
-
     int32 i_period;
     int32 i_expireTime;
 };
