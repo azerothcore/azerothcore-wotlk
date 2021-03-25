@@ -13,11 +13,12 @@
 <!-- If the issue does not exist, please describe it and how to reproduce it. If the issue already exists, just paste the link to the issue you close, like this: Closes https://github.com/azerothcore/azerothcore-wotlk/issues/967 -->
 
 
-##### SOURCE:
-<!-- If this report is linked with in-game content, please include any evidence/documentation/video or further proof in order to guarantee that the behavior described above is the correct one.
+## SOURCE:
+<!-- If this pull request IS linked with in-game content, please include any evidence/documentation/video or further proof in order to guarantee that the proposed changes described above are the correct ones.
  - If it is described in a guide/post or Wowhead comment, please include the link.
  - Can you link a video that confirms it?
  - Please share the source which states how it should work.
+ - If this pull request IS NOT linked with in-game content, please leave this field as N/A
 -->
 
 
