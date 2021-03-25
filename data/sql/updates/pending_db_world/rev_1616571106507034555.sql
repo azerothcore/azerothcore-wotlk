@@ -7,4 +7,6 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask` &~1
 645,  -- Cookie
 646,  -- Mr. Smite
 647,  -- Captain Greenskin
-642); -- Sneed's Shredder
+1763, -- Gilnid
+642,  -- Sneed's Shredder
+626); -- Foreman Thistlenettle
