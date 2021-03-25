@@ -5,8 +5,8 @@
 #ifndef __BATTLEGROUNDEY_H
 #define __BATTLEGROUNDEY_H
 
-#include "Language.h"
 #include "Battleground.h"
+#include "Language.h"
 
 enum BG_EY_Events
 {

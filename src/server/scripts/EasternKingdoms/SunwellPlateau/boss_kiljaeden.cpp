@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "sunwell_plateau.h"
-#include "MoveSplineInit.h"
 #include "CreatureTextMgr.h"
+#include "MoveSplineInit.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "sunwell_plateau.h"
 
 enum Yells
 {
@@ -421,7 +421,7 @@ public:
                     break;
                 case EVENT_TEXT_SPEACH22:
                     if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ANVEENA)))
-                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_IMPRISONED, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_IMPRISONED, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
                     break;
                 case EVENT_TEXT_SPEACH23:
                     Talk(SAY_KJ_PHASE3);
@@ -432,7 +432,7 @@ public:
                     break;
                 case EVENT_TEXT_SPEACH32:
                     if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ANVEENA)))
-                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_LOST, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_LOST, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
                     break;
                 case EVENT_TEXT_SPEACH33:
                     Talk(SAY_KJ_PHASE4);
@@ -443,7 +443,7 @@ public:
                     break;
                 case EVENT_TEXT_SPEACH42:
                     if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ANVEENA)))
-                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_KALEC, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_KALEC, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
                     break;
                 case EVENT_TEXT_SPEACH43:
                     if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS_KJ)))
@@ -451,7 +451,7 @@ public:
                     break;
                 case EVENT_TEXT_SPEACH44:
                     if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ANVEENA)))
-                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_GOODBYE, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_GOODBYE, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
                     break;
                 case EVENT_TEXT_SPEACH45:
                     if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ANVEENA)))

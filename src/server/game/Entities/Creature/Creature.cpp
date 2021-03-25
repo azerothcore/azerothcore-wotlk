@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,15 +7,14 @@
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "Common.h"
+#include "Creature.h"
 #include "CreatureAI.h"
 #include "CreatureAISelector.h"
 #include "CreatureGroups.h"
-#include "Creature.h"
 #include "DatabaseEnv.h"
 #include "Formulas.h"
 #include "GameEventMgr.h"
 #include "GossipDef.h"
-#include "ScriptedGossip.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
@@ -32,16 +31,16 @@
 #include "Player.h"
 #include "PoolMgr.h"
 #include "QuestDef.h"
+#include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
 #include "TemporarySummon.h"
+#include "Transport.h"
 #include "Util.h"
 #include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
 #include "World.h"
 #include "WorldPacket.h"
-
-#include "Transport.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -170,7 +169,7 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(),
     m_regenTimer = CREATURE_REGEN_INTERVAL;
     m_valuesCount = UNIT_END;
 
-    for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+    for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
         m_spells[i] = 0;
 
     for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
@@ -391,7 +390,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     if (!m_wanderDistance && m_defaultMovementType == RANDOM_MOTION_TYPE)
         m_defaultMovementType = IDLE_MOTION_TYPE;
 
-    for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+    for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
         m_spells[i] = GetCreatureTemplate()->spells[i];
 
     return true;
@@ -1034,6 +1033,47 @@ bool Creature::isCanTrainingAndResetTalentsOf(Player* player) const
            && player->getClass() == GetCreatureTemplate()->trainer_class;
 }
 
+bool Creature::IsValidTrainerForPlayer(Player* player, uint32* npcFlags /*= nullptr*/) const
+{
+    if (!IsTrainer())
+    {
+        return false;
+    }
+
+    switch (m_creatureInfo->trainer_type)
+    {
+        case TRAINER_TYPE_CLASS:
+        case TRAINER_TYPE_PETS:
+            if (m_creatureInfo->trainer_class && m_creatureInfo->trainer_class != player->getClass())
+            {
+                if (npcFlags)
+                    *npcFlags &= ~UNIT_NPC_FLAG_TRAINER_CLASS;
+
+                return false;
+            }
+            break;
+        case TRAINER_TYPE_MOUNTS:
+            if (m_creatureInfo->trainer_race && m_creatureInfo->trainer_race != player->getRace())
+            {
+                return false;
+            }
+            break;
+        case TRAINER_TYPE_TRADESKILLS:
+            if (m_creatureInfo->trainer_spell && !player->HasSpell(m_creatureInfo->trainer_spell))
+            {
+                if (npcFlags)
+                    *npcFlags &= ~UNIT_NPC_FLAG_TRAINER_PROFESSION;
+
+                return false;
+            }
+            break;
+        default:
+            break;
+    }
+
+    return true;
+}
+
 Player* Creature::GetLootRecipient() const
 {
     if (!m_lootRecipient)
@@ -1052,7 +1092,7 @@ void Creature::SetLootRecipient(Unit* unit, bool withGroup)
 {
     // set the player whose group should receive the right
     // to loot the creature after it dies
-    // should be set to NULL after the loot disappears
+    // should be set to nullptr after the loot disappears
 
     if (!unit)
     {
@@ -1250,8 +1290,7 @@ void Creature::SelectLevel(bool changelevel)
 
     // damage
 
-    // pussywizard: disabled until it's fixed
-    /*float basedamage = stats->GenerateBaseDamage(cInfo);
+    float basedamage = stats->GenerateBaseDamage(cInfo);
 
     float weaponBaseMinDamage = basedamage;
     float weaponBaseMaxDamage = basedamage * 1.5;
@@ -1266,19 +1305,7 @@ void Creature::SelectLevel(bool changelevel)
     SetBaseWeaponDamage(RANGED_ATTACK, MAXDAMAGE, weaponBaseMaxDamage);
 
     SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, stats->AttackPower);
-    SetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, stats->RangedAttackPower);*/
-
-    SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cInfo->mindmg);
-    SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cInfo->maxdmg);
-
-    SetBaseWeaponDamage(OFF_ATTACK, MINDAMAGE, cInfo->mindmg);
-    SetBaseWeaponDamage(OFF_ATTACK, MAXDAMAGE, cInfo->maxdmg);
-
-    SetBaseWeaponDamage(RANGED_ATTACK, MINDAMAGE, cInfo->minrangedmg);
-    SetBaseWeaponDamage(RANGED_ATTACK, MAXDAMAGE, cInfo->maxrangedmg);
-
-    SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, cInfo->attackpower);
-    SetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, cInfo->rangedattackpower);
+    SetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, stats->RangedAttackPower);
 
     sScriptMgr->Creature_SelectLevel(cInfo, this);
 }
@@ -1764,7 +1791,7 @@ void Creature::Respawn(bool force)
         //Re-initialize reactstate that could be altered by movementgenerators
         InitializeReactState();
     }
-
+    m_respawnedTime = time(nullptr);
     // xinef: relocate notifier, fixes npc appearing in corpse position after forced respawn (instead of spawn)
     m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
     UpdateObjectVisibility(false);
@@ -1840,7 +1867,6 @@ void Creature::LoadSpellTemplateImmunity()
     }
 }
 
-
 bool Creature::IsImmunedToSpell(SpellInfo const* spellInfo)
 {
     if (!spellInfo)
@@ -1883,7 +1909,7 @@ SpellInfo const* Creature::reachWithSpellAttack(Unit* victim)
     if (!victim)
         return nullptr;
 
-    for (uint32 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+    for (uint32 i = 0; i < MAX_CREATURE_SPELLS; ++i)
     {
         if (!m_spells[i])
             continue;
@@ -1931,7 +1957,7 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
     if (!victim)
         return nullptr;
 
-    for (uint32 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+    for (uint32 i = 0; i < MAX_CREATURE_SPELLS; ++i)
     {
         if (!m_spells[i])
             continue;
@@ -2250,6 +2276,12 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
     if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsInEvadeMode())
         return false;
 
+    // cannot attack if is during 5 second grace period, unless being attacked
+    if ((time(nullptr) - m_respawnedTime) < 5 && victim->getAttackers().empty())
+    {
+        return false;
+    }
+
     if (!IS_PLAYER_GUID(GetCharmerOrOwnerGUID()))
     {
         if (GetMap()->IsDungeon())
@@ -2389,7 +2421,7 @@ void Creature::SendZoneUnderAttackMessage(Player* attacker)
 {
     WorldPacket data(SMSG_ZONE_UNDER_ATTACK, 4);
     data << (uint32)GetAreaId();
-    sWorld->SendGlobalMessage(&data, NULL, (attacker->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE));
+    sWorld->SendGlobalMessage(&data, nullptr, (attacker->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE));
 }
 
 void Creature::SetInCombatWithZone()
@@ -2512,10 +2544,10 @@ bool Creature::HasSpellCooldown(uint32 spell_id) const
 bool Creature::HasSpell(uint32 spellID) const
 {
     uint8 i;
-    for (i = 0; i < CREATURE_MAX_SPELLS; ++i)
+    for (i = 0; i < MAX_CREATURE_SPELLS; ++i)
         if (spellID == m_spells[i])
             break;
-    return i < CREATURE_MAX_SPELLS;                         //broke before end of iteration of known spells
+    return i < MAX_CREATURE_SPELLS;                         //broke before end of iteration of known spells
 }
 
 time_t Creature::GetRespawnTimeEx() const

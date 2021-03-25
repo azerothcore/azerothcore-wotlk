@@ -2,13 +2,13 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "GameObjectAI.h"
 #include "InstanceScript.h"
 #include "Player.h"
 #include "scholomance.h"
-#include "GameObjectAI.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
 
 class instance_scholomance : public InstanceMapScript
 {

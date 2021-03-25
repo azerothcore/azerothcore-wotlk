@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "violet_hold.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "violet_hold.h"
 
 #define ACTION_WATER_ELEMENT_HIT            1
 #define ACTION_WATER_ELEMENT_KILLED         2
@@ -228,7 +228,7 @@ public:
             {
                 if (uiWaterBoltVolleyTimer <= uiDiff)
                 {
-                    me->CastSpell((Unit*)NULL, SPELL_WATER_BOLT_VOLLEY, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_WATER_BOLT_VOLLEY, false);
                     uiWaterBoltVolleyTimer = urand(10000, 15000);
                 }
                 else uiWaterBoltVolleyTimer -= uiDiff;

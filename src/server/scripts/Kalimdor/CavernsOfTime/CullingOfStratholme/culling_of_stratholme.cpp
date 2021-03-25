@@ -2,13 +2,13 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "culling_of_stratholme.h"
-#include "ScriptedEscortAI.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum Says
@@ -960,7 +960,7 @@ public:
                     case EVENT_ACTION_PHASE3+6:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN))
                         {
-                            cr->UpdateEntry(NPC_INFINITE_HUNTER, NULL, false);
+                            cr->UpdateEntry(NPC_INFINITE_HUNTER, nullptr, false);
                             cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                             cr->SetReactState(REACT_PASSIVE);
                         }
@@ -969,7 +969,7 @@ public:
                     case EVENT_ACTION_PHASE3+7:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN4))
                         {
-                            cr->UpdateEntry(NPC_INFINITE_AGENT, NULL, false);
+                            cr->UpdateEntry(NPC_INFINITE_AGENT, nullptr, false);
                             cr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                             cr->SetReactState(REACT_PASSIVE);
                         }
@@ -978,7 +978,7 @@ public:
                     case EVENT_ACTION_PHASE3+8:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN3))
                         {
-                            cr->UpdateEntry(NPC_INFINITE_ADVERSARY, NULL, false);
+                            cr->UpdateEntry(NPC_INFINITE_ADVERSARY, nullptr, false);
                             cr->SetReactState(REACT_AGGRESSIVE);
                             cr->SetInCombatWithZone();
                             cr->AddThreat(me, 0.0f);
@@ -1573,7 +1573,7 @@ public:
                 }
                 else if (changeTimer >= 14500 && changeTimer < 20000)
                 {
-                    me->UpdateEntry(NPC_RISEN_ZOMBIE, NULL, false);
+                    me->UpdateEntry(NPC_RISEN_ZOMBIE, nullptr, false);
                     me->SetReactState(REACT_AGGRESSIVE);
                     changeTimer = 20000;
                 }
