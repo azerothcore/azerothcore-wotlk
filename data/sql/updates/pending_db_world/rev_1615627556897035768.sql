@@ -2,7 +2,6 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1615627556897035768');
 
 UPDATE `creature_template` SET `BaseAttackTime`=2500  WHERE `entry`=485;   -- Blackrock Outrunner, was 2000
 UPDATE `creature_template` SET `BaseAttackTime`=2800  WHERE `entry`=584;   -- Kazon, was 1425
-UPDATE `creature_template` SET `BaseAttackTime`=3000  WHERE `entry`=646;   -- Mr. Smite, was 2000
 UPDATE `creature_template` SET `BaseAttackTime`=1500  WHERE `entry`=947;   -- Rohh the Silent, was 1425
 UPDATE `creature_template` SET `BaseAttackTime`=2200  WHERE `entry`=2271;  -- Dalaran Shield Guard, was 2000
 UPDATE `creature_template` SET `BaseAttackTime`=1300  WHERE `entry`=2275;  -- Enraged Stanley, was 1770
