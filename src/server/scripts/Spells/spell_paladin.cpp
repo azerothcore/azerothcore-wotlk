@@ -948,7 +948,7 @@ class spell_pal_heart_of_the_crusader : public SpellScriptLoader
 
             void Register() override
             {
-                OnEffectProc += AuraEffectProcFn(spell_pal_heart_of_the_crusader_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+                OnEffectProc += AuraEffectProcFn(spell_pal_heart_of_the_crusader_AuraScript::HandleProc, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
             }
         };
 
