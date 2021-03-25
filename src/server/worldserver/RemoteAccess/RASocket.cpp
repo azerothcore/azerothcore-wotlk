@@ -10,8 +10,8 @@
 
 #include "AccountMgr.h"
 #include "Common.h"
-#include "Configuration/Config.h"
-#include "Database/DatabaseEnv.h"
+#include "Config.h"
+#include "DatabaseEnv.h"
 #include "Duration.h"
 #include "Log.h"
 #include "RASocket.h"
@@ -85,7 +85,7 @@ int RASocket::recv_line(ACE_Message_Block& buffer)
             return -1;
         }
 
-        ACE_ASSERT(n == sizeof(byte));
+        ASSERT(n == sizeof(byte));
 
         if (byte == '\n')
             break;
