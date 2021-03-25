@@ -1,10 +1,10 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1616345174221959057');
 
 SET
-@POOL            = '11652',
-@POOLSIZE        = '5',
+@POOL            = 11652,
+@POOLSIZE        = 5,
 @POOLDESC        = 'Treasures - Eastern Plaguelands',
-@RESPAWN         = '900',
+@RESPAWN         = 900,
 @GUID = '45734,45735,45910,45915,45931,45933,45938,45949,45950,85791,85792,85793,85795,85797,100086';
 
 -- Create pool(s)
