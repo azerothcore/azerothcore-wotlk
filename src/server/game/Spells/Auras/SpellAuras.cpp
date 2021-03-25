@@ -2160,7 +2160,7 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
             else if (GetSpellInfo()->EquippedItemClass == ITEM_CLASS_ARMOR)
             {
                 // Check if player is wearing shield
-                Item* item = target->ToPlayer()->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+                item = target->ToPlayer()->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
             }
 
             if (!item || item->IsBroken() || !item->IsFitToSpellRequirements(GetSpellInfo()))
