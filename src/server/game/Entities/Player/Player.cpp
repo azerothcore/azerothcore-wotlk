@@ -6390,45 +6390,16 @@ float getProbabilityOfLevelUp(uint32 SkillValue)
      * skill up so that means 100/2 = 50%. The if statement returns the probability
      * depending on the player's SkillValue.
      */
-    if (SkillValue > 115 && SkillValue <= 135)
+    if (!SkillValue)
     {
-        return 100 / 2;
-    }
-    else if (SkillValue > 135 && SkillValue <= 160)
-    {
-        return 100 / 3;
-    }
-    else if (SkillValue > 160 && SkillValue <= 190)
-    {
-        return 100 / 4;
-    }
-    else if (SkillValue > 190 && SkillValue <= 215)
-    {
-        return 100 / 5;
-    }
-    else if (SkillValue > 215 && SkillValue <= 295)
-    {
-        return 100 / 6;
-    }
-    else if (SkillValue > 295 && SkillValue <= 315)
-    {
-        return 100 / 9;
-    }
-    else if (SkillValue > 315 && SkillValue <= 355)
-    {
-        return 100 / 10;
-    }
-    else if (SkillValue > 355 && SkillValue <= 425)
-    {
-        return 100 / 11;
-    }
-    else if (SkillValue > 425 && SkillValue < 450)
-    {
-        return 100 / 12;
+        return 0.0f;
     }
 
-    // There's a 100% chance of level up until 115 Fishing
-    return 100;
+    std::array bounds{ 115, 135, 160, 190, 215, 295, 315, 355, 425, 450 };
+    std::array<float, 11> dens{ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 9.0f, 10.0f, 11.0f, 12.0f, 1.0f };
+    auto it = std::lower_bound(std::begin(bounds), std::end(bounds), SkillValue);
+    float prob = dens[std::distance(std::begin(bounds), it)];
+    return 100 / prob;
 }
 
 bool Player::UpdateFishingSkill()
