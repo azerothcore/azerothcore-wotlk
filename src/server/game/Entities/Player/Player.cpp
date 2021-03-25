@@ -6398,8 +6398,7 @@ float getProbabilityOfLevelUp(uint32 SkillValue)
     std::array bounds{ 115, 135, 160, 190, 215, 295, 315, 355, 425, 450 };
     std::array<float, 11> dens{ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 9.0f, 10.0f, 11.0f, 12.0f, 1.0f };
     auto it = std::lower_bound(std::begin(bounds), std::end(bounds), SkillValue);
-    float prob = dens[std::distance(std::begin(bounds), it)];
-    return 100 / prob;
+    return 100 / dens[std::distance(std::begin(bounds), it)];
 }
 
 bool Player::UpdateFishingSkill()
