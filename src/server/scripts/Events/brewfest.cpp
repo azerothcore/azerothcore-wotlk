@@ -1,17 +1,17 @@
 // Scripted by Xinef
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
-#include "GridNotifiers.h"
-#include "SpellScript.h"
+#include "CellImpl.h"
 #include "GameEventMgr.h"
+#include "GridNotifiers.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
-#include "CellImpl.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 ///////////////////////////////////////
 ////// GOS
@@ -183,7 +183,7 @@ public:
                 if (Player* player = itr->GetSource())
                 {
                     if (player->CanRewardQuest(qReward, false))
-                        player->RewardQuest(qReward, 0, NULL, false);
+                        player->RewardQuest(qReward, 0, nullptr, false);
                 }
 
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
@@ -1561,7 +1561,7 @@ public:
         {
             if (Unit* caster = GetCaster())
             {
-                float z = caster->GetMap()->GetHeight(caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), MAX_HEIGHT);
+                float z = caster->GetMapHeight(caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), caster->GetPositionZ());
                 WorldLocation pPosition = WorldLocation(caster->GetMapId(), caster->GetPositionX() + 14 * cos(caster->GetOrientation()), caster->GetPositionY() + 14 * sin(caster->GetOrientation()), z, caster->GetOrientation());
                 SetExplTargetDest(pPosition);
             }

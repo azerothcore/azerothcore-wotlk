@@ -5,8 +5,8 @@
 #ifndef DEF_DRAK_THARON_H
 #define DEF_DRAK_THARON_H
 
-#include "SpellScript.h"
 #include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Data
 {

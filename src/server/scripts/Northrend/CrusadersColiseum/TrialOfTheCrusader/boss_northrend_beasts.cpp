@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "trial_of_the_crusader.h"
 #include "Vehicle.h"
-#include "Player.h"
 
 /***********
 ** GORMOK
@@ -149,7 +149,7 @@ public:
                     break;
                 case EVENT_SPELL_SNOBOLLED:
                     if( t->GetTypeId() == TYPEID_PLAYER )
-                        me->CastSpell((Unit*)NULL, SPELL_SNOBOLLED, true);
+                        me->CastSpell((Unit*)nullptr, SPELL_SNOBOLLED, true);
 
                     break;
                 case EVENT_SPELL_BATTER:
@@ -290,7 +290,7 @@ public:
                         events.RepeatEvent(2500);
                     break;
                 case EVENT_SPELL_STAGGERING_STOMP:
-                    me->CastSpell((Unit*)NULL, SPELL_STAGGERING_STOMP, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_STAGGERING_STOMP, false);
                     events.RepeatEvent(urand(20000, 25000));
                     break;
                 case EVENT_PICK_SNOBOLD_TARGET:
@@ -615,7 +615,7 @@ struct boss_jormungarAI : public ScriptedAI
                 events.RepeatEvent(20000);
                 break;
             case EVENT_SPELL_SWEEP:
-                me->CastSpell((Unit*)NULL, SPELL_SWEEP_0, false);
+                me->CastSpell((Unit*)nullptr, SPELL_SWEEP_0, false);
                 events.RepeatEvent(urand(15000, 30000));
                 break;
             case EVENT_SPELL_BITE:
@@ -833,7 +833,7 @@ public:
                 if( !DoTrampleIfValid() )
                 {
                     me->CastSpell(me, SPELL_STAGGERED_DAZE, true);
-                    me->CastSpell((Unit*)NULL, SPELL_TRAMPLE, true);
+                    me->CastSpell((Unit*)nullptr, SPELL_TRAMPLE, true);
                     Talk(EMOTE_TRAMPLE_CRASH);
                     events.DelayEvents(15000);
                 }
@@ -867,7 +867,7 @@ public:
                     events.RepeatEvent(urand(15000, 30000));
                     break;
                 case EVENT_SPELL_WHIRL:
-                    me->CastSpell((Unit*)NULL, SPELL_WHIRL, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_WHIRL, false);
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_ARCTIC_BREATH:
@@ -888,7 +888,7 @@ public:
                     break;
                 case EVENT_SPELL_MASSIVE_CRASH:
                     me->GetMotionMaster()->Clear();
-                    me->CastSpell((Unit*)NULL, SPELL_MASSIVE_CRASH, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_MASSIVE_CRASH, false);
 
                     events.RescheduleEvent(EVENT_GAZE, 2000);
                     break;

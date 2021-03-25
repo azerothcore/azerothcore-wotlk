@@ -3,15 +3,15 @@
 */
 
 #include "Creature.h"
-#include "MapManager.h"
-#include "RandomMovementGenerator.h"
-#include "ObjectAccessor.h"
-#include "Map.h"
-#include "Util.h"
 #include "CreatureGroups.h"
-#include "MoveSplineInit.h"
+#include "Map.h"
+#include "MapManager.h"
 #include "MoveSpline.h"
+#include "MoveSplineInit.h"
+#include "ObjectAccessor.h"
+#include "RandomMovementGenerator.h"
 #include "Spell.h"
+#include "Util.h"
 
 template<>
 void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
@@ -62,7 +62,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         }
 
         float ground = INVALID_HEIGHT;
-        float levelZ = map->GetWaterOrGroundLevel(creature->GetPhaseMask(), x, y, z + 4.0f, &ground);
+        float levelZ = creature->GetMapWaterOrGroundLevel(x, y, z, &ground);
         float newZ = INVALID_HEIGHT;
 
         // flying creature
@@ -71,15 +71,11 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         // point underwater
         else if (ground < levelZ)
         {
-            if (!creature->CanSwim())
+            if (!creature->CanEnterWater())
             {
-                if (ground < levelZ - 1.5f)
-                {
-                    _validPointsVector[_currentPoint].erase(randomIter);
-                    _preComputedPaths.erase(pathIdx);
-                    return;
-                }
-                levelZ = ground;
+                _validPointsVector[_currentPoint].erase(randomIter);
+                _preComputedPaths.erase(pathIdx);
+                return;
             }
             else
             {
@@ -98,6 +94,8 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
                 return;
             }
         }
+
+        creature->UpdateAllowedPositionZ(x, y, newZ);
 
         if (newZ > INVALID_HEIGHT)
         {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -182,7 +182,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x0A5*/ { "CMSG_CHANNEL_BAN",                                        STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleChannelBan                         },
     /*0x0A6*/ { "CMSG_CHANNEL_UNBAN",                                      STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleChannelUnban                       },
     /*0x0A7*/ { "CMSG_CHANNEL_ANNOUNCEMENTS",                              STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleChannelAnnouncements               },
-    /*0x0A8*/ { "CMSG_CHANNEL_MODERATE",                                   STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::Handle_NULL                              },
+    /*0x0A8*/ { "CMSG_CHANNEL_MODERATE",                                   STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleChannelModerateOpcode              },
     /*0x0A9*/ { "SMSG_UPDATE_OBJECT",                                      STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_ServerSide                        },
     /*0x0AA*/ { "SMSG_DESTROY_OBJECT",                                     STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_ServerSide                        },
     /*0x0AB*/ { "CMSG_USE_ITEM",                                           STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleUseItemOpcode                      },

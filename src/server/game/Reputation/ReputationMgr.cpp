@@ -1,17 +1,17 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "DatabaseEnv.h"
-#include "ReputationMgr.h"
 #include "DBCStores.h"
-#include "Player.h"
-#include "WorldPacket.h"
-#include "World.h"
 #include "ObjectMgr.h"
+#include "Player.h"
+#include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "World.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
 
 const int32 ReputationMgr::PointsInRank[MAX_REPUTATION_RANK] = {36000, 3000, 3000, 3000, 6000, 12000, 21000, 1000};

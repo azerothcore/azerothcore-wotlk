@@ -1,23 +1,39 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include <string>
 #include "Spell.h"
 #include "SpellAuras.h"
-#include "SpellScript.h"
 #include "SpellMgr.h"
+#include "SpellScript.h"
+#include <string>
 
 bool _SpellScript::_Validate(SpellInfo const* entry)
 {
     if (!Validate(entry))
     {
-        sLog->outError("TSCR: Spell `%u` did not pass Validate() function of script `%s` - script will be not added to the spell", entry->Id, m_scriptName->c_str());
+        sLog->outError("_SpellScript::_Validate: Spell `%u` did not pass Validate() function of script `%s` - script will not be added to the spell", entry->Id, m_scriptName->c_str());
         return false;
     }
     return true;
+}
+
+bool _SpellScript::_ValidateSpellInfo(uint32 const* begin, uint32 const* end)
+{
+    bool allValid = true;
+    while (begin != end)
+    {
+        if (!sSpellMgr->GetSpellInfo(*begin))
+        {
+            sLog->outError("_SpellScript::_ValidateSpellInfo: Spell %u does not exist.", *begin);
+            allValid = false;
+        }
+
+        ++begin;
+    }
+    return allValid;
 }
 
 void _SpellScript::_Register()

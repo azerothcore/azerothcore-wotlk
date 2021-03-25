@@ -819,6 +819,7 @@ ChatLogs.Guild = 0
 ChatLogs.Public = 0
 
 #
+#    WARNING: enabling this might cause issues to your addon channel
 #    ChatLogs.Addon
 #        Description: Log addon messages.
 #        Default:     0 - (Disabled)
@@ -1587,8 +1588,8 @@ IsPreloadedContinentTransport.Enabled = 0
 #
 #    Warden.Enabled
 #        Description: Enable Warden anti-cheat system.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
 
 Warden.Enabled = 1
 
@@ -1598,7 +1599,15 @@ Warden.Enabled = 1
 #        Default:     3 - (Enabled)
 #                     0 - (Disabled)
 
-Warden.NumMemChecks = 2
+Warden.NumMemChecks = 3
+
+#
+#    Warden.NumLuaChecks
+#        Description: Number of Warden LUA checks that are sent to the client each cycle.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Warden.NumLuaChecks = 1
 
 #
 #    Warden.NumOtherChecks
@@ -1607,7 +1616,7 @@ Warden.NumMemChecks = 2
 #        Default:     7 - (Enabled)
 #                     0 - (Disabled)
 
-Warden.NumOtherChecks = 5
+Warden.NumOtherChecks = 7
 
 #
 #    Warden.LogFile
@@ -1644,7 +1653,7 @@ Warden.ClientCheckHoldOff = 30
 #                     1 - (Kick)
 #                     2 - (Ban)
 
-Warden.ClientCheckFailAction = 2
+Warden.ClientCheckFailAction = 0
 
 #
 #    Warden.BanDuration
@@ -1942,6 +1951,29 @@ ListenRange.Yell = 300
 
 WaypointMovementStopTimeForPlayer = 120
 
+#    NpcEvadeIfTargetIsUnreachable
+#        Description: Specifies the time (in seconds) that a creature whom target
+#                     is unreachable to end up in evade mode.
+#        Default:     5
+
+NpcEvadeIfTargetIsUnreachable = 5
+
+#    NpcRegenHPIfTargetIsUnreachable
+#        Description: Regenerates HP for Creatures in Raids if they cannot reach the target.
+#                     Keep disabled if you are experiencing mmaps/pathing issues.
+#
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+NpcRegenHPIfTargetIsUnreachable = 1
+
+#    NpcRegenHPTimeIfTargetIsUnreachable
+#        Description: Specifies the time (in seconds) that a creature whom target
+#                     is unreachable in raid to end up regenerate health.
+#        Default:     10
+
+NpcRegenHPTimeIfTargetIsUnreachable = 10
+
 #
 ###################################################################################################
 
@@ -2032,6 +2064,14 @@ Channel.RestrictedLfg = 1
 #                     1 - (Enabled, Join without announcement)
 
 Channel.SilentlyGMJoin = 0
+
+#    Channel.ModerationGMLevel
+#        Min GM account security level required for executing moderator in-game commands in the channels
+#        This also bypasses password prompts on joining channels which require password
+#                 0 (in-game channel moderator privileges only)
+#        Default: 1 (enabled for moderators and above)
+
+Channel.ModerationGMLevel = 1
 
 #
 #    ChatLevelReq.Channel
@@ -2321,6 +2361,14 @@ Rate.Drop.Item.Legendary        = 1
 Rate.Drop.Item.Artifact         = 1
 Rate.Drop.Item.Referenced       = 1
 Rate.Drop.Money                 = 1
+
+#    RewardBonusMoney
+#        Description: Allows to further tweak the amount of extra money rewarded by quests when the player
+#                     is at MaxPlayerLevel (this amount is specified in quest_template.RewardBonusMoney).
+#                     NOTE: the final amount will also affected by Rate.Drop.Money
+#        Default:     1
+
+Rate.RewardBonusMoney = 1
 
 #
 #    Rate.SellValue.Item.Poor
@@ -2719,16 +2767,16 @@ Battleground.QueueAnnouncer.PlayerOnly = 0
 #        Default:     300000 - (Enabled, 5 minutes)
 #                     0      - (Disabled, Not recommended)
 
-BattleGround.PrematureFinishTimer = 300000
+Battleground.PrematureFinishTimer = 300000
 
 #
-#    BattleGround.PremadeGroupWaitForMatch
+#    Battleground.PremadeGroupWaitForMatch
 #        Description: Time (in milliseconds) a pre-made group has to wait for matching group of the
 #                     other faction.
 #        Default:     1800000 - (Enabled, 30 minutes)
 #                     0       - (Disabled, Not recommended)
 
-BattleGround.PremadeGroupWaitForMatch = 1800000
+Battleground.PremadeGroupWaitForMatch = 1800000
 
 #
 #    Battleground.GiveXPForKills
@@ -3209,15 +3257,13 @@ ItemDelete.ItemLevel = 80
 PlayerStart.AllReputation = 0
 
 #
-#    PlayerStart.AllSpells
-#        Description: If enabled, players will start with all their class spells (not talents).
-#                     You must populate playercreateinfo_spell_custom table with the spells you
-#                     want, or this will not work! The table has data for all classes / races up
-#                     to TBC expansion.
+#    PlayerStart.CustomSpells
+#        Description: If enabled, players will ignore spells from playercreateinfo_spellstart at character
+#                     creation and will start with spells from the table playercreateinfo_spell_custom instead.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-PlayerStart.AllSpells = 0
+PlayerStart.CustomSpells = 0
 
 #
 #    PlayerStart.MapsExplored
@@ -3287,6 +3333,14 @@ PvPToken.ItemCount = 1
 NoResetTalentsCost = 0
 
 #
+#    ToggleXP.Cost
+#        Description: Cost of locking/unlocking XP
+#        Default:     100000 - (10 Gold)
+#
+
+ToggleXP.Cost = 100000
+
+#
 #     Guild.AllowMultipleGuildMaster
 #        Description: Allow more than one guild master. Additional Guild Masters must be set using
 #                     the ".guild rank" command.
@@ -3294,6 +3348,31 @@ NoResetTalentsCost = 0
 #                     1 - (Enabled)
 
 Guild.AllowMultipleGuildMaster = 0
+
+#
+#     Guild.BankInitialTabs
+#        Description: Changes the amounts of available tabs of the guild bank on guild creation
+#        Default:     0   (no tabs given for free)
+#                     1-6 (amount of tabs of the guild bank at guild creation)
+
+Guild.BankInitialTabs = 0
+
+#
+#     Guild.BankTabCost0-5
+#        Description: Changes the price of the guild tabs. Note that the client will still show the default values.
+#        Default:     1000000  - (100 Gold)
+#                     2500000  - (250 Gold)
+#                     5000000  - (500 Gold)
+#                     10000000 - (1000 Gold)
+#                     25000000 - (2500 Gold)
+#                     50000000 - (5000 Gold)
+
+Guild.BankTabCost0 = 1000000
+Guild.BankTabCost1 = 2500000
+Guild.BankTabCost2 = 5000000
+Guild.BankTabCost3 = 10000000
+Guild.BankTabCost4 = 25000000
+Guild.BankTabCost5 = 50000000
 
 #
 #     ShowKickInWorld
@@ -3553,6 +3632,14 @@ LFG.Location.All = 0
 
 ICC.Buff.Horde    = 73822
 ICC.Buff.Alliance = 73828
+
+#
+#     Item.SetItemTradeable
+#        Description: Enabled/Disabled trading BoP items among raid members.
+#        Default:     1  - (Set BoP items tradeable timer to 2 hours)
+#                     0  - (Disable trading BoP items among raid members)
+
+Item.SetItemTradeable = 1
 
 #
 ###################################################################################################

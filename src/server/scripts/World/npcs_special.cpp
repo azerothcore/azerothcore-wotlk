@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -14,7 +14,6 @@ EndScriptData
 
 /* ContentData
 npc_air_force_bots       80%    support for misc (invisible) guard bots in areas where player allowed to fly. Summon guards after a preset time if tagged by spell
-npc_lunaclaw_spirit      80%    support for quests 6001/6002 (Body and Heart)
 npc_chicken_cluck       100%    support for quest 3861 (Cluck!)
 npc_dancing_flames      100%    midsummer event NPC
 npc_guardian            100%    guardianAI used to prevent players from accessing off-limits areas. Not in use by SD2
@@ -26,29 +25,27 @@ npc_locksmith            75%    list of keys needs to be confirmed
 npc_firework            100%    NPC's summoned by rockets and rocket clusters, for making them cast visual
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "World.h"
+#include "Cell.h"
+#include "CellImpl.h"
+#include "Chat.h"
+#include "CombatAI.h"
 #include "CreatureTextMgr.h"
-#include "PassiveAI.h"
+#include "DBCStructure.h"
 #include "GameEventMgr.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "Cell.h"
-#include "CellImpl.h"
-#include "SpellAuras.h"
-#include "CombatAI.h"
+#include "Group.h"
+#include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
-#include "Chat.h"
-#include "Group.h"
-#include "WaypointManager.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SmartAI.h"
-#include "DBCStructure.h"
+#include "SpellAuras.h"
+#include "WaypointManager.h"
+#include "World.h"
 
 enum elderClearwater
 {
@@ -564,7 +561,7 @@ public:
                 if (!playerTarget)
                     return;
 
-                Creature* lastSpawnedGuard = SpawnedGUID == 0 ? NULL : GetSummonedGuard();
+                Creature* lastSpawnedGuard = SpawnedGUID == 0 ? nullptr : GetSummonedGuard();
 
                 // prevent calling ObjectAccessor::GetUnit at next MoveInLineOfSight call - speedup
                 if (!lastSpawnedGuard)
@@ -633,55 +630,13 @@ public:
     }
 };
 
-/*######
-## npc_lunaclaw_spirit
-######*/
-
-enum LunaclawSpirit
-{
-    QUEST_BODY_HEART_A      = 6001,
-    QUEST_BODY_HEART_H      = 6002,
-
-    TEXT_ID_DEFAULT         = 4714,
-    TEXT_ID_PROGRESS        = 4715
-};
-
-#define GOSSIP_ITEM_GRANT   "You have thought well, spirit. I ask you to grant me the strength of your body and the strength of your heart."
-
-class npc_lunaclaw_spirit : public CreatureScript
-{
-public:
-    npc_lunaclaw_spirit() : CreatureScript("npc_lunaclaw_spirit") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_BODY_HEART_A) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_BODY_HEART_H) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_GRANT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, TEXT_ID_DEFAULT, creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            SendGossipMenuFor(player, TEXT_ID_PROGRESS, creature->GetGUID());
-            player->AreaExploredOrEventHappens(player->GetTeamId() == TEAM_ALLIANCE ? QUEST_BODY_HEART_A : QUEST_BODY_HEART_H);
-        }
-        return true;
-    }
-};
-
 /*########
 # npc_chicken_cluck
 #########*/
 
 enum ChickenCluck
 {
-    EMOTE_HELLO_A       = 0,
-    EMOTE_HELLO_H       = 1,
+    EMOTE_HELLO         = 0,
     EMOTE_CLUCK_TEXT    = 2,
 
     QUEST_CLUCK         = 3861,
@@ -736,7 +691,7 @@ public:
                     {
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                         me->setFaction(FACTION_FRIENDLY);
-                        Talk(player->GetTeamId() == TEAM_HORDE ? EMOTE_HELLO_H : EMOTE_HELLO_A);
+                        Talk(EMOTE_HELLO);
                     }
                     break;
                 case TEXT_EMOTE_CHEER:
@@ -1297,7 +1252,7 @@ public:
 
             RunAwayTimer = 5000;
 
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            me->SetPvP(true);
             me->SetStandState(UNIT_STAND_STATE_KNEEL);
             // expect database to have RegenHealth=0
             me->SetHealth(me->CountPctFromMaxHealth(70));
@@ -1994,7 +1949,6 @@ public:
 ## npc_experience
 ######*/
 
-#define EXP_COST                100000 //10 00 00 copper (10golds)
 #define GOSSIP_TEXT_EXP         14736
 #define GOSSIP_XP_OFF           "I no longer wish to gain experience."
 #define GOSSIP_XP_ON            "I wish to start gaining experience again."
@@ -2017,6 +1971,7 @@ public:
         ClearGossipMenuFor(player);
         bool noXPGain = player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
         bool doSwitch = false;
+        auto toggleXpCost = sWorld->getIntConfig(CONFIG_TOGGLE_XP_COST);
 
         switch (action)
         {
@@ -2035,16 +1990,18 @@ public:
         }
         if (doSwitch)
         {
-            if (!player->HasEnoughMoney(EXP_COST))
+            if (!player->HasEnoughMoney(toggleXpCost))
+            {
                 player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+            }
             else if (noXPGain)
             {
-                player->ModifyMoney(-EXP_COST);
+                player->ModifyMoney(-toggleXpCost);
                 player->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
             }
             else if (!noXPGain)
             {
-                player->ModifyMoney(-EXP_COST);
+                player->ModifyMoney(-toggleXpCost);
                 player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_XP_GAIN);
             }
         }
@@ -2504,7 +2461,6 @@ void AddSC_npcs_special()
 
     // Theirs
     new npc_air_force_bots();
-    new npc_lunaclaw_spirit();
     new npc_chicken_cluck();
     new npc_dancing_flames();
     new npc_doctor();

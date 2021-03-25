@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "PoolMgr.h"
 #include "Containers.h"
-#include "ObjectMgr.h"
 #include "Log.h"
 #include "MapManager.h"
+#include "ObjectMgr.h"
+#include "PoolMgr.h"
 #include "Transport.h"
 
 ////////////////////////////////////////////////////////////
@@ -210,7 +210,7 @@ void PoolGroup<Creature>::Despawn1Object(uint32 guid)
     {
         sObjectMgr->RemoveCreatureFromGrid(guid, data);
 
-        if (Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(guid, data->id, HIGHGUID_UNIT), (Creature*)NULL))
+        if (Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(guid, data->id, HIGHGUID_UNIT), (Creature*)nullptr))
             creature->AddObjectToRemoveList();
     }
 }
@@ -223,7 +223,7 @@ void PoolGroup<GameObject>::Despawn1Object(uint32 guid)
     {
         sObjectMgr->RemoveGameobjectFromGrid(guid, data);
 
-        if (GameObject* pGameobject = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(guid, data->id, HIGHGUID_GAMEOBJECT), (GameObject*)NULL))
+        if (GameObject* pGameobject = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(guid, data->id, HIGHGUID_GAMEOBJECT), (GameObject*)nullptr))
             pGameobject->AddObjectToRemoveList();
     }
 }
@@ -505,7 +505,7 @@ template <>
 void PoolGroup<Creature>::ReSpawn1Object(PoolObject* obj)
 {
     if (CreatureData const* data = sObjectMgr->GetCreatureData(obj->guid))
-        if (Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(obj->guid, data->id, HIGHGUID_UNIT), (Creature*)NULL))
+        if (Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(obj->guid, data->id, HIGHGUID_UNIT), (Creature*)nullptr))
             creature->GetMap()->AddToMap(creature);
 }
 
@@ -514,7 +514,7 @@ template <>
 void PoolGroup<GameObject>::ReSpawn1Object(PoolObject* obj)
 {
     if (GameObjectData const* data = sObjectMgr->GetGOData(obj->guid))
-        if (GameObject* pGameobject = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(obj->guid, data->id, HIGHGUID_GAMEOBJECT), (GameObject*)NULL))
+        if (GameObject* pGameobject = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(obj->guid, data->id, HIGHGUID_GAMEOBJECT), (GameObject*)nullptr))
             pGameobject->GetMap()->AddToMap(pGameobject);
 }
 

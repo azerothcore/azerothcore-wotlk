@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,19 +11,18 @@
 #ifndef __WORLDSESSION_H
 #define __WORLDSESSION_H
 
-#include <utility>
-
-#include "Common.h"
-#include "SharedDefines.h"
+#include "AccountMgr.h"
+#include "AuthDefines.h"
 #include "AddonMgr.h"
+#include "BanManager.h"
+#include "Common.h"
 #include "DatabaseEnv.h"
+#include "GossipDef.h"
+#include "Opcodes.h"
+#include "SharedDefines.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "GossipDef.h"
-#include "Cryptography/BigNumber.h"
-#include "AccountMgr.h"
-#include "BanManager.h"
-#include "Opcodes.h"
+#include <utility>
 
 class Creature;
 class GameObject;
@@ -240,7 +239,7 @@ public:
     void SetTotalTime(uint32 TotalTime) { m_total_time = TotalTime; }
     uint32 GetTotalTime() const { return m_total_time; }
 
-    void InitWarden(BigNumber* k, std::string const& os);
+    void InitWarden(SessionKey const&, std::string const& os);
 
     /// Session in auth.queue currently
     void SetInQueue(bool state) { m_inQueue = state; }
@@ -714,6 +713,7 @@ public:                                                 // opcodes handlers
     void HandleChannelBan(WorldPacket& recvPacket);
     void HandleChannelUnban(WorldPacket& recvPacket);
     void HandleChannelAnnouncements(WorldPacket& recvPacket);
+    void HandleChannelModerateOpcode(WorldPacket& recvPacket);
     void HandleChannelDeclineInvite(WorldPacket& recvPacket);
     void HandleChannelDisplayListQuery(WorldPacket& recvPacket);
     void HandleGetChannelMemberCount(WorldPacket& recvPacket);
@@ -1018,7 +1018,7 @@ private:
     typedef std::list<AddonInfo> AddonsList;
 
     // Warden
-    Warden* _warden;                                    // Remains NULL if Warden system is not enabled by config
+    Warden* _warden;                                    // Remains nullptr if Warden system is not enabled by config
 
     time_t _logoutTime;
     bool m_inQueue;                                     // session wait in auth.queue

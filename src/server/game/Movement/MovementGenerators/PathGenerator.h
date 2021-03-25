@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,13 +7,13 @@
 #ifndef _PATH_GENERATOR_H
 #define _PATH_GENERATOR_H
 
-#include "SharedDefines.h"
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
-#include "MoveSplineInitArgs.h"
-#include <G3D/Vector3.h>
 #include "MMapFactory.h"
 #include "MMapManager.h"
+#include "MoveSplineInitArgs.h"
+#include "SharedDefines.h"
+#include <G3D/Vector3.h>
 
 class Unit;
 class WorldObject;
@@ -53,9 +53,20 @@ class PathGenerator
         // Calculate the path from owner to given destination
         // return: true if new path was calculated, false otherwise (no change needed)
         bool CalculatePath(float destX, float destY, float destZ, bool forceDest = false);
-        bool IsInvalidDestinationZ(Unit const* target) const;
+        bool CalculatePath(float x, float y, float z, float destX, float destY, float destZ, bool forceDest);
+        [[nodiscard]] bool IsInvalidDestinationZ(Unit const* target) const;
+        [[nodiscard]] bool IsWalkableClimb(float const* v1, float const* v2) const;
+        [[nodiscard]] bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ) const;
+        [[nodiscard]] static bool IsWalkableClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight);
+        [[nodiscard]] bool IsWaterPath(Movement::PointsArray _pathPoints) const;
+        [[nodiscard]] bool IsSwimmableSegment(float const* v1, float const* v2, bool checkSwim = true) const;
+        [[nodiscard]] bool IsSwimmableSegment(float x, float y, float z, float destX, float destY, float destZ, bool checkSwim = true) const;
+        [[nodiscard]] static float GetRequiredHeightToClimb(float x, float y, float z, float destX, float destY, float destZ, float sourceHeight);
 
         // option setters - use optional
+
+        // when set, it skips paths with too high slopes (doesn't work with StraightPath enabled)
+        void SetSlopeCheck(bool checkSlope) { _slopeCheck = checkSlope; }
         void SetUseStraightPath(bool useStraightPath) { _useStraightPath = useStraightPath; }
         void SetPathLengthLimit(float distance) { _pointPathLimit = std::min<uint32>(uint32(distance/SMOOTH_PATH_STEP_SIZE), MAX_POINT_PATH_LENGTH); }
         void SetUseRaycast(bool useRaycast) { _useRaycast = useRaycast; }
@@ -106,8 +117,9 @@ class PathGenerator
         Movement::PointsArray _pathPoints;  // our actual (x,y,z) path to the target
         PathType _type;                     // tells what kind of path this is
 
-        bool _useStraightPath;  // type of path will be generated
+        bool _useStraightPath;  // type of path will be generated (do not use it for movement paths)
         bool _forceDestination; // when set, we will always arrive at given point
+        bool _slopeCheck;       // when set, it skips paths with too high slopes (doesn't work with _useStraightPath)
         uint32 _pointPathLimit; // limit point path size; min(this, MAX_POINT_PATH_LENGTH)
         bool _useRaycast;       // use raycast if true for a straight line path
 
@@ -119,7 +131,7 @@ class PathGenerator
         dtNavMesh const* _navMesh;              // the nav mesh
         dtNavMeshQuery const* _navMeshQuery;    // the nav mesh query used to find the path
 
-        dtQueryFilter _filter;  // use single filter for all movements, update it when needed
+        dtQueryFilterExt _filter;  // use single filter for all movements, update it when needed
 
         void SetStartPosition(G3D::Vector3 const& point) { _startPosition = point; }
         void SetEndPosition(G3D::Vector3 const& point) { _actualEndPosition = point; _endPosition = point; }
@@ -144,7 +156,7 @@ class PathGenerator
         void BuildPointPath(float const* startPoint, float const* endPoint);
         void BuildShortcut();
 
-        NavTerrain GetNavTerrain(float x, float y, float z);
+        NavTerrain GetNavTerrain(float x, float y, float z) const;
         void CreateFilter();
         void UpdateFilter();
 
