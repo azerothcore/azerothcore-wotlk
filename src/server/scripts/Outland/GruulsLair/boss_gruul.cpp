@@ -126,7 +126,7 @@ public:
                     events.DelayEvents(8001);
                     events.ScheduleEvent(EVENT_GROUND_SLAM, 60000);
                     events.ScheduleEvent(EVENT_SHATTER, 8000);
-                    me->SetControlled(true, UNIT_STATE_ROOT);       // UNIT_STATE_STUNNED would prevent finishing the cast of Ground Slam
+                    me->SetControlled(true, UNIT_STATE_ROOT); 
                     break;
                 case EVENT_SHATTER:
                     Talk(SAY_SHATTER);
