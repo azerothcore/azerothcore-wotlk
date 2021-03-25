@@ -6,15 +6,16 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `spell_enchant_proc_data`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spell_enchant_proc_data` 
 (
-  `entry` int(10) unsigned NOT NULL,
-  `customChance` int(10) unsigned NOT NULL DEFAULT 0,
-  `PPMChance` float unsigned NOT NULL DEFAULT 0,
-  `procEx` int(10) unsigned NOT NULL DEFAULT 0,
+  `entry` INT unsigned NOT NULL,
+  `customChance` INT unsigned NOT NULL DEFAULT 0,
+  `PPMChance` FLOAT NOT NULL DEFAULT 0,
+  `procEx` INT unsigned NOT NULL DEFAULT 0,
+  CHECK (`PPMChance`>=0),
   PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Spell enchant proc data';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=DYNAMIC COMMENT='Spell enchant proc data';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `spell_enchant_proc_data` WRITE;
