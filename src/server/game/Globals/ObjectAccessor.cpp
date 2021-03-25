@@ -43,7 +43,7 @@ void HashMapHolder<T>::Remove(T* o)
 template<class T>
 T* HashMapHolder<T>::Find(uint64 guid)
 {
-    std::unique_lock<std::shared_mutex> lock(*GetLock());
+    std::shared_lock<std::shared_mutex> lock(*GetLock());
     typename MapType::iterator itr = m_objectMap.find(guid);
     return (itr != m_objectMap.end()) ? itr->second : nullptr;
 }
@@ -233,6 +233,7 @@ Player* ObjectAccessor::FindPlayerByName(std::string const& name, bool checkInWo
 void ObjectAccessor::SaveAllPlayers()
 {
     std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
+
     HashMapHolder<Player>::MapType const& m = GetPlayers();
     for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
         itr->second->SaveToDB(false, false);
