@@ -1298,17 +1298,6 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_NUMTHREADS]                  = sConfigMgr->GetOption<int32>("MapUpdate.Threads", 1);
     m_int_configs[CONFIG_MAX_RESULTS_LOOKUP_COMMANDS] = sConfigMgr->GetOption<int32>("Command.LookupMaxResults", 0);
 
-    // chat logging
-    m_bool_configs[CONFIG_CHATLOG_CHANNEL] = sConfigMgr->GetOption<bool>("ChatLogs.Channel", false);
-    m_bool_configs[CONFIG_CHATLOG_WHISPER] = sConfigMgr->GetOption<bool>("ChatLogs.Whisper", false);
-    m_bool_configs[CONFIG_CHATLOG_SYSCHAN] = sConfigMgr->GetOption<bool>("ChatLogs.SysChan", false);
-    m_bool_configs[CONFIG_CHATLOG_PARTY]   = sConfigMgr->GetOption<bool>("ChatLogs.Party", false);
-    m_bool_configs[CONFIG_CHATLOG_RAID]    = sConfigMgr->GetOption<bool>("ChatLogs.Raid", false);
-    m_bool_configs[CONFIG_CHATLOG_GUILD]   = sConfigMgr->GetOption<bool>("ChatLogs.Guild", false);
-    m_bool_configs[CONFIG_CHATLOG_PUBLIC]  = sConfigMgr->GetOption<bool>("ChatLogs.Public", false);
-    m_bool_configs[CONFIG_CHATLOG_ADDON]   = sConfigMgr->GetOption<bool>("ChatLogs.Addon", false);
-    m_bool_configs[CONFIG_CHATLOG_BGROUND] = sConfigMgr->GetOption<bool>("ChatLogs.BattleGround", false);
-
     // Warden
     m_bool_configs[CONFIG_WARDEN_ENABLED]              = sConfigMgr->GetOption<bool>("Warden.Enabled", true);
     m_int_configs[CONFIG_WARDEN_NUM_MEM_CHECKS]        = sConfigMgr->GetOption<int32>("Warden.NumMemChecks", 3);
