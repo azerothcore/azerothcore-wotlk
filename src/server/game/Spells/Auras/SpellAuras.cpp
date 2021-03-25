@@ -2167,7 +2167,7 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
             {
                 return 0;
             }
-        }   
+        }
     }
 
     return roll_chance_f(CalcProcChance(*procEntry, eventInfo));
