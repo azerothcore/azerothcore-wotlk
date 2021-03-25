@@ -141,7 +141,7 @@ protected:
         sLog->outStaticDebug ("Network Thread Starting");
 #endif
 
-        ACE_ASSERT (m_Reactor);
+        ASSERT(m_Reactor);
 
         SocketSet::iterator i, t;
 
@@ -344,7 +344,7 @@ WorldSocketMgr::OnSocketOpen (WorldSocket* sock)
     // we skip the Acceptor Thread
     size_t min = 1;
 
-    ACE_ASSERT (m_NetThreadsCount >= 1);
+    ASSERT(m_NetThreadsCount >= 1);
 
     for (size_t i = 1; i < m_NetThreadsCount; ++i)
         if (m_NetThreads[i].Connections() < m_NetThreads[min].Connections())

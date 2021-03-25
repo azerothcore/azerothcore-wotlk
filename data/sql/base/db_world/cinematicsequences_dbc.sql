@@ -6,21 +6,21 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `cinematicsequences_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `cinematicsequences_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `SoundID` int(11) NOT NULL DEFAULT 0,
-  `Camera_1` int(11) NOT NULL DEFAULT 0,
-  `Camera_2` int(11) NOT NULL DEFAULT 0,
-  `Camera_3` int(11) NOT NULL DEFAULT 0,
-  `Camera_4` int(11) NOT NULL DEFAULT 0,
-  `Camera_5` int(11) NOT NULL DEFAULT 0,
-  `Camera_6` int(11) NOT NULL DEFAULT 0,
-  `Camera_7` int(11) NOT NULL DEFAULT 0,
-  `Camera_8` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `SoundID` INT NOT NULL DEFAULT 0,
+  `Camera_1` INT NOT NULL DEFAULT 0,
+  `Camera_2` INT NOT NULL DEFAULT 0,
+  `Camera_3` INT NOT NULL DEFAULT 0,
+  `Camera_4` INT NOT NULL DEFAULT 0,
+  `Camera_5` INT NOT NULL DEFAULT 0,
+  `Camera_6` INT NOT NULL DEFAULT 0,
+  `Camera_7` INT NOT NULL DEFAULT 0,
+  `Camera_8` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `cinematicsequences_dbc` WRITE;

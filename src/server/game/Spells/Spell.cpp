@@ -4892,6 +4892,11 @@ SpellCastResult Spell::CheckRuneCost(uint32 RuneCostID)
         return SPELL_CAST_OK;
 
     Player* player = m_caster->ToPlayer();
+    //If we are in .cheat power mode we dont need to check the cost as we are expected to be able to use it anyways (infinite power)
+    if (player->GetCommandStatus(CHEAT_POWER))
+    {
+        return SPELL_CAST_OK;
+    }
 
     if (player->getClass() != CLASS_DEATH_KNIGHT)
         return SPELL_CAST_OK;
@@ -6471,6 +6476,16 @@ SpellCastResult Spell::CheckPower()
     if (m_CastItem)
         return SPELL_CAST_OK;
 
+    //While .cheat power is enabled dont check if we need power to cast the spell
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (m_caster->ToPlayer()->GetCommandStatus(CHEAT_POWER))
+        {
+            return SPELL_CAST_OK;
+        }
+    }
+
+
     // health as power used - need check health amount
     if (m_spellInfo->PowerType == POWER_HEALTH)
     {
@@ -7364,8 +7379,18 @@ bool Spell::IsNextMeleeSwingSpell() const
 
 bool Spell::IsAutoActionResetSpell() const
 {
-    // TODO: changed SPELL_INTERRUPT_FLAG_AUTOATTACK -> SPELL_INTERRUPT_FLAG_INTERRUPT to fix compile - is this check correct at all?
-    return !IsTriggered() && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_INTERRUPT);
+    /// @todo changed SPELL_INTERRUPT_FLAG_AUTOATTACK -> SPELL_INTERRUPT_FLAG_INTERRUPT to fix compile - is this check correct at all?
+    if (IsTriggered() || !(m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_INTERRUPT))
+    {
+        return false;
+    }
+
+    if (!m_casttime && m_spellInfo->HasAttribute(SPELL_ATTR6_NOT_RESET_SWING_IF_INSTANT))
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool Spell::IsNeedSendToClient(bool go) const

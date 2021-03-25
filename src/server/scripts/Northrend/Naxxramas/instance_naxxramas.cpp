@@ -30,8 +30,10 @@ inline uint8 GetEruptionSection(float x, float y)
 
     float slope = y / x;
     for (uint32 i = 0; i < 3; ++i)
+    {
         if (slope > HeiganEruptionSlope[i])
             return i;
+    }
     return 3;
 }
 
@@ -68,6 +70,10 @@ public:
             _horsemanGateGUID = 0;
             _kelthuzadfloorGUID = 0;
             _kelthuzadgateGUID = 0;
+            _kelthuzadportal1GUID = 0;
+            _kelthuzadportal2GUID = 0;
+            _kelthuzadportal3GUID = 0;
+            _kelthuzadportal4GUID = 0;
             _sapphironGateGUID = 0;
             _horsemanPortalGUID = 0;
             _loathebPortalGUID = 0;
@@ -131,6 +137,10 @@ public:
         uint64 _horsemanGateGUID;
         uint64 _kelthuzadfloorGUID;
         uint64 _kelthuzadgateGUID;
+        uint64 _kelthuzadportal1GUID;
+        uint64 _kelthuzadportal2GUID;
+        uint64 _kelthuzadportal3GUID;
+        uint64 _kelthuzadportal4GUID;
         uint64 _sapphironGateGUID;
         uint64 _horsemanPortalGUID;
         uint64 _loathebPortalGUID;
@@ -272,57 +282,79 @@ public:
                 case GO_PATCHWERK_GATE:
                     _patchwerkGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_PATCHWERK) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_GLUTH_GATE:
                     _gluthGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_GLUTH) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_NOTH_GATE:
                     _nothGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_NOTH) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_HEIGAN_ENTERANCE_GATE:
                     _heiganGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_HEIGAN) == DONE || GetBossState(BOSS_NOTH) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_HEIGAN_EXIT_GATE:
                     _heiganGateExitGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_HEIGAN) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_LOATHEB_GATE:
                     _loathebGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_LOATHEB) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_ANUB_GATE:
                     _anubGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_ANUB) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_ANUB_NEXT_GATE:
                     _anubNextGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_ANUB) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_FAERLINA_GATE:
                     _faerlinaGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_FAERLINA) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_MAEXXNA_GATE:
                     _maexxnaGateGUID = pGo->GetGUID();
-                    if (GetBossState(BOSS_FAERLINA) == DONE) // faerlina is correct
+                    if (GetBossState(BOSS_FAERLINA) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_THADDIUS_GATE:
                     _thaddiusGateGUID = pGo->GetGUID();
-                    if (GetBossState(BOSS_GLUTH) == DONE) // gluth is correct
+                    if (GetBossState(BOSS_GLUTH) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_GOTHIK_ENTER_GATE:
                     _gothikEnterGateGUID = pGo->GetGUID();
@@ -333,12 +365,16 @@ public:
                 case GO_GOTHIK_EXIT_GATE:
                     _gothikExitGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_GOTHIK) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_HORSEMAN_GATE:
                     _horsemanGateGUID = pGo->GetGUID();
-                    if (GetBossState(BOSS_GOTHIK) == DONE) // correct
+                    if (GetBossState(BOSS_GOTHIK) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_KELTHUZAD_FLOOR:
                     _kelthuzadfloorGUID = pGo->GetGUID();
@@ -346,52 +382,84 @@ public:
                 case GO_KELTHUZAD_GATE:
                     _kelthuzadgateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_SAPPHIRON) == DONE && _speakTimer == 0)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    break;
+                case GO_KELTHUZAD_PORTAL_1:
+                    _kelthuzadportal1GUID = pGo->GetGUID();
+                    break;
+                case GO_KELTHUZAD_PORTAL_2:
+                    _kelthuzadportal2GUID = pGo->GetGUID();
+                    break;
+                case GO_KELTHUZAD_PORTAL_3:
+                    _kelthuzadportal3GUID = pGo->GetGUID();
+                    break;
+                case GO_KELTHUZAD_PORTAL_4:
+                    _kelthuzadportal4GUID = pGo->GetGUID();
                     break;
                 case GO_SAPPHIRON_GATE:
                     _sapphironGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_SAPPHIRON) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_DEATHKNIGHT_WING:
                     _loathebPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_LOATHEB) == DONE)
+                    {
                         pGo->SetPhaseMask(1, true);
+                    }
                     break;
                 case GO_THADDIUS_PORTAL:
                     _thaddiusPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_THADDIUS) == DONE)
+                    {
                         pGo->SetPhaseMask(1, true);
+                    }
                     break;
                 case GO_MAEXXNA_PORTAL:
                     _maexxnaPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_MAEXXNA) == DONE)
+                    {
                         pGo->SetPhaseMask(1, true);
+                    }
                     break;
                 case GO_HORSEMAN_PORTAL:
                     _horsemanPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_HORSEMAN) == DONE)
+                    {
                         pGo->SetPhaseMask(1, true);
+                    }
                     break;
                 case GO_DEATHKNIGHT_EYE_PORTAL:
                     _deathknightEyePortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_HORSEMAN) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_PLAGUE_EYE_PORTAL:
                     _plagueEyePortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_LOATHEB) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_SPIDER_EYE_PORTAL:
                     _spiderEyePortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_MAEXXNA) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
                 case GO_ABOM_EYE_PORTAL:
                     _abomEyePortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_THADDIUS) == DONE)
+                    {
                         pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
             }
         }
@@ -404,10 +472,13 @@ public:
                 HeiganEruption[section].erase(pGo);
                 return;
             }
-
             if (pGo->GetEntry() == GO_SAPPHIRON_BIRTH)
+            {
                 if (Creature* cr = instance->GetCreature(_sapphironGUID))
+                {
                     cr->AI()->DoAction(ACTION_SAPPHIRON_BIRTH);
+                }
+            }
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
@@ -484,9 +555,10 @@ public:
                     {
                         uint8 count = 0;
                         for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
+                        {
                             if (GetBossState(i) == NOT_STARTED)
                                 ++count;
-
+                        }
                         return !count && immortalAchievement;
                     }
 
@@ -550,7 +622,9 @@ public:
                     {
                         Creature* trash = ObjectAccessor::GetCreature(*patch, itr);
                         if (trash && trash->IsAlive() && !trash->IsInCombat())
+                        {
                             trash->AI()->AttackStart(patch->GetVictim());
+                        }
                     }
                 }
             }
@@ -566,10 +640,11 @@ public:
                     {
                         return false;
                     }
-
                     // All horsemans are killed
                     if (Creature* cr = instance->GetCreature(_blaumeuxGUID))
+                    {
                         cr->CastSpell(cr, 59450, true); // credit
+                    }
                 }
 
                 // respawn
@@ -578,45 +653,63 @@ public:
                     Creature* cr;
                     _horsemanKilled = 0;
                     if ((cr = instance->GetCreature(_blaumeuxGUID)))
+                    {
                         if (!cr->IsAlive())
                         {
                             cr->SetPosition(cr->GetHomePosition());
                             cr->Respawn();
                         }
+                    }
                     if ((cr = instance->GetCreature(_rivendareGUID)))
+                    {
                         if (!cr->IsAlive())
                         {
                             cr->SetPosition(cr->GetHomePosition());
                             cr->Respawn();
                         }
+                    }
                     if ((cr = instance->GetCreature(_zeliekGUID)))
+                    {
                         if (!cr->IsAlive())
                         {
                             cr->SetPosition(cr->GetHomePosition());
                             cr->Respawn();
                         }
+                    }
                     if ((cr = instance->GetCreature(_korthazzGUID)))
+                    {
                         if (!cr->IsAlive())
                         {
                             cr->SetPosition(cr->GetHomePosition());
                             cr->Respawn();
                         }
+                    }
                 }
                 else if (state == IN_PROGRESS)
                 {
                     Creature* cr;
                     if ((cr = instance->GetCreature(_blaumeuxGUID)))
+                    {
                         cr->SetInCombatWithZone();
+                    }
                     if ((cr = instance->GetCreature(_rivendareGUID)))
+                    {
                         cr->SetInCombatWithZone();
+                    }
                     if ((cr = instance->GetCreature(_zeliekGUID)))
+                    {
                         cr->SetInCombatWithZone();
+                    }
                     if ((cr = instance->GetCreature(_korthazzGUID)))
+                    {
                         cr->SetInCombatWithZone();
+                    }
                 }
 
                 if (state == NOT_STARTED)
+                {
                     _horsemanTimer = 0;
+                }
             }
 
             if (!InstanceScript::SetBossState(bossId, state))
@@ -627,23 +720,33 @@ public:
             {
                 case BOSS_KELTHUZAD:
                     if (state == NOT_STARTED)
+                    {
                         abominationsKilled = 0;
+                    }
                     break;
                 case BOSS_FAERLINA:
                     if (state == NOT_STARTED)
+                    {
                         faerlinaAchievement = true;
+                    }
                     break;
                 case BOSS_THADDIUS:
                     if (state == NOT_STARTED)
+                    {
                         thaddiusAchievement = true;
+                    }
                     break;
                 case BOSS_LOATHEB:
                     if (state == NOT_STARTED)
+                    {
                         loathebAchievement = true;
+                    }
                     break;
                 case BOSS_HEIGAN:
                     if (state == NOT_STARTED)
+                    {
                         heiganAchievement = true;
+                    }
                     break;
                 case BOSS_SAPPHIRON:
                     if (state == DONE)
@@ -653,7 +756,9 @@ public:
                         instance->LoadGrid(3763.43f, -5115.87f);
                     }
                     else if (state == NOT_STARTED)
+                    {
                         sapphironAchievement = true;
+                    }
                     break;
                 default:
                     break;
@@ -668,87 +773,133 @@ public:
                 {
                     case BOSS_PATCHWERK:
                         if (GameObject* go = instance->GetGameObject(_patchwerkGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         break;
                     case BOSS_GLUTH:
                         if (GameObject* go = instance->GetGameObject(_gluthGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         if (GameObject* go = instance->GetGameObject(_thaddiusGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         break;
                     case BOSS_NOTH:
                         if (GameObject* go = instance->GetGameObject(_nothGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         if (GameObject* go = instance->GetGameObject(_heiganGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         break;
                     case BOSS_HEIGAN:
                         if (GameObject* go = instance->GetGameObject(_heiganGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         if (GameObject* go = instance->GetGameObject(_heiganGateExitGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         break;
                     case BOSS_LOATHEB:
                         if (GameObject* go = instance->GetGameObject(_loathebGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         if (GameObject* go = instance->GetGameObject(_loathebPortalGUID))
+                        {
                             go->SetPhaseMask(1, true);
+                        }
                         if (GameObject* go = instance->GetGameObject(_plagueEyePortalGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_ANUB:
                         if (GameObject* go = instance->GetGameObject(_anubGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         if (GameObject* go = instance->GetGameObject(_anubNextGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         break;
                     case BOSS_FAERLINA:
                         if (GameObject* go = instance->GetGameObject(_faerlinaGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         if (GameObject* go = instance->GetGameObject(_maexxnaGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         break;
                     case BOSS_MAEXXNA:
                         if (GameObject* go = instance->GetGameObject(_maexxnaGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         if (GameObject* go = instance->GetGameObject(_maexxnaPortalGUID))
+                        {
                             go->SetPhaseMask(1, true);
+                        }
                         if (GameObject* go = instance->GetGameObject(_spiderEyePortalGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_GOTHIK:
                         if (GameObject* go = instance->GetGameObject(_gothikEnterGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         if (GameObject* go = instance->GetGameObject(_gothikExitGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         if (GameObject* go = instance->GetGameObject(_horsemanGateGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         break;
                     case BOSS_SAPPHIRON:
-                        if (GameObject* go = instance->GetGameObject(_sapphironGateGUID))
-                            go->SetGoState(GO_STATE_ACTIVE);
+                        events.ScheduleEvent(EVENT_FROSTWYRM_WATERFALL_DOOR, 5000);
                         break;
                     case BOSS_THADDIUS:
                         if (GameObject* go = instance->GetGameObject(_thaddiusPortalGUID))
+                        {
                             go->SetPhaseMask(1, true);
+                        }
                         if (GameObject* go = instance->GetGameObject(_abomEyePortalGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_HORSEMAN:
                         if (GameObject* go = instance->GetGameObject(_horsemanPortalGUID))
+                        {
                             go->SetPhaseMask(1, true);
+                        }
                         if (GameObject* go = instance->GetGameObject(_deathknightEyePortalGUID))
+                        {
                             go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     default:
                         break;
                 }
             }
-
             return true;
         }
 
@@ -759,9 +910,13 @@ public:
                 Creature* kel = instance->GetCreature(_kelthuzadGUID);
                 Creature* lich = instance->GetCreature(_lichkingGUID);
                 if (kel && lich)
+                {
                     _speakTimer += diff;
+                }
                 else
+                {
                     return;
+                }
                 if (_speakTimer > 10000 && _speakTimer < 20000)
                 {
                     kel->AI()->Talk(SAY_SAPP_DIALOG1);
@@ -792,13 +947,17 @@ public:
                     kel->AI()->Talk(SAY_SAPP_DIALOG6);
                     _speakTimer = 0;
                     if (GameObject* go = instance->GetGameObject(_kelthuzadgateGUID))
+                    {
                         go->SetGoState(GO_STATE_ACTIVE);
+                    }
                 }
             }
 
             // And They would all
             if (_horsemanTimer)
+            {
                 _horsemanTimer += diff;
+            }
 
             if (_screamTimer && GetBossState(BOSS_THADDIUS) != DONE)
             {
@@ -808,7 +967,9 @@ public:
                     _screamTimer = (2 * MINUTE + urand(0, 30)) * IN_MILLISECONDS;
                 }
                 else
+                {
                     _screamTimer -= diff;
+                }
             }
 
             events.Update(diff);
@@ -818,9 +979,16 @@ public:
                     // Loads Kel'Thuzad's grid. We need this as he must be active in order for his texts to work.
                     instance->LoadGrid(3749.67f, -5114.06f);
                     if (Creature* kelthuzad = instance->GetCreature(_kelthuzadGUID))
+                    {
                         kelthuzad->AI()->Talk(_currentWingTaunt);
+                    }
                     ++_currentWingTaunt;
-
+                    break;
+                case EVENT_FROSTWYRM_WATERFALL_DOOR:
+                    if (GameObject* go = instance->GetGameObject(_sapphironGateGUID))
+                    {
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    }
                     break;
             }
         }
@@ -848,6 +1016,14 @@ public:
                     return _kelthuzadfloorGUID;
                 case DATA_KELTHUZAD_GATE:
                     return _kelthuzadgateGUID;
+                case DATA_KELTHUZAD_PORTAL_1:
+                    return _kelthuzadportal1GUID;
+                case DATA_KELTHUZAD_PORTAL_2:
+                    return _kelthuzadportal2GUID;
+                case DATA_KELTHUZAD_PORTAL_3:
+                    return _kelthuzadportal3GUID;
+                case DATA_KELTHUZAD_PORTAL_4:
+                    return _kelthuzadportal4GUID;
 
                 // NPCs
                 case DATA_THADDIUS_BOSS:
@@ -896,9 +1072,13 @@ public:
                     uint32 tmpState;
                     loadStream >> tmpState;
                     if (tmpState == IN_PROGRESS)
+                    {
                         tmpState = NOT_STARTED;
+                    }
                     if (i == BOSS_HORSEMAN && tmpState == DONE)
+                    {
                         _horsemanLoadDoneState = true;
+                    }
                     SetBossState(i, EncounterState(tmpState));
                 }
                 loadStream >> immortalAchievement;
@@ -906,7 +1086,9 @@ public:
                 OUT_LOAD_INST_DATA_COMPLETE;
             }
             else
+            {
                 OUT_LOAD_INST_DATA_FAIL;
+            }
         }
     };
 };
@@ -963,7 +1145,9 @@ public:
                 acore::UnitLastSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, target, u_check);
                 me->VisitNearbyObject(1.5f, searcher);
                 if (target)
+                {
                     me->CastSpell(me, SPELL_FROGGER_EXPLODE, true);
+                }
             }
         }
     };
