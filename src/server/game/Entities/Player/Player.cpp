@@ -6387,8 +6387,8 @@ float getProbabilityOfLevelUp(uint32 SkillValue)
 {
     /* According to El's Extreme Angling page, from 1 to 115 the probability of a skill
      * level up is 100% since 100/1 = 100. From 115 - 135 should average 2 catches per
-     * skill up so that means 100/2 = 50%. The if statement returns the probability
-     * depending on the player's SkillValue.
+     * skill up so that means 100/2 = 50%.
+     * This returns the probability depending on the player's SkillValue.
      */
     if (!SkillValue)
     {
