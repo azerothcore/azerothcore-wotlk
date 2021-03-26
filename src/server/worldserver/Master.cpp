@@ -47,21 +47,18 @@ void HandleSignal(int sigNum)
 {
     switch (sigNum)
     {
-        case SIGINT:
-            World::StopNow(RESTART_EXIT_CODE);
-            break;
-        case SIGTERM:
+    case SIGINT:
+        World::StopNow(RESTART_EXIT_CODE);
+        break;
+    case SIGTERM:
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-        case SIGBREAK:
-            if (m_ServiceStatus != 1)
+    case SIGBREAK:
+        if (m_ServiceStatus != 1)
 #endif
-                    World::StopNow(SHUTDOWN_EXIT_CODE);
-                break;
-                /*case SIGSEGV:
-                    LOG_INFO("server", "ZOMG! SIGSEGV handled!");
-                    World::StopNow(SHUTDOWN_EXIT_CODE);
-                    break;*/
-        }
+            World::StopNow(SHUTDOWN_EXIT_CODE);
+        break;
+    default:
+        break;
     }
 }
 
