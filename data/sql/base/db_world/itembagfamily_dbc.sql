@@ -6,10 +6,10 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `itembagfamily_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `itembagfamily_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `Name_Lang_enUS` varchar(100) DEFAULT NULL,
   `Name_Lang_enGB` varchar(100) DEFAULT NULL,
   `Name_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -26,9 +26,9 @@ CREATE TABLE `itembagfamily_dbc`
   `Name_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Name_Lang_itIT` varchar(100) DEFAULT NULL,
   `Name_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Name_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Name_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `itembagfamily_dbc` WRITE;

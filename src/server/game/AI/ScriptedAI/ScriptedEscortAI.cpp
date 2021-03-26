@@ -62,19 +62,54 @@ void npc_escortAI::AttackStart(Unit* who)
 bool npc_escortAI::AssistPlayerInCombat(Unit* who)
 {
     if (!who || !who->GetVictim())
+    {
         return false;
+    }
+
+    if (me->HasReactState(REACT_PASSIVE))
+    {
+        return false;
+    }
 
     //experimental (unknown) flag not present
     if (!(me->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_CAN_ASSIST))
+    {
         return false;
+    }
 
     //not a player
     if (!who->GetVictim()->GetCharmerOrOwnerPlayerOrPlayerItself())
+    {
         return false;
+    }
+
+    if (!who->isInAccessiblePlaceFor(me))
+    {
+        return false;
+    }
+
+    if (!CanAIAttack(who))
+    {
+        return false;
+    }
+
+    // we cannot attack in evade mode
+    if (me->IsInEvadeMode())
+    {
+        return false;
+    }
+
+    // or if enemy is in evade mode
+    if (who->GetTypeId() == TYPEID_UNIT && who->ToCreature()->IsInEvadeMode())
+    {
+        return false;
+    }
 
     //never attack friendly
     if (!me->IsValidAttackTarget(who))
+    {
         return false;
+    }
 
     //too far away and no free sight?
     if (me->IsWithinDistInMap(who, GetMaxPlayerDistance()) && me->IsWithinLOSInMap(who))
