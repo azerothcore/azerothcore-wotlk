@@ -213,7 +213,7 @@ struct ScriptedAI : public CreatureAI
      * Hodir is in room until his Y position is below the Door position:
      * IsInRoom(doorPosition, AXIS_Y, false);
      */
-    bool IsInRoom(const Position* pos, Axis axis, bool above)
+    bool ScriptedAI::IsInRoom(const Position* pos, Axis axis, bool above)
     {
         if (!pos)
         {

@@ -217,7 +217,8 @@ public:
         uint16 addSpawnTimer{ 0 };
 
         // Used to make Hodir disengage whenever he leaves his room
-        const Position POSITION_ROOM_DOOR{ 1999.160034f, -297.792999f, 431.960999f, 0 };
+        const Position ENTRANCE_DOOR{ 1999.160034f, -297.792999f, 431.960999f, 0 };
+        const Position EXIT_DOOR{ 1999.709961f, -166.259003f, 432.822998f, 0 };
 
         void Reset() override
         {
@@ -374,7 +375,10 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!IsInRoom(&POSITION_ROOM_DOOR, Axis::AXIS_Y, false)) { return; }
+            if (!IsInRoom(&ENTRANCE_DOOR, Axis::AXIS_Y, false) || !IsInRoom(&EXIT_DOOR, Axis::AXIS_Y, true))
+            {
+                return;
+            }
 
             if (!UpdateVictim())
             {
