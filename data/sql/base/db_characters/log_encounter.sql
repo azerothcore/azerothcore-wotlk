@@ -6,16 +6,16 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `log_encounter`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `log_encounter` 
 (
   `time` datetime NOT NULL,
-  `map` smallint(5) unsigned NOT NULL,
-  `difficulty` tinyint(3) unsigned NOT NULL,
-  `creditType` tinyint(3) unsigned NOT NULL,
-  `creditEntry` int(10) unsigned NOT NULL,
+  `map` SMALLINT unsigned NOT NULL,
+  `difficulty` TINYINT unsigned NOT NULL,
+  `creditType` TINYINT unsigned NOT NULL,
+  `creditEntry` INT unsigned NOT NULL,
   `playersInfo` text NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `log_encounter` WRITE;
