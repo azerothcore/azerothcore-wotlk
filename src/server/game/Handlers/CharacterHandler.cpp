@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -115,7 +115,7 @@ bool LoginQueryHolder::Initialize()
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD);
     stmt->setUInt32(0, lowGuid);
-    stmt->setUInt64(1, uint64(time(NULL)));
+    stmt->setUInt64(1, uint64(time(nullptr)));
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAIL_UNREAD_COUNT, stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_MAILDATE);

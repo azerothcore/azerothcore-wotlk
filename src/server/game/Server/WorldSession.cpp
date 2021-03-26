@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -171,7 +171,7 @@ WorldSession::~WorldSession()
 
 std::string const& WorldSession::GetPlayerName() const
 {
-    return _player != NULL ? _player->GetName() : DefaultPlayerName;
+    return _player != nullptr ? _player->GetName() : DefaultPlayerName;
 }
 
 std::string WorldSession::GetPlayerInfo() const
@@ -179,7 +179,7 @@ std::string WorldSession::GetPlayerInfo() const
     std::ostringstream ss;
 
     ss << "[Player: " << GetPlayerName()
-       << " (Guid: " << (_player != NULL ? _player->GetGUID() : 0)
+       << " (Guid: " << (_player != nullptr ? _player->GetGUID() : 0)
        << ", Account: " << GetAccountId() << ")]";
 
     return ss.str();
@@ -765,7 +765,7 @@ void WorldSession::SetAccountData(AccountDataType type, time_t tm, std::string c
     }
     else
     {
-        // _player can be NULL and packet received after logout but m_GUID still store correct guid
+        // _player can be nullptr and packet received after logout but m_GUID still store correct guid
         if (!m_GUIDLow)
             return;
 
@@ -1160,7 +1160,7 @@ void WorldSession::SetPlayer(Player* player)
 void WorldSession::InitializeQueryCallbackParameters()
 {
     // Callback parameters that have pointers in them should be properly
-    // initialized to NULL here.
+    // initialized to nullptr here.
     _charCreateCallback.SetParam(nullptr);
     _loadPetFromDBFirstCallback.SetFirstParam(0);
     _loadPetFromDBFirstCallback.SetSecondParam(nullptr);
@@ -1331,7 +1331,7 @@ void WorldSession::ProcessQueryCallbackLogin()
     }
 }
 
-void WorldSession::InitWarden(BigNumber* k, std::string const& os)
+void WorldSession::InitWarden(SessionKey const& k, std::string const& os)
 {
     if (os == "Win")
     {

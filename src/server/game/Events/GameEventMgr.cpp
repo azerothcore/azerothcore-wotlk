@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -1361,7 +1361,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         {
             sObjectMgr->RemoveCreatureFromGrid(*itr, data);
 
-            if (Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_UNIT), (Creature*)NULL))
+            if (Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_UNIT), (Creature*)nullptr))
                 creature->AddObjectToRemoveList();
         }
     }
@@ -1383,7 +1383,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         {
             sObjectMgr->RemoveGameobjectFromGrid(*itr, data);
 
-            if (GameObject* pGameobject = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_GAMEOBJECT), (GameObject*)NULL))
+            if (GameObject* pGameobject = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(*itr, data->id, HIGHGUID_GAMEOBJECT), (GameObject*)nullptr))
                 pGameobject->AddObjectToRemoveList();
         }
     }
@@ -1409,7 +1409,7 @@ void GameEventMgr::ChangeEquipOrModel(int16 event_id, bool activate)
             continue;
 
         // Update if spawned
-        Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(itr->first, data->id, HIGHGUID_UNIT), (Creature*)NULL);
+        Creature* creature = ObjectAccessor::GetObjectInWorld(MAKE_NEW_GUID(itr->first, data->id, HIGHGUID_UNIT), (Creature*)nullptr);
         if (creature)
         {
             if (activate)

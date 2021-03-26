@@ -659,7 +659,7 @@ public:
 
             // Illusion shatters (param - stun time)
             WorldPacket data;
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, NULL, "Illusion shatters and a path to the central chamber opens!");
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, "Illusion shatters and a path to the central chamber opens!");
             me->SendMessageToSetInRange(&data, 500, false);
 
             uint32 timer = events.GetNextEventTime(EVENT_SARA_P2_OPEN_PORTALS);
@@ -986,7 +986,7 @@ public:
 
         void JustDied(Unit*) override
         {
-            me->CastSpell((Unit*)NULL, SPELL_SHADOW_NOVA, true);
+            me->CastSpell((Unit*)nullptr, SPELL_SHADOW_NOVA, true);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1904,12 +1904,12 @@ public:
             WorldPacket data;
             if (creature->GetGUID() != _yoggGUID)
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 creature->SendMessageToSetInRange(&data, 90, true);
             }
             else if (Creature* cr = me->SummonTrigger(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 5, 0, 5000))
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 cr->SendMessageToSetInRange(&data, 90, true);
             }
             else
@@ -2018,12 +2018,12 @@ public:
             WorldPacket data;
             if (creature->GetGUID() != _yoggGUID)
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 creature->SendMessageToSetInRange(&data, 90, true);
             }
             else if (Creature* cr = me->SummonTrigger(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 5, 0, 5000))
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 cr->SendMessageToSetInRange(&data, 90, true);
             }
             else
@@ -2138,12 +2138,12 @@ public:
             WorldPacket data;
             if (creature->GetGUID() != _yoggGUID)
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 creature->SendMessageToSetInRange(&data, 90, true);
             }
             else if (Creature* cr = me->SummonTrigger(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 5, 0, 5000))
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 cr->SendMessageToSetInRange(&data, 90, true);
             }
             else
@@ -2893,7 +2893,7 @@ public:
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             int32 damage = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), 60);
-            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetDamageInfo()->GetAttacker(), true, NULL, aurEff);
+            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetDamageInfo()->GetAttacker(), true, nullptr, aurEff);
         }
 
         void Register() override

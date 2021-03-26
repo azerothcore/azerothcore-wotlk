@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -1607,7 +1607,7 @@ public:
                 default:
                     return;
             }
-            GetTarget()->CastSpell(GetTarget(), spellId, true, NULL, aurEff);
+            GetTarget()->CastSpell(GetTarget(), spellId, true, nullptr, aurEff);
         }
 
         void Register() override
@@ -2004,7 +2004,7 @@ public:
                 default:
                     return;
             }
-            GetTarget()->CastSpell(GetTarget(), spellId, true, NULL, aurEff);
+            GetTarget()->CastSpell(GetTarget(), spellId, true, nullptr, aurEff);
         }
 
         void Register() override
@@ -2676,7 +2676,7 @@ public:
 
         void AchievementCredit(SpellEffIndex /*effIndex*/)
         {
-            // but in effect handling OriginalCaster can become NULL
+            // but in effect handling OriginalCaster can become nullptr
             if (Unit* originalCaster = GetOriginalCaster())
                 if (GameObject* go = GetHitGObj())
                     if (go->GetGOValue()->Building.Health > 0 && go->GetGOInfo()->type == GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING)
@@ -2735,7 +2735,7 @@ public:
             if (stackAmount >= 15 && stackAmount < 40)
             {
                 stackAmount = 40;
-                GetTarget()->CastSpell(GetTarget(), SPELL_TURKEY_VENGEANCE, true, NULL, aurEff, GetCasterGUID());
+                GetTarget()->CastSpell(GetTarget(), SPELL_TURKEY_VENGEANCE, true, nullptr, aurEff, GetCasterGUID());
             }
         }
 
@@ -3603,7 +3603,7 @@ public:
                 for (uint8 i = 0; i < GetSpellInfo()->StackAmount; ++i)
                     target->RemoveAurasDueToSpell(SPELL_VISUAL_SHIELD_1 + i);
 
-                target->CastSpell(target, SPELL_VISUAL_SHIELD_1 + GetAura()->GetStackAmount() - 1, true, NULL, aurEff);
+                target->CastSpell(target, SPELL_VISUAL_SHIELD_1 + GetAura()->GetStackAmount() - 1, true, nullptr, aurEff);
             }
             else
                 GetTarget()->RemoveAurasDueToSpell(GetId());
@@ -4339,7 +4339,7 @@ public:
                 return;
 
             // final heal
-            GetTarget()->CastSpell(GetTarget(), _spellId, true, NULL, aurEff, GetCasterGUID());
+            GetTarget()->CastSpell(GetTarget(), _spellId, true, nullptr, aurEff, GetCasterGUID());
         }
 
         void Register() override
@@ -4923,7 +4923,7 @@ public:
         void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
         {
             PreventDefaultAction();
-            GetTarget()->CastSpell((Unit*)NULL, SPELL_YOGG_SARON_WHISPER_DUMMY, true);
+            GetTarget()->CastSpell((Unit*)nullptr, SPELL_YOGG_SARON_WHISPER_DUMMY, true);
         }
 
         void Register() override
@@ -5038,6 +5038,63 @@ public:
     SpellScript* GetSpellScript() const override
     {
         return new spell_gen_charmed_unit_spell_cooldown_SpellScript();
+    }
+};
+
+class spell_gen_shadowmeld : public SpellScriptLoader
+{
+public:
+    spell_gen_shadowmeld() : SpellScriptLoader("spell_gen_shadowmeld") {}
+
+    class spell_gen_shadowmeld_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_shadowmeld_SpellScript);
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            Unit* caster = GetCaster();
+            if (!caster)
+                return;
+
+            caster->InterruptSpell(CURRENT_AUTOREPEAT_SPELL); // break Auto Shot and autohit
+            caster->InterruptSpell(CURRENT_CHANNELED_SPELL); // break channeled spells
+
+            bool instant_exit = true;
+            if (Player* pCaster = caster->ToPlayer()) // if is a creature instant exits combat, else check if someone in party is in combat in visibility distance
+            {
+                uint64 myGUID = pCaster->GetGUID();
+                float visibilityRange = pCaster->GetMap()->GetVisibilityRange();
+                if (Group* pGroup = pCaster->GetGroup())
+                {
+                    const Group::MemberSlotList membersList = pGroup->GetMemberSlots();
+                    for (Group::member_citerator itr = membersList.begin(); itr != membersList.end() && instant_exit; ++itr)
+                        if (itr->guid != myGUID)
+                            if (Player* GroupMember = ObjectAccessor::GetPlayer(*pCaster, itr->guid))
+                                if (GroupMember->IsInCombat() && pCaster->GetMap() == GroupMember->GetMap() && pCaster->IsWithinDistInMap(GroupMember, visibilityRange))
+                                    instant_exit = false;
+                }
+
+                pCaster->SendAttackSwingCancelAttack();
+            }
+
+            if (!caster->GetInstanceScript() || !caster->GetInstanceScript()->IsEncounterInProgress()) //Don't leave combat if you are in combat with a boss
+            {
+                if (!instant_exit) {
+                    caster->getHostileRefManager().deleteReferences(); // exit combat after 6 seconds
+                }
+                else caster->CombatStop(); // isn't necessary to call AttackStop because is just called in CombatStop
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_gen_shadowmeld_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_gen_shadowmeld_SpellScript();
     }
 };
 
@@ -5170,4 +5227,5 @@ void AddSC_generic_spell_scripts()
     new spell_gen_eject_all_passengers();
     new spell_gen_eject_passenger();
     new spell_gen_charmed_unit_spell_cooldown();
+    new spell_gen_shadowmeld();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -600,7 +600,7 @@ namespace lfg
                 else
                 {
                     uint8 memberCount = 0;
-                    for (GroupReference* itr = grp->GetFirstMember(); itr != NULL && joinData.result == LFG_JOIN_OK; itr = itr->next())
+                    for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr && joinData.result == LFG_JOIN_OK; itr = itr->next())
                     {
                         if (Player* plrg = itr->GetSource())
                         {
@@ -628,7 +628,7 @@ namespace lfg
                     joinData.result = LFG_JOIN_RANDOM_COOLDOWN;
                 else if (grp)
                 {
-                    for (GroupReference* itr = grp->GetFirstMember(); itr != NULL && joinData.result == LFG_JOIN_OK; itr = itr->next())
+                    for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr && joinData.result == LFG_JOIN_OK; itr = itr->next())
                         if (Player* plrg = itr->GetSource())
                             if (plrg->HasAura(LFG_SPELL_DUNGEON_COOLDOWN)) // xinef: added !isContinue
                                 joinData.result = LFG_JOIN_PARTY_RANDOM_COOLDOWN;
@@ -763,7 +763,7 @@ namespace lfg
 
     /**
         Leaves Dungeon System. Player/Group is removed from queue, rolechecks, proposals
-        or votekicks. Player or group needs to be not NULL and using Dungeon System
+        or votekicks. Player or group needs to be not nullptr and using Dungeon System
 
        @param[in]     guid Player or group guid
     */
@@ -2115,7 +2115,7 @@ namespace lfg
 
             // if we can take the quest, means that we haven't done this kind of "run", IE: First Heroic Random of Day.
             if (player->CanRewardQuest(quest, false))
-                player->RewardQuest(quest, 0, NULL, false);
+                player->RewardQuest(quest, 0, nullptr, false);
             else
             {
                 done = true;
@@ -2123,7 +2123,7 @@ namespace lfg
                 if (!quest)
                     continue;
                 // we give reward without informing client (retail does this)
-                player->RewardQuest(quest, 0, NULL, false);
+                player->RewardQuest(quest, 0, nullptr, false);
             }
 
             // Give rewards

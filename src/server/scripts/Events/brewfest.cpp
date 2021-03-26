@@ -183,7 +183,7 @@ public:
                 if (Player* player = itr->GetSource())
                 {
                     if (player->CanRewardQuest(qReward, false))
-                        player->RewardQuest(qReward, 0, NULL, false);
+                        player->RewardQuest(qReward, 0, nullptr, false);
                 }
 
             Map::PlayerList const& players = me->GetMap()->GetPlayers();

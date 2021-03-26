@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
 * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 */
@@ -26,12 +26,12 @@ void CreatureAI::OnCharmed(bool /*apply*/)
 AISpellInfoType* UnitAI::AISpellInfo;
 AISpellInfoType* GetAISpellInfo(uint32 i) { return &CreatureAI::AISpellInfo[i]; }
 
-void CreatureAI::Talk(uint8 id, WorldObject const* whisperTarget /*= NULL*/)
+void CreatureAI::Talk(uint8 id, WorldObject const* whisperTarget /*= nullptr*/)
 {
     sCreatureTextMgr->SendChat(me, id, whisperTarget);
 }
 
-void CreatureAI::DoZoneInCombat(Creature* creature /*= NULL*/, float maxRangeToNearestTarget /* = 50.0f*/)
+void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRangeToNearestTarget /* = 50.0f*/)
 {
     if (!creature)
         creature = me;

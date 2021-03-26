@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  *
  *
  * This program is free software licensed under GPL version 2
@@ -260,15 +260,15 @@ SpellInfo const* ScriptedAI::SelectSpell(Unit* target, uint32 school, uint32 mec
         return nullptr;
 
     //Using the extended script system we first create a list of viable spells
-    SpellInfo const* apSpell[CREATURE_MAX_SPELLS];
-    memset(apSpell, 0, CREATURE_MAX_SPELLS * sizeof(SpellInfo*));
+    SpellInfo const* apSpell[MAX_CREATURE_SPELLS];
+    memset(apSpell, 0, MAX_CREATURE_SPELLS * sizeof(SpellInfo*));
 
     uint32 spellCount = 0;
 
     SpellInfo const* tempSpell = nullptr;
 
     //Check if each spell is viable(set it to null if not)
-    for (uint32 i = 0; i < CREATURE_MAX_SPELLS; i++)
+    for (uint32 i = 0; i < MAX_CREATURE_SPELLS; i++)
     {
         tempSpell = sSpellMgr->GetSpellInfo(me->m_spells[i]);
 
@@ -473,7 +473,7 @@ Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura
     std::vector<Player*> tList;
     for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
     {
-        if (me->GetDistance(itr->GetSource()) > maxdist || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
+        if (!me->IsWithinDistInMap(itr->GetSource(), maxdist) || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
             continue;
         if (excludeAura && itr->GetSource()->HasAura(excludeAura))
             continue;

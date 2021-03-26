@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -64,7 +64,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) || // for .npc follow
         (owner->CanFly())
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
-
 
     Unit* target = i_target.getTarget();
 
@@ -271,7 +270,6 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         (followingMaster) || // allow pets following their master to cheat while generating paths
         (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) // for .npc follow
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
-
 
     i_recheckDistance.Update(time_diff);
     if (i_recheckDistance.Passed())

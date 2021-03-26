@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -401,7 +401,7 @@ CalendarEventStore CalendarMgr::GetPlayerEvents(uint64 guid)
     for (CalendarEventInviteStore::const_iterator itr = _invites.begin(); itr != _invites.end(); ++itr)
         for (CalendarInviteStore::const_iterator itr2 = itr->second.begin(); itr2 != itr->second.end(); ++itr2)
             if ((*itr2)->GetInviteeGUID() == guid)
-                if (CalendarEvent* event = GetEvent(itr->first)) // NULL check added as attempt to fix #11512
+                if (CalendarEvent* event = GetEvent(itr->first)) // nullptr check added as attempt to fix #11512
                     events.insert(event);
 
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
@@ -665,7 +665,7 @@ void CalendarMgr::SendCalendarClearPendingAction(uint64 guid)
     }
 }
 
-void CalendarMgr::SendCalendarCommandResult(uint64 guid, CalendarError err, char const* param /*= NULL*/)
+void CalendarMgr::SendCalendarCommandResult(uint64 guid, CalendarError err, char const* param /*= nullptr*/)
 {
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
     {

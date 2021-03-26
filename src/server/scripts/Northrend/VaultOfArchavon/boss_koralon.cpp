@@ -94,6 +94,7 @@ public:
         {
             if (rotateTimer)
             {
+                me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
                 rotateTimer += diff;
                 if (rotateTimer >= 3000)
                 {
@@ -194,7 +195,7 @@ public:
         void TriggerFists(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_METEOR_FISTS_DAMAGE, true, NULL, aurEff);
+            GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_METEOR_FISTS_DAMAGE, true, nullptr, aurEff);
         }
 
         void Register() override
@@ -226,7 +227,7 @@ public:
         void TriggerFists(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
-            GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_FW_METEOR_FISTS_DAMAGE, true, NULL, aurEff);
+            GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_FW_METEOR_FISTS_DAMAGE, true, nullptr, aurEff);
         }
 
         void Register() override

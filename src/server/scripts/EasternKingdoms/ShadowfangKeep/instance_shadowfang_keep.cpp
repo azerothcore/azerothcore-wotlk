@@ -116,7 +116,7 @@ public:
 
         void HandleDummyTick(AuraEffect const* aurEff)
         {
-            GetTarget()->CastSpell((Unit*)NULL, aurEff->GetAmount(), true);
+            GetTarget()->CastSpell((Unit*)nullptr, aurEff->GetAmount(), true);
         }
 
         void HandleUpdatePeriodic(AuraEffect* aurEff)

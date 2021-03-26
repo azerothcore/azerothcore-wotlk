@@ -6,14 +6,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `spell_group`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spell_group` 
 (
-  `id` int(10) unsigned NOT NULL DEFAULT 0,
-  `spell_id` int(11) unsigned NOT NULL DEFAULT 0,
-  `special_flag` int(11) unsigned NOT NULL DEFAULT 0,
+  `id` INT unsigned NOT NULL DEFAULT 0,
+  `spell_id` INT unsigned NOT NULL DEFAULT 0,
+  `special_flag` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`,`spell_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Spell System';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED COMMENT='Spell System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `spell_group` WRITE;

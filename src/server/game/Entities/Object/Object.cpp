@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -897,7 +897,6 @@ bool Object::PrintIndexError(uint32 index, bool set) const
     return false;
 }
 
-
 bool Position::operator==(Position const& a)
 {
     return (G3D::fuzzyEq(a.m_positionX, m_positionX) &&
@@ -1517,7 +1516,7 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
 
             if (max_z > INVALID_HEIGHT)
             {
-                if (canSwim && unit->GetMap()->IsInWater(x, y, max_z - WATER_HEIGHT_TOLERANCE)) {
+                if (canSwim && unit->GetMap()->IsInWater(x, y, max_z - Z_OFFSET_FIND_HEIGHT)) {
                     // do not allow creatures to walk on
                     // water level while swimming
                     max_z = max_z - GetMinHeightInWater();
@@ -2202,7 +2201,7 @@ void WorldObject::AddObjectToRemoveList()
     map->AddObjectToRemoveList(this);
 }
 
-TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= NULL*/, uint32 duration /*= 0*/, Unit* summoner /*= NULL*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/)
+TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, Unit* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/)
 {
     uint32 mask = UNIT_MASK_SUMMON;
     if (properties)
@@ -2306,14 +2305,14 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
 * @param list  List to store pointers to summoned creatures.
 */
 
-void Map::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= NULL*/)
+void Map::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= nullptr*/)
 {
     std::vector<TempSummonData> const* data = sObjectMgr->GetSummonGroup(GetId(), SUMMONER_TYPE_MAP, group);
     if (!data)
         return;
 
     for (std::vector<TempSummonData>::const_iterator itr = data->begin(); itr != data->end(); ++itr)
-        if (TempSummon* summon = SummonCreature(itr->entry, itr->pos, NULL, itr->time))
+        if (TempSummon* summon = SummonCreature(itr->entry, itr->pos, nullptr, itr->time))
             if (list)
                 list->push_back(summon);
 }
@@ -2438,7 +2437,7 @@ Creature* WorldObject::SummonTrigger(float x, float y, float z, float ang, uint3
 * @param group Id of group to summon.
 * @param list  List to store pointers to summoned creatures.
 */
-void WorldObject::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= NULL*/)
+void WorldObject::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= nullptr*/)
 {
     ASSERT((GetTypeId() == TYPEID_GAMEOBJECT || GetTypeId() == TYPEID_UNIT) && "Only GOs and creatures can summon npc groups!");
 
@@ -2851,7 +2850,7 @@ void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
         UpdateObjectVisibility();
 }
 
-void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= NULL*/)
+void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= nullptr*/)
 {
     WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4 + 8);
     data << uint32(sound_id);
@@ -2862,7 +2861,7 @@ void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= NULL*/)
         SendMessageToSet(&data, true);
 }
 
-void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= NULL*/)
+void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= nullptr*/)
 {
     WorldPacket data(SMSG_PLAY_SOUND, 4);
     data << uint32(sound_id);
@@ -2872,7 +2871,7 @@ void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= NULL*/)
         SendMessageToSet(&data, true);
 }
 
-void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= NULL*/)
+void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= nullptr*/)
 {
     WorldPacket data(SMSG_PLAY_MUSIC, 4);
     data << uint32(music_id);
@@ -2998,7 +2997,7 @@ struct WorldObjectChangeAccumulator
 
             if (IS_PLAYER_GUID(guid))
             {
-                //Caster may be NULL if DynObj is in removelist
+                //Caster may be nullptr if DynObj is in removelist
                 if (Player* caster = ObjectAccessor::FindPlayer(guid))
                     if (caster->GetUInt64Value(PLAYER_FARSIGHT) == source->GetGUID())
                         BuildPacket(caster);
@@ -3059,7 +3058,7 @@ uint64 WorldObject::GetTransGUID() const
 float WorldObject::GetMapHeight(float x, float y, float z, bool vmap/* = true*/, float distanceToSearch/* = DEFAULT_HEIGHT_SEARCH*/) const
 {
     if (z != MAX_HEIGHT)
-        z += GetCollisionHeight();
+        z += Z_OFFSET_FIND_HEIGHT;
 
     return GetMap()->GetHeight(GetPhaseMask(), x, y, z, vmap, distanceToSearch);
 }
@@ -3076,5 +3075,5 @@ float WorldObject::GetFloorZ() const
     if (!IsInWorld())
         return m_staticFloorZ;
 
-    return std::max<float>(m_staticFloorZ, GetMap()->GetGameObjectFloor(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight()));
+    return std::max<float>(m_staticFloorZ, GetMap()->GetGameObjectFloor(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ() + Z_OFFSET_FIND_HEIGHT));
 }
