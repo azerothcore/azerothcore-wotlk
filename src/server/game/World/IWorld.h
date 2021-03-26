@@ -5,16 +5,15 @@
 #ifndef AZEROTHCORE_IWORLD_H
 #define AZEROTHCORE_IWORLD_H
 
-#include "Common.h"
-#include "Timer.h"
-#include "SharedDefines.h"
-#include "QueryResult.h"
 #include "Callback.h"
-
+#include "Common.h"
+#include "QueryResult.h"
+#include "SharedDefines.h"
+#include "Timer.h"
+#include <atomic>
+#include <list>
 #include <map>
 #include <set>
-#include <list>
-#include <atomic>
 
 class WorldSession;
 class Player;
@@ -165,6 +164,8 @@ enum WorldBoolConfigs
     CONFIG_DEBUG_BATTLEGROUND,
     CONFIG_DEBUG_ARENA,
     CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID,
+    CONFIG_SET_SHAPASSHASH,
+    CONFIG_SET_BOP_ITEM_TRADEABLE,
     BOOL_CONFIG_VALUE_COUNT
 };
 

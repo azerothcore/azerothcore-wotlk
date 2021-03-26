@@ -6,11 +6,11 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `soundentries_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `soundentries_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `SoundType` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `SoundType` INT NOT NULL DEFAULT 0,
   `Name` varchar(100) DEFAULT NULL,
   `File_1` varchar(100) DEFAULT NULL,
   `File_2` varchar(100) DEFAULT NULL,
@@ -22,25 +22,25 @@ CREATE TABLE `soundentries_dbc`
   `File_8` varchar(100) DEFAULT NULL,
   `File_9` varchar(100) DEFAULT NULL,
   `File_10` varchar(100) DEFAULT NULL,
-  `Freq_1` int(11) NOT NULL DEFAULT 0,
-  `Freq_2` int(11) NOT NULL DEFAULT 0,
-  `Freq_3` int(11) NOT NULL DEFAULT 0,
-  `Freq_4` int(11) NOT NULL DEFAULT 0,
-  `Freq_5` int(11) NOT NULL DEFAULT 0,
-  `Freq_6` int(11) NOT NULL DEFAULT 0,
-  `Freq_7` int(11) NOT NULL DEFAULT 0,
-  `Freq_8` int(11) NOT NULL DEFAULT 0,
-  `Freq_9` int(11) NOT NULL DEFAULT 0,
-  `Freq_10` int(11) NOT NULL DEFAULT 0,
+  `Freq_1` INT NOT NULL DEFAULT 0,
+  `Freq_2` INT NOT NULL DEFAULT 0,
+  `Freq_3` INT NOT NULL DEFAULT 0,
+  `Freq_4` INT NOT NULL DEFAULT 0,
+  `Freq_5` INT NOT NULL DEFAULT 0,
+  `Freq_6` INT NOT NULL DEFAULT 0,
+  `Freq_7` INT NOT NULL DEFAULT 0,
+  `Freq_8` INT NOT NULL DEFAULT 0,
+  `Freq_9` INT NOT NULL DEFAULT 0,
+  `Freq_10` INT NOT NULL DEFAULT 0,
   `DirectoryBase` varchar(100) DEFAULT NULL,
   `Volumefloat` float NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
   `MinDistance` float NOT NULL DEFAULT 0,
   `DistanceCutoff` float NOT NULL DEFAULT 0,
-  `EAXDef` int(11) NOT NULL DEFAULT 0,
-  `SoundEntriesAdvancedID` int(11) NOT NULL DEFAULT 0,
+  `EAXDef` INT NOT NULL DEFAULT 0,
+  `SoundEntriesAdvancedID` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `soundentries_dbc` WRITE;

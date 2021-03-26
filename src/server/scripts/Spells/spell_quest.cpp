@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -10,16 +10,16 @@
  * Scriptnames of files in this file should be prefixed with "spell_q#questID_".
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "Vehicle.h"
-#include "SpellAuras.h"
+#include "CellImpl.h"
+#include "CreatureTextMgr.h"
 #include "GridNotifiers.h"
 #include "MapManager.h"
-#include "CreatureTextMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
-#include "CellImpl.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 class spell_q11065_wrangle_some_aether_rays : public SpellScriptLoader
@@ -2886,7 +2886,7 @@ public:
                     return;
             }
 
-            GetCaster()->CastSpell((Unit*)NULL, spellId, true);
+            GetCaster()->CastSpell((Unit*)nullptr, spellId, true);
         }
 
         void Register() override
@@ -2915,7 +2915,7 @@ public:
         {
             PreventDefaultAction();
             if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, NULL, aurEff);
+                caster->CastSpell(caster, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, nullptr, aurEff);
         }
 
         void Register() override

@@ -2,11 +2,10 @@
 Xinef
  */
 
-#include <time.h>
-
 #include "LootItemStorage.h"
-#include "PreparedStatement.h"
 #include "ObjectMgr.h"
+#include "PreparedStatement.h"
+#include <time.h>
 
 LootItemStorage::LootItemStorage()
 {

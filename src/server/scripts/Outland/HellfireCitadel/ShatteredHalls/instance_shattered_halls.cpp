@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
-#include "shattered_halls.h"
 #include "CreatureTextMgr.h"
+#include "InstanceScript.h"
+#include "ScriptMgr.h"
+#include "shattered_halls.h"
 
 class instance_shattered_halls : public InstanceMapScript
 {
@@ -126,7 +126,7 @@ public:
                 instance->LoadGrid(230, -80);
 
                 if (Creature* kargath = instance->GetCreature(warchiefKargathGUID))
-                    sCreatureTextMgr->SendChat(kargath, TeamIdInInstance == TEAM_ALLIANCE ? 3 : 4, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
+                    sCreatureTextMgr->SendChat(kargath, TeamIdInInstance == TEAM_ALLIANCE ? 3 : 4, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
 
                 RescueTimer = 80 * MINUTE * IN_MILLISECONDS;
             }
