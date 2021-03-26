@@ -62,3 +62,7 @@ When a PR is ready to be tested, it will be marked as **[WAITING TO BE TESTED]**
 You can help by testing PRs and writing your feedback here on the PR's page on GitHub. Follow the instructions here:
 
 http://www.azerothcore.org/wiki/How-to-test-a-PR
+
+**REMEMBER**: when testing a PR that changes something **generic** (i.e. a part of code that handles more than one specific thing), the tester should not only check that the PR does its job (e.g. fixing spell XXX) but **especially** check that the PR does not cause any regression (i.e. introducing new bugs).
+
+**For example**: if a PR fixes spell X by changing a part of code that handles spells X, Y, and Z, we should not only test X, but **we should test Y and Z as well**.
