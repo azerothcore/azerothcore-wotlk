@@ -130,6 +130,9 @@ bool AssistDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
     if (Unit* victim = ObjectAccessor::GetUnit(*m_owner, m_victim))
     {
+        // Initialize last damage timer if it doesn't exist
+        m_owner->SetLastDamagedTime(sWorld->GetGameTime() + MAX_AGGRO_RESET_TIME);
+
         while (!m_assistants.empty())
         {
             Creature* assistant = ObjectAccessor::GetCreature(*m_owner, *m_assistants.begin());
