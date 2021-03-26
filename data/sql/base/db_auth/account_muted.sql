@@ -6,12 +6,12 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `account_muted`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `account_muted` 
 (
-  `guid` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
-  `mutedate` int(10) unsigned NOT NULL DEFAULT 0,
-  `mutetime` int(10) unsigned NOT NULL DEFAULT 0,
+  `guid` INT unsigned NOT NULL DEFAULT 0 COMMENT 'Global Unique Identifier',
+  `mutedate` INT unsigned NOT NULL DEFAULT 0,
+  `mutetime` INT unsigned NOT NULL DEFAULT 0,
   `mutedby` varchar(50) NOT NULL,
   `mutereason` varchar(255) NOT NULL,
   PRIMARY KEY (`guid`,`mutedate`)
