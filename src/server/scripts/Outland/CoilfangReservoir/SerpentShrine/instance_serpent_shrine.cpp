@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "InstanceScript.h"
-#include "serpent_shrine.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+#include "serpent_shrine.h"
 #include "TemporarySummon.h"
 
 DoorData const doorData[] =
@@ -360,7 +360,6 @@ public:
             isPeriodic = true;
             amplitude = 8 * IN_MILLISECONDS;
         }
-
 
         void HandlePeriodic(AuraEffect const*  /*aurEff*/)
         {

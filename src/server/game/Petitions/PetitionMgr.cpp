@@ -2,12 +2,11 @@
 Xinef
  */
 
-#include "PetitionMgr.h"
-#include "Timer.h"
-#include "QueryResult.h"
-#include "Log.h"
 #include "DatabaseEnv.h"
-
+#include "Log.h"
+#include "PetitionMgr.h"
+#include "QueryResult.h"
+#include "Timer.h"
 
 PetitionMgr::PetitionMgr()
 {
@@ -163,5 +162,3 @@ void PetitionMgr::RemoveSignaturesByPlayerAndType(uint32 playerGuid, uint8 type)
             itr->second.signatureMap.erase(signItr);
     }
 }
-
-

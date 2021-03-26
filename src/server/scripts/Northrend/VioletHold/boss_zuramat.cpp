@@ -2,10 +2,10 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "violet_hold.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "violet_hold.h"
 
 enum Yells
 {
@@ -108,7 +108,7 @@ public:
                     events.RepeatEvent(urand(18000, 22000));
                     break;
                 case EVENT_SPELL_SUMMON_VOID_SENTRY:
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_VOID_SENTRY, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOID_SENTRY, false);
                     events.RepeatEvent(12000);
                     break;
             }

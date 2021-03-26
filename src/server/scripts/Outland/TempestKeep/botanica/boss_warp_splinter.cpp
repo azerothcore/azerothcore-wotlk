@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "the_botanica.h"
 
 enum Says
@@ -34,7 +34,6 @@ enum Misc
 class boss_warp_splinter : public CreatureScript
 {
 public:
-
     boss_warp_splinter() : CreatureScript("boss_warp_splinter") { }
     struct boss_warp_splinterAI : public BossAI
     {
@@ -109,4 +108,3 @@ void AddSC_boss_warp_splinter()
 {
     new boss_warp_splinter();
 }
-

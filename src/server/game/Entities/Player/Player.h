@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,20 +7,19 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
+
+#include "Battleground.h"
 #include "DBCStores.h"
 #include "GroupReference.h"
-#include "MapReference.h"
 #include "InstanceSaveMgr.h"
-
 #include "Item.h"
+#include "MapReference.h"
+#include "ObjectMgr.h"
 #include "PetDefines.h"
 #include "QuestDef.h"
 #include "SpellMgr.h"
 #include "Unit.h"
-#include "Battleground.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
-
 #include <string>
 #include <vector>
 
@@ -1042,11 +1041,9 @@ public:                                                 // constructors
     void SetInAcceptProcess(bool state) { m_acceptProccess = state; }
 
 private:                                                // internal functions
-
     void Update(bool for_trader = true);
 
 private:                                                // fields
-
     Player*    m_player;                                // Player who own of this TradeData
     Player*    m_trader;                                // Player who trade with m_player
 
@@ -1175,6 +1172,9 @@ public:
     void CleanupAfterTaxiFlight();
     void ContinueTaxiFlight();
     // mount_id can be used in scripting calls
+
+    [[nodiscard]] bool IsDeveloper() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER); }
+    void SetDeveloper(bool on) { ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER, on); }
     [[nodiscard]] bool isAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
     void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
     [[nodiscard]] bool IsGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
@@ -1244,6 +1244,7 @@ public:
     [[nodiscard]] Item* GetItemByPos(uint16 pos) const;
     [[nodiscard]] Item* GetItemByPos(uint8 bag, uint8 slot) const;
     [[nodiscard]] Bag*  GetBagByPos(uint8 slot) const;
+    [[nodiscard]] uint32 GetFreeInventorySpace() const;
     [[nodiscard]] inline Item* GetUseableItemByPos(uint8 bag, uint8 slot) const //Does additional check for disarmed weapons
     {
         if (!CanUseAttackType(GetAttackBySlot(slot)))
@@ -2353,7 +2354,7 @@ public:
     }
     void HandleFall(MovementInfo const& movementInfo);
 
-    [[nodiscard]] bool canFlyInZone(uint32 mapid, uint32 zone) const;
+    [[nodiscard]] bool canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) const;
 
     void SetClientControl(Unit* target, bool allowMove, bool packetOnly = false);
 
@@ -2560,6 +2561,7 @@ public:
     bool SetHover(bool enable, bool packetOnly = false) override;
 
     [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
+    [[nodiscard]] bool CanEnterWater() const override { return true; }
 
     // OURS
     // saving
@@ -2607,6 +2609,17 @@ public:
     [[nodiscard]] SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
 
     static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
+
+    // Cinematic camera data and remote sight functions
+    [[nodiscard]] uint32 GetActiveCinematicCamera() const { return m_activeCinematicCameraId; }
+    void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { m_activeCinematicCameraId = cinematicCameraId; }
+    [[nodiscard]] bool IsOnCinematic() const { return (m_cinematicCamera != nullptr); }
+    void BeginCinematic();
+    void EndCinematic();
+    void UpdateCinematicLocation(uint32 diff);
+
+    std::string GetMapAreaAndZoneString();
+    std::string GetCoordsMapAreaAndZoneString();
 
 protected:
     // Gamemaster whisper whitelist
@@ -2957,6 +2970,16 @@ private:
     uint32 manaBeforeDuel;
 
     bool m_isInstantFlightOn;
+
+    uint32 m_flightSpellActivated;
+
+    // Remote location information
+    uint32 m_cinematicDiff;
+    uint32 m_lastCinematicCheck;
+    uint32 m_activeCinematicCameraId;
+    FlyByCameraCollection* m_cinematicCamera;
+    Position m_remoteSightPosition;
+    Creature* m_CinematicObject;
 };
 
 void AddItemsSetItem(Player* player, Item* item);

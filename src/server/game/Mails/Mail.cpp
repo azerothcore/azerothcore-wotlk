@@ -1,21 +1,21 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "AuctionHouseMgr.h"
+#include "BattlegroundMgr.h"
+#include "CalendarMgr.h"
 #include "DatabaseEnv.h"
-#include "Mail.h"
+#include "Item.h"
 #include "Log.h"
-#include "World.h"
+#include "Mail.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "Unit.h"
-#include "BattlegroundMgr.h"
-#include "Item.h"
-#include "AuctionHouseMgr.h"
-#include "CalendarMgr.h"
 #include "ScriptMgr.h"
+#include "Unit.h"
+#include "World.h"
 
 MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery(stationery)
 {
@@ -177,7 +177,7 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
     if (!sendMail) // can be changed in the hook
         return;
 
-    Player* pReceiver = receiver.GetPlayer();               // can be NULL
+    Player* pReceiver = receiver.GetPlayer();               // can be nullptr
     Player* pSender = ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(sender.GetSenderId(), 0, HIGHGUID_PLAYER));
 
     if (pReceiver)

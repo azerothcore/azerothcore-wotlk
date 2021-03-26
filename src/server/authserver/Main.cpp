@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,7 +15,6 @@
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/TP_Reactor.h>
 #include <ace/ACE.h>
-#include <ace/Sig_Handler.h>
 #include <openssl/opensslv.h>
 #include <openssl/crypto.h>
 
@@ -46,22 +45,6 @@ bool stopEvent = false;                                     // Setting it to tru
 
 LoginDatabaseWorkerPool LoginDatabase;                      // Accessor to the authserver database
 
-/// Handle authserver's termination signals
-class AuthServerSignalHandler : public acore::SignalHandler
-{
-public:
-    void HandleSignal(int sigNum) override
-    {
-        switch (sigNum)
-        {
-            case SIGINT:
-            case SIGTERM:
-                stopEvent = true;
-                break;
-        }
-    }
-};
-
 /// Print out the usage string for this program on the console.
 void usage(const char* prog)
 {
@@ -74,7 +57,7 @@ void usage(const char* prog)
 extern int main(int argc, char** argv)
 {
     // Command line parsing to get the configuration file name
-    char const* configFile = _ACORE_REALM_CONFIG;
+    std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_REALM_CONFIG);
     int count = 1;
     while (count < argc)
     {
@@ -92,9 +75,10 @@ extern int main(int argc, char** argv)
         ++count;
     }
 
-    sConfigMgr->SetConfigList(std::string(configFile));
+    // Add file and args in config
+    sConfigMgr->Configure(configFile, std::vector<std::string>(argv, argv + argc));
 
-    if (!sConfigMgr->LoadAppConfigs("authserver"))
+    if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
     sLog->outString("%s (authserver)", GitRevision::GetFullVersion());
@@ -113,9 +97,9 @@ extern int main(int argc, char** argv)
     sLog->outString("                                ╚██████╗╚██████╔╝██║  ██║███████╗");
     sLog->outString("                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
 
-    sLog->outString("  	  AzerothCore 3.3.5a  -  www.azerothcore.org\n");
+    sLog->outString("     AzerothCore 3.3.5a  -  www.azerothcore.org\n");
 
-    sLog->outString("Using configuration file %s.", configFile);
+    sLog->outString("Using configuration file %s.", configFile.c_str());
 
     sLog->outDetail("%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
 
@@ -128,7 +112,7 @@ extern int main(int argc, char** argv)
     sLog->outBasic("Max allowed open files is %d", ACE::max_handles());
 
     // authserver PID file creation
-    std::string pidFile = sConfigMgr->GetStringDefault("PidFile", "");
+    std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
@@ -149,7 +133,7 @@ extern int main(int argc, char** argv)
     sLog->SetRealmID(0);                                               // ensure we've set realm to 0 (authserver realmid)
 
     // Get the list of realms for the server
-    sRealmList->Initialize(sConfigMgr->GetIntDefault("RealmsStateUpdateDelay", 20));
+    sRealmList->Initialize(sConfigMgr->GetOption<int32>("RealmsStateUpdateDelay", 20));
     if (sRealmList->size() == 0)
     {
         sLog->outError("No valid realms specified.");
@@ -159,14 +143,14 @@ extern int main(int argc, char** argv)
     // Launch the listening network socket
     RealmAcceptor acceptor;
 
-    int32 rmport = sConfigMgr->GetIntDefault("RealmServerPort", 3724);
+    int32 rmport = sConfigMgr->GetOption<int32>("RealmServerPort", 3724);
     if (rmport < 0 || rmport > 0xFFFF)
     {
         sLog->outError("The specified RealmServerPort (%d) is out of the allowed range (1-65535)", rmport);
         return 1;
     }
 
-    std::string bind_ip = sConfigMgr->GetStringDefault("BindIP", "0.0.0.0");
+    std::string bind_ip = sConfigMgr->GetOption<std::string>("BindIP", "0.0.0.0");
 
     ACE_INET_Addr bind_addr(uint16(rmport), bind_ip.c_str());
 
@@ -179,18 +163,21 @@ extern int main(int argc, char** argv)
     sLog->outString("Authserver listening to %s:%d", bind_ip.c_str(), rmport);
 
     // Initialize the signal handlers
-    AuthServerSignalHandler SignalINT, SignalTERM;
+    acore::SignalHandler signalHandler;
+    auto const _handler = [](int) { stopEvent = true; };
 
     // Register authservers's signal handlers
-    ACE_Sig_Handler Handler;
-    Handler.register_handler(SIGINT, &SignalINT);
-    Handler.register_handler(SIGTERM, &SignalTERM);
+    signalHandler.handle_signal(SIGINT, _handler);
+    signalHandler.handle_signal(SIGTERM, _handler);
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
+    signalHandler.handle_signal(SIGBREAK, _handler);
+#endif
 
 #if defined(_WIN32) || defined(__linux__)
 
     ///- Handle affinity for multiple processors and process priority
-    uint32 affinity = sConfigMgr->GetIntDefault("UseProcessors", 0);
-    bool highPriority = sConfigMgr->GetBoolDefault("ProcessPriority", false);
+    uint32 affinity = sConfigMgr->GetOption<int32>("UseProcessors", 0);
+    bool highPriority = sConfigMgr->GetOption<bool>("ProcessPriority", false);
 
 #ifdef _WIN32 // Windows
 
@@ -255,11 +242,11 @@ extern int main(int argc, char** argv)
 #endif
 
     // maximum counter for next ping
-    uint32 numLoops = (sConfigMgr->GetIntDefault("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));
+    uint32 numLoops = (sConfigMgr->GetOption<int32>("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));
     uint32 loopCounter = 0;
 
     // possibly enable db logging; avoid massive startup spam by doing it here.
-    if (sConfigMgr->GetBoolDefault("EnableLogDB", false))
+    if (sConfigMgr->GetOption<bool>("EnableLogDB", false))
     {
         sLog->outString("Enabling database logging...");
         sLog->SetLogDB(true);
@@ -294,21 +281,21 @@ bool StartDB()
 {
     MySQL::Library_Init();
 
-    std::string dbstring = sConfigMgr->GetStringDefault("LoginDatabaseInfo", "");
+    std::string dbstring = sConfigMgr->GetOption<std::string>("LoginDatabaseInfo", "");
     if (dbstring.empty())
     {
         sLog->outError("Database not specified");
         return false;
     }
 
-    int32 worker_threads = sConfigMgr->GetIntDefault("LoginDatabase.WorkerThreads", 1);
+    int32 worker_threads = sConfigMgr->GetOption<int32>("LoginDatabase.WorkerThreads", 1);
     if (worker_threads < 1 || worker_threads > 32)
     {
         sLog->outError("Improper value specified for LoginDatabase.WorkerThreads, defaulting to 1.");
         worker_threads = 1;
     }
 
-    int32 synch_threads = sConfigMgr->GetIntDefault("LoginDatabase.SynchThreads", 1);
+    int32 synch_threads = sConfigMgr->GetOption<int32>("LoginDatabase.SynchThreads", 1);
     if (synch_threads < 1 || synch_threads > 32)
     {
         sLog->outError("Improper value specified for LoginDatabase.SynchThreads, defaulting to 1.");

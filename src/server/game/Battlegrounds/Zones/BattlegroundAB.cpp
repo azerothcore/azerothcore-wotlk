@@ -3,17 +3,17 @@
 */
 
 #include "BattlegroundAB.h"
-#include "World.h"
-#include "WorldPacket.h"
-#include "ObjectMgr.h"
 #include "BattlegroundMgr.h"
 #include "Creature.h"
+#include "GameGraveyard.h"
 #include "Language.h"
 #include "Object.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "Util.h"
+#include "World.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
-#include "GameGraveyard.h"
 
 BattlegroundAB::BattlegroundAB()
 {
@@ -117,7 +117,6 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
 
 void BattlegroundAB::StartingEventCloseDoors()
 {
-
     for (uint32 obj = BG_AB_OBJECT_BANNER_NEUTRAL; obj < BG_AB_DYNAMIC_NODES_COUNT * BG_AB_OBJECTS_PER_NODE; ++obj)
         SpawnBGObject(obj, RESPAWN_ONE_DAY);
     for (uint32 i = 0; i < BG_AB_DYNAMIC_NODES_COUNT * 3; ++i)

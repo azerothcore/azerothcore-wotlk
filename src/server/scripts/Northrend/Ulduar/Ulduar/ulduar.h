@@ -5,10 +5,10 @@
 #ifndef DEF_ULDUAR_H
 #define DEF_ULDUAR_H
 
+#include "CellImpl.h"
 #include "Chat.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CellImpl.h"
 
 enum UlduarEncounters
 {
@@ -29,6 +29,9 @@ enum UlduarEncounters
     TYPE_YOGGSARON                          = 12,
     TYPE_ALGALON                            = 13,
     TYPE_WATCHERS                           = 14,
+    TYPE_SPAWN_HODIR_CACHE                  = 15,
+    TYPE_HODIR_HM_FAIL                      = 16,
+    TYPE_WINTER_CACHE                       = 17,
 };
 
 enum UlduarData
@@ -138,7 +141,6 @@ enum UlduarNPCs
     NPC_SALVAGED_DEMOLISHER                 = 33109,
     NPC_SALVAGED_DEMOLISHER_TURRET          = 33167,
     NPC_BRANN_BASE_CAMP                     = 33579,
-
 
     // Algalon the Observer
     NPC_BRANN_BRONZBEARD_ALG                = 34064,
@@ -251,7 +253,6 @@ enum UlduarMisc
     ACTION_TOWER_OF_FROST_DESTROYED         = 2,
     ACTION_TOWER_OF_FLAMES_DESTROYED        = 3,
     ACTION_TOWER_OF_LIFE_DESTROYED          = 4,
-
 
     // Algalon the Observer
     WORLD_STATE_ALGALON_DESPAWN_TIMER       = 4131,

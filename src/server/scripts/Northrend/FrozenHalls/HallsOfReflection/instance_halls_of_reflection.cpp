@@ -3,8 +3,8 @@
 */
 
 #include "halls_of_reflection.h"
-#include "Transport.h"
 #include "MapManager.h"
+#include "Transport.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {
@@ -27,7 +27,7 @@ public:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_HALT);
                 break;
             case 3:
-                _owner.CastSpell((Unit*)NULL, 69966, true);
+                _owner.CastSpell((Unit*)nullptr, 69966, true);
                 _owner.AI()->Talk(SAY_BATTERED_HILT_REALIZE);
                 if (InstanceScript* instance = _owner.GetInstanceScript())
                     instance->SetData(DATA_BATTERED_HILT, 4);
@@ -76,7 +76,7 @@ public:
                 _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, _eventId + 1), _owner.m_Events.CalculateTime(5000));
                 break;
             case 13:
-                _owner.CastSpell((Unit*)NULL, 73036, true);
+                _owner.CastSpell((Unit*)nullptr, 73036, true);
                 _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, _eventId + 1), _owner.m_Events.CalculateTime(3000));
                 break;
             case 14:
