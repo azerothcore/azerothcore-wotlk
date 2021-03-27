@@ -6,17 +6,17 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `guild_bank_item`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `guild_bank_item` 
 (
-  `guildid` int(10) unsigned NOT NULL DEFAULT 0,
-  `TabId` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `SlotId` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `item_guid` int(10) unsigned NOT NULL DEFAULT 0,
+  `guildid` INT unsigned NOT NULL DEFAULT 0,
+  `TabId` TINYINT unsigned NOT NULL DEFAULT 0,
+  `SlotId` TINYINT unsigned NOT NULL DEFAULT 0,
+  `item_guid` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guildid`,`TabId`,`SlotId`),
   KEY `guildid_key` (`guildid`),
   KEY `Idx_item_guid` (`item_guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `guild_bank_item` WRITE;

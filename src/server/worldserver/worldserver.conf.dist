@@ -3634,6 +3634,14 @@ ICC.Buff.Horde    = 73822
 ICC.Buff.Alliance = 73828
 
 #
+#     Item.SetItemTradeable
+#        Description: Enabled/Disabled trading BoP items among raid members.
+#        Default:     1  - (Set BoP items tradeable timer to 2 hours)
+#                     0  - (Disable trading BoP items among raid members)
+
+Item.SetItemTradeable = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################

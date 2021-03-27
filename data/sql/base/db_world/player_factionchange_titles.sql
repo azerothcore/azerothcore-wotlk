@@ -6,15 +6,15 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `player_factionchange_titles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `player_factionchange_titles` 
 (
-  `alliance_id` int(8) NOT NULL,
+  `alliance_id` INT NOT NULL,
   `alliance_comment` text DEFAULT NULL,
-  `horde_id` int(8) NOT NULL,
+  `horde_id` INT NOT NULL,
   `horde_comment` text DEFAULT NULL,
   PRIMARY KEY (`alliance_id`,`horde_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `player_factionchange_titles` WRITE;

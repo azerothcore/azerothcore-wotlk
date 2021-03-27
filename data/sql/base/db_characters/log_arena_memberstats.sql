@@ -6,21 +6,21 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `log_arena_memberstats`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `log_arena_memberstats` 
 (
-  `fight_id` int(10) unsigned NOT NULL,
-  `member_id` tinyint(3) unsigned NOT NULL,
+  `fight_id` INT unsigned NOT NULL,
+  `member_id` TINYINT unsigned NOT NULL,
   `name` char(20) NOT NULL,
-  `guid` int(10) unsigned NOT NULL,
-  `team` int(10) unsigned NOT NULL,
-  `account` int(10) unsigned NOT NULL,
+  `guid` INT unsigned NOT NULL,
+  `team` INT unsigned NOT NULL,
+  `account` INT unsigned NOT NULL,
   `ip` char(15) NOT NULL,
-  `damage` int(10) unsigned NOT NULL,
-  `heal` int(10) unsigned NOT NULL,
-  `kblows` int(10) unsigned NOT NULL,
+  `damage` INT unsigned NOT NULL,
+  `heal` INT unsigned NOT NULL,
+  `kblows` INT unsigned NOT NULL,
   PRIMARY KEY (`fight_id`,`member_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `log_arena_memberstats` WRITE;

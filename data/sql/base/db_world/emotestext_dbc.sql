@@ -6,30 +6,30 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `emotestext_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `emotestext_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `Name` varchar(100) DEFAULT NULL,
-  `EmoteID` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_1` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_2` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_3` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_4` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_5` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_6` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_7` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_8` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_9` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_10` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_11` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_12` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_13` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_14` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_15` int(11) NOT NULL DEFAULT 0,
-  `EmoteText_16` int(11) NOT NULL DEFAULT 0,
+  `EmoteID` INT NOT NULL DEFAULT 0,
+  `EmoteText_1` INT NOT NULL DEFAULT 0,
+  `EmoteText_2` INT NOT NULL DEFAULT 0,
+  `EmoteText_3` INT NOT NULL DEFAULT 0,
+  `EmoteText_4` INT NOT NULL DEFAULT 0,
+  `EmoteText_5` INT NOT NULL DEFAULT 0,
+  `EmoteText_6` INT NOT NULL DEFAULT 0,
+  `EmoteText_7` INT NOT NULL DEFAULT 0,
+  `EmoteText_8` INT NOT NULL DEFAULT 0,
+  `EmoteText_9` INT NOT NULL DEFAULT 0,
+  `EmoteText_10` INT NOT NULL DEFAULT 0,
+  `EmoteText_11` INT NOT NULL DEFAULT 0,
+  `EmoteText_12` INT NOT NULL DEFAULT 0,
+  `EmoteText_13` INT NOT NULL DEFAULT 0,
+  `EmoteText_14` INT NOT NULL DEFAULT 0,
+  `EmoteText_15` INT NOT NULL DEFAULT 0,
+  `EmoteText_16` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `emotestext_dbc` WRITE;
