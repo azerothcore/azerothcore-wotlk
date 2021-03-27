@@ -443,6 +443,14 @@ public:
         return false;
     }
 protected:
+    enum wg_events
+    {
+        EVENT_SAVE,
+        EVENT_UPDATE_TENACITY,
+    };
+
+    EventMap m_events;
+
     bool m_isRelicInteractible;
 
     Workshop WorkshopsList;
@@ -467,6 +475,9 @@ protected:
     Position kicked_position { 5728.117f, 2714.346f, 697.733f, 0.0f };
     Position attacking_position{ 5101.284180f, 2186.563965f, 365.620117f, 3.812000f };
     Position defending_position{ 5345.0f, 2842.0f, 410.0f, 3.14f };
+
+    // Wintergrasp relic position
+    Position relic_position{ 5440.0f, 2840.8f, 430.43f, 0 };
 };
 
 const uint8 WG_MAX_OBJ = 32;

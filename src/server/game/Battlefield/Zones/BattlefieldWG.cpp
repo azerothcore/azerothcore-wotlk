@@ -255,28 +255,25 @@ void BattlefieldWG::SpawnCreatures()
 bool BattlefieldWG::Update(uint32 diff)
 {
     bool m_return = Battlefield::Update(diff);
-    if (m_saveTimer <= diff)
-    {
-        sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_ACTIVE, m_isActive);
-        sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_DEFENDER, m_DefenderTeam);
-        sWorld->setWorldState(ClockWorldState[0], m_Timer);
-        m_saveTimer = 60 * IN_MILLISECONDS;
-    }
-    else
-        m_saveTimer -= diff;
 
-    // Update Tenacity
-    if (IsWarTime())
+    m_events.Update(diff);
+
+    switch (m_events.ExecuteEvent())
     {
-        if (m_tenacityUpdateTimer <= diff)
-        {
-            m_tenacityUpdateTimer = 10000;
+        case EVENT_UPDATE_TENACITY:
             if (!m_updateTenacityList.empty())
+            {
                 UpdateTenacity();
+            }
             m_updateTenacityList.clear();
-        }
-        else
-            m_tenacityUpdateTimer -= diff;
+            m_events.ScheduleEvent(EVENT_UPDATE_TENACITY, 10000);
+            break;
+        case EVENT_SAVE:
+            sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_ACTIVE, m_isActive);
+            sWorld->setWorldState(BATTLEFIELD_WG_WORLD_STATE_DEFENDER, m_DefenderTeam);
+            sWorld->setWorldState(ClockWorldState[0], m_Timer);
+            m_events.ScheduleEvent(EVENT_SAVE, 60 * IN_MILLISECONDS);
+            break;
     }
 
     return m_return;
@@ -284,22 +281,27 @@ bool BattlefieldWG::Update(uint32 diff)
 
 void BattlefieldWG::OnBattleStart()
 {
-    // Spawn titan relic
-    GameObject* go = SpawnGameObject(GO_WINTERGRASP_TITAN_S_RELIC, 5440.0f, 2840.8f, 430.43f, 0);
-    if (go)
+
+    if (GameObject* go = SpawnGameObject(GO_WINTERGRASP_TITAN_S_RELIC,
+        relic_position.GetPositionX(),
+        relic_position.GetPositionY(),
+        relic_position.GetPositionZ(),
+        relic_position.GetOrientation()))
     {
         // Update faction of relic, only attacker can click on
         go->SetUInt32Value(GAMEOBJECT_FACTION, WintergraspFaction[GetAttackerTeam()]);
-        // Set in use (not allow to click on before last door is broken)
+
+        // Not selectable until the last door is destroyed
         go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
 
-        // save guid
         m_titansRelic = go->GetGUID();
     }
     else
+    {
         sLog->outError("WG: Failed to spawn titan relic.");
+    }
 
-    // Update tower visibility and update faction
+    // Update the faction ID to the Defending team for the Wintergrasp Turrets
     for (GuidSet::const_iterator itr = CanonList.begin(); itr != CanonList.end(); ++itr)
     {
         if (Unit* unit = ObjectAccessor::FindUnit(*itr))
@@ -312,7 +314,7 @@ void BattlefieldWG::OnBattleStart()
         }
     }
 
-    // Rebuild all wall
+    // Re-build the Keep's walls
     for (GameObjectBuilding::const_iterator itr = BuildingsInZone.begin(); itr != BuildingsInZone.end(); ++itr)
     {
         if (*itr)
@@ -326,11 +328,14 @@ void BattlefieldWG::OnBattleStart()
     SetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT, 0);
     SetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 0);
 
-    // Update graveyard (in no war time all graveyard is to deffender, in war time, depend of base)
+    // Update graveyard ownership. While there's no war going on, they all belong to the defending team.
+    // However, during war time, they belong to the respective faction controlling a workshop.
     for (Workshop::const_iterator itr = WorkshopsList.begin(); itr != WorkshopsList.end(); ++itr)
         if (*itr)
             (*itr)->UpdateGraveyardAndWorkshop();
 
+    // ################### TO DO: Fix this piece of code ###################
+    /*
     for (uint8 team = 0; team < 2; ++team)
         for (GuidSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
         {
@@ -344,15 +349,18 @@ void BattlefieldWG::OnBattleStart()
                 SendInitWorldStatesTo(player);
             }
         }
+    */
     // Initialize vehicle counter
     UpdateCounterVehicle(true);
-    // Send start warning to all players
+
+    // Reset the tenacity stacks and schedule an update
+    m_tenacityStack = 0;
+    m_events.ScheduleEvent(EVENT_UPDATE_TENACITY, 20 * IN_MILLISECONDS);
+
+    // Send start warning to all players in the zone
     SendWarningToAllInZone(BATTLEFIELD_WG_TEXT_START);
 
-    // Xinef: reset tenacity counter
-    m_tenacityStack = 0;
-    m_tenacityUpdateTimer = 20000;
-
+    // Announce to the World that Wintergrasp is starting
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
         sWorld->SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE);
 }
