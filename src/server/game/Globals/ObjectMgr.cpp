@@ -528,10 +528,14 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     creatureTemplate.Entry = entry;
 
     for (uint8 i = 0; i < MAX_DIFFICULTY - 1; ++i)
+    {
         creatureTemplate.DifficultyEntry[i] = fields[1 + i].GetUInt32();
+    }
 
     for (uint8 i = 0; i < MAX_KILL_CREDIT; ++i)
+    {
         creatureTemplate.KillCredit[i] = fields[4 + i].GetUInt32();
+    }
 
     creatureTemplate.Modelid1          = fields[6].GetUInt32();
     creatureTemplate.Modelid2          = fields[7].GetUInt32();
@@ -572,10 +576,14 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields)
     creatureTemplate.SkinLootId        = fields[42].GetUInt32();
 
     for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
+    {
         creatureTemplate.resistance[i] = 0;
+    }
 
     for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
+    {
         creatureTemplate.spells[i] = 0;
+    }
 
     creatureTemplate.PetSpellDataId        = fields[43].GetUInt32();
     creatureTemplate.VehicleId             = fields[44].GetUInt32();
