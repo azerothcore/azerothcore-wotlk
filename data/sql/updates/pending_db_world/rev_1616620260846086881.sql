@@ -19,5 +19,5 @@ DELETE FROM `pool_gameobject` where `guid` in (8114, 9003);
 DELETE FROM `gameobject` where `guid` in (13573, 13585, 13577, 13586, 13687, 13358, 65123, 2350, 86281, 13372);
 DELETE FROM `gameobject` where `guid` in (63431, 13578, 31976, 13689, 14446, 33549, 13559, 13574, 13548, 14455);
 DELETE FROM `gameobject` where `guid` in (13684, 14463, 14459, 63424, 13589, 13571, 14201, 13702);
-DELETE FROM `pool_gameobject` where `guid` in (2350, );
+DELETE FROM `pool_gameobject` where `guid`=2350;
 UPDATE `gameobject` SET `position_x`=-1119.61, `position_y`=-2150.05, `position_z`=81.8622 WHERE `guid`=983;
