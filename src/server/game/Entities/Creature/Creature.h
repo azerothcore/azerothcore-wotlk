@@ -453,7 +453,7 @@ public:
     void SelectLevel(bool changelevel = true);
     void LoadEquipment(int8 id = 1, bool force = false);
 
-    [[nodiscard]] uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
+    [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
     void Update(uint32 time) override;                         // overwrited Unit::Update
     void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr, float* dist = nullptr) const;
@@ -782,7 +782,7 @@ protected:
     void RegenerateHealth();
     void Regenerate(Powers power);
     MovementGeneratorType m_defaultMovementType;
-    uint32 m_DBTableGuid;                               ///< For new or temporary creatures is 0 for saved it is lowguid
+    ObjectGuid::LowType m_spawnId;                      ///< For new or temporary creatures is 0 for saved it is lowguid
     uint8 m_equipmentId;
     int8 m_originalEquipmentId; // can be -1
 

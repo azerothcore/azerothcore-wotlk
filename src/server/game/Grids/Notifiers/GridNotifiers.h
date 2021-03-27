@@ -721,13 +721,13 @@ namespace acore
     class GameObjectWithDbGUIDCheck
     {
     public:
-        GameObjectWithDbGUIDCheck(uint32 db_guid) : i_db_guid(db_guid) {}
+        GameObjectWithDbGUIDCheck(ObjectGuid::LowType db_guid) : i_db_guid(db_guid) {}
         bool operator()(GameObject const* go) const
         {
-            return go->GetDBTableGUIDLow() == i_db_guid;
+            return go->GetSpawnId() == i_db_guid;
         }
     private:
-        uint32 i_db_guid;
+        ObjectGuid::LowType i_db_guid;
     };
 
     // Unit checks
@@ -862,13 +862,13 @@ namespace acore
     class CreatureWithDbGUIDCheck
     {
     public:
-        CreatureWithDbGUIDCheck(uint32 lowguid) : i_lowguid(lowguid) {}
+        CreatureWithDbGUIDCheck(ObjectGuid::LowType lowguid) : i_lowguid(lowguid) {}
         bool operator()(Creature* u)
         {
-            return u->GetDBTableGUIDLow() == i_lowguid;
+            return u->GetSpawnId() == i_lowguid;
         }
     private:
-        uint32 i_lowguid;
+        ObjectGuid::LowType i_lowguid;
     };
 
     class AnyFriendlyUnitInObjectRangeCheck

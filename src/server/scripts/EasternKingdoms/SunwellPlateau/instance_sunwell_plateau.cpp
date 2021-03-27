@@ -76,7 +76,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            if (creature->GetDBTableGUIDLow() > 0 || !creature->GetOwnerGUID().IsPlayer())
+            if (creature->GetSpawnId() > 0 || !creature->GetOwnerGUID().IsPlayer())
                 creature->CastSpell(creature, SPELL_SUNWELL_RADIANCE, true);
 
             switch (creature->GetEntry())

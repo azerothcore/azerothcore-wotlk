@@ -488,7 +488,7 @@ struct AcoreString
     StringVector Content;
 };
 
-typedef std::map<uint64, uint64> LinkedRespawnContainer;
+typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;
 typedef std::unordered_map<uint32, CreatureData> CreatureDataContainer;
 typedef std::unordered_map<uint32, GameObjectData> GameObjectDataContainer;
 typedef std::map<TempSummonGroupKey, std::vector<TempSummonData> > TempSummonDataContainer;
@@ -1135,22 +1135,23 @@ public:
             return &itr->second;
         return nullptr;
     }
-    [[nodiscard]] CreatureData const* GetCreatureData(uint32 guid) const
+    [[nodiscard]] CreatureData const* GetCreatureData(ObjectGuid::LowType spawnId) const
     {
-        CreatureDataContainer::const_iterator itr = _creatureDataStore.find(guid);
+        CreatureDataContainer::const_iterator itr = _creatureDataStore.find(spawnId);
         if (itr == _creatureDataStore.end()) return nullptr;
         return &itr->second;
     }
-    CreatureData& NewOrExistCreatureData(uint32 guid) { return _creatureDataStore[guid]; }
-    void DeleteCreatureData(uint32 guid);
-    [[nodiscard]] uint64 GetLinkedRespawnGuid(uint64 guid) const
+    CreatureData& NewOrExistCreatureData(ObjectGuid::LowType spawnId) { return _creatureDataStore[spawnId]; }
+    void DeleteCreatureData(ObjectGuid::LowType spawnId);
+    [[nodiscard]] ObjectGuid GetLinkedRespawnGuid(ObjectGuid guid) const
     {
         LinkedRespawnContainer::const_iterator itr = _linkedRespawnStore.find(guid);
-        if (itr == _linkedRespawnStore.end()) return 0;
+        if (itr == _linkedRespawnStore.end())
+            return ObjectGuid::Empty;
         return itr->second;
     }
 
-    [[nodiscard]] GameObjectData const* GetGOData(uint32 guid) const
+    [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(guid);
         if (itr == _gameObjectDataStore.end()) return nullptr;

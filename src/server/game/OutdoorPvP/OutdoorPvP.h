@@ -257,9 +257,9 @@ protected:
         m_capturePoints[cp->m_capturePointGUID] = cp;
     }
 
-    OPvPCapturePoint* GetCapturePoint(uint32 lowguid) const
+    OPvPCapturePoint* GetCapturePoint(ObjectGuid::LowType spawnId) const
     {
-        OutdoorPvP::OPvPCapturePointMap::const_iterator itr = m_capturePoints.find(lowguid);
+        OutdoorPvP::OPvPCapturePointMap::const_iterator itr = m_capturePoints.find(spawnId);
         if (itr != m_capturePoints.end())
             return itr->second;
         return nullptr;

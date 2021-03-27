@@ -3799,14 +3799,14 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
     if (!HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD) && canChangeFlying)
     {
         // xinef: summoned vehicles are treated as always in air, fixes flying on such units
-        if (IsVehicle() && !c->GetDBTableGUIDLow())
+        if (IsVehicle() && !c->GetSpawnId())
             isInAir = true;
 
         // xinef: triggers with inhabit type air are treated as always in air
         if (c->IsTrigger() && c->CanFly())
             isInAir = true;
 
-        if (c->GetOwnerGUID().IsPlayer() && c->CanFly() && IsVehicle() && !c->GetDBTableGUIDLow()) // mainly for oculus drakes
+        if (c->GetOwnerGUID().IsPlayer() && c->CanFly() && IsVehicle() && !c->GetSpawnId()) // mainly for oculus drakes
         {
             if (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
             {

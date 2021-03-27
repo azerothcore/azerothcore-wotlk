@@ -489,8 +489,8 @@ public:
     /*
         RESPAWN TIMES
     */
-    [[nodiscard]] time_t GetLinkedRespawnTime(uint64 guid) const;
-    [[nodiscard]] time_t GetCreatureRespawnTime(uint32 dbGuid) const
+    [[nodiscard]] time_t GetLinkedRespawnTime(ObjectGuid guid) const;
+    [[nodiscard]] time_t GetCreatureRespawnTime(ObjectGuid guid) const
     {
         std::unordered_map<uint32 /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
         if (itr != _creatureRespawnTimes.end())

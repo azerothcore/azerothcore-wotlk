@@ -534,7 +534,7 @@ public:
             return true;
 
         Creature* cr = object->ToCreature();
-        return cr->GetDBTableGUIDLow() != 54780 && cr->GetDBTableGUIDLow() != 54787 && cr->GetDBTableGUIDLow() != 54801;
+        return cr->GetSpawnId() != 54780 && cr->GetSpawnId() != 54787 && cr->GetSpawnId() != 54801;
     }
 };
 

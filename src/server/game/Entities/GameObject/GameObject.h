@@ -748,7 +748,7 @@ public:
     [[nodiscard]] bool IsTransport() const;
     [[nodiscard]] bool IsDestructibleBuilding() const;
 
-    [[nodiscard]] uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
+    [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
     // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
     void SetWorldRotationAngles(float z_rot, float y_rot, float x_rot);
@@ -970,7 +970,7 @@ protected:
     typedef std::map<uint32, uint64> ChairSlotAndUser;
     ChairSlotAndUser ChairListSlots;
 
-    uint32 m_DBTableGuid;                               ///< For new or temporary gameobjects is 0 for saved it is lowguid
+    ObjectGuid::LowType m_spawnId;                            ///< For new or temporary gameobjects is 0 for saved it is lowguid
     GameObjectTemplate const* m_goInfo;
     GameObjectData const* m_goData;
     GameObjectValue m_goValue;

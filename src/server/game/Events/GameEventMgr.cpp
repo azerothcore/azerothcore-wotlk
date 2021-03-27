@@ -1015,14 +1015,12 @@ void GameEventMgr::LoadHolidayDates()
 uint32 GameEventMgr::GetNPCFlag(Creature* cr)
 {
     uint32 mask = 0;
-    uint32 guid = cr->GetDBTableGUIDLow();
+    ObjectGuid::LowType spawnId = cr->GetSpawnId();
 
     for (ActiveEvents::iterator e_itr = m_ActiveEvents.begin(); e_itr != m_ActiveEvents.end(); ++e_itr)
     {
-        for (NPCFlagList::iterator itr = mGameEventNPCFlags[*e_itr].begin();
-                itr != mGameEventNPCFlags[*e_itr].end();
-                ++ itr)
-            if (itr->first == guid)
+        for (NPCFlagList::iterator itr = mGameEventNPCFlags[*e_itr].begin(); itr != mGameEventNPCFlags[*e_itr].end(); ++ itr)
+            if (itr->first == spawnId)
                 mask |= itr->second;
     }
 

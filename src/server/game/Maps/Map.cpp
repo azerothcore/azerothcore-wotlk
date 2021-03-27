@@ -3103,7 +3103,7 @@ void Map::UpdateIteratorBack(Player* player)
         m_mapRefIter = m_mapRefIter->nocheck_prev();
 }
 
-void Map::SaveCreatureRespawnTime(uint32 dbGuid, time_t& respawnTime)
+void Map::SaveCreatureRespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
 {
     if (!respawnTime)
     {
@@ -3126,7 +3126,7 @@ void Map::SaveCreatureRespawnTime(uint32 dbGuid, time_t& respawnTime)
     CharacterDatabase.Execute(stmt);
 }
 
-void Map::RemoveCreatureRespawnTime(uint32 dbGuid)
+void Map::RemoveCreatureRespawnTime(ObjectGuid::LowType spawnId)
 {
     _creatureRespawnTimes.erase(dbGuid);
 
@@ -3137,7 +3137,7 @@ void Map::RemoveCreatureRespawnTime(uint32 dbGuid)
     CharacterDatabase.Execute(stmt);
 }
 
-void Map::SaveGORespawnTime(uint32 dbGuid, time_t& respawnTime)
+void Map::SaveGORespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
 {
     if (!respawnTime)
     {
@@ -3160,7 +3160,7 @@ void Map::SaveGORespawnTime(uint32 dbGuid, time_t& respawnTime)
     CharacterDatabase.Execute(stmt);
 }
 
-void Map::RemoveGORespawnTime(uint32 dbGuid)
+void Map::RemoveGORespawnTime(ObjectGuid::LowType spawnId)
 {
     _goRespawnTimes.erase(dbGuid);
 
@@ -3328,9 +3328,9 @@ time_t Map::GetLinkedRespawnTime(ObjectGuid guid) const
     switch (linkedGuid.GetHigh())
     {
         case HIGHGUID_UNIT:
-            return GetCreatureRespawnTime(linkedGuid);
+            return GetCreatureRespawnTime(linkedGuid.GetCounter());
         case HIGHGUID_GAMEOBJECT:
-            return GetGORespawnTime(linkedGuid);
+            return GetGORespawnTime(linkedGuid.GetCounter());
         default:
             break;
     }

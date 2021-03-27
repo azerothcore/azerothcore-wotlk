@@ -1276,7 +1276,7 @@ public:
 
         // for standard creatures check full LOS
         if (Creature* c = unit->ToCreature())
-            if (!c->IsPet() && c->GetDBTableGUIDLow())
+            if (!c->IsPet() && c->GetSpawnId())
                 return !_caster->IsWithinLOSInMap(unit);
 
         // for players and pets check only dynamic los (ice block gameobjects)
@@ -1378,7 +1378,7 @@ public:
         {
             if (!me->isDead())
             {
-                _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
+                _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetSpawnId());  // this cannot be in Reset because reset also happens on evade
                 Reset();
             }
         }
@@ -1413,7 +1413,7 @@ public:
         void JustRespawned() override
         {
             ScriptedAI::JustRespawned();
-            _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
+            _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetSpawnId());  // this cannot be in Reset because reset also happens on evade
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -1515,7 +1515,7 @@ public:
         {
             if (!me->isDead())
             {
-                _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
+                _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetSpawnId());  // this cannot be in Reset because reset also happens on evade
                 Reset();
             }
         }
@@ -1550,7 +1550,7 @@ public:
         void JustRespawned() override
         {
             ScriptedAI::JustRespawned();
-            _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
+            _instance->SetData(DATA_SINDRAGOSA_FROSTWYRMS, me->GetSpawnId());  // this cannot be in Reset because reset also happens on evade
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -1782,7 +1782,7 @@ public:
             if (!me->isDead())
             {
                 if (me->GetEntry() == NPC_FROSTWING_WHELP)
-                    _instance->SetData(_frostwyrmId, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
+                    _instance->SetData(_frostwyrmId, me->GetSpawnId());  // this cannot be in Reset because reset also happens on evade
                 Reset();
             }
         }
@@ -1825,7 +1825,7 @@ public:
 
             // Increase add count
             if (me->GetEntry() == NPC_FROSTWING_WHELP)
-                _instance->SetData(_frostwyrmId, me->GetDBTableGUIDLow());  // this cannot be in Reset because reset also happens on evade
+                _instance->SetData(_frostwyrmId, me->GetSpawnId());  // this cannot be in Reset because reset also happens on evade
         }
 
         void SetData(uint32 type, uint32 data) override

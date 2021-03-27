@@ -53,7 +53,7 @@ void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
 void FormationMgr::RemoveCreatureFromGroup(CreatureGroup* group, Creature* member)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_UNITS, "Deleting member pointer to GUID: %u from group %u", group->GetId(), member->GetDBTableGUIDLow());
+    sLog->outDebug(LOG_FILTER_UNITS, "Deleting member pointer to spawnId: %u from group %u", member->GetSpawnId(), group->GetId());
 #endif
     group->RemoveMember(member);
 
@@ -148,7 +148,7 @@ void CreatureGroup::AddMember(Creature* member)
 #endif
 
     //Check if it is a leader
-    if (member->GetDBTableGUIDLow() == m_groupID)
+    if (member->GetSpawnId() == m_groupID)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_UNITS, "Unit GUID: %u is formation leader. Adding group.", member->GetGUIDLow());
@@ -156,7 +156,7 @@ void CreatureGroup::AddMember(Creature* member)
         m_leader = member;
     }
 
-    m_members[member] = sFormationMgr->CreatureGroupMap.find(member->GetDBTableGUIDLow())->second;
+    m_members[member] = sFormationMgr->CreatureGroupMap.find(member->GetSpawnId())->second;
     member->SetFormation(this);
 }
 
@@ -171,7 +171,7 @@ void CreatureGroup::RemoveMember(Creature* member)
 
 void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
 {
-    uint8 groupAI = sFormationMgr->CreatureGroupMap[member->GetDBTableGUIDLow()]->groupAI;
+    uint8 groupAI = sFormationMgr->CreatureGroupMap[member->GetSpawnId()]->groupAI;
     if (!groupAI)
         return;
 
@@ -228,7 +228,7 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, bool run)
     if (!m_leader)
         return;
 
-    uint8 groupAI = sFormationMgr->CreatureGroupMap[m_leader->GetDBTableGUIDLow()]->groupAI;
+    uint8 groupAI = sFormationMgr->CreatureGroupMap[m_leader->GetSpawnId()]->groupAI;
     if (groupAI == 5)
         return;
 

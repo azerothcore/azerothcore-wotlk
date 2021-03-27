@@ -620,14 +620,14 @@ public:
 
                     if (creature->AI()->GetData(1/*DATA_FROSTWYRM_OWNER*/) == DATA_SPINESTALKER)
                     {
-                        SpinestalkerTrash.erase(creature->GetDBTableGUIDLow());
+                        SpinestalkerTrash.erase(creature->GetSpawnId());
                         if (SpinestalkerTrash.empty())
                             if (Creature* spinestalk = instance->GetCreature(SpinestalkerGUID))
                                 spinestalk->AI()->DoAction(ACTION_START_FROSTWYRM);
                     }
                     else
                     {
-                        RimefangTrash.erase(creature->GetDBTableGUIDLow());
+                        RimefangTrash.erase(creature->GetSpawnId());
                         if (RimefangTrash.empty())
                             if (Creature* spinestalk = instance->GetCreature(RimefangGUID))
                                 spinestalk->AI()->DoAction(ACTION_START_FROSTWYRM);
@@ -642,7 +642,7 @@ public:
                         if (GetBossState(DATA_SINDRAGOSA) == DONE)
                             return;
 
-                        FrostwyrmGUIDs.erase(creature->GetDBTableGUIDLow());
+                        FrostwyrmGUIDs.erase(creature->GetSpawnId());
                         if (FrostwyrmGUIDs.empty())
                         {
                             instance->LoadGrid(SindragosaSpawnPos.GetPositionX(), SindragosaSpawnPos.GetPositionY());
@@ -1959,9 +1959,9 @@ public:
         uint64 PillarsUnchainedGUID;
         TeamId TeamIdInInstance;
         uint32 ColdflameJetsState;
-        std::set<uint32> FrostwyrmGUIDs;
-        std::set<uint32> SpinestalkerTrash;
-        std::set<uint32> RimefangTrash;
+        std::set<ObjectGuid::LowType> FrostwyrmGUIDs;
+        std::set<ObjectGuid::LowType> SpinestalkerTrash;
+        std::set<ObjectGuid::LowType> RimefangTrash;
         uint32 BloodQuickeningState;
         uint32 HeroicAttempts;
         uint16 BloodQuickeningMinutes;

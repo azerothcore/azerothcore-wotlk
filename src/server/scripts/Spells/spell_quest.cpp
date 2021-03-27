@@ -348,7 +348,7 @@ public:
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if (Creature* target = GetHitCreature())
-                if (target->GetDBTableGUIDLow() == 77757 || target->GetDBTableGUIDLow() == 78693)
+                if (target->GetSpawnId() == 77757 || target->GetSpawnId() == 78693)
                 {
                     count++;
                     if (count == 2)

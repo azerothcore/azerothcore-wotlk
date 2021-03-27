@@ -149,7 +149,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_OUTDOORPVP, "deleting opvp creature type %u", type);
 #endif
-    uint32 guid = cr->GetDBTableGUIDLow();
+    ObjectGuid::LowType spawnId = cr->GetSpawnId();
     // Don't save respawn time
     cr->SetRespawnTime(0);
     cr->RemoveCorpse();
@@ -160,13 +160,13 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
     //    map->Remove(cr, false);
     // delete respawn time for this creature
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CREATURE_RESPAWN);
-    stmt->setUInt32(0, guid);
+    stmt->setUInt32(0, spawnId);
     stmt->setUInt16(1, cr->GetMapId());
     stmt->setUInt32(2, 0);  // instance id, always 0 for world maps
     CharacterDatabase.Execute(stmt);
 
     cr->AddObjectToRemoveList();
-    sObjectMgr->DeleteCreatureData(guid);
+    sObjectMgr->DeleteCreatureData(spawnId);
     m_CreatureTypes[m_Creatures[type]] = 0;
     m_Creatures[type] = 0;
     return true;
@@ -183,10 +183,10 @@ bool OPvPCapturePoint::DelObject(uint32 type)
         m_Objects[type] = 0;
         return false;
     }
-    uint32 guid = obj->GetDBTableGUIDLow();
+    ObjectGuid::LowType spawnId = obj->GetSpawnId();
     obj->SetRespawnTime(0);                                 // not save respawn time
     obj->Delete();
-    sObjectMgr->DeleteGOData(guid);
+    sObjectMgr->DeleteGOData(spawnId);
     m_ObjectTypes[m_Objects[type]] = 0;
     m_Objects[type] = 0;
     return true;
@@ -608,7 +608,7 @@ void OutdoorPvP::OnGameObjectCreate(GameObject* go)
     if (go->GetGoType() != GAMEOBJECT_TYPE_CAPTURE_POINT)
         return;
 
-    if (OPvPCapturePoint* cp = GetCapturePoint(go->GetDBTableGUIDLow()))
+    if (OPvPCapturePoint* cp = GetCapturePoint(go->GetSpawnId()))
         cp->m_capturePoint = go;
 }
 
@@ -617,6 +617,6 @@ void OutdoorPvP::OnGameObjectRemove(GameObject* go)
     if (go->GetGoType() != GAMEOBJECT_TYPE_CAPTURE_POINT)
         return;
 
-    if (OPvPCapturePoint* cp = GetCapturePoint(go->GetDBTableGUIDLow()))
+    if (OPvPCapturePoint* cp = GetCapturePoint(go->GetSpawnId()))
         cp->m_capturePoint = nullptr;
 }

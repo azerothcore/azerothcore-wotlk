@@ -140,7 +140,7 @@ public:
     bool operator()(Creature* creature)
     {
         return creature->IsAlive() && creature->GetEntry() == NPC_RISEN_ARCHMAGE &&
-               creature->GetDBTableGUIDLow() && !creature->IsInCombat();
+               creature->GetSpawnId() && !creature->IsInCombat();
     }
 };
 
@@ -234,7 +234,7 @@ public:
                 creature->DespawnOrUnsummon();
                 return;
             case NPC_RISEN_ARCHMAGE:
-                if (!creature->GetDBTableGUIDLow())
+                if (!creature->GetSpawnId())
                 {
                     creature->DespawnOrUnsummon();
                     return;
@@ -279,7 +279,7 @@ public:
         {
             me->SetReactState(REACT_PASSIVE);
             _spawnHealth = 1; // just in case if not set below
-            if (CreatureData const* data = sObjectMgr->GetCreatureData(me->GetDBTableGUIDLow()))
+            if (CreatureData const* data = sObjectMgr->GetCreatureData(me->GetSpawnId()))
                 if (data->curhealth)
                     _spawnHealth = data->curhealth;
         }
@@ -712,7 +712,7 @@ public:
         {
             me->FinishSpell(CURRENT_CHANNELED_SPELL, false);
             me->SetInCombatWithZone();
-            if (me->GetDBTableGUIDLow())
+            if (me->GetSpawnId())
                 if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_VALITHRIA_TRIGGER)))
                     trigger->AI()->DoAction(ACTION_ENTER_COMBAT);
         }
@@ -734,7 +734,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!me->IsInCombat())
-                if (me->GetDBTableGUIDLow())
+                if (me->GetSpawnId())
                     if (!me->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
                         me->CastSpell(me, SPELL_CORRUPTION, false);
 

@@ -1729,17 +1729,17 @@ void ObjectMgr::LoadCreatures()
     {
         Field* fields = result->Fetch();
 
-        uint32 guid         = fields[0].GetUInt32();
-        uint32 entry        = fields[1].GetUInt32();
+        ObjectGuid::LowType spawnId     = fields[0].GetUInt32();
+        uint32 entry                    = fields[1].GetUInt32();
 
         CreatureTemplate const* cInfo = GetCreatureTemplate(entry);
         if (!cInfo)
         {
-            sLog->outErrorDb("Table `creature` has creature (GUID: %u) with non existing creature entry %u, skipped.", guid, entry);
+            sLog->outErrorDb("Table `creature` has creature (SpawnId: %u) with non existing creature entry %u, skipped.", spawnId, entry);
             continue;
         }
 
-        CreatureData& data      = _creatureDataStore[guid];
+        CreatureData& data      = _creatureDataStore[spawnId];
         data.id                 = entry;
         data.mapid              = fields[2].GetUInt16();
         data.displayid          = fields[3].GetUInt32();
@@ -1941,13 +1941,13 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     return guid;
 }
 
-bool ObjectMgr::MoveCreData(uint32 guid, uint32 mapId, Position pos)
+bool ObjectMgr::MoveCreData(ObjectGuid::LowType spawnId, uint32 mapId, Position pos)
 {
-    CreatureData& data = NewOrExistCreatureData(guid);
+    CreatureData& data = NewOrExistCreatureData(spawnId);
     if (!data.id)
         return false;
 
-    RemoveCreatureFromGrid(guid, &data);
+    RemoveCreatureFromGrid(spawnId, &data);
     if (data.posX == pos.GetPositionX() && data.posY == pos.GetPositionY() && data.posZ == pos.GetPositionZ())
         return true;
     data.posX = pos.GetPositionX();
@@ -9075,7 +9075,7 @@ VehicleAccessoryList const* ObjectMgr::GetVehicleAccessoryList(Vehicle* veh) con
     if (Creature* cre = veh->GetBase()->ToCreature())
     {
         // Give preference to GUID-based accessories
-        VehicleAccessoryContainer::const_iterator itr = _vehicleAccessoryStore.find(cre->GetDBTableGUIDLow());
+        VehicleAccessoryContainer::const_iterator itr = _vehicleAccessoryStore.find(cre->GetSpawnId());
         if (itr != _vehicleAccessoryStore.end())
             return &itr->second;
     }
