@@ -208,16 +208,15 @@ public:
     {
         npc_voidtravelerAI(Creature* creature) : ScriptedAI(creature)
         {
-            VorpilGUID = 0;
             moveTimer = 1000;
             sacrificed = false;
         }
 
-        uint64 VorpilGUID;
+        ObjectGuid VorpilGUID;
         uint32 moveTimer;
         bool sacrificed;
 
-        void SetGUID(uint64 guid, int32) override
+        void SetGUID(ObjectGuid guid, int32) override
         {
             VorpilGUID = guid;
         }

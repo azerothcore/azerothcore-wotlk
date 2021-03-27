@@ -200,7 +200,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch( identifier )
             {
@@ -218,7 +218,7 @@ public:
                     return DragonCageDoorGUID[identifier - 100];
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override

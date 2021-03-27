@@ -1288,7 +1288,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (!targets)
                     break;
 
-                instance->SetData64(e.action.setInstanceData64.field, targets->front()->GetGUID());
+                instance->SetGuidData(e.action.setInstanceData64.field, targets->front()->GetGUID());
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartScript::ProcessAction: SMART_ACTION_SET_INST_DATA64: Field: %u, data: %lu",
                                e.action.setInstanceData64.field, targets->front()->GetGUID());
@@ -4818,20 +4818,20 @@ void SmartScript::DoAction(int32 param)
 
 uint32 SmartScript::GetData(uint32 id)
 {
-return 0;
+    return 0;
 }
 
 void SmartScript::SetData(uint32 id, uint32 value)
 {
 }
 
-void SmartScript::SetGUID(uint64 guid, int32 id)
+void SmartScript::SetGUID(ObjectGuid guid, int32 id)
 {
 }
 
-uint64 SmartScript::GetGUID(int32 id)
+ObjectGuid SmartScript::GetGUID(int32 id)
 {
-return 0;
+    return ObjectGuid::Empty;
 }
 
 void SmartScript::MovepointStart(uint32 id)
@@ -4848,7 +4848,7 @@ void SmartScript::SetMovePathEndAction(SMART_ACTION action)
 
 uint32 SmartScript::DoChat(int8 id, uint64 whisperGuid)
 {
-return 0;
+    return 0;
 }*/
 // SmartScript end
 

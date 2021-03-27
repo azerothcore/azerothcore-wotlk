@@ -132,7 +132,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -143,7 +143,8 @@ public:
                 case DATA_EXECUTIONER:
                     return executionerGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         void Update(uint32 diff) override

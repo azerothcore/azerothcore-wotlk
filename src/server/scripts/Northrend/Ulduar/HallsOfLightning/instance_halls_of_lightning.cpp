@@ -219,7 +219,7 @@ public:
             return m_auiEncounter[uiType];
         }
 
-        uint64 GetData64(uint32 uiData) const override
+        ObjectGuid GetGuidData(uint32 uiData) const override
         {
             switch(uiData)
             {
@@ -232,7 +232,8 @@ public:
                 case TYPE_LOKEN:
                     return m_uiLokenGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
     };
 };

@@ -139,7 +139,7 @@ public:
                 summons.Summon(pSummoned);
                 pSummoned->SetPhaseMask(16, true);
                 if (pInstance)
-                    pInstance->SetData64(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
@@ -151,7 +151,7 @@ public:
                 if (pSummoned->IsAIEnabled)
                     pSummoned->AI()->DoAction(-1337);
                 if (pInstance)
-                    pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
@@ -190,7 +190,7 @@ public:
             {
                 pSummoned->SetPhaseMask(1, true);
                 SummonedGUID = pSummoned->GetGUID();
-                pInstance->SetData64(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
+                pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
@@ -219,7 +219,7 @@ public:
         void SummonedCreatureDespawn(Creature* pSummoned) override
         {
             if (pSummoned)
-                pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
+                pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
         }
 
         void UpdateAI(uint32 diff) override

@@ -164,7 +164,7 @@ public:
             repairTimer = 0;
             bossGUID = 0;
             if (InstanceScript* instance = me->GetInstanceScript())
-                bossGUID = instance->GetData64(TYPE_MEKGINEER_STEAMRIGGER);
+                bossGUID = instance->GetGuidData(TYPE_MEKGINEER_STEAMRIGGER);
         }
 
         void MoveInLineOfSight(Unit* /*who*/) override {}

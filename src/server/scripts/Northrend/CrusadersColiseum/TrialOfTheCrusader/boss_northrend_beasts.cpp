@@ -124,7 +124,7 @@ public:
                 me->CombatStop(true);
                 me->SetHealth(me->GetMaxHealth());
                 if( pInstance )
-                    if( Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_GORMOK)) )
+                    if( Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK)) )
                         if( gormok->IsAlive() )
                             if( Vehicle* vk = gormok->GetVehicleKit() )
                                 for( uint8 i = 0; i < 4; ++i )
@@ -163,7 +163,7 @@ public:
                         {
                             GuidVector validPlayers;
                             Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                            Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_GORMOK));
+                            Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK));
 
                             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             {
@@ -561,7 +561,7 @@ struct boss_jormungarAI : public ScriptedAI
 
                     // second one submerge 1.5sec after the first one, used also for synchronizing
                     if( pInstance )
-                        if( Creature* c = ObjectAccessor::GetCreature(*me, pInstance->GetData64(_TYPE_OTHER)) )
+                        if( Creature* c = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(_TYPE_OTHER)) )
                             c->AI()->DoAction(-1);
 
                     events.Reset();
@@ -647,7 +647,7 @@ struct boss_jormungarAI : public ScriptedAI
     {
         if( pInstance )
         {
-            if( Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(_TYPE_OTHER)) )
+            if( Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(_TYPE_OTHER)) )
                 if( c->IsAlive() )
                     c->AI()->DoAction(-2);
             pInstance->SetData(TYPE_JORMUNGAR, DONE);

@@ -98,7 +98,7 @@ public:
 
         bool _introDone;
         bool _boneSlice;
-        uint64 _lastBoneSliceTargets[3];
+        ObjectGuid _lastBoneSliceTargets[3];
 
         void Reset() override
         {
@@ -111,7 +111,9 @@ public:
             events.ScheduleEvent(EVENT_ENRAGE, 600000);
 
             _boneSlice = false;
-            memset(_lastBoneSliceTargets, 0, 3 * sizeof(uint64));
+
+            for (uint8 i = 0; i < 3; ++i)
+                _lastBoneSliceTargets[i].Clear();
 
             instance->SetData(DATA_BONED_ACHIEVEMENT, uint32(true));
         }
@@ -135,12 +137,12 @@ public:
                     }
         }
 
-        uint64 GetGUID(int32 id) const override
+        ObjectGuid GetGUID(int32 id) const override
         {
             if (id >= 0 && id <= 2)
                 return _lastBoneSliceTargets[id];
 
-            return (uint64)0;
+            return ObjectGuid::Empty;
         }
 
         void UpdateAI(uint32 diff) override

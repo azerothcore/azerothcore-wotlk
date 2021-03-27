@@ -184,7 +184,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -195,7 +195,8 @@ public:
                 case DATA_EXIT_GATE:
                     return _exitGateGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         void Update(uint32 diff) override

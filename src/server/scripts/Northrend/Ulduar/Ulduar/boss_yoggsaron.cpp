@@ -439,7 +439,7 @@ public:
                 m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, CRITERIA_NOT_GETTING_OLDER);
                 m_pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SANITY);
                 m_pInstance->SetData(TYPE_YOGGSARON, NOT_STARTED);
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_YOGG_SARON_DOORS)))
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_YOGG_SARON_DOORS)))
                     go->SetGoState(GO_STATE_ACTIVE);
             }
         }
@@ -765,7 +765,7 @@ public:
                     me->SummonCreature(NPC_VOICE_OF_YOGG_SARON, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
 
                     if (m_pInstance)
-                        if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_YOGG_SARON_DOORS)))
+                        if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_YOGG_SARON_DOORS)))
                             go->SetGoState(GO_STATE_READY);
 
                     events.ScheduleEvent(EVENT_SARA_P1_SPELLS, 0, 1, EVENT_PHASE_ONE);
@@ -894,7 +894,7 @@ public:
 
             _isSummoning = false;
             if (me->GetInstanceScript())
-                if (Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(NPC_SARA)))
+                if (Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(NPC_SARA)))
                     sara->AI()->JustSummoned(cr);
         }
 
@@ -1068,9 +1068,9 @@ public:
             if (m_pInstance)
             {
                 m_pInstance->SetData(TYPE_YOGGSARON, DONE);
-                if (Creature* sara = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_SARA)))
+                if (Creature* sara = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_SARA)))
                     sara->AI()->DoAction(ACTION_YOGG_SARON_DEATH);
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_YOGG_SARON_DOORS)))
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_YOGG_SARON_DOORS)))
                     go->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -1344,7 +1344,7 @@ public:
                 {
                     // Stun
                     if (me->GetInstanceScript())
-                        if(Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(NPC_SARA)))
+                        if(Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(NPC_SARA)))
                             sara->AI()->DoAction(MINUTE * IN_MILLISECONDS - std::min((uint32)MINUTE * IN_MILLISECONDS, _induceTimer));
 
                     _induceTimer = 0;
@@ -1411,7 +1411,7 @@ public:
 
                     me->CastSpell(me, SPELL_BRAIN_HURT_VISUAL, true);
                     if (me->GetInstanceScript())
-                        if(Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(NPC_SARA)))
+                        if(Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(NPC_SARA)))
                             sara->AI()->DoAction(ACTION_BRAIN_DAMAGED);
                 }
             }
@@ -1886,7 +1886,7 @@ public:
             _step = 0;
             _championGUID = 0;
             if (me->GetInstanceScript())
-                _yoggGUID = me->GetInstanceScript()->GetData64(TYPE_YOGGSARON);
+                _yoggGUID = me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON);
         }
 
         void NextStep(const uint32 time)
@@ -2000,7 +2000,7 @@ public:
             _step = 0;
             _garonaGUID = 0;
             if (me->GetInstanceScript())
-                _yoggGUID = me->GetInstanceScript()->GetData64(TYPE_YOGGSARON);
+                _yoggGUID = me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON);
         }
 
         void NextStep(const uint32 time)
@@ -2120,7 +2120,7 @@ public:
             _checkTimer = 0;
             _step = 0;
             if (me->GetInstanceScript())
-                _yoggGUID = me->GetInstanceScript()->GetData64(TYPE_YOGGSARON);
+                _yoggGUID = me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON);
         }
 
         void NextStep(const uint32 time)
@@ -2236,7 +2236,7 @@ public:
             {
                 // Drive Me Crazy achievement failed
                 if (me->GetInstanceScript())
-                    if (Creature* yogg = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_YOGGSARON)))
+                    if (Creature* yogg = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON)))
                         yogg->AI()->DoAction(ACTION_FAILED_DRIVE_ME_CRAZY);
 
                 events.ScheduleEvent(40, 8000);
@@ -2930,7 +2930,7 @@ public:
     bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/) override
     {
         if (player->GetInstanceScript())
-            if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetData64(NPC_SARA)))
+            if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetGuidData(NPC_SARA)))
                 return sara->GetAI()->GetData(DATA_GET_KEEPERS_COUNT) <= _keepersCount;
 
         return false;
@@ -2951,7 +2951,7 @@ public:
     bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/) override
     {
         if (player->GetInstanceScript())
-            if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetData64(NPC_BRAIN_OF_YOGG_SARON)))
+            if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetGuidData(NPC_BRAIN_OF_YOGG_SARON)))
                 return sara->GetAI()->GetData(DATA_GET_CURRENT_ILLUSION) == _requiredIllusion;
 
         return false;

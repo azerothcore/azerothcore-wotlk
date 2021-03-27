@@ -1843,7 +1843,7 @@ void ObjectMgr::LoadCreatures()
 
             stmt->setUInt32(0, zoneId);
             stmt->setUInt32(1, areaId);
-            stmt->setUInt64(2, guid);
+            stmt->setUInt32(2, guid);
 
             WorldDatabase.Execute(stmt);
         }
@@ -2181,7 +2181,7 @@ void ObjectMgr::LoadGameobjects()
 
             stmt->setUInt32(0, zoneId);
             stmt->setUInt32(1, areaId);
-            stmt->setUInt64(2, guid);
+            stmt->setUInt32(2, guid);
 
             WorldDatabase.Execute(stmt);
         }

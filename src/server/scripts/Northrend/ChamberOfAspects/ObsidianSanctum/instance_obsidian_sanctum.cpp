@@ -61,7 +61,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 uiData) const override
+        ObjectGuid GetGuidData(uint32 uiData) const override
         {
             switch(uiData)
             {
@@ -74,7 +74,8 @@ public:
                 case DATA_VESPERON:
                     return m_uiVesperonGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override

@@ -132,9 +132,9 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 id) const override
+        ObjectGuid GetGuidData(uint32 id) const override
         {
-            switch(id)
+            switch (id)
             {
                 case GO_TRIBUNAL_CONSOLE:
                     return goTribunalConsoleGUID;
@@ -160,12 +160,13 @@ public:
                 case NPC_BRANN:
                     return BrannGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         uint32 GetData(uint32 id) const override
         {
-            switch(id)
+            switch (id)
             {
                 case BOSS_KRYSTALLUS:
                 case BOSS_MAIDEN_OF_GRIEF:
@@ -174,18 +175,20 @@ public:
                 case BRANN_BRONZEBEARD:
                     return Encounter[id];
             }
+
             return 0;
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 7590: // Brann Spankin' New (2154)
                     return brannAchievement;
                 case 7593: // Abuse the Ooze (2155)
                     return sjonnirAchievement;
             }
+
             return false;
         }
 

@@ -115,7 +115,7 @@ public:
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
                 if (InstanceScript* instance = me->GetInstanceScript())
-                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetData64(TYPE_IGNIS)))
+                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
                     {
                         ignis->CastSpell(ignis, SPELL_STRENGTH_OF_THE_CREATOR, true);
                         AttackStart(ignis->GetVictim());
@@ -147,7 +147,7 @@ public:
                 Unit::Kill(attacker, me);
 
                 if (InstanceScript* instance = me->GetInstanceScript())
-                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetData64(TYPE_IGNIS)))
+                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
                         ignis->AI()->SetData(1337, 0);
             }
         }
@@ -155,7 +155,7 @@ public:
         void JustDied(Unit*  /*killer*/) override
         {
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetData64(TYPE_IGNIS)))
+                if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
                     ignis->RemoveAuraFromStack(SPELL_STRENGTH_OF_THE_CREATOR);
         }
 

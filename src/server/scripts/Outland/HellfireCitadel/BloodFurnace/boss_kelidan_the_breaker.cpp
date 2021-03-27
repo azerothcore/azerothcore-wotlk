@@ -184,8 +184,8 @@ public:
                 // Xinef: load grid with start doors
                 me->GetMap()->LoadGrid(0, -111.0f);
                 instance->SetData(DATA_KELIDAN, DONE);
-                instance->HandleGameObject(instance->GetData64(DATA_DOOR1), true);
-                instance->HandleGameObject(instance->GetData64(DATA_DOOR6), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR1), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_DOOR6), true);
             }
         }
 
@@ -288,7 +288,7 @@ public:
         Creature* GetKelidan()
         {
             if (me->GetInstanceScript())
-                return ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(DATA_KELIDAN));
+                return ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_KELIDAN));
             return nullptr;
         }
 

@@ -173,14 +173,15 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch(type)
             {
                 case DATA_MALYGOS_GUID:
                     return NPC_MalygosGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         void ProcessEvent(WorldObject* /*unit*/, uint32 eventId) override

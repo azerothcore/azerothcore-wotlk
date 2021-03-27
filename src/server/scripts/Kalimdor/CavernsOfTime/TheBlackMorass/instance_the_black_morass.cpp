@@ -209,7 +209,7 @@ public:
             return 0;
         }
 
-        void SetData64(uint32 type, uint64 data) override
+        void SetGuidData(uint32 type, ObjectGuid data) override
         {
             if (type == DATA_SUMMONED_NPC)
                 encounterNPCs.insert(data);

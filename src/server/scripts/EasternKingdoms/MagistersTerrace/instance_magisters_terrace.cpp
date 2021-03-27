@@ -182,14 +182,15 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
                 case NPC_DELRISSA:
                     return DelrissaGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
     };
 

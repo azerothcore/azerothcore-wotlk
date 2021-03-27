@@ -524,7 +524,7 @@ public:
         {
             if (!_combatStarted)
                 if (InstanceScript* instance = me->GetInstanceScript())
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, instance->GetData64(TYPE_KOLOGARN)))
+                    if (Creature* cr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_KOLOGARN)))
                     {
                         _combatStarted = true;
                         if (!cr->IsInCombat() && who)
@@ -561,7 +561,7 @@ public:
                 cr->CastSpell(cr, SPELL_RUBBLE_FALL, true);
 
                 if (me->GetInstanceScript())
-                    if (Creature* kologarn = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_KOLOGARN)))
+                    if (Creature* kologarn = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_KOLOGARN)))
                         for (uint8 i = 0; i < 5; ++i)
                             if (Creature* cr2 = kologarn->SummonCreature(NPC_RUBBLE_SUMMON, cr->GetPositionX() + irand(-5, 5), cr->GetPositionY() + irand(-5, 5), cr->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                             {
@@ -572,7 +572,7 @@ public:
             }
 
             if (me->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_KOLOGARN)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_KOLOGARN)))
                     cr->AI()->DoAction(DATA_KOLOGARN_RUBBLE_ACHIEV);
 
             me->ExitVehicle();
@@ -605,7 +605,7 @@ public:
             if (damage > 0 && !_damaged && me->GetInstanceScript())
             {
                 _damaged = true;
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_KOLOGARN)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_KOLOGARN)))
                     cr->AI()->DoAction(DATA_KOLOGARN_LOOKS_ACHIEV);
             }
         }
@@ -615,7 +615,7 @@ public:
             if (justSpawned)
             {
                 me->DespawnOrUnsummon(10000);
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(TYPE_KOLOGARN)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(TYPE_KOLOGARN)))
                 {
                     me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
                 }
@@ -818,7 +818,7 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_KOLOGARN)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_KOLOGARN)))
                     return cr->AI()->GetData(DATA_KOLOGARN_LOOKS_ACHIEV);
 
         return false;
@@ -834,7 +834,7 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_KOLOGARN)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_KOLOGARN)))
                     return cr->AI()->GetData(DATA_KOLOGARN_RUBBLE_ACHIEV);
 
         return false;
@@ -850,7 +850,7 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(TYPE_KOLOGARN)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_KOLOGARN)))
                     return cr->AI()->GetData(DATA_KOLOGARN_ARMS_ACHIEV);
 
         return false;

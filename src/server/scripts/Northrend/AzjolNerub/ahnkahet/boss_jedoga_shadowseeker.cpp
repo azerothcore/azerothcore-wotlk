@@ -450,7 +450,7 @@ public:
             if (!pInstance || Killer == me)
                 return;
 
-            Creature* boss = me->GetMap()->GetCreature(pInstance->GetData64(DATA_JEDOGA_SHADOWSEEKER));
+            Creature* boss = me->GetMap()->GetCreature(pInstance->GetGuidData(DATA_JEDOGA_SHADOWSEEKER));
             if (boss)
             {
                 if (Timer)
@@ -475,7 +475,7 @@ public:
             {
                 Unit::Kill(me, me);
                 me->DespawnOrUnsummon(5000);
-                Creature* boss = me->GetMap()->GetCreature(pInstance->GetData64(DATA_JEDOGA_SHADOWSEEKER));
+                Creature* boss = me->GetMap()->GetCreature(pInstance->GetGuidData(DATA_JEDOGA_SHADOWSEEKER));
                 if (boss)
                     boss->AI()->DoAction(ACTION_HERALD);
             }

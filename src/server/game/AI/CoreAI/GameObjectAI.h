@@ -30,8 +30,8 @@ public:
 
     // Pass parameters between AI
     virtual void DoAction(int32 /*param = 0 */) {}
-    virtual void SetGUID(uint64 /*guid*/, int32 /*id = 0 */) {}
-    virtual uint64 GetGUID(int32 /*id = 0 */) const { return 0; }
+    virtual void SetGUID(ObjectGuid /*guid*/, int32 /*id = 0 */) {}
+    virtual ObjectGuid GetGUID(int32 /*id = 0 */) const { return 0; }
 
     static int Permissible(GameObject const* go);
 

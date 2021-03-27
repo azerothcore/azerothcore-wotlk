@@ -1011,7 +1011,7 @@ public:
             if (CheckTimer <= diff)
             {
                 if (pInstance)
-                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MALYGOS_GUID)))
+                    if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MALYGOS_GUID)))
                         if (me->IsWithinDist3d(c, 12.0f))
                         {
                             me->CastSpell(c, SPELL_POWER_SPARK_MALYGOS_BUFF, true);
@@ -1028,7 +1028,7 @@ public:
                 if (MoveTimer <= diff)
                 {
                     if (pInstance)
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MALYGOS_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MALYGOS_GUID)))
                             me->GetMotionMaster()->MovePoint(0, *c);
                     MoveTimer = 2000;
                 }

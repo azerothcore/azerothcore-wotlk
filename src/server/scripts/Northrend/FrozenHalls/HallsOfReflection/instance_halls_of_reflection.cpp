@@ -683,7 +683,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch(type)
             {
@@ -714,7 +714,7 @@ public:
                     return GO_FrontDoorGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override

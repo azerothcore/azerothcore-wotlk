@@ -147,11 +147,12 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             if (identifier < MAX_ENCOUNTER)
                 return bossGUIDs[identifier];
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         uint32 GetData(uint32 identifier) const override

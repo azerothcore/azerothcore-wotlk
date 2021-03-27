@@ -428,7 +428,7 @@ public:
         {
             if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEFAULT)
                 if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
-                    if (Creature* leotheras = ObjectAccessor::GetCreature(*GetUnitOwner(), instance->GetData64(NPC_LEOTHERAS_THE_BLIND)))
+                    if (Creature* leotheras = ObjectAccessor::GetCreature(*GetUnitOwner(), instance->GetGuidData(NPC_LEOTHERAS_THE_BLIND)))
                         leotheras->CastSpell(GetUnitOwner(), SPELL_CONSUMING_MADNESS, true);
         }
 

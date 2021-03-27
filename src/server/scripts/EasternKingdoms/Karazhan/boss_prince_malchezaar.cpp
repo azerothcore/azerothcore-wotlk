@@ -194,7 +194,7 @@ public:
             phase = 1;
             clearweapons();
             positions.clear();
-            instance->HandleGameObject(instance->GetData64(DATA_GO_NETHER_DOOR), true);
+            instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
         }
 
         void clearweapons()
@@ -216,7 +216,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
-            instance->HandleGameObject(instance->GetData64(DATA_GO_NETHER_DOOR), true);
+            instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), true);
             if (Creature*  Axe = me->FindNearestCreature(MALCHEZARS_AXE, 100.0f))
             {
                 Axe->DespawnOrUnsummon();
@@ -227,7 +227,7 @@ public:
         {
             Talk(SAY_AGGRO);
             DoZoneInCombat();
-            instance->HandleGameObject(instance->GetData64(DATA_GO_NETHER_DOOR), false);
+            instance->HandleGameObject(instance->GetGuidData(DATA_GO_NETHER_DOOR), false);
         }
 
         void SummonAxes()

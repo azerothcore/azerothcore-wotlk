@@ -255,21 +255,21 @@ public:
 
             GameObject* go = nullptr;
             if (headMask & 0x1) // Kaddrak
-                if ((go = me->GetMap()->GetGameObject(pInstance->GetData64(GO_KADDRAK))))
+                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_KADDRAK))))
                     activate ? go->SendCustomAnim(0) : go->SetGoState(GO_STATE_READY);
 
             if (headMask & 0x2) // Marnak
-                if ((go = me->GetMap()->GetGameObject(pInstance->GetData64(GO_MARNAK))))
+                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_MARNAK))))
                     activate ? go->SendCustomAnim(0) : go->SetGoState(GO_STATE_READY);
 
             if (headMask & 0x4) // Abedneum
-                if ((go = me->GetMap()->GetGameObject(pInstance->GetData64(GO_ABEDNEUM))))
+                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_ABEDNEUM))))
                     activate ? go->SendCustomAnim(0) : go->SetGoState(GO_STATE_READY);
         }
 
         void ResetEvent()
         {
-            if (GameObject* tribunal = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_TRIBUNAL_CONSOLE)))
+            if (GameObject* tribunal = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_TRIBUNAL_CONSOLE)))
                 tribunal->SetGoState(GO_STATE_READY);
 
             events.Reset();
@@ -369,7 +369,7 @@ public:
                     me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
                     break;
                 case ACTION_OPEN_DOOR:
-                    if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
+                    if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_SJONNIR_DOOR)))
                         door->SetGoState(GO_STATE_ACTIVE);
                     SetEscortPaused(false);
                     me->RemoveAura(58506);
@@ -513,7 +513,7 @@ public:
                     }
                 case EVENT_GO_TO_SJONNIR:
                     {
-                        if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
+                        if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_SJONNIR_DOOR)))
                             door->SetGoState(GO_STATE_ACTIVE);
                         SetEscortPaused(false);
                         ResetEvent();
@@ -588,7 +588,7 @@ public:
             ResetEvent();
             if(pInstance)
             {
-                if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                 {
                     brann->setDeathState(JUST_DIED);
                     brann->Respawn();
@@ -653,7 +653,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             if(pInstance)
             {
                 pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, IN_PROGRESS);
-                if (GameObject* tribunal = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_TRIBUNAL_CONSOLE)))
+                if (GameObject* tribunal = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_TRIBUNAL_CONSOLE)))
                     tribunal->SetGoState(GO_STATE_ACTIVE);
             }
             break;
@@ -664,7 +664,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             {
                 pInstance->SetData(BRANN_BRONZEBEARD, 5);
                 me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_SJONNIR)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_SJONNIR)))
                     cr->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetOrientation(3.132660f);
                 DoCast(me, 58506, false);
@@ -677,7 +677,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             SetEscortPaused(true);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
             if (pInstance)
-                if (GameObject* console = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_CONSOLE)))
+                if (GameObject* console = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_SJONNIR_CONSOLE)))
                     console->SetGoState(GO_STATE_ACTIVE);
 
             break;

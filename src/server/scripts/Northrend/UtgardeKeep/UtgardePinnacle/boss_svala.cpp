@@ -152,7 +152,7 @@ public:
             if (instance)
             {
                 instance->SetData(DATA_SVALA_SORROWGRAVE, IN_PROGRESS);
-                if (GameObject* mirror = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_SVALA_MIRROR)))
+                if (GameObject* mirror = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_SVALA_MIRROR)))
                     mirror->SetGoState(GO_STATE_READY);
             }
         }
@@ -263,7 +263,7 @@ public:
                 case EVENT_SVALA_TALK7:
                     me->SetFacingTo(M_PI / 2.0f);
                     Talk(TALK_INTRO_S3);
-                    if (GameObject* mirror = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_SVALA_MIRROR)))
+                    if (GameObject* mirror = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_SVALA_MIRROR)))
                         mirror->SetGoState(GO_STATE_ACTIVE);
                     events2.ScheduleEvent(EVENT_SVALA_TALK8, 13000);
                     break;

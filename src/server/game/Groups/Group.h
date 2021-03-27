@@ -179,21 +179,21 @@ public:
     // group manipulation methods
     bool   Create(Player* leader);
     bool   LoadGroupFromDB(Field* field);
-    void   LoadMemberFromDB(uint32 guidLow, uint8 memberFlags, uint8 subgroup, uint8 roles);
+    void   LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uint8 subgroup, uint8 roles);
     bool   AddInvite(Player* player);
     void   RemoveInvite(Player* player);
     void   RemoveAllInvites();
     bool   AddLeaderInvite(Player* player);
     bool   AddMember(Player* player);
-    bool   RemoveMember(uint64 guid, const RemoveMethod& method = GROUP_REMOVEMETHOD_DEFAULT, uint64 kicker = 0, const char* reason = nullptr);
-    void   ChangeLeader(uint64 guid);
+    bool   RemoveMember(ObjectGuid guid, const RemoveMethod& method = GROUP_REMOVEMETHOD_DEFAULT, ObjectGuid kicker = ObjectGuid::Empty, const char* reason = nullptr);
+    void   ChangeLeader(ObjectGuid guid);
     void   SetLootMethod(LootMethod method);
-    void   SetLooterGuid(uint64 guid);
-    void   SetMasterLooterGuid(uint64 guid);
+    void   SetLooterGuid(ObjectGuid guid);
+    void   SetMasterLooterGuid(ObjectGuid guid);
     void   UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed = false);
     void   SetLootThreshold(ItemQualities threshold);
     void   Disband(bool hideDestroy = false);
-    void   SetLfgRoles(uint64 guid, const uint8 roles);
+    void   SetLfgRoles(ObjectGuid guid, const uint8 roles);
 
     // properties accessories
     bool IsFull() const;
@@ -202,26 +202,26 @@ public:
     bool isBFGroup()   const;
     bool isBGGroup()   const;
     bool IsCreated()   const;
-    uint64 GetLeaderGUID() const;
-    uint64 GetGUID() const;
-    uint32 GetLowGUID() const;
+    ObjectGuid GetLeaderGUID() const;
+    ObjectGuid GetGUID() const;
+    ObjectGuid::LowType GetLowGUID() const;
     const char* GetLeaderName() const;
     LootMethod GetLootMethod() const;
-    uint64 GetLooterGuid() const;
-    uint64 GetMasterLooterGuid() const;
+    ObjectGuid GetLooterGuid() const;
+    ObjectGuid GetMasterLooterGuid() const;
     ItemQualities GetLootThreshold() const;
 
     // member manipulation methods
-    bool IsMember(uint64 guid) const;
-    bool IsLeader(uint64 guid) const;
-    uint64 GetMemberGUID(const std::string& name);
-    bool IsAssistant(uint64 guid) const;
+    bool IsMember(ObjectGuid guid) const;
+    bool IsLeader(ObjectGuid guid) const;
+    ObjectGuid GetMemberGUID(const std::string& name);
+    bool IsAssistant(ObjectGuid guid) const;
 
-    Player* GetInvited(uint64 guid) const;
+    Player* GetInvited(ObjectGuid guid) const;
     Player* GetInvited(const std::string& name) const;
 
-    bool SameSubGroup(uint64 guid1, uint64 guid2) const;
-    bool SameSubGroup(uint64 guid1, MemberSlot const* slot2) const;
+    bool SameSubGroup(ObjectGuid guid1, ObjectGuid guid2) const;
+    bool SameSubGroup(ObjectGuid guid1, MemberSlot const* slot2) const;
     bool SameSubGroup(Player const* member1, Player const* member2) const;
     bool HasFreeSlotSubGroup(uint8 subgroup) const;
 
@@ -230,7 +230,7 @@ public:
     GroupReference const* GetFirstMember() const { return m_memberMgr.getFirst(); }
     uint32 GetMembersCount() const { return m_memberSlots.size(); }
 
-    uint8 GetMemberGroup(uint64 guid) const;
+    uint8 GetMemberGroup(ObjectGuid guid) const;
 
     void ConvertToLFG();
     void ConvertToRaid();
@@ -239,9 +239,9 @@ public:
     void SetBattlefieldGroup(Battlefield* bf);
     GroupJoinBattlegroundResult CanJoinBattlegroundQueue(Battleground const* bgTemplate, BattlegroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot);
 
-    void ChangeMembersGroup(uint64 guid, uint8 group);
-    void SetTargetIcon(uint8 id, uint64 whoGuid, uint64 targetGuid);
-    void SetGroupMemberFlag(uint64 guid, bool apply, GroupMemberFlags flag);
+    void ChangeMembersGroup(ObjectGuid guid, uint8 group);
+    void SetTargetIcon(uint8 id, ObjectGuid whoGuid, ObjectGuid targetGuid);
+    void SetGroupMemberFlag(ObjectGuid guid, bool apply, GroupMemberFlags flag);
     void RemoveUniqueGroupMemberFlag(GroupMemberFlags flag);
 
     Difficulty GetDifficulty(bool isRaid) const;
@@ -256,10 +256,10 @@ public:
     //void SendInit(WorldSession* session);
     void SendTargetIconList(WorldSession* session);
     void SendUpdate();
-    void SendUpdateToPlayer(uint64 playerGUID, MemberSlot* slot = nullptr);
+    void SendUpdateToPlayer(ObjectGuid playerGUID, MemberSlot* slot = nullptr);
     void UpdatePlayerOutOfRange(Player* player);
     // ignore: GUID of player that will be ignored
-    void BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int group = -1, uint64 ignore = 0);
+    void BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int group = -1, ObjectGuid ignore = ObjectGuid::Empty);
     void BroadcastReadyCheck(WorldPacket* packet);
     void OfflineReadyCheck();
 
@@ -270,16 +270,16 @@ public:
     bool isRollLootActive() const;
     void SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll& r);
     void SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p, bool canNeed, Roll const& r);
-    void SendLootRoll(uint64 SourceGuid, uint64 TargetGuid, uint8 RollNumber, uint8 RollType, const Roll& r);
-    void SendLootRollWon(uint64 SourceGuid, uint64 TargetGuid, uint8 RollNumber, uint8 RollType, const Roll& r);
+    void SendLootRoll(ObjectGuid SourceGuid, ObjectGuid TargetGuid, uint8 RollNumber, uint8 RollType, const Roll& r);
+    void SendLootRollWon(ObjectGuid SourceGuid, ObjectGuid TargetGuid, uint8 RollNumber, uint8 RollType, const Roll& r);
     void SendLootAllPassed(Roll const& roll);
     void SendLooter(Creature* creature, Player* pLooter);
     void GroupLoot(Loot* loot, WorldObject* pLootedObject);
     void NeedBeforeGreed(Loot* loot, WorldObject* pLootedObject);
     void MasterLoot(Loot* loot, WorldObject* pLootedObject);
-    Rolls::iterator GetRoll(uint64 Guid);
+    Rolls::iterator GetRoll(ObjectGuid Guid);
     void CountTheRoll(Rolls::iterator roll, Map* allowedMap);
-    bool CountRollVote(uint64 playerGUID, uint64 Guid, uint8 Choise);
+    bool CountRollVote(ObjectGuid playerGUID, ObjectGuid Guid, uint8 Choise);
     void EndRoll(Loot* loot, Map* allowedMap);
 
     // related to disenchant rolls

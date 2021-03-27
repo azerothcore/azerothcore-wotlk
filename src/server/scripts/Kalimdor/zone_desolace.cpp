@@ -78,19 +78,17 @@ public:
     {
         npc_cork_gizeltonAI(Creature* creature) : npc_escortAI(creature)
         {
-            memset(&summons, 0, sizeof(summons));
         }
 
         EventMap events;
-        uint64 summons[MAX_CARAVAN_SUMMONS];
+        ObjectGuid summons[MAX_CARAVAN_SUMMONS];
         bool headNorth;
 
-        uint64 _playerGUID;
+        ObjectGuid _playerGUID;
         uint32 _faction;
 
         void Initialize()
         {
-            _playerGUID = 0;
             _faction = 35;
             headNorth = true;
             me->setActive(true);
@@ -129,12 +127,12 @@ public:
                     if (me->IsWithinDist(player, 60.0f))
                         return;
 
-            _playerGUID = 0;
+            _playerGUID.Clear();
             _faction = 35;
             ImmuneFlagSet(false, _faction);
         }
 
-        void SetGUID(uint64 playerGUID, int32 faction) override
+        void SetGUID(ObjectGuid playerGUID, int32 faction) override
         {
             _playerGUID = playerGUID;
             _faction = faction;
@@ -155,7 +153,7 @@ public:
         {
             for (uint8 i = 0; i < MAX_CARAVAN_SUMMONS; ++i)
             {
-                if (summons[i] == 0)
+                if (!summons[i])
                 {
                     SummonHelpers();
                     return false;

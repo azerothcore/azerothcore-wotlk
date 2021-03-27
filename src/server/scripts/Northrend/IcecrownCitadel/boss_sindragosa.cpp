@@ -715,16 +715,15 @@ public:
         npc_ice_tombAI(Creature* creature) : NullCreatureAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
-            _trappedPlayerGUID = 0;
             _existenceCheckTimer = 1000;
             _asphyxiationTimer = 22500;
         }
 
-        uint64 _trappedPlayerGUID;
+        ObjectGuid _trappedPlayerGUID;
         uint32 _existenceCheckTimer;
         uint16 _asphyxiationTimer;
 
-        void SetGUID(uint64 guid, int32 type) override
+        void SetGUID(ObjectGuid guid, int32 type) override
         {
             if (type == DATA_TRAPPED_PLAYER)
                 _trappedPlayerGUID = guid;
@@ -1740,14 +1739,14 @@ public:
         if (InstanceScript* instance = player->GetInstanceScript())
         {
             if (!instance->GetData(DATA_SPINESTALKER))
-                if (Creature* spinestalker = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_SPINESTALKER)))
+                if (Creature* spinestalker = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_SPINESTALKER)))
                     spinestalker->AI()->DoAction(ACTION_START_FROSTWYRM);
 
             if (!instance->GetData(DATA_RIMEFANG))
-                if (Creature* rimefang = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_RIMEFANG)))
+                if (Creature* rimefang = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_RIMEFANG)))
                     rimefang->AI()->DoAction(ACTION_START_FROSTWYRM);
 
-            if (!instance->GetData(DATA_SINDRAGOSA_FROSTWYRMS) && !instance->GetData64(DATA_SINDRAGOSA) && instance->GetBossState(DATA_SINDRAGOSA) != DONE)
+            if (!instance->GetData(DATA_SINDRAGOSA_FROSTWYRMS) && !instance->GetGuidData(DATA_SINDRAGOSA) && instance->GetBossState(DATA_SINDRAGOSA) != DONE)
             {
                 if (instance->GetData(DATA_HAS_LIMITED_ATTEMPTS) && !instance->GetData(DATA_HEROIC_ATTEMPTS))
                     return true;

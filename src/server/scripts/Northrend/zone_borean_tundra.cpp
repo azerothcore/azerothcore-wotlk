@@ -1109,7 +1109,7 @@ public:
         uint32 uiEventTimer;
         uint8 uiEventPhase;
 
-        uint64 uiPlayerGUID;
+        ObjectGuid uiPlayerGUID;
 
         void Reset() override
         {
@@ -1139,7 +1139,7 @@ public:
             uiEventPhase = 1;
         }
 
-        void SetGUID(uint64 uiGuid, int32 /*iId*/) override
+        void SetGUID(ObjectGuid uiGuid, int32 /*iId*/) override
         {
             uiPlayerGUID = uiGuid;
         }
@@ -1322,10 +1322,10 @@ public:
         void Reset() override
         {
             _events.Reset();
-            _playerGUID = 0;
+            _playerGUID.Clear();
         }
 
-        void SetGUID(uint64 guid, int32 /*action*/) override
+        void SetGUID(ObjectGuid guid, int32 /*action*/) override
         {
             if (_playerGUID)
                 return;
@@ -1367,7 +1367,7 @@ public:
 
     private:
         EventMap _events;
-        uint64 _playerGUID;
+        ObjectGuid _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

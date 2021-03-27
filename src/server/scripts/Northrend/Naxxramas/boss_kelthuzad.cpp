@@ -171,13 +171,13 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
             me->SetReactState(REACT_AGGRESSIVE);
 
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_FLOOR)))
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_FLOOR)))
             {
                 go->SetPhaseMask(1, true);
                 go->SetGoState(GO_STATE_READY);
             }
 
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_GATE)))
             {
                 if(!_justSpawned) /* Don't open the door if we just spawned and are still doing the RP */
                     go->SetGoState(GO_STATE_ACTIVE);
@@ -214,7 +214,7 @@ public:
 
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_GATE)))
                     go->SetGoState(GO_STATE_ACTIVE);
             }
         }
@@ -243,13 +243,13 @@ public:
             events.ScheduleEvent(EVENT_START_SECOND_PHASE, 228000);
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_FLOOR)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_FLOOR)))
                 {
                     events.ScheduleEvent(EVENT_FLOOR_CHANGE, 15000);
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
             }
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_GATE)))
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_GATE)))
                 go->SetGoState(GO_STATE_READY);
         }
 
@@ -269,7 +269,7 @@ public:
                 case EVENT_FLOOR_CHANGE:
                     if (pInstance)
                     {
-                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_FLOOR)))
+                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_FLOOR)))
                         {
                             events.ScheduleEvent(EVENT_FLOOR_CHANGE, 15000);
                             go->SetGoState(GO_STATE_READY);
@@ -394,7 +394,7 @@ public:
                     break;
                 case EVENT_THIRD_PHASE_LICH_KING_SAY:
                     if (pInstance)
-                        if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_LICH_KING_BOSS)))
+                        if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_LICH_KING_BOSS)))
                             cr->AI()->Talk(SAY_ANSWER_REQUEST);
 
                     for (uint8 i = 0 ; i < RAID_MODE(2, 4); ++i)

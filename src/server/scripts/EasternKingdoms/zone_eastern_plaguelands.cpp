@@ -74,7 +74,7 @@ public:
 
         SummonList summons;
         EventMap events;
-        uint64 _playerGUID;
+        ObjectGuid _playerGUID;
         uint8 _counter;
         uint8 _savedCount;
         uint8 _deathCount;
@@ -88,7 +88,7 @@ public:
             _savedCount = 0;
             _deathCount = 0;
             _counter = 0;
-            _playerGUID = 0;
+            _playerGUID.Clear();
             events.Reset();
             summons.DespawnAll();
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
@@ -99,7 +99,7 @@ public:
             _faction = faction;
         }
 
-        void SetGUID(uint64 guid, int32) override
+        void SetGUID(ObjectGuid guid, int32) override
         {
             _playerGUID = guid;
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);

@@ -86,7 +86,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            uint64 TerestianGUID = instance->GetData64(DATA_TERESTIAN);
+            uint64 TerestianGUID = instance->GetGuidData(DATA_TERESTIAN);
             if (TerestianGUID)
             {
                 Unit* Terestian = ObjectAccessor::GetUnit(*me, TerestianGUID);

@@ -155,7 +155,7 @@ public:
                 pSummoned->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                 spheres.Summon(pSummoned);
                 if (pInstance)
-                    pInstance->SetData64(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
@@ -165,7 +165,7 @@ public:
             {
                 spheres.Despawn(pSummoned);
                 if (pInstance)
-                    pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 

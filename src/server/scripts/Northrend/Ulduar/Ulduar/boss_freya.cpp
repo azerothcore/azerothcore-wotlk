@@ -503,7 +503,7 @@ public:
 
             // HARD MODE CHECKS
             Creature* elder = nullptr;
-            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_ELDER_STONEBARK));
+            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_ELDER_STONEBARK));
             if (elder && elder->IsAlive())
             {
                 elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -514,7 +514,7 @@ public:
                 _elderGUID[0] = elder->GetGUID();
             }
 
-            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_ELDER_IRONBRANCH));
+            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_ELDER_IRONBRANCH));
             if (elder && elder->IsAlive())
             {
                 elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -525,7 +525,7 @@ public:
                 _elderGUID[1] = elder->GetGUID();
             }
 
-            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_ELDER_BRIGHTLEAF));
+            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_ELDER_BRIGHTLEAF));
             if (elder && elder->IsAlive())
             {
                 elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -713,7 +713,7 @@ public:
 
             // Lumberjacked
             if (me->GetInstanceScript())
-                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_FREYA)))
+                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_FREYA)))
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
@@ -819,7 +819,7 @@ public:
 
             // Lumberjacked
             if (me->GetInstanceScript())
-                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_FREYA)))
+                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_FREYA)))
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
@@ -940,7 +940,7 @@ public:
 
             // Lumberjacked
             if (me->GetInstanceScript())
-                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_FREYA)))
+                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_FREYA)))
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
@@ -1108,7 +1108,7 @@ public:
     {
         boss_freya_summonsAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            _freyaGUID = me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(TYPE_FREYA) : 0;
+            _freyaGUID = me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(TYPE_FREYA) : 0;
             _isTrio = me->GetEntry() == NPC_ANCIENT_WATER_SPIRIT || me->GetEntry() == NPC_STORM_LASHER || me->GetEntry() == NPC_SNAPLASHER;
             _hasDied = false;
         }

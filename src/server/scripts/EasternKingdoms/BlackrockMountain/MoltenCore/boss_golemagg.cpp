@@ -143,7 +143,7 @@ public:
             if (HealthAbovePct(50) || !instance)
                 return;
 
-            if (Creature* pGolemagg = instance->instance->GetCreature(instance->GetData64(BOSS_GOLEMAGG_THE_INCINERATOR)))
+            if (Creature* pGolemagg = instance->instance->GetCreature(instance->GetGuidData(BOSS_GOLEMAGG_THE_INCINERATOR)))
             {
                 if (pGolemagg->IsAlive())
                 {

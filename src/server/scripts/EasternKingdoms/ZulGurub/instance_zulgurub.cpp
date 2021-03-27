@@ -107,7 +107,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 uiData) const override
+        ObjectGuid GetGuidData(uint32 uiData) const override
         {
             switch (uiData)
             {
@@ -130,7 +130,8 @@ public:
                     return _goGongOfBethekkGUID;
                     break;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override

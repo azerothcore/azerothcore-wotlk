@@ -361,7 +361,7 @@ public:
         {
             if (me->GetEntry() == NPC_BRITTLE_GOLEM && param == ACTION_SHATTER)
             {
-                if (Creature* volkhan = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(TYPE_VOLKHAN)))
+                if (Creature* volkhan = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(TYPE_VOLKHAN)))
                     volkhan->AI()->DoAction(ACTION_DESTROYED);
 
                 me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_SHATTER_H : SPELL_SHATTER_N, true);

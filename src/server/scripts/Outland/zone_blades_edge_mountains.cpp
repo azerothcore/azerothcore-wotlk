@@ -670,7 +670,7 @@ public:
         }
 
         // Used for getting involved player guid. Parameter id is used for defining if is a large(Monument) or small(Relic) node
-        void SetGUID(uint64 guid, int32 id) override
+        void SetGUID(ObjectGuid guid, int32 id) override
         {
             me->SetCanFly(true);
 

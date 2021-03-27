@@ -284,9 +284,9 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 id) const override
+        ObjectGuid GetGuidData(uint32 id) const override
         {
-            switch(id)
+            switch (id)
             {
                 case DATA_KELESETH:
                     return NPC_KelesethGUID;
@@ -297,12 +297,13 @@ public:
                 case DATA_INGVAR:
                     return NPC_IngvarGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         uint32 GetData(uint32 id) const override
         {
-            switch(id)
+            switch (id)
             {
                 case DATA_KELESETH:
                 case DATA_DALRONN_AND_SKARVALD:
@@ -313,6 +314,7 @@ public:
                 case DATA_FORGE_3:
                     return ForgeEventMask & (uint32)(1 << (id - 100));
             }
+
             return 0;
         }
 

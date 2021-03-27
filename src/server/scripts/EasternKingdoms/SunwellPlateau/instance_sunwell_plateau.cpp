@@ -196,7 +196,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 id) const override
+        ObjectGuid GetGuidData(uint32 id) const override
         {
             switch (id)
             {
@@ -232,7 +232,8 @@ public:
                 case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4:
                     return blueFlightOrbGUID[id - DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1];
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override

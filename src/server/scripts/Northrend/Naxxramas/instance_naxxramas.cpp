@@ -825,7 +825,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 id) const override
+        ObjectGuid GetGuidData(uint32 id) const override
         {
             switch (id)
             {
@@ -858,10 +858,11 @@ public:
                     return _feugenGUID;
                 case DATA_LICH_KING_BOSS:
                     return _lichkingGUID;
-
                 default:
-                    return 0;
+                    break;
             }
+
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override

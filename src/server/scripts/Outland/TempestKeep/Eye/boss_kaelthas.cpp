@@ -182,7 +182,7 @@ public:
         void PrepareAdvisors()
         {
             for (uint8 i = DATA_KAEL_ADVISOR1; i <= DATA_KAEL_ADVISOR4; ++i)
-                if (Creature* advisor = ObjectAccessor::GetCreature(*me, instance->GetData64(i)))
+                if (Creature* advisor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(i)))
                 {
                     advisor->Respawn(true);
                     advisor->StopMovingOnCurrentPos();
@@ -209,11 +209,11 @@ public:
 
         void SetRoomState(GOState state)
         {
-            if (GameObject* window = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_BRIDGE_WINDOW)))
+            if (GameObject* window = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_BRIDGE_WINDOW)))
                 window->SetGoState(state);
-            if (GameObject* window = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_KAEL_STATUE_RIGHT)))
+            if (GameObject* window = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_KAEL_STATUE_RIGHT)))
                 window->SetGoState(state);
-            if (GameObject* window = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_KAEL_STATUE_LEFT)))
+            if (GameObject* window = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_KAEL_STATUE_LEFT)))
                 window->SetGoState(state);
         }
 
@@ -723,7 +723,7 @@ public:
         {
             if (GetCaster()->GetTypeId() == TYPEID_UNIT)
                 if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                    if (Creature* kael = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(NPC_KAELTHAS)))
+                    if (Creature* kael = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_KAELTHAS)))
                         kael->AI()->SummonedCreatureDies(GetCaster()->ToCreature(), nullptr);
             return true;
         }

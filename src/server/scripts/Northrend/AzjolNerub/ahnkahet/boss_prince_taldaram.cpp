@@ -105,7 +105,7 @@ public:
                 me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation(), true);
 
                 if (pInstance)
-                    pInstance->HandleGameObject(pInstance->GetData64(DATA_PRINCE_TALDARAM_PLATFORM), true);
+                    pInstance->HandleGameObject(pInstance->GetGuidData(DATA_PRINCE_TALDARAM_PLATFORM), true);
             }
         }
 
@@ -334,7 +334,7 @@ public:
         if (!pInstance)
             return false;
 
-        Creature* pPrinceTaldaram = ObjectAccessor::GetCreature(*go, pInstance->GetData64(DATA_PRINCE_TALDARAM));
+        Creature* pPrinceTaldaram = ObjectAccessor::GetCreature(*go, pInstance->GetGuidData(DATA_PRINCE_TALDARAM));
         if (pPrinceTaldaram && pPrinceTaldaram->IsAlive())
         {
             go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);

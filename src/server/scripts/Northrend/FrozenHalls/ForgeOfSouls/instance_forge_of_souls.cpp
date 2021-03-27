@@ -150,7 +150,7 @@ public:
                 SaveToDB();
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -158,7 +158,7 @@ public:
                     return NPC_BronjahmGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override

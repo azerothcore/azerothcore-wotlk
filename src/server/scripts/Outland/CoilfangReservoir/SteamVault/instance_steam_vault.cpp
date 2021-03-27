@@ -164,11 +164,12 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             if (data == TYPE_MEKGINEER_STEAMRIGGER)
                 return MekgineerGUID;
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override

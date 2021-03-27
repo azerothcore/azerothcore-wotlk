@@ -291,7 +291,7 @@ public:
             // Store dragons
             for (uint8 i = 0; i < MAX_DRAGONS; ++i)
             {
-                Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetData64(dragons[i]));
+                Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetGuidData(dragons[i]));
                 if (!dragon || !dragon->IsAlive() || instance->GetBossState(dragons[i]) == DONE)
                 {
                     continue;
@@ -486,7 +486,7 @@ public:
                     case EVENT_SARTHARION_CALL_TENEBRON:
                     {
                         Talk(SAY_SARTHARION_CALL_TENEBRON);
-                        if (Creature* tenebron = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TENEBRON)))
+                        if (Creature* tenebron = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TENEBRON)))
                         {
                             tenebron->AI()->DoAction(ACTION_CALL_DRAGON);
                         }
@@ -495,7 +495,7 @@ public:
                     case EVENT_SARTHARION_CALL_SHADRON:
                     {
                         Talk(SAY_SARTHARION_CALL_SHADRON);
-                        if (Creature* shadron = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SHADRON)))
+                        if (Creature* shadron = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SHADRON)))
                         {
                             shadron->AI()->DoAction(ACTION_CALL_DRAGON);
                         }
@@ -504,7 +504,7 @@ public:
                     case EVENT_SARTHARION_CALL_VESPERON:
                     {
                         Talk(SAY_SARTHARION_CALL_VESPERON);
-                        if (Creature* vesperon = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VESPERON)))
+                        if (Creature* vesperon = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VESPERON)))
                         {
                             vesperon->AI()->DoAction(ACTION_CALL_DRAGON);
                         }
@@ -664,7 +664,7 @@ public:
                     continue;
                 }
 
-                if (Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetData64(dragons[i])))
+                if (Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetGuidData(dragons[i])))
                 {
                     if (checkCombat && dragon->IsInCombat())
                     {
@@ -788,7 +788,7 @@ struct boss_sartharion_dragonAI : public BossAI
         // Transfer summons to Sartharion
         if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
         {
-            if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+            if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
             {
                 sartharion->AI()->JustSummoned(summon);
             }
@@ -872,7 +872,7 @@ struct boss_sartharion_dragonAI : public BossAI
                 Talk(SAY_SHADRON_DEATH);
                 if (isCalledBySartharion)
                 {
-                    if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                    if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
                     {
                         sartharion->RemoveAura(SPELL_GIFT_OF_TWILIGHT_FIRE);
                     }
@@ -902,7 +902,7 @@ struct boss_sartharion_dragonAI : public BossAI
         }
         else
         {
-            if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+            if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
             {
                 sartharion->AI()->DoAction(ACTION_DRAKE_DIED);
             }
@@ -1115,7 +1115,7 @@ public:
                             summons.Summon(egg);
                             if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
                             {
-                                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
                                 {
                                     sartharion->AI()->JustSummoned(egg);
                                 }
@@ -1144,7 +1144,7 @@ public:
                             summons2.Summon(whelp);
                             if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
                             {
-                                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
                                 {
                                     sartharion->AI()->JustSummoned(whelp);
                                 }
@@ -1219,7 +1219,7 @@ public:
                     instance->DoAction(ACTION_CLEAR_PORTAL);
                 }
 
-                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_SARTHARION)))
+                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
                 {
                     sartharion->RemoveAurasDueToSpell(SPELL_GIFT_OF_TWILIGHT_FIRE);
                 }
@@ -1534,7 +1534,7 @@ public:
 
             if (InstanceScript* pInstance = GetCaster()->GetInstanceScript())
             {
-                if (Creature* sarth = ObjectAccessor::GetCreature(*GetHitUnit(), pInstance->GetData64(DATA_SARTHARION)))
+                if (Creature* sarth = ObjectAccessor::GetCreature(*GetHitUnit(), pInstance->GetGuidData(DATA_SARTHARION)))
                 {
                     sarth->AI()->SetData(DATA_VOLCANO_BLOWS, GetHitUnit()->GetGUIDLow());
                     sarth->CastSpell(GetHitUnit(), SPELL_LAVA_STRIKE_SUMMON, true);

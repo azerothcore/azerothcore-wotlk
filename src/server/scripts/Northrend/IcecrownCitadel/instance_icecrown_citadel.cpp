@@ -941,7 +941,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -1014,7 +1014,7 @@ public:
                     break;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void HandleDropAttempt(bool drop = true)

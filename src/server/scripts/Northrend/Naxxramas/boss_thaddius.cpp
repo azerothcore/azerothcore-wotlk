@@ -373,7 +373,7 @@ public:
                 events.ScheduleEvent(EVENT_MINION_SPELL_MAGNETIC_PULL, 25000);
 
             if (pInstance)
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_THADDIUS_BOSS)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_THADDIUS_BOSS)))
                 {
                     cr->AI()->AttackStart(pWho);
                     cr->AddThreat(pWho, 10.0f);
@@ -405,7 +405,7 @@ public:
             Talk(me->GetEntry() == NPC_STALAGG ? SAY_STAL_DEATH : SAY_FEUG_DEATH);
             Talk(me->GetEntry() == NPC_STALAGG ? EMOTE_STAL_DEATH : EMOTE_FEUG_DEATH);
             if (pInstance)
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_THADDIUS_BOSS)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_THADDIUS_BOSS)))
                     cr->AI()->DoAction(ACTION_SUMMON_DIED);
         }
 
@@ -466,7 +466,7 @@ public:
                 case EVENT_MINION_SPELL_MAGNETIC_PULL:
                     events.RepeatEvent(25000);
                     if (pInstance)
-                        if (Creature* feugen = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_FEUGEN_BOSS)))
+                        if (Creature* feugen = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_FEUGEN_BOSS)))
                         {
                             if (!feugen->IsAlive() || !feugen->GetVictim() || !me->GetVictim())
                                 return;
@@ -660,7 +660,7 @@ public:
         if (!instance || instance->GetData(DATA_HAD_THADDIUS_GREET) || instance->GetBossState(BOSS_THADDIUS) == DONE)
             return true;
 
-        if (Creature* thaddius = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_THADDIUS_BOSS)))
+        if (Creature* thaddius = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_THADDIUS_BOSS)))
             thaddius->AI()->Talk(SAY_GREET);
         instance->SetData(DATA_HAD_THADDIUS_GREET, 1);
 

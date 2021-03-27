@@ -380,7 +380,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -390,7 +390,7 @@ public:
                     return MassiveGateGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
     };
 

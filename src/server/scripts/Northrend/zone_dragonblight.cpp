@@ -753,7 +753,7 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
 
         void CleanAll(bool fromReset = true)
         {
@@ -784,7 +784,7 @@ public:
             events.ScheduleEvent(999, 0);
             events.ScheduleEvent(1, 3000);
             summons.DespawnAll();
-            playerGUID = 0;
+            playerGUID.Clear();
 
             CleanAll();
 
@@ -800,10 +800,11 @@ public:
             me->GetMotionMaster()->Clear();
         }
 
-        void SetGUID(uint64 guid, int32  /*id*/) override
+        void SetGUID(ObjectGuid guid, int32  /*id*/) override
         {
             if (playerGUID || events.GetNextEventTime(998) || events.GetNextEventTime(2))
                 return;
+
             me->setActive(true);
             playerGUID = guid;
             events.ScheduleEvent(2, 900000);

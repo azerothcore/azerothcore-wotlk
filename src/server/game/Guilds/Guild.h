@@ -305,7 +305,7 @@ public: // pussywizard: public class Member
         void SaveToDB(SQLTransaction& trans) const;
         void WritePacket(WorldPacket& data, bool sendOfficerNote) const;
 
-        uint64 GetGUID() const { return m_guid; }
+        ObjectGuid GetGUID() const { return m_guid; }
         std::string const& GetName() const { return m_name; }
         uint32 GetAccountId() const { return m_accountId; }
         uint8 GetRankId() const { return m_rankId; }

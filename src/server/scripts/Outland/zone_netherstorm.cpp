@@ -1126,7 +1126,7 @@ public:
             npc_escortAI::MoveInLineOfSight(who);
         }
 
-        void SetGUID(uint64 playerGUID, int32 type) override
+        void SetGUID(ObjectGuid playerGUID, int32 type) override
         {
             if (type == DATA_START_ENCOUNTER)
             {

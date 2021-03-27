@@ -77,7 +77,7 @@ public:
                     LumaGUID = creature->GetGUID();
                     break;
                 case NPC_EARTHEN_RING_FLAMECALLER:
-                    SetData64(counter, creature->GetGUID());
+                    SetGuidData(counter, creature->GetGUID());
                     ++counter;
                     break;
                 default:
@@ -85,7 +85,7 @@ public:
             }
         }
 
-        void SetData64(uint32 data, uint64 guid) override
+        void SetGuidData(uint32 data, ObjectGuid guid) override
         {
             switch (data)
             {

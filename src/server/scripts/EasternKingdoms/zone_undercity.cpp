@@ -106,8 +106,7 @@ public:
         void Reset() override
         {
             LamentEvent = false;
-            targetGUID = 0;
-            playerGUID = 0;
+            playerGUID.Clear();
             _events.Reset();
         }
 
@@ -120,7 +119,7 @@ public:
             _events.ScheduleEvent(EVENT_MULTI_SHOT, 10000);
         }
 
-        void SetGUID(uint64 guid, int32 type) override
+        void SetGUID(ObjectGuid guid, int32 type) override
         {
             if (type == GUID_EVENT_INVOKER)
             {
@@ -223,8 +222,7 @@ public:
     private:
         EventMap _events;
         bool LamentEvent;
-        uint64 targetGUID;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

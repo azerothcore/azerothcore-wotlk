@@ -137,7 +137,7 @@ public:
             summonsGenerator.DoAction(ACTION_DESPAWN_ALL);
             summonsChanneler.DespawnAll();
             me->CastSpell(me, SPELL_SHADE_OF_AKAMA_TRIGGER, true);
-            if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_AKAMA_SHADE)))
+            if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA_SHADE)))
             {
                 akama->SetHomePosition(*akama);
                 akama->AI()->DoAction(ACTION_SHADE_DIED);
@@ -184,7 +184,7 @@ public:
                         summonsGenerator.Respawn();
                         ChannelersAction(ACTION_CHANNELERS_START_CHANNEL);
 
-                        if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_AKAMA_SHADE)))
+                        if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA_SHADE)))
                             akama->Respawn(true);
                         break;
                     }
@@ -194,7 +194,7 @@ public:
                     summonsChanneler.Respawn();
                     ChannelersAction(ACTION_CHANNELERS_START_CHANNEL);
 
-                    if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_AKAMA_SHADE)))
+                    if (Creature* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA_SHADE)))
                         akama->Respawn(true);
                     break;
             }
@@ -314,7 +314,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (Creature* shade = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_SHADE_OF_AKAMA)))
+            if (Creature* shade = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SHADE_OF_AKAMA)))
                 shade->AI()->DoAction(ACTION_AKAMA_DIED);
         }
 
@@ -345,7 +345,7 @@ public:
                     break;
                 case EVENT_AKAMA_START_CHANNEL:
                     me->CastSpell(me, SPELL_AKAMA_SOUL_CHANNEL, false);
-                    if (Creature* shade = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_SHADE_OF_AKAMA)))
+                    if (Creature* shade = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SHADE_OF_AKAMA)))
                     {
                         shade->AI()->AttackStart(me);
                         shade->GetMotionMaster()->Clear();
@@ -467,7 +467,7 @@ public:
             }
 
             summon->SetInCombatWithZone();
-            if (Unit* akama = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_AKAMA_SHADE)))
+            if (Unit* akama = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_AKAMA_SHADE)))
             {
                 summon->AddThreat(akama, 500.0f);
                 summon->AI()->AttackStart(akama);

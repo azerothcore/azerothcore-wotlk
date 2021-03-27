@@ -132,7 +132,7 @@ bool IsEncounterComplete(InstanceScript* pInstance, Creature* me)
 
     for (uint8 i = 0; i < 3; ++i)
     {
-        uint64 guid = pInstance->GetData64(DATA_STEELBREAKER + i);
+        uint64 guid = pInstance->GetGuidData(DATA_STEELBREAKER + i);
         if (!guid)
             return false;
 
@@ -155,7 +155,7 @@ void RespawnAssemblyOfIron(InstanceScript* pInstance, Creature* me)
 
     for (uint8 i = 0; i < 3; ++i)
     {
-        uint64 guid = pInstance->GetData64(DATA_STEELBREAKER + i);
+        uint64 guid = pInstance->GetGuidData(DATA_STEELBREAKER + i);
         if (!guid)
             return;
 
@@ -229,7 +229,7 @@ public:
             if (!pInstance)
                 return;
 
-            if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_STEELBREAKER + urand(0, 2))))
+            if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_STEELBREAKER + urand(0, 2))))
             {
                 switch (boss->GetEntry())
                 {
@@ -246,7 +246,7 @@ public:
             }
 
             for (uint8 i = 0; i < 3; ++i)
-                if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_STEELBREAKER + i)))
+                if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_STEELBREAKER + i)))
                     if (!boss->IsInCombat())
                         boss->AI()->AttackStart(who);
         }
@@ -286,7 +286,7 @@ public:
             }
             else
             {
-                RestoreAssemblyHealth(pInstance->GetData64(DATA_BRUNDIR), pInstance->GetData64(DATA_MOLGEIM), me);
+                RestoreAssemblyHealth(pInstance->GetGuidData(DATA_BRUNDIR), pInstance->GetGuidData(DATA_MOLGEIM), me);
                 me->CastSpell(me, SPELL_SUPERCHARGE, true);
                 Talk(SAY_STEELBREAKER_DEATH);
             }
@@ -423,7 +423,7 @@ public:
                 return;
 
             for (uint8 i = 0; i < 3; ++i)
-                if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_STEELBREAKER + i)))
+                if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_STEELBREAKER + i)))
                     if (!boss->IsInCombat())
                         boss->AI()->AttackStart(who);
         }
@@ -464,7 +464,7 @@ public:
             }
             else
             {
-                RestoreAssemblyHealth(pInstance->GetData64(DATA_STEELBREAKER), pInstance->GetData64(DATA_BRUNDIR), me);
+                RestoreAssemblyHealth(pInstance->GetGuidData(DATA_STEELBREAKER), pInstance->GetGuidData(DATA_BRUNDIR), me);
                 me->CastSpell(me, SPELL_SUPERCHARGE, true);
                 Talk(SAY_MOLGEIM_DEATH);
             }
@@ -642,7 +642,7 @@ public:
                 return;
 
             for (uint8 i = 0; i < 3; ++i)
-                if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_STEELBREAKER + i)))
+                if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_STEELBREAKER + i)))
                     if (!boss->IsInCombat())
                         boss->AI()->AttackStart(who);
         }
@@ -684,7 +684,7 @@ public:
             }
             else
             {
-                RestoreAssemblyHealth(pInstance->GetData64(DATA_STEELBREAKER), pInstance->GetData64(DATA_MOLGEIM), me);
+                RestoreAssemblyHealth(pInstance->GetGuidData(DATA_STEELBREAKER), pInstance->GetGuidData(DATA_MOLGEIM), me);
                 me->CastSpell(me, SPELL_SUPERCHARGE, true);
                 Talk(SAY_BRUNDIR_DEATH);
             }
@@ -869,7 +869,7 @@ public:
         void HandleInstaKill(SpellEffIndex /*effIndex*/)
         {
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                if (Creature* Steelbreaker = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(DATA_STEELBREAKER)))
+                if (Creature* Steelbreaker = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_STEELBREAKER)))
                     Steelbreaker->AI()->DoAction(ACTION_ADD_CHARGE);
         }
 
@@ -949,7 +949,7 @@ public:
             return false;
 
         if (InstanceScript* instance = target->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetData64(DATA_BRUNDIR)))
+            if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(DATA_BRUNDIR)))
                 return cr->AI()->GetData(DATA_BRUNDIR);
 
         return false;

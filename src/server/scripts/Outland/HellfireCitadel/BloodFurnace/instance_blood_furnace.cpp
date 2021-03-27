@@ -102,7 +102,7 @@ public:
                 _broggokLeverGUID = go->GetGUID();       //Broggok lever
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -125,7 +125,8 @@ public:
                 case DATA_PRISON_CELL4:
                     return _prisonGUIDs[data - DATA_PRISON_CELL1];
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         void SetData(uint32 type, uint32 data) override

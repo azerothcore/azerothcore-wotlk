@@ -121,7 +121,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -138,8 +138,9 @@ public:
                 case DATA_VISCIDUS:
                     return ViscidusGUID;
             }
-            return 0;
-        }                                                       // end GetData64
+
+            return ObjectGuid::Empty;
+        }
 
         void SetData(uint32 type, uint32 data) override
         {

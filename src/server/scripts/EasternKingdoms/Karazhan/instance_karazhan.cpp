@@ -142,7 +142,7 @@ public:
             return true;
         }
 
-        void SetData64(uint32 type, uint64 data) override
+        void SetGuidData(uint32 type, ObjectGuid data) override
         {
             if (type == DATA_IMAGE_OF_MEDIVH)
                 ImageGUID = data;
@@ -264,7 +264,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -302,7 +302,7 @@ public:
                     return m_uiNightBaneGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
     private:

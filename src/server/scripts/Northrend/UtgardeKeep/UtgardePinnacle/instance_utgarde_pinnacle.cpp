@@ -254,9 +254,9 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
-            switch(identifier)
+            switch (identifier)
             {
                 case DATA_SVALA_SORROWGRAVE:
                     return SvalaSorrowgrave;
@@ -286,7 +286,7 @@ public:
                     return SvalaMirrorGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
     };
 };

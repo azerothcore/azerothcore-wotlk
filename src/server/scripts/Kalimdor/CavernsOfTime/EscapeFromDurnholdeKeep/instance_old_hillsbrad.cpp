@@ -166,13 +166,14 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             if (data == DATA_THRALL_GUID)
                 return _thrallGUID;
             else if (data == DATA_TARETHA_GUID)
                 return _tarethaGUID;
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         void Update(uint32 diff) override
