@@ -1,15 +1,15 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "ByteBuffer.h"
 #include "Common.h"
-#include "WardenKeyGeneration.h"
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "SessionKeyGenerator.h"
 #include "Util.h"
 #include "WardenMac.h"
 #include "WardenModuleMac.h"
@@ -26,11 +26,11 @@ WardenMac::~WardenMac()
 {
 }
 
-void WardenMac::Init(WorldSession* pClient, BigNumber* K)
+void WardenMac::Init(WorldSession* pClient, SessionKey const& K)
 {
     _session = pClient;
     // Generate Warden Key
-    SHA1Randx WK(K->AsByteArray().get(), K->GetNumBytes());
+    SessionKeyGenerator<acore::Crypto::SHA1> WK(K);
     WK.Generate(_inputKey, 16);
     WK.Generate(_outputKey, 16);
     /*
@@ -48,17 +48,17 @@ void WardenMac::Init(WorldSession* pClient, BigNumber* K)
     _outputCrypto.Init(_outputKey);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Server side warden for client %u initializing...", pClient->GetAccountId());
-    sLog->outDebug(LOG_FILTER_WARDEN, "C->S Key: %s", ByteArrayToHexStr(_inputKey, 16).c_str());
-    sLog->outDebug(LOG_FILTER_WARDEN, "S->C Key: %s", ByteArrayToHexStr(_outputKey, 16).c_str());
-    sLog->outDebug(LOG_FILTER_WARDEN, "  Seed: %s", ByteArrayToHexStr(_seed, 16).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "C->S Key: %s", acore::Impl::ByteArrayToHexStr(_inputKey).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "S->C Key: %s", acore::Impl::ByteArrayToHexStr(_outputKey).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "  Seed: %s", acore::Impl::ByteArrayToHexStr(_seed).c_str());
     sLog->outDebug(LOG_FILTER_WARDEN, "Loading Module...");
 #endif
 
     _module = GetModuleForClient();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Module Key: %s", ByteArrayToHexStr(_module->Key, 16).c_str());
-    sLog->outDebug(LOG_FILTER_WARDEN, "Module ID: %s", ByteArrayToHexStr(_module->Id, 16).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "Module Key: %s", acore::Impl::ByteArrayToHexStr(_module->Key).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "Module ID: %s", acore::Impl::ByteArrayToHexStr(_module->Id).c_str());
 #endif
     RequestModule();
 }
@@ -154,14 +154,14 @@ void WardenMac::HandleHashResult(ByteBuffer& buff)
 
     buff.rpos(buff.wpos());
 
-    SHA1Hash sha1;
+    acore::Crypto::SHA1 sha1;
     sha1.UpdateData((uint8*)keyIn, 16);
     sha1.Finalize();
 
     //const uint8 validHash[20] = { 0x56, 0x8C, 0x05, 0x4C, 0x78, 0x1A, 0x97, 0x2A, 0x60, 0x37, 0xA2, 0x29, 0x0C, 0x22, 0xB5, 0x25, 0x71, 0xA0, 0x6F, 0x4E };
 
     // Verify key
-    if (memcmp(buff.contents() + 1, sha1.GetDigest(), 20) != 0)
+    if (memcmp(buff.contents() + 1, sha1.GetDigest().data(), 20) != 0)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_WARDEN, "Request hash reply: failed");
@@ -242,16 +242,16 @@ void WardenMac::HandleData(ByteBuffer& buff)
 
     std::string str = "Test string!";
 
-    SHA1Hash sha1;
+    acore::Crypto::SHA1 sha1;
     sha1.UpdateData(str);
     uint32 magic = 0xFEEDFACE;                              // unsure
     sha1.UpdateData((uint8*)&magic, 4);
     sha1.Finalize();
 
-    uint8 sha1Hash[20];
-    buff.read(sha1Hash, 20);
+    std::array<uint8, acore::Crypto::SHA1::DIGEST_LENGTH> sha1Hash;
+    buff.read(sha1Hash.data(), sha1Hash.size());
 
-    if (memcmp(sha1Hash, sha1.GetDigest(), 20))
+    if (sha1Hash != sha1.GetDigest())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_WARDEN, "Handle data failed: SHA1 hash is wrong!");

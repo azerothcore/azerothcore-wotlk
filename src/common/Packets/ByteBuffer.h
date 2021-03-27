@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,6 +17,7 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include <array>
 
 // Root of ByteBuffer exception hierarchy
 class ByteBufferException : public std::exception
@@ -330,6 +331,12 @@ public:
         _rpos += len;
     }
 
+    template<size_t Size>
+    void read(std::array<uint8, Size>& arr)
+    {
+        read(arr.data(), Size);
+    }
+
     void readPackGUID(uint64& guid)
     {
         if (rpos() + 1 > size())
@@ -450,6 +457,12 @@ public:
     {
         if (buffer.wpos())
             append(buffer.contents(), buffer.wpos());
+    }
+
+    template<size_t Size>
+    void append(std::array<uint8, Size> const& arr)
+    {
+        append(arr.data(), Size);
     }
 
     // can be used in SMSG_MONSTER_MOVE opcode

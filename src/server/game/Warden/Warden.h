@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,11 +7,11 @@
 #ifndef _WARDEN_BASE_H
 #define _WARDEN_BASE_H
 
+#include "ARC4.h"
+#include "AuthDefines.h"
 #include "ByteBuffer.h"
-#include "Cryptography/ARC4.h"
-#include "Cryptography/BigNumber.h"
 #include "WardenCheckMgr.h"
-#include <map>
+#include <array>
 
 enum WardenOpcodes
 {
@@ -97,7 +97,7 @@ public:
     Warden();
     virtual ~Warden();
 
-    virtual void Init(WorldSession* session, BigNumber* k) = 0;
+    virtual void Init(WorldSession* session, SessionKey const& k) = 0;
     virtual ClientWardenModule* GetModuleForClient() = 0;
     virtual void InitializeModule() = 0;
     virtual void RequestHash() = 0;
@@ -123,8 +123,8 @@ private:
     uint8 _inputKey[16];
     uint8 _outputKey[16];
     uint8 _seed[16];
-    ARC4 _inputCrypto;
-    ARC4 _outputCrypto;
+    acore::Crypto::ARC4 _inputCrypto;
+    acore::Crypto::ARC4 _outputCrypto;
     uint32 _checkTimer;                          // Timer for sending check requests
     uint32 _clientResponseTimer;                 // Timer for client response delay
     bool _dataSent;

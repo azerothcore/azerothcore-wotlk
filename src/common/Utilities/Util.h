@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,6 +17,7 @@
 #include <list>
 #include <map>
 #include <ace/INET_Addr.h>
+#include <array>
 
 // Searcher for map of structs
 template<typename T, class S> struct Finder
@@ -345,8 +346,30 @@ uint32 GetPID();
 
 bool StringEqualI(std::string_view str1, std::string_view str2);
 
-std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
-void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
+namespace acore::Impl
+{
+    std::string ByteArrayToHexStr(uint8 const* bytes, size_t length, bool reverse = false);
+    void HexStrToByteArray(std::string const& str, uint8* out, size_t outlen, bool reverse = false);
+}
+
+template<typename Container>
+std::string ByteArrayToHexStr(Container const& c, bool reverse = false)
+{
+    return acore::Impl::ByteArrayToHexStr(std::data(c), std::size(c), reverse);
+}
+
+template<size_t Size>
+void HexStrToByteArray(std::string const& str, std::array<uint8, Size>& buf, bool reverse = false)
+{
+    acore::Impl::HexStrToByteArray(str, buf.data(), Size, reverse);
+}
+template<size_t Size>
+std::array<uint8, Size> HexStrToByteArray(std::string const& str, bool reverse = false)
+{
+    std::array<uint8, Size> arr;
+    HexStrToByteArray(str, arr, reverse);
+    return arr;
+}
 
 bool StringContainsStringI(std::string const& haystack, std::string const& needle);
 template <typename T>

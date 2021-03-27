@@ -6,23 +6,23 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creaturemodeldata_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creaturemodeldata_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
   `ModelName` varchar(100) DEFAULT NULL,
-  `SizeClass` int(11) NOT NULL DEFAULT 0,
+  `SizeClass` INT NOT NULL DEFAULT 0,
   `ModelScale` float NOT NULL DEFAULT 0,
-  `BloodID` int(11) NOT NULL DEFAULT 0,
-  `FootprintTextureID` int(11) NOT NULL DEFAULT 0,
+  `BloodID` INT NOT NULL DEFAULT 0,
+  `FootprintTextureID` INT NOT NULL DEFAULT 0,
   `FootprintTextureLength` float NOT NULL DEFAULT 0,
   `FootprintTextureWidth` float NOT NULL DEFAULT 0,
   `FootprintParticleScale` float NOT NULL DEFAULT 0,
-  `FoleyMaterialID` int(11) NOT NULL DEFAULT 0,
-  `FootstepShakeSize` int(11) NOT NULL DEFAULT 0,
-  `DeathThudShakeSize` int(11) NOT NULL DEFAULT 0,
-  `SoundID` int(11) NOT NULL DEFAULT 0,
+  `FoleyMaterialID` INT NOT NULL DEFAULT 0,
+  `FootstepShakeSize` INT NOT NULL DEFAULT 0,
+  `DeathThudShakeSize` INT NOT NULL DEFAULT 0,
+  `SoundID` INT NOT NULL DEFAULT 0,
   `CollisionWidth` float NOT NULL DEFAULT 0,
   `CollisionHeight` float NOT NULL DEFAULT 0,
   `MountHeight` float NOT NULL DEFAULT 0,
@@ -38,7 +38,7 @@ CREATE TABLE `creaturemodeldata_dbc`
   `MissileCollisionPush` float NOT NULL DEFAULT 0,
   `MissileCollisionRaise` float NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creaturemodeldata_dbc` WRITE;
