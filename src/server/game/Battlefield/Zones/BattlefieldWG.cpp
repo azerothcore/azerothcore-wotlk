@@ -420,6 +420,10 @@ void BattlefieldWG::OnBattleStart()
         }
     }
 
+    // Relocate Offline players in Wintergrasp
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_WG_OFFLINE_PLAYERS);
+    CharacterDatabase.AsyncQuery(stmt);
+
     // Initialize vehicle counter
     UpdateCounterVehicle(true);
 
