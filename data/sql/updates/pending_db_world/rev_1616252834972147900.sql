@@ -220,9 +220,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23264;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 23264);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(23264, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 33811, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Overmine Flayer - On Aggro - Cast \'33811\' (No Repeat)'),
-(23264, 0, 1, 0, 0, 0, 100, 0, 2500, 5000, 20000, 25000, 11, 13443, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Overmine Flayer - In Combat - Cast \'13443\''),
-(23264, 0, 2, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 33810, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Overmine Flayer - Between 20-80% Health - Cast \'33810\' (No Repeat)');
+(23264, 0, 0, 0, 0, 0, 100, 0, 2500, 5000, 20000, 25000, 11, 13443, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Overmine Flayer - In Combat - Cast \'13443\''),
+(23264, 0, 1, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 33810, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Overmine Flayer - Between 20-80% Health - Cast \'33810\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 22274;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 22274);
@@ -260,7 +259,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21639;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21639);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(21639, 0, 0, 0, 0, 0, 100, 0, 2500, 5000, 10000, 15000, 11, 15496, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Illidari Slayer - In Combat - Cast \'15496\'');
+(21639, 0, 0, 1, 4, 0, 100, 1, 0, 0, 0, 0, 11, 22120, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Illidari Slayer - On Aggro - Cast \'22120\' (No Repeat)'),
+(21639, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Illidari Slayer - On Aggro - Set Run Off (No Repeat)'),
+(21639, 0, 2, 0, 0, 0, 100, 0, 2500, 5000, 10000, 15000, 11, 15496, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Illidari Slayer - In Combat - Cast \'15496\'');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21450;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21450);
@@ -311,4 +312,4 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21408;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21408);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (21408, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 37941, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Felfire Diemetradon - On Aggro - Cast \'37941\' (No Repeat)'),
-(21408, 0, 1, 0, 0, 0, 100, 0, 2500, 5000, 10000, 12500, 11, 35913, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Felfire Diemetradon - In Combat - Cast \'35913\'');
+(21408, 0, 1, 0, 0, 0, 100, 0, 2500, 5000, 10000, 12500, 11, 36247, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Felfire Diemetradon - In Combat - Cast \'36247\'');
