@@ -244,6 +244,8 @@ public:
     /// Return if battlefield is enable
     bool IsEnabled() { return m_IsEnabled; }
 
+    bool IsPlayerInQueue(uint64 guid, TeamId faction) { return m_PlayersInQueue[faction].find(guid) != m_PlayersInQueue[faction].end(); }
+
     /**
      * \brief Kick player from battlefield and teleport him to kick-point location
      * \param guid : guid of player who must be kick

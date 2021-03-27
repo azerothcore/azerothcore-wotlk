@@ -331,25 +331,95 @@ void BattlefieldWG::OnBattleStart()
     // Update graveyard ownership. While there's no war going on, they all belong to the defending team.
     // However, during war time, they belong to the respective faction controlling a workshop.
     for (Workshop::const_iterator itr = WorkshopsList.begin(); itr != WorkshopsList.end(); ++itr)
+    {
         if (*itr)
+        {
             (*itr)->UpdateGraveyardAndWorkshop();
+        }
+    }
 
-    // ################### TO DO: Fix this piece of code ###################
-    /*
-    for (uint8 team = 0; team < 2; ++team)
+    // Player reposition to avoid cheating Wintergrasp victories
+    for (uint8 team = 0; team <= TEAM_HORDE; ++team)
+    {
         for (GuidSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
         {
-            // Kick player in orb room, TODO: offline player ?
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
             {
                 float x, y, z;
                 player->GetPosition(x, y, z);
-                if (5500 > x && x > 5392 && y < 2880 && y > 2800 && z < 480)
-                    player->TeleportTo(571, 5349.8686f, 2838.481f, 409.240f, 0.046328f);
+                if (x > south_keep_position.GetPositionX() && y > south_keep_position.GetPositionY() && z < south_keep_position.GetPositionZ() )
+                {
+                    if (x < north_keep_position.GetPositionX() && y < north_keep_position.GetPositionY() && z < north_keep_position.GetPositionZ())
+                    {
+                        switch (team)
+                        {
+                            // Using 0 and 1 instead of TeamId to avoid type error checking
+                            case 0:
+                                if (IsPlayerInQueue(player->GetGUIDLow(), TEAM_ALLIANCE))
+                                {
+                                    if (GetDefenderTeam() == TEAM_ALLIANCE)
+                                    {
+                                        player->TeleportTo(571,
+                                            defending_position.GetPositionX(),
+                                            defending_position.GetPositionY(),
+                                            defending_position.GetPositionZ(),
+                                            defending_position.GetOrientation());
+                                    }
+                                    else
+                                    {
+                                        player->TeleportTo(571,
+                                            attacking_position.GetPositionX(),
+                                            attacking_position.GetPositionY(),
+                                            attacking_position.GetPositionZ(),
+                                            attacking_position.GetOrientation());
+                                    }
+                                }
+                                else
+                                {
+                                    player->TeleportTo(571,
+                                        kicked_position.GetPositionX(),
+                                        kicked_position.GetPositionY(),
+                                        kicked_position.GetPositionZ(),
+                                        kicked_position.GetOrientation());
+                                }
+                                break;
+                            case 1:
+                                if (IsPlayerInQueue(player->GetGUIDLow(), TEAM_HORDE))
+                                {
+                                    if (GetDefenderTeam() == TEAM_HORDE)
+                                    {
+                                        player->TeleportTo(571,
+                                            defending_position.GetPositionX(),
+                                            defending_position.GetPositionY(),
+                                            defending_position.GetPositionZ(),
+                                            defending_position.GetOrientation());
+                                    }
+                                    else
+                                    {
+                                        player->TeleportTo(571,
+                                            attacking_position.GetPositionX(),
+                                            attacking_position.GetPositionY(),
+                                            attacking_position.GetPositionZ(),
+                                            attacking_position.GetOrientation());
+                                    }
+                                }
+                                else
+                                {
+                                    player->TeleportTo(571,
+                                        kicked_position.GetPositionX(),
+                                        kicked_position.GetPositionY(),
+                                        kicked_position.GetPositionZ(),
+                                        kicked_position.GetOrientation());
+                                }
+                                break;
+                        }
+                    }
+                }
                 SendInitWorldStatesTo(player);
             }
         }
-    */
+    }
+
     // Initialize vehicle counter
     UpdateCounterVehicle(true);
 

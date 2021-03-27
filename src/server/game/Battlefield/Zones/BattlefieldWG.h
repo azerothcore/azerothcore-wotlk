@@ -477,7 +477,11 @@ protected:
     Position defending_position{ 5345.0f, 2842.0f, 410.0f, 3.14f };
 
     // Wintergrasp relic position
-    Position relic_position{ 5440.0f, 2840.8f, 430.43f, 0 };
+    Position relic_position{ 5440.0f, 2840.8f, 430.43f, 0.0f };
+
+    // Keep positions to avoid cheaters from winning WG
+    Position north_keep_position{ 5500.0f, 2880.0f, 480.0f, 0.0f };
+    Position south_keep_position{ 5392.0f, 2800.0f, 480.0f, 0.0f };
 };
 
 const uint8 WG_MAX_OBJ = 32;
