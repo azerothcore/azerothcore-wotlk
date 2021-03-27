@@ -6410,16 +6410,14 @@ bool Player::UpdateFishingSkill()
     uint32 SkillValue = GetPureSkillValue(SKILL_FISHING);
 
     if (SkillValue >= GetMaxSkillValue(SKILL_FISHING))
+    {
         return false;
-
-    float chanceOfLevelUp = getProbabilityOfLevelUp(SkillValue);
+    }
 
     /* Whenever the player clicks on the fishing gameobject the
-     * core will decide based on how many steps the player is
-     * into leveling up fishing, if the skill raises or not.
+     * core will decide based on a probability if the skill raises or not.
      */
-    uint32 gathering_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
-    return UpdateSkillPro(SKILL_FISHING, static_cast<int32>(chanceOfLevelUp) * 10, gathering_skill_gain);
+    return UpdateSkillPro(SKILL_FISHING, static_cast<int32>(getProbabilityOfLevelUp(SkillValue)) * 10, sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING));
 }
 
 // levels sync. with spell requirement for skill levels to learn
