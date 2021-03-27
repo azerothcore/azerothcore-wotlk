@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  */
 
@@ -7,8 +7,9 @@
 #define SC_ESCORTAI_H
 
 #include "ScriptSystem.h"
+#include "ScriptedCreature.h"
 
-#define DEFAULT_MAX_PLAYER_DISTANCE 50
+#define DEFAULT_MAX_PLAYER_DISTANCE 100
 
 struct Escort_Waypoint
 {
@@ -77,7 +78,7 @@ public:
     virtual void WaypointReached(uint32 pointId) = 0;
     virtual void WaypointStart(uint32 /*pointId*/) {}
 
-    void Start(bool isActiveAttacker = true, bool run = false, uint64 playerGUID = 0, Quest const* quest = NULL, bool instantRespawn = false, bool canLoopPath = false, bool resetWaypoints = true);
+    void Start(bool isActiveAttacker = true, bool run = false, uint64 playerGUID = 0, Quest const* quest = nullptr, bool instantRespawn = false, bool canLoopPath = false, bool resetWaypoints = true);
 
     void SetRun(bool on = true);
     void SetEscortPaused(bool on);

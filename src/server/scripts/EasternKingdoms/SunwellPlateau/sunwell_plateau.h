@@ -5,11 +5,11 @@
 #ifndef SUNWELL_PLATEAU_H
 #define SUNWELL_PLATEAU_H
 
-#include "Player.h"
-#include "SpellScript.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
 #include "CreatureAIImpl.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum DataTypes
 {

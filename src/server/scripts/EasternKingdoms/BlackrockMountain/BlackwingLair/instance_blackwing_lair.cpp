@@ -1,10 +1,9 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
 #include "blackwing_lair.h"
 #include "GameObject.h"
 #include "InstanceScript.h"
@@ -12,9 +11,10 @@
 #include "MotionMaster.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "TemporarySummon.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "TemporarySummon.h"
 
 DoorData const doorData[] =
 {
@@ -287,6 +287,12 @@ public:
     }
 };
 
+enum ShadowFlame
+{
+    SPELL_ONYXIA_SCALE_CLOAK = 22683,
+    SPELL_SHADOW_FLAME_DOT = 22682
+};
+
 // 22539 - Shadowflame (used in Blackwing Lair)
 class spell_bwl_shadowflame : public SpellScriptLoader
 {
@@ -297,17 +303,22 @@ public:
     {
         PrepareSpellScript(spell_bwl_shadowflame_SpellScript);
 
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_ONYXIA_SCALE_CLOAK, SPELL_SHADOW_FLAME_DOT });
+        }
+
         void HandleEffectScriptEffect(SpellEffIndex /*effIndex*/)
         {
             // If the victim of the spell does not have "Onyxia Scale Cloak" - add the Shadow Flame DoT (22682)
             if (Unit* victim = GetHitUnit())
-                if(!victim->HasAura(22683))
-                    victim->AddAura(22682, victim);
+                if (!victim->HasAura(SPELL_ONYXIA_SCALE_CLOAK))
+                    victim->AddAura(SPELL_SHADOW_FLAME_DOT, victim);
         }
 
-        void Register()
+        void Register() override
         {
-            OnEffectHitTarget += SpellEffectFn(spell_bwl_shadowflame_SpellScript::HandleEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            OnEffectHitTarget += SpellEffectFn(spell_bwl_shadowflame_SpellScript::HandleEffectScriptEffect, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
         }
     };
 

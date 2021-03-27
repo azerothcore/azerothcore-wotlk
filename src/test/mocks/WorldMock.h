@@ -5,9 +5,9 @@
 #ifndef AZEROTHCORE_WORLDMOCK_H
 #define AZEROTHCORE_WORLDMOCK_H
 
+#include "ArenaSpectator.h"
 #include "gmock/gmock.h"
 #include "IWorld.h"
-#include "ArenaSpectator.h"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"

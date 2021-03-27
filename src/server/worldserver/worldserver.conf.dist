@@ -819,6 +819,7 @@ ChatLogs.Guild = 0
 ChatLogs.Public = 0
 
 #
+#    WARNING: enabling this might cause issues to your addon channel
 #    ChatLogs.Addon
 #        Description: Log addon messages.
 #        Default:     0 - (Disabled)
@@ -1587,10 +1588,10 @@ IsPreloadedContinentTransport.Enabled = 0
 #
 #    Warden.Enabled
 #        Description: Enable Warden anti-cheat system.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
 
-Warden.Enabled = 0
+Warden.Enabled = 1
 
 #
 #    Warden.NumMemChecks
@@ -1965,6 +1966,13 @@ NpcEvadeIfTargetIsUnreachable = 5
 #                     0 - (Disabled)
 
 NpcRegenHPIfTargetIsUnreachable = 1
+
+#    NpcRegenHPTimeIfTargetIsUnreachable
+#        Description: Specifies the time (in seconds) that a creature whom target
+#                     is unreachable in raid to end up regenerate health.
+#        Default:     10
+
+NpcRegenHPTimeIfTargetIsUnreachable = 10
 
 #
 ###################################################################################################
@@ -2353,6 +2361,14 @@ Rate.Drop.Item.Legendary        = 1
 Rate.Drop.Item.Artifact         = 1
 Rate.Drop.Item.Referenced       = 1
 Rate.Drop.Money                 = 1
+
+#    RewardBonusMoney
+#        Description: Allows to further tweak the amount of extra money rewarded by quests when the player
+#                     is at MaxPlayerLevel (this amount is specified in quest_template.RewardBonusMoney).
+#                     NOTE: the final amount will also affected by Rate.Drop.Money
+#        Default:     1
+
+Rate.RewardBonusMoney = 1
 
 #
 #    Rate.SellValue.Item.Poor
@@ -2751,16 +2767,16 @@ Battleground.QueueAnnouncer.PlayerOnly = 0
 #        Default:     300000 - (Enabled, 5 minutes)
 #                     0      - (Disabled, Not recommended)
 
-BattleGround.PrematureFinishTimer = 300000
+Battleground.PrematureFinishTimer = 300000
 
 #
-#    BattleGround.PremadeGroupWaitForMatch
+#    Battleground.PremadeGroupWaitForMatch
 #        Description: Time (in milliseconds) a pre-made group has to wait for matching group of the
 #                     other faction.
 #        Default:     1800000 - (Enabled, 30 minutes)
 #                     0       - (Disabled, Not recommended)
 
-BattleGround.PremadeGroupWaitForMatch = 1800000
+Battleground.PremadeGroupWaitForMatch = 1800000
 
 #
 #    Battleground.GiveXPForKills
@@ -3616,6 +3632,14 @@ LFG.Location.All = 0
 
 ICC.Buff.Horde    = 73822
 ICC.Buff.Alliance = 73828
+
+#
+#     Item.SetItemTradeable
+#        Description: Enabled/Disabled trading BoP items among raid members.
+#        Default:     1  - (Set BoP items tradeable timer to 2 hours)
+#                     0  - (Disable trading BoP items among raid members)
+
+Item.SetItemTradeable = 1
 
 #
 ###################################################################################################

@@ -2,14 +2,14 @@
 Written by Xinef
  */
 
-#include "EscortMovementGenerator.h"
-#include "Errors.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "World.h"
-#include "MoveSplineInit.h"
+#include "Errors.h"
+#include "EscortMovementGenerator.h"
 #include "MoveSpline.h"
+#include "MoveSplineInit.h"
 #include "Player.h"
+#include "World.h"
 
 template<class T>
 void EscortMovementGenerator<T>::DoInitialize(T* unit)

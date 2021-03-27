@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -56,20 +56,20 @@ namespace acore
 
     template<class SPECIFIC_TYPE> SPECIFIC_TYPE* Insert(ContainerMapList<TypeNull>& /*elements*/, SPECIFIC_TYPE* /*obj*/)
     {
-        return NULL;
+        return nullptr;
     }
 
     // this is a missed
     template<class SPECIFIC_TYPE, class T> SPECIFIC_TYPE* Insert(ContainerMapList<T>& /*elements*/, SPECIFIC_TYPE* /*obj*/)
     {
-        return NULL;                                        // a missed
+        return nullptr;                                        // a missed
     }
 
     // Recursion
     template<class SPECIFIC_TYPE, class H, class T> SPECIFIC_TYPE* Insert(ContainerMapList<TypeList<H, T>>& elements, SPECIFIC_TYPE* obj)
     {
         SPECIFIC_TYPE* t = Insert(elements._elements, obj);
-        return (t != NULL ? t : Insert(elements._TailElements, obj));
+        return (t != nullptr ? t : Insert(elements._TailElements, obj));
     }
 
     //// non-const remove method
@@ -81,20 +81,20 @@ namespace acore
 
     //template<class SPECIFIC_TYPE> SPECIFIC_TYPE* Remove(ContainerMapList<TypeNull> &/*elements*/, SPECIFIC_TYPE * /*obj*/)
     //{
-    //    return NULL;
+    //    return nullptr;
     //}
 
     //// this is a missed
     //template<class SPECIFIC_TYPE, class T> SPECIFIC_TYPE* Remove(ContainerMapList<T> &/*elements*/, SPECIFIC_TYPE * /*obj*/)
     //{
-    //    return NULL;                                        // a missed
+    //    return nullptr;                                        // a missed
     //}
 
     //template<class SPECIFIC_TYPE, class T, class H> SPECIFIC_TYPE* Remove(ContainerMapList<TypeList<H, T> > &elements, SPECIFIC_TYPE *obj)
     //{
     //    // The head element is bad
     //    SPECIFIC_TYPE* t = Remove(elements._elements, obj);
-    //    return ( t != NULL ? t : Remove(elements._TailElements, obj) );
+    //    return ( t != nullptr ? t : Remove(elements._TailElements, obj) );
     //}
 }
 #endif

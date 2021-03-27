@@ -2,12 +2,12 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
-#include "sunken_temple.h"
-#include "Player.h"
 #include "CreatureAI.h"
+#include "InstanceScript.h"
+#include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "sunken_temple.h"
 
 class instance_sunken_temple : public InstanceMapScript
 {

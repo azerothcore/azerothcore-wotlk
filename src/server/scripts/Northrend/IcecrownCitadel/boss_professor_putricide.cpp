@@ -2,15 +2,15 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
-#include "Group.h"
-#include "Spell.h"
-#include "icecrown_citadel.h"
-#include "Vehicle.h"
 #include "GridNotifiers.h"
+#include "Group.h"
+#include "icecrown_citadel.h"
+#include "ObjectMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
+#include "SpellAuraEffects.h"
+#include "Vehicle.h"
 
 enum ScriptTexts
 {
@@ -335,7 +335,7 @@ public:
             if (Is25ManRaid() && me->HasAura(SPELL_SHADOWS_FATE))
                 DoCastAOE(SPELL_UNHOLY_INFUSION_CREDIT, true); // ReqTargetAura in dbc
 
-            me->CastSpell((Unit*)NULL, SPELL_MUTATED_PLAGUE_CLEAR, true);
+            me->CastSpell((Unit*)nullptr, SPELL_MUTATED_PLAGUE_CLEAR, true);
         }
 
         void JustSummoned(Creature* summon) override
@@ -1204,7 +1204,7 @@ public:
             int32 damage = spell->Effects[EFFECT_0].CalcValue(caster);
             damage = damage * pow(2.5f, GetStackAmount());
 
-            GetTarget()->CastCustomSpell(triggerSpell, SPELLVALUE_BASE_POINT0, damage, GetTarget(), true, NULL, aurEff, GetCasterGUID());
+            GetTarget()->CastCustomSpell(triggerSpell, SPELLVALUE_BASE_POINT0, damage, GetTarget(), true, nullptr, aurEff, GetCasterGUID());
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

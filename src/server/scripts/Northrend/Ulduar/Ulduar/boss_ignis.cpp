@@ -2,14 +2,14 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
 #include "SpellScript.h"
 #include "ulduar.h"
 #include "Vehicle.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
-#include "Player.h"
 
 #define SPELL_FLAME_JETS_10             62680
 #define SPELL_FLAME_JETS_25             63472
@@ -343,7 +343,7 @@ public:
                 case 0:
                     break;
                 case EVENT_ACTIVATE_CONSTRUCT:
-                    me->CastCustomSpell(SPELL_ACTIVATE_CONSTRUCT, SPELLVALUE_MAX_TARGETS, 1, (Unit*)NULL, false);
+                    me->CastCustomSpell(SPELL_ACTIVATE_CONSTRUCT, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
                     if (++counter >= 20)
                     {
                         me->MonsterYell(TEXT_BERSERK, LANG_UNIVERSAL, 0);

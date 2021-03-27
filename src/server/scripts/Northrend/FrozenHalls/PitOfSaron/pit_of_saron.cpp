@@ -2,16 +2,16 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SmartAI.h"
-#include "pit_of_saron.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
-#include "Player.h"
 #include "CreatureGroups.h"
 #include "MapManager.h"
+#include "PassiveAI.h"
+#include "pit_of_saron.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SmartAI.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 class npc_pos_leader : public CreatureScript
 {
