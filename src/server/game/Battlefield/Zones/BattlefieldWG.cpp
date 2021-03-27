@@ -467,33 +467,47 @@ void BattlefieldWG::UpdateCounterVehicle(bool init)
 void BattlefieldWG::UpdateVehicleCountWG()
 {
     for (uint8 i = 0; i < BG_TEAMS_COUNT; ++i)
+    {
         for (GuidSet::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+        {
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
             {
-                player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_H,     GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
+                player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_H, GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
                 player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_H, GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H));
-                player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_A,     GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
+                player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_A, GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
                 player->SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_A, GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A));
             }
+        }
+    }
 }
 
 void BattlefieldWG::CapturePointTaken(uint32 areaId)
 {
     for (uint8 i = 0; i < BG_TEAMS_COUNT; ++i)
+    {
         for (GuidSet::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+        {
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
+            {
                 if (player->GetAreaId() == areaId)
+                {
                     player->UpdateAreaDependentAuras(areaId);
+                }
+            }
+        }
+    }
 }
 
 void BattlefieldWG::OnBattleEnd(bool endByTimer)
 {
-    // Remove relic
+    // Remove relic and reset Its guid
     if (GameObject* go = GetRelic())
+    {
         go->RemoveFromWorld();
+    }
     m_titansRelic = 0;
 
-    // Remove turret
+    // Set the turret's visibility off
     for (GuidSet::const_iterator itr = CanonList.begin(); itr != CanonList.end(); ++itr)
     {
         if (Unit* unit = ObjectAccessor::FindUnit(*itr))
