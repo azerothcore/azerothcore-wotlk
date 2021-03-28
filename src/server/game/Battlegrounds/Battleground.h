@@ -418,10 +418,10 @@ public:
     [[nodiscard]] uint32 GetPlayersSize() const { return m_Players.size(); }
 
     void ReadyMarkerClicked(Player* p); // pussywizard
-    std::set<uint32> readyMarkerClickedSet; // pussywizard
+    GuidSet readyMarkerClickedSet; // pussywizard
 
-    typedef std::map<uint64, BattlegroundScore*> BattlegroundScoreMap;
-    typedef std::map<uint64, ArenaLogEntryData> ArenaLogEntryDataMap;// pussywizard
+    typedef std::map<ObjectGuid, BattlegroundScore*> BattlegroundScoreMap;
+    typedef std::map<ObjectGuid, ArenaLogEntryData> ArenaLogEntryDataMap;// pussywizard
     ArenaLogEntryDataMap ArenaLogEntries; // pussywizard
     [[nodiscard]] BattlegroundScoreMap::const_iterator GetPlayerScoresBegin() const { return PlayerScores.begin(); }
     [[nodiscard]] BattlegroundScoreMap::const_iterator GetPlayerScoresEnd() const { return PlayerScores.end(); }
@@ -429,7 +429,7 @@ public:
 
     [[nodiscard]] uint32 GetReviveQueueSize() const { return m_ReviveQueue.size(); }
 
-    void AddPlayerToResurrectQueue(uint64 npc_guid, uint64 player_guid);
+    void AddPlayerToResurrectQueue(ObjectGuid npc_guid, ObjectGuid player_guid);
     void RemovePlayerFromResurrectQueue(Player* player);
 
     /// Relocate all players in ReviveQueue to the closest graveyard

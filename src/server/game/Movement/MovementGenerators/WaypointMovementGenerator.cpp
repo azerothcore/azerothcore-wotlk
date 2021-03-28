@@ -27,7 +27,8 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature* creature)
     if (!i_path)
     {
         // No movement found for entry
-        sLog->outErrorDb("WaypointMovementGenerator::LoadPath: creature %s (Entry: %u GUID: %u) doesn't have waypoint path id: %u", creature->GetName().c_str(), creature->GetEntry(), creature->GetGUIDLow(), path_id);
+        sLog->outErrorDb("WaypointMovementGenerator::LoadPath: creature %s (%s) doesn't have waypoint path id: %u",
+            creature->GetName().c_str(), creature->GetGUID().ToString().c_str(), path_id);
         return;
     }
 
@@ -364,7 +365,8 @@ bool FlightPathMovementGenerator::DoUpdate(Player* player, uint32 /*diff*/)
         {
             if (i_currentNode >= i_path.size())
             {
-                sLog->outMisc("TAXI NODE WAS GREATER THAN PATH SIZE, GUID: %u, POINTID: %u, NODESIZE: %lu, CURRENT: %u", player->GetGUIDLow(), pointId, i_path.size(), i_currentNode);
+                sLog->outMisc("TAXI NODE WAS GREATER THAN PATH SIZE, %s, POINTID: %u, NODESIZE: %lu, CURRENT: %u",
+                    player->GetGUID().ToString().c_str(), pointId, i_path.size(), i_currentNode);
                 player->CleanupAfterTaxiFlight();
                 return false;
             }

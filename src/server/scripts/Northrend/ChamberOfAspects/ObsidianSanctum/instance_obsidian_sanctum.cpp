@@ -88,7 +88,7 @@ public:
                 case 7327:
                 {
                     Creature const* sartharion = instance->GetCreature(m_uiSartharionGUID);
-                    return sartharion && !sartharion->AI()->GetData(source->GetGUIDLow());
+                    return sartharion && !sartharion->AI()->GetData(source->GetGUID().GetCounter());
                 }
                 // Less Is More (10 player) (624)
                 case 7189:

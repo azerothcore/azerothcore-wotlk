@@ -69,7 +69,8 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket& recv_data)
     if (GetPlayer()->getDeathState() == JUST_DIED)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleRepopRequestOpcode: got request after player %s(%d) was killed and before he was updated", GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleRepopRequestOpcode: got request after player %s (%s) was killed and before he was updated",
+            GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str());
 #endif
         GetPlayer()->KillPlayer();
     }
@@ -724,8 +725,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     if (player->IsInFlight())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (GUID: %u) in flight, ignore Area Trigger ID:%u",
-                       player->GetName().c_str(), player->GetGUIDLow(), triggerId);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (%s) in flight, ignore Area Trigger ID:%u",
+                       player->GetName().c_str(), player->GetGUID().ToString().c_str(), triggerId);
 #endif
         return;
     }
@@ -734,8 +735,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     if (!atEntry)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (GUID: %u) send unknown (by DBC) Area Trigger ID:%u",
-                       player->GetName().c_str(), player->GetGUIDLow(), triggerId);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (%s) send unknown (by DBC) Area Trigger ID:%u",
+                       player->GetName().c_str(), player->GetGUID().ToString().c_str(), triggerId);
 #endif
         return;
     }
@@ -743,8 +744,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     if (!player->IsInAreaTriggerRadius(atEntry))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (GUID: %u) too far (trigger map: %u player map: %u), ignore Area Trigger ID: %u",
-                       player->GetName().c_str(), atEntry->map, player->GetMapId(), player->GetGUIDLow(), triggerId);
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleAreaTriggerOpcode: Player '%s' (%s) too far (trigger map: %u player map: %u), ignore Area Trigger ID: %u",
+                       player->GetName().c_str(), atEntry->map, player->GetMapId(), player->GetGUID().ToString().c_str(), triggerId);
 #endif
         return;
     }
@@ -952,7 +953,8 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
 #endif
                 break;
             default:
-                sLog->outError("MISC: Unknown action button type %u for action %u into button %u for player %s (GUID: %u)", type, action, button, _player->GetName().c_str(), _player->GetGUIDLow());
+                sLog->outError("MISC: Unknown action button type %u for action %u into button %u for player %s (%s)",
+                    type, action, button, _player->GetName().c_str(), _player->GetGUID().ToString().c_str());
                 return;
         }
         GetPlayer()->addActionButton(button, action, type);
@@ -1158,7 +1160,7 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
     if (GetPlayer()->IsInFlight())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "Player '%s' (GUID: %u) in flight, ignore worldport command.", GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "Player '%s' (%s) in flight, ignore worldport command.", GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str());
 #endif
         return;
     }
@@ -1316,7 +1318,7 @@ void WorldSession::HandleFarSightOpcode(WorldPacket& recvData)
     if (apply)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "Added FarSight %s to player %u", _player->GetGuidValue(PLAYER_FARSIGHT).ToString().c_str(), _player->GetGUIDLow());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "Added FarSight %s to player %s", _player->GetGuidValue(PLAYER_FARSIGHT).ToString().c_str(), _player->GetGUID().ToString().c_str());
 #endif
         if (WorldObject* target = _player->GetViewpoint())
             _player->SetSeer(target);
@@ -1330,7 +1332,7 @@ void WorldSession::HandleFarSightOpcode(WorldPacket& recvData)
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "Player %u set vision to self", _player->GetGUIDLow());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "Player %s set vision to self", _player->GetGUID().ToString().c_str());
 #endif
         _player->SetSeer(_player);
     }
@@ -1379,7 +1381,7 @@ void WorldSession::HandleResetInstancesOpcode(WorldPacket& /*recv_data*/)
             group->ResetInstances(INSTANCE_RESET_ALL, false, _player);
     }
     else
-        Player::ResetInstances(_player->GetGUIDLow(), INSTANCE_RESET_ALL, false);
+        Player::ResetInstances(_player->GetGUID(), INSTANCE_RESET_ALL, false);
 }
 
 void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recv_data)
@@ -1432,7 +1434,7 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recv_data)
             _player->SendDungeonDifficulty(group != nullptr);
             return;
         }
-        Player::ResetInstances(_player->GetGUIDLow(), INSTANCE_RESET_CHANGE_DIFFICULTY, false);
+        Player::ResetInstances(_player->GetGUID(), INSTANCE_RESET_CHANGE_DIFFICULTY, false);
         _player->SetDungeonDifficulty(Difficulty(mode));
     }
 }
@@ -1594,7 +1596,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
             _player->SendRaidDifficulty(group != nullptr);
             return;
         }
-        Player::ResetInstances(_player->GetGUIDLow(), INSTANCE_RESET_CHANGE_DIFFICULTY, true);
+        Player::ResetInstances(_player->GetGUID(), INSTANCE_RESET_CHANGE_DIFFICULTY, true);
         _player->SetRaidDifficulty(Difficulty(mode));
     }
 }
@@ -1798,7 +1800,8 @@ void WorldSession::HandleInstanceLockResponse(WorldPacket& recvPacket)
     if (!_player->HasPendingBind() || _player->GetPendingBind() != _player->GetInstanceId() || (_player->GetGroup() && _player->GetGroup()->isLFGGroup() && _player->GetGroup()->IsLfgRandomInstance()))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDetail("InstanceLockResponse: Player %s (guid %u) tried to bind himself/teleport to graveyard without a pending bind!", _player->GetName().c_str(), _player->GetGUIDLow());
+        sLog->outDetail("InstanceLockResponse: Player %s (%s) tried to bind himself/teleport to graveyard without a pending bind!",
+            _player->GetName().c_str(), _player->GetGUID().ToString().c_str());
 #endif
         return;
     }

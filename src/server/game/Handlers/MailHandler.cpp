@@ -114,7 +114,8 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     if (!rc)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDetail("Player %u is sending mail to %s (GUID: not existed!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u", player->GetGUIDLow(), receiver.c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
+        sLog->outDetail("Player %s is sending mail to %s (GUID: not existed!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u",
+            player->GetGUID().ToString().c_str(), receiver.c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
 #endif
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
         return;
@@ -297,7 +298,8 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         if( money >= 10 * GOLD )
         {
             CleanStringForMysqlQuery(subject);
-            CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<MAIL> %s\", NOW())", GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), player->GetSession()->GetRemoteAddress().c_str(), rc_account, receiver.c_str(), money, subject.c_str());
+            CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<MAIL> %s\", NOW())",
+                GetAccountId(), player->GetGUID().GetCounter(), player->GetName().c_str(), player->GetSession()->GetRemoteAddress().c_str(), rc_account, receiver.c_str(), money, subject.c_str());
         }
     }
 
@@ -367,7 +369,7 @@ void WorldSession::HandleMailDelete(WorldPacket& recvData)
 
         m->state = MAIL_STATE_DELETED;
         // xinef: update global data
-        sWorld->UpdateGlobalPlayerMails(player->GetGUIDLow(), -1);
+        sWorld->UpdateGlobalPlayerMails(player->GetGUID(), -1);
     }
     player->SendMailResult(mailId, MAIL_DELETED, MAIL_OK);
 }
@@ -431,7 +433,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
     player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_OK);
 
     // xinef: update global data
-    sWorld->UpdateGlobalPlayerMails(player->GetGUIDLow(), -1);
+    sWorld->UpdateGlobalPlayerMails(player->GetGUID(), -1);
 }
 
 //called when player takes item attached in mail
@@ -510,7 +512,8 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
                         senderName = sObjectMgr->GetAcoreStringForDBCLocale(LANG_UNKNOWN);
                     std::string subj = m->subject;
                     CleanStringForMysqlQuery(subj);
-                    CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<COD> %s\", NOW())", GetAccountId(), player->GetGUIDLow(), player->GetName().c_str(), player->GetSession()->GetRemoteAddress().c_str(), sender_accId, senderName.c_str(), m->COD, subj.c_str());
+                    CharacterDatabase.PExecute("INSERT INTO log_money VALUES(%u, %u, \"%s\", \"%s\", %u, \"%s\", %u, \"<COD> %s\", NOW())",
+                        GetAccountId(), player->GetGUID().GetCounter(), player->GetName().c_str(), player->GetSession()->GetRemoteAddress().c_str(), sender_accId, senderName.c_str(), m->COD, subj.c_str());
                 }
             }
 
@@ -520,7 +523,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
         m->COD = 0;
         m->state = MAIL_STATE_CHANGED;
         player->m_mailsUpdated = true;
-        player->RemoveMItem(it->GetGUIDLow());
+        player->RemoveMItem(it->GetGUID());
 
         uint32 count = it->GetCount();                      // save counts before store and possible merge with deleting
         it->SetState(ITEM_UNCHANGED);                       // need to set this state, otherwise item cannot be removed later, if neccessary
@@ -621,7 +624,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
         switch ((*itr)->messageType)
         {
             case MAIL_NORMAL:                               // sender guid
-                data << (*itr)->sender;
+                data << ObjectGuid::Create<HighGuid::Player>((*itr)->sender);
                 break;
             case MAIL_CREATURE:
             case MAIL_GAMEOBJECT:
@@ -661,7 +664,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
             // item index (0-6?)
             data << uint8(i);
             // item guid low?
-            data << uint32((item ? item->GetGUIDLow() : 0));
+            data << uint32((item ? item->GetGUID().GetCounter() : 0));
             // entry
             data << uint32((item ? item->GetEntry() : 0));
             for (uint8 j = 0; j < MAX_INSPECTED_ENCHANTMENT_SLOT; ++j)

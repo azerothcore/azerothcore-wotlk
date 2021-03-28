@@ -34,7 +34,7 @@ void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
     if (itr != map->CreatureGroupHolder.end())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_UNITS, "Group found: %u, inserting creature GUID: %u, Group InstanceID %u", groupId, member->GetGUIDLow(), member->GetInstanceId());
+        sLog->outDebug(LOG_FILTER_UNITS, "Group found: %u, inserting creature %s, Group InstanceID %u", groupId, member->GetGUID().ToString().c_str(), member->GetInstanceId());
 #endif
         itr->second->AddMember(member);
     }
@@ -144,14 +144,14 @@ void FormationMgr::LoadCreatureFormations()
 void CreatureGroup::AddMember(Creature* member)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_UNITS, "CreatureGroup::AddMember: Adding unit GUID: %u.", member->GetGUIDLow());
+    sLog->outDebug(LOG_FILTER_UNITS, "CreatureGroup::AddMember: Adding unit %s.", member->GetGUID().ToString().c_str());
 #endif
 
     //Check if it is a leader
     if (member->GetSpawnId() == m_groupID)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_UNITS, "Unit GUID: %u is formation leader. Adding group.", member->GetGUIDLow());
+        sLog->outDebug(LOG_FILTER_UNITS, "Unit %s is formation leader. Adding group.", member->GetGUID().ToString().c_str());
 #endif
         m_leader = member;
     }
@@ -214,7 +214,7 @@ void CreatureGroup::FormationReset(bool dismiss)
             else
                 itr->first->GetMotionMaster()->MoveIdle();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_UNITS, "Set %s movement for member GUID: %u", dismiss ? "default" : "idle", itr->first->GetGUIDLow());
+            sLog->outDebug(LOG_FILTER_UNITS, "Set %s movement for member %s", dismiss ? "default" : "idle", itr->first->GetGUID().ToString().c_str());
 #endif
         }
     }

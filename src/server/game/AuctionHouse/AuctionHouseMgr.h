@@ -132,16 +132,16 @@ private:
     ~AuctionHouseMgr();
 
 public:
-    typedef std::unordered_map<uint32, Item*> ItemMap;
+    typedef std::unordered_map<ObjectGuid, Item*> ItemMap;
 
     static AuctionHouseMgr* instance();
 
     AuctionHouseObject* GetAuctionsMap(uint32 factionTemplateId);
     AuctionHouseObject* GetBidsMap(uint32 factionTemplateId);
 
-    Item* GetAItem(uint32 id)
+    Item* GetAItem(ObjectGuid itemGuid)
     {
-        ItemMap::const_iterator itr = mAitems.find(id);
+        ItemMap::const_iterator itr = mAitems.find(itemGuid);
         if (itr != mAitems.end())
             return itr->second;
 

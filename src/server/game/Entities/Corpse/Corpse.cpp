@@ -91,7 +91,7 @@ void Corpse::SaveToDB()
     DeleteFromDB(trans);
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CORPSE);
-    stmt->setUInt32(0, GetGUIDLow());                                           // corpseGuid
+    stmt->setUInt32(0, GetGUID().GetCounter());                                 // corpseGuid
     stmt->setUInt32(1, GetOwnerGUID().GetCounter());                            // guid
     stmt->setFloat (2, GetPositionX());                                         // posX
     stmt->setFloat (3, GetPositionY());                                         // posY
@@ -121,7 +121,7 @@ void Corpse::DeleteFromDB(SQLTransaction& trans)
     {
         // Only specific bones
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CORPSE);
-        stmt->setUInt32(0, GetGUIDLow());
+        stmt->setUInt32(0, GetGUID().GetCounter());
     }
     else
     {

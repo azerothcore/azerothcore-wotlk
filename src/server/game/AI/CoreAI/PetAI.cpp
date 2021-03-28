@@ -59,7 +59,7 @@ void PetAI::_stopAttack()
     if (!me->IsAlive())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature stoped attacking cuz his dead [guid=%u]", me->GetGUIDLow());
+        sLog->outStaticDebug("Creature stoped attacking cuz his dead [%s]", me->GetGUID().ToString().c_str());
 #endif
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveIdle();
@@ -157,7 +157,7 @@ void PetAI::UpdateAI(uint32 diff)
         if (_needToStop())
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outStaticDebug("Pet AI stopped attacking [guid=%u]", me->GetGUIDLow());
+            sLog->outStaticDebug("Pet AI stopped attacking [%s]", me->GetGUID().ToString().c_str());
 #endif
             _stopAttack();
             return;
@@ -627,7 +627,7 @@ void PetAI::MovementInform(uint32 moveType, uint32 data)
             {
                 // Pet is returning to where stay was clicked. data should be
                 // pet's GUIDLow since we set that as the waypoint ID
-                if (data == me->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
+                if (data == me->GetGUID().GetCounter() && me->GetCharmInfo()->IsReturning())
                 {
                     ClearCharmInfoFlags();
                     me->GetCharmInfo()->SetIsAtStay(true);
@@ -640,7 +640,7 @@ void PetAI::MovementInform(uint32 moveType, uint32 data)
             {
                 // If data is owner's GUIDLow then we've reached follow point,
                 // otherwise we're probably chasing a creature
-                if (me->GetCharmerOrOwner() && me->GetCharmInfo() && data == me->GetCharmerOrOwner()->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
+                if (me->GetCharmerOrOwner() && me->GetCharmInfo() && data == me->GetCharmerOrOwner()->GetGUID().GetCounter() && me->GetCharmInfo()->IsReturning())
                 {
                     ClearCharmInfoFlags();
                     me->GetCharmInfo()->SetIsFollowing(true);

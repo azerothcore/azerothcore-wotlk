@@ -63,8 +63,8 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
     if (!seat->CanSwitchFromSeat())
     {
         recvData.rfinish();                                // prevent warnings spam
-        sLog->outError("HandleChangeSeatsOnControlledVehicle, Opcode: %u, Player %u tried to switch seats but current seatflags %u don't permit that.",
-                       recvData.GetOpcode(), GetPlayer()->GetGUIDLow(), seat->m_flags);
+        sLog->outError("HandleChangeSeatsOnControlledVehicle, Opcode: %u, Player %s tried to switch seats but current seatflags %u don't permit that.",
+                       recvData.GetOpcode(), GetPlayer()->GetGUID().ToString().c_str(), seat->m_flags);
         return;
     }
 
@@ -158,7 +158,7 @@ void WorldSession::HandleEjectPassenger(WorldPacket& data)
     if (!vehicle)
     {
         data.rfinish();                                     // prevent warnings spam
-        sLog->outError("HandleEjectPassenger: Player %u is not in a vehicle!", GetPlayer()->GetGUIDLow());
+        sLog->outError("HandleEjectPassenger: Player %s is not in a vehicle!", GetPlayer()->GetGUID().ToString().c_str());
         return;
     }
 
@@ -229,8 +229,8 @@ void WorldSession::HandleRequestVehicleExit(WorldPacket& /*recvData*/)
             if (seat->CanEnterOrExit())
                 GetPlayer()->ExitVehicle();
             else
-                sLog->outError("Player %u tried to exit vehicle, but seatflags %u (ID: %u) don't permit that.",
-                               GetPlayer()->GetGUIDLow(), seat->m_ID, seat->m_flags);
+                sLog->outError("Player %s tried to exit vehicle, but seatflags %u (ID: %u) don't permit that.",
+                               GetPlayer()->GetGUID().ToString().c_str(), seat->m_ID, seat->m_flags);
         }
     }
 }

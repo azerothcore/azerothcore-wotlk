@@ -230,7 +230,7 @@ public:
     uint32 GetCurrentVendor() const { return m_currentVendorEntry; }
     void SetCurrentVendor(uint32 vendorEntry) { m_currentVendorEntry = vendorEntry; }
 
-    uint32 GetGuidLow() const;
+    ObjectGuid::LowType GetGuidLow() const;
     void SetSecurity(AccountTypes security) { _security = security; }
     std::string const& GetRemoteAddress() { return m_Address; }
     void SetPlayer(Player* player);

@@ -88,7 +88,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     uint32 boundCounter = 0;
     for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
     {
-        BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(_player->GetGUIDLow(), Difficulty(i));
+        BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(_player->GetGUID(), Difficulty(i));
         for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
         {
             if (itr->second.perm)
@@ -786,7 +786,7 @@ void WorldSession::HandleSetSavedInstanceExtend(WorldPacket& recvData)
     if (!entry || !entry->IsRaid())
         return;
 
-    InstancePlayerBind* instanceBind = sInstanceSaveMgr->PlayerGetBoundInstance(GetPlayer()->GetGUIDLow(), mapId, Difficulty(difficulty));
+    InstancePlayerBind* instanceBind = sInstanceSaveMgr->PlayerGetBoundInstance(GetPlayer()->GetGUID(), mapId, Difficulty(difficulty));
     if (!instanceBind || !instanceBind->perm || (bool)toggleExtendOn == instanceBind->extended)
         return;
 
@@ -795,7 +795,7 @@ void WorldSession::HandleSetSavedInstanceExtend(WorldPacket& recvData)
     // update in db
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE_EXTENDED);
     stmt->setUInt8(0, toggleExtendOn ? 1 : 0);
-    stmt->setUInt32(1, GetPlayer()->GetGUIDLow());
+    stmt->setUInt32(1, GetPlayer()->GetGUID().GetCounter());
     stmt->setUInt32(2, instanceBind->save->GetInstanceId());
     CharacterDatabase.Execute(stmt);
 

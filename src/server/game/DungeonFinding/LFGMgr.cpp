@@ -399,7 +399,7 @@ namespace lfg
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
             else if (DisableMgr::IsDisabledFor(DISABLE_TYPE_LFG_MAP, dungeon->map, player))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
-            else if (dungeon->difficulty > DUNGEON_DIFFICULTY_NORMAL && (!mapEntry || !mapEntry->IsRaid()) && sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUIDLow(), dungeon->map, Difficulty(dungeon->difficulty)))
+            else if (dungeon->difficulty > DUNGEON_DIFFICULTY_NORMAL && (!mapEntry || !mapEntry->IsRaid()) && sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUID(), dungeon->map, Difficulty(dungeon->difficulty)))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
             else if (dungeon->minlevel > level)
                 lockData = LFG_LOCKSTATUS_TOO_LOW_LEVEL;
@@ -820,7 +820,7 @@ namespace lfg
         for (LfgDungeonSet::const_iterator itr = dungeons.begin(); itr != dungeons.end(); ++itr)
             if (GetLFGDungeon(*itr)) // ensure dungeon data exists for such dungeon id
             {
-                RaidBrowserStore[player->GetTeamId()][*itr][player->GetGUIDLow()] = entry;
+                RaidBrowserStore[player->GetTeamId()][*itr][player->GetGUID()] = entry;
                 RBUsedDungeonsStore[player->GetTeamId()].insert(*itr);
             }
     }
@@ -829,7 +829,7 @@ namespace lfg
     {
         for (uint8 team = 0; team < 2; ++team)
             for (RBStoreMap::iterator itr = RaidBrowserStore[team].begin(); itr != RaidBrowserStore[team].end(); ++itr)
-                itr->second.erase(guidLow);
+                itr->second.erase(guid);
     }
 
     void LFGMgr::SendRaidBrowserJoinedPacket(Player* p, LfgDungeonSet& dungeons, std::string comment)
@@ -840,7 +840,7 @@ namespace lfg
             uint8 team = p->GetTeamId();
             bool setComment = true;
             for (RBStoreMap::iterator itr = RaidBrowserStore[team].begin(); itr != RaidBrowserStore[team].end(); ++itr)
-                if ((iter = itr->second.find(p->GetGUIDLow())) != itr->second.end())
+                if ((iter = itr->second.find(p->GetGUID())) != itr->second.end())
                 {
                     dungeons.insert(itr->first);
                     if (setComment)
@@ -861,12 +861,12 @@ namespace lfg
 
     void LFGMgr::LfrSearchAdd(Player* p, uint32 dungeonId)
     {
-        RBSearchersStore[p->GetTeamId()][p->GetGUIDLow()] = dungeonId;
+        RBSearchersStore[p->GetTeamId()][p->GetGUID()] = dungeonId;
     }
 
     void LFGMgr::LfrSearchRemove(Player* p)
     {
-        RBSearchersStore[p->GetTeamId()].erase(p->GetGUIDLow());
+        RBSearchersStore[p->GetTeamId()].erase(p->GetGUID());
     }
 
     void LFGMgr::SendRaidBrowserCachedList(Player* player, uint32 dungeonId)
@@ -902,7 +902,7 @@ namespace lfg
         if (getMSTimeDiff(World::GetGameTimeMS(), getMSTime()) > (70 * 7) / 5) // prevent lagging
             return;
 
-        uint64 groupGuid, instanceGuid;
+        ObjectGuid groupGuid, instanceGuid;
         uint8 level, Class, race, talents[3];
         float iLevel, mp5, mp5combat, baseAP, rangedAP;
         int32 spellDamage, spellHeal;
@@ -2337,7 +2337,7 @@ namespace lfg
         uint8 teamId = p->GetTeamId();
         RBEntryInfoMap::iterator iter;
         for (RBStoreMap::iterator itr = RaidBrowserStore[teamId].begin(); itr != RaidBrowserStore[teamId].end(); ++itr)
-            if ((iter = itr->second.find(p->GetGUIDLow())) != itr->second.end())
+            if ((iter = itr->second.find(p->GetGUID())) != itr->second.end())
                 iter->second.comment = comment;
     }
 

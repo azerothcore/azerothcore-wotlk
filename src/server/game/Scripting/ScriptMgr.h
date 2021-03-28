@@ -1440,7 +1440,7 @@ public: /* GroupScript */
     void OnGroupDisband(Group* group);
 
 public: /* GlobalScript */
-    void OnGlobalItemDelFromDB(SQLTransaction& trans, uint32 itemGuid);
+    void OnGlobalItemDelFromDB(SQLTransaction& trans, ObjectGuid::LowType itemGuid);
     void OnGlobalMirrorImageDisplayItem(const Item* item, uint32& display);
     void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<uint32, uint32>& ap);
     void OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32& maxcount, LootStore const& store);

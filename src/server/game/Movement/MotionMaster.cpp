@@ -252,7 +252,7 @@ void MotionMaster::MoveRandom(float wanderDistance)
     if (_owner->GetTypeId() == TYPEID_UNIT)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature (GUID: %u) start moving random", _owner->GetGUIDLow());
+        sLog->outStaticDebug("Creature (%s) start moving random", _owner->GetGUID().ToString().c_str());
 #endif
         Mutate(new RandomMovementGenerator<Creature>(wanderDistance), MOTION_SLOT_IDLE);
     }
@@ -265,7 +265,7 @@ void MotionMaster::MoveTargetedHome()
     if (_owner->GetTypeId() == TYPEID_UNIT && !_owner->ToCreature()->GetCharmerOrOwnerGUID())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature (Entry: %u GUID: %u) targeted home", _owner->GetEntry(), _owner->GetGUIDLow());
+        sLog->outStaticDebug("Creature (%s) targeted home", _owner->GetGUID().ToString().c_str());
 #endif
         Mutate(new HomeMovementGenerator<Creature>(), MOTION_SLOT_ACTIVE);
     }
@@ -277,20 +277,20 @@ void MotionMaster::MoveTargetedHome()
             return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Pet or controlled creature (Entry: %u GUID: %u) targeting home", _owner->GetEntry(), _owner->GetGUIDLow());
+        sLog->outStaticDebug("Pet or controlled creature (%s) targeting home", _owner->GetGUID().ToString().c_str());
 #endif
         Unit* target = _owner->ToCreature()->GetCharmerOrOwner();
         if (target)
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outStaticDebug("Following %s (GUID: %u)", target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetTypeId() == TYPEID_PLAYER ? target->GetGUIDLow() : ((Creature*)target)->GetSpawnId());
+            sLog->outStaticDebug("Following %s (%s)", target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString().c_str());
 #endif
             Mutate(new FollowMovementGenerator<Creature>(target, PET_FOLLOW_DIST, _owner->GetFollowAngle()), MOTION_SLOT_ACTIVE);
         }
     }
     else
     {
-        sLog->outError("Player (GUID: %u) attempt targeted home", _owner->GetGUIDLow());
+        sLog->outError("Player (%s) attempt targeted home", _owner->GetGUID().ToString().c_str());
     }
 }
 
@@ -303,14 +303,14 @@ void MotionMaster::MoveConfused()
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Player (GUID: %u) move confused", _owner->GetGUIDLow());
+        sLog->outStaticDebug("Player (%s) move confused", _owner->GetGUID().ToString().c_str());
 #endif
         Mutate(new ConfusedMovementGenerator<Player>(), MOTION_SLOT_CONTROLLED);
     }
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature (Entry: %u GUID: %u) move confused", _owner->GetEntry(), _owner->GetGUIDLow());
+        sLog->outStaticDebug("Creature (%s) move confused", _owner->GetGUID().ToString().c_str());
 #endif
         Mutate(new ConfusedMovementGenerator<Creature>(), MOTION_SLOT_CONTROLLED);
     }
@@ -327,20 +327,16 @@ void MotionMaster::MoveChase(Unit* target,  std::optional<ChaseRange> dist, std:
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Player (GUID: %u) chase to %s (GUID: %u)",
-                             _owner->GetGUIDLow(),
-                             target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature",
-                             target->GetTypeId() == TYPEID_PLAYER ? target->GetGUIDLow() : target->ToCreature()->GetSpawnId());
+        sLog->outStaticDebug("Player (%s) chase to %s (%s)",
+            _owner->GetGUID().ToString().c_str(), target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString().c_str());
 #endif
         Mutate(new ChaseMovementGenerator<Player>(target, dist, angle), MOTION_SLOT_ACTIVE);
     }
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature (Entry: %u GUID: %u) chase to %s (GUID: %u)",
-                             _owner->GetEntry(), _owner->GetGUIDLow(),
-                             target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature",
-                             target->GetTypeId() == TYPEID_PLAYER ? target->GetGUIDLow() : target->ToCreature()->GetSpawnId());
+        sLog->outStaticDebug("Creature (%s) chase to %s (%s)",
+            _owner->GetGUID().ToString().c_str(), target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString().c_str());
 #endif
         Mutate(new ChaseMovementGenerator<Creature>(target, dist, angle), MOTION_SLOT_ACTIVE);
     }
@@ -405,19 +401,16 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlo
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Player (GUID: %u) follow to %s (GUID: %u)", _owner->GetGUIDLow(),
-                             target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature",
-                             target->GetTypeId() == TYPEID_PLAYER ? target->GetGUIDLow() : target->ToCreature()->GetSpawnId());
+        sLog->outStaticDebug("Player (%s) follow to %s (%s)",
+            _owner->GetGUID().ToString().c_str(), target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString().c_str());
 #endif
         Mutate(new FollowMovementGenerator<Player>(target, dist, angle), slot);
     }
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature (Entry: %u GUID: %u) follow to %s (GUID: %u)",
-                             _owner->GetEntry(), _owner->GetGUIDLow(),
-                             target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature",
-                             target->GetTypeId() == TYPEID_PLAYER ? target->GetGUIDLow() : target->ToCreature()->GetSpawnId());
+        sLog->outStaticDebug("Creature (%s) follow to %s (GUID: %u)",
+            _owner->GetGUID().ToString().c_str(), target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString().c_str());
 #endif
         Mutate(new FollowMovementGenerator<Creature>(target, dist, angle), slot);
     }
@@ -432,15 +425,14 @@ void MotionMaster::MovePoint(uint32 id, float x, float y, float z, bool generate
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Player (GUID: %u) targeted point (Id: %u X: %f Y: %f Z: %f)", _owner->GetGUIDLow(), id, x, y, z);
+        sLog->outStaticDebug("Player (%s) targeted point (Id: %u X: %f Y: %f Z: %f)", _owner->GetGUID().ToString().c_str(), id, x, y, z);
 #endif
         Mutate(new PointMovementGenerator<Player>(id, x, y, z, 0.0f, orientation, nullptr, generatePath, forceDestination), slot);
     }
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature (Entry: %u GUID: %u) targeted point (ID: %u X: %f Y: %f Z: %f)",
-                             _owner->GetEntry(), _owner->GetGUIDLow(), id, x, y, z);
+        sLog->outStaticDebug("Creature (%s) targeted point (ID: %u X: %f Y: %f Z: %f)", _owner->GetGUID().ToString().c_str(), id, x, y, z);
 #endif
         Mutate(new PointMovementGenerator<Creature>(id, x, y, z, 0.0f, orientation, nullptr, generatePath, forceDestination), slot);
     }
@@ -559,7 +551,7 @@ void MotionMaster::MoveJumpTo(float angle, float speedXY, float speedZ)
 void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float speedZ, uint32 id, Unit const* target)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("Unit (GUID: %u) jump to point (X: %f Y: %f Z: %f)", _owner->GetGUIDLow(), x, y, z);
+    sLog->outStaticDebug("Unit (%s) jump to point (X: %f Y: %f Z: %f)", _owner->GetGUID().ToString().c_str(), x, y, z);
 #endif
 
     if (speedXY <= 0.1f)
@@ -633,15 +625,14 @@ void MotionMaster::MoveCharge(float x, float y, float z, float speed, uint32 id,
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Player (GUID: %u) charge point (X: %f Y: %f Z: %f)", _owner->GetGUIDLow(), x, y, z);
+        sLog->outStaticDebug("Player (%s) charge point (X: %f Y: %f Z: %f)", _owner->GetGUID().ToString().c_str(), x, y, z);
 #endif
         Mutate(new PointMovementGenerator<Player>(id, x, y, z, speed, orientation, path, generatePath, generatePath), MOTION_SLOT_CONTROLLED);
     }
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature (Entry: %u GUID: %u) charge point (X: %f Y: %f Z: %f)",
-                             _owner->GetEntry(), _owner->GetGUIDLow(), x, y, z);
+        sLog->outStaticDebug("Creature (%s) charge point (X: %f Y: %f Z: %f)", _owner->GetGUID().ToString().c_str(), x, y, z);
 #endif
         Mutate(new PointMovementGenerator<Creature>(id, x, y, z, speed, orientation, path, generatePath, generatePath), MOTION_SLOT_CONTROLLED);
     }
@@ -655,13 +646,12 @@ void MotionMaster::MoveSeekAssistance(float x, float y, float z)
 
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
-        sLog->outError("Player (GUID: %u) attempt to seek assistance", _owner->GetGUIDLow());
+        sLog->outError("Player (%s) attempt to seek assistance", _owner->GetGUID().ToString().c_str());
     }
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature (Entry: %u GUID: %u) seek assistance (X: %f Y: %f Z: %f)",
-                             _owner->GetEntry(), _owner->GetGUIDLow(), x, y, z);
+        sLog->outStaticDebug("Creature (%s) seek assistance (X: %f Y: %f Z: %f)", _owner->GetGUID().ToString().c_str(), x, y, z);
 #endif
         _owner->AttackStop();
         _owner->CastStop(0, false);
@@ -678,13 +668,12 @@ void MotionMaster::MoveSeekAssistanceDistract(uint32 time)
 
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
-        sLog->outError("Player (GUID: %u) attempt to call distract after assistance", _owner->GetGUIDLow());
+        sLog->outError("Player (%s) attempt to call distract after assistance", _owner->GetGUID().ToString().c_str());
     }
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature (Entry: %u GUID: %u) is distracted after assistance call (Time: %u)",
-                             _owner->GetEntry(), _owner->GetGUIDLow(), time);
+        sLog->outStaticDebug("Creature (%s) is distracted after assistance call (Time: %u)", _owner->GetGUID().ToString().c_str(), time);
 #endif
         Mutate(new AssistanceDistractMovementGenerator(time), MOTION_SLOT_ACTIVE);
     }
@@ -702,20 +691,16 @@ void MotionMaster::MoveFleeing(Unit* enemy, uint32 time)
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Player (GUID: %u) flee from %s (GUID: %u)", _owner->GetGUIDLow(),
-                             enemy->GetTypeId() == TYPEID_PLAYER ? "player" : "creature",
-                             enemy->GetTypeId() == TYPEID_PLAYER ? enemy->GetGUIDLow() : enemy->ToCreature()->GetSpawnId());
+        sLog->outStaticDebug("Player (%s) flee from %s (%s)",
+            _owner->GetGUID().ToString().c_str(), enemy->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", enemy->GetGUID().ToString().c_str());
 #endif
         Mutate(new FleeingMovementGenerator<Player>(enemy->GetGUID()), MOTION_SLOT_CONTROLLED);
     }
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature (Entry: %u GUID: %u) flee from %s (GUID: %u)%s",
-                             _owner->GetEntry(), _owner->GetGUIDLow(),
-                             enemy->GetTypeId() == TYPEID_PLAYER ? "player" : "creature",
-                             enemy->GetTypeId() == TYPEID_PLAYER ? enemy->GetGUIDLow() : enemy->ToCreature()->GetSpawnId(),
-                             time ? " for a limited time" : "");
+        sLog->outStaticDebug("Creature (%s) flee from %s (%s) %s",
+            _owner->GetGUID().ToString().c_str(), enemy->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", enemy->GetGUID().ToString().c_str(), time ? " for a limited time" : "");
 #endif
         if (time)
             Mutate(new TimedFleeingMovementGenerator(enemy->GetGUID(), time), MOTION_SLOT_CONTROLLED);
@@ -745,8 +730,7 @@ void MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
     }
     else
     {
-        sLog->outError("Creature (Entry: %u GUID: %u) attempt taxi to (Path %u node %u)",
-                       _owner->GetEntry(), _owner->GetGUIDLow(), path, pathnode);
+        sLog->outError("Creature (%s) attempt taxi to (Path %u node %u)", _owner->GetGUID().ToString().c_str(), path, pathnode);
     }
 }
 
@@ -762,15 +746,14 @@ void MotionMaster::MoveDistract(uint32 timer)
     /*if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
     #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Player (GUID: %u) distracted (timer: %u)", _owner->GetGUIDLow(), timer);
+        sLog->outStaticDebug("Player (%s) distracted (timer: %u)", _owner->GetGUID().ToString().c_str(), timer);
     #endif
     }
     else
     {
     #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature (Entry: %u GUID: %u) (timer: %u)",
+        sLog->outStaticDebug("Creature (%s) (timer: %u)", _owner->GetGUID().ToString().c_str(), timer);
     #endif
-            _owner->GetEntry(), _owner->GetGUIDLow(), timer);
     }*/
 
     DistractMovementGenerator* mgen = new DistractMovementGenerator(timer);
@@ -832,9 +815,8 @@ void MotionMaster::MovePath(uint32 path_id, bool repeatable)
     Mutate(new WaypointMovementGenerator<Creature>(path_id, repeatable), MOTION_SLOT_IDLE);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("%s (GUID: %u) start moving over path(Id:%u, repeatable: %s)",
-                         _owner->GetTypeId() == TYPEID_PLAYER ? "Player" : "Creature",
-                         _owner->GetGUIDLow(), path_id, repeatable ? "YES" : "NO");
+    sLog->outStaticDebug("%s (%s) start moving over path(Id:%u, repeatable: %s)",
+        _owner->GetTypeId() == TYPEID_PLAYER ? "Player" : "Creature", _owner->GetGUID().ToString().c_str(), path_id, repeatable ? "YES" : "NO");
 #endif
 }
 

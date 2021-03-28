@@ -208,7 +208,7 @@ public:
             if (player->IsInCombat() || creature->IsInCombat())
                 return true;
 
-            if (!creature->AI()->GetData(player->GetGUIDLow()))
+            if (!creature->AI()->GetGUID(player->GetGUID().GetCounter()))
                 AddGossipItemFor(player, 9765, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
             SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
@@ -253,7 +253,7 @@ public:
         {
             if (!_duelInProgress && pSpell->Id == SPELL_DUEL)
             {
-                playerGUIDs.insert(caster->GetGUIDLow());
+                playerGUIDs.insert(caster->GetGUID().GetCounter());
                 _duelGUID = caster->GetGUID();
                 _duelInProgress = true;
 

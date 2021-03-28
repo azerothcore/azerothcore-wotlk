@@ -215,13 +215,15 @@ WorldSession* World::FindOfflineSession(uint32 id) const
         return nullptr;
 }
 
-WorldSession* World::FindOfflineSessionForCharacterGUID(uint32 guidLow) const
+WorldSession* World::FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const
 {
     if (m_offlineSessions.empty())
         return nullptr;
+
     for (SessionMap::const_iterator itr = m_offlineSessions.begin(); itr != m_offlineSessions.end(); ++itr)
         if (itr->second->GetGuidLow() == guidLow)
             return itr->second;
+
     return nullptr;
 }
 

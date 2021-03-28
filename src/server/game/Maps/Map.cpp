@@ -483,7 +483,8 @@ bool Map::AddPlayerToMap(Player* player)
     CellCoord cellCoord = acore::ComputeCellCoord(player->GetPositionX(), player->GetPositionY());
     if (!cellCoord.IsCoordValid())
     {
-        sLog->outError("Map::Add: Player (GUID: %u) has invalid coordinates X:%f Y:%f grid cell [%u:%u]", player->GetGUIDLow(), player->GetPositionX(), player->GetPositionY(), cellCoord.x_coord, cellCoord.y_coord);
+        sLog->outError("Map::Add: Player (%s) has invalid coordinates X:%f Y:%f grid cell [%u:%u]",
+            player->GetGUID().ToString().c_str(), player->GetPositionX(), player->GetPositionY(), cellCoord.x_coord, cellCoord.y_coord);
         return false;
     }
 
@@ -2337,7 +2338,7 @@ void Map::UpdateObjectsVisibilityFor(Player* player, Cell cell, CellCoord cellpa
 void Map::SendInitSelf(Player* player)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDetail("Creating player data for himself %u", player->GetGUIDLow());
+    sLog->outDetail("Creating player data for himself %s", player->GetGUID().ToString().c_str());
 #endif
 
     UpdateData data;
@@ -2431,7 +2432,7 @@ void Map::AddObjectToRemoveList(WorldObject* obj)
     obj->CleanupsBeforeDelete(false);                            // remove or simplify at least cross referenced links
 
     i_objectsToRemove.insert(obj);
-    //sLog->outDebug(LOG_FILTER_MAPS, "Object (GUID: %u TypeId: %u) added to removing list.", obj->GetGUIDLow(), obj->GetTypeId());
+    //sLog->outDebug(LOG_FILTER_MAPS, "Object (%s) added to removing list.", obj->GetGUID().ToString().c_str());
 }
 
 void Map::AddObjectToSwitchList(WorldObject* obj, bool on)
@@ -2489,7 +2490,7 @@ void Map::RemoveAllObjectsInRemoveList()
                 {
                     Corpse* corpse = ObjectAccessor::GetCorpse(*obj, obj->GetGUID());
                     if (!corpse)
-                        sLog->outError("Tried to delete corpse/bones %u that is not in map.", obj->GetGUIDLow());
+                        sLog->outError("Tried to delete corpse/bones %s that is not in map.", obj->GetGUID().ToString().c_str());
                     else
                         RemoveFromMap(corpse, true);
                     break;
@@ -2656,7 +2657,8 @@ bool InstanceMap::CanEnter(Player* player, bool loginCheck)
 {
     if (!loginCheck && player->GetMapRef().getTarget() == this)
     {
-        sLog->outError("InstanceMap::CanEnter - player %s(%u) already in map %d, %d, %d!", player->GetName().c_str(), player->GetGUIDLow(), GetId(), GetInstanceId(), GetSpawnMode());
+        sLog->outError("InstanceMap::CanEnter - player %s (%s) already in map %d, %d, %d!",
+            player->GetName().c_str(), player->GetGUID().ToString().c_str(), GetId(), GetInstanceId(), GetSpawnMode());
         ABORT();
         return false;
     }
@@ -2741,18 +2743,20 @@ bool InstanceMap::AddPlayerToMap(Player* player)
         }
 
         // check for existing instance binds
-        InstancePlayerBind* playerBind = sInstanceSaveMgr->PlayerGetBoundInstance(player->GetGUIDLow(), GetId(), Difficulty(GetSpawnMode()));
+        InstancePlayerBind* playerBind = sInstanceSaveMgr->PlayerGetBoundInstance(player->GetGUID(), GetId(), Difficulty(GetSpawnMode()));
         if (playerBind && playerBind->perm)
         {
             if (playerBind->save != mapSave)
             {
-                sLog->outError("InstanceMap::Add: player %s(%d) is permanently bound to instance %d, %d, %d, %d but he is being put into instance %d, %d, %d, %d", player->GetName().c_str(), player->GetGUIDLow(), playerBind->save->GetMapId(), playerBind->save->GetInstanceId(), playerBind->save->GetDifficulty(), playerBind->save->CanReset(), mapSave->GetMapId(), mapSave->GetInstanceId(), mapSave->GetDifficulty(), mapSave->CanReset());
+                sLog->outError("InstanceMap::Add: player %s (%s) is permanently bound to instance %d, %d, %d, %d but he is being put into instance %d, %d, %d, %d",
+                    player->GetName().c_str(), player->GetGUID().ToString().c_str(), playerBind->save->GetMapId(), playerBind->save->GetInstanceId(), playerBind->save->GetDifficulty(),
+                    playerBind->save->CanReset(), mapSave->GetMapId(), mapSave->GetInstanceId(), mapSave->GetDifficulty(), mapSave->CanReset());
                 return false;
             }
         }
         else
         {
-            playerBind = sInstanceSaveMgr->PlayerBindToInstance(player->GetGUIDLow(), mapSave, false, player);
+            playerBind = sInstanceSaveMgr->PlayerBindToInstance(player->GetGUID(), mapSave, false, player);
             // pussywizard: bind lider also if not yet bound
             if (Group* g = player->GetGroup())
                 if (g->GetLeaderGUID() != player->GetGUID())
@@ -2862,7 +2866,7 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
 /*
     Returns true if there are no players in the instance
 */
-bool InstanceMap::Reset(uint8 method, std::list<uint32>* globalResetSkipList)
+bool InstanceMap::Reset(uint8 method, GuidVector* globalResetSkipList)
 {
     if (method == INSTANCE_RESET_GLOBAL)
     {
@@ -2870,7 +2874,7 @@ bool InstanceMap::Reset(uint8 method, std::list<uint32>* globalResetSkipList)
         for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
         {
             // teleport players that are no longer bound (can be still bound if extended id)
-            if (!globalResetSkipList || std::find(globalResetSkipList->begin(), globalResetSkipList->end(), itr->GetSource()->GetGUIDLow()) == globalResetSkipList->end())
+            if (!globalResetSkipList || std::find(globalResetSkipList->begin(), globalResetSkipList->end(), itr->GetSource()->GetGUID()) == globalResetSkipList->end())
                 itr->GetSource()->RepopAtGraveyard();
         }
 
@@ -2926,14 +2930,14 @@ void InstanceMap::PermBindAllPlayers()
 
         // players inside an instance cannot be bound to other instances
         // some players may already be permanently bound, in this case nothing happens
-        InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(player->GetGUIDLow(), save->GetMapId(), save->GetDifficulty());
+        InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(player->GetGUID(), save->GetMapId(), save->GetDifficulty());
 
         if (!bind || !bind->perm)
         {
             WorldPacket data(SMSG_INSTANCE_SAVE_CREATED, 4);
             data << uint32(0);
             player->GetSession()->SendPacket(&data);
-            sInstanceSaveMgr->PlayerBindToInstance(player->GetGUIDLow(), save, true, player);
+            sInstanceSaveMgr->PlayerBindToInstance(player->GetGUID(), save, true, player);
         }
 
         // Xinef: Difficulty change prevention
@@ -3010,7 +3014,7 @@ bool BattlegroundMap::CanEnter(Player* player, bool loginCheck)
 {
     if (!loginCheck && player->GetMapRef().getTarget() == this)
     {
-        sLog->outError("BGMap::CanEnter - player %u is already in map!", player->GetGUIDLow());
+        sLog->outError("BGMap::CanEnter - player %s is already in map!", player->GetGUID().ToString().c_str());
         ABORT();
         return false;
     }
@@ -3299,7 +3303,8 @@ void Map::LogEncounterFinished(EncounterCreditType type, uint32 creditEntry)
                 auraStr += buffer2;
             }
 
-            snprintf(buffer, 16384, "%s (guid: %u, acc: %u, ip: %s, guild: %u), xyz: (%.1f, %.1f, %.1f), auras: %s\n", p->GetName().c_str(), p->GetGUIDLow(), p->GetSession()->GetAccountId(), p->GetSession()->GetRemoteAddress().c_str(), p->GetGuildId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), auraStr.c_str());
+            snprintf(buffer, 16384, "%s (%s, acc: %u, ip: %s, guild: %u), xyz: (%.1f, %.1f, %.1f), auras: %s\n",
+                p->GetName().c_str(), p->GetGUID().ToString().c_str(), p->GetSession()->GetAccountId(), p->GetSession()->GetRemoteAddress().c_str(), p->GetGuildId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), auraStr.c_str());
             playersInfo += buffer;
         }
     CleanStringForMysqlQuery(playersInfo);

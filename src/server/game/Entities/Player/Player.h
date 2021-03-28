@@ -1649,13 +1649,13 @@ public:
     uint32 totalMailCount;
     time_t m_nextMailDelivereTime;
 
-    typedef std::unordered_map<uint32, Item*> ItemMap;
+    typedef std::unordered_map<ObjectGuid, Item*> ItemMap;
 
     ItemMap mMitems;                                    //template defined in objectmgr.cpp
 
-    Item* GetMItem(uint32 id)
+    Item* GetMItem(ObjectGuid itemGuid)
     {
-        ItemMap::const_iterator itr = mMitems.find(id);
+        ItemMap::const_iterator itr = mMitems.find(itemGuid);
         return itr != mMitems.end() ? itr->second : nullptr;
     }
 
@@ -1663,12 +1663,12 @@ public:
     {
         ASSERT(it);
         //ASSERT deleted, because items can be added before loading
-        mMitems[it->GetGUIDLow()] = it;
+        mMitems[it->GetGUID()] = it;
     }
 
-    bool RemoveMItem(uint32 id)
+    bool RemoveMItem(ObjectGuid itemGuid)
     {
-        return !!mMitems.erase(id);
+        return !!mMitems.erase(itemGuid);
     }
 
     void PetSpellInitialize();
@@ -1883,7 +1883,7 @@ public:
     {
         SetUInt32Value(PLAYER_GUILDID, GuildId);
         // xinef: update global storage
-        sWorld->UpdateGlobalPlayerGuild(GetGUIDLow(), GuildId);
+        sWorld->UpdateGlobalPlayerGuild(GetGUID(), GuildId);
     }
     void SetRank(uint8 rankId) { SetUInt32Value(PLAYER_GUILDRANK, rankId); }
     [[nodiscard]] uint8 GetRank() const { return uint8(GetUInt32Value(PLAYER_GUILDRANK)); }

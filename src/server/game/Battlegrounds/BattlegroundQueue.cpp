@@ -1066,7 +1066,7 @@ bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
                 if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
                 {
                     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
-                    stmt->setUInt32(0, player->GetGUIDLow());
+                    stmt->setUInt32(0, player->GetGUID().GetCounter());
                     stmt->setUInt8(1, BG_DESERTION_TYPE_NO_ENTER_BUTTON);
                     CharacterDatabase.Execute(stmt);
                 }

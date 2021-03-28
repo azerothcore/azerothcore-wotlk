@@ -186,8 +186,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
                 break;
             default:
-                sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination",
-                               GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
+                sLog->outError("Player %s (%s) sent a chatmessage with an invalid language/message type combination",
+                               GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str());
 
                 recvData.rfinish();
                 return;
@@ -310,8 +310,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         {
             if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY) && !ChatHandler(this).isValidChatMessage(msg.c_str()))
             {
-                //sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName().c_str(),
-                //    GetPlayer()->GetGUIDLow(), msg.c_str());
+                //sLog->outError("Player %s (%s) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName().c_str(),
+                //    GetPlayer()->GetGUID().ToString().c_str(), msg.c_str());
 
                 if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
                     KickPlayer("CONFIG_CHAT_STRICT_LINK_CHECKING_KICK");

@@ -191,7 +191,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     if (!charter)
         return;
 
-    charter->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1, charter->GetGUIDLow());
+    charter->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1, charter->GetGUID().GetCounter());
     // ITEM_FIELD_ENCHANTMENT_1_1 is guild/arenateam id
     // ITEM_FIELD_ENCHANTMENT_1_1+1 is current signatures count (showed on item)
     charter->SetState(ITEM_CHANGED, _player);
@@ -200,7 +200,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     // a petition is invalid, if both the owner and the type matches
     // we checked above, if this player is in an arenateam, so this must be
     // datacorruption
-    Petition const* petition = sPetitionMgr->GetPetitionByOwnerWithType(_player->GetGUIDLow(), type);
+    Petition const* petition = sPetitionMgr->GetPetitionByOwnerWithType(_player->GetGUID(), type);
 
     CharacterDatabase.EscapeString(name);
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
@@ -220,8 +220,8 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     // xinef: petition pointer is invalid from now on
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION);
-    stmt->setUInt32(0, _player->GetGUIDLow());
-    stmt->setUInt32(1, charter->GetGUIDLow());
+    stmt->setUInt32(0, _player->GetGUID().GetCounter());
+    stmt->setUInt32(1, charter->GetGUID().GetCounter());
     stmt->setString(2, name);
     stmt->setUInt8(3, uint8(type));
     trans->Append(stmt);
@@ -229,7 +229,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     CharacterDatabase.CommitTransaction(trans);
 
     // xinef: fill petition store
-    sPetitionMgr->AddPetition(charter->GetGUIDLow(), _player->GetGUIDLow(), name, uint8(type));
+    sPetitionMgr->AddPetition(charter->GetGUID(), _player->GetGUID(), name, uint8(type));
 }
 
 void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
@@ -697,12 +697,12 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
         return;
     }
 
-    uint32 ownerguidlo = petition->ownerGuid;
+    ObjectGuid ownerGuid = petition->ownerGuid;
     uint8 type = petition->petitionType;
     std::string name = petition->petitionName;
 
     // Only the petition owner can turn in the petition
-    if (_player->GetGUIDLow() != ownerguidlo)
+    if (_player->GetGUID() != ownerGuid)
         return;
 
     // Petition type (guild/arena) specific checks

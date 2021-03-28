@@ -259,7 +259,8 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
 
     if (reward >= QUEST_REWARD_CHOICES_COUNT)
     {
-        sLog->outError("Error in CMSG_QUESTGIVER_CHOOSE_REWARD: player %s (guid %d) tried to get invalid reward (%u) (probably packet hacking)", _player->GetName().c_str(), _player->GetGUIDLow(), reward);
+        sLog->outError("Error in CMSG_QUESTGIVER_CHOOSE_REWARD: player %s (%s) tried to get invalid reward (%u) (probably packet hacking)",
+            _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), reward);
         return;
     }
 
@@ -280,8 +281,8 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
         if ((!_player->CanSeeStartQuest(quest) &&  _player->GetQuestStatus(questId) == QUEST_STATUS_NONE) ||
                 (_player->GetQuestStatus(questId) != QUEST_STATUS_COMPLETE && !quest->IsAutoComplete()))
         {
-            sLog->outError("HACK ALERT: Player %s (guid: %u) is trying to complete quest (id: %u) but he has no right to do it!",
-                           _player->GetName().c_str(), _player->GetGUIDLow(), questId);
+            sLog->outError("HACK ALERT: Player %s (%s) is trying to complete quest (id: %u) but he has no right to do it!",
+                           _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), questId);
             return;
         }
         if (_player->CanRewardQuest(quest, reward, true))
@@ -427,7 +428,7 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recvData)
             sEluna->OnQuestAbandon(_player, questId);
 #endif
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDetail("Player %u abandoned quest %u", _player->GetGUIDLow(), questId);
+            sLog->outDetail("Player %s abandoned quest %u", _player->GetGUID().ToString().c_str(), questId);
 #endif
             // check if Quest Tracker is enabled
             if (sWorld->getBoolConfig(CONFIG_QUEST_ENABLE_QUEST_TRACKER))
@@ -435,7 +436,7 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recvData)
                 // prepare Quest Tracker datas
                 auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_QUEST_TRACK_ABANDON_TIME);
                 stmt->setUInt32(0, questId);
-                stmt->setUInt32(1, _player->GetGUIDLow());
+                stmt->setUInt32(1, _player->GetGUID().GetCounter());
 
                 // add to Quest Tracker
                 CharacterDatabase.Execute(stmt);
@@ -508,8 +509,8 @@ void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
     {
         if (!_player->CanSeeStartQuest(quest) && _player->GetQuestStatus(questId) == QUEST_STATUS_NONE)
         {
-            sLog->outError("Possible hacking attempt: Player %s [guid: %u] tried to complete quest [entry: %u] without being in possession of the quest!",
-                           _player->GetName().c_str(), _player->GetGUIDLow(), questId);
+            sLog->outError("Possible hacking attempt: Player %s [%s] tried to complete quest [entry: %u] without being in possession of the quest!",
+                           _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), questId);
             return;
         }
 

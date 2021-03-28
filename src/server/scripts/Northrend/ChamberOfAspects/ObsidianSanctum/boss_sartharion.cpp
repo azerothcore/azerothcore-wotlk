@@ -1536,7 +1536,7 @@ public:
             {
                 if (Creature* sarth = ObjectAccessor::GetCreature(*GetHitUnit(), pInstance->GetGuidData(DATA_SARTHARION)))
                 {
-                    sarth->AI()->SetData(DATA_VOLCANO_BLOWS, GetHitUnit()->GetGUIDLow());
+                    sarth->AI()->SetData(DATA_VOLCANO_BLOWS, GetHitUnit()->GetGUID().GetCounter());
                     sarth->CastSpell(GetHitUnit(), SPELL_LAVA_STRIKE_SUMMON, true);
                     spawned = true;
                 }

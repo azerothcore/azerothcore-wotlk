@@ -377,7 +377,7 @@ bool Group::AddMember(Player* player)
     member.roles     = 0;
     m_memberSlots.push_back(member);
     if (!isBGGroup() && !isBFGroup())
-        sWorld->UpdateGlobalPlayerGroup(player->GetGUIDLow(), GetLowGUID());
+        sWorld->UpdateGlobalPlayerGroup(player->GetGUID(), GetLowGUID());
 
     SubGroupCounterIncrease(subGroup);
 
@@ -420,7 +420,7 @@ bool Group::AddMember(Player* player)
 
         if (!IsLeader(player->GetGUID()) && !isBGGroup() && !isBFGroup())
         {
-            Player::ResetInstances(player->GetGUIDLow(), INSTANCE_RESET_GROUP_JOIN, false);
+            Player::ResetInstances(player->GetGUID(), INSTANCE_RESET_GROUP_JOIN, false);
 
             if (player->GetDungeonDifficulty() != GetDungeonDifficulty())
             {
@@ -435,7 +435,7 @@ bool Group::AddMember(Player* player)
         }
         else if (IsLeader(player->GetGUID()) && isLFGGroup()) // pussywizard
         {
-            Player::ResetInstances(player->GetGUIDLow(), INSTANCE_RESET_GROUP_JOIN, false);
+            Player::ResetInstances(player->GetGUID(), INSTANCE_RESET_GROUP_JOIN, false);
         }
 
         player->SetGroupUpdateFlag(GROUP_UPDATE_FULL);
@@ -676,7 +676,7 @@ void Group::ChangeLeader(uint64 newLeaderGuid)
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
         // Update the group leader
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GROUP_LEADER);
-        stmt->setUInt32(0, newLeader->GetGUIDLow());
+        stmt->setUInt32(0, newLeader->GetGUID().GetCounter());
         stmt->setUInt32(1, GetLowGUID());
         trans->Append(stmt);
         CharacterDatabase.CommitTransaction(trans);
@@ -1953,7 +1953,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                 if (leader->GetDifficulty(false) != DUNGEON_DIFFICULTY_NORMAL)
                     break;
                 std::vector<InstanceSave*> toUnbind;
-                BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(leader->GetGUIDLow(), Difficulty(DUNGEON_DIFFICULTY_NORMAL));
+                BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(leader->GetGUID(), Difficulty(DUNGEON_DIFFICULTY_NORMAL));
                 for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
                 {
                     InstanceSave* instanceSave = itr->second.save;
@@ -1977,7 +1977,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
         case INSTANCE_RESET_CHANGE_DIFFICULTY:
             {
                 std::vector<InstanceSave*> toUnbind;
-                BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(leader->GetGUIDLow(), leader->GetDifficulty(isRaid));
+                BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(leader->GetGUID(), leader->GetDifficulty(isRaid));
                 for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
                 {
                     InstanceSave* instanceSave = itr->second.save;
@@ -2012,7 +2012,7 @@ void Group::_cancelHomebindIfInstance(Player* player)
     // if player is reinvited to group and in the instance - cancel homebind timer
     if (!player->FindMap() || !player->FindMap()->IsDungeon())
         return;
-    InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(player->GetGUIDLow(), player->FindMap()->GetId(), player->GetDifficulty(player->FindMap()->IsRaid()));
+    InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(player->GetGUID(), player->FindMap()->GetId(), player->GetDifficulty(player->FindMap()->IsRaid()));
     if (bind && bind->save->GetInstanceId() == player->GetInstanceId())
         player->m_InstanceValid = true;
 }

@@ -480,7 +480,8 @@ int WorldSocket::handle_input_header(void)
     if ((header.size < 4) || (header.size > 10240) || (header.cmd  > 10240))
     {
         Player* _player = m_Session ? m_Session->GetPlayer() : nullptr;
-        sLog->outError("WorldSocket::handle_input_header(): client (account: %u, char [GUID: %u, name: %s]) sent malformed packet (size: %d, cmd: %d)", m_Session ? m_Session->GetAccountId() : 0, _player ? _player->GetGUIDLow() : 0, _player ? _player->GetName().c_str() : "<none>", header.size, header.cmd);
+        sLog->outError("WorldSocket::handle_input_header(): client (account: %u, char [%s, name: %s]) sent malformed packet (size: %d, cmd: %d)",
+            m_Session ? m_Session->GetAccountId() : 0, _player ? _player->GetGUID().ToString().c_str() : "", _player ? _player->GetName().c_str() : "<none>", header.size, header.cmd);
 
         errno = EINVAL;
         return -1;
@@ -1058,9 +1059,9 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
                 if (m_Session && AccountMgr::IsPlayerAccount(m_Session->GetSecurity()))
                 {
                     Player* _player = m_Session->GetPlayer();
-                    sLog->outError("WorldSocket::HandlePing: Player (account: %u, GUID: %u, name: %s) kicked for over-speed pings (address: %s)",
+                    sLog->outError("WorldSocket::HandlePing: Player (account: %u, %s, name: %s) kicked for over-speed pings (address: %s)",
                                    m_Session->GetAccountId(),
-                                   _player ? _player->GetGUIDLow() : 0,
+                                   _player ? _player->GetGUID().ToString().c_str() : "",
                                    _player ? _player->GetName().c_str() : "<none>",
                                    GetRemoteAddress().c_str());
 

@@ -1020,7 +1020,7 @@ void Battleground::EndBattleground(TeamId winnerTeamId)
             BattlegroundScoreMap::const_iterator score = PlayerScores.find(player->GetGUID());
 
             stmt->setUInt32(0, battlegroundId);
-            stmt->setUInt32(1, player->GetGUIDLow());
+            stmt->setUInt32(1, player->GetGUID().GetCounter());
             stmt->setBool(2, bgTeamId == winnerTeamId);
             stmt->setUInt32(3, score->second->GetKillingBlows());
             stmt->setUInt32(4, score->second->GetDeaths());
@@ -1381,7 +1381,7 @@ void Battleground::ReadyMarkerClicked(Player* p)
 {
     if (!isArena() || GetStatus() >= STATUS_IN_PROGRESS || GetStartDelayTime() <= BG_START_DELAY_15S || (m_Events & BG_STARTING_EVENT_3) || p->IsSpectator())
         return;
-    readyMarkerClickedSet.insert(p->GetGUIDLow());
+    readyMarkerClickedSet.insert(p->GetGUID());
     uint32 count = readyMarkerClickedSet.size();
     uint32 req = GetArenaType() * 2;
     p->GetSession()->SendNotification("You are marked as ready %u/%u", count, req);
@@ -1524,11 +1524,11 @@ bool Battleground::AddObject(uint32 type, uint32 entry, float x, float y, float 
         return false;
     }
     /*
-        uint32 guid = go->GetGUIDLow();
+        ObjectGuid::LowType spawnId = go->GetSpawnId();
 
         // without this, UseButtonOrDoor caused the crash, since it tried to get go info from godata
         // iirc that was changed, so adding to go data map is no longer required if that was the only function using godata from GameObject without checking if it existed
-        GameObjectData& data = sObjectMgr->NewGOData(guid);
+        GameObjectData& data = sObjectMgr->NewGOData(spawnId);
 
         data.id             = entry;
         data.mapid          = GetMapId();

@@ -97,7 +97,7 @@ void Pet::RemoveFromWorld()
 SpellCastResult Pet::TryLoadFromDB(Player* owner, bool current /*= false*/, PetType mandatoryPetType /*= MAX_PET_TYPE*/)
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT);
-    stmt->setUInt32(0, owner->GetGUIDLow());
+    stmt->setUInt32(0, owner->GetGUID().GetCounter());
     stmt->setUInt8(1, uint8(current ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
 
     PreparedQueryResult result = CharacterDatabase.AsyncQuery(stmt);
@@ -156,28 +156,28 @@ bool Pet::LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry, ui
         if (owner->getClass() == CLASS_DEATH_KNIGHT && !owner->CanSeeDKPet()) // DK Pet exception
             return false;
 
-    uint32 ownerid = owner->GetGUIDLow();
+    ObjectGuid::LowType ownerGuid = owner->GetGUID().GetCounter();
     PreparedStatement* stmt;
 
     if (petnumber)
     {
         // Known petnumber entry
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY);
-        stmt->setUInt32(0, ownerid);
+        stmt->setUInt32(0, ownerGuid);
         stmt->setUInt32(1, petnumber);
     }
     else if (current)
     {
         // Current pet (slot 0)
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT);
-        stmt->setUInt32(0, ownerid);
+        stmt->setUInt32(0, ownerGuid);
         stmt->setUInt8(1, uint8(PET_SAVE_AS_CURRENT));
     }
     else if (petentry)
     {
         // known petentry entry (unique for summoned pet, but non unique for hunter pet (only from current or not stabled pets)
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT_2);
-        stmt->setUInt32(0, ownerid);
+        stmt->setUInt32(0, ownerGuid);
         stmt->setUInt32(1, petentry);
         stmt->setUInt8(2, uint8(PET_SAVE_AS_CURRENT));
         stmt->setUInt8(3, uint8(PET_SAVE_LAST_STABLE_SLOT));
@@ -186,13 +186,14 @@ bool Pet::LoadPetFromDB(Player* owner, uint8 asynchLoadType, uint32 petentry, ui
     {
         // Any current or other non-stabled pet (for hunter "call pet")
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_SLOT);
-        stmt->setUInt32(0, ownerid);
+        stmt->setUInt32(0, ownerGuid);
         stmt->setUInt8(1, uint8(PET_SAVE_AS_CURRENT));
         stmt->setUInt8(2, uint8(PET_SAVE_LAST_STABLE_SLOT));
     }
 
     if (AsynchPetSummon* info = owner->GetSession()->_loadPetFromDBFirstCallback.GetSecondParam())
         delete info;
+
     owner->GetSession()->_loadPetFromDBFirstCallback.Reset();
     owner->GetSession()->_loadPetFromDBFirstCallback.SetFirstParam(asynchLoadType);
     owner->GetSession()->_loadPetFromDBFirstCallback.SetSecondParam(info);
@@ -643,8 +644,8 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 
     if (!IsPositionValid())
     {
-        sLog->outError("Pet (guidlow %d, entry %d) not created base at creature. Suggested coordinates isn't valid (X: %f Y: %f)",
-                       GetGUIDLow(), GetEntry(), GetPositionX(), GetPositionY());
+        sLog->outError("Pet %s not created base at creature. Suggested coordinates isn't valid (X: %f Y: %f)",
+                       GetGUID().ToString().c_str(), GetPositionX(), GetPositionY());
         return false;
     }
 
@@ -1257,7 +1258,7 @@ void Pet::_SaveSpells(SQLTransaction& trans)
 void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_PETS, "Loading auras for pet %u", GetGUIDLow());
+    sLog->outDebug(LOG_FILTER_PETS, "Loading auras for pet %s", GetGUID().ToString().c_str());
 #endif
 
     if (result)
@@ -1267,7 +1268,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             int32 damage[3];
             int32 baseDamage[3];
             Field* fields = result->Fetch();
-            uint64 caster_guid = fields[0].GetUInt64();
+            ObjectGuid caster_guid = ObjectGuid(fields[0].GetUInt64());
             // nullptr guid stored - pet is the caster of the spell - see Pet::_SaveAuras
             if (!caster_guid)
                 caster_guid = GetGUID();
@@ -1796,7 +1797,7 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= nullptr*/)
 
     // xinef: zomg! sync query
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET);
-    stmt->setUInt32(0, owner->GetGUIDLow());
+    stmt->setUInt32(0, owner->GetGUID().GetCounter());
     stmt->setUInt32(1, except_petnumber);
     PreparedQueryResult resultPets = CharacterDatabase.Query(stmt);
 
@@ -1806,7 +1807,7 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= nullptr*/)
 
     // xinef: zomg! sync query
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SPELL_LIST);
-    stmt->setUInt32(0, owner->GetGUIDLow());
+    stmt->setUInt32(0, owner->GetGUID().GetCounter());
     stmt->setUInt32(1, except_petnumber);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 

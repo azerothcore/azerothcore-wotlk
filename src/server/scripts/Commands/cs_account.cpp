@@ -104,9 +104,9 @@ public:
                 handler->PSendSysMessage(LANG_ACCOUNT_CREATED, accountName);
                 if (handler->GetSession())
                 {
-                    sLog->outDebug(LOG_FILTER_WARDEN, "Account: %d (IP: %s) Character:[%s] (GUID: %u) Change Password.",
+                    sLog->outDebug(LOG_FILTER_WARDEN, "Account: %d (IP: %s) Character:[%s] (%s) Change Password.",
                                    handler->GetSession()->GetAccountId(), handler->GetSession()->GetRemoteAddress().c_str(),
-                                   handler->GetSession()->GetPlayer()->GetName().c_str(), handler->GetSession()->GetPlayer()->GetGUIDLow());
+                                   handler->GetSession()->GetPlayer()->GetName().c_str(), handler->GetSession()->GetPlayer()->GetGUID().ToString().c_str());
                 }
                 break;
             case AOR_NAME_TOO_LONG:

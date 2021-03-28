@@ -333,7 +333,8 @@ Creature* MotionTransport::CreateNPCPassenger(uint32 guid, CreatureData const* d
 
     if (!creature->IsPositionValid())
     {
-        sLog->outError("Creature (guidlow %d, entry %d) not created. Suggested coordinates aren't valid (X: %f Y: %f)", creature->GetGUIDLow(), creature->GetEntry(), creature->GetPositionX(), creature->GetPositionY());
+        sLog->outError("Creature (%s) not created. Suggested coordinates aren't valid (X: %f Y: %f)",
+            creature->GetGUID().ToString().c_str(), creature->GetPositionX(), creature->GetPositionY());
         delete creature;
         return nullptr;
     }
@@ -374,7 +375,8 @@ GameObject* MotionTransport::CreateGOPassenger(uint32 guid, GameObjectData const
 
     if (!go->IsPositionValid())
     {
-        sLog->outError("GameObject (guidlow %d, entry %d) not created. Suggested coordinates aren't valid (X: %f Y: %f)", go->GetGUIDLow(), go->GetEntry(), go->GetPositionX(), go->GetPositionY());
+        sLog->outError("GameObject (%s) not created. Suggested coordinates aren't valid (X: %f Y: %f)",
+            go->GetGUID().ToString().c_str(), go->GetPositionX(), go->GetPositionY());
         delete go;
         return nullptr;
     }

@@ -287,13 +287,12 @@ void SocialMgr::BroadcastToFriendListers(Player* player, WorldPacket* packet)
 
     TeamId teamId = player->GetTeamId();
     AccountTypes security = player->GetSession()->GetSecurity();
-    uint32 guid = player->GetGUIDLow();
     bool allowTwoSideWhoList = sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_WHO_LIST);
     AccountTypes gmLevelInWhoList = AccountTypes(sWorld->getIntConfig(CONFIG_GM_LEVEL_IN_WHO_LIST));
 
     for (auto const& itr : m_socialMap)
     {
-        auto const& itr2 = itr.second.m_playerSocialMap.find(guid);
+        auto const& itr2 = itr.second.m_playerSocialMap.find(player->GetGUID());
         if (itr2 != itr.second.m_playerSocialMap.end() && (itr2->second.Flags & SOCIAL_FLAG_FRIEND))
         {
             Player* pFriend = ObjectAccessor::FindPlayer(itr.first);

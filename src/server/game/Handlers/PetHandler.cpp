@@ -140,7 +140,8 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
     owner->GetClosePoint(px, py, pz, pet->GetObjectSize(), PET_FOLLOW_DIST, pet->GetFollowAngle());
     if (!pet->IsPositionValid())
     {
-        sLog->outError("Pet (guidlow %d, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)", pet->GetGUIDLow(), pet->GetEntry(), pet->GetPositionX(), pet->GetPositionY());
+        sLog->outError("Pet (%s, entry %d) not loaded. Suggested coordinates isn't valid (X: %f Y: %f)",
+            pet->GetGUID().ToString().c_str(), pet->GetEntry(), pet->GetPositionX(), pet->GetPositionY());
         delete pet;
         delete holder;
         return PET_LOAD_ERROR;
@@ -222,14 +223,14 @@ uint8 WorldSession::HandleLoadPetFromDBFirstCallback(PreparedQueryResult result,
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT_EXCLUDE_ID);
         stmt->setUInt8(0, uint8(PET_SAVE_NOT_IN_SLOT));
-        stmt->setUInt32(1, owner->GetGUIDLow());
+        stmt->setUInt32(1, owner->GetGUID().GetCounter());
         stmt->setUInt8(2, uint8(PET_SAVE_AS_CURRENT));
         stmt->setUInt32(3, pet_number);
         trans->Append(stmt);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_SLOT_BY_ID);
         stmt->setUInt8(0, uint8(PET_SAVE_AS_CURRENT));
-        stmt->setUInt32(1, owner->GetGUIDLow());
+        stmt->setUInt32(1, owner->GetGUID().GetCounter());
         stmt->setUInt32(2, pet_number);
         trans->Append(stmt);
 
@@ -1052,7 +1053,8 @@ void WorldSession::HandlePetSetAction(WorldPacket& recvData)
         CharmInfo* charmInfo = pet->GetCharmInfo();
         if (!charmInfo)
         {
-            sLog->outError("WorldSession::HandlePetSetAction: object (GUID: %u TypeId: %u) is considered pet-like but doesn't have a charminfo!", pet->GetGUIDLow(), pet->GetTypeId());
+            sLog->outError("WorldSession::HandlePetSetAction: object (%s TypeId: %u) is considered pet-like but doesn't have a charminfo!",
+                pet->GetGUID().ToString().c_str(), pet->GetTypeId());
             continue;
         }
 
@@ -1188,7 +1190,7 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
             trans->Append(stmt);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_ADD_CHAR_PET_DECLINEDNAME);
-            stmt->setUInt32(0, _player->GetGUIDLow());
+            stmt->setUInt32(0, _player->GetGUID().GetCounter());
 
             for (uint8 i = 0; i < 5; i++)
                 stmt->setString(i + 1, declinedname.name[i]);
@@ -1199,7 +1201,7 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_PET_NAME);
     stmt->setString(0, name);
-    stmt->setUInt32(1, _player->GetGUIDLow());
+    stmt->setUInt32(1, _player->GetGUID().GetCounter());
     stmt->setUInt32(2, pet->GetCharmInfo()->GetPetNumber());
     trans->Append(stmt);
 
@@ -1285,7 +1287,8 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPacket& recvPacket)
         CharmInfo* charmInfo = pet->GetCharmInfo();
         if (!charmInfo)
         {
-            sLog->outError("WorldSession::HandlePetSpellAutocastOpcod: object (GUID: %u TypeId: %u) is considered pet-like but doesn't have a charminfo!", pet->GetGUIDLow(), pet->GetTypeId());
+            sLog->outError("WorldSession::HandlePetSpellAutocastOpcod: object (%s TypeId: %u) is considered pet-like but doesn't have a charminfo!",
+                pet->GetGUID().ToString().c_str(), pet->GetTypeId());
             continue;
         }
 

@@ -541,7 +541,7 @@ void WorldSession::SendStablePet(uint64 guid)
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOTS_DETAIL);
 
-    stmt->setUInt32(0, _player->GetGUIDLow());
+    stmt->setUInt32(0, _player->GetGUID().GetCounter());
     stmt->setUInt8(1, PET_SAVE_FIRST_STABLE_SLOT);
     stmt->setUInt8(2, PET_SAVE_LAST_STABLE_SLOT);
 
@@ -584,7 +584,7 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
     else if (_player->IsPetDismissed() || _player->GetTemporaryUnsummonedPetNumber())
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT);
-        stmt->setUInt32(0, _player->GetGUIDLow());
+        stmt->setUInt32(0, _player->GetGUID().GetCounter());
         stmt->setUInt8(1, uint8(_player->GetTemporaryUnsummonedPetNumber() ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
 
         if (PreparedQueryResult _result = CharacterDatabase.AsyncQuery(stmt))
@@ -675,7 +675,7 @@ void WorldSession::HandleStablePet(WorldPacket& recvData)
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOTS);
 
-    stmt->setUInt32(0, _player->GetGUIDLow());
+    stmt->setUInt32(0, _player->GetGUID().GetCounter());
     stmt->setUInt8(1, PET_SAVE_FIRST_STABLE_SLOT);
     stmt->setUInt8(2, PET_SAVE_LAST_STABLE_SLOT);
 
@@ -720,7 +720,7 @@ void WorldSession::HandleStablePetCallback(PreparedQueryResult result)
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT);
         stmt->setUInt8(0, freeSlot);
-        stmt->setUInt32(1, _player->GetGUIDLow());
+        stmt->setUInt32(1, _player->GetGUID().GetCounter());
         stmt->setUInt8(2, uint8(_player->GetTemporaryUnsummonedPetNumber() ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
         trans->Append(stmt);
 
@@ -756,7 +756,7 @@ void WorldSession::HandleUnstablePet(WorldPacket& recvData)
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_ENTRY);
 
-    stmt->setUInt32(0, _player->GetGUIDLow());
+    stmt->setUInt32(0, _player->GetGUID().GetCounter());
     stmt->setUInt32(1, petnumber);
     stmt->setUInt8(2, PET_SAVE_FIRST_STABLE_SLOT);
     stmt->setUInt8(3, PET_SAVE_LAST_STABLE_SLOT);
@@ -822,7 +822,7 @@ void WorldSession::HandleUnstablePetCallback(PreparedQueryResult result, uint32 
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT);
         stmt->setUInt8(0, slot);
-        stmt->setUInt32(1, _player->GetGUIDLow());
+        stmt->setUInt32(1, _player->GetGUID().GetCounter());
         stmt->setUInt8(2, uint8(_player->GetTemporaryUnsummonedPetNumber() ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
         trans->Append(stmt);
 
@@ -923,7 +923,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
     // Find swapped pet slot in stable
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOT_BY_ID);
 
-    stmt->setUInt32(0, _player->GetGUIDLow());
+    stmt->setUInt32(0, _player->GetGUID().GetCounter());
     stmt->setUInt32(1, petId);
 
     _stableSwapCallback.SetParam(petId);
@@ -975,7 +975,7 @@ void WorldSession::HandleStableSwapPetCallback(PreparedQueryResult result, uint3
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT);
         stmt->setUInt8(0, slot);
-        stmt->setUInt32(1, _player->GetGUIDLow());
+        stmt->setUInt32(1, _player->GetGUID().GetCounter());
         stmt->setUInt8(2, uint8(_player->GetTemporaryUnsummonedPetNumber() ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
         trans->Append(stmt);
 

@@ -329,8 +329,7 @@ namespace lfg
     /// Stores group data related to proposal to join
     struct LfgProposal
     {
-        LfgProposal(uint32 dungeon = 0): id(0), dungeonId(dungeon), state(LFG_PROPOSAL_INITIATING),
-            group(0), leader(0), cancelTime(0), encounters(0), isNew(true)
+        LfgProposal(uint32 dungeon = 0): id(0), dungeonId(dungeon), state(LFG_PROPOSAL_INITIATING), cancelTime(0), encounters(0), isNew(true)
         { }
 
         uint32 id;                                             ///< Proposal Id
@@ -401,14 +400,14 @@ namespace lfg
         ~LFGMgr();
 
         // pussywizard: RAIDBROWSER
-        typedef std::unordered_map<uint32 /*playerGuidLow*/, RBEntryInfo> RBEntryInfoMap;
+        typedef std::unordered_map<ObjectGuid /*playerGuid*/, RBEntryInfo> RBEntryInfoMap;
         typedef std::unordered_map<uint32 /*dungeonId*/, RBEntryInfoMap> RBStoreMap;
         RBStoreMap RaidBrowserStore[2]; // for 2 factions
-        typedef std::unordered_map<uint32 /*playerGuidLow*/, uint32 /*dungeonId*/> RBSearchersMap;
+        typedef std::unordered_map<ObjectGuid /*playerGuid*/, uint32 /*dungeonId*/> RBSearchersMap;
         RBSearchersMap RBSearchersStore[2]; // for 2 factions
         typedef std::unordered_map<uint32 /*dungeonId*/, WorldPacket> RBCacheMap;
         RBCacheMap RBCacheStore[2]; // for 2 factions
-        typedef std::unordered_map<uint32 /*guidLow*/, RBInternalInfo> RBInternalInfoMap;
+        typedef std::unordered_map<ObjectGuid /*guid*/, RBInternalInfo> RBInternalInfoMap;
         typedef std::unordered_map<uint32 /*dungeonId*/, RBInternalInfoMap> RBInternalInfoMapMap;
         RBInternalInfoMapMap RBInternalInfoStorePrev[2]; // for 2 factions
         RBInternalInfoMapMap RBInternalInfoStoreCurr[2]; // for 2 factions

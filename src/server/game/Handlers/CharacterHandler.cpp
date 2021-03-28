@@ -660,11 +660,11 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
 
                 std::string IP_str = GetRemoteAddress();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDetail("Account: %d (IP: %s) Create Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), createInfo->Name.c_str(), newChar.GetGUIDLow());
+                sLog->outDetail("Account: %d (IP: %s) Create Character:[%s] (%s)", GetAccountId(), IP_str.c_str(), createInfo->Name.c_str(), newChar.GetGUID().ToString().c_str());
 #endif
-                sLog->outChar("Account: %d (IP: %s) Create Character:[%s] (GUID: %u)", GetAccountId(), IP_str.c_str(), createInfo->Name.c_str(), newChar.GetGUIDLow());
+                sLog->outChar("Account: %d (IP: %s) Create Character:[%s] (%s)", GetAccountId(), IP_str.c_str(), createInfo->Name.c_str(), newChar.GetGUID().ToString().c_str());
                 sScriptMgr->OnPlayerCreate(&newChar);
-                sWorld->AddGlobalPlayerData(newChar.GetGUIDLow(), GetAccountId(), newChar.GetName(), newChar.getGender(), newChar.getRace(), newChar.getClass(), newChar.getLevel(), 0, 0);
+                sWorld->AddGlobalPlayerData(newChar.GetGUID(), GetAccountId(), newChar.GetName(), newChar.getGender(), newChar.getRace(), newChar.getClass(), newChar.getLevel(), 0, 0);
 
                 newChar.CleanupsBeforeDelete();
                 delete createInfo;
@@ -924,7 +924,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
 #endif
     }
 
-    if (uint32 guildId = Player::GetGuildIdFromStorage(pCurrChar->GetGUIDLow()))
+    if (uint32 guildId = Player::GetGuildIdFromStorage(pCurrChar->GetGUID()))
     {
         Guild* guild = sGuildMgr->GetGuildById(guildId);
         Guild::Member const* member = guild ? guild->GetMember(pCurrChar->GetGUID()) : nullptr;
@@ -936,7 +936,8 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         }
         else
         {
-            sLog->outError("Player %s (GUID: %u) marked as member of not existing guild (id: %u), removing guild membership for player.", pCurrChar->GetName().c_str(), pCurrChar->GetGUIDLow(), guildId);
+            sLog->outError("Player %s (%s) marked as member of not existing guild (id: %u), removing guild membership for player.",
+                pCurrChar->GetName().c_str(), pCurrChar->GetGUID().ToString().c_str(), guildId);
             pCurrChar->SetInGuild(0);
             pCurrChar->SetRank(0);
         }
@@ -994,7 +995,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     pCurrChar->SendInitialPacketsAfterAddToMap();
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_ONLINE);
-    stmt->setUInt32(0, pCurrChar->GetGUIDLow());
+    stmt->setUInt32(0, pCurrChar->GetGUID().GetCounter());
     CharacterDatabase.Execute(stmt);
 
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_ONLINE);
@@ -1033,7 +1034,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
 
     // friend status
     if (AccountMgr::IsGMAccount(GetSecurity())) // pussywizard: only for non-gms
-        sSocialMgr->SendFriendStatus(pCurrChar, FRIEND_ONLINE, pCurrChar->GetGUIDLow(), true);
+        sSocialMgr->SendFriendStatus(pCurrChar, FRIEND_ONLINE, pCurrChar->GetGUID(), true);
 
     // Place character in world (and load zone) before some object loading
     pCurrChar->LoadCorpse();
@@ -1131,8 +1132,8 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         SendNotification(LANG_GM_ON);
 
     std::string IP_str = GetRemoteAddress();
-    sLog->outChar("Account: %d (IP: %s) Login Character:[%s] (GUID: %u) Level: %d",
-                  GetAccountId(), IP_str.c_str(), pCurrChar->GetName().c_str(), pCurrChar->GetGUIDLow(), pCurrChar->getLevel());
+    sLog->outChar("Account: %d (IP: %s) Login Character:[%s] (%s) Level: %d",
+                  GetAccountId(), IP_str.c_str(), pCurrChar->GetName().c_str(), pCurrChar->GetGUID().ToString().c_str(), pCurrChar->getLevel());
 
     if (!pCurrChar->IsStandState() && !pCurrChar->HasUnitState(UNIT_STATE_STUNNED))
         pCurrChar->SetStandState(UNIT_STAND_STATE_STAND);

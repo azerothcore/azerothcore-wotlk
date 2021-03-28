@@ -1602,8 +1602,8 @@ void GameObject::Use(Unit* user)
                 GameObjectTemplate const* info = GetGOInfo();
 
                 // ritual owner is set for GO's without owner (not summoned)
-                if (m_ritualOwnerGUIDLow == 0 && !owner)
-                    m_ritualOwnerGUIDLow = player->GetGUIDLow();
+                if (!m_ritualOwnerGUID && !owner)
+                    m_ritualOwnerGUID = player->GetGUID();
 
                 if (owner)
                 {
@@ -1824,8 +1824,8 @@ void GameObject::Use(Unit* user)
             }
         default:
             if (GetGoType() >= MAX_GAMEOBJECT_TYPE)
-                sLog->outError("GameObject::Use(): unit (type: %u, guid: %u, name: %s) tries to use object (guid: %u, entry: %u, name: %s) of unknown type (%u)",
-                               user->GetTypeId(), user->GetGUIDLow(), user->GetName().c_str(), GetGUIDLow(), GetEntry(), GetGOInfo()->name.c_str(), GetGoType());
+                sLog->outError("GameObject::Use(): unit (%s, name: %s) tries to use object (%s, name: %s) of unknown type (%u)",
+                               user->GetGUID().ToString().c_str(), user->GetName().c_str(), GetGUID().ToString().c_str(),  GetGOInfo()->name.c_str(), GetGoType());
             break;
     }
 

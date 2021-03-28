@@ -710,9 +710,9 @@ InstancePlayerBind* InstanceSaveManager::PlayerGetBoundInstance(uint32 guidLow, 
         return nullptr;
 }
 
-bool InstanceSaveManager::PlayerIsPermBoundToInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty)
+bool InstanceSaveManager::PlayerIsPermBoundToInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty)
 {
-    if (InstancePlayerBind* bind = PlayerGetBoundInstance(guidLow, mapid, difficulty))
+    if (InstancePlayerBind* bind = PlayerGetBoundInstance(guid, mapid, difficulty))
         if (bind->perm)
             return true;
     return false;
@@ -743,7 +743,7 @@ uint32 InstanceSaveManager::PlayerGetDestinationInstanceId(Player* player, uint3
     // returning 0 means a new instance will be created
     // non-zero implicates that InstanceSave exists
 
-    InstancePlayerBind* ipb = PlayerGetBoundInstance(player->GetGUIDLow(), mapid, difficulty);
+    InstancePlayerBind* ipb = PlayerGetBoundInstance(player->GetGUID(), mapid, difficulty);
     if (ipb && ipb->perm) // 1. self perm
         return ipb->save->GetInstanceId();
     if (Group* g = player->GetGroup())
@@ -755,7 +755,7 @@ uint32 InstanceSaveManager::PlayerGetDestinationInstanceId(Player* player, uint3
     return ipb ? ipb->save->GetInstanceId() : 0; // 4. self temp
 }
 
-void InstanceSaveManager::CopyBinds(uint32 from, uint32 to, Player* toPlr)
+void InstanceSaveManager::CopyBinds(ObjectGuid from, ObjectGuid to, Player* toPlr)
 {
     if (from == to)
         return;

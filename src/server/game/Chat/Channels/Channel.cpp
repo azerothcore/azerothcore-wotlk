@@ -1263,7 +1263,7 @@ void Channel::RemoveWatching(Player* p)
 
 void Channel::ToggleModeration(Player* player)
 {
-    uint64 guid = player->GetGUIDLow();
+    ObjectGuid guid = player->GetGUID();
 
     if (!IsOn(guid))
     {

@@ -935,7 +935,7 @@ private:
     BG_IC_GateState GateStatus[6];
     ICNodePoint nodePoint[7];
 
-    typedef std::map<uint32, uint32> RespawnMap;
+    typedef std::map<ObjectGuid, uint32> RespawnMap;
     RespawnMap respawnMap;
 
     MotionTransport* gunshipAlliance;

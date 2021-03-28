@@ -92,20 +92,20 @@ private:
 class MailReceiver
 {
 public:                                                 // Constructors
-    explicit MailReceiver(uint32 receiver_lowguid) : m_receiver(nullptr), m_receiver_lowguid(receiver_lowguid) {}
+    explicit MailReceiver(ObjectGuid::LowType receiver_lowguid) : m_receiver(nullptr), m_receiver_lowguid(receiver_lowguid) {}
     MailReceiver(Player* receiver);
-    MailReceiver(Player* receiver, uint32 receiver_lowguid);
+    MailReceiver(Player* receiver, ObjectGuid::LowType receiver_lowguid);
 public:                                                 // Accessors
     [[nodiscard]] Player* GetPlayer() const { return m_receiver; }
-    [[nodiscard]] uint32  GetPlayerGUIDLow() const { return m_receiver_lowguid; }
+    [[nodiscard]] ObjectGuid::LowType  GetPlayerGUIDLow() const { return m_receiver_lowguid; }
 private:
     Player* m_receiver;
-    uint32  m_receiver_lowguid;
+    ObjectGuid::LowType  m_receiver_lowguid;
 };
 
 class MailDraft
 {
-    typedef std::map<uint32, Item*> MailItemMap;
+    typedef std::map<ObjectGuid, Item*> MailItemMap;
 
 public:                                                 // Constructors
     explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
@@ -157,8 +157,8 @@ struct Mail
     uint8 messageType;
     uint8 stationery;
     uint16 mailTemplateId;
-    ObjectGuid sender;
-    ObjectGuid receiver;
+    uint32 sender;
+    ObjectGuid::LowType receiver;
     std::string subject;
     std::string body;
     std::vector<MailItemInfo> items;

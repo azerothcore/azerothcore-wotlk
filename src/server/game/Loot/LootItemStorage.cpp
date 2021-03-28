@@ -198,13 +198,13 @@ void LootItemStorage::RemoveStoredLootMoney(uint32 containerId, Loot* loot)
         lootItemStore.erase(itr);
 }
 
-void LootItemStorage::RemoveStoredLoot(uint32 containerId)
+void LootItemStorage::RemoveStoredLoot(ObjectGuid containerGuid)
 {
-    lootItemStore.erase(containerId);
+    lootItemStore.erase(containerGuid);
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEMCONTAINER_CONTAINER);
-    stmt->setUInt32(0, containerId);
+    stmt->setUInt32(0, containerGuid.GetCounter());
     trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);
