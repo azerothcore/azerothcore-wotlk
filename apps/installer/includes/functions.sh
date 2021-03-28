@@ -2,7 +2,7 @@ function inst_configureOS() {
     echo "Platform: $OSTYPE"
     case "$OSTYPE" in
         solaris*) echo "Solaris is not supported yet" ;;
-        darwin*)  source "$AC_PATH_INSTALLER/includes/os_configs/osx.sh" ;;  
+        darwin*)  source "$AC_PATH_INSTALLER/includes/os_configs/osx.sh" ;;
         linux*)
             # If $OSDISTRO is set, use this value (from config.sh)
             if [ ! -z "$OSDISTRO" ]; then
@@ -153,7 +153,7 @@ function inst_module_install {
     if [[ "$b" != "none" ]]; then
         Joiner:add_repo "https://github.com/azerothcore/$res" "$res" "$b" && echo "Done, please re-run compiling and db assembly. Read instruction on module repository for more information"
     else
-        echo "Cannot install $res module: it doesn't exists or no version compatible with AC v$ACORE_VERSION are available"   
+        echo "Cannot install $res module: it doesn't exists or no version compatible with AC v$ACORE_VERSION are available"
     fi
 
     echo "";
@@ -219,11 +219,11 @@ function inst_simple_restarter {
 }
 
 function inst_download_client_data {
-    if [[ $DOCKER ]]; then
-        local path="$AC_PATH_ROOT/docker/worldserver/data"
-    else
-        local path="$AC_BINPATH_FULL"
-    fi
+    # first check if it's defined in env, otherwise use the default
+    local path="${DATAPATH:-$AC_BINPATH_FULL}"
+
+    # create the path if doesn't exists
+    mkdir -p "$path"
 
     echo "Downloading client data in: $path/data.zip ..."
     curl -L https://github.com/wowgaming/client-data/releases/download/v9/data.zip > "$path/data.zip" \

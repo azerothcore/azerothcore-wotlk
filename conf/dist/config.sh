@@ -5,7 +5,9 @@ SRCPATH="$AC_PATH_ROOT"
 # absolute path where build files must be stored
 BUILDPATH="$AC_PATH_ROOT/var/build/obj"
 
-# absolute path where binary files must be stored
+# absolute path where azerothcore will be installed
+# NOTE: on linux the binaries are stored in a subfolder (/bin)
+# of the $BINPATH
 BINPATH="$AC_PATH_ROOT/env/dist"
 
 # bash fills it by default with your os type. No need to change it.
@@ -15,11 +17,16 @@ BINPATH="$AC_PATH_ROOT/env/dist"
 # When using linux, our installer automatically get information about your distro
 # using lsb_release. If your distro is not supported but it's based on ubuntu or debian,
 # please change it to one of these values.
-#OSDISTRO="ubuntu"
+# OSDISTRO="ubuntu"
 
 # absolute path where config. files must be stored
 # default: the system will use binpath by default
 # CONFDIR="$AC_PATH_ROOT/env/dist/etc/"
+
+# absolute path where maps and client data will be downloaded
+# by the AC dashboard
+# default: the system will use binpath by default
+# DATAPATH="$BINPATH/bin"
 
 ##############################################
 #

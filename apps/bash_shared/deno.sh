@@ -8,13 +8,13 @@ function denoInstall() {
     { # catch
         echo "Installing Deno..."
         # just one line of command that works on all OSes
-        # (temporary cd into AC_PATH_APPS)
-        curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL="$AC_PATH_APPS/deno" sh
+        # (temporary cd into AC_PATH_DEPS)
+        curl -fsSL https://deno.land/x/install/install.sh | DENO_INSTALL="$AC_PATH_DEPS/deno" sh
     }
 }
 
 function denoCmd() {
-    (cd "$AC_PATH_APPS" ; ./deno/bin/deno "$@")
+    (cd "$AC_PATH_DEPS" ; ./deno/bin/deno "$@")
 }
 
 function denoRunFile() {

@@ -9,9 +9,9 @@ services:
     networks:
       - ac-network
     ports:
-      - ${DB_EXTERNAL_PORT:-3306}:3306
+      - ${DOCKER_DB_EXTERNAL_PORT:-3306}:3306
     environment:
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-password}
+      - MYSQL_ROOT_PASSWORD=${DOCKER_DB_ROOT_PASSWORD:-password}
     volumes:
       - type: volume
         source: ac-database
@@ -29,22 +29,25 @@ services:
     networks:
       - ac-network
     ports:
-      - ${WORLD_EXTERNAL_PORT:-8085}:8085
-      - ${SOAP_EXTERNAL_PORT:-7878}:7878
+      - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
+      - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
       - ac-dist:/azerothcore/env/dist
       - type: bind
-        source: ${WORLDSERVER_ETC:-./docker/worldserver/etc}
+        source: ${DOCKER_WORLDSERVER_ETC:-./docker/worldserver/etc}
         target: /azerothcore/env/dist/etc
       - type: bind
-        source: ${WORLDSERVER_LOGS:-./docker/worldserver/logs}
+        source: ${DOCKER_WORLDSERVER_LOGS:-./docker/worldserver/logs}
         target: /azerothcore/env/dist/logs
+        bind:
+          # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
+          propagation: delegated
       - type: bind
-        source: ${WORLDSERVER_DATA:-./docker/worldserver/data}
+        source: ${DOCKER_WORLDSERVER_DATA:-./docker/worldserver/data}
         target: /azerothcore/env/dist/data
-      - ./apps:/azerothcore/apps
-      - ./acore.sh:/azerothcore/acore.sh
-      - ./acore.json:/azerothcore/acore.json
+        bind:
+          # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
+          propagation: delegated
     working_dir: /azerothcore
     depends_on:
       - ac-database
@@ -58,80 +61,112 @@ services:
     networks:
       - ac-network
     ports:
-      - ${AUTH_EXTERNAL_PORT:-3724}:3724
+      - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     volumes:
       - ac-dist:/azerothcore/env/dist
       - type: bind
-        source: ${AUTHSERVER_ETC:-./docker/authserver/etc}
+        source: ${DOCKER_AUTHSERVER_ETC:-./docker/authserver/etc}
         target: /azerothcore/env/dist/etc
       - type: bind
-        source: ${AUTHSERVER_LOGS:-./docker/authserver/logs}
+        source: ${DOCKER_WORLDSERVER_LOGS:-./docker/worldserver/logs}
         target: /azerothcore/env/dist/logs
+        bind:
+          # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
+          propagation: delegated
     depends_on:
       - ac-database
 
-  ac-build:
-    image: local/azerothcore/build
-    networks:
-      - ac-network
-    build:
-      context: .
-      dockerfile: ./docker/build/Dockerfile
-      args:
-        ENABLE_SCRIPTS: ${ENABLE_SCRIPTS:-1}
-        USER_ID: ${USER_ID:-1000}
-        GROUP_ID: ${GROUP_ID:-1000}
-    volumes:
-      - ac-build:/azerothcore/var/build
-      - ac-dist:/azerothcore/env/dist
-      - ./docker/config-docker.sh:/azerothcore/conf/dist/config.sh
-      - ./conf/dist/config.sh:/azerothcore/conf/dist/config-default.sh
-    profiles:
-      - build
-    depends_on:
-      - ac-database
 
-  ac-worldserver-dev:
+#======================
+#
+# DEV services
+#
+#======================
+
+  ac-dev-server-base:
     networks:
       - ac-network
     tty: true
-    image: local/azerothcore/worldserver-dev
+    image: local/azerothcore/dev-server
     security_opt:
       - seccomp:unconfined
+    environment:
+      USER_CONF_PATH: "/azerothcore/docker/config-docker.sh"
     build:
       context: .
-      dockerfile: ./docker/worldserver/Dockerfile.gdb
+      dockerfile: ./docker/dev-server/Dockerfile
       args:
-        USER_ID: ${USER_ID:-1000}
-        GROUP_ID: ${GROUP_ID:-1000}
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+    profiles:
+      - astract-service # do not run this
+
+  ac-dev-server-bind:
+    extends: ac-dev-server-base
     volumes:
-      - type: bind
-        source: ./
-        target: /azerothcore/
+      - .:/azerothcore/
+      # installation files shared between services
       - ac-dist:/azerothcore/env/dist
+      # build files, we need a volume here to share it with the ac-build process
       - ac-build:/azerothcore/var/build
       - type: bind
-        source: ${WORLDSERVER_ETC:-./docker/worldserver/etc}
+        source: ${DOCKER_WORLDSERVER_ETC:-./docker/worldserver/etc}
         target: /azerothcore/env/dist/etc
       - type: bind
-        source: ${WORLDSERVER_LOGS:-./docker/worldserver/logs}
+        source: ${DOCKER_WORLDSERVER_LOGS:-./docker/worldserver/logs}
         target: /azerothcore/env/dist/logs
+        bind:
+          # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
+          propagation: delegated
       - type: bind
-        source: ${WORLDSERVER_DATA:-./docker/worldserver/data}
+        source: ${DOCKER_WORLDSERVER_DATA:-./docker/worldserver/data}
         target: /azerothcore/env/dist/data
-      - ./docker/config-docker.sh:/azerothcore/conf/dist/config.sh
-      - ./conf/dist/config.sh:/azerothcore/conf/dist/config-default.sh
-      - ./acore.json:/azerothcore/acore.json
+        bind:
+          # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
+          propagation: delegated
+    profiles:
+      - astract-service # do not run this
+
+  ac-dev-server-no-bind:
+    extends: ac-dev-server-base
+    volumes:
+      - ac-proj::/azerothcore/
+      # installation files shared between services
+      - ac-dist:/azerothcore/env/dist
+      # build files, we need a volume here to share it with the ac-build process
+      - ac-build:/azerothcore/var/build
+    profiles:
+      - astract-service # do not run this
+
+  ac-dev-server:
+    # To maximize the performance on MAC you can change the DOCKER_BASE_DEV_SERVICE variable
+    # to "ac-dev-server-no-bind", however it won't bind the host directory inside the container.
+    # It means that you need to work directly within the container using a tool
+    # like the VScode dev-container of the remote-extension suite
+    extends: ${DOCKER_BASE_DEV_SERVICE:-"ac-dev-server-bind"}
     ports:
-      - ${WORLD_EXTERNAL_PORT:-8085}:8085
-      - ${SOAP_EXTERNAL_PORT:-7878}:7878
+      - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
+      - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
+    # This cannot be extended, so we need to define it here
+    depends_on:
+      - ac-database
     profiles:
       - dev
+
+  ac-build:
+    extends: ${DOCKER_BASE_DEV_SERVICE:-"ac-dev-server-bind"}
+    command: bash acore.sh compiler build && bash acore.sh db-assembler import-all
+    # This cannot be extended, so we need to define it here
+    depends_on:
+      - ac-database
+    profiles:
+      - build
 
 volumes:
   ac-database:
   ac-dist:
   ac-build:
+  ac-proj:
 
 networks:
   ac-network:

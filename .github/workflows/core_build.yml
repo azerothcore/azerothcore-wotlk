@@ -157,7 +157,7 @@ jobs:
         run: |
           docker-compose build ac-worldserver
 
-  docker-worldserver-dev:
+  docker-dev-server:
     strategy:
       fail-fast: true
     runs-on: ubuntu-20.04
@@ -170,7 +170,7 @@ jobs:
           docker-compose --version
       - name: Build
         run: |
-          docker-compose build ac-worldserver-dev
+          docker-compose build ac-dev-server
 
   docker-authserver:
     strategy:

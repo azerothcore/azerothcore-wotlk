@@ -24,7 +24,7 @@ docker/worldserver/data/
 !docker/build
 .env
 apps/joiner
-apps/deno
+deps/deno
 
 /docker-compose.override.yml
 

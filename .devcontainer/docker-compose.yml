@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   # Update this to the name of the service you want to work with in your docker-compose.yml file
-  ac-worldserver-dev:
+  ac-dev-server:
     # If you want add a non-root user to your Dockerfile, you can use the "remoteUser"
     # property in devcontainer.json to cause VS Code its sub-processes (terminals, tasks,
     # debugging) to execute as the user. Uncomment the next line if you want the entire

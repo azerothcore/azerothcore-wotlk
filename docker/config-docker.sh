@@ -1,8 +1,11 @@
 CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-source "$CUR_PATH/config-default.sh" # binded by docker-compose
-
 CTYPE=Debug
+
+# first check if it's defined in env, otherwise use the default
+CSCRIPTS=${ENABLE_SCRIPTS:-1}
+
+DATAPATH="$BINPATH/data"
 
 DB_AUTH_CONF="MYSQL_USER='root'; \
                     MYSQL_PASS='password'; \
