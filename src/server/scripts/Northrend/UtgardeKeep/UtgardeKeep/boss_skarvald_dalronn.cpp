@@ -179,7 +179,7 @@ public:
                     Talk(YELL_SKARVALD_DAL_DIEDFIRST);
                     break;
                 case EVENT_SPELL_CHARGE:
-                    if( Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, (IsHeroic() ? 100.0f : 30.0f), true) )
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, (IsHeroic() ? 100.0f : 30.0f), true))
                     {
                         ScriptedAI::DoResetThreat();
                         me->AddThreat(target, 10000.0f);
@@ -188,7 +188,7 @@ public:
                     events.RepeatEvent(urand(5000, 10000));
                     break;
                 case EVENT_SPELL_STONE_STRIKE:
-                    if( me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()) )
+                    if (me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         me->CastSpell(me->GetVictim(), SPELL_STONE_STRIKE, false);
                         events.RepeatEvent(urand(5000, 10000));
@@ -276,12 +276,12 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(DATA_DALRONN_AND_SKARVALD, IN_PROGRESS);
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SKARVALD)))
+                if (Creature* skarvald = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SKARVALD)))
                 {
-                    if (!c->IsInCombat() && who)
+                    if (!skarvald->IsInCombat() && who)
                     {
-                        c->AddThreat(who, 0.0f);
-                        c->AI()->AttackStart(who);
+                        skarvald->AddThreat(who, 0.0f);
+                        skarvald->AI()->AttackStart(who);
                     }
                 }
             }
@@ -347,11 +347,11 @@ public:
                     Talk(YELL_DALRONN_SKA_DIEDFIRST);
                     break;
                 case EVENT_SPELL_SHADOW_BOLT:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 42.0f, true))
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
                     {
                         me->CastSpell(target, DUNGEON_MODE(SPELL_SHADOW_BOLT_N, SPELL_SHADOW_BOLT_H), false);
                     }
-                    events.RepeatEvent(2500);
+                    events.RepeatEvent(2050);
                     break;
                 case EVENT_SPELL_DEBILITATE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true))
