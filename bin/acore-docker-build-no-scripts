@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-ENABLE_SCRIPTS=0 docker-compose --profile build up --build ac-build
-

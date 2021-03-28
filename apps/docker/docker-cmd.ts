@@ -2,51 +2,67 @@ import { Command } from 'https://cdn.depjs.com/cmd/mod.ts'
 
 const program = new Command();
 
-program.name("acore.sh docker").version("0.0.1");
+program.name("acore.sh docker")
+    .description("Shell scripts for docker")
+    .version("1.0.0");
 
-program.command("dashboard [args...]")
-  .description("Run the acore dashboard command under docker")
-  .action(async (args: any[]) => {
-    const { run } = Deno;
+shellCommandFactory(
+    "start:app",
+    "Startup the authserver and worldserver apps",
+    "docker-compose --profile app up"
+);
 
-    const cmd = run({
-      cmd: [
-        "docker-compose",
-        "exec",
-        "ac-worldserver",
-        "bash",
-        "acore.sh",
-        ...args,
-      ],
-    });
+shellCommandFactory(
+    "start:dev",
+    "Startup the dev server",
+    "docker-compose --profile dev up"
+);
 
-    await cmd.status();
+shellCommandFactory(
+    "build",
+    "Build the authserver and worldserver",
+    `docker-compose run ac-dev-server bash bin/acore-docker-build`
+);
 
-    cmd.close();
-  });
+shellCommandFactory(
+    "build:clean",
+    "Clean build data",
+    `docker-compose run ac-dev-server bash rm -rf var/build`
+);
 
-program.command("client-data")
-  .description(
-    "Download client data inside ac-worldserver docker-compose container",
-  )
-  .action(async (args: any[]) => {
-    console.log("Downloading client data");
-    const { run } = Deno;
+shellCommandFactory(
+    "client-data",
+    "Download client data inside the ac-data volume",
+    "docker-compose run ac-dev-server bash acore.sh client-data"
+);
 
-    const cmd = run({
-      cmd: [
-        "docker-compose",
-        "exec",
-        "ac-worldserver",
-        "bash",
-        "acore.sh",
-        "client-data",
-      ],
-    });
+shellCommandFactory(
+    "dashboard [args...]",
+    "Execute acore dashboard within a running ac-dev-server",
+    "docker-compose exec ac-dev-server bash acore.sh"
+);
 
-    await cmd.status();
-
-    cmd.close();
-  });
 
 program.parse(Deno.args);
+
+function shellCommandFactory(name: string, description: string, command: string): Command {
+    return program.command(name)
+    .description(description)
+    .action(async (args: any[] | undefined) => {
+      const { run } = Deno;
+
+      const cmd = command.split(" ");
+
+      if (Array.isArray(args)) {
+          cmd.push(...args)
+      }
+
+      const shellCmd = run({
+        cmd
+      });
+
+      await shellCmd.status();
+
+      shellCmd.close();
+    });
+}

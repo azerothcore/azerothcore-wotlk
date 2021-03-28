@@ -18,7 +18,7 @@ x-ac-dev-server-base: &ac-dev-server-base
   security_opt:
     - seccomp:unconfined
   environment:
-    USER_CONF_PATH: "/azerothcore/docker/config-docker.sh"
+    USER_CONF_PATH: "/azerothcore/apps/docker/config-docker.sh"
   build:
     context: .
     dockerfile: ./apps/docker/Dockerfile.dev
@@ -37,22 +37,22 @@ services:
     image: local/azerothcore/abstract-bind
     volumes:
       - .:/azerothcore/
-      # installation files shared between services
-      - ac-dist:/azerothcore/env/dist
+      # env dir shared between services
+      # we cannot use /env/dist to avoid permission issues
+      - ac-env:/azerothcore/env
       # expose some dist folder outside allowing the host to use them
-      # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
+      - ${DOCKER_CONF:-./conf}:/azerothcore/conf
       - ${DOCKER_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
+      # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
       - ${DOCKER_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
       - ${DOCKER_DATA:-./env/docker/data}:/azerothcore/env/dist/data:delegated
-    profiles:
-      - astract-service # do not run this
+    profiles: [abstract-service] # do not run this
 
   abstract-no-bind:
     image: local/azerothcore/abstract-no-bind
     volumes:
       - ac-proj:/azerothcore/
-    profiles:
-      - astract-service # do not run this
+    profiles: [abstract-service] # do not run this
 
 #=======================
 #
@@ -92,7 +92,7 @@ services:
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
-    profiles: default
+    profiles: [app]
 
   ac-authserver:
     <<: *ac-shared-conf
@@ -105,8 +105,7 @@ services:
       dockerfile: ./apps/docker/Dockerfile.srv
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
-    profiles: default
-
+    profiles: [app]
 #======================
 #
 # Dev services
@@ -123,23 +122,11 @@ services:
       # build files, we need a volume here to share it with the ac-build process
       - ac-build:/azerothcore/var/build
     # This cannot be extended, so we need to define it here
-    profiles:
-      - dev
-
-  ac-build:
-    << : *ac-dev-server-base
-    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
-    command: bash acore.sh compiler build && bash acore.sh db-assembler import-all
-    volumes:
-      # build files, we need a volume here to share it with the ac-build process
-      - ac-build:/azerothcore/var/build
-    # This cannot be extended, so we need to define it here
-    profiles:
-      - build
+    profiles: [dev]
 
 volumes:
   ac-database:
-  ac-dist:
+  ac-env:
   ac-build:
   ac-proj:
 

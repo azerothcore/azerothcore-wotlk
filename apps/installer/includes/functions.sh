@@ -68,7 +68,6 @@ function inst_cleanCompile() {
 
 function inst_allInOne() {
     inst_configureOS
-    inst_updateRepo
     inst_compile
     dbasm_import true true true
 }

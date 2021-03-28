@@ -15,7 +15,7 @@ ENV TZ=Etc/UTC
 ENV DEBIAN_FRONTEND=noninteractive
 
 # install essentials
-RUN apt-get update && apt-get install -y gdb gdbserver git lsb-core sudo curl unzip
+RUN apt-get update && apt-get install -y gdb gdbserver git dos2unix lsb-core sudo curl unzip
 
 # copy everything so we can work directly within the container
 # using tools such as vscode dev-container

@@ -140,7 +140,7 @@ jobs:
           docker-compose --version
       - name: Build
         run: |
-          ./bin/acore-docker-build-no-scripts
+          docker-compose run -e ENABLE_SCRIPTS=0 ac-dev-server bash bin/acore-docker-build
 
   docker-worldserver:
     strategy:
