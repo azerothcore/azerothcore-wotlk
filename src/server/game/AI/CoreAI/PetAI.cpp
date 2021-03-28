@@ -243,12 +243,9 @@ void PetAI::UpdateAI(uint32 diff)
 
             if (spellInfo->IsPositive())
             {
-                if (spellInfo->CanBeUsedInCombat())
-                {
-                    // Check if we're in combat or commanded to attack
-                    if (!me->IsInCombat() && !me->GetCharmInfo()->IsCommandAttack())
-                        continue;
-                }
+                // Check if we're in combat or commanded to attack
+                if ((me->IsInCombat() || me->GetCharmInfo()->IsCommandAttack()) && !spellInfo->CanBeUsedInCombat())
+                    continue;
 
                 Spell* spell = new Spell(me, spellInfo, TRIGGERED_NONE, 0);
                 spell->LoadScripts(); // xinef: load for CanAutoCast (calling CheckPetCast)
