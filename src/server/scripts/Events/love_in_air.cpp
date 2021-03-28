@@ -29,6 +29,12 @@ enum Spells
     NPC_SOMETHING_STINKS_CREDIT     = 37558,
 };
 
+enum Quests
+{
+    QUEST_PILGRIM_HORDE = 24541,
+    QUEST_PILGRIM_ALLIANCE = 24656
+};
+
 class npc_love_in_air_supply_sentry : public CreatureScript
 {
 public:
@@ -53,9 +59,13 @@ public:
                     me->MonsterSay("That crate won't deliver itself, friend. Get a move on!", LANG_UNIVERSAL, who->ToPlayer());
 
                 if (who->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
-                    who->CastSpell(who, SPELL_GOBLIN_ALLY_COMPLETE, true);
+                {
+                    who->ToPlayer()->CompleteQuest(QUEST_PILGRIM_ALLIANCE);
+                }
                 else
-                    who->CastSpell(who, SPELL_GOBLIN_HORDE_COMPLETE, true);
+                {
+                    who->ToPlayer()->CompleteQuest(QUEST_PILGRIM_HORDE);
+                }
 
                 me->CastSpell(who, SPELL_GOBLIN_CARRY_CRATE, true);
             }
