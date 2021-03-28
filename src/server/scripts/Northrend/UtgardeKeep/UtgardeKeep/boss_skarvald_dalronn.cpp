@@ -28,8 +28,8 @@ enum eSpells
     // Skarvald
     SPELL_CHARGE                                = 43651,
     SPELL_STONE_STRIKE                          = 48583,
+    SPELL_ENRAGE                                = 48193,
     SPELL_SUMMON_SKARVALD_GHOST                 = 48613,
-
     // Dalronn
     SPELL_SHADOW_BOLT_N                         = 43649,
     SPELL_SHADOW_BOLT_H                         = 59575,
@@ -40,12 +40,14 @@ enum eSpells
 
 enum eEvents
 {
-    EVENT_SPELL_CHARGE                          = 1,
-    EVENT_SPELL_STONE_STRIKE,
-
-    EVENT_SPELL_SHADOW_BOLT,
-    EVENT_SPELL_DEBILITATE,
-    EVENT_SPELL_SUMMON_SKELETONS,
+    // Skarvald
+    EVENT_SHARVALD_CHARGE                       = 1,
+    EVENT_STONE_STRIKE,
+    EVENT_ENRAGE,
+    // Dalronn
+    EVENT_SHADOW_BOLT,
+    EVENT_DEBILITATE,
+    EVENT_SUMMON_SKELETONS,
 
     EVENT_YELL_DALRONN_AGGRO,
     EVENT_MATE_DIED
@@ -105,14 +107,16 @@ public:
         void EnterCombat(Unit* who) override
         {
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_CHARGE, 5000);
-            events.RescheduleEvent(EVENT_SPELL_STONE_STRIKE, 10000);
-
+            events.RescheduleEvent(EVENT_SHARVALD_CHARGE, 5000);
+            events.RescheduleEvent(EVENT_STONE_STRIKE, 10000);
             if (me->GetEntry() == NPC_SKARVALD)
             {
                 Talk(YELL_SKARVALD_AGGRO);
+                if (IsHeroic())
+                {
+                    events.ScheduleEvent(EVENT_ENRAGE, 1000);
+                }
             }
-
             if (pInstance)
             {
                 pInstance->SetData(DATA_DALRONN_AND_SKARVALD, IN_PROGRESS);
@@ -178,7 +182,7 @@ public:
                 case EVENT_MATE_DIED:
                     Talk(YELL_SKARVALD_DAL_DIEDFIRST);
                     break;
-                case EVENT_SPELL_CHARGE:
+                case EVENT_SHARVALD_CHARGE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, (IsHeroic() ? 100.0f : 30.0f), true))
                     {
                         ScriptedAI::DoResetThreat();
@@ -187,7 +191,7 @@ public:
                     }
                     events.RepeatEvent(urand(5000, 10000));
                     break;
-                case EVENT_SPELL_STONE_STRIKE:
+                case EVENT_STONE_STRIKE:
                     if (me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         me->CastSpell(me->GetVictim(), SPELL_STONE_STRIKE, false);
@@ -197,6 +201,14 @@ public:
                     {
                         events.RepeatEvent(3000);
                     }
+                    break;
+                case EVENT_ENRAGE:
+                    if (me->GetHealthPct() <= 60)
+                    {
+                        me->CastSpell(me, SPELL_ENRAGE, true);
+                        break;
+                    }
+                    events.RepeatEvent(1000);
                     break;
             }
             DoMeleeAttackIfReady();
@@ -263,11 +275,11 @@ public:
         void EnterCombat(Unit* who) override
         {
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_SHADOW_BOLT, 1000);
-            events.RescheduleEvent(EVENT_SPELL_DEBILITATE, 5000);
+            events.RescheduleEvent(EVENT_SHADOW_BOLT, 1000);
+            events.RescheduleEvent(EVENT_DEBILITATE, 5000);
             if (IsHeroic())
             {
-                events.RescheduleEvent(EVENT_SPELL_SUMMON_SKELETONS, 10000);
+                events.RescheduleEvent(EVENT_SUMMON_SKELETONS, 10000);
             }
             if (me->GetEntry() == NPC_DALRONN)
             {
@@ -346,14 +358,14 @@ public:
                 case EVENT_MATE_DIED:
                     Talk(YELL_DALRONN_SKA_DIEDFIRST);
                     break;
-                case EVENT_SPELL_SHADOW_BOLT:
+                case EVENT_SHADOW_BOLT:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 40.0f, true))
                     {
                         me->CastSpell(target, DUNGEON_MODE(SPELL_SHADOW_BOLT_N, SPELL_SHADOW_BOLT_H), false);
                     }
                     events.RepeatEvent(2050);
                     break;
-                case EVENT_SPELL_DEBILITATE:
+                case EVENT_DEBILITATE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f, true))
                     {
                         me->CastSpell(target, SPELL_DEBILITATE, false);
@@ -364,7 +376,7 @@ public:
                         events.RepeatEvent(3000);
                     }
                     break;
-                case EVENT_SPELL_SUMMON_SKELETONS:
+                case EVENT_SUMMON_SKELETONS:
                     me->CastSpell((Unit*)nullptr, SPELL_SUMMON_SKELETONS, false);
                     events.RepeatEvent(urand(20000, 30000));
                     break;
