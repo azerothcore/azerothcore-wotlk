@@ -16,7 +16,7 @@ SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '161176926458895660
 
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1611769264588956600');
 
-ALTER TABLE `creature_template` ADD COLUMN `spell_school_immune_mask` INT(3) UNSIGNED NOT NULL DEFAULT 0 AFTER `mechanic_immune_mask`;
+ALTER TABLE `creature_template` ADD COLUMN `spell_school_immune_mask` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `mechanic_immune_mask`;
 
 -- Imported from TrinityCore
 -- SPELL_SCHOOL_NORMAL

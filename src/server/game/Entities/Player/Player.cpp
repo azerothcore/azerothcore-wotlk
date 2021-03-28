@@ -6383,6 +6383,24 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLeve
     return false;
 }
 
+float getProbabilityOfLevelUp(uint32 SkillValue)
+{
+    /* According to El's Extreme Angling page, from 1 to 115 the probability of a skill
+     * level up is 100% since 100/1 = 100. From 115 - 135 should average 2 catches per
+     * skill up so that means 100/2 = 50%.
+     * This returns the probability depending on the player's SkillValue.
+     */
+    if (!SkillValue)
+    {
+        return 0.0f;
+    }
+
+    std::array bounds{ 115, 135, 160, 190, 215, 295, 315, 355, 425, 450 };
+    std::array<float, 11> dens{ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 9.0f, 10.0f, 11.0f, 12.0f, 1.0f };
+    auto it = std::lower_bound(std::begin(bounds), std::end(bounds), SkillValue);
+    return 100 / dens[std::distance(std::begin(bounds), it)];
+}
+
 bool Player::UpdateFishingSkill()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -6391,11 +6409,15 @@ bool Player::UpdateFishingSkill()
 
     uint32 SkillValue = GetPureSkillValue(SKILL_FISHING);
 
-    int32 chance = SkillValue < 75 ? 100 : 2500 / (SkillValue - 50);
+    if (SkillValue >= GetMaxSkillValue(SKILL_FISHING))
+    {
+        return false;
+    }
 
-    uint32 gathering_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
-
-    return UpdateSkillPro(SKILL_FISHING, chance * 10, gathering_skill_gain);
+    /* Whenever the player clicks on the fishing gameobject the
+     * core will decide based on a probability if the skill raises or not.
+     */
+    return UpdateSkillPro(SKILL_FISHING, static_cast<int32>(getProbabilityOfLevelUp(SkillValue)) * 10, sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING));
 }
 
 // levels sync. with spell requirement for skill levels to learn
@@ -12704,7 +12726,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
         pItem = StoreItem(dest, pItem, update);
 
-        if (allowedLooters.size() > 1 && pItem->GetTemplate()->GetMaxStackSize() == 1 && pItem->IsSoulBound())
+        if (allowedLooters.size() > 1 && pItem->GetTemplate()->GetMaxStackSize() == 1 && pItem->IsSoulBound() && sWorld->getBoolConfig(CONFIG_SET_BOP_ITEM_TRADEABLE))
         {
             pItem->SetSoulboundTradeable(allowedLooters);
             pItem->SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, GetTotalPlayedTime());
@@ -24500,7 +24522,7 @@ void Player::UpdateAreaDependentAuras(uint32 newArea)
     for (AuraMap::iterator iter = m_ownedAuras.begin(); iter != m_ownedAuras.end();)
     {
         // use m_zoneUpdateId for speed: UpdateArea called from UpdateZone or instead UpdateZone in both cases m_zoneUpdateId up-to-date
-        if (iter->second->GetSpellInfo()->CheckLocation(GetMapId(), m_zoneUpdateId, newArea, this) != SPELL_CAST_OK)
+        if (iter->second->GetSpellInfo()->CheckLocation(GetMapId(), m_zoneUpdateId, newArea, this, false) != SPELL_CAST_OK)
             RemoveOwnedAura(iter);
         else
             ++iter;
@@ -25520,11 +25542,19 @@ uint32 Player::CalculateTalentsPoints() const
     return uint32(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
 }
 
-bool Player::canFlyInZone(uint32 mapid, uint32 zone) const
+bool Player::canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) const
 {
     // continent checked in SpellInfo::CheckLocation at cast and area update
     uint32 v_map = GetVirtualMapForMapAndZone(mapid, zone);
-    return v_map != 571 || HasSpell(54197); // 54197 = Cold Weather Flying
+    if (v_map == 571 && !bySpell->HasAttribute(SPELL_ATTR7_IGNORE_COLD_WEATHER_FLYING))
+    {
+        if (!HasSpell(54197)) // 54197 = Cold Weather Flying
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void Player::learnSpellHighRank(uint32 spellid)

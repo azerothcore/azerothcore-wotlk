@@ -6,21 +6,21 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `game_event`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `game_event` 
 (
-  `eventEntry` tinyint(3) unsigned NOT NULL COMMENT 'Entry of the game event',
+  `eventEntry` TINYINT unsigned NOT NULL COMMENT 'Entry of the game event',
   `start_time` timestamp NULL DEFAULT '2000-01-01 07:00:00' COMMENT 'Absolute start date, the event will never start before',
   `end_time` timestamp NULL DEFAULT '2000-01-01 07:00:00' COMMENT 'Absolute end date, the event will never start after',
-  `occurence` bigint(20) unsigned NOT NULL DEFAULT 5184000 COMMENT 'Delay in minutes between occurences of the event',
-  `length` bigint(20) unsigned NOT NULL DEFAULT 2592000 COMMENT 'Length in minutes of the event',
-  `holiday` mediumint(8) unsigned NOT NULL DEFAULT 0 COMMENT 'Client side holiday id',
-  `holidayStage` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `occurence` BIGINT unsigned NOT NULL DEFAULT 5184000 COMMENT 'Delay in minutes between occurences of the event',
+  `length` BIGINT unsigned NOT NULL DEFAULT 2592000 COMMENT 'Length in minutes of the event',
+  `holiday` MEDIUMINT unsigned NOT NULL DEFAULT 0 COMMENT 'Client side holiday id',
+  `holidayStage` TINYINT unsigned NOT NULL DEFAULT 0,
   `description` varchar(255) DEFAULT NULL COMMENT 'Description of the event displayed in console',
-  `world_event` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT '0 if normal event, 1 if world event',
-  `announce` tinyint(3) unsigned NOT NULL DEFAULT 2 COMMENT '0 dont announce, 1 announce, 2 value from config',
+  `world_event` TINYINT unsigned NOT NULL DEFAULT 0 COMMENT '0 if normal event, 1 if world event',
+  `announce` TINYINT unsigned NOT NULL DEFAULT 2 COMMENT '0 dont announce, 1 announce, 2 value from config',
   PRIMARY KEY (`eventEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `game_event` WRITE;

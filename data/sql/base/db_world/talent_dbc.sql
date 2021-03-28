@@ -6,34 +6,34 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `talent_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `talent_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `TabID` int(11) NOT NULL DEFAULT 0,
-  `TierID` int(11) NOT NULL DEFAULT 0,
-  `ColumnIndex` int(11) NOT NULL DEFAULT 0,
-  `SpellRank_1` int(11) NOT NULL DEFAULT 0,
-  `SpellRank_2` int(11) NOT NULL DEFAULT 0,
-  `SpellRank_3` int(11) NOT NULL DEFAULT 0,
-  `SpellRank_4` int(11) NOT NULL DEFAULT 0,
-  `SpellRank_5` int(11) NOT NULL DEFAULT 0,
-  `SpellRank_6` int(11) NOT NULL DEFAULT 0,
-  `SpellRank_7` int(11) NOT NULL DEFAULT 0,
-  `SpellRank_8` int(11) NOT NULL DEFAULT 0,
-  `SpellRank_9` int(11) NOT NULL DEFAULT 0,
-  `PrereqTalent_1` int(11) NOT NULL DEFAULT 0,
-  `PrereqTalent_2` int(11) NOT NULL DEFAULT 0,
-  `PrereqTalent_3` int(11) NOT NULL DEFAULT 0,
-  `PrereqRank_1` int(11) NOT NULL DEFAULT 0,
-  `PrereqRank_2` int(11) NOT NULL DEFAULT 0,
-  `PrereqRank_3` int(11) NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
-  `RequiredSpellID` int(11) NOT NULL DEFAULT 0,
-  `CategoryMask_1` int(11) NOT NULL DEFAULT 0,
-  `CategoryMask_2` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `TabID` INT NOT NULL DEFAULT 0,
+  `TierID` INT NOT NULL DEFAULT 0,
+  `ColumnIndex` INT NOT NULL DEFAULT 0,
+  `SpellRank_1` INT NOT NULL DEFAULT 0,
+  `SpellRank_2` INT NOT NULL DEFAULT 0,
+  `SpellRank_3` INT NOT NULL DEFAULT 0,
+  `SpellRank_4` INT NOT NULL DEFAULT 0,
+  `SpellRank_5` INT NOT NULL DEFAULT 0,
+  `SpellRank_6` INT NOT NULL DEFAULT 0,
+  `SpellRank_7` INT NOT NULL DEFAULT 0,
+  `SpellRank_8` INT NOT NULL DEFAULT 0,
+  `SpellRank_9` INT NOT NULL DEFAULT 0,
+  `PrereqTalent_1` INT NOT NULL DEFAULT 0,
+  `PrereqTalent_2` INT NOT NULL DEFAULT 0,
+  `PrereqTalent_3` INT NOT NULL DEFAULT 0,
+  `PrereqRank_1` INT NOT NULL DEFAULT 0,
+  `PrereqRank_2` INT NOT NULL DEFAULT 0,
+  `PrereqRank_3` INT NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
+  `RequiredSpellID` INT NOT NULL DEFAULT 0,
+  `CategoryMask_1` INT NOT NULL DEFAULT 0,
+  `CategoryMask_2` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `talent_dbc` WRITE;
