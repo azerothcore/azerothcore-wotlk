@@ -68,7 +68,7 @@ function _switch() {
             inst_simple_restarter authserver
             ;;
         ""|"d"|"docker"|"14")
-            DOCKER=1 denoRunFile "$AC_PATH_APPS/docker-tools/docker-tools.ts" "${@:2}"
+            DOCKER=1 denoRunFile "$AC_PATH_APPS/docker/docker-cmd.ts" "${@:2}"
             exit
             ;;
         ""|"quit"|"15")

@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 as dev
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 

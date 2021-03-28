@@ -65,4 +65,5 @@
         "codecvt": "cpp"
     },
     "deno.enable": true,
+    "deno.path" : "deps/deno/bin/deno"
 }

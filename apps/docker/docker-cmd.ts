@@ -1,10 +1,10 @@
-import { Command } from "https://cdn.depjs.com/cmd/mod.ts";
+import { Command } from 'https://cdn.depjs.com/cmd/mod.ts'
 
 const program = new Command();
 
-program.version("0.0.1");
+program.name("acore.sh docker").version("0.0.1");
 
-program.command("acore.sh [args...]")
+program.command("dashboard [args...]")
   .description("Run the acore dashboard command under docker")
   .action(async (args: any[]) => {
     const { run } = Deno;
@@ -40,26 +40,6 @@ program.command("client-data")
         "ac-worldserver",
         "bash",
         "acore.sh",
-        "client-data",
-      ],
-    });
-
-    await cmd.status();
-
-    cmd.close();
-  });
-
-  program.command("client-data-test")
-  .description(
-    "Download client data inside docker/worldserver/data",
-  )
-  .action(async (args: any[]) => {
-    console.log("Downloading client data");
-    const { run } = Deno;
-
-    const cmd = run({
-      cmd: [
-        "../acore.sh",
         "client-data",
       ],
     });

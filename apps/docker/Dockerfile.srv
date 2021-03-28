@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 as srv
 
 # List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
@@ -15,6 +15,3 @@ RUN apt update && apt install -y gdb gdbserver net-tools tzdata;
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
 HEALTHCHECK --interval=5s --timeout=15s --start-period=30s --retries=3 CMD netstat -lnpt | grep :3724 || exit 1
-
-# run the authserver located in the directory "docker/authserver/bin" of the host machine
-CMD ["/azerothcore/env/dist/bin/authserver"]
