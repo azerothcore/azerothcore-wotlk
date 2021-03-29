@@ -181,6 +181,7 @@ enum NPCsGOs
     NPC_LAUGHING_SKULL                  = 33990,
 
     NPC_IMMORTAL_GUARDIAN               = 33988,
+    NPC_MARKED_IMMORTAL_GUARDIAN        = 36064,
 
     // CHAMBER ILLUSION
     NPC_CONSORT_FIRST                   = 33716,
