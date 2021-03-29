@@ -1,3 +1,19 @@
+-- DB update 2021_03_28_03 -> 2021_03_29_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_03_28_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_03_28_03 2021_03_29_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1616977871251124200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1616977871251124200');
 
 -- Add IA for 'Marked immortal guardian'
@@ -14,3 +30,12 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,
 (13,1,64172,0,0,31,0,3,33988,0,0,0,0,'','Titanic Storm on Immortal Guardian'),
 (13,1,64172,0,1,31,0,3,36064,0,0,0,0,'','Titanic Storm on Marked Immortal Guardian');
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
