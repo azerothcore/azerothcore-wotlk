@@ -365,7 +365,7 @@ void FollowMovementGenerator<Creature>::_updateSpeed(Creature* owner)
 {
     // pet only sync speed with owner
     /// Make sure we are not in the process of a map change (IsInWorld)
-    if (!IS_PLAYER_GUID(owner->GetOwnerGUID()) || !owner->IsInWorld() || !i_target.isValid() || i_target->GetGUID() != owner->GetOwnerGUID())
+    if (!IS_PLAYER_GUID(owner->GetOwnerGUID()) || !owner->IsInWorld() || !i_target.isValid() || i_target->GetGUID() != owner->GetOwnerGUID() || !(owner->GetOwner()->GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED).empty()))
         return;
 
     owner->UpdateSpeed(MOVE_RUN, true);
