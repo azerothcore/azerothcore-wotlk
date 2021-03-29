@@ -405,7 +405,7 @@ public:
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
-                case GO_DEATHKNIGHT_WING:
+                case GO_LOATHEB_PORTAL:
                     _loathebPortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_LOATHEB) == DONE)
                     {

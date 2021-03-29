@@ -87,7 +87,7 @@ enum NXGOs
     GO_KELTHUZAD_PORTAL_3           = 181404,
     GO_KELTHUZAD_PORTAL_4           = 181405,
 
-    GO_DEATHKNIGHT_WING             = 181577,
+    GO_LOATHEB_PORTAL               = 181577,
     GO_THADDIUS_PORTAL              = 181576,
     GO_MAEXXNA_PORTAL               = 181575,
     GO_HORSEMAN_PORTAL              = 181578,
