@@ -29,8 +29,8 @@ enum Spells
 
 enum Quests
 {
-    QUEST_PILGRIM_HORDE = 24541,
-    QUEST_PILGRIM_ALLIANCE = 24656
+    QUEST_PILGRIM_HORDE             = 24541,
+    QUEST_PILGRIM_ALLIANCE          = 24656
 };
 
 class npc_love_in_air_supply_sentry : public CreatureScript
