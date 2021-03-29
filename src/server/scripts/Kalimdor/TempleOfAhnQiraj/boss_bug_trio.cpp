@@ -85,7 +85,6 @@ public:
 
             VemDead = false;
             Death = false;
-            
             RespawnTrio();
         }
 
@@ -180,7 +179,6 @@ public:
             Enrage_Timer = 120000;
 
             Enraged = false;
-            
             RespawnTrio();
         }
 
@@ -273,7 +271,6 @@ public:
             Check_Timer = 2000;
 
             VemDead = false;
-            
             RespawnTrio();
         }
 
