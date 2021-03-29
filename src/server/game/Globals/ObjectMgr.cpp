@@ -338,8 +338,29 @@ ObjectMgr::~ObjectMgr()
         for (DungeonEncounterList::iterator encounterItr = itr->second.begin(); encounterItr != itr->second.end(); ++encounterItr)
             delete *encounterItr;
 
-    for (AccessRequirementContainer::iterator itr = _accessRequirementStore.begin(); itr != _accessRequirementStore.end(); ++itr)
-        delete itr->second;
+    for (DungeonProgressionRequirementsContainer::iterator itr = _accessRequirementStore.begin(); itr != _accessRequirementStore.end(); ++itr)
+    {
+        std::unordered_map<uint8, DungeonProgressionRequirements*> difficulties = itr->second;
+        for (auto difficultiesItr = difficulties.begin(); difficultiesItr != difficulties.end(); ++difficultiesItr)
+        {
+            for (auto questItr = difficultiesItr->second->quests.begin(); questItr != difficultiesItr->second->quests.end(); ++questItr)
+            {
+                delete* questItr;
+            }
+
+            for (auto achievementItr = difficultiesItr->second->achievements.begin(); achievementItr != difficultiesItr->second->achievements.end(); ++achievementItr)
+            {
+                delete* achievementItr;
+            }
+
+            for (auto itemsItr = difficultiesItr->second->items.begin(); itemsItr != difficultiesItr->second->items.end(); ++itemsItr)
+            {
+                delete* itemsItr;
+            }
+
+            delete difficultiesItr->second;
+        }
+    }
 }
 
 ObjectMgr* ObjectMgr::instance()
@@ -6171,96 +6192,164 @@ void ObjectMgr::LoadAccessRequirements()
 
     if (!_accessRequirementStore.empty())
     {
-        for (AccessRequirementContainer::iterator itr = _accessRequirementStore.begin(); itr != _accessRequirementStore.end(); ++itr)
-            delete itr->second;
+        for (DungeonProgressionRequirementsContainer::iterator itr = _accessRequirementStore.begin(); itr != _accessRequirementStore.end(); ++itr)
+        {
+            std::unordered_map<uint8, DungeonProgressionRequirements*> difficulties = itr->second;
+            for (auto difficultiesItr = difficulties.begin(); difficultiesItr != difficulties.end(); ++difficultiesItr)
+            {
+                for (auto questItr = difficultiesItr->second->quests.begin(); questItr != difficultiesItr->second->quests.end(); ++questItr)
+                {
+                    delete* questItr;
+                }
+
+                for (auto achievementItr = difficultiesItr->second->achievements.begin(); achievementItr != difficultiesItr->second->achievements.end(); ++achievementItr)
+                {
+                    delete* achievementItr;
+                }
+
+                for (auto itemsItr = difficultiesItr->second->items.begin(); itemsItr != difficultiesItr->second->items.end(); ++itemsItr)
+                {
+                    delete* itemsItr;
+                }
+
+                delete difficultiesItr->second;
+            }
+        }
 
         _accessRequirementStore.clear();                                  // need for reload case
     }
-
-    //                                               0      1           2          3          4     5      6             7             8                      9                  10
-    QueryResult result = WorldDatabase.Query("SELECT mapid, difficulty, level_min, level_max, item, item2, quest_done_A, quest_done_H, completed_achievement, quest_failed_text, item_level FROM access_requirement");
-    if (!result)
+    //                                                               0       1            2           3          4            5
+    QueryResult access_template_result = WorldDatabase.Query("SELECT id, map_id, difficulty, min_level, max_level, min_avg_item_level FROM dungeon_access_template");
+    if (!access_template_result)
     {
-        sLog->outString(">> Loaded 0 access requirement definitions. DB table `access_requirement` is empty.");
+        sLog->outString(">> Loaded 0 access requirement definitions. DB table `dungeon_access_template` is empty.");
         sLog->outString();
         return;
     }
 
     uint32 count = 0;
+    uint32 countProgressionRequirements = 0;
 
     do
     {
-        Field* fields = result->Fetch();
+        Field* fields = access_template_result->Fetch();
 
-        ++count;
+        //Get the common variables for the access requirements
+        uint8 dungeon_access_id = fields[0].GetUInt8();
+        uint32 mapid            = fields[1].GetUInt32();
+        uint8 difficulty        = fields[2].GetUInt8();
 
-        uint32 mapid = fields[0].GetUInt32();
-        uint8 difficulty = fields[1].GetUInt8();
-        uint32 requirement_ID = MAKE_PAIR32(mapid, difficulty);
+        //Set up the access requirements
+        DungeonProgressionRequirements* ar = new DungeonProgressionRequirements();
+        ar->levelMin     = fields[3].GetUInt8();
+        ar->levelMax     = fields[4].GetUInt8();
+        ar->reqItemLevel = fields[5].GetUInt16();
 
-        AccessRequirement* ar = new AccessRequirement();
-
-        ar->levelMin                 = fields[2].GetUInt8();
-        ar->levelMax                 = fields[3].GetUInt8();
-        ar->item                     = fields[4].GetUInt32();
-        ar->item2                    = fields[5].GetUInt32();
-        ar->quest_A                  = fields[6].GetUInt32();
-        ar->quest_H                  = fields[7].GetUInt32();
-        ar->achievement              = fields[8].GetUInt32();
-        ar->questFailedText          = fields[9].GetString();
-        ar->reqItemLevel             = fields[10].GetUInt16();
-
-        if (ar->item)
+        //                                                                              0                 1               2                 3        4         6
+        QueryResult progression_requirements_results = WorldDatabase.PQuery("SELECT requirement_type, requirement_id, requirement_note, faction, priority, leader_only FROM dungeon_access_requirements where dungeon_access_id = %u", dungeon_access_id);
+        if (progression_requirements_results)
         {
-            ItemTemplate const* pProto = GetItemTemplate(ar->item);
-            if (!pProto)
+            do
             {
-                sLog->outError("Key item %u does not exist for map %u difficulty %u, removing key requirement.", ar->item, mapid, difficulty);
-                ar->item = 0;
-            }
+                Field* progression_requirement_row = progression_requirements_results->Fetch();
+
+                const uint8 requirement_type             = progression_requirement_row[0].GetUInt8();
+                const uint32 requirement_id              = progression_requirement_row[1].GetUInt32();
+                const std::string requirement_note       = progression_requirement_row[2].GetString();
+                const uint8 requirement_faction          = progression_requirement_row[3].GetUInt8();
+                const uint8 requirement_priority         = progression_requirement_row[4].IsNull() ? UINT8_MAX : progression_requirement_row[4].GetUInt8();
+                const bool requirement_checkLeaderOnly   = progression_requirement_row[5].GetBool();
+
+                ProgressionRequirement* progression_requirement = new ProgressionRequirement();
+                progression_requirement->id              = requirement_id;
+                progression_requirement->note            = requirement_note;
+                progression_requirement->faction         = (TeamId)requirement_faction;
+                progression_requirement->priority        = requirement_priority;
+                progression_requirement->checkLeaderOnly = requirement_checkLeaderOnly;
+
+                std::vector<ProgressionRequirement*>* currentRequirementsList = nullptr;
+
+                switch (requirement_type)
+                {
+                case 0:
+                {
+                    //Achievement
+                    if (!sAchievementStore.LookupEntry(progression_requirement->id))
+                    {
+                        sLog->outErrorDb("Required achievement %u for faction %u does not exist for map %u difficulty %u, remove or fix this achievement requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
+                        break;
+                    }
+
+                    currentRequirementsList = &ar->achievements;
+                    break;
+                }
+                case 1:
+                {
+                    //Quest
+                    if (!GetQuestTemplate(progression_requirement->id))
+                    {
+                        sLog->outErrorDb("Required quest %u for faction %u does not exist for map %u difficulty %u, remove or fix this quest requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
+                        break;
+                    }
+
+                    currentRequirementsList = &ar->quests;
+                    break;
+                }
+                case 2:
+                {
+                    //Item
+                    ItemTemplate const* pProto = GetItemTemplate(progression_requirement->id);
+                    if (!pProto)
+                    {
+                        sLog->outError("Required item %u for faction %u does not exist for map %u difficulty %u, remove or fix this item requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
+                        break;
+                    }
+
+                    currentRequirementsList = &ar->items;
+                    break;
+                }
+                default:
+                    sLog->outError("requirement_type of %u is not valid for map %u difficulty %u. Please use 0 for achievements, 1 for quest, 2 for items or remove this entry from the db.", requirement_type, mapid, difficulty);
+                    break;
+                }
+
+                //Check if array is valid and delete the progression requirement
+                if (!currentRequirementsList)
+                {
+                    delete progression_requirement;
+                    continue;
+                }
+
+                //Insert into the array
+                if (currentRequirementsList->size() > requirement_priority)
+                {
+                    currentRequirementsList->insert(currentRequirementsList->begin() + requirement_priority, progression_requirement);
+                }
+                else
+                {
+                    currentRequirementsList->push_back(progression_requirement);
+                }
+
+
+            } while (progression_requirements_results->NextRow());
         }
 
-        if (ar->item2)
-        {
-            ItemTemplate const* pProto = GetItemTemplate(ar->item2);
-            if (!pProto)
-            {
-                sLog->outError("Second item %u does not exist for map %u difficulty %u, removing key requirement.", ar->item2, mapid, difficulty);
-                ar->item2 = 0;
-            }
-        }
+        //Sort all arrays for priority
+        auto sortFunction = [](const ProgressionRequirement* const a, const ProgressionRequirement* const b) {return a->priority > b->priority; };
+        std::sort(ar->achievements.begin(), ar->achievements.end(), sortFunction);
+        std::sort(ar->quests.begin(), ar->quests.end(), sortFunction);
+        std::sort(ar->items.begin(), ar->items.end(), sortFunction);
 
-        if (ar->quest_A)
-        {
-            if (!GetQuestTemplate(ar->quest_A))
-            {
-                sLog->outErrorDb("Required Alliance Quest %u not exist for map %u difficulty %u, remove quest done requirement.", ar->quest_A, mapid, difficulty);
-                ar->quest_A = 0;
-            }
-        }
+        countProgressionRequirements += ar->achievements.size();
+        countProgressionRequirements += ar->quests.size();
+        countProgressionRequirements += ar->items.size();
+        count++;
 
-        if (ar->quest_H)
-        {
-            if (!GetQuestTemplate(ar->quest_H))
-            {
-                sLog->outErrorDb("Required Horde Quest %u not exist for map %u difficulty %u, remove quest done requirement.", ar->quest_H, mapid, difficulty);
-                ar->quest_H = 0;
-            }
-        }
+        _accessRequirementStore[mapid][difficulty] = ar;
+    } while (access_template_result->NextRow());
 
-        if (ar->achievement)
-        {
-            if (!sAchievementStore.LookupEntry(ar->achievement))
-            {
-                sLog->outErrorDb("Required Achievement %u not exist for map %u difficulty %u, remove quest done requirement.", ar->achievement, mapid, difficulty);
-                ar->achievement = 0;
-            }
-        }
 
-        _accessRequirementStore[requirement_ID] = ar;
-    } while (result->NextRow());
-
-    sLog->outString(">> Loaded %u access requirement definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString(">> Loaded %u rows from dungeon_access_template and %u rows from dungeon_access_requirements in %u ms", count, countProgressionRequirements, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
 }
 
