@@ -837,17 +837,23 @@ enum PlayerCharmedAISpells
 #define MAX_PLAYER_SUMMON_DELAY                   (2*MINUTE)
 #define MAX_MONEY_AMOUNT                       (0x7FFFFFFF-1)
 
-struct AccessRequirement
+struct ProgressionRequirement
+{
+    uint32 id;
+    TeamId faction;
+    std::string note;
+    uint32 priority;
+    bool checkLeaderOnly;
+};
+
+struct DungeonProgressionRequirements
 {
     uint8  levelMin;
     uint8  levelMax;
-    uint32 item;
-    uint32 item2;
-    uint32 quest_A;
-    uint32 quest_H;
-    uint32 achievement;
-    std::string questFailedText;
     uint16 reqItemLevel;
+    std::vector<ProgressionRequirement*> quests;
+    std::vector<ProgressionRequirement*> items;
+    std::vector<ProgressionRequirement*> achievements;
 };
 
 enum CharDeleteMethod
@@ -2449,7 +2455,10 @@ public:
     [[nodiscard]] uint32 GetPendingBind() const { return _pendingBindId; }
     void SendRaidInfo();
     void SendSavedInstances();
-    bool Satisfy(AccessRequirement const* ar, uint32 target_map, bool report = false);
+    void PrettyPrintRequirementsQuestList(const std::vector<const ProgressionRequirement*>& missingQuests) const;
+    void PrettyPrintRequirementsAchievementsList(const std::vector<const ProgressionRequirement*>& missingAchievements) const;
+    void PrettyPrintRequirementsItemsList(const std::vector<const ProgressionRequirement*>& missingItems) const;
+    bool Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map, bool report = false);
     bool CheckInstanceLoginValid();
     [[nodiscard]] bool CheckInstanceCount(uint32 instanceId) const;
 
