@@ -61,9 +61,9 @@ public:
         return GetInstanceAI<boss_kriAI>(creature);
     }
 
-    struct boss_kriAI : public ScriptedAI
+    struct boss_kriAI : public boss_bug_trioAI
     {
-        boss_kriAI(Creature* creature) : ScriptedAI(creature)
+        boss_kriAI(Creature* creature) : boss_bug_trioAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -158,9 +158,9 @@ public:
         return GetInstanceAI<boss_vemAI>(creature);
     }
 
-    struct boss_vemAI : public ScriptedAI
+    struct boss_vemAI : public boss_bug_trioAI
     {
-        boss_vemAI(Creature* creature) : ScriptedAI(creature)
+        boss_vemAI(Creature* creature) : boss_bug_trioAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -251,9 +251,9 @@ public:
         return GetInstanceAI<boss_yaujAI>(creature);
     }
 
-    struct boss_yaujAI : public ScriptedAI
+    struct boss_yaujAI : public boss_bug_trioAI
     {
-        boss_yaujAI(Creature* creature) : ScriptedAI(creature)
+        boss_yaujAI(Creature* creature) : boss_bug_trioAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
