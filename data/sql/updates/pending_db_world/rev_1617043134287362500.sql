@@ -1,7 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617043134287362500');
 
--- Useless object in the instance
-DELETE FROM `gameobject` WHERE `guid`=65857;
 -- PhaseMask to 1 for all Naxx end wing eyes
 UPDATE `gameobject` SET `phaseMask`=1 WHERE `guid` IN (268045, 268044, 268047, 268046);
 -- Set gobject flag "GO_FLAG_NOT_SELECTABLE" for all Naxx end wing eyes
@@ -19,6 +17,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 UPDATE `gameobject_template_addon` SET `faction`=0, `flags`=16 WHERE `entry` IN (181230, 181231, 181232, 181233);
 -- Fix Thaddius end wing eye location and its glow ramp
 UPDATE `gameobject` SET `position_x`=3539.016, `position_y`=-2936.821, `position_z`=302.4756, `orientation`=3.141593 WHERE `guid` IN (268047, 65856);
--- Kelthuza's throne should not be selectable otherwise player can see the name file of the gobject
+-- Kelthuzad's throne should not be selectable otherwise player can see the name file of the gobject
 UPDATE `gameobject_template_addon` SET `flags`=16 WHERE `entry`=181640;
 
