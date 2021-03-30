@@ -635,8 +635,8 @@ void ObjectMgr::LoadCreatureTemplateResistances()
 
     if (!result)
     {
-        sLog->outString(">> Loaded 0 creature template resistance definitions. DB table `creature_template_resistance` is empty.");
-        sLog->outString();
+        LOG_INFO("server.loading", ">> Loaded 0 creature template resistance definitions. DB table `creature_template_resistance` is empty.");
+        LOG_INFO("server.loading", " "); 
         return;
     }
 
@@ -651,14 +651,14 @@ void ObjectMgr::LoadCreatureTemplateResistances()
 
         if (school == SPELL_SCHOOL_NORMAL || school >= MAX_SPELL_SCHOOL)
         {
-            sLog->outErrorDb("creature_template_resistance has resistance definitions for creature %u but this school %u doesn't exist", creatureID, school);
+            LOG_ERROR("sql.sql", "creature_template_resistance has resistance definitions for creature %u but this school %u doesn't exist", creatureID, school);
             continue;
         }
 
         CreatureTemplateContainer::iterator itr = _creatureTemplateStore.find(creatureID);
         if (itr == _creatureTemplateStore.end())
         {
-            sLog->outErrorDb("creature_template_resistance has resistance definitions for creature %u but this creature doesn't exist", creatureID);
+            LOG_ERROR("sql.sql", "creature_template_resistance has resistance definitions for creature %u but this creature doesn't exist", creatureID);
             continue;
         }
 
@@ -668,8 +668,8 @@ void ObjectMgr::LoadCreatureTemplateResistances()
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u creature template resistances in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LOG_INFO("server.loading", ">> Loaded %u creature template resistances in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void ObjectMgr::LoadCreatureTemplateSpells()
@@ -681,8 +681,8 @@ void ObjectMgr::LoadCreatureTemplateSpells()
 
     if (!result)
     {
-        sLog->outString(">> Loaded 0 creature template spell definitions. DB table `creature_template_spell` is empty.");
-        sLog->outString();
+        LOG_INFO("server.loading", ">> Loaded 0 creature template spell definitions. DB table `creature_template_spell` is empty.");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -697,14 +697,14 @@ void ObjectMgr::LoadCreatureTemplateSpells()
 
         if (index >= MAX_CREATURE_SPELLS)
         {
-            sLog->outErrorDb("creature_template_spell has spell definitions for creature %u with a incorrect index %u", creatureID, index);
+            LOG_ERROR("sql.sql", "creature_template_spell has spell definitions for creature %u with a incorrect index %u", creatureID, index);
             continue;
         }
 
         CreatureTemplateContainer::iterator itr = _creatureTemplateStore.find(creatureID);
         if (itr == _creatureTemplateStore.end())
         {
-            sLog->outErrorDb("creature_template_spell has spell definitions for creature %u but this creature doesn't exist", creatureID);
+            LOG_ERROR("sql.sql", "creature_template_spell has spell definitions for creature %u but this creature doesn't exist", creatureID);
             continue;
         }
 
@@ -714,8 +714,8 @@ void ObjectMgr::LoadCreatureTemplateSpells()
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u creature template spells in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LOG_INFO("server.loading", ">> Loaded %u creature template spells in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void ObjectMgr::LoadCreatureTemplateAddons()
@@ -6234,8 +6234,8 @@ void ObjectMgr::LoadAccessRequirements()
     QueryResult access_template_result = WorldDatabase.Query("SELECT id, map_id, difficulty, min_level, max_level, min_avg_item_level FROM dungeon_access_template");
     if (!access_template_result)
     {
-        sLog->outString(">> Loaded 0 access requirement definitions. DB table `dungeon_access_template` is empty.");
-        sLog->outString();
+        LOG_INFO("server.loading", ">> Loaded 0 access requirement definitions. DB table `dungeon_access_template` is empty.");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -6288,7 +6288,7 @@ void ObjectMgr::LoadAccessRequirements()
                     //Achievement
                     if (!sAchievementStore.LookupEntry(progression_requirement->id))
                     {
-                        sLog->outErrorDb("Required achievement %u for faction %u does not exist for map %u difficulty %u, remove or fix this achievement requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
+                        LOG_ERROR("sql.sql", "Required achievement %u for faction %u does not exist for map %u difficulty %u, remove or fix this achievement requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
                         break;
                     }
 
@@ -6300,7 +6300,7 @@ void ObjectMgr::LoadAccessRequirements()
                     //Quest
                     if (!GetQuestTemplate(progression_requirement->id))
                     {
-                        sLog->outErrorDb("Required quest %u for faction %u does not exist for map %u difficulty %u, remove or fix this quest requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
+                        LOG_ERROR("sql.sql", "Required quest %u for faction %u does not exist for map %u difficulty %u, remove or fix this quest requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
                         break;
                     }
 
@@ -6313,7 +6313,7 @@ void ObjectMgr::LoadAccessRequirements()
                     ItemTemplate const* pProto = GetItemTemplate(progression_requirement->id);
                     if (!pProto)
                     {
-                        sLog->outError("Required item %u for faction %u does not exist for map %u difficulty %u, remove or fix this item requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
+                        LOG_ERROR("server", "Required item %u for faction %u does not exist for map %u difficulty %u, remove or fix this item requirement.", progression_requirement->id, requirement_faction, mapid, difficulty);
                         break;
                     }
 
@@ -6321,7 +6321,7 @@ void ObjectMgr::LoadAccessRequirements()
                     break;
                 }
                 default:
-                    sLog->outError("requirement_type of %u is not valid for map %u difficulty %u. Please use 0 for achievements, 1 for quest, 2 for items or remove this entry from the db.", requirement_type, mapid, difficulty);
+                    LOG_ERROR("server", "requirement_type of %u is not valid for map %u difficulty %u. Please use 0 for achievements, 1 for quest, 2 for items or remove this entry from the db.", requirement_type, mapid, difficulty);
                     break;
                 }
 
@@ -6361,8 +6361,8 @@ void ObjectMgr::LoadAccessRequirements()
     } while (access_template_result->NextRow());
 
 
-    sLog->outString(">> Loaded %u rows from dungeon_access_template and %u rows from dungeon_access_requirements in %u ms", count, countProgressionRequirements, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LOG_INFO("server.loading", ">> Loaded %u rows from dungeon_access_template and %u rows from dungeon_access_requirements in %u ms", count, countProgressionRequirements, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 /*
