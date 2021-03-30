@@ -17,4 +17,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (65854, 181230, 533, 0, 0, 3, 1, 2493.02, -2921.78, 241.193, 3.14159, 0, 0, 0.411143, -0.911571, 180, 0, 1, 0); -- Deathknight Wing Eye Portal Boss
 -- Update flags & faction for glow eyes at boss-side
 UPDATE `gameobject_template_addon` SET `faction`=0, `flags`=6553648 WHERE `entry` IN (181230, 181231, 181232, 181233);
+-- Fix Thaddius end wing eye location and its glow ramp
+UPDATE `gameobject` SET `position_x`=3539.016, `position_y`=-2936.821, `position_z`=302.4756, `orientation`=3.141593 WHERE `guid` IN (268047, 65856);
 
