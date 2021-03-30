@@ -231,13 +231,10 @@ struct ScriptedAI : public CreatureAI
                         return false;
                     }
                 }
-                else
+                else if (me->GetPositionX() > pos->GetPositionX())
                 {
-                    if (me->GetPositionX() > pos->GetPositionX())
-                    {
-                        EnterEvadeMode();
-                        return false;
-                    }
+                    EnterEvadeMode();
+                    return false;
                 }
                 break;
             case Axis::AXIS_Y:
