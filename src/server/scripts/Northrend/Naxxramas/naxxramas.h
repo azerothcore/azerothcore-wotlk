@@ -55,7 +55,8 @@ enum NXData
     DATA_KELTHUZAD_PORTAL_2         = 123,
     DATA_KELTHUZAD_PORTAL_3         = 124,
     DATA_KELTHUZAD_PORTAL_4         = 125,
-    DATA_HORSEMEN_GATE              = 126
+    DATA_HORSEMEN_GATE              = 126,
+    DATA_FAERLINA_WEB               = 127
 };
 
 enum NXGOs
@@ -68,6 +69,7 @@ enum NXGOs
     GO_LOATHEB_GATE                 = 181241,
     GO_ANUB_GATE                    = 181126,
     GO_ANUB_NEXT_GATE               = 181195,
+    GO_FAERLINA_WEB                 = 181235,
     GO_FAERLINA_GATE                = 194022,
     GO_MAEXXNA_GATE                 = 181209,
     GO_THADDIUS_GATE                = 181121,

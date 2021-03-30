@@ -64,16 +64,17 @@ public:
             _loathebGateGUID = 0;
             _anubGateGUID = 0;
             _anubNextGateGUID = 0;
+            _faerlinaWebGUID = 0;
             _faerlinaGateGUID = 0;
             _maexxnaGateGUID = 0;
             _thaddiusGateGUID = 0;
             _horsemanGateGUID = 0;
-            _kelthuzadfloorGUID = 0;
-            _kelthuzadgateGUID = 0;
-            _kelthuzadportal1GUID = 0;
-            _kelthuzadportal2GUID = 0;
-            _kelthuzadportal3GUID = 0;
-            _kelthuzadportal4GUID = 0;
+            _kelthuzadFloorGUID = 0;
+            _kelthuzadGateGUID = 0;
+            _kelthuzadPortal1GUID = 0;
+            _kelthuzadPortal2GUID = 0;
+            _kelthuzadPortal3GUID = 0;
+            _kelthuzadPortal4GUID = 0;
             _sapphironGateGUID = 0;
             _horsemanPortalGUID = 0;
             _loathebPortalGUID = 0;
@@ -132,6 +133,7 @@ public:
         uint64 _loathebGateGUID;
         uint64 _anubGateGUID;
         uint64 _anubNextGateGUID;
+        uint64 _faerlinaWebGUID;
         uint64 _faerlinaGateGUID;
         uint64 _maexxnaGateGUID;
         uint64 _thaddiusGateGUID;
@@ -139,12 +141,12 @@ public:
         uint64 _gothikInnerGateGUID{};
         uint64 _gothikExitGateGUID{};
         uint64 _horsemanGateGUID;
-        uint64 _kelthuzadfloorGUID;
-        uint64 _kelthuzadgateGUID;
-        uint64 _kelthuzadportal1GUID;
-        uint64 _kelthuzadportal2GUID;
-        uint64 _kelthuzadportal3GUID;
-        uint64 _kelthuzadportal4GUID;
+        uint64 _kelthuzadFloorGUID;
+        uint64 _kelthuzadGateGUID;
+        uint64 _kelthuzadPortal1GUID;
+        uint64 _kelthuzadPortal2GUID;
+        uint64 _kelthuzadPortal3GUID;
+        uint64 _kelthuzadPortal4GUID;
         uint64 _sapphironGateGUID;
         uint64 _horsemanPortalGUID;
         uint64 _loathebPortalGUID;
@@ -350,6 +352,13 @@ public:
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
+                case GO_FAERLINA_WEB:
+                    _faerlinaWebGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_FAERLINA) == DONE)
+                    {
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    break;
                 case GO_MAEXXNA_GATE:
                     _maexxnaGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_FAERLINA) == DONE)
@@ -385,26 +394,26 @@ public:
                     }
                     break;
                 case GO_KELTHUZAD_FLOOR:
-                    _kelthuzadfloorGUID = pGo->GetGUID();
+                    _kelthuzadFloorGUID = pGo->GetGUID();
                     break;
                 case GO_KELTHUZAD_GATE:
-                    _kelthuzadgateGUID = pGo->GetGUID();
+                    _kelthuzadGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_SAPPHIRON) == DONE && _speakTimer == 0)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
                 case GO_KELTHUZAD_PORTAL_1:
-                    _kelthuzadportal1GUID = pGo->GetGUID();
+                    _kelthuzadPortal1GUID = pGo->GetGUID();
                     break;
                 case GO_KELTHUZAD_PORTAL_2:
-                    _kelthuzadportal2GUID = pGo->GetGUID();
+                    _kelthuzadPortal2GUID = pGo->GetGUID();
                     break;
                 case GO_KELTHUZAD_PORTAL_3:
-                    _kelthuzadportal3GUID = pGo->GetGUID();
+                    _kelthuzadPortal3GUID = pGo->GetGUID();
                     break;
                 case GO_KELTHUZAD_PORTAL_4:
-                    _kelthuzadportal4GUID = pGo->GetGUID();
+                    _kelthuzadPortal4GUID = pGo->GetGUID();
                     break;
                 case GO_SAPPHIRON_GATE:
                     _sapphironGateGUID = pGo->GetGUID();
@@ -1010,7 +1019,7 @@ public:
                 {
                     kel->AI()->Talk(SAY_SAPP_DIALOG6);
                     _speakTimer = 0;
-                    if (GameObject* go = instance->GetGameObject(_kelthuzadgateGUID))
+                    if (GameObject* go = instance->GetGameObject(_kelthuzadGateGUID))
                     {
                         go->SetGoState(GO_STATE_ACTIVE);
                     }
@@ -1077,19 +1086,21 @@ public:
                 case DATA_GOTHIK_EXIT_GATE:
                     return _gothikExitGateGUID;
                 case DATA_KELTHUZAD_FLOOR:
-                    return _kelthuzadfloorGUID;
+                    return _kelthuzadFloorGUID;
                 case DATA_KELTHUZAD_GATE:
-                    return _kelthuzadgateGUID;
+                    return _kelthuzadGateGUID;
                 case DATA_KELTHUZAD_PORTAL_1:
-                    return _kelthuzadportal1GUID;
+                    return _kelthuzadPortal1GUID;
                 case DATA_KELTHUZAD_PORTAL_2:
-                    return _kelthuzadportal2GUID;
+                    return _kelthuzadPortal2GUID;
                 case DATA_KELTHUZAD_PORTAL_3:
-                    return _kelthuzadportal3GUID;
+                    return _kelthuzadPortal3GUID;
                 case DATA_KELTHUZAD_PORTAL_4:
-                    return _kelthuzadportal4GUID;
+                    return _kelthuzadPortal4GUID;
                 case DATA_HORSEMEN_GATE:
                     return _horsemanGateGUID;
+                case DATA_FAERLINA_WEB:
+                    return _faerlinaWebGUID;
 
                 // NPCs
                 case DATA_THADDIUS_BOSS:
