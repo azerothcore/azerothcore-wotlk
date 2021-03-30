@@ -191,9 +191,15 @@ public:
                 events.RescheduleEvent(EVENT_PUNISH, 5000);
                 events.RescheduleEvent(EVENT_SECONDARY_SPELL, 15000);
             }
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_HORSEMEN_GATE)))
+            if (pInstance)
             {
-                go->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_HORSEMEN_GATE)))
+                {
+                    if (pInstance->GetBossState(BOSS_GOTHIK) == DONE)
+                    {
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    }
+                }
             }
         }
 
