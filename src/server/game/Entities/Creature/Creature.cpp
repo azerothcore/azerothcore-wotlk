@@ -185,6 +185,8 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(),
     TriggerJustRespawned = false;
     m_isTempWorldObject = false;
     _focusSpell = nullptr;
+
+    m_respawnedTime = time_t(0);
 }
 
 Creature::~Creature()
@@ -1790,6 +1792,8 @@ void Creature::Respawn(bool force)
 
         //Re-initialize reactstate that could be altered by movementgenerators
         InitializeReactState();
+
+        m_respawnedTime = sWorld->GetGameTime();
     }
     m_respawnedTime = time(nullptr);
     // xinef: relocate notifier, fixes npc appearing in corpse position after forced respawn (instead of spawn)
@@ -2277,7 +2281,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
         return false;
 
     // cannot attack if is during 5 second grace period, unless being attacked
-    if ((time(nullptr) - m_respawnedTime) < 5 && victim->getAttackers().empty())
+    if (m_respawnedTime && (sWorld->GetGameTime() - m_respawnedTime) < 5 && victim->getAttackers().empty())
     {
         return false;
     }
