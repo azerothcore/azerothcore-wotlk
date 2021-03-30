@@ -73,7 +73,7 @@ enum NXGOs
     GO_GOTHIK_ENTER_GATE            = 181124,
     GO_GOTHIK_INNER_GATE            = 181170,
     GO_GOTHIK_EXIT_GATE             = 181125,
-    GO_HORSEMAN_GATE                = 181119,
+    GO_HORSEMEN_GATE                = 181119,
     GO_SAPPHIRON_GATE               = 181225,
 
     GO_HORSEMEN_CHEST_10            = 181366,

@@ -377,7 +377,7 @@ public:
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
-                case GO_HORSEMAN_GATE:
+                case GO_HORSEMEN_GATE:
                     _horsemanGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_GOTHIK) == DONE)
                     {
