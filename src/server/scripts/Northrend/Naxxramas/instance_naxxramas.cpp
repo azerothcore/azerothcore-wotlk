@@ -1233,7 +1233,7 @@ public:
                     if (Creature* cr = me->SummonCreature(NPC_LIVING_POISON, 3175.42, -3134.86, 293.34, 4.284, TEMPSUMMON_TIMED_DESPAWN, 14800))
                     {
                         cr->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        cr->GetMotionMaster()->MovePoint(0, 3157.175, -3163.252, 293.295, false);
+                        cr->GetMotionMaster()->MovePoint(0, 3158.778, -3164.201, 293.312, false);
                     }
                     timer = 0;
                 }
