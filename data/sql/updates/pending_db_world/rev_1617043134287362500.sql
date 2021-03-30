@@ -22,3 +22,9 @@ UPDATE `gameobject_template_addon` SET `flags`=16 WHERE `entry`=181640;
 -- Remove first and third Naxxramas trigger
 DELETE FROM `creature` WHERE `guid` IN (1971312, 1971314);
 
+
+/* Fix SAI */
+
+-- Fix Blood Presence on Death Knight
+UPDATE `smart_scripts` SET `event_type`=4, `event_phase_mask`=0, `event_param2`=0, `comment`='On Aggro - Cast Self - Blood Presence' WHERE `entryorguid`=16146 AND `source_type`=0 AND `id`=2 AND `link`=0;
+
