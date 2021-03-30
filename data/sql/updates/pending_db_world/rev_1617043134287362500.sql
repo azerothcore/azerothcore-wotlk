@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617043134287362500');
 
--- Useless object in world
+-- Useless object in the instance
 DELETE FROM `gameobject` WHERE `guid`=65857;
 -- PhaseMask to 1 for all Naxx end wing eyes
 UPDATE `gameobject` SET `phaseMask`=1 WHERE `guid` IN (268045, 268044, 268047, 268046);
