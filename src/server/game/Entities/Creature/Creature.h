@@ -815,6 +815,8 @@ protected:
 private:
     void ForcedDespawn(uint32 timeMSToDespawn = 0);
 
+    bool CanPeriodicallyCallForAssistance() const;
+
     //WaypointMovementGenerator vars
     uint32 m_waypointID;
     uint32 m_path_id;
@@ -831,6 +833,8 @@ private:
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
 
     bool _isMissingSwimmingFlagOutOfCombat;
+
+    TimeTracker m_assistanceTimer;
 
     void applyInhabitFlags();
 };
