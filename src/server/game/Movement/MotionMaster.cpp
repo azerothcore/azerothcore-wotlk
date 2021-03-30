@@ -97,17 +97,6 @@ void MotionMaster::UpdateMotion(uint32 diff)
     if (!_owner)
         return;
 
-    if (_owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED)) // what about UNIT_STATE_DISTRACTED? Why is this not included?
-    {
-        // pussywizard: the same as at the bottom of this function
-        if (_owner->GetTypeId() == TYPEID_PLAYER)
-            _owner->UpdateUnderwaterState(_owner->GetMap(), _owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ());
-        else
-            _owner->UpdateEnvironmentIfNeeded(0);
-
-        return;
-    }
-
     ASSERT(!empty());
 
     _cleanFlag |= MMCF_INUSE;
