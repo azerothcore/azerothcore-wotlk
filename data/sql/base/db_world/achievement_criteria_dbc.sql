@@ -6,18 +6,18 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `achievement_criteria_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `achievement_criteria_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Achievement_Id` int(11) NOT NULL DEFAULT 0,
-  `Type` int(11) NOT NULL DEFAULT 0,
-  `Asset_Id` int(11) NOT NULL DEFAULT 0,
-  `Quantity` int(11) NOT NULL DEFAULT 0,
-  `Start_Event` int(11) NOT NULL DEFAULT 0,
-  `Start_Asset` int(11) NOT NULL DEFAULT 0,
-  `Fail_Event` int(11) NOT NULL DEFAULT 0,
-  `Fail_Asset` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `Achievement_Id` INT NOT NULL DEFAULT 0,
+  `Type` INT NOT NULL DEFAULT 0,
+  `Asset_Id` INT NOT NULL DEFAULT 0,
+  `Quantity` INT NOT NULL DEFAULT 0,
+  `Start_Event` INT NOT NULL DEFAULT 0,
+  `Start_Asset` INT NOT NULL DEFAULT 0,
+  `Fail_Event` INT NOT NULL DEFAULT 0,
+  `Fail_Asset` INT NOT NULL DEFAULT 0,
   `Description_Lang_enUS` varchar(100) DEFAULT NULL,
   `Description_Lang_enGB` varchar(100) DEFAULT NULL,
   `Description_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -34,14 +34,14 @@ CREATE TABLE `achievement_criteria_dbc`
   `Description_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Description_Lang_itIT` varchar(100) DEFAULT NULL,
   `Description_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Description_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
-  `Timer_Start_Event` int(11) NOT NULL DEFAULT 0,
-  `Timer_Asset_Id` int(11) NOT NULL DEFAULT 0,
-  `Timer_Time` int(11) NOT NULL DEFAULT 0,
-  `Ui_Order` int(11) NOT NULL DEFAULT 0,
+  `Description_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
+  `Timer_Start_Event` INT NOT NULL DEFAULT 0,
+  `Timer_Asset_Id` INT NOT NULL DEFAULT 0,
+  `Timer_Time` INT NOT NULL DEFAULT 0,
+  `Ui_Order` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `achievement_criteria_dbc` WRITE;

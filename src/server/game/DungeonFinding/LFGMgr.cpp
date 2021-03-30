@@ -391,6 +391,7 @@ namespace lfg
             if (!dungeon) // should never happen - We provide a list from sLFGDungeonStore
                 continue;
             MapEntry const* mapEntry = sMapStore.LookupEntry(dungeon->map);
+            DungeonProgressionRequirements const* ar = sObjectMgr->GetAccessRequirement(dungeon->map, Difficulty(dungeon->difficulty));
 
             uint32 lockData = 0;
             if (dungeon->expansion > expansion)
@@ -401,29 +402,58 @@ namespace lfg
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
             else if (dungeon->difficulty > DUNGEON_DIFFICULTY_NORMAL && (!mapEntry || !mapEntry->IsRaid()) && sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUIDLow(), dungeon->map, Difficulty(dungeon->difficulty)))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
-            else if (dungeon->minlevel > level)
+            else if ((dungeon->minlevel > level && !sWorld->getBoolConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE)) || (sWorld->getBoolConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE) && ar && ar->levelMin > 0 && ar->levelMin > level))
                 lockData = LFG_LOCKSTATUS_TOO_LOW_LEVEL;
-            else if (dungeon->maxlevel < level)
+            else if ((dungeon->maxlevel < level && !sWorld->getBoolConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE)) || (sWorld->getBoolConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE) && ar && ar->levelMax > 0 && ar->levelMax < level))
                 lockData = LFG_LOCKSTATUS_TOO_HIGH_LEVEL;
             else if (dungeon->seasonal && !IsSeasonActive(dungeon->id))
                 lockData = LFG_LOCKSTATUS_NOT_IN_SEASON;
-            else if (AccessRequirement const* ar = sObjectMgr->GetAccessRequirement(dungeon->map, Difficulty(dungeon->difficulty)))
+            else if (ar)
             {
-                if (ar->achievement && !player->HasAchieved(ar->achievement))
-                    lockData = LFG_LOCKSTATUS_MISSING_ACHIEVEMENT;
-                else if (ar->reqItemLevel && (float)ar->reqItemLevel > avgItemLevel)
-                    lockData = LFG_LOCKSTATUS_TOO_LOW_GEAR_SCORE;
-                else if (player->GetTeamId() == TEAM_ALLIANCE && ar->quest_A && !player->GetQuestRewardStatus(ar->quest_A))
-                    lockData = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
-                else if (player->GetTeamId() == TEAM_HORDE && ar->quest_H && !player->GetQuestRewardStatus(ar->quest_H))
-                    lockData = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
-                else if (ar->item)
+                // Check required items
+                for (const ProgressionRequirement* itemRequirement : ar->items)
                 {
-                    if (!player->HasItemCount(ar->item) && (!ar->item2 || !player->HasItemCount(ar->item2)))
-                        lockData = LFG_LOCKSTATUS_MISSING_ITEM;
+                    if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == player->GetTeamId(true))
+                    {
+                        if (!player->HasItemCount(itemRequirement->id, 1))
+                        {
+                            lockData = LFG_LOCKSTATUS_MISSING_ITEM;
+                            break;
+                        }
+                    }
                 }
-                else if (ar->item2 && !player->HasItemCount(ar->item2))
-                    lockData = LFG_LOCKSTATUS_MISSING_ITEM;
+
+                //Check for quests
+                for (const ProgressionRequirement* questRequirement : ar->quests)
+                {
+                    if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == player->GetTeamId(true))
+                    {
+                        if (!player->GetQuestRewardStatus(questRequirement->id))
+                        {
+                            lockData = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
+                            break;
+                        }
+                    }
+                }
+
+                //Check for ilvl
+                if (ar->reqItemLevel && (float)ar->reqItemLevel > avgItemLevel)
+                {
+                    lockData = LFG_LOCKSTATUS_TOO_LOW_GEAR_SCORE;
+                }
+
+                //Check if player has the required achievements
+                for (const ProgressionRequirement* achievementRequirement : ar->achievements)
+                {
+                    if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == player->GetTeamId(true))
+                    {
+                        if (!player->HasAchieved(achievementRequirement->id))
+                        {
+                            lockData = LFG_LOCKSTATUS_MISSING_ACHIEVEMENT;
+                            break;
+                        }
+                    }
+                }
             }
 
             sScriptMgr->OnInitializeLockedDungeons(player, level, lockData);
