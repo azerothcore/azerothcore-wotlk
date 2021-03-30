@@ -1077,6 +1077,8 @@ public:
                     return _loathebGateGUID;
                 case DATA_ANUB_GATE:
                     return _anubGateGUID;
+                case DATA_FAERLINA_WEB:
+                    return _faerlinaWebGUID;
                 case DATA_MAEXXNA_GATE:
                     return _maexxnaGateGUID;
                 case DATA_GOTHIK_ENTER_GATE:
@@ -1099,8 +1101,8 @@ public:
                     return _kelthuzadPortal4GUID;
                 case DATA_HORSEMEN_GATE:
                     return _horsemanGateGUID;
-                case DATA_FAERLINA_WEB:
-                    return _faerlinaWebGUID;
+                case DATA_THADDIUS_GATE:
+                    return _thaddiusGateGUID;
 
                 // NPCs
                 case DATA_THADDIUS_BOSS:
