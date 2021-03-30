@@ -1220,10 +1220,10 @@ public:
                 timer += diff;
                 if (timer >= 5000)
                 {
-                    if (Creature* cr = me->SummonCreature(NPC_LIVING_POISON, *me, TEMPSUMMON_TIMED_DESPAWN, 9000))
+                    if (Creature* cr = me->SummonCreature(NPC_LIVING_POISON, *me, TEMPSUMMON_TIMED_DESPAWN, 15300))
                     {
                         cr->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        cr->GetMotionMaster()->MovePoint(0, me->GetPositionX() + 50 * cos(me->GetOrientation()), me->GetPositionY() + 50 * sin(me->GetOrientation()), me->GetPositionZ(), false);
+                        cr->GetMotionMaster()->MovePoint(0, me->GetPositionX() + 80 * cos(me->GetOrientation()), me->GetPositionY() + 40 * sin(me->GetOrientation()), me->GetPositionZ(), false);
                     }
                     timer = 0;
                 }
@@ -1233,7 +1233,7 @@ public:
                 Unit* target = nullptr;
                 acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 0.5f);
                 acore::UnitLastSearcher<acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, target, u_check);
-                me->VisitNearbyObject(1.5f, searcher);
+                me->VisitNearbyObject(0.5f, searcher);
                 if (target)
                 {
                     me->CastSpell(me, SPELL_FROGGER_EXPLODE, true);
