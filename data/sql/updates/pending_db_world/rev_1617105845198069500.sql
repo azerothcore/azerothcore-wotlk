@@ -2,6 +2,10 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617105845198069500');
 
 UPDATE `creature_template` SET `DamageModifier` = 1.7, `unit_flags2` = 2080, `HealthModifier` = 4, `ArmorModifier` = 3, `AIName` = 'SmartAI', `speed_walk` = 1.1, `speed_run` = 1.3 WHERE (`entry` = 17664);
 
+DELETE FROM `creature` WHERE (`id` = 17664);
+INSERT INTO `creature` VALUES
+(63387, 17664, 530, 0, 0, 1, 1, 0, 1, -1936.22, -10803.3, 86.3798, 5.1831, 1, 0, 0, 1131, 408, 0, 0, 0, 0, '', 0);
+
 DELETE FROM `creature_addon` WHERE (`guid` IN (63387));
 INSERT INTO `creature_addon` VALUES
 (63387, 0, 2346, 0, 1, 0, 0, NULL);
