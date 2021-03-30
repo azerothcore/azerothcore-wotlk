@@ -1088,6 +1088,8 @@ public:
                     return _kelthuzadportal3GUID;
                 case DATA_KELTHUZAD_PORTAL_4:
                     return _kelthuzadportal4GUID;
+                case DATA_HORSEMEN_GATE:
+                    return _horsemanGateGUID;
 
                 // NPCs
                 case DATA_THADDIUS_BOSS:

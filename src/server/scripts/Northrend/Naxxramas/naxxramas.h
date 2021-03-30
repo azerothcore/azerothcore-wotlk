@@ -54,7 +54,8 @@ enum NXData
     DATA_KELTHUZAD_PORTAL_1         = 122,
     DATA_KELTHUZAD_PORTAL_2         = 123,
     DATA_KELTHUZAD_PORTAL_3         = 124,
-    DATA_KELTHUZAD_PORTAL_4         = 125
+    DATA_KELTHUZAD_PORTAL_4         = 125,
+    DATA_HORSEMEN_GATE              = 126
 };
 
 enum NXGOs
