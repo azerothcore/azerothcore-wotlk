@@ -19,4 +19,6 @@ UPDATE `gameobject_template_addon` SET `faction`=0, `flags`=16 WHERE `entry` IN 
 UPDATE `gameobject` SET `position_x`=3539.016, `position_y`=-2936.821, `position_z`=302.4756, `orientation`=3.141593 WHERE `guid` IN (268047, 65856);
 -- Kelthuzad's throne should not be selectable otherwise player can see the name file of the gobject
 UPDATE `gameobject_template_addon` SET `flags`=16 WHERE `entry`=181640;
+-- Remove first and third Naxxramas trigger
+DELETE FROM `creature` WHERE `guid` IN (1971312, 1971314);
 
