@@ -477,11 +477,10 @@ public:
                     break;
 
                 // Glow portals at boss-side
-                case GO_ARAC_EYE_RAMP_BOSS:
+                case GO_MILI_EYE_RAMP_BOSS:
                     _deathknightGlowEyePortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_HORSEMAN) == DONE)
                     {
-                        pGo->SetPhaseMask(1, true);
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
@@ -489,15 +488,13 @@ public:
                     _plagueGlowEyePortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_LOATHEB) == DONE)
                     {
-                        pGo->SetPhaseMask(1, true);
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
-                case GO_MILI_EYE_RAMP_BOSS:
+                case GO_ARAC_EYE_RAMP_BOSS:
                     _spiderGlowEyePortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_MAEXXNA) == DONE)
                     {
-                        pGo->SetPhaseMask(1, true);
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
@@ -505,7 +502,6 @@ public:
                     _abomGlowEyePortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_THADDIUS) == DONE)
                     {
-                        pGo->SetPhaseMask(1, true);
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
@@ -871,7 +867,6 @@ public:
                         }
                         if (GameObject* go = instance->GetGameObject(_plagueGlowEyePortalGUID))
                         {
-                            go->SetPhaseMask(1, true);
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
@@ -912,7 +907,6 @@ public:
                         }
                         if (GameObject* go = instance->GetGameObject(_spiderGlowEyePortalGUID))
                         {
-                            go->SetPhaseMask(1, true);
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
@@ -946,7 +940,6 @@ public:
                         }
                         if (GameObject* go = instance->GetGameObject(_abomGlowEyePortalGUID))
                         {
-                            go->SetPhaseMask(1, true);
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
@@ -963,7 +956,6 @@ public:
                         }
                         if (GameObject* go = instance->GetGameObject(_deathknightGlowEyePortalGUID))
                         {
-                            go->SetPhaseMask(1, true);
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
