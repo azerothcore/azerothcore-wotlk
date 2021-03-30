@@ -58,7 +58,8 @@ public:
             // GOs
             _patchwerkGateGUID = 0;
             _gluthGateGUID = 0;
-            _nothGateGUID = 0;
+            _nothEntryGateGUID = 0;
+            _nothExitGateGUID = 0;
             _heiganGateGUID = 0;
             _heiganGateExitGUID = 0;
             _loathebGateGUID = 0;
@@ -127,7 +128,8 @@ public:
         // GOs
         uint64 _patchwerkGateGUID;
         uint64 _gluthGateGUID;
-        uint64 _nothGateGUID;
+        uint64 _nothEntryGateGUID;
+        uint64 _nothExitGateGUID;
         uint64 _heiganGateGUID;
         uint64 _heiganGateExitGUID;
         uint64 _loathebGateGUID;
@@ -303,14 +305,21 @@ public:
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
-                case GO_NOTH_GATE:
-                    _nothGateGUID = pGo->GetGUID();
+                case GO_NOTH_ENTRY_GATE:
+                    _nothEntryGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_NOTH) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
-                case GO_HEIGAN_ENTERANCE_GATE:
+                case GO_NOTH_EXIT_GATE:
+                    _nothExitGateGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_NOTH) == DONE)
+                    {
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    break;
+                case GO_HEIGAN_ENTRY_GATE:
                     _heiganGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_HEIGAN) == DONE || GetBossState(BOSS_NOTH) == DONE)
                     {
@@ -841,7 +850,7 @@ public:
                         }
                         break;
                     case BOSS_NOTH:
-                        if (GameObject* go = instance->GetGameObject(_nothGateGUID))
+                        if (GameObject* go = instance->GetGameObject(_nothExitGateGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
@@ -1087,6 +1096,12 @@ public:
                     return _gothikInnerGateGUID;
                 case DATA_GOTHIK_EXIT_GATE:
                     return _gothikExitGateGUID;
+                case DATA_HORSEMEN_GATE:
+                    return _horsemanGateGUID;
+                case DATA_THADDIUS_GATE:
+                    return _thaddiusGateGUID;
+                case DATA_NOTH_ENTRY_GATE:
+                    return _nothEntryGateGUID;
                 case DATA_KELTHUZAD_FLOOR:
                     return _kelthuzadFloorGUID;
                 case DATA_KELTHUZAD_GATE:
@@ -1099,10 +1114,6 @@ public:
                     return _kelthuzadPortal3GUID;
                 case DATA_KELTHUZAD_PORTAL_4:
                     return _kelthuzadPortal4GUID;
-                case DATA_HORSEMEN_GATE:
-                    return _horsemanGateGUID;
-                case DATA_THADDIUS_GATE:
-                    return _thaddiusGateGUID;
 
                 // NPCs
                 case DATA_THADDIUS_BOSS:
