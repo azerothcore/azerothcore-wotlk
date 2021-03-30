@@ -19859,7 +19859,6 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
             }
         }
 
-
         Difficulty target_difficulty = GetDifficulty(mapEntry->IsRaid());
         MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(target_map, target_difficulty);
         if (LevelMin || LevelMax || ilvlRequirementNotMet
