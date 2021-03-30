@@ -83,6 +83,10 @@ public:
             _plagueEyePortalGUID = 0;
             _spiderEyePortalGUID = 0;
             _abomEyePortalGUID = 0;
+            _deathknightGlowEyePortalGUID = 0;
+            _plagueGlowEyePortalGUID = 0;
+            _spiderGlowEyePortalGUID = 0;
+            _abomGlowEyePortalGUID = 0;
 
             // NPCs
             PatchwerkRoomTrash.clear();
@@ -150,6 +154,10 @@ public:
         uint64 _plagueEyePortalGUID;
         uint64 _spiderEyePortalGUID;
         uint64 _abomEyePortalGUID;
+        uint64 _deathknightGlowEyePortalGUID;
+        uint64 _plagueGlowEyePortalGUID;
+        uint64 _spiderGlowEyePortalGUID;
+        uint64 _abomGlowEyePortalGUID;
 
         // NPCs
         std::list<uint64> PatchwerkRoomTrash;
@@ -437,6 +445,8 @@ public:
                         pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
+
+                // Glow portals at center-side
                 case GO_DEATHKNIGHT_EYE_PORTAL:
                     _deathknightEyePortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_HORSEMAN) == DONE)
@@ -460,6 +470,36 @@ public:
                     break;
                 case GO_ABOM_EYE_PORTAL:
                     _abomEyePortalGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_THADDIUS) == DONE)
+                    {
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    break;
+
+                // Glow portals at boss-side
+                case GO_ARAC_EYE_RAMP_BOSS:
+                    _deathknightGlowEyePortalGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_HORSEMAN) == DONE)
+                    {
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    break;
+                case GO_PLAG_EYE_RAMP_BOSS:
+                    _plagueGlowEyePortalGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_LOATHEB) == DONE)
+                    {
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    break;
+                case GO_MILI_EYE_RAMP_BOSS:
+                    _spiderGlowEyePortalGUID = pGo->GetGUID();
+                    if (GetBossState(BOSS_MAEXXNA) == DONE)
+                    {
+                        pGo->SetGoState(GO_STATE_ACTIVE);
+                    }
+                    break;
+                case GO_CONS_EYE_RAMP_BOSS:
+                    _abomGlowEyePortalGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_THADDIUS) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
@@ -825,6 +865,10 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
+                        if (GameObject* go = instance->GetGameObject(_plagueGlowEyePortalGUID))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_ANUB:
@@ -861,6 +905,10 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
+                        if (GameObject* go = instance->GetGameObject(_spiderGlowEyePortalGUID))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_GOTHIK:
@@ -890,6 +938,10 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
+                        if (GameObject* go = instance->GetGameObject(_abomGlowEyePortalGUID))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        }
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6000);
                         break;
                     case BOSS_HORSEMAN:
@@ -899,6 +951,10 @@ public:
                             go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                         }
                         if (GameObject* go = instance->GetGameObject(_deathknightEyePortalGUID))
+                        {
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        }
+                        if (GameObject* go = instance->GetGameObject(_deathknightGlowEyePortalGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }

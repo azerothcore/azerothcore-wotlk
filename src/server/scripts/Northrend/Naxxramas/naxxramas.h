@@ -92,10 +92,17 @@ enum NXGOs
     GO_MAEXXNA_PORTAL               = 181575,
     GO_HORSEMAN_PORTAL              = 181578,
 
+    // "Glow" effect on center-side portal
     GO_DEATHKNIGHT_EYE_PORTAL       = 181210,
     GO_PLAGUE_EYE_PORTAL            = 181211,
     GO_SPIDER_EYE_PORTAL            = 181212,
-    GO_ABOM_EYE_PORTAL              = 181213
+    GO_ABOM_EYE_PORTAL              = 181213,
+
+    // "Glow" effect on boss-side portal
+    GO_ARAC_EYE_RAMP_BOSS           = 181233,
+    GO_PLAG_EYE_RAMP_BOSS           = 181231,
+    GO_MILI_EYE_RAMP_BOSS           = 181230,
+    GO_CONS_EYE_RAMP_BOSS           = 181232
 };
 
 enum NXNPCs
