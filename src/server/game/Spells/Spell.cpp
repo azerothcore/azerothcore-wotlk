@@ -6555,7 +6555,6 @@ SpellCastResult Spell::CheckPower()
         }
     }
 
-
     // health as power used - need check health amount
     if (m_spellInfo->PowerType == POWER_HEALTH)
     {
