@@ -463,6 +463,14 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
 
                 _player->SetBattlegroundId(bg->GetInstanceID(), bg->GetBgTypeID(), queueSlot, true, bgTypeId == BATTLEGROUND_RB, teamId);
 
+                if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
+                {
+                    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
+                    stmt->setUInt32(0, _player->GetGUIDLow());
+                    stmt->setUInt8(1, BG_DESERTION_TYPE_NONE);
+                    CharacterDatabase.Execute(stmt);
+                }
+
                 sBattlegroundMgr->SendToBattleground(_player, ginfo.IsInvitedToBGInstanceGUID, bgTypeId);
             }
             break;

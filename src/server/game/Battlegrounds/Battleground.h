@@ -40,6 +40,7 @@ enum BattlegroundDesertionType
     BG_DESERTION_TYPE_LEAVE_QUEUE       = 2, // player is invited to join and refuses to do it
     BG_DESERTION_TYPE_NO_ENTER_BUTTON   = 3, // player is invited to join and do nothing (time expires)
     BG_DESERTION_TYPE_INVITE_LOGOUT     = 4, // player is invited to join and logs out
+    BG_DESERTION_TYPE_NONE              = 5, // player is invited to join and accepted to do it
 };
 
 enum BattlegroundSounds
