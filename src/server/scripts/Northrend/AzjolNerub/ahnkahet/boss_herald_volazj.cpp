@@ -64,6 +64,13 @@ public:
         {
         }
 
+        void InitializeAI() override
+        {
+            BossAI::InitializeAI();
+            // Visible for all players in insanity
+            me->SetPhaseMask((1 | 16 | 32 | 64 | 128 | 256), true);
+        }
+
         void Reset() override
         {
             _Reset();
@@ -74,8 +81,6 @@ public:
             insanityTimes = 0;
             insanityHandled = 0;
 
-            // Visible for all players in insanity
-            me->SetPhaseMask((1 | 16 | 32 | 64 | 128 | 256), true);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
             ResetPlayersPhaseMask();
