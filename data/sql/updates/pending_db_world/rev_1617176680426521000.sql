@@ -1,8 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617176680426521000');
 
-UPDATE `creature_template` SET `speed_walk` = 0.9, `speed_run` = 1.1 WHERE (`entry` = 15958);
-
-UPDATE `creature_template` SET `speed_walk` = 0.9, `speed_run` = 1.1 WHERE (`entry` = 15656);
+UPDATE `creature_template` SET `speed_walk` = 0.9, `speed_run` = 1.1 WHERE `entry` IN (15958, 15656);
 
 DELETE FROM `creature_summon_groups` WHERE (`summonerId` = 15402);
 
