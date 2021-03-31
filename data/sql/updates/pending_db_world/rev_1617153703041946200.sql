@@ -45,6 +45,13 @@ INSERT INTO `factiontemplate_dbc` VALUES
 (96, 79, 0, 2, 2, 0, 66, 0, 0, 0, 79, 0, 0, 0);
 
 DELETE FROM `broadcast_text` WHERE (`ID` IN (599, 600, 601, 602, 603, 604));
+INSERT INTO `broadcast_text` VALUES
+(599, 0, 'Revenge shall be mine at last!','', 0, 0, 0, 0, 0, 0, 0, 0, 6, 18019),
+(600, 0, 'I have risen!','', 0, 0, 0, 0, 0, 0, 0, 0, 6, 18019),
+(601, 0, 'Southshore shall pay in blood!','', 0, 0, 0, 0, 0, 0, 0, 0, 6, 18019),
+(602, 0, 'I returned from the grave to take my revenge!','', 0, 0, 0, 0, 0, 0, 0, 0, 6, 18019),
+(603, 0, 'The undead shall feast on your soul, $n.','', 0, 0, 0, 0, 0, 0, 0, 0, 6, 18019),
+(604, 0, 'Die in the name of the Dark Lady, $n.','', 0, 0, 0, 0, 0, 0, 0, 0, 6, 18019);
 
 DELETE FROM `creature_text` WHERE (`CreatureID` IN (2433));
 INSERT INTO `creature_text` VALUES
