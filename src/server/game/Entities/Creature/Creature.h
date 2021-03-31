@@ -817,7 +817,7 @@ protected:
 private:
     void ForcedDespawn(uint32 timeMSToDespawn = 0);
 
-    bool CanPeriodicallyCallForAssistance() const;
+    [[nodiscard]] bool CanPeriodicallyCallForAssistance() const;
 
     //WaypointMovementGenerator vars
     uint32 m_waypointID;
