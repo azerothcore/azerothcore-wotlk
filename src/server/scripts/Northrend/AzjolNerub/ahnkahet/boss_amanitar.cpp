@@ -49,11 +49,7 @@ enum Events
     EVENT_KILLSELF,
 };
 
-enum Misc
-{
-    MAX_MUSHROOMS_COUNT                     = 32,
-};
-
+constexpr uint8 MAX_MUSHROOMS_COUNT = 32;
 Position const MushroomPositions[MAX_MUSHROOMS_COUNT] =
 {
     { 373.4807f, -856.5301f, -74.30518f, 0.2094395f },

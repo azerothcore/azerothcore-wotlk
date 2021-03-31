@@ -67,7 +67,7 @@ enum Creatures
     NPC_TWILIGHT_VOLUNTEER                  = 30385,
 };
 
-enum Misc
+enum Misc : uint32
 {
     MAX_COMBAT_INITIATES                    = 25,
     DATA_VOLUNTEER_WORK                     = 1,
@@ -82,9 +82,9 @@ enum SummonGroups
 enum Points
 {
     POINT_DOWN                              = 1,
-    POINT_UP                                = 2,
-    POINT_RITUAL                            = 3,
-    POINT_INITIAL                           = 4,
+    POINT_UP,
+    POINT_RITUAL,
+    POINT_INITIAL,
 };
 
 enum Phases
@@ -96,7 +96,7 @@ enum Phases
 enum Actions
 {
     ACTION_RITUAL_BEGIN                     = 1,
-    ACTION_SACRAFICE                        = 2,
+    ACTION_SACRAFICE,
 };
 
 const Position JedogaPosition[3] =
