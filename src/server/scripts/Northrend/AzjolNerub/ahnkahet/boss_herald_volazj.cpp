@@ -227,7 +227,7 @@ public:
                     }break;
                     case EVENT_HERALD_SHIVER:
                     {
-                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                             DoCast(pTarget, DUNGEON_MODE(SPELL_SHIVER, SPELL_SHIVER_H), false);
 
                         events.RepeatEvent(15000);
@@ -247,25 +247,6 @@ public:
         uint8 insanityTimes;
         uint8 insanityHandled;
 
-        uint32 GetSpellForPhaseMask(uint32 phase) const
-        {
-            switch (phase)
-            {
-            case 16:
-                return SPELL_INSANITY_PHASING_1;
-            case 32:
-                return SPELL_INSANITY_PHASING_2;
-            case 64:
-                return SPELL_INSANITY_PHASING_3;
-            case 128:
-                return SPELL_INSANITY_PHASING_4;
-            case 256:
-                return SPELL_INSANITY_PHASING_5;
-            }
-
-            return 0;
-        }
-
         void ResetPlayersPhaseMask()
         {
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
@@ -273,9 +254,39 @@ public:
             {
                 if (Player* pPlayer = i.GetSource())
                 {
-                    if (uint32 const spellId = GetSpellForPhaseMask(pPlayer->GetPhaseMask()))
+                    uint32 phaseAuraToRemove = 0;
+                    switch (pPlayer->GetPhaseMask())
                     {
-                        pPlayer->RemoveAurasDueToSpell(spellId);
+                        case 16:
+                        {
+                            phaseAuraToRemove = SPELL_INSANITY_PHASING_1;
+                            break;
+                        }
+                        case 32:
+                        {
+                            phaseAuraToRemove = SPELL_INSANITY_PHASING_2;
+                            break;
+                        }
+                        case 64:
+                        {
+                            phaseAuraToRemove = SPELL_INSANITY_PHASING_3;
+                            break;
+                        }
+                        case 128:
+                        {
+                            phaseAuraToRemove = SPELL_INSANITY_PHASING_4;
+                            break;
+                        }
+                        case 256:
+                        {
+                            phaseAuraToRemove = SPELL_INSANITY_PHASING_5;
+                            break;
+                        }
+                    }
+
+                    if (phaseAuraToRemove)
+                    {
+                        pPlayer->RemoveAurasDueToSpell(phaseAuraToRemove);
                     }
                 }
             }
