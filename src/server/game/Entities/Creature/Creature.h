@@ -756,6 +756,8 @@ public:
     }
     void RefreshSwimmingFlag(bool recheck = false);
 
+    void SetAssistanceTimer(uint32 value) { m_assistanceTimer = value; }
+
 protected:
     bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
     bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
@@ -834,7 +836,7 @@ private:
 
     bool _isMissingSwimmingFlagOutOfCombat;
 
-    TimeTracker m_assistanceTimer;
+    uint32 m_assistanceTimer;
 
     void applyInhabitFlags();
 };

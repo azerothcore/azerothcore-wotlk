@@ -169,7 +169,7 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(),
     m_DBTableGuid(0), m_equipmentId(0), m_originalEquipmentId(0), m_originalAnimTier(UNIT_BYTE1_FLAG_GROUND), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
     m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_waypointID(0), m_path_id(0), m_formation(nullptr), _lastDamagedTime(nullptr), m_cannotReachTarget(false), m_cannotReachTimer(0),
-    _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(1 * IN_MILLISECONDS)
+    _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
     m_valuesCount = UNIT_END;
@@ -631,18 +631,20 @@ void Creature::Update(uint32 diff)
                     }
                 }
 
-                if (IsInCombat())
+                // Call for assistance if not disabled
+                if (m_assistanceTimer)
                 {
-                    m_assistanceTimer.Update(diff);
-                    if (m_assistanceTimer.Passed())
+                    if (m_assistanceTimer <= diff)
                     {
-                        m_assistanceTimer.Reset(1 * IN_MILLISECONDS);
                         if (CanPeriodicallyCallForAssistance())
                         {
                             SetNoCallAssistance(false);
                             CallAssistance();
                         }
+                        m_assistanceTimer = sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY);
                     }
+                    else
+                        m_assistanceTimer -= diff;
                 }
 
                 if (!IsInEvadeMode() && IsAIEnabled)
@@ -3207,42 +3209,15 @@ void Creature::SetLastDamagedTimePtr(std::shared_ptr<time_t> const& val)
 
 bool Creature::CanPeriodicallyCallForAssistance() const
 {
-    // Unable to call for assistance
-    if (HasUnitState(UNIT_STATE_STUNNED | UNIT_STATE_DIED | UNIT_STATE_CONFUSED | UNIT_STATE_POSSESSED))
+    if (!IsInCombat())
         return false;
 
-    // Must be chasing or fleeing target
-    if (!HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CHASE))
+    // Unable to call for assistance
+    if (HasUnitState(UNIT_STATE_DIED | UNIT_STATE_POSSESSED))
         return false;
 
     if (!CanHaveThreatList())
         return false;
 
-    // Smart creatures
-    switch (GetCreatureTemplate()->type)
-    {
-        case CREATURE_TYPE_HUMANOID:
-        case CREATURE_TYPE_UNDEAD:
-        case CREATURE_TYPE_DEMON:
-            return true;
-        default:
-            break;
-    }
-
-    // Social type beasts
-    if (GetCreatureTemplate()->type == CREATURE_TYPE_BEAST)
-    {
-        switch (GetCreatureTemplate()->family)
-        {
-            case CREATURE_FAMILY_WOLF:
-            case CREATURE_FAMILY_CAT:
-            case CREATURE_FAMILY_CROCOLISK:
-            case CREATURE_FAMILY_SPIDER:
-                return true;
-            default:
-                break;
-        }
-    }
-
-    return false;
+    return true;
 }

@@ -9857,6 +9857,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
 
         creature->SendAIReaction(AI_REACTION_HOSTILE);
         creature->CallAssistance();
+        creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY));
     }
 
     // delay offhand weapon attack to next attack time
@@ -13004,6 +13005,8 @@ void Unit::ClearInCombat()
         // Xinef: will be recalculated at follow movement generator initialization
         if (!IsPet() && !IsCharmed())
             return;
+
+        creature->SetAssistanceTimer(0);
     }
     else if (Player* player = ToPlayer())
     {
