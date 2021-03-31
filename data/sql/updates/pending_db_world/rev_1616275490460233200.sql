@@ -273,3 +273,15 @@ UPDATE `creature_template` SET `DamageModifier`='2.5' WHERE  `entry`=644;
 UPDATE `creature_template` SET `DamageModifier`='2.45' WHERE  `entry`=647;
 -- cookie
 UPDATE `creature_template` SET `DamageModifier`='2.45' WHERE  `entry`=645;
+
+-- Ragefire chasm
+-- Oggleflint 1.7 -> 2.2 
+UPDATE `creature_template` SET `DamageModifier`='2.2' WHERE  `entry`=11517;
+-- Taragaman the Hungerer 1.7 -> 2.4
+UPDATE `creature_template` SET `DamageModifier`='2.4' WHERE  `entry`=11520;
+-- Jergosh the Invoker 1.7 -> 2.4
+UPDATE `creature_template` SET `DamageModifier`='2.4' WHERE  `entry`=11518;
+-- bazzalan 1.7 -> 2.2
+UPDATE `creature_template` SET `DamageModifier`='2.2' WHERE  `entry`=11519;
+-- trash, was 1.7
+UPDATE `creature_template` SET `DamageModifier`='1.5' WHERE  `entry`=11320;
