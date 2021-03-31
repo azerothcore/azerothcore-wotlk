@@ -13002,11 +13002,11 @@ void Unit::ClearInCombat()
         if (HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED))
             SetUInt32Value(UNIT_DYNAMIC_FLAGS, creature->GetCreatureTemplate()->dynamicflags);
 
+        creature->SetAssistanceTimer(0);
+
         // Xinef: will be recalculated at follow movement generator initialization
         if (!IsPet() && !IsCharmed())
             return;
-
-        creature->SetAssistanceTimer(0);
     }
     else if (Player* player = ToPlayer())
     {
