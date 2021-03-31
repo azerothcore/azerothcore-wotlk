@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
+ * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
+ */
 
 #ifndef DEF_AHNKAHET_H
 #define DEF_AHNKAHET_H
@@ -6,12 +10,13 @@ enum AhnkahetData
 {
     // Main encounters
     DATA_ELDER_NADOX            = 0,
-    DATA_PRINCE_TALDARAM,
-    DATA_JEDOGA_SHADOWSEEKER,
-    DATA_HERALD_VOLAZJ,
-    DATA_AMANITAR,
-    MAX_ENCOUNTER,
+    DATA_PRINCE_TALDARAM        = 1,
+    DATA_JEDOGA_SHADOWSEEKER    = 2,
+    DATA_HERALD_VOLAZJ          = 3,
+    DATA_AMANITAR               = 4,
+    MAX_ENCOUNTER               = 5,
 
+    // MISC DATA
     // Teldram encounter related
     DATA_PRINCE_TALDARAM_PLATFORM,
     DATA_TELDRAM_SPHERE1,
