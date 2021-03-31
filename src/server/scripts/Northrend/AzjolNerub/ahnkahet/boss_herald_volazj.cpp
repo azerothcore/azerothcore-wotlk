@@ -140,11 +140,6 @@ public:
             me->SetInCombatWithZone();
         }
 
-        void JustSummoned(Creature *summon) override
-        {
-            summons.Summon(summon);
-        }
-
         void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
@@ -165,29 +160,22 @@ public:
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
-            // TODO: move this to DamageTaken event
-            switch (insanityTimes)
-            {
-            case 0: // First insanity
-            {
-                if (me->HealthBelowPctDamaged(66, damage))
-                {
-                    DoCastSelf(SPELL_INSANITY, false);
-                    ++insanityTimes;
-                }
+            // Do not perform insanity recast if boss is casting insanity
+            if (me->FindCurrentSpellBySpellId(SPELL_INSANITY))
+                return;
 
-                events.RepeatEvent(1000);
-                break;
-            }
-            case 1: // Second insanity
+            // First insanity
+            if (insanityTimes == 0 && me->HealthBelowPctDamaged(66, damage))
             {
-                if (me->HealthBelowPctDamaged(33, damage))
-                {
-                    DoCastSelf(SPELL_INSANITY, false);
-                    ++insanityTimes;
-                }
-                break;
+                DoCastSelf(SPELL_INSANITY, false);
+                ++insanityTimes;
             }
+            // Second insanity
+            else if (insanityTimes == 1 && me->HealthBelowPctDamaged(33, damage))
+            {
+                me->InterruptNonMeleeSpells(false);
+                DoCastSelf(SPELL_INSANITY, false);
+                ++insanityTimes;
             }
         }
 
@@ -222,23 +210,28 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_HERALD_MIND_FLAY:
-                {
-                    DoCastVictim(DUNGEON_MODE(SPELL_MIND_FLAY, SPELL_MIND_FLAY_H), false);
-                    events.RepeatEvent(20000);
-                }break;
-                case EVENT_HERALD_SHADOW:
-                {
-                    DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_BOLT_VOLLEY, SPELL_SHADOW_BOLT_VOLLEY_H), false);
-                    events.RepeatEvent(5000);
-                }break;
-                case EVENT_HERALD_SHIVER:
-                {
-                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        DoCast(pTarget, DUNGEON_MODE(SPELL_SHIVER, SPELL_SHIVER_H), false);
+                    case EVENT_HERALD_MIND_FLAY:
+                    {
+                        DoCastVictim(DUNGEON_MODE(SPELL_MIND_FLAY, SPELL_MIND_FLAY_H), false);
+                        events.RepeatEvent(20000);
+                    }break;
+                    case EVENT_HERALD_SHADOW:
+                    {
+                        DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_BOLT_VOLLEY, SPELL_SHADOW_BOLT_VOLLEY_H), false);
+                        events.RepeatEvent(5000);
+                    }break;
+                    case EVENT_HERALD_SHIVER:
+                    {
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            DoCast(pTarget, DUNGEON_MODE(SPELL_SHIVER, SPELL_SHIVER_H), false);
 
-                    events.RepeatEvent(15000);
-                }break;
+                        events.RepeatEvent(15000);
+                    }break;
+                }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    return;
                 }
             }
 
