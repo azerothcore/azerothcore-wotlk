@@ -6,15 +6,15 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `character_achievement_progress`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `character_achievement_progress` 
 (
-  `guid` int(10) unsigned NOT NULL,
-  `criteria` smallint(5) unsigned NOT NULL,
-  `counter` int(10) unsigned NOT NULL,
-  `date` int(10) unsigned NOT NULL DEFAULT 0,
+  `guid` INT unsigned NOT NULL,
+  `criteria` SMALLINT unsigned NOT NULL,
+  `counter` INT unsigned NOT NULL,
+  `date` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`criteria`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `character_achievement_progress` WRITE;

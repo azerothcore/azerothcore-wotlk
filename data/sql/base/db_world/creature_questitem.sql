@@ -6,15 +6,15 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `creature_questitem`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `creature_questitem` 
 (
-  `CreatureEntry` int(10) unsigned NOT NULL DEFAULT 0,
-  `Idx` int(10) unsigned NOT NULL DEFAULT 0,
-  `ItemId` int(10) unsigned NOT NULL DEFAULT 0,
-  `VerifiedBuild` smallint(5) NOT NULL DEFAULT 0,
+  `CreatureEntry` INT unsigned NOT NULL DEFAULT 0,
+  `Idx` INT unsigned NOT NULL DEFAULT 0,
+  `ItemId` INT unsigned NOT NULL DEFAULT 0,
+  `VerifiedBuild` SMALLINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`CreatureEntry`,`Idx`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `creature_questitem` WRITE;

@@ -6,19 +6,19 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `game_event_npc_vendor`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `game_event_npc_vendor` 
 (
-  `eventEntry` tinyint(4) NOT NULL COMMENT 'Entry of the game event.',
-  `guid` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `slot` smallint(6) NOT NULL DEFAULT 0,
-  `item` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `maxcount` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `incrtime` mediumint(8) unsigned NOT NULL DEFAULT 0,
-  `ExtendedCost` mediumint(8) unsigned NOT NULL DEFAULT 0,
+  `eventEntry` TINYINT NOT NULL COMMENT 'Entry of the game event.',
+  `guid` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `slot` SMALLINT NOT NULL DEFAULT 0,
+  `item` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `maxcount` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `incrtime` MEDIUMINT unsigned NOT NULL DEFAULT 0,
+  `ExtendedCost` MEDIUMINT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`guid`,`item`),
   KEY `slot` (`slot`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `game_event_npc_vendor` WRITE;

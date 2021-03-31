@@ -6,13 +6,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `item_soulbound_trade_data`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `item_soulbound_trade_data` 
 (
-  `itemGuid` int(10) unsigned NOT NULL COMMENT 'Item GUID',
+  `itemGuid` INT unsigned NOT NULL COMMENT 'Item GUID',
   `allowedPlayers` text NOT NULL COMMENT 'Space separated GUID list of players who can receive this item in trade',
   PRIMARY KEY (`itemGuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Item Refund System';
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Item Refund System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `item_soulbound_trade_data` WRITE;

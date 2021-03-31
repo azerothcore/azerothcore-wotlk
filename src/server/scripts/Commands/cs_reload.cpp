@@ -55,7 +55,8 @@ public:
         static std::vector<ChatCommand> reloadCommandTable =
         {
             { "auctions",                     SEC_ADMINISTRATOR, true,  &HandleReloadAuctionsCommand,                   "" },
-            { "access_requirement",           SEC_ADMINISTRATOR, true,  &HandleReloadAccessRequirementCommand,          "" },
+            { "dungeon_access_template",      SEC_ADMINISTRATOR, true,  &HandleReloadDungeonAccessCommand,              "" },
+            { "dungeon_access_requirements",  SEC_ADMINISTRATOR, true,  &HandleReloadDungeonAccessCommand,              "" },
             { "achievement_criteria_data",    SEC_ADMINISTRATOR, true,  &HandleReloadAchievementCriteriaDataCommand,    "" },
             { "achievement_reward",           SEC_ADMINISTRATOR, true,  &HandleReloadAchievementRewardCommand,          "" },
             { "all",                          SEC_ADMINISTRATOR, true,  nullptr,                                        "", reloadAllCommandTable },
@@ -175,7 +176,7 @@ public:
         HandleReloadAllGossipsCommand(handler, "");
         HandleReloadAllLocalesCommand(handler, "");
 
-        HandleReloadAccessRequirementCommand(handler, "");
+        HandleReloadDungeonAccessCommand(handler, "");
         HandleReloadMailLevelRewardCommand(handler, "");
         HandleReloadCommandCommand(handler, "");
         HandleReloadReservedNameCommand(handler, "");
@@ -324,11 +325,11 @@ public:
         return true;
     }
 
-    static bool HandleReloadAccessRequirementCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadDungeonAccessCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading Access Requirement definitions...");
+        sLog->outString("Re-Loading Dungeon Access Requirement definitions...");
         sObjectMgr->LoadAccessRequirements();
-        handler->SendGlobalGMSysMessage("DB table `access_requirement` reloaded.");
+        handler->SendGlobalGMSysMessage("DB tables `dungeon_access_template` AND `dungeon_access_requirements` reloaded.");
         return true;
     }
 
@@ -436,74 +437,7 @@ public:
 
             Field* fields = result->Fetch();
 
-            cInfo->DifficultyEntry[0]       = fields[0].GetUInt32();
-            cInfo->DifficultyEntry[1]       = fields[1].GetUInt32();
-            cInfo->DifficultyEntry[2]       = fields[2].GetUInt32();
-            cInfo->KillCredit[0]            = fields[3].GetUInt32();
-            cInfo->KillCredit[1]            = fields[4].GetUInt32();
-            cInfo->Modelid1                 = fields[5].GetUInt32();
-            cInfo->Modelid2                 = fields[6].GetUInt32();
-            cInfo->Modelid3                 = fields[7].GetUInt32();
-            cInfo->Modelid4                 = fields[8].GetUInt32();
-            cInfo->Name                     = fields[9].GetString();
-            cInfo->SubName                  = fields[10].GetString();
-            cInfo->IconName                 = fields[11].GetString();
-            cInfo->GossipMenuId             = fields[12].GetUInt32();
-            cInfo->minlevel                 = fields[13].GetUInt8();
-            cInfo->maxlevel                 = fields[14].GetUInt8();
-            cInfo->expansion                = fields[15].GetUInt16();
-            cInfo->faction                  = fields[16].GetUInt16();
-            cInfo->npcflag                  = fields[17].GetUInt32();
-            cInfo->speed_walk               = fields[18].GetFloat();
-            cInfo->speed_run                = fields[19].GetFloat();
-            cInfo->scale                    = fields[20].GetFloat();
-            cInfo->rank                     = fields[21].GetUInt8();
-            cInfo->dmgschool                = fields[22].GetUInt8();
-            cInfo->DamageModifier           = fields[23].GetFloat();
-            cInfo->BaseAttackTime           = fields[24].GetUInt32();
-            cInfo->RangeAttackTime          = fields[25].GetUInt32();
-            cInfo->BaseVariance             = fields[26].GetFloat();
-            cInfo->RangeVariance            = fields[27].GetFloat();
-            cInfo->unit_class               = fields[28].GetUInt8();
-            cInfo->unit_flags               = fields[29].GetUInt32();
-            cInfo->unit_flags2              = fields[30].GetUInt32();
-            cInfo->dynamicflags             = fields[31].GetUInt32();
-            cInfo->family                   = fields[32].GetUInt8();
-            cInfo->trainer_type             = fields[33].GetUInt8();
-            cInfo->trainer_spell            = fields[34].GetUInt32();
-            cInfo->trainer_class            = fields[35].GetUInt8();
-            cInfo->trainer_race             = fields[36].GetUInt8();
-            cInfo->type                     = fields[37].GetUInt8();
-            cInfo->type_flags               = fields[38].GetUInt32();
-            cInfo->lootid                   = fields[39].GetUInt32();
-            cInfo->pickpocketLootId         = fields[40].GetUInt32();
-            cInfo->SkinLootId               = fields[41].GetUInt32();
-
-            for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-                cInfo->resistance[i] = fields[42 + i - 1].GetUInt16();
-
-            for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
-                cInfo->spells[i] = fields[48 + i].GetUInt32();
-
-            cInfo->PetSpellDataId           = fields[56].GetUInt32();
-            cInfo->VehicleId                = fields[57].GetUInt32();
-            cInfo->mingold                  = fields[58].GetUInt32();
-            cInfo->maxgold                  = fields[59].GetUInt32();
-            cInfo->AIName                   = fields[60].GetString();
-            cInfo->MovementType             = fields[61].GetUInt8();
-            cInfo->InhabitType              = fields[62].GetUInt8();
-            cInfo->HoverHeight              = fields[63].GetFloat();
-            cInfo->ModHealth                = fields[64].GetFloat();
-            cInfo->ModMana                  = fields[65].GetFloat();
-            cInfo->ModArmor                 = fields[66].GetFloat();
-            cInfo->RacialLeader             = fields[67].GetBool();
-            cInfo->movementId               = fields[68].GetUInt32();
-            cInfo->RegenHealth              = fields[69].GetBool();
-            cInfo->MechanicImmuneMask       = fields[70].GetUInt32();
-            cInfo->SpellSchoolImmuneMask    = fields[71].GetUInt32();
-            cInfo->flags_extra              = fields[72].GetUInt32();
-            cInfo->ScriptID                 = sObjectMgr->GetScriptId(fields[73].GetCString());
-
+            sObjectMgr->LoadCreatureTemplate(fields);
             sObjectMgr->CheckCreatureTemplate(cInfo);
         }
 

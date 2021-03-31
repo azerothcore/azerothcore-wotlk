@@ -6,13 +6,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `spell_script_names`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spell_script_names` 
 (
-  `spell_id` int(11) NOT NULL,
+  `spell_id` INT NOT NULL,
   `ScriptName` char(64) NOT NULL,
   UNIQUE KEY `spell_id` (`spell_id`,`ScriptName`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `spell_script_names` WRITE;
