@@ -641,7 +641,7 @@ void Creature::Update(uint32 diff)
                             SetNoCallAssistance(false);
                             CallAssistance();
                         }
-                        m_assistanceTimer = sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY);
+                        m_assistanceTimer = sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD);
                     }
                     else
                         m_assistanceTimer -= diff;
