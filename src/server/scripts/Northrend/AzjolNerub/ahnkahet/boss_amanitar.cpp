@@ -4,6 +4,8 @@
 
 #include "ahnkahet.h"
 #include "Player.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 
 enum Spells
@@ -35,16 +37,16 @@ enum Events
 {
     // Boss
     EVENT_RESPAWN                           = 1,
-    EVENT_ROOTS                             = 2,
-    EVENT_BASH                              = 3,
-    EVENT_BOLT                              = 4,
-    EVENT_REMOVE_MUSHROOM_POWER             = 5,
-    EVENT_MINI                              = 6,
+    EVENT_ROOTS,
+    EVENT_BASH,
+    EVENT_BOLT,
+    EVENT_REMOVE_MUSHROOM_POWER,
+    EVENT_MINI,
 
     // Mushroom
-    EVENT_GROW                              = 7,
-    EVENT_CHECK_PLAYER                      = 8,
-    EVENT_KILLSELF                          = 9,
+    EVENT_GROW,
+    EVENT_CHECK_PLAYER,
+    EVENT_KILLSELF,
 };
 
 enum Misc

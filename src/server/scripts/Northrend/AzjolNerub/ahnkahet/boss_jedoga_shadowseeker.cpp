@@ -5,6 +5,8 @@
 #include "ahnkahet.h"
 #include "Containers.h"
 #include "ObjectAccessor.h"
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
 #include "TemporarySummon.h"
@@ -49,14 +51,14 @@ enum Events
 {
     // Jedoga
     EVENT_JEDOGA_CYCLONE                    = 1,
-    EVENT_JEDOGA_LIGHTNING_BOLT             = 2,
-    EVENT_JEDOGA_THUNDERSHOCK               = 3,
-    EVENT_JEDOGA_PREPARE_RITUAL             = 4,
-    EVENT_JEDOGA_MOVE_UP                    = 5,
-    EVENT_JEDOGA_MOVE_DOWN                  = 6,
+    EVENT_JEDOGA_LIGHTNING_BOLT,
+    EVENT_JEDOGA_THUNDERSHOCK,
+    EVENT_JEDOGA_PREPARE_RITUAL,
+    EVENT_JEDOGA_MOVE_UP,
+    EVENT_JEDOGA_MOVE_DOWN,
 
     // Initiate
-    EVENT_RITUAL_BEGIN_MOVE                 = 7,
+    EVENT_RITUAL_BEGIN_MOVE,
 };
 
 enum Creatures

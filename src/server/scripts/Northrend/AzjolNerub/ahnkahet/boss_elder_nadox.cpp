@@ -42,9 +42,9 @@ enum Creatures
 enum Events
 {
     EVENT_CHECK_HOME                = 1,
-    EVENT_PLAGUE                    = 2,
-    EVENT_BROOD_RAGE                = 3,
-    EVENT_SWARMER                   = 4,
+    EVENT_PLAGUE,
+    EVENT_BROOD_RAGE,
+    EVENT_SWARMER,
 };
 
 enum Yells

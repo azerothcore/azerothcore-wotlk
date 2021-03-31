@@ -47,8 +47,8 @@ enum Misc
 enum Events
 {
     EVENT_HERALD_MIND_FLAY                  = 1,
-    EVENT_HERALD_SHADOW                     = 2,
-    EVENT_HERALD_SHIVER                     = 3,
+    EVENT_HERALD_SHADOW,
+    EVENT_HERALD_SHIVER,
 };
 
 class boss_volazj : public CreatureScript

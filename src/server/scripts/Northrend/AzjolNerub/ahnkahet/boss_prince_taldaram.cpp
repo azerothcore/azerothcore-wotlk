@@ -3,8 +3,8 @@
 */
 
 #include "ahnkahet.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "Player.h"
@@ -53,10 +53,10 @@ enum Actions
 enum Event
 {
     EVENT_PRINCE_FLAME_SPHERES              = 1,
-    EVENT_PRINCE_VANISH                     = 2,
-    EVENT_PRINCE_BLOODTHIRST                = 3,
-    EVENT_PRINCE_VANISH_RUN                 = 4,
-    EVENT_PRINCE_RESCHEDULE                 = 5,
+    EVENT_PRINCE_VANISH,
+    EVENT_PRINCE_BLOODTHIRST,
+    EVENT_PRINCE_VANISH_RUN,
+    EVENT_PRINCE_RESCHEDULE,
 };
 
 enum Yells
