@@ -111,7 +111,9 @@ public:
         void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == POINT_ORB)
+            {
                 me->DisappearAndDie();
+            }
         }
 
         void IsSummonedBy(Unit* /*summoner*/) override
@@ -170,6 +172,7 @@ public:
                     moveTimer -= diff;
                 }
             }
+
             if (uiDespawnTimer)
             {
                 if (uiDespawnTimer <= diff)

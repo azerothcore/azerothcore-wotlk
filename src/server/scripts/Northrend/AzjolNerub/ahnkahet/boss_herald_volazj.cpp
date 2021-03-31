@@ -247,6 +247,25 @@ public:
         uint8 insanityTimes;
         uint8 insanityHandled;
 
+        uint32 GetPlrInsanityAuraId(uint32 phaseMask) const
+        {
+            switch (phaseMask)
+            {
+                case 16:
+                    return SPELL_INSANITY_PHASING_1;
+                case 32:
+                    return SPELL_INSANITY_PHASING_2;
+                case 64:
+                    return SPELL_INSANITY_PHASING_3;
+                case 128:
+                    return SPELL_INSANITY_PHASING_4;
+                case 256:
+                    return SPELL_INSANITY_PHASING_5;
+            }
+
+            return 0;
+        }
+
         void ResetPlayersPhaseMask()
         {
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
@@ -254,39 +273,9 @@ public:
             {
                 if (Player* pPlayer = i.GetSource())
                 {
-                    uint32 phaseAuraToRemove = 0;
-                    switch (pPlayer->GetPhaseMask())
+                    if (uint32 const insanityAura = GetPlrInsanityAuraId(pPlayer->GetPhaseMask()))
                     {
-                        case 16:
-                        {
-                            phaseAuraToRemove = SPELL_INSANITY_PHASING_1;
-                            break;
-                        }
-                        case 32:
-                        {
-                            phaseAuraToRemove = SPELL_INSANITY_PHASING_2;
-                            break;
-                        }
-                        case 64:
-                        {
-                            phaseAuraToRemove = SPELL_INSANITY_PHASING_3;
-                            break;
-                        }
-                        case 128:
-                        {
-                            phaseAuraToRemove = SPELL_INSANITY_PHASING_4;
-                            break;
-                        }
-                        case 256:
-                        {
-                            phaseAuraToRemove = SPELL_INSANITY_PHASING_5;
-                            break;
-                        }
-                    }
-
-                    if (phaseAuraToRemove)
-                    {
-                        pPlayer->RemoveAurasDueToSpell(phaseAuraToRemove);
+                        pPlayer->RemoveAurasDueToSpell(insanityAura);
                     }
                 }
             }
@@ -316,7 +305,7 @@ public:
                 Player* pPlayer = i.GetSource();
                 if (pPlayer && !(pPlayer->GetPhaseMask() & phase))
                 {
-                    pPlayer->RemoveAurasDueToSpell(GetSpellForPhaseMask(pPlayer->GetPhaseMask()));
+                    pPlayer->RemoveAurasDueToSpell(GetPlrInsanityAuraId(pPlayer->GetPhaseMask()));
                 }
             }
 

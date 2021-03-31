@@ -7,6 +7,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
+#include <array>
 
 class instance_ahnkahet : public InstanceMapScript
 {
@@ -25,13 +26,12 @@ public:
             taldaramGate_GUID(0)
         {
             SetBossNumber(MAX_ENCOUNTER);
-            teldaramSpheres[0] = NOT_STARTED;
-            teldaramSpheres[1] = NOT_STARTED;
-        };
+            teldaramSpheres.fill(NOT_STARTED);
+        }
 
         void OnCreatureCreate(Creature* pCreature) override
         {
-            switch(pCreature->GetEntry())
+            switch (pCreature->GetEntry())
             {
             case NPC_ELDER_NADOX:
                 elderNadox_GUID = pCreature->GetGUID();
@@ -58,7 +58,7 @@ public:
                 case GO_TELDARAM_PLATFORM:
                 {
                     taldaramPlatform_GUID = pGo->GetGUID();
-                    if (IsAllSpheresActivated() || GetBossState(DATA_PRINCE_TALDARAM))
+                    if (IsAllSpheresActivated() || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
                     {
                         HandleGameObject(0, true, pGo);
                     }
@@ -68,7 +68,7 @@ public:
                 case GO_TELDARAM_SPHERE1:
                 case GO_TELDARAM_SPHERE2:
                 {
-                    if (teldaramSpheres[pGo->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1] == DONE || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
+                    if (teldaramSpheres.at(pGo->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1) == DONE || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
                         pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
@@ -100,16 +100,9 @@ public:
                 return false;
             }
 
-            switch (type)
+            if (type == DATA_PRINCE_TALDARAM && state == DONE)
             {
-                case DATA_PRINCE_TALDARAM:
-                {
-                    if (state == DONE)
-                    {
-                        HandleGameObject(taldaramGate_GUID, true);
-                    }
-                    break;
-                }
+                HandleGameObject(taldaramGate_GUID, true);
             }
 
             return true;
@@ -142,13 +135,14 @@ public:
 
         uint32 GetData(uint32 type) const override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_TELDRAM_SPHERE1:
-                    return teldaramSpheres[0];
+                    return teldaramSpheres.at(0);
                 case DATA_TELDRAM_SPHERE2:
-                    return teldaramSpheres[1];
+                    return teldaramSpheres.at(1);
             }
+
             return 0;
         }
 
@@ -167,6 +161,7 @@ public:
                 case DATA_AMANITAR:
                     return amanitar_GUID;
             }
+
             return 0;
         }
 
@@ -213,7 +208,10 @@ public:
                 loadStream >> teldaramSpheres[0] >> teldaramSpheres[1];
             }
             else
+            {
                 OUT_LOAD_INST_DATA_FAIL;
+                return;
+            }
 
             OUT_LOAD_INST_DATA_COMPLETE;
         }
@@ -228,11 +226,11 @@ public:
         // Teldaram related
         uint64 taldaramPlatform_GUID;
         uint64 taldaramGate_GUID;
-        uint32 teldaramSpheres[2];  // Used to identify for sphere activation
+        std::array<uint32, 2> teldaramSpheres;  // Used to identify for sphere activation
 
         bool IsAllSpheresActivated() const
         {
-            return teldaramSpheres[0] == DONE && teldaramSpheres[1] == DONE;
+            return teldaramSpheres.at(0) == DONE && teldaramSpheres.at(1) == DONE;
         }
     };
 
