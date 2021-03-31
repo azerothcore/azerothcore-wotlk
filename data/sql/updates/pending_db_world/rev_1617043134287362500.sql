@@ -1,5 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617043134287362500');
 
+/* Environment */
+
 -- PhaseMask to 1 for all Naxx end wing eyes
 UPDATE `gameobject` SET `phaseMask`=1 WHERE `guid` IN (268045, 268044, 268047, 268046);
 -- Set gobject flag "GO_FLAG_NOT_SELECTABLE" for all Naxx end wing eyes
@@ -47,10 +49,16 @@ DELETE FROM `smart_scripts` WHERE `entryorguid`=16244 AND `source_type`=0 AND `i
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (16244, 0, 4, 0, 2, 0, 100, 0, 0, 30, 60000, 60000, 0, 11, 54701, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infectious Ghoul - On 30% HP - CastSelf Frenzy'),
 (16244, 0, 5, 0, 2, 0, 100, 0, 0, 30, 60000, 60000, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infectious Ghoul - On 30% HP - Say EMOTE_FRENZY');
--- Fix elemental immunity mechanic on Plague Slime
+-- Fix elemental immunity mechanic on Plague Slime (immunity based on elemental selection)
 UPDATE `smart_scripts` SET `event_type`=4 WHERE `entryorguid`=16243 AND `source_type`=0 AND `id`=0 AND `link`=0;
--- WIP: Add immunities per color ..
-
+DELETE FROM `smart_scripts` WHERE `entryorguid`=16243 AND `source_type`=0 AND `id` IN (5, 6, 7, 8);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
+(16243, 0, 5, 0, 23, 0, 100, 0, 28987, 1, 0, 0, 0, 75, 7743, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Plague Slime - On has aura - Add aura Immunity: Shadow'),
+(16243, 0, 6, 0, 23, 0, 100, 0, 28988, 1, 0, 0, 0, 75, 7940, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Plague Slime - On has aura - Add aura Immunity: Frost'),
+(16243, 0, 7, 0, 23, 0, 100, 0, 28989, 1, 0, 0, 0, 75, 7941, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Plague Slime - On has aura - Add aura Immunity: Nature'),
+(16243, 0, 8, 0, 23, 0, 100, 0, 28990, 1, 0, 0, 0, 75, 7942, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Plague Slime - On has aura - Add aura Immunity: Fire');
+-- Fix Disease/Poison immunity on Plague Slime
+UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|2097152 WHERE `entry`=16243;
 -- Fix Blood Presence on Death Knight
 UPDATE `smart_scripts` SET `event_type`=4, `event_phase_mask`=0, `event_param2`=0, `comment`='On Aggro - Cast Self - Blood Presence' WHERE `entryorguid`=16146 AND `source_type`=0 AND `id`=2 AND `link`=0;
 
