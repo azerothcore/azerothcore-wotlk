@@ -9,3 +9,4 @@ INSERT INTO `smart_scripts` VALUES
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 4133);
 INSERT INTO `smart_scripts` VALUES
 (4133, 0, 1, 0, 2, 0, 100, 1, 1, 15, 0, 0, 0, 39, 30, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Silithid Hive Drone - Between 1-15% Health - Call For Help (No Repeat)');
+
