@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,16 +11,17 @@ Comment: All npc related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ObjectMgr.h"
 #include "Chat.h"
-#include "Transport.h"
+#include "CreatureAI.h"
 #include "CreatureGroups.h"
 #include "Language.h"
-#include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
-#include "CreatureAI.h"
-#include "Player.h"
+#include "ObjectMgr.h"
 #include "Pet.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
+#include "Transport.h"
+#include <string>
 
 struct NpcFlagText
 {
@@ -162,14 +163,14 @@ public:
             { "info",           SEC_MODERATOR,      false, &HandleNpcInfoCommand,              "" },
             { "near",           SEC_GAMEMASTER,     false, &HandleNpcNearCommand,              "" },
             { "move",           SEC_ADMINISTRATOR,  false, &HandleNpcMoveCommand,              "" },
-            { "playemote",      SEC_ADMINISTRATOR,  false, &HandleNpcPlayEmoteCommand,         "" },
+            { "playemote",      SEC_GAMEMASTER,  false, &HandleNpcPlayEmoteCommand,         "" },
             { "say",            SEC_GAMEMASTER,     false, &HandleNpcSayCommand,               "" },
             { "textemote",      SEC_GAMEMASTER,     false, &HandleNpcTextEmoteCommand,         "" },
             { "whisper",        SEC_GAMEMASTER,     false, &HandleNpcWhisperCommand,           "" },
             { "yell",           SEC_GAMEMASTER,     false, &HandleNpcYellCommand,              "" },
             { "tame",           SEC_GAMEMASTER,     false, &HandleNpcTameCommand,              "" },
-            { "add",            SEC_GAMEMASTER,     false, nullptr,                            "", npcAddCommandTable },
-            { "delete",         SEC_GAMEMASTER,     false, nullptr,                            "", npcDeleteCommandTable },
+            { "add",            SEC_ADMINISTRATOR,     false, nullptr,                         "", npcAddCommandTable },
+            { "delete",         SEC_ADMINISTRATOR,     false, nullptr,                         "", npcDeleteCommandTable },
             { "follow",         SEC_GAMEMASTER,     false, nullptr,                            "", npcFollowCommandTable },
             { "set",            SEC_ADMINISTRATOR,  false, nullptr,                            "", npcSetCommandTable }
         };
@@ -519,7 +520,7 @@ public:
         }
         uint32 itemId = atol(pitem);
 
-        char* addMulti = strtok(NULL, " ");
+        char* addMulti = strtok(nullptr, " ");
         if (!sObjectMgr->RemoveVendorItem(addMulti ? handler->GetSession()->GetCurrentVendor() : vendor->GetEntry(), itemId))
         {
             handler->PSendSysMessage(LANG_ITEM_NOT_IN_LIST, itemId);
@@ -918,6 +919,13 @@ public:
         if (!creature || creature->IsPet())
         {
             handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_FACTION_INVPARAM, std::to_string(displayId).c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }

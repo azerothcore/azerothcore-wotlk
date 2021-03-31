@@ -6,17 +6,17 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `disables`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `disables` 
 (
-  `sourceType` int(10) unsigned NOT NULL,
-  `entry` int(10) unsigned NOT NULL,
-  `flags` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `sourceType` INT unsigned NOT NULL,
+  `entry` INT unsigned NOT NULL,
+  `flags` TINYINT unsigned NOT NULL DEFAULT 0,
   `params_0` varchar(255) NOT NULL DEFAULT '',
   `params_1` varchar(255) NOT NULL DEFAULT '',
   `comment` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`sourceType`,`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `disables` WRITE;
@@ -459,8 +459,12 @@ INSERT INTO `disables` VALUES
 (1,8337,0,'','','Deprecated quest: <UNUSED>'),
 (1,8339,0,'','','Deprecated quest: Royalty of the Council <NYI> <TXT> UNUSED'),
 (1,8340,0,'','','Deprecated quest: Twilight Signet Ring <NYI> <TXT>'),
+(1,8367,0,'','','Deprecated Quest: For Great Honor'),
+(1,8371,0,'','','Deprecated Quest: Concerted Efforts'),
 (1,8384,0,'','','Deprecated quest: Claiming Arathi Basin'),
+(1,8385,0,'','','Deprecated Quest: Concerted Efforts'),
 (1,8386,0,'','','Deprecated quest: Fight for Warsong Gulch'),
+(1,8388,0,'','','Deprecated Quest: For Great Honor'),
 (1,8389,0,'','','Deprecated quest: Battle of Warsong Gulch'),
 (1,8390,0,'','','Deprecated quest: Conquering Arathi Basin'),
 (1,8391,0,'','','Deprecated quest: Claiming Arathi Basin'),
@@ -784,10 +788,15 @@ INSERT INTO `disables` VALUES
 (1,13210,0,'','','Deprecated quest: Blizzard Account: - DEM - E - FLAG'),
 (1,13303,0,'','','Deprecated quest'),
 (1,13317,0,'','','Deprecated quest: ----'),
+(1,13381,0,'','','Deprecated Quest: Watts My Target'),
 (1,13405,0,'','','Deprecated quest: Call to Arms: Strand of the Ancients'),
 (1,13407,0,'','','Deprecated quest: Call to Arms: Strand of the Ancients'),
 (1,13427,0,'','','Deprecated quest: Call to Arms: Alterac Valley'),
 (1,13428,0,'','','Deprecated quest: Call to Arms: Alterac Valley'),
+(1,13475,0,'','','Deprecated Quest: For Great Honor'),
+(1,13476,0,'','','Deprecated Quest: For Great Honor'),
+(1,13477,0,'','','Deprecated Quest: Concerted Efforts'),
+(1,13478,0,'','','Deprecated Quest: Concerted Efforts'),
 (1,13541,0,'','','Deprecated quest: '),
 (1,13649,0,'','','Deprecated quest: Justin\'s Fun Test'),
 (1,13827,0,'','','Deprecated quest'),

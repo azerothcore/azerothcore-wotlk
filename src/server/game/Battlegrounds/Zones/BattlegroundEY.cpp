@@ -3,17 +3,17 @@
 */
 
 #include "BattlegroundEY.h"
-#include "ObjectMgr.h"
-#include "World.h"
-#include "WorldPacket.h"
 #include "BattlegroundMgr.h"
 #include "Creature.h"
+#include "GameGraveyard.h"
 #include "Language.h"
 #include "Object.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "Util.h"
+#include "World.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
-#include "GameGraveyard.h"
 
 BattlegroundEY::BattlegroundEY()
 {
@@ -372,7 +372,7 @@ void BattlegroundEY::RespawnFlagAfterDrop()
 
     _flagState = BG_EY_FLAG_STATE_ON_BASE;
     RespawnFlag();
-    if (GameObject* flag = ObjectAccessor::GetObjectInMap(GetDroppedFlagGUID(), FindBgMap(), (GameObject*)NULL))
+    if (GameObject* flag = ObjectAccessor::GetObjectInMap(GetDroppedFlagGUID(), FindBgMap(), (GameObject*)nullptr))
         flag->Delete();
     SetDroppedFlagGUID(0);
 }
@@ -418,7 +418,7 @@ void BattlegroundEY::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     player->CastSpell(player, BG_EY_NETHERSTORM_FLAG_SPELL, true);
     player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 
-    PSendMessageToAll(LANG_BG_EY_HAS_TAKEN_FLAG, player->GetTeamId() == TEAM_ALLIANCE ? CHAT_MSG_BG_SYSTEM_ALLIANCE : CHAT_MSG_BG_SYSTEM_HORDE, NULL, player->GetName().c_str());
+    PSendMessageToAll(LANG_BG_EY_HAS_TAKEN_FLAG, player->GetTeamId() == TEAM_ALLIANCE ? CHAT_MSG_BG_SYSTEM_ALLIANCE : CHAT_MSG_BG_SYSTEM_HORDE, nullptr, player->GetName().c_str());
     PlaySoundToAll(player->GetTeamId() == TEAM_ALLIANCE ? BG_EY_SOUND_FLAG_PICKED_UP_ALLIANCE : BG_EY_SOUND_FLAG_PICKED_UP_HORDE);
     UpdateWorldState(NETHERSTORM_FLAG, 0);
 }

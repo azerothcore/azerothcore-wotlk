@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -78,7 +78,6 @@ namespace Movement
         void UninitializedSplineInitMethod(Vector3 const*, index_type, bool, index_type) { ABORT(); }
 
     public:
-
         explicit SplineBase()  {}
 
         /** Caclulates the position for given segment Idx, and percent of segment length t
@@ -133,12 +132,10 @@ namespace Movement
         typedef length_type LengthType;
         typedef std::vector<length_type> LengthArray;
     protected:
-
         LengthArray lengths;
 
         [[nodiscard]] index_type computeIndexInBounds(length_type length) const;
     public:
-
         explicit Spline() = default;
 
         /** Calculates the position for given t

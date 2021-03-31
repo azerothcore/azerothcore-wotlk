@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -9,31 +9,26 @@
 *  \author Derex <derex101@gmail.com>
 */
 
-#include "WorldSocketMgr.h"
-
-#include <ace/ACE.h>
-#include <ace/Log_Msg.h>
-#include <ace/Reactor.h>
-#include <ace/Reactor_Impl.h>
-#include <ace/TP_Reactor.h>
-#include <ace/Dev_Poll_Reactor.h>
-#include <ace/Guard_T.h>
-#include <atomic>
-#include <ace/os_include/arpa/os_inet.h>
-#include <ace/os_include/netinet/os_tcp.h>
-#include <ace/os_include/sys/os_types.h>
-#include <ace/os_include/sys/os_socket.h>
-
-#include <atomic>
-#include <set>
-
-#include "Log.h"
 #include "Common.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
+#include "Log.h"
+#include "ScriptMgr.h"
 #include "WorldSocket.h"
 #include "WorldSocketAcceptor.h"
-#include "ScriptMgr.h"
+#include "WorldSocketMgr.h"
+#include <ace/ACE.h>
+#include <ace/Dev_Poll_Reactor.h>
+#include <ace/Log_Msg.h>
+#include <ace/os_include/arpa/os_inet.h>
+#include <ace/os_include/netinet/os_tcp.h>
+#include <ace/os_include/sys/os_socket.h>
+#include <ace/os_include/sys/os_types.h>
+#include <ace/Reactor_Impl.h>
+#include <ace/Reactor.h>
+#include <ace/TP_Reactor.h>
+#include <atomic>
+#include <set>
 
 /**
 * This is a helper class to WorldSocketMgr, that manages
@@ -43,7 +38,6 @@
 class ReactorRunnable : protected ACE_Task_Base
 {
 public:
-
     ReactorRunnable() :
         m_Reactor(0),
         m_Connections(0),
@@ -116,7 +110,6 @@ public:
     }
 
 protected:
-
     void AddNewSockets()
     {
         ACORE_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
@@ -148,7 +141,7 @@ protected:
         sLog->outStaticDebug ("Network Thread Starting");
 #endif
 
-        ACE_ASSERT (m_Reactor);
+        ASSERT(m_Reactor);
 
         SocketSet::iterator i, t;
 
@@ -229,9 +222,9 @@ WorldSocketMgr* WorldSocketMgr::instance()
 int
 WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
 {
-    m_UseNoDelay = sConfigMgr->GetBoolDefault ("Network.TcpNodelay", true);
+    m_UseNoDelay = sConfigMgr->GetOption<bool> ("Network.TcpNodelay", true);
 
-    int num_threads = sConfigMgr->GetIntDefault ("Network.Threads", 1);
+    int num_threads = sConfigMgr->GetOption<int32> ("Network.Threads", 1);
 
     if (num_threads <= 0)
     {
@@ -246,9 +239,9 @@ WorldSocketMgr::StartReactiveIO (uint16 port, const char* address)
     sLog->outBasic ("Max allowed socket connections %d", ACE::max_handles());
 
     // -1 means use default
-    m_SockOutKBuff = sConfigMgr->GetIntDefault ("Network.OutKBuff", -1);
+    m_SockOutKBuff = sConfigMgr->GetOption<int32> ("Network.OutKBuff", -1);
 
-    m_SockOutUBuff = sConfigMgr->GetIntDefault ("Network.OutUBuff", 65536);
+    m_SockOutUBuff = sConfigMgr->GetOption<int32> ("Network.OutUBuff", 65536);
 
     if (m_SockOutUBuff <= 0)
     {
@@ -351,7 +344,7 @@ WorldSocketMgr::OnSocketOpen (WorldSocket* sock)
     // we skip the Acceptor Thread
     size_t min = 1;
 
-    ACE_ASSERT (m_NetThreadsCount >= 1);
+    ASSERT(m_NetThreadsCount >= 1);
 
     for (size_t i = 1; i < m_NetThreadsCount; ++i)
         if (m_NetThreads[i].Connections() < m_NetThreads[min].Connections())

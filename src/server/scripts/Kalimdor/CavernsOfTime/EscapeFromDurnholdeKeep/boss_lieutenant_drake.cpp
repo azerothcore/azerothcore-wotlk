@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "old_hillsbrad.h"
 #include "MoveSplineInit.h"
+#include "old_hillsbrad.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SmartScriptMgr.h"
 
 enum LieutenantDrake
@@ -150,7 +150,6 @@ public:
         EventMap events;
         Movement::PointsArray pathPoints;
     };
-
 };
 
 void AddSC_boss_lieutenant_drake()

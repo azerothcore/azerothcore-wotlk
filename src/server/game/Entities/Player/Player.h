@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,20 +7,18 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
+#include "Battleground.h"
 #include "DBCStores.h"
 #include "GroupReference.h"
-#include "MapReference.h"
 #include "InstanceSaveMgr.h"
-
 #include "Item.h"
+#include "MapReference.h"
+#include "ObjectMgr.h"
 #include "PetDefines.h"
 #include "QuestDef.h"
 #include "SpellMgr.h"
 #include "Unit.h"
-#include "Battleground.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
-
 #include <string>
 #include <vector>
 
@@ -446,51 +444,6 @@ enum PlayerFlags
     PLAYER_FLAGS_UNK31             = 0x80000000,
 };
 
-// used for PLAYER__FIELD_KNOWN_TITLES field (uint64), (1<<bit_index) without (-1)
-// can't use enum for uint64 values
-#define PLAYER_TITLE_DISABLED              UI64LIT(0x0000000000000000)
-#define PLAYER_TITLE_NONE                  UI64LIT(0x0000000000000001)
-#define PLAYER_TITLE_PRIVATE               UI64LIT(0x0000000000000002) // 1
-#define PLAYER_TITLE_CORPORAL              UI64LIT(0x0000000000000004) // 2
-#define PLAYER_TITLE_SERGEANT_A            UI64LIT(0x0000000000000008) // 3
-#define PLAYER_TITLE_MASTER_SERGEANT       UI64LIT(0x0000000000000010) // 4
-#define PLAYER_TITLE_SERGEANT_MAJOR        UI64LIT(0x0000000000000020) // 5
-#define PLAYER_TITLE_KNIGHT                UI64LIT(0x0000000000000040) // 6
-#define PLAYER_TITLE_KNIGHT_LIEUTENANT     UI64LIT(0x0000000000000080) // 7
-#define PLAYER_TITLE_KNIGHT_CAPTAIN        UI64LIT(0x0000000000000100) // 8
-#define PLAYER_TITLE_KNIGHT_CHAMPION       UI64LIT(0x0000000000000200) // 9
-#define PLAYER_TITLE_LIEUTENANT_COMMANDER  UI64LIT(0x0000000000000400) // 10
-#define PLAYER_TITLE_COMMANDER             UI64LIT(0x0000000000000800) // 11
-#define PLAYER_TITLE_MARSHAL               UI64LIT(0x0000000000001000) // 12
-#define PLAYER_TITLE_FIELD_MARSHAL         UI64LIT(0x0000000000002000) // 13
-#define PLAYER_TITLE_GRAND_MARSHAL         UI64LIT(0x0000000000004000) // 14
-#define PLAYER_TITLE_SCOUT                 UI64LIT(0x0000000000008000) // 15
-#define PLAYER_TITLE_GRUNT                 UI64LIT(0x0000000000010000) // 16
-#define PLAYER_TITLE_SERGEANT_H            UI64LIT(0x0000000000020000) // 17
-#define PLAYER_TITLE_SENIOR_SERGEANT       UI64LIT(0x0000000000040000) // 18
-#define PLAYER_TITLE_FIRST_SERGEANT        UI64LIT(0x0000000000080000) // 19
-#define PLAYER_TITLE_STONE_GUARD           UI64LIT(0x0000000000100000) // 20
-#define PLAYER_TITLE_BLOOD_GUARD           UI64LIT(0x0000000000200000) // 21
-#define PLAYER_TITLE_LEGIONNAIRE           UI64LIT(0x0000000000400000) // 22
-#define PLAYER_TITLE_CENTURION             UI64LIT(0x0000000000800000) // 23
-#define PLAYER_TITLE_CHAMPION              UI64LIT(0x0000000001000000) // 24
-#define PLAYER_TITLE_LIEUTENANT_GENERAL    UI64LIT(0x0000000002000000) // 25
-#define PLAYER_TITLE_GENERAL               UI64LIT(0x0000000004000000) // 26
-#define PLAYER_TITLE_WARLORD               UI64LIT(0x0000000008000000) // 27
-#define PLAYER_TITLE_HIGH_WARLORD          UI64LIT(0x0000000010000000) // 28
-#define PLAYER_TITLE_GLADIATOR             UI64LIT(0x0000000020000000) // 29
-#define PLAYER_TITLE_DUELIST               UI64LIT(0x0000000040000000) // 30
-#define PLAYER_TITLE_RIVAL                 UI64LIT(0x0000000080000000) // 31
-#define PLAYER_TITLE_CHALLENGER            UI64LIT(0x0000000100000000) // 32
-#define PLAYER_TITLE_SCARAB_LORD           UI64LIT(0x0000000200000000) // 33
-#define PLAYER_TITLE_CONQUEROR             UI64LIT(0x0000000400000000) // 34
-#define PLAYER_TITLE_JUSTICAR              UI64LIT(0x0000000800000000) // 35
-#define PLAYER_TITLE_CHAMPION_OF_THE_NAARU UI64LIT(0x0000001000000000) // 36
-#define PLAYER_TITLE_MERCILESS_GLADIATOR   UI64LIT(0x0000002000000000) // 37
-#define PLAYER_TITLE_OF_THE_SHATTERED_SUN  UI64LIT(0x0000004000000000) // 38
-#define PLAYER_TITLE_HAND_OF_ADAL          UI64LIT(0x0000008000000000) // 39
-#define PLAYER_TITLE_VENGEFUL_GLADIATOR    UI64LIT(0x0000010000000000) // 40
-
 #define KNOWN_TITLES_SIZE   3
 #define MAX_TITLE_INDEX     (KNOWN_TITLES_SIZE*64)          // 3 uint64 fields
 
@@ -687,7 +640,7 @@ enum EquipmentSetUpdateState
 
 struct EquipmentSet
 {
-    EquipmentSet()  
+    EquipmentSet()
     {
         for (unsigned int & Item : Items)
             Item = 0;
@@ -765,6 +718,13 @@ enum ArenaTeamInfoType
 };
 
 class InstanceSave;
+
+enum RestFlag
+{
+    REST_FLAG_IN_TAVERN         = 0x1,
+    REST_FLAG_IN_CITY           = 0x2,
+    REST_FLAG_IN_FACTION_AREA   = 0x4, // used with AREA_FLAG_REST_ZONE_*
+};
 
 enum TeleportToOptions
 {
@@ -876,17 +836,23 @@ enum PlayerCharmedAISpells
 #define MAX_PLAYER_SUMMON_DELAY                   (2*MINUTE)
 #define MAX_MONEY_AMOUNT                       (0x7FFFFFFF-1)
 
-struct AccessRequirement
+struct ProgressionRequirement
+{
+    uint32 id;
+    TeamId faction;
+    std::string note;
+    uint32 priority;
+    bool checkLeaderOnly;
+};
+
+struct DungeonProgressionRequirements
 {
     uint8  levelMin;
     uint8  levelMax;
-    uint32 item;
-    uint32 item2;
-    uint32 quest_A;
-    uint32 quest_H;
-    uint32 achievement;
-    std::string questFailedText;
     uint16 reqItemLevel;
+    std::vector<ProgressionRequirement*> quests;
+    std::vector<ProgressionRequirement*> items;
+    std::vector<ProgressionRequirement*> achievements;
 };
 
 enum CharDeleteMethod
@@ -1036,7 +1002,7 @@ struct BGData
 // holder for Entry Point data (pussywizard: stored in db)
 struct EntryPointData
 {
-    EntryPointData()  
+    EntryPointData()
     {
         ClearTaxiPath();
     }
@@ -1080,11 +1046,9 @@ public:                                                 // constructors
     void SetInAcceptProcess(bool state) { m_acceptProccess = state; }
 
 private:                                                // internal functions
-
     void Update(bool for_trader = true);
 
 private:                                                // fields
-
     Player*    m_player;                                // Player who own of this TradeData
     Player*    m_trader;                                // Player who trade with m_player
 
@@ -1213,6 +1177,9 @@ public:
     void CleanupAfterTaxiFlight();
     void ContinueTaxiFlight();
     // mount_id can be used in scripting calls
+
+    [[nodiscard]] bool IsDeveloper() const { return HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER); }
+    void SetDeveloper(bool on) { ApplyModFlag(PLAYER_FLAGS, PLAYER_FLAGS_DEVELOPER, on); }
     [[nodiscard]] bool isAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
     void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
     [[nodiscard]] bool IsGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
@@ -1251,6 +1218,10 @@ public:
     uint32 GetXPRestBonus(uint32 xp);
     [[nodiscard]] float GetRestBonus() const { return _restBonus; }
     void SetRestBonus(float rest_bonus_new);
+
+    bool HasRestFlag(RestFlag restFlag) const { return (_restFlagMask & restFlag) != 0; }
+    void SetRestFlag(RestFlag restFlag, uint32 triggerId = 0);
+    void RemoveRestFlag(RestFlag restFlag);
     [[nodiscard]] uint32 GetInnTriggerId() const { return _innTriggerId; }
 
     [[nodiscard]] Pet* GetPet() const;
@@ -1278,6 +1249,7 @@ public:
     [[nodiscard]] Item* GetItemByPos(uint16 pos) const;
     [[nodiscard]] Item* GetItemByPos(uint8 bag, uint8 slot) const;
     [[nodiscard]] Bag*  GetBagByPos(uint8 slot) const;
+    [[nodiscard]] uint32 GetFreeInventorySpace() const;
     [[nodiscard]] inline Item* GetUseableItemByPos(uint8 bag, uint8 slot) const //Does additional check for disarmed weapons
     {
         if (!CanUseAttackType(GetAttackBySlot(slot)))
@@ -2158,6 +2130,16 @@ public:
     void UpdateSkillsToMaxSkillsForLevel();             // for .levelup
     void ModifySkillBonus(uint32 skillid, int32 val, bool talent);
 
+    /**
+     * A talent point boost.
+     * Usage:
+     * 1). Hot update situation (occurred when character is online, like PlayerScript:OnAchiComplete):
+     *     Right after calling this function, character can reward talent points by calling function player->InitTalentForLevel().
+     *
+     * 2). Data initing situation (like PlayerScript:OnLoadFromDB)
+     */
+    void RewardExtraBonusTalentPoints(uint32 bonusTalentPoints);
+
     /*********************************************************/
     /***                  PVP SYSTEM                       ***/
     /*********************************************************/
@@ -2377,7 +2359,7 @@ public:
     }
     void HandleFall(MovementInfo const& movementInfo);
 
-    [[nodiscard]] bool canFlyInZone(uint32 mapid, uint32 zone) const;
+    [[nodiscard]] bool canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) const;
 
     void SetClientControl(Unit* target, bool allowMove, bool packetOnly = false);
 
@@ -2472,7 +2454,10 @@ public:
     [[nodiscard]] uint32 GetPendingBind() const { return _pendingBindId; }
     void SendRaidInfo();
     void SendSavedInstances();
-    bool Satisfy(AccessRequirement const* ar, uint32 target_map, bool report = false);
+    void PrettyPrintRequirementsQuestList(const std::vector<const ProgressionRequirement*>& missingQuests) const;
+    void PrettyPrintRequirementsAchievementsList(const std::vector<const ProgressionRequirement*>& missingAchievements) const;
+    void PrettyPrintRequirementsItemsList(const std::vector<const ProgressionRequirement*>& missingItems) const;
+    bool Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map, bool report = false);
     bool CheckInstanceLoginValid();
     [[nodiscard]] bool CheckInstanceCount(uint32 instanceId) const;
 
@@ -2584,40 +2569,7 @@ public:
     bool SetHover(bool enable, bool packetOnly = false) override;
 
     [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
-
-    //! Return collision height sent to client
-    float GetCollisionHeight(bool mounted)
-    {
-        if (mounted)
-        {
-            CreatureDisplayInfoEntry const* mountDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID));
-            if (!mountDisplayInfo)
-                return GetCollisionHeight(false);
-
-            CreatureModelDataEntry const* mountModelData = sCreatureModelDataStore.LookupEntry(mountDisplayInfo->ModelId);
-            if (!mountModelData)
-                return GetCollisionHeight(false);
-
-            CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId());
-            ASSERT(displayInfo);
-            CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayInfo->ModelId);
-            ASSERT(modelData);
-
-            float scaleMod = GetFloatValue(OBJECT_FIELD_SCALE_X); // 99% sure about this
-
-            return scaleMod * mountModelData->MountHeight + modelData->CollisionHeight * 0.5f;
-        }
-        else
-        {
-            //! Dismounting case - use basic default model data
-            CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId());
-            ASSERT(displayInfo);
-            CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayInfo->ModelId);
-            ASSERT(modelData);
-
-            return modelData->CollisionHeight;
-        }
-    }
+    [[nodiscard]] bool CanEnterWater() const override { return true; }
 
     // OURS
     // saving
@@ -2665,6 +2617,17 @@ public:
     [[nodiscard]] SpellModList const& GetSpellModList(uint32 type) const { return m_spellMods[type]; }
 
     static std::unordered_map<int, bgZoneRef> bgZoneIdToFillWorldStates; // zoneId -> FillInitialWorldStates
+
+    // Cinematic camera data and remote sight functions
+    [[nodiscard]] uint32 GetActiveCinematicCamera() const { return m_activeCinematicCameraId; }
+    void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { m_activeCinematicCameraId = cinematicCameraId; }
+    [[nodiscard]] bool IsOnCinematic() const { return (m_cinematicCamera != nullptr); }
+    void BeginCinematic();
+    void EndCinematic();
+    void UpdateCinematicLocation(uint32 diff);
+
+    std::string GetMapAreaAndZoneString();
+    std::string GetCoordsMapAreaAndZoneString();
 
 protected:
     // Gamemaster whisper whitelist
@@ -2901,11 +2864,13 @@ protected:
     time_t _restTime;
     uint32 _innTriggerId;
     float _restBonus;
+    uint32 _restFlagMask;
     ////////////////////Rest System/////////////////////
     uint32 m_resetTalentsCost;
     time_t m_resetTalentsTime;
     uint32 m_usedTalentCount;
     uint32 m_questRewardTalentCount;
+    uint32 m_extraBonusTalentCount;
 
     // Social
     PlayerSocial* m_social;
@@ -3013,6 +2978,16 @@ private:
     uint32 manaBeforeDuel;
 
     bool m_isInstantFlightOn;
+
+    uint32 m_flightSpellActivated;
+
+    // Remote location information
+    uint32 m_cinematicDiff;
+    uint32 m_lastCinematicCheck;
+    uint32 m_activeCinematicCameraId;
+    FlyByCameraCollection* m_cinematicCamera;
+    Position m_remoteSightPosition;
+    Creature* m_CinematicObject;
 };
 
 void AddItemsSetItem(Player* player, Item* item);

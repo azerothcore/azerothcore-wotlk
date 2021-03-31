@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "steam_vault.h"
 
 enum MekgineerSteamrigger
@@ -27,7 +27,6 @@ enum MekgineerSteamrigger
     EVENT_SPELL_SHRINK          = 4,
     EVENT_SPELL_SAW             = 5,
     EVENT_SPELL_NET             = 6
-
 };
 
 class boss_mekgineer_steamrigger : public CreatureScript

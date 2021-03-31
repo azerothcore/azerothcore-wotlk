@@ -1,8 +1,9 @@
 /* MAIDEN OF GRIEF BY SILVANII (mmorcin@wp.pl), Some cleanups by Xinef */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "halls_of_stone.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+
 enum spells
 {
     PARTING_SORROW          = 59723,

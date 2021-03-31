@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -77,7 +77,6 @@ const go_type HPTowerFlags[HP_TOWER_NUM] =
 class OPvPCapturePointHP : public OPvPCapturePoint
 {
 public:
-
     OPvPCapturePointHP(OutdoorPvP* pvp, OutdoorPvPHPTowerType type);
 
     void ChangeState() override;
@@ -91,14 +90,12 @@ public:
     void HandlePlayerLeave(Player* player) override;
 
 private:
-
     OutdoorPvPHPTowerType m_TowerType;
 };
 
 class OutdoorPvPHP : public OutdoorPvP
 {
 public:
-
     OutdoorPvPHP();
 
     bool SetupOutdoorPvP() override;
@@ -121,7 +118,6 @@ public:
     void SetHordeTowersControlled(uint32 count);
 
 private:
-
     // how many towers are controlled
     uint32 m_AllianceTowersControlled;
     uint32 m_HordeTowersControlled;

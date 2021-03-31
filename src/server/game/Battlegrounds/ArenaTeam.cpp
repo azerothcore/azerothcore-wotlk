@@ -1,19 +1,20 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ObjectMgr.h"
-#include "WorldPacket.h"
 #include "ArenaTeam.h"
-#include "World.h"
-#include "Group.h"
 #include "ArenaTeamMgr.h"
-#include "Player.h"
-#include "WorldSession.h"
+#include "BattlegroundMgr.h"
+#include "Group.h"
+#include "ObjectMgr.h"
 #include "Opcodes.h"
+#include "Player.h"
 #include "ScriptMgr.h"
+#include "World.h"
+#include "WorldPacket.h"
+#include "WorldSession.h"
 
 ArenaTeam::ArenaTeam()
     : TeamId(0), Type(0), TeamName(), CaptainGuid(0), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),
@@ -308,17 +309,46 @@ void ArenaTeam::SetCaptain(uint64 guid)
 
 void ArenaTeam::DelMember(uint64 guid, bool cleanDb)
 {
+    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+    Group* group = (player && player->GetGroup()) ? player->GetGroup() : nullptr;
+
     // Remove member from team
     for (MemberList::iterator itr = Members.begin(); itr != Members.end(); ++itr)
+    {
+        // Remove queues of members
+        if (Player* playerMember = ObjectAccessor::FindPlayerInOrOutOfWorld(itr->Guid))
+        {
+            if (group && playerMember->GetGroup() && group->GetGUID() == playerMember->GetGroup()->GetGUID())
+            {
+                if (BattlegroundQueueTypeId bgQueue = BattlegroundMgr::BGQueueTypeId(BATTLEGROUND_AA, GetType()))
+                {
+                    GroupQueueInfo ginfo;
+                    BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
+                    if (queue.GetPlayerGroupInfoData(playerMember->GetGUID(), &ginfo))
+                    {
+                        if (!ginfo.IsInvitedToBGInstanceGUID)
+                        {
+                            WorldPacket data;
+                            playerMember->RemoveBattlegroundQueueId(bgQueue);
+                            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, nullptr, playerMember->GetBattlegroundQueueIndex(bgQueue), STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
+                            queue.RemovePlayer(playerMember->GetGUID(), true, 0);
+                            playerMember->GetSession()->SendPacket(&data);
+                        }
+                    }
+                }
+            }
+        }
+
         if (itr->Guid == guid)
         {
             Members.erase(itr);
             sWorld->UpdateGlobalPlayerArenaTeam(GUID_LOPART(guid), GetSlot(), 0);
             break;
         }
+    }
 
     // Inform player and remove arena team info from player data
-    if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+    if (player)
     {
         player->GetSession()->SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, GetName(), "", 0);
         // delete all info regarding this team
@@ -865,7 +895,7 @@ void ArenaTeam::UpdateArenaPointsHelper(std::map<uint32, uint32>& playerPoints)
     // Called after a match has ended and the stats are already modified
     // Helper function for arena point distribution (this way, when distributing, no actual calculation is required, just a few comparisons)
     // 10 played games per week is a minimum
-    if (Stats.WeekGames < 10)
+    if (Stats.WeekGames < sWorld->getIntConfig(CONFIG_ARENA_GAMES_REQUIRED))
         return;
 
     // To get points, a player has to participate in at least 30% of the matches

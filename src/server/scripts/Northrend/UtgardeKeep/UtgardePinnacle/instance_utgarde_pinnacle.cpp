@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "utgarde_pinnacle.h"
 
 class instance_pinnacle : public InstanceMapScript
@@ -188,7 +188,6 @@ public:
                 case DATA_YMIRON_ACHIEVEMENT:
                     ymironAchievement = (bool)data;
                     return;
-
             }
             OUT_SAVE_INST_DATA;
 
@@ -229,7 +228,6 @@ public:
                 for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
                     if (Encounters[i] == IN_PROGRESS)
                         Encounters[i] = NOT_STARTED;
-
             }
             else OUT_LOAD_INST_DATA_FAIL;
 

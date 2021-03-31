@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "serpent_shrine.h"
 
 enum Yells
@@ -45,7 +45,6 @@ enum Misc
     EVENT_SPELL_EARTHQUAKE          = 3,
     EVENT_SUMMON_MURLOCS            = 4,
     EVENT_KILL_TALK                 = 5
-
 };
 
 const uint32 wateryGraveId[4] = {SPELL_WATERY_GRAVE_1, SPELL_WATERY_GRAVE_2, SPELL_WATERY_GRAVE_3, SPELL_WATERY_GRAVE_4};
