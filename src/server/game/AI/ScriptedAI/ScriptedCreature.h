@@ -238,19 +238,12 @@ struct ScriptedAI : public CreatureAI
                 }
                 break;
             case Axis::AXIS_Y:
-                if (!above)
-                {
-                    if (me->GetPositionY() < pos->GetPositionY())
-                    {
-                        EnterEvadeMode();
-                        return false;
-                    }
-                }
-                else if(me->GetPositionY() > pos->GetPositionY())
+                if ((!above && me->GetPositionY() < pos->GetPositionY())  || me->GetPositionY() > pos->GetPositionY())
                 {
                     EnterEvadeMode();
                     return false;
                 }
+
                 break;
         }
 
