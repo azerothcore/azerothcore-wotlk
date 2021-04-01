@@ -45,7 +45,7 @@ enum Misc : uint32
     ACHIEV_QUICK_DEMISE_START_EVENT         = 20382,
 
     MAX_INSANITY_TARGETS                    = 5,
-    DATA_INSANITY_INSANITY_CASTED           = 1,
+    DATA_SET_INSANITY_PHASE           = 1,
 };
 
 enum Events
@@ -66,7 +66,7 @@ public:
     {
         boss_volazjAI(Creature* pCreature) : BossAI(pCreature, DATA_HERALD_VOLAZJ),
             insanityTimes(0),
-            insanityTriggered(false)
+            insanityPhase(false)
         {
         }
 
@@ -85,7 +85,7 @@ public:
             events.ScheduleEvent(EVENT_HERALD_SHIVER, 15000);
 
             insanityTimes = 0;
-            insanityTriggered = false;
+            insanityPhase = false;
 
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
@@ -121,15 +121,19 @@ public:
 
         void SetData(uint32 type, uint32 value) override
         {
-            if (type == DATA_INSANITY_INSANITY_CASTED)
-                insanityTriggered = (value != 0);
+            if (type == DATA_SET_INSANITY_PHASE)
+            {
+                insanityPhase = (value != 0);
+            }
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
-            // Do not perform insanity recast if boss is casting insanity
+            // Do not perform insanity recast if boss is casting Insanity already
             if (me->FindCurrentSpellBySpellId(SPELL_INSANITY))
+            {
                 return;
+            }
 
             // First insanity
             if (insanityTimes == 0 && me->HealthBelowPctDamaged(66, damage))
@@ -154,14 +158,14 @@ public:
                 return;
             }
 
-            if (insanityTriggered)
+            if (insanityPhase)
             {
                 if (!CheckPhaseMinions())
                 {
                     return;
                 }
 
-                insanityTriggered = false;
+                insanityPhase = false;
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetControlled(false, UNIT_STATE_STUNNED);
                 me->RemoveAurasDueToSpell(INSANITY_VISUAL);
@@ -190,7 +194,9 @@ public:
                     case EVENT_HERALD_SHIVER:
                     {
                         if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        {
                             DoCast(pTarget, DUNGEON_MODE(SPELL_SHIVER, SPELL_SHIVER_H), false);
+                        }
 
                         events.RepeatEvent(15000);
                     }break;
@@ -207,7 +213,7 @@ public:
 
     private:
         uint8 insanityTimes;
-        bool insanityTriggered;
+        bool insanityPhase;     // Indicates if boss enter to insanity phase
 
         uint32 GetPlrInsanityAuraId(uint32 phaseMask) const
         {
@@ -297,9 +303,9 @@ public:
         {
             if (!targets.empty())
             {
-                targets.remove_if([](WorldObject* targetObj) -> bool
+                targets.remove_if([this](WorldObject* targetObj) -> bool
                 {
-                    return !targetObj || targetObj->GetTypeId() != TYPEID_PLAYER;
+                    return !targetObj || targetObj->GetTypeId() != TYPEID_PLAYER || targetObj->ToPlayer()->IsInCombatWith(GetCaster());
                 });
             }
 
@@ -360,7 +366,7 @@ public:
 
         void HandleAfterCast()
         {
-            GetCaster()->ToCreature()->AI()->SetData(DATA_INSANITY_INSANITY_CASTED, 1);
+            GetCaster()->ToCreature()->AI()->SetData(DATA_SET_INSANITY_PHASE, 1);
         }
 
         void Register() override
