@@ -17,27 +17,46 @@
 template<class T>
 void PointMovementGenerator<T>::DoInitialize(T* unit)
 {
-    Creature* cOwner = unit->ToCreature();
-    if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || (cOwner && cOwner->IsMovementPreventedByCasting()))
-    {
-        i_interrupted = true;
-        unit->StopMoving();
-        return;
-    }
-
     if (!unit->IsStopped())
         unit->StopMoving();
 
     unit->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
     i_recalculateSpeed = false;
     Movement::MoveSplineInit init(unit);
-    if (m_precomputedPath.size()) // pussywizard: for charge
+    if (m_precomputedPath.size() > 2) // pussywizard: for charge
         init.MovebyPath(m_precomputedPath);
+    else if (_generatePath)
+    {
+        PathGenerator path(unit);
+        bool result = path.CalculatePath(i_x, i_y, i_z, _forceDestination);
+        if (result && !(path.GetPathType() & PATHFIND_NOPATH) && path.GetPath().size() > 2)
+        {
+            m_precomputedPath = path.GetPath();
+            init.MovebyPath(m_precomputedPath);
+        }
+        else
+        {
+            // Xinef: fix strange client visual bug, moving on z coordinate only switches orientation by 180 degrees (visual only)
+            if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
+            {
+                i_x += 0.2f * cos(unit->GetOrientation());
+                i_y += 0.2f * sin(unit->GetOrientation());
+            }
+
+            init.MoveTo(i_x, i_y, i_z, true);
+        }
+    }
     else
     {
-        init.MoveTo(i_x, i_y, i_z, _generatePath);
-    }
+        // Xinef: fix strange client visual bug, moving on z coordinate only switches orientation by 180 degrees (visual only)
+        if (G3D::fuzzyEq(unit->GetPositionX(), i_x) && G3D::fuzzyEq(unit->GetPositionY(), i_y))
+        {
+            i_x += 0.2f * cos(unit->GetOrientation());
+            i_y += 0.2f * sin(unit->GetOrientation());
+        }
 
+        init.MoveTo(i_x, i_y, i_z, true);
+    }
     if (speed > 0.0f)
         init.SetVelocity(speed);
 
@@ -55,31 +74,37 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 /*diff*/)
     if (!unit)
         return false;
 
-    if (m_precomputedPath.size())
-    {
-        return !unit->movespline->Finalized();
-    }
-
-    Creature* cOwner = unit->ToCreature();
-
-    if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || (cOwner && cOwner->IsMovementPreventedByCasting()))
+    if (unit->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
     {
         unit->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
-        unit->StopMoving();
-        i_interrupted = true;
         return true;
     }
 
     unit->AddUnitState(UNIT_STATE_ROAMING_MOVE);
 
-    if ((i_interrupted && unit->movespline->Finalized()) || (i_recalculateSpeed && !unit->movespline->Finalized()))
+    if (i_recalculateSpeed && !unit->movespline->Finalized())
     {
         i_recalculateSpeed = false;
-        i_interrupted = false;
         Movement::MoveSplineInit init(unit);
 
-        init.MoveTo(i_x, i_y, i_z, _generatePath);
+        // xinef: speed changed during path execution, calculate remaining path and launch it once more
+        if (m_precomputedPath.size())
+        {
+            uint32 offset = std::min(uint32(unit->movespline->_currentSplineIdx()), uint32(m_precomputedPath.size()));
+            Movement::PointsArray::iterator offsetItr = m_precomputedPath.begin();
+            std::advance(offsetItr, offset);
+            m_precomputedPath.erase(m_precomputedPath.begin(), offsetItr);
 
+            // restore 0 element (current position)
+            m_precomputedPath.insert(m_precomputedPath.begin(), G3D::Vector3(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ()));
+
+            if (m_precomputedPath.size() > 2)
+                init.MovebyPath(m_precomputedPath);
+            else if (m_precomputedPath.size() == 2)
+                init.MoveTo(m_precomputedPath[1].x, m_precomputedPath[1].y, m_precomputedPath[1].z, true);
+        }
+        else
+            init.MoveTo(i_x, i_y, i_z, true);
         if (speed > 0.0f) // Default value for point motion type is 0.0, if 0.0 spline will use GetSpeed on unit
             init.SetVelocity(speed);
 
