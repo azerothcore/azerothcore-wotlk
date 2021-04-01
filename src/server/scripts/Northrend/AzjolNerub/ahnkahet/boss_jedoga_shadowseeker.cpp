@@ -13,12 +13,12 @@
 
 enum Yells
 {
-    TEXT_AGGRO          = 0,
-    TEXT_SACRIFICE_1    = 1,
-    TEXT_SACRIFICE_2    = 2,
-    TEXT_SLAY           = 3,
-    TEXT_DEATH          = 4,
-    TEXT_PREACHING      = 5,
+    SAY_AGGRO           = 0,
+    SAY_SACRIFICE_1     = 1,
+    SAY_SACRIFICE_2     = 2,
+    SAY_SLAY            = 3,
+    SAY_DEATH           = 4,
+    SAY_PREACHING       = 5,
 
     // Initiate
     SAY_CHOSEN          = 0,
@@ -145,6 +145,8 @@ public:
     struct boss_jedoga_shadowseekerAI : public BossAI
     {
         boss_jedoga_shadowseekerAI(Creature* pCreature) : BossAI(pCreature, DATA_JEDOGA_SHADOWSEEKER),
+            sacraficeTarget_GUID(0),
+            sayPreachTimer(120000),
             combatSummonsSummoned(false),
             ritualTriggered(false),
             volunteerWork(true)
@@ -194,6 +196,7 @@ public:
             }
 
             sacraficeTarget_GUID = 0;
+            sayPreachTimer = 120000;
             ritualTriggered = false;
             volunteerWork = true;
             combatSummonsSummoned = false;
@@ -314,7 +317,7 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
-            Talk(TEXT_AGGRO);
+            Talk(SAY_AGGRO);
         }
 
         void KilledUnit(Unit* who) override
@@ -324,13 +327,13 @@ public:
                 return;
             }
 
-            Talk(TEXT_SLAY);
+            Talk(SAY_SLAY);
         }
 
         void JustDied(Unit* /*Killer*/) override
         {
             _JustDied();
-            Talk(TEXT_DEATH);
+            Talk(SAY_DEATH);
         }
 
         void MovementInform(uint32 type, uint32 pointId) override
@@ -372,7 +375,7 @@ public:
                         sacraficeTarget_GUID = acore::Containers::SelectRandomContainerElement(summons);
                         if (Creature* volunteer = ObjectAccessor::GetCreature(*me, sacraficeTarget_GUID))
                         {
-                            Talk(TEXT_SACRIFICE_1);
+                            Talk(SAY_SACRIFICE_1);
                             sacraficeTarget_GUID = volunteer->GetGUID();
                             volunteer->AI()->DoAction(ACTION_RITUAL_BEGIN);
                         }
@@ -418,6 +421,18 @@ public:
         {
             if (!UpdateVictim())
             {
+                if (instance->GetBossState(DATA_PRINCE_TALDARAM) == DONE)
+                {
+                    if (sayPreachTimer <= diff)
+                    {
+                        Talk(SAY_PREACHING);
+                        sayPreachTimer = 120000;    // 2 min
+                    }
+                    else
+                    {
+                        sayPreachTimer -= diff;
+                    }
+                }
                 return;
             }
 
@@ -499,9 +514,8 @@ public:
     private:
         std::list<uint64> oocSummons;
         std::list<uint64> oocTriggers;
-
         uint64 sacraficeTarget_GUID;
-
+        uint32 sayPreachTimer;
         bool combatSummonsSummoned;
         bool ritualTriggered;
         bool volunteerWork; // true = success, false = failed
@@ -616,7 +630,7 @@ public:
             {
                 if (Creature* jedoga = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_JEDOGA_SHADOWSEEKER)))
                 {
-                    jedoga->AI()->Talk(TEXT_SACRIFICE_2);
+                    jedoga->AI()->Talk(SAY_SACRIFICE_2);
                     jedoga->CastSpell(nullptr, SPELL_SACRIFICE_BEAM);
                     if (Creature* ritualTrigger = jedoga->SummonCreature(NPC_JEDOGA_CONTROLLER, JedogaPosition[2], TEMPSUMMON_TIMED_DESPAWN, 5000))
                     {
