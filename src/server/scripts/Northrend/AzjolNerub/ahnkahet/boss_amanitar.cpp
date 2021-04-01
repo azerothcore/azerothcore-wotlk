@@ -280,6 +280,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (events.Empty())
+                return;
+
             events.Update(diff);
             while (uint32 const eventId = events.ExecuteEvent())
             {
