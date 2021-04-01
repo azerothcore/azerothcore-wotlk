@@ -13,16 +13,16 @@
 
 enum Yells
 {
-    SAY_AGGRO           = 0,
-    SAY_SACRIFICE_1     = 1,
-    SAY_SACRIFICE_2     = 2,
-    SAY_SLAY            = 3,
-    SAY_DEATH           = 4,
-    SAY_PREACHING       = 5,
+    SAY_AGGRO                               = 0,
+    SAY_SACRIFICE_1                         = 1,
+    SAY_SACRIFICE_2                         = 2,
+    SAY_SLAY                                = 3,
+    SAY_DEATH                               = 4,
+    SAY_PREACHING                           = 5,
 
     // Initiate
-    SAY_CHOSEN          = 0,
-    SAY_SACRIFICED      = 1,
+    SAY_CHOSEN                              = 0,
+    SAY_SACRIFICED                          = 1,
 };
 
 enum Spells
@@ -101,9 +101,9 @@ enum Actions
 
 const Position JedogaPosition[3] =
 {
-    { 372.330994f, -705.278015f, -2.459692f },      // POINT_DOWN
-    { 372.330994f, -705.278015f, -16.179716f },     // POINT_UP
-    { 373.48f, -706.00f, -16.18f, 0.0f }            // POINT_RITUAL and POINT_INITIAL. This positions also is used for visual trigger used for ritual
+    { 372.330994f,  -705.278015f,   -2.459692f  },     // POINT_DOWN
+    { 372.330994f,  -705.278015f,   -16.179716f },     // POINT_UP
+    { 373.48f,      -706.00f,       -16.18f     }      // POINT_RITUAL and POINT_INITIAL. This positions also is used for visual trigger used for ritual
 };
 
 // Combat summon locations

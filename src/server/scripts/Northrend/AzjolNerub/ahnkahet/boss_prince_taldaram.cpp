@@ -27,7 +27,7 @@ enum Spells
     SPELL_HOVER_FALL                        = 60425
 };
 
-#define SPELL_EMBRACE_OF_THE_VAMPYR         DUNGEON_MODE(55959,59513)
+#define SPELL_EMBRACE_OF_THE_VAMPYR         DUNGEON_MODE(55959, 59513)
 
 enum Creatures
 {
