@@ -201,6 +201,7 @@ public:
             volunteerWork = true;
             combatSummonsSummoned = false;
 
+            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             me->SetDisableGravity(true);
             me->SetHover(true);
             me->GetMotionMaster()->MovePoint(POINT_INITIAL, JedogaPosition[0], false);

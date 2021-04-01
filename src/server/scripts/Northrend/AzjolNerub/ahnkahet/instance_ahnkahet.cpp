@@ -23,7 +23,8 @@ public:
             heraldVolazj_GUID(0),
             amanitar_GUID(0),
             taldaramPlatform_GUID(0),
-            taldaramGate_GUID(0)
+            taldaramGate_GUID(0),
+            canSaveBossStates(false)
         {
             SetBossNumber(MAX_ENCOUNTER);
             teldaramSpheres.fill(NOT_STARTED);
@@ -103,6 +104,11 @@ public:
             if (type == DATA_PRINCE_TALDARAM && state == DONE)
             {
                 HandleGameObject(taldaramGate_GUID, true);
+            }
+
+            if (canSaveBossStates)
+            {
+                SaveToDB();
             }
 
             return true;
@@ -213,6 +219,7 @@ public:
                 return;
             }
 
+            canSaveBossStates = true;
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
@@ -227,6 +234,7 @@ public:
         uint64 taldaramPlatform_GUID;
         uint64 taldaramGate_GUID;
         std::array<uint32, 2> teldaramSpheres;  // Used to identify for sphere activation
+        bool canSaveBossStates;     // Indicates that it is safe to trigger SaveToDB call in SetBossState
 
         bool IsAllSpheresActivated() const
         {
