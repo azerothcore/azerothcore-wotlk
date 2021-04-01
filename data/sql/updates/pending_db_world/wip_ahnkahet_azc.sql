@@ -144,3 +144,8 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 DELETE FROM `spell_script_names` WHERE `spell_id`=57496 AND `ScriptName`='spell_herald_volzaj_insanity';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (57496, 'spell_herald_volzaj_insanity');
+
+-- Spell "Shadow Sickle" difficulty data
+DELETE FROM `spelldifficulty_dbc` WHERE `ID`=56701;
+INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpellID_2`, `DifficultySpellID_3`, `DifficultySpellID_4`) VALUES
+(56701, 56701, 59104, 0, 0);

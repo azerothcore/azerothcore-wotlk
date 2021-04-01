@@ -240,6 +240,8 @@ public:
     }
 };
 
+// 56702 Shadow Sickle
+// 59103 Shadow Sickle
 class spell_shadow_sickle_periodic_damage : public SpellScriptLoader
 {
 public:
@@ -251,27 +253,7 @@ public:
 
         void HandlePeriodic(AuraEffect const*  /*aurEff*/)
         {
-            PreventDefaultAction();
-
-            if (Unit* caster = GetCaster())
-            {
-                std::list<Player*> PlayerList;
-                PlayerList.clear();
-
-                    Map::PlayerList const &players = caster->GetMap()->GetPlayers();
-                    for (auto const& itr : players)
-                    {
-                        Player* player = itr.GetSource();
-                        if (player && player->IsWithinDist(caster, 40.0f) && player->IsAlive()) // SPELL_SHADOW_SICKLE_H & SPELL_SHADOW_SICKLE range is 40 yards
-                            PlayerList.push_back(player);
-                    }
-
-                    if (PlayerList.empty())
-                        return;
-
-                    if (Player* target = acore::Containers::SelectRandomContainerElement(PlayerList))
-                        caster->CastSpell(target, caster->GetMap()->IsHeroic() ? SPELL_SHADOW_SICKLE_H : SPELL_SHADOW_SICKLE, true);
-            }
+            GetCaster()->CastSpell(nullptr, SPELL_SHADOW_SICKLE);
         }
 
         void Register() override
