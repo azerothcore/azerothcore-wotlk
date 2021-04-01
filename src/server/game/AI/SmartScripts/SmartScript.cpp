@@ -3855,7 +3855,6 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                 delete units;
                 break;
             }
-        
         case SMART_TARGET_VEHICLE_PASSENGER:
             {
                 if (me && me->IsVehicle())
