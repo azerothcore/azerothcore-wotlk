@@ -222,7 +222,6 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
-            //me->SetHover(true);
             me->SendMovementFlagUpdate();
 
             if (pInstance)
@@ -277,7 +276,6 @@ public:
                     case MI_POINT_INTRO_LAND:
                         me->SetCanFly(false);
                         me->SetDisableGravity(false);
-                        //me->SetHover(false);
                         events.RescheduleEvent(EVENT_START_FIGHT, 0, 1);
                         break;
                     case MI_POINT_VORTEX_TAKEOFF:
@@ -286,7 +284,6 @@ public:
                     case MI_POINT_VORTEX_LAND:
                         me->SetCanFly(false);
                         me->SetDisableGravity(false);
-                        //me->SetHover(false);
                         events.RescheduleEvent(EVENT_VORTEX_LAND_1, 0, 1);
                         break;
                     case MI_POINT_CENTER_AIR_PH_2:
@@ -458,7 +455,6 @@ public:
                         me->StopMoving();
                         me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        //me->SetHover(true);
                         me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(MI_POINT_VORTEX_TAKEOFF, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ() + 20.0f, 7.0f);
 
@@ -1366,7 +1362,6 @@ public:
             events.ScheduleEvent(1, 9000);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
-            me->SetHover(true);
         }
 
         EventMap events;

@@ -116,7 +116,6 @@ struct boss_twin_valkyrAI : public ScriptedAI
             events.RescheduleEvent(EVENT_SPELL_TOUCH, urand(10000, 25000), 1);
 
         me->SetDisableGravity(true);
-        me->SetHover(true);
         me->SetCanFly(true);
     }
 

@@ -39,6 +39,7 @@ private:
     float speed;
     float i_orientation;
     bool i_recalculateSpeed;
+    bool i_interrupted;
     Movement::PointsArray m_precomputedPath;
     bool _generatePath;
     bool _forceDestination;

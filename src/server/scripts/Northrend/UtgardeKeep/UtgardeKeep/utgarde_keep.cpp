@@ -126,9 +126,8 @@ public:
                         if (Creature* rider = p->ToCreature())
                             rider->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.25f);
 
-                me->SetDisableGravity(false);
-                me->SetHover(false);
                 me->SetCanFly(false);
+                me->SetDisableGravity(false);
                 me->SetFacingTo(0.25f);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             }
@@ -139,9 +138,8 @@ public:
             if (type == TYPE_PROTODRAKE_AT && data == DATA_PROTODRAKE_MOVE && !_setData && me->IsAlive() && me->GetDistance(protodrakeCheckPos) < 10.0f)
             {
                 _setData = true;
-                me->SetDisableGravity(true);
-                me->SetHover(true);
                 me->SetCanFly(true);
+                me->SetDisableGravity(true);
                 me->GetMotionMaster()->MovePath(PATH_PROTODRAKE, false);
             }
         }
