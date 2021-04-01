@@ -18,7 +18,7 @@ template<class T>
 void PointMovementGenerator<T>::DoInitialize(T* unit)
 {
     Creature* cOwner = unit->ToCreature();
-    if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || cOwner && cOwner->IsMovementPreventedByCasting())
+    if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || (cOwner && cOwner->IsMovementPreventedByCasting()))
     {
         i_interrupted = true;
         unit->StopMoving();
