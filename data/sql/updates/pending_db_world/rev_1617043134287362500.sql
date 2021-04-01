@@ -99,5 +99,5 @@ UPDATE `smart_scripts` SET `event_type`=0, `event_param1`=1000, `event_param2`=7
 -- Add SAI for healing with Death Coil to friendly undead
 DELETE FROM `smart_scripts` WHERE `entryorguid`=16146 AND `source_type`=0 AND `id`=4;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(16146, 0, 4, 0, 0, 0, 100, 0, 16600, 17300, 28500, 34000, 0, 11, 55210, 0, 0, 0, 0, 0, 26, 20, 0, 0, 0, 0, 0, 0, 0, 'Death Knight - In combat - Cast Death Coil (heal)');
+(16146, 0, 4, 0, 14, 0, 50, 0, 80, 20, 16600, 17300, 0, 11, 55210, 0, 0, 0, 0, 0, 26, 20, 0, 0, 0, 0, 0, 0, 0, 'Death Knight - On Friendly HP Deficit - Cast Death Coil (heal)');
 
