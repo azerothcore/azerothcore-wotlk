@@ -12,10 +12,10 @@
 #define __WORLDSESSION_H
 
 #include "AccountMgr.h"
+#include "AuthDefines.h"
 #include "AddonMgr.h"
 #include "BanManager.h"
 #include "Common.h"
-#include "Cryptography/BigNumber.h"
 #include "DatabaseEnv.h"
 #include "GossipDef.h"
 #include "Opcodes.h"
@@ -239,7 +239,7 @@ public:
     void SetTotalTime(uint32 TotalTime) { m_total_time = TotalTime; }
     uint32 GetTotalTime() const { return m_total_time; }
 
-    void InitWarden(BigNumber* k, std::string const& os);
+    void InitWarden(SessionKey const&, std::string const& os);
 
     /// Session in auth.queue currently
     void SetInQueue(bool state) { m_inQueue = state; }
