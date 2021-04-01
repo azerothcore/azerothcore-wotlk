@@ -62,7 +62,7 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 /*diff*/)
 
     Creature* cOwner = unit->ToCreature();
 
-    if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || cOwner && cOwner->IsMovementPreventedByCasting())
+    if (unit->HasUnitState(UNIT_STATE_NOT_MOVE) || (cOwner && cOwner->IsMovementPreventedByCasting()))
     {
         unit->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
         unit->StopMoving();
