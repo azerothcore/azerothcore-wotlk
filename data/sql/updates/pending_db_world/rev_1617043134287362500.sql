@@ -79,15 +79,23 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (128174, 0, 0, 0, 1, 0, 1, '30110'),
 (128175, 0, 0, 0, 1, 0, 1, '30110'),
 (128176, 0, 0, 0, 1, 0, 1, '30110'),
-(128177, 0, 0, 0, 1, 0, 1, '30110'),
-(128178, 0, 0, 0, 1, 0, 1, '30110'),
-(128179, 0, 0, 0, 1, 0, 1, '30110'),
+(128177, 1281770, 0, 0, 1, 0, 1, '30110'),
+(128178, 1281780, 0, 0, 1, 0, 1, '30110'),
+(128179, 1281790, 0, 0, 1, 0, 1, '30110'),
 (128180, 0, 0, 0, 1, 0, 1, '30110'),
 (128181, 0, 0, 0, 1, 0, 1, '30110'),
 (128182, 0, 0, 0, 1, 0, 1, '30110'),
-(128183, 0, 0, 0, 1, 0, 1, '30110');
+(128183, 1281830, 0, 0, 1, 0, 1, '30110');
 -- Fix timer and trigger for Plague Splash on Plague Beast
 UPDATE `smart_scripts` SET `event_type`=2, `event_param1`=0, `event_param2`=50, `event_param3`=25000, `event_param4`=30000, `comment`='Plague Beast - Between 0-50% HP - Cast Plague Splash' WHERE `entryorguid`=16034 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
 -- Fix Blood Presence on Death Knight
 UPDATE `smart_scripts` SET `event_type`=4, `event_phase_mask`=0, `event_param2`=0, `comment`='On Aggro - Cast Self - Blood Presence' WHERE `entryorguid`=16146 AND `source_type`=0 AND `id`=2 AND `link`=0;
+-- Fix timer and target selection for Death Coil (damage) on Death Knight
+UPDATE `smart_scripts` SET `event_param1`=1000, `event_param2`=1400, `event_param3`=8500, `event_param4`=20500, `target_type`=5, `comment`='Death Knight - In combat - Cast Death Coil (damage)' WHERE  `entryorguid`=16146 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
+-- Fix Hysteria on Death Knight
+UPDATE `smart_scripts` SET `event_type`=0, `event_param1`=1000, `event_param2`=7400, `event_param3`=10100, `event_param4`=17300, `target_type`=26, `target_param1`=45, `comment`='Death Knight - In combat - Cast Hysteria' WHERE  `entryorguid`=16146 AND `source_type`=0 AND `id`=3 AND `link`=0;
+-- Add SAI for healing with Death Coil to friendly undead
+DELETE FROM `smart_scripts` WHERE `entryorguid`=16146 AND `source_type`=0 AND `id`=4;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
+(16146, 0, 4, 0, 0, 0, 100, 0, 16600, 17300, 28500, 34000, 0, 11, 55210, 0, 0, 0, 0, 0, 26, 45, 0, 0, 0, 0, 0, 0, 0, 'Death Knight - In combat - Cast Death Coil (heal)');
 
