@@ -26,6 +26,9 @@ DELETE FROM `creature` WHERE `guid` IN (1971312, 1971314);
 
 
 /* Fix SAI */
+-- source for timers: https://wowgaming.altervista.org/aowow/
+-- source for spells: https://wowhead.com/
+-- Add comments on the SAI that I fix/touch
 
 -- Fix timer for Acid Spit on Crypt Guard
 UPDATE `smart_scripts` SET `event_param3`=4000 WHERE `entryorguid`=16573 AND `source_type`=0 AND `id`=1 AND `link`=0;
@@ -59,6 +62,14 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (16243, 0, 8, 0, 23, 0, 100, 0, 28990, 1, 0, 0, 0, 75, 7942, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Plague Slime - On has aura - Add aura Immunity: Fire');
 -- Fix Disease/Poison immunity on Plague Slime
 UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|2097152 WHERE `entry`=16243;
+-- Fix timer for Acid Volley on Stoneskin Gargoyle
+UPDATE `smart_scripts` SET `event_param1`=3000, `event_param2`=5000, `event_param3`=5000, `event_param4`=7000, `comment`='Stoneskin Gargoyle - In Combat - Cast Acid Volley' WHERE  `entryorguid`=16168 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
+-- Fix timer for Stoneskin on Stoneskin Gargoyle
+UPDATE `smart_scripts` SET `event_param3`=60000, `event_param4`=60000, `event_phase_mask`=0, `comment`='Stoneskin Gargoyle - At 30% HP - Cast Stoneskin' WHERE  `entryorguid`=16168 AND `source_type`=0 AND `id` IN (2, 3) AND `link`=0;
+-- Fix target for Frenzied Dive on Frenzied Bat
+UPDATE `smart_scripts` SET `target_type`=2, `comment`='Frenzied Bat - In Combat - Cast Frenzied Dive' WHERE `entryorguid`=16036 AND `source_type`=0 AND `id`=0 AND `link`=0;
+-- Fix timer for Putrid Bite on Plagued Bat
+UPDATE `smart_scripts` SET `event_param1`=3000, `event_param2`=6000, `event_param3`=9000, `event_param4`=13000, `comment`='Plagued Bat - In combat - Cast Putrid Bite' WHERE `entryorguid`=16037 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
 -- Fix Blood Presence on Death Knight
 UPDATE `smart_scripts` SET `event_type`=4, `event_phase_mask`=0, `event_param2`=0, `comment`='On Aggro - Cast Self - Blood Presence' WHERE `entryorguid`=16146 AND `source_type`=0 AND `id`=2 AND `link`=0;
 
