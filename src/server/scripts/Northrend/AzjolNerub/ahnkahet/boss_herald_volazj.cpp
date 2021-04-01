@@ -301,6 +301,13 @@ public:
 
         void HandleDummyEffect(std::list<WorldObject*>& targets)
         {
+            Unit* caster = GetCaster();
+            if (!caster)
+            {
+                targets.clear();
+                return;
+            }
+
             if (!targets.empty())
             {
                 targets.remove_if([this](WorldObject* targetObj) -> bool
@@ -311,12 +318,7 @@ public:
 
             if (targets.empty())
             {
-                return;
-            }
-
-            Unit* caster = GetCaster();
-            if (!caster)
-            {
+                targets.clear();
                 return;
             }
 
@@ -361,6 +363,7 @@ public:
                 }
 
                 ++insanityHandled;
+                ++itr;
             }
         }
 
@@ -375,6 +378,11 @@ public:
             AfterCast += SpellCastFn(spell_herald_volzaj_insanity_SpellScript::HandleAfterCast);
         }
     };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_herald_volzaj_insanity_SpellScript();
+    }
 };
 
 void AddSC_boss_volazj()
