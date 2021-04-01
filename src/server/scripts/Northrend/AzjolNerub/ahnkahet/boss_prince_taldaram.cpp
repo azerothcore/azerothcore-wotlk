@@ -410,15 +410,13 @@ public:
                         {
                             for (HostileReference const* reference : t_list)
                             {
-                                if (!reference)
+                                if (reference)
                                 {
-                                    continue;
-                                }
-
-                                Unit const* pTarget = ObjectAccessor::GetUnit(*me, reference->getUnitGuid());
-                                if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
-                                {
-                                    ++count;
+                                    Unit const* pTarget = ObjectAccessor::GetUnit(*me, reference->getUnitGuid());
+                                    if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
+                                    {
+                                        ++count;
+                                    }
                                 }
                             }
                         }
