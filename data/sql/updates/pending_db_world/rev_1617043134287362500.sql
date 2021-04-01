@@ -128,6 +128,11 @@ UPDATE `smart_scripts` SET `event_phase_mask`=0, `event_param1`=3500, `event_par
 UPDATE `creature_template` SET `DamageModifier`=2 WHERE `entry`=16390; -- naxx 10mode
 UPDATE `creature_template` SET `DamageModifier`=4 WHERE `entry`=29901; -- naxx 25mode
 UPDATE `creature_template` SET `mechanic_immune_mask`=8388624 WHERE `entry` IN (16390, 29901); -- both versions
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=16390; -- Add AI
+DELETE FROM `smart_scripts` WHERE `entryorguid`=16390 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0; /* Create SAI */
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
+(16390, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathchill Servant - On spawn - Set in combat with zone'),
+(16390, 0, 1, 0, 1, 0, 100, 0, 250, 500, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathchill Servant - On OOC - Despawn if OOC');
 -- Fix timer for Crush Armor on Skeletal Smith
 UPDATE `smart_scripts` SET `event_param1`=1700, `event_param2`=7900, `event_param3`=10500, `event_param4`=12900, `comment`='Skeletal Smith - In combat - Cast Crush Armor' WHERE `entryorguid`=16193 AND `source_type`=0 AND `id`=0 AND `link`=0;
 -- Fix timer for Disarm on Skeletal Smith
@@ -140,4 +145,16 @@ UPDATE `smart_scripts` SET `event_param3`=4600, `event_param4`=7300, `target_typ
 UPDATE `smart_scripts` SET `event_param1`=1100, `event_param2`=2200, `event_param3`=4100, `event_param4`=6200, `target_type`=5, `comment`='Death Knight Cavalier - In combat - Cast Icy Touch' WHERE `entryorguid`=16163 AND `source_type`=0 AND `id` IN (2, 3) AND `link`=0;
 -- Fix timer for Bone Armor on Death Knight Cavalier
 UPDATE `smart_scripts` SET `event_param1`=4700, `event_param2`=6100, `event_param3`=15700, `event_param4`=19800, `comment`='Death Knight Cavalier - In combat - Cast Bone Armor' WHERE `entryorguid`=16163 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
+-- Add SAI for Dismount Deathcharger on Death Knight Cavalier
+DELETE FROM `smart_scripts` WHERE `entryorguid`=16163 AND `source_type`=0 AND `id`=6 AND `link`=0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
+(16163, 0, 6, 0, 2, 0, 100, 0, 0, 30, 0, 0, 0, 11, 55294, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Cavalier - At 30% HP - Cast Dismount Deathcharger');
+-- Adjust Charge for Deathcharger Steed
+UPDATE `smart_scripts` SET `event_flags`=0, `comment`='Deathcharger Steed - In combat - Cast Charge' WHERE `entryorguid`=29818 AND `source_type`=0 AND `id`=0 AND `link`=0;
+-- Create SAI mechanic for appropiate mount/dismount of Deathcharger Steed
+DELETE FROM `smart_scripts` WHERE `entryorguid`=29818 AND `source_type`=0 AND `id` IN (1, 2, 3) AND `link`=0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
+(29818, 0, 1, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathcharger Steed - On spawn - Unmount summoner'),
+(29818, 0, 2, 0, 1, 0, 100, 0, 250, 500, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathcharger Steed - On OOC - Despawn if OOC'),
+(29818, 0, 3, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathcharger Steed - On spawn - Set in combat with zone');
 
