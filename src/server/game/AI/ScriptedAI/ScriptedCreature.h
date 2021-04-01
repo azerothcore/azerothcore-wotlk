@@ -223,13 +223,10 @@ struct ScriptedAI : public CreatureAI
         switch (axis)
         {
             case Axis::AXIS_X:
-                if (!above)
+                if (!above && me->GetPositionX() < pos->GetPositionX())
                 {
-                    if (me->GetPositionX() < pos->GetPositionX())
-                    {
-                        EnterEvadeMode();
-                        return false;
-                    }
+                    EnterEvadeMode();
+                    return false;
                 }
                 else if (me->GetPositionX() > pos->GetPositionX())
                 {
