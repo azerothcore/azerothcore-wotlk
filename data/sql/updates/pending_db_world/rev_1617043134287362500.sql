@@ -70,6 +70,24 @@ UPDATE `smart_scripts` SET `event_param3`=60000, `event_param4`=60000, `event_ph
 UPDATE `smart_scripts` SET `target_type`=2, `comment`='Frenzied Bat - In Combat - Cast Frenzied Dive' WHERE `entryorguid`=16036 AND `source_type`=0 AND `id`=0 AND `link`=0;
 -- Fix timer for Putrid Bite on Plagued Bat
 UPDATE `smart_scripts` SET `event_param1`=3000, `event_param2`=6000, `event_param3`=9000, `event_param4`=13000, `comment`='Plagued Bat - In combat - Cast Putrid Bite' WHERE `entryorguid`=16037 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
+-- Fix aura of Mutated Spores on Plague Beast (must be on all of them, not just some)
+DELETE FROM `creature_addon` WHERE `guid` IN (128171, 128172, 128173, 128174, 128175, 128176, 128177, 128178, 128179, 128180, 128181, 128182, 128183);
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES 
+(128171, 0, 0, 0, 1, 0, 1, '30110'),
+(128172, 0, 0, 0, 1, 0, 1, '30110'),
+(128173, 0, 0, 0, 1, 0, 1, '30110'),
+(128174, 0, 0, 0, 1, 0, 1, '30110'),
+(128175, 0, 0, 0, 1, 0, 1, '30110'),
+(128176, 0, 0, 0, 1, 0, 1, '30110'),
+(128177, 0, 0, 0, 1, 0, 1, '30110'),
+(128178, 0, 0, 0, 1, 0, 1, '30110'),
+(128179, 0, 0, 0, 1, 0, 1, '30110'),
+(128180, 0, 0, 0, 1, 0, 1, '30110'),
+(128181, 0, 0, 0, 1, 0, 1, '30110'),
+(128182, 0, 0, 0, 1, 0, 1, '30110'),
+(128183, 0, 0, 0, 1, 0, 1, '30110');
+-- Fix timer and trigger for Plague Splash on Plague Beast
+UPDATE `smart_scripts` SET `event_type`=2, `event_param1`=0, `event_param2`=50, `event_param3`=25000, `event_param4`=30000, `comment`='Plague Beast - Between 0-50% HP - Cast Plague Splash' WHERE `entryorguid`=16034 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
 -- Fix Blood Presence on Death Knight
 UPDATE `smart_scripts` SET `event_type`=4, `event_phase_mask`=0, `event_param2`=0, `comment`='On Aggro - Cast Self - Blood Presence' WHERE `entryorguid`=16146 AND `source_type`=0 AND `id`=2 AND `link`=0;
 
