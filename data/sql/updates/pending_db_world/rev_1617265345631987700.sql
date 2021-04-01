@@ -10,7 +10,7 @@ INSERT INTO `waypoints` VALUES
 (3984, 4, 891.5708, -114.1264, 38.2004, 'Nancy Vishas'),
 (3984, 5, 888.1400, -121.8399, 38.3880, 'Nancy Vishas');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 398400) AND (`source_type` = 9)
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 398400) AND (`source_type` = 9);
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (3984, 3985));
 
