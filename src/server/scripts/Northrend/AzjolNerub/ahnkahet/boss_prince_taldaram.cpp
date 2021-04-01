@@ -22,12 +22,12 @@ enum Spells
     SPELL_FLAME_SPHERE_PERIODIC_H           = 59508,
     SPELL_FLAME_SPHERE_DEATH_EFFECT         = 55947,
     SPELL_BEAM_VISUAL                       = 60342,
-    SPELL_EMBRACE_OF_THE_VAMPYR             = 55959,
-    SPELL_EMBRACE_OF_THE_VAMPYR_H           = 59513,
     SPELL_VANISH                            = 55964,
     SPELL_SHADOWSTEP                        = 55966,
     SPELL_HOVER_FALL                        = 60425
 };
+
+#define SPELL_EMBRACE_OF_THE_VAMPYR         DUNGEON_MODE(55959,59513)
 
 enum Creatures
 {
@@ -283,12 +283,16 @@ public:
         {
             if (vanishTarget_GUID)
             {
-                vanishDamage += damage;
-                if (vanishDamage > DUNGEON_MODE<uint32>(MAX_EMBRACE_DMG, MAX_EMBRACE_DMG_H))
+                if (me->FindCurrentSpellBySpellId(SPELL_EMBRACE_OF_THE_VAMPYR))
                 {
-                    ScheduleCombatEvents();
-                    me->CastStop();
-                    vanishTarget_GUID = 0;
+                    vanishDamage += damage;
+                    if (vanishDamage > DUNGEON_MODE<uint32>(MAX_EMBRACE_DMG, MAX_EMBRACE_DMG_H))
+                    {
+                        ScheduleCombatEvents();
+                        me->CastStop();
+                        vanishTarget_GUID = 0;
+                        vanishDamage = 0;
+                    }
                 }
             }
         }
@@ -302,12 +306,17 @@ public:
         void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() != TYPEID_PLAYER)
+            {
                 return;
-
-            if (vanishTarget_GUID && victim->GetGUID() == vanishTarget_GUID)
-                vanishTarget_GUID = 0;
+            }
 
             Talk(SAY_SLAY);
+
+            if (vanishTarget_GUID && victim->GetGUID() == vanishTarget_GUID)
+            {
+                vanishTarget_GUID = 0;
+                vanishDamage = 0;
+            }
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -427,6 +436,7 @@ public:
                     {
                         if (Unit* _vanishTarget = ObjectAccessor::GetUnit(*me, vanishTarget_GUID))
                         {
+                            vanishDamage = 0;
                             DoCast(_vanishTarget, SPELL_SHADOWSTEP);
                             me->CastSpell(_vanishTarget, SPELL_EMBRACE_OF_THE_VAMPYR, false);
                             me->RemoveAura(SPELL_VANISH);
@@ -447,7 +457,9 @@ public:
             }
 
             if (me->IsVisible())
+            {
                 DoMeleeAttackIfReady();
+            }
         }
 
     private:
