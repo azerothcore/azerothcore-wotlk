@@ -18,11 +18,10 @@ enum Spells
 {
     // NADOX
     SPELL_BROOD_PLAGUE              = 56130,
-    SPELL_BROOD_PLAGUE_H            = 59467,
-    SPELL_BROOD_RAGE_H              = 59465,
-    SPELL_ENRAGE                    = 26662, // Enraged if too far away from home
-    SPELL_SUMMON_SWARMERS           = 56119, //2x NPC_AHNKAHAR_SWARMER
-    SPELL_SUMMON_SWARM_GUARD        = 56120, //1x NPC_AHNKAHAR_GUARDIAN_ENTRY  -- at 50%hp
+    SPELL_BROOD_RAGE_H              = 59465,    // Only in heroic
+    SPELL_ENRAGE                    = 26662,    // Enraged if too far away from home
+    SPELL_SUMMON_SWARMERS           = 56119,    // 2x NPC_AHNKAHAR_SWARMER
+    SPELL_SUMMON_SWARM_GUARD        = 56120,    // 1x NPC_AHNKAHAR_GUARDIAN_ENTRY  -- at 50%hp
     SPELL_SWARM                     = 56281,
 
     // ADDS
@@ -76,7 +75,11 @@ public:
             events.ScheduleEvent(EVENT_SWARMER, 10000);
             events.ScheduleEvent(EVENT_CHECK_HOME, 2000);
             events.ScheduleEvent(EVENT_PLAGUE, urand(5000, 8000));
-            events.ScheduleEvent(EVENT_BROOD_RAGE, 5000);
+
+            if (IsHeroic())
+            {
+                events.ScheduleEvent(EVENT_BROOD_RAGE, 5000);
+            }
 
             // Clear eggs data
             swarmEggs.clear();
@@ -181,34 +184,34 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_BROOD_RAGE:
-                {
-                    if (Creature* pSwarmer = me->FindNearestCreature(NPC_AHNKAHAR_SWARMER, 40, true))
-                        DoCast(pSwarmer, SPELL_BROOD_RAGE_H, true);
-
-                    events.RepeatEvent(10000);
-                    break;
-                }
-                case EVENT_PLAGUE:
-                {
-                    DoCastVictim(DUNGEON_MODE(SPELL_BROOD_PLAGUE, SPELL_BROOD_PLAGUE_H), false);
-                    events.RepeatEvent(12000 + rand() % 5000);
-                    break;
-                }
-                case EVENT_SWARMER:
-                {
-                    SummonHelpers(true);
-                    events.RepeatEvent(10000);
-                    break;
-                }
-                case EVENT_CHECK_HOME:
-                {
-                    if (!me->HasAura(SPELL_ENRAGE) && (me->GetPositionZ() < 24.0f || !me->GetHomePosition().IsInDist(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 110.0f)))
+                    case EVENT_BROOD_RAGE:
                     {
-                        DoCastSelf(SPELL_ENRAGE, true);
+                        if (Creature* pSwarmer = me->FindNearestCreature(NPC_AHNKAHAR_SWARMER, 40, true))
+                            DoCast(pSwarmer, SPELL_BROOD_RAGE_H, true);
+
+                        events.RepeatEvent(10000);
+                        break;
                     }
-                    break;
-                }
+                    case EVENT_PLAGUE:
+                    {
+                        DoCastVictim(SPELL_BROOD_PLAGUE, false);
+                        events.RepeatEvent(urand(12000, 17000));
+                        break;
+                    }
+                    case EVENT_SWARMER:
+                    {
+                        SummonHelpers(true);
+                        events.RepeatEvent(10000);
+                        break;
+                    }
+                    case EVENT_CHECK_HOME:
+                    {
+                        if (!me->HasAura(SPELL_ENRAGE) && (me->GetPositionZ() < 24.0f || !me->GetHomePosition().IsInDist(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 110.0f)))
+                        {
+                            DoCastSelf(SPELL_ENRAGE, true);
+                        }
+                        break;
+                    }
                 }
             }
 
