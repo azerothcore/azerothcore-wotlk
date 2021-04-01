@@ -299,7 +299,7 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
     // pussywizard: if corpse was removed during falling then the falling will continue after respawn, so stop falling is such case
     if (IsFalling())
         StopMoving();
-}
+    }
 
 /**
  * change the entry of creature until respawn
@@ -487,7 +487,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
         ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
     }
 
-    if (cInfo->InhabitType & INHABIT_ROOT)
+	if (cInfo->InhabitType & INHABIT_ROOT)
     {
         SetControlled(true, UNIT_STATE_ROOT);
     }
@@ -1696,8 +1696,8 @@ void Creature::setDeathState(DeathState s, bool despawn)
             m_formation->FormationReset(true);
 
         bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsUnderWater();
-        SetHover(false, false);
-        SetDisableGravity(false, false);
+        SetHover(false);
+        SetDisableGravity(false);
 
         if (needsFalling)
             GetMotionMaster()->MoveFall(0, true);
@@ -1719,19 +1719,20 @@ void Creature::setDeathState(DeathState s, bool despawn)
         // pussywizard:
         if (HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
             RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
-        UpdateEnvironmentIfNeeded(3);
 
         SetUInt32Value(UNIT_NPC_FLAGS, cinfo->npcflag);
         ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_IGNORE_PATHFINDING | UNIT_STATE_NO_ENVIRONMENT_UPD)));
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
 
         Unit::setDeathState(ALIVE, despawn);
+        
 
-        // Xinef: Load auras AFTER setting alive state
-        LoadCreaturesAddon(true);
         Motion_Initialize();
+        LoadCreaturesAddon(true);
         if (GetCreatureData() && GetPhaseMask() != GetCreatureData()->phaseMask)
             SetPhaseMask(GetCreatureData()->phaseMask, false);
+
+        UpdateEnvironmentIfNeeded(3);
     }
 }
 
@@ -2854,7 +2855,7 @@ bool Creature::SetSwim(bool enable)
 bool Creature::CanSwim() const
 {
     if (Unit::CanSwim())
-        return true;
+        return true; 
 
     if (IsPet() || IS_PLAYER_GUID(GetOwnerGUID()))
         return true;
@@ -3003,10 +3004,10 @@ void Creature::SetObjectScale(float scale)
             combatReach = minfo->combat_reach;
     }
 
-    if (IsPet())
+    if (IsPet()) 
         combatReach = DEFAULT_COMBAT_REACH;
 
-    SetFloatValue(UNIT_FIELD_COMBATREACH, combatReach * GetFloatValue(OBJECT_FIELD_SCALE_X) * scale);
+    SetFloatValue(UNIT_FIELD_COMBATREACH, combatReach * scale);
 }
 
 void Creature::SetDisplayId(uint32 modelId)
@@ -3123,10 +3124,10 @@ float Creature::GetAttackDistance(Unit const* player) const
 bool Creature::IsMovementPreventedByCasting() const
 {
     Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL];
-    // first check if currently a movement allowed channel is active and we're not casting
+     // first check if currently a movement allowed channel is active and we're not casting
     if (!!spell && spell->getState() != SPELL_STATE_FINISHED && spell->IsChannelActive() && spell->GetSpellInfo()->IsMoveAllowedChannel())
     {
-        return false;
+                return false;
     }
 
     if (HasSpellFocus())

@@ -366,7 +366,7 @@ public:
                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                     if (Player* p = itr->GetSource())
                         if (p->IsAlive() && !p->IsGameMaster() && p->GetExactDist(&SindragosaLandPos) < 200.0f && !p->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL))
-                            Unit::Kill(me, p);
+                                _Reset(); // Let Sindragos just Reset instead of Despawn.
             }
             me->DisableRotate(false);
             me->SetControlled(false, UNIT_STATE_ROOT);
@@ -396,13 +396,12 @@ public:
                 me->setActive(true);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetHover(true);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 4.28571f);
                 float moveTime = me->GetExactDist(&SindragosaFlyInPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, SindragosaLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
                 me->GetMotionMaster()->MovePoint(POINT_FROSTWYRM_FLY_IN, SindragosaFlyInPos);
-                me->CastSpell(me, SPELL_SINDRAGOSA_S_FURY, true);
+//                    me->CastSpell(me, SPELL_SINDRAGOSA_S_FURY, true); // Disable her Fury, because it was removed on 335a after Players wipe trought
             }
         }
 
@@ -423,9 +422,8 @@ public:
                 case POINT_FROSTWYRM_LAND:
                     me->setActive(false);
                     me->SetDisableGravity(false);
-                    me->SetHover(false);
                     me->SetCanFly(false);
-                    me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
+                    me->SetSpeed(MOVE_FLIGHT, 3.5f);
                     me->SetHomePosition(SindragosaLandPos);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
@@ -451,8 +449,8 @@ public:
                 case POINT_LAND_GROUND:
                     {
                         _isInAirPhase = false;
-                        me->SetDisableGravity(false);
                         me->SetCanFly(false);
+                        me->SetDisableGravity(false);
                         me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                         me->SetReactState(REACT_AGGRESSIVE);
                         if (Unit* target = me->SelectVictim())
@@ -566,10 +564,12 @@ public:
                 case EVENT_ICY_GRIP:
                     me->CastSpell((Unit*)nullptr, SPELL_ICY_GRIP, false);
                     events.DelayEventsToMax(1001, 0);
-                    events.ScheduleEvent(EVENT_BLISTERING_COLD, 1000, EVENT_GROUP_LAND_PHASE);
+                    events.ScheduleEvent(EVENT_BLISTERING_COLD, 1050, EVENT_GROUP_LAND_PHASE);
                     if (uint32 evTime = events.GetNextEventTime(EVENT_ICE_TOMB))
                         if (events.GetTimer() > evTime || evTime - events.GetTimer() < 7000)
                             events.RescheduleEvent(EVENT_ICE_TOMB, 7000);
+                    me->SetReactState(REACT_PASSIVE);
+                    DoStopAttack();
                     break;
                 case EVENT_BLISTERING_COLD:
                     Talk(EMOTE_WARN_BLISTERING_COLD);
@@ -579,6 +579,8 @@ public:
                         events.RescheduleEvent(EVENT_ICY_GRIP, urand(65000, 70000));
                     break;
                 case EVENT_BLISTERING_COLD_YELL:
+                        me->SetReactState(REACT_DEFENSIVE);
+                        AttackStart(me->GetVictim());
                     Talk(SAY_BLISTERING_COLD);
                     break;
 
@@ -603,7 +605,6 @@ public:
                     me->StopMoving();
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
-                    me->SetHover(true);
                     me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f, 10.0f);
                     events.CancelEventGroup(EVENT_GROUP_LAND_PHASE);
@@ -684,8 +685,8 @@ public:
                     break;
             }
 
-            if (me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()) && me->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE && !me->IsWithinLOSInMap(me->GetVictim()))
-                me->GetMotionMaster()->MoveCharge(me->GetVictim()->GetPositionX(), me->GetVictim()->GetPositionY(), me->GetVictim()->GetPositionZ(), me->GetSpeed(MOVE_RUN), POINT_CHASE_VICTIM);
+            //if (me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()) && me->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE && !me->IsWithinLOSInMap(me->GetVictim()))
+                //me->GetMotionMaster()->MoveCharge(me->GetVictim()->GetPositionX(), me->GetVictim()->GetPositionY(), me->GetVictim()->GetPositionZ(), me->GetSpeed(MOVE_RUN), POINT_CHASE_VICTIM);
             DoMeleeAttackIfReady();
         }
 
@@ -1052,7 +1053,11 @@ public:
         void HandleScript(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            if (!GetHitUnit()->IsWithinLOSInMap(GetCaster()) || GetHitUnit()->HasAura(SPELL_TANK_MARKER_AURA))
+
+            if (!GetHitUnit()->IsWithinLOS(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ() + GetHitUnit()->GetCollisionHeight(), LINEOFSIGHT_ALL_CHECKS))
+                return;
+
+            if (GetHitUnit()->HasAura(SPELL_TANK_MARKER_AURA))
                 return;
 
             GetHitUnit()->CastSpell(GetCaster(), SPELL_ICY_GRIP_JUMP, true);
@@ -1395,7 +1400,7 @@ public:
             {
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetHover(true);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
         }
 
@@ -1406,8 +1411,19 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
             }
+        }
+
+        bool IsOnPlatform()
+        {
+            if (me->GetExactDist(me->GetHomePosition().GetPositionX(),
+                me->GetHomePosition().GetPositionY(),
+                me->GetHomePosition().GetPositionZ()) > 290.0f)
+            {
+                EnterEvadeMode();
+                return false;
+            }
+            return true;
         }
 
         void JustRespawned() override
@@ -1433,7 +1449,7 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 float moveTime = me->GetExactDist(&SpinestalkerFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, SpinestalkerLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
                 me->SetDefaultMovementType(IDLE_MOTION_TYPE);
@@ -1451,15 +1467,14 @@ public:
             me->setActive(false);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            me->SetHover(false);
             me->SetHomePosition(SpinestalkerLandPos);
             me->SetFacingTo(SpinestalkerLandPos.GetOrientation());
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim())
+                if (!UpdateVictim() || !IsOnPlatform())
                 return;
 
             _events.Update(diff);
@@ -1532,7 +1547,7 @@ public:
             {
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetHover(true);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
         }
 
@@ -1543,8 +1558,19 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
             }
+        }
+
+        bool IsOnPlatform()
+        {
+            if (me->GetExactDist(me->GetHomePosition().GetPositionX(),
+                me->GetHomePosition().GetPositionY(),
+                me->GetHomePosition().GetPositionZ()) > 290.0f)
+            {
+                EnterEvadeMode();
+                return false;
+            }
+            return true;
         }
 
         void JustRespawned() override
@@ -1570,7 +1596,7 @@ public:
                     return;
 
                 me->setActive(true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 float moveTime = me->GetExactDist(&RimefangFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
                 me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, RimefangLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
                 me->SetDefaultMovementType(IDLE_MOTION_TYPE);
@@ -1590,16 +1616,14 @@ public:
                 me->setActive(false);
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
                 me->SetHomePosition(RimefangLandPos);
                 me->SetFacingTo(RimefangLandPos.GetOrientation());
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             }
             else if (point == POINT_LAND_GROUND)
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
                 me->SetReactState(REACT_DEFENSIVE);
                 if (Unit* victim = me->SelectVictim())
                     AttackStart(victim);
@@ -1613,7 +1637,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim())
+                if (!UpdateVictim() || !IsOnPlatform())
                 return;
 
             _events.Update(diff);
@@ -1644,7 +1668,6 @@ public:
                         me->AttackStop();
                         me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SetHover(true);
                         me->SendMovementFlagUpdate();
                         float floorZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         float destZ;

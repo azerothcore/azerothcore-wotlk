@@ -97,6 +97,10 @@ enum Spells
     // Unholy Infusion
     SPELL_UNHOLY_INFUSION                   = 71516,
     SPELL_UNHOLY_INFUSION_CREDIT            = 71518,
+
+    // Trap
+    SPELL_INSECT_SWARM                      = 70475,
+    SPELL_SUMMON_INSECTS                    = 70484,
 };
 
 enum PutricideData
@@ -108,18 +112,24 @@ enum PutricideData
 
 enum Events
 {
-    EVENT_NONE,
-    EVENT_BERSERK,
-    EVENT_SLIME_PUDDLE,
-    EVENT_UNSTABLE_EXPERIMENT,
-    EVENT_GO_TO_TABLE,
-    EVENT_TABLE_DRINK_STUFF,
-    EVENT_PHASE_TRANSITION,
-    EVENT_RESUME_ATTACK,
-    EVENT_UNBOUND_PLAGUE,
-    EVENT_MALLEABLE_GOO,
-    EVENT_CHOKING_GAS_BOMB,
+    EVENT_NONE                  = 1,
+    EVENT_BERSERK               = 2,
+    EVENT_SLIME_PUDDLE          = 3,
+    EVENT_UNSTABLE_EXPERIMENT   = 4,
+    EVENT_GO_TO_TABLE           = 5,
+    EVENT_TABLE_DRINK_STUFF     = 6,
+    EVENT_PHASE_TRANSITION      = 7,
+    EVENT_RESUME_ATTACK         = 8,
+    EVENT_UNBOUND_PLAGUE        = 9,
+    EVENT_MALLEABLE_GOO         = 10,
+    EVENT_CHOKING_GAS_BOMB      = 11,
+
+    // Trap
+    EVENT_TRAP_STOP             = 12,
+    EVENT_SUMMON_INSECTS        = 13,
 };
+
+#define ACTION_START_TRAP     1
 
 #define EVENT_GROUP_ABILITIES 1
 
@@ -234,7 +244,8 @@ public:
             _phase = 1;
             bChangePhase = false;
             _Reset();
-            me->SetReactState(REACT_AGGRESSIVE);
+            me->SetReactState(REACT_DEFENSIVE);
+            me->SetWalk(false);
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
             if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE)
@@ -391,12 +402,14 @@ public:
                     if (HealthAbovePct(80))
                         return;
                     me->SetReactState(REACT_PASSIVE);
+                    me->CastStop();
                     bChangePhase = true;
                     break;
                 case 2:
                     if (HealthAbovePct(35))
                         return;
                     me->SetReactState(REACT_PASSIVE);
+                    me->CastStop();
                     bChangePhase = true;
                     break;
                 default:
@@ -864,6 +877,86 @@ public:
     }
 };
 
+class npc_putricide_trap : public CreatureScript
+{
+    public:
+        npc_putricide_trap() : CreatureScript("npc_putricide_trap") { }
+
+        struct npc_putricide_trapAI : public ScriptedAI
+        {
+            npc_putricide_trapAI(Creature* creature) : ScriptedAI(creature) {}
+
+            void JustSummoned(Creature* summon)
+            {
+                Position pos;
+                me->GetPosition(&pos);
+                me->MovePosition(pos, frand(3.0f, 10.0f), float(rand_norm()*2*M_PI));
+                summon->NearTeleportTo(pos.m_positionX, pos.m_positionY, pos.m_positionZ, 0.0f);
+                summon->SetReactState(REACT_AGGRESSIVE);
+                DoZoneInCombat(summon);
+            }
+
+            void DoAction(const int32 action)
+            {
+                if (action == ACTION_START_TRAP)
+                {
+                    if (InstanceScript* instance = me->GetInstanceScript())
+                    {
+                        if (GameObject* go = instance->instance->GetGameObject(instance->GetData64(DATA_PLAGUEWORKS_DOOR_1)))
+                            go->SetGoState(GO_STATE_READY);
+                        if (GameObject* go = instance->instance->GetGameObject(instance->GetData64(DATA_PLAGUEWORKS_DOOR_2)))
+                            go->SetGoState(GO_STATE_READY);
+                        if (GameObject* go = instance->instance->GetGameObject(instance->GetData64(DATA_PUTRICIDE_COLLISION)))
+                            go->SetGoState(GO_STATE_READY);
+                        if (GameObject* go = me->FindNearestGameObject(GO_SCIENTIST_ENTRANCE, 100.0f))
+                            go->SetGoState(GO_STATE_READY);
+
+                        _events.ScheduleEvent(EVENT_TRAP_STOP, 40*IN_MILLISECONDS);
+                        _events.ScheduleEvent(EVENT_SUMMON_INSECTS, urand(600, 900));
+                        DoCastAOE(SPELL_INSECT_SWARM);
+                    }
+                }
+            }
+
+            void UpdateAI(uint32 const diff)
+            {
+                _events.Update(diff);
+
+                switch (_events.ExecuteEvent())
+                {
+                case EVENT_TRAP_STOP:
+                    if (InstanceScript* instance = me->GetInstanceScript())
+                    {
+                        if (GameObject* go = instance->instance->GetGameObject(instance->GetData64(DATA_PLAGUEWORKS_DOOR_1)))
+                            go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                        if (GameObject* go = instance->instance->GetGameObject(instance->GetData64(DATA_PLAGUEWORKS_DOOR_2)))
+                            go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                        if (GameObject* go = instance->instance->GetGameObject(instance->GetData64(DATA_PUTRICIDE_COLLISION)))
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        if (GameObject* go = me->FindNearestGameObject(GO_SCIENTIST_ENTRANCE, 100.0f))
+                            go->SetGoState(GO_STATE_ACTIVE);
+                        me->InterruptNonMeleeSpells(true);
+
+                        _events.Reset();
+                    }
+                    break;
+                case EVENT_SUMMON_INSECTS:
+                    DoCastAOE(SPELL_SUMMON_INSECTS, true);
+                    _events.RescheduleEvent(EVENT_SUMMON_INSECTS, (urand(700, 1200)));
+                    break;
+                }
+            }
+
+        private:
+            EventMap _events;
+        };
+
+        CreatureAI* GetAI(Creature* creature) const
+        {
+            return GetIcecrownCitadelAI<npc_putricide_trapAI>(creature);
+        }
+};
+
 class spell_putricide_slime_puddle : public SpellScriptLoader
 {
 public:
@@ -919,6 +1012,9 @@ public:
             if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
             {
                 float destZ = 395.0f; // random number close to ground, get exact in next call
+                if (InstanceScript* inst = GetCaster()->GetInstanceScript())
+                    if (inst->IsMythicRunActive())
+                        destZ = dest->GetPositionZ();
                 GetCaster()->UpdateGroundPositionZ(dest->GetPositionX(), dest->GetPositionY(), destZ);
                 dest->m_positionZ = destZ;
             }
@@ -1642,14 +1738,14 @@ public:
 
             if (Aura* grow = target->GetAura(uint32(GetEffectValue())))
             {
-                if (grow->GetStackAmount() <= 4)
+                    if (grow->GetStackAmount() < 3)
                 {
                     target->RemoveAurasDueToSpell(SPELL_GROW_STACKER);
                     target->RemoveAura(grow);
                     target->DespawnOrUnsummon(1);
                 }
                 else
-                    grow->ModStackAmount(-4);
+                        grow->ModStackAmount(-3);
             }
         }
 
@@ -1694,11 +1790,80 @@ public:
     }
 };
 
+class spell_putricide_insect_swarm : public SpellScriptLoader
+{
+    public:
+        spell_putricide_insect_swarm() : SpellScriptLoader("spell_putricide_insect_swarm") { }
+
+        class spell_putricide_insect_swarm_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_putricide_insect_swarm_AuraScript);
+
+            bool CheckAreaTarget(Unit* target)
+            {
+                if (!target->IsWithinLOSInMap(GetCaster()))
+                    return false;
+
+                Aura* tarAur = target->GetAura(GetId());
+
+                if (tarAur)
+                {
+                    if (tarAur != GetAura())
+                        return false;
+                }
+                return true;
+            }
+
+            void Register()
+            {
+                DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_putricide_insect_swarm_AuraScript::CheckAreaTarget);
+            }
+        };
+
+        AuraScript* GetAuraScript() const
+        {
+            return new spell_putricide_insect_swarm_AuraScript();
+        }
+};
+
+class at_putricide_trap : public AreaTriggerScript
+{
+   public:
+       at_putricide_trap() : AreaTriggerScript("at_putricide_trap") { }
+
+       bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/)
+       {
+           if (InstanceScript* instance = player->GetInstanceScript())
+           {
+               if (instance->GetData(DATA_PUTRICIDE_GAUNTLET))
+                   return false;
+
+               instance->SetData(DATA_PUTRICIDE_GAUNTLET, true);
+               std::list<Creature*> triggers;
+               player->GetCreatureListWithEntryInGrid(triggers, NPC_PUTRICIDE_TRAP, 100.0f);
+               if (triggers.empty())
+                   return false;
+
+               for (std::list<Creature*>::const_iterator itr = triggers.begin(); itr != triggers.end();++itr)
+               {
+                   if (Creature* trigger = *itr)
+                   {
+                       trigger->AI()->DoAction(ACTION_START_TRAP);
+                   }
+               }
+               triggers.front()->SendPlaySound(17125, false);
+           }
+
+           return true;
+       }
+};
+
 void AddSC_boss_professor_putricide()
 {
     new boss_professor_putricide();
     new npc_volatile_ooze();
     new npc_gas_cloud();
+    new npc_putricide_trap();
     new spell_putricide_slime_puddle();
     new spell_putricide_slime_puddle_spawn();
     new spell_putricide_grow_stacker();
@@ -1718,4 +1883,6 @@ void AddSC_boss_professor_putricide()
     new spell_putricide_mutated_transformation_dmg();
     new spell_putricide_eat_ooze();
     new spell_putricide_regurgitated_ooze();
+    new spell_putricide_insect_swarm();
+    new at_putricide_trap();
 }

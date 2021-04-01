@@ -1181,10 +1181,10 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
             {
                 // Physical Damage
                 if (damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL)
-                {
-                    // Get blocked status
-                    blocked = isSpellBlocked(victim, spellInfo, attackType);
-                }
+                    {
+                        // Get blocked status
+                        blocked = isSpellBlocked(victim, spellInfo, attackType);
+                    }
 
                 if (crit)
                 {
@@ -1706,8 +1706,8 @@ uint32 Unit::CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, co
                         bonusPct += (*itr)->GetAmount();
                 }
                 else
-                {
-                    if (attacker->ToPlayer()->HasItemFitToSpellRequirements((*itr)->GetSpellInfo()))
+            {
+                if (attacker->ToPlayer()->HasItemFitToSpellRequirements((*itr)->GetSpellInfo()))
                         bonusPct += (*itr)->GetAmount();
                 }
             }
@@ -1718,7 +1718,7 @@ uint32 Unit::CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, co
             else
                 maxArmorPen = 400 + 85 * victim->getLevel() + 4.5f * 85 * (victim->getLevel() - 59);
 
-            // Cap armor penetration to this number
+           // Cap armor penetration to this number
             maxArmorPen = std::min((armor + maxArmorPen) / 3, armor);
             // Figure out how much armor do we ignore
             float armorPen = CalculatePct(maxArmorPen, bonusPct + attacker->ToPlayer()->GetRatingBonusValue(CR_ARMOR_PENETRATION));
@@ -1801,18 +1801,18 @@ void Unit::CalcAbsorbResist(Unit* attacker, Unit* victim, SpellSchoolMask school
 
         float discreteResistProbability[11];
         for (uint32 i = 0; i < 11; ++i)
-        {
+    {
             discreteResistProbability[i] = 0.5f - 2.5f * fabs(0.1f * i - averageResist);
             if (discreteResistProbability[i] < 0.0f)
                 discreteResistProbability[i] = 0.0f;
-        }
+    }
 
-        if (averageResist <= 0.1f)
-        {
-            discreteResistProbability[0] = 1.0f - 7.5f * averageResist;
-            discreteResistProbability[1] = 5.0f * averageResist;
-            discreteResistProbability[2] = 2.5f * averageResist;
-        }
+    if (averageResist <= 0.1f)
+    {
+        discreteResistProbability[0] = 1.0f - 7.5f * averageResist;
+        discreteResistProbability[1] = 5.0f * averageResist;
+        discreteResistProbability[2] = 2.5f * averageResist;
+    }
 
         float r = float(rand_norm());
         uint32 i = 0;
@@ -1824,32 +1824,32 @@ void Unit::CalcAbsorbResist(Unit* attacker, Unit* victim, SpellSchoolMask school
         float damageResisted = float(damage * i / 10);
 
         if (damageResisted) // if equal to 0, checking these is pointless
+    {
+        if (attacker)
         {
-            if (attacker)
-            {
-                AuraEffectList const& ResIgnoreAurasAb = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST);
-                for (AuraEffectList::const_iterator j = ResIgnoreAurasAb.begin(); j != ResIgnoreAurasAb.end(); ++j)
-                    if (((*j)->GetMiscValue() & schoolMask) && (*j)->IsAffectedOnSpell(spellInfo))
+            AuraEffectList const& ResIgnoreAurasAb = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST);
+            for (AuraEffectList::const_iterator j = ResIgnoreAurasAb.begin(); j != ResIgnoreAurasAb.end(); ++j)
+                if (((*j)->GetMiscValue() & schoolMask) && (*j)->IsAffectedOnSpell(spellInfo))
                         AddPct(damageResisted, -(*j)->GetAmount());
 
                 AuraEffectList const& ResIgnoreAuras = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
                 for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
                     if ((*j)->GetMiscValue() & schoolMask)
                         AddPct(damageResisted, -(*j)->GetAmount());
-            }
+        }
 
             // pussywizard:
-            if (spellInfo && spellInfo->HasAttribute(SPELL_ATTR0_CU_SCHOOLMASK_NORMAL_WITH_MAGIC))
-            {
-                uint32 damageAfterArmor = Unit::CalcArmorReducedDamage(attacker, victim, damage, spellInfo, 0, BASE_ATTACK);
+        if (spellInfo && spellInfo->HasAttribute(SPELL_ATTR0_CU_SCHOOLMASK_NORMAL_WITH_MAGIC))
+        {
+            uint32 damageAfterArmor = Unit::CalcArmorReducedDamage(attacker, victim, damage, spellInfo, 0, BASE_ATTACK);
                 uint32 armorReduction = damage - damageAfterArmor;
                 if (armorReduction < damageResisted) // pick the lower one, the weakest resistance counts
                     damageResisted = armorReduction;
-            }
         }
+    }
 
         dmgInfo.ResistDamage(uint32(damageResisted));
-    }
+}
 
     // Ignore Absorption Auras
     float auraAbsorbMod = 0;
@@ -2418,13 +2418,13 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
 
         if ((tmp > 0)                                        // check if unit _can_ dodge
                 && ((tmp -= skillBonus) > 0)
-                && roll < (sum += tmp))
+            && roll < (sum += tmp))
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outStaticDebug ("RollMeleeOutcomeAgainst: DODGE <%d, %d)", sum - tmp, sum);
 #endif
             return MELEE_HIT_DODGE;
-        }
+    }
     }
 
     // parry & block chances
@@ -2445,22 +2445,22 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
             parry_chance -= GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE) * 25;
 
         if (victim->GetTypeId() == TYPEID_PLAYER || !(victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_PARRY))
-        {
-            tmp = parry_chance;
+    {
+        tmp = parry_chance;
 
             // xinef: cant parry while casting or while stunned
             if (victim->IsNonMeleeSpellCast(false, false, true) || victim->HasUnitState(UNIT_STATE_CONTROLLED))
                 tmp = 0;
 
-            if (tmp > 0                                         // check if unit _can_ parry
+        if (tmp > 0                                         // check if unit _can_ parry
                     && (tmp -= skillBonus) > 0
-                    && roll < (sum += tmp))
+            && roll < (sum += tmp))
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
                 sLog->outStaticDebug ("RollMeleeOutcomeAgainst: PARRY <%d, %d)", sum - tmp, sum);
 #endif
-                return MELEE_HIT_PARRY;
-            }
+            return MELEE_HIT_PARRY;
+    }
         }
 
         if (victim->GetTypeId() == TYPEID_PLAYER || !(victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK))
@@ -2486,8 +2486,8 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
     // Max 40% chance to score a glancing blow against mobs that are higher level (can do only players and pets and not with ranged weapon)
     if (attType != RANGED_ATTACK &&
             (GetTypeId() == TYPEID_PLAYER || IsPet()) &&
-            victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet() &&
-            getLevel() < victim->getLevelForTarget(this))
+        victim->GetTypeId() != TYPEID_PLAYER && !victim->IsPet() &&
+        getLevel() < victim->getLevelForTarget(this))
     {
         // cap possible value (with bonuses > max skill)
         int32 skill = attackerWeaponSkill;
@@ -2502,22 +2502,22 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
             sLog->outStaticDebug ("RollMeleeOutcomeAgainst: GLANCING <%d, %d)", sum - 4000, sum);
 #endif
             return MELEE_HIT_GLANCING;
-        }
+    }
     }
 
     // mobs can score crushing blows if they're 4 or more levels above victim
     if (getLevelForTarget(victim) >= victim->getLevelForTarget(this) + 4 &&
-            // can be from by creature (if can) or from controlled player that considered as creature
-            !IsControlledByPlayer() &&
-            !(GetTypeId() == TYPEID_UNIT && ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_CRUSH))
+        // can be from by creature (if can) or from controlled player that considered as creature
+        !IsControlledByPlayer() &&
+        !(GetTypeId() == TYPEID_UNIT && ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_CRUSH))
     {
         // when their weapon skill is 15 or more above victim's defense skill
         tmp = victimDefenseSkill;
         int32 tmpmax = victimMaxSkillValueForLevel;
-        // having defense above your maximum (from items, talents etc.) has no effect
+            // having defense above your maximum (from items, talents etc.) has no effect
         tmp = tmp > tmpmax ? tmpmax : tmp;
-        // tmp = mob's level * 5 - player's current defense skill
-        tmp = attackerMaxSkillValueForLevel - tmp;
+            // tmp = mob's level * 5 - player's current defense skill
+            tmp = attackerMaxSkillValueForLevel - tmp;
         if (tmp >= 15)
         {
             // add 2% chance per lacking skill point, min. is 15%
@@ -2535,7 +2535,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
     // Critical chance
     tmp = crit_chance;
 
-    if (tmp > 0 && roll < (sum += tmp))
+        if (tmp > 0 && roll < (sum += tmp))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outStaticDebug ("RollMeleeOutcomeAgainst: CRIT <%d, %d)", sum - tmp, sum);
@@ -2548,7 +2548,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
         }
         else
             return MELEE_HIT_CRIT;
-    }
+}
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outStaticDebug ("RollMeleeOutcomeAgainst: NORMAL");
@@ -2661,7 +2661,7 @@ bool Unit::isSpellBlocked(Unit* victim, SpellInfo const* spellProto, WeaponAttac
         // Check creatures flags_extra for disable block
         if (victim->GetTypeId() == TYPEID_UNIT &&
                 victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK)
-            return false;
+        return false;
 
         float blockChance = victim->GetUnitBlockChance();
         blockChance += (int32(GetWeaponSkillValue(attackType)) - int32(victim->GetMaxSkillValueForLevel())) * 0.04f;
@@ -2783,17 +2783,17 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spell)
 
     // Check creatures flags_extra for disable parry
     if (victim->GetTypeId() == TYPEID_UNIT)
-    {
+        {
         uint32 flagEx = victim->ToCreature()->GetCreatureTemplate()->flags_extra;
         // Xinef: no dodge flag
         if (flagEx & CREATURE_FLAG_EXTRA_NO_DODGE)
             canDodge = false;
         if (flagEx & CREATURE_FLAG_EXTRA_NO_PARRY)
-            canParry = false;
+                canParry = false;
         // Check creatures flags_extra for disable block
         if (flagEx & CREATURE_FLAG_EXTRA_NO_BLOCK)
             canBlock = false;
-    }
+        }
     // Ignore combat result aura
     AuraEffectList const& ignore = GetAuraEffectsByType(SPELL_AURA_IGNORE_COMBAT_RESULT);
     for (AuraEffectList::const_iterator i = ignore.begin(); i != ignore.end(); ++i)
@@ -3060,7 +3060,7 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
                 for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
                     if (spell->Effects[i].Effect && spell->Effects[i].Effect != SPELL_EFFECT_SCHOOL_DAMAGE)
                         if (spell->Effects[i].ApplyAuraName != SPELL_AURA_PERIODIC_DAMAGE)
-                            return SPELL_MISS_NONE;
+            return SPELL_MISS_NONE;
                 [[fallthrough]];
             }
         case SPELL_DAMAGE_CLASS_MAGIC:
@@ -3092,8 +3092,8 @@ float Unit::GetUnitDodgeChance() const
     {
         if (ToCreature()->IsTotem())
             return 0.0f;
-        else
-        {
+    else
+    {
             float dodge = ToCreature()->isWorldBoss() ? 5.85f : 5.0f; // Xinef: bosses should have 6.5% dodge (5.9 + 0.6 from defense skill difference)
             dodge += GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_PERCENT);
             return dodge > 0.0f ? dodge : 0.0f;
@@ -3118,7 +3118,7 @@ float Unit::GetUnitParryChance() const
         }
     }
     else if (GetTypeId() == TYPEID_UNIT)
-    {
+        {
         if (ToCreature()->isWorldBoss())
             chance = 13.4f; // + 0.6 by skill diff
         else if (GetCreatureType() == CREATURE_TYPE_HUMANOID)
@@ -3126,7 +3126,7 @@ float Unit::GetUnitParryChance() const
 
         // Xinef: if aura is present, type should not matter
         chance += GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);
-    }
+        }
 
     return chance > 0.0f ? chance : 0.0f;
 }
@@ -3189,7 +3189,7 @@ float Unit::GetUnitCriticalChance(WeaponAttackType attackType, const Unit* victi
             case RANGED_ATTACK:
                 crit = GetFloatValue(PLAYER_RANGED_CRIT_PERCENTAGE);
                 break;
-            // Just for good manner
+                // Just for good manner
             default:
                 crit = 0.0f;
                 break;
@@ -3200,7 +3200,7 @@ float Unit::GetUnitCriticalChance(WeaponAttackType attackType, const Unit* victi
         crit = 5.0f;
         crit += GetTotalAuraModifier(SPELL_AURA_MOD_WEAPON_CRIT_PERCENT);
         crit += GetTotalAuraModifier(SPELL_AURA_MOD_CRIT_PCT);
-    }
+}
 
     // flat aura mods
     if (attackType == RANGED_ATTACK)
@@ -3234,7 +3234,7 @@ float Unit::GetUnitCriticalChance(WeaponAttackType attackType, const Unit* victi
     return crit;
 }
 
-uint32 Unit::GetWeaponSkillValue (WeaponAttackType attType, Unit const* target) const
+uint32 Unit::GetWeaponSkillValue(WeaponAttackType attType, Unit const* target) const
 {
     uint32 value = 0;
     if (Player const* player = ToPlayer())
@@ -3671,7 +3671,7 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
     float radiusWidth = GetCollisionRadius();
     float radiusHeight = GetCollisionHeight() / 2;
     float radiusAvg = (radiusWidth + radiusHeight) / 2;
-    if (option <= 1 && GetExactDistSq(&m_last_environment_position) < radiusAvg*radiusAvg)
+    if (option <= 1 && GetExactDistSq(&m_last_environment_position) < radiusAvg * radiusAvg)
         return;
 
     m_last_environment_position.Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
@@ -3687,7 +3687,8 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         m_is_updating_environment = false;
         return;
     }
-    bool canChangeFlying = option == 3 || GetMotionMaster()->GetCurrentMovementGeneratorType() != WAYPOINT_MOTION_TYPE;
+
+    bool canChangeFlying = option == 3 || ((c->GetScriptId() == 0 || GetInstanceId() == 0) && GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE);
     bool canFallGround = option == 0 && canChangeFlying && GetInstanceId() == 0 && !IsInCombat() && !GetVehicle() && !GetTransport() && !HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && !c->IsTrigger() && !c->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && GetMotionMaster()->GetCurrentMovementGeneratorType() <= RANDOM_MOTION_TYPE && !HasUnitState(UNIT_STATE_EVADE) && !IsControlledByPlayer();
     float x = GetPositionX(), y = GetPositionY(), z = GetPositionZ();
     bool isInAir = true;
@@ -3747,16 +3748,17 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         }
     }
 
+    bool canUpdateEnvironment = !HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+
     bool flyingBarelyInWater = false;
     // Refresh being in water
     if (m_last_isinwater_status)
     {
         if (!c->CanFly() || enoughWater)
         {
-            if (!HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD) && c->CanSwim() && (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY)))
+            if (canUpdateEnvironment && c->CanSwim() && (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY)))
             {
                 SetSwim(true);
-                // SetDisableGravity(true);
                 changed = true;
             }
             isInAir = false;
@@ -3770,11 +3772,9 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
 
     if (!m_last_isinwater_status)
     {
-        if (!HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD) && c->CanWalk() && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
+        if (canUpdateEnvironment && c->CanWalk() && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
         {
             SetSwim(false);
-            if (!c->CanFly()) // if can fly, this will be removed below if needed
-                SetDisableGravity(false);
             changed = true;
         }
     }
@@ -3789,7 +3789,7 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
             {
                 ground_z = (c->CanSwim() && liquidData.level > INVALID_HEIGHT) ? liquidData.level : temp;
                 bool canHover = c->CanHover();
-                isInAir = flyingBarelyInWater || (G3D::fuzzyGt(GetPositionZ(), ground_z + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + GROUND_HEIGHT_TOLERANCE) || G3D::fuzzyLt(GetPositionZ(), ground_z - GROUND_HEIGHT_TOLERANCE)); // Can be underground too, prevent the falling
+                isInAir = flyingBarelyInWater || (G3D::fuzzyGt(GetPositionZ(), ground_z + (canHover ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f) + 0.75f) || G3D::fuzzyLt(GetPositionZ(), ground_z - 1.f)); // Can be underground too, prevent the falling
             }
             else
                 isInAir = true;
@@ -3801,7 +3801,7 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         }
     }
 
-    if (!HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD) && canChangeFlying)
+    if (canUpdateEnvironment && canChangeFlying)
     {
         // xinef: summoned vehicles are treated as always in air, fixes flying on such units
         if (IsVehicle() && !c->GetDBTableGUIDLow())
@@ -3822,7 +3822,6 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         }
         else if (c->CanFly() && isInAir && !c->IsFalling())
         {
-
             if (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
             {
                 SetCanFly(true);
@@ -3835,7 +3834,6 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
                 SetHover(false);
                 changed = true;
             }
-
         }
         else
         {
@@ -3859,8 +3857,8 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
             }
         }
 
-        if (isInAir && !c->CanFly() && option >= 2)
-            m_last_environment_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
+    if (isInAir && !c->CanFly() && option >= 2)
+        m_last_environment_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
     }
 
     if (!isInAir && HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
@@ -3869,7 +3867,7 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
     if (changed)
         propagateSpeedChange();
 
-    if (!HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD) && canFallGround && !c->CanFly() && !c->IsFalling() && !m_last_isinwater_status && (c->GetUnitMovementFlags() & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_HOVER | MOVEMENTFLAG_SWIMMING)) == 0 && z - ground_z > 5.0f && z - ground_z < 80.0f)
+    if (canUpdateEnvironment && canFallGround && !c->CanFly() && !c->IsFalling() && !m_last_isinwater_status && (c->GetUnitMovementFlags() & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_HOVER | MOVEMENTFLAG_SWIMMING)) == 0 && z - ground_z > 5.0f && z - ground_z < 80.0f)
         GetMotionMaster()->MoveFall();
 
     m_is_updating_environment = false;
@@ -9617,7 +9615,7 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
             // check FFA_PVP
             if (IsFFAPvP() && target->IsFFAPvP())
                 return REP_HOSTILE;
-
+    
             if (selfPlayerOwner)
             {
                 if (FactionTemplateEntry const* targetFactionTemplateEntry = target->GetFactionTemplateEntry())
@@ -11457,7 +11455,7 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
                         crit_chance += GetMaxPositiveAuraModifierByMiscMask(SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_CHANCE, schoolMask);
                     }
 
-                    Unit::ApplyResilience(this, &crit_chance, nullptr, false, CR_CRIT_TAKEN_SPELL);
+                        Unit::ApplyResilience(this, &crit_chance, nullptr, false, CR_CRIT_TAKEN_SPELL);
                 }
                 // scripted (increase crit chance ... against ... target by x%
                 if (caster)
@@ -13534,7 +13532,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                         }
                     }
                     else
-                        speed *= ToCreature()->GetCreatureTemplate()->speed_run;    // at this point, MOVE_WALK is never reached
+                    speed *= ToCreature()->GetCreatureTemplate()->speed_run;    // at this point, MOVE_WALK is never reached
                 }
 
                 // Normalize speed by 191 aura SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED if need
@@ -13559,7 +13557,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
 
     // for creature case, we check explicit if mob searched for assistance
     if (GetTypeId() == TYPEID_UNIT)
-    {
+        {
         if (ToCreature()->HasSearchedAssistance())
             speed *= 0.66f;                                 // best guessed value, so this will be 33% reduction. Based off initial speed, mob can then "run", "walk fast" or "walk".
     }
@@ -13745,7 +13743,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
         if (despawn)
             DisableSpline();
         else
-            StopMoving();
+        StopMoving();
 
         // without this when removing IncreaseMaxHealth aura player may stuck with 1 hp
         // do not why since in IncreaseMaxHealth currenthealth is checked
@@ -13758,7 +13756,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
     }
     else if (s == JUST_RESPAWNED)
     {
-        RemoveFlag (UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE); // clear skinnable for creature and player (at battleground)
+        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE); // clear skinnable for creature and player (at battleground)
     }
 
     m_deathState = s;
@@ -18081,7 +18079,7 @@ float Unit::MeleeSpellMissChance(const Unit* victim, WeaponAttackType attType, i
     // Calculate hit chance
     float hitChance = 100.0f;
 
-    // Spellmod from SPELLMOD_RESIST_MISS_CHANCE
+     // Spellmod from SPELLMOD_RESIST_MISS_CHANCE
     if (spellId)
     {
         if (Player* modOwner = GetSpellModOwner())
@@ -18725,7 +18723,7 @@ void Unit::_EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* a
     m_vehicle = vehicle;
 
     if (!m_vehicle->AddPassenger(this, seatId))
-    {
+    { 
         m_vehicle = nullptr;
         return;
     }
@@ -19972,8 +19970,8 @@ void Unit::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
                         fieldBuffer << (uint32)target->getFaction();
                 }
                 else
-                    fieldBuffer << m_uint32Values[index];
-            }
+                        fieldBuffer << m_uint32Values[index];
+                    }
             else
                 // send in current format (float as float, uint32 as uint32)
                 fieldBuffer << m_uint32Values[index];
@@ -20078,7 +20076,7 @@ float Unit::GetCollisionWidth() const
 
     float collisionWidth = scaleMod * modelData->CollisionWidth * modelData->Scale * displayInfo->scale * 2;
     // if the objectSize is the default value or the creature is mounted and we have a DBC value, then we can retrieve DBC value instead
-    return G3D::fuzzyGt(collisionWidth, 0.0f) && (G3D::fuzzyEq(objectSize,defaultSize) || IsMounted())  ? collisionWidth : objectSize;
+    return G3D::fuzzyGt(collisionWidth, 0.0f) && (G3D::fuzzyEq(objectSize, defaultSize) || IsMounted())  ? collisionWidth : objectSize;
 }
 
 /**

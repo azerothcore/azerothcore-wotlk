@@ -170,7 +170,7 @@ public:
             if (param == ACTION_SAPPHIRON_BIRTH)
             {
                 spawnTimer = 1;
-            }
+        }
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -178,7 +178,7 @@ public:
             if (type == POINT_MOTION_TYPE && id == POINT_CENTER)
             {
                 events.ScheduleEvent(EVENT_FLIGHT_LIFTOFF, 500);
-            }
+        }
         }
 
         void SpellHitTarget(Unit* target, const SpellInfo* spellInfo) override
@@ -210,7 +210,7 @@ public:
             if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
             {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
-            }
+        }
         }
 
         void UpdateAI(uint32 diff) override
@@ -293,7 +293,6 @@ public:
                     me->SendMeleeAttackStop(me->GetVictim());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                     me->SetDisableGravity(true);
-                    me->SetHover(true);
                     currentTarget = 0;
                     events.ScheduleEvent(EVENT_FLIGHT_ICEBOLT, 3000);
                     iceboltCount = RAID_MODE(2, 3);
@@ -329,7 +328,7 @@ public:
                                 if (!inList)
                                 {
                                     targets.push_back((*i)->getTarget());
-                                }
+                            }
                             }
                         }
 
@@ -377,7 +376,6 @@ public:
                 case EVENT_LAND:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
                     me->SetDisableGravity(false);
-                    me->SetHover(false);
                     events.ScheduleEvent(EVENT_GROUND, 1500);
                     return;
                 case EVENT_GROUND:
@@ -426,13 +424,13 @@ public:
                 if (CAST_AI(boss_sapphiron::boss_sapphironAI, caster->ToCreature()->AI())->IsValidExplosionTarget(target))
                 {
                     tmplist.push_back(target);
-                }
+            }
             }
             targets.clear();
             for (auto& itr : tmplist)
             {
                 targets.push_back(itr);
-            }
+        }
         }
 
         void Register() override

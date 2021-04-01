@@ -220,24 +220,20 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
             _type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
 
             AddFarFromPolyFlags(startFarFromPoly, endFarFromPoly);
-
             return;
         }
 
-        if (!isFarUnderWater)
+        float closestPoint[VERTEX_SIZE];
+        // we may want to use closestPointOnPolyBoundary instead
+        if (dtStatusSucceed(_navMeshQuery->closestPointOnPoly(endPoly, endPoint, closestPoint, nullptr)))
         {
-            float closestPoint[VERTEX_SIZE];
-            // we may want to use closestPointOnPolyBoundary instead
-            if (dtStatusSucceed(_navMeshQuery->closestPointOnPoly(endPoly, endPoint, closestPoint, nullptr)))
-            {
-                dtVcopy(endPoint, closestPoint);
-                SetActualEndPosition(G3D::Vector3(endPoint[2], endPoint[0], endPoint[1]));
-            }
-
-            _type = PathType(PATHFIND_INCOMPLETE);
-
-            AddFarFromPolyFlags(startFarFromPoly, endFarFromPoly);
+            dtVcopy(endPoint, closestPoint);
+            SetActualEndPosition(G3D::Vector3(endPoint[2], endPoint[0], endPoint[1]));
         }
+
+        _type = PathType(PATHFIND_INCOMPLETE);
+
+        AddFarFromPolyFlags(startFarFromPoly, endFarFromPoly);
     }
 
     // *** poly path generating logic ***
@@ -381,7 +377,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         // or something went really wrong -> we aren't moving along the path to the target
         // just generate new path
 
-        // free and invalidate old path data
+                // free and invalidate old path data
         Clear();
 
         dtStatus dtResult;
@@ -706,14 +702,14 @@ NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
 
     switch (data.type_flags)
     {
-        case MAP_LIQUID_TYPE_WATER:
-        case MAP_LIQUID_TYPE_OCEAN:
-            return NAV_WATER;
-        case MAP_LIQUID_TYPE_MAGMA:
-        case MAP_LIQUID_TYPE_SLIME:
+    case MAP_LIQUID_TYPE_WATER:
+    case MAP_LIQUID_TYPE_OCEAN:
+        return NAV_WATER;
+    case MAP_LIQUID_TYPE_MAGMA:
+    case MAP_LIQUID_TYPE_SLIME:
             return NAV_MAGMA;
-        default:
-            return NAV_GROUND;
+    default:
+        return NAV_GROUND;
     }
 }
 
