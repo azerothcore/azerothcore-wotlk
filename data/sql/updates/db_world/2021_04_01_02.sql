@@ -1,3 +1,19 @@
+-- DB update 2021_04_01_01 -> 2021_04_01_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_01_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_01_01 2021_04_01_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1616620260846086881'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1616620260846086881');
 
 -- Alterac Mountains - Chromie #272
@@ -21,3 +37,12 @@ DELETE FROM `gameobject` where `guid` in (63431, 13578, 31976, 13689, 14446, 335
 DELETE FROM `gameobject` where `guid` in (13684, 14463, 14459, 63424, 13589, 13571, 14201, 13702);
 DELETE FROM `pool_gameobject` where `guid`=2350;
 UPDATE `gameobject` SET `position_x`=-1119.61, `position_y`=-2150.05, `position_z`=81.8622 WHERE `guid`=983;
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

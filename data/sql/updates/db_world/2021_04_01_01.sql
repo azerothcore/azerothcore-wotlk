@@ -1,3 +1,19 @@
+-- DB update 2021_04_01_00 -> 2021_04_01_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_01_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_01_00 2021_04_01_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1616536931445376664'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1616536931445376664');
 
 -- Stonetalon Mountains herb issue #273
@@ -14,3 +30,12 @@ UPDATE `gameobject` SET `position_x`=-9160.94, `position_y`=-3029.85, `position_
 DELETE FROM `gameobject` WHERE `guid` in (3433, 3801, 85463);
 
 DELETE FROM `pool_gameobject` where `guid` in (3433, 3801, 85463);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

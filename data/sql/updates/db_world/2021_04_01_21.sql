@@ -1,3 +1,19 @@
+-- DB update 2021_04_01_20 -> 2021_04_01_21
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_01_20';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_01_20 2021_04_01_21 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1617265345631987700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617265345631987700');
 
 DELETE FROM `creature_addon` WHERE (`guid` IN (17090));
@@ -35,3 +51,12 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 3985);
 INSERT INTO `smart_scripts` VALUES
 (3985, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grandpa Vishas - On Respawn - Set Event Phase 1'),
 (3985, 0, 1, 0, 2, 1, 100, 1, 1, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Grandpa Vishas - Between 1-15% Health - Flee For Assist (Phase 1) (No Repeat)');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

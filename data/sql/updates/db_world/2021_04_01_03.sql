@@ -1,3 +1,19 @@
+-- DB update 2021_04_01_02 -> 2021_04_01_03
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_01_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_01_02 2021_04_01_03 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1616686614747472700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1616686614747472700');
 
 UPDATE `creature_template` SET `faction` = 1647, `DamageModifier` = 1.7, `unit_flags2` = 18432, `type_flags` = 4096, `AIName` = 'SmartAI', `HealthModifier` = 3, `ManaModifier` = 6, `ArmorModifier` = 3 WHERE (`entry` = 17982);
@@ -169,3 +185,12 @@ INSERT INTO `smart_scripts` VALUES
 (17678, 0, 12, 0, 61, 0, 100, 0, 1, 1, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 17982, 100, 0, 0, 0, 0, 0, 0, 'Sironas - On Data Set 1 1 - Start Attacking'),
 (17678, 0, 13, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 11, 17982, 45, 0, 0, 0, 0, 0, 0, 'Sironas - On Just Died - Set Data 1 1'),
 (17678, 0, 14, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 41, 7000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sironas - On Just Died - Despawn In 7000 ms');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

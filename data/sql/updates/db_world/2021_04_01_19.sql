@@ -1,3 +1,19 @@
+-- DB update 2021_04_01_18 -> 2021_04_01_19
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_01_18';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_01_18 2021_04_01_19 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1617197895526268300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617197895526268300');
 -- ----------------------------------The Ancient Statuette Fixes-------------------------------------------------
 
@@ -53,3 +69,12 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (326170,11,4206.5,1285.38,1.3025,0,0,0,0,100,0),
 (326170,12,4185.92,1278.95,1.27956,0,0,0,0,100,0),
 (326170,13,4168.32,1281.27,3.36765,0,0,0,0,100,0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

@@ -1,3 +1,19 @@
+-- DB update 2021_04_01_10 -> 2021_04_01_11
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_01_10';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_01_10 2021_04_01_11 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1617105845198069500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617105845198069500');
 
 UPDATE `creature_template` SET `DamageModifier` = 1.7, `unit_flags2` = 2080, `HealthModifier` = 4, `ArmorModifier` = 3, `AIName` = 'SmartAI', `speed_walk` = 1.1, `speed_run` = 1.3 WHERE (`entry` = 17664);
@@ -127,3 +143,12 @@ INSERT INTO `smart_scripts` VALUES
 (17853, 0, 7, 0, 38, 1, 100, 0, 1, 1, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tracker of the Hand - On Data Set 1 1 - Disable Combat Movement (Phase 1)'),
 (17853, 0, 8, 0, 38, 1, 100, 0, 1, 1, 0, 0, 0, 41, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tracker of the Hand - On Data Set 1 1 - Despawn In 5000 ms (Phase 1)'),
 (17853, 0, 9, 0, 38, 1, 100, 0, 1, 1, 0, 0, 0, 15, 9711, 0, 0, 0, 0, 0, 7, 1, 0, 0, 0, 0, 0, 0, 0, 'Tracker of the Hand - On Data Set 1 1 - Quest Credit \'Matis the Cruel\' (Phase 1)');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

@@ -1,3 +1,19 @@
+-- DB update 2021_04_01_11 -> 2021_04_01_12
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_01_11';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_01_11 2021_04_01_12 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1617153703041946200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617153703041946200');
 
 UPDATE `creature_template` SET `speed_walk` = 1, `HealthModifier` = 3, `ManaModifier` = 3, `ArmorModifier` = 3, `AIName` = 'SmartAI' WHERE (`entry` = 2433);
@@ -67,3 +83,12 @@ UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 1 AND `entryorguid` = 1767);
 INSERT INTO `smart_scripts` VALUES
 (1767, 1, 0, 0, 20, 0, 100, 0, 553, 0, 0, 0, 0, 12, 2433, 7, 60000, 0, 0, 0, 8, 0, 0, 0, 0, -740.43, -621.57, 18.6447, 3.2299, 'Helcular\'s Grave - On Quest \'Helcular\'s Revenge\' Finished - Summon Creature \'Helcular\'s Remains\'');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
