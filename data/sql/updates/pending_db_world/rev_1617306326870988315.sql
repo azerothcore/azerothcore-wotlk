@@ -5,3 +5,4 @@ UPDATE `gameobject` SET `position_x`=-9200.57, `position_y`=-2441.51, `position_
 UPDATE `gameobject` SET `position_x`=-8999.95, `position_y`=-3221.55, `position_z`=112.057 WHERE `guid`=4755;
 UPDATE `gameobject` SET `position_x`=-9001.20, `position_y`=-3207.21, `position_z`=111.948 WHERE `guid`=5746;
 UPDATE `gameobject` SET `position_x`=-9041.66, `position_y`=-3307.45, `position_z`=107.945 WHERE `guid`=5199;
+UPDATE `gameobject` SET `position_x`=-8923.28, `position_y`=-2651.38, `position_z`=134.326 WHERE `guid`=5637;
