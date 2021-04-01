@@ -124,7 +124,7 @@ UPDATE `smart_scripts` SET `event_param1`=1600, `event_param2`=7200, `event_para
 UPDATE `smart_scripts` SET `event_type`=4, `event_phase_mask`=0, `event_param2`=0, `comment`='Death Knight Captain - On aggro - Cast Unholy Presence' WHERE `entryorguid`=16145 AND `source_type`=0 AND `id`=2 AND `link`=0;
 -- Fix Raise Dead on Death Knight Captain
 UPDATE `smart_scripts` SET `event_phase_mask`=0, `event_param1`=3500, `event_param2`=10200, `comment`='Death Knight Captain - In combat - Cast Raise Dead' WHERE `entryorguid`=16145 AND `source_type`=0 AND `id`=3 AND `link`=0;
--- Unused NPCs in AC so let's adjust values
+-- Update Deathchill Servant's values as they were unused AC
 UPDATE `creature_template` SET `DamageModifier`=2 WHERE `entry`=16390; -- naxx 10mode
 UPDATE `creature_template` SET `DamageModifier`=4 WHERE `entry`=29901; -- naxx 25mode
 UPDATE `creature_template` SET `mechanic_immune_mask`=8388624 WHERE `entry` IN (16390, 29901); -- both versions
