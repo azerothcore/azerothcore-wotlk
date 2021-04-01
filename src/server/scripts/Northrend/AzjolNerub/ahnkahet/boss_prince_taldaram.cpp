@@ -211,8 +211,15 @@ public:
 
     struct boss_taldaramAI : public BossAI
     {
-        boss_taldaramAI(Creature* pCreature) : BossAI(pCreature, DATA_PRINCE_TALDARAM)
+        boss_taldaramAI(Creature* pCreature) : BossAI(pCreature, DATA_PRINCE_TALDARAM),
+            vanishDamage(0),
+            vanishTarget_GUID(0)
         {
+        }
+
+        void InitializeAI() override
+        {
+            BossAI::InitializeAI();
             if (instance->GetData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetData(DATA_TELDRAM_SPHERE2) == DONE)
             {
                 DoAction(ACTION_REMOVE_PRISON_AT_RESET);
