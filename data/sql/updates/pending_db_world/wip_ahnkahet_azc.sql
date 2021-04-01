@@ -111,7 +111,6 @@ INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value
 (7317, 11, 0, 0, 'achievement_respect_your_elders'),
 (7317, 12, 1, 0, '');
 
-
 -- Trash npcs
 -- Eye of Teldaram
 DELETE FROM `creature_template_addon` WHERE `entry`=31457;
@@ -140,3 +139,8 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (30179,0,5,0,1,0,100,1,1000,1000,0,0,0,11,56713,32,0,0,0,0,19,30413,5,0,0,0,0,0,0,"Twilight Apostle - Out of Combat - Cast 'Image Channel' (No Repeat)"),
 (30319,0,5,0,1,0,100,1,1000,1000,0,0,0,11,56711,32,0,0,0,0,19,30413,5,0,0,0,0,0,0,"Twilight Darkcaster - Out of Combat - Cast 'Image Channel' (No Repeat)"),
 (30319,0,6,0,1,0,100,1,1000,1000,0,0,0,11,56713,32,0,0,0,0,19,30413,5,0,0,0,0,0,0,"Twilight Darkcaster - Out of Combat - Cast 'Image Channel' (No Repeat)");
+
+-- Herald Volazj - Insanity spell script
+DELETE FROM `spell_script_names` WHERE `spell_id`=57496 AND `ScriptName`='spell_herald_volzaj_insanity';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(57496, 'spell_herald_volzaj_insanity');

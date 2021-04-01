@@ -7,6 +7,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 
 enum Spells
 {
@@ -38,10 +39,13 @@ enum Yells
     SAY_PHASE   = 3
 };
 
-enum Misc
+enum Misc : uint32
 {
     NPC_TWISTED_VISAGE                      = 30625,
     ACHIEV_QUICK_DEMISE_START_EVENT         = 20382,
+
+    MAX_INSANITY_TARGETS                    = 5,
+    DATA_INSANITY_INSANITY_CASTED           = 1,
 };
 
 enum Events
@@ -50,6 +54,8 @@ enum Events
     EVENT_HERALD_SHADOW,
     EVENT_HERALD_SHIVER,
 };
+
+const std::array<uint32, MAX_INSANITY_TARGETS> InsanitySpells = { SPELL_INSANITY_PHASING_1, SPELL_INSANITY_PHASING_2, SPELL_INSANITY_PHASING_3, SPELL_INSANITY_PHASING_4, SPELL_INSANITY_PHASING_5 };
 
 class boss_volazj : public CreatureScript
 {
@@ -60,7 +66,7 @@ public:
     {
         boss_volazjAI(Creature* pCreature) : BossAI(pCreature, DATA_HERALD_VOLAZJ),
             insanityTimes(0),
-            insanityHandled(0)
+            insanityTriggered(false)
         {
         }
 
@@ -79,62 +85,12 @@ public:
             events.ScheduleEvent(EVENT_HERALD_SHIVER, 15000);
 
             insanityTimes = 0;
-            insanityHandled = 0;
+            insanityTriggered = false;
 
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
             ResetPlayersPhaseMask();
             instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
-        }
-
-        void SpellHitTarget(Unit* pTarget, const SpellInfo *spell) override
-        {
-            if (spell->Id == SPELL_INSANITY)
-            {
-                // Not good target or too many players
-                if (pTarget->GetTypeId() != TYPEID_PLAYER || insanityHandled > 4)
-                {
-                    return;
-                }
-
-                // First target - start channel visual and set self as unnattackable
-                if (!insanityHandled)
-                {
-                    me->RemoveAllAuras();
-                    DoCastSelf(INSANITY_VISUAL, true);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetControlled(true, UNIT_STATE_STUNNED);
-                }
-
-                // phase mask
-                pTarget->CastSpell(pTarget, SPELL_INSANITY_TARGET + insanityHandled, true);
-                
-                // summon twisted party members for this target
-                Map::PlayerList const &players = me->GetMap()->GetPlayers();
-                for (auto const& i : players)
-                {
-                    Player *plr = i.GetSource();
-                    if (!plr || !plr->IsAlive() || plr->IsGameMaster() || pTarget->GetGUID() == plr->GetGUID())
-                    {
-                        continue;
-                    }
-
-                    // Summon clone
-                    if (Unit* summon = me->SummonCreature(NPC_TWISTED_VISAGE, *plr, TEMPSUMMON_CORPSE_DESPAWN, 0))
-                    {
-                        summon->AddThreat(pTarget, 0.0f);
-                        summon->SetInCombatWith(pTarget);
-                        pTarget->SetInCombatWith(summon);
-
-                        plr->CastSpell(summon, SPELL_CLONE_PLAYER, true);
-                        summon->SetPhaseMask(1 | (1 << (4 + insanityHandled)), true);
-                        summon->SetUInt32Value(UNIT_FIELD_MINDAMAGE, plr->GetUInt32Value(UNIT_FIELD_MINDAMAGE));
-                        summon->SetUInt32Value(UNIT_FIELD_MAXDAMAGE, plr->GetUInt32Value(UNIT_FIELD_MAXDAMAGE));
-                    }
-                }
-
-                ++insanityHandled;
-            }
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -161,6 +117,12 @@ public:
             {
                 Talk(SAY_SLAY);
             }
+        }
+
+        void SetData(uint32 type, uint32 value) override
+        {
+            if (type == DATA_INSANITY_INSANITY_CASTED)
+                insanityTriggered = (value != 0);
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
@@ -192,14 +154,14 @@ public:
                 return;
             }
 
-            if (insanityHandled)
+            if (insanityTriggered)
             {
                 if (!CheckPhaseMinions())
                 {
                     return;
                 }
 
-                insanityHandled = 0;
+                insanityTriggered = false;
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 me->SetControlled(false, UNIT_STATE_STUNNED);
                 me->RemoveAurasDueToSpell(INSANITY_VISUAL);
@@ -245,7 +207,7 @@ public:
 
     private:
         uint8 insanityTimes;
-        uint8 insanityHandled;
+        bool insanityTriggered;
 
         uint32 GetPlrInsanityAuraId(uint32 phaseMask) const
         {
@@ -291,7 +253,7 @@ public:
             }
 
             uint16 phase = 1;
-            for (uint64 const summonGUID : summons)
+            for (uint64 const& summonGUID : summons)
             {
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, summonGUID))
                 {
@@ -319,7 +281,98 @@ public:
     }
 };
 
+// 57496 Insanity
+class spell_herald_volzaj_insanity : public SpellScriptLoader
+{
+public:
+    spell_herald_volzaj_insanity() : SpellScriptLoader("spell_herald_volzaj_insanity") { }
+
+    class spell_herald_volzaj_insanity_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_herald_volzaj_insanity_SpellScript);
+
+        bool Load() override { return GetCaster()->GetTypeId() == TYPEID_UNIT; }
+
+        void HandleDummyEffect(std::list<WorldObject*>& targets)
+        {
+            if (!targets.empty())
+            {
+                targets.remove_if([](WorldObject* targetObj) -> bool
+                {
+                    return !targetObj || targetObj->GetTypeId() != TYPEID_PLAYER;
+                });
+            }
+
+            if (targets.empty())
+            {
+                return;
+            }
+
+            Unit* caster = GetCaster();
+            if (!caster)
+            {
+                return;
+            }
+
+            // Start channel visual and set self as unnattackable
+            caster->RemoveAllAuras();
+            caster->CastSpell(caster, INSANITY_VISUAL, true);
+            caster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            caster->SetControlled(true, UNIT_STATE_STUNNED);
+
+            // Handle phase effect
+            uint32 insanityHandled = 0;
+            std::list<WorldObject*>::const_iterator itr = targets.begin();
+            while (itr != targets.end() && insanityHandled < MAX_INSANITY_TARGETS)
+            {
+                WorldObject* targetObj = *itr;
+                if (!targetObj)
+                {
+                    continue;
+                }
+
+                Player* plrTarget = targetObj->ToPlayer();
+                // This should never happen, spell has attribute SPELL_ATTR3_ONLY_TARGET_PLAYERS
+                if (!plrTarget)
+                {
+                    continue;
+                }
+
+                // phase mask
+                plrTarget->CastSpell(plrTarget, InsanitySpells.at(insanityHandled), true);
+                
+                // Summon clone
+                if (Unit* summon = caster->SummonCreature(NPC_TWISTED_VISAGE, *plrTarget, TEMPSUMMON_CORPSE_DESPAWN, 0))
+                {
+                    summon->AddThreat(plrTarget, 0.0f);
+                    summon->SetInCombatWith(plrTarget);
+                    plrTarget->SetInCombatWith(summon);
+
+                    plrTarget->CastSpell(summon, SPELL_CLONE_PLAYER, true);
+                    summon->SetPhaseMask(1 | (1 << (4 + insanityHandled)), true);
+                    summon->SetUInt32Value(UNIT_FIELD_MINDAMAGE, plrTarget->GetUInt32Value(UNIT_FIELD_MINDAMAGE));
+                    summon->SetUInt32Value(UNIT_FIELD_MAXDAMAGE, plrTarget->GetUInt32Value(UNIT_FIELD_MAXDAMAGE));
+                }
+
+                ++insanityHandled;
+            }
+        }
+
+        void HandleAfterCast()
+        {
+            GetCaster()->ToCreature()->AI()->SetData(DATA_INSANITY_INSANITY_CASTED, 1);
+        }
+
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_herald_volzaj_insanity_SpellScript::HandleDummyEffect, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+            AfterCast += SpellCastFn(spell_herald_volzaj_insanity_SpellScript::HandleAfterCast);
+        }
+    };
+};
+
 void AddSC_boss_volazj()
 {
     new boss_volazj();
+    new spell_herald_volzaj_insanity();
 }
