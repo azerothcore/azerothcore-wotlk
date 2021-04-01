@@ -18,6 +18,8 @@ ACE_Dynamic::ACE_Dynamic (void)
   ACE_TRACE ("ACE_Dynamic::ACE_Dynamic");
 }
 
+ACE_ALLOC_HOOK_DEFINE(ACE_Dynamic)
+
 /* static */ ACE_Dynamic *
 ACE_Dynamic::instance (void)
 {

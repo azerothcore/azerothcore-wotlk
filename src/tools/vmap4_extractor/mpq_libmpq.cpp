@@ -14,8 +14,10 @@ MPQArchive::MPQArchive(const char* filename)
 {
     int result = libmpq__archive_open(&mpq_a, filename, -1);
     printf("Opening %s\n", filename);
-    if(result) {
-        switch(result) {
+    if (result)
+    {
+        switch (result)
+        {
             case LIBMPQ_ERROR_OPEN :
                 printf("Error opening archive '%s': Does file really exist?\n", filename);
                 break;
@@ -48,24 +50,25 @@ void MPQArchive::close()
 
 MPQFile::MPQFile(const char* filename):
     eof(false),
-    buffer(0),
+    buffer(nullptr),
     pointer(0),
     size(0)
 {
-    for(ArchiveSet::iterator i=gOpenArchives.begin(); i!=gOpenArchives.end();++i)
+    for (auto & gOpenArchive : gOpenArchives)
     {
-        mpq_archive *mpq_a = (*i)->mpq_a;
+        mpq_archive* mpq_a = gOpenArchive->mpq_a;
 
         uint32 filenum;
-        if(libmpq__file_number(mpq_a, filename, &filenum)) continue;
+        if (libmpq__file_number(mpq_a, filename, &filenum)) continue;
         libmpq__off_t transferred;
         libmpq__file_unpacked_size(mpq_a, filenum, &size);
 
         // HACK: in patch.mpq some files don't want to open and give 1 for filesize
-        if (size<=1) {
+        if (size <= 1)
+        {
             // printf("info: file %s has size %d; considered dummy file.\n", filename, size);
             eof = true;
-            buffer = 0;
+            buffer = nullptr;
             return;
         }
         buffer = new char[size];
@@ -74,10 +77,9 @@ MPQFile::MPQFile(const char* filename):
         libmpq__file_read(mpq_a, filenum, (unsigned char*)buffer, size, &transferred);
         /*libmpq_file_getdata(&mpq_a, hash, fileno, (unsigned char*)buffer);*/
         return;
-
     }
     eof = true;
-    buffer = 0;
+    buffer = nullptr;
 }
 
 size_t MPQFile::read(void* dest, size_t bytes)
@@ -85,7 +87,8 @@ size_t MPQFile::read(void* dest, size_t bytes)
     if (eof) return 0;
 
     size_t rpos = pointer + bytes;
-    if (rpos > size_t(size)) {
+    if (rpos > size_t(size))
+    {
         bytes = size - pointer;
         eof = true;
     }
@@ -112,6 +115,6 @@ void MPQFile::seekRelative(int offset)
 void MPQFile::close()
 {
     delete[] buffer;
-    buffer = 0;
+    buffer = nullptr;
     eof = true;
 }

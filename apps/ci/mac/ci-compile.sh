@@ -5,11 +5,11 @@ export CCACHE_MAXSIZE='2G'
 export CCACHE_COMPRESS=9
 ccache -s
 
-mkdir var/build/obj && cd var/build/obj;
+cd var/build/obj
 
 time cmake ../../../ \
 -DTOOLS=1 \
--DUNIT_TESTS=1 \
+-DBUILD_TESTING=1 \
 -DSCRIPTS=1 \
 -DCMAKE_BUILD_TYPE=Debug \
 -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include \

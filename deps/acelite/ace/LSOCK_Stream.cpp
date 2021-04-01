@@ -3,6 +3,9 @@
 
 #include "ace/Log_Category.h"
 #include "ace/OS_NS_sys_socket.h"
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 
 
@@ -66,7 +69,7 @@ ACE_LSOCK_Stream::send_msg (const iovec iov[],
 {
   ACE_TRACE ("ACE_LSOCK_Stream::send_msg");
   msghdr send_msg;
-#if defined (ACE_HAS_4_4BSD_SENDMSG_RECVMSG)
+#if !defined (ACE_LACKS_SENDMSG) && defined (ACE_HAS_4_4BSD_SENDMSG_RECVMSG)
   char cmsgbuf[ACE_BSD_CONTROL_MSG_LEN];
   cmsghdr *cmsgptr = (cmsghdr *) cmsgbuf;
 #endif /* ACE_HAS_4_4BSD_SENDMSG_RECVMSG */
@@ -76,7 +79,10 @@ ACE_LSOCK_Stream::send_msg (const iovec iov[],
   send_msg.msg_name = 0;
   send_msg.msg_namelen = 0;
 
-#if defined (ACE_HAS_4_4BSD_SENDMSG_RECVMSG)
+#if defined (ACE_LACKS_SENDMSG)
+  ACE_UNUSED_ARG (handle);
+#else
+# if defined (ACE_HAS_4_4BSD_SENDMSG_RECVMSG)
   cmsgptr->cmsg_level = SOL_SOCKET;
   cmsgptr->cmsg_type = SCM_RIGHTS;
   cmsgptr->cmsg_len = sizeof cmsgbuf;
@@ -84,10 +90,11 @@ ACE_LSOCK_Stream::send_msg (const iovec iov[],
   send_msg.msg_controllen = sizeof cmsgbuf;
   *(ACE_HANDLE *) CMSG_DATA (cmsgptr) = handle;
   send_msg.msg_flags = 0 ;
-#else
+# else
   send_msg.msg_accrights    = (char *) &handle;
   send_msg.msg_accrightslen = sizeof handle;
-#endif /* ACE_HAS_4_4BSD_SENDMSG_RECVMSG */
+# endif /* ACE_HAS_4_4BSD_SENDMSG_RECVMSG */
+#endif /* ACE_LACKS_SENDMSG */
 
   return ACE_OS::sendmsg (this->ACE_SOCK_Stream::get_handle (),
                           &send_msg, 0);
@@ -103,7 +110,7 @@ ACE_LSOCK_Stream::recv_msg (iovec iov[],
 {
   ACE_TRACE ("ACE_LSOCK_Stream::recv_msg");
   msghdr recv_msg;
-#if defined (ACE_HAS_4_4BSD_SENDMSG_RECVMSG)
+#if !defined (ACE_LACKS_SENDMSG) && defined (ACE_HAS_4_4BSD_SENDMSG_RECVMSG)
   char cmsgbuf[ACE_BSD_CONTROL_MSG_LEN];
   cmsghdr *cmsgptr = (cmsghdr *) cmsgbuf;
 #endif /* ACE_HAS_4_4BSD_SENDMSG_RECVMSG */
@@ -113,7 +120,9 @@ ACE_LSOCK_Stream::recv_msg (iovec iov[],
   recv_msg.msg_name = 0;
   recv_msg.msg_namelen = 0;
 
-#if defined (ACE_HAS_4_4BSD_SENDMSG_RECVMSG)
+#if defined (ACE_LACKS_SENDMSG)
+  ACE_UNUSED_ARG (handle);
+#elif defined (ACE_HAS_4_4BSD_SENDMSG_RECVMSG)
   recv_msg.msg_control = cmsgbuf;
   recv_msg.msg_controllen = sizeof cmsgbuf;
   ssize_t result = ACE_OS::recvmsg (this->ACE_SOCK_Stream::get_handle (),
@@ -123,10 +132,12 @@ ACE_LSOCK_Stream::recv_msg (iovec iov[],
 #else
   recv_msg.msg_accrights = (char *) &handle;
   recv_msg.msg_accrightslen = sizeof handle;
+#endif /* ACE_HAS_4_4BSD_SENDMSG_RECVMSG */ /* ACE_LACKS_SENDMSG */
 
+#if defined ACE_LACKS_SENDMSG || !defined ACE_HAS_4_4BSD_SENDMSG_RECVMSG
   return ACE_OS::recvmsg (this->ACE_SOCK_Stream::get_handle (),
                           &recv_msg, 0);
-#endif /* ACE_HAS_4_4BSD_SENDMSG_RECVMSG */
+#endif
 }
 #endif /* ACE_HAS_MSG */
 

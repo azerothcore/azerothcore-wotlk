@@ -67,7 +67,6 @@ template <class T, class ACE_LOCK>
 class ACE_Locked_Free_List : public ACE_Free_List<T>
 {
 public:
-  // = Initialization and termination.
   /**
    * Constructor takes a @a mode (i.e., ACE_FREE_LIST_WITH_POOL or
    * ACE_PURE_FREE_LIST), a count of the number of nodes to
@@ -98,6 +97,8 @@ public:
 
   /// Resizes the free list to @a newsize.
   virtual void resize (size_t newsize);
+
+  ACE_ALLOC_HOOK_DECLARE;
 
 protected:
   /// Allocates @a n extra nodes for the freelist.

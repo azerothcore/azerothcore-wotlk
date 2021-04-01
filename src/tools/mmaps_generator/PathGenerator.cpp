@@ -48,20 +48,20 @@ bool checkDirectories(bool debugOutput)
 }
 
 bool handleArgs(int argc, char** argv,
-               int &mapnum,
-               int &tileX,
-               int &tileY,
-               float &maxAngle,
-               bool &skipLiquid,
-               bool &skipContinents,
-               bool &skipJunkMaps,
-               bool &skipBattlegrounds,
-               bool &debugOutput,
-               bool &silent,
-               bool &bigBaseUnit,
-               char* &offMeshInputPath,
-               char* &file,
-               unsigned int& threads)
+                int& mapnum,
+                int& tileX,
+                int& tileY,
+                float& maxAngle,
+                bool& skipLiquid,
+                bool& skipContinents,
+                bool& skipJunkMaps,
+                bool& skipBattlegrounds,
+                bool& debugOutput,
+                bool& silent,
+                bool& bigBaseUnit,
+                char*& offMeshInputPath,
+                char*& file,
+                unsigned int& threads)
 {
     char* param = nullptr;
     for (int i = 1; i < argc; ++i)
@@ -231,7 +231,7 @@ int main(int argc, char** argv)
 {
     unsigned int threads = std::thread::hardware_concurrency();
     int mapnum = -1;
-    float maxAngle = 70.0f;
+    float maxAngle = 60.0f;
     int tileX = -1, tileY = -1;
     bool skipLiquid = false,
          skipContinents = false,

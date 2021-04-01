@@ -1,26 +1,24 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
-#include "ObjectAccessor.h"
-#include "ObjectMgr.h"
-#include "Map.h"
-#include "MapManager.h"
-#include "Group.h"
-#include "WorldPacket.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
-#include "GroupMgr.h"
-#include "Transport.h"
 #include "GameGraveyard.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "Group.h"
+#include "GroupMgr.h"
+#include "Map.h"
+#include "MapManager.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Transport.h"
+#include "WorldPacket.h"
 
 Battlefield::Battlefield()
 {
@@ -44,7 +42,7 @@ Battlefield::Battlefield()
 
     m_uiKickAfkPlayersTimer = 1000;
 
-    m_LastResurectTimer = 30 * IN_MILLISECONDS;
+    m_LastResurectTimer = RESURRECTION_INTERVAL;
     m_StartGroupingTimer = 0;
     m_StartGrouping = false;
     StalkerGuid = 0;
@@ -67,7 +65,7 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
     // Xinef: do not invite players on taxi
     if (!player->IsInFlight())
     {
-        // If battle is started, 
+        // If battle is started,
         // If not full of players > invite player to join the war
         // If full of players > announce to player that BF is full and kick him after a few second if he desn't leave
         if (IsWarTime())
@@ -77,7 +75,7 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
             else // No more vacant places
             {
                 // TODO: Send a packet to announce it to player
-                m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(nullptr) + (player->IsGameMaster() ? 30*MINUTE : 10);
+                m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = time(nullptr) + (player->IsGameMaster() ? 30 * MINUTE : 10);
                 InvitePlayerToQueue(player);
             }
         }
@@ -188,7 +186,6 @@ bool Battlefield::Update(uint32 diff)
             if (itr->second->Update(diff))
                 objective_changed = true;
     }
-
 
     if (m_LastResurectTimer <= diff)
     {
@@ -424,11 +421,14 @@ void Battlefield::PlayerAcceptInviteToWar(Player* player)
 
 void Battlefield::TeamCastSpell(TeamId team, int32 spellId)
 {
-    if (spellId > 0) {
+    if (spellId > 0)
+    {
         for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
                 player->CastSpell(player, uint32(spellId), true);
-    } else {
+    }
+    else
+    {
         for (GuidSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
                 player->RemoveAuraFromStack(uint32(-spellId));
@@ -463,7 +463,7 @@ void Battlefield::SendWarningToAllInZone(uint32 entry)
 {
     if (Unit* unit = ObjectAccessor::FindUnit(StalkerGuid))
         if (Creature* stalker = unit->ToCreature())
-            sCreatureTextMgr->SendChat(stalker, (uint8)entry, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+            sCreatureTextMgr->SendChat(stalker, (uint8)entry, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
 }
 
 void Battlefield::SendWarningToPlayer(Player* player, uint32 entry)
@@ -591,7 +591,7 @@ BfGraveyard* Battlefield::GetGraveyardById(uint32 id) const
     return nullptr;
 }
 
-GraveyardStruct const * Battlefield::GetClosestGraveyard(Player* player)
+GraveyardStruct const* Battlefield::GetClosestGraveyard(Player* player)
 {
     BfGraveyard* closestGY = nullptr;
     float maxdist = -1;
@@ -647,7 +647,7 @@ void Battlefield::RemovePlayerFromResurrectQueue(uint64 playerGuid)
     }
 }
 
-void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, const uint64 &guid)
+void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, const uint64& guid)
 {
     WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
     uint32 time = m_LastResurectTimer;  // resurrect every 30 seconds
@@ -875,9 +875,9 @@ GuidSet::iterator BfCapturePoint::HandlePlayerLeave(Player* player)
 {
     if (GameObject* go = GetCapturePointGo(player))
         player->SendUpdateWorldState(go->GetGOInfo()->capturePoint.worldState1, 0);
-    
+
     GuidSet::iterator current = m_activePlayers[player->GetTeamId()].find(player->GetGUID());
-    
+
     if (current == m_activePlayers[player->GetTeamId()].end())
         return current; // return end()
 

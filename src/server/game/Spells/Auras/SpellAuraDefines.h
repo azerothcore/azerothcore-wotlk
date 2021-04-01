@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -233,7 +233,7 @@ enum AuraType
     SPELL_AURA_MOD_RESISTANCE_OF_STAT_PERCENT = 182,
     SPELL_AURA_MOD_CRITICAL_THREAT = 183,
     SPELL_AURA_MOD_ATTACKER_MELEE_HIT_CHANCE = 184,
-    SPELL_AURA_MOD_ATTACKER_RANGED_HIT_CHANCE= 185,
+    SPELL_AURA_MOD_ATTACKER_RANGED_HIT_CHANCE = 185,
     SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE = 186,
     SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_CHANCE = 187,
     SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_CHANCE = 188,

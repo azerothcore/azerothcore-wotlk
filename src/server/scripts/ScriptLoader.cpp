@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -222,7 +222,7 @@ void AddSC_tirisfal_glades();
 void AddSC_undercity();
 void AddSC_western_plaguelands();
 void AddSC_westfall();
-void AddSC_wetlands();
+//void AddSC_wetlands();
 
 //kalimdor
 void AddSC_instance_blackfathom_deeps();     //Blackfathom Depths
@@ -812,7 +812,7 @@ void AddEasternKingdomsScripts()
     AddSC_undercity();
     AddSC_western_plaguelands();
     AddSC_westfall();
-    AddSC_wetlands();
+    //AddSC_wetlands();
 #endif
 }
 
@@ -1187,15 +1187,13 @@ void AddOutdoorPvPScripts()
 #endif
 }
 
-
 //~ **********************  Put your custom scripts below, like the commented examples, uncomment and edit *************************************
-
 
 //~ void AddSC_MySuperScript();
 
 void AddCustomScripts()
 {
 #ifdef SCRIPTS
-	//~ AddSC_MySuperScript();
+    //~ AddSC_MySuperScript();
 #endif
 }

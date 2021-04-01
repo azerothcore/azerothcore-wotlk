@@ -8,7 +8,7 @@ CWARNINGS=ON
 CDEBUG=OFF
 CTYPE=Release
 CSCRIPTS=ON
-CUNIT_TESTS=ON
+CBUILD_TESTING=ON
 CSERVERS=ON
 CTOOLS=ON
 CSCRIPTPCH=OFF
@@ -31,6 +31,12 @@ case $COMPILER in
     time sudo apt-get install -y gcc g++
     echo "CCOMPILERC=\"gcc\"" >> ./conf/config.sh
     echo "CCOMPILERCXX=\"g++\"" >> ./conf/config.sh
+    ;;
+
+  "gcc8" )
+    time sudo apt-get install -y gcc-8 g++-8
+    echo "CCOMPILERC=\"gcc-8\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"g++-8\"" >> ./conf/config.sh
     ;;
 
   "gcc10" )
@@ -62,6 +68,12 @@ case $COMPILER in
     time sudo apt-get install -y clang-10
     echo "CCOMPILERC=\"clang-10\"" >> ./conf/config.sh
     echo "CCOMPILERCXX=\"clang++-10\"" >> ./conf/config.sh
+    ;;
+
+  "clang11" )
+    time sudo apt-get install -y clang-11
+    echo "CCOMPILERC=\"clang-11\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"clang++-11\"" >> ./conf/config.sh
     ;;
 
   * )

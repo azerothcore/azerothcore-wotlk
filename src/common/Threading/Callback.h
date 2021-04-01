@@ -89,7 +89,7 @@ public:
     //! Resets all underlying variables (param, result and stage)
     void Reset()
     {
-        SetParam(NULL);
+        SetParam(nullptr);
         FreeResult();
         ResetStage();
     }
@@ -180,7 +180,7 @@ public:
     void Reset()
     {
         SetFirstParam(0);
-        SetSecondParam(NULL);
+        SetSecondParam(nullptr);
         FreeResult();
         ResetStage();
     }
@@ -281,9 +281,9 @@ public:
     //! Resets all underlying variables (param, result and stage)
     void Reset()
     {
-        SetFirstParam(NULL);
-        SetSecondParam(NULL);
-        SetThirdParam(NULL);
+        SetFirstParam(nullptr);
+        SetSecondParam(nullptr);
+        SetThirdParam(nullptr);
         FreeResult();
         ResetStage();
     }

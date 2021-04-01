@@ -9,8 +9,8 @@
 
 #include "mpq_libmpq04.h"
 #include "wmo.h"
+#include <cstdlib>
 #include <string>
-#include "stdlib.h"
 
 class ADTFile;
 
@@ -21,7 +21,7 @@ private:
     string filename;
 public:
     WDTFile(char* file_name, char* file_name1);
-    ~WDTFile(void);
+    ~WDTFile();
     bool init(char* map_id, unsigned int mapID);
 
     string* gWmoInstansName;

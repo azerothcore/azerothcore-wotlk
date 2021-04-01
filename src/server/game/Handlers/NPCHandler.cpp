@@ -1,31 +1,31 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "Battleground.h"
+#include "BattlegroundMgr.h"
 #include "Common.h"
-#include "Language.h"
+#include "Creature.h"
+#include "CreatureAI.h"
 #include "DatabaseEnv.h"
+#include "GameGraveyard.h"
+#include "GossipDef.h"
+#include "Language.h"
+#include "Log.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
+#include "Pet.h"
+#include "Player.h"
+#include "ReputationMgr.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "UpdateMask.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Opcodes.h"
-#include "Log.h"
-#include "ObjectMgr.h"
-#include "SpellMgr.h"
-#include "Player.h"
-#include "GossipDef.h"
-#include "UpdateMask.h"
-#include "ObjectAccessor.h"
-#include "Creature.h"
-#include "Pet.h"
-#include "ReputationMgr.h"
-#include "BattlegroundMgr.h"
-#include "Battleground.h"
-#include "ScriptMgr.h"
-#include "CreatureAI.h"
-#include "SpellInfo.h"
-#include "GameGraveyard.h"
 
 enum StableResultCode
 {
@@ -37,7 +37,7 @@ enum StableResultCode
     STABLE_ERR_EXOTIC       = 0x0C,                         // "you are unable to control exotic creatures"
 };
 
-void WorldSession::HandleTabardVendorActivateOpcode(WorldPacket & recvData)
+void WorldSession::HandleTabardVendorActivateOpcode(WorldPacket& recvData)
 {
     uint64 guid;
     recvData >> guid;
@@ -65,7 +65,7 @@ void WorldSession::SendTabardVendorActivate(uint64 guid)
     SendPacket(&data);
 }
 
-void WorldSession::HandleBankerActivateOpcode(WorldPacket & recvData)
+void WorldSession::HandleBankerActivateOpcode(WorldPacket& recvData)
 {
     uint64 guid;
 
@@ -106,7 +106,7 @@ void WorldSession::SendShowMailBox(uint64 guid)
     SendPacket(&data);
 }
 
-void WorldSession::HandleTrainerListOpcode(WorldPacket & recvData)
+void WorldSession::HandleTrainerListOpcode(WorldPacket& recvData)
 {
     uint64 guid;
 
@@ -158,7 +158,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
         return;
     }
 
-    WorldPacket data(SMSG_TRAINER_LIST, 8+4+4+trainer_spells->spellList.size()*38 + strTitle.size()+1);
+    WorldPacket data(SMSG_TRAINER_LIST, 8 + 4 + 4 + trainer_spells->spellList.size() * 38 + strTitle.size() + 1);
     data << guid;
     data << uint32(trainer_spells->trainerType);
 
@@ -199,7 +199,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
         data << uint32(floor(tSpell->spellCost * fDiscountMod));
 
         data << uint32(primary_prof_first_rank && can_learn_primary_prof ? 1 : 0);
-                                                            // primary prof. learn confirmation dialog
+        // primary prof. learn confirmation dialog
         data << uint32(primary_prof_first_rank ? 1 : 0);    // must be equal prev. field to have learn button in enabled state
         data << uint8(tSpell->reqLevel);
         data << uint32(tSpell->reqSkill);
@@ -241,7 +241,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
     SendPacket(&data);
 }
 
-void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recvData)
+void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
 {
     uint64 guid;
     uint32 spellId = 0;
@@ -302,7 +302,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recvData)
     SendPacket(&data);
 }
 
-void WorldSession::HandleGossipHelloOpcode(WorldPacket & recvData)
+void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_GOSSIP_HELLO");
@@ -341,7 +341,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket & recvData)
     //if (unit->IsArmorer() || unit->IsCivilian() || unit->IsQuestGiver() || unit->IsServiceProvider() || unit->IsGuard())
     {
         //if (!unit->GetTransport()) // pussywizard: reverted with new spline (old: without this check, npc would stay in place and the transport would continue moving, so the npc falls off. NPCs on transports don't have waypoints, so stopmoving is not needed)
-            unit->StopMoving();
+        unit->StopMoving();
     }
 
     // If spiritguide, no need for gossip menu, just put player into resurrect queue
@@ -358,7 +358,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket & recvData)
 
     if (!sScriptMgr->OnGossipHello(_player, unit))
     {
-//        _player->TalkedToCreature(unit->GetEntry(), unit->GetGUID());
+        //        _player->TalkedToCreature(unit->GetEntry(), unit->GetGUID());
         _player->PrepareGossipMenu(unit, unit->GetCreatureTemplate()->GossipMenuId, true);
         _player->SendPreparedGossip(unit);
     }
@@ -414,7 +414,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket & recvData)
     }
 }*/
 
-void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket & recvData)
+void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_SPIRIT_HEALER_ACTIVATE");
@@ -471,7 +471,7 @@ void WorldSession::SendSpiritResurrect()
     //    _player->UpdateObjectVisibility(); // xinef: not needed, called in ResurrectPlayer
 }
 
-void WorldSession::HandleBinderActivateOpcode(WorldPacket & recvData)
+void WorldSession::HandleBinderActivateOpcode(WorldPacket& recvData)
 {
     uint64 npcGUID;
     recvData >> npcGUID;
@@ -506,7 +506,7 @@ void WorldSession::SendBindPoint(Creature* npc)
     // send spell for homebinding (3286)
     npc->CastSpell(_player, bindspell, true);
 
-    WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, (8+4));
+    WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, (8 + 4));
     data << uint64(npc->GetGUID());
     data << uint32(bindspell);
     SendPacket(&data);
@@ -514,7 +514,7 @@ void WorldSession::SendBindPoint(Creature* npc)
     _player->PlayerTalkClass->SendCloseGossip();
 }
 
-void WorldSession::HandleListStabledPetsOpcode(WorldPacket & recvData)
+void WorldSession::HandleListStabledPetsOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recv MSG_LIST_STABLED_PETS");
@@ -586,7 +586,7 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT);
         stmt->setUInt32(0, _player->GetGUIDLow());
         stmt->setUInt8(1, uint8(_player->GetTemporaryUnsummonedPetNumber() ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
-        
+
         if (PreparedQueryResult _result = CharacterDatabase.AsyncQuery(stmt))
         {
             Field* fields = _result->Fetch();
@@ -594,7 +594,7 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
             data << uint32(fields[0].GetUInt32());        // id
             data << uint32(fields[1].GetUInt32());        // entry
             data << uint32(fields[4].GetUInt16());        // level
-            data << fields[8].GetString();                // petname 
+            data << fields[8].GetString();                // petname
             data << uint8(1);
             ++num;
         }
@@ -613,13 +613,11 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
             data << uint8(2);                               // 1 = current, 2/3 = in stable (any from 4, 5, ... create problems with proper show)
 
             ++num;
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 
     data.put<uint8>(wpos, num);                             // set real data to placeholder
     SendPacket(&data);
-
 }
 
 void WorldSession::SendStableResult(uint8 res)
@@ -629,7 +627,7 @@ void WorldSession::SendStableResult(uint8 res)
     SendPacket(&data);
 }
 
-void WorldSession::HandleStablePet(WorldPacket & recvData)
+void WorldSession::HandleStablePet(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recv CMSG_STABLE_PET");
@@ -704,8 +702,7 @@ void WorldSession::HandleStablePetCallback(PreparedQueryResult result)
 
             // this slot not free, skip
             ++freeSlot;
-        }
-        while (result->NextRow());
+        } while (result->NextRow());
     }
 
     WorldPacket data(SMSG_STABLE_RESULT, 1);
@@ -728,7 +725,7 @@ void WorldSession::HandleStablePetCallback(PreparedQueryResult result)
         trans->Append(stmt);
 
         CharacterDatabase.CommitTransaction(trans);
-        
+
         _player->SetTemporaryUnsummonedPetNumber(0);
         SendStableResult(STABLE_SUCCESS_STABLE);
         return;
@@ -737,7 +734,7 @@ void WorldSession::HandleStablePetCallback(PreparedQueryResult result)
         SendStableResult(STABLE_ERR_STABLE);
 }
 
-void WorldSession::HandleUnstablePet(WorldPacket & recvData)
+void WorldSession::HandleUnstablePet(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recv CMSG_UNSTABLE_PET.");
@@ -840,7 +837,7 @@ void WorldSession::HandleUnstablePetCallback(PreparedQueryResult result, uint32 
     }
 }
 
-void WorldSession::HandleBuyStableSlot(WorldPacket & recvData)
+void WorldSession::HandleBuyStableSlot(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recv CMSG_BUY_STABLE_SLOT.");
@@ -861,7 +858,7 @@ void WorldSession::HandleBuyStableSlot(WorldPacket & recvData)
 
     if (GetPlayer()->m_stableSlots < MAX_PET_STABLES)
     {
-        StableSlotPricesEntry const* SlotPrice = sStableSlotPricesStore.LookupEntry(GetPlayer()->m_stableSlots+1);
+        StableSlotPricesEntry const* SlotPrice = sStableSlotPricesStore.LookupEntry(GetPlayer()->m_stableSlots + 1);
         if (_player->HasEnoughMoney(SlotPrice->Price))
         {
             ++GetPlayer()->m_stableSlots;
@@ -875,14 +872,14 @@ void WorldSession::HandleBuyStableSlot(WorldPacket & recvData)
         SendStableResult(STABLE_ERR_STABLE);
 }
 
-void WorldSession::HandleStableRevivePet(WorldPacket &/* recvData */)
+void WorldSession::HandleStableRevivePet(WorldPacket& /* recvData */)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "HandleStableRevivePet: Not implemented");
 #endif
 }
 
-void WorldSession::HandleStableSwapPet(WorldPacket & recvData)
+void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recv CMSG_STABLE_SWAP_PET.");
@@ -967,7 +964,7 @@ void WorldSession::HandleStableSwapPetCallback(PreparedQueryResult result, uint3
     }
 
     Pet* pet = _player->GetPet();
-    
+
     // move alive pet to slot or delete dead pet
     if (pet)
         _player->RemovePet(pet, pet->IsAlive() ? PetSaveMode(slot) : PET_SAVE_AS_DELETED);
@@ -995,7 +992,7 @@ void WorldSession::HandleStableSwapPetCallback(PreparedQueryResult result, uint3
         SendStableResult(STABLE_SUCCESS_UNSTABLE);
 }
 
-void WorldSession::HandleRepairItemOpcode(WorldPacket & recvData)
+void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_REPAIR_ITEM");
@@ -1040,4 +1037,3 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket & recvData)
         _player->DurabilityRepairAll(true, discountMod, guildBank);
     }
 }
-
