@@ -25,15 +25,34 @@ enum Spells
     SPELL_INSANITY_PHASING_2                = 57509,
     SPELL_INSANITY_PHASING_3                = 57510,
     SPELL_INSANITY_PHASING_4                = 57511,
-    SPELL_INSANITY_PHASING_5                = 57512
+    SPELL_INSANITY_PHASING_5                = 57512,
+
+    SPELL_WHISPER_AGGRO                     = 60291,
+    SPELL_WHISPER_INSANITY                  = 60292,
+    SPELL_WHISPER_SLAY_1                    = 60293,
+    SPELL_WHISPER_SLAY_2                    = 60294,
+    SPELL_WHISPER_SLAY_3                    = 60295,
+    SPELL_WHISPER_DEATH_1                   = 60296,
+    SPELL_WHISPER_DEATH_2                   = 60297
 };
 
-enum Yells
+enum Texts
 {
     SAY_AGGRO                               = 0,
-    SAY_SLAY                                = 1,
-    SAY_DEATH                               = 2,
-    SAY_PHASE                               = 3
+    SAY_INSANITY                            = 1,
+    SAY_SLAY_1                              = 2,
+    SAY_SLAY_2                              = 3,
+    SAY_SLAY_3                              = 4,
+    SAY_DEATH_1                             = 5,
+    SAY_DEATH_2                             = 6,
+
+    WHISPER_AGGRO                           = 7,
+    WHISPER_INSANITY                        = 8,
+    WHISPER_SLAY_1                          = 9,
+    WHISPER_SLAY_2                          = 10,
+    WHISPER_SLAY_3                          = 11,
+    WHISPER_DEATH_1                         = 12,
+    WHISPER_DEATH_2                         = 13
 };
 
 enum Misc
@@ -94,6 +113,7 @@ public:
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
+            DoCastSelf(SPELL_WHISPER_AGGRO);
             instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
             me->SetInCombatWithZone();
         }
@@ -101,18 +121,52 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
-            Talk(SAY_DEATH);
-
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
             ResetPlayersPhaseMask();
+
+            switch (urand(0, 1))
+            {
+                case 0:
+                {
+                    Talk(SAY_DEATH_1);
+                    DoCastSelf(SPELL_WHISPER_DEATH_1, true);
+                    break;
+                }
+                case 1:
+                {
+                    Talk(SAY_DEATH_2);
+                    DoCastSelf(SPELL_WHISPER_DEATH_2, true);
+                    break;
+                }
+            }
         }
 
         void KilledUnit(Unit* victim) override
         {
             if (victim->GetTypeId() == TYPEID_PLAYER)
             {
-                Talk(SAY_SLAY);
+                switch (urand(0, 2))
+                {
+                    case 0:
+                    {
+                        Talk(SAY_SLAY_1);
+                        DoCastSelf(SPELL_WHISPER_SLAY_1);
+                        break;
+                    }
+                    case 1:
+                    {
+                        Talk(SAY_SLAY_2);
+                        DoCastSelf(SPELL_WHISPER_SLAY_2);
+                        break;
+                    }
+                    case 2:
+                    {
+                        Talk(SAY_SLAY_3);
+                        DoCastSelf(SPELL_WHISPER_SLAY_3);
+                        break;
+                    }
+                }
             }
         }
 
@@ -320,6 +374,8 @@ public:
             }
 
             // Start channel visual and set self as unnattackable
+            caster->ToCreature()->AI()->Talk(SAY_INSANITY);
+            caster->CastSpell(caster, SPELL_WHISPER_INSANITY, true);
             caster->RemoveAllAuras();
             caster->CastSpell(caster, INSANITY_VISUAL, true);
             caster->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -379,6 +435,74 @@ public:
     SpellScript* GetSpellScript() const override
     {
         return new spell_herald_volzaj_insanity_SpellScript();
+    }
+};
+
+// 60291 Volazj Whisper: Aggro
+// 60292 Volazj Whisper: Insanity
+// 60293 Volazj Whisper: Slay 01
+// 60294 Volazj Whisper: Slay 02
+// 60295 Volazj Whisper: Slay 03
+// 60296 Volazj Whisper: Death 01
+// 60297 Volazj Whisper: Death 02
+class spell_volazj_whisper : public SpellScriptLoader
+{
+public:
+    spell_volazj_whisper() : SpellScriptLoader("spell_volazj_whisper") { }
+
+    class spell_volazj_whisper_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_volazj_whisper_SpellScript);
+
+        bool Validate(SpellInfo const* /*spell*/) override
+        {
+            return ValidateSpellInfo(
+            {
+                SPELL_WHISPER_AGGRO,
+                SPELL_WHISPER_INSANITY,
+                SPELL_WHISPER_SLAY_1,
+                SPELL_WHISPER_SLAY_2,
+                SPELL_WHISPER_SLAY_3,
+                SPELL_WHISPER_DEATH_1,
+                SPELL_WHISPER_DEATH_2
+            });
+        }
+
+        bool Load() override { return GetCaster()->GetTypeId() == TYPEID_UNIT; }
+
+        void HandleScriptEffect(SpellEffIndex /* effIndex */)
+        {
+            Unit* target = GetHitPlayer();
+            Creature* caster = GetCaster()->ToCreature();
+            if (!target || !caster)
+            {
+                return;
+            }
+
+            uint32 text = 0;
+            switch (GetSpellInfo()->Id)
+            {
+                case SPELL_WHISPER_AGGRO:    text = WHISPER_AGGRO;    break;
+                case SPELL_WHISPER_INSANITY: text = WHISPER_INSANITY; break;
+                case SPELL_WHISPER_SLAY_1:   text = WHISPER_SLAY_1;   break;
+                case SPELL_WHISPER_SLAY_2:   text = WHISPER_SLAY_2;   break;
+                case SPELL_WHISPER_SLAY_3:   text = WHISPER_SLAY_3;   break;
+                case SPELL_WHISPER_DEATH_1:  text = WHISPER_DEATH_1;  break;
+                case SPELL_WHISPER_DEATH_2:  text = WHISPER_DEATH_2;  break;
+                default: return;
+            }
+            caster->AI()->Talk(text, target);
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_volazj_whisper_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_volazj_whisper_SpellScript();
     }
 };
 
