@@ -269,10 +269,8 @@ UPDATE `creature_template` SET `DamageModifier`='1' WHERE  `entry`=11442;
 -- some deadmines bosses
 -- ogre
 UPDATE `creature_template` SET `DamageModifier`='2.5' WHERE  `entry`=644;
--- greenskin
-UPDATE `creature_template` SET `DamageModifier`='2.45' WHERE  `entry`=647;
--- cookie
-UPDATE `creature_template` SET `DamageModifier`='2.45' WHERE  `entry`=645;
+-- greenskin and cookie
+UPDATE `creature_template` SET `DamageModifier`='2.45' WHERE  `entry` IN (647, 645);
 
 -- Ragefire chasm
 -- Oggleflint 1.7 -> 2.2 
