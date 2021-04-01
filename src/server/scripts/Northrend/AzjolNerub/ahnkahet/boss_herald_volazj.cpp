@@ -329,9 +329,9 @@ public:
             caster->SetControlled(true, UNIT_STATE_STUNNED);
 
             // Handle phase effect
-            uint32 insanityHandled = 0;
+            uint32 insanityCounter = 0;
             std::list<WorldObject*>::const_iterator itr = targets.begin();
-            while (itr != targets.end() && insanityHandled < MAX_INSANITY_TARGETS)
+            while (itr != targets.end() && insanityCounter < MAX_INSANITY_TARGETS)
             {
                 WorldObject* targetObj = *itr;
                 if (!targetObj)
@@ -347,7 +347,7 @@ public:
                 }
 
                 // phase mask
-                plrTarget->CastSpell(plrTarget, InsanitySpells.at(insanityHandled), true);
+                plrTarget->CastSpell(plrTarget, InsanitySpells.at(insanityCounter), true);
                 
                 // Summon clone
                 if (Unit* summon = caster->SummonCreature(NPC_TWISTED_VISAGE, *plrTarget, TEMPSUMMON_CORPSE_DESPAWN, 0))
@@ -357,12 +357,12 @@ public:
                     plrTarget->SetInCombatWith(summon);
 
                     plrTarget->CastSpell(summon, SPELL_CLONE_PLAYER, true);
-                    summon->SetPhaseMask(1 | (1 << (4 + insanityHandled)), true);
+                    summon->SetPhaseMask(1 | (1 << (4 + insanityCounter)), true);
                     summon->SetUInt32Value(UNIT_FIELD_MINDAMAGE, plrTarget->GetUInt32Value(UNIT_FIELD_MINDAMAGE));
                     summon->SetUInt32Value(UNIT_FIELD_MAXDAMAGE, plrTarget->GetUInt32Value(UNIT_FIELD_MAXDAMAGE));
                 }
 
-                ++insanityHandled;
+                ++insanityCounter;
                 ++itr;
             }
         }
