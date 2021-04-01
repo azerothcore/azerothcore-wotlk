@@ -2,7 +2,8 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617197895526268300');
 -- ----------------------------------The Ancient Statuette Fixes-------------------------------------------------
 
 -- Talen
-DELETE FROM `smart_scripts` WHERE `entryorguid` IN (3846,384600);
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 3846 AND `source_type` = 0;
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 384600 AND `source_type` = 9;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES 
 (3846,0,0,0,2,0,100,1,0,15,0,0,0,25,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,'Talen - Between 0-15% Health - Flee For Assist'),
 (3846,0,1,0,20,0,100,0,1007,0,0,0,0,80,384600,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Talen - On Quest \'The Ancient Statuette\' Finished - Run Script'),
