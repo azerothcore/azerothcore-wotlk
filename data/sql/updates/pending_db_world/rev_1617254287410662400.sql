@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617254287410662400');
 
-SET @SPELL_ATTR0_CU_NEGATIVE_EFF0                 := 0x00001000;
-SET @SPELL_ATTR0_CU_NEGATIVE_EFF1                 := 0x00002000;
+SET @SPELL_ATTR0_CU_NEGATIVE_EFF0 := 4096,
+	@SPELL_ATTR0_CU_NEGATIVE_EFF1 := 8192;
 
 DELETE FROM `spell_custom_attr` WHERE `spell_id`=57874;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
