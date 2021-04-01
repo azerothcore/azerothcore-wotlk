@@ -255,7 +255,7 @@ public:
                 return true;
             }
 
-            uint16 phase = 1;
+            uint32 phase = 1;
             for (uint64 const& summonGUID : summons)
             {
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, summonGUID))

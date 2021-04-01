@@ -98,6 +98,7 @@ public:
         boss_amanitarAI(Creature *creature) : BossAI(creature, DATA_AMANITAR), mushroomsSummoned(false)
         {
             creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_NATURE, true);
+            creature->SetMeleeDamageSchool(SPELL_SCHOOL_NATURE);
         }
 
         void Reset() override
@@ -105,9 +106,6 @@ public:
             _Reset();
             _mushroomsDeque.clear();
             mushroomsSummoned = false;
-
-            me->SetMeleeDamageSchool(SPELL_SCHOOL_NATURE);
-
             events.ScheduleEvent(EVENT_ROOTS, urand(5000, 9000));
             events.ScheduleEvent(EVENT_BASH, urand(10000, 14000));
             events.ScheduleEvent(EVENT_BOLT, urand(15000, 20000));
@@ -142,73 +140,73 @@ public:
         {
             switch (eventId)
             {
-            case EVENT_RESPAWN:
-            {
-                while (!_mushroomsDeque.empty())
+                case EVENT_RESPAWN:
                 {
-                    SummonMushroom(_mushroomsDeque.front());
-                    _mushroomsDeque.pop_front();
-                }
-
-                events.RepeatEvent(urand(40000, 60000));
-                break;
-            }
-            case EVENT_ROOTS:
-            {
-                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                {
-                    DoCast(pTarget, SPELL_ENTANGLING_ROOTS, false);
-                }
-
-                events.RepeatEvent(urand(10000, 15000));
-                break;
-            }
-            case EVENT_BASH:
-            {
-                DoCastVictim(SPELL_BASH, false);
-                events.RepeatEvent(urand(15000, 20000));
-                break;
-            }
-            case EVENT_BOLT:
-            {
-                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                {
-                    DoCast(pTarget, SPELL_VENOM_BOLT_VOLLEY, false);
-                }
-
-                events.RepeatEvent(urand(15000, 20000));
-                break;
-            }
-            case EVENT_REMOVE_MUSHROOM_POWER:
-            {
-                DoCastAOE(SPELL_REMOVE_MUSHROOM_POWER, true);
-                events.RescheduleEvent(EVENT_MINI, 1000);
-                break;
-            }
-            case EVENT_MINI:
-            {
-                if (!mushroomsSummoned)
-                {
-                    mushroomsSummoned = true;
-                    for (uint8 i = 0; i < MAX_MUSHROOMS_COUNT; ++i)
+                    while (!_mushroomsDeque.empty())
                     {
-                        SummonMushroom(MushroomPositions[i]);
+                        SummonMushroom(_mushroomsDeque.front());
+                        _mushroomsDeque.pop_front();
                     }
-                }
 
-                if (SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_MINI))
-                {
-                    DoCastSelf(SPELL_REMOVE_MUSHROOM_POWER, true);
-                    DoCastAOE(SPELL_MINI);
-                    events.RescheduleEvent(EVENT_REMOVE_MUSHROOM_POWER, 29000);
+                    events.RepeatEvent(urand(40000, 60000));
+                    break;
                 }
-                else
+                case EVENT_ROOTS:
                 {
-                    events.RepeatEvent(1000);
-                }
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    {
+                        DoCast(pTarget, SPELL_ENTANGLING_ROOTS, false);
+                    }
 
-                break;
-            }
+                    events.RepeatEvent(urand(10000, 15000));
+                    break;
+                }
+                case EVENT_BASH:
+                {
+                    DoCastVictim(SPELL_BASH, false);
+                    events.RepeatEvent(urand(15000, 20000));
+                    break;
+                }
+                case EVENT_BOLT:
+                {
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    {
+                        DoCast(pTarget, SPELL_VENOM_BOLT_VOLLEY, false);
+                    }
+
+                    events.RepeatEvent(urand(15000, 20000));
+                    break;
+                }
+                case EVENT_REMOVE_MUSHROOM_POWER:
+                {
+                    DoCastAOE(SPELL_REMOVE_MUSHROOM_POWER, true);
+                    events.RescheduleEvent(EVENT_MINI, 1000);
+                    break;
+                }
+                case EVENT_MINI:
+                {
+                    if (!mushroomsSummoned)
+                    {
+                        mushroomsSummoned = true;
+                        for (uint8 i = 0; i < MAX_MUSHROOMS_COUNT; ++i)
+                        {
+                            SummonMushroom(MushroomPositions[i]);
+                        }
+                    }
+
+                    if (SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_MINI))
+                    {
+                        DoCastSelf(SPELL_REMOVE_MUSHROOM_POWER, true);
+                        DoCastAOE(SPELL_MINI);
+                        events.RescheduleEvent(EVENT_REMOVE_MUSHROOM_POWER, 29000);
+                    }
+                    else
+                    {
+                        events.RepeatEvent(1000);
+                    }
+
+                    break;
+                }
             }
         }
 
@@ -287,33 +285,33 @@ public:
             {
                 switch (eventId)
                 {
-                case EVENT_GROW:
-                {
-                    DoCastSelf(SPELL_GROW);
-                    break;
-                }
-                case EVENT_CHECK_PLAYER:
-                {
-                    if (Player* plr = me->SelectNearestPlayer(2.0f))
+                    case EVENT_GROW:
                     {
-                        plr->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
-                        DoCastSelf(SPELL_POISONOUS_MUSHROOM_VISUAL_AREA);
-                        DoCastSelf(SPELL_POISONOUS_MUSHROOM_POISON_CLOUD);
-                        DoCastSelf(SPELL_SHRINK);
-                        events.ScheduleEvent(EVENT_KILLSELF, 4000);
+                        DoCastSelf(SPELL_GROW);
+                        break;
                     }
-                    else
+                    case EVENT_CHECK_PLAYER:
                     {
-                        events.RepeatEvent(250);
-                    }
+                        if (Player* plr = me->SelectNearestPlayer(2.0f))
+                        {
+                            plr->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
+                            DoCastSelf(SPELL_POISONOUS_MUSHROOM_VISUAL_AREA);
+                            DoCastSelf(SPELL_POISONOUS_MUSHROOM_POISON_CLOUD);
+                            DoCastSelf(SPELL_SHRINK);
+                            events.ScheduleEvent(EVENT_KILLSELF, 4000);
+                        }
+                        else
+                        {
+                            events.RepeatEvent(250);
+                        }
 
-                    break;
-                }
-                case EVENT_KILLSELF:
-                {
-                    me->DisappearAndDie();
-                    break;
-                }
+                        break;
+                    }
+                    case EVENT_KILLSELF:
+                    {
+                        me->DisappearAndDie();
+                        break;
+                    }
                 }
             }
         }
@@ -340,11 +338,10 @@ public:
 
         void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            Unit* target = GetTarget();
-            if (!target)
-                return;
-
-            target->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
+            if (Unit* target = GetTarget())
+            {
+                target->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
+            }
         }
 
         void Register() override
