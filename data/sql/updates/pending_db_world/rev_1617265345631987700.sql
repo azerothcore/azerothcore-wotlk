@@ -12,7 +12,7 @@ INSERT INTO `waypoints` VALUES
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 398400) AND (`source_type` = 9)
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (3984, 3985));
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (entry IN (3984, 3985));
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 3984);
 INSERT INTO `smart_scripts` VALUES
