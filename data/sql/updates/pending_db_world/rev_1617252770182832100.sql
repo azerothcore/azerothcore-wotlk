@@ -1,6 +1,4 @@
--- Change this back to INSERT once rewrite is complete
-REPLACE INTO `version_db_world` (`sql_rev`) VALUES
-('1599510903096685100');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617252770182832100');
 
 -- Amanitar encounter
 DELETE FROM `spell_script_names` WHERE `spell_id`=57283 AND `ScriptName`='spell_amanitar_remove_mushroom_power';
@@ -70,7 +68,7 @@ UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|
     536870912 -- MECHANIC_SAPPED
 WHERE `entry` IN (30385, 31474);
 
-DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_random_lightning_visual_effect';
+DELETE FROM `spell_script_names` WHERE `spell_id`=56328 AND `ScriptName`='spell_random_lightning_visual_effect';
 INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
 (56328,'spell_random_lightning_visual_effect');
 
