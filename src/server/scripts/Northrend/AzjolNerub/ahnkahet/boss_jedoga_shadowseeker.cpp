@@ -405,7 +405,7 @@ public:
                     DoCastSelf(SPELL_LIGHTNING_BOLTS, true);
                     if (!oocTriggers.empty())
                     {
-                        for (uint64 const guid : oocTriggers)
+                        for (uint64 const& guid : oocTriggers)
                         {
                             if (Creature* trigger = ObjectAccessor::GetCreature(*me, guid))
                             {
