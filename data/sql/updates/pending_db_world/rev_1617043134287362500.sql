@@ -100,7 +100,7 @@ UPDATE `smart_scripts` SET `event_type`=0, `event_param1`=1000, `event_param2`=7
 DELETE FROM `smart_scripts` WHERE `entryorguid`=16146 AND `source_type`=0 AND `id`=4;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (16146, 0, 4, 0, 14, 0, 50, 0, 80, 20, 16600, 17300, 0, 11, 55210, 0, 0, 0, 0, 0, 26, 20, 0, 0, 0, 0, 0, 0, 0, 'Death Knight - On Friendly HP Deficit - Cast Death Coil (heal)');
--- Recreate the whole SAI for Necro Knight (they will pick one magic school at aggro)
+-- Recreate the whole SAI for Necro Knight (they will pick one magic school on aggro)
 DELETE FROM `smart_Scripts` WHERE entryorguid=16165;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (16165, 0, 0, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 30, 1, 2, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Necro Knight - On Agro - Pick random Event Phase (1-2-3)'),
@@ -110,4 +110,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (16165, 0, 4, 0, 0, 2, 100, 0, 1800, 8900, 9600, 15700, 0, 11, 30091, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Necro Knight - In combat - Cast Flamestrike'),
 (16165, 0, 5, 0, 0, 4, 100, 0, 3000, 6000, 25000, 35000, 0, 11, 30094, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Necro Knight - In combat - Cast Frost Nova'),
 (16165, 0, 6, 0, 0, 4, 100, 0, 17000, 21000, 17000, 23000, 0, 11, 30095, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Necro Knight - In combat - Cast Cone of Cold');
+-- Fix timer for Shadow Bolt Volley on Shade of Naxxramas
+UPDATE `smart_scripts` SET `event_param1`=2800, `event_param2`=5100, `event_param3`=4500, `event_param4`=12000, `comment`='Shade of Naxxramas - In combat - Cast Shadow Bolt Volley' WHERE `entryorguid`=16164 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
+-- Create SAI for Portal of Shadows on Shade of Naxxramas
+DELETE FROM `smart_scripts` WHERE `entryorguid`=16164 AND `source_type`=0 AND `id`=2 AND `link`=0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
+(16164, 0, 2, 0, 0, 0, 100, 4, 4100, 8700, 60000, 60000, 0, 11, 28383, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shade of Naxxramas - In combat - Cast Portal of Shadows');
 
