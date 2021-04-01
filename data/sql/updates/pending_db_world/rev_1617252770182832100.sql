@@ -177,3 +177,6 @@ INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language
 /* 60295 */ (29311,11,0,"They drink your fear: it is the blood of life.",15,0,100,0,0,0,32607,0,"Herald Volazj WHISPER_SLAY_3"),
 /* 60296 */ (29311,12,0,"Where one falls, many shall take its place.",15,0,100,0,0,0,32608,0,"Herald Volazj WHISPER_DEATH_1"),
 /* 60297 */ (29311,13,0,"They do not die; they do not live. They are outside the cycle.",15,0,100,0,0,0,32609,0,"Herald Volazj WHISPER_DEATH_2");
+
+-- Increase Jedoga prieching text range to map wide
+UPDATE creature_text SET `TextRange`=3 WHERE `CreatureID`=29310 AND `GroupID`=5;
