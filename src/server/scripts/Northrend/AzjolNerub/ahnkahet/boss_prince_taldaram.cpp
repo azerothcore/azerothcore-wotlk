@@ -434,7 +434,6 @@ public:
                             events.CancelEvent(EVENT_PRINCE_FLAME_SPHERES);
                             events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
                             events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499);
-
                         }
                     }break;
                     case EVENT_PRINCE_VANISH_RUN:
