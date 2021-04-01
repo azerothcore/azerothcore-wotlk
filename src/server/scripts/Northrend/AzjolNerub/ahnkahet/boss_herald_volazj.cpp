@@ -510,4 +510,5 @@ void AddSC_boss_volazj()
 {
     new boss_volazj();
     new spell_herald_volzaj_insanity();
+    new spell_volazj_whisper();
 }
