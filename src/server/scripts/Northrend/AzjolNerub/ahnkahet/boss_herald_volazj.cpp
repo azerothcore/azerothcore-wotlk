@@ -345,7 +345,7 @@ public:
 
                 // phase mask
                 plrTarget->CastSpell(plrTarget, InsanitySpells.at(insanityCounter), true);
-                
+
                 // Summon clone
                 if (Unit* summon = caster->SummonCreature(NPC_TWISTED_VISAGE, *plrTarget, TEMPSUMMON_CORPSE_DESPAWN, 0))
                 {

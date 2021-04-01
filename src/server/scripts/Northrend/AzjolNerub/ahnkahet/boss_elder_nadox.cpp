@@ -67,7 +67,7 @@ public:
             previousSwarmEgg_GUID(0),
             guardianSummoned(false),
             respectYourElders(true)
-        {      
+        {
         }
 
         void Reset() override

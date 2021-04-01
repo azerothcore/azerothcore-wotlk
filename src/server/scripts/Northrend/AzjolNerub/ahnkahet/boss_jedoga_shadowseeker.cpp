@@ -332,7 +332,7 @@ public:
             _JustDied();
             Talk(TEXT_DEATH);
         }
-        
+
         void MovementInform(uint32 type, uint32 pointId) override
         {
             if (!(type == POINT_MOTION_TYPE || type == EFFECT_MOTION_TYPE))
@@ -576,7 +576,7 @@ public:
 
                 Talk(SAY_CHOSEN);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                
+
                 events.ScheduleEvent(EVENT_RITUAL_BEGIN_MOVE, 1500);
             }
         }
@@ -603,7 +603,7 @@ public:
             {
                 return;
             }
-            
+
             if (id == POINT_INITIAL)
             {
                 me->SetFacingTo(me->GetAngle(&JedogaPosition[0]));
@@ -648,7 +648,7 @@ public:
             if (UpdateVictim())
             {
                 DoMeleeAttackIfReady();
-            }           
+            }
         }
 
     private:

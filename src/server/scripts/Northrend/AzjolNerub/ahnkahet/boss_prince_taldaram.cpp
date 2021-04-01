@@ -339,7 +339,7 @@ public:
                     {
                         summonAI->SetVictimPos(victimSperePos);
                     }
-                        
+
                     break;
                 }
                 case NPC_JEDOGA_CONTROLLER:
@@ -350,7 +350,7 @@ public:
             }
             summons.Summon(summon);
         }
-    
+
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
