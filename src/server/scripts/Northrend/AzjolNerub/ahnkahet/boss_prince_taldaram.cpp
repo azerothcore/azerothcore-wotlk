@@ -47,7 +47,7 @@ enum Misc
 enum Actions
 {
     ACTION_REMOVE_PRISON_AT_RESET           = 1,
-    ACTION_SPHERE                           = 2,
+    ACTION_SPHERE,
 };
 
 enum Event
@@ -73,7 +73,7 @@ enum Yells
 enum Points
 {
     POINT_LAND                              = 1,
-    POINT_ORB                               = 2,
+    POINT_ORB,
 };
 
 constexpr float DATA_GROUND_POSITION_Z     = 11.308135f;
@@ -493,14 +493,18 @@ class go_prince_taldaram_sphere : public GameObjectScript
 public:
     go_prince_taldaram_sphere() : GameObjectScript("go_prince_taldaram_sphere") { }
 
-    bool OnGossipHello(Player * pPlayer, GameObject *go) override
+    bool OnGossipHello(Player* pPlayer, GameObject *go) override
     {
         if (pPlayer && pPlayer->IsInCombat())
+        {
             return true;
+        }
 
         InstanceScript *pInstance = go->GetInstanceScript();
         if (!pInstance)
+        {
             return true;
+        }
 
         go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
         go->SetGoState(GO_STATE_ACTIVE);
@@ -533,16 +537,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_FLAME_SPHERE_SUMMON_1))
-                return false;
-
-            if (!sSpellMgr->GetSpellInfo(SPELL_FLAME_SPHERE_SUMMON_2))
-                return false;
-
-            if (!sSpellMgr->GetSpellInfo(SPELL_FLAME_SPHERE_SUMMON_3))
-                return false;
-
-            return true;
+            return ValidateSpellInfo({SPELL_FLAME_SPHERE_SUMMON_1, SPELL_FLAME_SPHERE_SUMMON_2, SPELL_FLAME_SPHERE_SUMMON_3});
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)
