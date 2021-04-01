@@ -685,10 +685,10 @@ public:
     void Update(const uint32, const uint32, bool thread = true) override;
     void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
     bool Reset(uint8 method, std::list<uint32>* globalSkipList = nullptr);
-    uint32 GetScriptId() const { return i_script_id; }
-    std::string const& GetScriptName() const;
-    InstanceScript* GetInstanceScript() { return instance_data; }
-    InstanceScript const* GetInstanceScript() const { return instance_data; }
+    [[nodiscard]] uint32 GetScriptId() const { return i_script_id; }
+    [[nodiscard]] std::string const& GetScriptName() const;
+    [[nodiscard]] InstanceScript* GetInstanceScript() { return instance_data; }
+    [[nodiscard]] InstanceScript const* GetInstanceScript() const { return instance_data; }
     void PermBindAllPlayers();
     void UnloadAll() override;
     bool CanEnter(Player* player, bool loginCheck = false) override;
