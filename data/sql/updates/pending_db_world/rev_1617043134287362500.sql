@@ -118,4 +118,14 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (16164, 0, 2, 0, 0, 0, 100, 4, 4100, 8700, 60000, 60000, 0, 11, 28383, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shade of Naxxramas - In combat - Cast Portal of Shadows');
 -- Fix timer for Whirlwind on Dark Touched Warrior
 UPDATE `smart_scripts` SET `event_param1`=3300, `event_param2`=8900, `event_param3`=18900, `comment`='Dark Touched Warrior - In combat - Cast Whirlwind' WHERE `entryorguid`=16156 AND `source_type`=0 AND `id`=0 AND `link`=0;
+-- Fix timer for Plague Strike on Death Knight Captain
+UPDATE `smart_scripts` SET `event_param1`=1600, `event_param2`=7200, `event_param3`=8100, `event_param4`=14100, `comment`='Death Knight Captain - In combat - Cast Plague Strike' WHERE `entryorguid`=16145 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
+-- Fix Unholy Presence on Death Knight Captain
+UPDATE `smart_scripts` SET `event_type`=4, `event_phase_mask`=0, `event_param2`=0, `comment`='Death Knight Captain - On aggro - Cast Unholy Presence' WHERE `entryorguid`=16145 AND `source_type`=0 AND `id`=2 AND `link`=0;
+-- Fix Raise Dead on Death Knight Captain
+UPDATE `smart_scripts` SET `event_phase_mask`=0, `event_param1`=3500, `event_param2`=10200, `comment`='Death Knight Captain - In combat - Cast Raise Dead' WHERE `entryorguid`=16145 AND `source_type`=0 AND `id`=3 AND `link`=0;
+-- Unused NPCs in AC so let's adjust values
+UPDATE `creature_template` SET `DamageModifier`=2 WHERE `entry`=16390; -- naxx 10mode
+UPDATE `creature_template` SET `DamageModifier`=4 WHERE `entry`=29901; -- naxx 25mode
+UPDATE `creature_template` SET `mechanic_immune_mask`=8388624 WHERE `entry` IN (16390, 29901); -- both versions
 
