@@ -243,9 +243,12 @@ void PetAI::UpdateAI(uint32 diff)
 
             if (spellInfo->IsPositive())
             {
-                // Check if we're in combat or commanded to attack
-                if ((me->IsInCombat() || me->GetCharmInfo()->IsCommandAttack()) && !spellInfo->CanBeUsedInCombat())
-                    continue;
+                if (spellInfo->CanBeUsedInCombat())
+                {
+                    // Check if we're in combat or commanded to attack (exlude auras with infinity duration)
+                    if (!me->IsInCombat() && !me->GetCharmInfo()->IsCommandAttack() && spellInfo->GetMaxDuration() != -1)
+                        continue;
+                }
 
                 Spell* spell = new Spell(me, spellInfo, TRIGGERED_NONE, 0);
                 spell->LoadScripts(); // xinef: load for CanAutoCast (calling CheckPetCast)
