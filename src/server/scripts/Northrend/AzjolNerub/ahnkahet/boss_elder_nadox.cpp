@@ -216,7 +216,6 @@ public:
         }
 
     private:
-        
         std::list<uint64> swarmEggs;
         std::list<uint64> guardianEggs;
         uint64 previousSwarmEgg_GUID;   // This will prevent casting summoning spells on same egg twice

@@ -411,7 +411,6 @@ public:
                         {
                             Talk(SAY_VANISH);
                             DoCastSelf(SPELL_VANISH, false);
-
                             if (Unit* pEmbraceTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                                 vanishTarget_GUID = pEmbraceTarget->GetGUID();
 
