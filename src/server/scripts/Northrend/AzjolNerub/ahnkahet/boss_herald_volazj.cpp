@@ -13,11 +13,8 @@ enum Spells
 {
     // BASIC FIGHT
     SPELL_MIND_FLAY                         = 57941,
-    SPELL_MIND_FLAY_H                       = 59974,
     SPELL_SHADOW_BOLT_VOLLEY                = 57942,
-    SPELL_SHADOW_BOLT_VOLLEY_H              = 59975,
     SPELL_SHIVER                            = 57949,
-    SPELL_SHIVER_H                          = 59978,
 
     // INSANITY
     SPELL_INSANITY                          = 57496, //Dummy
@@ -33,19 +30,19 @@ enum Spells
 
 enum Yells
 {
-    SAY_AGGRO   = 0,
-    SAY_SLAY    = 1,
-    SAY_DEATH   = 2,
-    SAY_PHASE   = 3
+    SAY_AGGRO                               = 0,
+    SAY_SLAY                                = 1,
+    SAY_DEATH                               = 2,
+    SAY_PHASE                               = 3
 };
 
-enum Misc : uint32
+enum Misc
 {
     NPC_TWISTED_VISAGE                      = 30625,
     ACHIEV_QUICK_DEMISE_START_EVENT         = 20382,
 
     MAX_INSANITY_TARGETS                    = 5,
-    DATA_SET_INSANITY_PHASE           = 1,
+    DATA_SET_INSANITY_PHASE                 = 1,
 };
 
 enum Events
@@ -183,19 +180,19 @@ public:
                 {
                     case EVENT_HERALD_MIND_FLAY:
                     {
-                        DoCastVictim(DUNGEON_MODE(SPELL_MIND_FLAY, SPELL_MIND_FLAY_H), false);
+                        DoCastVictim(SPELL_MIND_FLAY, false);
                         events.RepeatEvent(20000);
                     }break;
                     case EVENT_HERALD_SHADOW:
                     {
-                        DoCastVictim(DUNGEON_MODE(SPELL_SHADOW_BOLT_VOLLEY, SPELL_SHADOW_BOLT_VOLLEY_H), false);
+                        DoCastVictim(SPELL_SHADOW_BOLT_VOLLEY, false);
                         events.RepeatEvent(5000);
                     }break;
                     case EVENT_HERALD_SHIVER:
                     {
                         if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                         {
-                            DoCast(pTarget, DUNGEON_MODE(SPELL_SHIVER, SPELL_SHIVER_H), false);
+                            DoCast(pTarget, SPELL_SHIVER, false);
                         }
 
                         events.RepeatEvent(15000);
