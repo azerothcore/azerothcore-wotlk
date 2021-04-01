@@ -2754,7 +2754,7 @@ Battleground.QueueAnnouncer.Enable = 0
 
 #
 #    Battleground.QueueAnnouncer.Limited.Enable
-#        Description: Show announce only if left player in queue = 1
+#        Description: Show announce only if left players in queue = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
