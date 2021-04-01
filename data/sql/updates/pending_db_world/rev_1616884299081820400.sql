@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1616884299081820400');
 
 -- Updated gossip_menu for Doctor Gregory Victor <Trauma Surgeon> 
-UPDATE `creature_template` SET `gossip_menu_id`='5381' WHERE  `entry`=12920;
+UPDATE `creature_template` SET `gossip_menu_id`=5381 WHERE  `entry`=12920;
 
 -- Condition for gossip before and after quest completion
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 14) AND (`SourceGroup` = 5381);
