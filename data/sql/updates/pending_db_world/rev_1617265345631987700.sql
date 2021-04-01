@@ -12,7 +12,7 @@ INSERT INTO `waypoints` VALUES
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 398400) AND (`source_type` = 9)
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 3984;
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (3984, 3985));
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 3984);
 INSERT INTO `smart_scripts` VALUES
@@ -30,8 +30,6 @@ INSERT INTO `smart_scripts` VALUES
 (3984, 0, 11, 0, 40, 0, 100, 0, 5, 0, 0, 0, 0, 70, 900, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nancy Vishas - On Waypoint 5 Reached - Respawn Self'),
 (3984, 0, 12, 0, 40, 0, 100, 0, 5, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 1.08982, 'Nancy Vishas - On Waypoint 5 Reached - Set Orientation 1.08982'),
 (3984, 0, 13, 0, 2, 1, 100, 1, 1, 15, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 19, 0, 30, 0, 0, 0, 0, 0, 0, 'Nancy Vishas - Between 1-15% Health - Flee For Assist (Phase 1) (No Repeat)');
-
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 3985;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 3985);
 INSERT INTO `smart_scripts` VALUES
