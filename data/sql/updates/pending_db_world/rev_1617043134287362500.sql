@@ -128,4 +128,16 @@ UPDATE `smart_scripts` SET `event_phase_mask`=0, `event_param1`=3500, `event_par
 UPDATE `creature_template` SET `DamageModifier`=2 WHERE `entry`=16390; -- naxx 10mode
 UPDATE `creature_template` SET `DamageModifier`=4 WHERE `entry`=29901; -- naxx 25mode
 UPDATE `creature_template` SET `mechanic_immune_mask`=8388624 WHERE `entry` IN (16390, 29901); -- both versions
+-- Fix timer for Crush Armor on Skeletal Smith
+UPDATE `smart_scripts` SET `event_param1`=1700, `event_param2`=7900, `event_param3`=10500, `event_param4`=12900, `comment`='Skeletal Smith - In combat - Cast Crush Armor' WHERE `entryorguid`=16193 AND `source_type`=0 AND `id`=0 AND `link`=0;
+-- Fix timer for Disarm on Skeletal Smith
+UPDATE `smart_scripts` SET `event_param1`=6200, `event_param2`=6700, `comment`='Skeletal Smith - In combat - Cast Disarm' WHERE `entryorguid`=16193 AND `source_type`=0 AND `id`=1 AND `link`=0;
+-- Fix timer for Brutal Swipe on Bony Construct
+UPDATE `smart_scripts` SET `event_param2`=20000, `comment`='Bony Construct - In combat - Cast Brutal Swipe' WHERE `entryorguid`=16167 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
+-- Fix timer and target selection for Strangulate on Death Knight Cavalier
+UPDATE `smart_scripts` SET `event_param3`=4600, `event_param4`=7300, `target_type`=6, `comment`='Death Knight Cavalier - In combat - Cast Strangulate' WHERE `entryorguid`=16163 AND `source_type`=0 AND `id` IN (4, 5) AND `link`=0;
+-- Fix timer and target selection for Icy Touch on Death Knight Cavalier
+UPDATE `smart_scripts` SET `event_param1`=1100, `event_param2`=2200, `event_param3`=4100, `event_param4`=6200, `target_type`=5, `comment`='Death Knight Cavalier - In combat - Cast Icy Touch' WHERE `entryorguid`=16163 AND `source_type`=0 AND `id` IN (2, 3) AND `link`=0;
+-- Fix timer for Bone Armor on Death Knight Cavalier
+UPDATE `smart_scripts` SET `event_param1`=4700, `event_param2`=6100, `event_param3`=15700, `event_param4`=19800, `comment`='Death Knight Cavalier - In combat - Cast Bone Armor' WHERE `entryorguid`=16163 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
 
