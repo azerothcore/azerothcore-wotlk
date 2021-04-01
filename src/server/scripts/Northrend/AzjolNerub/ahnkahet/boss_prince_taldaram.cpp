@@ -288,6 +288,7 @@ public:
                 {
                     ScheduleCombatEvents();
                     me->CastStop();
+                    vanishTarget_GUID = 0;
                 }
             }
         }
@@ -412,7 +413,9 @@ public:
                             Talk(SAY_VANISH);
                             DoCastSelf(SPELL_VANISH, false);
                             if (Unit* pEmbraceTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                            {
                                 vanishTarget_GUID = pEmbraceTarget->GetGUID();
+                            }
 
                             events.CancelEvent(EVENT_PRINCE_FLAME_SPHERES);
                             events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
