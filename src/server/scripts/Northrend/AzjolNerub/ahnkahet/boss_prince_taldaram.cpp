@@ -212,8 +212,8 @@ public:
     struct boss_taldaramAI : public BossAI
     {
         boss_taldaramAI(Creature* pCreature) : BossAI(pCreature, DATA_PRINCE_TALDARAM),
-            vanishDamage(0),
-            vanishTarget_GUID(0)
+            vanishTarget_GUID(0),
+            vanishDamage(0)
         {
         }
 
@@ -293,7 +293,7 @@ public:
                 if (me->FindCurrentSpellBySpellId(SPELL_EMBRACE_OF_THE_VAMPYR))
                 {
                     vanishDamage += damage;
-                    if (vanishDamage > DUNGEON_MODE<uint32>(MAX_EMBRACE_DMG, MAX_EMBRACE_DMG_H))
+                    if (vanishDamage >= DUNGEON_MODE<uint32>(MAX_EMBRACE_DMG, MAX_EMBRACE_DMG_H))
                     {
                         ScheduleCombatEvents();
                         me->CastStop();
