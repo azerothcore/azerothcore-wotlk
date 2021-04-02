@@ -60,7 +60,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (16243, 0, 6, 0, 23, 0, 100, 0, 28988, 1, 0, 0, 0, 75, 7940, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Plague Slime - On has aura - Add aura Immunity: Frost'),
 (16243, 0, 7, 0, 23, 0, 100, 0, 28989, 1, 0, 0, 0, 75, 7941, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Plague Slime - On has aura - Add aura Immunity: Nature'),
 (16243, 0, 8, 0, 23, 0, 100, 0, 28990, 1, 0, 0, 0, 75, 7942, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Plague Slime - On has aura - Add aura Immunity: Fire');
--- Fix Disease/Poison immunity on Plague Slime
+-- Add Disease/Poison immunity on Plague Slime
 UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|2097152 WHERE `entry`=16243;
 -- Fix timer for Acid Volley on Stoneskin Gargoyle
 UPDATE `smart_scripts` SET `event_param1`=3000, `event_param2`=5000, `event_param3`=5000, `event_param4`=7000, `comment`='Stoneskin Gargoyle - In Combat - Cast Acid Volley' WHERE  `entryorguid`=16168 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
@@ -132,7 +132,7 @@ UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=16390; -- Add AI
 DELETE FROM `smart_scripts` WHERE `entryorguid`=16390 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0; /* Create SAI */
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (16390, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathchill Servant - On spawn - Set in combat with zone'),
-(16390, 0, 1, 0, 1, 0, 100, 0, 250, 500, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathchill Servant - On OOC - Despawn if OOC');
+(16390, 0, 1, 0, 1, 0, 100, 0, 200, 200, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathchill Servant - On OOC - Despawn if OOC');
 -- Fix timer for Crush Armor on Skeletal Smith
 UPDATE `smart_scripts` SET `event_param1`=1700, `event_param2`=7900, `event_param3`=10500, `event_param4`=12900, `comment`='Skeletal Smith - In combat - Cast Crush Armor' WHERE `entryorguid`=16193 AND `source_type`=0 AND `id`=0 AND `link`=0;
 -- Fix timer for Disarm on Skeletal Smith
@@ -151,10 +151,37 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (16163, 0, 6, 0, 2, 0, 100, 0, 0, 30, 0, 0, 0, 11, 55294, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Cavalier - At 30% HP - Cast Dismount Deathcharger');
 -- Adjust Charge for Deathcharger Steed
 UPDATE `smart_scripts` SET `event_flags`=0, `comment`='Deathcharger Steed - In combat - Cast Charge' WHERE `entryorguid`=29818 AND `source_type`=0 AND `id`=0 AND `link`=0;
--- Create SAI mechanic for appropiate mount/dismount of Deathcharger Steed
+-- Create SAI mechanic for appropiate mount/dismount of Deathcharger Steed (summon)
 DELETE FROM `smart_scripts` WHERE `entryorguid`=29818 AND `source_type`=0 AND `id` IN (1, 2, 3) AND `link`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (29818, 0, 1, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathcharger Steed - On spawn - Unmount summoner'),
-(29818, 0, 2, 0, 1, 0, 100, 0, 250, 500, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathcharger Steed - On OOC - Despawn if OOC'),
+(29818, 0, 2, 0, 1, 0, 100, 0, 200, 200, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathcharger Steed - On OOC - Despawn if OOC'),
 (29818, 0, 3, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathcharger Steed - On spawn - Set in combat with zone');
+-- Fix timer for Pierce Armor on Risen Squire
+UPDATE `smart_scripts` SET `event_param1`=4000, `event_param2`=7000, `event_param4`=48000, `comment`='Risen Squire - In combat - Cast Pierce Armor' WHERE `entryorguid`=16154 AND `source_type`=0 AND `id`=0 AND `link`=0;
+-- Fix timer and target selection for Charge on Deathcharger Steed (non-summon)
+UPDATE `smart_scripts` SET `event_param1`=3300, `event_param2`=7500, `event_param3`=10000, `event_param4`=10900, `target_type`=2, `comment`='Deathcharger Steed - On aggro - Cast Charge' WHERE `entryorguid`=16067 AND `source_type`=0 AND `id`=0 AND `link`=0;
+-- Fix timer for Mortal Strike on Unholy Axe
+UPDATE `smart_scripts` SET `event_param1`=6100, `event_param2`=13100, `event_param3`=20100, `event_param4`=20100, `comment`='Unholy Axe - In combat - Cast Mortal Strike' WHERE `entryorguid`=16194 AND `source_type`=0 AND `id`=1 AND `link`=0;
+-- Fix timer for Whirlwind on Unholy Axe
+UPDATE `smart_scripts` SET `event_param1`=2200, `event_param2`=8600, `event_param3`=8800, `event_param4`=13300, `comment`='Unholy Axe - In combat - Cast Whirlwind' WHERE `entryorguid`=16194 AND `source_type`=0 AND `id`=0 AND `link`=0;
+-- Fix timer for Arcane Explosion on Unholy Staff
+UPDATE `smart_scripts` SET `event_param1`=2400, `event_param2`=8400, `event_param3`=8400, `event_param4`=16100, `comment`='Unholy Staff - In combat - Cast Arcane Explosion' WHERE `entryorguid`=16215 AND `source_type`=0 AND `id`=0 AND `link`=0; -- (10mode)
+UPDATE `smart_scripts` SET `event_param1`=9000, `event_param2`=16000, `event_param3`=20000, `event_param4`=30000, `comment`='Unholy Staff - In combat - Cast Arcane Explosion' WHERE `entryorguid`=16215 AND `source_type`=0 AND `id`=1 AND `link`=0; -- (25mode)
+-- Fix timer for Frost Nova on Unholy Staff
+UPDATE `smart_scripts` SET `event_param1`=6100, `event_param2`=10800, `comment`='Unholy Staff - In combat - Cast Frost Nova' WHERE `entryorguid`=16215 AND `source_type`=0 AND `id`=2 AND `link`=0;
+-- Fix timer for Polymorph on Unholy Staff
+UPDATE `smart_scripts` SET `event_param1`=4800, `event_param2`=6200, `event_param3`=14800, `event_param4`=14900, `target_type`=6, `comment`='Unholy Staff - In combat - Cast Polymorph' WHERE `entryorguid`=16215 AND `source_type`=0 AND `id`=3 AND `link`=0;
+-- Fix timer for Cleave on Unholy Swords
+UPDATE `smart_scripts` SET `event_param2`=4700, `event_param3`=9200, `event_param4`=15500, `comment`='Unholy Swords - In combat - Cast Cleave' WHERE `entryorguid`=16216 AND `source_type`=0 AND `id`=0 AND `link`=0;
+-- Recreate SAI for Thrash on Unholy Swords
+UPDATE `smart_scripts` SET `event_type`=0, `event_param1`=2400, `event_param2`=7800, `event_param3`=12000, `event_param4`=13600, `action_param1`=12787, `comment`='Unholy Swords - In combat - Cast Thrash' WHERE `entryorguid`=16216 AND `source_type`=0 AND `id`=1 AND `link`=0;
+-- Add Disarm immunity for Unholly (Axe/Staff/Swords)
+UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|4 WHERE `entry` IN (16194, 16215, 16216);
+-- Re-do Invisibility on Vigilant Shade
+UPDATE `smart_scripts` SET `event_type`=1, `event_param1`=1000, `event_param2`=1000, `event_param3`=5000, `event_param4`=5000, `comment`='Vigilant Shade - In OOC - Cast Invisibility' WHERE `entryorguid`=30085 AND `source_type`=0 AND `id`=0 AND `link`=0;
+-- Adjust SAI in order to remove Invisibility on Vigilant Shade when there is a player around
+UPDATE `smart_scripts` SET `event_type`=101, `event_param1`=1, `event_param2`=20, `event_param3`=1000, `event_param4`=1000, `comment`='Vigilant Shade - On Player near - Remove Invisibility' WHERE `entryorguid`=30085 AND `source_type`=0 AND `id`=1 AND `link`=0;
+-- Fix timer for Shadow Bolt Volley on Shadow Shade
+UPDATE `smart_scripts` SET `event_param1`=2300, `event_param2`=2300, `event_param3`=9600, `event_param4`=9900, `target_type`=2, `comment`='Vigilant Shade - In combat - Cast Shadow Bolt Volley' WHERE `entryorguid`=30085 AND `source_type`=0 AND `id` IN (2, 3) AND `link`=0;
 
