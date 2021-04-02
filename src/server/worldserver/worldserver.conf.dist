@@ -2761,6 +2761,14 @@ Battleground.QueueAnnouncer.Enable = 0
 Battleground.QueueAnnouncer.Limited.Enable = 0
 
 #
+#    Battleground.QueueAnnouncer.SpamProtection.Delay
+#        Description: Show announce if player rejoined in queue after sec
+#        Default:     30
+#
+
+Battleground.QueueAnnouncer.SpamProtection.Delay = 30
+
+#
 #    Battleground.QueueAnnouncer.PlayerOnly
 #        Description: Battleground queue announcement type.
 #        Default:     0 - (System message, Anyone can see it)

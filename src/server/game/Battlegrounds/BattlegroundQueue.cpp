@@ -991,8 +991,8 @@ void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDi
         if (searchGUID == BGSpamProtection.end())
             BGSpamProtection[leader->GetGUID()] = 0; // Leader GUID not found, initialize with 0
 
-        // Skip if spam time < 30 secs
-        if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] < 30)
+        // Skip if spam time < 30 secs (default)
+        if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] < sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY))
             return;
 
         // If left players > 1 - skip announce
