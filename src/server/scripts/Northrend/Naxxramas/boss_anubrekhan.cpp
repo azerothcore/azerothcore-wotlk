@@ -183,7 +183,7 @@ public:
         {
             if (!me->IsInCombat() && sayGreet)
             {
-                for( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
+                for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 {
                     if (pInstance)
                     {

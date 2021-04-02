@@ -214,4 +214,8 @@ UPDATE `smart_scripts` SET `event_param1`=1600, `event_param2`=2800, `event_para
 UPDATE `smart_scripts` SET `event_param1`=5100, `event_param2`=10400, `event_param3`=18800, `event_param4`=21300 WHERE `entryorguid`=16025 AND `source_type`=0 AND `id`=0 AND `link`=0;
 -- Update comment for Unstoppable Enrage on Stitched Giant
 UPDATE `smart_scripts` SET `comment`='Stitched Giant - At 30% HP - Cast self Unstoppable Enrage' WHERE `entryorguid`=16025 AND `source_type`=0 AND `id`=1 AND `link`=0;
+-- Fix timer for Massive Stomp on Stitched Colossus
+UPDATE `smart_scripts` SET `event_param1`=5400, `event_param2`=12200, `event_param3`=15500, `event_param4`=22300, `comment`='Stitched Colossus - In combat - Cast Massive Stomp' WHERE `entryorguid`=30071 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
+-- Fix xxxx on Stitched Colossus
+UPDATE `smart_scripts` SET `event_phase_mask`=0, `event_flags`=1, `comment`='Stitched Colossus - At 30% HP - Cast Unstoppable Enrage' WHERE `entryorguid`=30071 AND `source_type`=0 AND `id`=2 AND `link`=0;
 

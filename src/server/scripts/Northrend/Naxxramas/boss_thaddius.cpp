@@ -614,14 +614,7 @@ public:
             if (count)
             {
                 uint32 spellId = 0;
-                if (GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE)
-                {
-                    spellId = SPELL_POSITIVE_CHARGE_STACK;
-                }
-                else // if (GetSpellInfo()->Id == SPELL_NEGATIVE_CHARGE)
-                {
-                    spellId = SPELL_NEGATIVE_CHARGE_STACK;
-                }
+                spellId = GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE ? SPELL_NEGATIVE_CHARGE_STACK : SPELL_NEGATIVE_CHARGE_STACK;
                 GetCaster()->SetAuraStack(spellId, GetCaster(), count);
             }
         }
