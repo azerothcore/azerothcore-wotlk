@@ -462,7 +462,7 @@ void MotionMaster::MoveSplinePath(Movement::PointsArray* path)
     }
 }
 
-void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed)
+void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed /* = 0.0f*/)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
@@ -477,19 +477,24 @@ void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed)
 
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(x, y, z);
-    init.SetVelocity(speed);
+
+    if (speed > 0.0f)
+    {
+        init.SetVelocity(speed);
+    }
+
     init.SetAnimation(Movement::ToGround);
     init.Launch();
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_ACTIVE);
 }
 
-void MotionMaster::MoveLand(uint32 id, float x, float y, float z, float speed)
+void MotionMaster::MoveLand(uint32 id, float x, float y, float z, float speed /* = 0.0f*/)
 {
     Position pos = {x, y, z, 0.0f};
     MoveLand(id, pos, speed);
 }
 
-void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed)
+void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed /* = 0.0f*/)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
@@ -504,13 +509,18 @@ void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed)
 
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(x, y, z);
-    init.SetVelocity(speed);
+
+    if (speed > 0.0f)
+    {
+        init.SetVelocity(speed);
+    }
+
     init.SetAnimation(Movement::ToFly);
     init.Launch();
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_ACTIVE);
 }
 
-void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed)
+void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed /* = 0.0f*/)
 {
     Position pos = {x, y, z, 0.0f};
     MoveTakeoff(id, pos, speed);

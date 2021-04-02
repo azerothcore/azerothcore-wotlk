@@ -6,24 +6,24 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `skilllineability_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `skilllineability_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `SkillLine` int(11) NOT NULL DEFAULT 0,
-  `Spell` int(11) NOT NULL DEFAULT 0,
-  `RaceMask` int(11) NOT NULL DEFAULT 0,
-  `ClassMask` int(11) NOT NULL DEFAULT 0,
-  `MinSkillLineRank` int(11) NOT NULL DEFAULT 0,
-  `SupercededBySpell` int(11) NOT NULL DEFAULT 0,
-  `AcquireMethod` int(11) NOT NULL DEFAULT 0,
-  `TrivialSkillLineRankHigh` int(11) NOT NULL DEFAULT 0,
-  `TrivialSkillLineRankLow` int(11) NOT NULL DEFAULT 0,
-  `CharacterPoints_1` int(11) NOT NULL DEFAULT 0,
-  `CharacterPoints_2` int(11) NOT NULL DEFAULT 0,
-  `TradeSkillCategoryID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `SkillLine` INT NOT NULL DEFAULT 0,
+  `Spell` INT NOT NULL DEFAULT 0,
+  `RaceMask` INT NOT NULL DEFAULT 0,
+  `ClassMask` INT NOT NULL DEFAULT 0,
+  `MinSkillLineRank` INT NOT NULL DEFAULT 0,
+  `SupercededBySpell` INT NOT NULL DEFAULT 0,
+  `AcquireMethod` INT NOT NULL DEFAULT 0,
+  `TrivialSkillLineRankHigh` INT NOT NULL DEFAULT 0,
+  `TrivialSkillLineRankLow` INT NOT NULL DEFAULT 0,
+  `CharacterPoints_1` INT NOT NULL DEFAULT 0,
+  `CharacterPoints_2` INT NOT NULL DEFAULT 0,
+  `TradeSkillCategoryID` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `skilllineability_dbc` WRITE;

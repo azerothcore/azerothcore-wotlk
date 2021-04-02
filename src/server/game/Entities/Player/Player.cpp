@@ -2726,6 +2726,22 @@ void Player::Regenerate(Powers power)
     if (!maxValue)
         return;
 
+    //If .cheat power is on always have the max power
+    if (GetCommandStatus(CHEAT_POWER))
+    {
+        if (m_regenTimerCount >= 2000)
+        {
+            //Set the value to 0 first then set it to max to force resend of packet as for range clients keeps removing rage
+            if (power == POWER_RAGE || power == POWER_RUNIC_POWER)
+            {
+                UpdateUInt32Value(UNIT_FIELD_POWER1 + power, 0);
+            }
+
+            SetPower(power, maxValue);
+            return;
+        }
+    }
+
     uint32 curValue = GetPower(power);
 
     // TODO: possible use of miscvalueb instead of amount
@@ -3024,7 +3040,7 @@ bool Player::IsInWater(bool allowAbove) const
 bool Player::IsUnderWater() const
 {
     return IsInWater() &&
-           GetPositionZ() < (GetBaseMap()->GetWaterLevel(GetPositionX(), GetPositionY()) - 2);
+           GetPositionZ() < GetBaseMap()->GetWaterLevel(GetPositionX(), GetPositionY()) - GetCollisionHeight();
 }
 
 bool Player::IsFalling() const
@@ -6366,6 +6382,24 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue, uint32 RedLeve
     return false;
 }
 
+float getProbabilityOfLevelUp(uint32 SkillValue)
+{
+    /* According to El's Extreme Angling page, from 1 to 115 the probability of a skill
+     * level up is 100% since 100/1 = 100. From 115 - 135 should average 2 catches per
+     * skill up so that means 100/2 = 50%.
+     * This returns the probability depending on the player's SkillValue.
+     */
+    if (!SkillValue)
+    {
+        return 0.0f;
+    }
+
+    std::array bounds{ 115, 135, 160, 190, 215, 295, 315, 355, 425, 450 };
+    std::array<float, 11> dens{ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 9.0f, 10.0f, 11.0f, 12.0f, 1.0f };
+    auto it = std::lower_bound(std::begin(bounds), std::end(bounds), SkillValue);
+    return 100 / dens[std::distance(std::begin(bounds), it)];
+}
+
 bool Player::UpdateFishingSkill()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -6374,11 +6408,15 @@ bool Player::UpdateFishingSkill()
 
     uint32 SkillValue = GetPureSkillValue(SKILL_FISHING);
 
-    int32 chance = SkillValue < 75 ? 100 : 2500 / (SkillValue - 50);
+    if (SkillValue >= GetMaxSkillValue(SKILL_FISHING))
+    {
+        return false;
+    }
 
-    uint32 gathering_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
-
-    return UpdateSkillPro(SKILL_FISHING, chance * 10, gathering_skill_gain);
+    /* Whenever the player clicks on the fishing gameobject the
+     * core will decide based on a probability if the skill raises or not.
+     */
+    return UpdateSkillPro(SKILL_FISHING, static_cast<int32>(getProbabilityOfLevelUp(SkillValue)) * 10, sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING));
 }
 
 // levels sync. with spell requirement for skill levels to learn
@@ -12687,7 +12725,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
         pItem = StoreItem(dest, pItem, update);
 
-        if (allowedLooters.size() > 1 && pItem->GetTemplate()->GetMaxStackSize() == 1 && pItem->IsSoulBound())
+        if (allowedLooters.size() > 1 && pItem->GetTemplate()->GetMaxStackSize() == 1 && pItem->IsSoulBound() && sWorld->getBoolConfig(CONFIG_SET_BOP_ITEM_TRADEABLE))
         {
             pItem->SetSoulboundTradeable(allowedLooters);
             pItem->SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, GetTotalPlayedTime());
@@ -15063,6 +15101,11 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                     canTalk = false;
                     break;
                 case GOSSIP_OPTION_TRAINER:
+                    if (!creature->IsValidTrainerForPlayer(this))
+                    {
+                        canTalk = false;
+                    }
+                    break;
                 case GOSSIP_OPTION_GOSSIP:
                     if (creature->isVendorWithIconSpeak())
                     {
@@ -19611,7 +19654,115 @@ void Player::SendSavedInstances()
     }
 }
 
-bool Player::Satisfy(AccessRequirement const* ar, uint32 target_map, bool report)
+void Player::PrettyPrintRequirementsQuestList(const std::vector<const ProgressionRequirement*>& missingQuests) const
+{
+    LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
+    for (const ProgressionRequirement* missingReq : missingQuests)
+    {
+        Quest const* questTemplate = sObjectMgr->GetQuestTemplate(missingReq->id);
+        if (!questTemplate)
+        {
+            continue;
+        }
+
+        std::string questTitle = questTemplate->GetTitle();
+        if (QuestLocale const* questLocale = sObjectMgr->GetQuestLocale(questTemplate->GetQuestId()))
+        {
+            ObjectMgr::GetLocaleString(questLocale->Title, loc_idx, questTitle);
+        }
+
+        std::stringstream stream;
+        stream << "|cffff7c0a|Hquest:";
+        stream << questTemplate->GetQuestId();
+        stream << ":";
+        stream << questTemplate->GetQuestLevel();
+        stream << "|h[";
+        stream << questTitle;
+        stream << "]|h|r";
+
+        if (missingReq->note.empty())
+        {
+            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+        }
+        else
+        {
+            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
+        }
+    }
+}
+
+void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const ProgressionRequirement*>& missingAchievements) const
+{
+    LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
+    for (const ProgressionRequirement* missingReq : missingAchievements)
+    {
+        AchievementEntry const* achievementEntry = sAchievementStore.LookupEntry(missingReq->id);
+        if (!achievementEntry)
+        {
+            continue;
+        }
+
+        std::string name = *achievementEntry->name;
+
+        std::stringstream stream;
+        stream << "|cffff7c0a|Hachievement:";
+        stream << missingReq->id;
+        stream << ":";
+        stream << std::hex << GetGUID() << std::dec;
+        stream << ":0:0:0:0:0:0:0:0|h[";
+        stream << name;
+        stream << "]|h|r";
+
+        if (missingReq->note.empty())
+        {
+            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+        }
+        else
+        {
+            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
+        }
+    }
+}
+
+void Player::PrettyPrintRequirementsItemsList(const std::vector<const ProgressionRequirement*>& missingItems) const
+{
+    LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
+    for (const ProgressionRequirement* missingReq : missingItems)
+    {
+        const ItemTemplate* itemTemplate = sObjectMgr->GetItemTemplate(missingReq->id);
+        if (!itemTemplate)
+        {
+            continue;
+        }
+
+        //Get the localised name
+        std::string name = itemTemplate->Name1;
+        if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemTemplate->ItemId))
+        {
+            ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+        }
+
+        std::stringstream stream;
+        stream << "|c";
+        stream << std::hex << ItemQualityColors[itemTemplate->Quality] << std::dec;
+        stream << "|Hitem:";
+        stream << itemTemplate->ItemId;
+        stream << ":0:0:0:0:0:0:0:0:0|h[";
+        stream << name;
+        stream << "]|h|r";
+
+        if (missingReq->note.empty())
+        {
+            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+        }
+        else
+        {
+            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
+        }
+    }
+}
+
+bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map, bool report)
 {
     if (!IsGameMaster() && ar)
     {
@@ -19630,52 +19781,214 @@ bool Player::Satisfy(AccessRequirement const* ar, uint32 target_map, bool report
                 LevelMax = ar->levelMax;
         }
 
-        uint32 missingItem = 0;
-        if (ar->item)
-        {
-            if (!HasItemCount(ar->item, 1) &&
-                    (!ar->item2 || !HasItemCount(ar->item2)))
-                missingItem = ar->item;
-        }
-        else if (ar->item2 && !HasItemCount(ar->item2))
-            missingItem = ar->item2;
-
         if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, target_map, this))
         {
             GetSession()->SendAreaTriggerMessage("%s", GetSession()->GetAcoreString(LANG_INSTANCE_CLOSED));
             return false;
         }
 
-        uint32 missingQuest = 0;
-        if (GetTeamId(true) == TEAM_ALLIANCE && ar->quest_A && !GetQuestRewardStatus(ar->quest_A))
-            missingQuest = ar->quest_A;
-        else if (GetTeamId(true) == TEAM_HORDE && ar->quest_H && !GetQuestRewardStatus(ar->quest_H))
-            missingQuest = ar->quest_H;
+        Player* partyLeader = this;
+        std::string leaderName = m_session->GetAcoreString(LANG_YOU);
+        {
+            const uint64 leaderGuid = GetGroup() ? GetGroup()->GetLeaderGUID() : GetGUID();
+            Player* tempLeader = HashMapHolder<Player>::Find(leaderGuid);
 
-        uint32 missingAchievement = 0;
-        Player* leader = this;
-        uint64 leaderGuid = GetGroup() ? GetGroup()->GetLeaderGUID() : GetGUID();
-        if (leaderGuid != GetGUID())
-            leader = HashMapHolder<Player>::Find(leaderGuid);
+            if (leaderGuid != GetGUID())
+            {
+                if (tempLeader != nullptr)
+                {
+                    partyLeader = tempLeader;
+                }
+                leaderName = GetGroup()->GetLeaderName();
+            }
+        }
 
-        if (ar->achievement)
-            if (!leader || !leader->HasAchieved(ar->achievement))
-                missingAchievement = ar->achievement;
+        //Check all items
+        std::vector<const ProgressionRequirement*> missingPlayerItems;
+        std::vector<const ProgressionRequirement*> missingLeaderItems;
+        for (const ProgressionRequirement* itemRequirement : ar->items)
+        {
+            Player* checkPlayer = this;
+            std::vector<const ProgressionRequirement*>* missingItems = &missingPlayerItems;
+            if (itemRequirement->checkLeaderOnly)
+            {
+                checkPlayer = partyLeader;
+                missingItems = &missingLeaderItems;
+            }
+
+            if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == checkPlayer->GetTeamId(true))
+            {
+                if (!checkPlayer->HasItemCount(itemRequirement->id, 1))
+                {
+                    missingItems->push_back(itemRequirement);
+                }
+            }
+        }
+
+        //Check all achievements
+        std::vector<const ProgressionRequirement*> missingPlayerAchievements;
+        std::vector<const ProgressionRequirement*> missingLeaderAchievements;
+        for (const ProgressionRequirement* achievementRequirement : ar->achievements)
+        {
+            Player* checkPlayer = this;
+            std::vector<const ProgressionRequirement*>* missingAchievements = &missingPlayerAchievements;
+            if(achievementRequirement->checkLeaderOnly)
+            {
+                checkPlayer = partyLeader;
+                missingAchievements = &missingLeaderAchievements;
+            }
+
+            if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == GetTeamId(true))
+            {
+                if (!checkPlayer || !checkPlayer->HasAchieved(achievementRequirement->id))
+                {
+                    missingAchievements->push_back(achievementRequirement);
+                }
+            }
+        }
+
+        //Check all quests
+        std::vector<const ProgressionRequirement*> missingPlayerQuests;
+        std::vector<const ProgressionRequirement*> missingLeaderQuests;
+        for (const ProgressionRequirement* questRequirement : ar->quests)
+        {
+            Player* checkPlayer = this;
+            std::vector<const ProgressionRequirement*>* missingQuests = &missingPlayerQuests;
+            if (questRequirement->checkLeaderOnly)
+            {
+                checkPlayer = partyLeader;
+                missingQuests = &missingLeaderQuests;
+            }
+
+            if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == checkPlayer->GetTeamId(true))
+            {
+                if (!checkPlayer->GetQuestRewardStatus(questRequirement->id))
+                {
+                    missingQuests->push_back(questRequirement);
+                }
+            }
+        }
+
+        //Check if avg ILVL requirement is allowed
+        bool ilvlRequirementNotMet = false;
+        if (sWorld->getBoolConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PORTAL_CHECK_ILVL))
+        {
+            const int32 currentIlvl = (int32)GetAverageItemLevelForDF();
+            if (ar->reqItemLevel > currentIlvl)
+            {
+                ilvlRequirementNotMet = true;
+            }
+        }
+
 
         Difficulty target_difficulty = GetDifficulty(mapEntry->IsRaid());
         MapDifficulty const* mapDiff = GetDownscaledMapDifficultyData(target_map, target_difficulty);
-        if (LevelMin || LevelMax || missingItem || missingQuest || missingAchievement)
+        if (LevelMin || LevelMax || ilvlRequirementNotMet
+            || missingPlayerItems.size() || missingPlayerQuests.size() || missingPlayerAchievements.size()
+            || missingLeaderItems.size() || missingLeaderQuests.size() || missingLeaderAchievements.size())
         {
             if (report)
             {
-                if (missingQuest && !ar->questFailedText.empty())
-                    ChatHandler(GetSession()).PSendSysMessage("%s", ar->questFailedText.c_str());
-                else if (mapDiff->hasErrorMessage) // if (missingAchievement) covered by this case
-                    SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
-                else if (missingItem)
-                    GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), LevelMin, sObjectMgr->GetItemTemplate(missingItem)->Name1.c_str());
-                else if (LevelMin)
-                    GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
+                uint8 requirementPrintMode = sWorld->getIntConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PRINT_MODE);
+
+                if (requirementPrintMode == 0)
+                {
+                    //Just print out the requirements are not met
+                    ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_NOT_MET);
+                }
+                else if(requirementPrintMode == 1)
+                {
+                    //Blizzlike method of printing out the requirements
+                    if (missingLeaderQuests.size() && !missingLeaderQuests[0]->note.empty())
+                    {
+                        ChatHandler(GetSession()).PSendSysMessage("%s", missingLeaderQuests[0]->note.c_str());
+                    }
+                    else if (mapDiff->hasErrorMessage)
+                    { // if (missingAchievement) covered by this case
+                        SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
+                    }
+                    else if (missingPlayerItems.size())
+                    {
+                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), LevelMin, sObjectMgr->GetItemTemplate(missingPlayerItems[0]->id)->Name1.c_str());
+                    }
+                    else if (LevelMin)
+                    {
+                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
+                    }
+                    else if (ilvlRequirementNotMet)
+                    {
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, (uint16)GetAverageItemLevelForDF());
+                    }
+                }
+                else
+                {
+                    bool errorAlreadyPrinted = false;
+                    //Pretty way of printing out requirements
+                    if (missingPlayerQuests.size())
+                    {
+                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_QUESTS);
+                        PrettyPrintRequirementsQuestList(missingPlayerQuests);
+                        errorAlreadyPrinted = true;
+                    }
+                    if (missingLeaderQuests.size())
+                    {
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS, leaderName.c_str());
+                        PrettyPrintRequirementsQuestList(missingLeaderQuests);
+                        errorAlreadyPrinted = true;
+                    }
+
+                    if (missingPlayerAchievements.size())
+                    {
+                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_COMPLETE_ACHIEVEMENTS);
+                        PrettyPrintRequirementsAchievementsList(missingPlayerAchievements);
+                        errorAlreadyPrinted = true;
+                    }
+                    if (missingLeaderAchievements.size())
+                    {
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS, leaderName.c_str());
+                        PrettyPrintRequirementsAchievementsList(missingLeaderAchievements);
+                        errorAlreadyPrinted = true;
+                    }
+
+                    if (missingPlayerItems.size())
+                    {
+                        ChatHandler(GetSession()).SendSysMessage(LANG_ACCESS_REQUIREMENT_OBTAIN_ITEMS);
+                        PrettyPrintRequirementsItemsList(missingPlayerItems);
+                        errorAlreadyPrinted = true;
+                    }
+
+                    if (missingLeaderItems.size())
+                    {
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS, leaderName.c_str());
+                        PrettyPrintRequirementsItemsList(missingLeaderItems);
+                        errorAlreadyPrinted = true;
+                    }
+
+                    if (ilvlRequirementNotMet)
+                    {
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET, ar->reqItemLevel, (uint16)GetAverageItemLevelForDF());
+                    }
+
+                    if (LevelMin)
+                    {
+                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
+                    }
+                    else if (LevelMax)
+                    {
+                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_ACCESS_REQUIREMENT_MAX_LEVEL), LevelMax);
+                    }
+                    else if (mapDiff->hasErrorMessage && !errorAlreadyPrinted)
+                    {
+                        SendTransferAborted(target_map, TRANSFER_ABORT_DIFFICULTY, target_difficulty);
+                    }
+                }
+
+                //Print the extra string
+                uint32 optionalStringID = sWorld->getIntConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_OPTIONAL_STRING_ID);
+                if (optionalStringID > 0)
+                {
+                    ChatHandler(GetSession()).SendSysMessage(optionalStringID);
+                }
             }
             return false;
         }
@@ -21227,7 +21540,7 @@ void Player::VehicleSpellInitialize()
     data << uint8(0);                                       // Command State
     data << uint16(0x800);                                  // DisableActions (set for all vehicles)
 
-    for (uint32 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+    for (uint32 i = 0; i < MAX_CREATURE_SPELLS; ++i)
     {
         uint32 spellId = vehicle->m_spells[i];
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
@@ -21253,7 +21566,7 @@ void Player::VehicleSpellInitialize()
         data << uint32(MAKE_UNIT_ACTION_BUTTON(spellId, i + 8));
     }
 
-    for (uint32 i = CREATURE_MAX_SPELLS; i < MAX_SPELL_CONTROL_BAR; ++i)
+    for (uint32 i = MAX_CREATURE_SPELLS; i < MAX_SPELL_CONTROL_BAR; ++i)
         data << uint32(0);
 
     data << uint8(0); // Auras?
@@ -24495,7 +24808,7 @@ void Player::UpdateAreaDependentAuras(uint32 newArea)
     for (AuraMap::iterator iter = m_ownedAuras.begin(); iter != m_ownedAuras.end();)
     {
         // use m_zoneUpdateId for speed: UpdateArea called from UpdateZone or instead UpdateZone in both cases m_zoneUpdateId up-to-date
-        if (iter->second->GetSpellInfo()->CheckLocation(GetMapId(), m_zoneUpdateId, newArea, this) != SPELL_CAST_OK)
+        if (iter->second->GetSpellInfo()->CheckLocation(GetMapId(), m_zoneUpdateId, newArea, this, false) != SPELL_CAST_OK)
             RemoveOwnedAura(iter);
         else
             ++iter;
@@ -24764,13 +25077,14 @@ void Player::UpdateUnderwaterState(Map* m, float x, float y, float z)
     // pussywizard: optimization
     if (GetExactDistSq(&m_last_underwaterstate_position) < 3.0f * 3.0f)
         return;
+
     m_last_underwaterstate_position.Relocate(m_positionX, m_positionY, m_positionZ);
 
     if (!IsPositionValid()) // pussywizard: crashfix if calculated grid coords would be out of range 0-64
         return;
 
     LiquidData liquid_status;
-    ZLiquidStatus res = m->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status);
+    ZLiquidStatus res = m->getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, &liquid_status, GetCollisionHeight());
     if (!res)
     {
         m_MirrorTimerFlags &= ~(UNDERWATER_INWATER | UNDERWATER_INLAVA | UNDERWATER_INSLIME | UNDERWARER_INDARKWATER);
@@ -25514,11 +25828,19 @@ uint32 Player::CalculateTalentsPoints() const
     return uint32(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
 }
 
-bool Player::canFlyInZone(uint32 mapid, uint32 zone) const
+bool Player::canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) const
 {
     // continent checked in SpellInfo::CheckLocation at cast and area update
     uint32 v_map = GetVirtualMapForMapAndZone(mapid, zone);
-    return v_map != 571 || HasSpell(54197); // 54197 = Cold Weather Flying
+    if (v_map == 571 && !bySpell->HasAttribute(SPELL_ATTR7_IGNORE_COLD_WEATHER_FLYING))
+    {
+        if (!HasSpell(54197)) // 54197 = Cold Weather Flying
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void Player::learnSpellHighRank(uint32 spellid)
@@ -25722,7 +26044,7 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 
     //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
     // 14.57 can be calculated by resolving damageperc formula below to 0
-    if (z_diff >= 14.57f && !isDead() && !IsGameMaster() &&
+    if (z_diff >= 14.57f && !isDead() && !IsGameMaster() && !GetCommandStatus(CHEAT_GOD) &&
             !HasAuraType(SPELL_AURA_HOVER) && !HasAuraType(SPELL_AURA_FEATHER_FALL) &&
             !HasAuraType(SPELL_AURA_FLY))
     {

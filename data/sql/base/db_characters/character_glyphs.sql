@@ -6,19 +6,19 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `character_glyphs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `character_glyphs` 
 (
-  `guid` int(10) unsigned NOT NULL,
-  `talentGroup` tinyint(3) unsigned NOT NULL DEFAULT 0,
-  `glyph1` smallint(5) unsigned DEFAULT 0,
-  `glyph2` smallint(5) unsigned DEFAULT 0,
-  `glyph3` smallint(5) unsigned DEFAULT 0,
-  `glyph4` smallint(5) unsigned DEFAULT 0,
-  `glyph5` smallint(5) unsigned DEFAULT 0,
-  `glyph6` smallint(5) unsigned DEFAULT 0,
+  `guid` INT unsigned NOT NULL,
+  `talentGroup` TINYINT unsigned NOT NULL DEFAULT 0,
+  `glyph1` SMALLINT unsigned DEFAULT 0,
+  `glyph2` SMALLINT unsigned DEFAULT 0,
+  `glyph3` SMALLINT unsigned DEFAULT 0,
+  `glyph4` SMALLINT unsigned DEFAULT 0,
+  `glyph5` SMALLINT unsigned DEFAULT 0,
+  `glyph6` SMALLINT unsigned DEFAULT 0,
   PRIMARY KEY (`guid`,`talentGroup`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `character_glyphs` WRITE;
