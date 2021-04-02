@@ -15,6 +15,7 @@ jobs:
         os: [ubuntu-20.04]
         compiler: [clang]
         modules: [with, without]
+        extra_logs: [false]
         # we can include specific combinations here
         include:
           - os: ubuntu-20.04-extra-logs
@@ -24,21 +25,27 @@ jobs:
           - os: ubuntu-20.04
             compiler: clang11
             modules: without
+            extra_logs: false
           - os: ubuntu-20.04
             compiler: clang9
             modules: without
+            extra_logs: false
           - os: ubuntu-18.04
             compiler: clang # default in 18.04 is clang 6
             modules: without
+            extra_logs: false
           - os: ubuntu-18.04
             compiler: gcc8
             modules: without
+            extra_logs: false
           - os: ubuntu-20.04
             compiler: gcc # default in 20.04 is gcc 9
             modules: without
+            extra_logs: false
           - os: ubuntu-20.04
             compiler: gcc10
             modules: without
+            extra_logs: false
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
     env:
