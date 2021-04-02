@@ -239,3 +239,16 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (16419, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghost of Naxxramas - On spawn - Set in combat with zone'),
 (16419, 0, 1, 0, 1, 0, 100, 0, 100, 100, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghost of Naxxramas - On OOC - Despawn if OOC');
 
+
+-- Fix Vigilant Shade population in Naxxramas
+UPDATE `creature` SET `position_x`=2798.932, `position_y`=-2985.458, `position_z`=244.387, `orientation`=6.2765, `wander_distance`=40 WHERE `guid`=128065;
+DELETE FROM `creature` WHERE `guid` IN (128062, 128063, 128064, 128081, 128125, 128126, 128127);
+INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES 
+(128062, 30085, 533, 0, 0, 3, 1, 19329, 0, 2556.97, -3231.98, 246.370, 3.10938, 3600, 40, 0, 130330, 0, 1, 0, 0, 0, 0),
+(128063, 30085, 533, 0, 0, 3, 1, 19329, 0, 2557.78, -3633.28, 273.809, 3.18988, 3600, 40, 0, 130330, 0, 1, 0, 0, 0, 0),
+(128064, 30085, 533, 0, 0, 3, 1, 19329, 0, 2795.33, -3882.25, 279.417, 3.12988, 3600, 40, 0, 130330, 0, 1, 0, 0, 0, 0),
+(128081, 30085, 533, 0, 0, 3, 1, 19329, 0, 3204.13, -3881.97, 273.901, 3.10888, 3600, 40, 0, 130330, 0, 1, 0, 0, 0, 0),
+(128125, 30085, 533, 0, 0, 3, 1, 19329, 0, 3453.84, -3638.10, 276.313, 3.15988, 3600, 40, 0, 130330, 0, 1, 0, 0, 0, 0),
+(128126, 30085, 533, 0, 0, 3, 1, 19329, 0, 3454.06, -3232.31, 275.430, 3.10488, 3600, 40, 0, 130330, 0, 1, 0, 0, 0, 0),
+(128127, 30085, 533, 0, 0, 3, 1, 19329, 0, 3206.94, -2985.55, 275.347, 3.12938, 3600, 40, 0, 130330, 0, 1, 0, 0, 0, 0);
+
