@@ -199,6 +199,19 @@ UPDATE `smart_scripts` SET `event_param1`=1900, `event_param2`=3000, `event_para
 DELETE FROM `smart_scripts` WHERE `entryorguid`=16029 AND `source_type`=0 AND `id`=2 AND `link`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
 (16029, 0, 2, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 28362, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge Belcher - On reset - Cast Disease Cloud');
-
--- WIP patchwerk zone & Gluth-Thaddius zone
+-- Fix timer for Chain Lightning on Living Monstrosity
+UPDATE `smart_scripts` SET `event_param1`=7100, `event_param2`=12500, `event_param3`=18100, `event_param4`=20900, `target_type`=5, `comment`='Living Monstrosity - In combat - Cast Chain Lightning' WHERE `entryorguid`=16021 AND `source_type`=0 AND `id`=0 AND `link`=0; -- (10mode)
+UPDATE `smart_scripts` SET `event_param1`=5000, `event_param2`=8000, `event_param4`=24000, `target_type`=5, `comment`='Living Monstrosity - In combat - Cast Chain Lightning' WHERE `entryorguid`=16021 AND `source_type`=0 AND `id`=1 AND `link`=0; -- (25mode)
+-- Fix timer for Lightning Totem on Living Monstrosity
+UPDATE `smart_scripts` SET `event_param1`=6400, `event_param2`=10000, `event_param3`=16900, `event_param4`=18500, `comment`='Living Monstrosity - In combat - Cast Lightning Totem' WHERE `entryorguid`=16021 AND `source_type`=0 AND `id`=2 AND `link`=0;
+-- Fix timer and target for Mana Burn on Mad Scientist
+UPDATE `smart_scripts` SET `event_param1`=7600, `event_param2`=17300, `event_param3`=6000, `event_param4`=13300, `target_param1`=0, `comment`='Mad Scientist - In combat - Cast Mana Burn' WHERE `entryorguid`=16020 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
+-- Fix timer and target for Great Heal on Mad Scientist
+UPDATE `smart_scripts` SET `event_type`=2, `event_param1`=0, `event_param2`=30, `event_param3`=18000, `event_param4`=21000, `target_type`=1, `target_param1`=0, `comment`='Mad Scientist - At 30% HP - Cast Great Heal' WHERE `entryorguid`=16020 AND `source_type`=0 AND `id` IN (2, 3) AND `link`=0;
+-- Fix timer for Mind Flay on Surgical Assistant
+UPDATE `smart_scripts` SET `event_param1`=1600, `event_param2`=2800, `event_param3`=7700, `event_param4`=11900, `comment`='Surgical Assistant - In combat - Cast Mind Flay' WHERE `entryorguid`=16022 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
+-- Adjust timer for Knockback on Stitched Giant
+UPDATE `smart_scripts` SET `event_param1`=5100, `event_param2`=10400, `event_param3`=18800, `event_param4`=21300 WHERE `entryorguid`=16025 AND `source_type`=0 AND `id`=0 AND `link`=0;
+-- Update comment for Unstoppable Enrage on Stitched Giant
+UPDATE `smart_scripts` SET `comment`='Stitched Giant - At 30% HP - Cast self Unstoppable Enrage' WHERE `entryorguid`=16025 AND `source_type`=0 AND `id`=1 AND `link`=0;
 
