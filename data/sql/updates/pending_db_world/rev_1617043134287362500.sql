@@ -191,4 +191,11 @@ UPDATE `smart_scripts` SET `event_param1`=4800, `event_param2`=10700, `comment`=
 -- Fix spell difficulty and timer for Execute on Patchwork Golem
 UPDATE `smart_scripts` SET `event_phase_mask`=0, `event_flags`=4, `event_param4`=43000, `comment`='Patchwork Golem - On target HP 0-20% - Cast Execute' WHERE `entryorguid`=16017 AND `source_type`=0 AND `id`=3 AND `link`=0;
 UPDATE `smart_scripts` SET `event_phase_mask`=0, `event_flags`=2, `event_param4`=43000, `comment`='Patchwork Golem - On target HP 0-20% - Cast Execute' WHERE `entryorguid`=16017 AND `source_type`=0 AND `id`=4 AND `link`=0;
+-- Fix timer for Bile Vomit on Bile Retcher
+UPDATE `smart_scripts` SET `event_param1`=3600, `event_param2`=6800, `event_param3`=13700, `event_param4`=19700, `comment`='Bile Retcher - In combat - Cast Bile Vomit' WHERE `entryorguid`=16018 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
+-- Fix timer for Acidic Sludge on Sludge Belcher
+UPDATE `smart_scripts` SET `event_param1`=1900, `event_param2`=3000, `event_param3`=6000, `event_param4`=7300, `comment`='Sludge Belcher - In combat - Cast Acidic Sludge' WHERE `entryorguid`=16029 AND `source_type`=0 AND `id` (0, 1) AND `link`=0;
+-- Add SAI for Disease Cloud on Sludge Belcher
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
+(16029, 0, 2, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 11, 28362, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge Belcher - On reset - Cast Disease Cloud');
 
