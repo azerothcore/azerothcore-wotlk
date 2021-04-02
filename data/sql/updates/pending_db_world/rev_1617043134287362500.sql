@@ -113,9 +113,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- Fix timer for Shadow Bolt Volley on Shade of Naxxramas
 UPDATE `smart_scripts` SET `event_param1`=2800, `event_param2`=5100, `event_param3`=4500, `event_param4`=12000, `comment`='Shade of Naxxramas - In combat - Cast Shadow Bolt Volley' WHERE `entryorguid`=16164 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
 -- Create SAI for Portal of Shadows on Shade of Naxxramas
-DELETE FROM `smart_scripts` WHERE `entryorguid`=16164 AND `source_type`=0 AND `id`=2 AND `link`=0;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=16164 AND `source_type`=0 AND `id` IN (2, 3) AND `link`=0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(16164, 0, 2, 0, 0, 0, 100, 4, 4100, 8700, 60000, 60000, 0, 11, 28383, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shade of Naxxramas - In combat - Cast Portal of Shadows');
+(16164, 0, 2, 0, 0, 0, 100, 0, 4100, 8700, 60000, 60000, 0, 11, 28383, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shade of Naxxramas - In combat - Cast Portal of Shadows'),
+(16164, 0, 3, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 19, 16420, 0, 0, 0, 0, 0, 0, 0, 'Shade of Naxxramas - On reset - Despawn Portal of Shadows');
 -- Fix timer for Whirlwind on Dark Touched Warrior
 UPDATE `smart_scripts` SET `event_param1`=3300, `event_param2`=8900, `event_param3`=18900, `comment`='Dark Touched Warrior - In combat - Cast Whirlwind' WHERE `entryorguid`=16156 AND `source_type`=0 AND `id`=0 AND `link`=0;
 -- Fix timer for Plague Strike on Death Knight Captain
@@ -221,4 +222,20 @@ UPDATE `smart_scripts` SET `event_phase_mask`=0, `event_flags`=1, `comment`='Sti
 -- Fix movement speed for KT minions
 UPDATE `creature_template` SET `speed_walk`=0.1, `speed_run`=0.2 WHERE `entry` IN (16429, 30018); -- Soul Weaver
 UPDATE `creature_template` SET `speed_walk`=0.2, `speed_run`=0.3 WHERE `entry` IN (16427, 30015); -- Soldier of the Frozen Wastes
+
+
+-- Fix "Portal of Shadows" spell-mechanic which is used by Shade of Naxxramas
+
+-- Portal of Shadows (NPC)
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=16420;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=16420 AND `source_type`=0 AND `id`=0 AND `link`=0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
+(16420, 0, 0, 0, 101, 0, 100, 0, 1, 40, 5000, 5000, 0, 12, 16419, 3, 10000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Portal of Shadows - On player near - Summon Ghost of Naxxramas');
+
+-- Ghost of Naxxramas
+UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=16419;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=16419 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
+(16419, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghost of Naxxramas - On spawn - Set in combat with zone'),
+(16419, 0, 1, 0, 1, 0, 100, 0, 100, 100, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghost of Naxxramas - On OOC - Despawn if OOC');
 
