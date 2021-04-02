@@ -184,4 +184,11 @@ UPDATE `smart_scripts` SET `event_type`=1, `event_param1`=1000, `event_param2`=1
 UPDATE `smart_scripts` SET `event_type`=101, `event_param1`=1, `event_param2`=20, `event_param3`=1000, `event_param4`=1000, `comment`='Vigilant Shade - On Player near - Remove Invisibility' WHERE `entryorguid`=30085 AND `source_type`=0 AND `id`=1 AND `link`=0;
 -- Fix timer for Shadow Bolt Volley on Shadow Shade
 UPDATE `smart_scripts` SET `event_param1`=2300, `event_param2`=2300, `event_param3`=9600, `event_param4`=9900, `target_type`=2, `comment`='Vigilant Shade - In combat - Cast Shadow Bolt Volley' WHERE `entryorguid`=30085 AND `source_type`=0 AND `id` IN (2, 3) AND `link`=0;
+-- Fix timer for Cleave on Patchwork Golem
+UPDATE `smart_scripts` SET `event_param2`=9300, `event_param3`=15200, `event_param4`=15200, `comment`='Patchwork Golem - In combat - Cast Cleave' WHERE `entryorguid`=16017 AND `source_type`=0 AND `id`=2 AND `link`=0;
+-- Fix timer for War Stomp on Patchwork Golem
+UPDATE `smart_scripts` SET `event_param1`=4800, `event_param2`=10700, `comment`='Patchwork Golem - In combat - Cast War Stomp' WHERE `entryorguid`=16017 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
+-- Fix spell difficulty and timer for Execute on Patchwork Golem
+UPDATE `smart_scripts` SET `event_phase_mask`=0, `event_flags`=4, `event_param4`=43000, `comment`='Patchwork Golem - On target HP 0-20% - Cast Execute' WHERE `entryorguid`=16017 AND `source_type`=0 AND `id`=3 AND `link`=0;
+UPDATE `smart_scripts` SET `event_phase_mask`=0, `event_flags`=2, `event_param4`=43000, `comment`='Patchwork Golem - On target HP 0-20% - Cast Execute' WHERE `entryorguid`=16017 AND `source_type`=0 AND `id`=4 AND `link`=0;
 
