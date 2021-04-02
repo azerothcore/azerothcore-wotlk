@@ -180,7 +180,7 @@ UPDATE `smart_scripts` SET `event_type`=0, `event_param1`=2400, `event_param2`=7
 -- Add Disarm immunity for Unholly (Axe/Staff/Swords)
 UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|4 WHERE `entry` IN (16194, 16215, 16216);
 -- Re-do Invisibility on Vigilant Shade
-UPDATE `smart_scripts` SET `event_type`=1, `event_param1`=1000, `event_param2`=1000, `event_param3`=5000, `event_param4`=5000, `comment`='Vigilant Shade - In OOC - Cast Invisibility' WHERE `entryorguid`=30085 AND `source_type`=0 AND `id`=0 AND `link`=0;
+UPDATE `smart_scripts` SET `event_type`=1, `event_param1`=1000, `event_param2`=1000, `event_param3`=5000, `event_param4`=5000, `action_type`=75, `comment`='Vigilant Shade - In OOC - Add aura Invisibility' WHERE `entryorguid`=30085 AND `source_type`=0 AND `id`=0 AND `link`=0;
 -- Adjust SAI in order to remove Invisibility on Vigilant Shade when there is a player around
 UPDATE `smart_scripts` SET `event_type`=101, `event_param1`=1, `event_param2`=20, `event_param3`=1000, `event_param4`=1000, `comment`='Vigilant Shade - On Player near - Remove Invisibility' WHERE `entryorguid`=30085 AND `source_type`=0 AND `id`=1 AND `link`=0;
 -- Fix timer for Shadow Bolt Volley on Shadow Shade
