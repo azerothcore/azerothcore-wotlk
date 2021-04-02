@@ -216,6 +216,9 @@ UPDATE `smart_scripts` SET `event_param1`=5100, `event_param2`=10400, `event_par
 UPDATE `smart_scripts` SET `comment`='Stitched Giant - At 30% HP - Cast self Unstoppable Enrage' WHERE `entryorguid`=16025 AND `source_type`=0 AND `id`=1 AND `link`=0;
 -- Fix timer for Massive Stomp on Stitched Colossus
 UPDATE `smart_scripts` SET `event_param1`=5400, `event_param2`=12200, `event_param3`=15500, `event_param4`=22300, `comment`='Stitched Colossus - In combat - Cast Massive Stomp' WHERE `entryorguid`=30071 AND `source_type`=0 AND `id` IN (0, 1) AND `link`=0;
--- Fix xxxx on Stitched Colossus
+-- Fix Unstoppable Enrage on Stitched Colossus
 UPDATE `smart_scripts` SET `event_phase_mask`=0, `event_flags`=1, `comment`='Stitched Colossus - At 30% HP - Cast Unstoppable Enrage' WHERE `entryorguid`=30071 AND `source_type`=0 AND `id`=2 AND `link`=0;
+-- Fix movement speed for KT minions
+UPDATE `creature_template` SET `speed_walk`=0.1, `speed_run`=0.2 WHERE `entry` IN (16429, 30018); -- Soul Weaver
+UPDATE `creature_template` SET `speed_walk`=0.2, `speed_run`=0.3 WHERE `entry` IN (16427, 30015); -- Soldier of the Frozen Wastes
 
