@@ -78,7 +78,7 @@ case $COMPILER in
 esac
 
 if [[ $EXTRA_LOGS ]]; then
-  echo "CEXTRA_LOGS=\"1\"" >> ./conf/config.sh
+  echo "CEXTRA_LOGS=1" >> ./conf/config.sh
 else
-  echo "CEXTRA_LOGS=\"0\"" >> ./conf/config.sh
+  echo "CEXTRA_LOGS=0" >> ./conf/config.sh
 fi
