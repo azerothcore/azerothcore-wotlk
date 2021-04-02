@@ -19,7 +19,7 @@ public:
 
     ADT* Source;
     std::vector<Vector3> Vertices;
-    std::vector<Triangle<uint32> > Triangles;
+    std::vector<Triangle<uint32>> Triangles;
     std::vector<MCNKLiquidData> MCNKData;
 private:
     void HandleNewLiquid();

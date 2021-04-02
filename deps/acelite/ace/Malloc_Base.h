@@ -22,6 +22,8 @@
 #include "ace/os_include/sys/os_types.h"
 #include "ace/os_include/sys/os_mman.h"
 #include "ace/os_include/sys/os_types.h"
+#include <limits>
+#include <new>
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
@@ -37,7 +39,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_Allocator
 {
 public:
-
   /// Unsigned integer type used for specifying memory block lengths.
   typedef size_t size_type;
 
@@ -65,7 +66,7 @@ public:
   /// Allocate @a nbytes, giving them @a initial_value.
   virtual void *calloc (size_type nbytes, char initial_value = '\0') = 0;
 
-  /// Allocate <n_elem> each of size @a elem_size, giving them
+  /// Allocate @a n_elem each of size @a elem_size, giving them
   /// @a initial_value.
   virtual void *calloc (size_type n_elem,
                         size_type elem_size,
@@ -155,10 +156,72 @@ private:
 
   /// Pointer to a process-wide ACE_Allocator instance.
   static ACE_Allocator *allocator_;
-
-  /// Must delete the <allocator_> if non-0.
-  static int delete_allocator_;
 };
+
+/**
+ * @class ACE_Allocator_Std_Adapter
+ *
+ * @brief Model of std::allocator that forwards requests to
+#  ACE_Allocator::instance.  To be used with STL containers.
+ */
+
+template <typename T>
+class ACE_Export ACE_Allocator_Std_Adapter
+{
+public:
+  typedef T value_type;
+  typedef T* pointer;
+  typedef const T* const_pointer;
+  typedef T& reference;
+  typedef const T& const_reference;
+  typedef std::size_t size_type;
+  typedef std::ptrdiff_t difference_type;
+  template <typename U> struct rebind { typedef ACE_Allocator_Std_Adapter<U> other; };
+
+  ACE_Allocator_Std_Adapter() {}
+
+  template <typename U>
+  ACE_Allocator_Std_Adapter(const ACE_Allocator_Std_Adapter<U>&) {}
+
+  static T* allocate(std::size_t n)
+  {
+    void* raw_mem = ACE_Allocator::instance()->malloc(n * sizeof(T));
+    if (!raw_mem) throw std::bad_alloc();
+    return static_cast<T*>(raw_mem);
+  }
+
+  static void deallocate(T* ptr, std::size_t)
+  {
+    ACE_Allocator::instance()->free(ptr);
+  }
+
+  static void construct(T* ptr, const T& value)
+  {
+    new (static_cast<void*>(ptr)) T(value);
+  }
+
+  static void destroy(T* ptr)
+  {
+    ptr->~T();
+  }
+
+  static size_type max_size()
+  {
+    return (std::numeric_limits<size_type>::max)();
+  }
+};
+
+template <typename T, typename U>
+bool operator==(const ACE_Allocator_Std_Adapter<T>&, const ACE_Allocator_Std_Adapter<U>&)
+{
+  return true;
+}
+
+template <typename T, typename U>
+bool operator!=(const ACE_Allocator_Std_Adapter<T>&, const ACE_Allocator_Std_Adapter<U>&)
+{
+  return false;
+}
 
 ACE_END_VERSIONED_NAMESPACE_DECL
 

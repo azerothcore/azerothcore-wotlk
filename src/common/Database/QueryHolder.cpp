@@ -9,7 +9,7 @@
 #include "PreparedStatement.h"
 #include "Log.h"
 
-bool SQLQueryHolder::SetQuery(size_t index, const char *sql)
+bool SQLQueryHolder::SetQuery(size_t index, const char* sql)
 {
     if (m_queries.size() <= index)
     {
@@ -23,13 +23,13 @@ bool SQLQueryHolder::SetQuery(size_t index, const char *sql)
     element.element.query = strdup(sql);
 
     SQLResultSetUnion result;
-    result.qresult = NULL;
+    result.qresult = nullptr;
 
     m_queries[index] = SQLResultPair(element, result);
     return true;
 }
 
-bool SQLQueryHolder::SetPQuery(size_t index, const char *format, ...)
+bool SQLQueryHolder::SetPQuery(size_t index, const char* format, ...)
 {
     if (!format)
     {
@@ -66,7 +66,7 @@ bool SQLQueryHolder::SetPreparedQuery(size_t index, PreparedStatement* stmt)
     element.element.stmt = stmt;
 
     SQLResultSetUnion result;
-    result.presult = NULL;
+    result.presult = nullptr;
 
     m_queries[index] = SQLResultPair(element, result);
     return true;
@@ -79,13 +79,13 @@ QueryResult SQLQueryHolder::GetResult(size_t index)
     {
         ResultSet* result = m_queries[index].second.qresult;
         if (!result || !result->GetRowCount())
-            return QueryResult(NULL);
+            return QueryResult(nullptr);
 
         result->NextRow();
         return QueryResult(result);
     }
     else
-        return QueryResult(NULL);
+        return QueryResult(nullptr);
 }
 
 PreparedQueryResult SQLQueryHolder::GetPreparedResult(size_t index)
@@ -95,12 +95,12 @@ PreparedQueryResult SQLQueryHolder::GetPreparedResult(size_t index)
     {
         PreparedResultSet* result = m_queries[index].second.presult;
         if (!result || !result->GetRowCount())
-            return PreparedQueryResult(NULL);
+            return PreparedQueryResult(nullptr);
 
         return PreparedQueryResult(result);
     }
     else
-        return PreparedQueryResult(NULL);
+        return PreparedQueryResult(nullptr);
 }
 
 void SQLQueryHolder::SetResult(size_t index, ResultSet* result)
@@ -108,7 +108,7 @@ void SQLQueryHolder::SetResult(size_t index, ResultSet* result)
     if (result && !result->GetRowCount())
     {
         delete result;
-        result = NULL;
+        result = nullptr;
     }
 
     /// store the result in the holder
@@ -121,7 +121,7 @@ void SQLQueryHolder::SetPreparedResult(size_t index, PreparedResultSet* result)
     if (result && !result->GetRowCount())
     {
         delete result;
-        result = NULL;
+        result = nullptr;
     }
 
     /// store the result in the holder
@@ -165,7 +165,7 @@ bool SQLQueryHolderTask::Execute()
         return false;
 
     /// we can do this, we are friends
-    std::vector<SQLQueryHolder::SQLResultPair> &queries = m_holder->m_queries;
+    std::vector<SQLQueryHolder::SQLResultPair>& queries = m_holder->m_queries;
 
     for (size_t i = 0; i < queries.size(); i++)
     {

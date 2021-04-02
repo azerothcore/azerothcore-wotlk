@@ -24,6 +24,8 @@ ACE_Cached_Mem_Pool_Node<T>::set_next (ACE_Cached_Mem_Pool_Node<T> *ptr)
   this->next_ = ptr;
 }
 
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Cached_Mem_Pool_Node)
+
 template <class T, class ACE_LOCK> ACE_INLINE size_t
 ACE_Cached_Allocator<T, ACE_LOCK>::pool_depth (void)
 {
@@ -64,7 +66,11 @@ ACE_Malloc_T<ACE_MEM_POOL_2, ACE_LOCK, ACE_CB>::release (int close)
         this->memory_pool_.release (0);
 
       if (retv == 0)
-        this->remove ();
+        {
+          ace_mon.release ();
+          this->remove ();
+        }
+
       return retv;
     }
   return -1;

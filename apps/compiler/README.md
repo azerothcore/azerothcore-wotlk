@@ -1,7 +1,7 @@
 ## How to compile:
 
-first of all, if you need some custom configuration you have to copy and rename
-/conf/config.sh.dist in /conf/config.sh and configure it
+first of all, if you need some custom configuration you have to copy
+/conf/dist/config.sh in /conf/config.sh and configure it
 
 * for a "clean" compilation you must run all scripts in their order:
 

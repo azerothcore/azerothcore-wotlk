@@ -5,11 +5,11 @@
 #ifndef DEF_SERPENT_SHRINE_H
 #define DEF_SERPENT_SHRINE_H
 
-#include "Player.h"
-#include "SpellScript.h"
 #include "CreatureAI.h"
-#include "SpellAuraEffects.h"
 #include "GridNotifiers.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum DataTypes
 {
@@ -27,8 +27,6 @@ enum DataTypes
     DATA_ALIVE_KEEPERS                      = 22,
     DATA_BRIDGE_ACTIVATED                   = 23,
     DATA_ACTIVATE_SHIELD                    = 24,
-
-
 };
 
 enum SSNPCs
@@ -41,7 +39,7 @@ enum SSNPCs
 
     NPC_COILFANG_SHATTERER                  = 21301,
     NPC_COILFANG_PRIESTESS                  = 21220,
-    
+
     NPC_ENCHANTED_ELEMENTAL                 = 21958,
     NPC_COILFANG_ELITE                      = 22055,
     NPC_COILFANG_STRIDER                    = 22056,
@@ -68,4 +66,3 @@ enum SSSpells
 };
 
 #endif
-

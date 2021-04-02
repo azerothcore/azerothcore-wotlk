@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
-#include "WaypointManager.h"
-#include "MapManager.h"
 #include "Log.h"
+#include "MapManager.h"
+#include "WaypointManager.h"
 
 WaypointMgr::WaypointMgr()
 {
@@ -85,8 +85,7 @@ void WaypointMgr::Load()
 
         path.push_back(wp);
         ++count;
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 
     sLog->outString(">> Loaded %u waypoints in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();
@@ -133,20 +132,18 @@ void WaypointMgr::ReloadPath(uint32 id)
         wp->z = z;
         wp->orientation = o;
         wp->move_type = fields[5].GetUInt32();
-        
+
         if (wp->move_type >= WAYPOINT_MOVE_TYPE_MAX)
         {
             //TC_LOG_ERROR("sql.sql", "Waypoint %u in waypoint_data has invalid move_type, ignoring", wp->id);
             delete wp;
             continue;
         }
-        
+
         wp->delay = fields[6].GetUInt32();
         wp->event_id = fields[7].GetUInt32();
         wp->event_chance = fields[8].GetUInt8();
 
         path.push_back(wp);
-
-    }
-    while (result->NextRow());
+    } while (result->NextRow());
 }

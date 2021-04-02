@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,11 +11,11 @@ Comment: All cast related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "Chat.h"
 #include "Creature.h"
 #include "Language.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 class cast_commandscript : public CommandScript
@@ -26,7 +26,7 @@ public:
     std::vector<ChatCommand> GetCommands() const override
     {
         static std::vector<ChatCommand> castCommandTable =
-        {   
+        {
             { "back",           SEC_GAMEMASTER,  false, &HandleCastBackCommand,              "" },
             { "dist",           SEC_GAMEMASTER,  false, &HandleCastDistCommand,              "" },
             { "self",           SEC_GAMEMASTER,  false, &HandleCastSelfCommand,              "" },
@@ -70,15 +70,6 @@ public:
         if (!SpellMgr::IsSpellValid(spellInfo))
         {
             handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spellId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spellId);
-        uint32 spellDifficultyId = sSpellMgr->GetSpellDifficultyId(spellId);
-        if (handler->GetSession()->GetSecurity() < SEC_CONSOLE && (bounds.first != bounds.second || spellDifficultyId || spellInfo->HasEffect(SPELL_EFFECT_SKILL_STEP) || spellInfo->HasEffect(SPELL_EFFECT_TRADE_SKILL)))
-        {
-            handler->PSendSysMessage("Spell %u cannot be casted using a command!", spellId);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -129,15 +120,6 @@ public:
             return false;
         }
 
-        SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spellId);
-        uint32 spellDifficultyId = sSpellMgr->GetSpellDifficultyId(spellId);
-        if (handler->GetSession()->GetSecurity() < SEC_CONSOLE && (bounds.first != bounds.second || spellDifficultyId || spellInfo->HasEffect(SPELL_EFFECT_SKILL_STEP) || spellInfo->HasEffect(SPELL_EFFECT_TRADE_SKILL)))
-        {
-            handler->PSendSysMessage("Spell %u cannot be casted using a command!", spellId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
         char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
@@ -174,15 +156,6 @@ public:
         if (!SpellMgr::IsSpellValid(spellInfo))
         {
             handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spellId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spellId);
-        uint32 spellDifficultyId = sSpellMgr->GetSpellDifficultyId(spellId);
-        if (handler->GetSession()->GetSecurity() < SEC_CONSOLE && (bounds.first != bounds.second || spellDifficultyId || spellInfo->HasEffect(SPELL_EFFECT_SKILL_STEP) || spellInfo->HasEffect(SPELL_EFFECT_TRADE_SKILL)))
-        {
-            handler->PSendSysMessage("Spell %u cannot be casted using a command!", spellId);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -245,15 +218,6 @@ public:
             return false;
         }
 
-        SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spellId);
-        uint32 spellDifficultyId = sSpellMgr->GetSpellDifficultyId(spellId);
-        if (handler->GetSession()->GetSecurity() < SEC_CONSOLE && (bounds.first != bounds.second || spellDifficultyId || spellInfo->HasEffect(SPELL_EFFECT_SKILL_STEP) || spellInfo->HasEffect(SPELL_EFFECT_TRADE_SKILL)))
-        {
-            handler->PSendSysMessage("Spell %u cannot be casted using a command!", spellId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
         char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
@@ -306,15 +270,6 @@ public:
             return false;
         }
 
-        SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spellId);
-        uint32 spellDifficultyId = sSpellMgr->GetSpellDifficultyId(spellId);
-        if (handler->GetSession()->GetSecurity() < SEC_CONSOLE && (bounds.first != bounds.second || spellDifficultyId || spellInfo->HasEffect(SPELL_EFFECT_SKILL_STEP) || spellInfo->HasEffect(SPELL_EFFECT_TRADE_SKILL)))
-        {
-            handler->PSendSysMessage("Spell %u cannot be casted using a command!", spellId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
         char* triggeredStr = strtok(nullptr, " ");
         if (triggeredStr)
         {
@@ -356,15 +311,6 @@ public:
         if (!SpellMgr::IsSpellValid(spellInfo))
         {
             handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spellId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
-        SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spellId);
-        uint32 spellDifficultyId = sSpellMgr->GetSpellDifficultyId(spellId);
-        if (handler->GetSession()->GetSecurity() < SEC_CONSOLE && (bounds.first != bounds.second || spellDifficultyId || spellInfo->HasEffect(SPELL_EFFECT_SKILL_STEP) || spellInfo->HasEffect(SPELL_EFFECT_TRADE_SKILL)))
-        {
-            handler->PSendSysMessage("Spell %u cannot be casted using a command!", spellId);
             handler->SetSentErrorMessage(true);
             return false;
         }

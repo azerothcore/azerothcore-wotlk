@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,16 +11,17 @@ Comment: All npc related commands
 Category: commandscripts
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ObjectMgr.h"
 #include "Chat.h"
-#include "Transport.h"
+#include "CreatureAI.h"
 #include "CreatureGroups.h"
 #include "Language.h"
-#include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
-#include "CreatureAI.h"
-#include "Player.h"
+#include "ObjectMgr.h"
 #include "Pet.h"
+#include "Player.h"
+#include "ScriptMgr.h"
+#include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
+#include "Transport.h"
+#include <string>
 
 struct NpcFlagText
 {
@@ -68,38 +69,38 @@ struct MechanicImmune
 
 MechanicImmune const mechanicImmunes[MAX_MECHANIC] =
 {
-    { MECHANIC_NONE             , "MECHANIC_NONE"               },
-    { MECHANIC_CHARM            , "MECHANIC_CHARM"              },
-    { MECHANIC_DISORIENTED      , "MECHANIC_DISORIENTED"        },
-    { MECHANIC_DISARM           , "MECHANIC_DISARM"             },
-    { MECHANIC_DISTRACT         , "MECHANIC_DISTRACT"           },
-    { MECHANIC_FEAR             , "MECHANIC_FEAR"               },
-    { MECHANIC_GRIP             , "MECHANIC_GRIP"               },
-    { MECHANIC_ROOT             , "MECHANIC_ROOT"               },
-    { MECHANIC_SLOW_ATTACK      , "MECHANIC_SLOW_ATTACK"        },
-    { MECHANIC_SILENCE          , "MECHANIC_SILENCE"            },
-    { MECHANIC_SLEEP            , "MECHANIC_SLEEP"              },
-    { MECHANIC_SNARE            , "MECHANIC_SNARE"              },
-    { MECHANIC_STUN             , "MECHANIC_STUN"               },
-    { MECHANIC_FREEZE           , "MECHANIC_FREEZE"             },
-    { MECHANIC_KNOCKOUT         , "MECHANIC_KNOCKOUT"           },
-    { MECHANIC_BLEED            , "MECHANIC_BLEED"              },
-    { MECHANIC_BANDAGE          , "MECHANIC_BANDAGE"            },
-    { MECHANIC_POLYMORPH        , "MECHANIC_POLYMORPH"          },
-    { MECHANIC_BANISH           , "MECHANIC_BANISH"             },
-    { MECHANIC_SHIELD           , "MECHANIC_SHIELD"             },
-    { MECHANIC_SHACKLE          , "MECHANIC_SHACKLE"            },
-    { MECHANIC_MOUNT            , "MECHANIC_MOUNT"              },
-    { MECHANIC_INFECTED         , "MECHANIC_INFECTED"           },
-    { MECHANIC_TURN             , "MECHANIC_TURN"               },
-    { MECHANIC_HORROR           , "MECHANIC_HORROR"             },
-    { MECHANIC_INVULNERABILITY  , "MECHANIC_INVULNERABILITY"    },
-    { MECHANIC_INTERRUPT        , "MECHANIC_INTERRUPT"          },
-    { MECHANIC_DAZE             , "MECHANIC_DAZE"               },
-    { MECHANIC_DISCOVERY        , "MECHANIC_DISCOVERY"          },
-    { MECHANIC_IMMUNE_SHIELD    , "MECHANIC_IMMUNE_SHIELD"      },
-    { MECHANIC_SAPPED           , "MECHANIC_SAPPED"             },
-    { MECHANIC_ENRAGED          , "MECHANIC_ENRAGED"            },
+    { MECHANIC_NONE, "MECHANIC_NONE"               },
+    { MECHANIC_CHARM, "MECHANIC_CHARM"              },
+    { MECHANIC_DISORIENTED, "MECHANIC_DISORIENTED"        },
+    { MECHANIC_DISARM, "MECHANIC_DISARM"             },
+    { MECHANIC_DISTRACT, "MECHANIC_DISTRACT"           },
+    { MECHANIC_FEAR, "MECHANIC_FEAR"               },
+    { MECHANIC_GRIP, "MECHANIC_GRIP"               },
+    { MECHANIC_ROOT, "MECHANIC_ROOT"               },
+    { MECHANIC_SLOW_ATTACK, "MECHANIC_SLOW_ATTACK"        },
+    { MECHANIC_SILENCE, "MECHANIC_SILENCE"            },
+    { MECHANIC_SLEEP, "MECHANIC_SLEEP"              },
+    { MECHANIC_SNARE, "MECHANIC_SNARE"              },
+    { MECHANIC_STUN, "MECHANIC_STUN"               },
+    { MECHANIC_FREEZE, "MECHANIC_FREEZE"             },
+    { MECHANIC_KNOCKOUT, "MECHANIC_KNOCKOUT"           },
+    { MECHANIC_BLEED, "MECHANIC_BLEED"              },
+    { MECHANIC_BANDAGE, "MECHANIC_BANDAGE"            },
+    { MECHANIC_POLYMORPH, "MECHANIC_POLYMORPH"          },
+    { MECHANIC_BANISH, "MECHANIC_BANISH"             },
+    { MECHANIC_SHIELD, "MECHANIC_SHIELD"             },
+    { MECHANIC_SHACKLE, "MECHANIC_SHACKLE"            },
+    { MECHANIC_MOUNT, "MECHANIC_MOUNT"              },
+    { MECHANIC_INFECTED, "MECHANIC_INFECTED"           },
+    { MECHANIC_TURN, "MECHANIC_TURN"               },
+    { MECHANIC_HORROR, "MECHANIC_HORROR"             },
+    { MECHANIC_INVULNERABILITY, "MECHANIC_INVULNERABILITY"    },
+    { MECHANIC_INTERRUPT, "MECHANIC_INTERRUPT"          },
+    { MECHANIC_DAZE, "MECHANIC_DAZE"               },
+    { MECHANIC_DISCOVERY, "MECHANIC_DISCOVERY"          },
+    { MECHANIC_IMMUNE_SHIELD, "MECHANIC_IMMUNE_SHIELD"      },
+    { MECHANIC_SAPPED, "MECHANIC_SAPPED"             },
+    { MECHANIC_ENRAGED, "MECHANIC_ENRAGED"            },
 };
 
 class npc_commandscript : public CommandScript
@@ -162,14 +163,14 @@ public:
             { "info",           SEC_MODERATOR,      false, &HandleNpcInfoCommand,              "" },
             { "near",           SEC_GAMEMASTER,     false, &HandleNpcNearCommand,              "" },
             { "move",           SEC_ADMINISTRATOR,  false, &HandleNpcMoveCommand,              "" },
-            { "playemote",      SEC_ADMINISTRATOR,  false, &HandleNpcPlayEmoteCommand,         "" },
+            { "playemote",      SEC_GAMEMASTER,  false, &HandleNpcPlayEmoteCommand,         "" },
             { "say",            SEC_GAMEMASTER,     false, &HandleNpcSayCommand,               "" },
             { "textemote",      SEC_GAMEMASTER,     false, &HandleNpcTextEmoteCommand,         "" },
             { "whisper",        SEC_GAMEMASTER,     false, &HandleNpcWhisperCommand,           "" },
             { "yell",           SEC_GAMEMASTER,     false, &HandleNpcYellCommand,              "" },
             { "tame",           SEC_GAMEMASTER,     false, &HandleNpcTameCommand,              "" },
-            { "add",            SEC_GAMEMASTER,     false, nullptr,                            "", npcAddCommandTable },
-            { "delete",         SEC_GAMEMASTER,     false, nullptr,                            "", npcDeleteCommandTable },
+            { "add",            SEC_ADMINISTRATOR,     false, nullptr,                         "", npcAddCommandTable },
+            { "delete",         SEC_ADMINISTRATOR,     false, nullptr,                         "", npcDeleteCommandTable },
             { "follow",         SEC_GAMEMASTER,     false, nullptr,                            "", npcFollowCommandTable },
             { "set",            SEC_ADMINISTRATOR,  false, nullptr,                            "", npcSetCommandTable }
         };
@@ -295,7 +296,8 @@ public:
             return false;
         }
 
-        uint32 vendor_entry = vendor->GetEntry();
+        char* addMulti = strtok(nullptr, " ");
+        uint32 vendor_entry = addMulti ? handler->GetSession()->GetCurrentVendor() : vendor->GetEntry();
 
         if (!sObjectMgr->IsVendorItemValid(vendor_entry, itemId, maxcount, incrtime, extendedcost, handler->GetSession()->GetPlayer()))
         {
@@ -441,15 +443,15 @@ public:
         {
             if (((Pet*)creature)->getPetType() == HUNTER_PET)
             {
-                creature->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr->GetXPForLevel(lvl)/4);
+                creature->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr->GetXPForLevel(lvl) / 4);
                 creature->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             }
             ((Pet*)creature)->GivePetLevel(lvl);
         }
         else
         {
-            creature->SetMaxHealth(100 + 30*lvl);
-            creature->SetHealth(100 + 30*lvl);
+            creature->SetMaxHealth(100 + 30 * lvl);
+            creature->SetHealth(100 + 30 * lvl);
             creature->SetLevel(lvl);
             creature->SaveToDB();
         }
@@ -518,7 +520,8 @@ public:
         }
         uint32 itemId = atol(pitem);
 
-        if (!sObjectMgr->RemoveVendorItem(vendor->GetEntry(), itemId))
+        char* addMulti = strtok(nullptr, " ");
+        if (!sObjectMgr->RemoveVendorItem(addMulti ? handler->GetSession()->GetCurrentVendor() : vendor->GetEntry(), itemId))
         {
             handler->PSendSysMessage(LANG_ITEM_NOT_IN_LIST, itemId);
             handler->SetSentErrorMessage(true);
@@ -720,7 +723,7 @@ public:
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 Entry = target->GetEntry();
 
-        int64 curRespawnDelay = target->GetRespawnTimeEx()-time(nullptr);
+        int64 curRespawnDelay = target->GetRespawnTimeEx() - time(nullptr);
         if (curRespawnDelay < 0)
             curRespawnDelay = 0;
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);
@@ -789,8 +792,7 @@ public:
                 handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, guid, creatureTemplate->Name.c_str(), x, y, z, mapId);
 
                 ++count;
-            }
-            while (result->NextRow());
+            } while (result->NextRow());
         }
 
         handler->PSendSysMessage(LANG_COMMAND_NEAR_NPC_MESSAGE, distance, count);
@@ -917,6 +919,13 @@ public:
         if (!creature || creature->IsPet())
         {
             handler->SendSysMessage(LANG_SELECT_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_FACTION_INVPARAM, std::to_string(displayId).c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -1120,7 +1129,7 @@ public:
         }
 
         MovementGeneratorType mtype = IDLE_MOTION_TYPE;
-        if (option >0.0f)
+        if (option > 0.0f)
             mtype = RANDOM_MOTION_TYPE;
 
         Creature* creature = handler->getSelectedCreature();
@@ -1212,9 +1221,15 @@ public:
         char lastchar = args[strlen(args) - 1];
         switch (lastchar)
         {
-        case '?':   creature->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);      break;
-        case '!':   creature->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);   break;
-        default:    creature->HandleEmoteCommand(EMOTE_ONESHOT_TALK);          break;
+            case '?':
+                creature->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+                break;
+            case '!':
+                creature->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                break;
+            default:
+                creature->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                break;
         }
 
         return true;
@@ -1384,7 +1399,7 @@ public:
         // place pet before player
         float x, y, z;
         player->GetClosePoint (x, y, z, creatureTarget->GetObjectSize(), CONTACT_DISTANCE);
-        pet->Relocate(x, y, z, M_PI-player->GetOrientation());
+        pet->Relocate(x, y, z, M_PI - player->GetOrientation());
 
         // set pet to defensive mode by default (some classes can't control controlled pets in fact).
         pet->SetReactState(REACT_DEFENSIVE);
@@ -1440,7 +1455,7 @@ public:
 
         group_member                 = new FormationInfo;
         group_member->follow_angle   = (creature->GetAngle(chr) - chr->GetOrientation()) * 180 / M_PI;
-        group_member->follow_dist    = sqrtf(pow(chr->GetPositionX() - creature->GetPositionX(), int(2))+pow(chr->GetPositionY() - creature->GetPositionY(), int(2)));
+        group_member->follow_dist    = sqrtf(pow(chr->GetPositionX() - creature->GetPositionX(), int(2)) + pow(chr->GetPositionY() - creature->GetPositionY(), int(2)));
         group_member->leaderGUID     = leaderGUID;
         group_member->groupAI        = 0;
 
