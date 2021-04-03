@@ -153,10 +153,17 @@ public:
         {
         }
 
+        // Disabled events
+        void MoveInLineOfSight(Unit* /*who*/) override {}
+
         void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
+            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+            me->SetDisableGravity(true);
+            me->SetHover(true);
+            me->GetMotionMaster()->MovePoint(POINT_INITIAL, JedogaPosition[0], false);
 
             _Reset();
             events.SetPhase(PHASE_NORMAL);
@@ -200,14 +207,8 @@ public:
             ritualTriggered = false;
             volunteerWork = true;
             combatSummonsSummoned = false;
-
-            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-            me->SetDisableGravity(true);
-            me->SetHover(true);
-            me->GetMotionMaster()->MovePoint(POINT_INITIAL, JedogaPosition[0], false);
         }
 
-        // Disabled events
         void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_JEDOGA_CONTROLLER)
@@ -215,8 +216,6 @@ public:
                 summons.Summon(summon);
             }
         }
-
-        void MoveInLineOfSight(Unit* /*who*/) override {}
 
         void SummonedCreatureDies(Creature* summon, Unit* killer) override
         {
@@ -633,6 +632,7 @@ public:
                 {
                     jedoga->AI()->Talk(SAY_SACRIFICE_2);
                     jedoga->CastSpell(nullptr, SPELL_SACRIFICE_BEAM);
+
                     if (Creature* ritualTrigger = jedoga->SummonCreature(NPC_JEDOGA_CONTROLLER, JedogaPosition[2], TEMPSUMMON_TIMED_DESPAWN, 5000))
                     {
                         ritualTrigger->CastSpell(ritualTrigger, SPELL_SACRIFICE_VISUAL);
