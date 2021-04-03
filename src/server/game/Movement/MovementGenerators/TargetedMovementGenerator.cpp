@@ -334,8 +334,6 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     target->GetNearPoint(owner, x, y, z, _range, 0.f, target->ToAbsoluteAngle(tAngle));
 
-    Movement::MoveSplineInit init(owner);
-
     bool success = i_path->CalculatePath(x, y, z, forceDest);
     if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
     {
@@ -349,6 +347,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     i_recalculateTravel = false;
 
+    Movement::MoveSplineInit init(owner);
     init.MovebyPath(i_path->GetPath());
     init.SetFacing(target->GetOrientation());
     init.SetWalk(target->IsWalking());
