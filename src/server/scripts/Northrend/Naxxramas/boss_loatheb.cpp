@@ -154,14 +154,7 @@ public:
                 case EVENT_INEVITABLE_DOOM:
                     me->CastSpell(me, RAID_MODE(SPELL_INEVITABLE_DOOM_10, SPELL_INEVITABLE_DOOM_25), false);
                     doomCounter++;
-                    if (doomCounter < 6)
-                    {
-                        events.RepeatEvent(30000);
-                    }
-                    else
-                    {
-                        events.RepeatEvent(15000);
-                    }
+                    events.RepeatEvent(doomCounter < 6 ? 30000 : 15000);
                     break;
                 case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);

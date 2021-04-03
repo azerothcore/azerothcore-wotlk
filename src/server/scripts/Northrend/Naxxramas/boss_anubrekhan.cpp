@@ -8,16 +8,16 @@
 
 enum Says
 {
-    SAY_AGGRO           = 0,
-    SAY_GREET           = 1,
-    SAY_SLAY            = 2,
-    EMOTE_LOCUST        = 3
+    SAY_AGGRO                       = 0,
+    SAY_GREET                       = 1,
+    SAY_SLAY                        = 2,
+    EMOTE_LOCUST                    = 3
 };
 
 enum GuardSays
 {
-    EMOTE_SPAWN         = 1,
-    EMOTE_SCARAB        = 2
+    EMOTE_SPAWN                     = 1,
+    EMOTE_SCARAB                    = 2
 };
 
 enum Spells
@@ -183,7 +183,7 @@ public:
         {
             if (!me->IsInCombat() && sayGreet)
             {
-                for( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
+                for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 {
                     if (pInstance)
                     {
