@@ -106,27 +106,27 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21178;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21178);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(21178, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 38010, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Varedis - On Aggro - Cast \'38010\' (No Repeat)'), CURSE
-(21178, 0, 1, 0, 0, 0, 100, 0, 5000, 15000, 25000, 35000, 11, 39262, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Varedis - In Combat - Cast \'39262\''), MANA
-(21178, 0, 2, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 37683, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Varedis - Between 20-80% Health - Cast \'37683\' (No Repeat)'), DODGE
-(21178, 0, 3, 0, 0, 0, 100, 0, 25000, 35000, 55000, 75000, 11, 38608, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Varedis - In Combat - Cast \'38608\''), FLAME
-(21178, 0, 4, 0, 2, 0, 100, 1, 45, 50, 0, 0, 11, 36298, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Varedis - Between 45-50% Health - Cast \'36298\' (No Repeat)'); MORPH
+(21178, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 38010, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Varedis - On Aggro - Cast \'38010\' (No Repeat)'), 
+(21178, 0, 1, 0, 0, 0, 100, 0, 5000, 15000, 25000, 35000, 11, 39262, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Varedis - In Combat - Cast \'39262\''), 
+(21178, 0, 2, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 37683, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Varedis - Between 20-80% Health - Cast \'37683\' (No Repeat)'), 
+(21178, 0, 3, 0, 0, 0, 100, 0, 25000, 35000, 55000, 75000, 11, 38608, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Varedis - In Combat - Cast \'38608\''),
+(21178, 0, 4, 0, 2, 0, 100, 1, 45, 50, 0, 0, 11, 36298, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Varedis - Between 45-50% Health - Cast \'36298\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21171;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21171);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(21171, 0, 0, 0, 0, 0, 100, 0, 5000, 15000, 25000, 35000, 11, 39262, 32, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Alandien - In Combat - Cast \'39262\''), MANA
-(21171, 0, 1, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 37683, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Alandien - Between 20-80% Health - Cast \'37683\' (No Repeat)'), DODGE
-(21171, 0, 2, 0, 2, 0, 100, 1, 45, 50, 0, 0, 11, 36298, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Alandien - Between 45-50% Health - Cast \'36298\' (No Repeat)'), MORPH
-(21171, 0, 3, 0, 0, 0, 100, 0, 25000, 35000, 55000, 75000, 11, 39082, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Alandien - In Combat - Cast \'39082\''); FURY
+(21171, 0, 0, 0, 0, 0, 100, 0, 5000, 15000, 25000, 35000, 11, 39262, 32, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Alandien - In Combat - Cast \'39262\''),
+(21171, 0, 1, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 37683, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Alandien - Between 20-80% Health - Cast \'37683\' (No Repeat)'), 
+(21171, 0, 2, 0, 2, 0, 100, 1, 45, 50, 0, 0, 11, 36298, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Alandien - Between 45-50% Health - Cast \'36298\' (No Repeat)'),
+(21171, 0, 3, 0, 0, 0, 100, 0, 25000, 35000, 55000, 75000, 11, 39082, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Alandien - In Combat - Cast \'39082\''); 
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21164;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21164);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(21164, 0, 0, 0, 0, 0, 100, 0, 5000, 15000, 25000, 35000, 11, 39262, 32, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Netharel - In Combat - Cast \'39262\''), MANA
-(21164, 0, 1, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 37683, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Netharel - Between 20-80% Health - Cast \'37683\' (No Repeat)'), DODGE
-(21164, 0, 2, 0, 0, 0, 100, 0, 10000, 20000, 30000, 40000, 11, 39135, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Netharel - In Combat - Cast \'39135\''), STRIKE
-(21164, 0, 3, 0, 2, 0, 100, 1, 45, 50, 0, 0, 11, 36298, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Netharel - Between 45-50% Health - Cast \'36298\' (No Repeat)'); MORPH
+(21164, 0, 0, 0, 0, 0, 100, 0, 5000, 15000, 25000, 35000, 11, 39262, 32, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Netharel - In Combat - Cast \'39262\''), 
+(21164, 0, 1, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 37683, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Netharel - Between 20-80% Health - Cast \'37683\' (No Repeat)'),
+(21164, 0, 2, 0, 0, 0, 100, 0, 10000, 20000, 30000, 40000, 11, 39135, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Netharel - In Combat - Cast \'39135\'')
+(21164, 0, 3, 0, 2, 0, 100, 1, 45, 50, 0, 0, 11, 36298, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Netharel - Between 45-50% Health - Cast \'36298\' (No Repeat)'); 
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21168;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21168);
