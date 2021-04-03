@@ -216,18 +216,6 @@ public:
         void InitializeAI() override
         {
             BossAI::InitializeAI();
-            if (instance->GetData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetData(DATA_TELDRAM_SPHERE2) == DONE)
-            {
-                DoAction(ACTION_REMOVE_PRISON_AT_RESET);
-            }
-        }
-
-        void Reset() override
-        {
-            _Reset();
-
-            vanishDamage = 0;
-            vanishTarget_GUID = 0;
 
             // Event not started
             if (instance->GetData(DATA_TELDRAM_SPHERE1) != DONE || instance->GetData(DATA_TELDRAM_SPHERE2) != DONE)
@@ -241,7 +229,21 @@ public:
                 }
 
                 me->SummonCreatureGroup(SUMMON_GROUP_TRIGGERS);
+                return;
             }
+
+            if (instance->GetData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetData(DATA_TELDRAM_SPHERE2) == DONE)
+            {
+                DoAction(ACTION_REMOVE_PRISON_AT_RESET);
+            }
+        }
+
+        void Reset() override
+        {
+            _Reset();
+
+            vanishDamage = 0;
+            vanishTarget_GUID = 0;
         }
 
         void DoAction(int32 action) override
