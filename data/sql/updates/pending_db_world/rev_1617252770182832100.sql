@@ -190,5 +190,6 @@ UPDATE creature_template SET skinloot=80007 WHERE entry=31470;
 
 -- Amanitar immunities
 UPDATE creature_template SET
-    mechanic_immune_mask=1|2|4|8|16|32|64|256|512|1024|2048|4096|8192|65536|131072|8388608|33554432|67108864|536870912
+    mechanic_immune_mask=1|2|4|8|16|32|64|256|512|1024|2048|4096|8192|65536|131072|8388608|33554432|67108864|536870912,
+    skinloot=80007
 WHERE entry IN (30258, 31463);
