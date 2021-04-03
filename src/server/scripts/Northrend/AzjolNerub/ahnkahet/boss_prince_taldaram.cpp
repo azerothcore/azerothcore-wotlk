@@ -429,7 +429,7 @@ public:
                             }
                         }
 
-                        //He only vanishes if there are 3 or more alive players
+                        // He only vanishes if there are 3 or more alive players
                         if (count > 2)
                         {
                             Talk(SAY_VANISH);
