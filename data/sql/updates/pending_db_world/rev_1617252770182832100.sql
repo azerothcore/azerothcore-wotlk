@@ -180,3 +180,7 @@ INSERT INTO `creature_text` (`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language
 
 -- Increase Jedoga prieching text range to map wide
 UPDATE creature_text SET `TextRange`=3 WHERE `CreatureID`=29310 AND `GroupID`=5;
+
+-- Taldaram Spheres
+-- PS: not sure if "31458" entry actually should be used
+update creature_template SET modelid2 = 0, flags_extra=flags_extra|128 WHERE entry IN (30106, 31686, 31687, 31458);
