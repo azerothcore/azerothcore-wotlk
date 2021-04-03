@@ -29,7 +29,7 @@ enum Spells
 
 #define SPELL_EMBRACE_OF_THE_VAMPYR         DUNGEON_MODE(55959, 59513)
 
-enum Creatures
+enum Spheres
 {
     NPC_FLAME_SPHERE_1                      = 30106,
     NPC_FLAME_SPHERE_2                      = 31686,
@@ -85,20 +85,15 @@ class npc_taldaram_flamesphere : public CreatureScript
 public:
     npc_taldaram_flamesphere() : CreatureScript("npc_taldaram_flamesphere") { }
 
-    struct npc_taldaram_flamesphereAI : public ScriptedAI
+    struct npc_taldaram_flamesphereAI : public NullCreatureAI
     {
-        npc_taldaram_flamesphereAI(Creature *pCreature) : ScriptedAI(pCreature),
+        npc_taldaram_flamesphereAI(Creature *pCreature) : NullCreatureAI(pCreature),
             instance(pCreature->GetInstanceScript()),
             uiDespawnTimer(13000),
             moveTimer(0)
         {
             pCreature->SetReactState(REACT_PASSIVE);
         }
-
-        // Disabled events
-        void EnterCombat(Unit * /*who*/) override {}
-        void MoveInLineOfSight(Unit * /*who*/) override {}
-        void EnterEvadeMode() override {}
 
         void DoAction(int32 action) override
         {
@@ -189,6 +184,7 @@ public:
         {
             victimPos.Relocate(pos);
         }
+
     private:
         Position victimPos;
         InstanceScript* instance;
@@ -346,6 +342,7 @@ public:
 
         void JustSummoned(Creature* summon) override
         {
+            summons.Summon(summon);
             switch (summon->GetEntry())
             {
                 case NPC_FLAME_SPHERE_1:
@@ -365,7 +362,6 @@ public:
                     break;
                 }
             }
-            summons.Summon(summon);
         }
 
         void UpdateAI(uint32 diff) override
@@ -399,7 +395,17 @@ public:
                             DoCast(victim, SPELL_CONJURE_FLAME_SPHERE);
                             victimSperePos = *victim;
                         }
-                        events.RescheduleEvent(EVENT_PRINCE_VANISH, 14000);
+
+                        if (!events.GetNextEventTime(EVENT_PRINCE_VANISH))
+                        {
+                            events.RescheduleEvent(EVENT_PRINCE_VANISH, 14000);
+                        }
+                        else
+                        {
+                            // Make sure that Vanish won't get triggered at same time as sphere summon
+                            events.DelayEvents(4000);
+                        }
+
                         events.RepeatEvent(15000);
                         break;
                     }
