@@ -32,7 +32,7 @@ ACE_MEM_Connector::ACE_MEM_Connector (void)
 // Establish a connection.
 ACE_MEM_Connector::ACE_MEM_Connector (ACE_MEM_Stream &new_stream,
                                       const ACE_INET_Addr &remote_sap,
-                                      ACE_Time_Value *timeout,
+                                      const ACE_Time_Value *timeout,
                                       const ACE_Addr &local_sap,
                                       int reuse_addr,
                                       int flags,
@@ -55,7 +55,7 @@ ACE_MEM_Connector::ACE_MEM_Connector (ACE_MEM_Stream &new_stream,
 int
 ACE_MEM_Connector::connect (ACE_MEM_Stream &new_stream,
                             const ACE_INET_Addr &remote_sap,
-                            ACE_Time_Value *timeout,
+                            const ACE_Time_Value *timeout,
                             const ACE_Addr &local_sap,
                             int reuse_addr,
                             int flags,

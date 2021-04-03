@@ -21,7 +21,7 @@ public:
     ModelHeader Header;
     std::vector<Vector3> Vertices;
     std::vector<Vector3> Normals;
-    std::vector<Triangle<uint16> > Triangles;
+    std::vector<Triangle<uint16>> Triangles;
     bool IsCollidable;
     FILE* Stream;
     bool IsBad;

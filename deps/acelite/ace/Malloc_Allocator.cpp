@@ -68,10 +68,8 @@ ACE_Allocator::instance (ACE_Allocator *r)
                             *ACE_Static_Object_Lock::instance (), 0));
   ACE_Allocator *t = ACE_Allocator::allocator_;
 
-  // We can't safely delete it since we don't know who created it!
-  ACE_Allocator::delete_allocator_ = 0;
-
   ACE_Allocator::allocator_ = r;
+
   return t;
 }
 
@@ -79,18 +77,6 @@ void
 ACE_Allocator::close_singleton (void)
 {
   ACE_TRACE ("ACE_Allocator::close_singleton");
-
-  ACE_MT (ACE_GUARD (ACE_Recursive_Thread_Mutex, ace_mon,
-                     *ACE_Static_Object_Lock::instance ()));
-
-  if (ACE_Allocator::delete_allocator_)
-    {
-      // This should never be executed....  See the
-      // ACE_Allocator::instance (void) method for an explanation.
-      delete ACE_Allocator::allocator_;
-      ACE_Allocator::allocator_ = 0;
-      ACE_Allocator::delete_allocator_ = 0;
-    }
 }
 
 ACE_Allocator::~ACE_Allocator (void)
@@ -109,7 +95,6 @@ void *
 ACE_New_Allocator::malloc (size_t nbytes)
 {
   char *ptr = 0;
-
   if (nbytes > 0)
     ACE_NEW_RETURN (ptr, char[nbytes], 0);
   return (void *) ptr;
@@ -136,7 +121,11 @@ ACE_New_Allocator::calloc (size_t n_elem, size_t elem_size, char initial_value)
 void
 ACE_New_Allocator::free (void *ptr)
 {
+#ifdef ACE_FACE_SAFETY_BASE
+  ACE_UNUSED_ARG (ptr);
+#else
   delete [] (char *) ptr;
+#endif
 }
 
 int

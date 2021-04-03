@@ -5,10 +5,10 @@
 #ifndef DEF_ULDUAR_H
 #define DEF_ULDUAR_H
 
+#include "CellImpl.h"
 #include "Chat.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CellImpl.h"
 
 enum UlduarEncounters
 {
@@ -29,6 +29,9 @@ enum UlduarEncounters
     TYPE_YOGGSARON                          = 12,
     TYPE_ALGALON                            = 13,
     TYPE_WATCHERS                           = 14,
+    TYPE_SPAWN_HODIR_CACHE                  = 15,
+    TYPE_HODIR_HM_FAIL                      = 16,
+    TYPE_WINTER_CACHE                       = 17,
 };
 
 enum UlduarData
@@ -79,6 +82,11 @@ enum UlduarData
 
     // Tram
     DATA_CALL_TRAM                          = 710,
+
+    // Mage Barrier
+    DATA_MAGE_BARRIER                       = 800,
+    DATA_BRANN_MEMOTESAY                    = 801,
+    DATA_BRANN_EASY_MODE                    = 802,
 };
 
 enum UlduarNPCs
@@ -132,8 +140,8 @@ enum UlduarNPCs
     NPC_VEHICLE_CHOPPER                     = 33062,
     NPC_SALVAGED_DEMOLISHER                 = 33109,
     NPC_SALVAGED_DEMOLISHER_TURRET          = 33167,
+    NPC_BRANN_BASE_CAMP                     = 33579,
 
-    
     // Algalon the Observer
     NPC_BRANN_BRONZBEARD_ALG                = 34064,
     NPC_AZEROTH                             = 34246,
@@ -199,6 +207,7 @@ enum UlduarGameObjects
     GO_MIMIRON_DOOR_3                       = 194775,
     GO_HODIR_FROZEN_DOOR                    = 194441,
     GO_HODIR_DOOR                           = 194634,
+    GO_HODIR_FRONTDOOR                      = 194442,
     GO_VEZAX_DOOR                           = 194750,
 
     GO_SNOW_MOUND                           = 194907,
@@ -244,7 +253,6 @@ enum UlduarMisc
     ACTION_TOWER_OF_FROST_DESTROYED         = 2,
     ACTION_TOWER_OF_FLAMES_DESTROYED        = 3,
     ACTION_TOWER_OF_LIFE_DESTROYED          = 4,
-
 
     // Algalon the Observer
     WORLD_STATE_ALGALON_DESPAWN_TIMER       = 4131,

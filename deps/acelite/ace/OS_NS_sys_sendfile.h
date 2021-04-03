@@ -32,7 +32,7 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 namespace ACE_OS
 {
-  /// Finds the length of a string (char version).
+  /// Wrapper for sendfile to transfer data between file descriptor
   ACE_NAMESPACE_INLINE_FUNCTION
   ssize_t sendfile (ACE_HANDLE out_fd,
                     ACE_HANDLE in_fd,

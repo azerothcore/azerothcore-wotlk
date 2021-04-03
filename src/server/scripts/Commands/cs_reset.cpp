@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,8 +15,8 @@ EndScriptData */
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
-#include "Player.h"
 #include "Pet.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 
 class reset_commandscript : public CommandScript
@@ -28,7 +28,7 @@ public:
     {
         static std::vector<ChatCommand> resetCommandTable =
         {
-            { "achievements",   SEC_ADMINISTRATOR,  true,  &HandleResetAchievementsCommand,     "" },
+            { "achievements",   SEC_CONSOLE,        true,  &HandleResetAchievementsCommand,     "" },
             { "honor",          SEC_ADMINISTRATOR,  true,  &HandleResetHonorCommand,            "" },
             { "level",          SEC_ADMINISTRATOR,  true,  &HandleResetLevelCommand,            "" },
             { "spells",         SEC_ADMINISTRATOR,  true,  &HandleResetSpellsCommand,           "" },
@@ -119,8 +119,8 @@ public:
 
         // set starting level
         uint32 startLevel = target->getClass() != CLASS_DEATH_KNIGHT
-            ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
-            : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
+                            ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
+                            : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
 
         target->_ApplyAllLevelScaleItemMods(false);
         target->SetLevel(startLevel);
@@ -271,7 +271,7 @@ public:
             atLogin = AtLoginFlags(AT_LOGIN_RESET_TALENTS | AT_LOGIN_RESET_PET_TALENTS);
             sWorld->SendWorldText(LANG_RESETALL_TALENTS);
             if (!handler->GetSession())
-               handler->SendSysMessage(LANG_RESETALL_TALENTS);
+                handler->SendSysMessage(LANG_RESETALL_TALENTS);
         }
         else
         {

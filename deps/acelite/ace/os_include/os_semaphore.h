@@ -50,6 +50,11 @@ extern "C"
      /// POSIX semaphore, else its an unnamed POSIX semaphore).
      char *name_;
 
+     /// Do not unlink the named semaphore.  This lets the logical entity
+     /// of the semaphore outlive any one process that opens it.  The semaphore
+     /// must be manually unlinked with ACE_OS::sema_unlink().
+     bool avoid_unlink_;
+
 #  if defined (ACE_LACKS_NAMED_POSIX_SEM)
      /// this->sema_ doesn't always get created dynamically if a platform
      /// doesn't support named posix semaphores.  We use this flag to

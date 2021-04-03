@@ -3,7 +3,8 @@ var/*
 data/contrib/*
 data/doc/*
 conf/*
-!conf/*.dist
+!conf/dist
 docker/worldserver/data/*
+docker/build/cache
 .idea
 cmake-build-debug/*

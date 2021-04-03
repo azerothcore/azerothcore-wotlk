@@ -27,6 +27,8 @@
 #    CHARACTER DELETE OPTIONS
 #    ITEM DELETE OPTIONS
 #    CUSTOM SERVER OPTIONS
+#    PACKET SPOOF PROTECTION SETTINGS
+#    DEBUG
 #
 ###################################################################################################
 
@@ -69,6 +71,7 @@ DataDir = "."
 #        Description: Logs directory setting.
 #        Important:   LogsDir needs to be quoted, as the string might contain space characters.
 #                     Logs directory must exists, or log file creation will be disabled.
+#        Example:     "/home/youruser/azeroth-server/logs"
 #        Default:     "" - (Log files will be stored in the current path)
 
 LogsDir = ""
@@ -84,9 +87,9 @@ LogsDir = ""
 #                                                                 section my.ini)
 #                     ".;/path/to/unix_socket;username;password;database" - (use Unix sockets on
 #                                                                           Unix/Linux)
-#        Default:     "127.0.0.1;3306;acore;acore;auth"       - (LoginDatabaseInfo)
-#                     "127.0.0.1;3306;acore;acore;world"      - (WorldDatabaseInfo)
-#                     "127.0.0.1;3306;acore;acore;characters" - (CharacterDatabaseInfo)
+#        Default:     "127.0.0.1;3306;acore;acore;acore_auth"       - (LoginDatabaseInfo)
+#                     "127.0.0.1;3306;acore;acore;acore_world"      - (WorldDatabaseInfo)
+#                     "127.0.0.1;3306;acore;acore;acore_characters" - (CharacterDatabaseInfo)
 
 LoginDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_auth"
 WorldDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_world"
@@ -181,11 +184,11 @@ Compression = 1
 #        Description: Maximum number of players in the world. Excluding Mods, GMs and Admins.
 #          Important: If you want to block players and only allow Mods, GMs or Admins to join the
 #                     server, use the DB field "auth.realmlist.allowedSecurityLevel".
-#            Default: 100 - (Enabled)
-#                     1+  - (Enabled)
-#                     0   - (Disabled, No limit)
+#            Default: 1000 - (Enabled)
+#                     1+   - (Enabled)
+#                     0    - (Disabled, No limit)
 
-PlayerLimit = 100
+PlayerLimit = 1000
 
 #
 #    SaveRespawnTimeImmediately
@@ -285,7 +288,6 @@ PlayerSave.Stats.SaveOnlyOnLogout = 1
 
 vmap.enableLOS    = 1
 vmap.enableHeight = 1
-
 
 #
 #    vmap.petLOS
@@ -404,7 +406,7 @@ CleanCharacterDB = 0
 #                     Before use this feature, make a backup of your database.
 #
 #        Example:     14 - (CLEANING_FLAG_SKILLS + CLEANING_FLAG_SPELLS + CLEANING_FLAG_TALENTS
-#                           2+4+8 => 14. This will clean up skills, talents and spells will 
+#                           2+4+8 => 14. This will clean up skills, talents and spells will
 #                           remain enabled after the next cleanup)
 #        Default:     0  - (All cleanup methods will be disabled after the next cleanup)
 
@@ -651,7 +653,7 @@ SQLDeveloperLogFile = ""
 #
 #    SQLDriverLogFile
 #        Description: Log file for SQL driver events.
-#        Example:     "SQLDriver.log" - (Enabled)
+#        Example:     "WorldSQLDriver.log" - (Enabled)
 #        Default:      ""             - (Disabled)
 
 SQLDriverLogFile = ""
@@ -745,7 +747,6 @@ LogDB.World = 0
 
 LogDB.Chat = 0
 
-
 #    ChatLogFile
 #        Description: Log file for chat logs.
 #        Default:     "Chat.log" - (Enabled)
@@ -791,7 +792,6 @@ ChatLogs.SysChan = 0
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-
 ChatLogs.Party = 0
 
 #
@@ -799,7 +799,6 @@ ChatLogs.Party = 0
 #        Description: Log raid chat.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
-
 
 ChatLogs.Raid = 0
 
@@ -820,6 +819,7 @@ ChatLogs.Guild = 0
 ChatLogs.Public = 0
 
 #
+#    WARNING: enabling this might cause issues to your addon channel
 #    ChatLogs.Addon
 #        Description: Log addon messages.
 #        Default:     0 - (Disabled)
@@ -987,6 +987,22 @@ MinCharterName = 2
 #        Default:     2
 
 MinPetName = 2
+
+#
+#    Guild.CharterCost
+#    ArenaTeam.CharterCost.2v2
+#    ArenaTeam.CharterCost.3v3
+#    ArenaTeam.CharterCost.5v5
+#        Description: Amount of money (in Copper) the petitions costs.
+#        Default:     1000 - (10 Silver)
+#                     800000 - (80 Gold)
+#                     1200000 - (120 Gold)
+#                     2000000 - (200 Gold)
+
+Guild.CharterCost = 1000
+ArenaTeam.CharterCost.2v2 = 800000
+ArenaTeam.CharterCost.3v3 = 1200000
+ArenaTeam.CharterCost.5v5 = 2000000
 
 #
 #    MaxWhoListReturns
@@ -1572,8 +1588,8 @@ IsPreloadedContinentTransport.Enabled = 0
 #
 #    Warden.Enabled
 #        Description: Enable Warden anti-cheat system.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
 
 Warden.Enabled = 1
 
@@ -1583,7 +1599,15 @@ Warden.Enabled = 1
 #        Default:     3 - (Enabled)
 #                     0 - (Disabled)
 
-Warden.NumMemChecks = 2
+Warden.NumMemChecks = 3
+
+#
+#    Warden.NumLuaChecks
+#        Description: Number of Warden LUA checks that are sent to the client each cycle.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Warden.NumLuaChecks = 1
 
 #
 #    Warden.NumOtherChecks
@@ -1592,7 +1616,7 @@ Warden.NumMemChecks = 2
 #        Default:     7 - (Enabled)
 #                     0 - (Disabled)
 
-Warden.NumOtherChecks = 5
+Warden.NumOtherChecks = 7
 
 #
 #    Warden.LogFile
@@ -1629,7 +1653,7 @@ Warden.ClientCheckHoldOff = 30
 #                     1 - (Kick)
 #                     2 - (Ban)
 
-Warden.ClientCheckFailAction = 2
+Warden.ClientCheckFailAction = 0
 
 #
 #    Warden.BanDuration
@@ -1927,6 +1951,29 @@ ListenRange.Yell = 300
 
 WaypointMovementStopTimeForPlayer = 120
 
+#    NpcEvadeIfTargetIsUnreachable
+#        Description: Specifies the time (in seconds) that a creature whom target
+#                     is unreachable to end up in evade mode.
+#        Default:     5
+
+NpcEvadeIfTargetIsUnreachable = 5
+
+#    NpcRegenHPIfTargetIsUnreachable
+#        Description: Regenerates HP for Creatures in Raids if they cannot reach the target.
+#                     Keep disabled if you are experiencing mmaps/pathing issues.
+#
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+NpcRegenHPIfTargetIsUnreachable = 1
+
+#    NpcRegenHPTimeIfTargetIsUnreachable
+#        Description: Specifies the time (in seconds) that a creature whom target
+#                     is unreachable in raid to end up regenerate health.
+#        Default:     10
+
+NpcRegenHPTimeIfTargetIsUnreachable = 10
+
 #
 ###################################################################################################
 
@@ -2017,6 +2064,14 @@ Channel.RestrictedLfg = 1
 #                     1 - (Enabled, Join without announcement)
 
 Channel.SilentlyGMJoin = 0
+
+#    Channel.ModerationGMLevel
+#        Min GM account security level required for executing moderator in-game commands in the channels
+#        This also bypasses password prompts on joining channels which require password
+#                 0 (in-game channel moderator privileges only)
+#        Default: 1 (enabled for moderators and above)
+
+Channel.ModerationGMLevel = 1
 
 #
 #    ChatLevelReq.Channel
@@ -2151,7 +2206,7 @@ GM.LogTrade = 1
 #        Description: GM character starting level.
 #        Default:     1
 
-GM.StartLevel = 80
+GM.StartLevel = 1
 
 #
 #    GM.AllowInvite
@@ -2307,6 +2362,14 @@ Rate.Drop.Item.Artifact         = 1
 Rate.Drop.Item.Referenced       = 1
 Rate.Drop.Money                 = 1
 
+#    RewardBonusMoney
+#        Description: Allows to further tweak the amount of extra money rewarded by quests when the player
+#                     is at MaxPlayerLevel (this amount is specified in quest_template.RewardBonusMoney).
+#                     NOTE: the final amount will also affected by Rate.Drop.Money
+#        Default:     1
+
+Rate.RewardBonusMoney = 1
+
 #
 #    Rate.SellValue.Item.Poor
 #    Rate.SellValue.Item.Normal
@@ -2374,19 +2437,22 @@ Rate.Drop.Item.ReferencedAmount = 1
 #    Rate.XP.Kill
 #    Rate.XP.Quest
 #    Rate.XP.Explore
+#    Rate.XP.Pet
 #        Description: Experience rates (outside battleground)
 #        Default:     1 - (Rate.XP.Kill)
 #                     1 - (Rate.XP.Quest)
 #                     1 - (Rate.XP.Explore)
+#                     1 - (Rate.XP.Pet)
 
 Rate.XP.Kill    = 1
 Rate.XP.Quest   = 1
 Rate.XP.Explore = 1
+Rate.XP.Pet     = 1
 
 #
 #    Rate.XP.BattlegroundKill
-#        Description: Experience rate for honorable kills in battlegrounds,
-#                     it works when Battleground.GiveXPForKills = 1
+#        Description: Experience rate for honorable kills in battlegrounds. Not affected by Rate.XP.Kill
+#                     Only works if Battleground.GiveXPForKills = 1
 #        Default:     1
 
 Rate.XP.BattlegroundKill = 1
@@ -2497,6 +2563,14 @@ Rate.MoveSpeed = 1
 #        Default:     1
 
 Rate.InstanceResetTime = 1
+
+#
+#    Rate.Pet.LevelXP
+#        Description: Modifies the amount of experience required to level up a pet.
+#       The lower the rate the less experience is required.
+#        Default:     0.05
+#
+Rate.Pet.LevelXP = 0.05
 
 #
 #    SkillGain.Crafting
@@ -2686,7 +2760,6 @@ Battleground.QueueAnnouncer.Enable = 0
 
 Battleground.QueueAnnouncer.PlayerOnly = 0
 
-
 #
 #    Battleground.PrematureFinishTimer
 #        Description: Time (in milliseconds) before battleground will end prematurely if there are
@@ -2694,16 +2767,16 @@ Battleground.QueueAnnouncer.PlayerOnly = 0
 #        Default:     300000 - (Enabled, 5 minutes)
 #                     0      - (Disabled, Not recommended)
 
-BattleGround.PrematureFinishTimer = 300000
+Battleground.PrematureFinishTimer = 300000
 
 #
-#    BattleGround.PremadeGroupWaitForMatch
+#    Battleground.PremadeGroupWaitForMatch
 #        Description: Time (in milliseconds) a pre-made group has to wait for matching group of the
 #                     other faction.
 #        Default:     1800000 - (Enabled, 30 minutes)
 #                     0       - (Disabled, Not recommended)
 
-BattleGround.PremadeGroupWaitForMatch = 1800000
+Battleground.PremadeGroupWaitForMatch = 1800000
 
 #
 #    Battleground.GiveXPForKills
@@ -2745,6 +2818,73 @@ Battleground.TrackDeserters.Enable = 1
 #                     2 - (Experimental, Try to have even teams)
 
 Battleground.InvitationType = 0
+
+#
+#    Battleground.ReportAFK.Timer
+#         Description: After a few minutes that battle started you can report the player.
+#         Default:     4
+
+Battleground.ReportAFK.Timer = 4
+
+#
+#    Battleground.ReportAFK
+#        Description: Number of reports needed to kick someone AFK from Battleground.
+#        Range:       1-9
+#        Default:     3
+
+Battleground.ReportAFK = 3
+
+#    Battleground.DisableQuestShareInBG
+#        Description: Disables the ability to share quests while in a Battleground.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.DisableQuestShareInBG = 0
+
+#
+#    Battleground.DisableReadyCheckInBG
+#        Description: Disables the ability to send a Ready Check survey while in a Battleground.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.DisableReadyCheckInBG = 0
+
+#
+#     Battleground.RewardWinnerHonorFirst
+#     Battleground.RewardWinnerArenaFirst
+#     Battleground.RewardWinnerHonorLast
+#     Battleground.RewardWinnerArenaLast
+#     Battleground.RewardLoserHonorFirst
+#     Battleground.RewardLoserHonorLast
+#        Description: Random Battlegrounds / call to the arms rewards
+#        Default:     30 - Battleground.RewardWinnerHonorFirst
+#                     25 - Battleground.RewardWinnerArenaFirst
+#                     15 - Battleground.RewardWinnerHonorLast
+#                     0  - Battleground.RewardWinnerArenaLast
+#                     5  - Battleground.RewardLoserHonorFirst
+#                     5  - Battleground.RewardLoserHonorLast
+#
+
+Battleground.RewardWinnerHonorFirst = 30
+Battleground.RewardWinnerArenaFirst = 25
+Battleground.RewardWinnerHonorLast  = 15
+Battleground.RewardWinnerArenaLast  = 0
+Battleground.RewardLoserHonorFirst  = 5
+Battleground.RewardLoserHonorLast   = 5
+
+#
+#    Battleground.PlayerRespawn
+#        Description: Battleground player resurrection interval (in seconds).
+#        Default:     30
+
+Battleground.PlayerRespawn = 30
+
+#
+#    Battleground.BuffRespawn
+#        Description: Battleground buff respawn time (in seconds).
+#        Default:     180 (Recommended 10+)
+
+Battleground.BuffRespawn = 180
 
 #
 ###################################################################################################
@@ -2841,6 +2981,13 @@ Arena.AutoDistributePoints = 0
 Arena.AutoDistributeInterval = 7
 
 #
+#    Arena.GamesRequired
+#        Description: Number of arena matches teams must participate in to be eligible for arena point distribution.
+#        Default:     10
+
+Arena.GamesRequired = 10
+
+#
 #    Arena.QueueAnnouncer.Enable
 #        Description: Announce arena queue status to chat.
 #        Default:     0 - (Disabled)
@@ -2900,7 +3047,6 @@ Arena.ArenaWinRatingModifier1 = 48
 #        Default:     24
 
 Arena.ArenaWinRatingModifier2 = 24
-
 
 #
 #    Arena.ArenaLoseRatingModifier
@@ -3111,15 +3257,13 @@ ItemDelete.ItemLevel = 80
 PlayerStart.AllReputation = 0
 
 #
-#    PlayerStart.AllSpells
-#        Description: If enabled, players will start with all their class spells (not talents).
-#                     You must populate playercreateinfo_spell_custom table with the spells you
-#                     want, or this will not work! The table has data for all classes / races up
-#                     to TBC expansion.
+#    PlayerStart.CustomSpells
+#        Description: If enabled, players will ignore spells from playercreateinfo_spellstart at character
+#                     creation and will start with spells from the table playercreateinfo_spell_custom instead.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-PlayerStart.AllSpells = 0
+PlayerStart.CustomSpells = 0
 
 #
 #    PlayerStart.MapsExplored
@@ -3189,6 +3333,14 @@ PvPToken.ItemCount = 1
 NoResetTalentsCost = 0
 
 #
+#    ToggleXP.Cost
+#        Description: Cost of locking/unlocking XP
+#        Default:     100000 - (10 Gold)
+#
+
+ToggleXP.Cost = 100000
+
+#
 #     Guild.AllowMultipleGuildMaster
 #        Description: Allow more than one guild master. Additional Guild Masters must be set using
 #                     the ".guild rank" command.
@@ -3198,6 +3350,31 @@ NoResetTalentsCost = 0
 Guild.AllowMultipleGuildMaster = 0
 
 #
+#     Guild.BankInitialTabs
+#        Description: Changes the amounts of available tabs of the guild bank on guild creation
+#        Default:     0   (no tabs given for free)
+#                     1-6 (amount of tabs of the guild bank at guild creation)
+
+Guild.BankInitialTabs = 0
+
+#
+#     Guild.BankTabCost0-5
+#        Description: Changes the price of the guild tabs. Note that the client will still show the default values.
+#        Default:     1000000  - (100 Gold)
+#                     2500000  - (250 Gold)
+#                     5000000  - (500 Gold)
+#                     10000000 - (1000 Gold)
+#                     25000000 - (2500 Gold)
+#                     50000000 - (5000 Gold)
+
+Guild.BankTabCost0 = 1000000
+Guild.BankTabCost1 = 2500000
+Guild.BankTabCost2 = 5000000
+Guild.BankTabCost3 = 10000000
+Guild.BankTabCost4 = 25000000
+Guild.BankTabCost5 = 50000000
+
+#
 #     ShowKickInWorld
 #        Description: Determines whether a message is broadcast to the entire server when a
 #                     player gets kicked
@@ -3205,6 +3382,15 @@ Guild.AllowMultipleGuildMaster = 0
 #                     1 - (Enabled)
 
 ShowKickInWorld = 0
+
+#
+#     ShowMuteInWorld
+#        Description: Determines whether a message is broadcast to the entire server when a
+#                     player gets muted.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+ShowMuteInWorld = 0
 
 #
 #     ShowBanInWorld
@@ -3220,10 +3406,11 @@ ShowBanInWorld = 0
 #        Description: Time (in milliseconds) update time diff is written to the log file.
 #                     Update diff can be used as a performance indicator. Diff < 300: good
 #                     performance. Diff > 600 bad performance, may be caused by high CPU usage.
-#        Default:     60000 - (Enabled, 1 minute)
-#                     0     - (Disabled)
+#        Default:     300000 - (Enabled, 5 minutes)
+#                     0      - (Disabled)
 
-RecordUpdateTimeDiffInterval = 60000
+RecordUpdateTimeDiffInterval = 300000
+
 #
 #     MinRecordUpdateTimeDiff
 #        Description: Only record update time diff which is greater than this value.
@@ -3311,10 +3498,10 @@ MonsterSight = 50.000000
 StrictChannelNames = 0
 
 #
-#	Instance.SharedNormalHeroicId
-#		Description: 	No description
-#		Default:		0 - Disable
-#						1 - Enable
+# Instance.SharedNormalHeroicId
+#  Description:  No description
+#  Default:  0 - Disable
+#      1 - Enable
 #
 
 Instance.SharedNormalHeroicId = 0
@@ -3330,17 +3517,17 @@ Instance.SharedNormalHeroicId = 0
 Instance.ResetTimeRelativeTimestamp = 1135814400
 
 #
-#	TeleportTimeoutNear
-#		Description: 	No description
-#		Default:		25
+# TeleportTimeoutNear
+#  Description:  No description
+#  Default:  25
 #
 
 TeleportTimeoutNear = 25
 
 #
-#	TeleportTimeoutFar
-#		Description: 	No description
-#		Default:		45
+# TeleportTimeoutFar
+#  Description:  No description
+#  Default:  45
 #
 
 TeleportTimeoutFar = 45
@@ -3423,6 +3610,45 @@ Calculate.Gameoject.Zone.Area.Data = 0
 LFG.Location.All = 0
 
 #
+#    DungeonAccessRequirements.PrintMode
+#
+#        Description: Select the preferred format to display information to the player who cannot enter a portal dungeon because when has not met the access requirements:
+#        Default:     1 - (Display only one requirement at a time (BlizzLike, like in the LFG interface))
+#                     0 - (Display no extra information, only "Requirements  not met")
+#                     2 - (Display detailed requirements, all at once, with clickable links)
+#
+
+DungeonAccessRequirements.PrintMode = 1
+
+#
+#    DungeonAccessRequirements.PortalAvgIlevelCheck
+#
+#        Description: Enable average item level requirement when entering a dungeon/raid's portal (= deny the entry if player has too low average ilevel, like in LFG).
+#        Default:     0 - (Disabled  -> Blizzlike)
+#                     1 - (Enabled)
+
+DungeonAccessRequirements.PortalAvgIlevelCheck = 0
+
+#
+#    DungeonAccessRequirements.LFGLevelDBCOverride
+#
+#        Description: If enabled, use `min_level` and `max_level` values from table `dungeon_access_requirements` to list or to hide a dungeon from the LFG window.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+DungeonAccessRequirements.LFGLevelDBCOverride = 0
+
+#
+#    DungeonAccessRequirements.OptionalStringID
+#
+#        Description: Display an extra message from acore_strings in the chat after printing the dungeon access requirements.
+#                     To enable it set the ID of your desired string from the table acore_strings
+#        Default:     0 - (Disabled)
+#                     1+ - (Enabled)
+
+DungeonAccessRequirements.OptionalStringID = 0
+
+#
 #    ICC Buff
 #       Description: Specify ICC buff
 #                    (It is necessary to restart the server after changing the values!)
@@ -3447,17 +3673,24 @@ ICC.Buff.Horde    = 73822
 ICC.Buff.Alliance = 73828
 
 #
+#     Item.SetItemTradeable
+#        Description: Enabled/Disabled trading BoP items among raid members.
+#        Default:     1  - (Set BoP items tradeable timer to 2 hours)
+#                     0  - (Disable trading BoP items among raid members)
+
+Item.SetItemTradeable = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
-#
-# Packet Spoof Protection Settings
+# PACKET SPOOF PROTECTION SETTINGS
 #
 # These settings determine which action to take when harmful packet spoofing is detected.
 #
 #    PacketSpoof.Policy
 #        Description: Determines the course of action when packet spoofing is detected.
-#        Values:     0 - Log only 
+#        Values:     0 - Log only
 #                    1 - Log + kick
 #                    2 - Log + kick + ban
 
@@ -3483,4 +3716,25 @@ PacketSpoof.BanMode = 0
 PacketSpoof.BanDuration = 86400
 
 #
-################################################################################################### 
+###################################################################################################
+
+###################################################################################################
+# DEBUG
+#
+#    Debug.Battleground
+#        Description: Enable or disable Battleground 1v0 mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.Battleground = 0
+
+#
+#    Debug.Arena
+#        Description: Enable or disable Arena 1v1 mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.Arena = 0
+
+#
+###################################################################################################

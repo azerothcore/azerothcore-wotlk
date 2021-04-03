@@ -4,7 +4,7 @@
 /**
  *  @file    Thread.h
  *
- *  @author Douglas Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas Schmidt <d.schmidt@vanderbilt.edu>
  */
 //==========================================================================
 

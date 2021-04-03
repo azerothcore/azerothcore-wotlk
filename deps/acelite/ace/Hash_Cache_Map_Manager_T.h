@@ -72,7 +72,6 @@ class ACE_Hash_Cache_Map_Manager : public ACE_CACHE_MAP_MANAGER
   typedef KEY key_type;
   typedef VALUE mapped_type;
 
-  // = Initialization and termination methods.
   /// Initialize a <Hash_Cache_Map_Manager> with @a size entries.
   ACE_Hash_Cache_Map_Manager (CACHING_STRATEGY &caching_s,
                               size_t size = ACE_DEFAULT_MAP_SIZE,
@@ -182,6 +181,9 @@ class ACE_Hash_Cache_Map_Manager : public ACE_CACHE_MAP_MANAGER
 
   /// Remove entry from map.
   int unbind (CACHE_ENTRY *entry);
+
+  /// Declare the dynamic allocation hooks.
+  ACE_ALLOC_HOOK_DECLARE;
 
 protected:
   /// Base class.

@@ -17,7 +17,7 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Bounded_Stack)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Bounded_Stack)
 
 template <class T> void
 ACE_Bounded_Stack<T>::dump (void) const
@@ -81,7 +81,7 @@ ACE_Bounded_Stack<T>::~ACE_Bounded_Stack (void)
 
 // ----------------------------------------
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Fixed_Stack)
+ACE_ALLOC_HOOK_DEFINE_Tcs(ACE_Fixed_Stack)
 
 template <class T, size_t ACE_SIZE> void
 ACE_Fixed_Stack<T, ACE_SIZE>::dump (void) const
@@ -131,7 +131,7 @@ ACE_Fixed_Stack<T, ACE_SIZE>::~ACE_Fixed_Stack (void)
 
 //----------------------------------------
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Unbounded_Stack)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Unbounded_Stack)
 
 template <class T> void
 ACE_Unbounded_Stack<T>::dump (void) const
@@ -337,7 +337,7 @@ ACE_Unbounded_Stack<T>::remove (const T &item)
 }
 
 //--------------------------------------------------
-ACE_ALLOC_HOOK_DEFINE(ACE_Double_Linked_List_Iterator_Base)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Double_Linked_List_Iterator_Base)
 
 template <class T>
 ACE_Double_Linked_List_Iterator_Base<T>::ACE_Double_Linked_List_Iterator_Base (const ACE_Double_Linked_List<T> &dll)
@@ -446,7 +446,7 @@ ACE_Double_Linked_List_Iterator_Base<T>::dump_i (void) const
 }
 
 //--------------------------------------------------
-ACE_ALLOC_HOOK_DEFINE(ACE_Double_Linked_List_Iterator)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Double_Linked_List_Iterator)
 
 template <class T>
 ACE_Double_Linked_List_Iterator<T>::ACE_Double_Linked_List_Iterator (const ACE_Double_Linked_List<T> &dll)
@@ -551,7 +551,7 @@ ACE_Double_Linked_List_Iterator<T>::operator-- (int)
 
 
 //--------------------------------------------------
-ACE_ALLOC_HOOK_DEFINE(ACE_Double_Linked_List_Reverse_Iterator)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Double_Linked_List_Reverse_Iterator)
 
   template <class T>
 ACE_Double_Linked_List_Reverse_Iterator<T>::ACE_Double_Linked_List_Reverse_Iterator (ACE_Double_Linked_List<T> &dll)
@@ -657,7 +657,7 @@ ACE_Double_Linked_List_Reverse_Iterator<T>::operator-- (int)
 }
 
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Double_Linked_List)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Double_Linked_List)
 
   template <class T>
 ACE_Double_Linked_List<T>:: ACE_Double_Linked_List (ACE_Allocator *alloc)
@@ -872,7 +872,7 @@ ACE_Double_Linked_List<T>::remove_element (T *item)
 }
 
 //--------------------------------------------------
-ACE_ALLOC_HOOK_DEFINE(ACE_Fixed_Set)
+ACE_ALLOC_HOOK_DEFINE_Tcs(ACE_Fixed_Set)
 
 template <class T, size_t ACE_SIZE> size_t
 ACE_Fixed_Set<T, ACE_SIZE>::size (void) const
@@ -1011,7 +1011,7 @@ ACE_Fixed_Set<T, ACE_SIZE>::remove (const T &item)
 }
 
 //--------------------------------------------------
-ACE_ALLOC_HOOK_DEFINE(ACE_Fixed_Set_Iterator_Base)
+ACE_ALLOC_HOOK_DEFINE_Tcs(ACE_Fixed_Set_Iterator_Base)
 
 template <class T, size_t ACE_SIZE> void
 ACE_Fixed_Set_Iterator_Base<T, ACE_SIZE>::dump_i (void) const
@@ -1092,7 +1092,7 @@ ACE_Fixed_Set_Iterator_Base<T, ACE_SIZE>::next_i (T *&item)
 }
 
 //--------------------------------------------------
-ACE_ALLOC_HOOK_DEFINE(ACE_Fixed_Set_Iterator)
+ACE_ALLOC_HOOK_DEFINE_Tcs(ACE_Fixed_Set_Iterator)
 
 template <class T, size_t ACE_SIZE> void
 ACE_Fixed_Set_Iterator<T, ACE_SIZE>::dump (void) const
@@ -1146,7 +1146,7 @@ ACE_Fixed_Set_Iterator<T, ACE_SIZE>::operator* (void)
 }
 
 //--------------------------------------------------
-ACE_ALLOC_HOOK_DEFINE(ACE_Fixed_Set_Const_Iterator)
+ACE_ALLOC_HOOK_DEFINE_Tcs(ACE_Fixed_Set_Const_Iterator)
 
 template <class T, size_t ACE_SIZE> void
 ACE_Fixed_Set_Const_Iterator<T, ACE_SIZE>::dump (void) const
@@ -1185,7 +1185,7 @@ ACE_Fixed_Set_Const_Iterator<T, ACE_SIZE>::operator* (void) const
 }
 
 //--------------------------------------------------
-ACE_ALLOC_HOOK_DEFINE(ACE_Bounded_Set)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Bounded_Set)
 
 template <class T> void
 ACE_Bounded_Set<T>::dump (void) const
@@ -1349,7 +1349,7 @@ ACE_Bounded_Set<T>::remove (const T &item)
   return -1;
 }
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Bounded_Set_Iterator)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Bounded_Set_Iterator)
 
   template <class T> void
 ACE_Bounded_Set_Iterator<T>::dump (void) const
@@ -1413,7 +1413,7 @@ ACE_Bounded_Set_Iterator<T>::next (T *&item)
     return 0;
 }
 
-ACE_ALLOC_HOOK_DEFINE(ACE_DNode)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_DNode)
 
   template <class T>
 ACE_DNode<T>::ACE_DNode (const T &i, ACE_DNode<T> *n, ACE_DNode<T> *p)
@@ -1482,8 +1482,7 @@ ACE_Unbounded_Stack_Iterator<T>::next (T *&item)
 }
 
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Ordered_MultiSet)
-
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Ordered_MultiSet)
 
   template <class T>
 ACE_Ordered_MultiSet<T>::ACE_Ordered_MultiSet (ACE_Allocator *alloc)
@@ -1790,7 +1789,7 @@ ACE_Ordered_MultiSet<T>::delete_nodes (void)
   this->cur_size_ = 0;
 }
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Ordered_MultiSet_Iterator)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Ordered_MultiSet_Iterator)
 
 template <class T>
 ACE_Ordered_MultiSet_Iterator<T>::ACE_Ordered_MultiSet_Iterator (ACE_Ordered_MultiSet<T> &s)
@@ -1825,8 +1824,6 @@ ACE_Ordered_MultiSet_Iterator<T>::operator* (void)
 
   return *retv;
 }
-
-ACE_ALLOC_HOOK_DEFINE (ACE_DLList_Node)
 
 template <class T> T *
 ACE_DLList<T>::insert_tail (T *new_item)
