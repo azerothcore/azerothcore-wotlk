@@ -157,7 +157,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         if (cOwner)
             cOwner->SetCannotReachTarget(true);
-        i_recalculateTravel = false;
+        i_recalculateTravel = true;
         return true;
     }
 
@@ -341,7 +341,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         if (cOwner)
             cOwner->SetCannotReachTarget(true);
-        i_recalculateTravel = false;
+        i_recalculateTravel = true;
         return true;
     }
 
