@@ -92,8 +92,7 @@ enum Misc
     ACTION_RESTORE                      = 3,
     GO_TESLA_COIL_LEFT                  = 181478,
     GO_TESLA_COIL_RIGHT                 = 181477,
-    NPC_TESLA_COIL                      = 16218,
-    THADDIUS_ROOM_DOOR                  = 181121
+    NPC_TESLA_COIL                      = 16218
 };
 
 class boss_thaddius : public CreatureScript
@@ -177,9 +176,15 @@ public:
             {
                 go->SetGoState(GO_STATE_ACTIVE);
             }
-            if (GameObject* go = me->FindNearestGameObject(THADDIUS_ROOM_DOOR, 200.0f))
+            if (pInstance)
             {
-                go->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_THADDIUS_GATE)))
+                {
+                    if (pInstance->GetBossState(BOSS_GLUTH) == DONE)
+                    {
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    }
+                }
             }
         }
 
@@ -203,10 +208,10 @@ public:
             {
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(28059);
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(28084);
-            }
-            if (GameObject* go = me->FindNearestGameObject(THADDIUS_ROOM_DOOR, 200.0f))
-            {
-                go->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_THADDIUS_GATE)))
+                {
+                    go->SetGoState(GO_STATE_ACTIVE);
+                }
             }
         }
 
@@ -394,10 +399,6 @@ public:
         void EnterCombat(Unit* pWho) override
         {
             me->SetInCombatWithZone();
-            if (GameObject* go = me->FindNearestGameObject(THADDIUS_ROOM_DOOR, 200.0f))
-            {
-                go->SetGoState(GO_STATE_READY);
-            }
             if (Creature* cr = me->FindNearestCreature(NPC_TESLA_COIL, 150.f, true))
             {
                 myCoil = cr->GetGUID();
@@ -420,6 +421,10 @@ public:
             }
             if (pInstance)
             {
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_THADDIUS_GATE)))
+                {
+                    go->SetGoState(GO_STATE_READY);
+                }
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_THADDIUS_BOSS)))
                 {
                     cr->AI()->AttackStart(pWho);
@@ -609,14 +614,7 @@ public:
             if (count)
             {
                 uint32 spellId = 0;
-                if (GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE)
-                {
-                    spellId = SPELL_POSITIVE_CHARGE_STACK;
-                }
-                else // if (GetSpellInfo()->Id == SPELL_NEGATIVE_CHARGE)
-                {
-                    spellId = SPELL_NEGATIVE_CHARGE_STACK;
-                }
+                spellId = GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE ? SPELL_NEGATIVE_CHARGE_STACK : SPELL_NEGATIVE_CHARGE_STACK;
                 GetCaster()->SetAuraStack(spellId, GetCaster(), count);
             }
         }

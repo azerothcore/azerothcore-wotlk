@@ -13,11 +13,12 @@
 <!-- If the issue does not exist, please describe it and how to reproduce it. If the issue already exists, just paste the link to the issue you close, like this: Closes https://github.com/azerothcore/azerothcore-wotlk/issues/967 -->
 
 
-##### SOURCE:
-<!-- If this report is linked with in-game content, please include any evidence/documentation/video or further proof in order to guarantee that the behavior described above is the correct one.
+## SOURCE:
+<!-- If this pull request IS linked with in-game content, please include any evidence/documentation/video or further proof in order to guarantee that the proposed changes described above are the correct ones.
  - If it is described in a guide/post or Wowhead comment, please include the link.
  - Can you link a video that confirms it?
  - Please share the source which states how it should work.
+ - If this pull request IS NOT linked with in-game content, please leave this field as N/A
 -->
 
 
@@ -61,3 +62,7 @@ When a PR is ready to be tested, it will be marked as **[WAITING TO BE TESTED]**
 You can help by testing PRs and writing your feedback here on the PR's page on GitHub. Follow the instructions here:
 
 http://www.azerothcore.org/wiki/How-to-test-a-PR
+
+**REMEMBER**: when testing a PR that changes something **generic** (i.e. a part of code that handles more than one specific thing), the tester should not only check that the PR does its job (e.g. fixing spell XXX) but **especially** check that the PR does not cause any regression (i.e. introducing new bugs).
+
+**For example**: if a PR fixes spell X by changing a part of code that handles spells X, Y, and Z, we should not only test X, but **we should test Y and Z as well**.
