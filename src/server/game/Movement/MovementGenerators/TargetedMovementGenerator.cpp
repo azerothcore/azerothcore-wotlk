@@ -157,7 +157,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         if (cOwner)
             cOwner->SetCannotReachTarget(true);
-        owner->StopMoving();
+        i_recalculateTravel = false;
         return true;
     }
 
@@ -337,9 +337,11 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     Movement::MoveSplineInit init(owner);
 
     bool success = i_path->CalculatePath(x, y, z, forceDest);
-    if ((!success || i_path->GetPathType() & PATHFIND_NOPATH) && !followingMaster) // Exclude pets - must always follow its master
+    if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
     {
-        owner->StopMoving();
+        if (cOwner)
+            cOwner->SetCannotReachTarget(true);
+        i_recalculateTravel = false;
         return true;
     }
 
