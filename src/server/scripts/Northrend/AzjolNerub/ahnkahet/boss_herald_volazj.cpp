@@ -236,12 +236,14 @@ public:
                     {
                         DoCastVictim(SPELL_MIND_FLAY, false);
                         events.RepeatEvent(20000);
-                    }break;
+                        break;
+                    }
                     case EVENT_HERALD_SHADOW:
                     {
                         DoCastVictim(SPELL_SHADOW_BOLT_VOLLEY, false);
                         events.RepeatEvent(5000);
-                    }break;
+                        break;
+                    }
                     case EVENT_HERALD_SHIVER:
                     {
                         if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
@@ -250,7 +252,8 @@ public:
                         }
 
                         events.RepeatEvent(15000);
-                    }break;
+                        break;
+                    }
                 }
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))

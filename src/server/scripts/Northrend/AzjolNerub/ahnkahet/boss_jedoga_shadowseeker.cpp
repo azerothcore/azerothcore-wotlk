@@ -367,7 +367,8 @@ public:
                         me->StopMoving();
                         AttackStart(victim);
                     }
-                }break;
+                    break;
+                }
                 case POINT_UP:
                 {
                     me->SetFacingTo(5.66f);
