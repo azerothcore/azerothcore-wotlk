@@ -189,7 +189,6 @@ UPDATE creature_template SET modelid2 = 0, flags_extra=flags_extra|64|128 WHERE 
 UPDATE creature_template SET skinloot=80007 WHERE entry=31470;
 
 -- Amanitar immunities
--- 536870912, 67108864, 33554432, 8388608, 131072, 65536, 8192, 4096, 2048, 1024, 512, 256, 64, 32, 16, 8, 4, 2, 1
 UPDATE creature_template SET
     mechanic_immune_mask=1|2|4|8|16|32|64|256|512|1024|2048|4096|8192|65536|131072|8388608|33554432|67108864|536870912
 WHERE entry IN (30258, 31463);

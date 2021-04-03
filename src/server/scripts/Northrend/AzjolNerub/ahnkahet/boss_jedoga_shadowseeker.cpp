@@ -647,21 +647,19 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            events.Update(diff);
-            if (events.ExecuteEvent() == EVENT_RITUAL_BEGIN_MOVE)
+            if (!events.Empty())
             {
-                me->GetMotionMaster()->Clear();
-                me->SetHomePosition(JedogaPosition[2]);
-                me->SetWalk(true);
-                me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[2], false);
+                events.Update(diff);
+                if (events.ExecuteEvent() == EVENT_RITUAL_BEGIN_MOVE)
+                {
+                    me->GetMotionMaster()->Clear();
+                    me->SetHomePosition(JedogaPosition[2]);
+                    me->SetWalk(true);
+                    me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[2], false);
+                }
             }
 
-            if (isSacraficeTarget)
-            {
-                return;
-            }
-
-            if (UpdateVictim())
+            if (!isSacraficeTarget && UpdateVictim())
             {
                 DoMeleeAttackIfReady();
             }
