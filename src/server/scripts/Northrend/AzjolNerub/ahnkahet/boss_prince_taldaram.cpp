@@ -390,7 +390,8 @@ public:
                     {
                         DoCastSelf(SPELL_BLOODTHIRST);
                         events.RepeatEvent(10000);
-                    }break;
+                        break;
+                    }
                     case EVENT_PRINCE_FLAME_SPHERES:
                     {
                         if (Unit* victim = me->GetVictim())
@@ -400,7 +401,8 @@ public:
                         }
                         events.RescheduleEvent(EVENT_PRINCE_VANISH, 14000);
                         events.RepeatEvent(15000);
-                    }break;
+                        break;
+                    }
                     case EVENT_PRINCE_VANISH:
                     {
                         //Count alive players
@@ -435,7 +437,8 @@ public:
                             events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
                             events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499);
                         }
-                    }break;
+                        break;
+                    }
                     case EVENT_PRINCE_VANISH_RUN:
                     {
                         if (Unit* _vanishTarget = ObjectAccessor::GetUnit(*me, vanishTarget_GUID))
@@ -447,11 +450,13 @@ public:
                         }
 
                         events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20000);
-                    }break;
+                        break;
+                    }
                     case EVENT_PRINCE_RESCHEDULE:
                     {
                         ScheduleCombatEvents();
-                    }break;
+                        break;
+                    }
                 }
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
