@@ -3171,6 +3171,10 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_POSITIVE_TAKEN_BONUS;
                 break;
             case 65280: // Ulduar, Hodir, Singed
+            case 28969: // Naxxramas, Crypt Guard, Acid Spit (10 normal)
+            case 56098: // Naxxramas, Crypt Guard, Acid Spit (25 normal)
+            case 27891: // Naxxramas, Sludge Belcher, Acidic Sludge (10 normal)
+            case 54331: // Naxxramas, Sludge Belcher, Acidic Sludge (25 normal)
             case 29325: // Naxxramas, Stoneskin Gargoyle, Acid Volley (10 normal)
             case 54714: // Naxxramas, Stoneskin Gargoyle, Acid Volley (25 normal)
             case 65775: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (10 normal)
