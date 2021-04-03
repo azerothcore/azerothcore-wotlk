@@ -174,7 +174,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
 
     owner->AddUnitState(UNIT_STATE_CHASE_MOVE);
-    i_recalculateTravel = true;
+    i_recalculateTravel = false;
 
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(i_path->GetPath());
@@ -347,7 +347,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);
 
-    i_recalculateTravel = true;
+    i_recalculateTravel = false;
 
     init.MovebyPath(i_path->GetPath());
     init.SetFacing(target->GetOrientation());
