@@ -333,6 +333,7 @@ public:
         void JustDied(Unit* /*Killer*/) override
         {
             _JustDied();
+            DespawnOOCSummons();
             Talk(SAY_DEATH);
         }
 
