@@ -8,6 +8,7 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "Player.h"
+#include "PassiveAI.h"
 
 enum Spells
 {
@@ -19,7 +20,6 @@ enum Spells
     SPELL_FLAME_SPHERE_SUMMON_3             = 59512, // 1x 31687
     SPELL_FLAME_SPHERE_VISUAL               = 55928,
     SPELL_FLAME_SPHERE_PERIODIC             = 55926,
-    SPELL_FLAME_SPHERE_PERIODIC_H           = 59508,
     SPELL_FLAME_SPHERE_DEATH_EFFECT         = 55947,
     SPELL_BEAM_VISUAL                       = 60342,
     SPELL_VANISH                            = 55964,
@@ -138,7 +138,7 @@ public:
             {
                 if (moveTimer <= diff)
                 {
-                    DoCastSelf(DUNGEON_MODE(SPELL_FLAME_SPHERE_PERIODIC, SPELL_FLAME_SPHERE_PERIODIC_H));
+                    DoCastSelf(SPELL_FLAME_SPHERE_PERIODIC);
                     float angleOffset = 0.0f;
 
                     switch (me->GetEntry())
@@ -413,7 +413,7 @@ public:
                     {
                         //Count alive players
                         uint8 count = 0;
-                        std::list<HostileReference*> t_list = me->getThreatManager().getThreatList();
+                        std::list<HostileReference*> const t_list = me->getThreatManager().getThreatList();
                         if (!t_list.empty())
                         {
                             for (HostileReference const* reference : t_list)
