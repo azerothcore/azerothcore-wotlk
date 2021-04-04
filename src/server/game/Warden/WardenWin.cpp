@@ -397,7 +397,7 @@ void WardenWin::RequestChecks()
             case PAGE_CHECK_A:
             case PAGE_CHECK_B:
             {
-                std::vector<uint8> data = check->Data.ToByteVector(0, false);
+                std::vector<uint8> data = check->Data.ToByteVector(24, false);
                 buff.append(data.data(), data.size());
                 buff << uint32(check->Address);
                 buff << uint8(check->Length);
@@ -411,7 +411,7 @@ void WardenWin::RequestChecks()
             }
             case DRIVER_CHECK:
             {
-                std::vector<uint8> data = check->Data.ToByteVector(0, false);
+                std::vector<uint8> data = check->Data.ToByteVector(24, false);
                 buff.append(data.data(), data.size());
                 buff << uint8(index++);
                 break;

@@ -263,13 +263,10 @@ public:
             {
                 summons.DoZoneInCombat();
             }
-            else
+            else if (Unit* target = me->SelectNearestTarget(50.0f))
             {
-                if (Unit* target = me->SelectNearestTarget(50.0f))
-                {
-                    AttackStart(target);
-                    DoZoneInCombat();
-                }
+                AttackStart(target);
+                DoZoneInCombat();
             }
         }
 

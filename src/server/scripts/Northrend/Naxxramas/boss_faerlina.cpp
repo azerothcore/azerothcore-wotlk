@@ -9,13 +9,13 @@
 
 enum Yells
 {
-    SAY_GREET            = 0,
-    SAY_AGGRO            = 1,
-    SAY_SLAY             = 2,
-    SAY_DEATH            = 3,
-    EMOTE_WIDOWS_EMBRACE = 4,
-    EMOTE_FRENZY         = 5,
-    SAY_FRENZY           = 6
+    SAY_GREET                           = 0,
+    SAY_AGGRO                           = 1,
+    SAY_SLAY                            = 2,
+    SAY_DEATH                           = 3,
+    EMOTE_WIDOWS_EMBRACE                = 4,
+    EMOTE_FRENZY                        = 5,
+    SAY_FRENZY                          = 6
 };
 
 enum Spells
@@ -40,9 +40,7 @@ enum Events
 enum Misc
 {
     NPC_NAXXRAMAS_WORSHIPPER            = 16506,
-    NPC_NAXXRAMAS_FOLLOWER              = 16505,
-
-    SPIDER_WEB_ENTRANCE                 = 181235
+    NPC_NAXXRAMAS_FOLLOWER              = 16505
 };
 
 class boss_faerlina : public CreatureScript
@@ -92,9 +90,12 @@ public:
             events.Reset();
             summons.DespawnAll();
             SummonHelpers();
-            if (GameObject* go = me->FindNearestGameObject(SPIDER_WEB_ENTRANCE, 100.0f))
+            if (pInstance)
             {
-                go->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_FAERLINA_WEB)))
+                {
+                    go->SetGoState(GO_STATE_ACTIVE);
+                }
             }
         }
 
@@ -108,9 +109,12 @@ public:
             events.ScheduleEvent(EVENT_RAIN_OF_FIRE, urand(8000, 18000));
             events.ScheduleEvent(EVENT_FRENZY, urand(60000, 80000), 1);
             events.SetPhase(1);
-            if (GameObject* go = me->FindNearestGameObject(SPIDER_WEB_ENTRANCE, 100.0f))
+            if (pInstance)
             {
-                go->SetGoState(GO_STATE_READY);
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_FAERLINA_WEB)))
+                {
+                    go->SetGoState(GO_STATE_READY);
+                }
             }
         }
 
@@ -143,9 +147,12 @@ public:
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
-            if (GameObject* go = me->FindNearestGameObject(SPIDER_WEB_ENTRANCE, 100.0f))
+            if (pInstance)
             {
-                go->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_FAERLINA_WEB)))
+                {
+                    go->SetGoState(GO_STATE_ACTIVE);
+                }
             }
         }
 
@@ -153,7 +160,7 @@ public:
         {
             if (!me->IsInCombat() && sayGreet)
             {
-                for( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
+                for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 {
                     if (pInstance)
                     {

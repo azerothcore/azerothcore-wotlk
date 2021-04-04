@@ -181,6 +181,7 @@ enum NPCsGOs
     NPC_LAUGHING_SKULL                  = 33990,
 
     NPC_IMMORTAL_GUARDIAN               = 33988,
+    NPC_MARKED_IMMORTAL_GUARDIAN        = 36064,
 
     // CHAMBER ILLUSION
     NPC_CONSORT_FIRST                   = 33716,
@@ -2400,6 +2401,44 @@ public:
     }
 };
 
+class spell_yogg_saron_shadow_beacon : public SpellScriptLoader
+{
+    public:
+        spell_yogg_saron_shadow_beacon() : SpellScriptLoader("spell_yogg_saron_shadow_beacon") { }
+
+        class spell_yogg_saron_shadow_beacon_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_yogg_saron_shadow_beacon_AuraScript);
+
+            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Creature* target = GetTarget()->ToCreature())
+                {
+                    target->SetEntry(NPC_MARKED_IMMORTAL_GUARDIAN);
+                }
+            }
+
+            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Creature* target = GetTarget()->ToCreature())
+                {
+                    target->SetEntry(NPC_IMMORTAL_GUARDIAN);
+                }
+            }
+
+            void Register() override
+            {
+                AfterEffectApply += AuraEffectApplyFn(spell_yogg_saron_shadow_beacon_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_yogg_saron_shadow_beacon_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_yogg_saron_shadow_beacon_AuraScript();
+        }
+};
+
 class spell_yogg_saron_destabilization_matrix : public SpellScriptLoader
 {
 public:
@@ -2995,6 +3034,7 @@ void AddSC_boss_yoggsaron()
     // SPELLS
     new spell_yogg_saron_malady_of_the_mind();
     new spell_yogg_saron_brain_link();
+    new spell_yogg_saron_shadow_beacon();
     new spell_yogg_saron_destabilization_matrix();
     new spell_yogg_saron_titanic_storm();
     new spell_yogg_saron_lunatic_gaze();
