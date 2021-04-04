@@ -7,8 +7,6 @@
 
 #include "CreatureAIImpl.h"
 #include "GridNotifiers.h"
-#include "GridNotifiers.h"
-#include "PassiveAI.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedGossip.h"
