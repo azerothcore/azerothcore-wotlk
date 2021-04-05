@@ -16,18 +16,18 @@ class ADTFile;
 
 class WDTFile
 {
-private:
-    MPQFile WDT;
-    string filename;
 public:
     WDTFile(char* file_name, char* file_name1);
-    ~WDTFile();
-    bool init(char* map_id, unsigned int mapID);
+    ~WDTFile(void);
 
-    string* gWmoInstansName;
-    int gnWMO;
-
+    bool init(uint32 mapId);
     ADTFile* GetMap(int x, int z);
+
+    std::vector<std::string> _wmoNames;
+
+private:
+    MPQFile _file;
+    std::string filename;
 };
 
 #endif
