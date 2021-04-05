@@ -173,7 +173,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_high_king_maulgarAI>(creature);
+        return GetGruulsLairAI<boss_high_king_maulgarAI>(creature);
     }
 };
 
@@ -261,7 +261,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_olm_the_summonerAI>(creature);
+        return GetGruulsLairAI<boss_olm_the_summonerAI>(creature);
     }
 };
 
@@ -339,7 +339,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kiggler_the_crazedAI>(creature);
+        return GetGruulsLairAI<boss_kiggler_the_crazedAI>(creature);
     }
 };
 
@@ -411,7 +411,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_blindeye_the_seerAI>(creature);
+        return GetGruulsLairAI<boss_blindeye_the_seerAI>(creature);
     }
 };
 
@@ -491,7 +491,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_krosh_firehandAI>(creature);
+        return GetGruulsLairAI<boss_krosh_firehandAI>(creature);
     }
 };
 

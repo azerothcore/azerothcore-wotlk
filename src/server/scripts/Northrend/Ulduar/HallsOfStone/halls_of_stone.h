@@ -5,6 +5,10 @@
 #ifndef DEF_HALLS_OF_STONE_H
 #define DEF_HALLS_OF_STONE_H
 
+#include "CreatureAIImpl.h"
+
+#define HallsOfStoneScriptName "instance_halls_of_stone"
+
 enum Encounter
 {
     BOSS_KRYSTALLUS             = 0,
@@ -43,5 +47,11 @@ enum npcs
     NPC_SJONNIR                 = 27978,
     NPC_BRANN                   = 28070,
 };
+
+template <class AI, class T>
+inline AI* GetHallsOfStoneAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, HallsOfStoneScriptName);
+}
 
 #endif
