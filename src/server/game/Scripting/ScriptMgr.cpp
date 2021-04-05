@@ -1349,6 +1349,11 @@ void ScriptMgr::OnBattlegroundDesertion(Player* player, BattlegroundDesertionTyp
     FOREACH_SCRIPT(PlayerScript)->OnBattlegroundDesertion(player, desertionType);
 }
 
+void ScriptMgr::OnPlayerJoinedBattleground(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerJoinedBattleground(player);
+}
+
 void ScriptMgr::OnPlayerReleasedGhost(Player* player)
 {
     FOREACH_SCRIPT(PlayerScript)->OnPlayerReleasedGhost(player);
