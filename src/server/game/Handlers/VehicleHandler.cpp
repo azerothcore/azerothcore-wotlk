@@ -18,7 +18,7 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_DISMISS_CONTROLLED_VEHICLE");
 #endif
 
-    uint64 vehicleGUID = _player->GetCharmGUID();
+    ObjectGuid vehicleGUID = _player->GetCharmGUID();
 
     if (!vehicleGUID)                                       // something wrong here...
     {
@@ -133,7 +133,7 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
 void WorldSession::HandleEnterPlayerVehicle(WorldPacket& data)
 {
     // Read guid
-    uint64 guid;
+    ObjectGuid guid;
     data >> guid;
 
     if (Player* player = ObjectAccessor::GetPlayer(*_player, guid))
@@ -162,7 +162,7 @@ void WorldSession::HandleEjectPassenger(WorldPacket& data)
         return;
     }
 
-    uint64 guid;
+    ObjectGuid guid;
     data >> guid;
 
     if (guid.IsPlayer())

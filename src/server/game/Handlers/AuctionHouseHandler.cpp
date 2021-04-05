@@ -22,7 +22,7 @@
 //void called when player click on auctioneer npc
 void WorldSession::HandleAuctionHelloOpcode(WorldPacket& recvData)
 {
-    uint64 guid;                                            //NPC guid
+    ObjectGuid guid;                                            //NPC guid
     recvData >> guid;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
@@ -42,7 +42,7 @@ void WorldSession::HandleAuctionHelloOpcode(WorldPacket& recvData)
 }
 
 //this void causes that auction window is opened
-void WorldSession::SendAuctionHello(uint64 guid, Creature* unit)
+void WorldSession::SendAuctionHello(ObjectGuid guid, Creature* unit)
 {
     if (GetPlayer()->getLevel() < sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ))
     {
@@ -55,7 +55,7 @@ void WorldSession::SendAuctionHello(uint64 guid, Creature* unit)
         return;
 
     WorldPacket data(MSG_AUCTION_HELLO, 12);
-    data << uint64(guid);
+    data << guid;
     data << uint32(ahEntry->houseId);
     data << uint8(1);                                       // 3.3.3: 1 - AH enabled, 0 - AH disabled
     SendPacket(&data);
@@ -74,12 +74,12 @@ void WorldSession::SendAuctionCommandResult(uint32 auctionId, uint32 Action, uin
 }
 
 //this function sends notification, if bidder is online
-void WorldSession::SendAuctionBidderNotification(uint32 location, uint32 auctionId, uint64 bidder, uint32 bidSum, uint32 diff, uint32 item_template)
+void WorldSession::SendAuctionBidderNotification(uint32 location, uint32 auctionId, ObjectGuid bidder, uint32 bidSum, uint32 diff, uint32 item_template)
 {
     WorldPacket data(SMSG_AUCTION_BIDDER_NOTIFICATION, (8 * 4));
     data << uint32(location);
     data << uint32(auctionId);
-    data << uint64(bidder);
+    data << bidder;
     data << uint32(bidSum);
     data << uint32(diff);
     data << uint32(item_template);
@@ -104,13 +104,12 @@ void WorldSession::SendAuctionOwnerNotification(AuctionEntry* auction)
 //this void creates new auction and adds auction to some auctionhouse
 void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
 {
-    uint64 auctioneer;
+    ObjectGuid auctioneer;
     uint32 itemsCount, etime, bid, buyout;
     recvData >> auctioneer;
     recvData >> itemsCount;
 
-    uint64 itemGUIDs[MAX_AUCTION_ITEMS]; // 160 slot = 4x 36 slot bag + backpack 16 slot
-    memset(itemGUIDs, 0, sizeof(itemGUIDs));
+    ObjectGuid itemGUIDs[MAX_AUCTION_ITEMS]; // 160 slot = 4x 36 slot bag + backpack 16 slot
     uint32 count[MAX_AUCTION_ITEMS];
     memset(count, 0, sizeof(count));
 
@@ -381,7 +380,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_PLACE_BID");
 #endif
 
-    uint64 auctioneer;
+    ObjectGuid auctioneer;
     uint32 auctionId;
     uint32 price;
     recvData >> auctioneer;
@@ -511,7 +510,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_REMOVE_ITEM");
 #endif
 
-    uint64 auctioneer;
+    ObjectGuid auctioneer;
     uint32 auctionId;
     recvData >> auctioneer;
     recvData >> auctionId;
@@ -591,7 +590,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_LIST_BIDDER_ITEMS");
 #endif
 
-    uint64 guid;                                            //NPC guid
+    ObjectGuid guid;                                            //NPC guid
     uint32 listfrom;                                        //page of auctions
     uint32 outbiddedCount;                                  //count of outbidded auctions
 
@@ -649,7 +648,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recvData)
 void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recvData)
 {
     // prevent crash caused by malformed packet
-    uint64 guid;
+    ObjectGuid guid;
     uint32 listfrom;
 
     recvData >> guid;
@@ -668,7 +667,7 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recvData)
     _player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(guid, _player->GetGUID(), true), _player->m_Events.CalculateTime(delay - diff));
 }
 
-void WorldSession::HandleAuctionListOwnerItemsEvent(uint64 creatureGuid)
+void WorldSession::HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_LIST_OWNER_ITEMS");
@@ -714,7 +713,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
     std::string searchedname;
     uint8 levelmin, levelmax, usable;
     uint32 listfrom, auctionSlotID, auctionMainCategory, auctionSubCategory, quality;
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
     recvData >> listfrom;                                  // start, used for page control listing by 50 elements

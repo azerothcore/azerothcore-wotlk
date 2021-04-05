@@ -109,7 +109,7 @@ void GameObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
 
 void GameObject::RemoveFromOwner()
 {
-    uint64 ownerGUID = GetOwnerGUID();
+    ObjectGuid ownerGUID = GetOwnerGUID();
     if (!ownerGUID)
         return;
 
@@ -249,7 +249,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMa
         return false;
     }
 
-    Object::_Create(guidlow, goinfo->entry, HIGHGUID_GAMEOBJECT);
+    Object::_Create(guidlow, goinfo->entry, HighGuid::GameObject);
 
     m_goInfo = goinfo;
 
@@ -1052,7 +1052,7 @@ bool GameObject::IsAlwaysVisibleFor(WorldObject const* seer) const
         return false;
 
     // Always seen by owner and friendly units
-    if (uint64 guid = GetOwnerGUID())
+    if (ObjectGuid guid = GetOwnerGUID())
     {
         if (seer->GetGUID() == guid)
             return true;

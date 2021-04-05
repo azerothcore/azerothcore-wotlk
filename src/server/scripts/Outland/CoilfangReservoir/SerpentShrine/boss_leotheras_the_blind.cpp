@@ -273,7 +273,7 @@ public:
         {
         }
 
-        uint64 ownerGUID;
+        ObjectGuid ownerGUID;
         EventMap events;
 
         void EnterEvadeMode() override

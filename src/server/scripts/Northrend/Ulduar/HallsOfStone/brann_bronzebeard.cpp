@@ -224,16 +224,16 @@ public:
     {
         brann_bronzebeardAI(Creature* c) : npc_escortAI(c), summons(me)
         {
-            AbedneumGUID = MarnakGUID = KaddrakGUID = 0;
+            AbedneumGUID = MarnakGUID = KaddrakGUID.Clear();
             pInstance = c->GetInstanceScript();
         }
 
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 AbedneumGUID;
-        uint64 MarnakGUID;
-        uint64 KaddrakGUID;
+        ObjectGuid AbedneumGUID;
+        ObjectGuid MarnakGUID;
+        ObjectGuid KaddrakGUID;
         uint8 WaveNum;
 
         bool TalkEvent;

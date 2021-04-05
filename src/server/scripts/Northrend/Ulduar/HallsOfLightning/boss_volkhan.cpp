@@ -444,7 +444,7 @@ public:
     {
         npc_hol_monumentAI(Creature* creature) : ScriptedAI(creature)
         {
-            _attackGUID = 0;
+            _attackGUID.Clear();
             _isActive = urand(0, 1);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->CastSpell(me, SPELL_FREEZE_ANIM, true);
@@ -452,7 +452,7 @@ public:
 
         EventMap events;
         bool _isActive;
-        uint64 _attackGUID;
+        ObjectGuid _attackGUID;
 
         void Reset() override
         {

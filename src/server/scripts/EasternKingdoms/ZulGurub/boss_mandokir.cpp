@@ -261,7 +261,7 @@ public:
 
     private:
         uint8 killCount;
-        uint64 chainedSpirtGUIDs[CHAINED_SPIRT_COUNT];
+        ObjectGuid chainedSpirtGUIDs[CHAINED_SPIRT_COUNT];
     };
 
     CreatureAI* GetAI(Creature* creature) const override

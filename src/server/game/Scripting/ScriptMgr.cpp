@@ -1508,7 +1508,7 @@ void ScriptMgr::OnPlayerEmote(Player* player, uint32 emote)
     FOREACH_SCRIPT(PlayerScript)->OnEmote(player, emote);
 }
 
-void ScriptMgr::OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, uint64 guid)
+void ScriptMgr::OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, ObjectGuid guid)
 {
 #ifdef ELUNA
     sEluna->OnTextEmote(player, textEmote, emoteNum, guid);
@@ -1566,7 +1566,7 @@ void ScriptMgr::OnPlayerSave(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnSave(player);
 }
 
-void ScriptMgr::OnPlayerDelete(uint64 guid, uint32 accountId)
+void ScriptMgr::OnPlayerDelete(ObjectGuid guid, uint32 accountId)
 {
 #ifdef ELUNA
     sEluna->OnDelete(guid.GetCounter());
@@ -1574,7 +1574,7 @@ void ScriptMgr::OnPlayerDelete(uint64 guid, uint32 accountId)
     FOREACH_SCRIPT(PlayerScript)->OnDelete(guid, accountId);
 }
 
-void ScriptMgr::OnPlayerFailedDelete(uint64 guid, uint32 accountId)
+void ScriptMgr::OnPlayerFailedDelete(ObjectGuid guid, uint32 accountId)
 {
     FOREACH_SCRIPT(PlayerScript)->OnFailedDelete(guid, accountId);
 }
@@ -1690,7 +1690,7 @@ void ScriptMgr::OnGetMaxPersonalArenaRatingRequirement(const Player* player, uin
     FOREACH_SCRIPT(PlayerScript)->OnGetMaxPersonalArenaRatingRequirement(player, minSlot, maxArenaRating);
 }
 
-void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid)
+void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid)
 {
     FOREACH_SCRIPT(PlayerScript)->OnLootItem(player, item, count, lootguid);
 }
@@ -1713,7 +1713,7 @@ void ScriptMgr::OnFirstLogin(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnFirstLogin(player);
 }
 
-bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err)
+bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, ObjectGuid BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err)
 {
     bool ret = true;
 
@@ -1877,7 +1877,7 @@ void ScriptMgr::OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, uin
 }
 
 // Group
-void ScriptMgr::OnGroupAddMember(Group* group, uint64 guid)
+void ScriptMgr::OnGroupAddMember(Group* group, ObjectGuid guid)
 {
     ASSERT(group);
 #ifdef ELUNA
@@ -1886,7 +1886,7 @@ void ScriptMgr::OnGroupAddMember(Group* group, uint64 guid)
     FOREACH_SCRIPT(GroupScript)->OnAddMember(group, guid);
 }
 
-void ScriptMgr::OnGroupInviteMember(Group* group, uint64 guid)
+void ScriptMgr::OnGroupInviteMember(Group* group, ObjectGuid guid)
 {
     ASSERT(group);
 #ifdef ELUNA
@@ -1895,7 +1895,7 @@ void ScriptMgr::OnGroupInviteMember(Group* group, uint64 guid)
     FOREACH_SCRIPT(GroupScript)->OnInviteMember(group, guid);
 }
 
-void ScriptMgr::OnGroupRemoveMember(Group* group, uint64 guid, RemoveMethod method, uint64 kicker, const char* reason)
+void ScriptMgr::OnGroupRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, ObjectGuid kicker, const char* reason)
 {
     ASSERT(group);
 #ifdef ELUNA
@@ -1904,7 +1904,7 @@ void ScriptMgr::OnGroupRemoveMember(Group* group, uint64 guid, RemoveMethod meth
     FOREACH_SCRIPT(GroupScript)->OnRemoveMember(group, guid, method, kicker, reason);
 }
 
-void ScriptMgr::OnGroupChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLeaderGuid)
+void ScriptMgr::OnGroupChangeLeader(Group* group, ObjectGuid newLeaderGuid, ObjectGuid oldLeaderGuid)
 {
     ASSERT(group);
 #ifdef ELUNA
@@ -2027,7 +2027,7 @@ void ScriptMgr::OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 o
     FOREACH_SCRIPT(MovementHandlerScript)->OnPlayerMove(player, movementInfo, opcode);
 }
 
-void ScriptMgr::OnBeforeBuyItemFromVendor(Player* player, uint64 vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot)
+void ScriptMgr::OnBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot)
 {
     FOREACH_SCRIPT(PlayerScript)->OnBeforeBuyItemFromVendor(player, vendorguid, vendorslot, item, count, bag, slot);
 }

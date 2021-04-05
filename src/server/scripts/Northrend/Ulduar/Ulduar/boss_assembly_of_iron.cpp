@@ -132,7 +132,7 @@ bool IsEncounterComplete(InstanceScript* pInstance, Creature* me)
 
     for (uint8 i = 0; i < 3; ++i)
     {
-        uint64 guid = pInstance->GetGuidData(DATA_STEELBREAKER + i);
+        ObjectGuid guid = pInstance->GetGuidData(DATA_STEELBREAKER + i);
         if (!guid)
             return false;
 
@@ -155,7 +155,7 @@ void RespawnAssemblyOfIron(InstanceScript* pInstance, Creature* me)
 
     for (uint8 i = 0; i < 3; ++i)
     {
-        uint64 guid = pInstance->GetGuidData(DATA_STEELBREAKER + i);
+        ObjectGuid guid = pInstance->GetGuidData(DATA_STEELBREAKER + i);
         if (!guid)
             return;
 
@@ -166,14 +166,14 @@ void RespawnAssemblyOfIron(InstanceScript* pInstance, Creature* me)
     return;
 }
 
-void RestoreAssemblyHealth(uint64 guid1, uint64 guid2, Creature* me)
+void RestoreAssemblyHealth(ObjectGuid guid1, ObjectGuid guid2, Creature* me)
 {
-    if(Creature* cr = ObjectAccessor::GetCreature(*me, guid1))
-        if(cr->IsAlive())
+    if (Creature* cr = ObjectAccessor::GetCreature(*me, guid1))
+        if (cr->IsAlive())
             cr->SetHealth(cr->GetMaxHealth());
 
-    if(Creature* cr2 = ObjectAccessor::GetCreature(*me, guid2))
-        if(cr2->IsAlive())
+    if (Creature* cr2 = ObjectAccessor::GetCreature(*me, guid2))
+        if (cr2->IsAlive())
             cr2->SetHealth(cr2->GetMaxHealth());
 }
 

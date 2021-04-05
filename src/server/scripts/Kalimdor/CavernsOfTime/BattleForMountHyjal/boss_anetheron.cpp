@@ -183,7 +183,7 @@ public:
 
         uint32 ImmolationTimer;
         uint32 CheckTimer;
-        uint64 AnetheronGUID;
+        ObjectGuid AnetheronGUID;
         InstanceScript* instance;
 
         void Reset() override

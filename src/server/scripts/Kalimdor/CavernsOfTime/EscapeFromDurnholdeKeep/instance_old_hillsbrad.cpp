@@ -44,9 +44,6 @@ public:
             _barrelCount = 0;
             _attemptsCount = 0;
 
-            _thrallGUID = 0;
-            _tarethaGUID = 0;
-
             _initalFlamesSet.clear();
             _finalFlamesSet.clear();
             _prisonersSet.clear();
@@ -331,8 +328,8 @@ public:
         uint32 _barrelCount;
         uint32 _attemptsCount;
 
-        uint64 _thrallGUID;
-        uint64 _tarethaGUID;
+        ObjectGuid _thrallGUID;
+        ObjectGuid _tarethaGUID;
         GuidSet _initalFlamesSet;
         GuidSet _finalFlamesSet;
         GuidSet _prisonersSet;

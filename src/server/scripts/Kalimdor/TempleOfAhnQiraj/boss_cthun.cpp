@@ -470,7 +470,7 @@ public:
         //-------------------
 
         //Phase transition
-        uint64 HoldPlayer;
+        ObjectGuid HoldPlayer;
 
         //Body Phase
         uint32 EyeTentacleTimer;
@@ -480,10 +480,10 @@ public:
         uint32 StomachAcidTimer;
         uint32 StomachEnterTimer;
         uint32 StomachEnterVisTimer;
-        uint64 StomachEnterTarget;
+        ObjectGuid StomachEnterTarget;
 
         //Stomach map, bool = true then in stomach
-        std::unordered_map<uint64, bool> Stomach_Map;
+        std::unordered_map<ObjectGuid, bool> Stomach_Map;
 
         void Reset() override
         {
@@ -536,7 +536,7 @@ public:
             if (Stomach_Map.empty())
                 return nullptr;
 
-            std::unordered_map<uint64, bool>::const_iterator i = Stomach_Map.begin();
+            std::unordered_map<ObjectGuid, bool>::const_iterator i = Stomach_Map.begin();
 
             std::list<Unit*> temp;
             std::list<Unit*>::const_iterator j;
@@ -683,7 +683,7 @@ public:
 
                         DoCast(me, SPELL_PURPLE_COLORATION, true);
 
-                        std::unordered_map<uint64, bool>::iterator i = Stomach_Map.begin();
+                        std::unordered_map<ObjectGuid, bool>::iterator i = Stomach_Map.begin();
 
                         //Kick all players out of stomach
                         while (i != Stomach_Map.end())
@@ -715,7 +715,7 @@ public:
                     if (StomachAcidTimer <= diff)
                     {
                         //Apply aura to all players in stomach
-                        std::unordered_map<uint64, bool>::iterator i = Stomach_Map.begin();
+                        std::unordered_map<ObjectGuid, bool>::iterator i = Stomach_Map.begin();
 
                         while (i != Stomach_Map.end())
                         {
@@ -906,7 +906,6 @@ public:
     {
         eye_tentacleAI(Creature* creature) : ScriptedAI(creature)
         {
-            Portal = 0;
             if (Creature* pPortal = me->SummonCreature(NPC_SMALL_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
             {
                 pPortal->SetReactState(REACT_PASSIVE);
@@ -918,7 +917,7 @@ public:
 
         uint32 MindflayTimer;
         uint32 KillSelfTimer;
-        uint64 Portal;
+        ObjectGuid Portal;
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -985,7 +984,6 @@ public:
         {
             SetCombatMovement(false);
 
-            Portal = 0;
             if (Creature* pPortal = me->SummonCreature(NPC_SMALL_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
             {
                 pPortal->SetReactState(REACT_PASSIVE);
@@ -996,7 +994,7 @@ public:
         uint32 GroundRuptureTimer;
         uint32 HamstringTimer;
         uint32 EvadeTimer;
-        uint64 Portal;
+        ObjectGuid Portal;
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -1098,7 +1096,6 @@ public:
         {
             SetCombatMovement(false);
 
-            Portal = 0;
             if (Creature* pPortal = me->SummonCreature(NPC_GIANT_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
             {
                 pPortal->SetReactState(REACT_PASSIVE);
@@ -1110,7 +1107,7 @@ public:
         uint32 ThrashTimer;
         uint32 HamstringTimer;
         uint32 EvadeTimer;
-        uint64 Portal;
+        ObjectGuid Portal;
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -1221,7 +1218,6 @@ public:
         {
             SetCombatMovement(false);
 
-            Portal = 0;
             if (Creature* pPortal = me->SummonCreature(NPC_GIANT_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
             {
                 pPortal->SetReactState(REACT_PASSIVE);
@@ -1230,7 +1226,7 @@ public:
         }
 
         uint32 BeamTimer;
-        uint64 Portal;
+        ObjectGuid Portal;
 
         void JustDied(Unit* /*killer*/) override
         {

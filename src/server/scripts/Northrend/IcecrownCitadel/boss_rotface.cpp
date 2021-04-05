@@ -118,13 +118,17 @@ public:
         }
 
         uint32 infectionCooldown;
-        uint64 _oozeFloodDummyGUIDs[4][2];
+        ObjectGuid _oozeFloodDummyGUIDs[4][2];
         uint8 _oozeFloodStage;
 
         void Reset() override
         {
             infectionCooldown = 14000;
-            memset(&_oozeFloodDummyGUIDs, 0, sizeof(_oozeFloodDummyGUIDs));
+
+            for (uint8 i = 0; i < 4; ++i)
+                for (uint8 j = 0; j < 2; ++j)
+                    _oozeFloodDummyGUIDs[i][j].Clear();
+
             _oozeFloodStage = 0;
             _Reset();
             events.Reset();

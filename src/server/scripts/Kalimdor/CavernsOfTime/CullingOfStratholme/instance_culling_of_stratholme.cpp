@@ -24,14 +24,6 @@ public:
     {
         instance_culling_of_stratholme_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
-            // NPCs
-            _arthasGUID = 0;
-            _infiniteGUID = 0;
-
-            // GOs
-            _shkafGateGUID = 0;
-            _exitGateGUID = 0;
-
             // Instance
             _crateCount = 0;
             _showCrateTimer = 0;
@@ -399,12 +391,12 @@ public:
 
     private:
         // NPCs
-        uint64 _arthasGUID;
-        uint64 _infiniteGUID;
+        ObjectGuid _arthasGUID;
+        ObjectGuid _infiniteGUID;
 
         // GOs
-        uint64 _shkafGateGUID;
-        uint64 _exitGateGUID;
+        ObjectGuid _shkafGateGUID;
+        ObjectGuid _exitGateGUID;
         uint32 _encounterState;
         uint32 _crateCount;
         uint32 _showCrateTimer;

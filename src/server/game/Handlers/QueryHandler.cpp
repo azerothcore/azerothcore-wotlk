@@ -57,7 +57,7 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
 
 void WorldSession::HandleNameQueryOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     // This is disable by default to prevent lots of console spam
@@ -84,7 +84,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recvData)
 {
     uint32 entry;
     recvData >> entry;
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(entry);
@@ -154,7 +154,7 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recvData)
 {
     uint32 entry;
     recvData >> entry;
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     const GameObjectTemplate* info = sObjectMgr->GetGameObjectTemplate(entry);
@@ -274,7 +274,7 @@ void WorldSession::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
 void WorldSession::HandleNpcTextQueryOpcode(WorldPacket& recvData)
 {
     uint32 textID;
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> textID;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)

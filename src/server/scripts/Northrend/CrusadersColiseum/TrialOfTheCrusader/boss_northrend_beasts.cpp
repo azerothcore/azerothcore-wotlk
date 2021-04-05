@@ -76,13 +76,13 @@ public:
         npc_snobold_vassalAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
             pInstance = pCreature->GetInstanceScript();
-            TargetGUID = 0;
+            TargetGUID.Clear();
             me->SetReactState(REACT_PASSIVE);
         }
 
         InstanceScript* pInstance;
         EventMap events;
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
 
         void Reset() override
         {
@@ -134,7 +134,7 @@ public:
                                         Reset();
                                         break;
                                     }
-                TargetGUID = 0;
+                TargetGUID.Clear();
                 return;
             }
 
@@ -234,13 +234,13 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -358,7 +358,7 @@ public:
                                         snobold->ToCreature()->DespawnOrUnsummon();
                                 }
                         }
-                        PlayerGUID = 0;
+                        PlayerGUID.Clear();
                     }
                     break;
             }
@@ -776,7 +776,7 @@ public:
 
         InstanceScript* pInstance;
         EventMap events;
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
         float destX, destY, destZ;
 
         void AttackStart(Unit* who) override

@@ -37,7 +37,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_PETITION_BUY");
 #endif
 
-    uint64 guidNPC;
+    ObjectGuid guidNPC;
     uint32 clientIndex;                                     // 1 for guild and arenaslot+1 for arenas in client
     std::string name;
 
@@ -238,7 +238,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_PETITION_SHOW_SIGNATURES");
 #endif
 
-    uint64 petitionguid;
+    ObjectGuid petitionguid;
     recvData >> petitionguid;                              // petition guid
 
     // solve (possible) some strange compile problems with explicit use petition low guid at some GCC versions (wrong code optimization in compiler?)
@@ -260,8 +260,8 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
 #endif
 
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
-    data << uint64(petitionguid);                           // petition guid
-    data << uint64(_player->GetGUID());                     // owner guid
+    data << petitionguid;                                   // petition guid
+    data << _player->GetGUID();                             // owner guid
     data << uint32(petitionGuidLow);                        // guild guid
     data << uint8(signs);                                   // sign's count
 
@@ -282,7 +282,7 @@ void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recvData)
 #endif
 
     ObjectGuid::LowType guildguid;
-    uint64 petitionguid;
+    ObjectGuid petitionguid;
     recvData >> guildguid;                                 // in Trinity always same as petition low guid
     recvData >> petitionguid;                              // petition guid
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -292,7 +292,7 @@ void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recvData)
     SendPetitionQueryOpcode(petitionguid);
 }
 
-void WorldSession::SendPetitionQueryOpcode(uint64 petitionguid)
+void WorldSession::SendPetitionQueryOpcode(ObjectGuid petitionguid)
 {
     Petition const* petition = sPetitionMgr->GetPetition(petitionguid);
     if (!petition)
@@ -347,7 +347,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode MSG_PETITION_RENAME");   // ok
 #endif
 
-    uint64 petitionGuid;
+    ObjectGuid petitionGuid;
     std::string newName;
 
     recvData >> petitionGuid;                              // guid
@@ -407,7 +407,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Petition (%s) renamed to %s", petitionGuid.ToString().c_str(), newName.c_str());
 #endif
     WorldPacket data(MSG_PETITION_RENAME, (8 + newName.size() + 1));
-    data << uint64(petitionGuid);
+    data << petitionGuid;
     data << newName;
     SendPacket(&data);
 }
@@ -418,7 +418,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_PETITION_SIGN");    // ok
 #endif
 
-    uint64 petitionGuid;
+    ObjectGuid petitionGuid;
     uint8 unk;
     recvData >> petitionGuid;                              // petition guid
     recvData >> unk;
@@ -559,8 +559,8 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode MSG_PETITION_DECLINE");  // ok
 #endif
 
-    uint64 petitionguid;
-    uint64 ownerguid;
+    ObjectGuid petitionguid;
+    ObjectGuid ownerguid;
     recvData >> petitionguid;                              // petition guid
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Petition %s declined by %s", petitionguid.ToString().c_str(), _player->GetGUID().ToString().c_str());
@@ -573,7 +573,7 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
     if (Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(ownerguid))                 // petition owner online
     {
         WorldPacket data(MSG_PETITION_DECLINE, 8);
-        data << uint64(_player->GetGUID());
+        data << _player->GetGUID();
         owner->GetSession()->SendPacket(&data);
     }
 }
@@ -584,7 +584,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_OFFER_PETITION");   // ok
 #endif
 
-    uint64 petitionguid, plguid;
+    ObjectGuid petitionguid, plguid;
     uint32 junk;
     Player* player;
     recvData >> junk;                                      // this is not petition type!
@@ -653,7 +653,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
     uint8 signs = signatures ? signatures->signatureMap.size() : 0;
 
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + signs + signs * 12));
-    data << uint64(petitionguid);                           // petition guid
+    data << petitionguid;                                   // petition guid
     data << _player->GetGUID();                             // owner guid
     data << uint32(petitionguid.GetCounter());              // guild guid
     data << uint8(signs);                                   // sign's count
@@ -676,7 +676,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
 
     // Get petition guid from packet
     WorldPacket data;
-    uint64 petitionGuid;
+    ObjectGuid petitionGuid;
 
     recvData >> petitionGuid;
 
@@ -857,13 +857,13 @@ void WorldSession::HandlePetitionShowListOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "Received CMSG_PETITION_SHOWLIST");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     SendPetitionShowList(guid);
 }
 
-void WorldSession::SendPetitionShowList(uint64 guid)
+void WorldSession::SendPetitionShowList(ObjectGuid guid)
 {
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_PETITIONER);
     if (!creature)

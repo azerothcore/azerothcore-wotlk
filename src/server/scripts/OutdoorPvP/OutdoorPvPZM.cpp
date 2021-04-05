@@ -203,7 +203,7 @@ bool OPvPCapturePointZM_GraveYard::Update(uint32 /*diff*/)
     return retval;
 }
 
-int32 OPvPCapturePointZM_GraveYard::HandleOpenGo(Player* player, uint64 guid)
+int32 OPvPCapturePointZM_GraveYard::HandleOpenGo(Player* player, ObjectGuid guid)
 {
     int32 retval = OPvPCapturePoint::HandleOpenGo(player, guid);
     if (retval >= 0)
@@ -244,7 +244,7 @@ OPvPCapturePointZM_GraveYard::OPvPCapturePointZM_GraveYard(OutdoorPvP* pvp)
 {
     m_BothControllingFactionId = TEAM_NEUTRAL;
     m_GraveYardState = ZM_GRAVEYARD_N;
-    m_FlagCarrierGUID = 0;
+    m_FlagCarrierGUID.Clear();
     // add field scouts here
     AddCreature(ZM_ALLIANCE_FIELD_SCOUT, ZM_AllianceFieldScout.entry, ZM_AllianceFieldScout.map, ZM_AllianceFieldScout.x, ZM_AllianceFieldScout.y, ZM_AllianceFieldScout.z, ZM_AllianceFieldScout.o);
     AddCreature(ZM_HORDE_FIELD_SCOUT, ZM_HordeFieldScout.entry, ZM_HordeFieldScout.map, ZM_HordeFieldScout.x, ZM_HordeFieldScout.y, ZM_HordeFieldScout.z, ZM_HordeFieldScout.o);
@@ -312,7 +312,7 @@ void OPvPCapturePointZM_GraveYard::SetBeaconState(TeamId controlling_factionId)
                         p->RemoveAurasDueToSpell(ZM_BATTLE_STANDARD_A);
                         p->RemoveAurasDueToSpell(ZM_BATTLE_STANDARD_H);
                     }
-                    m_FlagCarrierGUID = 0;
+                    m_FlagCarrierGUID.Clear();
                 }
             }
             break;
@@ -323,8 +323,8 @@ void OPvPCapturePointZM_GraveYard::SetBeaconState(TeamId controlling_factionId)
 
 bool OPvPCapturePointZM_GraveYard::CanTalkTo(Player* player, Creature* c, GossipMenuItems const& /*gso*/)
 {
-    uint64 guid = c->GetGUID();
-    std::map<uint64, uint32>::iterator itr = m_CreatureTypes.find(guid);
+    ObjectGuid guid = c->GetGUID();
+    std::map<ObjectGuid::LowType, uint32>::iterator itr = m_CreatureTypes.find(guid.GetCounter());
     if (itr != m_CreatureTypes.end())
     {
         if (itr->second == ZM_ALLIANCE_FIELD_SCOUT && player->GetTeamId() == TEAM_ALLIANCE && m_BothControllingFactionId == TEAM_ALLIANCE && !m_FlagCarrierGUID && m_GraveYardState != ZM_GRAVEYARD_A)
@@ -335,9 +335,9 @@ bool OPvPCapturePointZM_GraveYard::CanTalkTo(Player* player, Creature* c, Gossip
     return false;
 }
 
-bool OPvPCapturePointZM_GraveYard::HandleGossipOption(Player* player, uint64 guid, uint32 /*gossipid*/)
+bool OPvPCapturePointZM_GraveYard::HandleGossipOption(Player* player, ObjectGuid guid, uint32 /*gossipid*/)
 {
-    std::map<uint64, uint32>::iterator itr = m_CreatureTypes.find(guid);
+    std::map<ObjectGuid::LowType, uint32>::iterator itr = m_CreatureTypes.find(guid.GetCounter());
     if (itr != m_CreatureTypes.end())
     {
         Creature* cr = HashMapHolder<Creature>::Find(guid);
@@ -368,10 +368,10 @@ bool OPvPCapturePointZM_GraveYard::HandleDropFlag(Player* /*player*/, uint32 spe
     switch (spellId)
     {
         case ZM_BATTLE_STANDARD_A:
-            m_FlagCarrierGUID = 0;
+            m_FlagCarrierGUID.Clear();
             return true;
         case ZM_BATTLE_STANDARD_H:
-            m_FlagCarrierGUID = 0;
+            m_FlagCarrierGUID.Clear();
             return true;
     }
     return false;

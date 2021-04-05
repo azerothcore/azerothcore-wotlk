@@ -171,8 +171,8 @@ public:
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_PREPARATION);
             gythEvent = false;
-            victorGUID = 0;
-            waveDoorGUID = 0;
+            victorGUID.Clear();
+            waveDoorGUID.Clear();
 
             summons.DespawnAll();
 
@@ -465,8 +465,8 @@ public:
 
     private:
         bool   gythEvent;
-        uint64 victorGUID;
-        uint64 waveDoorGUID;
+        ObjectGuid victorGUID;
+        ObjectGuid waveDoorGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

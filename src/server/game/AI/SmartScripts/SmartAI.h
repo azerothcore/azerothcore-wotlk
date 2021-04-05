@@ -194,7 +194,7 @@ private:
     uint32 mFollowCredit;
     uint32 mFollowArrivedEntry;
     bool   mFollowArrivedAlive;
-    uint64 mFollowGuid;
+    ObjectGuid mFollowGuid;
     float mFollowDist;
     float mFollowAngle;
 

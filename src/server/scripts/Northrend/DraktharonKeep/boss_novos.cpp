@@ -240,8 +240,8 @@ public:
     private:
         uint8 _crystalCounter;
         uint8 _stage;
-        uint64 _summonTargetRightGUID;
-        uint64 _summonTargetLeftGUID;
+        ObjectGuid _summonTargetRightGUID;
+        ObjectGuid _summonTargetLeftGUID;
 
         bool _achievement;
     };

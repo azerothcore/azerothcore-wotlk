@@ -70,7 +70,7 @@ public:
                         c->CastSpell(s, SPELL_FROST_TOMB_AURA, true);
                 }
         }
-        uint64 PrisonerGUID;
+        ObjectGuid PrisonerGUID;
 
         void JustDied(Unit* killer) override
         {

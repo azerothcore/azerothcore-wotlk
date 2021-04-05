@@ -2191,12 +2191,12 @@ public:
     {
         npc_icc_ice_sphereAI(Creature* creature) : ScriptedAI(creature)
         {
-            targetGUID = 0;
+            targetGUID.Clear();
             timer = 250;
             me->SetReactState(REACT_PASSIVE);
         }
 
-        uint64 targetGUID;
+        ObjectGuid targetGUID;
         uint16 timer;
 
         void DoAction(int32 a) override
@@ -2206,7 +2206,7 @@ public:
                 me->RemoveAllAuras();
                 me->CastSpell(me, SPELL_ICE_BURST, true);
                 me->DespawnOrUnsummon(1000);
-                targetGUID = 0;
+                targetGUID.Clear();
                 timer = 9999;
                 me->InterruptNonMeleeSpells(true);
                 me->AttackStop();
@@ -2219,7 +2219,7 @@ public:
         {
             if (!me->HasAura(SPELL_ICE_SPHERE))
                 me->CastSpell(me, SPELL_ICE_SPHERE, true);
-            targetGUID = 0;
+            targetGUID.Clear();
             me->InterruptNonMeleeSpells(true);
             me->AttackStop();
             me->GetMotionMaster()->Clear();
@@ -3121,8 +3121,8 @@ public:
                 path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), 843.0f));
                 me->GetMotionMaster()->MoveSplinePath(&path);
 
-                uint64 petGUID = summoner->GetPetGUID();
-                summoner->SetPetGUID(0);
+                ObjectGuid petGUID = summoner->GetPetGUID();
+                summoner->SetPetGUID(ObjectGuid::Empty);
                 summoner->StopMoving();
                 me->CastSpell(summoner, SPELL_HARVEST_SOUL_VEHICLE, true);
                 //summoner->ClearUnitState(UNIT_STATE_ONVEHICLE);

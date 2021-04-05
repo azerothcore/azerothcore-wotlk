@@ -174,7 +174,7 @@ private:
 class FrostBombExplosion : public BasicEvent
 {
 public:
-    FrostBombExplosion(Creature* owner, uint64 sindragosaGUID) : _owner(owner), _sindragosaGUID(sindragosaGUID) { }
+    FrostBombExplosion(Creature* owner, ObjectGuid sindragosaGUID) : _owner(owner), _sindragosaGUID(sindragosaGUID) { }
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
@@ -185,13 +185,13 @@ public:
 
 private:
     Creature* _owner;
-    uint64 _sindragosaGUID;
+    ObjectGuid _sindragosaGUID;
 };
 
 class IceTombSummonEvent : public BasicEvent
 {
 public:
-    IceTombSummonEvent(Unit* owner, uint64 sindragosaGUID) : _owner(owner), _sindragosaGUID(sindragosaGUID) { }
+    IceTombSummonEvent(Unit* owner, ObjectGuid sindragosaGUID) : _owner(owner), _sindragosaGUID(sindragosaGUID) { }
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
@@ -222,7 +222,7 @@ public:
 
 private:
     Unit* _owner;
-    uint64 _sindragosaGUID;
+    ObjectGuid _sindragosaGUID;
 };
 
 struct LastPhaseIceTombTargetSelector : public acore::unary_function<Unit*, bool>
@@ -741,7 +741,7 @@ public:
 
             if (Player* player = ObjectAccessor::GetPlayer(*me, _trappedPlayerGUID))
             {
-                _trappedPlayerGUID = 0;
+                _trappedPlayerGUID.Clear();
                 player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_DAMAGE);
                 player->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
                 player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);

@@ -20,7 +20,7 @@
 
 #define MAX_INBOX_CLIENT_CAPACITY 50
 
-bool WorldSession::CanOpenMailBox(uint64 guid)
+bool WorldSession::CanOpenMailBox(ObjectGuid guid)
 {
     if (guid == _player->GetGUID())
     {
@@ -48,7 +48,8 @@ bool WorldSession::CanOpenMailBox(uint64 guid)
 
 void WorldSession::HandleSendMail(WorldPacket& recvData)
 {
-    uint64 mailbox, unk3;
+    ObjectGuid mailbox;
+    uint64 unk3;
     std::string receiver, subject, body;
     uint32 unk1, unk2, money, COD;
     uint8 unk4;
@@ -79,7 +80,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         return;
     }
 
-    uint64 itemGUIDs[MAX_MAIL_ITEMS];
+    ObjectGuid itemGUIDs[MAX_MAIL_ITEMS];
 
     for (uint8 i = 0; i < items_count; ++i)
     {
@@ -107,7 +108,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         return;
     }
 
-    uint64 rc = 0;
+    ObjectGuid rc;
     if (normalizePlayerName(receiver))
         rc = sObjectMgr->GetPlayerGUIDByName(receiver);
 
@@ -323,7 +324,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 //called when mail is read
 void WorldSession::HandleMailMarkAsRead(WorldPacket& recvData)
 {
-    uint64 mailbox;
+    ObjectGuid mailbox;
     uint32 mailId;
     recvData >> mailbox;
     recvData >> mailId;
@@ -346,7 +347,7 @@ void WorldSession::HandleMailMarkAsRead(WorldPacket& recvData)
 //called when client deletes mail
 void WorldSession::HandleMailDelete(WorldPacket& recvData)
 {
-    uint64 mailbox;
+    ObjectGuid mailbox;
     uint32 mailId;
     recvData >> mailbox;
     recvData >> mailId;
@@ -376,7 +377,7 @@ void WorldSession::HandleMailDelete(WorldPacket& recvData)
 
 void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
 {
-    uint64 mailbox;
+    ObjectGuid mailbox;
     uint32 mailId;
     recvData >> mailbox;
     recvData >> mailId;
@@ -439,7 +440,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
 //called when player takes item attached in mail
 void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
 {
-    uint64 mailbox;
+    ObjectGuid mailbox;
     uint32 mailId;
     uint32 itemId;
     recvData >> mailbox;
@@ -541,7 +542,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
 
 void WorldSession::HandleMailTakeMoney(WorldPacket& recvData)
 {
-    uint64 mailbox;
+    ObjectGuid mailbox;
     uint32 mailId;
     recvData >> mailbox;
     recvData >> mailId;
@@ -580,7 +581,7 @@ void WorldSession::HandleMailTakeMoney(WorldPacket& recvData)
 //called when player lists his received mails
 void WorldSession::HandleGetMailList(WorldPacket& recvData)
 {
-    uint64 mailbox;
+    ObjectGuid mailbox;
     recvData >> mailbox;
 
     if (!CanOpenMailBox(mailbox))
@@ -703,7 +704,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
 //used when player copies mail body to his inventory
 void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
 {
-    uint64 mailbox;
+    ObjectGuid mailbox;
     uint32 mailId;
 
     recvData >> mailbox;
@@ -799,7 +800,7 @@ void WorldSession::HandleQueryNextMailTime(WorldPacket& /*recvData*/)
             if (sentSenders.count(m->sender))
                 continue;
 
-            data << uint64(m->messageType == MAIL_NORMAL ? m->sender : 0);  // player guid
+            data << (m->messageType == MAIL_NORMAL ? ObjectGuid::Create<HighGuid::Player>(m->sender) : ObjectGuid::Empty);  // player guid
             data << uint32(m->messageType != MAIL_NORMAL ? m->sender : 0);  // non-player entries
             data << uint32(m->messageType);
             data << uint32(m->stationery);

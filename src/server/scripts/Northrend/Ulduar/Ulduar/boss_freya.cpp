@@ -260,7 +260,6 @@ public:
             if (!me->IsAlive())
                 if (m_pInstance)
                     m_pInstance->SetData(TYPE_FREYA, DONE);
-            memset(_elderGUID, 0, sizeof(_elderGUID));
         }
 
         InstanceScript* m_pInstance;
@@ -275,7 +274,7 @@ public:
         bool _backToNature;
         uint8 _deforestation;
 
-        uint64 _elderGUID[3];
+        ObjectGuid _elderGUID[3];
 
         void Reset() override
         {
@@ -292,7 +291,8 @@ public:
 
                 if (Creature* elder = ObjectAccessor::GetCreature(*me, _elderGUID[i]))
                     elder->AI()->EnterEvadeMode();
-                _elderGUID[i] = 0;
+
+                _elderGUID[i].Clear();
             }
 
             _lumberjacked = 0;
@@ -1114,7 +1114,7 @@ public:
         }
 
         EventMap events;
-        uint64 _freyaGUID;
+        ObjectGuid _freyaGUID;
         uint8 _stackCount;
         bool _hasDied;
         bool _isTrio;
@@ -1251,10 +1251,10 @@ public:
     {
         boss_freya_nature_bombAI(Creature* pCreature) : NullCreatureAI(pCreature)
         {
-            _goGUID = 0;
+            _goGUID.Clear();
         }
 
-        uint64 _goGUID;
+        ObjectGuid _goGUID;
         uint32 _explodeTimer;
 
         void Reset() override

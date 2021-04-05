@@ -1966,7 +1966,7 @@ bool Pet::Create(ObjectGuid::LowType spawnId, Map* map, uint32 phaseMask, uint32
 
     SetPhaseMask(phaseMask, false);
 
-    Object::_Create(guidlow, pet_number, HIGHGUID_PET);
+    Object::_Create(guidlow, pet_number, HighGuid::Pet);
 
     m_spawnId = guidlow;
     m_originalEntry = Entry;
@@ -2330,7 +2330,7 @@ void Pet::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
         {
             WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
             data << uint32(spell_id);
-            data << uint64(GetGUID());
+            data << GetGUID();
             playerOwner->SendDirectMessage(&data);
         }
     }

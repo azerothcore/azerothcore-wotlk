@@ -541,7 +541,7 @@ void WorldSession::HandleCancelTradeOpcode(WorldPacket& /*recvPacket*/)
 
 void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
 {
-    uint64 ID;
+    ObjectGuid ID;
     recvPacket >> ID;
 
     if (GetPlayer()->m_trade)
@@ -648,7 +648,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
 
     WorldPacket data(SMSG_TRADE_STATUS, 12);
     data << uint32(TRADE_STATUS_BEGIN_TRADE);
-    data << uint64(_player->GetGUID());
+    data << _player->GetGUID();
     pOther->GetSession()->SendPacket(&data);
 }
 
@@ -694,7 +694,7 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    uint64 iGUID = item->GetGUID();
+    ObjectGuid iGUID = item->GetGUID();
 
     // prevent place single item into many trade slots using cheating and client bugs
     if (my_trade->HasItem(iGUID))

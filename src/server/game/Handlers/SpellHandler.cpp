@@ -61,7 +61,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     uint8 bagIndex, slot, castFlags;
     uint8 castCount;                                       // next cast if exists (single or not)
-    uint64 itemGUID;
+    ObjectGuid itemGUID;
     uint32 glyphIndex;                                      // something to do with glyphs?
     uint32 spellId;                                         // casted spell id
 
@@ -290,7 +290,7 @@ void WorldSession::HandleOpenWrappedItemCallback(PreparedQueryResult result, uin
 
 void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -313,7 +313,7 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleGameobjectReportUse(WorldPacket& recvPacket)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvPacket >> guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -487,7 +487,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint32 spellId;
 
     recvPacket >> guid;
@@ -595,7 +595,7 @@ void WorldSession::HandleSelfResOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleSpellClick(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     // this will get something not in world. crash
@@ -616,7 +616,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_GET_MIRRORIMAGE_DATA");
 #endif
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     // Get unit for which data is needed by client
@@ -633,7 +633,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
         return;
 
     WorldPacket data(SMSG_MIRRORIMAGE_DATA, 68);
-    data << uint64(guid);
+    data << guid;
     data << uint32(creator->GetDisplayId());
     data << uint8(creator->getRace());
     data << uint8(creator->getGender());
@@ -712,7 +712,7 @@ void WorldSession::HandleUpdateProjectilePosition(WorldPacket& recvPacket)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_UPDATE_PROJECTILE_POSITION");
 #endif
 
-    uint64 casterGuid;
+    ObjectGuid casterGuid;
     uint32 spellId;
     uint8 castCount;
     float x, y, z;    // Position of missile hit
@@ -737,7 +737,7 @@ void WorldSession::HandleUpdateProjectilePosition(WorldPacket& recvPacket)
     spell->m_targets.ModDst(pos);
 
     WorldPacket data(SMSG_SET_PROJECTILE_POSITION, 21);
-    data << uint64(casterGuid);
+    data << casterGuid;
     data << uint8(castCount);
     data << float(x);
     data << float(y);

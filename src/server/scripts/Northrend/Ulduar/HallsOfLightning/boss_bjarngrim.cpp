@@ -372,14 +372,14 @@ public:
         npc_stormforged_lieutenantAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
-        uint64 BjarngrimGUID;
+        ObjectGuid BjarngrimGUID;
 
         void Reset() override
         {
             if (me->IsSummon())
                 BjarngrimGUID = me->ToTempSummon()->GetSummonerGUID();
             else
-                BjarngrimGUID = 0;
+                BjarngrimGUID.Clear();
         }
 
         void EnterCombat(Unit*) override

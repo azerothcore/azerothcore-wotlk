@@ -48,7 +48,7 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
     if (!playerData)
         return;
 
-    uint64 friendGuid = ObjectGuid::Create<HighGuid::Player>(guidLow);
+    ObjectGuid friendGuid = ObjectGuid::Create<HighGuid::Player>(guidLow);
     uint32 friendAccountId = playerData->accountId;
     TeamId teamId = Player::TeamIdForRace(playerData->race);
     FriendsResult friendResult = FRIEND_NOT_FOUND;
@@ -86,7 +86,7 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleDelFriendOpcode(WorldPacket& recv_data)
 {
-    uint64 FriendGUID;
+    ObjectGuid FriendGUID;
     recv_data >> FriendGUID;
 
     _player->GetSocial()->RemoveFromSocialList(FriendGUID, SOCIAL_FLAG_FRIEND);
@@ -111,7 +111,7 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recv_data)
     if (!lowGuid)
         return;
 
-    uint64 IgnoreGuid = ObjectGuid::Create<HighGuid::Player>(lowGuid);
+    ObjectGuid IgnoreGuid = ObjectGuid::Create<HighGuid::Player>(lowGuid);
     FriendsResult ignoreResult;
 
     if (IgnoreGuid == GetPlayer()->GetGUID())              //not add yourself
@@ -134,7 +134,7 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleDelIgnoreOpcode(WorldPacket& recv_data)
 {
-    uint64 IgnoreGUID;
+    ObjectGuid IgnoreGUID;
     recv_data >> IgnoreGUID;
 
     _player->GetSocial()->RemoveFromSocialList(IgnoreGUID, SOCIAL_FLAG_IGNORED);
@@ -143,7 +143,7 @@ void WorldSession::HandleDelIgnoreOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleSetContactNotesOpcode(WorldPacket& recv_data)
 {
-    uint64 guid;
+    ObjectGuid guid;
     std::string note;
     recv_data >> guid >> note;
     _player->GetSocial()->SetFriendNote(guid, note);

@@ -159,7 +159,7 @@ struct ManaVoidSelector : public acore::unary_function<Unit*, bool>
 class DelayedCastEvent : public BasicEvent
 {
 public:
-    DelayedCastEvent(Creature* trigger, uint32 spellId, uint64 originalCaster, uint32 despawnTime) : _trigger(trigger), _originalCaster(originalCaster), _spellId(spellId), _despawnTime(despawnTime)
+    DelayedCastEvent(Creature* trigger, uint32 spellId, ObjectGuid originalCaster, uint32 despawnTime) : _trigger(trigger), _originalCaster(originalCaster), _spellId(spellId), _despawnTime(despawnTime)
     {
     }
 
@@ -173,7 +173,7 @@ public:
 
 private:
     Creature* _trigger;
-    uint64 _originalCaster;
+    ObjectGuid _originalCaster;
     uint32 _spellId;
     uint32 _despawnTime;
 };

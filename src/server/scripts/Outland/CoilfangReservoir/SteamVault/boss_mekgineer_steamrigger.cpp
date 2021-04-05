@@ -157,12 +157,12 @@ public:
         }
 
         uint32 repairTimer;
-        uint64 bossGUID;
+        ObjectGuid bossGUID;
 
         void Reset() override
         {
             repairTimer = 0;
-            bossGUID = 0;
+            bossGUID.Clear();
             if (InstanceScript* instance = me->GetInstanceScript())
                 bossGUID = instance->GetGuidData(TYPE_MEKGINEER_STEAMRIGGER);
         }

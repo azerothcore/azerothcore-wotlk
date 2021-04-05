@@ -22,19 +22,19 @@ public:
 
         uint32 Encounter[MAX_ENCOUNTER];
 
-        uint64 goKaddrakGUID;
-        uint64 goMarnakGUID;
-        uint64 goAbedneumGUID;
-        uint64 goTribunalConsoleGUID;
-        uint64 goSkyRoomFloorGUID;
-        uint64 goSjonnirConsoleGUID;
-        uint64 goSjonnirDoorGUID;
-        uint64 goLeftPipeGUID;
-        uint64 goRightPipeGUID;
-        uint64 goTribunalDoorGUID;
+        ObjectGuid goKaddrakGUID;
+        ObjectGuid goMarnakGUID;
+        ObjectGuid goAbedneumGUID;
+        ObjectGuid goTribunalConsoleGUID;
+        ObjectGuid goSkyRoomFloorGUID;
+        ObjectGuid goSjonnirConsoleGUID;
+        ObjectGuid goSjonnirDoorGUID;
+        ObjectGuid goLeftPipeGUID;
+        ObjectGuid goRightPipeGUID;
+        ObjectGuid goTribunalDoorGUID;
 
-        uint64 SjonnirGUID;
-        uint64 BrannGUID;
+        ObjectGuid SjonnirGUID;
+        ObjectGuid BrannGUID;
 
         bool brannAchievement;
         bool sjonnirAchievement;
@@ -44,20 +44,6 @@ public:
         void Initialize() override
         {
             memset(&Encounter, 0, sizeof(Encounter));
-
-            goKaddrakGUID = 0;
-            goMarnakGUID = 0;
-            goAbedneumGUID = 0;
-            goTribunalConsoleGUID = 0;
-            goSkyRoomFloorGUID = 0;
-            goSjonnirConsoleGUID = 0;
-            goSjonnirDoorGUID = 0;
-            goLeftPipeGUID = 0;
-            goRightPipeGUID = 0;
-            goTribunalDoorGUID = 0;
-
-            SjonnirGUID = 0;
-            BrannGUID = 0;
 
             brannAchievement = false;
             sjonnirAchievement = false;

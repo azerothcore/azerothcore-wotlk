@@ -210,7 +210,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         bool summoned;
-        uint64 MemoryGUID;
+        ObjectGuid MemoryGUID;
 
         void Reset() override
         {
@@ -220,7 +220,7 @@ public:
             {
                 if( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
                     memory->DespawnOrUnsummon();
-                MemoryGUID = 0;
+                MemoryGUID.Clear();
             }
             me->SetReactState(REACT_PASSIVE);
             if( pInstance )
@@ -259,7 +259,7 @@ public:
         {
             if( param == 1 )
             {
-                MemoryGUID = 0;
+                MemoryGUID.Clear();
                 me->RemoveAura(SPELL_SHIELD);
                 Talk(TEXT_PALETRESS_MEMORY_DEFEATED);
             }
@@ -269,7 +269,7 @@ public:
                     if( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
                     {
                         memory->DespawnOrUnsummon();
-                        MemoryGUID = 0;
+                        MemoryGUID.Clear();
                     }
             }
         }

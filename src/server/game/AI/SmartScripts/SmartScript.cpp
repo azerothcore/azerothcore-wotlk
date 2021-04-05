@@ -4846,7 +4846,7 @@ void SmartScript::SetMovePathEndAction(SMART_ACTION action)
 {
 }
 
-uint32 SmartScript::DoChat(int8 id, uint64 whisperGuid)
+uint32 SmartScript::DoChat(int8 id, ObjectGuid whisperGuid)
 {
     return 0;
 }*/

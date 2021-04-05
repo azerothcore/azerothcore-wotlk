@@ -129,18 +129,18 @@ static const uint8 GroupUpdateLength[GROUP_UPDATE_FLAGS_COUNT] = { 0, 2, 2, 2, 1
 class Roll : public LootValidatorRef
 {
 public:
-    Roll(uint64 _guid, LootItem const& li);
+    Roll(ObjectGuid _guid, LootItem const& li);
     ~Roll();
     void setLoot(Loot* pLoot);
     Loot* getLoot();
     void targetObjectBuildLink();
 
-    uint64 itemGUID;
+    ObjectGuid itemGUID;
     uint32 itemid;
     int32  itemRandomPropId;
     uint32 itemRandomSuffix;
     uint8 itemCount;
-    typedef std::map<uint64, RollVote> PlayerVote;
+    typedef std::map<ObjectGuid, RollVote> PlayerVote;
     PlayerVote playerVote;                              //vote position correspond with player position (in group)
     uint8 totalPlayersRolling;
     uint8 totalNeed;
@@ -157,7 +157,7 @@ class Group
 public:
     struct MemberSlot
     {
-        uint64      guid;
+        ObjectGuid  guid;
         std::string name;
         uint8       group;
         uint8       flags;
@@ -312,8 +312,8 @@ protected:
     void _cancelHomebindIfInstance(Player* player);
 
     void _initRaidSubGroupsCounter();
-    member_citerator _getMemberCSlot(uint64 Guid) const;
-    member_witerator _getMemberWSlot(uint64 Guid);
+    member_citerator _getMemberCSlot(ObjectGuid Guid) const;
+    member_witerator _getMemberWSlot(ObjectGuid Guid);
     void SubGroupCounterIncrease(uint8 subgroup);
     void SubGroupCounterDecrease(uint8 subgroup);
     void ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply);
@@ -321,21 +321,21 @@ protected:
     MemberSlotList      m_memberSlots;
     GroupRefManager     m_memberMgr;
     InvitesList         m_invitees;
-    uint64              m_leaderGuid;
+    ObjectGuid          m_leaderGuid;
     std::string         m_leaderName;
     GroupType           m_groupType;
     Difficulty          m_dungeonDifficulty;
     Difficulty          m_raidDifficulty;
     Battlefield*        m_bfGroup;
     Battleground*       m_bgGroup;
-    uint64              m_targetIcons[TARGETICONCOUNT];
+    ObjectGuid          m_targetIcons[TARGETICONCOUNT];
     LootMethod          m_lootMethod;
     ItemQualities       m_lootThreshold;
-    uint64              m_looterGuid;
-    uint64              m_masterLooterGuid;
+    ObjectGuid          m_looterGuid;
+    ObjectGuid          m_masterLooterGuid;
     Rolls               RollId;
     uint8*              m_subGroupsCounts;
-    uint64              m_guid;
+    ObjectGuid          m_guid;
     uint32              m_counter;                      // used only in SMSG_GROUP_LIST
     uint32              m_maxEnchantingLevel;
     uint8               m_lfgGroupFlags;

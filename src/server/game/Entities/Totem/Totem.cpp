@@ -15,7 +15,7 @@
 #include "Totem.h"
 #include "WorldPacket.h"
 
-Totem::Totem(SummonPropertiesEntry const* properties, uint64 owner) : Minion(properties, owner, false)
+Totem::Totem(SummonPropertiesEntry const* properties, ObjectGuid owner) : Minion(properties, owner, false)
 {
     m_unitTypeMask |= UNIT_MASK_TOTEM;
     m_duration = 0;
@@ -51,7 +51,7 @@ void Totem::InitStats(uint32 duration)
         {
             WorldPacket data(SMSG_TOTEM_CREATED, 1 + 8 + 4 + 4);
             data << uint8(m_Properties->Slot - 1);
-            data << uint64(GetGUID());
+            data << GetGUID();
             data << uint32(duration);
             data << uint32(GetUInt32Value(UNIT_CREATED_BY_SPELL));
             owner->ToPlayer()->SendDirectMessage(&data);

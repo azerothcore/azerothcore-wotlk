@@ -32,11 +32,7 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
 
-            LadyVashjGUID = 0;
-            memset(&ShieldGeneratorGUID, 0, sizeof(ShieldGeneratorGUID));
             AliveKeepersCount = 0;
-            LeotherasTheBlindGUID = 0;
-            LurkerBelowGUID = 0;
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -208,10 +204,10 @@ public:
         }
 
     private:
-        uint64 LadyVashjGUID;
-        uint64 ShieldGeneratorGUID[4];
-        uint64 LurkerBelowGUID;
-        uint64 LeotherasTheBlindGUID;
+        ObjectGuid LadyVashjGUID;
+        ObjectGuid ShieldGeneratorGUID[4];
+        ObjectGuid LurkerBelowGUID;
+        ObjectGuid LeotherasTheBlindGUID;
         int32 AliveKeepersCount;
     };
 

@@ -78,7 +78,7 @@ public:
 
         uint32 FlameWreathTimer;
         uint32 FlameWreathCheckTime;
-        uint64 FlameWreathTarget[3];
+        ObjectGuid FlameWreathTarget[3];
         float FWTargPosX[3];
         float FWTargPosY[3];
 
@@ -104,6 +104,9 @@ public:
 
             FlameWreathTimer = 0;
             FlameWreathCheckTime = 0;
+
+            for (uint8 i = 0; i < 3; ++i)
+                FlameWreathTarget[i].Clear();
 
             CurrentNormalSpell = 0;
             ArcaneCooldown = 0;

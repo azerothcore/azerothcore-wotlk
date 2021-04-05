@@ -36,7 +36,7 @@ void InstanceScript::SaveToDB()
     CharacterDatabase.Execute(stmt);
 }
 
-void InstanceScript::HandleGameObject(uint64 GUID, bool open, GameObject* go)
+void InstanceScript::HandleGameObject(ObjectGuid GUID, bool open, GameObject* go)
 {
     if (!go)
         go = instance->GetGameObject(GUID);
@@ -255,7 +255,7 @@ std::string InstanceScript::GetBossSaveData()
     return saveStream.str();
 }
 
-void InstanceScript::DoUseDoorOrButton(uint64 uiGuid, uint32 uiWithRestoreTime, bool bUseAlternativeState)
+void InstanceScript::DoUseDoorOrButton(ObjectGuid uiGuid, uint32 uiWithRestoreTime, bool bUseAlternativeState)
 {
     if (!uiGuid)
         return;
@@ -276,7 +276,7 @@ void InstanceScript::DoUseDoorOrButton(uint64 uiGuid, uint32 uiWithRestoreTime, 
     }
 }
 
-void InstanceScript::DoRespawnGameObject(uint64 uiGuid, uint32 uiTimeToDespawn)
+void InstanceScript::DoRespawnGameObject(ObjectGuid uiGuid, uint32 uiTimeToDespawn)
 {
     if (GameObject* go = instance->GetGameObject(uiGuid))
     {

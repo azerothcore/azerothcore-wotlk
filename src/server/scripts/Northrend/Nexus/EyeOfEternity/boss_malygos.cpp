@@ -452,7 +452,7 @@ public:
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 
                         me->SendMeleeAttackStop(me->GetVictim());
-                        me->SetTarget((uint64)0);
+                        me->SetTarget(ObjectGuid::Empty);
 
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
@@ -557,7 +557,7 @@ public:
                     Talk(SAY_END_P1);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
                     me->SendMeleeAttackStop();
-                    me->SetTarget((uint64)0);
+                    me->SetTarget(ObjectGuid::Empty);
                     me->GetMotionMaster()->MoveIdle();
                     me->DisableSpline();
                     me->GetMotionMaster()->MovePoint(MI_POINT_CENTER_GROUND_PH_2, CenterPos);
@@ -1467,11 +1467,10 @@ public:
     {
         PrepareSpellScript(spell_eoe_ph3_surge_of_power_SpellScript);
 
-        uint64 DrakeGUID[3];
+        ObjectGuid DrakeGUID[3];
 
         bool Load() override
         {
-            memset(&DrakeGUID, 0, sizeof(DrakeGUID));
             if (Unit* caster = GetCaster())
                 if (Creature* c = caster->ToCreature())
                 {

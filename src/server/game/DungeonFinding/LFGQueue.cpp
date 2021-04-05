@@ -29,7 +29,7 @@
 namespace lfg
 {
 
-    void LFGQueue::AddToQueue(uint64 guid, bool failedProposal)
+    void LFGQueue::AddToQueue(ObjectGuid guid, bool failedProposal)
     {
         //sLog->outString("ADD AddToQueue: %s, failed proposal: %u", guid.ToString().c_str(), failedProposal ? 1 : 0);
         LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(guid);
@@ -42,7 +42,7 @@ namespace lfg
         AddToNewQueue(guid, failedProposal);
     }
 
-    void LFGQueue::RemoveFromQueue(uint64 guid, bool partial)
+    void LFGQueue::RemoveFromQueue(ObjectGuid guid, bool partial)
     {
         //sLog->outString("REMOVE RemoveFromQueue: %s, partial: %u", guid.ToString().c_str(), partial ? 1 : 0);
         RemoveFromNewQueue(guid);
@@ -77,7 +77,7 @@ namespace lfg
         }
     }
 
-    void LFGQueue::AddToNewQueue(uint64 guid, bool front)
+    void LFGQueue::AddToNewQueue(ObjectGuid guid, bool front)
     {
         if (front)
         {
@@ -92,21 +92,21 @@ namespace lfg
         }
     }
 
-    void LFGQueue::RemoveFromNewQueue(uint64 guid)
+    void LFGQueue::RemoveFromNewQueue(ObjectGuid guid)
     {
         //sLog->outString("REMOVE RemoveFromNewQueue: %s", guid.ToString().c_str());
         newToQueueStore.remove(guid);
         restoredAfterProposal.remove(guid);
     }
 
-    void LFGQueue::AddQueueData(uint64 guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap)
+    void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap)
     {
         //sLog->outString("JOINED AddQueueData: %s", guid.ToString().c_str());
         QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap);
         AddToQueue(guid);
     }
 
-    void LFGQueue::RemoveQueueData(uint64 guid)
+    void LFGQueue::RemoveQueueData(ObjectGuid guid)
     {
         //sLog->outString("LEFT RemoveQueueData: %s", guid.ToString().c_str());
         LfgQueueDataContainer::iterator it = QueueDataStore.find(guid);
@@ -142,7 +142,7 @@ namespace lfg
         wt.time = int32((wt.time * old_number + waitTime) / wt.number);
     }
 
-    void LFGQueue::RemoveFromCompatibles(uint64 guid)
+    void LFGQueue::RemoveFromCompatibles(ObjectGuid guid)
     {
         //sLog->outString("COMPATIBLES REMOVE for: %s", guid.ToString().c_str());
         for (LfgCompatibleContainer::iterator it = CompatibleList.begin(); it != CompatibleList.end(); ++it)
@@ -175,7 +175,7 @@ namespace lfg
         if (!newToQueueStore.empty())
         {
             ++newGroupsProcessed;
-            uint64 newGuid = newToQueueStore.front();
+            ObjectGuid newGuid = newToQueueStore.front();
             bool pushCompatiblesToFront = (std::find(restoredAfterProposal.begin(), restoredAfterProposal.end(), newGuid) != restoredAfterProposal.end());
             //sLog->outString("newToQueueStore: %s, front: %u", newGuid.ToString().c_str(), pushCompatiblesToFront ? 1 : 0);
             RemoveFromNewQueue(newGuid);
@@ -190,7 +190,7 @@ namespace lfg
         return newGroupsProcessed;
     }
 
-    LfgCompatibility LFGQueue::FindNewGroups(const uint64& newGuid)
+    LfgCompatibility LFGQueue::FindNewGroups(const ObjectGuid& newGuid)
     {
         // each combination of dps+heal+tank (tank*8 + heal+4 + dps) has a value assigned 0..15
         // first 16 bits of the mask are for marking if such combination was found once, second 16 bits for marking second occurence of that combination, etc
@@ -239,7 +239,7 @@ namespace lfg
         return selfCompatibility;
     }
 
-    LfgCompatibility LFGQueue::CheckCompatibility(Lfg5Guids const& checkWith, const uint64& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles)
+    LfgCompatibility LFGQueue::CheckCompatibility(Lfg5Guids const& checkWith, const ObjectGuid& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles)
     {
         //sLog->outString("CHECK CheckCompatibility: %s, new guid: %s", checkWith.toString().c_str(), newGuid.ToString().c_str());
         Lfg5Guids check(checkWith, false); // here newGuid is at front
@@ -258,7 +258,7 @@ namespace lfg
         // Check if more than one LFG group and number of players joining
         uint8 numPlayers = 0;
         uint8 numLfgGroups = 0;
-        uint64 guid;
+        ObjectGuid guid;
         uint64 addToFoundMask = 0;
 
         for (uint8 i = 0; i < 5 && (guid = check.guid[i]) != 0 && numLfgGroups < 2 && numPlayers <= MAXGROUPSIZE; ++i)
@@ -379,7 +379,7 @@ namespace lfg
         }
         else
         {
-            uint64 gguid = check.front();
+            ObjectGuid gguid = check.front();
             const LfgQueueData& queue = QueueDataStore[gguid];
             proposalDungeons = queue.dungeons;
             proposalRoles = queue.roles;
@@ -402,7 +402,7 @@ namespace lfg
             return LFG_COMPATIBLES_WITH_LESS_PLAYERS;
         }
 
-        uint64 gguid = check.front();
+        ObjectGuid gguid = check.front();
         proposal.queues = strGuids;
         proposal.isNew = numLfgGroups != 1 || sLFGMgr->GetOldState(gguid) != LFG_STATE_DUNGEON;
 
@@ -474,7 +474,7 @@ namespace lfg
             {
                 if (currTime - itQueue->second.joinTime > 2 * HOUR)
                 {
-                    uint64 guid = itQueue->first;
+                    ObjectGuid guid = itQueue->first;
                     QueueDataStore.erase(itQueue++);
                     sLFGMgr->LeaveAllLfgQueues(guid, true);
                     continue;
@@ -538,13 +538,13 @@ namespace lfg
             LfgQueueStatusData queueData(dungeonId, waitTime, wtAvg, wtTank, wtHealer, wtDps, queuedTime, queueinfo.tanks, queueinfo.healers, queueinfo.dps);
             for (LfgRolesMap::const_iterator itPlayer = queueinfo.roles.begin(); itPlayer != queueinfo.roles.end(); ++itPlayer)
             {
-                uint64 pguid = itPlayer->first;
+                ObjectGuid pguid = itPlayer->first;
                 LFGMgr::SendLfgQueueStatus(pguid, queueData);
             }
         }
     }
 
-    time_t LFGQueue::GetJoinTime(uint64 guid)
+    time_t LFGQueue::GetJoinTime(ObjectGuid guid)
     {
         return QueueDataStore[guid].joinTime;
     }

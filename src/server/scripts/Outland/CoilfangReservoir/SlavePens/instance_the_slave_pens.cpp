@@ -103,7 +103,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -136,17 +136,18 @@ public:
                 default:
                     break;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
     protected:
-        uint64 AhuneGUID;
-        uint64 AhuneBunnyGUID;
-        uint64 FrozenCoreGUID;
-        uint64 LumaGUID;
-        uint64 FlameCallerGUIDs[3];
-        uint64 BonfireBunnyGUIDs[3];
-        uint64 BeamBunnyGUIDs[3];
+        ObjectGuid AhuneGUID;
+        ObjectGuid AhuneBunnyGUID;
+        ObjectGuid FrozenCoreGUID;
+        ObjectGuid LumaGUID;
+        ObjectGuid FlameCallerGUIDs[3];
+        ObjectGuid BonfireBunnyGUIDs[3];
+        ObjectGuid BeamBunnyGUIDs[3];
         uint8 counter;
     };
 

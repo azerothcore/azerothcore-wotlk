@@ -308,8 +308,6 @@ hyjalAI::hyjalAI(Creature* creature) : npc_escortAI(creature), Summons(me)
     instance = creature->GetInstanceScript();
     VeinsSpawned[0] = false;
     VeinsSpawned[1] = false;
-    for (uint8 i = 0; i < 14; ++i)
-        VeinGUID[i] = 0;
     InfernalCount = 0;
     TeleportTimer = 1000;
     Overrun = false;
@@ -340,7 +338,7 @@ void hyjalAI::Reset()
     IsDummy = false;
     me->setActive(true);
     // GUIDs
-    PlayerGUID = 0;
+    PlayerGUID.Clear();
     BossGUID[0] = 0;
     BossGUID[1] = 0;
 

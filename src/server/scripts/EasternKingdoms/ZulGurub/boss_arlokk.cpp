@@ -285,8 +285,8 @@ public:
     private:
         uint8 _summonCountA;
         uint8 _summonCountB;
-        uint64 _triggersSideAGUID[5];
-        uint64 _triggersSideBGUID[5];
+        ObjectGuid _triggersSideAGUID[5];
+        ObjectGuid _triggersSideBGUID[5];
     };
 
     CreatureAI* GetAI(Creature* creature) const override

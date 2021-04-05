@@ -93,7 +93,7 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleAutoEquipItemSlotOpcode(WorldPacket& recvData)
 {
-    uint64 itemguid;
+    ObjectGuid itemguid;
     uint8 dstslot;
     recvData >> itemguid >> dstslot;
 
@@ -629,7 +629,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_SELL_ITEM");
 #endif
-    uint64 vendorguid, itemguid;
+    ObjectGuid vendorguid, itemguid;
     uint32 count;
 
     recvData >> vendorguid >> itemguid >> count;
@@ -757,7 +757,7 @@ void WorldSession::HandleBuybackItem(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_BUYBACK_ITEM");
 #endif
-    uint64 vendorguid;
+    ObjectGuid vendorguid;
     uint32 slot;
 
     recvData >> vendorguid >> slot;
@@ -818,7 +818,7 @@ void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_BUY_ITEM_IN_SLOT");
 #endif
-    uint64 vendorguid, bagguid;
+    ObjectGuid vendorguid, bagguid;
     uint32 item, slot, count;
     uint8 bagslot;
 
@@ -862,7 +862,7 @@ void WorldSession::HandleBuyItemOpcode(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_BUY_ITEM");
 #endif
-    uint64 vendorguid;
+    ObjectGuid vendorguid;
     uint32 item, slot, count;
     uint8 unk1;
 
@@ -879,7 +879,7 @@ void WorldSession::HandleBuyItemOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleListInventoryOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
 
@@ -893,7 +893,7 @@ void WorldSession::HandleListInventoryOpcode(WorldPacket& recvData)
     SendListInventory(guid);
 }
 
-void WorldSession::SendListInventory(uint64 vendorGuid, uint32 vendorEntry)
+void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_LIST_INVENTORY");
@@ -923,7 +923,7 @@ void WorldSession::SendListInventory(uint64 vendorGuid, uint32 vendorEntry)
     if (!items)
     {
         WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + 1);
-        data << uint64(vendorGuid);
+        data << vendorGuid;
         data << uint8(0);                                   // count == 0, next will be error code
         data << uint8(0);                                   // "Vendor has no inventory"
         SendPacket(&data);
@@ -934,7 +934,7 @@ void WorldSession::SendListInventory(uint64 vendorGuid, uint32 vendorEntry)
     uint8 count = 0;
 
     WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + itemCount * 8 * 4);
-    data << uint64(vendorGuid);
+    data << vendorGuid;
 
     size_t countPos = data.wpos();
     data << uint8(count);
@@ -1055,7 +1055,7 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPacket& recvPacket)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_BUY_BANK_SLOT");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvPacket >> guid;
 
     if (!CanUseBank(guid))
@@ -1225,7 +1225,7 @@ void WorldSession::HandleSetAmmoOpcode(WorldPacket& recvData)
         _player->RemoveAmmo();
 }
 
-void WorldSession::SendEnchantmentLog(uint64 target, uint64 caster, uint32 itemId, uint32 enchantId)
+void WorldSession::SendEnchantmentLog(ObjectGuid target, ObjectGuid caster, uint32 itemId, uint32 enchantId)
 {
     WorldPacket data(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4)); // last check 2.0.10
     data << target.WriteAsPacked();
@@ -1235,14 +1235,14 @@ void WorldSession::SendEnchantmentLog(uint64 target, uint64 caster, uint32 itemI
     GetPlayer()->SendMessageToSet(&data, true);
 }
 
-void WorldSession::SendItemEnchantTimeUpdate(uint64 Playerguid, uint64 Itemguid, uint32 slot, uint32 Duration)
+void WorldSession::SendItemEnchantTimeUpdate(ObjectGuid Playerguid, ObjectGuid Itemguid, uint32 slot, uint32 Duration)
 {
     // last check 2.0.10
     WorldPacket data(SMSG_ITEM_ENCHANT_TIME_UPDATE, (8 + 4 + 4 + 8));
-    data << uint64(Itemguid);
+    data << Itemguid;
     data << uint32(slot);
     data << uint32(Duration);
-    data << uint64(Playerguid);
+    data << Playerguid;
     SendPacket(&data);
 }
 
@@ -1409,8 +1409,8 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_SOCKET_GEMS");
 #endif
 
-    uint64 item_guid;
-    uint64 gem_guids[MAX_GEM_SOCKETS];
+    ObjectGuid item_guid;
+    ObjectGuid gem_guids[MAX_GEM_SOCKETS];
 
     recvData >> item_guid;
     if (!item_guid)
@@ -1635,7 +1635,7 @@ void WorldSession::HandleItemRefundInfoRequest(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_ITEM_REFUND_INFO");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;                                      // item guid
 
     Item* item = _player->GetItemByGuid(guid);
@@ -1655,7 +1655,7 @@ void WorldSession::HandleItemRefund(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_ITEM_REFUND");
 #endif
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;                                      // item guid
 
     Item* item = _player->GetItemByGuid(guid);
@@ -1681,7 +1681,7 @@ void WorldSession::HandleItemRefund(WorldPacket& recvData)
  */
 void WorldSession::HandleItemTextQuery(WorldPacket& recvData )
 {
-    uint64 itemGuid;
+    ObjectGuid itemGuid;
     recvData >> itemGuid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -1693,7 +1693,7 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recvData )
     if (Item* item = _player->GetItemByGuid(itemGuid))
     {
         data << uint8(0);                                       // has text
-        data << uint64(itemGuid);                               // item guid
+        data << itemGuid;                                       // item guid
         data << item->GetText();
     }
     else
@@ -1704,7 +1704,7 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recvData )
     SendPacket(&data);
 }
 
-bool WorldSession::CanUseBank(uint64 bankerGUID) const
+bool WorldSession::CanUseBank(ObjectGuid bankerGUID) const
 {
     // bankerGUID parameter is optional, set to 0 by default.
     if (!bankerGUID)

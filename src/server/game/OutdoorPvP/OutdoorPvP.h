@@ -87,7 +87,7 @@ public:
     void SendUpdateWorldState(uint32 field, uint32 value);
 
     // send kill notify to players in the controlling faction
-    void SendObjectiveComplete(uint32 id, uint64 guid);
+    void SendObjectiveComplete(uint32 id, ObjectGuid guid);
 
     // used when player is activated/inactivated in the area
     virtual bool HandlePlayerEnter(Player* player);
@@ -98,7 +98,7 @@ public:
 
     virtual bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go);
 
-    virtual int32 HandleOpenGo(Player* player, uint64 guid);
+    virtual int32 HandleOpenGo(Player* player, ObjectGuid guid);
 
     // returns true if the state of the objective has changed, in this case, the OutdoorPvP must send a world state ui update.
     virtual bool Update(uint32 diff);
@@ -109,7 +109,7 @@ public:
 
     virtual void SendChangePhase();
 
-    virtual bool HandleGossipOption(Player* player, uint64 guid, uint32 gossipid);
+    virtual bool HandleGossipOption(Player* player, ObjectGuid guid, uint32 gossipid);
 
     virtual bool CanTalkTo(Player* player, Creature* c, GossipMenuItems const& gso);
 
@@ -165,10 +165,10 @@ protected:
 
     // map to store the various gameobjects and creatures spawned by the objective
     //        type, guid
-    std::map<uint32, uint64> m_Objects;
-    std::map<uint32, uint64> m_Creatures;
-    std::map<uint64, uint32> m_ObjectTypes;
-    std::map<uint64, uint32> m_CreatureTypes;
+    std::map<uint32, ObjectGuid> m_Objects;
+    std::map<uint32, ObjectGuid> m_Creatures;
+    std::map<ObjectGuid, uint32> m_ObjectTypes;
+    std::map<ObjectGuid, uint32> m_CreatureTypes;
 };
 
 // base class for specific outdoor pvp handlers
@@ -197,7 +197,7 @@ public:
     virtual bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go);
 
     // called on go use
-    virtual bool HandleOpenGo(Player* player, uint64 guid);
+    virtual bool HandleOpenGo(Player* player, ObjectGuid guid);
 
     // setup stuff
     virtual bool SetupOutdoorPvP() {return true;}
@@ -226,7 +226,7 @@ public:
 
     virtual bool HandleDropFlag(Player* player, uint32 spellId);
 
-    virtual bool HandleGossipOption(Player* player, uint64 guid, uint32 gossipid);
+    virtual bool HandleGossipOption(Player* player, ObjectGuid guid, uint32 gossipid);
 
     virtual bool CanTalkTo(Player* player, Creature* c, GossipMenuItems const& gso);
 

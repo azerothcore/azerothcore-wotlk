@@ -22,11 +22,11 @@ namespace Movement
         {
             float x, y, z;
         } f;
-        uint64  target;
-        float   angle;
+        ObjectGuid target;
+        float angle;
 
         FacingInfo(float o) : angle(o) {}
-        FacingInfo(uint64 t) : target(t) {}
+        FacingInfo(ObjectGuid t) : target(t) {}
         FacingInfo() = default;
     };
 

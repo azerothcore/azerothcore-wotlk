@@ -54,13 +54,13 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 lTarget;
+        ObjectGuid lTarget;
 
         void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            lTarget = 0;
+            lTarget.Clear();
         }
 
         void EnterCombat(Unit*) override

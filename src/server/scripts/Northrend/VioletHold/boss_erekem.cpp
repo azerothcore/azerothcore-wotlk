@@ -116,7 +116,7 @@ public:
                     events.RepeatEvent(urand(16000, 22000));
                     break;
                 case EVENT_SPELL_CHAIN_HEAL:
-                    if (uint64 TargetGUID = GetChainHealTargetGUID())
+                    if (ObjectGuid TargetGUID = GetChainHealTargetGUID())
                         if (pInstance)
                         {
                             if (Creature* target = pInstance->instance->GetCreature(TargetGUID))
@@ -184,7 +184,7 @@ public:
                 pInstance->SetData(DATA_FAILED, 1);
         }
 
-        uint64 GetChainHealTargetGUID()
+        ObjectGuid GetChainHealTargetGUID()
         {
             if (HealthBelowPct(85))
                 return me->GetGUID();

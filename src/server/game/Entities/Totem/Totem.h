@@ -24,7 +24,7 @@ enum TotemType
 class Totem : public Minion
 {
 public:
-    explicit Totem(SummonPropertiesEntry const* properties, uint64 owner);
+    explicit Totem(SummonPropertiesEntry const* properties, ObjectGuid owner);
     ~Totem() override {};
     void Update(uint32 time) override;
     void InitStats(uint32 duration) override;

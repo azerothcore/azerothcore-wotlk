@@ -70,7 +70,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 vanishTarget;
+        ObjectGuid vanishTarget;
         uint32 vanishDamage;
 
         void Reset() override

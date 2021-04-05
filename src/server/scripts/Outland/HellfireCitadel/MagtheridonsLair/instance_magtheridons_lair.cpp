@@ -37,7 +37,6 @@ public:
             _wardersSet.clear();
             _cubesSet.clear();
             _columnSet.clear();
-            _magtheridonGUID = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -206,7 +205,7 @@ public:
         }
 
     private:
-        uint64 _magtheridonGUID;
+        ObjectGuid _magtheridonGUID;
         GuidSet _wardersSet;
         GuidSet _cubesSet;
         GuidSet _columnSet;

@@ -340,7 +340,7 @@ public:
         SummonList summons;
 
         uint32 _initFight;
-        uint64 _keepersGUID[4];
+        ObjectGuid _keepersGUID[4];
         uint8 _summonedGuardiansCount;
         uint32 _p2TalkTimer;
         bool _secondPhase;
@@ -426,7 +426,10 @@ public:
             SpawnClouds();
 
             _initFight = 1;
-            memset(_keepersGUID, 0, sizeof(_keepersGUID));
+
+            for (uint8 i = 0; i < 4; ++i)
+                _keepersGUID[i].Clear();
+
             _summonedGuardiansCount = 0;
             _p2TalkTimer = 0;
             _secondPhase = false;
@@ -1600,11 +1603,11 @@ public:
         {
             SetCombatMovement(false);
             _checkTimer = 1;
-            _playerGUID = 0;
+            _playerGUID.Clear();
         }
 
         uint32 _checkTimer;
-        uint64 _playerGUID;
+        ObjectGuid _playerGUID;
 
         Unit* SelectConstrictTarget()
         {
@@ -1876,15 +1879,15 @@ public:
         bool _running;
         int32 _checkTimer;
         uint8 _step;
-        uint64 _championGUID;
-        uint64 _yoggGUID;
+        ObjectGuid _championGUID;
+        ObjectGuid _yoggGUID;
 
         void Reset() override
         {
             _running = true;
             _checkTimer = 0;
             _step = 0;
-            _championGUID = 0;
+            _championGUID.Clear();
             if (me->GetInstanceScript())
                 _yoggGUID = me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON);
         }
@@ -1895,7 +1898,7 @@ public:
             _checkTimer = time;
         }
 
-        void Say(std::string text, uint64 guid, bool yell, uint32 soundId)
+        void Say(std::string text, ObjectGuid guid, bool yell, uint32 soundId)
         {
             Creature* creature = guid ? ObjectAccessor::GetCreature(*me, guid) : me;
             if (!creature)
@@ -1990,15 +1993,15 @@ public:
         bool _running;
         int32 _checkTimer;
         uint8 _step;
-        uint64 _garonaGUID;
-        uint64 _yoggGUID;
+        ObjectGuid _garonaGUID;
+        ObjectGuid _yoggGUID;
 
         void Reset() override
         {
             _running = true;
             _checkTimer = 0;
             _step = 0;
-            _garonaGUID = 0;
+            _garonaGUID.Clear();
             if (me->GetInstanceScript())
                 _yoggGUID = me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON);
         }
@@ -2009,7 +2012,7 @@ public:
             _checkTimer = time;
         }
 
-        void Say(std::string text, uint64 guid, bool yell, uint32 soundId)
+        void Say(std::string text, ObjectGuid guid, bool yell, uint32 soundId)
         {
             Creature* creature = guid ? ObjectAccessor::GetCreature(*me, guid) : me;
             if (!creature)
@@ -2112,7 +2115,7 @@ public:
         bool _running;
         int32 _checkTimer;
         uint8 _step;
-        uint64 _yoggGUID;
+        ObjectGuid _yoggGUID;
 
         void Reset() override
         {
@@ -2129,7 +2132,7 @@ public:
             _checkTimer = time;
         }
 
-        void Say(std::string text, uint64 guid, bool yell, uint32 soundId)
+        void Say(std::string text, ObjectGuid guid, bool yell, uint32 soundId)
         {
             Creature* creature = guid ? ObjectAccessor::GetCreature(*me, guid) : me;
             if (!creature)
@@ -2251,7 +2254,7 @@ public:
             {
                 case 40:
                     {
-                        uint64 _guid = _targets.at(_current);
+                        ObjectGuid _guid = _targets.at(_current);
                         ++_current;
 
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _guid))
@@ -2364,7 +2367,7 @@ public:
         }
 
     protected:
-        uint64 _targetGUID;
+        ObjectGuid _targetGUID;
     };
 
     AuraScript* GetAuraScript() const override

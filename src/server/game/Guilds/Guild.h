@@ -274,7 +274,7 @@ public: // pussywizard: public class Member
     class Member
     {
     public:
-        Member(uint32 guildId, uint64 guid, uint8 rankId):
+        Member(uint32 guildId, ObjectGuid guid, uint8 rankId):
             m_guildId(guildId),
             m_guid(guid),
             m_zoneId(0),
@@ -324,7 +324,7 @@ public: // pussywizard: public class Member
         inline void UpdateLogoutTime() { m_logoutTime = ::time(nullptr); }
         inline bool IsRank(uint8 rankId) const { return m_rankId == rankId; }
         inline bool IsRankNotLower(uint8 rankId) const { return m_rankId <= rankId; }
-        inline bool IsSamePlayer(uint64 guid) const { return m_guid == guid; }
+        inline bool IsSamePlayer(ObjectGuid guid) const { return m_guid == guid; }
 
         void UpdateBankWithdrawValue(SQLTransaction& trans, uint8 tabId, uint32 amount);
         int32 GetBankWithdrawValue(uint8 tabId) const;
@@ -335,7 +335,7 @@ public: // pussywizard: public class Member
     private:
         uint32 m_guildId;
         // Fields from characters table
-        uint64 m_guid;
+        ObjectGuid m_guid;
         std::string m_name;
         uint32 m_zoneId;
         uint8 m_level;
@@ -353,12 +353,12 @@ public: // pussywizard: public class Member
     };
 
     // pussywizard: public GetMember
-    inline const Member* GetMember(uint64 guid) const
+    inline const Member* GetMember(ObjectGuid guid) const
     {
         Members::const_iterator itr = m_members.find(guid);
         return itr != m_members.end() ? itr->second : nullptr;
     }
-    inline Member* GetMember(uint64 guid)
+    inline Member* GetMember(ObjectGuid guid)
     {
         Members::iterator itr = m_members.find(guid);
         return itr != m_members.end() ? itr->second : nullptr;
@@ -666,7 +666,7 @@ public:
 
     // Getters
     uint32 GetId() const { return m_id; }
-    uint64 GetLeaderGUID() const { return m_leaderGuid; }
+    ObjectGuid GetLeaderGUID() const { return m_leaderGuid; }
     std::string const& GetName() const { return m_name; }
     std::string const& GetMOTD() const { return m_motd; }
     std::string const& GetInfo() const { return m_info; }
@@ -738,9 +738,9 @@ public:
 
     // Members
     // Adds member to guild. If rankId == GUILD_RANK_NONE, lowest rank is assigned.
-    bool AddMember(uint64 guid, uint8 rankId = GUILD_RANK_NONE);
-    void DeleteMember(uint64 guid, bool isDisbanding = false, bool isKicked = false, bool canDeleteGuild = false);
-    bool ChangeMemberRank(uint64 guid, uint8 newRank);
+    bool AddMember(ObjectGuid guid, uint8 rankId = GUILD_RANK_NONE);
+    void DeleteMember(ObjectGuid guid, bool isDisbanding = false, bool isKicked = false, bool canDeleteGuild = false);
+    bool ChangeMemberRank(ObjectGuid guid, uint8 newRank);
 
     // Bank
     void SwapItems(Player* player, uint8 tabId, uint8 slotId, uint8 destTabId, uint8 destSlotId, uint32 splitedAmount);
@@ -759,7 +759,7 @@ public:
 protected:
     uint32 m_id;
     std::string m_name;
-    uint64 m_leaderGuid;
+    ObjectGuid m_leaderGuid;
     std::string m_motd;
     std::string m_info;
     time_t m_createdDate;
@@ -826,8 +826,8 @@ private:
 
     int32 _GetMemberRemainingSlots(Member const* member, uint8 tabId) const;
     int32 _GetMemberRemainingMoney(Member const* member) const;
-    void _UpdateMemberWithdrawSlots(SQLTransaction& trans, uint64 guid, uint8 tabId);
-    bool _MemberHasTabRights(uint64 guid, uint8 tabId, uint32 rights) const;
+    void _UpdateMemberWithdrawSlots(SQLTransaction& trans, ObjectGuid guid, uint8 tabId);
+    bool _MemberHasTabRights(ObjectGuid guid, uint8 tabId, uint32 rights) const;
 
     void _LogEvent(GuildEventLogTypes eventType, uint32 playerGuid1, uint32 playerGuid2 = 0, uint8 newRank = 0);
     void _LogBankEvent(SQLTransaction& trans, GuildBankEventLogTypes eventType, uint8 tabId, uint32 playerGuid, uint32 itemOrMoney, uint16 itemStackCount = 0, uint8 destTabId = 0);
@@ -843,6 +843,6 @@ private:
     void _SendBankContentUpdate(uint8 tabId, SlotIds slots) const;
     void _SendBankList(WorldSession* session = nullptr, uint8 tabId = 0, bool sendFullSlots = false, SlotIds* slots = nullptr) const;
 
-    void _BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* param1 = nullptr, const char* param2 = nullptr, const char* param3 = nullptr) const;
+    void _BroadcastEvent(GuildEvents guildEvent, ObjectGuid guid, const char* param1 = nullptr, const char* param2 = nullptr, const char* param3 = nullptr) const;
 };
 #endif

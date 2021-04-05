@@ -129,7 +129,7 @@ public:
         InstanceScript* instance;
         EventMap events;
         uint8 eventTimer;
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         void Reset() override { }
 
@@ -454,7 +454,7 @@ public:
         }
 
         bool IsLoot;
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         void Reset() override { }
 
@@ -598,13 +598,13 @@ public:
 
         uint8 _gongEvent;
         uint32 _gongTimer;
-        uint64 uiTargetGUID;
+        ObjectGuid uiTargetGUID;
 
         void Reset() override
         {
             _gongEvent = 0;
             _gongTimer = 0;
-            uiTargetGUID = 0;
+            uiTargetGUID.Clear();
         }
 
         void EnterCombat(Unit* /*who*/) override { }

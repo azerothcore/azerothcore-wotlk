@@ -240,7 +240,7 @@ public:
 
     private:
         EventMap _events;
-        uint64 _tigerGuid;
+        ObjectGuid _tigerGuid;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

@@ -53,44 +53,8 @@ public:
             for (auto& i : HeiganEruption)
                 i.clear();
 
-            // GOs
-            _patchwerkGateGUID = 0;
-            _gluthGateGUID = 0;
-            _nothGateGUID = 0;
-            _heiganGateGUID = 0;
-            _heiganGateExitGUID = 0;
-            _loathebGateGUID = 0;
-            _anubGateGUID = 0;
-            _anubNextGateGUID = 0;
-            _faerlinaGateGUID = 0;
-            _maexxnaGateGUID = 0;
-            _thaddiusGateGUID = 0;
-            _horsemanGateGUID = 0;
-            _kelthuzadfloorGUID = 0;
-            _kelthuzadgateGUID = 0;
-            _sapphironGateGUID = 0;
-            _horsemanPortalGUID = 0;
-            _loathebPortalGUID = 0;
-            _maexxnaPortalGUID = 0;
-            _thaddiusPortalGUID = 0;
-            _deathknightEyePortalGUID = 0;
-            _plagueEyePortalGUID = 0;
-            _spiderEyePortalGUID = 0;
-            _abomEyePortalGUID = 0;
-
             // NPCs
             PatchwerkRoomTrash.clear();
-            _patchwerkGUID = 0;
-            _thaddiusGUID = 0;
-            _stalaggGUID = 0;
-            _feugenGUID = 0;
-            _zeliekGUID = 0;
-            _rivendareGUID = 0;
-            _blaumeuxGUID = 0;
-            _korthazzGUID = 0;
-            _sapphironGUID = 0;
-            _kelthuzadGUID = 0;
-            _lichkingGUID = 0;
 
             // Controls
             _horsemanKilled = 0;
@@ -114,46 +78,46 @@ public:
         std::set<GameObject*> HeiganEruption[4];
 
         // GOs
-        uint64 _patchwerkGateGUID;
-        uint64 _gluthGateGUID;
-        uint64 _nothGateGUID;
-        uint64 _heiganGateGUID;
-        uint64 _heiganGateExitGUID;
-        uint64 _loathebGateGUID;
-        uint64 _anubGateGUID;
-        uint64 _anubNextGateGUID;
-        uint64 _faerlinaGateGUID;
-        uint64 _maexxnaGateGUID;
-        uint64 _thaddiusGateGUID;
-        uint64 _gothikEnterGateGUID{};
-        uint64 _gothikInnerGateGUID{};
-        uint64 _gothikExitGateGUID{};
-        uint64 _horsemanGateGUID;
-        uint64 _kelthuzadfloorGUID;
-        uint64 _kelthuzadgateGUID;
-        uint64 _sapphironGateGUID;
-        uint64 _horsemanPortalGUID;
-        uint64 _loathebPortalGUID;
-        uint64 _maexxnaPortalGUID;
-        uint64 _thaddiusPortalGUID;
-        uint64 _deathknightEyePortalGUID;
-        uint64 _plagueEyePortalGUID;
-        uint64 _spiderEyePortalGUID;
-        uint64 _abomEyePortalGUID;
+        ObjectGuid _patchwerkGateGUID;
+        ObjectGuid _gluthGateGUID;
+        ObjectGuid _nothGateGUID;
+        ObjectGuid _heiganGateGUID;
+        ObjectGuid _heiganGateExitGUID;
+        ObjectGuid _loathebGateGUID;
+        ObjectGuid _anubGateGUID;
+        ObjectGuid _anubNextGateGUID;
+        ObjectGuid _faerlinaGateGUID;
+        ObjectGuid _maexxnaGateGUID;
+        ObjectGuid _thaddiusGateGUID;
+        ObjectGuid _gothikEnterGateGUID;
+        ObjectGuid _gothikInnerGateGUID;
+        ObjectGuid _gothikExitGateGUID;
+        ObjectGuid _horsemanGateGUID;
+        ObjectGuid _kelthuzadfloorGUID;
+        ObjectGuid _kelthuzadgateGUID;
+        ObjectGuid _sapphironGateGUID;
+        ObjectGuid _horsemanPortalGUID;
+        ObjectGuid _loathebPortalGUID;
+        ObjectGuid _maexxnaPortalGUID;
+        ObjectGuid _thaddiusPortalGUID;
+        ObjectGuid _deathknightEyePortalGUID;
+        ObjectGuid _plagueEyePortalGUID;
+        ObjectGuid _spiderEyePortalGUID;
+        ObjectGuid _abomEyePortalGUID;
 
         // NPCs
         GuidList PatchwerkRoomTrash;
-        uint64 _patchwerkGUID;
-        uint64 _thaddiusGUID;
-        uint64 _stalaggGUID;
-        uint64 _feugenGUID;
-        uint64 _zeliekGUID;
-        uint64 _rivendareGUID;
-        uint64 _blaumeuxGUID;
-        uint64 _korthazzGUID;
-        uint64 _sapphironGUID;
-        uint64 _kelthuzadGUID;
-        uint64 _lichkingGUID;
+        ObjectGuid _patchwerkGUID;
+        ObjectGuid _thaddiusGUID;
+        ObjectGuid _stalaggGUID;
+        ObjectGuid _feugenGUID;
+        ObjectGuid _zeliekGUID;
+        ObjectGuid _rivendareGUID;
+        ObjectGuid _blaumeuxGUID;
+        ObjectGuid _korthazzGUID;
+        ObjectGuid _sapphironGUID;
+        ObjectGuid _kelthuzadGUID;
+        ObjectGuid _lichkingGUID;
 
         // Controls
         uint8 _horsemanKilled;

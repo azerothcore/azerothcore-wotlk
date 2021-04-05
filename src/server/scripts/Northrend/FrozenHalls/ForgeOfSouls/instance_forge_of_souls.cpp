@@ -24,25 +24,18 @@ public:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         TeamId teamIdInInstance;
         std::string str_data;
-        uint64 NPC_BronjahmGUID;
-        uint64 NPC_DevourerGUID;
+        ObjectGuid NPC_BronjahmGUID;
+        ObjectGuid NPC_DevourerGUID;
 
-        uint64 NPC_LeaderFirstGUID;
-        uint64 NPC_LeaderSecondGUID;
-        uint64 NPC_GuardFirstGUID;
-        uint64 NPC_GuardSecondGUID;
+        ObjectGuid NPC_LeaderFirstGUID;
+        ObjectGuid NPC_LeaderSecondGUID;
+        ObjectGuid NPC_GuardFirstGUID;
+        ObjectGuid NPC_GuardSecondGUID;
 
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             teamIdInInstance = TEAM_NEUTRAL;
-            NPC_BronjahmGUID = 0;
-            NPC_DevourerGUID = 0;
-
-            NPC_LeaderFirstGUID = 0;
-            NPC_LeaderSecondGUID = 0;
-            NPC_GuardFirstGUID = 0;
-            NPC_GuardSecondGUID = 0;
         }
 
         bool IsEncounterInProgress() const override

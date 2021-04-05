@@ -114,7 +114,7 @@ public:
         InstanceScript* m_pInstance;
         EventMap events;
         SummonList summons;
-        uint64 OrbGUID;
+        ObjectGuid OrbGUID;
         uint8 Counter;
         uint8 RandomUnfreeze[4];
 
@@ -140,7 +140,7 @@ public:
             events.Reset();
             summons.DoAction(ACTION_DESPAWN_ADDS);
             summons.DespawnAll();
-            OrbGUID = 0;
+            OrbGUID.Clear();
             Counter = 0;
             me->CastSpell(me, SPELL_FREEZE, true);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);

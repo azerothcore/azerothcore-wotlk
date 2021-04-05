@@ -17,28 +17,20 @@ public:
         instance_blood_furnace_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
         uint32 _auiEncounter[MAX_ENCOUNTER];
-        uint64 _bossGUIDs[3];
-        uint64 _doorGUIDs[6];
-        uint64 _prisonGUIDs[4];
+        ObjectGuid _bossGUIDs[3];
+        ObjectGuid _doorGUIDs[6];
+        ObjectGuid _prisonGUIDs[4];
 
         GuidSet _prisonersCell[4];
 
         uint8 _prisonerCounter[4];
 
-        uint64 _broggokLeverGUID;
+        ObjectGuid _broggokLeverGUID;
 
         void Initialize() override
         {
             memset(&_auiEncounter, 0, sizeof(_auiEncounter));
-            memset(&_bossGUIDs, 0, sizeof(_bossGUIDs));
-            memset(&_doorGUIDs, 0, sizeof(_doorGUIDs));
-            memset(&_prisonGUIDs, 0, sizeof(_prisonGUIDs));
             memset(&_prisonerCounter, 0, sizeof(_prisonerCounter));
-
-            for (uint8 i = 0; i < 4; ++i)
-                _prisonersCell[i].clear();
-
-            _broggokLeverGUID = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -275,7 +267,7 @@ public:
             }
         }
 
-        void PrisonerDied(uint64 guid)
+        void PrisonerDied(ObjectGuid guid)
         {
             if (_prisonersCell[0].find(guid) != _prisonersCell[0].end() && --_prisonerCounter[0] <= 0)
                 ActivateCell(DATA_PRISON_CELL2);

@@ -52,7 +52,7 @@ public:
         npc_pet_mage_mirror_imageAI(Creature* creature) : CasterAI(creature) { }
 
         uint32 selectionTimer;
-        uint64 _ebonGargoyleGUID;
+        ObjectGuid _ebonGargoyleGUID;
         uint32 checktarget;
         uint32 dist = urand(1, 5);
 
@@ -99,7 +99,7 @@ public:
                 ref = ref->next();
             }
 
-            _ebonGargoyleGUID = 0;
+            _ebonGargoyleGUID.Clear();
 
             // Xinef: copy caster auras
             Unit::VisibleAuraMap const* visibleAuraMap = owner->GetVisibleAuras();
@@ -149,7 +149,7 @@ public:
                 Unit* gargoyle = ObjectAccessor::GetUnit(*me, _ebonGargoyleGUID);
                 if (gargoyle && gargoyle->GetAI())
                     gargoyle->GetAI()->AttackStart(me);
-                _ebonGargoyleGUID = 0;
+                _ebonGargoyleGUID.Clear();
             }
             Unit* owner = me->GetOwner();
             if (owner && owner->GetTypeId() == TYPEID_PLAYER)

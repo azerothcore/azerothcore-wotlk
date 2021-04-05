@@ -346,7 +346,7 @@ public:
             SetDespawnAtEnd(false);
             me->SetReactState(REACT_PASSIVE);
             BossOrder = 0;
-            NewMountGUID = 0;
+            NewMountGUID.Clear();
             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 
@@ -379,8 +379,8 @@ public:
         EventMap events;
         uint32 BossOrder;
         bool MountPhase;
-        uint64 NewMountGUID;
-        uint64 UnitTargetGUID;
+        ObjectGuid NewMountGUID;
+        ObjectGuid UnitTargetGUID;
 
         void Reset() override
         {
@@ -471,7 +471,7 @@ public:
             if( param == 1 )
             {
                 MountPhase = false;
-                NewMountGUID = 0;
+                NewMountGUID.Clear();
                 me->SetHealth(me->GetMaxHealth());
                 me->SetRegeneratingHealth(true);
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
@@ -621,7 +621,7 @@ public:
                             me->CastSpell(me, SPELL_TRAMPLE_AURA, true);
                             if( pInstance )
                                 pInstance->SetData(DATA_REACHED_NEW_MOUNT, 0);
-                            NewMountGUID = 0;
+                            NewMountGUID.Clear();
                         }
                 }
                 else if( id == 9 )
@@ -865,7 +865,7 @@ public:
                                     }
                                 }
                             }
-                            UnitTargetGUID = 0;
+                            UnitTargetGUID.Clear();
                         }
                         events.RepeatEvent(urand(15000, 20000));
                     }

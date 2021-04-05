@@ -89,7 +89,7 @@ public:
         uint8 iceboltCount{};
         uint32 spawnTimer{};
         GuidList blockList;
-        uint64 currentTarget{};
+        ObjectGuid currentTarget;
 
         void InitializeAI() override
         {

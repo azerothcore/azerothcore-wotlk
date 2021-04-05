@@ -28,7 +28,7 @@
 
 void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
     uint32 questStatus = DIALOG_STATUS_NONE;
 
@@ -71,7 +71,7 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -110,7 +110,7 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint32 questId;
     uint32 unk1;
     recvData >> guid >> questId >> unk1;
@@ -202,7 +202,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleQuestgiverQueryQuestOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint32 questId;
     uint8 unk1;
     recvData >> guid >> questId >> unk1;
@@ -254,7 +254,7 @@ void WorldSession::HandleQuestQueryOpcode(WorldPacket& recvData)
 void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
 {
     uint32 questId, reward;
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid >> questId >> reward;
 
     if (reward >= QUEST_REWARD_CHOICES_COUNT)
@@ -343,7 +343,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
 void WorldSession::HandleQuestgiverRequestRewardOpcode(WorldPacket& recvData)
 {
     uint32 questId;
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid >> questId;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -489,7 +489,7 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recvData)
 void WorldSession::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
 {
     uint32 questId;
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid >> questId;
 
@@ -625,7 +625,7 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
 
 void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint32 questId;
     uint8 msg;
     recvPacket >> guid >> questId >> msg;
@@ -639,7 +639,7 @@ void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
         if (Player* player = ObjectAccessor::GetPlayer(*_player, _player->GetDivider()))
         {
             WorldPacket data(MSG_QUEST_PUSH_RESULT, 8 + 4 + 1);
-            data << uint64(_player->GetGUID());
+            data << _player->GetGUID();
             data << uint8(msg);                             // valid values: 0-8
             player->GetSession()->SendPacket(&data);
             _player->SetDivider(0);
@@ -673,7 +673,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
 
             questStatus = _player->GetQuestDialogStatus(questgiver);
 
-            data << uint64(questgiver->GetGUID());
+            data << questgiver->GetGUID();
             data << uint8(questStatus);
             ++count;
         }
@@ -685,7 +685,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
 
             questStatus = _player->GetQuestDialogStatus(questgiver);
 
-            data << uint64(questgiver->GetGUID());
+            data << questgiver->GetGUID();
             data << uint8(questStatus);
             ++count;
         }

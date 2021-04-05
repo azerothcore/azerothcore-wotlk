@@ -245,7 +245,10 @@ public:
                 DoCastVictim(SPELL_BONE_SLICE);
 
             if (_boneSlice && me->isAttackReady() && me->GetVictim() && !me->HasUnitState(UNIT_STATE_CASTING) && me->IsWithinMeleeRange(me->GetVictim()))
-                memset(_lastBoneSliceTargets, 0, 3 * sizeof(uint64));
+            {
+                for (uint8 i = 0; i < 3; ++i)
+                    _lastBoneSliceTargets[i].Clear();
+            }
 
             DoMeleeAttackIfReady();
         }
@@ -408,8 +411,8 @@ public:
                     if (u->GetEntry() == NPC_BONE_SPIKE && u->GetTypeId() == TYPEID_UNIT)
                         u->ToCreature()->AI()->DoAction(-1337);
 
-            uint64 petGUID = summoner->GetPetGUID();
-            summoner->SetPetGUID(0);
+            ObjectGuid petGUID = summoner->GetPetGUID();
+            summoner->SetPetGUID(ObjectGuid::Empty);
             me->CastSpell(summoner, SPELL_IMPALED, true);
             summoner->CastSpell(me, SPELL_RIDE_VEHICLE, true);
             //summoner->ClearUnitState(UNIT_STATE_ONVEHICLE);

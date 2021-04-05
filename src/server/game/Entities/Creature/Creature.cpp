@@ -1358,7 +1358,7 @@ bool Creature::CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const
 
     SetOriginalEntry(Entry);
 
-    Object::_Create(guidlow, Entry, (vehId || normalInfo->VehicleId) ? HIGHGUID_VEHICLE : HIGHGUID_UNIT);
+    Object::_Create(guidlow, Entry, (vehId || normalInfo->VehicleId) ? HighGuid::Vehicle : HighGuid::Unit);
 
     // Xinef: select proper vehicle id
     if (!vehId)
@@ -2029,7 +2029,7 @@ void Creature::SendAIReaction(AiReaction reactionType)
 {
     WorldPacket data(SMSG_AI_REACTION, 12);
 
-    data << uint64(GetGUID());
+    data << GetGUID();
     data << uint32(reactionType);
 
     ((WorldObject*)this)->SendMessageToSet(&data, true);
@@ -2990,7 +2990,7 @@ void Creature::SetDisplayId(uint32 modelId)
     SetFloatValue(UNIT_FIELD_COMBATREACH, combatReach * GetObjectScale());
 }
 
-void Creature::SetTarget(uint64 guid)
+void Creature::SetTarget(ObjectGuid guid)
 {
     if (!_focusSpell)
         SetGuidValue(UNIT_FIELD_TARGET, guid);

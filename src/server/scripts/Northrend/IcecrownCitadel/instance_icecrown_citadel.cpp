@@ -160,63 +160,15 @@ public:
             // pussywizard:
             IsBuffAvailable = true;
             WeeklyQuestId10 = 0;
-            PutricideEnteranceDoorGUID = 0;
-            GasReleaseValveGUID = 0;
-            OozeReleaseValveGUID = 0;
             PutricideEventProgress = 0;
             LichKingHeroicAvailable = true;
             LichKingRandomWhisperTimer = 120 * IN_MILLISECONDS;
             DarkwhisperElevatorTimer = 3000;
-            memset(&WeeklyQuestNpcGUID, 0, sizeof(WeeklyQuestNpcGUID));
-            ScourgeTransporterFirstGUID = 0;
 
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
             TeamIdInInstance = TEAM_NEUTRAL;
             HeroicAttempts = MaxHeroicAttempts;
-            LadyDeathwhisperGUID = 0;
-            LadyDeathwisperElevatorGUID = 0;
-            GunshipGUID = 0;
-            EnemyGunshipGUID = 0;
-            GunshipArmoryGUID = 0;
-            DeathbringerSaurfangGUID = 0;
-            DeathbringerSaurfangDoorGUID = 0;
-            DeathbringerSaurfangEventGUID = 0;
-            DeathbringersCacheGUID = 0;
-            SaurfangTeleportGUID = 0;
-            PlagueSigilGUID = 0;
-            BloodwingSigilGUID = 0;
-            FrostwingSigilGUID = 0;
-            memset(PutricidePipeGUIDs, 0, 2 * sizeof(uint64));
-            memset(PutricideGateGUIDs, 0, 2 * sizeof(uint64));
-            PutricideCollisionGUID = 0;
-            FestergutGUID = 0;
-            RotfaceGUID = 0;
-            ProfessorPutricideGUID = 0;
-            PutricideTableGUID = 0;
-            memset(BloodCouncilGUIDs, 0, 3 * sizeof(uint64));
-            BloodCouncilControllerGUID = 0;
-            BloodQueenLanaThelGUID = 0;
-            CrokScourgebaneGUID = 0;
-            memset(CrokCaptainGUIDs, 0, 4 * sizeof(uint64));
-            SisterSvalnaGUID = 0;
-            ValithriaDreamwalkerGUID = 0;
-            ValithriaLichKingGUID = 0;
-            ValithriaTriggerGUID = 0;
-            PutricadeTrapGUID = 0;
-            SindragosaGauntletGUID = 0;
-            SindragosaGUID = 0;
-            SpinestalkerGUID = 0;
-            RimefangGUID = 0;
-            TheLichKingTeleportGUID = 0;
-            TheLichKingGUID = 0;
-            HighlordTirionFordringGUID = 0;
-            TerenasMenethilGUID = 0;
-            ArthasPlatformGUID = 0;
-            ArthasPrecipiceGUID = 0;
-            FrozenThroneEdgeGUID = 0;
-            FrozenThroneWindGUID = 0;
-            FrozenThroneWarningGUID = 0;
             IsBonedEligible = true;
             IsOozeDanceEligible = true;
             IsNauseaEligible = true;
@@ -512,7 +464,7 @@ public:
         void OnCreatureRemove(Creature* creature) override
         {
             if (creature->GetEntry() == NPC_SINDRAGOSA)
-                SindragosaGUID = 0;
+                SindragosaGUID.Clear();
         }
 
         uint32 GetCreatureEntry(uint32 /*guidLow*/, CreatureData const* data) override
@@ -893,7 +845,7 @@ public:
                     break;
                 case GO_THE_SKYBREAKER_A:
                 case GO_ORGRIMS_HAMMER_H:
-                    GunshipGUID = 0;
+                    GunshipGUID.Clear();
                     break;
                 default:
                     break;
@@ -1900,63 +1852,63 @@ public:
         // pussywizard:
         bool IsBuffAvailable;
         uint32 WeeklyQuestId10; // contains id from 10man for any difficulty (for simplicity)
-        uint64 WeeklyQuestNpcGUID[WeeklyNPCs];
-        uint64 PutricideEnteranceDoorGUID;
+        ObjectGuid WeeklyQuestNpcGUID[WeeklyNPCs];
+        ObjectGuid PutricideEnteranceDoorGUID;
         uint32 PutricideEventProgress;
-        uint64 GasReleaseValveGUID;
-        uint64 OozeReleaseValveGUID;
+        ObjectGuid GasReleaseValveGUID;
+        ObjectGuid OozeReleaseValveGUID;
         bool LichKingHeroicAvailable;
         uint32 LichKingRandomWhisperTimer;
         uint32 DarkwhisperElevatorTimer;
-        uint64 ScourgeTransporterFirstGUID;
+        ObjectGuid ScourgeTransporterFirstGUID;
 
         EventMap Events;
-        uint64 LadyDeathwhisperGUID;
-        uint64 LadyDeathwisperElevatorGUID;
-        uint64 GunshipGUID;
-        uint64 EnemyGunshipGUID;
-        uint64 GunshipArmoryGUID;
-        uint64 DeathbringerSaurfangGUID;
-        uint64 DeathbringerSaurfangDoorGUID;
-        uint64 DeathbringerSaurfangEventGUID;   // Muradin Bronzebeard or High Overlord Saurfang
-        uint64 DeathbringersCacheGUID;
-        uint64 SaurfangTeleportGUID;
-        uint64 PlagueSigilGUID;
-        uint64 BloodwingSigilGUID;
-        uint64 FrostwingSigilGUID;
-        uint64 PutricidePipeGUIDs[2];
-        uint64 PutricideGateGUIDs[2];
-        uint64 PutricideCollisionGUID;
-        uint64 FestergutGUID;
-        uint64 RotfaceGUID;
-        uint64 ProfessorPutricideGUID;
-        uint64 PutricideTableGUID;
-        uint64 BloodCouncilGUIDs[3];
-        uint64 BloodCouncilControllerGUID;
-        uint64 BloodQueenLanaThelGUID;
-        uint64 CrokScourgebaneGUID;
-        uint64 CrokCaptainGUIDs[4];
-        uint64 SisterSvalnaGUID;
-        uint64 ValithriaDreamwalkerGUID;
-        uint64 ValithriaLichKingGUID;
-        uint64 ValithriaTriggerGUID;
-        uint64 PutricadeTrapGUID;
-        uint64 SindragosaGauntletGUID;
-        uint64 SindragosaGUID;
-        uint64 SpinestalkerGUID;
-        uint64 RimefangGUID;
-        uint64 TheLichKingTeleportGUID;
-        uint64 TheLichKingGUID;
-        uint64 HighlordTirionFordringGUID;
-        uint64 TerenasMenethilGUID;
-        uint64 ArthasPlatformGUID;
-        uint64 ArthasPrecipiceGUID;
-        uint64 FrozenThroneEdgeGUID;
-        uint64 FrozenThroneWindGUID;
-        uint64 FrozenThroneWarningGUID;
-        uint64 FrozenBolvarGUID;
-        uint64 PillarsChainedGUID;
-        uint64 PillarsUnchainedGUID;
+        ObjectGuid LadyDeathwhisperGUID;
+        ObjectGuid LadyDeathwisperElevatorGUID;
+        ObjectGuid GunshipGUID;
+        ObjectGuid EnemyGunshipGUID;
+        ObjectGuid GunshipArmoryGUID;
+        ObjectGuid DeathbringerSaurfangGUID;
+        ObjectGuid DeathbringerSaurfangDoorGUID;
+        ObjectGuid DeathbringerSaurfangEventGUID;   // Muradin Bronzebeard or High Overlord Saurfang
+        ObjectGuid DeathbringersCacheGUID;
+        ObjectGuid SaurfangTeleportGUID;
+        ObjectGuid PlagueSigilGUID;
+        ObjectGuid BloodwingSigilGUID;
+        ObjectGuid FrostwingSigilGUID;
+        ObjectGuid PutricidePipeGUIDs[2];
+        ObjectGuid PutricideGateGUIDs[2];
+        ObjectGuid PutricideCollisionGUID;
+        ObjectGuid FestergutGUID;
+        ObjectGuid RotfaceGUID;
+        ObjectGuid ProfessorPutricideGUID;
+        ObjectGuid PutricideTableGUID;
+        ObjectGuid BloodCouncilGUIDs[3];
+        ObjectGuid BloodCouncilControllerGUID;
+        ObjectGuid BloodQueenLanaThelGUID;
+        ObjectGuid CrokScourgebaneGUID;
+        ObjectGuid CrokCaptainGUIDs[4];
+        ObjectGuid SisterSvalnaGUID;
+        ObjectGuid ValithriaDreamwalkerGUID;
+        ObjectGuid ValithriaLichKingGUID;
+        ObjectGuid ValithriaTriggerGUID;
+        ObjectGuid PutricadeTrapGUID;
+        ObjectGuid SindragosaGauntletGUID;
+        ObjectGuid SindragosaGUID;
+        ObjectGuid SpinestalkerGUID;
+        ObjectGuid RimefangGUID;
+        ObjectGuid TheLichKingTeleportGUID;
+        ObjectGuid TheLichKingGUID;
+        ObjectGuid HighlordTirionFordringGUID;
+        ObjectGuid TerenasMenethilGUID;
+        ObjectGuid ArthasPlatformGUID;
+        ObjectGuid ArthasPrecipiceGUID;
+        ObjectGuid FrozenThroneEdgeGUID;
+        ObjectGuid FrozenThroneWindGUID;
+        ObjectGuid FrozenThroneWarningGUID;
+        ObjectGuid FrozenBolvarGUID;
+        ObjectGuid PillarsChainedGUID;
+        ObjectGuid PillarsUnchainedGUID;
         TeamId TeamIdInInstance;
         uint32 ColdflameJetsState;
         std::set<ObjectGuid::LowType> FrostwyrmGUIDs;

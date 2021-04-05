@@ -304,7 +304,7 @@ class go_chromaggus_lever : public GameObjectScript
                         creature->AI()->AttackStart(player);
 
                     if (GameObject* go = _instance->instance->GetGameObject(DATA_GO_CHROMAGGUS_DOOR))
-                        _instance->HandleGameObject(0, true, go);
+                        _instance->HandleGameObject(ObjectGuid::Empty, true, go);
                 }
 
                 go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);

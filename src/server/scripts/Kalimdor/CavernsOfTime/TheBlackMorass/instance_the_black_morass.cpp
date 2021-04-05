@@ -34,14 +34,13 @@ public:
 
         GuidSet encounterNPCs;
         uint32 encounters[MAX_ENCOUNTER];
-        uint64 _medivhGUID;
+        ObjectGuid _medivhGUID;
         uint8  _currentRift;
         uint8  _shieldPercent;
 
         void Initialize() override
         {
             memset(&encounters, 0, sizeof(encounters));
-            _medivhGUID = 0;
             _currentRift = 0;
             _shieldPercent = 100;
             encounterNPCs.clear();
@@ -217,12 +216,12 @@ public:
                 encounterNPCs.erase(data);
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             if (data == DATA_MEDIVH)
                 return _medivhGUID;
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void SummonPortalKeeper()

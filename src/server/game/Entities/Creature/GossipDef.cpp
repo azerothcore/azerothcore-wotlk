@@ -174,13 +174,13 @@ void PlayerMenu::ClearMenus()
     _questMenu.ClearMenu();
 }
 
-void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const
+void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID) const
 {
     //ACE_Read_Guard<ACE_RW_Thread_Mutex> lock1(_gossipMenu.GetLock());
     //ACE_Read_Guard<ACE_RW_Thread_Mutex> lock2(_questMenu.GetLock());
 
     WorldPacket data(SMSG_GOSSIP_MESSAGE, 24 + _gossipMenu.GetMenuItemCount() * 100 + _questMenu.GetMenuItemCount() * 75);     // guess size
-    data << uint64(objectGUID);
+    data << objectGUID;
     data << uint32(_gossipMenu.GetMenuId());            // new 2.4.0
     data << uint32(titleTextId);
     data << uint32(_gossipMenu.GetMenuItemCount());     // max count 0x10
@@ -297,10 +297,10 @@ void QuestMenu::ClearMenu()
     _questMenuItems.clear();
 }
 
-void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, const std::string& Title, uint64 npcGUID)
+void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, const std::string& Title, ObjectGuid npcGUID)
 {
     WorldPacket data(SMSG_QUESTGIVER_QUEST_LIST, 100 + _questMenu.GetMenuItemCount() * 75);  // guess size
-    data << uint64(npcGUID);
+    data << npcGUID;
     data << Title;
     data << uint32(eEmote._Delay);                         // player emote
     data << uint32(eEmote._Emote);                         // NPC emote
@@ -339,10 +339,10 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, const std::string
 #endif
 }
 
-void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, uint64 npcGUID) const
+void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID) const
 {
     WorldPacket data(SMSG_QUESTGIVER_STATUS, 9);
-    data << uint64(npcGUID);
+    data << npcGUID;
     data << uint8(questStatus);
 
     _session->SendPacket(&data);
@@ -351,7 +351,7 @@ void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, uint64 npcGUID) const
 #endif
 }
 
-void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, bool activateAccept) const
+void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGUID, bool activateAccept) const
 {
     std::string questTitle           = quest->GetTitle();
     std::string questDetails         = quest->GetDetails();
@@ -368,8 +368,8 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, 
     }
 
     WorldPacket data(SMSG_QUESTGIVER_QUEST_DETAILS, 500);   // guess size
-    data << uint64(npcGUID);
-    data << uint64(_session->GetPlayer()->GetDivider());
+    data << npcGUID;
+    data << _session->GetPlayer()->GetDivider();
     data << uint32(quest->GetQuestId());
     data << questTitle;
     data << questDetails;
@@ -588,7 +588,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
 #endif
 }
 
-void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, uint64 npcGUID, bool enableNext) const
+void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUID, bool enableNext) const
 {
     std::string questTitle = quest->GetTitle();
     std::string RewardText = quest->GetOfferRewardText();
@@ -601,7 +601,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, uint64 npcGUID, b
         ObjectMgr::GetLocaleString(questOfferRewardLocale->RewardText, locale, RewardText);
 
     WorldPacket data(SMSG_QUESTGIVER_OFFER_REWARD, 400);    // guess size
-    data << uint64(npcGUID);
+    data << npcGUID;
     data << uint32(quest->GetQuestId());
     data << questTitle;
     data << RewardText;
@@ -678,7 +678,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, uint64 npcGUID, b
 #endif
 }
 
-void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, uint64 npcGUID, bool canComplete, bool closeOnCancel) const
+void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, ObjectGuid npcGUID, bool canComplete, bool closeOnCancel) const
 {
     // We can always call to RequestItems, but this packet only goes out if there are actually
     // items.  Otherwise, we'll skip straight to the OfferReward
@@ -717,7 +717,7 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, uint64 npcGUID, 
     }
 
     WorldPacket data(SMSG_QUESTGIVER_REQUEST_ITEMS, 300);   // guess size
-    data << uint64(npcGUID);
+    data << npcGUID;
     data << uint32(quest->GetQuestId());
     data << questTitle;
     data << requestItemsText;

@@ -413,7 +413,7 @@ public:
         }
 
     private:
-        uint64 _summonerGuid;
+        ObjectGuid _summonerGuid;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

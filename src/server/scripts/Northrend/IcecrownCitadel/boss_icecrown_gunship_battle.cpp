@@ -393,8 +393,13 @@ public:
     void ResetSlots(TeamId teamId, MotionTransport* t)
     {
         _transport = t;
-        memset(_controlledSlots, 0, sizeof(uint64)* MAX_SLOTS);
-        memset(_respawnCooldowns, 0, sizeof(time_t)* MAX_SLOTS);
+
+        for (uint8 i = 0; i < MAX_SLOTS; ++i)
+        {
+            _controlledSlots[i].Clear();
+            _respawnCooldowns[i] = time_t(0);
+        }
+
         _spawnPoint = teamId == TEAM_HORDE ? &OrgrimsHammerAddsSpawnPos : &SkybreakerAddsSpawnPos;
         _slotInfo = teamId == TEAM_HORDE ? OrgrimsHammerSlotInfo : SkybreakerSlotInfo;
     }
@@ -440,7 +445,7 @@ public:
 
     void ClearSlot(PassengerSlots slot)
     {
-        _controlledSlots[slot] = 0;
+        _controlledSlots[slot].Clear();
         _respawnCooldowns[slot] = time(nullptr) + _slotInfo[slot].Cooldown;
     }
 
@@ -457,7 +462,7 @@ private:
         return newPos;
     }
 
-    uint64 _controlledSlots[MAX_SLOTS];
+    ObjectGuid _controlledSlots[MAX_SLOTS];
     time_t _respawnCooldowns[MAX_SLOTS];
     MotionTransport* _transport;
     Position const* _spawnPoint;
@@ -489,7 +494,7 @@ private:
 class ResetEncounterEvent : public BasicEvent
 {
 public:
-    ResetEncounterEvent(Unit* caster, uint32 spellId, uint64 otherTransport) : _caster(caster), _spellId(spellId), _otherTransport(otherTransport) { }
+    ResetEncounterEvent(Unit* caster, uint32 spellId, ObjectGuid otherTransport) : _caster(caster), _spellId(spellId), _otherTransport(otherTransport) { }
 
     bool Execute(uint64, uint32) override
     {
@@ -509,7 +514,7 @@ public:
 private:
     Unit* _caster;
     uint32 _spellId;
-    uint64 _otherTransport;
+    ObjectGuid _otherTransport;
 };
 
 class npc_gunship : public CreatureScript

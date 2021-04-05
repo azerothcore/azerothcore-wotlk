@@ -63,12 +63,11 @@ public:
         boss_kelidan_the_breakerAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-            memset(&channelers, 0, sizeof(channelers));
         }
 
         InstanceScript* instance;
         EventMap events;
-        uint64 channelers[5];
+        ObjectGuid channelers[5];
         uint32 checkTimer;
         bool addYell;
 

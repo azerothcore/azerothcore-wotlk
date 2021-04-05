@@ -236,7 +236,7 @@ public:
         {
             if (Creature* darnavan = ObjectAccessor::GetCreature(*me, _darnavanGUID))
                 darnavan->DespawnOrUnsummon();
-            _darnavanGUID = 0;
+            _darnavanGUID.Clear();
             _waveCounter = 0;
             _Reset();
             me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
@@ -642,7 +642,7 @@ public:
 
     private:
         bool _introDone;
-        uint64 _darnavanGUID;
+        ObjectGuid _darnavanGUID;
         uint32 _waveCounter;
     };
 
@@ -898,11 +898,11 @@ public:
         {
             me->SetControlled(true, UNIT_STATE_ROOT);
             unroot_timer = 500;
-            targetGUID = 0;
+            targetGUID.Clear();
         }
 
         uint16 unroot_timer;
-        uint64 targetGUID;
+        ObjectGuid targetGUID;
 
         void Reset() override
         {

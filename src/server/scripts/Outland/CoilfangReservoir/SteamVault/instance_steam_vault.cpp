@@ -51,19 +51,14 @@ public:
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
 
-        uint64 MekgineerGUID;
-        uint64 MainChambersDoor;
-        uint64 AccessPanelHydro;
-        uint64 AccessPanelMek;
+        ObjectGuid MekgineerGUID;
+        ObjectGuid MainChambersDoor;
+        ObjectGuid AccessPanelHydro;
+        ObjectGuid AccessPanelMek;
 
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-
-            MekgineerGUID = 0;
-            MainChambersDoor = 0;
-            AccessPanelHydro = 0;
-            AccessPanelMek = 0;
         }
 
         bool IsEncounterInProgress() const override
@@ -92,21 +87,21 @@ public:
                 case GO_MAIN_CHAMBERS_DOOR:
                     MainChambersDoor = go->GetGUID();
                     if (GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL && GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_ACCESS_PANEL_HYDRO:
                     AccessPanelHydro = go->GetGUID();
                     if (GetData(TYPE_HYDROMANCER_THESPIA) == DONE)
                         go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     else if (GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_ACCESS_PANEL_MEK:
                     AccessPanelMek = go->GetGUID();
                     if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == DONE)
                         go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     else if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
             }
         }

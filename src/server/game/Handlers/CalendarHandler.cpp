@@ -38,7 +38,7 @@ Copied events should probably have a new owner
 
 void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_CALENDAR_GET_CALENDAR [%s]", guid.ToString().c_str());
 
     time_t currTime = time(nullptr);
@@ -206,7 +206,7 @@ void WorldSession::HandleCalendarArenaTeam(WorldPacket& recvData)
         team->MassInviteToEvent(this);
 }
 
-bool validUtf8String(WorldPacket& recvData, std::string& s, std::string action, uint64 playerGUID)
+bool validUtf8String(WorldPacket& recvData, std::string& s, std::string action, ObjectGuid playerGUID)
 {
     if (!utf8::is_valid(s.begin(), s.end()))
     {
@@ -219,7 +219,7 @@ bool validUtf8String(WorldPacket& recvData, std::string& s, std::string action, 
 
 void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
 
     std::string title;
     std::string description;
@@ -348,7 +348,7 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     time_t oldEventTime;
 
     uint64 eventId;
@@ -408,7 +408,7 @@ void WorldSession::HandleCalendarUpdateEvent(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarRemoveEvent(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint64 eventId;
 
     recvData >> eventId;
@@ -419,7 +419,7 @@ void WorldSession::HandleCalendarRemoveEvent(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarCopyEvent(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint64 eventId;
     uint64 inviteId;
     uint32 eventTime;
@@ -515,7 +515,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
     bool isPreInvite;
     bool isGuildEvent;
 
-    uint64 inviteeGuid = 0;
+    ObjectGuid inviteeGuid;
     uint32 inviteeTeamId = TEAM_NEUTRAL;
     uint32 inviteeGuildId = 0;
 
@@ -599,7 +599,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventSignup(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint64 eventId;
     bool tentative;
 
@@ -625,7 +625,7 @@ void WorldSession::HandleCalendarEventSignup(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventRsvp(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint64 eventId;
     uint64 inviteId;
     uint32 status;
@@ -690,7 +690,7 @@ void WorldSession::HandleCalendarEventRemoveInvite(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventStatus(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     ObjectGuid invitee;
     uint64 eventId;
     uint64 inviteId;
@@ -723,7 +723,7 @@ void WorldSession::HandleCalendarEventStatus(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     ObjectGuid invitee;
     uint64 eventId;
     uint64 inviteId;
@@ -753,9 +753,9 @@ void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarComplain(WorldPacket& recvData)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint64 eventId;
-    uint64 complainGUID;
+    ObjectGuid complainGUID;
 
     recvData >> eventId >> complainGUID;
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_CALENDAR_COMPLAIN [%s] EventId ["
@@ -766,7 +766,7 @@ void WorldSession::HandleCalendarComplain(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarGetNumPending(WorldPacket& /*recvData*/)
 {
-    uint64 guid = _player->GetGUID();
+    ObjectGuid guid = _player->GetGUID();
     uint32 pending = sCalendarMgr->GetPlayerNumPending(guid);
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_CALENDAR_GET_NUM_PENDING: [%s] Pending: %u", guid.ToString().c_str(), pending);

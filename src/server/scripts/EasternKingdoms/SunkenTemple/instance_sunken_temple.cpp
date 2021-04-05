@@ -25,9 +25,6 @@ public:
             _statuePhase = 0;
             _defendersKilled = 0;
             memset(&_encounters, 0, sizeof(_encounters));
-
-            _forcefieldGUID = 0;
-            _jammalanGUID = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -180,8 +177,8 @@ public:
         uint32 _defendersKilled;
         uint32 _encounters[MAX_ENCOUNTERS];
 
-        uint64 _forcefieldGUID;
-        uint64 _jammalanGUID;
+        ObjectGuid _forcefieldGUID;
+        ObjectGuid _jammalanGUID;
         GuidList _dragonkinList;
         EventMap _events;
     };

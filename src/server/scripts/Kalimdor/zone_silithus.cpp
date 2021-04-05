@@ -417,24 +417,24 @@ public:
         uint32 AnimationTimer;
         uint8 AnimationCount;
 
-        uint64 AnachronosQuestTriggerGUID;
-        uint64 MerithraGUID;
-        uint64 ArygosGUID;
-        uint64 CaelestraszGUID;
-        uint64 FandralGUID;
-        uint64 PlayerGUID;
+        ObjectGuid AnachronosQuestTriggerGUID;
+        ObjectGuid MerithraGUID;
+        ObjectGuid ArygosGUID;
+        ObjectGuid CaelestraszGUID;
+        ObjectGuid FandralGUID;
+        ObjectGuid PlayerGUID;
         bool eventEnd;
 
         void Reset() override
         {
             AnimationTimer = 1500;
             AnimationCount = 0;
-            AnachronosQuestTriggerGUID = 0;
-            MerithraGUID = 0;
-            ArygosGUID = 0;
-            CaelestraszGUID = 0;
-            FandralGUID = 0;
-            PlayerGUID = 0;
+            AnachronosQuestTriggerGUID.Clear();
+            MerithraGUID.Clear();
+            ArygosGUID.Clear();
+            CaelestraszGUID.Clear();
+            FandralGUID.Clear();
+            PlayerGUID.Clear();
             eventEnd = false;
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -741,16 +741,16 @@ public:
     {
         npc_qiraj_war_spawnAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 MobGUID;
-        uint64 PlayerGUID;
+        ObjectGuid MobGUID;
+        ObjectGuid PlayerGUID;
         uint32 SpellTimer1, SpellTimer2, SpellTimer3, SpellTimer4;
         bool Timers;
         bool hasTarget;
 
         void Reset() override
         {
-            MobGUID = 0;
-            PlayerGUID = 0;
+            MobGUID.Clear();
+            PlayerGUID.Clear();
             Timers = false;
             hasTarget = false;
         }
@@ -857,7 +857,7 @@ public:
     {
         npc_anachronos_quest_triggerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         uint32 WaveTimer;
         uint32 AnnounceTimer;
@@ -871,7 +871,7 @@ public:
 
         void Reset() override
         {
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
 
             WaveTimer = 2000;
             AnnounceTimer = 1000;

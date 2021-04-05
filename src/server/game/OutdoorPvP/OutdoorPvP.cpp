@@ -53,7 +53,7 @@ void OPvPCapturePoint::SendChangePhase()
     SendUpdateWorldState(m_capturePoint->GetGOInfo()->capturePoint.worldstate3, m_neutralValuePct);
 }
 
-void OPvPCapturePoint::AddGO(uint32 type, uint32 guid, uint32 entry)
+void OPvPCapturePoint::AddGO(uint32 type, ObjectGuid::LowType guid, uint32 entry)
 {
     if (!entry)
     {
@@ -66,7 +66,7 @@ void OPvPCapturePoint::AddGO(uint32 type, uint32 guid, uint32 entry)
     m_ObjectTypes[m_Objects[type]] = type;
 }
 
-void OPvPCapturePoint::AddCre(uint32 type, uint32 guid, uint32 entry)
+void OPvPCapturePoint::AddCre(uint32 type, ObjectGuid::LowType guid, uint32 entry)
 {
     if (!entry)
     {
@@ -81,7 +81,7 @@ void OPvPCapturePoint::AddCre(uint32 type, uint32 guid, uint32 entry)
 
 bool OPvPCapturePoint::AddObject(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3)
 {
-    if (uint32 guid = sObjectMgr->AddGOData(entry, map, x, y, z, o, 0, rotation0, rotation1, rotation2, rotation3))
+    if (ObjectGuid::LowType guid = sObjectMgr->AddGOData(entry, map, x, y, z, o, 0, rotation0, rotation1, rotation2, rotation3))
     {
         AddGO(type, guid, entry);
         return true;
@@ -92,7 +92,7 @@ bool OPvPCapturePoint::AddObject(uint32 type, uint32 entry, uint32 map, float x,
 
 bool OPvPCapturePoint::AddCreature(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay)
 {
-    if (uint32 guid = sObjectMgr->AddCreData(entry, map, x, y, z, o, spawntimedelay))
+    if (ObjectGuid::LowType guid = sObjectMgr->AddCreData(entry, map, x, y, z, o, spawntimedelay))
     {
         AddCre(type, guid, entry);
         return true;
@@ -143,7 +143,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
     if (!cr)
     {
         // can happen when closing the core
-        m_Creatures[type] = 0;
+        m_Creatures[type].Clear();
         return false;
     }
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -168,7 +168,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
     cr->AddObjectToRemoveList();
     sObjectMgr->DeleteCreatureData(spawnId);
     m_CreatureTypes[m_Creatures[type]] = 0;
-    m_Creatures[type] = 0;
+    m_Creatures[type].Clear();
     return true;
 }
 
@@ -180,7 +180,7 @@ bool OPvPCapturePoint::DelObject(uint32 type)
     GameObject* obj = HashMapHolder<GameObject>::Find(m_Objects[type]);
     if (!obj)
     {
-        m_Objects[type] = 0;
+        m_Objects[type].Clear();
         return false;
     }
     ObjectGuid::LowType spawnId = obj->GetSpawnId();
@@ -188,7 +188,7 @@ bool OPvPCapturePoint::DelObject(uint32 type)
     obj->Delete();
     sObjectMgr->DeleteGOData(spawnId);
     m_ObjectTypes[m_Objects[type]] = 0;
-    m_Objects[type] = 0;
+    m_Objects[type].Clear();
     return true;
 }
 
@@ -208,9 +208,9 @@ bool OPvPCapturePoint::DelCapturePoint()
 
 void OPvPCapturePoint::DeleteSpawns()
 {
-    for (std::map<uint32, uint64>::iterator i = m_Objects.begin(); i != m_Objects.end(); ++i)
+    for (std::map<uint32, ObjectGuid>::iterator i = m_Objects.begin(); i != m_Objects.end(); ++i)
         DelObject(i->first);
-    for (std::map<uint32, uint64>::iterator i = m_Creatures.begin(); i != m_Creatures.end(); ++i)
+    for (std::map<uint32, ObjectGuid>::iterator i = m_Creatures.begin(); i != m_Creatures.end(); ++i)
         DelCreature(i->first);
     DelCapturePoint();
 }
@@ -277,7 +277,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
     {
         for (PlayerSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end();)
         {
-            uint64 playerGuid = *itr;
+            ObjectGuid playerGuid = *itr;
             ++itr;
 
             if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
@@ -408,7 +408,7 @@ void OPvPCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
     }
 }
 
-void OPvPCapturePoint::SendObjectiveComplete(uint32 id, uint64 guid)
+void OPvPCapturePoint::SendObjectiveComplete(uint32 id, ObjectGuid guid)
 {
     uint32 team;
     switch (m_State)
@@ -493,7 +493,7 @@ bool OPvPCapturePoint::HandleCustomSpell(Player* player, uint32 /*spellId*/, Gam
     return false;
 }
 
-bool OutdoorPvP::HandleOpenGo(Player* player, uint64 guid)
+bool OutdoorPvP::HandleOpenGo(Player* player, ObjectGuid guid)
 {
     for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
         if (itr->second->HandleOpenGo(player, guid) >= 0)
@@ -502,7 +502,7 @@ bool OutdoorPvP::HandleOpenGo(Player* player, uint64 guid)
     return false;
 }
 
-bool OutdoorPvP::HandleGossipOption(Player* player, uint64 guid, uint32 id)
+bool OutdoorPvP::HandleGossipOption(Player* player, ObjectGuid guid, uint32 id)
 {
     for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
         if (itr->second->HandleGossipOption(player, guid, id))
@@ -529,7 +529,7 @@ bool OutdoorPvP::HandleDropFlag(Player* player, uint32 id)
     return false;
 }
 
-bool OPvPCapturePoint::HandleGossipOption(Player* /*player*/, uint64 /*guid*/, uint32 /*id*/)
+bool OPvPCapturePoint::HandleGossipOption(Player* /*player*/, ObjectGuid /*guid*/, uint32 /*id*/)
 {
     return false;
 }
@@ -544,9 +544,9 @@ bool OPvPCapturePoint::HandleDropFlag(Player* /*player*/, uint32 /*id*/)
     return false;
 }
 
-int32 OPvPCapturePoint::HandleOpenGo(Player* /*player*/, uint64 guid)
+int32 OPvPCapturePoint::HandleOpenGo(Player* /*player*/, ObjectGuid guid)
 {
-    std::map<uint64, uint32>::iterator itr = m_ObjectTypes.find(guid);
+    std::map<ObjectGuid, uint32>::iterator itr = m_ObjectTypes.find(guid);
     if (itr != m_ObjectTypes.end())
     {
         return itr->second;

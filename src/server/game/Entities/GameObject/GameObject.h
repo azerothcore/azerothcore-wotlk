@@ -765,7 +765,7 @@ public:
     bool LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap = true);
     void DeleteFromDB();
 
-    void SetOwnerGUID(uint64 owner)
+    void SetOwnerGUID(ObjectGuid owner)
     {
         // Owner already found and different than expected owner - remove object from old owner
         if (owner && GetOwnerGUID() && GetOwnerGUID() != owner)
@@ -775,7 +775,7 @@ public:
         m_spawnedByDefault = false;                     // all object with owner is despawned after delay
         SetGuidValue(OBJECT_FIELD_CREATED_BY, owner);
     }
-    [[nodiscard]] uint64 GetOwnerGUID() const { return GetGuidValue(OBJECT_FIELD_CREATED_BY); }
+    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(OBJECT_FIELD_CREATED_BY); }
     [[nodiscard]] Unit* GetOwner() const;
 
     void SetSpellId(uint32 id)
@@ -967,7 +967,7 @@ protected:
     GuidSet m_unique_users;
     uint32 m_usetimes;
 
-    typedef std::map<uint32, uint64> ChairSlotAndUser;
+    typedef std::map<uint32, ObjectGuid> ChairSlotAndUser;
     ChairSlotAndUser ChairListSlots;
 
     ObjectGuid::LowType m_spawnId;                            ///< For new or temporary gameobjects is 0 for saved it is lowguid
@@ -980,7 +980,7 @@ protected:
     G3D::Quat m_worldRotation;
     Position m_stationaryPosition;
 
-    uint64 m_lootRecipient;
+    ObjectGuid m_lootRecipient;
     uint32 m_lootRecipientGroup;
     uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
     uint32 m_lootGenerationTime;

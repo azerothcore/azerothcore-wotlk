@@ -101,10 +101,10 @@ public:
         {
             instance = creature->GetInstanceScript();
             Started = false;
-            ArthasGUID = 0;
+            ArthasGUID.Clear();
         }
 
-        uint64 ArthasGUID;
+        ObjectGuid ArthasGUID;
         bool Started;
         InstanceScript* instance;
         EventMap events;

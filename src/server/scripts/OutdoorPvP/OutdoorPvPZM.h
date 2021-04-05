@@ -197,11 +197,11 @@ public:
 
     void UpdateTowerState();
 
-    int32 HandleOpenGo(Player* player, uint64 guid) override;
+    int32 HandleOpenGo(Player* player, ObjectGuid guid) override;
 
     void SetBeaconState(TeamId controlling_teamId); // not good atm
 
-    bool HandleGossipOption(Player* player, uint64 guid, uint32 gossipid) override;
+    bool HandleGossipOption(Player* player, ObjectGuid guid, uint32 gossipid) override;
 
     bool HandleDropFlag(Player* player, uint32 spellId) override;
 
@@ -214,7 +214,7 @@ private:
 
 protected:
     TeamId m_BothControllingFactionId;
-    uint64 m_FlagCarrierGUID;
+    ObjectGuid m_FlagCarrierGUID;
 };
 
 class OutdoorPvPZM : public OutdoorPvP

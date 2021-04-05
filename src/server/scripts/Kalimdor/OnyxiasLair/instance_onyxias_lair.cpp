@@ -20,7 +20,7 @@ public:
     {
         instance_onyxias_lair_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
 
-        uint64 m_uiOnyxiasGUID;
+        ObjectGuid m_uiOnyxiasGUID;
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string str_data;
         uint16 ManyWhelpsCounter;
@@ -30,7 +30,6 @@ public:
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-            m_uiOnyxiasGUID = 0;
             ManyWhelpsCounter = 0;
             bDeepBreath = true;
         }

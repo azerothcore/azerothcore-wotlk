@@ -168,9 +168,9 @@ public:
             return 0;
         }
     private:
-        uint64 DoorHighInquisitorGUID;
-        uint64 MograineGUID;
-        uint64 WhitemaneGUID;
+        ObjectGuid DoorHighInquisitorGUID;
+        ObjectGuid MograineGUID;
+        ObjectGuid WhitemaneGUID;
         uint32 encounter;
     };
 };

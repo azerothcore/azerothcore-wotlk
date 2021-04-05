@@ -420,7 +420,7 @@ public:
                 summons.RemoveNotExisting();
                 if (!summons.empty())
                 {
-                    for (uint64 const summonGuid : summons)
+                    for (ObjectGuid const summonGuid : summons)
                     {
                         Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
                         if (summon && summon->GetEntry() == NPC_FIRE_CYCLONE)
@@ -556,7 +556,7 @@ public:
                         uint8 iter = 0;
                         if (!summons.empty())
                         {
-                            for (uint64 const summonGuid : summons)
+                            for (ObjectGuid const summonGuid : summons)
                             {
                                 Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
                                 if (summon && summon->GetEntry() == NPC_FIRE_CYCLONE && iter == rand)
@@ -636,7 +636,7 @@ public:
                 return;
             }
 
-            for (uint64 const guid : summons)
+            for (ObjectGuid const guid : summons)
             {
                 Creature* tsunami = ObjectAccessor::GetCreature(*me, guid);
                 if (!tsunami || tsunami->GetEntry() != NPC_FLAME_TSUNAMI)
@@ -722,7 +722,7 @@ struct boss_sartharion_dragonAI : public BossAI
         me->SetSpeed(MOVE_FLIGHT, 1.0f);
         me->SetCanFly(false);
         me->ResetLootMode();
-        portalGUID = 0;
+        portalGUID.Clear();
         isCalledBySartharion = false;
         instance->DoAction(ACTION_CLEAR_PORTAL);
     }
@@ -989,12 +989,12 @@ protected:
                 gobj->Delete();
             }
 
-            portalGUID = 0;
+            portalGUID.Clear();
         }
     }
 
     EventMap extraEvents;
-    uint64 portalGUID;
+    ObjectGuid portalGUID;
     bool isCalledBySartharion;
 };
 
@@ -1131,7 +1131,7 @@ public:
                 {
                     summons.RemoveNotExisting();
                     summons.DespawnEntry(NPC_TWILIGHT_WHELP);
-                    for (uint64 const summonGuid : summons)
+                    for (ObjectGuid const summonGuid : summons)
                     {
                         Creature const* summon = ObjectAccessor::GetCreature(*me, summonGuid);
                         if (!summon || !summon->IsAlive() || summon->GetEntry() != NPC_TWILIGHT_EGG)

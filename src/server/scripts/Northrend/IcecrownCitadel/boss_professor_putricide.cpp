@@ -140,7 +140,7 @@ class AbominationDespawner
 public:
     explicit AbominationDespawner(Unit* owner) : _owner(owner) { }
 
-    bool operator()(uint64 guid)
+    bool operator()(ObjectGuid guid)
     {
         if (Unit* summon = ObjectAccessor::GetUnit(*_owner, guid))
         {

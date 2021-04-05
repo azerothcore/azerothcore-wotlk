@@ -133,8 +133,8 @@ public:
 
         bool _creditBloodQuickening;
         bool _killMinchar;
-        uint64 _tankGUID;
-        uint64 _offtankGUID;
+        ObjectGuid _tankGUID;
+        ObjectGuid _offtankGUID;
         GuidSet _bloodboltedPlayers;
         GuidSet _vampires;
         bool bEnteredCombat; // needed for failing an attempt in JustReachedHome()
@@ -143,8 +143,8 @@ public:
         {
             _creditBloodQuickening = false;
             _killMinchar = false;
-            _tankGUID = 0;
-            _offtankGUID = 0;
+            _tankGUID.Clear();
+            _offtankGUID.Clear();
             _vampires.clear();
             CleanAuras();
             me->SetReactState(REACT_AGGRESSIVE);
@@ -373,8 +373,8 @@ public:
 
                                 if (target->GetDistance(me->GetVictim()) > 39.0f || me->GetDistance(me->GetVictim()) > 39.0f)
                                 {
-                                    _tankGUID = 0;
-                                    _offtankGUID = 0;
+                                    _tankGUID.Clear();
+                                    _offtankGUID.Clear();
                                     events.ScheduleEvent(EVENT_BLOOD_MIRROR, 2500);
                                     break;
                                 }

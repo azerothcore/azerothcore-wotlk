@@ -263,14 +263,14 @@ void Object::DestroyForPlayer(Player* target, bool onDeath) const
             if (bg->isArena())
             {
                 WorldPacket data(SMSG_ARENA_UNIT_DESTROYED, 8);
-                data << uint64(GetGUID());
+                data << GetGUID();
                 target->GetSession()->SendPacket(&data);
             }
         }
     }
 
     WorldPacket data(SMSG_DESTROY_OBJECT, 8 + 1);
-    data << uint64(GetGUID());
+    data << GetGUID();
     //! If the following bool is true, the client will call "void CGUnit_C::OnDeath()" for this object.
     //! OnDeath() does for eg trigger death animation and interrupts certain spells/missiles/auras/sounds...
     data << uint8(onDeath ? 1 : 0);
@@ -2117,10 +2117,10 @@ void WorldObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*
     VisitNearbyWorldObject(dist, notifier);
 }
 
-void WorldObject::SendObjectDeSpawnAnim(uint64 guid)
+void WorldObject::SendObjectDeSpawnAnim(ObjectGuid guid)
 {
     WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
-    data << uint64(guid);
+    data << guid;
     SendMessageToSet(&data, true);
 }
 
@@ -2840,7 +2840,7 @@ void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= nullptr*
 {
     WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4 + 8);
     data << uint32(sound_id);
-    data << uint64(GetGUID());
+    data << GetGUID();
     if (target)
         target->SendDirectMessage(&data);
     else
@@ -2979,7 +2979,7 @@ struct WorldObjectChangeAccumulator
         for (DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
         {
             source = iter->GetSource();
-            uint64 guid = source->GetCasterGUID();
+            ObjectGuid guid = source->GetCasterGUID();
 
             if (guid))
             {

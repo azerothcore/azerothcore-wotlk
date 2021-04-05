@@ -37,20 +37,16 @@ public:
         uint32 EncounterStatus;
         std::string str_data;
 
-        uint64 NPC_MalygosGUID;
-        uint64 GO_IrisGUID;
-        uint64 GO_ExitPortalGUID;
-        uint64 GO_PlatformGUID;
+        ObjectGuid NPC_MalygosGUID;
+        ObjectGuid GO_IrisGUID;
+        ObjectGuid GO_ExitPortalGUID;
+        ObjectGuid GO_PlatformGUID;
         bool bPokeAchiev;
 
         void Initialize() override
         {
             EncounterStatus = NOT_STARTED;
 
-            NPC_MalygosGUID = 0;
-            GO_IrisGUID = 0;
-            GO_ExitPortalGUID = 0;
-            GO_PlatformGUID = 0;
             bPokeAchiev = false;
         }
 

@@ -78,7 +78,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(std::string const& arenaTeamName, co
     return nullptr;
 }
 
-ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid) const
+ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(ObjectGuid guid) const
 {
     for (ArenaTeamContainer::const_iterator itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
     {
@@ -90,7 +90,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid) const
     return nullptr;
 }
 
-ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid, const uint32 type) const
+ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(ObjectGuid guid, const uint32 type) const
 {
     for (ArenaTeamContainer::const_iterator itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
     {

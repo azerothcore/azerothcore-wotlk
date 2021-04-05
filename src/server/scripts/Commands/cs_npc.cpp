@@ -327,7 +327,7 @@ public:
 
         /* FIXME: impossible without entry
         if (lowguid)
-            creature = ObjectAccessor::GetCreature(*handler->GetSession()->GetPlayer(), MAKE_GUID(lowguid, HIGHGUID_UNIT));
+            creature = ObjectAccessor::GetCreature(*handler->GetSession()->GetPlayer(), MAKE_GUID(lowguid, HighGuid::Unit));
         */
 
         // attempt check creature existence by DB data
@@ -802,7 +802,7 @@ public:
     //move selected creature
     static bool HandleNpcMoveCommand(ChatHandler* handler, const char* args)
     {
-        uint32 lowguid = 0;
+        uint32 lowguid.Clear();
 
         Creature* creature = handler->getSelectedCreature();
 
@@ -817,7 +817,7 @@ public:
 
             /* FIXME: impossible without entry
             if (lowguid)
-                creature = ObjectAccessor::GetCreature(*handler->GetSession()->GetPlayer(), MAKE_GUID(lowguid, HIGHGUID_UNIT));
+                creature = ObjectAccessor::GetCreature(*handler->GetSession()->GetPlayer(), MAKE_GUID(lowguid, HighGuid::Unit));
             */
 
             // Attempting creature load from DB data
@@ -963,7 +963,7 @@ public:
         if (!guid_str)
             return false;
 
-        uint32 lowguid = 0;
+        ObjectGuid::LowType lowguid = 0;
         Creature* creature = nullptr;
 
         if (dontdel_str)
@@ -1001,16 +1001,15 @@ public:
             creature = handler->getSelectedCreature();
             if (!creature || creature->IsPet())
                 return false;
+
             lowguid = creature->GetSpawnId();
         }
         else                                                    // case .setmovetype #creature_guid $move_type (with selected creature)
         {
             lowguid = atoi((char*)guid_str);
 
-            /* impossible without entry
             if (lowguid)
-                creature = ObjectAccessor::GetCreature(*handler->GetSession()->GetPlayer(), MAKE_GUID(lowguid, HIGHGUID_UNIT));
-            */
+                creature = handler->GetCreatureFromPlayerMapByDbGuid(lowguid);
 
             // attempt check creature existence by DB data
             if (!creature)
@@ -1297,11 +1296,11 @@ public:
         if (!creature || !receiver_str || !text)
             return false;
 
-        uint64 receiver_guid = atol(receiver_str);
+        ObjectGuid receiver_guid = ObjectGuid::Create<HighGuid::Player>(atol(receiver_str));
 
         // check online security
         Player* receiver = ObjectAccessor::FindPlayer(receiver_guid);
-        if (handler->HasLowerSecurity(receiver, 0))
+        if (handler->HasLowerSecurity(receiver, ObjectGuid::Empty))
             return false;
 
         creature->MonsterWhisper(text, receiver);
@@ -1509,7 +1508,7 @@ public:
         /*if (!*args)
             return false;
 
-        uint64 guid = handler->GetSession()->GetPlayer()->GetSelection();
+        ObjectGuid guid = handler->GetSession()->GetPlayer()->GetSelection();
         if (guid == 0)
         {
             handler->SendSysMessage(LANG_NO_SELECTION);
@@ -1593,7 +1592,7 @@ public:
             }
         }
 
-        uint64 guid;
+        ObjectGuid guid;
         guid = handler->GetSession()->GetPlayer()->GetSelection();
         if (guid == 0)
         {
@@ -1640,7 +1639,7 @@ public:
                 return false;
             }
         }
-        uint64 guid;
+        ObjectGuid guid;
         guid = handler->GetSession()->GetPlayer()->GetSelection();
         if (guid == 0)
         {

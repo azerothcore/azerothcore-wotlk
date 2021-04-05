@@ -277,7 +277,7 @@ bool ArenaTeam::SetName(std::string const& name)
     return true;
 }
 
-void ArenaTeam::SetCaptain(uint64 guid)
+void ArenaTeam::SetCaptain(ObjectGuid guid)
 {
     // Disable remove/promote buttons
     Player* oldCaptain = ObjectAccessor::FindPlayerInOrOutOfWorld(GetCaptain());
@@ -306,7 +306,7 @@ void ArenaTeam::SetCaptain(uint64 guid)
     }
 }
 
-void ArenaTeam::DelMember(uint64 guid, bool cleanDb)
+void ArenaTeam::DelMember(ObjectGuid guid, bool cleanDb)
 {
     Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
     Group* group = (player && player->GetGroup()) ? player->GetGroup() : nullptr;
@@ -434,8 +434,8 @@ void ArenaTeam::Roster(WorldSession* session)
     {
         player = ObjectAccessor::FindPlayerInOrOutOfWorld(itr->Guid);
 
-        data << uint64(itr->Guid);                          // guid
-        data << uint8((player ? 1 : 0));                        // online flag
+        data << itr->Guid;                                  // guid
+        data << uint8((player ? 1 : 0));                    // online flag
         tempName = "";
         sObjectMgr->GetPlayerNameByGUID(itr->Guid, tempName);
         data << tempName;                                  // member name
@@ -499,14 +499,14 @@ void ArenaTeam::NotifyStatsChanged()
             SendStats(player->GetSession());
 }
 
-void ArenaTeam::Inspect(WorldSession* session, uint64 guid)
+void ArenaTeam::Inspect(WorldSession* session, ObjectGuid guid)
 {
     ArenaTeamMember* member = GetMember(guid);
     if (!member || GetSlot() >= MAX_ARENA_SLOT)
         return;
 
     WorldPacket data(MSG_INSPECT_ARENA_TEAMS, 8 + 1 + 4 * 6);
-    data << uint64(guid);                                   // player guid
+    data << guid;                                           // player guid
     data << uint8(GetSlot());                               // slot (0...2)
     data << uint32(GetId());                                // arena team id
     data << uint32(Stats.Rating);                           // rating
@@ -556,7 +556,7 @@ void ArenaTeam::BroadcastPacket(WorldPacket* packet)
             player->GetSession()->SendPacket(packet);
 }
 
-void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3)
+void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3)
 {
     WorldPacket data(SMSG_ARENA_TEAM_EVENT, 1 + 1 + 1);
     data << uint8(event);
@@ -580,7 +580,7 @@ void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCoun
     }
 
     if (guid)
-        data << uint64(guid);
+        data << guid;
 
     BroadcastPacket(&data);
 
@@ -634,7 +634,7 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
     return 0xFF;
 }
 
-bool ArenaTeam::IsMember(uint64 guid) const
+bool ArenaTeam::IsMember(ObjectGuid guid) const
 {
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
         if (itr->Guid == guid)
@@ -988,7 +988,7 @@ ArenaTeamMember* ArenaTeam::GetMember(const std::string& name)
     return GetMember(sObjectMgr->GetPlayerGUIDByName(name));
 }
 
-ArenaTeamMember* ArenaTeam::GetMember(uint64 guid)
+ArenaTeamMember* ArenaTeam::GetMember(ObjectGuid guid)
 {
     for (MemberList::iterator itr = Members.begin(); itr != Members.end(); ++itr)
         if (itr->Guid == guid)

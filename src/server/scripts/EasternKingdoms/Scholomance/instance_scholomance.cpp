@@ -145,13 +145,13 @@ public:
         }
 
     protected:
-        uint64 GateKirtonosGUID;
-        uint64 GateMiliciaGUID;
-        uint64 GateTheolenGUID;
-        uint64 GatePolkeltGUID;
-        uint64 GateRavenianGUID;
-        uint64 GateBarovGUID;
-        uint64 GateIlluciaGUID;
+        ObjectGuid GateKirtonosGUID;
+        ObjectGuid GateMiliciaGUID;
+        ObjectGuid GateTheolenGUID;
+        ObjectGuid GatePolkeltGUID;
+        ObjectGuid GateRavenianGUID;
+        ObjectGuid GateBarovGUID;
+        ObjectGuid GateIlluciaGUID;
 
         uint32 _kirtonosState;
         uint32 _miniBosses;

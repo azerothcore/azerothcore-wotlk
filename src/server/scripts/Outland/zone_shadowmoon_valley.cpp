@@ -197,7 +197,7 @@ public:
 
     private:
         EventMap events;
-        uint64 infernalGUID;
+        ObjectGuid infernalGUID;
         float ground;
     };
 
@@ -259,7 +259,7 @@ public:
         }
 
     private:
-        uint64 casterGUID;
+        ObjectGuid casterGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -301,7 +301,7 @@ public:
     {
         npc_mature_netherwing_drakeAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 uiPlayerGUID;
+        ObjectGuid uiPlayerGUID;
 
         bool bCanEat;
         bool bIsEating;
@@ -311,7 +311,7 @@ public:
 
         void Reset() override
         {
-            uiPlayerGUID = 0;
+            uiPlayerGUID.Clear();
 
             bCanEat = false;
             bIsEating = false;
@@ -444,12 +444,12 @@ public:
     {
         npc_enslaved_netherwing_drakeAI(Creature* creature) : ScriptedAI(creature)
         {
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
             Tapped = false;
             Reset();
         }
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
         uint32 FlyTimer;
         bool Tapped;
 
@@ -590,13 +590,13 @@ public:
         npc_dragonmaw_peonAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
         bool Tapped;
 
         void Reset() override
         {
             events.Reset();
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
             Tapped = false;
         }
 
@@ -1089,8 +1089,8 @@ public:
 
         uint8 AnimationCount;
 
-        uint64 LordIllidanGUID;
-        uint64 AggroTargetGUID;
+        ObjectGuid LordIllidanGUID;
+        ObjectGuid AggroTargetGUID;
 
         bool Timers;
 
@@ -1098,8 +1098,8 @@ public:
         {
             AnimationTimer = 4000;
             AnimationCount = 0;
-            LordIllidanGUID = 0;
-            AggroTargetGUID = 0;
+            LordIllidanGUID.Clear();
+            AggroTargetGUID.Clear();
             Timers = false;
 
             me->AddUnitState(UNIT_STATE_ROOT);
@@ -1245,7 +1245,7 @@ public:
     {
         npc_lord_illidan_stormrageAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         uint32 WaveTimer;
         uint32 AnnounceTimer;
@@ -1259,7 +1259,7 @@ public:
 
         void Reset() override
         {
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
 
             WaveTimer = 10000;
             AnnounceTimer = 7000;
@@ -1390,13 +1390,13 @@ public:
     {
         npc_illidari_spawnAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 LordIllidanGUID;
+        ObjectGuid LordIllidanGUID;
         uint32 SpellTimer1, SpellTimer2, SpellTimer3;
         bool Timers;
 
         void Reset() override
         {
-            LordIllidanGUID = 0;
+            LordIllidanGUID.Clear();
             Timers = false;
         }
 
@@ -1739,7 +1739,7 @@ public:
         void Reset() override
         {
             tapped = false;
-            tuberGUID = 0;
+            tuberGUID.Clear();
             resetTimer = 60000;
         }
 
@@ -1794,7 +1794,7 @@ public:
         }
     private:
         bool tapped;
-        uint64 tuberGUID;
+        ObjectGuid tuberGUID;
         uint32 resetTimer;
     };
 

@@ -328,7 +328,7 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
     {
         if (GetReviveQueueSize())
         {
-            for (std::map<uint64, GuidVector>::iterator itr = m_ReviveQueue.begin(); itr != m_ReviveQueue.end(); ++itr)
+            for (std::map<ObjectGuid, GuidVector>::iterator itr = m_ReviveQueue.begin(); itr != m_ReviveQueue.end(); ++itr)
             {
                 Creature* sh = nullptr;
                 for (ObjectGuid const guid : itr->second)
@@ -567,7 +567,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                             p->SetSummonPoint(t->GetMapId(), t->GetPositionX(), t->GetPositionY(), t->GetPositionZ(), 15, true);
 
                             WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
-                            data << uint64(t->GetGUID());
+                            data << t->GetGUID();
                             data << uint32(t->GetZoneId());
                             data << uint32(15 * IN_MILLISECONDS);
                             p->GetSession()->SendPacket(&data);
@@ -1206,7 +1206,7 @@ void Battleground::AddPlayer(Player* player)
 
     // score struct must be created in inherited class
 
-    uint64 guid = player->GetGUID();
+    ObjectGuid guid = player->GetGUID();
     TeamId teamId = player->GetBgTeamId();
 
     // Add to list/maps
@@ -1283,7 +1283,7 @@ void Battleground::AddOrSetPlayerToCorrectBgGroup(Player* player, TeamId teamId)
         return;
     }
 
-    uint64 playerGuid = player->GetGUID();
+    ObjectGuid playerGuid = player->GetGUID();
     Group* group = GetBgRaid(teamId);
     if (!group)                                      // first player joined
     {
@@ -1454,7 +1454,7 @@ void Battleground::UpdatePlayerScore(Player* player, uint32 type, uint32 value, 
     }
 }
 
-void Battleground::AddPlayerToResurrectQueue(uint64 npc_guid, uint64 player_guid)
+void Battleground::AddPlayerToResurrectQueue(ObjectGuid npc_guid, ObjectGuid player_guid)
 {
     m_ReviveQueue[npc_guid].push_back(player_guid);
 
@@ -1467,7 +1467,7 @@ void Battleground::AddPlayerToResurrectQueue(uint64 npc_guid, uint64 player_guid
 
 void Battleground::RemovePlayerFromResurrectQueue(Player* player)
 {
-    for (std::map<uint64, GuidVector>::iterator itr = m_ReviveQueue.begin(); itr != m_ReviveQueue.end(); ++itr)
+    for (std::map<ObjectGuid, GuidVector>::iterator itr = m_ReviveQueue.begin(); itr != m_ReviveQueue.end(); ++itr)
         for (GuidVector::iterator itr2 = itr->second.begin(); itr2 != itr->second.end(); ++itr2)
             if (*itr2 == player->GetGUID())
             {
@@ -1477,7 +1477,7 @@ void Battleground::RemovePlayerFromResurrectQueue(Player* player)
             }
 }
 
-void Battleground::RelocateDeadPlayers(uint64 queueIndex)
+void Battleground::RelocateDeadPlayers(ObjectGuid queueIndex)
 {
     // Those who are waiting to resurrect at this node are taken to the closest own node's graveyard
     GuidVector& ghostList = m_ReviveQueue[queueIndex];
@@ -1883,7 +1883,7 @@ TeamId Battleground::GetOtherTeamId(TeamId teamId)
     return teamId != TEAM_NEUTRAL ? (teamId == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE) : TEAM_NEUTRAL;
 }
 
-bool Battleground::IsPlayerInBattleground(uint64 guid) const
+bool Battleground::IsPlayerInBattleground(ObjectGuid guid) const
 {
     BattlegroundPlayerMap::const_iterator itr = m_Players.find(guid);
     if (itr != m_Players.end())
@@ -1921,7 +1921,7 @@ void Battleground::SetHoliday(bool is_holiday)
     m_HonorMode = is_holiday ? BG_HOLIDAY : BG_NORMAL;
 }
 
-int32 Battleground::GetObjectType(uint64 guid)
+int32 Battleground::GetObjectType(ObjectGuid guid)
 {
     for (uint32 i = 0; i < BgObjects.size(); ++i)
         if (BgObjects[i] == guid)

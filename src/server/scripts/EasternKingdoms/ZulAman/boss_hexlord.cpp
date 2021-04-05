@@ -247,16 +247,14 @@ public:
         {
             instance = creature->GetInstanceScript();
             SelectAddEntry();
-            for (uint8 i = 0; i < 4; ++i)
-                AddGUID[i] = 0;
         }
 
         InstanceScript* instance;
 
-        uint64 AddGUID[4];
+        ObjectGuid AddGUID[4];
         uint32 AddEntry[4];
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         uint32 SpiritBolts_Timer;
         uint32 DrainPower_Timer;

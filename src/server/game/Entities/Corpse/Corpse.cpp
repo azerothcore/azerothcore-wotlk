@@ -53,7 +53,7 @@ void Corpse::RemoveFromWorld()
 bool Corpse::Create(uint32 guidlow, Map* map)
 {
     SetMap(map);
-    Object::_Create(guidlow, 0, HIGHGUID_CORPSE);
+    Object::_Create(guidlow, 0, HighGuid::Corpse);
     return true;
 }
 
@@ -74,7 +74,7 @@ bool Corpse::Create(uint32 guidlow, Player* owner)
     //in other way we will get a crash in Corpse::SaveToDB()
     SetMap(owner->GetMap());
 
-    WorldObject::_Create(guidlow, HIGHGUID_CORPSE, owner->GetPhaseMask());
+    WorldObject::_Create(guidlow, HighGuid::Corpse, owner->GetPhaseMask());
 
     SetObjectScale(1);
     SetGuidValue(CORPSE_FIELD_OWNER, owner->GetGUID());
@@ -143,7 +143,7 @@ bool Corpse::LoadCorpseFromDB(uint32 guid, Field* fields)
     float o      = fields[3].GetFloat();
     uint32 mapId = fields[4].GetUInt16();
 
-    Object::_Create(guid, 0, HIGHGUID_CORPSE);
+    Object::_Create(guid, 0, HighGuid::Corpse);
 
     SetObjectScale(1.0f);
     SetUInt32Value(CORPSE_FIELD_DISPLAY_ID, fields[5].GetUInt32());

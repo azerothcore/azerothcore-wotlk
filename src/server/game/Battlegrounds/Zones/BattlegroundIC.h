@@ -924,7 +924,7 @@ public:
 
     bool AllNodesConrolledByTeam(TeamId teamId) const override;  // overwrited
     bool IsResourceGlutAllowed(TeamId teamId) const;
-    void DoAction(uint32 action, uint64 guid) override;
+    void DoAction(uint32 action, ObjectGuid guid) override;
 private:
     uint32 closeFortressDoorsTimer;
     bool doorsClosed;

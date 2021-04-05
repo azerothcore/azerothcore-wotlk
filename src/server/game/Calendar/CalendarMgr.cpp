@@ -87,8 +87,8 @@ void CalendarMgr::LoadFromDB()
 
             uint64 inviteId             = fields[0].GetUInt64();
             uint64 eventId              = fields[1].GetUInt64();
-            uint64 invitee              = ObjectGuid::Create<HighGuid::Player>(fields[2].GetUInt32());
-            uint64 senderGUID           = ObjectGuid::Create<HighGuid::Player>(fields[3].GetUInt32());
+            ObjectGuid invitee          = ObjectGuid::Create<HighGuid::Player>(fields[2].GetUInt32());
+            ObjectGuid senderGUID       = ObjectGuid::Create<HighGuid::Player>(fields[3].GetUInt32());
             CalendarInviteStatus status = CalendarInviteStatus(fields[4].GetUInt8());
             uint32 statusTime           = fields[5].GetUInt32();
             CalendarModerationRank rank = CalendarModerationRank(fields[6].GetUInt8());
@@ -142,7 +142,7 @@ void CalendarMgr::AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite
     }
 }
 
-void CalendarMgr::RemoveEvent(uint64 eventId, uint64 remover)
+void CalendarMgr::RemoveEvent(uint64 eventId, ObjectGuid remover)
 {
     CalendarEvent* calendarEvent = GetEvent(eventId);
 
@@ -155,7 +155,7 @@ void CalendarMgr::RemoveEvent(uint64 eventId, uint64 remover)
     RemoveEvent(calendarEvent, remover);
 }
 
-void CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, uint64 remover)
+void CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover)
 {
     if (!calendarEvent)
     {
@@ -197,7 +197,7 @@ void CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, uint64 remover)
     return;
 }
 
-void CalendarMgr::RemoveInvite(uint64 inviteId, uint64 eventId, uint64 /*remover*/)
+void CalendarMgr::RemoveInvite(uint64 inviteId, uint64 eventId, ObjectGuid /*remover*/)
 {
     CalendarEvent* calendarEvent = GetEvent(eventId);
 
@@ -267,7 +267,7 @@ void CalendarMgr::UpdateInvite(CalendarInvite* invite, SQLTransaction& trans)
     CharacterDatabase.ExecuteOrAppend(trans, stmt);
 }
 
-void CalendarMgr::RemoveAllPlayerEventsAndInvites(uint64 guid)
+void CalendarMgr::RemoveAllPlayerEventsAndInvites(ObjectGuid guid)
 {
     for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end();)
     {
@@ -285,7 +285,7 @@ void CalendarMgr::RemoveAllPlayerEventsAndInvites(uint64 guid)
         RemoveInvite((*itr)->GetInviteId(), (*itr)->GetEventId(), guid);
 }
 
-void CalendarMgr::RemovePlayerGuildEventsAndSignups(uint64 guid, uint32 guildId)
+void CalendarMgr::RemovePlayerGuildEventsAndSignups(ObjectGuid guid, uint32 guildId)
 {
     for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end(); ++itr)
         if ((*itr)->GetCreatorGUID() == guid && ((*itr)->IsGuildEvent() || (*itr)->IsGuildAnnouncement()))
@@ -369,7 +369,7 @@ void CalendarMgr::DeleteOldEvents()
     }
 }
 
-CalendarEventStore CalendarMgr::GetEventsCreatedBy(uint64 guid, bool includeGuildEvents)
+CalendarEventStore CalendarMgr::GetEventsCreatedBy(ObjectGuid guid, bool includeGuildEvents)
 {
     CalendarEventStore result;
     for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end(); ++itr)
@@ -394,7 +394,7 @@ CalendarEventStore CalendarMgr::GetGuildEvents(uint32 guildId)
     return result;
 }
 
-CalendarEventStore CalendarMgr::GetPlayerEvents(uint64 guid)
+CalendarEventStore CalendarMgr::GetPlayerEvents(ObjectGuid guid)
 {
     CalendarEventStore events;
 
@@ -418,7 +418,7 @@ CalendarInviteStore const& CalendarMgr::GetEventInvites(uint64 eventId)
     return _invites[eventId];
 }
 
-CalendarInviteStore CalendarMgr::GetPlayerInvites(uint64 guid)
+CalendarInviteStore CalendarMgr::GetPlayerInvites(ObjectGuid guid)
 {
     CalendarInviteStore invites;
 
@@ -430,7 +430,7 @@ CalendarInviteStore CalendarMgr::GetPlayerInvites(uint64 guid)
     return invites;
 }
 
-uint32 CalendarMgr::GetPlayerNumPending(uint64 guid)
+uint32 CalendarMgr::GetPlayerNumPending(ObjectGuid guid)
 {
     CalendarInviteStore const& invites = GetPlayerInvites(guid);
 
@@ -452,7 +452,7 @@ uint32 CalendarMgr::GetPlayerNumPending(uint64 guid)
     return pendingNum;
 }
 
-std::string CalendarEvent::BuildCalendarMailSubject(uint64 remover) const
+std::string CalendarEvent::BuildCalendarMailSubject(ObjectGuid remover) const
 {
     std::ostringstream strm;
     strm << remover << ':' << _title;
@@ -478,7 +478,7 @@ void CalendarMgr::SendCalendarEventInvite(CalendarInvite const& invite)
     time_t statusTime = invite.GetStatusTime();
     bool hasStatusTime = statusTime != 946684800;   // 01/01/2000 00:00:00
 
-    uint64 invitee = invite.GetInviteeGUID();
+    ObjectGuid invitee = invite.GetInviteeGUID();
     Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(invitee);
 
     uint8 level = player ? player->getLevel() : Player::GetLevelFromStorage(invitee);
@@ -596,7 +596,7 @@ void CalendarMgr::SendCalendarEventInviteAlert(CalendarEvent const& calendarEven
         player->SendDirectMessage(&data);
 }
 
-void CalendarMgr::SendCalendarEvent(uint64 guid, CalendarEvent const& calendarEvent, CalendarSendEventType sendType)
+void CalendarMgr::SendCalendarEvent(ObjectGuid guid, CalendarEvent const& calendarEvent, CalendarSendEventType sendType)
 {
     Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
     if (!player)
@@ -642,7 +642,7 @@ void CalendarMgr::SendCalendarEvent(uint64 guid, CalendarEvent const& calendarEv
     player->SendDirectMessage(&data);
 }
 
-void CalendarMgr::SendCalendarEventInviteRemoveAlert(uint64 guid, CalendarEvent const& calendarEvent, CalendarInviteStatus status)
+void CalendarMgr::SendCalendarEventInviteRemoveAlert(ObjectGuid guid, CalendarEvent const& calendarEvent, CalendarInviteStatus status)
 {
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
     {
@@ -656,7 +656,7 @@ void CalendarMgr::SendCalendarEventInviteRemoveAlert(uint64 guid, CalendarEvent 
     }
 }
 
-void CalendarMgr::SendCalendarClearPendingAction(uint64 guid)
+void CalendarMgr::SendCalendarClearPendingAction(ObjectGuid guid)
 {
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
     {
@@ -665,7 +665,7 @@ void CalendarMgr::SendCalendarClearPendingAction(uint64 guid)
     }
 }
 
-void CalendarMgr::SendCalendarCommandResult(uint64 guid, CalendarError err, char const* param /*= nullptr*/)
+void CalendarMgr::SendCalendarCommandResult(ObjectGuid guid, CalendarError err, char const* param /*= nullptr*/)
 {
     if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
     {

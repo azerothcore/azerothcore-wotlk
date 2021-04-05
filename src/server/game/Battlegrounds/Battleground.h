@@ -400,13 +400,13 @@ public:
     [[nodiscard]] uint32 GetMaxFreeSlots() const;
 
     typedef std::set<Player*> SpectatorList;
-    typedef std::map<uint64, uint64> ToBeTeleportedMap;
+    typedef std::map<ObjectGuid, ObjectGuid> ToBeTeleportedMap;
     void AddSpectator(Player* p) { m_Spectators.insert(p); }
     void RemoveSpectator(Player* p) { m_Spectators.erase(p); }
     bool HaveSpectators() { return !m_Spectators.empty(); }
     [[nodiscard]] const SpectatorList& GetSpectators() const { return m_Spectators; }
-    void AddToBeTeleported(uint64 spectator, uint64 participant) { m_ToBeTeleported[spectator] = participant; }
-    void RemoveToBeTeleported(uint64 spectator) { ToBeTeleportedMap::iterator itr = m_ToBeTeleported.find(spectator); if (itr != m_ToBeTeleported.end()) m_ToBeTeleported.erase(itr); }
+    void AddToBeTeleported(ObjectGuid spectator, ObjectGuid participant) { m_ToBeTeleported[spectator] = participant; }
+    void RemoveToBeTeleported(ObjectGuid spectator) { ToBeTeleportedMap::iterator itr = m_ToBeTeleported.find(spectator); if (itr != m_ToBeTeleported.end()) m_ToBeTeleported.erase(itr); }
     void SpectatorsSendPacket(WorldPacket& data);
 
     [[nodiscard]] bool isArena() const        { return m_IsArena; }
@@ -433,7 +433,7 @@ public:
     void RemovePlayerFromResurrectQueue(Player* player);
 
     /// Relocate all players in ReviveQueue to the closest graveyard
-    void RelocateDeadPlayers(uint64 queueIndex);
+    void RelocateDeadPlayers(ObjectGuid queueIndex);
 
     void StartBattleground();
 
@@ -560,7 +560,7 @@ public:
     bool DelCreature(uint32 type);
     bool DelObject(uint32 type);
     bool AddSpiritGuide(uint32 type, float x, float y, float z, float o, TeamId teamId);
-    int32 GetObjectType(uint64 guid);
+    int32 GetObjectType(ObjectGuid guid);
 
     void DoorOpen(uint32 type);
     void DoorClose(uint32 type);
@@ -571,15 +571,15 @@ public:
 
     // since arenas can be AvA or Hvh, we have to get the "temporary" team of a player
     static TeamId GetOtherTeamId(TeamId teamId);
-    [[nodiscard]] bool IsPlayerInBattleground(uint64 guid) const;
+    [[nodiscard]] bool IsPlayerInBattleground(ObjectGuid guid) const;
 
     [[nodiscard]] bool ToBeDeleted() const { return m_SetDeleteThis; }
     //void SetDeleteThis() { m_SetDeleteThis = true; }
 
     void RewardXPAtKill(Player* killer, Player* victim);
 
-    [[nodiscard]] virtual uint64 GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const { return 0; }
-    virtual void SetDroppedFlagGUID(uint64 /*guid*/, TeamId /*teamId*/ = TEAM_NEUTRAL) {}
+    [[nodiscard]] virtual ObjectGuid GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const { return 0; }
+    virtual void SetDroppedFlagGUID(ObjectGuid /*guid*/, TeamId /*teamId*/ = TEAM_NEUTRAL) {}
     [[nodiscard]] uint32 GetTeamScore(TeamId teamId) const;
 
     virtual TeamId GetPrematureWinner();
@@ -639,7 +639,7 @@ protected:
     // Player lists, those need to be accessible by inherited classes
     BattlegroundPlayerMap m_Players;
     // Spirit Guide guid + Player list GUIDS
-    std::map<uint64, GuidVector> m_ReviveQueue;
+    std::map<ObjectGuid, GuidVector> m_ReviveQueue;
 
     // these are important variables used for starting messages
     uint8 m_Events;

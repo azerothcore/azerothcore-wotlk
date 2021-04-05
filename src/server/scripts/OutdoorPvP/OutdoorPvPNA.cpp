@@ -32,7 +32,7 @@ void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
 uint32 OPvPCapturePointNA::GetAliveGuardsCount()
 {
     uint32 cnt = 0;
-    for (std::map<uint32, uint64>::iterator itr = m_Creatures.begin(); itr != m_Creatures.end(); ++itr)
+    for (std::map<uint32, ObjectGuid::LowType>::iterator itr = m_Creatures.begin(); itr != m_Creatures.end(); ++itr)
     {
         switch (itr->first)
         {
@@ -393,7 +393,7 @@ bool OPvPCapturePointNA::HandleCustomSpell(Player* player, uint32 spellId, GameO
     return false;
 }
 
-int32 OPvPCapturePointNA::HandleOpenGo(Player* player, uint64 guid)
+int32 OPvPCapturePointNA::HandleOpenGo(Player* player, ObjectGuid guid)
 {
     int32 retval = OPvPCapturePoint::HandleOpenGo(player, guid);
     if (retval >= 0)

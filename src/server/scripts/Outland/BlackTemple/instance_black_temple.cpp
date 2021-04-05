@@ -39,18 +39,7 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
 
-            ShadeOfAkamaGUID            = 0;
-            AkamaShadeGUID              = 0;
-            TeronGorefiendGUID          = 0;
-            ReliquaryGUID               = 0;
             ashtongueGUIDs.clear();
-            GathiosTheShattererGUID     = 0;
-            HighNethermancerZerevorGUID = 0;
-            LadyMalandeGUID             = 0;
-            VerasDarkshadowGUID         = 0;
-            IllidariCouncilGUID         = 0;
-            AkamaGUID                   = 0;
-            IllidanStormrageGUID        = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -255,18 +244,18 @@ public:
         }
 
     protected:
-        uint64 ShadeOfAkamaGUID;
-        uint64 AkamaShadeGUID;
-        uint64 TeronGorefiendGUID;
-        uint64 ReliquaryGUID;
+        ObjectGuid ShadeOfAkamaGUID;
+        ObjectGuid AkamaShadeGUID;
+        ObjectGuid TeronGorefiendGUID;
+        ObjectGuid ReliquaryGUID;
         GuidList ashtongueGUIDs;
-        uint64 GathiosTheShattererGUID;
-        uint64 HighNethermancerZerevorGUID;
-        uint64 LadyMalandeGUID;
-        uint64 VerasDarkshadowGUID;
-        uint64 IllidariCouncilGUID;
-        uint64 AkamaGUID;
-        uint64 IllidanStormrageGUID;
+        ObjectGuid GathiosTheShattererGUID;
+        ObjectGuid HighNethermancerZerevorGUID;
+        ObjectGuid LadyMalandeGUID;
+        ObjectGuid VerasDarkshadowGUID;
+        ObjectGuid IllidariCouncilGUID;
+        ObjectGuid AkamaGUID;
+        ObjectGuid IllidanStormrageGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

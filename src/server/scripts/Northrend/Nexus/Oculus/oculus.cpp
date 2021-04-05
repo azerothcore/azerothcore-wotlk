@@ -887,7 +887,7 @@ public:
     {
         PrepareAuraScript(spell_oculus_rider_auraAuraScript);
 
-        uint64 _drakeGUID;
+        ObjectGuid _drakeGUID;
 
         void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {

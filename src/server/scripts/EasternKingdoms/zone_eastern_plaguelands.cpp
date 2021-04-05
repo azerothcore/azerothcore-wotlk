@@ -242,7 +242,7 @@ public:
 
     struct npc_balance_of_light_and_shadowAI : public NullCreatureAI
     {
-        npc_balance_of_light_and_shadowAI(Creature* creature) : NullCreatureAI(creature) { timer = 0; _targetGUID = 0; }
+        npc_balance_of_light_and_shadowAI(Creature* creature) : NullCreatureAI(creature) { timer = 0; _targetGUID.Clear(); }
 
         bool CanBeSeen(Player const* player) override
         {
@@ -251,7 +251,7 @@ public:
         }
 
         uint32 timer;
-        uint64 _targetGUID;
+        ObjectGuid _targetGUID;
 
         void SpellHit(Unit*, const SpellInfo* spellInfo) override
         {

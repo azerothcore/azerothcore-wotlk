@@ -137,7 +137,7 @@ public:
         Map* map = player->GetMap();
 
         GameObject* object = sObjectMgr->IsGameObjectStaticTransport(objectInfo->entry) ? new StaticTransport() : new GameObject();
-        uint32 guidLow = sObjectMgr->GenerateRecycledLowGuid(HIGHGUID_GAMEOBJECT);
+        uint32 guidLow = sObjectMgr->GenerateRecycledLowGuid(HighGuid::GameObject);
 
         if (!object->Create(guidLow, objectInfo->entry, map, player->GetPhaseMaskForSpawn(), x, y, z, o, G3D::Quat(), 0, GO_STATE_READY))
         {
@@ -347,7 +347,7 @@ public:
             return false;
         }
 
-        uint64 ownerGuid = object->GetOwnerGUID();
+        ObjectGuid ownerGuid = object->GetOwnerGUID();
         if (ownerGuid)
         {
             Unit* owner = ObjectAccessor::GetUnit(*handler->GetSession()->GetPlayer(), ownerGuid);

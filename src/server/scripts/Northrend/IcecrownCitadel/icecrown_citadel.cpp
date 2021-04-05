@@ -367,9 +367,9 @@ public:
         void Reset() override
         {
             _events.Reset();
-            _theLichKing = 0;
-            _bolvarFordragon = 0;
-            _factionNPC = 0;
+            _theLichKing.Clear();
+            _bolvarFordragon.Clear();
+            _factionNPC.Clear();
             _damnedKills = 0;
         }
 
@@ -561,9 +561,9 @@ public:
     private:
         EventMap _events;
         InstanceScript* const _instance;
-        uint64 _theLichKing;
-        uint64 _bolvarFordragon;
-        uint64 _factionNPC;
+        ObjectGuid _theLichKing;
+        ObjectGuid _bolvarFordragon;
+        ObjectGuid _factionNPC;
         uint16 _damnedKills;
     };
 

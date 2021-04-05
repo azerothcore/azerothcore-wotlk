@@ -113,7 +113,7 @@ public:
         InstanceScript* m_pInstance;
         EventMap events;
         SummonList summons;
-        uint64 GraufGUID;
+        ObjectGuid GraufGUID;
         bool SecondPhase, EventStarted;
 
         void Reset() override

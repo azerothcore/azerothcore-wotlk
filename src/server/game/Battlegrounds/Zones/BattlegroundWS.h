@@ -159,8 +159,8 @@ public:
     void StartingEventOpenDoors() override;
 
     /* BG Flags */
-    uint64 GetFlagPickerGUID(TeamId teamId) const override { return _flagKeepers[teamId];  }
-    void SetFlagPicker(uint64 guid, TeamId teamId) { _flagKeepers[teamId] = guid; }
+    ObjectGuid GetFlagPickerGUID(TeamId teamId) const override { return _flagKeepers[teamId];  }
+    void SetFlagPicker(ObjectGuid guid, TeamId teamId) { _flagKeepers[teamId] = guid; }
     void RespawnFlagAfterDrop(TeamId teamId);
     uint8 GetFlagState(TeamId teamId) const { return _flagState[teamId]; }
 
@@ -179,8 +179,8 @@ public:
 
     void UpdateFlagState(TeamId teamId, uint32 value);
     void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
-    void SetDroppedFlagGUID(uint64 guid, TeamId teamId) override { _droppedFlagGUID[teamId] = guid; }
-    uint64 GetDroppedFlagGUID(TeamId teamId) const { return _droppedFlagGUID[teamId];}
+    void SetDroppedFlagGUID(ObjectGuid guid, TeamId teamId) override { _droppedFlagGUID[teamId] = guid; }
+    ObjectGuid GetDroppedFlagGUID(TeamId teamId) const { return _droppedFlagGUID[teamId];}
     void FillInitialWorldStates(WorldPacket& data) override;
 
     /* Scorekeeping */
@@ -194,8 +194,8 @@ public:
 private:
     EventMap _bgEvents;
 
-    uint64 _flagKeepers[2];
-    uint64 _droppedFlagGUID[2];
+    ObjectGuid _flagKeepers[2];
+    ObjectGuid _droppedFlagGUID[2];
     uint8  _flagState[2];
     TeamId _lastFlagCaptureTeam;
     uint32 _reputationCapture;

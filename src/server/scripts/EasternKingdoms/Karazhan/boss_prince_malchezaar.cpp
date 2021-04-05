@@ -87,11 +87,11 @@ public:
     struct netherspite_infernalAI : public ScriptedAI
     {
         netherspite_infernalAI(Creature* creature) : ScriptedAI(creature),
-            HellfireTimer(0), CleanupTimer(0), malchezaar(0), point(nullptr) { }
+            HellfireTimer(0), CleanupTimer(0), point(nullptr) { }
 
         uint32 HellfireTimer;
         uint32 CleanupTimer;
-        uint64 malchezaar;
+        ObjectGuid malchezaar;
         InfernalPoint* point;
 
         void Reset() override { }
@@ -176,7 +176,7 @@ public:
         uint32 InfernalCleanupTimer;
         uint32 phase;
         uint32 enfeeble_health[5];
-        uint64 enfeeble_targets[5];
+        ObjectGuid enfeeble_targets[5];
 
         GuidVector infernals;
         std::vector<InfernalPoint*> positions;

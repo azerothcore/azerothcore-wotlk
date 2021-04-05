@@ -148,11 +148,11 @@ public:
     {
         npc_ulduar_storm_tempered_keeperAI(Creature* creature) : ScriptedAI(creature)
         {
-            otherGUID = 0;
+            otherGUID.Clear();
         }
 
         EventMap events;
-        uint64 otherGUID;
+        ObjectGuid otherGUID;
 
         void Reset() override
         {

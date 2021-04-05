@@ -74,10 +74,10 @@ public:
     {
         boss_festergutAI(Creature* creature) : BossAI(creature, DATA_FESTERGUT)
         {
-            _gasDummyGUID = 0;
+            _gasDummyGUID.Clear();
         }
 
-        uint64 _gasDummyGUID;
+        ObjectGuid _gasDummyGUID;
         uint32 _maxInoculatedStack;
         uint32 _inhaleCounter;
 

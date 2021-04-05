@@ -144,7 +144,7 @@ struct LootItem
     int32   randomPropertyId;
     ConditionList conditions;                               // additional loot condition
     AllowedLooterSet allowedGUIDs;
-    uint64  rollWinnerGUID;                                 // Stores the guid of person who won loot, if his bags are full only he can see the item in loot list!
+    ObjectGuid rollWinnerGUID;                              // Stores the guid of person who won loot, if his bags are full only he can see the item in loot list!
     uint8   count             : 8;
     bool    is_looted         : 1;
     bool    is_blocked        : 1;
@@ -306,8 +306,8 @@ struct Loot
     std::vector<LootItem> quest_items;
     uint32 gold;
     uint8 unlootedCount{0};
-    uint64 roundRobinPlayer{0};                                // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
-    LootType loot_type{LOOT_NONE};                                     // required for achievement system
+    ObjectGuid roundRobinPlayer;        // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
+    LootType loot_type{LOOT_NONE};      // required for achievement system
 
     // GUIDLow of container that holds this loot (item_instance.entry), set for items that can be looted
     uint32 containerId{0};
@@ -352,8 +352,8 @@ struct Loot
     void NotifyItemRemoved(uint8 lootIndex);
     void NotifyQuestItemRemoved(uint8 questIndex);
     void NotifyMoneyRemoved();
-    void AddLooter(uint64 GUID) { PlayersLooting.insert(GUID); }
-    void RemoveLooter(uint64 GUID) { PlayersLooting.erase(GUID); }
+    void AddLooter(ObjectGuid GUID) { PlayersLooting.insert(GUID); }
+    void RemoveLooter(ObjectGuid GUID) { PlayersLooting.erase(GUID); }
 
     void generateMoneyLoot(uint32 minAmount, uint32 maxAmount);
     bool FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError = false, uint16 lootMode = LOOT_MODE_DEFAULT);

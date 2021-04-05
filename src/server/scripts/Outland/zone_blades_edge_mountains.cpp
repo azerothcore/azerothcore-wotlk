@@ -64,8 +64,8 @@ public:
 
         EventMap events;
         bool PartyTime;
-        uint64 PlayerGUID;
-        uint64 CannonGUID;
+        ObjectGuid PlayerGUID;
+        ObjectGuid CannonGUID;
         uint8 count;
 
         void Reset() override
@@ -77,8 +77,8 @@ public:
         void Initialize()
         {
             PartyTime = false;
-            PlayerGUID = 0;
-            CannonGUID = 0;
+            PlayerGUID.Clear();
+            CannonGUID.Clear();
             count = 0;
         }
 
@@ -560,7 +560,7 @@ public:
         uint8 gameLevel;
         uint8 fails;
         uint8 gameTicks;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         uint32 clusterIds[SIMON_MAX_COLORS];
         float zCoordCorrection;
         float searchDistance;
@@ -1073,7 +1073,7 @@ public:
     {
         npc_oscillating_frequency_scanner_master_bunnyAI(Creature* creature) : ScriptedAI(creature)
         {
-            playerGuid = 0;
+            playerGuid.Clear();
             timer = 500;
         }
 
@@ -1112,7 +1112,7 @@ public:
         }
 
     private:
-        uint64 playerGuid;
+        ObjectGuid playerGuid;
         uint32 timer;
     };
 

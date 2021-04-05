@@ -302,7 +302,7 @@ public:
                         else
                             player->FailQuest(QUEST_BODYGUARD_FOR_HIRE);
                     }
-                    _playerGUID = 0;
+                    _playerGUID.Clear();
                     CheckPlayer();
                     break;
                 // South -> North - complete
@@ -314,7 +314,7 @@ public:
                         else
                             player->FailQuest(QUEST_GIZELTON_CARAVAN);
                     }
-                    _playerGUID = 0;
+                    _playerGUID.Clear();
                     CheckPlayer();
                     break;
                 // North -> South - spawn attackers

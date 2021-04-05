@@ -183,7 +183,7 @@ public:
                         }
 
                         DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
-                        m_uiPortalGUID = 0;
+                        m_uiPortalGUID.Clear();
                     }
                     break;
                 }
@@ -233,11 +233,11 @@ public:
         }
 
     private:
-        uint64 m_uiSartharionGUID;
-        uint64 m_uiTenebronGUID;
-        uint64 m_uiShadronGUID;
-        uint64 m_uiVesperonGUID;
-        uint64 m_uiPortalGUID;
+        ObjectGuid m_uiSartharionGUID;
+        ObjectGuid m_uiTenebronGUID;
+        ObjectGuid m_uiShadronGUID;
+        ObjectGuid m_uiVesperonGUID;
+        ObjectGuid m_uiPortalGUID;
         uint8 portalCount;
     };
 };

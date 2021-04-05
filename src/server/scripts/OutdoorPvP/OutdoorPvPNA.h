@@ -258,7 +258,7 @@ public:
 
     bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go) override;
 
-    int32 HandleOpenGo(Player* player, uint64 guid) override;
+    int32 HandleOpenGo(Player* player, ObjectGuid guid) override;
 
     uint32 GetAliveGuardsCount();
     TeamId GetControllingFaction() const;

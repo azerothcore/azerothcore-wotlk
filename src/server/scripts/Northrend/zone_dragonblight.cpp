@@ -64,8 +64,8 @@ public:
         bool secondpart;
         int32 timer;
         uint8 step;
-        uint64 pGUID;
-        uint64 oachanoaGUID;
+        ObjectGuid pGUID;
+        ObjectGuid oachanoaGUID;
 
         void Reset() override
         {
@@ -73,8 +73,8 @@ public:
             secondpart = false;
             timer = 0;
             step = 0;
-            pGUID = 0;
-            oachanoaGUID = 0;
+            pGUID.Clear();
+            oachanoaGUID.Clear();
         }
 
         void NextStep(const uint32 time)
@@ -234,7 +234,7 @@ public:
             }
         }
 
-        void Start(uint64 g)
+        void Start(ObjectGuid g)
         {
             running = true;
             pGUID = g;
@@ -301,8 +301,8 @@ public:
     {
         npc_hourglass_of_eternityAI(Creature* c) : ScriptedAI(c) {}
 
-        uint64 summonerGUID;
-        uint64 futureGUID;
+        ObjectGuid summonerGUID;
+        ObjectGuid futureGUID;
         EventMap events;
         uint8 count[3];
         uint8 phase;
@@ -838,7 +838,7 @@ public:
                     c->CastSpell(c, SPELL_SAC_HOLY_ZONE_AURA, true);
                     if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_3, 150.0f))
                         go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
-                    playerGUID = 0;
+                    playerGUID.Clear();
                     events.RescheduleEvent(2, 60000);
                 }
             }
@@ -1505,8 +1505,13 @@ public:
         void Reset() override
         {
             talkWing = 0;
-            memset(audienceList, 0, sizeof(audienceList));
-            memset(imageList, 0, sizeof(imageList));
+
+            for (uint8 i = 0; i < 10; ++i)
+                audienceList[i].Clear();
+
+            for (uint8 i = 0; i < 5; ++i)
+                imageList[i].Clear();
+
             _events.ScheduleEvent(EVENT_GET_TARGETS, 5000);
             _events.ScheduleEvent(EVENT_START_RANDOM, 20000);
         }
@@ -1731,9 +1736,9 @@ public:
         }
     private:
         EventMap _events;
-        uint64   audienceList[10];
-        uint64   imageList[5];
-        uint8    talkWing;
+        ObjectGuid audienceList[10];
+        ObjectGuid imageList[5];
+        uint8 talkWing;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1863,7 +1868,7 @@ public:
     {
         npc_torturer_lecraftAI(Creature* creature) : ScriptedAI(creature)
         {
-            _playerGUID = 0;
+            _playerGUID.Clear();
         }
 
         void Reset() override
@@ -1934,7 +1939,7 @@ public:
     private:
         EventMap _events;
         uint8    _textCounter;
-        uint64   _playerGUID;
+        ObjectGuid   _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

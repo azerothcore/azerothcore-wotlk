@@ -126,7 +126,7 @@ public:
 
         InstanceScript* instance;
 
-        uint64 m_uiSpotlightGUID;
+        ObjectGuid m_uiSpotlightGUID;
 
         uint32 TalkCount;
         uint32 TalkTimer;
@@ -138,7 +138,7 @@ public:
 
         void Reset() override
         {
-            m_uiSpotlightGUID = 0;
+            m_uiSpotlightGUID.Clear();
 
             TalkCount = 0;
             TalkTimer = 2000;
@@ -437,7 +437,7 @@ public:
 
         InstanceScript* instance;
 
-        uint64 ArcanagosGUID;
+        ObjectGuid ArcanagosGUID;
 
         uint32 YellTimer;
         uint8 Step;
@@ -448,7 +448,7 @@ public:
 
         void Reset() override
         {
-            ArcanagosGUID = 0;
+            ArcanagosGUID.Clear();
             MTimer = 0;
             ATimer = 0;
 

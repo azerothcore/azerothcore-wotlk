@@ -137,8 +137,7 @@ public:
 
     struct boss_kologarnAI : public ScriptedAI
     {
-        boss_kologarnAI(Creature* pCreature) : ScriptedAI(pCreature), vehicle(me->GetVehicleKit()),
-            _left(0), _right(0), summons(me), breathReady(false)
+        boss_kologarnAI(Creature* pCreature) : ScriptedAI(pCreature), vehicle(me->GetVehicleKit()), summons(me), breathReady(false)
         {
             m_pInstance = me->GetInstanceScript();
             eyebeamTarget = nullptr;
@@ -149,7 +148,7 @@ public:
         InstanceScript* m_pInstance;
 
         Vehicle* vehicle;
-        uint64 _left, _right;
+        ObjectGuid _left, _right;
         EventMap events;
         SummonList summons;
 

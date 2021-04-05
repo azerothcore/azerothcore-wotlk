@@ -29,22 +29,6 @@ public:
         {
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
-
-            KalecgosDragonGUID          = 0;
-            SathrovarrGUID              = 0;
-            BrutallusGUID               = 0;
-            MadrigosaGUID               = 0;
-            FelmystGUID                 = 0;
-            AlythessGUID                = 0;
-            SacrolashGUID               = 0;
-            MuruGUID                    = 0;
-            KilJaedenGUID               = 0;
-            KilJaedenControllerGUID     = 0;
-            AnveenaGUID                 = 0;
-            KalecgosKjGUID              = 0;
-
-            IceBarrierGUID              = 0;
-            memset(&blueFlightOrbGUID, 0, sizeof(blueFlightOrbGUID));
         }
 
         void OnPlayerEnter(Player* player) override
@@ -280,21 +264,21 @@ public:
         }
 
     protected:
-        uint64 KalecgosDragonGUID;
-        uint64 SathrovarrGUID;
-        uint64 BrutallusGUID;
-        uint64 MadrigosaGUID;
-        uint64 FelmystGUID;
-        uint64 AlythessGUID;
-        uint64 SacrolashGUID;
-        uint64 MuruGUID;
-        uint64 KilJaedenGUID;
-        uint64 KilJaedenControllerGUID;
-        uint64 AnveenaGUID;
-        uint64 KalecgosKjGUID;
+        ObjectGuid KalecgosDragonGUID;
+        ObjectGuid SathrovarrGUID;
+        ObjectGuid BrutallusGUID;
+        ObjectGuid MadrigosaGUID;
+        ObjectGuid FelmystGUID;
+        ObjectGuid AlythessGUID;
+        ObjectGuid SacrolashGUID;
+        ObjectGuid MuruGUID;
+        ObjectGuid KilJaedenGUID;
+        ObjectGuid KilJaedenControllerGUID;
+        ObjectGuid AnveenaGUID;
+        ObjectGuid KalecgosKjGUID;
 
-        uint64 IceBarrierGUID;
-        uint64 blueFlightOrbGUID[4];
+        ObjectGuid IceBarrierGUID;
+        ObjectGuid blueFlightOrbGUID[4];
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

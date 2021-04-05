@@ -54,12 +54,12 @@ enum VehicleNPCs
 
 struct PassengerInfo
 {
-    uint64 Guid;
+    ObjectGuid Guid;
     bool IsUnselectable;
 
     void Reset()
     {
-        Guid = 0;
+        Guid.Clear();
         IsUnselectable = false;
     }
 };

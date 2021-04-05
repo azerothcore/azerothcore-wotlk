@@ -67,13 +67,6 @@ public:
         boss_netherspiteAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-
-            for (int i = 0; i < 3; ++i)
-            {
-                PortalGUID[i] = 0;
-                BeamTarget[i] = 0;
-                BeamerGUID[i] = 0;
-            }
         }
 
         InstanceScript* instance;
@@ -86,9 +79,9 @@ public:
         uint32 NetherbreathTimer;
         uint32 EmpowermentTimer;
         uint32 PortalTimer; // timer for beam checking
-        uint64 PortalGUID[3]; // guid's of portals
-        uint64 BeamerGUID[3]; // guid's of auxiliary beaming portals
-        uint64 BeamTarget[3]; // guid's of portals' current targets
+        ObjectGuid PortalGUID[3]; // guid's of portals
+        ObjectGuid BeamerGUID[3]; // guid's of auxiliary beaming portals
+        ObjectGuid BeamTarget[3]; // guid's of portals' current targets
 
         bool IsBetween(WorldObject* u1, WorldObject* target, WorldObject* u2) // the in-line checker
         {

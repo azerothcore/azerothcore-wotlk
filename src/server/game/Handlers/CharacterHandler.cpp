@@ -676,7 +676,7 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
 
 void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     // Initiating
@@ -763,7 +763,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
         return;
     }
 
-    uint64 playerGuid = 0;
+    ObjectGuid playerGuid;
     recvData >> playerGuid;
 
     if (!IsLegitCharacterForAccount(playerGuid))
@@ -874,7 +874,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
 {
-    uint64 playerGuid = holder->GetGuid();
+    ObjectGuid playerGuid = holder->GetGuid();
 
     Player* pCurrChar = new Player(this);
     // for send server info and strings (config)
@@ -1427,7 +1427,7 @@ void WorldSession::HandleShowingCloakOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     std::string newName;
 
     recvData >> guid;
@@ -1447,7 +1447,7 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)
     {
         WorldPacket data(SMSG_CHAR_RENAME, 1 + 8 + (newName.size() + 1));
         data << uint8(res);
-        data << uint64(guid);
+        data << guid;
         data << newName;
         SendPacket(&data);
         return;
@@ -1492,7 +1492,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(PreparedQueryResult resu
     uint32 guidLow      = fields[0].GetUInt32();
     std::string oldName = fields[1].GetString();
 
-    uint64 guid = ObjectGuid::Create<HighGuid::Player>(guidLow);
+    ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(guidLow);
 
     // pussywizard:
     if (ObjectAccessor::FindPlayerInOrOutOfWorld(guid) || sWorld->FindOfflineSessionForCharacterGUID(guidLow))
@@ -1526,7 +1526,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(PreparedQueryResult resu
 
     WorldPacket data(SMSG_CHAR_RENAME, 1 + 8 + (newName.size() + 1));
     data << uint8(RESPONSE_SUCCESS);
-    data << uint64(guid);
+    data << guid;
     data << newName;
     SendPacket(&data);
 
@@ -1541,7 +1541,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
     if (!sWorld->getBoolConfig(CONFIG_DECLINED_NAMES_USED))
         return;
 
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
 
@@ -1551,7 +1551,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
     {
         WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4 + 8);
         data << uint32(1);
-        data << uint64(guid);
+        data << guid;
         SendPacket(&data);
         return;
     }
@@ -1561,7 +1561,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
     {
         WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4 + 8);
         data << uint32(1);
-        data << uint64(guid);
+        data << guid;
         SendPacket(&data);
         return;
     }
@@ -1570,7 +1570,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
     {
         WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4 + 8);
         data << uint32(1);
-        data << uint64(guid);
+        data << guid;
         SendPacket(&data);
         return;
     }
@@ -1584,7 +1584,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
     {
         WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4 + 8);
         data << uint32(1);
-        data << uint64(guid);
+        data << guid;
         SendPacket(&data);
         return;
     }
@@ -1596,7 +1596,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
         {
             WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4 + 8);
             data << uint32(1);
-            data << uint64(guid);
+            data << guid;
             SendPacket(&data);
             return;
         }
@@ -1606,7 +1606,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
     {
         WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4 + 8);
         data << uint32(1);
-        data << uint64(guid);
+        data << guid;
         SendPacket(&data);
         return;
     }
@@ -1632,7 +1632,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
 
     WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4 + 8);
     data << uint32(0);                                      // OK
-    data << uint64(guid);
+    data << guid;
     SendPacket(&data);
 }
 
@@ -1736,7 +1736,7 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
 
 void WorldSession::HandleCharCustomize(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     std::string newName;
 
     recvData >> guid;
@@ -1828,7 +1828,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
     }
 
     // character with this name already exist
-    if (uint64 newguid = sObjectMgr->GetPlayerGUIDByName(newName))
+    if (ObjectGuid newguid = sObjectMgr->GetPlayerGUIDByName(newName))
     {
         if (newguid != guid)
         {
@@ -1867,7 +1867,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
 
     WorldPacket data(SMSG_CHAR_CUSTOMIZE, 1 + 8 + (newName.size() + 1) + 6);
     data << uint8(RESPONSE_SUCCESS);
-    data << uint64(guid);
+    data << guid;
     data << newName;
     data << uint8(gender);
     data << uint8(skin);
@@ -2041,7 +2041,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
 
 void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     std::string newname;
     uint8 gender, skin, face, hairStyle, hairColor, facialHair, race;
     recvData >> guid;
@@ -2242,7 +2242,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
     }
 
     // character with this name already exist
-    if (uint64 newguid = sObjectMgr->GetPlayerGUIDByName(newname))
+    if (ObjectGuid newguid = sObjectMgr->GetPlayerGUIDByName(newname))
     {
         if (newguid != guid)
         {
@@ -2678,7 +2678,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
 
     WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1 + 8 + (newname.size() + 1) + 1 + 1 + 1 + 1 + 1 + 1 + 1);
     data << uint8(RESPONSE_SUCCESS);
-    data << uint64(guid);
+    data << guid;
     data << newname;
     data << uint8(gender);
     data << uint8(skin);

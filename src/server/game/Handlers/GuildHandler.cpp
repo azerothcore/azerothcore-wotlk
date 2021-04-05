@@ -342,7 +342,7 @@ void WorldSession::HandleGuildChangeInfoTextOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
 {
-    uint64 vendorGuid;
+    ObjectGuid vendorGuid;
     recvPacket >> vendorGuid;
 
     EmblemInfo emblemInfo;
@@ -402,7 +402,7 @@ void WorldSession::HandleGuildPermissions(WorldPacket& /* recvData */)
 // Called when clicking on Guild bank gameobject
 void WorldSession::HandleGuildBankerActivate(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     bool sendAllSlots;
     recvData >> guid >> sendAllSlots;
 
@@ -423,7 +423,7 @@ void WorldSession::HandleGuildBankerActivate(WorldPacket& recvData)
 // Called when opening guild bank tab only (first one)
 void WorldSession::HandleGuildBankQueryTab(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint8 tabId;
     bool full;
 
@@ -440,7 +440,7 @@ void WorldSession::HandleGuildBankQueryTab(WorldPacket& recvData)
 
 void WorldSession::HandleGuildBankDepositMoney(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint32 money;
     recvData >> guid >> money;
 
@@ -456,7 +456,7 @@ void WorldSession::HandleGuildBankDepositMoney(WorldPacket& recvData)
 
 void WorldSession::HandleGuildBankWithdrawMoney(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint32 money;
     recvData >> guid >> money;
 
@@ -475,7 +475,7 @@ void WorldSession::HandleGuildBankSwapItems(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_GUILD, "CMSG_GUILD_BANK_SWAP_ITEMS [%s]", GetPlayerInfo().c_str());
 #endif
 
-    uint64 GoGuid;
+    ObjectGuid GoGuid;
     recvData >> GoGuid;
 
     if (!GetPlayer()->GetGameObjectIfCanInteractWith(GoGuid, GAMEOBJECT_TYPE_GUILD_BANK))
@@ -554,7 +554,7 @@ void WorldSession::HandleGuildBankSwapItems(WorldPacket& recvData)
 
 void WorldSession::HandleGuildBankBuyTab(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint8 tabId;
 
     recvData >> guid >> tabId;
@@ -570,7 +570,7 @@ void WorldSession::HandleGuildBankBuyTab(WorldPacket& recvData)
 
 void WorldSession::HandleGuildBankUpdateTab(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     uint8 tabId;
     std::string name, icon;
 

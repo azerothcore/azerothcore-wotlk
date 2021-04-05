@@ -21,21 +21,21 @@ public:
         uint32 InstanceProgress;
         std::string str_data;
 
-        uint64 NPC_LeaderFirstGUID;
-        uint64 NPC_LeaderSecondGUID;
-        uint64 NPC_TyrannusEventGUID;
-        uint64 NPC_Necrolyte1GUID;
-        uint64 NPC_Necrolyte2GUID;
-        uint64 NPC_GuardFirstGUID;
-        uint64 NPC_GuardSecondGUID;
-        uint64 NPC_SindragosaGUID;
+        ObjectGuid NPC_LeaderFirstGUID;
+        ObjectGuid NPC_LeaderSecondGUID;
+        ObjectGuid NPC_TyrannusEventGUID;
+        ObjectGuid NPC_Necrolyte1GUID;
+        ObjectGuid NPC_Necrolyte2GUID;
+        ObjectGuid NPC_GuardFirstGUID;
+        ObjectGuid NPC_GuardSecondGUID;
+        ObjectGuid NPC_SindragosaGUID;
 
-        uint64 NPC_GarfrostGUID;
-        uint64 NPC_MartinOrGorkunGUID;
-        uint64 NPC_RimefangGUID;
-        uint64 NPC_TyrannusGUID;
+        ObjectGuid NPC_GarfrostGUID;
+        ObjectGuid NPC_MartinOrGorkunGUID;
+        ObjectGuid NPC_RimefangGUID;
+        ObjectGuid NPC_TyrannusGUID;
 
-        uint64 GO_IceWallGUID;
+        ObjectGuid GO_IceWallGUID;
 
         bool bAchievEleven;
         bool bAchievDontLookUp;
@@ -45,22 +45,6 @@ public:
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             teamIdInInstance = TEAM_NEUTRAL;
             InstanceProgress = INSTANCE_PROGRESS_NONE;
-
-            NPC_LeaderFirstGUID = 0;
-            NPC_LeaderSecondGUID = 0;
-            NPC_TyrannusEventGUID = 0;
-            NPC_Necrolyte1GUID = 0;
-            NPC_Necrolyte2GUID = 0;
-            NPC_GuardFirstGUID = 0;
-            NPC_GuardSecondGUID = 0;
-            NPC_SindragosaGUID = 0;
-
-            NPC_GarfrostGUID = 0;
-            NPC_MartinOrGorkunGUID = 0;
-            NPC_RimefangGUID = 0;
-            NPC_TyrannusGUID = 0;
-
-            GO_IceWallGUID = 0;
 
             bAchievEleven = true;
             bAchievDontLookUp = true;

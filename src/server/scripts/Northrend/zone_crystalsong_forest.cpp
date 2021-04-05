@@ -165,11 +165,11 @@ public:
             SetCombatMovement(false);
         }
 
-        uint64 targetGUID;
+        ObjectGuid targetGUID;
 
         void Reset() override
         {
-            targetGUID = 0;
+            targetGUID.Clear();
         }
 
         void UpdateAI(uint32 /*diff*/) override

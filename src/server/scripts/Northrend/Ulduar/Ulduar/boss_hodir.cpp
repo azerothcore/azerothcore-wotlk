@@ -208,7 +208,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 Helpers[8];
+        ObjectGuid Helpers[8];
         bool berserk;
         bool hardmode;
         bool bAchievCheese;
@@ -792,7 +792,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( uint64 g = pInstance->GetGuidData(TYPE_HODIR) )
+                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -888,7 +888,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( uint64 g = pInstance->GetGuidData(TYPE_HODIR) )
+                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -992,7 +992,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( uint64 g = pInstance->GetGuidData(TYPE_HODIR) )
+                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -1086,7 +1086,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( uint64 g = pInstance->GetGuidData(TYPE_HODIR) )
+                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);

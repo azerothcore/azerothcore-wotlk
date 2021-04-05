@@ -24,13 +24,6 @@ public:
         {
             SetBossNumber(MAX_ENCOUTER);
             LoadDoorData(doorData);
-
-            DalliahGUID       = 0;
-            SoccothratesGUID  = 0;
-            MellicharGUID     = 0;
-            WardensShieldGUID = 0;
-
-            memset(StasisPodGUIDs, 0, 5 * sizeof(uint64));
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -192,11 +185,11 @@ public:
         }
 
     protected:
-        uint64 DalliahGUID;
-        uint64 SoccothratesGUID;
-        uint64 StasisPodGUIDs[5];
-        uint64 MellicharGUID;
-        uint64 WardensShieldGUID;
+        ObjectGuid DalliahGUID;
+        ObjectGuid SoccothratesGUID;
+        ObjectGuid StasisPodGUIDs[5];
+        ObjectGuid MellicharGUID;
+        ObjectGuid WardensShieldGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

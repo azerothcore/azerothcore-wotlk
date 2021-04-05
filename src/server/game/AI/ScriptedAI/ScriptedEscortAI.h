@@ -78,7 +78,7 @@ public:
     virtual void WaypointReached(uint32 pointId) = 0;
     virtual void WaypointStart(uint32 /*pointId*/) {}
 
-    void Start(bool isActiveAttacker = true, bool run = false, uint64 playerGUID = 0, Quest const* quest = nullptr, bool instantRespawn = false, bool canLoopPath = false, bool resetWaypoints = true);
+    void Start(bool isActiveAttacker = true, bool run = false, ObjectGuid playerGUID = ObjectGuid::Empty, Quest const* quest = nullptr, bool instantRespawn = false, bool canLoopPath = false, bool resetWaypoints = true);
 
     void SetRun(bool on = true);
     void SetEscortPaused(bool on);
@@ -93,7 +93,7 @@ public:
     void SetDespawnAtFar(bool despawn) { DespawnAtFar = despawn; }
     bool GetAttack() { return m_bIsActiveAttacker; }//used in EnterEvadeMode override
     void SetCanAttack(bool attack) { m_bIsActiveAttacker = attack; }
-    uint64 GetEventStarterGUID() { return m_uiPlayerGUID; }
+    ObjectGuid GetEventStarterGUID() { return m_uiPlayerGUID; }
 
     void AddEscortState(uint32 escortState) { m_uiEscortState |= escortState; }
     void RemoveEscortState(uint32 escortState) { m_uiEscortState &= ~escortState; }
@@ -106,7 +106,7 @@ private:
     bool IsPlayerOrGroupInRange();
     void FillPointMovementListForCreature();
 
-    uint64 m_uiPlayerGUID;
+    ObjectGuid m_uiPlayerGUID;
     uint32 m_uiWPWaitTimer;
     uint32 m_uiPlayerCheckTimer;
     uint32 m_uiEscortState;

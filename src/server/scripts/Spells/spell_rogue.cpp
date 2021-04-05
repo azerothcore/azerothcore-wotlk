@@ -116,7 +116,7 @@ public:
 
         bool Load() override
         {
-            _procTargetGUID = 0;
+            _procTargetGUID.Clear();
             return true;
         }
 
@@ -154,7 +154,7 @@ public:
         }
 
     private:
-        uint64 _procTargetGUID;
+        ObjectGuid _procTargetGUID;
     };
 
     AuraScript* GetAuraScript() const override
@@ -395,7 +395,7 @@ public:
         {
             while (!_targets.empty())
             {
-                uint64 guid = acore::Containers::SelectRandomContainerElement(_targets);
+                ObjectGuid guid = acore::Containers::SelectRandomContainerElement(_targets);
                 if (Unit* target = ObjectAccessor::GetUnit(*GetTarget(), guid))
                 {
                     // xinef: target may be no longer valid

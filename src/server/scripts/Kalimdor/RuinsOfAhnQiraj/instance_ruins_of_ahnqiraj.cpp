@@ -134,13 +134,13 @@ public:
         }
 
     private:
-        uint64 _kurinaxxGUID;
-        uint64 _rajaxxGUID;
-        uint64 _moamGUID;
-        uint64 _buruGUID;
-        uint64 _ayamissGUID;
-        uint64 _ossirianGUID;
-        uint64 _paralyzedGUID;
+        ObjectGuid _kurinaxxGUID;
+        ObjectGuid _rajaxxGUID;
+        ObjectGuid _moamGUID;
+        ObjectGuid _buruGUID;
+        ObjectGuid _ayamissGUID;
+        ObjectGuid _ossirianGUID;
+        ObjectGuid _paralyzedGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

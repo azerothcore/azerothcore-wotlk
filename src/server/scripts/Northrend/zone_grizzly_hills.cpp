@@ -237,12 +237,12 @@ public:
         void Reset() override
         {
             _mrfloppyGUID     = 0;
-            _RavenousworgGUID = 0;
+            _RavenousworgGUID.Clear();
         }
 
     private:
-        uint64   _RavenousworgGUID;
-        uint64   _mrfloppyGUID;
+        ObjectGuid   _RavenousworgGUID;
+        ObjectGuid   _mrfloppyGUID;
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
@@ -571,7 +571,7 @@ public:
         void Reset() override
         {
             _despawnTimer = 5000;
-            _playerGUID = 0;
+            _playerGUID.Clear();
         }
 
         void MovementInform(uint32, uint32 id) override
@@ -605,7 +605,7 @@ public:
             DoMeleeAttackIfReady();
         }
     private:
-        uint64 _playerGUID;
+        ObjectGuid _playerGUID;
         uint32 _despawnTimer;
     };
 
@@ -711,7 +711,7 @@ public:
 
     private:
         EventMap _events;
-        uint64 _playerGUID;
+        ObjectGuid _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

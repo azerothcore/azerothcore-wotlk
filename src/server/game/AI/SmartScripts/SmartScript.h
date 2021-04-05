@@ -172,7 +172,7 @@ public:
         return gameObject;
     }
 
-    Creature* FindCreatureNear(WorldObject* searchObject, uint32 guid) const
+    Creature* FindCreatureNear(WorldObject* searchObject, ObjectGuid::LowType guid) const
     {
         Creature* creature = nullptr;
         CellCoord p(acore::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
@@ -215,7 +215,7 @@ public:
     //TIMED_ACTIONLIST (script type 9 aka script9)
     void SetScript9(SmartScriptHolder& e, uint32 entry);
     Unit* GetLastInvoker(Unit* invoker = nullptr);
-    uint64 mLastInvoker;
+    ObjectGuid mLastInvoker;
     typedef std::unordered_map<uint32, uint32> CounterMap;
     CounterMap mCounterList;
 
@@ -262,9 +262,9 @@ private:
     SmartAIEventList mTimedActionList;
     bool isProcessingTimedActionList;
     Creature* me;
-    uint64 meOrigGUID;
+    ObjectGuid meOrigGUID;
     GameObject* go;
-    uint64 goOrigGUID;
+    ObjectGuid goOrigGUID;
     AreaTrigger const* trigger;
     SmartScriptType mScriptType;
     uint32 mEventPhase;

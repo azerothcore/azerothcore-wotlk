@@ -120,10 +120,10 @@ public:
 
             if (instance)
             {
-                if (instance->GetGuidData(DATA_NIGHTBANE) == DONE)
+                if (instance->GetData(DATA_NIGHTBANE) == DONE)
                     me->DisappearAndDie();
                 else
-                    instance->SetData64(DATA_NIGHTBANE, NOT_STARTED);
+                    instance->SetData(DATA_NIGHTBANE, NOT_STARTED);
             }
 
             HandleTerraceDoors(true);
@@ -150,7 +150,7 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             if (instance)
-                instance->SetData64(DATA_NIGHTBANE, IN_PROGRESS);
+                instance->SetData(DATA_NIGHTBANE, IN_PROGRESS);
 
             HandleTerraceDoors(false);
             Talk(YELL_AGGRO);

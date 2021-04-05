@@ -1401,7 +1401,7 @@ void ObjectMgr::LoadLinkedRespawn()
         uint32 linkedGuidLow = fields[1].GetUInt32();
         uint8  linkType = fields[2].GetUInt8();
 
-        uint64 guid = 0, linkedGuid = 0;
+        ObjectGuid guid = 0, linkedGuid = 0;
         bool error = false;
         switch (linkType)
         {
@@ -2223,17 +2223,17 @@ void ObjectMgr::RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data
     }
 }
 
-uint64 ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
+ObjectGuid ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
 {
     // Get data from global storage
     if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(name))
         return ObjectGuid::Create<HighGuid::Player>(guidLow);
 
     // No player found
-    return 0;
+    return ObjectGuid::Empty;
 }
 
-bool ObjectMgr::GetPlayerNameByGUID(uint64 guid, std::string& name) const
+bool ObjectMgr::GetPlayerNameByGUID(ObjectGuid guid, std::string& name) const
 {
     // Get data from global storage
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
@@ -2245,7 +2245,7 @@ bool ObjectMgr::GetPlayerNameByGUID(uint64 guid, std::string& name) const
     return false;
 }
 
-TeamId ObjectMgr::GetPlayerTeamIdByGUID(uint64 guid) const
+TeamId ObjectMgr::GetPlayerTeamIdByGUID(ObjectGuid guid) const
 {
     // xinef: Get data from global storage
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
@@ -2254,7 +2254,7 @@ TeamId ObjectMgr::GetPlayerTeamIdByGUID(uint64 guid) const
     return TEAM_NEUTRAL;
 }
 
-uint32 ObjectMgr::GetPlayerAccountIdByGUID(uint64 guid) const
+uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid guid) const
 {
     // xinef: Get data from global storage
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))

@@ -483,11 +483,11 @@ public:
         boss_essence_of_angerAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
-        uint64 targetGUID;
+        ObjectGuid targetGUID;
 
         void Reset() override
         {
-            targetGUID = 0;
+            targetGUID.Clear();
             events.Reset();
         }
 
@@ -552,7 +552,7 @@ public:
                 case EVENT_ANGER_SEETHE:
                     if (Unit* victim = me->GetVictim())
                     {
-                        uint64 victimGUID = victim->GetGUID();
+                        ObjectGuid victimGUID = victim->GetGUID();
                         if (targetGUID && targetGUID != victimGUID)
                             me->CastSpell(me, SPELL_SEETHE, false);
                         // victim can be lost

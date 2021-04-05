@@ -82,7 +82,7 @@ public:
         }
 
         // Get target information
-        uint64 targetGuid = sObjectMgr->GetPlayerGUIDByName(target.c_str());
+        ObjectGuid targetGuid = sObjectMgr->GetPlayerGUIDByName(target.c_str());
         uint64 targetAccountId = sObjectMgr->GetPlayerAccountIdByGUID(targetGuid);
         uint32 targetGmLevel = AccountMgr::GetSecurity(targetAccountId, realmID);
 
@@ -380,7 +380,7 @@ public:
             security = assignedPlayer->GetSession()->GetSecurity();
         else
         {
-            uint64 guid = ticket->GetAssignedToGUID();
+            ObjectGuid guid = ticket->GetAssignedToGUID();
             uint32 accountId = sObjectMgr->GetPlayerAccountIdByGUID(guid);
             security = AccountMgr::GetSecurity(accountId, realmID);
         }
@@ -438,7 +438,7 @@ public:
             return false;
 
         // Detect target's GUID
-        uint64 guid = 0;
+        ObjectGuid guid;
         if (Player* player = ObjectAccessor::FindPlayerByName(name, false))
             guid = player->GetGUID();
         else

@@ -93,7 +93,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
 
     uint32 gossipListId;
     uint32 menuId;
-    uint64 guid;
+    ObjectGuid guid;
     std::string code = "";
 
     recv_data >> guid >> menuId >> gossipListId;
@@ -417,7 +417,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_LOGOUT_REQUEST Message, security - %u", GetSecurity());
 #endif
 
-    if (uint64 lguid = GetPlayer()->GetLootGUID())
+    if (ObjectGuid lguid = GetPlayer()->GetLootGUID())
         DoLootRelease(lguid);
 
     bool instantLogout = ((GetSecurity() >= 0 && uint32(GetSecurity()) >= sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))
@@ -540,7 +540,7 @@ void WorldSession::HandleZoneUpdateOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleSetSelectionOpcode(WorldPacket& recv_data)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     _player->SetSelection(guid);
@@ -635,7 +635,7 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_RECLAIM_CORPSE");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     if (_player->IsAlive())
@@ -674,7 +674,7 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket& recv_data)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_RESURRECT_RESPONSE");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     uint8 status;
     recv_data >> guid;
     recv_data >> status;
@@ -897,11 +897,11 @@ void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
     dest.resize(destSize);
 
     WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 8 + 4 + 4 + 4 + destSize);
-    data << uint64(_player ? _player->GetGUID() : 0);       // player guid
-    data << uint32(type);                                   // type (0-7)
-    data << uint32(adata->Time);                            // unix time
-    data << uint32(size);                                   // decompressed length
-    data.append(dest);                                      // compressed data
+    data << (_player ? _player->GetGUID() : ObjectGuid::Empty); // player guid
+    data << uint32(type);                                       // type (0-7)
+    data << uint32(adata->Time);                                // unix time
+    data << uint32(size);                                       // decompressed length
+    data.append(dest);                                          // compressed data
     SendPacket(&data);
 }
 
@@ -998,7 +998,7 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
     // no used
     recv_data.rfinish();                       // prevent warnings spam
     /*
-        uint64 guid;
+        ObjectGuid guid;
         recv_data >> guid;
 
         // now can skip not our packet
@@ -1026,7 +1026,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
     // no used
     recv_data.rfinish();                       // prevent warnings spam
     /*
-        uint64 guid;
+        ObjectGuid guid;
         recv_data >> guid;
 
         // now can skip not our packet
@@ -1077,7 +1077,7 @@ void WorldSession::HandlePlayedTime(WorldPacket& recv_data)
 
 void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -1115,7 +1115,7 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     Player* player = ObjectAccessor::GetPlayer(*_player, guid);
@@ -1128,7 +1128,7 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     }
 
     WorldPacket data(MSG_INSPECT_HONOR_STATS, 8 + 1 + 4 * 4);
-    data << uint64(player->GetGUID());
+    data << player->GetGUID();
     data << uint8(player->GetHonorPoints());
     data << uint32(player->GetUInt32Value(PLAYER_FIELD_KILLS));
     data << uint32(player->GetUInt32Value(PLAYER_FIELD_TODAY_CONTRIBUTION));
@@ -1246,7 +1246,7 @@ void WorldSession::HandleComplainOpcode(WorldPacket& recv_data)
 #endif
 
     uint8 spam_type;                                        // 0 - mail, 1 - chat
-    uint64 spammer_guid;
+    ObjectGuid spammer_guid;
     uint32 unk1 = 0;
     uint32 unk2 = 0;
     uint32 unk3 = 0;
@@ -1729,7 +1729,7 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data)
 
     Battleground* bg = _player->GetBattleground();
 
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
@@ -1754,7 +1754,7 @@ void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket& recv_data)
 
     Battleground* bg = _player->GetBattleground();
 
-    uint64 guid;
+    ObjectGuid guid;
     recv_data >> guid;
 
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
@@ -1820,7 +1820,7 @@ void WorldSession::HandleUpdateMissileTrajectory(WorldPacket& recvPacket)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_UPDATE_MISSILE_TRAJECTORY");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     uint32 spellId;
     float elevation, speed;
     float curX, curY, curZ;

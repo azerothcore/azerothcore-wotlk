@@ -317,7 +317,6 @@ public:
         {
             pInstance = me->GetInstanceScript();
             overload = false;
-            myCoil = 0;
         }
 
         InstanceScript* pInstance;
@@ -325,7 +324,7 @@ public:
         uint32 pullTimer{};
         uint32 visualTimer{};
         bool overload;
-        uint64 myCoil;
+        ObjectGuid myCoil;
 
         void Reset() override
         {

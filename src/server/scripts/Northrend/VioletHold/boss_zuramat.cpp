@@ -183,7 +183,7 @@ public:
         npc_vh_void_sentryAI(Creature* c) : NullCreatureAI(c)
         {
             pInstance = c->GetInstanceScript();
-            SummonedGUID = 0;
+            SummonedGUID.Clear();
             checkTimer = 5000;
             //me->CastSpell(me, SPELL_SUMMON_VOID_SENTRY_BALL, true);
             if (Creature* pSummoned = me->SummonCreature(NPC_VOID_SENTRY_BALL, *me, TEMPSUMMON_TIMED_DESPAWN, 300000))
@@ -195,7 +195,7 @@ public:
         }
 
         InstanceScript* pInstance;
-        uint64 SummonedGUID;
+        ObjectGuid SummonedGUID;
         uint16 checkTimer;
 
         void DoAction(int32 a) override

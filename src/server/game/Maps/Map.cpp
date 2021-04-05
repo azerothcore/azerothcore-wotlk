@@ -3062,41 +3062,41 @@ void BattlegroundMap::RemoveAllPlayers()
                     player->TeleportTo(player->GetEntryPoint());
 }
 
-Player* Map::GetPlayer(uint64 guid)
+Player* Map::GetPlayer(ObjectGuid guid)
 {
     return ObjectAccessor::GetObjectInMap(guid, this, (Player*)nullptr);
 }
 
-Creature* Map::GetCreature(uint64 guid)
+Creature* Map::GetCreature(ObjectGuid guid)
 {
     return ObjectAccessor::GetObjectInMap(guid, this, (Creature*)nullptr);
 }
 
-GameObject* Map::GetGameObject(uint64 guid)
+GameObject* Map::GetGameObject(ObjectGuid guid)
 {
     return ObjectAccessor::GetObjectInMap(guid, this, (GameObject*)nullptr);
 }
 
-Transport* Map::GetTransport(uint64 guid)
+Transport* Map::GetTransport(ObjectGuid guid)
 {
-    if (guid.GetHigh() != HIGHGUID_MO_TRANSPORT && guid.GetHigh() != HIGHGUID_TRANSPORT)
+    if (guid.GetHigh() != HighGuid::Mo_Transport && guid.GetHigh() != HighGuid::Transport)
         return nullptr;
 
     GameObject* go = GetGameObject(guid);
     return go ? go->ToTransport() : nullptr;
 }
 
-DynamicObject* Map::GetDynamicObject(uint64 guid)
+DynamicObject* Map::GetDynamicObject(ObjectGuid guid)
 {
     return ObjectAccessor::GetObjectInMap(guid, this, (DynamicObject*)nullptr);
 }
 
-Pet* Map::GetPet(uint64 guid)
+Pet* Map::GetPet(ObjectGuid guid)
 {
     return ObjectAccessor::GetObjectInMap(guid, this, (Pet*)nullptr);
 }
 
-Corpse* Map::GetCorpse(uint64 guid)
+Corpse* Map::GetCorpse(ObjectGuid guid)
 {
     return ObjectAccessor::GetObjectInMap(guid, this, (Corpse*)nullptr);
 }
@@ -3332,9 +3332,9 @@ time_t Map::GetLinkedRespawnTime(ObjectGuid guid) const
     ObjectGuid linkedGuid = sObjectMgr->GetLinkedRespawnGuid(guid);
     switch (linkedGuid.GetHigh())
     {
-        case HIGHGUID_UNIT:
+        case HighGuid::Unit:
             return GetCreatureRespawnTime(linkedGuid.GetCounter());
-        case HIGHGUID_GAMEOBJECT:
+        case HighGuid::GameObject:
             return GetGORespawnTime(linkedGuid.GetCounter());
         default:
             break;

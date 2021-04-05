@@ -114,7 +114,7 @@ public:
             }
         }
 
-        void ManageRespawn(uint64 EggGUID)
+        void ManageRespawn(ObjectGuid EggGUID)
         {
             ChaseNewVictim();
             Eggs.push_back(EggGUID);

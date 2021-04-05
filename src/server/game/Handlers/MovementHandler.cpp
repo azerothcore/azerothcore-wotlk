@@ -625,7 +625,7 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     if (GetPlayer()->IsInWorld() && _player->m_mover && _player->m_mover->IsInWorld())
@@ -662,7 +662,7 @@ void WorldSession::HandleMoveNotActiveMover(WorldPacket& recvData)
 void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
 {
     WorldPacket data(SMSG_MOUNTSPECIAL_ANIM, 8);
-    data << uint64(GetPlayer()->GetGUID());
+    data << GetPlayer()->GetGUID();
 
     GetPlayer()->SendMessageToSet(&data, false);
 }
@@ -745,7 +745,7 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
     if (!_player->IsAlive() || _player->IsInCombat())
         return;
 
-    uint64 summoner_guid;
+    ObjectGuid summoner_guid;
     bool agree;
     recvData >> summoner_guid;
     recvData >> agree;

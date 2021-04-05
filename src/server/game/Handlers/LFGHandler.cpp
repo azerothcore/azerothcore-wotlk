@@ -27,7 +27,7 @@ void BuildPartyLockDungeonBlock(WorldPacket& data, const lfg::LfgLockPartyMap& l
     data << uint8(lockMap.size());
     for (lfg::LfgLockPartyMap::const_iterator it = lockMap.begin(); it != lockMap.end(); ++it)
     {
-        data << uint64(it->first);                         // Player guid
+        data << it->first;                                 // Player guid
         BuildPlayerLockDungeonBlock(data, it->second);
     }
 }
@@ -88,8 +88,8 @@ void WorldSession::HandleLfgJoinOpcode(WorldPacket& recvData)
 void WorldSession::HandleLfgLeaveOpcode(WorldPacket&  /*recvData*/)
 {
     Group* group = GetPlayer()->GetGroup();
-    uint64 guid = GetPlayer()->GetGUID();
-    uint64 gguid = group ? group->GetGUID() : guid;
+    ObjectGuid guid = GetPlayer()->GetGUID();
+    ObjectGuid gguid = group ? group->GetGUID() : guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LFG_LEAVE [%s] in group: %u", guid.ToString().c_str(), group ? 1 : 0);
@@ -120,7 +120,7 @@ void WorldSession::HandleLfgSetRolesOpcode(WorldPacket& recvData)
 {
     uint8 roles;
     recvData >> roles;                                    // Player Group Roles
-    uint64 guid = GetPlayer()->GetGUID();
+    ObjectGuid guid = GetPlayer()->GetGUID();
     Group* group = GetPlayer()->GetGroup();
     if (!group)
     {
@@ -129,7 +129,7 @@ void WorldSession::HandleLfgSetRolesOpcode(WorldPacket& recvData)
 #endif
         return;
     }
-    uint64 gguid = group->GetGUID();
+    ObjectGuid gguid = group->GetGUID();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LFG_SET_ROLES: Group [%s], Player [%s], Roles: %u", gguid.ToString().c_str(), guid.ToString().c_str(), roles);
 #endif
@@ -141,7 +141,7 @@ void WorldSession::HandleLfgSetCommentOpcode(WorldPacket&  recvData)
     std::string comment;
     recvData >> comment;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    uint64 guid = GetPlayer()->GetGUID();
+    ObjectGuid guid = GetPlayer()->GetGUID();
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LFG_SET_COMMENT [%s] comment: %s", guid.ToString().c_str(), comment.c_str());
 #endif
 
@@ -154,7 +154,7 @@ void WorldSession::HandleLfgSetBootVoteOpcode(WorldPacket& recvData)
     bool agree;                                            // Agree to kick player
     recvData >> agree;
 
-    uint64 guid = GetPlayer()->GetGUID();
+    ObjectGuid guid = GetPlayer()->GetGUID();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LFG_SET_BOOT_VOTE [%s] agree: %u", guid.ToString().c_str(), agree ? 1 : 0);
 #endif
@@ -174,7 +174,7 @@ void WorldSession::HandleLfgTeleportOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*/)
 {
-    uint64 guid = GetPlayer()->GetGUID();
+    ObjectGuid guid = GetPlayer()->GetGUID();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LFG_PLAYER_LOCK_INFO_REQUEST [%s]", guid.ToString().c_str());
 #endif
@@ -249,7 +249,7 @@ void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*
 
 void WorldSession::HandleLfgPartyLockInfoRequestOpcode(WorldPacket&  /*recvData*/)
 {
-    uint64 guid = GetPlayer()->GetGUID();
+    ObjectGuid guid = GetPlayer()->GetGUID();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_LFG_PARTY_LOCK_INFO_REQUEST [%s]", guid.ToString().c_str());
 #endif
@@ -266,7 +266,7 @@ void WorldSession::HandleLfgPartyLockInfoRequestOpcode(WorldPacket&  /*recvData*
         if (!plrg)
             continue;
 
-        uint64 pguid = plrg->GetGUID();
+        ObjectGuid pguid = plrg->GetGUID();
         if (pguid == guid)
             continue;
 
@@ -308,7 +308,7 @@ void WorldSession::HandleLfgGetStatus(WorldPacket& /*recvData*/)
     sLog->outDebug(LOG_FILTER_LFG, "CMSG_LFG_GET_STATUS %s", GetPlayerInfo().c_str());
 #endif
 
-    uint64 guid = GetPlayer()->GetGUID();
+    ObjectGuid guid = GetPlayer()->GetGUID();
     lfg::LfgUpdateData updateData = sLFGMgr->GetLfgStatus(guid);
 
     if (GetPlayer()->GetGroup())
@@ -410,14 +410,14 @@ void WorldSession::SendLfgUpdateParty(lfg::LfgUpdateData const& updateData)
     SendPacket(&data);
 }
 
-void WorldSession::SendLfgRoleChosen(uint64 guid, uint8 roles)
+void WorldSession::SendLfgRoleChosen(ObjectGuid guid, uint8 roles)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "SMSG_LFG_ROLE_CHOSEN [%s] guid: [%s] roles: %u", GetPlayer()->GetGUID().ToString().c_str(), guid.ToString().c_str(), roles);
 #endif
 
     WorldPacket data(SMSG_LFG_ROLE_CHOSEN, 8 + 1 + 4);
-    data << uint64(guid);                                  // Guid
+    data << guid;                                          // Guid
     data << uint8(roles > 0);                              // Ready
     data << uint32(roles);                                 // Roles
     SendPacket(&data);
@@ -447,9 +447,9 @@ void WorldSession::SendLfgRoleCheckUpdate(lfg::LfgRoleCheck const& roleCheck)
     if (!roleCheck.roles.empty())
     {
         // Leader info MUST be sent 1st :S
-        uint64 guid = roleCheck.leader;
+        ObjectGuid guid = roleCheck.leader;
         uint8 roles = roleCheck.roles.find(guid)->second;
-        data << uint64(guid);                              // Guid
+        data << guid;                                      // Guid
         data << uint8(roles > 0);                          // Ready
         data << uint32(roles);                             // Roles
         Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
@@ -462,7 +462,7 @@ void WorldSession::SendLfgRoleCheckUpdate(lfg::LfgRoleCheck const& roleCheck)
 
             guid = it->first;
             roles = it->second;
-            data << uint64(guid);                          // Guid
+            data << guid;                                  // Guid
             data << uint8(roles > 0);                      // Ready
             data << uint32(roles);                         // Roles
             player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
@@ -546,7 +546,7 @@ void WorldSession::SendLfgPlayerReward(lfg::LfgPlayerRewardData const& rewardDat
 
 void WorldSession::SendLfgBootProposalUpdate(lfg::LfgPlayerBoot const& boot)
 {
-    uint64 guid = GetPlayer()->GetGUID();
+    ObjectGuid guid = GetPlayer()->GetGUID();
     lfg::LfgAnswer playerVote = boot.votes.find(guid)->second;
     uint8 votesNum = 0;
     uint8 agreeNum = 0;
@@ -567,21 +567,21 @@ void WorldSession::SendLfgBootProposalUpdate(lfg::LfgPlayerBoot const& boot)
 #endif
     WorldPacket data(SMSG_LFG_BOOT_PROPOSAL_UPDATE, 1 + 1 + 1 + 8 + 4 + 4 + 4 + 4 + boot.reason.length());
     data << uint8(boot.inProgress);                        // Vote in progress
-    data << uint8(playerVote != lfg::LFG_ANSWER_PENDING);       // Did Vote
-    data << uint8(playerVote == lfg::LFG_ANSWER_AGREE);         // Agree
-    data << uint64(boot.victim);                           // Victim GUID
+    data << uint8(playerVote != lfg::LFG_ANSWER_PENDING);  // Did Vote
+    data << uint8(playerVote == lfg::LFG_ANSWER_AGREE);    // Agree
+    data << boot.victim;                                   // Victim GUID
     data << uint32(votesNum);                              // Total Votes
     data << uint32(agreeNum);                              // Agree Count
     data << uint32(secsleft);                              // Time Left
-    data << uint32(lfg::LFG_GROUP_KICK_VOTES_NEEDED);           // Needed Votes
+    data << uint32(lfg::LFG_GROUP_KICK_VOTES_NEEDED);      // Needed Votes
     data << boot.reason.c_str();                           // Kick reason
     SendPacket(&data);
 }
 
 void WorldSession::SendLfgUpdateProposal(lfg::LfgProposal const& proposal)
 {
-    uint64 guid = GetPlayer()->GetGUID();
-    uint64 gguid = proposal.players.find(guid)->second.group;
+    ObjectGuid guid = GetPlayer()->GetGUID();
+    ObjectGuid gguid = proposal.players.find(guid)->second.group;
     bool silent = !proposal.isNew && gguid == proposal.group;
     uint32 dungeonEntry = proposal.dungeonId;
 

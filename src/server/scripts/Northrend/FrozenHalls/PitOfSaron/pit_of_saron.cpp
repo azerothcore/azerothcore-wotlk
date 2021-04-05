@@ -575,14 +575,12 @@ public:
         {
             pInstance = me->GetInstanceScript();
             killsLeft = 0;
-            deathbringerGUID[0] = 0;
-            deathbringerGUID[1] = 0;
         }
 
         InstanceScript* pInstance;
         EventMap events;
         uint32 killsLeft;
-        uint64 deathbringerGUID[2];
+        ObjectGuid deathbringerGUID[2];
 
         void MovementInform(uint32 type, uint32 id) override
         {
@@ -1139,7 +1137,7 @@ public:
         npc_pos_leader_secondAI(Creature* creature) : NullCreatureAI(creature)
         {
             pInstance = me->GetInstanceScript();
-            barrierGUID = 0;
+            barrierGUID.Clear();
             events.Reset();
             me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
@@ -1161,7 +1159,7 @@ public:
 
         InstanceScript* pInstance;
         EventMap events;
-        uint64 barrierGUID;
+        ObjectGuid barrierGUID;
 
         void DoAction(int32 p) override
         {
@@ -1267,7 +1265,7 @@ public:
                             c->SetVisible(false);
                     if (GameObject* barrier = pInstance->instance->GetGameObject(barrierGUID))
                         barrier->Delete();
-                    barrierGUID = 0;
+                    barrierGUID.Clear();
 
                     events.RescheduleEvent(8, 2000);
                     break;

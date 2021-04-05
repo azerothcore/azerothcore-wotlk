@@ -821,7 +821,7 @@ public:
     // Both of the below are called on emote opcodes.
     virtual void OnEmote(Player* /*player*/, uint32 /*emote*/) { }
 
-    virtual void OnTextEmote(Player* /*player*/, uint32 /*textEmote*/, uint32 /*emoteNum*/, uint64 /*guid*/) { }
+    virtual void OnTextEmote(Player* /*player*/, uint32 /*textEmote*/, uint32 /*emoteNum*/, ObjectGuid /*guid*/) { }
 
     // Called in Spell::Cast.
     virtual void OnSpellCast(Player* /*player*/, Spell* /*spell*/, bool /*skipCheck*/) { }
@@ -839,10 +839,10 @@ public:
     virtual void OnCreate(Player* /*player*/) { }
 
     // Called when a player is deleted.
-    virtual void OnDelete(uint64 /*guid*/, uint32 /*accountId*/) { }
+    virtual void OnDelete(ObjectGuid /*guid*/, uint32 /*accountId*/) { }
 
     // Called when a player delete failed.
-    virtual void OnFailedDelete(uint64 /*guid*/, uint32 /*accountId*/) { }
+    virtual void OnFailedDelete(ObjectGuid /*guid*/, uint32 /*accountId*/) { }
 
     // Called when a player is about to be saved.
     virtual void OnSave(Player* /*player*/) { }
@@ -917,7 +917,7 @@ public:
     virtual void OnGetMaxPersonalArenaRatingRequirement(const Player* /*player*/, uint32 /*minSlot*/, uint32& /*maxArenaRating*/) const {}
 
     //After looting item
-    virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, uint64 /*lootguid*/) { }
+    virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
 
     //After creating item (eg profession item creation)
     virtual void OnCreateItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
@@ -926,7 +926,7 @@ public:
     virtual void OnQuestRewardItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
 
     //Before buying something from any vendor
-    virtual void OnBeforeBuyItemFromVendor(Player* /*player*/, uint64 /*vendorguid*/, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/) { };
+    virtual void OnBeforeBuyItemFromVendor(Player* /*player*/, ObjectGuid /*vendorguid*/, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/) { };
 
     //Before buying something from any vendor
     virtual void OnAfterStoreOrEquipNewItem(Player* /*player*/, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) { };
@@ -942,7 +942,7 @@ public:
 
     virtual void OnFirstLogin(Player* /*player*/) { }
 
-    virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, uint64 /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
+    virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, ObjectGuid /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
     virtual bool ShouldBeRewardedWithMoneyInsteadOfExp(Player* /*player*/) { return false; }
 
     // Called before the player's temporary summoned creature has initialized it's stats
@@ -1033,16 +1033,16 @@ public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     // Called when a member is added to a group.
-    virtual void OnAddMember(Group* /*group*/, uint64 /*guid*/) { }
+    virtual void OnAddMember(Group* /*group*/, ObjectGuid /*guid*/) { }
 
     // Called when a member is invited to join a group.
-    virtual void OnInviteMember(Group* /*group*/, uint64 /*guid*/) { }
+    virtual void OnInviteMember(Group* /*group*/, ObjectGuid /*guid*/) { }
 
     // Called when a member is removed from a group.
-    virtual void OnRemoveMember(Group* /*group*/, uint64 /*guid*/, RemoveMethod /*method*/, uint64 /*kicker*/, const char* /*reason*/) { }
+    virtual void OnRemoveMember(Group* /*group*/, ObjectGuid /*guid*/, RemoveMethod /*method*/, ObjectGuid /*kicker*/, const char* /*reason*/) { }
 
     // Called when the leader of a group is changed.
-    virtual void OnChangeLeader(Group* /*group*/, uint64 /*newLeaderGuid*/, uint64 /*oldLeaderGuid*/) { }
+    virtual void OnChangeLeader(Group* /*group*/, ObjectGuid /*newLeaderGuid*/, ObjectGuid /*oldLeaderGuid*/) { }
 
     // Called when a group is disbanded.
     virtual void OnDisband(Group* /*group*/) { }
@@ -1359,15 +1359,15 @@ public: /* PlayerScript */
     void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Guild* guild);
     void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Channel* channel);
     void OnPlayerEmote(Player* player, uint32 emote);
-    void OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, uint64 guid);
+    void OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, ObjectGuid guid);
     void OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck);
     void OnPlayerLogin(Player* player);
     void OnPlayerLoadFromDB(Player* player);
     void OnPlayerLogout(Player* player);
     void OnPlayerCreate(Player* player);
     void OnPlayerSave(Player* player);
-    void OnPlayerDelete(uint64 guid, uint32 accountId);
-    void OnPlayerFailedDelete(uint64 guid, uint32 accountId);
+    void OnPlayerDelete(ObjectGuid guid, uint32 accountId);
+    void OnPlayerFailedDelete(ObjectGuid guid, uint32 accountId);
     void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
     void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);
     void OnPlayerUpdateArea(Player* player, uint32 oldArea, uint32 newArea);
@@ -1390,10 +1390,10 @@ public: /* PlayerScript */
     void GetCustomGetArenaTeamId(const Player* player, uint8 slot, uint32& teamID) const;
     void GetCustomArenaPersonalRating(const Player* player, uint8 slot, uint32& rating) const;
     void OnGetMaxPersonalArenaRatingRequirement(const Player* player, uint32 minSlot, uint32& maxArenaRating) const;
-    void OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid);
+    void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
     void OnCreateItem(Player* player, Item* item, uint32 count);
     void OnQuestRewardItem(Player* player, Item* item, uint32 count);
-    void OnBeforeBuyItemFromVendor(Player* player, uint64 vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot);
+    void OnBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot);
     void OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
     void OnAfterUpdateMaxPower(Player* player, Powers& power, float& value);
     void OnAfterUpdateMaxHealth(Player* player, float& value);
@@ -1403,7 +1403,7 @@ public: /* PlayerScript */
     void OnFirstLogin(Player* player);
     void OnPlayerCompleteQuest(Player* player, Quest const* quest);
     void OnBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType);
-    bool CanJoinInBattlegroundQueue(Player* player, uint64 BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
+    bool CanJoinInBattlegroundQueue(Player* player, ObjectGuid BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
     bool ShouldBeRewardedWithMoneyInsteadOfExp(Player* player);
     void OnBeforeTempSummonInitStats(Player* player, TempSummon* tempSummon, uint32& duration);
     void OnBeforeGuardianInitStatsForLevel(Player* player, Guardian* guardian, CreatureTemplate const* cinfo, PetType& petType);
@@ -1433,10 +1433,10 @@ public: /* GuildScript */
     void OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, uint32 playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
 
 public: /* GroupScript */
-    void OnGroupAddMember(Group* group, uint64 guid);
-    void OnGroupInviteMember(Group* group, uint64 guid);
-    void OnGroupRemoveMember(Group* group, uint64 guid, RemoveMethod method, uint64 kicker, const char* reason);
-    void OnGroupChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLeaderGuid);
+    void OnGroupAddMember(Group* group, ObjectGuid guid);
+    void OnGroupInviteMember(Group* group, ObjectGuid guid);
+    void OnGroupRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, ObjectGuid kicker, const char* reason);
+    void OnGroupChangeLeader(Group* group, ObjectGuid newLeaderGuid, ObjectGuid oldLeaderGuid);
     void OnGroupDisband(Group* group);
 
 public: /* GlobalScript */

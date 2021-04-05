@@ -86,7 +86,7 @@ public:
 
         // We declare all the required variables
         uint32 playerGuid = accountId;
-        uint32 characterGuid = 0;
+        uint32 characterGuid.Clear();
         std::string systemNote = "ERROR"; // "ERROR" is a placeholder here. We change it later.
 
         // With this switch, we change systemNote so that we have a more accurate phrasing of what type it is.
@@ -245,18 +245,18 @@ public:
     CharacterDeleteActionIpLogger() : PlayerScript("CharacterDeleteActionIpLogger") { }
 
     // CHARACTER_DELETE = 10
-    void OnDelete(uint64 guid, uint32 accountId) override
+    void OnDelete(ObjectGuid guid, uint32 accountId) override
     {
         DeleteIPLogAction(guid, accountId, CHARACTER_DELETE);
     }
 
     // CHARACTER_FAILED_DELETE = 11
-    void OnFailedDelete(uint64 guid, uint32 accountId) override
+    void OnFailedDelete(ObjectGuid guid, uint32 accountId) override
     {
         DeleteIPLogAction(guid, accountId, CHARACTER_FAILED_DELETE);
     }
 
-    void DeleteIPLogAction(uint64 guid, uint32 playerGuid, IPLoggingTypes aType)
+    void DeleteIPLogAction(ObjectGuid guid, uint32 playerGuid, IPLoggingTypes aType)
     {
         if (!sWorld->getBoolConfig(CONFIG_IP_BASED_ACTION_LOGGING))
             return;

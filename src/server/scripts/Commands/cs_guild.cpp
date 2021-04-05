@@ -131,7 +131,7 @@ public:
             return false;
 
         // if not guild name only (in "") then player name
-        uint64 targetGuid;
+        ObjectGuid targetGuid;
         if (!handler->extractPlayerTarget(*args != '"' ? (char*)args : nullptr, nullptr, &targetGuid))
             return false;
 
@@ -155,7 +155,7 @@ public:
     static bool HandleGuildUninviteCommand(ChatHandler* handler, char const* args)
     {
         Player* target;
-        uint64 targetGuid;
+        ObjectGuid targetGuid;
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid))
             return false;
 
@@ -180,7 +180,7 @@ public:
             return false;
 
         Player* target;
-        uint64 targetGuid;
+        ObjectGuid targetGuid;
         std::string target_name;
         if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &target_name))
             return false;

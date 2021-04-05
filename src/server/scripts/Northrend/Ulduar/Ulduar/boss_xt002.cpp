@@ -754,8 +754,8 @@ public:
             _boomed = true; // Prevent recursive calls
 
             WorldPacket data(SMSG_SPELLINSTAKILLLOG, 8 + 8 + 4);
-            data << uint64(me->GetGUID());
-            data << uint64(me->GetGUID());
+            data << me->GetGUID();
+            data << me->GetGUID();
             data << uint32(SPELL_BOOM);
             me->SendMessageToSet(&data, false);
 

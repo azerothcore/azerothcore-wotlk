@@ -93,47 +93,47 @@ namespace lfg
     typedef std::list<Lfg5Guids> Lfg5GuidsList;
     typedef std::set<uint32> LfgDungeonSet;
     typedef std::map<uint32, uint32> LfgLockMap;
-    typedef std::map<uint64, LfgLockMap> LfgLockPartyMap;
+    typedef std::map<ObjectGuid, LfgLockMap> LfgLockPartyMap;
     typedef GuidSet LfgGuidSet;
     typedef GuidList LfgGuidList;
-    typedef std::map<uint64, uint8> LfgRolesMap;
-    typedef std::map<uint64, uint64> LfgGroupsMap;
+    typedef std::map<ObjectGuid, uint8> LfgRolesMap;
+    typedef std::map<ObjectGuid, ObjectGuid> LfgGroupsMap;
 
     class Lfg5Guids
     {
     public:
-        uint64 guid[5];
+        std::array<ObjectGuid, 5> guid;
         LfgRolesMap* roles;
         Lfg5Guids()
         {
-            memset(&guid, 0, 5 * 8);
+            guid.fill(ObjectGuid::Empty);
             roles = nullptr;
         }
 
-        Lfg5Guids(uint64 g)
+        Lfg5Guids(ObjectGuid g)
         {
-            memset(&guid, 0, 5 * 8);
+            guid.fill(ObjectGuid::Empty);
             guid[0] = g;
             roles = nullptr;
         }
 
         Lfg5Guids(Lfg5Guids const& x)
         {
-            memcpy(guid, x.guid, 5 * 8);
+            guid = x.guid;
             roles = x.roles ? (new LfgRolesMap(*(x.roles))) : nullptr;
         }
 
         Lfg5Guids(Lfg5Guids const& x, bool /*copyRoles*/)
         {
-            memcpy(guid, x.guid, 5 * 8);
+            guid = x.guid;
             roles = nullptr;
         }
 
         ~Lfg5Guids() { delete roles; }
         void addRoles(LfgRolesMap const& r) { roles = new LfgRolesMap(r); }
-        void clear() { memset(&guid, 0, 5 * 8); }
-        bool empty() const { return guid[0] == 0; }
-        uint64 front() const { return guid[0]; }
+        void clear() { guid.fill(ObjectGuid::Empty); }
+        bool empty() const { return guid[0] == ObjectGuid::Empty; }
+        ObjectGuid front() const { return guid[0]; }
 
         uint8 size() const
         {
@@ -162,7 +162,7 @@ namespace lfg
             return 0;
         }
 
-        void insert(const uint64& g)
+        void insert(const ObjectGuid& g)
         {
             // avoid loops for performance
             if (guid[0] == 0)
@@ -253,7 +253,7 @@ namespace lfg
             guid[4] = g;
         }
 
-        void force_insert_front(const uint64& g)
+        void force_insert_front(const ObjectGuid& g)
         {
             if (guid[3])
             {
@@ -274,7 +274,7 @@ namespace lfg
             guid[0] = g;
         }
 
-        void remove(const uint64& g)
+        void remove(const ObjectGuid& g)
         {
             // avoid loops for performance
             if (guid[0] == g)
@@ -407,7 +407,7 @@ namespace lfg
             }
         }
 
-        bool hasGuid(const uint64& g) const
+        bool hasGuid(const ObjectGuid& g) const
         {
             return g && (guid[0] == g || guid[1] == g || guid[2] == g || guid[3] == g || guid[4] == g);
         }

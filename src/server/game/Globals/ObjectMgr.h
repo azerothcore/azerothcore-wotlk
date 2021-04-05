@@ -766,10 +766,10 @@ public:
 
     void GetPlayerLevelInfo(uint32 race, uint32 class_, uint8 level, PlayerLevelInfo* info) const;
 
-    [[nodiscard]] uint64 GetPlayerGUIDByName(std::string const& name) const;
-    bool GetPlayerNameByGUID(uint64 guid, std::string& name) const;
-    [[nodiscard]] TeamId GetPlayerTeamIdByGUID(uint64 guid) const;
-    [[nodiscard]] uint32 GetPlayerAccountIdByGUID(uint64 guid) const;
+    [[nodiscard]] ObjectGuid GetPlayerGUIDByName(std::string const& name) const;
+    bool GetPlayerNameByGUID(ObjectGuid guid, std::string& name) const;
+    [[nodiscard]] TeamId GetPlayerTeamIdByGUID(ObjectGuid guid) const;
+    [[nodiscard]] uint32 GetPlayerAccountIdByGUID(ObjectGuid guid) const;
     [[nodiscard]] uint32 GetPlayerAccountIdByPlayerName(std::string const& name) const;
 
     uint32 GetNearestTaxiNode(float x, float y, float z, uint32 mapid, uint32 teamId);

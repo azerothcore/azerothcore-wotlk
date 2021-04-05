@@ -63,10 +63,10 @@ public:
     bool CheckNormalMatch(Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32 minPlayers, uint32 maxPlayers);
     bool CheckSkirmishForSameFaction(BattlegroundBracketId bracket_id, uint32 minPlayersPerTeam);
     GroupQueueInfo* AddGroup(Player* leader, Group* group, PvPDifficultyEntry const*  bracketEntry, bool isRated, bool isPremade, uint32 ArenaRating, uint32 MatchmakerRating, uint32 ArenaTeamId);
-    void RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQueueSlot);
-    bool IsPlayerInvitedToRatedArena(uint64 pl_guid);
-    bool IsPlayerInvited(uint64 pl_guid, uint32 bgInstanceGuid, uint32 removeTime);
-    bool GetPlayerGroupInfoData(uint64 guid, GroupQueueInfo* ginfo);
+    void RemovePlayer(ObjectGuid guid, bool sentToBg, uint32 playerQueueSlot);
+    bool IsPlayerInvitedToRatedArena(ObjectGuid pl_guid);
+    bool IsPlayerInvited(ObjectGuid pl_guid, uint32 bgInstanceGuid, uint32 removeTime);
+    bool GetPlayerGroupInfoData(ObjectGuid guid, GroupQueueInfo* ginfo);
     void PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* ginfo);
     uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const;
     uint32 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
@@ -76,7 +76,7 @@ public:
     void SetBgTypeIdAndArenaType(BattlegroundTypeId b, uint8 a) { m_bgTypeId = b; m_arenaType = ArenaType(a); } // pussywizard
     void AddEvent(BasicEvent* Event, uint64 e_time);
 
-    typedef std::map<uint64, GroupQueueInfo*> QueuedPlayersMap;
+    typedef std::map<ObjectGuid, GroupQueueInfo*> QueuedPlayersMap;
     QueuedPlayersMap m_QueuedPlayers;
 
     //do NOT use deque because deque.erase() invalidates ALL iterators
@@ -127,7 +127,7 @@ private:
 class BGQueueInviteEvent : public BasicEvent
 {
 public:
-    BGQueueInviteEvent(uint64 pl_guid, uint32 BgInstanceGUID, BattlegroundTypeId BgTypeId, uint8 arenaType, uint32 removeTime) :
+    BGQueueInviteEvent(ObjectGuid pl_guid, uint32 BgInstanceGUID, BattlegroundTypeId BgTypeId, uint8 arenaType, uint32 removeTime) :
         m_PlayerGuid(pl_guid), m_BgInstanceGUID(BgInstanceGUID), m_BgTypeId(BgTypeId), m_ArenaType(arenaType), m_RemoveTime(removeTime)
     { }
     ~BGQueueInviteEvent() override = default;
@@ -135,7 +135,7 @@ public:
     bool Execute(uint64 e_time, uint32 p_time) override;
     void Abort(uint64 e_time) override;
 private:
-    uint64 m_PlayerGuid;
+    ObjectGuid m_PlayerGuid;
     uint32 m_BgInstanceGUID;
     BattlegroundTypeId m_BgTypeId;
     uint8  m_ArenaType;
@@ -150,7 +150,7 @@ private:
 class BGQueueRemoveEvent : public BasicEvent
 {
 public:
-    BGQueueRemoveEvent(uint64 pl_guid, uint32 bgInstanceGUID, BattlegroundQueueTypeId bgQueueTypeId, uint32 removeTime)
+    BGQueueRemoveEvent(ObjectGuid pl_guid, uint32 bgInstanceGUID, BattlegroundQueueTypeId bgQueueTypeId, uint32 removeTime)
         : m_PlayerGuid(pl_guid), m_BgInstanceGUID(bgInstanceGUID), m_RemoveTime(removeTime), m_BgQueueTypeId(bgQueueTypeId)
     {}
 
@@ -159,7 +159,7 @@ public:
     bool Execute(uint64 e_time, uint32 p_time) override;
     void Abort(uint64 e_time) override;
 private:
-    uint64 m_PlayerGuid;
+    ObjectGuid m_PlayerGuid;
     uint32 m_BgInstanceGUID;
     uint32 m_RemoveTime;
     BattlegroundQueueTypeId m_BgQueueTypeId;

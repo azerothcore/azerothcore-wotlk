@@ -530,7 +530,7 @@ public:
     {
         ::Spell const* Spell = nullptr;
         uint32 Delay = 0;         // ms until the creature's target should snap back (0 = no snapback scheduled)
-        uint64 Target;            // the creature's "real" target while casting
+        ObjectGuid Target;        // the creature's "real" target while casting
         float Orientation = 0.0f; // the creature's "real" orientation while casting
     } _spellFocusInfo;
 
@@ -595,7 +595,7 @@ public:
     virtual void DeleteFromDB();                        // overriden in Pet
 
     Loot loot;
-    [[nodiscard]] uint64 GetLootRecipientGUID() const { return m_lootRecipient; }
+    [[nodiscard]] ObjectGuid GetLootRecipientGUID() const { return m_lootRecipient; }
     [[nodiscard]] Player* GetLootRecipient() const;
     [[nodiscard]] Group* GetLootRecipientGroup() const;
     [[nodiscard]] bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
@@ -736,7 +736,7 @@ public:
     bool m_isTempWorldObject; //true when possessed
 
     // Handling caster facing during spellcast
-    void SetTarget(uint64 guid) override;
+    void SetTarget(ObjectGuid guid) override;
     void FocusTarget(Spell const* focusSpell, WorldObject const* target);
     void ReleaseFocus(Spell const* focusSpell);
     bool IsMovementPreventedByCasting() const;
@@ -766,7 +766,7 @@ protected:
 
     static float _GetHealthMod(int32 Rank);
 
-    uint64 m_lootRecipient;
+    ObjectGuid m_lootRecipient;
     uint32 m_lootRecipientGroup;
 
     /// Timers
@@ -841,11 +841,11 @@ public:
     AssistDelayEvent(uint64 victim, Unit& owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
 
     bool Execute(uint64 e_time, uint32 p_time) override;
-    void AddAssistant(uint64 guid) { m_assistants.push_back(guid); }
+    void AddAssistant(ObjectGuid guid) { m_assistants.push_back(guid); }
 private:
     AssistDelayEvent();
 
-    uint64            m_victim;
+    ObjectGuid        m_victim;
     GuidList          m_assistants;
     Unit&             m_owner;
 };

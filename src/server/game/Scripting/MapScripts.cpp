@@ -28,9 +28,9 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, Object* source, O
         return;
 
     // prepare static data
-    uint64 sourceGUID = source ? source->GetGUID() : uint64(0); //some script commands doesn't have source
-    uint64 targetGUID = target ? target->GetGUID() : uint64(0);
-    uint64 ownerGUID  = (source && source->GetTypeId() == TYPEID_ITEM) ? ((Item*)source)->GetOwnerGUID() : uint64(0);
+    ObjectGuid sourceGUID = source ? source->GetGUID() : ObjectGuid::Empty; //some script commands doesn't have source
+    ObjectGuid targetGUID = target ? target->GetGUID() : ObjectGuid::Empty;
+    ObjectGuid ownerGUID  = (source && source->GetTypeId() == TYPEID_ITEM) ? ((Item*)source)->GetOwnerGUID() : ObjectGuid::Empty;
 
     ///- Schedule script execution for all scripts in the script map
     ScriptMap const* s2 = &(s->second);
@@ -63,9 +63,9 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* sou
     // NOTE: script record _must_ exist until command executed
 
     // prepare static data
-    uint64 sourceGUID = source ? source->GetGUID() : uint64(0);
-    uint64 targetGUID = target ? target->GetGUID() : uint64(0);
-    uint64 ownerGUID  = (source && source->GetTypeId() == TYPEID_ITEM) ? ((Item*)source)->GetOwnerGUID() : uint64(0);
+    ObjectGuid sourceGUID = source ? source->GetGUID() : ObjectGuid::Empty;
+    ObjectGuid targetGUID = target ? target->GetGUID() : ObjectGuid::Empty;
+    ObjectGuid ownerGUID  = (source && source->GetTypeId() == TYPEID_ITEM) ? ((Item*)source)->GetOwnerGUID() : ObjectGuid::Empty;
 
     ScriptAction sa;
     sa.sourceGUID = sourceGUID;
@@ -290,28 +290,28 @@ void Map::ScriptsProcess()
         {
             switch (step.sourceGUID.GetHigh())
             {
-                case HIGHGUID_ITEM: // as well as HIGHGUID_CONTAINER
+                case HighGuid::Item: // as well as HIGHGUID_CONTAINER
                     if (Player* player = GetPlayer(step.ownerGUID))
                         source = player->GetItemByGuid(step.sourceGUID);
                     break;
-                case HIGHGUID_UNIT:
-                case HIGHGUID_VEHICLE:
+                case HighGuid::Unit:
+                case HighGuid::Vehicle:
                     source = GetCreature(step.sourceGUID);
                     break;
-                case HIGHGUID_PET:
+                case HighGuid::Pet:
                     source = GetPet(step.sourceGUID);
                     break;
-                case HIGHGUID_PLAYER:
+                case HighGuid::Player:
                     source = GetPlayer(step.sourceGUID);
                     break;
-                case HIGHGUID_TRANSPORT:
-                case HIGHGUID_GAMEOBJECT:
+                case HighGuid::Transport:
+                case HighGuid::GameObject:
                     source = GetGameObject(step.sourceGUID);
                     break;
-                case HIGHGUID_CORPSE:
+                case HighGuid::Corpse:
                     source = GetCorpse(step.sourceGUID);
                     break;
-                case HIGHGUID_MO_TRANSPORT:
+                case HighGuid::Mo_Transport:
                     {
                         GameObject* go = GetGameObject(step.sourceGUID);
                         source = go ? go->ToTransport() : nullptr;
@@ -329,24 +329,24 @@ void Map::ScriptsProcess()
         {
             switch (step.targetGUID.GetHigh())
             {
-                case HIGHGUID_UNIT:
-                case HIGHGUID_VEHICLE:
+                case HighGuid::Unit:
+                case HighGuid::Vehicle:
                     target = GetCreature(step.targetGUID);
                     break;
-                case HIGHGUID_PET:
+                case HighGuid::Pet:
                     target = GetPet(step.targetGUID);
                     break;
-                case HIGHGUID_PLAYER:                       // empty GUID case also
+                case HighGuid::Player:                       // empty GUID case also
                     target = GetPlayer(step.targetGUID);
                     break;
-                case HIGHGUID_TRANSPORT:
-                case HIGHGUID_GAMEOBJECT:
+                case HighGuid::Transport:
+                case HighGuid::GameObject:
                     target = GetGameObject(step.targetGUID);
                     break;
-                case HIGHGUID_CORPSE:
+                case HighGuid::Corpse:
                     target = GetCorpse(step.targetGUID);
                     break;
-                case HIGHGUID_MO_TRANSPORT:
+                case HighGuid::Mo_Transport:
                     {
                         GameObject* go = GetGameObject(step.targetGUID);
                         target = go ? go->ToTransport() : nullptr;
@@ -390,7 +390,7 @@ void Map::ScriptsProcess()
                             case CHAT_TYPE_WHISPER:
                             case CHAT_MSG_RAID_BOSS_WHISPER:
                                 {
-                                    uint64 targetGUID = target ? target->GetGUID() : 0;
+                                    ObjectGuid targetGUID = target ? target->GetGUID() : ObjectGuid::Empty;
                                     if (!targetGUID || !targetGUID.IsPlayer())
                                         sLog->outError("%s attempt to whisper to non-player unit, skipping.", step.script->GetDebugInfo().c_str());
                                     else
@@ -407,7 +407,7 @@ void Map::ScriptsProcess()
                     // Source or target must be Creature.
                     if (Creature* cSource = _GetScriptCreatureSourceOrTarget(source, target, step.script))
                     {
-                        uint64 targetGUID = target ? target->GetGUID() : 0;
+                        ObjectGuid targetGUID = target ? target->GetGUID() : ObjectGuid::Empty;
                         switch (step.script->Talk.ChatType)
                         {
                             case CHAT_TYPE_SAY:

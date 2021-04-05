@@ -949,7 +949,7 @@ public:
         }
 
         uint32 timer;
-        uint64 targetGUID;
+        ObjectGuid targetGUID;
         void EnterCombat(Unit*) override {}
         void MoveInLineOfSight(Unit*) override {}
         void AttackStart(Unit*) override {}
@@ -1004,7 +1004,7 @@ public:
         void Reset() override
         {
             timer = 0;
-            targetGUID = 0;
+            targetGUID.Clear();
             me->SetWalk(true);
             FindNextKeg();
             me->ApplySpellImmune(SPELL_ATTACK_KEG, IMMUNITY_ID, SPELL_ATTACK_KEG, true);
@@ -1463,7 +1463,7 @@ public:
                     {
                         player->DestroyItemCount(itemCaster->GetEntry(), 1, true);
                         GetSpell()->m_CastItem = nullptr;
-                        GetSpell()->m_castItemGUID = 0;
+                        GetSpell()->m_castItemGUID.Clear();
                     }
                 }
             }
@@ -1530,7 +1530,7 @@ public:
                     {
                         player->DestroyItemCount(itemCaster->GetEntry(), 1, true);
                         GetSpell()->m_CastItem = nullptr;
-                        GetSpell()->m_castItemGUID = 0;
+                        GetSpell()->m_castItemGUID.Clear();
                     }
                 }
             }

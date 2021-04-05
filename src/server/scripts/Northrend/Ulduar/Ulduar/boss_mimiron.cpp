@@ -780,7 +780,7 @@ public:
 
                         if( pInstance )
                             for( uint16 i = 0; i < 3; ++i )
-                                if( uint64 guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
+                                if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                                     if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                                         if( door->GetGoState() != GO_STATE_ACTIVE )
                                         {
@@ -863,7 +863,7 @@ public:
         {
             if( pInstance )
                 for( uint16 i = 0; i < 3; ++i )
-                    if( uint64 guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
+                    if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                         if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                             if( door->GetGoState() != GO_STATE_ACTIVE )
                             {
@@ -894,7 +894,7 @@ public:
         {
             if( pInstance )
                 for( uint16 i = 0; i < 3; ++i )
-                    if( uint64 guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
+                    if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                         if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                             if( door->GetGoState() != GO_STATE_READY )
                             {
@@ -2308,7 +2308,7 @@ public:
             }
         }
 
-        void RemoveFlame(uint64 guid)
+        void RemoveFlame(ObjectGuid guid)
         {
             FlameList.remove(guid);
         }

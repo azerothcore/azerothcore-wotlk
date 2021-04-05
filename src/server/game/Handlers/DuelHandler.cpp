@@ -14,7 +14,7 @@
 
 void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 {
-    uint64 guid;
+    ObjectGuid guid;
     Player* player;
     Player* plTarget;
 
@@ -48,7 +48,7 @@ void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_DUEL_CANCELLED");
 #endif
-    uint64 guid;
+    ObjectGuid guid;
     recvPacket >> guid;
 
     // no duel requested

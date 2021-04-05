@@ -226,7 +226,7 @@ public:
         npc_death_knight_initiateAI(Creature* creature) : CombatAI(creature) { }
 
         bool _duelInProgress;
-        uint64 _duelGUID;
+        ObjectGuid _duelGUID;
         EventMap events;
         std::set<uint32> playerGUIDs;
         uint32 timer = 0;
@@ -242,7 +242,7 @@ public:
         void Reset() override
         {
             _duelInProgress = false;
-            _duelGUID = 0;
+            _duelGUID.Clear();
             me->RestoreFaction();
             CombatAI::Reset();
 
@@ -280,7 +280,7 @@ public:
                     damage = 0;
                     events.ScheduleEvent(EVENT_DUEL_LOST, 2000);
                     events.ScheduleEvent(EVENT_DUEL_LOST + 1, 6000);
-                    _duelGUID = 0;
+                    _duelGUID.Clear();
                     _duelInProgress = 0;
 
                     attacker->RemoveGameObject(SPELL_DUEL_FLAG, true);
@@ -700,17 +700,17 @@ public:
                 me->SetCurrentEquipmentId(me->GetOriginalEquipmentId());
         }
 
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         UnworthyInitiatePhase phase;
         uint32 wait_timer;
         float anchorX, anchorY;
-        uint64 anchorGUID;
+        ObjectGuid anchorGUID;
 
         EventMap events;
 
         void Reset() override
         {
-            anchorGUID = 0;
+            anchorGUID.Clear();
             phase = PHASE_CHAINED;
             events.Reset();
             me->setFaction(7);
@@ -1003,11 +1003,11 @@ public:
 
         uint32 IntroTimer;
         uint32 IntroPhase;
-        uint64 carGUID;
+        ObjectGuid carGUID;
 
         void Reset() override
         {
-            carGUID = 0;
+            carGUID.Clear();
             IntroTimer = 0;
             IntroPhase = 0;
         }

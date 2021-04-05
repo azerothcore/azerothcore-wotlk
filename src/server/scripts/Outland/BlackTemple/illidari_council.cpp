@@ -100,7 +100,7 @@ struct HammerOfJusticeSelector : public acore::unary_function<Unit*, bool>
 class VerasEnvenom : public BasicEvent
 {
 public:
-    VerasEnvenom(Unit& owner, uint64 targetGUID) : _owner(owner), _targetGUID(targetGUID) { }
+    VerasEnvenom(Unit& owner, ObjectGuid targetGUID) : _owner(owner), _targetGUID(targetGUID) { }
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
@@ -116,7 +116,7 @@ public:
 
 private:
     Unit& _owner;
-    uint64 _targetGUID;
+    ObjectGuid _targetGUID;
 };
 
 class boss_illidari_council : public CreatureScript
@@ -133,10 +133,9 @@ public:
     {
         boss_illidari_councilAI(Creature* creature) : BossAI(creature, DATA_ILLIDARI_COUNCIL)
         {
-            memset(councilGUIDs, 0, sizeof(councilGUIDs));
         }
 
-        uint64 councilGUIDs[4];
+        ObjectGuid councilGUIDs[4];
 
         void Reset() override
         {

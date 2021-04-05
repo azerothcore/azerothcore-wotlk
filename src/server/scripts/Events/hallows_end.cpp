@@ -368,13 +368,13 @@ public:
 
         uint32 eventStarted;
         bool allowQuest;
-        uint64 horseGUID;
+        ObjectGuid horseGUID;
 
         void Reset() override
         {
             eventStarted = 0;
             allowQuest = false;
-            horseGUID = 0;
+            horseGUID.Clear();
         }
 
         void GetInitXYZ(float& x, float& y, float& z, float& o, uint32& path)
@@ -954,7 +954,7 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         uint8 talkCount;
         bool inFight;
         uint8 phase;
@@ -1079,7 +1079,7 @@ public:
         {
             events.Reset();
             summons.DespawnAll();
-            playerGUID = 0;
+            playerGUID.Clear();
             talkCount = 0;
             phase = 0;
             inFight = false;

@@ -43,31 +43,31 @@ public:
         bool bDefensesUsed;
 
         GuidVector GO_ActivationCrystalGUID;
-        uint64 GO_MainGateGUID;
+        ObjectGuid GO_MainGateGUID;
 
-        uint64 GO_MoraggCellGUID;
-        uint64 GO_ErekemCellGUID;
-        uint64 GO_ErekemRightGuardCellGUID;
-        uint64 GO_ErekemLeftGuardCellGUID;
-        uint64 GO_IchoronCellGUID;
-        uint64 GO_LavanthorCellGUID;
-        uint64 GO_XevozzCellGUID;
-        uint64 GO_ZuramatCellGUID;
+        ObjectGuid GO_MoraggCellGUID;
+        ObjectGuid GO_ErekemCellGUID;
+        ObjectGuid GO_ErekemRightGuardCellGUID;
+        ObjectGuid GO_ErekemLeftGuardCellGUID;
+        ObjectGuid GO_IchoronCellGUID;
+        ObjectGuid GO_LavanthorCellGUID;
+        ObjectGuid GO_XevozzCellGUID;
+        ObjectGuid GO_ZuramatCellGUID;
 
         GuidSet trashMobs;
-        uint64 NPC_SinclariGUID;
-        uint64 NPC_GuardGUID[4];
-        uint64 NPC_PortalGUID;
-        uint64 NPC_DoorSealGUID;
+        ObjectGuid NPC_SinclariGUID;
+        ObjectGuid NPC_GuardGUID[4];
+        ObjectGuid NPC_PortalGUID;
+        ObjectGuid NPC_DoorSealGUID;
 
-        uint64 NPC_MoraggGUID;
-        uint64 NPC_ErekemGUID;
-        uint64 NPC_ErekemGuardGUID[2];
-        uint64 NPC_IchoronGUID;
-        uint64 NPC_LavanthorGUID;
-        uint64 NPC_XevozzGUID;
-        uint64 NPC_ZuramatGUID;
-        uint64 NPC_CyanigosaGUID;
+        ObjectGuid NPC_MoraggGUID;
+        ObjectGuid NPC_ErekemGUID;
+        ObjectGuid NPC_ErekemGuardGUID[2];
+        ObjectGuid NPC_IchoronGUID;
+        ObjectGuid NPC_LavanthorGUID;
+        ObjectGuid NPC_XevozzGUID;
+        ObjectGuid NPC_ZuramatGUID;
+        ObjectGuid NPC_CyanigosaGUID;
 
         void Initialize() override
         {
@@ -84,30 +84,6 @@ public:
             bDefensesUsed = false;
 
             GO_ActivationCrystalGUID.clear();
-            GO_MainGateGUID = 0;
-
-            GO_MoraggCellGUID = 0;
-            GO_ErekemCellGUID = 0;
-            GO_ErekemRightGuardCellGUID = 0;
-            GO_ErekemLeftGuardCellGUID = 0;
-            GO_IchoronCellGUID = 0;
-            GO_LavanthorCellGUID = 0;
-            GO_XevozzCellGUID = 0;
-            GO_ZuramatCellGUID = 0;
-
-            NPC_SinclariGUID = 0;
-            memset(&NPC_GuardGUID, 0, sizeof(NPC_GuardGUID));
-            NPC_PortalGUID = 0;
-            NPC_DoorSealGUID = 0;
-
-            NPC_MoraggGUID = 0;
-            NPC_ErekemGUID = 0;
-            NPC_ErekemGuardGUID[0] = NPC_ErekemGuardGUID[1] = 0;
-            NPC_IchoronGUID = 0;
-            NPC_LavanthorGUID = 0;
-            NPC_XevozzGUID = 0;
-            NPC_ZuramatGUID = 0;
-            NPC_CyanigosaGUID = 0;
         }
 
         bool IsEncounterInProgress() const override
@@ -175,7 +151,7 @@ public:
             switch(go->GetEntry())
             {
                 case GO_ACTIVATION_CRYSTAL:
-                    HandleGameObject(0, false, go); // make go not used yet
+                    HandleGameObject(ObjectGuid::Empty, false, go); // make go not used yet
                     go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
                     GO_ActivationCrystalGUID.push_back(go->GetGUID());
                     break;
@@ -313,9 +289,9 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
-            switch(identifier)
+            switch (identifier)
             {
                 case DATA_TELEPORTATION_PORTAL_GUID:
                     return NPC_PortalGUID;
@@ -331,7 +307,7 @@ public:
                     return NPC_IchoronGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void StartBossEncounter(uint8 uiBoss)
@@ -461,7 +437,7 @@ public:
                         for (ObjectGuid guid : GO_ActivationCrystalGUIDr)
                             if (GameObject* go = instance->GetGameObject(guid))
                             {
-                                HandleGameObject(0, false, go); // not used yet
+                                HandleGameObject(ObjectGuid::Empty, false, go); // not used yet
                                 go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // make it useable
                             }
                         events.RescheduleEvent(EVENT_SUMMON_PORTAL, 4000);
@@ -555,7 +531,7 @@ public:
             for (ObjectGuid guid : GO_ActivationCrystalGUID)
                 if (GameObject* go = instance->GetGameObject(guid))
                 {
-                    HandleGameObject(0, false, go); // not used yet
+                    HandleGameObject(ObjectGuid::Empty, false, go); // not used yet
                     go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
                 }
 
@@ -576,7 +552,7 @@ public:
             // remove portal if any
             if (Creature* c = instance->GetCreature(NPC_PortalGUID))
                 c->DespawnOrUnsummon();
-            NPC_PortalGUID = 0;
+            NPC_PortalGUID.Clear();
 
             // remove trash
             for (ObjectGuid guid : trashMobs)

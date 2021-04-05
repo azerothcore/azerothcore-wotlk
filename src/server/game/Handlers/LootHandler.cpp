@@ -31,7 +31,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
 #endif
     Player* player = GetPlayer();
-    uint64 lguid = player->GetLootGUID();
+    ObjectGuid lguid = player->GetLootGUID();
     Loot* loot = nullptr;
     uint8 lootSlot = 0;
 
@@ -104,7 +104,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 #endif
 
     Player* player = GetPlayer();
-    uint64 guid = player->GetLootGUID();
+    ObjectGuid guid = player->GetLootGUID();
     if (!guid)
         return;
 
@@ -113,7 +113,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
     switch (guid.GetHigh())
     {
-        case HIGHGUID_GAMEOBJECT:
+        case HighGuid::GameObject:
             {
                 GameObject* go = GetPlayer()->GetMap()->GetGameObject(guid);
 
@@ -123,7 +123,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
                 break;
             }
-        case HIGHGUID_CORPSE:                               // remove insignia ONLY in BG
+        case HighGuid::Corpse:                               // remove insignia ONLY in BG
             {
                 Corpse* bones = ObjectAccessor::GetCorpse(*player, guid);
 
@@ -135,7 +135,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
                 break;
             }
-        case HIGHGUID_ITEM:
+        case HighGuid::Item:
             {
                 if (Item* item = player->GetItemByGuid(guid))
                 {
@@ -144,8 +144,8 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
                 }
                 break;
             }
-        case HIGHGUID_UNIT:
-        case HIGHGUID_VEHICLE:
+        case HighGuid::Unit:
+        case HighGuid::Vehicle:
             {
                 Creature* creature = player->GetMap()->GetCreature(guid);
                 bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
@@ -225,7 +225,7 @@ void WorldSession::HandleLootOpcode(WorldPacket& recvData)
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_LOOT");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     // Check possible cheat
@@ -247,20 +247,20 @@ void WorldSession::HandleLootReleaseOpcode(WorldPacket& recvData)
 
     // cheaters can modify lguid to prevent correct apply loot release code and re-loot
     // use internal stored guid
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
-    if (uint64 lguid = GetPlayer()->GetLootGUID())
+    if (ObjectGuid lguid = GetPlayer()->GetLootGUID())
         if (lguid == guid)
             DoLootRelease(lguid);
 }
 
-void WorldSession::DoLootRelease(uint64 lguid)
+void WorldSession::DoLootRelease(ObjectGuid lguid)
 {
     Player*  player = GetPlayer();
     Loot*    loot;
 
-    player->SetLootGUID(0);
+    player->SetLootGUID(ObjectGuid::Empty);
     player->SendLootRelease(lguid);
 
     player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
@@ -406,7 +406,7 @@ void WorldSession::DoLootRelease(uint64 lguid)
 void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 {
     uint8 slotid;
-    uint64 lootguid, target_playerguid;
+    ObjectGuid lootguid, target_playerguid;
 
     recvData >> lootguid >> slotid >> target_playerguid;
 

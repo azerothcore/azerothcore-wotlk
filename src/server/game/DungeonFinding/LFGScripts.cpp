@@ -59,12 +59,12 @@ namespace lfg
             return;
 
         // Temporal: Trying to determine when group data and LFG data gets desynched
-        uint64 guid = player->GetGUID();
-        uint64 gguid = sLFGMgr->GetGroup(guid);
+        ObjectGuid guid = player->GetGUID();
+        ObjectGuid gguid = sLFGMgr->GetGroup(guid);
 
         if (Group const* group = player->GetGroup())
         {
-            uint64 gguid2 = group->GetGUID();
+            ObjectGuid gguid2 = group->GetGUID();
             if (gguid != gguid2)
             {
                 //sLog->outError("%s on group %s but LFG has group %s saved... Fixing.",
@@ -131,13 +131,13 @@ namespace lfg
     {
     }
 
-    void LFGGroupScript::OnAddMember(Group* group, uint64 guid)
+    void LFGGroupScript::OnAddMember(Group* group, ObjectGuid guid)
     {
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
             return;
 
-        uint64 gguid = group->GetGUID();
-        uint64 leader = group->GetLeaderGUID();
+        ObjectGuid gguid = group->GetGUID();
+        ObjectGuid leader = group->GetLeaderGUID();
 
         if (leader == guid)
         {
@@ -176,7 +176,7 @@ namespace lfg
             sLFGMgr->LeaveLfg(guid);
     }
 
-    void LFGGroupScript::OnRemoveMember(Group* group, uint64 guid, RemoveMethod method, uint64 kicker, char const* reason)
+    void LFGGroupScript::OnRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, ObjectGuid kicker, char const* reason)
     {
         // used only with EXTRA_LOGS
         UNUSED(kicker);
@@ -185,7 +185,7 @@ namespace lfg
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
             return;
 
-        uint64 gguid = group->GetGUID();
+        ObjectGuid gguid = group->GetGUID();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnRemoveMember [%s]: remove [%s] Method: %d Kicker: [%s] Reason: %s",
             gguid.ToString().c_str(), guid.ToString().c_str(), method, kicker.ToString().c_str(), (reason ? reason : ""));
@@ -247,7 +247,7 @@ namespace lfg
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
             return;
 
-        uint64 gguid = group->GetGUID();
+        ObjectGuid gguid = group->GetGUID();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnDisband [%s]", gguid.ToString().c_str());
 #endif
@@ -259,12 +259,12 @@ namespace lfg
         sLFGMgr->RemoveGroupData(gguid);
     }
 
-    void LFGGroupScript::OnChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLeaderGuid)
+    void LFGGroupScript::OnChangeLeader(Group* group, ObjectGuid newLeaderGuid, ObjectGuid oldLeaderGuid)
     {
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
             return;
 
-        uint64 gguid = group->GetGUID();
+        ObjectGuid gguid = group->GetGUID();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnChangeLeader [%s]: old [%s] new [%s]",
@@ -277,7 +277,7 @@ namespace lfg
             sLFGMgr->LeaveLfg(oldLeaderGuid);
     }
 
-    void LFGGroupScript::OnInviteMember(Group* group, uint64 guid)
+    void LFGGroupScript::OnInviteMember(Group* group, ObjectGuid guid)
     {
         // used only with EXTRA_LOGS
         UNUSED(guid);
@@ -285,8 +285,8 @@ namespace lfg
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER))
             return;
 
-        uint64 gguid = group->GetGUID();
-        uint64 leader = group->GetLeaderGUID();
+        ObjectGuid gguid = group->GetGUID();
+        ObjectGuid leader = group->GetLeaderGUID();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnInviteMember [%s]: invite [%s] leader [%s]", gguid.ToString().c_str(), guid.ToString().c_str(), leader.ToString().c_str());
 #endif

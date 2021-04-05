@@ -33,7 +33,6 @@ public:
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-            memset(&bossGUIDs, 0, sizeof(bossGUIDs));
 
             ArchavonDeath = 0;
             EmalonDeath = 0;
@@ -267,7 +266,7 @@ public:
         bool stoned;
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
-        uint64 bossGUIDs[MAX_ENCOUNTER];
+        ObjectGuid bossGUIDs[MAX_ENCOUNTER];
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
