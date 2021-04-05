@@ -111,7 +111,11 @@ class ObjectGuid
     public:
         static ObjectGuid const Empty;
 
-        typedef uint32 LowType;
+        // ultranix: restore
+        class LowType
+        {
+        };
+        //typedef uint32 LowType;
 
         template<HighGuid type>
         static typename std::enable_if<ObjectGuidTraits<type>::Global, ObjectGuid>::type Create(LowType counter) { return Global(type, counter); }

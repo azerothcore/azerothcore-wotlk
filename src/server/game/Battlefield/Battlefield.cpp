@@ -50,7 +50,7 @@ Battlefield::Battlefield()
 
 Battlefield::~Battlefield()
 {
-    for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+    for (BfCapturePointVector::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
         delete itr->second;
 
     for (GraveyardVect::const_iterator itr = m_GraveyardList.begin(); itr != m_GraveyardList.end(); ++itr)
@@ -110,7 +110,7 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
         }
     }
 
-    for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+    for (BfCapturePointVector::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
         itr->second->HandlePlayerLeave(player);
 
     m_InvitedPlayers[player->GetTeamId()].erase(player->GetGUID());
@@ -182,7 +182,7 @@ bool Battlefield::Update(uint32 diff)
         else
             m_uiKickDontAcceptTimer -= diff;
 
-        for (BfCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+        for (BfCapturePointVector::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
             if (itr->second->Update(diff))
                 objective_changed = true;
     }

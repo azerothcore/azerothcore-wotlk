@@ -100,7 +100,7 @@ void FormationMgr::LoadCreatureFormations()
         //Load group member data
         group_member                        = new FormationInfo();
         group_member->leaderGUID            = fields[0].GetUInt32();
-        uint32 memberGUID                   = fields[1].GetUInt32();
+        ObjectGuid::LowType memberGUID      = fields[1].GetUInt32();
         group_member->groupAI               = fields[4].GetUInt32();
         group_member->point_1               = fields[5].GetUInt16();
         group_member->point_2               = fields[6].GetUInt16();

@@ -204,7 +204,7 @@ public:
     ~Battlefield() override;
 
     /// typedef of map witch store capturepoint and the associate gameobject entry
-    typedef std::map<uint32 /*lowguid */, BfCapturePoint*> BfCapturePointMap;
+    typedef std::vector<BfCapturePoint*> BfCapturePointVector;
 
     /// Call this to init the Battlefield
     virtual bool SetupBattlefield() { return true; }
@@ -358,7 +358,7 @@ protected:
     TeamId m_DefenderTeam;
 
     // Map of the objectives belonging to this OutdoorPvP
-    BfCapturePointMap m_capturePoints;
+    BfCapturePointVector m_capturePoints;
 
     // Players info maps
     GuidUnorderedSet m_players[BG_TEAMS_COUNT];             // Players in zone
@@ -407,15 +407,7 @@ protected:
     void BroadcastPacketToWar(WorldPacket& data) const;
 
     // CapturePoint system
-    void AddCapturePoint(BfCapturePoint* cp, GameObject* go) { m_capturePoints[go->GetEntry()] = cp; }
-
-    BfCapturePoint* GetCapturePoint(uint32 lowguid) const
-    {
-        Battlefield::BfCapturePointMap::const_iterator itr = m_capturePoints.find(lowguid);
-        if (itr != m_capturePoints.end())
-            return itr->second;
-        return nullptr;
-    }
+    void AddCapturePoint(BfCapturePoint* cp) { m_capturePoints.push_back(cp); }
 
     void RegisterZone(uint32 zoneid);
     bool HasPlayer(Player* player) const;

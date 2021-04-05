@@ -173,7 +173,7 @@ PoolObject* PoolGroup<T>::RollOne(ActivePoolData& spawns, uint32 triggerFrom)
 // If no guid is passed, the pool is just removed (event end case)
 // If guid is filled, cache will be used and no removal will occur, it just fill the cache
 template<class T>
-void PoolGroup<T>::DespawnObject(ActivePoolData& spawns, uint32 guid)
+void PoolGroup<T>::DespawnObject(ActivePoolData& spawns, ObjectGuid::LowType guid)
 {
     for (size_t i = 0; i < EqualChanced.size(); ++i)
     {
@@ -204,7 +204,7 @@ void PoolGroup<T>::DespawnObject(ActivePoolData& spawns, uint32 guid)
 
 // Method that is actualy doing the removal job on one creature
 template<>
-void PoolGroup<Creature>::Despawn1Object(uint32 guid)
+void PoolGroup<Creature>::Despawn1Object(ObjectGuid::LowType guid)
 {
     if (CreatureData const* data = sObjectMgr->GetCreatureData(guid))
     {
@@ -217,7 +217,7 @@ void PoolGroup<Creature>::Despawn1Object(uint32 guid)
 
 // Same on one gameobject
 template<>
-void PoolGroup<GameObject>::Despawn1Object(uint32 guid)
+void PoolGroup<GameObject>::Despawn1Object(ObjectGuid::LowType guid)
 {
     if (GameObjectData const* data = sObjectMgr->GetGOData(guid))
     {
@@ -603,9 +603,9 @@ void PoolMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint32 guid    = fields[0].GetUInt32();
+                ObjectGuid::LowType guid = fields[0].GetUInt32();
                 uint32 pool_id = fields[1].GetUInt32();
-                float chance   = fields[2].GetFloat();
+                float chance = fields[2].GetFloat();
 
                 CreatureData const* data = sObjectMgr->GetCreatureData(guid);
                 if (!data)
@@ -661,9 +661,9 @@ void PoolMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint32 guid    = fields[0].GetUInt32();
+                ObjectGuid::LowType guid = fields[0].GetUInt32();
                 uint32 pool_id = fields[1].GetUInt32();
-                float chance   = fields[2].GetFloat();
+                float chance = fields[2].GetFloat();
 
                 GameObjectData const* data = sObjectMgr->GetGOData(guid);
                 if (!data)

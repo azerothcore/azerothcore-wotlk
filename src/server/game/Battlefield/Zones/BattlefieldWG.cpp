@@ -682,7 +682,7 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
 
                 capturePoint->SetCapturePointData(go);
                 capturePoint->LinkToWorkshop(workshop);
-                AddCapturePoint(capturePoint, go);
+                AddCapturePoint(capturePoint);
                 break;
             }
         }

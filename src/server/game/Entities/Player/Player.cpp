@@ -1032,9 +1032,9 @@ void Player::CleanupsBeforeDelete(bool finalCleanup)
     Unit::CleanupsBeforeDelete(finalCleanup);
 }
 
-bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
+bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo)
 {
-    //FIXME: outfitId not used in player creating
+    // FIXME: outfitId not used in player creating
     // TODO: need more checks against packet modifications
     // should check that skin, face, hair* are valid via DBC per race/class
     // also do it in Player::BuildEnumData, Player::LoadFromDB
@@ -2045,7 +2045,7 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
 
     Field* fields = result->Fetch();
 
-    uint32 guidLow = fields[0].GetUInt32();
+    ObjectGuid::LowType guidLow = fields[0].GetUInt32();
     uint8 plrRace = fields[2].GetUInt8();
     uint8 plrClass = fields[3].GetUInt8();
     uint8 gender = fields[4].GetUInt8();
@@ -3677,7 +3677,7 @@ void Player::RemoveMail(uint32 id)
     }
 }
 
-void Player::SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError, uint32 item_guid, uint32 item_count)
+void Player::SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError, ObjectGuid::LowType item_guid, uint32 item_count)
 {
     WorldPacket data(SMSG_SEND_MAIL_RESULT, (4 + 4 + 4 + (mailError == MAIL_ERR_EQUIP_ERROR ? 4 : (mailAction == MAIL_ITEM_TAKEN ? 4 + 4 : 0))));
     data << (uint32) mailId;
@@ -4825,7 +4825,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
     if (deleteFinally || Player::GetLevelFromStorage(playerguid) < charDelete_minLvl)
         charDelete_method = CHAR_DELETE_REMOVE;
 
-    uint32 guid = playerguid.GetCounter();
+    ObjectGuid::LowType guid = playerguid.GetCounter();
 
     // convert corpse to bones if exist (to prevent exiting Corpse in World without DB entry)
     // bones will be deleted by corpse/bones deleting thread shortly
@@ -4912,7 +4912,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
                                 do
                                 {
                                     Field* itemFields = resultItems->Fetch();
-                                    uint32 item_guidlow = itemFields[11].GetUInt32();
+                                    ObjectGuid::LowType item_guidlow = itemFields[11].GetUInt32();
                                     uint32 item_template = itemFields[12].GetUInt32();
 
                                     ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(item_template);
@@ -4957,7 +4957,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
                 {
                     do
                     {
-                        uint32 petguidlow = (*resultPets)[0].GetUInt32();
+                        ObjectGuid::LowType petguidlow = (*resultPets)[0].GetUInt32();
                         Pet::DeleteFromDB(petguidlow);
                     } while (resultPets->NextRow());
                 }
@@ -7575,21 +7575,21 @@ void Player::ModifyArenaPoints(int32 value, SQLTransaction* trans /*=nullptr*/)
     }
 }
 
-uint32 Player::GetGuildIdFromStorage(uint32 guid)
+uint32 Player::GetGuildIdFromStorage(ObjectGuid::LowType guid)
 {
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
         return playerData->guildId;
     return 0;
 }
 
-uint32 Player::GetGroupIdFromStorage(uint32 guid)
+uint32 Player::GetGroupIdFromStorage(ObjectGuid::LowType guid)
 {
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
         return playerData->groupId;
     return 0;
 }
 
-uint32 Player::GetArenaTeamIdFromStorage(uint32 guid, uint8 slot)
+uint32 Player::GetArenaTeamIdFromStorage(ObjectGuid::LowType guid, uint8 slot)
 {
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
     {
@@ -7626,13 +7626,15 @@ uint32 Player::GetArenaTeamIdFromDB(ObjectGuid guid, uint8 type)
 
 uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
 {
-    uint32 guidLow = guid.GetCounter();
+    ObjectGuid::LowType guidLow = guid.GetCounter();
+
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_ZONE);
     stmt->setUInt32(0, guidLow);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     if (!result)
         return 0;
+
     Field* fields = result->Fetch();
     uint32 zone = fields[0].GetUInt16();
 
@@ -7645,6 +7647,7 @@ uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
 
         if (!result)
             return 0;
+
         fields = result->Fetch();
         uint32 map = fields[0].GetUInt16();
         float posx = fields[1].GetFloat();
@@ -7670,7 +7673,7 @@ uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
     return zone;
 }
 
-uint32 Player::GetLevelFromStorage(ObjectGuid guid)
+uint32 Player::GetLevelFromStorage(ObjectGuid::LowType guid)
 {
     // xinef: Get data from global storage
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
@@ -17750,7 +17753,7 @@ bool Player::HasPvPForcingQuest() const
 /***                   LOAD SYSTEM                     ***/
 /*********************************************************/
 
-void Player::Initialize(uint32 guid)
+void Player::Initialize(ObjectGuid::LowType guid)
 {
     Object::_Create(guid, 0, HighGuid::Player);
 }
@@ -17851,10 +17854,10 @@ void Player::_LoadEntryPointData(PreparedQueryResult result)
     m_entryPointData.mountSpell   = fields[6].GetUInt32();
 }
 
-bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid guid)
+bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid::LowType guid)
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_POSITION);
-    stmt->setUInt32(0, guid.GetCounter());
+    stmt->setUInt32(0, guid);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     if (!result)
@@ -18051,7 +18054,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, SQLQueryHolder* holder)
     InitPrimaryProfessions();                               // to max set before any spell loaded
 
     // init saved position, and fix it later if problematic
-    uint32 transLowGUID = fields[35].GetUInt32();
+    ObjectGuid::LowType transLowGUID = fields[35].GetUInt32();
     Relocate(fields[17].GetFloat(), fields[18].GetFloat(), fields[19].GetFloat(), fields[21].GetFloat());
     uint32 mapId = fields[20].GetUInt16();
     uint32 instanceId = fields[63].GetUInt32();
@@ -18812,7 +18815,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
         uint32 zoneId = GetZoneId(true);
 
         std::map<uint32, Bag*> bagMap;                               // fast guid lookup for bags
-        std::map<uint32, Item*> invalidBagMap;                       // fast guid lookup for bags
+        std::map<ObjectGuid::LowType, Item*> invalidBagMap;          // fast guid lookup for bags
         std::list<Item*> problematicItems;
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -18823,7 +18826,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
             Field* fields = result->Fetch();
             if (Item* item = _LoadItem(trans, zoneId, timeDiff, fields))
             {
-                uint32 bagGuid  = fields[11].GetUInt32();
+                ObjectGuid::LowType bagGuid  = fields[11].GetUInt32();
                 uint8  slot     = fields[12].GetUInt8();
 
                 uint8 err = EQUIP_ERR_OK;
@@ -18931,7 +18934,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
 Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, Field* fields)
 {
     Item* item = nullptr;
-    uint32 itemGuid  = fields[13].GetUInt32();
+    ObjectGuid::LowType itemGuid  = fields[13].GetUInt32();
     uint32 itemEntry = fields[14].GetUInt32();
     if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemEntry))
     {
@@ -19079,7 +19082,7 @@ void Player::_LoadMailedItems(Mail* mail)
     {
         Field* fields = result->Fetch();
 
-        uint32 itemGuid = fields[11].GetUInt32();
+        ObjectGuid::LowType itemGuid = fields[11].GetUInt32();
         uint32 itemTemplate = fields[12].GetUInt32();
 
         mail->AddItem(itemGuid, itemTemplate);
@@ -19487,7 +19490,7 @@ void Player::_LoadSpells(PreparedQueryResult result)
 
 void Player::_LoadGroup()
 {
-    if (uint32 groupId = GetGroupIdFromStorage(GetGUID()))
+    if (uint32 groupId = GetGroupIdFromStorage(GetGUID().GetCounter()))
         if (Group* group = sGroupMgr->GetGroupByGUID(groupId))
             if (group->GetMemberGroup(GetGUID()) <= MAX_RAID_SUBGROUPS)
             {
@@ -22172,7 +22175,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         if (pProto->Flags & ITEM_FLAG_ITEM_PURCHASE_RECORD && crItem->ExtendedCost && pProto->GetMaxStackSize() == 1)
         {
             it->SetFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE);
-            it->SetRefundRecipient(GetGUID());
+            it->SetRefundRecipient(GetGUID().GetCounter());
             it->SetPaidMoney(price);
             it->SetPaidExtendedCost(crItem->ExtendedCost);
             it->SaveRefundDataToDB();
@@ -23981,7 +23984,7 @@ void Player::UpdateForQuestWorldObjects()
     GetSession()->SendPacket(&packet);
 }
 
-void Player::SummonIfPossible(bool agree, uint32 summoner_guid)
+void Player::SummonIfPossible(bool agree, ObjectGuid summoner_guid)
 {
     if (!agree)
     {
@@ -27326,7 +27329,7 @@ void Player::SendRefundInfo(Item* item)
         return;
     }
 
-    if (GetGUID() != item->GetRefundRecipient()) // Formerly refundable item got traded
+    if (GetGUID().GetCounter() != item->GetRefundRecipient()) // Formerly refundable item got traded
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item refund: item was traded!");
@@ -27402,7 +27405,7 @@ void Player::RefundItem(Item* item)
         return;
     }
 
-    if (GetGUID() != item->GetRefundRecipient()) // Formerly refundable item got traded
+    if (GetGUID().GetCounter() != item->GetRefundRecipient()) // Formerly refundable item got traded
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item refund: item was traded!");

@@ -93,7 +93,7 @@ void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefManager<T>&
     for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
     {
         T* obj = new T;
-        uint32 guid = *i_guid;
+        ObjectGuid::LowType guid = *i_guid;
         //sLog->outString("DEBUG: LoadHelper from table: %s for (guid: %u) Loading", table, guid);
         if (!obj->LoadFromDB(guid, map))
         {
@@ -110,7 +110,7 @@ void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefManager<Gam
 {
     for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
     {
-        uint32 guid = *i_guid;
+        ObjectGuid::LowType guid = *i_guid;
         GameObjectData const* data = sObjectMgr->GetGOData(guid);
         GameObject* obj = data && sObjectMgr->IsGameObjectStaticTransport(data->id) ? new StaticTransport() : new GameObject();
         //sLog->outString("DEBUG: LoadHelper from table: %s for (guid: %u) Loading", table, guid);
@@ -134,7 +134,7 @@ void LoadHelper(CellCorpseSet const& cell_corpses, CellCoord& cell, CorpseMapTyp
         if (itr->second != map->GetInstanceId())
             continue;
 
-        uint32 player_guid = itr->first;
+        ObjectGuid::LowType player_guid = itr->first;
 
         Corpse* obj = sObjectAccessor->GetCorpseForPlayerGUID(player_guid);
         if (!obj)

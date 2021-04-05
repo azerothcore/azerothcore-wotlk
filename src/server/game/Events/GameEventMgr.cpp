@@ -396,7 +396,7 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint32 guid    = fields[0].GetUInt32();
+                ObjectGuid::LowType guid = fields[0].GetUInt32();
                 int16 event_id = fields[1].GetInt8();
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
@@ -407,7 +407,7 @@ void GameEventMgr::LoadFromDB()
                     continue;
                 }
 
-                GuidList& crelist = mGameEventCreatureGuids[internal_event_id];
+                GuidLowList& crelist = mGameEventCreatureGuids[internal_event_id];
                 crelist.push_back(guid);
 
                 ++count;
@@ -438,7 +438,7 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint32 guid    = fields[0].GetUInt32();
+                ObjectGuid::LowType guid = fields[0].GetUInt32();
                 int16 event_id = fields[1].GetInt8();
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
@@ -449,7 +449,7 @@ void GameEventMgr::LoadFromDB()
                     continue;
                 }
 
-                GuidList& golist = mGameEventGameobjectGuids[internal_event_id];
+                GuidLowList& golist = mGameEventGameobjectGuids[internal_event_id];
                 golist.push_back(guid);
 
                 ++count;
@@ -480,8 +480,8 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint32 guid     = fields[0].GetUInt32();
-                uint32 entry    = fields[1].GetUInt32();
+                ObjectGuid::LowType guid = fields[0].GetUInt32();
+                uint32 entry = fields[1].GetUInt32();
                 uint16 event_id = fields[2].GetUInt8();
 
                 if (event_id >= mGameEventModelEquip.size())
@@ -508,7 +508,7 @@ void GameEventMgr::LoadFromDB()
                     }
                 }
 
-                equiplist.push_back(std::pair<uint32, ModelEquip>(guid, newModelEquipSet));
+                equiplist.push_back(std::pair<ObjectGuid::LowType, ModelEquip>(guid, newModelEquipSet));
 
                 ++count;
             } while (result->NextRow());
@@ -747,9 +747,9 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                uint32 guid     = fields[0].GetUInt32();
+                ObjectGuid::LowType guid = fields[0].GetUInt32();
                 uint16 event_id = fields[1].GetUInt8();
-                uint32 npcflag  = fields[2].GetUInt32();
+                uint32 npcflag = fields[2].GetUInt32();
 
                 if (event_id >= mGameEvent.size())
                 {
@@ -841,7 +841,7 @@ void GameEventMgr::LoadFromDB()
 
                 NPCVendorList& vendors = mGameEventVendors[event_id];
                 NPCVendorEntry newEntry;
-                uint32 guid = fields[1].GetUInt32();
+                ObjectGuid::LowType guid = fields[1].GetUInt32();
                 newEntry.item = fields[2].GetUInt32();
                 newEntry.maxcount = fields[3].GetUInt32();
                 newEntry.incrtime = fields[4].GetUInt32();

@@ -126,7 +126,7 @@ public:                                                 // modifiers
     MailDraft& AddCOD(uint32 COD) { m_COD = COD; return *this; }
 
 public:                                                 // finishers
-    void SendReturnToSender(uint32 sender_acc, uint32 sender_guid, uint32 receiver_guid, SQLTransaction& trans);
+    void SendReturnToSender(uint32 sender_acc, ObjectGuid::LowType sender_guid, ObjectGuid::LowType receiver_guid, SQLTransaction& trans);
     void SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 custom_expiration = 0, bool deleteMailItemsFromDB = false, bool sendMail = true);
 
 private:
@@ -146,7 +146,7 @@ private:
 
 struct MailItemInfo
 {
-    uint32 item_guid;
+    ObjectGuid::LowType item_guid;
     uint32 item_template;
 };
 typedef std::vector<MailItemInfo> MailItemInfoVec;
@@ -170,7 +170,7 @@ struct Mail
     uint32 checked;
     MailState state;
 
-    void AddItem(uint32 itemGuidLow, uint32 item_template)
+    void AddItem(ObjectGuid::LowType itemGuidLow, uint32 item_template)
     {
         MailItemInfo mii;
         mii.item_guid = itemGuidLow;
@@ -178,7 +178,7 @@ struct Mail
         items.push_back(mii);
     }
 
-    bool RemoveItem(uint32 item_guid)
+    bool RemoveItem(ObjectGuid::LowType item_guid)
     {
         for (MailItemInfoVec::iterator itr = items.begin(); itr != items.end(); ++itr)
         {

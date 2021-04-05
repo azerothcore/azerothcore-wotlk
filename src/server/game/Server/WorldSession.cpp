@@ -1192,7 +1192,7 @@ void WorldSession::ProcessQueryCallbackPlayer()
     {
         uint8 bagIndex = _openWrappedItemCallback.GetFirstParam();
         uint8 slot = _openWrappedItemCallback.GetSecondParam();
-        uint32 itemLowGUID = _openWrappedItemCallback.GetThirdParam();
+        ObjectGuid::LowType itemLowGUID = _openWrappedItemCallback.GetThirdParam();
         _openWrappedItemCallback.GetResult(result);
         HandleOpenWrappedItemCallback(result, bagIndex, slot, itemLowGUID);
         _openWrappedItemCallback.FreeResult();

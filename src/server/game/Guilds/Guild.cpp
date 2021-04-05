@@ -164,6 +164,7 @@ inline uint32 Guild::LogHolder::GetNextGUID()
         m_nextGUID = 0;
     else
         m_nextGUID = (m_nextGUID + 1) % m_maxRecords;
+
     return m_nextGUID;
 }
 
@@ -393,7 +394,7 @@ void Guild::BankTab::LoadFromDB(Field* fields)
 bool Guild::BankTab::LoadItemFromDB(Field* fields)
 {
     uint8 slotId = fields[13].GetUInt8();
-    uint32 itemGuid = fields[14].GetUInt32();
+    ObjectGuid::LowType itemGuid = fields[14].GetUInt32();
     uint32 itemEntry = fields[15].GetUInt32();
     if (slotId >= GUILD_BANK_MAX_SLOTS)
     {
@@ -409,7 +410,7 @@ bool Guild::BankTab::LoadItemFromDB(Field* fields)
     }
 
     Item* pItem = NewItemOrBag(proto);
-    if (!pItem->LoadFromDB(itemGuid, 0, fields, itemEntry))
+    if (!pItem->LoadFromDB(itemGuid, ObjectGuid::Empty, fields, itemEntry))
     {
         sLog->outError("Item (GUID %u, id: %u) not found in item_instance, deleting from guild bank!", itemGuid, itemEntry);
 
@@ -2027,7 +2028,7 @@ bool Guild::LoadBankEventLogFromDB(Field* fields)
         LogHolder* pLog = m_bankEventLog[tabId];
         if (pLog->CanInsert())
         {
-            uint32 guid = fields[2].GetUInt32();
+            ObjectGuid::LowType guid = fields[2].GetUInt32();
             GuildBankEventLogTypes eventType = GuildBankEventLogTypes(fields[3].GetUInt8());
             if (BankEventLogEntry::IsMoneyEvent(eventType))
             {
@@ -2647,7 +2648,7 @@ inline bool Guild::_MemberHasTabRights(ObjectGuid guid, uint8 tabId, uint32 righ
 }
 
 // Add new event log record
-inline void Guild::_LogEvent(GuildEventLogTypes eventType, uint32 playerGuid1, uint32 playerGuid2, uint8 newRank)
+inline void Guild::_LogEvent(GuildEventLogTypes eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2, uint8 newRank)
 {
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     m_eventLog->AddEvent(trans, new EventLogEntry(m_id, m_eventLog->GetNextGUID(), eventType, playerGuid1, playerGuid2, newRank));
@@ -2657,7 +2658,7 @@ inline void Guild::_LogEvent(GuildEventLogTypes eventType, uint32 playerGuid1, u
 }
 
 // Add new bank event log record
-void Guild::_LogBankEvent(SQLTransaction& trans, GuildBankEventLogTypes eventType, uint8 tabId, uint32 lowguid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId)
+void Guild::_LogBankEvent(SQLTransaction& trans, GuildBankEventLogTypes eventType, uint8 tabId, ObjectGuid::LowType lowguid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId)
 {
     if (tabId > GUILD_BANK_MAX_TABS)
         return;

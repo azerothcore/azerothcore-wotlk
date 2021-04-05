@@ -1398,7 +1398,7 @@ public:
     typedef std::list<Aura*> AuraList;
     typedef std::list<AuraApplication*> AuraApplicationList;
     typedef std::list<DiminishingReturn> Diminishing;
-    typedef std::unordered_set<uint32> ComboPointHolderSet;
+    typedef GuidUnorderedSet ComboPointHolderSet;
 
     typedef std::map<uint8, AuraApplication*> VisibleAuraMap;
 
@@ -2318,8 +2318,8 @@ public:
     void DisableRotate(bool apply);
     void DisableSpline();
 
-    void AddComboPointHolder(uint32 lowguid) { m_ComboPointHolders.insert(lowguid); }
-    void RemoveComboPointHolder(uint32 lowguid) { m_ComboPointHolders.erase(lowguid); }
+    void AddComboPointHolder(ObjectGuid lowguid) { m_ComboPointHolders.insert(lowguid); }
+    void RemoveComboPointHolder(ObjectGuid lowguid) { m_ComboPointHolders.erase(lowguid); }
     void ClearComboPointHolders();
 
     ///----------Pet responses methods-----------------

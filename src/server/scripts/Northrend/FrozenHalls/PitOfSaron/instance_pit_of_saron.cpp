@@ -65,7 +65,7 @@ public:
                 c->AI()->SetData(DATA_START_INTRO, 0);
         }
 
-        uint32 GetCreatureEntry(uint32 /*guidLow*/, CreatureData const* data) override
+        uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
         {
             if (teamIdInInstance == TEAM_NEUTRAL)
             {

@@ -490,28 +490,28 @@ public:
         RESPAWN TIMES
     */
     [[nodiscard]] time_t GetLinkedRespawnTime(ObjectGuid guid) const;
-    [[nodiscard]] time_t GetCreatureRespawnTime(ObjectGuid guid) const
+    [[nodiscard]] time_t GetCreatureRespawnTime(ObjectGuid::LowType guid) const
     {
-        std::unordered_map<uint32 /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
+        std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
         if (itr != _creatureRespawnTimes.end())
             return itr->second;
 
         return time_t(0);
     }
 
-    [[nodiscard]] time_t GetGORespawnTime(uint32 dbGuid) const
+    [[nodiscard]] time_t GetGORespawnTime(ObjectGuid::LowType dbGuid) const
     {
-        std::unordered_map<uint32 /*dbGUID*/, time_t>::const_iterator itr = _goRespawnTimes.find(dbGuid);
+        std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t>::const_iterator itr = _goRespawnTimes.find(dbGuid);
         if (itr != _goRespawnTimes.end())
             return itr->second;
 
         return time_t(0);
     }
 
-    void SaveCreatureRespawnTime(uint32 dbGuid, time_t& respawnTime);
-    void RemoveCreatureRespawnTime(uint32 dbGuid);
-    void SaveGORespawnTime(uint32 dbGuid, time_t& respawnTime);
-    void RemoveGORespawnTime(uint32 dbGuid);
+    void SaveCreatureRespawnTime(ObjectGuid::LowType dbGuid, time_t& respawnTime);
+    void RemoveCreatureRespawnTime(ObjectGuid::LowType dbGuid);
+    void SaveGORespawnTime(ObjectGuid::LowType dbGuid, time_t& respawnTime);
+    void RemoveGORespawnTime(ObjectGuid::LowType dbGuid);
     void LoadRespawnTimes();
     void DeleteRespawnTimes();
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
@@ -619,7 +619,7 @@ private:
     Creature* _GetScriptCreature(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const;
     WorldObject* _GetScriptWorldObject(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const;
     void _ScriptProcessDoor(Object* source, Object* target, const ScriptInfo* scriptInfo) const;
-    GameObject* _FindGameObject(WorldObject* pWorldObject, uint32 guid) const;
+    GameObject* _FindGameObject(WorldObject* pWorldObject, ObjectGuid::LowType guid) const;
 
     //used for fast base_map (e.g. MapInstanced class object) search for
     //InstanceMaps and BattlegroundMaps...
@@ -666,8 +666,8 @@ private:
             m_activeNonPlayers.erase(obj);
     }
 
-    std::unordered_map<uint32 /*dbGUID*/, time_t> _creatureRespawnTimes;
-    std::unordered_map<uint32 /*dbGUID*/, time_t> _goRespawnTimes;
+    std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _creatureRespawnTimes;
+    std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _goRespawnTimes;
 
     ZoneDynamicInfoMap _zoneDynamicInfo;
     uint32 _defaultLight;

@@ -40,17 +40,17 @@ public:
     void LoadSignatures();
 
     // Petitions
-    void AddPetition(uint32 petitionId, uint32 ownerGuid, std::string const& name, uint8 type);
+    void AddPetition(uint32 petitionId, ObjectGuid ownerGuid, std::string const& name, uint8 type);
     void RemovePetition(uint32 petitionId);
-    void RemovePetitionByOwnerAndType(uint32 ownerGuid, uint8 type);
+    void RemovePetitionByOwnerAndType(ObjectGuid ownerGuid, uint8 type);
     Petition const* GetPetition(uint32 petitionId) const;
-    Petition const* GetPetitionByOwnerWithType(uint32 ownerGuid, uint8 type) const;
+    Petition const* GetPetitionByOwnerWithType(ObjectGuid ownerGuid, uint8 type) const;
     PetitionContainer* GetPetitionStore() { return &PetitionStore; }
 
     // Signatures
-    void AddSignature(uint32 petitionId, uint32 accountId, uint32 playerGuid);
-    void RemoveSignaturesByPlayer(uint32 playerGuid);
-    void RemoveSignaturesByPlayerAndType(uint32 playerGuid, uint8 type);
+    void AddSignature(uint32 petitionId, uint32 accountId, ObjectGuid playerGuid);
+    void RemoveSignaturesByPlayer(ObjectGuid playerGuid);
+    void RemoveSignaturesByPlayerAndType(ObjectGuid playerGuid, uint8 type);
     Signatures const* GetSignature(uint32 petitionId) const;
     SignatureContainer* GetSignatureStore() { return &SignatureStore; }
 

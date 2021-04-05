@@ -469,7 +469,7 @@ public:
             if (!cId)
                 return false;
 
-            uint32 lowguid = atoi(cId);
+            ObjectGuid::LowType lowguid = atoi(cId);
             if (!lowguid)
                 return false;
 
@@ -777,7 +777,7 @@ public:
             do
             {
                 Field* fields = result->Fetch();
-                uint32 guid = fields[0].GetUInt32();
+                ObjectGuid::LowType guid = fields[0].GetUInt32();
                 uint32 entry = fields[1].GetUInt32();
                 float x = fields[2].GetFloat();
                 float y = fields[3].GetFloat();
@@ -802,7 +802,7 @@ public:
     //move selected creature
     static bool HandleNpcMoveCommand(ChatHandler* handler, const char* args)
     {
-        uint32 lowguid.Clear();
+        ObjectGuid::LowType lowguid = 0;
 
         Creature* creature = handler->getSelectedCreature();
 
@@ -1124,7 +1124,7 @@ public:
             mtype = RANDOM_MOTION_TYPE;
 
         Creature* creature = handler->getSelectedCreature();
-        uint32 guidLow = 0;
+        ObjectGuid::LowType guidLow = 0;
 
         if (creature)
             guidLow = creature->GetSpawnId();
@@ -1173,7 +1173,7 @@ public:
         }
 
         Creature* creature = handler->getSelectedCreature();
-        uint32 guidLow = 0;
+        ObjectGuid::LowType guidLow = 0;
 
         if (creature)
             guidLow = creature->GetSpawnId();
@@ -1421,7 +1421,7 @@ public:
         if (!*args)
             return false;
 
-        uint32 leaderGUID = (uint32) atoi((char*)args);
+        ObjectGuid::LowType leaderGUID = (uint32) atoi((char*)args);
         Creature* creature = handler->getSelectedCreature();
 
         if (!creature || !creature->GetSpawnId())
@@ -1431,7 +1431,7 @@ public:
             return false;
         }
 
-        uint32 lowguid = creature->GetSpawnId();
+        ObjectGuid::LowType lowguid = creature->GetSpawnId();
         if (creature->GetFormation())
         {
             handler->PSendSysMessage("Selected creature is already member of group %u", creature->GetFormation()->GetId());
@@ -1473,7 +1473,7 @@ public:
         if (!*args)
             return false;
 
-        uint32 linkguid = (uint32) atoi((char*)args);
+        ObjectGuid::LowType linkguid = (uint32) atoi((char*)args);
 
         Creature* creature = handler->getSelectedCreature();
 

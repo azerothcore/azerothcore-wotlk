@@ -1005,7 +1005,7 @@ public:
         if (!e || !f)
             return false;
 
-        uint32 guid = (uint32)atoi(e);
+        ObjectGuid::LowType guid = (uint32)atoi(e);
         uint32 index = (uint32)atoi(f);
 
         Item* i = handler->GetSession()->GetPlayer()->GetItemByGuid(ObjectGuid::Create<HighGuid::Item>(guid));
@@ -1035,7 +1035,7 @@ public:
         if (!e || !f || !g)
             return false;
 
-        uint32 guid = (uint32)atoi(e);
+        ObjectGuid::LowType guid = (uint32)atoi(e);
         uint32 index = (uint32)atoi(f);
         uint32 value = (uint32)atoi(g);
 
@@ -1061,7 +1061,7 @@ public:
         if (!e)
             return false;
 
-        uint32 guid = (uint32)atoi(e);
+        ObjectGuid::LowType guid = (uint32)atoi(e);
 
         Item* i = handler->GetSession()->GetPlayer()->GetItemByGuid(ObjectGuid::Create<HighGuid::Item>(guid));
 

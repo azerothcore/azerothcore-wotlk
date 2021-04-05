@@ -738,7 +738,7 @@ public:
     void RemoveFromWorld() override;
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
-    virtual bool Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
+    virtual bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
     void Update(uint32 p_time) override;
     [[nodiscard]] GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
     [[nodiscard]] GameObjectTemplateAddon const* GetTemplateAddon() const;
@@ -761,8 +761,8 @@ public:
 
     void SaveToDB();
     void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
-    bool LoadFromDB(uint32 guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
-    bool LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap = true);
+    bool LoadFromDB(ObjectGuid::LowType guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
+    bool LoadGameObjectFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true);
     void DeleteFromDB();
 
     void SetOwnerGUID(ObjectGuid owner)
@@ -822,7 +822,7 @@ public:
     void SetGoArtKit(uint8 artkit);
     [[nodiscard]] uint8 GetGoAnimProgress() const { return GetByteValue(GAMEOBJECT_BYTES_1, 3); }
     void SetGoAnimProgress(uint8 animprogress) { SetByteValue(GAMEOBJECT_BYTES_1, 3, animprogress); }
-    static void SetGoArtKit(uint8 artkit, GameObject* go, uint32 lowguid = 0);
+    static void SetGoArtKit(uint8 artkit, GameObject* go, ObjectGuid::LowType lowguid = 0);
 
     void SetPhaseMask(uint32 newPhaseMask, bool update) override;
     void EnableCollision(bool enable);
@@ -840,11 +840,11 @@ public:
     void RemoveLootMode(uint16 lootMode) { m_LootMode &= ~lootMode; }
     void ResetLootMode() { m_LootMode = LOOT_MODE_DEFAULT; }
 
-    void AddToSkillupList(uint32 PlayerGuidLow) { m_SkillupList.push_back(PlayerGuidLow); }
-    [[nodiscard]] bool IsInSkillupList(uint32 PlayerGuidLow) const
+    void AddToSkillupList(ObjectGuid playerGuid) { m_SkillupList.push_back(playerGuid); }
+    [[nodiscard]] bool IsInSkillupList(ObjectGuid playerGuid) const
     {
-        for (unsigned int i : m_SkillupList)
-            if (i == PlayerGuidLow)
+        for (ObjectGuid const guid : m_SkillupList)
+            if (guid == playerGuid)
                 return true;
 
         return false;
@@ -961,9 +961,8 @@ protected:
     bool        m_spawnedByDefault;
     uint32       m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
     // For traps this: spell casting cooldown, for doors/buttons: reset time.
-    std::list<uint32> m_SkillupList;
+    GuidList m_SkillupList;
 
-    uint32 m_ritualOwnerGUIDLow;                              // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
     GuidSet m_unique_users;
     uint32 m_usetimes;
 

@@ -209,13 +209,13 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
     {
         do
         {
-            uint32 guidlow = (*result)[0].GetUInt32();
+            ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>((*result)[0].GetUInt32());
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             sLog->outDetail("Loading char guid %u from account %u.", guidlow, GetAccountId());
 #endif
             if (Player::BuildEnumData(result, &data))
             {
-                _legitCharacters.insert(guidlow);
+                _legitCharacters.insert(guid);
                 ++num;
             }
         } while (result->NextRow());
@@ -1489,7 +1489,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(PreparedQueryResult resu
 
     Field* fields = result->Fetch();
 
-    uint32 guidLow      = fields[0].GetUInt32();
+    ObjectGuid::LowType guidLow = fields[0].GetUInt32();
     std::string oldName = fields[1].GetString();
 
     ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(guidLow);

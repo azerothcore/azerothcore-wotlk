@@ -242,7 +242,7 @@ void Pet::SavePetToDB(PetSaveMode mode, bool logout)
     // current/stable/not_in_slot
     if (mode >= PET_SAVE_AS_CURRENT)
     {
-        uint32 ownerLowGUID = GetOwnerGUID().GetCounter();
+        ObjectGuid::LowType ownerLowGUID = GetOwnerGUID().GetCounter();
         trans = CharacterDatabase.BeginTransaction();
         // remove current data
 
@@ -306,7 +306,7 @@ void Pet::SavePetToDB(PetSaveMode mode, bool logout)
     }
 }
 
-void Pet::DeleteFromDB(uint32 guidlow)
+void Pet::DeleteFromDB(ObjectGuid::LowType guidlow)
 {
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 

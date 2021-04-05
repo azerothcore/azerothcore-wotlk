@@ -47,7 +47,6 @@ GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_spellId = 0;
     m_cooldownTime = 0;
     m_goInfo = nullptr;
-    m_ritualOwnerGUIDLow = 0;
     m_goData = nullptr;
     m_packedRotation = 0;
 
@@ -219,7 +218,7 @@ void GameObject::ClearRitualList()
     m_unique_users.clear();
 }
 
-bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit)
+bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit)
 {
     ASSERT(map);
     SetMap(map);
@@ -1229,7 +1228,7 @@ void GameObject::SetGoArtKit(uint8 kit)
         data->artKit = kit;
 }
 
-void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, uint32 lowguid)
+void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, ObjectGuid::LowType lowguid)
 {
     const GameObjectData* data = nullptr;
     if (go)

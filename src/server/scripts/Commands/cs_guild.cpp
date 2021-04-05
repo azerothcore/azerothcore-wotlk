@@ -159,7 +159,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid))
             return false;
 
-        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(targetGuid);
+        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(targetGuid.GetCounter());
         if (!guildId)
             return false;
 
@@ -185,7 +185,7 @@ public:
         if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &target_name))
             return false;
 
-        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(targetGuid);
+        uint32 guildId = target ? target->GetGuildId() : Player::GetGuildIdFromStorage(targetGuid.GetCounter());
         if (!guildId)
             return false;
 

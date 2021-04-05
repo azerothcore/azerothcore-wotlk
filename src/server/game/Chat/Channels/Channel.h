@@ -194,7 +194,7 @@ public:
     void KickOrBan(Player const* player, std::string const& badname, bool ban);
     void Kick(Player const* player, std::string const& badname) { KickOrBan(player, badname, false); }
     void Ban(Player const* player, std::string const& badname) { KickOrBan(player, badname, true); }
-    void AddBan(uint32 guid, uint32 time) { bannedStore[guid] = time; }
+    void AddBan(ObjectGuid guid, uint32 time) { bannedStore[guid] = time; }
     void UnBan(Player const* player, std::string const& badname);
     void UnBan(ObjectGuid guid);
     void Password(Player const* player, std::string const& pass);
@@ -274,8 +274,8 @@ private:
 
     void UpdateChannelInDB() const;
     void UpdateChannelUseageInDB() const;
-    void AddChannelBanToDB(uint32 guid, uint32 time) const;
-    void RemoveChannelBanFromDB(uint32 guid) const;
+    void AddChannelBanToDB(ObjectGuid guid, uint32 time) const;
+    void RemoveChannelBanFromDB(ObjectGuid guid) const;
 
     uint8 GetPlayerFlags(ObjectGuid guid) const
     {

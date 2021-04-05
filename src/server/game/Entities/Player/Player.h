@@ -1125,10 +1125,10 @@ public:
     }
     [[nodiscard]] bool IsSummonAsSpectator() const { return m_summon_asSpectator && m_summon_expire >= time(nullptr); }
     void SetSummonAsSpectator(bool on) { m_summon_asSpectator = on; }
-    void SummonIfPossible(bool agree, uint32 summoner_guid);
+    void SummonIfPossible(bool agree, ObjectGuid summoner_guid);
     [[nodiscard]] time_t GetSummonExpireTimer() const { return m_summon_expire; }
 
-    bool Create(uint32 guidlow, CharacterCreateInfo* createInfo);
+    bool Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo);
 
     void Update(uint32 time) override;
 
@@ -1509,7 +1509,7 @@ public:
     void KilledMonster(CreatureTemplate const* cInfo, ObjectGuid guid);
     void KilledMonsterCredit(uint32 entry, ObjectGuid guid);
     void KilledPlayerCredit();
-    void KillCreditGO(uint32 entry, ObjectGuid guid = 0);
+    void KillCreditGO(uint32 entry, ObjectGuid guid = ObjectGuid::Empty);
     void TalkedToCreature(uint32 entry, ObjectGuid guid);
     void MoneyChanged(uint32 value);
     void ReputationChanged(FactionEntry const* factionEntry);
@@ -1546,15 +1546,15 @@ public:
     /***                   LOAD SYSTEM                     ***/
     /*********************************************************/
 
-    bool LoadFromDB(uint32 guid, SQLQueryHolder* holder);
+    bool LoadFromDB(ObjectGuid::LowType guid, SQLQueryHolder* holder);
     [[nodiscard]] bool isBeingLoaded() const override;
 
-    void Initialize(uint32 guid);
+    void Initialize(ObjectGuid::LowType guid);
     static uint32 GetUInt32ValueFromArray(Tokenizer const& data, uint16 index);
     static float  GetFloatValueFromArray(Tokenizer const& data, uint16 index);
     static uint32 GetZoneIdFromDB(ObjectGuid guid);
-    static uint32 GetLevelFromStorage(ObjectGuid guid);
-    static bool   LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid guid);
+    static uint32 GetLevelFromStorage(ObjectGuid::LowType guid);
+    static bool   LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid::LowType guid);
 
     static bool IsValidGender(uint8 Gender) { return Gender <= GENDER_FEMALE; }
 
@@ -1626,7 +1626,7 @@ public:
     void ClearComboPoints();
     void SendComboPoints();
 
-    void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, uint32 item_guid = 0, uint32 item_count = 0);
+    void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, ObjectGuid::LowType item_guid = 0, uint32 item_count = 0);
     void SendNewMail();
     void UpdateNextMailTimeAndUnreads();
     void AddNewMailDeliverTime(time_t deliver_time);
@@ -1890,9 +1890,9 @@ public:
     void SetGuildIdInvited(uint32 GuildId) { m_GuildIdInvited = GuildId; }
     [[nodiscard]] uint32 GetGuildId() const { return GetUInt32Value(PLAYER_GUILDID);  }
     [[nodiscard]] Guild* GetGuild() const;
-    static uint32 GetGuildIdFromStorage(uint32 guid);
-    static uint32 GetGroupIdFromStorage(uint32 guid);
-    static uint32 GetArenaTeamIdFromStorage(uint32 guid, uint8 slot);
+    static uint32 GetGuildIdFromStorage(ObjectGuid::LowType guid);
+    static uint32 GetGroupIdFromStorage(ObjectGuid::LowType guid);
+    static uint32 GetArenaTeamIdFromStorage(ObjectGuid::LowType guid, uint8 slot);
     uint32 GetGuildIdInvited() { return m_GuildIdInvited; }
     static void RemovePetitionsAndSigns(ObjectGuid guid, uint32 type);
 
@@ -2569,13 +2569,13 @@ public:
     [[nodiscard]] bool HasPendingSpectatorForBG(uint32 bgInstanceId) const { return m_pendingSpectatorForBG == bgInstanceId; }
     void SetPendingSpectatorInviteInstanceId(uint32 bgInstanceId) { m_pendingSpectatorInviteInstanceId = bgInstanceId; }
     [[nodiscard]] uint32 GetPendingSpectatorInviteInstanceId() const { return m_pendingSpectatorInviteInstanceId; }
-    bool HasReceivedSpectatorResetFor(uint32 guid) { return m_receivedSpectatorResetFor.find(guid) != m_receivedSpectatorResetFor.end(); }
+    bool HasReceivedSpectatorResetFor(ObjectGuid guid) { return m_receivedSpectatorResetFor.find(guid) != m_receivedSpectatorResetFor.end(); }
     void ClearReceivedSpectatorResetFor() { m_receivedSpectatorResetFor.clear(); }
-    void AddReceivedSpectatorResetFor(uint32 guid) { m_receivedSpectatorResetFor.insert(guid); }
-    void RemoveReceivedSpectatorResetFor(uint32 guid) { m_receivedSpectatorResetFor.erase(guid); }
+    void AddReceivedSpectatorResetFor(ObjectGuid guid) { m_receivedSpectatorResetFor.insert(guid); }
+    void RemoveReceivedSpectatorResetFor(ObjectGuid guid) { m_receivedSpectatorResetFor.erase(guid); }
     uint32 m_pendingSpectatorForBG;
     uint32 m_pendingSpectatorInviteInstanceId;
-    std::set<uint32> m_receivedSpectatorResetFor;
+    GuidSet m_receivedSpectatorResetFor;
 
     // Dancing Rune weapon
     void setRuneWeaponGUID(ObjectGuid guid) { m_drwGUID = guid; };

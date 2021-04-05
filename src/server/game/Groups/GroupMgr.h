@@ -20,10 +20,10 @@ public:
 
     typedef std::map<uint32, Group*> GroupContainer;
 
-    Group* GetGroupByGUID(uint32 guid) const;
+    Group* GetGroupByGUID(ObjectGuid::LowType guid) const;
 
     void InitGroupIds();
-    void RegisterGroupId(uint32 groupId);
+    void RegisterGroupId(ObjectGuid::LowType groupId);
     ObjectGuid::LowType GenerateGroupId();
 
     void LoadGroups();
@@ -32,9 +32,9 @@ public:
 
 protected:
     typedef std::vector<bool> GroupIds;
-    GroupIds         _groupIds;
-    uint32           _nextGroupId;
-    GroupContainer   GroupStore;
+    GroupIds            _groupIds;
+    ObjectGuid::LowType _nextGroupId;
+    GroupContainer      GroupStore;
 };
 
 #define sGroupMgr GroupMgr::instance()

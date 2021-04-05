@@ -74,7 +74,7 @@ public:
     // Stores informations about a deleted character
     struct DeletedInfo
     {
-        uint32      lowGuid;                            ///< the low GUID from the character
+        ObjectGuid::LowType lowGuid;                    ///< the low GUID from the character
         std::string name;                               ///< the character name
         uint32      accountId;                          ///< the account id
         std::string accountName;                        ///< the account name
@@ -688,7 +688,7 @@ public:
         if (!normalizePlayerName(characterName))
             return false;
 
-        uint32 characterGuid;
+        ObjectGuid characterGuid;
         uint32 accountId;
 
         Player* player = ObjectAccessor::FindPlayerByName(characterName);
@@ -707,14 +707,14 @@ public:
                 handler->SetSentErrorMessage(true);
                 return false;
             }
-            accountId = sObjectMgr->GetPlayerAccountIdByGUID(characterGuid);
+            accountId = sObjectMgr->GetPlayerAccountIdByGUID(characterGuid.GetCounter());
         }
 
         std::string accountName;
         AccountMgr::GetName(accountId, accountName);
 
         Player::DeleteFromDB(characterGuid, accountId, true, true);
-        handler->PSendSysMessage(LANG_CHARACTER_DELETED, characterName.c_str(), characterGuid, accountName.c_str(), accountId);
+        handler->PSendSysMessage(LANG_CHARACTER_DELETED, characterName.c_str(), characterGuid.GetCounter(), accountName.c_str(), accountId);
 
         return true;
     }
@@ -824,7 +824,7 @@ public:
             guidStr = strtok(nullptr, " ");
         }
 
-        uint32 guid = 0;
+        ObjectGuid::LowType guid = 0;
 
         if (guidStr)
         {

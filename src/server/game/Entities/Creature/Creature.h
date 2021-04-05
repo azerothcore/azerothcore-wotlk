@@ -448,7 +448,7 @@ public:
 
     void DisappearAndDie();
 
-    bool Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
+    bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
     bool LoadCreaturesAddon(bool reload = false);
     void SelectLevel(bool changelevel = true);
     void LoadEquipment(int8 id = 1, bool force = false);
@@ -587,8 +587,8 @@ public:
 
     void setDeathState(DeathState s, bool despawn = false) override;                   // override virtual Unit::setDeathState
 
-    bool LoadFromDB(uint32 guid, Map* map) { return LoadCreatureFromDB(guid, map, false, true); }
-    bool LoadCreatureFromDB(uint32 guid, Map* map, bool addToMap = true, bool gridLoad = false);
+    bool LoadFromDB(ObjectGuid::LowType guid, Map* map) { return LoadCreatureFromDB(guid, map, false, true); }
+    bool LoadCreatureFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true, bool gridLoad = false);
     void SaveToDB();
     // overriden in Pet
     virtual void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
@@ -665,7 +665,7 @@ public:
     void SetWanderDistance(float dist) { m_wanderDistance = dist; }
 
     uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
-    uint32 lootingGroupLowGUID;                         // used to find group which is looting corpse
+    ObjectGuid lootingGroupGUID;                        // used to find group which is looting corpse
 
     void SendZoneUnderAttackMessage(Player* attacker);
 
@@ -758,7 +758,7 @@ public:
     void RefreshSwimmingFlag(bool recheck = false);
 
 protected:
-    bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
+    bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
     bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
 
     // vendor items

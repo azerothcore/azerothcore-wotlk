@@ -110,20 +110,20 @@ void Channel::UpdateChannelUseageInDB() const
     CharacterDatabase.Execute(stmt);
 }
 
-void Channel::AddChannelBanToDB(uint32 guid, uint32 time) const
+void Channel::AddChannelBanToDB(ObjectGuid guid, uint32 time) const
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHANNEL_BAN);
     stmt->setUInt32(0, _channelDBId);
-    stmt->setUInt32(1, guid);
+    stmt->setUInt32(1, guid.GetCounter());
     stmt->setUInt32(2, time);
     CharacterDatabase.Execute(stmt);
 }
 
-void Channel::RemoveChannelBanFromDB(uint32 guid) const
+void Channel::RemoveChannelBanFromDB(ObjectGuid guid) const
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHANNEL_BAN);
     stmt->setUInt32(0, _channelDBId);
-    stmt->setUInt32(1, guid);
+    stmt->setUInt32(1, guid.GetCounter());
     CharacterDatabase.Execute(stmt);
 }
 
@@ -348,7 +348,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
     {
         if (ban && (AccountMgr::IsGMAccount(sec) || isGoodConstantModerator))
         {
-            if (uint32 lowGuid = sWorld->GetGlobalPlayerGUID(badname))
+            if (ObjectGuid::LowType lowGuid = sWorld->GetGlobalPlayerGUID(badname))
                 if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(lowGuid))
                 {
                     if (Player::TeamIdForRace(gpd->race) == Player::TeamIdForRace(player->getRace()))
@@ -485,7 +485,7 @@ void Channel::UnBan(Player const* player, std::string const& badname)
     }
 
     ObjectGuid victim;
-    if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(badname))
+    if (ObjectGuid::LowType guidLow = sWorld->GetGlobalPlayerGUID(badname))
         victim = ObjectGuid::Create<HighGuid::Player>(guidLow);
 
     if (!victim || !IsBanned(victim))

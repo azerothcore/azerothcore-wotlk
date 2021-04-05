@@ -156,7 +156,7 @@ public:
         return 0;
     }
 
-    GameObject* FindGameObjectNear(WorldObject* searchObject, uint32 guid) const
+    GameObject* FindGameObjectNear(WorldObject* searchObject, ObjectGuid::LowType guid) const
     {
         GameObject* gameObject = nullptr;
 

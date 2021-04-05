@@ -590,7 +590,7 @@ public:                                                 // opcodes handlers
     void HandleStableRevivePet(WorldPacket& recvPacket);
     void HandleStableSwapPet(WorldPacket& recvPacket);
     void HandleStableSwapPetCallback(PreparedQueryResult result, uint32 petId);
-    void HandleOpenWrappedItemCallback(PreparedQueryResult result, uint8 bagIndex, uint8 slot, uint32 itemLowGUID);
+    void HandleOpenWrappedItemCallback(PreparedQueryResult result, uint8 bagIndex, uint8 slot, ObjectGuid::LowType itemLowGUID);
     void HandleLoadActionsSwitchSpec(PreparedQueryResult result);
     void HandleCharacterAuraFrozen(PreparedQueryResult result);
     uint8 HandleLoadPetFromDBFirstCallback(PreparedQueryResult result, uint8 asynchLoadType);
@@ -994,16 +994,16 @@ private:
     bool recoveryItem(Item* pItem);
 
     // EnumData helpers
-    bool IsLegitCharacterForAccount(uint32 lowGUID)
+    bool IsLegitCharacterForAccount(ObjectGuid gUID)
     {
         return _legitCharacters.find(lowGUID) != _legitCharacters.end();
     }
 
     // this stores the GUIDs of the characters who can login
     // characters who failed on Player::BuildEnumData shouldn't login
-    std::set<uint32> _legitCharacters;
+    GuidSet _legitCharacters;
 
-    uint32 m_GUIDLow;
+    ObjectGuid::LowType m_GUIDLow;
     Player* _player;
     WorldSocket* m_Socket;
     std::string m_Address;

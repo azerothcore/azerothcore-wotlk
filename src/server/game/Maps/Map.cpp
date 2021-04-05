@@ -3185,10 +3185,10 @@ void Map::LoadRespawnTimes()
         do
         {
             Field* fields = result->Fetch();
-            uint32 loguid      = fields[0].GetUInt32();
+            ObjectGuid::LowType lowguid = fields[0].GetUInt32();
             uint32 respawnTime = fields[1].GetUInt32();
 
-            _creatureRespawnTimes[loguid] = time_t(respawnTime);
+            _creatureRespawnTimes[lowguid] = time_t(respawnTime);
         } while (result->NextRow());
     }
 
@@ -3200,7 +3200,7 @@ void Map::LoadRespawnTimes()
         do
         {
             Field* fields = result->Fetch();
-            uint32 loguid      = fields[0].GetUInt32();
+            ObjectGuid::LowType lowguid = fields[0].GetUInt32();
             uint32 respawnTime = fields[1].GetUInt32();
 
             _goRespawnTimes[loguid] = time_t(respawnTime);

@@ -32,7 +32,7 @@ MotionTransport::~MotionTransport()
     UnloadStaticPassengers();
 }
 
-bool MotionTransport::CreateMoTrans(uint32 guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress)
+bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress)
 {
     Relocate(x, y, z, ang);
 
@@ -302,7 +302,7 @@ void MotionTransport::RemovePassenger(WorldObject* passenger, bool withAll)
     }
 }
 
-Creature* MotionTransport::CreateNPCPassenger(uint32 guid, CreatureData const* data)
+Creature* MotionTransport::CreateNPCPassenger(ObjectGuid::LowType guid, CreatureData const* data)
 {
     Map* map = GetMap();
     Creature* creature = new Creature();
@@ -350,7 +350,7 @@ Creature* MotionTransport::CreateNPCPassenger(uint32 guid, CreatureData const* d
     return creature;
 }
 
-GameObject* MotionTransport::CreateGOPassenger(uint32 guid, GameObjectData const* data)
+GameObject* MotionTransport::CreateGOPassenger(ObjectGuid::LowType guid, GameObjectData const* data)
 {
     Map* map = GetMap();
     GameObject* go = new GameObject();
@@ -662,7 +662,7 @@ StaticTransport::~StaticTransport()
     ASSERT(_passengers.empty());
 }
 
-bool StaticTransport::Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit)
+bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit)
 {
     ASSERT(map);
     SetMap(map);

@@ -1048,7 +1048,7 @@ ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text)
             }
         case SPELL_LINK_CREATURE:
             {
-                uint32 lowguid = (uint32)atol(idS);
+                ObjectGuid::LowType lowguid = (uint32)atol(idS);
 
                 if (CreatureData const* data = sObjectMgr->GetCreatureData(lowguid))
                     return lowguid;
@@ -1057,7 +1057,7 @@ ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text)
             }
         case SPELL_LINK_GAMEOBJECT:
             {
-                uint32 lowguid = (uint32)atol(idS);
+                ObjectGuid::LowType lowguid = (uint32)atol(idS);
 
                 if (GameObjectData const* data = sObjectMgr->GetGOData(lowguid))
                     return lowguid;

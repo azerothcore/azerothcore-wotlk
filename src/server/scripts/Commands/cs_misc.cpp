@@ -1800,7 +1800,7 @@ public:
 
         // Account data print variables
         std::string userName          = handler->GetAcoreString(LANG_ERROR);
-        uint32 lowguid                = targetGuid.GetCounter();
+        ObjectGuid::LowType lowguid   = targetGuid.GetCounter();
         uint32 accId                  = 0;
         std::string eMail             = handler->GetAcoreString(LANG_ERROR);
         std::string regMail           = handler->GetAcoreString(LANG_ERROR);
@@ -2007,8 +2007,8 @@ public:
         if (charXpResult)
         {
             Field* fields = charXpResult->Fetch();
-            xp            = fields[0].GetUInt32();
-            uint32 gguid  = fields[1].GetUInt32();
+            xp = fields[0].GetUInt32();
+            ObjectGuid::LowType gguid = fields[1].GetUInt32();
 
             if (gguid != 0)
             {

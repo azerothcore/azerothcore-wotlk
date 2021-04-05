@@ -73,7 +73,7 @@ MailReceiver::MailReceiver(Player* receiver) : m_receiver(receiver), m_receiver_
 {
 }
 
-MailReceiver::MailReceiver(Player* receiver, uint32 receiver_lowguid) : m_receiver(receiver), m_receiver_lowguid(receiver_lowguid)
+MailReceiver::MailReceiver(Player* receiver, ObjectGuid::LowType receiver_lowguid) : m_receiver(receiver), m_receiver_lowguid(receiver_lowguid)
 {
     ASSERT(!receiver || receiver->GetGUID().GetCounter() == receiver_lowguid);
 }
@@ -129,7 +129,7 @@ void MailDraft::deleteIncludedItems(SQLTransaction& trans, bool inDB /*= false*/
     m_items.clear();
 }
 
-void MailDraft::SendReturnToSender(uint32  /*sender_acc*/, ObjectGuid sender_guid, ObjectGuid receiver_guid, SQLTransaction& trans)
+void MailDraft::SendReturnToSender(uint32 /*sender_acc*/, ObjectGuid::LowType sender_guid, ObjectGuid::LowType receiver_guid, SQLTransaction& trans)
 {
     Player* receiver = ObjectAccessor::FindPlayerInOrOutOfWorld(receiver_guid);
 
@@ -155,7 +155,7 @@ void MailDraft::SendReturnToSender(uint32  /*sender_acc*/, ObjectGuid sender_gui
             item->SaveToDB(trans);                      // item not in inventory and can be save standalone
             // owner in data will set at mail receive and item extracting
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
-            stmt->setUInt32(0, receiver_guid.GetCounter());
+            stmt->setUInt32(0, receiver_guid);
             stmt->setUInt32(1, item->GetGUID().GetCounter());
             trans->Append(stmt);
         }

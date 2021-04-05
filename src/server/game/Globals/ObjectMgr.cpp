@@ -1018,7 +1018,7 @@ void ObjectMgr::LoadCreatureAddons()
     {
         Field* fields = result->Fetch();
 
-        uint32 guid = fields[0].GetUInt32();
+        ObjectGuid::LowType guid = fields[0].GetUInt32();
 
         CreatureData const* creData = GetCreatureData(guid);
         if (!creData)
@@ -1097,7 +1097,7 @@ void ObjectMgr::LoadGameObjectAddons()
     {
         Field* fields = result->Fetch();
 
-        uint32 guid = fields[0].GetUInt32();
+        ObjectGuid::LowType guid = fields[0].GetUInt32();
 
         const GameObjectData* goData = GetGOData(guid);
         if (!goData)
@@ -1130,7 +1130,7 @@ void ObjectMgr::LoadGameObjectAddons()
     sLog->outString();
 }
 
-GameObjectAddon const* ObjectMgr::GetGameObjectAddon(uint32 lowguid)
+GameObjectAddon const* ObjectMgr::GetGameObjectAddon(ObjectGuid::LowType lowguid)
 {
     GameObjectAddonContainer::const_iterator itr = _gameObjectAddonStore.find(lowguid);
     if (itr != _gameObjectAddonStore.end())
@@ -1139,7 +1139,7 @@ GameObjectAddon const* ObjectMgr::GetGameObjectAddon(uint32 lowguid)
     return nullptr;
 }
 
-CreatureAddon const* ObjectMgr::GetCreatureAddon(uint32 lowguid)
+CreatureAddon const* ObjectMgr::GetCreatureAddon(ObjectGuid::LowType lowguid)
 {
     CreatureAddonContainer::const_iterator itr = _creatureAddonStore.find(lowguid);
     if (itr != _creatureAddonStore.end())
@@ -1397,11 +1397,11 @@ void ObjectMgr::LoadLinkedRespawn()
     {
         Field* fields = result->Fetch();
 
-        uint32 guidLow = fields[0].GetUInt32();
-        uint32 linkedGuidLow = fields[1].GetUInt32();
+        ObjectGuid::LowType guidLow = fields[0].GetUInt32();
+        ObjectGuid::LowType linkedGuidLow = fields[1].GetUInt32();
         uint8  linkType = fields[2].GetUInt8();
 
-        ObjectGuid guid = 0, linkedGuid = 0;
+        ObjectGuid guid, linkedGuid;
         bool error = false;
         switch (linkType)
         {
@@ -1563,7 +1563,7 @@ void ObjectMgr::LoadLinkedRespawn()
     sLog->outString();
 }
 
-bool ObjectMgr::SetCreatureLinkedRespawn(uint32 guidLow, uint32 linkedGuidLow)
+bool ObjectMgr::SetCreatureLinkedRespawn(ObjectGuid::LowType guidLow, ObjectGuid::LowType linkedGuidLow)
 {
     if (!guidLow)
         return false;
@@ -1859,7 +1859,7 @@ void ObjectMgr::LoadCreatures()
     sLog->outString();
 }
 
-void ObjectMgr::AddCreatureToGrid(uint32 guid, CreatureData const* data)
+void ObjectMgr::AddCreatureToGrid(ObjectGuid::LowType guid, CreatureData const* data)
 {
     uint8 mask = data->spawnMask;
     for (uint8 i = 0; mask != 0; i++, mask >>= 1)
@@ -1873,7 +1873,7 @@ void ObjectMgr::AddCreatureToGrid(uint32 guid, CreatureData const* data)
     }
 }
 
-void ObjectMgr::RemoveCreatureFromGrid(uint32 guid, CreatureData const* data)
+void ObjectMgr::RemoveCreatureFromGrid(ObjectGuid::LowType guid, CreatureData const* data)
 {
     uint8 mask = data->spawnMask;
     for (uint8 i = 0; mask != 0; i++, mask >>= 1)
@@ -2061,8 +2061,8 @@ void ObjectMgr::LoadGameobjects()
     {
         Field* fields = result->Fetch();
 
-        uint32 guid         = fields[0].GetUInt32();
-        uint32 entry        = fields[1].GetUInt32();
+        ObjectGuid::LowType guid    = fields[0].GetUInt32();
+        uint32 entry                = fields[1].GetUInt32();
 
         GameObjectTemplate const* gInfo = GetGameObjectTemplate(entry);
         if (!gInfo)
@@ -2195,7 +2195,7 @@ void ObjectMgr::LoadGameobjects()
     sLog->outString();
 }
 
-void ObjectMgr::AddGameobjectToGrid(uint32 guid, GameObjectData const* data)
+void ObjectMgr::AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData const* data)
 {
     uint8 mask = data->spawnMask;
     for (uint8 i = 0; mask != 0; i++, mask >>= 1)
@@ -2209,7 +2209,7 @@ void ObjectMgr::AddGameobjectToGrid(uint32 guid, GameObjectData const* data)
     }
 }
 
-void ObjectMgr::RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data)
+void ObjectMgr::RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectData const* data)
 {
     uint8 mask = data->spawnMask;
     for (uint8 i = 0; mask != 0; i++, mask >>= 1)
@@ -2226,7 +2226,7 @@ void ObjectMgr::RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data
 ObjectGuid ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
 {
     // Get data from global storage
-    if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(name))
+    if (ObjectGuid::LowType guidLow = sWorld->GetGlobalPlayerGUID(name))
         return ObjectGuid::Create<HighGuid::Player>(guidLow);
 
     // No player found
@@ -2245,7 +2245,7 @@ bool ObjectMgr::GetPlayerNameByGUID(ObjectGuid guid, std::string& name) const
     return false;
 }
 
-TeamId ObjectMgr::GetPlayerTeamIdByGUID(ObjectGuid guid) const
+TeamId ObjectMgr::GetPlayerTeamIdByGUID(ObjectGuid::LowType guid) const
 {
     // xinef: Get data from global storage
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
@@ -2254,7 +2254,7 @@ TeamId ObjectMgr::GetPlayerTeamIdByGUID(ObjectGuid guid) const
     return TEAM_NEUTRAL;
 }
 
-uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid guid) const
+uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid::LowType guid) const
 {
     // xinef: Get data from global storage
     if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
@@ -2266,7 +2266,7 @@ uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid guid) const
 uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(const std::string& name) const
 {
     // Get data from global storage
-    if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(name))
+    if (ObjectGuid::LowType guidLow = sWorld->GetGlobalPlayerGUID(name))
         if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guidLow))
             return playerData->accountId;
 
@@ -6791,7 +6791,7 @@ void ObjectMgr::LoadCorpses()
     do
     {
         Field* fields = result->Fetch();
-        uint32 guid = fields[16].GetUInt32();
+        ObjectGuid::LowType guid = fields[16].GetUInt32();
         CorpseType type = CorpseType(fields[13].GetUInt8());
         if (type >= MAX_CORPSE_TYPE)
         {
@@ -7278,7 +7278,7 @@ void ObjectMgr::LoadNPCSpellClickSpells()
     sLog->outString();
 }
 
-void ObjectMgr::DeleteCreatureData(uint32 guid)
+void ObjectMgr::DeleteCreatureData(ObjectGuid::LowType guid)
 {
     // remove mapid*cellid -> guid_set map
     CreatureData const* data = GetCreatureData(guid);
@@ -7288,7 +7288,7 @@ void ObjectMgr::DeleteCreatureData(uint32 guid)
     _creatureDataStore.erase(guid);
 }
 
-void ObjectMgr::DeleteGOData(uint32 guid)
+void ObjectMgr::DeleteGOData(ObjectGuid::LowType guid)
 {
     // remove mapid*cellid -> guid_set map
     GameObjectData const* data = GetGOData(guid);
@@ -7298,14 +7298,14 @@ void ObjectMgr::DeleteGOData(uint32 guid)
     _gameObjectDataStore.erase(guid);
 }
 
-void ObjectMgr::AddCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_guid, uint32 instance)
+void ObjectMgr::AddCorpseCellData(uint32 mapid, uint32 cellid, ObjectGuid::LowType player_guid, uint32 instance)
 {
     // corpses are always added to spawn mode 0 and they are spawned by their instance id
     CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(mapid, 0)][cellid];
     cell_guids.corpses[player_guid] = instance;
 }
 
-void ObjectMgr::DeleteCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_guid)
+void ObjectMgr::DeleteCorpseCellData(uint32 mapid, uint32 cellid, ObjectGuid::LowType player_guid)
 {
     // corpses are always added to spawn mode 0 and they are spawned by their instance id
     CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(mapid, 0)][cellid];
@@ -9045,7 +9045,7 @@ GameObjectTemplate const* ObjectMgr::GetGameObjectTemplate(uint32 entry)
     return nullptr;
 }
 
-Player* ObjectMgr::GetPlayerByLowGUID(uint32 lowguid) const
+Player* ObjectMgr::GetPlayerByLowGUID(ObjectGuid::LowType lowguid) const
 {
     return ObjectAccessor::FindPlayer(ObjectGuid::Create<HighGuid::Player>(lowguid));
 }

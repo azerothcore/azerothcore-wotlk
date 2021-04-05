@@ -86,7 +86,7 @@ public:
 
         // We declare all the required variables
         uint32 playerGuid = accountId;
-        uint32 characterGuid.Clear();
+        uint32 characterGuid = 0;
         std::string systemNote = "ERROR"; // "ERROR" is a placeholder here. We change it later.
 
         // With this switch, we change systemNote so that we have a more accurate phrasing of what type it is.
@@ -256,7 +256,7 @@ public:
         DeleteIPLogAction(guid, accountId, CHARACTER_FAILED_DELETE);
     }
 
-    void DeleteIPLogAction(ObjectGuid guid, uint32 playerGuid, IPLoggingTypes aType)
+    void DeleteIPLogAction(ObjectGuid guid, ObjectGuid::LowType playerGuid, IPLoggingTypes aType)
     {
         if (!sWorld->getBoolConfig(CONFIG_IP_BASED_ACTION_LOGGING))
             return;
@@ -265,7 +265,7 @@ public:
         // Else, this script isn't loaded in the first place: We require no config check.
 
         // We declare all the required variables
-        uint32 characterGuid = guid.GetCounter(); // We have no access to any member function of Player* or WorldSession*. So use old-fashioned way.
+        ObjectGuid::LowType characterGuid = guid.GetCounter(); // We have no access to any member function of Player* or WorldSession*. So use old-fashioned way.
         // Query playerGuid/accountId, as we only have characterGuid
         std::string systemNote = "ERROR"; // "ERROR" is a placeholder here. We change it later.
 

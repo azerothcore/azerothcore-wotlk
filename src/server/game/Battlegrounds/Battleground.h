@@ -274,7 +274,7 @@ class ArenaLogEntryData
 {
 public:
     ArenaLogEntryData()  {}
-    void Fill(const char* name, uint32 guid, uint32 acc, uint32 arenaTeamId, std::string ip)
+    void Fill(const char* name, ObjectGuid::LowType guid, uint32 acc, uint32 arenaTeamId, std::string ip)
     {
         Name = std::string(name);
         Guid = guid;
@@ -284,7 +284,7 @@ public:
     }
 
     std::string Name;
-    uint32 Guid{0};
+    ObjectGuid::LowType Guid{0};
     uint32 Acc;
     uint32 ArenaTeamId{0};
     std::string IP;

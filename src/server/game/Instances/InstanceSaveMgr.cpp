@@ -192,16 +192,16 @@ MapEntry const* InstanceSave::GetMapEntry()
     return sMapStore.LookupEntry(m_mapid);
 }
 
-void InstanceSave::AddPlayer(uint32 guidLow)
+void InstanceSave::AddPlayer(ObjectGuid guid)
 {
     ACORE_GUARD(ACE_Thread_Mutex, _lock);
-    m_playerList.push_back(guidLow);
+    m_playerList.push_back(guid);
 }
 
-bool InstanceSave::RemovePlayer(uint32 guidLow, InstanceSaveManager* ism)
+bool InstanceSave::RemovePlayer(ObjectGuid guid, InstanceSaveManager* ism)
 {
     ACORE_GUARD(ACE_Thread_Mutex, _lock);
-    m_playerList.remove(guidLow);
+    m_playerList.remove(guid);
 
     // ism passed as an argument to avoid calling via singleton (might result in a deadlock)
     return ism->DeleteInstanceSaveIfNeeded(this->GetInstanceId(), false);
@@ -360,7 +360,7 @@ void InstanceSaveManager::LoadCharacterBinds()
         {
             Field* fields = result->Fetch();
 
-            uint32 guid = fields[0].GetUInt32();
+            ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32());
             uint32 instanceId = fields[1].GetUInt32();
             bool perm = fields[2].GetBool();
             bool extended = fields[3].GetBool();
@@ -374,7 +374,7 @@ void InstanceSaveManager::LoadCharacterBinds()
                     if (bind.perm) // already loaded perm -> delete currently checked one from db
                     {
                         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
-                        stmt->setUInt32(0, guid);
+                        stmt->setUInt32(0, guid.GetCounter());
                         stmt->setUInt32(1, instanceId);
                         CharacterDatabase.Execute(stmt);
                         continue;
@@ -576,9 +576,9 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
     }
 }
 
-InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(uint32 guidLow, InstanceSave* save, bool permanent, Player* player /*= nullptr*/)
+InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(ObjectGuid guid, InstanceSave* save, bool permanent, Player* player /*= nullptr*/)
 {
-    InstancePlayerBind& bind = playerBindStorage[guidLow]->m[save->GetDifficulty()][save->GetMapId()];
+    InstancePlayerBind& bind = playerBindStorage[guid]->m[save->GetDifficulty()][save->GetMapId()];
     ASSERT(!bind.perm || permanent); // ensure there's no changing permanent to temporary, this can be done only by unbinding
 
     if (bind.save)
@@ -645,16 +645,16 @@ InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(uint32 guidLow, In
     return &bind;
 }
 
-void InstanceSaveManager::PlayerUnbindInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player /*= nullptr*/)
+void InstanceSaveManager::PlayerUnbindInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player /*= nullptr*/)
 {
-    BoundInstancesMapWrapper* w = playerBindStorage[guidLow];
+    BoundInstancesMapWrapper* w = playerBindStorage[guid];
     BoundInstancesMap::iterator itr = w->m[difficulty].find(mapid);
     if (itr != w->m[difficulty].end())
     {
         if (deleteFromDB)
         {
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
-            stmt->setUInt32(0, guidLow);
+            stmt->setUInt32(0, guid.GetCounter());
             stmt->setUInt32(1, itr->second.save->GetInstanceId());
             CharacterDatabase.Execute(stmt);
         }
@@ -668,7 +668,7 @@ void InstanceSaveManager::PlayerUnbindInstance(uint32 guidLow, uint32 mapid, Dif
     }
 }
 
-void InstanceSaveManager::PlayerUnbindInstanceNotExtended(uint32 guidLow, uint32 mapid, Difficulty difficulty, Player* player /*= nullptr*/)
+void InstanceSaveManager::PlayerUnbindInstanceNotExtended(ObjectGuid guid, uint32 mapid, Difficulty difficulty, Player* player /*= nullptr*/)
 {
     BoundInstancesMapWrapper* w = playerBindStorage[guidLow];
     BoundInstancesMap::iterator itr = w->m[difficulty].find(mapid);
@@ -688,7 +688,7 @@ void InstanceSaveManager::PlayerUnbindInstanceNotExtended(uint32 guidLow, uint32
     }
 }
 
-InstancePlayerBind* InstanceSaveManager::PlayerGetBoundInstance(uint32 guidLow, uint32 mapid, Difficulty difficulty)
+InstancePlayerBind* InstanceSaveManager::PlayerGetBoundInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty)
 {
     Difficulty difficulty_fixed = ( IsSharedDifficultyMap(mapid) ? Difficulty(difficulty % 2) : difficulty);
 
@@ -718,7 +718,7 @@ bool InstanceSaveManager::PlayerIsPermBoundToInstance(ObjectGuid guid, uint32 ma
     return false;
 }
 
-BoundInstancesMap const& InstanceSaveManager::PlayerGetBoundInstances(uint32 guidLow, Difficulty difficulty)
+BoundInstancesMap const& InstanceSaveManager::PlayerGetBoundInstances(ObjectGuid guid, Difficulty difficulty)
 {
     PlayerBindStorage::iterator itr = playerBindStorage.find(guidLow);
     if (itr != playerBindStorage.end())
@@ -726,13 +726,13 @@ BoundInstancesMap const& InstanceSaveManager::PlayerGetBoundInstances(uint32 gui
     return emptyBoundInstancesMap;
 }
 
-void InstanceSaveManager::PlayerCreateBoundInstancesMaps(uint32 guidLow)
+void InstanceSaveManager::PlayerCreateBoundInstancesMaps(ObjectGuid guid)
 {
-    if (playerBindStorage.find(guidLow) == playerBindStorage.end())
-        playerBindStorage[guidLow] = new BoundInstancesMapWrapper;
+    if (playerBindStorage.find(guid) == playerBindStorage.end())
+        playerBindStorage[guid] = new BoundInstancesMapWrapper;
 }
 
-InstanceSave* InstanceSaveManager::PlayerGetInstanceSave(uint32 guidLow, uint32 mapid, Difficulty difficulty)
+InstanceSave* InstanceSaveManager::PlayerGetInstanceSave(ObjectGuid guid, uint32 mapid, Difficulty difficulty)
 {
     InstancePlayerBind* pBind = PlayerGetBoundInstance(guidLow, mapid, difficulty);
     return (pBind ? pBind->save : nullptr);

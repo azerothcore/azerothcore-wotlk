@@ -204,7 +204,7 @@ public:
 
     Item();
 
-    virtual bool Create(uint32 guidlow, uint32 itemid, Player const* owner);
+    virtual bool Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner);
 
     [[nodiscard]] ItemTemplate const* GetTemplate() const;
 
@@ -219,10 +219,10 @@ public:
     [[nodiscard]] bool IsBoundByEnchant() const;
     [[nodiscard]] bool IsBoundByTempEnchant() const;
     virtual void SaveToDB(SQLTransaction& trans);
-    virtual bool LoadFromDB(uint32 guid, ObjectGuid owner_guid, Field* fields, uint32 entry);
-    static void DeleteFromDB(SQLTransaction& trans, uint32 itemGuid);
+    virtual bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry);
+    static void DeleteFromDB(SQLTransaction& trans, ObjectGuid::LowType itemGuid);
     virtual void DeleteFromDB(SQLTransaction& trans);
-    static void DeleteFromInventoryDB(SQLTransaction& trans, uint32 itemGuid);
+    static void DeleteFromInventoryDB(SQLTransaction& trans, ObjectGuid::LowType itemGuid);
     void DeleteFromInventoryDB(SQLTransaction& trans);
     void SaveRefundDataToDB();
     void DeleteRefundDataFromDB(SQLTransaction* trans);
@@ -318,10 +318,10 @@ public:
 
     // Item Refund system
     void SetNotRefundable(Player* owner, bool changestate = true, SQLTransaction* trans = nullptr);
-    void SetRefundRecipient(uint32 pGuidLow) { m_refundRecipient = pGuidLow; }
+    void SetRefundRecipient(ObjectGuid::LowType pGuidLow) { m_refundRecipient = pGuidLow; }
     void SetPaidMoney(uint32 money) { m_paidMoney = money; }
     void SetPaidExtendedCost(uint32 iece) { m_paidExtendedCost = iece; }
-    uint32 GetRefundRecipient() { return m_refundRecipient; }
+    ObjectGuid::LowType GetRefundRecipient() { return m_refundRecipient; }
     uint32 GetPaidMoney() { return m_paidMoney; }
     uint32 GetPaidExtendedCost() { return m_paidExtendedCost; }
 

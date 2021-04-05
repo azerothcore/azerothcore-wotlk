@@ -86,7 +86,7 @@ Group::~Group()
 bool Group::Create(Player* leader)
 {
     ObjectGuid leaderGuid = leader->GetGUID();
-    uint32 lowguid = sGroupMgr->GenerateGroupId();
+    ObjectGuid::LowType lowguid = sGroupMgr->GenerateGroupId();
 
     m_guid = ObjectGuid::Create<HighGuid::Group>(lowguid);
     m_leaderGuid = leaderGuid;
@@ -149,13 +149,14 @@ bool Group::Create(Player* leader)
 
 bool Group::LoadGroupFromDB(Field* fields)
 {
-    m_guid = ObjectGuid::Create<HighGuid::Group>(fields[16].GetUInt32());
+    ObjectGuid::LowType groupLowGuid = fields[16].GetUInt32();
+    m_guid = ObjectGuid::Create<HighGuid::Group>(groupLowGuid);
+
     m_leaderGuid = ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32());
 
     // group leader not exist
     if (!sObjectMgr->GetPlayerNameByGUID(fields[0].GetUInt32(), m_leaderName))
     {
-        uint32 groupLowGuid = fields[16].GetUInt32();
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP);
         stmt->setUInt32(0, groupLowGuid);
@@ -201,7 +202,7 @@ bool Group::LoadGroupFromDB(Field* fields)
     return true;
 }
 
-void Group::LoadMemberFromDB(uint32 guidLow, uint8 memberFlags, uint8 subgroup, uint8 roles)
+void Group::LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uint8 subgroup, uint8 roles)
 {
     MemberSlot member;
     member.guid = ObjectGuid::Create<HighGuid::Player>(guidLow);

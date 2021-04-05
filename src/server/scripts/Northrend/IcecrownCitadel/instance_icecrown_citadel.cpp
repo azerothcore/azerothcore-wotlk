@@ -467,7 +467,7 @@ public:
                 SindragosaGUID.Clear();
         }
 
-        uint32 GetCreatureEntry(uint32 /*guidLow*/, CreatureData const* data) override
+        uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -512,7 +512,7 @@ public:
             return entry;
         }
 
-        uint32 GetGameObjectEntry(uint32 /*guidLow*/, uint32 entry) override
+        uint32 GetGameObjectEntry(ObjectGuid::LowType /*guidLow*/, uint32 entry) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {

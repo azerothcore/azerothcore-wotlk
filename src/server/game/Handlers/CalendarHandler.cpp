@@ -531,7 +531,7 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
     else
     {
         // xinef: Get Data From global storage
-        if (uint32 guidLow = sWorld->GetGlobalPlayerGUID(name))
+        if (ObjectGuid::LowType guidLow = sWorld->GetGlobalPlayerGUID(name))
         {
             if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guidLow))
             {
