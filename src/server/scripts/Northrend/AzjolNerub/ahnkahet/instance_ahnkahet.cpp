@@ -12,7 +12,7 @@
 class instance_ahnkahet : public InstanceMapScript
 {
 public:
-    instance_ahnkahet() : InstanceMapScript("instance_ahnkahet", 619) { }
+    instance_ahnkahet() : InstanceMapScript(AhnahetScriptName, 619) { }
 
     struct instance_ahnkahet_InstanceScript : public InstanceScript
     {

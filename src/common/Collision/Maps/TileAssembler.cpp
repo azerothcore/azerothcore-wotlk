@@ -41,7 +41,7 @@ namespace VMAP
     //=================================================================
 
     TileAssembler::TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName)
-        : iDestDir(pDestDirName), iSrcDir(pSrcDirName), iFilterMethod(nullptr), iCurrentUniqueNameId(0)
+        : iDestDir(pDestDirName), iSrcDir(pSrcDirName)
     {
         //mkdir(iDestDir);
         //init();
@@ -209,9 +209,8 @@ namespace VMAP
         ModelSpawn spawn;
         while (!feof(dirf))
         {
-            check = 0;
-            // read mapID, tileX, tileY, Flags, adtID, ID, Pos, Rot, Scale, Bound_lo, Bound_hi, name
-            check += fread(&mapID, sizeof(uint32), 1, dirf);
+            // read mapID, tileX, tileY, Flags, NameSet, UniqueId, Pos, Rot, Scale, Bound_lo, Bound_hi, name
+            check = fread(&mapID, sizeof(uint32), 1, dirf);
             if (check == 0) // EoF...
                 break;
             check += fread(&tileX, sizeof(uint32), 1, dirf);
@@ -226,8 +225,10 @@ namespace VMAP
                 printf("spawning Map %d\n", mapID);
                 mapData[mapID] = current = new MapSpawns();
             }
-            else current = (*map_iter).second;
-            current->UniqueEntries.insert(pair<uint32, ModelSpawn>(spawn.ID, spawn));
+            else
+                current = map_iter->second;
+
+            current->UniqueEntries.emplace(spawn.ID, spawn);
             current->TileEntries.insert(pair<uint32, uint32>(StaticMapTree::packTileID(tileX, tileY), spawn.ID));
         }
         bool success = (ferror(dirf) == 0);
@@ -283,6 +284,7 @@ namespace VMAP
         return true;
     }
 
+#pragma pack(push, 1)
     struct WMOLiquidHeader
     {
         int xverts, yverts, xtiles, ytiles;
@@ -291,6 +293,7 @@ namespace VMAP
         float pos_z;
         short type;
     };
+#pragma pack(pop)
     //=================================================================
     bool TileAssembler::convertRawFile(const std::string& pModelFilename)
     {
@@ -334,6 +337,10 @@ namespace VMAP
         if (!model_list)
             return;
 
+        char ident[8];
+        if (fread(ident, 1, 8, model_list) != 8 || memcmp(ident, VMAP::RAW_VMAP_MAGIC, 8) != 0)
+            return;
+
         FILE* model_list_copy = fopen((iDestDir + "/" + GAMEOBJECT_MODELS).c_str(), "wb");
         if (!model_list_copy)
         {
@@ -341,14 +348,21 @@ namespace VMAP
             return;
         }
 
+        fwrite(VMAP::VMAP_MAGIC, 1, 8, model_list_copy);
+
         uint32 name_length, displayId;
+        uint8 isWmo;
         char buff[500];
         while (!feof(model_list))
         {
-            if (fread(&displayId, sizeof(uint32), 1, model_list) != 1
-                    || fread(&name_length, sizeof(uint32), 1, model_list) != 1
-                    || name_length >= sizeof(buff)
-                    || fread(&buff, sizeof(char), name_length, model_list) != name_length)
+            if (fread(&displayId, sizeof(uint32), 1, model_list) != 1)
+                if (feof(model_list))   // EOF flag is only set after failed reading attempt
+                    break;
+
+            if (fread(&isWmo, sizeof(uint8), 1, model_list) != 1
+                || fread(&name_length, sizeof(uint32), 1, model_list) != 1
+                || name_length >= sizeof(buff)
+                || fread(&buff, sizeof(char), name_length, model_list) != name_length)
             {
                 std::cout << "\nFile 'temp_gameobject_models' seems to be corrupted" << std::endl;
                 break;
@@ -379,6 +393,7 @@ namespace VMAP
             }
 
             fwrite(&displayId, sizeof(uint32), 1, model_list_copy);
+            fwrite(&isWmo, sizeof(uint8), 1, model_list_copy);
             fwrite(&name_length, sizeof(uint32), 1, model_list_copy);
             fwrite(&buff, sizeof(char), name_length, model_list_copy);
             fwrite(&bounds.low(), sizeof(Vector3), 1, model_list_copy);

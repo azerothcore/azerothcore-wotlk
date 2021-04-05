@@ -363,7 +363,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_akilzonAI>(creature);
+        return GetZulAmanAI<boss_akilzonAI>(creature);
     }
 };
 
@@ -444,7 +444,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_akilzon_eagleAI(creature);
+        return GetZulAmanAI<npc_akilzon_eagleAI>(creature);
     }
 };
 

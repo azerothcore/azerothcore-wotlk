@@ -222,7 +222,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_amanitarAI(creature);
+        return GetAhnkahetAI<boss_amanitarAI>(creature);
     }
 };
 
@@ -325,7 +325,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_amanitar_mushroomsAI(creature);
+        return GetAhnkahetAI<npc_amanitar_mushroomsAI>(creature);
     }
 };
 

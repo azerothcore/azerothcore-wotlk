@@ -193,7 +193,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_hodirAI (pCreature);
+        return GetUlduarAI<boss_hodirAI>(pCreature);
     }
 
     struct boss_hodirAI : public ScriptedAI
@@ -595,7 +595,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_icicleAI (pCreature);
+        return GetUlduarAI<npc_ulduar_icicleAI>(pCreature);
     }
 
     struct npc_ulduar_icicleAI : public NullCreatureAI
@@ -638,7 +638,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_flash_freezeAI (pCreature);
+        return GetUlduarAI<npc_ulduar_flash_freezeAI>(pCreature);
     }
 
     struct npc_ulduar_flash_freezeAI : public NullCreatureAI
@@ -698,7 +698,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_toasty_fireAI (pCreature);
+        return GetUlduarAI<npc_ulduar_toasty_fireAI>(pCreature);
     }
 
     struct npc_ulduar_toasty_fireAI : public NullCreatureAI
@@ -741,7 +741,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_hodir_priestAI (pCreature);
+        return GetUlduarAI<npc_ulduar_hodir_priestAI>(pCreature);
     }
 
     struct npc_ulduar_hodir_priestAI : public ScriptedAI
@@ -838,7 +838,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_hodir_druidAI (pCreature);
+        return GetUlduarAI<npc_ulduar_hodir_druidAI>(pCreature);
     }
 
     struct npc_ulduar_hodir_druidAI : public ScriptedAI
@@ -935,7 +935,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_hodir_shamanAI (pCreature);
+        return GetUlduarAI<npc_ulduar_hodir_shamanAI>(pCreature);
     }
 
     struct npc_ulduar_hodir_shamanAI : public ScriptedAI
@@ -1035,7 +1035,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_hodir_mageAI (pCreature);
+        return GetUlduarAI<npc_ulduar_hodir_mageAI>(pCreature);
     }
 
     struct npc_ulduar_hodir_mageAI : public ScriptedAI

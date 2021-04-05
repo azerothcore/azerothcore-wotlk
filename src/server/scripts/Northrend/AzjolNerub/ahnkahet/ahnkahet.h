@@ -6,6 +6,8 @@
 #ifndef DEF_AHNKAHET_H
 #define DEF_AHNKAHET_H
 
+#define AhnahetScriptName "instance_ahnkahet"
+
 enum AhnkahetData
 {
     // Main encounters
@@ -53,4 +55,9 @@ enum AhnKahetActions
     ACTION_REMOVE_PRISON            = -1
 };
 
+template <class AI, class T>
+inline AI* GetAhnkahetAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, AhnahetScriptName);
+}
 #endif // DEF_AHNKAHET_H
