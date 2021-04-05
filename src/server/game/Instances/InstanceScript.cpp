@@ -468,3 +468,13 @@ std::string InstanceScript::GetBossStateName(uint8 state)
             return "INVALID";
     }
 }
+
+bool InstanceHasScript(WorldObject const* obj, char const* scriptName)
+{
+    if (InstanceMap* instance = obj->GetMap()->ToInstanceMap())
+    {
+        return instance->GetScriptName() == scriptName;
+    }
+
+    return false;
+}

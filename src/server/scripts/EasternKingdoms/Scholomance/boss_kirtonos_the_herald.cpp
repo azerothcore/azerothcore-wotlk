@@ -212,7 +212,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kirtonos_the_heraldAI>(creature);
+        return GetScholomanceAI<boss_kirtonos_the_heraldAI>(creature);
     }
 };
 

@@ -6,6 +6,9 @@
 #define DEF_GUNDRAK_H
 
 #include "SpellScript.h"
+#include "CreatureAIImpl.h"
+
+#define GundrakScriptName "instance_gundrak"
 
 enum Data
 {
@@ -42,5 +45,11 @@ enum GameObjects
     GO_GAL_DARAH_DOORS1                 = 193208,
     GO_GAL_DARAH_DOORS2                 = 193209
 };
+
+template <class AI, class T>
+inline AI* GetGundrakAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, GundrakScriptName);
+}
 
 #endif
