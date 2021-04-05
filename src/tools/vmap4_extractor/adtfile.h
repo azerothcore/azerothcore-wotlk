@@ -94,20 +94,45 @@ struct MapChunkHeader
     uint32 effectId;
 };
 
+#pragma pack(push, 1)
+
+namespace ADT
+{
+    struct MDDF
+    {
+        uint32 Id;
+        uint32 UniqueId;
+        Vec3D Position;
+        Vec3D Rotation;
+        uint16 Scale;
+        uint16 Flags;
+    };
+
+    struct MODF
+    {
+        uint32 Id;
+        uint32 UniqueId;
+        Vec3D Position;
+        Vec3D Rotation;
+        AaBox3D Bounds;
+        uint16 Flags;
+        uint16 DoodadSet;   // can be larger than number of doodad sets in WMO
+        uint16 NameSet;
+        uint16 Scale;
+    };
+}
+#pragma pack(pop)
+
 class ADTFile
 {
 private:
-    //size_t mcnk_offsets[256], mcnk_sizes[256];
-    MPQFile ADT;
-    //mcell Mcell;
-    string Adtfilename;
+    MPQFile _file;
+    std::string Adtfilename;
 public:
     ADTFile(char* filename);
     ~ADTFile();
-    int nWMO;
-    int nMDX;
-    string* WmoInstansName;
-    string* ModelInstansName;
+    std::vector<std::string> WmoInstanceNames;
+    std::vector<std::string> ModelInstanceNames;
     bool init(uint32 map_num, uint32 tileX, uint32 tileY);
     //void LoadMapChunks();
 
