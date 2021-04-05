@@ -49,9 +49,7 @@ enum Misc
 {
     NPC_PLAGUED_WARRIOR                     = 16984,
     NPC_PLAGUED_CHAMPION                    = 16983,
-    NPC_PLAGUED_GUARDIAN                    = 16981,
-
-    NOTH_ROOM_ENTRANCE                      = 181200
+    NPC_PLAGUED_GUARDIAN                    = 16981
 };
 
 const Position summoningPosition[5] =
@@ -140,9 +138,12 @@ public:
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->SetReactState(REACT_AGGRESSIVE);
             timesInBalcony = 0;
-            if (GameObject* go = me->FindNearestGameObject(NOTH_ROOM_ENTRANCE, 100.0f))
+            if (pInstance)
             {
-                go->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_NOTH_ENTRY_GATE)))
+                {
+                    go->SetGoState(GO_STATE_ACTIVE);
+                }
             }
         }
 
@@ -157,9 +158,12 @@ public:
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
             StartGroundPhase();
-            if (GameObject* go = me->FindNearestGameObject(NOTH_ROOM_ENTRANCE, 100.0f))
+            if (pInstance)
             {
-                go->SetGoState(GO_STATE_READY);
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_NOTH_ENTRY_GATE)))
+                {
+                    go->SetGoState(GO_STATE_READY);
+                }
             }
         }
 
@@ -178,9 +182,12 @@ public:
             }
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
-            if (GameObject* go = me->FindNearestGameObject(NOTH_ROOM_ENTRANCE, 100.0f))
+            if (pInstance)
             {
-                go->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_NOTH_ENTRY_GATE)))
+                {
+                    go->SetGoState(GO_STATE_ACTIVE);
+                }
             }
         }
 
