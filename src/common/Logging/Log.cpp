@@ -115,11 +115,11 @@ void Log::Initialize()
 
     m_gmlog_per_account = sConfigMgr->GetOption<bool>("GmLogPerAccount", false, false);
     if (!m_gmlog_per_account)
-        gmLogfile = openLogFile("GMLogFile", "GmLogTimestamp", "a");
+        gmLogfile = openLogFile("GmLogFile", "GmLogTimestamp", "a");
     else
     {
         // GM log settings for per account case
-        m_gmlog_filename_format = sConfigMgr->GetOption<std::string>("GMLogFile", "", false);
+        m_gmlog_filename_format = sConfigMgr->GetOption<std::string>("GmLogFile", "", false);
         if (!m_gmlog_filename_format.empty())
         {
             bool m_gmlog_timestamp = sConfigMgr->GetOption<bool>("GmLogTimestamp", false, false);

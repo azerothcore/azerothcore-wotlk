@@ -3855,6 +3855,17 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                 delete units;
                 break;
             }
+        case SMART_TARGET_VEHICLE_PASSENGER:
+            {
+                if (me && me->IsVehicle())
+                {
+                    if (Unit* target = me->GetVehicleKit()->GetPassenger(e.target.vehicle.seat))
+                    {
+                        l->push_back(target);
+                    }
+                }
+                break;
+            }
         case SMART_TARGET_NONE:
         case SMART_TARGET_POSITION:
         default:
