@@ -7,7 +7,15 @@
 #ifndef VMAPEXPORT_H
 #define VMAPEXPORT_H
 
+#include "loadlib/loadlib.h"
 #include <string>
+#include <unordered_map>
+
+namespace VMAP
+{
+    const char VMAP_MAGIC[] = "VMAP_4.5";
+    const char RAW_VMAP_MAGIC[] = "VMAP045";                // used in extracted vmap files with raw data
+}
 
 enum ModelFlags
 {
@@ -16,8 +24,12 @@ enum ModelFlags
     MOD_HAS_BOUND = 1 << 2
 };
 
-extern const char* szWorkDirWmo;
-extern const char* szRawVMAPMagic;                          // vmap magic string for extracted raw vmap data
+struct WMODoodadData;
+
+extern const char * szWorkDirWmo;
+extern std::unordered_map<std::string, WMODoodadData> WmoDoodads;
+
+uint32 GenerateUniqueObjectId(uint32 clientId, uint16 clientDoodadId);
 
 bool FileExists(const char* file);
 void strToLower(char* str);
