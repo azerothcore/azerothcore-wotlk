@@ -8,6 +8,8 @@
 #include "Chat.h"
 #include "CreatureAIImpl.h"
 
+#define PitOfSaronScriptName "instance_pit_of_saron"
+
 enum DataTypes
 {
     DATA_GARFROST,
@@ -311,5 +313,11 @@ enum eTSTexts
     SAY_GENERAL_ALLIANCE_OUTRO_1                = 68,
     SAY_GENERAL_ALLIANCE_TRASH                  = 69,
 };
+
+template <class AI, class T>
+inline AI* GetPitOfSaronAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, PitOfSaronScriptName);
+}
 
 #endif

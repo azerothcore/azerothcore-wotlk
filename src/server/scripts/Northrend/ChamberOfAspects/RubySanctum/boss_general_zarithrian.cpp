@@ -175,7 +175,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_general_zarithrianAI>(creature);
+        return GetRubySanctumAI<boss_general_zarithrianAI>(creature);
     }
 };
 
@@ -275,7 +275,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_onyx_flamecallerAI>(creature);
+        return GetRubySanctumAI<npc_onyx_flamecallerAI>(creature);
     }
 };
 

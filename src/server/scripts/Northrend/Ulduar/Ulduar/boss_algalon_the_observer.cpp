@@ -793,7 +793,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_algalon_the_observerAI(creature);
+        return GetUlduarAI<boss_algalon_the_observerAI>(creature);
     }
 };
 
@@ -891,7 +891,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_brann_bronzebeard_algalonAI(creature);
+        return GetUlduarAI<npc_brann_bronzebeard_algalonAI>(creature);
     }
 };
 
@@ -927,7 +927,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_collapsing_starAI(creature);
+        return GetUlduarAI<npc_collapsing_starAI>(creature);
     }
 };
 
@@ -1018,7 +1018,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_living_constellationAI(creature);
+        return GetUlduarAI<npc_living_constellationAI>(creature);
     }
 };
 
@@ -1066,7 +1066,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_algalon_worm_holeAI(creature);
+        return GetUlduarAI<npc_algalon_worm_holeAI>(creature);
     }
 };
 

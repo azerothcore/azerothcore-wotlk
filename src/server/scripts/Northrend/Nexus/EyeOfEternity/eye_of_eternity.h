@@ -8,6 +8,8 @@
 #include "Chat.h"
 #include "CreatureAIImpl.h"
 
+#define EyeOfEternityScriptName "instance_eye_of_eternity"
+
 enum Objects
 {
     GO_NEXUS_PLATFORM           = 193070,
@@ -100,5 +102,11 @@ private:
     Creature& _owner;
     uint64 _playerGUID;
 };
+
+template <class AI, class T>
+inline AI* GetEyeOfEternityAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, EyeOfEternityScriptName);
+}
 
 #endif
