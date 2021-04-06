@@ -65,10 +65,10 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_FRENZY, 30000);
-            events.ScheduleEvent(EVENT_PANIC, 20000);
+            events.ScheduleEvent(EVENT_FRENZY, 8500);
+            events.ScheduleEvent(EVENT_PANIC, 9500);
             events.ScheduleEvent(EVENT_LAVA_BOMB, 12000);
-            events.ScheduleEvent(EVENT_LAVA_BOMB_RANGED, 18000);
+            events.ScheduleEvent(EVENT_LAVA_BOMB_RANGED, 15000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -93,13 +93,13 @@ public:
                     {
                         Talk(EMOTE_FRENZY);
                         DoCastSelf(SPELL_FRENZY);
-                        events.RepeatEvent(15000);
+                        events.RepeatEvent(urand(15000, 20000));
                         break;
                     }
                     case EVENT_PANIC:
                     {
                         DoCastVictim(SPELL_PANIC);
-                        events.RepeatEvent(35000);
+                        events.RepeatEvent(urand(31000, 38000));
                         break;
                     }
                     case EVENT_LAVA_BOMB:
@@ -109,7 +109,7 @@ public:
                             DoCast(target, SPELL_LAVA_BOMB);
                         }
 
-                        events.RepeatEvent(12000);
+                        events.RepeatEvent(urand(12000, 15000));
                         break;
                     }
                     case EVENT_LAVA_BOMB_RANGED:
@@ -123,6 +123,11 @@ public:
                         events.RepeatEvent(urand(12000, 15000));
                         break;
                     }
+                }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    return;
                 }
             }
 
