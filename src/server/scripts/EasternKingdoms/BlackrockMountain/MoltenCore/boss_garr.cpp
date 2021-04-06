@@ -45,9 +45,9 @@ public:
         {
         }
 
-        void EnterCombat(Unit* victim) override
+        void EnterCombat(Unit* /*attacker*/)
         {
-            BossAI::EnterCombat(victim);
+            _EnterCombat();
             events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 15000);
             events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 10000);
         }
@@ -55,27 +55,38 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
-            while (uint32 eventId = events.ExecuteEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
                     case EVENT_ANTIMAGIC_PULSE:
-                        DoCast(me, SPELL_ANTIMAGIC_PULSE);
-                        events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 20000);
+                    {
+                        DoCastSelf(SPELL_ANTIMAGIC_PULSE);
+                        events.RepeatEvent(20000);
                         break;
+                    }
                     case EVENT_MAGMA_SHACKLES:
-                        DoCast(me, SPELL_MAGMA_SHACKLES);
-                        events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 15000);
+                    {
+                        DoCastSelf(SPELL_MAGMA_SHACKLES);
+                        events.RepeatEvent(15000);
                         break;
-                    default:
-                        break;
+                    }
+                }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    return;
                 }
             }
 
@@ -96,20 +107,19 @@ public:
 
     struct npc_fireswornAI : public ScriptedAI
     {
-        npc_fireswornAI(Creature* creature) : ScriptedAI(creature) { }
-
-        uint32 immolateTimer;
+        npc_fireswornAI(Creature* creature) : ScriptedAI(creature),
+            immolateTimer(4000)
+        {
+        }
 
         void Reset() override
         {
-            immolateTimer = 4000;                              //These times are probably wrong
+            immolateTimer = 4000;   // These times are probably wrong
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            uint32 const health10pct = me->CountPctFromMaxHealth(10);
-            uint32 health = me->GetHealth();
-            if (int32(health) - int32(damage) < int32(health10pct))
+            if (me->HealthBelowPctDamaged(10, damage))
             {
                 damage = 0;
                 DoCastVictim(SPELL_ERUPTION);
@@ -120,19 +130,27 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             if (immolateTimer <= diff)
             {
                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
                     DoCast(target, SPELL_IMMOLATE);
+
                 immolateTimer = urand(5000, 10000);
             }
             else
+            {
                 immolateTimer -= diff;
+            }
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        uint32 immolateTimer;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

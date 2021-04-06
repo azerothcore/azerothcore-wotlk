@@ -25,7 +25,7 @@ enum Encounters
     BOSS_GOLEMAGG_THE_INCINERATOR   = 7,
     BOSS_MAJORDOMO_EXECUTUS         = 8,
     BOSS_RAGNAROS                   = 9,
-    MAX_ENCOUNTER,
+    MAX_ENCOUNTER                   = 10,
 };
 
 enum Actions

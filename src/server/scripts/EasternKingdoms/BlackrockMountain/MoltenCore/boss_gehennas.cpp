@@ -26,8 +26,8 @@ enum Spells
 enum Events
 {
     EVENT_GEHENNAS_CURSE    = 1,
-    EVENT_RAIN_OF_FIRE      = 2,
-    EVENT_SHADOW_BOLT       = 3,
+    EVENT_RAIN_OF_FIRE,
+    EVENT_SHADOW_BOLT,
 };
 
 class boss_gehennas : public CreatureScript
@@ -41,9 +41,9 @@ public:
         {
         }
 
-        void EnterCombat(Unit* victim) override
+        void EnterCombat(Unit* /*attacker*/) override
         {
-            BossAI::EnterCombat(victim);
+            _EnterCombat();
             events.ScheduleEvent(EVENT_GEHENNAS_CURSE, 12000);
             events.ScheduleEvent(EVENT_RAIN_OF_FIRE, 10000);
             events.ScheduleEvent(EVENT_SHADOW_BOLT, 6000);
@@ -52,33 +52,51 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
-            while (uint32 eventId = events.ExecuteEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
                     case EVENT_GEHENNAS_CURSE:
+                    {
                         DoCastVictim(SPELL_GEHENNAS_CURSE);
-                        events.ScheduleEvent(EVENT_GEHENNAS_CURSE, urand(22000, 30000));
+                        events.RepeatEvent(urand(22000, 30000));
                         break;
+                    }
                     case EVENT_RAIN_OF_FIRE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    {
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        {
                             DoCast(target, SPELL_RAIN_OF_FIRE);
-                        events.ScheduleEvent(EVENT_RAIN_OF_FIRE, urand(4000, 12000));
+                        }
+                        events.RepeatEvent(urand(4000, 12000));
                         break;
+                    }
                     case EVENT_SHADOW_BOLT:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                    {
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                        {
                             DoCast(target, SPELL_SHADOW_BOLT);
-                        events.ScheduleEvent(EVENT_SHADOW_BOLT, 7000);
+                        }
+
+                        events.RepeatEvent(7000);
                         break;
-                    default:
-                        break;
+                    }
+                }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    return;
                 }
             }
 
