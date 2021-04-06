@@ -71,8 +71,8 @@ public:
     struct boss_ragnarosAI : public BossAI
     {
         boss_ragnarosAI(Creature* creature) : BossAI(creature, BOSS_RAGNAROS),
-            _introState(0),
             _emergeTimer(90000),
+            _introState(0),
             _hasYelledMagmaBurst(false),
             _hasSubmergedOnce(false),
             _isBanished(false)

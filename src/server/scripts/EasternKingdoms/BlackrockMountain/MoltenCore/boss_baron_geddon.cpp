@@ -53,7 +53,7 @@ public:
             armageddonCasted = false;
         }
 
-        void EnterCombat(Unit* /*attacker*/)
+        void EnterCombat(Unit* /*attacker*/) override
         {
             _EnterCombat();
             events.ScheduleEvent(EVENT_INFERNO, 45000);
