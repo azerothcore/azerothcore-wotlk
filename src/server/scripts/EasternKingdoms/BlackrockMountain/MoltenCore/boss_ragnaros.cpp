@@ -103,7 +103,7 @@ public:
             events.ScheduleEvent(EVENT_SUBMERGE, 180000);
         }
 
-        void JustDied(Unit* killer) override
+        void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
             me->SetFacingTo(DEATH_ORIENTATION);
