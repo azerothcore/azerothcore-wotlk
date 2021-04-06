@@ -182,7 +182,7 @@ public:
             }
             else
             {
-                if (_isBanished && (_emergeTimer <= diff) || instance->GetData(DATA_RAGNAROS_ADDS) > 8)
+                if (_isBanished && ((_emergeTimer <= diff) || instance->GetData(DATA_RAGNAROS_ADDS) > 8))
                 {
                     //Become unbanished again
                     me->SetReactState(REACT_AGGRESSIVE);

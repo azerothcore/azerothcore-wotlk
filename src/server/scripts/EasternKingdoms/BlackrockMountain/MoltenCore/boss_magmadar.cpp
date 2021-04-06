@@ -114,7 +114,11 @@ public:
                     case EVENT_LAVA_BOMB_RANGED:
                     {
                         std::list<Unit*> targets;
-                        SelectTargetList(targets, [this](Unit* target) { return target && target->GetTypeId() == TYPEID_PLAYER && target->GetDistance(me) > MELEE_TARGET_LOOKUP_DIST; }, 1, SELECT_TARGET_RANDOM);
+                        SelectTargetList(targets, [this](Unit* target)
+                        {
+                            return target && target->GetTypeId() == TYPEID_PLAYER && target->GetDistance(me) > MELEE_TARGET_LOOKUP_DIST && target->GetDistance(me) < 100.0f;
+                        }, 1, SELECT_TARGET_RANDOM);
+
                         if (!targets.empty())
                         {
                             DoCast(targets.front() , SPELL_LAVA_BOMB_RANGED);
