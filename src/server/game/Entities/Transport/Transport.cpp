@@ -97,7 +97,6 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
 
 void MotionTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
 {
-    HashMapHolder<MotionTransport>::Remove(this);
     UnloadStaticPassengers();
     while (!_passengers.empty())
     {

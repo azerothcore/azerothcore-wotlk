@@ -18070,7 +18070,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, SQLQueryHolder* holder)
     InitPrimaryProfessions();                               // to max set before any spell loaded
 
     // init saved position, and fix it later if problematic
-    ObjectGuid::LowType transLowGUID = fields[35].GetUInt32();
+    int32 transLowGUID = fields[35].GetInt32();
     Relocate(fields[17].GetFloat(), fields[18].GetFloat(), fields[19].GetFloat(), fields[21].GetFloat());
     uint32 mapId = fields[20].GetUInt16();
     uint32 instanceId = fields[63].GetUInt32();
@@ -18106,6 +18106,8 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, SQLQueryHolder* holder)
 
     GetSession()->SetPlayer(this);
     MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
+
+    Map* map = nullptr;
 
     // pussywizard: group changed difficulty when player was offline, teleport to the enterance of new difficulty
     if (mapEntry && ((mapEntry->IsNonRaidDungeon() && dungeonDiff != GetDungeonDifficulty()) || (mapEntry->IsRaid() && raidDiff != GetRaidDifficulty())))
@@ -18167,24 +18169,34 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, SQLQueryHolder* holder)
         }
     }
     // currently we do not support transport in bg
-    else if (transLowGUID)
+    else if (transLowGUID != 0)
     {
-        ObjectGuid transGUID = ObjectGuid::Create<HighGuid::Mo_Transport>(transLowGUID);
-        Transport* transGO = HashMapHolder<MotionTransport>::Find(transGUID);
-        if (!transGO) // pussywizard: if not MotionTransport, look for StaticTransport
+        // transLowGUID > 0 ---> motion transport guid
+        // transLowGUID < 0 ---> static transport spawn id
+        Transport* transGO = nullptr;
+        if (transLowGUID > 0)
         {
-            transGUID = ObjectGuid::Create<HighGuid::Transport>(transLowGUID);
-            transGO = HashMapHolder<GameObject>::Find(transGUID);
+            ObjectGuid transGUID = ObjectGuid::Create<HighGuid::Mo_Transport>(transLowGUID);
+            transGO = HashMapHolder<MotionTransport>::Find(transGUID);
+        }
+        else
+        {
+            if (map = sMapMgr->CreateMap(mapId, this))
+            {
+                auto bounds = map->GetGameObjectBySpawnIdStore().equal_range(abs(transLowGUID));
+                if (bounds.first != bounds.second)
+                    transGO = bounds.first->second->ToTransport();
+            }
         }
 
-        if (transGO)
-            if (transGO->IsInWorld() && transGO->FindMap()) // pussywizard: must be on map, for one world tick transport is not in map and has old GetMapId(), player would be added to old map and to the transport, multithreading crashfix
-                m_transport = transGO;
+        // pussywizard: must be on map, for one world tick transport is not in map and has old GetMapId(), player would be added to old map and to the transport, multithreading crashfix
+        if (transGO && transGO->IsInWorld() && transGO->FindMap())
+            m_transport = transGO;
 
         if (m_transport)
         {
             float x = fields[31].GetFloat(), y = fields[32].GetFloat(), z = fields[33].GetFloat(), o = fields[34].GetFloat();
-            m_movementInfo.transport.guid = transGUID;
+            m_movementInfo.transport.guid = m_transport->GetGUID();
             m_movementInfo.transport.pos.Relocate(x, y, z, o);
             m_transport->CalculatePassengerPosition(x, y, z, &o);
 
@@ -18262,7 +18274,8 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, SQLQueryHolder* holder)
 
     // NOW player must have valid map
     // load the player's map here if it's not already loaded
-    Map* map = sMapMgr->CreateMap(mapId, this);
+    if (!map)
+        map = sMapMgr->CreateMap(mapId, this);
 
     if (!map)
     {
@@ -26571,10 +26584,16 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
         stmt->setFloat(index++, finiteAlways(GetTransOffsetY()));
         stmt->setFloat(index++, finiteAlways(GetTransOffsetZ()));
         stmt->setFloat(index++, finiteAlways(GetTransOffsetO()));
-        ObjectGuid::LowType transLowGUID = 0;
-        if (GetTransport())
-            transLowGUID = GetTransport()->GetGUID().GetCounter();
-        stmt->setUInt32(index++, transLowGUID);
+
+        int32 lowGuidOrSpawnId = 0;
+        if (Transport* transport = GetTransport())
+        {
+            if (transport->IsMotionTransport())
+                lowGuidOrSpawnId = static_cast<int32>(transport->GetGUID().GetCounter());
+            else if (transport->IsStaticTransport())
+                lowGuidOrSpawnId = -static_cast<int32>(transport->GetSpawnId());
+        }
+        stmt->setInt32(index++, lowGuidOrSpawnId);
 
         std::ostringstream ss;
         ss << m_taxi;
@@ -26703,10 +26722,16 @@ void Player::_SaveCharacter(bool create, SQLTransaction& trans)
         stmt->setFloat(index++, finiteAlways(GetTransOffsetY()));
         stmt->setFloat(index++, finiteAlways(GetTransOffsetZ()));
         stmt->setFloat(index++, finiteAlways(GetTransOffsetO()));
-        ObjectGuid::LowType transLowGUID = 0;
-        if (GetTransport())
-            transLowGUID = GetTransport()->GetGUID().GetCounter();
-        stmt->setUInt32(index++, transLowGUID);
+
+        int32 lowGuidOrSpawnId = 0;
+        if (Transport* transport = GetTransport())
+        {
+            if (transport->IsMotionTransport())
+                lowGuidOrSpawnId = static_cast<int32>(transport->GetGUID().GetCounter());
+            else if (transport->IsStaticTransport())
+                lowGuidOrSpawnId = -static_cast<int32>(transport->GetSpawnId());
+        }
+        stmt->setInt32(index++, lowGuidOrSpawnId);
 
         std::ostringstream ss;
         ss << m_taxi;

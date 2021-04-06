@@ -262,9 +262,26 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
         AH->Id = sObjectMgr->GenerateAuctionID();
 
         if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
-            AH->auctioneer = 23442;
+            AH->houseId = AUCTIONHOUSE_NEUTRAL;
         else
-            AH->auctioneer = GUID_LOPART(auctioneer);
+        {
+            CreatureData const* auctioneerData = sObjectMgr->GetCreatureData(creature->GetSpawnId());
+            if (!auctioneerData)
+            {
+                TC_LOG_ERROR("misc", "Data for auctioneer not found (%s)", auctioneer.ToString().c_str());
+                return;
+            }
+
+            CreatureTemplate const* auctioneerInfo = sObjectMgr->GetCreatureTemplate(auctioneerData->id);
+            if (!auctioneerInfo)
+            {
+                TC_LOG_ERROR("misc", "Non existing auctioneer (%s)", auctioneer.ToString().c_str());
+                return;
+            }
+
+            const AuctionHouseEntry* AHEntry = sAuctionMgr->GetAuctionHouseEntry(auctioneerInfo->faction);
+            AH->houseId = AHEntry->houseId;
+        }
 
         // Required stack size of auction matches to current item stack size, just move item to auctionhouse
         if (itemsCount == 1 && item->GetCount() == count[i])
@@ -282,8 +299,8 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             AH->auctionHouseEntry = auctionHouseEntry;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDetail("CMSG_AUCTION_SELL_ITEM: Player %s (%s) is selling item %s entry %u (%s) to auctioneer %u with count %u with initial bid %u with buyout %u and with time %u (in sec) in auctionhouse %u",
-                _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), item->GetTemplate()->Name1.c_str(), item->GetEntry(), item->GetGUID().ToString().c_str(), AH->auctioneer, item->GetCount(), bid, buyout, auctionTime, AH->GetHouseId());
+            sLog->outDetail("CMSG_AUCTION_SELL_ITEM: Player %s (%s) is selling item %s entry %u (%s) with count %u with initial bid %u with buyout %u and with time %u (in sec) in auctionhouse %u",
+                _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), item->GetTemplate()->Name1.c_str(), item->GetEntry(), item->GetGUID().ToString().c_str(), item->GetCount(), bid, buyout, auctionTime, AH->GetHouseId());
 #endif
             sAuctionMgr->AddAItem(item);
             auctionHouse->AddAuction(AH);
@@ -325,8 +342,8 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             AH->auctionHouseEntry = auctionHouseEntry;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDetail("CMSG_AUCTION_SELL_ITEM: Player %s (%s) is selling item %s entry %u (%s) to auctioneer %u with count %u with initial bid %u with buyout %u and with time %u (in sec) in auctionhouse %u",
-                _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), newItem->GetTemplate()->Name1.c_str(), newItem->GetEntry(), newItem->GetGUID().ToString().c_str(), AH->auctioneer, newItem->GetCount(), bid, buyout, auctionTime, AH->GetHouseId());
+            sLog->outDetail("CMSG_AUCTION_SELL_ITEM: Player %s (%s) is selling item %s entry %u (%s) with count %u with initial bid %u with buyout %u and with time %u (in sec) in auctionhouse %u",
+                _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), newItem->GetTemplate()->Name1.c_str(), newItem->GetEntry(), newItem->GetGUID().ToString().c_str(), newItem->GetCount(), bid, buyout, auctionTime, AH->GetHouseId());
 #endif
             sAuctionMgr->AddAItem(newItem);
             auctionHouse->AddAuction(AH);

@@ -111,11 +111,7 @@ class ObjectGuid
     public:
         static ObjectGuid const Empty;
 
-        // ultranix: restore
-        class LowType
-        {
-        };
-        //typedef uint32 LowType;
+        typedef uint32 LowType;
 
         template<HighGuid type>
         static typename std::enable_if<ObjectGuidTraits<type>::Global, ObjectGuid>::type Create(LowType counter) { return Global(type, counter); }
@@ -126,10 +122,7 @@ class ObjectGuid
         ObjectGuid() : _guid(0) { }
         explicit ObjectGuid(uint64 guid) : _guid(guid) { }
 
-        // ultranix: check transport guids used in player::loadfromdb
-        // ultranix: check mails and action house - saving npcs' guids to database
-        // ultranix: restore
-        //operator uint64() const { return _guid; }
+        operator uint64() const { return _guid; }
         PackedGuidReader ReadAsPacked() { return PackedGuidReader(*this); }
 
         void Set(uint64 guid) { _guid = guid; }
