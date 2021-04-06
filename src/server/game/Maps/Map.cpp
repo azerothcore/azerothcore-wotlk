@@ -398,7 +398,7 @@ void Map::DeleteFromWorld(Player* player)
     std::transform(charName.begin(), charName.end(), charName.begin(), ::tolower);
     sObjectAccessor->playerNameToPlayerPointer.erase(charName);
 
-    sObjectAccessor->RemoveUpdateObject(player); //TODO: I do not know why we need this, it should be removed in ~Object anyway
+    RemoveUpdateObject(player); //TODO: I do not know why we need this, it should be removed in ~Object anyway
     delete player;
 }
 
@@ -835,6 +835,8 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         transport->Update(t_diff);
     }
 
+    SendObjectUpdates();
+
     ///- Process necessary scripts
     if (!m_scriptSchedule.empty())
     {
@@ -850,8 +852,6 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
     HandleDelayedVisibility();
 
     sScriptMgr->OnMapUpdate(this, t_diff);
-
-    BuildAndSendUpdateForObjects(); // pussywizard
 }
 
 void Map::HandleDelayedVisibility()
@@ -2409,6 +2409,28 @@ inline void Map::setNGrid(NGridType* grid, uint32 x, uint32 y)
     i_grids[x][y] = grid;
 }
 
+void Map::SendObjectUpdates()
+{
+    UpdateDataMapType update_players;
+
+    while (!_updateObjects.empty())
+    {
+        Object* obj = *_updateObjects.begin();
+        ASSERT(obj->IsInWorld());
+
+        _updateObjects.erase(_updateObjects.begin());
+        obj->BuildUpdate(update_players);
+    }
+
+    WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
+    for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
+    {
+        iter->second.BuildPacket(&packet);
+        iter->first->GetSession()->SendPacket(&packet);
+        packet.clear();                                     // clean the string
+    }
+}
+
 void Map::DelayedUpdate(const uint32 t_diff)
 {
     for (_transportsUpdateIter = _transports.begin(); _transportsUpdateIter != _transports.end();)
@@ -2951,7 +2973,10 @@ void InstanceMap::UnloadAll()
     ASSERT(!HavePlayers());
 
     if (m_resetAfterUnload == true)
+    {
         DeleteRespawnTimes();
+        DeleteCorpseData();
+    }
 
     Map::UnloadAll();
 }
@@ -3062,19 +3087,24 @@ void BattlegroundMap::RemoveAllPlayers()
                     player->TeleportTo(player->GetEntryPoint());
 }
 
-Player* Map::GetPlayer(ObjectGuid guid)
+Corpse* Map::GetCorpse(ObjectGuid const guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (Player*)nullptr);
+    return _objectsStore.Find<Corpse>(guid);
 }
 
-Creature* Map::GetCreature(ObjectGuid guid)
+Creature* Map::GetCreature(ObjectGuid const guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (Creature*)nullptr);
+    return _objectsStore.Find<Creature>(guid);
 }
 
-GameObject* Map::GetGameObject(ObjectGuid guid)
+GameObject* Map::GetGameObject(ObjectGuid const guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (GameObject*)nullptr);
+    return _objectsStore.Find<GameObject>(guid);
+}
+
+Pet* Map::GetPet(ObjectGuid const guid)
+{
+    return _objectsStore.Find<Pet>(guid);
 }
 
 Transport* Map::GetTransport(ObjectGuid guid)
@@ -3088,17 +3118,7 @@ Transport* Map::GetTransport(ObjectGuid guid)
 
 DynamicObject* Map::GetDynamicObject(ObjectGuid guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (DynamicObject*)nullptr);
-}
-
-Pet* Map::GetPet(ObjectGuid guid)
-{
-    return ObjectAccessor::GetObjectInMap(guid, this, (Pet*)nullptr);
-}
-
-Corpse* Map::GetCorpse(ObjectGuid guid)
-{
-    return ObjectAccessor::GetObjectInMap(guid, this, (Corpse*)nullptr);
+    return _objectsStore.Find<DynamicObject>(guid);
 }
 
 void Map::UpdateIteratorBack(Player* player)
@@ -3636,4 +3656,50 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
     }
 
     return failOnCollision ? !collided : true;
+}
+
+void Map::LoadCorpseData()
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CORPSES);
+    stmt->setUInt32(0, GetId());
+    stmt->setUInt32(1, GetInstanceId());
+
+    //        0     1     2     3            4      5          6          7       8       9        10     11        12    13          14          15         16
+    // SELECT posX, posY, posZ, orientation, mapId, displayId, itemCache, bytes1, bytes2, guildId, flags, dynFlags, time, corpseType, instanceId, phaseMask, guid FROM corpse WHERE mapId = ? AND instanceId = ?
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+    if (!result)
+        return;
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+        CorpseType type = CorpseType(fields[13].GetUInt8());
+        uint32 guid = fields[16].GetUInt32();
+        if (type >= MAX_CORPSE_TYPE || type == CORPSE_BONES)
+        {
+            TC_LOG_ERROR("misc", "Corpse (guid: %u) have wrong corpse type (%u), not loading.", guid, type);
+            continue;
+        }
+
+        Corpse* corpse = new Corpse(type);
+
+        if (!corpse->LoadCorpseFromDB(GenerateLowGuid<HighGuid::Corpse>(), fields))
+        {
+            delete corpse;
+            continue;
+        }
+
+        sObjectAccessor->AddCorpse(corpse);
+        ++count;
+    } while (result->NextRow());
+}
+
+void Map::DeleteCorpseData()
+{
+    // DELETE FROM corpse WHERE mapId = ? AND instanceId = ?
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CORPSES_FROM_MAP);
+    stmt->setUInt32(0, GetId());
+    stmt->setUInt32(1, GetInstanceId());
+    CharacterDatabase.Execute(stmt);
 }

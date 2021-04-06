@@ -25,6 +25,7 @@
 #include <ace/Thread_Mutex.h>
 #include <bitset>
 #include <list>
+#include <memory>
 
 class Unit;
 class WorldPacket;
@@ -341,8 +342,6 @@ public:
     // pussywizard: movemaps, mmaps
     [[nodiscard]] ACE_RW_Thread_Mutex& GetMMapLock() const { return *(const_cast<ACE_RW_Thread_Mutex*>(&MMapLock)); }
     // pussywizard:
-    std::unordered_set<Object*> i_objectsToUpdate;
-    void BuildAndSendUpdateForObjects(); // definition in ObjectAccessor.cpp, below ObjectAccessor::Update, because it does the same for a map
     std::unordered_set<Unit*> i_objectsForDelayedVisibility;
     void HandleDelayedVisibility();
 
@@ -452,13 +451,21 @@ public:
     TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, Unit* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0);
     GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
-    Player* GetPlayer(ObjectGuid guid);
-    Creature* GetCreature(ObjectGuid guid);
-    GameObject* GetGameObject(ObjectGuid guid);
-    Transport* GetTransport(ObjectGuid guid);
-    DynamicObject* GetDynamicObject(ObjectGuid guid);
-    Pet* GetPet(ObjectGuid guid);
-    Corpse* GetCorpse(ObjectGuid guid);
+
+    Corpse* GetCorpse(ObjectGuid const guid);
+    Creature* GetCreature(ObjectGuid const guid);
+    GameObject* GetGameObject(ObjectGuid const guid);
+    Transport* GetTransport(ObjectGuid const guid);
+    DynamicObject* GetDynamicObject(ObjectGuid const guid);
+    Pet* GetPet(ObjectGuid const guid);
+
+    MapStoredObjectTypesContainer& GetObjectsStore() { return _objectsStore; }
+
+    typedef std::unordered_multimap<ObjectGuid::LowType, Creature*> CreatureBySpawnIdContainer;
+    CreatureBySpawnIdContainer& GetCreatureBySpawnIdStore() { return _creatureBySpawnIdStore; }
+
+    typedef std::unordered_multimap<ObjectGuid::LowType, GameObject*> GameObjectBySpawnIdContainer;
+    GameObjectBySpawnIdContainer& GetGameObjectBySpawnIdStore() { return _gameobjectBySpawnIdStore; }
 
     MapInstanced* ToMapInstanced() { if (Instanceable())  return reinterpret_cast<MapInstanced*>(this); else return nullptr;  }
     [[nodiscard]] const MapInstanced* ToMapInstanced() const { if (Instanceable())  return (const MapInstanced*)((MapInstanced*)this); else return nullptr;  }
@@ -516,6 +523,9 @@ public:
     void DeleteRespawnTimes();
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
 
+    void LoadCorpseData();
+    void DeleteCorpseData();
+
     static void DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId);
 
     void SendInitTransports(Player* player);
@@ -545,6 +555,16 @@ public:
     {
         static_assert(ObjectGuidTraits<high>::MapSpecific, "Only map specific guid can be generated in Map context");
         return GetGuidSequenceGenerator<high>().Generate();
+    }
+
+    void AddUpdateObject(Object* obj)
+    {
+        _updateObjects.insert(obj);
+    }
+
+    void RemoveUpdateObject(Object* obj)
+    {
+        _updateObjects.erase(obj);
     }
 
 private:
@@ -586,6 +606,8 @@ private:
     void ScriptsProcess();
 
     void UpdateActiveCells(const float& x, const float& y, const uint32 t_diff);
+
+    void SendObjectUpdates();
 
 protected:
     ACE_Thread_Mutex Lock;
@@ -689,6 +711,8 @@ private:
     std::unordered_map<uint32/*cellId*/, std::unordered_set<Corpse*>> _corpsesByCell;
     std::unordered_map<ObjectGuid, Corpse*> _corpsesByPlayer;
     std::unordered_set<Corpse*> _corpseBones;
+
+    std::unordered_set<Object*> _updateObjects;
 };
 
 enum InstanceResetMethod

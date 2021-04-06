@@ -54,8 +54,10 @@ void DynamicObject::AddToWorld()
     ///- Register the dynamicObject for guid lookup and for caster
     if (!IsInWorld())
     {
-        sObjectAccessor->AddObject(this);
+        GetMap()->GetObjectsStore().Insert<DynamicObject>(GetGUID(), this);
+
         WorldObject::AddToWorld();
+
         BindToCaster();
     }
 }
@@ -76,10 +78,13 @@ void DynamicObject::RemoveFromWorld()
             return;
 
         UnbindFromCaster();
+
         if (Transport* transport = GetTransport())
             transport->RemovePassenger(this, true);
+
         WorldObject::RemoveFromWorld();
-        sObjectAccessor->RemoveObject(this);
+
+        GetMap()->GetObjectsStore().Remove<DynamicObject>(GetGUID());
     }
 }
 

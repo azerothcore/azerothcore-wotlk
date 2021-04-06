@@ -2614,11 +2614,7 @@ void Player::RemoveFromWorld()
         sBattlefieldMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
     }
 
-    ///- Do not add/remove the player from the object storage
-    ///- It will crash when updating the ObjectAccessor
-    ///- The player should only be removed when logging out
-    Unit::RemoveFromWorld();
-
+    // Remove items from world before self - player must be found in Item::RemoveFromObjectUpdate
     for (uint8 i = PLAYER_SLOT_START; i < PLAYER_SLOT_END; ++i)
     {
         if (m_items[i])
@@ -2627,6 +2623,11 @@ void Player::RemoveFromWorld()
 
     for (ItemMap::iterator iter = mMitems.begin(); iter != mMitems.end(); ++iter)
         iter->second->RemoveFromWorld();
+
+    ///- Do not add/remove the player from the object storage
+    ///- It will crash when updating the ObjectAccessor
+    ///- The player should only be removed when logging out
+    Unit::RemoveFromWorld();
 
     if (m_uint32Values)
     {
@@ -15239,7 +15240,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
                 break;
             }
         case GOSSIP_OPTION_OUTDOORPVP:
-            sOutdoorPvPMgr->HandleGossipOption(this, source->GetGUID(), gossipListId);
+            sOutdoorPvPMgr->HandleGossipOption(this, source, gossipListId);
             break;
         case GOSSIP_OPTION_SPIRITHEALER:
             if (isDead())
@@ -18154,15 +18155,16 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, SQLQueryHolder* holder)
     else if (transLowGUID)
     {
         ObjectGuid transGUID = ObjectGuid::Create<HighGuid::Mo_Transport>(transLowGUID);
-        GameObject* transGO = HashMapHolder<GameObject>::Find(transGUID);
+        Transport* transGO = HashMapHolder<MotionTransport>::Find(transGUID);
         if (!transGO) // pussywizard: if not MotionTransport, look for StaticTransport
         {
             transGUID = ObjectGuid::Create<HighGuid::Transport>(transLowGUID);
             transGO = HashMapHolder<GameObject>::Find(transGUID);
         }
+
         if (transGO)
             if (transGO->IsInWorld() && transGO->FindMap()) // pussywizard: must be on map, for one world tick transport is not in map and has old GetMapId(), player would be added to old map and to the transport, multithreading crashfix
-                m_transport = transGO->ToTransport();
+                m_transport = transGO;
 
         if (m_transport)
         {
@@ -23948,7 +23950,7 @@ void Player::UpdateForQuestWorldObjects()
     {
         if ((*itr).IsGameObject())
         {
-            if (GameObject* obj = HashMapHolder<GameObject>::Find(*itr))
+            if (GameObject* obj = ObjectAccessor::GetGameObject(*this, *itr))
                 obj->BuildValuesUpdateBlockForPlayer(&udata, this);
         }
         else if ((*itr).IsCreatureOrVehicle())

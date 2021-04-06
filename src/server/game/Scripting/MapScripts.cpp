@@ -258,18 +258,11 @@ inline void Map::_ScriptProcessDoor(Object* source, Object* target, const Script
 
 inline GameObject* Map::_FindGameObject(WorldObject* searchObject, ObjectGuid::LowType guid) const
 {
-    GameObject* gameobject = nullptr;
+    auto bounds = searchObject->GetMap()->GetGameObjectBySpawnIdStore().equal_range(guid);
+    if (bounds.first == bounds.second)
+        return nullptr;
 
-    CellCoord p(acore::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
-    Cell cell(p);
-
-    acore::GameObjectWithDbGUIDCheck goCheck(guid);
-    acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck> checker(searchObject, gameobject, goCheck);
-
-    TypeContainerVisitor<acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > objectChecker(checker);
-    cell.Visit(p, objectChecker, *searchObject->GetMap(), *searchObject, searchObject->GetGridActivationRange());
-
-    return gameobject;
+    return bounds.first->second;
 }
 
 /// Process queued scripts
@@ -302,7 +295,7 @@ void Map::ScriptsProcess()
                     source = GetPet(step.sourceGUID);
                     break;
                 case HighGuid::Player:
-                    source = GetPlayer(step.sourceGUID);
+                    source = HashMapHolder<Player>::Find(step.sourceGUID);
                     break;
                 case HighGuid::Transport:
                 case HighGuid::GameObject:
@@ -312,11 +305,8 @@ void Map::ScriptsProcess()
                     source = GetCorpse(step.sourceGUID);
                     break;
                 case HighGuid::Mo_Transport:
-                    {
-                        GameObject* go = GetGameObject(step.sourceGUID);
-                        source = go ? go->ToTransport() : nullptr;
-                        break;
-                    }
+                    source = GetTransport(step.sourceGUID);
+                    break;
                 default:
                     sLog->outError("%s source with unsupported high guid (%s).",
                                    step.script->GetDebugInfo().c_str(), step.sourceGUID.ToString().c_str());
@@ -337,7 +327,7 @@ void Map::ScriptsProcess()
                     target = GetPet(step.targetGUID);
                     break;
                 case HighGuid::Player:                       // empty GUID case also
-                    target = GetPlayer(step.targetGUID);
+                    target = HashMapHolder<Player>::Find(step.targetGUID);
                     break;
                 case HighGuid::Transport:
                 case HighGuid::GameObject:
@@ -347,11 +337,8 @@ void Map::ScriptsProcess()
                     target = GetCorpse(step.targetGUID);
                     break;
                 case HighGuid::Mo_Transport:
-                    {
-                        GameObject* go = GetGameObject(step.targetGUID);
-                        target = go ? go->ToTransport() : nullptr;
-                        break;
-                    }
+                    target = GetTransport(step.targetGUID);
+                    break;
                 default:
                     sLog->outError("%s target with unsupported high guid (%s).",
                                    step.script->GetDebugInfo().c_str(), step.targetGUID.ToString().c_str());
@@ -814,22 +801,15 @@ void Map::ScriptsProcess()
                     }
 
                     Creature* cTarget = nullptr;
-                    WorldObject* wSource = dynamic_cast <WorldObject*> (source);
-                    if (wSource) //using grid searcher
+                    auto creatureBounds = _creatureBySpawnIdStore.equal_range(step.script->CallScript.CreatureEntry);
+                    if (creatureBounds.first != creatureBounds.second)
                     {
-                        CellCoord p(acore::ComputeCellCoord(wSource->GetPositionX(), wSource->GetPositionY()));
-                        Cell cell(p);
-
-                        acore::CreatureWithDbGUIDCheck target_check(step.script->CallScript.CreatureEntry);
-                        acore::CreatureSearcher<acore::CreatureWithDbGUIDCheck> checker(wSource, cTarget, target_check);
-
-                        TypeContainerVisitor<acore::CreatureSearcher <acore::CreatureWithDbGUIDCheck>, GridTypeMapContainer > unit_checker(checker);
-                        cell.Visit(p, unit_checker, *wSource->GetMap(), *wSource, wSource->GetGridActivationRange());
-                    }
-                    else //check hashmap holders
-                    {
-                        if (CreatureData const* data = sObjectMgr->GetCreatureData(step.script->CallScript.CreatureEntry))
-                            cTarget = ObjectAccessor::GetObjectInWorld<Creature>(data->mapid, data->posX, data->posY, ObjectGuid::Create<HighGuid::Unit>(data->id, step.script->CallScript.CreatureEntry), cTarget);
+                        // Prefer alive (last respawned) creature
+                        auto creatureItr = std::find_if(creatureBounds.first, creatureBounds.second, [](Map::CreatureBySpawnIdContainer::value_type const& pair)
+                        {
+                            return pair.second->IsAlive();
+                        });
+                        cTarget = creatureItr != creatureBounds.second ? creatureItr->second : creatureBounds.first->second;
                     }
 
                     if (!cTarget)

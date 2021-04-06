@@ -718,18 +718,6 @@ namespace acore
         NearestGameObjectTypeInObjectRangeCheck(NearestGameObjectTypeInObjectRangeCheck const&);
     };
 
-    class GameObjectWithDbGUIDCheck
-    {
-    public:
-        GameObjectWithDbGUIDCheck(ObjectGuid::LowType db_guid) : i_db_guid(db_guid) {}
-        bool operator()(GameObject const* go) const
-        {
-            return go->GetSpawnId() == i_db_guid;
-        }
-    private:
-        ObjectGuid::LowType i_db_guid;
-    };
-
     // Unit checks
 
     class MostHPMissingInRange
@@ -857,18 +845,6 @@ namespace acore
     private:
         Unit const* i_funit;
         float i_range;
-    };
-
-    class CreatureWithDbGUIDCheck
-    {
-    public:
-        CreatureWithDbGUIDCheck(ObjectGuid::LowType lowguid) : i_lowguid(lowguid) {}
-        bool operator()(Creature* u)
-        {
-            return u->GetSpawnId() == i_lowguid;
-        }
-    private:
-        ObjectGuid::LowType i_lowguid;
     };
 
     class AnyFriendlyUnitInObjectRangeCheck

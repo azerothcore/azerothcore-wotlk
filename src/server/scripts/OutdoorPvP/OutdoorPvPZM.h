@@ -197,11 +197,11 @@ public:
 
     void UpdateTowerState();
 
-    int32 HandleOpenGo(Player* player, ObjectGuid guid) override;
+    int32 HandleOpenGo(Player* player, GameObject* go) override;
 
     void SetBeaconState(TeamId controlling_teamId); // not good atm
 
-    bool HandleGossipOption(Player* player, ObjectGuid guid, uint32 gossipid) override;
+    bool HandleGossipOption(Player* player, Creature* creature, uint32 gossipid) override;
 
     bool HandleDropFlag(Player* player, uint32 spellId) override;
 

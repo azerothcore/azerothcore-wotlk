@@ -210,10 +210,16 @@ void Creature::AddToWorld()
         if (GetZoneScript())
             GetZoneScript()->OnCreatureCreate(this);
 
-        sObjectAccessor->AddObject(this);
+        GetMap()->GetObjectsStore().Insert<Creature>(GetGUID(), this);
+        if (m_spawnId)
+            GetMap()->GetCreatureBySpawnIdStore().insert(std::make_pair(m_spawnId, this));
+
         Unit::AddToWorld();
+
         SearchFormation();
+
         AIM_Initialize();
+
         if (IsVehicle())
             GetVehicleKit()->Install();
 #ifdef ELUNA
@@ -231,12 +237,19 @@ void Creature::RemoveFromWorld()
 #endif
         if (GetZoneScript())
             GetZoneScript()->OnCreatureRemove(this);
+
         if (m_formation)
             sFormationMgr->RemoveCreatureFromGroup(m_formation, this);
+
         if (Transport* transport = GetTransport())
             transport->RemovePassenger(this, true);
+
         Unit::RemoveFromWorld();
-        sObjectAccessor->RemoveObject(this);
+
+        if (m_spawnId)
+            Trinity::Containers::MultimapErasePair(GetMap()->GetCreatureBySpawnIdStore(), m_spawnId, this);
+
+        GetMap()->GetObjectsStore().Remove<Creature>(GetGUID());
     }
 }
 
@@ -1418,17 +1431,9 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
 
     // xinef: this has to be assigned before Create function, properly loads equipment id from DB
     m_creatureData = data;
-    m_spawnId = guid;
+    m_spawnId = spawnId;
 
-    if (map->GetInstanceId() == 0)
-    {
-        if (map->GetCreature(ObjectGuid::Create<HighGuid::Unit>(data->id, guid)))
-            return false;
-    }
-    else
-        guid = map->GenerateLowGuid<HighGuid::Unit>();
-
-    if (!Create(guid, map, data->phaseMask, data->id, 0, data->posX, data->posY, data->posZ, data->orientation, data))
+    if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, data->id, 0, data->posX, data->posY, data->posZ, data->orientation, data))
         return false;
 
     //We should set first home position, because then AI calls home movement

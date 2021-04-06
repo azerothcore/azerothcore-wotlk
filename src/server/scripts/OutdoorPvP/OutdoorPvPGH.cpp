@@ -22,6 +22,8 @@ OutdoorPvPGH::OutdoorPvPGH()
 bool OutdoorPvPGH::SetupOutdoorPvP()
 {
     RegisterZone(GH_ZONE);
+    SetMapFromZone(GH_ZONE);
+
     if ((m_obj = new OPvPCapturePointGH(this)))
     {
         AddCapturePoint(m_obj);

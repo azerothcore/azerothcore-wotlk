@@ -158,33 +158,25 @@ public:
 
     GameObject* FindGameObjectNear(WorldObject* searchObject, ObjectGuid::LowType guid) const
     {
-        GameObject* gameObject = nullptr;
+        auto bounds = searchObject->GetMap()->GetGameObjectBySpawnIdStore().equal_range(guid);
+        if (bounds.first == bounds.second)
+            return nullptr;
 
-        CellCoord p(acore::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
-        Cell cell(p);
-
-        acore::GameObjectWithDbGUIDCheck goCheck(guid);
-        acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck> checker(searchObject, gameObject, goCheck);
-
-        TypeContainerVisitor<acore::GameObjectSearcher<acore::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > objectChecker(checker);
-        cell.Visit(p, objectChecker, *searchObject->GetMap(), *searchObject, searchObject->GetVisibilityRange());
-
-        return gameObject;
+        return bounds.first->second;
     }
 
     Creature* FindCreatureNear(WorldObject* searchObject, ObjectGuid::LowType guid) const
     {
-        Creature* creature = nullptr;
-        CellCoord p(acore::ComputeCellCoord(searchObject->GetPositionX(), searchObject->GetPositionY()));
-        Cell cell(p);
+        auto bounds = searchObject->GetMap()->GetCreatureBySpawnIdStore().equal_range(guid);
+        if (bounds.first == bounds.second)
+            return nullptr;
 
-        acore::CreatureWithDbGUIDCheck target_check(guid);
-        acore::CreatureSearcher<acore::CreatureWithDbGUIDCheck> checker(searchObject, creature, target_check);
+        auto creatureItr = std::find_if(bounds.first, bounds.second, [](Map::CreatureBySpawnIdContainer::value_type const& pair)
+        {
+            return pair.second->IsAlive();
+        });
 
-        TypeContainerVisitor<acore::CreatureSearcher <acore::CreatureWithDbGUIDCheck>, GridTypeMapContainer > unit_checker(checker);
-        cell.Visit(p, unit_checker, *searchObject->GetMap(), *searchObject, searchObject->GetVisibilityRange());
-
-        return creature;
+        return creatureItr != bounds.second ? creatureItr->second : bounds.first->second;
     }
 
     ObjectListMap* mTargetStorage;
@@ -192,22 +184,31 @@ public:
     void OnReset();
     void ResetBaseObject()
     {
-        if (meOrigGUID)
+        WorldObject* lookupRoot = me;
+        if (!lookupRoot)
+            lookupRoot = go;
+
+        if (lookupRoot)
         {
-            if (Creature* m = HashMapHolder<Creature>::Find(meOrigGUID))
+            if (meOrigGUID)
             {
-                me = m;
-                go = nullptr;
+                if (Creature* m = ObjectAccessor::GetCreature(*lookupRoot, meOrigGUID))
+                {
+                    me = m;
+                    go = nullptr;
+                }
+            }
+
+            if (goOrigGUID)
+            {
+                if (GameObject* o = ObjectAccessor::GetGameObject(*lookupRoot, goOrigGUID))
+                {
+                    me = nullptr;
+                    go = o;
+                }
             }
         }
-        if (goOrigGUID)
-        {
-            if (GameObject* o = HashMapHolder<GameObject>::Find(goOrigGUID))
-            {
-                me = nullptr;
-                go = o;
-            }
-        }
+
         goOrigGUID = 0;
         meOrigGUID = 0;
     }

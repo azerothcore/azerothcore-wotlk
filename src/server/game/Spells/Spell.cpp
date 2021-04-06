@@ -2357,6 +2357,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     uint8 mask = target->effectMask;
 
     Unit* effectUnit = m_caster->GetGUID() == target->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, target->targetGUID);
+    if (!effectUnit && !target->targetGUID.IsPlayer()) // only players may be targeted across maps
+        return;
+
     if (!effectUnit || m_spellInfo->Id == 45927)
     {
         uint8 farMask = 0;

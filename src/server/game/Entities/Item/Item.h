@@ -335,6 +335,8 @@ public:
     bool CheckSoulboundTradeExpire();
 
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
+    void AddToObjectUpdate() override;
+    void RemoveFromObjectUpdate() override;
 
     [[nodiscard]] uint32 GetScriptId() const { return GetTemplate()->ScriptId; }
 private:

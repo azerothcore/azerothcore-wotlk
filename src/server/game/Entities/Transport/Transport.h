@@ -35,7 +35,7 @@ protected:
 
 class MotionTransport : public Transport
 {
-    friend MotionTransport* TransportMgr::CreateTransport(uint32, uint32, Map*);
+    friend MotionTransport* TransportMgr::CreateTransport(uint32, ObjectGuid::LowType, Map*);
     MotionTransport();
 public:
     ~MotionTransport() override;

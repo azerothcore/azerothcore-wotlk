@@ -84,6 +84,7 @@ Map* MapManager::CreateBaseMap(uint32 id)
             {
                 map = new Map(id, 0, REGULAR_DIFFICULTY);
                 map->LoadRespawnTimes();
+                map->LoadCorpseData();
             }
 
             i_maps[id] = map;
@@ -291,8 +292,6 @@ void MapManager::Update(uint32 diff)
         i_timer[mapUpdateStep].SetCurrent(0);
         ++mapUpdateStep;
     }
-
-    sObjectAccessor->Update(0);
 
     if (mapUpdateStep == 3 && i_timer[3].Passed())
     {

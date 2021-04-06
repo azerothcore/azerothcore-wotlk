@@ -315,6 +315,10 @@ protected:
 
     uint16 _fieldNotifyFlags;
 
+    virtual void AddToObjectUpdate() = 0;
+    virtual void RemoveFromObjectUpdate() = 0;
+    void AddToObjectUpdateIfNeeded();
+
     bool m_objectUpdated;
 
 private:
@@ -939,6 +943,7 @@ public:
     [[nodiscard]] Map const* GetBaseMap() const;
 
     void SetZoneScript();
+    void ClearZoneScript();
     [[nodiscard]] ZoneScript* GetZoneScript() const { return m_zoneScript; }
 
     TempSummon* SummonCreature(uint32 id, const Position& pos, TempSummonType spwtype = TEMPSUMMON_MANUAL_DESPAWN, uint32 despwtime = 0, uint32 vehId = 0, SummonPropertiesEntry const* properties = nullptr) const;
@@ -969,6 +974,9 @@ public:
     virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set) override;
     void GetCreaturesWithEntryInRange(std::list<Creature*>& creatureList, float radius, uint32 entry);
+
+    void AddToObjectUpdate() override;
+    void RemoveFromObjectUpdate() override;
 
     //relocation and visibility system functions
     void AddToNotify(uint16 f);

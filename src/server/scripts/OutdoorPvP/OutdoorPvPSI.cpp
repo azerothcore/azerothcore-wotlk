@@ -50,6 +50,9 @@ bool OutdoorPvPSI::SetupOutdoorPvP()
 {
     for (uint8 i = 0; i < OutdoorPvPSIBuffZonesNum; ++i)
         RegisterZone(OutdoorPvPSIBuffZones[i]);
+
+    SetMapFromZone(OutdoorPvPSIBuffZones[0]);
+
     return true;
 }
 
