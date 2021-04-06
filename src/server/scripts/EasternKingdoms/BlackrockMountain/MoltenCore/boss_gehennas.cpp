@@ -18,9 +18,10 @@ EndScriptData */
 
 enum Spells
 {
-    SPELL_GEHENNAS_CURSE    = 19716,
-    SPELL_RAIN_OF_FIRE      = 19717,
-    SPELL_SHADOW_BOLT       = 19728,
+    SPELL_GEHENNAS_CURSE        = 19716,
+    SPELL_RAIN_OF_FIRE          = 19717,
+    SPELL_SHADOW_BOLT_RANDOM    = 19728,
+    SPELL_SHADOW_BOLT_VICTIM    = 19729,
 };
 
 enum Events
@@ -84,9 +85,16 @@ public:
                     }
                     case EVENT_SHADOW_BOLT:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                        if (urand(0, 2))
                         {
-                            DoCast(target, SPELL_SHADOW_BOLT);
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                            {
+                                DoCast(target, SPELL_SHADOW_BOLT_RANDOM);
+                            }
+                        }
+                        else
+                        {
+                            DoCastVictim(SPELL_SHADOW_BOLT_VICTIM);
                         }
 
                         events.RepeatEvent(7000);
