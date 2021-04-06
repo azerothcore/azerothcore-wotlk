@@ -91,6 +91,10 @@ public:
                             {
                                 DoCast(target, SPELL_SHADOW_BOLT_RANDOM);
                             }
+                            else
+                            {
+                                DoCastVictim(SPELL_SHADOW_BOLT_VICTIM);
+                            }
                         }
                         else
                         {
