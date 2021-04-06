@@ -1985,6 +1985,12 @@ public:
     void RemoveMovementImpairingAuras(bool withRoot);
     void RemoveAurasByShapeShift();
 
+    // Convenience methods removing auras by predicate
+    void RemoveAppliedAuras(std::function<bool(AuraApplication const*)> const& check);
+
+    // Optimized overloads taking advantage of map key
+    void RemoveAppliedAuras(uint32 spellId, std::function<bool(AuraApplication const*)> const& check);
+
     void RemoveAreaAurasDueToLeaveWorld();
     void RemoveAllAuras();
     void RemoveArenaAuras();
