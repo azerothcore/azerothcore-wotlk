@@ -462,13 +462,11 @@ struct BroadcastText
 typedef std::unordered_map<uint32, BroadcastText> BroadcastTextContainer;
 
 typedef std::set<ObjectGuid::LowType> CellGuidSet;
-typedef std::unordered_map<ObjectGuid::LowType/*player guid*/, uint32/*instance*/> CellCorpseSet;
 
 struct CellObjectGuids
 {
     CellGuidSet creatures;
     CellGuidSet gameobjects;
-    CellCorpseSet corpses;
 };
 
 typedef std::unordered_map<uint32/*cell_id*/, CellObjectGuids> CellObjectGuidsMap;
@@ -1237,9 +1235,6 @@ public:
     [[nodiscard]] char const* GetAcoreStringForDBCLocale(uint32 entry) const { return GetAcoreString(entry, DBCLocaleIndex); }
     [[nodiscard]] LocaleConstant GetDBCLocaleIndex() const { return DBCLocaleIndex; }
     void SetDBCLocaleIndex(LocaleConstant locale) { DBCLocaleIndex = locale; }
-
-    void AddCorpseCellData(uint32 mapid, uint32 cellid, ObjectGuid::LowType player_guid, uint32 instance);
-    void DeleteCorpseCellData(uint32 mapid, uint32 cellid, ObjectGuid::LowType player_guid);
 
     // grid objects
     void AddCreatureToGrid(ObjectGuid::LowType guid, CreatureData const* data);

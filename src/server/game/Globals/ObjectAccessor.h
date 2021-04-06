@@ -74,18 +74,8 @@ private:
 template <class T> std::unordered_map<ObjectGuid, T*> HashMapHolder<T>::m_objectMap;
 template <class T> typename HashMapHolder<T>::LockType HashMapHolder<T>::i_lock;
 
-class ObjectAccessor
+namespace ObjectAccessor
 {
-private:
-    ObjectAccessor();
-    ~ObjectAccessor();
-    ObjectAccessor(const ObjectAccessor&);
-    ObjectAccessor& operator=(const ObjectAccessor&);
-
-public:
-    static ObjectAccessor* instance();
-    // TODO: override these template functions for each holder type and add assertions
-
     // these functions return objects only if in map of specified object
     static WorldObject* GetWorldObject(WorldObject const&, ObjectGuid const guid);
     static Object* GetObjectByTypeMask(WorldObject const&, ObjectGuid const guid, uint32 typemask);
@@ -108,49 +98,21 @@ public:
     static std::map<std::string, Player*> playerNameToPlayerPointer; // pussywizard: optimization
 
     // when using this, you must use the hashmapholder's lock
-    static HashMapHolder<Player>::MapType const& GetPlayers()
-    {
-        return HashMapHolder<Player>::GetContainer();
-    }
+    HashMapHolder<Player>::MapType const& GetPlayers();
 
-    template<class T> static void AddObject(T* object)
+    template<class T>
+    void AddObject(T* object)
     {
         HashMapHolder<T>::Insert(object);
     }
 
-    template<class T> static void RemoveObject(T* object)
+    template<class T>
+    void RemoveObject(T* object)
     {
         HashMapHolder<T>::Remove(object);
     }
 
-    static void SaveAllPlayers();
-
-    //Thread safe
-    Corpse* GetCorpseForPlayerGUID(ObjectGuid const guid);
-    void RemoveCorpse(Corpse* corpse, bool final = false);
-    void AddCorpse(Corpse* corpse);
-    void AddCorpsesToGrid(GridCoord const& gridpair, GridType& grid, Map* map);
-    Corpse* ConvertCorpseForPlayer(ObjectGuid const player_guid, bool insignia = false);
-
-    //Thread unsafe
-    void RemoveOldCorpses();
-    void UnloadAll();
-
-    // pussywizard: crashfix for corpses
-    void AddDelayedCorpseAction(Corpse* corpse, uint8 action, uint32 mapId = 0, uint32 instanceId = 0);
-    void ProcessDelayedCorpseActions();
-
-private:
-    typedef std::unordered_map<ObjectGuid, Corpse*> Player2CorpsesMapType;
-    typedef std::unordered_map<Player*, UpdateData>::value_type UpdateDataValueType;
-
-    Player2CorpsesMapType i_player2corpse;
-    GuidList i_playerBones;
-
-    ACE_RW_Thread_Mutex i_corpseLock;
-    mutable ACE_Thread_Mutex DelayedCorpseLock;
+    void SaveAllPlayers();
 };
-
-#define sObjectAccessor ObjectAccessor::instance()
 
 #endif

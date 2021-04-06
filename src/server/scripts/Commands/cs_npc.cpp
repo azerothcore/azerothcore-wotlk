@@ -245,7 +245,7 @@ public:
         creature->CleanupsBeforeDelete();
         delete creature;
         creature = new Creature();
-        if (!creature->LoadCreatureFromDB(db_guid, map))
+        if (!creature->LoadCreatureFromDB(db_guid, map, true, false, true))
         {
             delete creature;
             return false;

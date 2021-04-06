@@ -502,7 +502,8 @@ enum AtLoginFlags
     AT_LOGIN_CHANGE_RACE       = 0x80,
     AT_LOGIN_RESET_AP          = 0x100,
     AT_LOGIN_RESET_ARENA       = 0x200,
-    AT_LOGIN_CHECK_ACHIEVS     = 0x400
+    AT_LOGIN_CHECK_ACHIEVS     = 0x400,
+    AT_LOGIN_RESURRECT         = 0x800
 };
 
 typedef std::map<uint32, QuestStatusData> QuestStatusMap;
@@ -799,7 +800,8 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_SEASONAL_QUEST_STATUS   = 31,
     PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS    = 32,
     PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH       = 34,
-    MAX_PLAYER_LOGIN_QUERY,
+    PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 35,
+    MAX_PLAYER_LOGIN_QUERY
 };
 
 enum PlayerDelayedOperations
@@ -1385,7 +1387,7 @@ public:
     void AddItemDurations(Item* item);
     void RemoveItemDurations(Item* item);
     void SendItemDurations();
-    void LoadCorpse();
+    void LoadCorpse(PreparedQueryResult result);
     void LoadPet();
 
     bool AddItem(uint32 itemId, uint32 count);
@@ -2023,9 +2025,12 @@ public:
     void SendTeleportAckPacket();
 
     [[nodiscard]] Corpse* GetCorpse() const;
-    void SpawnCorpseBones();
-    void CreateCorpse();
+    void SpawnCorpseBones(bool triggerSave = true);
+    Corpse* CreateCorpse();
     void KillPlayer();
+    static void OfflineResurrect(ObjectGuid const guid, SQLTransaction& trans);
+    bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
+    WorldLocation GetCorpseLocation() const { return _corpseLocation; }
     uint32 GetResurrectionSpellId();
     void ResurrectPlayer(float restore_percent, bool applySickness = false);
     void BuildPlayerRepop();
@@ -2973,6 +2978,8 @@ private:
     FlyByCameraCollection* m_cinematicCamera;
     Position m_remoteSightPosition;
     Creature* m_CinematicObject;
+
+    WorldLocation _corpseLocation;
 };
 
 void AddItemsSetItem(Player* player, Item* item);

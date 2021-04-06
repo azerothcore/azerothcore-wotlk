@@ -371,7 +371,7 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
             player->ResurrectPlayer(1.0f);
             player->CastSpell(player, 6962, true);
             player->CastSpell(player, SPELL_SPIRIT_HEAL_MANA, true);
-            sObjectAccessor->ConvertCorpseForPlayer(guid);
+            player->SpawnCorpseBones(false);
         }
         m_ResurrectQueue.clear();
     }

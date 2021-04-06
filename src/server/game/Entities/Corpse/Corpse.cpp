@@ -50,9 +50,8 @@ void Corpse::RemoveFromWorld()
     WorldObject::RemoveFromWorld();
 }
 
-bool Corpse::Create(ObjectGuid::LowType guidlow, Map* map)
+bool Corpse::Create(ObjectGuid::LowType guidlow)
 {
-    SetMap(map);
     Object::_Create(guidlow, 0, HighGuid::Corpse);
     return true;
 }
@@ -70,16 +69,12 @@ bool Corpse::Create(ObjectGuid::Low guidlow, Player* owner)
         return false;
     }
 
-    //we need to assign owner's map for corpse
-    //in other way we will get a crash in Corpse::SaveToDB()
-    SetMap(owner->GetMap());
-
     WorldObject::_Create(guidlow, HighGuid::Corpse, owner->GetPhaseMask());
 
     SetObjectScale(1);
     SetGuidValue(CORPSE_FIELD_OWNER, owner->GetGUID());
 
-    _gridCoord = acore::ComputeGridCoord(GetPositionX(), GetPositionY());
+    _cellCoord = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
 
     return true;
 }
@@ -115,10 +110,14 @@ void Corpse::SaveToDB()
 
 void Corpse::DeleteFromDB(SQLTransaction& trans)
 {
-    PreparedStatement* stmt = nullptr;
-    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CORPSE);
-    stmt->setUInt32(0, GetOwnerGUID().GetCounter());
-    trans->Append(stmt);
+    DeleteFromDB(GetOwnerGUID(), trans);
+}
+
+void Corpse::DeleteFromDB(ObjectGuid const ownerGuid, SQLTransaction& trans)
+{
+    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CORPSE);
+    stmt->setUInt32(0, ownerGuid.GetCounter());
+    CharacterDatabase.ExecuteOrAppend(trans, stmt);
 }
 
 bool Corpse::LoadCorpseFromDB(ObjectGuid::LowType guid, Field* fields)
@@ -163,12 +162,16 @@ bool Corpse::LoadCorpseFromDB(ObjectGuid::LowType guid, Field* fields)
         return false;
     }
 
-    _gridCoord = acore::ComputeGridCoord(GetPositionX(), GetPositionY());
+    _cellCoord = acore::ComputeCellCoord(GetPositionX(), GetPositionY());
     return true;
 }
 
 bool Corpse::IsExpired(time_t t) const
 {
+    // Deleted character
+    if (!sWorld->GetCharacterNameData(GetOwnerGUID()))
+        return true;
+
     if (m_type == CORPSE_BONES)
         return m_time < t - 60 * MINUTE;
     else

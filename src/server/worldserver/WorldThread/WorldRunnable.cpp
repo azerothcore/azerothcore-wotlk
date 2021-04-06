@@ -78,7 +78,6 @@ void WorldRunnable::run()
 
     sMapMgr->UnloadAll();                     // unload all grids (including locked in memory)
     sOutdoorPvPMgr->Die();
-    sObjectAccessor->UnloadAll();             // unload 'i_player2corpse' storage and remove from world
     sScriptMgr->Unload();
 #ifdef ELUNA
     Eluna::Uninitialize();

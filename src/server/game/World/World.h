@@ -394,6 +394,8 @@ public:
     std::string const& GetRealmName() const { return _realmName; } // pussywizard
     void SetRealmName(std::string name) { _realmName = name; } // pussywizard
 
+    void RemoveOldCorpses();
+
 protected:
     void _UpdateGameTime();
     // callback for UpdateRealmCharacters

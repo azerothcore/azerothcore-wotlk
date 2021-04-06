@@ -297,7 +297,7 @@ void SmartAI::EndPath(bool fail)
                     if (!groupGuy || !player->IsInMap(groupGuy))
                         continue;
 
-                    if (!fail && groupGuy->IsAtGroupRewardDistance(me) && !groupGuy->GetCorpse())
+                    if (!fail && groupGuy->IsAtGroupRewardDistance(me) && !groupGuy->HasCorpse())
                         groupGuy->AreaExploredOrEventHappens(mEscortQuestID);
                     else if (fail && groupGuy->GetQuestStatus(mEscortQuestID) == QUEST_STATUS_INCOMPLETE)
                         groupGuy->FailQuest(mEscortQuestID);
@@ -305,7 +305,7 @@ void SmartAI::EndPath(bool fail)
             }
             else
             {
-                if (!fail && player->IsAtGroupRewardDistance(me) && !player->GetCorpse())
+                if (!fail && player->IsAtGroupRewardDistance(me) && !player->HasCorpse())
                     player->GroupEventHappens(mEscortQuestID, me);
                 else if (fail && player->GetQuestStatus(mEscortQuestID) == QUEST_STATUS_INCOMPLETE)
                     player->FailQuest(mEscortQuestID);
@@ -318,7 +318,7 @@ void SmartAI::EndPath(bool fail)
                 if (GetScript()->IsPlayer((*iter)))
                 {
                     Player* player = (*iter)->ToPlayer();
-                    if (!fail && player->IsAtGroupRewardDistance(me) && !player->GetCorpse())
+                    if (!fail && player->IsAtGroupRewardDistance(me) && !player->HasCorpse())
                         player->AreaExploredOrEventHappens(mEscortQuestID);
                     else if (fail && player->GetQuestStatus(mEscortQuestID) == QUEST_STATUS_INCOMPLETE)
                         player->FailQuest(mEscortQuestID);
