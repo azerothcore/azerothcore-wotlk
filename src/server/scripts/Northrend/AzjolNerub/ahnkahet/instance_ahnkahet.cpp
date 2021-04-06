@@ -117,25 +117,21 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch (type)
+            if (type == DATA_TELDRAM_SPHERE1 || type == DATA_TELDRAM_SPHERE2)
             {
-                case DATA_TELDRAM_SPHERE1:
-                case DATA_TELDRAM_SPHERE2:
+
+                teldaramSpheres[type == DATA_TELDRAM_SPHERE1 ? 0 : 1] = data;
+                SaveToDB();
+
+                if (IsAllSpheresActivated())
                 {
-                    teldaramSpheres[type == DATA_TELDRAM_SPHERE1 ? 0 : 1] = data;
-                    SaveToDB();
+                    HandleGameObject(taldaramPlatform_GUID, true, nullptr);
 
-                    if (IsAllSpheresActivated())
+                    Creature* teldaram = instance->GetCreature(princeTaldaram_GUID);
+                    if (teldaram && teldaram->IsAlive())
                     {
-                        HandleGameObject(taldaramPlatform_GUID, true, nullptr);
-
-                        Creature* teldaram = instance->GetCreature(princeTaldaram_GUID);
-                        if (teldaram && teldaram->IsAlive())
-                        {
-                            teldaram->AI()->DoAction(ACTION_REMOVE_PRISON);
-                        }
+                        teldaram->AI()->DoAction(ACTION_REMOVE_PRISON);
                     }
-                    break;
                 }
             }
         }
@@ -234,7 +230,7 @@ public:
         // Teldaram related
         uint64 taldaramPlatform_GUID;
         uint64 taldaramGate_GUID;
-        std::array<uint32, 2> teldaramSpheres;  // Used to identify for sphere activation
+        std::array<uint32, 2> teldaramSpheres;  // Used to identify activation status for sphere activation
         bool canSaveBossStates;     // Indicates that it is safe to trigger SaveToDB call in SetBossState
 
         bool IsAllSpheresActivated() const
