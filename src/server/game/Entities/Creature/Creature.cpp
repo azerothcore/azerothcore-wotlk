@@ -644,7 +644,9 @@ void Creature::Update(uint32 diff)
                         m_assistanceTimer = sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD);
                     }
                     else
+                    {
                         m_assistanceTimer -= diff;
+                    }
                 }
 
                 if (!IsInEvadeMode() && IsAIEnabled)
