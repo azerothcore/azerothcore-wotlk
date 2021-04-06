@@ -11,51 +11,55 @@ SDComment: Conflag on ground nyi
 SDCategory: Molten Core
 EndScriptData */
 
+#include "ScriptMgr.h"
+#include "ScriptedCreature.h"
 #include "molten_core.h"
 #include "ObjectMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 enum Texts
 {
-    EMOTE_FRENZY        = 0,
-    EMOTE_SMOLDERING    = 0,
-    EMOTE_IGNITE        = 1,
+    EMOTE_FRENZY                    = 0,
+    EMOTE_SMOLDERING                = 0,
+    EMOTE_IGNITE                    = 1,
 };
 
 enum Spells
 {
-    SPELL_FRENZY        = 19451,
-    SPELL_MAGMA_SPIT    = 19449,
-    SPELL_PANIC         = 19408,
-    SPELL_LAVA_BOMB     = 19428,
-    SPELL_SERRATED_BITE = 19771,
+    SPELL_FRENZY                    = 19451,
+    SPELL_MAGMA_SPIT                = 19449,
+    SPELL_PANIC                     = 19408,                    // Aoe fear
+    SPELL_LAVA_BOMB                 = 19411,                    // This calls a dummy server side effect that cast spell 20494 to spawn GO 177704 for 30s
+    SPELL_LAVA_BOMB_EFFECT          = 20494,                    // Spawns trap GO 177704 which triggers 19428
+    SPELL_LAVA_BOMB_RANGED          = 20474,                    // This calls a dummy server side effect that cast spell 20495 to spawn GO 177704 for 60s
+    SPELL_LAVA_BOMB_RANGED_EFFECT   = 20495,                    // Spawns trap GO 177704 which triggers 19428
+
+    SPELL_SERRATED_BITE             = 19771,
 };
 
 enum Events
 {
-    EVENT_FRENZY        = 1,
+    EVENT_FRENZY                    = 1,
     EVENT_PANIC,
     EVENT_LAVA_BOMB,
+    EVENT_LAVA_BOMB_RANGED,
     EVENT_SERRATED_BITE,
     EVENT_IGNITE,
 };
 
+constexpr float MELEE_TARGET_LOOKUP_DIST = 10.0f;
+
 class boss_magmadar : public CreatureScript
 {
 public:
-    boss_magmadar() : CreatureScript("boss_magmadar") { }
+    boss_magmadar() : CreatureScript("boss_magmadar")
+    {
+    }
 
     struct boss_magmadarAI : public BossAI
     {
         boss_magmadarAI(Creature* creature) : BossAI(creature, BOSS_MAGMADAR)
         {
-        }
-
-        void Reset() override
-        {
-            _Reset();
-            DoCastSelf(SPELL_MAGMA_SPIT, true);
         }
 
         void EnterCombat(Unit* /*victim*/) override
@@ -64,6 +68,7 @@ public:
             events.ScheduleEvent(EVENT_FRENZY, 30000);
             events.ScheduleEvent(EVENT_PANIC, 20000);
             events.ScheduleEvent(EVENT_LAVA_BOMB, 12000);
+            events.ScheduleEvent(EVENT_LAVA_BOMB_RANGED, 18000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -99,12 +104,23 @@ public:
                     }
                     case EVENT_LAVA_BOMB:
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true, -SPELL_LAVA_BOMB))
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, MELEE_TARGET_LOOKUP_DIST, true))
                         {
                             DoCast(target, SPELL_LAVA_BOMB);
                         }
 
                         events.RepeatEvent(12000);
+                        break;
+                    }
+                    case EVENT_LAVA_BOMB_RANGED:
+                    {
+                        std::list<Unit*> targets;
+                        SelectTargetList(targets, [this](Unit* target) { return target && target->GetTypeId() == TYPEID_PLAYER && target->GetDistance(me) > MELEE_TARGET_LOOKUP_DIST; }, 1, SelectAggroTarget::SELECT_TARGET_RANDOM);
+                        if (!targets.empty())
+                        {
+                            DoCast(targets.front() , SPELL_LAVA_BOMB_RANGED);
+                        }
+                        events.RepeatEvent(urand(12000, 15000));
                         break;
                     }
                 }
@@ -269,8 +285,60 @@ public:
     }
 };
 
+// 19411 Lava Bomb
+// 20474 Lava Bomb
+class spell_magmadar_lava_bomb : public SpellScriptLoader
+{
+public:
+    spell_magmadar_lava_bomb() : SpellScriptLoader("spell_magmadar_lava_bomb")
+    {
+    }
+
+    class spell_magmadar_lava_bomb_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_magmadar_lava_bomb_SpellScript);
+
+        void HandleDummy(SpellEffIndex effIndex)
+        {
+            if (Unit* target = GetHitUnit())
+            {
+                uint32 spellId = 0;
+                switch (m_scriptSpellId)
+                {
+                    case SPELL_LAVA_BOMB:
+                    {
+                        spellId = SPELL_LAVA_BOMB_EFFECT;
+                        break;
+                    }
+                    case SPELL_LAVA_BOMB_RANGED:
+                    {
+                        spellId = SPELL_LAVA_BOMB_RANGED_EFFECT;
+                        break;
+                    }
+                    default:
+                    {
+                        return;
+                    }
+                }
+                target->CastSpell(target, spellId, true, nullptr, nullptr, GetCaster() ? GetCaster()->GetGUID() : 0);
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_magmadar_lava_bomb_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_magmadar_lava_bomb_SpellScript();
+    }
+};
+
 void AddSC_boss_magmadar()
 {
     new boss_magmadar();
     new npc_magmadar_core_hound();
+    new spell_magmadar_lava_bomb();
 }
