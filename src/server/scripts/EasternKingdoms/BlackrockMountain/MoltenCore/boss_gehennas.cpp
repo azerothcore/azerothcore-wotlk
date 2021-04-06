@@ -85,7 +85,7 @@ public:
                     }
                     case EVENT_SHADOW_BOLT:
                     {
-                        if (urand(0, 2))
+                        if (urand(0, 1))
                         {
                             if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
                             {
