@@ -7298,6 +7298,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->ManaCostPercentage = 0;
     });
 
+    // Serrated Bite (Hounds, Molten Core)
+    ApplySpellFix({ 19771 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_STACK_FOR_DIFF_CASTERS;
+    });
+
     for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
     {
         SpellEntry* spellInfo = (SpellEntry*)sSpellStore.LookupEntry(i);
