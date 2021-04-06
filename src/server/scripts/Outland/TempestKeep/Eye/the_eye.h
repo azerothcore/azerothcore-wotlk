@@ -5,10 +5,13 @@
 #ifndef DEF_THE_EYE_H
 #define DEF_THE_EYE_H
 
+#include "CreatureAIImpl.h"
 #include "GridNotifiers.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+
+#define TheEyeScriptName "instance_the_eye"
 
 enum EyeData
 {
@@ -40,5 +43,11 @@ enum EyeGOs
     GO_KAEL_STATUE_RIGHT    = 184596,
     GO_KAEL_STATUE_LEFT     = 184597
 };
+
+template <class AI, class T>
+inline AI* GetTheEyeAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, TheEyeScriptName);
+}
 
 #endif
