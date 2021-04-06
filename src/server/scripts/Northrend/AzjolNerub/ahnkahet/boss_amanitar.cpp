@@ -106,6 +106,10 @@ public:
             _Reset();
             _mushroomsDeque.clear();
             mushroomsSummoned = false;
+        }
+
+        void EnterCombat(Unit* /*attacker*/) override
+        {
             events.ScheduleEvent(EVENT_ROOTS, urand(5000, 9000));
             events.ScheduleEvent(EVENT_BASH, urand(10000, 14000));
             events.ScheduleEvent(EVENT_BOLT, urand(15000, 20000));

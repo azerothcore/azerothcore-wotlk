@@ -72,14 +72,6 @@ public:
         void Reset() override
         {
             _Reset();
-            events.ScheduleEvent(EVENT_SWARMER, 10000);
-            events.ScheduleEvent(EVENT_CHECK_HOME, 2000);
-            events.ScheduleEvent(EVENT_PLAGUE, urand(5000, 8000));
-
-            if (IsHeroic())
-            {
-                events.ScheduleEvent(EVENT_BROOD_RAGE, 5000);
-            }
 
             // Clear eggs data
             swarmEggs.clear();
@@ -93,6 +85,15 @@ public:
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
+
+            events.ScheduleEvent(EVENT_SWARMER, 10000);
+            events.ScheduleEvent(EVENT_CHECK_HOME, 2000);
+            events.ScheduleEvent(EVENT_PLAGUE, urand(5000, 8000));
+
+            if (IsHeroic())
+            {
+                events.ScheduleEvent(EVENT_BROOD_RAGE, 5000);
+            }
 
             // Cache eggs
             std::list<Creature*> eggs;

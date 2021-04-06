@@ -167,7 +167,6 @@ public:
 
             _Reset();
             events.SetPhase(PHASE_NORMAL);
-            ReschedulleCombatEvents();
 
             DespawnOOCSummons();
             std::list<TempSummon*> tempOOCSummons;
@@ -318,6 +317,7 @@ public:
         {
             _EnterCombat();
             Talk(SAY_AGGRO);
+            ReschedulleCombatEvents();
         }
 
         void KilledUnit(Unit* who) override

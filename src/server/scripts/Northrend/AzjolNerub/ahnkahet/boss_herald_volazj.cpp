@@ -96,10 +96,6 @@ public:
         void Reset() override
         {
             _Reset();
-            events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8000);
-            events.ScheduleEvent(EVENT_HERALD_SHADOW, 5000);
-            events.ScheduleEvent(EVENT_HERALD_SHIVER, 15000);
-
             insanityTimes = 0;
             insanityPhase = false;
 
@@ -112,6 +108,9 @@ public:
         void EnterCombat(Unit* /*who*/) override
         {
             _EnterCombat();
+            events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8000);
+            events.ScheduleEvent(EVENT_HERALD_SHADOW, 5000);
+            events.ScheduleEvent(EVENT_HERALD_SHIVER, 15000);
             Talk(SAY_AGGRO);
             DoCastSelf(SPELL_WHISPER_AGGRO);
             instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
