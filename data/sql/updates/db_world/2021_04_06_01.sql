@@ -1,3 +1,19 @@
+-- DB update 2021_04_06_00 -> 2021_04_06_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_06_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_06_00 2021_04_06_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1617676322351034500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617676322351034500');
 
 -- 4512 Un largo camino para unas babosas
@@ -7794,3 +7810,12 @@ INSERT INTO `quest_offer_reward_locale` (`id`, `locale`, `RewardText`, `Verified
 (@ID, 'esES', 'Descansa, $c. Mis fuentes me indican que luchaste bien en el frente de Trabalomas.', 0),
 (@ID, 'esMX', 'Descansa, $c. Mis fuentes me indican que luchaste bien en el frente de Trabalomas.', 0);
 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

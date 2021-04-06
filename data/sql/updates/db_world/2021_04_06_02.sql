@@ -1,3 +1,19 @@
+-- DB update 2021_04_06_01 -> 2021_04_06_02
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_06_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_06_01 2021_04_06_02 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1617676326188062600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617676326188062600');
 
 -- 528 La batalla de Trabalomas
@@ -10313,3 +10329,12 @@ DELETE FROM `quest_offer_reward_locale` WHERE `id` = @ID AND `locale` IN('esES',
 INSERT INTO `quest_offer_reward_locale` (`id`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
 (@ID, 'esES', 'Tus proezas no se quedarán sin reconocimiento, $n. Te has ganado este tributo. El Señor de la Guerra hablará contigo respecto a la misión final.', 0),
 (@ID, 'esMX', 'Tus proezas no se quedarán sin reconocimiento, $n. Te has ganado este tributo. El Señor de la Guerra hablará contigo respecto a la misión final.', 0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
