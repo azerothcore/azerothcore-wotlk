@@ -192,7 +192,7 @@ public:
         uint32 moveTimer;
     };
 
-    CreatureAI *GetAI(Creature *creature) const
+    CreatureAI *GetAI(Creature *creature) const override
     {
         return GetAhnkahetAI<npc_taldaram_flamesphereAI>(creature);
     }
