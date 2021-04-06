@@ -3,8 +3,8 @@
 */
 
 #include "ScriptMgr.h"
-#include "ahnkahet.h"
 #include "ScriptedCreature.h"
+#include "ahnkahet.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 

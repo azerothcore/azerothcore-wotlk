@@ -3,10 +3,9 @@
 */
 
 #include "ScriptMgr.h"
-#include "ahnkahet.h"
 #include "ScriptedCreature.h"
+#include "ahnkahet.h"
 #include "Player.h"
-
 #include "SpellInfo.h"
 #include "SpellScript.h"
 
