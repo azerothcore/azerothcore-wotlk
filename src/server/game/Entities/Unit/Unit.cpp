@@ -4427,6 +4427,32 @@ void Unit::RemoveAura(Aura* aura, AuraRemoveMode mode)
         RemoveAura(aurApp, mode);
 }
 
+void Unit::RemoveAppliedAuras(std::function<bool(AuraApplication const*)> const& check)
+{
+    for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
+    {
+        if (check(iter->second))
+        {
+            RemoveAura(iter);
+            continue;
+        }
+        ++iter;
+    }
+}
+
+void Unit::RemoveAppliedAuras(uint32 spellId, std::function<bool(AuraApplication const*)> const& check)
+{
+    for (AuraApplicationMap::iterator iter = m_appliedAuras.lower_bound(spellId); iter != m_appliedAuras.upper_bound(spellId);)
+    {
+        if (check(iter->second))
+        {
+            RemoveAura(iter);
+            continue;
+        }
+        ++iter;
+    }
+}
+
 void Unit::RemoveAurasDueToSpell(uint32 spellId, uint64 casterGUID, uint8 reqEffMask, AuraRemoveMode removeMode)
 {
     for (AuraApplicationMap::iterator iter = m_appliedAuras.lower_bound(spellId); iter != m_appliedAuras.upper_bound(spellId);)
@@ -4845,23 +4871,14 @@ void Unit::RemoveArenaAuras()
 {
     // in join, remove positive buffs, on end, remove negative
     // used to remove positive visible auras in arenas
-    for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
+    RemoveAppliedAuras([](AuraApplication const* aurApp)
     {
-        AuraApplication const* aurApp = iter->second;
         Aura const* aura = aurApp->GetBase();
-        if (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR4_DONT_REMOVE_IN_ARENA) // don't remove stances, shadowform, pally/hunter auras
-                && !aura->IsPassive()                               // don't remove passive auras
-                && !aura->IsArea()                                  // don't remove area auras, eg pet talents affecting owner
-                && (aurApp->IsPositive() || IsPet() || !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR3_DEATH_PERSISTENT))) // not negative death persistent auras
-        {
-            RemoveAura(iter);
-        }
-        // xinef: special marker, 95% sure
-        else if (aura->GetSpellInfo()->HasAttribute(SPELL_ATTR5_REMOVE_ON_ARENA_ENTER))
-            RemoveAura(iter);
-        else
-            ++iter;
-    }
+        return (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR4_DONT_REMOVE_IN_ARENA)                          // don't remove stances, shadowform, pally/hunter auras
+            && !aura->IsPassive()                                                                              // don't remove passive auras
+            && (aurApp->IsPositive() || !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR3_DEATH_PERSISTENT))) || // not negative death persistent auras
+            aura->GetSpellInfo()->HasAttribute(SPELL_ATTR5_REMOVE_ON_ARENA_ENTER);                             // special marker, always remove
+    });
 }
 
 void Unit::RemoveAllAurasOnDeath()
@@ -15202,15 +15219,22 @@ bool Unit::isFrozen() const
 
 struct ProcTriggeredData
 {
-    ProcTriggeredData(Aura* _aura)
-        : aura(_aura)
+    ProcTriggeredData(Aura* _aura) : aura(_aura)
     {
         effMask = 0;
         spellProcEvent = nullptr;
+        triggerSpelId.fill(0);
     }
+
     SpellProcEventEntry const* spellProcEvent;
     Aura* aura;
     uint32 effMask;
+    std::array<uint32, EFFECT_ALL> triggerSpelId;
+
+    bool operator==(const uint32 spellId) const
+    {
+        return aura->GetId() == spellId;
+    }
 };
 
 typedef std::list< ProcTriggeredData > ProcTriggeredList;
@@ -15554,24 +15578,74 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         //bool triggered = !spellProto->HasAttribute(SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED) ?
         //    (procExtra & PROC_EX_INTERNAL_TRIGGERED && !(procFlag & PROC_FLAG_DONE_TRAP_ACTIVATION)) : false;
 
+        bool hasTriggeredProc = false;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
             if (itr->second->HasEffect(i))
             {
                 AuraEffect* aurEff = itr->second->GetBase()->GetEffect(i);
+
                 // Skip this auras
                 if (isNonTriggerAura[aurEff->GetAuraType()])
                     continue;
+
                 // If not trigger by default and spellProcEvent == nullptr - skip
                 if (!isTriggerAura[aurEff->GetAuraType()] && triggerData.spellProcEvent == nullptr)
                     continue;
+
+                switch (aurEff->GetAuraType())
+                {
+                    case SPELL_AURA_PROC_TRIGGER_SPELL:
+                    case SPELL_AURA_MANA_SHIELD:
+                    case SPELL_AURA_DUMMY:
+                    case SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE:
+                        if (uint32 triggerSpellId = aurEff->GetSpellInfo()->Effects[i].TriggerSpell)
+                        {
+                            triggerData.triggerSpelId[i] = triggerSpellId;
+                            hasTriggeredProc = true;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
                 // Some spells must always trigger
                 //if (isAlwaysTriggeredAura[aurEff->GetAuraType()])
                 triggerData.effMask |= 1 << i;
             }
         }
+
         if (triggerData.effMask)
-            procTriggered.push_front(triggerData);
+        {
+            // If there is aura that triggers another proc aura, make sure that the triggered one is going to be proccessed on top of it
+            if (hasTriggeredProc)
+            {
+                bool proccessed = false;
+                for (uint8 i = 0; i < EFFECT_ALL; ++i)
+                {
+                    if (uint32 triggeredSpellId = triggerData.triggerSpelId[i])
+                    {
+                        auto iter = std::find(procTriggered.begin(), procTriggered.end(), triggeredSpellId);
+                        if (iter != procTriggered.end())
+                        {
+                            std::advance(iter, 1);
+                            procTriggered.insert(iter, triggerData);
+                            proccessed = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!proccessed)
+                {
+                    procTriggered.push_front(triggerData);
+                }
+            }
+            else
+            {
+                procTriggered.push_front(triggerData);
+            }
+        }
     }
 
     // Nothing found
