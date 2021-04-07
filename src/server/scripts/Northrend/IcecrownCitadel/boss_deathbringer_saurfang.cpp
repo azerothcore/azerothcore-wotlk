@@ -1386,7 +1386,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_icc_blood_beastAI(creature);
+        return GetIcecrownCitadelAI<npc_icc_blood_beastAI>(creature);
     }
 };
 

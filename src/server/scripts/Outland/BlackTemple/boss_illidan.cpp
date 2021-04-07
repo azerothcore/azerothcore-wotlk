@@ -696,7 +696,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_illidan_stormrageAI>(creature);
+        return GetBlackTempleAI<boss_illidan_stormrageAI>(creature);
     }
 };
 
@@ -979,7 +979,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_akama_illidanAI>(creature);
+        return GetBlackTempleAI<npc_akama_illidanAI>(creature);
     }
 };
 

@@ -7,6 +7,10 @@
 #ifndef DEF_CULLING_OF_STRATHOLME_H
 #define DEF_CULLING_OF_STRATHOLME_H
 
+#include "CreatureAIImpl.h"
+
+#define CullingOfStratholmeScriptName "instance_culling_of_stratholme"
+
 enum Data
 {
     DATA_ARTHAS_EVENT,
@@ -169,5 +173,11 @@ const Position EventPos[] =
     {2329.07f,  1276.98f,  132.68f,  4.0f},         // infinite corruptor pos
     {2298.25f,  1500.56f,  128.37f,  4.95f}         // malganis final pos
 };
+
+template <class AI, class T>
+inline AI* GetCullingOfStratholmeAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, CullingOfStratholmeScriptName);
+}
 
 #endif

@@ -24,11 +24,12 @@ using G3D::AABox;
 
 struct GameobjectModelData
 {
-    GameobjectModelData(const std::string& name_, const AABox& box) :
-        bound(box), name(name_) {}
+    GameobjectModelData(char const* name_, uint32 nameLength, Vector3 const& lowBound, Vector3 const& highBound, bool isWmo_) :
+        bound(lowBound, highBound), name(name_, nameLength), isWmo(isWmo_) { }
 
     AABox bound;
     std::string name;
+    bool isWmo;
 };
 
 typedef std::unordered_map<uint32, GameobjectModelData> ModelList;
@@ -47,7 +48,15 @@ void LoadGameObjectModelList()
         return;
     }
 
+    char magic[8];
+    if (fread(magic, 1, 8, model_list_file) != 8 || memcmp(magic, VMAP::VMAP_MAGIC, 8) != 0)
+    {
+        sLog->outError("File '%s' has wrong header, expected %s.", VMAP::GAMEOBJECT_MODELS, VMAP::VMAP_MAGIC);
+        return;
+    }
+
     uint32 name_length, displayId;
+    uint8 isWmo;
     char buff[500];
     while (true)
     {
@@ -56,20 +65,25 @@ void LoadGameObjectModelList()
             if (feof(model_list_file))  // EOF flag is only set after failed reading attempt
                 break;
 
-        if (fread(&name_length, sizeof(uint32), 1, model_list_file) != 1
-                || name_length >= sizeof(buff)
-                || fread(&buff, sizeof(char), name_length, model_list_file) != name_length
-                || fread(&v1, sizeof(Vector3), 1, model_list_file) != 1
-                || fread(&v2, sizeof(Vector3), 1, model_list_file) != 1)
+        if (fread(&isWmo, sizeof(uint8), 1, model_list_file) != 1
+            || fread(&name_length, sizeof(uint32), 1, model_list_file) != 1
+            || name_length >= sizeof(buff)
+            || fread(&buff, sizeof(char), name_length, model_list_file) != name_length
+            || fread(&v1, sizeof(Vector3), 1, model_list_file) != 1
+            || fread(&v2, sizeof(Vector3), 1, model_list_file) != 1)
         {
             sLog->outError("File '%s' seems to be corrupted!", VMAP::GAMEOBJECT_MODELS);
             break;
         }
 
-        model_list.insert
-        (
-            ModelList::value_type( displayId, GameobjectModelData(std::string(buff, name_length), AABox(v1, v2)) )
-        );
+        if (v1.isNaN() || v2.isNaN())
+        {
+            sLog->outError("File '%s' Model '%s' has invalid v1%s v2%s values!",
+                VMAP::GAMEOBJECT_MODELS, std::string(buff, name_length).c_str(), v1.toString().c_str(), v2.toString().c_str());
+            continue;
+        }
+
+        model_list.emplace(std::piecewise_construct, std::forward_as_tuple(displayId), std::forward_as_tuple(&buff[0], name_length, v1, v2, isWmo != 0));
     }
 
     fclose(model_list_file);
