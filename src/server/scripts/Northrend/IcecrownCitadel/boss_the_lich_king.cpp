@@ -2654,8 +2654,8 @@ public:
                     break;
                 case EVENT_MOVE_TO_DROP_POS:
                     me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-                    me->SetDisableGravity(false);
                     me->SetCanFly(false);
+                    me->SetDisableGravity(false);
                     me->GetMotionMaster()->MovePoint(POINT_DROP_PLAYER, _destPoint, false);
                     me->SetDisableGravity(true, true);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);

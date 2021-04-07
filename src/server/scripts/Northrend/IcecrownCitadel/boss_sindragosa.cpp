@@ -281,8 +281,8 @@ public:
 
             if (!_summoned)
             {
-                me->SetDisableGravity(true);
                 me->SetCanFly(true);
+                me->SetDisableGravity(true);
             }
         }
 
@@ -353,8 +353,8 @@ public:
             instance->SetBossState(DATA_SINDRAGOSA, FAIL);
             if (_summoned)
             {
-                me->SetDisableGravity(false);
                 me->SetCanFly(false);
+                me->SetDisableGravity(false);
             }
         }
 
@@ -421,8 +421,8 @@ public:
             {
                 case POINT_FROSTWYRM_LAND:
                     me->setActive(false);
-                    me->SetDisableGravity(false);
                     me->SetCanFly(false);
+                    me->SetDisableGravity(false);
                     me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                     me->SetHomePosition(SindragosaLandPos);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);

@@ -183,8 +183,8 @@ public:
         {
             if (type == POINT_MOTION_TYPE && id == POINT_MIDDLE)
             {
-                me->SetDisableGravity(false);
                 me->SetCanFly(false);
+                me->SetDisableGravity(false);
                 events.ScheduleEvent(EVENT_RESTORE_COMBAT, 0);
                 events.ScheduleEvent(EVENT_SPELL_CONE_OF_FIRE, 5000);
                 if (IsHeroic())

@@ -3046,8 +3046,8 @@ public:
     {
         npc_icc_spire_frostwyrmAI(Creature* creature) : ScriptedAI(creature)
         {
-            me->SetDisableGravity(true);
             me->SetCanFly(true);
+            me->SetDisableGravity(true);
         }
 
         EventMap events;
@@ -3075,8 +3075,8 @@ public:
         {
             if (type == EFFECT_MOTION_TYPE && id == 1)
             {
-                me->SetDisableGravity(false);
                 me->SetCanFly(false);
+                me->SetDisableGravity(false);
 
                 if (Player* p = SelectTargetFromPlayerList(100.0f))
                 {
