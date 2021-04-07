@@ -42,7 +42,6 @@ public:
             _golemaggTheIncineratorGUID(0),
             _majordomoExecutusGUID(0),
             _cacheOfTheFirelordGUID(0),
-            _deadBossCount(0),
             _ragnarosAddDeaths(0),
             canSaveBossState(false)
         {
@@ -287,7 +286,6 @@ public:
         uint64 _golemaggTheIncineratorGUID;
         uint64 _majordomoExecutusGUID;
         uint64 _cacheOfTheFirelordGUID;
-        uint8 _deadBossCount;
         uint8 _ragnarosAddDeaths;
         bool canSaveBossState;
     };
