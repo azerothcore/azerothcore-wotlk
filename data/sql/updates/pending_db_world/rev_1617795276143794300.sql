@@ -1,7 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617795276143794300');
 
 DELETE FROM `item_loot_template` WHERE (`Entry` = 16882);
-
 INSERT INTO `item_loot_template` VALUES
 (16882, 422, 0, 2.5, 0, 1, 0, 1, 1, 'Battered Junkbox - Dwarven Mild'),
 (16882, 929, 0, 2.5, 0, 1, 0, 1, 1, 'Battered Junkbox - Healing Potion'),
