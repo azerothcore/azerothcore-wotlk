@@ -40,7 +40,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_maiden_of_griefAI (pCreature);
+        return GetHallsOfStoneAI<boss_maiden_of_griefAI>(pCreature);
     }
 
     struct boss_maiden_of_griefAI : public ScriptedAI

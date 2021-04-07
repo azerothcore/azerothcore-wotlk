@@ -326,7 +326,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_saraAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_saraAI>(pCreature);
     }
 
     struct boss_yoggsaron_saraAI : public ScriptedAI
@@ -874,7 +874,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_cloudAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_cloudAI>(pCreature);
     }
 
     struct boss_yoggsaron_cloudAI : public npc_escortAI
@@ -970,7 +970,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_guardian_of_ysAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_guardian_of_ysAI>(pCreature);
     }
 
     struct boss_yoggsaron_guardian_of_ysAI : public ScriptedAI
@@ -1014,7 +1014,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaronAI (pCreature);
+        return GetUlduarAI<boss_yoggsaronAI>(pCreature);
     }
 
     struct boss_yoggsaronAI : public ScriptedAI
@@ -1197,7 +1197,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_brainAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_brainAI>(pCreature);
     }
 
     struct boss_yoggsaron_brainAI : public NullCreatureAI
@@ -1433,7 +1433,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_death_orbAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_death_orbAI>(pCreature);
     }
 
     struct boss_yoggsaron_death_orbAI : public NullCreatureAI
@@ -1473,7 +1473,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_crusher_tentacleAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_crusher_tentacleAI>(pCreature);
     }
 
     struct boss_yoggsaron_crusher_tentacleAI : public ScriptedAI
@@ -1535,7 +1535,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_corruptor_tentacleAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_corruptor_tentacleAI>(pCreature);
     }
 
     struct boss_yoggsaron_corruptor_tentacleAI : public ScriptedAI
@@ -1592,7 +1592,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_constrictor_tentacleAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_constrictor_tentacleAI>(pCreature);
     }
 
     struct boss_yoggsaron_constrictor_tentacleAI : public ScriptedAI
@@ -1671,7 +1671,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_keeperAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_keeperAI>(pCreature);
     }
 
     struct boss_yoggsaron_keeperAI : public NullCreatureAI
@@ -1747,7 +1747,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_influence_tentacleAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_influence_tentacleAI>(pCreature);
     }
 
     struct boss_yoggsaron_influence_tentacleAI : public NullCreatureAI
@@ -1779,7 +1779,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_immortal_guardianAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_immortal_guardianAI>(pCreature);
     }
 
     struct boss_yoggsaron_immortal_guardianAI : public ScriptedAI
@@ -1867,7 +1867,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_lich_kingAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_lich_kingAI>(pCreature);
     }
 
     struct boss_yoggsaron_lich_kingAI : public NullCreatureAI
@@ -1981,7 +1981,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_llaneAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_llaneAI>(pCreature);
     }
 
     struct boss_yoggsaron_llaneAI : public NullCreatureAI
@@ -2103,7 +2103,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_neltharionAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_neltharionAI>(pCreature);
     }
 
     struct boss_yoggsaron_neltharionAI : public ScriptedAI
@@ -2211,7 +2211,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_voiceAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_voiceAI>(pCreature);
     }
 
     struct boss_yoggsaron_voiceAI : public NullCreatureAI

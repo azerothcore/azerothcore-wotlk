@@ -27,7 +27,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_highlordomokkAI(creature);
+        return GetBlackrockSpireAI<boss_highlordomokkAI>(creature);
     }
 
     struct boss_highlordomokkAI : public BossAI
