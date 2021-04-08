@@ -1617,6 +1617,7 @@ void Player::Update(uint32 p_time)
     time_t now = time(nullptr);
 
     UpdatePvPFlag(now);
+    UpdateFFAPvPFlag(now);
 
     UpdateContestedPvP(p_time);
 
@@ -7730,28 +7731,8 @@ void Player::UpdateArea(uint32 newArea)
     m_areaUpdateId = newArea;
 
     AreaTableEntry const* area = sAreaTableStore.LookupEntry(newArea);
-    bool oldFFAPvPArea = pvpInfo.IsInFFAPvPArea;
     pvpInfo.IsInFFAPvPArea = area && (area->flags & AREA_FLAG_ARENA);
-    UpdatePvPState(true);
-
-    // xinef: check if we were in ffa arena and we left
-    if (oldFFAPvPArea && !pvpInfo.IsInFFAPvPArea)
-    {
-        // xinef: iterate attackers
-        AttackerSet toRemove;
-        AttackerSet const& attackers = getAttackers();
-        for (AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
-            if (!(*itr)->IsValidAttackTarget(this))
-                toRemove.insert(*itr);
-
-        for (AttackerSet::const_iterator itr = toRemove.begin(); itr != toRemove.end(); ++itr)
-            (*itr)->AttackStop();
-
-        // xinef: remove our own victim
-        if (Unit* victim = GetVictim())
-            if (!IsValidAttackTarget(victim))
-                AttackStop();
-    }
+    UpdateFFAPvPState(false);
 
     UpdateAreaDependentAuras(newArea);
 
@@ -21158,16 +21139,48 @@ void Player::UpdatePvPFlag(time_t currTime)
 {
     if (!IsPvP())
         return;
+
     if (pvpInfo.EndTimer == 0 || pvpInfo.IsHostile)
         return;
+
     if (currTime < (pvpInfo.EndTimer + 300 + 5))
     {
         if (currTime > (pvpInfo.EndTimer + 4) && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER))
             SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
+
         return;
     }
 
     UpdatePvP(false);
+}
+
+void Player::UpdateFFAPvPFlag(time_t currTime)
+{
+    if (!IsFFAPvP() || sWorld->IsFFAPvPRealm() || !pvpInfo.FFAPvPEndTimer || currTime < pvpInfo.FFAPvPEndTimer + 30)
+    {
+        return;
+    }
+
+    pvpInfo.FFAPvPEndTimer = time_t(0);
+
+    RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+    for (ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
+        (*itr)->RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+
+    // xinef: iterate attackers
+    AttackerSet toRemove;
+    AttackerSet const& attackers = getAttackers();
+    for (AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
+        if (!(*itr)->IsValidAttackTarget(this))
+            toRemove.insert(*itr);
+
+    for (AttackerSet::const_iterator itr = toRemove.begin(); itr != toRemove.end(); ++itr)
+        (*itr)->AttackStop();
+
+    // xinef: remove our own victim
+    if (Unit* victim = GetVictim())
+        if (!IsValidAttackTarget(victim))
+            AttackStop();
 }
 
 void Player::UpdateDuelFlag(time_t currTime)
@@ -22747,29 +22760,9 @@ void Player::UpdateHomebindTime(uint32 time)
     }
 }
 
-void Player::UpdatePvPState(bool onlyFFA)
+void Player::UpdatePvPState()
 {
-    // TODO: should we always synchronize UNIT_FIELD_BYTES_2, 1 of controller and controlled?
-    // no, we shouldn't, those are checked for affecting player by client
-    if (!pvpInfo.IsInNoPvPArea && !IsGameMaster()
-            && (pvpInfo.IsInFFAPvPArea || sWorld->IsFFAPvPRealm()))
-    {
-        if (!IsFFAPvP())
-        {
-            SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-            for (ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
-                (*itr)->SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-        }
-    }
-    else if (IsFFAPvP())
-    {
-        RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-        for (ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
-            (*itr)->RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-    }
-
-    if (onlyFFA)
-        return;
+    UpdateFFAPvPState();
 
     if (pvpInfo.IsHostile)                               // in hostile area
     {
@@ -22780,6 +22773,63 @@ void Player::UpdatePvPState(bool onlyFFA)
     {
         if (IsPvP() && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP) && pvpInfo.EndTimer == 0)
             pvpInfo.EndTimer = time(nullptr);                     // start toggle-off
+    }
+}
+
+void Player::UpdateFFAPvPState(bool reset /*= true*/)
+{
+    // TODO: should we always synchronize UNIT_FIELD_BYTES_2, 1 of controller and controlled?
+    // no, we shouldn't, those are checked for affecting player by client
+    if (!pvpInfo.IsInNoPvPArea && !IsGameMaster() && (pvpInfo.IsInFFAPvPArea || sWorld->IsFFAPvPRealm()))
+    {
+        if (!IsFFAPvP())
+        {
+            SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+            for (ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
+                (*itr)->SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+        }
+
+        if (pvpInfo.IsInFFAPvPArea)
+        {
+            pvpInfo.FFAPvPEndTimer = time_t(0);
+        }
+    }
+    else if (IsFFAPvP())
+    {
+        if ((pvpInfo.IsInNoPvPArea || IsGameMaster()) || reset || !pvpInfo.EndTimer)
+        {
+            pvpInfo.FFAPvPEndTimer = time_t(0);
+
+            RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+            for (ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
+                (*itr)->RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
+
+            // xinef: iterate attackers
+            AttackerSet toRemove;
+            AttackerSet const& attackers = getAttackers();
+            for (AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
+                if (!(*itr)->IsValidAttackTarget(this))
+                    toRemove.insert(*itr);
+
+            for (AttackerSet::const_iterator itr = toRemove.begin(); itr != toRemove.end(); ++itr)
+                (*itr)->AttackStop();
+
+            // xinef: remove our own victim
+            if (Unit* victim = GetVictim())
+                if (!IsValidAttackTarget(victim))
+                    AttackStop();
+        }
+        else
+        {
+            // Not in FFA PvP Area
+            // Not FFA PvP realm
+            // Not FFA PvP timer already set
+            // Being recently in PvP combat
+            if (!pvpInfo.IsInFFAPvPArea && !sWorld->IsFFAPvPRealm() && !pvpInfo.FFAPvPEndTimer)
+            {
+                pvpInfo.FFAPvPEndTimer = sWorld->GetGameTime() + sWorld->getIntConfig(CONFIG_FFA_PVP_TIMER);
+            }
+        }
     }
 }
 
@@ -22795,6 +22845,7 @@ void Player::UpdatePvP(bool state, bool _override)
         pvpInfo.EndTimer = time(nullptr);
         SetPvP(state);
     }
+
     RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER);
 }
 
