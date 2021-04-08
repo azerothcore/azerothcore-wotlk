@@ -113,7 +113,13 @@ public:
                     break;
                 case EVENT_HURTFUL_STRIKE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1, 5.0f))
+                    {
                         me->CastSpell(target, SPELL_HURTFUL_STRIKE, false);
+                    }
+                    else
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_HURTFUL_STRIKE, false);
+                    }
                     events.ScheduleEvent(EVENT_HURTFUL_STRIKE, 15000);
                     break;
                 case EVENT_GROUND_SLAM:
@@ -122,14 +128,19 @@ public:
                     events.DelayEvents(8001);
                     events.ScheduleEvent(EVENT_GROUND_SLAM, 60000);
                     events.ScheduleEvent(EVENT_SHATTER, 8000);
+                    me->SetControlled(true, UNIT_STATE_ROOT);
                     break;
                 case EVENT_SHATTER:
                     Talk(SAY_SHATTER);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
                     me->CastSpell(me, SPELL_SHATTER, false);
                     break;
             }
 
-            DoMeleeAttackIfReady();
+            if (!me->HasUnitState(UNIT_STATE_ROOT))
+            {
+                DoMeleeAttackIfReady();
+            }
         }
 
     private:
@@ -138,7 +149,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_gruulAI>(creature);
+        return GetGruulsLairAI<boss_gruulAI>(creature);
     }
 };
 
@@ -178,7 +189,7 @@ public:
     {
         PrepareAuraScript(spell_gruul_ground_slam_trigger_AuraScript);
 
-        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
             if (GetUnitOwner()->GetAuraCount(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell) == 5)
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_STONED, true);
@@ -186,7 +197,7 @@ public:
 
         void Register() override
         {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_gruul_ground_slam_trigger_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_gruul_ground_slam_trigger_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
         }
     };
 

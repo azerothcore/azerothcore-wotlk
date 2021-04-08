@@ -4,6 +4,7 @@
 REWRITTEN BY XINEF
 */
 
+#include "scarletmonastery.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
@@ -228,7 +229,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_scarlet_guardAI(creature);
+        return GetScarletMonasteryAI<npc_scarlet_guardAI>(creature);
     }
 };
 
@@ -505,7 +506,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_mograineAI(creature);
+        return GetScarletMonasteryAI<npc_mograineAI>(creature);
     }
 };
 
@@ -647,7 +648,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_high_inquisitor_whitemaneAI(creature);
+        return GetScarletMonasteryAI<boss_high_inquisitor_whitemaneAI>(creature);
     }
 };
 
@@ -788,7 +789,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_fairbanksAI(creature);
+        return GetScarletMonasteryAI<npc_fairbanksAI>(creature);
     }
 };
 

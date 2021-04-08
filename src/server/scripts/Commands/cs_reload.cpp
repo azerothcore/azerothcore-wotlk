@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -55,7 +55,8 @@ public:
         static std::vector<ChatCommand> reloadCommandTable =
         {
             { "auctions",                     SEC_ADMINISTRATOR, true,  &HandleReloadAuctionsCommand,                   "" },
-            { "access_requirement",           SEC_ADMINISTRATOR, true,  &HandleReloadAccessRequirementCommand,          "" },
+            { "dungeon_access_template",      SEC_ADMINISTRATOR, true,  &HandleReloadDungeonAccessCommand,              "" },
+            { "dungeon_access_requirements",  SEC_ADMINISTRATOR, true,  &HandleReloadDungeonAccessCommand,              "" },
             { "achievement_criteria_data",    SEC_ADMINISTRATOR, true,  &HandleReloadAchievementCriteriaDataCommand,    "" },
             { "achievement_reward",           SEC_ADMINISTRATOR, true,  &HandleReloadAchievementRewardCommand,          "" },
             { "all",                          SEC_ADMINISTRATOR, true,  nullptr,                                        "", reloadAllCommandTable },
@@ -175,7 +176,7 @@ public:
         HandleReloadAllGossipsCommand(handler, "");
         HandleReloadAllLocalesCommand(handler, "");
 
-        HandleReloadAccessRequirementCommand(handler, "");
+        HandleReloadDungeonAccessCommand(handler, "");
         HandleReloadMailLevelRewardCommand(handler, "");
         HandleReloadCommandCommand(handler, "");
         HandleReloadReservedNameCommand(handler, "");
@@ -324,11 +325,11 @@ public:
         return true;
     }
 
-    static bool HandleReloadAccessRequirementCommand(ChatHandler* handler, const char* /*args*/)
+    static bool HandleReloadDungeonAccessCommand(ChatHandler* handler, const char* /*args*/)
     {
-        sLog->outString("Re-Loading Access Requirement definitions...");
+        sLog->outString("Re-Loading Dungeon Access Requirement definitions...");
         sObjectMgr->LoadAccessRequirements();
-        handler->SendGlobalGMSysMessage("DB table `access_requirement` reloaded.");
+        handler->SendGlobalGMSysMessage("DB tables `dungeon_access_template` AND `dungeon_access_requirements` reloaded.");
         return true;
     }
 
@@ -436,82 +437,7 @@ public:
 
             Field* fields = result->Fetch();
 
-            cInfo->DifficultyEntry[0] = fields[0].GetUInt32();
-            cInfo->DifficultyEntry[1] = fields[1].GetUInt32();
-            cInfo->DifficultyEntry[2] = fields[2].GetUInt32();
-            cInfo->KillCredit[0]      = fields[3].GetUInt32();
-            cInfo->KillCredit[1]      = fields[4].GetUInt32();
-            cInfo->Modelid1           = fields[5].GetUInt32();
-            cInfo->Modelid2           = fields[6].GetUInt32();
-            cInfo->Modelid3           = fields[7].GetUInt32();
-            cInfo->Modelid4           = fields[8].GetUInt32();
-            cInfo->Name               = fields[9].GetString();
-            cInfo->SubName            = fields[10].GetString();
-            cInfo->IconName           = fields[11].GetString();
-            cInfo->GossipMenuId       = fields[12].GetUInt32();
-            cInfo->minlevel           = fields[13].GetUInt8();
-            cInfo->maxlevel           = fields[14].GetUInt8();
-            cInfo->expansion          = fields[15].GetUInt16();
-            cInfo->faction            = fields[16].GetUInt16();
-            cInfo->npcflag            = fields[17].GetUInt32();
-            cInfo->speed_walk         = fields[18].GetFloat();
-            cInfo->speed_run          = fields[19].GetFloat();
-            cInfo->scale              = fields[20].GetFloat();
-            cInfo->rank               = fields[21].GetUInt8();
-            cInfo->mindmg             = fields[22].GetFloat();
-            cInfo->maxdmg             = fields[23].GetFloat();
-            cInfo->dmgschool          = fields[24].GetUInt8();
-            cInfo->attackpower        = fields[25].GetUInt32();
-            cInfo->DamageModifier     = fields[26].GetFloat();
-            cInfo->BaseAttackTime     = fields[27].GetUInt32();
-            cInfo->RangeAttackTime    = fields[28].GetUInt32();
-            cInfo->unit_class         = fields[29].GetUInt8();
-            cInfo->unit_flags         = fields[30].GetUInt32();
-            cInfo->unit_flags2        = fields[31].GetUInt32();
-            cInfo->dynamicflags       = fields[32].GetUInt32();
-            cInfo->family             = fields[33].GetUInt8();
-            cInfo->trainer_type       = fields[34].GetUInt8();
-            cInfo->trainer_spell      = fields[35].GetUInt32();
-            cInfo->trainer_class      = fields[36].GetUInt8();
-            cInfo->trainer_race       = fields[37].GetUInt8();
-            cInfo->minrangedmg        = fields[38].GetFloat();
-            cInfo->maxrangedmg        = fields[39].GetFloat();
-            cInfo->rangedattackpower  = fields[40].GetUInt16();
-            cInfo->type               = fields[41].GetUInt8();
-            cInfo->type_flags         = fields[42].GetUInt32();
-            cInfo->lootid             = fields[43].GetUInt32();
-            cInfo->pickpocketLootId   = fields[44].GetUInt32();
-            cInfo->SkinLootId         = fields[45].GetUInt32();
-
-            for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-                cInfo->resistance[i] = fields[46 + i - 1].GetUInt16();
-
-            cInfo->spells[0]          = fields[52].GetUInt32();
-            cInfo->spells[1]          = fields[53].GetUInt32();
-            cInfo->spells[2]          = fields[54].GetUInt32();
-            cInfo->spells[3]          = fields[55].GetUInt32();
-            cInfo->spells[4]          = fields[56].GetUInt32();
-            cInfo->spells[5]          = fields[57].GetUInt32();
-            cInfo->spells[6]          = fields[58].GetUInt32();
-            cInfo->spells[7]          = fields[59].GetUInt32();
-            cInfo->PetSpellDataId     = fields[60].GetUInt32();
-            cInfo->VehicleId          = fields[61].GetUInt32();
-            cInfo->mingold            = fields[62].GetUInt32();
-            cInfo->maxgold            = fields[63].GetUInt32();
-            cInfo->AIName             = fields[64].GetString();
-            cInfo->MovementType       = fields[65].GetUInt8();
-            cInfo->InhabitType        = fields[66].GetUInt8();
-            cInfo->HoverHeight        = fields[67].GetFloat();
-            cInfo->ModHealth          = fields[68].GetFloat();
-            cInfo->ModMana            = fields[69].GetFloat();
-            cInfo->ModArmor           = fields[70].GetFloat();
-            cInfo->RacialLeader       = fields[71].GetBool();
-            cInfo->movementId         = fields[72].GetUInt32();
-            cInfo->RegenHealth        = fields[73].GetBool();
-            cInfo->MechanicImmuneMask = fields[74].GetUInt32();
-            cInfo->flags_extra        = fields[75].GetUInt32();
-            cInfo->ScriptID           = sObjectMgr->GetScriptId(fields[76].GetCString());
-
+            sObjectMgr->LoadCreatureTemplate(fields);
             sObjectMgr->CheckCreatureTemplate(cInfo);
         }
 

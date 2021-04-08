@@ -68,7 +68,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_oculus_drakegiverAI(creature);
+        return GetOculusAI<npc_oculus_drakegiverAI>(creature);
     }
 
     struct  npc_oculus_drakegiverAI : public ScriptedAI {
@@ -324,7 +324,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_oculus_drakeAI (creature);
+        return GetOculusAI<npc_oculus_drakeAI>(creature);
     }
 
     struct npc_oculus_drakeAI : public VehicleAI
@@ -509,7 +509,7 @@ public:
     };
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_centrifuge_constructAI(creature);
+        return GetOculusAI<npc_centrifuge_constructAI>(creature);
     }
 };
 

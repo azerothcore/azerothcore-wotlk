@@ -113,7 +113,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_razorscaleAI (pCreature);
+        return GetUlduarAI<boss_razorscaleAI>(pCreature);
     }
 
     struct boss_razorscaleAI : public ScriptedAI
@@ -643,7 +643,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_ulduar_expedition_commanderAI>(creature);
+        return GetUlduarAI<npc_ulduar_expedition_commanderAI>(creature);
     }
 
     struct npc_ulduar_expedition_commanderAI : public NullCreatureAI
@@ -680,7 +680,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_harpoonfirestateAI (pCreature);
+        return GetUlduarAI<npc_ulduar_harpoonfirestateAI>(pCreature);
     }
 
     struct npc_ulduar_harpoonfirestateAI : public NullCreatureAI
@@ -780,7 +780,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_expedition_engineerAI (pCreature);
+        return GetUlduarAI<npc_ulduar_expedition_engineerAI>(pCreature);
     }
 
     struct npc_ulduar_expedition_engineerAI : public NullCreatureAI
@@ -944,7 +944,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_dark_rune_guardianAI (pCreature);
+        return GetUlduarAI<npc_ulduar_dark_rune_guardianAI>(pCreature);
     }
 
     struct npc_ulduar_dark_rune_guardianAI : public ScriptedAI
@@ -991,7 +991,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_dark_rune_watcherAI (pCreature);
+        return GetUlduarAI<npc_ulduar_dark_rune_watcherAI>(pCreature);
     }
 
     struct npc_ulduar_dark_rune_watcherAI : public ScriptedAI
@@ -1047,7 +1047,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_dark_rune_sentinelAI (pCreature);
+        return GetUlduarAI<npc_ulduar_dark_rune_sentinelAI>(pCreature);
     }
 
     struct npc_ulduar_dark_rune_sentinelAI : public ScriptedAI

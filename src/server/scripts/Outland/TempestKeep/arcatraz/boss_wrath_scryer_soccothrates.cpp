@@ -242,7 +242,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_wrath_scryer_soccothratesAI(creature);
+        return GetArcatrazAI<boss_wrath_scryer_soccothratesAI>(creature);
     }
 };
 

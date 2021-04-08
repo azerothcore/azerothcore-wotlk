@@ -101,7 +101,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_palehoofAI (pCreature);
+        return GetUtgardePinnacleAI<boss_palehoofAI>(pCreature);
     }
 
     struct boss_palehoofAI : public ScriptedAI
@@ -333,7 +333,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_massive_jormungarAI (pCreature);
+        return GetUtgardePinnacleAI<npc_massive_jormungarAI>(pCreature);
     }
 
     struct npc_massive_jormungarAI : public ScriptedAI
@@ -461,7 +461,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ferocious_rhinoAI (pCreature);
+        return GetUtgardePinnacleAI<npc_ferocious_rhinoAI>(pCreature);
     }
 
     struct npc_ferocious_rhinoAI : public ScriptedAI
@@ -571,7 +571,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ravenous_furbolgAI (pCreature);
+        return GetUtgardePinnacleAI<npc_ravenous_furbolgAI>(pCreature);
     }
 
     struct npc_ravenous_furbolgAI : public ScriptedAI
@@ -679,7 +679,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_frenzied_worgenAI (pCreature);
+        return GetUtgardePinnacleAI<npc_frenzied_worgenAI>(pCreature);
     }
 
     struct npc_frenzied_worgenAI : public ScriptedAI

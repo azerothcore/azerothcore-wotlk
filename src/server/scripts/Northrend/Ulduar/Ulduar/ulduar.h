@@ -7,8 +7,11 @@
 
 #include "CellImpl.h"
 #include "Chat.h"
+#include "CreatureAIImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+
+#define UlduarScriptName "instance_ulduar"
 
 enum UlduarEncounters
 {
@@ -29,6 +32,9 @@ enum UlduarEncounters
     TYPE_YOGGSARON                          = 12,
     TYPE_ALGALON                            = 13,
     TYPE_WATCHERS                           = 14,
+    TYPE_SPAWN_HODIR_CACHE                  = 15,
+    TYPE_HODIR_HM_FAIL                      = 16,
+    TYPE_WINTER_CACHE                       = 17,
 };
 
 enum UlduarData
@@ -275,5 +281,11 @@ enum UlduarMisc
 
 Position const AlgalonSummonPos = {1632.531f, -304.8516f, 450.1123f, 1.530165f};
 Position const AlgalonLandPos   = {1632.668f, -302.7656f, 417.3211f, 1.530165f};
+
+template <class AI, class T>
+inline AI* GetUlduarAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, UlduarScriptName);
+}
 
 #endif

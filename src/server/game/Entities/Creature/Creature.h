@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -99,13 +99,12 @@ struct CreatureTemplate
     float   speed_run;
     float   scale;
     uint32  rank;
-    float   mindmg;
-    float   maxdmg;
     uint32  dmgschool;
-    uint32  attackpower;
     float   DamageModifier;
     uint32  BaseAttackTime;
     uint32  RangeAttackTime;
+    float   BaseVariance;
+    float   RangeVariance;
     uint32  unit_class;                                     // enum Classes. Note only 4 classes are known for creatures.
     uint32  unit_flags;                                     // enum UnitFlags mask values
     uint32  unit_flags2;                                    // enum UnitFlags2 mask values
@@ -115,16 +114,13 @@ struct CreatureTemplate
     uint32  trainer_spell;
     uint32  trainer_class;
     uint32  trainer_race;
-    float   minrangedmg;
-    float   maxrangedmg;
-    uint32  rangedattackpower;
     uint32  type;                                           // enum CreatureType values
     uint32  type_flags;                                     // enum CreatureTypeFlags mask values
     uint32  lootid;
     uint32  pickpocketLootId;
     uint32  SkinLootId;
     int32   resistance[MAX_SPELL_SCHOOL];
-    uint32  spells[CREATURE_MAX_SPELLS];
+    uint32  spells[MAX_CREATURE_SPELLS];
     uint32  PetSpellDataId;
     uint32  VehicleId;
     uint32  mingold;
@@ -478,6 +474,7 @@ public:
     ///// TODO RENAME THIS!!!!!
     bool isCanInteractWithBattleMaster(Player* player, bool msg) const;
     bool isCanTrainingAndResetTalentsOf(Player* player) const;
+    [[nodiscard]] bool IsValidTrainerForPlayer(Player* player, uint32* npcFlags = nullptr) const;
     bool CanCreatureAttack(Unit const* victim, bool skipDistCheck = false) const;
     void LoadSpellTemplateImmunity();
     bool IsImmunedToSpell(SpellInfo const* spellInfo) override;
@@ -617,7 +614,7 @@ public:
     SpellInfo const* reachWithSpellAttack(Unit* victim);
     SpellInfo const* reachWithSpellCure(Unit* victim);
 
-    uint32 m_spells[CREATURE_MAX_SPELLS];
+    uint32 m_spells[MAX_CREATURE_SPELLS];
     CreatureSpellCooldowns m_CreatureSpellCooldowns;
     uint32 m_ProhibitSchoolTime[7];
 
@@ -742,8 +739,10 @@ public:
     bool IsMovementPreventedByCasting() const;
 
     // Part of Evade mechanics
-    [[nodiscard]] time_t GetLastDamagedTime() const { return _lastDamagedTime; }
-    void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
+    [[nodiscard]] time_t GetLastDamagedTime() const;
+    [[nodiscard]] std::shared_ptr<time_t> const& GetLastDamagedTimePtr() const;
+    void SetLastDamagedTime(time_t val);
+    void SetLastDamagedTimePtr(std::shared_ptr<time_t> const& val);
 
     bool IsFreeToMove();
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
@@ -772,6 +771,7 @@ protected:
     /// Timers
     time_t m_corpseRemoveTime;                          // (msecs)timer for death or corpse disappearance
     time_t m_respawnTime;                               // (secs) time of next respawn
+    time_t m_respawnedTime;                             // (secs) time when creature respawned
     uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning
     uint32 m_corpseDelay;                               // (secs) delay between death and corpse disappearance
     float m_wanderDistance;
@@ -823,7 +823,7 @@ private:
     CreatureGroup* m_formation;
     bool TriggerJustRespawned;
 
-    time_t _lastDamagedTime; // Part of Evade mechanics
+    mutable std::shared_ptr<time_t> _lastDamagedTime; // Part of Evade mechanics
 
     bool m_cannotReachTarget;
     uint32 m_cannotReachTimer;
@@ -838,16 +838,17 @@ private:
 class AssistDelayEvent : public BasicEvent
 {
 public:
-    AssistDelayEvent(ObjectGuid victim, Unit& owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
+    AssistDelayEvent(ObjectGuid victim, Creature* owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
 
     bool Execute(uint64 e_time, uint32 p_time) override;
     void AddAssistant(ObjectGuid guid) { m_assistants.push_back(guid); }
+
 private:
     AssistDelayEvent();
 
     ObjectGuid        m_victim;
     GuidList          m_assistants;
-    Unit&             m_owner;
+    Creature*         m_owner;
 };
 
 class ForcedDespawnDelayEvent : public BasicEvent

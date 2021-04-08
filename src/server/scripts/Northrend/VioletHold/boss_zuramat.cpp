@@ -48,7 +48,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_zuramatAI (pCreature);
+        return GetVioletHoldAI<boss_zuramatAI>(pCreature);
     }
 
     struct boss_zuramatAI : public ScriptedAI
@@ -175,7 +175,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_vh_void_sentryAI (pCreature);
+        return GetVioletHoldAI<npc_vh_void_sentryAI>(pCreature);
     }
 
     struct npc_vh_void_sentryAI : public NullCreatureAI

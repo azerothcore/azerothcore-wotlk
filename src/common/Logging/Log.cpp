@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -9,9 +9,9 @@
 #include "WorldPacket.h"
 #include "Configuration/Config.h"
 #include "Util.h"
-#include "SHA1.h"
 
 #include "Implementation/LoginDatabase.h" // For logging
+
 extern LoginDatabaseWorkerPool LoginDatabase;
 
 #include <stdarg.h>
@@ -115,11 +115,11 @@ void Log::Initialize()
 
     m_gmlog_per_account = sConfigMgr->GetOption<bool>("GmLogPerAccount", false, false);
     if (!m_gmlog_per_account)
-        gmLogfile = openLogFile("GMLogFile", "GmLogTimestamp", "a");
+        gmLogfile = openLogFile("GmLogFile", "GmLogTimestamp", "a");
     else
     {
         // GM log settings for per account case
-        m_gmlog_filename_format = sConfigMgr->GetOption<std::string>("GMLogFile", "", false);
+        m_gmlog_filename_format = sConfigMgr->GetOption<std::string>("GmLogFile", "", false);
         if (!m_gmlog_filename_format.empty())
         {
             bool m_gmlog_timestamp = sConfigMgr->GetOption<bool>("GmLogTimestamp", false, false);

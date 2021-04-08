@@ -50,7 +50,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_frost_tombAI(pCreature);
+        return GetUtgardeKeepAI<npc_frost_tombAI>(pCreature);
     }
 
     struct npc_frost_tombAI : public NullCreatureAI
@@ -107,7 +107,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_kelesethAI (pCreature);
+        return GetUtgardeKeepAI<boss_kelesethAI>(pCreature);
     }
 
     struct boss_kelesethAI : public ScriptedAI
@@ -235,7 +235,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_vrykul_skeletonAI (pCreature);
+        return GetUtgardeKeepAI<npc_vrykul_skeletonAI>(pCreature);
     }
 
     struct npc_vrykul_skeletonAI : public ScriptedAI

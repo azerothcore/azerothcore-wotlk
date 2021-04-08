@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -387,25 +387,54 @@ LootItem::LootItem(LootStoreItem const& li)
 }
 
 // Basic checks for player/item compatibility - if false no chance to see the item in the loot
-bool LootItem::AllowedForPlayer(Player const* player) const
+bool LootItem::AllowedForPlayer(Player const* player, bool isGivenByMasterLooter /*= false*/, bool allowQuestLoot /*= true*/) const
 {
-    // DB conditions check
-    if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(player), conditions))
-        return false;
-
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemid);
     if (!pProto)
         return false;
 
-    // not show loot for players without profession or those who already know the recipe
-    if ((pProto->Flags & ITEM_FLAG_HIDE_UNUSABLE_RECIPE) && (!player->HasSkill(pProto->RequiredSkill) || player->HasSpell(pProto->Spells[1].SpellId)))
+    bool isMasterLooter = player->GetGroup() && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID();
+
+    // DB conditions check
+    if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(player), conditions))
+    {
+        // Master Looter can see conditioned recipes
+        if (!isGivenByMasterLooter && isMasterLooter)
+        {
+            if ((pProto->Flags & ITEM_FLAG_HIDE_UNUSABLE_RECIPE) || (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0))
+            {
+                return true;
+            }
+        }
+
         return false;
+    }
 
     // not show loot for not own team
     if ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && player->GetTeamId(true) != TEAM_HORDE)
         return false;
 
     if ((pProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && player->GetTeamId(true) != TEAM_ALLIANCE)
+        return false;
+
+    // Master looter can see certain items even if the character can't loot them
+    if (!isGivenByMasterLooter && isMasterLooter && allowQuestLoot)
+    {
+        // check quest requirements (exclude items not under threshold)
+        if (!(pProto->FlagsCu & ITEM_FLAGS_CU_IGNORE_QUEST_STATUS) && (needs_quest || pProto->StartQuest))
+        {
+            return !is_underthreshold;
+        }
+
+        return true;
+    }
+
+    // Don't allow loot for players without profession or those who already know the recipe
+    if ((pProto->Flags & ITEM_FLAG_HIDE_UNUSABLE_RECIPE) && (!player->HasSkill(pProto->RequiredSkill) || player->HasSpell(pProto->Spells[1].SpellId)))
+        return false;
+
+    // Don't allow to loot soulbound recipes that the player has already learned
+    if (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0 && player->HasSpell(pProto->Spells[1].SpellId))
         return false;
 
     // check quest requirements
@@ -571,7 +600,7 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
     {
         LootItem& item = quest_items[i];
 
-        if (!item.is_looted && (item.AllowedForPlayer(player) || (item.follow_loot_rules && player->GetGroup() && ((player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID()) || player->GetGroup()->GetLootMethod() != MASTER_LOOT ))))
+        if (!item.is_looted && (item.AllowedForPlayer(player, false, false) || (item.follow_loot_rules && player->GetGroup() && ((player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID()) || player->GetGroup()->GetLootMethod() != MASTER_LOOT ))))
         {
             ql->push_back(QuestItem(i));
 
@@ -783,6 +812,12 @@ uint32 Loot::GetMaxSlotInLootFor(Player* player) const
 
 bool Loot::hasItemForAll() const
 {
+    // Gold is always lootable
+    if (gold)
+    {
+        return true;
+    }
+
     for (LootItem const& item : items)
         if (!item.is_looted && !item.freeforall && item.conditions.empty())
             return true;
@@ -881,11 +916,13 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         case MASTER_PERMISSION:
         case RESTRICTED_PERMISSION:
             {
+                bool isMasterLooter = lv.viewer->GetGroup() && lv.viewer->GetGroup()->GetMasterLooterGuid() == lv.viewer->GetGUID();
+
                 // if you are not the round-robin group looter, you can only see
                 // blocked rolled items and quest items, and !ffa items
                 for (uint8 i = 0; i < l.items.size(); ++i)
                 {
-                    if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
+                    if (!l.items[i].is_looted && !l.items[i].freeforall && (l.items[i].conditions.empty() || isMasterLooter) && l.items[i].AllowedForPlayer(lv.viewer))
                     {
                         uint8 slot_type = 0;
 

@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #ifndef _PLAYER_H
 #define _PLAYER_H
-
 
 #include "Battleground.h"
 #include "DBCStores.h"
@@ -835,17 +834,23 @@ enum PlayerCharmedAISpells
 #define MAX_PLAYER_SUMMON_DELAY                   (2*MINUTE)
 #define MAX_MONEY_AMOUNT                       (0x7FFFFFFF-1)
 
-struct AccessRequirement
+struct ProgressionRequirement
+{
+    uint32 id;
+    TeamId faction;
+    std::string note;
+    uint32 priority;
+    bool checkLeaderOnly;
+};
+
+struct DungeonProgressionRequirements
 {
     uint8  levelMin;
     uint8  levelMax;
-    uint32 item;
-    uint32 item2;
-    uint32 quest_A;
-    uint32 quest_H;
-    uint32 achievement;
-    std::string questFailedText;
     uint16 reqItemLevel;
+    std::vector<ProgressionRequirement*> quests;
+    std::vector<ProgressionRequirement*> items;
+    std::vector<ProgressionRequirement*> achievements;
 };
 
 enum CharDeleteMethod
@@ -2355,7 +2360,7 @@ public:
     }
     void HandleFall(MovementInfo const& movementInfo);
 
-    [[nodiscard]] bool canFlyInZone(uint32 mapid, uint32 zone) const;
+    [[nodiscard]] bool canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) const;
 
     void SetClientControl(Unit* target, bool allowMove, bool packetOnly = false);
 
@@ -2449,7 +2454,10 @@ public:
     [[nodiscard]] uint32 GetPendingBind() const { return _pendingBindId; }
     void SendRaidInfo();
     void SendSavedInstances();
-    bool Satisfy(AccessRequirement const* ar, uint32 target_map, bool report = false);
+    void PrettyPrintRequirementsQuestList(const std::vector<const ProgressionRequirement*>& missingQuests) const;
+    void PrettyPrintRequirementsAchievementsList(const std::vector<const ProgressionRequirement*>& missingAchievements) const;
+    void PrettyPrintRequirementsItemsList(const std::vector<const ProgressionRequirement*>& missingItems) const;
+    bool Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map, bool report = false);
     bool CheckInstanceLoginValid();
     [[nodiscard]] bool CheckInstanceCount(uint32 instanceId) const;
 
@@ -2970,6 +2978,8 @@ private:
     uint32 manaBeforeDuel;
 
     bool m_isInstantFlightOn;
+
+    uint32 m_flightSpellActivated;
 
     // Remote location information
     uint32 m_cinematicDiff;

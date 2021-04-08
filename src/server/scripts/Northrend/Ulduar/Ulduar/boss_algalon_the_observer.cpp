@@ -347,6 +347,11 @@ public:
                 me->SetInCombatWithZone();
                 return;
             }
+            else if (events.GetPhaseMask() & PHASE_NORMAL)
+            {
+                DoAction(ACTION_ASCEND);
+                return;
+            }
 
             ScriptedAI::EnterEvadeMode();
         }
@@ -596,9 +601,20 @@ public:
             }
         }
 
+        bool IsInRoom()
+        {
+            if (me->GetExactDist2d(&me->GetHomePosition()) > 45.f || me->GetPositionZ() < 410.f)
+            {
+                DoAction(ACTION_ASCEND);
+                return false;
+            }
+
+            return true;
+        }
+
         void UpdateAI(uint32 diff) override
         {
-            if ((!(events.GetPhaseMask() & PHASE_MASK_NO_UPDATE) && !UpdateVictim()) /*ZOMG!|| !CheckInRoom()*/)
+            if (!(events.GetPhaseMask() & PHASE_MASK_NO_UPDATE) && (!UpdateVictim() || !IsInRoom()))
                 return;
 
             events.Update(diff);
@@ -777,7 +793,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_algalon_the_observerAI(creature);
+        return GetUlduarAI<boss_algalon_the_observerAI>(creature);
     }
 };
 
@@ -875,7 +891,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_brann_bronzebeard_algalonAI(creature);
+        return GetUlduarAI<npc_brann_bronzebeard_algalonAI>(creature);
     }
 };
 
@@ -911,7 +927,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_collapsing_starAI(creature);
+        return GetUlduarAI<npc_collapsing_starAI>(creature);
     }
 };
 
@@ -1002,7 +1018,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_living_constellationAI(creature);
+        return GetUlduarAI<npc_living_constellationAI>(creature);
     }
 };
 
@@ -1026,6 +1042,17 @@ public:
             _summonTimer = urand(22000, 24000);
         }
 
+        void JustSummoned(Creature* summon) override
+        {
+            if (TempSummon* summ = me->ToTempSummon())
+            {
+                if (Creature* algalon = ObjectAccessor::GetCreature(*me, summ->GetSummonerGUID()))
+                {
+                    algalon->AI()->JustSummoned(summon);
+                }
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             _summonTimer += diff;
@@ -1039,7 +1066,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_algalon_worm_holeAI(creature);
+        return GetUlduarAI<npc_algalon_worm_holeAI>(creature);
     }
 };
 

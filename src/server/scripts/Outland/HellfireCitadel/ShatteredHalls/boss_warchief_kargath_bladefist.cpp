@@ -167,7 +167,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_warchief_kargath_bladefistAI>(creature);
+        return GetShatteredHallsAI<boss_warchief_kargath_bladefistAI>(creature);
     }
 };
 

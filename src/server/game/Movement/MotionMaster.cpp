@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -96,17 +96,6 @@ void MotionMaster::UpdateMotion(uint32 diff)
 {
     if (!_owner)
         return;
-
-    if (_owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED)) // what about UNIT_STATE_DISTRACTED? Why is this not included?
-    {
-        // pussywizard: the same as at the bottom of this function
-        if (_owner->GetTypeId() == TYPEID_PLAYER)
-            _owner->UpdateUnderwaterState(_owner->GetMap(), _owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ());
-        else
-            _owner->UpdateEnvironmentIfNeeded(0);
-
-        return;
-    }
 
     ASSERT(!empty());
 
@@ -454,7 +443,7 @@ void MotionMaster::MoveSplinePath(Movement::PointsArray* path)
     }
 }
 
-void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed)
+void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed /* = 0.0f*/)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
@@ -469,19 +458,24 @@ void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed)
 
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(x, y, z);
-    init.SetVelocity(speed);
+
+    if (speed > 0.0f)
+    {
+        init.SetVelocity(speed);
+    }
+
     init.SetAnimation(Movement::ToGround);
     init.Launch();
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_ACTIVE);
 }
 
-void MotionMaster::MoveLand(uint32 id, float x, float y, float z, float speed)
+void MotionMaster::MoveLand(uint32 id, float x, float y, float z, float speed /* = 0.0f*/)
 {
     Position pos = {x, y, z, 0.0f};
     MoveLand(id, pos, speed);
 }
 
-void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed)
+void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed /* = 0.0f*/)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
@@ -496,13 +490,18 @@ void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed)
 
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(x, y, z);
-    init.SetVelocity(speed);
+
+    if (speed > 0.0f)
+    {
+        init.SetVelocity(speed);
+    }
+
     init.SetAnimation(Movement::ToFly);
     init.Launch();
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_ACTIVE);
 }
 
-void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed)
+void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed /* = 0.0f*/)
 {
     Position pos = {x, y, z, 0.0f};
     MoveTakeoff(id, pos, speed);

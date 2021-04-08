@@ -6,13 +6,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `pool_quest_save`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `pool_quest_save` 
 (
-  `pool_id` int(10) unsigned NOT NULL DEFAULT 0,
-  `quest_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `pool_id` INT unsigned NOT NULL DEFAULT 0,
+  `quest_id` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`pool_id`,`quest_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `pool_quest_save` WRITE;
