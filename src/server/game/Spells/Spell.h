@@ -411,8 +411,12 @@ public:
     void TakeReagents();
     void TakeCastItem();
 
-    SpellCastResult CheckCast(bool strict);
+    SpellCastResult CheckCast(bool strict, bool OnlyAtCastEnd = false);
     SpellCastResult CheckPetCast(Unit* target);
+
+    // CCDelay
+    uint32 GetCCDelay(SpellInfo const* _spell);
+    uint32 ReturnCCDelay(SpellInfo const* _spell, bool isGeneric = false);
 
     // handlers
     void handle_immediate();

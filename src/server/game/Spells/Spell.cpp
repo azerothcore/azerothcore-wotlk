@@ -858,7 +858,7 @@ void Spell::SelectSpellTargets()
         }
     }
 
-    if (m_targets.HasDst())
+    if (m_targets.HasDst() && !IsCCSpell(m_spellInfo))
     {
         if (m_targets.HasTraj())
         {
@@ -869,7 +869,7 @@ void Spell::SelectSpellTargets()
         else if (m_spellInfo->Speed > 0.0f)
         {
             float dist = m_caster->GetExactDist(m_targets.GetDstPos());
-            m_delayTrajectory = (uint64) floor(dist / m_spellInfo->Speed * 1000.0f);
+            m_delayTrajectory = (uint64)floor(dist / m_spellInfo->Speed * 1000.0f);
         }
     }
 }
@@ -2164,11 +2164,11 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     TargetInfo targetInfo;
     targetInfo.targetGUID = targetGUID;                         // Store target GUID
     targetInfo.effectMask = effectMask;                         // Store all effects not immune
-    targetInfo.processed  = false;                              // Effects not apply on target
-    targetInfo.alive      = target->IsAlive();
-    targetInfo.damage     = 0;
-    targetInfo.crit       = false;
-    targetInfo.scaleAura  = false;
+    targetInfo.processed = false;                              // Effects not apply on target
+    targetInfo.alive = target->IsAlive();
+    targetInfo.damage = 0;
+    targetInfo.crit = false;
+    targetInfo.scaleAura = false;
     if (m_auraScaleMask && targetInfo.effectMask == m_auraScaleMask && m_caster != target)
     {
         SpellInfo const* auraSpell = m_spellInfo->GetFirstRankSpell();
@@ -2179,7 +2179,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
     // Calculate hit result
     if (m_originalCaster)
     {
-        targetInfo.missCondition = m_originalCaster->SpellHitResult(target, m_spellInfo, m_canReflect);
+        targetInfo.missCondition = m_originalCaster->SpellHitResult(target, m_spellInfo, m_canReflect && !(m_spellInfo->IsPositive() && m_caster->IsFriendlyTo(target)));
         if (m_skipCheck && targetInfo.missCondition != SPELL_MISS_IMMUNE)
             targetInfo.missCondition = SPELL_MISS_NONE;
     }
@@ -2188,7 +2188,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
 
     // Spell have speed - need calculate incoming time
     // Incoming time is zero for self casts. At least I think so.
-    if (m_spellInfo->Speed > 0.0f && m_caster != target)
+    if (m_spellInfo->Speed > 0.0f && m_caster != target) // Flying Spells
     {
         // calculate spell incoming interval
         // TODO: this is a hack
@@ -2196,13 +2196,52 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
 
         if (dist < 5.0f)
             dist = 5.0f;
-        targetInfo.timeDelay = (uint64) floor(dist / m_spellInfo->Speed * 1000.0f);
+
+        targetInfo.timeDelay = (uint64)floor(dist / m_spellInfo->Speed * 1000.0f);
+
+        // 100LL delay for incoming spells
+        if (!IsCCSpell(m_spellInfo) && !m_spellInfo->_IsPositiveSpell())
+        {
+            //sLog->outError("FLYING");
+            targetInfo.timeDelay += 100LL;
+        }
 
         // Calculate minimum incoming time
         if (m_delayMoment == 0 || m_delayMoment > targetInfo.timeDelay)
             m_delayMoment = targetInfo.timeDelay;
     }
-    else
+    else if (!IsCCSpell(m_spellInfo) && !IsTriggered()) // Non CC Non Triggered Spells
+    {
+        // Add extra traveltime for Mind freeze, "Working as intended" // Blizzard
+        if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_DIRECT_DAMAGE || m_spellInfo->Id == 47528) // + Damage Spells delay
+        {
+            targetInfo.timeDelay = 100LL;
+            m_delayMoment = 100LL;
+            //sLog->outError("Damage non CC spells");
+        }
+        else // Other
+            targetInfo.timeDelay = 0LL;
+    }
+    else if (!IsTriggered()) // CC Spells
+    {
+        // Rogue Sap -> Vanish -> Sap -> Get out of Vanish || Sap -> Vanish -> Stay in Vanish.
+        if (m_spellInfo->Mechanic == MECHANIC_SAPPED)
+        {
+            if (target->GetTypeId() == TYPEID_PLAYER)
+            {
+                if (target->ToPlayer()->m_stealthDetectTimer > 0)
+                    targetInfo.timeDelay = 0LL; // Don't Eat
+                else
+                    targetInfo.timeDelay = 100LL; // Eat
+            }
+        }
+        else
+            targetInfo.timeDelay = GetCCDelay(m_spellInfo);
+
+        if (m_delayMoment == 0 || m_delayMoment > targetInfo.timeDelay)
+            m_delayMoment = targetInfo.timeDelay;
+    }
+    else // Triggered Spells / Other
         targetInfo.timeDelay = 0LL;
 
     // If target reflect spell back to caster
@@ -2222,7 +2261,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
 
         // HACK: workaround check for succubus seduction case
         // TODO: seduction should be casted only on humanoids (not demons)
-        if (m_caster->IsPet())
+       /*if (m_caster->IsPet())
         {
             CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(m_caster->GetEntry());
             switch (ci->family)
@@ -2235,7 +2274,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
                     break;
                     return;
             }
-        }
+        }*/
     }
     else
         targetInfo.reflectResult = SPELL_MISS_NONE;
@@ -3616,7 +3655,7 @@ void Spell::_cast(bool skipCheck)
     SendSpellGo();
 
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
-    if ((m_spellInfo->Speed > 0.0f && !m_spellInfo->IsChanneled())/* xinef: we dont need this shit || m_spellInfo->Id == 14157*/)
+    if ((m_spellInfo->Speed > 0.0f || GetCCDelay(m_spellInfo) > 0 /*|| m_delayMoment*/) && !m_spellInfo->IsChanneled())/* xinef: we dont need this shit || m_spellInfo->Id == 14157)*/
     {
         // Remove used for cast item if need (it can be already nullptr after TakeReagents call
         // in case delayed spell remove item at cast delay start
@@ -5129,7 +5168,7 @@ void Spell::HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOT
     }
 }
 
-SpellCastResult Spell::CheckCast(bool strict)
+SpellCastResult Spell::CheckCast(bool strict, bool OnlyAtCastEnd)
 {
     // check death state
     if (!m_caster->IsAlive() && !m_spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !(m_spellInfo->HasAttribute(SPELL_ATTR0_CASTABLE_WHILE_DEAD) || (IsTriggered() && !m_triggeredByAuraSpell)))
@@ -5363,6 +5402,13 @@ SpellCastResult Spell::CheckCast(bool strict)
 
         if (target != m_caster)
         {
+            if (OnlyAtCastEnd)
+                if (IsCCSpell(m_spellInfo) && m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC
+                    /* && m_spellInfo->Mechanic != MECHANIC_BANISH*/) // banish should be cancelable
+                    if (Aura* aur = target->GetAura(m_spellInfo->Id))
+                        if (aur->GetDuration() > (aur->GetMaxDuration() / 2))
+                            return SPELL_FAILED_AURA_BOUNCED;
+
             // Must be behind the target
             if (m_spellInfo->HasAttribute(SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET) && target->HasInArc(static_cast<float>(M_PI), m_caster))
                 return SPELL_FAILED_NOT_BEHIND;
@@ -6193,6 +6239,158 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
             return SPELL_FAILED_NOT_READY;
 
     return CheckCast(true);
+}
+uint32 Spell::ReturnCCDelay(SpellInfo const* _spell, bool isGeneric)
+{
+    const uint32 delayForRoots = 70;
+    const uint32 delayForStuns = 130;
+    const uint32 delayForDisarms = 70;
+    const uint32 delayForDisorients = 130;
+    const uint32 delayForFears = 130;
+    const uint32 delayForHorrors = 130;
+    const uint32 delayForOpenerStuns = 100;
+    const uint32 delayForBanishes = 130;
+    const uint32 delayForSilences = 0;
+    const uint32 delayForInstantSpells = 100;
+
+    // SPELLFAMILY_GENERIC
+    if (isGeneric)
+    {
+        switch (_spell->Id)
+        {
+        case 23694: // Warrior - Improved Hamstring
+            return delayForRoots;
+        case 24259: // Warlock - Pet - Spell Lock - Silenced
+        case 1330:	// Rogue - Garote silence
+            return delayForSilences;
+        case 46026:	// War Stomp - Tauren's racial
+        case 12355:	// Mage - Talent - Impact
+        case 60995:	// Warlock - Demon charge 
+        case 54785:
+        case 47995:	// Warlock - Pet - Felguard intercept trigg.
+        case 24394:	// Hunter - Pet - Intimidation
+        case 47481:	// DK - Pet - Gnaw (ghoul's stun)
+        case 9005:	// Druid - Pounce
+        case 9823:
+        case 9827:
+        case 27006:
+        case 49803:
+            return delayForStuns;
+        case 6789:	// Warlock - DeathCoil
+        case 17925:
+        case 17926:
+        case 27223:
+        case 47859:
+        case 47860:
+            return delayForHorrors;
+        case 3355:	// Freezing trap
+        case 14308:
+        case 14309:
+            return 0;
+        default:
+            break;
+        }
+    }
+
+    // Spells with no mechanic
+    switch (_spell->Id)
+    {
+    case 34490:	// Silencing Shot
+        return delayForSilences;
+    case 1776: 	// Gouge
+    case 1548: 	// Dragon's Breath
+        return delayForDisorients;
+    case 33395: // Water Elemental - Freeze
+        return delayForRoots;
+    case 22703:	// Summon Inferno - Stun
+        return delayForStuns;
+    default:
+        break;
+    }
+
+    // Spells with a mechanic
+    switch (_spell->Mechanic)
+    {
+    case MECHANIC_ROOT:
+        return delayForRoots;
+    case MECHANIC_BANISH:
+        return delayForBanishes;
+    case MECHANIC_STUN:
+        return delayForStuns;
+    case MECHANIC_SILENCE:
+        return delayForSilences;
+    case MECHANIC_HORROR:
+        return delayForHorrors;
+    case MECHANIC_TURN:
+    case MECHANIC_FEAR:
+        return delayForFears;
+    case MECHANIC_DISARM:
+        return delayForDisarms;
+    case MECHANIC_SLEEP:
+    case MECHANIC_POLYMORPH:
+    case MECHANIC_FREEZE:
+    case MECHANIC_SHACKLE:
+    case MECHANIC_SAPPED:
+    case MECHANIC_DISORIENTED:
+    case MECHANIC_KNOCKOUT:
+        return delayForDisorients;
+    default:
+        break;
+    }
+
+    return 0;
+}
+
+uint32 Spell::GetCCDelay(SpellInfo const* _spell)
+{
+    // CCDelay for spell with auras
+    AuraType auraWithCCD[] =
+    {
+        SPELL_AURA_MOD_STUN,
+        SPELL_AURA_MOD_CONFUSE,
+        SPELL_AURA_MOD_FEAR,
+        SPELL_AURA_MOD_SILENCE,
+        SPELL_AURA_MOD_DISARM,
+        SPELL_AURA_MOD_ROOT,
+        SPELL_AURA_MOD_POSSESS
+    };
+
+    switch (_spell->SpellFamilyName)
+    {
+    case SPELLFAMILY_WARRIOR:
+        return ReturnCCDelay(_spell); // Charge, Intercept, Concussion Blow, Shockwave, Talent - Gag Order Proc, Intimidating Shout, Disarm	
+    case SPELLFAMILY_PALADIN:
+        return ReturnCCDelay(_spell); // Talent - Shield Of The Templar Proc, Repentance, Hammer of Justice, Turn Evil
+    case SPELLFAMILY_HUNTER:
+        if (_spell->Mechanic == MECHANIC_SNARE) // Entrapment has to return 0 or the root will break randomly
+            return 0;
+        return ReturnCCDelay(_spell); // Scatter Shot, Wyvern Sting, Scare Beast, Silencing Arrow, Freezing trap
+    case SPELLFAMILY_ROGUE:
+        return ReturnCCDelay(_spell); // Talent - Improved Kick, Cheap Shot, Kidney Shot, Blind, Sap, Dismantle, Gouge
+    case SPELLFAMILY_PRIEST:
+        if (_spell->Mechanic == MECHANIC_CHARM) // Mind Control
+            return 0;
+        return ReturnCCDelay(_spell); // Silence, Psychic Scream, Psychic Horror, Shackle Undead
+    case SPELLFAMILY_DEATHKNIGHT:
+        return ReturnCCDelay(_spell); // Hungering Cold, Mind Freeze, Strangulate
+    case SPELLFAMILY_SHAMAN:
+        return ReturnCCDelay(_spell); // Hex, Stoneclaw Stun, Feral bash, Talent - Earth's Grasp root
+    case SPELLFAMILY_MAGE:
+        return ReturnCCDelay(_spell); // Polymorph, Frost Nova, Talent - Frostbite, Deep Freeze, Talent - Improved Counter spell silence, Dragon's Breath, Water Elemental
+    case SPELLFAMILY_WARLOCK:
+        return ReturnCCDelay(_spell); // Fear, Howl of Terror, Banish, Shadowfury, Summon Inferno Stun, Death Coil, Felhunter - Spell Lock
+    case SPELLFAMILY_DRUID:
+        return ReturnCCDelay(_spell); // Cyclone, Entangling Root, Bash, Maim, Feral charge - Bear, Hibernate, Pounce
+    case SPELLFAMILY_GENERIC:
+        return ReturnCCDelay(_spell, true);
+    }
+
+    // Other anything thats left including player / creature spells
+    for (AuraType i : auraWithCCD)
+        if (_spell->HasAura(auraWithCCD[i]))
+            return 100;
+
+    return 0;
 }
 
 SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
