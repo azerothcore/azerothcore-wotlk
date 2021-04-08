@@ -607,14 +607,10 @@ private:
     uint32 _triggerId;
 };
 
-template<class AI>
-CreatureAI* GetIcecrownCitadelAI(Creature* creature)
+template <class AI, class T>
+inline AI* GetIcecrownCitadelAI(T* obj)
 {
-    if (InstanceMap* instance = creature->GetMap()->ToInstanceMap())
-        if (instance->GetInstanceScript())
-            if (instance->GetScriptId() == sObjectMgr->GetScriptId(ICCScriptName))
-                return new AI(creature);
-    return nullptr;
+    return GetInstanceAI<AI>(obj, ICCScriptName);
 }
 
 #endif // ICECROWN_CITADEL_H_

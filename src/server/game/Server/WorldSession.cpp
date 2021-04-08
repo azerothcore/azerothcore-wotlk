@@ -588,8 +588,7 @@ void WorldSession::LogoutPlayer(bool save)
         }
 
         //! Broadcast a logout message to the player's friends
-        if (AccountMgr::IsGMAccount(GetSecurity())) // pussywizard: only for non-gms
-            sSocialMgr->SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUIDLow(), true);
+        sSocialMgr->SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUIDLow(), true);
         sSocialMgr->RemovePlayerSocial(_player->GetGUIDLow());
 
         //! Call script hook before deletion

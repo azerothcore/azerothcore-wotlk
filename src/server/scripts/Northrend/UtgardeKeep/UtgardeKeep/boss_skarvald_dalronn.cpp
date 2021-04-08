@@ -60,7 +60,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_skarvald_the_constructorAI (pCreature);
+        return GetUtgardeKeepAI<boss_skarvald_the_constructorAI>(pCreature);
     }
 
     struct boss_skarvald_the_constructorAI : public ScriptedAI
@@ -223,7 +223,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_dalronn_the_controllerAI (pCreature);
+        return GetUtgardeKeepAI<boss_dalronn_the_controllerAI>(pCreature);
     }
 
     struct boss_dalronn_the_controllerAI : public ScriptedAI
