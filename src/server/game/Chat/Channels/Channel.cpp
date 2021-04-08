@@ -22,7 +22,6 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
     _channelId(channelId),
     _channelDBId(channelDBId),
     _teamId(teamId),
-    _ownerGUID(0),
     _name(name),
     _password("")
 {
@@ -303,7 +302,7 @@ void Channel::LeaveChannel(Player* player, bool send)
                 // if the new owner is invisible gm, set flag to automatically choose a new owner
             }
             else
-                SetOwner(0);
+                SetOwner(ObjectGuid::Empty);
         }
     }
 }
@@ -348,13 +347,13 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
     {
         if (ban && (AccountMgr::IsGMAccount(sec) || isGoodConstantModerator))
         {
-            if (ObjectGuid::LowType lowGuid = sWorld->GetGlobalPlayerGUID(badname))
-                if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(lowGuid))
+            if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(badname))
+                if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid.GetCounter()))
                 {
                     if (Player::TeamIdForRace(gpd->race) == Player::TeamIdForRace(player->getRace()))
                     {
                         banOffline = true;
-                        victim = ObjectGuid::Create<HighGuid::Player>(lowGuid);
+                        victim = guid;
                         badAccId = gpd->accountId;
                     }
                     else
@@ -459,7 +458,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
             SetOwner(newowner);
         }
         else
-            SetOwner(0);
+            SetOwner(ObjectGuid::Empty);
     }
 }
 
@@ -485,8 +484,8 @@ void Channel::UnBan(Player const* player, std::string const& badname)
     }
 
     ObjectGuid victim;
-    if (ObjectGuid::LowType guidLow = sWorld->GetGlobalPlayerGUID(badname))
-        victim = ObjectGuid::Create<HighGuid::Player>(guidLow);
+    if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(badname))
+        victim = guid;
 
     if (!victim || !IsBanned(victim))
     {
@@ -816,7 +815,7 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang)
     else
         ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), guid, guid, what, 0, "", "", 0, false, _name);
 
-    SendToAll(&data, pinfo.IsModerator() ? 0 : guid);
+    SendToAll(&data, pinfo.IsModerator() ? ObjectGuid::Empty : guid);
 }
 
 void Channel::EveryoneSayToSelf(const char* what)
@@ -968,7 +967,7 @@ void Channel::SendToAllButOne(WorldPacket* data, ObjectGuid who)
 
 void Channel::SendToOne(WorldPacket* data, ObjectGuid who)
 {
-    if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(who))
+    if (Player* player = ObjectAccessor::FindConnectedPlayer(who))
         player->GetSession()->SendPacket(data);
 }
 
@@ -1062,7 +1061,7 @@ void Channel::MakeChannelOwner(WorldPacket* data)
 {
     std::string name = "";
 
-    if (!sObjectMgr->GetPlayerNameByGUID(_ownerGUID, name) || name.empty())
+    if (!sObjectMgr->GetPlayerNameByGUID(_ownerGUID.GetCounter(), name) || name.empty())
         name = "PLAYER_NOT_FOUND";
 
     MakeNotifyPacket(data, CHAT_CHANNEL_OWNER_NOTICE);

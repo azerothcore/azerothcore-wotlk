@@ -161,36 +161,15 @@ Player* ObjectAccessor::FindPlayer(ObjectGuid const guid)
     return player && player->IsInWorld() ? player : nullptr;
 }
 
+Player* ObjectAccessor::FindPlayerByLowGUID(ObjectGuid::LowType lowguid)
+{
+    ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(lowguid);
+    return ObjectAccessor::FindPlayer(guid);
+}
+
 Player* ObjectAccessor::FindConnectedPlayer(ObjectGuid const guid)
 {
     return HashMapHolder<Player>::Find(guid);
-}
-
-Player* ObjectAccessor::FindPlayerByName(std::string const& name, bool checkInWorld)
-{
-    /*ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
-    std::string nameStr = name;
-    std::transform(nameStr.begin(), nameStr.end(), nameStr.begin(), ::tolower);
-    HashMapHolder<Player>::MapType const& m = GetPlayers();
-    for (HashMapHolder<Player>::MapType::const_iterator iter = m.begin(); iter != m.end(); ++iter)
-    {
-        if (!iter->second->IsInWorld())
-            continue;
-        std::string currentName = iter->second->GetName();
-        std::transform(currentName.begin(), currentName.end(), currentName.begin(), ::tolower);
-        if (nameStr.compare(currentName) == 0)
-            return iter->second;
-    }*/
-
-    // pussywizard: optimization
-    std::string nameStr = name;
-    std::transform(nameStr.begin(), nameStr.end(), nameStr.begin(), ::tolower);
-    std::map<std::string, Player*>::iterator itr = playerNameToPlayerPointer.find(nameStr);
-    if (itr != playerNameToPlayerPointer.end())
-        if (!checkInWorld || itr->second->IsInWorld())
-            return itr->second;
-
-    return nullptr;
 }
 
 HashMapHolder<Player>::MapType const& ObjectAccessor::GetPlayers()
@@ -206,8 +185,56 @@ void ObjectAccessor::SaveAllPlayers()
         itr->second->SaveToDB(false, false);
 }
 
-std::map<std::string, Player*> ObjectAccessor::playerNameToPlayerPointer;
-
 /// Global definitions for the hashmap storage
 template class HashMapHolder<Player>;
 template class HashMapHolder<MotionTransport>;
+
+namespace PlayerNameMapHolder
+{
+    typedef std::unordered_map<std::string, Player*> MapType;
+    static MapType PlayerNameMap;
+
+    void Insert(Player* p)
+    {
+        PlayerNameMap[p->GetName()] = p;
+    }
+
+    void Remove(Player* p)
+    {
+        PlayerNameMap.erase(p->GetName());
+    }
+
+    Player* Find(std::string const& name)
+    {
+        std::string charName(name);
+        if (!normalizePlayerName(charName))
+            return nullptr;
+
+        auto itr = PlayerNameMap.find(charName);
+        return (itr != PlayerNameMap.end()) ? itr->second : nullptr;
+    }
+
+} // namespace PlayerNameMapHolder
+
+Player* ObjectAccessor::FindPlayerByName(std::string const& name, bool checkInWorld)
+{
+    if (Player* player = PlayerNameMapHolder::Find(name))
+        if (!checkInWorld || player->IsInWorld())
+            return player;
+
+    return nullptr;
+}
+
+template<>
+void ObjectAccessor::AddObject(Player* player)
+{
+    HashMapHolder<Player>::Insert(player);
+    PlayerNameMapHolder::Insert(player);
+}
+
+template<>
+void ObjectAccessor::RemoveObject(Player* player)
+{
+    HashMapHolder<Player>::Remove(player);
+    PlayerNameMapHolder::Remove(player);
+}

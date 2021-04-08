@@ -1233,7 +1233,7 @@ public:
 
     void SetForcedSpell(uint32 id) { _forcedSpellId = id; }
     int32 GetForcedSpell() { return _forcedSpellId; }
-    void SetForcedTargetGUID(ObjectGuid guid) { _forcedTargetGUID = guid; }
+    void SetForcedTargetGUID(ObjectGuid guid = ObjectGuid::Empty) { _forcedTargetGUID = guid; }
     ObjectGuid GetForcedTarget() { return _forcedTargetGUID; }
 
     // Player react states
@@ -1484,7 +1484,7 @@ public:
     [[nodiscard]] bool CanFreeMove() const
     {
         return !HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT |
-                             UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) && GetOwnerGUID() == 0;
+                             UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) && !GetOwnerGUID();
     }
 
     [[nodiscard]] uint32 HasUnitTypeMask(uint32 mask) const { return mask & m_unitTypeMask; }
@@ -1911,7 +1911,7 @@ public:
     [[nodiscard]] Unit* GetFirstControlled() const;
     void RemoveAllControlled();
 
-    [[nodiscard]] bool IsCharmed() const { return GetCharmerGUID() != 0; }
+    [[nodiscard]] bool IsCharmed() const { return GetCharmerGUID(); }
     [[nodiscard]] bool isPossessed() const { return HasUnitState(UNIT_STATE_POSSESSED); }
     [[nodiscard]] bool isPossessedByPlayer() const { return HasUnitState(UNIT_STATE_POSSESSED) && GetCharmerGUID().IsPlayer(); }
     [[nodiscard]] bool isPossessing() const
@@ -2364,7 +2364,7 @@ public:
 
     // Redirect Threat
     void SetRedirectThreat(ObjectGuid guid, uint32 pct) { _redirectThreatInfo.Set(guid, pct); }
-    void ResetRedirectThreat() { SetRedirectThreat(0, 0); }
+    void ResetRedirectThreat() { SetRedirectThreat(ObjectGuid::Empty, 0); }
     void ModifyRedirectThreat(int32 amount) { _redirectThreatInfo.ModifyThreatPct(amount); }
     uint32 GetRedirectThreatPercent() { return _redirectThreatInfo.GetThreatPct(); }
     [[nodiscard]] Unit* GetRedirectThreatTarget() const;
@@ -2472,7 +2472,7 @@ public:
     int32 CalculateAOEDamageReduction(int32 damage, uint32 schoolMask, Unit* caster) const;
 
     [[nodiscard]] ObjectGuid GetTarget() const { return GetGuidValue(UNIT_FIELD_TARGET); }
-    virtual void SetTarget(ObjectGuid /*guid*/) = 0;
+    virtual void SetTarget(ObjectGuid guid = ObjectGuid::Empty) = 0;
 
     void SetInstantCast(bool set) { _instantCast = set; }
     [[nodiscard]] bool CanInstantCast() const { return _instantCast; }
@@ -2671,12 +2671,12 @@ namespace acore
 class ConflagrateAuraStateDelayEvent : public BasicEvent
 {
 public:
-    ConflagrateAuraStateDelayEvent(ObjectGuid ownerGUID, ObjectGuid casterGUID) : BasicEvent(), m_owner(ownerGUID), m_caster(casterGUID) { }
+    ConflagrateAuraStateDelayEvent(Unit* owner, ObjectGuid casterGUID) : BasicEvent(), m_owner(owner), m_casterGUID(casterGUID) { }
     bool Execute(uint64 e_time, uint32 p_time) override;
 
 private:
-    ObjectGuid m_owner;
-    ObjectGuid m_caster;
+    Unit* m_owner;
+    ObjectGuid m_casterGUID;
 };
 
 class RedirectSpellEvent : public BasicEvent

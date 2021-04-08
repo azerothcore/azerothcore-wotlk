@@ -382,7 +382,7 @@ void InstanceSaveManager::LoadCharacterBinds()
                     else // override temp bind by newest one
                     {
                         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_INSTANCE_GUID);
-                        stmt->setUInt32(0, guid);
+                        stmt->setUInt32(0, guid.GetCounter());
                         stmt->setUInt32(1, bind.save->GetInstanceId());
                         CharacterDatabase.Execute(stmt);
                         bind.save->RemovePlayer(guid, this);
@@ -455,11 +455,11 @@ void InstanceSaveManager::_ResetSave(InstanceSaveHashMap::iterator& itr)
 {
     lock_instLists = true;
 
-    InstanceSave::PlayerListType& pList = itr->second->m_playerList;
-    for (InstanceSave::PlayerListType::iterator iter = pList.begin(), iter2; iter != pList.end(); )
+    GuidList& pList = itr->second->m_playerList;
+    for (GuidList::iterator iter = pList.begin(), iter2; iter != pList.end(); )
     {
         iter2 = iter++;
-        PlayerUnbindInstanceNotExtended(*iter2, itr->second->GetMapId(), itr->second->GetDifficulty(), ObjectAccessor::GetObjectInOrOutOfWorld(*iter2, (Player*)nullptr));
+        PlayerUnbindInstanceNotExtended(*iter2, itr->second->GetMapId(), itr->second->GetDifficulty(), ObjectAccessor::FindConnectedPlayer(*iter2));
     }
 
     // delete stuff if no players left (noone extended id)
@@ -590,7 +590,7 @@ InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(ObjectGuid guid, I
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE);
             stmt->setUInt32(0, save->GetInstanceId());
             stmt->setBool(1, permanent);
-            stmt->setUInt32(2, guidLow);
+            stmt->setUInt32(2, guid.GetCounter());
             stmt->setUInt32(3, bind.save->GetInstanceId());
             CharacterDatabase.Execute(stmt);
         }
@@ -616,7 +616,7 @@ InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(ObjectGuid guid, I
         CharacterDatabase.CommitTransaction(trans);*/
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_INSTANCE);
-        stmt->setUInt32(0, guidLow);
+        stmt->setUInt32(0, guid.GetCounter());
         stmt->setUInt32(1, save->GetInstanceId());
         stmt->setBool(2, permanent);
         CharacterDatabase.Execute(stmt);
@@ -625,8 +625,8 @@ InstancePlayerBind* InstanceSaveManager::PlayerBindToInstance(ObjectGuid guid, I
     if (bind.save != save)
     {
         if (bind.save)
-            bind.save->RemovePlayer(guidLow, this);
-        save->AddPlayer(guidLow);
+            bind.save->RemovePlayer(guid, this);
+        save->AddPlayer(guid);
     }
 
     if (permanent)
@@ -664,13 +664,13 @@ void InstanceSaveManager::PlayerUnbindInstance(ObjectGuid guid, uint32 mapid, Di
 
         InstanceSave* tmp = itr->second.save;
         w->m[difficulty].erase(itr);
-        tmp->RemovePlayer(guidLow, this);
+        tmp->RemovePlayer(guid, this);
     }
 }
 
 void InstanceSaveManager::PlayerUnbindInstanceNotExtended(ObjectGuid guid, uint32 mapid, Difficulty difficulty, Player* player /*= nullptr*/)
 {
-    BoundInstancesMapWrapper* w = playerBindStorage[guidLow];
+    BoundInstancesMapWrapper* w = playerBindStorage[guid];
     BoundInstancesMap::iterator itr = w->m[difficulty].find(mapid);
     if (itr != w->m[difficulty].end())
     {
@@ -683,7 +683,7 @@ void InstanceSaveManager::PlayerUnbindInstanceNotExtended(ObjectGuid guid, uint3
 
             InstanceSave* tmp = itr->second.save;
             w->m[difficulty].erase(itr);
-            tmp->RemovePlayer(guidLow, this);
+            tmp->RemovePlayer(guid, this);
         }
     }
 }
@@ -697,7 +697,7 @@ InstancePlayerBind* InstanceSaveManager::PlayerGetBoundInstance(ObjectGuid guid,
         return nullptr;
 
     BoundInstancesMapWrapper* w = nullptr;
-    PlayerBindStorage::const_iterator itr = playerBindStorage.find(guidLow);
+    PlayerBindStorage::const_iterator itr = playerBindStorage.find(guid);
     if (itr != playerBindStorage.end())
         w = itr->second;
     else
@@ -720,7 +720,7 @@ bool InstanceSaveManager::PlayerIsPermBoundToInstance(ObjectGuid guid, uint32 ma
 
 BoundInstancesMap const& InstanceSaveManager::PlayerGetBoundInstances(ObjectGuid guid, Difficulty difficulty)
 {
-    PlayerBindStorage::iterator itr = playerBindStorage.find(guidLow);
+    PlayerBindStorage::iterator itr = playerBindStorage.find(guid);
     if (itr != playerBindStorage.end())
         return itr->second->m[difficulty];
     return emptyBoundInstancesMap;
@@ -734,7 +734,7 @@ void InstanceSaveManager::PlayerCreateBoundInstancesMaps(ObjectGuid guid)
 
 InstanceSave* InstanceSaveManager::PlayerGetInstanceSave(ObjectGuid guid, uint32 mapid, Difficulty difficulty)
 {
-    InstancePlayerBind* pBind = PlayerGetBoundInstance(guidLow, mapid, difficulty);
+    InstancePlayerBind* pBind = PlayerGetBoundInstance(guid, mapid, difficulty);
     return (pBind ? pBind->save : nullptr);
 }
 
@@ -771,7 +771,7 @@ void InstanceSaveManager::CopyBinds(ObjectGuid from, ObjectGuid to, Player* toPl
 
 void InstanceSaveManager::UnbindAllFor(InstanceSave* save)
 {
-    InstanceSave::PlayerListType& pList = save->m_playerList;
+    GuidList& pList = save->m_playerList;
     while (!pList.empty())
-        PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), true, ObjectAccessor::GetObjectInOrOutOfWorld(*(pList.begin()), (Player*)nullptr));
+        PlayerUnbindInstance(*(pList.begin()), save->GetMapId(), save->GetDifficulty(), true, ObjectAccessor::FindConnectedPlayer(*(pList.begin())));
 }

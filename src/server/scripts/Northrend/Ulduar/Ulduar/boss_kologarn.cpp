@@ -322,7 +322,7 @@ public:
                 // left arm
                 if (who->GetGUID() == _left)
                 {
-                    _left = 0;
+                    _left.Clear();
                     if (me->IsInCombat())
                     {
                         Talk(SAY_LEFT_ARM_GONE);
@@ -331,7 +331,7 @@ public:
                 }
                 else
                 {
-                    _right = 0;
+                    _right.Clear();
                     if (me->IsInCombat())
                     {
                         Talk(SAY_RIGHT_ARM_GONE);

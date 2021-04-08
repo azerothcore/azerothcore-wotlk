@@ -57,7 +57,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target))
             return false;
 
         uint32 amount = (uint32)atoi(args);
@@ -76,7 +76,7 @@ public:
         }
 
         // check online security
-        if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer(), 0))
+        if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer()))
             return false;
 
         handler->GetSession()->GetPlayer()->RewardHonor(target, 1);
@@ -94,7 +94,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target))
             return false;
 
         target->UpdateHonorFields();

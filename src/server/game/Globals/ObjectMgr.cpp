@@ -1512,7 +1512,7 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = ObjectGuid::Create<HighGuid::GameObject>(slave->id, guidlow);
+                    guid = ObjectGuid::Create<HighGuid::GameObject>(slave->id, guidLow);
                     linkedGuid = ObjectGuid::Create<HighGuid::GameObject>(master->id, linkedGuidLow);
                     break;
                 }
@@ -1765,7 +1765,7 @@ void ObjectMgr::LoadCreatures()
         MapEntry const* mapEntry = sMapStore.LookupEntry(data.mapid);
         if (!mapEntry)
         {
-            sLog->outErrorDb("Table `creature` have creature (GUID: %u) that spawned at not existed map (Id: %u), skipped.", guid, data.mapid);
+            sLog->outErrorDb("Table `creature` have creature (SpawnId: %u) that spawned at not existed map (Id: %u), skipped.", spawnId, data.mapid);
             continue;
         }
 
@@ -1775,15 +1775,16 @@ void ObjectMgr::LoadCreatures()
 
         // Skip spawnMask check for transport maps
         if (!_transportMaps.count(data.mapid) && data.spawnMask & ~spawnMasks[data.mapid])
-            sLog->outErrorDb("Table `creature` have creature (GUID: %u) that have wrong spawn mask %u including not supported difficulty modes for map (Id: %u).", guid, data.spawnMask, data.mapid);
+            sLog->outErrorDb("Table `creature` have creature (SpawnId: %u) that have wrong spawn mask %u including not supported difficulty modes for map (Id: %u).",
+                spawnId, data.spawnMask, data.mapid);
 
         bool ok = true;
         for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && ok; ++diff)
         {
             if (_difficultyEntries[diff].find(data.id) != _difficultyEntries[diff].end())
             {
-                sLog->outErrorDb("Table `creature` have creature (GUID: %u) that listed as difficulty %u template (entry: %u) in `creature_template`, skipped.",
-                                 guid, diff + 1, data.id);
+                sLog->outErrorDb("Table `creature` have creature (SpawnId: %u) that listed as difficulty %u template (entry: %u) in `creature_template`, skipped.",
+                                 spawnId, diff + 1, data.id);
                 ok = false;
             }
         }
@@ -1795,7 +1796,8 @@ void ObjectMgr::LoadCreatures()
         {
             if (!GetEquipmentInfo(data.id, data.equipmentId))
             {
-                sLog->outErrorDb("Table `creature` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.", data.id, data.equipmentId);
+                sLog->outErrorDb("Table `creature` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.",
+                    data.id, data.equipmentId);
                 data.equipmentId = 0;
             }
         }
@@ -1803,19 +1805,21 @@ void ObjectMgr::LoadCreatures()
         if (cInfo->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
         {
             if (!mapEntry->IsDungeon())
-                sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `creature_template`.`flags_extra` including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.", guid, data.id);
+                sLog->outErrorDb("Table `creature` have creature (SpawnId: %u Entry: %u) with `creature_template`.`flags_extra` including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.",
+                    spawnId, data.id);
         }
 
         if (data.wander_distance < 0.0f)
         {
-            sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `wander_distance`< 0, set to 0.", guid, data.id);
+            sLog->outErrorDb("Table `creature` have creature (SpawnId: %u Entry: %u) with `wander_distance`< 0, set to 0.", spawnId, data.id);
             data.wander_distance = 0.0f;
         }
         else if (data.movementType == RANDOM_MOTION_TYPE)
         {
             if (data.wander_distance == 0.0f)
             {
-                sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=1 (random movement) but with `wander_distance`=0, replace by idle movement type (0).", guid, data.id);
+                sLog->outErrorDb("Table `creature` have creature (SpawnId: %u Entry: %u) with `MovementType`=1 (random movement) but with `wander_distance`=0, replace by idle movement type (0).",
+                    spawnId, data.id);
                 data.movementType = IDLE_MOTION_TYPE;
             }
         }
@@ -1823,14 +1827,14 @@ void ObjectMgr::LoadCreatures()
         {
             if (data.wander_distance != 0.0f)
             {
-                sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.", guid, data.id);
+                sLog->outErrorDb("Table `creature` have creature (SpawnId: %u Entry: %u) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.", spawnId, data.id);
                 data.wander_distance = 0.0f;
             }
         }
 
         if (data.phaseMask == 0)
         {
-            sLog->outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", guid, data.id);
+            sLog->outErrorDb("Table `creature` have creature (SpawnId: %u Entry: %u) with `phaseMask`=0 (not visible for anyone), set to 1.", spawnId, data.id);
             data.phaseMask = 1;
         }
 
@@ -1843,14 +1847,14 @@ void ObjectMgr::LoadCreatures()
 
             stmt->setUInt32(0, zoneId);
             stmt->setUInt32(1, areaId);
-            stmt->setUInt32(2, guid);
+            stmt->setUInt32(2, spawnId);
 
             WorldDatabase.Execute(stmt);
         }
 
         // Add to grid if not managed by the game event or pool system
         if (gameEvent == 0 && PoolId == 0)
-            AddCreatureToGrid(guid, &data);
+            AddCreatureToGrid(spawnId, &data);
 
         ++count;
     } while (result->NextRow());
@@ -1900,7 +1904,6 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     ObjectGuid::LowType spawnId = GenerateGameObjectSpawnId();
 
     GameObjectData& data = NewGOData(spawnId);
-    data.spawnId        = spawnId;
     data.id             = entry;
     data.mapid          = mapId;
     data.posX           = x;
@@ -1919,14 +1922,14 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     data.artKit         = goinfo->type == GAMEOBJECT_TYPE_CAPTURE_POINT ? 21 : 0;
     data.dbData = false;
 
-    AddGameobjectToGrid(guid, &data);
+    AddGameobjectToGrid(spawnId, &data);
 
     // Spawn if necessary (loaded grids only)
     // We use spawn coords to spawn
     if (!map->Instanceable() && map->IsGridLoaded(x, y))
     {
         GameObject* go = sObjectMgr->IsGameObjectStaticTransport(data.id) ? new StaticTransport() : new GameObject();
-        if (!go->LoadGameObjectFromDB(guid, map))
+        if (!go->LoadGameObjectFromDB(spawnId, map))
         {
             sLog->outError("AddGOData: cannot add gameobject entry %u to map", entry);
             delete go;
@@ -1935,10 +1938,10 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_MAPS, "AddGOData: dbguid %u entry %u map %u x %f y %f z %f o %f", guid, entry, mapId, x, y, z, o);
+    sLog->outDebug(LOG_FILTER_MAPS, "AddGOData: spawnId %u entry %u map %u x %f y %f z %f o %f", spawnId, entry, mapId, x, y, z, o);
 #endif
 
-    return guid;
+    return spawnId;
 }
 
 uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay)
@@ -1977,13 +1980,13 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     data.unit_flags = cInfo->unit_flags;
     data.dynamicflags = cInfo->dynamicflags;
 
-    AddCreatureToGrid(guid, &data);
+    AddCreatureToGrid(spawnId, &data);
 
     // Spawn if necessary (loaded grids only)
     if (!map->Instanceable() && !map->IsRemovalGrid(x, y))
     {
         Creature* creature = new Creature();
-        if (!creature->LoadCreatureFromDB(guid, map, true, false, true))
+        if (!creature->LoadCreatureFromDB(spawnId, map, true, false, true))
         {
             sLog->outError("AddCreature: Cannot add creature entry %u to map", entry);
             delete creature;
@@ -1991,7 +1994,7 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
         }
     }
 
-    return guid;
+    return spawnId;
 }
 
 void ObjectMgr::LoadGameobjects()
@@ -2192,17 +2195,17 @@ void ObjectMgr::RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectDat
 ObjectGuid ObjectMgr::GetPlayerGUIDByName(std::string const& name) const
 {
     // Get data from global storage
-    if (ObjectGuid::LowType guidLow = sWorld->GetGlobalPlayerGUID(name))
-        return ObjectGuid::Create<HighGuid::Player>(guidLow);
+    if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(name))
+        return guid;
 
     // No player found
     return ObjectGuid::Empty;
 }
 
-bool ObjectMgr::GetPlayerNameByGUID(ObjectGuid guid, std::string& name) const
+bool ObjectMgr::GetPlayerNameByGUID(ObjectGuid::LowType lowGuid, std::string& name) const
 {
     // Get data from global storage
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
+    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(lowGuid))
     {
         name = playerData->name;
         return true;
@@ -2232,8 +2235,8 @@ uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid::LowType guid) const
 uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(const std::string& name) const
 {
     // Get data from global storage
-    if (ObjectGuid::LowType guidLow = sWorld->GetGlobalPlayerGUID(name))
-        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guidLow))
+    if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(name))
+        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid.GetCounter()))
             return playerData->accountId;
 
     return 0;
@@ -5541,7 +5544,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         m->messageID      = fields[0].GetUInt32();
         m->messageType    = fields[1].GetUInt8();
         m->sender         = fields[2].GetUInt32();
-        m->receiver       = ObjectGuid::Create<HighGuid::Player>(fields[3].GetUInt32());
+        m->receiver       = fields[3].GetUInt32();
         bool has_items    = fields[4].GetBool();
         m->expire_time    = time_t(fields[5].GetUInt32());
         m->deliver_time   = 0;
@@ -5551,7 +5554,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
 
         Player* player = nullptr;
         if (serverUp)
-            player = ObjectAccessor::FindPlayerInOrOutOfWorld(m->receiver);
+            player = ObjectAccessor::FindPlayerByLowGUID(m->receiver);
 
         if (player) // don't modify mails of a logged in player
         {
@@ -8956,11 +8959,6 @@ GameObjectTemplate const* ObjectMgr::GetGameObjectTemplate(uint32 entry)
         return &(itr->second);
 
     return nullptr;
-}
-
-Player* ObjectMgr::GetPlayerByLowGUID(ObjectGuid::LowType lowguid) const
-{
-    return ObjectAccessor::FindPlayer(ObjectGuid::Create<HighGuid::Player>(lowguid));
 }
 
 bool ObjectMgr::IsGameObjectStaticTransport(uint32 entry)

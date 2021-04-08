@@ -800,11 +800,11 @@ protected:
 class ReflectEvent : public BasicEvent
 {
 public:
-    ReflectEvent(ObjectGuid casterGUID, ObjectGuid targetGUID, const SpellInfo* spellInfo) : _casterGUID(casterGUID), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
+    ReflectEvent(Unit* caster, ObjectGuid targetGUID, const SpellInfo* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
     bool Execute(uint64 e_time, uint32 p_time) override;
 
 protected:
-    ObjectGuid _casterGUID;
+    Unit* _caster;
     ObjectGuid _targetGUID;
     const SpellInfo* _spellInfo;
 };

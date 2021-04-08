@@ -252,17 +252,17 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
     if (type == GUILD_CHARTER_TYPE && _player->GetGuildId())
         return;
 
-    Signatures const* signatures = sPetitionMgr->GetSignature(petitionGuidLow);
+    Signatures const* signatures = sPetitionMgr->GetSignature(petitionguid);
     uint8 signs = signatures ? signatures->signatureMap.size() : 0;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_PETITION_SHOW_SIGNATURES petition entry: '%u'", petitionGuidLow);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_PETITION_SHOW_SIGNATURES petition entry: '%u'", petitionguid.GetCounter());
 #endif
 
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
     data << petitionguid;                                   // petition guid
     data << _player->GetGUID();                             // owner guid
-    data << uint32(petitionGuidLow);                        // guild guid
+    data << uint32(petitionguid.GetCounter());              // guild guid
     data << uint8(signs);                                   // sign's count
 
     if (signs)
@@ -423,7 +423,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
     recvData >> petitionGuid;                              // petition guid
     recvData >> unk;
 
-    Petition const* petition = sPetitionMgr->GetPetition(petitionGuid.GetCounter());
+    Petition const* petition = sPetitionMgr->GetPetition(petitionGuid);
     if (!petition)
     {
         sLog->outError("Petition %s is not found for player %s (Name: %s)", petitionGuid.ToString().c_str(), GetPlayer()->GetGUID().ToString().c_str(), GetPlayer()->GetName().c_str());
@@ -441,7 +441,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
         return;
 
     // not let enemies sign guild charter
-    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && GetPlayer()->GetTeamId() != sObjectMgr->GetPlayerTeamIdByGUID(ownerGuid))
+    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && GetPlayer()->GetTeamId() != sObjectMgr->GetPlayerTeamIdByGUID(petition->ownerGuid.GetCounter()))
     {
         if (type != GUILD_CHARTER_TYPE)
             SendArenaTeamCommandResult(ERR_ARENA_TEAM_INVITE_SS, "", "", ERR_ARENA_TEAM_NOT_ALLIED);
@@ -514,14 +514,14 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
         SendPacket(&data);
 
         // update for owner if online
-        if (Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(ownerGuid))
+        if (Player* owner = ObjectAccessor::FindConnectedPlayer(petition->ownerGuid))
             owner->GetSession()->SendPacket(&data);
         return;
     }
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PETITION_SIGNATURE);
 
-    stmt->setUInt32(0, ownerGuid.GetCounter());
+    stmt->setUInt32(0, petition->ownerGuid.GetCounter());
     stmt->setUInt32(1, petitionGuid.GetCounter());
     stmt->setUInt32(2, playerGuid.GetCounter());
     stmt->setUInt32(3, GetAccountId());
@@ -549,7 +549,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
     //    item->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1+1, signs);
 
     // update for owner if online
-    if (Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(ownerGuid))
+    if (Player* owner = ObjectAccessor::FindConnectedPlayer(petition->ownerGuid))
         owner->GetSession()->SendPacket(&data);
 }
 
@@ -570,7 +570,7 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
     if (!petition)
         return;
 
-    if (Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(ownerguid))                 // petition owner online
+    if (Player* owner = ObjectAccessor::FindConnectedPlayer(ownerguid))                 // petition owner online
     {
         WorldPacket data(MSG_PETITION_DECLINE, 8);
         data << _player->GetGUID();
@@ -591,7 +591,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
     recvData >> petitionguid;                              // petition guid
     recvData >> plguid;                                    // player guid
 
-    player = ObjectAccessor::FindPlayerInOrOutOfWorld(plguid);
+    player = ObjectAccessor::FindConnectedPlayer(plguid);
     if (!player)
         return;
 

@@ -928,7 +928,7 @@ public:
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            GetTarget()->RemoveAurasDueToSpell(_markSpell, 0, 0, AURA_REMOVE_BY_EXPIRE);
+            GetTarget()->RemoveAurasDueToSpell(_markSpell, ObjectGuid::Empty, 0, AURA_REMOVE_BY_EXPIRE);
         }
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -978,7 +978,7 @@ public:
 
             if (Unit* dispelledUnit = GetUnitOwner())
                 if (dispelledUnit->HasAura(_removeSpellId))
-                    dispelledUnit->RemoveAurasDueToSpell(_removeSpellId, 0, 0, AURA_REMOVE_BY_EXPIRE);
+                    dispelledUnit->RemoveAurasDueToSpell(_removeSpellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_EXPIRE);
         }
 
         void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1188,7 +1188,7 @@ public:
             if (!target)
                 return;
 
-            target->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION, 0, 0, AURA_REMOVE_BY_ENEMY_SPELL);
+            target->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
             if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
                 return;
             GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
@@ -1221,7 +1221,7 @@ public:
             if (!target)
                 return;
 
-            target->RemoveAurasDueToSpell(SPELL_SOUL_CONSUMPTION, 0, 0, AURA_REMOVE_BY_ENEMY_SPELL);
+            target->RemoveAurasDueToSpell(SPELL_SOUL_CONSUMPTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)

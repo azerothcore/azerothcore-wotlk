@@ -250,7 +250,7 @@ void PetAI::UpdateAI(uint32 diff)
                         continue;
                 }
 
-                Spell* spell = new Spell(me, spellInfo, TRIGGERED_NONE, 0);
+                Spell* spell = new Spell(me, spellInfo, TRIGGERED_NONE);
                 spell->LoadScripts(); // xinef: load for CanAutoCast (calling CheckPetCast)
                 bool spellUsed = false;
 
@@ -295,7 +295,7 @@ void PetAI::UpdateAI(uint32 diff)
             }
             else if (me->GetVictim() && CanAttack(me->GetVictim(), spellInfo) && spellInfo->CanBeUsedInCombat())
             {
-                Spell* spell = new Spell(me, spellInfo, TRIGGERED_NONE, 0);
+                Spell* spell = new Spell(me, spellInfo, TRIGGERED_NONE);
                 if (spell->CanAutoCast(me->GetVictim()))
                     targetSpellStore.push_back(std::make_pair(me->GetVictim(), spell));
                 else
@@ -557,7 +557,7 @@ void PetAI::HandleReturnMovement()
     }
 
     me->GetCharmInfo()->SetForcedSpell(0);
-    me->GetCharmInfo()->SetForcedTargetGUID(0);
+    me->GetCharmInfo()->SetForcedTargetGUID();
 
     // xinef: remember that npcs summoned by npcs can also be pets
     me->DeleteThreatList();
@@ -570,7 +570,7 @@ void PetAI::SpellHit(Unit* caster, const SpellInfo* spellInfo)
     if (spellInfo->HasAura(SPELL_AURA_MOD_TAUNT) && !me->HasReactState(REACT_PASSIVE))
     {
         me->GetCharmInfo()->SetForcedSpell(0);
-        me->GetCharmInfo()->SetForcedTargetGUID(0);
+        me->GetCharmInfo()->SetForcedTargetGUID();
         AttackStart(caster);
     }
 }

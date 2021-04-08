@@ -387,7 +387,7 @@ public:
                 if (uiRand < 40)
                 {
                     player->CastSpell(me, SPELL_FREED_WARSONG_PEON, true);
-                    player->KilledMonsterCredit(NPC_WARSONG_PEON, 0);
+                    player->KilledMonsterCredit(NPC_WARSONG_PEON);
                 }
                 else if (uiRand < 80)
                 {
@@ -590,7 +590,7 @@ public:
                 me->DespawnOrUnsummon(45000);
 
                 if (Player* player = pCaster->ToPlayer())
-                    player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER, 0);
+                    player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
 
                 bEnslaved = true;
             }
@@ -724,7 +724,7 @@ public:
                         break;
                     case 7:
                         Talk(SAY_IMPRISIONED_BERYL_7);
-                        caster->KilledMonsterCredit(NPC_IMPRISONED_BERYL_SORCERER, 0);
+                        caster->KilledMonsterCredit(NPC_IMPRISONED_BERYL_SORCERER);
                         break;
                 }
             }

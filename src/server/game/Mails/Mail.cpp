@@ -131,7 +131,7 @@ void MailDraft::deleteIncludedItems(SQLTransaction& trans, bool inDB /*= false*/
 
 void MailDraft::SendReturnToSender(uint32 /*sender_acc*/, ObjectGuid::LowType sender_guid, ObjectGuid::LowType receiver_guid, SQLTransaction& trans)
 {
-    Player* receiver = ObjectAccessor::FindPlayerInOrOutOfWorld(receiver_guid);
+    Player* receiver = ObjectAccessor::FindPlayerByLowGUID(receiver_guid);
 
     uint32 rc_account = 0;
     if (!receiver)
@@ -178,7 +178,7 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
         return;
 
     Player* pReceiver = receiver.GetPlayer();               // can be nullptr
-    Player* pSender = ObjectAccessor::FindPlayerInOrOutOfWorld(ObjectGuid::Create<HighGuid::Player>(sender.GetSenderId()));
+    Player* pSender = ObjectAccessor::FindPlayerByLowGUID(sender.GetSenderId());
 
     if (pReceiver)
         prepareItems(pReceiver, trans);                            // generate mail template items
@@ -257,7 +257,7 @@ void MailDraft::SendMailTo(SQLTransaction& trans, MailReceiver const& receiver, 
         for (MailItemMap::const_iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
         {
             Item* item = mailItemIter->second;
-            m->AddItem(item->GetGUID(), item->GetEntry());
+            m->AddItem(item->GetGUID().GetCounter(), item->GetEntry());
         }
 
         m->messageType = sender.GetMailMessageType();

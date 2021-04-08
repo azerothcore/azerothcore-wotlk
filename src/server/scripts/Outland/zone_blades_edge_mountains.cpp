@@ -106,9 +106,9 @@ public:
                     if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                     {
                         if (GetClosestCreatureWithEntry(me, NPC_SOUTH_GATE, 200.0f))
-                            player->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT, TRIGGERED_NONE);
+                            player->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT);
                         else if (GetClosestCreatureWithEntry(me, NPC_NORTH_GATE, 200.0f))
-                            player->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT, TRIGGERED_NONE);
+                            player->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT);
                         // complete quest part
                         if (Creature* bunny = GetClosestCreatureWithEntry(me, NPC_EXPLOSION_BUNNY, 200.0f))
                             bunny->CastSpell(nullptr, SPELL_EXPLOSION, TRIGGERED_NONE);

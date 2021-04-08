@@ -45,7 +45,7 @@ void Totem::InitStats(uint32 duration)
 {
     // client requires SMSG_TOTEM_CREATED to be sent before adding to world and before removing old totem
     // Xinef: Set level for Unit totems
-    if (Unit* owner = ObjectAccessor::FindUnit(m_owner))
+    if (Unit* owner = ObjectAccessor::GetUnit(*this, m_owner))
     {
         if (owner->GetTypeId() == TYPEID_PLAYER && m_Properties->Slot >= SUMMON_SLOT_TOTEM && m_Properties->Slot < MAX_TOTEM_SLOT)
         {
@@ -109,7 +109,7 @@ void Totem::UnSummon(uint32 msTime)
     {
         if (owner->m_SummonSlot[i] == GetGUID())
         {
-            owner->m_SummonSlot[i] = 0;
+            owner->m_SummonSlot[i].Clear();
             break;
         }
     }

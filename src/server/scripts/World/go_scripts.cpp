@@ -311,7 +311,7 @@ public:
                 GetCreatureListWithEntryInGrid(cList, go, NPC_WINTERFIN_TADPOLE, 5.0f);
                 for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
                 {
-                    player->KilledMonsterCredit(NPC_WINTERFIN_TADPOLE, 0);
+                    player->KilledMonsterCredit(NPC_WINTERFIN_TADPOLE);
                     (*itr)->DespawnOrUnsummon(urand(45000, 60000));
                     (*itr)->GetMotionMaster()->MoveFollow(player, 1.0f, frand(0.0f, 2 * M_PI), MOTION_SLOT_CONTROLLED);
                 }
@@ -1247,7 +1247,7 @@ public:
             return false;
 
         pPrisoner->DespawnOrUnsummon();
-        player->KilledMonsterCredit(NPC_EBON_BLADE_PRISONER_HUMAN, 0);
+        player->KilledMonsterCredit(NPC_EBON_BLADE_PRISONER_HUMAN);
         switch (pPrisoner->GetEntry())
         {
             case NPC_EBON_BLADE_PRISONER_HUMAN:
@@ -1486,7 +1486,7 @@ public:
         if (qInfo)
         {
             /// @todo prisoner should help player for a short period of time
-            player->KilledMonsterCredit(qInfo->RequiredNpcOrGo[0], 0);
+            player->KilledMonsterCredit(qInfo->RequiredNpcOrGo[0]);
             pPrisoner->DisappearAndDie();
         }
         return true;

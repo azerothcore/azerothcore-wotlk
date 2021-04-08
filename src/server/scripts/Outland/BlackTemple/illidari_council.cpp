@@ -225,7 +225,7 @@ struct boss_illidari_council_memberAI : public ScriptedAI
 
     void EnterEvadeMode() override
     {
-        me->SetOwnerGUID(0);
+        me->SetOwnerGUID(ObjectGuid::Empty);
         ScriptedAI::EnterEvadeMode();
     }
 

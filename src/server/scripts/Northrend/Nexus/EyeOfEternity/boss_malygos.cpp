@@ -339,7 +339,7 @@ public:
                 if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED))
                     me->GetMotionMaster()->MoveChase(victim);
                 else
-                    me->SetTarget(0);
+                    me->SetTarget();
             }
         }
 
@@ -452,7 +452,7 @@ public:
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
 
                         me->SendMeleeAttackStop(me->GetVictim());
-                        me->SetTarget(ObjectGuid::Empty);
+                        me->SetTarget();
 
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
@@ -557,7 +557,7 @@ public:
                     Talk(SAY_END_P1);
                     me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
                     me->SendMeleeAttackStop();
-                    me->SetTarget(ObjectGuid::Empty);
+                    me->SetTarget();
                     me->GetMotionMaster()->MoveIdle();
                     me->DisableSpline();
                     me->GetMotionMaster()->MovePoint(MI_POINT_CENTER_GROUND_PH_2, CenterPos);
@@ -659,7 +659,7 @@ public:
                     break;
                 case EVENT_CLEAR_TARGET:
                     me->SendMeleeAttackStop();
-                    me->SetTarget(0);
+                    me->SetTarget();
                     break;
                 case EVENT_CHECK_TRASH_DEAD:
                     {
@@ -668,7 +668,7 @@ public:
                         else
                         {
                             me->SendMeleeAttackStop();
-                            me->SetTarget(0);
+                            me->SetTarget();
                             events.CancelEventGroup(1);
                             summons.DespawnAll();
                             // start phase 3

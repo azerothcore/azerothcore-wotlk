@@ -987,7 +987,7 @@ struct BGData
     bool isInvited{false};
     bool bgIsRandom{false};
 
-    std::set<uint32>   bgAfkReporter;
+    GuidSet            bgAfkReporter;
     uint8              bgAfkReportedCount{0};
     time_t             bgAfkReportedTimer{0};
 };
@@ -1027,7 +1027,7 @@ public:                                                 // constructors
     void SetSpell(uint32 spell_id, Item* castItem = nullptr);
 
     [[nodiscard]] Item*  GetSpellCastItem() const;
-    [[nodiscard]] bool HasSpellCastItem() const { return m_spellCastItem != 0; }
+    [[nodiscard]] bool HasSpellCastItem() const { return m_spellCastItem; }
 
     [[nodiscard]] uint32 GetMoney() const { return m_money; }
     void SetMoney(uint32 money);
@@ -1313,8 +1313,8 @@ public:
     InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = nullptr) const;
     InventoryResult CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item* pItem = nullptr, bool swap = false, uint32* no_space_count = nullptr) const;
 
-    void AddRefundReference(uint32 it);
-    void DeleteRefundReference(uint32 it);
+    void AddRefundReference(ObjectGuid itemGUID);
+    void DeleteRefundReference(ObjectGuid itemGUID);
 
     void ApplyEquipCooldown(Item* pItem);
     void SetAmmo(uint32 item);
@@ -1509,7 +1509,7 @@ public:
     void ItemAddedQuestCheck(uint32 entry, uint32 count);
     void ItemRemovedQuestCheck(uint32 entry, uint32 count);
     void KilledMonster(CreatureTemplate const* cInfo, ObjectGuid guid);
-    void KilledMonsterCredit(uint32 entry, ObjectGuid guid);
+    void KilledMonsterCredit(uint32 entry, ObjectGuid guid = ObjectGuid::Empty);
     void KilledPlayerCredit();
     void KillCreditGO(uint32 entry, ObjectGuid guid = ObjectGuid::Empty);
     void TalkedToCreature(uint32 entry, ObjectGuid guid);
@@ -1533,7 +1533,7 @@ public:
     void SendQuestUpdateAddPlayer(Quest const* quest, uint16 old_count, uint16 add_count);
 
     ObjectGuid GetDivider() { return m_divider; }
-    void SetDivider(ObjectGuid guid) { m_divider = guid; }
+    void SetDivider(ObjectGuid guid = ObjectGuid::Empty) { m_divider = guid; }
 
     uint32 GetInGameTime() { return m_ingametime; }
 
@@ -1548,7 +1548,7 @@ public:
     /***                   LOAD SYSTEM                     ***/
     /*********************************************************/
 
-    bool LoadFromDB(ObjectGuid::LowType guid, SQLQueryHolder* holder);
+    bool LoadFromDB(ObjectGuid guid, SQLQueryHolder* holder);
     [[nodiscard]] bool isBeingLoaded() const override;
 
     void Initialize(ObjectGuid::LowType guid);
@@ -1573,7 +1573,7 @@ public:
     static void Customize(ObjectGuid guid, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
     static void SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, ObjectGuid guid);
 
-    static void DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRealmChars, bool deleteFinally);
+    static void DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool updateRealmChars, bool deleteFinally);
     static void DeleteOldCharacters();
     static void DeleteOldCharacters(uint32 keepDays);
 
@@ -1618,7 +1618,7 @@ public:
     [[nodiscard]] Unit* GetSelectedUnit() const;
     [[nodiscard]] Player* GetSelectedPlayer() const;
 
-    void SetTarget(ObjectGuid /*guid*/) override { } /// Used for serverside target changes, does not apply to players
+    void SetTarget(ObjectGuid guid = ObjectGuid::Empty) override { } /// Used for serverside target changes, does not apply to players
     void SetSelection(ObjectGuid guid);
 
     [[nodiscard]] uint8 GetComboPoints() const { return m_comboPoints; }
@@ -1651,13 +1651,13 @@ public:
     uint32 totalMailCount;
     time_t m_nextMailDelivereTime;
 
-    typedef std::unordered_map<ObjectGuid, Item*> ItemMap;
+    typedef std::unordered_map<ObjectGuid::LowType, Item*> ItemMap;
 
     ItemMap mMitems;                                    //template defined in objectmgr.cpp
 
-    Item* GetMItem(ObjectGuid itemGuid)
+    Item* GetMItem(ObjectGuid::LowType itemLowGuid)
     {
-        ItemMap::const_iterator itr = mMitems.find(itemGuid);
+        ItemMap::const_iterator itr = mMitems.find(itemLowGuid);
         return itr != mMitems.end() ? itr->second : nullptr;
     }
 
@@ -1665,12 +1665,12 @@ public:
     {
         ASSERT(it);
         //ASSERT deleted, because items can be added before loading
-        mMitems[it->GetGUID()] = it;
+        mMitems[it->GetGUID().GetCounter()] = it;
     }
 
-    bool RemoveMItem(ObjectGuid itemGuid)
+    bool RemoveMItem(ObjectGuid::LowType itemLowGuid)
     {
-        return !!mMitems.erase(itemGuid);
+        return !!mMitems.erase(itemLowGuid);
     }
 
     void PetSpellInitialize();
@@ -1814,9 +1814,9 @@ public:
         m_resurrectHealth = health;
         m_resurrectMana = mana;
     }
-    void clearResurrectRequestData() { setResurrectRequestData(0, 0, 0.0f, 0.0f, 0.0f, 0, 0); }
+    void clearResurrectRequestData() { setResurrectRequestData(ObjectGuid::Empty, 0, 0.0f, 0.0f, 0.0f, 0, 0); }
     [[nodiscard]] bool isResurrectRequestedBy(ObjectGuid guid) const { return m_resurrectGUID && m_resurrectGUID == guid; }
-    [[nodiscard]] bool isResurrectRequested() const { return m_resurrectGUID != 0; }
+    [[nodiscard]] bool isResurrectRequested() const { return m_resurrectGUID; }
     void ResurectUsingRequestData();
 
     [[nodiscard]] uint8 getCinematic() const
@@ -1885,7 +1885,7 @@ public:
     {
         SetUInt32Value(PLAYER_GUILDID, GuildId);
         // xinef: update global storage
-        sWorld->UpdateGlobalPlayerGuild(GetGUID(), GuildId);
+        sWorld->UpdateGlobalPlayerGuild(GetGUID().GetCounter(), GuildId);
     }
     void SetRank(uint8 rankId) { SetUInt32Value(PLAYER_GUILDRANK, rankId); }
     [[nodiscard]] uint8 GetRank() const { return uint8(GetUInt32Value(PLAYER_GUILDRANK)); }

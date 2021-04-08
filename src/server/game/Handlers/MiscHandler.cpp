@@ -294,7 +294,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
     data << uint32(displaycount);                         // placeholder, count of players displayed
 
     ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
-    HashMapHolder<Player>::MapType const& m = sObjectAccessor->GetPlayers();
+    HashMapHolder<Player>::MapType const& m = ObjectAccessor::GetPlayers();
     for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
     {
         if (AccountMgr::IsPlayerAccount(security))

@@ -118,7 +118,7 @@ public:
             {
                 if (state == IN_PROGRESS)
                 {
-                    for (ObjectGuid const guid : _wardersSetr)
+                    for (ObjectGuid const guid : _wardersSet)
                         if (Creature* warder = instance->GetCreature(guid))
                             if (warder->IsAlive())
                             {

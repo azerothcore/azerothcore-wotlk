@@ -66,7 +66,7 @@ void CalendarMgr::LoadFromDB()
             uint32 guildId = 0;
 
             if (flags & CALENDAR_FLAG_GUILD_EVENT || flags & CALENDAR_FLAG_WITHOUT_INVITES)
-                guildId = Player::GetGuildIdFromStorage(creatorGUID);
+                guildId = Player::GetGuildIdFromStorage(creatorGUID.GetCounter());
 
             CalendarEvent* calendarEvent = new CalendarEvent(eventId, creatorGUID, guildId, type, dungeonId, time_t(eventTime), flags, time_t(timezoneTime), title, description);
             _events.insert(calendarEvent);
@@ -180,7 +180,7 @@ void CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover)
         // guild events only? check invite status here?
         // When an event is deleted, all invited (accepted/declined? - verify) guildies are notified via in-game mail. (wowwiki)
         if (remover && invite->GetInviteeGUID() != remover)
-            mail.SendMailTo(trans, MailReceiver(invite->GetInviteeGUID()), calendarEvent, MAIL_CHECK_MASK_COPIED);
+            mail.SendMailTo(trans, MailReceiver(invite->GetInviteeGUID().GetCounter()), calendarEvent, MAIL_CHECK_MASK_COPIED);
 
         delete invite;
     }
@@ -275,7 +275,7 @@ void CalendarMgr::RemoveAllPlayerEventsAndInvites(ObjectGuid guid)
         ++itr;
         if (event->GetCreatorGUID() == guid)
         {
-            RemoveEvent(event, 0);
+            RemoveEvent(event, ObjectGuid::Empty);
             continue;
         }
     }
@@ -365,7 +365,7 @@ void CalendarMgr::DeleteOldEvents()
         CalendarEvent* event = *itr;
         ++itr;
         if (event->GetEventTime() < oldEventsTime)
-            RemoveEvent(event, 0);
+            RemoveEvent(event, ObjectGuid::Empty);
     }
 }
 
@@ -404,7 +404,7 @@ CalendarEventStore CalendarMgr::GetPlayerEvents(ObjectGuid guid)
                 if (CalendarEvent* event = GetEvent(itr->first)) // nullptr check added as attempt to fix #11512
                     events.insert(event);
 
-    if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+    if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
         if (player->GetGuildId())
             for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end(); ++itr)
                 if ((*itr)->GetGuildId() == player->GetGuildId())
@@ -455,7 +455,7 @@ uint32 CalendarMgr::GetPlayerNumPending(ObjectGuid guid)
 std::string CalendarEvent::BuildCalendarMailSubject(ObjectGuid remover) const
 {
     std::ostringstream strm;
-    strm << remover << ':' << _title;
+    strm << remover.ToString().c_str() << ':' << _title;
     return strm.str();
 }
 
@@ -479,9 +479,9 @@ void CalendarMgr::SendCalendarEventInvite(CalendarInvite const& invite)
     bool hasStatusTime = statusTime != 946684800;   // 01/01/2000 00:00:00
 
     ObjectGuid invitee = invite.GetInviteeGUID();
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(invitee);
+    Player* player = ObjectAccessor::FindConnectedPlayer(invitee);
 
-    uint8 level = player ? player->getLevel() : Player::GetLevelFromStorage(invitee);
+    uint8 level = player ? player->getLevel() : Player::GetLevelFromStorage(invitee.GetCounter());
 
     WorldPacket data(SMSG_CALENDAR_EVENT_INVITE, 8 + 8 + 8 + 1 + 1 + 1 + (statusTime ? 4 : 0) + 1);
     data << invitee.WriteAsPacked();
@@ -496,7 +496,7 @@ void CalendarMgr::SendCalendarEventInvite(CalendarInvite const& invite)
 
     if (!calendarEvent) // Pre-invite
     {
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(invite.GetSenderGUID()))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(invite.GetSenderGUID()))
             player->SendDirectMessage(&data);
     }
     else
@@ -529,7 +529,7 @@ void CalendarMgr::SendCalendarEventUpdateAlert(CalendarEvent const& calendarEven
 void CalendarMgr::SendCalendarEventStatus(CalendarEvent const& calendarEvent, CalendarInvite const& invite)
 {
     WorldPacket data(SMSG_CALENDAR_EVENT_STATUS, 8 + 8 + 4 + 4 + 1 + 1 + 4);
-    data << invite.GetInviteeGUID(.WriteAsPacked();
+    data << invite.GetInviteeGUID().WriteAsPacked();
     data << uint64(calendarEvent.GetEventId());
     data.AppendPackedTime(calendarEvent.GetEventTime());
     data << uint32(calendarEvent.GetFlags());
@@ -553,7 +553,7 @@ void CalendarMgr::SendCalendarEventRemovedAlert(CalendarEvent const& calendarEve
 void CalendarMgr::SendCalendarEventInviteRemove(CalendarEvent const& calendarEvent, CalendarInvite const& invite, uint32 flags)
 {
     WorldPacket data(SMSG_CALENDAR_EVENT_INVITE_REMOVED, 8 + 4 + 4 + 1);
-    data<< invite.GetInviteeGUID(.WriteAsPacked();
+    data<< invite.GetInviteeGUID().WriteAsPacked();
     data << uint64(invite.GetEventId());
     data << uint32(flags);
     data << uint8(1); // FIXME
@@ -592,13 +592,13 @@ void CalendarMgr::SendCalendarEventInviteAlert(CalendarEvent const& calendarEven
         if (Guild* guild = sGuildMgr->GetGuildById(calendarEvent.GetGuildId()))
             guild->BroadcastPacket(&data);
     }
-    else if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(invite.GetInviteeGUID()))
+    else if (Player* player = ObjectAccessor::FindConnectedPlayer(invite.GetInviteeGUID()))
         player->SendDirectMessage(&data);
 }
 
 void CalendarMgr::SendCalendarEvent(ObjectGuid guid, CalendarEvent const& calendarEvent, CalendarSendEventType sendType)
 {
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(guid);
     if (!player)
         return;
 
@@ -624,10 +624,10 @@ void CalendarMgr::SendCalendarEvent(ObjectGuid guid, CalendarEvent const& calend
     {
         CalendarInvite const* calendarInvite = (*itr);
         ObjectGuid inviteeGuid = calendarInvite->GetInviteeGUID();
-        Player* invitee = ObjectAccessor::FindPlayerInOrOutOfWorld(inviteeGuid);
+        Player* invitee = ObjectAccessor::FindConnectedPlayer(inviteeGuid);
 
-        uint8 inviteeLevel = invitee ? invitee->getLevel() : Player::GetLevelFromStorage(inviteeGuid);
-        uint32 inviteeGuildId = invitee ? invitee->GetGuildId() : Player::GetGuildIdFromStorage(inviteeGuid);
+        uint8 inviteeLevel = invitee ? invitee->getLevel() : Player::GetLevelFromStorage(inviteeGuid.GetCounter());
+        uint32 inviteeGuildId = invitee ? invitee->GetGuildId() : Player::GetGuildIdFromStorage(inviteeGuid.GetCounter());
 
         data << inviteeGuid.WriteAsPacked();
         data << uint8(inviteeLevel);
@@ -644,7 +644,7 @@ void CalendarMgr::SendCalendarEvent(ObjectGuid guid, CalendarEvent const& calend
 
 void CalendarMgr::SendCalendarEventInviteRemoveAlert(ObjectGuid guid, CalendarEvent const& calendarEvent, CalendarInviteStatus status)
 {
-    if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+    if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
     {
         WorldPacket data(SMSG_CALENDAR_EVENT_INVITE_REMOVED_ALERT, 8 + 4 + 4 + 1);
         data << uint64(calendarEvent.GetEventId());
@@ -658,7 +658,7 @@ void CalendarMgr::SendCalendarEventInviteRemoveAlert(ObjectGuid guid, CalendarEv
 
 void CalendarMgr::SendCalendarClearPendingAction(ObjectGuid guid)
 {
-    if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+    if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
     {
         WorldPacket data(SMSG_CALENDAR_CLEAR_PENDING_ACTION, 0);
         player->SendDirectMessage(&data);
@@ -667,7 +667,7 @@ void CalendarMgr::SendCalendarClearPendingAction(ObjectGuid guid)
 
 void CalendarMgr::SendCalendarCommandResult(ObjectGuid guid, CalendarError err, char const* param /*= nullptr*/)
 {
-    if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+    if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
     {
         WorldPacket data(SMSG_CALENDAR_COMMAND_RESULT, 0);
         data << uint32(0);
@@ -700,7 +700,7 @@ void CalendarMgr::SendPacketToAllEventRelatives(WorldPacket packet, CalendarEven
     // Send packet to all invitees if event is non-guild, in other case only to non-guild invitees (packet was broadcasted for them)
     CalendarInviteStore invites = _invites[calendarEvent.GetEventId()];
     for (CalendarInviteStore::iterator itr = invites.begin(); itr != invites.end(); ++itr)
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld((*itr)->GetInviteeGUID()))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer((*itr)->GetInviteeGUID()))
             if (!calendarEvent.IsGuildEvent() || player->GetGuildId() != calendarEvent.GetGuildId())
                 player->SendDirectMessage(&packet);
 }

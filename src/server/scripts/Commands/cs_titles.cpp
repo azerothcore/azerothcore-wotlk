@@ -66,7 +66,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target))
             return false;
 
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(id);
@@ -111,7 +111,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target))
             return false;
 
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(id);
@@ -157,7 +157,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target))
             return false;
 
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(id);
@@ -205,7 +205,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target))
             return false;
 
         uint64 titles2 = titles;

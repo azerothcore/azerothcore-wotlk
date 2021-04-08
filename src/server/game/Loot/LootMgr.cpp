@@ -383,7 +383,7 @@ LootItem::LootItem(LootStoreItem const& li)
     is_blocked = 0;
     is_underthreshold = 0;
     is_counted = 0;
-    rollWinnerGUID = 0;
+    rollWinnerGUID = ObjectGuid::Empty;
 }
 
 // Basic checks for player/item compatibility - if false no chance to see the item in the loot
@@ -503,15 +503,15 @@ void Loot::FillNotNormalLootFor(Player* player, bool presentAtLooting)
 {
     ObjectGuid playerGuid = player->GetGUID();
 
-    QuestItemMap::const_iterator qmapitr = PlayerQuestItems.find(plguid);
+    QuestItemMap::const_iterator qmapitr = PlayerQuestItems.find(playerGuid);
     if (qmapitr == PlayerQuestItems.end())
         FillQuestLoot(player);
 
-    qmapitr = PlayerFFAItems.find(plguid);
+    qmapitr = PlayerFFAItems.find(playerGuid);
     if (qmapitr == PlayerFFAItems.end())
         FillFFALoot(player);
 
-    qmapitr = PlayerNonQuestNonFFAConditionalItems.find(plguid);
+    qmapitr = PlayerNonQuestNonFFAConditionalItems.find(playerGuid);
     if (qmapitr == PlayerNonQuestNonFFAConditionalItems.end())
         FillNonQuestNonFFAConditionalLoot(player, presentAtLooting);
 
@@ -921,7 +921,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                             else
                                 continue;
                         }
-                        else if (l.roundRobinPlayer == 0 || lv.viewer->GetGUID() == l.roundRobinPlayer || !l.items[i].is_underthreshold)
+                        else if (!l.roundRobinPlayer || lv.viewer->GetGUID() == l.roundRobinPlayer || !l.items[i].is_underthreshold)
                         {
                             // no round robin owner or he has released the loot
                             // or it IS the round robin group owner
@@ -945,7 +945,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
                 {
                     if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].conditions.empty() && l.items[i].AllowedForPlayer(lv.viewer))
                     {
-                        if (l.roundRobinPlayer != 0 && lv.viewer->GetGUID() != l.roundRobinPlayer)
+                        if (l.roundRobinPlayer && lv.viewer->GetGUID() != l.roundRobinPlayer)
                             // item shall not be displayed.
                             continue;
 

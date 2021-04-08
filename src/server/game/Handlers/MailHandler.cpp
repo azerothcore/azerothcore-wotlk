@@ -157,7 +157,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         return;
     }
 
-    Player* receive = ObjectAccessor::FindPlayerInOrOutOfWorld(rc);
+    Player* receive = ObjectAccessor::FindConnectedPlayer(rc);
 
     uint32 rc_teamId = TEAM_NEUTRAL;
     uint16 mails_count = 0;                                  //do not allow to send to one player more than 100 mails
@@ -170,7 +170,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     else
     {
         // xinef: get data from global storage
-        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(rc))
+        if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(rc.GetCounter()))
         {
             rc_teamId = Player::TeamIdForRace(playerData->race);
             mails_count = playerData->mailCount;
@@ -201,7 +201,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     uint32 rc_account = receive
                         ? receive->GetSession()->GetAccountId()
-                        : sObjectMgr->GetPlayerAccountIdByGUID(rc);
+                        : sObjectMgr->GetPlayerAccountIdByGUID(rc.GetCounter());
 
     if (/*!accountBound*/ GetAccountId() != rc_account && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL) && player->GetTeamId() != rc_teamId && AccountMgr::IsPlayerAccount(GetSecurity()))
     {
@@ -315,7 +315,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     draft
     .AddMoney(money)
     .AddCOD(COD)
-    .SendMailTo(trans, MailReceiver(receive, rc), MailSender(player), body.empty() ? MAIL_CHECK_MASK_COPIED : MAIL_CHECK_MASK_HAS_BODY, deliver_delay);
+    .SendMailTo(trans, MailReceiver(receive, rc.GetCounter()), MailSender(player), body.empty() ? MAIL_CHECK_MASK_COPIED : MAIL_CHECK_MASK_HAS_BODY, deliver_delay);
 
     player->SaveInventoryAndGoldToDB(trans);
     CharacterDatabase.CommitTransaction(trans);
@@ -370,7 +370,7 @@ void WorldSession::HandleMailDelete(WorldPacket& recvData)
 
         m->state = MAIL_STATE_DELETED;
         // xinef: update global data
-        sWorld->UpdateGlobalPlayerMails(player->GetGUID(), -1);
+        sWorld->UpdateGlobalPlayerMails(player->GetGUID().GetCounter(), -1);
     }
     player->SendMailResult(mailId, MAIL_DELETED, MAIL_OK);
 }
@@ -434,7 +434,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
     player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_OK);
 
     // xinef: update global data
-    sWorld->UpdateGlobalPlayerMails(player->GetGUID(), -1);
+    sWorld->UpdateGlobalPlayerMails(player->GetGUID().GetCounter(), -1);
 }
 
 //called when player takes item attached in mail
@@ -442,10 +442,10 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
 {
     ObjectGuid mailbox;
     uint32 mailId;
-    uint32 itemId;
+    uint32 itemLowGuid;
     recvData >> mailbox;
     recvData >> mailId;
-    recvData >> itemId;                                    // item guid low
+    recvData >> itemLowGuid;    // item guid low
 
     if (!CanOpenMailBox(mailbox))
         return;
@@ -462,7 +462,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
     // verify that the mail has the item to avoid cheaters taking COD items without paying
     bool foundItem = false;
     for (std::vector<MailItemInfo>::const_iterator itr = m->items.begin(); itr != m->items.end(); ++itr)
-        if (itr->item_guid == itemId)
+        if (itr->item_guid == itemLowGuid)
         {
             foundItem = true;
             break;
@@ -480,24 +480,24 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
         return;
     }
 
-    Item* it = player->GetMItem(itemId);
+    Item* it = player->GetMItem(itemLowGuid);
 
     ItemPosCountVec dest;
     uint8 msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, it, false);
     if (msg == EQUIP_ERR_OK)
     {
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
-        m->RemoveItem(itemId);
-        m->removedItems.push_back(itemId);
+        m->RemoveItem(itemLowGuid);
+        m->removedItems.push_back(itemLowGuid);
 
         if (m->COD > 0) // if there is COD, take COD money from player and send them to sender by mail
         {
             uint32 sender_accId = 0;
-            Player* sender = ObjectAccessor::FindPlayerInOrOutOfWorld(sender_guid);
+            Player* sender = ObjectAccessor::FindPlayerByLowGUID(m->sender);
             if (sender)
                 sender_accId = sender->GetSession()->GetAccountId();
             else
-                sender_accId = sObjectMgr->GetPlayerAccountIdByGUID(sender_guid);
+                sender_accId = sObjectMgr->GetPlayerAccountIdByGUID(m->sender);
 
             // check player existence
             if (sender || sender_accId)
@@ -509,7 +509,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
                 if( m->COD >= 10 * GOLD )
                 {
                     std::string senderName;
-                    if (!sObjectMgr->GetPlayerNameByGUID(sender_guid, senderName))
+                    if (!sObjectMgr->GetPlayerNameByGUID(m->sender, senderName))
                         senderName = sObjectMgr->GetAcoreStringForDBCLocale(LANG_UNKNOWN);
                     std::string subj = m->subject;
                     CleanStringForMysqlQuery(subj);
@@ -524,7 +524,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
         m->COD = 0;
         m->state = MAIL_STATE_CHANGED;
         player->m_mailsUpdated = true;
-        player->RemoveMItem(it->GetGUID());
+        player->RemoveMItem(it->GetGUID().GetCounter());
 
         uint32 count = it->GetCount();                      // save counts before store and possible merge with deleting
         it->SetState(ITEM_UNCHANGED);                       // need to set this state, otherwise item cannot be removed later, if neccessary
@@ -534,7 +534,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
         player->_SaveMail(trans);
         CharacterDatabase.CommitTransaction(trans);
 
-        player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_OK, 0, itemId, count);
+        player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_OK, 0, itemLowGuid, count);
     }
     else
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_EQUIP_ERROR, msg);

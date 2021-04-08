@@ -768,7 +768,7 @@ void WorldSession::HandleBuybackItem(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleBuybackItem - Unit (%s) not found or you can not interact with him.", vendorguid.ToString().c_str());
 #endif
-        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, 0, 0);
+        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, ObjectGuid::Empty, 0);
         return;
     }
 
@@ -793,7 +793,7 @@ void WorldSession::HandleBuybackItem(WorldPacket& recvData)
             if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
             {
                 PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM);
-                stmt->setUInt32(0, _player->GetGUID());
+                stmt->setUInt32(0, _player->GetGUID().GetCounter());
                 stmt->setUInt32(1, pItem->GetEntry());
                 stmt->setUInt32(2, pItem->GetCount());
                 CharacterDatabase.Execute(stmt);
@@ -905,7 +905,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendListInventory - Unit (%s) not found or you can not interact with him.", vendorGuid.ToString().c_str());
 #endif
-        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, 0, 0);
+        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, ObjectGuid::Empty, 0);
         return;
     }
 
@@ -1730,7 +1730,7 @@ bool WorldSession::recoveryItem(Item* pItem)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RECOVERY_ITEM);
 
-        stmt->setUInt32(0, pItem->GetOwnerGUID());
+        stmt->setUInt32(0, pItem->GetOwnerGUID().GetCounter());
         stmt->setUInt32(1, pItem->GetTemplate()->ItemId);
         stmt->setUInt32(2, pItem->GetCount());
 

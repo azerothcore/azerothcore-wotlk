@@ -202,7 +202,7 @@ public:
                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                     if (Player* p = itr->GetSource())
-                        p->KilledMonsterCredit(RAID_MODE(NPC_INFILTRATOR_MINCHAR_BQ, NPC_BLOOD_QUICKENING_CREDIT_25), 0);
+                        p->KilledMonsterCredit(RAID_MODE(NPC_INFILTRATOR_MINCHAR_BQ, NPC_BLOOD_QUICKENING_CREDIT_25));
                 if (Creature* minchar = me->FindNearestCreature(NPC_INFILTRATOR_MINCHAR_BQ, 200.0f))
                 {
                     minchar->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
@@ -876,7 +876,7 @@ public:
                 return;
 
             uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_FRENZIED_BLOODTHIRST, GetCaster());
-            GetCaster()->RemoveAura(spellId, 0, 0, AURA_REMOVE_BY_ENEMY_SPELL);
+            GetCaster()->RemoveAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
             GetCaster()->CastSpell(GetCaster(), SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, TRIGGERED_FULL_MASK);
 
             if (Aura* aura = GetCaster()->GetAura(SPELL_GUSHING_WOUND))

@@ -179,7 +179,7 @@ void WorldSession::HandleArenaTeamAcceptOpcode(WorldPacket& /*recvData*/)
     }
 
     // Only allow members of the other faction to join the team if cross faction interaction is enabled
-    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && _player->GetTeamId() != sObjectMgr->GetPlayerTeamIdByGUID(arenaTeam->GetCaptain()))
+    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && _player->GetTeamId() != sObjectMgr->GetPlayerTeamIdByGUID(arenaTeam->GetCaptain().GetCounter()))
     {
         SendArenaTeamCommandResult(ERR_ARENA_TEAM_CREATE_S, "", "", ERR_ARENA_TEAM_NOT_ALLIED);
         return;
@@ -363,7 +363,7 @@ void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket& recvData)
     arenaTeam->DelMember(member->Guid, true);
 
     // Broadcast event
-    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_REMOVE_SSS, 0, 3, name, arenaTeam->GetName(), _player->GetName());
+    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_REMOVE_SSS, ObjectGuid::Empty, 3, name, arenaTeam->GetName(), _player->GetName());
 }
 
 void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket& recvData)
@@ -408,7 +408,7 @@ void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket& recvData)
     arenaTeam->SetCaptain(member->Guid);
 
     // Broadcast event
-    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_LEADER_CHANGED_SSS, 0, 3, _player->GetName().c_str(), name, arenaTeam->GetName());
+    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_LEADER_CHANGED_SSS, ObjectGuid::Empty, 3, _player->GetName().c_str(), name, arenaTeam->GetName());
 }
 
 void WorldSession::SendArenaTeamCommandResult(uint32 teamAction, const std::string& team, const std::string& player, uint32 errorId)

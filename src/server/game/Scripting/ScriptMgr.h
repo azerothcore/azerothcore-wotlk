@@ -1068,7 +1068,7 @@ public:
     virtual void OnAfterInitializeLockedDungeons(Player* /*player*/) { }
 
     // On Before arena points distribution
-    virtual void OnBeforeUpdateArenaPoints(ArenaTeam* /*at*/, std::map<uint32, uint32>& /*ap*/) { }
+    virtual void OnBeforeUpdateArenaPoints(ArenaTeam* /*at*/, std::map<ObjectGuid, uint32>& /*ap*/) { }
 
     // Called when a dungeon encounter is updated.
     virtual void OnAfterUpdateEncounterState(Map* /*map*/, EncounterCreditType /*type*/,  uint32 /*creditEntry*/, Unit* /*source*/, Difficulty /*difficulty_fixed*/, DungeonEncounterList const* /*encounters*/, uint32 /*dungeonCompleted*/, bool /*updated*/) { }
@@ -1442,7 +1442,7 @@ public: /* GroupScript */
 public: /* GlobalScript */
     void OnGlobalItemDelFromDB(SQLTransaction& trans, ObjectGuid::LowType itemGuid);
     void OnGlobalMirrorImageDisplayItem(const Item* item, uint32& display);
-    void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<uint32, uint32>& ap);
+    void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<ObjectGuid, uint32>& ap);
     void OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32& maxcount, LootStore const& store);
     void OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, LootStore const& store);
     void OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float& chance, Loot& loot, LootStore const& store);

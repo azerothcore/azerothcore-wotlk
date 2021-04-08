@@ -87,7 +87,7 @@ bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
     if (target)
         target_session = target->GetSession();
     else if (guid)
-        target_account = sObjectMgr->GetPlayerAccountIdByGUID(guid);
+        target_account = sObjectMgr->GetPlayerAccountIdByGUID(guid.GetCounter());
 
     if (!target_session && !target_account)
     {
@@ -713,7 +713,7 @@ Player* ChatHandler::getSelectedPlayer()
     if (!selected)
         return m_session->GetPlayer();
 
-    return ObjectAccessor::FindPlayerInOrOutOfWorld(selected);
+    return ObjectAccessor::FindConnectedPlayer(selected);
 }
 
 Unit* ChatHandler::getSelectedUnit()
@@ -734,7 +734,7 @@ WorldObject* ChatHandler::getSelectedObject()
 
     ObjectGuid guid = m_session->GetPlayer()->GetTarget();
 
-    if (guid == 0)
+    if (!guid)
         return GetNearbyGameObject();
 
     return ObjectAccessor::GetUnit(*m_session->GetPlayer(), guid);
@@ -758,7 +758,7 @@ Player* ChatHandler::getSelectedPlayerOrSelf()
         return m_session->GetPlayer();
 
     // first try with selected target
-    Player* targetPlayer = ObjectAccessor::FindPlayerInOrOutOfWorld(selected);
+    Player* targetPlayer = ObjectAccessor::FindConnectedPlayer(selected);
     // if the target is not a player, then return self
     if (!targetPlayer)
         targetPlayer = m_session->GetPlayer();
@@ -891,25 +891,35 @@ GameObject* ChatHandler::GetNearbyGameObject()
     return obj;
 }
 
-GameObject* ChatHandler::GetObjectGlobalyWithGuidOrNearWithDbGuid(ObjectGuid::LowType lowguid, uint32 entry)
+Creature* ChatHandler::GetCreatureFromPlayerMapByDbGuid(ObjectGuid::LowType lowguid)
 {
     if (!m_session)
         return nullptr;
 
-    Player* pl = m_session->GetPlayer();
+    // Select the first alive creature or a dead one if not found
+    Creature* creature = nullptr;
 
-    GameObject* obj = pl->GetMap()->GetGameObject(ObjectGuid::Create<HighGuid::GameObject>(entry, lowguid));
-
-    if (!obj && sObjectMgr->GetGOData(lowguid))                   // guid is DB guid of object
+    auto bounds = m_session->GetPlayer()->GetMap()->GetCreatureBySpawnIdStore().equal_range(lowguid);
+    for (auto it = bounds.first; it != bounds.second; ++it)
     {
-        auto bounds = pl->GetMap()->GetGameObjectBySpawnIdStore().equal_range(lowguid);
-        if (bounds.first == bounds.second)
-            return nullptr;
-
-        return bounds.first->second;
+        creature = it->second;
+        if (it->second->IsAlive())
+            break;
     }
 
-    return obj;
+    return creature;
+}
+
+GameObject* ChatHandler::GetObjectFromPlayerMapByDbGuid(ObjectGuid::LowType lowguid)
+{
+    if (!m_session)
+        return nullptr;
+
+    auto bounds = m_session->GetPlayer()->GetMap()->GetGameObjectBySpawnIdStore().equal_range(lowguid);
+    if (bounds.first != bounds.second)
+        return bounds.first->second;
+
+    return nullptr;
 }
 
 enum SpellLinkType
@@ -1015,7 +1025,7 @@ static char const* const guidKeys[] =
     0
 };
 
-ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text)
+ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text, HighGuid& guidHigh)
 {
     int type = 0;
 
@@ -1099,7 +1109,7 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid* p
             *player = pl;
 
         // if need guid value from DB (in name case for check player existence)
-        ObjectGuid guid = !pl && (player_guid || player_name) ? sObjectMgr->GetPlayerGUIDByName(name) : 0;
+        ObjectGuid guid = !pl && (player_guid || player_name) ? sObjectMgr->GetPlayerGUIDByName(name) : ObjectGuid::Empty;
 
         // if allowed player guid (if no then only online players allowed)
         if (player_guid)
@@ -1116,7 +1126,7 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid* p
             *player = pl;
         // if allowed player guid (if no then only online players allowed)
         if (player_guid)
-            *player_guid = pl ? pl->GetGUID() : 0;
+            *player_guid = pl ? pl->GetGUID() : ObjectGuid::Empty;
 
         if (player_name)
             *player_name = pl ? pl->GetName() : "";
@@ -1241,8 +1251,8 @@ bool CliHandler::needReportToTarget(Player* /*chr*/) const
 
 bool ChatHandler::GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, ObjectGuid& guid, bool offline)
 {
-    player  = nullptr;
-    guid = 0;
+    player = nullptr;
+    guid = ObjectGuid::Empty;
 
     if (cname)
     {

@@ -339,8 +339,8 @@ void hyjalAI::Reset()
     me->setActive(true);
     // GUIDs
     PlayerGUID.Clear();
-    BossGUID[0] = 0;
-    BossGUID[1] = 0;
+    BossGUID[0].Clear();
+    BossGUID[1].Clear();
 
     // Timers
     NextWaveTimer = 10000;
@@ -814,7 +814,7 @@ void hyjalAI::UpdateAI(uint32 diff)
                     EventBegun = false;
                     CheckTimer = 0;
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    BossGUID[i] = 0;
+                    BossGUID[i].Clear();
                     instance->DoUpdateWorldState(WORLD_STATE_ENEMY, 0); // Reset world state for enemies to disable it
                 }
             }

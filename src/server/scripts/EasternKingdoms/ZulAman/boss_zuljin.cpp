@@ -278,7 +278,7 @@ public:
                         temp->setDeathState(DEAD);
                     }
                 }
-                SpiritGUID[i] = 0;
+                SpiritGUID[i].Clear();
             }
         }
 

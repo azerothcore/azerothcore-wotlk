@@ -566,7 +566,7 @@ public:
         {
             if (_trappedPlayerGUID)
             {
-                if (Player* pPlayer = instance->GetPlayer(_trappedPlayerGUID))
+                if (Player* pPlayer = ObjectAccessor::GetPlayer(instance, _trappedPlayerGUID))
                 {
                     DoSpawnPlaguedCritters(gate, pPlayer);
                 }

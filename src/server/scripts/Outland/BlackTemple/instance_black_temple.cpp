@@ -293,7 +293,7 @@ public:
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            for (ObjectGuid const guid : _turtleSetr)
+            for (ObjectGuid const guid : _turtleSet)
                 if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
                 {
                     turtle->TauntFadeOut(GetUnitOwner());

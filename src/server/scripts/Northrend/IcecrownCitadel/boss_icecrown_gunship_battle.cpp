@@ -502,10 +502,10 @@ public:
         _caster->GetTransport()->ToMotionTransport()->UnloadNonStaticPassengers();
         _caster->GetTransport()->AddObjectToRemoveList();
 
-        if (GameObject* go = HashMapHolder<GameObject>::Find(_otherTransport))
+        if (Transport* transport = ObjectAccessor::GetTransport(*_caster, _otherTransport))
         {
-            go->ToMotionTransport()->UnloadNonStaticPassengers();
-            go->AddObjectToRemoveList();
+            transport->ToMotionTransport()->UnloadNonStaticPassengers();
+            transport->AddObjectToRemoveList();
         }
 
         return true;
@@ -623,8 +623,8 @@ public:
 
             if (isVictory)
             {
-                if (GameObject* go = HashMapHolder<GameObject>::Find(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
-                    if (MotionTransport* otherTransport = go->ToMotionTransport())
+                if (Transport * transport = _instance->instance->GetTransport(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                    if (MotionTransport* otherTransport = transport->ToMotionTransport())
                         otherTransport->EnableMovement(true);
 
                 me->GetTransport()->ToMotionTransport()->EnableMovement(true);
@@ -956,8 +956,8 @@ public:
                         me->SummonCreature(NPC_TELEPORT_PORTAL, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN, 21000);
                     }
 
-                    if (GameObject* go = HashMapHolder<GameObject>::Find(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
-                        if (MotionTransport* skybreaker = go->ToMotionTransport())
+                    if (Transport* transport = _instance->instance->GetTransport(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                        if (MotionTransport* skybreaker = transport->ToMotionTransport())
                         {
                             float x, y, z, o;
                             SkybreakerTeleportExit.GetPosition(x, y, z, o);
@@ -1295,8 +1295,8 @@ public:
                         me->SummonCreature(NPC_TELEPORT_PORTAL, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN, 21000);
                     }
 
-                    if (GameObject* go = HashMapHolder<GameObject>::Find(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
-                        if (MotionTransport* orgrimsHammer = go->ToMotionTransport())
+                    if (Transport* transport = _instance->instance->GetTransport(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                        if (MotionTransport* orgrimsHammer = transport->ToMotionTransport())
                         {
                             float x, y, z, o;
                             OrgrimsHammerTeleportExit.GetPosition(x, y, z, o);
@@ -1575,8 +1575,8 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
             if (!myTransport)
                 return;
 
-            if (GameObject* go = HashMapHolder<GameObject>::Find(Instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
-                if (Transport* destTransport = go->ToTransport())
+            if (Transport* transport = Instance->instance->GetTransport(Instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                if (Transport* destTransport = transport->ToTransport())
                     destTransport->CalculatePassengerPosition(x, y, z, &o);
 
             float angle = frand(0, M_PI * 2.0f);
@@ -2124,7 +2124,7 @@ public:
         void SelectTransport(WorldObject*& target)
         {
             if (InstanceScript* instance = target->GetInstanceScript())
-                target = HashMapHolder<GameObject>::Find(instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE));
+                target = instance->instance->GetTransport(instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE));
         }
 
         void RelocateDest(SpellEffIndex /*effIndex*/)

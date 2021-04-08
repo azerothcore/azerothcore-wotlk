@@ -261,7 +261,7 @@ namespace lfg
         ObjectGuid guid;
         uint64 addToFoundMask = 0;
 
-        for (uint8 i = 0; i < 5 && (guid = check.guid[i]) != 0 && numLfgGroups < 2 && numPlayers <= MAXGROUPSIZE; ++i)
+        for (uint8 i = 0; i < 5 && !(guid = check.guids[i]).IsEmpty() && numLfgGroups < 2 && numPlayers <= MAXGROUPSIZE; ++i)
         {
             LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(guid);
             if (itQueue == QueueDataStore.end())
@@ -310,9 +310,9 @@ namespace lfg
         // If it's single group no need to check for duplicate players, ignores, bad roles or bad dungeons as it's been checked before joining
         if (check.size() > 1)
         {
-            for (uint8 i = 0; i < 5 && check.guid[i]; ++i)
+            for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
             {
-                const LfgRolesMap& roles = QueueDataStore[check.guid[i]].roles;
+                const LfgRolesMap& roles = QueueDataStore[check.guids[i]].roles;
                 for (LfgRolesMap::const_iterator itRoles = roles.begin(); itRoles != roles.end(); ++itRoles)
                 {
                     LfgRolesMap::const_iterator itPlayer;
@@ -366,10 +366,10 @@ namespace lfg
                 addToFoundMask |= (((uint64)1) << (roleCheckResult - 1));
 
             proposalDungeons = QueueDataStore[check.front()].dungeons;
-            for (uint8 i = 1; i < 5 && check.guid[i]; ++i)
+            for (uint8 i = 1; i < 5 && check.guids[i]; ++i)
             {
                 LfgDungeonSet temporal;
-                LfgDungeonSet& dungeons = QueueDataStore[check.guid[i]].dungeons;
+                LfgDungeonSet& dungeons = QueueDataStore[check.guids[i]].dungeons;
                 std::set_intersection(proposalDungeons.begin(), proposalDungeons.end(), dungeons.begin(), dungeons.end(), std::inserter(temporal, temporal.begin()));
                 proposalDungeons = temporal;
             }
@@ -390,9 +390,9 @@ namespace lfg
         if (numPlayers != MAXGROUPSIZE)
         {
             strGuids.addRoles(proposalRoles);
-            for (uint8 i = 0; i < 5 && check.guid[i]; ++i)
+            for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
             {
-                LfgQueueDataContainer::iterator itr = QueueDataStore.find(check.guid[i]);
+                LfgQueueDataContainer::iterator itr = QueueDataStore.find(check.guids[i]);
                 if (!itr->second.bestCompatible.empty()) // update if groups don't have it empty (for empty it will be generated in UpdateQueueTimers)
                     UpdateBestCompatibleInQueue(itr, strGuids);
             }
@@ -412,7 +412,7 @@ namespace lfg
         // Create a new proposal
         proposal.cancelTime = time(nullptr) + LFG_TIME_PROPOSAL;
         proposal.state = LFG_PROPOSAL_INITIATING;
-        proposal.leader = 0;
+        proposal.leader.Clear();
         proposal.dungeonId = acore::Containers::SelectRandomContainerElement(proposalDungeons);
 
         bool leader = false;
@@ -436,8 +436,8 @@ namespace lfg
                 data.accept = LFG_ANSWER_AGREE;
         }
 
-        for (uint8 i = 0; i < 5 && proposal.queues.guid[i]; ++i)
-            RemoveFromQueue(proposal.queues.guid[i], true);
+        for (uint8 i = 0; i < 5 && proposal.queues.guids[i]; ++i)
+            RemoveFromQueue(proposal.queues.guids[i], true);
 
         sLFGMgr->AddProposal(proposal);
 

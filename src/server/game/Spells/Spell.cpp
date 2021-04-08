@@ -58,14 +58,12 @@ extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 SpellDestination::SpellDestination()
 {
     _position.Relocate(0, 0, 0, 0);
-    _transportGUID = 0;
     _transportOffset.Relocate(0, 0, 0, 0);
 }
 
 SpellDestination::SpellDestination(float x, float y, float z, float orientation, uint32 mapId)
 {
     _position.Relocate(x, y, z, orientation);
-    _transportGUID = 0;
     _position.m_mapId = mapId;
     _transportOffset.Relocate(0, 0, 0, 0);
 }
@@ -73,7 +71,6 @@ SpellDestination::SpellDestination(float x, float y, float z, float orientation,
 SpellDestination::SpellDestination(Position const& pos)
 {
     _position.Relocate(pos);
-    _transportGUID = 0;
     _transportOffset.Relocate(0, 0, 0, 0);
 }
 
@@ -111,9 +108,6 @@ SpellCastTargets::SpellCastTargets() : m_elevation(0), m_speed(0), m_strTarget()
     m_itemTargetEntry  = 0;
 
     m_targetMask = 0;
-
-    // Xinef: Channel data
-    m_objectTargetGUIDChannel = 0;
 }
 
 SpellCastTargets::~SpellCastTargets()
@@ -318,7 +312,7 @@ ObjectGuid SpellCastTargets::GetObjectTargetGUID() const
 void SpellCastTargets::RemoveObjectTarget()
 {
     m_objectTarget = nullptr;
-    m_objectTargetGUID = 0LL;
+    m_objectTargetGUID.Clear();
     m_targetMask &= ~(TARGET_FLAG_UNIT_MASK | TARGET_FLAG_CORPSE_MASK | TARGET_FLAG_GAMEOBJECT_MASK);
 }
 
@@ -613,7 +607,6 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
         _triggeredCastFlags = TriggerCastFlags(uint32(_triggeredCastFlags) | TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_CAST_DIRECTLY);
 
     m_CastItem = nullptr;
-    m_castItemGUID = 0;
 
     unitTarget = nullptr;
     itemTarget = nullptr;
@@ -2221,7 +2214,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
             targetInfo.reflectResult = SPELL_MISS_PARRY;
 
         // Increase time interval for reflected spells by 1.5
-        m_caster->m_Events.AddEvent(new ReflectEvent(m_caster->GetGUID(), targetInfo.targetGUID, m_spellInfo), m_caster->m_Events.CalculateTime(targetInfo.timeDelay));
+        m_caster->m_Events.AddEvent(new ReflectEvent(m_caster, targetInfo.targetGUID, m_spellInfo), m_caster->m_Events.CalculateTime(targetInfo.timeDelay));
         targetInfo.timeDelay += targetInfo.timeDelay >> 1;
 
         m_spellFlags |= SPELL_FLAG_REFLECTED;
@@ -2373,7 +2366,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             return;
         // find unit in world
         // Xinef: FindUnit Access without Map check!!! Intended
-        effectUnit = ObjectAccessor::FindUnit(target->targetGUID);
+        effectUnit = ObjectAccessor::FindPlayer(target->targetGUID);
         if (!effectUnit)
             return;
 
@@ -2855,7 +2848,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         {
             bool refresh = false;
             m_spellAura = Aura::TryRefreshStackOrCreate(aurSpellInfo, effectMask, unit, m_originalCaster,
-                          (aurSpellInfo == m_spellInfo) ? &m_spellValue->EffectBasePoints[0] : &basePoints[0], m_CastItem, 0, &refresh, !(_triggeredCastFlags & TRIGGERED_NO_PERIODIC_RESET));
+                          (aurSpellInfo == m_spellInfo) ? &m_spellValue->EffectBasePoints[0] : &basePoints[0], m_CastItem, ObjectGuid::Empty, &refresh, !(_triggeredCastFlags & TRIGGERED_NO_PERIODIC_RESET));
 
             // xinef: if aura was not refreshed, add proc ex
             if (!refresh)
@@ -3167,7 +3160,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
     }
     else
     {
-        m_castItemGUID = 0;
+        m_castItemGUID = ObjectGuid::Empty;
     }
 
     InitExplicitTargets(*targets);
@@ -4651,13 +4644,13 @@ void Spell::ExecuteLogEffectSummonObject(uint8 effIndex, WorldObject* obj)
 void Spell::ExecuteLogEffectUnsummonObject(uint8 effIndex, WorldObject* obj)
 {
     InitEffectExecuteData(effIndex);
-    *m_effectExecuteData[effIndex] << obj->GetPackGUID());
+    *m_effectExecuteData[effIndex] << obj->GetPackGUID();
 }
 
 void Spell::ExecuteLogEffectResurrect(uint8 effIndex, Unit* target)
 {
     InitEffectExecuteData(effIndex);
-    *m_effectExecuteData[effIndex] << target->GetPackGUID());
+    *m_effectExecuteData[effIndex] << target->GetPackGUID();
 }
 
 void Spell::SendInterrupted(uint8 result)
@@ -4797,7 +4790,7 @@ void Spell::TakeCastItem()
             m_targets.SetItemTarget(nullptr);
 
         m_CastItem = nullptr;
-        m_castItemGUID = 0;
+        m_castItemGUID.Clear();
     }
 }
 
@@ -5048,7 +5041,7 @@ void Spell::TakeReagents()
             }
 
             m_CastItem = nullptr;
-            m_castItemGUID = 0;
+            m_castItemGUID.Clear();
         }
 
         // if GetItemTarget is also spell reagent
@@ -5752,7 +5745,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_targets.GetTargetMask() & TARGET_FLAG_TRADE_ITEM)
                     {
                         if (TradeData* pTrade = m_caster->ToPlayer()->GetTradeData())
-                            pTempItem = pTrade->GetTraderData()->GetItem(TradeSlots(m_targets.GetItemTargetGUID()));
+                            pTempItem = pTrade->GetTraderData()->GetItem(TradeSlots(m_targets.GetItemTargetGUID().GetRawValue()));
                     }
                     else if (m_targets.GetTargetMask() & TARGET_FLAG_ITEM)
                         pTempItem = m_caster->ToPlayer()->GetItemByGuid(m_targets.GetItemTargetGUID());
@@ -6139,7 +6132,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         if (!my_trade)
             return SPELL_FAILED_NOT_TRADING;
 
-        TradeSlots slot = TradeSlots(m_targets.GetItemTargetGUID());
+        TradeSlots slot = TradeSlots(m_targets.GetItemTargetGUID().GetRawValue());
         if (slot != TRADE_SLOT_NONTRADED)
             return SPELL_FAILED_BAD_TARGETS;
 
@@ -7499,10 +7492,9 @@ bool SpellEvent::IsDeletable() const
 
 bool ReflectEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
 {
-    Unit* caster = ObjectAccessor::FindUnit(_casterGUID);
-    Unit* target = ObjectAccessor::FindUnit(_targetGUID);
-    if (caster && target && caster->IsInMap(target))
-        caster->ProcDamageAndSpell(target, PROC_FLAG_NONE, PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG, PROC_EX_REFLECT, 1, BASE_ATTACK, _spellInfo);
+    Unit* target = ObjectAccessor::GetUnit(*_caster, _targetGUID);
+    if (target && _caster->IsInMap(target))
+        _caster->ProcDamageAndSpell(target, PROC_FLAG_NONE, PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG, PROC_EX_REFLECT, 1, BASE_ATTACK, _spellInfo);
     return true;
 }
 

@@ -70,7 +70,7 @@ public:
                 }
 
                 go->SetLootState(GO_JUST_DEACTIVATED);
-                charmer->KilledMonsterCredit(21959, 0);
+                charmer->KilledMonsterCredit(21959);
             }
         }
 
@@ -99,7 +99,7 @@ public:
         {
             if (Player* player = GetTarget()->ToPlayer())
             {
-                player->KilledMonsterCredit(21502, 0);
+                player->KilledMonsterCredit(21502);
                 player->SetControlled(false, UNIT_STATE_STUNNED);
             }
         }
@@ -380,7 +380,7 @@ public:
 
                         if (Player* player = ObjectAccessor::GetPlayer(*me, uiPlayerGUID))
                         {
-                            player->KilledMonsterCredit(NPC_EVENT_PINGER, 0);
+                            player->KilledMonsterCredit(NPC_EVENT_PINGER);
 
                             if (GameObject* go = player->FindNearestGameObject(GO_CARCASS, 10))
                                 go->Delete();
@@ -639,7 +639,7 @@ public:
             {
                 Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID);
                 if (player && player->GetQuestStatus(QUEST_A_SLOW_DEATH) == QUEST_STATUS_INCOMPLETE)
-                    player->KilledMonsterCredit(DRAGONMAW_PEON_KILL_CREDIT, 0);
+                    player->KilledMonsterCredit(DRAGONMAW_PEON_KILL_CREDIT);
             }
         }
 
@@ -1104,7 +1104,7 @@ public:
 
             me->AddUnitState(UNIT_STATE_ROOT);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            me->SetTarget(0);
+            me->SetTarget();
         }
 
         void EnterCombat(Unit* /*who*/) override { }
@@ -1706,7 +1706,7 @@ public:
 
                     if (Unit* owner = totemOspirits->GetOwner())
                         if (Player* player = owner->ToPlayer())
-                            player->KilledMonsterCredit(credit, 0);
+                            player->KilledMonsterCredit(credit);
                     DoCast(totemOspirits, SPELL_SOUL_CAPTURED);
                 }
             }

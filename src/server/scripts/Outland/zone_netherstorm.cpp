@@ -1040,8 +1040,7 @@ public:
                     _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, 4000);
                     break;
                 case EVENT_SPELL_CONSECRATION:
-                    if (me->FindNearestCreature(me->GetVictim()->GetGUID(), 10.0f, true))
-                        me->CastSpell(me, CONSECRATION, false);
+                    me->CastSpell(me->GetVictim(), CONSECRATION, false);
                     _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 14000);
                     break;
             }
@@ -1280,7 +1279,7 @@ public:
         if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
         {
             creature->AI()->SetGUID(player->GetGUID(), DATA_START_ENCOUNTER);
-            player->KilledMonsterCredit(creature->GetEntry(), 0);
+            player->KilledMonsterCredit(creature->GetEntry());
         }
         else if (uiAction == GOSSIP_ACTION_INFO_DEF + 2)
         {

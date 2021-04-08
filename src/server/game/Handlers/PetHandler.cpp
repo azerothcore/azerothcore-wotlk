@@ -511,7 +511,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint16 spe
                             pet->ToPet()->ClearCastWhenWillAvailable();
 
                         charmInfo->SetForcedSpell(0);
-                        charmInfo->SetForcedTargetGUID(0);
+                        charmInfo->SetForcedTargetGUID();
                         break;
                     }
                 case COMMAND_FOLLOW:                        //spellid=1792  //FOLLOW
@@ -531,7 +531,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint16 spe
                         charmInfo->SetIsFollowing(false);
                         charmInfo->RemoveStayPosition();
                         charmInfo->SetForcedSpell(0);
-                        charmInfo->SetForcedTargetGUID(0);
+                        charmInfo->SetForcedTargetGUID();
                         break;
                     }
                 case COMMAND_ATTACK:                        //spellid=1792  //ATTACK
@@ -750,7 +750,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint16 spe
                     spell->prepare(&(spell->m_targets));
 
                     charmInfo->SetForcedSpell(0);
-                    charmInfo->SetForcedTargetGUID(0);
+                    charmInfo->SetForcedTargetGUID();
                 }
                 else if (pet->ToPet() && (result == SPELL_FAILED_LINE_OF_SIGHT || result == SPELL_FAILED_OUT_OF_RANGE))
                 {
@@ -1136,7 +1136,7 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
     recvData >> name;
     recvData >> isdeclined;
 
-    Pet* pet = ObjectAccessor::FindPet(petguid);
+    Pet* pet = ObjectAccessor::GetPet(*_player, petguid);
     // check it!
     if (!pet || !pet->IsPet() || ((Pet*)pet)->getPetType() != HUNTER_PET ||
             !pet->HasByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED) ||

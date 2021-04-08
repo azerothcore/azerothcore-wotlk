@@ -885,7 +885,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            Start(false, true, 0, 0, false, true);
+            Start(false, true, ObjectGuid::Empty, nullptr, false, true);
         }
 
         uint32 _checkTimer;
@@ -1948,7 +1948,7 @@ public:
                     case 1:
                         if (Creature* cr = me->FindNearestCreature(NPC_IMMOLATED_CHAMPION, 50))
                             _championGUID = cr->GetGUID();
-                        Say("Your resilience is admirable.", 0, false, LK_1);
+                        Say("Your resilience is admirable.", ObjectGuid::Empty, false, LK_1);
                         NextStep(7000);
                         break;
                     case 2:
@@ -1960,7 +1960,7 @@ public:
                         NextStep(6500);
                         break;
                     case 4:
-                        Say("I will break you as I broke him.", 0, false, LK_2);
+                        Say("I will break you as I broke him.", ObjectGuid::Empty, false, LK_2);
                         NextStep(7500);
                         break;
                     case 5:
@@ -2082,7 +2082,7 @@ public:
                         NextStep(2500);
                         break;
                     case 6:
-                        Say("We will hold until the reinforcements come. As long as men with stout hearts are manning the walls and throne Stormwind will hold.", 0, false, LL_1);
+                        Say("We will hold until the reinforcements come. As long as men with stout hearts are manning the walls and throne Stormwind will hold.", ObjectGuid::Empty, false, LL_1);
                         NextStep(10000);
                         break;
                     case 7:
@@ -2134,7 +2134,7 @@ public:
 
         void Say(std::string text, ObjectGuid guid, bool yell, uint32 soundId)
         {
-            Creature* creature = guid ? ObjectAccessor::GetCreature(*me, guid) : me;
+            Creature* creature = !guid ? ObjectAccessor::GetCreature(*me, guid) : me;
             if (!creature)
                 return;
 
@@ -2180,7 +2180,7 @@ public:
                         NextStep(5000);
                         break;
                     case 1:
-                        Say("It is done... All have been given that which must be given. I now seal the Dragon Soul forever...", 0, false, NEL_1);
+                        Say("It is done... All have been given that which must be given. I now seal the Dragon Soul forever...", ObjectGuid::Empty, false, NEL_1);
                         NextStep(10000);
                         break;
                     case 2:
@@ -2189,7 +2189,7 @@ public:
                         NextStep(4000);
                         break;
                     case 3:
-                        Say("For it to be as it must, yes.", 0, false, NEL_2);
+                        Say("For it to be as it must, yes.", ObjectGuid::Empty, false, NEL_2);
                         NextStep(4000);
                         break;
                     case 4:

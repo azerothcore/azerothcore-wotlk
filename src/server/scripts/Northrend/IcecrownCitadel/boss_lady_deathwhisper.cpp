@@ -230,7 +230,7 @@ public:
 
     struct boss_lady_deathwhisperAI : public BossAI
     {
-        boss_lady_deathwhisperAI(Creature* creature) : BossAI(creature, DATA_LADY_DEATHWHISPER), _introDone(false), _darnavanGUID(0) { }
+        boss_lady_deathwhisperAI(Creature* creature) : BossAI(creature, DATA_LADY_DEATHWHISPER), _introDone(false) { }
 
         void Reset() override
         {
@@ -516,10 +516,10 @@ public:
                             for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                                 if (Player* member = itr->GetSource())
                                     if (member->IsInMap(owner))
-                                        member->KilledMonsterCredit(NPC_DARNAVAN_CREDIT, 0);
+                                        member->KilledMonsterCredit(NPC_DARNAVAN_CREDIT);
                         }
                         else
-                            owner->KilledMonsterCredit(NPC_DARNAVAN_CREDIT, 0);
+                            owner->KilledMonsterCredit(NPC_DARNAVAN_CREDIT);
                     }
                 }
             }

@@ -285,7 +285,7 @@ public:
                 return;
 
             me->m_Events.AddEvent(new SuckBackEvent(*me, ACTION_ESSENCE_OF_SUFFERING), me->m_Events.CalculateTime(1500));
-            me->SetTarget(0);
+            me->SetTarget();
             me->SetFacingTo(M_PI / 2.0f);
         }
 
@@ -396,7 +396,7 @@ public:
                 return;
 
             me->m_Events.AddEvent(new SuckBackEvent(*me, ACTION_ESSENCE_OF_DESIRE), me->m_Events.CalculateTime(1500));
-            me->SetTarget(0);
+            me->SetTarget();
             me->SetFacingTo(M_PI / 2.0f);
         }
 

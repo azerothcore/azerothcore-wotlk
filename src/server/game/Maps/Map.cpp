@@ -412,11 +412,6 @@ void Map::DeleteFromWorld(Player* player)
 {
     ObjectAccessor::RemoveObject(player);
 
-    // pussywizard: optimization
-    std::string charName = player->GetName();
-    std::transform(charName.begin(), charName.end(), charName.begin(), ::tolower);
-    ObjectAccessor::playerNameToPlayerPointer.erase(charName);
-
     RemoveUpdateObject(player); //TODO: I do not know why we need this, it should be removed in ~Object anyway
     delete player;
 }
@@ -2417,7 +2412,7 @@ void Map::SendRemoveTransports(Player* player)
             (*itr)->BuildOutOfRangeUpdateBlock(&transData);
 
     // pussywizard: remove static transports from client
-    for (Player::ClientGUIDs::const_iterator it = player->m_clientGUIDs.begin(); it != player->m_clientGUIDs.end(); )
+    for (GuidUnorderedSet::const_iterator it = player->m_clientGUIDs.begin(); it != player->m_clientGUIDs.end(); )
     {
         if ((*it).IsTransport())
         {
@@ -2446,6 +2441,7 @@ inline void Map::setNGrid(NGridType* grid, uint32 x, uint32 y)
 void Map::SendObjectUpdates()
 {
     UpdateDataMapType update_players;
+    UpdatePlayerSet player_set;
 
     while (!_updateObjects.empty())
     {
@@ -2453,7 +2449,7 @@ void Map::SendObjectUpdates()
         ASSERT(obj->IsInWorld());
 
         _updateObjects.erase(_updateObjects.begin());
-        obj->BuildUpdate(update_players);
+        obj->BuildUpdate(update_players, player_set);
     }
 
     WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
@@ -2819,7 +2815,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
                     if (!sInstanceSaveMgr->PlayerGetBoundInstance(g->GetLeaderGUID(), mapSave->GetMapId(), mapSave->GetDifficulty()))
                     {
                         sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(g->GetLeaderGUID());
-                        sInstanceSaveMgr->PlayerBindToInstance(g->GetLeaderGUID(), mapSave, false, ObjectAccessor::FindPlayerInOrOutOfWorld(g->GetLeaderGUID()));
+                        sInstanceSaveMgr->PlayerBindToInstance(g->GetLeaderGUID(), mapSave, false, ObjectAccessor::FindConnectedPlayer(g->GetLeaderGUID()));
                     }
         }
 
@@ -2922,7 +2918,7 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
 /*
     Returns true if there are no players in the instance
 */
-bool InstanceMap::Reset(uint8 method, GuidVector* globalResetSkipList)
+bool InstanceMap::Reset(uint8 method, GuidList* globalResetSkipList)
 {
     if (method == INSTANCE_RESET_GLOBAL)
     {
@@ -3166,7 +3162,7 @@ void Map::SaveCreatureRespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTi
     if (!respawnTime)
     {
         // Delete only
-        RemoveCreatureRespawnTime(dbGuid);
+        RemoveCreatureRespawnTime(spawnId);
         return;
     }
 
@@ -3174,10 +3170,10 @@ void Map::SaveCreatureRespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTi
     if (GetInstanceResetPeriod() > 0 && respawnTime - now + 5 >= GetInstanceResetPeriod())
         respawnTime = now + YEAR;
 
-    _creatureRespawnTimes[dbGuid] = respawnTime;
+    _creatureRespawnTimes[spawnId] = respawnTime;
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CREATURE_RESPAWN);
-    stmt->setUInt32(0, dbGuid);
+    stmt->setUInt32(0, spawnId);
     stmt->setUInt32(1, uint32(respawnTime));
     stmt->setUInt16(2, GetId());
     stmt->setUInt32(3, GetInstanceId());
@@ -3186,10 +3182,10 @@ void Map::SaveCreatureRespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTi
 
 void Map::RemoveCreatureRespawnTime(ObjectGuid::LowType spawnId)
 {
-    _creatureRespawnTimes.erase(dbGuid);
+    _creatureRespawnTimes.erase(spawnId);
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CREATURE_RESPAWN);
-    stmt->setUInt32(0, dbGuid);
+    stmt->setUInt32(0, spawnId);
     stmt->setUInt16(1, GetId());
     stmt->setUInt32(2, GetInstanceId());
     CharacterDatabase.Execute(stmt);
@@ -3200,7 +3196,7 @@ void Map::SaveGORespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
     if (!respawnTime)
     {
         // Delete only
-        RemoveGORespawnTime(dbGuid);
+        RemoveGORespawnTime(spawnId);
         return;
     }
 
@@ -3208,10 +3204,10 @@ void Map::SaveGORespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
     if (GetInstanceResetPeriod() > 0 && respawnTime - now + 5 >= GetInstanceResetPeriod())
         respawnTime = now + YEAR;
 
-    _goRespawnTimes[dbGuid] = respawnTime;
+    _goRespawnTimes[spawnId] = respawnTime;
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_GO_RESPAWN);
-    stmt->setUInt32(0, dbGuid);
+    stmt->setUInt32(0, spawnId);
     stmt->setUInt32(1, uint32(respawnTime));
     stmt->setUInt16(2, GetId());
     stmt->setUInt32(3, GetInstanceId());
@@ -3220,10 +3216,10 @@ void Map::SaveGORespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
 
 void Map::RemoveGORespawnTime(ObjectGuid::LowType spawnId)
 {
-    _goRespawnTimes.erase(dbGuid);
+    _goRespawnTimes.erase(spawnId);
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GO_RESPAWN);
-    stmt->setUInt32(0, dbGuid);
+    stmt->setUInt32(0, spawnId);
     stmt->setUInt16(1, GetId());
     stmt->setUInt32(2, GetInstanceId());
     CharacterDatabase.Execute(stmt);
@@ -3257,7 +3253,7 @@ void Map::LoadRespawnTimes()
             ObjectGuid::LowType lowguid = fields[0].GetUInt32();
             uint32 respawnTime = fields[1].GetUInt32();
 
-            _goRespawnTimes[loguid] = time_t(respawnTime);
+            _goRespawnTimes[lowguid] = time_t(respawnTime);
         } while (result->NextRow());
     }
 }
@@ -3428,7 +3424,7 @@ void Map::RemoveCorpse(Corpse* corpse)
         _corpseBones.erase(corpse);
 }
 
-Corpse* Map::ConvertCorpseToBones(ObjectGuid const& ownerGuid, bool insignia /*= false*/)
+Corpse* Map::ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia /*= false*/)
 {
     Corpse* corpse = GetCorpseByPlayer(ownerGuid);
     if (!corpse)
@@ -3819,7 +3815,7 @@ void Map::LoadCorpseData()
         uint32 guid = fields[16].GetUInt32();
         if (type >= MAX_CORPSE_TYPE || type == CORPSE_BONES)
         {
-            TC_LOG_ERROR("misc", "Corpse (guid: %u) have wrong corpse type (%u), not loading.", guid, type);
+            sLog->outError("Corpse (guid: %u) have wrong corpse type (%u), not loading.", guid, type);
             continue;
         }
 

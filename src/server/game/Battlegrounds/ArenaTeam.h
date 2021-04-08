@@ -169,7 +169,7 @@ public:
     int32  LostAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, const Map* bgMap);
     void   MemberLost(Player* player, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange = -12);
 
-    void UpdateArenaPointsHelper(std::map<uint32, uint32>& PlayerPoints);
+    void UpdateArenaPointsHelper(std::map<ObjectGuid, uint32>& PlayerPoints);
 
     void FinishWeek();
     void FinishGame(int32 mod, const Map* bgMap);

@@ -268,14 +268,14 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             CreatureData const* auctioneerData = sObjectMgr->GetCreatureData(creature->GetSpawnId());
             if (!auctioneerData)
             {
-                TC_LOG_ERROR("misc", "Data for auctioneer not found (%s)", auctioneer.ToString().c_str());
+                sLog->outError("Data for auctioneer not found (%s)", auctioneer.ToString().c_str());
                 return;
             }
 
             CreatureTemplate const* auctioneerInfo = sObjectMgr->GetCreatureTemplate(auctioneerData->id);
             if (!auctioneerInfo)
             {
-                TC_LOG_ERROR("misc", "Non existing auctioneer (%s)", auctioneer.ToString().c_str());
+                sLog->outError("Non existing auctioneer (%s)", auctioneer.ToString().c_str());
                 return;
             }
 
@@ -291,7 +291,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             AH->itemCount = item->GetCount();
             AH->owner = _player->GetGUID();
             AH->startbid = bid;
-            AH->bidder = 0;
+            AH->bidder = ObjectGuid::Empty;
             AH->bid = 0;
             AH->buyout = buyout;
             AH->expire_time = time(nullptr) + auctionTime;
@@ -329,12 +329,12 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
                 return;
             }
 
-            AH->itemGuid = newItem->GetGUID();
+            AH->item_guid = newItem->GetGUID();
             AH->item_template = newItem->GetEntry();
             AH->itemCount = newItem->GetCount();
             AH->owner = _player->GetGUID();
             AH->startbid = bid;
-            AH->bidder = 0;
+            AH->bidder = ObjectGuid::Empty;
             AH->bid = 0;
             AH->buyout = buyout;
             AH->expire_time = time(nullptr) + auctionTime;
@@ -432,8 +432,8 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
     }
 
     // impossible have online own another character (use this for speedup check in case online owner)
-    Player* auction_owner = ObjectAccessor::FindPlayerInOrOutOfWorld(auction->owner);
-    if (!auction_owner && sObjectMgr->GetPlayerAccountIdByGUID(auction->owner) == GetAccountId())
+    Player* auction_owner = ObjectAccessor::FindConnectedPlayer(auction->owner);
+    if (!auction_owner && sObjectMgr->GetPlayerAccountIdByGUID(auction->owner.GetCounter()) == GetAccountId())
     {
         //you cannot bid your another character auction:
         SendAuctionCommandResult(0, AUCTION_PLACE_BID, ERR_AUCTION_BID_OWN);
@@ -513,7 +513,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 
         auction->DeleteFromDB(trans);
 
-        sAuctionMgr->RemoveAItem(auction->itemGuid);
+        sAuctionMgr->RemoveAItem(auction->item_guid);
         auctionHouse->RemoveAuction(auction);
     }
     player->SaveInventoryAndGoldToDB(trans);
@@ -554,10 +554,10 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     if (auction && auction->owner == player->GetGUID())
     {
-        Item* pItem = sAuctionMgr->GetAItem(auction->itemGuid);
+        Item* pItem = sAuctionMgr->GetAItem(auction->item_guid);
         if (pItem)
         {
-            if (auction->bidder > 0)                        // If we have a bidder, we have to send him the money he paid
+            if (auction->bidder)                        // If we have a bidder, we have to send him the money he paid
             {
                 uint32 auctionCut = auction->GetAuctionCut();
                 if (!player->HasEnoughMoney(auctionCut))          //player doesn't have enough money, maybe message needed
@@ -568,13 +568,13 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
             }
 
             // item will deleted or added to received mail list
-            MailDraft(auction->BuildAuctionMailSubject(AUCTION_CANCELED), AuctionEntry::BuildAuctionMailBody(0, 0, auction->buyout, auction->deposit, 0))
+            MailDraft(auction->BuildAuctionMailSubject(AUCTION_CANCELED), AuctionEntry::BuildAuctionMailBody(ObjectGuid::Empty, 0, auction->buyout, auction->deposit, 0))
             .AddItem(pItem)
             .SendMailTo(trans, player, auction, MAIL_CHECK_MASK_COPIED);
         }
         else
         {
-            sLog->outError("Auction id: %u has non-existed item (item: %s)!!!", auction->Id, auction->itemGuid);
+            sLog->outError("Auction id: %u has non-existed item (item: %s)!!!", auction->Id, auction->item_guid.ToString().c_str());
             SendAuctionCommandResult(0, AUCTION_CANCEL, ERR_AUCTION_DATABASE_ERROR);
             return;
         }
@@ -596,7 +596,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
     auction->DeleteFromDB(trans);
     CharacterDatabase.CommitTransaction(trans);
 
-    sAuctionMgr->RemoveAItem(auction->itemGuid);
+    sAuctionMgr->RemoveAItem(auction->item_guid);
     auctionHouse->RemoveAuction(auction);
 }
 

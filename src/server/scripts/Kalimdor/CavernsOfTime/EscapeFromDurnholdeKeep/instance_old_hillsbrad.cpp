@@ -212,10 +212,10 @@ public:
                             if (!players.isEmpty())
                                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                                     if (Player* player = itr->GetSource())
-                                        player->KilledMonsterCredit(NPC_LODGE_QUEST_TRIGGER, 0);
+                                        player->KilledMonsterCredit(NPC_LODGE_QUEST_TRIGGER);
                         }
 
-                        for (ObjectGuid const : _finalFlamesSet)
+                        for (ObjectGuid const guid : _finalFlamesSet)
                             if (GameObject* gobject = instance->GetGameObject(guid))
                             {
                                 gobject->SetRespawnTime(0);

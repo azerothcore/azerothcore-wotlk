@@ -330,7 +330,7 @@ public: // pussywizard: public class Member
         int32 GetBankWithdrawValue(uint8 tabId) const;
         void ResetValues();
 
-        inline Player* FindPlayer() const { return ObjectAccessor::GetObjectInOrOutOfWorld(m_guid, (Player*)nullptr); }
+        inline Player* FindPlayer() const { return ObjectAccessor::FindConnectedPlayer(m_guid); }
 
     private:
         uint32 m_guildId;
@@ -650,7 +650,7 @@ private:
         void CanStoreItemInTab(Item* pItem, uint8 skipSlotId, bool merge, uint32& count);
     };
 
-    typedef std::unordered_map<uint32, Member*> Members;
+    typedef std::unordered_map<ObjectGuid, Member*> Members;
     typedef std::vector<RankInfo> Ranks;
     typedef std::vector<BankTab*> BankTabs;
 
@@ -843,6 +843,6 @@ private:
     void _SendBankContentUpdate(uint8 tabId, SlotIds slots) const;
     void _SendBankList(WorldSession* session = nullptr, uint8 tabId = 0, bool sendFullSlots = false, SlotIds* slots = nullptr) const;
 
-    void _BroadcastEvent(GuildEvents guildEvent, ObjectGuid guid, const char* param1 = nullptr, const char* param2 = nullptr, const char* param3 = nullptr) const;
+    void _BroadcastEvent(GuildEvents guildEvent, ObjectGuid guid = ObjectGuid::Empty, const char* param1 = nullptr, const char* param2 = nullptr, const char* param3 = nullptr) const;
 };
 #endif

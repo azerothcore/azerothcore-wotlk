@@ -867,7 +867,7 @@ public:
                     else
                         me->RemoveAllAuras();
 
-                    caster->ToPlayer()->KilledMonsterCredit(me->GetEntry(), 0);
+                    caster->ToPlayer()->KilledMonsterCredit(me->GetEntry());
                 }
             }
         }

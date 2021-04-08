@@ -292,7 +292,7 @@ public:
                     break;
                 case DATA_DOOR5:
                     HandleGameObject(_doorGUIDs[4], true);
-                    if (Creature* broggok = instance->GetCreature(GetData64(DATA_BROGGOK)))
+                    if (Creature* broggok = instance->GetCreature(GetGuidData(DATA_BROGGOK)))
                         broggok->AI()->DoAction(ACTION_ACTIVATE_BROGGOK);
                     break;
             }

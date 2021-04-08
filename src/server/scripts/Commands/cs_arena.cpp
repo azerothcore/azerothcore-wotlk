@@ -251,7 +251,7 @@ public:
         }
 
         std::string oldCaptainName;
-        sObjectMgr->GetPlayerNameByGUID(arena->GetCaptain(), oldCaptainName);
+        sObjectMgr->GetPlayerNameByGUID(arena->GetCaptain().GetCounter(), oldCaptainName);
         arena->SetCaptain(targetGuid);
 
         handler->PSendSysMessage(LANG_ARENA_CAPTAIN, arena->GetName().c_str(), arena->GetId(), oldCaptainName.c_str(), target->GetName().c_str());

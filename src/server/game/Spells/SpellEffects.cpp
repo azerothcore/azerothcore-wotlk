@@ -1855,7 +1855,7 @@ void Spell::EffectPersistentAA(SpellEffIndex effIndex)
         if (!caster->IsInWorld() || !caster->FindMap() || !ObjectAccessor::GetUnit(*caster, caster->GetGUID())) // pussywizard: temporary crash fix (FindMap and GetUnit are mine)
             return;
         DynamicObject* dynObj = new DynamicObject(false);
-        if (!dynObj->CreateDynamicObject(unitCaster->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), caster, m_spellInfo->Id, *destTarget, radius, DYNAMIC_OBJECT_AREA_SPELL))
+        if (!dynObj->CreateDynamicObject(caster->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), caster, m_spellInfo->Id, *destTarget, radius, DYNAMIC_OBJECT_AREA_SPELL))
         {
             delete dynObj;
             return;
@@ -2096,7 +2096,7 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
     Player* player = m_caster->ToPlayer();
 
     uint32 lockId = 0;
-    ObjectGuid guid = 0;
+    ObjectGuid guid;
 
     // Get lockId
     if (gameObjTarget)
@@ -2246,7 +2246,7 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
                 m_targets.SetItemTarget(nullptr);
 
             m_CastItem = nullptr;
-            m_castItemGUID = 0;
+            m_castItemGUID.Clear();
 
             player->StoreItem(dest, pNewItem, true);
             player->ItemAddedQuestCheck(pNewItem->GetEntry(), 1);
@@ -2266,7 +2266,7 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
                 m_targets.SetItemTarget(nullptr);
 
             m_CastItem = nullptr;
-            m_castItemGUID = 0;
+            m_castItemGUID.Clear();
 
             player->BankItem(dest, pNewItem, true);
             return;
@@ -2289,7 +2289,7 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
                 m_targets.SetItemTarget(nullptr);
 
             m_CastItem = nullptr;
-            m_castItemGUID = 0;
+            m_castItemGUID.Clear();
 
             player->EquipItem(dest, pNewItem, true);
             player->AutoUnequipOffhandIfNeed();
@@ -4741,7 +4741,7 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
     if (m_caster)
     {
         ObjectGuid guid = m_caster->m_ObjectSlot[slot];
-        if (guid != 0)
+        if (guid)
         {
             if (GameObject* gameObject = m_caster->GetMap()->GetGameObject(guid))
             {
@@ -4750,7 +4750,7 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
                     gameObject->SetSpellId(0);
                 m_caster->RemoveGameObject(gameObject, true);
             }
-            m_caster->m_ObjectSlot[slot] = 0;
+            m_caster->m_ObjectSlot[slot].Clear();
         }
     }
 
@@ -5314,7 +5314,7 @@ void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
     player->GetPosition(x, y, z);
     if (!pet)
     {
-        player->SummonPet(0, x, y, z, player->GetOrientation(), SUMMON_PET, 0, 0, (uint64)damage, PET_LOAD_SUMMON_DEAD_PET);
+        player->SummonPet(0, x, y, z, player->GetOrientation(), SUMMON_PET, 0, 0, ObjectGuid((uint64)damage), PET_LOAD_SUMMON_DEAD_PET);
         return;
     }
 
@@ -5484,7 +5484,7 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
 
     GameObject* pGameObj = sObjectMgr->IsGameObjectStaticTransport(name_id) ? new StaticTransport() : new GameObject();
 
-    if (!pGameObj->Create(map->GenerateLowGuid<HighGuid::GameObject>(), name_id, cMap, m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
+    if (!pGameObj->Create(cMap->GenerateLowGuid<HighGuid::GameObject>(), name_id, cMap, m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
     {
         delete pGameObj;
         return;
@@ -5790,7 +5790,7 @@ void Spell::EffectKillCreditPersonal(SpellEffIndex effIndex)
     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    unitTarget->ToPlayer()->KilledMonsterCredit(m_spellInfo->Effects[effIndex].MiscValue, 0);
+    unitTarget->ToPlayer()->KilledMonsterCredit(m_spellInfo->Effects[effIndex].MiscValue);
 }
 
 void Spell::EffectKillCredit(SpellEffIndex effIndex)

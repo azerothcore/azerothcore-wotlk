@@ -260,7 +260,7 @@ public:
         {
             if (DorotheeGUID)
             {
-                Creature* Dorothee = (ObjectAccessor::GetCreature((*me), DorotheeGUID));
+                Creature* Dorothee = ObjectAccessor::GetCreature(*me, DorotheeGUID);
                 if (Dorothee && Dorothee->IsAlive())
                 {
                     CAST_AI(boss_dorothee::boss_dorotheeAI, Dorothee->AI())->TitoDied = true;
@@ -1259,7 +1259,7 @@ public:
             Talk(SAY_ROMULO_AGGRO);
             if (JulianneGUID)
             {
-                Creature* Julianne = (ObjectAccessor::GetCreature((*me), JulianneGUID));
+                Creature* Julianne = ObjectAccessor::GetCreature(*me, JulianneGUID);
                 if (Julianne && Julianne->GetVictim())
                 {
                     me->AddThreat(Julianne->GetVictim(), 1.0f);

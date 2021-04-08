@@ -61,7 +61,7 @@ void VisibleNotifier::SendToSelf()
             }
         }
 
-    for (Player::ClientGUIDs::const_iterator it = vis_guids.begin(); it != vis_guids.end(); ++it)
+    for (GuidUnorderedSet::const_iterator it = vis_guids.begin(); it != vis_guids.end(); ++it)
     {
         if (WorldObject* obj = ObjectAccessor::GetWorldObject(i_player, *it))
             if (i_largeOnly != obj->IsVisibilityOverridden())

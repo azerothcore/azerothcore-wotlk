@@ -442,7 +442,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             spellInfo = actualSpellInfo;
     }
 
-    Spell* spell = new Spell(mover, spellInfo, TRIGGERED_NONE, 0, false);
+    Spell* spell = new Spell(mover, spellInfo, TRIGGERED_NONE, ObjectGuid::Empty, false);
     spell->m_cast_count = castCount;                       // set count of casts
     spell->prepare(&targets);
 }
@@ -482,7 +482,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     }
 
     // maybe should only remove one buff when there are multiple?
-    _player->RemoveOwnedAura(spellId, 0, 0, AURA_REMOVE_BY_CANCEL);
+    _player->RemoveOwnedAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
 }
 
 void WorldSession::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
@@ -520,7 +520,7 @@ void WorldSession::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    pet->RemoveOwnedAura(spellId, 0, 0, AURA_REMOVE_BY_CANCEL);
+    pet->RemoveOwnedAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
 
     pet->AddSpellCooldown(spellId, 0, 0);
 }
@@ -620,7 +620,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
     recvData >> guid;
 
     // Get unit for which data is needed by client
-    Unit* unit = ObjectAccessor::GetObjectInWorld(guid, (Unit*)nullptr);
+    Unit* unit = ObjectAccessor::GetUnit(*_player, guid);
     if (!unit)
         return;
 

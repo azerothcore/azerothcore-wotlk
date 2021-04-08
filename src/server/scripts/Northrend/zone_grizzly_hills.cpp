@@ -173,7 +173,7 @@ public:
                 case 19:
                     if (Creature* Mrfloppy = ObjectAccessor::GetCreature(*me, _mrfloppyGUID))
                     {
-                        if (Mrfloppy->HasAura(SPELL_MRFLOPPY, 0))
+                        if (Mrfloppy->HasAura(SPELL_MRFLOPPY))
                         {
                             if (Creature* RWORG = ObjectAccessor::GetCreature(*me, _RavenousworgGUID))
                                 Mrfloppy->EnterVehicle(RWORG);
@@ -236,7 +236,7 @@ public:
 
         void Reset() override
         {
-            _mrfloppyGUID     = 0;
+            _mrfloppyGUID.Clear();
             _RavenousworgGUID.Clear();
         }
 
@@ -649,7 +649,7 @@ public:
 
         void Reset() override
         {
-            _playerGUID   = 0;
+            _playerGUID.Clear();
 
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC);
             me->SetReactState(REACT_AGGRESSIVE);

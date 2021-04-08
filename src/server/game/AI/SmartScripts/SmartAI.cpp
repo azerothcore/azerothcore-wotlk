@@ -50,7 +50,6 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
     mDespawnState = 0;
 
     mEscortInvokerCheckTimer = 1000;
-    mFollowGuid = 0;
     mFollowDist = 0;
     mFollowAngle = 0;
     mFollowCredit = 0;
@@ -724,7 +723,7 @@ void SmartAI::JustRespawned()
     mJustReset = true;
     JustReachedHome();
     GetScript()->ProcessEventsFor(SMART_EVENT_RESPAWN);
-    mFollowGuid = 0;//do not reset follower on Reset(), we need it after combat evade
+    mFollowGuid.Clear();//do not reset follower on Reset(), we need it after combat evade
     mFollowDist = 0;
     mFollowAngle = 0;
     mFollowCredit = 0;
@@ -1014,7 +1013,7 @@ void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, ui
 
 void SmartAI::StopFollow(bool complete)
 {
-    mFollowGuid = 0;
+    mFollowGuid.Clear();
     mFollowDist = 0;
     mFollowAngle = 0;
     mFollowCredit = 0;

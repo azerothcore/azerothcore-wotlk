@@ -361,7 +361,7 @@ void WorldSession::HandleBattlefieldListOpcode(WorldPacket& recvData)
         return;
 
     WorldPacket data;
-    sBattlegroundMgr->BuildBattlegroundListPacket(&data, 0, _player, BattlegroundTypeId(bgTypeId), fromWhere);
+    sBattlegroundMgr->BuildBattlegroundListPacket(&data, ObjectGuid::Empty, _player, BattlegroundTypeId(bgTypeId), fromWhere);
     SendPacket(&data);
 }
 

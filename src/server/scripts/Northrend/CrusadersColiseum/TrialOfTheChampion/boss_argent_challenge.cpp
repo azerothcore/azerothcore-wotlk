@@ -598,7 +598,7 @@ public:
                     break;
             }
 
-            Start(false, true, 0);
+            Start(false, true);
             uiWaypoint = uiType;
         }
 

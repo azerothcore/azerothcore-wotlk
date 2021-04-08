@@ -276,8 +276,6 @@ void MapManager::Update(uint32 diff)
     if (m_updater.activated())
         m_updater.wait();
 
-    sObjectAccessor->ProcessDelayedCorpseActions();
-
     if (mapUpdateStep < 3)
     {
         for (iter = i_maps.begin(); iter != i_maps.end(); ++iter)

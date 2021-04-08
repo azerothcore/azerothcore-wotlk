@@ -665,7 +665,7 @@ public:
     void SetWanderDistance(float dist) { m_wanderDistance = dist; }
 
     uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
-    ObjectGuid lootingGroupGUID;                        // used to find group which is looting corpse
+    uint32 lootingGroupLowGUID;                         // used to find group which is looting corpse
 
     void SendZoneUnderAttackMessage(Player* attacker);
 
@@ -736,7 +736,7 @@ public:
     bool m_isTempWorldObject; //true when possessed
 
     // Handling caster facing during spellcast
-    void SetTarget(ObjectGuid guid) override;
+    void SetTarget(ObjectGuid guid = ObjectGuid::Empty) override;
     void FocusTarget(Spell const* focusSpell, WorldObject const* target);
     void ReleaseFocus(Spell const* focusSpell);
     bool IsMovementPreventedByCasting() const;
@@ -838,7 +838,7 @@ private:
 class AssistDelayEvent : public BasicEvent
 {
 public:
-    AssistDelayEvent(uint64 victim, Unit& owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
+    AssistDelayEvent(ObjectGuid victim, Unit& owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
 
     bool Execute(uint64 e_time, uint32 p_time) override;
     void AddAssistant(ObjectGuid guid) { m_assistants.push_back(guid); }

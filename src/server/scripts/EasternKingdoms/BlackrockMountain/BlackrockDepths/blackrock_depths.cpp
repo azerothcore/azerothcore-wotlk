@@ -294,11 +294,11 @@ public:
                             if (theldrenEvent)
                             {
                                 if (GameObject* go = me->SummonGameObject(GO_ARENA_SPOILS, 596.48f, -187.91f, -54.14f, 4.9f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
-                                    go->SetOwnerGUID(0);
+                                    go->SetOwnerGUID(ObjectGuid::Empty);
 
                                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                                    itr->GetSource()->KilledMonsterCredit(16166, 0);
+                                    itr->GetSource()->KilledMonsterCredit(16166);
                             }
 
                             HandleGameObject(DATA_ARENA2, false);

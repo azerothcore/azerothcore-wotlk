@@ -10,11 +10,13 @@
 #include "ByteBuffer.h"
 #include "ConditionMgr.h"
 #include "ItemEnchantmentMgr.h"
+#include "ObjectGuid.h"
 #include "RefManager.h"
 #include "SharedDefines.h"
 #include <list>
 #include <map>
 #include <vector>
+
 
 enum RollType
 {
@@ -135,7 +137,7 @@ struct LootStoreItem
     // Checks correctness of values
 };
 
-typedef std::set<uint32> AllowedLooterSet;
+typedef GuidSet AllowedLooterSet;
 
 struct LootItem
 {
@@ -183,7 +185,7 @@ class LootTemplate;
 
 typedef std::vector<QuestItem> QuestItemList;
 typedef std::vector<LootItem> LootItemList;
-typedef std::map<uint32, QuestItemList*> QuestItemMap;
+typedef std::map<ObjectGuid, QuestItemList*> QuestItemMap;
 typedef std::list<LootStoreItem*> LootStoreItemList;
 typedef std::unordered_map<uint32, LootTemplate*> LootTemplateMap;
 
@@ -309,8 +311,8 @@ struct Loot
     ObjectGuid roundRobinPlayer;        // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
     LootType loot_type{LOOT_NONE};      // required for achievement system
 
-    // GUIDLow of container that holds this loot (item_instance.entry), set for items that can be looted
-    uint32 containerId{0};
+    // GUID of container that holds this loot (item_instance.entry), set for items that can be looted
+    ObjectGuid containerGUID;
 
     Loot(uint32 _gold = 0) : gold(_gold) { }
     ~Loot() { clear(); }
@@ -341,7 +343,7 @@ struct Loot
         quest_items.clear();
         gold = 0;
         unlootedCount = 0;
-        roundRobinPlayer = 0;
+        roundRobinPlayer.Clear();
         i_LootValidatorRefManager.clearReferences();
         loot_type = LOOT_NONE;
     }

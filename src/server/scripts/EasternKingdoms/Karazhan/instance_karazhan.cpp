@@ -228,37 +228,6 @@ public:
                     return OperaEvent;
                 case DATA_OPERA_OZ_DEATHCOUNT:
                     return OzDeathCount;
-
-                case DATA_KILREK:
-                    return m_uiKilrekGUID;
-                case DATA_TERESTIAN:
-                    return m_uiTerestianGUID;
-                case DATA_MOROES:
-                    return m_uiMoroesGUID;
-                case DATA_GO_STAGEDOORLEFT:
-                    return m_uiStageDoorLeftGUID;
-                case DATA_GO_STAGEDOORRIGHT:
-                    return m_uiStageDoorRightGUID;
-                case DATA_GO_CURTAINS:
-                    return m_uiCurtainGUID;
-                case DATA_GO_LIBRARY_DOOR:
-                    return m_uiLibraryDoor;
-                case DATA_GO_MASSIVE_DOOR:
-                    return m_uiMassiveDoor;
-                case DATA_GO_SIDE_ENTRANCE_DOOR:
-                    return m_uiSideEntranceDoor;
-                case DATA_GO_GAME_DOOR:
-                    return m_uiGamesmansDoor;
-                case DATA_GO_GAME_EXIT_DOOR:
-                    return m_uiGamesmansExitDoor;
-                case DATA_GO_NETHER_DOOR:
-                    return m_uiNetherspaceDoor;
-                case DATA_MASTERS_TERRACE_DOOR_1:
-                    return MastersTerraceDoor[0];
-                case DATA_MASTERS_TERRACE_DOOR_2:
-                    return MastersTerraceDoor[1];
-                case DATA_IMAGE_OF_MEDIVH:
-                    return ImageGUID;
             }
 
             return 0;

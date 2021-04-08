@@ -121,8 +121,9 @@ class ObjectGuid
 
         ObjectGuid() : _guid(0) { }
         explicit ObjectGuid(uint64 guid) : _guid(guid) { }
+        ObjectGuid(HighGuid hi, uint32 entry, LowType counter) : _guid(counter ? uint64(counter) | (uint64(entry) << 24) | (uint64(hi) << 48) : 0) { }
+        ObjectGuid(HighGuid hi, LowType counter) : _guid(counter ? uint64(counter) | (uint64(hi) << 48) : 0) { }
 
-        operator uint64() const { return _guid; }
         PackedGuidReader ReadAsPacked() { return PackedGuidReader(*this); }
 
         void Set(uint64 guid) { _guid = guid; }
@@ -191,19 +192,18 @@ class ObjectGuid
 
         TypeID GetTypeId() const { return GetTypeId(GetHigh()); }
 
-        bool operator!() const { return IsEmpty(); }
+        operator bool() const { return !IsEmpty(); }
+        bool operator!() const { return !(bool(*this)); }
         bool operator==(ObjectGuid const& guid) const { return GetRawValue() == guid.GetRawValue(); }
         bool operator!=(ObjectGuid const& guid) const { return GetRawValue() != guid.GetRawValue(); }
         bool operator< (ObjectGuid const& guid) const { return GetRawValue() < guid.GetRawValue(); }
+        bool operator<= (ObjectGuid const& guid) const { return GetRawValue() <= guid.GetRawValue(); }
 
         static char const* GetTypeName(HighGuid high);
         char const* GetTypeName() const { return !IsEmpty() ? GetTypeName(GetHigh()) : "None"; }
         std::string ToString() const;
 
     private:
-        ObjectGuid(HighGuid hi, uint32 entry, LowType counter) : _guid(counter ? uint64(counter) | (uint64(entry) << 24) | (uint64(hi) << 48) : 0) { }
-        ObjectGuid(HighGuid hi, LowType counter) : _guid(counter ? uint64(counter) | (uint64(hi) << 48) : 0) { }
-
         static bool HasEntry(HighGuid high)
         {
             switch (high)
@@ -231,9 +231,12 @@ class ObjectGuid
         static ObjectGuid Global(HighGuid type, LowType counter);
         static ObjectGuid MapSpecific(HighGuid type, uint32 entry, LowType counter);
 
-        explicit ObjectGuid(uint32 const&) = delete;                 // no implementation, used to catch wrong type assignment
-        ObjectGuid(HighGuid, uint32, uint64 counter) = delete;       // no implementation, used to catch wrong type assignment
-        ObjectGuid(HighGuid, uint64 counter) = delete;               // no implementation, used to catch wrong type assignment
+        explicit ObjectGuid(uint32 const&) = delete;                // no implementation, used to catch wrong type assignment
+        ObjectGuid(HighGuid, uint32, uint64 counter) = delete;      // no implementation, used to catch wrong type assignment
+        ObjectGuid(HighGuid, uint64 counter) = delete;              // no implementation, used to catch wrong type assignment
+
+        // used to catch wrong type assignment
+        operator int64() const = delete;
 
         uint64 _guid;
 };

@@ -313,7 +313,7 @@ public:
         {
             if (damage >= me->GetHealth())
             {
-                me->SetTarget(0);
+                me->SetTarget();
                 me->SetReactState(REACT_PASSIVE);
                 me->RemoveAllAuras();
                 me->DeleteThreatList();

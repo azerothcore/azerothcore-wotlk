@@ -69,7 +69,7 @@ class StaticTransport;
 class MotionTransport;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
-typedef std::unordered_set<uint32> UpdatePlayerSet;
+typedef GuidUnorderedSet UpdatePlayerSet;
 
 class Object
 {
@@ -653,6 +653,12 @@ public:
     {
         m_mapId = loc.GetMapId();
         Relocate(loc);
+    }
+
+    void WorldRelocate(uint32 mapId = MAPID_INVALID, float x = 0.f, float y = 0.f, float z = 0.f, float o = 0.f)
+    {
+        m_mapId = mapId;
+        Relocate(x, y, z, o);
     }
 
     [[nodiscard]] uint32 GetMapId() const

@@ -81,7 +81,7 @@ public:
             events.Reset();
             summons.DespawnAll();
             vanishDamage = 0;
-            vanishTarget = 0;
+            vanishTarget.Clear();
 
             if (pInstance)
             {
@@ -126,7 +126,7 @@ public:
             events.Reset();
             events.ScheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10000);
             events.ScheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10000);
-            vanishTarget = 0;
+            vanishTarget.Clear();
             vanishDamage = 0;
         }
 

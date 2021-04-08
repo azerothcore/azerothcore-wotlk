@@ -81,7 +81,6 @@ struct AuctionEntry
     void DeleteFromDB(SQLTransaction& trans) const;
     void SaveToDB(SQLTransaction& trans) const;
     bool LoadFromDB(Field* fields);
-    bool LoadFromFieldList(Field* fields);
     [[nodiscard]] std::string BuildAuctionMailSubject(MailAuctionAnswers response) const;
     static std::string BuildAuctionMailBody(ObjectGuid guid, uint32 bid, uint32 buyout, uint32 deposit, uint32 cut);
 };
@@ -173,7 +172,7 @@ public:
     void LoadAuctions();
 
     void AddAItem(Item* it);
-    bool RemoveAItem(uint32 id, bool deleteFromDB = false);
+    bool RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB = false);
 
     void Update();
 

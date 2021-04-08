@@ -246,7 +246,7 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool sentToBg, uint32 play
 {
     // pussywizard: leave queue packet
     if (playerQueueSlot < PLAYER_MAX_BATTLEGROUND_QUEUES)
-        if (Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+        if (Player* p = ObjectAccessor::FindConnectedPlayer(guid))
         {
             WorldPacket data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, nullptr, playerQueueSlot, STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
@@ -306,7 +306,7 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool sentToBg, uint32 play
     if (groupInfo->IsInvitedToBGInstanceGUID && groupInfo->IsRated && !sentToBg)
         if (ArenaTeam* at = sArenaTeamMgr->GetArenaTeamById(groupInfo->ArenaTeamId))
         {
-            if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+            if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
                 at->MemberLost(player, groupInfo->OpponentsMatchmakerRating);
             at->SaveToDB();
         }
@@ -325,7 +325,7 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool sentToBg, uint32 play
     {
         uint32 queueSlot = PLAYER_MAX_BATTLEGROUND_QUEUES;
 
-        if (Player* plr = ObjectAccessor::FindPlayerInOrOutOfWorld(*(groupInfo->Players.begin())))
+        if (Player* plr = ObjectAccessor::FindConnectedPlayer(*(groupInfo->Players.begin())))
         {
             BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(groupInfo->BgTypeId, groupInfo->ArenaType);
             queueSlot = plr->GetBattlegroundQueueIndex(bgQueueTypeId);
@@ -1004,7 +1004,7 @@ void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDi
 
 bool BGQueueInviteEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(m_PlayerGuid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(m_PlayerGuid);
 
     // player logged off, so he is no longer in queue
     if (!player)
@@ -1042,7 +1042,7 @@ void BGQueueInviteEvent::Abort(uint64 /*e_time*/)
 
 bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(m_PlayerGuid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(m_PlayerGuid);
 
     // player logged off, so he is no longer in queue
     if (!player)

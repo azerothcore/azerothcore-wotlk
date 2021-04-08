@@ -99,7 +99,7 @@ void WorldSession::HandleLfgLeaveOpcode(WorldPacket&  /*recvData*/)
     if (!group || group->GetLeaderGUID() == guid)
     {
         sLFGMgr->LeaveLfg(sLFGMgr->GetState(guid) == lfg::LFG_STATE_RAIDBROWSER ? guid : gguid);
-        sLFGMgr->LeaveAllLfgQueues(guid, true, group ? group->GetGUID() : 0);
+        sLFGMgr->LeaveAllLfgQueues(guid, true, group ? group->GetGUID() : ObjectGuid::Empty);
     }
 }
 
@@ -452,7 +452,7 @@ void WorldSession::SendLfgRoleCheckUpdate(lfg::LfgRoleCheck const& roleCheck)
         data << guid;                                      // Guid
         data << uint8(roles > 0);                          // Ready
         data << uint32(roles);                             // Roles
-        Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+        Player* player = ObjectAccessor::FindConnectedPlayer(guid);
         data << uint8(player ? player->getLevel() : 0);    // Level
 
         for (lfg::LfgRolesMap::const_iterator it = roleCheck.roles.begin(); it != roleCheck.roles.end(); ++it)
@@ -465,7 +465,7 @@ void WorldSession::SendLfgRoleCheckUpdate(lfg::LfgRoleCheck const& roleCheck)
             data << guid;                                  // Guid
             data << uint8(roles > 0);                      // Ready
             data << uint32(roles);                         // Roles
-            player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+            player = ObjectAccessor::FindConnectedPlayer(guid);
             data << uint8(player ? player->getLevel() : 0);// Level
         }
     }

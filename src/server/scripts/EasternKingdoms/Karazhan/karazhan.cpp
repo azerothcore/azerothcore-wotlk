@@ -452,7 +452,7 @@ public:
             MTimer = 0;
             ATimer = 0;
 
-            if (instance && instance->GetGuidData(DATA_IMAGE_OF_MEDIVH) == 0)
+            if (instance && !instance->GetGuidData(DATA_IMAGE_OF_MEDIVH))
             {
                 Creature* Arcanagos = me->SummonCreature(NPC_ARCANAGOS, ArcanagosPos[0], ArcanagosPos[1], ArcanagosPos[2], 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
                 if (!Arcanagos)

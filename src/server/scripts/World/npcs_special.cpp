@@ -562,7 +562,7 @@ public:
                 if (!playerTarget)
                     return;
 
-                Creature* lastSpawnedGuard = SpawnedGUID == 0 ? nullptr : GetSummonedGuard();
+                Creature* lastSpawnedGuard = !SpawnedGUID ? nullptr : GetSummonedGuard();
 
                 // prevent calling ObjectAccessor::GetUnit at next MoveInLineOfSight call - speedup
                 if (!lastSpawnedGuard)
@@ -1434,7 +1434,7 @@ public:
                                 break;
                         }
 
-                        Start(false, true, true);
+                        Start(false, true);
                     }
                     else
                         EnterEvadeMode();                       //something went wrong

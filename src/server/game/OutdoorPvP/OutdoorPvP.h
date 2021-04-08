@@ -87,7 +87,7 @@ public:
     void SendUpdateWorldState(uint32 field, uint32 value);
 
     // send kill notify to players in the controlling faction
-    void SendObjectiveComplete(uint32 id, ObjectGuid guid);
+    void SendObjectiveComplete(uint32 id, ObjectGuid guid = ObjectGuid::Empty);
 
     // used when player is activated/inactivated in the area
     virtual bool HandlePlayerEnter(Player* player);
@@ -165,10 +165,10 @@ protected:
 
     // map to store the various gameobjects and creatures spawned by the objective
     //        type, guid
-    std::map<uint32, ObjectGuid> m_Objects;
-    std::map<uint32, ObjectGuid> m_Creatures;
-    std::map<ObjectGuid, uint32> m_ObjectTypes;
-    std::map<ObjectGuid, uint32> m_CreatureTypes;
+    std::map<uint32, ObjectGuid::LowType> m_Objects;
+    std::map<uint32, ObjectGuid::LowType> m_Creatures;
+    std::map<ObjectGuid::LowType, uint32> m_ObjectTypes;
+    std::map<ObjectGuid::LowType, uint32> m_CreatureTypes;
 };
 
 // base class for specific outdoor pvp handlers

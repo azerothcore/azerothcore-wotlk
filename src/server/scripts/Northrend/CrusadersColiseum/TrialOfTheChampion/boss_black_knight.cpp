@@ -327,7 +327,7 @@ public:
 
         void Reset() override
         {
-            Start(false, true, 0, nullptr);
+            Start(false, true, ObjectGuid::Empty, nullptr);
             SetDespawnAtEnd(true);
         }
 

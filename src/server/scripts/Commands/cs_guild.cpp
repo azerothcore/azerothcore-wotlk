@@ -217,7 +217,7 @@ public:
         // Display Guild Information
         handler->PSendSysMessage(LANG_GUILD_INFO_NAME, guild->GetName().c_str(), guild->GetId()); // Guild Id + Name
         std::string guildMasterName;
-        if (sObjectMgr->GetPlayerNameByGUID(guild->GetLeaderGUID(), guildMasterName))
+        if (sObjectMgr->GetPlayerNameByGUID(guild->GetLeaderGUID().GetCounter(), guildMasterName))
             handler->PSendSysMessage(LANG_GUILD_INFO_GUILD_MASTER, guildMasterName.c_str(), guild->GetLeaderGUID().GetCounter()); // Guild Master
 
         // Format creation date

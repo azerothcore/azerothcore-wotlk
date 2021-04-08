@@ -3272,9 +3272,9 @@ void World::AddGlobalPlayerData(ObjectGuid::LowType guid, uint32 accountId, std:
     _globalPlayerNameStore[name] = guid;
 }
 
-void World::UpdateGlobalPlayerData(ObjectGuid guid, uint8 mask, std::string const& name, uint8 level, uint8 gender, uint8 race, uint8 playerClass)
+void World::UpdateGlobalPlayerData(ObjectGuid::LowType guid, uint8 mask, std::string const& name, uint8 level, uint8 gender, uint8 race, uint8 playerClass)
 {
-    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid.GetCounter());
+    GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
     if (itr == _globalPlayerDataStore.end())
         return;
 
@@ -3400,12 +3400,12 @@ GlobalPlayerData const* World::GetGlobalPlayerData(ObjectGuid::LowType guid) con
     return nullptr;
 }
 
-ObjectGuid::LowType World::GetGlobalPlayerGUID(std::string const& name) const
+ObjectGuid World::GetGlobalPlayerGUID(std::string const& name) const
 {
     // Get data from global storage
     GlobalPlayerNameMap::const_iterator itr = _globalPlayerNameStore.find(name);
     if (itr != _globalPlayerNameStore.end())
-        return itr->second;
+        return ObjectGuid::Create<HighGuid::Player>(itr->second);
 
     // Player is not in the global storage, try to get it from the Database
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_DATA_BY_NAME);
@@ -3441,12 +3441,12 @@ ObjectGuid::LowType World::GetGlobalPlayerGUID(std::string const& name) const
         {
             sLog->outString("Player %s [GUID: %u] added to the global storage.", name.c_str(), guidLow);
 
-            return guidLow;
+            return ObjectGuid::Create<HighGuid::Player>(guidLow);
         }
     }
 
     // Player not found
-    return 0;
+    return ObjectGuid::Empty;
 }
 
 void World::RemoveOldCorpses()

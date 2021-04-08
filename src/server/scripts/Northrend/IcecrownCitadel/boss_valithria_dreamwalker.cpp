@@ -726,7 +726,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_COLUMN_OF_FROST)
-                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_COLUMN_OF_FROST_DAMAGE, 0, 8000), summon->m_Events.CalculateTime(2000));
+                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_COLUMN_OF_FROST_DAMAGE, ObjectGuid::Empty, 8000), summon->m_Events.CalculateTime(2000));
             else if (summon->GetEntry() == NPC_MANA_VOID)
                 summon->DespawnOrUnsummon(36000);
         }

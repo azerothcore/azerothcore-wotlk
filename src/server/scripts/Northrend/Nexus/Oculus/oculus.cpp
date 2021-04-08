@@ -62,7 +62,7 @@ enum DrakeGiverTexts
 class npc_oculus_drakegiver : public CreatureScript
 {
 public:
-    std::unordered_map<uint32, bool>openedMenu;
+    std::unordered_map<ObjectGuid, bool>openedMenu;
 
     npc_oculus_drakegiver() : CreatureScript("npc_oculus_drakegiver") { }
 

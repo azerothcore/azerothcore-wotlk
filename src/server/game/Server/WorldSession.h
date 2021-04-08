@@ -938,7 +938,7 @@ private:
     QueryCallback<PreparedQueryResult, std::string> _charRenameCallback;
     QueryCallback<PreparedQueryResult, uint32> _unstablePetCallback;
     QueryCallback<PreparedQueryResult, uint32> _stableSwapCallback;
-    QueryCallback<PreparedQueryResult, uint64> _sendStabledPetCallback;
+    QueryCallback<PreparedQueryResult, ObjectGuid> _sendStabledPetCallback;
     QueryCallback<PreparedQueryResult, CharacterCreateInfo*, true> _charCreateCallback;
 
     QueryResultHolderFuture _charLoginCallback;
@@ -994,9 +994,9 @@ private:
     bool recoveryItem(Item* pItem);
 
     // EnumData helpers
-    bool IsLegitCharacterForAccount(ObjectGuid gUID)
+    bool IsLegitCharacterForAccount(ObjectGuid guid)
     {
-        return _legitCharacters.find(lowGUID) != _legitCharacters.end();
+        return _legitCharacters.find(guid) != _legitCharacters.end();
     }
 
     // this stores the GUIDs of the characters who can login

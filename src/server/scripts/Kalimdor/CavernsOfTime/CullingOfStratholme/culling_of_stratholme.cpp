@@ -303,7 +303,7 @@ public:
                     // After killing epoch
                     creature->AI()->DoAction(ACTION_START_SECRET_PASSAGE);
                     creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    creature->SetTarget(0);
+                    creature->SetTarget();
                     CloseGossipMenuFor(player);
                     break;
                 case GOSSIP_ACTION_INFO_DEF+5:
@@ -775,7 +775,7 @@ public:
                     case EVENT_ACTION_PHASE1+18:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                         {
-                            uther->SetTarget(0);
+                            uther->SetTarget();
                             uther->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             uther->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
                         }
@@ -784,7 +784,7 @@ public:
                     case EVENT_ACTION_PHASE1+19:
                         if (Creature* jaina = GetEventNpc(NPC_JAINA))
                         {
-                            jaina->SetTarget(0);
+                            jaina->SetTarget();
                             jaina->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             jaina->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
                         }
@@ -812,13 +812,13 @@ public:
                     case EVENT_ACTION_PHASE1+22:
                         SetEscortPaused(false);
                         eventInRun = false;
-                        me->SetTarget(0);
+                        me->SetTarget();
                         // dont schedule next, do it in gossip select!
                         break;
                     //After Gossip 1 (waypoint 8)
                     case EVENT_ACTION_PHASE2:
                         summons.DespawnEntry(NPC_INVIS_TARGET); // remove trigger
-                        me->SetTarget(0);
+                        me->SetTarget();
                         SetEscortPaused(false);
                         eventInRun = false;
                         ScheduleNextEvent(currentEvent, 1000);
@@ -885,7 +885,7 @@ public:
                     case EVENT_ACTION_PHASE2+6:
                         if (Creature* malganis = GetEventNpc(NPC_MAL_GANIS))
                         {
-                            me->SetTarget(0);
+                            me->SetTarget();
                             me->SetFacingToObject(malganis);
                             malganis->SetVisible(false);
                         }

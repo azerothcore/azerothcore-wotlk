@@ -72,12 +72,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = nullptr;
-
-        // by DB guid
-        if (GameObjectData const* goData = sObjectMgr->GetGOData(guidLow))
-            object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(guidLow, goData->id);
-
+        GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
         if (!object)
         {
             handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, guidLow);
@@ -335,12 +330,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = nullptr;
-
-        // by DB guid
-        if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
-            object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(guidLow, gameObjectData->id);
-
+        GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
         if (!object)
         {
             handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, guidLow);
@@ -383,12 +373,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = nullptr;
-
-        // by DB guid
-        if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
-            object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(guidLow, gameObjectData->id);
-
+        GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
         if (!object)
         {
             handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, guidLow);
@@ -441,12 +426,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = nullptr;
-
-        // by DB guid
-        if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
-            object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(guidLow, gameObjectData->id);
-
+        GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
         if (!object)
         {
             handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, guidLow);
@@ -506,12 +486,7 @@ public:
         if (!guidLow)
             return false;
 
-        GameObject* object = nullptr;
-
-        // by DB guid
-        if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
-            object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(guidLow, gameObjectData->id);
-
+        GameObject* object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
         if (!object)
         {
             handler->PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, guidLow);
@@ -648,8 +623,7 @@ public:
 
         if (guidLow > 0)
         {
-            if (GameObjectData const* gameObjectData = sObjectMgr->GetGOData(guidLow))
-                object = handler->GetObjectGlobalyWithGuidOrNearWithDbGuid(guidLow, gameObjectData->id);
+            object = handler->GetObjectFromPlayerMapByDbGuid(guidLow);
         }
         else
             object = handler->GetSession()->GetPlayer()->FindNearestGameObject(-guidLow, 30.0f);

@@ -137,7 +137,7 @@ public:
                     me->CastSpell(me, SPELL_SPOUT_VISUAL, TRIGGERED_IGNORE_SET_FACING);
                     me->SetReactState(REACT_PASSIVE);
                     me->SetFacingToObject(me->GetVictim());
-                    me->SetTarget(0);
+                    me->SetTarget();
                     events.ScheduleEvent(EVENT_SPELL_SPOUT, 60000);
                     events.RescheduleEvent(EVENT_SPELL_WHIRL, 18000);
                     events.RescheduleEvent(EVENT_SPELL_GEYSER, 25000);

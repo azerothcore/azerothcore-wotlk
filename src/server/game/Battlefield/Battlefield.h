@@ -97,8 +97,8 @@ public:
     virtual void SendChangePhase();
 
     bool SetCapturePointData(GameObject* capturePoint);
-    GameObject* GetCapturePointGo() { return ObjectAccessor::GetObjectInWorld(m_capturePoint, (GameObject*)nullptr); }
-    GameObject* GetCapturePointGo(WorldObject* obj) { return ObjectAccessor::GetGameObject(*obj, m_capturePoint); }
+    GameObject* GetCapturePointGo();
+    GameObject* GetCapturePointGo(WorldObject* obj);
 
     TeamId GetTeamId() { return m_team; }
 protected:
@@ -295,6 +295,9 @@ public:
     Creature* SpawnCreature(uint32 entry, Position pos, TeamId teamId);
     GameObject* SpawnGameObject(uint32 entry, float x, float y, float z, float o);
 
+    Creature* GetCreature(ObjectGuid const guid);
+    GameObject* GetGameObject(ObjectGuid const guid);
+
     // Script-methods
 
     /// Called on start
@@ -372,6 +375,7 @@ protected:
     uint32 m_BattleId;                                      // BattleID (for packet)
     uint32 m_ZoneId;                                        // ZoneID of Wintergrasp = 4197
     uint32 m_MapId;                                         // MapId where is Battlefield
+    Map* m_Map;
     uint32 m_MaxPlayer;                                     // Maximum number of player that participated to Battlefield
     uint32 m_MinPlayer;                                     // Minimum number of player for Battlefield start
     uint32 m_MinLevel;                                      // Required level to participate at Battlefield

@@ -21,7 +21,7 @@
 
 void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
 {
-    GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid);
+    GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid.GetCounter());
 
     WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 10));
     data << guid;
@@ -32,7 +32,7 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
         return;
     }
 
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(guid);
 
     data << uint8(0);                               // name known
     data << playerData->name;                       // played name
@@ -42,7 +42,7 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
     data << uint8(playerData->playerClass);
 
     // pussywizard: optimization
-    /*Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+    /*Player* player = ObjectAccessor::FindConnectedPlayer(guid);
     if (DeclinedName const* names = (player ? player->GetDeclinedNames() : nullptr))
     {
         data << uint8(1);                           // Name is declined

@@ -158,7 +158,7 @@ bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     return true;
 }
 
-Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_PlayerDamageReq(0), m_lootRecipient(0), m_lootRecipientGroup(0),
+Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_PlayerDamageReq(0), m_lootRecipientGroup(0),
     m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f),
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0),  m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
     m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_originalAnimTier(UNIT_BYTE1_FLAG_GROUND), m_AlreadyCallAssistance(false),
@@ -247,7 +247,7 @@ void Creature::RemoveFromWorld()
         Unit::RemoveFromWorld();
 
         if (m_spawnId)
-            Trinity::Containers::MultimapErasePair(GetMap()->GetCreatureBySpawnIdStore(), m_spawnId, this);
+            acore::Containers::MultimapErasePair(GetMap()->GetCreatureBySpawnIdStore(), m_spawnId, this);
 
         GetMap()->GetObjectsStore().Remove<Creature>(GetGUID());
     }
@@ -538,7 +538,7 @@ void Creature::Update(uint32 diff)
                     if (!allowed)                                               // Will be rechecked on next Update call
                         break;
 
-                    ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(GetEntry(), m_DBTableGuid);
+                    ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(GetEntry(), m_spawnId);
                     time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
                     if (!linkedRespawntime)             // Can respawn
                         Respawn();
@@ -1050,7 +1050,7 @@ Player* Creature::GetLootRecipient() const
 {
     if (!m_lootRecipient)
         return nullptr;
-    return ObjectAccessor::FindPlayerInOrOutOfWorld(m_lootRecipient);
+    return ObjectAccessor::FindConnectedPlayer(m_lootRecipient);
 }
 
 Group* Creature::GetLootRecipientGroup() const
@@ -1068,7 +1068,7 @@ void Creature::SetLootRecipient(Unit* unit, bool withGroup)
 
     if (!unit)
     {
-        m_lootRecipient = 0;
+        m_lootRecipient.Clear();
         m_lootRecipientGroup = 0;
         RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE | UNIT_DYNFLAG_TAPPED);
         return;
@@ -1086,7 +1086,7 @@ void Creature::SetLootRecipient(Unit* unit, bool withGroup)
     if (withGroup)
     {
         if (Group* group = player->GetGroup())
-            m_lootRecipientGroup = group->GetLowGUID();
+            m_lootRecipientGroup = group->GetGUID().GetCounter();
     }
     else
         m_lootRecipientGroup = 0;
@@ -1424,13 +1424,13 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
             {
                 if (itr->second->IsAlive())
                 {
-                    TC_LOG_DEBUG("maps", "Would have spawned %u but %s already exists", spawnId, creatureBounds.first->second->GetGUID().ToString().c_str());
+                    sLog->outDebug(LOG_FILTER_MAPS, "Would have spawned %u but %s already exists", spawnId, creatureBounds.first->second->GetGUID().ToString().c_str());
                     return false;
                 }
                 else
                 {
                     despawnList.push_back(itr->second);
-                    TC_LOG_DEBUG("maps", "Despawned dead instance of spawn %u (%s)", spawnId, itr->second->GetGUID().ToString().c_str());
+                    sLog->outDebug(LOG_FILTER_MAPS, "Despawned dead instance of spawn %u (%s)", spawnId, itr->second->GetGUID().ToString().c_str());
                 }
             }
 
@@ -1441,10 +1441,10 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
         }
     }
 
-    CreatureData const* data = sObjectMgr->GetCreatureData(guid);
+    CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
     if (!data)
     {
-        sLog->outErrorDb("Creature (GUID: %u) not found in table `creature`, can't load. ", guid);
+        sLog->outErrorDb("Creature (SpawnId: %u) not found in table `creature`, can't load. ", spawnId);
         return false;
     }
 
@@ -1677,7 +1677,7 @@ void Creature::setDeathState(DeathState s, bool despawn)
         if (GetMap()->IsDungeon() || isWorldBoss() || GetCreatureTemplate()->rank >= CREATURE_ELITE_ELITE)
             SaveRespawnTime();
 
-        SetTarget(0);                // remove target selection in any cases (can be set at aura remove in Unit::setDeathState)
+        SetTarget();                // remove target selection in any cases (can be set at aura remove in Unit::setDeathState)
         SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
 
         Dismount(); // if creature is mounted on a virtual mount, remove it at death

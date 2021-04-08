@@ -284,7 +284,7 @@ void Map::ScriptsProcess()
             switch (step.sourceGUID.GetHigh())
             {
                 case HighGuid::Item: // as well as HIGHGUID_CONTAINER
-                    if (Player* player = GetPlayer(step.ownerGUID))
+                    if (Player* player = ObjectAccessor::GetPlayer(this, step.ownerGUID))
                         source = player->GetItemByGuid(step.sourceGUID);
                     break;
                 case HighGuid::Unit:
@@ -570,7 +570,7 @@ void Map::ScriptsProcess()
                     if (step.script->KillCredit.Flags & SF_KILLCREDIT_REWARD_GROUP)
                         player->RewardPlayerAndGroupAtEvent(step.script->KillCredit.CreatureEntry, player);
                     else
-                        player->KilledMonsterCredit(step.script->KillCredit.CreatureEntry, 0);
+                        player->KilledMonsterCredit(step.script->KillCredit.CreatureEntry);
                 }
                 break;
 

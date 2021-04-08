@@ -1045,7 +1045,7 @@ void BattlegroundMgr::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, T
     for (auto itr : ginfo->Players)
     {
         // get the player
-        Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(itr);
+        Player* player = ObjectAccessor::FindConnectedPlayer(itr);
         if (!player)
             continue;
 
@@ -1073,7 +1073,7 @@ void BattlegroundMgr::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, T
 
         // pussywizard:
         if (bg->isArena() && bg->isRated())
-            bg->ArenaLogEntries[player->GetGUID()].Fill(player->GetName().c_str(), player->GetGUID(), player->GetSession()->GetAccountId(), ginfo->ArenaTeamId, player->GetSession()->GetRemoteAddress());
+            bg->ArenaLogEntries[player->GetGUID()].Fill(player->GetName().c_str(), player->GetGUID().GetCounter(), player->GetSession()->GetAccountId(), ginfo->ArenaTeamId, player->GetSession()->GetRemoteAddress());
     }
 }
 

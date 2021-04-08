@@ -56,7 +56,7 @@ bool Corpse::Create(ObjectGuid::LowType guidlow)
     return true;
 }
 
-bool Corpse::Create(ObjectGuid::Low guidlow, Player* owner)
+bool Corpse::Create(ObjectGuid::LowType guidlow, Player* owner)
 {
     ASSERT(owner);
 
@@ -169,7 +169,7 @@ bool Corpse::LoadCorpseFromDB(ObjectGuid::LowType guid, Field* fields)
 bool Corpse::IsExpired(time_t t) const
 {
     // Deleted character
-    if (!sWorld->GetCharacterNameData(GetOwnerGUID()))
+    if (!sWorld->GetGlobalPlayerData(GetOwnerGUID().GetCounter()))
         return true;
 
     if (m_type == CORPSE_BONES)

@@ -705,7 +705,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 #pragma warning(default:4355)
 #endif
 
-    m_drwGUID = 0;
     m_speakTime = 0;
     m_speakCount = 0;
 
@@ -716,7 +715,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_session = session;
 
-    m_divider = 0;
     m_ingametime = 0;
 
     m_ExtraFlags = 0;
@@ -728,9 +726,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     if (AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
         SetAcceptWhispers(true);
 
-    m_lootGuid = 0;
-
-    m_comboTarget = 0;
     m_comboPoints = 0;
 
     m_usedTalentCount = 0;
@@ -2412,7 +2407,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 return true;
             }
 
-            SetSelection(0);
+            SetSelection(ObjectGuid::Empty);
 
             CombatStop();
 
@@ -3147,7 +3142,7 @@ void Player::SetGMVisible(bool on)
 
     if (on)
     {
-        if (HasAura(VISUAL_AURA, 0))
+        if (HasAura(VISUAL_AURA))
             RemoveAurasDueToSpell(VISUAL_AURA);
 
         m_ExtraFlags &= ~PLAYER_EXTRA_GM_INVISIBLE;         //remove flag
@@ -3733,7 +3728,7 @@ void Player::UpdateNextMailTimeAndUnreads()
 
 void Player::AddNewMailDeliverTime(time_t deliver_time)
 {
-    sWorld->UpdateGlobalPlayerMails(GetGUID(), totalMailCount, false);
+    sWorld->UpdateGlobalPlayerMails(GetGUID().GetCounter(), totalMailCount, false);
     if (deliver_time <= time(nullptr))                      // ready now
     {
         ++unReadMails;
@@ -4814,41 +4809,41 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
  * @param updateRealmChars when this flag is set, the amount of characters on that realm will be updated in the realmlist
  * @param deleteFinally    if this flag is set, the config option will be ignored and the character will be permanently removed from the database
  */
-void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRealmChars, bool deleteFinally)
+void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool updateRealmChars, bool deleteFinally)
 {
     // for not existed account avoid update realm
-    if (accountId == 0)
+    if (!accountId)
         updateRealmChars = false;
+
+    ObjectGuid playerGuid = ObjectGuid::Create<HighGuid::Player>(lowGuid);
 
     uint32 charDelete_method = sWorld->getIntConfig(CONFIG_CHARDELETE_METHOD);
     uint32 charDelete_minLvl = sWorld->getIntConfig(CONFIG_CHARDELETE_MIN_LEVEL);
 
     // if we want to finally delete the character or the character does not meet the level requirement,
     // we set it to mode CHAR_DELETE_REMOVE
-    if (deleteFinally || Player::GetLevelFromStorage(playerguid) < charDelete_minLvl)
+    if (deleteFinally || Player::GetLevelFromStorage(lowGuid) < charDelete_minLvl)
         charDelete_method = CHAR_DELETE_REMOVE;
 
-    ObjectGuid::LowType guid = playerguid.GetCounter();
-
-    if (uint32 guildId = GetGuildIdFromStorage(guid))
+    if (uint32 guildId = GetGuildIdFromStorage(lowGuid))
         if (Guild* guild = sGuildMgr->GetGuildById(guildId))
-            guild->DeleteMember(guid, false, false, true);
+            guild->DeleteMember(playerGuid, false, false, true);
 
     // remove from arena teams
-    LeaveAllArenaTeams(playerguid);
+    LeaveAllArenaTeams(playerGuid);
 
     // close player ticket if any
-    GmTicket* ticket = sTicketMgr->GetTicketByPlayer(playerguid);
+    GmTicket* ticket = sTicketMgr->GetTicketByPlayer(playerGuid);
     if (ticket)
-        sTicketMgr->CloseTicket(ticket->GetId(), playerguid);
+        sTicketMgr->CloseTicket(ticket->GetId(), playerGuid);
 
     // remove from group
-    if (uint32 groupId = GetGroupIdFromStorage(guid))
+    if (uint32 groupId = GetGroupIdFromStorage(lowGuid))
         if (Group* group = sGroupMgr->GetGroupByGUID(groupId))
-            RemoveFromGroup(group, playerguid);
+            RemoveFromGroup(group, playerGuid);
 
     // Remove signs from petitions (also remove petitions if owner);
-    RemovePetitionsAndSigns(playerguid, 10);
+    RemovePetitionsAndSigns(playerGuid, 10);
 
     PreparedStatement* stmt = nullptr;
 
@@ -4860,7 +4855,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
                 SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_COD_ITEM_MAIL);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 PreparedQueryResult resultMail = CharacterDatabase.Query(stmt);
 
                 if (resultMail)
@@ -4924,7 +4919,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
                                     }
 
                                     Item* pItem = NewItemOrBag(itemProto);
-                                    if (!pItem->LoadFromDB(item_guidlow, playerguid, itemFields, item_template))
+                                    if (!pItem->LoadFromDB(item_guidlow, playerGuid, itemFields, item_template))
                                     {
                                         pItem->FSetState(ITEM_REMOVED);
                                         pItem->SaveToDB(trans);              // it also deletes item object!
@@ -4940,16 +4935,16 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
                         stmt->setUInt32(0, mail_id);
                         trans->Append(stmt);
 
-                        uint32 pl_account = sObjectMgr->GetPlayerAccountIdByGUID(playerGuid);
+                        uint32 pl_account = sObjectMgr->GetPlayerAccountIdByGUID(lowGuid);
 
-                        draft.AddMoney(money).SendReturnToSender(pl_account, guid, sender, trans);
+                        draft.AddMoney(money).SendReturnToSender(pl_account, lowGuid, sender, trans);
                     } while (resultMail->NextRow());
                 }
 
                 // Unsummon and delete for pets in world is not required: player deleted from CLI or character list with not loaded pet.
                 // NOW we can finally clear other DB data related to character
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PETS);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 PreparedQueryResult resultPets = CharacterDatabase.Query(stmt);
 
                 if (resultPets)
@@ -4963,172 +4958,172 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
 
                 // Delete char from social list of online chars
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_SOCIAL);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 PreparedQueryResult resultFriends = CharacterDatabase.Query(stmt);
 
                 if (resultFriends)
                 {
                     do
                     {
-                        if (Player* pFriend = ObjectAccessor::FindPlayerInOrOutOfWorld(ObjectGuid::Create<HighGuid::Player>((*resultFriends)[0].GetUInt32())))
+                        if (Player* pFriend = ObjectAccessor::FindPlayerByLowGUID((*resultFriends)[0].GetUInt32()))
                         {
-                            pFriend->GetSocial()->RemoveFromSocialList(guid, SOCIAL_FLAG_ALL);
-                            sSocialMgr->SendFriendStatus(pFriend, FRIEND_REMOVED, guid, false);
+                            pFriend->GetSocial()->RemoveFromSocialList(playerGuid, SOCIAL_FLAG_ALL);
+                            sSocialMgr->SendFriendStatus(pFriend, FRIEND_REMOVED, playerGuid, false);
                         }
                     } while (resultFriends->NextRow());
                 }
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_ACCOUNT_DATA);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_DECLINED_NAME);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACTION);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_GIFT);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_HOMEBIND);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_REPUTATION);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_COOLDOWN);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 if (sWorld->getBoolConfig(CONFIG_DELETE_CHARACTER_TICKET_TRACE))
                 {
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_GM_TICKETS_ON_CHAR_DELETION);
-                    stmt->setUInt32(0, guid);
+                    stmt->setUInt32(0, lowGuid);
                     trans->Append(stmt);
                 }
                 else
                 {
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_GM_TICKETS);
-                    stmt->setUInt32(0, guid);
+                    stmt->setUInt32(0, lowGuid);
                     trans->Append(stmt);
                 }
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE_BY_OWNER);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SOCIAL_BY_FRIEND);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SOCIAL_BY_GUID);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEMS);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_BY_OWNER);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_PET_DECLINEDNAME_BY_OWNER);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENTS);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENT_PROGRESS);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_EQUIPMENTSETS);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_EVENTLOG_BY_PLAYER);
-                stmt->setUInt32(0, guid);
-                stmt->setUInt32(1, guid);
+                stmt->setUInt32(0, lowGuid);
+                stmt->setUInt32(1, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_BANK_EVENTLOG_BY_PLAYER);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_ENTRY_POINT);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_GLYPHS);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_DAILY_CHAR);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_WEEKLY_CHAR);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_MONTHLY_CHAR);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_SEASONAL_CHAR);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_TALENT);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SKILLS);
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
                 trans->Append(stmt);
 
-                Corpse::DeleteFromDB(playerguid, trans);
+                Corpse::DeleteFromDB(playerGuid, trans);
 
                 CharacterDatabase.CommitTransaction(trans);
                 break;
@@ -5138,7 +5133,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_DELETE_INFO);
 
-                stmt->setUInt32(0, guid);
+                stmt->setUInt32(0, lowGuid);
 
                 CharacterDatabase.Execute(stmt);
                 break;
@@ -5382,7 +5377,7 @@ void Player::KillPlayer()
     //UpdateObjectVisibility(); // pussywizard: not needed
 }
 
-void Player::OfflineResurrect(ObjectGuid const& guid, SQLTransaction& trans)
+void Player::OfflineResurrect(ObjectGuid const guid, SQLTransaction& trans)
 {
     Corpse::DeleteFromDB(guid, trans);
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
@@ -7442,13 +7437,13 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             //  title[15..28] -> rank[5..18]
             //  title[other]  -> 0
             if (victim_title == 0)
-                victim_guid = 0;                        // Don't show HK: <rank> message, only log.
+                victim_guid.Clear();                        // Don't show HK: <rank> message, only log.
             else if (victim_title < 15)
                 victim_rank = victim_title + 4;
             else if (victim_title < 29)
                 victim_rank = victim_title - 14 + 4;
             else
-                victim_guid = 0;                        // Don't show HK: <rank> message, only log.
+                victim_guid.Clear();                        // Don't show HK: <rank> message, only log.
 
             honor_f = ceil(acore::Honor::hk_honor_at_level_f(k_level) * (v_level - k_grey) / (k_level - k_grey));
 
@@ -9271,7 +9266,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         loot = &item->loot;
 
         // Xinef: Store container id
-        loot->containerId = item->GetGUID();
+        loot->containerGUID = item->GetGUID();
 
         if (!item->m_lootGenerated && !sLootItemStorage->LoadStoredLoot(item))
         {
@@ -12717,9 +12712,9 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
             // save data
             std::ostringstream ss;
             AllowedLooterSet::const_iterator itr = allowedLooters.begin();
-            ss << *itr;
+            ss << (*itr).GetCounter();
             for (++itr; itr != allowedLooters.end(); ++itr)
-                ss << ' ' << *itr;
+                ss << ' ' << (*itr).GetCounter();
 
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEM_BOP_TRADE);
             stmt->setUInt32(0, pItem->GetGUID().GetCounter());
@@ -15255,7 +15250,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
                 break;
             }
         case GOSSIP_OPTION_OUTDOORPVP:
-            sOutdoorPvPMgr->HandleGossipOption(this, source, gossipListId);
+            sOutdoorPvPMgr->HandleGossipOption(this, source->ToCreature(), gossipListId);
             break;
         case GOSSIP_OPTION_SPIRITHEALER:
             if (isDead())
@@ -17208,7 +17203,7 @@ void Player::KilledMonster(CreatureTemplate const* cInfo, ObjectGuid guid)
 
     for (uint8 i = 0; i < MAX_KILL_CREDIT; ++i)
         if (cInfo->KillCredit[i])
-            KilledMonsterCredit(cInfo->KillCredit[i], 0);
+            KilledMonsterCredit(cInfo->KillCredit[i]);
 }
 
 void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid)
@@ -17790,7 +17785,7 @@ void Player::_LoadArenaTeamInfo()
     memset((void*)&m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1], 0, sizeof(uint32) * MAX_ARENA_SLOT * ARENA_TEAM_END);
 
     for (uint8 slot = 0; slot < MAX_ARENA_SLOT; ++slot)
-        if (uint32 arenaTeamId = Player::GetArenaTeamIdFromStorage(GetGUID(), slot))
+        if (uint32 arenaTeamId = Player::GetArenaTeamIdFromStorage(GetGUID().GetCounter(), slot))
         {
             ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
             if (!arenaTeam) // some shit, should be assert, but just ignore
@@ -17829,7 +17824,7 @@ void Player::_LoadEquipmentSets(PreparedQueryResult result)
         eqSet.state     = EQUIPMENT_SET_UNCHANGED;
 
         for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
-            eqSet.Items[i] = fields[5 + i].GetUInt32();
+            eqSet.Items[i] = ObjectGuid::Create<HighGuid::Item>(fields[5 + i].GetUInt32());
 
         m_EquipmentSets[index] = eqSet;
 
@@ -17968,7 +17963,9 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, SQLQueryHolder* holder)
         return false;
     }
 
-    Object::_Create(playerGuid.GetCounter(), 0, HighGuid::Player);
+    ObjectGuid::LowType guid = playerGuid.GetCounter();
+
+    Object::_Create(guid, 0, HighGuid::Player);
 
     m_name = fields[2].GetString();
 
@@ -17982,9 +17979,6 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, SQLQueryHolder* holder)
         CharacterDatabase.Execute(stmt);
         return false;
     }
-
-    // overwrite possible wrong/corrupted guid
-    SetGuidValue(OBJECT_FIELD_GUID, guid);
 
     uint8 Gender = fields[5].GetUInt8();
     if (!IsValidGender(Gender))
@@ -18061,7 +18055,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, SQLQueryHolder* holder)
     setFactionForRace(getRace(true));
 
     // pussywizard: create empty instance bind containers if necessary
-    sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(guid);
+    sInstanceSaveMgr->PlayerCreateBoundInstancesMaps(playerGuid);
 
     // load home bind and check in same time class/race pair, it used later for restore broken positions
     if (!_LoadHomeBind(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_HOME_BIND)))
@@ -18651,7 +18645,7 @@ bool Player::isAllowedToLoot(const Creature* creature)
         case ROUND_ROBIN:
             // may only loot if the player is the loot roundrobin player
             // or if there are free/quest/conditional item for the player
-            if (loot->roundRobinPlayer == 0 || loot->roundRobinPlayer == GetGUID())
+            if (!loot->roundRobinPlayer || loot->roundRobinPlayer == GetGUID())
                 return true;
 
             return loot->hasItemFor(this);
@@ -18660,7 +18654,7 @@ bool Player::isAllowedToLoot(const Creature* creature)
             // may only loot if the player is the loot roundrobin player
             // or item over threshold (so roll(s) can be launched)
             // or if there are free/quest/conditional item for the player
-            if (loot->roundRobinPlayer == 0 || loot->roundRobinPlayer == GetGUID())
+            if (!loot->roundRobinPlayer || loot->roundRobinPlayer == GetGUID())
                 return true;
 
             if (loot->hasOverThresholdItem())
@@ -18850,8 +18844,8 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
     {
         uint32 zoneId = GetZoneId(true);
 
-        std::map<uint32, Bag*> bagMap;                               // fast guid lookup for bags
-        std::map<ObjectGuid::LowType, Item*> invalidBagMap;          // fast guid lookup for bags
+        std::map<ObjectGuid::LowType, Bag*> bagMap;                 // fast guid lookup for bags
+        std::map<ObjectGuid::LowType, Item*> invalidBagMap;         // fast guid lookup for bags
         std::list<Item*> problematicItems;
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -18899,17 +18893,17 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
                     {
                         if (IsBagPos(item->GetPos()))
                             if (Bag* pBag = item->ToBag())
-                                bagMap[item->GetGUID()] = pBag;
+                                bagMap[item->GetGUID().GetCounter()] = pBag;
                     }
                     else if (IsBagPos(item->GetPos()))
                         if (item->IsBag())
-                            invalidBagMap[item->GetGUID()] = item;
+                            invalidBagMap[item->GetGUID().GetCounter()] = item;
                 }
                 else
                 {
                     item->SetSlot(NULL_SLOT);
                     // Item is in the bag, find the bag
-                    std::map<uint32, Bag*>::iterator itr = bagMap.find(bagGuid);
+                    std::map<ObjectGuid::LowType, Bag*>::iterator itr = bagMap.find(bagGuid);
                     if (itr != bagMap.end())
                     {
                         ItemPosCountVec dest;
@@ -18919,7 +18913,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
                     }
                     else if (invalidBagMap.find(bagGuid) != invalidBagMap.end())
                     {
-                        std::map<uint32, Item*>::iterator itr = invalidBagMap.find(bagGuid);
+                        std::map<ObjectGuid::LowType, Item*>::iterator itr = invalidBagMap.find(bagGuid);
                         if (std::find(problematicItems.begin(), problematicItems.end(), itr->second) != problematicItems.end())
                             err = EQUIP_ERR_INT_BAG_ERROR;
                     }
@@ -19045,7 +19039,7 @@ Item* Player::_LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, F
                     Tokenizer GUIDlist(strGUID, ' ');
                     AllowedLooterSet looters;
                     for (Tokenizer::const_iterator itr = GUIDlist.begin(); itr != GUIDlist.end(); ++itr)
-                        looters.insert(atol(*itr));
+                        looters.insert(ObjectGuid::Create<HighGuid::Player>(atol(*itr)));
 
                     if (looters.size() > 1 && item->GetTemplate()->GetMaxStackSize() == 1 && item->IsSoulBound())
                     {
@@ -19167,7 +19161,7 @@ void Player::_LoadMailInit(PreparedQueryResult resultMailCount, PreparedQueryRes
     if (resultMailCount)
     {
         totalMailCount = uint32((*resultMailCount)[0].GetUInt32());
-        sWorld->UpdateGlobalPlayerMails(GetGUID(), totalMailCount, false);
+        sWorld->UpdateGlobalPlayerMails(GetGUID().GetCounter(), totalMailCount, false);
     }
 
     //set a count of unread mails
@@ -20726,7 +20720,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
     {
         case INSTANCE_RESET_ALL:
             {
-                Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+                Player* p = ObjectAccessor::FindConnectedPlayer(guid);
                 if (!p || p->GetDifficulty(false) != DUNGEON_DIFFICULTY_NORMAL)
                     break;
                 std::vector<InstanceSave*> toUnbind;
@@ -20753,7 +20747,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
             break;
         case INSTANCE_RESET_CHANGE_DIFFICULTY:
             {
-                Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+                Player* p = ObjectAccessor::FindConnectedPlayer(guid);
                 if (!p)
                     break;
                 std::vector<InstanceSave*> toUnbind;
@@ -20780,7 +20774,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
             break;
         case INSTANCE_RESET_GROUP_JOIN:
             {
-                Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+                Player* p = ObjectAccessor::FindConnectedPlayer(guid);
                 if (!p)
                     break;
                 for (uint8 d = 0; d < MAX_DIFFICULTY; ++d)
@@ -20808,7 +20802,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
             break;
         case INSTANCE_RESET_GROUP_LEAVE:
             {
-                Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+                Player* p = ObjectAccessor::FindConnectedPlayer(guid);
                 for (uint8 d = 0; d < MAX_DIFFICULTY; ++d)
                 {
                     std::vector<InstanceSave*> toUnbind;
@@ -21111,7 +21105,7 @@ void Player::Whisper(const std::string& text, uint32 language, ObjectGuid receiv
     if (!isAddonMessage)                                    // if not addon data
         language = LANG_UNIVERSAL;                          // whispers should always be readable
 
-    Player* rPlayer = ObjectAccessor::GetObjectInOrOutOfWorld(receiver, (Player*)nullptr);
+    Player* rPlayer = ObjectAccessor::FindConnectedPlayer(receiver);
 
     std::string _text(text);
     sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, language, _text, rPlayer);
@@ -21639,7 +21633,7 @@ void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
     SignatureContainer* signatureStore = sPetitionMgr->GetSignatureStore();
     for (SignatureContainer::iterator itr = signatureStore->begin(); itr != signatureStore->end(); ++itr)
     {
-        SignatureMap::iterator signItr = itr->second.signatureMap.find(playerGuid);
+        SignatureMap::iterator signItr = itr->second.signatureMap.find(guid);
         if (signItr != itr->second.signatureMap.end())
         {
             Petition const* petition = sPetitionMgr->GetPetition(itr->first);
@@ -21650,9 +21644,9 @@ void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
             itr->second.signatureMap.erase(signItr);
 
             // send update if charter owner in game
-            Player* owner = ObjectAccessor::FindPlayerInOrOutOfWorld(ownerguid);
+            Player* owner = ObjectAccessor::FindConnectedPlayer(petition->ownerGuid);
             if (owner)
-                owner->GetSession()->SendPetitionQueryOpcode(petitionguid);
+                owner->GetSession()->SendPetitionQueryOpcode(petition->petitionGuid);
         }
     }
 
@@ -21665,7 +21659,7 @@ void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
     else
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_SIGNATURE);
-        stmt->setUInt32(0, playerGuid);
+        stmt->setUInt32(0, guid.GetCounter());
         stmt->setUInt8(1, uint8(type));
         CharacterDatabase.Execute(stmt);
     }
@@ -21674,30 +21668,30 @@ void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
     if (type == 10)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_OWNER);
-        stmt->setUInt32(0, playerGuid);
+        stmt->setUInt32(0, guid.GetCounter());
         trans->Append(stmt);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_SIGNATURE_BY_OWNER);
-        stmt->setUInt32(0, playerGuid);
+        stmt->setUInt32(0, guid.GetCounter());
         trans->Append(stmt);
 
         // xinef: clear petition store
-        sPetitionMgr->RemovePetitionByOwnerAndType(playerGuid, 0);
+        sPetitionMgr->RemovePetitionByOwnerAndType(guid, 0);
     }
     else
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_BY_OWNER_AND_TYPE);
-        stmt->setUInt32(0, playerGuid);
+        stmt->setUInt32(0, guid.GetCounter());
         stmt->setUInt8(1, uint8(type));
         trans->Append(stmt);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PETITION_SIGNATURE_BY_OWNER_AND_TYPE);
-        stmt->setUInt32(0, playerGuid);
+        stmt->setUInt32(0, guid.GetCounter());
         stmt->setUInt8(1, uint8(type));
         trans->Append(stmt);
 
         // xinef: clear petition store
-        sPetitionMgr->RemovePetitionByOwnerAndType(playerGuid, uint8(type));
+        sPetitionMgr->RemovePetitionByOwnerAndType(guid, uint8(type));
     }
     CharacterDatabase.CommitTransaction(trans);
 }
@@ -23036,13 +23030,13 @@ bool Player::IsVisibleGloballyFor(Player const* u) const
 }
 
 template<class T>
-inline void UpdateVisibilityOf_helper(Player::ClientGUIDs& s64, T* target, std::vector<Unit*>& /*v*/)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, T* target, std::vector<Unit*>& /*v*/)
 {
     s64.insert(target->GetGUID());
 }
 
 template<>
-inline void UpdateVisibilityOf_helper(Player::ClientGUIDs& s64, GameObject* target, std::vector<Unit*>& /*v*/)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, GameObject* target, std::vector<Unit*>& /*v*/)
 {
     // @HACK: This is to prevent objects like deeprun tram from disappearing when player moves far from its spawn point while riding it
     if ((target->GetGOInfo()->type != GAMEOBJECT_TYPE_TRANSPORT))
@@ -23050,14 +23044,14 @@ inline void UpdateVisibilityOf_helper(Player::ClientGUIDs& s64, GameObject* targ
 }
 
 template<>
-inline void UpdateVisibilityOf_helper(Player::ClientGUIDs& s64, Creature* target, std::vector<Unit*>& v)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Creature* target, std::vector<Unit*>& v)
 {
     s64.insert(target->GetGUID());
     v.push_back(target);
 }
 
 template<>
-inline void UpdateVisibilityOf_helper(Player::ClientGUIDs& s64, Player* target, std::vector<Unit*>& v)
+inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Player* target, std::vector<Unit*>& v)
 {
     s64.insert(target->GetGUID());
     v.push_back(target);
@@ -23113,9 +23107,9 @@ void Player::UpdateTriggerVisibility()
 
     UpdateData udata;
     WorldPacket packet;
-    for (ClientGUIDs::iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
+    for (GuidUnorderedSet::iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
     {
-        if ((*itr).IsVehicleOrCreature())
+        if ((*itr).IsCreatureOrVehicle())
         {
             Creature* creature = GetMap()->GetCreature(*itr);
             // Update fields of triggers, transformed units or unselectable units (values dependent on GM state)
@@ -23332,7 +23326,7 @@ void Player::ClearComboPoints()
     if (Unit* target = ObjectAccessor::GetUnit(*this, m_comboTarget))
         target->RemoveComboPointHolder(GetGUID());
 
-    m_comboTarget = 0;
+    m_comboTarget.Clear();
 }
 
 void Player::SetGroup(Group* group, int8 subgroup)
@@ -23980,7 +23974,7 @@ void Player::UpdateForQuestWorldObjects()
 
     UpdateData udata;
     WorldPacket packet;
-    for (ClientGUIDs::iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
+    for (GuidUnorderedSet::iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
     {
         if ((*itr).IsGameObject())
         {
@@ -25494,8 +25488,8 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         UpdateLootAchievements(item, loot);
 
         // LootItem is being removed (looted) from the container, delete it from the DB.
-        if (loot->containerId > 0)
-            sLootItemStorage->RemoveStoredLootItem(loot->containerId, item->itemid, item->count, loot);
+        if (loot->containerGUID)
+            sLootItemStorage->RemoveStoredLootItem(loot->containerGUID, item->itemid, item->count, loot);
 
 #ifdef ELUNA
         sEluna->OnLootItem(this, newitem, item->count, this->GetLootGUID());
@@ -26424,7 +26418,7 @@ void Player::_SaveEquipmentSets(SQLTransaction& trans)
                 stmt->setString(j++, eqset.IconName.c_str());
                 stmt->setUInt32(j++, eqset.IgnoreMask);
                 for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i)
-                    stmt->setUInt32(j++, eqset.Items[i]);
+                    stmt->setUInt32(j++, eqset.Items[i].GetCounter());
                 stmt->setUInt32(j++, GetGUID().GetCounter());
                 stmt->setUInt64(j++, eqset.Guid);
                 stmt->setUInt32(j, index);
@@ -26441,7 +26435,7 @@ void Player::_SaveEquipmentSets(SQLTransaction& trans)
                 stmt->setString(j++, eqset.IconName.c_str());
                 stmt->setUInt32(j++, eqset.IgnoreMask);
                 for (uint8 i = 0; i < EQUIPMENT_SLOT_END; ++i)
-                    stmt->setUInt32(j++, eqset.Items[i]);
+                    stmt->setUInt32(j++, eqset.Items[i].GetCounter());
                 trans->Append(stmt);
                 eqset.state = EQUIPMENT_SET_UNCHANGED;
                 ++itr;
@@ -27352,14 +27346,14 @@ void Player::PrepareCharmAISpells()
     }
 }
 
-void Player::AddRefundReference(uint32 it)
+void Player::AddRefundReference(ObjectGuid itemGUID)
 {
-    m_refundableItems.insert(it);
+    m_refundableItems.insert(itemGUID);
 }
 
-void Player::DeleteRefundReference(uint32 it)
+void Player::DeleteRefundReference(ObjectGuid itemGUID)
 {
-    RefundableItemsSet::iterator itr = m_refundableItems.find(it);
+    RefundableItemsSet::iterator itr = m_refundableItems.find(itemGUID);
     if (itr != m_refundableItems.end())
         m_refundableItems.erase(itr);
 }

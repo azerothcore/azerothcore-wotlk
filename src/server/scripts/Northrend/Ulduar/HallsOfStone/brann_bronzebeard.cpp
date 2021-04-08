@@ -224,7 +224,6 @@ public:
     {
         brann_bronzebeardAI(Creature* c) : npc_escortAI(c), summons(me)
         {
-            AbedneumGUID = MarnakGUID = KaddrakGUID.Clear();
             pInstance = c->GetInstanceScript();
         }
 
@@ -322,7 +321,7 @@ public:
             switch (action)
             {
                 case ACTION_START_EVENT:
-                    Start(false, true, 0, 0, true, false);
+                    Start(false, true, ObjectGuid::Empty, 0, true, false);
                     break;
                 case ACTION_START_TRIBUNAL:
                     {
@@ -363,7 +362,7 @@ public:
                     Reset();
                     break;
                 case ACTION_WIPE_START:
-                    Start(false, true, 0, 0, true, false);
+                    Start(false, true, ObjectGuid::Empty, 0, true, false);
                     SetNextWaypoint(20, false);
                     ResetEvent();
                     me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);

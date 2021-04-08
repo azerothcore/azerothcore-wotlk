@@ -42,7 +42,7 @@ namespace lfg
         {
             player->GetSession()->SendLfgLfrList(false);
             sLFGMgr->LeaveLfg(player->GetGUID());
-            sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), true, player->GetGroup() ? player->GetGroup()->GetGUID() : 0);
+            sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), true, player->GetGroup() ? player->GetGroup()->GetGUID() : ObjectGuid::Empty);
 
             // pussywizard: after all necessary actions handle raid browser
             // pussywizard: already done above
@@ -198,14 +198,14 @@ namespace lfg
         if (state == LFG_STATE_PROPOSAL && method == GROUP_REMOVEMETHOD_DEFAULT)
         {
             // LfgData: Remove player from group
-            sLFGMgr->SetGroup(guid, 0);
+            sLFGMgr->SetGroup(guid, ObjectGuid::Empty);
             sLFGMgr->RemovePlayerFromGroup(gguid, guid);
             return;
         }
 
         sLFGMgr->LeaveLfg(guid);
         sLFGMgr->LeaveAllLfgQueues(guid, true, gguid);
-        sLFGMgr->SetGroup(guid, 0);
+        sLFGMgr->SetGroup(guid, ObjectGuid::Empty);
         uint8 players = sLFGMgr->RemovePlayerFromGroup(gguid, guid);
 
         // pussywizard: after all necessary actions handle raid browser
@@ -217,7 +217,7 @@ namespace lfg
         if (!isLFG)
             return;
 
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
         {
             // xinef: fixed dungeon deserter
             if (method != GROUP_REMOVEMETHOD_KICK_LFG && state != LFG_STATE_FINISHED_DUNGEON &&
@@ -238,7 +238,7 @@ namespace lfg
         }
 
         if (state != LFG_STATE_FINISHED_DUNGEON) // Need more players to finish the dungeon
-            if (Player* leader = ObjectAccessor::FindPlayerInOrOutOfWorld(sLFGMgr->GetLeader(gguid)))
+            if (Player* leader = ObjectAccessor::FindConnectedPlayer(sLFGMgr->GetLeader(gguid)))
                 leader->GetSession()->SendLfgOfferContinue(sLFGMgr->GetDungeon(gguid, false));
     }
 

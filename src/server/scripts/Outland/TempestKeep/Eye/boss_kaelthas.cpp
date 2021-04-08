@@ -486,19 +486,19 @@ public:
                     events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
                     break;
                 case EVENT_SCENE_1:
-                    me->SetTarget(0);
+                    me->SetTarget();
                     me->SetFacingTo(M_PI);
                     me->SetWalk(true);
                     Talk(SAY_PHASE5_NUTS);
                     break;
                 case EVENT_SCENE_2:
-                    me->SetTarget(0);
+                    me->SetTarget();
                     me->CastSpell(me, SPELL_KAEL_EXPLODES1, true);
                     me->CastSpell(me, SPELL_KAEL_GAINING_POWER, false);
                     me->SetDisableGravity(true);
                     break;
                 case EVENT_SCENE_3:
-                    me->SetTarget(0);
+                    me->SetTarget();
                     for (uint8 i = 0; i < 2; ++i)
                         if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, triggersPos[i], TEMPSUMMON_TIMED_DESPAWN, 60000))
                             trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
@@ -506,7 +506,7 @@ public:
                     me->CastSpell(me, SPELL_GROW, true);
                     break;
                 case EVENT_SCENE_4:
-                    me->SetTarget(0);
+                    me->SetTarget();
                     me->CastSpell(me, SPELL_GROW, true);
                     me->CastSpell(me, SPELL_KAEL_EXPLODES2, true);
                     me->CastSpell(me, SPELL_NETHERBEAM_AURA1, true);
@@ -515,7 +515,7 @@ public:
                             trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
                     break;
                 case EVENT_SCENE_5:
-                    me->SetTarget(0);
+                    me->SetTarget();
                     me->CastSpell(me, SPELL_GROW, true);
                     me->CastSpell(me, SPELL_KAEL_EXPLODES3, true);
                     me->CastSpell(me, SPELL_NETHERBEAM_AURA2, true);
@@ -676,7 +676,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_NETHER_VAPOR, 0);
                     me->CastSpell(me, SPELL_SHOCK_BARRIER, false);
                     me->CastSpell(me, SPELL_GRAVITY_LAPSE, false);
-                    me->SetTarget(0);
+                    me->SetTarget();
                     me->GetMotionMaster()->Clear();
                     me->StopMoving();
                     Talk(SAY_GRAVITYLAPSE);

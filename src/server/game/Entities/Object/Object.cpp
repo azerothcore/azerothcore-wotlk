@@ -2198,26 +2198,26 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     switch (mask)
     {
         case UNIT_MASK_SUMMON:
-            summon = new TempSummon(properties, summoner ? summoner->GetGUID() : 0, false);
+            summon = new TempSummon(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty, false);
             break;
         case UNIT_MASK_GUARDIAN:
-            summon = new Guardian(properties, summoner ? summoner->GetGUID() : 0, false);
+            summon = new Guardian(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty, false);
             break;
         case UNIT_MASK_PUPPET:
-            summon = new Puppet(properties, summoner ? summoner->GetGUID() : 0);
+            summon = new Puppet(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty);
             break;
         case UNIT_MASK_TOTEM:
-            summon = new Totem(properties, summoner ? summoner->GetGUID() : 0);
+            summon = new Totem(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty);
             break;
         case UNIT_MASK_MINION:
-            summon = new Minion(properties, summoner ? summoner->GetGUID() : 0, false);
+            summon = new Minion(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty, false);
             break;
         default:
             return nullptr;
     }
 
     EnsureGridLoaded(Cell(pos.GetPositionX(), pos.GetPositionY()));
-    if (!summon->Create(map->GenerateLowGuid<HighGuid::Unit>(), this, phase, entry, vehId, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()))
+    if (!summon->Create(GenerateLowGuid<HighGuid::Unit>(), this, phase, entry, vehId, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()))
     {
         delete summon;
         return nullptr;
@@ -2265,7 +2265,7 @@ GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float
     }
 
     GameObject* go = sObjectMgr->IsGameObjectStaticTransport(entry) ? new StaticTransport() : new GameObject();
-    if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, this, PHASEMASK_NORMAL, x, y, z, ang, G3D::Quat(rotation0, rotation1, rotation2, rotation3), 100, GO_STATE_READY))
+    if (!go->Create(GenerateLowGuid<HighGuid::GameObject>(), entry, this, PHASEMASK_NORMAL, x, y, z, ang, G3D::Quat(rotation0, rotation1, rotation2, rotation3), 100, GO_STATE_READY))
     {
         delete go;
         return nullptr;
@@ -2938,7 +2938,7 @@ struct WorldObjectChangeAccumulator
             source = iter->GetSource();
             ObjectGuid guid = source->GetCasterGUID();
 
-            if (guid))
+            if (guid)
             {
                 //Caster may be nullptr if DynObj is in removelist
                 if (Player* caster = ObjectAccessor::FindPlayer(guid))

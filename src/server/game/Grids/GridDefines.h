@@ -18,6 +18,7 @@ class DynamicObject;
 class GameObject;
 class Pet;
 class Player;
+class ObjectGuid;
 
 #define MAX_NUMBER_OF_CELLS     8
 

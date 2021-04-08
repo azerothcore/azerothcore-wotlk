@@ -28,7 +28,7 @@ namespace acore
     struct VisibleNotifier
     {
         Player& i_player;
-        Player::ClientGUIDs vis_guids;
+        GuidUnorderedSet vis_guids;
         std::vector<Unit*>& i_visibleNow;
         bool i_gobjOnly;
         bool i_largeOnly;

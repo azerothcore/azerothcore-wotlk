@@ -83,7 +83,7 @@ public:
 
         // Get target information
         ObjectGuid targetGuid = sObjectMgr->GetPlayerGUIDByName(target.c_str());
-        uint64 targetAccountId = sObjectMgr->GetPlayerAccountIdByGUID(targetGuid);
+        uint32 targetAccountId = sObjectMgr->GetPlayerAccountIdByGUID(targetGuid.GetCounter());
         uint32 targetGmLevel = AccountMgr::GetSecurity(targetAccountId, realmID);
 
         // Target must exist and have administrative rights
@@ -142,7 +142,7 @@ public:
             return true;
         }
 
-        sTicketMgr->ResolveAndCloseTicket(ticket->GetId(), player ? player->GetGUID() : -1);
+        sTicketMgr->ResolveAndCloseTicket(ticket->GetId(), player ? player->GetGUID() : ObjectGuid::Empty);
         sTicketMgr->UpdateLastChange();
 
         std::string msg = ticket->FormatMessageString(*handler, player ? player->GetName().c_str() : "Console", nullptr, nullptr, nullptr);
@@ -244,7 +244,7 @@ public:
 
         SQLTransaction trans = SQLTransaction(nullptr);
         ticket->SetCompleted();
-        ticket->SetResolvedBy(gm ? gm->GetGUID() : -1);
+        ticket->SetResolvedBy(gm ? gm->GetGUID() : ObjectGuid::Empty);
         ticket->SaveToDB(trans);
 
         std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
@@ -381,7 +381,7 @@ public:
         else
         {
             ObjectGuid guid = ticket->GetAssignedToGUID();
-            uint32 accountId = sObjectMgr->GetPlayerAccountIdByGUID(guid);
+            uint32 accountId = sObjectMgr->GetPlayerAccountIdByGUID(guid.GetCounter());
             security = AccountMgr::GetSecurity(accountId, realmID);
         }
 

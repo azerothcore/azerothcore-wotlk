@@ -558,7 +558,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
             if (GetStatus() == STATUS_IN_PROGRESS)
             {
                 for (ToBeTeleportedMap::const_iterator itr = m_ToBeTeleported.begin(); itr != m_ToBeTeleported.end(); ++itr)
-                    if (Player* p = ObjectAccessor::GetObjectInOrOutOfWorld(itr->first, (Player*)nullptr))
+                    if (Player* p = ObjectAccessor::FindConnectedPlayer(itr->first))
                         if (Player* t = ObjectAccessor::FindPlayer(itr->second))
                         {
                             if (!t->FindMap() || t->FindMap() != GetBgMap())

@@ -215,7 +215,7 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
         {
             ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>((*result)[0].GetUInt32());
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDetail("Loading char guid %u from account %u.", guidlow, GetAccountId());
+            sLog->outDetail("Loading char %s from account %u.", guid.ToString().c_str(), GetAccountId());
 #endif
             if (Player::BuildEnumData(result, &data))
             {
@@ -668,7 +668,7 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
 #endif
                 sLog->outChar("Account: %d (IP: %s) Create Character:[%s] (%s)", GetAccountId(), IP_str.c_str(), createInfo->Name.c_str(), newChar.GetGUID().ToString().c_str());
                 sScriptMgr->OnPlayerCreate(&newChar);
-                sWorld->AddGlobalPlayerData(newChar.GetGUID(), GetAccountId(), newChar.GetName(), newChar.getGender(), newChar.getRace(), newChar.getClass(), newChar.getLevel(), 0, 0);
+                sWorld->AddGlobalPlayerData(newChar.GetGUID().GetCounter(), GetAccountId(), newChar.GetName(), newChar.getGender(), newChar.getRace(), newChar.getClass(), newChar.getLevel(), 0, 0);
 
                 newChar.CleanupsBeforeDelete();
                 delete createInfo;
@@ -687,7 +687,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     uint32 initAccountId = GetAccountId();
 
     // can't delete loaded character
-    if (ObjectAccessor::FindPlayerInOrOutOfWorld(guid) || sWorld->FindOfflineSessionForCharacterGUID(guid))
+    if (ObjectAccessor::FindConnectedPlayer(guid) || sWorld->FindOfflineSessionForCharacterGUID(guid.GetCounter()))
     {
         sScriptMgr->OnPlayerFailedDelete(guid, initAccountId);
         WorldPacket data(SMSG_CHAR_DELETE, 1);
@@ -719,7 +719,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid))
+    if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid.GetCounter()))
     {
         accountId     = playerData->accountId;
         name          = playerData->name;
@@ -745,14 +745,14 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     if (sLog->IsOutCharDump())                                // optimize GetPlayerDump call
     {
         std::string dump;
-        if (PlayerDumpWriter().GetDump(guid, dump))
-            sLog->outCharDump(dump.c_str(), GetAccountId(), guid, name.c_str());
+        if (PlayerDumpWriter().GetDump(guid.GetCounter(), dump))
+            sLog->outCharDump(dump.c_str(), GetAccountId(), guid.GetCounter(), name.c_str());
     }
 
     sCalendarMgr->RemoveAllPlayerEventsAndInvites(guid);
-    Player::DeleteFromDB(guid, GetAccountId(), true, false);
+    Player::DeleteFromDB(guid.GetCounter(), GetAccountId(), true, false);
 
-    sWorld->DeleteGlobalPlayerData(guid, name);
+    sWorld->DeleteGlobalPlayerData(guid.GetCounter(), name);
     WorldPacket data(SMSG_CHAR_DELETE, 1);
     data << (uint8)CHAR_DELETE_SUCCESS;
     SendPacket(&data);
@@ -770,7 +770,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
     ObjectGuid playerGuid;
     recvData >> playerGuid;
 
-    if (!IsLegitCharacterForAccount(playerGuid))
+    if (!playerGuid.IsPlayer() || !IsLegitCharacterForAccount(playerGuid))
     {
         sLog->outError("Account (%u) can't login with that character (%s).", GetAccountId(), playerGuid.ToString().c_str());
         KickPlayer("Account can't login with this character");
@@ -778,7 +778,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
     }
 
     // pussywizard:
-    if (WorldSession* sess = sWorld->FindOfflineSessionForCharacterGUID(playerGuid))
+    if (WorldSession* sess = sWorld->FindOfflineSessionForCharacterGUID(playerGuid.GetCounter()))
         if (sess->GetAccountId() != GetAccountId())
         {
             WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
@@ -928,7 +928,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
 #endif
     }
 
-    if (uint32 guildId = Player::GetGuildIdFromStorage(pCurrChar->GetGUID()))
+    if (uint32 guildId = Player::GetGuildIdFromStorage(pCurrChar->GetGUID().GetCounter()))
     {
         Guild* guild = sGuildMgr->GetGuildById(guildId);
         Guild::Member const* member = guild ? guild->GetMember(pCurrChar->GetGUID()) : nullptr;
@@ -990,11 +990,6 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
     }
 
     //sLog->outDebug("Player %s added to Map.", pCurrChar->GetName().c_str());
-
-    // pussywizard: optimization
-    std::string charName = pCurrChar->GetName();
-    std::transform(charName.begin(), charName.end(), charName.begin(), ::tolower);
-    ObjectAccessor::playerNameToPlayerPointer[charName] = pCurrChar;
 
     pCurrChar->SendInitialPacketsAfterAddToMap();
 
@@ -1499,7 +1494,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(PreparedQueryResult resu
     ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(guidLow);
 
     // pussywizard:
-    if (ObjectAccessor::FindPlayerInOrOutOfWorld(guid) || sWorld->FindOfflineSessionForCharacterGUID(guidLow))
+    if (ObjectAccessor::FindConnectedPlayer(guid) || sWorld->FindOfflineSessionForCharacterGUID(guidLow))
     {
         WorldPacket data(SMSG_CHAR_RENAME, 1);
         data << uint8(CHAR_CREATE_ERROR);
@@ -1551,7 +1546,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
 
     // not accept declined names for unsupported languages
     std::string name;
-    if (!sObjectMgr->GetPlayerNameByGUID(guid, name))
+    if (!sObjectMgr->GetPlayerNameByGUID(guid.GetCounter(), name))
     {
         WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4 + 8);
         data << uint32(1);
@@ -1754,7 +1749,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
     }
 
     // pussywizard:
-    if (ObjectAccessor::FindPlayerInOrOutOfWorld(guid) || sWorld->FindOfflineSessionForCharacterGUID(guid))
+    if (ObjectAccessor::FindConnectedPlayer(guid) || sWorld->FindOfflineSessionForCharacterGUID(guid.GetCounter()))
     {
         recvData.rfinish();
         WorldPacket data(SMSG_CHAR_CUSTOMIZE, 1);
@@ -1771,7 +1766,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
     // xinef: zomg! sync query
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_AT_LOGIN);
 
-    stmt->setUInt32(0, guid);
+    stmt->setUInt32(0, guid.GetCounter());
 
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
@@ -1784,7 +1779,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
     }
 
     // get the players old (at this moment current) race
-    GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid);
+    GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid.GetCounter());
     if (!playerData)
     {
         WorldPacket data(SMSG_CHAR_CUSTOMIZE, 1);
@@ -1843,7 +1838,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
         }
     }
 
-    sLog->outChar("Account: %d (IP: %s), Character [%s] (%s) Customized to: %s"
+    sLog->outChar("Account: %d (IP: %s), Character [%s] (%s) Customized to: %s",
         GetAccountId(), GetRemoteAddress().c_str(), playerData->name.c_str(), guid.ToString().c_str(), newName.c_str());
 
     Player::Customize(guid, gender, skin, face, hairStyle, hairColor, facialHair);
@@ -1866,8 +1861,8 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
     }
 
     // xinef: update global data
-    sWorld->UpdateGlobalNameData(guid, playerData->name, newName);
-    sWorld->UpdateGlobalPlayerData(guid, PLAYER_UPDATE_DATA_NAME | PLAYER_UPDATE_DATA_GENDER, newName, 0, gender);
+    sWorld->UpdateGlobalNameData(guid.GetCounter(), playerData->name, newName);
+    sWorld->UpdateGlobalPlayerData(guid.GetCounter(), PLAYER_UPDATE_DATA_NAME | PLAYER_UPDATE_DATA_GENDER, newName, 0, gender);
 
     WorldPacket data(SMSG_CHAR_CUSTOMIZE, 1 + 8 + (newName.size() + 1) + 6);
     data << uint8(RESPONSE_SUCCESS);
@@ -1917,7 +1912,7 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
         // xinef: if client sends 0, it means empty slot
         if (!itemGuid)
         {
-            eqSet.Items[i] = 0;
+            eqSet.Items[i].Clear();
             continue;
         }
 
@@ -1982,7 +1977,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
             continue;
 
         Item* item = nullptr;
-        if (itemGuid > 0)
+        if (itemGuid)
             item = _player->GetItemByGuid(itemGuid);
 
         uint16 dstpos = i | (INVENTORY_SLOT_BAG_0 << 8);
@@ -2060,7 +2055,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
     }
 
     // pussywizard:
-    if (ObjectAccessor::FindPlayerInOrOutOfWorld(guid) || sWorld->FindOfflineSessionForCharacterGUID(guid))
+    if (ObjectAccessor::FindConnectedPlayer(guid) || sWorld->FindOfflineSessionForCharacterGUID(guid.GetCounter()))
     {
         recvData.rfinish();
         WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1);
@@ -2071,6 +2066,8 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
 
     recvData >> newname;
     recvData >> gender >> skin >> hairColor >> hairStyle >> facialHair >> face >> race;
+
+    ObjectGuid::LowType lowGuid = guid.GetCounter();
 
     // get the players old (at this moment current) race
     GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(lowGuid);
@@ -2122,7 +2119,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
             for (; itr != _end; ++itr)
             {
                 AuctionEntry* Aentry = itr->second;
-                if (Aentry && (Aentry->owner == lowGuid || Aentry->bidder == lowGuid))
+                if (Aentry && (Aentry->owner == guid || Aentry->bidder == guid))
                 {
                     has_auctions = true;
                     break;
@@ -2446,7 +2443,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
                 stmt->setFloat (3, -8867.68f);
                 stmt->setFloat (4, 673.373f);
                 stmt->setFloat (5, 97.9034f);
-                Player::SavePositionInDB(0, -8867.68f, 673.373f, 97.9034f, 0.0f, 1519, lowGuid);
+                Player::SavePositionInDB(0, -8867.68f, 673.373f, 97.9034f, 0.0f, 1519, guid);
             }
             else
             {
@@ -2455,7 +2452,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
                 stmt->setFloat (3, 1633.33f);
                 stmt->setFloat (4, -4439.11f);
                 stmt->setFloat (5, 15.7588f);
-                Player::SavePositionInDB(1, 1633.33f, -4439.11f, 15.7588f, 0.0f, 1637, lowGuid);
+                Player::SavePositionInDB(1, 1633.33f, -4439.11f, 15.7588f, 0.0f, 1637, guid);
             }
             trans->Append(stmt);
 
@@ -2490,7 +2487,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INVENTORY_FACTION_CHANGE);
                 stmt->setUInt32(0, new_entry);
                 stmt->setUInt32(1, old_entry);
-                stmt->setUInt32(2, guid);
+                stmt->setUInt32(2, guid.GetCounter());
                 trans->Append(stmt);
             }
 

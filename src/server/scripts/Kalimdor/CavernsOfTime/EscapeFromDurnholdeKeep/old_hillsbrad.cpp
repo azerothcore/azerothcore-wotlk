@@ -700,7 +700,7 @@ public:
                         if (!players.isEmpty())
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                                 if (Player* player = itr->GetSource())
-                                    player->KilledMonsterCredit(20156, 0);
+                                    player->KilledMonsterCredit(20156);
 
                         me->SetFacingTo(5.76f);
                         break;

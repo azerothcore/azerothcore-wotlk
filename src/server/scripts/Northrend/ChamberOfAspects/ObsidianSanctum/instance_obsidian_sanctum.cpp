@@ -20,13 +20,7 @@ public:
 
     struct instance_obsidian_sanctum_InstanceMapScript : public InstanceScript
     {
-        instance_obsidian_sanctum_InstanceMapScript(Map* pMap) : InstanceScript(pMap),
-            m_uiSartharionGUID(0),
-            m_uiTenebronGUID(0),
-            m_uiShadronGUID(0),
-            m_uiVesperonGUID(0),
-            m_uiPortalGUID(0),
-            portalCount(0)
+        instance_obsidian_sanctum_InstanceMapScript(Map* pMap) : InstanceScript(pMap), portalCount(0)
         {
             SetBossNumber(MAX_ENCOUNTERS);
         }

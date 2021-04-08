@@ -62,7 +62,7 @@ void OPvPCapturePoint::AddGO(uint32 type, ObjectGuid::LowType guid, uint32 entry
             return;
         entry = data->id;
     }
-    m_Objects[type] = ObjectGuid::Create<HighGuid::GameObject>(entry, guid);
+    m_Objects[type] = guid;
     m_ObjectTypes[m_Objects[type]] = type;
 }
 
@@ -75,7 +75,7 @@ void OPvPCapturePoint::AddCre(uint32 type, ObjectGuid::LowType guid, uint32 entr
             return;
         entry = data->id;
     }
-    m_Creatures[type] = ObjectGuid::Create<HighGuid::Unit>(entry, guid);
+    m_Creatures[type] = guid;
     m_CreatureTypes[m_Creatures[type]] = type;
 }
 
@@ -544,7 +544,7 @@ bool OutdoorPvP::HandleDropFlag(Player* player, uint32 id)
     return false;
 }
 
-bool OPvPCapturePoint::HandleGossipOption(Player* /*player*/, Creature /*creature*/, uint32 /*id*/)
+bool OPvPCapturePoint::HandleGossipOption(Player* /*player*/, Creature* /*creature*/, uint32 /*id*/)
 {
     return false;
 }

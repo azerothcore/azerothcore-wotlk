@@ -100,7 +100,7 @@ public:
                     break;
                 case NPC_VIOLET_HOLD_GUARD:
                     for (uint8 i = 0; i < 4; ++i)
-                        if (NPC_GuardGUID[i] == 0)
+                        if (!NPC_GuardGUID[i])
                         {
                             NPC_GuardGUID[i] = creature->GetGUID();
                             break;
@@ -132,7 +132,7 @@ public:
                     NPC_ErekemGUID = creature->GetGUID();
                     break;
                 case NPC_EREKEM_GUARD:
-                    if (NPC_ErekemGuardGUID[0] == 0)
+                    if (!NPC_ErekemGuardGUID[0])
                         NPC_ErekemGuardGUID[0] = creature->GetGUID();
                     else
                         NPC_ErekemGuardGUID[1] = creature->GetGUID();
@@ -434,7 +434,7 @@ public:
                         DoUpdateWorldState(WORLD_STATE_VH_PRISON_STATE, (uint32)GateHealth);
                         DoUpdateWorldState(WORLD_STATE_VH_WAVE_COUNT, (uint32)WaveCount);
 
-                        for (ObjectGuid guid : GO_ActivationCrystalGUIDr)
+                        for (ObjectGuid guid : GO_ActivationCrystalGUID)
                             if (GameObject* go = instance->GetGameObject(guid))
                             {
                                 HandleGameObject(ObjectGuid::Empty, false, go); // not used yet

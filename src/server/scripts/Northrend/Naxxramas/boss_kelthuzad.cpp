@@ -231,7 +231,7 @@ public:
             Talk(SAY_SUMMON_MINIONS);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
             me->RemoveAllAttackers();
-            me->SetTarget(0);
+            me->SetTarget();
             me->SetReactState(REACT_PASSIVE);
 
             // Spawn helpers

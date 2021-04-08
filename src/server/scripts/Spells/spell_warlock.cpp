@@ -152,7 +152,7 @@ public:
                     if (owner->GetAuraEffectDummy(56250))
                     {
                         Unit* target = GetTarget();
-                        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
+                        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, ObjectGuid::Empty, target->GetAura(32409)); // SW:D shall not be removed.
                         target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
                         target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
                     }
@@ -275,7 +275,7 @@ public:
         void HandleAuraApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             // Remove Fel Armor and Demon Armor
-            GetTarget()->RemoveAurasWithFamily(SPELLFAMILY_WARLOCK, 0, 0x20000020, 0, 0);
+            GetTarget()->RemoveAurasWithFamily(SPELLFAMILY_WARLOCK, 0, 0x20000020, 0, ObjectGuid::Empty);
         }
 
         void Register() override

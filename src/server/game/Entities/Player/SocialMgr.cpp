@@ -40,8 +40,8 @@ bool PlayerSocial::AddToSocialList(ObjectGuid friendGuid, SocialFlag flag)
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_CHARACTER_SOCIAL_FLAGS);
 
         stmt->setUInt8(0, itr->second.Flags);
-        stmt->setUInt32(1, GetPlayerGUID());
-        stmt->setUInt32(2, friendGuid);
+        stmt->setUInt32(1, GetPlayerGUID().GetCounter());
+        stmt->setUInt32(2, friendGuid.GetCounter());
 
         CharacterDatabase.Execute(stmt);
     }
@@ -51,8 +51,8 @@ bool PlayerSocial::AddToSocialList(ObjectGuid friendGuid, SocialFlag flag)
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_SOCIAL);
 
-        stmt->setUInt32(0, GetPlayerGUID());
-        stmt->setUInt32(1, friendGuid);
+        stmt->setUInt32(0, GetPlayerGUID().GetCounter());
+        stmt->setUInt32(1, friendGuid.GetCounter());
         stmt->setUInt8(2, flag);
 
         CharacterDatabase.Execute(stmt);
@@ -72,8 +72,8 @@ void PlayerSocial::RemoveFromSocialList(ObjectGuid friendGuid, SocialFlag flag)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SOCIAL);
 
-        stmt->setUInt32(0, GetPlayerGUID());
-        stmt->setUInt32(1, friendGuid);
+        stmt->setUInt32(0, GetPlayerGUID().GetCounter());
+        stmt->setUInt32(1, friendGuid.GetCounter());
 
         CharacterDatabase.Execute(stmt);
 
@@ -84,8 +84,8 @@ void PlayerSocial::RemoveFromSocialList(ObjectGuid friendGuid, SocialFlag flag)
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_REM_CHARACTER_SOCIAL_FLAGS);
 
         stmt->setUInt8(0, flag);
-        stmt->setUInt32(1, GetPlayerGUID());
-        stmt->setUInt32(2, friendGuid);
+        stmt->setUInt32(1, GetPlayerGUID().GetCounter());
+        stmt->setUInt32(2, friendGuid.GetCounter());
 
         CharacterDatabase.Execute(stmt);
     }
@@ -102,8 +102,8 @@ void PlayerSocial::SetFriendNote(ObjectGuid friendGuid, std::string note)
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_SOCIAL_NOTE);
 
     stmt->setString(0, note);
-    stmt->setUInt32(1, GetPlayerGUID());
-    stmt->setUInt32(2, friendGuid);
+    stmt->setUInt32(1, GetPlayerGUID().GetCounter());
+    stmt->setUInt32(2, friendGuid.GetCounter());
 
     CharacterDatabase.Execute(stmt);
 
@@ -208,7 +208,7 @@ void SocialMgr::GetFriendInfo(Player* player, ObjectGuid friendGUID, FriendInfo&
     friendInfo.Level = 0;
     friendInfo.Class = 0;
 
-    Player* pFriend = ObjectAccessor::FindPlayerInOrOutOfWorld(friendGUID);
+    Player* pFriend = ObjectAccessor::FindConnectedPlayer(friendGUID);
     if (!pFriend || AccountMgr::IsGMAccount(pFriend->GetSession()->GetSecurity()))
         return;
 
@@ -317,7 +317,7 @@ PlayerSocial* SocialMgr::LoadFromDB(PreparedQueryResult result, ObjectGuid guid)
     {
         Field* fields = result->Fetch();
 
-        auto friendGuid = fields[0].GetUInt32();
+        auto friendGuid = ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32());
         auto flags = fields[1].GetUInt8();
         auto note = fields[2].GetString();
 

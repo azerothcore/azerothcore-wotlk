@@ -184,7 +184,7 @@ public:
                 {
                     CrystalGUID = Crystal->GetGUID();
                     ++CrystalIterator;
-                    Crystal->SetOwnerGUID(0);
+                    Crystal->SetOwnerGUID(ObjectGuid::Empty);
                 }
             }
         }

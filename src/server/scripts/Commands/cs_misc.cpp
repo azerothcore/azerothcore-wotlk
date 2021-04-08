@@ -367,9 +367,10 @@ public:
         if (*args)
         {
             HighGuid guidHigh;
-            ObjectGuid::LowType guidLow = handler->extractLowGuidFromLink((char*)args);
+            ObjectGuid::LowType guidLow = handler->extractLowGuidFromLink((char*)args, guidHigh);
             if (!guidLow)
                 return false;
+
             switch (guidHigh)
             {
                 case HighGuid::Player:
@@ -559,7 +560,7 @@ public:
         if (target)
         {
             // check online security
-            if (handler->HasLowerSecurity(target, 0))
+            if (handler->HasLowerSecurity(target))
                 return false;
 
             std::string chrNameLink = handler->playerLink(targetName);
@@ -647,7 +648,7 @@ public:
             float x, y, z, o;
             uint32 map;
             bool in_flight;
-            if (!Player::LoadPositionFromDB(map, x, y, z, o, in_flight, targetGuid))
+            if (!Player::LoadPositionFromDB(map, x, y, z, o, in_flight, targetGuid.GetCounter()))
                 return false;
 
             // stop flight if need
@@ -686,7 +687,7 @@ public:
         {
             std::string nameLink = handler->playerLink(targetName);
             // check online security
-            if (handler->HasLowerSecurity(target, 0))
+            if (handler->HasLowerSecurity(target))
                 return false;
 
             if (target->IsBeingTeleported())
@@ -784,7 +785,7 @@ public:
             return false;
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target))
             return false;
 
         Group* group = target->GetGroup();
@@ -820,7 +821,7 @@ public:
                 continue;
 
             // check online security
-            if (handler->HasLowerSecurity(player, 0))
+            if (handler->HasLowerSecurity(player))
                 return false;
 
             std::string plNameLink = handler->GetNameLink(player);
@@ -887,7 +888,7 @@ public:
 
         if (target->GetTypeId() == TYPEID_PLAYER)
         {
-            if (handler->HasLowerSecurity(target->ToPlayer(), 0, false))
+            if (handler->HasLowerSecurity(target->ToPlayer()))
                 return false;
         }
 
@@ -956,7 +957,7 @@ public:
     {
         ObjectGuid guid = handler->GetSession()->GetPlayer()->GetTarget();
 
-        if (guid == 0)
+        if (!guid)
         {
             handler->SendSysMessage(LANG_NO_SELECTION);
             handler->SetSentErrorMessage(true);
@@ -1057,12 +1058,13 @@ public:
     static bool HandleGetDistanceCommand(ChatHandler* handler, char const* args)
     {
         WorldObject* obj = nullptr;
-=        if (*args)
+        if (*args)
         {
             HighGuid guidHigh;
             ObjectGuid::LowType guidLow = handler->extractLowGuidFromLink((char*)args, guidHigh);
             if (!guidLow)
                 return false;
+
             switch (guidHigh)
             {
                 case HighGuid::Player:
@@ -1124,7 +1126,7 @@ public:
             return false;
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target))
             return false;
 
         if (target->IsBeingTeleported())
@@ -1198,7 +1200,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target))
             return false;
 
         std::string kickReasonStr = handler->GetAcoreString(LANG_NO_REASON);
@@ -1792,9 +1794,9 @@ public:
 
         ObjectGuid parseGUID = ObjectGuid::Create<HighGuid::Player>(atol((char*)args));
 
-        if (sObjectMgr->GetPlayerNameByGUID(parseGUID, targetName))
+        if (sObjectMgr->GetPlayerNameByGUID(parseGUID.GetCounter(), targetName))
         {
-            target = ObjectAccessor::FindPlayerInOrOutOfWorld(parseGUID);
+            target = ObjectAccessor::FindConnectedPlayer(parseGUID);
             targetGuid = parseGUID;
         }
         else if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
@@ -1856,7 +1858,7 @@ public:
         if (target)
         {
             // check online security
-            if (handler->HasLowerSecurity(target, 0))
+            if (handler->HasLowerSecurity(target))
                 return false;
 
             accId             = target->GetSession()->GetAccountId();
@@ -2258,7 +2260,7 @@ public:
         if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &targetName))
             return false;
 
-        uint32 accountId = target ? target->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(targetGuid);
+        uint32 accountId = target ? target->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(targetGuid.GetCounter());
 
         // find only player from same account if any
         if (!target)
@@ -2316,7 +2318,7 @@ public:
         {
             // pussywizard: notify all online GMs
             ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
-            HashMapHolder<Player>::MapType const& m = sObjectAccessor->GetPlayers();
+            HashMapHolder<Player>::MapType const& m = ObjectAccessor::GetPlayers();
             for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->second->GetSession()->GetSecurity())
                     ChatHandler(itr->second->GetSession()).PSendSysMessage(target ? LANG_YOU_DISABLE_CHAT : LANG_COMMAND_DISABLE_CHAT_DELAYED, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : handler->GetAcoreString(LANG_CONSOLE)), nameLink.c_str(), notSpeakTime, muteReasonStr.c_str());
@@ -2334,7 +2336,7 @@ public:
         if (!handler->extractPlayerTarget((char*)args, &target, &targetGuid, &targetName))
             return false;
 
-        uint32 accountId = target ? target->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(targetGuid);
+        uint32 accountId = target ? target->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(targetGuid.GetCounter());
 
         // find only player from same account if any
         if (!target)
@@ -2581,7 +2583,7 @@ public:
 
         if (target->GetTypeId() == TYPEID_PLAYER)
         {
-            if (handler->HasLowerSecurity(target->ToPlayer(), 0, false))
+            if (handler->HasLowerSecurity(target->ToPlayer()))
                 return false;
         }
 
@@ -2624,7 +2626,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target))
             return false;
 
         target->CombatStop();
@@ -2645,7 +2647,7 @@ public:
             return false;
 
         // check online security
-        if (handler->HasLowerSecurity(target, 0))
+        if (handler->HasLowerSecurity(target))
             return false;
 
         // Repair items
@@ -2694,7 +2696,7 @@ public:
         //- TODO: Fix poor design
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
         MailDraft(subject, text)
-        .SendMailTo(trans, MailReceiver(target, targetGuid), sender);
+        .SendMailTo(trans, MailReceiver(target, targetGuid.GetCounter()), sender);
 
         CharacterDatabase.CommitTransaction(trans);
 
@@ -2803,7 +2805,7 @@ public:
             }
         }
 
-        draft.SendMailTo(trans, MailReceiver(receiver, receiverGuid), sender);
+        draft.SendMailTo(trans, MailReceiver(receiver, receiverGuid.GetCounter()), sender);
         CharacterDatabase.CommitTransaction(trans);
 
         std::string nameLink = handler->playerLink(receiverName);
@@ -2853,7 +2855,7 @@ public:
 
         MailDraft(subject, text)
         .AddMoney(money)
-        .SendMailTo(trans, MailReceiver(receiver, receiverGuid), sender);
+        .SendMailTo(trans, MailReceiver(receiver, receiverGuid.GetCounter()), sender);
 
         CharacterDatabase.CommitTransaction(trans);
 
@@ -3228,14 +3230,14 @@ public:
     static bool HandleGroupListCommand(ChatHandler* handler, char const* args)
     {
         Player* playerTarget;
-        ObjectGuid guidTarge;
+        ObjectGuid guidTarget;
         std::string nameTarget;
 
         ObjectGuid parseGUID = ObjectGuid::Create<HighGuid::Player>(atol((char*)args));
 
-        if (sObjectMgr->GetPlayerNameByGUID(parseGUID, nameTarget))
+        if (sObjectMgr->GetPlayerNameByGUID(parseGUID.GetCounter(), nameTarget))
         {
-            playerTarget = ObjectAccessor::FindPlayerInOrOutOfWorld(parseGUID);
+            playerTarget = ObjectAccessor::FindConnectedPlayer(parseGUID);
             guidTarget = parseGUID;
         }
         else if (!handler->extractPlayerTarget((char*)args, &playerTarget, &guidTarget, &nameTarget))
@@ -3246,7 +3248,7 @@ public:
             groupTarget = playerTarget->GetGroup();
 
         if (!groupTarget && guidTarget)
-            if (ObjectGuid groupGUID = Player::GetGroupIdFromStorage(guidTarget))
+            if (uint32 groupGUID = Player::GetGroupIdFromStorage(guidTarget.GetCounter()))
                 groupTarget = sGroupMgr->GetGroupByGUID(groupGUID);
 
         if (groupTarget)
@@ -3278,7 +3280,7 @@ public:
                 if (flags.empty())
                     flags = "None";
 
-                /*Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld((*itr).guid);
+                /*Player* p = ObjectAccessor::FindConnectedPlayer((*itr).guid);
                 const char* onlineState = p ? "online" : "offline";
 
                 handler->PSendSysMessage(LANG_GROUP_PLAYER_NAME_GUID, slot.name.c_str(), onlineState,

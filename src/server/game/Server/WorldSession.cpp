@@ -115,7 +115,6 @@ WorldSession::WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8
     recruiterId(recruiter),
     isRecruiter(isARecruiter),
     m_currentVendorEntry(0),
-    m_currentBankerGUID(0),
     timeWhoCommandAllowed(0),
     _calendarEventCreationCooldown(0)
 {
@@ -953,7 +952,7 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
 
 void WorldSession::WriteMovementInfo(WorldPacket* data, MovementInfo* mi)
 {
-    data << mi->guid.WriteAsPacked();
+    *data << mi->guid.WriteAsPacked();
 
     *data << mi->flags;
     *data << mi->flags2;
@@ -1214,7 +1213,7 @@ void WorldSession::ProcessQueryCallbackPet()
     //- SendStabledPet
     if (_sendStabledPetCallback.IsReady())
     {
-        uint64 param = _sendStabledPetCallback.GetParam();
+        ObjectGuid param = _sendStabledPetCallback.GetParam();
         _sendStabledPetCallback.GetResult(result);
         SendStablePetCallback(result, param);
         _sendStabledPetCallback.FreeResult();

@@ -468,7 +468,7 @@ public:
 
         Creature* GetHelper(uint8 index)
         {
-            return (Helpers[index] ? ObjectAccessor::GetCreature(*me, Helpers[index]) : nullptr);
+            return Helpers[index] ? ObjectAccessor::GetCreature(*me, Helpers[index]) : nullptr;
         }
 
         void SpawnHelpers()
@@ -714,7 +714,7 @@ public:
             {
                 if( GameObject* fire = me->FindNearestGameObject(194300, 1.0f) )
                 {
-                    fire->SetOwnerGUID(0);
+                    fire->SetOwnerGUID(ObjectGuid::Empty);
                     fire->Delete();
                 }
                 me->DespawnOrUnsummon(); // this will remove DynObjects

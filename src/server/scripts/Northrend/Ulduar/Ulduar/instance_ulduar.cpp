@@ -325,7 +325,7 @@ public:
                 go->SetGoState(state);
         }
 
-        void ShowKeeperGossip(uint8 type, Creature* cr, ObjectGuid guid = 0)
+        void ShowKeeperGossip(uint8 type, Creature* cr, ObjectGuid guid = ObjectGuid::Empty)
         {
             if (!cr)
             {
@@ -614,27 +614,27 @@ public:
                     return;
                 case TYPE_ALGALON:
                     m_auiEncounter[type] = data;
-                    if (GameObject* go = instance->GetGameObject(GetData64(GO_DOODAD_UL_SIGILDOOR_03)))
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_SIGILDOOR_03)))
                     {
                         go->SetGoState(data != IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
-                    if (GameObject* go = instance->GetGameObject(GetData64(GO_DOODAD_UL_UNIVERSEFLOOR_01)))
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_UNIVERSEFLOOR_01)))
                     {
                         go->SetGoState(data != IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
-                    if (GameObject* go = instance->GetGameObject(GetData64(GO_DOODAD_UL_UNIVERSEFLOOR_02)))
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_UNIVERSEFLOOR_02)))
                     {
                         go->SetGoState(data == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
-                    if (GameObject* go = instance->GetGameObject(GetData64(GO_DOODAD_UL_UNIVERSEGLOBE01)))
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_UNIVERSEGLOBE01)))
                     {
                         go->SetGoState(data == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
-                    if (GameObject* go = instance->GetGameObject(GetData64(GO_DOODAD_UL_ULDUAR_TRAPDOOR_03)))
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_ULDUAR_TRAPDOOR_03)))
                     {
                         go->SetGoState(data == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
@@ -674,7 +674,7 @@ public:
             if (type == TYPE_FREYA && data == DONE)
             {
                 std::list<GameObject*> goList;
-                if (Creature* freya = instance->GetCreature(GetData64(TYPE_FREYA)))
+                if (Creature* freya = instance->GetCreature(GetGuidData(TYPE_FREYA)))
                 {
                     freya->GetGameObjectListWithEntryInGrid(goList, 191019 /*Adder's Tongue*/, 333.0f);
                     freya->GetGameObjectListWithEntryInGrid(goList, 190176 /*Frost Lotus*/, 333.0f);

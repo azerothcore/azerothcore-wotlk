@@ -898,7 +898,7 @@ public:
         {
             PreventDefaultAction();
             if (aurEff->GetTickNumber() % 2 == 0)
-                GetTarget()->CastSpell(GetTarget(), SPELL_RUNE_OF_SUMMONING_SUMMON, true, nullptr, aurEff, GetTarget()->IsSummon() ? GetTarget()->ToTempSummon()->GetSummonerGUID() : 0);
+                GetTarget()->CastSpell(GetTarget(), SPELL_RUNE_OF_SUMMONING_SUMMON, true, nullptr, aurEff, GetTarget()->IsSummon() ? GetTarget()->ToTempSummon()->GetSummonerGUID() : ObjectGuid::Empty);
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

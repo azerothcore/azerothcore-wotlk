@@ -250,7 +250,7 @@ public:
             CharacterDatabase.Execute(stmt);
 
             // xinef: update global storage
-            sWorld->UpdateGlobalPlayerData(playerGuid, PLAYER_UPDATE_DATA_LEVEL, "", newLevel);
+            sWorld->UpdateGlobalPlayerData(playerGuid.GetCounter(), PLAYER_UPDATE_DATA_LEVEL, "", newLevel);
         }
     }
 
@@ -311,7 +311,7 @@ public:
         if (target)
         {
             // check online security
-            if (handler->HasLowerSecurity(target, 0))
+            if (handler->HasLowerSecurity(target))
                 return false;
 
             handler->PSendSysMessage(LANG_RENAME_PLAYER, handler->GetNameLink(target).c_str());
@@ -356,7 +356,7 @@ public:
         if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &targetName))
             return false;
 
-        int32 oldlevel = target ? target->getLevel() : Player::GetLevelFromStorage(targetGuid);
+        int32 oldlevel = target ? target->getLevel() : Player::GetLevelFromStorage(targetGuid.GetCounter());
         int32 newlevel = levelStr ? atoi(levelStr) : oldlevel;
 
         if (newlevel < 1)
@@ -713,7 +713,7 @@ public:
         std::string accountName;
         AccountMgr::GetName(accountId, accountName);
 
-        Player::DeleteFromDB(characterGuid, accountId, true, true);
+        Player::DeleteFromDB(characterGuid.GetCounter(), accountId, true, true);
         handler->PSendSysMessage(LANG_CHARACTER_DELETED, characterName.c_str(), characterGuid.GetCounter(), accountName.c_str(), accountId);
 
         return true;
@@ -738,7 +738,7 @@ public:
         if (!handler->extractPlayerTarget(nameStr, &target, &targetGuid, &targetName))
             return false;
 
-        int32 oldlevel = target ? target->getLevel() : Player::GetLevelFromStorage(targetGuid);
+        int32 oldlevel = target ? target->getLevel() : Player::GetLevelFromStorage(targetGuid.GetCounter());
         int32 addlevel = levelStr ? atoi(levelStr) : 1;
         int32 newlevel = oldlevel + addlevel;
 
@@ -929,14 +929,14 @@ public:
             guid = sObjectMgr->GetPlayerGUIDByName(name);
         }
 
-        if (!sObjectMgr->GetPlayerAccountIdByGUID(guid))
+        if (!sObjectMgr->GetPlayerAccountIdByGUID(guid.GetCounter()))
         {
             handler->PSendSysMessage(LANG_PLAYER_NOT_FOUND);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        switch (PlayerDumpWriter().WriteDump(fileStr, uint32(guid.GetCounter())))
+        switch (PlayerDumpWriter().WriteDump(fileStr, guid.GetCounter()))
         {
             case DUMP_SUCCESS:
                 handler->PSendSysMessage(LANG_COMMAND_EXPORT_SUCCESS);

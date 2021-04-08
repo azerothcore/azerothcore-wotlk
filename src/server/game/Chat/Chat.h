@@ -79,7 +79,7 @@ public:
     virtual LocaleConstant GetSessionDbcLocale() const;
     virtual int GetSessionDbLocaleIndex() const;
 
-    bool HasLowerSecurity(Player* target, ObjectGuid guid, bool strong = false);
+    bool HasLowerSecurity(Player* target, ObjectGuid guid = ObjectGuid::Empty, bool strong = false);
     bool HasLowerSecurityAccount(WorldSession* target, uint32 account, bool strong = false);
 
     void SendGlobalGMSysMessage(const char* str);
@@ -98,7 +98,7 @@ public:
     char*     extractQuotedArg(char* args);
 
     uint32    extractSpellIdFromLink(char* text);
-    ObjectGuid::LowType extractLowGuidFromLink(char* text);
+    ObjectGuid::LowType extractLowGuidFromLink(char* text, HighGuid& guidHigh);
     GameTele const* extractGameTeleFromLink(char* text);
     bool GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, ObjectGuid& guid, bool offline = false);
     std::string extractPlayerNameFromLink(char* text);
@@ -109,7 +109,8 @@ public:
     std::string GetNameLink(Player* chr) const;
 
     GameObject* GetNearbyGameObject();
-    GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(ObjectGuid::LowType lowguid, uint32 entry);
+    GameObject* GetObjectFromPlayerMapByDbGuid(ObjectGuid::LowType lowguid);
+    Creature* GetCreatureFromPlayerMapByDbGuid(ObjectGuid::LowType lowguid);
     bool HasSentErrorMessage() const { return sentErrorMessage; }
     void SetSentErrorMessage(bool val) { sentErrorMessage = val; }
     static bool LoadCommandTable() { return load_command_table; }

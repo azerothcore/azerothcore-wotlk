@@ -14,6 +14,7 @@
 #include "Callback.h"
 #include "Common.h"
 #include "IWorld.h"
+#include "ObjectGuid.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
 #include "Timer.h"
@@ -356,10 +357,10 @@ public:
 
     // xinef: Global Player Data Storage system
     void LoadGlobalPlayerDataStore();
-    ObjectGuid::LowType GetGlobalPlayerGUID(std::string const& name) const;
+    ObjectGuid GetGlobalPlayerGUID(std::string const& name) const;
     GlobalPlayerData const* GetGlobalPlayerData(ObjectGuid::LowType guid) const;
     void AddGlobalPlayerData(ObjectGuid::LowType guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId);
-    void UpdateGlobalPlayerData(ObjectGuid guid, uint8 mask, std::string const& name, uint8 level = 0, uint8 gender = 0, uint8 race = 0, uint8 playerClass = 0);
+    void UpdateGlobalPlayerData(ObjectGuid::LowType guid, uint8 mask, std::string const& name, uint8 level = 0, uint8 gender = 0, uint8 race = 0, uint8 playerClass = 0);
     void UpdateGlobalPlayerMails(ObjectGuid::LowType guid, int16 count, bool add = true);
     void UpdateGlobalPlayerGuild(ObjectGuid::LowType guid, uint32 guildId);
     void UpdateGlobalPlayerGroup(ObjectGuid::LowType guid, uint32 groupId);

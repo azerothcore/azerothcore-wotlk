@@ -203,10 +203,10 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
         m_currentSpells[i] = nullptr;
 
     for (uint8 i = 0; i < MAX_SUMMON_SLOT; ++i)
-        m_SummonSlot[i] = 0;
+        m_SummonSlot[i].Clear();
 
     for (uint8 i = 0; i < MAX_GAMEOBJECT_SLOT; ++i)
-        m_ObjectSlot[i] = 0;
+        m_ObjectSlot[i].Clear();
 
     m_auraUpdateIterator = m_ownedAuras.end();
 
@@ -3330,7 +3330,7 @@ void Unit::_UpdateSpells(uint32 time)
             if (GameObject* go = ObjectAccessor::GetGameObject(*this, *itr))
                 if (!go->isSpawned())
                 {
-                    go->SetOwnerGUID(0);
+                    go->SetOwnerGUID(ObjectGuid::Empty);
                     go->SetRespawnTime(0);
                     go->Delete();
                     m_gameObj.erase(itr++);
@@ -3956,7 +3956,7 @@ Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8
             castItemGUID = castItem->GetGUID();
 
         // find current aura from spell and change it's stackamount, or refresh it's duration
-        if (Aura* foundAura = GetOwnedAura(newAura->Id, newAura->HasAttribute(SPELL_ATTR0_CU_SINGLE_AURA_STACK) ? ObjectGuid::Empty : casterGUID, newAura->HasAttribute(SPELL_ATTR0_CU_ENCHANT_PROC) ? castItemGUID : 0, 0))
+        if (Aura* foundAura = GetOwnedAura(newAura->Id, newAura->HasAttribute(SPELL_ATTR0_CU_SINGLE_AURA_STACK) ? ObjectGuid::Empty : casterGUID, newAura->HasAttribute(SPELL_ATTR0_CU_ENCHANT_PROC) ? castItemGUID : ObjectGuid::Empty, 0))
         {
             // effect masks do not match
             // extremely rare case
@@ -4112,7 +4112,7 @@ void Unit::_ApplyAura(AuraApplication* aurApp, uint8 effMask)
         }
         else if (caster)
         {
-            ConflagrateAuraStateDelayEvent* pEvent = new ConflagrateAuraStateDelayEvent(GetGUID(), caster->GetGUID());
+            ConflagrateAuraStateDelayEvent* pEvent = new ConflagrateAuraStateDelayEvent(this, caster->GetGUID());
             m_Events.AddEvent(pEvent, m_Events.CalculateTime(700)); // intended 700ms delay before allowing to cast conflagrate
         }
     }
@@ -5646,7 +5646,7 @@ GameObject* Unit::GetGameObject(uint32 spellId) const
 
 void Unit::AddGameObject(GameObject* gameObj)
 {
-    if (!gameObj || gameObj->GetOwnerGUID() != 0)
+    if (!gameObj || gameObj->GetOwnerGUID())
         return;
 
     m_gameObj.push_back(gameObj->GetGUID());
@@ -5667,13 +5667,13 @@ void Unit::RemoveGameObject(GameObject* gameObj, bool del)
     if (!gameObj || gameObj->GetOwnerGUID() != GetGUID())
         return;
 
-    gameObj->SetOwnerGUID(0);
+    gameObj->SetOwnerGUID(ObjectGuid::Empty);
 
     for (uint8 i = 0; i < MAX_GAMEOBJECT_SLOT; ++i)
     {
         if (m_ObjectSlot[i] == gameObj->GetGUID())
         {
-            m_ObjectSlot[i] = 0;
+            m_ObjectSlot[i].Clear();
             break;
         }
     }
@@ -5717,7 +5717,7 @@ void Unit::RemoveGameObject(uint32 spellid, bool del)
                 continue;
             }
 
-            go->SetOwnerGUID(0);
+            go->SetOwnerGUID(ObjectGuid::Empty);
             if(del)
             {
                 go->SetRespawnTime(0);
@@ -5735,7 +5735,7 @@ void Unit::RemoveAllGameObjects()
         GameObject* go = ObjectAccessor::GetGameObject(*this, *m_gameObj.begin());
         if(go)
         {
-            go->SetOwnerGUID(0);
+            go->SetOwnerGUID(ObjectGuid::Empty);
             go->SetRespawnTime(0);
             go->Delete();
         }
@@ -6491,7 +6491,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         {
                             if (!target)
                                 return false;
-                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, 0, target->GetAura(32409)); // SW:D shall not be removed.
+                            target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, ObjectGuid::Empty, target->GetAura(32409)); // SW:D shall not be removed.
                             target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
                             target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
                             return true;
@@ -6499,7 +6499,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // Glyph of Icy Veins
                     case 56374:
                         {
-                            RemoveAurasByType(SPELL_AURA_HASTE_SPELLS, 0, 0, true, false);
+                            RemoveAurasByType(SPELL_AURA_HASTE_SPELLS, ObjectGuid::Empty, 0, true, false);
                             RemoveAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
                             return true;
                         }
@@ -9502,7 +9502,7 @@ FactionTemplateEntry const* Unit::GetFactionTemplateEntry() const
     FactionTemplateEntry const* entry = sFactionTemplateStore.LookupEntry(getFaction());
     if (!entry)
     {
-        static ObjectGuid guid = 0;                             // prevent repeating spam same faction problem
+        static ObjectGuid guid;                             // prevent repeating spam same faction problem
 
         if (GetGUID() != guid)
         {
@@ -9832,7 +9832,7 @@ bool Unit::AttackStop()
     m_attacking = nullptr;
 
     // Clear our target
-    SetTarget(0);
+    SetTarget();
 
     ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
 
@@ -10131,13 +10131,13 @@ void Unit::SetMinion(Minion* minion, bool apply)
                     else
                         oldPet->UnSummon();
                     SetPetGUID(minion->GetGUID());
-                    SetMinionGUID(0);
+                    SetMinionGUID(ObjectGuid::Empty);
                 }
             }
             else
             {
                 SetPetGUID(minion->GetGUID());
-                SetMinionGUID(0);
+                SetMinionGUID(ObjectGuid::Empty);
             }
         }
 
@@ -10187,13 +10187,13 @@ void Unit::SetMinion(Minion* minion, bool apply)
         if (minion->m_Properties && minion->m_Properties->Type == SUMMON_TYPE_MINIPET)
         {
             if (GetCritterGUID() == minion->GetGUID())
-                SetCritterGUID(0);
+                SetCritterGUID(ObjectGuid::Empty);
         }
 
         if (minion->IsGuardianPet())
         {
             if (GetPetGUID() == minion->GetGUID())
-                SetPetGUID(0);
+                SetPetGUID(ObjectGuid::Empty);
         }
         else if (minion->IsTotem())
         {
@@ -14579,7 +14579,7 @@ void Unit::SetLevel(uint8 lvl, bool showLevelChange)
 
     // xinef: update global data
     if (GetTypeId() == TYPEID_PLAYER)
-        sWorld->UpdateGlobalPlayerData(ToPlayer()->GetGUID(), PLAYER_UPDATE_DATA_LEVEL, "", lvl);
+        sWorld->UpdateGlobalPlayerData(ToPlayer()->GetGUID().GetCounter(), PLAYER_UPDATE_DATA_LEVEL, "", lvl);
 }
 
 void Unit::SetHealth(uint32 val)
@@ -14905,7 +14905,7 @@ void Unit::DeleteCharmInfo()
 CharmInfo::CharmInfo(Unit* unit)
     : _unit(unit), _CommandState(COMMAND_FOLLOW), _petnumber(0), _oldReactState(REACT_PASSIVE),
       _isCommandAttack(false), _isCommandFollow(false), _isAtStay(false), _isFollowing(false), _isReturning(false),
-      _forcedSpellId(0), _forcedTargetGUID(0), _stayX(0.0f), _stayY(0.0f), _stayZ(0.0f)
+      _forcedSpellId(0), _stayX(0.0f), _stayY(0.0f), _stayZ(0.0f)
 {
     for (uint8 i = 0; i < MAX_SPELL_CHARM; ++i)
         _charmspells[i].SetActionAndType(0, ACT_DISABLED);
@@ -17188,7 +17188,7 @@ void Unit::SetStunned(bool apply)
         if (m_rootTimes > 0) // blizzard internal check?
             m_rootTimes++;
 
-        SetTarget(0);
+        SetTarget();
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 
         // MOVEMENTFLAG_ROOT cannot be used in conjunction with MOVEMENTFLAG_MASK_MOVING (tested 3.3.5a)
@@ -17329,7 +17329,7 @@ void Unit::SetFeared(bool apply)
 {
     if (apply)
     {
-        SetTarget(0);
+        SetTarget();
 
         Unit* caster = nullptr;
         Unit::AuraEffectList const& fearAuras = GetAuraEffectsByType(SPELL_AURA_MOD_FEAR);
@@ -17368,7 +17368,7 @@ void Unit::SetConfused(bool apply)
 {
     if (apply)
     {
-        SetTarget(0);
+        SetTarget();
         GetMotionMaster()->MoveConfused();
     }
     else
@@ -19390,7 +19390,7 @@ void Unit::PetSpellFail(const SpellInfo* spellInfo, Unit* target, uint32 result)
         else
         {
             charmInfo->SetForcedSpell(0);
-            charmInfo->SetForcedTargetGUID(0);
+            charmInfo->SetForcedTargetGUID(ObjectGuid::Empty);
         }
     }
 }
@@ -19404,13 +19404,12 @@ int32 Unit::CalculateAOEDamageReduction(int32 damage, uint32 schoolMask, Unit* c
     return damage;
 }
 
-bool ConflagrateAuraStateDelayEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
+bool ConflagrateAuraStateDelayEvent::Execute(uint64 /*e_time*/, uint32  /*p_time*/)
 {
-    if (Unit* owner = ObjectAccessor::FindUnit(m_owner))
-        if (owner && m_caster && owner->IsInWorld())
-            if (owner->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x4, 0, 0, m_caster) || // immolate
-                    owner->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0, 0, 0x2, m_caster)) // shadowflame
-                owner->ModifyAuraState(AURA_STATE_CONFLAGRATE, true);
+    if (m_owner->IsInWorld())
+        if (m_owner->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0x4, 0, 0, m_casterGUID) || // immolate
+                m_owner->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_WARLOCK, 0, 0, 0x2, m_casterGUID)) // shadowflame
+            m_owner->ModifyAuraState(AURA_STATE_CONFLAGRATE, true);
 
     return true;
 }

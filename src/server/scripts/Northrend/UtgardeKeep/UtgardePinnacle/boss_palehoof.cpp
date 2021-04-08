@@ -785,7 +785,7 @@ public:
     {
         InstanceScript* pInstance = go->GetInstanceScript();
 
-        Creature* pPalehoof = ObjectAccessor::GetCreature(*go, pInstance ? pInstance->GetGuidData(DATA_GORTOK_PALEHOOF) : 0);
+        Creature* pPalehoof = ObjectAccessor::GetCreature(*go, pInstance ? pInstance->GetGuidData(DATA_GORTOK_PALEHOOF) : ObjectGuid::Empty);
         if (pPalehoof && pPalehoof->IsAlive())
         {
             // maybe these are hacks :(

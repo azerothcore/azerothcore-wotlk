@@ -714,8 +714,6 @@ public:
 
     typedef std::map<uint32, uint32> CharacterConversionMap;
 
-    [[nodiscard]] Player* GetPlayerByLowGUID(ObjectGuid::LowType lowguid) const;
-
     GameObjectTemplate const* GetGameObjectTemplate(uint32 entry);
     bool IsGameObjectStaticTransport(uint32 entry);
     [[nodiscard]] GameObjectTemplateContainer const* GetGameObjectTemplates() const { return &_gameObjectTemplateStore; }
@@ -765,7 +763,7 @@ public:
     void GetPlayerLevelInfo(uint32 race, uint32 class_, uint8 level, PlayerLevelInfo* info) const;
 
     [[nodiscard]] ObjectGuid GetPlayerGUIDByName(std::string const& name) const;
-    bool GetPlayerNameByGUID(ObjectGuid guid, std::string& name) const;
+    bool GetPlayerNameByGUID(ObjectGuid::LowType lowGuid, std::string& name) const;
     [[nodiscard]] TeamId GetPlayerTeamIdByGUID(ObjectGuid::LowType guid) const;
     [[nodiscard]] uint32 GetPlayerAccountIdByGUID(ObjectGuid::LowType guid) const;
     [[nodiscard]] uint32 GetPlayerAccountIdByPlayerName(std::string const& name) const;
@@ -1150,9 +1148,9 @@ public:
 
     [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
     {
-        GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(guid);
+        GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
         if (itr == _gameObjectDataStore.end()) return nullptr;
-        return &itr->second;
+            return &itr->second;
     }
     [[nodiscard]] CreatureLocale const* GetCreatureLocale(uint32 entry) const
     {

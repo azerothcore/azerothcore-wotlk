@@ -106,7 +106,7 @@ class PlayerSocial
         uint32 GetNumberOfSocialsWithFlag(SocialFlag flag) const;
     private:
         bool _checkContact(ObjectGuid guid, SocialFlag flags) const;
-        typedef std::map<uint32, FriendInfo> PlayerSocialMap;
+        typedef std::map<ObjectGuid, FriendInfo> PlayerSocialMap;
         PlayerSocialMap m_playerSocialMap;
         ObjectGuid m_playerGUID;
 };

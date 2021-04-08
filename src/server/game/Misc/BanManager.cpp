@@ -228,7 +228,7 @@ BanReturn BanManager::BanCharacter(std::string const& CharacterName, std::string
     CharacterDatabase.Execute(stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_BAN);
-    stmt->setUInt32(0, TargetGUID);
+    stmt->setUInt32(0, TargetGUID.GetCounter());
     stmt->setUInt32(1, DurationSecs);
     stmt->setString(2, Author);
     stmt->setString(3, Reason);

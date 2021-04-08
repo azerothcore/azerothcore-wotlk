@@ -17,7 +17,7 @@
 #include "WorldSession.h"
 
 ArenaTeam::ArenaTeam()
-    : TeamId(0), Type(0), TeamName(), CaptainGuid(0), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),
+    : TeamId(0), Type(0), TeamName(), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),
       BorderStyle(0), BorderColor(0)
 {
     Stats.WeekGames   = 0;
@@ -35,7 +35,7 @@ ArenaTeam::~ArenaTeam()
 bool ArenaTeam::Create(ObjectGuid captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor)
 {
     // Check if captain is present
-    if (!ObjectAccessor::FindPlayerInOrOutOfWorld(captainGuid))
+    if (!ObjectAccessor::FindConnectedPlayer(captainGuid))
         return false;
 
     // Check if arena team name is already taken
@@ -59,7 +59,7 @@ bool ArenaTeam::Create(ObjectGuid captainGuid, uint8 type, std::string const& te
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM);
     stmt->setUInt32(0, TeamId);
     stmt->setString(1, TeamName);
-    stmt->setUInt32(2, captainLowGuid.GetCounter());
+    stmt->setUInt32(2, captainGuid.GetCounter());
     stmt->setUInt8(3, Type);
     stmt->setUInt16(4, Stats.Rating);
     stmt->setUInt32(5, BackgroundColor);
@@ -84,7 +84,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
         return false;
 
     // xinef: Get player name and class from player storage or global data storage
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(playerGuid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(playerGuid);
     if (player)
     {
         playerClass = player->getClass();
@@ -92,7 +92,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     }
     else
     {
-        GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(playerGuid);
+        GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(playerGuid.GetCounter());
         if (!playerData)
             return false;
 
@@ -101,7 +101,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     }
 
     // Check if player is already in a similar arena team
-    if ((player && player->GetArenaTeamId(GetSlot())) || Player::GetArenaTeamIdFromStorage(playerGuid, GetSlot()) != 0)
+    if ((player && player->GetArenaTeamId(GetSlot())) || Player::GetArenaTeamIdFromStorage(playerGuid.GetCounter(), GetSlot()) != 0)
     {
         sLog->outError("Arena: Player %s (%s) already has an arena team of type %u", playerName.c_str(), playerGuid.ToString().c_str(), GetType());
         return false;
@@ -154,7 +154,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     newMember.MaxMMR           = maxMMR;
 
     Members.push_back(newMember);
-    sWorld->UpdateGlobalPlayerArenaTeam(playerGuid, GetSlot(), GetId());
+    sWorld->UpdateGlobalPlayerArenaTeam(playerGuid.GetCounter(), GetSlot(), GetId());
 
     // Save player's arena team membership to db
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM_MEMBER);
@@ -249,7 +249,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
 
         // Put the player in the team
         Members.push_back(newMember);
-        sWorld->UpdateGlobalPlayerArenaTeam(newMember.Guid, GetSlot(), GetId());
+        sWorld->UpdateGlobalPlayerArenaTeam(newMember.Guid.GetCounter(), GetSlot(), GetId());
     } while (result->NextRow());
 
     if (Empty() || !captainPresentInTeam)
@@ -280,7 +280,7 @@ bool ArenaTeam::SetName(std::string const& name)
 void ArenaTeam::SetCaptain(ObjectGuid guid)
 {
     // Disable remove/promote buttons
-    Player* oldCaptain = ObjectAccessor::FindPlayerInOrOutOfWorld(GetCaptain());
+    Player* oldCaptain = ObjectAccessor::FindConnectedPlayer(GetCaptain());
     if (oldCaptain)
         oldCaptain->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_MEMBER, 1);
 
@@ -294,7 +294,7 @@ void ArenaTeam::SetCaptain(ObjectGuid guid)
     CharacterDatabase.Execute(stmt);
 
     // Enable remove/promote buttons
-    if (Player* newCaptain = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+    if (Player* newCaptain = ObjectAccessor::FindConnectedPlayer(guid))
     {
         newCaptain->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_MEMBER, 0);
         /*if (oldCaptain)
@@ -308,14 +308,14 @@ void ArenaTeam::SetCaptain(ObjectGuid guid)
 
 void ArenaTeam::DelMember(ObjectGuid guid, bool cleanDb)
 {
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(guid);
     Group* group = (player && player->GetGroup()) ? player->GetGroup() : nullptr;
 
     // Remove member from team
     for (MemberList::iterator itr = Members.begin(); itr != Members.end(); ++itr)
     {
         // Remove queues of members
-        if (Player* playerMember = ObjectAccessor::FindPlayerInOrOutOfWorld(itr->Guid))
+        if (Player* playerMember = ObjectAccessor::FindConnectedPlayer(itr->Guid))
         {
             if (group && playerMember->GetGroup() && group->GetGUID() == playerMember->GetGroup()->GetGUID())
             {
@@ -341,7 +341,7 @@ void ArenaTeam::DelMember(ObjectGuid guid, bool cleanDb)
         if (itr->Guid == guid)
         {
             Members.erase(itr);
-            sWorld->UpdateGlobalPlayerArenaTeam(guid, GetSlot(), 0);
+            sWorld->UpdateGlobalPlayerArenaTeam(guid.GetCounter(), GetSlot(), 0);
             break;
         }
     }
@@ -374,7 +374,7 @@ void ArenaTeam::Disband(WorldSession* session)
     // Broadcast update
     if (session)
     {
-        BroadcastEvent(ERR_ARENA_TEAM_DISBANDED_S, 0, 2, session->GetPlayerName(), GetName(), "");
+        BroadcastEvent(ERR_ARENA_TEAM_DISBANDED_S, ObjectGuid::Empty, 2, session->GetPlayerName(), GetName(), "");
     }
 
     // Update database
@@ -432,12 +432,12 @@ void ArenaTeam::Roster(WorldSession* session)
 
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
     {
-        player = ObjectAccessor::FindPlayerInOrOutOfWorld(itr->Guid);
+        player = ObjectAccessor::FindConnectedPlayer(itr->Guid);
 
         data << itr->Guid;                                  // guid
         data << uint8((player ? 1 : 0));                    // online flag
         tempName = "";
-        sObjectMgr->GetPlayerNameByGUID(itr->Guid, tempName);
+        sObjectMgr->GetPlayerNameByGUID(itr->Guid.GetCounter(), tempName);
         data << tempName;                                  // member name
         data << uint32((itr->Guid == GetCaptain() ? 0 : 1));// captain flag 0 captain 1 member
         data << uint8((player ? player->getLevel() : 0));           // unknown, level?
@@ -495,7 +495,7 @@ void ArenaTeam::NotifyStatsChanged()
     // This is called after a rated match ended
     // Updates arena team stats for every member of the team (not only the ones who participated!)
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(itr->Guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->Guid))
             SendStats(player->GetSession());
 }
 
@@ -552,7 +552,7 @@ void ArenaTeamMember::ModifyMatchmakerRating(int32 mod, uint32 /*slot*/)
 void ArenaTeam::BroadcastPacket(WorldPacket* packet)
 {
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(itr->Guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->Guid))
             player->GetSession()->SendPacket(packet);
 }
 
@@ -683,7 +683,7 @@ uint32 ArenaTeam::GetAverageMMR(Group* group) const
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
     {
         // Skip if player is not online
-        if (!ObjectAccessor::FindPlayerInOrOutOfWorld(itr->Guid))
+        if (!ObjectAccessor::FindConnectedPlayer(itr->Guid))
             continue;
 
         // Skip if player is not member of group
@@ -777,7 +777,7 @@ void ArenaTeam::FinishGame(int32 mod, const Map* bgMap)
 
         // Check if rating related achivements are met
         for (MemberList::iterator itr = Members.begin(); itr != Members.end(); ++itr)
-            if (Player* member = ObjectAccessor::FindPlayerInOrOutOfWorld(itr->Guid))
+            if (Player* member = ObjectAccessor::FindConnectedPlayer(itr->Guid))
                 if (member->FindMap() == bgMap)
                     member->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_TEAM_RATING, Stats.Rating, Type);
     }

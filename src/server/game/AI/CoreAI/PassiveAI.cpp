@@ -76,5 +76,5 @@ void CritterAI::UpdateAI(uint32 diff)
 void TriggerAI::IsSummonedBy(Unit* summoner)
 {
     if (me->m_spells[0])
-        me->CastSpell(me, me->m_spells[0], false, 0, 0, summoner ? summoner->GetGUID() : 0);
+        me->CastSpell(me, me->m_spells[0], false, 0, 0, summoner ? summoner->GetGUID() : ObjectGuid::Empty);
 }

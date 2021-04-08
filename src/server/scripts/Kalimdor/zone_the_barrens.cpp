@@ -329,7 +329,7 @@ public:
                 ChallengerDown[i] = false;
             }
 
-            BigWill = 0;
+            BigWill.Clear();
         }
 
         void EnterCombat(Unit* /*who*/) override { }

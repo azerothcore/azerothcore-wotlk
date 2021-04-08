@@ -77,25 +77,25 @@ template <class T> typename HashMapHolder<T>::LockType HashMapHolder<T>::i_lock;
 namespace ObjectAccessor
 {
     // these functions return objects only if in map of specified object
-    static WorldObject* GetWorldObject(WorldObject const&, ObjectGuid const guid);
-    static Object* GetObjectByTypeMask(WorldObject const&, ObjectGuid const guid, uint32 typemask);
-    static Corpse* GetCorpse(WorldObject const& u, ObjectGuid const guid);
-    static GameObject* GetGameObject(WorldObject const& u, ObjectGuid const guid);
-    static Transport* GetTransport(WorldObject const& u, ObjectGuid const guid);
-    static DynamicObject* GetDynamicObject(WorldObject const& u, ObjectGuid const guid);
-    static Unit* GetUnit(WorldObject const&, ObjectGuid const guid);
-    static Creature* GetCreature(WorldObject const& u, ObjectGuid const guid);
-    static Pet* GetPet(WorldObject const&, ObjectGuid const guid);
-    static Player* GetPlayer(Map const*, ObjectGuid const guid);
-    static Player* GetPlayer(WorldObject const&, ObjectGuid const guid);
-    static Creature* GetCreatureOrPetOrVehicle(WorldObject const&, ObjectGuid const);
+    WorldObject* GetWorldObject(WorldObject const&, ObjectGuid const guid);
+    Object* GetObjectByTypeMask(WorldObject const&, ObjectGuid const guid, uint32 typemask);
+    Corpse* GetCorpse(WorldObject const& u, ObjectGuid const guid);
+    GameObject* GetGameObject(WorldObject const& u, ObjectGuid const guid);
+    Transport* GetTransport(WorldObject const& u, ObjectGuid const guid);
+    DynamicObject* GetDynamicObject(WorldObject const& u, ObjectGuid const guid);
+    Unit* GetUnit(WorldObject const&, ObjectGuid const guid);
+    Creature* GetCreature(WorldObject const& u, ObjectGuid const guid);
+    Pet* GetPet(WorldObject const&, ObjectGuid const guid);
+    Player* GetPlayer(Map const*, ObjectGuid const guid);
+    Player* GetPlayer(WorldObject const&, ObjectGuid const guid);
+    Creature* GetCreatureOrPetOrVehicle(WorldObject const&, ObjectGuid const);
 
     // these functions return objects if found in whole world
     // ACCESS LIKE THAT IS NOT THREAD SAFE
-    static Player* FindPlayer(ObjectGuid const);
-    static Player* FindConnectedPlayer(ObjectGuid const);
-    static Player* FindPlayerByName(std::string const& name, bool checkInWorld = true);
-    static std::map<std::string, Player*> playerNameToPlayerPointer; // pussywizard: optimization
+    Player* FindPlayer(ObjectGuid const guid);
+    Player* FindPlayerByLowGUID(ObjectGuid::LowType lowguid);
+    Player* FindConnectedPlayer(ObjectGuid const guid);
+    Player* FindPlayerByName(std::string const& name, bool checkInWorld = true);
 
     // when using this, you must use the hashmapholder's lock
     HashMapHolder<Player>::MapType const& GetPlayers();
@@ -113,6 +113,12 @@ namespace ObjectAccessor
     }
 
     void SaveAllPlayers();
+
+    template<>
+    void AddObject(Player* player);
+
+    template<>
+    void RemoveObject(Player* player);
 };
 
 #endif

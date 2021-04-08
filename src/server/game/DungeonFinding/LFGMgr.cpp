@@ -254,7 +254,7 @@ namespace lfg
             CachedDungeonMapStore.clear();
             // Recalculate locked dungeons
             for (LfgPlayerDataContainer::const_iterator it = PlayersStore.begin(); it != PlayersStore.end(); ++it)
-                if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(it->first))
+                if (Player* player = ObjectAccessor::FindConnectedPlayer(it->first))
                     InitializeLockedDungeons(player);
         }
     }
@@ -345,7 +345,7 @@ namespace lfg
                     uint32 proposalId = itProposal->first;
                     LfgProposal& proposal = ProposalsStore[proposalId];
 
-                    ObjectGuid guid = 0;
+                    ObjectGuid guid;
                     for (LfgProposalPlayerContainer::const_iterator itPlayers = proposal.players.begin(); itPlayers != proposal.players.end(); ++itPlayers)
                     {
                         guid = itPlayers->first;
@@ -902,7 +902,7 @@ namespace lfg
         if (getMSTimeDiff(World::GetGameTimeMS(), getMSTime()) > (70 * 7) / 5) // prevent lagging
             return;
 
-        ObjectGuid groupGuid, instanceGuid;
+        ObjectGuid guid, groupGuid, instanceGuid;
         uint8 level, Class, race, talents[3];
         float iLevel, mp5, mp5combat, baseAP, rangedAP;
         int32 spellDamage, spellHeal;
@@ -939,8 +939,9 @@ namespace lfg
                 RBInternalInfoMap& currInternalInfoMap = RBInternalInfoStoreCurr[team][dungeonId];
                 for (RBEntryInfoMap::const_iterator sitr = entryInfoMap.begin(); sitr != entryInfoMap.end(); ++sitr)
                 {
-                    groupGuid = 0;
-                    Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+                    guid = sitr->first;
+                    groupGuid.Clear();
+                    Player* p = ObjectAccessor::FindConnectedPlayer(guid);
                     ASSERT(p);
                     if (sitr->second.roles == PLAYER_ROLE_LEADER)
                     {
@@ -948,8 +949,8 @@ namespace lfg
                         groupGuid = p->GetGroup()->GetGUID();
                     }
                     encounterMask = 0;
-                    instanceGuid = 0;
-                    if (InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(sitr->first, dungeonData->map, dungeonData->difficulty))
+                    instanceGuid.Clear();
+                    if (InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(guid, dungeonData->map, dungeonData->difficulty))
                         if (bind->perm)
                         {
                             instanceGuid = ObjectGuid::Create<HighGuid::Instance>(bind->save->GetInstanceId());
@@ -972,7 +973,7 @@ namespace lfg
                     else
                         maxPower = (p->getPowerType() == POWER_RAGE || p->getPowerType() == POWER_RUNIC_POWER) ? p->GetMaxPower(p->getPowerType()) / 10 : p->GetMaxPower(p->getPowerType());
 
-                    currInternalInfoMap[sitr->first] = RBInternalInfo(guid, sitr->second.comment, groupGuid != 0, groupGuid, sitr->second.roles, encounterMask, instanceGuid,
+                    currInternalInfoMap[sitr->first] = RBInternalInfo(guid, sitr->second.comment, !groupGuid.IsEmpty(), groupGuid, sitr->second.roles, encounterMask, instanceGuid,
                                                        1, p->getLevel(), p->getClass(), p->getRace(), p->GetAverageItemLevel(),
                                                        talents, p->m_last_area_id, p->GetArmor(), (uint32)std::max<int32>(0, spellDamage), (uint32)std::max<int32>(0, spellHeal),
                                                        p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_CRIT_MELEE), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_CRIT_RANGED), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + CR_CRIT_SPELL), std::max<float>(0.0f, mp5), std::max<float>(0.0f, mp5combat),
@@ -985,6 +986,8 @@ namespace lfg
                     {
                         if (mitr->guid == sitr->first) // leader already added
                             continue;
+
+                        guid = mitr->guid;
                         level = 1;
                         Class = 0;
                         race = 0;
@@ -992,19 +995,19 @@ namespace lfg
                         talents[0] = 0;
                         talents[1] = 0;
                         talents[2] = 0;
-                        if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(mitr->guid))
+                        if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(mitr->guid.GetCounter()))
                         {
                             level = gpd->level;
                             Class = gpd->playerClass;
                             race = gpd->race;
                         }
-                        Player* mplr = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+                        Player* mplr = ObjectAccessor::FindConnectedPlayer(guid);
                         if (mplr)
                         {
                             iLevel = mplr->GetAverageItemLevel();
                             mplr->GetTalentTreePoints(talents);
                         }
-                        currInternalInfoMap[mitr->guid] = RBInternalInfo(guid, emptyComment, false, groupGuid, 0, 0, 0,
+                        currInternalInfoMap[mitr->guid] = RBInternalInfo(guid, emptyComment, false, groupGuid, 0, 0, ObjectGuid::Empty,
                                                           (mplr ? 1 : 0), level, Class, race, iLevel,
                                                           talents, 0, 0, 0, 0,
                                                           0, 0, 0, 0, 0,
@@ -1096,7 +1099,7 @@ namespace lfg
                 }
 
                 if (!deletedGroupsToErase.empty())
-                    for (ObjectGuid const guid : deletedGroupsToEraser)
+                    for (ObjectGuid const guid : deletedGroupsToErase)
                         deletedGroups.erase(guid);
 
                 if (!deletedGroups.empty())
@@ -1121,7 +1124,7 @@ namespace lfg
                 // send difference packet to browsing players
                 for (RBSearchersMap::const_iterator sitr = RBSearchersStore[team].begin(); sitr != RBSearchersStore[team].end(); ++sitr)
                     if (sitr->second == dungeonId)
-                        if (Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld(sitr->first))
+                        if (Player* p = ObjectAccessor::FindConnectedPlayer(sitr->first))
                             p->GetSession()->SendPacket(&differencePacket);
 
                 break; // one dungeon updated in one LFGMgr::UpdateRaidBrowser
@@ -1260,7 +1263,7 @@ namespace lfg
             gguid = GetGroup(guid);
         }
         if (!allowgroup)
-            gguid = 0;
+            gguid.Clear();
 
         if (pguid)
             for (lfg::LfgQueueContainer::iterator itr = QueuesStore.begin(); itr != QueuesStore.end(); ++itr)
@@ -1502,12 +1505,12 @@ namespace lfg
         LFGDungeonData const* dungeon = GetLFGDungeon(proposal.dungeonId);
         ASSERT(dungeon);
 
-        Group* grp = proposal.group ? sGroupMgr->GetGroupByGUID(proposal.group) : nullptr;
+        Group* grp = proposal.group ? sGroupMgr->GetGroupByGUID(proposal.group.GetCounter()) : nullptr;
         ObjectGuid oldGroupGUID;
         for (LfgGuidList::const_iterator it = players.begin(); it != players.end(); ++it)
         {
             ObjectGuid pguid = (*it);
-            Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(pguid);
+            Player* player = ObjectAccessor::FindConnectedPlayer(pguid);
             if (!player)
                 continue;
 
@@ -1697,8 +1700,8 @@ namespace lfg
         }
 
         // Remove players/groups from Queue
-        for (uint8 i = 0; i < 5 && proposal.queues.guid[i]; ++i)
-            queue.RemoveQueueData(proposal.queues.guid[i]);
+        for (uint8 i = 0; i < 5 && proposal.queues.guids[i]; ++i)
+            queue.RemoveQueueData(proposal.queues.guids[i]);
 
         MakeNewGroup(proposal);
         ProposalsStore.erase(itProposal);
@@ -1727,7 +1730,7 @@ namespace lfg
         // pussywizard: add cooldown for not accepting (after 40 secs) or declining
         for (LfgProposalPlayerContainer::iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
             if (it->second.accept == LFG_ANSWER_DENY)
-                if (Player* plr = sObjectAccessor->FindPlayer(it->first))
+                if (Player* plr = ObjectAccessor::FindPlayer(it->first))
                     if (Aura* aura = plr->AddAura(LFG_SPELL_DUNGEON_COOLDOWN, plr))
                         aura->SetDuration(150 * IN_MILLISECONDS);
 
@@ -1808,12 +1811,12 @@ namespace lfg
         }
 
         // Readd to queue
-        for (uint8 i = 0; i < 5 && proposal.queues.guid[i]; ++i)
+        for (uint8 i = 0; i < 5 && proposal.queues.guids[i]; ++i)
         {
             // xinef: this will work as data is not deleted, only references to this data are cleared
             // xinef: when new proposal is created
             // xinef: successful proposal is also taken into account is similar manner
-            queue.AddToQueue(proposal.queues.guid[i], true);
+            queue.AddToQueue(proposal.queues.guids[i], true);
         }
 
         ProposalsStore.erase(itProposal);
@@ -1909,7 +1912,7 @@ namespace lfg
         SetState(gguid, LFG_STATE_DUNGEON);
         if (agreeNum == LFG_GROUP_KICK_VOTES_NEEDED)           // Vote passed - Kick player
         {
-            if (Group* group = sGroupMgr->GetGroupByGUID(gguid))
+            if (Group* group = sGroupMgr->GetGroupByGUID(gguid.GetCounter()))
                 Player::RemoveFromGroup(group, boot.victim, GROUP_REMOVEMETHOD_KICK_LFG);
 
             DecreaseKicksLeft(gguid);
@@ -2380,7 +2383,7 @@ namespace lfg
         for (LfgGuidSet::const_iterator it = players.begin(); it != players.end(); ++it)
         {
             ObjectGuid guid = (*it);
-            SetGroup(*it, 0);
+            SetGroup(*it, ObjectGuid::Empty);
             if (state != LFG_STATE_PROPOSAL)
             {
                 SetState(*it, LFG_STATE_NONE);
@@ -2455,56 +2458,56 @@ namespace lfg
 
     bool LFGMgr::HasIgnore(ObjectGuid guid1, ObjectGuid guid2)
     {
-        Player* plr1 = ObjectAccessor::FindPlayerInOrOutOfWorld(guid1);
-        Player* plr2 = ObjectAccessor::FindPlayerInOrOutOfWorld(guid2);
+        Player* plr1 = ObjectAccessor::FindConnectedPlayer(guid1);
+        Player* plr2 = ObjectAccessor::FindConnectedPlayer(guid2);
         return plr1 && plr2 && (plr1->GetSocial()->HasIgnore(guid2) || plr2->GetSocial()->HasIgnore(guid1));
     }
 
     void LFGMgr::SendLfgRoleChosen(ObjectGuid guid, ObjectGuid pguid, uint8 roles)
     {
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->GetSession()->SendLfgRoleChosen(pguid, roles);
     }
 
     void LFGMgr::SendLfgRoleCheckUpdate(ObjectGuid guid, LfgRoleCheck const& roleCheck)
     {
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->GetSession()->SendLfgRoleCheckUpdate(roleCheck);
     }
 
     void LFGMgr::SendLfgUpdatePlayer(ObjectGuid guid, LfgUpdateData const& data)
     {
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->GetSession()->SendLfgUpdatePlayer(data);
     }
 
     void LFGMgr::SendLfgUpdateParty(ObjectGuid guid, LfgUpdateData const& data)
     {
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->GetSession()->SendLfgUpdateParty(data);
     }
 
     void LFGMgr::SendLfgJoinResult(ObjectGuid guid, LfgJoinResultData const& data)
     {
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->GetSession()->SendLfgJoinResult(data);
     }
 
     void LFGMgr::SendLfgBootProposalUpdate(ObjectGuid guid, LfgPlayerBoot const& boot)
     {
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->GetSession()->SendLfgBootProposalUpdate(boot);
     }
 
     void LFGMgr::SendLfgUpdateProposal(ObjectGuid guid, LfgProposal const& proposal)
     {
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->GetSession()->SendLfgUpdateProposal(proposal);
     }
 
     void LFGMgr::SendLfgQueueStatus(ObjectGuid guid, LfgQueueStatusData const& data)
     {
-        if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+        if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->GetSession()->SendLfgQueueStatus(data);
     }
 
@@ -2537,9 +2540,9 @@ namespace lfg
         if (check.empty())
             return false;
 
-        for (uint8 i = 0; i < 5 && check.guid[i]; ++i)
+        for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
         {
-            ObjectGuid guid = check.guid[i];
+            ObjectGuid guid = check.guids[i];
             if (GetState(guid) != LFG_STATE_QUEUED)
             {
                 LFGQueue& queue = GetQueue(guid);

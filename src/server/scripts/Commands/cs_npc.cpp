@@ -245,13 +245,13 @@ public:
         creature->CleanupsBeforeDelete();
         delete creature;
         creature = new Creature();
-        if (!creature->LoadCreatureFromDB(db_guid, map, true, false, true))
+        if (!creature->LoadCreatureFromDB(spawnId, map, true, false, true))
         {
             delete creature;
             return false;
         }
 
-        sObjectMgr->AddCreatureToGrid(db_guid, sObjectMgr->GetCreatureData(db_guid));
+        sObjectMgr->AddCreatureToGrid(spawnId, sObjectMgr->GetCreatureData(spawnId));
         return true;
     }
 
@@ -336,7 +336,7 @@ public:
             CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
             if (!data)
             {
-                handler->PSendSysMessage(LANG_COMMAND_CREATGUIDNOTFOUND, lowGuid);
+                handler->PSendSysMessage(LANG_COMMAND_CREATGUIDNOTFOUND, spawnId);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -344,7 +344,7 @@ public:
         else
         {
             // obtain real GUID for DB operations
-            lowGuid = creature->GetSpawnId();
+            spawnId = creature->GetSpawnId();
         }
 
         int wait = waitStr ? atoi(waitStr) : 0;
@@ -356,7 +356,7 @@ public:
         PreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_MOVEMENT_TYPE);
 
         stmt->setUInt8(0, uint8(WAYPOINT_MOTION_TYPE));
-        stmt->setUInt32(1, lowGuid);
+        stmt->setUInt32(1, spawnId);
 
         WorldDatabase.Execute(stmt);
 

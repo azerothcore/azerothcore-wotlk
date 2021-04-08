@@ -378,7 +378,7 @@ public:
                     break;
                 case EVENT_OUTRO_KNEEL:
                     if (Player* p = ObjectAccessor::GetPlayer(*me, playerGUID))
-                        p->KilledMonsterCredit(NPC_THALORIEN_KILL_CREDIT, 0);
+                        p->KilledMonsterCredit(NPC_THALORIEN_KILL_CREDIT);
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     events.ScheduleEvent(EVENT_DISAPPEAR, 6000);
                     break;

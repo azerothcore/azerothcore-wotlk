@@ -92,7 +92,7 @@ namespace ArenaSpectator
     {
         if (!targetGUID.IsPlayer())
             return;
-        SendCommand(o, "%s0x%016llX;%s=%s;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, c);
+        SendCommand(o, "%s0x%016llX;%s=%s;", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, c);
     }
 
     template<class T>
@@ -100,15 +100,15 @@ namespace ArenaSpectator
     {
         if (!targetGUID.IsPlayer())
             return;
-        SendCommand(o, "%s0x%016llX;%s=%u;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, t);
+        SendCommand(o, "%s0x%016llX;%s=%u;", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, t);
     }
 
     template<class T>
-    void SendCommand_GUID(T* o, ObjectGuid targetGUID, const char* prefix, uint64 t)
+    void SendCommand_GUID(T* o, ObjectGuid targetGUID, const char* prefix, ObjectGuid t)
     {
         if (!targetGUID.IsPlayer())
             return;
-        SendCommand(o, "%s0x%016llX;%s=0x%016llX;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, (unsigned long long)t);
+        SendCommand(o, "%s0x%016llX;%s=0x%016llX;", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, t.GetRawValue());
     }
 
     template<class T>
@@ -116,7 +116,7 @@ namespace ArenaSpectator
     {
         if (!targetGUID.IsPlayer())
             return;
-        SendCommand(o, "%s0x%016llX;%s=%u,%i;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, id, casttime);
+        SendCommand(o, "%s0x%016llX;%s=%u,%i;", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, id, casttime);
     }
 
     template<class T>
@@ -127,7 +127,7 @@ namespace ArenaSpectator
         if (const SpellInfo* si = sSpellMgr->GetSpellInfo(id))
             if (si->SpellIconID == 1)
                 return;
-        SendCommand(o, "%s0x%016llX;%s=%u,%u,%u;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, id, dur, maxdur);
+        SendCommand(o, "%s0x%016llX;%s=%u,%u,%u;", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, id, dur, maxdur);
     }
 
     template<class T>
@@ -135,7 +135,7 @@ namespace ArenaSpectator
     {
         if (!targetGUID.IsPlayer())
             return;
-        SendCommand(o, "%s0x%016llX;%s=%u,%u,%i,%i,%u,%u,%u,0x%016llX;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, remove ? 1 : 0, stack, dur, maxdur, id, dispel, isDebuff ? 1 : 0, (unsigned long long)caster);
+        SendCommand(o, "%s0x%016llX;%s=%u,%u,%i,%i,%u,%u,%u,0x%016llX;", SPECTATOR_ADDON_PREFIX, targetGUID.GetRawValue(), prefix, remove ? 1 : 0, stack, dur, maxdur, id, dispel, isDebuff ? 1 : 0, caster.GetRawValue());
     }
 
     void HandleResetCommand(Player* p)

@@ -247,7 +247,7 @@ public:
                             events.CancelEvent(EVENT_SPELL_FIREBALL);
                             events.CancelEvent(EVENT_SPELL_DEVOURING_FLAME);
                             events.CancelEvent(EVENT_SUMMON_MOLE_MACHINES);
-                            me->SetTarget(0);
+                            me->SetTarget();
                             me->SendMeleeAttackStop(me->GetVictim());
                             me->GetMotionMaster()->MoveLand(0, CORDS_GROUND, 25.0f);
                         }

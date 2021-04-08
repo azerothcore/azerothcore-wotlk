@@ -20,11 +20,11 @@ inline float GetAge(uint64 t) { return float(time(nullptr) - t) / DAY; }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // GM ticket
-GmTicket::GmTicket() : _id(0), _playerGuid(0), _type(TICKET_TYPE_OPEN), _posX(0), _posY(0), _posZ(0), _mapId(0), _createTime(0), _lastModifiedTime(0),
-    _closedBy(0), _resolvedBy(0), _assignedTo(0), _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false),
-    _needResponse(false), _needMoreHelp(false) { }
+GmTicket::GmTicket() : _id(0), _type(TICKET_TYPE_OPEN), _posX(0), _posY(0), _posZ(0), _mapId(0), _createTime(0), _lastModifiedTime(0),
+    _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false), _needResponse(false), _needMoreHelp(false) { }
 
-GmTicket::GmTicket(Player* player) : _type(TICKET_TYPE_OPEN), _createTime(time(nullptr)), _lastModifiedTime(time(nullptr)), _closedBy(0), _resolvedBy(0), _assignedTo(0), _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false), _needMoreHelp(false)
+GmTicket::GmTicket(Player* player) : _type(TICKET_TYPE_OPEN), _createTime(time(nullptr)), _lastModifiedTime(time(nullptr)),
+    _completed(false), _escalatedStatus(TICKET_UNASSIGNED), _viewed(false), _needMoreHelp(false)
 {
     _id = sTicketMgr->GenerateTicketId();
     _playerName = player->GetName();
@@ -49,7 +49,7 @@ bool GmTicket::LoadFromDB(Field* fields)
     _posY               = fields[++index].GetFloat();
     _posZ               = fields[++index].GetFloat();
     _lastModifiedTime   = fields[++index].GetUInt32();
-    _closedBy           = fields[++index].GetInt32();
+    _closedBy           = ObjectGuid::Create<HighGuid::Player>(fields[++index].GetInt32());
     _assignedTo         = ObjectGuid::Create<HighGuid::Player>(fields[++index].GetUInt32());
     _comment            = fields[++index].GetString();
     _response           = fields[++index].GetString();
@@ -57,7 +57,7 @@ bool GmTicket::LoadFromDB(Field* fields)
     _escalatedStatus    = GMTicketEscalationStatus(fields[++index].GetUInt8());
     _viewed             = fields[++index].GetBool();
     _needMoreHelp       = fields[++index].GetBool();
-    _resolvedBy         = fields[++index].GetInt32();
+    _resolvedBy         = ObjectGuid::Create<HighGuid::Player>(fields[++index].GetInt32());
 
     return true;
 }
@@ -156,7 +156,7 @@ std::string GmTicket::FormatMessageString(ChatHandler& handler, bool detailed) c
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTAGE, (secsToTimeString(curTime - _lastModifiedTime, true)).c_str());
 
     std::string name;
-    if (sObjectMgr->GetPlayerNameByGUID(_assignedTo, name))
+    if (sObjectMgr->GetPlayerNameByGUID(_assignedTo.GetCounter(), name))
         ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTASSIGNEDTO, name.c_str());
 
     if (detailed)
@@ -188,7 +188,8 @@ std::string GmTicket::FormatMessageString(ChatHandler& handler, const char* szCl
 
 void GmTicket::SetUnassigned()
 {
-    _assignedTo = 0;
+    _assignedTo.Clear();
+
     switch (_escalatedStatus)
     {
         case TICKET_ASSIGNED:
@@ -344,7 +345,7 @@ void TicketMgr::AddTicket(GmTicket* ticket)
     ticket->SaveToDB(trans);
 }
 
-void TicketMgr::CloseTicket(uint32 ticketId, int64 source)
+void TicketMgr::CloseTicket(uint32 ticketId, ObjectGuid source)
 {
     if (GmTicket* ticket = GetTicket(ticketId))
     {
@@ -366,7 +367,7 @@ void TicketMgr::RemoveTicket(uint32 ticketId)
     }
 }
 
-void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, int64 source)
+void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, ObjectGuid source)
 {
     if (GmTicket* ticket = GetTicket(ticketId))
     {

@@ -2003,7 +2003,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
         return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::SetCriteriaProgress(%u, %u) for %s", entry->ID, changeValue, m_player->GetGUID().c_str());
+    sLog->outDebug(LOG_FILTER_ACHIEVEMENTSYS, "AchievementMgr::SetCriteriaProgress(%u, %u) for %s", entry->ID, changeValue, m_player->GetGUID().ToString().c_str());
 #endif
 
     CriteriaProgress* progress = GetCriteriaProgress(entry);
@@ -2296,7 +2296,7 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket* data, bool inspect) const
         for (CriteriaProgressMap::const_iterator iter = m_criteriaProgress.begin(); iter != m_criteriaProgress.end(); ++iter)
         {
             *data << uint32(iter->first);
-            *data << iter->second.counter.WriteAsPacked();
+            data->appendPackGUID(iter->second.counter);
             *data << GetPlayer()->GetPackGUID();
             *data << uint32(0);
             data->AppendPackedTime(iter->second.date);

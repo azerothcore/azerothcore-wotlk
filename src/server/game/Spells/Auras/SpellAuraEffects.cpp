@@ -1647,7 +1647,7 @@ void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, boo
 
     if (!apply && aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT)
     {
-        target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable()), true);
+        target->UpdateObjectVisibility((target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable()), true);
         target->bRequestForcedVisibilityUpdate = false;
     }
     else
@@ -1882,7 +1882,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         // remove other shapeshift before applying a new one
         // xinef: rogue shouldnt be wrapped by this check (shadow dance vs stealth)
         if (GetSpellInfo()->SpellFamilyName != SPELLFAMILY_ROGUE)
-            target->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT, 0, GetBase());
+            target->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT, ObjectGuid::Empty, GetBase());
 
         // stop handling the effect if it was removed by linked event
         if (aurApp->GetRemoveMode())
@@ -2265,7 +2265,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
         {
             // for players, start regeneration after 1s (in polymorph fast regeneration case)
             // only if caster is Player (after patch 2.4.2)
-            if (GetCasterGUID()))
+            if (GetCasterGUID().IsPlayer())
                 target->ToPlayer()->setRegenTimerCount(1 * IN_MILLISECONDS);
 
             //dismount polymorphed target (after patch 2.4.2)
@@ -3698,7 +3698,7 @@ void AuraEffect::HandleAuraModStateImmunity(AuraApplication const* aurApp, uint8
     target->ApplySpellImmune(GetId(), IMMUNITY_STATE, GetMiscValue(), apply);
 
     if (apply && GetSpellInfo()->HasAttribute(SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY))
-        target->RemoveAurasByType(AuraType(GetMiscValue()), 0, GetBase());
+        target->RemoveAurasByType(AuraType(GetMiscValue()), ObjectGuid::Empty, GetBase());
 }
 
 void AuraEffect::HandleAuraModSchoolImmunity(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -5144,7 +5144,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                                 {
                                     Unit* caster = GetBase()->GetCaster();
                                     if (caster && caster->GetTypeId() == TYPEID_PLAYER)
-                                        caster->ToPlayer()->KilledMonsterCredit(25987, 0);
+                                        caster->ToPlayer()->KilledMonsterCredit(25987);
                                 }
                                 return;
                             }
@@ -5936,7 +5936,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                         case 28820:
                             {
                                 // Need remove self if Lightning Shield not active
-                                if (!target->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_SHAMAN, 0x400))
+                                if (!target->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_SHAMAN, 0x400, 0, 0))
                                     target->RemoveAurasDueToSpell(28820);
                                 return;
                             }
@@ -6480,7 +6480,7 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     if (caster)
         target->getHostileRefManager().threatAssist(caster, float(gain) * 0.5f, GetSpellInfo());
 
-    bool haveCastItem = GetBase()->GetCastItemGUID() != 0;
+    bool haveCastItem = GetBase()->GetCastItemGUID();
 
     // Health Funnel
     // damage caster for heal amount

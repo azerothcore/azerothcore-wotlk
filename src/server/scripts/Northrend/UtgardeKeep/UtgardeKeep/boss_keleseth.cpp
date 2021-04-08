@@ -55,7 +55,7 @@ public:
 
     struct npc_frost_tombAI : public NullCreatureAI
     {
-        npc_frost_tombAI(Creature* c) : NullCreatureAI(c), PrisonerGUID(0)
+        npc_frost_tombAI(Creature* c) : NullCreatureAI(c)
         {
             if (TempSummon* t = c->ToTempSummon())
                 if (Unit* s = t->GetSummoner())

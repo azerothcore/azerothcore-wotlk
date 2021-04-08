@@ -18,14 +18,6 @@ public:
         instance_ruins_of_ahnqiraj_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(NUM_ENCOUNTER);
-
-            _kurinaxxGUID   = 0;
-            _rajaxxGUID     = 0;
-            _moamGUID       = 0;
-            _buruGUID       = 0;
-            _ayamissGUID    = 0;
-            _ossirianGUID   = 0;
-            _paralyzedGUID  = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override

@@ -69,7 +69,7 @@ void ChannelMgr::LoadChannels()
                 Field* banFields = banResult->Fetch();
                 if (!banFields)
                     break;
-                newChannel->AddBan(banFields[0].GetUInt32(), banFields[1].GetUInt32());
+                newChannel->AddBan(ObjectGuid::Create<HighGuid::Player>(banFields[0].GetUInt32()), banFields[1].GetUInt32());
             } while (banResult->NextRow());
         }
 

@@ -1072,7 +1072,7 @@ public:
                 {
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, generatorGUID[i]))
                     {
-                        generatorGUID[i] = 0;
+                        generatorGUID[i].Clear();
                         temp->DespawnOrUnsummon();
                     }
                 }
@@ -1081,7 +1081,7 @@ public:
                 {
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, allianceForcesGUID[i]))
                     {
-                        allianceForcesGUID[i] = 0;
+                        allianceForcesGUID[i].Clear();
                         temp->DespawnOrUnsummon();
                     }
                 }
@@ -1096,7 +1096,7 @@ public:
                 {
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, hordeForcesGUID[i]))
                     {
-                        hordeForcesGUID[i] = 0;
+                        hordeForcesGUID[i].Clear();
                         temp->DespawnOrUnsummon();
                     }
                 }

@@ -151,7 +151,7 @@ private:
 template<typename Worker>
 void MapManager::DoForAllMaps(Worker&& worker)
 {
-    std::lock_guard<std::mutex> lock(_mapsLock);
+    ACORE_GUARD(ACE_Thread_Mutex, Lock);
 
     for (auto& mapPair : i_maps)
     {
@@ -170,7 +170,7 @@ void MapManager::DoForAllMaps(Worker&& worker)
 template<typename Worker>
 inline void MapManager::DoForAllMapsWithMapId(uint32 mapId, Worker&& worker)
 {
-    std::lock_guard<std::mutex> lock(_mapsLock);
+    ACORE_GUARD(ACE_Thread_Mutex, Lock);
 
     auto itr = i_maps.find(mapId);
     if (itr != i_maps.end())

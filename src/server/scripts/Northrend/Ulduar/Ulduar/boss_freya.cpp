@@ -1108,7 +1108,7 @@ public:
     {
         boss_freya_summonsAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            _freyaGUID = me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(TYPE_FREYA) : 0;
+            _freyaGUID = me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(TYPE_FREYA) : ObjectGuid::Empty;
             _isTrio = me->GetEntry() == NPC_ANCIENT_WATER_SPIRIT || me->GetEntry() == NPC_STORM_LASHER || me->GetEntry() == NPC_SNAPLASHER;
             _hasDied = false;
         }

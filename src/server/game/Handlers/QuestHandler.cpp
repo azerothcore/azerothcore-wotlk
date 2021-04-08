@@ -126,7 +126,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
             (object->GetTypeId() == TYPEID_PLAYER && !object->ToPlayer()->CanShareQuest(questId)))
     {
         _player->PlayerTalkClass->SendCloseGossip();
-        _player->SetDivider(0);
+        _player->SetDivider();
         return;
     }
 
@@ -147,17 +147,17 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
         if (!GetPlayer()->CanTakeQuest(quest, true))
         {
             _player->PlayerTalkClass->SendCloseGossip();
-            _player->SetDivider(0);
+            _player->SetDivider();
             return;
         }
 
-        if (_player->GetDivider() != 0)
+        if (_player->GetDivider())
         {
             Player* player = ObjectAccessor::GetPlayer(*_player, _player->GetDivider());
             if (player)
             {
                 player->SendPushToPartyResponse(_player, QUEST_PARTY_MSG_ACCEPT_QUEST);
-                _player->SetDivider(0);
+                _player->SetDivider();
             }
         }
 
@@ -482,7 +482,7 @@ void WorldSession::HandleQuestConfirmAccept(WorldPacket& recvData)
         if (_player->CanAddQuest(quest, true))
             _player->AddQuestAndCheckCompletion(quest, nullptr); // nullptr, this prevent DB script from duplicate running
 
-        _player->SetDivider(0);
+        _player->SetDivider();
     }
 }
 
@@ -600,7 +600,7 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
                     }
                 }
 
-                if (player->GetDivider() != 0)
+                if (player->GetDivider())
                 {
                     _player->SendPushToPartyResponse(player, QUEST_PARTY_MSG_BUSY);
                     continue;
@@ -642,7 +642,7 @@ void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
             data << _player->GetGUID();
             data << uint8(msg);                             // valid values: 0-8
             player->GetSession()->SendPacket(&data);
-            _player->SetDivider(0);
+            _player->SetDivider();
         }
     }
 }
@@ -658,7 +658,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
     WorldPacket data(SMSG_QUESTGIVER_STATUS_MULTIPLE, 4);
     data << uint32(count);                                  // placeholder
 
-    for (Player::ClientGUIDs::const_iterator itr = _player->m_clientGUIDs.begin(); itr != _player->m_clientGUIDs.end(); ++itr)
+    for (GuidUnorderedSet::const_iterator itr = _player->m_clientGUIDs.begin(); itr != _player->m_clientGUIDs.end(); ++itr)
     {
         uint32 questStatus = DIALOG_STATUS_NONE;
 

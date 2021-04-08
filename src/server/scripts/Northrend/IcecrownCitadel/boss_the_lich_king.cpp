@@ -2591,7 +2591,7 @@ public:
                         {
                             _events.Reset();
                             _events.ScheduleEvent(EVENT_GRAB_PLAYER, 500);
-                            _grabbedPlayer = 0;
+                            _grabbedPlayer.Clear();
                         }
                     }
                     break;

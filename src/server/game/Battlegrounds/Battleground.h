@@ -532,7 +532,7 @@ public:
     virtual void EventPlayerUsedGO(Player* /*player*/, GameObject* /*go*/) {}
 
     // this function can be used by spell to interact with the BG map
-    virtual void DoAction(uint32 /*action*/, uint64 /*var*/) {}
+    virtual void DoAction(uint32 /*action*/, ObjectGuid /*var*/) {}
 
     virtual void HandlePlayerResurrect(Player* /*player*/) {}
 
@@ -578,7 +578,7 @@ public:
 
     void RewardXPAtKill(Player* killer, Player* victim);
 
-    [[nodiscard]] virtual ObjectGuid GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const { return 0; }
+    [[nodiscard]] virtual ObjectGuid GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const { return ObjectGuid::Empty; }
     virtual void SetDroppedFlagGUID(ObjectGuid /*guid*/, TeamId /*teamId*/ = TEAM_NEUTRAL) {}
     [[nodiscard]] uint32 GetTeamScore(TeamId teamId) const;
 

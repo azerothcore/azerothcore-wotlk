@@ -314,7 +314,7 @@ private:
     }
 
     typedef std::unordered_map<ObjectGuid, PlayerInfo> PlayerContainer;
-    typedef std::unordered_map<uint32, uint32> BannedContainer;
+    typedef std::unordered_map<ObjectGuid, uint32> BannedContainer;
     typedef std::unordered_set<Player*> PlayersWatchingContainer;
 
     bool _announce;

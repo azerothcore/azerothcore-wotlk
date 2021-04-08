@@ -89,7 +89,7 @@ public:
             case GOSSIP_ACTION_INFO_DEF + 6:
                 SendGossipMenuFor(player, 7761, creature->GetGUID());
                 //'kill' our trigger to update quest status
-                player->KilledMonsterCredit(TRIGGER_RUTGAR, 0);
+                player->KilledMonsterCredit(TRIGGER_RUTGAR);
                 break;
 
             case GOSSIP_ACTION_INFO_DEF + 9:
@@ -115,7 +115,7 @@ public:
             case GOSSIP_ACTION_INFO_DEF + 14:
                 SendGossipMenuFor(player, 7767, creature->GetGUID());
                 //'kill' our trigger to update quest status
-                player->KilledMonsterCredit(TRIGGER_FRANKAL, 0);
+                player->KilledMonsterCredit(TRIGGER_FRANKAL);
                 break;
         }
         return true;
@@ -467,7 +467,7 @@ public:
                         Fandral->AI()->Talk(FANDRAL_SAY_1, me);
                         break;
                     case 2:
-                        Fandral->SetTarget(0);
+                        Fandral->SetTarget();
                         Merithra->AI()->Talk(MERITHRA_EMOTE_1);
                         break;
                     case 3:
@@ -484,7 +484,7 @@ public:
                         Merithra->AI()->Talk(MERITHRA_SAY_2);
                         break;
                     case 7:
-                        Caelestrasz->SetTarget(0);
+                        Caelestrasz->SetTarget();
                         Merithra->GetMotionMaster()->MoveCharge(-8065, 1530, 2.61f, 10);
                         break;
                     case 8:

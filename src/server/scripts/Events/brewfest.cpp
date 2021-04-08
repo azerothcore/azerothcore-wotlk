@@ -421,7 +421,7 @@ public:
                 Player* player = who->ToPlayer();
                 if (player->HasItemCount(ITEM_PORTABLE_BREWFEST_KEG)) // portable brewfest keg
                 {
-                    player->KilledMonsterCredit(KEG_KILL_CREDIT, 0);
+                    player->KilledMonsterCredit(KEG_KILL_CREDIT);
                     player->CastSpell(me, SPELL_THROW_KEG, true);          // throw keg
                     player->DestroyItemCount(ITEM_PORTABLE_BREWFEST_KEG, 1, true);
 
@@ -539,7 +539,7 @@ public:
                     QuestStatusData& q_status = itr->second;
                     if (q_status.CreatureOrGOCount[me->GetEntry() - 24202] == 0)
                     {
-                        player->KilledMonsterCredit(me->GetEntry(), 0);
+                        player->KilledMonsterCredit(me->GetEntry());
                         player->MonsterSay(GetTextFor(me->GetEntry(), quest).c_str(), LANG_UNIVERSAL, player);
                     }
                 }
@@ -1225,7 +1225,7 @@ public:
                         privateLevel++;
                     }
                     else if (questTick++ > 3)
-                        caster->ToPlayer()->KilledMonsterCredit(CREDIT_TROT, 0);
+                        caster->ToPlayer()->KilledMonsterCredit(CREDIT_TROT);
                     break;
                 case 2:
                     // Two - three clicks to maintains speed, less to decrease, more to increase
@@ -1242,7 +1242,7 @@ public:
                         questTick = 0;
                     }
                     else if (questTick++ > 3)
-                        caster->ToPlayer()->KilledMonsterCredit(CREDIT_CANTER, 0);
+                        caster->ToPlayer()->KilledMonsterCredit(CREDIT_CANTER);
                     break;
                 case 3:
                     // Four or more clicks to maintains speed, less to decrease
@@ -1253,7 +1253,7 @@ public:
                         questTick = 0;
                     }
                     else if (questTick++ > 3)
-                        caster->ToPlayer()->KilledMonsterCredit(CREDIT_GALLOP, 0);
+                        caster->ToPlayer()->KilledMonsterCredit(CREDIT_GALLOP);
                     break;
             }
 

@@ -365,9 +365,9 @@ public:
                         FlameWreathTimer = 20000;
                         FlameWreathCheckTime = 500;
 
-                        FlameWreathTarget[0] = 0;
-                        FlameWreathTarget[1] = 0;
-                        FlameWreathTarget[2] = 0;
+                        FlameWreathTarget[0].Clear();
+                        FlameWreathTarget[1].Clear();
+                        FlameWreathTarget[2].Clear();
 
                         FlameWreathEffect();
                         break;
@@ -499,7 +499,7 @@ public:
                         {
                             unit->CastSpell(unit, 20476, true, 0, 0, me->GetGUID());
                             unit->CastSpell(unit, 11027, true);
-                            FlameWreathTarget[i] = 0;
+                            FlameWreathTarget[i].Clear();
                         }
                     }
                     FlameWreathCheckTime = 500;

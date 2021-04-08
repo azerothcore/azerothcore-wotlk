@@ -89,6 +89,12 @@ struct MinionData
     uint32 entry, bossId;
 };
 
+struct ObjectData
+{
+    uint32 entry;
+    uint32 type;
+};
+
 struct BossInfo
 {
     BossInfo() : state(TO_BE_DECIDED) {}

@@ -25,7 +25,7 @@ void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
 {
     if (killed->GetTypeId() == TYPEID_PLAYER && player->GetTeamId() != killed->ToPlayer()->GetTeamId())
     {
-        player->KilledMonsterCredit(NA_CREDIT_MARKER, 0); // 0 guid, btw it isn't even used in killedmonster function :S
+        player->KilledMonsterCredit(NA_CREDIT_MARKER);
         player->CastSpell(player, player->GetTeamId() == TEAM_ALLIANCE ? NA_KILL_TOKEN_ALLIANCE : NA_KILL_TOKEN_HORDE, true);
     }
 }

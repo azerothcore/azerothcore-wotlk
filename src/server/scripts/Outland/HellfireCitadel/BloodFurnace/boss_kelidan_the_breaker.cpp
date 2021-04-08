@@ -171,7 +171,7 @@ public:
                 if (!channeler)
                     channeler = me->SummonCreature(NPC_CHANNELER, ShadowmoonChannelers[i][0], ShadowmoonChannelers[i][1], ShadowmoonChannelers[i][2], ShadowmoonChannelers[i][3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 300000);
 
-                channelers[i] = channeler ? channeler->GetGUID() : 0;
+                channelers[i] = channeler ? channeler->GetGUID() : ObjectGuid::Empty;
             }
         }
 

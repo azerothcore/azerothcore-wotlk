@@ -515,7 +515,7 @@ public:
         RESPAWN TIMES
     */
     [[nodiscard]] time_t GetLinkedRespawnTime(ObjectGuid guid) const;
-    [[nodiscard]] time_t GetCreatureRespawnTime(ObjectGuid::LowType guid) const
+    [[nodiscard]] time_t GetCreatureRespawnTime(ObjectGuid::LowType dbGuid) const
     {
         std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
         if (itr != _creatureRespawnTimes.end())
@@ -756,7 +756,7 @@ public:
     void AfterPlayerUnlinkFromMap() override;
     void Update(const uint32, const uint32, bool thread = true) override;
     void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
-    bool Reset(uint8 method, std::list<uint32>* globalSkipList = nullptr);
+    bool Reset(uint8 method, GuidList* globalSkipList = nullptr);
     uint32 GetScriptId() { return i_script_id; }
     InstanceScript* GetInstanceScript() { return instance_script; }
     void PermBindAllPlayers();

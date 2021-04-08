@@ -129,7 +129,7 @@ public:
                         Map::PlayerList const& PlayerList = instance->GetPlayers();
                         if (!PlayerList.isEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                                i->GetSource()->KilledMonsterCredit(NPC_GRAIN_CREATE_TRIGGER, 0);
+                                i->GetSource()->KilledMonsterCredit(NPC_GRAIN_CREATE_TRIGGER);
 
                         _showCrateTimer++;
                         if (GetData(DATA_ARTHAS_EVENT) < COS_PROGRESS_CRATES_FOUND)

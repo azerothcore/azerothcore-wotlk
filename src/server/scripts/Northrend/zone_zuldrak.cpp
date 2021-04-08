@@ -88,7 +88,7 @@ public:
                         return;
                     }
                     else
-                        player->KilledMonsterCredit(28248, 0);
+                        player->KilledMonsterCredit(28248);
                 }
                 else
                 {
@@ -295,7 +295,7 @@ public:
 
                         if (Unit* owner = me->ToTempSummon()->GetSummoner())
                             if (Player* player = owner->ToPlayer())
-                                player->KilledMonsterCredit(me->GetEntry(), 0);
+                                player->KilledMonsterCredit(me->GetEntry());
 
                         me->DespawnOrUnsummon(1);
                     }

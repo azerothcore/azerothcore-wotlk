@@ -7,6 +7,7 @@
 
 #include "Callback.h"
 #include "Common.h"
+#include "ObjectGuid.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
 #include "Timer.h"
@@ -563,7 +564,7 @@ public:
     virtual void KickAllLess(AccountTypes sec) = 0;
     virtual uint32 GetNextWhoListUpdateDelaySecs() = 0;
     virtual void LoadGlobalPlayerDataStore() = 0;
-    virtual ObjectGuid::LowType GetGlobalPlayerGUID(std::string const& name) const = 0;
+    virtual ObjectGuid GetGlobalPlayerGUID(std::string const& name) const = 0;
     virtual GlobalPlayerData const* GetGlobalPlayerData(ObjectGuid::LowType guid) const = 0;
     virtual void AddGlobalPlayerData(ObjectGuid::LowType guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId) = 0;
     virtual void UpdateGlobalPlayerData(ObjectGuid::LowType guid, uint8 mask, std::string const& name, uint8 level = 0, uint8 gender = 0, uint8 race = 0, uint8 playerClass = 0) = 0;
@@ -589,6 +590,7 @@ public:
     virtual time_t GetNextTimeWithMonthAndHour(int8 month, int8 hour) = 0;
     virtual std::string const& GetRealmName() const = 0;
     virtual void SetRealmName(std::string name) = 0;
+    virtual void RemoveOldCorpses() = 0;
 };
 
 #endif //AZEROTHCORE_IWORLD_H

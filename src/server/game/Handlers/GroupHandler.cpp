@@ -238,7 +238,7 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
         return;
     }
 
-    Player* leader = ObjectAccessor::FindPlayerInOrOutOfWorld(group->GetLeaderGUID());
+    Player* leader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
 
     // Forming a new group, create it
     if (!group->IsCreated())
@@ -275,7 +275,7 @@ void WorldSession::HandleGroupDeclineOpcode(WorldPacket& /*recvData*/)
         return;
 
     // Remember leader if online (group pointer will be invalid if group gets disbanded)
-    Player* leader = ObjectAccessor::FindPlayerInOrOutOfWorld(group->GetLeaderGUID());
+    Player* leader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
 
     // uninvite, group can be deleted
     GetPlayer()->UninviteFromGroup();
@@ -309,7 +309,7 @@ void WorldSession::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
     }
 
     // Xinef: name is properly filled in packets
-    sObjectMgr->GetPlayerNameByGUID(guid, name);
+    sObjectMgr->GetPlayerNameByGUID(guid.GetCounter(), name);
 
     PartyResult res = GetPlayer()->CanUninviteFromGroup();
     if (res != ERR_PARTY_RESULT_OK)
@@ -406,7 +406,7 @@ void WorldSession::HandleGroupSetLeaderOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(guid);
     Group* group = GetPlayer()->GetGroup();
 
     if (!group || !player)
@@ -596,7 +596,7 @@ void WorldSession::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
 
         if (guid.IsPlayer())
         {
-            Player* target = ObjectAccessor::FindPlayerInOrOutOfWorld(guid);
+            Player* target = ObjectAccessor::FindConnectedPlayer(guid);
 
             if (!target || target->IsHostileTo(GetPlayer()))
                 return;
@@ -1174,7 +1174,7 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
         // no player, cheating?
         if (!group->GetMemberGUID(playerName))
         {
-            return uint64(0);
+            return ObjectGuid::Empty;
         }
 
         if (Player* player = ObjectAccessor::FindPlayerByName(playerName.c_str()))
@@ -1189,7 +1189,7 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
             }
             else
             {
-                return uint64(0); // no player - again, cheating?
+                return ObjectGuid::Empty; // no player - again, cheating?
             }
         }
     };

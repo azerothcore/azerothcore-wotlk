@@ -399,7 +399,7 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
         return false;
 
     // set owner (not if item is only loaded for gbank/auction/mail
-    if (owner_guid != 0)
+    if (owner_guid)
         SetOwnerGUID(owner_guid);
 
     bool need_save = false;                                 // need explicit save data at load fixes
@@ -885,7 +885,7 @@ void Item::SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint
     if (slot < MAX_INSPECTED_ENCHANTMENT_SLOT)
     {
         if (uint32 oldEnchant = GetEnchantmentId(slot))
-            owner->GetSession()->SendEnchantmentLog(GetOwnerGUID(), 0, GetEntry(), oldEnchant);
+            owner->GetSession()->SendEnchantmentLog(GetOwnerGUID(), ObjectGuid::Empty, GetEntry(), oldEnchant);
 
         if (id)
             owner->GetSession()->SendEnchantmentLog(GetOwnerGUID(), caster, GetEntry(), id);

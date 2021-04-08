@@ -209,8 +209,8 @@ public:
             }
         }
 
-        goOrigGUID = 0;
-        meOrigGUID = 0;
+        goOrigGUID.Clear();
+        meOrigGUID.Clear();
     }
 
     //TIMED_ACTIONLIST (script type 9 aka script9)

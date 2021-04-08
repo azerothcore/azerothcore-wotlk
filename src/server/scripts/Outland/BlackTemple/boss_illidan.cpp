@@ -554,7 +554,7 @@ public:
 
                         Talk(SAY_ILLIDAN_TAKEOFF);
                         me->SendMeleeAttackStop(me->GetVictim());
-                        me->SetTarget(0);
+                        me->SetTarget();
                         me->GetMotionMaster()->Clear();
                         me->StopMovingOnCurrentPos();
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);

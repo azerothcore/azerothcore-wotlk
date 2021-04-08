@@ -778,7 +778,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
     recvData >> iguid;
     recvData >> unk;                                       // probably related to spam reporting
 
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(iguid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(iguid);
     if (!player)
         return;
 

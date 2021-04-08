@@ -61,9 +61,6 @@ SmartScript::SmartScript()
     mUseTextTimer = false;
     mTalkerEntry = 0;
     mTemplate = SMARTAI_TEMPLATE_BASIC;
-    meOrigGUID = 0;
-    goOrigGUID = 0;
-    mLastInvoker = 0;
     mScriptType = SMART_SCRIPT_TYPE_CREATURE;
     isProcessingTimedActionList = false;
 
@@ -103,7 +100,7 @@ void SmartScript::OnReset()
         }
     }
     ProcessEventsFor(SMART_EVENT_RESET);
-    mLastInvoker = 0;
+    mLastInvoker.Clear();
     mCounterList.clear();
 
     // Xinef: Fix Combat Movement
@@ -2124,9 +2121,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (IsCreature(*itr))
                     {
                         if (!meOrigGUID)
-                            meOrigGUID = me ? me->GetGUID() : 0;
+                            meOrigGUID = me ? me->GetGUID() : ObjectGuid::Empty;
                         if (!goOrigGUID)
-                            goOrigGUID = go ? go->GetGUID() : 0;
+                            goOrigGUID = go ? go->GetGUID() : ObjectGuid::Empty;
                         go = nullptr;
                         me = (*itr)->ToCreature();
                         break;
@@ -2134,9 +2131,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     else if (IsGameObject(*itr))
                     {
                         if (!meOrigGUID)
-                            meOrigGUID = me ? me->GetGUID() : 0;
+                            meOrigGUID = me ? me->GetGUID() : ObjectGuid::Empty;
                         if (!goOrigGUID)
-                            goOrigGUID = go ? go->GetGUID() : 0;
+                            goOrigGUID = go ? go->GetGUID() : ObjectGuid::Empty;
                         go = (*itr)->ToGameObject();
                         me = nullptr;
                         break;

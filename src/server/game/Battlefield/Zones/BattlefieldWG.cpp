@@ -32,6 +32,7 @@ bool BattlefieldWG::SetupBattlefield()
     m_BattleId = BATTLEFIELD_BATTLEID_WG;
     m_ZoneId = BATTLEFIELD_WG_ZONEID;
     m_MapId = BATTLEFIELD_WG_MAPID;
+    m_Map = sMapMgr->FindMap(m_MapId, 0);
 
     // init stalker AFTER setting map id... we spawn it at map=random memory value?...
     InitStalker(BATTLEFIELD_WG_NPC_STALKER, WintergraspStalkerPos[0], WintergraspStalkerPos[1], WintergraspStalkerPos[2], WintergraspStalkerPos[3]);
@@ -49,7 +50,7 @@ bool BattlefieldWG::SetupBattlefield()
     m_StartGrouping = false;
 
     m_tenacityStack = 0;
-    m_titansRelic = 0;
+    m_titansRelic.Clear();
 
     KickPosition.Relocate(5728.117f, 2714.346f, 697.733f, 0);
     KickPosition.m_mapId = m_MapId;
@@ -122,9 +123,8 @@ bool BattlefieldWG::SetupBattlefield()
 
     // Hide NPCs from the Attacker's team in the keep
     for (GuidUnorderedSet::const_iterator itr = KeepCreature[GetAttackerTeam()].begin(); itr != KeepCreature[GetAttackerTeam()].end(); ++itr)
-        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-            if (Creature* creature = unit->ToCreature())
-                HideNpc(creature);
+        if (Creature* creature = GetCreature(*itr))
+            HideNpc(creature);
 
     // Spawn Horde NPCs outside the keep
     for (uint8 i = 0; i < WG_OUTSIDE_ALLIANCE_NPC; i++)
@@ -138,9 +138,8 @@ bool BattlefieldWG::SetupBattlefield()
 
     // Hide units outside the keep that are defenders
     for (GuidUnorderedSet::const_iterator itr = OutsideCreature[GetDefenderTeam()].begin(); itr != OutsideCreature[GetDefenderTeam()].end(); ++itr)
-        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-            if (Creature* creature = unit->ToCreature())
-                HideNpc(creature);
+        if (Creature* creature = GetCreature(*itr))
+            HideNpc(creature);
 
     // Spawn turrets and hide them per default
     for (uint8 i = 0; i < WG_MAX_TURRET; i++)
@@ -225,13 +224,10 @@ void BattlefieldWG::OnBattleStart()
     // Update tower visibility and update faction
     for (GuidUnorderedSet::const_iterator itr = CanonList.begin(); itr != CanonList.end(); ++itr)
     {
-        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+        if (Creature* creature = GetCreature(*itr))
         {
-            if (Creature* creature = unit->ToCreature())
-            {
-                ShowNpc(creature, true);
-                creature->setFaction(WintergraspFaction[GetDefenderTeam()]);
-            }
+            ShowNpc(creature, true);
+            creature->setFaction(WintergraspFaction[GetDefenderTeam()]);
         }
     }
 
@@ -332,43 +328,37 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     // Remove relic
     if (GameObject* go = GetRelic())
         go->RemoveFromWorld();
-    m_titansRelic = 0;
+
+    m_titansRelic.Clear();
 
     // Remove turret
     for (GuidUnorderedSet::const_iterator itr = CanonList.begin(); itr != CanonList.end(); ++itr)
     {
-        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+        if (Creature* creature = GetCreature(*itr))
         {
-            if (Creature* creature = unit->ToCreature())
-            {
-                if (!endByTimer)
-                    creature->setFaction(WintergraspFaction[GetDefenderTeam()]);
-                HideNpc(creature);
-            }
+            if (!endByTimer)
+                creature->setFaction(WintergraspFaction[GetDefenderTeam()]);
+            HideNpc(creature);
         }
     }
 
     // Change all npc in keep
     for (GuidUnorderedSet::const_iterator itr = KeepCreature[GetAttackerTeam()].begin(); itr != KeepCreature[GetAttackerTeam()].end(); ++itr)
-        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-            if (Creature* creature = unit->ToCreature())
-                HideNpc(creature);
+        if (Creature* creature = GetCreature(*itr))
+            HideNpc(creature);
 
     for (GuidUnorderedSet::const_iterator itr = KeepCreature[GetDefenderTeam()].begin(); itr != KeepCreature[GetDefenderTeam()].end(); ++itr)
-        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-            if (Creature* creature = unit->ToCreature())
-                ShowNpc(creature, true);
+        if (Creature* creature = GetCreature(*itr))
+            ShowNpc(creature, true);
 
     // Change all npc out of keep
     for (GuidUnorderedSet::const_iterator itr = OutsideCreature[GetDefenderTeam()].begin(); itr != OutsideCreature[GetDefenderTeam()].end(); ++itr)
-        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-            if (Creature* creature = unit->ToCreature())
-                HideNpc(creature);
+        if (Creature* creature = GetCreature(*itr))
+            HideNpc(creature);
 
     for (GuidUnorderedSet::const_iterator itr = OutsideCreature[GetAttackerTeam()].begin(); itr != OutsideCreature[GetAttackerTeam()].end(); ++itr)
-        if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-            if (Creature* creature = unit->ToCreature())
-                ShowNpc(creature, true);
+        if (Creature* creature = GetCreature(*itr))
+            ShowNpc(creature, true);
 
     // Update all graveyard, control is to defender when no wartime
     for (uint8 i = 0; i < BATTLEFIELD_WG_GY_HORDE; i++)
@@ -399,9 +389,8 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     for (uint8 team = 0; team < 2; ++team)
     {
         for (GuidUnorderedSet::const_iterator itr = m_vehicles[team].begin(); itr != m_vehicles[team].end(); ++itr)
-            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-                if (Creature* creature = unit->ToCreature())
-                    creature->DespawnOrUnsummon(1);
+            if (Creature* creature = GetCreature(*itr))
+                creature->DespawnOrUnsummon(1);
 
         m_vehicles[team].clear();
     }
@@ -715,7 +704,7 @@ void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInWar[killerTeam].begin(); itr != m_PlayersInWar[killerTeam].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
                 if (player->GetDistance2d(killer) < 40)
-                    player->KilledMonsterCredit(NPC_QUEST_PVP_KILL_VEHICLE, 0);
+                    player->KilledMonsterCredit(NPC_QUEST_PVP_KILL_VEHICLE);
     }
 }
 
@@ -957,7 +946,7 @@ void BattlefieldWG::UpdatedDestroyedTowerCount(TeamId team, GameObject* go)
             {
                 // Quest - Wintergrasp - Southern Tower Kill
                 if (go && player->GetDistance2d(go) < 200.0f)
-                    player->KilledMonsterCredit(NPC_QUEST_SOUTHERN_TOWER_KILL, 0);
+                    player->KilledMonsterCredit(NPC_QUEST_SOUTHERN_TOWER_KILL);
 
                 player->CastSpell(player, SPELL_TOWER_CONTROL, true);
                 player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_LEANING_TOWER_ACHIEVEMENT, 0, 0);
@@ -981,7 +970,7 @@ void BattlefieldWG::UpdatedDestroyedTowerCount(TeamId team, GameObject* go)
             {
                 // Quest - Wintergrasp - Vehicle Protected
                 if (go && player->GetDistance2d(go) < 100.0f)
-                    player->KilledMonsterCredit(NPC_QUEST_VEHICLE_PROTECTED, 0);
+                    player->KilledMonsterCredit(NPC_QUEST_VEHICLE_PROTECTED);
             }
     }
 }
@@ -1053,7 +1042,7 @@ void BattlefieldWG::AddUpdateTenacity(Player* player)
 void BattlefieldWG::RemoveUpdateTenacity(Player* player)
 {
     m_updateTenacityList.erase(player->GetGUID());
-    m_updateTenacityList.insert(0);
+    m_updateTenacityList.insert(ObjectGuid::Empty);
 }
 
 void BattlefieldWG::UpdateTenacity()
@@ -1104,8 +1093,8 @@ void BattlefieldWG::UpdateTenacity()
                 player->RemoveAurasDueToSpell(SPELL_TENACITY);
 
         for (GuidUnorderedSet::const_iterator itr = m_vehicles[team].begin(); itr != m_vehicles[team].end(); ++itr)
-            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-                unit->RemoveAurasDueToSpell(SPELL_TENACITY_VEHICLE);
+            if (Creature* creature = GetCreature(*itr))
+                creature->RemoveAurasDueToSpell(SPELL_TENACITY_VEHICLE);
     }
 
     // Apply new buff
@@ -1124,11 +1113,11 @@ void BattlefieldWG::UpdateTenacity()
             }
 
         for (GuidUnorderedSet::const_iterator itr = m_vehicles[team].begin(); itr != m_vehicles[team].end(); ++itr)
-            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+            if (Creature* creature = GetCreature(*itr))
             {
-                unit->SetAuraStack(SPELL_TENACITY_VEHICLE, unit, newStack);
+                creature->SetAuraStack(SPELL_TENACITY_VEHICLE, creature, newStack);
                 if (buff_honor)
-                    unit->CastSpell(unit, buff_honor, true);
+                    creature->CastSpell(creature, buff_honor, true);
             }
     }
 }

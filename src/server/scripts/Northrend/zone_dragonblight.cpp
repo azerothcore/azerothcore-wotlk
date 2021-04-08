@@ -571,7 +571,7 @@ public:
                 if (TempSummon* summon = me->ToTempSummon())
                     if (Unit* owner = summon->GetSummoner())
                         if (Player* player = owner->ToPlayer())
-                            player->KilledMonsterCredit(me->GetEntry(), 0);
+                            player->KilledMonsterCredit(me->GetEntry());
             }
         }
     };
@@ -1874,7 +1874,7 @@ public:
         void Reset() override
         {
             _textCounter = 1;
-            _playerGUID  = 0;
+            _playerGUID.Clear();
         }
 
         void EnterCombat(Unit* who) override
@@ -1902,7 +1902,7 @@ public:
                 Talk(_textCounter, player);
 
                 if (_textCounter == 5)
-                    player->KilledMonsterCredit(NPC_TORTURER_LECRAFT, 0);
+                    player->KilledMonsterCredit(NPC_TORTURER_LECRAFT);
 
                 ++_textCounter;
 

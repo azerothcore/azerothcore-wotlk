@@ -84,7 +84,7 @@ void OPvPCapturePointEP_EWT::ChangeState()
 
     // complete quest objective
     if (m_TowerState == EP_TS_A || m_TowerState == EP_TS_H)
-        SendObjectiveComplete(EP_EWT_CM, 0);
+        SendObjectiveComplete(EP_EWT_CM);
 }
 
 void OPvPCapturePointEP_EWT::SendChangePhase()
@@ -230,7 +230,7 @@ void OPvPCapturePointEP_NPT::ChangeState()
 
     // complete quest objective
     if (m_TowerState == EP_TS_A || m_TowerState == EP_TS_H)
-        SendObjectiveComplete(EP_NPT_CM, 0);
+        SendObjectiveComplete(EP_NPT_CM);
 }
 
 void OPvPCapturePointEP_NPT::SendChangePhase()
@@ -362,7 +362,7 @@ void OPvPCapturePointEP_CGT::ChangeState()
 
     // complete quest objective
     if (m_TowerState == EP_TS_A || m_TowerState == EP_TS_H)
-        SendObjectiveComplete(EP_CGT_CM, 0);
+        SendObjectiveComplete(EP_CGT_CM);
 }
 
 void OPvPCapturePointEP_CGT::SendChangePhase()
@@ -499,7 +499,7 @@ void OPvPCapturePointEP_PWT::ChangeState()
 
     // complete quest objective
     if (m_TowerState == EP_TS_A || m_TowerState == EP_TS_H)
-        SendObjectiveComplete(EP_PWT_CM, 0);
+        SendObjectiveComplete(EP_PWT_CM);
 }
 
 void OPvPCapturePointEP_PWT::SendChangePhase()

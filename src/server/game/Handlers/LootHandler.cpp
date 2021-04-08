@@ -210,8 +210,8 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
         loot->gold = 0;
 
         // Delete the money loot record from the DB
-        if (loot->containerId > 0)
-            sLootItemStorage->RemoveStoredLootMoney(loot->containerId, loot);
+        if (loot->containerGUID)
+            sLootItemStorage->RemoveStoredLootMoney(loot->containerGUID, loot);
 
         // Delete container if empty
         if (loot->isLooted() && guid.IsItem())
@@ -319,7 +319,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
 
             // if the round robin player release, reset it.
             if (player->GetGUID() == loot->roundRobinPlayer)
-                loot->roundRobinPlayer = 0;
+                loot->roundRobinPlayer.Clear();
         }
     }
     else if (lguid.IsCorpse())        // ONLY remove insignia at BG
@@ -337,7 +337,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             corpse->RemoveFlag(CORPSE_FIELD_DYNAMIC_FLAGS, CORPSE_DYNFLAG_LOOTABLE);
         }
     }
-    else if ((lguid.IsItem())
+    else if (lguid.IsItem())
     {
         Item* pItem = player->GetItemByGuid(lguid);
         if (!pItem)
@@ -389,7 +389,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             // if the round robin player release, reset it.
             if (player->GetGUID() == loot->roundRobinPlayer)
             {
-                loot->roundRobinPlayer = 0;
+                loot->roundRobinPlayer.Clear();
 
                 if (Group* group = player->GetGroup())
                     group->SendLooter(creature, nullptr);
@@ -416,7 +416,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
-    Player* target = ObjectAccessor::GetPlayer(*_player, target_playerguid));
+    Player* target = ObjectAccessor::GetPlayer(*_player, target_playerguid);
     if (!target)
     {
         _player->SendLootError(lootguid, LOOT_ERROR_PLAYER_NOT_FOUND);

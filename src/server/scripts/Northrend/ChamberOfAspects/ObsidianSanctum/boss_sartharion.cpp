@@ -706,9 +706,7 @@ public:
 
 struct boss_sartharion_dragonAI : public BossAI
 {
-    boss_sartharion_dragonAI(Creature* pCreature, uint32 bossId) : BossAI(pCreature, bossId),
-        portalGUID(0),
-        isCalledBySartharion(false)
+    boss_sartharion_dragonAI(Creature* pCreature, uint32 bossId) : BossAI(pCreature, bossId), isCalledBySartharion(false)
     {
     }
 

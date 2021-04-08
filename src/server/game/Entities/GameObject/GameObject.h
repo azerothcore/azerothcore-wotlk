@@ -963,6 +963,7 @@ protected:
     // For traps this: spell casting cooldown, for doors/buttons: reset time.
     GuidList m_SkillupList;
 
+    ObjectGuid m_ritualOwnerGUID;                       // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
     GuidSet m_unique_users;
     uint32 m_usetimes;
 

@@ -1173,7 +1173,7 @@ public:
                             outroTimer = 0;
                             for (Map::PlayerList::const_iterator itr = instance->GetPlayers().begin(); itr != instance->GetPlayers().end(); ++itr)
                                 if (Player* p = itr->GetSource())
-                                    p->KilledMonsterCredit(NPC_WRATH_OF_THE_LICH_KING_CREDIT, 0);
+                                    p->KilledMonsterCredit(NPC_WRATH_OF_THE_LICH_KING_CREDIT);
                             if (TeamIdInInstance == TEAM_ALLIANCE)
                                 if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                                 {

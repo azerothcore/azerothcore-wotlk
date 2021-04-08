@@ -1725,7 +1725,7 @@ public:
                         Map::PlayerList const& pl = pInstance->instance->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
-                                p->KilledMonsterCredit(me->GetEntry(), 0); // for quest
+                                p->KilledMonsterCredit(me->GetEntry()); // for quest
 
                         Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_LEAVE : SAY_SYLVANAS_LEAVE);
                         me->GetMotionMaster()->MovePoint(0, LeaderEscapePos);

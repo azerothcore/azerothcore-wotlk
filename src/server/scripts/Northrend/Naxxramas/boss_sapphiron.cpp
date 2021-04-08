@@ -120,7 +120,7 @@ public:
             events.Reset();
             iceboltCount = 0;
             spawnTimer = 0;
-            currentTarget = 0;
+            currentTarget.Clear();
             blockList.clear();
         }
 
@@ -284,7 +284,7 @@ public:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                     me->SetDisableGravity(true);
                     me->SetHover(true);
-                    currentTarget = 0;
+                    currentTarget.Clear();
                     events.ScheduleEvent(EVENT_FLIGHT_ICEBOLT, 3000);
                     iceboltCount = RAID_MODE(2, 3);
                     return;
@@ -327,7 +327,7 @@ public:
                         return;
                     }
                 case EVENT_FLIGHT_BREATH:
-                    currentTarget = 0;
+                    currentTarget.Clear();
                     Talk(EMOTE_BREATH);
                     me->CastSpell(me, SPELL_FROST_MISSILE, false);
                     events.ScheduleEvent(EVENT_FLIGHT_SPELL_EXPLOSION, 8500);

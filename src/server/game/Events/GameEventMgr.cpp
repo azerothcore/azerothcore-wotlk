@@ -1285,7 +1285,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
         return;
     }
 
-    for (GuidList::iterator itr = mGameEventCreatureGuids[internal_event_id].begin(); itr != mGameEventCreatureGuids[internal_event_id].end(); ++itr)
+    for (GuidLowList::iterator itr = mGameEventCreatureGuids[internal_event_id].begin(); itr != mGameEventCreatureGuids[internal_event_id].end(); ++itr)
     {
         // Add to correct cell
         if (CreatureData const* data = sObjectMgr->GetCreatureData(*itr))
@@ -1312,7 +1312,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
         return;
     }
 
-    for (GuidList::iterator itr = mGameEventGameobjectGuids[internal_event_id].begin(); itr != mGameEventGameobjectGuids[internal_event_id].end(); ++itr)
+    for (GuidLowList::iterator itr = mGameEventGameobjectGuids[internal_event_id].begin(); itr != mGameEventGameobjectGuids[internal_event_id].end(); ++itr)
     {
         // Add to correct cell
         if (GameObjectData const* data = sObjectMgr->GetGOData(*itr))
@@ -1360,7 +1360,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         return;
     }
 
-    for (GuidList::iterator itr = mGameEventCreatureGuids[internal_event_id].begin(); itr != mGameEventCreatureGuids[internal_event_id].end(); ++itr)
+    for (GuidLowList::iterator itr = mGameEventCreatureGuids[internal_event_id].begin(); itr != mGameEventCreatureGuids[internal_event_id].end(); ++itr)
     {
         // check if it's needed by another event, if so, don't remove
         if (event_id > 0 && hasCreatureActiveEventExcept(*itr, event_id))
@@ -1391,7 +1391,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         return;
     }
 
-    for (GuidList::iterator itr = mGameEventGameobjectGuids[internal_event_id].begin(); itr != mGameEventGameobjectGuids[internal_event_id].end(); ++itr)
+    for (GuidLowList::iterator itr = mGameEventGameobjectGuids[internal_event_id].begin(); itr != mGameEventGameobjectGuids[internal_event_id].end(); ++itr)
     {
         // check if it's needed by another event, if so, don't remove
         if (event_id > 0 && hasGameObjectActiveEventExcept(*itr, event_id))
@@ -1516,9 +1516,7 @@ bool GameEventMgr::hasCreatureActiveEventExcept(uint32 creature_id, uint16 event
         if ((*e_itr) != event_id)
         {
             int32 internal_event_id = mGameEvent.size() + (*e_itr) - 1;
-            for (GuidList::iterator itr = mGameEventCreatureGuids[internal_event_id].begin();
-                    itr != mGameEventCreatureGuids[internal_event_id].end();
-                    ++ itr)
+            for (GuidLowList::iterator itr = mGameEventCreatureGuids[internal_event_id].begin(); itr != mGameEventCreatureGuids[internal_event_id].end(); ++ itr)
                 if (*itr == creature_id)
                     return true;
         }
@@ -1532,9 +1530,7 @@ bool GameEventMgr::hasGameObjectActiveEventExcept(uint32 go_id, uint16 event_id)
         if ((*e_itr) != event_id)
         {
             int32 internal_event_id = mGameEvent.size() + (*e_itr) - 1;
-            for (GuidList::iterator itr = mGameEventGameobjectGuids[internal_event_id].begin();
-                    itr != mGameEventGameobjectGuids[internal_event_id].end();
-                    ++ itr)
+            for (GuidLowList::iterator itr = mGameEventGameobjectGuids[internal_event_id].begin(); itr != mGameEventGameobjectGuids[internal_event_id].end(); ++ itr)
                 if (*itr == go_id)
                     return true;
         }

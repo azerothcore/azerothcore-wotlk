@@ -82,22 +82,22 @@ public:
     bool IsClosed() const { return  _type != TICKET_TYPE_OPEN; }
     bool IsCompleted() const { return _completed; }
     bool IsFromPlayer(ObjectGuid guid) const { return guid == _playerGuid; }
-    bool IsAssigned() const { return _assignedTo != 0; }
+    bool IsAssigned() const { return _assignedTo; }
     bool IsAssignedTo(ObjectGuid guid) const { return guid == _assignedTo; }
     bool IsAssignedNotTo(ObjectGuid guid) const { return IsAssigned() && !IsAssignedTo(guid); }
 
     uint32 GetId() const { return _id; }
-    Player* GetPlayer() const { return ObjectAccessor::FindPlayerInOrOutOfWorld(_playerGuid); }
+    Player* GetPlayer() const { return ObjectAccessor::FindConnectedPlayer(_playerGuid); }
     std::string const& GetPlayerName() const { return _playerName; }
     std::string const& GetMessage() const { return _message; }
-    Player* GetAssignedPlayer() const { return ObjectAccessor::FindPlayerInOrOutOfWorld(_assignedTo); }
+    Player* GetAssignedPlayer() const { return ObjectAccessor::FindConnectedPlayer(_assignedTo); }
     ObjectGuid GetAssignedToGUID() const { return _assignedTo; }
     std::string GetAssignedToName() const
     {
         std::string name;
         // save queries if ticket is not assigned
         if (_assignedTo)
-            sObjectMgr->GetPlayerNameByGUID(_assignedTo, name);
+            sObjectMgr->GetPlayerNameByGUID(_assignedTo.GetCounter(), name);
 
         return name;
     }
@@ -113,8 +113,8 @@ public:
         else if (_escalatedStatus == TICKET_UNASSIGNED)
             _escalatedStatus = TICKET_ASSIGNED;
     }
-    void SetClosedBy(int64 value) { _closedBy = value; _type = TICKET_TYPE_CLOSED; }
-    void SetResolvedBy(int64 value) { _resolvedBy = value; }
+    void SetClosedBy(ObjectGuid value) { _closedBy = value; _type = TICKET_TYPE_CLOSED; }
+    void SetResolvedBy(ObjectGuid value) { _resolvedBy = value; }
     void SetCompleted() { _completed = true; }
     void SetMessage(std::string const& message)
     {
@@ -210,8 +210,8 @@ public:
     }
 
     void AddTicket(GmTicket* ticket);
-    void CloseTicket(uint32 ticketId, int64 source = -1);
-    void ResolveAndCloseTicket(uint32 ticketId, int64 source); // used when GM resolves a ticket by simply closing it
+    void CloseTicket(uint32 ticketId, ObjectGuid source = ObjectGuid::Empty);
+    void ResolveAndCloseTicket(uint32 ticketId, ObjectGuid source); // used when GM resolves a ticket by simply closing it
     void RemoveTicket(uint32 ticketId);
 
     bool GetStatus() const { return _status; }

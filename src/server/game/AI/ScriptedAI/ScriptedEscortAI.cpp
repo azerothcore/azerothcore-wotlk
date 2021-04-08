@@ -22,7 +22,6 @@ enum ePoints
 };
 
 npc_escortAI::npc_escortAI(Creature* creature) : ScriptedAI(creature),
-    m_uiPlayerGUID(0),
     m_uiWPWaitTimer(1000),
     m_uiPlayerCheckTimer(0),
     m_uiEscortState(STATE_ESCORT_NONE),

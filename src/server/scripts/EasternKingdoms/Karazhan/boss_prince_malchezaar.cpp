@@ -278,7 +278,7 @@ public:
                 Unit* target = ObjectAccessor::GetUnit(*me, enfeeble_targets[i]);
                 if (target && target->IsAlive())
                     target->SetHealth(enfeeble_health[i]);
-                enfeeble_targets[i] = 0;
+                enfeeble_targets[i].Clear();
                 enfeeble_health[i] = 0;
             }
         }

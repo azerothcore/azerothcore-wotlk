@@ -23,7 +23,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID() : 0, true),
+Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID() : ObjectGuid::Empty, true),
     m_usedTalentCount(0), m_removed(false), m_owner(owner),
     m_happinessTimer(PET_LOSE_HAPPINES_INTERVAL), m_petType(type), m_duration(0),
     m_auraRaidUpdateMask(0), m_loading(false), m_petRegenTimer(PET_FOCUS_REGEN_INTERVAL), m_declinedname(nullptr), m_tempspellTarget(nullptr), m_tempoldTarget(nullptr), m_tempspellIsPositive(false), m_tempspell(0), asynchLoadType(PET_LOAD_DEFAULT)
@@ -1959,7 +1959,7 @@ bool Pet::IsPermanentPetFor(Player* owner) const
     }
 }
 
-bool Pet::Create(ObjectGuid::LowType spawnId, Map* map, uint32 phaseMask, uint32 Entry, uint32 pet_number)
+bool Pet::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 pet_number)
 {
     ASSERT(map);
     SetMap(map);
@@ -2239,7 +2239,7 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
         // we are almost at home...
         if (asynchLoadType == PET_LOAD_SUMMON_PET)
         {
-            Unit* caster = ObjectAccessor::GetObjectInMap(info->m_casterGUID, map, (Unit*)nullptr);
+            Unit* caster = ObjectAccessor::GetUnit(*player, info->m_casterGUID);
             if (!caster)
                 caster = player;
 
@@ -2274,7 +2274,7 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
             pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
             pet->setDeathState(ALIVE);
             pet->ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_POSSESSED))); // xinef: just in case
-            pet->SetHealth(pet->CountPctFromMaxHealth(uint32(info->m_casterGUID))); // damage for this effect is saved in caster guid, dont create next variable...
+            pet->SetHealth(pet->CountPctFromMaxHealth(uint32(info->m_casterGUID.GetRawValue()))); // damage for this effect is saved in caster guid, dont create next variable...
 
             //AIM_Initialize();
             //owner->PetSpellInitialize();

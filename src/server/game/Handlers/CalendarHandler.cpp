@@ -210,7 +210,8 @@ bool validUtf8String(WorldPacket& recvData, std::string& s, std::string action, 
 {
     if (!utf8::is_valid(s.begin(), s.end()))
     {
-        sLog->outString("CalendarHandler: Player with guid %llu attempt to %s an event with invalid name or description (packet modification)", (unsigned long long)playerGUID, action.c_str());
+        sLog->outString("CalendarHandler: Player (%s) attempt to %s an event with invalid name or description (packet modification)",
+            playerGUID.ToString().c_str(), action.c_str());
         recvData.rfinish();
         return false;
     }
@@ -292,13 +293,13 @@ void WorldSession::HandleCalendarAddEvent(WorldPacket& recvData)
             time_t(eventPackedTime), flags, time_t(unkPackedTime), title, description);
 
     if (calendarEvent->IsGuildEvent() || calendarEvent->IsGuildAnnouncement())
-        if (Player* creator = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+        if (Player* creator = ObjectAccessor::FindConnectedPlayer(guid))
             calendarEvent->SetGuildId(creator->GetGuildId());
 
     if (calendarEvent->IsGuildAnnouncement())
     {
         // 946684800 is 01/01/2000 00:00:00 - default response time
-        CalendarInvite* invite = new CalendarInvite(0, calendarEvent->GetEventId(), 0, guid, 946684800, CALENDAR_STATUS_NOT_SIGNED_UP, CALENDAR_RANK_PLAYER, "");
+        CalendarInvite* invite = new CalendarInvite(0, calendarEvent->GetEventId(), ObjectGuid::Empty, guid, 946684800, CALENDAR_STATUS_NOT_SIGNED_UP, CALENDAR_RANK_PLAYER, "");
         sCalendarMgr->AddInvite(calendarEvent, invite);
     }
     else
@@ -531,11 +532,11 @@ void WorldSession::HandleCalendarEventInvite(WorldPacket& recvData)
     else
     {
         // xinef: Get Data From global storage
-        if (ObjectGuid::LowType guidLow = sWorld->GetGlobalPlayerGUID(name))
+        if (ObjectGuid guid = sWorld->GetGlobalPlayerGUID(name))
         {
-            if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guidLow))
+            if (GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid.GetCounter()))
             {
-                inviteeGuid = ObjectGuid::Create<HighGuid::Player>(guidLow);
+                inviteeGuid = guid;
                 inviteeTeamId = Player::TeamIdForRace(playerData->race);
                 inviteeGuildId = playerData->guildId;
             }
@@ -699,7 +700,7 @@ void WorldSession::HandleCalendarEventStatus(WorldPacket& recvData)
 
     recvData >> invitee.ReadAsPacked();
     recvData >> eventId >> inviteId >> ownerInviteId >> status;
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_CALENDAR_EVENT_STATUS [%s] EventId [" UI64FMTD "] ownerInviteId [" UI64FMTD "], Invitee ([%s"] id: [" UI64FMTD "], status %u",
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_CALENDAR_EVENT_STATUS [%s] EventId [" UI64FMTD "] ownerInviteId [" UI64FMTD "], Invitee (%s) id: [" UI64FMTD "], status %u",
         guid.ToString().c_str(), eventId, ownerInviteId, invitee.ToString().c_str(), inviteId, status);
 
     if (CalendarEvent* calendarEvent = sCalendarMgr->GetEvent(eventId))

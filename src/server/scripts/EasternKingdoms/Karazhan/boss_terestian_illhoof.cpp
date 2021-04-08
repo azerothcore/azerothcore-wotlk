@@ -337,7 +337,7 @@ public:
                     if (Creature* pPortal = ObjectAccessor::GetCreature((*me), PortalGUID[i]))
                         pPortal->DespawnOrUnsummon();
 
-                    PortalGUID[i] = 0;
+                    PortalGUID[i].Clear();
                 }
             }
 

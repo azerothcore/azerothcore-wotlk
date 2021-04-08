@@ -30,6 +30,7 @@ Battlefield::Battlefield()
     m_TypeId = 0;
     m_BattleId = 0;
     m_ZoneId = 0;
+    m_Map = nullptr;
     m_MapId = 0;
     m_MaxPlayer = 0;
     m_MinPlayer = 0;
@@ -45,13 +46,12 @@ Battlefield::Battlefield()
     m_LastResurectTimer = RESURRECTION_INTERVAL;
     m_StartGroupingTimer = 0;
     m_StartGrouping = false;
-    StalkerGuid = 0;
 }
 
 Battlefield::~Battlefield()
 {
     for (BfCapturePointVector::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        delete itr->second;
+        delete *itr;
 
     for (GraveyardVect::const_iterator itr = m_GraveyardList.begin(); itr != m_GraveyardList.end(); ++itr)
         delete *itr;
@@ -111,7 +111,7 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
     }
 
     for (BfCapturePointVector::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        itr->second->HandlePlayerLeave(player);
+        (*itr)->HandlePlayerLeave(player);
 
     m_InvitedPlayers[player->GetTeamId()].erase(player->GetGUID());
     m_PlayersWillBeKick[player->GetTeamId()].erase(player->GetGUID());
@@ -183,7 +183,7 @@ bool Battlefield::Update(uint32 diff)
             m_uiKickDontAcceptTimer -= diff;
 
         for (BfCapturePointVector::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-            if (itr->second->Update(diff))
+            if ((*itr)->Update(diff))
                 objective_changed = true;
     }
 
@@ -461,15 +461,16 @@ void Battlefield::BroadcastPacketToWar(WorldPacket& data) const
 
 void Battlefield::SendWarningToAllInZone(uint32 entry)
 {
-    if (Unit* unit = ObjectAccessor::FindUnit(StalkerGuid))
-        if (Creature* stalker = unit->ToCreature())
-            sCreatureTextMgr->SendChat(stalker, (uint8)entry, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+    if (Map* map = sMapMgr->CreateBaseMap(m_MapId))
+        if (Unit* unit = map->GetCreature(StalkerGuid))
+            if (Creature* stalker = unit->ToCreature())
+                sCreatureTextMgr->SendChat(stalker, (uint8)entry, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
 }
 
 void Battlefield::SendWarningToPlayer(Player* player, uint32 entry)
 {
     if (player)
-        if (Unit* unit = ObjectAccessor::FindUnit(StalkerGuid))
+        if (Unit* unit = ObjectAccessor::GetCreature(*player, StalkerGuid))
             if (Creature* stalker = unit->ToCreature())
                 sCreatureTextMgr->SendChat(stalker, (uint8)entry, player);
 }
@@ -519,7 +520,7 @@ void Battlefield::ShowNpc(Creature* creature, bool aggressive)
 Group* Battlefield::GetFreeBfRaid(TeamId TeamId)
 {
     for (GuidUnorderedSet::const_iterator itr = m_Groups[TeamId].begin(); itr != m_Groups[TeamId].end(); ++itr)
-        if (Group* group = sGroupMgr->GetGroupByGUID(*itr))
+        if (Group* group = sGroupMgr->GetGroupByGUID(itr->GetCounter()))
             if (!group->IsFull())
                 return group;
 
@@ -529,7 +530,7 @@ Group* Battlefield::GetFreeBfRaid(TeamId TeamId)
 Group* Battlefield::GetGroupPlayer(ObjectGuid guid, TeamId TeamId)
 {
     for (GuidUnorderedSet::const_iterator itr = m_Groups[TeamId].begin(); itr != m_Groups[TeamId].end(); ++itr)
-        if (Group* group = sGroupMgr->GetGroupByGUID(*itr))
+        if (Group* group = sGroupMgr->GetGroupByGUID(itr->GetCounter()))
             if (group->IsMember(guid))
                 return group;
 
@@ -665,8 +666,6 @@ BfGraveyard::BfGraveyard(Battlefield* battlefield)
     m_Bf = battlefield;
     m_GraveyardId = 0;
     m_ControlTeam = TEAM_NEUTRAL;
-    m_SpiritGuide[0] = 0;
-    m_SpiritGuide[1] = 0;
     m_ResurrectQueue.clear();
 }
 
@@ -727,7 +726,7 @@ void BfGraveyard::Resurrect()
 
         // Check  if the player is in world and on the good graveyard
         if (player->IsInWorld())
-            if (Unit* spirit = ObjectAccessor::FindUnit(m_SpiritGuide[m_ControlTeam]))
+            if (Unit* spirit = ObjectAccessor::GetCreature(*player, m_SpiritGuide[m_ControlTeam]))
                 spirit->CastSpell(spirit, SPELL_SPIRIT_HEAL, true);
 
         // Resurect player
@@ -843,11 +842,27 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
     return go;
 }
 
+Creature* Battlefield::GetCreature(ObjectGuid const guid)
+{
+    if (!m_Map)
+        return nullptr;
+
+    return m_Map->GetCreature(guid);
+}
+
+GameObject* Battlefield::GetGameObject(ObjectGuid const guid)
+{
+    if (!m_Map)
+        return nullptr;
+
+    return m_Map->GetGameObject(guid);
+}
+
 // *******************************************************
 // ******************* CapturePoint **********************
 // *******************************************************
 
-BfCapturePoint::BfCapturePoint(Battlefield* battlefield) : m_Bf(battlefield), m_capturePoint(0)
+BfCapturePoint::BfCapturePoint(Battlefield* battlefield) : m_Bf(battlefield)
 {
     m_team = TEAM_NEUTRAL;
     m_value = 0;
@@ -948,10 +963,20 @@ bool BfCapturePoint::DelCapturePoint()
     {
         capturePoint->SetRespawnTime(0);                  // not save respawn time
         capturePoint->Delete();
-        m_capturePoint = 0;
+        m_capturePoint.Clear();
     }
 
     return true;
+}
+
+GameObject* BfCapturePoint::GetCapturePointGo()
+{
+    return m_Bf->GetGameObject(m_capturePoint);
+}
+
+GameObject* BfCapturePoint::GetCapturePointGo(WorldObject* obj)
+{
+    return ObjectAccessor::GetGameObject(*obj, m_capturePoint);
 }
 
 bool BfCapturePoint::Update(uint32 diff)

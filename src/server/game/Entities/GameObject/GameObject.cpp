@@ -52,7 +52,6 @@ GameObject::GameObject() : WorldObject(false), MovableMapObject(),
 
     m_spawnId = 0;
 
-    m_lootRecipient = 0;
     m_lootRecipientGroup = 0;
     m_groupLootTimer = 0;
     lootingGroupLowGUID = 0;
@@ -122,7 +121,7 @@ void GameObject::RemoveFromOwner()
     /*sLog->outCrash("Delete GameObject (%s Entry: %u SpellId %u LinkedGO %u) that lost references to owner %s GO list. Crash possible later.",
         GetGUID().ToString().c_str(), GetGOInfo()->entry, m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), ownerGUID.ToString().c_str());*/
 
-    SetOwnerGUID(0);
+    SetOwnerGUID(ObjectGuid::Empty);
 }
 
 void GameObject::AddToWorld()
@@ -497,7 +496,7 @@ void GameObject::Update(uint32 diff)
                     time_t now = time(nullptr);
                     if (m_respawnTime <= now)            // timer expired
                     {
-                        ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::GameObject>(GetEntry(), m_DBTableGuid);
+                        ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::GameObject>(GetEntry(), m_spawnId);
                         time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
                         if (linkedRespawntime)             // Can't respawn, the master is dead
                         {
@@ -839,7 +838,7 @@ void GameObject::SaveToDB()
 {
     // this should only be used when the gameobject has already been loaded
     // preferably after adding to map, because mapid may not be valid otherwise
-    GameObjectData const* data = sObjectMgr->GetGOData(m_DBTableGuid);
+    GameObjectData const* data = sObjectMgr->GetGOData(m_spawnId);
     if (!data)
     {
         sLog->outError("GameObject::SaveToDB failed, cannot get gameobject data!");
@@ -1348,9 +1347,9 @@ void GameObject::Use(Unit* user)
                 {
                     if (info->chair.slots > 0)     // sometimes chairs in DB have error in fields and we dont know number of slots
                         for (uint32 i = 0; i < info->chair.slots; ++i)
-                            ChairListSlots[i] = 0; // Last user of current slot set to 0 (none sit here yet)
+                            ChairListSlots[i].Clear(); // Last user of current slot set to 0 (none sit here yet)
                     else
-                        ChairListSlots[0] = 0;     // error in DB, make one default slot
+                        ChairListSlots[0].Clear();     // error in DB, make one default slot
                 }
 
                 Player* player = user->ToPlayer();
@@ -1383,10 +1382,10 @@ void GameObject::Use(Unit* user)
                             if (ChairUser->IsSitState() && ChairUser->getStandState() != UNIT_STAND_STATE_SIT && ChairUser->GetExactDist2d(x_i, y_i) < 0.1f)
                                 continue;        // This seat is already occupied by ChairUser. NOTE: Not sure if the ChairUser->getStandState() != UNIT_STAND_STATE_SIT check is required.
                             else
-                                itr->second = 0; // This seat is unoccupied.
+                                itr->second.Clear(); // This seat is unoccupied.
                         }
                         else
-                            itr->second = 0;     // The seat may of had an occupant, but they're offline.
+                            itr->second.Clear();     // The seat may of had an occupant, but they're offline.
                     }
 
                     found_free_slot = true;
@@ -1667,7 +1666,7 @@ void GameObject::Use(Unit* user)
 
                 if (info->spellcaster.partyOnly)
                 {
-                    Player const* caster = ObjectAccessor::GetObjectInOrOutOfWorld(GetOwnerGUID(), (Player*)nullptr);
+                    Player const* caster = ObjectAccessor::FindConnectedPlayer(GetOwnerGUID());
                     if (!caster || user->GetTypeId() != TYPEID_PLAYER || !user->ToPlayer()->IsInSameRaidWith(caster))
                         return;
                 }
@@ -1914,7 +1913,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
         // xinef: set proper orientation, fixes cast against stealthed targets
         if (target)
             trigger->SetInFront(target);
-        trigger->CastSpell(target ? target : trigger, spellInfo, true, 0, 0, target ? target->GetGUID() : 0);
+        trigger->CastSpell(target ? target : trigger, spellInfo, true, 0, 0, target ? target->GetGUID() : ObjectGuid::Empty);
     }
 }
 
@@ -2289,7 +2288,7 @@ Player* GameObject::GetLootRecipient() const
 {
     if (!m_lootRecipient)
         return nullptr;
-    return ObjectAccessor::FindPlayerInOrOutOfWorld(m_lootRecipient);
+    return ObjectAccessor::FindConnectedPlayer(m_lootRecipient);
 }
 
 Group* GameObject::GetLootRecipientGroup() const
@@ -2307,7 +2306,7 @@ void GameObject::SetLootRecipient(Unit* unit)
 
     if (!unit)
     {
-        m_lootRecipient = 0;
+        m_lootRecipient.Clear();
         m_lootRecipientGroup = 0;
         return;
     }
@@ -2321,7 +2320,7 @@ void GameObject::SetLootRecipient(Unit* unit)
 
     m_lootRecipient = player->GetGUID();
     if (Group* group = player->GetGroup())
-        m_lootRecipientGroup = group->GetLowGUID();
+        m_lootRecipientGroup = group->GetGUID().GetCounter();
 }
 
 bool GameObject::IsLootAllowedFor(Player const* player) const

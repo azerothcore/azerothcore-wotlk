@@ -50,7 +50,7 @@ Vehicle::~Vehicle()
     for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
         if (itr->second.Passenger.Guid)
         {
-            if (Unit* unit = ObjectAccessor::FindUnit(itr->second.Passenger.Guid))
+            if (Unit* unit = ObjectAccessor::GetUnit(*_me, itr->second.Passenger.Guid))
             {
                 sLog->outString("ZOMG! ~Vehicle(), unit: %s, entry: %u, typeid: %u, this_entry: %u, this_typeid: %u!", unit->GetName().c_str(), unit->GetEntry(), unit->GetTypeId(), _me ? _me->GetEntry() : 0, _me ? _me->GetTypeId() : 0);
                 unit->_ExitVehicle();
@@ -340,7 +340,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
             if (Unit* passenger = ObjectAccessor::GetUnit(*GetBase(), seat->second.Passenger.Guid))
                 passenger->ExitVehicle();
 
-            seat->second.Passenger.Guid = 0;
+            seat->second.Passenger.Guid.Clear();
         }
 
         ASSERT(seat->second.IsEmpty());

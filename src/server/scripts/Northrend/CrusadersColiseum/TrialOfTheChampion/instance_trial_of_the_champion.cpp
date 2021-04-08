@@ -47,7 +47,7 @@ public:
         ObjectGuid NPC_GrandChampionMinionsGUID[3][3];
         ObjectGuid NPC_ArgentChampionGUID;
         ObjectGuid NPC_ArgentSoldierGUID[3][3];
-        ObjectGuid NPC_MemoryEntry;
+        uint32 NPC_MemoryEntry;
         ObjectGuid NPC_BlackKnightVehicleGUID;
         ObjectGuid NPC_BlackKnightGUID;
         ObjectGuid GO_MainGateGUID;
@@ -291,11 +291,11 @@ public:
                             {
                                 if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[i][j]) )
                                     c->DespawnOrUnsummon();
-                                NPC_GrandChampionMinionsGUID[i][j] = 0;
+                                NPC_GrandChampionMinionsGUID[i][j].Clear();
                             }
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                                 c->DespawnOrUnsummon();
-                            NPC_GrandChampionGUID[i] = 0;
+                            NPC_GrandChampionGUID[i].Clear();
                         }
                         if( Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
                         {
@@ -360,7 +360,7 @@ public:
                             {
                                 if( Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]) )
                                     c->DespawnOrUnsummon();
-                                NPC_ArgentSoldierGUID[i][j] = 0;
+                                NPC_ArgentSoldierGUID[i][j].Clear();
                             }
                         if( Creature* c = instance->GetCreature(NPC_ArgentChampionGUID) )
                         {

@@ -8,7 +8,7 @@ Xinef
 #include "Common.h"
 #include <map>
 
-typedef std::map<ObjectGuid, ObjectGuid> SignatureMap;
+typedef std::map<ObjectGuid, uint32> SignatureMap;
 
 struct Petition
 {
@@ -40,18 +40,18 @@ public:
     void LoadSignatures();
 
     // Petitions
-    void AddPetition(uint32 petitionId, ObjectGuid ownerGuid, std::string const& name, uint8 type);
-    void RemovePetition(uint32 petitionId);
+    void AddPetition(ObjectGuid petitionGUID, ObjectGuid ownerGuid, std::string const& name, uint8 type);
+    void RemovePetition(ObjectGuid petitionGUID);
     void RemovePetitionByOwnerAndType(ObjectGuid ownerGuid, uint8 type);
-    Petition const* GetPetition(uint32 petitionId) const;
+    Petition const* GetPetition(ObjectGuid petitionGUID) const;
     Petition const* GetPetitionByOwnerWithType(ObjectGuid ownerGuid, uint8 type) const;
     PetitionContainer* GetPetitionStore() { return &PetitionStore; }
 
     // Signatures
-    void AddSignature(uint32 petitionId, uint32 accountId, ObjectGuid playerGuid);
+    void AddSignature(ObjectGuid petitionGUID, uint32 accountId, ObjectGuid playerGuid);
     void RemoveSignaturesByPlayer(ObjectGuid playerGuid);
     void RemoveSignaturesByPlayerAndType(ObjectGuid playerGuid, uint8 type);
-    Signatures const* GetSignature(uint32 petitionId) const;
+    Signatures const* GetSignature(ObjectGuid petitionGUID) const;
     SignatureContainer* GetSignatureStore() { return &SignatureStore; }
 
 protected:
