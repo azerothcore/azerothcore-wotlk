@@ -45,7 +45,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_razuviousAI (pCreature);
+        return GetNaxxramasAI<boss_razuviousAI>(pCreature);
     }
 
     struct boss_razuviousAI : public BossAI
@@ -89,12 +89,9 @@ public:
             {
                 Talk(SAY_SLAY);
             }
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
             {
-                if (pInstance)
-                {
-                    pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
-                }
+                pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
             }
         }
 
@@ -171,7 +168,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_razuvious_minionAI (pCreature);
+        return GetNaxxramasAI<boss_razuvious_minionAI>(pCreature);
     }
 
     struct boss_razuvious_minionAI : public ScriptedAI
@@ -187,12 +184,9 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
             {
-                if (me->GetInstanceScript())
-                {
-                    me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
-                }
+                me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
             }
         }
 

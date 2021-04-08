@@ -60,7 +60,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_eregosAI (pCreature);
+        return GetOculusAI<boss_eregosAI>(pCreature);
     }
 
     struct boss_eregosAI : public ScriptedAI

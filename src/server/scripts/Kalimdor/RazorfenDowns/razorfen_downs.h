@@ -6,6 +6,9 @@
 #define DEF_RAZORFEN_DOWNS_H
 
 #include "PassiveAI.h"
+#include "CreatureAIImpl.h"
+
+#define RazorfenDownsScriptName "instance_razorfen_downs"
 
 enum CreatureIds
 {
@@ -25,5 +28,11 @@ enum GameObjectIds
     GO_IDOL_MOUTH_FIRE                     = 151973,
     GO_BELNISTRASZS_BRAZIER                = 152097
 };
+
+template <class AI, class T>
+inline AI* GetRazorfenDownsAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, RazorfenDownsScriptName);
+}
 
 #endif

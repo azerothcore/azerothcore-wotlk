@@ -29,7 +29,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_thespiaAI (creature);
+        return GetSteamVaultAI<boss_thespiaAI>(creature);
     }
 
     struct boss_thespiaAI : public ScriptedAI

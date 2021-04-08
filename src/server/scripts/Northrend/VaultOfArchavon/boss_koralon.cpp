@@ -147,7 +147,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_koralonAI(creature);
+        return GetVaultOfArchavonAI<boss_koralonAI>(creature);
     }
 };
 

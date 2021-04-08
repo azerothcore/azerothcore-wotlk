@@ -6,9 +6,12 @@
 #define DEF_MECHANAR_H
 
 #include "CreatureAI.h"
+#include "CreatureAIImpl.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+
+#define MechanarScriptName "instance_mechanar"
 
 enum DataTypes
 {
@@ -51,5 +54,11 @@ enum SpellIds
 {
     SPELL_TELEPORT_VISUAL               = 35517
 };
+
+template <class AI, class T>
+inline AI* GetMechanarAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, MechanarScriptName);
+}
 
 #endif
