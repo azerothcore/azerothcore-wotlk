@@ -784,12 +784,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_trade = nullptr;
 
-    // Fade out
-    m_sapTimer = 0;
-    m_stealthDetectTimer = 0;
-    m_lastStealthValue = 0;
-    fadeOutDelay = 275;
-
     m_cinematic = 0;
 
     PlayerTalkClass = new PlayerMenu(GetSession());
@@ -1964,39 +1958,6 @@ void Player::Update(uint32 p_time)
         UpdateObjectVisibility(true, true);
         m_delayed_unit_relocation_timer = 0;
         RemoveFromNotify(NOTIFY_VISIBILITY_CHANGED);
-    }
-    // lordlook Vanish Delay Pog
-// We remove the invisibility if the player is in CC
-    if (IsUnderCrowdControlEffects() && HasStealthAura())
-    {
-        // First you must remove vanish and then stealth
-        if (HasAura(26888))
-            RemoveAura(26888);
-
-        RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
-    }
-
-    // We remove the invisibility if the player is in CC
-    if (IsUnderCrowdControlEffects() && HasInvisibilityAura())
-        RemoveAurasByType(SPELL_AURA_MOD_INVISIBILITY);
-
-    /*************** Fade Out ***************/
-    // If the player does not have aura of stealth and the timer has some value, it is reset to 0 (we avoid bugs)
-    if (m_stealthDetectTimer > 0 && !HasStealthAura())
-        m_stealthDetectTimer = 0;
-    // If the timer is greater than 0 it means that the player has used some spell that HandleModStealth has proceeded
-    if (m_stealthDetectTimer > 0 && HasStealthAura())
-    {
-        if (p_time >= m_stealthDetectTimer && HasStealthAura())
-        {
-            // Once done the fade out, we hide the player
-            m_stealth.AddValue(STEALTH_GENERAL, GetLastStealthValue());
-            UpdateObjectVisibility();
-            m_lastStealthValue = 0;
-            m_stealthDetectTimer = 0;
-        }
-        else if (m_stealthDetectTimer >= 0 && HasStealthAura())
-            m_stealthDetectTimer -= p_time;
     }
 }
 

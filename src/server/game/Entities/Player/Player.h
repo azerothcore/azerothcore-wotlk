@@ -1125,24 +1125,6 @@ public:
             return false;
     }
 
-    // Fade Out (Vanish delay)
-    int32 fadeOutDelay;
-    uint32 m_stealthDetectTimer;
-
-    int32 m_lastStealthValue;
-    int32 GetLastStealthValue() { return m_lastStealthValue; }
-    void AddLastStealthValue(int32 value)
-    {
-        m_stealthDetectTimer = fadeOutDelay;
-        m_lastStealthValue += value;
-    }
-
-    // Used for the Fade Out system
-    bool IsUnderCrowdControlEffects() { return HasAuraType(SPELL_AURA_MOD_CONFUSE) || HasAuraType(SPELL_AURA_MOD_FEAR) || HasAuraType(SPELL_AURA_MOD_STUN); }
-
-    // Sap DMG timer
-    uint32 m_sapTimer;
-
     bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0, Unit* target = nullptr);
     bool TeleportTo(WorldLocation const& loc, uint32 options = 0, Unit* target = nullptr)
     {

@@ -2818,35 +2818,3 @@ void SpellInfo::_UnloadImplicitTargetConditionLists()
         delete cur;
     }
 }
-
-bool IsCCSpell(SpellInfo const* const spellInfo, uint8 EffMask)
-{
-    if (spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER ||
-        spellInfo->SpellFamilyName == SPELLFAMILY_GENERIC)
-        return false;
-
-    // Should not add delay on Mind control as it causes problems with it breaking.
-    if (spellInfo->Id == 605)
-        return false;
-
-    for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
-    {
-        if (EffMask && !(EffMask & (1 << effIndex)))
-            continue;
-
-        switch (spellInfo->Effects[effIndex].ApplyAuraName)
-        {
-        case SPELL_AURA_MOD_CONFUSE:
-        case SPELL_AURA_MOD_FEAR:
-        case SPELL_AURA_MOD_STUN:
-        case SPELL_AURA_MOD_ROOT:
-        case SPELL_AURA_TRANSFORM:
-            if (!spellInfo->IsPositiveEffect(effIndex))
-                return true;
-            break;
-        default:
-            break;
-        }
-    }
-    return false;
-}
