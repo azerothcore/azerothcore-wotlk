@@ -1116,7 +1116,7 @@ public:
         SetFloatValue(UNIT_FIELD_COMBATREACH, scale * DEFAULT_COMBAT_REACH);
     }
 
-    [[nodiscard]] bool isSpanishClient()
+    [[nodiscard]] bool hasSpanishClient()
     {
         return GetSession()->GetSessionDbLocaleIndex() == LOCALE_esES || GetSession()->GetSessionDbLocaleIndex() == LOCALE_esMX;
     }
