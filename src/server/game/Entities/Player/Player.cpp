@@ -2963,11 +2963,11 @@ Creature* Player::GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask)
         return nullptr;
 
     // Deathstate checks
-    if (!IsAlive() && !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_GHOST_VISIBLE))
+    if (!IsAlive() && !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_VISIBLE_TO_GHOSTS))
         return nullptr;
 
     // alive or spirit healer
-    if (!creature->IsAlive() && !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_CAN_INTERACT_WHILE_DEAD))
+    if (!creature->IsAlive() && !(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_INTERACT_WHILE_DEAD))
         return nullptr;
 
     // appropriate npc type
@@ -6505,7 +6505,7 @@ void Player::UpdateWeaponSkill(WeaponAttackType attType)
     if (GetShapeshiftForm() == FORM_TREE)
         return;                                             // use weapon but not skill up
 
-    if (victim && victim->GetTypeId() == TYPEID_UNIT && (victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_SKILLGAIN))
+    if (victim && victim->GetTypeId() == TYPEID_UNIT && (victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_SKILL_GAINS))
         return;
 
     uint32 weapon_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_WEAPON);
@@ -24619,7 +24619,7 @@ bool Player::isHonorOrXPTarget(Unit* victim) const
     {
         if (victim->IsTotem() ||
                 victim->IsPet() ||
-                victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL)
+                victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP)
             return false;
     }
     return true;

@@ -2509,7 +2509,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit* victim, WeaponAttackTy
     if (getLevelForTarget(victim) >= victim->getLevelForTarget(this) + 4 &&
             // can be from by creature (if can) or from controlled player that considered as creature
             !IsControlledByPlayer() &&
-            !(GetTypeId() == TYPEID_UNIT && ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_CRUSH))
+            !(GetTypeId() == TYPEID_UNIT && ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_CRUSHING_BLOWS))
     {
         // when their weapon skill is 15 or more above victim's defense skill
         tmp = victimDefenseSkill;
@@ -12989,7 +12989,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
             UpdateSpeed(MOVE_FLIGHT, true);
         }
 
-        if (!(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_MOUNTED_COMBAT_ALLOWED))
+        if (!(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_ALLOW_MOUNTED_COMBAT))
             Dismount();
         if (!IsStandState()) // pussywizard: already done in CombatStart(target, initialAggro) for the target, but when aggro'ing from MoveInLOS CombatStart is not called!
             SetStandState(UNIT_STAND_STATE_STAND);
@@ -14275,7 +14275,7 @@ float Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32& duration, 
 
     if (group == DIMINISHING_TAUNT)
     {
-        if (GetTypeId() == TYPEID_UNIT && (ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_TAUNT_DIMINISH))
+        if (GetTypeId() == TYPEID_UNIT && (ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_OBEYS_TAUNT_DIMINISHING_RETURNS))
         {
             DiminishingLevels diminish = Level;
             switch (diminish)
