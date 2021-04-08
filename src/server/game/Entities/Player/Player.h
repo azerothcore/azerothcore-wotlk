@@ -1117,12 +1117,9 @@ public:
     }
 	
 	// Detect Client Languaje
-    bool ClientInSpanishOrMexican()
+    bool isSpanishClient()
     {
-        if (GetSession()->GetSessionDbLocaleIndex() == LOCALE_esES || GetSession()->GetSessionDbLocaleIndex() == LOCALE_esMX)
-            return true;
-        else
-            return false;
+        return GetSession()->GetSessionDbLocaleIndex() == LOCALE_esES || GetSession()->GetSessionDbLocaleIndex() == LOCALE_esMX;
     }
 
     bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0, Unit* target = nullptr);
