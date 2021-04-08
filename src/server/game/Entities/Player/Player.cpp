@@ -25705,9 +25705,9 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         return;
     }
 
-    // Xinef: exploit protection, dont allow to loot normal items if player is not master loot
+    // Xinef: exploit protection, dont allow to loot normal items if player is not master loot and not below loot threshold
     // Xinef: only quest, ffa and conditioned items
-    if (!IS_ITEM_GUID(GetLootGUID()) && GetGroup() && GetGroup()->GetLootMethod() == MASTER_LOOT && GetGUID() != GetGroup()->GetMasterLooterGuid())
+    if (!item->is_underthreshold && !IS_ITEM_GUID(GetLootGUID()) && GetGroup() && GetGroup()->GetLootMethod() == MASTER_LOOT && GetGUID() != GetGroup()->GetMasterLooterGuid())
         if (qitem == nullptr && ffaitem == nullptr && conditem == nullptr)
         {
             SendLootRelease(GetLootGUID());
