@@ -5288,7 +5288,7 @@ void ObjectMgr::ValidateSpellScripts()
             bool valid = true;
             if (!spellScript && !auraScript)
             {
-                LOG_ERROR("server", "TSCR: Functions GetSpellScript() and GetAuraScript() of script `%s` do not return objects - script skipped",  GetScriptName(sitr->second->second));
+                LOG_ERROR("server", "TSCR: Functions GetSpellScript() and GetAuraScript() of script `%s` do not return objects - script skipped", GetScriptName(sitr->second->second).c_str());
                 valid = false;
             }
             if (spellScript)
