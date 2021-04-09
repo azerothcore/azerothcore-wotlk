@@ -1695,8 +1695,8 @@ public:
     void SendProficiency(ItemClass itemClass, uint32 itemSubclassMask);
     void SendInitialSpells();
     void SendLearnPacket(uint32 spellId, bool learn);
-    bool addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool temporary = false);
-    bool _addSpell(uint32 spellId, uint8 addSpecMask, bool temporary);
+    bool addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool temporary = false, bool learnFromSkill = false);
+    bool _addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool learnFromSkill = false);
     void learnSpell(uint32 spellId);
     void removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporary);
     void resetSpells();
