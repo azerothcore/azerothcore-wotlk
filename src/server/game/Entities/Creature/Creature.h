@@ -740,8 +740,10 @@ public:
     bool IsMovementPreventedByCasting() const;
 
     // Part of Evade mechanics
-    [[nodiscard]] time_t GetLastDamagedTime() const { return _lastDamagedTime; }
-    void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
+    [[nodiscard]] time_t GetLastDamagedTime() const;
+    [[nodiscard]] std::shared_ptr<time_t> const& GetLastDamagedTimePtr() const;
+    void SetLastDamagedTime(time_t val);
+    void SetLastDamagedTimePtr(std::shared_ptr<time_t> const& val);
 
     bool IsFreeToMove();
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
@@ -822,7 +824,7 @@ private:
     CreatureGroup* m_formation;
     bool TriggerJustRespawned;
 
-    time_t _lastDamagedTime; // Part of Evade mechanics
+    mutable std::shared_ptr<time_t> _lastDamagedTime; // Part of Evade mechanics
 
     bool m_cannotReachTarget;
     uint32 m_cannotReachTimer;
@@ -837,7 +839,7 @@ private:
 class AssistDelayEvent : public BasicEvent
 {
 public:
-    AssistDelayEvent(uint64 victim, Unit& owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
+    AssistDelayEvent(uint64 victim, Creature* owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
 
     bool Execute(uint64 e_time, uint32 p_time) override;
     void AddAssistant(uint64 guid) { m_assistants.push_back(guid); }
@@ -846,7 +848,7 @@ private:
 
     uint64            m_victim;
     std::list<uint64> m_assistants;
-    Unit&             m_owner;
+    Creature*         m_owner;
 };
 
 class ForcedDespawnDelayEvent : public BasicEvent

@@ -1182,7 +1182,7 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, LineOfSightChecks che
     if (obj->GetTypeId() == TYPEID_PLAYER)
     {
         obj->GetPosition(ox, oy, oz);
-        oz += GetCollisionHeight();
+        oz += obj->GetCollisionHeight();
     }
     else
         obj->GetHitSpherePointFor({ GetPositionX(), GetPositionY(), GetPositionZ() + GetCollisionHeight() }, ox, oy, oz);
@@ -1514,10 +1514,11 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
 
             if (max_z > INVALID_HEIGHT)
             {
-                if (canSwim && unit->GetMap()->IsInWater(x, y, max_z - Z_OFFSET_FIND_HEIGHT)) {
+                if (canSwim && unit->GetMap()->IsInWater(x, y, max_z - Z_OFFSET_FIND_HEIGHT))
+                {
                     // do not allow creatures to walk on
                     // water level while swimming
-                    max_z = max_z - GetMinHeightInWater();
+                    max_z = std::max(max_z - GetMinHeightInWater(), ground_z);
                 }
                 else
                 {

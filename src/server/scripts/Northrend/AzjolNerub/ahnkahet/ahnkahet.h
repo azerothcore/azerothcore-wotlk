@@ -1,8 +1,15 @@
+/*
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ */
 
 #ifndef DEF_AHNKAHET_H
 #define DEF_AHNKAHET_H
 
 #define MAX_ENCOUNTER           5
+
+#include "CreatureAIImpl.h"
+
+#define AhnahetScriptName "instance_ahnkahet"
 
 enum Data64
 {
@@ -39,5 +46,12 @@ enum Npc
     SPELL_SHADOW_SICKLE             = 56701, // Shadow Sickle Normal
     SPELL_SHADOW_SICKLE_H           = 59104  // Shadow Sickle Heroic
 };
+
+template <class AI, class T>
+inline AI* GetAhnkahetAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, AhnahetScriptName);
+}
+
 
 #endif

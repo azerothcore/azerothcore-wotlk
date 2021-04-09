@@ -2592,7 +2592,7 @@ template void Map::RemoveFromMap(DynamicObject*, bool);
 InstanceMap::InstanceMap(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent)
     : Map(id, InstanceId, SpawnMode, _parent),
       m_resetAfterUnload(false), m_unloadWhenEmpty(false),
-      instance_script(nullptr), i_script_id(0)
+      instance_data(nullptr), i_script_id(0)
 {
     //lets initialize visibility distance for dungeons
     InstanceMap::InitVisibilityDistance();
@@ -2610,9 +2610,8 @@ InstanceMap::InstanceMap(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _pa
 
 InstanceMap::~InstanceMap()
 {
-    delete instance_script;
-    instance_script = nullptr;
-    sInstanceSaveMgr->DeleteInstanceSaveIfNeeded(GetInstanceId(), true);
+    delete instance_data;
+    instance_data = nullptr;
 }
 
 void InstanceMap::InitVisibilityDistance()
@@ -2768,7 +2767,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
         {
             WorldPacket data(SMSG_INSTANCE_LOCK_WARNING_QUERY, 9);
             data << uint32(60000);
-            data << uint32(instance_script ? instance_script->GetCompletedEncounterMask() : 0);
+            data << uint32(instance_data ? instance_data->GetCompletedEncounterMask() : 0);
             data << uint8(0);
             player->GetSession()->SendPacket(&data);
             player->SetPendingBind(mapSave->GetInstanceId(), 60000);
@@ -2783,8 +2782,8 @@ bool InstanceMap::AddPlayerToMap(Player* player)
     // this will acquire the same mutex so it cannot be in the previous block
     Map::AddPlayerToMap(player);
 
-    if (instance_script)
-        instance_script->OnPlayerEnter(player);
+    if (instance_data)
+        instance_data->OnPlayerEnter(player);
 
     return true;
 }
@@ -2794,8 +2793,8 @@ void InstanceMap::Update(const uint32 t_diff, const uint32 s_diff, bool /*thread
     Map::Update(t_diff, s_diff);
 
     if (t_diff)
-        if (instance_script)
-            instance_script->Update(t_diff);
+        if (instance_data)
+            instance_data->Update(t_diff);
 }
 
 void InstanceMap::RemovePlayerFromMap(Player* player, bool remove)
@@ -2815,12 +2814,12 @@ void InstanceMap::AfterPlayerUnlinkFromMap()
 
 void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask)
 {
-    if (instance_script != nullptr)
+    if (instance_data != nullptr)
         return;
 #ifdef ELUNA
     bool isElunaAI = false;
-    instance_script = sEluna->GetInstanceData(this);
-    if (instance_script)
+    instance_data = sEluna->GetInstanceData(this);
+    if (instance_data)
         isElunaAI = true;
 
     // if Eluna AI was fetched succesfully we should not call CreateInstanceData nor set the unused scriptID
@@ -2831,13 +2830,13 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
         if (mInstance)
         {
             i_script_id = mInstance->ScriptId;
-            instance_script = sScriptMgr->CreateInstanceScript(this);
+            instance_data = sScriptMgr->CreateInstanceScript(this);
         }
 #ifdef ELUNA
     }
 #endif
 
-    if (!instance_script)
+    if (!instance_data)
         return;
 
 #ifdef ELUNA
@@ -2845,13 +2844,13 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
     // initialize should then be called only if load is false
     if (!isElunaAI || !load)
 #endif
-        instance_script->Initialize();
+        instance_data->Initialize();
 
     if (load)
     {
-        instance_script->SetCompletedEncountersMask(completedEncounterMask, false);
+        instance_data->SetCompletedEncountersMask(completedEncounterMask, false);
         if (data != "")
-            instance_script->Load(data.c_str());
+            instance_data->Load(data.c_str());
     }
 }
 
@@ -2898,6 +2897,11 @@ bool InstanceMap::Reset(uint8 method, std::list<uint32>* globalResetSkipList)
     }
 
     return m_mapRefManager.isEmpty();
+}
+
+std::string const& InstanceMap::GetScriptName() const
+{
+    return sObjectMgr->GetScriptName(i_script_id);
 }
 
 void InstanceMap::PermBindAllPlayers()

@@ -3171,12 +3171,18 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_POSITIVE_TAKEN_BONUS;
                 break;
             case 65280: // Ulduar, Hodir, Singed
+            case 28969: // Naxxramas, Crypt Guard, Acid Spit (10 normal)
+            case 56098: // Naxxramas, Crypt Guard, Acid Spit (25 normal)
+            case 27891: // Naxxramas, Sludge Belcher, Acidic Sludge (10 normal)
+            case 54331: // Naxxramas, Sludge Belcher, Acidic Sludge (25 normal)
+            case 29325: // Naxxramas, Stoneskin Gargoyle, Acid Volley (10 normal)
+            case 54714: // Naxxramas, Stoneskin Gargoyle, Acid Volley (25 normal)
             case 65775: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (10 normal)
             case 67861: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (25 normal)
             case 67862: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (10 heroic)
             case 67863: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (25 heroic)
-            case 55604: // Naxxramas, Unrelenting Trainee, Death Plague (10 mode)
-            case 55645: // Naxxramas, Unrelenting Trainee, Death Plague (25 mode)
+            case 55604: // Naxxramas, Unrelenting Trainee, Death Plague (10 normal)
+            case 55645: // Naxxramas, Unrelenting Trainee, Death Plague (25 normal)
             case 67721: // Anub'arak, Nerubian Burrower, Expose Weakness (normal)
             case 67847: // Anub'arak, Nerubian Burrower, Expose Weakness (heroic)
             case 64638: // Ulduar, Winter Jormungar, Acidic Bite
