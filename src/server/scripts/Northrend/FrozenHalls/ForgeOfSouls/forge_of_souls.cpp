@@ -206,7 +206,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_fos_leaderAI(creature);
+        return GetForgeOfSoulsAI<npc_fos_leaderAI>(creature);
     }
 };
 
@@ -238,7 +238,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_fos_leader_secondAI(creature);
+        return GetForgeOfSoulsAI<npc_fos_leader_secondAI>(creature);
     }
 };
 

@@ -94,7 +94,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_urok_doomhowlAI(creature);
+        return GetBlackrockSpireAI<boss_urok_doomhowlAI>(creature);
     }
 };
 

@@ -402,7 +402,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                          e.entryOrGuid, e.event_id, e.GetTargetType());
         return false;
     }
-    if (e.target.type == SMART_TARGET_LOOT_RECIPIENTS || e.target.type == SMART_TARGET_VEHICLE_PASSENGER)
+    if (e.target.type == SMART_TARGET_LOOT_RECIPIENTS)
     {
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has a target type that is not yet supported on AzerothCore (%u), skipped.",
                          e.entryOrGuid, e.event_id, e.GetTargetType());

@@ -33,7 +33,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_rage_winterchillAI>(creature);
+        return GetHyjalAI<boss_rage_winterchillAI>(creature);
     }
 
     struct boss_rage_winterchillAI : public hyjal_trashAI
