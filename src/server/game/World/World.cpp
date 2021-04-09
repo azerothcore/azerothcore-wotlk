@@ -1115,19 +1115,21 @@ void World::LoadConfigSettings(bool reload)
     m_float_configs[CONFIG_LISTEN_RANGE_TEXTEMOTE] = sConfigMgr->GetOption<float>("ListenRange.TextEmote", 25.0f);
     m_float_configs[CONFIG_LISTEN_RANGE_YELL]      = sConfigMgr->GetOption<float>("ListenRange.Yell", 300.0f);
 
-    m_bool_configs[CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG]    = sConfigMgr->GetOption<bool>("Battleground.DisableQuestShareInBG", false);
-    m_bool_configs[CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG]    = sConfigMgr->GetOption<bool>("Battleground.DisableReadyCheckInBG", false);
-    m_bool_configs[CONFIG_BATTLEGROUND_CAST_DESERTER]                = sConfigMgr->GetOption<bool>("Battleground.CastDeserter", true);
-    m_bool_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE]       = sConfigMgr->GetOption<bool>("Battleground.QueueAnnouncer.Enable", false);
-    m_bool_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY]   = sConfigMgr->GetOption<bool>("Battleground.QueueAnnouncer.PlayerOnly", false);
-    m_bool_configs[CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE]      = sConfigMgr->GetOption<bool>("Battleground.StoreStatistics.Enable", false);
-    m_bool_configs[CONFIG_BATTLEGROUND_TRACK_DESERTERS]              = sConfigMgr->GetOption<bool>("Battleground.TrackDeserters.Enable", false);
-    m_int_configs[CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER]        = sConfigMgr->GetOption<int32> ("Battleground.PrematureFinishTimer", 5 * MINUTE * IN_MILLISECONDS);
-    m_int_configs[CONFIG_BATTLEGROUND_INVITATION_TYPE]               = sConfigMgr->GetOption<int32>("Battleground.InvitationType", 0);
-    m_int_configs[CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH]  = sConfigMgr->GetOption<int32> ("Battleground.PremadeGroupWaitForMatch", 30 * MINUTE * IN_MILLISECONDS);
-    m_bool_configs[CONFIG_BG_XP_FOR_KILL]                            = sConfigMgr->GetOption<bool>("Battleground.GiveXPForKills", false);
-    m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK_TIMER]              = sConfigMgr->GetOption<int32>("Battleground.ReportAFK.Timer", 4);
-    m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]                    = sConfigMgr->GetOption<int32>("Battleground.ReportAFK", 3);
+    m_bool_configs[CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG]      = sConfigMgr->GetOption<bool>("Battleground.DisableQuestShareInBG", false);
+    m_bool_configs[CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG]      = sConfigMgr->GetOption<bool>("Battleground.DisableReadyCheckInBG", false);
+    m_bool_configs[CONFIG_BATTLEGROUND_CAST_DESERTER]                  = sConfigMgr->GetOption<bool>("Battleground.CastDeserter", true);
+    m_bool_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE]         = sConfigMgr->GetOption<bool>("Battleground.QueueAnnouncer.Enable", false);
+    m_bool_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMITED_ENABLE] = sConfigMgr->GetOption<bool>("Battleground.QueueAnnouncer.Limited.Enable", false);
+    m_int_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY]      = sConfigMgr->GetOption<uint32>("Battleground.QueueAnnouncer.SpamProtection.Delay", 30);
+    m_bool_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY]     = sConfigMgr->GetOption<bool>("Battleground.QueueAnnouncer.PlayerOnly", false);
+    m_bool_configs[CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE]        = sConfigMgr->GetOption<bool>("Battleground.StoreStatistics.Enable", false);
+    m_bool_configs[CONFIG_BATTLEGROUND_TRACK_DESERTERS]                = sConfigMgr->GetOption<bool>("Battleground.TrackDeserters.Enable", false);
+    m_int_configs[CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER]          = sConfigMgr->GetOption<int32> ("Battleground.PrematureFinishTimer", 5 * MINUTE * IN_MILLISECONDS);
+    m_int_configs[CONFIG_BATTLEGROUND_INVITATION_TYPE]                 = sConfigMgr->GetOption<int32>("Battleground.InvitationType", 0);
+    m_int_configs[CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH]    = sConfigMgr->GetOption<int32> ("Battleground.PremadeGroupWaitForMatch", 30 * MINUTE * IN_MILLISECONDS);
+    m_bool_configs[CONFIG_BG_XP_FOR_KILL]                              = sConfigMgr->GetOption<bool>("Battleground.GiveXPForKills", false);
+    m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK_TIMER]                = sConfigMgr->GetOption<int32>("Battleground.ReportAFK.Timer", 4);
+    m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]                      = sConfigMgr->GetOption<int32>("Battleground.ReportAFK", 3);
     if (m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] < 1)
     {
         sLog->outError("Battleground.ReportAFK (%d) must be >0. Using 3 instead.", m_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]);
@@ -1239,6 +1241,8 @@ void World::LoadConfigSettings(bool reload)
     m_bool_configs[CONFIG_ITEMDELETE_VENDOR]    = sConfigMgr->GetOption<bool>("ItemDelete.Vendor", 0);
     m_int_configs[CONFIG_ITEMDELETE_QUALITY]    = sConfigMgr->GetOption<int32>("ItemDelete.Quality", 3);
     m_int_configs[CONFIG_ITEMDELETE_ITEM_LEVEL] = sConfigMgr->GetOption<int32>("ItemDelete.ItemLevel", 80);
+
+    m_int_configs[CONFIG_FFA_PVP_TIMER] = sConfigMgr->GetOption<int32>("FFAPvPTimer", 30);
 
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");

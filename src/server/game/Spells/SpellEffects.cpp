@@ -2449,12 +2449,10 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
                         TempSummonType summonType = (duration <= 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
 
-                        uint32 currMinionsCount = m_caster->m_Controlled.size();
-                        uint32 totalNumGuardians = numSummons + currMinionsCount;
                         for (uint32 count = 0; count < numSummons; ++count)
                         {
                             Position pos;
-                            if (totalNumGuardians == 1)
+                            if (count == 0)
                                 pos = *destTarget;
                             else
                                 // randomize position for multiple summons
@@ -5069,7 +5067,7 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
                 m_caster->GetFirstCollisionPosition(pos, dist, angle);
             }
 
-            m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+            m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + Z_OFFSET_FIND_HEIGHT);
         }
     }
 

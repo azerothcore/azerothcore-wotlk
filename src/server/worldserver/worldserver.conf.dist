@@ -2753,6 +2753,22 @@ Battleground.CastDeserter = 1
 Battleground.QueueAnnouncer.Enable = 0
 
 #
+#    Battleground.QueueAnnouncer.Limited.Enable
+#        Description: Show announce only if left players in queue = 1
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.QueueAnnouncer.Limited.Enable = 0
+
+#
+#    Battleground.QueueAnnouncer.SpamProtection.Delay
+#        Description: Show announce if player rejoined in queue after sec
+#        Default:     30
+#
+
+Battleground.QueueAnnouncer.SpamProtection.Delay = 30
+
+#
 #    Battleground.QueueAnnouncer.PlayerOnly
 #        Description: Battleground queue announcement type.
 #        Default:     0 - (System message, Anyone can see it)
@@ -3679,6 +3695,13 @@ ICC.Buff.Alliance = 73828
 #                     0  - (Disable trading BoP items among raid members)
 
 Item.SetItemTradeable = 1
+
+#
+#     FFAPvPTimer
+#        Description: Specify time offset when player unset FFAPvP flag when leaving FFAPvP area. (e.g. Gurubashi Arena)
+#        Default:     30 sec
+
+FFAPvPTimer = 30
 
 #
 ###################################################################################################
