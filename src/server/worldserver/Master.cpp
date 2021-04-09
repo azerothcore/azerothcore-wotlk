@@ -9,6 +9,7 @@
 */
 
 #include "ACSoap.h"
+#include "Banner.h"
 #include "BigNumber.h"
 #include "CliRunnable.h"
 #include "Common.h"
@@ -115,23 +116,18 @@ int Master::Run()
     BigNumber seed1;
     seed1.SetRand(16 * 8);
 
-    sLog->outString("%s (worldserver-daemon)", GitRevision::GetFullVersion());
-    sLog->outString("<Ctrl-C> to stop.\n");
-
-    sLog->outString("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");
-    sLog->outString("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");
-    sLog->outString("  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");
-    sLog->outString("  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");
-    sLog->outString("  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");
-    sLog->outString("  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");
-    sLog->outString("                                ██████╗ ██████╗ ██████╗ ███████╗");
-    sLog->outString("                                ██╔════╝██╔═══██╗██╔══██╗██╔═══╝");
-    sLog->outString("                                ██║     ██║   ██║██████╔╝█████╗");
-    sLog->outString("                                ██║     ██║   ██║██╔══██╗██╔══╝");
-    sLog->outString("                                ╚██████╗╚██████╔╝██║  ██║███████╗");
-    sLog->outString("                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
-
-    sLog->outString("     AzerothCore 3.3.5a  -  www.azerothcore.org\n");
+    acore::Banner::Show("worldserver-daemon",
+        [](char const* text)
+        {
+            sLog->outString("%s", text);
+        },
+        []()
+        {
+            sLog->outString("Using configuration file %s.", sConfigMgr->GetFilename().c_str());
+            sLog->outString("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            sLog->outString("Using ACE version: %s", ACE_VERSION);
+        }
+    );
 
     /// worldserver PID file creation
     std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");
