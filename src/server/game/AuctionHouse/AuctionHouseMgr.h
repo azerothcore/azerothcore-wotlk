@@ -11,6 +11,7 @@
 #include "DatabaseEnv.h"
 #include "DBCStructure.h"
 #include "EventProcessor.h"
+#include "ObjectGuid.h"
 #include "WorldPacket.h"
 
 class Item;

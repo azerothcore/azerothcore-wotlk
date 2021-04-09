@@ -1040,12 +1040,14 @@ ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text, HighGuid& gu
     {
         case SPELL_LINK_PLAYER:
             {
+                guidHigh = HighGuid::Player;
+
                 std::string name = idS;
                 if (!normalizePlayerName(name))
                     return 0;
 
                 if (Player* player = ObjectAccessor::FindPlayerByName(name, false))
-                    return 0;
+                    return player->GetGUID().GetCounter();
 
                 if (ObjectGuid guid = sObjectMgr->GetPlayerGUIDByName(name))
                     return guid.GetCounter();
@@ -1054,18 +1056,22 @@ ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text, HighGuid& gu
             }
         case SPELL_LINK_CREATURE:
             {
+                guidHigh = HighGuid::Unit;
+
                 ObjectGuid::LowType lowguid = (uint32)atol(idS);
 
-                if (CreatureData const* data = sObjectMgr->GetCreatureData(lowguid))
+                if (sObjectMgr->GetCreatureData(lowguid))
                     return lowguid;
                 else
                     return 0;
             }
         case SPELL_LINK_GAMEOBJECT:
             {
+                guidHigh = HighGuid::GameObject;
+
                 ObjectGuid::LowType lowguid = (uint32)atol(idS);
 
-                if (GameObjectData const* data = sObjectMgr->GetGOData(lowguid))
+                if (sObjectMgr->GetGOData(lowguid))
                     return lowguid;
                 else
                     return 0;

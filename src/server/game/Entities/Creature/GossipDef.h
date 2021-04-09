@@ -12,6 +12,7 @@
 #include "QuestDef.h"
 
 class WorldSession;
+class ObjectGuid;
 
 #define GOSSIP_MAX_MENU_ITEMS               32
 #define DEFAULT_GOSSIP_MESSAGE              0xffffff

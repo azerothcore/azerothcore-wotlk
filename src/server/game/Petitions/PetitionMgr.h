@@ -6,6 +6,8 @@ Xinef
 #define _PETITIONMGR_H
 
 #include "Common.h"
+#include "ObjectGuid.h"
+
 #include <map>
 
 typedef std::map<ObjectGuid, uint32> SignatureMap;

@@ -18222,7 +18222,8 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, SQLQueryHolder* holder)
         }
         else
         {
-            if (map = sMapMgr->CreateMap(mapId, this))
+            map = sMapMgr->CreateMap(mapId, this);
+            if (map)
             {
                 auto bounds = map->GetGameObjectBySpawnIdStore().equal_range(abs(transLowGUID));
                 if (bounds.first != bounds.second)
@@ -19730,7 +19731,7 @@ void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const Pro
         stream << "|cffff7c0a|Hachievement:";
         stream << missingReq->id;
         stream << ":";
-        stream << std::hex << GetGUID() << std::dec;
+        stream << GetGUID().ToString();
         stream << ":0:0:0:0:0:0:0:0|h[";
         stream << name;
         stream << "]|h|r";

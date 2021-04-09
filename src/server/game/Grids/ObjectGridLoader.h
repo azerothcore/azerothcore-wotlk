@@ -53,7 +53,7 @@ public:
 class ObjectGridUnloader
 {
 public:
-    void Visit(CorpseMapType& m) { }    // corpses are deleted with Map
+    void Visit(CorpseMapType&) { }    // corpses are deleted with Map
     template<class T> void Visit(GridRefManager<T>& m);
 };
 #endif

@@ -178,7 +178,7 @@ public:
             }
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_THADDIUS_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_THADDIUS_GATE)))
                 {
                     if (pInstance->GetBossState(BOSS_GLUTH) == DONE)
                     {
@@ -208,7 +208,7 @@ public:
             {
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(28059);
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(28084);
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_THADDIUS_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_THADDIUS_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }

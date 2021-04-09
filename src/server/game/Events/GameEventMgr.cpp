@@ -1509,7 +1509,7 @@ bool GameEventMgr::hasGameObjectQuestActiveEventExcept(uint32 quest_id, uint16 e
     }
     return false;
 }
-bool GameEventMgr::hasCreatureActiveEventExcept(uint32 creature_id, uint16 event_id)
+bool GameEventMgr::hasCreatureActiveEventExcept(ObjectGuid::LowType creature_guid, uint16 event_id)
 {
     for (ActiveEvents::iterator e_itr = m_ActiveEvents.begin(); e_itr != m_ActiveEvents.end(); ++e_itr)
     {
@@ -1517,13 +1517,13 @@ bool GameEventMgr::hasCreatureActiveEventExcept(uint32 creature_id, uint16 event
         {
             int32 internal_event_id = mGameEvent.size() + (*e_itr) - 1;
             for (GuidLowList::iterator itr = mGameEventCreatureGuids[internal_event_id].begin(); itr != mGameEventCreatureGuids[internal_event_id].end(); ++ itr)
-                if (*itr == creature_id)
+                if (*itr == creature_guid)
                     return true;
         }
     }
     return false;
 }
-bool GameEventMgr::hasGameObjectActiveEventExcept(uint32 go_id, uint16 event_id)
+bool GameEventMgr::hasGameObjectActiveEventExcept(ObjectGuid::LowType go_guid, uint16 event_id)
 {
     for (ActiveEvents::iterator e_itr = m_ActiveEvents.begin(); e_itr != m_ActiveEvents.end(); ++e_itr)
     {
@@ -1531,7 +1531,7 @@ bool GameEventMgr::hasGameObjectActiveEventExcept(uint32 go_id, uint16 event_id)
         {
             int32 internal_event_id = mGameEvent.size() + (*e_itr) - 1;
             for (GuidLowList::iterator itr = mGameEventGameobjectGuids[internal_event_id].begin(); itr != mGameEventGameobjectGuids[internal_event_id].end(); ++ itr)
-                if (*itr == go_id)
+                if (*itr == go_guid)
                     return true;
         }
     }

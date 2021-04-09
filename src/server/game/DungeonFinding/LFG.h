@@ -9,6 +9,7 @@
 
 #include "Common.h"
 #include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
 

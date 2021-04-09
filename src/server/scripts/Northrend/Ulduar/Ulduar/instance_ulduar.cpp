@@ -686,7 +686,7 @@ public:
                     {
                         hmHodir = false;
                         go->Delete();
-                        m_hodirHardmodeChest = 0;
+                        m_hodirHardmodeChest.Clear();
                     }
                     break;
                 case TYPE_WATCHERS:

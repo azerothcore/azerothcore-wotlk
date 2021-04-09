@@ -49,6 +49,8 @@ WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, ObjectGuid con
         default:
             return nullptr;
     }
+
+    return nullptr;
 }
 
 Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const& p, ObjectGuid const guid, uint32 typemask)
@@ -82,8 +84,8 @@ Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const& p, ObjectGuid con
             if (typemask & TYPEMASK_DYNAMICOBJECT)
                 return GetDynamicObject(p, guid);
             break;
-        case HighGuid::Corpse:
-            break;
+        default:
+            return nullptr;
     }
 
     return nullptr;

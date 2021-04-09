@@ -223,19 +223,19 @@ public:
                 }
             }
             _justSpawned = false;
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_PORTAL_1)))
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_PORTAL_1)))
             {
                 go->SetGoState(GO_STATE_READY);
             }
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_PORTAL_2)))
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_PORTAL_2)))
             {
                 go->SetGoState(GO_STATE_READY);
             }
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_PORTAL_3)))
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_PORTAL_3)))
             {
                 go->SetGoState(GO_STATE_READY);
             }
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_KELTHUZAD_PORTAL_4)))
+            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_PORTAL_4)))
             {
                 go->SetGoState(GO_STATE_READY);
             }

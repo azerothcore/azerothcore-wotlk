@@ -8,6 +8,7 @@
 #define __UPDATEDATA_H
 
 #include "ByteBuffer.h"
+#include "ObjectGuid.h"
 
 class WorldPacket;
 

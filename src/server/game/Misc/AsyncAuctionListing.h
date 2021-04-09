@@ -4,6 +4,7 @@
 #include "Common.h"
 #include "EventProcessor.h"
 #include "WorldPacket.h"
+#include "ObjectGuid.h"
 
 class AuctionListOwnerItemsDelayEvent : public BasicEvent
 {

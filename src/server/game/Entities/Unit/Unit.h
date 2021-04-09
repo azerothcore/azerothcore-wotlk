@@ -2480,7 +2480,7 @@ public:
     int32 CalculateAOEDamageReduction(int32 damage, uint32 schoolMask, Unit* caster) const;
 
     [[nodiscard]] ObjectGuid GetTarget() const { return GetGuidValue(UNIT_FIELD_TARGET); }
-    virtual void SetTarget(ObjectGuid guid = ObjectGuid::Empty) = 0;
+    virtual void SetTarget(ObjectGuid /*guid*/ = ObjectGuid::Empty) = 0;
 
     void SetInstantCast(bool set) { _instantCast = set; }
     [[nodiscard]] bool CanInstantCast() const { return _instantCast; }

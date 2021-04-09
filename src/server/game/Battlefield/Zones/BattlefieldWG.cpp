@@ -9,6 +9,7 @@
 // TODO: Add proper implement of achievement
 
 #include "BattlefieldWG.h"
+#include "MapManager.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"

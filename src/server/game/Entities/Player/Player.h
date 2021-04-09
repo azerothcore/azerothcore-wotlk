@@ -1623,7 +1623,7 @@ public:
     [[nodiscard]] Unit* GetSelectedUnit() const;
     [[nodiscard]] Player* GetSelectedPlayer() const;
 
-    void SetTarget(ObjectGuid guid = ObjectGuid::Empty) override { } /// Used for serverside target changes, does not apply to players
+    void SetTarget(ObjectGuid /*guid*/ = ObjectGuid::Empty) override { } /// Used for serverside target changes, does not apply to players
     void SetSelection(ObjectGuid guid);
 
     [[nodiscard]] uint8 GetComboPoints() const { return m_comboPoints; }
