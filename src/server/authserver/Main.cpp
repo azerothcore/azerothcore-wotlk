@@ -82,7 +82,7 @@ extern int main(int argc, char** argv)
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
-        acore::Banner::Show("authserver",
+    acore::Banner::Show("authserver",
         [](char const* text)
         {
             sLog->outString("%s", text);
