@@ -27,7 +27,7 @@ void acore::Banner::Show(char const* applicationName, void(*log)(char const* tex
 
     sLog->outString("     AzerothCore 3.3.5a  -  www.azerothcore.org\n");
 
-    if(logExtraInfo)
+    if (logExtraInfo)
     {
         logExtraInfo();
     }
