@@ -12,7 +12,7 @@ namespace acore
 {
     namespace Banner
     {
-        void Show(char const* applicationName, void(*log)(char const* text), void(*logExtraInfo)());
+        void Show(char const* applicationName, void(char const* text), void(*logExtraInfo)());
     }
 }
 

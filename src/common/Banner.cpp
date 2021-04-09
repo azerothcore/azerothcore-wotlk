@@ -8,7 +8,7 @@
 #include "Log.h"
 #include "StringFormat.h"
 
-void acore::Banner::Show(char const* applicationName, void(*log)(char const* text), void(*logExtraInfo)())
+void acore::Banner::Show(char const* applicationName, void(char const* text), void(*logExtraInfo)())
 {
     sLog->outString(acore::StringFormat("%s (%s)", GitRevision::GetFullVersion(), applicationName).c_str());
     sLog->outString("<Ctrl-C> to stop.\n");
