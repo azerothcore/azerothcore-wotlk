@@ -55,7 +55,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_grandmaster_vorpilAI (creature);
+        return GetShadowLabyrinthAI<boss_grandmaster_vorpilAI>(creature);
     }
 
     struct boss_grandmaster_vorpilAI : public ScriptedAI
@@ -201,7 +201,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_voidtravelerAI (creature);
+        return GetShadowLabyrinthAI<npc_voidtravelerAI>(creature);
     }
 
     struct npc_voidtravelerAI : public ScriptedAI

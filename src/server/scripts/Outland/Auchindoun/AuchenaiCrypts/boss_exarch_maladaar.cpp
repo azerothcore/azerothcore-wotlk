@@ -2,6 +2,7 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
+#include "auchenai_crypts.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 
@@ -35,7 +36,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_exarch_maladaarAI (creature);
+        return GetAuchenaiCryptsAI<boss_exarch_maladaarAI>(creature);
     }
 
     struct boss_exarch_maladaarAI : public ScriptedAI
@@ -162,7 +163,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_stolen_soulAI (creature);
+        return GetAuchenaiCryptsAI<npc_stolen_soulAI>(creature);
     }
 
     struct npc_stolen_soulAI : public ScriptedAI
