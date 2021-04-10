@@ -6972,7 +6972,7 @@ ActionButton* Player::addActionButton(uint8 button, uint32 action, uint8 type)
     ab.SetActionAndType(action, ActionButtonType(type));
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDetail("Player '%u' Added Action %s (type %u) to Button %u", GetGUID().ToString().c_str(), action, type, button);
+    sLog->outDetail("Player %s Added Action %u (type %u) to Button %u", GetGUID().ToString().c_str(), action, type, button);
 #endif
     return &ab;
 }
