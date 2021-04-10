@@ -7,6 +7,9 @@
 
 #include "GridNotifiers.h"
 #include "SpellAuraEffects.h"
+#include "CreatureAIImpl.h"
+
+#define TrialOfTheCrusaderScriptName "instance_trial_of_the_crusader"
 
 enum DataTypes
 {
@@ -385,5 +388,11 @@ const uint32 dedicatedInsanityItems[405] =
     48622, 48623, 48624, 48625, 48626, 48637, 48638, 48639, 48640, 48641, 48657, 48658, 48659, 48660, 48661, 48666, 48667, 48668, 48669, 48670, 48671, 48672, 48673, 48674, 48675, 48693, 48695, 48697, 48699, 48701,
     48703, 48705, 48708, 48709, 48710, 48711, 48712, 48713, 48714, 48722, 48724, 49233, 49234, 49237, 49238
 };
+
+template <class AI, class T>
+inline AI* GetTrialOfTheCrusaderAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, TrialOfTheCrusaderScriptName);
+}
 
 #endif

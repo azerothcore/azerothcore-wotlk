@@ -222,7 +222,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_ayamissAI>(creature);
+        return GetRuinsOfAhnQirajAI<boss_ayamissAI>(creature);
     }
 };
 
@@ -276,7 +276,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_hive_zara_larvaAI>(creature);
+        return GetRuinsOfAhnQirajAI<npc_hive_zara_larvaAI>(creature);
     }
 };
 

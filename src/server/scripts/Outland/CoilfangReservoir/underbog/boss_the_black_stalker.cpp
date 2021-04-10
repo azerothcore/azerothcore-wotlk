@@ -14,6 +14,7 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "the_underbog.h"
 
 enum eBlackStalker
 {
@@ -43,7 +44,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_the_black_stalkerAI (creature);
+        return GetTheUnderbogAI<boss_the_black_stalkerAI>(creature);
     }
 
     struct boss_the_black_stalkerAI : public ScriptedAI
