@@ -669,15 +669,13 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
         switch (opcode)
         {
             case CMSG_PING:
+                try
                 {
-                    try
-                    {
-                        return HandlePing(*new_pct);
-                    }
-                    catch (ByteBufferPositionException const&) {}
-                    LOG_ERROR("server", "WorldSocket::ReadDataHandler(): client sent malformed CMSG_PING");
-                    return -1;
+                    return HandlePing(*new_pct);
                 }
+                catch (ByteBufferPositionException const&) {}
+                 LOG_ERROR("server", "WorldSocket::ReadDataHandler(): client sent malformed CMSG_PING");
+                return -1;
             case CMSG_AUTH_SESSION:
                 if (m_Session)
                 {
@@ -689,27 +687,12 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                 if (m_Session)
                     m_Session->ResetTimeOutTime(true);
                 return 0;
+            case CMSG_TIME_SYNC_RESP:
+                new_pct = new WorldPacket(std::move(*new_pct), std::chrono::steady_clock::now());
+                break;
+
             default:
-                {
-                    std::lock_guard<std::mutex> guard(m_SessionLock);
-
-                    if (m_Session != nullptr)
-                    {
-                        // Our Idle timer will reset on any non PING opcodes.
-                        // Catches people idling on the login screen and any lingering ingame connections.
-                        m_Session->ResetTimeOutTime(false);
-
-                        // OK, give the packet to WorldSession
-                        aptr.release();
-                        m_Session->QueuePacket (new_pct);
-                        return 0;
-                    }
-                    else
-                    {
-                        LOG_ERROR("server", "WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
-                        return -1;
-                    }
-                }
+                break;
         }
     }
     catch (ByteBufferException const&)
@@ -721,6 +704,26 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
             new_pct->hexlike();
         }
 
+        return -1;
+    }
+
+    ACE_GUARD_RETURN(LockType, Guard, m_SessionLock, -1);
+
+    if (m_Session != nullptr)
+    {
+        // Our Idle timer will reset on any non PING or TIME_SYNC opcodes.
+        // Catches people idling on the login screen and any lingering ingame connections.
+        if(opcode != CMSG_PING && opcode != CMSG_TIME_SYNC_RESP)
+            m_Session->ResetTimeOutTime(false);
+
+        // OK, give the packet to WorldSession
+        aptr.release();
+        m_Session->QueuePacket(new_pct);
+        return 0;
+    }
+    else
+    {
+         LOG_ERROR("server", "WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
         return -1;
     }
 
@@ -1074,7 +1077,6 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
         if (m_Session)
         {
             m_Session->SetLatency (latency);
-            m_Session->ResetClientTimeDelay();
         }
         else
         {
