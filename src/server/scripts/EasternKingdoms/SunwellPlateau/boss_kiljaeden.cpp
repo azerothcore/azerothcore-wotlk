@@ -370,8 +370,8 @@ public:
         {
             if (summon->GetEntry() == NPC_ARMAGEDDON_TARGET)
             {
-                summon->SetDisableGravity(true);
                 summon->SetCanFly(true);
+                summon->SetDisableGravity(true);
                 summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
                 summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
                 summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
@@ -786,8 +786,8 @@ public:
         {
             if (param == ACTION_START_POST_EVENT)
             {
-                me->SetDisableGravity(false);
                 me->SetCanFly(false);
+                me->SetDisableGravity(false);
                 me->CastSpell(me, SPELL_TELEPORT_AND_TRANSFORM, true);
                 events.ScheduleEvent(EVENT_SCENE_01, 35000);
             }

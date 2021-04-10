@@ -281,8 +281,8 @@ public:
 
             if (!_summoned)
             {
-                me->SetDisableGravity(true);
                 me->SetCanFly(true);
+                me->SetDisableGravity(true);
             }
         }
 
@@ -353,8 +353,8 @@ public:
             instance->SetBossState(DATA_SINDRAGOSA, FAIL);
             if (_summoned)
             {
-                me->SetDisableGravity(false);
                 me->SetCanFly(false);
+                me->SetDisableGravity(false);
             }
         }
 
@@ -396,7 +396,6 @@ public:
                 me->setActive(true);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetHover(true);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 4.28571f);
                 float moveTime = me->GetExactDist(&SindragosaFlyInPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
@@ -422,9 +421,8 @@ public:
             {
                 case POINT_FROSTWYRM_LAND:
                     me->setActive(false);
-                    me->SetDisableGravity(false);
-                    me->SetHover(false);
                     me->SetCanFly(false);
+                    me->SetDisableGravity(false);
                     me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                     me->SetHomePosition(SindragosaLandPos);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -451,8 +449,8 @@ public:
                 case POINT_LAND_GROUND:
                     {
                         _isInAirPhase = false;
-                        me->SetDisableGravity(false);
                         me->SetCanFly(false);
+                        me->SetDisableGravity(false);
                         me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                         me->SetReactState(REACT_AGGRESSIVE);
                         if (Unit* target = me->SelectVictim())
@@ -603,7 +601,6 @@ public:
                     me->StopMoving();
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
-                    me->SetHover(true);
                     me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f, 10.0f);
                     events.CancelEventGroup(EVENT_GROUP_LAND_PHASE);
@@ -1394,7 +1391,6 @@ public:
             {
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetHover(true);
             }
         }
 
@@ -1405,7 +1401,6 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
             }
         }
 
@@ -1450,7 +1445,6 @@ public:
             me->setActive(false);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            me->SetHover(false);
             me->SetHomePosition(SpinestalkerLandPos);
             me->SetFacingTo(SpinestalkerLandPos.GetOrientation());
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
@@ -1531,7 +1525,6 @@ public:
             {
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetHover(true);
             }
         }
 
@@ -1542,7 +1535,6 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
             }
         }
 
@@ -1589,7 +1581,6 @@ public:
                 me->setActive(false);
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
                 me->SetHomePosition(RimefangLandPos);
                 me->SetFacingTo(RimefangLandPos.GetOrientation());
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
@@ -1598,7 +1589,6 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
                 me->SetReactState(REACT_DEFENSIVE);
                 if (Unit* victim = me->SelectVictim())
                     AttackStart(victim);
@@ -1643,7 +1633,6 @@ public:
                         me->AttackStop();
                         me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SetHover(true);
                         me->SendMovementFlagUpdate();
                         float floorZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         float destZ;

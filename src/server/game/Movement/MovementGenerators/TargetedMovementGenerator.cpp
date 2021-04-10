@@ -48,7 +48,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || (cOwner && cOwner->IsMovementPreventedByCasting()))
     {
-        i_path = nullptr;
         owner->StopMoving();
         _lastTargetPosition.reset();
         if (Creature* cOwner = owner->ToCreature())
@@ -234,7 +233,7 @@ bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target, float rang
     if (owner->GetExactDistSq(target) > G3D::square(owner->GetCombatReach() + target->GetCombatReach() + range))
         return false;
 
-    return !owner->IsPet() || !angle || angle->IsAngleOkay(target->GetRelativeAngle(owner)); // need to check - dont think we need !pet exception here because there are scripts with MoveFollow that require angle
+    return !angle || angle->IsAngleOkay(target->GetRelativeAngle(owner));
 }
 
 template<class T>
