@@ -62,7 +62,9 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
                         count++;
                     }
                     else
+                    {
                         break;
+                    }
 
                 } while (count < ATTEMPTS);
             }

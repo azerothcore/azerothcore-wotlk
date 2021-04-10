@@ -125,7 +125,9 @@ uint32 MySQLConnection::Open()
             sLog->outSQLDriver("MySQL server ver: %s ", mysql_get_server_info(m_Mysql));
 
             if (mysql_get_server_version(m_Mysql) != mysql_get_client_version())
+            {
                 sLog->outSQLDriver("[WARNING] MySQL client/server version mismatch; may conflict with behaviour of prepared statements.");
+            }
         }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)

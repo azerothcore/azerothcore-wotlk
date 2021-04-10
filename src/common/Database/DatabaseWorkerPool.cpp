@@ -104,11 +104,17 @@ uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConne
         T* t;
 
         if (type == IDX_ASYNC)
+        {
             t = new T(_queue, *_connectionInfo);
+        }
         else if (type == IDX_SYNCH)
+        {
             t = new T(*_connectionInfo);
+        }
         else
-            ABORT();
+        {
+            ASSERT(false, "> Incorrect InternalIndex (%u)", static_cast<uint32>(type));
+        }
 
         _connections[type][i] = t;
         ++_connectionCount[type];
@@ -133,6 +139,7 @@ uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConne
                 delete t;
                 --_connectionCount[type];
             }
+
             return error;
         }
     }
@@ -158,7 +165,9 @@ bool DatabaseWorkerPool<T>::PrepareStatements()
                 return false;
             }
             else
+            {
                 t->Unlock();
+            }
         }
     }
 
