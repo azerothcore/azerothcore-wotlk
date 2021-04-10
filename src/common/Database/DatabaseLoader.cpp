@@ -100,13 +100,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
 
 bool DatabaseLoader::Load()
 {
-    if (!OpenDatabases())
-        return false;
-
-    if (!PrepareStatements())
-        return false;
-
-    return true;
+    return OpenDatabases() && PrepareStatements();
 }
 
 bool DatabaseLoader::OpenDatabases()
