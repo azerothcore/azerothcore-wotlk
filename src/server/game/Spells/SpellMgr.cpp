@@ -6815,8 +6815,8 @@ void SpellMgr::LoadDbcDataCorrections()
     });
 
     ApplySpellFix({
-    37851, // Tag Greater Felfire Diemetradon
-    37918  // Arcano-pince
+        37851, // Tag Greater Felfire Diemetradon
+        37918  // Arcano-pince
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->RecoveryTime = 3000;

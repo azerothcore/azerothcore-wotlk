@@ -13483,8 +13483,15 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                         SetSpeed(mtype, AddPct(non_stack_bonus, (*itr)->GetAmount()), forced);
                         return;
                     }
-                    else if ((*itr)->GetAmount() > main_speed_mod)
+                    else if (
+                        // case: increase speed
+                        ((*itr)->GetAmount() > 0 && (*itr)->GetAmount() > main_speed_mod) ||
+                        // case: decrease speed
+                        ((*itr)->GetAmount() < 0 && (*itr)->GetAmount() < main_speed_mod)
+                     )
+                    {
                         main_speed_mod = (*itr)->GetAmount();
+                    }
                 }
                 break;
             }
