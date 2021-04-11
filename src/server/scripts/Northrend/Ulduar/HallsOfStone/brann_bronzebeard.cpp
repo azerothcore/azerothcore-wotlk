@@ -2,13 +2,13 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "halls_of_stone.h"
-#include "ScriptedEscortAI.h"
-#include "SpellScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 #define GOSSIP_ITEM_1       "Brann, it would be our honor!"
 #define GOSSIP_ITEM_2       "Let's move Brann, enough of the history lessons!"
@@ -179,7 +179,6 @@ public:
                 default:
                     break;
             }
-
         }
         SendGossipMenuFor(player, TEXT_ID_START, creature->GetGUID());
         return true;
@@ -223,7 +222,6 @@ public:
 
     struct brann_bronzebeardAI : public npc_escortAI
     {
-
         brann_bronzebeardAI(Creature* c) : npc_escortAI(c), summons(me)
         {
             AbedneumGUID = MarnakGUID = KaddrakGUID = 0;
@@ -515,7 +513,6 @@ public:
                     }
                 case EVENT_GO_TO_SJONNIR:
                     {
-
                         if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(GO_SJONNIR_DOOR)))
                             door->SetGoState(GO_STATE_ACTIVE);
                         SetEscortPaused(false);

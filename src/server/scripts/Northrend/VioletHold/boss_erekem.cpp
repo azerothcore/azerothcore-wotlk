@@ -2,8 +2,8 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "violet_hold.h"
 
 enum eSpells
@@ -52,7 +52,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_erekemAI (pCreature);
+        return GetVioletHoldAI<boss_erekemAI>(pCreature);
     }
 
     struct boss_erekemAI : public ScriptedAI
@@ -108,11 +108,11 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_BLOODLUST:
-                    me->CastSpell((Unit*)NULL, SPELL_BLOODLUST, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_BLOODLUST, false);
                     events.RepeatEvent(urand(35000, 45000));
                     break;
                 case EVENT_SPELL_BREAK_BONDS:
-                    me->CastSpell((Unit*)NULL, SPELL_BREAK_BONDS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_BREAK_BONDS, false);
                     events.RepeatEvent(urand(16000, 22000));
                     break;
                 case EVENT_SPELL_CHAIN_HEAL:
@@ -226,7 +226,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_erekem_guardAI (pCreature);
+        return GetVioletHoldAI<npc_erekem_guardAI>(pCreature);
     }
 
     struct npc_erekem_guardAI : public ScriptedAI

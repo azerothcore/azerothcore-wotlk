@@ -149,7 +149,7 @@ QueryResult DatabaseWorkerPool<T>::Query(const char* sql, T* conn /* = nullptr*/
     if (!result || !result->GetRowCount())
     {
         delete result;
-        return QueryResult(NULL);
+        return QueryResult(nullptr);
     }
 
     result->NextRow();
@@ -169,7 +169,7 @@ PreparedQueryResult DatabaseWorkerPool<T>::Query(PreparedStatement* stmt)
     if (!ret || !ret->GetRowCount())
     {
         delete ret;
-        return PreparedQueryResult(NULL);
+        return PreparedQueryResult(nullptr);
     }
 
     return PreparedQueryResult(ret);

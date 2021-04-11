@@ -40,7 +40,6 @@ public:
     SQLQueryHolderTask(SQLQueryHolder* holder, QueryResultHolderFuture res)
         : m_holder(holder), m_result(res) { };
     bool Execute() override;
-
 };
 
 #endif

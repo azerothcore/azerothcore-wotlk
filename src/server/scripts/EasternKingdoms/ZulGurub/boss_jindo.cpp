@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,8 +11,8 @@ SDComment: Mind Control not working because of core bug. Shades visible for all.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "zulgurub.h"
 
 enum Say
@@ -167,7 +167,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_jindoAI(creature);
+        return GetZulGurubAI<boss_jindoAI>(creature);
     }
 };
 
@@ -175,7 +175,6 @@ public:
 class npc_healing_ward : public CreatureScript
 {
 public:
-
     npc_healing_ward()
         : CreatureScript("npc_healing_ward")
     {
@@ -219,7 +218,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_healing_wardAI>(creature);
+        return GetZulGurubAI<npc_healing_wardAI>(creature);
     }
 };
 
@@ -227,7 +226,6 @@ public:
 class npc_shade_of_jindo : public CreatureScript
 {
 public:
-
     npc_shade_of_jindo()
         : CreatureScript("npc_shade_of_jindo")
     {
@@ -249,7 +247,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-
             //ShadowShock_Timer
             if (ShadowShock_Timer <= diff)
             {
@@ -264,7 +261,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_shade_of_jindoAI(creature);
+        return GetZulGurubAI<npc_shade_of_jindoAI>(creature);
     }
 };
 

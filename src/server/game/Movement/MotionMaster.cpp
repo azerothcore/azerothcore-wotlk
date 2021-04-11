@@ -1,25 +1,51 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "MotionMaster.h"
-#include "CreatureAISelector.h"
-#include "Creature.h"
-
 #include "ConfusedMovementGenerator.h"
+#include "Creature.h"
+#include "CreatureAISelector.h"
+#include "EscortMovementGenerator.h"
 #include "FleeingMovementGenerator.h"
 #include "HomeMovementGenerator.h"
 #include "IdleMovementGenerator.h"
-#include "PointMovementGenerator.h"
-#include "TargetedMovementGenerator.h"
-#include "WaypointMovementGenerator.h"
-#include "RandomMovementGenerator.h"
-#include "EscortMovementGenerator.h"
+#include "MotionMaster.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "PointMovementGenerator.h"
+#include "RandomMovementGenerator.h"
+#include "TargetedMovementGenerator.h"
+#include "WaypointMovementGenerator.h"
 #include <cassert>
+
+ // ---- ChaseRange ---- //
+
+ChaseRange::ChaseRange(float range) : MinRange(range > CONTACT_DISTANCE ? 0 : range - CONTACT_DISTANCE), MinTolerance(range), MaxRange(range + CONTACT_DISTANCE), MaxTolerance(range) { }
+ChaseRange::ChaseRange(float _minRange, float _maxRange) : MinRange(_minRange), MinTolerance(std::min(_minRange + CONTACT_DISTANCE, (_minRange + _maxRange) / 2)), MaxRange(_maxRange), MaxTolerance(std::max(_maxRange - CONTACT_DISTANCE, MinTolerance)) { }
+ChaseRange::ChaseRange(float _minRange, float _minTolerance, float _maxTolerance, float _maxRange) : MinRange(_minRange), MinTolerance(_minTolerance), MaxRange(_maxRange), MaxTolerance(_maxTolerance) { }
+
+// ---- ChaseAngle ---- //
+
+ChaseAngle::ChaseAngle(float angle, float _tolerance/* = M_PI_4*/) : RelativeAngle(Position::NormalizeOrientation(angle)), Tolerance(_tolerance) { }
+
+float ChaseAngle::UpperBound() const
+{
+    return Position::NormalizeOrientation(RelativeAngle + Tolerance);
+}
+
+float ChaseAngle::LowerBound() const
+{
+    return Position::NormalizeOrientation(RelativeAngle - Tolerance);
+}
+
+bool ChaseAngle::IsAngleOkay(float relativeAngle) const
+{
+    float const diff = std::abs(relativeAngle - RelativeAngle);
+
+    return (std::min(diff, float(2 * M_PI) - diff) <= Tolerance);
+}
 
 inline bool isStatic(MovementGenerator* mv)
 {
@@ -46,7 +72,7 @@ void MotionMaster::InitDefault()
     if (_owner->GetTypeId() == TYPEID_UNIT && _owner->IsAlive())
     {
         MovementGenerator* movement = FactorySelector::selectMovementGenerator(_owner->ToCreature());
-        Mutate(movement == NULL ? &si_idleMovement : movement, MOTION_SLOT_IDLE);
+        Mutate(movement == nullptr ? &si_idleMovement : movement, MOTION_SLOT_IDLE);
     }
     else
     {
@@ -70,17 +96,6 @@ void MotionMaster::UpdateMotion(uint32 diff)
 {
     if (!_owner)
         return;
-
-    if (_owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED)) // what about UNIT_STATE_DISTRACTED? Why is this not included?
-    {
-        // pussywizard: the same as at the bottom of this function
-        if (_owner->GetTypeId() == TYPEID_PLAYER)
-            _owner->UpdateUnderwaterState(_owner->GetMap(), _owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ());
-        else
-            _owner->UpdateEnvironmentIfNeeded(0);
-
-        return;
-    }
 
     ASSERT(!empty());
 
@@ -290,7 +305,7 @@ void MotionMaster::MoveConfused()
     }
 }
 
-void MotionMaster::MoveChase(Unit* target, float dist, float angle)
+void MotionMaster::MoveChase(Unit* target,  std::optional<ChaseRange> dist, std::optional<ChaseAngle> angle)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     // ignore movement request if target not exist
@@ -334,19 +349,16 @@ void MotionMaster::MoveBackwards(Unit* target, float dist)
     point.y = pos.m_positionY + dist * sinf(angle);
     point.z = pos.m_positionZ;
 
-    //if (_owner->IsFlying())
-    //    point.z = pos.m_positionZ;
-    //else
-    //    point.z = _owner->GetMapHeight(point.x, point.y, point.z);
-
-    if (_owner->GetMap()->CanReachPositionAndGetCoords(_owner, point.x, point.y, point.z, true, 6.0f, M_PI/4))
+    if (!_owner->GetMap()->CanReachPositionAndGetValidCoords(_owner, point.x, point.y, point.z, true, true))
     {
-        Movement::MoveSplineInit init(_owner);
-        init.MoveTo(point.x, point.y, point.z, true);
-        init.SetFacing(target);
-        init.SetOrientationInversed();
-        init.Launch();
+        return;
     }
+
+    Movement::MoveSplineInit init(_owner);
+    init.MoveTo(point.x, point.y, point.z, false);
+    init.SetFacing(target);
+    init.SetOrientationInversed();
+    init.Launch();
 }
 
 void MotionMaster::MoveCircleTarget(Unit* target)
@@ -357,34 +369,16 @@ void MotionMaster::MoveCircleTarget(Unit* target)
     }
 
     Position* point = target->GetMeleeAttackPoint(_owner);
-    if (point == NULL)
+    if (point == nullptr)
     {
         return;
     }
 
-    if (_owner->IsFlying()) {
-        // Dont do anything yet might add later
-    }
-    else
-    {
-        point->m_positionZ = _owner->GetMapHeight(point->m_positionX, point->m_positionY, point->m_positionZ);
-    }
-
-    const Map* _map = _owner->GetBaseMap();
-
-    float x = point->m_positionX;
-    float y = point->m_positionY;
-    float z = point->m_positionZ;
-
-    if (_map->CanReachPositionAndGetCoords(_owner, x, y, z, true, 6.0f, M_PI/3))
-    {
-        Movement::MoveSplineInit init(_owner);
-        init.SetSmooth();
-        init.MoveTo(x, y, z, true);
-        init.SetWalk(true);
-        init.SetFacing(target);
-        init.Launch();
-    }
+    Movement::MoveSplineInit init(_owner);
+    init.MoveTo(point->m_positionX, point->m_positionY, point->m_positionZ, false);
+    init.SetWalk(true);
+    init.SetFacing(target);
+    init.Launch();
 }
 
 void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlot slot)
@@ -457,7 +451,7 @@ void MotionMaster::MoveSplinePath(Movement::PointsArray* path)
     }
 }
 
-void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed)
+void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed /* = 0.0f*/)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
@@ -472,19 +466,24 @@ void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed)
 
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(x, y, z);
-    init.SetVelocity(speed);
+
+    if (speed > 0.0f)
+    {
+        init.SetVelocity(speed);
+    }
+
     init.SetAnimation(Movement::ToGround);
     init.Launch();
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_ACTIVE);
 }
 
-void MotionMaster::MoveLand(uint32 id, float x, float y, float z, float speed)
+void MotionMaster::MoveLand(uint32 id, float x, float y, float z, float speed /* = 0.0f*/)
 {
     Position pos = {x, y, z, 0.0f};
     MoveLand(id, pos, speed);
 }
 
-void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed)
+void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed /* = 0.0f*/)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
@@ -499,13 +498,18 @@ void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed)
 
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(x, y, z);
-    init.SetVelocity(speed);
+
+    if (speed > 0.0f)
+    {
+        init.SetVelocity(speed);
+    }
+
     init.SetAnimation(Movement::ToFly);
     init.Launch();
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_ACTIVE);
 }
 
-void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed)
+void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed /* = 0.0f*/)
 {
     Position pos = {x, y, z, 0.0f};
     MoveTakeoff(id, pos, speed);
@@ -520,22 +524,16 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
     if (speedXY <= 0.1f)
         return;
 
+     Position dest = _owner->GetPosition();
     float moveTimeHalf = speedZ / Movement::gravity;
     float dist = 2 * moveTimeHalf * speedXY;
     float max_height = -Movement::computeFallElevation(moveTimeHalf, false, -speedZ);
 
-    Position pos;
-    _owner->GetNearPoint(_owner, pos.m_positionX, pos.m_positionY, pos.m_positionZ, _owner->GetObjectSize(), dist, _owner->GetAngle(srcX, srcY) + M_PI);
-
-    // xinef: check LoS!
-    if (!_owner->IsWithinLOS(pos.m_positionX, pos.m_positionY, pos.m_positionZ))
-    {
-        _owner->GetPosition(&pos);
-        _owner->MovePositionToFirstCollision(pos, dist, _owner->GetAngle(srcX, srcY) + M_PI);
-    }
+    // Use a mmap raycast to get a valid destination.
+    _owner->MovePositionToFirstCollision(dest, dist, _owner->GetRelativeAngle(srcX, srcY) + float(M_PI));
 
     Movement::MoveSplineInit init(_owner);
-    init.MoveTo(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
+    init.MoveTo(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
     init.SetParabolic(max_height, 0);
     init.SetOrientationFixed(true);
     init.SetVelocity(speedXY);
@@ -586,12 +584,12 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
         return;
 
     // use larger distance for vmap height search than in most other cases
-    float tz = _owner->GetMap()->GetHeight(_owner->GetPhaseMask(), _owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ(), true, MAX_FALL_DISTANCE);
+    float tz = _owner->GetMapHeight(_owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ(), true, MAX_FALL_DISTANCE);
     if (tz <= INVALID_HEIGHT)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         sLog->outStaticDebug("MotionMaster::MoveFall: unable retrive a proper height at map %u (x: %f, y: %f, z: %f).",
-                             _owner->GetMap()->GetId(), _owner->GetPositionX(), _owner->GetPositionX(), _owner->GetPositionZ());
+                             _owner->GetMap()->GetId(), _owner->GetPositionX(), _owner->GetPositionX(), _owner->GetPositionZ() + _owner->GetPositionZ());
 #endif
         return;
     }
@@ -616,7 +614,7 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
     }
 
     Movement::MoveSplineInit init(_owner);
-    init.MoveTo(_owner->GetPositionX(), _owner->GetPositionY(), tz);
+    init.MoveTo(_owner->GetPositionX(), _owner->GetPositionY(), tz + _owner->GetHoverHeight());
     init.SetFall();
     init.Launch();
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);

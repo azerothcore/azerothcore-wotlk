@@ -23,7 +23,7 @@ function export() {
     database=$1
 
     var_base_path="DB_"$database"_PATHS"
-    base_path=${!var_base_path}
+    base_path=${!var_base_path%/}
     
     base_conf="TPATH="$base_path";\
                CLEANFOLDER=1; \

@@ -2,12 +2,12 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "vault_of_archavon.h"
-#include "SpellAuras.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "vault_of_archavon.h"
 
 enum Spells
 {
@@ -35,7 +35,6 @@ enum Events
     EVENT_FROZEN_ORB_STALKER            = 2,
     EVENT_CAST_WHITEOUT                 = 3,
     EVENT_CAST_WHITEOUT_GROUND_EFFECT   = 4,
-
 };
 
 enum Misc
@@ -149,7 +148,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_toravonAI(creature);
+        return GetVaultOfArchavonAI<boss_toravonAI>(creature);
     }
 };
 
@@ -193,7 +192,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_frozen_orbAI(creature);
+        return GetVaultOfArchavonAI<npc_frozen_orbAI>(creature);
     }
 };
 
@@ -224,7 +223,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_frozen_orb_stalkerAI(creature);
+        return GetVaultOfArchavonAI<npc_frozen_orb_stalkerAI>(creature);
     }
 };
 

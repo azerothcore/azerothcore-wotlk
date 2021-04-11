@@ -2,17 +2,17 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "ulduar.h"
-#include "ScriptedEscortAI.h"
-#include "SpellAuras.h"
-#include "PassiveAI.h"
-#include "Opcodes.h"
-#include "Player.h"
 #include "CreatureAI.h"
 #include "Object.h"
+#include "Opcodes.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "ulduar.h"
 
 enum YoggSpells
 {
@@ -181,6 +181,7 @@ enum NPCsGOs
     NPC_LAUGHING_SKULL                  = 33990,
 
     NPC_IMMORTAL_GUARDIAN               = 33988,
+    NPC_MARKED_IMMORTAL_GUARDIAN        = 36064,
 
     // CHAMBER ILLUSION
     NPC_CONSORT_FIRST                   = 33716,
@@ -325,7 +326,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_saraAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_saraAI>(pCreature);
     }
 
     struct boss_yoggsaron_saraAI : public ScriptedAI
@@ -659,7 +660,7 @@ public:
 
             // Illusion shatters (param - stun time)
             WorldPacket data;
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, NULL, "Illusion shatters and a path to the central chamber opens!");
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, me, nullptr, "Illusion shatters and a path to the central chamber opens!");
             me->SendMessageToSetInRange(&data, 500, false);
 
             uint32 timer = events.GetNextEventTime(EVENT_SARA_P2_OPEN_PORTALS);
@@ -873,7 +874,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_cloudAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_cloudAI>(pCreature);
     }
 
     struct boss_yoggsaron_cloudAI : public npc_escortAI
@@ -969,7 +970,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_guardian_of_ysAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_guardian_of_ysAI>(pCreature);
     }
 
     struct boss_yoggsaron_guardian_of_ysAI : public ScriptedAI
@@ -986,7 +987,7 @@ public:
 
         void JustDied(Unit*) override
         {
-            me->CastSpell((Unit*)NULL, SPELL_SHADOW_NOVA, true);
+            me->CastSpell((Unit*)nullptr, SPELL_SHADOW_NOVA, true);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1013,7 +1014,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaronAI (pCreature);
+        return GetUlduarAI<boss_yoggsaronAI>(pCreature);
     }
 
     struct boss_yoggsaronAI : public ScriptedAI
@@ -1196,7 +1197,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_brainAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_brainAI>(pCreature);
     }
 
     struct boss_yoggsaron_brainAI : public NullCreatureAI
@@ -1432,7 +1433,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_death_orbAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_death_orbAI>(pCreature);
     }
 
     struct boss_yoggsaron_death_orbAI : public NullCreatureAI
@@ -1472,7 +1473,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_crusher_tentacleAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_crusher_tentacleAI>(pCreature);
     }
 
     struct boss_yoggsaron_crusher_tentacleAI : public ScriptedAI
@@ -1534,7 +1535,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_corruptor_tentacleAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_corruptor_tentacleAI>(pCreature);
     }
 
     struct boss_yoggsaron_corruptor_tentacleAI : public ScriptedAI
@@ -1591,7 +1592,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_constrictor_tentacleAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_constrictor_tentacleAI>(pCreature);
     }
 
     struct boss_yoggsaron_constrictor_tentacleAI : public ScriptedAI
@@ -1670,7 +1671,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_keeperAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_keeperAI>(pCreature);
     }
 
     struct boss_yoggsaron_keeperAI : public NullCreatureAI
@@ -1746,7 +1747,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_influence_tentacleAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_influence_tentacleAI>(pCreature);
     }
 
     struct boss_yoggsaron_influence_tentacleAI : public NullCreatureAI
@@ -1778,7 +1779,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_immortal_guardianAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_immortal_guardianAI>(pCreature);
     }
 
     struct boss_yoggsaron_immortal_guardianAI : public ScriptedAI
@@ -1866,7 +1867,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_lich_kingAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_lich_kingAI>(pCreature);
     }
 
     struct boss_yoggsaron_lich_kingAI : public NullCreatureAI
@@ -1904,12 +1905,12 @@ public:
             WorldPacket data;
             if (creature->GetGUID() != _yoggGUID)
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 creature->SendMessageToSetInRange(&data, 90, true);
             }
             else if (Creature* cr = me->SummonTrigger(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 5, 0, 5000))
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 cr->SendMessageToSetInRange(&data, 90, true);
             }
             else
@@ -1980,7 +1981,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_llaneAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_llaneAI>(pCreature);
     }
 
     struct boss_yoggsaron_llaneAI : public NullCreatureAI
@@ -2018,12 +2019,12 @@ public:
             WorldPacket data;
             if (creature->GetGUID() != _yoggGUID)
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 creature->SendMessageToSetInRange(&data, 90, true);
             }
             else if (Creature* cr = me->SummonTrigger(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 5, 0, 5000))
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 cr->SendMessageToSetInRange(&data, 90, true);
             }
             else
@@ -2102,7 +2103,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_neltharionAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_neltharionAI>(pCreature);
     }
 
     struct boss_yoggsaron_neltharionAI : public ScriptedAI
@@ -2138,12 +2139,12 @@ public:
             WorldPacket data;
             if (creature->GetGUID() != _yoggGUID)
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 creature->SendMessageToSetInRange(&data, 90, true);
             }
             else if (Creature* cr = me->SummonTrigger(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 5, 0, 5000))
             {
-                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, NULL, text);
+                ChatHandler::BuildChatPacket(data, yell ? CHAT_MSG_MONSTER_YELL : CHAT_MSG_MONSTER_SAY, LANG_UNIVERSAL, creature, nullptr, text);
                 cr->SendMessageToSetInRange(&data, 90, true);
             }
             else
@@ -2210,7 +2211,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_yoggsaron_voiceAI (pCreature);
+        return GetUlduarAI<boss_yoggsaron_voiceAI>(pCreature);
     }
 
     struct boss_yoggsaron_voiceAI : public NullCreatureAI
@@ -2398,6 +2399,44 @@ public:
     {
         return new spell_yogg_saron_brain_link_SpellScript();
     }
+};
+
+class spell_yogg_saron_shadow_beacon : public SpellScriptLoader
+{
+    public:
+        spell_yogg_saron_shadow_beacon() : SpellScriptLoader("spell_yogg_saron_shadow_beacon") { }
+
+        class spell_yogg_saron_shadow_beacon_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_yogg_saron_shadow_beacon_AuraScript);
+
+            void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Creature* target = GetTarget()->ToCreature())
+                {
+                    target->SetEntry(NPC_MARKED_IMMORTAL_GUARDIAN);
+                }
+            }
+
+            void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                if (Creature* target = GetTarget()->ToCreature())
+                {
+                    target->SetEntry(NPC_IMMORTAL_GUARDIAN);
+                }
+            }
+
+            void Register() override
+            {
+                AfterEffectApply += AuraEffectApplyFn(spell_yogg_saron_shadow_beacon_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_yogg_saron_shadow_beacon_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_yogg_saron_shadow_beacon_AuraScript();
+        }
 };
 
 class spell_yogg_saron_destabilization_matrix : public SpellScriptLoader
@@ -2887,15 +2926,13 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_GRIM_REPRISAL_DAMAGE))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_GRIM_REPRISAL_DAMAGE });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             int32 damage = CalculatePct(int32(eventInfo.GetDamageInfo()->GetDamage()), 60);
-            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetDamageInfo()->GetAttacker(), true, NULL, aurEff);
+            GetTarget()->CastCustomSpell(SPELL_GRIM_REPRISAL_DAMAGE, SPELLVALUE_BASE_POINT0, damage, eventInfo.GetDamageInfo()->GetAttacker(), true, nullptr, aurEff);
         }
 
         void Register() override
@@ -2997,6 +3034,7 @@ void AddSC_boss_yoggsaron()
     // SPELLS
     new spell_yogg_saron_malady_of_the_mind();
     new spell_yogg_saron_brain_link();
+    new spell_yogg_saron_shadow_beacon();
     new spell_yogg_saron_destabilization_matrix();
     new spell_yogg_saron_titanic_storm();
     new spell_yogg_saron_lunatic_gaze();

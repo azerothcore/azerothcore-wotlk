@@ -1,15 +1,15 @@
 // Scripted by Xinef
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "SpellScript.h"
-#include "LFGMgr.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
+#include "LFGMgr.h"
 #include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 
 ///////////////////////////////////////
 ////// GOS
@@ -22,11 +22,15 @@
 enum Spells
 {
     SPELL_GOBLIN_DISGUISE           = 71450,
-    SPELL_GOBLIN_ALLY_COMPLETE      = 71522,
-    SPELL_GOBLIN_HORDE_COMPLETE     = 71539,
     SPELL_GOBLIN_CARRY_CRATE        = 71459,
 
     NPC_SOMETHING_STINKS_CREDIT     = 37558,
+};
+
+enum Quests
+{
+    QUEST_PILGRIM_HORDE             = 24541,
+    QUEST_PILGRIM_ALLIANCE          = 24656
 };
 
 class npc_love_in_air_supply_sentry : public CreatureScript
@@ -53,9 +57,13 @@ public:
                     me->MonsterSay("That crate won't deliver itself, friend. Get a move on!", LANG_UNIVERSAL, who->ToPlayer());
 
                 if (who->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
-                    who->CastSpell(who, SPELL_GOBLIN_ALLY_COMPLETE, true);
+                {
+                    who->ToPlayer()->CompleteQuest(QUEST_PILGRIM_ALLIANCE);
+                }
                 else
-                    who->CastSpell(who, SPELL_GOBLIN_HORDE_COMPLETE, true);
+                {
+                    who->ToPlayer()->CompleteQuest(QUEST_PILGRIM_HORDE);
+                }
 
                 me->CastSpell(who, SPELL_GOBLIN_CARRY_CRATE, true);
             }
@@ -737,9 +745,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_SERVICE_UNIFORM))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_SERVICE_UNIFORM });
         }
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

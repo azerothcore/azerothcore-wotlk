@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <deque>
 #include <set>
+#include <filesystem>
 
 #ifdef _WIN32
 #include "direct.h"
@@ -62,12 +63,13 @@ char input_path[MAX_PATH_LENGTH] = ".";
 // **************************************************
 enum Extract
 {
-    EXTRACT_MAP = 1,
-    EXTRACT_DBC = 2
+    EXTRACT_MAP    = 1,
+    EXTRACT_DBC    = 2,
+    EXTRACT_CAMERA = 4
 };
 
 // Select data for extract
-int   CONF_extract = EXTRACT_MAP | EXTRACT_DBC;
+int   CONF_extract = EXTRACT_MAP | EXTRACT_DBC | EXTRACT_CAMERA;
 // This option allow limit minimum height to some value (Allow save some memory)
 bool  CONF_allow_height_limit = true;
 float CONF_use_minHeight = -500.0f;
@@ -140,7 +142,7 @@ void Usage(char* prg)
         "%s -[var] [value]\n"\
         "-i set input path\n"\
         "-o set output path\n"\
-        "-e extract only MAP(1)/DBC(2) - standard: both(3)\n"\
+        "-e extract only MAP(1)/DBC(2)/Camera(4) - standard: all(7)\n"\
         "-f height stored as int (less map size but lost some accuracy) 1 by default\n"\
         "Example: %s -f 0 -i \"c:\\games\\game\"", prg, prg);
     exit(1);
@@ -156,37 +158,55 @@ void HandleArgs(int argc, char* arg[])
         // f - use float to int conversion
         // h - limit minimum height
         if (arg[c][0] != '-')
+        {
             Usage(arg[0]);
+        }
 
         switch (arg[c][1])
         {
             case 'i':
                 if (c + 1 < argc)                           // all ok
+                {
                     strcpy(input_path, arg[(c++) + 1]);
+                }
                 else
+                {
                     Usage(arg[0]);
+                }
                 break;
             case 'o':
                 if (c + 1 < argc)                           // all ok
+                {
                     strcpy(output_path, arg[(c++) + 1]);
+                }
                 else
+                {
                     Usage(arg[0]);
+                }
                 break;
             case 'f':
                 if (c + 1 < argc)                           // all ok
+                {
                     CONF_allow_float_to_int = atoi(arg[(c++) + 1]) != 0;
+                }
                 else
+                {
                     Usage(arg[0]);
+                }
                 break;
             case 'e':
                 if (c + 1 < argc)                           // all ok
                 {
                     CONF_extract = atoi(arg[(c++) + 1]);
-                    if (!(CONF_extract > 0 && CONF_extract < 4))
+                    if (!(CONF_extract > 0 && CONF_extract < 8))
+                    {
                         Usage(arg[0]);
+                    }
                 }
                 else
+                {
                     Usage(arg[0]);
+                }
                 break;
         }
     }
@@ -367,6 +387,7 @@ uint16 liquid_entry[ADT_CELLS_PER_GRID][ADT_CELLS_PER_GRID];
 uint8 liquid_flags[ADT_CELLS_PER_GRID][ADT_CELLS_PER_GRID];
 bool  liquid_show[ADT_GRID_SIZE][ADT_GRID_SIZE];
 float liquid_height[ADT_GRID_SIZE + 1][ADT_GRID_SIZE + 1];
+uint16 holes[ADT_CELLS_PER_GRID][ADT_CELLS_PER_GRID];
 
 int16 flight_box_max[3][3];
 int16 flight_box_min[3][3];
@@ -388,6 +409,8 @@ bool ConvertADT(std::string const& inputPath, std::string const& outputPath, int
     memset(liquid_show, 0, sizeof(liquid_show));
     memset(liquid_flags, 0, sizeof(liquid_flags));
     memset(liquid_entry, 0, sizeof(liquid_entry));
+
+    memset(holes, 0, sizeof(holes));
 
     // Prepare map header
     map_fileheader map;
@@ -841,15 +864,6 @@ bool ConvertADT(std::string const& inputPath, std::string const& outputPath, int
             map.liquidMapSize += sizeof(float) * liquidHeader.width * liquidHeader.height;
     }
 
-    // map hole info
-    uint16 holes[ADT_CELLS_PER_GRID][ADT_CELLS_PER_GRID];
-
-    if (map.liquidMapOffset)
-        map.holesOffset = map.liquidMapOffset + map.liquidMapSize;
-    else
-        map.holesOffset = map.heightMapOffset + map.heightMapSize;
-
-    memset(holes, 0, sizeof(holes));
     bool hasHoles = false;
 
     for (int i = 0; i < ADT_CELLS_PER_GRID; ++i)
@@ -866,9 +880,19 @@ bool ConvertADT(std::string const& inputPath, std::string const& outputPath, int
     }
 
     if (hasHoles)
+    {
+        if (map.liquidMapOffset)
+            map.holesOffset = map.liquidMapOffset + map.liquidMapSize;
+        else
+            map.holesOffset = map.heightMapOffset + map.heightMapSize;
+
         map.holesSize = sizeof(holes);
+    }
     else
+    {
+        map.holesOffset = 0;
         map.holesSize = 0;
+    }
 
     // Ok all data prepared - store it
     FILE* output = fopen(outputPath.c_str(), "wb");
@@ -1048,6 +1072,62 @@ void ExtractDBCFiles(int locale, bool basicLocale)
     printf("Extracted %u DBC files\n\n", count);
 }
 
+void ExtractCameraFiles(int locale, bool basicLocale)
+{
+    printf("Extracting camera files...\n");
+    DBCFile camdbc("DBFilesClient\\CinematicCamera.dbc");
+
+    if (!camdbc.open())
+    {
+        printf("Unable to open CinematicCamera.dbc. Camera extract aborted.\n");
+        return;
+    }
+
+    // get camera file list from DBC
+    std::vector<std::string> camerafiles;
+    size_t cam_count = camdbc.getRecordCount();
+
+    for (uint32 i = 0; i < cam_count; ++i)
+    {
+        std::string camFile(camdbc.getRecord(i).getString(1));
+        size_t loc = camFile.find(".mdx");
+        if (loc != std::string::npos)
+        {
+            camFile.replace(loc, 4, ".m2");
+        }
+        camerafiles.push_back(std::string(camFile));
+    }
+
+    std::string path = output_path;
+    path += "/Cameras/";
+    CreateDir(path);
+    if (!basicLocale)
+    {
+        path += langs[locale];
+        path += "/";
+        CreateDir(path);
+    }
+
+    // extract M2s
+    uint32 count = 0;
+    for (std::string thisFile : camerafiles)
+    {
+        std::string filename = path;
+        filename += (thisFile.c_str() + strlen("Cameras\\"));
+
+        if (std::filesystem::exists(filename))
+        {
+            continue;
+        }
+
+        if (ExtractFile(thisFile.c_str(), filename))
+        {
+            ++count;
+        }
+    }
+    printf("Extracted %u camera files\n", count);
+}
+
 void LoadLocaleMPQFiles(int const locale)
 {
     char filename[512];
@@ -1134,6 +1214,19 @@ int main(int argc, char* arg[])
     {
         printf("No locales detected\n");
         return 0;
+    }
+
+    if (CONF_extract & EXTRACT_CAMERA)
+    {
+        printf("Using locale: %s\n", langs[FirstLocale]);
+
+        // Open MPQs
+        LoadLocaleMPQFiles(FirstLocale);
+        LoadCommonMPQFiles();
+
+        ExtractCameraFiles(FirstLocale, true);
+        // Close MPQs
+        CloseMPQFiles();
     }
 
     if (CONF_extract & EXTRACT_MAP)

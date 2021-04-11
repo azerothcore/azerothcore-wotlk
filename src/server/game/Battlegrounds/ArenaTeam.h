@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,8 +7,8 @@
 #ifndef AZEROTHCORE_ARENATEAM_H
 #define AZEROTHCORE_ARENATEAM_H
 
-#include "QueryResult.h"
 #include "Map.h"
+#include "QueryResult.h"
 #include <list>
 #include <map>
 
@@ -175,7 +175,6 @@ public:
     void FinishGame(int32 mod, const Map* bgMap);
 
 protected:
-
     uint32      TeamId;
     uint8       Type;
     std::string TeamName;

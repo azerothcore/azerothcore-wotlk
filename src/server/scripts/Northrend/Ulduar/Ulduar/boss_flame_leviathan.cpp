@@ -2,21 +2,21 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "CombatAI.h"
+#include "GridNotifiers.h"
+#include "Opcodes.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
 #include "SpellScript.h"
 #include "ulduar.h"
 #include "Vehicle.h"
-#include "ScriptedEscortAI.h"
-#include "SpellAuras.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
-#include "ScriptedGossip.h"
-#include "CombatAI.h"
-#include "Spell.h"
-#include "GridNotifiers.h"
-#include "Player.h"
-#include "Opcodes.h"
 
 enum LeviathanSpells
 {
@@ -121,7 +121,6 @@ enum Texts
     FLAME_LEVIATHAN_EMOTE_PURSUE,
     FLAME_LEVIATHAN_EMOTE_OVERLOAD,
     FLAME_LEVIATHAN_EMOTE_REPAIR
-
 };
 
 enum Sounds
@@ -180,7 +179,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_flame_leviathanAI (pCreature);
+        return GetUlduarAI<boss_flame_leviathanAI>(pCreature);
     }
 
     struct boss_flame_leviathanAI : public ScriptedAI
@@ -692,7 +691,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_flame_leviathan_seatAI (pCreature);
+        return GetUlduarAI<boss_flame_leviathan_seatAI>(pCreature);
     }
 
     struct boss_flame_leviathan_seatAI : public VehicleAI
@@ -833,7 +832,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_flame_leviathan_defense_turretAI(creature);
+        return GetUlduarAI<boss_flame_leviathan_defense_turretAI>(creature);
     }
 };
 
@@ -869,7 +868,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_flame_leviathan_overload_deviceAI(creature);
+        return GetUlduarAI<boss_flame_leviathan_overload_deviceAI>(creature);
     }
 };
 
@@ -880,7 +879,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_freya_wardAI (pCreature);
+        return GetUlduarAI<npc_freya_wardAI>(pCreature);
     }
 
     struct npc_freya_wardAI : public NullCreatureAI
@@ -960,7 +959,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_hodirs_furyAI (pCreature);
+        return GetUlduarAI<npc_hodirs_furyAI>(pCreature);
     }
 
     struct npc_hodirs_furyAI : public NullCreatureAI
@@ -1039,7 +1038,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_mimirons_infernoAI(creature);
+        return GetUlduarAI<npc_mimirons_infernoAI>(creature);
     }
 
     struct npc_mimirons_infernoAI : public npc_escortAI
@@ -1092,7 +1091,6 @@ public:
             }
         }
     };
-
 };
 
 class npc_thorims_hammer : public CreatureScript
@@ -1102,7 +1100,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_thorims_hammerAI (pCreature);
+        return GetUlduarAI<npc_thorims_hammerAI>(pCreature);
     }
 
     struct npc_thorims_hammerAI : public NullCreatureAI
@@ -1158,7 +1156,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_pool_of_tarAI (pCreature);
+        return GetUlduarAI<npc_pool_of_tarAI>(pCreature);
     }
 
     struct npc_pool_of_tarAI : public NullCreatureAI
@@ -1206,7 +1204,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_brann_radioAI (pCreature);
+        return GetUlduarAI<npc_brann_radioAI>(pCreature);
     }
 
     struct npc_brann_radioAI : public NullCreatureAI
@@ -1311,7 +1309,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_storm_beacon_spawnAI (pCreature);
+        return GetUlduarAI<npc_storm_beacon_spawnAI>(pCreature);
     }
 
     struct npc_storm_beacon_spawnAI : public NullCreatureAI
@@ -1352,7 +1350,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_flame_leviathan_safety_containerAI (pCreature);
+        return GetUlduarAI<boss_flame_leviathan_safety_containerAI>(pCreature);
     }
 
     struct boss_flame_leviathan_safety_containerAI : public NullCreatureAI
@@ -1385,7 +1383,7 @@ public:
             {
                 float x, y, z;
                 me->GetPosition(x, y, z);
-                z = me->GetMap()->GetHeight(me->GetPhaseMask(), x, y, z);
+                z = me->GetMapHeight(x, y, z);
                 me->GetMotionMaster()->MovePoint(me->GetEntry(), x, y, z);
                 me->SetPosition(x, y, z, 0);
             }
@@ -1400,7 +1398,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_mechanoliftAI (pCreature);
+        return GetUlduarAI<npc_mechanoliftAI>(pCreature);
     }
 
     struct npc_mechanoliftAI : public NullCreatureAI

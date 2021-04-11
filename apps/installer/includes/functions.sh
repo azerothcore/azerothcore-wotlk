@@ -8,8 +8,8 @@ function inst_configureOS() {
             if [ ! -z "$OSDISTRO" ]; then
                 DISTRO=$OSDISTRO
             # If available, use LSB to identify distribution
-            elif [ -f /etc/lsb-release -o -d /etc/lsb-release.d ]; then
-                DISTRO=$(lsb_release -i | cut -d: -f2 | sed s/'^\t'//)
+            elif command -v lsb_release >/dev/null 2>&1 ; then
+                DISTRO=$(lsb_release -is)
             # Otherwise, use release info file
             else
                 DISTRO=$(ls -d /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -v "lsb" | cut -d'/' -f3 | cut -d'-' -f1 | cut -d'_' -f1)
@@ -19,10 +19,10 @@ function inst_configureOS() {
             # add here distro that are debian or ubuntu based
             # TODO: find a better way, maybe checking the existance
             # of a package manager
-                "neon" | "ubuntu")
+                "neon" | "ubuntu" | "Ubuntu")
                     DISTRO="ubuntu"
                 ;;
-                "debian")
+                "debian" | "Debian")
                     DISTRO="debian"
                 ;;
                 *)
@@ -222,6 +222,6 @@ function inst_download_client_data {
     local path="$AC_BINPATH_FULL"
 
     echo "Downloading client data in: $path/data.zip ..."
-    curl -L https://github.com/wowgaming/client-data/releases/download/v9/data.zip > "$path/data.zip" \
+    curl -L https://github.com/wowgaming/client-data/releases/download/v10/data.zip > "$path/data.zip" \
         && unzip -o "$path/data.zip" -d "$path/" && rm "$path/data.zip"
 }

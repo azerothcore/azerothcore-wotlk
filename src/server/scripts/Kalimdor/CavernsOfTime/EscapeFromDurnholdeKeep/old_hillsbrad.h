@@ -5,6 +5,10 @@
 #ifndef DEF_OLD_HILLSBRAD_H
 #define DEF_OLD_HILLSBRAD_H
 
+#include "CreatureAIImpl.h"
+
+#define OldHillsbradScriptName "instance_old_hillsbrad"
+
 enum DataIds
 {
     DATA_ESCORT_PROGRESS    = 0,
@@ -72,7 +76,12 @@ enum MiscIds
 
     INSTANCE_POSITIONS_COUNT        = 3,
     THRALL_POSITIONS_COUNT          = 5
-
 };
+
+template <class AI, class T>
+inline AI* GetOldHillsbradAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, OldHillsbradScriptName);
+}
 
 #endif

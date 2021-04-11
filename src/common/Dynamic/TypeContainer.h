@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -86,20 +86,20 @@ template<class OBJECT_TYPES>
 class TypeMapContainer
 {
 public:
-    template<class SPECIFIC_TYPE> [[nodiscard]] size_t Count() const { return acore::Count(i_elements, (SPECIFIC_TYPE*)NULL); }
+    template<class SPECIFIC_TYPE> [[nodiscard]] size_t Count() const { return acore::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
 
     /// inserts a specific object into the container
     template<class SPECIFIC_TYPE> bool insert(SPECIFIC_TYPE* obj)
     {
         SPECIFIC_TYPE* t = acore::Insert(i_elements, obj);
-        return (t != NULL);
+        return (t != nullptr);
     }
 
     ///  Removes the object from the container, and returns the removed object
     //template<class SPECIFIC_TYPE> bool remove(SPECIFIC_TYPE* obj)
     //{
     //    SPECIFIC_TYPE* t = acore::Remove(i_elements, obj);
-    //    return (t != NULL);
+    //    return (t != nullptr);
     //}
 
     ContainerMapList<OBJECT_TYPES>& GetElements() { return i_elements; }
