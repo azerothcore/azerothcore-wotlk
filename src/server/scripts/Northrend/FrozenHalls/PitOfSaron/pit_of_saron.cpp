@@ -182,7 +182,6 @@ public:
                                 c->CastSpell(c, 69413, true);
                                 c->SetCanFly(true);
                                 c->SetDisableGravity(true);
-                                c->SetHover(true);
                                 c->SendMovementFlagUpdate();
                                 float dist = rand_norm() * 2.0f;
                                 float angle = rand_norm() * 2 * M_PI;
@@ -227,7 +226,6 @@ public:
                                     continue;
                                 c->SetCanFly(false);
                                 c->SetDisableGravity(false);
-                                c->SetHover(false);
                                 c->SendMovementFlagUpdate();
                                 c->CastSpell(c, 69350, true);
                             }
@@ -1218,7 +1216,6 @@ public:
                         {
                             c->SetCanFly(true);
                             c->SetDisableGravity(true);
-                            c->SetHover(true);
                             c->GetMotionMaster()->MovePoint(0, TSSindragosaPos2);
                         }
 

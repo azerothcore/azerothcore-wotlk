@@ -136,9 +136,9 @@ public:
                     break;
                 case INTRO_4:
                     me->SetWalk(true);
+                    me->SetCanFly(false);
                     me->SetDisableGravity(false);
                     me->CastSpell(me, SPELL_KIRTONOS_TRANSFORM, true);
-                    me->SetCanFly(false);
                     break;
                 case INTRO_5:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
