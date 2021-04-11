@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "drak_tharon_keep.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Yells
 {
@@ -59,7 +59,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_tharon_jaAI>(creature);
+        return GetDraktharonKeepAI<boss_tharon_jaAI>(creature);
     }
 
     struct boss_tharon_jaAI : public BossAI
@@ -149,7 +149,7 @@ public:
                     {
                         Talk(SAY_FLESH);
                         me->getThreatManager().resetAllAggro();
-                        me->CastSpell((Unit*)NULL, SPELL_TURN_FLESH, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_TURN_FLESH, false);
 
                         events.Reset();
                         events.ScheduleEvent(EVENT_TURN_FLESH_REAL, 3000);
@@ -246,7 +246,7 @@ public:
             PreventDefaultAction();
             GetUnitOwner()->getThreatManager().resetAllAggro();
             GetUnitOwner()->GetMotionMaster()->Clear();
-            GetUnitOwner()->CastSpell((Unit*)NULL, SPELL_TURN_BONES, false);
+            GetUnitOwner()->CastSpell((Unit*)nullptr, SPELL_TURN_BONES, false);
             GetUnitOwner()->GetAI()->DoAction(ACTION_TURN_BONES);
         }
 

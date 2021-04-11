@@ -2,23 +2,23 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "utgarde_pinnacle.h"
 
-class instance_pinnacle : public InstanceMapScript
+class instance_utgarde_pinnacle : public InstanceMapScript
 {
 public:
-    instance_pinnacle() : InstanceMapScript("instance_pinnacle", 575) { }
+    instance_utgarde_pinnacle() : InstanceMapScript("instance_utgarde_pinnacle", 575) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
-        return new instance_pinnacle_InstanceMapScript(pMap);
+        return new instance_utgarde_pinnacle_InstanceMapScript(pMap);
     }
 
-    struct instance_pinnacle_InstanceMapScript : public InstanceScript
+    struct instance_utgarde_pinnacle_InstanceMapScript : public InstanceScript
     {
-        instance_pinnacle_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
+        instance_utgarde_pinnacle_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
 
         uint64 SvalaSorrowgrave;
         uint64 GortokPalehoof;
@@ -293,5 +293,5 @@ public:
 
 void AddSC_instance_utgarde_pinnacle()
 {
-    new instance_pinnacle();
+    new instance_utgarde_pinnacle();
 }

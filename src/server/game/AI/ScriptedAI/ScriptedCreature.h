@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -196,6 +196,51 @@ struct ScriptedAI : public CreatureAI
 
     // Called when AI is temporarily replaced or put back when possess is applied or removed
     void OnPossess(bool /*apply*/) {}
+
+    enum class Axis
+    {
+        AXIS_X,
+        AXIS_Y
+    };
+
+    /* This is called for bosses whenever an encounter is happening.
+     * - Arguments:
+     * - Position has to be passed as a constant pointer (&Position)
+     * - Axis is the X or Y axis that is used to decide the position threshold
+     * - Above decides if the boss position should be above the passed position
+     *   or below.
+     * Example:
+     * Hodir is in room until his Y position is below the Door position:
+     * IsInRoom(doorPosition, AXIS_Y, false);
+     */
+    bool IsInRoom(const Position* pos, Axis axis, bool above)
+    {
+        if (!pos)
+        {
+            return true;
+        }
+
+        switch (axis)
+        {
+            case Axis::AXIS_X:
+                if ((!above && me->GetPositionX() < pos->GetPositionX()) || me->GetPositionX() > pos->GetPositionX())
+                {
+                    EnterEvadeMode();
+                    return false;
+                }
+                break;
+            case Axis::AXIS_Y:
+                if ((!above && me->GetPositionY() < pos->GetPositionY())  || me->GetPositionY() > pos->GetPositionY())
+                {
+                    EnterEvadeMode();
+                    return false;
+                }
+
+                break;
+        }
+
+        return true;
+    }
 
     // *************
     // Variables

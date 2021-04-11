@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,31 +7,31 @@
 #ifndef _OBJECTMGR_H
 #define _OBJECTMGR_H
 
-#include "Log.h"
-#include "Object.h"
 #include "Bag.h"
+#include "ConditionMgr.h"
+#include "Corpse.h"
 #include "Creature.h"
+#include "DatabaseEnv.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
-#include "TemporarySummon.h"
-#include "Corpse.h"
-#include "QuestDef.h"
 #include "ItemTemplate.h"
-#include "NPCHandler.h"
-#include "DatabaseEnv.h"
+#include "Log.h"
 #include "Mail.h"
 #include "Map.h"
+#include "NPCHandler.h"
+#include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectDefines.h"
+#include "QuestDef.h"
+#include "TemporarySummon.h"
 #include "VehicleDefines.h"
-#include <string>
-#include <map>
-#include <limits>
-#include "ConditionMgr.h"
 #include <functional>
+#include <limits>
+#include <map>
+#include <string>
 
 class Item;
-struct AccessRequirement;
+struct DungeonProgressionRequirements;
 struct PlayerClassInfo;
 struct PlayerClassLevelInfo;
 struct PlayerInfo;
@@ -704,7 +704,7 @@ public:
 
     typedef std::unordered_map<uint32, uint32> AreaTriggerScriptContainer;
 
-    typedef std::unordered_map<uint32, AccessRequirement*> AccessRequirementContainer;
+    typedef std::unordered_map<uint32, std::unordered_map<uint8, DungeonProgressionRequirements*>> DungeonProgressionRequirementsContainer;
 
     typedef std::unordered_map<uint32, RepRewardRate > RepRewardRateContainer;
     typedef std::unordered_map<uint32, ReputationOnKillEntry> RepOnKillContainer;
@@ -832,11 +832,18 @@ public:
         return nullptr;
     }
 
-    [[nodiscard]] AccessRequirement const* GetAccessRequirement(uint32 mapid, Difficulty difficulty) const
+    [[nodiscard]] DungeonProgressionRequirements const* GetAccessRequirement(uint32 mapid, Difficulty difficulty) const
     {
-        AccessRequirementContainer::const_iterator itr = _accessRequirementStore.find(MAKE_PAIR32(mapid, difficulty));
+        DungeonProgressionRequirementsContainer::const_iterator itr = _accessRequirementStore.find(mapid);
         if (itr != _accessRequirementStore.end())
-            return itr->second;
+        {
+            std::unordered_map<uint8, DungeonProgressionRequirements*> difficultiesProgressionRequirements = itr->second;
+            auto difficultiesItr = difficultiesProgressionRequirements.find(difficulty);
+            if (difficultiesItr != difficultiesProgressionRequirements.end())
+            {
+                return difficultiesItr->second;
+            }
+        }
         return nullptr;
     }
 
@@ -971,7 +978,10 @@ public:
     void LoadCreatureClassLevelStats();
     void LoadCreatureLocales();
     void LoadCreatureTemplates();
+    void LoadCreatureTemplate(Field* fields);
     void LoadCreatureTemplateAddons();
+    void LoadCreatureTemplateResistances();
+    void LoadCreatureTemplateSpells();
     void CheckCreatureTemplate(CreatureTemplate const* cInfo);
     void LoadGameObjectQuestItems();
     void LoadCreatureQuestItems();
@@ -1289,7 +1299,7 @@ public:
 
     void LoadScriptNames();
     ScriptNameContainer& GetScriptNames() { return _scriptNamesStore; }
-    [[nodiscard]] const char* GetScriptName(uint32 id) const { return id < _scriptNamesStore.size() ? _scriptNamesStore[id].c_str() : ""; }
+    [[nodiscard]] std::string const& GetScriptName(uint32 id) const;
     uint32 GetScriptId(const char* name);
 
     [[nodiscard]] SpellClickInfoMapBounds GetSpellClickInfoMapBounds(uint32 creature_id) const
@@ -1384,7 +1394,7 @@ private:
     AreaTriggerContainer _areaTriggerStore;
     AreaTriggerTeleportContainer _areaTriggerTeleportStore;
     AreaTriggerScriptContainer _areaTriggerScriptStore;
-    AccessRequirementContainer _accessRequirementStore;
+    DungeonProgressionRequirementsContainer _accessRequirementStore;
     DungeonEncounterContainer _dungeonEncounterStore;
 
     RepRewardRateContainer _repRewardRateStore;

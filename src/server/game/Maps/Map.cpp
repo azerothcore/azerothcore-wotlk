@@ -1,20 +1,22 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Map.h"
-#include "Geometry.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "Chat.h"
 #include "DynamicTree.h"
+#include "Geometry.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "Object.h"
 #include "Group.h"
 #include "InstanceScript.h"
+#include "LFGMgr.h"
+#include "Map.h"
 #include "MapInstanced.h"
+#include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
@@ -22,8 +24,7 @@
 #include "Transport.h"
 #include "Vehicle.h"
 #include "VMapFactory.h"
-#include "LFGMgr.h"
-#include "Chat.h"
+
 #ifdef ELUNA
 #include "LuaEngine.h"
 #endif
@@ -184,11 +185,11 @@ void Map::LoadMap(int gx, int gy, bool reload)
         sScriptMgr->OnUnloadGridMap(this, GridMaps[gx][gy], gx, gy);
 
         delete (GridMaps[gx][gy]);
-        GridMaps[gx][gy] = NULL;
+        GridMaps[gx][gy] = nullptr;
     }
 
     // map file name
-    char* tmp = NULL;
+    char* tmp = nullptr;
     int len = sWorld->GetDataPath().length() + strlen("maps/%03u%02u%02u.map") + 1;
     tmp = new char[len];
     snprintf(tmp, len, (char*)(sWorld->GetDataPath() + "maps/%03u%02u%02u.map").c_str(), GetId(), gx, gy);
@@ -228,7 +229,7 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
         for (unsigned int j = 0; j < MAX_NUMBER_OF_GRIDS; ++j)
         {
             //z code
-            GridMaps[idx][j] = NULL;
+            GridMaps[idx][j] = nullptr;
             setNGrid(nullptr, idx, j);
         }
     }
@@ -1801,7 +1802,7 @@ uint8 GridMap::getTerrainType(float x, float y) const
 }
 
 // Get water state on map
-inline ZLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, LiquidData* data)
+inline ZLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, float collisionHeight, LiquidData* data)
 {
     // Check water type (if no water return)
     if (!_liquidType && !_liquidFlags)
@@ -1886,11 +1887,11 @@ inline ZLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 R
     // For speed check as int values
     float delta = liquid_level - z;
 
-    if (delta > 2.0f)                   // Under water
+    if (delta > collisionHeight)        // Under water
         return LIQUID_MAP_UNDER_WATER;
     if (delta > 0.0f)                   // In water
         return LIQUID_MAP_IN_WATER;
-    if (delta > -0.1f)                   // Walk on water
+    if (delta > -0.1f)                  // Walk on water
         return LIQUID_MAP_WATER_WALK;
     // Above water
     return LIQUID_MAP_ABOVE_WATER;
@@ -1908,12 +1909,12 @@ GridMap* Map::GetGrid(float x, float y)
     return GridMaps[gx][gy];
 }
 
-float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground /*= NULL*/, bool /*swim = false*/, float collisionHeight) const
+float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground /*= nullptr*/, bool /*swim = false*/, float collisionHeight) const
 {
     if (const_cast<Map*>(this)->GetGrid(x, y))
     {
         // we need ground level (including grid height version) for proper return water level in point
-        float ground_z = GetHeight(phasemask, x, y, z + collisionHeight, true, 50.0f);
+        float ground_z = GetHeight(phasemask, x, y, z + Z_OFFSET_FIND_HEIGHT, true, 50.0f);
         if (ground)
             *ground = ground_z;
 
@@ -2217,7 +2218,7 @@ ZLiquidStatus Map::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidTyp
     if (GridMap* gmap = const_cast<Map*>(this)->GetGrid(x, y))
     {
         LiquidData map_data;
-        ZLiquidStatus map_result = gmap->getLiquidStatus(x, y, z, ReqLiquidType, &map_data);
+        ZLiquidStatus map_result = gmap->getLiquidStatus(x, y, z, ReqLiquidType, collisionHeight, &map_data);
         // Not override LIQUID_MAP_ABOVE_WATER with LIQUID_MAP_NO_WATER:
         if (map_result != LIQUID_MAP_NO_WATER && (map_data.level > ground_level))
         {
@@ -2591,7 +2592,7 @@ template void Map::RemoveFromMap(DynamicObject*, bool);
 InstanceMap::InstanceMap(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent)
     : Map(id, InstanceId, SpawnMode, _parent),
       m_resetAfterUnload(false), m_unloadWhenEmpty(false),
-      instance_script(nullptr), i_script_id(0)
+      instance_data(nullptr), i_script_id(0)
 {
     //lets initialize visibility distance for dungeons
     InstanceMap::InitVisibilityDistance();
@@ -2609,9 +2610,8 @@ InstanceMap::InstanceMap(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _pa
 
 InstanceMap::~InstanceMap()
 {
-    delete instance_script;
-    instance_script = nullptr;
-    sInstanceSaveMgr->DeleteInstanceSaveIfNeeded(GetInstanceId(), true);
+    delete instance_data;
+    instance_data = nullptr;
 }
 
 void InstanceMap::InitVisibilityDistance()
@@ -2767,7 +2767,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
         {
             WorldPacket data(SMSG_INSTANCE_LOCK_WARNING_QUERY, 9);
             data << uint32(60000);
-            data << uint32(instance_script ? instance_script->GetCompletedEncounterMask() : 0);
+            data << uint32(instance_data ? instance_data->GetCompletedEncounterMask() : 0);
             data << uint8(0);
             player->GetSession()->SendPacket(&data);
             player->SetPendingBind(mapSave->GetInstanceId(), 60000);
@@ -2782,8 +2782,8 @@ bool InstanceMap::AddPlayerToMap(Player* player)
     // this will acquire the same mutex so it cannot be in the previous block
     Map::AddPlayerToMap(player);
 
-    if (instance_script)
-        instance_script->OnPlayerEnter(player);
+    if (instance_data)
+        instance_data->OnPlayerEnter(player);
 
     return true;
 }
@@ -2793,8 +2793,8 @@ void InstanceMap::Update(const uint32 t_diff, const uint32 s_diff, bool /*thread
     Map::Update(t_diff, s_diff);
 
     if (t_diff)
-        if (instance_script)
-            instance_script->Update(t_diff);
+        if (instance_data)
+            instance_data->Update(t_diff);
 }
 
 void InstanceMap::RemovePlayerFromMap(Player* player, bool remove)
@@ -2814,12 +2814,12 @@ void InstanceMap::AfterPlayerUnlinkFromMap()
 
 void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask)
 {
-    if (instance_script != nullptr)
+    if (instance_data != nullptr)
         return;
 #ifdef ELUNA
     bool isElunaAI = false;
-    instance_script = sEluna->GetInstanceData(this);
-    if (instance_script)
+    instance_data = sEluna->GetInstanceData(this);
+    if (instance_data)
         isElunaAI = true;
 
     // if Eluna AI was fetched succesfully we should not call CreateInstanceData nor set the unused scriptID
@@ -2830,13 +2830,13 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
         if (mInstance)
         {
             i_script_id = mInstance->ScriptId;
-            instance_script = sScriptMgr->CreateInstanceScript(this);
+            instance_data = sScriptMgr->CreateInstanceScript(this);
         }
 #ifdef ELUNA
     }
 #endif
 
-    if (!instance_script)
+    if (!instance_data)
         return;
 
 #ifdef ELUNA
@@ -2844,13 +2844,13 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
     // initialize should then be called only if load is false
     if (!isElunaAI || !load)
 #endif
-        instance_script->Initialize();
+        instance_data->Initialize();
 
     if (load)
     {
-        instance_script->SetCompletedEncountersMask(completedEncounterMask, false);
+        instance_data->SetCompletedEncountersMask(completedEncounterMask, false);
         if (data != "")
-            instance_script->Load(data.c_str());
+            instance_data->Load(data.c_str());
     }
 }
 
@@ -2897,6 +2897,11 @@ bool InstanceMap::Reset(uint8 method, std::list<uint32>* globalResetSkipList)
     }
 
     return m_mapRefManager.isEmpty();
+}
+
+std::string const& InstanceMap::GetScriptName() const
+{
+    return sObjectMgr->GetScriptName(i_script_id);
 }
 
 void InstanceMap::PermBindAllPlayers()
@@ -3055,17 +3060,17 @@ void BattlegroundMap::RemoveAllPlayers()
 
 Player* Map::GetPlayer(uint64 guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (Player*)NULL);
+    return ObjectAccessor::GetObjectInMap(guid, this, (Player*)nullptr);
 }
 
 Creature* Map::GetCreature(uint64 guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (Creature*)NULL);
+    return ObjectAccessor::GetObjectInMap(guid, this, (Creature*)nullptr);
 }
 
 GameObject* Map::GetGameObject(uint64 guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (GameObject*)NULL);
+    return ObjectAccessor::GetObjectInMap(guid, this, (GameObject*)nullptr);
 }
 
 Transport* Map::GetTransport(uint64 guid)
@@ -3079,17 +3084,17 @@ Transport* Map::GetTransport(uint64 guid)
 
 DynamicObject* Map::GetDynamicObject(uint64 guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (DynamicObject*)NULL);
+    return ObjectAccessor::GetObjectInMap(guid, this, (DynamicObject*)nullptr);
 }
 
 Pet* Map::GetPet(uint64 guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (Pet*)NULL);
+    return ObjectAccessor::GetObjectInMap(guid, this, (Pet*)nullptr);
 }
 
 Corpse* Map::GetCorpse(uint64 guid)
 {
-    return ObjectAccessor::GetObjectInMap(guid, this, (Corpse*)NULL);
+    return ObjectAccessor::GetObjectInMap(guid, this, (Corpse*)nullptr);
 }
 
 void Map::UpdateIteratorBack(Player* player)
@@ -3482,11 +3487,6 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, PathGener
     return true;
 }
 
-bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
-{
-    return CanReachPositionAndGetValidCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, failOnCollision, failOnSlopes);
-}
-
 /**
  * @brief validate the new destination and set reachable coords
  * Check if a given unit can reach a specific point on a segment
@@ -3499,15 +3499,18 @@ bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float &de
  * @return true if the destination is valid, false otherwise
  *
  **/
+
+bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float& destX, float& destY, float& destZ, bool failOnCollision, bool failOnSlopes) const
+{
+    return CanReachPositionAndGetValidCoords(source, source->GetPositionX(), source->GetPositionY(), source->GetPositionZ(), destX, destY, destZ, failOnCollision, failOnSlopes);
+}
+
 bool Map::CanReachPositionAndGetValidCoords(const WorldObject* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
 {
-    float tempX=destX, tempY=destY, tempZ=destZ;
     if (!CheckCollisionAndGetValidCoords(source, startX, startY, startZ, destX, destY, destZ, failOnCollision))
     {
         return false;
     }
-
-    destX = tempX, destY = tempY, destZ = tempZ;
 
     const Unit* unit = source->ToUnit();
     // if it's not an unit (Object) then we do not have to continue
@@ -3613,7 +3616,7 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
     source->UpdateAllowedPositionZ(destX, destY, destZ, &groundZ);
 
     // position has no ground under it (or is too far away)
-    if (groundZ <= INVALID_HEIGHT && unit && unit->CanFly())
+    if (groundZ <= INVALID_HEIGHT && unit && !unit->CanFly())
     {
         // fall back to gridHeight if any
         float gridHeight = GetGridHeight(destX, destY);

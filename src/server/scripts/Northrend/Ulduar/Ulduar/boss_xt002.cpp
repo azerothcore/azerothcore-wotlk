@@ -2,15 +2,15 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Opcodes.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "ulduar.h"
 #include "Vehicle.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
-#include "Player.h"
-#include "Opcodes.h"
 
 enum XT002Spells
 {
@@ -112,7 +112,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_xt002AI (pCreature);
+        return GetUlduarAI<boss_xt002AI>(pCreature);
     }
 
     struct boss_xt002AI : public ScriptedAI
@@ -401,7 +401,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_xt002_heartAI (pCreature);
+        return GetUlduarAI<npc_xt002_heartAI>(pCreature);
     }
 
     struct npc_xt002_heartAI : public PassiveAI
@@ -551,7 +551,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_xt002_scrapbotAI (pCreature);
+        return GetUlduarAI<npc_xt002_scrapbotAI>(pCreature);
     }
 
     struct npc_xt002_scrapbotAI : public PassiveAI
@@ -634,7 +634,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_xt002_pummellerAI (pCreature);
+        return GetUlduarAI<npc_xt002_pummellerAI>(pCreature);
     }
 
     struct npc_xt002_pummellerAI : public ScriptedAI
@@ -720,7 +720,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_xt002_boombotAI (pCreature);
+        return GetUlduarAI<npc_xt002_boombotAI>(pCreature);
     }
 
     struct npc_xt002_boombotAI : public PassiveAI
@@ -821,7 +821,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_xt002_life_sparkAI (pCreature);
+        return GetUlduarAI<npc_xt002_life_sparkAI>(pCreature);
     }
 
     struct npc_xt002_life_sparkAI : public ScriptedAI

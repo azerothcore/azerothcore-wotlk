@@ -1,24 +1,23 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "DatabaseEnv.h"
-#include "ObjectMgr.h"
-#include "ObjectDefines.h"
-#include "GridDefines.h"
-#include "GridNotifiers.h"
-#include "SpellMgr.h"
-#include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "InstanceScript.h"
-#include "ScriptedCreature.h"
-#include "GameEventMgr.h"
 #include "CreatureTextMgr.h"
-
+#include "DatabaseEnv.h"
+#include "GameEventMgr.h"
+#include "GridDefines.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "InstanceScript.h"
+#include "ObjectDefines.h"
+#include "ObjectMgr.h"
+#include "ScriptedCreature.h"
 #include "SmartScriptMgr.h"
+#include "SpellMgr.h"
 
 SmartWaypointMgr* SmartWaypointMgr::instance()
 {
@@ -403,7 +402,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                          e.entryOrGuid, e.event_id, e.GetTargetType());
         return false;
     }
-    if (e.target.type == SMART_TARGET_LOOT_RECIPIENTS || e.target.type == SMART_TARGET_VEHICLE_PASSENGER)
+    if (e.target.type == SMART_TARGET_LOOT_RECIPIENTS)
     {
         sLog->outErrorDb("SmartAIMgr: EntryOrGuid %d using event(%u) has a target type that is not yet supported on AzerothCore (%u), skipped.",
                          e.entryOrGuid, e.event_id, e.GetTargetType());

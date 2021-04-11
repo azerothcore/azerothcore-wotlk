@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -246,7 +246,7 @@ enum UnitRename
     UNIT_CAN_BE_ABANDONED   = 0x02,
 };
 
-#define CREATURE_MAX_SPELLS     8
+static constexpr uint32 MAX_CREATURE_SPELLS = 8;
 #define MAX_SPELL_CHARM         4
 #define MAX_SPELL_VEHICLE       6
 #define MAX_SPELL_POSSESS       8
@@ -1274,11 +1274,11 @@ struct AttackPosition {
     {
         if (!val)
         {
-            // _pos = NULL;
+            // _pos = nullptr;
             _taken = false;
-            return 0; // NULL
+            return 0; // nullptr
         }
-        return 0; // NULL
+        return 0; // nullptr
     };
     Position _pos;
     bool _taken;
@@ -1970,6 +1970,14 @@ public:
     void RemoveAura(uint32 spellId, uint64 casterGUID = 0, uint8 reqEffMask = 0, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
     void RemoveAura(AuraApplication* aurApp, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
     void RemoveAura(Aura* aur, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
+
+    // Convenience methods removing auras by predicate
+    void RemoveAppliedAuras(std::function<bool(AuraApplication const*)> const& check);
+    void RemoveOwnedAuras(std::function<bool(Aura const*)> const& check);
+
+    // Optimized overloads taking advantage of map key
+    void RemoveAppliedAuras(uint32 spellId, std::function<bool(AuraApplication const*)> const& check);
+    void RemoveOwnedAuras(uint32 spellId, std::function<bool(Aura const*)> const& check);
 
     void RemoveAurasDueToSpell(uint32 spellId, uint64 casterGUID = 0, uint8 reqEffMask = 0, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
     void RemoveAuraFromStack(uint32 spellId, uint64 casterGUID = 0, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);

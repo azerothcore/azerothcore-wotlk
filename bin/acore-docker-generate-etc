@@ -5,3 +5,7 @@ cp src/server/authserver/authserver.conf.dist docker/authserver/etc/authserver.c
 
 cp docker/worldserver/etc/worldserver.conf.dockerdist docker/worldserver/etc/worldserver.conf
 cp docker/authserver/etc/authserver.conf.dockerdist docker/authserver/etc/authserver.conf
+
+if [ $OSTYPE = msys ]; then
+    dos2unix docker/worldserver/etc/* docker/authserver/etc/*
+fi

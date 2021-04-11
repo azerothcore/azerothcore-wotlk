@@ -1,28 +1,28 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ArenaSpectator.h"
+#include "Battleground.h"
 #include "Common.h"
-#include "DatabaseEnv.h"
-#include "Log.h"
-#include "WorldPacket.h"
-#include "ObjectMgr.h"
-#include "SpellMgr.h"
-#include "Pet.h"
-#include "Formulas.h"
-#include "SpellAuras.h"
-#include "SpellAuraEffects.h"
 #include "CreatureAI.h"
+#include "DatabaseEnv.h"
+#include "Formulas.h"
+#include "Group.h"
+#include "InstanceScript.h"
+#include "Log.h"
+#include "ObjectMgr.h"
+#include "Pet.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "Unit.h"
 #include "Util.h"
-#include "Group.h"
+#include "WorldPacket.h"
 #include "WorldSession.h"
-#include "Battleground.h"
-#include "InstanceScript.h"
-#include "ArenaSpectator.h"
-#include "ScriptMgr.h"
 
 Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID() : 0, true),
     m_usedTalentCount(0), m_removed(false), m_owner(owner),
@@ -1271,7 +1271,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             int32 baseDamage[3];
             Field* fields = result->Fetch();
             uint64 caster_guid = fields[0].GetUInt64();
-            // NULL guid stored - pet is the caster of the spell - see Pet::_SaveAuras
+            // nullptr guid stored - pet is the caster of the spell - see Pet::_SaveAuras
             if (!caster_guid)
                 caster_guid = GetGUID();
             uint32 spellid = fields[1].GetUInt32();
@@ -1322,7 +1322,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             else
                 remaincharges = 0;
 
-            if (Aura* aura = Aura::TryCreate(spellInfo, effmask, this, NULL, &baseDamage[0], NULL, caster_guid))
+            if (Aura* aura = Aura::TryCreate(spellInfo, effmask, this, nullptr, &baseDamage[0], nullptr, caster_guid))
             {
                 if (!aura->CanBeSaved())
                 {
@@ -1787,7 +1787,7 @@ bool Pet::resetTalents()
     return true;
 }
 
-void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= NULL*/)
+void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* online_pet /*= nullptr*/)
 {
     // not need after this call
     if (owner->ToPlayer()->HasAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS))
@@ -2247,7 +2247,7 @@ void Pet::HandleAsynchLoadFailed(AsynchPetSummon* info, Player* player, uint8 as
         // we are almost at home...
         if (asynchLoadType == PET_LOAD_SUMMON_PET)
         {
-            Unit* caster = ObjectAccessor::GetObjectInMap(info->m_casterGUID, map, (Unit*)NULL);
+            Unit* caster = ObjectAccessor::GetObjectInMap(info->m_casterGUID, map, (Unit*)nullptr);
             if (!caster)
                 caster = player;
 

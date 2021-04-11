@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "halls_of_lightning.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 
 enum VolkahnSpells
@@ -72,7 +72,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_volkhanAI (creature);
+        return GetHallsOfLightningAI<boss_volkhanAI>(creature);
     }
 
     struct boss_volkhanAI : public ScriptedAI
@@ -313,7 +313,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_molten_golemAI (creature);
+        return GetHallsOfLightningAI<npc_molten_golemAI>(creature);
     }
 
     struct npc_molten_golemAI : public ScriptedAI
@@ -437,7 +437,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_hol_monumentAI(creature);
+        return GetHallsOfLightningAI<npc_hol_monumentAI>(creature);
     }
 
     struct npc_hol_monumentAI : public ScriptedAI

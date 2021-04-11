@@ -6,13 +6,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `spell_required`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `spell_required` 
 (
-  `spell_id` mediumint(8) NOT NULL DEFAULT 0,
-  `req_spell` mediumint(8) NOT NULL DEFAULT 0,
+  `spell_id` MEDIUMINT NOT NULL DEFAULT 0,
+  `req_spell` MEDIUMINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`spell_id`,`req_spell`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Spell Additinal Data';
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4 ROW_FORMAT=FIXED COMMENT='Spell Additinal Data';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `spell_required` WRITE;

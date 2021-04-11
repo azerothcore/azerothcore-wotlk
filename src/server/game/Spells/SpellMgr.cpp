@@ -1,28 +1,28 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "SpellMgr.h"
-#include "SpellInfo.h"
-#include "ObjectMgr.h"
-#include "SpellAuras.h"
-#include "SpellAuraDefines.h"
-#include "SharedDefines.h"
-#include "DBCStores.h"
-#include "World.h"
-#include "Chat.h"
-#include "Spell.h"
-#include "BattlegroundMgr.h"
-#include "CreatureAI.h"
-#include "MapManager.h"
-#include "BattlegroundIC.h"
-#include "BattlefieldWG.h"
 #include "BattlefieldMgr.h"
-#include "InstanceScript.h"
-#include "Player.h"
+#include "BattlefieldWG.h"
+#include "BattlegroundIC.h"
+#include "BattlegroundMgr.h"
+#include "Chat.h"
+#include "CreatureAI.h"
+#include "DBCStores.h"
 #include "GameGraveyard.h"
+#include "InstanceScript.h"
+#include "MapManager.h"
+#include "ObjectMgr.h"
+#include "Player.h"
+#include "SharedDefines.h"
+#include "Spell.h"
+#include "SpellAuraDefines.h"
+#include "SpellAuras.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
 {
@@ -508,7 +508,7 @@ uint32 SpellMgr::GetSpellIdForDifficulty(uint32 spellId, Unit const* caster) con
     if (difficultyEntry->SpellID[mode] <= 0 && mode > DUNGEON_DIFFICULTY_HEROIC)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SpellMgr::GetSpellIdForDifficulty: spell %u mode %u spell is NULL, using mode %u", spellId, mode, mode - 2);
+        sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "SpellMgr::GetSpellIdForDifficulty: spell %u mode %u spell is nullptr, using mode %u", spellId, mode, mode - 2);
 #endif
         mode -= 2;
     }
@@ -3171,12 +3171,18 @@ void SpellMgr::LoadSpellCustomAttr()
                 spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_POSITIVE_TAKEN_BONUS;
                 break;
             case 65280: // Ulduar, Hodir, Singed
+            case 28969: // Naxxramas, Crypt Guard, Acid Spit (10 normal)
+            case 56098: // Naxxramas, Crypt Guard, Acid Spit (25 normal)
+            case 27891: // Naxxramas, Sludge Belcher, Acidic Sludge (10 normal)
+            case 54331: // Naxxramas, Sludge Belcher, Acidic Sludge (25 normal)
+            case 29325: // Naxxramas, Stoneskin Gargoyle, Acid Volley (10 normal)
+            case 54714: // Naxxramas, Stoneskin Gargoyle, Acid Volley (25 normal)
             case 65775: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (10 normal)
             case 67861: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (25 normal)
             case 67862: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (10 heroic)
             case 67863: // Anub'arak, Swarm Scarab, Acid-Drenched Mandibles (25 heroic)
-            case 55604: // Naxxramas, Unrelenting Trainee, Death Plague (10 mode)
-            case 55645: // Naxxramas, Unrelenting Trainee, Death Plague (25 mode)
+            case 55604: // Naxxramas, Unrelenting Trainee, Death Plague (10 normal)
+            case 55645: // Naxxramas, Unrelenting Trainee, Death Plague (25 normal)
             case 67721: // Anub'arak, Nerubian Burrower, Expose Weakness (normal)
             case 67847: // Anub'arak, Nerubian Burrower, Expose Weakness (heroic)
             case 64638: // Ulduar, Winter Jormungar, Acidic Bite
@@ -5246,6 +5252,12 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectRadiusIndex[0] = 16; // 1yd
     });
 
+    // Hodir Shatter Cache
+    ApplySpellFix({ 62502 }, [](SpellEntry* spellInfo)
+    {
+        spellInfo->EffectImplicitTargetA[0] = TARGET_UNIT_SRC_AREA_ENTRY;
+    });
+
     // Ulduar, General Vezax, Mark of the Faceless
     ApplySpellFix({ 63278 }, [](SpellEntry* spellInfo)
     {
@@ -6803,8 +6815,8 @@ void SpellMgr::LoadDbcDataCorrections()
     });
 
     ApplySpellFix({
-    37851, // Tag Greater Felfire Diemetradon
-    37918  // Arcano-pince
+        37851, // Tag Greater Felfire Diemetradon
+        37918  // Arcano-pince
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->RecoveryTime = 3000;
@@ -7082,10 +7094,14 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->SpellLevel = 0;
     });
 
-    // Drain Life - Bryntroll
     ApplySpellFix({
-        71838,  // N
-        71839   // H
+        6789,  // Warlock - Death Coil (Rank 1)
+        17925, // Warlock - Death Coil (Rank 2)
+        17926, // Warlock - Death Coil (Rank 3)
+        27223, // Warlock - Death Coil (Rank 4)
+        47859, // Warlock - Death Coil (Rank 5)
+        71838, // Drain Life - Bryntroll Normal
+        71839  // Drain Life - Bryntroll Heroic
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;

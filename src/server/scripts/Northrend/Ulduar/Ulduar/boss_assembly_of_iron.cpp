@@ -2,12 +2,12 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "ulduar.h"
-#include "SpellAuraEffects.h"
-#include "Player.h"
 
 enum AssemblySpells
 {
@@ -184,7 +184,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_steelbreakerAI (pCreature);
+        return GetUlduarAI<boss_steelbreakerAI>(pCreature);
     }
 
     struct boss_steelbreakerAI : public ScriptedAI
@@ -375,7 +375,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_runemaster_molgeimAI (pCreature);
+        return GetUlduarAI<boss_runemaster_molgeimAI>(pCreature);
     }
 
     struct boss_runemaster_molgeimAI : public ScriptedAI
@@ -540,7 +540,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_assembly_lightningAI (pCreature);
+        return GetUlduarAI<npc_assembly_lightningAI>(pCreature);
     }
 
     struct npc_assembly_lightningAI : public ScriptedAI
@@ -585,7 +585,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_stormcaller_brundirAI (pCreature);
+        return GetUlduarAI<boss_stormcaller_brundirAI>(pCreature);
     }
 
     struct boss_stormcaller_brundirAI : public ScriptedAI

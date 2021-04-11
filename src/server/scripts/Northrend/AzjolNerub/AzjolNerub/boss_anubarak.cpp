@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "azjol_nerub.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -224,7 +224,7 @@ class boss_anub_arak : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new boss_anub_arakAI(creature);
+            return GetAzjolNerubAI<boss_anub_arakAI>(creature);
         }
 };
 

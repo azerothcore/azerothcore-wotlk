@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
  */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "sunwell_plateau.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "sunwell_plateau.h"
 
 enum Quotes
 {
@@ -209,7 +209,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_sacrolashAI>(creature);
+        return GetSunwellPlateauAI<boss_sacrolashAI>(creature);
     };
 };
 
@@ -347,7 +347,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_alythessAI>(creature);
+        return GetSunwellPlateauAI<boss_alythessAI>(creature);
     };
 };
 

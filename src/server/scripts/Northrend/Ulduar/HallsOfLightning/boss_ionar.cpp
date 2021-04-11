@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "halls_of_lightning.h"
-#include "SpellInfo.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
 
 enum IonarSpells
 {
@@ -59,7 +59,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_ionarAI (creature);
+        return GetHallsOfLightningAI<boss_ionarAI>(creature);
     }
 
     struct boss_ionarAI : public ScriptedAI
@@ -220,7 +220,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_spark_of_ionarAI (creature);
+        return GetHallsOfLightningAI<npc_spark_of_ionarAI>(creature);
     }
 
     struct npc_spark_of_ionarAI : public ScriptedAI

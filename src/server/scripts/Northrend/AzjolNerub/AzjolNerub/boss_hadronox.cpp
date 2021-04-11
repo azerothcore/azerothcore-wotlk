@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "azjol_nerub.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -178,7 +178,7 @@ public:
                 case EVENT_HADRONOX_MOVE2:
                 case EVENT_HADRONOX_MOVE3:
                     Talk(SAY_HADRONOX_EMOTE);
-                    me->GetMotionMaster()->MoveCharge(hadronoxSteps[eventId - 1].GetPositionX(), hadronoxSteps[eventId - 1].GetPositionY(), hadronoxSteps[eventId - 1].GetPositionZ(), 10.0f, 0, NULL, true);
+                    me->GetMotionMaster()->MoveCharge(hadronoxSteps[eventId - 1].GetPositionX(), hadronoxSteps[eventId - 1].GetPositionY(), hadronoxSteps[eventId - 1].GetPositionZ(), 10.0f, 0, nullptr, true);
                     break;
             }
 
@@ -194,7 +194,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_hadronoxAI(creature);
+        return GetAzjolNerubAI<boss_hadronoxAI>(creature);
     }
 };
 
@@ -291,7 +291,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_anub_ar_crusherAI(creature);
+        return GetAzjolNerubAI<npc_anub_ar_crusherAI>(creature);
     }
 };
 

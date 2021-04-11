@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "GridNotifiers.h"
 #include "icecrown_citadel.h"
+#include "ObjectMgr.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Texts
 {
@@ -178,7 +178,7 @@ public:
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
-        _owner->CastSpell((Unit*)NULL, SPELL_FROST_BOMB, false, nullptr, nullptr, _sindragosaGUID);
+        _owner->CastSpell((Unit*)nullptr, SPELL_FROST_BOMB, false, nullptr, nullptr, _sindragosaGUID);
         _owner->RemoveAurasDueToSpell(SPELL_FROST_BOMB_VISUAL);
         return true;
     }
@@ -281,8 +281,8 @@ public:
 
             if (!_summoned)
             {
-                me->SetDisableGravity(true);
                 me->SetCanFly(true);
+                me->SetDisableGravity(true);
             }
         }
 
@@ -353,8 +353,8 @@ public:
             instance->SetBossState(DATA_SINDRAGOSA, FAIL);
             if (_summoned)
             {
-                me->SetDisableGravity(false);
                 me->SetCanFly(false);
+                me->SetDisableGravity(false);
             }
         }
 
@@ -396,7 +396,6 @@ public:
                 me->setActive(true);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetHover(true);
                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 4.28571f);
                 float moveTime = me->GetExactDist(&SindragosaFlyInPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
@@ -422,9 +421,8 @@ public:
             {
                 case POINT_FROSTWYRM_LAND:
                     me->setActive(false);
-                    me->SetDisableGravity(false);
-                    me->SetHover(false);
                     me->SetCanFly(false);
+                    me->SetDisableGravity(false);
                     me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                     me->SetHomePosition(SindragosaLandPos);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -451,8 +449,8 @@ public:
                 case POINT_LAND_GROUND:
                     {
                         _isInAirPhase = false;
-                        me->SetDisableGravity(false);
                         me->SetCanFly(false);
+                        me->SetDisableGravity(false);
                         me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
                         me->SetReactState(REACT_AGGRESSIVE);
                         if (Unit* target = me->SelectVictim())
@@ -560,11 +558,11 @@ public:
                     break;
                 case EVENT_UNCHAINED_MAGIC:
                     Talk(SAY_UNCHAINED_MAGIC);
-                    me->CastSpell((Unit*)NULL, SPELL_UNCHAINED_MAGIC, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_UNCHAINED_MAGIC, false);
                     events.ScheduleEvent(EVENT_UNCHAINED_MAGIC, urand(30000, 35000), EVENT_GROUP_LAND_PHASE);
                     break;
                 case EVENT_ICY_GRIP:
-                    me->CastSpell((Unit*)NULL, SPELL_ICY_GRIP, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_ICY_GRIP, false);
                     events.DelayEventsToMax(1001, 0);
                     events.ScheduleEvent(EVENT_BLISTERING_COLD, 1000, EVENT_GROUP_LAND_PHASE);
                     if (uint32 evTime = events.GetNextEventTime(EVENT_ICE_TOMB))
@@ -603,7 +601,6 @@ public:
                     me->StopMoving();
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
-                    me->SetHover(true);
                     me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f, 10.0f);
                     events.CancelEventGroup(EVENT_GROUP_LAND_PHASE);
@@ -1020,7 +1017,7 @@ public:
         void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
         {
             if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
-                GetTarget()->CastCustomSpell(SPELL_BACKLASH, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, NULL, aurEff, GetCasterGUID());
+                GetTarget()->CastCustomSpell(SPELL_BACKLASH, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, nullptr, aurEff, GetCasterGUID());
         }
 
         void Register() override
@@ -1395,7 +1392,6 @@ public:
             {
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetHover(true);
             }
         }
 
@@ -1406,7 +1402,6 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
             }
         }
 
@@ -1451,7 +1446,6 @@ public:
             me->setActive(false);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            me->SetHover(false);
             me->SetHomePosition(SpinestalkerLandPos);
             me->SetFacingTo(SpinestalkerLandPos.GetOrientation());
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
@@ -1532,7 +1526,6 @@ public:
             {
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->SetHover(true);
             }
         }
 
@@ -1543,7 +1536,6 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
             }
         }
 
@@ -1590,7 +1582,6 @@ public:
                 me->setActive(false);
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
                 me->SetHomePosition(RimefangLandPos);
                 me->SetFacingTo(RimefangLandPos.GetOrientation());
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
@@ -1599,7 +1590,6 @@ public:
             {
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
-                me->SetHover(false);
                 me->SetReactState(REACT_DEFENSIVE);
                 if (Unit* victim = me->SelectVictim())
                     AttackStart(victim);
@@ -1644,7 +1634,6 @@ public:
                         me->AttackStop();
                         me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        me->SetHover(true);
                         me->SendMovementFlagUpdate();
                         float floorZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         float destZ;

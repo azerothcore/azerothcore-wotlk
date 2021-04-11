@@ -2,8 +2,14 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
+#include "CreatureAIImpl.h"
+
 #ifndef DEF_CULLING_OF_STRATHOLME_H
 #define DEF_CULLING_OF_STRATHOLME_H
+
+#include "CreatureAIImpl.h"
+
+#define CullingOfStratholmeScriptName "instance_culling_of_stratholme"
 
 enum Data
 {
@@ -167,5 +173,11 @@ const Position EventPos[] =
     {2329.07f,  1276.98f,  132.68f,  4.0f},         // infinite corruptor pos
     {2298.25f,  1500.56f,  128.37f,  4.95f}         // malganis final pos
 };
+
+template <class AI, class T>
+inline AI* GetCullingOfStratholmeAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, CullingOfStratholmeScriptName);
+}
 
 #endif
