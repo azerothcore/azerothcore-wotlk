@@ -989,7 +989,6 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
-            me->SetHover(true);
             me->SendMovementFlagUpdate();
         }
 
@@ -1112,7 +1111,6 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            me->SetHover(false);
             me->SetReactState(REACT_AGGRESSIVE);
             DoZoneInCombat(nullptr, 150.0f);
         }
@@ -3048,9 +3046,8 @@ public:
     {
         npc_icc_spire_frostwyrmAI(Creature* creature) : ScriptedAI(creature)
         {
-            me->SetDisableGravity(true);
-            me->SetHover(true);
             me->SetCanFly(true);
+            me->SetDisableGravity(true);
         }
 
         EventMap events;
@@ -3078,9 +3075,8 @@ public:
         {
             if (type == EFFECT_MOTION_TYPE && id == 1)
             {
-                me->SetDisableGravity(false);
-                me->SetHover(false);
                 me->SetCanFly(false);
+                me->SetDisableGravity(false);
 
                 if (Player* p = SelectTargetFromPlayerList(100.0f))
                 {
@@ -3329,6 +3325,7 @@ public:
             events.ScheduleEvent(1, urand(3000, 10000)); // Crypt Scarabs
             events.ScheduleEvent(2, urand(15000, 25000)); // Dark Mending
             events.ScheduleEvent(3, urand(8000, 15000)); // Web Wrap
+            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -3374,13 +3371,9 @@ public:
                     me->SetDisableGravity(false);
                     me->SetOrientation(0.0f);
                     me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+                    me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                 }
             }
-        }
-
-        bool CanAIAttack(const Unit*  /*target*/) const override
-        {
-            return !me->IsLevitating();
         }
 
         void UpdateAI(uint32 diff) override
@@ -3540,7 +3533,6 @@ public:
             if (summon->GetPositionZ() > 220.0f)
             {
                 summon->SetDisableGravity(true);
-                summon->SetHover(true);
                 summon->SetWalk(true);
             }
         }
