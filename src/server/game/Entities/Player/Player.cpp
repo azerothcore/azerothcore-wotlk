@@ -3908,9 +3908,9 @@ void Player::SendLearnPacket(uint32 spellId, bool learn)
     }
 }
 
-bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool temporary)
+bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool temporary /*= false*/, bool learnFromSkill /*= false*/)
 {
-    if (!_addSpell(spellId, addSpecMask, temporary))
+    if (!_addSpell(spellId, addSpecMask, temporary, learnFromSkill))
         return false;
 
     if (!updateActive)
@@ -3955,7 +3955,7 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
     return true;
 }
 
-bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary)
+bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool learnFromSkill /*= false*/)
 {
     // pussywizard: this can be called to OVERWRITE currently existing spell params! usually to set active = false for lower ranks of a spell
 
@@ -3971,7 +3971,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary)
     // xinef: send packet so client can properly recognize this new spell
     // xinef: ignore passive spells and spells with learn effect
     // xinef: send spells with no aura effects (ie dual wield)
-    if (IsInWorld() && !isBeingLoaded() && temporary && (!spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_HIDDEN_CLIENTSIDE)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+    if (IsInWorld() && !isBeingLoaded() && temporary && (learnFromSkill || !spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_HIDDEN_CLIENTSIDE)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
         SendLearnPacket(spellInfo->Id, true);
 
     // xinef: DO NOT allow to learn spell with effect learn spell!
@@ -5570,6 +5570,11 @@ void Player::DurabilityPointsLossAll(int32 points, bool inventory)
 
 void Player::DurabilityPointsLoss(Item* item, int32 points)
 {
+    if (HasAuraType(SPELL_AURA_PREVENT_DURABILITY_LOSS))
+    {
+        return;
+    }
+
     int32 pMaxDurability = item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
     int32 pOldDurability = item->GetUInt32Value(ITEM_FIELD_DURABILITY);
     int32 pNewDurability = pOldDurability - points;
@@ -6397,7 +6402,7 @@ float getProbabilityOfLevelUp(uint32 SkillValue)
         return 0.0f;
     }
 
-    std::array bounds{ 115, 135, 160, 190, 215, 295, 315, 355, 425, 450 };
+    std::array<uint32, 10> bounds{ 115, 135, 160, 190, 215, 295, 315, 355, 425, 450 };
     std::array<float, 11> dens{ 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 9.0f, 10.0f, 11.0f, 12.0f, 1.0f };
     auto it = std::lower_bound(std::begin(bounds), std::end(bounds), SkillValue);
     return 100 / dens[std::distance(std::begin(bounds), it)];
@@ -16787,12 +16792,12 @@ bool Player::CanShareQuest(uint32 quest_id) const
         QuestStatusMap::const_iterator itr = m_QuestStatus.find(quest_id);
         if (itr != m_QuestStatus.end())
         {
-            if (itr->second.Status != QUEST_STATUS_INCOMPLETE)
-                return false;
-
-            // pussywizard: in pool and not currently available (wintergrasp weekly, dalaran weekly) - can't share
+            // in pool and not currently available (wintergrasp weekly, dalaran weekly) - can't share
             if (sPoolMgr->IsPartOfAPool<Quest>(quest_id) && !sPoolMgr->IsSpawnedObject<Quest>(quest_id))
+            {
+                SendPushToPartyResponse(this, QUEST_PARTY_MSG_CANT_BE_SHARED_TODAY);
                 return false;
+            }
 
             return true;
         }
@@ -17685,7 +17690,7 @@ void Player::SendQuestConfirmAccept(const Quest* quest, Player* pReceiver)
     }
 }
 
-void Player::SendPushToPartyResponse(Player* player, uint8 msg)
+void Player::SendPushToPartyResponse(Player const* player, uint8 msg) const
 {
     if (player)
     {
@@ -24033,7 +24038,7 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
                         continue;
                 }
 
-                addSpell(pAbility->spellId, SPEC_MASK_ALL, true, true);
+                addSpell(pAbility->spellId, SPEC_MASK_ALL, true, true, true);
             }
         }
     }
