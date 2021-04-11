@@ -11,6 +11,8 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
+#define SWPScriptName "instance_sunwell_plateau"
+
 enum DataTypes
 {
     DATA_KALECGOS                           = 0,
@@ -85,5 +87,11 @@ enum SpellIds
 {
     SPELL_SUNWELL_RADIANCE                  = 45769,
 };
+
+template <class AI, class T>
+inline AI* GetSunwellPlateauAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, SWPScriptName);
+}
 
 #endif // SUNWELL_PLATEAU_H

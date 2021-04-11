@@ -239,7 +239,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_thekalAI>(creature);
+        return GetZulGurubAI<boss_thekalAI>(creature);
     }
 };
 
@@ -392,7 +392,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_zealot_lorkhanAI>(creature);
+        return GetZulGurubAI<npc_zealot_lorkhanAI>(creature);
     }
 };
 
@@ -545,7 +545,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_zealot_zathAI>(creature);
+        return GetZulGurubAI<npc_zealot_zathAI>(creature);
     }
 };
 
