@@ -48,18 +48,18 @@ void WardenMac::Init(WorldSession* pClient, SessionKey const& K)
     _outputCrypto.Init(_outputKey);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("warden", "Server side warden for client %u initializing...", pClient->GetAccountId());
-    LOG_DEBUG("warden", "C->S Key: %s", acore::Impl::ByteArrayToHexStr(_inputKey).c_str());
-    LOG_DEBUG("warden", "S->C Key: %s", acore::Impl::ByteArrayToHexStr(_outputKey).c_str());
-    LOG_DEBUG("warden", "  Seed: %s", acore::Impl::ByteArrayToHexStr(_seed).c_str());
-    LOG_DEBUG("warden", "Loading Module...");
+    sLog->outDebug(LOG_FILTER_WARDEN, "Server side warden for client %u initializing...", pClient->GetAccountId());
+    sLog->outDebug(LOG_FILTER_WARDEN, "C->S Key: %s", acore::Impl::ByteArrayToHexStr(_inputKey, false).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "S->C Key: %s", acore::Impl::ByteArrayToHexStr(_outputKey, false ).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "  Seed: %s", acore::Impl::ByteArrayToHexStr(_seed, false).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "Loading Module...");
 #endif
 
     _module = GetModuleForClient();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("warden", "Module Key: %s", acore::Impl::ByteArrayToHexStr(_module->Key).c_str());
-    LOG_DEBUG("warden", "Module ID: %s", acore::Impl::ByteArrayToHexStr(_module->Id).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "Module Key: %s", acore::Impl::ByteArrayToHexStr(_module->Key, false).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "Module ID: %s", acore::Impl::ByteArrayToHexStr(_module->Id, false).c_str());
 #endif
     RequestModule();
 }

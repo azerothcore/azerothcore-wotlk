@@ -1703,8 +1703,8 @@ void Creature::setDeathState(DeathState s, bool despawn)
             m_formation->FormationReset(true);
 
         bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsUnderWater();
-        SetHover(false, false);
-        SetDisableGravity(false, false);
+        SetHover(false);
+        SetDisableGravity(false);
 
         if (needsFalling)
             GetMotionMaster()->MoveFall(0, true);
@@ -1726,7 +1726,6 @@ void Creature::setDeathState(DeathState s, bool despawn)
         // pussywizard:
         if (HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
             RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
-        UpdateEnvironmentIfNeeded(3);
 
         SetUInt32Value(UNIT_NPC_FLAGS, cinfo->npcflag);
         ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_IGNORE_PATHFINDING | UNIT_STATE_NO_ENVIRONMENT_UPD)));
@@ -1734,11 +1733,12 @@ void Creature::setDeathState(DeathState s, bool despawn)
 
         Unit::setDeathState(ALIVE, despawn);
 
-        // Xinef: Load auras AFTER setting alive state
-        LoadCreaturesAddon(true);
         Motion_Initialize();
+        LoadCreaturesAddon(true);
         if (GetCreatureData() && GetPhaseMask() != GetCreatureData()->phaseMask)
             SetPhaseMask(GetCreatureData()->phaseMask, false);
+
+        UpdateEnvironmentIfNeeded(3);
     }
 }
 
@@ -3013,7 +3013,7 @@ void Creature::SetObjectScale(float scale)
     if (IsPet())
         combatReach = DEFAULT_COMBAT_REACH;
 
-    SetFloatValue(UNIT_FIELD_COMBATREACH, combatReach * GetFloatValue(OBJECT_FIELD_SCALE_X) * scale);
+    SetFloatValue(UNIT_FIELD_COMBATREACH, combatReach * scale);
 }
 
 void Creature::SetDisplayId(uint32 modelId)
