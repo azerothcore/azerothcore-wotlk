@@ -34,6 +34,7 @@ UPDATE `gameobject` SET `id` = 24681 WHERE `guid` = 11132;
 
 UPDATE `gameobject` SET `id` = 24681 WHERE `guid` = 11053;
 
+
 UPDATE `gameobject` SET `id` = 24681 WHERE `guid` = 11057;
 
 UPDATE `gameobject` SET `id` = 24681 WHERE `guid` = 11056;
