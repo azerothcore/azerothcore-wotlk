@@ -2,7 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1618169172923159272');
 
 DELETE FROM `gameobject` WHERE (`id` = 2040) AND (`guid` IN (32880)); -- mithril vein duplicate
 DELETE FROM `gameobject` WHERE (`id` = 3726) AND (`guid` IN (13596)); -- earthroot duplicate
-DELETE FROM `gameobject` WHERE (`id` = 175404) AND (`guid` IN (17507)); -- rich thorium veins duplicate
+DELETE FROM `gameobject` WHERE (`id` = 175404) AND (`guid` IN (17506, 17507)); -- rich thorium veins duplicate
 
 -- fix spawn small thorium vein
 DELETE FROM `gameobject` WHERE (`id` = 324) AND (`guid` IN (317));
