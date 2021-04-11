@@ -1,3 +1,19 @@
+-- DB update 2021_04_11_12 -> 2021_04_11_13
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_11_12';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_11_12 2021_04_11_13 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1617779221786870600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617779221786870600');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 12818;
@@ -23,3 +39,12 @@ INSERT INTO `smart_scripts` VALUES
 (12818, 0, 16, 17, 58, 1, 100, 1, 15, 0, 0, 0, 0, 1, 1, 2000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruul Snowhoof - On Waypoint Finished - Say Line 1 (Phase 1) (No Repeat)'),
 (12818, 0, 17, 0, 61, 0, 100, 0, 15, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruul Snowhoof - On Waypoint Finished - Demorph (Phase 1) (No Repeat)'),
 (12818, 0, 18, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ruul Snowhoof - On Respawn - Set Reactstate Passive');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

@@ -1,3 +1,19 @@
+-- DB update 2021_04_11_22 -> 2021_04_11_23
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_11_22';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_11_22 2021_04_11_23 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1617946428490261300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617946428490261300');
 -- New GUIDs game_event 87, CREATURE 300007 - 300015*/
 
@@ -311,3 +327,12 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (11878,0,6,0,38,0,100,0,1,1,0,0,0,80,1187800,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Nathanos Blightcaller - On Data Set 1 1 - Run Script'),
 (1187800,9,0,0,0,0,100,0,300000,300000,300000,300000,0,111,87,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Nathanos Blightcaller - Script - Stop Event'),
 (1187800,9,1,0,0,0,100,0,1000,1000,0,0,0,48,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Nathanos Blightcaller - On Game Event \'Demetria\' End - Set Active Off');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
