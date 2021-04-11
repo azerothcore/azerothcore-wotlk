@@ -97,17 +97,6 @@ void MotionMaster::UpdateMotion(uint32 diff)
     if (!_owner)
         return;
 
-    if (_owner->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED)) // what about UNIT_STATE_DISTRACTED? Why is this not included?
-    {
-        // pussywizard: the same as at the bottom of this function
-        if (_owner->GetTypeId() == TYPEID_PLAYER)
-            _owner->UpdateUnderwaterState(_owner->GetMap(), _owner->GetPositionX(), _owner->GetPositionY(), _owner->GetPositionZ());
-        else
-            _owner->UpdateEnvironmentIfNeeded(0);
-
-        return;
-    }
-
     ASSERT(!empty());
 
     _cleanFlag |= MMCF_INUSE;
@@ -607,19 +596,15 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
 
     // Abort too if the ground is very near
     if (fabs(_owner->GetPositionZ() - tz) < 0.1f)
-    {
         return;
-    }
-    _owner->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
-    _owner->m_movementInfo.SetFallTime(0);
 
-    // don't run spline movement for players
     if (_owner->GetTypeId() == TYPEID_PLAYER)
     {
-        return;
+        _owner->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
+        _owner->m_movementInfo.SetFallTime(0);
+        _owner->ToPlayer()->SetFallInformation(time(nullptr), _owner->GetPositionZ());
     }
-
-    if (_owner->GetTypeId() == TYPEID_UNIT && addFlagForNPC) // pussywizard
+    else if (_owner->GetTypeId() == TYPEID_UNIT && addFlagForNPC) // pussywizard
     {
         _owner->RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         _owner->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY);

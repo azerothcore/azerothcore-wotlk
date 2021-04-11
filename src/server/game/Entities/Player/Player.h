@@ -7,7 +7,6 @@
 #ifndef _PLAYER_H
 #define _PLAYER_H
 
-
 #include "Battleground.h"
 #include "DBCStores.h"
 #include "GroupReference.h"
@@ -310,7 +309,8 @@ struct PvPInfo
     bool IsInHostileArea{false};               ///> Marks if player is in an area which forces PvP flag
     bool IsInNoPvPArea{false};                 ///> Marks if player is in a sanctuary or friendly capital city
     bool IsInFFAPvPArea{false};                ///> Marks if player is in an FFAPvP area (such as Gurubashi Arena)
-    time_t EndTimer{0};                    ///> Time when player unflags himself for PvP (flag removed after 5 minutes)
+    time_t EndTimer{0};                        ///> Time when player unflags himself for PvP (flag removed after 5 minutes)
+    time_t FFAPvPEndTimer{0};                  ///> Time when player unflags himself for FFA PvP (flag removed after 30 sec)
 };
 
 struct DuelInfo
@@ -837,17 +837,23 @@ enum PlayerCharmedAISpells
 #define MAX_PLAYER_SUMMON_DELAY                   (2*MINUTE)
 #define MAX_MONEY_AMOUNT                       (0x7FFFFFFF-1)
 
-struct AccessRequirement
+struct ProgressionRequirement
+{
+    uint32 id;
+    TeamId faction;
+    std::string note;
+    uint32 priority;
+    bool checkLeaderOnly;
+};
+
+struct DungeonProgressionRequirements
 {
     uint8  levelMin;
     uint8  levelMax;
-    uint32 item;
-    uint32 item2;
-    uint32 quest_A;
-    uint32 quest_H;
-    uint32 achievement;
-    std::string questFailedText;
     uint16 reqItemLevel;
+    std::vector<ProgressionRequirement*> quests;
+    std::vector<ProgressionRequirement*> items;
+    std::vector<ProgressionRequirement*> achievements;
 };
 
 enum CharDeleteMethod
@@ -1529,7 +1535,7 @@ public:
     void SendQuestTimerFailed(uint32 quest_id);
     void SendCanTakeQuestResponse(uint32 msg) const;
     void SendQuestConfirmAccept(Quest const* quest, Player* pReceiver);
-    void SendPushToPartyResponse(Player* player, uint8 msg);
+    void SendPushToPartyResponse(Player const* player, uint8 msg) const;
     void SendQuestUpdateAddItem(Quest const* quest, uint32 item_idx, uint16 count);
     void SendQuestUpdateAddCreatureOrGo(Quest const* quest, uint64 guid, uint32 creatureOrGO_idx, uint16 old_count, uint16 add_count);
     void SendQuestUpdateAddPlayer(Quest const* quest, uint16 old_count, uint16 add_count);
@@ -1689,8 +1695,8 @@ public:
     void SendProficiency(ItemClass itemClass, uint32 itemSubclassMask);
     void SendInitialSpells();
     void SendLearnPacket(uint32 spellId, bool learn);
-    bool addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool temporary = false);
-    bool _addSpell(uint32 spellId, uint8 addSpecMask, bool temporary);
+    bool addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool temporary = false, bool learnFromSkill = false);
+    bool _addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool learnFromSkill = false);
     void learnSpell(uint32 spellId);
     void removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporary);
     void resetSpells();
@@ -1838,7 +1844,8 @@ public:
     bool IsActionButtonDataValid(uint8 button, uint32 action, uint8 type);
 
     PvPInfo pvpInfo;
-    void UpdatePvPState(bool onlyFFA = false);
+    void UpdatePvPState();
+    void UpdateFFAPvPState(bool reset = true);
     void SetPvP(bool state)
     {
         Unit::SetPvP(state);
@@ -1859,6 +1866,7 @@ public:
 
     void UpdateAfkReport(time_t currTime);
     void UpdatePvPFlag(time_t currTime);
+    void UpdateFFAPvPFlag(time_t currTime);
     void UpdateContestedPvP(uint32 currTime);
     void SetContestedPvPTimer(uint32 newTime) {m_contestedPvPTimer = newTime;}
     void ResetContestedPvP()
@@ -2449,7 +2457,10 @@ public:
     [[nodiscard]] uint32 GetPendingBind() const { return _pendingBindId; }
     void SendRaidInfo();
     void SendSavedInstances();
-    bool Satisfy(AccessRequirement const* ar, uint32 target_map, bool report = false);
+    void PrettyPrintRequirementsQuestList(const std::vector<const ProgressionRequirement*>& missingQuests) const;
+    void PrettyPrintRequirementsAchievementsList(const std::vector<const ProgressionRequirement*>& missingAchievements) const;
+    void PrettyPrintRequirementsItemsList(const std::vector<const ProgressionRequirement*>& missingItems) const;
+    bool Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map, bool report = false);
     bool CheckInstanceLoginValid();
     [[nodiscard]] bool CheckInstanceCount(uint32 instanceId) const;
 

@@ -2753,6 +2753,22 @@ Battleground.CastDeserter = 1
 Battleground.QueueAnnouncer.Enable = 0
 
 #
+#    Battleground.QueueAnnouncer.Limited.Enable
+#        Description: Show announce only if left players in queue = 1
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Battleground.QueueAnnouncer.Limited.Enable = 0
+
+#
+#    Battleground.QueueAnnouncer.SpamProtection.Delay
+#        Description: Show announce if player rejoined in queue after sec
+#        Default:     30
+#
+
+Battleground.QueueAnnouncer.SpamProtection.Delay = 30
+
+#
 #    Battleground.QueueAnnouncer.PlayerOnly
 #        Description: Battleground queue announcement type.
 #        Default:     0 - (System message, Anyone can see it)
@@ -3610,6 +3626,45 @@ Calculate.Gameoject.Zone.Area.Data = 0
 LFG.Location.All = 0
 
 #
+#    DungeonAccessRequirements.PrintMode
+#
+#        Description: Select the preferred format to display information to the player who cannot enter a portal dungeon because when has not met the access requirements:
+#        Default:     1 - (Display only one requirement at a time (BlizzLike, like in the LFG interface))
+#                     0 - (Display no extra information, only "Requirements  not met")
+#                     2 - (Display detailed requirements, all at once, with clickable links)
+#
+
+DungeonAccessRequirements.PrintMode = 1
+
+#
+#    DungeonAccessRequirements.PortalAvgIlevelCheck
+#
+#        Description: Enable average item level requirement when entering a dungeon/raid's portal (= deny the entry if player has too low average ilevel, like in LFG).
+#        Default:     0 - (Disabled  -> Blizzlike)
+#                     1 - (Enabled)
+
+DungeonAccessRequirements.PortalAvgIlevelCheck = 0
+
+#
+#    DungeonAccessRequirements.LFGLevelDBCOverride
+#
+#        Description: If enabled, use `min_level` and `max_level` values from table `dungeon_access_requirements` to list or to hide a dungeon from the LFG window.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+DungeonAccessRequirements.LFGLevelDBCOverride = 0
+
+#
+#    DungeonAccessRequirements.OptionalStringID
+#
+#        Description: Display an extra message from acore_strings in the chat after printing the dungeon access requirements.
+#                     To enable it set the ID of your desired string from the table acore_strings
+#        Default:     0 - (Disabled)
+#                     1+ - (Enabled)
+
+DungeonAccessRequirements.OptionalStringID = 0
+
+#
 #    ICC Buff
 #       Description: Specify ICC buff
 #                    (It is necessary to restart the server after changing the values!)
@@ -3640,6 +3695,13 @@ ICC.Buff.Alliance = 73828
 #                     0  - (Disable trading BoP items among raid members)
 
 Item.SetItemTradeable = 1
+
+#
+#     FFAPvPTimer
+#        Description: Specify time offset when player unset FFAPvP flag when leaving FFAPvP area. (e.g. Gurubashi Arena)
+#        Default:     30 sec
+
+FFAPvPTimer = 30
 
 #
 ###################################################################################################

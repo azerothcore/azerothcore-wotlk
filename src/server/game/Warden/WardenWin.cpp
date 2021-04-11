@@ -105,17 +105,17 @@ void WardenWin::Init(WorldSession* session, SessionKey const& k)
     _outputCrypto.Init(_outputKey);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     sLog->outDebug(LOG_FILTER_WARDEN, "Server side warden for client %u initializing...", session->GetAccountId());
-    sLog->outDebug(LOG_FILTER_WARDEN, "C->S Key: %s", acore::Impl::ByteArrayToHexStr(_inputKey).c_str());
-    sLog->outDebug(LOG_FILTER_WARDEN, "S->C Key: %s", acore::Impl::ByteArrayToHexStr(_outputKey).c_str());
-    sLog->outDebug(LOG_FILTER_WARDEN, "  Seed: %s", acore::Impl::ByteArrayToHexStr(_seed).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "C->S Key: %s", acore::Impl::ByteArrayToHexStr(_inputKey, false).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "S->C Key: %s", acore::Impl::ByteArrayToHexStr(_outputKey,false).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "  Seed: %s", acore::Impl::ByteArrayToHexStr(_seed, false).c_str());
     sLog->outDebug(LOG_FILTER_WARDEN, "Loading Module...");
 #endif
 
     _module = GetModuleForClient();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Module Key: %s", acore::Impl::ByteArrayToHexStr(_module->Key).c_str());
-    sLog->outDebug(LOG_FILTER_WARDEN, "Module ID: %s", acore::Impl::ByteArrayToHexStr(_module->Id).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "Module Key: %s", acore::Impl::ByteArrayToHexStr(_module->Key, false).c_str());
+    sLog->outDebug(LOG_FILTER_WARDEN, "Module ID: %s", acore::Impl::ByteArrayToHexStr(_module->Id, false).c_str());
 #endif
     RequestModule();
 }
@@ -397,7 +397,7 @@ void WardenWin::RequestChecks()
             case PAGE_CHECK_A:
             case PAGE_CHECK_B:
             {
-                std::vector<uint8> data = check->Data.ToByteVector(0, false);
+                std::vector<uint8> data = check->Data.ToByteVector(24, false);
                 buff.append(data.data(), data.size());
                 buff << uint32(check->Address);
                 buff << uint8(check->Length);
@@ -411,7 +411,7 @@ void WardenWin::RequestChecks()
             }
             case DRIVER_CHECK:
             {
-                std::vector<uint8> data = check->Data.ToByteVector(0, false);
+                std::vector<uint8> data = check->Data.ToByteVector(24, false);
                 buff.append(data.data(), data.size());
                 buff << uint8(index++);
                 break;

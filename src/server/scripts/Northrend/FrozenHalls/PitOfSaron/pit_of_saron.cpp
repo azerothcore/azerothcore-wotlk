@@ -182,7 +182,6 @@ public:
                                 c->CastSpell(c, 69413, true);
                                 c->SetCanFly(true);
                                 c->SetDisableGravity(true);
-                                c->SetHover(true);
                                 c->SendMovementFlagUpdate();
                                 float dist = rand_norm() * 2.0f;
                                 float angle = rand_norm() * 2 * M_PI;
@@ -227,7 +226,6 @@ public:
                                     continue;
                                 c->SetCanFly(false);
                                 c->SetDisableGravity(false);
-                                c->SetHover(false);
                                 c->SendMovementFlagUpdate();
                                 c->CastSpell(c, 69350, true);
                             }
@@ -364,7 +362,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_leaderAI(creature);
+        return GetPitOfSaronAI<npc_pos_leaderAI>(creature);
     }
 };
 
@@ -479,7 +477,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_deathwhisper_necrolyteAI(creature);
+        return GetPitOfSaronAI<npc_pos_deathwhisper_necrolyteAI>(creature);
     }
 };
 
@@ -560,7 +558,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_after_first_bossAI(creature);
+        return GetPitOfSaronAI<npc_pos_after_first_bossAI>(creature);
     }
 };
 
@@ -809,7 +807,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_tyrannus_eventsAI(creature);
+        return GetPitOfSaronAI<npc_pos_tyrannus_eventsAI>(creature);
     }
 };
 
@@ -846,7 +844,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_icicle_triggerAI(creature);
+        return GetPitOfSaronAI<npc_pos_icicle_triggerAI>(creature);
     }
 };
 
@@ -897,7 +895,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_collapsing_icicleAI(creature);
+        return GetPitOfSaronAI<npc_pos_collapsing_icicleAI>(creature);
     }
 };
 
@@ -1084,7 +1082,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_martin_or_gorkun_secondAI(creature);
+        return GetPitOfSaronAI<npc_pos_martin_or_gorkun_secondAI>(creature);
     }
 };
 
@@ -1125,7 +1123,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_freed_slaveAI(creature);
+        return GetPitOfSaronAI<npc_pos_freed_slaveAI>(creature);
     }
 };
 
@@ -1218,7 +1216,6 @@ public:
                         {
                             c->SetCanFly(true);
                             c->SetDisableGravity(true);
-                            c->SetHover(true);
                             c->GetMotionMaster()->MovePoint(0, TSSindragosaPos2);
                         }
 
@@ -1285,7 +1282,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_leader_secondAI(creature);
+        return GetPitOfSaronAI<npc_pos_leader_secondAI>(creature);
     }
 };
 
@@ -1327,7 +1324,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_frostbite_invisible_stalkerAI(creature);
+        return GetPitOfSaronAI<npc_frostbite_invisible_stalkerAI>(creature);
     }
 };
 

@@ -3671,7 +3671,7 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
     float radiusWidth = GetCollisionRadius();
     float radiusHeight = GetCollisionHeight() / 2;
     float radiusAvg = (radiusWidth + radiusHeight) / 2;
-    if (option <= 1 && GetExactDistSq(&m_last_environment_position) < radiusAvg*radiusAvg)
+    if (option <= 1 && GetExactDistSq(&m_last_environment_position) < radiusAvg * radiusAvg)
         return;
 
     m_last_environment_position.Relocate(GetPositionX(), GetPositionY(), GetPositionZ());
@@ -3687,7 +3687,8 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         m_is_updating_environment = false;
         return;
     }
-    bool canChangeFlying = option == 3 || GetMotionMaster()->GetCurrentMovementGeneratorType() != WAYPOINT_MOTION_TYPE;
+
+    bool canChangeFlying = option == 3 || ((c->GetScriptId() == 0 || GetInstanceId() == 0) && GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE);
     bool canFallGround = option == 0 && canChangeFlying && GetInstanceId() == 0 && !IsInCombat() && !GetVehicle() && !GetTransport() && !HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && !c->IsTrigger() && !c->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) && GetMotionMaster()->GetCurrentMovementGeneratorType() <= RANDOM_MOTION_TYPE && !HasUnitState(UNIT_STATE_EVADE) && !IsControlledByPlayer();
     float x = GetPositionX(), y = GetPositionY(), z = GetPositionZ();
     bool isInAir = true;
@@ -3747,16 +3748,17 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         }
     }
 
+    bool canUpdateEnvironment = !HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+
     bool flyingBarelyInWater = false;
     // Refresh being in water
     if (m_last_isinwater_status)
     {
         if (!c->CanFly() || enoughWater)
         {
-            if (!HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD) && c->CanSwim() && (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY)))
+            if (canUpdateEnvironment && c->CanSwim() && (!HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY)))
             {
                 SetSwim(true);
-                // SetDisableGravity(true);
                 changed = true;
             }
             isInAir = false;
@@ -3770,11 +3772,9 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
 
     if (!m_last_isinwater_status)
     {
-        if (!HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD) && c->CanWalk() && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
+        if (canUpdateEnvironment && c->CanWalk() && HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING))
         {
             SetSwim(false);
-            if (!c->CanFly()) // if can fly, this will be removed below if needed
-                SetDisableGravity(false);
             changed = true;
         }
     }
@@ -3801,7 +3801,7 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         }
     }
 
-    if (!HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD) && canChangeFlying)
+    if (canUpdateEnvironment && canChangeFlying)
     {
         // xinef: summoned vehicles are treated as always in air, fixes flying on such units
         if (IsVehicle() && !c->GetDBTableGUIDLow())
@@ -3822,7 +3822,6 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
         }
         else if (c->CanFly() && isInAir && !c->IsFalling())
         {
-
             if (!HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || !HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
             {
                 SetCanFly(true);
@@ -3835,7 +3834,6 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
                 SetHover(false);
                 changed = true;
             }
-
         }
         else
         {
@@ -3869,7 +3867,7 @@ void Unit::UpdateEnvironmentIfNeeded(const uint8 option)
     if (changed)
         propagateSpeedChange();
 
-    if (!HasUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD) && canFallGround && !c->CanFly() && !c->IsFalling() && !m_last_isinwater_status && (c->GetUnitMovementFlags() & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_HOVER | MOVEMENTFLAG_SWIMMING)) == 0 && z - ground_z > 5.0f && z - ground_z < 80.0f)
+    if (canUpdateEnvironment && canFallGround && !c->CanFly() && !c->IsFalling() && !m_last_isinwater_status && (c->GetUnitMovementFlags() & (MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_HOVER | MOVEMENTFLAG_SWIMMING)) == 0 && z - ground_z > 5.0f && z - ground_z < 80.0f)
         GetMotionMaster()->MoveFall();
 
     m_is_updating_environment = false;
@@ -4427,6 +4425,58 @@ void Unit::RemoveAura(Aura* aura, AuraRemoveMode mode)
         RemoveAura(aurApp, mode);
 }
 
+void Unit::RemoveOwnedAuras(std::function<bool(Aura const*)> const& check)
+{
+    for (AuraMap::iterator iter = m_ownedAuras.begin(); iter != m_ownedAuras.end();)
+    {
+        if (check(iter->second))
+        {
+            RemoveOwnedAura(iter);
+            continue;
+        }
+        ++iter;
+    }
+}
+
+void Unit::RemoveAppliedAuras(std::function<bool(AuraApplication const*)> const& check)
+{
+    for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
+    {
+        if (check(iter->second))
+        {
+            RemoveAura(iter);
+            continue;
+        }
+        ++iter;
+    }
+}
+
+void Unit::RemoveOwnedAuras(uint32 spellId, std::function<bool(Aura const*)> const& check)
+{
+    for (AuraMap::iterator iter = m_ownedAuras.lower_bound(spellId); iter != m_ownedAuras.upper_bound(spellId);)
+    {
+        if (check(iter->second))
+        {
+            RemoveOwnedAura(iter);
+            continue;
+        }
+        ++iter;
+    }
+}
+
+void Unit::RemoveAppliedAuras(uint32 spellId, std::function<bool(AuraApplication const*)> const& check)
+{
+    for (AuraApplicationMap::iterator iter = m_appliedAuras.lower_bound(spellId); iter != m_appliedAuras.upper_bound(spellId);)
+    {
+        if (check(iter->second))
+        {
+            RemoveAura(iter);
+            continue;
+        }
+        ++iter;
+    }
+}
+
 void Unit::RemoveAurasDueToSpell(uint32 spellId, uint64 casterGUID, uint8 reqEffMask, AuraRemoveMode removeMode)
 {
     for (AuraApplicationMap::iterator iter = m_appliedAuras.lower_bound(spellId); iter != m_appliedAuras.upper_bound(spellId);)
@@ -4845,23 +4895,14 @@ void Unit::RemoveArenaAuras()
 {
     // in join, remove positive buffs, on end, remove negative
     // used to remove positive visible auras in arenas
-    for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
+    RemoveAppliedAuras([](AuraApplication const* aurApp)
     {
-        AuraApplication const* aurApp = iter->second;
         Aura const* aura = aurApp->GetBase();
-        if (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR4_DONT_REMOVE_IN_ARENA) // don't remove stances, shadowform, pally/hunter auras
-                && !aura->IsPassive()                               // don't remove passive auras
-                && !aura->IsArea()                                  // don't remove area auras, eg pet talents affecting owner
-                && (aurApp->IsPositive() || IsPet() || !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR3_DEATH_PERSISTENT))) // not negative death persistent auras
-        {
-            RemoveAura(iter);
-        }
-        // xinef: special marker, 95% sure
-        else if (aura->GetSpellInfo()->HasAttribute(SPELL_ATTR5_REMOVE_ON_ARENA_ENTER))
-            RemoveAura(iter);
-        else
-            ++iter;
-    }
+        return (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR4_DONT_REMOVE_IN_ARENA)                          // don't remove stances, shadowform, pally/hunter auras
+            && !aura->IsPassive()                                                                              // don't remove passive auras
+            && (aurApp->IsPositive() || !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR3_DEATH_PERSISTENT))) || // not negative death persistent auras
+            aura->GetSpellInfo()->HasAttribute(SPELL_ATTR5_REMOVE_ON_ARENA_ENTER);                             // special marker, always remove
+    });
 }
 
 void Unit::RemoveAllAurasOnDeath()
@@ -5854,7 +5895,6 @@ void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo)
                     absorb = damage;
                     damage = 0;
                 }
-
 
                 data << uint32(damage);                         // damage
                 data << uint32(pInfo->overDamage);              // overkill?
@@ -13443,8 +13483,15 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                         SetSpeed(mtype, AddPct(non_stack_bonus, (*itr)->GetAmount()), forced);
                         return;
                     }
-                    else if ((*itr)->GetAmount() > main_speed_mod)
+                    else if (
+                        // case: increase speed
+                        ((*itr)->GetAmount() > 0 && (*itr)->GetAmount() > main_speed_mod) ||
+                        // case: decrease speed
+                        ((*itr)->GetAmount() < 0 && (*itr)->GetAmount() < main_speed_mod)
+                     )
+                    {
                         main_speed_mod = (*itr)->GetAmount();
+                    }
                 }
                 break;
             }
@@ -15203,15 +15250,22 @@ bool Unit::isFrozen() const
 
 struct ProcTriggeredData
 {
-    ProcTriggeredData(Aura* _aura)
-        : aura(_aura)
+    ProcTriggeredData(Aura* _aura) : aura(_aura)
     {
         effMask = 0;
         spellProcEvent = nullptr;
+        triggerSpelId.fill(0);
     }
+
     SpellProcEventEntry const* spellProcEvent;
     Aura* aura;
     uint32 effMask;
+    std::array<uint32, EFFECT_ALL> triggerSpelId;
+
+    bool operator==(const uint32 spellId) const
+    {
+        return aura->GetId() == spellId;
+    }
 };
 
 typedef std::list< ProcTriggeredData > ProcTriggeredList;
@@ -15555,24 +15609,74 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         //bool triggered = !spellProto->HasAttribute(SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED) ?
         //    (procExtra & PROC_EX_INTERNAL_TRIGGERED && !(procFlag & PROC_FLAG_DONE_TRAP_ACTIVATION)) : false;
 
+        bool hasTriggeredProc = false;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
             if (itr->second->HasEffect(i))
             {
                 AuraEffect* aurEff = itr->second->GetBase()->GetEffect(i);
+
                 // Skip this auras
                 if (isNonTriggerAura[aurEff->GetAuraType()])
                     continue;
+
                 // If not trigger by default and spellProcEvent == nullptr - skip
                 if (!isTriggerAura[aurEff->GetAuraType()] && triggerData.spellProcEvent == nullptr)
                     continue;
+
+                switch (aurEff->GetAuraType())
+                {
+                    case SPELL_AURA_PROC_TRIGGER_SPELL:
+                    case SPELL_AURA_MANA_SHIELD:
+                    case SPELL_AURA_DUMMY:
+                    case SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE:
+                        if (uint32 triggerSpellId = aurEff->GetSpellInfo()->Effects[i].TriggerSpell)
+                        {
+                            triggerData.triggerSpelId[i] = triggerSpellId;
+                            hasTriggeredProc = true;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
                 // Some spells must always trigger
                 //if (isAlwaysTriggeredAura[aurEff->GetAuraType()])
                 triggerData.effMask |= 1 << i;
             }
         }
+
         if (triggerData.effMask)
-            procTriggered.push_front(triggerData);
+        {
+            // If there is aura that triggers another proc aura, make sure that the triggered one is going to be proccessed on top of it
+            if (hasTriggeredProc)
+            {
+                bool proccessed = false;
+                for (uint8 i = 0; i < EFFECT_ALL; ++i)
+                {
+                    if (uint32 triggeredSpellId = triggerData.triggerSpelId[i])
+                    {
+                        auto iter = std::find(procTriggered.begin(), procTriggered.end(), triggeredSpellId);
+                        if (iter != procTriggered.end())
+                        {
+                            std::advance(iter, 1);
+                            procTriggered.insert(iter, triggerData);
+                            proccessed = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!proccessed)
+                {
+                    procTriggered.push_front(triggerData);
+                }
+            }
+            else
+            {
+                procTriggered.push_front(triggerData);
+            }
+        }
     }
 
     // Nothing found
@@ -16418,13 +16522,13 @@ void Unit::SetContestedPvP(Player* attackedPlayer)
         player->AddUnitState(UNIT_STATE_ATTACK_PLAYER);
         player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP);
         // call MoveInLineOfSight for nearby contested guards
-        //UpdateObjectVisibility();
+        AddToNotify(NOTIFY_AI_RELOCATION);
     }
     if (!HasUnitState(UNIT_STATE_ATTACK_PLAYER))
     {
         AddUnitState(UNIT_STATE_ATTACK_PLAYER);
         // call MoveInLineOfSight for nearby contested guards
-        //UpdateObjectVisibility();
+        AddToNotify(NOTIFY_AI_RELOCATION);
     }
 }
 
@@ -20098,7 +20202,7 @@ float Unit::GetCollisionRadius() const
 float Unit::GetCollisionHeight() const
 {
     float scaleMod = GetObjectScale(); // 99% sure about this
-    float defaultHeight = DEFAULT_WORLD_OBJECT_SIZE * scaleMod;
+    float defaultHeight = DEFAULT_COLLISION_HEIGHT * scaleMod;
 
     CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.AssertEntry(GetNativeDisplayId());
     CreatureModelDataEntry const* modelData = sCreatureModelDataStore.AssertEntry(displayInfo->ModelId);

@@ -93,7 +93,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_ingvar_the_plundererAI(pCreature);
+        return GetUtgardeKeepAI<boss_ingvar_the_plundererAI>(pCreature);
     }
 
     struct boss_ingvar_the_plundererAI : public ScriptedAI
@@ -170,7 +170,6 @@ public:
                 ValkyrGUID = s->GetGUID();
                 s->SetCanFly(true);
                 s->SetDisableGravity(true);
-                s->SetHover(true);
                 s->SetPosition(s->GetPositionX(), s->GetPositionY(), s->GetPositionZ() + 35.0f, s->GetOrientation());
                 s->SetFacingTo(s->GetOrientation());
             }

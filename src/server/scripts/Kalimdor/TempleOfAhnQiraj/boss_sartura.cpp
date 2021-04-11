@@ -13,6 +13,7 @@ EndScriptData */
 
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "temple_of_ahnqiraj.h"
 
 enum Sartura
 {
@@ -36,7 +37,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_sarturaAI(creature);
+        return GetTempleOfAhnQirajAI<boss_sarturaAI>(creature);
     }
 
     struct boss_sarturaAI : public ScriptedAI
@@ -183,7 +184,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_sartura_royal_guardAI(creature);
+        return GetTempleOfAhnQirajAI<npc_sartura_royal_guardAI>(creature);
     }
 
     struct npc_sartura_royal_guardAI : public ScriptedAI

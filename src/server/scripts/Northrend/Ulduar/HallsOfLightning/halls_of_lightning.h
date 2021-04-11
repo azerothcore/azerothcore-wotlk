@@ -5,6 +5,10 @@
 #ifndef DEF_HALLS_OF_LIGHTNING_H
 #define DEF_HALLS_OF_LIGHTNING_H
 
+#include "CreatureAIImpl.h"
+
+#define HallsOfLightningScriptName "instance_halls_of_lightning"
+
 enum HoLEvents
 {
     TYPE_BJARNGRIM          = 0,
@@ -34,5 +38,11 @@ enum HoLGOs
     GO_LOKEN_DOOR           = 191324,                      //_doors02
     GO_LOKEN_THRONE         = 192654,
 };
+
+template <class AI, class T>
+inline AI* GetHallsOfLightningAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, HallsOfLightningScriptName);
+}
 
 #endif

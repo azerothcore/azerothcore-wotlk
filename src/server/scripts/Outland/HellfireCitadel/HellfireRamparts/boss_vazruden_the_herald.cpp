@@ -128,7 +128,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_vazruden_the_heraldAI(creature);
+        return GetHellfireRampartsAI<boss_vazruden_the_heraldAI>(creature);
     }
 };
 
@@ -183,8 +183,8 @@ public:
         {
             if (type == POINT_MOTION_TYPE && id == POINT_MIDDLE)
             {
-                me->SetDisableGravity(false);
                 me->SetCanFly(false);
+                me->SetDisableGravity(false);
                 events.ScheduleEvent(EVENT_RESTORE_COMBAT, 0);
                 events.ScheduleEvent(EVENT_SPELL_CONE_OF_FIRE, 5000);
                 if (IsHeroic())
@@ -236,7 +236,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_nazanAI(creature);
+        return GetHellfireRampartsAI<boss_nazanAI>(creature);
     }
 };
 
@@ -307,7 +307,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_vazrudenAI(creature);
+        return GetHellfireRampartsAI<boss_vazrudenAI>(creature);
     }
 };
 

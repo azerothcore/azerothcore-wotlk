@@ -188,7 +188,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_malygosAI (pCreature);
+        return GetEyeOfEternityAI<boss_malygosAI>(pCreature);
     }
 
     struct boss_malygosAI : public ScriptedAI
@@ -222,7 +222,6 @@ public:
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
-            //me->SetHover(true);
             me->SendMovementFlagUpdate();
 
             if (pInstance)
@@ -277,7 +276,6 @@ public:
                     case MI_POINT_INTRO_LAND:
                         me->SetCanFly(false);
                         me->SetDisableGravity(false);
-                        //me->SetHover(false);
                         events.RescheduleEvent(EVENT_START_FIGHT, 0, 1);
                         break;
                     case MI_POINT_VORTEX_TAKEOFF:
@@ -286,7 +284,6 @@ public:
                     case MI_POINT_VORTEX_LAND:
                         me->SetCanFly(false);
                         me->SetDisableGravity(false);
-                        //me->SetHover(false);
                         events.RescheduleEvent(EVENT_VORTEX_LAND_1, 0, 1);
                         break;
                     case MI_POINT_CENTER_AIR_PH_2:
@@ -458,7 +455,6 @@ public:
                         me->StopMoving();
                         me->SetCanFly(true);
                         me->SetDisableGravity(true);
-                        //me->SetHover(true);
                         me->SendMovementFlagUpdate();
                         me->GetMotionMaster()->MoveTakeoff(MI_POINT_VORTEX_TAKEOFF, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ() + 20.0f, 7.0f);
 
@@ -852,7 +848,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_vortex_rideAI (pCreature);
+        return GetEyeOfEternityAI<npc_vortex_rideAI> (pCreature);
     }
 
     struct npc_vortex_rideAI : public VehicleAI
@@ -950,7 +946,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_power_sparkAI (pCreature);
+        return GetEyeOfEternityAI<npc_power_sparkAI>(pCreature);
     }
 
     struct npc_power_sparkAI : public NullCreatureAI
@@ -1046,7 +1042,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_nexus_lordAI (pCreature);
+        return GetEyeOfEternityAI<npc_nexus_lordAI>(pCreature);
     }
 
     struct npc_nexus_lordAI : public ScriptedAI
@@ -1139,7 +1135,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_scion_of_eternityAI (pCreature);
+        return GetEyeOfEternityAI<npc_scion_of_eternityAI>(pCreature);
     }
 
     struct npc_scion_of_eternityAI : public ScriptedAI
@@ -1213,7 +1209,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_hover_diskAI (pCreature);
+        return GetEyeOfEternityAI<npc_hover_diskAI>(pCreature);
     }
 
     struct npc_hover_diskAI : public VehicleAI
@@ -1355,7 +1351,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_alexstraszaAI (pCreature);
+        return GetEyeOfEternityAI<npc_alexstraszaAI>(pCreature);
     }
 
     struct npc_alexstraszaAI : public ScriptedAI
@@ -1366,7 +1362,6 @@ public:
             events.ScheduleEvent(1, 9000);
             me->SetCanFly(true);
             me->SetDisableGravity(true);
-            me->SetHover(true);
         }
 
         EventMap events;
@@ -1412,7 +1407,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_eoe_wyrmrest_skytalonAI (pCreature);
+        return GetEyeOfEternityAI<npc_eoe_wyrmrest_skytalonAI>(pCreature);
     }
 
     struct npc_eoe_wyrmrest_skytalonAI : public VehicleAI
