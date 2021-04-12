@@ -7,8 +7,6 @@
 #ifndef _DATABASEWORKERPOOL_H
 #define _DATABASEWORKERPOOL_H
 
-#include <ace/Thread_Mutex.h>
-
 #include "Common.h"
 #include "Callback.h"
 #include "MySQLConnection.h"
@@ -20,6 +18,7 @@
 #include "QueryHolder.h"
 #include "AdhocStatement.h"
 #include "StringFormat.h"
+#include <ace/Thread_Mutex.h>
 
 class PingOperation : public SQLOperation
 {
@@ -37,12 +36,19 @@ class DatabaseWorkerPool
 public:
     /* Activity state */
     DatabaseWorkerPool();
-
     ~DatabaseWorkerPool() = default;
 
-    bool Open(const std::string& infoString, uint8 async_threads, uint8 synch_threads);
-
+    void SetConnectionInfo(std::string const& infoString, uint8 const asyncThreads, uint8 const synchThreads);
+    uint32 Open();
     void Close();
+
+    //! Prepares all prepared statements
+    bool PrepareStatements();
+
+    inline MySQLConnectionInfo const* GetConnectionInfo() const
+    {
+        return _connectionInfo.get();
+    }
 
     /**
         Delayed one-way statement methods.
@@ -199,11 +205,6 @@ public:
     //! Keeps all our MySQL connections alive, prevent the server from disconnecting us.
     void KeepAlive();
 
-    [[nodiscard]] char const* GetDatabaseName() const
-    {
-        return _connectionInfo.database.c_str();
-    }
-
     void EscapeString(std::string& str)
     {
         if (str.empty())
@@ -216,28 +217,33 @@ public:
     }
 
 private:
-    void Enqueue(SQLOperation* op)
-    {
-        _queue->enqueue(op);
-    }
-
-    //! Gets a free connection in the synchronous connection pool.
-    //! Caller MUST call t->Unlock() after touching the MySQL context to prevent deadlocks.
-    T* GetFreeConnection();
-
-private:
-    enum _internalIndex
+    enum InternalIndex
     {
         IDX_ASYNC,
         IDX_SYNCH,
         IDX_SIZE
     };
 
-    ACE_Message_Queue<ACE_SYNCH>*   _mqueue;
-    ACE_Activation_Queue*           _queue;             //! Queue shared by async worker threads.
-    std::vector<std::vector<T*>>    _connections;
-    uint32                          _connectionCount[2];       //! Counter of MySQL connections;
-    MySQLConnectionInfo             _connectionInfo;
+    uint32 OpenConnections(InternalIndex type, uint8 numConnections);
+
+    void Enqueue(SQLOperation* op)
+    {
+        _queue->enqueue(op);
+    }
+
+    [[nodiscard]] char const* GetDatabaseName() const;
+
+    //! Gets a free connection in the synchronous connection pool.
+    //! Caller MUST call t->Unlock() after touching the MySQL context to prevent deadlocks.
+    T* GetFreeConnection();
+
+    ACE_Message_Queue<ACE_SYNCH>* _mqueue;
+    ACE_Activation_Queue* _queue; //! Queue shared by async worker threads.
+    std::vector<std::vector<T*>> _connections;
+    uint32 _connectionCount[IDX_SIZE]; //! Counter of MySQL connections;
+    std::unique_ptr<MySQLConnectionInfo> _connectionInfo;
+    std::vector<uint8> _preparedStatementSize;
+    uint8 _async_threads, _synch_threads;
 };
 
 #endif
