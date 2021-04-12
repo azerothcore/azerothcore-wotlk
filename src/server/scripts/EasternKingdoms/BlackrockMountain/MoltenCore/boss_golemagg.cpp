@@ -61,16 +61,19 @@ public:
         void EnterCombat(Unit* victim) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_PYROBLAST, 7000);
+            events.ScheduleEvent(EVENT_PYROBLAST, urand(3000, 7000));
 
             // The two ragers should join the fight alongside me against my foes.
             std::list<Creature*> ragers;
             me->GetCreaturesWithEntryInRange(ragers, 100, NPC_CORE_RAGER);
-            for (Creature* rager : ragers)
+            if (!ragers.empty())
             {
-                if (rager && rager->IsAlive() && !rager->IsInCombat())
+                for (Creature* rager : ragers)
                 {
-                    rager->AI()->AttackStart(victim);
+                    if (rager && rager->IsAlive() && !rager->IsInCombat())
+                    {
+                        rager->AI()->AttackStart(victim);
+                    }
                 }
             }
         }
@@ -109,13 +112,13 @@ public:
                             DoCast(target, SPELL_PYROBLAST);
                         }
 
-                        events.RepeatEvent(7000);
+                        events.RepeatEvent(urand(3000, 7000));
                         break;
                     }
                     case EVENT_EARTHQUAKE:
                     {
                         DoCastVictim(SPELL_EARTHQUAKE);
-                        events.RepeatEvent(3000);
+                        events.RepeatEvent(5000);
                         break;
                     }
                 }
