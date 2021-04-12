@@ -38,6 +38,7 @@ enum Spells
     SPELL_MAGMA_BLAST           = 20565,                   // Ranged attack
     SPELL_SONS_OF_FLAME_DUMMY   = 21108,                   // Server side effect
     SPELL_RAGSUBMERGE           = 21107,                   // Stealth aura
+    SPELL_RAGNA_SUBMERGE_VISUAL = 20567,                   // Visual for submerging into lava
     SPELL_RAGEMERGE             = 20568,
     SPELL_MELT_WEAPON           = 21387,
     SPELL_ELEMENTAL_FIRE        = 20563,
@@ -286,54 +287,16 @@ public:
                         {
                             if (!_isBanished)
                             {
-                                // TODO: There is a spell to summon him
+                                me->InterruptNonMeleeSpells(false);
+                                DoCastSelf(SPELL_RAGNA_SUBMERGE_VISUAL, true);
                                 me->AttackStop();
                                 DoResetThreat();
                                 me->SetReactState(REACT_PASSIVE);
-                                me->InterruptNonMeleeSpells(false);
                                 me->setFaction(35);
                                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
-                                me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
-
-                                if (!_hasSubmergedOnce)
-                                {
-                                    Talk(SAY_REINFORCEMENTS1);
-
-                                    // summon 8 elementals
-                                    for (uint8 i = 0; i < MAX_SON_OF_FLAME_COUNT; ++i)
-                                    {
-                                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                        {
-                                            if (Creature* summoned = me->SummonCreature(NPC_SON_OF_FLAME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
-                                            {
-                                                summoned->AI()->AttackStart(target);
-                                            }
-                                        }
-                                    }
-
-                                    _hasSubmergedOnce = true;
-                                    _isBanished = true;
-                                    _emergeTimer = 90000;
-                                }
-                                else
-                                {
-                                    Talk(SAY_REINFORCEMENTS2);
-
-                                    for (uint8 i = 0; i < MAX_SON_OF_FLAME_COUNT; ++i)
-                                    {
-                                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
-                                        {
-                                            if (Creature* summoned = me->SummonCreature(NPC_SON_OF_FLAME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
-                                            {
-                                                summoned->AI()->AttackStart(target);
-                                            }
-                                        }
-                                    }
-
-                                    _isBanished = true;
-                                    _emergeTimer = 90000;
-                                }
+                                //me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
+                                SummonMinions();
                             }
                             events.ScheduleEvent(EVENT_SUBMERGE, 180000);
                             break;
@@ -357,6 +320,29 @@ public:
         bool _hasYelledMagmaBurst;
         bool _hasSubmergedOnce;
         bool _isBanished;
+
+        void SummonMinions()
+        {
+            Talk(_hasSubmergedOnce ? SAY_REINFORCEMENTS2 : SAY_REINFORCEMENTS1);
+
+            for (uint8 i = 0; i < MAX_SON_OF_FLAME_COUNT; ++i)
+            {
+                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                {
+                    if (Creature* summoned = me->SummonCreature(NPC_SON_OF_FLAME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
+                    {
+                        summoned->AI()->AttackStart(target);
+                    }
+                }
+            }
+
+            _isBanished = true;
+            _emergeTimer = 90000;
+            if (!_hasSubmergedOnce)
+            {
+                _hasSubmergedOnce = true;
+            }
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
