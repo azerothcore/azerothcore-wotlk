@@ -71,7 +71,9 @@ constexpr float DEATH_ORIENTATION = 4.0f;
 class boss_ragnaros : public CreatureScript
 {
 public:
-    boss_ragnaros() : CreatureScript("boss_ragnaros") { }
+    boss_ragnaros() : CreatureScript("boss_ragnaros")
+    {
+    }
 
     struct boss_ragnarosAI : public BossAI
     {
@@ -94,6 +96,11 @@ public:
             _hasSubmergedOnce = false;
             _isBanished = false;
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+        }
+
+        void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+        {
+            summons.Despawn(summon);
         }
 
         void EnterCombat(Unit* /*victim*/) override
@@ -137,17 +144,17 @@ public:
                 if (!_introState)
                 {
                     me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
-                    events.ScheduleEvent(EVENT_INTRO_1, 4000);
-                    events.ScheduleEvent(EVENT_INTRO_2, 23000);
-                    events.ScheduleEvent(EVENT_INTRO_3, 42000);
-                    events.ScheduleEvent(EVENT_INTRO_4, 43000);
-                    events.ScheduleEvent(EVENT_INTRO_5, 53000);
+                    introEvents.ScheduleEvent(EVENT_INTRO_1, 4000);
+                    introEvents.ScheduleEvent(EVENT_INTRO_2, 23000);
+                    introEvents.ScheduleEvent(EVENT_INTRO_3, 42000);
+                    introEvents.ScheduleEvent(EVENT_INTRO_4, 43000);
+                    introEvents.ScheduleEvent(EVENT_INTRO_5, 53000);
                     _introState = 1;
                 }
 
-                events.Update(diff);
+                introEvents.Update(diff);
 
-                while (uint32 const eventId = events.ExecuteEvent())
+                while (uint32 const eventId = introEvents.ExecuteEvent())
                 {
                     switch (eventId)
                     {
@@ -187,7 +194,7 @@ public:
             }
             else
             {
-                if (_isBanished && ((_emergeTimer <= diff) || instance->GetData(DATA_RAGNAROS_ADDS) > 8))
+                if (_isBanished && (_emergeTimer <= diff || !summons.HasEntry(NPC_SON_OF_FLAME)))
                 {
                     //Become unbanished again
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -199,7 +206,7 @@ public:
                     {
                         AttackStart(target);
                     }
-                    instance->SetData(DATA_RAGNAROS_ADDS, 0);
+
                     _isBanished = false;
                 }
                 else if (_isBanished)
@@ -215,6 +222,10 @@ public:
 
                 events.Update(diff);
 
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    return;
+                }
                 while (uint32 const eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
@@ -285,7 +296,6 @@ public:
                                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
                                 me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
-                                instance->SetData(DATA_RAGNAROS_ADDS, 0);
 
                                 if (!_hasSubmergedOnce)
                                 {
@@ -329,7 +339,11 @@ public:
                             events.ScheduleEvent(EVENT_SUBMERGE, 180000);
                             break;
                         }
+                    }
 
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                    {
+                        return;
                     }
                 }
 
@@ -338,6 +352,7 @@ public:
         }
 
     private:
+        EventMap introEvents;
         uint32 _emergeTimer;
         uint8 _introState;
         bool _hasYelledMagmaBurst;
@@ -351,42 +366,7 @@ public:
     }
 };
 
-class npc_son_of_flame : public CreatureScript
-{
-public:
-    npc_son_of_flame() : CreatureScript("npc_SonOfFlame") { }
-
-    struct npc_son_of_flameAI : public ScriptedAI
-    {
-        npc_son_of_flameAI(Creature* creature) : ScriptedAI(creature), instance(creature->GetInstanceScript())
-        {
-        }
-
-        // TODO: replace with better solution
-        void JustDied(Unit* /*killer*/) override { instance->SetData(DATA_RAGNAROS_ADDS, 1); }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-            if (!UpdateVictim())
-            {
-                return;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        InstanceScript* instance;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetMoltenCoreAI<npc_son_of_flameAI>(creature);
-    }
-};
-
 void AddSC_boss_ragnaros()
 {
     new boss_ragnaros();
-    new npc_son_of_flame();
 }

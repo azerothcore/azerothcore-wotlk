@@ -22,9 +22,6 @@ enum MCData
     DATA_MAJORDOMO_EXECUTUS         = 8,
     DATA_RAGNAROS                   = 9,
     MAX_ENCOUNTER                   = 10,
-
-    // Other data
-    DATA_RAGNAROS_ADDS,
 };
 
 enum MCActions

@@ -42,7 +42,7 @@ public:
             _golemaggTheIncineratorGUID(0),
             _majordomoExecutusGUID(0),
             _cacheOfTheFirelordGUID(0),
-            _ragnarosAddDeaths(0),
+            _garrGUID(0),
             canSaveBossState(false)
         {
             SetBossNumber(MAX_ENCOUNTER);
@@ -123,32 +123,6 @@ public:
                     break;
                 }
             }
-        }
-
-        void SetData(uint32 type, uint32 data) override
-        {
-            if (type == DATA_RAGNAROS_ADDS)
-            {
-                if (data == 1)
-                {
-                    ++_ragnarosAddDeaths;
-                }
-                else if (data == 0)
-                {
-                    _ragnarosAddDeaths = 0;
-                }
-            }
-        }
-
-        uint32 GetData(uint32 type) const  override
-        {
-            switch (type)
-            {
-                case DATA_RAGNAROS_ADDS:
-                    return _ragnarosAddDeaths;
-            }
-
-            return 0;
         }
 
         uint64 GetData64(uint32 type) const  override
@@ -294,7 +268,6 @@ public:
         uint64 _majordomoExecutusGUID;
         uint64 _cacheOfTheFirelordGUID;
         uint64 _garrGUID;
-        uint8 _ragnarosAddDeaths;
         bool canSaveBossState;
     };
 
