@@ -41,7 +41,7 @@ enum Spells
     SPELL_RAGEMERGE             = 20568,
     SPELL_MELT_WEAPON           = 21388,
     SPELL_ELEMENTAL_FIRE        = 20564,
-    SPELL_ERRUPTION             = 17731
+    SPELL_ERRUPTION             = 17731,
 };
 
 enum Events
@@ -59,6 +59,11 @@ enum Events
     EVENT_INTRO_3,
     EVENT_INTRO_4,
     EVENT_INTRO_5,
+};
+
+enum Creatures
+{
+    NPC_SON_OF_FLAME            = 12143,
 };
 
 constexpr float DEATH_ORIENTATION = 4.0f;
@@ -291,7 +296,7 @@ public:
                                     {
                                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                         {
-                                            if (Creature* summoned = me->SummonCreature(12143, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
+                                            if (Creature* summoned = me->SummonCreature(NPC_SON_OF_FLAME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
                                             {
                                                 summoned->AI()->AttackStart(target);
                                             }
@@ -310,7 +315,7 @@ public:
                                     {
                                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                         {
-                                            if (Creature* summoned = me->SummonCreature(12143, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
+                                            if (Creature* summoned = me->SummonCreature(NPC_SON_OF_FLAME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 900000))
                                             {
                                                 summoned->AI()->AttackStart(target);
                                             }
@@ -353,17 +358,19 @@ public:
 
     struct npc_son_of_flameAI : public ScriptedAI
     {
-        npc_son_of_flameAI(Creature* creature) : ScriptedAI(creature)
+        npc_son_of_flameAI(Creature* creature) : ScriptedAI(creature), instance(creature->GetInstanceScript())
         {
-            instance = me->GetInstanceScript();
         }
 
+        // TODO: replace with better solution
         void JustDied(Unit* /*killer*/) override { instance->SetData(DATA_RAGNAROS_ADDS, 1); }
 
         void UpdateAI(uint32 /*diff*/) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             DoMeleeAttackIfReady();
         }
