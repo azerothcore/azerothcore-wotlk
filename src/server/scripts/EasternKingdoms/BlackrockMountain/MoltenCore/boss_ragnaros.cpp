@@ -39,7 +39,7 @@ enum Spells
     SPELL_SONS_OF_FLAME_DUMMY   = 21108,                   // Server side effect
     SPELL_RAGSUBMERGE           = 21107,                   // Stealth aura
     SPELL_RAGEMERGE             = 20568,
-    SPELL_MELT_WEAPON           = 21388,
+    SPELL_MELT_WEAPON           = 21387,
     SPELL_ELEMENTAL_FIRE        = 20563,
     SPELL_ERRUPTION             = 17731,
 };
@@ -100,6 +100,7 @@ public:
             _hasSubmergedOnce = false;
             _isBanished = false;
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+            DoCastSelf(SPELL_MELT_WEAPON, true);
             DoCastSelf(SPELL_ELEMENTAL_FIRE, true);
         }
 
