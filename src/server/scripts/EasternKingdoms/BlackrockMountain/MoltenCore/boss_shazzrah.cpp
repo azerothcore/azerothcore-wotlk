@@ -36,7 +36,9 @@ public:
 
     struct boss_shazzrahAI : public BossAI
     {
-        boss_shazzrahAI(Creature* creature) : BossAI(creature, DATA_SHAZZRAH) { }
+        boss_shazzrahAI(Creature* creature) : BossAI(creature, DATA_SHAZZRAH)
+        {
+        }
 
         void EnterCombat(Unit* /*target*/) override
         {
