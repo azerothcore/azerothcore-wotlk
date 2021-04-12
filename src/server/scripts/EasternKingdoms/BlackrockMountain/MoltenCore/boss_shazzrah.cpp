@@ -41,11 +41,11 @@ public:
         void EnterCombat(Unit* /*target*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 6000);
-            events.ScheduleEvent(EVENT_SHAZZRAH_CURSE, 10000);
-            events.ScheduleEvent(EVENT_MAGIC_GROUNDING, 24000);
-            events.ScheduleEvent(EVENT_COUNTERSPELL, 15000);
-            events.ScheduleEvent(EVENT_SHAZZRAH_GATE, 45000);
+            events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, urand(2000, 4000));
+            events.ScheduleEvent(EVENT_SHAZZRAH_CURSE, urand(7000, 11000));
+            events.ScheduleEvent(EVENT_MAGIC_GROUNDING, urand(14000, 19000));
+            events.ScheduleEvent(EVENT_COUNTERSPELL, urand(9000, 10000));
+            events.ScheduleEvent(EVENT_SHAZZRAH_GATE, 30000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -69,7 +69,7 @@ public:
                     case EVENT_ARCANE_EXPLOSION:
                     {
                         DoCastVictim(SPELL_ARCANE_EXPLOSION);
-                        events.RepeatEvent(urand(4000, 7000));
+                        events.RepeatEvent(urand(4000, 5000));
                         break;
                     }
                     // Triggered subsequent to using "Gate of Shazzrah".
@@ -84,19 +84,19 @@ public:
                         {
                             DoCast(target, SPELL_SHAZZRAH_CURSE);
                         }
-                        events.RepeatEvent(urand(25000, 30000));
+                        events.RepeatEvent(urand(23000, 26000));
                         break;
                     }
                     case EVENT_MAGIC_GROUNDING:
                     {
                         DoCastSelf(SPELL_MAGIC_GROUNDING);
-                        events.RepeatEvent(35000);
+                        events.RepeatEvent(urand(7000, 9000));
                         break;
                     }
                     case EVENT_COUNTERSPELL:
                     {
                         DoCastVictim(SPELL_COUNTERSPELL);
-                        events.RepeatEvent(urand(16000, 20000));
+                        events.RepeatEvent(urand(15000, 18000));
                         break;
                     }
                     case EVENT_SHAZZRAH_GATE:
