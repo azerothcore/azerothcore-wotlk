@@ -306,7 +306,7 @@ public:
     {
         PrepareSpellScript(spell_magmadar_lava_bomb_SpellScript);
 
-        void HandleDummy(SpellEffIndex effIndex)
+        void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if (Unit* target = GetHitUnit())
             {
