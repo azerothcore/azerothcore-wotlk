@@ -59,8 +59,8 @@ public:
         {
             _EnterCombat();
             events.ScheduleEvent(EVENT_DARK_STRIKE, 10000);
-            events.ScheduleEvent(EVENT_DEMORALIZING_SHOUT, 15000);
-            events.ScheduleEvent(EVENT_INSPIRE, 13000);
+            events.ScheduleEvent(EVENT_DEMORALIZING_SHOUT, urand(6000, 20000));
+            events.ScheduleEvent(EVENT_INSPIRE, urand(7000, 10000));
             events.ScheduleEvent(EVENT_KNOCKDOWN, 6000);
             events.ScheduleEvent(EVENT_FLAMESPEAR, 2000);
         }
@@ -92,7 +92,7 @@ public:
                     case EVENT_DEMORALIZING_SHOUT:
                     {
                         DoCastVictim(SPELL_DEMORALIZING_SHOUT);
-                        events.RepeatEvent(urand(15000, 20000));
+                        events.RepeatEvent(urand(12000, 18000));
                         break;
                     }
                     case EVENT_INSPIRE:
@@ -104,13 +104,13 @@ public:
                         }
 
                         DoCastSelf(SPELL_INSPIRE);
-                        events.RepeatEvent(urand(20000, 26000));
+                        events.RepeatEvent(urand(13000, 20000));
                         break;
                     }
                     case EVENT_KNOCKDOWN:
                     {
                         DoCastVictim(SPELL_KNOCKDOWN);
-                        events.RepeatEvent(urand(12000, 15000));
+                        events.RepeatEvent(urand(10000, 20000));
                         break;
                     }
                     case EVENT_FLAMESPEAR:

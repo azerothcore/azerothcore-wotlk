@@ -48,7 +48,9 @@ enum Creatures
 class boss_garr : public CreatureScript
 {
 public:
-    boss_garr() : CreatureScript("boss_garr") { }
+    boss_garr() : CreatureScript("boss_garr")
+    {
+    }
 
     struct boss_garrAI : public BossAI
     {
