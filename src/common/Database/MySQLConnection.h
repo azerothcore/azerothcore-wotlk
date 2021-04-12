@@ -63,8 +63,9 @@ public:
     MySQLConnection(ACE_Activation_Queue* queue, MySQLConnectionInfo& connInfo);  //! Constructor for asynchronous connections.
     virtual ~MySQLConnection();
 
-    virtual bool Open();
+    virtual uint32 Open();
     void Close();
+    bool PrepareStatements();
 
 public:
     bool Execute(const char* sql);
@@ -102,7 +103,6 @@ protected:
     MySQLPreparedStatement* GetPreparedStatement(uint32 index);
     void PrepareStatement(uint32 index, const char* sql, ConnectionFlags flags);
 
-    bool PrepareStatements();
     virtual void DoPrepareStatements() = 0;
 
 protected:
@@ -121,6 +121,9 @@ private:
     MySQLConnectionInfo&  m_connectionInfo;             //! Connection info (used for logging)
     ConnectionFlags       m_connectionFlags;            //! Connection flags (for preparing relevant statements)
     ACE_Thread_Mutex      m_Mutex;
+
+    MySQLConnection(MySQLConnection const& right) = delete;
+    MySQLConnection& operator=(MySQLConnection const& right) = delete;
 };
 
 #endif
