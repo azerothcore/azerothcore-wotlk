@@ -147,29 +147,28 @@ public:
     struct npc_core_ragerAI : public ScriptedAI
     {
         npc_core_ragerAI(Creature* creature) : ScriptedAI(creature),
-            instance(creature->GetInstanceScript())
+            instance(creature->GetInstanceScript()),
+            mangleTimer(urand(6000, 10000))
         {
         }
 
         void Reset() override
         {
-            mangleTimer = 7 * IN_MILLISECONDS;               // These times are probably wrong
+            mangleTimer = urand(6000, 10000);
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
         {
-            if (!me->HealthBelowPctDamaged(50, damage))
+            if (me->HealthBelowPctDamaged(50, damage))
             {
-                return;
-            }
-
-            Creature const* pGolemagg = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GOLEMAGG_THE_INCINERATOR));
-            if (pGolemagg && pGolemagg->IsAlive())
-            {
-                damage = 0;
-                me->AddAura(SPELL_GOLEMAGG_TRUST, me);
-                Talk(EMOTE_LOWHP);
-                me->SetFullHealth();
+                Creature const* pGolemagg = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GOLEMAGG_THE_INCINERATOR));
+                if (pGolemagg && pGolemagg->IsAlive())
+                {
+                    damage = 0;
+                    Talk(EMOTE_LOWHP);
+                    me->AddAura(SPELL_GOLEMAGG_TRUST, me);
+                    me->SetFullHealth();
+                }
             }
         }
 
@@ -184,7 +183,7 @@ public:
             if (mangleTimer <= diff)
             {
                 DoCastVictim(SPELL_MANGLE);
-                mangleTimer = 10 * IN_MILLISECONDS;
+                mangleTimer = 20000;
             }
             else
             {
