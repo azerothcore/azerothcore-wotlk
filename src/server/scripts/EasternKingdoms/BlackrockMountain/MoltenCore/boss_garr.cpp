@@ -44,11 +44,6 @@ enum Creatures
     NPC_FIREWORN            = 12099,
 };
 
-enum Misc
-{
-    ACTION_ENRAGE           = 1,
-};
-
 class boss_garr : public CreatureScript
 {
 public:
@@ -77,14 +72,6 @@ public:
                         fireworn->Respawn(true);
                     }
                 }
-            }
-        }
-
-        void DoAction(int32 action) override
-        {
-            if (action == ACTION_ENRAGE)
-            {
-                DoCastSelf(SPELL_ENRAGE);
             }
         }
 
@@ -212,7 +199,7 @@ public:
         {
             if (Creature* garr = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GARR)))
             {
-                garr->AI()->DoAction(ACTION_ENRAGE);
+                garr->CastSpell(garr, SPELL_ENRAGE, true);
             }
         }
 
