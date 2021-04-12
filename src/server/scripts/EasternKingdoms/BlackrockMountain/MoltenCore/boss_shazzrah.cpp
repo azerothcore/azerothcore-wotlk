@@ -138,14 +138,12 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            if (targets.empty())
+            if (!targets.empty())
             {
-                return;
+                WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
+                targets.clear();
+                targets.push_back(target);
             }
-
-            WorldObject* target = acore::Containers::SelectRandomContainerElement(targets);
-            targets.clear();
-            targets.push_back(target);
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)
