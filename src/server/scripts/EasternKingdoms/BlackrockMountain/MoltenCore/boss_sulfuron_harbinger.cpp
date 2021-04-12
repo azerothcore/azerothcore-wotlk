@@ -58,7 +58,7 @@ public:
         void EnterCombat(Unit* /*victim*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_DARK_STRIKE, 10000);
+            events.ScheduleEvent(EVENT_DARK_STRIKE, urand(4000, 7000));
             events.ScheduleEvent(EVENT_DEMORALIZING_SHOUT, urand(6000, 20000));
             events.ScheduleEvent(EVENT_INSPIRE, urand(7000, 10000));
             events.ScheduleEvent(EVENT_KNOCKDOWN, 6000);
@@ -86,7 +86,7 @@ public:
                     case EVENT_DARK_STRIKE:
                     {
                         DoCastSelf(SPELL_DARK_STRIKE);
-                        events.RepeatEvent(urand(15000, 18000));
+                        events.RepeatEvent(urand(4000, 7000));
                         break;
                     }
                     case EVENT_DEMORALIZING_SHOUT:
@@ -156,11 +156,11 @@ public:
             events.Reset();
         }
 
-        void EnterCombat(Unit* victim) override
+        void EnterCombat(Unit* /*victim*/) override
         {
             events.ScheduleEvent(EVENT_HEAL, urand(15000, 30000));
-            events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 2000);
-            events.ScheduleEvent(EVENT_IMMOLATE, 8000);
+            events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, urand(2000, 4000));
+            events.ScheduleEvent(EVENT_IMMOLATE, urand(3500, 6000));
         }
 
         void UpdateAI(uint32 diff) override
@@ -196,7 +196,7 @@ public:
                         {
                             DoCast(target, SPELL_SHADOWWORDPAIN);
                         }
-                        events.RepeatEvent(urand(18000, 26000));
+                        events.RepeatEvent(urand(2500, 5000));
                         break;
                     }
                     case EVENT_IMMOLATE:
@@ -205,7 +205,7 @@ public:
                         {
                             DoCast(target, SPELL_IMMOLATE);
                         }
-                        events.RepeatEvent(urand(15000, 25000));
+                        events.RepeatEvent(urand(5000, 7000));
                         break;
                     }
                 }
