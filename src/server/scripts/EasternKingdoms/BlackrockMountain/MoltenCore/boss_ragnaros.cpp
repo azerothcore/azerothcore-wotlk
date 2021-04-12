@@ -40,7 +40,7 @@ enum Spells
     SPELL_RAGSUBMERGE           = 21107,                   // Stealth aura
     SPELL_RAGEMERGE             = 20568,
     SPELL_MELT_WEAPON           = 21388,
-    SPELL_ELEMENTAL_FIRE        = 20564,
+    SPELL_ELEMENTAL_FIRE        = 20563,
     SPELL_ERRUPTION             = 17731,
 };
 
@@ -50,7 +50,6 @@ enum Events
     EVENT_WRATH_OF_RAGNAROS,
     EVENT_HAND_OF_RAGNAROS,
     EVENT_LAVA_BURST,
-    EVENT_ELEMENTAL_FIRE,
     EVENT_MAGMA_BLAST,
     EVENT_SUBMERGE,
 
@@ -64,6 +63,11 @@ enum Events
 enum Creatures
 {
     NPC_SON_OF_FLAME            = 12143,
+};
+
+enum Misc
+{
+    MAX_SON_OF_FLAME_COUNT      = 8,
 };
 
 constexpr float DEATH_ORIENTATION = 4.0f;
@@ -96,6 +100,7 @@ public:
             _hasSubmergedOnce = false;
             _isBanished = false;
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+            DoCastSelf(SPELL_ELEMENTAL_FIRE, true);
         }
 
         void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
@@ -110,7 +115,6 @@ public:
             events.ScheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30000);
             events.ScheduleEvent(EVENT_HAND_OF_RAGNAROS, 25000);
             events.ScheduleEvent(EVENT_LAVA_BURST, 10000);
-            events.ScheduleEvent(EVENT_ELEMENTAL_FIRE, 3000);
             events.ScheduleEvent(EVENT_MAGMA_BLAST, 2000);
             events.ScheduleEvent(EVENT_SUBMERGE, 180000);
         }
@@ -262,12 +266,6 @@ public:
                             events.RepeatEvent(10000);
                             break;
                         }
-                        case EVENT_ELEMENTAL_FIRE:
-                        {
-                            DoCastVictim(SPELL_ELEMENTAL_FIRE);
-                            events.RepeatEvent(urand(10000, 14000));
-                            break;
-                        }
                         case EVENT_MAGMA_BLAST:
                         {
                             Unit* victim = me->GetVictim();
@@ -302,7 +300,7 @@ public:
                                     Talk(SAY_REINFORCEMENTS1);
 
                                     // summon 8 elementals
-                                    for (uint8 i = 0; i < 8; ++i)
+                                    for (uint8 i = 0; i < MAX_SON_OF_FLAME_COUNT; ++i)
                                     {
                                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                         {
@@ -321,7 +319,7 @@ public:
                                 {
                                     Talk(SAY_REINFORCEMENTS2);
 
-                                    for (uint8 i = 0; i < 8; ++i)
+                                    for (uint8 i = 0; i < MAX_SON_OF_FLAME_COUNT; ++i)
                                     {
                                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
                                         {
