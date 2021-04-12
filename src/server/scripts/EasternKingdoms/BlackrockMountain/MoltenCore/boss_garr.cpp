@@ -18,6 +18,11 @@ EndScriptData */
 #include "ObjectAccessor.h"
 #include "SpellInfo.h"
 
+enum Texts
+{
+    EMOTE_MASS_ERRUPTION        = 0,
+};
+
 enum Spells
 {
     // Garr
@@ -55,14 +60,14 @@ public:
     struct boss_garrAI : public BossAI
     {
         boss_garrAI(Creature* creature) : BossAI(creature, DATA_GARR),
-            massExplodeTimer(600000)
+            massEruptionTimer(600000)
         {
         }
 
         void Reset() override
         {
             _Reset();
-            massExplodeTimer = 600000;
+            massEruptionTimer = 600000;
 
             std::list<Creature*> fireworns;
             me->GetCreatureListWithEntryInGrid(fireworns, NPC_FIREWORN, 240.0f);
@@ -100,7 +105,7 @@ public:
             _EnterCombat();
             events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 15000);
             events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 10000);
-            massExplodeTimer = 600000;
+            massEruptionTimer = 600000;
         }
 
         void UpdateAI(uint32 diff) override
@@ -110,17 +115,15 @@ public:
                 return;
             }
 
-            if (massExplodeTimer)
+            if (massEruptionTimer <= diff)
             {
-                if (massExplodeTimer <= diff)
-                {
-                    DoCastAOE(SPELL_ERUPTION_TRIGGER, true);
-                    massExplodeTimer = 20000;
-                }
-                else
-                {
-                    massExplodeTimer -= diff;
-                }
+                Talk(EMOTE_MASS_ERRUPTION, me);
+                DoCastAOE(SPELL_ERUPTION_TRIGGER, true);
+                massEruptionTimer = 20000;
+            }
+            else
+            {
+                massEruptionTimer -= diff;
             }
 
             events.Update(diff);
@@ -158,7 +161,7 @@ public:
         }
 
     private:
-        uint32 massExplodeTimer;
+        uint32 massEruptionTimer;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
