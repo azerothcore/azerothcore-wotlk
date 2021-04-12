@@ -22,11 +22,11 @@ enum Spells
 enum Events
 {
     EVENT_ARCANE_EXPLOSION              = 1,
-    EVENT_ARCANE_EXPLOSION_TRIGGERED    = 2,
-    EVENT_SHAZZRAH_CURSE                = 3,
-    EVENT_MAGIC_GROUNDING               = 4,
-    EVENT_COUNTERSPELL                  = 5,
-    EVENT_SHAZZRAH_GATE                 = 6,
+    EVENT_ARCANE_EXPLOSION_TRIGGERED,
+    EVENT_SHAZZRAH_CURSE,
+    EVENT_MAGIC_GROUNDING,
+    EVENT_COUNTERSPELL,
+    EVENT_SHAZZRAH_GATE,
 };
 
 class boss_shazzrah : public CreatureScript
