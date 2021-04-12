@@ -21,17 +21,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-#define CHARTER_DISPLAY_ID 16161
-
-// Charters ID in item_template
-enum CharterItemIDs
-{
-    GUILD_CHARTER                                 = 5863,
-    ARENA_TEAM_CHARTER_2v2                        = 23560,
-    ARENA_TEAM_CHARTER_3v3                        = 23561,
-    ARENA_TEAM_CHARTER_5v5                        = 23562
-};
-
 void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
