@@ -154,7 +154,9 @@ public:
 
     struct npc_magmadar_core_houndAI : public CreatureAI
     {
-        npc_magmadar_core_houndAI(Creature* creature) : CreatureAI(creature)
+        npc_magmadar_core_houndAI(Creature* creature) : CreatureAI(creature),
+            killerGUID(0),
+            smoldering(false)
         {
         }
 
