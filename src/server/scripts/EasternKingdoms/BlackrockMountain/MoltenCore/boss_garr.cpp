@@ -16,6 +16,7 @@ EndScriptData */
 #include "molten_core.h"
 #include "Containers.h"
 #include "ObjectAccessor.h"
+#include "SpellInfo.h"
 
 enum Spells
 {
