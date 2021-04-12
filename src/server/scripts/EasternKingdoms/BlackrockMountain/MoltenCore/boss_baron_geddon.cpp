@@ -56,9 +56,9 @@ public:
         void EnterCombat(Unit* /*attacker*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_INFERNO, 45000);
-            events.ScheduleEvent(EVENT_IGNITE_MANA, 30000);
-            events.ScheduleEvent(EVENT_LIVING_BOMB, 35000);
+            events.ScheduleEvent(EVENT_INFERNO, urand(13000, 15000));
+            events.ScheduleEvent(EVENT_IGNITE_MANA, urand(7000, 19000));
+            events.ScheduleEvent(EVENT_LIVING_BOMB, urand(11000, 16000));
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
@@ -67,7 +67,7 @@ public:
             if (!armageddonCasted && damage < me->GetHealth() && me->HealthBelowPctDamaged(2, damage))
             {
                 me->InterruptNonMeleeSpells(true);
-                DoCast(me, SPELL_ARMAGEDDON);
+                DoCastSelf(SPELL_ARMAGEDDON);
                 Talk(EMOTE_SERVICE);
                 armageddonCasted = true;
             }
@@ -94,7 +94,7 @@ public:
                     case EVENT_INFERNO:
                     {
                         DoCastSelf(SPELL_INFERNO);
-                        events.RepeatEvent(45000);
+                        events.RepeatEvent(urand(21000, 26000));
                         break;
                     }
                     case EVENT_IGNITE_MANA:
@@ -104,7 +104,7 @@ public:
                             DoCast(target, SPELL_IGNITE_MANA);
                         }
 
-                        events.RepeatEvent(30000);
+                        events.RepeatEvent(urand(27000, 32000));
                         break;
                     }
                     case EVENT_LIVING_BOMB:
@@ -114,7 +114,7 @@ public:
                             DoCast(target, SPELL_LIVING_BOMB);
                         }
 
-                        events.RepeatEvent(35000);
+                        events.RepeatEvent(urand(11000, 16000));
                         break;
                     }
                 }
