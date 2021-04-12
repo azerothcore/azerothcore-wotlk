@@ -70,6 +70,11 @@ public:
                     _majordomoExecutusGUID = creature->GetGUID();
                     break;
                 }
+                case NPC_GARR:
+                {
+                    _garrGUID = creature->GetGUID();
+                    break;
+                }
             }
         }
 
@@ -154,6 +159,8 @@ public:
                     return _golemaggTheIncineratorGUID;
                 case BOSS_MAJORDOMO_EXECUTUS:
                     return _majordomoExecutusGUID;
+                case BOSS_GARR:
+                    return _garrGUID;
             }
 
             return 0;
@@ -286,6 +293,7 @@ public:
         uint64 _golemaggTheIncineratorGUID;
         uint64 _majordomoExecutusGUID;
         uint64 _cacheOfTheFirelordGUID;
+        uint64 _garrGUID;
         uint8 _ragnarosAddDeaths;
         bool canSaveBossState;
     };

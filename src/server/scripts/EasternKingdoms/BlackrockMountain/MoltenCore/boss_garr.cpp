@@ -14,23 +14,34 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "molten_core.h"
+#include "Containers.h"
+#include "ObjectAccessor.h"
 
 enum Spells
 {
     // Garr
-    SPELL_ANTIMAGIC_PULSE   = 19492,
-    SPELL_MAGMA_SHACKLES    = 19496,
-    SPELL_ENRAGE            = 19516,
+    SPELL_ANTIMAGIC_PULSE       = 19492,
+    SPELL_MAGMA_SHACKLES        = 19496,
+    SPELL_ENRAGE                = 19516,
 
-    // Adds
-    SPELL_ERUPTION          = 19497,
-    SPELL_IMMOLATE          = 20294,
+    // Fireworn
+    SPELL_THRASH                = 8876,
+    SPELL_IMMOLATE              = 15733,
+    SPELL_SEPARATION_ANXIETY    = 23492,
+    SPELL_ERUPTION              = 19497,
+    SPELL_MASSIVE_ERUPTION      = 20483,
+    SPELL_ERUPTION_TRIGGER      = 20482,    // Removes banish auras and applied immunity to banish
 };
 
 enum Events
 {
     EVENT_ANTIMAGIC_PULSE    = 1,
-    EVENT_MAGMA_SHACKLES     = 2,
+    EVENT_MAGMA_SHACKLES,
+};
+
+enum Creatures
+{
+    NPC_FIREWORN            = 12099,
 };
 
 class boss_garr : public CreatureScript
@@ -40,8 +51,45 @@ public:
 
     struct boss_garrAI : public BossAI
     {
-        boss_garrAI(Creature* creature) : BossAI(creature, BOSS_GARR)
+        boss_garrAI(Creature* creature) : BossAI(creature, BOSS_GARR),
+            massExplodeTimer(600000)
         {
+        }
+
+        void Reset() override
+        {
+            _Reset();
+            massExplodeTimer = 600000;
+
+            std::list<Creature*> fireworns;
+            me->GetCreatureListWithEntryInGrid(fireworns, NPC_FIREWORN, 240.0f);
+            if (!fireworns.empty())
+            {
+                for (Creature* fireworn : fireworns)
+                {
+                    if (fireworn && fireworn->isDead())
+                    {
+                        fireworn->Respawn(true);
+                    }
+                }
+            }
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            _JustDied();
+            std::list<Creature*> fireworns;
+            me->GetCreatureListWithEntryInGrid(fireworns, NPC_FIREWORN, 240.0f);
+            if (!fireworns.empty())
+            {
+                for (Creature* fireworn : fireworns)
+                {
+                    if (fireworn)
+                    {
+                        fireworn->DespawnOrUnsummon();
+                    }
+                }
+            }
         }
 
         void EnterCombat(Unit* /*attacker*/) override
@@ -49,6 +97,7 @@ public:
             _EnterCombat();
             events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 15000);
             events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 10000);
+            massExplodeTimer = 600000;
         }
 
         void UpdateAI(uint32 diff) override
@@ -56,6 +105,19 @@ public:
             if (!UpdateVictim())
             {
                 return;
+            }
+
+            if (massExplodeTimer)
+            {
+                if (massExplodeTimer <= diff)
+                {
+                    DoCastAOE(SPELL_ERUPTION_TRIGGER, true);
+                    massExplodeTimer = 20000;
+                }
+                else
+                {
+                    massExplodeTimer -= diff;
+                }
             }
 
             events.Update(diff);
@@ -91,6 +153,9 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        uint32 massExplodeTimer;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -102,27 +167,40 @@ public:
 class npc_firesworn : public CreatureScript
 {
 public:
-    npc_firesworn() : CreatureScript("npc_firesworn") { }
+    npc_firesworn() : CreatureScript("npc_firesworn")
+    {
+    }
 
     struct npc_fireswornAI : public ScriptedAI
     {
         npc_fireswornAI(Creature* creature) : ScriptedAI(creature),
-            immolateTimer(4000)
+            instance(creature->GetInstanceScript()),
+            aniexityTimer(10000),
+            canErrupt(true)
         {
         }
 
-        void Reset() override
+        void EnterCombat(Unit* /*attacker*/) override
         {
-            immolateTimer = 4000;   // These times are probably wrong
+            DoCastSelf(SPELL_THRASH);
+            DoCastSelf(SPELL_IMMOLATE);
         }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
         {
-            if (me->HealthBelowPctDamaged(10, damage))
+            if (canErrupt && damage >= me->GetHealth() && attacker->GetGUID() != me->GetGUID())
             {
-                damage = 0;
-                DoCastVictim(SPELL_ERUPTION);
-                me->DespawnOrUnsummon();
+                DoCastAOE(SPELL_ERUPTION, true);
+                Unit::Kill(attacker, me);
+            }
+        }
+
+        void SpellHit(Unit* /*caster*/, SpellInfo const* pSpell) override
+        {
+            if (pSpell->Id == SPELL_ERUPTION_TRIGGER)
+            {
+                canErrupt = false;
+                DoCastAOE(SPELL_MASSIVE_ERUPTION);
             }
         }
 
@@ -133,23 +211,32 @@ public:
                 return;
             }
 
-            if (immolateTimer <= diff)
+            if (aniexityTimer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_IMMOLATE);
+                if (!me->HasAura(SPELL_SEPARATION_ANXIETY))
+                {
+                    if (Creature const* garr = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_GARR)))
+                    {
+                        if (me->GetDistance2d(garr) > 45.0f)
+                        {
+                            DoCastSelf(SPELL_SEPARATION_ANXIETY);
+                        }
+                    }
+                }
 
-                immolateTimer = urand(5000, 10000);
+                aniexityTimer = 250;
             }
             else
             {
-                immolateTimer -= diff;
+                aniexityTimer -= diff;
             }
 
             DoMeleeAttackIfReady();
         }
-
     private:
-        uint32 immolateTimer;
+        InstanceScript const* instance;
+        uint32 aniexityTimer;
+        bool canErrupt;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
