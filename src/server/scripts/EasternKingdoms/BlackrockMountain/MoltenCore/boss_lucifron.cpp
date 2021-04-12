@@ -43,9 +43,9 @@ public:
         void EnterCombat(Unit* /*attacker*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_IMPENDING_DOOM, 10000);
-            events.ScheduleEvent(EVENT_LUCIFRON_CURSE, 20000);
-            events.ScheduleEvent(EVENT_SHADOW_SHOCK, 6000);
+            events.ScheduleEvent(EVENT_IMPENDING_DOOM, urand(6000, 11000));
+            events.ScheduleEvent(EVENT_LUCIFRON_CURSE, urand(11000, 14000));
+            events.ScheduleEvent(EVENT_SHADOW_SHOCK, 5000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -75,13 +75,13 @@ public:
                     case EVENT_LUCIFRON_CURSE:
                     {
                         DoCastVictim(SPELL_LUCIFRON_CURSE);
-                        events.RepeatEvent(15000);
+                        events.RepeatEvent(20000);
                         break;
                     }
                     case EVENT_SHADOW_SHOCK:
                     {
                         DoCastVictim(SPELL_SHADOW_SHOCK);
-                        events.RepeatEvent(6000);
+                        events.RepeatEvent(5000);
                         break;
                     }
                 }
