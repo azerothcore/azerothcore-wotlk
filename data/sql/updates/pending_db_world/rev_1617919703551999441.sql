@@ -5,11 +5,10 @@ DELETE FROM `creature_template_spell` WHERE (`CreatureID` = @ENTRY);
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES
 (@ENTRY, 0, 18376, 0),
 (@ENTRY, 1, 12020, 12340),
-(@ENTRY, 2, 18116, 12340),
-(@ENTRY, 3, 8362, 0),
-(@ENTRY, 4, 27608, 0),
-(@ENTRY, 5, 22167, 0),
-(@ENTRY, 6, 6146, 0);
+(@ENTRY, 2, 8362, 0),
+(@ENTRY, 3, 17843, 0),
+(@ENTRY, 4, 15586, 0),
+(@ENTRY, 5, 13747, 0);
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = @ENTRY;
 
@@ -18,9 +17,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY, 0, 0, 0, 0, 0, 100, 0, 7000, 15000, 60000, 60000, 0, 11, 12020, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - In Combat - Cast \'Call of the Grave\''),
 (@ENTRY, 0, 1, 0, 0, 0, 100, 0, 3000, 12000, 17000, 22000, 0, 11, 18376, 32, 0, 0, 0, 0, 5, 30, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - In Combat - Cast \'Corruption\''),
 (@ENTRY, 0, 2, 0, 14, 0, 100, 0, 5000, 40, 10000, 10000, 0, 11, 8362, 32, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - Friendly At 5000 Health - Cast \'Renew\''),
-(@ENTRY, 0, 3, 0, 14, 0, 100, 0, 5000, 40, 8000, 8000, 0, 11, 27608, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - Friendly At 5000 Health - Cast \'Flash Heal\''),
-(@ENTRY, 0, 4, 0, 2, 0, 100, 0, 0, 40, 18000, 25000, 0, 11, 22167, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - Between 0-40% Health - Cast \'Heal\''),
-(@ENTRY, 0, 5, 6, 0, 0, 100, 0, 13000, 15000, 20000, 35000, 0, 11, 6146, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - In Combat - Cast \'Slow\''),
-(@ENTRY, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 11, 6146, 32, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - In Combat - Cast \'Slow\''),
-(@ENTRY, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 11, 6146, 32, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - In Combat - Cast \'Slow\''),
-(@ENTRY, 0, 8, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 34, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - On Just Died - Set Instance Data 1 to 1');
+(@ENTRY, 0, 3, 0, 14, 0, 100, 0, 5000, 40, 8000, 8000, 0, 11, 17843, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - Friendly At 5000 Health - Cast \'Flash Heal\''),
+(@ENTRY, 0, 4, 0, 2, 0, 100, 0, 0, 40, 18000, 25000, 0, 11, 15586, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - Between 0-40% Health - Cast \'Heal\''),
+(@ENTRY, 0, 5, 0, 0, 0, 100, 0, 13000, 15000, 20000, 35000, 0, 11, 13747, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - In Combat - Cast \'Slow\''),
+(@ENTRY, 0, 6, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 34, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Instructor Malicia - On Just Died - Set Instance Data 1 to 1');
