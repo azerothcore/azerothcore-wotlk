@@ -56,7 +56,7 @@ uint32 DatabaseWorkerPool<T>::Open()
             GetDatabaseName(), (_connectionCount[IDX_SYNCH] + _connectionCount[IDX_ASYNC]));
     }
 
-    LOG_INFO("sql.driver", "");
+    LOG_INFO("sql.driver", " ");
 
     return error;
 }
