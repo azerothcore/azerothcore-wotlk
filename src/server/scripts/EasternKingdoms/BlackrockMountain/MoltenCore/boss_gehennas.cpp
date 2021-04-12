@@ -44,9 +44,9 @@ public:
         void EnterCombat(Unit* /*attacker*/) override
         {
             _EnterCombat();
-            events.ScheduleEvent(EVENT_GEHENNAS_CURSE, 12000);
+            events.ScheduleEvent(EVENT_GEHENNAS_CURSE, urand(6000, 9000));
             events.ScheduleEvent(EVENT_RAIN_OF_FIRE, 10000);
-            events.ScheduleEvent(EVENT_SHADOW_BOLT, 6000);
+            events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 5000));
         }
 
         void UpdateAI(uint32 diff) override
@@ -70,7 +70,7 @@ public:
                     case EVENT_GEHENNAS_CURSE:
                     {
                         DoCastVictim(SPELL_GEHENNAS_CURSE);
-                        events.RepeatEvent(urand(22000, 30000));
+                        events.RepeatEvent(urand(25000, 30000));
                         break;
                     }
                     case EVENT_RAIN_OF_FIRE:
@@ -79,7 +79,7 @@ public:
                         {
                             DoCast(target, SPELL_RAIN_OF_FIRE);
                         }
-                        events.RepeatEvent(urand(4000, 12000));
+                        events.RepeatEvent(6000);
                         break;
                     }
                     case EVENT_SHADOW_BOLT:
@@ -100,7 +100,7 @@ public:
                             DoCastVictim(SPELL_SHADOW_BOLT_VICTIM);
                         }
 
-                        events.RepeatEvent(7000);
+                        events.RepeatEvent(5000);
                         break;
                     }
                 }
