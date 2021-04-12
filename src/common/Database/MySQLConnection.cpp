@@ -68,7 +68,7 @@ uint32 MySQLConnection::Open()
     MYSQL* mysqlInit = mysql_init(nullptr);
     if (!mysqlInit)
     {
-        LOG_ERROR("server", "Could not initialize Mysql connection to database `%s`", m_connectionInfo.database.c_str());
+        LOG_ERROR("sql.sql", "Could not initialize Mysql connection to database `%s`", m_connectionInfo.database.c_str());
         return false;
     }
 
@@ -121,18 +121,17 @@ uint32 MySQLConnection::Open()
     {
         if (!m_reconnecting)
         {
-            sLog->outSQLDriver("MySQL client library: %s", mysql_get_client_info());
-            sLog->outSQLDriver("MySQL server ver: %s ", mysql_get_server_info(m_Mysql));
+            LOG_INFO("sql.sql", "MySQL client library: %s", mysql_get_client_info());
+            LOG_INFO("sql.sql", "MySQL server ver: %s ", mysql_get_server_info(m_Mysql));
 
             if (mysql_get_server_version(m_Mysql) != mysql_get_client_version())
             {
-                sLog->outSQLDriver("[WARNING] MySQL client/server version mismatch; may conflict with behaviour of prepared statements.");
+                LOG_WARN("sql.sql", "[WARNING] MySQL client/server version mismatch; may conflict with behaviour of prepared statements.");
             }
         }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDetail("Connected to MySQL database at %s", m_connectionInfo.host.c_str());
-#endif
+        LOG_INFO("sql.sql", "Connected to MySQL database at %s", m_connectionInfo.host.c_str());
+
         mysql_autocommit(m_Mysql, 1);
 
         // set connection properties to UTF8 to properly handle locales for different
@@ -141,7 +140,7 @@ uint32 MySQLConnection::Open()
         return 0;
     }
 
-    sLog->outError("Could not connect to MySQL database at %s: %s", m_connectionInfo.host.c_str(), mysql_error(mysqlInit));
+    LOG_ERROR("sql.sql", "Could not connect to MySQL database at %s: %s", m_connectionInfo.host.c_str(), mysql_error(mysqlInit));
     uint32 errorCode = mysql_errno(mysqlInit);
     mysql_close(mysqlInit);
     return errorCode;

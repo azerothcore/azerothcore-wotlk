@@ -38,8 +38,8 @@ uint32 DatabaseWorkerPool<T>::Open()
 {
     WPFatal(_connectionInfo.get(), "Connection info was not set!");
 
-    sLog->outSQLDriver("Opening DatabasePool '%s'. Asynchronous connections: %u, synchronous connections: %u.",
-                       GetDatabaseName(), _async_threads, _synch_threads);
+    LOG_INFO("sql.driver", "Opening DatabasePool '%s'. Asynchronous connections: %u, synchronous connections: %u.",
+        GetDatabaseName(), _async_threads, _synch_threads);
 
     uint32 error = OpenConnections(IDX_ASYNC, _async_threads);
 
@@ -52,9 +52,11 @@ uint32 DatabaseWorkerPool<T>::Open()
 
     if (!error)
     {
-        sLog->outSQLDriver("DatabasePool '%s' opened successfully. %u total connections running.",
-        GetDatabaseName(), (_connectionCount[IDX_SYNCH] + _connectionCount[IDX_ASYNC]));
+        LOG_INFO("sql.driver", "DatabasePool '%s' opened successfully. %u total connections running.",
+            GetDatabaseName(), (_connectionCount[IDX_SYNCH] + _connectionCount[IDX_ASYNC]));
     }
+
+    LOG_INFO("sql.driver", "");
 
     return error;
 }
@@ -79,7 +81,7 @@ void DatabaseWorkerPool<T>::Close()
     }
 
     LOG_INFO("sql.driver", "Asynchronous connections on DatabasePool '%s' terminated. Proceeding with synchronous connections.",
-                       GetDatabaseName());
+        GetDatabaseName());
 
     //! Shut down the synchronous connections
     //! There's no need for locking the connection, because DatabaseWorkerPool<>::Close
@@ -125,7 +127,7 @@ uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConne
         {
             if (mysql_get_server_version(t->GetHandle()) < MIN_MYSQL_SERVER_VERSION)
             {
-                sLog->outSQLDriver("Not support MySQL versions below 5.7");
+                LOG_ERROR("sql.driver", "Not support MySQL versions below 5.7");
                 error = 1;
             }
         }

@@ -384,8 +384,6 @@ bool Master::_StartDB()
 {
     MySQL::Library_Init();
 
-    sLog->SetLogDB(false);
-
     // Load databases
     DatabaseLoader loader;
     loader

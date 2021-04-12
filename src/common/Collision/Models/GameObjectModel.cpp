@@ -51,7 +51,7 @@ void LoadGameObjectModelList()
     char magic[8];
     if (fread(magic, 1, 8, model_list_file) != 8 || memcmp(magic, VMAP::VMAP_MAGIC, 8) != 0)
     {
-        sLog->outError("File '%s' has wrong header, expected %s.", VMAP::GAMEOBJECT_MODELS, VMAP::VMAP_MAGIC);
+        LOG_ERROR("maps", "File '%s' has wrong header, expected %s.", VMAP::GAMEOBJECT_MODELS, VMAP::VMAP_MAGIC);
         return;
     }
 
@@ -78,7 +78,7 @@ void LoadGameObjectModelList()
 
         if (v1.isNaN() || v2.isNaN())
         {
-            sLog->outError("File '%s' Model '%s' has invalid v1%s v2%s values!",
+            LOG_ERROR("maps", "File '%s' Model '%s' has invalid v1%s v2%s values!",
                 VMAP::GAMEOBJECT_MODELS, std::string(buff, name_length).c_str(), v1.toString().c_str(), v2.toString().c_str());
             continue;
         }
