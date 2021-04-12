@@ -46,7 +46,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
 
                 auto sleepThread = [&]()
                 {
-                    LOG_INFO("sql.driver", "> Retrying after %u seconds", durationSecs.count());
+                    LOG_INFO("sql.driver", "> Retrying after %u seconds", static_cast<uint32>(durationSecs.count()));
                     std::this_thread::sleep_for(durationSecs);
                 };
 
