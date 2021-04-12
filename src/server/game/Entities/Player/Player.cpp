@@ -19953,7 +19953,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
             || missingPlayerItems.size() || missingPlayerQuests.size() || missingPlayerAchievements.size()
             || missingLeaderItems.size() || missingLeaderQuests.size() || missingLeaderAchievements.size())
         {
-            if (!sScriptMgr->NotAvoidSatisfy(leader, ar, target_map, report))
+            if (!sScriptMgr->NotAvoidSatisfy(partyLeader, ar, target_map, report))
                 return true;
 
             if (report)
