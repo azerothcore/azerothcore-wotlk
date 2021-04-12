@@ -24,7 +24,7 @@ enum MCData
     MAX_ENCOUNTER                   = 10,
 
     // Other data
-    DATA_RAGNAROS_ADDS              = 0,
+    DATA_RAGNAROS_ADDS,
 };
 
 enum MCActions
