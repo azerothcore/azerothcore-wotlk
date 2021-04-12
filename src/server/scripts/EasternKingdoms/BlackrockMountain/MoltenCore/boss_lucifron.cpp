@@ -36,7 +36,7 @@ public:
 
     struct boss_lucifronAI : public BossAI
     {
-        boss_lucifronAI(Creature* creature) : BossAI(creature, BOSS_LUCIFRON)
+        boss_lucifronAI(Creature* creature) : BossAI(creature, DATA_LUCIFRON)
         {
         }
 

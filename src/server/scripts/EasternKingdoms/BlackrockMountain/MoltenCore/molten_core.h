@@ -11,16 +11,16 @@
 
 enum Encounters
 {
-    BOSS_LUCIFRON                   = 0,
-    BOSS_MAGMADAR                   = 1,
-    BOSS_GEHENNAS                   = 2,
-    BOSS_GARR                       = 3,
-    BOSS_SHAZZRAH                   = 4,
-    BOSS_BARON_GEDDON               = 5,
-    BOSS_SULFURON_HARBINGER         = 6,
-    BOSS_GOLEMAGG_THE_INCINERATOR   = 7,
-    BOSS_MAJORDOMO_EXECUTUS         = 8,
-    BOSS_RAGNAROS                   = 9,
+    DATA_LUCIFRON                   = 0,
+    DATA_MAGMADAR                   = 1,
+    DATA_GEHENNAS                   = 2,
+    DATA_GARR                       = 3,
+    DATA_SHAZZRAH                   = 4,
+    DATA_BARON_GEDDON               = 5,
+    DATA_SULFURON_HARBINGER         = 6,
+    DATA_GOLEMAGG_THE_INCINERATOR   = 7,
+    DATA_MAJORDOMO_EXECUTUS         = 8,
+    DATA_RAGNAROS                   = 9,
     MAX_ENCOUNTER                   = 10,
 };
 

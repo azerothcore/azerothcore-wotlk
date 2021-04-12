@@ -56,7 +56,7 @@ public:
 
     struct boss_garrAI : public BossAI
     {
-        boss_garrAI(Creature* creature) : BossAI(creature, BOSS_GARR),
+        boss_garrAI(Creature* creature) : BossAI(creature, DATA_GARR),
             massExplodeTimer(600000)
         {
         }
@@ -210,7 +210,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (Creature* garr = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_GARR)))
+            if (Creature* garr = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GARR)))
             {
                 garr->AI()->DoAction(ACTION_ENRAGE);
             }
@@ -236,7 +236,7 @@ public:
             {
                 if (!me->HasAura(SPELL_SEPARATION_ANXIETY))
                 {
-                    if (Creature const* garr = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_GARR)))
+                    if (Creature const* garr = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GARR)))
                     {
                         if (me->GetDistance2d(garr) > 45.0f)
                         {

@@ -57,7 +57,7 @@ public:
 
     struct boss_magmadarAI : public BossAI
     {
-        boss_magmadarAI(Creature* creature) : BossAI(creature, BOSS_MAGMADAR)
+        boss_magmadarAI(Creature* creature) : BossAI(creature, DATA_MAGMADAR)
         {
         }
 

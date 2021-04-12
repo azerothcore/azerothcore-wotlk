@@ -155,11 +155,11 @@ public:
         {
             switch (type)
             {
-                case BOSS_GOLEMAGG_THE_INCINERATOR:
+                case DATA_GOLEMAGG_THE_INCINERATOR:
                     return _golemaggTheIncineratorGUID;
-                case BOSS_MAJORDOMO_EXECUTUS:
+                case DATA_MAJORDOMO_EXECUTUS:
                     return _majordomoExecutusGUID;
-                case BOSS_GARR:
+                case DATA_GARR:
                     return _garrGUID;
             }
 
@@ -173,12 +173,12 @@ public:
                 return false;
             }
 
-            if (state == DONE && bossId < BOSS_MAJORDOMO_EXECUTUS && CheckMajordomoExecutus())
+            if (state == DONE && bossId < DATA_MAJORDOMO_EXECUTUS && CheckMajordomoExecutus())
             {
                 SummonMajordomoExecutus();
             }
 
-            if (bossId == BOSS_MAJORDOMO_EXECUTUS && state == DONE)
+            if (bossId == DATA_MAJORDOMO_EXECUTUS && state == DONE)
             {
                 DoRespawnGameObject(_cacheOfTheFirelordGUID, 7 * DAY);
             }
@@ -197,7 +197,7 @@ public:
                 return;
             }
 
-            if (GetBossState(BOSS_MAJORDOMO_EXECUTUS) != DONE)
+            if (GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
                 instance->SummonCreature(NPC_MAJORDOMO_EXECUTUS, SummonPositions[0]);
                 instance->SummonCreature(NPC_FLAMEWAKER_HEALER, SummonPositions[1]);
@@ -217,12 +217,12 @@ public:
 
         bool CheckMajordomoExecutus() const
         {
-            if (GetBossState(BOSS_RAGNAROS) == DONE)
+            if (GetBossState(DATA_RAGNAROS) == DONE)
             {
                 return false;
             }
 
-            for (uint8 i = 0; i < BOSS_MAJORDOMO_EXECUTUS; ++i)
+            for (uint8 i = 0; i < DATA_MAJORDOMO_EXECUTUS; ++i)
             {
                 if (GetBossState(i) != DONE)
                 {

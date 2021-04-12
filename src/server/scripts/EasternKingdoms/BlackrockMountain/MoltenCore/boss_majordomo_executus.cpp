@@ -64,7 +64,7 @@ public:
 
     struct boss_majordomoAI : public BossAI
     {
-        boss_majordomoAI(Creature* creature) : BossAI(creature, BOSS_MAJORDOMO_EXECUTUS)
+        boss_majordomoAI(Creature* creature) : BossAI(creature, DATA_MAJORDOMO_EXECUTUS)
         {
         }
 
@@ -91,7 +91,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (instance->GetBossState(BOSS_MAJORDOMO_EXECUTUS) != DONE)
+            if (instance->GetBossState(DATA_MAJORDOMO_EXECUTUS) != DONE)
             {
                 if (!UpdateVictim())
                 {

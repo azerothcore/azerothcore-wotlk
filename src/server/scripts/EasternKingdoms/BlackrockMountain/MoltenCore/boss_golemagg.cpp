@@ -47,7 +47,7 @@ public:
 
     struct boss_golemaggAI : public BossAI
     {
-        boss_golemaggAI(Creature* creature) : BossAI(creature, BOSS_GOLEMAGG_THE_INCINERATOR)
+        boss_golemaggAI(Creature* creature) : BossAI(creature, DATA_GOLEMAGG_THE_INCINERATOR)
         {
         }
 
@@ -160,7 +160,7 @@ public:
                 return;
             }
 
-            Creature const* pGolemagg = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_GOLEMAGG_THE_INCINERATOR));
+            Creature const* pGolemagg = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_GOLEMAGG_THE_INCINERATOR));
             if (pGolemagg && pGolemagg->IsAlive())
             {
                 damage = 0;

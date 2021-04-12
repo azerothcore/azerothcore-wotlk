@@ -51,7 +51,7 @@ public:
 
     struct boss_sulfuronAI : public BossAI
     {
-        boss_sulfuronAI(Creature* creature) : BossAI(creature, BOSS_SULFURON_HARBINGER)
+        boss_sulfuronAI(Creature* creature) : BossAI(creature, DATA_SULFURON_HARBINGER)
         {
         }
 

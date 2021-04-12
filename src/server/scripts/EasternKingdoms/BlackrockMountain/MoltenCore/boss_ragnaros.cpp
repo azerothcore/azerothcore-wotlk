@@ -70,7 +70,7 @@ public:
 
     struct boss_ragnarosAI : public BossAI
     {
-        boss_ragnarosAI(Creature* creature) : BossAI(creature, BOSS_RAGNAROS),
+        boss_ragnarosAI(Creature* creature) : BossAI(creature, DATA_RAGNAROS),
             _emergeTimer(90000),
             _introState(0),
             _hasYelledMagmaBurst(false),
@@ -164,7 +164,7 @@ public:
                         case EVENT_INTRO_4:
                         {
                             Talk(SAY_ARRIVAL5_RAG);
-                            if (Creature* executus = ObjectAccessor::GetCreature(*me, instance->GetData64(BOSS_MAJORDOMO_EXECUTUS)))
+                            if (Creature* executus = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MAJORDOMO_EXECUTUS)))
                             {
                                 Unit::Kill(me, executus);
                             }
