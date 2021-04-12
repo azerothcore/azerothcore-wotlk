@@ -9,7 +9,7 @@
 
 #define MCScriptName "instance_molten_core"
 
-enum Encounters
+enum MCData
 {
     DATA_LUCIFRON                   = 0,
     DATA_MAGMADAR                   = 1,
@@ -22,18 +22,21 @@ enum Encounters
     DATA_MAJORDOMO_EXECUTUS         = 8,
     DATA_RAGNAROS                   = 9,
     MAX_ENCOUNTER                   = 10,
+
+    // Other data
+    DATA_RAGNAROS_ADDS              = 0,
 };
 
-enum Actions
+enum MCActions
 {
-    ACTION_START_RAGNAROS       = 0,
-    ACTION_START_RAGNAROS_ALT   = 1,
+    ACTION_START_RAGNAROS           = -1,
+    ACTION_START_RAGNAROS_ALT       = -2,
 };
 
 Position const RagnarosTelePos   = {829.159f, -815.773f, -228.972f, 5.30500f};
 Position const RagnarosSummonPos = {838.510f, -829.840f, -232.000f, 2.00000f};
 
-enum Creatures
+enum MCCreatures
 {
     NPC_LUCIFRON                    = 12118,
     NPC_MAGMADAR                    = 11982,
@@ -51,7 +54,7 @@ enum Creatures
     NPC_CORE_HOUND                  = 11671,
 };
 
-enum GameObjects
+enum MCGameObjects
 {
     GO_CACHE_OF_THE_FIRELORD        = 179703,
     GO_CIRCLE_SULFURON              = 178187,
@@ -61,11 +64,6 @@ enum GameObjects
     GO_CIRCLE_GARR                  = 178191,
     GO_CIRCLE_MAGMADAR              = 178192,
     GO_CIRCLE_GEHENNAS              = 178193,
-};
-
-enum Data
-{
-    DATA_RAGNAROS_ADDS  = 0,
 };
 
 template <class AI, class T>
