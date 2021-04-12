@@ -233,7 +233,7 @@ void check_args(std::string const&, ...);
 
 // Warning - 3
 #define LOG_WARN(filterType__, ...)  \
-    LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_WARNING, __VA_ARGS__)
+    LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_WARN, __VA_ARGS__)
 
 // Info - 4
 #define LOG_INFO(filterType__, ...)  \
