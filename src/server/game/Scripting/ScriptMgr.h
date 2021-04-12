@@ -64,6 +64,7 @@ struct AchievementCriteriaData;
 struct AuctionEntry;
 struct ConditionSourceInfo;
 struct Condition;
+struct DungeonProgressionRequirements;
 struct ItemTemplate;
 struct OutdoorPvPData;
 struct GroupQueueInfo;
@@ -1053,7 +1054,7 @@ public:
 
     [[nodiscard]] virtual bool CheckItemInSlotAtLoadInventory(Player* /*player*/, Item* /*item*/, uint8 /*slot*/, uint8& /*err*/, uint16& /*dest*/) { return true; }
 
-    [[nodiscard]] virtual bool NotAvoidSatisfy(Player* /*player*/, AccessRequirement const* /*ar*/, uint32 /*target_map*/, bool /*report*/) { return true; }
+    [[nodiscard]] virtual bool NotAvoidSatisfy(Player* /*player*/, DungeonProgressionRequirements const* /*ar*/, uint32 /*target_map*/, bool /*report*/) { return true; }
 
     [[nodiscard]] virtual bool NotVisibleGloballyFor(Player* /*player*/, Player const* /*u*/) { return true; }
 
@@ -1718,7 +1719,7 @@ public: /* PlayerScript */
     void OnGetQuestRate(Player* player, float& result);
     bool PassedQuestKilledMonsterCredit(Player* player, Quest const* qinfo, uint32 entry, uint32 real_entry, uint64 guid);
     bool CheckItemInSlotAtLoadInventory(Player* player, Item* item, uint8 slot, uint8& err, uint16& dest);
-    bool NotAvoidSatisfy(Player* player, AccessRequirement const* ar, uint32 target_map, bool report);
+    bool NotAvoidSatisfy(Player* player, DungeonProgressionRequirements const* ar, uint32 target_map, bool report);
     bool NotVisibleGloballyFor(Player* player, Player const* u);
     void OnGetArenaPersonalRating(Player* player, uint8 slot, uint32& result);
     void OnGetArenaTeamId(Player* player, uint8 slot, uint32& result);
