@@ -2,9 +2,9 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "pit_of_saron.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "Vehicle.h"
 
 enum Texts
@@ -146,7 +146,7 @@ public:
                     if (me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FORCEFUL_SMASH, false);
-                        
+
                         events.RescheduleEvent(EVENT_SPELL_UNHOLY_POWER, 1000);
                         break;
                     }
@@ -156,7 +156,7 @@ public:
                     Talk(SAY_SMASH);
                     Talk(EMOTE_SMASH);
                     me->CastSpell(me, SPELL_UNHOLY_POWER, false);
-                    
+
                     events.ScheduleEvent(EVENT_SPELL_FORCEFUL_SMASH, urand(40000, 48000));
                     break;
                 case EVENT_SPELL_OVERLORDS_BRAND:
@@ -222,7 +222,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_tyrannusAI(creature);
+        return GetPitOfSaronAI<boss_tyrannusAI>(creature);
     }
 };
 

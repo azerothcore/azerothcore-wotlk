@@ -1,19 +1,19 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
+#include "CombatAI.h"
+#include "CreatureTextMgr.h"
+#include "Pet.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "Vehicle.h"
-#include "CombatAI.h"
-#include "Player.h"
-#include "Pet.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
-#include "CreatureTextMgr.h"
 #include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 enum qRedRocket
@@ -21,7 +21,6 @@ enum qRedRocket
     SPELL_TORPEDO_EXPLODE                       = 49290,
     SPELL_ALLIANCE_TORPEDO_KILL_CREDIT          = 49510,
     SPELL_HORDE_TORPEDO_KILL_CREDIT             = 49340,
-
 };
 
 class npc_riding_the_red_rocket : public CreatureScript
@@ -71,7 +70,6 @@ public:
         return new npc_riding_the_red_rocketAI(creature);
     }
 };
-
 
 // Theirs
 
@@ -304,7 +302,6 @@ public:
         }
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
-
 
         void UpdateAI(uint32 /*diff*/) override
         {

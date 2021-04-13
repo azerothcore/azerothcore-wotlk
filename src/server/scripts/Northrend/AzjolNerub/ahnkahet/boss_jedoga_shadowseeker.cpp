@@ -2,10 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "ahnkahet.h"
-
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Yells
 {
@@ -135,7 +134,6 @@ public:
                 me->SummonCreature(NPC_INITIATE, 366.861f, -721.702f, -16.1797f, 5.65409f);
                 me->SummonCreature(NPC_INITIATE, 362.343f, -718.019f, -16.1797f, 5.51665f);
                 me->SummonCreature(NPC_INITIATE, 358.906f, -714.357f, -16.1797f, 5.35957f);
-
             }
         }
 
@@ -393,7 +391,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_jedoga_shadowseekerAI(creature);
+        return GetAhnkahetAI<boss_jedoga_shadowseekerAI>(creature);
     }
 };
 
@@ -523,7 +521,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_jedoga_initiandAI(creature);
+        return GetAhnkahetAI<npc_jedoga_initiandAI>(creature);
     }
 };
 

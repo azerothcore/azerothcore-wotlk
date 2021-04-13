@@ -2,16 +2,16 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SmartAI.h"
-#include "pit_of_saron.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
-#include "Player.h"
 #include "CreatureGroups.h"
 #include "MapManager.h"
+#include "PassiveAI.h"
+#include "pit_of_saron.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SmartAI.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 class npc_pos_leader : public CreatureScript
 {
@@ -88,7 +88,6 @@ public:
                         }
                         else
                         {
-                            
                             events.RescheduleEvent(2, 2500);
                         }
                     }
@@ -100,14 +99,14 @@ public:
                             c->setActive(true);
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_1);
                         }
-                    
+
                     events.RescheduleEvent(3, 7000);
                     break;
                 case 3:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_2);
-                    
+
                     events.RescheduleEvent(4, 14000);
                     break;
                 case 4:
@@ -148,19 +147,19 @@ public:
                                 }
                         }
                     }
-                    
+
                     events.RescheduleEvent(5, 1);
                     break;
                 case 5:
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_1 : SAY_SYLVANAS_INTRO_1);
-                    
+
                     events.RescheduleEvent(6, 1000);
                     break;
                 case 6:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_INTRO_3);
-                    
+
                     events.RescheduleEvent(7, 5000);
                     break;
                 case 7:
@@ -183,21 +182,20 @@ public:
                                 c->CastSpell(c, 69413, true);
                                 c->SetCanFly(true);
                                 c->SetDisableGravity(true);
-                                c->SetHover(true);
                                 c->SendMovementFlagUpdate();
                                 float dist = rand_norm() * 2.0f;
                                 float angle = rand_norm() * 2 * M_PI;
                                 c->GetMotionMaster()->MoveTakeoff(0, c->GetPositionX() + dist * cos(angle), c->GetPositionY() + dist * sin(angle), c->GetPositionZ() + 6.0f + (float)urand(0, 4), 1.5f + frand(0.0f, 1.5f));
                             }
                     }
-                    
+
                     events.RescheduleEvent(8, 7000);
                     break;
                 case 8:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_TYRANNUS_EVENT_GUID)))
                             c->CastSpell(c, 69753, false);
-                    
+
                     events.RescheduleEvent(9, 400);
                     break;
                 case 9:
@@ -211,12 +209,12 @@ public:
                                 c->RemoveAllAuras();
                                 c->GetMotionMaster()->MoveFall(0, true);
                             }
-                    
+
                     events.RescheduleEvent(10, 1000);
                     break;
                 case 10:
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_2 : SAY_SYLVANAS_INTRO_2);
-                    
+
                     events.RescheduleEvent(11, 1000);
                     break;
                 case 11:
@@ -228,11 +226,10 @@ public:
                                     continue;
                                 c->SetCanFly(false);
                                 c->SetDisableGravity(false);
-                                c->SetHover(false);
                                 c->SendMovementFlagUpdate();
                                 c->CastSpell(c, 69350, true);
                             }
-                    
+
                     events.RescheduleEvent(12, 2000);
                     break;
                 case 12:
@@ -253,7 +250,7 @@ public:
                                 c->SetReactState(REACT_PASSIVE);
                             }
                     }
-                    
+
                     events.RescheduleEvent(13, 3000);
                     break;
                 case 13:
@@ -273,7 +270,7 @@ public:
                                 c->SetHomePosition(me->GetPositionX() + dist * cos(angle), me->GetPositionY() + dist * sin(angle), me->GetPositionZ(), 0.0f);
                             }
                     }
-                    
+
                     events.RescheduleEvent(14, 2000);
                     break;
                 case 14:
@@ -292,7 +289,7 @@ public:
                                     c->CastSpell(c, 70513, false);
                         }
                     }
-                    
+
                     events.RescheduleEvent(15, 2000);
                     break;
                 case 15:
@@ -308,7 +305,7 @@ public:
                                     c->CastSpell(c, 70464, false);
                         }
                     }
-                    
+
                     events.RescheduleEvent(16, 3000);
                     break;
                 case 16:
@@ -333,13 +330,13 @@ public:
                             }
                         pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_FINISHED_INTRO);
                     }
-                    
+
                     events.RescheduleEvent(17, 5000);
                     break;
                 case 17:
                     me->setActive(false);
                     Talk(me->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_INTRO_5 : SAY_SYLVANAS_INTRO_4);
-                    
+
                     break;
             }
 
@@ -365,7 +362,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_leaderAI(creature);
+        return GetPitOfSaronAI<npc_pos_leaderAI>(creature);
     }
 };
 
@@ -480,7 +477,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_deathwhisper_necrolyteAI(creature);
+        return GetPitOfSaronAI<npc_pos_deathwhisper_necrolyteAI>(creature);
     }
 };
 
@@ -548,12 +545,12 @@ public:
                 case 2:
                     if (Creature* c = me->SummonCreature(NPC_TYRANNUS_VOICE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() - 10.0f, me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 1))
                         c->AI()->Talk(SAY_TYRANNUS_GARFROST);
-                    
+
                     events.RescheduleEvent(3, 4000);
                     break;
                 case 3:
                     Talk(SAY_GENERAL_GARFROST);
-                    
+
                     break;
             }
         }
@@ -561,7 +558,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_after_first_bossAI(creature);
+        return GetPitOfSaronAI<npc_pos_after_first_bossAI>(creature);
     }
 };
 
@@ -810,7 +807,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_tyrannus_eventsAI(creature);
+        return GetPitOfSaronAI<npc_pos_tyrannus_eventsAI>(creature);
     }
 };
 
@@ -847,7 +844,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_icicle_triggerAI(creature);
+        return GetPitOfSaronAI<npc_pos_icicle_triggerAI>(creature);
     }
 };
 
@@ -898,7 +895,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_collapsing_icicleAI(creature);
+        return GetPitOfSaronAI<npc_pos_collapsing_icicleAI>(creature);
     }
 };
 
@@ -1085,7 +1082,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_martin_or_gorkun_secondAI(creature);
+        return GetPitOfSaronAI<npc_pos_martin_or_gorkun_secondAI>(creature);
     }
 };
 
@@ -1126,7 +1123,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_freed_slaveAI(creature);
+        return GetPitOfSaronAI<npc_pos_freed_slaveAI>(creature);
     }
 };
 
@@ -1219,29 +1216,28 @@ public:
                         {
                             c->SetCanFly(true);
                             c->SetDisableGravity(true);
-                            c->SetHover(true);
                             c->GetMotionMaster()->MovePoint(0, TSSindragosaPos2);
                         }
-                    
+
                     break;
                 case 2:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MARTIN_OR_GORKUN_GUID)))
                             c->AI()->Talk(SAY_GENERAL_OUTRO_2);
-                    
+
                     events.RescheduleEvent(3, me->GetEntry() == NPC_JAINA_PART2 ? 7000 : 8000);
                     break;
                 case 3:
                     Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_OUTRO_1 : SAY_SYLVANAS_OUTRO_1);
                     me->CastSpell(me, me->GetEntry() == NPC_JAINA_PART2 ? SPELL_TELEPORT_JAINA_VISUAL : SPELL_TELEPORT_SYLVANAS_VISUAL, true);
-                    
+
                     events.RescheduleEvent(4, 2000);
                     break;
                 case 4:
                     me->CastSpell(me, me->GetEntry() == NPC_JAINA_PART2 ? SPELL_TELEPORT_JAINA : SPELL_TELEPORT_SYLVANAS, true);
                     if (GameObject* barrier = me->SummonGameObject(203005, 1055.49f, 115.03f, 628.15f, 2.08f, 0.0f, 0.0f, 0.0f, 0.0f, 86400, false))
                         barrierGUID = barrier->GetGUID();
-                    
+
                     events.RescheduleEvent(5, 1500);
                     break;
                 case 5:
@@ -1251,7 +1247,7 @@ public:
                             if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SINDRAGOSA_GUID)))
                                 c->CastSpell(x->GetPositionX(), x->GetPositionY(), x->GetPositionZ(), SPELL_SINDRAGOSA_FROST_BOMB_POS, true);
                         }
-                    
+
                     events.RescheduleEvent(6, 5000);
                     events.RescheduleEvent(10, 2000);
                     break;
@@ -1259,7 +1255,7 @@ public:
                     if (pInstance)
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SINDRAGOSA_GUID)))
                             c->GetMotionMaster()->MovePoint(0, TSSindragosaPos1);
-                    
+
                     events.RescheduleEvent(7, 4500);
                     break;
                 case 7:
@@ -1269,7 +1265,7 @@ public:
                     if (GameObject* barrier = pInstance->instance->GetGameObject(barrierGUID))
                         barrier->Delete();
                     barrierGUID = 0;
-                    
+
                     events.RescheduleEvent(8, 2000);
                     break;
                 case 8:
@@ -1278,7 +1274,7 @@ public:
                 case 10:
                     if (Creature* x = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MARTIN_OR_GORKUN_GUID)))
                         x->AI()->DoAction(3);
-                    
+
                     break;
             }
         }
@@ -1286,7 +1282,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_pos_leader_secondAI(creature);
+        return GetPitOfSaronAI<npc_pos_leader_secondAI>(creature);
     }
 };
 
@@ -1328,7 +1324,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_frostbite_invisible_stalkerAI(creature);
+        return GetPitOfSaronAI<npc_frostbite_invisible_stalkerAI>(creature);
     }
 };
 
@@ -1402,7 +1398,6 @@ public:
 
     class spell_pos_slave_trigger_closestSpellScript : public SpellScript
     {
-
         PrepareSpellScript(spell_pos_slave_trigger_closestSpellScript);
 
         void HandleDummy(SpellEffIndex /*effIndex*/)

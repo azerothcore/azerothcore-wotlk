@@ -15,27 +15,42 @@ jobs:
         os: [ubuntu-20.04]
         compiler: [clang]
         modules: [with, without]
+        extra_logs: [false]
         # we can include specific combinations here
         include:
           - os: ubuntu-20.04
+            compiler: clang11
+            modules: without
+            extra_logs: true
+          - os: ubuntu-20.04
+            compiler: clang11
+            modules: without
+            extra_logs: false
+          - os: ubuntu-20.04
             compiler: clang9
             modules: without
+            extra_logs: false
           - os: ubuntu-18.04
             compiler: clang # default in 18.04 is clang 6
             modules: without
+            extra_logs: false
           - os: ubuntu-18.04
-            compiler: gcc # default in 18.04 is gcc 7
+            compiler: gcc8
             modules: without
+            extra_logs: false
           - os: ubuntu-20.04
             compiler: gcc # default in 20.04 is gcc 9
             modules: without
+            extra_logs: false
           - os: ubuntu-20.04
             compiler: gcc10
             modules: without
+            extra_logs: false
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules-extra_logs-${{ matrix.extra_logs }}
     env:
       COMPILER: ${{ matrix.compiler }}
+      EXTRA_LOGS: ${{ matrix.extra_logs }}
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
@@ -51,9 +66,11 @@ jobs:
             ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
             ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
       - name: Configure OS
-        run: source ./apps/ci/ci-install.sh
+        run: source ./acore.sh install-deps
         env:
           CONTINUOUS_INTEGRATION: true
+      - name: Create conf/config.sh
+        run: source ./apps/ci/ci-conf.sh
       - name: Import db
         run: source ./apps/ci/ci-import-db.sh
       - name: Build
@@ -71,16 +88,17 @@ jobs:
       matrix:
         os:
           - macos-10.15
-          - macos-11.0
+ #         - macos-11.0
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    needs: [build]
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && success()
     steps:
       - uses: actions/checkout@v2
       - name: Cache
         uses: actions/cache@v1.1.2
         with:
-          path: /Users/runner/.ccache
+          path: ~/.ccache
           key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
             ccache:${{ matrix.os }}:${{ github.ref }}

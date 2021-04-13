@@ -1,15 +1,14 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
 * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 * Rescripted By Lee (Talamortis)
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "karazhan.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
-
 
 enum PrinceSay
 {
@@ -74,7 +73,6 @@ struct InfernalPoint
     { -10935.7f, -1996.0f }
 };*/
 
-
 //---------Infernal code first
 class netherspite_infernal : public CreatureScript
 {
@@ -99,7 +97,6 @@ public:
         void Reset() override { }
         void EnterCombat(Unit* /*who*/) override { }
         void MoveInLineOfSight(Unit* /*who*/) override { }
-
 
         void UpdateAI(uint32 diff) override
         {
@@ -151,7 +148,6 @@ public:
     };
 };
 
-
 class boss_malchezaar : public CreatureScript
 {
 public:
@@ -159,7 +155,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_malchezaarAI>(creature);
+        return GetKarazhanAI<boss_malchezaarAI>(creature);
     }
 
     struct boss_malchezaarAI : public ScriptedAI
@@ -199,7 +195,6 @@ public:
             clearweapons();
             positions.clear();
             instance->HandleGameObject(instance->GetData64(DATA_GO_NETHER_DOOR), true);
-
         }
 
         void clearweapons()
@@ -443,7 +438,6 @@ public:
 
             DoMeleeAttackIfReady();
         }
-
     };
 };
 
@@ -454,12 +448,11 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<prince_axesAI>(creature);
+        return GetKarazhanAI<prince_axesAI>(creature);
     }
 
     struct prince_axesAI : public ScriptedAI
     {
-
         prince_axesAI(Creature* creature) : ScriptedAI(creature)
         {
             Initialize();
@@ -468,7 +461,6 @@ public:
 
         uint32 AxesTargetSwitchTimer;
         InstanceScript* instance;
-
 
         void Initialize()
         {

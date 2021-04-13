@@ -5,11 +5,14 @@
 #ifndef DEF_SERPENT_SHRINE_H
 #define DEF_SERPENT_SHRINE_H
 
-#include "Player.h"
-#include "SpellScript.h"
 #include "CreatureAI.h"
-#include "SpellAuraEffects.h"
+#include "CreatureAIImpl.h"
 #include "GridNotifiers.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+
+#define SerpentShrineScriptName "instance_serpent_shrine"
 
 enum DataTypes
 {
@@ -27,8 +30,6 @@ enum DataTypes
     DATA_ALIVE_KEEPERS                      = 22,
     DATA_BRIDGE_ACTIVATED                   = 23,
     DATA_ACTIVATE_SHIELD                    = 24,
-
-
 };
 
 enum SSNPCs
@@ -67,5 +68,10 @@ enum SSSpells
     SPELL_FRENZY_WATER                      = 37026
 };
 
-#endif
+template <class AI, class T>
+inline AI* GetSerpentShrineAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, SerpentShrineScriptName);
+}
 
+#endif

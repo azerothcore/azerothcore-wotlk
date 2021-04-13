@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "ruby_sanctum.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ruby_sanctum.h"
+#include "ScriptMgr.h"
 
 enum Texts
 {
@@ -175,7 +175,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_general_zarithrianAI>(creature);
+        return GetRubySanctumAI<boss_general_zarithrianAI>(creature);
     }
 };
 
@@ -275,7 +275,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_onyx_flamecallerAI>(creature);
+        return GetRubySanctumAI<npc_onyx_flamecallerAI>(creature);
     }
 };
 

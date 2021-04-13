@@ -2,13 +2,13 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
+#include "icecrown_citadel.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
-#include "icecrown_citadel.h"
-#include "Player.h"
 
 enum ScriptTexts
 {
@@ -423,7 +423,7 @@ public:
                         break;
                     case EVENT_BLOOD_NOVA:
                         {
-                            me->CastSpell((Unit*)NULL, SPELL_BLOOD_NOVA_TRIGGER, false);
+                            me->CastSpell((Unit*)nullptr, SPELL_BLOOD_NOVA_TRIGGER, false);
                             events.ScheduleEvent(EVENT_BLOOD_NOVA, urand(20000, 25000));
                             break;
                         }
@@ -432,7 +432,7 @@ public:
                         events.ScheduleEvent(EVENT_RUNE_OF_BLOOD, urand(20000, 25000));
                         break;
                     case EVENT_BOILING_BLOOD:
-                        me->CastSpell((Unit*)NULL, SPELL_BOILING_BLOOD, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_BOILING_BLOOD, false);
                         events.ScheduleEvent(EVENT_BOILING_BLOOD, urand(15000, 20000));
                         break;
                     case EVENT_BERSERK:
@@ -575,7 +575,6 @@ public:
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_1, 10000);
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_2, 18000);
                         _events.ScheduleEvent(EVENT_OUTRO_HORDE_3, 24000);*/
-
                     }
                     break;
                 case ACTION_EVADE:
@@ -1387,7 +1386,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_icc_blood_beastAI(creature);
+        return GetIcecrownCitadelAI<npc_icc_blood_beastAI>(creature);
     }
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,18 +15,18 @@ EndScriptData */
 npc_arete
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellAuras.h"
-#include "Player.h"
 #include "CombatAI.h"
 #include "MoveSplineInit.h"
-#include "ScriptedEscortAI.h"
-#include "Vehicle.h"
-#include "SmartScriptMgr.h"
-#include "SpellScript.h"
 #include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SmartScriptMgr.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
 // Ours
 enum eBKG
@@ -232,7 +232,7 @@ public:
                                 break;
                             case QUEST_BFV_SIGRID:
                                 PrepareSummons();
-                                me->MonsterTextEmote("Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!", NULL, true);
+                                me->MonsterTextEmote("Circling Valhalas, Sigrid Iceborn approaches to seek her revenge!", nullptr, true);
                                 break;
                             case QUEST_BFV_CARNAGE:
                                 events.ScheduleEvent(EVENT_VALHALAS_SECOND, 8000);
@@ -258,20 +258,20 @@ public:
                         {
                             case QUEST_BFV_FALLEN_HEROES:
                                 me->MonsterYell("There can only be one outcome to such a battle: death for one side or the other. Let $n prove himself upon the bones of these outsiders who have fallen before!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                                me->MonsterTextEmote("The fallen heroes of Valhalas emerge from the ground to do battle once more!", NULL, true);
+                                me->MonsterTextEmote("The fallen heroes of Valhalas emerge from the ground to do battle once more!", nullptr, true);
                                 break;
                             case QUEST_BFV_DARK_MASTER:
-                                me->MonsterTextEmote("Khit'rix the Dark Master skitters into Valhalas from the southeast!", NULL, true);
+                                me->MonsterTextEmote("Khit'rix the Dark Master skitters into Valhalas from the southeast!", nullptr, true);
                                 break;
                             case QUEST_BFV_CARNAGE:
-                                me->MonsterTextEmote("Lumbering in from the south, the smell of Carnage precedes him!", NULL, true);
+                                me->MonsterTextEmote("Lumbering in from the south, the smell of Carnage precedes him!", nullptr, true);
                                 break;
                             case QUEST_BFV_THANE:
-                                me->MonsterTextEmote("Thane Banahogg appears upon the overlook to the southeast!", NULL, true);
+                                me->MonsterTextEmote("Thane Banahogg appears upon the overlook to the southeast!", nullptr, true);
                                 break;
                             case QUEST_BFV_FINAL:
                                 me->MonsterYell("Warriors of Jotunheim, I present to you, Blood Prince Sandoval!", LANG_UNIVERSAL, nullptr);
-                                me->MonsterTextEmote("Without warning, Prince Sandoval magically appears within Valhalas!", NULL, true);
+                                me->MonsterTextEmote("Without warning, Prince Sandoval magically appears within Valhalas!", nullptr, true);
                                 break;
                         }
 
@@ -1033,7 +1033,6 @@ enum infraGreenBomberQuests
     SPELL_WAITING_FOR_A_BOMBER  = 59563,
     SPELL_FLIGHT_ORDERS         = 61281,
 
-
     EVENT_TAKE_PASSENGER        = 1,
     EVENT_START_FLIGHT          = 2,
     EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE           = 3,
@@ -1095,7 +1094,6 @@ public:
     {
         return new spell_switch_infragreen_bomber_station_SpellScript();
     }
-
 };
 
 class spell_charge_shield_bomber : public SpellScriptLoader
@@ -1370,7 +1368,7 @@ public:
                                         fireCount++;
 
                         if (fireCount)
-                            Unit::DealDamage(me, me, 3000 * fireCount, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_FIRE);
+                            Unit::DealDamage(me, me, 3000 * fireCount, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_FIRE);
                         else // Heal
                             me->ModifyHealth(2000);
 
@@ -1407,7 +1405,6 @@ public:
 
     private:
         EventMap events;
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1415,7 +1412,6 @@ public:
         return new npc_infra_green_bomber_genericAI(creature);
     }
 };
-
 
 // Theirs
 /*######
@@ -1459,7 +1455,6 @@ public:
                 who->CastSpell(who, SPELL_TRESPASSER_H, true);
             else
                 who->CastSpell(who, SPELL_TRESPASSER_A, true);
-
         }
     };
 
@@ -1619,14 +1614,12 @@ public:
         }
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
-
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_tournament_training_dummyAI(creature);
     }
-
 };
 
 // Battle for Crusaders' Pinnacle
@@ -1754,7 +1747,6 @@ public:
         void EnterCombat(Unit* /*who*/) override { }
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
-
 
         void JustSummoned(Creature* Summoned) override
         {

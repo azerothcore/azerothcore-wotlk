@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "trial_of_the_crusader.h"
-#include "SpellScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
+#include "trial_of_the_crusader.h"
 
 enum AnubTexts
 {
@@ -137,7 +137,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_anubarak_trialAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_anubarak_trialAI>(pCreature);
     };
 
     struct boss_anubarak_trialAI : public ScriptedAI
@@ -246,7 +246,7 @@ public:
                 events.CancelEvent(EVENT_EMERGE_2);
                 if( !IsHeroic() )
                     events.CancelEvent(EVENT_SUMMON_NERUBIAN);
-                me->CastSpell((Unit*)NULL, SPELL_LEECHING_SWARM, false);
+                me->CastSpell((Unit*)nullptr, SPELL_LEECHING_SWARM, false);
                 Talk(EMOTE_LEECHING_SWARM);
                 Talk(SAY_LEECHING_SWARM);
                 return;
@@ -434,7 +434,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_swarm_scarabAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_swarm_scarabAI>(pCreature);
     };
 
     struct npc_swarm_scarabAI : public ScriptedAI
@@ -523,7 +523,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_frost_sphereAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_frost_sphereAI>(pCreature);
     };
 
     struct npc_frost_sphereAI : public NullCreatureAI
@@ -612,7 +612,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_nerubian_burrowerAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_nerubian_burrowerAI>(pCreature);
     };
 
     struct npc_nerubian_burrowerAI : public ScriptedAI
@@ -691,7 +691,7 @@ public:
                         me->CastSpell(me, SPELL_EXPOSE_WEAKNESS, true);
                         me->CastSpell(me, SPELL_SPIDER_FRENZY, true);
                         me->CastSpell(me, SPELL_SUBMERGE, false);
-                        
+
                         events.DelayEvents(15000);
                         events.RescheduleEvent(EVENT_EMERGE, 10000);
                     }
@@ -704,7 +704,7 @@ public:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_EMERGE, false);
                     me->RemoveAura(SPELL_SUBMERGE);
-                    
+
                     events.RescheduleEvent(EVENT_SUBMERGE, 30000);
                     break;
             }
@@ -731,7 +731,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_anubarak_spikeAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_anubarak_spikeAI>(pCreature);
     };
 
     struct npc_anubarak_spikeAI : public ScriptedAI
@@ -813,12 +813,12 @@ public:
                     break;
                 case 1:
                     me->CastSpell(me, SPELL_SPIKE_SPEED2, true);
-                    
+
                     events.RescheduleEvent(2, 7000);
                     break;
                 case 2:
                     me->CastSpell(me, SPELL_SPIKE_SPEED3, true);
-                    
+
                     break;
                 case 3:
                     Reset();
@@ -855,7 +855,7 @@ public:
                     Remove();
                     return;
                 }
-                target->CastSpell((Unit*)NULL, SPELL_IMPALE, true);
+                target->CastSpell((Unit*)nullptr, SPELL_IMPALE, true);
             }
         }
 
@@ -889,11 +889,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellEntry*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_LEECHING_SWARM_DMG))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_LEECHING_SWARM_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_LEECHING_SWARM_DMG, SPELL_LEECHING_SWARM_HEAL });
         }
 
         void HandleEffectPeriodic(AuraEffect const* aurEff)
@@ -939,7 +935,6 @@ public:
                     caster->CastCustomSpell(caster, SPELL_LEECHING_SWARM_HEAL, &damage, 0, 0, true);
                 }
         }
-
 
         void Register() override
         {

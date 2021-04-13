@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "MoveSplineInit.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "the_black_morass.h"
-#include "MoveSplineInit.h"
 
 enum medivhSays
 {
@@ -80,7 +80,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_medivh_bmAI(creature);
+        return GetTheBlackMorassAI<npc_medivh_bmAI>(creature);
     }
 
     struct npc_medivh_bmAI : public ScriptedAI
@@ -246,9 +246,6 @@ public:
                         cr->AI()->Talk(SAY_ORCS_ANSWER);
                     }
                     break;
-
-
-
             }
         }
 
@@ -258,7 +255,7 @@ public:
             {
                 if (Creature* cr = me->SummonCreature(NPC_SHADOW_COUNCIL_ENFORCER, -2091.731f, 7133.083f - 3.0f * i, 34.589f, 0.0f))
                 {
-                    cr->GetMotionMaster()->MovePoint(0, (first && i == 3) ? x + 2.0f : x, cr->GetPositionY() + y, cr->GetMap()->GetHeight(x, cr->GetPositionY() + y, MAX_HEIGHT, true));
+                    cr->GetMotionMaster()->MovePoint(0, (first && i == 3) ? x + 2.0f : x, cr->GetPositionY() + y, cr->GetMapHeight(x, cr->GetPositionY() + y, cr->GetPositionZ(), true));
                     cr->m_Events.AddEvent(new NpcRunToHome(*cr), cr->m_Events.CalculateTime(homeTime + urand(0, 2000)));
                     cr->DespawnOrUnsummon(duration + urand(0, 2000));
                 }
@@ -266,7 +263,6 @@ public:
         }
     };
 };
-
 
 enum timeRift
 {
@@ -281,7 +277,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_time_riftAI(creature);
+        return GetTheBlackMorassAI<npc_time_riftAI>(creature);
     }
 
     struct npc_time_riftAI : public NullCreatureAI

@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "trial_of_the_crusader.h"
 #include "Vehicle.h"
-#include "Player.h"
 
 /***********
 ** GORMOK
@@ -68,7 +68,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_snobold_vassalAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_snobold_vassalAI>(pCreature);
     }
 
     struct npc_snobold_vassalAI : public ScriptedAI
@@ -149,8 +149,8 @@ public:
                     break;
                 case EVENT_SPELL_SNOBOLLED:
                     if( t->GetTypeId() == TYPEID_PLAYER )
-                        me->CastSpell((Unit*)NULL, SPELL_SNOBOLLED, true);
-                    
+                        me->CastSpell((Unit*)nullptr, SPELL_SNOBOLLED, true);
+
                     break;
                 case EVENT_SPELL_BATTER:
                     if( t->GetTypeId() == TYPEID_PLAYER )
@@ -219,7 +219,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_gormokAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_gormokAI>(pCreature);
     }
 
     struct boss_gormokAI : public ScriptedAI
@@ -290,7 +290,7 @@ public:
                         events.RepeatEvent(2500);
                     break;
                 case EVENT_SPELL_STAGGERING_STOMP:
-                    me->CastSpell((Unit*)NULL, SPELL_STAGGERING_STOMP, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_STAGGERING_STOMP, false);
                     events.RepeatEvent(urand(20000, 25000));
                     break;
                 case EVENT_PICK_SNOBOLD_TARGET:
@@ -399,7 +399,6 @@ public:
         }
     };
 };
-
 
 /***********
 ** ACIDMAW AND DREADSCALE
@@ -582,7 +581,7 @@ struct boss_jormungarAI : public ScriptedAI
                     me->UpdatePosition(Locs[LOC_CENTER].GetPositionX() + cos(angle)*dist, Locs[LOC_CENTER].GetPositionY() + sin(angle)*dist, me->GetPositionZ(), me->GetOrientation(), true);
                     me->StopMovingOnCurrentPos();
                     DoResetThreat();
-                    
+
                     events.RescheduleEvent(EVENT_EMERGE, 6000);
                 }
                 break;
@@ -616,7 +615,7 @@ struct boss_jormungarAI : public ScriptedAI
                 events.RepeatEvent(20000);
                 break;
             case EVENT_SPELL_SWEEP:
-                me->CastSpell((Unit*)NULL, SPELL_SWEEP_0, false);
+                me->CastSpell((Unit*)nullptr, SPELL_SWEEP_0, false);
                 events.RepeatEvent(urand(15000, 30000));
                 break;
             case EVENT_SPELL_BITE:
@@ -684,10 +683,9 @@ public:
         }
     };
 
-
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_acidmawAI(creature);
+        return GetTrialOfTheCrusaderAI<boss_acidmawAI>(creature);
     }
 };
 
@@ -712,10 +710,9 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_dreadscaleAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_dreadscaleAI>(pCreature);
     }
 };
-
 
 /***********
 ** ICEHOWL
@@ -757,7 +754,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_icehowlAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_icehowlAI>(pCreature);
     }
 
     struct boss_icehowlAI : public ScriptedAI
@@ -836,7 +833,7 @@ public:
                 if( !DoTrampleIfValid() )
                 {
                     me->CastSpell(me, SPELL_STAGGERED_DAZE, true);
-                    me->CastSpell((Unit*)NULL, SPELL_TRAMPLE, true);
+                    me->CastSpell((Unit*)nullptr, SPELL_TRAMPLE, true);
                     Talk(EMOTE_TRAMPLE_CRASH);
                     events.DelayEvents(15000);
                 }
@@ -870,7 +867,7 @@ public:
                     events.RepeatEvent(urand(15000, 30000));
                     break;
                 case EVENT_SPELL_WHIRL:
-                    me->CastSpell((Unit*)NULL, SPELL_WHIRL, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_WHIRL, false);
                     events.RepeatEvent(urand(15000, 20000));
                     break;
                 case EVENT_SPELL_ARCTIC_BREATH:
@@ -891,8 +888,8 @@ public:
                     break;
                 case EVENT_SPELL_MASSIVE_CRASH:
                     me->GetMotionMaster()->Clear();
-                    me->CastSpell((Unit*)NULL, SPELL_MASSIVE_CRASH, false);
-                    
+                    me->CastSpell((Unit*)nullptr, SPELL_MASSIVE_CRASH, false);
+
                     events.RescheduleEvent(EVENT_GAZE, 2000);
                     break;
                 case EVENT_GAZE:
@@ -914,7 +911,7 @@ public:
                         me->GetMotionMaster()->MovementExpired();
                         me->SetReactState(REACT_AGGRESSIVE);
                     }
-                    
+
                     break;
                 case EVENT_JUMP_BACK:
                     {
@@ -963,7 +960,7 @@ public:
                     me->GetMotionMaster()->MoveCharge(destX, destY, destZ + 1.0f, 65.0f);
                     me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
                     events.RescheduleEvent(EVENT_CHECK_TRAMPLE_PLAYERS, 100);
-                    
+
                     break;
                 case EVENT_CHECK_TRAMPLE_PLAYERS:
                     if( DoTrampleIfValid() )
@@ -982,7 +979,7 @@ public:
                     break;
                 case EVENT_REFRESH_POSITION:
                     //me->SetFacingTo(me->GetOrientation());
-                    
+
                     break;
             }
 
@@ -1024,7 +1021,6 @@ public:
         }
     };
 };
-
 
 void AddSC_boss_northrend_beasts()
 {

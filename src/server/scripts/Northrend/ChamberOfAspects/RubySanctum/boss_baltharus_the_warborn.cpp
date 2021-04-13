@@ -3,10 +3,10 @@
 */
 
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
 #include "ruby_sanctum.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
 
 enum Texts
 {
@@ -254,7 +254,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_baltharus_the_warbornAI>(creature);
+        return GetRubySanctumAI<boss_baltharus_the_warbornAI>(creature);
     }
 };
 
@@ -313,7 +313,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_baltharus_the_warborn_cloneAI>(creature);
+        return GetRubySanctumAI<npc_baltharus_the_warborn_cloneAI>(creature);
     }
 };
 
@@ -441,7 +441,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_xerestraszaAI>(creature);
+        return GetRubySanctumAI<npc_xerestraszaAI>(creature);
     }
 };
 

@@ -2,12 +2,12 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "utgarde_pinnacle.h"
-#include "SpellScript.h"
-#include "Player.h"
 #include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
+#include "utgarde_pinnacle.h"
 
 enum Misc
 {
@@ -92,7 +92,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_svalaAI (creature);
+        return GetUtgardePinnacleAI<boss_svalaAI>(creature);
     }
 
     struct boss_svalaAI : public ScriptedAI
@@ -363,7 +363,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ritual_channelerAI (pCreature);
+        return GetUtgardePinnacleAI<npc_ritual_channelerAI>(pCreature);
     }
 
     struct npc_ritual_channelerAI : public NullCreatureAI
@@ -400,7 +400,7 @@ public:
                 if (unitTarget->GetTypeId() != TYPEID_UNIT)
                     return;
 
-                Unit::DealDamage(GetCaster(), unitTarget, 7000, NULL, DIRECT_DAMAGE);
+                Unit::DealDamage(GetCaster(), unitTarget, 7000, nullptr, DIRECT_DAMAGE);
             }
         }
 

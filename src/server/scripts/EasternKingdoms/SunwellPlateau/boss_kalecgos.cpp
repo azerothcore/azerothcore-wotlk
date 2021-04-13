@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "sunwell_plateau.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "sunwell_plateau.h"
 #include "WorldSession.h"
 
 enum Yells
@@ -15,7 +15,6 @@ enum Yells
     SAY_SATH_DEATH                              = 2,
     SAY_SATH_SPELL1                             = 3,
     SAY_SATH_SPELL2                             = 4,
-
 
     SAY_EVIL_AGGRO                              = 0,
     SAY_EVIL_SLAY                               = 1,
@@ -342,7 +341,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kalecgosAI>(creature);
+        return GetSunwellPlateauAI<boss_kalecgosAI>(creature);
     }
 };
 
@@ -363,7 +362,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kalecAI>(creature);
+        return GetSunwellPlateauAI<boss_kalecAI>(creature);
     }
 
     struct boss_kalecAI : public ScriptedAI
@@ -480,7 +479,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_sathrovarrAI>(creature);
+        return GetSunwellPlateauAI<boss_sathrovarrAI>(creature);
     }
 
     struct boss_sathrovarrAI : public ScriptedAI

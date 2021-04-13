@@ -2,12 +2,12 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "scholomance.h"
-#include "MoveSplineInit.h"
 #include "GameObjectAI.h"
+#include "MoveSplineInit.h"
 #include "Player.h"
+#include "scholomance.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -136,9 +136,9 @@ public:
                     break;
                 case INTRO_4:
                     me->SetWalk(true);
+                    me->SetCanFly(false);
                     me->SetDisableGravity(false);
                     me->CastSpell(me, SPELL_KIRTONOS_TRANSFORM, true);
-                    me->SetCanFly(false);
                     break;
                 case INTRO_5:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
@@ -212,7 +212,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kirtonos_the_heraldAI>(creature);
+        return GetScholomanceAI<boss_kirtonos_the_heraldAI>(creature);
     }
 };
 

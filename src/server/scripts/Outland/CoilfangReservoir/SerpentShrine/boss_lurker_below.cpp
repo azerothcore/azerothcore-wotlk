@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "serpent_shrine.h"
 
 enum Spells
@@ -53,7 +53,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_the_lurker_belowAI>(creature);
+        return GetSerpentShrineAI<boss_the_lurker_belowAI>(creature);
     }
 
     struct boss_the_lurker_belowAI : public BossAI
@@ -244,7 +244,6 @@ public:
             PreventDefaultAction();
             GetUnitOwner()->SetFacingTo(Position::NormalizeOrientation(GetUnitOwner()->GetOrientation() + 0.1f));
             GetUnitOwner()->CastSpell(GetUnitOwner(), aurEff->GetAmount(), true);
-
         }
 
         void Register() override

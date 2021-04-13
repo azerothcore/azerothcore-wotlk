@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "Vehicle.h"
-#include "SpellScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
 enum Texts
 {
@@ -358,9 +358,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_MOUNTING_CHECK))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_MOUNTING_CHECK });
         }
 
         void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
@@ -406,11 +404,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_MOTIVATE_1))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_MOTIVATE_2))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_MOTIVATE_1, SPELL_MOTIVATE_2 });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -463,12 +457,16 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_BREW) || !sSpellMgr->GetSpellInfo(SPELL_GHOSTLY) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_HEX1) || !sSpellMgr->GetSpellInfo(SPELL_HEX2) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_HEX3) || !sSpellMgr->GetSpellInfo(SPELL_GROW) ||
-                    !sSpellMgr->GetSpellInfo(SPELL_LAUNCH))
-                return false;
-            return true;
+            return ValidateSpellInfo(
+                {
+                    SPELL_BREW,
+                    SPELL_GHOSTLY,
+                    SPELL_HEX1,
+                    SPELL_HEX2,
+                    SPELL_HEX3,
+                    SPELL_GROW,
+                    SPELL_LAUNCH
+                });
         }
 
         void HandleDummy(SpellEffIndex /*effIndex*/)

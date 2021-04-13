@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "nexus.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 DoorData const doorData[] =
 {
@@ -185,7 +185,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_crystalline_frayerAI>(creature);
+        return GetNexusAI<npc_crystalline_frayerAI>(creature);
     }
 
     struct npc_crystalline_frayerAI : public ScriptedAI

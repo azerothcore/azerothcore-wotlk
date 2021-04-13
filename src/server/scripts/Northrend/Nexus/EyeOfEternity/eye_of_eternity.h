@@ -6,6 +6,9 @@
 #define DEF_EYE_OF_ETERNITY_H
 
 #include "Chat.h"
+#include "CreatureAIImpl.h"
+
+#define EyeOfEternityScriptName "instance_eye_of_eternity"
 
 enum Objects
 {
@@ -99,5 +102,11 @@ private:
     Creature& _owner;
     uint64 _playerGUID;
 };
+
+template <class AI, class T>
+inline AI* GetEyeOfEternityAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, EyeOfEternityScriptName);
+}
 
 #endif

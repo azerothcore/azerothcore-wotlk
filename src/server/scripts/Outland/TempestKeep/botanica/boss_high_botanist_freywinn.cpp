@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "the_botanica.h"
 
 enum Says
@@ -40,7 +40,6 @@ enum Misc
 class boss_high_botanist_freywinn : public CreatureScript
 {
 public:
-
     boss_high_botanist_freywinn() : CreatureScript("boss_high_botanist_freywinn")
     {
     }
@@ -138,7 +137,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_high_botanist_freywinnAI(creature);
+        return GetTheBotanicaAI<boss_high_botanist_freywinnAI>(creature);
     }
 };
 
@@ -146,4 +145,3 @@ void AddSC_boss_high_botanist_freywinn()
 {
     new boss_high_botanist_freywinn();
 }
-

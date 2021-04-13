@@ -96,7 +96,6 @@ enum AcoreStrings
     LANG_PVPSTATS_DISABLED              = 81,
     // Free 82 - 95
 
-
     LANG_GUILD_RENAME_ALREADY_EXISTS    = 96,
     LANG_GUILD_RENAME_DONE              = 97,
     LANG_RENAME_PLAYER_ALREADY_EXISTS   = 98,
@@ -845,6 +844,18 @@ enum AcoreStrings
     LANG_RBAC_EMAIL_REQUIRED            = 881,
     // Room for in-game strings           882-999 not used
 
+    //Access Requirements
+    LANG_ACCESS_REQUIREMENT_COMPLETE_QUESTS = 882,
+    LANG_ACCESS_REQUIREMENT_COMPLETE_ACHIEVEMENTS = 883,
+    LANG_ACCESS_REQUIREMENT_OBTAIN_ITEMS = 884,
+    LANG_ACCESS_REQUIREMENT_NOTE = 885,
+    LANG_ACCESS_REQUIREMENT_NOT_MET = 886,
+    LANG_ACCESS_REQUIREMENT_AVERAGE_ILVL_NOT_MET = 887,
+    LANG_ACCESS_REQUIREMENT_MAX_LEVEL = 888,
+    LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS = 889,
+    LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS = 890,
+    LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS = 891,
+
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                   = 1000,
     LANG_ACCOUNT_DELETED                = 1001,
@@ -878,7 +889,6 @@ enum AcoreStrings
     // 1029-1030 used in other client versions
     // Room for more level 4              1031-1099 not used
     LANG_ACCOUNT_PASS_TOO_LONG            = 1031,
-
 
     // Level 3 (continue)
     LANG_ACCOUNT_SETADDON               = 1100,
@@ -1291,7 +1301,6 @@ enum AcoreStrings
     LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD       = 11006,
     LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD   = 11007,
 
-
     LANG_NPCINFO_INHABIT_TYPE                     = 11008,
     LANG_NPCINFO_FLAGS_EXTRA                      = 11009,
     LANG_INSTANCE_LOGIN_GAMEMASTER_EXCEPTION      = 11010,
@@ -1304,8 +1313,8 @@ enum AcoreStrings
     LANG_SELECT_PLAYER_OR_PET                     = 11016,
 
     // Continue show Ban in world (ip)
-    LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD       	    = 11017,
-    LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD   	    = 11018,
+    LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD            = 11017,
+    LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD        = 11018,
 
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
 
@@ -1323,6 +1332,6 @@ enum AcoreStrings
     LANG_BG_READY_CHECK_ERROR                     = 30084,
 
     LANG_DEBUG_BG_CONF                            = 30085,
-    LANG_DEBUG_ARENA_CONF                         = 30086
+    LANG_DEBUG_ARENA_CONF                         = 30086,
 };
 #endif

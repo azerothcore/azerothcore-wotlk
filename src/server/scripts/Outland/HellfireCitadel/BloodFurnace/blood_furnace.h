@@ -6,6 +6,9 @@
 #define DEF_BLOOD_FURNACE_H
 
 #include "Player.h"
+#include "CreatureAIImpl.h"
+
+#define BloodFurnaceScriptName "instance_blood_furnace"
 
 enum bloodFurnace
 {
@@ -39,5 +42,10 @@ enum bloodFurnaceNPC
     NPC_CHANNELER                       = 17653
 };
 
-#endif
+template <class AI, class T>
+inline AI* GetBloodFurnaceAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, BloodFurnaceScriptName);
+}
 
+#endif

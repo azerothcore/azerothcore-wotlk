@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "MoveSplineInit.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "the_eye.h"
 #include "WaypointManager.h"
-#include "MoveSplineInit.h"
 
 enum Spells
 {
@@ -62,7 +62,6 @@ enum Misc
 
     EVENT_MOVE_TO_PHASE_2       = 20,
     EVENT_FINISH_DIVE           = 21
-
 };
 
 // Xinef: Ruse of the Ashtongue (10946)
@@ -328,7 +327,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_alarAI>(creature);
+        return GetTheEyeAI<boss_alarAI>(creature);
     }
 };
 

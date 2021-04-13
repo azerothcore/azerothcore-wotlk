@@ -56,6 +56,8 @@ CTOOLS=OFF
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
 CSCRIPTPCH=ON
 CCOREPCH=ON
+# enable/disable extra logs
+CEXTRA_LOGS=0
 
 # Skip specific modules from compilation (cmake reconfigure needed)
 # use semicolon ; to separate modules
@@ -152,7 +154,7 @@ DB_SKIP_BASE_IMPORT_IF_EXISTS=true
 
 #
 # Example:
-#        "C:/Program Files/MySQL/MySQL Server 5.6/bin/mysql.exe"
+#        "C:/Program Files/MySQL/MySQL Server 8.0/bin/mysql.exe"
 #        "/usr/bin/mysql"
 #        "mysql"
 #
@@ -164,16 +166,19 @@ DB_MYSQL_DUMP_EXEC="mysqldump"
 DB_AUTH_CONF="MYSQL_USER='acore'; \
                     MYSQL_PASS='acore'; \
                     MYSQL_HOST='localhost';\
+                    MYSQL_PORT='3306';\
                     "
 
 DB_CHARACTERS_CONF="MYSQL_USER='acore'; \
                     MYSQL_PASS='acore'; \
                     MYSQL_HOST='localhost';\
+                    MYSQL_PORT='3306';\
                     "
 
 DB_WORLD_CONF="MYSQL_USER='acore'; \
                     MYSQL_PASS='acore'; \
                     MYSQL_HOST='localhost';\
+                    MYSQL_PORT='3306';\
                     "
 
 DB_AUTH_NAME="acore_auth"

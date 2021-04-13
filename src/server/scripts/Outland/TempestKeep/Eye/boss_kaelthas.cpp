@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Opcodes.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "the_eye.h"
 #include "WorldPacket.h"
-#include "Opcodes.h"
 
 enum Yells
 {
@@ -88,7 +88,6 @@ enum Spells
     SPELL_SUMMON_NETHER_VAPOR           = 35865,
     SPELL_NETHER_BEAM                   = 35869,
     SPELL_NETHER_BEAM_DAMAGE            = 35873,
-
 
     SPELL_REMOTE_TOY_STUN               = 37029
 };
@@ -704,11 +703,10 @@ public:
         {
             return me->GetHomePosition().GetExactDist2d(me) > 165.0f || !SelectTargetFromPlayerList(165.0f);
         }
-
     };
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kaelthasAI>(creature);
+        return GetTheEyeAI<boss_kaelthasAI>(creature);
     }
 };
 

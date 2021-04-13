@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "TransportMgr.h"
-#include "Transport.h"
 #include "InstanceScript.h"
-#include "MoveSpline.h"
 #include "MapManager.h"
+#include "MoveSpline.h"
+#include "Transport.h"
+#include "TransportMgr.h"
 
 TransportTemplate::~TransportTemplate()
 {
@@ -80,6 +80,7 @@ void TransportMgr::LoadTransportTemplates()
     } while (result->NextRow());
 
     sLog->outString(">> Loaded %u transport templates in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    sLog->outString();
 }
 
 class SplineRawInitializer
@@ -343,7 +344,7 @@ void TransportMgr::AddPathNodeToTransport(uint32 transportEntry, uint32 timeSeg,
     animNode.Path[timeSeg] = node;
 }
 
-MotionTransport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map* map /*= NULL*/)
+MotionTransport* TransportMgr::CreateTransport(uint32 entry, uint32 guid /*= 0*/, Map* map /*= nullptr*/)
 {
     // instance case, execute GetGameObjectEntry hook
     if (map)
@@ -428,11 +429,11 @@ void TransportMgr::SpawnContinentTransports()
                     if (!tInfo->inInstance)
                         if (CreateTransport(entry, guid))
                             ++count;
-
             } while (result->NextRow());
         }
 
         sLog->outString(">> Spawned %u continent motion transports in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+        sLog->outString();
 
         if (sWorld->getBoolConfig(CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING))
         {
@@ -456,7 +457,6 @@ void TransportMgr::SpawnContinentTransports()
                             map->LoadGrid(x, y);
                             ++count;
                         }
-
                 } while (result->NextRow());
             }
 

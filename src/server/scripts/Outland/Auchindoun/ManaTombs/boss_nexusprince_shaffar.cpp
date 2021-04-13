@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Player.h"
+#include "mana_tombs.h"
 
 enum ePrince
 {
@@ -39,7 +39,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_nexusprince_shaffarAI (creature);
+        return GetManaTombsAI<boss_nexusprince_shaffarAI>(creature);
     }
 
     struct boss_nexusprince_shaffarAI : public ScriptedAI
@@ -168,7 +168,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_yorAI(creature);
+        return GetManaTombsAI<npc_yorAI>(creature);
     }
 
     struct npc_yorAI : public ScriptedAI
