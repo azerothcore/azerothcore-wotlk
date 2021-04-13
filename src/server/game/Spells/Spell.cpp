@@ -6282,7 +6282,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
                         break;
                     }
                 }
-                if (foundNotStun)
+                if (foundNotStun && m_spellInfo->Id != 22812 && m_spellInfo->Id != 1044) // allow barkskin and HOF to be casted while player has gouge tried to do it above with disorient but didn't work
                     prevented_reason = SPELL_FAILED_STUNNED;
             }
             else
