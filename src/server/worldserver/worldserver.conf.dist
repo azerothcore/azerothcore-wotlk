@@ -3411,7 +3411,7 @@ Logger.root=2,Console Server
 Logger.server=4,Console Server
 Logger.commands.gm=4,Console GM
 Logger.scripts.hotswap=4,Console Server
-Logger.sql.sql=4,Console DBErrors
+Logger.sql.sql=2,Console DBErrors
 Logger.sql.updates=4,Console Server
 Logger.mmaps=4,Server
 
