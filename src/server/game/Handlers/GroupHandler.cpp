@@ -14,6 +14,7 @@
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "SpellAuras.h"
 #include "Util.h"
@@ -73,6 +74,9 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_BAD_PLAYER_NAME_S);
         return;
     }
+
+    if (!sScriptMgr->CanGroupInvite(GetPlayer(), membername))
+        return;
 
     if (GetPlayer()->IsSpectator() || player->IsSpectator())
     {
@@ -223,6 +227,9 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
         SendPartyResult(PARTY_OP_INVITE, "", ERR_INVITE_RESTRICTED);
         return;
     }
+
+    if (!sScriptMgr->CanGroupAccept(GetPlayer(), group))
+        return;
 
     if (group->GetLeaderGUID() == GetPlayer()->GetGUID())
     {
