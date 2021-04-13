@@ -2531,7 +2531,7 @@ bool ScriptMgr::CheckItemInSlotAtLoadInventory(Player* player, Item* item, uint8
     return ret;
 }
 
-bool ScriptMgr::NotAvoidSatisfy(Player* player, AccessRequirement const* ar, uint32 target_map, bool report)
+bool ScriptMgr::NotAvoidSatisfy(Player* player, DungeonProgressionRequirements const* ar, uint32 target_map, bool report)
 {
     bool ret = true;
 
