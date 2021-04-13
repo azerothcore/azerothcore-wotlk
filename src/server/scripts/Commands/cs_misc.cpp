@@ -347,12 +347,14 @@ public:
         {
             player->SetDeveloper(true);
             handler->GetSession()->SendNotification(LANG_DEV_ON);
+            sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enablestr);
             return true;
         }
         else if (enablestr == "off")
         {
             player->SetDeveloper(false);
             handler->GetSession()->SendNotification(LANG_DEV_OFF);
+            sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enablestr);
             return true;
         }
 

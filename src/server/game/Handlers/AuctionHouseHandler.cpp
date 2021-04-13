@@ -12,6 +12,7 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
+#include "ScriptMgr.h"
 #include "Player.h"
 #include "UpdateMask.h"
 #include "Util.h"
@@ -49,6 +50,9 @@ void WorldSession::SendAuctionHello(uint64 guid, Creature* unit)
         SendNotification(GetAcoreString(LANG_AUCTION_REQ), sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ));
         return;
     }
+
+    if (!sScriptMgr->CanSendAuctionHello(this, guid, unit))
+        return;
 
     AuctionHouseEntry const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntry(unit->getFaction());
     if (!ahEntry)

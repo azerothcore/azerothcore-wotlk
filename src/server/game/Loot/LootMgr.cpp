@@ -503,6 +503,8 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
 
     tab->Process(*this, store, lootMode, lootOwner);          // Processing is done there, callback via Loot::AddItem()
 
+    sScriptMgr->OnAfterLootTemplateProcess(this, tab, store, lootOwner, personal, noEmptyError, lootMode);
+
     // Setting access rights for group loot case
     Group* group = lootOwner->GetGroup();
     if (!personal && group)

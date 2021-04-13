@@ -12,6 +12,7 @@
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
 #include "World.h"
@@ -639,6 +640,9 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         SendNotification(GetAcoreString(LANG_TRADE_OTHER_REQ), sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ));
         return;
     }
+
+    if (!sScriptMgr->CanInitTrade(_player, pOther))
+        return;
 
     // OK start trade
     _player->m_trade = new TradeData(_player, pOther);

@@ -14,6 +14,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -196,9 +197,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         }
     }*/
 
-    uint32 rc_account = receive
-                        ? receive->GetSession()->GetAccountId()
-                        : sObjectMgr->GetPlayerAccountIdByGUID(rc);
+    uint32 rc_account = receive ? receive->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(rc);
 
     if (/*!accountBound*/ GetAccountId() != rc_account && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL) && player->GetTeamId() != rc_teamId && AccountMgr::IsPlayerAccount(GetSecurity()))
     {
@@ -254,6 +253,9 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
             player->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS);
             return;
         }
+
+        if (!sScriptMgr->CanSendMail(player, rc, mailbox, subject, body, money, COD, item))
+            return;
 
         items[i] = item;
     }

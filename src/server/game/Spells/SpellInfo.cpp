@@ -9,6 +9,7 @@
 #include "ConditionMgr.h"
 #include "DBCStores.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
@@ -2487,7 +2488,14 @@ SpellInfo const* SpellInfo::GetAuraRankForLevel(uint8 level) const
     if (!needRankSelection)
         return this;
 
-    for (SpellInfo const* nextSpellInfo = this; nextSpellInfo != nullptr; nextSpellInfo = nextSpellInfo->GetPrevRankSpell())
+    SpellInfo const* nextSpellInfo = nullptr;
+
+    sScriptMgr->OnBeforeAuraRankForLevel(this, nextSpellInfo, level);
+
+    if (nextSpellInfo != nullptr)
+        return nextSpellInfo;
+
+    for (nextSpellInfo = this; nextSpellInfo != nullptr; nextSpellInfo = nextSpellInfo->GetPrevRankSpell())
     {
         // if found appropriate level
         if (uint32(level + 10) >= nextSpellInfo->SpellLevel)
