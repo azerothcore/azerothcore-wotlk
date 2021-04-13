@@ -771,7 +771,8 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket.read(digest);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "WorldSocket::HandleAuthSession: client %u, loginServerID %u, account %s, loginServerType %u, clientseed %u", BuiltNumberClient, loginServerID, account.c_str(), loginServerType, clientSeed);
+    LOG_DEBUG("server", "WorldSocket::HandleAuthSession: client %u, loginServerID %u, account %s, loginServerType %u", 
+        BuiltNumberClient, loginServerID, account.c_str(), loginServerType);
 #endif
     // Get the account information from the realmd database
     //         0           1        2       3        4            5         6       7          8      9      10
