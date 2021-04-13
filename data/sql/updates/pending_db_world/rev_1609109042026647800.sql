@@ -1,18 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1609109042026647800');
 
--- ----------------------------
--- Table structure for gtoctclasscombatratingscalar_dbc
--- ----------------------------
-DROP TABLE IF EXISTS `gtoctclasscombatratingscalar_dbc`;
-CREATE TABLE `gtoctclasscombatratingscalar_dbc`  (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `Data` float NOT NULL DEFAULT 0,
-  PRIMARY KEY (`ID`) USING BTREE
-) ENGINE = MyISAM CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Fixed;
-
--- ----------------------------
--- Records of gtoctclasscombatratingscalar_dbc
--- ----------------------------
+TRUNCATE TABLE `gtoctclasscombatratingscalar_dbc`;
 INSERT INTO `gtoctclasscombatratingscalar_dbc` VALUES 
 (1, 1),
 (2, 1),
