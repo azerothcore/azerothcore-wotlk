@@ -5580,6 +5580,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (!target || !pet || pet->isDead() || target->isDead())
                             return SPELL_FAILED_BAD_TARGETS;
 
+                        if (pet->HasAura(SPELL_AURA_MOD_STUN) || pet->HasAuraType(SPELL_AURA_MOD_CONFUSE) || pet->HasAuraType(SPELL_AURA_MOD_FEAR))
+                            return SPELL_FAILED_NOT_IN_CONTROL;
+
                         if (!pet->IsWithinLOSInMap(target, LINEOFSIGHT_ALL_CHECKS))
                             return SPELL_FAILED_LINE_OF_SIGHT;
                     }
