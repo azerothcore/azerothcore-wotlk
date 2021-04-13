@@ -691,25 +691,6 @@ public:
             return ValidateSpellInfo({ SPELL_HUNTER_MASTERS_CALL_TRIGGERED });
         }
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-            {
-                // Cannot be processed while pet is dead
-                TriggerCastFlags castMask = TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_CASTER_AURASTATE);
-                //target->CastSpell(target, GetEffectValue(), castMask);
-                target->CastSpell(target, SPELL_HUNTER_MASTERS_CALL_TRIGGERED, castMask);
-                // there is a possibility that this effect should access effect 0 (dummy) target, but i dubt that
-                // it's more likely that on on retail it's possible to call target selector based on dbc values
-                // anyways, we're using GetExplTargetUnit() here and it's ok
-                if (Unit* ally = GetExplTargetUnit())
-                {
-                    //target->CastSpell(ally, GetEffectValue(), castMask);
-                    target->CastSpell(ally, GetSpellInfo()->Effects[EFFECT_0].CalcValue(), castMask);
-                }
-            }
-        }
-
         SpellCastResult DoCheckCast()
         {
             Guardian* pet = GetCaster()->ToPlayer()->GetGuardianPet();
@@ -746,6 +727,11 @@ public:
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             GetCaster()->ToPlayer()->GetPet()->CastSpell(GetHitUnit(), GetEffectValue(), true);
+        }
+
+        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+        {
+            GetHitUnit()->CastSpell((Unit*)nullptr, SPELL_HUNTER_MASTERS_CALL_TRIGGERED, true);
         }
 
         void Register() override
