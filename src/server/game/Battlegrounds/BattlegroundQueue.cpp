@@ -941,9 +941,9 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
     }
 }
 
-uint8 BattlegroundQueue::GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue)
+uint32 BattlegroundQueue::GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue)
 {
-    uint8 playersCount = 0;
+    uint32 playersCount = 0;
 
     for (auto const& itr : m_QueuedGroups[bracketId][bgqueue])
         if (!itr->IsInvitedToBGInstanceGUID)
@@ -972,12 +972,12 @@ void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDi
 
     BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
     char const* bgName = bg->GetName();
-    auto MinPlayers = bg->GetMinPlayersPerTeam();
-    auto MaxPlayers = MinPlayers * 2;
-    auto q_min_level = std::min(bracketEntry->minLevel, static_cast<uint32>(80));
-    auto q_max_level = std::min(bracketEntry->maxLevel, static_cast<uint32>(80));
-    auto qHorde = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_HORDE);
-    auto qAlliance = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_ALLIANCE);
+    uint32 MinPlayers = bg->GetMinPlayersPerTeam();
+    uint32 MaxPlayers = MinPlayers * 2;
+    uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32)80);
+    uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32)80);
+    uint32 qHorde = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_HORDE);
+    uint32 qAlliance = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_ALLIANCE);
     auto qTotal = qHorde + qAlliance;
 
     // Show queue status to player only (when joining battleground queue or Arena and arena world announcer is disabled)
