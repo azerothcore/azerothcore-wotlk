@@ -15,6 +15,7 @@
 #include "Object.h"
 #include "SpellAuraDefines.h"
 #include "ThreatManager.h"
+#include <functional>
 
 #define WORLD_TRIGGER   12999
 
