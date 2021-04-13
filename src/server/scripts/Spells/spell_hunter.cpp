@@ -710,8 +710,49 @@ public:
             }
         }
 
+        SpellCastResult DoCheckCast()
+        {
+            Guardian* pet = GetCaster()->ToPlayer()->GetGuardianPet();
+            ASSERT(pet); // checked in Spell::CheckCast
+
+            if (!pet->IsPet() || !pet->IsAlive())
+                return SPELL_FAILED_NO_PET;
+
+            // Do a mini Spell::CheckCasterAuras on the pet, no other way of doing this
+            SpellCastResult result = SPELL_CAST_OK;
+            uint32 const unitflag = pet->GetUInt32Value(UNIT_FIELD_FLAGS);
+            if (pet->GetCharmerGUID())
+                result = SPELL_FAILED_CHARMED;
+            else if (unitflag & UNIT_FLAG_STUNNED)
+                result = SPELL_FAILED_STUNNED;
+            else if (unitflag & UNIT_FLAG_FLEEING)
+                result = SPELL_FAILED_FLEEING;
+            else if (unitflag & UNIT_FLAG_CONFUSED)
+                result = SPELL_FAILED_CONFUSED;
+
+            if (result != SPELL_CAST_OK)
+                return result;
+
+            Unit* target = GetExplTargetUnit();
+            if (!target)
+                return SPELL_FAILED_BAD_TARGETS;
+
+            if (!pet->IsWithinLOSInMap(target))
+                return SPELL_FAILED_LINE_OF_SIGHT;
+
+            return SPELL_CAST_OK;
+        }
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            GetCaster()->ToPlayer()->GetPet()->CastSpell(GetHitUnit(), GetEffectValue(), true);
+        }
+
         void Register() override
         {
+            OnCheckCast += SpellCheckCastFn(spell_hun_masters_call_SpellScript::DoCheckCast);
+
+            OnEffectHitTarget += SpellEffectFn(spell_hun_masters_call_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             OnEffectHitTarget += SpellEffectFn(spell_hun_masters_call_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };
