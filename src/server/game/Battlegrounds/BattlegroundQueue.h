@@ -69,8 +69,8 @@ public:
     bool GetPlayerGroupInfoData(uint64 guid, GroupQueueInfo* ginfo);
     void PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* ginfo);
     uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const;
-    uint32 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
-    bool IsAllQueuesEmpty(BattlegroundBracketId bracket_id);
+    [[nodiscard]] uint8 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
+    [[nodiscard]] bool IsAllQueuesEmpty(BattlegroundBracketId bracket_id);
     void SendMessageQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
 
     void SetBgTypeIdAndArenaType(BattlegroundTypeId b, uint8 a) { m_bgTypeId = b; m_arenaType = ArenaType(a); } // pussywizard
