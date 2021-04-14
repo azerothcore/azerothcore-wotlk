@@ -118,3 +118,63 @@ UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `m
 UPDATE `dungeon_access_template` SET `max_level` = 72, `min_level` = 63 WHERE `map_id` = 558 AND `difficulty` = 0;
 -- Auchenai Crypts - Heroic
 UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 558 AND `difficulty` = 1;
+-- Caverns Of Time: Old Hillsbrad Foothills/Escape from Durnholde - Normal
+UPDATE `dungeon_access_template` SET `max_level` = 73, `min_level` = 64 WHERE `map_id` = 560 AND `difficulty` = 0;
+-- Caverns Of Time: Old Hillsbrad Foothills/Escape from Durnholde - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 560 AND `difficulty` = 1;
+-- Black Temple
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 70 WHERE `map_id` = 564;
+-- Gruul's Lair
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 70 WHERE `map_id` = 565;
+-- Zul'Aman
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 70 WHERE `map_id` = 568;
+-- Utgarde Keep
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 68 WHERE `map_id` = 574 AND `difficulty` = 0;
+-- Utgarde Keep - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 574 AND `difficulty` = 1;
+-- Utgarde Pinnacle
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 77 WHERE `map_id` = 575 AND `difficulty` = 0;
+-- Utgarde Pinnacle - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 575 AND `difficulty` = 1;
+-- The Nexus
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 69 WHERE `map_id` = 576 AND `difficulty` = 0;
+-- The Nexus - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 576 AND `difficulty` = 1;
+-- The Oculus
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 77 WHERE `map_id` = 578 AND `difficulty` = 0;
+-- The Oculus - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 578 AND `difficulty` = 1;
+-- Sunwell Plateau
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 70 WHERE `map_id` = 580;
+-- Magisters' Terrace - Normal
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 68 WHERE `map_id` = 585 AND `difficulty` = 0;
+-- Magisters' Terrace - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 585 AND `difficulty` = 1;
+-- Culling of Stratholme
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 77 WHERE `map_id` = 595 AND `difficulty` = 0;
+-- Culling of Stratholme - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 595 AND `difficulty` = 1;
+-- Ulduar,Halls of Stone
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 75 WHERE `map_id` = 599 AND `difficulty` = 0;
+-- Ulduar,Halls of Stone - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 599 AND `difficulty` = 1;
+-- Drak'Tharon Keep
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 72 WHERE `map_id` = 600 AND `difficulty` = 0;
+-- Drak'Tharon Keep - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 600 AND `difficulty` = 1;
+-- Azjol-Nerub
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 70 WHERE `map_id` = 601 AND `difficulty` = 0;
+-- Azjol-Nerub - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 601 AND `difficulty` = 1;
+-- Ulduar,Halls of Lightning
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 77 WHERE `map_id` = 602 AND `difficulty` = 0;
+-- Ulduar,Halls of Lightning - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 602 AND `difficulty` = 1;
+-- Ulduar - 10man
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 603 AND `difficulty` = 0;
+-- Ulduar - 10man - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 603 AND `difficulty` = 1;
+-- Gundrak (North entrance)
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 74 WHERE `map_id` = 604 AND `difficulty` = 0;
+-- Gundrak (North entrance) - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 604 AND `difficulty` = 1;
