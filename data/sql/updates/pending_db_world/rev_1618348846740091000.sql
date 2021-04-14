@@ -48,3 +48,27 @@ UPDATE `dungeon_access_template` SET `max_level` = 21, `min_level` = 15 WHERE `m
 UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 60 WHERE `map_id` = 409;
 -- Dire Maul - All wings
 UPDATE `dungeon_access_template` SET `max_level` = 65, `min_level` = 53 WHERE `map_id` = 429;
+-- Blackwing Lair (BWL) - 40man
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 60 WHERE `map_id` = 469;
+-- Ahn'Qiraj Ruins (AQ20) - 20man
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 60 WHERE `map_id` = 509;
+-- Ahn'Qiraj Temple (AQ40) - 40man
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 60 WHERE `map_id` = 531;
+-- Karazhan - 10man
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 70 WHERE `map_id` = 532;
+-- Naxxramas
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 533;
+-- Battle Of Mount Hyjal,Alliance Base
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 70 WHERE `map_id` = 534;
+-- The Shattered Halls
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 67 WHERE `map_id` = 540 AND `difficulty` = 0;
+-- The Shattered Halls - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 540 AND `difficulty` = 1;
+-- The Blood Furnace
+UPDATE `dungeon_access_template` SET `max_level` = 68, `min_level` = 59 WHERE `map_id` = 542 AND `difficulty` = 0;
+-- The Blood Furnace - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 542 AND `difficulty` = 1;
+-- Hellfire Ramparts
+UPDATE `dungeon_access_template` SET `max_level` = 67, `min_level` = 57 WHERE `map_id` = 543 AND `difficulty` = 0;
+-- Hellfire Ramparts - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 543 AND `difficulty` = 1;
