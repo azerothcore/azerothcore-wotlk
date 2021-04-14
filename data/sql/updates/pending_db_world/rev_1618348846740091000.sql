@@ -98,3 +98,23 @@ UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `m
 UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 67 WHERE `map_id` = 553 AND `difficulty` = 0;
 -- The Botanica - Heroic
 UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 553 AND `difficulty` = 1;
+-- The Mechanar
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 67 WHERE `map_id` = 554 AND `difficulty` = 0;
+-- The Mechanar - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 554 AND `difficulty` = 1;
+-- Shadow Labyrinth
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 67 WHERE `map_id` = 555 AND `difficulty` = 0;
+-- Shadow Labyrinth - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 555 AND `difficulty` = 1;
+-- Sethekk Halls
+UPDATE `dungeon_access_template` SET `max_level` = 73, `min_level` = 65 WHERE `map_id` = 556 AND `difficulty` = 0;
+-- Sethekk Halls - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 556 AND `difficulty` = 1;
+-- Mana Tombs
+UPDATE `dungeon_access_template` SET `max_level` = 71, `min_level` = 62 WHERE `map_id` = 557 AND `difficulty` = 0;
+-- Mana Tombs - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 557 AND `difficulty` = 1;
+-- Auchenai Crypts
+UPDATE `dungeon_access_template` SET `max_level` = 72, `min_level` = 63 WHERE `map_id` = 558 AND `difficulty` = 0;
+-- Auchenai Crypts - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 558 AND `difficulty` = 1;
