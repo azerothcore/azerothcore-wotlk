@@ -171,10 +171,44 @@ UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 77 WHERE `m
 -- Ulduar,Halls of Lightning - Heroic
 UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 602 AND `difficulty` = 1;
 -- Ulduar - 10man
-UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 603 AND `difficulty` = 0;
--- Ulduar - 10man - Heroic
-UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 603 AND `difficulty` = 1;
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 603;
 -- Gundrak (North entrance)
 UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 74 WHERE `map_id` = 604 AND `difficulty` = 0;
 -- Gundrak (North entrance) - Heroic
 UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 604 AND `difficulty` = 1;
+-- Violet Hold
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 73 WHERE `map_id` = 608 AND `difficulty` = 0;
+-- Violet Hold - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 608 AND `difficulty` = 1;
+-- The Obsidian Sanctum
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 615;
+-- The Eye of Eternity
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 616;
+-- Ahn'Kahet
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 71 WHERE `map_id` = 619 AND `difficulty` = 0;
+-- Ahn'Kahet - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 619 AND `difficulty` = 1;
+-- Vault of Archavon
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 624;
+-- Icecrown Citadel
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 631;
+-- Forge of Souls
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 80 WHERE `map_id` = 632 AND `difficulty` = 0;
+-- Forge of Souls - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 632 AND `difficulty` = 1;
+-- Trial of the Crusader
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 649;
+-- Trial of the Champion
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 80 WHERE `map_id` = 650 AND `difficulty` = 0;
+-- Trial of the Champion - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 650 AND `difficulty` = 1;
+-- Pit of Saron
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 80 WHERE `map_id` = 658 AND `difficulty` = 0;
+-- Pit of Saron - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 658 AND `difficulty` = 1;
+-- Halls of Reflection
+UPDATE `dungeon_access_template` SET `max_level` = 80, `min_level` = 80 WHERE `map_id` = 668 AND `difficulty` = 0;
+-- Halls of Reflection - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 668 AND `difficulty` = 1;
+-- The Ruby Sanctum
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 724;
