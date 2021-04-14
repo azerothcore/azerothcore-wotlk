@@ -49,6 +49,68 @@ services:
     depends_on:
       - ac-database
 
+  ac-realm-one:
+    stdin_open: true
+    tty: true
+    image: azerothcore/worldserver
+    profiles: ["realm-one"]
+    restart: unless-stopped
+    privileged: true
+    build:
+      context: ./docker/realm/one
+      dockerfile: Dockerfile
+    networks:
+      - ac-network
+    ports:
+      - ${REALM1_EXTERNAL_PORT:-8086}:8085
+      - ${REAML1_SOAP_EXTERNAL_PORT:-7879}:7878
+    volumes:
+      - type: bind
+        source: ./docker/worldserver/bin
+        target: /azeroth-server/bin
+      - type: bind
+        source: ${REALM1_ETC:-./docker/realm/one/etc}
+        target: /azeroth-server/etc
+      - type: bind
+        source: ${REALM1_LOGS:-./docker/realm/one/logs}
+        target: /azeroth-server/logs
+      - type: bind
+        source: ${REALM1_DATA:-./docker/worldserver/data}
+        target: /azeroth-server/data
+    depends_on:
+      - ac-database
+
+  ac-realm-two:
+    stdin_open: true
+    tty: true
+    image: azerothcore/worldserver
+    profiles: ["realm-two"]
+    restart: unless-stopped
+    privileged: true
+    build:
+      context: ./docker/realm/two
+      dockerfile: Dockerfile
+    networks:
+      - ac-network
+    ports:
+      - ${REALM2_EXTERNAL_PORT:-8087}:8085
+      - ${REAML2_SOAP_EXTERNAL_PORT:-7880}:7878
+    volumes:
+      - type: bind
+        source: ./docker/worldserver/bin
+        target: /azeroth-server/bin
+      - type: bind
+        source: ${REALM2_ETC:-./docker/realm/two/etc}
+        target: /azeroth-server/etc
+      - type: bind
+        source: ${REALM2_LOGS:-./docker/realm/two/logs}
+        target: /azeroth-server/logs
+      - type: bind
+        source: ${REALM2_DATA:-./docker/worldserver/data}
+        target: /azeroth-server/data
+    depends_on:
+      - ac-database
+
   ac-authserver:
     image: azerothcore/authserver
     restart: unless-stopped
