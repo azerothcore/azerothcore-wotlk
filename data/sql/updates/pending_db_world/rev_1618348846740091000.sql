@@ -18,3 +18,15 @@ UPDATE `dungeon_access_template` SET `max_level` = 45, `min_level` = 35 WHERE `m
 UPDATE `dungeon_access_template` SET `max_level` = 33, `min_level` = 23 WHERE `map_id` = 90;
 -- Sunken Temple
 UPDATE `dungeon_access_template` SET `max_level` = 55, `min_level` = 45 WHERE `map_id` = 109;
+-- Razorfen Downs
+UPDATE `dungeon_access_template` SET `max_level` = 42, `min_level` = 32 WHERE `map_id` = 129;
+-- Scarlet Monastery (SM) - All wings
+UPDATE `dungeon_access_template` SET `max_level` = 45, `min_level` = 27 WHERE `map_id` = 189;
+-- Zul'Farrak
+UPDATE `dungeon_access_template` SET `max_level` = 51, `min_level` = 41 WHERE `map_id` = 209;
+-- Blackrock Spire - Both Lower (LBRS) & Upper (UBRS) - 5/10man
+UPDATE `dungeon_access_template` SET `max_level` = 65, `min_level` = 55 WHERE `map_id` = 229;
+-- Blackrock Depths (BRD)
+UPDATE `dungeon_access_template` SET `max_level` = 61, `min_level` = 47 WHERE `map_id` = 230;
+-- Onyxia's Lair - 10man & Onyxia's Lair - 25man
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 249;
