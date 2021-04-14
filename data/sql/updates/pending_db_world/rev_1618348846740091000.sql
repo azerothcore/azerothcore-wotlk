@@ -30,3 +30,21 @@ UPDATE `dungeon_access_template` SET `max_level` = 65, `min_level` = 55 WHERE `m
 UPDATE `dungeon_access_template` SET `max_level` = 61, `min_level` = 47 WHERE `map_id` = 230;
 -- Onyxia's Lair - 10man & Onyxia's Lair - 25man
 UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 80 WHERE `map_id` = 249;
+-- Caverns Of Time: Black Morass/Opening the Dark Portal - Normal
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 68 WHERE `map_id` = 269 AND `difficulty` = 0;
+-- Caverns Of Time: Black Morass/Opening the Dark Portal - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 269 AND `difficulty` = 1;
+-- Scholomance
+UPDATE `dungeon_access_template` SET `max_level` = 65, `min_level` = 55 WHERE `map_id` = 289;
+-- Zul'Gurub (ZG) - 20man
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 56 WHERE `map_id` = 309;
+-- Stratholme
+UPDATE `dungeon_access_template` SET `max_level` = 65, `min_level` = 55 WHERE `map_id` = 329;
+-- Maraudon - All wings
+UPDATE `dungeon_access_template` SET `max_level` = 53, `min_level` = 39 WHERE `map_id` = 349;
+-- Ragefire Chasm (RF)
+UPDATE `dungeon_access_template` SET `max_level` = 21, `min_level` = 15 WHERE `map_id` = 389;
+-- Molten Core - 40man
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 60 WHERE `map_id` = 409;
+-- Dire Maul - All wings
+UPDATE `dungeon_access_template` SET `max_level` = 65, `min_level` = 53 WHERE `map_id` = 429;
