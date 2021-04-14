@@ -72,3 +72,29 @@ UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `m
 UPDATE `dungeon_access_template` SET `max_level` = 67, `min_level` = 57 WHERE `map_id` = 543 AND `difficulty` = 0;
 -- Hellfire Ramparts - Heroic
 UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 543 AND `difficulty` = 1;
+-- Hellfire Citadel: Magtheridon's Lair - 25man
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 70 WHERE `map_id` = 544;
+-- The Steamvault
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 67 WHERE `map_id` = 545 AND `difficulty` = 0;
+-- The Steamvault - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 545 AND `difficulty` = 1;
+-- The Underbog
+UPDATE `dungeon_access_template` SET `max_level` = 70, `min_level` = 61 WHERE `map_id` = 546 AND `difficulty` = 0;
+-- The Underbog - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 546 AND `difficulty` = 1;
+-- The Slave Pens
+UPDATE `dungeon_access_template` SET `max_level` = 69, `min_level` = 60 WHERE `map_id` = 547 AND `difficulty` = 0;
+-- The Slave Pens - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 547 AND `difficulty` = 1;
+-- Coilfang Reservoir: Serpentshrine Cavern - 25man
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 70 WHERE `map_id` = 548;
+-- The Eye
+UPDATE `dungeon_access_template` SET `max_level` = 83, `min_level` = 70 WHERE `map_id` = 550;
+-- The Arcatraz
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 68 WHERE `map_id` = 552 AND `difficulty` = 0;
+-- The Arcatraz - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 552 AND `difficulty` = 1;
+-- The Botanica
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 67 WHERE `map_id` = 553 AND `difficulty` = 0;
+-- The Botanica - Heroic
+UPDATE `dungeon_access_template` SET `max_level` = 75, `min_level` = 70 WHERE `map_id` = 553 AND `difficulty` = 1;
