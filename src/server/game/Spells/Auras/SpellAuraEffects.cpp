@@ -4726,7 +4726,7 @@ void AuraEffect::HandleModDamageDone(AuraApplication const* aurApp, uint8 mode, 
     // with spell->EquippedItemClass and  EquippedItemSubClassMask and EquippedItemInventoryTypeMask
     // GetMiscValue() comparison with item generated damage types
 
-    if ((GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL) != 0)
+    if ((GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL) != 0 && sScriptMgr->CanModAuraEffectDamageDone(this, target, aurApp, mode, apply))
     {
         // apply generic physical damage bonuses including wand case
         if (GetSpellInfo()->EquippedItemClass == -1 || target->GetTypeId() != TYPEID_PLAYER)
@@ -4794,6 +4794,9 @@ void AuraEffect::HandleModDamagePercentDone(AuraApplication const* aurApp, uint8
 
     Unit* target = aurApp->GetTarget();
     if (!target)
+        return;
+
+    if (!sScriptMgr->CanModAuraEffectModDamagePercentDone(this, target, aurApp, mode, apply))
         return;
 
     if (target->GetTypeId() == TYPEID_PLAYER)
