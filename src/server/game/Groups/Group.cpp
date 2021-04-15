@@ -59,10 +59,13 @@ Group::Group() : m_leaderGuid(0), m_leaderName(""), m_groupType(GROUPTYPE_NORMAL
 {
     for (uint8 i = 0; i < TARGETICONCOUNT; ++i)
         m_targetIcons[i] = 0;
+        sScriptMgr->OnConstructGroup(this);
 }
 
 Group::~Group()
 {
+    sScriptMgr->OnDestructGroup(this);
+
     if (m_bgGroup)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -142,6 +145,8 @@ bool Group::Create(Player* leader)
         CharacterDatabase.Execute(stmt);
 
         ASSERT(AddMember(leader)); // If the leader can't be added to a new group because it appears full, something is clearly wrong.
+
+        sScriptMgr->OnCreate(this, leader);
     }
     else if (!AddMember(leader))
         return false;
@@ -1838,6 +1843,9 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
 
         // don't let join with offline members
         if (!member)
+            return ERR_BATTLEGROUND_JOIN_FAILED;
+
+        if (!sScriptMgr->CanGroupJoinBattlegroundQueue(this, member, bgTemplate, MinPlayerCount, isRated, arenaSlot))
             return ERR_BATTLEGROUND_JOIN_FAILED;
 
         // don't allow cross-faction groups to join queue

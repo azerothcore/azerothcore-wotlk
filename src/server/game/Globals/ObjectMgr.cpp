@@ -6342,7 +6342,6 @@ void ObjectMgr::LoadAccessRequirements()
                     currentRequirementsList->push_back(progression_requirement);
                 }
 
-
             } while (progression_requirements_results->NextRow());
         }
 
@@ -6359,7 +6358,6 @@ void ObjectMgr::LoadAccessRequirements()
 
         _accessRequirementStore[mapid][difficulty] = ar;
     } while (access_template_result->NextRow());
-
 
     sLog->outString(">> Loaded %u rows from dungeon_access_template and %u rows from dungeon_access_requirements in %u ms", count, countProgressionRequirements, GetMSTimeDiffToNow(oldMSTime));
     sLog->outString();

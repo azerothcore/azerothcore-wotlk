@@ -15,6 +15,7 @@
 #include "DBCStores.h"
 #include "DynamicObject.h"
 #include "GameEventMgr.h"
+#include "LFGMgr.h"
 #include "ObjectMgr.h"
 #include "PetDefines.h"
 #include "QuestDef.h"
@@ -63,9 +64,11 @@ struct AchievementCriteriaData;
 struct AuctionEntry;
 struct ConditionSourceInfo;
 struct Condition;
+struct DungeonProgressionRequirements;
 struct ItemTemplate;
 struct OutdoorPvPData;
 struct GroupQueueInfo;
+struct TargetInfo;
 
 #define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
 
@@ -287,6 +290,9 @@ public:
 
     // Called after calculating arena rating changes
     virtual void OnAfterArenaRatingCalculation(Battleground* const /*bg*/, int32& /*winnerMatchmakerChange*/, int32& /*loserMatchmakerChange*/, int32& /*winnerChange*/, int32& /*loserChange*/) { };
+
+    // Called before modifying a player's personal rating
+    virtual void OnBeforeUpdatingPersonalRating(int32& /*mod*/, uint32 /*type*/) { }
 };
 
 template<class TMap> class MapScript : public UpdatableScript<TMap>
@@ -397,19 +403,19 @@ public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when a player accepts a quest from the item.
-    virtual bool OnQuestAccept(Player* /*player*/, Item* /*item*/, Quest const* /*quest*/) { return false; }
+    [[nodiscard]] virtual bool OnQuestAccept(Player* /*player*/, Item* /*item*/, Quest const* /*quest*/) { return false; }
 
     // Called when a player uses the item.
-    virtual bool OnUse(Player* /*player*/, Item* /*item*/, SpellCastTargets const& /*targets*/) { return false; }
+    [[nodiscard]] virtual bool OnUse(Player* /*player*/, Item* /*item*/, SpellCastTargets const& /*targets*/) { return false; }
 
     // Called when the item is destroyed.
-    virtual bool OnRemove(Player* /*player*/, Item* /*item*/) { return false; }
+    [[nodiscard]] virtual bool OnRemove(Player* /*player*/, Item* /*item*/) { return false; }
 
     // Called before casting a combat spell from this item (chance on hit spells of item template, can be used to prevent cast if returning false)
-    virtual bool OnCastItemCombatSpell(Player* /*player*/, Unit* /*victim*/, SpellInfo const* /*spellInfo*/, Item* /*item*/) { return true; }
+    [[nodiscard]] virtual bool OnCastItemCombatSpell(Player* /*player*/, Unit* /*victim*/, SpellInfo const* /*spellInfo*/, Item* /*item*/) { return true; }
 
     // Called when the item expires (is destroyed).
-    virtual bool OnExpire(Player* /*player*/, ItemTemplate const* /*proto*/) { return false; }
+    [[nodiscard]] virtual bool OnExpire(Player* /*player*/, ItemTemplate const* /*proto*/) { return false; }
 
     // Called when a player selects an option in an item gossip window
     virtual void OnGossipSelect(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/) { }
@@ -447,6 +453,20 @@ public:
     virtual uint32 DealDamage(Unit* /*AttackerUnit*/, Unit* /*pVictim*/, uint32 damage, DamageEffectType /*damagetype*/) { return damage; }
 
     virtual void OnBeforeRollMeleeOutcomeAgainst(const Unit* /*attacker*/, const Unit* /*victim*/, WeaponAttackType /*attType*/, int32& /*attackerMaxSkillValueForLevel*/, int32& /*victimMaxSkillValueForLevel*/, int32& /*attackerWeaponSkill*/, int32& /*victimDefenseSkill*/, int32& /*crit_chance*/, int32& /*miss_chance*/, int32& /*dodge_chance*/, int32& /*parry_chance*/, int32& /*block_chance*/ ) {   };
+
+    virtual void OnAuraRemove(Unit* /*unit*/, AuraApplication* /*aurApp*/, AuraRemoveMode /*mode*/) { }
+
+    [[nodiscard]] virtual bool IfNormalReaction(Unit const* /*unit*/, Unit const* /*target*/, ReputationRank& /*repRank*/) { return true; }
+
+    [[nodiscard]] virtual bool IsNeedModSpellDamagePercent(Unit const* /*unit*/, AuraEffect* /*auraEff*/, float& /*doneTotalMod*/, SpellInfo const* /*spellProto*/) { return true; }
+
+    [[nodiscard]] virtual bool IsNeedModMeleeDamagePercent(Unit const* /*unit*/, AuraEffect* /*auraEff*/, float& /*doneTotalMod*/, SpellInfo const* /*spellProto*/) { return true; }
+
+    [[nodiscard]] virtual bool IsNeedModHealPercent(Unit const* /*unit*/, AuraEffect* /*auraEff*/, float& /*doneTotalMod*/, SpellInfo const* /*spellProto*/) { return true; }
+
+    [[nodiscard]] virtual bool CanSetPhaseMask(Unit const* /*unit*/, uint32 /*newPhaseMask*/, bool /*update*/) { return true; }
+
+    [[nodiscard]] virtual bool IsCustomBuildValuesUpdate(Unit const* /*unit*/, uint8 /*updateType*/, ByteBuffer& /*fieldBuffer*/, Player const* /*target*/, uint16 /*index*/) { return false; }
 };
 
 class MovementHandlerScript : public ScriptObject
@@ -494,25 +514,25 @@ public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when a player opens a gossip dialog with the creature.
-    virtual bool OnGossipHello(Player* /*player*/, Creature* /*creature*/) { return false; }
+    [[nodiscard]] virtual bool OnGossipHello(Player* /*player*/, Creature* /*creature*/) { return false; }
 
     // Called when a player selects a gossip item in the creature's gossip menu.
-    virtual bool OnGossipSelect(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/) { return false; }
+    [[nodiscard]] virtual bool OnGossipSelect(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/) { return false; }
 
     // Called when a player selects a gossip with a code in the creature's gossip menu.
-    virtual bool OnGossipSelectCode(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { return false; }
+    [[nodiscard]] virtual bool OnGossipSelectCode(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { return false; }
 
     // Called when a player accepts a quest from the creature.
-    virtual bool OnQuestAccept(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/) { return false; }
+    [[nodiscard]] virtual bool OnQuestAccept(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/) { return false; }
 
     // Called when a player selects a quest in the creature's quest menu.
-    virtual bool OnQuestSelect(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/) { return false; }
+    [[nodiscard]] virtual bool OnQuestSelect(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/) { return false; }
 
     // Called when a player completes a quest with the creature.
-    virtual bool OnQuestComplete(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/) { return false; }
+    [[nodiscard]] virtual bool OnQuestComplete(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/) { return false; }
 
     // Called when a player selects a quest reward.
-    virtual bool OnQuestReward(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/, uint32 /*opt*/) { return false; }
+    [[nodiscard]] virtual bool OnQuestReward(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/, uint32 /*opt*/) { return false; }
 
     // Called when the dialog status between a player and the creature is requested.
     virtual uint32 GetDialogStatus(Player* /*player*/, Creature* /*creature*/) { return DIALOG_STATUS_SCRIPTED_NO_STATUS; }
@@ -530,19 +550,19 @@ public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when a player opens a gossip dialog with the gameobject.
-    virtual bool OnGossipHello(Player* /*player*/, GameObject* /*go*/) { return false; }
+    [[nodiscard]] virtual bool OnGossipHello(Player* /*player*/, GameObject* /*go*/) { return false; }
 
     // Called when a player selects a gossip item in the gameobject's gossip menu.
-    virtual bool OnGossipSelect(Player* /*player*/, GameObject* /*go*/, uint32 /*sender*/, uint32 /*action*/) { return false; }
+    [[nodiscard]] virtual bool OnGossipSelect(Player* /*player*/, GameObject* /*go*/, uint32 /*sender*/, uint32 /*action*/) { return false; }
 
     // Called when a player selects a gossip with a code in the gameobject's gossip menu.
-    virtual bool OnGossipSelectCode(Player* /*player*/, GameObject* /*go*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { return false; }
+    [[nodiscard]] virtual bool OnGossipSelectCode(Player* /*player*/, GameObject* /*go*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { return false; }
 
     // Called when a player accepts a quest from the gameobject.
-    virtual bool OnQuestAccept(Player* /*player*/, GameObject* /*go*/, Quest const* /*quest*/) { return false; }
+    [[nodiscard]] virtual bool OnQuestAccept(Player* /*player*/, GameObject* /*go*/, Quest const* /*quest*/) { return false; }
 
     // Called when a player selects a quest reward.
-    virtual bool OnQuestReward(Player* /*player*/, GameObject* /*go*/, Quest const* /*quest*/, uint32 /*opt*/) { return false; }
+    [[nodiscard]] virtual bool OnQuestReward(Player* /*player*/, GameObject* /*go*/, Quest const* /*quest*/, uint32 /*opt*/) { return false; }
 
     // Called when the dialog status between a player and the gameobject is requested.
     virtual uint32 GetDialogStatus(Player* /*player*/, GameObject* /*go*/) { return DIALOG_STATUS_SCRIPTED_NO_STATUS; }
@@ -572,7 +592,7 @@ public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when the area trigger is activated by a player.
-    virtual bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) { return false; }
+    [[nodiscard]] virtual bool OnTrigger(Player* /*player*/, AreaTrigger const* /*trigger*/) { return false; }
 };
 
 class BattlegroundScript : public ScriptObject
@@ -670,7 +690,7 @@ public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when a single condition is checked for a player.
-    virtual bool OnConditionCheck(Condition* /*condition*/, ConditionSourceInfo& /*sourceInfo*/) { return true; }
+    [[nodiscard]] virtual bool OnConditionCheck(Condition* /*condition*/, ConditionSourceInfo& /*sourceInfo*/) { return true; }
 };
 
 class VehicleScript : public ScriptObject
@@ -734,7 +754,7 @@ public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // deprecated/legacy
-    virtual bool OnCheck(Player* /*source*/, Unit* /*target*/) { return true; };
+    [[nodiscard]] virtual bool OnCheck(Player* /*source*/, Unit* /*target*/) { return true; };
 };
 
 class PlayerScript : public ScriptObject
@@ -860,7 +880,7 @@ public:
     virtual void OnMapChanged(Player* /*player*/) { }
 
     // Called before a player is being teleported to new coords
-    virtual bool OnBeforeTeleport(Player* /*player*/, uint32 /*mapid*/, float /*x*/, float /*y*/, float /*z*/, float /*orientation*/, uint32 /*options*/, Unit* /*target*/) { return true; }
+    [[nodiscard]] virtual bool OnBeforeTeleport(Player* /*player*/, uint32 /*mapid*/, float /*x*/, float /*y*/, float /*z*/, float /*orientation*/, uint32 /*options*/, Unit* /*target*/) { return true; }
 
     // Called when team/faction is set on player
     virtual void OnUpdateFaction(Player* /*player*/) { }
@@ -922,14 +942,23 @@ public:
     //After creating item (eg profession item creation)
     virtual void OnCreateItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
 
-    //After receiving item as a quest reward
+    // After receiving item as a quest reward
     virtual void OnQuestRewardItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
+
+    // After completed a quest
+    [[nodiscard]] virtual bool OnBeforeQuestComplete(Player* /*player*/, uint32 /*quest_id*/) { return true; }
+
+    // Before durability repair action, you can even modify the discount value
+    virtual void OnBeforeDurabilityRepair(Player* /*player*/, uint64 /*npcGUID*/, uint64 /*itemGUID*/, float&/*discountMod*/, uint8 /*guildBank*/) { }
 
     //Before buying something from any vendor
     virtual void OnBeforeBuyItemFromVendor(Player* /*player*/, uint64 /*vendorguid*/, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/) { };
 
     //Before buying something from any vendor
-    virtual void OnAfterStoreOrEquipNewItem(Player* /*player*/, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) { };
+    virtual void OnBeforeStoreOrEquipNewItem(Player* /*player*/, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) { };
+
+    //After buying something from any vendor
+    virtual void OnAfterStoreOrEquipNewItem(Player* /*player*/, uint32 /*vendorslot*/, Item* /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) { };
 
     virtual void OnAfterUpdateMaxPower(Player* /*player*/, Powers& /*power*/, float& /*value*/) { }
 
@@ -942,7 +971,7 @@ public:
 
     virtual void OnFirstLogin(Player* /*player*/) { }
 
-    virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, uint64 /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
+    [[nodiscard]] virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, uint64 /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
     virtual bool ShouldBeRewardedWithMoneyInsteadOfExp(Player* /*player*/) { return false; }
 
     // Called before the player's temporary summoned creature has initialized it's stats
@@ -956,6 +985,100 @@ public:
 
     // Called before loading a player's pet from the DB
     virtual void OnBeforeLoadPetFromDB(Player* /*player*/, uint32& /*petentry*/, uint32& /*petnumber*/, bool& /*current*/, bool& /*forceLoadFromDB*/) { }
+
+    [[nodiscard]] virtual bool CanJoinInArenaQueue(Player* /*player*/, uint64 /*BattlemasterGuid*/, uint8 /*arenaslot*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, uint8 /*IsRated*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
+
+    [[nodiscard]] virtual bool CanBattleFieldPort(Player* /*player*/, uint8 /*arenaType*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*action*/) { return true; }
+
+    [[nodiscard]] virtual bool CanGroupInvite(Player* /*player*/, std::string& /*membername*/) { return true; }
+
+    [[nodiscard]] virtual bool CanGroupAccept(Player* /*player*/, Group* /*group*/) { return true; }
+
+    [[nodiscard]] virtual bool CanSellItem(Player* /*player*/, Item* /*item*/, Creature* /*creature*/) { return true; }
+
+    [[nodiscard]] virtual bool CanSendMail(Player* /*player*/, uint64 /*receiverGuid*/, uint64 /*mailbox*/, std::string& /*subject*/, std::string& /*body*/, uint32 /*money*/, uint32 /*COD*/, Item* /*item*/) { return true; }
+
+    virtual void PetitionBuy(Player* /*player*/, Creature* /*creature*/, uint32& /*charterid*/, uint32& /*cost*/, uint32& /*type*/) { }
+
+    virtual void PetitionShowList(Player* /*player*/, Creature* /*creature*/, uint32& /*CharterEntry*/, uint32& /*CharterDispayID*/, uint32& /*CharterCost*/) { }
+
+    virtual void OnRewardKillRewarder(Player* /*player*/, bool /*isDungeon*/, float& /*rate*/) { }
+
+    [[nodiscard]] virtual bool CanGiveMailRewardAtGiveLevel(Player* /*player*/, uint8 /*level*/) { return true; }
+
+    virtual void OnDeleteFromDB(SQLTransaction& /*trans*/, uint32 /*guid*/) { }
+
+    [[nodiscard]] virtual bool CanRepopAtGraveyard(Player* /*player*/) { return true; }
+
+    virtual void OnGetMaxSkillValue(Player* /*player*/, uint32 /*skill*/, int32& /*result*/, bool /*IsPure*/) { }
+
+    [[nodiscard]] virtual bool CanAreaExploreAndOutdoor(Player* /*player*/) { return true; }
+
+    virtual void OnVictimRewardBefore(Player* /*player*/, Player* /*victim*/, uint32& /*killer_title*/, uint32& /*victim_title*/) { }
+
+    virtual void OnVictimRewardAfter(Player* /*player*/, Player* /*victim*/, uint32& /*killer_title*/, uint32& /*victim_rank*/, float& /*honor_f*/) { }
+
+    virtual void OnCustomScalingStatValueBefore(Player* /*player*/, ItemTemplate const* /*proto*/, uint8 /*slot*/, bool /*apply*/, uint32& /*CustomScalingStatValue*/) { }
+
+    virtual void OnCustomScalingStatValue(Player* /*player*/, ItemTemplate const* /*proto*/, uint32& /*statType*/, int32& /*val*/, uint8 /*itemProtoStatNumber*/, uint32 /*ScalingStatValue*/, ScalingStatValuesEntry const* /*ssv*/) { }
+
+    [[nodiscard]] virtual bool CanArmorDamageModifier(Player* /*player*/) { return true; }
+
+    virtual void OnGetFeralApBonus(Player* /*player*/, int32& /*feral_bonus*/, int32 /*dpsMod*/, ItemTemplate const* /*proto*/, ScalingStatValuesEntry const* /*ssv*/) { }
+
+    [[nodiscard]] virtual bool CanApplyWeaponDependentAuraDamageMod(Player* /*player*/, Item* /*item*/, WeaponAttackType /*attackType*/, AuraEffect const* /*aura*/, bool /*apply*/) { return true; }
+
+    [[nodiscard]] virtual bool CanApplyEquipSpell(Player* /*player*/, SpellInfo const* /*spellInfo*/, Item* /*item*/, bool /*apply*/, bool /*form_change*/) { return true; }
+
+    [[nodiscard]] virtual bool CanApplyEquipSpellsItemSet(Player* /*player*/, ItemSetEffect* /*eff*/) { return true; }
+
+    [[nodiscard]] virtual bool CanCastItemCombatSpell(Player* /*player*/, Unit* /*target*/, WeaponAttackType /*attType*/, uint32 /*procVictim*/, uint32 /*procEx*/, Item* /*item*/, ItemTemplate const* /*proto*/) { return true; }
+
+    [[nodiscard]] virtual bool CanCastItemUseSpell(Player* /*player*/, Item* /*item*/, SpellCastTargets const& /*targets*/, uint8 /*cast_count*/, uint32 /*glyphIndex*/) { return true; }
+
+    virtual void OnApplyAmmoBonuses(Player* /*player*/, ItemTemplate const* /*proto*/, float& /*currentAmmoDPS*/) { }
+
+    [[nodiscard]] virtual bool CanEquipItem(Player* /*player*/, uint8 /*slot*/, uint16& /*dest*/, Item* /*pItem*/, bool /*swap*/, bool /*not_loading*/) { return true; }
+
+    [[nodiscard]] virtual bool CanUnequipItem(Player* /*player*/, uint16 /*pos*/, bool /*swap*/) { return true; }
+
+    [[nodiscard]] virtual bool CanUseItem(Player* /*player*/, ItemTemplate const* /*proto*/, InventoryResult& /*result*/) { return true; }
+
+    [[nodiscard]] virtual bool CanSaveEquipNewItem(Player* /*player*/, Item* /*item*/, uint16 /*pos*/, bool /*update*/) { return true; }
+
+    [[nodiscard]] virtual bool CanApplyEnchantment(Player* /*player*/, Item* /*item*/, EnchantmentSlot /*slot*/, bool /*apply*/, bool /*apply_dur*/, bool /*ignore_condition*/) { return true; }
+
+    virtual void OnGetQuestRate(Player* /*player*/, float& /*result*/) { }
+
+    [[nodiscard]] virtual bool PassedQuestKilledMonsterCredit(Player* /*player*/, Quest const* /*qinfo*/, uint32 /*entry*/, uint32 /*real_entry*/, uint64 /*guid*/) { return true; }
+
+    [[nodiscard]] virtual bool CheckItemInSlotAtLoadInventory(Player* /*player*/, Item* /*item*/, uint8 /*slot*/, uint8& /*err*/, uint16& /*dest*/) { return true; }
+
+    [[nodiscard]] virtual bool NotAvoidSatisfy(Player* /*player*/, DungeonProgressionRequirements const* /*ar*/, uint32 /*target_map*/, bool /*report*/) { return true; }
+
+    [[nodiscard]] virtual bool NotVisibleGloballyFor(Player* /*player*/, Player const* /*u*/) { return true; }
+
+    virtual void OnGetArenaPersonalRating(Player* /*player*/, uint8 /*slot*/, uint32& /*result*/) { }
+
+    virtual void OnGetArenaTeamId(Player* /*player*/, uint8 /*slot*/, uint32& /*result*/) { }
+
+    virtual void OnIsFFAPvP(Player* /*player*/, bool& /*result*/) { }
+
+    virtual void OnIsPvP(Player* /*player*/, bool& /*result*/) { }
+
+    virtual void OnGetMaxSkillValueForLevel(Player* /*player*/, uint16& /*result*/) { }
+
+    [[nodiscard]] virtual bool NotSetArenaTeamInfoField(Player* /*player*/, uint8 /*slot*/, ArenaTeamInfoType /*type*/, uint32 /*value*/) { return true; }
+
+    [[nodiscard]] virtual bool CanJoinLfg(Player* /*player*/, uint8 /*roles*/, lfg::LfgDungeonSet& /*dungeons*/, const std::string& /*comment*/) { return true; }
+
+    [[nodiscard]] virtual bool CanEnterMap(Player* /*player*/, MapEntry const* /*entry*/, InstanceTemplate const* /*instance*/, MapDifficulty const* /*mapDiff*/, bool /*loginCheck*/) { return true; }
+
+    [[nodiscard]] virtual bool CanInitTrade(Player* /*player*/, Player* /*target*/) { return true; }
+
+    virtual void OnSetServerSideVisibility(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
+
+    virtual void OnSetServerSideVisibilityDetect(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
 };
 
 class AccountScript : public ScriptObject
@@ -1025,6 +1148,8 @@ public:
     virtual void OnEvent(Guild* /*guild*/, uint8 /*eventType*/, uint32 /*playerGuid1*/, uint32 /*playerGuid2*/, uint8 /*newRank*/) { }
 
     virtual void OnBankEvent(Guild* /*guild*/, uint8 /*eventType*/, uint8 /*tabId*/, uint32 /*playerGuid*/, uint32 /*itemOrMoney*/, uint16 /*itemStackCount*/, uint8 /*destTabId*/) { }
+
+    [[nodiscard]] virtual bool CanGuildSendBankList(Guild const* /*guild*/, WorldSession* /*session*/, uint8 /*tabId*/, bool /*sendAllSlots*/) { return true; }
 };
 
 class GroupScript : public ScriptObject
@@ -1049,6 +1174,10 @@ public:
 
     // Called when a group is disbanded.
     virtual void OnDisband(Group* /*group*/) { }
+
+    [[nodiscard]] virtual bool CanGroupJoinBattlegroundQueue(Group const* /*group*/, Player* /*member*/, Battleground const* /*bgTemplate*/, uint32 /*MinPlayerCount*/, bool /*isRated*/, uint32 /*arenaSlot*/) { return true; }
+
+    virtual void OnCreate(Group* /*group*/, Player* /*leader*/) { }
 };
 
 // following hooks can be used anywhere and are not db bounded
@@ -1067,7 +1196,7 @@ public:
     virtual void OnBeforeDropAddItem(Player const* /*player*/, Loot& /*loot*/, bool /*canRate*/, uint16 /*lootMode*/, LootStoreItem* /*LootStoreItem*/, LootStore const& /*store*/) { }
     virtual void OnItemRoll(Player const* /*player*/, LootStoreItem const* /*LootStoreItem*/, float& /*chance*/, Loot& /*loot*/, LootStore const& /*store*/) { };
 
-    virtual void OnInitializeLockedDungeons(Player* /*player*/, uint8& /*level*/, uint32& /*lockData*/) { }
+    virtual void OnInitializeLockedDungeons(Player* /*player*/, uint8& /*level*/, uint32& /*lockData*/, lfg::LFGDungeonData const* /*dungeon*/) { }
     virtual void OnAfterInitializeLockedDungeons(Player* /*player*/) { }
 
     // On Before arena points distribution
@@ -1106,16 +1235,20 @@ public:
     // Remove player at leave BG
     virtual void OnBattlegroundRemovePlayerAtLeave(Battleground* /*bg*/, Player* /*player*/) { }
 
+    virtual void OnQueueUpdate(BattlegroundQueue* /*queue*/, BattlegroundBracketId /*bracket_id*/, bool /*isRated*/, uint32 /*arenaRatedTeamId*/) { }
+
     virtual void OnAddGroup(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/, uint32& /*index*/, Player* /*leader*/, Group* /*grp*/, PvPDifficultyEntry const* /*bracketEntry*/, bool /*isPremade*/) { }
 
-    virtual bool CanFillPlayersToBG(BattlegroundQueue* /*queue*/, Battleground* /*bg*/, const int32 /*aliFree*/, const int32 /*hordeFree*/, BattlegroundBracketId /*bracket_id*/) { return true; }
+    [[nodiscard]] virtual bool CanFillPlayersToBG(BattlegroundQueue* /*queue*/, Battleground* /*bg*/, const int32 /*aliFree*/, const int32 /*hordeFree*/, BattlegroundBracketId /*bracket_id*/) { return true; }
 
-    virtual bool CanFillPlayersToBGWithSpecific(BattlegroundQueue* /*queue*/, Battleground* /*bg*/, const int32 /*aliFree*/, const int32 /*hordeFree*/,
+    [[nodiscard]] virtual bool CanFillPlayersToBGWithSpecific(BattlegroundQueue* /*queue*/, Battleground* /*bg*/, const int32 /*aliFree*/, const int32 /*hordeFree*/,
             BattlegroundBracketId /*thisBracketId*/, BattlegroundQueue* /*specificQueue*/, BattlegroundBracketId /*specificBracketId*/) { return true; }
 
     virtual void OnCheckNormalMatch(BattlegroundQueue* /*queue*/, uint32& /*Coef*/, Battleground* /*bgTemplate*/, BattlegroundBracketId /*bracket_id*/, uint32& /*minPlayers*/, uint32& /*maxPlayers*/) { }
 
-    virtual bool CanSendMessageQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, Battleground* /*bg*/, PvPDifficultyEntry const* /*bracketEntry*/) { return true; }
+    [[nodiscard]] virtual bool CanSendMessageBGQueue(BattlegroundQueue* /*queue*/, Player* /*leader*/, Battleground* /*bg*/, PvPDifficultyEntry const* /*bracketEntry*/) { return true; }
+
+    [[nodiscard]] virtual bool CanSendMessageArenaQueue(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/, bool /*IsJoin*/) { return true; }
 };
 
 class ArenaTeamScript : public ScriptObject
@@ -1143,6 +1276,24 @@ public:
 
     // Calculate max duration in applying aura
     virtual void OnCalcMaxDuration(Aura const* /*aura*/, int32& /*maxDuration*/) { }
+
+    [[nodiscard]] virtual bool CanModAuraEffectDamageDone(AuraEffect const* /*auraEff*/, Unit* /*target*/, AuraApplication const* /*aurApp*/, uint8 /*mode*/, bool /*apply*/) { return true; }
+
+    [[nodiscard]] virtual bool CanModAuraEffectModDamagePercentDone(AuraEffect const* /*auraEff*/, Unit* /*target*/, AuraApplication const* /*aurApp*/, uint8 /*mode*/, bool /*apply*/) { return true; }
+
+    virtual void OnSpellCheckCast(Spell* /*spell*/, bool /*strict*/, SpellCastResult& /*res*/) { }
+
+    [[nodiscard]] virtual bool CanPrepare(Spell* /*spell*/, SpellCastTargets const* /*targets*/, AuraEffect const* /*triggeredByAura*/) { return true; }
+
+    [[nodiscard]] virtual bool CanScalingEverything(Spell* /*spell*/) { return false; }
+
+    [[nodiscard]] virtual bool CanSelectSpecTalent(Spell* /*spell*/) { return true; }
+
+    virtual void OnScaleAuraUnitAdd(Spell* /*spell*/, Unit* /*target*/, uint32 /*effectMask*/, bool /*checkIfValid*/, bool /*implicit*/, uint8 /*auraScaleMask*/, TargetInfo& /*targetInfo*/) { }
+
+    virtual void OnRemoveAuraScaleTargets(Spell* /*spell*/, TargetInfo& /*targetInfo*/, uint8 /*auraScaleMask*/, bool& /*needErase*/) { }
+
+    virtual void OnBeforeAuraRankForLevel(SpellInfo const* /*spellInfo*/, SpellInfo const* /*latestSpellInfo*/, uint8 /*level*/) { }
 };
 
 // this class can be used to be extended by Modules
@@ -1174,6 +1325,124 @@ protected:
 public:
     // Called before mail is sent
     virtual void OnBeforeMailDraftSendMailTo(MailDraft* /*mailDraft*/, MailReceiver const& /*receiver*/, MailSender const& /*sender*/, MailCheckMask& /*checked*/, uint32& /*deliver_delay*/, uint32& /*custom_expiration*/, bool& /*deleteMailItemsFromDB*/, bool& /*sendMail*/) { }
+};
+
+class AchievementScript : public ScriptObject
+{
+protected:
+
+    AchievementScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    // After complete global acvievement
+    virtual void SetRealmCompleted(AchievementEntry const* /*achievement*/) { }
+
+    [[nodiscard]] virtual bool IsCompletedCriteria(AchievementMgr* /*mgr*/, AchievementCriteriaEntry const* /*achievementCriteria*/, AchievementEntry const* /*achievement*/, CriteriaProgress const* /*progress*/) { return true; }
+
+    [[nodiscard]] virtual bool IsRealmCompleted(AchievementGlobalMgr const* /*globalmgr*/, AchievementEntry const* /*achievement*/, std::chrono::system_clock::time_point /*completionTime*/) { return true; }
+
+    virtual void OnBeforeCheckCriteria(AchievementMgr* /*mgr*/, AchievementCriteriaEntryList const* /*achievementCriteriaList*/) { }
+
+    [[nodiscard]] virtual bool CanCheckCriteria(AchievementMgr* /*mgr*/, AchievementCriteriaEntry const* /*achievementCriteria*/) { return true; }
+};
+
+class PetScript : public ScriptObject
+{
+protected:
+
+    PetScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    virtual void OnInitStatsForLevel(Guardian* /*guardian*/, uint8 /*petlevel*/) { }
+
+    virtual void OnCalculateMaxTalentPointsForLevel(Pet* /*pet*/, uint8 /*level*/, uint8& /*points*/) { }
+
+    [[nodiscard]] virtual bool CanUnlearnSpellSet(Pet* /*pet*/, uint32 /*level*/, uint32 /*spell*/) { return true; }
+
+    [[nodiscard]] virtual bool CanUnlearnSpellDefault(Pet* /*pet*/, SpellInfo const* /*spellEntry*/) { return true; }
+
+    [[nodiscard]] virtual bool CanResetTalents(Pet* /*pet*/) { return true; }
+};
+
+class ArenaScript : public ScriptObject
+{
+protected:
+
+    ArenaScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    [[nodiscard]] virtual bool CanAddMember(ArenaTeam* /*team*/, uint64 /*PlayerGuid*/) { return true; }
+
+    virtual void OnGetPoints(ArenaTeam* /*team*/, uint32 /*memberRating*/, float& /*points*/) { }
+
+    [[nodiscard]] virtual bool CanSaveToDB(ArenaTeam* /*team*/) { return true; }
+};
+
+class MiscScript : public ScriptObject
+{
+protected:
+
+    MiscScript(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    virtual void OnConstructObject(Object* /*origin*/) { }
+
+    virtual void OnDestructObject(Object* /*origin*/) { }
+
+    virtual void OnConstructPlayer(Player* /*origin*/) { }
+
+    virtual void OnDestructPlayer(Player* /*origin*/) { }
+
+    virtual void OnConstructGroup(Group* /*origin*/) { }
+
+    virtual void OnDestructGroup(Group* /*origin*/) { }
+
+    virtual void OnConstructInstanceSave(InstanceSave* /*origin*/) { }
+
+    virtual void OnDestructInstanceSave(InstanceSave* /*origin*/) { }
+
+    virtual void OnItemCreate(Item* /*item*/, ItemTemplate const* /*itemProto*/, Player const* /*owner*/) { }
+
+    [[nodiscard]] virtual bool CanApplySoulboundFlag(Item* /*item*/, ItemTemplate const* /*proto*/) { return true; }
+
+    [[nodiscard]] virtual bool CanItemApplyEquipSpell(Player* /*player*/, Item* /*item*/) { return true; }
+
+    [[nodiscard]] virtual bool CanSendAuctionHello(WorldSession const* /*session*/, uint64 /*guid*/, Creature* /*creature*/) { return true; }
+
+    virtual void ValidateSpellAtCastSpell(Player* /*player*/, uint32& /*oldSpellId*/, uint32& /*spellId*/, uint8& /*castCount*/, uint8& /*castFlags*/) { }
+
+    virtual void ValidateSpellAtCastSpellResult(Player* /*player*/, Unit* /*mover*/, Spell* /*spell*/, uint32 /*oldSpellId*/, uint32 /*spellId*/) { }
+
+    virtual void OnAfterLootTemplateProcess(Loot* /*loot*/, LootTemplate const* /*tab*/, LootStore const& /*store*/, Player* /*lootOwner*/, bool /*personal*/, bool /*noEmptyError*/, uint16 /*lootMode*/) { }
+
+    virtual void OnPlayerSetPhase(const AuraEffect* /*auraEff*/, AuraApplication const* /*aurApp*/, uint8 /*mode*/, bool /*apply*/, uint32& /*newPhase*/) { }
+
+    virtual void OnInstanceSave(InstanceSave* /*instanceSave*/) { }
+};
+
+class CommandSC : public ScriptObject
+{
+protected:
+
+    CommandSC(const char* name);
+
+public:
+
+    bool IsDatabaseBound() const { return false; }
+
+    virtual void OnHandleDevCommand(Player* /*player*/, std::string& /*argstr*/) { }
 };
 
 // Manages registration, loading, and execution of scripts.
@@ -1234,6 +1503,7 @@ public: /* FormulaScript */
     void OnGainCalculation(uint32& gain, Player* player, Unit* unit);
     void OnGroupRateCalculation(float& rate, uint32 count, bool isRaid);
     void OnAfterArenaRatingCalculation(Battleground* const bg, int32& winnerMatchmakerChange, int32& loserMatchmakerChange, int32& winnerChange, int32& loserChange);
+    void OnBeforeUpdatingPersonalRating(int32& mod, uint32 type);
 
 public: /* MapScript */
     void OnCreateMap(Map* map);
@@ -1396,8 +1666,11 @@ public: /* PlayerScript */
     void OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid);
     void OnCreateItem(Player* player, Item* item, uint32 count);
     void OnQuestRewardItem(Player* player, Item* item, uint32 count);
+    bool OnBeforePlayerQuestComplete(Player* player, uint32 quest_id);
+    void OnBeforePlayerDurabilityRepair(Player* player, uint64 npcGUID, uint64 itemGUID, float& discountMod, uint8 guildBank);
     void OnBeforeBuyItemFromVendor(Player* player, uint64 vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot);
-    void OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
+    void OnBeforeStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
+    void OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, Item* item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
     void OnAfterUpdateMaxPower(Player* player, Powers& power, float& value);
     void OnAfterUpdateMaxHealth(Player* player, float& value);
     void OnBeforeUpdateAttackPowerAndDamage(Player* player, float& level, float& val2, bool ranged);
@@ -1412,6 +1685,53 @@ public: /* PlayerScript */
     void OnBeforeGuardianInitStatsForLevel(Player* player, Guardian* guardian, CreatureTemplate const* cinfo, PetType& petType);
     void OnAfterGuardianInitStatsForLevel(Player* player, Guardian* guardian);
     void OnBeforeLoadPetFromDB(Player* player, uint32& petentry, uint32& petnumber, bool& current, bool& forceLoadFromDB);
+    bool CanJoinInArenaQueue(Player* player, uint64 BattlemasterGuid, uint8 arenaslot, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, uint8 IsRated, GroupJoinBattlegroundResult& err);
+    bool CanBattleFieldPort(Player* player, uint8 arenaType, BattlegroundTypeId BGTypeID, uint8 action);
+    bool CanGroupInvite(Player* player, std::string& membername);
+    bool CanGroupAccept(Player* player, Group* group);
+    bool CanSellItem(Player* player, Item* item, Creature* creature);
+    bool CanSendMail(Player* player, uint64 receiverGuid, uint64 mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, Item* item);
+    void PetitionBuy(Player* player, Creature* creature, uint32& charterid, uint32& cost, uint32& type);
+    void PetitionShowList(Player* player, Creature* creature, uint32& CharterEntry, uint32& CharterDispayID, uint32& CharterCost);
+    void OnRewardKillRewarder(Player* player, bool isDungeon, float& rate);
+    bool CanGiveMailRewardAtGiveLevel(Player* player, uint8 level);
+    void OnDeleteFromDB(SQLTransaction& trans, uint32 guid);
+    bool CanRepopAtGraveyard(Player* player);
+    void OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);
+    bool CanAreaExploreAndOutdoor(Player* player);
+    void OnVictimRewardBefore(Player* player, Player* victim, uint32& killer_title, uint32& victim_title);
+    void OnVictimRewardAfter(Player* player, Player* victim, uint32& killer_title, uint32& victim_rank, float& honor_f);
+    void OnCustomScalingStatValueBefore(Player* player, ItemTemplate const* proto, uint8 slot, bool apply, uint32& CustomScalingStatValue);
+    void OnCustomScalingStatValue(Player* player, ItemTemplate const* proto, uint32& statType, int32& val, uint8 itemProtoStatNumber, uint32 ScalingStatValue, ScalingStatValuesEntry const* ssv);
+    bool CanArmorDamageModifier(Player* player);
+    void OnGetFeralApBonus(Player* player, int32& feral_bonus, int32 dpsMod, ItemTemplate const* proto, ScalingStatValuesEntry const* ssv);
+    bool CanApplyWeaponDependentAuraDamageMod(Player* player, Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
+    bool CanApplyEquipSpell(Player* player, SpellInfo const* spellInfo, Item* item, bool apply, bool form_change);
+    bool CanApplyEquipSpellsItemSet(Player* player, ItemSetEffect* eff);
+    bool CanCastItemCombatSpell(Player* player, Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto);
+    bool CanCastItemUseSpell(Player* player, Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex);
+    void OnApplyAmmoBonuses(Player* player, ItemTemplate const* proto, float& currentAmmoDPS);
+    bool CanEquipItem(Player* player, uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading);
+    bool CanUnequipItem(Player* player, uint16 pos, bool swap);
+    bool CanUseItem(Player* player, ItemTemplate const* proto, InventoryResult& result);
+    bool CanSaveEquipNewItem(Player* player, Item* item, uint16 pos, bool update);
+    bool CanApplyEnchantment(Player* player, Item* item, EnchantmentSlot slot, bool apply, bool apply_dur, bool ignore_condition);
+    void OnGetQuestRate(Player* player, float& result);
+    bool PassedQuestKilledMonsterCredit(Player* player, Quest const* qinfo, uint32 entry, uint32 real_entry, uint64 guid);
+    bool CheckItemInSlotAtLoadInventory(Player* player, Item* item, uint8 slot, uint8& err, uint16& dest);
+    bool NotAvoidSatisfy(Player* player, DungeonProgressionRequirements const* ar, uint32 target_map, bool report);
+    bool NotVisibleGloballyFor(Player* player, Player const* u);
+    void OnGetArenaPersonalRating(Player* player, uint8 slot, uint32& result);
+    void OnGetArenaTeamId(Player* player, uint8 slot, uint32& result);
+    void OnIsFFAPvP(Player* player, bool& result);
+    void OnIsPvP(Player* player, bool& result);
+    void OnGetMaxSkillValueForLevel(Player* player, uint16& result);
+    bool NotSetArenaTeamInfoField(Player* player, uint8 slot, ArenaTeamInfoType type, uint32 value);
+    bool CanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dungeons, const std::string& comment);
+    bool CanEnterMap(Player* player, MapEntry const* entry, InstanceTemplate const* instance, MapDifficulty const* mapDiff, bool loginCheck);
+    bool CanInitTrade(Player* player, Player* target);
+    void OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
+    void OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
 
 public: /* AccountScript */
     void OnAccountLogin(uint32 accountId);
@@ -1435,6 +1755,7 @@ public: /* GuildScript */
                          bool isDestBank, uint8 destContainer, uint8 destSlotId);
     void OnGuildEvent(Guild* guild, uint8 eventType, uint32 playerGuid1, uint32 playerGuid2, uint8 newRank);
     void OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, uint32 playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
+    bool CanGuildSendBankList(Guild const* guild, WorldSession* session, uint8 tabId, bool sendAllSlots);
 
 public: /* GroupScript */
     void OnGroupAddMember(Group* group, uint64 guid);
@@ -1442,6 +1763,8 @@ public: /* GroupScript */
     void OnGroupRemoveMember(Group* group, uint64 guid, RemoveMethod method, uint64 kicker, const char* reason);
     void OnGroupChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLeaderGuid);
     void OnGroupDisband(Group* group);
+    bool CanGroupJoinBattlegroundQueue(Group const* group, Player* member, Battleground const* bgTemplate, uint32 MinPlayerCount, bool isRated, uint32 arenaSlot);
+    void OnCreate(Group* group, Player* leader);
 
 public: /* GlobalScript */
     void OnGlobalItemDelFromDB(SQLTransaction& trans, uint32 itemGuid);
@@ -1450,7 +1773,7 @@ public: /* GlobalScript */
     void OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32& maxcount, LootStore const& store);
     void OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, LootStore const& store);
     void OnItemRoll(Player const* player, LootStoreItem const* LootStoreItem, float& chance, Loot& loot, LootStore const& store);
-    void OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData);
+    void OnInitializeLockedDungeons(Player* player, uint8& level, uint32& lockData, lfg::LFGDungeonData const* dungeon);
     void OnAfterInitializeLockedDungeons(Player* player);
     void OnAfterUpdateEncounterState(Map* map, EncounterCreditType type, uint32 creditEntry, Unit* source, Difficulty difficulty_fixed, DungeonEncounterList const* encounters, uint32 dungeonCompleted, bool updated);
     void OnBeforeWorldObjectSetPhaseMask(WorldObject const* worldObject, uint32& oldPhaseMask, uint32& newPhaseMask, bool& useCombinedPhases, bool& update);
@@ -1470,6 +1793,13 @@ public: /* UnitScript */
     void ModifyHealRecieved(Unit* target, Unit* attacker, uint32& addHealth);
     uint32 DealDamage(Unit* AttackerUnit, Unit* pVictim, uint32 damage, DamageEffectType damagetype);
     void OnBeforeRollMeleeOutcomeAgainst(const Unit* attacker, const Unit* victim, WeaponAttackType attType, int32& attackerMaxSkillValueForLevel, int32& victimMaxSkillValueForLevel, int32& attackerWeaponSkill, int32& victimDefenseSkill, int32& crit_chance, int32& miss_chance, int32& dodge_chance, int32& parry_chance, int32& block_chance);
+    void OnAuraRemove(Unit* unit, AuraApplication* aurApp, AuraRemoveMode mode);
+    bool IfNormalReaction(Unit const* unit, Unit const* target, ReputationRank& repRank);
+    bool IsNeedModSpellDamagePercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto);
+    bool IsNeedModMeleeDamagePercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto);
+    bool IsNeedModHealPercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto);
+    bool CanSetPhaseMask(Unit const* unit, uint32 newPhaseMask, bool update);
+    bool IsCustomBuildValuesUpdate(Unit const* unit, uint8 updateType, ByteBuffer& fieldBuffer, Player const* target, uint16 index);
 
 public: /* MovementHandlerScript */
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
@@ -1491,12 +1821,14 @@ public: /* BGScript */
     void OnBattlegroundAddPlayer(Battleground* bg, Player* player);
     void OnBattlegroundBeforeAddPlayer(Battleground* bg, Player* player);
     void OnBattlegroundRemovePlayerAtLeave(Battleground* bg, Player* player);
+    void OnQueueUpdate(BattlegroundQueue* queue, BattlegroundBracketId bracket_id, bool isRated, uint32 arenaRatedTeamId);
     void OnAddGroup(BattlegroundQueue* queue, GroupQueueInfo* ginfo, uint32& index, Player* leader, Group* grp, PvPDifficultyEntry const* bracketEntry, bool isPremade);
     bool CanFillPlayersToBG(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree, BattlegroundBracketId bracket_id);
     bool CanFillPlayersToBGWithSpecific(BattlegroundQueue* queue, Battleground* bg, const int32 aliFree, const int32 hordeFree,
                                         BattlegroundBracketId thisBracketId, BattlegroundQueue* specificQueue, BattlegroundBracketId specificBracketId);
     void OnCheckNormalMatch(BattlegroundQueue* queue, uint32& Coef, Battleground* bgTemplate, BattlegroundBracketId bracket_id, uint32& minPlayers, uint32& maxPlayers);
-    bool CanSendMessageQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
+    bool CanSendMessageBGQueue(BattlegroundQueue* queue, Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
+    bool CanSendMessageArenaQueue(BattlegroundQueue* queue, GroupQueueInfo* ginfo, bool IsJoin);
 
 public: /* Arena Team Script */
     void OnGetSlotByType(const uint32 type, uint8& slot);
@@ -1507,6 +1839,15 @@ public: /* Arena Team Script */
 
 public: /* SpellSC */
     void OnCalcMaxDuration(Aura const* aura, int32& maxDuration);
+    bool CanModAuraEffectDamageDone(AuraEffect const* auraEff, Unit* target, AuraApplication const* aurApp, uint8 mode, bool apply);
+    bool CanModAuraEffectModDamagePercentDone(AuraEffect const* auraEff, Unit* target, AuraApplication const* aurApp, uint8 mode, bool apply);
+    void OnSpellCheckCast(Spell* spell, bool strict, SpellCastResult& res);
+    bool CanPrepare(Spell* spell, SpellCastTargets const* targets, AuraEffect const* triggeredByAura);
+    bool CanScalingEverything(Spell* spell);
+    bool CanSelectSpecTalent(Spell* spell);
+    void OnScaleAuraUnitAdd(Spell* spell, Unit* target, uint32 effectMask, bool checkIfValid, bool implicit, uint8 auraScaleMask, TargetInfo& targetInfo);
+    void OnRemoveAuraScaleTargets(Spell* spell, TargetInfo& targetInfo, uint8 auraScaleMask, bool& needErase);
+    void OnBeforeAuraRankForLevel(SpellInfo const* spellInfo, SpellInfo const* latestSpellInfo, uint8 level);
 
 public: /* GameEventScript */
     void OnGameEventStart(uint16 EventID);
@@ -1514,6 +1855,52 @@ public: /* GameEventScript */
 
 public: /* MailScript */
     void OnBeforeMailDraftSendMailTo(MailDraft* mailDraft, MailReceiver const& receiver, MailSender const& sender, MailCheckMask& checked, uint32& deliver_delay, uint32& custom_expiration, bool& deleteMailItemsFromDB, bool& sendMail);
+
+public: /* AchievementScript */
+
+        void SetRealmCompleted(AchievementEntry const* achievement);
+        bool IsCompletedCriteria(AchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement, CriteriaProgress const* progress);
+        bool IsRealmCompleted(AchievementGlobalMgr const* globalmgr, AchievementEntry const* achievement, std::chrono::system_clock::time_point completionTime);
+        void OnBeforeCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntryList const* achievementCriteriaList);
+        bool CanCheckCriteria(AchievementMgr* mgr, AchievementCriteriaEntry const* achievementCriteria);
+
+    public: /* PetScript */
+
+        void OnInitStatsForLevel(Guardian* guardian, uint8 petlevel);
+        void OnCalculateMaxTalentPointsForLevel(Pet* pet, uint8 level, uint8& points);
+        bool CanUnlearnSpellSet(Pet* pet, uint32 level, uint32 spell);
+        bool CanUnlearnSpellDefault(Pet* pet, SpellInfo const* spellEntry);
+        bool CanResetTalents(Pet* pet);
+
+    public: /* ArenaScript */
+
+        bool CanAddMember(ArenaTeam* team, uint64 PlayerGuid);
+        void OnGetPoints(ArenaTeam* team, uint32 memberRating, float& points);
+        bool CanSaveToDB(ArenaTeam* team);
+
+    public: /* MiscScript */
+
+        void OnConstructObject(Object* origin);
+        void OnDestructObject(Object* origin);
+        void OnConstructPlayer(Player* origin);
+        void OnDestructPlayer(Player* origin);
+        void OnConstructGroup(Group* origin);
+        void OnDestructGroup(Group* origin);
+        void OnConstructInstanceSave(InstanceSave* origin);
+        void OnDestructInstanceSave(InstanceSave* origin);
+        void OnItemCreate(Item* item, ItemTemplate const* itemProto, Player const* owner);
+        bool CanApplySoulboundFlag(Item* item, ItemTemplate const* proto);
+        bool CanItemApplyEquipSpell(Player* player, Item* item);
+        bool CanSendAuctionHello(WorldSession const* session, uint64 guid, Creature* creature);
+        void ValidateSpellAtCastSpell(Player* player, uint32& oldSpellId, uint32& spellId, uint8& castCount, uint8& castFlags);
+        void OnPlayerSetPhase(const AuraEffect* auraEff, AuraApplication const* aurApp, uint8 mode, bool apply, uint32& newPhase);
+        void ValidateSpellAtCastSpellResult(Player* player, Unit* mover, Spell* spell, uint32 oldSpellId, uint32 spellId);
+        void OnAfterLootTemplateProcess(Loot* loot, LootTemplate const* tab, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError, uint16 lootMode);
+        void OnInstanceSave(InstanceSave* instanceSave);
+
+    public: /* CommandSC */
+
+        void OnHandleDevCommand(Player* player, std::string& argstr);
 
 private:
     uint32 _scriptCount;
