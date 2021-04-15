@@ -426,9 +426,13 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         if (_timeSyncTimer > 0)
         {
             if (diff >= _timeSyncTimer)
+            {
                 SendTimeSync();
+            }
             else
+            {
                 _timeSyncTimer -= diff;
+            }
         }
     }
 
