@@ -616,7 +616,7 @@ void SmartAI::EnterEvadeMode()
     if (!me->IsAlive() || me->IsInEvadeMode())
         return;
 
-    if (IS_PLAYER_GUID(me->GetCharmerGUID()) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+    if (IS_PLAYER_GUID(me->GetCharmerGUID()) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
     {
         me->AttackStop();
         return;
@@ -783,7 +783,7 @@ void SmartAI::JustSummoned(Creature* creature)
 void SmartAI::AttackStart(Unit* who)
 {
     // xinef: dont allow charmed npcs to act on their own
-    if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+    if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
     {
         if (who && mCanAutoAttack)
             me->Attack(who, true);

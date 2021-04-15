@@ -1095,7 +1095,7 @@ public:
     {
         npc_pos_freed_slaveAI(Creature* creature) : SmartAI(creature)
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
             // immune to falling icicles
             me->ApplySpellImmune(0, IMMUNITY_ID, 69425, true);
             me->ApplySpellImmune(0, IMMUNITY_ID, 70827, true);
