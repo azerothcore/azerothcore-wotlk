@@ -3269,11 +3269,11 @@ void SpellMgr::LoadSpellCustomAttr()
                 break;
                 // spells that shouldn't be dodged/parried/deflected
             case 64382: // shattering throw
-            case 20252: // intercept
-            case 20616:
-            case 20617:
-            case 25272:
-            case 25275:
+            case 20252: // intercept rank 1
+            case 20616: // intercept rank 2
+            case 20617: // intercept rank 3
+            case 25272: // intercept rank 4
+            case 25275: // intercept rank 5
                 spellInfo->Attributes = SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
                 break;
         }
