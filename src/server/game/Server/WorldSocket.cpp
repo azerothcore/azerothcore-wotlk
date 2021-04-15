@@ -673,7 +673,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                 {
                     return HandlePing(*new_pct);
                 }
-                catch (ByteBufferPositionException const&) {}
+                catch (ByteBufferPositionException const&) { }
                  LOG_ERROR("server", "WorldSocket::ReadDataHandler(): client sent malformed CMSG_PING");
                 return -1;
             case CMSG_AUTH_SESSION:
@@ -690,7 +690,6 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
             case CMSG_TIME_SYNC_RESP:
                 new_pct = new WorldPacket(std::move(*new_pct), std::chrono::steady_clock::now());
                 break;
-
             default:
                 break;
         }
@@ -713,8 +712,10 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     {
         // Our Idle timer will reset on any non PING or TIME_SYNC opcodes.
         // Catches people idling on the login screen and any lingering ingame connections.
-        if(opcode != CMSG_PING && opcode != CMSG_TIME_SYNC_RESP)
+        if (opcode != CMSG_PING && opcode != CMSG_TIME_SYNC_RESP)
+        {
             m_Session->ResetTimeOutTime(false);
+        }
 
         // OK, give the packet to WorldSession
         aptr.release();
