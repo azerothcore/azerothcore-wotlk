@@ -58,6 +58,19 @@ enum ArenaTeamEvents
     ERR_ARENA_TEAM_DISBANDED_S              = 8             // captain name + arena team name
 };
 
+// PLAYER_FIELD_ARENA_TEAM_INFO_1_1 offsets
+enum ArenaTeamInfoType
+{
+    ARENA_TEAM_ID                = 0,
+    ARENA_TEAM_TYPE              = 1,                       // new in 3.2 - team type?
+    ARENA_TEAM_MEMBER            = 2,                       // 0 - captain, 1 - member
+    ARENA_TEAM_GAMES_WEEK        = 3,
+    ARENA_TEAM_GAMES_SEASON      = 4,
+    ARENA_TEAM_WINS_SEASON       = 5,
+    ARENA_TEAM_PERSONAL_RATING   = 6,
+    ARENA_TEAM_END               = 7
+};
+
 /*
 need info how to send these ones:
 ERR_ARENA_TEAM_YOU_JOIN_S - client show it automatically when accept invite
@@ -71,6 +84,13 @@ enum ArenaTeamTypes
     ARENA_TEAM_2v2      = 2,
     ARENA_TEAM_3v3      = 3,
     ARENA_TEAM_5v5      = 5
+};
+
+enum ArenaSlot
+{
+    ARENA_SLOT_2v2,
+    ARENA_SLOT_3v3,
+    ARENA_SLOT_5v5
 };
 
 struct ArenaTeamMember
@@ -118,9 +138,11 @@ public:
     [[nodiscard]] uint32 GetType() const            { return Type; }
     [[nodiscard]] uint8  GetSlot() const            { return GetSlotByType(GetType()); }
     static uint8 GetSlotByType(uint32 type);
+    static uint8 GetReqPlayersForType(uint32 type);
     [[nodiscard]] uint64 GetCaptain() const  { return CaptainGuid; }
     [[nodiscard]] std::string const& GetName() const       { return TeamName; }
     [[nodiscard]] const ArenaTeamStats& GetStats() const { return Stats; }
+    void SetArenaTeamStats(ArenaTeamStats& stats) { Stats = stats; }
 
     [[nodiscard]] uint32 GetRating() const          { return Stats.Rating; }
     uint32 GetAverageMMR(Group* group) const;
@@ -137,6 +159,7 @@ public:
     [[nodiscard]] bool   Empty() const                  { return Members.empty(); }
     MemberList::iterator m_membersBegin() { return Members.begin(); }
     MemberList::iterator m_membersEnd()   { return Members.end(); }
+    MemberList& GetMembers() { return Members; }
     [[nodiscard]] bool IsMember(uint64 guid) const;
 
     ArenaTeamMember* GetMember(uint64 guid);
@@ -173,6 +196,12 @@ public:
 
     void FinishWeek();
     void FinishGame(int32 mod, const Map* bgMap);
+
+    void CreateTempArenaTeam(std::vector<Player*> playerList, uint8 type, std::string const& teamName);
+
+    // Containers
+    static std::unordered_map<uint32, uint8> ArenaSlotByType; // Slot -> Type
+    static std::unordered_map<uint8, uint8> ArenaReqPlayersForType; // Type -> Players count
 
 protected:
     uint32      TeamId;
