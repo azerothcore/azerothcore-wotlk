@@ -851,45 +851,30 @@ void WorldSession::ComputeNewClockDelta()
     vector<uint32> latencies;
     vector<int64> clockDeltasAfterFiltering;
 
-    sLog->outString("clockDeltas and latencies:-------");
     for (auto pair : _timeSyncClockDeltaQueue.content())
-    {
         latencies.push_back(pair.second);
-        sLog->outString("%u %u", pair.first, pair.second);
-    }
-    sLog->outString("--------------------------------");
 
     uint32 latencyMedian = median(latencies);
-    sLog->outString("latencyMedian: %u", latencyMedian);
-
     uint32 latencyStandardDeviation = standard_deviation(latencies);
-    sLog->outString("latencyStandardDeviation: %u", latencyStandardDeviation);
 
-    sLog->outString("clockDeltas and latencies after filtering:-------");
     uint32 sampleSizeAfterFiltering = 0;
     for (auto pair : _timeSyncClockDeltaQueue.content())
     {
         if (pair.second <= latencyMedian + latencyStandardDeviation) {
             clockDeltasAfterFiltering.push_back(pair.first);
             sampleSizeAfterFiltering++;
-            sLog->outString("%u %u", pair.first, pair.second);
         }
     }
-    sLog->outString("--------------------------------");
 
     if (sampleSizeAfterFiltering != 0)
     {
-        sLog->outString(">>>> A. OLD clockDelta %u", (uint32)_timeSyncClockDelta);
         int64 meanClockDelta = static_cast<int64>(mean(clockDeltasAfterFiltering));
         if (std::abs(meanClockDelta - _timeSyncClockDelta) > 25)
             _timeSyncClockDelta = meanClockDelta;
-        sLog->outString(">>>> A. NEW clockDelta %u", (uint32)_timeSyncClockDelta);
     }
     else if (_timeSyncClockDelta == 0)
     {
-        sLog->outString(">>>> B. OLD clockDelta %u", (uint32)_timeSyncClockDelta);
         std::pair<int64, uint32> back = _timeSyncClockDeltaQueue.peak_back();
         _timeSyncClockDelta = back.first;
-        sLog->outString(">>>> B. NEW clockDelta %u", (uint32)_timeSyncClockDelta);
     }
 }
