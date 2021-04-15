@@ -42,30 +42,6 @@ public:
         full_ = head_ == tail_;
     }
 
-    //T get()
-    //{
-    //    std::lock_guard<std::mutex> lock(mutex_);
-
-    //    if (empty())
-    //    {
-    //        return T();
-    //    }
-
-    //    //Read data and advance the tail (we now have a free space)
-    //    auto val = buf_[tail_];
-    //    full_ = false;
-    //    tail_ = (tail_ + 1) % max_size_;
-
-    //    return val;
-    //}
-
-    void reset()
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        head_ = tail_;
-        full_ = false;
-    }
-
     bool empty() const
     {
         //if head and tail are equal, we are empty
@@ -102,8 +78,7 @@ public:
         return size;
     }
 
-    // the implementation of this function has been simplified by making the assumption that
-    // head_ will never be lower than tail (since the get() function has been commented out)
+    // the implementation of this function is simplified by the fact that head_ will never be lower than tail_
     std::vector<T> content() {
         std::lock_guard<std::mutex> lock(mutex_);
 
