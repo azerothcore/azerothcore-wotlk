@@ -441,10 +441,13 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     SetAttackTime(RANGED_ATTACK, cInfo->RangeAttackTime);
 
     uint32 previousHealth = GetHealth();
+    uint32 previousPlayerDamageReq = m_PlayerDamageReq;
+
     SelectLevel(changelevel);
     if (previousHealth > 0)
     {
         SetHealth(previousHealth);
+        m_PlayerDamageReq = previousPlayerDamageReq;
     }
 
     SetMeleeDamageSchool(SpellSchools(cInfo->dmgschool));
