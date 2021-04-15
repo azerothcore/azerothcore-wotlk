@@ -2618,6 +2618,8 @@ private:
 
     uint32 _oldFactionId;           ///< faction before charm
     bool m_petCatchUp;
+
+    float processDummyAuras(float TakenTotalMod) const;
 };
 
 namespace acore
