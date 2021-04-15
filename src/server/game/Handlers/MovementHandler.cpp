@@ -420,11 +420,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (mover->GetGUID() != _player->GetGUID())
         movementInfo.flags &= ~MOVEMENTFLAG_WALKING;
 
-    //uint32 mstime = World::GetGameTimeMS();
-    ///*----------------------*/
-    //if(m_clientTimeDelay == 0)
-    //    m_clientTimeDelay = mstime > movementInfo.time ? std::min(mstime - movementInfo.time, (uint32)100) : 0;
-
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (mover->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE))
     {
