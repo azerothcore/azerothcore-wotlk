@@ -881,6 +881,10 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                         // remove all harmful spells on you...
                         SpellInfo const* spell = iter->second->GetBase()->GetSpellInfo();
 
+                        // Pounce Bleed shouldn't be removed by Cloak of Shadows.
+                        if (spell->GetAllEffectsMechanicMask() & 1 << MECHANIC_BLEED)
+                            return;
+
                         bool dmgClassNone = false;
                         if (spell->DmgClass == SPELL_DAMAGE_CLASS_NONE && spell->SpellFamilyName == SPELLFAMILY_GENERIC)
                             for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
