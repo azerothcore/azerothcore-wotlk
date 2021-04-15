@@ -14,6 +14,7 @@
 #include "GameGraveyard.h"
 #include "InstanceSaveMgr.h"
 #include "Log.h"
+#include "MathUtil.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -442,8 +443,16 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     /* process position-change */
     WorldPacket data(opcode, recvData.size());
-    //movementInfo.time = movementInfo.time + m_clientTimeDelay + MOVEMENT_PACKET_TIME_DELAY;
-    //movementInfo.time = mstime; // pussywizard: set to time of relocation (server time), constant addition may smoothen movement clientside, but client sees target on different position than the real serverside position
+    int64 movementTime = (int64)movementInfo.time + _timeSyncClockDelta;
+    if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > 0xFFFFFFFF)
+    {
+        sLog->outMisc("The computed movement time using clockDelta is erronous. Using fallback instead");
+        movementInfo.time = getMSTime();
+    }
+    else
+    {
+        movementInfo.time = (uint32) movementTime;
+    }
 
     movementInfo.guid = mover->GetGUID();
     WriteMovementInfo(&data, &movementInfo);
@@ -797,14 +806,6 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
     GetPlayer()->SendMessageToSet(&data, false);
 }
 
-//void WorldSession::HandleTimeSyncResp(WorldPacket& recv_data)
-//{
-//    uint32 counter, clientTicks;
-//    recv_data >> counter >> clientTicks;
-//    //uint32 ourTicks = clientTicks + (World::GetGameTimeMS() - _player->m_timeSyncServer);
-//    //_player->m_timeSyncClient = clientTicks;
-//}
-
 void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
@@ -847,35 +848,48 @@ void WorldSession::ComputeNewClockDelta()
     // implementation of the technique described here: https://web.archive.org/web/20180430214420/http://www.mine-control.com/zack/timesync/timesync.html
     // to reduce the skew induced by dropped TCP packets that get resent.
 
-    //using namespace boost::accumulators;
+    vector<uint32> latencies;
+    vector<int64> clockDeltasAfterFiltering;
 
-    //accumulator_set<uint32, features<tag::mean, tag::median, tag::variance(lazy)> > latencyAccumulator;
+    sLog->outString("clockDeltas and latencies:-------");
+    for (auto pair : _timeSyncClockDeltaQueue.content())
+    {
+        latencies.push_back(pair.second);
+        sLog->outString("%u %u", pair.first, pair.second);
+    }
+    sLog->outString("--------------------------------");
 
-    //for (auto pair : _timeSyncClockDeltaQueue)
-    //    latencyAccumulator(pair.second);
+    uint32 latencyMedian = median(latencies);
+    sLog->outString("latencyMedian: %u", latencyMedian);
 
-    //uint32 latencyMedian = static_cast<uint32>(std::round(median(latencyAccumulator)));
-    //uint32 latencyStandardDeviation = static_cast<uint32>(std::round(sqrt(variance(latencyAccumulator))));
+    uint32 latencyStandardDeviation = standard_deviation(latencies);
+    sLog->outString("latencyStandardDeviation: %u", latencyStandardDeviation);
 
-    //accumulator_set<int64, features<tag::mean> > clockDeltasAfterFiltering;
-    //uint32 sampleSizeAfterFiltering = 0;
-    //for (auto pair : _timeSyncClockDeltaQueue)
-    //{
-    //    if (pair.second < latencyStandardDeviation + latencyMedian) {
-    //        clockDeltasAfterFiltering(pair.first);
-    //        sampleSizeAfterFiltering++;
-    //    }
-    //}
+    sLog->outString("clockDeltas and latencies after filtering:-------");
+    uint32 sampleSizeAfterFiltering = 0;
+    for (auto pair : _timeSyncClockDeltaQueue.content())
+    {
+        if (pair.second <= latencyMedian + latencyStandardDeviation) {
+            clockDeltasAfterFiltering.push_back(pair.first);
+            sampleSizeAfterFiltering++;
+            sLog->outString("%u %u", pair.first, pair.second);
+        }
+    }
+    sLog->outString("--------------------------------");
 
-    //if (sampleSizeAfterFiltering != 0)
-    //{
-    //    int64 meanClockDelta = static_cast<int64>(std::round(mean(clockDeltasAfterFiltering)));
-    //    if (std::abs(meanClockDelta - _timeSyncClockDelta) > 25)
-    //        _timeSyncClockDelta = meanClockDelta;
-    //}
-    //else if (_timeSyncClockDelta == 0)
-    //{
-    //    std::pair<int64, uint32> back = _timeSyncClockDeltaQueue.back();
-    //    _timeSyncClockDelta = back.first;
-    //}
+    if (sampleSizeAfterFiltering != 0)
+    {
+        sLog->outString(">>>> A. OLD clockDelta %u", (uint32)_timeSyncClockDelta);
+        int64 meanClockDelta = static_cast<int64>(mean(clockDeltasAfterFiltering));
+        if (std::abs(meanClockDelta - _timeSyncClockDelta) > 25)
+            _timeSyncClockDelta = meanClockDelta;
+        sLog->outString(">>>> A. NEW clockDelta %u", (uint32)_timeSyncClockDelta);
+    }
+    else if (_timeSyncClockDelta == 0)
+    {
+        sLog->outString(">>>> B. OLD clockDelta %u", (uint32)_timeSyncClockDelta);
+        std::pair<int64, uint32> back = _timeSyncClockDeltaQueue.peak_back();
+        _timeSyncClockDelta = back.first;
+        sLog->outString(">>>> B. NEW clockDelta %u", (uint32)_timeSyncClockDelta);
+    }
 }

@@ -1,6 +1,9 @@
 /*
- * This file was taken from https://github.com/embeddedartistry/embedded-resources/blob/master/examples/cpp/circular_buffer.cpp
- *
+ * This file was taken from
+ * https://embeddedartistry.com/blog/2017/05/17/creating-a-circular-buffer-in-c-and-c/
+ * https://github.com/embeddedartistry/embedded-resources/blob/master/examples/cpp/circular_buffer.cpp
+ * and adapted
+ * 
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -9,12 +12,11 @@
 #ifndef AZEROTHCORE_CIRCULAR_BUFFER_H
 #define AZEROTHCORE_CIRCULAR_BUFFER_H
 
-#include <cstdio>
-
 #include <memory>
 #include <mutex>
+#include <vector>
 
-template <class T>
+template <typename T>
 class CircularBuffer {
 public:
     explicit CircularBuffer(size_t size) :
@@ -40,22 +42,22 @@ public:
         full_ = head_ == tail_;
     }
 
-    T get()
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
+    //T get()
+    //{
+    //    std::lock_guard<std::mutex> lock(mutex_);
 
-        if (empty())
-        {
-            return T();
-        }
+    //    if (empty())
+    //    {
+    //        return T();
+    //    }
 
-        //Read data and advance the tail (we now have a free space)
-        auto val = buf_[tail_];
-        full_ = false;
-        tail_ = (tail_ + 1) % max_size_;
+    //    //Read data and advance the tail (we now have a free space)
+    //    auto val = buf_[tail_];
+    //    full_ = false;
+    //    tail_ = (tail_ + 1) % max_size_;
 
-        return val;
-    }
+    //    return val;
+    //}
 
     void reset()
     {
@@ -98,6 +100,28 @@ public:
         }
 
         return size;
+    }
+
+    // the implementation of this function has been simplified by making the assumption that
+    // head_ will never be lower than tail (since the get() function has been commented out)
+    std::vector<T> content() {
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        if(full_)
+            return std::vector<T>(buf_.get(), buf_.get() + max_size_);
+        else
+            return std::vector<T>(buf_.get(), buf_.get() + head_ - tail_);
+    }
+
+    T peak_back() {
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        if (empty())
+        {
+            return T();
+        }
+
+        return buf_[tail_];
     }
 
 private:
