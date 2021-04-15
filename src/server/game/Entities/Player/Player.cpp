@@ -611,9 +611,9 @@ void KillRewarder::_RewardPlayer(Player* player, bool isDungeon)
     // Give reputation and kill credit only in PvE.
     if (!_isPvP || _isBattleGround)
     {
-        const float rate = _group ?
-                           _groupRate * float(player->getLevel()) / _sumLevel : // Group rate depends on summary level.
-                           1.0f;                                                // Personal rate is 100%.
+        float rate = _group ? _groupRate * float(player->getLevel()) / _sumLevel : /*Personal rate is 100%.*/ 1.0f; // Group rate depends on summary level.
+
+        sScriptMgr->OnRewardKillRewarder(player, isDungeon, rate);                                              // Personal rate is 100%.
         if (_xp)
             // 4.2. Give XP.
             _RewardXP(player, rate);
@@ -976,10 +976,14 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_applyResilience = true;
 
     m_isInstantFlightOn = true;
+
+    sScriptMgr->OnConstructPlayer(this);
 }
 
 Player::~Player()
 {
+    sScriptMgr->OnDestructPlayer(this);
+
     // it must be unloaded already in PlayerLogout and accessed only for loggined player
     //m_social = nullptr;
 
@@ -3389,7 +3393,8 @@ void Player::GiveLevel(uint8 level)
     if (Pet* pet = GetPet())
         pet->SynchronizeLevelWithOwner();
 
-    if (MailLevelReward const* mailReward = sObjectMgr->GetMailLevelReward(level, getRaceMask()))
+    MailLevelReward const* mailReward = sObjectMgr->GetMailLevelReward(level, getRaceMask());
+    if (mailReward && sScriptMgr->CanGiveMailRewardAtGiveLevel(this, level))
     {
         //- TODO: Poor design of mail system
         SQLTransaction trans = CharacterDatabase.BeginTransaction();
@@ -5144,6 +5149,8 @@ void Player::DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmC
                 stmt->setUInt32(0, guid);
                 trans->Append(stmt);
 
+                sScriptMgr->OnDeleteFromDB(trans, guid);
+
                 CharacterDatabase.CommitTransaction(trans);
                 break;
             }
@@ -5712,6 +5719,9 @@ void Player::RepopAtGraveyard()
     // for example from WorldSession::HandleMovementOpcodes
 
     AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetAreaId());
+
+    if (!sScriptMgr->CanRepopAtGraveyard(this))
+        return;
 
     // Such zones are considered unreachable as a ghost and the player must be automatically revived
     // Xinef: Get Transport Check is not needed
@@ -6803,6 +6813,7 @@ uint16 Player::GetMaxSkillValue(uint32 skill) const
     uint32 bonus = GetUInt32Value(PLAYER_SKILL_BONUS_INDEX(itr->second.pos));
 
     int32 result = int32(SKILL_MAX(GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(itr->second.pos))));
+    sScriptMgr->OnGetMaxSkillValue(const_cast<Player*>(this), skill, result, false);
     result += SKILL_TEMP_BONUS(bonus);
     result += SKILL_PERM_BONUS(bonus);
     return result < 0 ? 0 : result;
@@ -6817,7 +6828,11 @@ uint16 Player::GetPureMaxSkillValue(uint32 skill) const
     if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
         return 0;
 
-    return SKILL_MAX(GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(itr->second.pos)));
+    int32 result = int32(SKILL_MAX(GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(itr->second.pos))));
+
+    sScriptMgr->OnGetMaxSkillValue(const_cast<Player*>(this), skill, result, true);
+
+    return result < 0 ? 0 : result;
 }
 
 uint16 Player::GetBaseSkillValue(uint32 skill) const
@@ -7074,6 +7089,9 @@ void Player::CheckAreaExploreAndOutdoor()
 
     if (sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK) && !isOutdoor)
         RemoveAurasWithAttribute(SPELL_ATTR0_OUTDOORS_ONLY);
+
+    if (!sScriptMgr->CanAreaExploreAndOutdoor(this))
+        return;
 
     if (!areaId)
         return;
@@ -7466,6 +7484,8 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             //  [29..38] Other title and player name
             //  [39+]    Nothing
             uint32 victim_title = victim->GetUInt32Value(PLAYER_CHOSEN_TITLE);
+            uint32 killer_title = 0;
+            sScriptMgr->OnVictimRewardBefore(this, victim, killer_title, victim_title);
             // Get Killer titles, CharTitlesEntry::bit_index
             // Ranks:
             //  title[1..14]  -> rank[5..18]
@@ -7492,6 +7512,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, GetAreaId());
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL, 1, 0, victim);
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL, 1, 0, victim);
+            sScriptMgr->OnVictimRewardAfter(this, victim, killer_title, victim_rank, honor_f);
         }
         else
         {
@@ -7644,14 +7665,6 @@ uint32 Player::GetArenaTeamIdFromStorage(uint32 guid, uint8 slot)
         }
     }
     return 0;
-}
-
-void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
-{
-    if (slot < MAX_ARENA_SLOT)
-    {
-        SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
-    }
 }
 
 uint32 Player::GetArenaTeamIdFromDB(uint64 guid, uint8 type)
@@ -8081,6 +8094,12 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
 
     // req. check at equip, but allow use for extended range if range limit max level, set proper level
     uint32 ssd_level = getLevel();
+    uint32 CustomScalingStatValue = 0;
+
+    sScriptMgr->OnCustomScalingStatValueBefore(this, proto, slot, apply, CustomScalingStatValue);
+
+    uint32 ScalingStatValue = proto->ScalingStatValue > 0 ? proto->ScalingStatValue : CustomScalingStatValue;
+
     if (ssd && ssd_level > ssd->MaxLevel)
         ssd_level = ssd->MaxLevel;
 
@@ -8093,17 +8112,30 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
         uint32 statType = 0;
         int32  val = 0;
         // If set ScalingStatDistribution need get stats and values from it
-        if (ssd && ssv)
+        if (ssv)
         {
-            if (ssd->StatMod[i] < 0)
-                continue;
-            statType = ssd->StatMod[i];
-            val = (ssv->getssdMultiplier(proto->ScalingStatValue) * ssd->Modifier[i]) / 10000;
+            if (ssd)
+            {
+                if (ssd->StatMod[i] < 0)
+                    continue;
+
+                statType = ssd->StatMod[i];
+                val = (ssv->getssdMultiplier(ScalingStatValue) * ssd->Modifier[i]) / 10000;
+            }
+            else
+            {
+                if (i >= proto->StatsCount)
+                    continue;
+
+                // OnCustomScalingStatValue(Player* player, ItemTemplate const* proto, uint32& statType, int32& val, uint8 itemProtoStatNumber, uint32 ScalingStatValue, ScalingStatValuesEntry const* ssv)
+                sScriptMgr->OnCustomScalingStatValue(this, proto, statType, val, i, ScalingStatValue, ssv);
+            }
         }
         else
         {
             if (i >= proto->StatsCount)
                 continue;
+
             statType = proto->ItemStat[i].ItemStatType;
             val = proto->ItemStat[i].ItemStatValue;
         }
@@ -8262,15 +8294,16 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
 
     // Apply Spell Power from ScalingStatValue if set
     if (ssv)
-        if (int32 spellbonus = ssv->getSpellBonus(proto->ScalingStatValue))
+        if (int32 spellbonus = ssv->getSpellBonus(ScalingStatValue))
             ApplySpellPowerBonus(spellbonus, apply);
 
     // If set ScalingStatValue armor get it or use item armor
     uint32 armor = proto->Armor;
     if (ssv)
     {
-        if (uint32 ssvarmor = ssv->getArmorMod(proto->ScalingStatValue))
-            armor = ssvarmor;
+        if (uint32 ssvarmor = ssv->getArmorMod(ScalingStatValue))
+            if (proto->ScalingStatValue > 0 || ssvarmor < proto->Armor) //Check to avoid higher values than stat itself (heirloom OR items with correct armor value)
+                armor = ssvarmor;
     }
     else if (armor && proto->ArmorDamageModifier)
         armor -= uint32(proto->ArmorDamageModifier);
@@ -8295,7 +8328,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     }
 
     // Add armor bonus from ArmorDamageModifier if > 0
-    if (proto->ArmorDamageModifier > 0)
+    if (proto->ArmorDamageModifier > 0 && sScriptMgr->CanArmorDamageModifier(this))
         HandleStatModifier(UNIT_MOD_ARMOR, TOTAL_VALUE, float(proto->ArmorDamageModifier), apply);
 
     if (proto->Block)
@@ -8342,11 +8375,12 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
         int32 feral_bonus = 0;
         if (ssv)
         {
-            dpsMod = ssv->getDPSMod(proto->ScalingStatValue);
-            feral_bonus += ssv->getFeralBonus(proto->ScalingStatValue);
+            dpsMod = ssv->getDPSMod(ScalingStatValue);
+            feral_bonus += ssv->getFeralBonus(ScalingStatValue);
         }
 
         feral_bonus += proto->getFeralBonus(dpsMod);
+        sScriptMgr->OnGetFeralApBonus(this, feral_bonus, dpsMod, proto, ssv);
         if (feral_bonus)
             ApplyFeralAPBonus(feral_bonus, apply);
     }
@@ -8354,6 +8388,27 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
 
 void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingStatValuesEntry const* ssv, bool apply)
 {
+    uint32 CustomScalingStatValue = 0;
+
+    sScriptMgr->OnCustomScalingStatValueBefore(this, proto, slot, apply, CustomScalingStatValue);
+
+    uint32 ScalingStatValue = proto->ScalingStatValue > 0 ? proto->ScalingStatValue : CustomScalingStatValue;
+
+    // following part fix disarm issue
+    // that doesn't apply the scaling after disarmed
+    if (!ssv)
+    {
+        ScalingStatDistributionEntry const* ssd = proto->ScalingStatDistribution ? sScalingStatDistributionStore.LookupEntry(proto->ScalingStatDistribution) : nullptr;
+
+        // req. check at equip, but allow use for extended range if range limit max level, set proper level
+        uint32 ssd_level = getLevel();
+
+        if (ssd && ssd_level > ssd->MaxLevel)
+            ssd_level = ssd->MaxLevel;
+
+        ssv = ScalingStatValue ? sScalingStatValuesStore.LookupEntry(ssd_level) : nullptr;
+    }
+
     WeaponAttackType attType = BASE_ATTACK;
     float damage = 0.0f;
 
@@ -8374,7 +8429,7 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
     // If set dpsMod in ScalingStatValue use it for min (70% from average), max (130% from average) damage
     if (ssv)
     {
-        int32 extraDPS = ssv->getDPSMod(proto->ScalingStatValue);
+        int32 extraDPS = ssv->getDPSMod(ScalingStatValue);
         if (extraDPS)
         {
             float average = extraDPS * proto->Delay / 1000.0f;
@@ -8436,6 +8491,9 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attac
 
     // generic not weapon specific case processes in aura code
     if (aura->GetSpellInfo()->EquippedItemClass == -1)
+        return;
+
+    if (!sScriptMgr->CanApplyWeaponDependentAuraDamageMod(this, item, attackType, aura, apply))
         return;
 
     BaseModGroup mod = BASEMOD_END;
@@ -8548,6 +8606,9 @@ void Player::ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply,
 {
     if (apply)
     {
+        if (!sScriptMgr->CanApplyEquipSpell(this, spellInfo, item, apply, form_change))
+            return;
+
         // Cannot be used in this stance/form
         if (spellInfo->CheckShapeshift(GetShapeshiftForm()) != SPELL_CAST_OK)
             return;
@@ -8619,6 +8680,8 @@ void Player::UpdateEquipSpellsAtFormChange()
                 continue;
 
             ApplyEquipSpell(spellInfo, nullptr, false, true);       // remove spells that not fit to form
+            if (!sScriptMgr->CanApplyEquipSpellsItemSet(this, eff))
+                break;
             ApplyEquipSpell(spellInfo, nullptr, true, true);        // add spells that fit form but not active
         }
     }
@@ -8671,6 +8734,9 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
 
 void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto)
 {
+    if (!sScriptMgr->CanCastItemCombatSpell(this, target, attType, procVictim, procEx, item, proto))
+        return;
+
     // Can do effect if any damage done to target
     if (procVictim & PROC_FLAG_TAKEN_DAMAGE)
         //if (damageInfo->procVictim & PROC_FLAG_TAKEN_ANY_DAMAGE)
@@ -8794,6 +8860,9 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
 
 void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex)
 {
+    if (!sScriptMgr->CanCastItemUseSpell(this, item, targets, cast_count, glyphIndex))
+        return;
+
     ItemTemplate const* proto = item->GetTemplate();
     // special learning case
     if (proto->Spells[0].SpellId == 483 || proto->Spells[0].SpellId == 55884)
@@ -9055,6 +9124,8 @@ void Player::_ApplyAmmoBonuses()
         currentAmmoDPS = 0.0f;
     else
         currentAmmoDPS = (ammo_proto->Damage[0].DamageMin + ammo_proto->Damage[0].DamageMax) / 2;
+
+    sScriptMgr->OnApplyAmmoBonuses(this, ammo_proto, currentAmmoDPS);
 
     if (currentAmmoDPS == GetAmmoDPS())
         return;
@@ -12047,6 +12118,9 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
         ItemTemplate const* pProto = pItem->GetTemplate();
         if (pProto)
         {
+            if (!sScriptMgr->CanEquipItem(const_cast<Player*>(this), slot, dest, pItem, swap, not_loading))
+                return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+
             // item used
             if (pItem->m_lootGenerated)
                 return EQUIP_ERR_ALREADY_LOOTED;
@@ -12208,6 +12282,9 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
 
 InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
 {
+    if (!sScriptMgr->CanUnequipItem(const_cast<Player*>(this), pos, swap))
+        return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+
     // Applied only to equipped items and bank bags
     if (!IsEquipmentPos(pos) && !IsBagPos(pos))
         return EQUIP_ERR_OK;
@@ -12528,6 +12605,11 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
 
         if (proto->RequiredSpell != 0 && !HasSpell(proto->RequiredSpell))
             return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
+
+        InventoryResult result = EQUIP_ERR_OK;
+
+        if (!sScriptMgr->CanUseItem(const_cast<Player*>(this), proto, result))
+            return result;
 
         if (getLevel() < proto->RequiredLevel)
             return EQUIP_ERR_CANT_EQUIP_LEVEL_I;
@@ -12872,7 +12954,11 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
 
 Item* Player::EquipNewItem(uint16 pos, uint32 item, bool update)
 {
-    if (Item* pItem = Item::CreateItem(item, 1, this))
+    Item* _item = Item::CreateItem(item, 1, this);
+    if (!_item)
+        return nullptr;
+
+    if (!IsEquipmentPos(pos) || sScriptMgr->CanSaveEquipNewItem(this, _item, pos, update))
     {
         // pussywizard: obtaining blue or better items saves to db
         if (ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(item))
@@ -12881,10 +12967,9 @@ Item* Player::EquipNewItem(uint16 pos, uint32 item, bool update)
 
         ItemAddedQuestCheck(item, 1);
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, 1);
-        return EquipItem(pos, pItem, update);
     }
 
-    return nullptr;
+    return EquipItem(pos, _item, update);
 }
 
 Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
@@ -14497,6 +14582,9 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
     if (pEnchant->requiredSkill > 0 && pEnchant->requiredSkillValue > GetSkillValue(pEnchant->requiredSkill))
         return;
 
+    if (!sScriptMgr->CanApplyEnchantment(this, item, slot, apply, apply_dur, ignore_condition))
+        return;
+
     // If we're dealing with a gem inside a prismatic socket we need to check the prismatic socket requirements
     // rather than the gem requirements itself. If the socket has no color it is a prismatic socket.
     if ((slot == SOCK_ENCHANTMENT_SLOT || slot == SOCK_ENCHANTMENT_SLOT_2 || slot == SOCK_ENCHANTMENT_SLOT_3)
@@ -16096,7 +16184,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     bool rewarded = IsQuestRewarded(quest_id) && !quest->IsDFQuest();
 
     // Not give XP in case already completed once repeatable quest
-    uint32 XP = rewarded ? 0 : uint32(quest->XPValue(this) * sWorld->getRate(RATE_XP_QUEST));
+    uint32 XP = rewarded ? 0 : uint32(quest->XPValue(this) * GetQuestRate());
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
@@ -17252,6 +17340,9 @@ void Player::KilledMonsterCredit(uint32 entry, uint64 guid)
         if (q_status.Status == QUEST_STATUS_INCOMPLETE && (!GetGroup() || !GetGroup()->isRaidGroup() || qInfo->IsAllowedInRaid(GetMap()->GetDifficulty()) ||
                 (qInfo->IsPVPQuest() && (GetGroup()->isBFGroup() || GetGroup()->isBGGroup()))))
         {
+            if (!sScriptMgr->PassedQuestKilledMonsterCredit(this, qInfo, entry, real_entry, guid))
+                continue;
+
             if (qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_KILL) /*&& !qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_CAST)*/)
             {
                 for (uint8 j = 0; j < QUEST_OBJECTIVES_COUNT; ++j)
@@ -17801,8 +17892,8 @@ void Player::_LoadArenaTeamInfo()
 {
     memset((void*)&m_uint32Values[PLAYER_FIELD_ARENA_TEAM_INFO_1_1], 0, sizeof(uint32) * MAX_ARENA_SLOT * ARENA_TEAM_END);
 
-    for (uint8 slot = 0; slot < MAX_ARENA_SLOT; ++slot)
-        if (uint32 arenaTeamId = Player::GetArenaTeamIdFromStorage(GetGUIDLow(), slot))
+    for (auto const& itr : ArenaTeam::ArenaSlotByType)
+        if (uint32 arenaTeamId = Player::GetArenaTeamIdFromStorage(GetGUIDLow(), itr.second))
         {
             ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
             if (!arenaTeam) // some shit, should be assert, but just ignore
@@ -17810,6 +17901,8 @@ void Player::_LoadArenaTeamInfo()
             ArenaTeamMember const* member = arenaTeam->GetMember(GetGUID());
             if (!member) // some shit, should be assert, but just ignore
                 continue;
+
+            uint8 slot = itr.second;
 
             SetArenaTeamInfoField(slot, ARENA_TEAM_ID, arenaTeamId);
             SetArenaTeamInfoField(slot, ARENA_TEAM_TYPE, arenaTeam->GetType());
@@ -18874,7 +18967,8 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
                     else if (IsEquipmentPos(INVENTORY_SLOT_BAG_0, slot))
                     {
                         uint16 dest;
-                        err = CanEquipItem(slot, dest, item, false, false);
+                        if (sScriptMgr->CheckItemInSlotAtLoadInventory(this, item, slot, err, dest))
+                            err = CanEquipItem(slot, dest, item, false, false);
                         if (err == EQUIP_ERR_OK)
                             QuickEquipItem(dest, item);
                     }
@@ -19858,6 +19952,9 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
             || missingPlayerItems.size() || missingPlayerQuests.size() || missingPlayerAchievements.size()
             || missingLeaderItems.size() || missingLeaderQuests.size() || missingLeaderAchievements.size())
         {
+            if (!sScriptMgr->NotAvoidSatisfy(partyLeader, ar, target_map, report))
+                return true;
+
             if (report)
             {
                 uint8 requirementPrintMode = sWorld->getIntConfig(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PRINT_MODE);
@@ -22020,36 +22117,6 @@ void Player::LeaveAllArenaTeams(uint64 guid)
     } while (result->NextRow());
 }
 
-uint32 Player::GetArenaTeamId(uint8 slot) const
-{
-    uint32 rtVal = 0;
-    if (slot >= MAX_ARENA_SLOT)
-    {
-        sScriptMgr->GetCustomGetArenaTeamId(this, slot, rtVal);
-    }
-    else
-    {
-        rtVal = GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID);
-    }
-
-    return rtVal;
-}
-
-uint32 Player::GetArenaPersonalRating(uint8 slot) const
-{
-    uint32 rtVal = 0;
-    if (slot >= MAX_ARENA_SLOT)
-    {
-        sScriptMgr->GetCustomGetArenaTeamId(this, slot, rtVal);
-    }
-    else
-    {
-        rtVal = GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING);
-    }
-
-    return rtVal;
-}
-
 void Player::SetRestBonus(float rest_bonus_new)
 {
     // Prevent resting on max level
@@ -22492,9 +22559,9 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         }
     }
 
-    Item* it = bStore ?
-               StoreNewItem(vDest, item, true) :
-               EquipNewItem(uiDest, item, true);
+    sScriptMgr->OnBeforeStoreOrEquipNewItem(this, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore);
+
+    Item* it = bStore ? StoreNewItem(vDest, item, true) : EquipNewItem(uiDest, item, true);
     if (it)
     {
         uint32 new_count = pVendor->UpdateVendorItemCurrentCount(crItem, pProto->BuyCount * count);
@@ -22520,6 +22587,9 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
             AddRefundReference(it->GetGUIDLow());
         }
     }
+
+    sScriptMgr->OnAfterStoreOrEquipNewItem(this, vendorslot, it, count, bag, slot, pProto, pVendor, crItem, bStore);
+
     return true;
 }
 
@@ -23370,6 +23440,9 @@ bool Player::IsVisibleGloballyFor(Player const* u) const
     // GMs are visible for higher gms (or players are visible for gms)
     if (!AccountMgr::IsPlayerAccount(u->GetSession()->GetSecurity()))
         return GetSession()->GetSecurity() <= u->GetSession()->GetSecurity();
+
+    if (!sScriptMgr->NotVisibleGloballyFor(const_cast<Player*>(this), u))
+        return true;
 
     // non faction visibility non-breakable for non-GMs
     return false;
@@ -28456,4 +28529,78 @@ void Player::RemoveRestFlag(RestFlag restFlag)
         _restTime = 0;
         RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING);
     }
+}
+
+void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
+{
+    if (sScriptMgr->NotSetArenaTeamInfoField(this, slot, type, value))
+        SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
+}
+
+uint32 Player::GetArenaPersonalRating(uint8 slot) const
+{
+    uint32 result = GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING);
+
+    sScriptMgr->OnGetArenaPersonalRating(const_cast<Player*>(this), slot, result);
+
+    return result;
+}
+
+uint32 Player::GetArenaTeamId(uint8 slot) const
+{
+    uint32 result = GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID);
+
+    sScriptMgr->OnGetArenaTeamId(const_cast<Player*>(this), slot, result);
+
+    return result;
+}
+
+bool Player::IsFFAPvP()
+{
+    bool result = Unit::IsFFAPvP();
+
+    sScriptMgr->OnIsFFAPvP(this, result);
+
+    return result;
+}
+
+bool Player::IsPvP()
+{
+    bool result = Unit::IsPvP();
+
+    sScriptMgr->OnIsPvP(this, result);
+
+    return result;
+}
+
+uint16 Player::GetMaxSkillValueForLevel() const
+{
+    uint16 result = Unit::GetMaxSkillValueForLevel();
+
+    sScriptMgr->OnGetMaxSkillValueForLevel(const_cast<Player*>(this), result);
+
+    return result;
+}
+
+float Player::GetQuestRate()
+{
+    float result = sWorld->getRate(RATE_XP_QUEST);
+
+    sScriptMgr->OnGetQuestRate(this, result);
+
+    return result;
+}
+
+void Player::SetServerSideVisibility(ServerSideVisibilityType type, AccountTypes sec)
+{
+    sScriptMgr->OnSetServerSideVisibility(this, type, sec);
+
+    m_serverSideVisibility.SetValue(type, sec);
+}
+
+void Player::SetServerSideVisibilityDetect(ServerSideVisibilityType type, AccountTypes sec)
+{
+    sScriptMgr->OnSetServerSideVisibilityDetect(this, type, sec);
+
+    m_serverSideVisibilityDetect.SetValue(type, sec);
 }
