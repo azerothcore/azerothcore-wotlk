@@ -3256,26 +3256,6 @@ void SpellMgr::LoadSpellCustomAttr()
             case 44535: // Spirit Heal, abilities also have no cost
                 spellInfo->Effects[EFFECT_0].MiscValue = 127;
                 break;
-                // (DK) Glyph of Chains of Ice should be able to crit
-            case 58621:
-                spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
-                spellInfo->SpellLevel = 0;
-                break;
-                // (Warrior) Intercept DMG should be able to crit
-            case 20253:
-                spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MELEE;
-                spellInfo->Attributes = SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
-                spellInfo->SpellLevel = 0;
-                break;
-                // spells that shouldn't be dodged/parried/deflected
-            case 64382: // shattering throw
-            case 20252: // intercept rank 1
-            case 20616: // intercept rank 2
-            case 20617: // intercept rank 3
-            case 25272: // intercept rank 4
-            case 25275: // intercept rank 5
-                spellInfo->Attributes = SPELL_ATTR0_IMPOSSIBLE_DODGE_PARRY_BLOCK;
-                break;
         }
     }
 
