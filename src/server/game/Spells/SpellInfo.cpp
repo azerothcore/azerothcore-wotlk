@@ -1082,7 +1082,7 @@ bool SpellInfo::IsAutocastable() const
 {
     if (Attributes & SPELL_ATTR0_PASSIVE)
         return false;
-    if (AttributesEx & SPELL_ATTR1_UNAUTOCASTABLE_BY_PET)
+    if (AttributesEx & SPELL_ATTR1_NO_AUTOCAST_AI)
         return false;
     return true;
 }
@@ -1233,7 +1233,7 @@ bool SpellInfo::IsPositiveEffect(uint8 effIndex) const
 
 bool SpellInfo::IsChanneled() const
 {
-    return (AttributesEx & (SPELL_ATTR1_CHANNELED_1 | SPELL_ATTR1_CHANNELED_2));
+    return (AttributesEx & (SPELL_ATTR1_IS_CHANNELED | SPELL_ATTR1_IS_SELF_CHANNELED));
 }
 
 bool SpellInfo::IsMoveAllowedChannel() const
@@ -1243,12 +1243,12 @@ bool SpellInfo::IsMoveAllowedChannel() const
 
 bool SpellInfo::NeedsComboPoints() const
 {
-    return (AttributesEx & (SPELL_ATTR1_REQ_COMBO_POINTS1 | SPELL_ATTR1_REQ_COMBO_POINTS2));
+    return (AttributesEx & (SPELL_ATTR1_FINISHING_MOVE_DAMAGE | SPELL_ATTR1_FINISHING_MOVE_DURATION));
 }
 
 bool SpellInfo::IsBreakingStealth() const
 {
-    return !(AttributesEx & SPELL_ATTR1_NOT_BREAK_STEALTH);
+    return !(AttributesEx & SPELL_ATTR1_ALLOW_WHILE_STEALTHED);
 }
 
 bool SpellInfo::IsRangedWeaponSpell() const
@@ -1294,7 +1294,7 @@ bool SpellInfo::CanPierceImmuneAura(SpellInfo const* aura) const
         return true;
 
     // these spells (Cyclone for example) can pierce all...
-    if ((AttributesEx & SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE)
+    if ((AttributesEx & SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS)
             // ...but not these (Divine shield for example)                                                                                 // xinef: banish exception, banish can override banish to cancel itself
             && !(aura && (aura->Mechanic == MECHANIC_IMMUNE_SHIELD || aura->Mechanic == MECHANIC_INVULNERABILITY || (aura->Mechanic == MECHANIC_BANISH && (Mechanic != MECHANIC_BANISH || !(AttributesEx2 & SPELL_ATTR2_CANT_TARGET_TAPPED))))))
         return true;
@@ -1322,7 +1322,7 @@ bool SpellInfo::CanDispelAura(SpellInfo const* aura) const
         return false;
 
     // These auras (Cyclone for example) are not dispelable
-    if (aura->HasAttribute(SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE))
+    if (aura->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
         return false;
 
     return true;
@@ -1729,7 +1729,7 @@ bool SpellInfo::ValidateAttribute6SpellDamageMods(const Unit* caster, const Aura
 
 SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* target, bool implicit) const
 {
-    if (AttributesEx & SPELL_ATTR1_CANT_TARGET_SELF && caster == target)
+    if (AttributesEx & SPELL_ATTR1_EXCLUDE_CASTER && caster == target)
         return SPELL_FAILED_BAD_TARGETS;
 
     // check visibility - ignore stealth for implicit (area) targets
@@ -1742,7 +1742,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
     if (unitTarget)
     {
         // xinef: spells cannot be cast if player is in fake combat also
-        if (AttributesEx & SPELL_ATTR1_CANT_TARGET_IN_COMBAT && (unitTarget->IsInCombat() || unitTarget->IsPetInCombat()))
+        if (AttributesEx & SPELL_ATTR1_ONLY_PEACEFUL_TARGETS && (unitTarget->IsInCombat() || unitTarget->IsPetInCombat()))
             return SPELL_FAILED_TARGET_AFFECTING_COMBAT;
 
         // only spells with SPELL_ATTR3_ONLY_TARGET_GHOSTS can target ghosts
@@ -2341,7 +2341,7 @@ uint32 SpellInfo::GetRecoveryTime() const
 int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, Spell* spell) const
 {
     // Spell drain all exist power on cast (Only paladin lay of Hands)
-    if (AttributesEx & SPELL_ATTR1_DRAIN_ALL_POWER)
+    if (AttributesEx & SPELL_ATTR1_USE_ALL_MANA)
     {
         // If power type - health drain all
         if (PowerType == POWER_HEALTH)

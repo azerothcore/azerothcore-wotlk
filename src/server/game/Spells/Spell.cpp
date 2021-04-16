@@ -648,7 +648,7 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
     // Determine if spell can be reflected back to the caster
     // Patch 1.2 notes: Spell Reflection no longer reflects abilities
     m_canReflect = m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !m_spellInfo->HasAttribute(SPELL_ATTR0_IS_ABILITY)
-                   && !m_spellInfo->HasAttribute(SPELL_ATTR1_CANT_BE_REFLECTED) && !m_spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES)
+                   && !m_spellInfo->HasAttribute(SPELL_ATTR1_NO_REFLECTION) && !m_spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES)
                    && !m_spellInfo->IsPassive() && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL));
 
     CleanupTargetList();
@@ -3125,7 +3125,7 @@ bool Spell::UpdateChanneledTargetList()
                                 continue;
                             }
                             // Xinef: Update Orientation server side (non players wont sent appropriate packets)
-                            else if (m_spellInfo->HasAttribute(SPELL_ATTR1_CHANNEL_TRACK_TARGET))
+                            else if (m_spellInfo->HasAttribute(SPELL_ATTR1_TRACK_TARGET_IN_CHANNEL))
                                 m_caster->UpdateOrientation(m_caster->GetAngle(unit));
                         }
                     }
@@ -3480,8 +3480,8 @@ void Spell::_cast(bool skipCheck)
         return;
     }
 
-    // Xinef: implement attribute SPELL_ATTR1_DISMISS_PET, on spell cast current pet is dismissed and charms are removed
-    if (m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET))
+    // Xinef: implement attribute SPELL_ATTR1_DISMISS_PET_FIRST, on spell cast current pet is dismissed and charms are removed
+    if (m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET_FIRST))
     {
         if (m_caster->GetTypeId() == TYPEID_PLAYER && !m_spellInfo->HasEffect(SPELL_EFFECT_SUMMON_PET))
             if (Pet* pet = m_caster->ToPlayer()->GetPet())
@@ -5513,7 +5513,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_DISPEL)
         {
-            if (m_spellInfo->Effects[i].IsTargetingArea() || m_spellInfo->HasAttribute(SPELL_ATTR1_MELEE_COMBAT_START))
+            if (m_spellInfo->Effects[i].IsTargetingArea() || m_spellInfo->HasAttribute(SPELL_ATTR1_INITIATE_COMBAT))
             {
                 hasDispellableAura = true;
                 break;
@@ -5836,7 +5836,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             case SPELL_EFFECT_SUMMON:
                 {
                     SummonPropertiesEntry const* SummonProperties = sSummonPropertiesStore.LookupEntry(m_spellInfo->Effects[i].MiscValueB);
-                    if (!SummonProperties || m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET))
+                    if (!SummonProperties || m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET_FIRST))
                         break;
                     switch (SummonProperties->Category)
                     {
@@ -5864,7 +5864,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_EFFECT_SUMMON_PET:
                 {
-                    if (!m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET))
+                    if (!m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET_FIRST))
                     {
                         if (m_caster->GetPetGUID())
                             return SPELL_FAILED_ALREADY_HAVE_SUMMON;
@@ -6028,7 +6028,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_CHARMED;
 
                     // Xinef: allow SPELL_AURA_MOD_POSSESS to posses target if caster has some pet
-                    if (m_spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_CHARM && !m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET))
+                    if (m_spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_CHARM && !m_spellInfo->HasAttribute(SPELL_ATTR1_DISMISS_PET_FIRST))
                     {
                         if (m_caster->GetPetGUID())
                             return SPELL_FAILED_ALREADY_HAVE_SUMMON;
@@ -6228,7 +6228,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
 
     // Check if the spell grants school or mechanic immunity.
     // We use bitmasks so the loop is done only once and not on every aura check below.
-    if (m_spellInfo->HasAttribute(SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY))
+    if (m_spellInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_PURGES_EFFECT))
     {
         for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
@@ -6316,7 +6316,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
                 SpellInfo const* auraInfo = aura->GetSpellInfo();
                 if (auraInfo->GetAllEffectsMechanicMask() & mechanic_immune)
                     continue;
-                if (auraInfo->GetSchoolMask() & school_immune && !auraInfo->HasAttribute(SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE))
+                if (auraInfo->GetSchoolMask() & school_immune && !auraInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
                     continue;
                 if (auraInfo->GetDispelMask() & dispel_immune)
                     continue;

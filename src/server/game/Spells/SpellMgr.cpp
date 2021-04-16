@@ -3830,7 +3830,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Hand of Reckoning
     ApplySpellFix({ 62124 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REDIRECTED;
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_REDIRECTION;
     });
 
     // Redemption
@@ -3981,7 +3981,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Heart of the Phoenix (triggered)
     ApplySpellFix({ 54114 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx &= ~SPELL_ATTR1_DISMISS_PET;
+        spellInfo->AttributesEx &= ~SPELL_ATTR1_DISMISS_PET_FIRST;
         spellInfo->RecoveryTime = 8 * 60 * IN_MILLISECONDS; // prev 600000
     });
 
@@ -4037,7 +4037,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Killing Spree
     ApplySpellFix({ 51690 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx |= SPELL_ATTR1_NOT_BREAK_STEALTH;
+        spellInfo->AttributesEx |= SPELL_ATTR1_ALLOW_WHILE_STEALTHED;
     });
 
     // Blood Tap visual cd reset
@@ -4150,7 +4150,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Death Pact
     ApplySpellFix({ 48743 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx &= ~SPELL_ATTR1_CANT_TARGET_SELF;
+        spellInfo->AttributesEx &= ~SPELL_ATTR1_EXCLUDE_CASTER;
     });
 
     // Raise Ally (trigger)
@@ -4238,7 +4238,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 6277 }, [](SpellEntry* spellInfo)
     {
         // because it is passive, needs this to be properly removed at death in RemoveAllAurasOnDeath()
-        spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_1;
+        spellInfo->AttributesEx &= ~SPELL_ATTR1_IS_CHANNELED;
         spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
         spellInfo->AttributesEx7 |= SPELL_ATTR7_REACTIVATE_AT_RESURRECT;
     });
@@ -4281,7 +4281,7 @@ void SpellMgr::LoadDbcDataCorrections()
         61291   // r2
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REDIRECTED;
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_REDIRECTION;
     });
 
     // Curse of Doom
@@ -4569,7 +4569,7 @@ void SpellMgr::LoadDbcDataCorrections()
         16857   // Faerie Fire (Feral)
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx &= ~SPELL_ATTR1_UNAFFECTED_BY_SCHOOL_IMMUNE;
+        spellInfo->AttributesEx &= ~SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS;
     });
 
     // Feral Charge - Cat
@@ -4849,7 +4849,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Shared Bonds
     ApplySpellFix({ 41363 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_1;
+        spellInfo->AttributesEx &= ~SPELL_ATTR1_IS_CHANNELED;
     });
 
     ApplySpellFix({
@@ -5091,7 +5091,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Gift of Twilight Shadow/Fire
     ApplySpellFix({ 57835, 58766 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_1;
+        spellInfo->AttributesEx &= ~SPELL_ATTR1_IS_CHANNELED;
     });
 
     // Pyrobuffet
@@ -5302,7 +5302,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Potent Pheromones
     ApplySpellFix({ 62619 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx |= SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY;
+        spellInfo->AttributesEx |= SPELL_ATTR1_IMMUNITY_PURGES_EFFECT;
     });
 
     // Healthy spore summon periodic
@@ -5322,7 +5322,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 64321 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ONLY_TARGET_PLAYERS;
-        spellInfo->AttributesEx |= SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY;
+        spellInfo->AttributesEx |= SPELL_ATTR1_IMMUNITY_PURGES_EFFECT;
     });
 
     // Lightning Orb Charged
@@ -6108,7 +6108,7 @@ void SpellMgr::LoadDbcDataCorrections()
         71258   // Adrenaline Rush (Ymirjar Battle-Maiden)
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx &= ~SPELL_ATTR1_CHANNELED_2;
+        spellInfo->AttributesEx &= ~SPELL_ATTR1_IS_SELF_CHANNELED;
     });
 
     // Saber Lash (Lord Marrowgar)
@@ -6262,7 +6262,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Ooze Flood (Rotface)
     ApplySpellFix({ 69783, 69797, 69799, 69802 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx |= SPELL_ATTR1_CANT_TARGET_SELF;
+        spellInfo->AttributesEx |= SPELL_ATTR1_EXCLUDE_CASTER;
     });
 
     // Volatile Ooze Beam Protection
@@ -6653,7 +6653,7 @@ void SpellMgr::LoadDbcDataCorrections()
         74792   // Soul Consumption
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx |= SPELL_ATTR1_CANT_BE_REDIRECTED;
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_REDIRECTION;
     });
 
     // Combustion
