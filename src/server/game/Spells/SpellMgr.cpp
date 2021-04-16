@@ -3386,7 +3386,7 @@ void SpellMgr::LoadDbcDataCorrections()
         45634   // Neural Needle
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;    // Crashes client on pressing ESC
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;    // Crashes client on pressing ESC
     });
 
     ApplySpellFix({
@@ -3955,7 +3955,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Kindred Spirits, damage aura
     ApplySpellFix({ 57458 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_DONT_REMOVE_IN_ARENA;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_ALLOW_ENETRING_ARENA;
     });
 
     // Chimera Shot - Serpent trigger
@@ -4349,7 +4349,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 44461, 55361, 55362 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_REACTIVE_DAMAGE_PROC;
     });
 
     // Evocation
@@ -4420,7 +4420,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 44544 }, [](SpellEntry* spellInfo)
     {
         spellInfo->Dispel = DISPEL_NONE;
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_STEALABLE;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_CANNOT_BE_STOLEN;
         spellInfo->EffectSpellClassMask[0] = flag96(685904631, 1151040, 32);
     });
 
@@ -5166,7 +5166,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->MaxAffectedTargets = 1;
         spellInfo->InterruptFlags = 0;
         spellInfo->EffectRadiusIndex[0] = 28;
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;
         spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
         spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
@@ -5180,7 +5180,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->MaxAffectedTargets = 3;
         spellInfo->InterruptFlags = 0;
         spellInfo->EffectRadiusIndex[0] = 28;
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;
         spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
         spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
@@ -5243,7 +5243,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 64566 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
     });
 
     // Ulduar, Hodir, Starlight
@@ -5651,7 +5651,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // tempfix, make Nether Power not stealable
     ApplySpellFix({ 66228, 67106, 67107, 67108 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_STEALABLE;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_CANNOT_BE_STOLEN;
     });
 
     // Trial of the Crusader, Faction Champions, Druid - Tranquality
@@ -6142,7 +6142,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 69146, 70823, 70824, 70825 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectRadiusIndex[0] = 15;   // 3yd instead of 5yd
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
     });
 
     // Dark Martyrdom (Lady Deathwhisper)
@@ -6304,7 +6304,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Mutated Plague (Professor Putricide)
     ApplySpellFix({ 72454, 72464, 72506, 72507 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_RESISTANCES;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
         spellInfo->EffectRadiusIndex[0] = EFFECT_RADIUS_50000_YARDS;   // 50000yd
     });
 
@@ -6442,7 +6442,7 @@ void SpellMgr::LoadDbcDataCorrections()
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
     });
 
     // Fury of Frostmourne
@@ -6702,7 +6702,7 @@ void SpellMgr::LoadDbcDataCorrections()
     //Blazing Aura
     ApplySpellFix({ 75885, 75886 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
     });
 
     ApplySpellFix({
@@ -6710,7 +6710,7 @@ void SpellMgr::LoadDbcDataCorrections()
         74629   //Combustion Periodic
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
     });
 
     // Going Bearback
@@ -6719,7 +6719,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
         spellInfo->EffectRadiusIndex[1] = spellInfo->EffectRadiusIndex[0];
         spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_DEST_AREA_ENTRY;
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;
     });
 
     // Still At It
@@ -6970,7 +6970,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Leading the Charge (13380), All Infra-Green bomber quests
     ApplySpellFix({ 59059 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;
     });
 
     // Dark Horizon (12664), Reunited (12663)
@@ -7105,7 +7105,7 @@ void SpellMgr::LoadDbcDataCorrections()
         }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_RESISTANCES;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
     });
 
     // Alchemist's Stone
