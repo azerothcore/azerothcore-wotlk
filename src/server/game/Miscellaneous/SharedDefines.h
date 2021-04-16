@@ -345,38 +345,38 @@ enum SpellAttr1
 
 enum SpellAttr2
 {
-    SPELL_ATTR2_CAN_TARGET_DEAD                  = 0x00000001, // TITLE Can target dead players or corpses
-    SPELL_ATTR2_UNK1                             = 0x00000002, // TITLE Unknown attribute 1@Attr2 DESCRIPTION vanish, shadowform, Ghost Wolf and other
-    SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS            = 0x00000004, // TITLE Ignore Line of Sight
-    SPELL_ATTR2_UNK3                             = 0x00000008, // TITLE Ignore aura scaling
-    SPELL_ATTR2_DISPLAY_IN_STANCE_BAR            = 0x00000010, // TITLE Show in stance bar (client only)
-    SPELL_ATTR2_AUTOREPEAT_FLAG                  = 0x00000020, // TITLE Ranged auto-attack spell
-    SPELL_ATTR2_CANT_TARGET_TAPPED               = 0x00000040, // TITLE Cannot target others' tapped units DESCRIPTION Can only target untapped units, or those tapped by caster
-    SPELL_ATTR2_UNK7                             = 0x00000080, // TITLE Unknown attribute 7@Attr2
-    SPELL_ATTR2_UNK8                             = 0x00000100, // TITLE Unknown attribute 8@Attr2 DESCRIPTION not set in 3.0.3
-    SPELL_ATTR2_UNK9                             = 0x00000200, // TITLE Unknown attribute 9@Attr2
-    SPELL_ATTR2_UNK10                            = 0x00000400, // TITLE Unknown attribute 10@Attr2 DESCRIPTION Related to taming?
-    SPELL_ATTR2_HEALTH_FUNNEL                    = 0x00000800, // TITLE Health Funnel
-    SPELL_ATTR2_UNK12                            = 0x00001000, // TITLE Unknown attribute 12@Attr2 DESCRIPTION Cleave, Heart Strike, Maul, Sunder Armor, Swipe
-    SPELL_ATTR2_PRESERVE_ENCHANT_IN_ARENA        = 0x00002000, // TITLE Enchant persists when entering arena
-    SPELL_ATTR2_UNK14                            = 0x00004000, // TITLE Unknown attribute 14@Attr2
-    SPELL_ATTR2_UNK15                            = 0x00008000, // TITLE Unknown attribute 15@Attr2 DESCRIPTION not set in 3.0.3
-    SPELL_ATTR2_TAME_BEAST                       = 0x00010000, // TITLE Tame Beast
-    SPELL_ATTR2_NOT_RESET_AUTO_ACTIONS           = 0x00020000, // TITLE Don't reset swing timer DESCRIPTION Does not reset melee/ranged autoattack timer on cast
-    SPELL_ATTR2_REQ_DEAD_PET                     = 0x00040000, // TITLE Requires dead pet
-    SPELL_ATTR2_NOT_NEED_SHAPESHIFT              = 0x00080000, // TITLE Also allow outside shapeshift DESCRIPTION Even if Stances are nonzero, allow spell to be cast outside of shapeshift (though not in a different shapeshift)
-    SPELL_ATTR2_UNK20                            = 0x00100000, // TITLE Unknown attribute 20@Attr2
-    SPELL_ATTR2_DAMAGE_REDUCED_SHIELD            = 0x00200000, // TITLE Damage reduction ability DESCRIPTION Causes BG flags to be dropped if combined with ATTR1_DISPEL_AURAS_ON_IMMUNITY
-    SPELL_ATTR2_UNK22                            = 0x00400000, // TITLE Unknown attribute 22@Attr2 DESCRIPTION Ambush, Backstab, Cheap Shot, Death Grip, Garrote, Judgements, Mutilate, Pounce, Ravage, Shiv, Shred
-    SPELL_ATTR2_IS_ARCANE_CONCENTRATION          = 0x00800000, // TITLE Arcane Concentration
-    SPELL_ATTR2_UNK24                            = 0x01000000, // TITLE Unknown attribute 24@Attr2
-    SPELL_ATTR2_UNK25                            = 0x02000000, // TITLE Unknown attribute 25@Attr2
-    SPELL_ATTR2_UNAFFECTED_BY_AURA_SCHOOL_IMMUNE = 0x04000000, // TITLE Pierce aura application immunities DESCRIPTION Allow aura to be applied despite target being immune to new aura applications
-    SPELL_ATTR2_UNK27                            = 0x08000000, // TITLE Unknown attribute 27@Attr2
-    SPELL_ATTR2_UNK28                            = 0x10000000, // TITLE Unknown attribute 28@Attr2
-    SPELL_ATTR2_CANT_CRIT                        = 0x20000000, // TITLE Cannot critically strike
-    SPELL_ATTR2_TRIGGERED_CAN_TRIGGER_PROC       = 0x40000000, // TITLE Allow triggered spell to trigger (type 1) DESCRIPTION Without this attribute, any triggered spell will be unable to trigger other auras' procs
-    SPELL_ATTR2_FOOD_BUFF                        = 0x80000000  // TITLE Food buff (client only)
+    SPELL_ATTR2_ALLOW_DEAD_TARGET                    = 0x00000001, // TITLE Can target dead players or corpses
+    SPELL_ATTR2_NO_SHAPESHIFT_UI                     = 0x00000002, // TITLE Unknown attribute 1@Attr2 DESCRIPTION vanish, shadowform, Ghost Wolf and other
+    SPELL_ATTR2_IGNORE_LINE_OF_SIGHT                 = 0x00000004, // TITLE Ignore Line of Sight
+    SPELL_ATTR2_ALLOW_LOW_LEVEL_BUFF                 = 0x00000008, // TITLE Ignore aura scaling
+    SPELL_ATTR2_USE_SHAPESHIFT_BAR                   = 0x00000010, // TITLE Show in stance bar (client only)
+    SPELL_ATTR2_AUTO_REPEAT                          = 0x00000020, // TITLE Ranged auto-attack spell
+    SPELL_ATTR2_CANNOT_CAST_ON_TAPPED                = 0x00000040, // TITLE Cannot target others' tapped units DESCRIPTION Can only target untapped units, or those tapped by caster
+    SPELL_ATTR2_DO_NOT_REPORT_SPELL_FAILURE          = 0x00000080, // TITLE Unknown attribute 7@Attr2
+    SPELL_ATTR2_INCLUDE_IN_ADVANCED_COMBAT_LOG       = 0x00000100, // TITLE Unknown attribute 8@Attr2 DESCRIPTION not set in 3.0.3
+    SPELL_ATTR2_ALWAYS_CAST_AS_UNIT                  = 0x00000200, // TITLE Unknown attribute 9@Attr2
+    SPELL_ATTR2_SPECIAL_TAMING_FLAG                  = 0x00000400, // TITLE Unknown attribute 10@Attr2 DESCRIPTION Related to taming?
+    SPELL_ATTR2_NO_TARGET_PER_SECOND_COST            = 0x00000800, // TITLE Health Funnel
+    SPELL_ATTR2_CHAIN_FROM_CASTER                    = 0x00001000, // TITLE Unknown attribute 12@Attr2 DESCRIPTION Cleave, Heart Strike, Maul, Sunder Armor, Swipe
+    SPELL_ATTR2_ENCHANT_OWN_ITEM_ONLY                = 0x00002000, // TITLE Enchant persists when entering arena
+    SPELL_ATTR2_ALLOW_WHILE_INVISIBLE                = 0x00004000, // TITLE Unknown attribute 14@Attr2
+    SPELL_ATTR2_DO_NOT_CONSUME_IF_GAINED_DURING_CAST = 0x00008000, // TITLE Unknown attribute 15@Attr2 DESCRIPTION not set in 3.0.3
+    SPELL_ATTR2_NO_ACTIVE_PETS                       = 0x00010000, // TITLE Tame Beast
+    SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS           = 0x00020000, // TITLE Don't reset swing timer DESCRIPTION Does not reset melee/ranged autoattack timer on cast
+    SPELL_ATTR2_NO_JUMP_WHILE_CAST_PENDING           = 0x00040000, // TITLE Requires dead pet
+    SPELL_ATTR2_ALLOW_WHILE_NOT_SHAPESHIFTED         = 0x00080000, // TITLE Also allow outside shapeshift (caster form) DESCRIPTION Even if Stances are nonzero, allow spell to be cast outside of shapeshift (though not in a different shapeshift)
+    SPELL_ATTR2_INITIATE_COMBAT_POST_CAST            = 0x00100000, // TITLE (Enables Auto-Attack)
+    SPELL_ATTR2_FAIL_ON_ALL_TARGETS_IMMUNE           = 0x00200000, // TITLE Damage reduction ability DESCRIPTION Causes BG flags to be dropped if combined with ATTR1_DISPEL_AURAS_ON_IMMUNITY
+    SPELL_ATTR2_NO_INITIAL_THREAD                    = 0x00400000, // TITLE Unknown attribute 22@Attr2 DESCRIPTION Ambush, Backstab, Cheap Shot, Death Grip, Garrote, Judgements, Mutilate, Pounce, Ravage, Shiv, Shred
+    SPELL_ATTR2_PROC_COOLDOWN_ON_FAILURE             = 0x00800000, // TITLE Arcane Concentration
+    SPELL_ATTR2_ITEM_CAST_WITH_OWNER_SKILL           = 0x01000000, // TITLE Unknown attribute 24@Attr2
+    SPELL_ATTR2_DONT_BLOCK_MANA_REGEN                = 0x02000000, // TITLE Unknown attribute 25@Attr2
+    SPELL_ATTR2_NO_SCHOOL_IMMUNITIES                 = 0x04000000, // TITLE Pierce aura application immunities DESCRIPTION Allow aura to be applied despite target being immune to new aura applications
+    SPELL_ATTR2_IGNORE_WEAPONSKILL                   = 0x08000000, // TITLE Unknown attribute 27@Attr2
+    SPELL_ATTR2_NOT_AN_ACTION                        = 0x10000000, // TITLE Unknown attribute 28@Attr2
+    SPELL_ATTR2_CANT_CRIT                            = 0x20000000, // TITLE Cannot critically strike
+    SPELL_ATTR2_ACTIVE_THREAT                        = 0x40000000, // TITLE Allow triggered spell to trigger (type 1) DESCRIPTION Without this attribute, any triggered spell will be unable to trigger other auras' procs
+    SPELL_ATTR2_ITEM_CAST                            = 0x80000000  // TITLE Food buff (client only)
 };
 
 enum SpellAttr3

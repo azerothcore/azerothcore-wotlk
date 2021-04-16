@@ -2069,7 +2069,7 @@ void Unit::CalcAbsorbResist(Unit* attacker, Unit* victim, SpellSchoolMask school
 
             // Xinef: Single Target splits require LoS
             const SpellInfo* splitSpellInfo = (*itr)->GetSpellInfo();
-            if (!splitSpellInfo->Effects[(*itr)->GetEffIndex()].IsAreaAuraEffect() && !splitSpellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS))
+            if (!splitSpellInfo->Effects[(*itr)->GetEffIndex()].IsAreaAuraEffect() && !splitSpellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT))
                 if (!caster->IsWithinLOSInMap(victim) || !caster->IsWithinDist(victim, splitSpellInfo->GetMaxRange(splitSpellInfo->IsPositive(), caster)))
                     continue;
 
@@ -3530,7 +3530,7 @@ bool Unit::IsNonMeleeSpellCast(bool withDelayed, bool skipChanneled, bool skipAu
     {
         if (!skipInstant || m_currentSpells[CURRENT_GENERIC_SPELL]->GetCastTime())
         {
-            if (!isAutoshoot || !m_currentSpells[CURRENT_GENERIC_SPELL]->m_spellInfo->HasAttribute(SPELL_ATTR2_NOT_RESET_AUTO_ACTIONS))
+            if (!isAutoshoot || !m_currentSpells[CURRENT_GENERIC_SPELL]->m_spellInfo->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS))
                 return true;
         }
     }
@@ -3538,7 +3538,7 @@ bool Unit::IsNonMeleeSpellCast(bool withDelayed, bool skipChanneled, bool skipAu
     if (!skipChanneled && m_currentSpells[CURRENT_CHANNELED_SPELL] &&
             (m_currentSpells[CURRENT_CHANNELED_SPELL]->getState() != SPELL_STATE_FINISHED))
     {
-        if (!isAutoshoot || !m_currentSpells[CURRENT_CHANNELED_SPELL]->m_spellInfo->HasAttribute(SPELL_ATTR2_NOT_RESET_AUTO_ACTIONS))
+        if (!isAutoshoot || !m_currentSpells[CURRENT_CHANNELED_SPELL]->m_spellInfo->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS))
             return true;
     }
     // autorepeat spells may be finished or delayed, but they are still considered cast
@@ -15392,7 +15392,7 @@ void createProcFlags(const SpellInfo* spellInfo, WeaponAttackType attackType, bo
                 break;
             case SPELL_DAMAGE_CLASS_RANGED:
                 // Auto attack
-                if (spellInfo->HasAttribute(SPELL_ATTR2_AUTOREPEAT_FLAG))
+                if (spellInfo->HasAttribute(SPELL_ATTR2_AUTO_REPEAT))
                 {
                     procAttacker = PROC_FLAG_DONE_RANGED_AUTO_ATTACK;
                     procVictim   = PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK;
@@ -15406,7 +15406,7 @@ void createProcFlags(const SpellInfo* spellInfo, WeaponAttackType attackType, bo
             default:
                 if (spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON &&
                         spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_WEAPON_WAND)
-                        && spellInfo->HasAttribute(SPELL_ATTR2_AUTOREPEAT_FLAG)) // Wands auto attack
+                        && spellInfo->HasAttribute(SPELL_ATTR2_AUTO_REPEAT)) // Wands auto attack
                 {
                     procAttacker = PROC_FLAG_DONE_RANGED_AUTO_ATTACK;
                     procVictim   = PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK;
@@ -18069,7 +18069,7 @@ Aura* Unit::AddAura(uint32 spellId, Unit* target)
     if (!spellInfo)
         return nullptr;
 
-    if (!target->IsAlive() && !spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !spellInfo->HasAttribute(SPELL_ATTR2_CAN_TARGET_DEAD))
+    if (!target->IsAlive() && !spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_DEAD_TARGET))
         return nullptr;
 
     return AddAura(spellInfo, MAX_EFFECT_MASK, target);

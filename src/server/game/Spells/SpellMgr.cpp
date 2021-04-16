@@ -2133,7 +2133,7 @@ void SpellMgr::LoadEnchantCustomAttr()
 
         // TODO: find a better check
         // Xinef: commented second part, fixes warlock enchants like firestone, spellstone
-        if (!spellInfo->HasAttribute(SPELL_ATTR2_PRESERVE_ENCHANT_IN_ARENA)/* || !spellInfo->HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFTED)*/)
+        if (!spellInfo->HasAttribute(SPELL_ATTR2_ENCHANT_OWN_ITEM_ONLY)/* || !spellInfo->HasAttribute(SPELL_ATTR0_NOT_SHAPESHIFTED)*/)
             continue;
 
         for (uint32 j = 0; j < MAX_SPELL_EFFECTS; ++j)
@@ -4092,7 +4092,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Death and Decay
     ApplySpellFix({ 52212 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
     });
 
@@ -4144,7 +4144,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Death Grip Jump Dest
     ApplySpellFix({ 57604 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     // Death Pact
@@ -4253,14 +4253,14 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 32182 }, [](SpellEntry* spellInfo)
     {
         spellInfo->ExcludeTargetAuraSpell = 57723; // Exhaustion
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     // Bloodlust
     ApplySpellFix({ 2825 }, [](SpellEntry* spellInfo)
     {
         spellInfo->ExcludeTargetAuraSpell = 57724; // Sated
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     // Improved Succubus
@@ -5169,7 +5169,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx4 |= SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
         spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
         spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     // Surge of Power (Phase 3)
@@ -5183,7 +5183,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->AttributesEx4 |= SPELL_ATTR4_CAN_CAST_WHILE_CASTING;
         spellInfo->EffectImplicitTargetA[0] = TARGET_SRC_CASTER;
         spellInfo->EffectImplicitTargetB[0] = TARGET_UNIT_SRC_AREA_ENEMY;
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     // Wyrmrest Drake - Life Burst
@@ -5197,7 +5197,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectPointsPerComboPoint[1] = 2500;
         spellInfo->EffectBasePoints[1] = 2499;
         spellInfo->RangeIndex = 1;
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     //Alexstrasza - Gift
@@ -5233,7 +5233,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Ulduar, Mimiron, Summon Flames Initial
     ApplySpellFix({ 64563 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
         spellInfo->EffectImplicitTargetA[0] = TARGET_DEST_DEST;
         spellInfo->EffectImplicitTargetB[0] = 0;
@@ -5242,7 +5242,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Ulduar, Mimiron, Flames (damage)
     ApplySpellFix({ 64566 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_RESISTANCES;
     });
 
@@ -5378,7 +5378,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Cosmic Smash (Algalon the Observer)
     ApplySpellFix({ 62311, 64596 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->EffectRadiusIndex[0] = 12; // 100yd
         spellInfo->RangeIndex = 13;  // 50000yd
     });
@@ -5518,7 +5518,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Trial of the Champion, Summon Risen Jaeren/Arelas
     ApplySpellFix({ 67705, 67715 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_ALLOW_DEAD_TARGET;
     });
 
     // Trial of the Champion, Ghoul Explode
@@ -6011,12 +6011,12 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 69232 }, [](SpellEntry* spellInfo)
     {
         spellInfo->EffectTriggerSpell[1] = 69238;
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     ApplySpellFix({ 69233, 69646 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     ApplySpellFix({ 69238, 69628 }, [](SpellEntry* spellInfo)
@@ -6025,13 +6025,13 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetB[0] = TARGET_DEST_DYNOBJ_NONE;
         spellInfo->EffectImplicitTargetA[1] = TARGET_DEST_DEST;
         spellInfo->EffectImplicitTargetB[1] = TARGET_DEST_DYNOBJ_NONE;
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     // Hoarfrost
     ApplySpellFix({ 69246, 69245, 69645 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     // Devour Humanoid
@@ -6148,7 +6148,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Dark Martyrdom (Lady Deathwhisper)
     ApplySpellFix({ 70897 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_ALLOW_DEAD_TARGET;
     });
 
     ApplySpellFix({
@@ -6228,7 +6228,7 @@ void SpellMgr::LoadDbcDataCorrections()
         71289   // Dominate Mind (Lady Deathwhisper)
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     // Severed Essence (Val'kyr Herald)
@@ -6425,7 +6425,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Lich King, Infest
     ApplySpellFix({ 70541, 73779, 73780, 73781 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     // Lich King, Necrotic Plague
@@ -6511,7 +6511,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 69198 }, [](SpellEntry* spellInfo)
     {
         spellInfo->RangeIndex = 13; // 50000yd
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_HIT_RESULT;
     });
 
@@ -6688,7 +6688,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 75509 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_100_YARDS;
         spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_100_YARDS;
     });
@@ -6865,7 +6865,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Kaw the Mammoth Destroyer
     ApplySpellFix({ 46260 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     // That's Abominable
@@ -6988,7 +6988,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Not a Bug (13342)
     ApplySpellFix({ 60531 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_DEAD;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_ALLOW_DEAD_TARGET;
     });
 
     // Frankly,  It Makes No Sense... (10672)
@@ -7012,7 +7012,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Mangletooth Quests (http://www.wowhead.com/npc=3430)
     ApplySpellFix({ 7764, 10767, 16610, 16612, 16618, 17013 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->AttributesEx5 |= SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK;
     });
 
@@ -7263,13 +7263,13 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->Effect[1] = SPELL_EFFECT_DUMMY;
         spellInfo->EffectImplicitTargetA[1] = TARGET_UNIT_NEARBY_ENTRY;
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     // Light Bonfire (DND)
     ApplySpellFix({ 29831 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
     // Infernal
