@@ -62,7 +62,7 @@ uint32 acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
     uint32 gain = 0;
 
     if (!creature || (!creature->IsTotem() && !creature->IsPet() && !creature->IsCritter() &&
-        !(creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL)))
+        !(creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP)))
     {
         float xpMod = 1.0f;
 
