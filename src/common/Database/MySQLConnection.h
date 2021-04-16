@@ -120,7 +120,7 @@ private:
     MYSQL*                m_Mysql;                      //! MySQL Handle.
     MySQLConnectionInfo&  m_connectionInfo;             //! Connection info (used for logging)
     ConnectionFlags       m_connectionFlags;            //! Connection flags (for preparing relevant statements)
-    std::mutex      m_Mutex;
+    std::mutex            m_Mutex;
 
     MySQLConnection(MySQLConnection const& right) = delete;
     MySQLConnection& operator=(MySQLConnection const& right) = delete;
