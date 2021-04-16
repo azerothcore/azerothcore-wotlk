@@ -545,8 +545,12 @@ public:
           for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
           {
               if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+              {
                   if (unit->HasUnitState(UNIT_STATE_CASTING))
+                  {
                       return unit;
+                  }
+              }
           }
           return nullptr;
         }
@@ -574,7 +578,9 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             events.Update(diff);
 
@@ -587,7 +593,9 @@ public:
             }
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
             switch(events.ExecuteEvent())
             {
@@ -600,13 +608,17 @@ public:
                     {
                         me->CastSpell(target, COUNTER_SPELL, false);
                         events.RepeatEvent(urand(10000, 20000));
-                    } else {
+                    }
+                    else
+                    {
                         events.RepeatEvent(400);
                     }
                     break;
                 case 3:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, PowerUsersSelector(me, POWER_MANA, 20.0f, false)))
+                    {
                         me->CastSpell(target, DRAIN_MANA_SPELL, false);
+                    }
                     events.RepeatEvent(urand(13000, 20000));
                     break;
                 case 4:
