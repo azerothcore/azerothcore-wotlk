@@ -2239,7 +2239,7 @@ void World::Update(uint32 diff)
     // so we don't have to do it in every packet that modifies auctions
     AsyncAuctionListingMgr::SetAuctionListingAllowed(false);
     {
-        ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetLock());
+        std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetLock());
 
         // pussywizard: handle auctions when the timer has passed
         if (m_timers[WUPDATE_AUCTIONS].Passed())
