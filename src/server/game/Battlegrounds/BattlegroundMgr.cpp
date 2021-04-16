@@ -746,6 +746,8 @@ BattlegroundQueueTypeId BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId bgType
         }
 
         sScriptMgr->OnArenaTypeIDToQueueID(bgTypeId, arenaType, queueTypeID);
+
+        return static_cast<BattlegroundQueueTypeId>(queueTypeID);
     }
 
     if (BattlegroundMgr::bgToQueue.find(bgTypeId) != BattlegroundMgr::bgToQueue.end())
