@@ -4240,7 +4240,7 @@ void SpellMgr::LoadDbcDataCorrections()
         // because it is passive, needs this to be properly removed at death in RemoveAllAurasOnDeath()
         spellInfo->AttributesEx &= ~SPELL_ATTR1_IS_CHANNELED;
         spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
-        spellInfo->AttributesEx7 |= SPELL_ATTR7_REACTIVATE_AT_RESURRECT;
+        spellInfo->AttributesEx7 |= SPELL_ATTR7_DISABLE_AURA_WHILE_DEAD;
     });
 
     // Ancestral Awakening Heal
@@ -7280,7 +7280,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->EffectImplicitTargetA[EFFECT_2] = TARGET_UNIT_TARGET_ANY;
     });
 
-    // Check for SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER
+    // Check for SPELL_ATTR7_CAN_CAUSE_INTERRUPT
     ApplySpellFix({
         47476,  // Deathknight - Strangulate
         15487,  // Priest - Silence
@@ -7289,7 +7289,7 @@ void SpellMgr::LoadDbcDataCorrections()
         8983    // Druid - Bash  - R3
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx7 |= SPELL_ATTR7_INTERRUPT_ONLY_NONPLAYER;
+        spellInfo->AttributesEx7 |= SPELL_ATTR7_CAN_CAUSE_INTERRUPT;
     });
 
     // Clicking on Warlock Summoning portal should not require mana
