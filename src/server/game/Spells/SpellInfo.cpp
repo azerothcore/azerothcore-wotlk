@@ -1501,7 +1501,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     }
 
     // raid instance limitation
-    if (HasAttribute(SPELL_ATTR6_NOT_IN_RAID_INSTANCE))
+    if (HasAttribute(SPELL_ATTR6_NOT_IN_RAID_INSTANCES))
     {
         MapEntry const* mapEntry = sMapStore.LookupEntry(map_id);
         if (!mapEntry || mapEntry->IsRaid())
@@ -1708,7 +1708,7 @@ bool SpellInfo::IsAuraEffectEqual(SpellInfo const* otherSpellInfo) const
 bool SpellInfo::ValidateAttribute6SpellDamageMods(const Unit* caster, const AuraEffect* auraEffect, bool isDot) const
 {
     // Xinef: no attribute
-    if (!(AttributesEx6 & SPELL_ATTR6_LIMIT_PCT_DAMAGE_MODS))
+    if (!(AttributesEx6 & SPELL_ATTR6_IGNORE_CASTER_DAMAGE_MODIFIERS))
         return true;
 
     // Xinef we have a hook to decide which auras should profit to the spell, by default no profits
@@ -1733,7 +1733,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
         return SPELL_FAILED_BAD_TARGETS;
 
     // check visibility - ignore stealth for implicit (area) targets
-    if (!(AttributesEx6 & SPELL_ATTR6_CAN_TARGET_INVISIBLE) && !caster->CanSeeOrDetect(target, implicit))
+    if (!(AttributesEx6 & SPELL_ATTR6_IGNORE_PHASE_SHIFT) && !caster->CanSeeOrDetect(target, implicit))
         return SPELL_FAILED_BAD_TARGETS;
 
     Unit const* unitTarget = target->ToUnit();
@@ -1811,14 +1811,14 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
         return SPELL_FAILED_TARGETS_DEAD;
 
     // check this flag only for implicit targets (chain and area), allow to explicitly target units for spells like Shield of Righteousness
-    if (implicit && AttributesEx6 & SPELL_ATTR6_CANT_TARGET_CROWD_CONTROLLED && !unitTarget->CanFreeMove())
+    if (implicit && AttributesEx6 & SPELL_ATTR6_DO_NOT_CHAIN_TO_CROWD_CONTROLLED_TARGETS && !unitTarget->CanFreeMove())
         return SPELL_FAILED_BAD_TARGETS;
 
     // checked in Unit::IsValidAttack/AssistTarget, shouldn't be checked for ENTRY targets
     //if (!(AttributesEx6 & SPELL_ATTR6_CAN_TARGET_UNTARGETABLE) && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
     //    return SPELL_FAILED_BAD_TARGETS;
 
-    //if (!(AttributesEx6 & SPELL_ATTR6_CAN_TARGET_POSSESSED_FRIENDS)
+    //if (!(AttributesEx6 & SPELL_ATTR6_NO_AURA_LOG)
 
     if (!CheckTargetCreatureType(unitTarget))
     {

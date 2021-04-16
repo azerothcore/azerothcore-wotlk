@@ -4278,7 +4278,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
             if ((*iter)->GetCurrentSpell(i) && (*iter)->GetCurrentSpell(i)->m_targets.GetUnitTargetGUID() == unitTarget->GetGUID())
             {
                 const SpellInfo* si = (*iter)->GetCurrentSpell(i)->GetSpellInfo();
-                if (si->HasAttribute(SPELL_ATTR6_CAN_TARGET_INVISIBLE) && (*iter)->GetTypeId() == TYPEID_UNIT)
+                if (si->HasAttribute(SPELL_ATTR6_IGNORE_PHASE_SHIFT) && (*iter)->GetTypeId() == TYPEID_UNIT)
                 {
                     Creature* c = (*iter)->ToCreature();
                     if ((!c->IsPet() && c->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS) || c->isWorldBoss() || c->IsDungeonBoss())
@@ -4949,7 +4949,7 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
                 if (spell->m_targets.GetUnitTargetGUID() == m_caster->GetGUID())
                 {
                     const SpellInfo* si = spell->GetSpellInfo();
-                    if (si->HasAttribute(SPELL_ATTR6_CAN_TARGET_INVISIBLE) && (*iter)->GetTypeId() == TYPEID_UNIT)
+                    if (si->HasAttribute(SPELL_ATTR6_IGNORE_PHASE_SHIFT) && (*iter)->GetTypeId() == TYPEID_UNIT)
                     {
                         Creature* c = (*iter)->ToCreature();
                         if ((!c->IsPet() && c->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS) || c->isWorldBoss() || c->IsDungeonBoss())

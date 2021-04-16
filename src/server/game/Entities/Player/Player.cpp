@@ -22983,7 +22983,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
         if (rec > 0)
             ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, rec, spell);
 
-        if (catrec > 0 && !spellInfo->HasAttribute(SPELL_ATTR6_IGNORE_CATEGORY_COOLDOWN_MODS))
+        if (catrec > 0 && !spellInfo->HasAttribute(SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS))
             ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, catrec, spell);
 
         if (int32 cooldownMod = GetTotalAuraModifier(SPELL_AURA_MOD_COOLDOWN))

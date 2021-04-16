@@ -4093,7 +4093,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 52212 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-        spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
     });
 
     // T9 blood plague crit bonus
@@ -4175,7 +4175,7 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->CategoryRecoveryTime = 0;
         spellInfo->RecoveryTime = 0;
-        spellInfo->AttributesEx6 |= SPELL_ATTR6_LIMIT_PCT_DAMAGE_MODS;
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_CASTER_DAMAGE_MODIFIERS;
     });
 
     // Improved Earth Shield
@@ -4457,7 +4457,7 @@ void SpellMgr::LoadDbcDataCorrections()
         }, [](SpellEntry* spellInfo)
     {
         // Strange shared cooldown
-        spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_CATEGORY_COOLDOWN_MODS;
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
     });
 
     // Vigilance
@@ -4857,7 +4857,7 @@ void SpellMgr::LoadDbcDataCorrections()
         41487   // Envenom
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
     });
 
     // Parasitic Shadowfiend
@@ -5360,7 +5360,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Sanity
     ApplySpellFix({ 63050 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
     });
 
     // Shadow Nova
@@ -6521,7 +6521,7 @@ void SpellMgr::LoadDbcDataCorrections()
         spellInfo->DurationIndex = 559; // 53 seconds
         spellInfo->ExcludeCasterAuraSpell = 0;
         spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
-        spellInfo->AttributesEx6 |= (SPELL_ATTR6_CAN_TARGET_INVISIBLE | SPELL_ATTR6_CAN_TARGET_UNTARGETABLE);
+        spellInfo->AttributesEx6 |= (SPELL_ATTR6_IGNORE_PHASE_SHIFT | SPELL_ATTR6_CAN_TARGET_UNTARGETABLE);
     });
 
     // Defile
@@ -6687,7 +6687,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Twilight Mending
     ApplySpellFix({ 75509 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx6 |= SPELL_ATTR6_CAN_TARGET_INVISIBLE;
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->EffectRadiusIndex[EFFECT_0] = EFFECT_RADIUS_100_YARDS;
         spellInfo->EffectRadiusIndex[EFFECT_1] = EFFECT_RADIUS_100_YARDS;

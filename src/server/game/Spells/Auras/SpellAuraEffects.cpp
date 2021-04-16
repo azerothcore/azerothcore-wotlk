@@ -2406,7 +2406,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
                 if ((*iter)->GetCurrentSpell(i) && (*iter)->GetCurrentSpell(i)->m_targets.GetUnitTargetGUID() == target->GetGUID())
                 {
                     const SpellInfo* si = (*iter)->GetCurrentSpell(i)->GetSpellInfo();
-                    if (si->HasAttribute(SPELL_ATTR6_CAN_TARGET_INVISIBLE) && (*iter)->GetTypeId() == TYPEID_UNIT)
+                    if (si->HasAttribute(SPELL_ATTR6_IGNORE_PHASE_SHIFT) && (*iter)->GetTypeId() == TYPEID_UNIT)
                     {
                         Creature* c = (*iter)->ToCreature();
                         if ((!c->IsPet() && c->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS) || c->isWorldBoss() || c->IsDungeonBoss())

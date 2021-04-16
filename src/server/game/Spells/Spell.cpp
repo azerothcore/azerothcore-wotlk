@@ -542,7 +542,7 @@ SpellValue::SpellValue(SpellInfo const* proto)
 
 Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags, uint64 originalCasterGUID, bool skipCheck) :
     m_spellInfo(sSpellMgr->GetSpellForDifficultyFromSpell(info, caster)),
-    m_caster((info->HasAttribute(SPELL_ATTR6_CAST_BY_CHARMER) && caster->GetCharmerOrOwner()) ? caster->GetCharmerOrOwner() : caster)
+    m_caster((info->HasAttribute(SPELL_ATTR6_ORIGINATE_FROM_CONTROLLER) && caster->GetCharmerOrOwner()) ? caster->GetCharmerOrOwner() : caster)
     , m_spellValue(new SpellValue(m_spellInfo))
 {
     m_customError = SPELL_CUSTOM_ERROR_NONE;
@@ -5332,7 +5332,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
         // All creatures should be able to cast as passengers freely, restriction and attribute are only for players
         VehicleSeatEntry const* vehicleSeat = vehicle->GetSeatForPassenger(m_caster);
-        if (!m_spellInfo->HasAttribute(SPELL_ATTR6_CASTABLE_WHILE_ON_VEHICLE) && !m_spellInfo->HasAttribute(SPELL_ATTR0_ALLOW_WHILE_MOUNTED)
+        if (!m_spellInfo->HasAttribute(SPELL_ATTR6_ALLOW_WHILE_RIDING_VEHICLE) && !m_spellInfo->HasAttribute(SPELL_ATTR0_ALLOW_WHILE_MOUNTED)
                 && (vehicleSeat->m_flags & checkMask) != checkMask && m_caster->GetTypeId() == TYPEID_PLAYER)
             return SPELL_FAILED_DONT_REPORT;
     }
@@ -6219,7 +6219,7 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
 {
     // spells totally immuned to caster auras (wsg flag drop, give marks etc)
-    if (m_spellInfo->HasAttribute(SPELL_ATTR6_IGNORE_CASTER_AURAS))
+    if (m_spellInfo->HasAttribute(SPELL_ATTR6_NOT_AN_ATTACK))
         return SPELL_CAST_OK;
 
     uint8 school_immune = 0;
@@ -7405,7 +7405,7 @@ bool Spell::IsAutoActionResetSpell() const
         return false;
     }
 
-    if (!m_casttime && m_spellInfo->HasAttribute(SPELL_ATTR6_NOT_RESET_SWING_IF_INSTANT))
+    if (!m_casttime && m_spellInfo->HasAttribute(SPELL_ATTR6_DOESNT_RESET_SWING_TIMER_IF_INSTANT))
     {
         return false;
     }
