@@ -1360,7 +1360,7 @@ void Pet::_SaveAuras(SQLTransaction& trans, bool logout)
             continue;
 
         // pussywizard: don't save auras that cannot be cancelled (needed for ICC buff on pets/summons)
-        if (aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CANT_CANCEL))
+        if (aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_NO_AURA_CANCEL))
             continue;
 
         // xinef: don't save hidden auras
