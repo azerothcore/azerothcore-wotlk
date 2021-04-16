@@ -182,7 +182,6 @@ public:
                                 c->CastSpell(c, 69413, true);
                                 c->SetCanFly(true);
                                 c->SetDisableGravity(true);
-                                c->SetHover(true);
                                 c->SendMovementFlagUpdate();
                                 float dist = rand_norm() * 2.0f;
                                 float angle = rand_norm() * 2 * M_PI;
@@ -227,7 +226,6 @@ public:
                                     continue;
                                 c->SetCanFly(false);
                                 c->SetDisableGravity(false);
-                                c->SetHover(false);
                                 c->SendMovementFlagUpdate();
                                 c->CastSpell(c, 69350, true);
                             }
@@ -1097,7 +1095,7 @@ public:
     {
         npc_pos_freed_slaveAI(Creature* creature) : SmartAI(creature)
         {
-            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
             // immune to falling icicles
             me->ApplySpellImmune(0, IMMUNITY_ID, 69425, true);
             me->ApplySpellImmune(0, IMMUNITY_ID, 70827, true);
@@ -1218,7 +1216,6 @@ public:
                         {
                             c->SetCanFly(true);
                             c->SetDisableGravity(true);
-                            c->SetHover(true);
                             c->GetMotionMaster()->MovePoint(0, TSSindragosaPos2);
                         }
 

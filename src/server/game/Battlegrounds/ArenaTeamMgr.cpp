@@ -14,10 +14,14 @@
 #include "ScriptMgr.h"
 #include "World.h"
 
+constexpr uint32 MAX_ARENA_TEAM_ID = 0xFFF00000;
+constexpr uint32 MAX_TEMP_ARENA_TEAM_ID = 0xFFFFFFFE;
+
 ArenaTeamMgr::ArenaTeamMgr()
 {
     NextArenaTeamId = 1;
     LastArenaLogId = 0;
+    NextTempArenaTeamId = 0xFFF00000;
 }
 
 ArenaTeamMgr::~ArenaTeamMgr()
@@ -114,12 +118,21 @@ void ArenaTeamMgr::RemoveArenaTeam(uint32 arenaTeamId)
 
 uint32 ArenaTeamMgr::GenerateArenaTeamId()
 {
-    if (NextArenaTeamId >= 0xFFFFFFFE)
+    if (NextArenaTeamId >= MAX_ARENA_TEAM_ID)
     {
         sLog->outError("Arena team ids overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
+
     return NextArenaTeamId++;
+}
+
+uint32 ArenaTeamMgr::GenerateTempArenaTeamId()
+{
+    if (NextTempArenaTeamId >= MAX_TEMP_ARENA_TEAM_ID)
+        NextTempArenaTeamId = MAX_ARENA_TEAM_ID;
+
+    return NextTempArenaTeamId++;
 }
 
 void ArenaTeamMgr::LoadArenaTeams()

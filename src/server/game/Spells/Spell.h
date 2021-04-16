@@ -234,6 +234,21 @@ struct ChannelTargetData
     SpellDestination spellDst;
 };
 
+ // Targets store structures and data
+struct TargetInfo
+{
+    uint64 targetGUID;
+    uint64 timeDelay;
+    SpellMissInfo missCondition:8;
+    SpellMissInfo reflectResult:8;
+    uint8  effectMask:8;
+    bool   processed:1;
+    bool   alive:1;
+    bool   crit:1;
+    bool   scaleAura:1;
+    int32  damage;
+};
+
 static const uint32 SPELL_INTERRUPT_NONPLAYER = 32747;
 
 class Spell
@@ -241,6 +256,9 @@ class Spell
     friend void Unit::SetCurrentCastedSpell(Spell* pSpell);
     friend class SpellScript;
 public:
+    Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags, uint64 originalCasterGUID = 0, bool skipCheck = false);
+    ~Spell();
+
     void EffectNULL(SpellEffIndex effIndex);
     void EffectUnused(SpellEffIndex effIndex);
     void EffectDistract(SpellEffIndex effIndex);
@@ -369,9 +387,6 @@ public:
 
     typedef std::set<Aura*> UsedSpellMods;
 
-    Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags, uint64 originalCasterGUID = 0, bool skipCheck = false);
-    ~Spell();
-
     void InitExplicitTargets(SpellCastTargets const& targets);
     void SelectExplicitTargets();
 
@@ -473,7 +488,7 @@ public:
     void HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOTarget, uint32 i, SpellEffectHandleMode mode);
     void HandleThreatSpells();
 
-    SpellInfo const* const m_spellInfo;
+    SpellInfo const* m_spellInfo;
     Item* m_CastItem;
     uint64 m_castItemGUID;
     uint8 m_cast_count;
@@ -511,6 +526,7 @@ public:
     Unit* GetCaster() const { return m_caster; }
     Unit* GetOriginalCaster() const { return m_originalCaster; }
     SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
+    void SetSpellInfo(SpellInfo const* info) { m_spellInfo = info; }
     int32 GetPowerCost() const { return m_powerCost; }
 
     bool UpdatePointers();                              // must be used at call Spell code after time delay (non triggered spell cast/update spell call/etc)
@@ -522,21 +538,6 @@ public:
 
     // xinef: moved to public
     void LoadScripts();
-
-    // Targets store structures and data
-    struct TargetInfo
-    {
-        uint64 targetGUID;
-        uint64 timeDelay;
-        SpellMissInfo missCondition: 8;
-        SpellMissInfo reflectResult: 8;
-        uint8  effectMask: 8;
-        bool   processed: 1;
-        bool   alive: 1;
-        bool   crit: 1;
-        bool   scaleAura: 1;
-        int32  damage;
-    };
     std::list<TargetInfo>* GetUniqueTargetInfo() { return &m_UniqueTargetInfo; }
 protected:
     bool HasGlobalCooldown() const;

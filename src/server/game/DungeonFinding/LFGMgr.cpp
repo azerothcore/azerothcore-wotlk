@@ -456,7 +456,7 @@ namespace lfg
                 }
             }
 
-            sScriptMgr->OnInitializeLockedDungeons(player, level, lockData);
+            sScriptMgr->OnInitializeLockedDungeons(player, level, lockData, dungeon);
 
             /* TODO VoA closed if WG is not under team control (LFG_LOCKSTATUS_RAID_LOCKED)
                 lockData = LFG_LOCKSTATUS_TOO_LOW_GEAR_SCORE;
@@ -498,6 +498,9 @@ namespace lfg
         bool isContinue = grp && grp->isLFGGroup() && GetState(gguid) != LFG_STATE_FINISHED_DUNGEON;
 
         if (grp && (grp->isBGGroup() || grp->isBFGroup()))
+            return;
+
+        if (!sScriptMgr->CanJoinLfg(player, roles, dungeons, comment))
             return;
 
         // pussywizard: can't join LFG/LFR while using LFR
