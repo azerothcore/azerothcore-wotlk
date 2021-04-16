@@ -97,10 +97,10 @@ void AuctionListingRunnable::run()
 
             if (AsyncAuctionListingMgr::GetTempList().size() || AsyncAuctionListingMgr::GetList().size())
             {
-                ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetLock());
+                std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetLock());
 
                 {
-                    ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
+                    std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
                     for (std::list<AuctionListItemsDelayEvent>::iterator itr = AsyncAuctionListingMgr::GetTempList().begin(); itr != AsyncAuctionListingMgr::GetTempList().end(); ++itr)
                         AsyncAuctionListingMgr::GetList().push_back( (*itr) );
                     AsyncAuctionListingMgr::GetTempList().clear();

@@ -388,6 +388,9 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
     BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, arenaType);
     BattlegroundQueue& bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
 
+    if (!sScriptMgr->CanBattleFieldPort(_player, arenaType, bgTypeId, action))
+        return;
+
     // get group info from queue
     GroupQueueInfo ginfo;
     if (!bgQueue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
@@ -657,6 +660,14 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
 
     // queue result (default ok)
     GroupJoinBattlegroundResult err = GroupJoinBattlegroundResult(bgt->GetBgTypeID());
+
+    if (!sScriptMgr->CanJoinInArenaQueue(_player, guid, arenaslot, bgTypeId, asGroup, isRated, err) && err <= 0)
+    {
+        WorldPacket data;
+        sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
+        SendPacket(&data);
+        return;
+    }
 
     // check if player can queue:
     if (!asGroup)

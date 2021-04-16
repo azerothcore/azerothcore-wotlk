@@ -11,6 +11,8 @@
 #include "QuestDef.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "Formulas.h"
+#include "Player.h"
 
 GossipMenu::GossipMenu()
 {
@@ -176,9 +178,6 @@ void PlayerMenu::ClearMenus()
 
 void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const
 {
-    //ACE_Read_Guard<ACE_RW_Thread_Mutex> lock1(_gossipMenu.GetLock());
-    //ACE_Read_Guard<ACE_RW_Thread_Mutex> lock2(_questMenu.GetLock());
-
     WorldPacket data(SMSG_GOSSIP_MESSAGE, 24 + _gossipMenu.GetMenuItemCount() * 100 + _questMenu.GetMenuItemCount() * 75);     // guess size
     data << uint64(objectGUID);
     data << uint32(_gossipMenu.GetMenuId());            // new 2.4.0
@@ -420,7 +419,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, uint64 npcGUID, 
         }
 
         data << uint32(quest->GetRewOrReqMoney());
-        data << uint32(quest->XPValue(_session->GetPlayer()) * sWorld->getRate(RATE_XP_QUEST));
+        data << uint32(quest->XPValue(_session->GetPlayer()) * _session->GetPlayer()->GetQuestRate());
     }
 
     // rewarded honor points. Multiply with 10 to satisfy client
@@ -650,7 +649,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, uint64 npcGUID, b
     }
 
     data << uint32(quest->GetRewOrReqMoney());
-    data << uint32(quest->XPValue(_session->GetPlayer()) * sWorld->getRate(RATE_XP_QUEST));
+    data << uint32(quest->XPValue(_session->GetPlayer()) * _session->GetPlayer()->GetQuestRate());
 
     // rewarded honor points. Multiply with 10 to satisfy client
     data << uint32(10 * quest->CalculateHonorGain(_session->GetPlayer()->GetQuestLevel(quest)));

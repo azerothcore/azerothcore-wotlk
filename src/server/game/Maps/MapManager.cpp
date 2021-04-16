@@ -22,6 +22,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
+#include "ScriptMgr.h"
 #include "Player.h"
 #include "Transport.h"
 #include "World.h"
@@ -70,7 +71,7 @@ Map* MapManager::CreateBaseMap(uint32 id)
 
     if (map == nullptr)
     {
-        ACORE_GUARD(ACE_Thread_Mutex, Lock);
+        std::lock_guard<std::mutex> guard(Lock);
 
         map = FindBaseMap(id);
         if (map == nullptr) // pussywizard: check again after acquiring mutex
@@ -152,6 +153,9 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
         return true;
 
     char const* mapName = entry->name[player->GetSession()->GetSessionDbcLocale()];
+
+    if (!sScriptMgr->CanEnterMap(player, entry, instance, mapDiff, loginCheck))
+        return false;
 
     Group* group = player->GetGroup();
     if (entry->IsRaid())

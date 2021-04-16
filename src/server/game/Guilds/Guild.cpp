@@ -2875,6 +2875,9 @@ void Guild::_BroadcastEvent(GuildEvents guildEvent, uint64 guid, const char* par
 
 void Guild::_SendBankList(WorldSession* session /* = nullptr*/, uint8 tabId /*= 0*/, bool sendAllSlots /*= false*/, SlotIds* slots /*= nullptr*/) const
 {
+    if (!sScriptMgr->CanGuildSendBankList(this, session, tabId, sendAllSlots))
+        return;
+
     WorldPacket data(SMSG_GUILD_BANK_LIST, 500);
     data << uint64(m_bankMoney);
     data << uint8(tabId);

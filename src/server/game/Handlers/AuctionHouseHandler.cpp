@@ -12,6 +12,7 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
+#include "ScriptMgr.h"
 #include "Player.h"
 #include "UpdateMask.h"
 #include "Util.h"
@@ -49,6 +50,9 @@ void WorldSession::SendAuctionHello(uint64 guid, Creature* unit)
         SendNotification(GetAcoreString(LANG_AUCTION_REQ), sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ));
         return;
     }
+
+    if (!sScriptMgr->CanSendAuctionHello(this, guid, unit))
+        return;
 
     AuctionHouseEntry const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntry(unit->getFaction());
     if (!ahEntry)
@@ -745,7 +749,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
     if (diff > delay)
         diff = delay;
     _lastAuctionListItemsMSTime = now + delay - diff;
-    ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
+    std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
     AsyncAuctionListingMgr::GetTempList().push_back( AuctionListItemsDelayEvent(delay - diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, getAll) );
 }
 
