@@ -85,7 +85,9 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_GATE_KIRTONOS)))
+            {
                 gate->SetGoState(GO_STATE_ACTIVE);
+            }
 
             instance->SetData(DATA_KIRTONOS_THE_HERALD, DONE);
         }
@@ -93,7 +95,9 @@ public:
         void EnterEvadeMode() override
         {
             if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_GATE_KIRTONOS)))
+            {
                 gate->SetGoState(GO_STATE_ACTIVE);
+            }
 
             instance->SetData(DATA_KIRTONOS_THE_HERALD, NOT_STARTED);
             me->DespawnOrUnsummon(1);
@@ -134,7 +138,9 @@ public:
                     break;
                 case INTRO_3:
                     if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_GATE_KIRTONOS)))
+                    {
                         gate->SetGoState(GO_STATE_READY);
+                    }
                     me->SetFacingTo(0.01745329f);
                     break;
                 case INTRO_4:
@@ -151,16 +157,22 @@ public:
                     break;
                 case INTRO_6:
                     if (!me->IsInCombat())
+                    {
                         me->GetMotionMaster()->MovePoint(0, PosMove[1]);
+                    }
                     break;
             }
 
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
             switch (events.ExecuteEvent())
             {
@@ -190,7 +202,9 @@ public:
                     break;
                 case EVENT_DOMINATE_MIND:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 20.0f, true))
+                    {
                         me->CastSpell(target, SPELL_DOMINATE_MIND, false);
+                    }
                     break;
                 case EVENT_KIRTONOS_TRANSFORM:
                     TransformsCount++;
@@ -206,7 +220,9 @@ public:
                         me->CastSpell(me, SPELL_TRANSFORM_VISUAL, true);
                         me->RemoveAura(SPELL_KIRTONOS_TRANSFORM);
                         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(0));
-                    } else {
+                    }
+                    else
+                    {
                         events.Reset();
                         events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 2000);
                         events.ScheduleEvent(EVENT_CURSE_OF_TONGUES, 6000);
@@ -216,7 +232,9 @@ public:
 
                         // Schedule Dominate Mind on every 2nd caster transform
                         if ((TransformsCount - 2) % 4 == 0)
+                        {
                             events.ScheduleEvent(EVENT_DOMINATE_MIND, urand(4000, 8000));
+                        }
                     }
 
                     events.ScheduleEvent(EVENT_KIRTONOS_TRANSFORM, 20000);
