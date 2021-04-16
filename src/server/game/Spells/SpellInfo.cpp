@@ -1238,7 +1238,7 @@ bool SpellInfo::IsChanneled() const
 
 bool SpellInfo::IsMoveAllowedChannel() const
 {
-    return IsChanneled() && (HasAttribute(SPELL_ATTR5_CAN_CHANNEL_WHEN_MOVING) || (!(ChannelInterruptFlags & (AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING))));
+    return IsChanneled() && (HasAttribute(SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL) || (!(ChannelInterruptFlags & (AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING))));
 }
 
 bool SpellInfo::NeedsComboPoints() const
@@ -1331,7 +1331,7 @@ bool SpellInfo::CanDispelAura(SpellInfo const* aura) const
 bool SpellInfo::IsSingleTarget() const
 {
     // all other single target spells have if it has AttributesEx5
-    if (AttributesEx5 & SPELL_ATTR5_SINGLE_TARGET_SPELL)
+    if (AttributesEx5 & SPELL_ATTR5_LIMIT_N)
         return true;
 
     switch (GetSpellSpecific())

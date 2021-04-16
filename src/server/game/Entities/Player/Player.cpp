@@ -24579,8 +24579,8 @@ bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item cons
 
 bool Player::CanNoReagentCast(SpellInfo const* spellInfo) const
 {
-    // don't take reagents for spells with SPELL_ATTR5_NO_REAGENT_WHILE_PREP
-    if (spellInfo->HasAttribute(SPELL_ATTR5_NO_REAGENT_WHILE_PREP) && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREPARATION))
+    // don't take reagents for spells with SPELL_ATTR5_NO_REAGENT_COST_WITH_AURA
+    if (spellInfo->HasAttribute(SPELL_ATTR5_NO_REAGENT_COST_WITH_AURA) && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREPARATION))
         return true;
 
     // Check no reagent use mask

@@ -3049,7 +3049,7 @@ void Creature::FocusTarget(Spell const* focusSpell, WorldObject const* target)
 
     _focusSpell = focusSpell;
     SetUInt64Value(UNIT_FIELD_TARGET, this == target ? 0 : target->GetGUID());
-    if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_DONT_TURN_DURING_CAST))
+    if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AI_DOESNT_FACE_TARGET))
         AddUnitState(UNIT_STATE_ROTATING);
 
     // Set serverside orientation if needed (needs to be after attribute check)
@@ -3081,7 +3081,7 @@ void Creature::ReleaseFocus(Spell const* focusSpell)
     else
         SetUInt64Value(UNIT_FIELD_TARGET, 0);
 
-    if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_DONT_TURN_DURING_CAST))
+    if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AI_DOESNT_FACE_TARGET))
         ClearUnitState(UNIT_STATE_ROTATING);
 }
 

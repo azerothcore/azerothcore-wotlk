@@ -3671,7 +3671,7 @@ void SpellMgr::LoadDbcDataCorrections()
         6474    // Earthbind Totem (instant pulse)
         }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx5 |= SPELL_ATTR5_START_PERIODIC_AT_APPLY;
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_EXTRA_INITIAL_PERIOD;
     });
 
     // Marked for Death
@@ -3969,7 +3969,7 @@ void SpellMgr::LoadDbcDataCorrections()
     {
         spellInfo->EffectImplicitTargetA[EFFECT_0] = TARGET_DEST_TARGET_ENEMY;
         spellInfo->EffectImplicitTargetB[EFFECT_0] = TARGET_UNIT_DEST_AREA_ENEMY;
-        spellInfo->AttributesEx5 |= SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK;
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT;
     });
 
     // Improved Stings (Rank 2)
@@ -4876,7 +4876,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Watery Grave Explosion
     ApplySpellFix({ 37852 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_WHILE_STUNNED;
     });
 
     // Amplify Damage
@@ -5610,7 +5610,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Trial of the Crusader, Acidmaw & Dreadscale, Emerge
     ApplySpellFix({ 66947 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_WHILE_STUNNED;
     });
 
     // Trial of the Crusader, Jaraxxus, Curse of the Nether
@@ -5847,7 +5847,7 @@ void SpellMgr::LoadDbcDataCorrections()
     // Trial of the Crusader, Anub'arak, Emerge
     ApplySpellFix({ 65982 }, [](SpellEntry* spellInfo)
     {
-        spellInfo->AttributesEx5 |= SPELL_ATTR5_USABLE_WHILE_STUNNED;
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_WHILE_STUNNED;
     });
 
     // Trial of the Crusader, Anub'arak, Penetrating Cold
@@ -7013,7 +7013,7 @@ void SpellMgr::LoadDbcDataCorrections()
     ApplySpellFix({ 7764, 10767, 16610, 16612, 16618, 17013 }, [](SpellEntry* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-        spellInfo->AttributesEx5 |= SPELL_ATTR5_SKIP_CHECKCAST_LOS_CHECK;
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT;
     });
 
     //Crushing the Crown

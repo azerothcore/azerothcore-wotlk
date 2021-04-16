@@ -633,7 +633,7 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
 
         if (caster)
         {
-            if (caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_HASTE_AFFECT_DURATION))
+            if (caster->HasAuraTypeWithAffectMask(SPELL_AURA_PERIODIC_HASTE, m_spellInfo) || m_spellInfo->HasAttribute(SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC))
                 m_amplitude = int32(m_amplitude * caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
         }
     }
@@ -642,7 +642,7 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
     {
         m_tickNumber = m_amplitude ? GetBase()->GetDuration() / m_amplitude : 0;
         m_periodicTimer = m_amplitude ? GetBase()->GetDuration() % m_amplitude : 0;
-        if (m_spellInfo->HasAttribute(SPELL_ATTR5_START_PERIODIC_AT_APPLY))
+        if (m_spellInfo->HasAttribute(SPELL_ATTR5_EXTRA_INITIAL_PERIOD))
             ++m_tickNumber;
     }
     else // aura just created or reapplied
@@ -660,7 +660,7 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
             // Start periodic on next tick or at aura apply
             if (m_amplitude)
             {
-                if (!GetSpellInfo()->HasAttribute(SPELL_ATTR5_START_PERIODIC_AT_APPLY))
+                if (!GetSpellInfo()->HasAttribute(SPELL_ATTR5_EXTRA_INITIAL_PERIOD))
                     m_periodicTimer += m_amplitude;
                 else if (caster && caster->IsTotem()) // for totems only ;d
                 {
