@@ -351,7 +351,7 @@ uint32 constexpr QuestDifficultyColors[MAX_QUEST_DIFFICULTY] =
 // EnumUtils: DESCRIBE THIS
 enum SpellAttr0 : uint32
 {
-    SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE        = 0x00000001, // TITLE Unknown attribute 0@Attr0
+    SPELL_ATTR0_UNK0                             = 0x00000001, // TITLE Unknown attribute 0@Attr0
     SPELL_ATTR0_REQ_AMMO                         = 0x00000002, // TITLE Treat as ranged attack DESCRIPTION Use ammo, ranged attack range modifiers, ranged haste, etc.
     SPELL_ATTR0_ON_NEXT_SWING                    = 0x00000004, // TITLE On next melee (type 1) DESCRIPTION Both "on next swing" attributes have identical handling in server & client
     SPELL_ATTR0_IS_REPLENISHMENT                 = 0x00000008, // TITLE Replenishment (client only)
