@@ -2706,9 +2706,9 @@ int32 Unit::GetMechanicResistChance(const SpellInfo* spell)
 // Melee based spells hit result calculations
 SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spell)
 {
-    // Spells with SPELL_ATTR3_IGNORE_HIT_RESULT will additionally fully ignore
+    // Spells with SPELL_ATTR3_ALWAYS_HIT will additionally fully ignore
     // resist and deflect chances
-    if (spell->HasAttribute(SPELL_ATTR3_IGNORE_HIT_RESULT))
+    if (spell->HasAttribute(SPELL_ATTR3_ALWAYS_HIT))
         return SPELL_MISS_NONE;
 
     WeaponAttackType attType = BASE_ATTACK;
@@ -2738,7 +2738,7 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit* victim, SpellInfo const* spell)
 
     bool canDodge = true;
     bool canParry = true;
-    bool canBlock = spell->HasAttribute(SPELL_ATTR3_BLOCKABLE_SPELL) && !spell->HasAttribute(SPELL_ATTR0_CU_DIRECT_DAMAGE);
+    bool canBlock = spell->HasAttribute(SPELL_ATTR3_COMPLETELY_BLOCKED) && !spell->HasAttribute(SPELL_ATTR0_CU_DIRECT_DAMAGE);
 
     // Same spells cannot be parry/dodge
     if (spell->HasAttribute(SPELL_ATTR0_NO_ACTIVE_DEFENSE))
@@ -2886,10 +2886,10 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spell)
     if (IsVehicle())
         return SPELL_MISS_NONE;
 
-    // Spells with SPELL_ATTR3_IGNORE_HIT_RESULT will additionally fully ignore
+    // Spells with SPELL_ATTR3_ALWAYS_HIT will additionally fully ignore
     // resist and deflect chances
     // xinef: skip all calculations, proof: Toxic Tolerance quest
-    if (spell->HasAttribute(SPELL_ATTR3_IGNORE_HIT_RESULT))
+    if (spell->HasAttribute(SPELL_ATTR3_ALWAYS_HIT))
         return SPELL_MISS_NONE;
 
     SpellSchoolMask schoolMask = spell->GetSchoolMask();
@@ -2914,9 +2914,9 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spell)
     // Increase from attacker SPELL_AURA_MOD_INCREASES_SPELL_PCT_TO_HIT auras
     modHitChance += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_INCREASES_SPELL_PCT_TO_HIT, schoolMask);
 
-    // Spells with SPELL_ATTR3_IGNORE_HIT_RESULT will ignore target's avoidance effects
+    // Spells with SPELL_ATTR3_ALWAYS_HIT will ignore target's avoidance effects
     // xinef: imo it should completly ignore all calculations, eg: 14792. Hits 80 level players on blizz without any problems
-    //if (!spell->HasAttribute(SPELL_ATTR3_IGNORE_HIT_RESULT))
+    //if (!spell->HasAttribute(SPELL_ATTR3_ALWAYS_HIT))
     {
         // Chance hit from victim SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE auras
         modHitChance += victim->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_ATTACKER_SPELL_HIT_CHANCE, schoolMask);
@@ -4902,7 +4902,7 @@ void Unit::RemoveArenaAuras()
         Aura const* aura = aurApp->GetBase();
         return (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR4_DONT_REMOVE_IN_ARENA)                          // don't remove stances, shadowform, pally/hunter auras
             && !aura->IsPassive()                                                                              // don't remove passive auras
-            && (aurApp->IsPositive() || !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR3_DEATH_PERSISTENT))) || // not negative death persistent auras
+            && (aurApp->IsPositive() || !aura->GetSpellInfo()->HasAttribute(SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD))) || // not negative death persistent auras
             aura->GetSpellInfo()->HasAttribute(SPELL_ATTR5_REMOVE_ON_ARENA_ENTER);                             // special marker, always remove
     });
 }
@@ -10758,7 +10758,7 @@ float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, Da
         return 1.0f;
 
     // Some spells don't benefit from done mods
-    if (spellProto->HasAttribute(SPELL_ATTR3_NO_DONE_BONUS))
+    if (spellProto->HasAttribute(SPELL_ATTR3_IGNORE_CASTER_MODIFIERS))
         return 1.0f;
 
     // For totems get damage bonus from owner
@@ -11085,7 +11085,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
         return pdamage;
 
     // Some spells don't benefit from done mods
-    if (spellProto->HasAttribute(SPELL_ATTR3_NO_DONE_BONUS))
+    if (spellProto->HasAttribute(SPELL_ATTR3_IGNORE_CASTER_MODIFIERS))
         return pdamage;
 
     // For totems get damage bonus from owner
@@ -11779,7 +11779,7 @@ float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, D
             return owner->SpellPctHealingModsDone(victim, spellProto, damagetype);
 
     // Some spells don't benefit from done mods
-    if (spellProto->HasAttribute(SPELL_ATTR3_NO_DONE_BONUS))
+    if (spellProto->HasAttribute(SPELL_ATTR3_IGNORE_CASTER_MODIFIERS))
         return 1.0f;
 
     // xinef: Some spells don't benefit from done mods
@@ -12320,7 +12320,7 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) cons
         SpellImmuneList const& list = m_spellImmune[IMMUNITY_STATE];
         for (SpellImmuneList::const_iterator itr = list.begin(); itr != list.end(); ++itr)
             if (itr->type == aura && (itr->spellId != 64848 || spellInfo->Effects[index].MiscValue == POWER_MANA))
-                if (!spellInfo->HasAttribute(SPELL_ATTR3_IGNORE_HIT_RESULT))
+                if (!spellInfo->HasAttribute(SPELL_ATTR3_ALWAYS_HIT))
                     if (itr->blockType == SPELL_BLOCK_TYPE_ALL || spellInfo->IsPositive()) // xinef: added for pet scaling
                         return true;
 
@@ -12523,7 +12523,7 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
 
     // Some spells don't benefit from done mods
     if (spellProto)
-        if (spellProto->HasAttribute(SPELL_ATTR3_NO_DONE_BONUS))
+        if (spellProto->HasAttribute(SPELL_ATTR3_IGNORE_CASTER_MODIFIERS))
         {
             DoneFlatBenefit = 0;
             DoneTotalMod = 1.0f;
@@ -15624,7 +15624,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
             continue;
 
         // Triggered spells not triggering additional spells
-        //bool triggered = !spellProto->HasAttribute(SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED) ?
+        //bool triggered = !spellProto->HasAttribute(SPELL_ATTR3_CAN_PROC_FROM_PROCS) ?
         //    (procExtra & PROC_EX_INTERNAL_TRIGGERED && !(procFlag & PROC_FLAG_DONE_TRAP_ACTIVATION)) : false;
 
         bool hasTriggeredProc = false;
@@ -15733,7 +15733,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         eventInfo.SetProcCooldown(cooldown);
 
         // Note: must SetCantProc(false) before return
-        if (spellInfo->HasAttribute(SPELL_ATTR3_DISABLE_PROC))
+        if (spellInfo->HasAttribute(SPELL_ATTR3_INSTANT_TARGET_PROCS))
             SetCantProc(true);
 
         bool handled = i->aura->CallScriptProcHandlers(aurApp, eventInfo);
@@ -15929,7 +15929,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
 
         i->aura->CallScriptAfterProcHandlers(aurApp, eventInfo);
 
-        if (spellInfo->HasAttribute(SPELL_ATTR3_DISABLE_PROC))
+        if (spellInfo->HasAttribute(SPELL_ATTR3_INSTANT_TARGET_PROCS))
             SetCantProc(false);
     }
 

@@ -376,43 +376,43 @@ enum SpellAttr2
     SPELL_ATTR2_NOT_AN_ACTION                        = 0x10000000, // TITLE Unknown attribute 28@Attr2
     SPELL_ATTR2_CANT_CRIT                            = 0x20000000, // TITLE Cannot critically strike
     SPELL_ATTR2_ACTIVE_THREAT                        = 0x40000000, // TITLE Allow triggered spell to trigger (type 1) DESCRIPTION Without this attribute, any triggered spell will be unable to trigger other auras' procs
-    SPELL_ATTR2_ITEM_CAST                            = 0x80000000  // TITLE Food buff (client only)
+    SPELL_ATTR2_RETAIN_ITEM_CAST                     = 0x80000000  // TITLE Food buff (client only)
 };
 
 enum SpellAttr3
 {
-    SPELL_ATTR3_UNK0                             = 0x00000001, // TITLE Unknown attribute 0@Attr3
-    SPELL_ATTR3_IGNORE_PROC_SUBCLASS_MASK        = 0x00000002, //  1 Ignores subclass mask check when checking proc
-    SPELL_ATTR3_UNK2                             = 0x00000004, // TITLE Unknown attribute 2@Attr3
-    SPELL_ATTR3_BLOCKABLE_SPELL                  = 0x00000008, // TITLE Blockable spell
-    SPELL_ATTR3_IGNORE_RESURRECTION_TIMER        = 0x00000010, // TITLE Ignore resurrection timer
-    SPELL_ATTR3_UNK5                             = 0x00000020, // TITLE Unknown attribute 5@Attr3
-    SPELL_ATTR3_UNK6                             = 0x00000040, // TITLE Unknown attribute 6@Attr3
-    SPELL_ATTR3_STACK_FOR_DIFF_CASTERS           = 0x00000080, // TITLE Stack separately for each caster
-    SPELL_ATTR3_ONLY_TARGET_PLAYERS              = 0x00000100, // TITLE Can only target players
-    SPELL_ATTR3_TRIGGERED_CAN_TRIGGER_PROC_2     = 0x00000200, // TITLE Allow triggered spell to trigger (type 2) DESCRIPTION Without this attribute, any triggered spell will be unable to trigger other auras' procs
-    SPELL_ATTR3_MAIN_HAND                        = 0x00000400, // TITLE Require main hand weapon
-    SPELL_ATTR3_BATTLEGROUND                     = 0x00000800, // TITLE Can only be cast in battleground
-    SPELL_ATTR3_ONLY_TARGET_GHOSTS               = 0x00001000, // TITLE Can only target ghost players
-    SPELL_ATTR3_DONT_DISPLAY_CHANNEL_BAR         = 0x00002000, // TITLE Do not display channel bar (client only)
-    SPELL_ATTR3_IS_HONORLESS_TARGET              = 0x00004000, // TITLE Honorless Target
-    SPELL_ATTR3_UNK15                            = 0x00008000, // TITLE Unknown attribute 15@Attr3 DESCRIPTION Auto Shoot, Shoot, Throw - ranged normal attack attribute?
-    SPELL_ATTR3_CANT_TRIGGER_PROC                = 0x00010000, // TITLE Cannot trigger procs
-    SPELL_ATTR3_NO_INITIAL_AGGRO                 = 0x00020000, // TITLE No initial aggro
-    SPELL_ATTR3_IGNORE_HIT_RESULT                = 0x00040000, // TITLE Ignore hit result DESCRIPTION Spell cannot miss, or be dodged/parried/blocked
-    SPELL_ATTR3_DISABLE_PROC                     = 0x00080000, // TITLE Cannot trigger spells during aura proc
-    SPELL_ATTR3_DEATH_PERSISTENT                 = 0x00100000, // TITLE Persists through death
-    SPELL_ATTR3_UNK21                            = 0x00200000, // TITLE Unknown attribute 21@Attr3
-    SPELL_ATTR3_REQ_WAND                         = 0x00400000, // TITLE Requires equipped Wand
-    SPELL_ATTR3_UNK23                            = 0x00800000, // TITLE Unknown attribute 23@Attr3
-    SPELL_ATTR3_REQ_OFFHAND                      = 0x01000000, // TITLE Requires offhand weapon
-    SPELL_ATTR3_TREAT_AS_PERIODIC                = 0x02000000, // TITLE Treat as periodic effect
-    SPELL_ATTR3_CAN_PROC_WITH_TRIGGERED          = 0x04000000, // TITLE Can trigger from triggered spells
-    SPELL_ATTR3_DRAIN_SOUL                       = 0x08000000, // TITLE Drain Soul
-    SPELL_ATTR3_UNK28                            = 0x10000000, // TITLE Unknown attribute 28@Attr3
-    SPELL_ATTR3_NO_DONE_BONUS                    = 0x20000000, // TITLE Damage dealt is unaffected by modifiers
-    SPELL_ATTR3_DONT_DISPLAY_RANGE               = 0x40000000, // TITLE Do not show range in tooltip (client only)
-    SPELL_ATTR3_UNK31                            = 0x80000000  // TITLE Unknown attribute 31@Attr3
+    SPELL_ATTR3_PVP_ENABLING                          = 0x00000001, // TITLE Unknown attribute 0@Attr3
+    SPELL_ATTR3_NO_PROC_EQUIP_REQUIREMENT             = 0x00000002, // TITLE 1 Ignores subclass mask check when checking proc
+    SPELL_ATTR3_NO_CASTING_BAR_TEXT                   = 0x00000004, // TITLE Unknown attribute 2@Attr3
+    SPELL_ATTR3_COMPLETELY_BLOCKED                    = 0x00000008, // TITLE Blockable spell
+    SPELL_ATTR3_NO_RES_TIMER                          = 0x00000010, // TITLE Ignore resurrection timer
+    SPELL_ATTR3_NO_DURABILITY_LOSS                    = 0x00000020, // TITLE Unknown attribute 5@Attr3
+    SPELL_ATTR3_NO_AVOIDANCE                          = 0x00000040, // TITLE Unknown attribute 6@Attr3
+    SPELL_ATTR3_DOT_STACKING_RULE                     = 0x00000080, // TITLE Stack separately for each caster
+    SPELL_ATTR3_ONLY_ON_PLAYER                        = 0x00000100, // TITLE Can only target players
+    SPELL_ATTR3_NOT_A_PROC                            = 0x00000200, // TITLE Allow triggered spell to trigger (type 2) DESCRIPTION Without this attribute, any triggered spell will be unable to trigger other auras' procs
+    SPELL_ATTR3_REQUIRES_MAIN_HAND_WEAPON             = 0x00000400, // TITLE Require main hand weapon
+    SPELL_ATTR3_ONLY_BATTLEGROUNDS                    = 0x00000800, // TITLE Can only be cast in battleground
+    SPELL_ATTR3_ONLY_ON_GHOSTS                        = 0x00001000, // TITLE Can only target ghost players
+    SPELL_ATTR3_HIDE_CHANNEL_BAR                      = 0x00002000, // TITLE Do not display channel bar (client only)
+    SPELL_ATTR3_HIDE_IN_RAID_FILTER                   = 0x00004000, // TITLE Honorless Target
+    SPELL_ATTR3_NORMAL_RANGED_ATTACK                  = 0x00008000, // TITLE Unknown attribute 15@Attr3 DESCRIPTION Auto Shoot, Shoot, Throw - ranged normal attack attribute?
+    SPELL_ATTR3_SUPRESS_CASTER_PROCS                  = 0x00010000, // TITLE Cannot trigger procs
+    SPELL_ATTR3_SUPRESS_TARGET_PROCS                  = 0x00020000, // TITLE No initial aggro
+    SPELL_ATTR3_ALWAYS_HIT                            = 0x00040000, // TITLE Ignore hit result DESCRIPTION Spell cannot miss, or be dodged/parried/blocked
+    SPELL_ATTR3_INSTANT_TARGET_PROCS                  = 0x00080000, // TITLE Cannot trigger spells during aura proc
+    SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD                 = 0x00100000, // TITLE Persists through death
+    SPELL_ATTR3_ONLY_PROC_OUTDOORS                    = 0x00200000, // TITLE Unknown attribute 21@Attr3
+    SPELL_ATTR3_CASTING_CANCELS_AUTOREPEAT            = 0x00400000, // TITLE Requires equipped Wand (Mainline: Do Not Trigger Target Stand)
+    SPELL_ATTR3_NO_DAMAGE_HISTORY                     = 0x00800000, // TITLE Unknown attribute 23@Attr3
+    SPELL_ATTR3_REQUIRES_OFF_HAND_WEAPON              = 0x01000000, // TITLE Requires offhand weapon
+    SPELL_ATTR3_TREAT_AS_PERIODIC                     = 0x02000000, // TITLE Treat as periodic effect
+    SPELL_ATTR3_CAN_PROC_FROM_PROCS                   = 0x04000000, // TITLE Can trigger from triggered spells
+    SPELL_ATTR3_ONLY_PROC_ON_CASTER                   = 0x08000000, // TITLE Drain Soul
+    SPELL_ATTR3_IGNORE_CASTER_AND_TARGET_RESTRICTIONS = 0x10000000, // TITLE Unknown attribute 28@Attr3
+    SPELL_ATTR3_IGNORE_CASTER_MODIFIERS               = 0x20000000, // TITLE Damage dealt is unaffected by modifiers
+    SPELL_ATTR3_DO_NOT_DISPLAY_RANGE                  = 0x40000000, // TITLE Do not show range in tooltip (client only)
+    SPELL_ATTR3_NOT_ON_AOE_IMMUNE                     = 0x80000000  // TITLE Unknown attribute 31@Attr3
 };
 
 enum SpellAttr4

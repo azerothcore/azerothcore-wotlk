@@ -139,7 +139,7 @@ void UnitAI::DoCast(uint32 spellId)
         case AITARGET_ENEMY:
             {
                 const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
+                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER);
                 //float range = GetSpellMaxRange(spellInfo, false);
                 target = SelectTarget(SELECT_TARGET_RANDOM, 0, spellInfo->GetMaxRange(false), playerOnly);
                 break;
@@ -153,7 +153,7 @@ void UnitAI::DoCast(uint32 spellId)
         case AITARGET_DEBUFF:
             {
                 const SpellInfo* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS);
+                bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER);
                 float range = spellInfo->GetMaxRange(false);
 
                 DefaultTargetSelector targetSelector(me, range, playerOnly, -(int32)spellId);

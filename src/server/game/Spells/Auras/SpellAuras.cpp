@@ -1973,7 +1973,7 @@ bool Aura::CanStackWith(Aura const* existingAura, bool remove) const
         if (existingAura->GetSpellInfo()->IsChanneled())
             return true;
 
-        if (m_spellInfo->HasAttribute(SPELL_ATTR3_STACK_FOR_DIFF_CASTERS))
+        if (m_spellInfo->HasAttribute(SPELL_ATTR3_DOT_STACKING_RULE))
             return true;
 
         // check same periodic auras
@@ -2133,7 +2133,7 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
     Unit* target = aurApp->GetTarget();
     if (IsPassive() && target->GetTypeId() == TYPEID_PLAYER && GetSpellInfo()->EquippedItemClass != -1)
     {
-        if (!GetSpellInfo()->HasAttribute(SPELL_ATTR3_IGNORE_PROC_SUBCLASS_MASK))
+        if (!GetSpellInfo()->HasAttribute(SPELL_ATTR3_NO_PROC_EQUIP_REQUIREMENT))
         {
             Item* item = nullptr;
             if (GetSpellInfo()->EquippedItemClass == ITEM_CLASS_WEAPON)

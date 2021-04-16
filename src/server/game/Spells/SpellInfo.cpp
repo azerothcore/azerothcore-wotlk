@@ -1194,12 +1194,12 @@ bool SpellInfo::IsCooldownStartedOnEvent() const
 
 bool SpellInfo::IsDeathPersistent() const
 {
-    return AttributesEx3 & SPELL_ATTR3_DEATH_PERSISTENT;
+    return AttributesEx3 & SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
 }
 
 bool SpellInfo::IsRequiringDeadTarget() const
 {
-    return AttributesEx3 & SPELL_ATTR3_ONLY_TARGET_GHOSTS;
+    return AttributesEx3 & SPELL_ATTR3_ONLY_ON_GHOSTS;
 }
 
 bool SpellInfo::IsAllowingDeadTarget() const
@@ -1265,7 +1265,7 @@ bool SpellInfo::IsAutoRepeatRangedSpell() const
 
 bool SpellInfo::IsAffectedBySpellMods() const
 {
-    return !(AttributesEx3 & SPELL_ATTR3_NO_DONE_BONUS);
+    return !(AttributesEx3 & SPELL_ATTR3_IGNORE_CASTER_MODIFIERS);
 }
 
 bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
@@ -1745,10 +1745,10 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
         if (AttributesEx & SPELL_ATTR1_ONLY_PEACEFUL_TARGETS && (unitTarget->IsInCombat() || unitTarget->IsPetInCombat()))
             return SPELL_FAILED_TARGET_AFFECTING_COMBAT;
 
-        // only spells with SPELL_ATTR3_ONLY_TARGET_GHOSTS can target ghosts
+        // only spells with SPELL_ATTR3_ONLY_ON_GHOSTS can target ghosts
         if (((IsRequiringDeadTarget() != 0) != unitTarget->HasAuraType(SPELL_AURA_GHOST)) && !(IsDeathPersistent() && IsAllowingDeadTarget()))
         {
-            if (AttributesEx3 & SPELL_ATTR3_ONLY_TARGET_GHOSTS)
+            if (AttributesEx3 & SPELL_ATTR3_ONLY_ON_GHOSTS)
                 return SPELL_FAILED_TARGET_NOT_GHOST;
             else
                 return SPELL_FAILED_BAD_TARGETS;
@@ -1804,7 +1804,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
     else return SPELL_CAST_OK;
 
     // corpseOwner and unit specific target checks
-    if (AttributesEx3 & SPELL_ATTR3_ONLY_TARGET_PLAYERS && !unitTarget->ToPlayer())
+    if (AttributesEx3 & SPELL_ATTR3_ONLY_ON_PLAYER && !unitTarget->ToPlayer())
         return SPELL_FAILED_TARGET_NOT_PLAYER;
 
     if (!IsAllowingDeadTarget() && !unitTarget->IsAlive())
@@ -2397,7 +2397,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
         else
         {
             WeaponAttackType slot = BASE_ATTACK;
-            if (AttributesEx3 & SPELL_ATTR3_REQ_OFFHAND)
+            if (AttributesEx3 & SPELL_ATTR3_REQUIRES_OFF_HAND_WEAPON)
                 slot = OFF_ATTACK;
 
             speed = caster->GetAttackTime(slot);

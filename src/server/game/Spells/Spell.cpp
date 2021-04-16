@@ -562,7 +562,7 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
     switch (m_spellInfo->DmgClass)
     {
         case SPELL_DAMAGE_CLASS_MELEE:
-            if (m_spellInfo->HasAttribute(SPELL_ATTR3_REQ_OFFHAND))
+            if (m_spellInfo->HasAttribute(SPELL_ATTR3_REQUIRES_OFF_HAND_WEAPON))
                 m_attackType = OFF_ATTACK;
             else
                 m_attackType = BASE_ATTACK;
@@ -1867,9 +1867,9 @@ uint32 Spell::GetSearcherTypeMask(SpellTargetObjectTypes objType, ConditionList*
     }
     if (!m_spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_DEAD_TARGET))
         retMask &= ~GRID_MAP_TYPE_MASK_CORPSE;
-    if (m_spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_PLAYERS))
+    if (m_spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER))
         retMask &= GRID_MAP_TYPE_MASK_CORPSE | GRID_MAP_TYPE_MASK_PLAYER;
-    if (m_spellInfo->HasAttribute(SPELL_ATTR3_ONLY_TARGET_GHOSTS))
+    if (m_spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_GHOSTS))
         retMask &= GRID_MAP_TYPE_MASK_PLAYER;
 
     if (condList)
@@ -2100,7 +2100,7 @@ void Spell::prepareDataForTriggerSystem(AuraEffect const* /*triggeredByAura*/)
     {
         if (_triggeredCastFlags & TRIGGERED_DISALLOW_PROC_EVENTS &&
                 (m_spellInfo->HasAttribute(SPELL_ATTR2_ACTIVE_THREAT) ||
-                 m_spellInfo->HasAttribute(SPELL_ATTR3_TRIGGERED_CAN_TRIGGER_PROC_2)))
+                 m_spellInfo->HasAttribute(SPELL_ATTR3_NOT_A_PROC)))
             m_procEx |= PROC_EX_INTERNAL_CANT_PROC;
         else if (_triggeredCastFlags & TRIGGERED_DISALLOW_PROC_EVENTS)
             m_procEx |= PROC_EX_INTERNAL_TRIGGERED;
@@ -2412,7 +2412,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     m_spellAura = nullptr; // Set aura to null for every target-make sure that pointer is not used for unit without aura applied
 
     //Spells with this flag cannot trigger if effect is casted on self
-    bool canEffectTrigger = !m_spellInfo->HasAttribute(SPELL_ATTR3_CANT_TRIGGER_PROC) && unitTarget->CanProc() && (CanExecuteTriggersOnHit(mask) || missInfo == SPELL_MISS_IMMUNE2);
+    bool canEffectTrigger = !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_CASTER_PROCS) && unitTarget->CanProc() && (CanExecuteTriggersOnHit(mask) || missInfo == SPELL_MISS_IMMUNE2);
     bool reflectedSpell = missInfo == SPELL_MISS_REFLECT;
     Unit* spellHitTarget = nullptr;
 
@@ -2652,7 +2652,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     {
         if (missInfo != SPELL_MISS_EVADE && !m_caster->IsFriendlyTo(effectUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)))
         {
-            m_caster->CombatStart(effectUnit, !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_NO_INITIAL_AGGRO));
+            m_caster->CombatStart(effectUnit, !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_SUPRESS_TARGET_PROCS));
 
             // Unsure if there are more spells that are not supposed to stop enemy from
             // regenerating HP from food, so for now it stays as an ID.
@@ -2784,7 +2784,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             }
 
             // xinef: triggered spells should not prolong combat
-            if (unit->IsInCombat() && !m_spellInfo->HasAttribute(SPELL_ATTR3_NO_INITIAL_AGGRO) && !m_triggeredByAuraSpell)
+            if (unit->IsInCombat() && !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_TARGET_PROCS) && !m_triggeredByAuraSpell)
             {
                 // xinef: start combat with hostile unit...
                 if (Unit* hostile = unit->getAttackerForHelper())
@@ -3502,8 +3502,8 @@ void Spell::_cast(bool skipCheck)
         // As of 3.0.2 pets begin attacking their owner's target immediately
         // Let any pets know we've attacked something. Check DmgClass for harmful spells only
         // This prevents spells such as Hunter's Mark from triggering pet attack
-        // xinef: take into account SPELL_ATTR3_NO_INITIAL_AGGRO
-        if ((m_targets.GetTargetMask() & TARGET_FLAG_UNIT) && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE && !GetSpellInfo()->HasAttribute(SPELL_ATTR3_NO_INITIAL_AGGRO))
+        // xinef: take into account SPELL_ATTR3_SUPRESS_TARGET_PROCS
+        if ((m_targets.GetTargetMask() & TARGET_FLAG_UNIT) && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE && !GetSpellInfo()->HasAttribute(SPELL_ATTR3_SUPRESS_TARGET_PROCS))
             if (!playerCaster->m_Controlled.empty())
                 for (Unit::ControlSet::iterator itr = playerCaster->m_Controlled.begin(); itr != playerCaster->m_Controlled.end(); ++itr)
                     if (Unit* pet = *itr)
@@ -3684,7 +3684,7 @@ void Spell::_cast(bool skipCheck)
     if (Unit* target = m_targets.GetUnitTarget())
         if (m_caster->GetTypeId() == TYPEID_PLAYER || (m_caster->IsPet() && m_caster->IsControlledByPlayer()))
             if (GetDelayMoment() > 0 && !m_caster->IsFriendlyTo(target) && !m_spellInfo->HasAura(SPELL_AURA_BIND_SIGHT) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)))
-                m_caster->CombatStartOnCast(target, !m_spellInfo->HasAttribute(SPELL_ATTR3_NO_INITIAL_AGGRO), GetDelayMoment() + 500); // xinef: increase this time so we dont leave and enter combat in a moment
+                m_caster->CombatStartOnCast(target, !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_TARGET_PROCS), GetDelayMoment() + 500); // xinef: increase this time so we dont leave and enter combat in a moment
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
         if (m_caster->ToPlayer()->GetCommandStatus(CHEAT_COOLDOWN))
@@ -4736,7 +4736,7 @@ void Spell::SendResurrectRequest(Player* target)
 
     data << uint8(m_caster->GetTypeId() == TYPEID_PLAYER ? 0 : 1); // "you'll be afflicted with resurrection sickness"
     // override delay sent with SMSG_CORPSE_RECLAIM_DELAY, set instant resurrection for spells with this attribute
-    if (m_spellInfo->HasAttribute(SPELL_ATTR3_IGNORE_RESURRECTION_TIMER))
+    if (m_spellInfo->HasAttribute(SPELL_ATTR3_NO_RES_TIMER))
         data << uint32(0);
     target->GetSession()->SendPacket(&data);
 }
@@ -5072,7 +5072,7 @@ void Spell::HandleThreatSpells()
     if (m_UniqueTargetInfo.empty())
         return;
 
-    if (m_spellInfo->HasAttribute(SPELL_ATTR1_NO_THREAT) || m_spellInfo->HasAttribute(SPELL_ATTR3_NO_INITIAL_AGGRO))
+    if (m_spellInfo->HasAttribute(SPELL_ATTR1_NO_THREAT) || m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_TARGET_PROCS))
         return;
 
     float threat = 0.0f;
@@ -5422,7 +5422,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
     }
     // Spell casted only on battleground
-    if (m_spellInfo->HasAttribute(SPELL_ATTR3_BATTLEGROUND) &&  m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_spellInfo->HasAttribute(SPELL_ATTR3_ONLY_BATTLEGROUNDS) &&  m_caster->GetTypeId() == TYPEID_PLAYER)
         if (!m_caster->ToPlayer()->InBattleground())
             return SPELL_FAILED_ONLY_BATTLEGROUNDS;
 
@@ -7065,7 +7065,7 @@ SpellCastResult Spell::CheckItems()
     if (/*Moar retardnes! never skip those checks !(_triggeredCastFlags & TRIGGERED_IGNORE_EQUIPPED_ITEM_REQUIREMENT) &&*/ m_spellInfo->EquippedItemClass >= 0)
     {
         // main hand weapon required
-        if (m_spellInfo->HasAttribute(SPELL_ATTR3_MAIN_HAND))
+        if (m_spellInfo->HasAttribute(SPELL_ATTR3_REQUIRES_MAIN_HAND_WEAPON))
         {
             Item* item = m_caster->ToPlayer()->GetWeaponForAttack(BASE_ATTACK);
 
@@ -7079,7 +7079,7 @@ SpellCastResult Spell::CheckItems()
         }
 
         // offhand hand weapon required
-        if (m_spellInfo->HasAttribute(SPELL_ATTR3_REQ_OFFHAND))
+        if (m_spellInfo->HasAttribute(SPELL_ATTR3_REQUIRES_OFF_HAND_WEAPON))
         {
             Item* item = m_caster->ToPlayer()->GetWeaponForAttack(OFF_ATTACK);
 
