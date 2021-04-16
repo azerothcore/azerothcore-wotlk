@@ -5111,15 +5111,10 @@ public:
                 pCaster->SendAttackSwingCancelAttack();
             }
 
-            if (!caster->GetInstanceScript() || !caster->GetInstanceScript()->IsEncounterInProgress()) //Don't leave combat if you are in combat with a boss
-            {
-                if (instant_exit) {
-                    caster->getHostileRefManager().deleteReferences();
-                }
-
-                caster->CombatStop();
+            if (instant_exit) {
+                caster->getHostileRefManager().deleteReferences();
             }
-
+            caster->CombatStop();
         }
 
         void Register() override
