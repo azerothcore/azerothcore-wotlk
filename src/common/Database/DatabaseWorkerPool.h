@@ -18,7 +18,7 @@
 #include "QueryHolder.h"
 #include "AdhocStatement.h"
 #include "StringFormat.h"
-#include <ace/Thread_Mutex.h>
+#include <mutex>
 
 class PingOperation : public SQLOperation
 {
