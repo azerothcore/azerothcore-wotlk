@@ -92,7 +92,7 @@ public:
 
     int AddSocket (WorldSocket* sock)
     {
-        ACORE_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
+        std::lock_guard<std::mutex> guard(m_NewSockets_Lock);
 
         ++m_Connections;
         sock->AddReference();
@@ -112,7 +112,7 @@ public:
 protected:
     void AddNewSockets()
     {
-        ACORE_GUARD(ACE_Thread_Mutex, m_NewSockets_Lock);
+        std::lock_guard<std::mutex> guard(m_NewSockets_Lock);
 
         if (m_NewSockets.empty())
             return;
@@ -194,7 +194,7 @@ private:
     SocketSet m_Sockets;
 
     SocketSet m_NewSockets;
-    ACE_Thread_Mutex m_NewSockets_Lock;
+    std::mutex m_NewSockets_Lock;
 };
 
 WorldSocketMgr::WorldSocketMgr() :
