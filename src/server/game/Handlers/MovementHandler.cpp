@@ -441,7 +441,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     int64 movementTime = (int64)movementInfo.time + _timeSyncClockDelta;
     if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > 0xFFFFFFFF)
     {
-        sLog->outMisc("The computed movement time using clockDelta is erronous. Using fallback instead");
+        LOG_INFO("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
         movementInfo.time = getMSTime();
     }
     else
@@ -804,7 +804,7 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
 void WorldSession::HandleTimeSyncResp(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_TIME_SYNC_RESP");
+    LOG_DEBUG("network", "CMSG_TIME_SYNC_RESP");
 #endif
 
     uint32 counter, clientTimestamp;

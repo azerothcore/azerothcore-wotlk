@@ -706,7 +706,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
         return -1;
     }
 
-    ACE_GUARD_RETURN(LockType, Guard, m_SessionLock, -1);
+    std::lock_guard<std::mutex> guard(m_SessionLock);
 
     if (m_Session != nullptr)
     {
@@ -724,7 +724,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     }
     else
     {
-         LOG_ERROR("server", "WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
+        LOG_ERROR("server", "WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
         return -1;
     }
 
