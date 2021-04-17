@@ -173,7 +173,7 @@ public:
 
             if (smoldering)
             {
-                events.RescheduleEvent(EVENT_SERRATED_BITE, 10000); // timer may be wrong
+                events.RescheduleEvent(EVENT_SERRATED_BITE, 3000);
             }
 
             smoldering = false;
@@ -217,7 +217,7 @@ public:
 
         void EnterCombat(Unit* /*victim*/) override
         {
-            events.ScheduleEvent(EVENT_SERRATED_BITE, 10000); // timer may be wrong
+            events.ScheduleEvent(EVENT_SERRATED_BITE, 3000);
         }
 
         void UpdateAI(uint32 diff) override
@@ -239,7 +239,7 @@ public:
                         {
                             DoCastVictim(SPELL_SERRATED_BITE);
                         }
-                        events.ScheduleEvent(EVENT_SERRATED_BITE, 10000); // again, timer may be wrong
+                        events.RepeatEvent(6000); // again, timer may be wrong
                         break;
                     }
                     case EVENT_IGNITE:
