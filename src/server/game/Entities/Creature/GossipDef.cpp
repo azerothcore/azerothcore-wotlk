@@ -178,9 +178,6 @@ void PlayerMenu::ClearMenus()
 
 void PlayerMenu::SendGossipMenu(uint32 titleTextId, uint64 objectGUID) const
 {
-    //ACE_Read_Guard<ACE_RW_Thread_Mutex> lock1(_gossipMenu.GetLock());
-    //ACE_Read_Guard<ACE_RW_Thread_Mutex> lock2(_questMenu.GetLock());
-
     WorldPacket data(SMSG_GOSSIP_MESSAGE, 24 + _gossipMenu.GetMenuItemCount() * 100 + _questMenu.GetMenuItemCount() * 75);     // guess size
     data << uint64(objectGUID);
     data << uint32(_gossipMenu.GetMenuId());            // new 2.4.0
