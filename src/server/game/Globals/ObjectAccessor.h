@@ -122,34 +122,8 @@ public:
         return nullptr;
     }
 
-    template<class T> static T* GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/)
-    {
-        T* obj = HashMapHolder<T>::Find(guid);
-        if (!obj || obj->GetMapId() != mapid)
-            return nullptr;
-
-        CellCoord p = acore::ComputeCellCoord(x, y);
-        if (!p.IsCoordValid())
-        {
-            sLog->outError("ObjectAccessor::GetObjectInWorld: invalid coordinates supplied X:%f Y:%f grid cell [%u:%u]", x, y, p.x_coord, p.y_coord);
-            return nullptr;
-        }
-
-        CellCoord q = acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
-        if (!q.IsCoordValid())
-        {
-            sLog->outError("ObjectAccessor::GetObjecInWorld: object (GUID: %u TypeId: %u) has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUIDLow(), obj->GetTypeId(), obj->GetPositionX(), obj->GetPositionY(), q.x_coord, q.y_coord);
-            return nullptr;
-        }
-
-        int32 dx = int32(p.x_coord) - int32(q.x_coord);
-        int32 dy = int32(p.y_coord) - int32(q.y_coord);
-
-        if (dx > -2 && dx < 2 && dy > -2 && dy < 2)
-            return obj;
-        else
-            return nullptr;
-    }
+    template<class T>
+    static T* GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/);
 
     // these functions return objects only if in map of specified object
     static WorldObject* GetWorldObject(WorldObject const&, uint64);

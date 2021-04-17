@@ -60,7 +60,7 @@ void WorldSession::SendTradeStatus(TradeStatus status)
 void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Ignore Trade %u", _player->GetGUIDLow());
+    LOG_DEBUG("network", "WORLD: Ignore Trade %u", _player->GetGUIDLow());
 #endif
     // recvPacket.print_storage();
 }
@@ -68,7 +68,7 @@ void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
 void WorldSession::HandleBusyTradeOpcode(WorldPacket& /*recvPacket*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Busy Trade %u", _player->GetGUIDLow());
+    LOG_DEBUG("network", "WORLD: Busy Trade %u", _player->GetGUIDLow());
 #endif
     // recvPacket.print_storage();
 }
@@ -145,7 +145,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             {
                 // logging
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "partner storing: %u", myItems[i]->GetGUIDLow());
+                LOG_DEBUG("network", "partner storing: %u", myItems[i]->GetGUIDLow());
 #endif
 
                 // adjust time (depends on /played)
@@ -158,7 +158,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             {
                 // logging
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "player storing: %u", hisItems[i]->GetGUIDLow());
+                LOG_DEBUG("network", "player storing: %u", hisItems[i]->GetGUIDLow());
 #endif
 
                 // adjust time (depends on /played)
@@ -175,21 +175,21 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             if (myItems[i])
             {
                 if (!traderCanTrade)
-                    sLog->outError("trader can't store item: %u", myItems[i]->GetGUIDLow());
+                    LOG_ERROR("server", "trader can't store item: %u", myItems[i]->GetGUIDLow());
                 if (_player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, myItems[i], false) == EQUIP_ERR_OK)
                     _player->MoveItemToInventory(playerDst, myItems[i], true, true);
                 else
-                    sLog->outError("player can't take item back: %u", myItems[i]->GetGUIDLow());
+                    LOG_ERROR("server", "player can't take item back: %u", myItems[i]->GetGUIDLow());
             }
             // return the already removed items to the original owner
             if (hisItems[i])
             {
                 if (!playerCanTrade)
-                    sLog->outError("player can't store item: %u", hisItems[i]->GetGUIDLow());
+                    LOG_ERROR("server", "player can't store item: %u", hisItems[i]->GetGUIDLow());
                 if (trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, hisItems[i], false) == EQUIP_ERR_OK)
                     trader->MoveItemToInventory(traderDst, hisItems[i], true, true);
                 else
-                    sLog->outError("trader can't take item back: %u", hisItems[i]->GetGUIDLow());
+                    LOG_ERROR("server", "trader can't take item back: %u", hisItems[i]->GetGUIDLow());
             }
         }
     }
@@ -208,7 +208,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item * *
         if (Item* item = myTrade->GetItem(TradeSlots(i)))
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outStaticDebug("player trade item %u bag: %u slot: %u", item->GetGUIDLow(), item->GetBagSlot(), item->GetSlot());
+            LOG_DEBUG("server", "player trade item %u bag: %u slot: %u", item->GetGUIDLow(), item->GetBagSlot(), item->GetSlot());
 #endif
             //Can return nullptr
             myItems[i] = item;
@@ -218,7 +218,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item * *
         if (Item* item = hisTrade->GetItem(TradeSlots(i)))
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outStaticDebug("partner trade item %u bag: %u slot: %u", item->GetGUIDLow(), item->GetBagSlot(), item->GetSlot());
+            LOG_DEBUG("server", "partner trade item %u bag: %u slot: %u", item->GetGUIDLow(), item->GetBagSlot(), item->GetSlot());
 #endif
             hisItems[i] = item;
             hisItems[i]->SetInTrade();
