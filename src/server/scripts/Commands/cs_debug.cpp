@@ -417,7 +417,7 @@ public:
             }
             else
             {
-                sLog->outError("Sending opcode that has unknown type '%s'", type.c_str());
+                LOG_ERROR("server", "Sending opcode that has unknown type '%s'", type.c_str());
                 break;
             }
         }
@@ -1372,7 +1372,7 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        sLog->outSQLDev("(@PATH, XX, %.3f, %.3f, %.5f, 0,0, 0,100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+        LOG_INFO("sql.dev", "(@PATH, XX, %.3f, %.3f, %.5f, 0,0, 0,100, 0),", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
 
         handler->PSendSysMessage("Waypoint SQL written to SQL Developer log");
         return true;
