@@ -522,7 +522,7 @@ void AddSC_instance_shattered_halls();
 void AddSC_boss_watchkeeper_gargolmar();     //HC Ramparts
 void AddSC_boss_omor_the_unscarred();
 void AddSC_boss_vazruden_the_herald();
-void AddSC_instance_ramparts();
+void AddSC_instance_hellfire_ramparts();
 void AddSC_arcatraz();                       //TK Arcatraz
 void AddSC_boss_harbinger_skyriss();
 void AddSC_boss_wrath_scryer_soccothrates();
@@ -957,7 +957,7 @@ void AddOutlandScripts()
     AddSC_boss_watchkeeper_gargolmar();     //HC Ramparts
     AddSC_boss_omor_the_unscarred();
     AddSC_boss_vazruden_the_herald();
-    AddSC_instance_ramparts();
+    AddSC_instance_hellfire_ramparts();
     AddSC_arcatraz();                       //TK Arcatraz
     AddSC_boss_harbinger_skyriss();
     AddSC_boss_wrath_scryer_soccothrates();

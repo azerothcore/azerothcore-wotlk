@@ -74,7 +74,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_leotheras_the_blindAI>(creature);
+        return GetSerpentShrineAI<boss_leotheras_the_blindAI>(creature);
     }
 
     struct boss_leotheras_the_blindAI : public BossAI
@@ -264,7 +264,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_inner_demonAI(creature);
+        return GetSerpentShrineAI<npc_inner_demonAI>(creature);
     }
 
     struct npc_inner_demonAI : public ScriptedAI

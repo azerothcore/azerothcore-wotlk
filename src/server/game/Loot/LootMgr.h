@@ -161,7 +161,7 @@ struct LootItem
     LootItem() = default;
 
     // Basic checks for player/item compatibility - if false no chance to see the item in the loot
-    bool AllowedForPlayer(Player const* player) const;
+    bool AllowedForPlayer(Player const* player, bool isGivenByMasterLooter = false, bool allowQuestLoot = true) const;
 
     void AddAllowedLooter(Player const* player);
     [[nodiscard]] const AllowedLooterSet& GetAllowedLooters() const { return allowedGUIDs; }

@@ -115,9 +115,8 @@ struct boss_twin_valkyrAI : public ScriptedAI
         if( IsHeroic() )
             events.RescheduleEvent(EVENT_SPELL_TOUCH, urand(10000, 25000), 1);
 
-        me->SetDisableGravity(true);
-        me->SetHover(true);
         me->SetCanFly(true);
+        me->SetDisableGravity(true);
     }
 
     InstanceScript* pInstance;
@@ -507,7 +506,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_eydisAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_eydisAI>(pCreature);
     }
 
     struct boss_eydisAI : public boss_twin_valkyrAI
@@ -533,7 +532,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_fjolaAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_fjolaAI>(pCreature);
     }
 
     struct boss_fjolaAI : public boss_twin_valkyrAI
@@ -668,7 +667,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_concentrated_ballAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_concentrated_ballAI>(pCreature);
     }
 
     struct npc_concentrated_ballAI : public NullCreatureAI
