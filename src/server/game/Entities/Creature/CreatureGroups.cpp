@@ -34,7 +34,7 @@ void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
     if (itr != map->CreatureGroupHolder.end())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_UNITS, "Group found: %u, inserting creature GUID: %u, Group InstanceID %u", groupId, member->GetGUIDLow(), member->GetInstanceId());
+        LOG_DEBUG("entities.unit", "Group found: %u, inserting creature GUID: %u, Group InstanceID %u", groupId, member->GetGUIDLow(), member->GetInstanceId());
 #endif
         itr->second->AddMember(member);
     }
@@ -42,7 +42,7 @@ void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_UNITS, "Group not found: %u. Creating new group.", groupId);
+        LOG_DEBUG("entities.unit", "Group not found: %u. Creating new group.", groupId);
 #endif
         CreatureGroup* group = new CreatureGroup(groupId);
         map->CreatureGroupHolder[groupId] = group;
@@ -53,7 +53,7 @@ void FormationMgr::AddCreatureToGroup(uint32 groupId, Creature* member)
 void FormationMgr::RemoveCreatureFromGroup(CreatureGroup* group, Creature* member)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_UNITS, "Deleting member pointer to GUID: %u from group %u", group->GetId(), member->GetDBTableGUIDLow());
+    LOG_DEBUG("entities.unit", "Deleting member pointer to GUID: %u from group %u", group->GetId(), member->GetDBTableGUIDLow());
 #endif
     group->RemoveMember(member);
 
@@ -64,7 +64,7 @@ void FormationMgr::RemoveCreatureFromGroup(CreatureGroup* group, Creature* membe
             return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_UNITS, "Deleting group with InstanceID %u", member->GetInstanceId());
+        LOG_DEBUG("entities.unit", "Deleting group with InstanceID %u", member->GetInstanceId());
 #endif
         map->CreatureGroupHolder.erase(group->GetId());
         delete group;
@@ -84,8 +84,8 @@ void FormationMgr::LoadCreatureFormations()
 
     if (!result)
     {
-        sLog->outErrorDb(">>  Loaded 0 creatures in formations. DB table `creature_formations` is empty!");
-        sLog->outString();
+        LOG_ERROR("sql.sql", ">>  Loaded 0 creatures in formations. DB table `creature_formations` is empty!");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -120,14 +120,14 @@ void FormationMgr::LoadCreatureFormations()
         {
             if (!sObjectMgr->GetCreatureData(group_member->leaderGUID))
             {
-                sLog->outErrorDb("creature_formations table leader guid %u incorrect (not exist)", group_member->leaderGUID);
+                LOG_ERROR("sql.sql", "creature_formations table leader guid %u incorrect (not exist)", group_member->leaderGUID);
                 delete group_member;
                 continue;
             }
 
             if (!sObjectMgr->GetCreatureData(memberGUID))
             {
-                sLog->outErrorDb("creature_formations table member guid %u incorrect (not exist)", memberGUID);
+                LOG_ERROR("sql.sql", "creature_formations table member guid %u incorrect (not exist)", memberGUID);
                 delete group_member;
                 continue;
             }
@@ -137,21 +137,21 @@ void FormationMgr::LoadCreatureFormations()
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u creatures in formations in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LOG_INFO("server", ">> Loaded %u creatures in formations in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", " ");
 }
 
 void CreatureGroup::AddMember(Creature* member)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_UNITS, "CreatureGroup::AddMember: Adding unit GUID: %u.", member->GetGUIDLow());
+    LOG_DEBUG("entities.unit", "CreatureGroup::AddMember: Adding unit GUID: %u.", member->GetGUIDLow());
 #endif
 
     //Check if it is a leader
     if (member->GetDBTableGUIDLow() == m_groupID)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_UNITS, "Unit GUID: %u is formation leader. Adding group.", member->GetGUIDLow());
+        LOG_DEBUG("entities.unit", "Unit GUID: %u is formation leader. Adding group.", member->GetGUIDLow());
 #endif
         m_leader = member;
     }
@@ -182,7 +182,7 @@ void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         if (m_leader) // avoid crash if leader was killed and reset.
-            sLog->outDebug(LOG_FILTER_UNITS, "GROUP ATTACK: group instance id %u calls member instid %u", m_leader->GetInstanceId(), member->GetInstanceId());
+            LOG_DEBUG("entities.unit", "GROUP ATTACK: group instance id %u calls member instid %u", m_leader->GetInstanceId(), member->GetInstanceId());
 #endif
 
         //Skip one check
@@ -214,7 +214,7 @@ void CreatureGroup::FormationReset(bool dismiss)
             else
                 itr->first->GetMotionMaster()->MoveIdle();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_UNITS, "Set %s movement for member GUID: %u", dismiss ? "default" : "idle", itr->first->GetGUIDLow());
+            LOG_DEBUG("entities.unit", "Set %s movement for member GUID: %u", dismiss ? "default" : "idle", itr->first->GetGUIDLow());
 #endif
         }
     }

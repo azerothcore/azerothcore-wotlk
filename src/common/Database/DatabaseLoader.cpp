@@ -19,14 +19,14 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
         std::string const dbString = sConfigMgr->GetOption<std::string>(name + "DatabaseInfo", "");
         if (dbString.empty())
         {
-            sLog->outSQLDriver("Database %s not specified in configuration file!", name.c_str());
+            LOG_INFO("sql.driver", "Database %s not specified in configuration file!", name.c_str());
             return false;
         }
 
         uint8 const asyncThreads = sConfigMgr->GetOption<uint8>(name + "Database.WorkerThreads", 1);
         if (asyncThreads < 1 || asyncThreads > 32)
         {
-            sLog->outSQLDriver("%s database: invalid number of worker threads specified. Please pick a value between 1 and 32.", name.c_str());
+            LOG_INFO("sql.driver", "%s database: invalid number of worker threads specified. Please pick a value between 1 and 32.", name.c_str());
             return false;
         }
 
@@ -46,7 +46,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
 
                 auto sleepThread = [&]()
                 {
-                    sLog->outSQLDriver("> Retrying after %u seconds", durationSecs.count());
+                    LOG_INFO("sql.driver", "> Retrying after %u seconds", static_cast<uint32>(durationSecs.count()));
                     std::this_thread::sleep_for(durationSecs);
                 };
 
@@ -72,7 +72,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
             // If the error wasn't handled quit
             if (error)
             {
-                sLog->outSQLDriver("DatabasePool %s NOT opened. There were errors opening the MySQL connections. Check your SQLDriverLogFile for specific errors", name.c_str());
+                LOG_ERROR("sql.driver", "DatabasePool %s NOT opened. There were errors opening the MySQL connections. Check your SQLDriverLogFile for specific errors", name.c_str());
                 return false;
             }
         }
@@ -90,7 +90,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
     {
         if (!pool.PrepareStatements())
         {
-            sLog->outSQLDriver("Could not prepare statements of the %s database, see log for details.", name.c_str());
+            LOG_ERROR("sql.driver", "Could not prepare statements of the %s database, see log for details.", name.c_str());
             return false;
         }
 
