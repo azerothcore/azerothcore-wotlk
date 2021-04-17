@@ -86,7 +86,6 @@ extern int main(int argc, char** argv)
     sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize();
 
-  
     acore::Banner::Show("authserver",
         [](char const* text)
         {
