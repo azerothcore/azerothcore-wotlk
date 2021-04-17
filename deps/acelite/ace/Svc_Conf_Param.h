@@ -45,7 +45,7 @@ extern void ace_yy_delete_buffer (ace_yy_buffer_state *buffer);
  * This class retains the state for a given parse/scan.  It primarily
  * makes it possible to hold the static object lock in the scanner
  * for as short a period of time as possible.  The resulting finer
- * grained locking prevents deadlocks from occuring when scanning a
+ * grained locking prevents deadlocks from occurring when scanning a
  * `svc.conf' file and activating an ACE_Task, for example, as a
  * result of processing the directives in that file.
  */

@@ -32,7 +32,7 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
-ACE_ALLOC_HOOK_DEFINE(ACE_Select_Reactor_T)
+ACE_ALLOC_HOOK_DEFINE_Tc(ACE_Select_Reactor_T)
 
 template <class ACE_SELECT_REACTOR_TOKEN> int
 ACE_Select_Reactor_T<ACE_SELECT_REACTOR_TOKEN>::any_ready
@@ -190,7 +190,7 @@ ACE_Select_Reactor_T<ACE_SELECT_REACTOR_TOKEN>::renew (void)
 {
   ACE_TRACE ("ACE_Select_Reactor_T::renew");
 #if defined (ACE_MT_SAFE) && (ACE_MT_SAFE != 0)
-  if (this->supress_notify_renew () == 0)
+  if (!this->supress_notify_renew ())
     this->token_.renew (this->requeue_position_);
 #endif /* defined (ACE_MT_SAFE) && (ACE_MT_SAFE != 0) */
 }
@@ -1364,7 +1364,7 @@ ACE_Select_Reactor_T<ACE_SELECT_REACTOR_TOKEN>::dispatch
                (dispatch_set,
                 active_handle_count,
                 other_handlers_dispatched) == -1)
-        // State has changed or a serious failure has occured, so exit
+        // State has changed or a serious failure has occurred, so exit
         // loop.
         break;
 

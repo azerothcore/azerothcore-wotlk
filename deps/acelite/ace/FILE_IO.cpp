@@ -4,6 +4,9 @@
 #include "ace/OS_NS_sys_stat.h"
 #include "ace/OS_Memory.h"
 #include "ace/Truncate.h"
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 #if !defined (__ACE_INLINE__)
 #include "ace/FILE_IO.inl"
@@ -43,15 +46,26 @@ ssize_t
 ACE_FILE_IO::send (size_t n, ...) const
 {
   ACE_TRACE ("ACE_FILE_IO::send");
+#ifdef ACE_LACKS_VA_FUNCTIONS
+  ACE_UNUSED_ARG (n);
+  ACE_NOTSUP_RETURN (-1);
+#else
   va_list argp;
   int total_tuples = ACE_Utils::truncate_cast<int> (n / 2);
   iovec *iovp = 0;
 #if defined (ACE_HAS_ALLOCA)
   iovp = (iovec *) alloca (total_tuples * sizeof (iovec));
 #else
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_ALLOCATOR_RETURN (iovp, (iovec *)
+                        ACE_Allocator::instance ()->malloc (total_tuples *
+                                                            sizeof (iovec)),
+                        -1);
+# else
   ACE_NEW_RETURN (iovp,
                   iovec[total_tuples],
                   -1);
+# endif /* ACE_HAS_ALLOC_HOOKS */
 #endif /* !defined (ACE_HAS_ALLOCA) */
 
   va_start (argp, n);
@@ -66,10 +80,15 @@ ACE_FILE_IO::send (size_t n, ...) const
                                    iovp,
                                    total_tuples);
 #if !defined (ACE_HAS_ALLOCA)
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_Allocator::instance ()->free (iovp);
+# else
   delete [] iovp;
+# endif /* ACE_HAS_ALLOC_HOOKS */
 #endif /* !defined (ACE_HAS_ALLOCA) */
   va_end (argp);
   return result;
+#endif // ACE_LACKS_VA_FUNCTIONS
 }
 
 // This is basically an interface to ACE_OS::readv, that doesn't use
@@ -82,15 +101,26 @@ ssize_t
 ACE_FILE_IO::recv (size_t n, ...) const
 {
   ACE_TRACE ("ACE_FILE_IO::recv");
+#ifdef ACE_LACKS_VA_FUNCTIONS
+  ACE_UNUSED_ARG (n);
+  ACE_NOTSUP_RETURN (-1);
+#else
   va_list argp;
   int total_tuples = ACE_Utils::truncate_cast<int> (n / 2);
   iovec *iovp = 0;
 #if defined (ACE_HAS_ALLOCA)
   iovp = (iovec *) alloca (total_tuples * sizeof (iovec));
 #else
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_ALLOCATOR_RETURN (iovp, (iovec *)
+                        ACE_Allocator::instance ()->malloc (total_tuples *
+                                                            sizeof (iovec)),
+                        -1);
+# else
   ACE_NEW_RETURN (iovp,
                   iovec[total_tuples],
                   -1);
+# endif /* ACE_HAS_ALLOC_HOOKS */
 #endif /* !defined (ACE_HAS_ALLOCA) */
 
   va_start (argp, n);
@@ -105,10 +135,15 @@ ACE_FILE_IO::recv (size_t n, ...) const
                                         iovp,
                                         total_tuples);
 #if !defined (ACE_HAS_ALLOCA)
+# ifdef ACE_HAS_ALLOC_HOOKS
+  ACE_Allocator::instance ()->free (iovp);
+# else
   delete [] iovp;
+# endif /* ACE_HAS_ALLOC_HOOKS */
 #endif /* !defined (ACE_HAS_ALLOCA) */
   va_end (argp);
   return result;
+#endif // ACE_LACKS_VA_FUNCTIONS
 }
 
 // Allows a client to read from a file without having to provide a
@@ -128,9 +163,15 @@ ACE_FILE_IO::recvv (iovec *io_vec)
     {
       // Restrict to max size we can record in iov_len.
       size_t len = ACE_Utils::truncate_cast<u_long> (length);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_ALLOCATOR_RETURN (io_vec->iov_base,
+                            static_cast<char*>(ACE_Allocator::instance()->malloc(sizeof(char) * len)),
+                            -1);
+#else
       ACE_NEW_RETURN (io_vec->iov_base,
                       char[len],
                       -1);
+#endif /* ACE_HAS_ALLOC_HOOKS */
       io_vec->iov_len = static_cast<u_long> (this->recv_n (io_vec->iov_base,
                                                            len));
       return io_vec->iov_len;

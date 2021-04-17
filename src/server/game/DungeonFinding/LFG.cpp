@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "LFG.h"
 #include "Language.h"
+#include "LFG.h"
 #include "ObjectMgr.h"
 
 namespace lfg
@@ -65,34 +65,33 @@ namespace lfg
         int32 entry = LANG_LFG_ERROR;
         switch (state)
         {
-        case LFG_STATE_NONE:
-            entry = LANG_LFG_STATE_NONE;
-            break;
-        case LFG_STATE_ROLECHECK:
-            entry = LANG_LFG_STATE_ROLECHECK;
-            break;
-        case LFG_STATE_QUEUED:
-            entry = LANG_LFG_STATE_QUEUED;
-            break;
-        case LFG_STATE_PROPOSAL:
-            entry = LANG_LFG_STATE_PROPOSAL;
-            break;
-        case LFG_STATE_DUNGEON:
-            entry = LANG_LFG_STATE_DUNGEON;
-            break;
-        case LFG_STATE_BOOT:
-            entry = LANG_LFG_STATE_BOOT;
-            break;
-        case LFG_STATE_FINISHED_DUNGEON:
-            entry = LANG_LFG_STATE_FINISHED_DUNGEON;
-            break;
-        case LFG_STATE_RAIDBROWSER:
-            entry = LANG_LFG_STATE_RAIDBROWSER;
-            break;
+            case LFG_STATE_NONE:
+                entry = LANG_LFG_STATE_NONE;
+                break;
+            case LFG_STATE_ROLECHECK:
+                entry = LANG_LFG_STATE_ROLECHECK;
+                break;
+            case LFG_STATE_QUEUED:
+                entry = LANG_LFG_STATE_QUEUED;
+                break;
+            case LFG_STATE_PROPOSAL:
+                entry = LANG_LFG_STATE_PROPOSAL;
+                break;
+            case LFG_STATE_DUNGEON:
+                entry = LANG_LFG_STATE_DUNGEON;
+                break;
+            case LFG_STATE_BOOT:
+                entry = LANG_LFG_STATE_BOOT;
+                break;
+            case LFG_STATE_FINISHED_DUNGEON:
+                entry = LANG_LFG_STATE_FINISHED_DUNGEON;
+                break;
+            case LFG_STATE_RAIDBROWSER:
+                entry = LANG_LFG_STATE_RAIDBROWSER;
+                break;
         }
 
         return std::string(sObjectMgr->GetAcoreStringForDBCLocale(entry));
     }
 
 } // namespace lfg
-

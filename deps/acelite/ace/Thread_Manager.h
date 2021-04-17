@@ -4,7 +4,7 @@
 /**
  *  @file    Thread_Manager.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -137,6 +137,8 @@ public:
 
   virtual ~ACE_At_Thread_Exit_Func (void);
 
+  ACE_ALLOC_HOOK_DECLARE;
+
 protected:
    /// The object to be cleanup
    void *object_;
@@ -192,6 +194,8 @@ public:
   /// ACE_Task_Base associated with this thread.;
   ACE_Task_Base *task (void) const;
 
+  ACE_ALLOC_HOOK_DECLARE;
+
 protected:
   /// Reset this base thread descriptor.
   void reset (void);
@@ -222,7 +226,7 @@ protected:
  * @class ACE_Thread_Descriptor
  *
  * @brief Information for controlling threads that run under the control
- * of the <Thread_Manager>.
+ * of the Thread_Manager.
  */
 class ACE_Export ACE_Thread_Descriptor : public ACE_Thread_Descriptor_Base
 {
@@ -231,7 +235,6 @@ class ACE_Export ACE_Thread_Descriptor : public ACE_Thread_Descriptor_Base
   friend class ACE_Double_Linked_List<ACE_Thread_Descriptor>;
   friend class ACE_Double_Linked_List_Iterator<ACE_Thread_Descriptor>;
 public:
-  // = Initialization method.
   ACE_Thread_Descriptor (void);
 
   // = Accessor methods.
@@ -271,7 +274,7 @@ public:
    * "cleanup_hook" function; the first parameter is the object (or
    * array) to be destroyed.  Returns 0 on success, non-zero on
    * failure: -1 if virtual memory is exhausted or 1 if the object (or
-   * arrayt) had already been registered.
+   * array) had already been registered.
    */
   int at_exit (void *object,
                ACE_CLEANUP_FUNC cleanup_hook,
@@ -300,6 +303,13 @@ public:
   void set_next (ACE_Thread_Descriptor *td);
   ACE_Thread_Descriptor *get_next (void) const;
 
+protected:
+  /// Run the AT_Thread_Exit hooks.
+  void do_at_exit (void);
+
+  /// Terminate realize the cleanup process to thread termination
+  void terminate (void);
+
 private:
   /// Reset this thread descriptor.
   void reset (ACE_Thread_Manager *tm);
@@ -313,12 +323,7 @@ private:
   void at_push (ACE_At_Thread_Exit* cleanup,
                 bool is_owner = false);
 
-  /// Run the AT_Thread_Exit hooks.
-  void do_at_exit (void);
-
-  /// Terminate realize the cleanup process to thread termination
-  void terminate (void);
-
+private:
   /// Thread_Descriptor is the ownership of ACE_Log_Msg if log_msg_!=0
   /// This can occur because ACE_TSS_cleanup was executed before terminate.
   ACE_Log_Msg *log_msg_;
@@ -336,7 +341,7 @@ private:
 #endif
 
   /// Pointer to an ACE_Thread_Manager or NULL if there's no
-  /// ACE_Thread_Manager>
+  /// ACE_Thread_Manager
   ACE_Thread_Manager* tm_;
 
   /// Registration lock to prevent premature removal of thread descriptor.
@@ -383,7 +388,7 @@ class ACE_Export ACE_Thread_Manager
 public:
   friend class ACE_Thread_Control;
 
-  // Allow ACE_THread_Exit to register the global TSS instance object.
+  // Allow ACE_Thread_Exit to register the global TSS instance object.
   friend class ACE_Thread_Exit;
   friend class ACE_Thread_Descriptor;
 
@@ -899,7 +904,7 @@ public:
   int kill_task (ACE_Task_Base *task, int signum);
 
   /**
-   * Cancel all threads in an ACE_Task.  If <async_cancel> is non-0,
+   * Cancel all threads in an ACE_Task.  If @a async_cancel is non-0,
    * then asynchronously cancel these threads if the OS platform
    * supports cancellation.  Otherwise, perform a "cooperative"
    * cancellation.
@@ -1031,7 +1036,7 @@ public:
   int get_grp (ACE_Task_Base *task, int &grp_id);
 
   /// Return a count of the current number of threads active in the
-  /// <Thread_Manager>.
+  /// Thread_Manager.
   size_t count_threads (void) const;
 
   /// Get the state of the thread. Returns false if the thread is not
@@ -1065,7 +1070,7 @@ public:
    * second parameter to the "cleanup_hook" function; the first
    * parameter is the object (or array) to be destroyed.
    * "cleanup_hook", for example, may delete the object (or array).
-   * If <cleanup_hook> == 0, the <object> will _NOT_ get cleanup at
+   * If @a cleanup_hook == 0, the @a object will _NOT_ get cleanup at
    * thread exit.  You can use this to cancel the previously added
    * at_exit.
    */
@@ -1117,12 +1122,12 @@ protected:
   /// Run the registered hooks when the thread exits.
   void run_thread_exit_hooks (int i);
 
-  /// Locate the index of the table slot occupied by <t_id>.  Returns
-  /// -1 if <t_id> is not in the table doesn't contain <t_id>.
+  /// Locate the index of the table slot occupied by @a t_id.  Returns
+  /// -1 if @a t_id is not in the table doesn't contain @a t_id.
   ACE_Thread_Descriptor *find_thread (ACE_thread_t t_id);
 
-  /// Locate the index of the table slot occupied by <h_id>.  Returns
-  /// -1 if <h_id> is not in the table doesn't contain <h_id>.
+  /// Locate the index of the table slot occupied by @a h_id.  Returns
+  /// -1 if @a h_id is not in the table doesn't contain @a h_id.
   ACE_Thread_Descriptor *find_hthread (ACE_hthread_t h_id);
 
   /**
@@ -1201,7 +1206,7 @@ protected:
   int cancel_thr (ACE_Thread_Descriptor *td,
                   int async_cancel = 0);
 
-  /// Register a thread as terminated and put it into the <terminated_thr_list_>.
+  /// Register a thread as terminated and put it into the terminated_thr_list_.
   int register_as_terminated (ACE_Thread_Descriptor *td);
 
   /// Setting the static ACE_TSS_TYPE (ACE_Thread_Exit) *thr_exit_ pointer.
@@ -1232,7 +1237,7 @@ protected:
 
   // = ACE_Thread_Mutex and condition variable for synchronizing termination.
 #if defined (ACE_HAS_THREADS)
-  /// Serialize access to the <zero_cond_>.
+  /// Serialize access to the zero_cond_.
   ACE_Thread_Mutex lock_;
 
   /// Keep track of when there are no more threads.
@@ -1240,6 +1245,10 @@ protected:
 #endif /* ACE_HAS_THREADS */
 
   ACE_Locked_Free_List<ACE_Thread_Descriptor, ACE_SYNCH_MUTEX> thread_desc_freelist_;
+
+#if defined (ACE_HAS_THREADS) && defined (ACE_LACKS_PTHREAD_JOIN)
+  ACE_Condition_Thread_Mutex join_cond_;
+#endif
 
 private:
 #if ! defined (ACE_THREAD_MANAGER_LACKS_STATICS)

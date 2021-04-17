@@ -9,14 +9,14 @@
 
 /*! Basic, ad-hoc queries. */
 BasicStatementTask::BasicStatementTask(const char* sql) :
-m_has_result(false)
+    m_has_result(false)
 {
     m_sql = strdup(sql);
 }
 
 BasicStatementTask::BasicStatementTask(const char* sql, QueryResultFuture result) :
-m_has_result(true),
-m_result(result)
+    m_has_result(true),
+    m_result(result)
 {
     m_sql = strdup(sql);
 }
@@ -34,7 +34,7 @@ bool BasicStatementTask::Execute()
         if (!result || !result->GetRowCount())
         {
             delete result;
-            m_result.set(QueryResult(NULL));
+            m_result.set(QueryResult(nullptr));
             return false;
         }
         result->NextRow();

@@ -30,7 +30,7 @@ function import() {
     oldDate=${dateLast%_$tmp}
 
     if [ "$oldDate" = "$dateToday" ]; then
-        ((counter=$oldCnt+1))
+        ((counter=10#$oldCnt+1)) # 10 # is needed to explictly add to a base 10 number
     fi;
 
     for entry in "$pendingPath"/*.sql
