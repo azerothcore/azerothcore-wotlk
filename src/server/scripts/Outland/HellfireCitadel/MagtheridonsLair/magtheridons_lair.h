@@ -6,6 +6,9 @@
 #define DEF_MAGTHERIDONS_LAIR_H
 
 #include "SpellScript.h"
+#include "CreatureAIImpl.h"
+
+#define MagtheridonsLairScriptName "instance_magtheridons_lair"
 
 enum DataTypes
 {
@@ -38,5 +41,10 @@ enum GoIds
     GO_MAGTHERIDON_COLUMN5          = 184639
 };
 
-#endif
+template <class AI, class T>
+inline AI* GetMagtheridonsLairAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, MagtheridonsLairScriptName);
+}
 
+#endif

@@ -34,6 +34,8 @@
 #   elif (_WRS_VXWORKS_MINOR == 9)
 #    define ACE_VXWORKS 0x690
 #   endif
+#  elif (_WRS_VXWORKS_MAJOR == 7)
+#   define ACE_VXWORKS 0x700
 #  endif
 # endif
 #endif /* ! ACE_VXWORKS */
@@ -50,8 +52,10 @@
 # include "ace/config-vxworks6.8.h"
 #elif (ACE_VXWORKS == 0x690)
 # include "ace/config-vxworks6.9.h"
+#elif (ACE_VXWORKS == 0x700)
+# include "ace/config-vxworks7.0.h"
 #else
-#error Unknown or unsupported VxWorks version
+# error Unknown or unsupported VxWorks version
 #endif
 
 // Adapt to system argument changes added at VxWorks 6.9 and 64-bit.

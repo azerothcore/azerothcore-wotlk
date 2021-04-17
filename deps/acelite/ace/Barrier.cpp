@@ -9,6 +9,10 @@
 #include "ace/Guard_T.h"
 #include "ace/OS_NS_errno.h"
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
 #if defined (ACE_HAS_DUMP)
 #  include "ace/Log_Category.h"
 #endif /* ACE_HAS_DUMP */

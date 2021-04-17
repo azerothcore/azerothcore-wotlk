@@ -22,6 +22,9 @@
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
+ACE_ALLOC_HOOK_DEFINE_Tccct(ACE_Timer_Heap_Iterator_T)
+ACE_ALLOC_HOOK_DEFINE_Tccct(ACE_Timer_Heap_T)
+
 // Define some simple inlined functions to clarify the code.
 inline size_t
 ACE_HEAP_PARENT (size_t X)
@@ -121,8 +124,13 @@ ACE_Timer_Heap_T<TYPE, FUNCTOR, ACE_LOCK, TIME_POLICY>::ACE_Timer_Heap_T (
     }
 
   // Create the heap array.
-  ACE_NEW (this->heap_,
-           ACE_Timer_Node_T<TYPE> *[size]);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+    this->heap_ = reinterpret_cast<ACE_Timer_Node_T<TYPE> **>
+      (ACE_Allocator::instance ()->malloc (sizeof (ACE_Timer_Node_T<TYPE> *) * size));
+#else
+    ACE_NEW (this->heap_,
+             ACE_Timer_Node_T<TYPE> *[size]);
+#endif  /* ACE_HAS_ALLOC_HOOKS */
 
   // Create the parallel
   ACE_NEW (this->timer_ids_,
@@ -186,12 +194,22 @@ ACE_Timer_Heap_T<TYPE, FUNCTOR, ACE_LOCK, TIME_POLICY>::ACE_Timer_Heap_T (
     this->max_size_ = static_cast<size_t> (ACE_Numeric_Limits<long>::max ());
 
   // Create the heap array.
+#if defined (ACE_HAS_ALLOC_HOOKS)
+    this->heap_ = reinterpret_cast<ACE_Timer_Node_T<TYPE> **>
+      (ACE_Allocator::instance ()->malloc (sizeof (ACE_Timer_Node_T<TYPE> *) * this->max_size_));
+#else
     ACE_NEW (this->heap_,
              ACE_Timer_Node_T<TYPE> *[this->max_size_]);
+#endif  /* ACE_HAS_ALLOC_HOOKS */
 
   // Create the parallel array.
-  ACE_NEW (this->timer_ids_,
-           ssize_t[this->max_size_]);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+    this->timer_ids_ = reinterpret_cast<ssize_t *>
+      (ACE_Allocator::instance ()->malloc (sizeof (ssize_t) * this->max_size_));
+#else
+    ACE_NEW (this->timer_ids_,
+             ssize_t[this->max_size_]);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
   // Initialize the "freelist," which uses negative values to
   // distinguish freelist elements from "pointers" into the <heap_>
@@ -212,8 +230,19 @@ ACE_Timer_Heap_T<TYPE, FUNCTOR, ACE_LOCK, TIME_POLICY>::~ACE_Timer_Heap_T (void)
 
   this->close ();
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  if (this->heap_)
+    (ACE_Allocator::instance ()->free (this->heap_));
+#else
   delete [] this->heap_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  if (this->timer_ids_)
+      (ACE_Allocator::instance ()->free (this->timer_ids_));
+#else
   delete [] this->timer_ids_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
   // clean up any preallocated timer nodes
   if (preallocated_nodes_ != 0)
@@ -541,27 +570,48 @@ ACE_Timer_Heap_T<TYPE, FUNCTOR, ACE_LOCK, TIME_POLICY>::grow_heap (void)
   // First grow the heap itself.
   ACE_Timer_Node_T<TYPE> **new_heap = 0;
 
-  ACE_NEW (new_heap,
-           ACE_Timer_Node_T<TYPE> *[new_size]);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+    new_heap = reinterpret_cast<ACE_Timer_Node_T<TYPE> **>
+      (ACE_Allocator::instance ()->malloc (sizeof (ACE_Timer_Node_T<TYPE> *) * new_size));
+#else
+    ACE_NEW (new_heap,
+             ACE_Timer_Node_T<TYPE> *[new_size]);
+#endif  /* ACE_HAS_ALLOC_HOOKS */
 
   ACE_OS::memcpy (new_heap,
                   this->heap_,
                   this->max_size_ * sizeof *new_heap);
+
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance ()->free (this->heap_);
+#else
   delete [] this->heap_;
+#endif  /* ACE_HAS_ALLOC_HOOKS */
+
   this->heap_ = new_heap;
 
   // Grow the array of timer ids.
 
   ssize_t *new_timer_ids = 0;
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  new_timer_ids = reinterpret_cast<ssize_t *>
+      (ACE_Allocator::instance ()->malloc (sizeof (ssize_t) * new_size));
+#else
   ACE_NEW (new_timer_ids,
            ssize_t[new_size]);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
   ACE_OS::memcpy (new_timer_ids,
                   this->timer_ids_,
                   this->max_size_ * sizeof (ssize_t));
 
-  delete [] timer_ids_;
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  if (this->timer_ids_)
+      (ACE_Allocator::instance ()->free (this->timer_ids_));
+#else
+  delete [] this->timer_ids_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
   this->timer_ids_ = new_timer_ids;
 
   // And add the new elements to the end of the "freelist".

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL3 v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+# Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 # Copyright (C) 2008-2019 TrinityCore <https://www.trinitycore.org/>
 #
 
@@ -18,6 +18,11 @@ string(REGEX REPLACE "/W[0-4] " "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 string(REGEX REPLACE "/W[0-4]$" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 string(REGEX REPLACE "/W[0-4] " "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 string(REGEX REPLACE "/W[0-4]$" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+
+# https://tinyurl.com/jxnc4s83
+target_compile_options(acore-compile-option-interface
+    INTERFACE
+      /utf-8)
 
 if(PLATFORM EQUAL 64)
   # This definition is necessary to work around a bug with Intellisense described
@@ -96,7 +101,7 @@ if(NOT WITH_WARNINGS)
       /wd4267
       /wd4619
       # /wd4512
-      )    
+      )
     message(STATUS "MSVC: Disabled generic compiletime warnings")
   endif()
 endif()

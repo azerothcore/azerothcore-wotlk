@@ -1,11 +1,12 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
+#include "blackrock_depths.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -19,9 +20,9 @@ class boss_general_angerforge : public CreatureScript
 public:
     boss_general_angerforge() : CreatureScript("boss_general_angerforge") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_general_angerforgeAI(creature);
+        return GetBlackrockDepthsAI<boss_general_angerforgeAI>(creature);
     }
 
     struct boss_general_angerforgeAI : public ScriptedAI
@@ -34,7 +35,7 @@ public:
         uint32 Adds_Timer;
         bool Medics;
 
-        void Reset()
+        void Reset() override
         {
             MightyBlow_Timer = 8000;
             HamString_Timer = 12000;
@@ -43,7 +44,7 @@ public:
             Medics = false;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit* /*who*/) override { }
 
         void SummonAdds(Unit* victim)
         {
@@ -57,7 +58,7 @@ public:
                 SummonedMedic->AI()->AttackStart(victim);
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             //Return since we have no target
             if (!UpdateVictim())
@@ -68,21 +69,24 @@ public:
             {
                 DoCastVictim(SPELL_MIGHTYBLOW);
                 MightyBlow_Timer = 18000;
-            } else MightyBlow_Timer -= diff;
+            }
+            else MightyBlow_Timer -= diff;
 
             //HamString_Timer
             if (HamString_Timer <= diff)
             {
                 DoCastVictim(SPELL_HAMSTRING);
                 HamString_Timer = 15000;
-            } else HamString_Timer -= diff;
+            }
+            else HamString_Timer -= diff;
 
             //Cleave_Timer
             if (Cleave_Timer <= diff)
             {
                 DoCastVictim(SPELL_CLEAVE);
                 Cleave_Timer = 9000;
-            } else Cleave_Timer -= diff;
+            }
+            else Cleave_Timer -= diff;
 
             //Adds_Timer
             if (HealthBelowPct(21))
@@ -95,7 +99,8 @@ public:
                     SummonAdds(me->GetVictim());
 
                     Adds_Timer = 25000;
-                } else Adds_Timer -= diff;
+                }
+                else Adds_Timer -= diff;
             }
 
             //Summon Medics
