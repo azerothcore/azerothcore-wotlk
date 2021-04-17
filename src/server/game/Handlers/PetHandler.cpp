@@ -7,6 +7,7 @@
 #include "Chat.h"
 #include "Common.h"
 #include "CreatureAI.h"
+#include "DisableMgr.h"
 #include "Group.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -557,7 +558,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, uint64 guid1, uint16 spellid
                                 return;
 
                         // Not let attack through obstructions
-                        bool checkLos = !MMAP::MMapFactory::IsPathfindingEnabled(pet->GetMap()) ||
+                        bool checkLos = !DisableMgr::IsPathfindingEnabled(pet->GetMap()) ||
                                         (TargetUnit->GetTypeId() == TYPEID_UNIT && (TargetUnit->ToCreature()->isWorldBoss() || TargetUnit->ToCreature()->IsDungeonBoss()));
 
                         if (checkLos && !pet->IsWithinLOSInMap(TargetUnit))
