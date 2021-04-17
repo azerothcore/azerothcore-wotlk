@@ -3,6 +3,10 @@
 #include "ace/OS_Memory.h"
 #include "ace/OS_NS_ctype.h"
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
 namespace
 {
   // Just in case ...
@@ -47,7 +51,11 @@ ACE_Base64::encode (const ACE_Byte* input,
   size_t length = ((input_len + 2) / 3) * 4;
   size_t num_lines = length / max_columns + 1;
   length += num_lines + 1;
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_ALLOCATOR_RETURN (result, static_cast<ACE_Byte*> (ACE_Allocator::instance()->malloc(sizeof (ACE_Byte) * length)), 0);
+#else
   ACE_NEW_RETURN (result, ACE_Byte[length], 0);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
   int char_count = 0;
   int bits = 0;
@@ -135,7 +143,12 @@ ACE_Base64::decode (const ACE_Byte* input, size_t* output_len)
 
   size_t result_len = ACE_Base64::length (input);
   ACE_Byte* result = 0;
+
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_ALLOCATOR_RETURN (result, static_cast<ACE_Byte*> (ACE_Allocator::instance()->malloc(sizeof (ACE_Byte) * result_len)), 0);
+#else
   ACE_NEW_RETURN (result, ACE_Byte[result_len], 0);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
   ACE_Byte* ptr = const_cast<ACE_Byte*> (input);
   while (*ptr != 0 &&
@@ -204,7 +217,11 @@ ACE_Base64::decode (const ACE_Byte* input, size_t* output_len)
 
   if (errors)
     {
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_Allocator::instance()->free(result);
+#else
       delete[] result;
+#endif /* ACE_HAS_ALLOC_HOOKS */
       return 0;
     }
   result[pos] = 0;

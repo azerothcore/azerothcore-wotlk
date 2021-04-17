@@ -24,6 +24,7 @@
 
 #include "ace/os_include/netinet/os_in.h"
 #include "ace/os_include/os_limits.h"
+#include "ace/os_include/sys/os_socket.h"
 
 // Place all additions (especially function declarations) within extern "C" {}
 #ifdef __cplusplus
@@ -62,6 +63,55 @@ struct  servent {
         char    *s_proto;       /* protocol to use */
 };
 #endif /* ACE_LACKS_SERVENT */
+
+#ifdef ACE_LACKS_ADDRINFO
+  struct addrinfo {
+    int ai_flags;
+    int ai_family;
+    int ai_socktype;
+    int ai_protocol;
+    ACE_SOCKET_LEN ai_addrlen;
+    sockaddr *ai_addr;
+    char *ai_canonname;
+    addrinfo *ai_next;
+  };
+#endif
+
+#ifndef AI_V4MAPPED
+# define AI_V4MAPPED 0x8
+#endif
+
+#ifndef AI_ADDRCONFIG
+# define AI_ADDRCONFIG 0x20
+#endif
+
+#ifndef EAI_NONAME
+# define EAI_NONAME -2 /* Error result from getaddrinfo(): no addr for name */
+#endif
+
+#ifndef EAI_AGAIN
+# define EAI_AGAIN -3 /* Error result from getaddrinfo(): try again later */
+#endif
+
+#ifndef EAI_FAIL
+# define EAI_FAIL -4 /* Error result from getaddrinfo(): non-recoverable */
+#endif
+
+#ifndef EAI_FAMILY
+# define EAI_FAMILY -6 /* Error result from getaddrinfo(): family not supp. */
+#endif
+
+#ifndef EAI_MEMORY
+# define EAI_MEMORY -10 /* Error result from getaddrinfo(): out of memory */
+#endif
+
+#ifndef EAI_SYSTEM
+# define EAI_SYSTEM -11 /* Error result from getaddrinfo(): see errno */
+#endif
+
+#ifndef EAI_OVERFLOW
+# define EAI_OVERFLOW -12 /* Error result from getaddrinfo(): buffer overflow */
+#endif
 
 #if defined (ACE_HAS_STRUCT_NETDB_DATA)
    typedef char ACE_HOSTENT_DATA[sizeof(struct hostent_data)];

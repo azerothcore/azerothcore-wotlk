@@ -41,7 +41,11 @@ ACE_Registry_ImpExp::import_config (const ACE_TCHAR* filename)
   u_int buffer_size = 4096;
   u_int read_pos = 0;
   ACE_TCHAR *buffer = 0;
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_ALLOCATOR_NORETURN (buffer, static_cast<ACE_TCHAR*> (ACE_Allocator::instance()->malloc(sizeof(ACE_TCHAR) * buffer_size)));
+#else
   ACE_NEW_NORETURN (buffer, ACE_TCHAR[buffer_size]);
+#endif /* ACE_HAS_ALLOC_HOOKS */
   if (!buffer)
     {
       ACE_Errno_Guard guard (errno);
@@ -60,11 +64,19 @@ ACE_Registry_ImpExp::import_config (const ACE_TCHAR* filename)
         {
           // allocate a new buffer - double size the previous one
           ACE_TCHAR *temp_buffer;
+#if defined (ACE_HAS_ALLOC_HOOKS)
+          ACE_ALLOCATOR_NORETURN (temp_buffer, static_cast<ACE_TCHAR*> (ACE_Allocator::instance()->malloc(sizeof (ACE_TCHAR) * buffer_size * 2)));
+#else
           ACE_NEW_NORETURN (temp_buffer, ACE_TCHAR[buffer_size * 2]);
+#endif /* ACE_HAS_ALLOC_HOOKS */
           if (!temp_buffer)
             {
               ACE_Errno_Guard guard (errno);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+              ACE_Allocator::instance()->free(buffer);
+#else
               delete [] buffer;
+#endif /* ACE_HAS_ALLOC_HOOKS */
               (void) ACE_OS::fclose (in);
               return -1;
             }
@@ -73,7 +85,11 @@ ACE_Registry_ImpExp::import_config (const ACE_TCHAR* filename)
           ACE_OS::memcpy (temp_buffer, buffer, buffer_size);
           read_pos = buffer_size - 1;
           buffer_size *= 2;
+#if defined (ACE_HAS_ALLOC_HOOKS)
+          ACE_Allocator::instance()->free(buffer);
+#else
           delete [] buffer;
+#endif /* ACE_HAS_ALLOC_HOOKS */
           buffer = temp_buffer;
           continue;
         }
@@ -90,7 +106,11 @@ ACE_Registry_ImpExp::import_config (const ACE_TCHAR* filename)
           if (!end)
             {
               ACE_OS::fclose (in);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+              ACE_Allocator::instance()->free(buffer);
+#else
               delete [] buffer;
+#endif /* ACE_HAS_ALLOC_HOOKS */
               return -3;
             }
           *end = 0;
@@ -98,7 +118,11 @@ ACE_Registry_ImpExp::import_config (const ACE_TCHAR* filename)
           if (config_.expand_path (config_.root_section (), buffer + 1, section, 1))
             {
               ACE_OS::fclose (in);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+              ACE_Allocator::instance()->free(buffer);
+#else
               delete [] buffer;
+#endif /* ACE_HAS_ALLOC_HOOKS */
               return -3;
             }
           continue;
@@ -127,7 +151,11 @@ ACE_Registry_ImpExp::import_config (const ACE_TCHAR* filename)
               if (config_.set_string_value (section, name, end))
                 {
                   ACE_OS::fclose (in);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+                  ACE_Allocator::instance()->free(buffer);
+#else
                   delete [] buffer;
+#endif /* ACE_HAS_ALLOC_HOOKS */
                   return -4;
                 }
             }
@@ -140,7 +168,11 @@ ACE_Registry_ImpExp::import_config (const ACE_TCHAR* filename)
                                              static_cast<u_int> (value)))
                 {
                   ACE_OS::fclose (in);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+                  ACE_Allocator::instance()->free(buffer);
+#else
                   delete [] buffer;
+#endif /* ACE_HAS_ALLOC_HOOKS */
                   return -4;
                 }
             }
@@ -152,9 +184,15 @@ ACE_Registry_ImpExp::import_config (const ACE_TCHAR* filename)
               size_t length = string_length / 3;
               size_t remaining = length;
               u_char* data = 0;
+#if defined (ACE_HAS_ALLOC_HOOKS)
+              ACE_ALLOCATOR_RETURN (data,
+                                    static_cast<u_char*> (ACE_Allocator::instance()->malloc(sizeof(u_char) * length)),
+                                    -1);
+#else
               ACE_NEW_RETURN (data,
                               u_char[length],
                               -1);
+#endif /* ACE_HAS_ALLOC_HOOKS */
               u_char* out = data;
               ACE_TCHAR* inb = end + 4;
               ACE_TCHAR* endptr = 0;
@@ -169,12 +207,21 @@ ACE_Registry_ImpExp::import_config (const ACE_TCHAR* filename)
               if (config_.set_binary_value (section, name, data, length))
                 {
                   ACE_OS::fclose (in);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+                  ACE_Allocator::instance()->free(data);
+                  ACE_Allocator::instance()->free(buffer);
+#else
                   delete [] data;
                   delete [] buffer;
+#endif /* ACE_HAS_ALLOC_HOOKS */
                   return -4;
                 }
               else
+#if defined (ACE_HAS_ALLOC_HOOKS)
+                ACE_Allocator::instance()->free(data);
+#else
                 delete [] data;
+#endif /* ACE_HAS_ALLOC_HOOKS */
             }
           else
             {
@@ -192,7 +239,11 @@ ACE_Registry_ImpExp::import_config (const ACE_TCHAR* filename)
           if (rc != 0)
             {
               ACE_OS::fclose (in);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+              ACE_Allocator::instance()->free(buffer);
+#else
               delete [] buffer;
+#endif /* ACE_HAS_ALLOC_HOOKS */
               return rc;
             }
         }             // end if maybe old format
@@ -201,12 +252,20 @@ ACE_Registry_ImpExp::import_config (const ACE_TCHAR* filename)
   if (ferror (in))
     {
       ACE_OS::fclose (in);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_Allocator::instance()->free(buffer);
+#else
       delete [] buffer;
+#endif /* ACE_HAS_ALLOC_HOOKS */
       return -1;
     }
 
   ACE_OS::fclose (in);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(buffer);
+#else
   delete [] buffer;
+#endif /* ACE_HAS_ALLOC_HOOKS */
   return 0;
 }
 
@@ -237,6 +296,21 @@ ACE_Registry_ImpExp::export_config (const ACE_TCHAR* filename)
   return result;
 }
 
+
+#if !defined ACE_USES_WCHAR && defined ACE_LACKS_FPUTS
+# define ACE_WRITE_STRING write_string
+namespace
+{
+  int write_string (const char *string, FILE *stream)
+  {
+    const size_t count = ACE_OS::strlen (string);
+    return (ACE_OS::fwrite (string, 1, count, stream) < count) ? -1 : 0;
+  }
+}
+#else
+# define ACE_WRITE_STRING ACE_OS::fputs
+#endif
+
 // Method provided by derived classes in order to write one section
 // to the file specified.  Called by export_config when exporting
 // the entire configuration object.
@@ -254,7 +328,7 @@ ACE_Registry_ImpExp::export_section (const ACE_Configuration_Section_Key& sectio
       header += path;
       header += ACE_TEXT ("]");
       header += ACE_TEXT ("\n");
-      if (ACE_OS::fputs (header.fast_rep (), out) < 0)
+      if (ACE_WRITE_STRING (header.fast_rep (), out) < 0)
         return -1;
       // Write out each value
       int index = 0;
@@ -276,7 +350,7 @@ ACE_Registry_ImpExp::export_section (const ACE_Configuration_Section_Key& sectio
                 u_int value;
                 if (config_.get_integer_value (section, name.fast_rep (), value))
                   return -2;
-                ACE_OS::sprintf (int_value, ACE_TEXT ("%08x"), value);
+                ACE_OS::snprintf (int_value, 32, ACE_TEXT ("%08x"), value);
                 line += ACE_TEXT ("dword:");
                 line += int_value;
                 break;
@@ -291,11 +365,9 @@ ACE_Registry_ImpExp::export_section (const ACE_Configuration_Section_Key& sectio
                 line += string_value + ACE_TEXT ("\"");
                 break;
               }
-#ifdef _WIN32
+#ifdef ACE_WIN32
             case ACE_Configuration::INVALID:
-              break;  // JDO added break.  Otherwise INVALID is processed
-              // like BINARY. If that's correct, please remove the
-              // break and these comments
+              break;
 #endif
             case ACE_Configuration::BINARY:
               {
@@ -313,19 +385,23 @@ ACE_Registry_ImpExp::export_section (const ACE_Configuration_Section_Key& sectio
                       {
                         line += ACE_TEXT (",");
                       }
-                    ACE_OS::sprintf (bin_value, ACE_TEXT ("%02x"), *ptr);
+                    ACE_OS::snprintf (bin_value, 3, ACE_TEXT ("%02x"), *ptr);
                     line += bin_value;
                     --binary_length;
                     ++ptr;
                   }
+#if defined (ACE_HAS_ALLOC_HOOKS)
+                ACE_Allocator::instance()->free(binary_data);
+#else
                 delete [] (char*) binary_data;
+#endif /* ACE_HAS_ALLOC_HOOKS */
                 break;
               }
             default:
               return -3;
             }
           line += ACE_TEXT ("\n");
-          if (ACE_OS::fputs (line.fast_rep (), out) < 0)
+          if (ACE_WRITE_STRING (line.fast_rep (), out) < 0)
             return -4;
           ++index;
         }
@@ -334,7 +410,6 @@ ACE_Registry_ImpExp::export_section (const ACE_Configuration_Section_Key& sectio
   int index = 0;
   ACE_TString name;
   ACE_Configuration_Section_Key sub_key;
-  ACE_TString sub_section;
   while (!config_.enumerate_sections (section, index, name))
     {
       ACE_TString sub_section (path);
@@ -538,7 +613,7 @@ ACE_Ini_ImpExp::export_section (const ACE_Configuration_Section_Key& section,
       ACE_TString header = ACE_TEXT ("[");
       header += path;
       header += ACE_TEXT ("]\n");
-      if (ACE_OS::fputs (header.fast_rep (), out) < 0)
+      if (ACE_WRITE_STRING (header.fast_rep (), out) < 0)
         return -1;
       // Write out each value
       int index = 0;
@@ -560,7 +635,7 @@ ACE_Ini_ImpExp::export_section (const ACE_Configuration_Section_Key& section,
                 u_int value;
                 if (config_.get_integer_value (section, name.fast_rep (), value))
                   return -2;
-                ACE_OS::sprintf (int_value, ACE_TEXT ("%08x"), value);
+                ACE_OS::snprintf (int_value, 32, ACE_TEXT ("%08x"), value);
                 line += int_value;
                 break;
               }
@@ -595,13 +670,17 @@ ACE_Ini_ImpExp::export_section (const ACE_Configuration_Section_Key& section,
                       {
                         line += ACE_TEXT (",");
                       }
-                    ACE_OS::sprintf (bin_value, ACE_TEXT ("%02x"), *ptr);
+                    ACE_OS::snprintf (bin_value, 3, ACE_TEXT ("%02x"), *ptr);
                     line += bin_value;
                     --binary_length;
                     ++ptr;
                   }
                 line += ACE_TEXT ("\"");
+#if defined (ACE_HAS_ALLOC_HOOKS)
+                ACE_Allocator::instance()->free(binary_data);
+#else
                 delete [] (char *) binary_data;
+#endif /* ACE_HAS_ALLOC_HOOKS */
                 break;
               }
             default:
@@ -610,7 +689,7 @@ ACE_Ini_ImpExp::export_section (const ACE_Configuration_Section_Key& section,
             }// end switch on type
 
           line += ACE_TEXT ("\n");
-          if (ACE_OS::fputs (line.fast_rep (), out) < 0)
+          if (ACE_WRITE_STRING (line.fast_rep (), out) < 0)
             return -4;
           ++index;
         }// end while enumerating values
@@ -619,7 +698,6 @@ ACE_Ini_ImpExp::export_section (const ACE_Configuration_Section_Key& section,
   int index = 0;
   ACE_TString name;
   ACE_Configuration_Section_Key sub_key;
-  ACE_TString sub_section;
   while (!config_.enumerate_sections (section, index, name))
     {
       ACE_TString sub_section (path);

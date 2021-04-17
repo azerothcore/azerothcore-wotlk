@@ -4,7 +4,7 @@
 /**
  *  @file    FILE_Addr.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu>
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu>
  */
 //=============================================================================
 
@@ -31,7 +31,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_FILE_Addr : public ACE_Addr
 {
 public:
-  // = Initialization methods.
   /// Default constructor.
   ACE_FILE_Addr (void);
 

@@ -7,67 +7,64 @@
 #include "DatabaseWorkerPool.h"
 #include "DatabaseEnv.h"
 
-#define MIN_MYSQL_SERVER_VERSION 50600u
-#define MIN_MYSQL_CLIENT_VERSION 50600u
+#define MIN_MYSQL_SERVER_VERSION 50700u
+#define MIN_MYSQL_CLIENT_VERSION 50700u
 
-template <class T>
-DatabaseWorkerPool<T>::DatabaseWorkerPool() :
-_mqueue(new ACE_Message_Queue<ACE_SYNCH>(2*1024*1024, 2*1024*1024)),
-_queue(new ACE_Activation_Queue(_mqueue))
+template <class T> DatabaseWorkerPool<T>::DatabaseWorkerPool() :
+    _mqueue(new ACE_Message_Queue<ACE_SYNCH>(2 * 1024 * 1024, 2 * 1024 * 1024)),
+    _queue(new ACE_Activation_Queue(_mqueue)),
+    _async_threads(0),
+    _synch_threads(0)
 {
     memset(_connectionCount, 0, sizeof(_connectionCount));
     _connections.resize(IDX_SIZE);
 
     WPFatal(mysql_thread_safe(), "Used MySQL library isn't thread-safe.");
-    WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "AzerothCore does not support MySQL versions below 5.6");
+    WPFatal(mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION, "AzerothCore does not support MySQL versions below 5.7");
 }
 
 template <class T>
-bool DatabaseWorkerPool<T>::Open(const std::string& infoString, uint8 async_threads, uint8 synch_threads)
+void DatabaseWorkerPool<T>::SetConnectionInfo(std::string const& infoString,
+        uint8 const asyncThreads, uint8 const synchThreads)
 {
-    bool res = true;
-    _connectionInfo = MySQLConnectionInfo(infoString);
+    _connectionInfo = std::make_unique<MySQLConnectionInfo>(infoString);
 
-    sLog->outSQLDriver("Opening DatabasePool '%s'. Asynchronous connections: %u, synchronous connections: %u.",
-        GetDatabaseName(), async_threads, synch_threads);
+    _async_threads = asyncThreads;
+    _synch_threads = synchThreads;
+}
 
-    //! Open asynchronous connections (delayed operations)
-    _connections[IDX_ASYNC].resize(async_threads);
-    for (uint8 i = 0; i < async_threads; ++i)
+template <class T>
+uint32 DatabaseWorkerPool<T>::Open()
+{
+    WPFatal(_connectionInfo.get(), "Connection info was not set!");
+
+    LOG_INFO("sql.driver", "Opening DatabasePool '%s'. Asynchronous connections: %u, synchronous connections: %u.",
+        GetDatabaseName(), _async_threads, _synch_threads);
+
+    uint32 error = OpenConnections(IDX_ASYNC, _async_threads);
+
+    if (error)
     {
-        T* t = new T(_queue, _connectionInfo);
-        res &= t->Open();
-        if (res) // only check mysql version if connection is valid
-            WPFatal(mysql_get_server_version(t->GetHandle()) >= MIN_MYSQL_SERVER_VERSION, "AzerothCore does not support MySQL versions below 5.6");
-        
-        _connections[IDX_ASYNC][i] = t;
-        ++_connectionCount[IDX_ASYNC];
+        return error;
     }
 
-    //! Open synchronous connections (direct, blocking operations)
-    _connections[IDX_SYNCH].resize(synch_threads);
-    for (uint8 i = 0; i < synch_threads; ++i)
+    error = OpenConnections(IDX_SYNCH, _synch_threads);
+
+    if (!error)
     {
-        T* t = new T(_connectionInfo);
-        res &= t->Open();
-        _connections[IDX_SYNCH][i] = t;
-        ++_connectionCount[IDX_SYNCH];
+        LOG_INFO("sql.driver", "DatabasePool '%s' opened successfully. %u total connections running.",
+            GetDatabaseName(), (_connectionCount[IDX_SYNCH] + _connectionCount[IDX_ASYNC]));
     }
 
-    if (res)
-        sLog->outSQLDriver("DatabasePool '%s' opened successfully. %u total connections running.", GetDatabaseName(),
-            (_connectionCount[IDX_SYNCH] + _connectionCount[IDX_ASYNC]));
-    else
-        sLog->outError("DatabasePool %s NOT opened. There were errors opening the MySQL connections. Check your SQLDriverLogFile "
-            "for specific errors.", GetDatabaseName());
-    
-    return res;
+    LOG_INFO("sql.driver", " ");
+
+    return error;
 }
 
 template <class T>
 void DatabaseWorkerPool<T>::Close()
 {
-    sLog->outSQLDriver("Closing down DatabasePool '%s'.", GetDatabaseName());
+    LOG_INFO("sql.driver", "Closing down DatabasePool '%s'.", GetDatabaseName());
 
     //! Shuts down delaythreads for this connection pool by underlying deactivate().
     //! The next dequeue attempt in the worker thread tasks will result in an error,
@@ -83,7 +80,7 @@ void DatabaseWorkerPool<T>::Close()
         t->Close();         //! Closes the actualy MySQL connection.
     }
 
-    sLog->outSQLDriver("Asynchronous connections on DatabasePool '%s' terminated. Proceeding with synchronous connections.",
+    LOG_INFO("sql.driver", "Asynchronous connections on DatabasePool '%s' terminated. Proceeding with synchronous connections.",
         GetDatabaseName());
 
     //! Shut down the synchronous connections
@@ -97,7 +94,92 @@ void DatabaseWorkerPool<T>::Close()
     delete _queue;
     delete _mqueue;
 
-    sLog->outSQLDriver("All connections on DatabasePool '%s' closed.", GetDatabaseName());
+    LOG_INFO("sql.driver", "All connections on DatabasePool '%s' closed.", GetDatabaseName());
+}
+
+template <class T>
+uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConnections)
+{
+    _connections[type].resize(numConnections);
+    for (uint8 i = 0; i < numConnections; ++i)
+    {
+        T* t;
+
+        if (type == IDX_ASYNC)
+        {
+            t = new T(_queue, *_connectionInfo);
+        }
+        else if (type == IDX_SYNCH)
+        {
+            t = new T(*_connectionInfo);
+        }
+        else
+        {
+            ASSERT(false, "> Incorrect InternalIndex (%u)", static_cast<uint32>(type));
+        }
+
+        _connections[type][i] = t;
+        ++_connectionCount[type];
+
+        uint32 error = t->Open();
+
+        if (!error)
+        {
+            if (mysql_get_server_version(t->GetHandle()) < MIN_MYSQL_SERVER_VERSION)
+            {
+                LOG_ERROR("sql.driver", "Not support MySQL versions below 5.7");
+                error = 1;
+            }
+        }
+
+        // Failed to open a connection or invalid version, abort and cleanup
+        if (error)
+        {
+            while (_connectionCount[type] != 0)
+            {
+                T* t = _connections[type][i--];
+                delete t;
+                --_connectionCount[type];
+            }
+
+            return error;
+        }
+    }
+
+    // Everything is fine
+    return 0;
+}
+
+template <class T>
+bool DatabaseWorkerPool<T>::PrepareStatements()
+{
+    for (uint8 i = 0; i < IDX_SIZE; ++i)
+    {
+        for (uint32 c = 0; c < _connectionCount[i]; ++c)
+        {
+            T* t = _connections[i][c];
+            t->LockIfReady();
+
+            if (!t->PrepareStatements())
+            {
+                t->Unlock();
+                Close();
+                return false;
+            }
+            else
+            {
+                t->Unlock();
+            }
+        }
+    }
+
+    return true;
+}
+
+template <class T>
+char const* DatabaseWorkerPool<T>::GetDatabaseName() const
+{
+    return _connectionInfo->database.c_str();
 }
 
 template <class T>
@@ -150,7 +232,7 @@ QueryResult DatabaseWorkerPool<T>::Query(const char* sql, T* conn /* = nullptr*/
     if (!result || !result->GetRowCount())
     {
         delete result;
-        return QueryResult(NULL);
+        return QueryResult(nullptr);
     }
 
     result->NextRow();
@@ -170,7 +252,7 @@ PreparedQueryResult DatabaseWorkerPool<T>::Query(PreparedStatement* stmt)
     if (!ret || !ret->GetRowCount())
     {
         delete ret;
-        return PreparedQueryResult(NULL);
+        return PreparedQueryResult(nullptr);
     }
 
     return PreparedQueryResult(ret);
@@ -212,22 +294,22 @@ SQLTransaction DatabaseWorkerPool<T>::BeginTransaction()
 template <class T>
 void DatabaseWorkerPool<T>::CommitTransaction(SQLTransaction transaction)
 {
-    #ifdef ACORE_DEBUG
+#ifdef ACORE_DEBUG
     //! Only analyze transaction weaknesses in Debug mode.
     //! Ideally we catch the faults in Debug mode and then correct them,
     //! so there's no need to waste these CPU cycles in Release mode.
     switch (transaction->GetSize())
     {
         case 0:
-            sLog->outSQLDriver("Transaction contains 0 queries. Not executing.");
+            LOG_INFO("sql.driver", "Transaction contains 0 queries. Not executing.");
             return;
         case 1:
-            sLog->outSQLDriver("Warning: Transaction only holds 1 query, consider removing Transaction context in code.");
+            LOG_INFO("sql.driver", "Warning: Transaction only holds 1 query, consider removing Transaction context in code.");
             break;
         default:
             break;
     }
-    #endif // ACORE_DEBUG
+#endif // ACORE_DEBUG
 
     Enqueue(new TransactionTask(transaction));
 }
@@ -263,7 +345,7 @@ void DatabaseWorkerPool<T>::DirectCommitTransaction(SQLTransaction& transaction)
 template <class T>
 void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, PreparedStatement* stmt)
 {
-    if (trans.null())
+    if (!trans)
         Execute(stmt);
     else
         trans->Append(stmt);
@@ -272,7 +354,7 @@ void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, PreparedState
 template <class T>
 void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, const char* sql)
 {
-    if (trans.null())
+    if (!trans)
         Execute(sql);
     else
         trans->Append(sql);
@@ -311,7 +393,7 @@ T* DatabaseWorkerPool<T>::GetFreeConnection()
     uint8 i = 0;
     size_t num_cons = _connectionCount[IDX_SYNCH];
     T* t = nullptr;
-    
+
     //! Block forever until a connection is free
     for (;;)
     {

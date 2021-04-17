@@ -22,10 +22,10 @@ Without it, the party doing random dungeon won't get satchel of spoils and
 gets instead the deserter debuff.
 */
 
-#include "ScriptMgr.h"
 #include "Creature.h"
 #include "InstanceScript.h"
 #include "Map.h"
+#include "ScriptMgr.h"
 #include "the_slave_pens.h"
 
 class instance_the_slave_pens : public InstanceMapScript
@@ -39,7 +39,7 @@ public:
         {
             counter = DATA_FLAMECALLER_000;
         }
-        
+
         void Load(char const* /*data*/) override { LoadBossState(DataHeader); }
 
         void OnCreatureCreate(Creature* creature) override

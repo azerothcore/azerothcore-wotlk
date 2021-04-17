@@ -90,6 +90,9 @@ public:
    */
   ~ACE_Vector ();
 
+  /// Declare the dynamic allocation hooks.
+  ACE_ALLOC_HOOK_DECLARE;
+
   /**
    * Returns the current vector capacity, that is, the currently
    * allocated buffer size.
@@ -185,6 +188,16 @@ public:
 
   void swap (ACE_Vector &rhs);
 
+  /*
+   * Implement our own end functions because Array_Base's end functions use the
+   * current capacity, not the Vector's actual element count!
+   */
+  /// C++ Standard End Iterator
+  ///{
+  typename ACE_Array_Base<T>::iterator end ();
+  typename ACE_Array_Base<T>::const_iterator end () const;
+  ///}
+
 protected:
 
   /**
@@ -213,7 +226,6 @@ template <class T, size_t DEFAULT_SIZE = ACE_VECTOR_DEFAULT_SIZE>
 class ACE_Vector_Iterator
 {
 public:
-  // = Initialization method.
   ACE_Vector_Iterator (ACE_Vector<T, DEFAULT_SIZE> &);
 
   // = Iteration methods.

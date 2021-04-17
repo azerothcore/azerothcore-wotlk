@@ -1,6 +1,9 @@
 #include "ace/Process_Semaphore.h"
 #include "ace/Log_Category.h"
 #include "ace/OS_Memory.h"
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 #if !defined (__ACE_INLINE__)
 #include "ace/Process_Semaphore.inl"
@@ -11,6 +14,8 @@
 
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
+
+ACE_ALLOC_HOOK_DEFINE(ACE_Process_Semaphore)
 
 void
 ACE_Process_Semaphore::dump (void) const

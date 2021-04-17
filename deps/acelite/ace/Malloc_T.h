@@ -4,7 +4,7 @@
 /**
  *  @file    Malloc_T.h
  *
- *  @author Douglas C. Schmidt <schmidt@cs.wustl.edu> and
+ *  @author Douglas C. Schmidt <d.schmidt@vanderbilt.edu> and
  *          Irfan Pyarali <irfan@cs.wustl.edu>
  */
 //==========================================================================
@@ -50,6 +50,8 @@ public:
 
   /// Set the next ACE_Cached_Mem_Pool_Node.
   void set_next (ACE_Cached_Mem_Pool_Node<T> *ptr);
+
+  ACE_ALLOC_HOOK_DECLARE;
 
 private:
   /**
@@ -118,6 +120,8 @@ public:
 
   /// Return the number of chunks available in the cache.
   size_t pool_depth (void);
+
+  ACE_ALLOC_HOOK_DECLARE;
 
 private:
   /// Remember how we allocate the memory in the first place so
@@ -344,6 +348,8 @@ public:
   /// Dump the state of the object.
   virtual void dump (void) const;
 
+  ACE_ALLOC_HOOK_DECLARE;
+
 private:
   /// ALLOCATOR instance, which is owned by the adapter.
   ALLOCATOR allocator_;
@@ -436,7 +442,6 @@ public:
   typedef typename ACE_CB::ACE_Name_Node NAME_NODE;
   typedef typename ACE_CB::ACE_Malloc_Header MALLOC_HEADER;
 
-  // = Initialization and termination methods.
   /**
    * Initialize ACE_Malloc.  This constructor passes @a pool_name to
    * initialize the memory pool, and uses ACE::basename() to
@@ -692,7 +697,6 @@ public:
   typedef typename ACE_CB::ACE_Name_Node NAME_NODE;
   typedef typename ACE_CB::ACE_Malloc_Header MALLOC_HEADER;
 
-  // = Initialization method.
   /// If @a name = 0 it will iterate through everything else only
   /// through those entries whose @a name match.
   ACE_Malloc_LIFO_Iterator_T (ACE_Malloc_T<ACE_MEM_POOL_2, ACE_LOCK, ACE_CB> &malloc,
@@ -819,7 +823,6 @@ template <ACE_MEM_POOL_1, class ACE_LOCK>
 class ACE_Malloc : public ACE_Malloc_T<ACE_MEM_POOL_2, ACE_LOCK, ACE_Control_Block>
 {
 public:
-  // = Initialization and termination methods.
   /**
    * Initialize ACE_Malloc.  This constructor passes @a pool_name to
    * initialize the memory pool, and uses ACE::basename() to
