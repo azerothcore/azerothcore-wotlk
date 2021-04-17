@@ -5,6 +5,9 @@
 #include "ace/OS_NS_errno.h"
 #include "ace/os_include/net/os_if.h"
 #include "ace/os_include/arpa/os_inet.h"
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
 
 #if defined (ACE_LINUX) && defined (ACE_HAS_IPV6)
 #include "ace/OS_NS_sys_socket.h"
@@ -145,7 +148,11 @@ ACE_SOCK_Dgram_Mcast::~ACE_SOCK_Dgram_Mcast (void)
   ACE_TRACE ("ACE_SOCK_Dgram_Mcast::~ACE_SOCK_Dgram_Mcast");
 
   // Free memory and optionally unsubscribe from currently subscribed group(s).
+#if defined (ACE_HAS_ALLOC_HOOKS)
+  ACE_Allocator::instance()->free(this->send_net_if_);
+#else
   delete [] this->send_net_if_;
+#endif /* ACE_HAS_ALLOC_HOOKS */
   this->clear_subs_list ();
 }
 
@@ -241,8 +248,11 @@ ACE_SOCK_Dgram_Mcast::open_i (const ACE_INET_Addr &mcast_addr,
     {
       if (this->set_nic (net_if, mcast_addr.get_type ()))
         return -1;
-
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      this->send_net_if_ = static_cast<ACE_TCHAR*>(ACE_Allocator::instance()->malloc(sizeof(ACE_TCHAR) * (ACE_OS::strlen (net_if) + 1)));
+#else
       this->send_net_if_ = new ACE_TCHAR[ACE_OS::strlen (net_if) + 1];
+#endif /* ACE_HAS_ALLOC_HOOKS */
       ACE_OS::strcpy (this->send_net_if_, net_if);
     }
 

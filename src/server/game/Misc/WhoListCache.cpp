@@ -1,8 +1,8 @@
-#include "WhoListCache.h"
-#include "World.h"
+#include "GuildMgr.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
-#include "GuildMgr.h"
+#include "WhoListCache.h"
+#include "World.h"
 
 std::vector<WhoListPlayerInfo> WhoListCacheMgr::m_whoOpcodeList;
 
@@ -10,9 +10,9 @@ void WhoListCacheMgr::Update()
 {
     // clear current list
     m_whoOpcodeList.clear();
-    m_whoOpcodeList.reserve(sWorld->GetPlayerCount()+1);
+    m_whoOpcodeList.reserve(sWorld->GetPlayerCount() + 1);
 
-    ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
+    std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
     HashMapHolder<Player>::MapType const& m = sObjectAccessor->GetPlayers();
     for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
     {

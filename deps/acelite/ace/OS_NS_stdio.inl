@@ -13,6 +13,14 @@
 #  include <trio.h>
 #endif /* ACE_HAS_TRIO */
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
+#ifdef ACE_MQX
+#  include "ace/MQX_Filesystem.h"
+#endif
+
 /*****************************************************************************/
 
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
@@ -166,8 +174,13 @@ ACE_OS::flock_destroy (ACE_OS::ace_flock_t *lock,
         {
           if (unlink_file)
             ACE_OS::unlink (lock->lockname_);
+#if defined (ACE_HAS_ALLOC_HOOKS)
+          ACE_Allocator::instance()->free (
+            static_cast<void *> (const_cast<ACE_TCHAR *> (lock->lockname_)));
+#else
           ACE_OS::free (
             static_cast<void *> (const_cast<ACE_TCHAR *> (lock->lockname_)));
+#endif /* ACE_HAS_ALLOC_HOOKS */
         }
       lock->lockname_ = 0;
     }
@@ -372,7 +385,10 @@ ACE_OS::cuserid (char *user, size_t maxlen)
     return user;
 #elif defined (ACE_HAS_ALT_CUSERID)
 #  if defined (ACE_LACKS_PWD_FUNCTIONS)
-#    error Cannot use alternate cuserid() without POSIX password functions!
+  ACE_UNUSED_ARG (user);
+  ACE_UNUSED_ARG (maxlen);
+  ACE_NOTSUP_RETURN (0);
+  //#    error Cannot use alternate cuserid() without POSIX password functions!
 #  endif  /* ACE_LACKS_PWD_FUNCTIONS */
 
   // POSIX.1 dropped the cuserid() function.
@@ -543,28 +559,52 @@ ACE_OS::fflush (FILE *fp)
 }
 
 ACE_INLINE int
-ACE_OS::fgetc (FILE* fp)
+ACE_OS::fgetc (FILE *fp)
 {
   return ace_fgetc_helper (fp);
 }
 
 ACE_INLINE int
-ACE_OS::getc (FILE* fp)
+ACE_OS::getc (FILE *fp)
 {
+#ifdef ACE_LACKS_GETC
+  ACE_UNUSED_ARG (fp);
+  ACE_NOTSUP_RETURN (-1);
+#else
   return ace_getc_helper (fp);
+#endif
 }
 
 ACE_INLINE int
-ACE_OS::fgetpos (FILE* fp, fpos_t* pos)
+ACE_OS::fgetpos (FILE *fp, fpos_t *pos)
 {
+#ifdef ACE_LACKS_FGETPOS
+  ACE_UNUSED_ARG (fp);
+  ACE_UNUSED_ARG (pos);
+  ACE_NOTSUP_RETURN (-1);
+#else
   ACE_OSCALL_RETURN (ACE_STD_NAMESPACE::fgetpos (fp, pos), int, -1);
+#endif
 }
 
 ACE_INLINE char *
 ACE_OS::fgets (char *buf, int size, FILE *fp)
 {
   ACE_OS_TRACE ("ACE_OS::fgets");
+#if defined (ACE_LACKS_FGETS)
+  char *iter = buf;
+  int c = EOF;
+  for (int i = 0; i < size - 1 && c != '\n'; ++i)
+    {
+      c = ACE_STD_NAMESPACE::fgetc (fp);
+      if (c != EOF)
+        *iter++ = static_cast<char> (c);
+    }
+  *iter = '\0';
+  return c == EOF ? 0 : buf;
+#else
   ACE_OSCALL_RETURN (ACE_STD_NAMESPACE::fgets (buf, size, fp), char *, 0);
+#endif /* ACE_LACKS_FGETS */
 }
 
 #if defined (ACE_HAS_WCHAR) && !defined(ACE_LACKS_FGETWS)
@@ -643,26 +683,50 @@ ACE_OS::fopen (const wchar_t *filename, const char *mode)
 ACE_INLINE int
 ACE_OS::ungetc (int c, FILE *fp)
 {
+#ifdef ACE_LACKS_UNGETC
+  ACE_UNUSED_ARG (c);
+  ACE_UNUSED_ARG (fp);
+  ACE_NOTSUP_RETURN (-1);
+#else
   return ace_ungetc_helper (c, fp);
+#endif
 }
 
 ACE_INLINE int
 ACE_OS::fputc (int c, FILE *fp)
 {
+#ifdef ACE_LACKS_FPUTC
+  ACE_UNUSED_ARG (c);
+  ACE_UNUSED_ARG (fp);
+  ACE_NOTSUP_RETURN (-1);
+#else
   return ace_fputc_helper (c, fp);
+#endif
 }
 
 ACE_INLINE int
 ACE_OS::putc (int c, FILE *fp)
 {
+#ifdef ACE_LACKS_PUTC
+  ACE_UNUSED_ARG (c);
+  ACE_UNUSED_ARG (fp);
+  ACE_NOTSUP_RETURN (-1);
+#else
   return ace_putc_helper (c, fp);
+#endif
 }
 
 ACE_INLINE int
 ACE_OS::fputs (const char *s, FILE *stream)
 {
   ACE_OS_TRACE ("ACE_OS::fputs");
+#ifdef ACE_LACKS_FPUTS
+  ACE_UNUSED_ARG (s);
+  ACE_UNUSED_ARG (stream);
+  ACE_NOTSUP_RETURN (-1);
+#else
   ACE_OSCALL_RETURN (ACE_STD_NAMESPACE::fputs (s, stream), int, -1);
+#endif
 }
 
 #if defined (ACE_HAS_WCHAR) && !defined(ACE_LACKS_FPUTWS)
@@ -692,6 +756,11 @@ ACE_OS::freopen (const ACE_TCHAR *filename, const ACE_TCHAR *mode, FILE* stream)
                                   ACE_TEXT_ALWAYS_WCHAR (mode),
                                   stream),
                      FILE *, 0);
+#elif defined (ACE_LACKS_FREOPEN)
+  ACE_UNUSED_ARG (filename);
+  ACE_UNUSED_ARG (mode);
+  ACE_UNUSED_ARG (stream);
+  ACE_NOTSUP_RETURN (0);
 #else
   ACE_OSCALL_RETURN
     (ACE_STD_NAMESPACE::freopen (ACE_TEXT_ALWAYS_CHAR (filename),
@@ -704,8 +773,8 @@ ACE_OS::freopen (const ACE_TCHAR *filename, const ACE_TCHAR *mode, FILE* stream)
 ACE_INLINE int
 ACE_OS::fseek (FILE *fp, long offset, int whence)
 {
-# if defined (ACE_WIN32)
-#   if SEEK_SET != FILE_BEGIN || SEEK_CUR != FILE_CURRENT || SEEK_END != FILE_END
+#if defined (ACE_WIN32)
+# if SEEK_SET != FILE_BEGIN || SEEK_CUR != FILE_CURRENT || SEEK_END != FILE_END
   //#error Windows NT is evil AND rude!
   switch (whence)
     {
@@ -722,15 +791,21 @@ ACE_OS::fseek (FILE *fp, long offset, int whence)
       errno = EINVAL;
       return -1; // rather safe than sorry
     }
-#   endif  /* SEEK_SET != FILE_BEGIN || SEEK_CUR != FILE_CURRENT || SEEK_END != FILE_END */
-# endif   /* ACE_WIN32 */
+# endif  /* SEEK_SET != FILE_BEGIN || SEEK_CUR != FILE_CURRENT || SEEK_END != FILE_END */
+#endif   /* ACE_WIN32 */
   ACE_OSCALL_RETURN (ACE_STD_NAMESPACE::fseek (fp, offset, whence), int, -1);
 }
 
 ACE_INLINE int
 ACE_OS::fsetpos (FILE* fp, fpos_t* pos)
 {
+#if defined (ACE_LACKS_FSETPOS)
+  ACE_UNUSED_ARG (fp);
+  ACE_UNUSED_ARG (pos);
+  ACE_NOTSUP_RETURN (-1);
+#else
   ACE_OSCALL_RETURN (::fsetpos (fp, pos), int, -1);
+#endif /* ACE_LACKS_FSETPOS */
 }
 
 ACE_INLINE long
@@ -779,7 +854,12 @@ ACE_INLINE int
 ACE_OS::puts (const char *s)
 {
   ACE_OS_TRACE ("ACE_OS::puts");
+#if defined (ACE_LACKS_PUTS)
+  ACE_UNUSED_ARG (s);
+  ACE_NOTSUP_RETURN (-1);
+#else
   ACE_OSCALL_RETURN (::puts (s), int, -1);
+#endif /* ACE_LACKS_PUTS */
 }
 
 #if defined (ACE_HAS_WCHAR)
@@ -802,7 +882,12 @@ ACE_OS::rename (const char *old_name,
                 const char *new_name,
                 int flags)
 {
-# if defined (ACE_HAS_WINCE)
+# if defined (ACE_LACKS_RENAME)
+  ACE_UNUSED_ARG (old_name);
+  ACE_UNUSED_ARG (new_name);
+  ACE_UNUSED_ARG (flags);
+  ACE_NOTSUP_RETURN (-1);
+# elif defined (ACE_HAS_WINCE)
   // Win CE is always wide-char.
   ACE_UNUSED_ARG (flags);
   if (0 == ::MoveFile (ACE_TEXT_CHAR_TO_TCHAR (old_name),
@@ -819,6 +904,8 @@ ACE_OS::rename (const char *old_name,
   if (::MoveFileExA (old_name, new_name, flags) == 0)
     ACE_FAIL_RETURN (-1);
   return 0;
+#elif defined (ACE_RENAME_EQUIVALENT)
+  ACE_OSCALL_RETURN (ACE_RENAME_EQUIVALENT (old_name, new_name), int, -1);
 # else
   ACE_UNUSED_ARG (flags);
   ACE_OSCALL_RETURN (::rename (old_name, new_name), int, -1);
@@ -831,7 +918,12 @@ ACE_OS::rename (const wchar_t *old_name,
                 const wchar_t *new_name,
                 int flags)
 {
-# if defined (ACE_HAS_WINCE)
+# if defined (ACE_LACKS_RENAME)
+  ACE_UNUSED_ARG (old_name);
+  ACE_UNUSED_ARG (new_name);
+  ACE_UNUSED_ARG (flags);
+  ACE_NOTSUP_RETURN (-1);
+# elif defined (ACE_HAS_WINCE)
   ACE_UNUSED_ARG (flags);
   if (::MoveFileW (old_name, new_name) == 0)
     ACE_FAIL_RETURN (-1);
@@ -860,9 +952,13 @@ ACE_OS::rename (const wchar_t *old_name,
 ACE_INLINE void
 ACE_OS::rewind (FILE *fp)
 {
-#if !defined (ACE_HAS_WINCE)
+#if !defined (ACE_HAS_WINCE) && !defined (ACE_MQX)
   ACE_OS_TRACE ("ACE_OS::rewind");
+# if defined (ACE_LACKS_REWIND)
+  ACE_UNUSED_ARG (fp);
+# else
   ::rewind (fp);
+# endif /* ACE_LACKS_REWIND */
 #else
   // This isn't perfect since it doesn't reset EOF, but it's probably
   // the closest we can get on WINCE.
@@ -881,6 +977,8 @@ ACE_OS::tempnam (const char *dir, const char *pfx)
   ACE_NOTSUP_RETURN (0);
 #elif defined (ACE_HAS_NONCONST_TEMPNAM)
   ACE_OSCALL_RETURN (ACE_STD_NAMESPACE::tempnam (const_cast <char *> (dir), const_cast<char *> (pfx)), char *, 0);
+#elif defined (ACE_TEMPNAM_EQUIVALENT)
+  ACE_OSCALL_RETURN (ACE_TEMPNAM_EQUIVALENT (dir, pfx), char *, 0);
 #else /* ACE_LACKS_TEMPNAM */
   ACE_OSCALL_RETURN (ACE_STD_NAMESPACE::tempnam (dir, pfx), char *, 0);
 #endif /* ACE_LACKS_TEMPNAM */
@@ -929,6 +1027,11 @@ ACE_OS::vasprintf (char **bufp, const char* format, va_list argptr)
 {
 #if defined (ACE_HAS_VASPRINTF)
   return ::vasprintf (bufp, format, argptr);
+#elif defined (ACE_LACKS_VA_COPY)
+  ACE_UNUSED_ARG (bufp);
+  ACE_UNUSED_ARG (format);
+  ACE_UNUSED_ARG (argptr);
+  ACE_NOTSUP_RETURN (-1);
 #else
   return ACE_OS::vasprintf_emulation (bufp, format, argptr);
 #endif /* ACE_HAS_VASPRINTF */
@@ -940,6 +1043,11 @@ ACE_OS::vasprintf (wchar_t **bufp, const wchar_t* format, va_list argptr)
 {
 #if defined (ACE_HAS_VASWPRINTF)
   return ::vaswprintf (bufp, format, argptr);
+#elif defined (ACE_LACKS_VA_COPY)
+  ACE_UNUSED_ARG (bufp);
+  ACE_UNUSED_ARG (format);
+  ACE_UNUSED_ARG (argptr);
+  ACE_NOTSUP_RETURN (-1);
 #else
   return ACE_OS::vaswprintf_emulation (bufp, format, argptr);
 #endif /* ACE_HAS_VASWPRINTF */
@@ -949,7 +1057,13 @@ ACE_OS::vasprintf (wchar_t **bufp, const wchar_t* format, va_list argptr)
 ACE_INLINE int
 ACE_OS::vprintf (const char *format, va_list argptr)
 {
+#if defined (ACE_LACKS_VPRINTF)
+  ACE_UNUSED_ARG (format);
+  ACE_UNUSED_ARG (argptr);
+  ACE_NOTSUP_RETURN (-1);
+#else
   return ::vprintf (format, argptr);
+#endif /* ACE_LACKS_VPRINTF */
 }
 
 #if defined (ACE_HAS_WCHAR)
@@ -969,7 +1083,14 @@ ACE_OS::vprintf (const wchar_t *format, va_list argptr)
 ACE_INLINE int
 ACE_OS::vfprintf (FILE *fp, const char *format, va_list argptr)
 {
+#ifdef ACE_LACKS_VFPRINTF
+  ACE_UNUSED_ARG (fp);
+  ACE_UNUSED_ARG (format);
+  ACE_UNUSED_ARG (argptr);
+  ACE_NOTSUP_RETURN (-1);
+#else
   return ACE_STD_NAMESPACE::vfprintf (fp, format, argptr);
+#endif
 }
 
 #if defined (ACE_HAS_WCHAR)
@@ -990,7 +1111,14 @@ ACE_OS::vfprintf (FILE *fp, const wchar_t *format, va_list argptr)
 ACE_INLINE int
 ACE_OS::vsprintf (char *buffer, const char *format, va_list argptr)
 {
+#ifdef ACE_LACKS_VSPRINTF
+  ACE_UNUSED_ARG (buffer);
+  ACE_UNUSED_ARG (format);
+  ACE_UNUSED_ARG (argptr);
+  ACE_NOTSUP_RETURN (-1);
+#else
   return ::vsprintf (buffer, format, argptr);
+#endif /* ACE_LACKS_VSPRINTF */
 }
 
 #if defined (ACE_HAS_WCHAR)
@@ -1066,6 +1194,8 @@ ACE_OS::vsnprintf (char *buffer, size_t maxlen, const char *format, va_list ap)
   return result;
 #elif defined (ACE_HAS_TRIO)
   return trio_vsnprintf (buffer, maxlen, format, ap);
+#elif defined (ACE_HAS_VSNPRINTF_EMULATION)
+  return vsnprintf_emulation (buffer, maxlen, format, ap);
 #else
   ACE_UNUSED_ARG (buffer);
   ACE_UNUSED_ARG (maxlen);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -15,8 +15,8 @@ EndScriptData */
 #include "Chat.h"
 #include "Language.h"
 #include "ObjectAccessor.h"
-#include "Player.h"
 #include "Pet.h"
+#include "Player.h"
 #include "ScriptMgr.h"
 
 class reset_commandscript : public CommandScript
@@ -28,7 +28,7 @@ public:
     {
         static std::vector<ChatCommand> resetCommandTable =
         {
-            { "achievements",   SEC_ADMINISTRATOR,  true,  &HandleResetAchievementsCommand,     "" },
+            { "achievements",   SEC_CONSOLE,        true,  &HandleResetAchievementsCommand,     "" },
             { "honor",          SEC_ADMINISTRATOR,  true,  &HandleResetHonorCommand,            "" },
             { "level",          SEC_ADMINISTRATOR,  true,  &HandleResetLevelCommand,            "" },
             { "spells",         SEC_ADMINISTRATOR,  true,  &HandleResetSpellsCommand,           "" },
@@ -79,7 +79,7 @@ public:
         ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(player->getClass());
         if (!classEntry)
         {
-            sLog->outError("Class %u not found in DBC (Wrong DBC files?)", player->getClass());
+            LOG_ERROR("server", "Class %u not found in DBC (Wrong DBC files?)", player->getClass());
             return false;
         }
 
@@ -99,7 +99,7 @@ public:
 
         player->SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP);
 
-        player->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+        player->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
         //-1 is default value
         player->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, uint32(-1));
@@ -119,8 +119,8 @@ public:
 
         // set starting level
         uint32 startLevel = target->getClass() != CLASS_DEATH_KNIGHT
-            ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
-            : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
+                            ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
+                            : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
 
         target->_ApplyAllLevelScaleItemMods(false);
         target->SetLevel(startLevel);
@@ -271,7 +271,7 @@ public:
             atLogin = AtLoginFlags(AT_LOGIN_RESET_TALENTS | AT_LOGIN_RESET_PET_TALENTS);
             sWorld->SendWorldText(LANG_RESETALL_TALENTS);
             if (!handler->GetSession())
-               handler->SendSysMessage(LANG_RESETALL_TALENTS);
+                handler->SendSysMessage(LANG_RESETALL_TALENTS);
         }
         else
         {
@@ -284,7 +284,7 @@ public:
         stmt->setUInt16(0, uint16(atLogin));
         CharacterDatabase.Execute(stmt);
 
-        ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
+        std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
         HashMapHolder<Player>::MapType const& plist = sObjectAccessor->GetPlayers();
         for (HashMapHolder<Player>::MapType::const_iterator itr = plist.begin(); itr != plist.end(); ++itr)
             itr->second->SetAtLoginFlag(atLogin);

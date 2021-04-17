@@ -46,7 +46,6 @@ ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 class ACE_Export ACE_CE_Screen_Output : public ACE_Log_Msg_Callback
 {
 public:
-
   ACE_CE_Screen_Output (HWND hEdit);
 
   ACE_CE_Screen_Output (void);
@@ -89,11 +88,9 @@ public:
   ACE_CE_Screen_Output& operator << (FILE* pFile);
 
 private:
-
   ACE_CE_Screen_Output (ACE_CE_Screen_Output&);
 
 private:
-
   HWND handler_;
 
   /// FILE pointer that used to save output to file.  This class does

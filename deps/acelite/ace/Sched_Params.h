@@ -71,7 +71,6 @@ class ACE_Export ACE_Sched_Params
 public:
   typedef int Policy;
 
-  // = Initialization and termination methods.
   /// Constructor.
   ACE_Sched_Params (const Policy policy,
                     const ACE_Sched_Priority priority,

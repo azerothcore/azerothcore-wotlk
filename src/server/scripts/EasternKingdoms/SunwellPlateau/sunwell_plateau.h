@@ -5,11 +5,13 @@
 #ifndef SUNWELL_PLATEAU_H
 #define SUNWELL_PLATEAU_H
 
-#include "Player.h"
-#include "SpellScript.h"
-#include "PassiveAI.h"
-#include "SpellAuraEffects.h"
 #include "CreatureAIImpl.h"
+#include "PassiveAI.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+
+#define SWPScriptName "instance_sunwell_plateau"
 
 enum DataTypes
 {
@@ -53,7 +55,6 @@ enum CreatureIds
     NPC_VOID_SENTINEL                       = 25772,
     NPC_VOID_SPAWN                          = 25824,
 
-    
     NPC_KILJAEDEN_CONTROLLER                = 25608,
     NPC_KILJAEDEN                           = 25315,
     NPC_ANVEENA                             = 26046,
@@ -86,5 +87,11 @@ enum SpellIds
 {
     SPELL_SUNWELL_RADIANCE                  = 45769,
 };
+
+template <class AI, class T>
+inline AI* GetSunwellPlateauAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, SWPScriptName);
+}
 
 #endif // SUNWELL_PLATEAU_H

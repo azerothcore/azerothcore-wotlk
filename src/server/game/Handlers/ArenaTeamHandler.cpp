@@ -1,32 +1,32 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "ArenaTeam.h"
+#include "ArenaTeamMgr.h"
+#include "BattlegroundMgr.h"
+#include "DatabaseEnv.h"
+#include "Log.h"
+#include "ObjectMgr.h"
+#include "Opcodes.h"
 #include "Player.h"
+#include "SocialMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "DatabaseEnv.h"
 
-#include "ArenaTeam.h"
-#include "Log.h"
-#include "ObjectMgr.h"
-#include "SocialMgr.h"
-#include "ArenaTeamMgr.h"
-#include "Opcodes.h"
-
-void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket & recvData)
+void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "MSG_INSPECT_ARENA_TEAMS");
+    LOG_DEBUG("network", "MSG_INSPECT_ARENA_TEAMS");
 #endif
 
     uint64 guid;
     recvData >> guid;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Inspect Arena stats (GUID: %u TypeId: %u)", GUID_LOPART(guid), GuidHigh2TypeId(GUID_HIPART(guid)));
+    LOG_DEBUG("network", "Inspect Arena stats (GUID: %u TypeId: %u)", GUID_LOPART(guid), GuidHigh2TypeId(GUID_HIPART(guid)));
 #endif
 
     if (Player* player = ObjectAccessor::FindPlayer(guid))
@@ -42,10 +42,10 @@ void WorldSession::HandleInspectArenaTeamsOpcode(WorldPacket & recvData)
     }
 }
 
-void WorldSession::HandleArenaTeamQueryOpcode(WorldPacket & recvData)
+void WorldSession::HandleArenaTeamQueryOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ARENA_TEAM_QUERY");
+    LOG_DEBUG("network", "WORLD: Received CMSG_ARENA_TEAM_QUERY");
 #endif
 
     uint32 arenaTeamId;
@@ -58,10 +58,10 @@ void WorldSession::HandleArenaTeamQueryOpcode(WorldPacket & recvData)
     }
 }
 
-void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recvData)
+void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ARENA_TEAM_ROSTER");
+    LOG_DEBUG("network", "WORLD: Received CMSG_ARENA_TEAM_ROSTER");
 #endif
 
     uint32 arenaTeamId;                                     // arena team id
@@ -71,16 +71,16 @@ void WorldSession::HandleArenaTeamRosterOpcode(WorldPacket & recvData)
         arenaTeam->Roster(this);
 }
 
-void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket & recvData)
+void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_INVITE");
+    LOG_DEBUG("network", "CMSG_ARENA_TEAM_INVITE");
 #endif
 
     uint32 arenaTeamId;                                     // arena team id
     std::string invitedName;
 
-    Player* player = NULL;
+    Player* player = nullptr;
 
     recvData >> arenaTeamId >> invitedName;
 
@@ -146,25 +146,25 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket & recvData)
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Player %s Invited %s to Join his ArenaTeam", GetPlayer()->GetName().c_str(), invitedName.c_str());
+    LOG_DEBUG("bg.battleground", "Player %s Invited %s to Join his ArenaTeam", GetPlayer()->GetName().c_str(), invitedName.c_str());
 #endif
 
     player->SetArenaTeamIdInvited(arenaTeam->GetId());
 
-    WorldPacket data(SMSG_ARENA_TEAM_INVITE, (8+10));
+    WorldPacket data(SMSG_ARENA_TEAM_INVITE, (8 + 10));
     data << GetPlayer()->GetName();
     data << arenaTeam->GetName();
     player->GetSession()->SendPacket(&data);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_ARENA_TEAM_INVITE");
+    LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_INVITE");
 #endif
 }
 
-void WorldSession::HandleArenaTeamAcceptOpcode(WorldPacket & /*recvData*/)
+void WorldSession::HandleArenaTeamAcceptOpcode(WorldPacket& /*recvData*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_ACCEPT");                // empty opcode
+    LOG_DEBUG("network", "CMSG_ARENA_TEAM_ACCEPT");                // empty opcode
 #endif
 
     ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(_player->GetArenaTeamIdInvited());
@@ -196,20 +196,20 @@ void WorldSession::HandleArenaTeamAcceptOpcode(WorldPacket & /*recvData*/)
     arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_JOIN_SS, _player->GetGUID(), 2, _player->GetName().c_str(), arenaTeam->GetName(), "");
 }
 
-void WorldSession::HandleArenaTeamDeclineOpcode(WorldPacket & /*recvData*/)
+void WorldSession::HandleArenaTeamDeclineOpcode(WorldPacket& /*recvData*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_DECLINE");               // empty opcode
+    LOG_DEBUG("network", "CMSG_ARENA_TEAM_DECLINE");               // empty opcode
 #endif
 
     // Remove invite from player
     _player->SetArenaTeamIdInvited(0);
 }
 
-void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket & recvData)
+void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_LEAVE");
+    LOG_DEBUG("network", "CMSG_ARENA_TEAM_LEAVE");
 #endif
 
     uint32 arenaTeamId;
@@ -222,7 +222,7 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket & recvData)
     // Disallow leave team while in arena
     if (arenaTeam->IsFighting())
     {
-        SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, "", "", ERR_ARENA_TEAM_INTERNAL);
+        SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, "", "", ERR_ARENA_TEAMS_LOCKED);
         return;
     }
 
@@ -231,6 +231,21 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket & recvData)
     {
         SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, "", "", ERR_ARENA_TEAM_LEADER_LEAVE_S);
         return;
+    }
+
+    // Player cannot be removed during queues
+    if (BattlegroundQueueTypeId bgQueue = BattlegroundMgr::BGQueueTypeId(BATTLEGROUND_AA, arenaTeam->GetType()))
+    {
+        GroupQueueInfo ginfo;
+        BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
+        if (queue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
+        {
+            if (ginfo.IsInvitedToBGInstanceGUID)
+            {
+                SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, "", "", ERR_ARENA_TEAMS_LOCKED);
+                return;
+            }
+        }
     }
 
     // If team consists only of the captain, disband the team
@@ -250,10 +265,10 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket & recvData)
     SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, arenaTeam->GetName(), "", 0);
 }
 
-void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket & recvData)
+void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_DISBAND");
+    LOG_DEBUG("network", "CMSG_ARENA_TEAM_DISBAND");
 #endif
 
     uint32 arenaTeamId;
@@ -265,6 +280,16 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket & recvData)
         if (arenaTeam->GetCaptain() != _player->GetGUID())
             return;
 
+        // Teams cannot be disbanded during queues
+        if (BattlegroundQueueTypeId bgQueue = BattlegroundMgr::BGQueueTypeId(BATTLEGROUND_AA, arenaTeam->GetType()))
+        {
+            GroupQueueInfo ginfo;
+            BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
+            if (queue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
+                if (ginfo.IsInvitedToBGInstanceGUID)
+                    return;
+        }
+
         // Teams cannot be disbanded during fights
         if (arenaTeam->IsFighting())
             return;
@@ -274,10 +299,10 @@ void WorldSession::HandleArenaTeamDisbandOpcode(WorldPacket & recvData)
     }
 }
 
-void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket & recvData)
+void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_REMOVE");
+    LOG_DEBUG("network", "CMSG_ARENA_TEAM_REMOVE");
 #endif
 
     uint32 arenaTeamId;
@@ -316,6 +341,21 @@ void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket & recvData)
         return;
     }
 
+    // Team member cannot be removed during queues
+    if (BattlegroundQueueTypeId bgQueue = BattlegroundMgr::BGQueueTypeId(BATTLEGROUND_AA, arenaTeam->GetType()))
+    {
+        GroupQueueInfo ginfo;
+        BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueue);
+        if (queue.GetPlayerGroupInfoData(_player->GetGUID(), &ginfo))
+        {
+            if (ginfo.IsInvitedToBGInstanceGUID)
+            {
+                SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, "", "", ERR_ARENA_TEAMS_LOCKED);
+                return;
+            }
+        }
+    }
+
     // Player cannot be removed during fights
     if (arenaTeam->IsFighting())
         return;
@@ -326,10 +366,10 @@ void WorldSession::HandleArenaTeamRemoveOpcode(WorldPacket & recvData)
     arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_REMOVE_SSS, 0, 3, name, arenaTeam->GetName(), _player->GetName());
 }
 
-void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket & recvData)
+void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ARENA_TEAM_LEADER");
+    LOG_DEBUG("network", "CMSG_ARENA_TEAM_LEADER");
 #endif
 
     uint32 arenaTeamId;
@@ -373,7 +413,7 @@ void WorldSession::HandleArenaTeamLeaderOpcode(WorldPacket & recvData)
 
 void WorldSession::SendArenaTeamCommandResult(uint32 teamAction, const std::string& team, const std::string& player, uint32 errorId)
 {
-    WorldPacket data(SMSG_ARENA_TEAM_COMMAND_RESULT, 4+team.length()+1+player.length()+1+4);
+    WorldPacket data(SMSG_ARENA_TEAM_COMMAND_RESULT, 4 + team.length() + 1 + player.length() + 1 + 4);
     data << uint32(teamAction);
     data << team;
     data << player;
@@ -383,7 +423,7 @@ void WorldSession::SendArenaTeamCommandResult(uint32 teamAction, const std::stri
 
 void WorldSession::SendNotInArenaTeamPacket(uint8 type)
 {
-    WorldPacket data(SMSG_ARENA_ERROR, 4+1);                // 886 - You are not in a %uv%u arena team
+    WorldPacket data(SMSG_ARENA_ERROR, 4 + 1);              // 886 - You are not in a %uv%u arena team
     uint32 unk = 0;
     data << uint32(unk);                                    // unk(0)
     if (!unk)
