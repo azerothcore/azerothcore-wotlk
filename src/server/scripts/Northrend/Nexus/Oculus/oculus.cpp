@@ -929,7 +929,7 @@ public:
 
             if (drake)
             {
-                drake->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                drake->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
                 drake->RemoveAurasDueToSpell(GetId());
                 drake->RemoveAurasDueToSpell(SPELL_SOAR_TRIGGER);
                 drake->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_AURA);

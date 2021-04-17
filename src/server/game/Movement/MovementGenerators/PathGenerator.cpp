@@ -369,7 +369,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
             // this is probably an error state, but we'll leave it
             // and hopefully recover on the next Update
             // we still need to copy our preffix
-            sLog->outError("PathGenerator::BuildPolyPath: Path Build failed\n%lu", _source->GetGUID());
+            LOG_ERROR("server", "PathGenerator::BuildPolyPath: Path Build failed %u", _source->GetGUIDLow());
         }
 
         // new path = prefix + suffix - overlap
@@ -470,7 +470,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
         if (!_polyLength || dtStatusFailed(dtResult))
         {
             // only happens if we passed bad data to findPath(), or navmesh is messed up
-            sLog->outError("PathGenerator::BuildPolyPath: %lu Path Build failed: 0 length path", _source->GetGUID());
+            LOG_ERROR("server", "PathGenerator::BuildPolyPath: %u Path Build failed: 0 length path", _source->GetGUIDLow());
             BuildShortcut();
             _type = PATHFIND_NOPATH;
             return;
@@ -479,7 +479,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
 
     if (!_polyLength)
     {
-        sLog->outError("PathGenerator::BuildPolyPath: %lu Path Build failed: 0 length path", _source->GetGUID());
+        LOG_ERROR("server", "PathGenerator::BuildPolyPath: %u Path Build failed: 0 length path", _source->GetGUIDLow());
         BuildShortcut();
         _type = PATHFIND_NOPATH;
         return;
@@ -509,7 +509,7 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     if (_useRaycast)
     {
         // _straightLine uses raycast and it currently doesn't support building a point path, only a 2-point path with start and hitpoint/end is returned
-        sLog->outError("PathGenerator::BuildPointPath() called with _useRaycast for unit %lu", _source->GetGUID());
+        LOG_ERROR("server", "PathGenerator::BuildPointPath() called with _useRaycast for unit %u", _source->GetGUIDLow());
         BuildShortcut();
         _type = PATHFIND_NOPATH;
         return;
@@ -893,7 +893,7 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
         npolys = FixupCorridor(polys, npolys, MAX_PATH_LENGTH, visited, nvisited);
 
         if (dtStatusFailed(_navMeshQuery->getPolyHeight(polys[0], result, &result[1])))
-            sLog->outDebug(LOG_FILTER_MAPS, "PathGenerator::FindSmoothPath: Cannot find height at position X: %f Y: %f Z: %f for %lu", result[2], result[0], result[1], _source->GetGUID());
+            LOG_DEBUG("maps", "PathGenerator::FindSmoothPath: Cannot find height at position X: %f Y: %f Z: %f for %u", result[2], result[0], result[1], _source->GetGUIDLow());
         result[1] += 0.5f;
         dtVcopy(iterPos, result);
 
@@ -1040,7 +1040,7 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
 {
     if (GetPathType() == PATHFIND_BLANK || _pathPoints.size() < 2)
     {
-        sLog->outError("PathGenerator::ReducePathLengthByDist called before path was successfully built");
+        LOG_ERROR("server", "PathGenerator::ReducePathLengthByDist called before path was successfully built");
         return;
     }
 
