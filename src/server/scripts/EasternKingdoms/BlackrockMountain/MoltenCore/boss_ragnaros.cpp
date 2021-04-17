@@ -288,13 +288,13 @@ public:
                             if (!_isBanished)
                             {
                                 me->InterruptNonMeleeSpells(false);
-                                DoCastSelf(SPELL_RAGNA_SUBMERGE_VISUAL, true);
                                 me->AttackStop();
                                 DoResetThreat();
                                 me->SetReactState(REACT_PASSIVE);
                                 me->setFaction(35);
                                 me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_SUBMERGED);
+                                DoCastSelf(SPELL_RAGNA_SUBMERGE_VISUAL, true);
                                 //me->HandleEmoteCommand(EMOTE_ONESHOT_SUBMERGE);
                                 SummonMinions();
                             }
