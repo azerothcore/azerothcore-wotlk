@@ -151,12 +151,13 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (owner->IsHovering())
         owner->UpdateAllowedPositionZ(x, y, z);
 
+    i_recalculateTravel = true;
+
     bool success = i_path->CalculatePath(x, y, z, forceDest);
     if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
     {
         if (cOwner)
             cOwner->SetCannotReachTarget(true);
-        owner->StopMoving();
         return true;
     }
 
@@ -173,7 +174,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
 
     owner->AddUnitState(UNIT_STATE_CHASE_MOVE);
-    i_recalculateTravel = true;
 
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(i_path->GetPath());
@@ -333,16 +333,17 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     target->GetNearPoint(owner, x, y, z, _range, 0.f, target->ToAbsoluteAngle(tAngle));
 
+    i_recalculateTravel = true;
+
     bool success = i_path->CalculatePath(x, y, z, forceDest);
     if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
     {
-        owner->StopMoving();
+        if (cOwner)
+            cOwner->SetCannotReachTarget(true);
         return true;
     }
 
     owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);
-
-    i_recalculateTravel = true;
 
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(i_path->GetPath());
