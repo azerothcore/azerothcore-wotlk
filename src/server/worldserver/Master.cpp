@@ -119,13 +119,13 @@ int Master::Run()
     acore::Banner::Show("worldserver-daemon",
         [](char const* text)
         {
-            sLog->outString("%s", text);
+            LOG_INFO("server.worldserver", "%s", text);
         },
         []()
         {
-            sLog->outString("Using configuration file %s.", sConfigMgr->GetFilename().c_str());
-            sLog->outString("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            sLog->outString("Using ACE version: %s", ACE_VERSION);
+            LOG_INFO("server.worldserver", "Using configuration file %s.", sConfigMgr->GetFilename().c_str());
+            LOG_INFO("server.worldserver", "Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            LOG_INFO("server.worldserver", "Using ACE version: %s", ACE_VERSION);
         }
     );
 

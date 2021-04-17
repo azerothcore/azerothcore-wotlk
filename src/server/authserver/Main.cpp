@@ -85,13 +85,13 @@ extern int main(int argc, char** argv)
     acore::Banner::Show("authserver",
         [](char const* text)
         {
-            sLog->outString("%s", text);
+            LOG_INFO("server.authserver", "%s", text);
         },
         []()
         {
-            sLog->outString("Using configuration file %s.", sConfigMgr->GetFilename().c_str());
-            sLog->outString("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            sLog->outString("Using ACE version: %s", ACE_VERSION);
+            LOG_INFO("server.authserver", "Using configuration file %s.", sConfigMgr->GetFilename().c_str());
+            LOG_INFO("server.authserver", "Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            LOG_INFO("server.authserver", "Using ACE version: %s", ACE_VERSION);
         }
     );
 
