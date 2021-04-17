@@ -20,10 +20,10 @@
 #include "PathGenerator.h"
 #include "SharedDefines.h"
 #include "Timer.h"
-#include <ace/RW_Thread_Mutex.h>
-#include <ace/Thread_Mutex.h>
 #include <bitset>
 #include <list>
+#include <mutex>
+#include <shared_mutex>
 
 class Unit;
 class WorldPacket;
@@ -338,7 +338,7 @@ public:
     [[nodiscard]] Map const* GetParent() const { return m_parentMap; }
 
     // pussywizard: movemaps, mmaps
-    [[nodiscard]] ACE_RW_Thread_Mutex& GetMMapLock() const { return *(const_cast<ACE_RW_Thread_Mutex*>(&MMapLock)); }
+    [[nodiscard]] std::shared_mutex& GetMMapLock() const { return *(const_cast<std::shared_mutex*>(&MMapLock)); }
     // pussywizard:
     std::unordered_set<Object*> i_objectsToUpdate;
     void BuildAndSendUpdateForObjects(); // definition in ObjectAccessor.cpp, below ObjectAccessor::Update, because it does the same for a map
@@ -580,9 +580,9 @@ private:
     void UpdateActiveCells(const float& x, const float& y, const uint32 t_diff);
 
 protected:
-    ACE_Thread_Mutex Lock;
-    ACE_Thread_Mutex GridLock;
-    ACE_RW_Thread_Mutex MMapLock;
+    std::mutex Lock;
+    std::mutex GridLock;
+    std::shared_mutex MMapLock;
 
     MapEntry const* i_mapEntry;
     uint8 i_spawnMode;
