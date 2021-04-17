@@ -160,6 +160,7 @@ void AddSC_boss_golemagg();
 void AddSC_boss_sulfuron();
 void AddSC_boss_majordomo();
 void AddSC_boss_ragnaros();
+void AddSC_molten_core();
 void AddSC_instance_molten_core();
 void AddSC_the_scarlet_enclave();            //Scarlet Enclave
 void AddSC_the_scarlet_enclave_c1();

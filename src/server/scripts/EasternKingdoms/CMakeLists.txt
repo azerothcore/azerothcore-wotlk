@@ -64,6 +64,7 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/MoltenCore/boss_ragnaros.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/MoltenCore/boss_garr.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/MoltenCore/molten_core.h
+  ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/MoltenCore/molten_core.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/MoltenCore/instance_molten_core.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/MoltenCore/boss_sulfuron_harbinger.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/BlackrockMountain/MoltenCore/boss_magmadar.cpp
