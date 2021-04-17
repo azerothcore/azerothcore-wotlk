@@ -2821,7 +2821,7 @@ protected:
     EnchantDurationList m_enchantDuration;
     ItemDurationList m_itemDuration;
     ItemDurationList m_itemSoulboundTradeable;
-    ACE_Thread_Mutex m_soulboundTradableLock;
+    std::mutex m_soulboundTradableLock;
 
     void ResetTimeSync();
     void SendTimeSync();

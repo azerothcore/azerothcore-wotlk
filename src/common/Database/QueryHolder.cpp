@@ -13,7 +13,7 @@ bool SQLQueryHolder::SetQuery(size_t index, const char* sql)
 {
     if (m_queries.size() <= index)
     {
-        sLog->outError("Query index (%u) out of range (size: %u) for query: %s", uint32(index), (uint32)m_queries.size(), sql);
+        LOG_ERROR("server", "Query index (%u) out of range (size: %u) for query: %s", uint32(index), (uint32)m_queries.size(), sql);
         return false;
     }
 
@@ -33,7 +33,7 @@ bool SQLQueryHolder::SetPQuery(size_t index, const char* format, ...)
 {
     if (!format)
     {
-        sLog->outError("Query (index: %u) is empty.", uint32(index));
+        LOG_ERROR("server", "Query (index: %u) is empty.", uint32(index));
         return false;
     }
 
@@ -45,7 +45,7 @@ bool SQLQueryHolder::SetPQuery(size_t index, const char* format, ...)
 
     if (res == -1)
     {
-        sLog->outError("SQL Query truncated (and not execute) for format: %s", format);
+        LOG_ERROR("server", "SQL Query truncated (and not execute) for format: %s", format);
         return false;
     }
 
@@ -56,7 +56,7 @@ bool SQLQueryHolder::SetPreparedQuery(size_t index, PreparedStatement* stmt)
 {
     if (m_queries.size() <= index)
     {
-        sLog->outError("Query index (%u) out of range (size: %u) for prepared statement", uint32(index), (uint32)m_queries.size());
+        LOG_ERROR("server", "Query index (%u) out of range (size: %u) for prepared statement", uint32(index), (uint32)m_queries.size());
         return false;
     }
 

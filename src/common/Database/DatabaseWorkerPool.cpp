@@ -38,8 +38,8 @@ uint32 DatabaseWorkerPool<T>::Open()
 {
     WPFatal(_connectionInfo.get(), "Connection info was not set!");
 
-    sLog->outSQLDriver("Opening DatabasePool '%s'. Asynchronous connections: %u, synchronous connections: %u.",
-                       GetDatabaseName(), _async_threads, _synch_threads);
+    LOG_INFO("sql.driver", "Opening DatabasePool '%s'. Asynchronous connections: %u, synchronous connections: %u.",
+        GetDatabaseName(), _async_threads, _synch_threads);
 
     uint32 error = OpenConnections(IDX_ASYNC, _async_threads);
 
@@ -52,9 +52,11 @@ uint32 DatabaseWorkerPool<T>::Open()
 
     if (!error)
     {
-        sLog->outSQLDriver("DatabasePool '%s' opened successfully. %u total connections running.",
-        GetDatabaseName(), (_connectionCount[IDX_SYNCH] + _connectionCount[IDX_ASYNC]));
+        LOG_INFO("sql.driver", "DatabasePool '%s' opened successfully. %u total connections running.",
+            GetDatabaseName(), (_connectionCount[IDX_SYNCH] + _connectionCount[IDX_ASYNC]));
     }
+
+    LOG_INFO("sql.driver", " ");
 
     return error;
 }
@@ -62,7 +64,7 @@ uint32 DatabaseWorkerPool<T>::Open()
 template <class T>
 void DatabaseWorkerPool<T>::Close()
 {
-    sLog->outSQLDriver("Closing down DatabasePool '%s'.", GetDatabaseName());
+    LOG_INFO("sql.driver", "Closing down DatabasePool '%s'.", GetDatabaseName());
 
     //! Shuts down delaythreads for this connection pool by underlying deactivate().
     //! The next dequeue attempt in the worker thread tasks will result in an error,
@@ -78,8 +80,8 @@ void DatabaseWorkerPool<T>::Close()
         t->Close();         //! Closes the actualy MySQL connection.
     }
 
-    sLog->outSQLDriver("Asynchronous connections on DatabasePool '%s' terminated. Proceeding with synchronous connections.",
-                       GetDatabaseName());
+    LOG_INFO("sql.driver", "Asynchronous connections on DatabasePool '%s' terminated. Proceeding with synchronous connections.",
+        GetDatabaseName());
 
     //! Shut down the synchronous connections
     //! There's no need for locking the connection, because DatabaseWorkerPool<>::Close
@@ -92,7 +94,7 @@ void DatabaseWorkerPool<T>::Close()
     delete _queue;
     delete _mqueue;
 
-    sLog->outSQLDriver("All connections on DatabasePool '%s' closed.", GetDatabaseName());
+    LOG_INFO("sql.driver", "All connections on DatabasePool '%s' closed.", GetDatabaseName());
 }
 
 template <class T>
@@ -125,7 +127,7 @@ uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConne
         {
             if (mysql_get_server_version(t->GetHandle()) < MIN_MYSQL_SERVER_VERSION)
             {
-                sLog->outSQLDriver("Not support MySQL versions below 5.7");
+                LOG_ERROR("sql.driver", "Not support MySQL versions below 5.7");
                 error = 1;
             }
         }
@@ -299,10 +301,10 @@ void DatabaseWorkerPool<T>::CommitTransaction(SQLTransaction transaction)
     switch (transaction->GetSize())
     {
         case 0:
-            sLog->outSQLDriver("Transaction contains 0 queries. Not executing.");
+            LOG_INFO("sql.driver", "Transaction contains 0 queries. Not executing.");
             return;
         case 1:
-            sLog->outSQLDriver("Warning: Transaction only holds 1 query, consider removing Transaction context in code.");
+            LOG_INFO("sql.driver", "Warning: Transaction only holds 1 query, consider removing Transaction context in code.");
             break;
         default:
             break;
