@@ -8,6 +8,7 @@
 /// @{
 /// \file
 
+#include "AppenderDB.h"
 #include "Common.h"
 #include "Configuration/Config.h"
 #include "Database/DatabaseEnv.h"
@@ -34,10 +35,6 @@ char serviceDescription[] = "AzerothCore World of Warcraft emulator world servic
  */
 int m_ServiceStatus = -1;
 #endif
-
-WorldDatabaseWorkerPool WorldDatabase;                      ///< Accessor to the world database
-CharacterDatabaseWorkerPool CharacterDatabase;              ///< Accessor to the character database
-LoginDatabaseWorkerPool LoginDatabase;                      ///< Accessor to the realm/login database
 
 uint32 realmID;                                             ///< Id of the realm
 
@@ -121,6 +118,9 @@ extern int main(int argc, char** argv)
 
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
+
+    sLog->RegisterAppender<AppenderDB>();
+    sLog->Initialize();
 
     ///- and run the 'Master'
     /// @todo Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?

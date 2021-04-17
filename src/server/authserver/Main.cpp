@@ -14,6 +14,7 @@
 
 #include "Banner.h"
 #include "Common.h"
+#include "AppenderDB.h"
 #include "DatabaseEnv.h"
 #include "Config.h"
 #include "Log.h"
@@ -48,7 +49,7 @@ bool stopEvent = false;                                     // Setting it to tru
 /// Print out the usage string for this program on the console.
 void usage(const char* prog)
 {
-    sLog->outString("Usage: \n %s [<options>]\n"
+    LOG_INFO("server.authserver", "Usage: \n %s [<options>]\n"
                     "    -c config_file           use config_file as configuration file\n\r",
                     prog);
 }
@@ -81,6 +82,11 @@ extern int main(int argc, char** argv)
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
+    // Init logging
+    sLog->RegisterAppender<AppenderDB>();
+    sLog->Initialize();
+
+  
     acore::Banner::Show("authserver",
         [](char const* text)
         {
@@ -100,17 +106,17 @@ extern int main(int argc, char** argv)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_TP_Reactor(), true), true);
 #endif
 
-    sLog->outBasic("Max allowed open files is %d", ACE::max_handles());
+    LOG_INFO("server.authserver", "Max allowed open files is %d", ACE::max_handles());
 
     // authserver PID file creation
     std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            sLog->outError("Daemon PID: %u\n", pid); // outError for red color in console
+            LOG_INFO("server.authserver", "Daemon PID: %u\n", pid); // outError for red color in console
         else
         {
-            sLog->outError("Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
+            LOG_ERROR("server.authserver", "Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
             return 1;
         }
     }
@@ -119,15 +125,11 @@ extern int main(int argc, char** argv)
     if (!StartDB())
         return 1;
 
-    // Initialize the log database
-    sLog->SetLogDB(false);
-    sLog->SetRealmID(0);                                               // ensure we've set realm to 0 (authserver realmid)
-
     // Get the list of realms for the server
     sRealmList->Initialize(sConfigMgr->GetOption<int32>("RealmsStateUpdateDelay", 20));
     if (sRealmList->size() == 0)
     {
-        sLog->outError("No valid realms specified.");
+        LOG_ERROR("server.authserver", "No valid realms specified.");
         return 1;
     }
 
@@ -137,7 +139,7 @@ extern int main(int argc, char** argv)
     int32 rmport = sConfigMgr->GetOption<int32>("RealmServerPort", 3724);
     if (rmport < 0 || rmport > 0xFFFF)
     {
-        sLog->outError("The specified RealmServerPort (%d) is out of the allowed range (1-65535)", rmport);
+        LOG_ERROR("server.authserver", "The specified RealmServerPort (%d) is out of the allowed range (1-65535)", rmport);
         return 1;
     }
 
@@ -147,11 +149,11 @@ extern int main(int argc, char** argv)
 
     if (acceptor.open(bind_addr, ACE_Reactor::instance(), ACE_NONBLOCK) == -1)
     {
-        sLog->outError("Auth server can not bind to %s:%d (possible error: port already in use)", bind_ip.c_str(), rmport);
+        LOG_ERROR("server.authserver", "Auth server can not bind to %s:%d (possible error: port already in use)", bind_ip.c_str(), rmport);
         return 1;
     }
 
-    sLog->outString("Authserver listening to %s:%d", bind_ip.c_str(), rmport);
+    LOG_INFO("server.authserver", "Authserver listening to %s:%d", bind_ip.c_str(), rmport);
 
     // Initialize the signal handlers
     acore::SignalHandler signalHandler;
@@ -184,20 +186,20 @@ extern int main(int argc, char** argv)
             ULONG_PTR currentAffinity = affinity & appAff;
 
             if (!currentAffinity)
-                sLog->outError("server.authserver", "Processors marked in UseProcessors bitmask (hex) %x are not accessible for the authserver. Accessible processors bitmask (hex): %x", affinity, appAff);
+                LOG_ERROR("server.authserver", "server.authserver", "Processors marked in UseProcessors bitmask (hex) %x are not accessible for the authserver. Accessible processors bitmask (hex): %x", affinity, appAff);
             else if (SetProcessAffinityMask(hProcess, currentAffinity))
-                sLog->outString("server.authserver", "Using processors (bitmask, hex): %x", currentAffinity);
+                LOG_INFO("server.authserver", "server.authserver", "Using processors (bitmask, hex): %x", currentAffinity);
             else
-                sLog->outError("server.authserver", "Can't set used processors (hex): %x", currentAffinity);
+                LOG_ERROR("server.authserver", "server.authserver", "Can't set used processors (hex): %x", currentAffinity);
         }
     }
 
     if (highPriority)
     {
         if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
-            sLog->outString("server.authserver", "authserver process priority class set to HIGH");
+            LOG_INFO("server.authserver", "server.authserver", "authserver process priority class set to HIGH");
         else
-            sLog->outError("server.authserver", "Can't set authserver process priority class.");
+            LOG_ERROR("server.authserver", "server.authserver", "Can't set authserver process priority class.");
     }
 
 #else // Linux
@@ -212,21 +214,21 @@ extern int main(int argc, char** argv)
                 CPU_SET(i, &mask);
 
         if (sched_setaffinity(0, sizeof(mask), &mask))
-            sLog->outError("Can't set used processors (hex): %x, error: %s", affinity, strerror(errno));
+            LOG_ERROR("server.authserver", "Can't set used processors (hex): %x, error: %s", affinity, strerror(errno));
         else
         {
             CPU_ZERO(&mask);
             sched_getaffinity(0, sizeof(mask), &mask);
-            sLog->outString("Using processors (bitmask, hex): %lx", *(__cpu_mask*)(&mask));
+            LOG_INFO("server.authserver", "Using processors (bitmask, hex): %lx", *(__cpu_mask*)(&mask));
         }
     }
 
     if (highPriority)
     {
         if (setpriority(PRIO_PROCESS, 0, PROCESS_HIGH_PRIORITY))
-            sLog->outError("Can't set authserver process priority class, error: %s", strerror(errno));
+            LOG_ERROR("server.authserver", "Can't set authserver process priority class, error: %s", strerror(errno));
         else
-            sLog->outString("authserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
+            LOG_INFO("server.authserver", "authserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
     }
 
 #endif
@@ -235,13 +237,6 @@ extern int main(int argc, char** argv)
     // maximum counter for next ping
     uint32 numLoops = (sConfigMgr->GetOption<int32>("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));
     uint32 loopCounter = 0;
-
-    // possibly enable db logging; avoid massive startup spam by doing it here.
-    if (sConfigMgr->GetOption<bool>("EnableLogDB", false))
-    {
-        sLog->outString("Enabling database logging...");
-        sLog->SetLogDB(true);
-    }
 
     // Wait for termination signal
     while (!stopEvent)
@@ -255,7 +250,7 @@ extern int main(int argc, char** argv)
         if ((++loopCounter) == numLoops)
         {
             loopCounter = 0;
-            sLog->outDetail("Ping MySQL to keep connection alive");
+            LOG_INFO("server.authserver", "Ping MySQL to keep connection alive");
             LoginDatabase.KeepAlive();
         }
     }
@@ -263,7 +258,7 @@ extern int main(int argc, char** argv)
     // Close the Database Pool and library
     StopDB();
 
-    sLog->outString("Halting process...");
+    LOG_INFO("server.authserver", "Halting process...");
     return 0;
 }
 
@@ -282,7 +277,8 @@ bool StartDB()
     if (!loader.Load())
         return false;
 
-    sLog->outString("Started auth database connection pool.");
+    LOG_INFO("server.authserver", "Started auth database connection pool.");
+    sLog->SetRealmId(0); // Enables DB appenders when realm is set.
     return true;
 }
 
