@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -21,13 +21,15 @@ The collision detection is modified to return true, if we are inside an object.
 namespace VMAP
 {
     template<class TValue>
-    class IntersectionCallBack {
+    class IntersectionCallBack
+    {
     public:
         TValue*      closestEntity;
         G3D::Vector3 hitLocation;
         G3D::Vector3 hitNormal;
 
-        void operator()(const G3D::Ray& ray, const TValue* entity, bool StopAtFirstHit, float& distance) {
+        void operator()(const G3D::Ray& ray, const TValue* entity, bool StopAtFirstHit, float& distance)
+        {
             entity->intersect(ray, distance, StopAtFirstHit, hitLocation, hitNormal);
         }
     };
@@ -40,7 +42,6 @@ namespace VMAP
     {
     private:
     public:
-
         static bool collisionLocationForMovingPointFixedAABox(
             const G3D::Vector3&     origin,
             const G3D::Vector3&     dir,
@@ -48,7 +49,6 @@ namespace VMAP
             G3D::Vector3&           location,
             bool&                   Inside)
         {
-
             // Integer representation of a floating-point value.
 #define IR(x)   (reinterpret_cast<G3D::uint32 const&>(x))
 
@@ -116,7 +116,7 @@ namespace VMAP
                 {
                     location[i] = origin[i] + MaxT[WhichPlane] * dir[i];
                     if ((location[i] < MinB[i]) ||
-                        (location[i] > MaxB[i]))
+                            (location[i] > MaxB[i]))
                     {
                         // On this plane we're outside the box extents, so
                         // we miss the box

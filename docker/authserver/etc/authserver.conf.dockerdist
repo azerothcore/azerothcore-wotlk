@@ -4,7 +4,8 @@
 [authserver]
 
 # Do not change this
-LogsDir = "/azeroth-server/logs" # will reflect on your host directory: docker/worldserver/logs
+# Files in LogsDir will reflect on your host directory: docker/authserver/logs
+LogsDir = "/azeroth-server/logs"
 
 # Change this configuration accordingly with your docker setup
 # The format is "hostname;port;username;password;database":

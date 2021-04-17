@@ -1,25 +1,25 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "Common.h"
-#include "Log.h"
 #include "Corpse.h"
 #include "Creature.h"
 #include "GameObject.h"
 #include "Group.h"
+#include "Log.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
-#include "ObjectAccessor.h"
 #include "Object.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "ObjectMgr.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -28,11 +28,11 @@
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
+    LOG_DEBUG("network", "WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
 #endif
     Player* player = GetPlayer();
     uint64 lguid = player->GetLootGUID();
-    Loot* loot = NULL;
+    Loot* loot = nullptr;
     uint8 lootSlot = 0;
 
     recvData >> lootSlot;
@@ -42,7 +42,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         GameObject* go = player->GetMap()->GetGameObject(lguid);
         // xinef: cheating protection
         //if (player->GetGroup() && player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGUID() != player->GetGroup()->GetMasterLooterGuid())
-        //    go = NULL;
+        //    go = nullptr;
 
         // not check distance for GO in case owned GO (fishing bobber case, for example) or Fishing hole GO
         if (!go || ((go->GetOwnerGUID() != _player->GetGUID() && go->GetGoType() != GAMEOBJECT_TYPE_FISHINGHOLE) && !go->IsWithinDistInMap(_player, INTERACTION_DISTANCE)))
@@ -97,10 +97,10 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         DoLootRelease(lguid);
 }
 
-void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recvData*/)
+void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_LOOT_MONEY");
+    LOG_DEBUG("network", "WORLD: CMSG_LOOT_MONEY");
 #endif
 
     Player* player = GetPlayer();
@@ -108,57 +108,57 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recvData*/)
     if (!guid)
         return;
 
-    Loot* loot = NULL;
+    Loot* loot = nullptr;
     bool shareMoney = true;
 
     switch (GUID_HIPART(guid))
     {
         case HIGHGUID_GAMEOBJECT:
-        {
-            GameObject* go = GetPlayer()->GetMap()->GetGameObject(guid);
+            {
+                GameObject* go = GetPlayer()->GetMap()->GetGameObject(guid);
 
-            // do not check distance for GO if player is the owner of it (ex. fishing bobber)
-            if (go && ((go->GetOwnerGUID() == player->GetGUID() || go->IsWithinDistInMap(player, INTERACTION_DISTANCE))))
-                loot = &go->loot;
+                // do not check distance for GO if player is the owner of it (ex. fishing bobber)
+                if (go && ((go->GetOwnerGUID() == player->GetGUID() || go->IsWithinDistInMap(player, INTERACTION_DISTANCE))))
+                    loot = &go->loot;
 
-            break;
-        }
+                break;
+            }
         case HIGHGUID_CORPSE:                               // remove insignia ONLY in BG
-        {
-            Corpse* bones = ObjectAccessor::GetCorpse(*player, guid);
-
-            if (bones && bones->IsWithinDistInMap(player, INTERACTION_DISTANCE))
             {
-                loot = &bones->loot;
-                shareMoney = false;
-            }
+                Corpse* bones = ObjectAccessor::GetCorpse(*player, guid);
 
-            break;
-        }
+                if (bones && bones->IsWithinDistInMap(player, INTERACTION_DISTANCE))
+                {
+                    loot = &bones->loot;
+                    shareMoney = false;
+                }
+
+                break;
+            }
         case HIGHGUID_ITEM:
-        {
-            if (Item* item = player->GetItemByGuid(guid))
             {
-                loot = &item->loot;
-                shareMoney = false;
+                if (Item* item = player->GetItemByGuid(guid))
+                {
+                    loot = &item->loot;
+                    shareMoney = false;
+                }
+                break;
             }
-            break;
-        }
         case HIGHGUID_UNIT:
         case HIGHGUID_VEHICLE:
-        {
-            Creature* creature = player->GetMap()->GetCreature(guid);
-            bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
-            if (lootAllowed && creature->IsWithinDistInMap(player, INTERACTION_DISTANCE))
             {
-                loot = &creature->loot;
-                if (creature->IsAlive())
-                    shareMoney = false;
+                Creature* creature = player->GetMap()->GetCreature(guid);
+                bool lootAllowed = creature && creature->IsAlive() == (player->getClass() == CLASS_ROGUE && creature->loot.loot_type == LOOT_PICKPOCKETING);
+                if (lootAllowed && creature->IsWithinDistInMap(player, INTERACTION_DISTANCE))
+                {
+                    loot = &creature->loot;
+                    if (creature->IsAlive())
+                        shareMoney = false;
+                }
+                else
+                    player->SendLootError(guid, lootAllowed ? LOOT_ERROR_TOO_FAR : LOOT_ERROR_DIDNT_KILL);
+                break;
             }
-            else
-                player->SendLootError(guid, lootAllowed ? LOOT_ERROR_TOO_FAR : LOOT_ERROR_DIDNT_KILL);
-            break;
-        }
         default:
             return;                                         // unlootable type
     }
@@ -171,7 +171,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recvData*/)
             Group* group = player->GetGroup();
 
             std::vector<Player*> playersNear;
-            for (GroupReference* itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
                 Player* member = itr->GetSource();
                 if (!member)
@@ -222,7 +222,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recvData*/)
 void WorldSession::HandleLootOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_LOOT");
+    LOG_DEBUG("network", "WORLD: CMSG_LOOT");
 #endif
 
     uint64 guid;
@@ -242,7 +242,7 @@ void WorldSession::HandleLootOpcode(WorldPacket& recvData)
 void WorldSession::HandleLootReleaseOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_LOOT_RELEASE");
+    LOG_DEBUG("network", "WORLD: CMSG_LOOT_RELEASE");
 #endif
 
     // cheaters can modify lguid to prevent correct apply loot release code and re-loot
@@ -257,8 +257,8 @@ void WorldSession::HandleLootReleaseOpcode(WorldPacket& recvData)
 
 void WorldSession::DoLootRelease(uint64 lguid)
 {
-    Player  *player = GetPlayer();
-    Loot    *loot;
+    Player*  player = GetPlayer();
+    Loot*    loot;
 
     player->SetLootGUID(0);
     player->SendLootRelease(lguid);
@@ -286,7 +286,8 @@ void WorldSession::DoLootRelease(uint64 lguid)
         else if (loot->isLooted() || go->GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE)
         {
             if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGHOLE)
-            {                                               // The fishing hole used once more
+            {
+                // The fishing hole used once more
                 go->AddUse();                               // if the max usage is reached, will be despawned in next tick
                 if (go->GetUseCount() >= go->GetGOValue()->FishingHole.MaxOpens)
                     go->SetLootState(GO_JUST_DEACTIVATED);
@@ -295,15 +296,15 @@ void WorldSession::DoLootRelease(uint64 lguid)
             }
             else
             {
-                go->SetLootState(GO_JUST_DEACTIVATED);                
-                
+                go->SetLootState(GO_JUST_DEACTIVATED);
+
                 // Xinef: moved event execution to loot release (after everything is looted)
                 // Xinef: 99% sure that this worked like this on blizz
                 // Xinef: prevents exploits with just opening GO and spawning bilions of npcs, which can crash core if you know what you're doin ;)
                 if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST && go->GetGOInfo()->chest.eventId)
                 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "Chest ScriptStart id %u for GO %u", go->GetGOInfo()->chest.eventId, go->GetDBTableGUIDLow());
+                    LOG_DEBUG("spells.aura", "Chest ScriptStart id %u for GO %u", go->GetGOInfo()->chest.eventId, go->GetDBTableGUIDLow());
 #endif
                     player->GetMap()->ScriptsStart(sEventScripts, go->GetGOInfo()->chest.eventId, player, go);
                 }
@@ -391,13 +392,10 @@ void WorldSession::DoLootRelease(uint64 lguid)
                 loot->roundRobinPlayer = 0;
 
                 if (Group* group = player->GetGroup())
-                {
-                    group->SendLooter(creature, NULL);
-
-                    // force update of dynamic flags, otherwise other group's players still not able to loot.
-                    creature->ForceValuesUpdateAtIndex(UNIT_DYNAMIC_FLAGS);
-                }
+                    group->SendLooter(creature, nullptr);
             }
+            // force dynflag update to update looter and lootable info
+            creature->ForceValuesUpdateAtIndex(UNIT_DYNAMIC_FLAGS);
         }
     }
 
@@ -426,7 +424,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [%s].", target->GetName().c_str());
+    LOG_DEBUG("network", "WorldSession::HandleLootMasterGiveOpcode (CMSG_LOOT_MASTER_GIVE, 0x02A3) Target = [%s].", target->GetName().c_str());
 #endif
 
     if (_player->GetLootGUID() != lootguid)
@@ -438,11 +436,11 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     if (!_player->IsInRaidWith(target))
     {
         _player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
-        //sLog->outDebug(LOG_FILTER_NETWORKIO, "MasterLootItem: Player %s tried to give an item to ineligible player %s !", GetPlayer()->GetName().c_str(), target->GetName().c_str());
+        //LOG_DEBUG("network", "MasterLootItem: Player %s tried to give an item to ineligible player %s !", GetPlayer()->GetName().c_str(), target->GetName().c_str());
         return;
     }
 
-    Loot* loot = NULL;
+    Loot* loot = nullptr;
 
     if (IS_CRE_OR_VEH_GUID(GetPlayer()->GetLootGUID()))
     {
@@ -467,7 +465,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
     if (slotid >= loot->items.size() + loot->quest_items.size())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_LOOT, "MasterLootItem: Player %s might be using a hack! (slot %d, size %lu)", GetPlayer()->GetName().c_str(), slotid, (unsigned long)loot->items.size());
+        LOG_DEBUG("loot", "MasterLootItem: Player %s might be using a hack! (slot %d, size %lu)", GetPlayer()->GetName().c_str(), slotid, (unsigned long)loot->items.size());
 #endif
         return;
     }
@@ -476,7 +474,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 
     ItemPosCountVec dest;
     InventoryResult msg = target->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item.itemid, item.count);
-    if (item.follow_loot_rules && !item.AllowedForPlayer(target))
+    if (!item.AllowedForPlayer(target, true))
         msg = EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
     if (msg != EQUIP_ERR_OK)
     {
@@ -487,7 +485,6 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         else
             _player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
 
-        target->SendEquipError(msg, NULL, NULL, item.itemid);
         return;
     }
 
@@ -504,8 +501,8 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 #endif
 
     // mark as looted
-    item.count=0;
-    item.is_looted=true;
+    item.count = 0;
+    item.is_looted = true;
 
     loot->NotifyItemRemoved(slotid);
     --loot->unlootedCount;

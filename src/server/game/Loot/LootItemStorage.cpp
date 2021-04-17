@@ -2,11 +2,10 @@
 Xinef
  */
 
-#include <time.h>
-
 #include "LootItemStorage.h"
-#include "PreparedStatement.h"
 #include "ObjectMgr.h"
+#include "PreparedStatement.h"
+#include <time.h>
 
 LootItemStorage::LootItemStorage()
 {
@@ -31,8 +30,8 @@ void LootItemStorage::LoadStorageFromDB()
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
     if (!result)
     {
-        sLog->outString(">>  Loaded 0 stored items!");
-        sLog->outString();
+        LOG_INFO("server", ">>  Loaded 0 stored items!");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -40,15 +39,15 @@ void LootItemStorage::LoadStorageFromDB()
     do
     {
         Field* fields = result->Fetch();
-        
+
         StoredLootItemList& itemList = lootItemStore[fields[0].GetUInt32()];
         itemList.push_back(StoredLootItem(fields[1].GetUInt32(), fields[2].GetUInt32(), fields[3].GetInt32(), fields[4].GetUInt32()));
 
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %d stored items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LOG_INFO("server", ">> Loaded %d stored items in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", " ");
 }
 
 void LootItemStorage::RemoveEntryFromDB(uint32 containerId, uint32 itemid, uint32 count)
@@ -67,12 +66,12 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
 {
     if (lootItemStore.find(loot->containerId) != lootItemStore.end())
     {
-        sLog->outMisc("LootItemStorage::AddNewStoredLoot (A1) - %u!", loot->containerId);
+        LOG_INFO("misc", "LootItemStorage::AddNewStoredLoot (A1) - %u!", loot->containerId);
         return;
     }
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
-    PreparedStatement* stmt = NULL;
+    PreparedStatement* stmt = nullptr;
 
     StoredLootItemList& itemList = lootItemStore[loot->containerId];
 
@@ -152,12 +151,12 @@ bool LootItemStorage::LoadStoredLoot(Item* item)
         loot->unlootedCount++;
     }
 
-   // Mark the item if it has loot so it won't be generated again on open
-   item->m_lootGenerated = true;
-   return true;
+    // Mark the item if it has loot so it won't be generated again on open
+    item->m_lootGenerated = true;
+    return true;
 }
 
-void LootItemStorage::RemoveStoredLootItem(uint32 containerId, uint32 itemid, uint32 count, Loot *loot)
+void LootItemStorage::RemoveStoredLootItem(uint32 containerId, uint32 itemid, uint32 count, Loot* loot)
 {
     LootItemContainer::iterator itr = lootItemStore.find(containerId);
     if (itr == lootItemStore.end())
@@ -172,13 +171,13 @@ void LootItemStorage::RemoveStoredLootItem(uint32 containerId, uint32 itemid, ui
             break;
         }
 
-    // loot with empty itemList but unlootedCount > 0 
+    // loot with empty itemList but unlootedCount > 0
     // must be deleted manually by the player or traded
     if (!loot->unlootedCount)
         lootItemStore.erase(itr);
 }
 
-void LootItemStorage::RemoveStoredLootMoney(uint32 containerId, Loot *loot)
+void LootItemStorage::RemoveStoredLootMoney(uint32 containerId, Loot* loot)
 {
     LootItemContainer::iterator itr = lootItemStore.find(containerId);
     if (itr == lootItemStore.end())
@@ -193,7 +192,7 @@ void LootItemStorage::RemoveStoredLootMoney(uint32 containerId, Loot *loot)
             break;
         }
 
-    // loot with empty itemList but unlootedCount > 0 
+    // loot with empty itemList but unlootedCount > 0
     // must be deleted manually by the player or traded
     if (!loot->unlootedCount)
         lootItemStore.erase(itr);

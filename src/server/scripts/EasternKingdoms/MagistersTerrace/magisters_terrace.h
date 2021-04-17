@@ -5,9 +5,12 @@
 #ifndef DEF_MAGISTERS_TERRACE_H
 #define DEF_MAGISTERS_TERRACE_H
 
-#include "Player.h"
 #include "CreatureAI.h"
+#include "Player.h"
 #include "SpellScript.h"
+#include "CreatureAIImpl.h"
+
+#define MTScriptName "instance_magisters_terrace"
 
 enum MTData
 {
@@ -17,7 +20,6 @@ enum MTData
     DATA_KAELTHAS_EVENT         = 3,
     MAX_ENCOUNTER               = 4
 };
-
 
 enum MTCreatures
 {
@@ -38,5 +40,10 @@ enum MTGameObjects
     GO_ESCAPE_ORB               = 188173
 };
 
+template <class AI, class T>
+inline AI* GetMagistersTerraceAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, MTScriptName);
+}
 
 #endif

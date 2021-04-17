@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -49,16 +49,16 @@
 
 #include "Define.h"
 
+#include <cassert>
+#include <cerrno>
+#include <cmath>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <unordered_map>
 #include <unordered_set>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <math.h>
-#include <errno.h>
-#include <signal.h>
-#include <assert.h>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #define STRCASECMP stricmp
@@ -78,12 +78,6 @@
 
 #include "Threading/LockedQueue.h"
 #include "Threading/Threading.h"
-
-#include <ace/Basic_Types.h>
-#include <ace/Guard_T.h>
-#include <ace/RW_Thread_Mutex.h>
-#include <ace/Thread_Mutex.h>
-#include <ace/OS_NS_time.h>
 #include <ace/Stack_Trace.h>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
@@ -108,7 +102,6 @@
 
 #define I32FMT "%08I32X"
 #define I64FMT "%016I64X"
-#define snprintf _snprintf
 #define atoll _atoi64
 #define vsnprintf _vsnprintf
 #define llabs _abs64
@@ -128,8 +121,6 @@ inline float finiteAlways(float f) { return isfinite(f) ? f : 0.0f; }
 
 inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
 
-#define atol(a) strtoul( a, NULL, 10)
-
 #define STRINGIZE(a) #a
 
 #define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
@@ -137,11 +128,11 @@ inline bool myisfinite(float f) { return isfinite(f) && !isnan(f); }
 enum TimeConstants
 {
     MINUTE          = 60,
-    HOUR            = MINUTE*60,
-    DAY             = HOUR*24,
-    WEEK            = DAY*7,
-    MONTH           = DAY*30,
-    YEAR            = MONTH*12,
+    HOUR            = MINUTE * 60,
+    DAY             = HOUR * 24,
+    WEEK            = DAY * 7,
+    MONTH           = DAY * 30,
+    YEAR            = MONTH * 12,
     IN_MILLISECONDS = 1000
 };
 
@@ -189,27 +180,7 @@ typedef std::vector<std::string> StringVector;
 #undef min
 #endif
 
-#ifndef M_PI
-#define M_PI            3.14159265358979323846f
-#endif
-
 #define MAX_QUERY_LEN 32*1024
-
-#define ACORE_GUARD(MUTEX, LOCK) \
-  ACE_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
-    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
-
-//! For proper implementation of multiple-read, single-write pattern, use
-//! ACE_RW_Mutex as underlying @MUTEX
-# define ACORE_WRITE_GUARD(MUTEX, LOCK) \
-  ACE_Write_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
-    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
-
-//! For proper implementation of multiple-read, single-write pattern, use
-//! ACE_RW_Mutex as underlying @MUTEX
-# define ACORE_READ_GUARD(MUTEX, LOCK) \
-  ACE_Read_Guard< MUTEX > ACORE_GUARD_OBJECT (LOCK); \
-    if (ACORE_GUARD_OBJECT.locked() == 0) ASSERT(false);
 
 namespace acore
 {

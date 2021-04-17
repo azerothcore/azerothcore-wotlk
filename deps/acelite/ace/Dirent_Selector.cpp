@@ -7,6 +7,10 @@
 #include "ace/OS_NS_dirent.h"
 #include "ace/OS_NS_stdlib.h"
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+# include "ace/Malloc_Base.h"
+#endif /* ACE_HAS_ALLOC_HOOKS */
+
 ACE_BEGIN_VERSIONED_NAMESPACE_DECL
 
 // Construction/Destruction
@@ -40,12 +44,24 @@ ACE_Dirent_Selector::close (void)
 #if defined (ACE_LACKS_STRUCT_DIR)
       // Only the lacking-struct-dir emulation allocates this. Native
       // scandir includes d_name in the dirent struct itself.
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_Allocator::instance()->free (this->namelist_[n_]->d_name);
+#else
       ACE_OS::free (this->namelist_[n_]->d_name);
+#endif /* ACE_HAS_ALLOC_HOOKS */
 #endif
+#if defined (ACE_HAS_ALLOC_HOOKS)
+      ACE_Allocator::instance()->free (this->namelist_[n_]);
+#else
       ACE_OS::free (this->namelist_[n_]);
+#endif /* ACE_HAS_ALLOC_HOOKS */
     }
 
+#if defined (ACE_HAS_ALLOC_HOOKS)
+    ACE_Allocator::instance()->free (this->namelist_);
+#else
   ACE_OS::free (this->namelist_);
+#endif /* ACE_HAS_ALLOC_HOOKS */
   this->namelist_ = 0;
   return 0;
 }
