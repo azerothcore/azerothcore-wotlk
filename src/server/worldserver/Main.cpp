@@ -9,6 +9,7 @@
 /// \file
 
 #include "AppenderDB.h"
+#include "Banner.h"
 #include "Common.h"
 #include "Configuration/Config.h"
 #include "Database/DatabaseEnv.h"
@@ -121,6 +122,19 @@ extern int main(int argc, char** argv)
 
     sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize();
+
+    acore::Banner::Show("worldserver-daemon",
+        [](char const* text)
+        {
+            LOG_INFO("server.worldserver", "%s", text);
+        },
+        []()
+        {
+            LOG_INFO("server.worldserver", "Using configuration file %s.", sConfigMgr->GetFilename().c_str());
+            LOG_INFO("server.worldserver", "Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            LOG_INFO("server.worldserver", "Using ACE version: %s", ACE_VERSION);
+        }
+    );
 
     ///- and run the 'Master'
     /// @todo Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?

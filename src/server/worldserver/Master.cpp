@@ -9,7 +9,6 @@
 */
 
 #include "ACSoap.h"
-#include "Banner.h"
 #include "BigNumber.h"
 #include "CliRunnable.h"
 #include "Common.h"
@@ -112,19 +111,6 @@ int Master::Run()
     OpenSSLCrypto::threadsSetup();
     BigNumber seed1;
     seed1.SetRand(16 * 8);
-
-    acore::Banner::Show("worldserver-daemon",
-        [](char const* text)
-        {
-            LOG_INFO("server.worldserver", "%s", text);
-        },
-        []()
-        {
-            LOG_INFO("server.worldserver", "Using configuration file %s.", sConfigMgr->GetFilename().c_str());
-            LOG_INFO("server.worldserver", "Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-            LOG_INFO("server.worldserver", "Using ACE version: %s", ACE_VERSION);
-        }
-    );
 
     /// worldserver PID file creation
     std::string pidFile = sConfigMgr->GetOption<std::string>("PidFile", "");
