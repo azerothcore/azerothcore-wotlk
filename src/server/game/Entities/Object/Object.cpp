@@ -103,7 +103,7 @@ WorldObject::~WorldObject()
     {
         if (GetTypeId() == TYPEID_CORPSE)
         {
-            sLog->outCrash("Object::~Object Corpse guid=" UI64FMTD ", type=%d, entry=%u deleted but still in map!!", GetGUID(), ((Corpse*)this)->GetType(), GetEntry());
+            LOG_FATAL("server", "Object::~Object Corpse guid=" UI64FMTD ", type=%d, entry=%u deleted but still in map!!", GetGUID(), ((Corpse*)this)->GetType(), GetEntry());
             ABORT();
         }
         ResetMap();
@@ -116,16 +116,16 @@ Object::~Object()
 
     if (IsInWorld())
     {
-        sLog->outCrash("Object::~Object - guid=" UI64FMTD ", typeid=%d, entry=%u deleted but still in world!!", GetGUID(), GetTypeId(), GetEntry());
+        LOG_FATAL("server", "Object::~Object - guid=" UI64FMTD ", typeid=%d, entry=%u deleted but still in world!!", GetGUID(), GetTypeId(), GetEntry());
         if (isType(TYPEMASK_ITEM))
-            sLog->outCrash("Item slot %u", ((Item*)this)->GetSlot());
+            LOG_FATAL("server", "Item slot %u", ((Item*)this)->GetSlot());
         ABORT();
         RemoveFromWorld();
     }
 
     if (m_objectUpdated)
     {
-        sLog->outCrash("Object::~Object - guid=" UI64FMTD ", typeid=%d, entry=%u deleted but still in update list!!", GetGUID(), GetTypeId(), GetEntry());
+        LOG_FATAL("server", "Object::~Object - guid=" UI64FMTD ", typeid=%d, entry=%u deleted but still in update list!!", GetGUID(), GetTypeId(), GetEntry());
         ABORT();
         sObjectAccessor->RemoveUpdateObject(this);
     }
@@ -245,8 +245,6 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
                 flags |= UPDATEFLAG_HAS_TARGET;
         }
     }
-
-    //sLog->outDebug("BuildCreateUpdate: update-type: %u, object-type: %u got flags: %X, flags2: %X", updatetype, m_objectTypeId, flags, flags2);
 
     ByteBuffer buf(500);
     buf << (uint8)updatetype;
@@ -717,7 +715,7 @@ void Object::SetByteValue(uint16 index, uint8 offset, uint8 value)
 
     if (offset > 3)
     {
-        sLog->outError("Object::SetByteValue: wrong offset %u", offset);
+        LOG_ERROR("server", "Object::SetByteValue: wrong offset %u", offset);
         return;
     }
 
@@ -741,7 +739,7 @@ void Object::SetUInt16Value(uint16 index, uint8 offset, uint16 value)
 
     if (offset > 1)
     {
-        sLog->outError("Object::SetUInt16Value: wrong offset %u", offset);
+        LOG_ERROR("server", "Object::SetUInt16Value: wrong offset %u", offset);
         return;
     }
 
@@ -853,7 +851,7 @@ void Object::SetByteFlag(uint16 index, uint8 offset, uint8 newFlag)
 
     if (offset > 3)
     {
-        sLog->outError("Object::SetByteFlag: wrong offset %u", offset);
+        LOG_ERROR("server", "Object::SetByteFlag: wrong offset %u", offset);
         return;
     }
 
@@ -876,7 +874,7 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 
     if (offset > 3)
     {
-        sLog->outError("Object::RemoveByteFlag: wrong offset %u", offset);
+        LOG_ERROR("server", "Object::RemoveByteFlag: wrong offset %u", offset);
         return;
     }
 
@@ -895,7 +893,7 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 
 bool Object::PrintIndexError(uint32 index, bool set) const
 {
-    sLog->outString("Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u", (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
+    LOG_INFO("server", "Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u", (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
 
     // ASSERT must fail after function call
     return false;
@@ -967,32 +965,32 @@ ByteBuffer& operator<<(ByteBuffer& buf, Position::PositionXYZOStreamer const& st
 
 void MovementInfo::OutDebug()
 {
-    sLog->outString("MOVEMENT INFO");
-    sLog->outString("guid " UI64FMTD, guid);
-    sLog->outString("flags %u", flags);
-    sLog->outString("flags2 %u", flags2);
-    sLog->outString("time %u current time " UI64FMTD "", flags2, uint64(::time(nullptr)));
-    sLog->outString("position: `%s`", pos.ToString().c_str());
+    LOG_INFO("server", "MOVEMENT INFO");
+    LOG_INFO("server", "guid " UI64FMTD, guid);
+    LOG_INFO("server", "flags %u", flags);
+    LOG_INFO("server", "flags2 %u", flags2);
+    LOG_INFO("server", "time %u current time " UI64FMTD "", flags2, uint64(::time(nullptr)));
+    LOG_INFO("server", "position: `%s`", pos.ToString().c_str());
     if (flags & MOVEMENTFLAG_ONTRANSPORT)
     {
-        sLog->outString("TRANSPORT:");
-        sLog->outString("guid: " UI64FMTD, transport.guid);
-        sLog->outString("position: `%s`", transport.pos.ToString().c_str());
-        sLog->outString("seat: %i", transport.seat);
-        sLog->outString("time: %u", transport.time);
+        LOG_INFO("server", "TRANSPORT:");
+        LOG_INFO("server", "guid: " UI64FMTD, transport.guid);
+        LOG_INFO("server", "position: `%s`", transport.pos.ToString().c_str());
+        LOG_INFO("server", "seat: %i", transport.seat);
+        LOG_INFO("server", "time: %u", transport.time);
         if (flags2 & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
-            sLog->outString("time2: %u", transport.time2);
+            LOG_INFO("server", "time2: %u", transport.time2);
     }
 
     if ((flags & (MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (flags2 & MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
-        sLog->outString("pitch: %f", pitch);
+        LOG_INFO("server", "pitch: %f", pitch);
 
-    sLog->outString("fallTime: %u", fallTime);
+    LOG_INFO("server", "fallTime: %u", fallTime);
     if (flags & MOVEMENTFLAG_FALLING)
-        sLog->outString("j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
+        LOG_INFO("server", "j_zspeed: %f j_sinAngle: %f j_cosAngle: %f j_xyspeed: %f", jump.zspeed, jump.sinAngle, jump.cosAngle, jump.xyspeed);
 
     if (flags & MOVEMENTFLAG_SPLINE_ELEVATION)
-        sLog->outString("splineElevation: %f", splineElevation);
+        LOG_INFO("server", "splineElevation: %f", splineElevation);
 }
 
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
@@ -1979,7 +1977,7 @@ namespace acore
                 ChatHandler::BuildChatPacket(data, i_msgtype, i_language, i_object, i_target, text, 0, "", loc_idx);
             }
             else
-                sLog->outError("MonsterChatBuilder: `broadcast_text` id %i missing", i_textId);
+                LOG_ERROR("server", "MonsterChatBuilder: `broadcast_text` id %i missing", i_textId);
         }
 
     private:
@@ -2151,7 +2149,7 @@ void WorldObject::SetMap(Map* map)
         return;
     if (m_currMap)
     {
-        sLog->outCrash("WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
+        LOG_FATAL("server", "WorldObject::SetMap: obj %u new map %u %u, old map %u %u", (uint32)GetTypeId(), map->GetId(), map->GetInstanceId(), m_currMap->GetId(), m_currMap->GetInstanceId());
         ABORT();
     }
     m_currMap = map;
@@ -2199,7 +2197,7 @@ void WorldObject::AddObjectToRemoveList()
     Map* map = FindMap();
     if (!map)
     {
-        sLog->outError("Object (TypeId: %u Entry: %u GUID: %u) at attempt add to move list not have valid map (Id: %u).", GetTypeId(), GetEntry(), GetGUIDLow(), GetMapId());
+        LOG_ERROR("server", "Object (TypeId: %u Entry: %u GUID: %u) at attempt add to move list not have valid map (Id: %u).", GetTypeId(), GetEntry(), GetGUIDLow(), GetMapId());
         return;
     }
 
@@ -2327,7 +2325,7 @@ GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo)
     {
-        sLog->outErrorDb("Gameobject template %u not found in database!", entry);
+        LOG_ERROR("sql.sql", "Gameobject template %u not found in database!", entry);
         return nullptr;
     }
 
@@ -2387,7 +2385,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo)
     {
-        sLog->outErrorDb("Gameobject template %u not found in database!", entry);
+        LOG_ERROR("sql.sql", "Gameobject template %u not found in database!", entry);
         return nullptr;
     }
 
@@ -2759,7 +2757,7 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
     // Prevent invalid coordinates here, position is unchanged
     if (!acore::IsValidMapCoord(destx, desty))
     {
-        sLog->outCrash("WorldObject::MovePosition invalid coordinates X: %f and Y: %f were passed!", destx, desty);
+        LOG_FATAL("server", "WorldObject::MovePosition invalid coordinates X: %f and Y: %f were passed!", destx, desty);
         return;
     }
 
