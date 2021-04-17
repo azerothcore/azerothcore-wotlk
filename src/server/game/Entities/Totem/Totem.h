@@ -21,7 +21,7 @@ enum TotemType
 #define SENTRY_TOTEM_ENTRY    3968
 #define EARTHBIND_TOTEM_ENTRY 2630
 
-#define IMMUNE_TOTEM  33786
+#define SPELL_CYCLONE 33786
 
 class Totem : public Minion
 {
