@@ -12,6 +12,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Item.h"
+#include "Log.h"
 #include "Map.h"
 #include "MapInstanced.h"
 #include "MapManager.h"
@@ -347,7 +348,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("Deleting Corpse and spawned bones.");
+    LOG_DEBUG("server", "Deleting Corpse and spawned bones.");
 #endif
 
     // Map can be nullptr
@@ -541,6 +542,36 @@ void ObjectAccessor::UnloadAll()
         itr->second->RemoveFromWorld();
         delete itr->second;
     }
+}
+
+template<class T>
+/*static*/ T* ObjectAccessor::GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/)
+{
+    T* obj = HashMapHolder<T>::Find(guid);
+    if (!obj || obj->GetMapId() != mapid)
+        return nullptr;
+
+    CellCoord p = acore::ComputeCellCoord(x, y);
+    if (!p.IsCoordValid())
+    {
+        LOG_ERROR("server", "ObjectAccessor::GetObjectInWorld: invalid coordinates supplied X:%f Y:%f grid cell [%u:%u]", x, y, p.x_coord, p.y_coord);
+        return nullptr;
+    }
+
+    CellCoord q = acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
+    if (!q.IsCoordValid())
+    {
+        LOG_ERROR("server", "ObjectAccessor::GetObjecInWorld: object (GUID: %u TypeId: %u) has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUIDLow(), obj->GetTypeId(), obj->GetPositionX(), obj->GetPositionY(), q.x_coord, q.y_coord);
+        return nullptr;
+    }
+
+    int32 dx = int32(p.x_coord) - int32(q.x_coord);
+    int32 dy = int32(p.y_coord) - int32(q.y_coord);
+
+    if (dx > -2 && dx < 2 && dy > -2 && dy < 2)
+        return obj;
+
+    return nullptr;
 }
 
 std::map<std::string, Player*> ObjectAccessor::playerNameToPlayerPointer;

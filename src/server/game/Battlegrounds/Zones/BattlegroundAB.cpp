@@ -381,14 +381,14 @@ bool BattlegroundAB::SetupBattleground()
     for (uint32 i = BG_AB_OBJECT_BANNER_NEUTRAL; i < BG_AB_OBJECT_MAX; ++i)
         if (BgObjects[i] == 0)
         {
-            sLog->outErrorDb("BatteGroundAB: Failed to spawn some object Battleground not created!");
+            LOG_ERROR("sql.sql", "BatteGroundAB: Failed to spawn some object Battleground not created!");
             return false;
         }
 
     for (uint32 i = BG_AB_SPIRIT_ALIANCE; i <= BG_AB_SPIRIT_HORDE; ++i)
         if (BgCreatures[i] == 0)
         {
-            sLog->outErrorDb("BatteGroundAB: Failed to spawn spirit guides Battleground not created!");
+            LOG_ERROR("sql.sql", "BatteGroundAB: Failed to spawn spirit guides Battleground not created!");
             return false;
         }
 
