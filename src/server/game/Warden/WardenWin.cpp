@@ -114,7 +114,6 @@ void WardenWin::Init(WorldSession* session, SessionKey const& k)
     _module = GetModuleForClient();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-
     LOG_DEBUG("warden", "Module Key: %s", acore::Impl::ByteArrayToHexStr(_module->Key, 16).c_str());
     LOG_DEBUG("warden", "Module ID: %s", acore::Impl::ByteArrayToHexStr(_module->Id, 16).c_str());
 #endif
