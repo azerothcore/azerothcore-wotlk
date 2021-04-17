@@ -30,3 +30,6 @@ UPDATE `smart_scripts` SET `event_param1`='4000', `event_param2`='9000', `event_
 
 -- Removed C++ script from "Son of Flame"
 update creature_template SET `ScriptName`='' WHERE entry=12143;
+
+-- Renamed Core Hound script
+update creature_template set `ScriptName`='npc_mc_core_hound' WHERE entry=11671;
