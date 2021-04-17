@@ -239,7 +239,7 @@ public:
                         {
                             DoCastVictim(SPELL_SERRATED_BITE);
                         }
-                        events.RepeatEvent(6000); // again, timer may be wrong
+                        events.RepeatEvent(urand(5000, 6000));
                         break;
                     }
                     case EVENT_IGNITE:
