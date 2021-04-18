@@ -12,7 +12,6 @@ FROM `creature_loot_template`
 WHERE ENTRY = 2850
   AND Item NOT IN (1688, 4580, 8146);
 
-
 # Update chance for Long Soft Tail
 UPDATE `creature_loot_template` SET Chance = 19 WHERE Entry = 2850 AND Item = 1688;
 
