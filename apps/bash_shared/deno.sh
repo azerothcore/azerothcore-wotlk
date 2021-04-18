@@ -14,7 +14,7 @@ function denoInstall() {
 }
 
 function denoCmd() {
-    (cd "$AC_PATH_DEPS" ; ./deno/bin/deno "$@")
+    (cd "$AC_PATH_ROOT" ; ./deps/deno/bin/deno "$@")
 }
 
 function denoRunFile() {

@@ -84,7 +84,9 @@ services:
     tty: true
     image: local/azerothcore/worldserver # name of the generated image after built locally
     restart: unless-stopped
-    command: "/azerothcore/env/dist/bin/worldserver"
+    command: "./acore.sh run-worldserver"
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     privileged: true
     build:
       context: .
@@ -99,7 +101,9 @@ services:
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     image: local/azerothcore/authserver # name of the generated image after built locally
     restart: unless-stopped
-    command: "/azerothcore/env/dist/bin/authserver"
+    command: "./acore.sh run-authserver"
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     build:
       context: .
       dockerfile: ./apps/docker/Dockerfile.srv
@@ -115,13 +119,14 @@ services:
   ac-dev-server:
     << : *ac-dev-server-base
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     ports:
+      - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
-      # build files, we need a volume here to share it with the ac-build process
       - ac-build:/azerothcore/var/build
-    # This cannot be extended, so we need to define it here
     profiles: [dev]
 
 volumes:

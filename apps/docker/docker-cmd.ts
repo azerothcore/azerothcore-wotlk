@@ -21,19 +21,19 @@ shellCommandFactory(
 shellCommandFactory(
     "build",
     "Build the authserver and worldserver",
-    `docker-compose run ac-dev-server bash bin/acore-docker-build`
+    `docker-compose run --rm ac-dev-server bash bin/acore-docker-build`
 );
 
 shellCommandFactory(
     "build:clean",
     "Clean build data",
-    `docker-compose run ac-dev-server bash rm -rf var/build`
+    `docker-compose run --rm ac-dev-server bash rm -rf var/build`
 );
 
 shellCommandFactory(
     "client-data",
     "Download client data inside the ac-data volume",
-    "docker-compose run ac-dev-server bash acore.sh client-data"
+    "docker-compose run --rm ac-dev-server bash acore.sh client-data"
 );
 
 shellCommandFactory(
@@ -58,7 +58,8 @@ function shellCommandFactory(name: string, description: string, command: string)
       }
 
       const shellCmd = run({
-        cmd
+        cmd,
+        cwd: process.cwd()
       });
 
       await shellCmd.status();

@@ -16,7 +16,7 @@ env/docker/logs/*
 env/docker/etc/*
 !env/docker/etc/authserver.conf.dockerdist
 !env/docker/etc/worldserver.conf.dockerdist
-.env
+/.env*
 apps/joiner
 deps/deno
 

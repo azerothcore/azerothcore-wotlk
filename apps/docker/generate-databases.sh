@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # TODO: remove this line after we squash our DB updates
 mysql -u root -p$MYSQL_ROOT_PASSWORD -e "SET GLOBAL max_allowed_packet=128*1024*1024;"
 
