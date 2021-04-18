@@ -12,6 +12,7 @@
 * authentication server
 */
 
+#include "Banner.h"
 #include "Common.h"
 #include "AppenderDB.h"
 #include "DatabaseEnv.h"
@@ -85,25 +86,18 @@ extern int main(int argc, char** argv)
     sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize();
 
-    LOG_INFO("server.authserver", "%s (authserver)", GitRevision::GetFullVersion());
-    LOG_INFO("server.authserver", "<Ctrl-C> to stop.");
-    LOG_INFO("server.authserver", " ");
-    LOG_INFO("server.authserver", "   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");
-    LOG_INFO("server.authserver", "  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");
-    LOG_INFO("server.authserver", "  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║");
-    LOG_INFO("server.authserver", "  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║");
-    LOG_INFO("server.authserver", "  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║");
-    LOG_INFO("server.authserver", "  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝");
-    LOG_INFO("server.authserver", "                                ██████╗ ██████╗ ██████╗ ███████╗");
-    LOG_INFO("server.authserver", "                                ██╔════╝██╔═══██╗██╔══██╗██╔═══╝");
-    LOG_INFO("server.authserver", "                                ██║     ██║   ██║██████╔╝█████╗");
-    LOG_INFO("server.authserver", "                                ██║     ██║   ██║██╔══██╗██╔══╝");
-    LOG_INFO("server.authserver", "                                ╚██████╗╚██████╔╝██║  ██║███████╗");
-    LOG_INFO("server.authserver", "                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝\n");
-    LOG_INFO("server.authserver", "     AzerothCore 3.3.5a  -  www.azerothcore.org");
-    LOG_INFO("server.authserver", " ");
-    LOG_INFO("server.authserver", "Using configuration file %s.", configFile.c_str());
-    LOG_INFO("server.authserver", "%s (Library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+    acore::Banner::Show("authserver",
+        [](char const* text)
+        {
+            LOG_INFO("server.authserver", "%s", text);
+        },
+        []()
+        {
+            LOG_INFO("server.authserver", "> Using configuration file       %s.", sConfigMgr->GetFilename().c_str());
+            LOG_INFO("server.authserver", "> Using SSL version:             %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            LOG_INFO("server.authserver", "> Using ACE version:             %s", ACE_VERSION);
+        }
+    );
 
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
