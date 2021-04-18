@@ -15,4 +15,4 @@ INSERT INTO `spell_dbc` (`ID`, `Category`, `DispelType`, `Mechanic`, `Attributes
 
 UPDATE `spell_dbc` SET `DefenseType`=2, `Attributes`=8192,`SpellLevel`=0 WHERE `ID`=20253;
 UPDATE `spell_dbc` SET `DefenseType`=1, `SpellLevel`=0 WHERE `ID` IN (58620,58621);
-UPDATE `spell_dbc` SET `Attributes`=8192 WHERE `ID` IN (64382,20252,20616,20617,25272,25275);
+UPDATE `spell_dbc` SET `DefenseType`=2, `Attributes`=8192, `SpellLevel`=0 WHERE `ID` IN (64382,20252,20616,20617,25272,25275);
