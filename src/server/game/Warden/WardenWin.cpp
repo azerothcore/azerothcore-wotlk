@@ -105,17 +105,17 @@ void WardenWin::Init(WorldSession* session, SessionKey const& k)
     _outputCrypto.Init(_outputKey);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("warden", "Server side warden for client %u initializing...", session->GetAccountId());
-    LOG_DEBUG("warden", "C->S Key: %s", acore::Impl::ByteArrayToHexStr(_inputKey, false).c_str());
-    LOG_DEBUG("warden", "S->C Key: %s", acore::Impl::ByteArrayToHexStr(_outputKey,false).c_str());
-    LOG_DEBUG("warden", "  Seed: %s", acore::Impl::ByteArrayToHexStr(_seed, false).c_str());
+    LOG_DEBUG("warden", "C->S Key: %s", acore::Impl::ByteArrayToHexStr(_inputKey, 16).c_str());
+    LOG_DEBUG("warden", "S->C Key: %s", acore::Impl::ByteArrayToHexStr(_outputKey,16).c_str());
+    LOG_DEBUG("warden", "  Seed: %s", acore::Impl::ByteArrayToHexStr(_seed, 16).c_str());
     LOG_DEBUG("warden", "Loading Module...");
 #endif
 
     _module = GetModuleForClient();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("warden", "Module Key: %s", acore::Impl::ByteArrayToHexStr(_module->Key, false).c_str());
-    LOG_DEBUG("warden", "Module ID: %s", acore::Impl::ByteArrayToHexStr(_module->Id, false).c_str());
+    LOG_DEBUG("warden", "Module Key: %s", acore::Impl::ByteArrayToHexStr(_module->Key, 16).c_str());
+    LOG_DEBUG("warden", "Module ID: %s", acore::Impl::ByteArrayToHexStr(_module->Id, 16).c_str());
 #endif
     RequestModule();
 }
