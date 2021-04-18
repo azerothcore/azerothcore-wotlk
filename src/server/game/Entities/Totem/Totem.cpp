@@ -154,7 +154,9 @@ bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) con
 
     // Cyclone shouldn't be casted on totems
     if (spellInfo->Id == SPELL_CYCLONE)
+    {
         return true;
+    }
 
     switch (spellInfo->Effects[index].ApplyAuraName)
     {
