@@ -6,42 +6,6 @@ DELETE
 FROM `creature_loot_template`
 WHERE Comment LIKE '%Broken Tooth - (ReferenceTable%';
 
-DELETE
-FROM `reference_loot_template`
-WHERE reference_loot_template.Entry IN
-      (24016,
-       24036,
-       24037,
-       24038,
-       24039,
-       24040,
-       24041,
-       24042,
-       24047,
-       24048,
-       24049,
-       24050,
-       24051,
-       24052,
-       24053,
-       24054,
-       24055,
-       24056,
-       24057,
-       24058,
-       24059,
-       24060,
-       24061,
-       24062,
-       24063,
-       24064,
-       24065,
-       24066,
-       24067,
-       24068,
-       24069,
-       24078);
-
 # Delete the junk Broken Tooth currently drops like Melon Juice
 DELETE
 FROM `creature_loot_template`
