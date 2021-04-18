@@ -11333,7 +11333,8 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
     return uint32(std::max(tmpDamage, 0.0f));
 }
 
-float Unit::processDummyAuras(float TakenTotalMod) const {
+float Unit::processDummyAuras(float TakenTotalMod) const
+{
     // note: old code coming from TC, just extracted here to remove the code duplication + solve potential crash
     // see: https://github.com/TrinityCore/TrinityCore/commit/c85710e148d75450baedf6632b9ca6fd40b4148e
 
