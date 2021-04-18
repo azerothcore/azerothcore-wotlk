@@ -179,7 +179,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_skeramAI(creature);
+        return GetTempleOfAhnQirajAI<boss_skeramAI>(creature);
     }
 };
 

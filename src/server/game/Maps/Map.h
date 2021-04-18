@@ -20,10 +20,10 @@
 #include "PathGenerator.h"
 #include "SharedDefines.h"
 #include "Timer.h"
-#include <ace/RW_Thread_Mutex.h>
-#include <ace/Thread_Mutex.h>
 #include <bitset>
 #include <list>
+#include <mutex>
+#include <shared_mutex>
 
 class Unit;
 class WorldPacket;
@@ -338,7 +338,7 @@ public:
     [[nodiscard]] Map const* GetParent() const { return m_parentMap; }
 
     // pussywizard: movemaps, mmaps
-    [[nodiscard]] ACE_RW_Thread_Mutex& GetMMapLock() const { return *(const_cast<ACE_RW_Thread_Mutex*>(&MMapLock)); }
+    [[nodiscard]] std::shared_mutex& GetMMapLock() const { return *(const_cast<std::shared_mutex*>(&MMapLock)); }
     // pussywizard:
     std::unordered_set<Object*> i_objectsToUpdate;
     void BuildAndSendUpdateForObjects(); // definition in ObjectAccessor.cpp, below ObjectAccessor::Update, because it does the same for a map
@@ -580,9 +580,9 @@ private:
     void UpdateActiveCells(const float& x, const float& y, const uint32 t_diff);
 
 protected:
-    ACE_Thread_Mutex Lock;
-    ACE_Thread_Mutex GridLock;
-    ACE_RW_Thread_Mutex MMapLock;
+    std::mutex Lock;
+    std::mutex GridLock;
+    std::shared_mutex MMapLock;
 
     MapEntry const* i_mapEntry;
     uint8 i_spawnMode;
@@ -685,8 +685,10 @@ public:
     void Update(const uint32, const uint32, bool thread = true) override;
     void CreateInstanceScript(bool load, std::string data, uint32 completedEncounterMask);
     bool Reset(uint8 method, std::list<uint32>* globalSkipList = nullptr);
-    uint32 GetScriptId() { return i_script_id; }
-    InstanceScript* GetInstanceScript() { return instance_script; }
+    [[nodiscard]] uint32 GetScriptId() const { return i_script_id; }
+    [[nodiscard]] std::string const& GetScriptName() const;
+    [[nodiscard]] InstanceScript* GetInstanceScript() { return instance_data; }
+    [[nodiscard]] InstanceScript const* GetInstanceScript() const { return instance_data; }
     void PermBindAllPlayers();
     void UnloadAll() override;
     bool CanEnter(Player* player, bool loginCheck = false) override;
@@ -699,7 +701,7 @@ public:
 private:
     bool m_resetAfterUnload;
     bool m_unloadWhenEmpty;
-    InstanceScript* instance_script;
+    InstanceScript* instance_data;
     uint32 i_script_id;
 };
 

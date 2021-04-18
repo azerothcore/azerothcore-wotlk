@@ -101,10 +101,13 @@ bool ArenaTeam::AddMember(uint64 playerGuid)
         playerClass = playerData->playerClass;
     }
 
+    if (!sScriptMgr->CanAddMember(this, playerGuid))
+        return false;
+
     // Check if player is already in a similar arena team
     if ((player && player->GetArenaTeamId(GetSlot())) || Player::GetArenaTeamIdFromStorage(GUID_LOPART(playerGuid), GetSlot()) != 0)
     {
-        sLog->outError("Arena: Player %s (guid: %u) already has an arena team of type %u", playerName.c_str(), GUID_LOPART(playerGuid), GetType());
+        LOG_ERROR("server", "Arena: Player %s (guid: %u) already has an arena team of type %u", playerName.c_str(), GUID_LOPART(playerGuid), GetType());
         return false;
     }
 
@@ -239,7 +242,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
         // Delete member if character information is missing
         if (fields[6].GetString().empty())
         {
-            sLog->outErrorDb("ArenaTeam %u has member with empty name - probably player %u doesn't exist, deleting him from memberlist!", arenaTeamId, GUID_LOPART(newMember.Guid));
+            LOG_ERROR("sql.sql", "ArenaTeam %u has member with empty name - probably player %u doesn't exist, deleting him from memberlist!", arenaTeamId, GUID_LOPART(newMember.Guid));
             this->DelMember(newMember.Guid, true);
             continue;
         }
@@ -257,7 +260,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
     {
         // Arena team is empty or captain is not in team, delete from db
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "ArenaTeam %u does not have any members or its captain is not in team, disbanding it...", TeamId);
+        LOG_DEBUG("bg.battleground", "ArenaTeam %u does not have any members or its captain is not in team, disbanding it...", TeamId);
 #endif
         return false;
     }
@@ -300,7 +303,7 @@ void ArenaTeam::SetCaptain(uint64 guid)
         newCaptain->SetArenaTeamInfoField(GetSlot(), ARENA_TEAM_MEMBER, 0);
         /*if (oldCaptain)
         {
-            sLog->outDebug(LOG_FILTER_BATTLEGROUND, "Player: %s [GUID: %u] promoted player: %s [GUID: %u] to leader of arena team [Id: %u] [Type: %u].",
+            LOG_DEBUG("bg.battleground", "Player: %s [GUID: %u] promoted player: %s [GUID: %u] to leader of arena team [Id: %u] [Type: %u].",
                 oldCaptain->GetName().c_str(), oldCaptain->GetGUIDLow(), newCaptain->GetName().c_str(),
                 newCaptain->GetGUIDLow(), GetId(), GetType());
         }*/
@@ -457,7 +460,7 @@ void ArenaTeam::Roster(WorldSession* session)
 
     session->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_ARENA_TEAM_ROSTER");
+    LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_ROSTER");
 #endif
 }
 
@@ -474,7 +477,7 @@ void ArenaTeam::Query(WorldSession* session)
     data << uint32(BorderColor);                            // border color
     session->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_ARENA_TEAM_QUERY_RESPONSE");
+    LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_QUERY_RESPONSE");
 #endif
 }
 
@@ -576,7 +579,7 @@ void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCoun
             data << str1 << str2 << str3;
             break;
         default:
-            sLog->outError("Unhandled strCount %u in ArenaTeam::BroadcastEvent", strCount);
+            LOG_ERROR("server", "Unhandled strCount %u in ArenaTeam::BroadcastEvent", strCount);
             return;
     }
 
@@ -586,7 +589,7 @@ void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, uint64 guid, uint8 strCoun
     BroadcastPacket(&data);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_ARENA_TEAM_EVENT");
+    LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_EVENT");
 #endif
 }
 
@@ -610,28 +613,25 @@ void ArenaTeam::MassInviteToEvent(WorldSession* session)
 uint8 ArenaTeam::GetSlotByType(uint32 type)
 {
     uint8 slot = 0xFF;
-    switch (type)
+
+    auto const& itr = ArenaSlotByType.find(type);
+    if (itr == ArenaSlotByType.end())
     {
-        case ARENA_TEAM_2v2:
-            slot = 0;
-            break;
-        case ARENA_TEAM_3v3:
-            slot = 1;
-            break;
-        case ARENA_TEAM_5v5:
-            slot = 2;
-            break;
-        default:
-            break;
+        sLog->outError("FATAL: Unknown arena team type %u for some arena team", type);
+        return slot;
     }
-    //Get the changed slot type
+
+    slot = ArenaSlotByType.at(type);
+
+    // Get the changed slot type
     sScriptMgr->OnGetSlotByType(type, slot);
 
     if (slot != 0xFF)
     {
         return slot;
     }
-    sLog->outError("FATAL: Unknown arena team type %u for some arena team", type);
+
+    LOG_ERROR("server", "FATAL: Unknown arena team type %u for some arena team", type);
     return 0xFF;
 }
 
@@ -868,12 +868,14 @@ void ArenaTeam::MemberWon(Player* player, uint32 againstMatchmakerRating, int32 
         {
             // update personal rating
             int32 mod = GetRatingMod(itr->PersonalRating, againstMatchmakerRating, true);
+            sScriptMgr->OnBeforeUpdatingPersonalRating(mod, GetType());
             itr->ModifyPersonalRating(player, mod, GetType());
 
             // update matchmaker rating (pussywizard: but don't allow it to go over team rating)
             if (itr->MatchMakerRating < Stats.Rating)
             {
                 mod = std::min(MatchmakerRatingChange, Stats.Rating - itr->MatchMakerRating);
+                sScriptMgr->OnBeforeUpdatingPersonalRating(mod, GetType());
                 itr->ModifyMatchmakerRating(mod, GetSlot());
             }
 
@@ -922,6 +924,9 @@ void ArenaTeam::UpdateArenaPointsHelper(std::map<uint32, uint32>& playerPoints)
 
 void ArenaTeam::SaveToDB()
 {
+    if (!sScriptMgr->CanSaveToDB(this))
+        return;
+
     // Save team and member stats to db
     // Called after a match has ended or when calculating arena_points
 
@@ -997,3 +1002,83 @@ ArenaTeamMember* ArenaTeam::GetMember(uint64 guid)
 
     return nullptr;
 }
+
+uint8 ArenaTeam::GetReqPlayersForType(uint32 type)
+{
+    auto const& itr = ArenaReqPlayersForType.find(type);
+    if (itr == ArenaReqPlayersForType.end())
+    {
+        sLog->outError("FATAL: Unknown arena type %u!", type);
+        return 0xFF;
+    }
+
+    return ArenaReqPlayersForType.at(type);
+}
+
+void ArenaTeam::CreateTempArenaTeam(std::vector<Player*> playerList, uint8 type, std::string const& teamName)
+{
+    auto playerCountInTeam = static_cast<uint32>(playerList.size());
+
+    ASSERT(playerCountInTeam == GetReqPlayersForType(type));
+
+    // Generate new arena team id
+    TeamId = sArenaTeamMgr->GenerateTempArenaTeamId();
+
+    // Assign member variables
+    CaptainGuid = playerList[0]->GetGUID();
+    Type = type;
+    TeamName = teamName;
+
+    BackgroundColor = 0;
+    EmblemStyle = 0;
+    EmblemColor = 0;
+    BorderStyle = 0;
+    BorderColor = 0;
+
+    Stats.WeekGames = 0;
+    Stats.SeasonGames = 0;
+    Stats.Rating = 0;
+    Stats.WeekWins = 0;
+    Stats.SeasonWins = 0;
+
+    for (auto const& _player : playerList)
+    {
+        ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(_player->GetArenaTeamId(GetSlotByType(type)));
+        if (!team)
+            continue;
+
+        ArenaTeamMember newMember;
+        for (auto const& itr : Members)
+            newMember = itr;
+
+        Stats.WeekGames += team->Stats.WeekGames;
+        Stats.SeasonGames += team->Stats.SeasonGames;
+        Stats.Rating += team->GetRating();
+        Stats.WeekWins += team->Stats.WeekWins;
+        Stats.SeasonWins += team->Stats.SeasonWins;
+
+        Members.push_back(newMember);
+    }
+
+    Stats.WeekGames /= playerCountInTeam;
+    Stats.SeasonGames /= playerCountInTeam;
+    Stats.Rating /= playerCountInTeam;
+    Stats.WeekWins /= playerCountInTeam;
+    Stats.SeasonWins /= playerCountInTeam;
+}
+
+// init/update unordered_map ArenaSlotByType
+std::unordered_map<uint32, uint8> ArenaTeam::ArenaSlotByType =
+{
+    { ARENA_TEAM_2v2, ARENA_SLOT_2v2},
+    { ARENA_TEAM_3v3, ARENA_SLOT_3v3},
+    { ARENA_TEAM_5v5, ARENA_SLOT_5v5}
+};
+
+// init/update unordered_map ArenaReqPlayersForType
+std::unordered_map<uint8, uint8> ArenaTeam::ArenaReqPlayersForType =
+{
+    { ARENA_TYPE_2v2, 4},
+    { ARENA_TYPE_3v3, 6},
+    { ARENA_TYPE_5v5, 10}
+};

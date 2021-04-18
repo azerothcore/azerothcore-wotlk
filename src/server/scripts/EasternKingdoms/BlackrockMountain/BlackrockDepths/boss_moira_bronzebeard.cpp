@@ -4,6 +4,7 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "blackrock_depths.h"
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 
@@ -24,7 +25,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_moira_bronzebeardAI(creature);
+        return GetBlackrockDepthsAI<boss_moira_bronzebeardAI>(creature);
     }
 
     struct boss_moira_bronzebeardAI : public ScriptedAI

@@ -7,6 +7,10 @@
 #ifndef DEF_RUINS_OF_AHNQIRAJ_H
 #define DEF_RUINS_OF_AHNQIRAJ_H
 
+#include "CreatureAIImpl.h"
+
+#define RuinsOfAhnQirajScriptName "instance_ruins_of_ahnqiraj"
+
 enum DataTypes
 {
     DATA_KURINNAXX          = 0,
@@ -43,5 +47,11 @@ enum GameObjects
 {
     GO_OSSIRIAN_CRYSTAL         = 180619
 };
+
+template <class AI, class T>
+inline AI* GetRuinsOfAhnQirajAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, RuinsOfAhnQirajScriptName);
+}
 
 #endif
