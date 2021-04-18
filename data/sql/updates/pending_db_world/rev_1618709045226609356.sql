@@ -111,6 +111,3 @@ VALUES (2850, 7493, 0, 0, 0, 1, 1, 1, 1, 'Broken Tooth - Captain''s Bracers'),
        (2850, 9896, 0, 0, 0, 1, 1, 1, 1, 'Broken Tooth - Jazeraint Bracers'),
        (2850, 7446, 0, 0, 0, 1, 1, 1, 1, 'Broken Tooth - Sentinel Cloak'),
        (2850, 7445, 0, 0, 0, 1, 1, 1, 1, 'Broken Tooth - Sentinel Shoulders');
-
-
-
