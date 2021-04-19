@@ -12,6 +12,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Item.h"
+#include "Log.h"
 #include "Map.h"
 #include "MapInstanced.h"
 #include "MapManager.h"
@@ -25,6 +26,35 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include <cmath>
+
+template<class T>
+void HashMapHolder<T>::Insert(T* o)
+{
+    std::unique_lock<std::shared_mutex> lock(*GetLock());
+    m_objectMap[o->GetGUID()] = o;
+}
+
+template<class T>
+void HashMapHolder<T>::Remove(T* o)
+{
+    std::unique_lock<std::shared_mutex> lock(*GetLock());
+    m_objectMap.erase(o->GetGUID());
+}
+
+template<class T>
+T* HashMapHolder<T>::Find(uint64 guid)
+{
+    std::shared_lock<std::shared_mutex> lock(*GetLock());
+    typename MapType::iterator itr = m_objectMap.find(guid);
+    return (itr != m_objectMap.end()) ? itr->second : nullptr;
+}
+
+template<class T>
+std::shared_mutex* HashMapHolder<T>::GetLock()
+{
+    static std::shared_mutex _lock;
+    return &_lock;
+}
 
 ObjectAccessor::ObjectAccessor()
 {
@@ -190,20 +220,6 @@ Player* ObjectAccessor::FindConnectedPlayer(uint64 const& guid)
 
 Player* ObjectAccessor::FindPlayerByName(std::string const& name, bool checkInWorld)
 {
-    /*ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
-    std::string nameStr = name;
-    std::transform(nameStr.begin(), nameStr.end(), nameStr.begin(), ::tolower);
-    HashMapHolder<Player>::MapType const& m = GetPlayers();
-    for (HashMapHolder<Player>::MapType::const_iterator iter = m.begin(); iter != m.end(); ++iter)
-    {
-        if (!iter->second->IsInWorld())
-            continue;
-        std::string currentName = iter->second->GetName();
-        std::transform(currentName.begin(), currentName.end(), currentName.begin(), ::tolower);
-        if (nameStr.compare(currentName) == 0)
-            return iter->second;
-    }*/
-
     // pussywizard: optimization
     std::string nameStr = name;
     std::transform(nameStr.begin(), nameStr.end(), nameStr.begin(), ::tolower);
@@ -217,7 +233,8 @@ Player* ObjectAccessor::FindPlayerByName(std::string const& name, bool checkInWo
 
 void ObjectAccessor::SaveAllPlayers()
 {
-    ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
+    std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
+
     HashMapHolder<Player>::MapType const& m = GetPlayers();
     for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
         itr->second->SaveToDB(false, false);
@@ -225,7 +242,7 @@ void ObjectAccessor::SaveAllPlayers()
 
 Corpse* ObjectAccessor::GetCorpseForPlayerGUID(uint64 guid)
 {
-    ACORE_READ_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    std::shared_lock<std::shared_mutex> lock(i_corpseLock);
 
     Player2CorpsesMapType::iterator iter = i_player2corpse.find(guid);
     if (iter == i_player2corpse.end())
@@ -242,7 +259,7 @@ void ObjectAccessor::RemoveCorpse(Corpse* corpse, bool final)
 
     if (!final)
     {
-        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        std::unique_lock<std::shared_mutex> guard(i_corpseLock);
         Player2CorpsesMapType::iterator iter = i_player2corpse.find(corpse->GetOwnerGUID());
         if (iter == i_player2corpse.end())
             return;
@@ -269,7 +286,7 @@ void ObjectAccessor::RemoveCorpse(Corpse* corpse, bool final)
 
     // Critical section
     {
-        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        std::unique_lock<std::shared_mutex> guard(i_corpseLock);
 
         // build mapid*cellid -> guid_set map
         CellCoord cellCoord = acore::ComputeCellCoord(corpse->GetPositionX(), corpse->GetPositionY());
@@ -285,7 +302,7 @@ void ObjectAccessor::AddCorpse(Corpse* corpse)
 
     // Critical section
     {
-        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        std::unique_lock<std::shared_mutex> guard(i_corpseLock);
 
         ASSERT(i_player2corpse.find(corpse->GetOwnerGUID()) == i_player2corpse.end());
         i_player2corpse[corpse->GetOwnerGUID()] = corpse;
@@ -298,7 +315,7 @@ void ObjectAccessor::AddCorpse(Corpse* corpse)
 
 void ObjectAccessor::AddCorpsesToGrid(GridCoord const& gridpair, GridType& grid, Map* map)
 {
-    ACORE_READ_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    std::shared_lock<std::shared_mutex> guard(i_corpseLock);
 
     for (Player2CorpsesMapType::iterator iter = i_player2corpse.begin(); iter != i_player2corpse.end(); ++iter)
     {
@@ -331,7 +348,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("Deleting Corpse and spawned bones.");
+    LOG_DEBUG("server", "Deleting Corpse and spawned bones.");
 #endif
 
     // Map can be nullptr
@@ -386,7 +403,7 @@ Corpse* ObjectAccessor::ConvertCorpseForPlayer(uint64 player_guid, bool insignia
         }
 
         // pussywizard: for deleting bones
-        ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+        std::unique_lock<std::shared_mutex> guard(i_corpseLock);
         i_playerBones.push_back(bones->GetGUID());
     }
 
@@ -413,7 +430,7 @@ void ObjectAccessor::RemoveOldCorpses()
 
     // pussywizard: for deleting bones
     std::list<uint64>::iterator next2;
-    ACORE_WRITE_GUARD(ACE_RW_Thread_Mutex, i_corpseLock);
+    std::unique_lock<std::shared_mutex> guard(i_corpseLock);
     for (std::list<uint64>::iterator itr = i_playerBones.begin(); itr != i_playerBones.end(); itr = next2)
     {
         next2 = itr;
@@ -446,13 +463,13 @@ void ObjectAccessor::RemoveOldCorpses()
 
 void ObjectAccessor::AddDelayedCorpseAction(Corpse* corpse, uint8 action, uint32 mapId, uint32 instanceId)
 {
-    ACORE_GUARD(ACE_Thread_Mutex, DelayedCorpseLock);
+    std::lock_guard<std::mutex> guard(DelayedCorpseLock);
     i_delayedCorpseActions.push_back(DelayedCorpseAction(corpse, action, mapId, instanceId));
 }
 
 void ObjectAccessor::ProcessDelayedCorpseActions()
 {
-    ACORE_GUARD(ACE_Thread_Mutex, DelayedCorpseLock);
+    std::lock_guard<std::mutex> guard(DelayedCorpseLock);
     for (std::list<DelayedCorpseAction>::iterator itr = i_delayedCorpseActions.begin(); itr != i_delayedCorpseActions.end(); ++itr)
     {
         DelayedCorpseAction a = (*itr);
@@ -525,6 +542,36 @@ void ObjectAccessor::UnloadAll()
         itr->second->RemoveFromWorld();
         delete itr->second;
     }
+}
+
+template<class T>
+/*static*/ T* ObjectAccessor::GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/)
+{
+    T* obj = HashMapHolder<T>::Find(guid);
+    if (!obj || obj->GetMapId() != mapid)
+        return nullptr;
+
+    CellCoord p = acore::ComputeCellCoord(x, y);
+    if (!p.IsCoordValid())
+    {
+        LOG_ERROR("server", "ObjectAccessor::GetObjectInWorld: invalid coordinates supplied X:%f Y:%f grid cell [%u:%u]", x, y, p.x_coord, p.y_coord);
+        return nullptr;
+    }
+
+    CellCoord q = acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
+    if (!q.IsCoordValid())
+    {
+        LOG_ERROR("server", "ObjectAccessor::GetObjecInWorld: object (GUID: %u TypeId: %u) has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUIDLow(), obj->GetTypeId(), obj->GetPositionX(), obj->GetPositionY(), q.x_coord, q.y_coord);
+        return nullptr;
+    }
+
+    int32 dx = int32(p.x_coord) - int32(q.x_coord);
+    int32 dy = int32(p.y_coord) - int32(q.y_coord);
+
+    if (dx > -2 && dx < 2 && dy > -2 && dy < 2)
+        return obj;
+
+    return nullptr;
 }
 
 std::map<std::string, Player*> ObjectAccessor::playerNameToPlayerPointer;
