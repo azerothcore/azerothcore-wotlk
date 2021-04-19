@@ -39,7 +39,7 @@ Warden::~Warden()
 void Warden::SendModuleToClient()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Send module to client");
+    LOG_DEBUG("warden", "Send module to client");
 #endif
 
     // Create packet structure
@@ -67,7 +67,7 @@ void Warden::SendModuleToClient()
 void Warden::RequestModule()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Request module");
+    LOG_DEBUG("warden", "Request module");
 #endif
 
     // Create packet structure
@@ -140,14 +140,14 @@ bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 le
     if (checksum != newChecksum)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_WARDEN, "CHECKSUM IS NOT VALID");
+        LOG_DEBUG("warden", "CHECKSUM IS NOT VALID");
 #endif
         return false;
     }
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_WARDEN, "CHECKSUM IS VALID");
+        LOG_DEBUG("warden", "CHECKSUM IS VALID");
 #endif
         return true;
     }
@@ -274,7 +274,7 @@ void Warden::ApplyPenalty(uint16 checkId, std::string const& reason)
     }
 
     reportMsg = "Warden: " + reportMsg;
-    sLog->outString(reportMsg.c_str());
+    LOG_INFO("warden", "> Warden: %s", reportMsg.c_str());
 }
 
 bool Warden::ProcessLuaCheckResponse(std::string const& msg)
@@ -322,7 +322,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
     uint8 opcode;
     recvData >> opcode;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
+    LOG_DEBUG("warden", "Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
 #endif
     recvData.hexlike();
 
@@ -339,7 +339,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
             break;
         case WARDEN_CMSG_MEM_CHECKS_RESULT:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_WARDEN, "NYI WARDEN_CMSG_MEM_CHECKS_RESULT received!");
+            LOG_DEBUG("warden", "NYI WARDEN_CMSG_MEM_CHECKS_RESULT received!");
 #endif
             break;
         case WARDEN_CMSG_HASH_RESULT:
@@ -348,12 +348,12 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
             break;
         case WARDEN_CMSG_MODULE_FAILED:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_WARDEN, "NYI WARDEN_CMSG_MODULE_FAILED received!");
+            LOG_DEBUG("warden", "NYI WARDEN_CMSG_MODULE_FAILED received!");
 #endif
             break;
         default:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_WARDEN, "Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
+            LOG_DEBUG("warden", "Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
 #endif
             break;
     }

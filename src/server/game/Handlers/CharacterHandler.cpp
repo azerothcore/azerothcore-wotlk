@@ -215,7 +215,7 @@ void WorldSession::HandleCharEnum(PreparedQueryResult result)
         {
             ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>((*result)[0].GetUInt32());
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDetail("Loading char %s from account %u.", guid.ToString().c_str(), GetAccountId());
+            LOG_DEBUG("server", "Loading char %s from account %u.", guid.ToString().c_str(), GetAccountId());
 #endif
             if (Player::BuildEnumData(result, &data))
             {
@@ -286,7 +286,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     {
         data << (uint8)CHAR_CREATE_FAILED;
         SendPacket(&data);
-        sLog->outError("Class (%u) not found in DBC while creating new char for account (ID: %u): wrong DBC files or cheater?", class_, GetAccountId());
+        LOG_ERROR("server", "Class (%u) not found in DBC while creating new char for account (ID: %u): wrong DBC files or cheater?", class_, GetAccountId());
         return;
     }
 
@@ -295,7 +295,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     {
         data << (uint8)CHAR_CREATE_FAILED;
         SendPacket(&data);
-        sLog->outError("Race (%u) not found in DBC while creating new char for account (ID: %u): wrong DBC files or cheater?", race_, GetAccountId());
+        LOG_ERROR("server", "Race (%u) not found in DBC while creating new char for account (ID: %u): wrong DBC files or cheater?", race_, GetAccountId());
         return;
     }
 
@@ -303,7 +303,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     if (raceEntry->expansion > Expansion())
     {
         data << (uint8)CHAR_CREATE_EXPANSION;
-        sLog->outError("Expansion %u account:[%d] tried to Create character with expansion %u race (%u)", Expansion(), GetAccountId(), raceEntry->expansion, race_);
+        LOG_ERROR("server", "Expansion %u account:[%d] tried to Create character with expansion %u race (%u)", Expansion(), GetAccountId(), raceEntry->expansion, race_);
         SendPacket(&data);
         return;
     }
@@ -312,7 +312,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     if (classEntry->expansion > Expansion())
     {
         data << (uint8)CHAR_CREATE_EXPANSION_CLASS;
-        sLog->outError("Expansion %u account:[%d] tried to Create character with expansion %u class (%u)", Expansion(), GetAccountId(), classEntry->expansion, class_);
+        LOG_ERROR("server", "Expansion %u account:[%d] tried to Create character with expansion %u class (%u)", Expansion(), GetAccountId(), classEntry->expansion, class_);
         SendPacket(&data);
         return;
     }
@@ -341,7 +341,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     {
         data << (uint8)CHAR_NAME_NO_NAME;
         SendPacket(&data);
-        sLog->outError("Account:[%d] but tried to Create character with empty [name] ", GetAccountId());
+        LOG_ERROR("server", "Account:[%d] but tried to Create character with empty [name] ", GetAccountId());
         return;
     }
 
@@ -604,7 +604,7 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
                     uint8 unk;
                     createInfo->Data >> unk;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    sLog->outDebug(LOG_FILTER_NETWORKIO, "Character creation %s (account %u) has unhandled tail data: [%u]", createInfo->Name.c_str(), GetAccountId(), unk);
+                    LOG_DEBUG("network", "Character creation %s (account %u) has unhandled tail data: [%u]", createInfo->Name.c_str(), GetAccountId(), unk);
 #endif
                 }
 
@@ -664,9 +664,9 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
 
                 std::string IP_str = GetRemoteAddress();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDetail("Account: %d (IP: %s) Create Character:[%s] (%s)", GetAccountId(), IP_str.c_str(), createInfo->Name.c_str(), newChar.GetGUID().ToString().c_str());
+                LOG_DEBUG("server", "Account: %d (IP: %s) Create Character:[%s] (%s)", GetAccountId(), IP_str.c_str(), createInfo->Name.c_str(), newChar.GetGUID().ToString().c_str());
 #endif
-                sLog->outChar("Account: %d (IP: %s) Create Character:[%s] (%s)", GetAccountId(), IP_str.c_str(), createInfo->Name.c_str(), newChar.GetGUID().ToString().c_str());
+                LOG_INFO("entities.player", "Account: %d (IP: %s) Create Character:[%s] (%s)", GetAccountId(), IP_str.c_str(), createInfo->Name.c_str(), newChar.GetGUID().ToString().c_str());
                 sScriptMgr->OnPlayerCreate(&newChar);
                 sWorld->AddGlobalPlayerData(newChar.GetGUID().GetCounter(), GetAccountId(), newChar.GetName(), newChar.getGender(), newChar.getRace(), newChar.getClass(), newChar.getLevel(), 0, 0);
 
@@ -734,19 +734,19 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
 
     std::string IP_str = GetRemoteAddress();
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDetail("Account: %d (IP: %s) Delete Character:[%s] (%s)", GetAccountId(), IP_str.c_str(), name.c_str(), guid.ToString().c_str());
+    LOG_DEBUG("server", "Account: %d (IP: %s) Delete Character:[%s] (%s)", GetAccountId(), IP_str.c_str(), name.c_str(), guid.ToString().c_str());
 #endif
-    sLog->outChar("Account: %d (IP: %s) Delete Character:[%s] (%s)", GetAccountId(), IP_str.c_str(), name.c_str(), guid.ToString().c_str());
+    LOG_INFO("entities.player", "Account: %d (IP: %s) Delete Character:[%s] (%s)", GetAccountId(), IP_str.c_str(), name.c_str(), guid.ToString().c_str());
 
     // To prevent hook failure, place hook before removing reference from DB
     sScriptMgr->OnPlayerDelete(guid, initAccountId); // To prevent race conditioning, but as it also makes sense, we hand the accountId over for successful delete.
     // Shouldn't interfere with character deletion though
 
-    if (sLog->IsOutCharDump())                                // optimize GetPlayerDump call
+    if (sLog->ShouldLog("entities.player.dump", LogLevel::LOG_LEVEL_INFO)) // optimize GetPlayerDump call
     {
         std::string dump;
         if (PlayerDumpWriter().GetDump(guid.GetCounter(), dump))
-            sLog->outCharDump(dump.c_str(), GetAccountId(), guid.GetCounter(), name.c_str());
+            LOG_CHAR_DUMP(dump.c_str(), GetAccountId(), guid.GetCounter(), name.c_str());
     }
 
     sCalendarMgr->RemoveAllPlayerEventsAndInvites(guid);
@@ -762,7 +762,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 {
     if (PlayerLoading() || GetPlayer() != nullptr)
     {
-        sLog->outError("Player tries to login again, AccountId = %d", GetAccountId());
+        LOG_ERROR("server", "Player tries to login again, AccountId = %d", GetAccountId());
         KickPlayer("Player tries to login again");
         return;
     }
@@ -772,7 +772,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 
     if (!playerGuid.IsPlayer() || !IsLegitCharacterForAccount(playerGuid))
     {
-        sLog->outError("Account (%u) can't login with that character (%s).", GetAccountId(), playerGuid.ToString().c_str());
+        LOG_ERROR("server", "Account (%u) can't login with that character (%s).", GetAccountId(), playerGuid.ToString().c_str());
         KickPlayer("Account can't login with this character");
         return;
     }
@@ -816,14 +816,14 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
             {
                 if (limitA == 0 || --limitA == 0)
                 {
-                    sLog->outMisc("HandlePlayerLoginOpcode A");
+                    LOG_INFO("misc", "HandlePlayerLoginOpcode A");
                     break;
                 }
                 while (sess->GetPlayer() && sess->GetPlayer()->IsBeingTeleportedFar())
                 {
                     if (limitB == 0 || --limitB == 0)
                     {
-                        sLog->outMisc("HandlePlayerLoginOpcode B");
+                        LOG_INFO("misc", "HandlePlayerLoginOpcode B");
                         break;
                     }
                     sess->HandleMoveWorldportAckOpcode();
@@ -832,7 +832,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
                 {
                     if (limitC == 0 || --limitC == 0)
                     {
-                        sLog->outMisc("HandlePlayerLoginOpcode C");
+                        LOG_INFO("misc", "HandlePlayerLoginOpcode C");
                         break;
                     }
                     Player* plMover = sess->GetPlayer()->m_mover->ToPlayer();
@@ -924,7 +924,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
             chH.PSendSysMessage("%s", GitRevision::GetFullVersion());
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("WORLD: Sent server info");
+        LOG_DEBUG("server", "WORLD: Sent server info");
 #endif
     }
 
@@ -940,7 +940,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         }
         else
         {
-            sLog->outError("Player %s (%s) marked as member of not existing guild (id: %u), removing guild membership for player.",
+            LOG_ERROR("server", "Player %s (%s) marked as member of not existing guild (id: %u), removing guild membership for player.",
                 pCurrChar->GetName().c_str(), pCurrChar->GetGUID().ToString().c_str(), guildId);
             pCurrChar->SetInGuild(0);
             pCurrChar->SetRank(0);
@@ -988,8 +988,6 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         else
             pCurrChar->TeleportTo(pCurrChar->m_homebindMapId, pCurrChar->m_homebindX, pCurrChar->m_homebindY, pCurrChar->m_homebindZ, pCurrChar->GetOrientation());
     }
-
-    //sLog->outDebug("Player %s added to Map.", pCurrChar->GetName().c_str());
 
     pCurrChar->SendInitialPacketsAfterAddToMap();
 
@@ -1130,7 +1128,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder* holder)
         SendNotification(LANG_GM_ON);
 
     std::string IP_str = GetRemoteAddress();
-    sLog->outChar("Account: %d (IP: %s) Login Character:[%s] (%s) Level: %d",
+    LOG_INFO("entities.player", "Account: %d (IP: %s) Login Character:[%s] (%s) Level: %d",
                   GetAccountId(), IP_str.c_str(), pCurrChar->GetName().c_str(), pCurrChar->GetGUID().ToString().c_str(), pCurrChar->getLevel());
 
     if (!pCurrChar->IsStandState() && !pCurrChar->HasUnitState(UNIT_STATE_STUNNED))
@@ -1235,7 +1233,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
             chH.PSendSysMessage("%s", GitRevision::GetFullVersion());
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("WORLD: Sent server info");
+        LOG_DEBUG("server", "WORLD: Sent server info");
 #endif
     }
 
@@ -1336,7 +1334,7 @@ void WorldSession::HandlePlayerLoginToCharOutOfWorld(Player*  /*pCurrChar*/)
 void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("WORLD: Received CMSG_SET_FACTION_ATWAR");
+    LOG_DEBUG("server", "WORLD: Received CMSG_SET_FACTION_ATWAR");
 #endif
 
     uint32 repListID;
@@ -1351,7 +1349,7 @@ void WorldSession::HandleSetFactionAtWar(WorldPacket& recvData)
 //I think this function is never used :/ I dunno, but i guess this opcode not exists
 void WorldSession::HandleSetFactionCheat(WorldPacket& /*recvData*/)
 {
-    sLog->outError("WORLD SESSION: HandleSetFactionCheat, not expected call, please report.");
+    LOG_ERROR("server", "WORLD SESSION: HandleSetFactionCheat, not expected call, please report.");
     GetPlayer()->GetReputationMgr().SendStates();
 }
 
@@ -1386,7 +1384,7 @@ void WorldSession::HandleTutorialReset(WorldPacket& /*recvData*/)
 void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("WORLD: Received CMSG_SET_WATCHED_FACTION");
+    LOG_DEBUG("server", "WORLD: Received CMSG_SET_WATCHED_FACTION");
 #endif
     uint32 fact;
     recvData >> fact;
@@ -1396,7 +1394,7 @@ void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
 void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("WORLD: Received CMSG_SET_FACTION_INACTIVE");
+    LOG_DEBUG("server", "WORLD: Received CMSG_SET_FACTION_INACTIVE");
 #endif
     uint32 replistid;
     uint8 inactive;
@@ -1408,7 +1406,7 @@ void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recvData)
 void WorldSession::HandleShowingHelmOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("CMSG_SHOWING_HELM for %s", _player->GetName().c_str());
+    LOG_DEBUG("server", "CMSG_SHOWING_HELM for %s", _player->GetName().c_str());
 #endif
     recvData.read_skip<uint8>(); // unknown, bool?
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
@@ -1417,7 +1415,7 @@ void WorldSession::HandleShowingHelmOpcode(WorldPacket& recvData)
 void WorldSession::HandleShowingCloakOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("CMSG_SHOWING_CLOAK for %s", _player->GetName().c_str());
+    LOG_DEBUG("server", "CMSG_SHOWING_CLOAK for %s", _player->GetName().c_str());
 #endif
     recvData.read_skip<uint8>(); // unknown, bool?
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK);
@@ -1520,7 +1518,7 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(PreparedQueryResult resu
         CharacterDatabase.Execute(stmt);
     }
 
-    sLog->outChar("Account: %d (IP: %s), Character [%s] (guid: %u) Changed name to: %s", GetAccountId(), GetRemoteAddress().c_str(), oldName.c_str(), guidLow, newName.c_str());
+    LOG_INFO("entities.player", "Account: %d (IP: %s), Character [%s] (guid: %u) Changed name to: %s", GetAccountId(), GetRemoteAddress().c_str(), oldName.c_str(), guidLow, newName.c_str());
 
     WorldPacket data(SMSG_CHAR_RENAME, 1 + 8 + (newName.size() + 1));
     data << uint8(RESPONSE_SUCCESS);
@@ -1637,7 +1635,7 @@ void WorldSession::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
 void WorldSession::HandleAlterAppearance(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_ALTER_APPEARANCE");
+    LOG_DEBUG("network", "CMSG_ALTER_APPEARANCE");
 #endif
 
     uint32 Hair, Color, FacialHair, SkinColor;
@@ -1716,7 +1714,7 @@ void WorldSession::HandleRemoveGlyph(WorldPacket& recvData)
     if (slot >= MAX_GLYPH_SLOT_INDEX)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "Client sent wrong glyph slot number in opcode CMSG_REMOVE_GLYPH %u", slot);
+        LOG_DEBUG("network", "Client sent wrong glyph slot number in opcode CMSG_REMOVE_GLYPH %u", slot);
 #endif
         return;
     }
@@ -1740,7 +1738,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
     recvData >> guid;
     if (!IsLegitCharacterForAccount(guid))
     {
-        sLog->outError("Account %u, IP: %s tried to customise character %s, but it does not belong to their account!",
+        LOG_ERROR("server", "Account %u, IP: %s tried to customise character %s, but it does not belong to their account!",
                        GetAccountId(), GetRemoteAddress().c_str(), guid.ToString().c_str());
         recvData.rfinish();
         KickPlayer("HandleCharCustomize");
@@ -1837,7 +1835,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
         }
     }
 
-    sLog->outChar("Account: %d (IP: %s), Character [%s] (%s) Customized to: %s",
+    LOG_INFO("entities.player", "Account: %d (IP: %s), Character [%s] (%s) Customized to: %s",
         GetAccountId(), GetRemoteAddress().c_str(), playerData->name.c_str(), guid.ToString().c_str(), newName.c_str());
 
     Player::Customize(guid, gender, skin, face, hairStyle, hairColor, facialHair);
@@ -1879,7 +1877,7 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
 void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_EQUIPMENT_SET_SAVE");
+    LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_SAVE");
 #endif
 
     uint64 setGuid;
@@ -1940,7 +1938,7 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
 void WorldSession::HandleEquipmentSetDelete(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_EQUIPMENT_SET_DELETE");
+    LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_DELETE");
 #endif
 
     uint64 setGuid;
@@ -1952,7 +1950,7 @@ void WorldSession::HandleEquipmentSetDelete(WorldPacket& recvData)
 void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_EQUIPMENT_SET_USE");
+    LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_USE");
 #endif
 
     for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
@@ -1964,7 +1962,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
         recvData >> srcbag >> srcslot;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_PLAYER_ITEMS, "Item %s: srcbag %u, srcslot %u", itemGuid.ToString().c_str(), srcbag, srcslot);
+        LOG_DEBUG("entities.player.items", "Item %s: srcbag %u, srcslot %u", itemGuid.ToString().c_str(), srcbag, srcslot);
 #endif
 
         // check if item slot is set to "ignored" (raw value == 1), must not be unequipped then
@@ -2046,7 +2044,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
 
     if (!IsLegitCharacterForAccount(guid))
     {
-        sLog->outError("Account %u, IP: %s tried to factionchange character %s, but it does not belong to their account!",
+        LOG_ERROR("server", "Account %u, IP: %s tried to factionchange character %s, but it does not belong to their account!",
                        GetAccountId(), GetRemoteAddress().c_str(), guid.ToString().c_str());
         recvData.rfinish();
         KickPlayer("HandleCharFactionOrRaceChange");
@@ -2272,7 +2270,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
     stmt->setUInt32(0, lowGuid);
     trans->Append(stmt);
 
-    sLog->outChar("Account: %d (IP: %s), Character [%s] (guid: %u) Changed Race/Faction to: %s", GetAccountId(), GetRemoteAddress().c_str(), playerData->name.c_str(), lowGuid, newname.c_str());
+    LOG_INFO("entities.player", "Account: %d (IP: %s), Character [%s] (guid: %u) Changed Race/Faction to: %s", GetAccountId(), GetRemoteAddress().c_str(), playerData->name.c_str(), lowGuid, newname.c_str());
 
     // xinef: update global data
     sWorld->UpdateGlobalNameData(lowGuid, playerData->name, newname);
@@ -2678,7 +2676,6 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recvData)
     }
 
     std::string IP_str = GetRemoteAddress();
-    //sLog->outDebug(LOG_FILTER_PLAYER, "%s (IP: %s) changed race from %u to %u", GetPlayerInfo().c_str(), IP_str.c_str(), oldRace, race);
 
     WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1 + 8 + (newname.size() + 1) + 1 + 1 + 1 + 1 + 1 + 1 + 1);
     data << uint8(RESPONSE_SUCCESS);

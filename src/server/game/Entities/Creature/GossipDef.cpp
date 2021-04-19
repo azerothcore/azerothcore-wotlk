@@ -4,13 +4,16 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Formulas.h"
 #include "GossipDef.h"
+#include "Formulas.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
+#include "Player.h"
 #include "QuestDef.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "Formulas.h"
+#include "Player.h"
 
 GossipMenu::GossipMenu()
 {
@@ -176,9 +179,6 @@ void PlayerMenu::ClearMenus()
 
 void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID) const
 {
-    //ACE_Read_Guard<ACE_RW_Thread_Mutex> lock1(_gossipMenu.GetLock());
-    //ACE_Read_Guard<ACE_RW_Thread_Mutex> lock2(_questMenu.GetLock());
-
     WorldPacket data(SMSG_GOSSIP_MESSAGE, 24 + _gossipMenu.GetMenuItemCount() * 100 + _questMenu.GetMenuItemCount() * 75);     // guess size
     data << objectGUID;
     data << uint32(_gossipMenu.GetMenuId());            // new 2.4.0
@@ -234,7 +234,7 @@ void PlayerMenu::SendPointOfInterest(uint32 poiId) const
     PointOfInterest const* poi = sObjectMgr->GetPointOfInterest(poiId);
     if (!poi)
     {
-        sLog->outErrorDb("Request to send non-existing POI (Id: %u), ignored.", poiId);
+        LOG_ERROR("sql.sql", "Request to send non-existing POI (Id: %u), ignored.", poiId);
         return;
     }
 
@@ -335,7 +335,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, const std::string
     data.put<uint8>(count_pos, count);
     _session->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST NPC %s", npcGUID.ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST NPC %s", npcGUID.ToString().c_str());
 #endif
 }
 
@@ -347,7 +347,7 @@ void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID) con
 
     _session->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUESTGIVER_STATUS NPC %s, status=%u", npcGUID.ToString().c_str(), questStatus);
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_STATUS NPC %s, status=%u", npcGUID.ToString().c_str(), questStatus);
 #endif
 }
 
@@ -420,7 +420,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
         }
 
         data << uint32(quest->GetRewOrReqMoney());
-        data << uint32(quest->XPValue(_session->GetPlayer()) * sWorld->getRate(RATE_XP_QUEST));
+        data << uint32(quest->XPValue(_session->GetPlayer()) * _session->GetPlayer()->GetQuestRate());
     }
 
     // rewarded honor points. Multiply with 10 to satisfy client
@@ -451,7 +451,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
     _session->SendPacket(&data);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS %s, questid=%u", npcGUID.ToString().c_str(), quest->GetQuestId());
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS %s, questid=%u", npcGUID.ToString().c_str(), quest->GetQuestId());
 #endif
 }
 
@@ -584,7 +584,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
 
     _session->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUEST_QUERY_RESPONSE questid=%u", quest->GetQuestId());
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUEST_QUERY_RESPONSE questid=%u", quest->GetQuestId());
 #endif
 }
 
@@ -650,7 +650,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUI
     }
 
     data << uint32(quest->GetRewOrReqMoney());
-    data << uint32(quest->XPValue(_session->GetPlayer()) * sWorld->getRate(RATE_XP_QUEST));
+    data << uint32(quest->XPValue(_session->GetPlayer()) * _session->GetPlayer()->GetQuestRate());
 
     // rewarded honor points. Multiply with 10 to satisfy client
     data << uint32(10 * quest->CalculateHonorGain(_session->GetPlayer()->GetQuestLevel(quest)));
@@ -674,7 +674,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUI
 
     _session->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUESTGIVER_OFFER_REWARD %s, questid=%u", npcGUID.ToString().c_str(), quest->GetQuestId());
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_OFFER_REWARD %s, questid=%u", npcGUID.ToString().c_str(), quest->GetQuestId());
 #endif
 }
 
@@ -767,6 +767,6 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, ObjectGuid npcGU
 
     _session->SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_QUESTGIVER_REQUEST_ITEMS %s, questid=%u", npcGUID.ToString().c_str(), quest->GetQuestId());
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_REQUEST_ITEMS %s, questid=%u", npcGUID.ToString().c_str(), quest->GetQuestId());
 #endif
 }

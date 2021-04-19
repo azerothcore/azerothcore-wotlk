@@ -12,6 +12,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Item.h"
+#include "Log.h"
 #include "Map.h"
 #include "MapInstanced.h"
 #include "MapManager.h"
@@ -26,6 +27,83 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include <cmath>
+template<class T>
+void HashMapHolder<T>::Insert(T* o)
+{
+    static_assert(std::is_same<Player, T>::value
+        || std::is_same<MotionTransport, T>::value,
+        "Only Player and Motion Transport can be registered in global HashMapHolder");
+
+    std::unique_lock<std::shared_mutex> lock(*GetLock());
+
+    GetContainer()[o->GetGUID()] = o;
+}
+
+template<class T>
+void HashMapHolder<T>::Remove(T* o)
+{
+    std::unique_lock<std::shared_mutex> lock(*GetLock());
+
+    GetContainer().erase(o->GetGUID());
+}
+
+template<class T>
+T* HashMapHolder<T>::Find(ObjectGuid guid)
+{
+    std::shared_lock<std::shared_mutex> lock(*GetLock());
+
+    typename MapType::iterator itr = GetContainer().find(guid);
+    return (itr != GetContainer().end()) ? itr->second : nullptr;
+}
+
+template<class T>
+auto HashMapHolder<T>::GetContainer() -> MapType&
+{
+    static MapType _objectMap;
+    return _objectMap;
+}
+
+template<class T>
+std::shared_mutex* HashMapHolder<T>::GetLock()
+{
+    static std::shared_mutex _lock;
+    return &_lock;
+}
+
+HashMapHolder<Player>::MapType const& ObjectAccessor::GetPlayers()
+{
+    return HashMapHolder<Player>::GetContainer();
+}
+
+template class HashMapHolder<Player>;
+template class HashMapHolder<MotionTransport>;
+
+namespace PlayerNameMapHolder
+{
+    typedef std::unordered_map<std::string, Player*> MapType;
+    static MapType PlayerNameMap;
+
+    void Insert(Player* p)
+    {
+        PlayerNameMap[p->GetName()] = p;
+    }
+
+    void Remove(Player* p)
+    {
+        PlayerNameMap.erase(p->GetName());
+    }
+
+    Player* Find(std::string const& name)
+    {
+        std::string charName(name);
+        if (!normalizePlayerName(charName))
+            return nullptr;
+
+        auto itr = PlayerNameMap.find(charName);
+        return (itr != PlayerNameMap.end()) ? itr->second : nullptr;
+    }
+
+} // namespace PlayerNameMapHolder
 
 WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, ObjectGuid const guid)
 {
@@ -174,49 +252,14 @@ Player* ObjectAccessor::FindConnectedPlayer(ObjectGuid const guid)
     return HashMapHolder<Player>::Find(guid);
 }
 
-HashMapHolder<Player>::MapType const& ObjectAccessor::GetPlayers()
-{
-    return HashMapHolder<Player>::GetContainer();
-}
-
 void ObjectAccessor::SaveAllPlayers()
 {
-    ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
+    std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
+
     HashMapHolder<Player>::MapType const& m = GetPlayers();
     for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
         itr->second->SaveToDB(false, false);
 }
-
-/// Global definitions for the hashmap storage
-template class HashMapHolder<Player>;
-template class HashMapHolder<MotionTransport>;
-
-namespace PlayerNameMapHolder
-{
-    typedef std::unordered_map<std::string, Player*> MapType;
-    static MapType PlayerNameMap;
-
-    void Insert(Player* p)
-    {
-        PlayerNameMap[p->GetName()] = p;
-    }
-
-    void Remove(Player* p)
-    {
-        PlayerNameMap.erase(p->GetName());
-    }
-
-    Player* Find(std::string const& name)
-    {
-        std::string charName(name);
-        if (!normalizePlayerName(charName))
-            return nullptr;
-
-        auto itr = PlayerNameMap.find(charName);
-        return (itr != PlayerNameMap.end()) ? itr->second : nullptr;
-    }
-
-} // namespace PlayerNameMapHolder
 
 Player* ObjectAccessor::FindPlayerByName(std::string const& name, bool checkInWorld)
 {

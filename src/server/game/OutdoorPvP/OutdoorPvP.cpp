@@ -104,14 +104,14 @@ bool OPvPCapturePoint::AddCreature(uint32 type, uint32 entry, uint32 map, float 
 bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_OUTDOORPVP, "Creating capture point %u", entry);
+    LOG_DEBUG("outdoorpvp", "Creating capture point %u", entry);
 #endif
 
     // check info existence
     GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
     if (!goinfo || goinfo->type != GAMEOBJECT_TYPE_CAPTURE_POINT)
     {
-        sLog->outError("OutdoorPvP: GO %u is not capture point!", entry);
+        LOG_ERROR("server", "OutdoorPvP: GO %u is not capture point!", entry);
         return false;
     }
 
@@ -133,7 +133,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
     if (!spawnId)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_OUTDOORPVP, "opvp creature type %u was already deleted", type);
+        LOG_DEBUG("outdoorpvp", "opvp creature type %u was already deleted", type);
 #endif
         return false;
     }
@@ -150,7 +150,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
         c->AddObjectToRemoveList();
     }
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_OUTDOORPVP, "deleting opvp creature type %u", type);
+    LOG_DEBUG("outdoorpvp", "deleting opvp creature type %u", type);
 #endif
     // explicit removal from map
     // beats me why this is needed, but with the recent removal "cleanup" some creatures stay in the map if "properly" deleted
@@ -262,7 +262,7 @@ void OutdoorPvP::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
         SendRemoveWorldStates(player);
     m_players[player->GetTeamId()].erase(player->GetGUID());
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_OUTDOORPVP, "Player %s left an outdoorpvp zone", player->GetName().c_str());
+    LOG_DEBUG("outdoorpvp", "Player %s left an outdoorpvp zone", player->GetName().c_str());
 #endif
 }
 
@@ -393,7 +393,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
     if (m_OldState != m_State)
     {
-        //sLog->outError(LOG_FILTER_OUTDOORPVP, "%u->%u", m_OldState, m_State);
+        //LOG_ERROR("server", LOG_FILTER_OUTDOORPVP, "%u->%u", m_OldState, m_State);
         if (oldTeam != m_team)
             ChangeTeam(oldTeam);
         ChangeState();

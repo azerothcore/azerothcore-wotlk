@@ -12,6 +12,7 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
+#include "ScriptMgr.h"
 #include "Player.h"
 #include "UpdateMask.h"
 #include "Util.h"
@@ -29,7 +30,7 @@ void WorldSession::HandleAuctionHelloOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionHelloOpcode - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
+        LOG_DEBUG("network", "WORLD: HandleAuctionHelloOpcode - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -49,6 +50,9 @@ void WorldSession::SendAuctionHello(ObjectGuid guid, Creature* unit)
         SendNotification(GetAcoreString(LANG_AUCTION_REQ), sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ));
         return;
     }
+
+    if (!sScriptMgr->CanSendAuctionHello(this, guid, unit))
+        return;
 
     AuctionHouseEntry const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntry(unit->getFaction());
     if (!ahEntry)
@@ -142,7 +146,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
     if (bid > MAX_MONEY_AMOUNT || buyout > MAX_MONEY_AMOUNT)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionSellItem - Player %s (%s) attempted to sell item with higher price than max gold amount.",
+        LOG_DEBUG("network", "WORLD: HandleAuctionSellItem - Player %s (%s) attempted to sell item with higher price than max gold amount.",
             _player->GetName().c_str(), _player->GetGUID().ToString().c_str());
 #endif
         SendAuctionCommandResult(0, AUCTION_SELL_ITEM, ERR_AUCTION_DATABASE_ERROR);
@@ -153,7 +157,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionSellItem - Unit (%s) not found or you can't interact with him.", auctioneer.ToString().c_str());
+        LOG_DEBUG("network", "WORLD: HandleAuctionSellItem - Unit (%s) not found or you can't interact with him.", auctioneer.ToString().c_str());
 #endif
         return;
     }
@@ -162,7 +166,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
     if (!auctionHouseEntry)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionSellItem - Unit (%s) has wrong faction.", auctioneer.ToString().c_str());
+        LOG_DEBUG("network", "WORLD: HandleAuctionSellItem - Unit (%s) has wrong faction.", auctioneer.ToString().c_str());
 #endif
         return;
     }
@@ -268,14 +272,14 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             CreatureData const* auctioneerData = sObjectMgr->GetCreatureData(creature->GetSpawnId());
             if (!auctioneerData)
             {
-                sLog->outError("Data for auctioneer not found (%s)", auctioneer.ToString().c_str());
+                LOG_ERROR("server", "Data for auctioneer not found (%s)", auctioneer.ToString().c_str());
                 return;
             }
 
             CreatureTemplate const* auctioneerInfo = sObjectMgr->GetCreatureTemplate(auctioneerData->id);
             if (!auctioneerInfo)
             {
-                sLog->outError("Non existing auctioneer (%s)", auctioneer.ToString().c_str());
+                LOG_ERROR("server", "Non existing auctioneer (%s)", auctioneer.ToString().c_str());
                 return;
             }
 
@@ -299,7 +303,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             AH->auctionHouseEntry = auctionHouseEntry;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDetail("CMSG_AUCTION_SELL_ITEM: Player %s (%s) is selling item %s entry %u (%s) with count %u with initial bid %u with buyout %u and with time %u (in sec) in auctionhouse %u",
+            LOG_DEBUG("server", "CMSG_AUCTION_SELL_ITEM: Player %s (%s) is selling item %s entry %u (%s) with count %u with initial bid %u with buyout %u and with time %u (in sec) in auctionhouse %u",
                 _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), item->GetTemplate()->Name1.c_str(), item->GetEntry(), item->GetGUID().ToString().c_str(), item->GetCount(), bid, buyout, auctionTime, AH->GetHouseId());
 #endif
             sAuctionMgr->AddAItem(item);
@@ -324,7 +328,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             Item* newItem = item->CloneItem(finalCount, _player);
             if (!newItem)
             {
-                sLog->outError("CMSG_AUCTION_SELL_ITEM: Could not create clone of item %u", item->GetEntry());
+                LOG_ERROR("server", "CMSG_AUCTION_SELL_ITEM: Could not create clone of item %u", item->GetEntry());
                 SendAuctionCommandResult(0, AUCTION_SELL_ITEM, ERR_AUCTION_DATABASE_ERROR);
                 return;
             }
@@ -342,7 +346,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             AH->auctionHouseEntry = auctionHouseEntry;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDetail("CMSG_AUCTION_SELL_ITEM: Player %s (%s) is selling item %s entry %u (%s) with count %u with initial bid %u with buyout %u and with time %u (in sec) in auctionhouse %u",
+            LOG_DEBUG("server", "CMSG_AUCTION_SELL_ITEM: Player %s (%s) is selling item %s entry %u (%s) with count %u with initial bid %u with buyout %u and with time %u (in sec) in auctionhouse %u",
                 _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), newItem->GetTemplate()->Name1.c_str(), newItem->GetEntry(), newItem->GetGUID().ToString().c_str(), newItem->GetCount(), bid, buyout, auctionTime, AH->GetHouseId());
 #endif
             sAuctionMgr->AddAItem(newItem);
@@ -394,7 +398,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
 void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_PLACE_BID");
+    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_PLACE_BID");
 #endif
 
     ObjectGuid auctioneer;
@@ -410,7 +414,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionPlaceBid - Unit (%s) not found or you can't interact with him.", auctioneer.ToString().c_str());
+        LOG_DEBUG("network", "WORLD: HandleAuctionPlaceBid - Unit (%s) not found or you can't interact with him.", auctioneer.ToString().c_str());
 #endif
         return;
     }
@@ -524,20 +528,19 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_REMOVE_ITEM");
+    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_REMOVE_ITEM");
 #endif
 
     ObjectGuid auctioneer;
     uint32 auctionId;
     recvData >> auctioneer;
     recvData >> auctionId;
-    //sLog->outDebug("Cancel AUCTION AuctionID: %u", auctionId);
 
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(auctioneer, UNIT_NPC_FLAG_AUCTIONEER);
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionRemoveItem - Unit (%s) not found or you can't interact with him.", auctioneer.ToString().c_str());
+        LOG_DEBUG("network", "WORLD: HandleAuctionRemoveItem - Unit (%s) not found or you can't interact with him.", auctioneer.ToString().c_str());
 #endif
         return;
     }
@@ -574,7 +577,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
         }
         else
         {
-            sLog->outError("Auction id: %u has non-existed item (item: %s)!!!", auction->Id, auction->item_guid.ToString().c_str());
+            LOG_ERROR("server", "Auction id: %u has non-existed item (item: %s)!!!", auction->Id, auction->item_guid.ToString().c_str());
             SendAuctionCommandResult(0, AUCTION_CANCEL, ERR_AUCTION_DATABASE_ERROR);
             return;
         }
@@ -583,7 +586,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
     {
         SendAuctionCommandResult(0, AUCTION_CANCEL, ERR_AUCTION_DATABASE_ERROR);
         //this code isn't possible ... maybe there should be assert
-        sLog->outError("CHEATER : %s, he tried to cancel auction (id: %u) of another player, or auction is nullptr", player->GetGUID().ToString().c_str(), auctionId);
+        LOG_ERROR("server", "CHEATER : %s, he tried to cancel auction (id: %u) of another player, or auction is nullptr", player->GetGUID().ToString().c_str(), auctionId);
         return;
     }
 
@@ -604,7 +607,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
 void WorldSession::HandleAuctionListBidderItems(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_LIST_BIDDER_ITEMS");
+    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_BIDDER_ITEMS");
 #endif
 
     ObjectGuid guid;                                            //NPC guid
@@ -616,7 +619,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recvData)
     recvData >> outbiddedCount;
     if (recvData.size() != (16 + outbiddedCount * 4))
     {
-        sLog->outError("Client sent bad opcode!!! with count: %u and size : %lu (must be: %u)", outbiddedCount, (unsigned long)recvData.size(), (16 + outbiddedCount * 4));
+        LOG_ERROR("server", "Client sent bad opcode!!! with count: %u and size : %lu (must be: %u)", outbiddedCount, (unsigned long)recvData.size(), (16 + outbiddedCount * 4));
         outbiddedCount = 0;
     }
 
@@ -624,7 +627,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recvData)
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionListBidderItems - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
+        LOG_DEBUG("network", "WORLD: HandleAuctionListBidderItems - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
 #endif
         recvData.rfinish();
         return;
@@ -687,7 +690,7 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recvData)
 void WorldSession::HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_LIST_OWNER_ITEMS");
+    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_OWNER_ITEMS");
 #endif
 
     _lastAuctionListOwnerItemsMSTime = World::GetGameTimeMS(); // pussywizard
@@ -696,7 +699,7 @@ void WorldSession::HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid)
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleAuctionListOwnerItems - Unit (%s) not found or you can't interact with him.", creatureGuid.ToString().c_str());
+        LOG_DEBUG("network", "WORLD: HandleAuctionListOwnerItems - Unit (%s) not found or you can't interact with him.", creatureGuid.ToString().c_str());
 #endif
         return;
     }
@@ -724,7 +727,7 @@ void WorldSession::HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid)
 void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_LIST_ITEMS");
+    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_ITEMS");
 #endif
 
     std::string searchedname;
@@ -764,14 +767,14 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
     if (diff > delay)
         diff = delay;
     _lastAuctionListItemsMSTime = now + delay - diff;
-    ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
+    std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
     AsyncAuctionListingMgr::GetTempList().push_back( AuctionListItemsDelayEvent(delay - diff, _player->GetGUID(), guid, searchedname, listfrom, levelmin, levelmax, usable, auctionSlotID, auctionMainCategory, auctionSubCategory, quality, getAll) );
 }
 
 void WorldSession::HandleAuctionListPendingSales(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_AUCTION_LIST_PENDING_SALES");
+    LOG_DEBUG("network", "WORLD: Received CMSG_AUCTION_LIST_PENDING_SALES");
 #endif
 
     recvData.read_skip<uint64>();

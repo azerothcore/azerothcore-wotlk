@@ -14,7 +14,7 @@
 #include "Object.h"
 #include "MapInstanced.h"
 
-#include <ace/Thread_Mutex.h>
+#include <mutex>
 
 class Transport;
 class StaticTransport;
@@ -138,7 +138,7 @@ private:
     MapManager(const MapManager&);
     MapManager& operator=(const MapManager&);
 
-    ACE_Thread_Mutex Lock;
+    std::mutex Lock;
     MapMapType i_maps;
     IntervalTimer i_timer[4]; // continents, bgs/arenas, instances, total from the beginning
     uint8 mapUpdateStep;
@@ -151,7 +151,7 @@ private:
 template<typename Worker>
 void MapManager::DoForAllMaps(Worker&& worker)
 {
-    ACORE_GUARD(ACE_Thread_Mutex, Lock);
+    std::lock_guard<std::mutex> guard(Lock);
 
     for (auto& mapPair : i_maps)
     {
@@ -170,7 +170,7 @@ void MapManager::DoForAllMaps(Worker&& worker)
 template<typename Worker>
 inline void MapManager::DoForAllMapsWithMapId(uint32 mapId, Worker&& worker)
 {
-    ACORE_GUARD(ACE_Thread_Mutex, Lock);
+    std::lock_guard<std::mutex> guard(Lock);
 
     auto itr = i_maps.find(mapId);
     if (itr != i_maps.end())

@@ -906,13 +906,13 @@ public:
     void LoadQuests();
     void LoadQuestStartersAndEnders()
     {
-        sLog->outString("Loading GO Start Quest Data...");
+        LOG_INFO("server", "Loading GO Start Quest Data...");
         LoadGameobjectQuestStarters();
-        sLog->outString("Loading GO End Quest Data...");
+        LOG_INFO("server", "Loading GO End Quest Data...");
         LoadGameobjectQuestEnders();
-        sLog->outString("Loading Creature Start Quest Data...");
+        LOG_INFO("server", "Loading Creature Start Quest Data...");
         LoadCreatureQuestStarters();
-        sLog->outString("Loading Creature End Quest Data...");
+        LOG_INFO("server", "Loading Creature End Quest Data...");
         LoadCreatureQuestEnders();
     }
     void LoadGameobjectQuestStarters();
@@ -1352,9 +1352,9 @@ private:
     uint32 _auctionId; // pussywizard: accessed by a single thread
     uint64 _equipmentSetGuid; // pussywizard: accessed by a single thread
     uint32 _mailId;
-    ACE_Thread_Mutex _mailIdMutex;
+    std::mutex _mailIdMutex;
     uint32 _hiPetNumber;
-    ACE_Thread_Mutex _hiPetNumberMutex;
+    std::mutex _hiPetNumberMutex;
 
     ObjectGuid::LowType _creatureSpawnId;
     ObjectGuid::LowType _gameObjectSpawnId;

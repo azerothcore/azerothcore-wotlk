@@ -11,8 +11,9 @@
 #include "GridDefines.h"
 #include "Object.h"
 #include "UpdateData.h"
-#include <ace/Thread_Mutex.h>
+#include <mutex>
 #include <set>
+#include <shared_mutex>
 #include <unordered_map>
 
 class Creature;
@@ -31,48 +32,23 @@ class MotionTransport;
 template <class T>
 class HashMapHolder
 {
+    //Non instanceable only static
+    HashMapHolder() { }
+
 public:
-    static_assert(std::is_same<Player, T>::value || std::is_same<MotionTransport, T>::value,
-        "Only Player and Motionransport can be registered in global HashMapHolder");
 
     typedef std::unordered_map<ObjectGuid, T*> MapType;
-    typedef ACE_RW_Thread_Mutex LockType;
 
-    static void Insert(T* o)
-    {
-        ACORE_WRITE_GUARD(LockType, i_lock);
-        m_objectMap[o->GetGUID()] = o;
-    }
+    static void Insert(T* o);
 
-    static void Remove(T* o)
-    {
-        ACORE_WRITE_GUARD(LockType, i_lock);
-        m_objectMap.erase(o->GetGUID());
-    }
+    static void Remove(T* o);
 
-    static T* Find(ObjectGuid guid)
-    {
-        ACORE_READ_GUARD(LockType, i_lock);
-        typename MapType::iterator itr = m_objectMap.find(guid);
-        return (itr != m_objectMap.end()) ? itr->second : nullptr;
-    }
+    static T* Find(ObjectGuid guid);
 
-    static MapType& GetContainer() { return m_objectMap; }
+    static MapType& GetContainer();
 
-    static LockType* GetLock() { return &i_lock; }
-
-private:
-    //Non instanceable only static
-    HashMapHolder() = default;
-
-    static LockType i_lock;
-    static MapType  m_objectMap;
+    static std::shared_mutex* GetLock();
 };
-
-/// Define the static members of HashMapHolder
-
-template <class T> std::unordered_map<ObjectGuid, T*> HashMapHolder<T>::m_objectMap;
-template <class T> typename HashMapHolder<T>::LockType HashMapHolder<T>::i_lock;
 
 namespace ObjectAccessor
 {

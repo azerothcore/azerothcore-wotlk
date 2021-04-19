@@ -98,7 +98,7 @@ WayPoint* SmartAI::GetNextWayPoint()
     {
         mLastWP = (*itr).second;
         if (mLastWP->id != mCurrentWPID)
-            sLog->outError("SmartAI::GetNextWayPoint: Got not expected waypoint id %u, expected %u", mLastWP->id, mCurrentWPID);
+            LOG_ERROR("server", "SmartAI::GetNextWayPoint: Got not expected waypoint id %u, expected %u", mLastWP->id, mCurrentWPID);
 
         return (*itr).second;
     }
@@ -172,7 +172,7 @@ void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
 {
     if (me->IsInCombat())// no wp movement in combat
     {
-        sLog->outError("SmartAI::StartPath: Creature entry %u wanted to start waypoint movement while in combat, ignoring.", me->GetEntry());
+        LOG_ERROR("server", "SmartAI::StartPath: Creature entry %u wanted to start waypoint movement while in combat, ignoring.", me->GetEntry());
         return;
     }
 
@@ -231,7 +231,7 @@ void SmartAI::PausePath(uint32 delay, bool forced)
 
     if (HasEscortState(SMART_ESCORT_PAUSED))
     {
-        sLog->outError("SmartAI::StartPath: Creature entry %u wanted to pause waypoint movement while already paused, ignoring.", me->GetEntry());
+        LOG_ERROR("server", "SmartAI::StartPath: Creature entry %u wanted to pause waypoint movement while already paused, ignoring.", me->GetEntry());
         return;
     }
 
@@ -615,7 +615,7 @@ void SmartAI::EnterEvadeMode()
     if (!me->IsAlive() || me->IsInEvadeMode())
         return;
 
-    if (me->GetCharmerGUID().IsPlayer() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+    if (me->GetCharmerGUID().IsPlayer() || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
     {
         me->AttackStop();
         return;
@@ -782,7 +782,7 @@ void SmartAI::JustSummoned(Creature* creature)
 void SmartAI::AttackStart(Unit* who)
 {
     // xinef: dont allow charmed npcs to act on their own
-    if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+    if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
     {
         if (who && mCanAutoAttack)
             me->Attack(who, true);
@@ -1097,7 +1097,7 @@ void SmartGameObjectAI::Reset()
 bool SmartGameObjectAI::GossipHello(Player* player, bool reportUse)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_DATABASE_AI, "SmartGameObjectAI::GossipHello");
+    LOG_DEBUG("sql.sql", "SmartGameObjectAI::GossipHello");
 #endif
     GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_HELLO, player, (uint32)reportUse, 0, false, nullptr, go);
     return false;
@@ -1179,7 +1179,7 @@ public:
             return false;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_DATABASE_AI, "AreaTrigger %u is using SmartTrigger script", trigger->entry);
+        LOG_DEBUG("sql.sql", "AreaTrigger %u is using SmartTrigger script", trigger->entry);
 #endif
         SmartScript script;
         script.OnInitialize(nullptr, trigger);

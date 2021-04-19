@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
@@ -15,26 +15,16 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "PetitionMgr.h"
+#include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
-#define CHARTER_DISPLAY_ID 16161
-
-// Charters ID in item_template
-enum CharterItemIDs
-{
-    GUILD_CHARTER                                 = 5863,
-    ARENA_TEAM_CHARTER_2v2                        = 23560,
-    ARENA_TEAM_CHARTER_3v3                        = 23561,
-    ARENA_TEAM_CHARTER_5v5                        = 23562
-};
-
 void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_PETITION_BUY");
+    LOG_DEBUG("network", "Received opcode CMSG_PETITION_BUY");
 #endif
 
     ObjectGuid guidNPC;
@@ -65,7 +55,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     recvData.read_skip<uint32>();                          // 0
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Petitioner (%s) tried sell petition: name %s", guidNPC.ToString().c_str(), name.c_str());
+    LOG_DEBUG("network", "Petitioner (%s) tried sell petition: name %s", guidNPC.ToString().c_str(), name.c_str());
 #endif
 
     // prevent cheating
@@ -73,7 +63,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandlePetitionBuyOpcode - Unit (%s) not found or you can't interact with him.", guidNPC.ToString().c_str());
+        LOG_DEBUG("network", "WORLD: HandlePetitionBuyOpcode - Unit (%s) not found or you can't interact with him.", guidNPC.ToString().c_str());
 #endif
         return;
     }
@@ -124,7 +114,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
                 break;
             default:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "unknown selection at buy arena petition: %u", clientIndex);
+                LOG_DEBUG("network", "unknown selection at buy arena petition: %u", clientIndex);
 #endif
                 return;
         }
@@ -135,6 +125,8 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
             return;
         }
     }
+
+    sScriptMgr->PetitionBuy(_player, creature, charterid, cost, type);
 
     if (type == GUILD_CHARTER_TYPE)
     {
@@ -208,7 +200,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     if (petition)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "Invalid petition GUIDs: %u", petition->petitionGuid);
+        LOG_DEBUG("network", "Invalid petition: %s", petition->petitionGuid.ToString().c_str());
 #endif
 
         trans->PAppend("DELETE FROM petition WHERE petitionguid = %u", petition->petitionGuid);
@@ -235,7 +227,7 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
 void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_PETITION_SHOW_SIGNATURES");
+    LOG_DEBUG("network", "Received opcode CMSG_PETITION_SHOW_SIGNATURES");
 #endif
 
     ObjectGuid petitionguid;
@@ -256,7 +248,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
     uint8 signs = signatures ? signatures->signatureMap.size() : 0;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_PETITION_SHOW_SIGNATURES petition entry: '%u'", petitionguid.GetCounter());
+    LOG_DEBUG("network", "CMSG_PETITION_SHOW_SIGNATURES petition entry: '%u'", petitionguid.GetCounter());
 #endif
 
     WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
@@ -278,7 +270,7 @@ void WorldSession::HandlePetitionShowSignOpcode(WorldPacket& recvData)
 void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_PETITION_QUERY");   // ok
+    LOG_DEBUG("network", "Received opcode CMSG_PETITION_QUERY");   // ok
 #endif
 
     ObjectGuid::LowType guildguid;
@@ -286,7 +278,7 @@ void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recvData)
     recvData >> guildguid;                                 // in Trinity always same as petition low guid
     recvData >> petitionguid;                              // petition guid
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_PETITION_QUERY Petition (%s) Guild GUID %s", petitionguid.ToString().c_str(), guildguid);
+    LOG_DEBUG("network", "CMSG_PETITION_QUERY Petition (%s) Guild GUID %s", petitionguid.ToString().c_str(), guildguid);
 #endif
 
     SendPetitionQueryOpcode(petitionguid);
@@ -298,7 +290,7 @@ void WorldSession::SendPetitionQueryOpcode(ObjectGuid petitionguid)
     if (!petition)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_PETITION_QUERY failed for petition (%s)", petitionguid.ToString().c_str());
+        LOG_DEBUG("network", "CMSG_PETITION_QUERY failed for petition (%s)", petitionguid.ToString().c_str());
 #endif
         return;
     }
@@ -344,7 +336,7 @@ void WorldSession::SendPetitionQueryOpcode(ObjectGuid petitionguid)
 void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode MSG_PETITION_RENAME");   // ok
+    LOG_DEBUG("network", "Received opcode MSG_PETITION_RENAME");   // ok
 #endif
 
     ObjectGuid petitionGuid;
@@ -361,7 +353,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
     if (!petition)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "CMSG_PETITION_QUERY failed for petition (%s)", petitionGuid.ToString().c_str());
+        LOG_DEBUG("network", "CMSG_PETITION_QUERY failed for petition (%s)", petitionGuid.ToString().c_str());
 #endif
         return;
     }
@@ -404,7 +396,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
     const_cast<Petition*>(petition)->petitionName = newName;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Petition (%s) renamed to %s", petitionGuid.ToString().c_str(), newName.c_str());
+    LOG_DEBUG("network", "Petition (%s) renamed to %s", petitionGuid.ToString().c_str(), newName.c_str());
 #endif
     WorldPacket data(MSG_PETITION_RENAME, (8 + newName.size() + 1));
     data << petitionGuid;
@@ -415,7 +407,7 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
 void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_PETITION_SIGN");    // ok
+    LOG_DEBUG("network", "Received opcode CMSG_PETITION_SIGN");    // ok
 #endif
 
     ObjectGuid petitionGuid;
@@ -426,7 +418,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
     Petition const* petition = sPetitionMgr->GetPetition(petitionGuid);
     if (!petition)
     {
-        sLog->outError("Petition %s is not found for player %s (Name: %s)", petitionGuid.ToString().c_str(), GetPlayer()->GetGUID().ToString().c_str(), GetPlayer()->GetName().c_str());
+        LOG_ERROR("server", "Petition %s is not found for player %s (Name: %s)", petitionGuid.ToString().c_str(), GetPlayer()->GetGUID().ToString().c_str(), GetPlayer()->GetName().c_str());
         return;
     }
 
@@ -532,7 +524,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
     sPetitionMgr->AddSignature(petitionGuid, GetAccountId(), playerGuid);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "PETITION SIGN: %s by player: %s (GUID: %u Account: %u)", petitionGuid.ToString().c_str(), _player->GetName().c_str(), playerGuid, GetAccountId());
+    LOG_DEBUG("network", "PETITION SIGN: %s by player: %s (%s, Account: %u)", petitionGuid.ToString().c_str(), _player->GetName().c_str(), playerGuid.ToString().c_str(), GetAccountId());
 #endif
 
     WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
@@ -556,14 +548,14 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
 void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode MSG_PETITION_DECLINE");  // ok
+    LOG_DEBUG("network", "Received opcode MSG_PETITION_DECLINE");  // ok
 #endif
 
     ObjectGuid petitionguid;
     ObjectGuid ownerguid;
     recvData >> petitionguid;                              // petition guid
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Petition %s declined by %s", petitionguid.ToString().c_str(), _player->GetGUID().ToString().c_str());
+    LOG_DEBUG("network", "Petition %s declined by %s", petitionguid.ToString().c_str(), _player->GetGUID().ToString().c_str());
 #endif
 
     Petition const* petition = sPetitionMgr->GetPetition(petitionguid);
@@ -581,7 +573,7 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
 void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_OFFER_PETITION");   // ok
+    LOG_DEBUG("network", "Received opcode CMSG_OFFER_PETITION");   // ok
 #endif
 
     ObjectGuid petitionguid, plguid;
@@ -671,7 +663,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
 void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Received opcode CMSG_TURN_IN_PETITION");
+    LOG_DEBUG("network", "Received opcode CMSG_TURN_IN_PETITION");
 #endif
 
     // Get petition guid from packet
@@ -686,13 +678,13 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
         return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Petition %s turned in by %s", petitionGuid.ToString().c_str(), _player->GetGUID().ToString().c_str());
+    LOG_DEBUG("network", "Petition %s turned in by %s", petitionGuid.ToString().c_str(), _player->GetGUID().ToString().c_str());
 #endif
 
     Petition const* petition = sPetitionMgr->GetPetition(petitionGuid);
     if (!petition)
     {
-        sLog->outError("Player %s (%s) tried to turn in petition (%s) that is not present in the database",
+        LOG_ERROR("server", "Player %s (%s) tried to turn in petition (%s) that is not present in the database",
             _player->GetName().c_str(), _player->GetGUID().ToString().c_str(), petitionGuid.ToString().c_str());
         return;
     }
@@ -812,7 +804,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
         // Register arena team
         sArenaTeamMgr->AddArenaTeam(arenaTeam);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "PetitonsHandler: Arena team (guid: %u) added to ObjectMgr", arenaTeam->GetId());
+        LOG_DEBUG("network", "PetitonsHandler: Arena team (guid: %u) added to ObjectMgr", arenaTeam->GetId());
 #endif
 
         // Add members
@@ -820,7 +812,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
             for (SignatureMap::const_iterator itr = signatureCopy.begin(); itr != signatureCopy.end(); ++itr)
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "PetitionsHandler: Adding arena team (guid: %u) member %u", arenaTeam->GetId(), itr->first);
+                LOG_DEBUG("network", "PetitionsHandler: Adding arena team (guid: %u) member %s", arenaTeam->GetId(), itr->first.ToString().c_str());
 #endif
                 arenaTeam->AddMember(itr->first);
             }
@@ -843,7 +835,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
 
     // created
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "TURN IN PETITION %s", petitionGuid.ToString().c_str());
+    LOG_DEBUG("network", "TURN IN PETITION %s", petitionGuid.ToString().c_str());
 #endif
 
     data.Initialize(SMSG_TURN_IN_PETITION_RESULTS, 4);
@@ -854,7 +846,7 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
 void WorldSession::HandlePetitionShowListOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Received CMSG_PETITION_SHOWLIST");
+    LOG_DEBUG("network", "Received CMSG_PETITION_SHOWLIST");
 #endif
 
     ObjectGuid guid;
@@ -869,7 +861,7 @@ void WorldSession::SendPetitionShowList(ObjectGuid guid)
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandlePetitionShowListOpcode - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
+        LOG_DEBUG("network", "WORLD: HandlePetitionShowListOpcode - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -877,44 +869,71 @@ void WorldSession::SendPetitionShowList(ObjectGuid guid)
     WorldPacket data(SMSG_PETITION_SHOWLIST, 8 + 1 + 4 * 6);
     data << guid;                                           // npc guid
 
+    // For guild default
+    uint32 CharterEntry = GUILD_CHARTER;
+    uint32 CharterDispayID = CHARTER_DISPLAY_ID;
+    uint32 CharterCost = sWorld->getIntConfig(CONFIG_CHARTER_COST_GUILD);
+
     if (creature->IsTabardDesigner())
     {
+        sScriptMgr->PetitionShowList(_player, creature, CharterEntry, CharterDispayID, CharterCost);
+
         data << uint8(1);                                   // count
         data << uint32(1);                                  // index
-        data << uint32(GUILD_CHARTER);                      // charter entry
-        data << uint32(CHARTER_DISPLAY_ID);                 // charter display id
-        data << uint32(sWorld->getIntConfig(CONFIG_CHARTER_COST_GUILD)); // charter cost
+        data << CharterEntry;                               // charter entry
+        data << CharterDispayID;                            // charter display id
+        data << CharterCost;                                // charter cost
         data << uint32(0);                                  // unknown
         data << uint32(sWorld->getIntConfig(CONFIG_MIN_PETITION_SIGNS)); // required signs
     }
     else
     {
-        data << uint8(3);                                   // count
+        // For 2v2 default
+        CharterEntry = ARENA_TEAM_CHARTER_2v2;
+        CharterDispayID = CHARTER_DISPLAY_ID;
+        CharterCost = sWorld->getIntConfig(CONFIG_CHARTER_COST_ARENA_2v2);
+
         // 2v2
+        data << uint8(3);                                   // count
+        sScriptMgr->PetitionShowList(_player, creature, CharterEntry, CharterDispayID, CharterCost);
         data << uint32(1);                                  // index
-        data << uint32(ARENA_TEAM_CHARTER_2v2);             // charter entry
-        data << uint32(CHARTER_DISPLAY_ID);                 // charter display id
-        data << uint32(sWorld->getIntConfig(CONFIG_CHARTER_COST_ARENA_2v2)); // charter cost
+        data << CharterEntry;                               // charter entry
+        data << CharterDispayID;                            // charter display id
+        data << CharterCost;                                // charter cost
         data << uint32(2);                                  // unknown
         data << uint32(2);                                  // required signs?
+
+        // For 3v3 default
+        CharterEntry = ARENA_TEAM_CHARTER_3v3;
+        CharterDispayID = CHARTER_DISPLAY_ID;
+        CharterCost = sWorld->getIntConfig(CONFIG_CHARTER_COST_ARENA_3v3);
+
         // 3v3
+        sScriptMgr->PetitionShowList(_player, creature, CharterEntry, CharterDispayID, CharterCost);
         data << uint32(2);                                  // index
-        data << uint32(ARENA_TEAM_CHARTER_3v3);             // charter entry
-        data << uint32(CHARTER_DISPLAY_ID);                 // charter display id
-        data << uint32(sWorld->getIntConfig(CONFIG_CHARTER_COST_ARENA_3v3)); // charter cost
+        data << CharterEntry;                               // charter entry
+        data << CharterDispayID;                            // charter display id
+        data << CharterCost;                                // charter cost
         data << uint32(3);                                  // unknown
         data << uint32(3);                                  // required signs?
+
+        // For 3v3 default
+        CharterEntry = ARENA_TEAM_CHARTER_5v5;
+        CharterDispayID = CHARTER_DISPLAY_ID;
+        CharterCost = sWorld->getIntConfig(CONFIG_CHARTER_COST_ARENA_5v5);
+
         // 5v5
+        sScriptMgr->PetitionShowList(_player, creature, CharterEntry, CharterDispayID, CharterCost);
         data << uint32(3);                                  // index
-        data << uint32(ARENA_TEAM_CHARTER_5v5);             // charter entry
-        data << uint32(CHARTER_DISPLAY_ID);                 // charter display id
-        data << uint32(sWorld->getIntConfig(CONFIG_CHARTER_COST_ARENA_5v5)); // charter cost
+        data << CharterEntry;                               // charter entry
+        data << CharterDispayID;                            // charter display id
+        data << CharterCost;                                // charter cost
         data << uint32(5);                                  // unknown
         data << uint32(5);                                  // required signs?
     }
 
     SendPacket(&data);
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Sent SMSG_PETITION_SHOWLIST");
+    LOG_DEBUG("network", "Sent SMSG_PETITION_SHOWLIST");
 #endif
 }

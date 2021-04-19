@@ -31,20 +31,20 @@ namespace lfg
 
     void LFGQueue::AddToQueue(ObjectGuid guid, bool failedProposal)
     {
-        //sLog->outString("ADD AddToQueue: %s, failed proposal: %u", guid.ToString().c_str(), failedProposal ? 1 : 0);
+        //LOG_INFO("server", "ADD AddToQueue: %s, failed proposal: %u", guid.ToString().c_str(), failedProposal ? 1 : 0);
         LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(guid);
         if (itQueue == QueueDataStore.end())
         {
-            sLog->outError("LFGQueue::AddToQueue: Queue data not found for [%s]", guid.ToString().c_str());
+            LOG_ERROR("server", "LFGQueue::AddToQueue: Queue data not found for [%s]", guid.ToString().c_str());
             return;
         }
-        //sLog->outString("AddToQueue success: %s", guid.ToString().c_str());
+        //LOG_INFO("server", "AddToQueue success: %s", guid.ToString().c_str());
         AddToNewQueue(guid, failedProposal);
     }
 
     void LFGQueue::RemoveFromQueue(ObjectGuid guid, bool partial)
     {
-        //sLog->outString("REMOVE RemoveFromQueue: %s, partial: %u", guid.ToString().c_str(), partial ? 1 : 0);
+        //LOG_INFO("server", "REMOVE RemoveFromQueue: %s, partial: %u", guid.ToString().c_str(), partial ? 1 : 0);
         RemoveFromNewQueue(guid);
         RemoveFromCompatibles(guid);
 
@@ -55,13 +55,13 @@ namespace lfg
             {
                 if (itr->second.bestCompatible.hasGuid(guid))
                 {
-                    //sLog->outString("CLEAR bestCompatible: %s, because of: %s", itr->second.bestCompatible.toString().c_str(), guid.ToString().c_str());
+                    //LOG_INFO("server", "CLEAR bestCompatible: %s, because of: %s", itr->second.bestCompatible.toString().c_str(), guid.ToString().c_str());
                     itr->second.bestCompatible.clear();
                 }
             }
             else
             {
-                //sLog->outString("CLEAR bestCompatible SELF: %s, because of: %s", itr->second.bestCompatible.toString().c_str(), guid.ToString().c_str());
+                //LOG_INFO("server", "CLEAR bestCompatible SELF: %s, because of: %s", itr->second.bestCompatible.toString().c_str(), guid.ToString().c_str());
                 //itr->second.bestCompatible.clear(); // don't clear here, because UpdateQueueTimers will try to find with every diff update
                 itDelete = itr;
             }
@@ -70,10 +70,10 @@ namespace lfg
         // xinef: partial
         if (!partial && itDelete != QueueDataStore.end())
         {
-            //sLog->outString("ERASE QueueDataStore for: %s", guid.ToString().c_str());
-            //sLog->outString("ERASE QueueDataStore for: %s, itDelete: %u,%u,%u", guid.ToString().c_str(), itDelete->second.dps, itDelete->second.healers, itDelete->second.tanks);
+            //LOG_INFO("server", "ERASE QueueDataStore for: %s", guid.ToString().c_str());
+            //LOG_INFO("server", "ERASE QueueDataStore for: %s, itDelete: %u,%u,%u", guid.ToString().c_str(), itDelete->second.dps, itDelete->second.healers, itDelete->second.tanks);
             QueueDataStore.erase(itDelete);
-            //sLog->outString("ERASE QueueDataStore for: %s SUCCESS", guid.ToString().c_str());
+            //LOG_INFO("server", "ERASE QueueDataStore for: %s SUCCESS", guid.ToString().c_str());
         }
     }
 
@@ -81,34 +81,34 @@ namespace lfg
     {
         if (front)
         {
-            //sLog->outString("ADD AddToNewQueue at FRONT: %s", guid.ToString().c_str());
+            //LOG_INFO("server", "ADD AddToNewQueue at FRONT: %s", guid.ToString().c_str());
             restoredAfterProposal.push_back(guid);
             newToQueueStore.push_front(guid);
         }
         else
         {
-            //sLog->outString("ADD AddToNewQueue at the END: %s", guid.ToString().c_str());
+            //LOG_INFO("server", "ADD AddToNewQueue at the END: %s", guid.ToString().c_str());
             newToQueueStore.push_back(guid);
         }
     }
 
     void LFGQueue::RemoveFromNewQueue(ObjectGuid guid)
     {
-        //sLog->outString("REMOVE RemoveFromNewQueue: %s", guid.ToString().c_str());
+        //LOG_INFO("server", "REMOVE RemoveFromNewQueue: %s", guid.ToString().c_str());
         newToQueueStore.remove(guid);
         restoredAfterProposal.remove(guid);
     }
 
     void LFGQueue::AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap)
     {
-        //sLog->outString("JOINED AddQueueData: %s", guid.ToString().c_str());
+        //LOG_INFO("server", "JOINED AddQueueData: %s", guid.ToString().c_str());
         QueueDataStore[guid] = LfgQueueData(joinTime, dungeons, rolesMap);
         AddToQueue(guid);
     }
 
     void LFGQueue::RemoveQueueData(ObjectGuid guid)
     {
-        //sLog->outString("LEFT RemoveQueueData: %s", guid.ToString().c_str());
+        //LOG_INFO("server", "LEFT RemoveQueueData: %s", guid.ToString().c_str());
         LfgQueueDataContainer::iterator it = QueueDataStore.find(guid);
         if (it != QueueDataStore.end())
             QueueDataStore.erase(it);
@@ -144,11 +144,11 @@ namespace lfg
 
     void LFGQueue::RemoveFromCompatibles(ObjectGuid guid)
     {
-        //sLog->outString("COMPATIBLES REMOVE for: %s", guid.ToString().c_str());
+        //LOG_INFO("server", "COMPATIBLES REMOVE for: %s", guid.ToString().c_str());
         for (LfgCompatibleContainer::iterator it = CompatibleList.begin(); it != CompatibleList.end(); ++it)
             if (it->hasGuid(guid))
             {
-                //sLog->outString("Removed Compatible: %s, because of: %s", it->toString().c_str(), guid.ToString().c_str());
+                //LOG_INFO("server", "Removed Compatible: %s, because of: %s", it->toString().c_str(), guid.ToString().c_str());
                 it->clear(); // set to 0, this will be removed while iterating in FindNewGroups
             }
         for (LfgCompatibleContainer::iterator itr = CompatibleTempList.begin(); itr != CompatibleTempList.end(); )
@@ -156,7 +156,7 @@ namespace lfg
             LfgCompatibleContainer::iterator it = itr++;
             if (it->hasGuid(guid))
             {
-                //sLog->outString("Erased Temp Compatible: %s, because of: %s", it->toString().c_str(), guid.ToString().c_str());
+                //LOG_INFO("server", "Erased Temp Compatible: %s, because of: %s", it->toString().c_str(), guid.ToString().c_str());
                 CompatibleTempList.erase(it);
             }
         }
@@ -164,20 +164,20 @@ namespace lfg
 
     void LFGQueue::AddToCompatibles(Lfg5Guids const& key)
     {
-        //sLog->outString("COMPATIBLES ADD: %s", key.toString().c_str());
+        //LOG_INFO("server", "COMPATIBLES ADD: %s", key.toString().c_str());
         CompatibleTempList.push_back(key);
     }
 
     uint8 LFGQueue::FindGroups()
     {
-        //sLog->outString("FIND GROUPS!");
+        //LOG_INFO("server", "FIND GROUPS!");
         uint8 newGroupsProcessed = 0;
         if (!newToQueueStore.empty())
         {
             ++newGroupsProcessed;
             ObjectGuid newGuid = newToQueueStore.front();
             bool pushCompatiblesToFront = (std::find(restoredAfterProposal.begin(), restoredAfterProposal.end(), newGuid) != restoredAfterProposal.end());
-            //sLog->outString("newToQueueStore: %s, front: %u", newGuid.ToString().c_str(), pushCompatiblesToFront ? 1 : 0);
+            //LOG_INFO("server", "newToQueueStore: %s, front: %u", newGuid.ToString().c_str(), pushCompatiblesToFront ? 1 : 0);
             RemoveFromNewQueue(newGuid);
 
             FindNewGroups(newGuid);
@@ -197,7 +197,7 @@ namespace lfg
         uint64 foundMask = 0;
         uint32 foundCount = 0;
 
-        //sLog->outString("FIND NEW GROUPS for: %s", newGuid.ToString().c_str());
+        //LOG_INFO("server", "FIND NEW GROUPS for: %s", newGuid.ToString().c_str());
 
         // we have to take into account that FindNewGroups is called every X minutes if number of compatibles is low!
         // build set of already present compatibles for this guid
@@ -225,7 +225,7 @@ namespace lfg
             Lfg5GuidsList::iterator itr = it++;
             if (itr->empty())
             {
-                //sLog->outString("ERASE from CompatibleList");
+                //LOG_INFO("server", "ERASE from CompatibleList");
                 CompatibleList.erase(itr);
                 continue;
             }
@@ -241,7 +241,7 @@ namespace lfg
 
     LfgCompatibility LFGQueue::CheckCompatibility(Lfg5Guids const& checkWith, const ObjectGuid& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles)
     {
-        //sLog->outString("CHECK CheckCompatibility: %s, new guid: %s", checkWith.toString().c_str(), newGuid.ToString().c_str());
+        //LOG_INFO("server", "CHECK CheckCompatibility: %s, new guid: %s", checkWith.toString().c_str(), newGuid.ToString().c_str());
         Lfg5Guids check(checkWith, false); // here newGuid is at front
         Lfg5Guids strGuids(checkWith, false); // here guids are sorted
         check.force_insert_front(newGuid);
@@ -266,7 +266,7 @@ namespace lfg
             LfgQueueDataContainer::iterator itQueue = QueueDataStore.find(guid);
             if (itQueue == QueueDataStore.end())
             {
-                sLog->outError("LFGQueue::CheckCompatibility: [%s] is not queued but listed as queued!", guid.ToString().c_str());
+                LOG_ERROR("server", "LFGQueue::CheckCompatibility: [%s] is not queued but listed as queued!", guid.ToString().c_str());
                 RemoveFromQueue(guid);
                 return LFG_COMPATIBILITY_PENDING;
             }
@@ -321,7 +321,7 @@ namespace lfg
                         if (itRoles->first == itPlayer->first)
                         {
                             // pussywizard: LFG ZOMG! this means that this player was in two different LfgQueueData (in QueueDataStore), and at least one of them is a group guid, because we do checks so there aren't 2 same guids in current CHECK
-                            //sLog->outError("LFGQueue::CheckCompatibility: ERROR! Player multiple times in queue! [%s]", itRoles->first.ToString().c_str());
+                            //LOG_ERROR("server", "LFGQueue::CheckCompatibility: ERROR! Player multiple times in queue! [%s]", itRoles->first.ToString().c_str());
                             break;
                         }
                         else if (sLFGMgr->HasIgnore(itRoles->first, itPlayer->first))
@@ -457,13 +457,13 @@ namespace lfg
         else
             m_QueueStatusTimer += diff;
 
-        //sLog->outString("UPDATE UpdateQueueTimers");
+        //LOG_INFO("server", "UPDATE UpdateQueueTimers");
         for (Lfg5GuidsList::iterator it = CompatibleList.begin(); it != CompatibleList.end(); )
         {
             Lfg5GuidsList::iterator itr = it++;
             if (itr->empty())
             {
-                //sLog->outString("UpdateQueueTimers ERASE compatible");
+                //LOG_INFO("server", "UpdateQueueTimers ERASE compatible");
                 CompatibleList.erase(itr);
             }
         }
@@ -493,7 +493,7 @@ namespace lfg
             return;
         }
 
-        //sLog->outTrace(LOG_FILTER_LFG, "Updating queue timers...");
+        // LOG_TRACE("lfg", "Updating queue timers...");
         for (LfgQueueDataContainer::iterator itQueue = QueueDataStore.begin(); itQueue != QueueDataStore.end(); ++itQueue)
         {
             LfgQueueData& queueinfo = itQueue->second;
@@ -531,7 +531,7 @@ namespace lfg
 
             if (queueinfo.bestCompatible.empty())
             {
-                //sLog->outString("found empty bestCompatible");
+                //LOG_INFO("server", "found empty bestCompatible");
                 FindBestCompatibleInQueue(itQueue);
             }
 
@@ -563,7 +563,7 @@ namespace lfg
 
     void LFGQueue::UpdateBestCompatibleInQueue(LfgQueueDataContainer::iterator itrQueue, Lfg5Guids const& key)
     {
-        //sLog->outString("UpdateBestCompatibleInQueue: %s", key.toString().c_str());
+        //LOG_INFO("server", "UpdateBestCompatibleInQueue: %s", key.toString().c_str());
         LfgQueueData& queueData = itrQueue->second;
 
         uint8 storedSize = queueData.bestCompatible.size();

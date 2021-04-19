@@ -71,7 +71,8 @@ public:
     uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const;
     uint32 GetPlayersCountInGroupsQueue(BattlegroundBracketId bracketId, BattlegroundQueueGroupTypes bgqueue);
     bool IsAllQueuesEmpty(BattlegroundBracketId bracket_id);
-    void SendMessageQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
+    void SendMessageBGQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry);
+    void SendMessageArenaQueue(GroupQueueInfo* ginfo, bool IsJoin);
 
     void SetBgTypeIdAndArenaType(BattlegroundTypeId b, uint8 a) { m_bgTypeId = b; m_arenaType = ArenaType(a); } // pussywizard
     void AddEvent(BasicEvent* Event, uint64 e_time);
@@ -110,6 +111,9 @@ public:
 
     //one selection pool for horde, other one for alliance
     SelectionPool m_SelectionPools[BG_TEAMS_COUNT];
+
+    ArenaType GetArenaType() { return m_arenaType; }
+    BattlegroundTypeId GetBGTypeID() { return m_bgTypeId; }
 private:
     BattlegroundTypeId m_bgTypeId;
     ArenaType m_arenaType;

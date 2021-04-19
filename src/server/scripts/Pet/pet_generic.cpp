@@ -606,8 +606,8 @@ public:
         {
             if (GetHitUnit() != GetCaster())
             {
-                std::list<Spell::TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-                for (std::list<Spell::TargetInfo>::iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+                std::list<TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+                for (std::list<TargetInfo>::iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
                     if (ihit->targetGUID == GetCaster()->GetGUID())
                         ihit->damage = -int32(GetHitDamage() * 0.25f);
             }

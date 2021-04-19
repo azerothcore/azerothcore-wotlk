@@ -12,6 +12,7 @@
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
 #include "World.h"
@@ -59,7 +60,7 @@ void WorldSession::SendTradeStatus(TradeStatus status)
 void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Ignore Trade %s", _player->GetGUID().ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Ignore Trade %s", _player->GetGUID().ToString().c_str());
 #endif
     // recvPacket.print_storage();
 }
@@ -67,7 +68,7 @@ void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
 void WorldSession::HandleBusyTradeOpcode(WorldPacket& /*recvPacket*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Busy Trade %s", _player->GetGUID().ToString().c_str());
+    LOG_DEBUG("network", "WORLD: Busy Trade %s", _player->GetGUID().ToString().c_str());
 #endif
     // recvPacket.print_storage();
 }
@@ -144,7 +145,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             {
                 // logging
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "partner storing: %s", myItems[i]->GetGUID().ToString().c_str());
+                LOG_DEBUG("network", "partner storing: %s", myItems[i]->GetGUID().ToString().c_str());
 #endif
 
                 // adjust time (depends on /played)
@@ -157,7 +158,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             {
                 // logging
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_NETWORKIO, "player storing: %s", hisItems[i]->GetGUID().ToString().c_str());
+                LOG_DEBUG("network", "player storing: %s", hisItems[i]->GetGUID().ToString().c_str());
 #endif
 
                 // adjust time (depends on /played)
@@ -174,21 +175,21 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
             if (myItems[i])
             {
                 if (!traderCanTrade)
-                    sLog->outError("trader can't store item: %s", myItems[i]->GetGUID().ToString().c_str());
+                    LOG_ERROR("server", "trader can't store item: %s", myItems[i]->GetGUID().ToString().c_str());
                 if (_player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, myItems[i], false) == EQUIP_ERR_OK)
                     _player->MoveItemToInventory(playerDst, myItems[i], true, true);
                 else
-                    sLog->outError("player can't take item back: %s", myItems[i]->GetGUID().ToString().c_str());
+                    LOG_ERROR("server", "player can't take item back: %s", myItems[i]->GetGUID().ToString().c_str());
             }
             // return the already removed items to the original owner
             if (hisItems[i])
             {
                 if (!playerCanTrade)
-                    sLog->outError("player can't store item: %s", hisItems[i]->GetGUID().ToString().c_str());
+                    LOG_ERROR("server", "player can't store item: %s", hisItems[i]->GetGUID().ToString().c_str());
                 if (trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, hisItems[i], false) == EQUIP_ERR_OK)
                     trader->MoveItemToInventory(traderDst, hisItems[i], true, true);
                 else
-                    sLog->outError("trader can't take item back: %s", hisItems[i]->GetGUID().ToString().c_str());
+                    LOG_ERROR("server", "trader can't take item back: %s", hisItems[i]->GetGUID().ToString().c_str());
             }
         }
     }
@@ -207,7 +208,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item * *
         if (Item* item = myTrade->GetItem(TradeSlots(i)))
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outStaticDebug("player trade item %s bag: %u slot: %u", item->GetGUID().ToString().c_str(), item->GetBagSlot(), item->GetSlot());
+            LOG_DEBUG("server", "player trade item %s bag: %u slot: %u", item->GetGUID().ToString().c_str(), item->GetBagSlot(), item->GetSlot());
 #endif
             //Can return nullptr
             myItems[i] = item;
@@ -217,7 +218,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item * *
         if (Item* item = hisTrade->GetItem(TradeSlots(i)))
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outStaticDebug("partner trade item %s bag: %u slot: %u", item->GetGUID().ToString().c_str(), item->GetBagSlot(), item->GetSlot());
+            LOG_DEBUG("server", "partner trade item %s bag: %u slot: %u", item->GetGUID().ToString().c_str(), item->GetBagSlot(), item->GetSlot());
 #endif
             hisItems[i] = item;
             hisItems[i]->SetInTrade();
@@ -641,6 +642,9 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         SendNotification(GetAcoreString(LANG_TRADE_OTHER_REQ), sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ));
         return;
     }
+
+    if (!sScriptMgr->CanInitTrade(_player, pOther))
+        return;
 
     // OK start trade
     _player->m_trade = new TradeData(_player, pOther);

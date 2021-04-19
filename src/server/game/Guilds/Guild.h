@@ -756,6 +756,9 @@ public:
 
     void ResetTimes();
 
+    [[nodiscard]] bool ModifyBankMoney(SQLTransaction& trans, const uint64& amount, bool add) { return _ModifyBankMoney(trans, amount, add); }
+    [[nodiscard]] uint32 GetMemberSize() const { return m_members.size(); }
+
 protected:
     uint32 m_id;
     std::string m_name;
