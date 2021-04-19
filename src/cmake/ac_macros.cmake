@@ -6,6 +6,22 @@ MACRO(AC_ADD_SCRIPT path)
 ENDMACRO()
 
 #
+# AC_ADD_SCRIPTS
+#
+# This macro can be used to automatically load scripts for the ScriptMgr
+# from a specified folder, instead of manually list them within the cmake
+# NOTE: you must still manually specify the script loader header
+#
+
+MACRO(AC_ADD_SCRIPTS path)
+CU_SUBDIRLIST(sub_DIRS ${path} TRUE TRUE)
+FOREACH(subdir ${sub_DIRS})
+  file(GLOB sources "${subdir}/*.cpp" "${subdir}/*.h")
+    CU_LIST_ADD_CACHE(scripts_STAT_SRCS "${sources}")
+ENDFOREACH()
+ENDMACRO()
+
+#
 # AC_ADD_SCRIPT_LOADER
 #
 MACRO(AC_ADD_SCRIPT_LOADER script_dec include)

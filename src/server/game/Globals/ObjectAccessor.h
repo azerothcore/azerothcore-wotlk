@@ -11,8 +11,9 @@
 #include "GridDefines.h"
 #include "Object.h"
 #include "UpdateData.h"
-#include <ace/Thread_Mutex.h>
+#include <mutex>
 #include <set>
+#include <shared_mutex>
 #include <unordered_map>
 
 class Creature;
@@ -33,43 +34,24 @@ class HashMapHolder
 {
 public:
     typedef std::unordered_map<uint64, T*> MapType;
-    typedef ACE_RW_Thread_Mutex LockType;
 
-    static void Insert(T* o)
-    {
-        ACORE_WRITE_GUARD(LockType, i_lock);
-        m_objectMap[o->GetGUID()] = o;
-    }
-
-    static void Remove(T* o)
-    {
-        ACORE_WRITE_GUARD(LockType, i_lock);
-        m_objectMap.erase(o->GetGUID());
-    }
-
-    static T* Find(uint64 guid)
-    {
-        ACORE_READ_GUARD(LockType, i_lock);
-        typename MapType::iterator itr = m_objectMap.find(guid);
-        return (itr != m_objectMap.end()) ? itr->second : nullptr;
-    }
+    static void Insert(T* o);
+    static void Remove(T* o);
+    static T* Find(uint64 guid);
 
     static MapType& GetContainer() { return m_objectMap; }
-
-    static LockType* GetLock() { return &i_lock; }
+    static std::shared_mutex* GetLock();
 
 private:
     //Non instanceable only static
     HashMapHolder() = default;
 
-    static LockType i_lock;
-    static MapType  m_objectMap;
+    static MapType m_objectMap;
 };
 
 /// Define the static members of HashMapHolder
 
 template <class T> std::unordered_map< uint64, T* > HashMapHolder<T>::m_objectMap;
-template <class T> typename HashMapHolder<T>::LockType HashMapHolder<T>::i_lock;
 
 // pussywizard:
 class DelayedCorpseAction
@@ -140,34 +122,8 @@ public:
         return nullptr;
     }
 
-    template<class T> static T* GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/)
-    {
-        T* obj = HashMapHolder<T>::Find(guid);
-        if (!obj || obj->GetMapId() != mapid)
-            return nullptr;
-
-        CellCoord p = acore::ComputeCellCoord(x, y);
-        if (!p.IsCoordValid())
-        {
-            sLog->outError("ObjectAccessor::GetObjectInWorld: invalid coordinates supplied X:%f Y:%f grid cell [%u:%u]", x, y, p.x_coord, p.y_coord);
-            return nullptr;
-        }
-
-        CellCoord q = acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
-        if (!q.IsCoordValid())
-        {
-            sLog->outError("ObjectAccessor::GetObjecInWorld: object (GUID: %u TypeId: %u) has invalid coordinates X:%f Y:%f grid cell [%u:%u]", obj->GetGUIDLow(), obj->GetTypeId(), obj->GetPositionX(), obj->GetPositionY(), q.x_coord, q.y_coord);
-            return nullptr;
-        }
-
-        int32 dx = int32(p.x_coord) - int32(q.x_coord);
-        int32 dy = int32(p.y_coord) - int32(q.y_coord);
-
-        if (dx > -2 && dx < 2 && dy > -2 && dy < 2)
-            return obj;
-        else
-            return nullptr;
-    }
+    template<class T>
+    static T* GetObjectInWorld(uint32 mapid, float x, float y, uint64 guid, T* /*fake*/);
 
     // these functions return objects only if in map of specified object
     static WorldObject* GetWorldObject(WorldObject const&, uint64);
@@ -226,7 +182,7 @@ public:
     //non-static functions
     void AddUpdateObject(Object* obj)
     {
-        ACORE_GUARD(ACE_Thread_Mutex, i_objectLock);
+        std::lock_guard<std::mutex> guard(i_objectLock);
         if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
             i_objects.insert(obj);
         else
@@ -235,7 +191,7 @@ public:
 
     void RemoveUpdateObject(Object* obj)
     {
-        ACORE_GUARD(ACE_Thread_Mutex, i_objectLock);
+        std::lock_guard<std::mutex> guard(i_objectLock);
         if (obj->GetTypeId() < TYPEID_UNIT) // these are not in map: TYPEID_OBJECT, TYPEID_ITEM, TYPEID_CONTAINER
             i_objects.erase(obj);
         else
@@ -270,10 +226,10 @@ private:
     Player2CorpsesMapType i_player2corpse;
     std::list<uint64> i_playerBones;
 
-    ACE_Thread_Mutex i_objectLock;
-    ACE_RW_Thread_Mutex i_corpseLock;
+    std::mutex i_objectLock;
+    std::shared_mutex i_corpseLock;
     std::list<DelayedCorpseAction> i_delayedCorpseActions;
-    mutable ACE_Thread_Mutex DelayedCorpseLock;
+    mutable std::mutex DelayedCorpseLock;
 };
 
 #define sObjectAccessor ObjectAccessor::instance()

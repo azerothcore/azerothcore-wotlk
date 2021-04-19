@@ -28,7 +28,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
     uint64 guid;
     recvData >> guid;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (GUID: %u TypeId:%u)", GUID_LOPART(guid), GuidHigh2TypeId(GUID_HIPART(guid)));
+    LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (GUID: %u TypeId:%u)", GUID_LOPART(guid), GuidHigh2TypeId(GUID_HIPART(guid)));
 #endif
 
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
@@ -268,7 +268,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
 void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvData*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd MSG_BATTLEGROUND_PLAYER_POSITIONS Message");
+    LOG_DEBUG("network", "WORLD: Recvd MSG_BATTLEGROUND_PLAYER_POSITIONS Message");
 #endif
 
     Battleground* bg = _player->GetBattleground();
@@ -321,7 +321,7 @@ void WorldSession::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvDa
 void WorldSession::HandlePVPLogDataOpcode(WorldPacket& /*recvData*/)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd MSG_PVP_LOG_DATA Message");
+    LOG_DEBUG("network", "WORLD: Recvd MSG_PVP_LOG_DATA Message");
 #endif
 
     Battleground* bg = _player->GetBattleground();
@@ -337,14 +337,14 @@ void WorldSession::HandlePVPLogDataOpcode(WorldPacket& /*recvData*/)
     SendPacket(&data);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent MSG_PVP_LOG_DATA Message");
+    LOG_DEBUG("network", "WORLD: Sent MSG_PVP_LOG_DATA Message");
 #endif
 }
 
 void WorldSession::HandleBattlefieldListOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_BATTLEFIELD_LIST Message");
+    LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEFIELD_LIST Message");
 #endif
 
     uint32 bgTypeId;
@@ -387,6 +387,9 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
     BattlegroundTypeId bgTypeId = BattlegroundTypeId(bgTypeId_);
     BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, arenaType);
     BattlegroundQueue& bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
+
+    if (!sScriptMgr->CanBattleFieldPort(_player, arenaType, bgTypeId, action))
+        return;
 
     // get group info from queue
     GroupQueueInfo ginfo;
@@ -493,7 +496,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
 void WorldSession::HandleBattlefieldLeaveOpcode(WorldPacket& recvData)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Recvd CMSG_LEAVE_BATTLEFIELD Message");
+    LOG_DEBUG("network", "WORLD: Recvd CMSG_LEAVE_BATTLEFIELD Message");
 #endif
 
     recvData.read_skip<uint8>();                           // unk1
@@ -658,6 +661,14 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
     // queue result (default ok)
     GroupJoinBattlegroundResult err = GroupJoinBattlegroundResult(bgt->GetBgTypeID());
 
+    if (!sScriptMgr->CanJoinInArenaQueue(_player, guid, arenaslot, bgTypeId, asGroup, isRated, err) && err <= 0)
+    {
+        WorldPacket data;
+        sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
+        SendPacket(&data);
+        return;
+    }
+
     // check if player can queue:
     if (!asGroup)
     {
@@ -797,13 +808,13 @@ void WorldSession::HandleReportPvPAFK(WorldPacket& recvData)
     if (!reportedPlayer)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_BATTLEGROUND, "WorldSession::HandleReportPvPAFK: player not found");
+        LOG_DEBUG("bg.battleground", "WorldSession::HandleReportPvPAFK: player not found");
 #endif
         return;
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_BATTLEGROUND, "WorldSession::HandleReportPvPAFK: %s reported %s", _player->GetName().c_str(), reportedPlayer->GetName().c_str());
+    LOG_DEBUG("bg.battleground", "WorldSession::HandleReportPvPAFK: %s reported %s", _player->GetName().c_str(), reportedPlayer->GetName().c_str());
 #endif
 
     reportedPlayer->ReportedAfkBy(_player);

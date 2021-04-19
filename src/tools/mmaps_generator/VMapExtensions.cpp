@@ -10,10 +10,6 @@
 #include "WorldModel.h"
 #include "ModelInstance.h"
 
-#include "Database/DatabaseEnv.h"
-LoginDatabaseWorkerPool LoginDatabase;
-WorldDatabaseWorkerPool WorldDatabase;
-
 namespace VMAP
 {
     // Need direct access to encapsulated VMAP data, so we add functions for MMAP generator

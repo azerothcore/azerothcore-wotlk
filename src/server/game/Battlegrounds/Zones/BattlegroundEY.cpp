@@ -320,14 +320,14 @@ bool BattlegroundEY::SetupBattleground()
     for (uint32 i = BG_EY_OBJECT_DOOR_A; i < BG_EY_OBJECT_MAX; ++i)
         if (BgObjects[i] == 0)
         {
-            sLog->outErrorDb("BatteGroundEY: Failed to spawn some object Battleground not created!");
+            LOG_ERROR("sql.sql", "BatteGroundEY: Failed to spawn some object Battleground not created!");
             return false;
         }
 
     for (uint32 i = BG_EY_SPIRIT_MAIN_ALLIANCE; i <= BG_EY_SPIRIT_MAIN_HORDE; ++i)
         if (BgCreatures[i] == 0)
         {
-            sLog->outErrorDb("BatteGroundEY: Failed to spawn spirit guides Battleground not created!");
+            LOG_ERROR("sql.sql", "BatteGroundEY: Failed to spawn spirit guides Battleground not created!");
             return false;
         }
 
