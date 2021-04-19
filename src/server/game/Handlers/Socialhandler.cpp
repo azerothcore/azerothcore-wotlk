@@ -19,14 +19,14 @@ void WorldSession::HandleContactListOpcode(WorldPacket& recv_data)
     uint32 flags;
     recv_data >> flags;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_CONTACT_LIST - Unk: %d", flags);
+    LOG_DEBUG("network", "WORLD: Received CMSG_CONTACT_LIST - Unk: %d", flags);
 
     _player->GetSocial()->SendSocialList(_player, flags);
 }
 
 void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
 {
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_ADD_FRIEND");
+    LOG_DEBUG("network", "WORLD: Received CMSG_ADD_FRIEND");
 
     std::string friendName = GetAcoreString(LANG_FRIEND_IGNORE_UNKNOWN);
     std::string friendNote;
@@ -37,7 +37,7 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
     if (!normalizePlayerName(friendName))
         return;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: %s asked to add friend : '%s'", GetPlayer()->GetName().c_str(), friendName.c_str());
+    LOG_DEBUG("network", "WORLD: %s asked to add friend : '%s'", GetPlayer()->GetName().c_str(), friendName.c_str());
 
     // xinef: Get Data From global storage
     uint32 guidLow = sWorld->GetGlobalPlayerGUID(friendName);
@@ -81,7 +81,7 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
 
     sSocialMgr->SendFriendStatus(GetPlayer(), friendResult, guidLow, false);
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent (SMSG_FRIEND_STATUS)");
+    LOG_DEBUG("network", "WORLD: Sent (SMSG_FRIEND_STATUS)");
 }
 
 void WorldSession::HandleDelFriendOpcode(WorldPacket& recv_data)
@@ -93,7 +93,7 @@ void WorldSession::HandleDelFriendOpcode(WorldPacket& recv_data)
 
     sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_REMOVED, GUID_LOPART(FriendGUID), false);
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent motd (SMSG_FRIEND_STATUS)");
+    LOG_DEBUG("network", "WORLD: Sent motd (SMSG_FRIEND_STATUS)");
 }
 
 void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recv_data)
@@ -105,7 +105,7 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recv_data)
     if (!normalizePlayerName(ignoreName))
         return;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: %s asked to Ignore: '%s'", GetPlayer()->GetName().c_str(), ignoreName.c_str());
+    LOG_DEBUG("network", "WORLD: %s asked to Ignore: '%s'", GetPlayer()->GetName().c_str(), ignoreName.c_str());
 
     uint32 lowGuid = sWorld->GetGlobalPlayerGUID(ignoreName);
     if (!lowGuid)
@@ -129,7 +129,7 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recv_data)
 
     sSocialMgr->SendFriendStatus(GetPlayer(), ignoreResult, lowGuid, false);
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent (SMSG_FRIEND_STATUS)");
+    LOG_DEBUG("network", "WORLD: Sent (SMSG_FRIEND_STATUS)");
 }
 
 void WorldSession::HandleDelIgnoreOpcode(WorldPacket& recv_data)

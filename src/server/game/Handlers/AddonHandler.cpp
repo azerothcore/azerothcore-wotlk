@@ -73,7 +73,7 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
             AddOnPacked >> enabled >> crc >> unk2;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk2);
+            LOG_DEBUG("network", "ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk2);
 #endif
 
             uint8 state = (enabled ? 2 : 1);
@@ -129,12 +129,12 @@ bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         if (AddOnPacked.rpos() != AddOnPacked.size())
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "packet under read!");
+            LOG_DEBUG("network", "packet under read!");
 #endif
     }
     else
     {
-        sLog->outError("Addon packet uncompress error :(");
+        LOG_ERROR("server", "Addon packet uncompress error :(");
         return false;
     }
     return true;
