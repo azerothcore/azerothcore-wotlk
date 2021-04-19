@@ -142,8 +142,8 @@ jobs:
   docker-build:
     strategy:
       fail-fast: true
-    runs-on: ubuntu-20.04
     container:
+      image: ubuntu-20.04
       options: --user 1000 --group-add docker
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
