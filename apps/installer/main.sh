@@ -19,7 +19,7 @@ options=(
     "client-data: (gd): download client data from github repository (beta)"   # 11
     "run-worldserver (rw): execute a simple restarter for worldserver" # 12
     "run-authserver (ra): execute a simple restarter for authserver" # 13
-    "docker (d): Run docker tools" # 14
+    "docker (dr): Run docker tools" # 14
     "quit: Exit from this menu"                     # 15
     )
 
