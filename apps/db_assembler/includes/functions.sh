@@ -11,7 +11,7 @@ function dbasm_mysqlExec() {
 	confs=$1
 	command=$2
 	options=$3
-	
+
     # MYSQL_PORT needs to be reseted as the next eval might not overwite the current value causing the commands to use wrong port
     MYSQL_PORT=3306
 	eval $confs
@@ -100,7 +100,9 @@ function dbasm_createDB() {
     name="DB_"$uc"_NAME"
     dbname=${!name}
 
-    eval $confs
+    if [[ -z "$MYSQL_HOST" && -z "$MYSQL_USER" ]]; then
+        eval $confs
+    fi
 
     CONF_USER=$MYSQL_USER
     CONF_PASS=$MYSQL_PASS
@@ -251,7 +253,7 @@ function dbasm_db_backup() {
 
     name="DB_"$uc"_NAME"
     dbname=${!name}
-	
+
     # MYSQL_PORT needs to be reseted as the next eval might not overwite the current value causing the commands to use wrong port
     MYSQL_PORT=3306
     eval $confs;
@@ -303,7 +305,7 @@ function dbasm_db_import() {
     fi
 
     echo "importing $1 - $2 ..."
-    
+
     # MYSQL_PORT needs to be reseted as the next eval might not overwite the current value causing the commands to use wrong port
     MYSQL_PORT=3306
     eval $confs;

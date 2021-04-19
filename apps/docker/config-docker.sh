@@ -1,10 +1,5 @@
 CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-CTYPE=Release
-
-# first check if it's defined in env, otherwise use the default
-CSCRIPTS=${ENABLE_SCRIPTS:-1}
-
 DATAPATH="$BINPATH/data"
 
 DB_AUTH_CONF="MYSQL_USER='root'; \

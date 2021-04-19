@@ -143,6 +143,8 @@ jobs:
     strategy:
       fail-fast: true
     runs-on: ubuntu-20.04
+    container:
+      options: "--user 1000 --group-add docker"
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
@@ -152,7 +154,7 @@ jobs:
           docker-compose --version
       - name: Build
         run: |
-          docker-compose run -e ENABLE_SCRIPTS=0 ac-dev-server bash bin/acore-docker-build
+          docker-compose run -e CSCRIPTS=0 ac-dev-server bash bin/acore-docker-build
 
   docker-worldserver:
     strategy:
