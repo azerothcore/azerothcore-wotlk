@@ -279,7 +279,7 @@ bool BattlegroundRV::SetupBattleground()
             || !AddObject(BG_RV_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 757.02f, -267.30f, 2.80f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
        )
     {
-        sLog->outErrorDb("BatteGroundRV: Failed to spawn some object!");
+        LOG_ERROR("sql.sql", "BatteGroundRV: Failed to spawn some object!");
         return false;
     }
 

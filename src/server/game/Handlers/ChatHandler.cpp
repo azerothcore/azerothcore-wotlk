@@ -43,14 +43,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     if (type >= MAX_CHAT_MSG_TYPE)
     {
-        sLog->outError("CHAT: Wrong message type received: %u", type);
+        LOG_ERROR("server", "CHAT: Wrong message type received: %u", type);
         recvData.rfinish();
         return;
     }
 
     Player* sender = GetPlayer();
-
-    //sLog->outDebug("CHAT: packet received. type %u, lang %u", type, lang);
 
     // pussywizard: chatting on most chat types requires 2 hours played to prevent spam/abuse
     if (AccountMgr::IsPlayerAccount(GetSecurity()))
@@ -145,29 +143,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             case CHAT_MSG_RAID:
             case CHAT_MSG_GUILD:
             case CHAT_MSG_BATTLEGROUND:
-                // check if addon messages are disabled
-                if (!sWorld->getBoolConfig(CONFIG_ADDON_CHANNEL))
-                {
-                    recvData.rfinish();
-                    return;
-                }
-
-                if (sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
-                {
-                    std::string msg;
-                    recvData >> msg;
-
-                    if (msg.empty())
-                        return;
-
-                    sScriptMgr->OnPlayerChat(sender, type, lang, msg);
-#ifdef ELUNA
-                    if (!sEluna->OnChat(sender, type, lang, msg))
-                        return;
-#endif
-                }
-
-                break;
             case CHAT_MSG_WHISPER:
                 // check if addon messages are disabled
                 if (!sWorld->getBoolConfig(CONFIG_ADDON_CHANNEL))
@@ -175,19 +150,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     recvData.rfinish();
                     return;
                 }
-
-                if (sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
-                {
-                    std::string to, msg;
-                    recvData >> to >> msg;
-                    if (msg.empty())
-                        return;
-                }
-
                 break;
             default:
-                sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination",
-                               GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
+                LOG_ERROR("network", "Player %s (GUID: %u) sent a chatmessage with an invalid language/message type combination",
+                    GetPlayer()->GetName().c_str(), GetPlayer()->GetGUIDLow());
 
                 recvData.rfinish();
                 return;
@@ -310,7 +276,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         {
             if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY) && !ChatHandler(this).isValidChatMessage(msg.c_str()))
             {
-                //sLog->outError("Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName().c_str(),
+                //LOG_ERROR("server", "Player %s (GUID: %u) sent a chatmessage with an invalid link: %s", GetPlayer()->GetName().c_str(),
                 //    GetPlayer()->GetGUIDLow(), msg.c_str());
 
                 if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
@@ -646,7 +612,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 break;
             }
         default:
-            sLog->outError("CHAT: unknown message type %u, lang: %u", type, lang);
+            LOG_ERROR("server", "CHAT: unknown message type %u, lang: %u", type, lang);
             break;
     }
 }
@@ -773,7 +739,6 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
 {
     uint64 iguid;
     uint8 unk;
-    //sLog->outDebug(LOG_FILTER_PACKETIO, "WORLD: Received CMSG_CHAT_IGNORED");
 
     recvData >> iguid;
     recvData >> unk;                                       // probably related to spam reporting
@@ -793,7 +758,7 @@ void WorldSession::HandleChannelDeclineInvite(WorldPacket& recvPacket)
     UNUSED(recvPacket);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "Opcode %u", recvPacket.GetOpcode());
+    LOG_DEBUG("network", "Opcode %u", recvPacket.GetOpcode());
 #endif
 }
 
