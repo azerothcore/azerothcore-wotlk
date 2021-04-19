@@ -152,7 +152,7 @@ jobs:
           docker-compose --version
       - name: Build
         run: |
-          docker-compose run -e CSCRIPTS=0 -e USER_ID=1001 ac-dev-server bash bin/acore-docker-build
+          DOCKER_EXTENDS_BIND=abstract-no-bind docker-compose run -e CSCRIPTS=0 ac-dev-server bash bin/acore-docker-build
 
   docker-worldserver:
     strategy:
