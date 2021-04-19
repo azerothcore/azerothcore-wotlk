@@ -83,4 +83,4 @@ if(BUILD_SHARED_LIBS)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --no-undefined")
 
     message(STATUS "Clang: Disallow undefined symbols")
-  endif()
+endif()
