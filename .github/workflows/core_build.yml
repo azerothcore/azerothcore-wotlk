@@ -158,8 +158,8 @@ jobs:
           docker --version
           docker-compose --version
       - name: Build
-        env:
-          DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
+        #env:
+        #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
         run: |
           ./acore.sh docker build
            docker-compose --profile app build
@@ -169,6 +169,9 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Deploy
+        #env:
+        #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
+        # if: ${{ steps.extract_branch.outputs.branch == 'master' }}
         run: |
           docker-compose push ac-worldserver ac-authserver ac-dev-server
 

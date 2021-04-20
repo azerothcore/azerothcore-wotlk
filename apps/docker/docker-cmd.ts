@@ -70,7 +70,7 @@ program.command("attach [service]")
       command = `${command} ${service}`;
     }
 
-    console.log(ink.colorize(`<red>>>>>> Running: ${command}</red>`));
+    console.log(ink.colorize(`<green>>>>>> Running: ${command}</green>`));
 
     let cmd = command.split(" ");
     const res = Deno.run({
@@ -101,7 +101,7 @@ program.command("attach [service]")
 
     command = `docker attach ${selService.split(" ")[0]}`;
 
-    console.log(ink.colorize(`<red>>>>>> Running: ${command}</red>`));
+    console.log(ink.colorize(`<green>>>>>> Running: ${command}</green>`));
 
     console.log(
       ink.colorize(
@@ -149,12 +149,12 @@ function shellCommandFactory(
 ): Command {
   return program.command(name)
     .description(
-      `${description}. Command: \n"${ink.colorize(`<red>${command}</red>`)}"\n`,
+      `${description}. Command: \n"${ink.colorize(`<green>${command}</green>`)}"\n`,
     )
     .action(async (args: any[] | undefined) => {
       const { run } = Deno;
 
-      console.log(ink.colorize(`<red>>>>>> Running: ${command}</red>`));
+      console.log(ink.colorize(`<green>>>>>> Running: ${command}</green>`));
 
       const cmd = command.split(" ");
 
