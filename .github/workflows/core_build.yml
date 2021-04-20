@@ -146,7 +146,8 @@ jobs:
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     env:
       DOCKER_EXTENDS_BIND: abstract-no-bind
-      DOCKER_BUILD_TARGET: prod
+      DOCKER_BUILD_WORLD_TARGET: worldserver
+      DOCKER_BUILD_AUTH_TARGET: authserver
     steps:
       - name: Extract branch name
         shell: bash

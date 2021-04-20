@@ -80,8 +80,8 @@ services:
     privileged: true
     build:
       context: .
-      target: ${DOCKER_BUILD_TARGET:-dev}
-      dockerfile: ./apps/docker/Dockerfile.worldserver
+      target: ${DOCKER_BUILD_WORLD_TARGET:-dev}
+      dockerfile: ./apps/docker/Dockerfile
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
@@ -98,8 +98,8 @@ services:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     build:
       context: .
-      target: ${DOCKER_BUILD_TARGET:-dev}
-      dockerfile: ./apps/docker/Dockerfile.authserver
+      target: ${DOCKER_BUILD_AUTH_TARGET:-dev}
+      dockerfile: ./apps/docker/Dockerfile
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [app, authserver]
@@ -118,7 +118,8 @@ services:
       - seccomp:unconfined
     build:
       context: .
-      dockerfile: ./apps/docker/Dockerfile.dev
+      target: dev
+      dockerfile: ./apps/docker/Dockerfile
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
