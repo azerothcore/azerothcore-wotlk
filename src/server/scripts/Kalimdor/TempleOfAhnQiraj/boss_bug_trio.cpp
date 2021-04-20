@@ -29,6 +29,28 @@ enum Spells
     SPELL_FEAR         = 19408
 };
 
+struct boss_bug_trioAI : public ScriptedAI
+{
+public:
+    boss_bug_trioAI(Creature* creature) : ScriptedAI(creature) { instance = me->GetInstanceScript(); }
+
+    void RespawnTrio()
+    {
+        if (Creature* vem = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_VEM)))
+            if (!vem->IsAlive())
+                vem->Respawn();
+        if (Creature* kri = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_KRI)))
+            if (!kri->IsAlive())
+                kri->Respawn();
+        if (Creature* yauj = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_YAUJ)))
+            if (!yauj->IsAlive())
+                yauj->Respawn();
+    }
+
+private:
+    InstanceScript* instance;
+};
+
 class boss_kri : public CreatureScript
 {
 public:
@@ -39,9 +61,9 @@ public:
         return GetTempleOfAhnQirajAI<boss_kriAI>(creature);
     }
 
-    struct boss_kriAI : public ScriptedAI
+    struct boss_kriAI : public boss_bug_trioAI
     {
-        boss_kriAI(Creature* creature) : ScriptedAI(creature)
+        boss_kriAI(Creature* creature) : boss_bug_trioAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -63,6 +85,7 @@ public:
 
             VemDead = false;
             Death = false;
+            RespawnTrio();
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -134,9 +157,9 @@ public:
         return GetTempleOfAhnQirajAI<boss_vemAI>(creature);
     }
 
-    struct boss_vemAI : public ScriptedAI
+    struct boss_vemAI : public boss_bug_trioAI
     {
-        boss_vemAI(Creature* creature) : ScriptedAI(creature)
+        boss_vemAI(Creature* creature) : boss_bug_trioAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -156,6 +179,7 @@ public:
             Enrage_Timer = 120000;
 
             Enraged = false;
+            RespawnTrio();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -225,9 +249,9 @@ public:
         return GetTempleOfAhnQirajAI<boss_yaujAI>(creature);
     }
 
-    struct boss_yaujAI : public ScriptedAI
+    struct boss_yaujAI : public boss_bug_trioAI
     {
-        boss_yaujAI(Creature* creature) : ScriptedAI(creature)
+        boss_yaujAI(Creature* creature) : boss_bug_trioAI(creature)
         {
             instance = creature->GetInstanceScript();
         }
@@ -247,6 +271,7 @@ public:
             Check_Timer = 2000;
 
             VemDead = false;
+            RespawnTrio();
         }
 
         void JustDied(Unit* /*killer*/) override
