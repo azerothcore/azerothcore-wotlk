@@ -218,13 +218,31 @@ function inst_simple_restarter {
 }
 
 function inst_download_client_data {
+    # change the following version when needed
+    local VERSION=v10
+
+    echo "#######################"
+    echo "Client data downloader"
+    echo "#######################"
+
     # first check if it's defined in env, otherwise use the default
     local path="${DATAPATH:-$AC_BINPATH_FULL}"
+
+    dataVersionFile="$path/data-version"
+
+    [ -f "$dataVersionFile" ] && source "$dataVersionFile"
 
     # create the path if doesn't exists
     mkdir -p "$path"
 
+    if [ "$VERSION" == "$INSTALLED_VERSION" ]; then
+        echo "Data $VERSION already installed. If you want to force the download remove the following file: $dataVersionFile"
+        return
+    fi
+
     echo "Downloading client data in: $path/data.zip ..."
-    curl -L https://github.com/wowgaming/client-data/releases/download/v10/data.zip > "$path/data.zip" \
-        && unzip -o "$path/data.zip" -d "$path/" && rm "$path/data.zip"
+    curl -L https://github.com/wowgaming/client-data/releases/download/$VERSION/data.zip > "$path/data.zip" \
+        && echo "unzip downloaded file..." && unzip -q -o "$path/data.zip" -d "$path/" \
+        && echo "Remove downloaded file" && rm "$path/data.zip" \
+        && echo "INSTALLED_VERSION=$VERSION" > "$dataVersionFile"
 }

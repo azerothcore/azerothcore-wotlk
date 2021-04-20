@@ -18,9 +18,9 @@ shellCommandFactory(
 );
 
 shellCommandFactory(
-  "start:app",
-  "Startup the authserver and worldserver apps",
-  "docker-compose --profile app up",
+  "start:app:d",
+  "Startup the authserver and worldserver apps in detached mode",
+  "docker-compose --profile app up -d",
 );
 
 shellCommandFactory(
@@ -126,8 +126,6 @@ program.command("quit").description("Close docker command").action(()=> {
 })
 
 // Handle it however you like
-console.log(Deno.args);
-
 // e.g. display usage
 while (true) {
   if (Deno.args.length === 0) {
@@ -137,7 +135,8 @@ while (true) {
     });
     await program.parseAsync(command.split(" "));
   } else {
-    program.parse(Deno.args);
+    await program.parseAsync(Deno.args);
+    process.exit(0)
   }
 }
 

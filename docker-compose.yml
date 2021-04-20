@@ -12,19 +12,6 @@ x-ac-shared-conf: &ac-shared-conf
     ac-database:
       condition: service_healthy
 
-x-ac-dev-server-base: &ac-dev-server-base
-  <<: *ac-shared-conf
-  tty: true
-  image: local/azerothcore/dev-server
-  security_opt:
-    - seccomp:unconfined
-  build:
-    context: .
-    dockerfile: ./apps/docker/Dockerfile.dev
-    args:
-      USER_ID: ${DOCKER_USER_ID:-1000}
-      GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-
 services:
 #============================
 #
@@ -86,14 +73,14 @@ services:
     stdin_open: true
     tty: true
     command: ./acore.sh run-worldserver
-    image: local/azerothcore/worldserver # name of the generated image after built locally
+    image: acore/worldserver # name of the generated image after built locally
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     privileged: true
     build:
       context: .
-      target: dev
+      target: ${DOCKER_BUILD_TARGET:-dev}
       dockerfile: ./apps/docker/Dockerfile.worldserver
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
@@ -105,17 +92,18 @@ services:
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     tty: true
     command: ./acore.sh run-authserver
-    image: local/azerothcore/authserver # name of the generated image after built locally
+    image: acore/authserver # name of the generated image after built locally
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     build:
       context: .
-      target: dev
+      target: ${DOCKER_BUILD_TARGET:-dev}
       dockerfile: ./apps/docker/Dockerfile.authserver
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [app, authserver]
+
 #======================
 #
 # Dev services
@@ -123,7 +111,17 @@ services:
 #======================
 
   ac-dev-server:
-    << : *ac-dev-server-base
+    <<: *ac-shared-conf
+    tty: true
+    image: acore/dev-server
+    security_opt:
+      - seccomp:unconfined
+    build:
+      context: .
+      dockerfile: ./apps/docker/Dockerfile.dev
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}

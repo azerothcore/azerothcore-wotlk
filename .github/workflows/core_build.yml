@@ -139,11 +139,14 @@ jobs:
           name: windows-2019-MSVC16-release
           path: build/bin/Release
 
-  docker-build:
+  docker-build-n-deploy:
     strategy:
       fail-fast: true
     runs-on: ubuntu-20.04
     if: github.repository == 'azerothcore/azerothcore-wotlk'
+    env:
+      DOCKER_EXTENDS_BIND: abstract-no-bind
+      DOCKER_BUILD_TARGET: prod
     steps:
       - uses: actions/checkout@v2
       - name: Configure
@@ -152,64 +155,14 @@ jobs:
           docker-compose --version
       - name: Build
         run: |
-          DOCKER_EXTENDS_BIND=abstract-no-bind docker-compose run -e CSCRIPTS=0 ac-dev-server bash bin/acore-docker-build
+          ./acore.sh docker build
+           docker-compose --profile app build
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Deploy
+        run: |
+          docker-compose push ac-worldserver ac-authserver ac-dev-server
 
-  docker-worldserver:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          docker-compose build ac-worldserver
-
-  docker-dev-server:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          docker-compose build ac-dev-server
-
-  docker-authserver:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          docker-compose build ac-authserver
-
-  docker-database:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          docker-compose build ac-database
