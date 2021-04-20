@@ -148,12 +148,18 @@ jobs:
       DOCKER_EXTENDS_BIND: abstract-no-bind
       DOCKER_BUILD_TARGET: prod
     steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
       - uses: actions/checkout@v2
       - name: Configure
         run: |
           docker --version
           docker-compose --version
       - name: Build
+        env:
+          DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
         run: |
           ./acore.sh docker build
            docker-compose --profile app build

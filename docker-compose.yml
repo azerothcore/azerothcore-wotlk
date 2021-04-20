@@ -73,7 +73,7 @@ services:
     stdin_open: true
     tty: true
     command: ./acore.sh run-worldserver
-    image: acore/worldserver # name of the generated image after built locally
+    image: acore/worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
@@ -92,7 +92,7 @@ services:
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     tty: true
     command: ./acore.sh run-authserver
-    image: acore/authserver # name of the generated image after built locally
+    image: acore/authserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
@@ -113,7 +113,7 @@ services:
   ac-dev-server:
     <<: *ac-shared-conf
     tty: true
-    image: acore/dev-server
+    image: acore/dev-server:${DOCKER_IMAGE_TAG:-master}
     security_opt:
       - seccomp:unconfined
     build:
