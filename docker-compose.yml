@@ -85,7 +85,7 @@ services:
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
-    profiles: [app, worldserver]
+    profiles: [all, app, worldserver]
 
   ac-authserver:
     <<: *ac-shared-conf
@@ -102,7 +102,7 @@ services:
       dockerfile: ./apps/docker/Dockerfile
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
-    profiles: [app, authserver]
+    profiles: [all, app, authserver]
 
 #======================
 #
@@ -134,7 +134,7 @@ services:
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
       - ac-build:/azerothcore/var/build
-    profiles: [dev]
+    profiles: [all, dev]
 
 volumes:
   ac-database:
