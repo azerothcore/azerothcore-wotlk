@@ -48,7 +48,7 @@ shellCommandFactory(
 );
 
 shellCommandFactory(
-  "migrate",
+  "db-import",
   "Create and upgrade the database with latest updates",
   "docker-compose run --rm ac-dev-server bash acore.sh db-assembler import-all",
 );
