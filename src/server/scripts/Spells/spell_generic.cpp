@@ -5111,7 +5111,8 @@ public:
                 pCaster->SendAttackSwingCancelAttack();
             }
 
-            if (instant_exit) {
+            if (instant_exit)
+            {
                 caster->getHostileRefManager().deleteReferences();
             }
             caster->CombatStop();
