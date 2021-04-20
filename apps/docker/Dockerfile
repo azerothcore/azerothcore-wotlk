@@ -98,7 +98,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
 WORKDIR /azerothcore/
 
 RUN cp -n "/azerothcore/env/docker/etc/worldserver.conf.dockerdist" "/azerothcore/env/dist/etc/worldserver.conf"
-RUN cp -n "/azerothcore/env/etc/authserver.conf.dockerdist" "/azerothcore/env/dist/etc/authserver.conf"
+RUN cp -n "/azerothcore/env/docker/etc/authserver.conf.dockerdist" "/azerothcore/env/dist/etc/authserver.conf"
 
 #================================================================
 #
