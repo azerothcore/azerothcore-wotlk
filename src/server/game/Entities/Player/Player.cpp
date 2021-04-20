@@ -19244,7 +19244,7 @@ void Player::_LoadMailedItems(Mail* mail)
 
         if (!proto)
         {
-            LOG_ERROR("server", "Player %u has unknown item_template (ProtoType) in mailed items (%s template: %u) in mail (%u), deleted.",
+            LOG_ERROR("server", "Player %s has unknown item_template (ProtoType) in mailed items (GUID: %u, template: %u) in mail (%u), deleted.",
                 GetGUID().ToString().c_str(), itemGuid, itemTemplate, mail->messageID);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
@@ -20444,7 +20444,7 @@ void Player::_SaveInventory(SQLTransaction& trans)
         }
         else
         {
-            LOG_ERROR("server", "Can't find item %s but is in refundable storage for player %u ! Removing.", (*itr).ToString().c_str(), GetGUID().ToString().c_str());
+            LOG_ERROR("server", "Can't find item %s but is in refundable storage for player %s ! Removing.", (*itr).ToString().c_str(), GetGUID().ToString().c_str());
             m_refundableItems.erase(itr);
         }
     }

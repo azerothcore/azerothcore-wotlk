@@ -28,7 +28,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (%s)", guid.ToString());
+    LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from (%s)", guid.ToString().c_str());
 #endif
 
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);

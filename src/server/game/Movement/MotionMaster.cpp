@@ -398,7 +398,7 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlo
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", "Creature (%s) follow to %s (GUID: %u)",
+        LOG_DEBUG("server", "Creature (%s) follow to %s (%s)",
             _owner->GetGUID().ToString().c_str(), target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString().c_str());
 #endif
         Mutate(new FollowMovementGenerator<Creature>(target, dist, angle), slot);

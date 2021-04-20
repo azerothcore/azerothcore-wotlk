@@ -742,8 +742,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     if (!player->IsInAreaTriggerRadius(atEntry))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "HandleAreaTriggerOpcode: Player '%s' (%s) too far (trigger map: %u player map: %u), ignore Area Trigger ID: %u",
-                       player->GetName().c_str(), atEntry->map, player->GetMapId(), player->GetGUID().ToString().c_str(), triggerId);
+        LOG_DEBUG("network", "HandleAreaTriggerOpcode: Player %s (%s) too far (trigger map: %u player map: %u), ignore Area Trigger ID: %u",
+                       player->GetName().c_str(), player->GetGUID().ToString().c_str(), atEntry->map, player->GetMapId(), triggerId);
 #endif
         return;
     }

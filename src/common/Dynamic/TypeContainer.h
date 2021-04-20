@@ -129,13 +129,13 @@ public:
     template<class SPECIFIC_TYPE>
     bool Remove(KEY_TYPE const& handle)
     {
-        return acore::Remove(_elements, handle, (SPECIFIC_TYPE*)NULL);
+        return acore::Remove(_elements, handle, (SPECIFIC_TYPE*)nullptr);
     }
 
     template<class SPECIFIC_TYPE>
     SPECIFIC_TYPE* Find(KEY_TYPE const& handle)
     {
-        return acore::Find(_elements, handle, (SPECIFIC_TYPE*)NULL);
+        return acore::Find(_elements, handle, (SPECIFIC_TYPE*)nullptr);
     }
 
     ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE>& GetElements() { return _elements; }

@@ -1796,7 +1796,7 @@ void Creature::Respawn(bool force)
             GetMap()->RemoveCreatureRespawnTime(m_spawnId);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", "Respawning creature %s (SpawnId: %u, %s)", GetName().c_str(), GetSpawnId(), GetGUID().ToString().c_str(), GetEntry());
+        LOG_DEBUG("server", "Respawning creature %s (SpawnId: %u, %s)", GetName().c_str(), GetSpawnId(), GetGUID().ToString().c_str());
 #endif
         m_respawnTime = 0;
         ResetPickPocketLootTime();

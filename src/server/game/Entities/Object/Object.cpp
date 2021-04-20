@@ -603,6 +603,7 @@ void Object::UpdateUInt32Value(uint16 index, uint32 value)
 void Object::SetUInt64Value(uint16 index, uint64 value)
 {
     ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
+
     if (*((uint64*) & (m_uint32Values[index])) != value)
     {
         m_uint32Values[index] = PAIR64_LOPART(value);
@@ -617,6 +618,7 @@ void Object::SetUInt64Value(uint16 index, uint64 value)
 bool Object::AddGuidValue(uint16 index, ObjectGuid value)
 {
     ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
+
     if (value && !*((ObjectGuid*)&(m_uint32Values[index])))
     {
         *((ObjectGuid*)&(m_uint32Values[index])) = value;
@@ -634,6 +636,7 @@ bool Object::AddGuidValue(uint16 index, ObjectGuid value)
 bool Object::RemoveGuidValue(uint16 index, ObjectGuid value)
 {
     ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
+
     if (value && *((ObjectGuid*)&(m_uint32Values[index])) == value)
     {
         m_uint32Values[index] = 0;
@@ -652,6 +655,7 @@ bool Object::RemoveGuidValue(uint16 index, ObjectGuid value)
 void Object::SetGuidValue(uint16 index, ObjectGuid value)
 {
     ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
+
     if (*((ObjectGuid*)&(m_uint32Values[index])) != value)
     {
         *((ObjectGuid*)&(m_uint32Values[index])) = value;

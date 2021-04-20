@@ -278,7 +278,7 @@ void WorldSession::HandlePetitionQueryOpcode(WorldPacket& recvData)
     recvData >> guildguid;                                 // in Trinity always same as petition low guid
     recvData >> petitionguid;                              // petition guid
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("network", "CMSG_PETITION_QUERY Petition (%s) Guild GUID %s", petitionguid.ToString().c_str(), guildguid);
+    LOG_DEBUG("network", "CMSG_PETITION_QUERY Petition (%s) Guild GUID %u", petitionguid.ToString().c_str(), guildguid);
 #endif
 
     SendPetitionQueryOpcode(petitionguid);
