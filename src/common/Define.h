@@ -65,10 +65,10 @@
 #endif //AC_COMPILER == AC_COMPILER_GNU
 
 #ifdef ACORE_API_USE_DYNAMIC_LINKING
-#  if ACORE_COMPILER == ACORE_COMPILER_MICROSOFT
+#  if AC_COMPILER == AC_COMPILER_MICROSOFT
 #    define AC_API_EXPORT __declspec(dllexport)
 #    define AC_API_IMPORT __declspec(dllimport)
-#  elif ACORE_COMPILER == ACORE_COMPILER_GNU
+#  elif AC_COMPILER == AC_COMPILER_GNU
 #    define AC_API_EXPORT __attribute__((visibility("default")))
 #    define AC_API_IMPORT
 #  else
