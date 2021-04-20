@@ -1,0 +1,34 @@
+FROM ubuntu:20.04 as dev
+
+# List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+# set timezone environment variable
+ENV TZ=Etc/UTC
+
+# set noninteractive mode so tzdata doesn't ask to set timezone on install
+ENV DEBIAN_FRONTEND=noninteractive
+
+# install the required dependencies to run the authserver
+RUN apt-get update && apt-get install -y gdb gdbserver net-tools tzdata libmysqlclient-dev libace-dev mysql-client;
+
+# change timezone in container
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
+
+WORKDIR /azerothcore/
+
+#
+# Prepare production image
+#
+FROM dev as prod
+
+# copy the sources from the host machine
+COPY apps /azerothcore/apps
+COPY bin /azerothcore/bin
+COPY conf /azerothcore/conf
+COPY data /azerothcore/data
+COPY deps /azerothcore/deps
+COPY acore.json /azerothcore/acore.json
+COPY acore.sh /azerothcore/acore.sh
+
+CMD ./acore.sh run-authserver
+

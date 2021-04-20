@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 as srv
+FROM ubuntu:20.04 as dev
 
 # List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
@@ -9,7 +9,17 @@ ENV TZ=Etc/UTC
 ENV DEBIAN_FRONTEND=noninteractive
 
 # install the required dependencies to run the authserver
-RUN apt-get update && apt-get install -y gdb gdbserver net-tools tzdata libmysqlclient-dev libace-dev;
+RUN apt-get update && apt-get install -y gdb gdbserver net-tools tzdata libmysqlclient-dev libace-dev mysql-client;
+
+# change timezone in container
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
+
+WORKDIR /azerothcore/
+
+#
+# Prepare production image
+#
+FROM dev as prod
 
 # copy the sources from the host machine
 COPY apps /azerothcore/apps
@@ -18,11 +28,10 @@ COPY conf /azerothcore/conf
 COPY data /azerothcore/data
 COPY deps /azerothcore/deps
 COPY acore.json /azerothcore/acore.json
+COPY acore.sh /azerothcore/acore.sh
 
-# run the AzerothCore database assembler
-RUN ./azerothcore/bin/acore-db-asm 1
+ENV DATAPATH=/azerothcore/env/dist/data
 
-# change timezone in container
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
+RUN "./acore.sh client-data"
 
-HEALTHCHECK --interval=5s --timeout=15s --start-period=30s --retries=3 CMD netstat -lnpt | grep :3724 || exit 1
+CMD ./acore.sh run-worldserver

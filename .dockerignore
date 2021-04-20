@@ -1,8 +1,9 @@
-build*/
-var/*
-data/contrib/*
-data/doc/*
-docker/worldserver/data/*
-docker/build/cache
+/cmake-build-debug/*
+/build*/
+/var/*
+env/dist/*
+env/user/*
+env/docker/data/*
+env/docker/logs/*
+env/docker/etc/*
 .idea
-cmake-build-debug/*

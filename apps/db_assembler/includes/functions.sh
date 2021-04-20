@@ -2,6 +2,21 @@
 PROMPT_USER=""
 PROMPT_PASS=""
 
+function dbasm_waitMysqlConn() {
+    DBHOST="$1"
+    DBPORT="$2"
+    COUNT=0
+    while ! mysqladmin ping -h"$DBHOST" --port="$DBPORT" --silent; do
+        ((COUNT++))
+        if [ $COUNT -gt $DBASM_WAIT_RETRIES ]; then
+            echo "DBASM Timeout: Cannot ping mysql!" 1>&2
+            exit 64
+        fi
+        echo "Cannot ping mysql, retry in $DBASM_WAIT_TIMEOUT seconds (remaining: $COUNT/$DBASM_WAIT_RETRIES)..."
+        sleep $DBASM_WAIT_TIMEOUT
+    done
+}
+
 # use in a subshell
 function dbasm_resetExitCode() {
 	exit 0
@@ -21,6 +36,7 @@ function dbasm_mysqlExec() {
 		MYSQL_PASS=$PROMPT_PASS
 	fi
 
+    dbasm_waitMysqlConn $MYSQL_HOST $MYSQL_PORT
 
 	export MYSQL_PWD=$MYSQL_PASS
 
@@ -100,9 +116,7 @@ function dbasm_createDB() {
     name="DB_"$uc"_NAME"
     dbname=${!name}
 
-    if [[ -z "$MYSQL_HOST" && -z "$MYSQL_USER" ]]; then
-        eval $confs
-    fi
+    eval $confs
 
     CONF_USER=$MYSQL_USER
     CONF_PASS=$MYSQL_PASS
@@ -314,6 +328,8 @@ function dbasm_db_import() {
 		MYSQL_USER=$PROMPT_USER
 		MYSQL_PASS=$PROMPT_PASS
 	fi
+
+    dbasm_waitMysqlConn $MYSQL_HOST $MYSQL_PORT
 
     export MYSQL_PWD=$MYSQL_PASS
 

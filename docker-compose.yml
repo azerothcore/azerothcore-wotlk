@@ -9,7 +9,8 @@ x-ac-shared-conf: &ac-shared-conf
   <<: *networks
   working_dir: /azerothcore
   depends_on:
-    - ac-database
+    ac-database:
+      condition: service_healthy
 
 x-ac-dev-server-base: &ac-dev-server-base
   <<: *ac-shared-conf
@@ -17,8 +18,6 @@ x-ac-dev-server-base: &ac-dev-server-base
   image: local/azerothcore/dev-server
   security_opt:
     - seccomp:unconfined
-  environment:
-    USER_CONF_PATH: "/azerothcore/apps/docker/config-docker.sh"
   build:
     context: .
     dockerfile: ./apps/docker/Dockerfile.dev
@@ -63,11 +62,10 @@ services:
 
   ac-database:
     <<: *networks
-    image: local/azerothcore/database # name of the generated image after built locally
+    image: mysql:8.0
     restart: unless-stopped
-    build:
-      context: .
-      dockerfile: ./apps/docker/Dockerfile.db
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
     ports:
       - ${DOCKER_DB_EXTERNAL_PORT:-3306}:3306
     environment:
@@ -76,40 +74,48 @@ services:
       - type: volume
         source: ac-database
         target: /var/lib/mysql
+    healthcheck:
+        test: ["CMD", "mysqladmin" ,"ping", "-h", "127.0.0.1", "-P", "3306"]
+        timeout: 2s
+        retries: 4
+
 
   ac-worldserver:
     <<: *ac-shared-conf
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     stdin_open: true
     tty: true
+    command: ./acore.sh run-worldserver
     image: local/azerothcore/worldserver # name of the generated image after built locally
     restart: unless-stopped
-    command: "./acore.sh run-worldserver"
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     privileged: true
     build:
       context: .
-      dockerfile: ./apps/docker/Dockerfile.srv
+      target: dev
+      dockerfile: ./apps/docker/Dockerfile.worldserver
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
-    profiles: [app]
+    profiles: [app, worldserver]
 
   ac-authserver:
     <<: *ac-shared-conf
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
+    tty: true
+    command: ./acore.sh run-authserver
     image: local/azerothcore/authserver # name of the generated image after built locally
     restart: unless-stopped
-    command: "./acore.sh run-authserver"
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     build:
       context: .
-      dockerfile: ./apps/docker/Dockerfile.srv
+      target: dev
+      dockerfile: ./apps/docker/Dockerfile.authserver
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
-    profiles: [app]
+    profiles: [app, authserver]
 #======================
 #
 # Dev services
@@ -121,6 +127,8 @@ services:
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    environment:
+        DBLIST: AUTH,CHARACTERS,WORLD
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085

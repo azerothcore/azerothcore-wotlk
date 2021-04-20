@@ -89,17 +89,21 @@ CCUSTOMOPTIONS=""
 ##############################################
 
 #
-# Basically you don't have to edit it
-# but if you have another database you can add it here
-# and create relative confiugurations below
+# Comma separated list of databases
 #
-DATABASES=(
-	"AUTH"
-	"CHARACTERS"
-	"WORLD"
-)
+# You can add another element here if you need
+# to support multiple databases
+#
 
-OUTPUT_FOLDER="$AC_PATH_ROOT/env/dist/sql/"
+DBLIST=${DBLIST:-"AUTH,CHARACTERS,WORLD"}
+# convert from comma separated list to an array.
+# This is needed to support environment variables
+readarray -td, DATABASES <<<"$DBLIST";
+
+OUTPUT_FOLDER=${OUTPUT_FOLDER:-"$AC_PATH_ROOT/env/dist/sql/"}
+
+DBASM_WAIT_TIMEOUT=${DBASM_WAIT_TIMEOUT:-1}
+DBASM_WAIT_RETRIES=${DBASM_WAIT_RETRIES:-3}
 
 ####### BACKUP
 # Set to true if you want to backup your azerothcore databases before importing the SQL with the db_assembler
@@ -176,23 +180,23 @@ DB_MYSQL_EXEC="mysql"
 DB_MYSQL_DUMP_EXEC="mysqldump"
 
 
-DB_AUTH_CONF="MYSQL_USER='acore'; \
+DB_AUTH_CONF=${DB_AUTH_CONF:-"MYSQL_USER='acore'; \
                     MYSQL_PASS='acore'; \
                     MYSQL_HOST='localhost';\
                     MYSQL_PORT='3306';\
-                    "
+                    "}
 
-DB_CHARACTERS_CONF="MYSQL_USER='acore'; \
+DB_CHARACTERS_CONF=${DB_CHARACTERS_CONF:-"MYSQL_USER='acore'; \
                     MYSQL_PASS='acore'; \
                     MYSQL_HOST='localhost';\
                     MYSQL_PORT='3306';\
-                    "
+                    "}
 
-DB_WORLD_CONF="MYSQL_USER='acore'; \
+DB_WORLD_CONF=${DB_WORLD_CONF:-"MYSQL_USER='acore'; \
                     MYSQL_PASS='acore'; \
                     MYSQL_HOST='localhost';\
                     MYSQL_PORT='3306';\
-                    "
+                    "}
 
 DB_AUTH_NAME="acore_auth"
 

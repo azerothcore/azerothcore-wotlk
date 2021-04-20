@@ -18,5 +18,5 @@ function denoCmd() {
 }
 
 function denoRunFile() {
-    denoCmd run --allow-all "$@"
+    denoCmd run --allow-all --unstable "$@"
 }

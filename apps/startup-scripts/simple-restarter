@@ -34,6 +34,7 @@ do
         echo "Running with GDB enabled"
         gdb -x "$CURRENT_PATH/gdb.conf" --batch "./$bin_file"
     else
+        echo "Running without GDB"
         "./$bin_file"
     fi
 
