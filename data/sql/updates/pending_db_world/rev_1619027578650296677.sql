@@ -3787,5 +3787,3 @@ DELETE FROM `gameobject` WHERE `guid` IN (
 1880872,  -- Duplicate of GUID 1880867
 2134402,  -- Duplicate of GUID 2134401
 2134425);  -- Duplicate of GUID 2134424
-
-
