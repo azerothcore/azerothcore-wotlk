@@ -24,7 +24,7 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
     GlobalPlayerData const* playerData = sWorld->GetGlobalPlayerData(guid.GetCounter());
 
     WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 10));
-    data << guid;
+    data << guid.WriteAsPacked();
     if (!playerData)
     {
         data << uint8(1);                           // name unknown

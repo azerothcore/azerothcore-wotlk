@@ -12764,7 +12764,7 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
 
                 // Send others that we now have a vehicle
                 WorldPacket data(SMSG_PLAYER_VEHICLE_DATA, GetPackGUID().size() + 4);
-                data << GetGUID().WriteAsPacked();
+                data << GetPackGUID();
                 data << uint32(VehicleId);
                 SendMessageToSet(&data, true);
 
@@ -12821,7 +12821,7 @@ void Unit::Dismount()
     }
 
     WorldPacket data(SMSG_DISMOUNT, 8);
-    data << GetGUID().WriteAsPacked();
+    data << GetPackGUID();
     SendMessageToSet(&data, true);
 
     // dismount as a vehicle
@@ -12829,7 +12829,7 @@ void Unit::Dismount()
     {
         // Send other players that we are no longer a vehicle
         data.Initialize(SMSG_PLAYER_VEHICLE_DATA, 8 + 4);
-        data << GetGUID().WriteAsPacked();
+        data << GetPackGUID();
         data << uint32(0);
         ToPlayer()->SendMessageToSet(&data, true);
         // Remove vehicle from player
