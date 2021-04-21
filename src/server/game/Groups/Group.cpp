@@ -1496,10 +1496,14 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
 
     {
         Loot* loot = roll->getLoot();
-        if (loot->isLooted() && loot->sourceGameObject != nullptr && loot->sourceGameObject->GetGOInfo()->type == GAMEOBJECT_TYPE_CHEST)
+        if (loot->isLooted() && loot->sourceGameObject != nullptr)
         {
-            // Deactivate chest if the last item was rolled in group
-            loot->sourceGameObject->SetLootState(GO_JUST_DEACTIVATED);
+            const GameObjectTemplate* goInfo = loot->sourceGameObject->GetGOInfo();
+            if (goInfo != nullptr && goInfo->type == GAMEOBJECT_TYPE_CHEST)
+            {
+                // Deactivate chest if the last item was rolled in group
+                loot->sourceGameObject->SetLootState(GO_JUST_DEACTIVATED);
+            }
         }
     }
 

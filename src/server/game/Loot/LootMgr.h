@@ -312,7 +312,7 @@ struct Loot
 
     // GUIDLow of container that holds this loot (item_instance.entry), set for items that can be looted
     uint32 containerId{0};
-    GameObject* sourceGameObject;
+    GameObject* sourceGameObject{nullptr};
 
     Loot(uint32 _gold = 0) : gold(_gold) { }
     ~Loot() { clear(); }
