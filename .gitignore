@@ -22,6 +22,8 @@ docker/worldserver/etc/worldserver.conf.dist
 docker/authserver/logs/
 docker/worldserver/logs/
 docker/worldserver/data/
+docker/realm/one/logs/*
+docker/realm/two/logs/*
 !docker/build
 .env
 apps/joiner
