@@ -73,10 +73,6 @@ public:
             events.Update(diff);
             switch (events.ExecuteEvent())
             {
-                case EVENT_SMITE_SLAM:
-                    me->CastSpell(me->GetVictim(), SPELL_SMITE_SLAM, false);
-                    events.ScheduleEvent(EVENT_SMITE_SLAM, 15000);
-                    break;
                 case EVENT_CHECK_HEALTH1:
                     if (me->HealthBelowPct(67) && !health67)
                     {
@@ -103,6 +99,13 @@ public:
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED);
                         me->SetReactState(REACT_PASSIVE);
                         health34 = true;
+                        break;
+                    }
+                case EVENT_SMITE_SLAM:
+                    if (me->HealthBelowPct(33))
+                    {
+                        me->CastSpell(me->GetVictim(), SPELL_SMITE_SLAM, false);
+                        events.ScheduleEvent(EVENT_SMITE_SLAM, 6000);
                         break;
                     }
                     events.ScheduleEvent(EVENT_CHECK_HEALTH2, 500);
