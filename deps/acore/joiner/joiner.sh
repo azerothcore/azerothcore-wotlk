@@ -69,17 +69,17 @@ function Joiner:_help() {
 }
 
 function Joiner:_searchFirstValiPath() {
-    path=$1
+    path="$1"
     until $(cd -- "$path")
     do
-        case   $path  in(*[!/]/*)
+        case   "$path"  in(*[!/]/*)
             path="${path%/*}"
         ;;
         (*)
             ! break
     esac
     done  2>/dev/null
-    echo $path
+    echo "$path"
 }
 
 #
@@ -88,10 +88,10 @@ function Joiner:_searchFirstValiPath() {
 
 function Joiner:add_repo() (
     set -e
-    url=$1
+    url="$1"
     name=${2:-""}
     branch=${3:-"master"}
-    basedir=${4:-""}
+    basedir="${4:-""}"
 
     [[ -z $url ]] && hasReq=false || hasReq=true
     Joiner:_help $hasReq "$1" "Syntax: joiner.sh add-repo [-d] [-e] url name branch [basedir]"
@@ -101,9 +101,9 @@ function Joiner:add_repo() (
         basename=$(basename $url)
         name=${basename%%.*}
 
-        if [[ -z $basedir ]]; then
-            dir=$(dirname $url)
-            basedir=$(basename $dir)
+        if [[ -z "$basedir" ]]; then
+            dir=$(dirname "$url")
+            basedir=$(basename "$dir")
         fi
 
         name="${name,,}" #to lowercase
@@ -118,7 +118,7 @@ function Joiner:add_repo() (
         git --git-dir="$path/.git/" rev-parse && git --git-dir="$path/.git/" pull origin $branch | grep 'Already up-to-date.' && changed="no" || true
     else
         # otherwise clone
-        git clone $url -c advice.detachedHead=0 -b $branch $path
+        git clone $url -c advice.detachedHead=0 -b $branch "$path"
     fi
 
     if [ "$?" -ne "0" ]; then
