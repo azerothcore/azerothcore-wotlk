@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/azerothcore/cmake-utils
 	branch = master
-	commit = 341a719b0620a2cf6769c45863969d79b9c51a72
+	commit = 1589c53ac61b7909c6950f1d85833441cbd58790
 	method = merge
-	cmdver = 0.4.1
-	parent = e8c4624f74c71a2c5f735a30b0c2d68469b16749
+	cmdver = 0.4.3
+	parent = ebcbd4e904f835beef8db05c88f2e971c48c2820
