@@ -1851,9 +1851,7 @@ void Player::Update(uint32 p_time)
         KillPlayer();
 
     if (m_nextSave <= SavingSystemMgr::GetSavingCurrentValue() && !GetSession()->isLogingOut())
-    {
         SaveToDB(false, false);
-    }
     else if (m_additionalSaveTimer && !GetSession()->isLogingOut()) // pussywizard:
     {
         if (m_additionalSaveTimer <= p_time)
