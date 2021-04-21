@@ -1,120 +1,256 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * Copyright (C) 2008-2021 TrinityCore <http://www.trinitycore.org/>
  */
 
-#ifndef AZEROTHCORE_LOG_H
-#define AZEROTHCORE_LOG_H
+#ifndef _LOG_H__
+#define _LOG_H__
 
-#include "Common.h"
-#include "ILog.h"
-#include <ace/Task.h>
+#include "Define.h"
+#include "LogCommon.h"
+#include "StringFormat.h"
 
-class Log : public ILog
+#include <memory>
+#include <unordered_map>
+#include <vector>
+
+class Appender;
+class Logger;
+struct LogMessage;
+
+#define LOGGER_ROOT "root"
+
+typedef Appender*(*AppenderCreatorFn)(uint8 id, std::string const& name, LogLevel level, AppenderFlags flags, std::vector<std::string_view> const& extraArgs);
+
+template <class AppenderImpl>
+Appender* CreateAppender(uint8 id, std::string const& name, LogLevel level, AppenderFlags flags, std::vector<std::string_view> const& extraArgs)
 {
+    return new AppenderImpl(id, name, level, flags, extraArgs);
+}
+
+class Log
+{
+typedef std::unordered_map<std::string, Logger> LoggerMap;
+
 private:
+    Log();
+    ~Log();
     Log(Log const&) = delete;
     Log(Log&&) = delete;
     Log& operator=(Log const&) = delete;
     Log& operator=(Log&&) = delete;
 
 public:
-    Log();
-    ~Log();
+    static Log* instance();
+
     void Initialize();
+    void LoadFromConfig();
+    void Close();
+    bool ShouldLog(std::string const& type, LogLevel level) const;
+    bool SetLogLevel(std::string const& name, int32 level, bool isLogger = true);
 
-    void ReloadConfig();
+    template<typename Format, typename... Args>
+    inline void outMessage(std::string const& filter, LogLevel const level, Format&& fmt, Args&&... args)
+    {
+        outMessage(filter, level, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
 
-    void InitColors(const std::string& init_str);
-    void SetColor(bool stdout_stream, ColorTypes color);
-    void ResetColor(bool stdout_stream);
+    template<typename Format, typename... Args>
+    void outCommand(uint32 account, Format&& fmt, Args&&... args)
+    {
+        if (!ShouldLog("commands.gm", LOG_LEVEL_INFO))
+            return;
 
-    void outDB(LogTypes type, const char* str);
-    void outString(const char* str, ...)                   ATTR_PRINTF(2, 3);
-    void outString();
-    void outStringInLine(const char* str, ...)             ATTR_PRINTF(2, 3);
-    void outError(const char* err, ...)                    ATTR_PRINTF(2, 3);
-    void outCrash(const char* err, ...)                    ATTR_PRINTF(2, 3);
-    void outBasic(const char* str, ...)                    ATTR_PRINTF(2, 3);
-    void outDetail(const char* str, ...)                   ATTR_PRINTF(2, 3);
-    void outSQLDev(const char* str, ...)                   ATTR_PRINTF(2, 3);
-    void outDebug(DebugLogFilters f, const char* str, ...)  ATTR_PRINTF(3, 4);
-    void outStaticDebug(const char* str, ...)              ATTR_PRINTF(2, 3);
-    void outErrorDb(const char* str, ...)                  ATTR_PRINTF(2, 3);
-    void outChar(const char* str, ...)                     ATTR_PRINTF(2, 3);
-    void outCommand(uint32 account, const char* str, ...)  ATTR_PRINTF(3, 4);
-    void outChat(const char* str, ...)                     ATTR_PRINTF(2, 3);
-    void outRemote(const char* str, ...)                   ATTR_PRINTF(2, 3);
-    void outSQLDriver(const char* str, ...)                 ATTR_PRINTF(2, 3);
-    void outMisc(const char* str, ...)                     ATTR_PRINTF(2, 3);  // pussywizard
-    void outCharDump(const char* str, uint32 account_id, uint32 guid, const char* name);
+        outCommand(acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...), std::to_string(account));
+    }
 
-    static void outTimestamp(FILE* file);
-    static std::string GetTimestampStr();
+    void outCharDump(char const* str, uint32 account_id, uint64 guid, char const* name);
 
-    void SetLogLevel(char* Level);
-    void SetLogFileLevel(char* Level);
-    void SetSQLDriverQueryLogging(bool newStatus) { m_sqlDriverQueryLogging = newStatus; }
-    void SetRealmID(uint32 id) { realm = id; }
+    void SetRealmId(uint32 id);
 
-    [[nodiscard]] bool IsOutDebug() const { return m_logLevel > 2 || (m_logFileLevel > 2 && logfile); }
-    [[nodiscard]] bool IsOutCharDump() const { return m_charLog_Dump; }
+    template<class AppenderImpl>
+    void RegisterAppender()
+    {
+        RegisterAppender(AppenderImpl::type, &CreateAppender<AppenderImpl>);
+    }
 
-    [[nodiscard]] bool GetLogDB() const { return m_enableLogDB; }
-    void SetLogDB(bool enable) { m_enableLogDB = enable; }
-    [[nodiscard]] bool GetSQLDriverQueryLogging() const { return m_sqlDriverQueryLogging; }
+    std::string const& GetLogsDir() const { return m_logsDir; }
+    std::string const& GetLogsTimestamp() const { return m_logsTimestamp; }
+
+    // Deprecated functions
+    template<typename Format, typename... Args>
+    inline void outString(Format&& fmt, Args&& ... args)
+    {
+        outMessage("server", LOG_LEVEL_INFO, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
+
+    inline void outString()
+    {
+        outMessage("server", LOG_LEVEL_INFO, " ");
+    }
+
+    template<typename Format, typename... Args>
+    inline void outError(Format&& fmt, Args&& ... args)
+    {
+        outMessage("server", LOG_LEVEL_ERROR, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
+
+    template<typename Format, typename... Args>
+    void outErrorDb(Format&& fmt, Args&& ... args)
+    {
+        if (!ShouldLog("sql.sql", LOG_LEVEL_ERROR))
+            return;
+
+        outMessage("sql.sql", LOG_LEVEL_ERROR, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
+
+    template<typename Format, typename... Args>
+    inline void outBasic(Format&& fmt, Args&& ... args)
+    {
+        outMessage("server", LOG_LEVEL_INFO, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
+
+    template<typename Format, typename... Args>
+    inline void outDetail(Format&& fmt, Args&& ... args)
+    {
+        outMessage("server", LOG_LEVEL_INFO, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
+
+    template<typename Format, typename... Args>
+    void outSQLDev(Format&& fmt, Args&& ... args)
+    {
+        if (!ShouldLog("sql.dev", LOG_LEVEL_INFO))
+            return;
+
+        outMessage("sql.dev", LOG_LEVEL_INFO, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
+
+    template<typename Format, typename... Args>
+    void outSQLDriver(Format&& fmt, Args&& ... args)
+    {
+        if (!ShouldLog("sql.driver", LOG_LEVEL_INFO))
+            return;
+
+        outMessage("sql.driver", LOG_LEVEL_INFO, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
+
+    template<typename Format, typename... Args>
+    inline void outMisc(Format&& fmt, Args&& ... args)
+    {
+        outMessage("server", LOG_LEVEL_INFO, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
+
+    template<typename Format, typename... Args>
+    void outDebug(DebugLogFilters filter, Format&& fmt, Args&& ... args)
+    {
+        if (!(_debugLogMask & filter))
+            return;
+
+        if (!ShouldLog("server", LOG_LEVEL_DEBUG))
+            return;
+
+        outMessage("server", LOG_LEVEL_DEBUG, acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...));
+    }
+
 private:
-    FILE* openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode);
-    FILE* openGmlogPerAccount(uint32 account);
+    static std::string GetTimestampStr();
+    void write(std::unique_ptr<LogMessage>&& msg) const;
 
-    FILE* raLogfile;
-    FILE* logfile;
-    FILE* gmLogfile;
-    FILE* charLogfile;
-    FILE* dberLogfile;
-    FILE* chatLogfile;
-    FILE* sqlLogFile;
-    FILE* sqlDevLogFile;
-    FILE* miscLogFile;
+    Logger const* GetLoggerByType(std::string const& type) const;
+    Appender* GetAppenderByName(std::string_view name);
+    uint8 NextAppenderId();
+    void CreateAppenderFromConfig(std::string const& name);
+    void CreateLoggerFromConfig(std::string const& name);
+    void ReadAppendersFromConfig();
+    void ReadLoggersFromConfig();
+    void RegisterAppender(uint8 index, AppenderCreatorFn appenderCreateFn);
+    void outMessage(std::string const& filter, LogLevel level, std::string&& message);
+    void outCommand(std::string&& message, std::string&& param1);
 
-    // cache values for after initilization use (like gm log per account case)
+    std::unordered_map<uint8, AppenderCreatorFn> appenderFactory;
+    std::unordered_map<uint8, std::unique_ptr<Appender>> appenders;
+    std::unordered_map<std::string, std::unique_ptr<Logger>> loggers;
+    uint8 AppenderId;
+    LogLevel highestLogLevel;
+
     std::string m_logsDir;
     std::string m_logsTimestamp;
 
-    // gm log control
-    bool m_gmlog_per_account;
-    std::string m_gmlog_filename_format;
-
-    bool m_enableLogDB;
-    uint32 realm;
-
-    // log coloring
-    bool m_colored;
-    ColorTypes m_colors[4];
-
-    // log levels:
-    // false: errors only, true: full query logging
-    bool m_sqlDriverQueryLogging;
-
-    // log levels:
-    // 0 minimum/string, 1 basic/error, 2 detail, 3 full/debug
-    uint8 m_dbLogLevel;
-    uint8 m_logLevel;
-    uint8 m_logFileLevel;
-    bool m_dbChar;
-    bool m_dbRA;
-    bool m_dbGM;
-    bool m_dbChat;
-    bool m_charLog_Dump;
-    bool m_charLog_Dump_Separate;
-    std::string m_dumpsDir;
-
-    DebugLogFilters m_DebugLogMask;
+    // Deprecated debug filter logs
+    DebugLogFilters _debugLogMask;
 };
 
-std::unique_ptr<ILog>& getLogInstance();
+#define sLog Log::instance()
 
-#define sLog getLogInstance()
+#define LOG_EXCEPTION_FREE(filterType__, level__, ...) \
+    { \
+        try \
+        { \
+            sLog->outMessage(filterType__, level__, __VA_ARGS__); \
+        } \
+        catch (std::exception const& e) \
+        { \
+            sLog->outMessage("server", LOG_LEVEL_ERROR, "Wrong format occurred (%s) at %s:%u.", \
+                e.what(), __FILE__, __LINE__); \
+        } \
+    }
 
+#ifdef PERFORMANCE_PROFILING
+#define LOG_MESSAGE_BODY(filterType__, level__, ...) ((void)0)
+#elif AC_PLATFORM != AC_PLATFORM_WINDOWS
+void check_args(char const*, ...) ATTR_PRINTF(1, 2);
+void check_args(std::string const&, ...);
+
+// This will catch format errors on build time
+#define LOG_MESSAGE_BODY(filterType__, level__, ...)                 \
+        do {                                                            \
+            if (sLog->ShouldLog(filterType__, level__))                 \
+            {                                                           \
+                if (false)                                              \
+                    check_args(__VA_ARGS__);                            \
+                                                                        \
+                LOG_EXCEPTION_FREE(filterType__, level__, __VA_ARGS__); \
+            }                                                           \
+        } while (0)
+#else
+#define LOG_MESSAGE_BODY(filterType__, level__, ...)                 \
+        __pragma(warning(push))                                         \
+        __pragma(warning(disable:4127))                                 \
+        do {                                                            \
+            if (sLog->ShouldLog(filterType__, level__))                 \
+                LOG_EXCEPTION_FREE(filterType__, level__, __VA_ARGS__); \
+        } while (0)                                                     \
+        __pragma(warning(pop))
 #endif
+
+// Fatal - 1
+#define LOG_FATAL(filterType__, ...) \
+    LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_FATAL, __VA_ARGS__)
+
+// Error - 2
+#define LOG_ERROR(filterType__, ...) \
+    LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_ERROR, __VA_ARGS__)
+
+// Warning - 3
+#define LOG_WARN(filterType__, ...)  \
+    LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_WARN, __VA_ARGS__)
+
+// Info - 4
+#define LOG_INFO(filterType__, ...)  \
+    LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_INFO, __VA_ARGS__)
+
+// Debug - 5
+#define LOG_DEBUG(filterType__, ...) \
+    LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_DEBUG, __VA_ARGS__)
+
+// Trace - 6
+#define LOG_TRACE(filterType__, ...) \
+    LOG_MESSAGE_BODY(filterType__, LogLevel::LOG_LEVEL_TRACE, __VA_ARGS__)
+
+#define LOG_CHAR_DUMP(message__, accountId__, guid__, name__) \
+    sLog->outCharDump(message__, accountId__, guid__, name__)
+
+#define LOG_GM(accountId__, ...) \
+    sLog->outCommand(accountId__, __VA_ARGS__)
+
+#endif // _LOG_H__
