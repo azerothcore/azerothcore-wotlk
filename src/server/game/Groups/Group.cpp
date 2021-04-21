@@ -1494,15 +1494,6 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
             item->is_blocked = false;
     }
 
-    {
-        Loot* loot = roll->getLoot();
-        if (loot->isLooted() && loot->sourceGameObject != nullptr && loot->sourceGameObject->GetGOInfo()->type == GAMEOBJECT_TYPE_CHEST)
-        {
-            // Deactivate chest if the last item was rolled in group
-            loot->sourceGameObject->SetLootState(GO_JUST_DEACTIVATED);
-        }
-    }
-
     RollId.erase(rollI);
     delete roll;
 }
