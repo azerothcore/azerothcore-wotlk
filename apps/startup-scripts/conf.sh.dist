@@ -2,7 +2,7 @@
 export GDB_ENABLED=0
 
 # [optional] gdb file
-# default: gdb.txt
+# default: gdb.conf
 export GDB=""
 
 # directory where binary are stored
