@@ -76,13 +76,11 @@ public:
     }
 
     // the implementation of this function is simplified by the fact that head_ will never be lower than tail_
+    // when compared to the original implementation of this class
     std::vector<T> content() {
         std::lock_guard<std::mutex> lock(mutex_);
 
-        if(full_)
-            return std::vector<T>(buf_.get(), buf_.get() + max_size_);
-        else
-            return std::vector<T>(buf_.get(), buf_.get() + head_ - tail_);
+        return std::vector<T>(buf_.get(), buf_.get() + size());
     }
 
     T peak_back() {
