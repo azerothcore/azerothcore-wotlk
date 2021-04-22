@@ -722,13 +722,9 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
         m_Session->QueuePacket(new_pct);
         return 0;
     }
-    else
-    {
-        LOG_ERROR("server", "WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
-        return -1;
-    }
 
-    ACE_NOTREACHED (return 0);
+    LOG_ERROR("server", "WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
+    return -1;
 }
 
 int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
