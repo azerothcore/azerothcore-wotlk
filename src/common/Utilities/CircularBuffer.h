@@ -68,7 +68,7 @@ public:
             }
             else
             {
-                size = max_size_ + head_ - tail_;
+                size += head_ - tail_;
             }
         }
 
@@ -88,12 +88,7 @@ public:
     T peak_back() {
         std::lock_guard<std::mutex> lock(mutex_);
 
-        if (empty())
-        {
-            return T();
-        }
-
-        return buf_[tail_];
+        return empty() ? T() : buf_[tail_];
     }
 
 private:
