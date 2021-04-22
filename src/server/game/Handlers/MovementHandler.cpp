@@ -843,8 +843,8 @@ void WorldSession::ComputeNewClockDelta()
     // implementation of the technique described here: https://web.archive.org/web/20180430214420/http://www.mine-control.com/zack/timesync/timesync.html
     // to reduce the skew induced by dropped TCP packets that get resent.
 
-    vector<uint32> latencies;
-    vector<int64> clockDeltasAfterFiltering;
+    std::vector<uint32> latencies;
+    std::vector<int64> clockDeltasAfterFiltering;
 
     for (auto pair : _timeSyncClockDeltaQueue.content())
         latencies.push_back(pair.second);
