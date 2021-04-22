@@ -1,4 +1,4 @@
-DENO_MIN_VERSION="1.7.4"
+DENO_MIN_VERSION="1.9.1"
 
 function denoInstall() {
 
