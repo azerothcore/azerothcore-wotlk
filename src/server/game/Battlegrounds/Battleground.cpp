@@ -309,7 +309,7 @@ inline void Battleground::_CheckSafePositions(uint32 diff)
             if (pos.GetExactDistSq(x, y, z) > maxDist)
             {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_BATTLEGROUND, "BATTLEGROUND: Sending %s back to start location (map: %u) (possible exploit)", itr->second->GetName().c_str(), GetMapId());
+                LOG_DEBUG("bg.battleground", "BATTLEGROUND: Sending %s back to start location (map: %u) (possible exploit)", itr->second->GetName().c_str(), GetMapId());
 #endif
                 itr->second->TeleportTo(GetMapId(), x, y, z, o);
             }
@@ -442,7 +442,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         if (!FindBgMap())
         {
-            sLog->outError("Battleground::_ProcessJoin: map (map id: %u, instance id: %u) is not created!", m_MapId, m_InstanceID);
+            LOG_ERROR("server", "Battleground::_ProcessJoin: map (map id: %u, instance id: %u) is not created!", m_MapId, m_InstanceID);
             EndNow();
             return;
         }
@@ -1169,7 +1169,7 @@ void Battleground::Init()
 
     if (m_BgInvitedPlayers[TEAM_ALLIANCE] > 0 || m_BgInvitedPlayers[TEAM_HORDE] > 0)
     {
-        sLog->outError("Battleground::Reset: one of the counters is not 0 (alliance: %u, horde: %u) for BG (map: %u, instance id: %u)!", m_BgInvitedPlayers[TEAM_ALLIANCE], m_BgInvitedPlayers[TEAM_HORDE], m_MapId, m_InstanceID);
+        LOG_ERROR("server", "Battleground::Reset: one of the counters is not 0 (alliance: %u, horde: %u) for BG (map: %u, instance id: %u)!", m_BgInvitedPlayers[TEAM_ALLIANCE], m_BgInvitedPlayers[TEAM_HORDE], m_MapId, m_InstanceID);
         ABORT();
     }
 
@@ -1269,7 +1269,7 @@ void Battleground::AddPlayer(Player* player)
 
     // Log
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDetail("BATTLEGROUND: Player %s joined the battle.", player->GetName().c_str());
+    LOG_DEBUG("server", "BATTLEGROUND: Player %s joined the battle.", player->GetName().c_str());
 #endif
 }
 
@@ -1278,7 +1278,7 @@ void Battleground::AddOrSetPlayerToCorrectBgGroup(Player* player, TeamId teamId)
 {
     if (player->GetGroup() && (player->GetGroup()->isBGGroup() || player->GetGroup()->isBFGroup()))
     {
-        sLog->outMisc("Battleground::AddOrSetPlayerToCorrectBgGroup - player is already in %s group!", (player->GetGroup()->isBGGroup() ? "BG" : "BF"));
+        LOG_INFO("misc", "Battleground::AddOrSetPlayerToCorrectBgGroup - player is already in %s group!", (player->GetGroup()->isBGGroup() ? "BG" : "BF"));
         return;
     }
 
@@ -1447,7 +1447,7 @@ void Battleground::UpdatePlayerScore(Player* player, uint32 type, uint32 value, 
             }
             break;
         default:
-            sLog->outError("Battleground::UpdatePlayerScore: unknown score type (%u) for BG (map: %u, instance id: %u)!",
+            LOG_ERROR("server", "Battleground::UpdatePlayerScore: unknown score type (%u) for BG (map: %u, instance id: %u)!",
                            type, m_MapId, m_InstanceID);
             break;
     }
@@ -1514,9 +1514,9 @@ bool Battleground::AddObject(uint32 type, uint32 entry, float x, float y, float 
     if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, GetBgMap(),
                     PHASEMASK_NORMAL, x, y, z, o, G3D::Quat(rotation0, rotation1, rotation2, rotation3), 100, goState))
     {
-        sLog->outErrorDb("Battleground::AddObject: cannot create gameobject (entry: %u) for BG (map: %u, instance id: %u)!",
+        LOG_ERROR("sql.sql", "Battleground::AddObject: cannot create gameobject (entry: %u) for BG (map: %u, instance id: %u)!",
                          entry, m_MapId, m_InstanceID);
-        sLog->outError("Battleground::AddObject: cannot create gameobject (entry: %u) for BG (map: %u, instance id: %u)!",
+        LOG_ERROR("server", "Battleground::AddObject: cannot create gameobject (entry: %u) for BG (map: %u, instance id: %u)!",
                        entry, m_MapId, m_InstanceID);
         delete go;
         return false;
@@ -1567,7 +1567,7 @@ void Battleground::DoorClose(uint32 type)
         }
     }
     else
-        sLog->outError("Battleground::DoorClose: door gameobject (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
+        LOG_ERROR("server", "Battleground::DoorClose: door gameobject (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
                        type, GUID_LOPART(BgObjects[type]), m_MapId, m_InstanceID);
 }
 
@@ -1579,7 +1579,7 @@ void Battleground::DoorOpen(uint32 type)
         obj->SetGoState(GO_STATE_ACTIVE);
     }
     else
-        sLog->outError("Battleground::DoorOpen: door gameobject (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
+        LOG_ERROR("server", "Battleground::DoorOpen: door gameobject (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
                        type, GUID_LOPART(BgObjects[type]), m_MapId, m_InstanceID);
 }
 
@@ -1587,7 +1587,7 @@ GameObject* Battleground::GetBGObject(uint32 type)
 {
     GameObject* obj = GetBgMap()->GetGameObject(BgObjects[type]);
     if (!obj)
-        sLog->outError("Battleground::GetBGObject: gameobject (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
+        LOG_ERROR("server", "Battleground::GetBGObject: gameobject (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
                        type, GUID_LOPART(BgObjects[type]), m_MapId, m_InstanceID);
     return obj;
 }
@@ -1596,7 +1596,7 @@ Creature* Battleground::GetBGCreature(uint32 type)
 {
     Creature* creature = GetBgMap()->GetCreature(BgCreatures[type]);
     if (!creature)
-        sLog->outError("Battleground::GetBGCreature: creature (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
+        LOG_ERROR("server", "Battleground::GetBGCreature: creature (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
                        type, GUID_LOPART(BgCreatures[type]), m_MapId, m_InstanceID);
     return creature;
 }
@@ -1641,7 +1641,7 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
     Creature* creature = new Creature();
     if (!creature->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), map, PHASEMASK_NORMAL, entry, 0, x, y, z, o))
     {
-        sLog->outError("Battleground::AddCreature: cannot create creature (entry: %u) for BG (map: %u, instance id: %u)!",
+        LOG_ERROR("server", "Battleground::AddCreature: cannot create creature (entry: %u) for BG (map: %u, instance id: %u)!",
                        entry, m_MapId, m_InstanceID);
         delete creature;
         return nullptr;
@@ -1652,7 +1652,7 @@ Creature* Battleground::AddCreature(uint32 entry, uint32 type, float x, float y,
     CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(entry);
     if (!cinfo)
     {
-        sLog->outError("Battleground::AddCreature: creature template (entry: %u) does not exist for BG (map: %u, instance id: %u)!",
+        LOG_ERROR("server", "Battleground::AddCreature: creature template (entry: %u) does not exist for BG (map: %u, instance id: %u)!",
                        entry, m_MapId, m_InstanceID);
         delete creature;
         return nullptr;
@@ -1691,7 +1691,7 @@ bool Battleground::DelCreature(uint32 type)
         return true;
     }
 
-    sLog->outError("Battleground::DelCreature: creature (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
+    LOG_ERROR("server", "Battleground::DelCreature: creature (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
                    type, GUID_LOPART(BgCreatures[type]), m_MapId, m_InstanceID);
     BgCreatures[type] = 0;
     return false;
@@ -1709,7 +1709,7 @@ bool Battleground::DelObject(uint32 type)
         BgObjects[type] = 0;
         return true;
     }
-    sLog->outError("Battleground::DelObject: gameobject (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
+    LOG_ERROR("server", "Battleground::DelObject: gameobject (type: %u, GUID: %u) not found for BG (map: %u, instance id: %u)!",
                    type, GUID_LOPART(BgObjects[type]), m_MapId, m_InstanceID);
     BgObjects[type] = 0;
     return false;
@@ -1733,7 +1733,7 @@ bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float 
         //creature->CastSpell(creature, SPELL_SPIRIT_HEAL_CHANNEL, true);
         return true;
     }
-    sLog->outError("Battleground::AddSpiritGuide: cannot create spirit guide (type: %u, entry: %u) for BG (map: %u, instance id: %u)!",
+    LOG_ERROR("server", "Battleground::AddSpiritGuide: cannot create spirit guide (type: %u, entry: %u) for BG (map: %u, instance id: %u)!",
                    type, entry, m_MapId, m_InstanceID);
     EndNow();
     return false;
@@ -1921,7 +1921,7 @@ int32 Battleground::GetObjectType(uint64 guid)
     for (uint32 i = 0; i < BgObjects.size(); ++i)
         if (BgObjects[i] == guid)
             return i;
-    sLog->outError("Battleground::GetObjectType: player used gameobject (GUID: %u) which is not in internal data for BG (map: %u, instance id: %u), cheating?",
+    LOG_ERROR("server", "Battleground::GetObjectType: player used gameobject (GUID: %u) which is not in internal data for BG (map: %u, instance id: %u), cheating?",
                    GUID_LOPART(guid), m_MapId, m_InstanceID);
     return -1;
 }
@@ -1977,7 +1977,7 @@ uint32 Battleground::GetTeamScore(TeamId teamId) const
     if (teamId == TEAM_ALLIANCE || teamId == TEAM_HORDE)
         return m_TeamScores[teamId];
 
-    sLog->outError("GetTeamScore with wrong Team %u for BG %u", teamId, GetBgTypeID());
+    LOG_ERROR("server", "GetTeamScore with wrong Team %u for BG %u", teamId, GetBgTypeID());
     return 0;
 }
 
