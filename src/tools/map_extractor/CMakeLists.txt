@@ -25,7 +25,8 @@ target_include_directories(mapextractor
 target_link_libraries(mapextractor
   PUBLIC
     common
-    mpq)
+    mpq
+    stdc++fs)
 
 CollectIncludeDirectories(
   ${CMAKE_CURRENT_SOURCE_DIR}
