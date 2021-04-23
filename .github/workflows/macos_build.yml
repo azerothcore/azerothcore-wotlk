@@ -16,7 +16,6 @@ jobs:
  #         - macos-11.0
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
-    needs: [build]
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
