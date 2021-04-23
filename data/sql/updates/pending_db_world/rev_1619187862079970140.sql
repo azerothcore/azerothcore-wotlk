@@ -201,4 +201,4 @@ DELETE FROM `gameobject` WHERE `guid` IN (
 120789,  -- Probably duplicate of GUID 5088  [d = 5.524]  [Copper Vein]
 120790,  -- Probably duplicate of GUID 4734  [d = 9.576]  [Copper Vein]
 120806,  -- Probably duplicate of GUID 6291  [d = 8.186]  [Iron Deposit]
-120815)  -- Probably duplicate of GUID 15463  [d = 8.036]  [Ooze Covered Thorium Vein];
+120815);  -- Probably duplicate of GUID 15463  [d = 8.036]  [Ooze Covered Thorium Vein]

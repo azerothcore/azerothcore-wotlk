@@ -141,4 +141,4 @@ DELETE FROM `gameobject` WHERE `guid` IN (
 100493,  -- Probably duplicate of GUID 100489  [d = 0.407]
 240410,  -- Probably duplicate of GUID 240409  [d = 0.429]
 265905,  -- Probably duplicate of GUID 29831  [d = 0.33]
-268921)  -- Probably duplicate of GUID 268920  [d = 0.394];
+268921);  -- Probably duplicate of GUID 268920  [d = 0.394]
