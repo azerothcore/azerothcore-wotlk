@@ -2,6 +2,21 @@
 PROMPT_USER=""
 PROMPT_PASS=""
 
+function dbasm_waitMysqlConn() {
+    DBHOST="$1"
+    DBPORT="$2"
+    COUNT=0
+    while ! mysqladmin ping -h"$DBHOST" --port="$DBPORT" --silent; do
+        ((COUNT++))
+        if [ $COUNT -gt $DBASM_WAIT_RETRIES ]; then
+            echo "DBASM Timeout: Cannot ping mysql!" 1>&2
+            exit 64
+        fi
+        echo "Cannot ping mysql, retry in $DBASM_WAIT_TIMEOUT seconds (remaining: $COUNT/$DBASM_WAIT_RETRIES)..."
+        sleep $DBASM_WAIT_TIMEOUT
+    done
+}
+
 # use in a subshell
 function dbasm_resetExitCode() {
 	exit 0
@@ -11,7 +26,7 @@ function dbasm_mysqlExec() {
 	confs=$1
 	command=$2
 	options=$3
-	
+
     # MYSQL_PORT needs to be reseted as the next eval might not overwite the current value causing the commands to use wrong port
     MYSQL_PORT=3306
 	eval $confs
@@ -21,6 +36,7 @@ function dbasm_mysqlExec() {
 		MYSQL_PASS=$PROMPT_PASS
 	fi
 
+    dbasm_waitMysqlConn $MYSQL_HOST $MYSQL_PORT
 
 	export MYSQL_PWD=$MYSQL_PASS
 
@@ -57,7 +73,7 @@ function dbasm_mysqlExec() {
 
                 eval $_confs
                 echo "Grant permissions for ${MYSQL_USER}'@'${MYSQL_HOST} to ${_dbname}"
-                "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -P "$MYSQL_PORT" -e "GRANT ALL PRIVILEGES ON ${_dbname}.* TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION;"
+                "$DB_MYSQL_EXEC"  -h "$MYSQL_HOST" -u "$PROMPT_USER" $options -P "$MYSQL_PORT" -e "GRANT ALL PRIVILEGES ON ${_dbname}.* TO '${MYSQL_USER}'@'${MYSQL_HOST}'  WITH GRANT OPTION; FLUSH PRIVILEGES;"
             done
 		else
 			exit
@@ -109,9 +125,13 @@ function dbasm_createDB() {
         echo "$dbname database exists"
     else
 		echo "Creating DB ${dbname} ..."
-        dbasm_mysqlExec "$confs" "CREATE DATABASE \`${dbname}\`" ""
+        dbasm_mysqlExec "$confs" "CREATE DATABASE \`${dbname}\`;" ""
+        echo "Creating User ${CONF_USER}@${MYSQL_HOST} identified by ${CONF_PASS}..."
         dbasm_mysqlExec "$confs" "CREATE USER IF NOT EXISTS '${CONF_USER}'@'${MYSQL_HOST}' IDENTIFIED BY '${CONF_PASS}';"
-        dbasm_mysqlExec "$confs" "GRANT ALL PRIVILEGES ON \`${dbname}\`.* TO '${CONF_USER}'@'${MYSQL_HOST}' WITH GRANT OPTION;"
+        echo "Granting user privileges on: ${dbname} ..."
+        dbasm_mysqlExec "$confs" "GRANT ALL PRIVILEGES ON \`${dbname}\`.* TO '${CONF_USER}'@'${MYSQL_HOST}'"
+        echo "Flush privileges"
+        dbasm_mysqlExec "$confs" "FLUSH PRIVILEGES;"
     fi
 }
 
@@ -247,7 +267,7 @@ function dbasm_db_backup() {
 
     name="DB_"$uc"_NAME"
     dbname=${!name}
-	
+
     # MYSQL_PORT needs to be reseted as the next eval might not overwite the current value causing the commands to use wrong port
     MYSQL_PORT=3306
     eval $confs;
@@ -299,7 +319,7 @@ function dbasm_db_import() {
     fi
 
     echo "importing $1 - $2 ..."
-    
+
     # MYSQL_PORT needs to be reseted as the next eval might not overwite the current value causing the commands to use wrong port
     MYSQL_PORT=3306
     eval $confs;
@@ -308,6 +328,8 @@ function dbasm_db_import() {
 		MYSQL_USER=$PROMPT_USER
 		MYSQL_PASS=$PROMPT_PASS
 	fi
+
+    dbasm_waitMysqlConn $MYSQL_HOST $MYSQL_PORT
 
     export MYSQL_PWD=$MYSQL_PASS
 
