@@ -11,8 +11,13 @@ if [[ "$unamestr" == 'Darwin' ]]; then
    fi
    AC_PATH_ROOT=$(greadlink -f "$AC_PATH_APPS/../")
 else
-   AC_PATH_ROOT=$(readlink -f "$AC_PATH_APPS/../")
+   AC_PATH_ROOT=$(readlink -f --canonicalize "$AC_PATH_APPS/../")
 fi
+
+case $AC_PATH_ROOT in
+  /*) AC_PATH_ROOT=$AC_PATH_ROOT;;
+  *) AC_PATH_ROOT=$PWD/$AC_PATH_ROOT;;
+esac
 
 AC_PATH_CONF="$AC_PATH_ROOT/conf"
 
