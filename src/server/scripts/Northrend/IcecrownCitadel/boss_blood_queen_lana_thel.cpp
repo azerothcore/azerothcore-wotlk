@@ -208,7 +208,6 @@ public:
                     minchar->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                     minchar->SetCanFly(false);
                     minchar->SetDisableGravity(false);
-                    minchar->SetHover(false);
                     minchar->RemoveAllAuras();
                     minchar->GetMotionMaster()->MoveCharge(4629.3711f, 2782.6089f, 401.5301f, SPEED_CHARGE / 3.0f);
                 }
@@ -226,7 +225,6 @@ public:
             me->StopMoving();
             me->SetCanFly(true);
             me->SetDisableGravity(true);
-            me->SetHover(true);
             me->SendMovementFlagUpdate();
             me->GetMotionMaster()->MovePoint(POINT_MINCHAR, mincharPos);
         }
@@ -246,7 +244,6 @@ public:
         {
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            me->SetHover(false);
 
             _JustReachedHome();
             if (bEnteredCombat)
@@ -284,7 +281,6 @@ public:
                 case POINT_GROUND:
                     me->SetCanFly(false);
                     me->SetDisableGravity(false);
-                    me->SetHover(false);
                     me->SetReactState(REACT_AGGRESSIVE);
                     if (Unit* target = me->SelectVictim())
                         AttackStart(target);
@@ -492,7 +488,6 @@ public:
                     me->DisableSpline();
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
-                    me->SetHover(true);
                     me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MoveTakeoff(POINT_AIR, airPos, 0.642857f * 7.0f);
                     break;

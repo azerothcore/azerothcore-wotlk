@@ -160,7 +160,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_hakkarAI>(creature);
+        return GetZulGurubAI<boss_hakkarAI>(creature);
     }
 };
 

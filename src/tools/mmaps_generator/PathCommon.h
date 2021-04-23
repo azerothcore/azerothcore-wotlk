@@ -20,8 +20,6 @@
 #include <errno.h>
 #endif
 
-#include "Database/DatabaseEnv.h"
-
 enum NavTerrain
 {
     NAV_EMPTY   = 0x00,

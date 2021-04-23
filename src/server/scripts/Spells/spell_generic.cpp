@@ -1745,6 +1745,40 @@ public:
     }
 };
 
+// 34098 - ClearAllDebuffs
+class spell_gen_clear_debuffs : public SpellScriptLoader
+{
+public:
+    spell_gen_clear_debuffs() : SpellScriptLoader("spell_gen_clear_debuffs") { }
+
+    class spell_gen_clear_debuffs_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_clear_debuffs_SpellScript);
+
+        void HandleScript(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* target = GetHitUnit())
+            {
+                target->RemoveOwnedAuras([](Aura const* aura)
+                {
+                    SpellInfo const* spellInfo = aura->GetSpellInfo();
+                    return !spellInfo->IsPositive() && !spellInfo->IsPassive();
+                });
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_gen_clear_debuffs_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_gen_clear_debuffs_SpellScript();
+    }
+};
+
 // 63845 - Create Lance
 enum CreateLanceSpells
 {
@@ -5077,13 +5111,11 @@ public:
                 pCaster->SendAttackSwingCancelAttack();
             }
 
-            if (!caster->GetInstanceScript() || !caster->GetInstanceScript()->IsEncounterInProgress()) //Don't leave combat if you are in combat with a boss
+            if (instant_exit)
             {
-                if (!instant_exit) {
-                    caster->getHostileRefManager().deleteReferences(); // exit combat after 6 seconds
-                }
-                else caster->CombatStop(); // isn't necessary to call AttackStop because is just called in CombatStop
+                caster->getHostileRefManager().deleteReferences();
             }
+            caster->CombatStop();
         }
 
         void Register() override
@@ -5154,6 +5186,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_av_drekthar_presence();
     new spell_gen_burn_brutallus();
     new spell_gen_cannibalize();
+    new spell_gen_clear_debuffs();
     new spell_gen_create_lance();
     new spell_gen_netherbloom();
     new spell_gen_nightmare_vine();

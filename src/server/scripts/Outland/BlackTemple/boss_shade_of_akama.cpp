@@ -256,7 +256,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_shade_of_akamaAI>(creature);
+        return GetBlackTempleAI<boss_shade_of_akamaAI>(creature);
     }
 };
 
@@ -420,7 +420,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_akamaAI>(creature);
+        return GetBlackTempleAI<npc_akamaAI>(creature);
     }
 };
 
@@ -540,7 +540,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_creature_generator_akamaAI>(creature);
+        return GetBlackTempleAI<npc_creature_generator_akamaAI>(creature);
     }
 };
 

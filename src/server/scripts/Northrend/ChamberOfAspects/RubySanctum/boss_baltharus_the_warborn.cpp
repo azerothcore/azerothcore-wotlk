@@ -254,7 +254,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_baltharus_the_warbornAI>(creature);
+        return GetRubySanctumAI<boss_baltharus_the_warbornAI>(creature);
     }
 };
 
@@ -313,7 +313,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_baltharus_the_warborn_cloneAI>(creature);
+        return GetRubySanctumAI<npc_baltharus_the_warborn_cloneAI>(creature);
     }
 };
 
@@ -364,7 +364,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            me->RemoveFlag(UNIT_NPC_FLAGS, GOSSIP_OPTION_QUESTGIVER);
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
             // Xinef: after soft reset npc is no longer present
             if (me->GetInstanceScript()->GetBossState(DATA_BALTHARUS_THE_WARBORN) == DONE)
@@ -426,7 +426,7 @@ public:
                     Talk(SAY_XERESTRASZA_EVENT_6);
                     break;
                 case EVENT_XERESTRASZA_EVENT_7:
-                    me->SetFlag(UNIT_NPC_FLAGS, GOSSIP_OPTION_QUESTGIVER);
+                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                     Talk(SAY_XERESTRASZA_EVENT_7);
                     me->setActive(false);
                     break;
@@ -441,7 +441,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_xerestraszaAI>(creature);
+        return GetRubySanctumAI<npc_xerestraszaAI>(creature);
     }
 };
 

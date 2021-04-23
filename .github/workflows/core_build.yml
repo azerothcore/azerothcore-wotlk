@@ -15,30 +15,42 @@ jobs:
         os: [ubuntu-20.04]
         compiler: [clang]
         modules: [with, without]
+        extra_logs: [false]
         # we can include specific combinations here
         include:
           - os: ubuntu-20.04
             compiler: clang11
             modules: without
+            extra_logs: true
+          - os: ubuntu-20.04
+            compiler: clang11
+            modules: without
+            extra_logs: false
           - os: ubuntu-20.04
             compiler: clang9
             modules: without
+            extra_logs: false
           - os: ubuntu-18.04
             compiler: clang # default in 18.04 is clang 6
             modules: without
+            extra_logs: false
           - os: ubuntu-18.04
             compiler: gcc8
             modules: without
+            extra_logs: false
           - os: ubuntu-20.04
             compiler: gcc # default in 20.04 is gcc 9
             modules: without
+            extra_logs: false
           - os: ubuntu-20.04
             compiler: gcc10
             modules: without
+            extra_logs: false
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules
+    name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules-extra_logs-${{ matrix.extra_logs }}
     env:
       COMPILER: ${{ matrix.compiler }}
+      EXTRA_LOGS: ${{ matrix.extra_logs }}
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v2
@@ -127,62 +139,40 @@ jobs:
           name: windows-2019-MSVC16-release
           path: build/bin/Release
 
-  docker-build:
+  docker-build-n-deploy:
     strategy:
       fail-fast: true
     runs-on: ubuntu-20.04
     if: github.repository == 'azerothcore/azerothcore-wotlk'
+    env:
+      DOCKER_EXTENDS_BIND: abstract-no-bind
+      DOCKER_BUILD_WORLD_TARGET: worldserver
+      DOCKER_BUILD_AUTH_TARGET: authserver
     steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
       - uses: actions/checkout@v2
       - name: Configure
         run: |
           docker --version
           docker-compose --version
       - name: Build
+        #env:
+        #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
         run: |
-          ./bin/acore-docker-build-no-scripts
+           docker-compose --profile all build
+      - name: Login to Docker Hub
+        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Deploy
+        #env:
+        #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
+        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
+        run: |
+          docker-compose --profile all push
 
-  docker-worldserver:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          docker build -t azerothcore/worldserver -f docker/worldserver/Dockerfile docker/worldserver
-
-  docker-authserver:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          docker build -t azerothcore/authserver -f docker/authserver/Dockerfile docker/authserver
-
-  docker-database:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    steps:
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        run: |
-          docker build -t azerothcore/database -f docker/database/Dockerfile .
