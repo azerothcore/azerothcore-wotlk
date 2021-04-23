@@ -22,8 +22,9 @@ set(winService
   ${CMAKE_SOURCE_DIR}/src/common/Platform/ServiceWin32.h)
 endif()
 
-add_subdirectory(shared)
-add_subdirectory(game)
 add_subdirectory(authserver)
+add_subdirectory(database)
+add_subdirectory(game)
+add_subdirectory(shared)
 add_subdirectory(scripts)
 add_subdirectory(worldserver)
