@@ -254,7 +254,7 @@ public:
         {
             if (sender == GOSSIP_ID && action == 0)
             {
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 BeginSpeech(player);
             }
         }

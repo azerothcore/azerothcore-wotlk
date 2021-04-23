@@ -375,7 +375,7 @@ public:
                 if (!instance || instance->GetBossState(DATA_NEFARIAN) == DONE)
                     return;
 
-                player->CLOSE_GOSSIP_MENU();
+                CloseGossipMenuFor(player);
                 Talk(SAY_GAMESBEGIN_1);
                 BeginEvent(player);
             }
