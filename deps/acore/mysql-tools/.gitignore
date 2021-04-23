@@ -1,0 +1,13 @@
+/mysql_config
+mysql_tools_(for usr-local-bin)
+
+#
+# Editors / debuggers / other output files
+#
+*~
+*.bak
+*.orig
+*.patch
+callgrind.out.*
+
+.upt.json
