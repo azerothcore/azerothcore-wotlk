@@ -5238,24 +5238,22 @@ void Player::BuildPlayerRepop()
     WorldPacket data(SMSG_PRE_RESURRECT, GetPackGUID().size());
     data.append(GetPackGUID());
     GetSession()->SendPacket(&data);
-
     if (getRace(true) == RACE_NIGHTELF)
+    {
         CastSpell(this, 20584, true);
+    }
     CastSpell(this, 8326, true);
 
     // there must be SMSG.FORCE_RUN_SPEED_CHANGE, SMSG.FORCE_SWIM_SPEED_CHANGE, SMSG.MOVE_WATER_WALK
     // there must be SMSG.STOP_MIRROR_TIMER
     // there we must send 888 opcode
 
-    // the player cannot have a corpse already, only bones which are not returned by GetCorpse
-    if (GetCorpse())
+    if (GetCorpse()) // the player cannot have a corpse already, only bones which are not returned by GetCorpse
     {
         LOG_ERROR("server", "BuildPlayerRepop: player %s(%d) already has a corpse", GetName().c_str(), GetGUIDLow());
         return;
     }
-
-    // create a corpse and place it at the player's location
-    CreateCorpse();
+    CreateCorpse(); // create a corpse and place it at the player's location
     Corpse* corpse = GetCorpse();
     if (!corpse)
     {
@@ -5263,30 +5261,22 @@ void Player::BuildPlayerRepop()
         return;
     }
     GetMap()->AddToMap(corpse);
-
-    // convert player body to ghost
-    SetHealth(1);
-
+    SetHealth(1); // convert player body to ghost
     SetMovement(MOVE_WATER_WALK);
+    SetWaterWalking(true);
     if (!GetSession()->isLogingOut())
+    {
         SetMovement(MOVE_UNROOT);
-
-    // BG - remove insignia related
-    RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
-
+    }
+    RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE); // BG - remove insignia related
     int32 corpseReclaimDelay = CalculateCorpseReclaimDelay();
-
     if (corpseReclaimDelay >= 0)
+    {
         SendCorpseReclaimDelay(corpseReclaimDelay);
-
-    // to prevent cheating
-    corpse->ResetGhostTime();
-
-    StopMirrorTimers();                                     //disable timers(bars)
-
-    // set and clear other
-    SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND);
-
+    }
+    corpse->ResetGhostTime(); // to prevent cheating
+    StopMirrorTimers(); // disable timers on bars
+    SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND); // set and clear other
     sScriptMgr->OnPlayerReleasedGhost(this);
 }
 
@@ -5310,12 +5300,9 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_REFER_A_FRIEND);
 
     setDeathState(ALIVE);
-
     SetMovement(MOVE_LAND_WALK);
     SetMovement(MOVE_UNROOT);
-
     SetWaterWalking(false);
-
     m_deathTimer = 0;
 
     // set health/powers (0- will be set in caller)
