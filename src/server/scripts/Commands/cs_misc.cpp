@@ -1476,6 +1476,7 @@ public:
         // Subtract
         if (count < 0)
         {
+            // Only have scam check on player accounts
             if (playerTarget->GetSession()->GetSecurity() == SEC_PLAYER)
             {
                 if (!playerTarget->HasItemCount(itemId, 0))
