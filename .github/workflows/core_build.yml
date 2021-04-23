@@ -82,36 +82,6 @@ jobs:
       - name: Run unit tests
         run: source ./apps/ci/ci-run-unit-tests.sh
 
-  mac-build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - macos-10.15
- #         - macos-11.0
-    runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}
-    needs: [build]
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && success()
-    steps:
-      - uses: actions/checkout@v2
-      - name: Cache
-        uses: actions/cache@v1.1.2
-        with:
-          path: ~/.ccache
-          key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}
-          restore-keys: |
-            ccache:${{ matrix.os }}:${{ github.ref }}
-            ccache:${{ matrix.os }}
-      - name: Install latest bash
-        run: brew install bash
-      - name: Configure OS
-        run: source ./acore.sh install-deps
-      - name: Build
-        run: source ./apps/ci/mac/ci-compile.sh
-      - name: Run unit tests
-        run: source ./apps/ci/ci-run-unit-tests.sh
-
   docker-build-n-deploy:
     strategy:
       fail-fast: true
