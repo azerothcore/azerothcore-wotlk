@@ -22,7 +22,7 @@ jobs:
       - name: Cache
         uses: actions/cache@v2
         with:
-          path: ~/.ccache
+          path: ~/Library/Caches/ccache
           key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
             ccache:${{ matrix.os }}:${{ github.ref }}
