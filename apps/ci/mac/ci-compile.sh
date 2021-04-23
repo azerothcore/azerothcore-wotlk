@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 export CCACHE_CPP2=true
-export CCACHE_MAXSIZE='2G'
+export CCACHE_MAXSIZE='500MB'
 export CCACHE_COMPRESS=9
 ccache -s
 
