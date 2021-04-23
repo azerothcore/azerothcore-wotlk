@@ -81,7 +81,7 @@ jobs:
         run: source ./apps/ci/ci-error-check.sh
       - name: Run unit tests
         run: source ./apps/ci/ci-run-unit-tests.sh
-  
+
   windows-build:
     strategy:
       fail-fast: false
