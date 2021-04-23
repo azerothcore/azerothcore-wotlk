@@ -60,7 +60,6 @@ GameObject::GameObject() : WorldObject(false), MovableMapObject(),
     m_lootGenerationTime = 0;
 
     ResetLootMode(); // restore default loot mode
-    loot.sourceGameObject = this;
     m_stationaryPosition.Relocate(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
