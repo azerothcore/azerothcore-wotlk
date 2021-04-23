@@ -54,7 +54,6 @@ target_link_libraries(common
   PUBLIC
     acore-core-interface
     ace
-    mysql
     g3dlib
     Detour
     sfmt
