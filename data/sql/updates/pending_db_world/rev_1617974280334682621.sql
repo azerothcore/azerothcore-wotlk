@@ -3,9 +3,6 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617974280334682621');
 -- Splintered Skeleton
 SET @ENTRY := 10478;
 
--- Set template ai to SAI
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = @ENTRY);
-
 -- Add SAI for Hate to zero
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = @ENTRY;
 
