@@ -1,0 +1,52 @@
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1619268122604279800');
+
+DROP TABLE IF EXISTS `trainer`;
+CREATE TABLE IF NOT EXISTS `trainer` (
+  `Id` INT UNSIGNED NOT NULL DEFAULT 0,
+  `Type` TINYINT UNSIGNED NOT NULL DEFAULT 2,
+  `Requirement` MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,
+  `Greeting` TEXT,
+  `VerifiedBuild` SMALLINT DEFAULT 0,
+  PRIMARY KEY (`Id`)
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
+
+DROP TABLE IF EXISTS `trainer_locale`;
+CREATE TABLE IF NOT EXISTS `trainer_locale` (
+  `Id` INT UNSIGNED NOT NULL DEFAULT 0,
+  `locale` VARCHAR(4) NOT NULL,
+  `Greeting_lang` text,
+  `VerifiedBuild` SMALLINT  DEFAULT 0,
+  PRIMARY KEY (`Id`,`locale`)
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
+
+DROP TABLE IF EXISTS `trainer_spell`;
+CREATE TABLE IF NOT EXISTS `trainer_spell` (
+  `TrainerId` INT UNSIGNED NOT NULL DEFAULT 0,
+  `SpellId` INT UNSIGNED NOT NULL DEFAULT 0,
+  `MoneyCost` INT UNSIGNED NOT NULL DEFAULT 0,
+  `ReqSkillLine` INT UNSIGNED NOT NULL DEFAULT 0,
+  `ReqSkillRank` INT UNSIGNED NOT NULL DEFAULT 0,
+  `ReqAbility1` INT UNSIGNED NOT NULL DEFAULT 0,
+  `ReqAbility2` INT UNSIGNED NOT NULL DEFAULT 0,
+  `ReqAbility3` INT UNSIGNED NOT NULL DEFAULT 0,
+  `ReqLevel` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `VerifiedBuild` SMALLINT DEFAULT 0,
+  PRIMARY KEY (`TrainerId`,`SpellId`)
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
+
+DROP TABLE IF EXISTS `creature_default_trainer`;
+CREATE TABLE IF NOT EXISTS `creature_default_trainer` (
+  `CreatureId` INT UNSIGNED NOT NULL,
+  `TrainerId` INT UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (`CreatureId`)
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
+
+-- Drop unused table
+DROP TABLE IF EXISTS `npc_trainer`;
+
+-- Drop removed columns
+ALTER TABLE `creature_template`
+  DROP `trainer_type`,
+  DROP `trainer_spell`,
+  DROP `trainer_class`,
+  DROP `trainer_race`;
