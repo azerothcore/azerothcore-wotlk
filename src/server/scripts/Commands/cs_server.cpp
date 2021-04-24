@@ -20,6 +20,7 @@ EndScriptData */
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ServerMotd.h"
+#include "StringConvert.h"
 
 class server_commandscript : public CommandScript
 {
@@ -56,7 +57,6 @@ public:
         {
             { "difftime",       SEC_CONSOLE,        true,  &HandleServerSetDiffTimeCommand,         "" },
             { "loglevel",       SEC_CONSOLE,        true,  &HandleServerSetLogLevelCommand,         "" },
-            { "logfilelevel",   SEC_CONSOLE,        true,  &HandleServerSetLogFileLevelCommand,     "" },
             { "motd",           SEC_ADMINISTRATOR,  true,  &HandleServerSetMotdCommand,             "" },
             { "closed",         SEC_CONSOLE,        true,  &HandleServerSetClosedCommand,           "" }
         };
@@ -71,14 +71,14 @@ public:
             { "motd",           SEC_PLAYER,         true,  &HandleServerMotdCommand,                "" },
             { "restart",        SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverRestartCommandTable },
             { "shutdown",       SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverShutdownCommandTable },
-            { "set",            SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverSetCommandTable },
-            { "togglequerylog", SEC_CONSOLE,        true,  &HandleServerToggleQueryLogging,         "" }
+            { "set",            SEC_ADMINISTRATOR,  true,  nullptr,                                 "", serverSetCommandTable }
         };
 
         static std::vector<ChatCommand> commandTable =
         {
             { "server",         SEC_PLAYER,         true,  nullptr,                                 "", serverCommandTable }
         };
+
         return commandTable;
     }
 
@@ -314,30 +314,19 @@ public:
     }
 
     // Set the level of logging
-    static bool HandleServerSetLogFileLevelCommand(ChatHandler* /*handler*/, char const* args)
-    {
-        if (!*args)
-            return false;
-
-        char* newLevel = strtok((char*)args, " ");
-        if (!newLevel)
-            return false;
-
-        sLog->SetLogFileLevel(newLevel);
-        return true;
-    }
-
-    // Set the level of logging
     static bool HandleServerSetLogLevelCommand(ChatHandler* /*handler*/, char const* args)
     {
-        if (!*args)
+       if (!*args)
             return false;
 
-        char* newLevel = strtok((char*)args, " ");
-        if (!newLevel)
+        char* type = strtok((char*)args, " ");
+        char* name = strtok(nullptr, " ");
+        char* level = strtok(nullptr, " ");
+
+        if (!type || !name || !level || *name == '\0' || *level == '\0' || (*type != 'a' && *type != 'l'))
             return false;
 
-        sLog->SetLogLevel(newLevel);
+        sLog->SetLogLevel(name, *acore::StringTo<uint32>(level), *type == 'l');
         return true;
     }
 
@@ -358,18 +347,6 @@ public:
         sWorld->SetRecordDiffInterval(newTime);
         printf("Record diff every %u ms\n", newTime);
 
-        return true;
-    }
-
-    // toggle sql driver query logging
-    static bool HandleServerToggleQueryLogging(ChatHandler* handler, char const* /*args*/)
-    {
-        sLog->SetSQLDriverQueryLogging(!sLog->GetSQLDriverQueryLogging());
-
-        if (sLog->GetSQLDriverQueryLogging())
-            handler->PSendSysMessage(LANG_SQLDRIVER_QUERY_LOGGING_ENABLED);
-        else
-            handler->PSendSysMessage(LANG_SQLDRIVER_QUERY_LOGGING_DISABLED);
         return true;
     }
 };

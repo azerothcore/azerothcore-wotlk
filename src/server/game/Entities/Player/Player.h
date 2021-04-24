@@ -2821,10 +2821,7 @@ protected:
     EnchantDurationList m_enchantDuration;
     ItemDurationList m_itemDuration;
     ItemDurationList m_itemSoulboundTradeable;
-    ACE_Thread_Mutex m_soulboundTradableLock;
-
-    void ResetTimeSync();
-    void SendTimeSync();
+    std::mutex m_soulboundTradableLock;
 
     uint64 m_resurrectGUID;
     uint32 m_resurrectMap;
@@ -2965,11 +2962,6 @@ private:
     SpellCooldowns m_spellCooldowns;
 
     uint32 m_ChampioningFaction;
-
-    uint32 m_timeSyncCounter;
-    uint32 m_timeSyncTimer;
-    uint32 m_timeSyncClient;
-    uint32 m_timeSyncServer;
 
     InstanceTimeMap _instanceResetTimes;
     uint32 _pendingBindId;
