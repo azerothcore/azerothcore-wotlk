@@ -333,12 +333,15 @@ bool MapManager::IsValidMAP(uint32 mapid, bool startUp)
 
 void MapManager::UnloadAll()
 {
-    for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end();)
-    {
+    // First unload maps
+    for (auto iter = i_maps.begin(); iter != i_maps.end(); ++iter)
         iter->second->UnloadAll();
+
+    // Then delete them
+    for (auto iter = i_maps.begin(); iter != i_maps.end(); ++iter)
         delete iter->second;
-        i_maps.erase(iter++);
-    }
+
+    i_maps.clear();
 
     if (m_updater.activated())
         m_updater.deactivate();
