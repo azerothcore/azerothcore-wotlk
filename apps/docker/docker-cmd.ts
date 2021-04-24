@@ -14,49 +14,49 @@ program.name("acore.sh docker")
 shellCommandFactory(
   "start:app",
   "Startup the authserver and worldserver apps",
-  "docker-compose --profile app up",
+  "docker compose --profile app up",
 );
 
 shellCommandFactory(
   "start:app:d",
   "Startup the authserver and worldserver apps in detached mode",
-  "docker-compose --profile app up -d",
+  "docker compose --profile app up -d",
 );
 
 shellCommandFactory(
   "start:dev",
   "Startup the dev server",
-  "docker-compose --profile dev up",
+  "docker compose --profile dev up",
 );
 
 shellCommandFactory(
   "build",
   "Build the authserver and worldserver",
-  `docker-compose run --rm ac-dev-server bash bin/acore-docker-build`,
+  `docker compose run --rm ac-dev-server bash bin/acore-docker-build`,
 );
 
 shellCommandFactory(
   "build:clean",
   "Clean build data",
-  `docker-compose run --rm ac-dev-server bash rm -rf var/build`,
+  `docker compose run --rm ac-dev-server bash rm -rf var/build`,
 );
 
 shellCommandFactory(
   "client-data",
   "Download client data inside the ac-data volume",
-  "docker-compose run --rm ac-dev-server bash acore.sh client-data",
+  "docker compose run --rm ac-dev-server bash acore.sh client-data",
 );
 
 shellCommandFactory(
   "db-import",
   "Create and upgrade the database with latest updates",
-  "docker-compose run --rm ac-dev-server bash acore.sh db-assembler import-all",
+  "docker compose run --rm ac-dev-server bash acore.sh db-assembler import-all",
 );
 
 shellCommandFactory(
   "dashboard [args...]",
   "Execute acore dashboard within a running ac-dev-server",
-  "docker-compose exec ac-dev-server bash acore.sh",
+  "docker compose exec ac-dev-server bash acore.sh",
 );
 
 program.command("attach [service]")
@@ -64,7 +64,7 @@ program.command("attach [service]")
   .action(async (service: string | undefined) => {
     const { run } = Deno;
 
-    let command = `docker-compose ps`;
+    let command = `docker compose ps`;
 
     if (service) {
       command = `${command} ${service}`;
