@@ -1,3 +1,19 @@
+-- DB update 2021_04_22_01 -> 2021_04_24_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_22_01';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_22_01 2021_04_24_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1615627556897035768'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1615627556897035768');
 
 UPDATE `creature_template` SET `BaseAttackTime`=2500  WHERE `entry`=485;   -- Blackrock Outrunner, was 2000
@@ -88,3 +104,12 @@ UPDATE `creature_template` SET `BaseAttackTime`=2400  WHERE `entry`=15742; -- Co
 UPDATE `creature_template` SET `BaseAttackTime`=2000  WHERE `entry`=15802; -- Flesh Tentacle, was 1500
 UPDATE `creature_template` SET `BaseAttackTime`=1800  WHERE `entry`=15952; -- Maexxna, was 2000
 UPDATE `creature_template` SET `BaseAttackTime`=750   WHERE `entry`=16028; -- Patchwerk, was 1200
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
