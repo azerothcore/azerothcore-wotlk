@@ -8409,7 +8409,7 @@ void ObjectMgr::LoadTrainers()
             _trainers.emplace(std::piecewise_construct, std::forward_as_tuple(trainerId), std::forward_as_tuple(trainerId, trainerType, requirement, std::move(greeting), std::move(spells)));
         } while (trainersResult->NextRow());
     }
-    
+
     for (auto const& unusedSpells : spellsByTrainer)
     {
         for (Trainer::Spell const& unusedSpell : unusedSpells.second)
