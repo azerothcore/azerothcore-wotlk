@@ -14,7 +14,8 @@ function denoInstall() {
 }
 
 function denoCmd() {
-    (cd "$AC_PATH_ROOT" ; ./deps/deno/bin/deno "$@")
+    [[ "$OSTYPE" = "msys" ]] && DENOEXEC="./deps/deno/bin/deno.exe" || DENOEXEC="./deps/deno/bin/deno"
+    (cd "$AC_PATH_ROOT" ; $DENOEXEC "$@")
 }
 
 function denoRunFile() {
