@@ -412,6 +412,11 @@ public:
             _storage.reserve(ressize);
     }
 
+    void shrink_to_fit()
+    {
+        _storage.shrink_to_fit();
+    }
+
     void append(const char* src, size_t cnt)
     {
         return append((const uint8*)src, cnt);

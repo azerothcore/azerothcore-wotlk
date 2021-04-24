@@ -48,6 +48,15 @@ struct DeclinedName;
 struct ItemTemplate;
 struct MovementInfo;
 
+namespace WorldPackets
+{
+    namespace NPC
+    {
+        class Hello;
+        class TrainerBuySpell;
+    }
+}
+
 namespace lfg
 {
     struct LfgJoinResultData;
@@ -274,8 +283,7 @@ public:
     //void SendTestCreatureQueryOpcode(uint32 entry, uint64 guid, uint32 testvalue);
     void SendNameQueryOpcode(uint64 guid);
 
-    void SendTrainerList(uint64 guid);
-    void SendTrainerList(uint64 guid, std::string const& strTitle);
+    void SendTrainerList(Creature* npc);
     void SendListInventory(uint64 guid, uint32 vendorEntry = 0);
     void SendShowBank(uint64 guid);
     bool CanOpenMailBox(uint64 guid);
@@ -577,8 +585,8 @@ public:                                                 // opcodes handlers
     void HandleTabardVendorActivateOpcode(WorldPacket& recvPacket);
     void HandleBankerActivateOpcode(WorldPacket& recvPacket);
     void HandleBuyBankSlotOpcode(WorldPacket& recvPacket);
-    void HandleTrainerListOpcode(WorldPacket& recvPacket);
-    void HandleTrainerBuySpellOpcode(WorldPacket& recvPacket);
+    void HandleTrainerListOpcode(WorldPackets::NPC::Hello& recvPacket);
+    void HandleTrainerBuySpellOpcode(WorldPackets::NPC::TrainerBuySpell& recvPacket);
     void HandlePetitionShowListOpcode(WorldPacket& recvPacket);
     void HandleGossipHelloOpcode(WorldPacket& recvPacket);
     void HandleGossipSelectOptionOpcode(WorldPacket& recvPacket);

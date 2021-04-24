@@ -1330,6 +1330,9 @@ enum Opcodes
     NUM_MSG_TYPES                                   = 0x51F
 };
 
+typedef Opcodes OpcodeClient;
+typedef Opcodes OpcodeServer;
+
 /// Player state
 enum SessionStatus
 {

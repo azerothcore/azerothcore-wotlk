@@ -82,7 +82,7 @@ namespace acore
 
     struct MessageDistDeliverer
     {
-        WorldObject* i_source;
+        WorldObject const* i_source;
         WorldPacket* i_message;
         uint32 i_phaseMask;
         float i_distSq;
