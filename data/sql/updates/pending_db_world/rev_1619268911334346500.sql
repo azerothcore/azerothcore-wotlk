@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1619268911334346500');
 
-DELETE FROM `command` WHERE `name` = 'reload trainer';
+DELETE FROM `command` WHERE `name` IN ('reload trainer', 'reload npc_trainer');
 INSERT INTO `command` (`name`,`permission`,`help`) VALUES ('reload trainer',3,'Syntax: .reload trainer\nReloads trainer,trainer_locale,trainer_spell and creature_default_trainer tables.');
 
 DELETE FROM `creature_default_trainer`;
