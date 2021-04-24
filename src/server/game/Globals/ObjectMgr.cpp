@@ -8359,7 +8359,7 @@ void ObjectMgr::LoadMailLevelRewards()
     LOG_INFO("server", " ");
 }
 
-void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel)
+void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqSpell, uint32 reqLevel)
 {
     if (entry >= ACORE_TRAINER_START_REF)
         return;
@@ -8403,7 +8403,21 @@ void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, 
     trainerSpell.spellCost     = spellCost;
     trainerSpell.reqSkill      = reqSkill;
     trainerSpell.reqSkillValue = reqSkillValue;
+    trainerSpell.reqSpell      = reqSpell;
     trainerSpell.reqLevel      = reqLevel;
+
+    SpellInfo const* spellinfoReqSpell = sSpellMgr->GetSpellInfo(reqSpell);
+    if (!spellinfoReqSpell && trainerSpell.reqSpell != 0)
+    {
+        LOG_ERROR("sql.sql", "Table `npc_trainer` uses non-existing spell for reqSpell (Spell: %u) (Entry: %u), ignoring", reqSpell, entry);
+        return;
+    }
+
+    if (!SpellMgr::ComputeIsSpellValid(spellinfoReqSpell) && trainerSpell.reqSpell != 0)
+    {
+        LOG_ERROR("sql.sql", "Table `npc_trainer` uses a broken spell for reqSpell (Spell: %u) (Entry: %u), ignoring", reqSpell, entry);
+        return;
+    }
 
     if (!trainerSpell.reqLevel)
         trainerSpell.reqLevel = spellinfo->SpellLevel;
@@ -8444,7 +8458,7 @@ void ObjectMgr::LoadTrainerSpell()
     // For reload case
     _cacheTrainerSpellStore.clear();
 
-    QueryResult result = WorldDatabase.Query("SELECT b.ID, a.SpellID, a.MoneyCost, a.ReqSkillLine, a.ReqSkillRank, a.ReqLevel FROM npc_trainer AS a "
+    QueryResult result = WorldDatabase.Query("SELECT b.ID, a.SpellID, a.MoneyCost, a.ReqSkillLine, a.ReqSkillRank, a.ReqSpell, a.ReqLevel FROM npc_trainer AS a "
                          "INNER JOIN npc_trainer AS b ON a.ID = -(b.SpellID) "
                          "UNION SELECT * FROM npc_trainer WHERE SpellID > 0");
 
@@ -8466,9 +8480,10 @@ void ObjectMgr::LoadTrainerSpell()
         uint32 spellCost     = fields[2].GetUInt32();
         uint32 reqSkill      = fields[3].GetUInt16();
         uint32 reqSkillValue = fields[4].GetUInt16();
-        uint32 reqLevel      = fields[5].GetUInt8();
+        uint32 reqSpell      = fields[5].GetUInt32();
+        uint32 reqLevel      = fields[6].GetUInt8();
 
-        AddSpellToTrainer(entry, spell, spellCost, reqSkill, reqSkillValue, reqLevel);
+        AddSpellToTrainer(entry, spell, spellCost, reqSkill, reqSkillValue, reqSpell, reqLevel);
 
         ++count;
     } while (result->NextRow());

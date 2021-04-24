@@ -403,6 +403,7 @@ struct TrainerSpell
     uint32 spellCost{0};
     uint32 reqSkill{0};
     uint32 reqSkillValue{0};
+    uint32 reqSpell{0};
     uint32 reqLevel{0};
     uint32 learnedSpell[3];
 
