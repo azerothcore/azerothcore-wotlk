@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -31,7 +31,7 @@
 #include <string>
 
 class Item;
-struct AccessRequirement;
+struct DungeonProgressionRequirements;
 struct PlayerClassInfo;
 struct PlayerClassLevelInfo;
 struct PlayerInfo;
@@ -704,7 +704,7 @@ public:
 
     typedef std::unordered_map<uint32, uint32> AreaTriggerScriptContainer;
 
-    typedef std::unordered_map<uint32, AccessRequirement*> AccessRequirementContainer;
+    typedef std::unordered_map<uint32, std::unordered_map<uint8, DungeonProgressionRequirements*>> DungeonProgressionRequirementsContainer;
 
     typedef std::unordered_map<uint32, RepRewardRate > RepRewardRateContainer;
     typedef std::unordered_map<uint32, ReputationOnKillEntry> RepOnKillContainer;
@@ -832,11 +832,18 @@ public:
         return nullptr;
     }
 
-    [[nodiscard]] AccessRequirement const* GetAccessRequirement(uint32 mapid, Difficulty difficulty) const
+    [[nodiscard]] DungeonProgressionRequirements const* GetAccessRequirement(uint32 mapid, Difficulty difficulty) const
     {
-        AccessRequirementContainer::const_iterator itr = _accessRequirementStore.find(MAKE_PAIR32(mapid, difficulty));
+        DungeonProgressionRequirementsContainer::const_iterator itr = _accessRequirementStore.find(mapid);
         if (itr != _accessRequirementStore.end())
-            return itr->second;
+        {
+            std::unordered_map<uint8, DungeonProgressionRequirements*> difficultiesProgressionRequirements = itr->second;
+            auto difficultiesItr = difficultiesProgressionRequirements.find(difficulty);
+            if (difficultiesItr != difficultiesProgressionRequirements.end())
+            {
+                return difficultiesItr->second;
+            }
+        }
         return nullptr;
     }
 
@@ -903,13 +910,13 @@ public:
     void LoadQuests();
     void LoadQuestStartersAndEnders()
     {
-        sLog->outString("Loading GO Start Quest Data...");
+        LOG_INFO("server", "Loading GO Start Quest Data...");
         LoadGameobjectQuestStarters();
-        sLog->outString("Loading GO End Quest Data...");
+        LOG_INFO("server", "Loading GO End Quest Data...");
         LoadGameobjectQuestEnders();
-        sLog->outString("Loading Creature Start Quest Data...");
+        LOG_INFO("server", "Loading Creature Start Quest Data...");
         LoadCreatureQuestStarters();
-        sLog->outString("Loading Creature End Quest Data...");
+        LOG_INFO("server", "Loading Creature End Quest Data...");
         LoadCreatureQuestEnders();
     }
     void LoadGameobjectQuestStarters();
@@ -971,7 +978,10 @@ public:
     void LoadCreatureClassLevelStats();
     void LoadCreatureLocales();
     void LoadCreatureTemplates();
+    void LoadCreatureTemplate(Field* fields);
     void LoadCreatureTemplateAddons();
+    void LoadCreatureTemplateResistances();
+    void LoadCreatureTemplateSpells();
     void CheckCreatureTemplate(CreatureTemplate const* cInfo);
     void LoadGameObjectQuestItems();
     void LoadCreatureQuestItems();
@@ -1289,7 +1299,7 @@ public:
 
     void LoadScriptNames();
     ScriptNameContainer& GetScriptNames() { return _scriptNamesStore; }
-    [[nodiscard]] const char* GetScriptName(uint32 id) const { return id < _scriptNamesStore.size() ? _scriptNamesStore[id].c_str() : ""; }
+    [[nodiscard]] std::string const& GetScriptName(uint32 id) const;
     uint32 GetScriptId(const char* name);
 
     [[nodiscard]] SpellClickInfoMapBounds GetSpellClickInfoMapBounds(uint32 creature_id) const
@@ -1343,28 +1353,28 @@ private:
     uint64 _equipmentSetGuid; // pussywizard: accessed by a single thread
     uint32 _itemTextId; // pussywizard: unused? xD
     uint32 _mailId;
-    ACE_Thread_Mutex _mailIdMutex;
+    std::mutex _mailIdMutex;
     uint32 _hiPetNumber;
-    ACE_Thread_Mutex _hiPetNumberMutex;
+    std::mutex _hiPetNumberMutex;
 
     // first free low guid for selected guid type
     uint32 _hiCharGuid; // pussywizard: accessed by a single thread
     uint32 _hiCreatureGuid;
-    ACE_Thread_Mutex _hiCreatureGuidMutex;
+    std::mutex _hiCreatureGuidMutex;
     uint32 _hiPetGuid;
-    ACE_Thread_Mutex _hiPetGuidMutex;
+    std::mutex _hiPetGuidMutex;
     uint32 _hiVehicleGuid;
-    ACE_Thread_Mutex _hiVehicleGuidMutex;
+    std::mutex _hiVehicleGuidMutex;
     uint32 _hiItemGuid;
-    ACE_Thread_Mutex _hiItemGuidMutex;
+    std::mutex _hiItemGuidMutex;
     uint32 _hiGoGuid;
-    ACE_Thread_Mutex _hiGoGuidMutex;
+    std::mutex _hiGoGuidMutex;
     uint32 _hiDoGuid;
-    ACE_Thread_Mutex _hiDoGuidMutex;
+    std::mutex _hiDoGuidMutex;
     uint32 _hiCorpseGuid;
-    ACE_Thread_Mutex _hiCorpseGuidMutex;
+    std::mutex _hiCorpseGuidMutex;
     uint32 _hiMoTransGuid;
-    ACE_Thread_Mutex _hiMoTransGuidMutex;
+    std::mutex _hiMoTransGuidMutex;
 
     uint32 _hiCreatureRecycledGuidMax;
     uint32 _hiCreatureRecycledGuid;
@@ -1384,7 +1394,7 @@ private:
     AreaTriggerContainer _areaTriggerStore;
     AreaTriggerTeleportContainer _areaTriggerTeleportStore;
     AreaTriggerScriptContainer _areaTriggerScriptStore;
-    AccessRequirementContainer _accessRequirementStore;
+    DungeonProgressionRequirementsContainer _accessRequirementStore;
     DungeonEncounterContainer _dungeonEncounterStore;
 
     RepRewardRateContainer _repRewardRateStore;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -267,7 +267,7 @@ public:
         void SetData64(uint32 type, uint64 data) override
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Blackrock Depths: SetData64 update (Type: %u Data " UI64FMTD ")", type, data);
+            LOG_DEBUG("scripts.ai", "TSCR: Instance Blackrock Depths: SetData64 update (Type: %u Data " UI64FMTD ")", type, data);
 #endif
 
             switch (type)
@@ -285,7 +285,7 @@ public:
         void SetData(uint32 type, uint32 data) override
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
+            LOG_DEBUG("scripts.ai", "TSCR: Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
 #endif
 
             switch (type)

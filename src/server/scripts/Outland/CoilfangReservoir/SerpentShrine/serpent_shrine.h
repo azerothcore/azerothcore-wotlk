@@ -6,10 +6,13 @@
 #define DEF_SERPENT_SHRINE_H
 
 #include "CreatureAI.h"
+#include "CreatureAIImpl.h"
 #include "GridNotifiers.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+
+#define SerpentShrineScriptName "instance_serpent_shrine"
 
 enum DataTypes
 {
@@ -64,5 +67,11 @@ enum SSSpells
     SPELL_SCALDING_WATER                    = 37284,
     SPELL_FRENZY_WATER                      = 37026
 };
+
+template <class AI, class T>
+inline AI* GetSerpentShrineAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, SerpentShrineScriptName);
+}
 
 #endif

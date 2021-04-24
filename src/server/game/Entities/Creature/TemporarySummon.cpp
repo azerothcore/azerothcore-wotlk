@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -139,7 +139,7 @@ void TempSummon::Update(uint32 diff)
             }
         default:
             UnSummon();
-            sLog->outError("Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
+            LOG_ERROR("server", "Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
             break;
     }
 }
@@ -263,7 +263,7 @@ void TempSummon::RemoveFromWorld()
                     owner->m_SummonSlot[slot] = 0;
 
     //if (GetOwnerGUID())
-    //    sLog->outError("Unit %u has owner guid when removed from world", GetEntry());
+    //    LOG_ERROR("server", "Unit %u has owner guid when removed from world", GetEntry());
 
     Creature::RemoveFromWorld();
 }
@@ -378,10 +378,10 @@ void Puppet::InitSummon()
     if (!SetCharmedBy(GetOwner(), CHARM_TYPE_POSSESS))
     {
         if (Player* p = GetOwner())
-            sLog->outMisc("Puppet::InitSummon (A1) - %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u", p->GetTypeId(), p->GetEntry(), p->GetUnitTypeMask(), p->GetGUIDLow(), p->GetMapId(), p->GetInstanceId(), p->FindMap()->GetId(), p->IsInWorld() ? 1 : 0, p->IsDuringRemoveFromWorld() ? 1 : 0, p->IsBeingTeleported() ? 1 : 0, p->isBeingLoaded() ? 1 : 0);
+            LOG_INFO("misc", "Puppet::InitSummon (A1) - %u, %u, %u, %u, %u, %u, %u, %u, %u, %u, %u", p->GetTypeId(), p->GetEntry(), p->GetUnitTypeMask(), p->GetGUIDLow(), p->GetMapId(), p->GetInstanceId(), p->FindMap()->GetId(), p->IsInWorld() ? 1 : 0, p->IsDuringRemoveFromWorld() ? 1 : 0, p->IsBeingTeleported() ? 1 : 0, p->isBeingLoaded() ? 1 : 0);
         else
         {
-            sLog->outMisc("Puppet::InitSummon (B1)");
+            LOG_INFO("misc", "Puppet::InitSummon (B1)");
             //ABORT(); // ZOMG!
         }
     }

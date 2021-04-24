@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -21,6 +21,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 #include "Transport.h"
+#include <string>
 
 struct NpcFlagText
 {
@@ -922,6 +923,13 @@ public:
             return false;
         }
 
+        if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_FACTION_INVPARAM, std::to_string(displayId).c_str());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         creature->SetDisplayId(displayId);
         creature->SetNativeDisplayId(displayId);
 
@@ -968,7 +976,7 @@ public:
 
         if (dontdel_str)
         {
-            //sLog->outError("DEBUG: All 3 params are set");
+            //LOG_ERROR("server", "DEBUG: All 3 params are set");
 
             // All 3 params are set
             // GUID
@@ -976,7 +984,7 @@ public:
             // doNotDEL
             if (stricmp(dontdel_str, "NODEL") == 0)
             {
-                //sLog->outError("DEBUG: doNotDelete = true;");
+                //LOG_ERROR("server", "DEBUG: doNotDelete = true;");
                 doNotDelete = true;
             }
         }
@@ -985,10 +993,10 @@ public:
             // Only 2 params - but maybe NODEL is set
             if (type_str)
             {
-                sLog->outError("DEBUG: Only 2 params ");
+                LOG_ERROR("server", "DEBUG: Only 2 params ");
                 if (stricmp(type_str, "NODEL") == 0)
                 {
-                    //sLog->outError("DEBUG: type_str, NODEL ");
+                    //LOG_ERROR("server", "DEBUG: type_str, NODEL ");
                     doNotDelete = true;
                     type_str = nullptr;
                 }

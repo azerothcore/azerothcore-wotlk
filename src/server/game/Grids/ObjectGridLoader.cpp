@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -94,7 +94,7 @@ void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefManager<T>&
     {
         T* obj = new T;
         uint32 guid = *i_guid;
-        //sLog->outString("DEBUG: LoadHelper from table: %s for (guid: %u) Loading", table, guid);
+        //LOG_INFO("server", "DEBUG: LoadHelper from table: %s for (guid: %u) Loading", table, guid);
         if (!obj->LoadFromDB(guid, map))
         {
             delete obj;
@@ -113,7 +113,7 @@ void LoadHelper(CellGuidSet const& guid_set, CellCoord& cell, GridRefManager<Gam
         uint32 guid = *i_guid;
         GameObjectData const* data = sObjectMgr->GetGOData(guid);
         GameObject* obj = data && sObjectMgr->IsGameObjectStaticTransport(data->id) ? new StaticTransport() : new GameObject();
-        //sLog->outString("DEBUG: LoadHelper from table: %s for (guid: %u) Loading", table, guid);
+        //LOG_INFO("server", "DEBUG: LoadHelper from table: %s for (guid: %u) Loading", table, guid);
         if (!obj->LoadFromDB(guid, map))
         {
             delete obj;
@@ -207,7 +207,7 @@ void ObjectGridLoader::LoadN(void)
         }
     }
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_MAPS, "%u GameObjects, %u Creatures, and %u Corpses/Bones loaded for grid %u on map %u", i_gameObjects, i_creatures, i_corpses, i_grid.GetGridId(), i_map->GetId());
+    LOG_DEBUG("maps", "%u GameObjects, %u Creatures, and %u Corpses/Bones loaded for grid %u on map %u", i_gameObjects, i_creatures, i_corpses, i_grid.GetGridId(), i_map->GetId());
 #endif
 }
 

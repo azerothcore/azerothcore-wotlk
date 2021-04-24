@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -1197,7 +1197,7 @@ struct BfWGGameObjectBuilding
                 if (GameObject* go = m_WG->GetRelic())
                     go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                 else
-                    sLog->outError("BattlefieldWG: Relic not found.");
+                    LOG_ERROR("server", "BattlefieldWG: Relic not found.");
                 break;
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
             case BATTLEFIELD_WG_OBJECTTYPE_WALL:
@@ -1211,6 +1211,11 @@ struct BfWGGameObjectBuilding
 
     void Init(GameObject* gobj, uint32 type, uint32 worldstate, uint8 damageText, uint8 destroyText)
     {
+        if (!gobj)
+        {
+            return;
+        }
+
         // GameObject associated to object
         m_Build = gobj->GetGUID();
 

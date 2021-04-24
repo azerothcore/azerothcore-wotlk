@@ -5,12 +5,15 @@
 #ifndef BLACK_TEMPLE_H_
 #define BLACK_TEMPLE_H_
 
+#include "CreatureAIImpl.h"
 #include "GridNotifiers.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+
+#define BlackTempleScriptName "instance_black_temple"
 
 enum DataTypes
 {
@@ -82,5 +85,11 @@ enum MiscIds
 
     FACTION_ASHTONGUE               = 1820
 };
+
+template <class AI, class T>
+inline AI* GetBlackTempleAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, BlackTempleScriptName);
+}
 
 #endif // BLACK_TEMPLE_H_

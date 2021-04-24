@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -59,7 +59,7 @@ void PetAI::_stopAttack()
     if (!me->IsAlive())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outStaticDebug("Creature stoped attacking cuz his dead [guid=%u]", me->GetGUIDLow());
+        LOG_DEBUG("server", "Creature stoped attacking cuz his dead [guid=%u]", me->GetGUIDLow());
 #endif
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveIdle();
@@ -157,7 +157,7 @@ void PetAI::UpdateAI(uint32 diff)
         if (_needToStop())
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outStaticDebug("Pet AI stopped attacking [guid=%u]", me->GetGUIDLow());
+            LOG_DEBUG("server", "Pet AI stopped attacking [guid=%u]", me->GetGUIDLow());
 #endif
             _stopAttack();
             return;
@@ -245,8 +245,8 @@ void PetAI::UpdateAI(uint32 diff)
             {
                 if (spellInfo->CanBeUsedInCombat())
                 {
-                    // Check if we're in combat or commanded to attack
-                    if (!me->IsInCombat() && !me->GetCharmInfo()->IsCommandAttack())
+                    // Check if we're in combat or commanded to attack (exlude auras with infinity duration)
+                    if (!me->IsInCombat() && !me->GetCharmInfo()->IsCommandAttack() && spellInfo->GetMaxDuration() != -1)
                         continue;
                 }
 
@@ -681,7 +681,7 @@ bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
     // pussywizard: ZOMG! TEMP!
     if (!me->GetCharmInfo())
     {
-        sLog->outMisc("PetAI::CanAttack (A1) - %u, %u", me->GetEntry(), GUID_LOPART(me->GetOwnerGUID()));
+        LOG_INFO("misc", "PetAI::CanAttack (A1) - %u, %u", me->GetEntry(), GUID_LOPART(me->GetOwnerGUID()));
         return false;
     }
 

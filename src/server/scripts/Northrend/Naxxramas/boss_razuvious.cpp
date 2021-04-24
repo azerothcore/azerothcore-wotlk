@@ -8,40 +8,34 @@
 
 enum Says
 {
-    SAY_AGGRO   = 0,
-    SAY_SLAY    = 1,
-    SAY_TAUNTED = 2,
-    SAY_DEATH   = 3,
-    SAY_SHOUT   = 4
+    SAY_AGGRO                       = 0,
+    SAY_SLAY                        = 1,
+    SAY_TAUNTED                     = 2,
+    SAY_DEATH                       = 3
 };
 
 enum Spells
 {
     SPELL_UNBALANCING_STRIKE        = 26613,
-    SPELL_DISRUPTING_SHOUT_10       = 29107,
-    SPELL_DISRUPTING_SHOUT_25       = 55543,
+    SPELL_DISRUPTING_SHOUT_10       = 55543,
+    SPELL_DISRUPTING_SHOUT_25       = 29107,
     SPELL_JAGGED_KNIFE              = 55550,
     SPELL_HOPELESS                  = 29125,
 
-    SPELL_BONE_BARRIER              = 29061,
-    SPELL_BLOOD_STRIKE              = 61696,
+    SPELL_TAUNT                     = 29060
 };
 
 enum Events
 {
-    EVENT_SPELL_UNBALANCING_STRIKE  = 1,
-    EVENT_SPELL_DISRUPTING_SHOUT    = 2,
-    EVENT_SPELL_JAGGED_KNIFE        = 3,
-    EVENT_PLAY_COMMAND              = 4,
-
-    EVENT_MINION_BLOOD_STRIKE       = 10,
-    EVENT_MINION_BONE_BARRIER       = 11,
+    EVENT_UNBALANCING_STRIKE        = 1,
+    EVENT_DISRUPTING_SHOUT          = 2,
+    EVENT_JAGGED_KNIFE              = 3
 };
 
 enum Misc
 {
     NPC_DEATH_KNIGHT_UNDERSTUDY     = 16803,
-    NPC_RAZUVIOUS                   = 16061,
+    NPC_RAZUVIOUS                   = 16061
 };
 
 class boss_razuvious : public CreatureScript
@@ -51,7 +45,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_razuviousAI (pCreature);
+        return GetNaxxramasAI<boss_razuviousAI>(pCreature);
     }
 
     struct boss_razuviousAI : public BossAI
@@ -67,16 +61,19 @@ public:
 
         void SpawnHelpers()
         {
-            me->SummonCreature(NPC_DEATH_KNIGHT_UNDERSTUDY, 2782.45f, -3088.03f, 267.685f, 0.75f);
-            me->SummonCreature(NPC_DEATH_KNIGHT_UNDERSTUDY, 2778.56f, -3113.74f, 267.685f, 5.28f);
+            me->SummonCreature(NPC_DEATH_KNIGHT_UNDERSTUDY, 2762.23f, -3085.07f, 267.685f, 1.95f);
+            me->SummonCreature(NPC_DEATH_KNIGHT_UNDERSTUDY, 2758.24f, -3110.97f, 267.685f, 3.94f);
             if (Is25ManRaid())
             {
-                me->SummonCreature(NPC_DEATH_KNIGHT_UNDERSTUDY, 2762.23f, -3085.07f, 267.685f, 1.95f);
-                me->SummonCreature(NPC_DEATH_KNIGHT_UNDERSTUDY, 2758.24f, -3110.97f, 267.685f, 3.94f);
+                me->SummonCreature(NPC_DEATH_KNIGHT_UNDERSTUDY, 2782.45f, -3088.03f, 267.685f, 0.75f);
+                me->SummonCreature(NPC_DEATH_KNIGHT_UNDERSTUDY, 2778.56f, -3113.74f, 267.685f, 5.28f);
             }
         }
 
-        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
+        void JustSummoned(Creature* cr) override
+        {
+            summons.Summon(cr);
+        }
 
         void Reset() override
         {
@@ -88,40 +85,47 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
-                return;
-
-            Talk(SAY_SLAY);
-
-            if (pInstance)
+            if (roll_chance_i(30))
+            {
+                Talk(SAY_SLAY);
+            }
+            if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
+            {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
+            }
         }
 
         void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             // Damage done by the controlled Death Knight understudies should also count toward damage done by players
             if(who && who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_DEATH_KNIGHT_UNDERSTUDY)
+            {
                 me->LowerPlayerDamageReq(damage);
+            }
         }
 
         void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
-
             me->CastSpell(me, SPELL_HOPELESS, true);
+        }
+
+        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_TAUNT)
+            {
+                Talk(SAY_TAUNTED, caster);
+            }
         }
 
         void EnterCombat(Unit* who) override
         {
             BossAI::EnterCombat(who);
             Talk(SAY_AGGRO);
-
-            events.ScheduleEvent(EVENT_SPELL_UNBALANCING_STRIKE, 30000);
-            events.ScheduleEvent(EVENT_SPELL_DISRUPTING_SHOUT, 25000);
-            events.ScheduleEvent(EVENT_SPELL_JAGGED_KNIFE, 15000);
-            events.ScheduleEvent(EVENT_PLAY_COMMAND, 40000);
-
+            events.ScheduleEvent(EVENT_UNBALANCING_STRIKE, 20000);
+            events.ScheduleEvent(EVENT_DISRUPTING_SHOUT, 15000);
+            events.ScheduleEvent(EVENT_JAGGED_KNIFE, 10000);
             summons.DoZoneInCombat();
         }
 
@@ -136,27 +140,22 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_SPELL_UNBALANCING_STRIKE:
+                case EVENT_UNBALANCING_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_UNBALANCING_STRIKE, false);
-                    events.RepeatEvent(30000);
+                    events.RepeatEvent(20000);
                     break;
-                case EVENT_SPELL_DISRUPTING_SHOUT:
-                    Talk(SAY_SHOUT);
+                case EVENT_DISRUPTING_SHOUT:
                     me->CastSpell(me, RAID_MODE(SPELL_DISRUPTING_SHOUT_10, SPELL_DISRUPTING_SHOUT_25), false);
-                    events.RepeatEvent(25000);
+                    events.RepeatEvent(15000);
                     break;
-                case EVENT_SPELL_JAGGED_KNIFE:
+                case EVENT_JAGGED_KNIFE:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f))
+                    {
                         me->CastSpell(target, SPELL_JAGGED_KNIFE, false);
-
-                    events.RepeatEvent(25000);
-                    break;
-                case EVENT_PLAY_COMMAND:
-                    Talk(SAY_TAUNTED);
-                    events.RepeatEvent(40000);
+                    }
+                    events.RepeatEvent(10000);
                     break;
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -169,7 +168,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_razuvious_minionAI (pCreature);
+        return GetNaxxramasAI<boss_razuvious_minionAI>(pCreature);
     }
 
     struct boss_razuvious_minionAI : public ScriptedAI
@@ -185,11 +184,10 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
-                return;
-
-            if (me->GetInstanceScript())
+            if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
+            {
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
+            }
         }
 
         void EnterCombat(Unit* who) override
@@ -199,33 +197,18 @@ public:
                 cr->SetInCombatWithZone();
                 cr->AI()->AttackStart(who);
             }
-
-            events.ScheduleEvent(EVENT_MINION_BLOOD_STRIKE, 4000);
-            events.ScheduleEvent(EVENT_MINION_BONE_BARRIER, 9000);
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING) || me->IsCharmed())
-                return;
-
-            switch (events.ExecuteEvent())
+            if (UpdateVictim())
             {
-                case EVENT_MINION_BLOOD_STRIKE:
-                    me->CastSpell(me->GetVictim(), SPELL_BLOOD_STRIKE, false);
-                    events.RepeatEvent(8000);
-                    break;
-                case EVENT_MINION_BONE_BARRIER:
-                    me->CastSpell(me, SPELL_BONE_BARRIER, true);
-                    events.RepeatEvent(40000);
-                    break;
+                events.Update(diff);
+                if (!me->HasUnitState(UNIT_STATE_CASTING) || !me->IsCharmed())
+                {
+                    DoMeleeAttackIfReady();
+                }
             }
-
-            DoMeleeAttackIfReady();
         }
     };
 };

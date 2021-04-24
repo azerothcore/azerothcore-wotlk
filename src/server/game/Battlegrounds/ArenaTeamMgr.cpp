@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -14,10 +14,14 @@
 #include "ScriptMgr.h"
 #include "World.h"
 
+constexpr uint32 MAX_ARENA_TEAM_ID = 0xFFF00000;
+constexpr uint32 MAX_TEMP_ARENA_TEAM_ID = 0xFFFFFFFE;
+
 ArenaTeamMgr::ArenaTeamMgr()
 {
     NextArenaTeamId = 1;
     LastArenaLogId = 0;
+    NextTempArenaTeamId = 0xFFF00000;
 }
 
 ArenaTeamMgr::~ArenaTeamMgr()
@@ -114,12 +118,21 @@ void ArenaTeamMgr::RemoveArenaTeam(uint32 arenaTeamId)
 
 uint32 ArenaTeamMgr::GenerateArenaTeamId()
 {
-    if (NextArenaTeamId >= 0xFFFFFFFE)
+    if (NextArenaTeamId >= MAX_ARENA_TEAM_ID)
     {
-        sLog->outError("Arena team ids overflow!! Can't continue, shutting down server. ");
+        LOG_ERROR("server", "Arena team ids overflow!! Can't continue, shutting down server. ");
         World::StopNow(ERROR_EXIT_CODE);
     }
+
     return NextArenaTeamId++;
+}
+
+uint32 ArenaTeamMgr::GenerateTempArenaTeamId()
+{
+    if (NextTempArenaTeamId >= MAX_TEMP_ARENA_TEAM_ID)
+        NextTempArenaTeamId = MAX_ARENA_TEAM_ID;
+
+    return NextTempArenaTeamId++;
 }
 
 void ArenaTeamMgr::LoadArenaTeams()
@@ -136,8 +149,8 @@ void ArenaTeamMgr::LoadArenaTeams()
 
     if (!result)
     {
-        sLog->outString(">> Loaded 0 arena teams. DB table `arena_team` is empty!");
-        sLog->outString();
+        LOG_INFO("server", ">> Loaded 0 arena teams. DB table `arena_team` is empty!");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -166,8 +179,8 @@ void ArenaTeamMgr::LoadArenaTeams()
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u arena teams in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LOG_INFO("server", ">> Loaded %u arena teams in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", " ");
 }
 
 void ArenaTeamMgr::DistributeArenaPoints()

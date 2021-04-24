@@ -267,7 +267,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_ickAI(creature);
+        return GetPitOfSaronAI<boss_ickAI>(creature);
     }
 };
 
@@ -405,7 +405,7 @@ public:
                             c->CastSpell(c, 69753, false);
 
                     me->SetReactState(REACT_PASSIVE);
-                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29 | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
+                    me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
                     me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                     me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->AddUnitState(UNIT_STATE_DIED);
@@ -445,7 +445,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_krickAI(creature);
+        return GetPitOfSaronAI<boss_krickAI>(creature);
     }
 };
 

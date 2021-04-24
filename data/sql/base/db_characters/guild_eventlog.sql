@@ -6,21 +6,21 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `guild_eventlog`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `guild_eventlog` 
 (
-  `guildid` int(10) unsigned NOT NULL COMMENT 'Guild Identificator',
-  `LogGuid` int(10) unsigned NOT NULL COMMENT 'Log record identificator - auxiliary column',
-  `EventType` tinyint(3) unsigned NOT NULL COMMENT 'Event type',
-  `PlayerGuid1` int(10) unsigned NOT NULL COMMENT 'Player 1',
-  `PlayerGuid2` int(10) unsigned NOT NULL COMMENT 'Player 2',
-  `NewRank` tinyint(3) unsigned NOT NULL COMMENT 'New rank(in case promotion/demotion)',
-  `TimeStamp` int(10) unsigned NOT NULL COMMENT 'Event UNIX time',
+  `guildid` INT unsigned NOT NULL COMMENT 'Guild Identificator',
+  `LogGuid` INT unsigned NOT NULL COMMENT 'Log record identificator - auxiliary column',
+  `EventType` TINYINT unsigned NOT NULL COMMENT 'Event type',
+  `PlayerGuid1` INT unsigned NOT NULL COMMENT 'Player 1',
+  `PlayerGuid2` INT unsigned NOT NULL COMMENT 'Player 2',
+  `NewRank` TINYINT unsigned NOT NULL COMMENT 'New rank(in case promotion/demotion)',
+  `TimeStamp` INT unsigned NOT NULL COMMENT 'Event UNIX time',
   PRIMARY KEY (`guildid`,`LogGuid`),
   KEY `Idx_PlayerGuid1` (`PlayerGuid1`),
   KEY `Idx_PlayerGuid2` (`PlayerGuid2`),
   KEY `Idx_LogGuid` (`LogGuid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Guild Eventlog';
+) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4 COMMENT='Guild Eventlog';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `guild_eventlog` WRITE;

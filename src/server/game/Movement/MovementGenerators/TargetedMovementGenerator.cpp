@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -48,7 +48,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || (cOwner && cOwner->IsMovementPreventedByCasting()))
     {
-        i_path = nullptr;
         owner->StopMoving();
         _lastTargetPosition.reset();
         if (Creature* cOwner = owner->ToCreature())
@@ -152,12 +151,13 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (owner->IsHovering())
         owner->UpdateAllowedPositionZ(x, y, z);
 
+    i_recalculateTravel = true;
+
     bool success = i_path->CalculatePath(x, y, z, forceDest);
     if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
     {
         if (cOwner)
             cOwner->SetCannotReachTarget(true);
-        owner->StopMoving();
         return true;
     }
 
@@ -174,7 +174,6 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
 
     owner->AddUnitState(UNIT_STATE_CHASE_MOVE);
-    i_recalculateTravel = true;
 
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(i_path->GetPath());
@@ -234,7 +233,7 @@ bool FollowMovementGenerator<T>::PositionOkay(T* owner, Unit* target, float rang
     if (owner->GetExactDistSq(target) > G3D::square(owner->GetCombatReach() + target->GetCombatReach() + range))
         return false;
 
-    return !owner->IsPet() || !angle || angle->IsAngleOkay(target->GetRelativeAngle(owner)); // need to check - dont think we need !pet exception here because there are scripts with MoveFollow that require angle
+    return !angle || angle->IsAngleOkay(target->GetRelativeAngle(owner));
 }
 
 template<class T>
@@ -334,16 +333,17 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     target->GetNearPoint(owner, x, y, z, _range, 0.f, target->ToAbsoluteAngle(tAngle));
 
+    i_recalculateTravel = true;
+
     bool success = i_path->CalculatePath(x, y, z, forceDest);
     if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
     {
-        owner->StopMoving();
+        if (cOwner)
+            cOwner->SetCannotReachTarget(true);
         return true;
     }
 
     owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);
-
-    i_recalculateTravel = true;
 
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(i_path->GetPath());

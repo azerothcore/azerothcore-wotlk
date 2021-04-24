@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -14,6 +14,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -26,7 +27,7 @@ bool WorldSession::CanOpenMailBox(uint64 guid)
     {
         if (_player->GetSession()->GetSecurity() < SEC_MODERATOR)
         {
-            sLog->outError("%s attempt open mailbox in cheating way.", _player->GetName().c_str());
+            LOG_ERROR("server", "%s attempt open mailbox in cheating way.", _player->GetName().c_str());
             return false;
         }
     }
@@ -114,14 +115,14 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     if (!rc)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDetail("Player %u is sending mail to %s (GUID: not existed!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u", player->GetGUIDLow(), receiver.c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
+        LOG_DEBUG("server", "Player %u is sending mail to %s (GUID: not existed!) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u", player->GetGUIDLow(), receiver.c_str(), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
 #endif
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_RECIPIENT_NOT_FOUND);
         return;
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDetail("Player %u is sending mail to %s (GUID: %u) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u", player->GetGUIDLow(), receiver.c_str(), GUID_LOPART(rc), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
+    LOG_DEBUG("server", "Player %u is sending mail to %s (GUID: %u) with subject %s and body %s includes %u items, %u copper and %u COD copper with unk1 = %u, unk2 = %u", player->GetGUIDLow(), receiver.c_str(), GUID_LOPART(rc), subject.c_str(), body.c_str(), items_count, money, COD, unk1, unk2);
 #endif
 
     if (player->GetGUID() == rc)
@@ -132,7 +133,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     if (money && COD) // cannot send money in a COD mail
     {
-        sLog->outError("%s attempt to dupe money!!!.", receiver.c_str());
+        LOG_ERROR("server", "%s attempt to dupe money!!!.", receiver.c_str());
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_INTERNAL_ERROR);
         return;
     }
@@ -196,9 +197,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         }
     }*/
 
-    uint32 rc_account = receive
-                        ? receive->GetSession()->GetAccountId()
-                        : sObjectMgr->GetPlayerAccountIdByGUID(rc);
+    uint32 rc_account = receive ? receive->GetSession()->GetAccountId() : sObjectMgr->GetPlayerAccountIdByGUID(rc);
 
     if (/*!accountBound*/ GetAccountId() != rc_account && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL) && player->GetTeamId() != rc_teamId && AccountMgr::IsPlayerAccount(GetSecurity()))
     {
@@ -254,6 +253,9 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
             player->SendMailResult(0, MAIL_SEND, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS);
             return;
         }
+
+        if (!sScriptMgr->CanSendMail(player, rc, mailbox, subject, body, money, COD, item))
+            return;
 
         items[i] = item;
     }
@@ -666,9 +668,9 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
             data << uint32((item ? item->GetEntry() : 0));
             for (uint8 j = 0; j < MAX_INSPECTED_ENCHANTMENT_SLOT; ++j)
             {
-                data << uint32(item ? item->GetEnchantmentCharges(EnchantmentSlot(j)) : 0);
-                data << uint32(item ? item->GetEnchantmentDuration(EnchantmentSlot(j)) : 0);
                 data << uint32(item ? item->GetEnchantmentId(EnchantmentSlot(j)) : 0);
+                data << uint32(item ? item->GetEnchantmentDuration(EnchantmentSlot(j)) : 0);
+                data << uint32(item ? item->GetEnchantmentCharges(EnchantmentSlot(j)) : 0);
             }
             // can be negative
             data << int32((item ? item->GetItemRandomPropertyId() : 0));
@@ -745,7 +747,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
     bodyItem->SetFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_MAIL_TEXT_MASK);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDetail("HandleMailCreateTextItem mailid=%u", mailId);
+    LOG_DEBUG("server", "HandleMailCreateTextItem mailid=%u", mailId);
 #endif
 
     ItemPosCountVec dest;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,10 +11,9 @@
 #include "DBCEnums.h"
 #include "Define.h"
 #include "ObjectDefines.h"
-#include <ace/Null_Mutex.h>
-#include <ace/Thread_Mutex.h>
 #include <list>
 #include <map>
+#include <mutex>
 #include <unordered_map>
 
 struct InstanceTemplate;
@@ -88,7 +87,7 @@ private:
     std::string m_instanceData;
     uint32 m_completedEncounterMask;
 
-    ACE_Thread_Mutex _lock;
+    std::mutex _lock;
 };
 
 typedef std::unordered_map<uint32 /*PAIR32(map, difficulty)*/, time_t /*resetTime*/> ResetTimeByMapDifficultyMap;

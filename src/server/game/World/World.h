@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -440,7 +440,7 @@ private:
     std::string m_newCharString;
 
     float rate_values[MAX_RATES];
-    uint64 m_int_configs[INT_CONFIG_VALUE_COUNT];
+    uint32 m_int_configs[INT_CONFIG_VALUE_COUNT];
     bool m_bool_configs[BOOL_CONFIG_VALUE_COUNT];
     float m_float_configs[FLOAT_CONFIG_VALUE_COUNT];
     typedef std::map<uint32, uint64> WorldStatesMap;
@@ -465,7 +465,7 @@ private:
     std::string _realmName;
 
     // CLI command holder to be thread safe
-    ACE_Based::LockedQueue<CliCommandHolder*, ACE_Thread_Mutex> cliCmdQueue;
+    LockedQueue<CliCommandHolder*> cliCmdQueue;
 
     // next daily quests and random bg reset time
     time_t m_NextDailyQuestReset;
@@ -480,7 +480,7 @@ private:
 
     // sessions that are added async
     void AddSession_(WorldSession* s);
-    ACE_Based::LockedQueue<WorldSession*, ACE_Thread_Mutex> addSessQueue;
+    LockedQueue<WorldSession*> addSessQueue;
 
     // used versions
     std::string m_DBVersion;

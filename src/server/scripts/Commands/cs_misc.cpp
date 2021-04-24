@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -347,12 +347,14 @@ public:
         {
             player->SetDeveloper(true);
             handler->GetSession()->SendNotification(LANG_DEV_ON);
+            sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enablestr);
             return true;
         }
         else if (enablestr == "off")
         {
             player->SetDeveloper(false);
             handler->GetSession()->SendNotification(LANG_DEV_OFF);
+            sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enablestr);
             return true;
         }
 
@@ -1460,7 +1462,7 @@ public:
             playerTarget = player;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDetail(handler->GetAcoreString(LANG_ADDITEM), itemId, count);
+        LOG_DEBUG("server", handler->GetAcoreString(LANG_ADDITEM), itemId, count);
 #endif
 
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
@@ -1564,7 +1566,7 @@ public:
             playerTarget = player;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDetail(handler->GetAcoreString(LANG_ADDITEMSET), itemSetId);
+        LOG_DEBUG("server", handler->GetAcoreString(LANG_ADDITEMSET), itemSetId);
 #endif
 
         bool found = false;
@@ -2252,7 +2254,7 @@ public:
         else
         {
             // pussywizard: notify all online GMs
-            ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
+            std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
             HashMapHolder<Player>::MapType const& m = sObjectAccessor->GetPlayers();
             for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
                 if (itr->second->GetSession()->GetSecurity())
@@ -2871,7 +2873,7 @@ public:
 
         if (!pet->InitStatsForLevel(creatureTarget->getLevel()))
         {
-            sLog->outError("InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
+            LOG_ERROR("server", "InitStatsForLevel() in EffectTameCreature failed! Pet deleted.");
             handler->PSendSysMessage("Error 2");
             delete pet;
             return false;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -76,7 +76,7 @@ void CalendarMgr::LoadFromDB()
             ++count;
         } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u calendar events", count);
+    LOG_INFO("server", ">> Loaded %u calendar events", count);
     count = 0;
 
     //                                                       0   1      2        3       4       5            6      7
@@ -102,8 +102,8 @@ void CalendarMgr::LoadFromDB()
             ++count;
         } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u calendar invites", count);
-    sLog->outString();
+    LOG_INFO("server", ">> Loaded %u calendar invites", count);
+    LOG_INFO("server", " ");
 
     for (uint64 i = 1; i < _maxEventId; ++i)
         if (!GetEvent(i))
@@ -315,7 +315,7 @@ CalendarInvite* CalendarMgr::GetInvite(uint64 inviteId) const
                 return *itr2;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_UNITS, "CalendarMgr::GetInvite: [" UI64FMTD "] not found!", inviteId);
+    LOG_DEBUG("entities.unit", "CalendarMgr::GetInvite: [" UI64FMTD "] not found!", inviteId);
 #endif
     return nullptr;
 }

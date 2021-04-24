@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -42,7 +42,7 @@ void ChannelMgr::LoadChannels()
     QueryResult result = CharacterDatabase.PQuery("SELECT channelId, name, team, announce, ownership, password FROM channels WHERE team = %u ORDER BY channelId ASC", _teamId);
     if (!result)
     {
-        sLog->outString(">> Loaded 0 channels for %s", _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde");
+        LOG_INFO("server", ">> Loaded 0 channels for %s", _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde");
         return;
     }
 
@@ -78,8 +78,8 @@ void ChannelMgr::LoadChannels()
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %u channels for %s in %ums", count, _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde", GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LOG_INFO("server", ">> Loaded %u channels for %s in %ums", count, _teamId == TEAM_ALLIANCE ? "Alliance" : "Horde", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", " ");
 }
 
 Channel* ChannelMgr::GetJoinChannel(std::string const& name, uint32 channelId)
@@ -135,8 +135,8 @@ void ChannelMgr::LoadChannelRights()
     QueryResult result = CharacterDatabase.Query("SELECT name, flags, speakdelay, joinmessage, delaymessage, moderators FROM channels_rights");
     if (!result)
     {
-        sLog->outString(">>  Loaded 0 Channel Rights!");
-        sLog->outString();
+        LOG_INFO("server", ">>  Loaded 0 Channel Rights!");
+        LOG_INFO("server", " ");
         return;
     }
 
@@ -162,8 +162,8 @@ void ChannelMgr::LoadChannelRights()
         ++count;
     } while (result->NextRow());
 
-    sLog->outString(">> Loaded %d Channel Rights in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LOG_INFO("server", ">> Loaded %d Channel Rights in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", " ");
 }
 
 const ChannelRights& ChannelMgr::GetChannelRightsFor(const std::string& name)

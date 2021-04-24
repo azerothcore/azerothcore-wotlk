@@ -8,10 +8,6 @@ bzip2 (a freely available, patent free, high-quality data compressor)
   http://www.bzip.org/
   Version: 1.0.6
 
-cotire (CMake module to speed up builds)
-  https://github.com/sakra/cotire
-  Version: 1.8.0 391bf6b7609e14f5976bd5247b68d63cbf8d4d12
-
 G3D (a commercial-grade C++ 3D engine available as Open Source (BSD License)
   http://g3d.sourceforge.net/
   Version: 8.01-Release

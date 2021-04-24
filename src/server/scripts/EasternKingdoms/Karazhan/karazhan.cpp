@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+* Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
 * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
 * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
 */
@@ -229,7 +229,7 @@ public:
         void PrepareEncounter()
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
+            LOG_DEBUG("scripts.ai", "TSCR: Barnes Opera Event - Introduction complete - preparing encounter %d", m_uiEventId);
 #endif
             uint8 index = 0;
             uint8 count = 0;
@@ -395,7 +395,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_barnesAI(creature);
+        return GetKarazhanAI<npc_barnesAI>(creature);
     }
 };
 
@@ -423,7 +423,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_image_of_medivhAI(creature);
+        return GetKarazhanAI<npc_image_of_medivhAI>(creature);
     }
 
     struct npc_image_of_medivhAI : public ScriptedAI
