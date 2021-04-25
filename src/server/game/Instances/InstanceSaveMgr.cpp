@@ -59,19 +59,19 @@ InstanceSave* InstanceSaveManager::AddInstanceSave(uint32 mapId, uint32 instance
     const MapEntry* entry = sMapStore.LookupEntry(mapId);
     if (!entry)
     {
-        sLog->outError("InstanceSaveManager::AddInstanceSave: wrong mapid = %d, instanceid = %d!", mapId, instanceId);
+        LOG_ERROR("server", "InstanceSaveManager::AddInstanceSave: wrong mapid = %d, instanceid = %d!", mapId, instanceId);
         return nullptr;
     }
 
     if (instanceId == 0)
     {
-        sLog->outError("InstanceSaveManager::AddInstanceSave: mapid = %d, wrong instanceid = %d!", mapId, instanceId);
+        LOG_ERROR("server", "InstanceSaveManager::AddInstanceSave: mapid = %d, wrong instanceid = %d!", mapId, instanceId);
         return nullptr;
     }
 
     if (difficulty >= (entry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
     {
-        sLog->outError("InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong dificalty %u!", mapId, instanceId, difficulty);
+        LOG_ERROR("server", "InstanceSaveManager::AddInstanceSave: mapid = %d, instanceid = %d, wrong dificalty %u!", mapId, instanceId, difficulty);
         return nullptr;
     }
 
@@ -134,11 +134,14 @@ bool InstanceSaveManager::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool sk
 InstanceSave::InstanceSave(uint16 MapId, uint32 InstanceId, Difficulty difficulty, time_t resetTime, time_t extendedResetTime)
     : m_resetTime(resetTime), m_extendedResetTime(extendedResetTime), m_instanceid(InstanceId), m_mapid(MapId), m_difficulty(IsSharedDifficultyMap(MapId) ? Difficulty(difficulty % 2) : difficulty), m_canReset(true), m_instanceData(""), m_completedEncounterMask(0)
 {
+    sScriptMgr->OnConstructInstanceSave(this);
 }
 
 InstanceSave::~InstanceSave()
 {
     ASSERT(m_playerList.empty());
+
+    sScriptMgr->OnDestructInstanceSave(this);
 }
 
 void InstanceSave::InsertToDB()
@@ -169,6 +172,8 @@ void InstanceSave::InsertToDB()
     stmt->setUInt32(4, completedEncounters);
     stmt->setString(5, data);
     CharacterDatabase.Execute(stmt);
+
+    sScriptMgr->OnInstanceSave(this);
 }
 
 time_t InstanceSave::GetResetTimeForDB()
@@ -194,13 +199,13 @@ MapEntry const* InstanceSave::GetMapEntry()
 
 void InstanceSave::AddPlayer(uint32 guidLow)
 {
-    ACORE_GUARD(ACE_Thread_Mutex, _lock);
+    std::lock_guard<std::mutex> guard(_lock);
     m_playerList.push_back(guidLow);
 }
 
 bool InstanceSave::RemovePlayer(uint32 guidLow, InstanceSaveManager* ism)
 {
-    ACORE_GUARD(ACE_Thread_Mutex, _lock);
+    std::lock_guard<std::mutex> guard(_lock);
     m_playerList.remove(guidLow);
 
     // ism passed as an argument to avoid calling via singleton (might result in a deadlock)
@@ -239,8 +244,8 @@ void InstanceSaveManager::LoadInstances()
     LoadInstanceSaves();
     LoadCharacterBinds();
 
-    sLog->outString(">> Loaded instances and binds in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    LOG_INFO("server", ">> Loaded instances and binds in %u ms", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", " ");
 }
 
 void InstanceSaveManager::LoadResetTimes()
@@ -263,7 +268,7 @@ void InstanceSaveManager::LoadResetTimes()
             MapDifficulty const* mapDiff = GetMapDifficultyData(mapid, difficulty);
             if (!mapDiff)
             {
-                sLog->outError("InstanceSaveManager::LoadResetTimes: invalid mapid(%u)/difficulty(%u) pair in instance_reset!", mapid, difficulty);
+                LOG_ERROR("server", "InstanceSaveManager::LoadResetTimes: invalid mapid(%u)/difficulty(%u) pair in instance_reset!", mapid, difficulty);
                 CharacterDatabase.DirectPExecute("DELETE FROM instance_reset WHERE mapid = '%u' AND difficulty = '%u'", mapid, difficulty);
                 continue;
             }
@@ -440,7 +445,7 @@ void InstanceSaveManager::Update()
     // pussywizard: send updated calendar and raid info
     if (resetOccurred)
     {
-        sLog->outString("Instance ID reset occurred, sending updated calendar and raid info to all players!");
+        LOG_INFO("server", "Instance ID reset occurred, sending updated calendar and raid info to all players!");
         WorldPacket dummy;
         for (SessionMap::const_iterator itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
             if (Player* plr = itr->second->GetPlayer())
@@ -514,7 +519,7 @@ void InstanceSaveManager::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, b
         MapDifficulty const* mapDiff = GetMapDifficultyData(mapid, difficulty);
         if (!mapDiff || !mapDiff->resetTime)
         {
-            sLog->outError("InstanceSaveManager::ResetOrWarnAll: not valid difficulty or no reset delay for map %d", mapid);
+            LOG_ERROR("server", "InstanceSaveManager::ResetOrWarnAll: not valid difficulty or no reset delay for map %d", mapid);
             return;
         }
 

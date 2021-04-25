@@ -61,7 +61,7 @@ RealmID = 1
 #    DataDir
 #        Description: Data directory setting.
 #        Important:   DataDir needs to be quoted, as the string might contain space characters.
-#        Example:     "/home/youruser/azeroth-server/data"
+#        Example:     "/home/youruser/azerothcore/data"
 #        Default:     "."
 
 DataDir = "."
@@ -71,7 +71,7 @@ DataDir = "."
 #        Description: Logs directory setting.
 #        Important:   LogsDir needs to be quoted, as the string might contain space characters.
 #                     Logs directory must exists, or log file creation will be disabled.
-#        Example:     "/home/youruser/azeroth-server/logs"
+#        Example:     "/home/youruser/azerothcore/logs"
 #        Default:     "" - (Log files will be stored in the current path)
 
 LogsDir = ""
@@ -450,392 +450,12 @@ SetAllCreaturesWithWaypointMovementActive = 0
 PidFile = ""
 
 #
-#    LogLevel
-#        Description: Server console level of logging
-#        Default:     1 - (Basic)
-#                     0 - (Minimum)
-#                     2 - (Detail)
-#                     3 - (Full/Debug)
-
-LogLevel = 1
-
-#
-#    LogFile
-#        Description: Log file for main server log.
-#        Default:     "Server.log" - (Enabled)
-#                     ""           - (Disabled)
-
-LogFile = "Server.log"
-
-#
-#    LogTimestamp
-#        Description: Append timestamp to the server log file name.
-#                     Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-LogTimestamp = 0
-
-#
-#    LogFileLevel
-#        Description: Server file level of logging
-#        Default:     0 - (Minimum)
-#                     1 - (Basic)
-#                     2 - (Detail)
-#                     3 - (Full/Debug)
-
-LogFileLevel = 0
-
-#
-#    Debug Log Mask
-#        Description: Bitmask that determines which debug log output (level 3)
-#                     will be logged.
-#        Possible flags:
-#                   1 - Anything related to units that doesn't fit in other
-#                          categories.
-#                   2 - Anything related to pets.
-#                   4 - Anything related to vehicles.
-#                   8 - Anything related to C++ AI, instance scripts, etc.
-#                  16 - Anything related to DB AI, such as SAI, EAI, CreatureAI
-#                  32 - Anything related to DB map scripts
-#                  64 - Anything related to network input/output,
-#                        such as packet handlers and netcode logs
-#                 128 - Anything related to the spellsystem and aurasystem
-#                 256 - Anything related to the achievement system
-#                 512 - Anything related to the condition system
-#                1024 - Anything related to the pool system
-#                2048 - Anything related to the auction house
-#                4096 - Anything related to arena's and battlegrounds
-#                8192 - Anything related to outdoor PVP
-#               16384 - Anything related to the chat system
-#               32768 - Anything related to the LFG system
-#               65536 - Anything related to maps, instances (not scripts),
-#                       grids, cells, visibility, etc.
-#              131072 - Anything related to player loading from DB
-#                      (Player::_LoadXXX functions)
-#              262144 - Anything related to items
-#              524288 - Anything related to player skills
-#                      (do not confuse with spells)
-#             1048576 - Anything related to loot
-#             2097152 - Anything related to guilds
-#             4194304 - Anything related to transports
-#             8388608 - Anything related to Warden anti cheat
-#            67108864 - Whenever KickPlayer() or CloseSocket() are called
-#
-#                       Simply add the values together to create a bitmask.
-#                       For more info see enum DebugLogFilters in Log.h
-#
-#             Default: 0 (nothing)
-
-DebugLogMask = 0
-
-#
-#    PacketLogFile
-#        Description: Binary packet logging file for the world server.
-#                     Filename extension must be .bin to be parsable with WowPacketParser.
-#        Example:     "World.bin" - (Enabled)
-#        Default:     ""          - (Disabled)
-
-PacketLogFile = ""
-
-#
-#    DBErrorLogFile
-#        Description: Log file for database errors.
-#        Default:     "DBErrors.log" - (Enabled)
-#                     ""             - (Disabled)
-
-DBErrorLogFile = "DBErrors.log"
-
-#
-#    CharLogFile
-#        Description: Log file for character operations
-#        Default:     "Char.log" - (Enabled)
-#                     ""         - (Disabled)
-
-CharLogFile = "Char.log"
-
-#
-#    CharLogTimestamp
-#        Description: Append timestamp to the character log file name.
-#                     Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-CharLogTimestamp = 0
-
-#
-#    CharLogDump
-#        Description: Write a character dump in the CharLogFile before deleting it.
-#                     For restoration, copy character data from log file starting from
-#                     line == START DUMP == to line == END DUMP == (exclusive)
-#                     and load it using the "pdump load" command.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-CharLogDump = 0
-
-#
-#    CharLogDump.Separate
-#        Description: Write character dump to separate files files rather than adding it to the
-#                     CharLogFile.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-CharLogDump.Separate = 0
-
-#
-#    CharLogDump.SeparateDir
-#        Description: Write dump files into the sub folder within the log folder.
-#        Example:     "chardumps" - (Enabled)
-#        Default:     ""         - (Disabled)
-
-CharLogDump.SeparateDir = ""
-
-#
-#    GmLogFile
-#        Description: Log file for gamemaster commands.
-#        Default:     "GM.log" - (Enabled)
-#                     ""       - (Disabled)
-
-GmLogFile = "GM.log"
-
-#
-#    GmLogTimestamp
-#        Description: Append timestamp to the gamemaster log file name.
-#                     Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-GmLogTimestamp = 0
-
-#
-#    GmLogPerAccount
-#        Description: Create a log file per gamemaster account.
-#        Important:   Logs not created if GmLogFile is not set.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-GmLogPerAccount = 0
-
-#
-#    RaLogFile
-#        Description: Log file for Remote Access commands.
-#        Default:     "RA.log" - (Enabled)
-#                     ""       - (Disabled)
-
-RaLogFile = "RA.log"
-
-#
-#    ArenaLogFile
-#        Description: Log file for arena fights and arena team creations.
-#        Example:     "Arena.log" - (Enabled)
-#        Default:     ""          - (Disabled)
-
-ArenaLogFile = ""
-
-#
-#    ArenaLog.ExtendedInfo
-#        Description: Include extended info to ArenaLogFile for each player after rated arena
-#                     matches (guid, name, team, IP, healing/damage done, killing blows).
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-ArenaLog.ExtendedInfo = 0
-
-#
-#    SQLDeveloperLogFile
-#        Description: Log file for core-generated SQL queries/dumps
-#        Example:     "SQLDev.log"    - (Enabled)
-#        Default:      ""             - (Disabled)
-
-SQLDeveloperLogFile = ""
-
-#
-#    SQLDriverLogFile
-#        Description: Log file for SQL driver events.
-#        Example:     "WorldSQLDriver.log" - (Enabled)
-#        Default:      ""             - (Disabled)
-
-SQLDriverLogFile = ""
-
-#
-#    SQLDriverQueryLogging
-#        Description: Log SQL queries to the SQLDriverLogFile and console.
-#        Default:     0 - (Disabled, Query errors only)
-#                     1 - (Enabled, Full query logging - may have performance impact)
-
-SQLDriverQueryLogging = 0
-
-#
-#    LogColors
-#        Description: Colors for log messages (Format: "normal basic detail debug").
-#        Colors:      0  - Black
-#                     1  - Red
-#                     2  - Green
-#                     3  - Brown
-#                     4  - Blue
-#                     5  - Magenta
-#                     6  - Cyan
-#                     7  - Grey
-#                     8  - Yellow
-#                     9  - Lred
-#                     10 - Lgreen
-#                     11 - Lblue
-#                     12 - Lmagenta
-#                     13 - Lcyan
-#                     14 - White
-#        Example:     "13 11 9 5" - (Enabled)
-#        Default:     ""          - (Disabled)
-
-LogColors = ""
-
-#
 #    EnableLogDB
 #        Description: Write log messages to database (LogDatabaseInfo).
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
 EnableLogDB = 0
-
-#
-#    DBLogLevel
-#        Description: Log level of databases logging.
-#        Default:     2 - (Detail)
-#                     0 - (Minimum)
-#                     1 - (Basic)
-#                     3 - (Full/Debug)
-
-DBLogLevel = 2
-
-#
-#    LogDB.Char
-#        Description: Log character operations to database.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-LogDB.Char = 0
-
-#
-#    LogDB.GM
-#        Description: Log gamemaster commands to database.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-LogDB.GM = 0
-
-#
-#    LogDB.RA
-#        Description: Log remote access events to database.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-LogDB.RA = 0
-
-#
-#    LogDB.World
-#        Description: Log world server packets to database.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled, May have performance impact)
-
-LogDB.World = 0
-
-#
-#    LogDB.Chat
-#        Description: Log chat messages to database.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-LogDB.Chat = 0
-
-#    ChatLogFile
-#        Description: Log file for chat logs.
-#        Default:     "Chat.log" - (Enabled)
-#                     ""         - (Disabled)
-
-ChatLogFile = "Chat.log"
-
-#    ChatLogTimestamp
-#        Description: Append timestamp to the chat log file name.
-#                     Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-ChatLogTimestamp = 0
-
-#
-#    ChatLogs.Channel
-#        Description: Log custom channel chat.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-ChatLogs.Channel = 0
-
-#
-#    ChatLogs.Whisper
-#        Description: Log whispers between players.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-ChatLogs.Whisper = 0
-
-#
-#    ChatLogs.SysChan
-#        Description: Log system channel messages.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-ChatLogs.SysChan = 0
-
-#
-#    ChatLogs.Party
-#        Description: Log party chat.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-ChatLogs.Party = 0
-
-#
-#    ChatLogs.Raid
-#        Description: Log raid chat.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-ChatLogs.Raid = 0
-
-#
-#    ChatLogs.Guild
-#        Description: Log guild chat.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-ChatLogs.Guild = 0
-
-#
-#    ChatLogs.Public
-#        Description: Log public chat (say/yell/emote).
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-ChatLogs.Public = 0
-
-#
-#    WARNING: enabling this might cause issues to your addon channel
-#    ChatLogs.Addon
-#        Description: Log addon messages.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-ChatLogs.Addon = 0
-
-#
-#    ChatLogs.BattleGround
-#        Description: Log battleground chat.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-ChatLogs.BattleGround = 0
-
-#
 ###################################################################################################
 
 ###################################################################################################
@@ -1617,15 +1237,6 @@ Warden.NumLuaChecks = 1
 #                     0 - (Disabled)
 
 Warden.NumOtherChecks = 7
-
-#
-#    Warden.LogFile
-#        Description: Client check fails will be logged here.
-#        Default:     ""           - (Disabled)
-#                     "Warden.log" - (Enabled)
-#
-
-Warden.LogFile = ""
 
 #
 #    Warden.ClientResponseDelay
@@ -3704,6 +3315,168 @@ Item.SetItemTradeable = 1
 FFAPvPTimer = 30
 
 #
+###################################################################################################
+
+###################################################################################################
+# LOGGING SYSTEM SETTINGS
+#
+#  Appender config values: Given an appender "name"
+#    Appender.name
+#        Description: Defines 'where to log'.
+#        Format:      Type,LogLevel,Flags,optional1,optional2,optional3
+#
+#                     Type
+#                         0 - (None)
+#                         1 - (Console)
+#                         2 - (File)
+#                         3 - (DB)
+#
+#                     LogLevel
+#                         0 - (Disabled)
+#                         1 - (Fatal)
+#                         2 - (Error)
+#                         3 - (Warning)
+#                         4 - (Info)
+#                         5 - (Debug)
+#                         6 - (Trace)
+#
+#                     Flags:
+#                         0 - None
+#                         1 - Prefix Timestamp to the text
+#                         2 - Prefix Log Level to the text
+#                         4 - Prefix Log Filter type to the text
+#                         8 - Append timestamp to the log file name. Format: YYYY-MM-DD_HH-MM-SS
+#                             (Only used with Type = 2)
+#                        16 - Make a backup of existing file before overwrite
+#                             (Only used with Mode = w)
+#
+#                     Colors (read as optional1 if Type = Console)
+#                         Format: "fatal error warn info debug trace"
+#                         0 - BLACK
+#                         1 - RED
+#                         2 - GREEN
+#                         3 - BROWN
+#                         4 - BLUE
+#                         5 - MAGENTA
+#                         6 - CYAN
+#                         7 - GREY
+#                         8 - YELLOW
+#                         9 - LRED
+#                        10 - LGREEN
+#                        11 - LBLUE
+#                        12 - LMAGENTA
+#                        13 - LCYAN
+#                        14 - WHITE
+#                         Example: "1 9 3 6 5 8"
+#
+#                     File: Name of the file (read as optional1 if Type = File)
+#                         Allows to use one "%s" to create dynamic files
+#
+#                     Mode: Mode to open the file (read as optional2 if Type = File)
+#                          a - (Append)
+#                          w - (Overwrite)
+#
+#                     MaxFileSize: Maximum file size of the log file before creating a new log file
+#                     (read as optional3 if Type = File)
+#                         Size is measured in bytes expressed in a 64-bit unsigned integer.
+#                         Maximum value is 4294967295 (4 GB). Leave blank for no limit.
+#                         NOTE: Does not work with dynamic filenames.
+#                         Example:  536870912 (512 MB)
+#
+
+Appender.Console=1,4,0,"1 9 3 6 5 8"
+Appender.Server=2,5,0,Server.log,w
+Appender.GM=2,5,15,gm_%s.log
+Appender.DBErrors=2,5,0,DBErrors.log
+
+#  Logger config values: Given a logger "name"
+#    Logger.name
+#        Description: Defines 'What to log'
+#        Format:      LogLevel,AppenderList
+#
+#                     LogLevel
+#                         0 - (Disabled)
+#                         1 - (Fatal)
+#                         2 - (Error)
+#                         3 - (Warning)
+#                         4 - (Info)
+#                         5 - (Debug)
+#                         6 - (Trace)
+#
+#                     AppenderList: List of appenders linked to logger
+#                     (Using spaces as separator).
+#
+
+Logger.root=2,Console Server
+Logger.server=4,Console Server
+Logger.commands.gm=4,Console GM
+Logger.scripts.hotswap=4,Console Server
+Logger.sql.sql=2,Console DBErrors
+Logger.sql.updates=4,Console Server
+Logger.mmaps=4,Server
+
+#Logger.achievement=4,Console Server
+#Logger.addon=4,Console Server
+#Logger.ahbot=4,Console Server
+#Logger.auctionHouse=4,Console Server
+#Logger.bg.arena=4,Console Server
+#Logger.bg.battlefield=4,Console Server
+#Logger.bg.battleground=4,Console Server
+#Logger.bg.reportpvpafk=4,Console Server
+#Logger.chat.log=4,Console Server
+#Logger.calendar=4,Console Server
+#Logger.chat.system=4,Console Server
+#Logger.cheat=4,Console Server
+#Logger.commands.ra=4,Console Server
+#Logger.condition=4,Console Server
+#Logger.entities.faction=4,Console Server
+#Logger.entities.gameobject=4,Console Server
+#Logger.entities.pet=4,Console Server
+#Logger.entities.player=4,Console Server
+#Logger.entities.player.character=4,Console Server
+#Logger.entities.player.dump=4,Console Server
+#Logger.entities.player.items=4,Console Server
+#Logger.entities.player.loading=4,Console Server
+#Logger.entities.player.skills=4,Console Server
+#Logger.entities.transport=4,Console Server
+#Logger.entities.unit=4,Console Server
+#Logger.entities.unit.ai=4,Console Server
+#Logger.entities.vehicle=4,Console Server
+#Logger.gameevent=4,Console Server
+#Logger.guild=4,Console Server
+#Logger.lfg=4,Console Server
+#Logger.loot=4,Console Server
+#Logger.maps.script=4,Console Server
+#Logger.maps=4,Console Server
+#Logger.misc=4,Console Server
+#Logger.mmaps.tiles=4,Console Server
+#Logger.movement.flightpath=4,Console Server
+#Logger.movement.motionmaster=4,Console Server
+#Logger.movement.splinechain=4,Console Server
+#Logger.network=4,Console Server
+#Logger.network.kick=4,Console Server
+#Logger.network.opcode=4,Console Server
+#Logger.network.soap=4,Console Server
+#Logger.outdoorpvp=4,Console Server
+#Logger.pool=4,Console Server
+#Logger.rbac=4,Console Server
+#Logger.scripts=4,Console Server
+#Logger.scripts.ai=4,Console Server
+#Logger.scripts.ai.escortai=4,Console Server
+#Logger.scripts.ai.followerai=4,Console Server
+#Logger.scripts.ai.petai=4,Console Server
+#Logger.scripts.ai.sai=4,Console Server
+#Logger.scripts.cos=4,Console Server
+#Logger.server.authserver=4,Console Server
+#Logger.spells=4,Console Server
+#Logger.spells.aura.effect=4,Console Server
+#Logger.spells.aura.effect.nospell=4,Console Server
+#Logger.spells.effect=4,Console Server
+#Logger.spells.effect.nospell=4,Console Server
+#Logger.sql.dev=4,Console Server
+#Logger.sql.driver=4,Console Server
+#Logger.warden=4,Console Server
+#Logger.vehicles=4,Console Server
 ###################################################################################################
 
 ###################################################################################################
