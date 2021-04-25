@@ -71,7 +71,7 @@ ARG SKIP_SRV_BUILD
 
 WORKDIR /azerothcore
 
-RUN if [[ ! -z $SKIP_SRV_BUILD ]]; then bin/acore-docker-build; fi
+RUN if [ "$SKIP_SRV_BUILD" != "1" ]; then bin/acore-docker-build; fi
 
 #================================================================
 #
