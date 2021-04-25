@@ -31,7 +31,7 @@ shellCommandFactory(
 );
 
 shellCommandFactory("build", "Build the authserver and worldserver", [
-    "docker-compose --profile all build --no-rm --progress plain",
+    "docker-compose --profile all build",
     "docker-compose run --rm ac-dev-server bash bin/acore-docker-update",
 ]);
 
@@ -145,11 +145,11 @@ while (true) {
 }
 
 /**
- * 
- * @param name 
- * @param description 
+ *
+ * @param name
+ * @param description
  * @param commands you can pass one or more commands, they will be executed sequentially
- * @returns 
+ * @returns
  */
 function shellCommandFactory(
     name: string,
