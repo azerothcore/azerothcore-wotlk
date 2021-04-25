@@ -38,7 +38,7 @@ shellCommandFactory(
 shellCommandFactory(
   "build:clean",
   "Clean build data",
-  `docker-compose run --rm ac-dev-server bash rm -rf var/build`,
+  `docker-compose run --rm ac-dev-server bash acore.sh compiler clean`,
 );
 
 shellCommandFactory(

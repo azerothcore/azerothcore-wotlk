@@ -1,16 +1,8 @@
 
 function comp_clean() {
-  echo "Cleaning build files"
+  echo "Cleaning build files in $BUILDPATH"
 
-  CWD=$(pwd)
-
-  cd $BUILDPATH
-
-  make -f Makefile clean || true
-  make clean || true
-  find -iname '*cmake*' -not -name CMakeLists.txt -exec rm -rf {} \+
-
-  cd $CWD
+  [ -d "$BUILDPATH" ] && rm -rf "$BUILDPATH/*"
 }
 
 function comp_configure() {
