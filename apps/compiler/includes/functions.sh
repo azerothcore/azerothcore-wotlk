@@ -1,8 +1,11 @@
 
 function comp_clean() {
-  echo "Cleaning build files in $BUILDPATH"
+  DIRTOCLEAN=${$BUILDPATH:-"var/build/obj"}
+  PATTERN="$DIRTOCLEAN/*"
 
-  [ -d "$BUILDPATH" ] && rm -rf "$BUILDPATH/*"
+  echo "Cleaning build files in $DIRTOCLEAN"
+
+  [ -d "$DIRTOCLEAN" ] && rm -rf "$PATTERN"
 }
 
 function comp_configure() {
