@@ -24,14 +24,14 @@ public:
         instance_oculus_InstanceMapScript(Map* pMap) : InstanceScript(pMap) { Initialize(); }
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
-        uint64 DragonCageDoorGUID[3];
-        uint64 EregosCacheGUID;
+        ObjectGuid DragonCageDoorGUID[3];
+        ObjectGuid EregosCacheGUID;
         uint32 CentrifugeCount;
 
-        uint64 uiDrakosGUID;
-        uint64 uiVarosGUID;
-        uint64 uiUromGUID;
-        uint64 uiEregosGUID;
+        ObjectGuid uiDrakosGUID;
+        ObjectGuid uiVarosGUID;
+        ObjectGuid uiUromGUID;
+        ObjectGuid uiEregosGUID;
 
         bool bAmberVoid;
         bool bEmeraldVoid;
@@ -39,18 +39,12 @@ public:
 
         void Initialize() override
         {
-            EregosCacheGUID = 0;
-            uiDrakosGUID    = 0;
-            uiVarosGUID     = 0;
-            uiUromGUID      = 0;
-            uiEregosGUID    = 0;
             CentrifugeCount = 0;
             bAmberVoid = false;
             bEmeraldVoid = false;
             bRubyVoid = false;
 
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-            memset(&DragonCageDoorGUID, 0, sizeof(DragonCageDoorGUID));
         }
 
         void OnCreatureCreate(Creature* pCreature) override
@@ -200,7 +194,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch( identifier )
             {
@@ -218,7 +212,7 @@ public:
                     return DragonCageDoorGUID[identifier - 100];
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override

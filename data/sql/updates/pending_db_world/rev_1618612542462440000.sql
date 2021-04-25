@@ -1,9 +1,0 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1618612542462440000');
-
-ALTER TABLE `spell_dbc`
-	CHANGE COLUMN `AttributesExB` `AttributesEx2` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `AttributesEx`,
-	CHANGE COLUMN `AttributesExC` `AttributesEx3` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `AttributesEx2`,
-	CHANGE COLUMN `AttributesExD` `AttributesEx4` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `AttributesEx3`,
-	CHANGE COLUMN `AttributesExE` `AttributesEx5` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `AttributesEx4`,
-	CHANGE COLUMN `AttributesExF` `AttributesEx6` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `AttributesEx5`,
-	CHANGE COLUMN `AttributesExG` `AttributesEx7` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `AttributesEx6`;

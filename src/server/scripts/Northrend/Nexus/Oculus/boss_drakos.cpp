@@ -92,7 +92,7 @@ public:
             {
                 pInstance->SetData(DATA_DRAKOS, DONE);
                 for( uint8 i = 0; i < 3; ++i )
-                    if( uint64 guid = pInstance->GetData64(DATA_DCD_1 + i) )
+                    if( ObjectGuid guid = pInstance->GetGuidData(DATA_DCD_1 + i) )
                         if( GameObject* pGo = ObjectAccessor::GetGameObject(*me, guid) )
                             if( pGo->GetGoState() != GO_STATE_ACTIVE )
                             {
