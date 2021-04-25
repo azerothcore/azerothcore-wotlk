@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#bash acore.sh compiler build && bash acore.sh db-assembler import-all
+bash acore.sh compiler build && bash acore.sh db-assembler import-all
 
 CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
