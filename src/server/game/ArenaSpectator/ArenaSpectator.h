@@ -27,14 +27,14 @@ namespace ArenaSpectator
     inline void SendPacketTo(const Player* p, const char* m);
     inline void SendPacketTo(const Map* map, const char* m);
     inline void HandleResetCommand(Player* p);
-    inline bool ShouldSendAura(Aura* aura, uint8 effMask, uint64 targetGUID, bool remove);
+    inline bool ShouldSendAura(Aura* aura, uint8 effMask, ObjectGuid targetGUID, bool remove);
 
-    template<class T> inline void SendCommand_String(T* p, uint64 targetGUID, const char* prefix, const std::string& c);
-    template<class T> inline void SendCommand_UInt32Value(T* o, uint64 targetGUID, const char* prefix, uint32 t);
-    template<class T> inline void SendCommand_GUID(T* o, uint64 targetGUID, const char* prefix, uint64 t);
-    template<class T> inline void SendCommand_Spell(T* o, uint64 targetGUID, const char* prefix, uint32 id, int32 casttime);
-    template<class T> inline void SendCommand_Cooldown(T* o, uint64 targetGUID, const char* prefix, uint32 id, uint32 dur, uint32 maxdur);
-    template<class T> inline void SendCommand_Aura(T* o, uint64 targetGUID, const char* prefix, uint64 caster, uint32 id, bool isDebuff, uint32 dispel, int32 dur, int32 maxdur, uint32 stack, bool remove);
+    template<class T> inline void SendCommand_String(T* p, ObjectGuid targetGUID, const char* prefix, const std::string& c);
+    template<class T> inline void SendCommand_UInt32Value(T* o, ObjectGuid targetGUID, const char* prefix, uint32 t);
+    template<class T> inline void SendCommand_GUID(T* o, ObjectGuid targetGUID, const char* prefix, ObjectGuid t);
+    template<class T> inline void SendCommand_Spell(T* o, ObjectGuid targetGUID, const char* prefix, uint32 id, int32 casttime);
+    template<class T> inline void SendCommand_Cooldown(T* o, ObjectGuid targetGUID, const char* prefix, uint32 id, uint32 dur, uint32 maxdur);
+    template<class T> inline void SendCommand_Aura(T* o, ObjectGuid targetGUID, const char* prefix, ObjectGuid caster, uint32 id, bool isDebuff, uint32 dispel, int32 dur, int32 maxdur, uint32 stack, bool remove);
 
     bool HandleSpectatorSpectateCommand(ChatHandler* handler, char const* args);
     bool HandleSpectatorWatchCommand(ChatHandler* handler, char const* args);
@@ -88,54 +88,54 @@ namespace ArenaSpectator
     }
 
     template<class T>
-    void SendCommand_String(T* o, uint64 targetGUID, const char* prefix, const char* c)
+    void SendCommand_String(T* o, ObjectGuid targetGUID, const char* prefix, const char* c)
     {
-        if (!IS_PLAYER_GUID(targetGUID))
+        if (!targetGUID.IsPlayer())
             return;
-        SendCommand(o, "%s0x%016llX;%s=%s;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, c);
+        SendCommand(o, "%s0x%016llX;%s=%s;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID.GetRawValue(), prefix, c);
     }
 
     template<class T>
-    void SendCommand_UInt32Value(T* o, uint64 targetGUID, const char* prefix, uint32 t)
+    void SendCommand_UInt32Value(T* o, ObjectGuid targetGUID, const char* prefix, uint32 t)
     {
-        if (!IS_PLAYER_GUID(targetGUID))
+        if (!targetGUID.IsPlayer())
             return;
-        SendCommand(o, "%s0x%016llX;%s=%u;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, t);
+        SendCommand(o, "%s0x%016llX;%s=%u;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID.GetRawValue(), prefix, t);
     }
 
     template<class T>
-    void SendCommand_GUID(T* o, uint64 targetGUID, const char* prefix, uint64 t)
+    void SendCommand_GUID(T* o, ObjectGuid targetGUID, const char* prefix, ObjectGuid t)
     {
-        if (!IS_PLAYER_GUID(targetGUID))
+        if (!targetGUID.IsPlayer())
             return;
-        SendCommand(o, "%s0x%016llX;%s=0x%016llX;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, (unsigned long long)t);
+        SendCommand(o, "%s0x%016llX;%s=0x%016llX;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID.GetRawValue(), prefix, (unsigned long long)t.GetRawValue());
     }
 
     template<class T>
-    void SendCommand_Spell(T* o, uint64 targetGUID, const char* prefix, uint32 id, int32 casttime)
+    void SendCommand_Spell(T* o, ObjectGuid targetGUID, const char* prefix, uint32 id, int32 casttime)
     {
-        if (!IS_PLAYER_GUID(targetGUID))
+        if (!targetGUID.IsPlayer())
             return;
-        SendCommand(o, "%s0x%016llX;%s=%u,%i;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, id, casttime);
+        SendCommand(o, "%s0x%016llX;%s=%u,%i;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID.GetRawValue(), prefix, id, casttime);
     }
 
     template<class T>
-    void SendCommand_Cooldown(T* o, uint64 targetGUID, const char* prefix, uint32 id, uint32 dur, uint32 maxdur)
+    void SendCommand_Cooldown(T* o, ObjectGuid targetGUID, const char* prefix, uint32 id, uint32 dur, uint32 maxdur)
     {
-        if (!IS_PLAYER_GUID(targetGUID))
+        if (!targetGUID.IsPlayer())
             return;
         if (const SpellInfo* si = sSpellMgr->GetSpellInfo(id))
             if (si->SpellIconID == 1)
                 return;
-        SendCommand(o, "%s0x%016llX;%s=%u,%u,%u;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, id, dur, maxdur);
+        SendCommand(o, "%s0x%016llX;%s=%u,%u,%u;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID.GetRawValue(), prefix, id, dur, maxdur);
     }
 
     template<class T>
-    void SendCommand_Aura(T* o, uint64 targetGUID, const char* prefix, uint64 caster, uint32 id, bool isDebuff, uint32 dispel, int32 dur, int32 maxdur, uint32 stack, bool remove)
+    void SendCommand_Aura(T* o, ObjectGuid targetGUID, const char* prefix, ObjectGuid caster, uint32 id, bool isDebuff, uint32 dispel, int32 dur, int32 maxdur, uint32 stack, bool remove)
     {
-        if (!IS_PLAYER_GUID(targetGUID))
+        if (!targetGUID.IsPlayer())
             return;
-        SendCommand(o, "%s0x%016llX;%s=%u,%u,%i,%i,%u,%u,%u,0x%016llX;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID, prefix, remove ? 1 : 0, stack, dur, maxdur, id, dispel, isDebuff ? 1 : 0, (unsigned long long)caster);
+        SendCommand(o, "%s0x%016llX;%s=%u,%u,%i,%i,%u,%u,%u,0x%016llX;", SPECTATOR_ADDON_PREFIX, (unsigned long long)targetGUID.GetRawValue(), prefix, remove ? 1 : 0, stack, dur, maxdur, id, dispel, isDebuff ? 1 : 0, (unsigned long long)caster.GetRawValue());
     }
 
     void HandleResetCommand(Player* p)
@@ -148,11 +148,11 @@ namespace ArenaSpectator
         Battleground::BattlegroundPlayerMap const& pl = bg->GetPlayers();
         for (Battleground::BattlegroundPlayerMap::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
         {
-            if (p->HasReceivedSpectatorResetFor(GUID_LOPART(itr->first)))
+            if (p->HasReceivedSpectatorResetFor(itr->first))
                 continue;
 
             Player* plr = itr->second;
-            p->AddReceivedSpectatorResetFor(GUID_LOPART(itr->first));
+            p->AddReceivedSpectatorResetFor(itr->first);
 
             SendCommand_String(p, itr->first, "NME", plr->GetName().c_str());
             // Xinef: addon compatibility
@@ -192,7 +192,7 @@ namespace ArenaSpectator
         }
     }
 
-    bool ShouldSendAura(Aura* aura, uint8 effMask, uint64 targetGUID, bool remove)
+    bool ShouldSendAura(Aura* aura, uint8 effMask, ObjectGuid targetGUID, bool remove)
     {
         if (aura->GetSpellInfo()->SpellIconID == 1 || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR1_DONT_DISPLAY_IN_AURA_BAR))
             return false;

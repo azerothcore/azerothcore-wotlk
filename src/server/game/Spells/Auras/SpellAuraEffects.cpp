@@ -387,7 +387,7 @@ AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32* baseAmount, Unit* cast
     // Xinef: channel data structure
     if (caster)
         if (Spell* spell = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-            m_channelData = new ChannelTargetData(caster->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT), spell->m_targets.HasDst() ? spell->m_targets.GetDst() : nullptr);
+            m_channelData = new ChannelTargetData(caster->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT), spell->m_targets.HasDst() ? spell->m_targets.GetDst() : nullptr);
 }
 
 AuraEffect::~AuraEffect()
@@ -445,7 +445,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
 
     // check item enchant aura cast
     if (!amount && caster)
-        if (uint64 itemGUID = GetBase()->GetCastItemGUID())
+        if (ObjectGuid itemGUID = GetBase()->GetCastItemGUID())
             if (Player* playerCaster = caster->ToPlayer())
                 if (Item* castItem = playerCaster->GetItemByGuid(itemGUID))
                     if (castItem->GetItemSuffixFactor())
@@ -807,7 +807,7 @@ void AuraEffect::ApplySpellMod(Unit* target, bool apply)
         case SPELLMOD_EFFECT2:
         case SPELLMOD_EFFECT3:
             {
-                uint64 guid = target->GetGUID();
+                ObjectGuid guid = target->GetGUID();
                 Unit::AuraApplicationMap& auras = target->GetAppliedAuras();
                 for (Unit::AuraApplicationMap::iterator iter = auras.begin(); iter != auras.end(); ++iter)
                 {
@@ -846,7 +846,7 @@ void AuraEffect::ApplySpellMod(Unit* target, bool apply)
                 if (!pet)
                     break;
 
-                uint64 petguid = pet->GetGUID();
+                ObjectGuid petguid = pet->GetGUID();
                 Unit::AuraApplicationMap& petauras = pet->GetAppliedAuras();
                 for (Unit::AuraApplicationMap::iterator iter = petauras.begin(); iter != petauras.end(); ++iter)
                 {
@@ -1509,7 +1509,7 @@ void AuraEffect::HandleModInvisibilityDetect(AuraApplication const* aurApp, uint
     }
 
     // call functions which may have additional effects after chainging state of unit
-    target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(target->GetOwnerGUID()));
+    target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer());
 }
 
 void AuraEffect::HandleModInvisibility(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -1568,11 +1568,11 @@ void AuraEffect::HandleModInvisibility(AuraApplication const* aurApp, uint8 mode
 
     if (!apply && aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT)
     {
-        target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(target->GetOwnerGUID() || target->GetMap()->Instanceable()), true);
+        target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable(), true);
         target->bRequestForcedVisibilityUpdate = false;
     }
     else
-        target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(target->GetOwnerGUID()) || target->GetMap()->Instanceable());
+        target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable());
 }
 
 void AuraEffect::HandleModStealthDetect(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -1597,7 +1597,7 @@ void AuraEffect::HandleModStealthDetect(AuraApplication const* aurApp, uint8 mod
     }
 
     // call functions which may have additional effects after chainging state of unit
-    target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(target->GetOwnerGUID()));
+    target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer());
 }
 
 void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -1647,11 +1647,11 @@ void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, boo
 
     if (!apply && aurApp->GetRemoveMode() == AURA_REMOVE_BY_DEFAULT)
     {
-        target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(target->GetOwnerGUID() || target->GetMap()->Instanceable()), true);
+        target->UpdateObjectVisibility((target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable()), true);
         target->bRequestForcedVisibilityUpdate = false;
     }
     else
-        target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(target->GetOwnerGUID() || target->GetMap()->Instanceable()));
+        target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer() || target->GetMap()->Instanceable());
 }
 
 void AuraEffect::HandleModStealthLevel(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -1668,7 +1668,7 @@ void AuraEffect::HandleModStealthLevel(AuraApplication const* aurApp, uint8 mode
         target->m_stealth.AddValue(type, -GetAmount());
 
     // call functions which may have additional effects after chainging state of unit
-    target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(target->GetOwnerGUID()));
+    target->UpdateObjectVisibility(target->GetTypeId() == TYPEID_PLAYER || target->GetOwnerGUID().IsPlayer());
 }
 
 void AuraEffect::HandleDetectAmore(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -1794,7 +1794,7 @@ void AuraEffect::HandlePhase(AuraApplication const* aurApp, uint8 mode, bool app
         {
             newPhase = PHASEMASK_NORMAL;
             if (Creature* creature = target->ToCreature())
-                if (CreatureData const* data = sObjectMgr->GetCreatureData(creature->GetDBTableGUIDLow()))
+                if (CreatureData const* data = sObjectMgr->GetCreatureData(creature->GetSpawnId()))
                     newPhase = data->phaseMask;
         }
 
@@ -1915,7 +1915,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         // remove other shapeshift before applying a new one
         // xinef: rogue shouldnt be wrapped by this check (shadow dance vs stealth)
         if (GetSpellInfo()->SpellFamilyName != SPELLFAMILY_ROGUE)
-            target->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT, 0, GetBase());
+            target->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT, ObjectGuid::Empty, GetBase());
 
         // stop handling the effect if it was removed by linked event
         if (aurApp->GetRemoveMode())
@@ -2298,7 +2298,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
         {
             // for players, start regeneration after 1s (in polymorph fast regeneration case)
             // only if caster is Player (after patch 2.4.2)
-            if (IS_PLAYER_GUID(GetCasterGUID()))
+            if (GetCasterGUID().IsPlayer())
                 target->ToPlayer()->setRegenTimerCount(1 * IN_MILLISECONDS);
 
             //dismount polymorphed target (after patch 2.4.2)
@@ -3731,7 +3731,7 @@ void AuraEffect::HandleAuraModStateImmunity(AuraApplication const* aurApp, uint8
     target->ApplySpellImmune(GetId(), IMMUNITY_STATE, GetMiscValue(), apply);
 
     if (apply && GetSpellInfo()->HasAttribute(SPELL_ATTR1_DISPEL_AURAS_ON_IMMUNITY))
-        target->RemoveAurasByType(AuraType(GetMiscValue()), 0, GetBase());
+        target->RemoveAurasByType(AuraType(GetMiscValue()), ObjectGuid::Empty, GetBase());
 }
 
 void AuraEffect::HandleAuraModSchoolImmunity(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -5180,7 +5180,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                                 {
                                     Unit* caster = GetBase()->GetCaster();
                                     if (caster && caster->GetTypeId() == TYPEID_PLAYER)
-                                        caster->ToPlayer()->KilledMonsterCredit(25987, 0);
+                                        caster->ToPlayer()->KilledMonsterCredit(25987);
                                 }
                                 return;
                             }
@@ -5569,13 +5569,13 @@ void AuraEffect::HandleAuraLinked(AuraApplication const* aurApp, uint8 mode, boo
         }
         else
         {
-            uint64 casterGUID = triggeredSpellInfo->NeedsToBeTriggeredByCaster(m_spellInfo, GetEffIndex()) ? GetCasterGUID() : target->GetGUID();
+            ObjectGuid casterGUID = triggeredSpellInfo->NeedsToBeTriggeredByCaster(m_spellInfo, GetEffIndex()) ? GetCasterGUID() : target->GetGUID();
             target->RemoveAura(triggeredSpellId, casterGUID, 0, aurApp->GetRemoveMode());
         }
     }
     else if (mode & AURA_EFFECT_HANDLE_REAPPLY && apply)
     {
-        uint64 casterGUID = triggeredSpellInfo->NeedsToBeTriggeredByCaster(m_spellInfo, GetEffIndex()) ? GetCasterGUID() : target->GetGUID();
+        ObjectGuid casterGUID = triggeredSpellInfo->NeedsToBeTriggeredByCaster(m_spellInfo, GetEffIndex()) ? GetCasterGUID() : target->GetGUID();
         // change the stack amount to be equal to stack amount of our aura
         if (Aura* triggeredAura = target->GetAura(triggeredSpellId, casterGUID))
             triggeredAura->ModStackAmount(GetBase()->GetStackAmount() - triggeredAura->GetStackAmount());
@@ -5690,7 +5690,7 @@ void AuraEffect::HandleAuraSetVehicle(AuraApplication const* aurApp, uint8 mode,
         target->RemoveVehicleKit();
 
     WorldPacket data(SMSG_PLAYER_VEHICLE_DATA, target->GetPackGUID().size() + 4);
-    data.appendPackGUID(target->GetGUID());
+    data << target->GetPackGUID();
     data << uint32(apply ? vehicleId : 0);
     target->SendMessageToSet(&data, true);
 
@@ -5972,7 +5972,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                         case 28820:
                             {
                                 // Need remove self if Lightning Shield not active
-                                if (!target->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_SHAMAN, 0x400))
+                                if (!target->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_SHAMAN, 0x400, 0, 0))
                                     target->RemoveAurasDueToSpell(28820);
                                 return;
                             }
@@ -6255,8 +6255,8 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     Unit::CalcAbsorbResist(caster, target, GetSpellInfo()->GetSchoolMask(), DOT, damage, &absorb, &resist, GetSpellInfo());
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "PeriodicTick: %u (TypeId: %u) attacked %u (TypeId: %u) for %u dmg inflicted by %u abs is %u",
-                    GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), target->GetGUIDLow(), target->GetTypeId(), damage, GetId(), absorb);
+    LOG_DEBUG("server", "PeriodicTick: %s attacked %s for %u dmg inflicted by %u abs is %u",
+                    GetCasterGUID().ToString().c_str(), target->GetGUID().ToString().c_str(), damage, GetId(), absorb);
 #endif
     Unit::DealDamageMods(target, damage, &absorb);
 
@@ -6351,8 +6351,8 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
         damage = target->GetHealth();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "PeriodicTick: %u (TypeId: %u) health leech of %u (TypeId: %u) for %u dmg inflicted by %u abs is %u",
-                    GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), target->GetGUIDLow(), target->GetTypeId(), damage, GetId(), absorb);
+    LOG_DEBUG("server", "PeriodicTick: %s health leech of %s for %u dmg inflicted by %u abs is %u",
+                    GetCasterGUID().ToString().c_str(), target->GetGUID().ToString().c_str(), damage, GetId(), absorb);
 #endif
     if (caster)
         caster->SendSpellNonMeleeDamageLog(target, GetId(), damage + absorb + resist, GetSpellInfo()->GetSchoolMask(), absorb, resist, false, 0, crit);
@@ -6498,8 +6498,8 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
         damage = Unit::SpellCriticalHealingBonus(caster, GetSpellInfo(), damage, target);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "PeriodicTick: %u (TypeId: %u) heal of %u (TypeId: %u) for %u health inflicted by %u",
-                    GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), target->GetGUIDLow(), target->GetTypeId(), damage, GetId());
+    LOG_DEBUG("server", "PeriodicTick: %s heal of %s for %u health inflicted by %u",
+                    GetCasterGUID().ToString().c_str(), target->GetGUID().ToString().c_str(), damage, GetId());
 #endif
     uint32 absorb = 0;
     uint32 heal = uint32(damage);
@@ -6516,7 +6516,7 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     if (caster)
         target->getHostileRefManager().threatAssist(caster, float(gain) * 0.5f, GetSpellInfo());
 
-    bool haveCastItem = GetBase()->GetCastItemGUID() != 0;
+    bool haveCastItem = GetBase()->GetCastItemGUID();
 
     // Health Funnel
     // damage caster for heal amount
@@ -6578,8 +6578,8 @@ void AuraEffect::HandlePeriodicManaLeechAuraTick(Unit* target, Unit* caster) con
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "PeriodicTick: %u (TypeId: %u) power leech of %u (TypeId: %u) for %u dmg inflicted by %u",
-                    GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), target->GetGUIDLow(), target->GetTypeId(), drainAmount, GetId());
+    LOG_DEBUG("server", "PeriodicTick: %s power leech of %s for %u dmg inflicted by %u",
+                    GetCasterGUID().ToString().c_str(), target->GetGUID().ToString().c_str(), drainAmount, GetId());
 #endif
     // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
     if (PowerType == POWER_MANA)
@@ -6645,8 +6645,8 @@ void AuraEffect::HandleObsModPowerAuraTick(Unit* target, Unit* caster) const
     // ignore negative values (can be result apply spellmods to aura damage
     uint32 amount = std::max(m_amount, 0) * target->GetMaxPower(PowerType) / 100;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "PeriodicTick: %u (TypeId: %u) energize %u (TypeId: %u) for %u dmg inflicted by %u",
-                    GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), target->GetGUIDLow(), target->GetTypeId(), amount, GetId());
+    LOG_DEBUG("server", "PeriodicTick: %s energize %s for %u dmg inflicted by %u",
+                    GetCasterGUID().ToString().c_str(), target->GetGUID().ToString().c_str(), amount, GetId());
 #endif
     SpellPeriodicAuraLogInfo pInfo(this, amount, 0, 0, 0, 0.0f, false);
     target->SendPeriodicAuraLog(&pInfo);
@@ -6684,8 +6684,8 @@ void AuraEffect::HandlePeriodicEnergizeAuraTick(Unit* target, Unit* caster) cons
     target->SendPeriodicAuraLog(&pInfo);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "PeriodicTick: %u (TypeId: %u) energize %u (TypeId: %u) for %u dmg inflicted by %u",
-                    GUID_LOPART(GetCasterGUID()), GuidHigh2TypeId(GUID_HIPART(GetCasterGUID())), target->GetGUIDLow(), target->GetTypeId(), amount, GetId());
+    LOG_DEBUG("server", "PeriodicTick: %s energize %s for %u dmg inflicted by %u",
+                    GetCasterGUID().ToString().c_str(), target->GetGUID().ToString().c_str(), amount, GetId());
 #endif
     int32 gain = target->ModifyPower(PowerType, amount);
 

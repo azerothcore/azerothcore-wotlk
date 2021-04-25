@@ -139,7 +139,7 @@ public:
             if (type != POINT_MOTION_TYPE)
                 return;
 
-            me->SetTarget(0);
+            me->SetTarget();
             me->SetFacingTo(5.558f);
             me->SetStandState(UNIT_STAND_STATE_KNEEL);
             events.ScheduleEvent(point == EQUIP_TWO_SWORDS ? EVENT_SWAP_WEAPON1 : EVENT_SWAP_WEAPON2, 1500);

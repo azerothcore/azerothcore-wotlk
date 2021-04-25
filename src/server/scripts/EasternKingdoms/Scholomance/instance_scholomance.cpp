@@ -6,6 +6,7 @@
 #include "InstanceScript.h"
 #include "Player.h"
 #include "scholomance.h"
+#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -23,13 +24,6 @@ public:
     struct instance_scholomance_InstanceMapScript : public InstanceScript
     {
         instance_scholomance_InstanceMapScript(Map* map) : InstanceScript(map),
-            GateKirtonosGUID { 0 },
-            GateMiliciaGUID  { 0 },
-            GateTheolenGUID  { 0 },
-            GatePolkeltGUID  { 0 },
-            GateRavenianGUID { 0 },
-            GateBarovGUID    { 0 },
-            GateIlluciaGUID  { 0 },
             _kirtonosState   { 0 },
             _miniBosses      { 0 },
             _rasHuman        { 0 }
@@ -63,7 +57,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -83,7 +77,7 @@ public:
                     return GateIlluciaGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -145,13 +139,13 @@ public:
         }
 
     protected:
-        uint64 GateKirtonosGUID;
-        uint64 GateMiliciaGUID;
-        uint64 GateTheolenGUID;
-        uint64 GatePolkeltGUID;
-        uint64 GateRavenianGUID;
-        uint64 GateBarovGUID;
-        uint64 GateIlluciaGUID;
+        ObjectGuid GateKirtonosGUID;
+        ObjectGuid GateMiliciaGUID;
+        ObjectGuid GateTheolenGUID;
+        ObjectGuid GatePolkeltGUID;
+        ObjectGuid GateRavenianGUID;
+        ObjectGuid GateBarovGUID;
+        ObjectGuid GateIlluciaGUID;
 
         uint32 _kirtonosState;
         uint32 _miniBosses;
@@ -290,37 +284,37 @@ public:
                 {
                     case ROOM_HALL_OF_SECRETS:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_RAVENIAN)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_RAVENIAN)))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_HALLOFSECRETS;
                         break;
                     case ROOM_HALL_OF_THE_DAMNED:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_THEOLEN)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_THEOLEN)))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_HALLOFTHEDAMNED;
                         break;
                     case ROOM_THE_COVEN:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_MALICIA)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_MALICIA)))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_THECOVEN;
                         break;
                     case ROOM_THE_SHADOW_VAULT:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_ILLUCIA)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_ILLUCIA)))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_THESHADOWVAULT;
                         break;
                     case ROOM_BAROV_FAMILY_VAULT:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_BAROV)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_BAROV)))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_BAROVFAMILYVAULT;
                         break;
                     case ROOM_VAULT_OF_THE_RAVENIAN:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_POLKELT)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_POLKELT)))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_VAULTOFTHERAVENIAN;
                         break;
@@ -441,7 +435,7 @@ public:
                 }
 
                 if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                    if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(gateId)))
+                    if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(gateId)))
                     {
                         gate->SetGoState(GO_STATE_READY);
                         gate->AI()->SetData(1, 1);
@@ -508,6 +502,134 @@ public:
     }
 };
 
+enum OccultistEntries
+{
+    CASTER_ENTRY      = 10472,
+    DARK_SHADE_ENTRY  = 11284
+};
+
+enum OccultistSpells
+{
+    BONE_ARMOR_SPELL         = 16431,
+    COUNTER_SPELL            = 15122,
+    DRAIN_MANA_SPELL         = 17243,
+    SHADOWBOLT_VOLLEY_SPELL  = 17228
+};
+
+class npc_scholomance_occultist : public CreatureScript
+{
+public:
+    npc_scholomance_occultist() : CreatureScript("npc_scholomance_occultist") { }
+
+    struct npc_scholomance_occultistAI: public ScriptedAI
+    {
+        npc_scholomance_occultistAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = me->GetInstanceScript();
+        }
+
+        uint32 originalDisplayId;
+        EventMap events;
+        InstanceScript* instance;
+
+        Unit* SelectUnitCasting()
+        {
+          ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
+          for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+          {
+              if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+              {
+                  if (unit->HasUnitState(UNIT_STATE_CASTING))
+                  {
+                      return unit;
+                  }
+              }
+          }
+          return nullptr;
+        }
+
+        void JustReachedHome() override
+        {
+            events.Reset();
+            if (me->GetEntry() != CASTER_ENTRY)
+            {
+                me->UpdateEntry(CASTER_ENTRY, nullptr, false);
+                me->SetDisplayId(originalDisplayId);
+            }
+        }
+
+        void EnterCombat(Unit* /*who*/) override
+        {
+            originalDisplayId = me->GetDisplayId();
+
+            events.Reset();
+            events.RescheduleEvent(1, urand(1000, 7000));
+            events.RescheduleEvent(2, 400);
+            events.RescheduleEvent(3, urand(6000, 15000));
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+            {
+                return;
+            }
+
+            events.Update(diff);
+
+            if (me->HealthBelowPct(30) && !(me->GetEntry() == DARK_SHADE_ENTRY))
+            {
+                events.Reset();
+                me->InterruptNonMeleeSpells(false);
+                me->UpdateEntry(DARK_SHADE_ENTRY, nullptr, false);
+                events.RescheduleEvent(4, urand(2000, 10000));
+            }
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                return;
+            }
+
+            switch(events.ExecuteEvent())
+            {
+                case 1:
+                    me->CastSpell(me, BONE_ARMOR_SPELL, false);
+                    events.RepeatEvent(60000);
+                    break;
+                case 2:
+                    if (Unit* target = SelectUnitCasting())
+                    {
+                        me->CastSpell(target, COUNTER_SPELL, false);
+                        events.RepeatEvent(urand(10000, 20000));
+                    }
+                    else
+                    {
+                        events.RepeatEvent(400);
+                    }
+                    break;
+                case 3:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, PowerUsersSelector(me, POWER_MANA, 20.0f, false)))
+                    {
+                        me->CastSpell(target, DRAIN_MANA_SPELL, false);
+                    }
+                    events.RepeatEvent(urand(13000, 20000));
+                    break;
+                case 4:
+                    me->CastSpell(me->GetVictim(), SHADOWBOLT_VOLLEY_SPELL, true);
+                    events.RepeatEvent(urand(11000, 17000));
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetScholomanceAI<npc_scholomance_occultistAI>(creature);
+    }
+};
+
+
 void AddSC_instance_scholomance()
 {
     new instance_scholomance();
@@ -517,4 +639,5 @@ void AddSC_instance_scholomance()
     new spell_scholomance_shadow_portal();
     new spell_scholomance_shadow_portal_rooms();
     new spell_scholomance_boon_of_life();
+    new npc_scholomance_occultist();
 }
