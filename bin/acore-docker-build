@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 
-docker build -t acbuild -f docker/build/Dockerfile .
+bash acore.sh compiler build && bash acore.sh db-assembler import-all
 
-docker run \
-    -v /"$(pwd)"/docker/build/cache:/azerothcore/build \
-    -v /"$(pwd)"/docker/worldserver/bin:/binworldserver \
-    -v /"$(pwd)"/docker/authserver/bin:/binauthserver \
-    acbuild
+CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+ENV_PATH=$(readlink -f "$CUR_PATH/../env")
+
+echo "Generating confs..."
+cp -n "$ENV_PATH/docker/etc/worldserver.conf.dockerdist" "$ENV_PATH/dist/etc/worldserver.conf"
+cp -n "$ENV_PATH/docker/etc/authserver.conf.dockerdist" "$ENV_PATH/dist/etc/authserver.conf"
+
+echo "Fixing EOL..."
+dos2unix "$ENV_PATH/dist/etc/"*
+

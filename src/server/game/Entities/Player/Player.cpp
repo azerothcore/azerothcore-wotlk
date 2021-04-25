@@ -924,11 +924,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_ChampioningFaction = 0;
 
-    m_timeSyncCounter = 0;
-    m_timeSyncTimer = 0;
-    m_timeSyncClient = 0;
-    m_timeSyncServer = 0;
-
     for (uint8 i = 0; i < MAX_POWERS; ++i)
         m_powerFraction[i] = 0;
 
@@ -1827,14 +1822,6 @@ void Player::Update(uint32 p_time)
         }
         else
             m_zoneUpdateTimer -= p_time;
-    }
-
-    if (m_timeSyncTimer > 0)
-    {
-        if (p_time >= m_timeSyncTimer)
-            SendTimeSync();
-        else
-            m_timeSyncTimer -= p_time;
     }
 
     if (IsAlive())
@@ -5238,9 +5225,10 @@ void Player::BuildPlayerRepop()
     WorldPacket data(SMSG_PRE_RESURRECT, GetPackGUID().size());
     data << GetPackGUID();
     GetSession()->SendPacket(&data);
-
     if (getRace(true) == RACE_NIGHTELF)
+    {
         CastSpell(this, 20584, true);
+    }
     CastSpell(this, 8326, true);
 
     // there must be SMSG.FORCE_RUN_SPEED_CHANGE, SMSG.FORCE_SWIM_SPEED_CHANGE, SMSG.MOVE_WATER_WALK
@@ -5262,30 +5250,22 @@ void Player::BuildPlayerRepop()
         return;
     }
     GetMap()->AddToMap(corpse);
-
-    // convert player body to ghost
-    SetHealth(1);
-
+    SetHealth(1); // convert player body to ghost
     SetMovement(MOVE_WATER_WALK);
+    SetWaterWalking(true);
     if (!GetSession()->isLogingOut())
+    {
         SetMovement(MOVE_UNROOT);
-
-    // BG - remove insignia related
-    RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
-
+    }
+    RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE); // BG - remove insignia related
     int32 corpseReclaimDelay = CalculateCorpseReclaimDelay();
-
     if (corpseReclaimDelay >= 0)
+    {
         SendCorpseReclaimDelay(corpseReclaimDelay);
-
-    // to prevent cheating
-    corpse->ResetGhostTime();
-
-    StopMirrorTimers();                                     //disable timers(bars)
-
-    // set and clear other
-    SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND);
-
+    }
+    corpse->ResetGhostTime(); // to prevent cheating
+    StopMirrorTimers(); // disable timers on bars
+    SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_ALWAYS_STAND); // set and clear other
     sScriptMgr->OnPlayerReleasedGhost(this);
 }
 
@@ -5309,12 +5289,9 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_REFER_A_FRIEND);
 
     setDeathState(ALIVE);
-
     SetMovement(MOVE_LAND_WALK);
     SetMovement(MOVE_UNROOT);
-
     SetWaterWalking(false);
-
     m_deathTimer = 0;
 
     // set health/powers (0- will be set in caller)
@@ -23852,8 +23829,8 @@ void Player::SendInitialPacketsAfterAddToMap()
 {
     UpdateVisibilityForPlayer(true);
 
-    ResetTimeSync();
-    SendTimeSync();
+    GetSession()->ResetTimeSync();
+    GetSession()->SendTimeSync();
 
     CastSpell(this, 836, true);                             // LOGINEFFECT
 
@@ -27618,25 +27595,6 @@ uint8 Player::GetMostPointsTalentTree() const
             maxCount = specPoints[i];
         }
     return maxIndex;
-}
-
-void Player::ResetTimeSync()
-{
-    m_timeSyncCounter = 0;
-    m_timeSyncTimer = 0;
-    m_timeSyncClient = 0;
-    m_timeSyncServer = World::GetGameTimeMS();
-}
-
-void Player::SendTimeSync()
-{
-    WorldPacket data(SMSG_TIME_SYNC_REQ, 4);
-    data << uint32(m_timeSyncCounter++);
-    GetSession()->SendPacket(&data);
-
-    // Schedule next sync in 10 sec
-    m_timeSyncTimer = 10000;
-    m_timeSyncServer = World::GetGameTimeMS();
 }
 
 void Player::SetReputation(uint32 factionentry, uint32 value)
