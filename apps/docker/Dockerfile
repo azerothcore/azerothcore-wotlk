@@ -22,16 +22,14 @@ ENV TZ=Etc/UTC
 # set noninteractive mode so tzdata doesn't ask to set timezone on install
 ENV DEBIAN_FRONTEND=noninteractive
 
-# install essentials
-RUN apt-get update && apt-get install -y gdb gdbserver git dos2unix lsb-core sudo curl unzip
-
-# copy everything so we can work directly within the container
-# using tools such as vscode dev-container
-# NOTE: this folder is different by the /azerothcore (which is binded instead)
-COPY . /azerothcore-internal
-
-# install the required dependencies
-RUN /azerothcore-internal/acore.sh install-deps
+# Do not use acore dashboard to install
+# since it's not cacheable by docker
+RUN apt-get update
+RUN apt-get install -y gdb gdbserver git dos2unix lsb-core sudo curl unzip \
+  make cmake clang libmysqlclient-dev libace-dev \
+  build-essential libtool cmake-data openssl libgoogle-perftools-dev \
+  libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client \
+  libncurses5-dev ccache
 
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
@@ -49,13 +47,17 @@ RUN mkdir -p /azerothcore-internal/env/dist/etc
 RUN mkdir -p /azerothcore
 
 # Correct permissions for non-root operations
-RUN chown -R acore:acore /home/acore
-RUN chown -R acore:acore /run
-RUN chown -R acore:acore /opt
-RUN chown -R acore:acore /azerothcore
-RUN chown -R acore:acore /azerothcore-internal
+RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore
+RUN chown -R $DOCKER_USER:$DOCKER_USER /run
+RUN chown -R $DOCKER_USER:$DOCKER_USER /opt
+RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 
 USER $DOCKER_USER
+
+# copy everything so we can work directly within the container
+# using tools such as vscode dev-container
+# NOTE: this folder is different by the /azerothcore (which is binded instead)
+COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore-internal
 
 #================================================================
 #
