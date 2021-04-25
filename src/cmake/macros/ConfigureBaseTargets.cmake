@@ -9,15 +9,12 @@ add_library(acore-compile-option-interface INTERFACE)
 # Use -std=c++11 instead of -std=gnu++11
 set(CXX_EXTENSIONS OFF)
 
-# Enable support С++17
-set(CMAKE_CXX_STANDARD 17)
-message(STATUS "Enabled С++17 support")
-
 # An interface library to make the target features available to other targets
 add_library(acore-feature-interface INTERFACE)
 
 target_compile_features(acore-feature-interface
   INTERFACE
+    cxx_std_17
     cxx_alias_templates
     cxx_auto_type
     cxx_constexpr
