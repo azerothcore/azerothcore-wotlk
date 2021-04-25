@@ -35,12 +35,12 @@ protected:
 
 class MotionTransport : public Transport
 {
-    friend MotionTransport* TransportMgr::CreateTransport(uint32, uint32, Map*);
+    friend MotionTransport* TransportMgr::CreateTransport(uint32, ObjectGuid::LowType, Map*);
     MotionTransport();
 public:
     ~MotionTransport() override;
 
-    bool CreateMoTrans(uint32 guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
+    bool CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
 
@@ -50,8 +50,8 @@ public:
 
     void AddPassenger(WorldObject* passenger, bool withAll = false) override;
     void RemovePassenger(WorldObject* passenger, bool withAll = false) override;
-    Creature* CreateNPCPassenger(uint32 guid, CreatureData const* data);
-    GameObject* CreateGOPassenger(uint32 guid, GameObjectData const* data);
+    Creature* CreateNPCPassenger(ObjectGuid::LowType guid, CreatureData const* data);
+    GameObject* CreateGOPassenger(ObjectGuid::LowType guid, GameObjectData const* data);
 
     void LoadStaticPassengers();
     PassengerSet const& GetStaticPassengers() const { return _staticPassengers; }
@@ -102,7 +102,7 @@ public:
     StaticTransport();
     ~StaticTransport() override;
 
-    bool Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0) override;
+    bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0) override;
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
 

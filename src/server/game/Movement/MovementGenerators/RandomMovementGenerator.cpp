@@ -202,7 +202,7 @@ void RandomMovementGenerator<Creature>::DoInitialize(Creature* creature)
     if (!_wanderDistance)
         _wanderDistance = creature->GetWanderDistance();
 
-    _nextMoveTime.Reset(creature->GetDBTableGUIDLow() && creature->GetWanderDistance() == _wanderDistance ? urand(1, 5000) : 0);
+    _nextMoveTime.Reset(creature->GetSpawnId() && creature->GetWanderDistance() == _wanderDistance ? urand(1, 5000) : 0);
     _wanderDistance = std::max((creature->GetWanderDistance() == _wanderDistance && creature->GetInstanceId() == 0) ? (creature->CanFly() ? MIN_WANDER_DISTANCE_AIR : MIN_WANDER_DISTANCE_GROUND) : 0.0f, _wanderDistance);
 
     if (G3D::fuzzyEq(_initialPosition.GetExactDist2d(0.0f, 0.0f), 0.0f))

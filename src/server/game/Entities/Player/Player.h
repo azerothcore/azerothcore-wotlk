@@ -156,7 +156,7 @@ typedef std::unordered_map<uint32, PlayerTalent*> PlayerTalentMap;
 typedef std::unordered_map<uint32, PlayerSpell*> PlayerSpellMap;
 typedef std::list<SpellModifier*> SpellModList;
 
-typedef std::list<uint64> WhisperListContainer;
+typedef GuidList WhisperListContainer;
 
 struct SpellCooldown
 {
@@ -503,7 +503,8 @@ enum AtLoginFlags
     AT_LOGIN_CHANGE_RACE       = 0x80,
     AT_LOGIN_RESET_AP          = 0x100,
     AT_LOGIN_RESET_ARENA       = 0x200,
-    AT_LOGIN_CHECK_ACHIEVS     = 0x400
+    AT_LOGIN_CHECK_ACHIEVS     = 0x400,
+    AT_LOGIN_RESURRECT         = 0x800
 };
 
 typedef std::map<uint32, QuestStatusData> QuestStatusMap;
@@ -642,17 +643,13 @@ enum EquipmentSetUpdateState
 
 struct EquipmentSet
 {
-    EquipmentSet()
-    {
-        for (unsigned int & Item : Items)
-            Item = 0;
-    }
+    EquipmentSet() { }
 
-    uint64 Guid{0};
+    uint64 Guid;
     std::string Name;
     std::string IconName;
     uint32 IgnoreMask{0};
-    uint32 Items[EQUIPMENT_SLOT_END];
+    ObjectGuid Items[EQUIPMENT_SLOT_END];
     EquipmentSetUpdateState state{EQUIPMENT_SET_NEW};
 };
 
@@ -791,7 +788,8 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_SEASONAL_QUEST_STATUS   = 31,
     PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS    = 32,
     PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH       = 34,
-    MAX_PLAYER_LOGIN_QUERY,
+    PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 35,
+    MAX_PLAYER_LOGIN_QUERY
 };
 
 enum PlayerDelayedOperations
@@ -983,7 +981,7 @@ struct BGData
     bool isInvited{false};
     bool bgIsRandom{false};
 
-    std::set<uint32>   bgAfkReporter;
+    GuidSet            bgAfkReporter;
     uint8              bgAfkReportedCount{0};
     time_t             bgAfkReportedTimer{0};
 };
@@ -1007,23 +1005,23 @@ struct EntryPointData
 class TradeData
 {
 public:                                                 // constructors
-    TradeData(Player* player, Player* trader) :
-        m_player(player),  m_trader(trader), m_accepted(false), m_acceptProccess(false),
-        m_money(0), m_spell(0), m_spellCastItem(0) { memset(m_items, 0, TRADE_SLOT_COUNT * sizeof(uint64)); }
+    TradeData(Player* player, Player* trader) : m_player(player),  m_trader(trader), m_accepted(false), m_acceptProccess(false), m_money(0), m_spell(0)
+    {
+    }
 
     [[nodiscard]] Player* GetTrader() const { return m_trader; }
     [[nodiscard]] TradeData* GetTraderData() const;
 
     [[nodiscard]] Item* GetItem(TradeSlots slot) const;
-    [[nodiscard]] bool HasItem(uint64 itemGuid) const;
-    [[nodiscard]] TradeSlots GetTradeSlotForItem(uint64 itemGuid) const;
+    [[nodiscard]] bool HasItem(ObjectGuid itemGuid) const;
+    [[nodiscard]] TradeSlots GetTradeSlotForItem(ObjectGuid itemGuid) const;
     void SetItem(TradeSlots slot, Item* item);
 
     [[nodiscard]] uint32 GetSpell() const { return m_spell; }
     void SetSpell(uint32 spell_id, Item* castItem = nullptr);
 
     [[nodiscard]] Item*  GetSpellCastItem() const;
-    [[nodiscard]] bool HasSpellCastItem() const { return m_spellCastItem != 0; }
+    [[nodiscard]] bool HasSpellCastItem() const { return m_spellCastItem; }
 
     [[nodiscard]] uint32 GetMoney() const { return m_money; }
     void SetMoney(uint32 money);
@@ -1047,9 +1045,9 @@ private:                                                // fields
     uint32     m_money;                                 // m_player place money to trade
 
     uint32     m_spell;                                 // m_player apply spell to non-traded slot item
-    uint64     m_spellCastItem;                         // applied spell casted by item use
+    ObjectGuid m_spellCastItem;                         // applied spell casted by item use
 
-    uint64     m_items[TRADE_SLOT_COUNT];               // traded itmes from m_player side including non-traded slot
+    ObjectGuid m_items[TRADE_SLOT_COUNT];               // traded itmes from m_player side including non-traded slot
 };
 
 class KillRewarder
@@ -1128,10 +1126,10 @@ public:
     }
     [[nodiscard]] bool IsSummonAsSpectator() const { return m_summon_asSpectator && m_summon_expire >= time(nullptr); }
     void SetSummonAsSpectator(bool on) { m_summon_asSpectator = on; }
-    void SummonIfPossible(bool agree, uint32 summoner_guid);
+    void SummonIfPossible(bool agree, ObjectGuid summoner_guid);
     [[nodiscard]] time_t GetSummonExpireTimer() const { return m_summon_expire; }
 
-    bool Create(uint32 guidlow, CharacterCreateInfo* createInfo);
+    bool Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo);
 
     void Update(uint32 time) override;
 
@@ -1150,8 +1148,8 @@ public:
     void SendInstanceResetWarning(uint32 mapid, Difficulty difficulty, uint32 time, bool onEnterMap);
 
     bool CanInteractWithQuestGiver(Object* questGiver);
-    Creature* GetNPCIfCanInteractWith(uint64 guid, uint32 npcflagmask);
-    [[nodiscard]] GameObject* GetGameObjectIfCanInteractWith(uint64 guid, GameobjectTypes type) const;
+    Creature* GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask);
+    [[nodiscard]] GameObject* GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTypes type) const;
 
     void ToggleAFK();
     void ToggleDND();
@@ -1220,14 +1218,14 @@ public:
 
     [[nodiscard]] Pet* GetPet() const;
     bool IsPetDismissed();
-    void SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime, uint32 createdBySpell, uint64 casterGUID, uint8 asynchLoadType);
+    void SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 despwtime, uint32 createdBySpell, ObjectGuid casterGUID, uint8 asynchLoadType);
     void RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent = false);
     [[nodiscard]] uint32 GetPhaseMaskForSpawn() const;                // used for proper set phase for DB at GM-mode creature/GO spawn
 
     void Say(std::string const& text, const uint32 language);
     void Yell(std::string const& text, const uint32 language);
     void TextEmote(std::string const& text);
-    void Whisper(std::string const& text, const uint32 language, uint64 receiver);
+    void Whisper(std::string const& text, const uint32 language, ObjectGuid receiver);
 
     /*********************************************************/
     /***                    STORAGE SYSTEM                 ***/
@@ -1238,7 +1236,7 @@ public:
     uint8 FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) const;
     uint32 GetItemCount(uint32 item, bool inBankAlso = false, Item* skipItem = nullptr) const;
     uint32 GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem = nullptr) const;
-    [[nodiscard]] Item* GetItemByGuid(uint64 guid) const;
+    [[nodiscard]] Item* GetItemByGuid(ObjectGuid guid) const;
     [[nodiscard]] Item* GetItemByEntry(uint32 entry) const;
     [[nodiscard]] Item* GetItemByPos(uint16 pos) const;
     [[nodiscard]] Item* GetItemByPos(uint8 bag, uint8 slot) const;
@@ -1314,8 +1312,8 @@ public:
     InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = nullptr) const;
     InventoryResult CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item* pItem = nullptr, bool swap = false, uint32* no_space_count = nullptr) const;
 
-    void AddRefundReference(uint32 it);
-    void DeleteRefundReference(uint32 it);
+    void AddRefundReference(ObjectGuid itemGUID);
+    void DeleteRefundReference(ObjectGuid itemGUID);
 
     void ApplyEquipCooldown(Item* pItem);
     void SetAmmo(uint32 item);
@@ -1349,7 +1347,7 @@ public:
     [[nodiscard]] uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END - KEYRING_SLOT_START; }
     void SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2 = nullptr, uint32 itemid = 0);
     void SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32 param);
-    void SendSellError(SellResult msg, Creature* creature, uint64 guid, uint32 param);
+    void SendSellError(SellResult msg, Creature* creature, ObjectGuid guid, uint32 param);
     void AddWeaponProficiency(uint32 newflag) { m_WeaponProficiency |= newflag; }
     void AddArmorProficiency(uint32 newflag) { m_ArmorProficiency |= newflag; }
     [[nodiscard]] uint32 GetWeaponProficiency() const { return m_WeaponProficiency; }
@@ -1361,7 +1359,7 @@ public:
         return mainItem && mainItem->GetTemplate()->InventoryType == INVTYPE_2HWEAPON && !CanTitanGrip();
     }
     void SendNewItem(Item* item, uint32 count, bool received, bool created, bool broadcast = false, bool sendChatMessage = true);
-    bool BuyItemFromVendorSlot(uint64 vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot);
+    bool BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot);
     bool _StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot, int32 price, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
 
     float GetReputationPriceDiscount(Creature const* creature) const;
@@ -1388,7 +1386,7 @@ public:
     void AddItemDurations(Item* item);
     void RemoveItemDurations(Item* item);
     void SendItemDurations();
-    void LoadCorpse();
+    void LoadCorpse(PreparedQueryResult result);
     void LoadPet();
 
     bool AddItem(uint32 itemId, uint32 count);
@@ -1415,10 +1413,10 @@ public:
 
     int32 GetQuestLevel(Quest const* quest) const { return quest && (quest->GetQuestLevel() > 0) ? quest->GetQuestLevel() : getLevel(); }
 
-    void PrepareQuestMenu(uint64 guid);
-    void SendPreparedQuest(uint64 guid);
+    void PrepareQuestMenu(ObjectGuid guid);
+    void SendPreparedQuest(ObjectGuid guid);
     [[nodiscard]] bool IsActiveQuest(uint32 quest_id) const;
-    Quest const* GetNextQuest(uint64 guid, Quest const* quest);
+    Quest const* GetNextQuest(ObjectGuid guid, Quest const* quest);
     bool CanSeeStartQuest(Quest const* quest);
     bool CanTakeQuest(Quest const* quest, bool msg);
     bool CanAddQuest(Quest const* quest, bool msg);
@@ -1509,11 +1507,11 @@ public:
     void GroupEventHappens(uint32 questId, WorldObject const* pEventObject);
     void ItemAddedQuestCheck(uint32 entry, uint32 count);
     void ItemRemovedQuestCheck(uint32 entry, uint32 count);
-    void KilledMonster(CreatureTemplate const* cInfo, uint64 guid);
-    void KilledMonsterCredit(uint32 entry, uint64 guid);
+    void KilledMonster(CreatureTemplate const* cInfo, ObjectGuid guid);
+    void KilledMonsterCredit(uint32 entry, ObjectGuid guid = ObjectGuid::Empty);
     void KilledPlayerCredit();
-    void KillCreditGO(uint32 entry, uint64 guid = 0);
-    void TalkedToCreature(uint32 entry, uint64 guid);
+    void KillCreditGO(uint32 entry, ObjectGuid guid = ObjectGuid::Empty);
+    void TalkedToCreature(uint32 entry, ObjectGuid guid);
     void MoneyChanged(uint32 value);
     void ReputationChanged(FactionEntry const* factionEntry);
     void ReputationChanged2(FactionEntry const* factionEntry);
@@ -1530,11 +1528,11 @@ public:
     void SendQuestConfirmAccept(Quest const* quest, Player* pReceiver);
     void SendPushToPartyResponse(Player const* player, uint8 msg) const;
     void SendQuestUpdateAddItem(Quest const* quest, uint32 item_idx, uint16 count);
-    void SendQuestUpdateAddCreatureOrGo(Quest const* quest, uint64 guid, uint32 creatureOrGO_idx, uint16 old_count, uint16 add_count);
+    void SendQuestUpdateAddCreatureOrGo(Quest const* quest, ObjectGuid guid, uint32 creatureOrGO_idx, uint16 old_count, uint16 add_count);
     void SendQuestUpdateAddPlayer(Quest const* quest, uint16 old_count, uint16 add_count);
 
-    uint64 GetDivider() { return m_divider; }
-    void SetDivider(uint64 guid) { m_divider = guid; }
+    ObjectGuid GetDivider() { return m_divider; }
+    void SetDivider(ObjectGuid guid = ObjectGuid::Empty) { m_divider = guid; }
 
     uint32 GetInGameTime() { return m_ingametime; }
 
@@ -1549,15 +1547,15 @@ public:
     /***                   LOAD SYSTEM                     ***/
     /*********************************************************/
 
-    bool LoadFromDB(uint32 guid, SQLQueryHolder* holder);
+    bool LoadFromDB(ObjectGuid guid, SQLQueryHolder* holder);
     [[nodiscard]] bool isBeingLoaded() const override;
 
-    void Initialize(uint32 guid);
+    void Initialize(ObjectGuid::LowType guid);
     static uint32 GetUInt32ValueFromArray(Tokenizer const& data, uint16 index);
     static float  GetFloatValueFromArray(Tokenizer const& data, uint16 index);
-    static uint32 GetZoneIdFromDB(uint64 guid);
-    static uint32 GetLevelFromStorage(uint64 guid);
-    static bool   LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, uint64 guid);
+    static uint32 GetZoneIdFromDB(ObjectGuid guid);
+    static uint32 GetLevelFromStorage(ObjectGuid::LowType guid);
+    static bool   LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid::LowType guid);
 
     static bool IsValidGender(uint8 Gender) { return Gender <= GENDER_FEMALE; }
 
@@ -1571,17 +1569,17 @@ public:
 
     static void SetUInt32ValueInArray(Tokenizer& data, uint16 index, uint32 value);
     static void SetFloatValueInArray(Tokenizer& data, uint16 index, float value);
-    static void Customize(uint64 guid, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
-    static void SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, uint64 guid);
+    static void Customize(ObjectGuid guid, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
+    static void SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, ObjectGuid guid);
 
-    static void DeleteFromDB(uint64 playerguid, uint32 accountId, bool updateRealmChars, bool deleteFinally);
+    static void DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool updateRealmChars, bool deleteFinally);
     static void DeleteOldCharacters();
     static void DeleteOldCharacters(uint32 keepDays);
 
     bool m_mailsUpdated;
 
-    void SetBindPoint(uint64 guid);
-    void SendTalentWipeConfirm(uint64 guid);
+    void SetBindPoint(ObjectGuid guid);
+    void SendTalentWipeConfirm(ObjectGuid guid);
     void ResetPetTalents();
     void CalcRage(uint32 damage, bool attacker);
     void RegenerateAll();
@@ -1620,17 +1618,17 @@ public:
     [[nodiscard]] Unit* GetSelectedUnit() const;
     [[nodiscard]] Player* GetSelectedPlayer() const;
 
-    void SetTarget(uint64 /*guid*/) override { } /// Used for serverside target changes, does not apply to players
-    void SetSelection(uint64 guid);
+    void SetTarget(ObjectGuid /*guid*/ = ObjectGuid::Empty) override { } /// Used for serverside target changes, does not apply to players
+    void SetSelection(ObjectGuid guid);
 
     [[nodiscard]] uint8 GetComboPoints() const { return m_comboPoints; }
-    [[nodiscard]] uint64 GetComboTarget() const { return m_comboTarget; }
+    [[nodiscard]] ObjectGuid GetComboTarget() const { return m_comboTarget; }
 
     void AddComboPoints(Unit* target, int8 count);
     void ClearComboPoints();
     void SendComboPoints();
 
-    void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, uint32 item_guid = 0, uint32 item_count = 0);
+    void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, ObjectGuid::LowType item_guid = 0, uint32 item_count = 0);
     void SendNewMail();
     void UpdateNextMailTimeAndUnreads();
     void AddNewMailDeliverTime(time_t deliver_time);
@@ -1653,13 +1651,13 @@ public:
     uint32 totalMailCount;
     time_t m_nextMailDelivereTime;
 
-    typedef std::unordered_map<uint32, Item*> ItemMap;
+    typedef std::unordered_map<ObjectGuid::LowType, Item*> ItemMap;
 
     ItemMap mMitems;                                    //template defined in objectmgr.cpp
 
-    Item* GetMItem(uint32 id)
+    Item* GetMItem(ObjectGuid::LowType itemLowGuid)
     {
-        ItemMap::const_iterator itr = mMitems.find(id);
+        ItemMap::const_iterator itr = mMitems.find(itemLowGuid);
         return itr != mMitems.end() ? itr->second : nullptr;
     }
 
@@ -1667,12 +1665,12 @@ public:
     {
         ASSERT(it);
         //ASSERT deleted, because items can be added before loading
-        mMitems[it->GetGUIDLow()] = it;
+        mMitems[it->GetGUID().GetCounter()] = it;
     }
 
-    bool RemoveMItem(uint32 id)
+    bool RemoveMItem(ObjectGuid::LowType itemLowGuid)
     {
-        return !!mMitems.erase(id);
+        return !!mMitems.erase(itemLowGuid);
     }
 
     void PetSpellInitialize();
@@ -1710,7 +1708,7 @@ public:
     void BuildPetTalentsInfoData(WorldPacket* data);
     void SendTalentsInfoData(bool pet);
     void LearnTalent(uint32 talentId, uint32 talentRank);
-    void LearnPetTalent(uint64 petGuid, uint32 talentId, uint32 talentRank);
+    void LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRank);
 
     bool addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank);
     void _removeTalent(PlayerTalentMap::iterator& itr, uint8 specMask);
@@ -1806,7 +1804,7 @@ public:
     void SetLastPotionId(uint32 item_id) { m_lastPotionId = item_id; }
     void UpdatePotionCooldown();
 
-    void setResurrectRequestData(uint64 guid, uint32 mapId, float X, float Y, float Z, uint32 health, uint32 mana)
+    void setResurrectRequestData(ObjectGuid guid, uint32 mapId, float X, float Y, float Z, uint32 health, uint32 mana)
     {
         m_resurrectGUID = guid;
         m_resurrectMap = mapId;
@@ -1816,9 +1814,9 @@ public:
         m_resurrectHealth = health;
         m_resurrectMana = mana;
     }
-    void clearResurrectRequestData() { setResurrectRequestData(0, 0, 0.0f, 0.0f, 0.0f, 0, 0); }
-    [[nodiscard]] bool isResurrectRequestedBy(uint64 guid) const { return m_resurrectGUID && m_resurrectGUID == guid; }
-    [[nodiscard]] bool isResurrectRequested() const { return m_resurrectGUID != 0; }
+    void clearResurrectRequestData() { setResurrectRequestData(ObjectGuid::Empty, 0, 0.0f, 0.0f, 0.0f, 0, 0); }
+    [[nodiscard]] bool isResurrectRequestedBy(ObjectGuid guid) const { return m_resurrectGUID && m_resurrectGUID == guid; }
+    [[nodiscard]] bool isResurrectRequested() const { return m_resurrectGUID; }
     void ResurectUsingRequestData();
 
     [[nodiscard]] uint8 getCinematic() const
@@ -1881,7 +1879,7 @@ public:
     bool IsInSameGroupWith(Player const* p) const;
     bool IsInSameRaidWith(Player const* p) const { return p == this || (GetGroup() != nullptr && GetGroup() == p->GetGroup()); }
     void UninviteFromGroup();
-    static void RemoveFromGroup(Group* group, uint64 guid, RemoveMethod method = GROUP_REMOVEMETHOD_DEFAULT, uint64 kicker = 0, const char* reason = nullptr);
+    static void RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method = GROUP_REMOVEMETHOD_DEFAULT, ObjectGuid kicker = ObjectGuid::Empty, const char* reason = nullptr);
     void RemoveFromGroup(RemoveMethod method = GROUP_REMOVEMETHOD_DEFAULT) { RemoveFromGroup(GetGroup(), GetGUID(), method); }
     void SendUpdateToOutOfRangeGroupMembers();
 
@@ -1889,18 +1887,18 @@ public:
     {
         SetUInt32Value(PLAYER_GUILDID, GuildId);
         // xinef: update global storage
-        sWorld->UpdateGlobalPlayerGuild(GetGUIDLow(), GuildId);
+        sWorld->UpdateGlobalPlayerGuild(GetGUID().GetCounter(), GuildId);
     }
     void SetRank(uint8 rankId) { SetUInt32Value(PLAYER_GUILDRANK, rankId); }
     [[nodiscard]] uint8 GetRank() const { return uint8(GetUInt32Value(PLAYER_GUILDRANK)); }
     void SetGuildIdInvited(uint32 GuildId) { m_GuildIdInvited = GuildId; }
     [[nodiscard]] uint32 GetGuildId() const { return GetUInt32Value(PLAYER_GUILDID);  }
     [[nodiscard]] Guild* GetGuild() const;
-    static uint32 GetGuildIdFromStorage(uint32 guid);
-    static uint32 GetGroupIdFromStorage(uint32 guid);
-    static uint32 GetArenaTeamIdFromStorage(uint32 guid, uint8 slot);
+    static uint32 GetGuildIdFromStorage(ObjectGuid::LowType guid);
+    static uint32 GetGroupIdFromStorage(ObjectGuid::LowType guid);
+    static uint32 GetArenaTeamIdFromStorage(ObjectGuid::LowType guid, uint8 slot);
     uint32 GetGuildIdInvited() { return m_GuildIdInvited; }
-    static void RemovePetitionsAndSigns(uint64 guid, uint32 type);
+    static void RemovePetitionsAndSigns(ObjectGuid guid, uint32 type);
 
     // Arena Team
     void SetInArenaTeam(uint32 ArenaTeamId, uint8 slot, uint8 type)
@@ -1910,8 +1908,8 @@ public:
     }
     void SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value);
     uint32 GetArenaPersonalRating(uint8 slot) const;
-    static uint32 GetArenaTeamIdFromDB(uint64 guid, uint8 slot);
-    static void LeaveAllArenaTeams(uint64 guid);
+    static uint32 GetArenaTeamIdFromDB(ObjectGuid guid, uint8 slot);
+    static void LeaveAllArenaTeams(ObjectGuid guid);
     [[nodiscard]] uint32 GetArenaTeamId(uint8 slot) const;
     void SetArenaTeamIdInvited(uint32 ArenaTeamId) { m_ArenaTeamIdInvited = ArenaTeamId; }
     uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
@@ -1989,8 +1987,8 @@ public:
     void UpdateManaRegen();
     void UpdateRuneRegen(RuneType rune);
 
-    [[nodiscard]] uint64 GetLootGUID() const { return m_lootGuid; }
-    void SetLootGUID(uint64 guid) { m_lootGuid = guid; }
+    [[nodiscard]] ObjectGuid GetLootGUID() const { return m_lootGuid; }
+    void SetLootGUID(ObjectGuid guid) { m_lootGuid = guid; }
 
     void RemovedInsignia(Player* looterPlr);
 
@@ -2012,7 +2010,7 @@ public:
 
     void SendDungeonDifficulty(bool IsInGroup);
     void SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty = -1);
-    static void ResetInstances(uint64 guid, uint8 method, bool isRaid);
+    static void ResetInstances(ObjectGuid guid, uint8 method, bool isRaid);
     void SendResetInstanceSuccess(uint32 MapId);
     void SendResetInstanceFailed(uint32 reason, uint32 MapId);
     void SendResetFailedNotify(uint32 mapid);
@@ -2029,9 +2027,12 @@ public:
     void SendTeleportAckPacket();
 
     [[nodiscard]] Corpse* GetCorpse() const;
-    void SpawnCorpseBones();
-    void CreateCorpse();
+    void SpawnCorpseBones(bool triggerSave = true);
+    Corpse* CreateCorpse();
     void KillPlayer();
+    static void OfflineResurrect(ObjectGuid const guid, SQLTransaction& trans);
+    bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
+    WorldLocation GetCorpseLocation() const { return _corpseLocation; }
     uint32 GetResurrectionSpellId();
     void ResurrectPlayer(float restore_percent, bool applySickness = false);
     void BuildPlayerRepop();
@@ -2228,9 +2229,9 @@ public:
     PlayerMenu* PlayerTalkClass;
     std::vector<ItemSetEffect*> ItemSetEff;
 
-    void SendLoot(uint64 guid, LootType loot_type);
-    void SendLootError(uint64 guid, LootError error);
-    void SendLootRelease(uint64 guid);
+    void SendLoot(ObjectGuid guid, LootType loot_type);
+    void SendLootError(ObjectGuid guid, LootError error);
+    void SendLootRelease(ObjectGuid guid);
     void SendNotifyLootItemRemoved(uint8 lootSlot);
     void SendNotifyLootMoneyRemoved();
 
@@ -2394,12 +2395,11 @@ public:
     void SetEntryPoint();
 
     // currently visible objects at player client
-    typedef std::unordered_set<uint64> ClientGUIDs;
-    ClientGUIDs m_clientGUIDs;
+    GuidUnorderedSet m_clientGUIDs;
     std::vector<Unit*> m_newVisible; // pussywizard
 
     bool HaveAtClient(WorldObject const* u) const { return u == this || m_clientGUIDs.find(u->GetGUID()) != m_clientGUIDs.end(); }
-    [[nodiscard]] bool HaveAtClient(uint64 guid) const { return guid == GetGUID() || m_clientGUIDs.find(guid) != m_clientGUIDs.end(); }
+    [[nodiscard]] bool HaveAtClient(ObjectGuid guid) const { return guid == GetGUID() || m_clientGUIDs.find(guid) != m_clientGUIDs.end(); }
 
     [[nodiscard]] bool IsNeverVisible() const override;
 
@@ -2560,8 +2560,8 @@ public:
     bool isDebugAreaTriggers;
 
     void ClearWhisperWhiteList() { WhisperList.clear(); }
-    void AddWhisperWhiteList(uint64 guid) { WhisperList.push_back(guid); }
-    bool IsInWhisperWhiteList(uint64 guid);
+    void AddWhisperWhiteList(ObjectGuid guid) { WhisperList.push_back(guid); }
+    bool IsInWhisperWhiteList(ObjectGuid guid);
 
     bool SetDisableGravity(bool disable, bool packetOnly /* = false */) override;
     bool SetCanFly(bool apply, bool packetOnly = false) override;
@@ -2583,18 +2583,18 @@ public:
     [[nodiscard]] bool HasPendingSpectatorForBG(uint32 bgInstanceId) const { return m_pendingSpectatorForBG == bgInstanceId; }
     void SetPendingSpectatorInviteInstanceId(uint32 bgInstanceId) { m_pendingSpectatorInviteInstanceId = bgInstanceId; }
     [[nodiscard]] uint32 GetPendingSpectatorInviteInstanceId() const { return m_pendingSpectatorInviteInstanceId; }
-    bool HasReceivedSpectatorResetFor(uint32 guid) { return m_receivedSpectatorResetFor.find(guid) != m_receivedSpectatorResetFor.end(); }
+    bool HasReceivedSpectatorResetFor(ObjectGuid guid) { return m_receivedSpectatorResetFor.find(guid) != m_receivedSpectatorResetFor.end(); }
     void ClearReceivedSpectatorResetFor() { m_receivedSpectatorResetFor.clear(); }
-    void AddReceivedSpectatorResetFor(uint32 guid) { m_receivedSpectatorResetFor.insert(guid); }
-    void RemoveReceivedSpectatorResetFor(uint32 guid) { m_receivedSpectatorResetFor.erase(guid); }
+    void AddReceivedSpectatorResetFor(ObjectGuid guid) { m_receivedSpectatorResetFor.insert(guid); }
+    void RemoveReceivedSpectatorResetFor(ObjectGuid guid) { m_receivedSpectatorResetFor.erase(guid); }
     uint32 m_pendingSpectatorForBG;
     uint32 m_pendingSpectatorInviteInstanceId;
-    std::set<uint32> m_receivedSpectatorResetFor;
+    GuidSet m_receivedSpectatorResetFor;
 
     // Dancing Rune weapon
-    void setRuneWeaponGUID(uint64 guid) { m_drwGUID = guid; };
-    uint64 getRuneWeaponGUID() { return m_drwGUID; };
-    uint64 m_drwGUID;
+    void setRuneWeaponGUID(ObjectGuid guid) { m_drwGUID = guid; };
+    ObjectGuid getRuneWeaponGUID() { return m_drwGUID; };
+    ObjectGuid m_drwGUID;
 
     [[nodiscard]] bool CanSeeDKPet() const    { return m_ExtraFlags & PLAYER_EXTRA_SHOW_DK_PET; }
     void SetShowDKPet(bool on)  { if (on) m_ExtraFlags |= PLAYER_EXTRA_SHOW_DK_PET; else m_ExtraFlags &= ~PLAYER_EXTRA_SHOW_DK_PET; };
@@ -2682,7 +2682,7 @@ protected:
     QuestSet m_monthlyquests;
     SeasonalEventQuestMap m_seasonalquests;
 
-    uint64 m_divider;
+    ObjectGuid m_divider;
     uint32 m_ingametime;
 
     /*********************************************************/
@@ -2755,7 +2755,7 @@ protected:
     time_t m_lastHonorUpdateTime;
 
     void outDebugValues() const;
-    uint64 m_lootGuid;
+    ObjectGuid m_lootGuid;
 
     TeamId m_team;
     uint32 m_nextSave; // pussywizard
@@ -2778,7 +2778,7 @@ protected:
 
     uint32 m_ExtraFlags;
 
-    uint64 m_comboTarget;
+    ObjectGuid m_comboTarget;
     int8 m_comboPoints;
 
     QuestStatusMap m_QuestStatus;
@@ -2823,7 +2823,7 @@ protected:
     ItemDurationList m_itemSoulboundTradeable;
     std::mutex m_soulboundTradableLock;
 
-    uint64 m_resurrectGUID;
+    ObjectGuid m_resurrectGUID;
     uint32 m_resurrectMap;
     float m_resurrectX, m_resurrectY, m_resurrectZ;
     uint32 m_resurrectHealth, m_resurrectMana;
@@ -2915,7 +2915,7 @@ private:
     Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
     Item* _LoadItem(SQLTransaction& trans, uint32 zoneId, uint32 timeDiff, Field* fields);
 
-    typedef std::set<uint32> RefundableItemsSet;
+    typedef GuidSet RefundableItemsSet;
     RefundableItemsSet m_refundableItems;
     void SendRefundInfo(Item* item);
     void RefundItem(Item* item);
@@ -2984,6 +2984,8 @@ private:
     FlyByCameraCollection* m_cinematicCamera;
     Position m_remoteSightPosition;
     Creature* m_CinematicObject;
+
+    WorldLocation _corpseLocation;
 };
 
 void AddItemsSetItem(Player* player, Item* item);

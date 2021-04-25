@@ -444,12 +444,12 @@ public:
 
     void DisappearAndDie();
 
-    bool Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
+    bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
     bool LoadCreaturesAddon(bool reload = false);
     void SelectLevel(bool changelevel = true);
     void LoadEquipment(int8 id = 1, bool force = false);
 
-    [[nodiscard]] uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
+    [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
     void Update(uint32 time) override;                         // overwrited Unit::Update
     void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr, float* dist = nullptr) const;
@@ -527,7 +527,7 @@ public:
     {
         ::Spell const* Spell = nullptr;
         uint32 Delay = 0;         // ms until the creature's target should snap back (0 = no snapback scheduled)
-        uint64 Target;            // the creature's "real" target while casting
+        ObjectGuid Target;        // the creature's "real" target while casting
         float Orientation = 0.0f; // the creature's "real" orientation while casting
     } _spellFocusInfo;
 
@@ -584,15 +584,15 @@ public:
 
     void setDeathState(DeathState s, bool despawn = false) override;                   // override virtual Unit::setDeathState
 
-    bool LoadFromDB(uint32 guid, Map* map) { return LoadCreatureFromDB(guid, map, false, true); }
-    bool LoadCreatureFromDB(uint32 guid, Map* map, bool addToMap = true, bool gridLoad = false);
+    bool LoadFromDB(ObjectGuid::LowType guid, Map* map, bool allowDuplicate = false) { return LoadCreatureFromDB(guid, map, false, true, allowDuplicate); }
+    bool LoadCreatureFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true, bool gridLoad = false, bool allowDuplicate = false);
     void SaveToDB();
     // overriden in Pet
     virtual void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
     virtual void DeleteFromDB();                        // overriden in Pet
 
     Loot loot;
-    [[nodiscard]] uint64 GetLootRecipientGUID() const { return m_lootRecipient; }
+    [[nodiscard]] ObjectGuid GetLootRecipientGUID() const { return m_lootRecipient; }
     [[nodiscard]] Player* GetLootRecipient() const;
     [[nodiscard]] Group* GetLootRecipientGroup() const;
     [[nodiscard]] bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
@@ -733,7 +733,7 @@ public:
     bool m_isTempWorldObject; //true when possessed
 
     // Handling caster facing during spellcast
-    void SetTarget(uint64 guid) override;
+    void SetTarget(ObjectGuid guid = ObjectGuid::Empty) override;
     void FocusTarget(Spell const* focusSpell, WorldObject const* target);
     void ReleaseFocus(Spell const* focusSpell);
     bool IsMovementPreventedByCasting() const;
@@ -757,7 +757,7 @@ public:
     void RefreshSwimmingFlag(bool recheck = false);
 
 protected:
-    bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
+    bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
     bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
 
     // vendor items
@@ -765,7 +765,7 @@ protected:
 
     static float _GetHealthMod(int32 Rank);
 
-    uint64 m_lootRecipient;
+    ObjectGuid m_lootRecipient;
     uint32 m_lootRecipientGroup;
 
     /// Timers
@@ -782,7 +782,7 @@ protected:
     void RegenerateHealth();
     void Regenerate(Powers power);
     MovementGeneratorType m_defaultMovementType;
-    uint32 m_DBTableGuid;                               ///< For new or temporary creatures is 0 for saved it is lowguid
+    ObjectGuid::LowType m_spawnId;                      ///< For new or temporary creatures is 0 for saved it is lowguid
     uint8 m_equipmentId;
     int8 m_originalEquipmentId; // can be -1
 
@@ -838,15 +838,16 @@ private:
 class AssistDelayEvent : public BasicEvent
 {
 public:
-    AssistDelayEvent(uint64 victim, Creature* owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
+    AssistDelayEvent(ObjectGuid victim, Creature* owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
 
     bool Execute(uint64 e_time, uint32 p_time) override;
-    void AddAssistant(uint64 guid) { m_assistants.push_back(guid); }
+    void AddAssistant(ObjectGuid guid) { m_assistants.push_back(guid); }
+
 private:
     AssistDelayEvent();
 
-    uint64            m_victim;
-    std::list<uint64> m_assistants;
+    ObjectGuid        m_victim;
+    GuidList          m_assistants;
     Creature*         m_owner;
 };
 
