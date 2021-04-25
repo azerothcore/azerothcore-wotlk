@@ -74,13 +74,13 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recvData)
 
     if (_player->IsBankPos(INVENTORY_SLOT_BAG_0, srcslot) && !CanUseBank())
     {
-        //TC_LOG_DEBUG("network", "WORLD: HandleSwapInvItemOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(m_currentBankerGUID)));
+        //TC_LOG_DEBUG("network", "WORLD: HandleSwapInvItemOpcode - Unit (%s) not found or you can't interact with him.", m_currentBankerGUID.ToString().c_str());
         return;
     }
 
     if (_player->IsBankPos(INVENTORY_SLOT_BAG_0, dstslot) && !CanUseBank())
     {
-        //TC_LOG_DEBUG("network", "WORLD: HandleSwapInvItemOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(m_currentBankerGUID)));
+        //TC_LOG_DEBUG("network", "WORLD: HandleSwapInvItemOpcode - Unit (%s) not found or you can't interact with him.", m_currentBankerGUID.ToString().c_str());
         return;
     }
 
@@ -92,7 +92,7 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleAutoEquipItemSlotOpcode(WorldPacket& recvData)
 {
-    uint64 itemguid;
+    ObjectGuid itemguid;
     uint8 dstslot;
     recvData >> itemguid >> dstslot;
 
@@ -137,13 +137,13 @@ void WorldSession::HandleSwapItem(WorldPacket& recvData)
 
     if (_player->IsBankPos(srcbag, srcslot) && !CanUseBank())
     {
-        //TC_LOG_DEBUG("network", "WORLD: HandleSwapItem - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(m_currentBankerGUID)));
+        //TC_LOG_DEBUG("network", "WORLD: HandleSwapItem - Unit (%s) not found or you can't interact with him.", m_currentBankerGUID.ToString().c_str());
         return;
     }
 
     if (_player->IsBankPos(dstbag, dstslot) && !CanUseBank())
     {
-        //TC_LOG_DEBUG("network", "WORLD: HandleSwapItem - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(m_currentBankerGUID)));
+        //TC_LOG_DEBUG("network", "WORLD: HandleSwapItem - Unit (%s) not found or you can't interact with him.", m_currentBankerGUID.ToString().c_str());
         return;
     }
 
@@ -625,7 +625,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Received CMSG_SELL_ITEM");
 #endif
-    uint64 vendorguid, itemguid;
+    ObjectGuid vendorguid, itemguid;
     uint32 count;
 
     recvData >> vendorguid >> itemguid >> count;
@@ -637,7 +637,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "WORLD: HandleSellItemOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(vendorguid)));
+        LOG_DEBUG("network", "WORLD: HandleSellItemOpcode - Unit (%s) not found or you can not interact with him.", vendorguid.ToString().c_str());
 #endif
         _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, itemguid, 0);
         return;
@@ -756,7 +756,7 @@ void WorldSession::HandleBuybackItem(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Received CMSG_BUYBACK_ITEM");
 #endif
-    uint64 vendorguid;
+    ObjectGuid vendorguid;
     uint32 slot;
 
     recvData >> vendorguid >> slot;
@@ -765,9 +765,9 @@ void WorldSession::HandleBuybackItem(WorldPacket& recvData)
     if (!creature)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "WORLD: HandleBuybackItem - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(vendorguid)));
+        LOG_DEBUG("network", "WORLD: HandleBuybackItem - Unit (%s) not found or you can not interact with him.", vendorguid.ToString().c_str());
 #endif
-        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, 0, 0);
+        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, ObjectGuid::Empty, 0);
         return;
     }
 
@@ -792,7 +792,7 @@ void WorldSession::HandleBuybackItem(WorldPacket& recvData)
             if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_VENDOR))
             {
                 PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM);
-                stmt->setUInt32(0, _player->GetGUID());
+                stmt->setUInt32(0, _player->GetGUID().GetCounter());
                 stmt->setUInt32(1, pItem->GetEntry());
                 stmt->setUInt32(2, pItem->GetCount());
                 CharacterDatabase.Execute(stmt);
@@ -817,7 +817,7 @@ void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Received CMSG_BUY_ITEM_IN_SLOT");
 #endif
-    uint64 vendorguid, bagguid;
+    ObjectGuid vendorguid, bagguid;
     uint32 item, slot, count;
     uint8 bagslot;
 
@@ -861,7 +861,7 @@ void WorldSession::HandleBuyItemOpcode(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Received CMSG_BUY_ITEM");
 #endif
-    uint64 vendorguid;
+    ObjectGuid vendorguid;
     uint32 item, slot, count;
     uint8 unk1;
 
@@ -878,7 +878,7 @@ void WorldSession::HandleBuyItemOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleListInventoryOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
 
@@ -892,7 +892,7 @@ void WorldSession::HandleListInventoryOpcode(WorldPacket& recvData)
     SendListInventory(guid);
 }
 
-void WorldSession::SendListInventory(uint64 vendorGuid, uint32 vendorEntry)
+void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Sent SMSG_LIST_INVENTORY");
@@ -902,9 +902,9 @@ void WorldSession::SendListInventory(uint64 vendorGuid, uint32 vendorEntry)
     if (!vendor)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "WORLD: SendListInventory - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(vendorGuid)));
+        LOG_DEBUG("network", "WORLD: SendListInventory - Unit (%s) not found or you can not interact with him.", vendorGuid.ToString().c_str());
 #endif
-        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, 0, 0);
+        _player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, ObjectGuid::Empty, 0);
         return;
     }
 
@@ -922,7 +922,7 @@ void WorldSession::SendListInventory(uint64 vendorGuid, uint32 vendorEntry)
     if (!items)
     {
         WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + 1);
-        data << uint64(vendorGuid);
+        data << vendorGuid;
         data << uint8(0);                                   // count == 0, next will be error code
         data << uint8(0);                                   // "Vendor has no inventory"
         SendPacket(&data);
@@ -933,7 +933,7 @@ void WorldSession::SendListInventory(uint64 vendorGuid, uint32 vendorEntry)
     uint8 count = 0;
 
     WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + itemCount * 8 * 4);
-    data << uint64(vendorGuid);
+    data << vendorGuid;
 
     size_t countPos = data.wpos();
     data << uint8(count);
@@ -1053,12 +1053,12 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPacket& recvPacket)
     LOG_DEBUG("network", "WORLD: CMSG_BUY_BANK_SLOT");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvPacket >> guid;
 
     if (!CanUseBank(guid))
     {
-        //TC_LOG_DEBUG("network", "WORLD: HandleBuyBankSlotOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
+        //TC_LOG_DEBUG("network", "WORLD: HandleBuyBankSlotOpcode - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
         return;
     }
 
@@ -1114,7 +1114,7 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPacket& recvPacket)
 
     if (!CanUseBank())
     {
-        //TC_LOG_DEBUG("network", "WORLD: HandleAutoBankItemOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(m_currentBankerGUID)));
+        //TC_LOG_DEBUG("network", "WORLD: HandleAutoBankItemOpcode - Unit (%s) not found or you can't interact with him.", m_currentBankerGUID.ToString().c_str());
         return;
     }
 
@@ -1156,7 +1156,7 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket)
 
     if (!CanUseBank())
     {
-        //TC_LOG_DEBUG("network", "WORLD: HandleAutoStoreBankItemOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(m_currentBankerGUID)));
+        //TC_LOG_DEBUG("network", "WORLD: HandleAutoStoreBankItemOpcode - Unit (%s) not found or you can't interact with him.", m_currentBankerGUID.ToString().c_str());
         return;
     }
 
@@ -1223,24 +1223,24 @@ void WorldSession::HandleSetAmmoOpcode(WorldPacket& recvData)
         _player->RemoveAmmo();
 }
 
-void WorldSession::SendEnchantmentLog(uint64 target, uint64 caster, uint32 itemId, uint32 enchantId)
+void WorldSession::SendEnchantmentLog(ObjectGuid target, ObjectGuid caster, uint32 itemId, uint32 enchantId)
 {
     WorldPacket data(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4)); // last check 2.0.10
-    data.appendPackGUID(target);
-    data.appendPackGUID(caster);
+    data << target.WriteAsPacked();
+    data << caster.WriteAsPacked();
     data << uint32(itemId);
     data << uint32(enchantId);
     GetPlayer()->SendMessageToSet(&data, true);
 }
 
-void WorldSession::SendItemEnchantTimeUpdate(uint64 Playerguid, uint64 Itemguid, uint32 slot, uint32 Duration)
+void WorldSession::SendItemEnchantTimeUpdate(ObjectGuid Playerguid, ObjectGuid Itemguid, uint32 slot, uint32 Duration)
 {
     // last check 2.0.10
     WorldPacket data(SMSG_ITEM_ENCHANT_TIME_UPDATE, (8 + 4 + 4 + 8));
-    data << uint64(Itemguid);
+    data << Itemguid;
     data << uint32(slot);
     data << uint32(Duration);
-    data << uint64(Playerguid);
+    data << Playerguid;
     SendPacket(&data);
 }
 
@@ -1325,7 +1325,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (item->GetUInt64Value(ITEM_FIELD_GIFTCREATOR))        // HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED);
+    if (item->GetGuidValue(ITEM_FIELD_GIFTCREATOR))        // HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAGS_WRAPPED);
     {
         _player->SendEquipError(EQUIP_ERR_WRAPPED_CANT_BE_WRAPPED, item, nullptr);
         return;
@@ -1359,8 +1359,8 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_GIFT);
-    stmt->setUInt32(0, GUID_LOPART(item->GetOwnerGUID()));
-    stmt->setUInt32(1, item->GetGUIDLow());
+    stmt->setUInt32(0, item->GetOwnerGUID().GetCounter());
+    stmt->setUInt32(1, item->GetGUID().GetCounter());
     stmt->setUInt32(2, item->GetEntry());
     stmt->setUInt32(3, item->GetUInt32Value(ITEM_FIELD_FLAGS));
     trans->Append(stmt);
@@ -1388,7 +1388,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
             item->SetEntry(21831);
             break;
     }
-    item->SetUInt64Value(ITEM_FIELD_GIFTCREATOR, _player->GetGUID());
+    item->SetGuidValue(ITEM_FIELD_GIFTCREATOR, _player->GetGUID());
     item->SetUInt32Value(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED);
     item->SetState(ITEM_CHANGED, _player);
 
@@ -1407,8 +1407,8 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: CMSG_SOCKET_GEMS");
 #endif
 
-    uint64 item_guid;
-    uint64 gem_guids[MAX_GEM_SOCKETS];
+    ObjectGuid item_guid;
+    ObjectGuid gem_guids[MAX_GEM_SOCKETS];
 
     recvData >> item_guid;
     if (!item_guid)
@@ -1633,7 +1633,7 @@ void WorldSession::HandleItemRefundInfoRequest(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: CMSG_ITEM_REFUND_INFO");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;                                      // item guid
 
     Item* item = _player->GetItemByGuid(guid);
@@ -1653,7 +1653,7 @@ void WorldSession::HandleItemRefund(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: CMSG_ITEM_REFUND");
 #endif
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;                                      // item guid
 
     Item* item = _player->GetItemByGuid(guid);
@@ -1679,11 +1679,11 @@ void WorldSession::HandleItemRefund(WorldPacket& recvData)
  */
 void WorldSession::HandleItemTextQuery(WorldPacket& recvData )
 {
-    uint64 itemGuid;
+    ObjectGuid itemGuid;
     recvData >> itemGuid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("network", "CMSG_ITEM_TEXT_QUERY item guid: %u", GUID_LOPART(itemGuid));
+    LOG_DEBUG("network", "CMSG_ITEM_TEXT_QUERY item: %s", itemGuid.ToString().c_str());
 #endif
 
     WorldPacket data(SMSG_ITEM_TEXT_QUERY_RESPONSE, 50);        // guess size
@@ -1691,7 +1691,7 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recvData )
     if (Item* item = _player->GetItemByGuid(itemGuid))
     {
         data << uint8(0);                                       // has text
-        data << uint64(itemGuid);                               // item guid
+        data << itemGuid;                                       // item guid
         data << item->GetText();
     }
     else
@@ -1702,7 +1702,7 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recvData )
     SendPacket(&data);
 }
 
-bool WorldSession::CanUseBank(uint64 bankerGUID) const
+bool WorldSession::CanUseBank(ObjectGuid bankerGUID) const
 {
     // bankerGUID parameter is optional, set to 0 by default.
     if (!bankerGUID)
@@ -1728,7 +1728,7 @@ bool WorldSession::recoveryItem(Item* pItem)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RECOVERY_ITEM);
 
-        stmt->setUInt32(0, pItem->GetOwnerGUID());
+        stmt->setUInt32(0, pItem->GetOwnerGUID().GetCounter());
         stmt->setUInt32(1, pItem->GetTemplate()->ItemId);
         stmt->setUInt32(2, pItem->GetCount());
 
