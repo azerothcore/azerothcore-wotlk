@@ -148,14 +148,6 @@ services:
     image: acore/dev-server:${DOCKER_IMAGE_TAG:-master}
     security_opt:
       - seccomp:unconfined
-    build:
-      context: .
-      target: dev
-      dockerfile: ./apps/docker/Dockerfile
-      args:
-        USER_ID: ${DOCKER_USER_ID:-1000}
-        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-        DOCKER_USER: ${DOCKER_USER:-acore}
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     user: ${DOCKER_USER:-acore}
@@ -168,6 +160,11 @@ services:
     volumes:
       - ac-build-dev:/azerothcore/var/build
     profiles: [all, dev]
+    depends_on:
+      ac-database:
+        condition: service_healthy
+      ac-build:
+        condition: service_started
 
 volumes:
   ac-database:
