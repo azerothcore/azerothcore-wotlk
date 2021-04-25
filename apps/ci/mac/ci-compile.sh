@@ -11,7 +11,7 @@ time cmake ../../../ \
 -DTOOLS=1 \
 -DBUILD_TESTING=1 \
 -DSCRIPTS=1 \
--DCMAKE_BUILD_TYPE=Debug \
+-DCMAKE_BUILD_TYPE=Release \
 -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include \
 -DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib \
 -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include \
