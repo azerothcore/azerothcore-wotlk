@@ -27,11 +27,11 @@ services:
       # we cannot use /env/dist to avoid permission issues
       - ac-env:/azerothcore/env
       # expose some dist folder outside allowing the host to use them
-      - ${DOCKER_CONF:-./conf}:/azerothcore/conf
-      - ${DOCKER_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
+      - ${DOCKER_VOL_CONF:-./conf}:/azerothcore/conf
+      - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
       # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
-      - ${DOCKER_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
-      - ${DOCKER_DATA:-./env/docker/data}:/azerothcore/env/dist/data:delegated
+      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+      - ${DOCKER_VOL_DATA:-./env/docker/data}:/azerothcore/env/dist/data:delegated
     profiles: [abstract-service] # do not run this
 
   abstract-no-bind:
@@ -78,11 +78,16 @@ services:
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-acore}
     privileged: true
     build:
       context: .
       target: ${DOCKER_BUILD_WORLD_TARGET:-dev}
       dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
@@ -97,10 +102,15 @@ services:
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-acore}
     build:
       context: .
       target: ${DOCKER_BUILD_AUTH_TARGET:-dev}
       dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [all, app, authserver]
@@ -124,9 +134,11 @@ services:
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-acore}
     environment:
         DBLIST: AUTH,CHARACTERS,WORLD
     ports:
@@ -142,6 +154,12 @@ volumes:
   ac-env:
   ac-build:
   ac-proj:
+  # not used, but you can use them by setting
+  # the DOCKER_VOL_* env variabiles
+  ac-conf:
+  ac-etc:
+  ac-logs:
+  ac-client-data:
 
 networks:
   ac-network:

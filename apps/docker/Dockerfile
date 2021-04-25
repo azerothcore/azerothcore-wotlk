@@ -8,6 +8,7 @@
 FROM ubuntu:20.04 as dev
 ARG USER_ID=1000
 ARG GROUP_ID=1000
+ARG DOCKER_USER=acore
 
 LABEL description="AC Worldserver Debug Container for use with Visual Studio"
 
@@ -40,7 +41,10 @@ RUN addgroup --gid $GROUP_ID acore && \
     passwd -d acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
-RUN mkdir -p /azerothcore
+# must be created to set the correct permissions on them
+RUN mkdir -p /azerothcore/env/dist/data
+RUN mkdir -p /azerothcore/env/dist/logs
+RUN mkdir -p /azerothcore/env/dist/etc
 
 # Correct permissions for non-root operations
 RUN chown -R acore:acore \
@@ -49,7 +53,7 @@ RUN chown -R acore:acore \
     /opt/ \
     /azerothcore
 
-USER acore
+USER $DOCKER_USER
 
 WORKDIR /azerothcore
 
@@ -70,6 +74,8 @@ RUN bash acore.sh compiler build
 
 FROM ubuntu:20.04 as servicebase
 
+ARG DOCKER_USER=acore
+
 # List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 # set timezone environment variable
@@ -77,6 +83,8 @@ ENV TZ=Etc/UTC
 
 # set noninteractive mode so tzdata doesn't ask to set timezone on install
 ENV DEBIAN_FRONTEND=noninteractive
+
+USER $DOCKER_USER
 
 COPY --from=build /azerothcore/env /azerothcore/env
 

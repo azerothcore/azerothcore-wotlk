@@ -56,7 +56,7 @@ shellCommandFactory(
 shellCommandFactory(
   "dashboard [args...]",
   "Execute acore dashboard within a running ac-dev-server",
-  "docker-compose exec ac-dev-server bash acore.sh",
+  "docker-compose run --rm ac-dev-server bash acore.sh",
 );
 
 program.command("attach [service]")
