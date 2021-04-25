@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+source "$CUR_PATH/acore-docker-build"
+
+cp -ar env/dist/bin /azerothcore/env/dist/bin
+cp -ar env/dist/etc /azerothcore/env/dist/etc
+bash acore.sh db-assembler import-all

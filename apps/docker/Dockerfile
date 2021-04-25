@@ -27,10 +27,11 @@ RUN apt-get update && apt-get install -y gdb gdbserver git dos2unix lsb-core sud
 
 # copy everything so we can work directly within the container
 # using tools such as vscode dev-container
-COPY . /azerothcore
+# NOTE: this folder is different by the /azerothcore (which is binded instead)
+COPY . /azerothcore-internal
 
-# install the required dependencies to run the worldserver
-RUN /azerothcore/acore.sh install-deps
+# install the required dependencies
+RUN /azerothcore-internal/acore.sh install-deps
 
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
@@ -42,29 +43,31 @@ RUN addgroup --gid $GROUP_ID acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
 # must be created to set the correct permissions on them
-RUN mkdir -p /azerothcore/env/dist/data
-RUN mkdir -p /azerothcore/env/dist/logs
-RUN mkdir -p /azerothcore/env/dist/etc
+RUN mkdir -p /azerothcore-internal/env/dist/data
+RUN mkdir -p /azerothcore-internal/env/dist/logs
+RUN mkdir -p /azerothcore-internal/env/dist/etc
+RUN mkdir -p /azerothcore
 
 # Correct permissions for non-root operations
-RUN chown -R acore:acore \
-    /run \
-    /home/acore \
-    /opt/ \
-    /azerothcore
+RUN chown -R acore:acore /home/acore
+RUN chown -R acore:acore /run
+RUN chown -R acore:acore /opt
+RUN chown -R acore:acore /azerothcore
+RUN chown -R acore:acore /azerothcore-internal
 
 USER $DOCKER_USER
 
-WORKDIR /azerothcore
-
 #================================================================
 #
-# BUILD STAGE: to prepare binaries for the production services
+# BUILD: compile sources
 #
 #=================================================================
+
 FROM dev as build
 
-RUN bash acore.sh compiler build
+WORKDIR /azerothcore-internal
+
+RUN bin/acore-docker-build
 
 #================================================================
 #
@@ -86,7 +89,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 USER $DOCKER_USER
 
-COPY --from=build /azerothcore/env /azerothcore/env
+COPY --from=build /azerothcore-internal/env /azerothcore/env
 
 # copy the sources from the host machine
 COPY apps /azerothcore/apps
@@ -104,9 +107,6 @@ RUN apt-get update && apt-get install -y gdb gdbserver net-tools tzdata libmysql
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
 WORKDIR /azerothcore/
-
-RUN cp -n "/azerothcore/env/docker/etc/worldserver.conf.dockerdist" "/azerothcore/env/dist/etc/worldserver.conf"
-RUN cp -n "/azerothcore/env/docker/etc/authserver.conf.dockerdist" "/azerothcore/env/dist/etc/authserver.conf"
 
 #================================================================
 #

@@ -37,7 +37,8 @@ services:
   abstract-no-bind:
     image: local/azerothcore/abstract-no-bind
     volumes:
-      - ac-proj:/azerothcore/
+      - ac-proj:/azerothcore-internal/
+    working_dir: /azerothcore-internal/
     profiles: [abstract-service] # do not run this
 
 #=======================
@@ -123,19 +124,19 @@ services:
 
   ac-dev-server:
     <<: *ac-shared-conf
+    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     tty: true
     image: acore/dev-server:${DOCKER_IMAGE_TAG:-master}
     security_opt:
       - seccomp:unconfined
     build:
       context: .
-      target: dev
+      target: ${DOCKER_BUILD_DEV_TARGET:-dev}
       dockerfile: ./apps/docker/Dockerfile
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     user: ${DOCKER_USER:-acore}
