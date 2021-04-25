@@ -73,7 +73,7 @@ services:
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     stdin_open: true
     tty: true
-    command: ls -al env/dist/bin/worldserver
+    command: ./acore.sh run-worldserver
     image: acore/worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
