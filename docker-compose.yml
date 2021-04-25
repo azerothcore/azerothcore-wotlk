@@ -123,6 +123,7 @@ services:
 #
 #======================
   ac-build:
+    <<: *ac-shared-conf
     image: acore/dev-server:${DOCKER_IMAGE_TAG:-master}
     build:
       context: .

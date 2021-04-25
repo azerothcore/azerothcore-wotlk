@@ -116,6 +116,17 @@ RUN apt-get update && apt-get install -y gdb gdbserver net-tools tzdata libmysql
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
+# must be created to set the correct permissions on them
+RUN mkdir -p /azerothcore/env/dist/data
+RUN mkdir -p /azerothcore/env/dist/logs
+RUN mkdir -p /azerothcore/env/dist/etc
+
+# Correct permissions for non-root operations
+RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore
+RUN chown -R $DOCKER_USER:$DOCKER_USER /run
+RUN chown -R $DOCKER_USER:$DOCKER_USER /opt
+RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
+
 USER $DOCKER_USER
 
 WORKDIR /azerothcore/
