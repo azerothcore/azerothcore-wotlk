@@ -644,7 +644,7 @@ public:
                     me->RemoveAurasDueToSpell(SPELL_INVOCATION_OF_BLOOD_TALDARAM);
                     break;
                 case ACTION_FLAME_BALL_CHASE:
-                    summons.DoAction(ACTION_FLAME_BALL_CHASE, 1);
+                    summons.DoAction(ACTION_FLAME_BALL_CHASE);
                     break;
                 default:
                     break;

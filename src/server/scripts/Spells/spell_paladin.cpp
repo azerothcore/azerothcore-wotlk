@@ -652,7 +652,7 @@ public:
 
         void CountTargets(std::list<WorldObject*>& targetList)
         {
-            acore::Containers::RandomResizeList(targetList, GetSpellValue()->MaxAffectedTargets);
+            acore::Containers::RandomResize(targetList, GetSpellValue()->MaxAffectedTargets);
             _targetCount = targetList.size();
         }
 
