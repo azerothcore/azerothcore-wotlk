@@ -36,14 +36,20 @@ shellCommandFactory("build", "Build the authserver and worldserver", [
 ]);
 
 shellCommandFactory(
-  "build:clean",
-  "Clean and run build without cache",
-  [
+    "build:clean",
+    "Clean and run build",
+    [
+      "docker-compose --profile all build",
+      `docker-compose run --rm ac-build bash acore.sh compiler clean`,
+      "docker-compose run --rm ac-build bash bin/acore-docker-update",
+    ],
+  );
+
+
+shellCommandFactory("build:nocache", "Build the authserver and worldserver without docker cache", [
     "docker-compose --profile all build --no-cache",
-    `docker-compose run --rm ac-build bash acore.sh compiler clean`,
     "docker-compose run --rm ac-build bash bin/acore-docker-update",
-  ],
-);
+]);
 
 shellCommandFactory(
   "client-data",
