@@ -373,7 +373,7 @@ public:
     bool SetupBattlefield() override;
 
     /// Return pointer to relic object
-    GameObject* GetRelic() { return ObjectAccessor::GetObjectInWorld(m_titansRelic, (GameObject*)nullptr); }
+    GameObject* GetRelic() { return GetGameObject(m_titansRelic); }
 
     /// Define relic object
     //void SetRelic(GameObject* relic) { m_titansRelic = relic; }
@@ -450,17 +450,17 @@ protected:
     GameObjectSet m_KeepGameObject[2];
     GameObjectBuilding BuildingsInZone;
 
-    GuidSet m_vehicles[2];
-    GuidSet CanonList;
-    GuidSet KeepCreature[2];
-    GuidSet OutsideCreature[2];
-    GuidSet m_updateTenacityList;
+    GuidUnorderedSet m_vehicles[2];
+    GuidUnorderedSet CanonList;
+    GuidUnorderedSet KeepCreature[2];
+    GuidUnorderedSet OutsideCreature[2];
+    GuidUnorderedSet m_updateTenacityList;
 
     int32 m_tenacityStack;
     uint32 m_tenacityUpdateTimer;
     uint32 m_saveTimer;
 
-    uint64 m_titansRelic;
+    ObjectGuid m_titansRelic;
 };
 
 const uint8 WG_MAX_OBJ = 32;
@@ -1079,7 +1079,6 @@ struct BfWGGameObjectBuilding
     {
         m_WG = WG;
         m_Team = TEAM_ALLIANCE;
-        m_Build = 0;
         m_Type = 0;
         m_WorldState = 0;
         m_State = 0;
@@ -1094,7 +1093,7 @@ struct BfWGGameObjectBuilding
     BattlefieldWG* m_WG;
 
     // Linked gameobject
-    uint64 m_Build;
+    ObjectGuid m_Build;
 
     // eWGGameObjectBuildingType
     uint32 m_Type;
@@ -1113,10 +1112,10 @@ struct BfWGGameObjectBuilding
     GameObjectSet m_GameObjectList[2];
 
     // Creature associations
-    GuidSet m_CreatureBottomList[2];
-    GuidSet m_CreatureTopList[2];
-    GuidSet m_TowerCannonBottomList;
-    GuidSet m_TurretTopList;
+    GuidUnorderedSet m_CreatureBottomList[2];
+    GuidUnorderedSet m_CreatureTopList[2];
+    GuidUnorderedSet m_TowerCannonBottomList;
+    GuidUnorderedSet m_TurretTopList;
 
     void Rebuild()
     {
@@ -1136,7 +1135,7 @@ struct BfWGGameObjectBuilding
                 break;
         }
 
-        GameObject* go = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)nullptr);
+        GameObject* go = m_WG->GetGameObject(m_Build);
         if (go)
         {
             // Rebuild gameobject
@@ -1161,15 +1160,13 @@ struct BfWGGameObjectBuilding
         if (m_damagedText)                                       // tower damage + name
             m_WG->SendWarningToAllInZone(m_damagedText);
 
-        for (GuidSet::const_iterator itr = m_CreatureTopList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureTopList[m_WG->GetAttackerTeam()].end(); ++itr)
-            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-                if (Creature* creature = unit->ToCreature())
-                    m_WG->HideNpc(creature);
+        for (GuidUnorderedSet::const_iterator itr = m_CreatureTopList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureTopList[m_WG->GetAttackerTeam()].end(); ++itr)
+            if (Creature* creature = m_WG->GetCreature(*itr))
+                m_WG->HideNpc(creature);
 
-        for (GuidSet::const_iterator itr = m_TurretTopList.begin(); itr != m_TurretTopList.end(); ++itr)
-            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-                if (Creature* creature = unit->ToCreature())
-                    m_WG->HideNpc(creature);
+        for (GuidUnorderedSet::const_iterator itr = m_TurretTopList.begin(); itr != m_TurretTopList.end(); ++itr)
+            if (Creature* creature = m_WG->GetCreature(*itr))
+                m_WG->HideNpc(creature);
 
         if (m_Type == BATTLEFIELD_WG_OBJECTTYPE_TOWER)
             m_WG->UpdateDamagedTowerCount(m_WG->GetAttackerTeam());
@@ -1190,7 +1187,7 @@ struct BfWGGameObjectBuilding
         {
             // Inform the global wintergrasp script of the destruction of this object
             case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
-                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)nullptr));
+                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), m_WG->GetGameObject(m_Build));
                 break;
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
                 m_WG->SetRelicInteractible(true);
@@ -1202,7 +1199,7 @@ struct BfWGGameObjectBuilding
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
             case BATTLEFIELD_WG_OBJECTTYPE_WALL:
             case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
-                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)nullptr));
+                m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), m_WG->GetGameObject(m_Build));
                 break;
         }
 
@@ -1355,25 +1352,21 @@ struct BfWGGameObjectBuilding
 
     void UpdateCreatureAndGo()
     {
-        for (GuidSet::const_iterator itr = m_CreatureTopList[m_WG->GetDefenderTeam()].begin(); itr != m_CreatureTopList[m_WG->GetDefenderTeam()].end(); ++itr)
-            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-                if (Creature* creature = unit->ToCreature())
-                    m_WG->HideNpc(creature);
+        for (GuidUnorderedSet::const_iterator itr = m_CreatureTopList[m_WG->GetDefenderTeam()].begin(); itr != m_CreatureTopList[m_WG->GetDefenderTeam()].end(); ++itr)
+            if (Creature* creature = m_WG->GetCreature(*itr))
+                m_WG->HideNpc(creature);
 
-        for (GuidSet::const_iterator itr = m_CreatureTopList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureTopList[m_WG->GetAttackerTeam()].end(); ++itr)
-            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-                if (Creature* creature = unit->ToCreature())
-                    m_WG->ShowNpc(creature, true);
+        for (GuidUnorderedSet::const_iterator itr = m_CreatureTopList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureTopList[m_WG->GetAttackerTeam()].end(); ++itr)
+            if (Creature* creature = m_WG->GetCreature(*itr))
+                m_WG->ShowNpc(creature, true);
 
-        for (GuidSet::const_iterator itr = m_CreatureBottomList[m_WG->GetDefenderTeam()].begin(); itr != m_CreatureBottomList[m_WG->GetDefenderTeam()].end(); ++itr)
-            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-                if (Creature* creature = unit->ToCreature())
-                    m_WG->HideNpc(creature);
+        for (GuidUnorderedSet::const_iterator itr = m_CreatureBottomList[m_WG->GetDefenderTeam()].begin(); itr != m_CreatureBottomList[m_WG->GetDefenderTeam()].end(); ++itr)
+            if (Creature* creature = m_WG->GetCreature(*itr))
+                m_WG->HideNpc(creature);
 
-        for (GuidSet::const_iterator itr = m_CreatureBottomList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureBottomList[m_WG->GetAttackerTeam()].end(); ++itr)
-            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
-                if (Creature* creature = unit->ToCreature())
-                    m_WG->ShowNpc(creature, true);
+        for (GuidUnorderedSet::const_iterator itr = m_CreatureBottomList[m_WG->GetAttackerTeam()].begin(); itr != m_CreatureBottomList[m_WG->GetAttackerTeam()].end(); ++itr)
+            if (Creature* creature = m_WG->GetCreature(*itr))
+                m_WG->ShowNpc(creature, true);
 
         for (GameObjectSet::const_iterator itr = m_GameObjectList[m_WG->GetDefenderTeam()].begin(); itr != m_GameObjectList[m_WG->GetDefenderTeam()].end(); ++itr)
             (*itr)->SetRespawnTime(RESPAWN_ONE_DAY);
@@ -1384,7 +1377,7 @@ struct BfWGGameObjectBuilding
 
     void UpdateTurretAttack(bool disable)
     {
-        GameObject* build = ObjectAccessor::GetObjectInWorld(m_Build, (GameObject*)nullptr);
+        GameObject* build = m_WG->GetGameObject(m_Build);
         if (!build)
             return;
 
@@ -1404,33 +1397,27 @@ struct BfWGGameObjectBuilding
                 break;
         }
 
-        for (GuidSet::const_iterator itr = m_TowerCannonBottomList.begin(); itr != m_TowerCannonBottomList.end(); ++itr)
+        for (GuidUnorderedSet::const_iterator itr = m_TowerCannonBottomList.begin(); itr != m_TowerCannonBottomList.end(); ++itr)
         {
-            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+            if (Creature* creature = m_WG->GetCreature(*itr))
             {
-                if (Creature* creature = unit->ToCreature())
-                {
-                    creature->setFaction(faction);
-                    if (disable)
-                        m_WG->HideNpc(creature);
-                    else
-                        m_WG->ShowNpc(creature, true);
-                }
+                creature->setFaction(faction);
+                if (disable)
+                    m_WG->HideNpc(creature);
+                else
+                    m_WG->ShowNpc(creature, true);
             }
         }
 
-        for (GuidSet::const_iterator itr = m_TurretTopList.begin(); itr != m_TurretTopList.end(); ++itr)
+        for (GuidUnorderedSet::const_iterator itr = m_TurretTopList.begin(); itr != m_TurretTopList.end(); ++itr)
         {
-            if (Unit* unit = ObjectAccessor::FindUnit(*itr))
+            if (Creature* creature = m_WG->GetCreature(*itr))
             {
-                if (Creature* creature = unit->ToCreature())
-                {
-                    creature->setFaction(faction);
-                    if (disable)
-                        m_WG->HideNpc(creature);
-                    else
-                        m_WG->ShowNpc(creature, true);
-                }
+                creature->setFaction(faction);
+                if (disable)
+                    m_WG->HideNpc(creature);
+                else
+                    m_WG->ShowNpc(creature, true);
             }
         }
     }

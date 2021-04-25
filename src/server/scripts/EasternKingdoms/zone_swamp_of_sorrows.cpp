@@ -34,7 +34,7 @@ public:
     {
         npc_galen_goodwardAI(Creature* creature) : npc_escortAI(creature)
         {
-            galensCageGUID = 0;
+            galensCageGUID.Clear();
             Reset();
         }
 
@@ -123,7 +123,7 @@ public:
         }
 
     private:
-        uint64 galensCageGUID;
+        ObjectGuid galensCageGUID;
         uint32 periodicSay;
     };
 

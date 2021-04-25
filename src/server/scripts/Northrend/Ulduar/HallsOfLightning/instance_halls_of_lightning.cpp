@@ -22,16 +22,16 @@ public:
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
 
-        uint64 m_uiGeneralBjarngrimGUID;
-        uint64 m_uiIonarGUID;
-        uint64 m_uiLokenGUID;
-        uint64 m_uiVolkhanGUID;
+        ObjectGuid m_uiGeneralBjarngrimGUID;
+        ObjectGuid m_uiIonarGUID;
+        ObjectGuid m_uiLokenGUID;
+        ObjectGuid m_uiVolkhanGUID;
 
-        uint64 m_uiBjarngrimDoorGUID;
-        uint64 m_uiVolkhanDoorGUID;
-        uint64 m_uiIonarDoorGUID;
-        uint64 m_uiLokenDoorGUID;
-        uint64 m_uiLokenGlobeGUID;
+        ObjectGuid m_uiBjarngrimDoorGUID;
+        ObjectGuid m_uiVolkhanDoorGUID;
+        ObjectGuid m_uiIonarDoorGUID;
+        ObjectGuid m_uiLokenDoorGUID;
+        ObjectGuid m_uiLokenGlobeGUID;
 
         bool volkhanAchievement;
         bool bjarngrimAchievement;
@@ -39,17 +39,6 @@ public:
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-
-            m_uiGeneralBjarngrimGUID = 0;
-            m_uiVolkhanGUID       = 0;
-            m_uiIonarGUID           = 0;
-            m_uiLokenGUID           = 0;
-
-            m_uiBjarngrimDoorGUID   = 0;
-            m_uiVolkhanDoorGUID   = 0;
-            m_uiIonarDoorGUID       = 0;
-            m_uiLokenDoorGUID       = 0;
-            m_uiLokenGlobeGUID     = 0;
 
             volkhanAchievement = false;
             bjarngrimAchievement = false;
@@ -219,7 +208,7 @@ public:
             return m_auiEncounter[uiType];
         }
 
-        uint64 GetData64(uint32 uiData) const override
+        ObjectGuid GetGuidData(uint32 uiData) const override
         {
             switch(uiData)
             {
@@ -232,7 +221,8 @@ public:
                 case TYPE_LOKEN:
                     return m_uiLokenGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
     };
 };
