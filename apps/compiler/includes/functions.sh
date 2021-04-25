@@ -1,6 +1,6 @@
 
 function comp_clean() {
-  DIRTOCLEAN=${$BUILDPATH:-var/build/obj}
+  DIRTOCLEAN=${BUILDPATH:-var/build/obj}
   PATTERN="$DIRTOCLEAN/*"
 
   echo "Cleaning build files in $DIRTOCLEAN"
