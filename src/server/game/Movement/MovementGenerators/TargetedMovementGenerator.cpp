@@ -222,7 +222,7 @@ void ChaseMovementGenerator<T>::MovementInform(T* owner)
 
     // Pass back the GUIDLow of the target. If it is pet's owner then PetAI will handle
     if (CreatureAI* AI = owner->ToCreature()->AI())
-        AI->MovementInform(CHASE_MOTION_TYPE, i_target.getTarget()->GetGUIDLow());
+        AI->MovementInform(CHASE_MOTION_TYPE, i_target.getTarget()->GetGUID().GetCounter());
 }
 
 //-----------------------------------------------//
@@ -365,7 +365,7 @@ void FollowMovementGenerator<Creature>::_updateSpeed(Creature* owner)
 {
     // pet only sync speed with owner
     /// Make sure we are not in the process of a map change (IsInWorld)
-    if (!IS_PLAYER_GUID(owner->GetOwnerGUID()) || !owner->IsInWorld() || !i_target.isValid() || i_target->GetGUID() != owner->GetOwnerGUID())
+    if (!owner->GetOwnerGUID().IsPlayer() || !owner->IsInWorld() || !i_target.isValid() || i_target->GetGUID() != owner->GetOwnerGUID())
         return;
 
     owner->UpdateSpeed(MOVE_RUN, true);
@@ -402,7 +402,7 @@ void FollowMovementGenerator<T>::MovementInform(T* owner)
 
     // Pass back the GUIDLow of the target. If it is pet's owner then PetAI will handle
     if (CreatureAI* AI = owner->ToCreature()->AI())
-        AI->MovementInform(FOLLOW_MOTION_TYPE, i_target.getTarget()->GetGUIDLow());
+        AI->MovementInform(FOLLOW_MOTION_TYPE, i_target.getTarget()->GetGUID().GetCounter());
 }
 
 //-----------------------------------------------//

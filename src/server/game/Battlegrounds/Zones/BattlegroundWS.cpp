@@ -24,10 +24,6 @@ BattlegroundWS::BattlegroundWS()
     StartMessageIds[BG_STARTING_EVENT_THIRD]  = LANG_BG_WS_START_HALF_MINUTE;
     StartMessageIds[BG_STARTING_EVENT_FOURTH] = LANG_BG_WS_HAS_BEGUN;
 
-    _flagKeepers[TEAM_ALLIANCE] = 0;
-    _flagKeepers[TEAM_HORDE] = 0;
-    _droppedFlagGUID[TEAM_ALLIANCE] = 0;
-    _droppedFlagGUID[TEAM_HORDE] = 0;
     _flagState[TEAM_ALLIANCE] = BG_WS_FLAG_STATE_ON_BASE;
     _flagState[TEAM_HORDE] = BG_WS_FLAG_STATE_ON_BASE;
     _lastFlagCaptureTeam = TEAM_NEUTRAL;
@@ -70,18 +66,18 @@ void BattlegroundWS::PostUpdateImpl(uint32 diff)
                 RespawnFlagAfterDrop(TEAM_HORDE);
                 break;
             case BG_WS_EVENT_BOTH_FLAGS_KEPT10:
-                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)nullptr))
+                if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(TEAM_ALLIANCE)))
                     player->CastSpell(player, BG_WS_SPELL_FOCUSED_ASSAULT, true);
-                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)nullptr))
+                if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(TEAM_HORDE)))
                     player->CastSpell(player, BG_WS_SPELL_FOCUSED_ASSAULT, true);
                 break;
             case BG_WS_EVENT_BOTH_FLAGS_KEPT15:
-                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)nullptr))
+                if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(TEAM_ALLIANCE)))
                 {
                     player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
                     player->CastSpell(player, BG_WS_SPELL_BRUTAL_ASSAULT, true);
                 }
-                if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)nullptr))
+                if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(TEAM_HORDE)))
                 {
                     player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
                     player->CastSpell(player, BG_WS_SPELL_BRUTAL_ASSAULT, true);
@@ -142,7 +138,7 @@ void BattlegroundWS::RespawnFlagAfterDrop(TeamId teamId)
     if (GameObject* flag = GetBgMap()->GetGameObject(GetDroppedFlagGUID(teamId)))
         flag->Delete();
 
-    SetDroppedFlagGUID(0, teamId);
+    SetDroppedFlagGUID(ObjectGuid::Empty, teamId);
     _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT10);
     _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT15);
     RemoveAssaultAuras();
@@ -157,7 +153,7 @@ void BattlegroundWS::EventPlayerCapturedFlag(Player* player)
     RemoveAssaultAuras();
 
     AddPoints(player->GetTeamId(), 1);
-    SetFlagPicker(0, GetOtherTeamId(player->GetTeamId()));
+    SetFlagPicker(ObjectGuid::Empty, GetOtherTeamId(player->GetTeamId()));
     UpdateFlagState(GetOtherTeamId(player->GetTeamId()), BG_WS_FLAG_STATE_ON_BASE);
     if (player->GetTeamId() == TEAM_ALLIANCE)
     {
@@ -200,7 +196,7 @@ void BattlegroundWS::EventPlayerDroppedFlag(Player* player)
     if (GetFlagPickerGUID(TEAM_HORDE) != player->GetGUID() && GetFlagPickerGUID(TEAM_ALLIANCE) != player->GetGUID())
         return;
 
-    SetFlagPicker(0, GetOtherTeamId(player->GetTeamId()));
+    SetFlagPicker(ObjectGuid::Empty, GetOtherTeamId(player->GetTeamId()));
     player->RemoveAurasDueToSpell(BG_WS_SPELL_WARSONG_FLAG);
     player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
     player->RemoveAurasDueToSpell(BG_WS_SPELL_BRUTAL_ASSAULT);
@@ -279,7 +275,7 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     // Alliance Flag on ground
     if (GetFlagState(TEAM_ALLIANCE) == BG_WS_FLAG_STATE_ON_GROUND && player->IsWithinDistInMap(gameObject, 10.0f) && gameObject->GetEntry() == BG_OBJECT_A_FLAG_GROUND_WS_ENTRY)
     {
-        SetDroppedFlagGUID(0, TEAM_ALLIANCE);
+        SetDroppedFlagGUID(ObjectGuid::Empty, TEAM_ALLIANCE);
         if (player->GetTeamId() == TEAM_ALLIANCE)
         {
             UpdateFlagState(TEAM_ALLIANCE, BG_WS_FLAG_STATE_ON_BASE);
@@ -310,7 +306,7 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     // Horde Flag on ground
     if (GetFlagState(TEAM_HORDE) == BG_WS_FLAG_STATE_ON_GROUND && player->IsWithinDistInMap(gameObject, 10.0f) && gameObject->GetEntry() == BG_OBJECT_H_FLAG_GROUND_WS_ENTRY)
     {
-        SetDroppedFlagGUID(0, TEAM_HORDE);
+        SetDroppedFlagGUID(ObjectGuid::Empty, TEAM_HORDE);
         if (player->GetTeamId() == TEAM_HORDE)
         {
             UpdateFlagState(TEAM_HORDE, BG_WS_FLAG_STATE_ON_BASE);
@@ -412,14 +408,14 @@ bool BattlegroundWS::SetupBattleground()
     AddSpiritGuide(WS_SPIRIT_MAIN_HORDE, sg->x, sg->y, sg->z, 3.193953f, TEAM_HORDE);
 
     for (uint32 i = BG_WS_OBJECT_DOOR_A_1; i < BG_WS_OBJECT_MAX; ++i)
-        if (BgObjects[i] == 0)
+        if (!BgObjects[i])
         {
             LOG_ERROR("sql.sql", "BatteGroundWS: Failed to spawn some object Battleground not created!");
             return false;
         }
 
     for (uint32 i = WS_SPIRIT_MAIN_ALLIANCE; i < BG_CREATURES_MAX_WS; ++i)
-        if (BgCreatures[i] == 0)
+        if (!BgCreatures[i])
         {
             LOG_ERROR("sql.sql", "BatteGroundWS: Failed to spawn spirit guides Battleground not created!");
             return false;
@@ -434,10 +430,10 @@ void BattlegroundWS::Init()
     Battleground::Init();
 
     _bgEvents.Reset();
-    _flagKeepers[TEAM_ALLIANCE]     = 0;
-    _flagKeepers[TEAM_HORDE]        = 0;
-    _droppedFlagGUID[TEAM_ALLIANCE] = 0;
-    _droppedFlagGUID[TEAM_HORDE]    = 0;
+    _flagKeepers[TEAM_ALLIANCE].Clear();
+    _flagKeepers[TEAM_HORDE].Clear();
+    _droppedFlagGUID[TEAM_ALLIANCE].Clear();
+    _droppedFlagGUID[TEAM_HORDE].Clear();
     _flagState[TEAM_ALLIANCE]       = BG_WS_FLAG_STATE_ON_BASE;
     _flagState[TEAM_HORDE]          = BG_WS_FLAG_STATE_ON_BASE;
     _lastFlagCaptureTeam            = TEAM_NEUTRAL;
@@ -530,8 +526,8 @@ TeamId BattlegroundWS::GetPrematureWinner()
 
 uint32 BattlegroundWS::GetAssaultSpellId() const
 {
-    if ((GetFlagPickerGUID(TEAM_ALLIANCE) == 0 && GetFlagState(TEAM_ALLIANCE) != BG_WS_FLAG_STATE_ON_GROUND) ||
-            (GetFlagPickerGUID(TEAM_HORDE) == 0 && GetFlagState(TEAM_HORDE) != BG_WS_FLAG_STATE_ON_GROUND) ||
+    if ((!GetFlagPickerGUID(TEAM_ALLIANCE) && GetFlagState(TEAM_ALLIANCE) != BG_WS_FLAG_STATE_ON_GROUND) ||
+            (!GetFlagPickerGUID(TEAM_HORDE) && GetFlagState(TEAM_HORDE) != BG_WS_FLAG_STATE_ON_GROUND) ||
             _bgEvents.GetNextEventTime(BG_WS_EVENT_BOTH_FLAGS_KEPT10) > 0)
         return 0;
 
@@ -540,12 +536,12 @@ uint32 BattlegroundWS::GetAssaultSpellId() const
 
 void BattlegroundWS::RemoveAssaultAuras()
 {
-    if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_ALLIANCE), this->FindBgMap(), (Player*)nullptr))
+    if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(TEAM_ALLIANCE)))
     {
         player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
         player->RemoveAurasDueToSpell(BG_WS_SPELL_BRUTAL_ASSAULT);
     }
-    if (Player* player = ObjectAccessor::GetObjectInMap(GetFlagPickerGUID(TEAM_HORDE), this->FindBgMap(), (Player*)nullptr))
+    if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(TEAM_HORDE)))
     {
         player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
         player->RemoveAurasDueToSpell(BG_WS_SPELL_BRUTAL_ASSAULT);

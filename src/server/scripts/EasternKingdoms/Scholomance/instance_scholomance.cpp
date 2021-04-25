@@ -24,13 +24,6 @@ public:
     struct instance_scholomance_InstanceMapScript : public InstanceScript
     {
         instance_scholomance_InstanceMapScript(Map* map) : InstanceScript(map),
-            GateKirtonosGUID { 0 },
-            GateMiliciaGUID  { 0 },
-            GateTheolenGUID  { 0 },
-            GatePolkeltGUID  { 0 },
-            GateRavenianGUID { 0 },
-            GateBarovGUID    { 0 },
-            GateIlluciaGUID  { 0 },
             _kirtonosState   { 0 },
             _miniBosses      { 0 },
             _rasHuman        { 0 }
@@ -64,7 +57,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -84,7 +77,7 @@ public:
                     return GateIlluciaGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -146,13 +139,13 @@ public:
         }
 
     protected:
-        uint64 GateKirtonosGUID;
-        uint64 GateMiliciaGUID;
-        uint64 GateTheolenGUID;
-        uint64 GatePolkeltGUID;
-        uint64 GateRavenianGUID;
-        uint64 GateBarovGUID;
-        uint64 GateIlluciaGUID;
+        ObjectGuid GateKirtonosGUID;
+        ObjectGuid GateMiliciaGUID;
+        ObjectGuid GateTheolenGUID;
+        ObjectGuid GatePolkeltGUID;
+        ObjectGuid GateRavenianGUID;
+        ObjectGuid GateBarovGUID;
+        ObjectGuid GateIlluciaGUID;
 
         uint32 _kirtonosState;
         uint32 _miniBosses;
@@ -291,37 +284,37 @@ public:
                 {
                     case ROOM_HALL_OF_SECRETS:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_RAVENIAN)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_RAVENIAN)))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_HALLOFSECRETS;
                         break;
                     case ROOM_HALL_OF_THE_DAMNED:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_THEOLEN)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_THEOLEN)))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_HALLOFTHEDAMNED;
                         break;
                     case ROOM_THE_COVEN:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_MALICIA)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_MALICIA)))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_THECOVEN;
                         break;
                     case ROOM_THE_SHADOW_VAULT:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_ILLUCIA)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_ILLUCIA)))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_THESHADOWVAULT;
                         break;
                     case ROOM_BAROV_FAMILY_VAULT:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_BAROV)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_BAROV)))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_BAROVFAMILYVAULT;
                         break;
                     case ROOM_VAULT_OF_THE_RAVENIAN:
                         if (InstanceScript* instance = caster->GetInstanceScript())
-                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(GO_GATE_POLKELT)))
+                            if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(GO_GATE_POLKELT)))
                                 if (gate->GetGoState() == GO_STATE_ACTIVE)
                                     spellId = SPELL_SHADOW_PORTAL_VAULTOFTHERAVENIAN;
                         break;
@@ -442,7 +435,7 @@ public:
                 }
 
                 if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                    if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetData64(gateId)))
+                    if (GameObject* gate = ObjectAccessor::GetGameObject(*caster, instance->GetGuidData(gateId)))
                     {
                         gate->SetGoState(GO_STATE_READY);
                         gate->AI()->SetData(1, 1);
