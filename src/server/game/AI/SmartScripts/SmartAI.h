@@ -144,10 +144,10 @@ public:
     void SetData(uint32 id, uint32 value) override;
 
     // Used in scripts to share variables
-    void SetGUID(uint64 guid, int32 id = 0) override;
+    void SetGUID(ObjectGuid guid, int32 id = 0) override;
 
     // Used in scripts to share variables
-    uint64 GetGUID(int32 id = 0) const override;
+    ObjectGuid GetGUID(int32 id = 0) const override;
 
     //core related
     static int32 Permissible(const Creature*);
@@ -194,7 +194,7 @@ private:
     uint32 mFollowCredit;
     uint32 mFollowArrivedEntry;
     bool   mFollowArrivedAlive;
-    uint64 mFollowGuid;
+    ObjectGuid mFollowGuid;
     float mFollowDist;
     float mFollowAngle;
 

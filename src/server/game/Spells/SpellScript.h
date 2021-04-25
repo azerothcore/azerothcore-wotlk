@@ -801,7 +801,7 @@ public:
     uint32 GetId() const;
 
     // returns guid of object which casted the aura (m_originalCaster of the Spell class)
-    uint64 GetCasterGUID() const;
+    ObjectGuid GetCasterGUID() const;
     // returns unit which casted the aura or nullptr if not avalible (caster logged out for example)
     Unit* GetCaster() const;
     // returns object on which aura was casted, target for non-area auras, area aura source for area auras
