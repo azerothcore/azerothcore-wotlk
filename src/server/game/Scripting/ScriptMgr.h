@@ -803,6 +803,12 @@ public:
 
     // Called when a player gains XP (before anything is given)
     virtual void OnGiveXP(Player* /*player*/, uint32& /*amount*/, Unit* /*victim*/) { }
+	
+    // Called when a player's honor points changes (before it is actually changed)
+    virtual void OnPlayerHonorChange(Player* /*player*/, int32& /*amount*/) { }
+
+    // Called when a player's arena points changes (before it is actually changed)
+    virtual void OnPlayerArenaPointsChange(Player* /*player*/, int32& /*amount*/) { }
 
     // Called when a player's reputation changes (before it is actually changed)
     virtual void OnReputationChange(Player* /*player*/, uint32 /*factionId*/, int32& /*standing*/, bool /*incremental*/) { }
@@ -935,9 +941,15 @@ public:
 
     //Called after the normal slots (0..2) for arena have been evaluated so that custom arena teams could modify it if nececasry
     virtual void OnGetMaxPersonalArenaRatingRequirement(const Player* /*player*/, uint32 /*minSlot*/, uint32& /*maxArenaRating*/) const {}
+	
+    //Before looting item
+    virtual void OnBeforeLootItem(Player* /*player*/, LootItem* /*item*/, uint64 /*lootguid*/) { }
 
     //After looting item
     virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, uint64 /*lootguid*/) { }
+	
+    //After looting item
+    virtual void OnLootGold(Player* /*player*/, uint32& /*amount*/) { }
 
     //After creating item (eg profession item creation)
     virtual void OnCreateItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
@@ -1618,6 +1630,8 @@ public: /* PlayerScript */
     void OnPlayerTalentsReset(Player* player, bool noCost);
     void OnPlayerMoneyChanged(Player* player, int32& amount);
     void OnGivePlayerXP(Player* player, uint32& amount, Unit* victim);
+    void OnPlayerHonorChange(Player* player, int32& amount);
+    void OnPlayerArenaPointsChange(Player* player, int32& amount);
     void OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
     void OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased);
     void OnPlayerLearnSpell(Player* player, uint32 spellID);
@@ -1663,7 +1677,9 @@ public: /* PlayerScript */
     void GetCustomGetArenaTeamId(const Player* player, uint8 slot, uint32& teamID) const;
     void GetCustomArenaPersonalRating(const Player* player, uint8 slot, uint32& rating) const;
     void OnGetMaxPersonalArenaRatingRequirement(const Player* player, uint32 minSlot, uint32& maxArenaRating) const;
+    void OnBeforeLootItem(Player* player, LootItem* item, uint64 lootguid);
     void OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid);
+    void OnLootGold(Player* player, uint32& amount);
     void OnCreateItem(Player* player, Item* item, uint32 count);
     void OnQuestRewardItem(Player* player, Item* item, uint32 count);
     bool OnBeforePlayerQuestComplete(Player* player, uint32 quest_id);

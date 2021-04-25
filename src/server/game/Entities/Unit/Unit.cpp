@@ -17028,7 +17028,10 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
                 loot->FillLoot(lootid, LootTemplates_Creature, looter, false, false, creature->GetLootMode());
 
             if (creature->GetLootMode())
+            {
                 loot->generateMoneyLoot(creature->GetCreatureTemplate()->mingold, creature->GetCreatureTemplate()->maxgold);
+                sScriptMgr->OnLootGold(player, loot->gold);
+            }
 
             if (group)
             {

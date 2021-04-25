@@ -7579,6 +7579,9 @@ void Player::SetArenaPoints(uint32 value)
 
 void Player::ModifyHonorPoints(int32 value, SQLTransaction* trans /*=nullptr*/)
 {
+
+    sScriptMgr->OnPlayerHonorChange(this, value);
+
     int32 newValue = int32(GetHonorPoints()) + value;
     if (newValue < 0)
         newValue = 0;
@@ -7595,6 +7598,9 @@ void Player::ModifyHonorPoints(int32 value, SQLTransaction* trans /*=nullptr*/)
 
 void Player::ModifyArenaPoints(int32 value, SQLTransaction* trans /*=nullptr*/)
 {
+
+    sScriptMgr->OnPlayerArenaPointsChange(this, value);
+
     int32 newValue = int32(GetArenaPoints()) + value;
     if (newValue < 0)
         newValue = 0;
@@ -9245,7 +9251,10 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                     group->UpdateLooterGuid(go);
             }
             if (GameObjectTemplateAddon const* addon = go->GetTemplateAddon())
+            {
                 loot->generateMoneyLoot(addon->mingold, addon->maxgold);
+                sScriptMgr->OnLootGold(this, loot->gold);
+            }
 
             if (loot_type == LOOT_FISHING)
                 go->getFishLoot(loot, this);
@@ -9336,6 +9345,7 @@ void Player::SendLoot(uint64 guid, LootType loot_type)
                     break;
                 default:
                     loot->generateMoneyLoot(item->GetTemplate()->MinMoneyLoot, item->GetTemplate()->MaxMoneyLoot);
+                    sScriptMgr->OnLootGold(this, loot->gold);
                     loot->FillLoot(item->GetEntry(), LootTemplates_Item, this, true, loot->gold != 0);
 
                     // Xinef: Add to storage
@@ -25830,6 +25840,8 @@ void Player::StoreLootItem(uint8 lootSlot, Loot* loot)
         SendLootRelease(GetLootGUID());
         return;
     }
+	
+    sScriptMgr->OnBeforeLootItem(this, item, this->GetLootGUID());
 
     ItemPosCountVec dest;
     InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item->itemid, item->count);

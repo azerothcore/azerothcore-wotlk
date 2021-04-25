@@ -1443,6 +1443,22 @@ void ScriptMgr::OnGivePlayerXP(Player* player, uint32& amount, Unit* victim)
     FOREACH_SCRIPT(PlayerScript)->OnGiveXP(player, amount, victim);
 }
 
+void ScriptMgr::OnPlayerHonorChange(Player* player, int32& amount)
+{
+#ifdef ELUNA
+    sEluna->OnPlayerHonorChange(player, amount);
+#endif
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerHonorChange(player, amount);
+}
+
+void ScriptMgr::OnPlayerArenaPointsChange(Player* player, int32& amount)
+{
+#ifdef ELUNA
+    sEluna->OnPlayerArenaPointsChange(player, amount);
+#endif
+    FOREACH_SCRIPT(PlayerScript)->OnPlayerArenaPointsChange(player, amount);
+}
+
 void ScriptMgr::OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental)
 {
 #ifdef ELUNA
@@ -1710,9 +1726,19 @@ void ScriptMgr::OnGetMaxPersonalArenaRatingRequirement(const Player* player, uin
     FOREACH_SCRIPT(PlayerScript)->OnGetMaxPersonalArenaRatingRequirement(player, minSlot, maxArenaRating);
 }
 
+void ScriptMgr::OnBeforeLootItem(Player* player, LootItem* item, uint64 lootguid)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnBeforeLootItem(player, item, lootguid);
+}
+
 void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid)
 {
     FOREACH_SCRIPT(PlayerScript)->OnLootItem(player, item, count, lootguid);
+}
+
+void ScriptMgr::OnLootGold(Player* player, uint32& amount)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnLootGold(player, amount);
 }
 
 void ScriptMgr::OnCreateItem(Player* player, Item* item, uint32 count)
