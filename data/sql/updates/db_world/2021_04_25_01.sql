@@ -1,3 +1,19 @@
+-- DB update 2021_04_25_00 -> 2021_04_25_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_25_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_25_00 2021_04_25_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1618407580655578700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1618407580655578700');
 
 UPDATE `acore_string` SET `locale_zhCN` = '你必须选择一个目标或者生物。' WHERE `entry` IN (1);
@@ -1086,3 +1102,11 @@ UPDATE `acore_string` SET `locale_zhCN` = '|cffff0000[Wintergrasp]:|r Battle sta
 UPDATE `acore_string` SET `locale_zhCN` = '这些曲目必须属于信仰同化祭礼.' WHERE `entry` IN (28634);
 UPDATE `acore_string` SET `locale_zhCN` = '这些不是信仰同化祭礼的足迹.' WHERE `entry` IN (28635);
 UPDATE `acore_string` SET `locale_zhCN` = '准备好了。' WHERE `entry` IN (30000);
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
