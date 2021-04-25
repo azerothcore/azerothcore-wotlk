@@ -6,6 +6,7 @@
 #include "InstanceScript.h"
 #include "Player.h"
 #include "scholomance.h"
+#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -508,6 +509,134 @@ public:
     }
 };
 
+enum OccultistEntries
+{
+    CASTER_ENTRY      = 10472,
+    DARK_SHADE_ENTRY  = 11284
+};
+
+enum OccultistSpells
+{
+    BONE_ARMOR_SPELL         = 16431,
+    COUNTER_SPELL            = 15122,
+    DRAIN_MANA_SPELL         = 17243,
+    SHADOWBOLT_VOLLEY_SPELL  = 17228
+};
+
+class npc_scholomance_occultist : public CreatureScript
+{
+public:
+    npc_scholomance_occultist() : CreatureScript("npc_scholomance_occultist") { }
+
+    struct npc_scholomance_occultistAI: public ScriptedAI
+    {
+        npc_scholomance_occultistAI(Creature* creature) : ScriptedAI(creature)
+        {
+            instance = me->GetInstanceScript();
+        }
+
+        uint32 originalDisplayId;
+        EventMap events;
+        InstanceScript* instance;
+
+        Unit* SelectUnitCasting()
+        {
+          ThreatContainer::StorageType threatlist = me->getThreatManager().getThreatList();
+          for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+          {
+              if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+              {
+                  if (unit->HasUnitState(UNIT_STATE_CASTING))
+                  {
+                      return unit;
+                  }
+              }
+          }
+          return nullptr;
+        }
+
+        void JustReachedHome() override
+        {
+            events.Reset();
+            if (me->GetEntry() != CASTER_ENTRY)
+            {
+                me->UpdateEntry(CASTER_ENTRY, nullptr, false);
+                me->SetDisplayId(originalDisplayId);
+            }
+        }
+
+        void EnterCombat(Unit* /*who*/) override
+        {
+            originalDisplayId = me->GetDisplayId();
+
+            events.Reset();
+            events.RescheduleEvent(1, urand(1000, 7000));
+            events.RescheduleEvent(2, 400);
+            events.RescheduleEvent(3, urand(6000, 15000));
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+            {
+                return;
+            }
+
+            events.Update(diff);
+
+            if (me->HealthBelowPct(30) && !(me->GetEntry() == DARK_SHADE_ENTRY))
+            {
+                events.Reset();
+                me->InterruptNonMeleeSpells(false);
+                me->UpdateEntry(DARK_SHADE_ENTRY, nullptr, false);
+                events.RescheduleEvent(4, urand(2000, 10000));
+            }
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                return;
+            }
+
+            switch(events.ExecuteEvent())
+            {
+                case 1:
+                    me->CastSpell(me, BONE_ARMOR_SPELL, false);
+                    events.RepeatEvent(60000);
+                    break;
+                case 2:
+                    if (Unit* target = SelectUnitCasting())
+                    {
+                        me->CastSpell(target, COUNTER_SPELL, false);
+                        events.RepeatEvent(urand(10000, 20000));
+                    }
+                    else
+                    {
+                        events.RepeatEvent(400);
+                    }
+                    break;
+                case 3:
+                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, PowerUsersSelector(me, POWER_MANA, 20.0f, false)))
+                    {
+                        me->CastSpell(target, DRAIN_MANA_SPELL, false);
+                    }
+                    events.RepeatEvent(urand(13000, 20000));
+                    break;
+                case 4:
+                    me->CastSpell(me->GetVictim(), SHADOWBOLT_VOLLEY_SPELL, true);
+                    events.RepeatEvent(urand(11000, 17000));
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetScholomanceAI<npc_scholomance_occultistAI>(creature);
+    }
+};
+
+
 void AddSC_instance_scholomance()
 {
     new instance_scholomance();
@@ -517,4 +646,5 @@ void AddSC_instance_scholomance()
     new spell_scholomance_shadow_portal();
     new spell_scholomance_shadow_portal_rooms();
     new spell_scholomance_boon_of_life();
+    new npc_scholomance_occultist();
 }

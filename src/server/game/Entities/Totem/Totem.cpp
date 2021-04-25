@@ -152,6 +152,12 @@ bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) con
             spellInfo->Effects[index].TargetA.GetCheckType() != TARGET_CHECK_ENTRY && spellInfo->Id != 55277 && spellInfo->Id != 6277)
         return true;
 
+    // Cyclone shouldn't be casted on totems
+    if (spellInfo->Id == SPELL_CYCLONE)
+    {
+        return true;
+    }
+
     switch (spellInfo->Effects[index].ApplyAuraName)
     {
         // i think its wrong (xinef)
