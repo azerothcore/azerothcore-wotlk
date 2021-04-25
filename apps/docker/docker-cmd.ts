@@ -32,25 +32,25 @@ shellCommandFactory(
 
 shellCommandFactory("build", "Build the authserver and worldserver", [
     "docker-compose --profile all build",
-    "docker-compose run --rm ac-dev-server bash bin/acore-docker-update",
+    "docker-compose run --rm ac-build bash bin/acore-docker-update",
 ]);
 
 shellCommandFactory(
     "build:clean",
     "Clean build data",
-    [`docker-compose run --rm ac-dev-server bash acore.sh compiler clean`]
+    [`docker-compose run --rm ac-build bash acore.sh compiler clean`]
 );
 
 shellCommandFactory(
     "client-data",
     "Download client data inside the ac-data volume",
-    ["docker-compose run --rm ac-dev-server bash acore.sh client-data"]
+    ["docker-compose run --rm ac-worlserver bash acore.sh client-data"]
 );
 
 shellCommandFactory(
     "db-import",
     "Create and upgrade the database with latest updates",
-    ["docker-compose run --rm ac-dev-server bash acore.sh db-assembler import-all"]
+    ["docker-compose run --rm ac-build bash acore.sh db-assembler import-all"]
 );
 
 shellCommandFactory(
@@ -182,7 +182,11 @@ function shellCommandFactory(
                     cwd: process.cwd(),
                 });
 
-                await shellCmd.status();
+                const status = await shellCmd.status();
+
+                if (!status.success) {
+                    throw new Error(`Failed with error: ${status.code}`)
+                }
 
                 shellCmd.close();
             }

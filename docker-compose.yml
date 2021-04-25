@@ -37,8 +37,7 @@ services:
   abstract-no-bind:
     image: local/azerothcore/abstract-no-bind
     volumes:
-      - ac-proj:/azerothcore-internal/
-    working_dir: /azerothcore-internal/
+      - ac-proj:/azerothcore/
     profiles: [abstract-service] # do not run this
 
 #=======================
@@ -74,7 +73,7 @@ services:
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     stdin_open: true
     tty: true
-    command: ./acore.sh run-worldserver
+    command: ls -al env/dist/bin/worldserver
     image: acore/worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
@@ -83,12 +82,13 @@ services:
     privileged: true
     build:
       context: .
-      target: ${DOCKER_BUILD_WORLD_TARGET:-dev}
+      target: worldserver-without-data
       dockerfile: ./apps/docker/Dockerfile
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
+        SKIP_SRV_BUILD: ${SKIP_SRV_BUILD:-1}
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
@@ -106,12 +106,13 @@ services:
     user: ${DOCKER_USER:-acore}
     build:
       context: .
-      target: ${DOCKER_BUILD_AUTH_TARGET:-dev}
+      target: authserver
       dockerfile: ./apps/docker/Dockerfile
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
+        SKIP_SRV_BUILD: ${SKIP_SRV_BUILD:-1}
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [all, app, authserver]
@@ -121,6 +122,23 @@ services:
 # Dev services
 #
 #======================
+  ac-build:
+    image: acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+    build:
+      context: .
+      target: dev
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    working_dir: /azerothcore/
+    volumes:
+        - ac-env:/azerothcore/env
+        - ac-build:/azerothcore/var/build
+    profiles: [all, build]
 
   ac-dev-server:
     <<: *ac-shared-conf
@@ -131,7 +149,7 @@ services:
       - seccomp:unconfined
     build:
       context: .
-      target: ${DOCKER_BUILD_DEV_TARGET:-dev}
+      target: dev
       dockerfile: ./apps/docker/Dockerfile
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
@@ -147,15 +165,14 @@ services:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
-      - ac-build:/azerothcore/var/build
-      - ac-build-internal:/azerothcore-internal/var/build
+      - ac-build-dev:/azerothcore/var/build
     profiles: [all, dev]
 
 volumes:
   ac-database:
   ac-env:
+  ac-build-dev:
   ac-build:
-  ac-build-internal:
   ac-proj:
   # not used, but you can use them by setting
   # the DOCKER_VOL_* env variabiles

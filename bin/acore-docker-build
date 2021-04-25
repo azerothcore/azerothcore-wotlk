@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd /azerothcore-internal
+cd /azerothcore
 
 bash acore.sh compiler build
 
