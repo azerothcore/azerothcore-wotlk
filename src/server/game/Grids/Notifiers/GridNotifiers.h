@@ -83,17 +83,21 @@ namespace acore
     struct MessageDistDeliverer
     {
         WorldObject const* i_source;
-        WorldPacket* i_message;
+        WorldPacket const* i_message;
         uint32 i_phaseMask;
         float i_distSq;
         TeamId teamId;
         Player const* skipped_receiver;
-        MessageDistDeliverer(WorldObject* src, WorldPacket* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr)
-            : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist * dist)
+        MessageDistDeliverer(WorldObject const* src, WorldPacket const* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr)
+            : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist* dist)
             , teamId((own_team_only && src->GetTypeId() == TYPEID_PLAYER) ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL)
             , skipped_receiver(skipped)
         {
+            if (own_team_only)
+                if (Player const* player = src->ToPlayer())
+                    teamId = player->GetTeamId();
         }
+
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
         void Visit(DynamicObjectMapType& m);

@@ -7,6 +7,7 @@
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "CellImpl.h"
+#include "Cell.h"
 #include "Chat.h"
 #include "Common.h"
 #include "Creature.h"
@@ -2133,13 +2134,13 @@ void WorldObject::SendMessageToSet(WorldPacket const* data, bool self) const
 void WorldObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/) const
 {
     acore::MessageDistDeliverer notifier(this, data, dist);
-    VisitNearbyWorldObject(this, notifier, dist);
+    Cell::VisitWorldObjects(this, notifier, dist);
 }
 
 void WorldObject::SendMessageToSetInRange(WorldPacket const* data, Player const* skipped_rcvr) const
 {
     acore::MessageDistDeliverer notifier(this, data, GetVisibilityRange(), false, skipped_rcvr);
-    VisitNearbyWorldObject(this, notifier, GetVisibilityRange());
+    Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
 }
 
 void WorldObject::SendObjectDeSpawnAnim(uint64 guid)

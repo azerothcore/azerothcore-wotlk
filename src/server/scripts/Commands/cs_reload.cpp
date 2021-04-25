@@ -22,6 +22,7 @@ EndScriptData */
 #include "LFGMgr.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
+#include "Object.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SkillExtraItems.h"

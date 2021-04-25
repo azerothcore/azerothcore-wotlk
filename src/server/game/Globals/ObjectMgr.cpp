@@ -22,6 +22,7 @@
 #include "Log.h"
 #include "MapManager.h"
 #include "ObjectMgr.h"
+#include "Object.h"
 #include "Pet.h"
 #include "PoolMgr.h"
 #include "ReputationMgr.h"

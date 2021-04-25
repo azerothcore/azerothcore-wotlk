@@ -113,6 +113,30 @@ inline void Cell::Visit(CellCoord const& standing_cell, TypeContainerVisitor<T, 
     Visit(standing_cell, visitor, map, radius + obj.GetObjectSize(), obj.GetPositionX(), obj.GetPositionY());
 }
 
+template<class T>
+inline void Cell::VisitWorldObjects(WorldObject const* center_obj, T& visitor, float radius, bool dont_load /*= true*/)
+{
+    CellCoord p(acore::ComputeCellCoord(center_obj->GetPositionX(), center_obj->GetPositionY()));
+    Cell cell(p);
+    if (dont_load)
+        cell.SetNoCreate();
+
+    TypeContainerVisitor<T, WorldTypeMapContainer> wnotifier(visitor);
+    cell.Visit(p, wnotifier, *center_obj->GetMap(), *center_obj, radius);
+}
+
+template<class T>
+inline void Cell::VisitWorldObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load /*= true*/)
+{
+    CellCoord p(Trinity::ComputeCellCoord(x, y));
+    Cell cell(p);
+    if (dont_load)
+        cell.SetNoCreate();
+
+    TypeContainerVisitor<T, WorldTypeMapContainer> wnotifier(visitor);
+    cell.Visit(p, wnotifier, *map, x, y, radius);
+}
+
 template<class T, class CONTAINER>
 inline void Cell::VisitCircle(TypeContainerVisitor<T, CONTAINER>& visitor, Map& map, CellCoord const& begin_cell, CellCoord const& end_cell) const
 {

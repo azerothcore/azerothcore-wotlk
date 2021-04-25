@@ -17,6 +17,7 @@
 #include "NPCPackets.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
+#include "Object.h"
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
@@ -117,10 +118,7 @@ void WorldSession::HandleTrainerListOpcode(WorldPackets::NPC::Hello& packet)
         return;
     }
 
-    if (sObjectMgr->GetTrainer(npc->GetEntry()))
-        SendTrainerList(npc);
-    else
-        LOG_DEBUG("network", "WorldSession::SendTrainerList - Creature id %u has no trainer data.", npc->GetEntry());
+    SendTrainerList(npc);
 
 }
 
@@ -146,13 +144,16 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPackets::NPC::TrainerBuySpel
 {
     LOG_DEBUG("network", "WORLD: Received CMSG_TRAINER_BUY_SPELL %s, learn spell id is: %u", packet.TrainerGUID.ToString().c_str(), packet.SpellID);
 
-
     Creature* npc = GetPlayer()->GetNPCIfCanInteractWith(packet.TrainerGUID, UNIT_NPC_FLAG_TRAINER);
     if (!npc)
     {
         LOG_DEBUG("network", "WORLD: HandleTrainerBuySpellOpcode - %s not found or you can not interact with him.", packet.TrainerGUID.ToString().c_str());
         return;
     }
+
+    // remove fake death
+    if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
+        GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
     Trainer::Trainer const* trainer = sObjectMgr->GetTrainer(npc->GetEntry());
     if (!trainer)

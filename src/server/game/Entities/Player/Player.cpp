@@ -6930,30 +6930,32 @@ void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool s
 {
     if (self)
         SendDirectMessage(data);
+
     acore::MessageDistDeliverer notifier(this, data, dist);
-    VisitNearbyWorldObject(this, notifier, dist);
+    Cell::VisitWorldObjects(this, notifier, dist);
 }
 
-// pussywizard!
-void Player::SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool self)
+void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool own_team_only) const
 {
     if (self)
         SendDirectMessage(data);
+
     acore::MessageDistDeliverer notifier(this, data, dist, own_team_only);
-    VisitNearbyWorldObject(this, notifier, dist);
+    Cell::VisitWorldObjects(this, notifier, dist);
 }
 
 void Player::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const
 {
     if (skipped_rcvr != this)
         SendDirectMessage(data);
+
     // we use World::GetMaxVisibleDistance() because i cannot see why not use a distance
     // update: replaced by GetMap()->GetVisibilityDistance()
     acore::MessageDistDeliverer notifier(this, data, GetVisibilityRange(), false, skipped_rcvr);
-    VisitNearbyWorldObject(this, notifier, GetVisibilityRange());
+    Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
 }
 
-void Player::SendDirectMessage(WorldPacket* data)
+void Player::SendDirectMessage(WorldPacket const* data)
 {
     m_session->SendPacket(data);
 }
