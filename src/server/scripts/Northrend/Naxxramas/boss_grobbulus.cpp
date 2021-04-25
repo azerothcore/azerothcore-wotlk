@@ -79,10 +79,7 @@ public:
             me->GetCreaturesWithEntryInRange(StichedGiants, 300.0f, NPC_STICHED_GIANT);
             for (std::list<Creature*>::const_iterator itr = StichedGiants.begin(); itr != StichedGiants.end(); ++itr)
             {
-                if ((*itr)->GetGUID())
-                {
-                    (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
-                }
+                (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
             }
         }
 

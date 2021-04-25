@@ -39,18 +39,7 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
 
-            ShadeOfAkamaGUID            = 0;
-            AkamaShadeGUID              = 0;
-            TeronGorefiendGUID          = 0;
-            ReliquaryGUID               = 0;
             ashtongueGUIDs.clear();
-            GathiosTheShattererGUID     = 0;
-            HighNethermancerZerevorGUID = 0;
-            LadyMalandeGUID             = 0;
-            VerasDarkshadowGUID         = 0;
-            IllidariCouncilGUID         = 0;
-            AkamaGUID                   = 0;
-            IllidanStormrageGUID        = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -164,7 +153,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -188,7 +177,7 @@ public:
                     return IllidanStormrageGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -198,8 +187,8 @@ public:
 
             if (type == DATA_SHADE_OF_AKAMA && state == DONE)
             {
-                for (std::list<uint64>::const_iterator itr = ashtongueGUIDs.begin(); itr != ashtongueGUIDs.end(); ++itr)
-                    if (Creature* ashtongue = instance->GetCreature(*itr))
+                for (ObjectGuid const guid : ashtongueGUIDs)
+                    if (Creature* ashtongue = instance->GetCreature(guid))
                         ashtongue->setFaction(FACTION_ASHTONGUE);
             }
             else if (type == DATA_ILLIDARI_COUNCIL && state == DONE)
@@ -255,18 +244,18 @@ public:
         }
 
     protected:
-        uint64 ShadeOfAkamaGUID;
-        uint64 AkamaShadeGUID;
-        uint64 TeronGorefiendGUID;
-        uint64 ReliquaryGUID;
-        std::list<uint64> ashtongueGUIDs;
-        uint64 GathiosTheShattererGUID;
-        uint64 HighNethermancerZerevorGUID;
-        uint64 LadyMalandeGUID;
-        uint64 VerasDarkshadowGUID;
-        uint64 IllidariCouncilGUID;
-        uint64 AkamaGUID;
-        uint64 IllidanStormrageGUID;
+        ObjectGuid ShadeOfAkamaGUID;
+        ObjectGuid AkamaShadeGUID;
+        ObjectGuid TeronGorefiendGUID;
+        ObjectGuid ReliquaryGUID;
+        GuidList ashtongueGUIDs;
+        ObjectGuid GathiosTheShattererGUID;
+        ObjectGuid HighNethermancerZerevorGUID;
+        ObjectGuid LadyMalandeGUID;
+        ObjectGuid VerasDarkshadowGUID;
+        ObjectGuid IllidariCouncilGUID;
+        ObjectGuid AkamaGUID;
+        ObjectGuid IllidanStormrageGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
@@ -304,8 +293,8 @@ public:
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            for (std::set<uint64>::const_iterator itr = _turtleSet.begin(); itr != _turtleSet.end(); ++itr)
-                if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), *itr))
+            for (ObjectGuid const guid : _turtleSet)
+                if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
                 {
                     turtle->TauntFadeOut(GetUnitOwner());
                     turtle->AddThreat(GetUnitOwner(), -10000000.0f);
@@ -319,7 +308,7 @@ public:
         }
 
     private:
-        std::set<uint64> _turtleSet;
+        GuidSet _turtleSet;
     };
 
     AuraScript* GetAuraScript() const override

@@ -21,14 +21,12 @@ public:
         instance_sethekk_halls_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
         uint32 AnzuEncounter;
-        uint64 m_uiIkissDoorGUID;
-        uint64 _talonKingsCofferGUID;
+        ObjectGuid m_uiIkissDoorGUID;
+        ObjectGuid _talonKingsCofferGUID;
 
         void Initialize() override
         {
             AnzuEncounter = NOT_STARTED;
-            m_uiIkissDoorGUID = 0;
-            _talonKingsCofferGUID = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
