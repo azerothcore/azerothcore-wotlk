@@ -2012,10 +2012,10 @@ public:
     bool UpdatePosition(const Position& pos, bool teleport = false) { return UpdatePosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), teleport); }
     void UpdateUnderwaterState(Map* m, float x, float y, float z) override;
 
-    void SendMessageToSet(WorldPacket* data, bool self) { SendMessageToSetInRange(data, GetVisibilityRange(), self, true); } // pussywizard!
-    void SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool includeMargin = false, Player const* skipped_rcvr = nullptr); // pussywizard!
-    void SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool self); // pussywizard! param includeMargin not needed here
-    void SendMessageToSet(WorldPacket* data, Player const* skipped_rcvr) { SendMessageToSetInRange(data, GetVisibilityRange(), skipped_rcvr != this, true, skipped_rcvr); } // pussywizard!
+    void SendMessageToSet(WorldPacket const* data, bool self) const override { SendMessageToSetInRange(data, GetVisibilityRange(), self); }
+    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self) const override;
+    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool own_team_only) const;
+    void SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const override;
 
     void SendTeleportAckPacket();
 

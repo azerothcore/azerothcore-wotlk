@@ -6926,27 +6926,31 @@ void Player::SaveRecallPosition()
     m_recallO = GetOrientation();
 }
 
-// pussywizard!
-void Player::SendMessageToSetInRange(WorldPacket* data, float dist, bool self, bool includeMargin, Player const* skipped_rcvr)
+void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool self) const
 {
     if (self)
-        GetSession()->SendPacket(data);
-
-    dist += GetObjectSize();
-    if (includeMargin)
-        dist += VISIBILITY_COMPENSATION; // pussywizard: to ensure everyone receives all important packets
-    acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
-    VisitNearbyWorldObject(dist, notifier);
+        SendDirectMessage(data);
+    acore::MessageDistDeliverer notifier(this, data, dist);
+    VisitNearbyWorldObject(this, notifier, dist);
 }
 
 // pussywizard!
 void Player::SendMessageToSetInRange_OwnTeam(WorldPacket* data, float dist, bool self)
 {
     if (self)
-        GetSession()->SendPacket(data);
+        SendDirectMessage(data);
+    acore::MessageDistDeliverer notifier(this, data, dist, own_team_only);
+    VisitNearbyWorldObject(this, notifier, dist);
+}
 
-    acore::MessageDistDeliverer notifier(this, data, dist, true);
-    VisitNearbyWorldObject(dist, notifier);
+void Player::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const
+{
+    if (skipped_rcvr != this)
+        SendDirectMessage(data);
+    // we use World::GetMaxVisibleDistance() because i cannot see why not use a distance
+    // update: replaced by GetMap()->GetVisibilityDistance()
+    acore::MessageDistDeliverer notifier(this, data, GetVisibilityRange(), false, skipped_rcvr);
+    VisitNearbyWorldObject(this, notifier, GetVisibilityRange());
 }
 
 void Player::SendDirectMessage(WorldPacket* data)
