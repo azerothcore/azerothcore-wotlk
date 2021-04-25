@@ -48,7 +48,7 @@ shellCommandFactory(
 shellCommandFactory(
   "client-data",
   "Download client data inside the ac-data volume",
-  ["docker-compose run --rm ac-worlserver bash acore.sh client-data"],
+  ["docker-compose run --rm ac-worldserver bash acore.sh client-data"],
 );
 
 shellCommandFactory(
