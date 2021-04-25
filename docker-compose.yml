@@ -148,12 +148,14 @@ services:
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
       - ac-build:/azerothcore/var/build
+      - ac-build-internal:/azerothcore-internal/var/build
     profiles: [all, dev]
 
 volumes:
   ac-database:
   ac-env:
   ac-build:
+  ac-build-internal:
   ac-proj:
   # not used, but you can use them by setting
   # the DOCKER_VOL_* env variabiles

@@ -44,6 +44,7 @@ RUN addgroup --gid $GROUP_ID acore && \
 RUN mkdir -p /azerothcore-internal/env/dist/data
 RUN mkdir -p /azerothcore-internal/env/dist/logs
 RUN mkdir -p /azerothcore-internal/env/dist/etc
+RUN mkdir -p /azerothcore-internal/var/build
 RUN mkdir -p /azerothcore
 
 # Correct permissions for non-root operations
@@ -51,6 +52,7 @@ RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore
 RUN chown -R $DOCKER_USER:$DOCKER_USER /run
 RUN chown -R $DOCKER_USER:$DOCKER_USER /opt
 RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
+RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore-internal
 
 USER $DOCKER_USER
 
