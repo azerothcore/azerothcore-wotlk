@@ -665,7 +665,8 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     LOG_DEBUG("achievement", "AchievementMgr::SendAchievementEarned(%u)", achievement->ID);
 #endif
 
-    if (Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId()))
+    Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId());
+    if (guild)
     {
         acore::AchievementChatBuilder say_builder(*GetPlayer(), CHAT_MSG_GUILD_ACHIEVEMENT, LANG_ACHIEVEMENT_EARNED, achievement->ID);
         acore::LocalizedPacketDo<acore::AchievementChatBuilder> say_do(say_builder);
@@ -674,19 +675,33 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
 
     if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_KILL | ACHIEVEMENT_FLAG_REALM_FIRST_REACH))
     {
-        TeamId teamId = GetPlayer()->GetTeamId();
+        // If guild exists - send its name to the server
+        // If guild does not exist - send player's name to the server
+        if (achievement->flags & ACHIEVEMENT_FLAG_REALM_FIRST_KILL && guild)
+        {
+            WorldPacket data(SMSG_SERVER_FIRST_ACHIEVEMENT, guild->GetName().size() + 1 + 8 + 4 + 4);
+            data << guild->GetName();
+            data << uint64(GetPlayer()->GetGUID());
+            data << uint32(achievement->ID);
+            data << uint32(0);                                  // display name as plain string in chat (always 0 for guild)
+            sWorld->SendGlobalMessage(&data);
+        }
+        else
+        {
+            TeamId teamId = GetPlayer()->GetTeamId();
 
-        // broadcast realm first reached
-        WorldPacket data(SMSG_SERVER_FIRST_ACHIEVEMENT, GetPlayer()->GetName().size() + 1 + 8 + 4 + 4);
-        data << GetPlayer()->GetName();
-        data << uint64(GetPlayer()->GetGUID());
-        data << uint32(achievement->ID);
-        std::size_t linkTypePos = data.wpos();
-        data << uint32(1);                                  // display name as clickable link in chat
-        sWorld->SendGlobalMessage(&data, nullptr, teamId);
+            // broadcast realm first reached
+            WorldPacket data(SMSG_SERVER_FIRST_ACHIEVEMENT, GetPlayer()->GetName().size() + 1 + 8 + 4 + 4);
+            data << GetPlayer()->GetName();
+            data << uint64(GetPlayer()->GetGUID());
+            data << uint32(achievement->ID);
+            std::size_t linkTypePos = data.wpos();
+            data << uint32(1);                                  // display name as clickable link in chat
+            sWorld->SendGlobalMessage(&data, nullptr, teamId);
 
-        data.put<uint32>(linkTypePos, 0);                   // display name as plain string in chat
-        sWorld->SendGlobalMessage(&data, nullptr, teamId == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
+            data.put<uint32>(linkTypePos, 0);                   // display name as plain string in chat
+            sWorld->SendGlobalMessage(&data, nullptr, teamId == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
+        }
     }
     // if player is in world he can tell his friends about new achievement
     else if (GetPlayer()->IsInWorld())
