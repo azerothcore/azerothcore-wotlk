@@ -5,7 +5,7 @@ function comp_clean() {
 
   echo "Cleaning build files in $DIRTOCLEAN"
 
-  [ -d "$DIRTOCLEAN" ] && rm -rf "$PATTERN"
+  [ -d "$DIRTOCLEAN" ] && rm -rf $PATTERN
 }
 
 function comp_configure() {
