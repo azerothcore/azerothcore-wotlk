@@ -84,7 +84,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_GATE_KIRTONOS)))
+            if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GATE_KIRTONOS)))
             {
                 gate->SetGoState(GO_STATE_ACTIVE);
             }
@@ -94,7 +94,7 @@ public:
 
         void EnterEvadeMode() override
         {
-            if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_GATE_KIRTONOS)))
+            if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GATE_KIRTONOS)))
             {
                 gate->SetGoState(GO_STATE_ACTIVE);
             }
@@ -137,7 +137,7 @@ public:
                     me->GetMotionMaster()->MovePoint(0, PosMove[0]);
                     break;
                 case INTRO_3:
-                    if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetData64(GO_GATE_KIRTONOS)))
+                    if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetGuidData(GO_GATE_KIRTONOS)))
                     {
                         gate->SetGoState(GO_STATE_READY);
                     }

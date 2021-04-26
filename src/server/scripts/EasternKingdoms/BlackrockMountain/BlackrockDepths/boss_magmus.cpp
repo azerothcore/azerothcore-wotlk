@@ -70,7 +70,7 @@ public:
         void JustDied(Unit* killer) override
         {
             if (InstanceScript* instance = killer->GetInstanceScript())
-                instance->HandleGameObject(instance->GetData64(DATA_THRONE_DOOR), true);
+                instance->HandleGameObject(instance->GetGuidData(DATA_THRONE_DOOR), true);
         }
     };
 };
