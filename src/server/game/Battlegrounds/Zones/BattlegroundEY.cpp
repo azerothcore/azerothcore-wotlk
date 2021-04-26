@@ -28,8 +28,6 @@ BattlegroundEY::BattlegroundEY()
     _honorTics = 0;
     _ownedPointsCount[TEAM_ALLIANCE] = 0;
     _ownedPointsCount[TEAM_HORDE] = 0;
-    _flagKeeperGUID = 0;
-    _droppedFlagGUID = 0;
     _flagState = BG_EY_FLAG_STATE_ON_BASE;
     _flagCapturedObject = 0;
 
@@ -318,14 +316,14 @@ bool BattlegroundEY::SetupBattleground()
     AddSpiritGuide(BG_EY_SPIRIT_MAIN_HORDE, sg->x, sg->y, sg->z, 3.193953f, TEAM_HORDE);
 
     for (uint32 i = BG_EY_OBJECT_DOOR_A; i < BG_EY_OBJECT_MAX; ++i)
-        if (BgObjects[i] == 0)
+        if (!BgObjects[i])
         {
             LOG_ERROR("sql.sql", "BatteGroundEY: Failed to spawn some object Battleground not created!");
             return false;
         }
 
     for (uint32 i = BG_EY_SPIRIT_MAIN_ALLIANCE; i <= BG_EY_SPIRIT_MAIN_HORDE; ++i)
-        if (BgCreatures[i] == 0)
+        if (!BgCreatures[i])
         {
             LOG_ERROR("sql.sql", "BatteGroundEY: Failed to spawn spirit guides Battleground not created!");
             return false;
@@ -343,8 +341,8 @@ void BattlegroundEY::Init()
     _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_EY_HONOR_TICK_WEEKEND : BG_EY_HONOR_TICK_NORMAL;
     _ownedPointsCount[TEAM_ALLIANCE] = 0;
     _ownedPointsCount[TEAM_HORDE] = 0;
-    _flagKeeperGUID = 0;
-    _droppedFlagGUID = 0;
+    _flagKeeperGUID.Clear();
+    _droppedFlagGUID.Clear();
     _flagState = BG_EY_FLAG_STATE_ON_BASE;
     _flagCapturedObject = 0;
 }
@@ -372,9 +370,9 @@ void BattlegroundEY::RespawnFlagAfterDrop()
 
     _flagState = BG_EY_FLAG_STATE_ON_BASE;
     RespawnFlag();
-    if (GameObject* flag = ObjectAccessor::GetObjectInMap(GetDroppedFlagGUID(), FindBgMap(), (GameObject*)nullptr))
+    if (GameObject* flag = FindBgMap()->GetGameObject(GetDroppedFlagGUID()))
         flag->Delete();
-    SetDroppedFlagGUID(0);
+    SetDroppedFlagGUID(ObjectGuid::Empty);
 }
 
 void BattlegroundEY::HandleKillPlayer(Player* player, Player* killer)
@@ -391,7 +389,7 @@ void BattlegroundEY::EventPlayerDroppedFlag(Player* player)
     if (GetFlagPickerGUID() != player->GetGUID())
         return;
 
-    SetFlagPicker(0);
+    SetFlagPicker(ObjectGuid::Empty);
     player->RemoveAurasDueToSpell(BG_EY_NETHERSTORM_FLAG_SPELL);
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -413,7 +411,7 @@ void BattlegroundEY::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     _flagState = BG_EY_FLAG_STATE_ON_PLAYER;
     SpawnBGObject(BG_EY_OBJECT_FLAG_NETHERSTORM, RESPAWN_ONE_DAY);
     SetFlagPicker(player->GetGUID());
-    SetDroppedFlagGUID(0);
+    SetDroppedFlagGUID(ObjectGuid::Empty);
 
     player->CastSpell(player, BG_EY_NETHERSTORM_FLAG_SPELL, true);
     player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
@@ -501,7 +499,7 @@ void BattlegroundEY::EventTeamCapturedPoint(TeamId teamId, uint32 point)
 
 void BattlegroundEY::EventPlayerCapturedFlag(Player* player, uint32 BgObjectType)
 {
-    SetFlagPicker(0);
+    SetFlagPicker(ObjectGuid::Empty);
     _flagState = BG_EY_FLAG_STATE_ON_BASE;
     player->RemoveAurasDueToSpell(BG_EY_NETHERSTORM_FLAG_SPELL);
     player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
