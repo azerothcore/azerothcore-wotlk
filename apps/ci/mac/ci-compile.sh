@@ -2,7 +2,8 @@
 
 export CCACHE_CPP2=true
 export CCACHE_MAXSIZE='1G'
-export CCACHE_COMPRESS=9
+export CCACHE_COMPRESS=1
+export CCACHE_COMPRESSLEVEL=9
 ccache -s
 
 cd var/build/obj
