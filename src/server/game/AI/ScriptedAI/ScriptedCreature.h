@@ -116,7 +116,7 @@ public:
             {
                 summon->AI()->DoAction(info);
             }
-            else
+            else if (!summon)
             {
                 storage_.remove(guid);
             }
