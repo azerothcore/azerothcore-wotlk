@@ -44,14 +44,14 @@ void LoadGameObjectModelList()
     FILE* model_list_file = fopen((sWorld->GetDataPath() + "vmaps/" + VMAP::GAMEOBJECT_MODELS).c_str(), "rb");
     if (!model_list_file)
     {
-        sLog->outError("Unable to open '%s' file.", VMAP::GAMEOBJECT_MODELS);
+        LOG_ERROR("server", "Unable to open '%s' file.", VMAP::GAMEOBJECT_MODELS);
         return;
     }
 
     char magic[8];
     if (fread(magic, 1, 8, model_list_file) != 8 || memcmp(magic, VMAP::VMAP_MAGIC, 8) != 0)
     {
-        sLog->outError("File '%s' has wrong header, expected %s.", VMAP::GAMEOBJECT_MODELS, VMAP::VMAP_MAGIC);
+        LOG_ERROR("maps", "File '%s' has wrong header, expected %s.", VMAP::GAMEOBJECT_MODELS, VMAP::VMAP_MAGIC);
         return;
     }
 
@@ -72,13 +72,13 @@ void LoadGameObjectModelList()
             || fread(&v1, sizeof(Vector3), 1, model_list_file) != 1
             || fread(&v2, sizeof(Vector3), 1, model_list_file) != 1)
         {
-            sLog->outError("File '%s' seems to be corrupted!", VMAP::GAMEOBJECT_MODELS);
+            LOG_ERROR("server", "File '%s' seems to be corrupted!", VMAP::GAMEOBJECT_MODELS);
             break;
         }
 
         if (v1.isNaN() || v2.isNaN())
         {
-            sLog->outError("File '%s' Model '%s' has invalid v1%s v2%s values!",
+            LOG_ERROR("maps", "File '%s' Model '%s' has invalid v1%s v2%s values!",
                 VMAP::GAMEOBJECT_MODELS, std::string(buff, name_length).c_str(), v1.toString().c_str(), v2.toString().c_str());
             continue;
         }
@@ -87,8 +87,9 @@ void LoadGameObjectModelList()
     }
 
     fclose(model_list_file);
-    sLog->outString(">> Loaded %u GameObject models in %u ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+
+    LOG_INFO("server", ">> Loaded %u GameObject models in %u ms", uint32(model_list.size()), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server", " ");
 }
 
 GameObjectModel::~GameObjectModel()
@@ -107,7 +108,7 @@ bool GameObjectModel::initialize(const GameObject& go, const GameObjectDisplayIn
     // ignore models with no bounds
     if (mdl_box == G3D::AABox::zero())
     {
-        sLog->outError("GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
+        LOG_ERROR("server", "GameObject model %s has zero bounds, loading skipped", it->second.name.c_str());
         return false;
     }
 
