@@ -42,32 +42,32 @@ public:
         bool bAchiev;
         bool bDefensesUsed;
 
-        std::vector<uint64> GO_ActivationCrystalGUID;
-        uint64 GO_MainGateGUID;
+        GuidVector GO_ActivationCrystalGUID;
+        ObjectGuid GO_MainGateGUID;
 
-        uint64 GO_MoraggCellGUID;
-        uint64 GO_ErekemCellGUID;
-        uint64 GO_ErekemRightGuardCellGUID;
-        uint64 GO_ErekemLeftGuardCellGUID;
-        uint64 GO_IchoronCellGUID;
-        uint64 GO_LavanthorCellGUID;
-        uint64 GO_XevozzCellGUID;
-        uint64 GO_ZuramatCellGUID;
+        ObjectGuid GO_MoraggCellGUID;
+        ObjectGuid GO_ErekemCellGUID;
+        ObjectGuid GO_ErekemRightGuardCellGUID;
+        ObjectGuid GO_ErekemLeftGuardCellGUID;
+        ObjectGuid GO_IchoronCellGUID;
+        ObjectGuid GO_LavanthorCellGUID;
+        ObjectGuid GO_XevozzCellGUID;
+        ObjectGuid GO_ZuramatCellGUID;
 
-        std::set<uint64> trashMobs;
-        uint64 NPC_SinclariGUID;
-        uint64 NPC_GuardGUID[4];
-        uint64 NPC_PortalGUID;
-        uint64 NPC_DoorSealGUID;
+        GuidSet trashMobs;
+        ObjectGuid NPC_SinclariGUID;
+        ObjectGuid NPC_GuardGUID[4];
+        ObjectGuid NPC_PortalGUID;
+        ObjectGuid NPC_DoorSealGUID;
 
-        uint64 NPC_MoraggGUID;
-        uint64 NPC_ErekemGUID;
-        uint64 NPC_ErekemGuardGUID[2];
-        uint64 NPC_IchoronGUID;
-        uint64 NPC_LavanthorGUID;
-        uint64 NPC_XevozzGUID;
-        uint64 NPC_ZuramatGUID;
-        uint64 NPC_CyanigosaGUID;
+        ObjectGuid NPC_MoraggGUID;
+        ObjectGuid NPC_ErekemGUID;
+        ObjectGuid NPC_ErekemGuardGUID[2];
+        ObjectGuid NPC_IchoronGUID;
+        ObjectGuid NPC_LavanthorGUID;
+        ObjectGuid NPC_XevozzGUID;
+        ObjectGuid NPC_ZuramatGUID;
+        ObjectGuid NPC_CyanigosaGUID;
 
         void Initialize() override
         {
@@ -84,30 +84,6 @@ public:
             bDefensesUsed = false;
 
             GO_ActivationCrystalGUID.clear();
-            GO_MainGateGUID = 0;
-
-            GO_MoraggCellGUID = 0;
-            GO_ErekemCellGUID = 0;
-            GO_ErekemRightGuardCellGUID = 0;
-            GO_ErekemLeftGuardCellGUID = 0;
-            GO_IchoronCellGUID = 0;
-            GO_LavanthorCellGUID = 0;
-            GO_XevozzCellGUID = 0;
-            GO_ZuramatCellGUID = 0;
-
-            NPC_SinclariGUID = 0;
-            memset(&NPC_GuardGUID, 0, sizeof(NPC_GuardGUID));
-            NPC_PortalGUID = 0;
-            NPC_DoorSealGUID = 0;
-
-            NPC_MoraggGUID = 0;
-            NPC_ErekemGUID = 0;
-            NPC_ErekemGuardGUID[0] = NPC_ErekemGuardGUID[1] = 0;
-            NPC_IchoronGUID = 0;
-            NPC_LavanthorGUID = 0;
-            NPC_XevozzGUID = 0;
-            NPC_ZuramatGUID = 0;
-            NPC_CyanigosaGUID = 0;
         }
 
         bool IsEncounterInProgress() const override
@@ -124,7 +100,7 @@ public:
                     break;
                 case NPC_VIOLET_HOLD_GUARD:
                     for (uint8 i = 0; i < 4; ++i)
-                        if (NPC_GuardGUID[i] == 0)
+                        if (!NPC_GuardGUID[i])
                         {
                             NPC_GuardGUID[i] = creature->GetGUID();
                             break;
@@ -156,7 +132,7 @@ public:
                     NPC_ErekemGUID = creature->GetGUID();
                     break;
                 case NPC_EREKEM_GUARD:
-                    if (NPC_ErekemGuardGUID[0] == 0)
+                    if (!NPC_ErekemGuardGUID[0])
                         NPC_ErekemGuardGUID[0] = creature->GetGUID();
                     else
                         NPC_ErekemGuardGUID[1] = creature->GetGUID();
@@ -175,7 +151,7 @@ public:
             switch(go->GetEntry())
             {
                 case GO_ACTIVATION_CRYSTAL:
-                    HandleGameObject(0, false, go); // make go not used yet
+                    HandleGameObject(ObjectGuid::Empty, false, go); // make go not used yet
                     go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
                     GO_ActivationCrystalGUID.push_back(go->GetGUID());
                     break;
@@ -280,7 +256,7 @@ public:
             }
         }
 
-        void SetData64(uint32 type, uint64 data) override
+        void SetGuidData(uint32 type, ObjectGuid data) override
         {
             switch(type)
             {
@@ -313,9 +289,9 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
-            switch(identifier)
+            switch (identifier)
             {
                 case DATA_TELEPORTATION_PORTAL_GUID:
                     return NPC_PortalGUID;
@@ -331,7 +307,7 @@ public:
                     return NPC_IchoronGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void StartBossEncounter(uint8 uiBoss)
@@ -458,10 +434,10 @@ public:
                         DoUpdateWorldState(WORLD_STATE_VH_PRISON_STATE, (uint32)GateHealth);
                         DoUpdateWorldState(WORLD_STATE_VH_WAVE_COUNT, (uint32)WaveCount);
 
-                        for (std::vector<uint64>::iterator itr = GO_ActivationCrystalGUID.begin(); itr != GO_ActivationCrystalGUID.end(); ++itr)
-                            if (GameObject* go = instance->GetGameObject(*itr))
+                        for (ObjectGuid guid : GO_ActivationCrystalGUID)
+                            if (GameObject* go = instance->GetGameObject(guid))
                             {
-                                HandleGameObject(0, false, go); // not used yet
+                                HandleGameObject(ObjectGuid::Empty, false, go); // not used yet
                                 go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // make it useable
                             }
                         events.RescheduleEvent(EVENT_SUMMON_PORTAL, 4000);
@@ -552,10 +528,10 @@ public:
             CLEANED = true;
 
             // reset defense crystals
-            for (std::vector<uint64>::iterator itr = GO_ActivationCrystalGUID.begin(); itr != GO_ActivationCrystalGUID.end(); ++itr)
-                if (GameObject* go = instance->GetGameObject(*itr))
+            for (ObjectGuid guid : GO_ActivationCrystalGUID)
+                if (GameObject* go = instance->GetGameObject(guid))
                 {
-                    HandleGameObject(0, false, go); // not used yet
+                    HandleGameObject(ObjectGuid::Empty, false, go); // not used yet
                     go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
                 }
 
@@ -576,12 +552,13 @@ public:
             // remove portal if any
             if (Creature* c = instance->GetCreature(NPC_PortalGUID))
                 c->DespawnOrUnsummon();
-            NPC_PortalGUID = 0;
+            NPC_PortalGUID.Clear();
 
             // remove trash
-            for (std::set<uint64>::iterator itr = trashMobs.begin(); itr != trashMobs.end(); ++itr)
-                if (Creature* c = instance->GetCreature(*itr))
+            for (ObjectGuid guid : trashMobs)
+                if (Creature* c = instance->GetCreature(guid))
                     c->DespawnOrUnsummon();
+
             trashMobs.clear();
 
             // clear door seal damaging auras:

@@ -59,7 +59,7 @@ void PetAI::_stopAttack()
     if (!me->IsAlive())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("server", "Creature stoped attacking cuz his dead [guid=%u]", me->GetGUIDLow());
+        LOG_DEBUG("server", "Creature stoped attacking cuz his dead [%s]", me->GetGUID().ToString().c_str());
 #endif
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveIdle();
@@ -157,7 +157,7 @@ void PetAI::UpdateAI(uint32 diff)
         if (_needToStop())
         {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-            LOG_DEBUG("server", "Pet AI stopped attacking [guid=%u]", me->GetGUIDLow());
+            LOG_DEBUG("server", "Pet AI stopped attacking [%s]", me->GetGUID().ToString().c_str());
 #endif
             _stopAttack();
             return;
@@ -250,7 +250,7 @@ void PetAI::UpdateAI(uint32 diff)
                         continue;
                 }
 
-                Spell* spell = new Spell(me, spellInfo, TRIGGERED_NONE, 0);
+                Spell* spell = new Spell(me, spellInfo, TRIGGERED_NONE);
                 spell->LoadScripts(); // xinef: load for CanAutoCast (calling CheckPetCast)
                 bool spellUsed = false;
 
@@ -272,9 +272,9 @@ void PetAI::UpdateAI(uint32 diff)
                 // No enemy, check friendly
                 if (!spellUsed)
                 {
-                    for (std::set<uint64>::const_iterator tar = m_AllySet.begin(); tar != m_AllySet.end(); ++tar)
+                    for (ObjectGuid const guid : m_AllySet)
                     {
-                        Unit* ally = ObjectAccessor::GetUnit(*me, *tar);
+                        Unit* ally = ObjectAccessor::GetUnit(*me, guid);
 
                         //only buff targets that are in combat, unless the spell can only be cast while out of combat
                         if (!ally)
@@ -295,7 +295,7 @@ void PetAI::UpdateAI(uint32 diff)
             }
             else if (me->GetVictim() && CanAttack(me->GetVictim(), spellInfo) && spellInfo->CanBeUsedInCombat())
             {
-                Spell* spell = new Spell(me, spellInfo, TRIGGERED_NONE, 0);
+                Spell* spell = new Spell(me, spellInfo, TRIGGERED_NONE);
                 if (spell->CanAutoCast(me->GetVictim()))
                     targetSpellStore.push_back(std::make_pair(me->GetVictim(), spell));
                 else
@@ -389,7 +389,7 @@ void PetAI::KilledUnit(Unit* victim)
         return;
 
     // Xinef: if pet is channeling a spell and owner killed something different, dont interrupt it
-    if (me->HasUnitState(UNIT_STATE_CASTING) && me->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT) && me->GetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT) != victim->GetGUID())
+    if (me->HasUnitState(UNIT_STATE_CASTING) && me->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT) && me->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT) != victim->GetGUID())
         return;
 
     // Clear target just in case. May help problem where health / focus / mana
@@ -537,7 +537,7 @@ void PetAI::HandleReturnMovement()
                     ClearCharmInfoFlags();
                     me->GetCharmInfo()->SetIsReturning(true);
                     me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(me->GetUInt32Value(OBJECT_FIELD_GUID), x, y, z);
+                    me->GetMotionMaster()->MovePoint(me->GetGUID().GetCounter(), x, y, z);
                 }
             }
         }
@@ -557,7 +557,7 @@ void PetAI::HandleReturnMovement()
     }
 
     me->GetCharmInfo()->SetForcedSpell(0);
-    me->GetCharmInfo()->SetForcedTargetGUID(0);
+    me->GetCharmInfo()->SetForcedTargetGUID();
 
     // xinef: remember that npcs summoned by npcs can also be pets
     me->DeleteThreatList();
@@ -570,7 +570,7 @@ void PetAI::SpellHit(Unit* caster, const SpellInfo* spellInfo)
     if (spellInfo->HasAura(SPELL_AURA_MOD_TAUNT) && !me->HasReactState(REACT_PASSIVE))
     {
         me->GetCharmInfo()->SetForcedSpell(0);
-        me->GetCharmInfo()->SetForcedTargetGUID(0);
+        me->GetCharmInfo()->SetForcedTargetGUID();
         AttackStart(caster);
     }
 }
@@ -627,7 +627,7 @@ void PetAI::MovementInform(uint32 moveType, uint32 data)
             {
                 // Pet is returning to where stay was clicked. data should be
                 // pet's GUIDLow since we set that as the waypoint ID
-                if (data == me->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
+                if (data == me->GetGUID().GetCounter() && me->GetCharmInfo()->IsReturning())
                 {
                     ClearCharmInfoFlags();
                     me->GetCharmInfo()->SetIsAtStay(true);
@@ -640,7 +640,7 @@ void PetAI::MovementInform(uint32 moveType, uint32 data)
             {
                 // If data is owner's GUIDLow then we've reached follow point,
                 // otherwise we're probably chasing a creature
-                if (me->GetCharmerOrOwner() && me->GetCharmInfo() && data == me->GetCharmerOrOwner()->GetGUIDLow() && me->GetCharmInfo()->IsReturning())
+                if (me->GetCharmerOrOwner() && me->GetCharmInfo() && data == me->GetCharmerOrOwner()->GetGUID().GetCounter() && me->GetCharmInfo()->IsReturning())
                 {
                     ClearCharmInfoFlags();
                     me->GetCharmInfo()->SetIsFollowing(true);
@@ -681,7 +681,7 @@ bool PetAI::CanAttack(Unit* target, const SpellInfo* spellInfo)
     // pussywizard: ZOMG! TEMP!
     if (!me->GetCharmInfo())
     {
-        LOG_INFO("misc", "PetAI::CanAttack (A1) - %u, %u", me->GetEntry(), GUID_LOPART(me->GetOwnerGUID()));
+        LOG_INFO("misc", "PetAI::CanAttack (A1) - %u, %s", me->GetEntry(), me->GetOwnerGUID().ToString().c_str());
         return false;
     }
 

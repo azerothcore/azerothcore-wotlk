@@ -15,7 +15,7 @@
 #include "Totem.h"
 #include "WorldPacket.h"
 
-Totem::Totem(SummonPropertiesEntry const* properties, uint64 owner) : Minion(properties, owner, false)
+Totem::Totem(SummonPropertiesEntry const* properties, ObjectGuid owner) : Minion(properties, owner, false)
 {
     m_unitTypeMask |= UNIT_MASK_TOTEM;
     m_duration = 0;
@@ -45,13 +45,13 @@ void Totem::InitStats(uint32 duration)
 {
     // client requires SMSG_TOTEM_CREATED to be sent before adding to world and before removing old totem
     // Xinef: Set level for Unit totems
-    if (Unit* owner = ObjectAccessor::FindUnit(m_owner))
+    if (Unit* owner = ObjectAccessor::GetUnit(*this, m_owner))
     {
         if (owner->GetTypeId() == TYPEID_PLAYER && m_Properties->Slot >= SUMMON_SLOT_TOTEM && m_Properties->Slot < MAX_TOTEM_SLOT)
         {
             WorldPacket data(SMSG_TOTEM_CREATED, 1 + 8 + 4 + 4);
             data << uint8(m_Properties->Slot - 1);
-            data << uint64(GetGUID());
+            data << GetGUID();
             data << uint32(duration);
             data << uint32(GetUInt32Value(UNIT_CREATED_BY_SPELL));
             owner->ToPlayer()->SendDirectMessage(&data);
@@ -109,7 +109,7 @@ void Totem::UnSummon(uint32 msTime)
     {
         if (owner->m_SummonSlot[i] == GetGUID())
         {
-            owner->m_SummonSlot[i] = 0;
+            owner->m_SummonSlot[i].Clear();
             break;
         }
     }
