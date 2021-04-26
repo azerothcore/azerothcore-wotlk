@@ -42,9 +42,6 @@ public:
         instance_molten_core_InstanceMapScript(Map* map) : InstanceScript(map)
         {
             SetBossNumber(MAX_ENCOUNTER);
-            _golemaggTheIncineratorGUID = 0;
-            _majordomoExecutusGUID = 0;
-            _cacheOfTheFirelordGUID = 0;
             _deadBossCount = 0;
             _ragnarosAddDeaths = 0;
         }
@@ -125,7 +122,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 type) const  override
+        ObjectGuid GetGuidData(uint32 type) const  override
         {
             switch (type)
             {
@@ -135,7 +132,7 @@ public:
                     return _majordomoExecutusGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         bool SetBossState(uint32 bossId, EncounterState state) override
@@ -236,12 +233,12 @@ public:
         }
 
     private:
-        uint64 _golemaggTheIncineratorGUID;
-        uint64 _majordomoExecutusGUID;
-        uint64 _cacheOfTheFirelordGUID;
+        ObjectGuid _golemaggTheIncineratorGUID;
+        ObjectGuid _majordomoExecutusGUID;
+        ObjectGuid _cacheOfTheFirelordGUID;
         uint8 _deadBossCount;
         uint8 _ragnarosAddDeaths;
-        std::unordered_map<uint8, uint64> _circlesGUIDs;
+        std::unordered_map<uint8, ObjectGuid> _circlesGUIDs;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

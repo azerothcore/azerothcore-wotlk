@@ -23,7 +23,6 @@ enum ePoints
 };
 
 FollowerAI::FollowerAI(Creature* creature) : ScriptedAI(creature),
-    m_uiLeaderGUID(0),
     m_uiUpdateFollowTimer(2500),
     m_uiFollowState(STATE_FOLLOW_NONE),
     m_pQuestForFollow(nullptr)
@@ -301,7 +300,7 @@ void FollowerAI::StartFollow(Player* player, uint32 factionForFollower, const Qu
     me->GetMotionMaster()->MoveFollow(player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("scripts.ai", "TSCR: FollowerAI start follow %s (GUID " UI64FMTD ")", player->GetName().c_str(), m_uiLeaderGUID);
+    LOG_DEBUG("scripts.ai", "TSCR: FollowerAI start follow %s (%s)", player->GetName().c_str(), m_uiLeaderGUID.ToString().c_str());
 #endif
 }
 
