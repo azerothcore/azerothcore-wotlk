@@ -151,7 +151,7 @@ void BattlegroundWS::CheckFlagKeeperInArea(TeamId teamId)
     if (GetStatus() != STATUS_IN_PROGRESS || GetFlagState(teamId) != BG_WS_FLAG_STATE_ON_PLAYER)
         return;
 
-    uint32 triggerId = teamId == TEAM_ALLIANCE ? 3647 : 3646;
+    uint32 triggerId = teamId == TEAM_ALLIANCE ? BG_WS_TRIGGER_HORDE_FLAG_SPAWN : BG_WS_TRIGGER_ALLIANCE_FLAG_SPAWN;
     AreaTrigger const* areaTrigger = sObjectMgr->GetAreaTrigger(triggerId);
     if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(teamId)))
     {
@@ -376,11 +376,11 @@ void BattlegroundWS::HandleAreaTrigger(Player* player, uint32 trigger)
 
     switch (trigger)
     {
-        case 3646: // Alliance Flag spawn
+        case BG_WS_TRIGGER_ALLIANCE_FLAG_SPAWN: // Alliance Flag spawn
             if (GetFlagState(TEAM_ALLIANCE) == BG_WS_FLAG_STATE_ON_BASE && GetFlagPickerGUID(TEAM_HORDE) == player->GetGUID())
                 EventPlayerCapturedFlag(player);
             break;
-        case 3647: // Horde Flag spawn
+        case BG_WS_TRIGGER_HORDE_FLAG_SPAWN: // Horde Flag spawn
             if (GetFlagState(TEAM_HORDE) == BG_WS_FLAG_STATE_ON_BASE && GetFlagPickerGUID(TEAM_ALLIANCE) == player->GetGUID())
                 EventPlayerCapturedFlag(player);
             break;
@@ -388,12 +388,12 @@ void BattlegroundWS::HandleAreaTrigger(Player* player, uint32 trigger)
         case 3688: // Not used
         case 4628: // Not used
         case 4629: // Not used
-        case 3686: // Alliance elixir of speed spawn
-        case 3687: // Horde elixir of speed spawn
-        case 3706: // Alliance elixir of regeneration spawn
-        case 3708: // Horde elixir of regeneration spawn
-        case 3707: // Alliance elixir of berserk spawn
-        case 3709: // Horde elixir of berserk spawn
+        case BG_WS_TRIGGER_ALLIANCE_ELIXIR_SPEED_SPAWN: // Alliance elixir of speed spawn
+        case BG_WS_TRIGGER_HORDE_ELIXIR_SPEED_SPAWN: // Horde elixir of speed spawn
+        case BG_WS_TRIGGER_ALLIANCE_ELIXIR_REGEN_SPAWN: // Alliance elixir of regeneration spawn
+        case BG_WS_TRIGGER_HORDE_ELIXIR_REGEN_SPAWN: // Horde elixir of regeneration spawn
+        case BG_WS_TRIGGER_ALLIANCE_ELIXIR_BERSERK_SPAWN: // Alliance elixir of berserk spawn
+        case BG_WS_TRIGGER_HORDE_ELIXIR_BERSERK_SPAWN: // Horde elixir of berserk spawn
             break;
     }
 }
