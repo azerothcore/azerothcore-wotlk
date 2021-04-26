@@ -178,6 +178,19 @@ namespace acore::Containers
         std::shuffle(std::begin(container), std::end(container), RandomEngine::Instance());
     }
 
+    template<class K, class V, template<class, class, class...> class M, class... Rest>
+    void MultimapErasePair(M<K, V, Rest...>& multimap, K const& key, V const& value)
+    {
+        auto range = multimap.equal_range(key);
+        for (auto itr = range.first; itr != range.second;)
+        {
+            if (itr->second == value)
+                itr = multimap.erase(itr);
+            else
+                ++itr;
+        }
+    }
+
     template <typename Container, typename Predicate>
     std::enable_if_t<std::is_move_assignable_v<decltype(*std::declval<Container>().begin())>, void> EraseIf(Container& c, Predicate p)
     {
@@ -209,20 +222,7 @@ namespace acore::Containers
             {
                 ++it;
             }
-        }
-
-        template<class K, class V, template<class, class, class...> class M, class... Rest>
-        void MultimapErasePair(M<K, V, Rest...>& multimap, K const& key, V const& value)
-        {
-            auto range = multimap.equal_range(key);
-            for (auto itr = range.first; itr != range.second;)
-            {
-                if (itr->second == value)
-                    itr = multimap.erase(itr);
-                else
-                    ++itr;
-            }
-        }
+        }       
     }
 }
 
