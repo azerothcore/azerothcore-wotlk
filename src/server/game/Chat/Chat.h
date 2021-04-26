@@ -45,7 +45,7 @@ public:
     virtual ~ChatHandler() { }
 
     // Builds chat packet and returns receiver guid position in the packet to substitute in whisper builders
-    static size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, uint64 senderGUID, uint64 receiverGUID, std::string const& message, uint8 chatTag,
+    static size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string const& message, uint8 chatTag,
                                   std::string const& senderName = "", std::string const& receiverName = "",
                                   uint32 achievementId = 0, bool gmMessage = false, std::string const& channelName = "");
 
@@ -79,7 +79,7 @@ public:
     virtual LocaleConstant GetSessionDbcLocale() const;
     virtual int GetSessionDbLocaleIndex() const;
 
-    bool HasLowerSecurity(Player* target, uint64 guid, bool strong = false);
+    bool HasLowerSecurity(Player* target, ObjectGuid guid = ObjectGuid::Empty, bool strong = false);
     bool HasLowerSecurityAccount(WorldSession* target, uint32 account, bool strong = false);
 
     void SendGlobalGMSysMessage(const char* str);
@@ -98,18 +98,19 @@ public:
     char*     extractQuotedArg(char* args);
 
     uint32    extractSpellIdFromLink(char* text);
-    uint64    extractGuidFromLink(char* text);
+    ObjectGuid::LowType extractLowGuidFromLink(char* text, HighGuid& guidHigh);
     GameTele const* extractGameTeleFromLink(char* text);
-    bool GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, uint64& guid, bool offline = false);
+    bool GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, ObjectGuid& guid, bool offline = false);
     std::string extractPlayerNameFromLink(char* text);
     // select by arg (name/link) or in-game selection online/offline player
-    bool extractPlayerTarget(char* args, Player** player, uint64* player_guid = nullptr, std::string* player_name = nullptr);
+    bool extractPlayerTarget(char* args, Player** player, ObjectGuid* player_guid = nullptr, std::string* player_name = nullptr);
 
     std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:" + name + "|h[" + name + "]|h|r" : name; }
     std::string GetNameLink(Player* chr) const;
 
     GameObject* GetNearbyGameObject();
-    GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid, uint32 entry);
+    GameObject* GetObjectFromPlayerMapByDbGuid(ObjectGuid::LowType lowguid);
+    Creature* GetCreatureFromPlayerMapByDbGuid(ObjectGuid::LowType lowguid);
     bool HasSentErrorMessage() const { return sentErrorMessage; }
     void SetSentErrorMessage(bool val) { sentErrorMessage = val; }
     static bool LoadCommandTable() { return load_command_table; }
