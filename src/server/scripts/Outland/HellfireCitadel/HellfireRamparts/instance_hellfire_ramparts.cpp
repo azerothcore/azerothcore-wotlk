@@ -18,7 +18,6 @@ public:
         void Initialize() override
         {
             SetBossNumber(MAX_ENCOUNTERS);
-            felIronChestGUID = 0;
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -74,7 +73,7 @@ public:
         }
 
     protected:
-        uint64 felIronChestGUID;
+        ObjectGuid felIronChestGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
