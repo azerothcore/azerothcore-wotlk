@@ -2,7 +2,7 @@ INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1619468769521968763');
 
 DELETE FROM `creature` WHERE (`id` = 511) AND (`guid` IN (4444));
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
-(4444, 511, 0, 0, 0, 1, 1, 828, 1, -10995, -11012, 53.658, 5.70029, 300, 0, 0, 787, 0, 0, 0, 0, 0, '', 0);
+(4444, 511, 0, 0, 0, 1, 1, 828, 1, -11012, -1350.91, 53.658, 5.70029, 300, 0, 0, 787, 0, 0, 0, 0, 0, '', 0);
 
 DELETE FROM `creature_addon` WHERE (`guid` IN (4444));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `isLarge`, `auras`) VALUES
