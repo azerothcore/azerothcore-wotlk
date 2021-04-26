@@ -67,7 +67,7 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
 
 FROM dev as build
 
-ARG SKIP_SRV_BUILD
+ARG SKIP_SRV_BUILD=0
 
 WORKDIR /azerothcore
 
