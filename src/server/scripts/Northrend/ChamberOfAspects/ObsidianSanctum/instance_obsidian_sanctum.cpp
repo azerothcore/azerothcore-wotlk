@@ -20,13 +20,7 @@ public:
 
     struct instance_obsidian_sanctum_InstanceMapScript : public InstanceScript
     {
-        instance_obsidian_sanctum_InstanceMapScript(Map* pMap) : InstanceScript(pMap),
-            m_uiSartharionGUID(0),
-            m_uiTenebronGUID(0),
-            m_uiShadronGUID(0),
-            m_uiVesperonGUID(0),
-            m_uiPortalGUID(0),
-            portalCount(0)
+        instance_obsidian_sanctum_InstanceMapScript(Map* pMap) : InstanceScript(pMap), portalCount(0)
         {
             SetBossNumber(MAX_ENCOUNTERS);
         }
@@ -61,7 +55,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 uiData) const override
+        ObjectGuid GetGuidData(uint32 uiData) const override
         {
             switch(uiData)
             {
@@ -74,7 +68,8 @@ public:
                 case DATA_VESPERON:
                     return m_uiVesperonGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
@@ -87,7 +82,7 @@ public:
                 case 7327:
                 {
                     Creature const* sartharion = instance->GetCreature(m_uiSartharionGUID);
-                    return sartharion && !sartharion->AI()->GetData(source->GetGUIDLow());
+                    return sartharion && !sartharion->AI()->GetData(source->GetGUID().GetCounter());
                 }
                 // Less Is More (10 player) (624)
                 case 7189:
@@ -182,7 +177,7 @@ public:
                         }
 
                         DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
-                        m_uiPortalGUID = 0;
+                        m_uiPortalGUID.Clear();
                     }
                     break;
                 }
@@ -232,11 +227,11 @@ public:
         }
 
     private:
-        uint64 m_uiSartharionGUID;
-        uint64 m_uiTenebronGUID;
-        uint64 m_uiShadronGUID;
-        uint64 m_uiVesperonGUID;
-        uint64 m_uiPortalGUID;
+        ObjectGuid m_uiSartharionGUID;
+        ObjectGuid m_uiTenebronGUID;
+        ObjectGuid m_uiShadronGUID;
+        ObjectGuid m_uiVesperonGUID;
+        ObjectGuid m_uiPortalGUID;
         uint8 portalCount;
     };
 };

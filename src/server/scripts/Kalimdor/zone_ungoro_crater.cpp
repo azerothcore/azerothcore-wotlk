@@ -189,14 +189,14 @@ public:
         uint32 EndEventProgress;
         uint32 EndEventTimer;
 
-        uint64 SpraggleGUID;
+        ObjectGuid SpraggleGUID;
 
         void Reset() override
         {
             FaintTimer = urand(30000, 60000);
             EndEventProgress = 0;
             EndEventTimer = 1000;
-            SpraggleGUID = 0;
+            SpraggleGUID.Clear();
         }
 
         void MoveInLineOfSight(Unit* who) override
