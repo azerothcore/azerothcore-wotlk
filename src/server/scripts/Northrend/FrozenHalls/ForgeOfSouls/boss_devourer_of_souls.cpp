@@ -140,7 +140,7 @@ public:
                 me->SetOrientation(me->GetAngle(target));
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->DisableRotate(true);
-                me->SetUInt64Value(UNIT_FIELD_TARGET, 0);
+                me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
                 me->SetReactState(REACT_PASSIVE);
                 me->GetMotionMaster()->Clear(false);
                 me->GetMotionMaster()->MoveIdle();
@@ -337,7 +337,7 @@ public:
                         t->ToCreature()->SetReactState(REACT_AGGRESSIVE);
                     if (t->GetVictim())
                     {
-                        t->SetUInt64Value(UNIT_FIELD_TARGET, t->GetVictim()->GetGUID());
+                        t->SetGuidValue(UNIT_FIELD_TARGET, t->GetVictim()->GetGUID());
                         t->GetMotionMaster()->MoveChase(t->GetVictim());
                     }
                 }

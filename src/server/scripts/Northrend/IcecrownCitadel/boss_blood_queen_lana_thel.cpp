@@ -133,18 +133,18 @@ public:
 
         bool _creditBloodQuickening;
         bool _killMinchar;
-        uint64 _tankGUID;
-        uint64 _offtankGUID;
-        std::set<uint64> _bloodboltedPlayers;
-        std::set<uint64> _vampires;
+        ObjectGuid _tankGUID;
+        ObjectGuid _offtankGUID;
+        GuidSet _bloodboltedPlayers;
+        GuidSet _vampires;
         bool bEnteredCombat; // needed for failing an attempt in JustReachedHome()
 
         void Reset() override
         {
             _creditBloodQuickening = false;
             _killMinchar = false;
-            _tankGUID = 0;
-            _offtankGUID = 0;
+            _tankGUID.Clear();
+            _offtankGUID.Clear();
             _vampires.clear();
             CleanAuras();
             me->SetReactState(REACT_AGGRESSIVE);
@@ -202,7 +202,7 @@ public:
                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                     if (Player* p = itr->GetSource())
-                        p->KilledMonsterCredit(RAID_MODE(NPC_INFILTRATOR_MINCHAR_BQ, NPC_BLOOD_QUICKENING_CREDIT_25), 0);
+                        p->KilledMonsterCredit(RAID_MODE(NPC_INFILTRATOR_MINCHAR_BQ, NPC_BLOOD_QUICKENING_CREDIT_25));
                 if (Creature* minchar = me->FindNearestCreature(NPC_INFILTRATOR_MINCHAR_BQ, 200.0f))
                 {
                     minchar->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
@@ -369,8 +369,8 @@ public:
 
                                 if (target->GetDistance(me->GetVictim()) > 39.0f || me->GetDistance(me->GetVictim()) > 39.0f)
                                 {
-                                    _tankGUID = 0;
-                                    _offtankGUID = 0;
+                                    _tankGUID.Clear();
+                                    _offtankGUID.Clear();
                                     events.ScheduleEvent(EVENT_BLOOD_MIRROR, 2500);
                                     break;
                                 }
@@ -514,17 +514,17 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(PRESENCE_OF_THE_DARKFALLEN);
         }
 
-        bool WasVampire(uint64 guid)
+        bool WasVampire(ObjectGuid guid)
         {
             return _vampires.count(guid) != 0;
         }
 
-        bool WasBloodbolted(uint64 guid)
+        bool WasBloodbolted(ObjectGuid guid)
         {
             return _bloodboltedPlayers.count(guid) != 0;
         }
 
-        void SetGUID(uint64 guid, int32 type = 0) override
+        void SetGUID(ObjectGuid guid, int32 type = 0) override
         {
             switch (type)
             {
@@ -760,7 +760,7 @@ public:
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             if (InstanceScript* instance = GetTarget()->GetInstanceScript())
-                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetTarget(), instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL)))
+                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetTarget(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
                     bloodQueen->AI()->Talk(EMOTE_BLOODTHIRST, GetTarget());
         }
 
@@ -769,7 +769,7 @@ public:
             Unit* target = GetTarget();
             if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
                 if (InstanceScript* instance = target->GetInstanceScript())
-                    if (Creature* bloodQueen = ObjectAccessor::GetCreature(*target, instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL)))
+                    if (Creature* bloodQueen = ObjectAccessor::GetCreature(*target, instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
                         if (bloodQueen->IsAlive() && bloodQueen->IsInCombat())
                         {
                             // this needs to be done BEFORE charm aura or we hit an assert in Unit::SetCharmedBy
@@ -871,7 +871,7 @@ public:
                 return;
 
             uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_FRENZIED_BLOODTHIRST, GetCaster());
-            GetCaster()->RemoveAura(spellId, 0, 0, AURA_REMOVE_BY_ENEMY_SPELL);
+            GetCaster()->RemoveAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
             GetCaster()->CastSpell(GetCaster(), SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, TRIGGERED_FULL_MASK);
 
             if (Aura* aura = GetCaster()->GetAura(SPELL_GUSHING_WOUND))
@@ -886,7 +886,7 @@ public:
             }
 
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL)))
+                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
                     bloodQueen->AI()->SetGUID(GetHitUnit()->GetGUID(), GUID_VAMPIRE);
         }
 
@@ -952,7 +952,7 @@ public:
                 return;
 
             if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
-                GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetData64(DATA_BLOOD_QUEEN_LANA_THEL));
+                GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL));
         }
 
         void Register() override

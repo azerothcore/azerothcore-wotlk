@@ -21,7 +21,7 @@ class InstanceScript;
 class SummonList
 {
 public:
-    typedef std::list<uint64> StorageType;
+    typedef GuidList StorageType;
     typedef StorageType::iterator iterator;
     typedef StorageType::const_iterator const_iterator;
     typedef StorageType::size_type size_type;
@@ -139,7 +139,7 @@ class EntryCheckPredicate
 {
 public:
     EntryCheckPredicate(uint32 entry) : _entry(entry) {}
-    bool operator()(uint64 guid) { return GUID_ENPART(guid) == _entry; }
+    bool operator()(ObjectGuid guid) { return guid.GetEntry() == _entry; }
 
 private:
     uint32 _entry;
@@ -151,7 +151,7 @@ public:
     bool operator() (WorldObject* unit) const
     {
         if (unit->GetTypeId() != TYPEID_PLAYER)
-            if (!IS_PLAYER_GUID(unit->ToUnit()->GetOwnerGUID()))
+            if (!unit->ToUnit()->GetOwnerGUID().IsPlayer())
                 return true;
 
         return false;

@@ -178,7 +178,7 @@ public:
             }
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_THADDIUS_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_THADDIUS_GATE)))
                 {
                     if (pInstance->GetBossState(BOSS_GLUTH) == DONE)
                     {
@@ -208,7 +208,7 @@ public:
             {
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(28059);
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(28084);
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_THADDIUS_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_THADDIUS_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
@@ -365,7 +365,6 @@ public:
         {
             pInstance = me->GetInstanceScript();
             overload = false;
-            myCoil = 0;
         }
 
         InstanceScript* pInstance;
@@ -373,7 +372,7 @@ public:
         uint32 pullTimer{};
         uint32 visualTimer{};
         bool overload;
-        uint64 myCoil;
+        ObjectGuid myCoil;
 
         void Reset() override
         {
@@ -421,11 +420,11 @@ public:
             }
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_THADDIUS_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_THADDIUS_GATE)))
                 {
                     go->SetGoState(GO_STATE_READY);
                 }
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_THADDIUS_BOSS)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_THADDIUS_BOSS)))
                 {
                     cr->AI()->AttackStart(pWho);
                     cr->AddThreat(pWho, 10.0f);
@@ -461,7 +460,7 @@ public:
             Talk(me->GetEntry() == NPC_STALAGG ? EMOTE_STAL_DEATH : EMOTE_FEUG_DEATH);
             if (pInstance)
             {
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_THADDIUS_BOSS)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_THADDIUS_BOSS)))
                 {
                     cr->AI()->DoAction(ACTION_SUMMON_DIED);
                 }
@@ -530,7 +529,7 @@ public:
                     events.RepeatEvent(20000);
                     if (pInstance)
                     {
-                        if (Creature* feugen = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_FEUGEN_BOSS)))
+                        if (Creature* feugen = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_FEUGEN_BOSS)))
                         {
                             if (!feugen->IsAlive() || !feugen->GetVictim() || !me->GetVictim())
                                 return;
@@ -734,7 +733,7 @@ public:
         if (!instance || instance->GetData(DATA_HAD_THADDIUS_GREET) || instance->GetBossState(BOSS_THADDIUS) == DONE)
             return true;
 
-        if (Creature* thaddius = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_THADDIUS_BOSS)))
+        if (Creature* thaddius = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_THADDIUS_BOSS)))
         {
             thaddius->AI()->Talk(SAY_GREET);
         }

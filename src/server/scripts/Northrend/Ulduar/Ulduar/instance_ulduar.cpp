@@ -37,164 +37,111 @@ public:
         int m_difficulty;
 
         // Bosses
-        uint64 m_uiLeviathanGUID;
-        uint64 m_uiIgnisGUID;
-        uint64 m_uiRazorscaleGUID;
-        uint64 m_uiXT002GUID;
-        uint64 m_auiAssemblyGUIDs[3];
-        uint64 m_uiKologarnGUID;
-        uint64 m_uiAuriayaGUID;
-        uint64 m_uiMimironGUID;
-        uint64 m_uiHodirGUID;
-        uint64 m_uiThorimGUID;
-        uint64 m_uiFreyaGUID;
-        uint64 m_uiVezaxGUID;
-        uint64 m_uiYoggSaronGUID;
-        uint64 m_uiAlgalonGUID;
+        ObjectGuid m_uiLeviathanGUID;
+        ObjectGuid m_uiIgnisGUID;
+        ObjectGuid m_uiRazorscaleGUID;
+        ObjectGuid m_uiXT002GUID;
+        ObjectGuid m_auiAssemblyGUIDs[3];
+        ObjectGuid m_uiKologarnGUID;
+        ObjectGuid m_uiAuriayaGUID;
+        ObjectGuid m_uiMimironGUID;
+        ObjectGuid m_uiHodirGUID;
+        ObjectGuid m_uiThorimGUID;
+        ObjectGuid m_uiFreyaGUID;
+        ObjectGuid m_uiVezaxGUID;
+        ObjectGuid m_uiYoggSaronGUID;
+        ObjectGuid m_uiAlgalonGUID;
 
         // Flame Leviathan
-        uint64 m_leviathanDoorsGUID;
-        uint64 m_leviathanVisualTowers[4][2];
-        uint64 m_RepairSGUID[2];
-        uint64 m_lightningWalls[2];
+        ObjectGuid m_leviathanDoorsGUID;
+        ObjectGuid m_leviathanVisualTowers[4][2];
+        ObjectGuid m_RepairSGUID[2];
+        ObjectGuid m_lightningWalls[2];
         bool m_leviathanTowers[4];
-        std::list<uint64> _leviathanVehicles;
+        GuidList _leviathanVehicles;
         uint32 m_unbrokenAchievement;
         uint32 m_mageBarrier;
 
         // Razorscale
-        uint64 m_RazorscaleHarpoonFireStateGUID[4];
+        ObjectGuid m_RazorscaleHarpoonFireStateGUID[4];
 
         // XT-002
-        uint64 m_xt002DoorsGUID;
+        ObjectGuid m_xt002DoorsGUID;
 
         // Kologarn
-        uint64 KologarnDoorGUID;
+        ObjectGuid KologarnDoorGUID;
 
         // Assembly of Iron
-        uint64 m_assemblyDoorsGUID;
-        uint64 m_archivumDoorsGUID;
+        ObjectGuid m_assemblyDoorsGUID;
+        ObjectGuid m_archivumDoorsGUID;
 
         // Thorim
-        uint64 m_thorimGameobjectsGUID[5];
+        ObjectGuid m_thorimGameobjectsGUID[5];
 
         // Hodir's chests
         bool hmHodir;
-        uint64 m_hodirNormalChest;
-        uint64 m_hodirHardmodeChest;
+        ObjectGuid m_hodirNormalChest;
+        ObjectGuid m_hodirHardmodeChest;
         Position normalChestPosition = { 1967.152588f, -204.188461f, 432.686951f, 5.50957f };
         Position hardChestPosition = { 2035.94600f, -202.084885f, 432.686859f, 3.164077f };
 
         // Mimiron
-        uint64 m_MimironDoor[3];
-        uint64 m_MimironLeviathanMKIIguid;
-        uint64 m_MimironVX001guid;
-        uint64 m_MimironACUguid;
+        ObjectGuid m_MimironDoor[3];
+        ObjectGuid m_MimironLeviathanMKIIguid;
+        ObjectGuid m_MimironVX001guid;
+        ObjectGuid m_MimironACUguid;
 
         // Freya
-        uint64 m_FreyaElder[3];
+        ObjectGuid m_FreyaElder[3];
         uint32 m_conspeedatoryAttempt;
 
         // Yogg-Saron
-        uint64 m_saraGUID;
-        uint64 m_yoggsaronBrainGUID;
-        uint64 m_yoggsaronDoorsGUID;
+        ObjectGuid m_saraGUID;
+        ObjectGuid m_yoggsaronBrainGUID;
+        ObjectGuid m_yoggsaronDoorsGUID;
 
         // Algalon
-        uint64 m_algalonSigilDoorGUID[3];
-        uint64 m_algalonFloorGUID[2];
-        uint64 m_algalonUniverseGUID;
-        uint64 m_algalonTrapdoorGUID;
-        uint64 m_brannBronzebeardAlgGUID;
-        uint64 m_brannBronzebeardBaseCamp;
+        ObjectGuid m_algalonSigilDoorGUID[3];
+        ObjectGuid m_algalonFloorGUID[2];
+        ObjectGuid m_algalonUniverseGUID;
+        ObjectGuid m_algalonTrapdoorGUID;
+        ObjectGuid m_brannBronzebeardAlgGUID;
+        ObjectGuid m_brannBronzebeardBaseCamp;
         uint32 m_algalonTimer;
 
         // Shared
         EventMap _events;
         bool m_mimironTramUsed;
-        uint64 m_mimironTramGUID;
-        uint64 m_keepersgateGUID;
-        uint64 m_keepersGossipGUID[4];
+        ObjectGuid m_mimironTramGUID;
+        ObjectGuid m_keepersgateGUID;
+        ObjectGuid m_keepersGossipGUID[4];
 
         void Initialize() override
         {
             // Bosses
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             C_of_Ulduar_MASK = 0;
-            memset(&m_auiAssemblyGUIDs, 0, sizeof(m_auiAssemblyGUIDs));
-            m_uiLeviathanGUID       = 0;
-            m_uiIgnisGUID           = 0;
-            m_uiRazorscaleGUID      = 0;
-            m_uiXT002GUID           = 0;
-            m_uiKologarnGUID        = 0;
-            m_uiAuriayaGUID         = 0;
-            m_uiMimironGUID         = 0;
-            m_uiHodirGUID           = 0;
-            m_uiThorimGUID          = 0;
-            m_uiFreyaGUID           = 0;
-            m_uiVezaxGUID           = 0;
-            m_uiYoggSaronGUID       = 0;
-            m_uiAlgalonGUID         = 0;
 
             // Flame Leviathan
-            memset(&m_leviathanTowers, 1, sizeof(m_leviathanTowers));
-            memset(&m_leviathanVisualTowers, 0, sizeof(m_leviathanVisualTowers));
-            memset(&m_RepairSGUID, 0, sizeof(m_RepairSGUID));
-            memset(&m_lightningWalls, 0, sizeof(m_lightningWalls));
-            m_leviathanDoorsGUID    = 0;
+            for (uint8 i = 0; i < 4; ++i)
+                m_leviathanTowers[i] = false;
+
             _leviathanVehicles.clear();
             m_unbrokenAchievement   = 1;
             m_mageBarrier           = 0;
-            m_brannBronzebeardBaseCamp = 0;
-
-            // Razorscale
-            memset(&m_RazorscaleHarpoonFireStateGUID, 0, sizeof(m_RazorscaleHarpoonFireStateGUID));
-
-            // XT-002
-            m_xt002DoorsGUID        = 0;
-
-            // Kologarn Door
-            // Assembly of Iron
-            m_assemblyDoorsGUID     = 0;
-            m_archivumDoorsGUID     = 0;
-
-            // Thorim
-            memset(&m_thorimGameobjectsGUID, 0, sizeof(m_thorimGameobjectsGUID));
 
             // Hodir
-            m_hodirNormalChest = 0;
-            m_hodirHardmodeChest = 0;
             hmHodir = true; // If players fail the Hardmode then becomes false
 
-            // Mimiron
-            memset(&m_MimironDoor, 0, sizeof(m_MimironDoor));
-            m_MimironLeviathanMKIIguid = 0;
-            m_MimironVX001guid = 0;
-            m_MimironACUguid = 0;
-
             // Freya
-            memset(&m_FreyaElder, 0, sizeof(m_FreyaElder));
             m_conspeedatoryAttempt  = 0;
 
-            // Yogg-Saron
-            m_saraGUID              = 0;
-            m_yoggsaronBrainGUID    = 0;
-            m_yoggsaronDoorsGUID    = 0;
-
             // Algalon
-            memset(&m_algalonSigilDoorGUID, 0, sizeof(m_algalonSigilDoorGUID));
-            memset(&m_algalonFloorGUID, 0, sizeof(m_algalonFloorGUID));
-            m_algalonUniverseGUID   = 0;
-            m_algalonTrapdoorGUID   = 0;
-            m_brannBronzebeardAlgGUID   = 0;
             m_algalonTimer          = 0;
 
             // Shared
             _events.Reset();
-            memset(&m_keepersGossipGUID, 0, sizeof(m_keepersGossipGUID));
             m_mimironTramUsed       = false;
-            m_mimironTramGUID       = 0;
-            m_keepersgateGUID       = 0;
         }
 
         void FillInitialWorldStates(WorldPacket& packet) override
@@ -457,7 +404,7 @@ public:
             {
                 case NPC_BRANN_BRONZBEARD_ALG:
                     if (m_brannBronzebeardAlgGUID == creature->GetGUID())
-                        m_brannBronzebeardAlgGUID = 0;
+                        m_brannBronzebeardAlgGUID.Clear();
                     break;
             }
         }
@@ -468,7 +415,7 @@ public:
                 go->SetGoState(state);
         }
 
-        void ShowKeeperGossip(uint8 type, Creature* cr, uint64 guid = 0)
+        void ShowKeeperGossip(uint8 type, Creature* cr, ObjectGuid guid = ObjectGuid::Empty)
         {
             if (!cr)
             {
@@ -739,7 +686,7 @@ public:
                     {
                         hmHodir = false;
                         go->Delete();
-                        m_hodirHardmodeChest = 0;
+                        m_hodirHardmodeChest.Clear();
                     }
                     break;
                 case TYPE_WATCHERS:
@@ -788,27 +735,27 @@ public:
                     return;
                 case TYPE_ALGALON:
                     m_auiEncounter[type] = data;
-                    if (GameObject* go = instance->GetGameObject(GetData64(GO_DOODAD_UL_SIGILDOOR_03)))
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_SIGILDOOR_03)))
                     {
                         go->SetGoState(data != IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
-                    if (GameObject* go = instance->GetGameObject(GetData64(GO_DOODAD_UL_UNIVERSEFLOOR_01)))
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_UNIVERSEFLOOR_01)))
                     {
                         go->SetGoState(data != IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
-                    if (GameObject* go = instance->GetGameObject(GetData64(GO_DOODAD_UL_UNIVERSEFLOOR_02)))
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_UNIVERSEFLOOR_02)))
                     {
                         go->SetGoState(data == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
-                    if (GameObject* go = instance->GetGameObject(GetData64(GO_DOODAD_UL_UNIVERSEGLOBE01)))
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_UNIVERSEGLOBE01)))
                     {
                         go->SetGoState(data == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
-                    if (GameObject* go = instance->GetGameObject(GetData64(GO_DOODAD_UL_ULDUAR_TRAPDOOR_03)))
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_ULDUAR_TRAPDOOR_03)))
                     {
                         go->SetGoState(data == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
@@ -848,7 +795,7 @@ public:
             if (type == TYPE_FREYA && data == DONE)
             {
                 std::list<GameObject*> goList;
-                if (Creature* freya = instance->GetCreature(GetData64(TYPE_FREYA)))
+                if (Creature* freya = instance->GetCreature(GetGuidData(TYPE_FREYA)))
                 {
                     freya->GetGameObjectListWithEntryInGrid(goList, 191019 /*Adder's Tongue*/, 333.0f);
                     freya->GetGameObjectListWithEntryInGrid(goList, 190176 /*Frost Lotus*/, 333.0f);
@@ -873,9 +820,9 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
-            switch(data)
+            switch (data)
             {
                 // Bosses
                 case TYPE_LEVIATHAN:
@@ -998,7 +945,7 @@ public:
                     return m_brannBronzebeardAlgGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         uint32 GetData(uint32 type) const override
@@ -1272,8 +1219,8 @@ void instance_ulduar::instance_ulduar_InstanceMapScript::SpawnLeviathanEncounter
 {
     if (!_leviathanVehicles.empty())
     {
-        for (std::list<uint64>::iterator itr = _leviathanVehicles.begin(); itr != _leviathanVehicles.end(); ++itr)
-            if (Creature* cr = instance->GetCreature(*itr))
+        for (ObjectGuid guid : _leviathanVehicles)
+            if (Creature* cr = instance->GetCreature(guid))
                 if (Vehicle* veh = cr->GetVehicleKit())
                     veh->Dismiss();
 
