@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -7,11 +7,12 @@
 #ifndef _MMAP_MANAGER_H
 #define _MMAP_MANAGER_H
 
+#include "Common.h"
 #include "DetourAlloc.h"
 #include "DetourNavMesh.h"
-#include "DetourNavMeshQuery.h"
-#include "World.h"
+#include "DetourExtended.h"
 #include <unordered_map>
+#include <shared_mutex>
 
 //  memory management
 inline void* dtCustomAlloc(size_t size, dtAllocHint /*hint*/)
@@ -72,9 +73,9 @@ namespace MMAP
         uint32 getLoadedTilesCount() const { return loadedTiles; }
         uint32 getLoadedMapsCount() const { return loadedMMaps.size(); }
 
-        ACE_RW_Thread_Mutex& GetMMapLock(uint32 mapId);
-        ACE_RW_Thread_Mutex& GetMMapGeneralLock() { return MMapLock; } // pussywizard: in case a per-map mutex can't be found, should never happen
-        ACE_RW_Thread_Mutex& GetManagerLock() { return MMapManagerLock; }
+        std::shared_mutex& GetMMapLock(uint32 mapId);
+        std::shared_mutex& GetMMapGeneralLock() { return MMapLock; } // pussywizard: in case a per-map mutex can't be found, should never happen
+        std::shared_mutex& GetManagerLock() { return MMapManagerLock; }
     private:
         bool loadMapData(uint32 mapId);
         uint32 packTileID(int32 x, int32 y);
@@ -82,8 +83,8 @@ namespace MMAP
         MMapDataSet loadedMMaps;
         uint32 loadedTiles;
 
-        ACE_RW_Thread_Mutex MMapManagerLock;
-        ACE_RW_Thread_Mutex MMapLock; // pussywizard: in case a per-map mutex can't be found, should never happen
+        std::shared_mutex MMapManagerLock;
+        std::shared_mutex MMapLock; // pussywizard: in case a per-map mutex can't be found, should never happen
     };
 }
 

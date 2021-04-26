@@ -1,13 +1,13 @@
 // Scripted by Xinef
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
 #include "CombatAI.h"
-#include "SpellScript.h"
-#include "Player.h"
-#include "Vehicle.h"
 #include "PassiveAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "Vehicle.h"
 
 ///////////////////////////////////////
 ////// TABLE EVENT
@@ -96,7 +96,7 @@ public:
     {
         npc_pilgrims_bounty_chairAI(Creature* creature) : VehicleAI(creature)
         {
-            plateGUID = 0;
+            plateGUID.Clear();
             timerSpawnPlate = 1;
             timerRotateChair = 0;
             me->SetReactState(REACT_PASSIVE);
@@ -111,7 +111,7 @@ public:
                 who->ToPlayer()->SetClientControl(me, 0, true);
         }
 
-        uint64 plateGUID;
+        ObjectGuid plateGUID;
         uint32 timerSpawnPlate;
         uint32 timerRotateChair;
 

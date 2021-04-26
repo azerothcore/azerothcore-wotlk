@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
-#include "SpellScript.h"
 #include "CreatureAI.h"
+#include "InstanceScript.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
 #include "uldaman.h"
 
 enum Spells
@@ -31,8 +31,6 @@ public:
         void Initialize() override
         {
             memset(&_encounters, 0, sizeof(_encounters));
-            archaedasTempleDoorGUID = 0;
-            ancientVaultDoorGUID = 0;
         }
 
         void OnGameObjectCreate(GameObject* gameobject) override
@@ -43,18 +41,18 @@ public:
                 case GO_KEYSTONE:
                     if (_encounters[DATA_IRONAYA_DOORS] == DONE)
                     {
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                         gameobject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
                 case GO_TEMPLE_DOOR:
                     if (_encounters[DATA_STONE_KEEPERS] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
                 case GO_ANCIENT_VAULT_DOOR:
                     ancientVaultDoorGUID = gameobject->GetGUID();
                     if (_encounters[DATA_ARCHAEDAS] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
                 case GO_ARCHAEDAS_TEMPLE_DOOR:
                     archaedasTempleDoorGUID = gameobject->GetGUID();
@@ -121,8 +119,8 @@ public:
 
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
-        uint64 archaedasTempleDoorGUID;
-        uint64 ancientVaultDoorGUID;
+        ObjectGuid archaedasTempleDoorGUID;
+        ObjectGuid ancientVaultDoorGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

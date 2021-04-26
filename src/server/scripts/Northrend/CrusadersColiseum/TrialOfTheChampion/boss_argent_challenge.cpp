@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "trial_of_the_champion.h"
 #include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "trial_of_the_champion.h"
 
 enum EadricSpells
 {
@@ -137,7 +137,7 @@ public:
                 damage = me->GetHealth() - 1;
                 if( me->getFaction() != 35 )
                 {
-                    me->CastSpell((Unit*)NULL, 68575, true); // achievements
+                    me->CastSpell((Unit*)nullptr, 68575, true); // achievements
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_CAST_SPELL, 68574, me); // paletress' spell credits encounter, but shouldn't credit achievements
                     me->setFaction(35);
                     events.Reset();
@@ -167,7 +167,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_RADIANCE:
-                    me->CastSpell((Unit*)NULL, SPELL_RADIANCE, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_RADIANCE, false);
                     me->MonsterTextEmote(TEXT_RADIATE, 0, true);
                     events.RepeatEvent(16000);
                     break;
@@ -191,7 +191,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_eadricAI(pCreature);
+        return GetTrialOfTheChampionAI<boss_eadricAI>(pCreature);
     }
 };
 
@@ -210,7 +210,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         bool summoned;
-        uint64 MemoryGUID;
+        ObjectGuid MemoryGUID;
 
         void Reset() override
         {
@@ -220,7 +220,7 @@ public:
             {
                 if( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
                     memory->DespawnOrUnsummon();
-                MemoryGUID = 0;
+                MemoryGUID.Clear();
             }
             me->SetReactState(REACT_PASSIVE);
             if( pInstance )
@@ -259,7 +259,7 @@ public:
         {
             if( param == 1 )
             {
-                MemoryGUID = 0;
+                MemoryGUID.Clear();
                 me->RemoveAura(SPELL_SHIELD);
                 Talk(TEXT_PALETRESS_MEMORY_DEFEATED);
             }
@@ -269,7 +269,7 @@ public:
                     if( Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
                     {
                         memory->DespawnOrUnsummon();
-                        MemoryGUID = 0;
+                        MemoryGUID.Clear();
                     }
             }
         }
@@ -285,7 +285,7 @@ public:
 
                 if( me->getFaction() != 35 )
                 {
-                    me->CastSpell((Unit*)NULL, 68574, true); // achievements
+                    me->CastSpell((Unit*)nullptr, 68574, true); // achievements
                     me->setFaction(35);
                     events.Reset();
                     Talk(TEXT_PALETRESS_DEATH);
@@ -327,11 +327,11 @@ public:
             {
                 me->InterruptNonMeleeSpells(true);
                 Talk(TEXT_PALETRESS_MEMORY_SUMMON);
-                me->CastSpell((Unit*)NULL, SPELL_HOLY_NOVA, false);
+                me->CastSpell((Unit*)nullptr, SPELL_HOLY_NOVA, false);
                 me->CastSpell(me, SPELL_SHIELD, false);
-                me->CastSpell((Unit*)NULL, SPELL_SUMMON_MEMORY, false);
+                me->CastSpell((Unit*)nullptr, SPELL_SUMMON_MEMORY, false);
                 SummonMemory();
-                me->CastSpell((Unit*)NULL, SPELL_CONFESS, false);
+                me->CastSpell((Unit*)nullptr, SPELL_CONFESS, false);
                 events.ScheduleEvent(EVENT_SPELL_RENEW, urand(6000, 8000));
                 summoned = true;
                 return;
@@ -374,7 +374,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_paletressAI(pCreature);
+        return GetTrialOfTheChampionAI<boss_paletressAI>(pCreature);
     }
 };
 
@@ -403,7 +403,7 @@ public:
         {
             me->DespawnOrUnsummon(20000);
             if( pInstance )
-                if( Creature* paletress = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_PALETRESS)) )
+                if( Creature* paletress = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_PALETRESS)) )
                     paletress->AI()->DoAction(1);
         }
 
@@ -459,7 +459,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_memoryAI(pCreature);
+        return GetTrialOfTheChampionAI<npc_memoryAI>(pCreature);
     }
 };
 
@@ -598,7 +598,7 @@ public:
                     break;
             }
 
-            Start(false, true, 0);
+            Start(false, true);
             uiWaypoint = uiType;
         }
 
@@ -610,7 +610,7 @@ public:
                 damage = me->GetHealth() - 1;
                 events.DelayEvents(10000);
                 me->CastSpell(me, SPELL_DIVINE_SHIELD_H, true);
-                me->CastSpell((Unit*)NULL, SPELL_FINAL_MEDITATION_H, true);
+                me->CastSpell((Unit*)nullptr, SPELL_FINAL_MEDITATION_H, true);
             }
         }
 
@@ -678,7 +678,7 @@ public:
                     events.RepeatEvent(urand(12000, 15000));
                     break;
                 case EVENT_PRIESTESS_SPELL_FOUNTAIN_OF_LIGHT:
-                    me->CastSpell((Unit*)NULL, SPELL_FOUNTAIN_OF_LIGHT, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_FOUNTAIN_OF_LIGHT, false);
                     events.RepeatEvent(urand(35000, 45000));
                     break;
                 case EVENT_PRIESTESS_SPELL_MIND_CONTROL_H:
@@ -721,7 +721,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_argent_soldierAI(pCreature);
+        return GetTrialOfTheChampionAI<npc_argent_soldierAI>(pCreature);
     }
 };
 

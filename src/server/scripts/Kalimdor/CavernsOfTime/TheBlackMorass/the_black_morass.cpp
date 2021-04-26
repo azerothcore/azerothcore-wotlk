@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "MoveSplineInit.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "the_black_morass.h"
-#include "MoveSplineInit.h"
 
 enum medivhSays
 {
@@ -80,7 +80,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_medivh_bmAI(creature);
+        return GetTheBlackMorassAI<npc_medivh_bmAI>(creature);
     }
 
     struct npc_medivh_bmAI : public ScriptedAI
@@ -120,7 +120,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             if (instance)
-                instance->SetData64(DATA_SUMMONED_NPC, summon->GetGUID());
+                instance->SetGuidData(DATA_SUMMONED_NPC, summon->GetGUID());
 
             if (summon->GetEntry() == NPC_DP_CRYSTAL_STALKER)
             {
@@ -141,7 +141,7 @@ public:
         void SummonedCreatureDespawn(Creature* summon) override
         {
             if (instance)
-                instance->SetData64(DATA_DELETED_NPC, summon->GetGUID());
+                instance->SetGuidData(DATA_DELETED_NPC, summon->GetGUID());
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -255,7 +255,7 @@ public:
             {
                 if (Creature* cr = me->SummonCreature(NPC_SHADOW_COUNCIL_ENFORCER, -2091.731f, 7133.083f - 3.0f * i, 34.589f, 0.0f))
                 {
-                    cr->GetMotionMaster()->MovePoint(0, (first && i == 3) ? x + 2.0f : x, cr->GetPositionY() + y, cr->GetMap()->GetHeight(x, cr->GetPositionY() + y, MAX_HEIGHT, true));
+                    cr->GetMotionMaster()->MovePoint(0, (first && i == 3) ? x + 2.0f : x, cr->GetPositionY() + y, cr->GetMapHeight(x, cr->GetPositionY() + y, cr->GetPositionZ(), true));
                     cr->m_Events.AddEvent(new NpcRunToHome(*cr), cr->m_Events.CalculateTime(homeTime + urand(0, 2000)));
                     cr->DespawnOrUnsummon(duration + urand(0, 2000));
                 }
@@ -277,7 +277,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_time_riftAI(creature);
+        return GetTheBlackMorassAI<npc_time_riftAI>(creature);
     }
 
     struct npc_time_riftAI : public NullCreatureAI
@@ -285,12 +285,11 @@ public:
         npc_time_riftAI(Creature* creature) : NullCreatureAI(creature)
         {
             instance = creature->GetInstanceScript();
-            riftKeeperGUID = 0;
         }
 
         EventMap events;
         InstanceScript* instance;
-        uint64 riftKeeperGUID;
+        ObjectGuid riftKeeperGUID;
 
         void Reset() override
         {
@@ -304,7 +303,7 @@ public:
             events.ScheduleEvent(EVENT_CHECK_DEATH, 8000);
         }
 
-        void SetGUID(uint64 guid, int32) override
+        void SetGUID(ObjectGuid guid, int32) override
         {
             riftKeeperGUID = guid;
         }
@@ -317,7 +316,7 @@ public:
             if (Creature* summon = me->SummonCreature(entry, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 150000))
                 if (instance)
                 {
-                    if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_MEDIVH)))
+                    if (Unit* medivh = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_MEDIVH)))
                     {
                         float o = medivh->GetAngle(summon) + frand(-1.0f, 1.0f);
                         summon->SetHomePosition(medivh->GetPositionX() + 14.0f * cos(o), medivh->GetPositionY() + 14.0f * sin(o), medivh->GetPositionZ(), summon->GetAngle(medivh));

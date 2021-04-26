@@ -2,10 +2,10 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "violet_hold.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "violet_hold.h"
 
 enum Yells
 {
@@ -51,7 +51,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_cyanigosaAI (pCreature);
+        return GetVioletHoldAI<boss_cyanigosaAI>(pCreature);
     }
 
     struct boss_cyanigosaAI : public ScriptedAI
@@ -109,7 +109,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_ARCANE_VACUUM:
-                    me->CastSpell((Unit*)NULL, SPELL_ARCANE_VACUUM, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_ARCANE_VACUUM, false);
                     DoResetThreat();
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->setAttackTimer(BASE_ATTACK, 3000);
@@ -148,7 +148,7 @@ public:
             Talk(SAY_DEATH);
             if (pInstance)
                 pInstance->SetData(DATA_BOSS_DIED, 0);
-            float h = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f);
+            float h = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
             if (h != INVALID_HEIGHT && me->GetPositionZ() - h > 3.0f)
             {
                 me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), h, me->GetOrientation(), true); // move to ground

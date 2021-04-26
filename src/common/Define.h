@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -32,6 +32,7 @@
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #  define ACORE_PATH_MAX MAX_PATH
+#  define _USE_MATH_DEFINES
 #  ifndef DECLSPEC_NORETURN
 #    define DECLSPEC_NORETURN __declspec(noreturn)
 #  endif //DECLSPEC_NORETURN
@@ -62,6 +63,45 @@
 #  define ATTR_PRINTF(F, V)
 #  define ATTR_DEPRECATED
 #endif //AC_COMPILER == AC_COMPILER_GNU
+
+#ifdef ACORE_API_USE_DYNAMIC_LINKING
+#  if AC_COMPILER == AC_COMPILER_MICROSOFT
+#    define AC_API_EXPORT __declspec(dllexport)
+#    define AC_API_IMPORT __declspec(dllimport)
+#  elif AC_COMPILER == AC_COMPILER_GNU
+#    define AC_API_EXPORT __attribute__((visibility("default")))
+#    define AC_API_IMPORT
+#  else
+#    error compiler not supported!
+#  endif
+#else
+#  define AC_API_EXPORT
+#  define AC_API_IMPORT
+#endif
+
+#ifdef ACORE_API_EXPORT_COMMON
+#  define AC_COMMON_API AC_API_EXPORT
+#else
+#  define AC_COMMON_API AC_API_IMPORT
+#endif
+
+#ifdef ACORE_API_EXPORT_DATABASE
+#  define AC_DATABASE_API AC_API_EXPORT
+#else
+#  define AC_DATABASE_API AC_API_IMPORT
+#endif
+
+#ifdef ACORE_API_EXPORT_SHARED
+#  define AC_SHARED_API AC_API_EXPORT
+#else
+#  define AC_SHARED_API AC_API_IMPORT
+#endif
+
+#ifdef ACORE_API_EXPORT_GAME
+#  define AC_GAME_API AC_API_EXPORT
+#else
+#  define AC_GAME_API AC_API_IMPORT
+#endif
 
 #define UI64FMTD "%" PRIu64
 #define UI64LIT(N) UINT64_C(N)

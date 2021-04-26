@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -11,8 +11,8 @@ SDComment: Ohgan function needs improvements.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -107,7 +107,7 @@ public:
             {
                 killCount = 0;
                 events.ScheduleEvent(EVENT_CHECK_START, 1000);
-                if (Creature* speaker = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_VILEBRANCH_SPEAKER)))
+                if (Creature* speaker = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_VILEBRANCH_SPEAKER)))
                     if (!speaker->IsAlive())
                         speaker->Respawn(true);
             }
@@ -157,7 +157,7 @@ public:
             if (++killCount == 3)
             {
                 Talk(SAY_DING_KILL);
-                if (Creature* jindo = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_JINDO)))
+                if (Creature* jindo = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_JINDO)))
                     if (jindo->IsAlive())
                         jindo->AI()->Talk(SAY_GRATS_JINDO);
                 DoCast(me, SPELL_LEVEL_UP, true);
@@ -261,7 +261,7 @@ public:
 
     private:
         uint8 killCount;
-        uint64 chainedSpirtGUIDs[CHAINED_SPIRT_COUNT];
+        ObjectGuid chainedSpirtGUIDs[CHAINED_SPIRT_COUNT];
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -384,7 +384,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_vilebranch_speakerAI>(creature);
+        return GetZulGurubAI<npc_vilebranch_speakerAI>(creature);
     }
 };
 

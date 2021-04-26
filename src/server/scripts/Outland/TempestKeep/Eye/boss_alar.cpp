@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "MoveSplineInit.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "the_eye.h"
 #include "WaypointManager.h"
-#include "MoveSplineInit.h"
 
 enum Spells
 {
@@ -327,7 +327,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_alarAI>(creature);
+        return GetTheEyeAI<boss_alarAI>(creature);
     }
 };
 
@@ -395,7 +395,7 @@ public:
         {
             PreventHitEffect(effIndex);
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                if (Creature* alar = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(NPC_ALAR)))
+                if (Creature* alar = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_ALAR)))
                     Unit::DealDamage(GetCaster(), alar, alar->CountPctFromMaxHealth(2));
         }
 

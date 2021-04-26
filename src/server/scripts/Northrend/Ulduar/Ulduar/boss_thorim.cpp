@@ -2,14 +2,14 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "ulduar.h"
-#include "ScriptedEscortAI.h"
-#include "SpellAuraEffects.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "ulduar.h"
 
 enum ThorimSpells
 {
@@ -308,7 +308,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_thorimAI (pCreature);
+        return GetUlduarAI<boss_thorimAI>(pCreature);
     }
 
     struct boss_thorimAI : public ScriptedAI
@@ -355,7 +355,7 @@ public:
         GameObject* GetThorimObject(uint32 entry)
         {
             if (m_pInstance)
-                return ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(entry));
+                return ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(entry));
             return nullptr;
         }
 
@@ -818,7 +818,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_thorim_sifAI (pCreature);
+        return GetUlduarAI<boss_thorim_sifAI>(pCreature);
     }
 
     struct boss_thorim_sifAI : public ScriptedAI
@@ -845,7 +845,7 @@ public:
             else if (param == ACTION_SIF_START_DOMINION)
             {
                 if (me->GetInstanceScript())
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_THORIM)))
+                    if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
                         me->CastSpell(cr, SPELL_TOUCH_OF_DOMINION, false);
 
                 events.ScheduleEvent(EVENT_SIF_FINISH_DOMINION, 150000);
@@ -929,7 +929,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_thorim_lightning_orbAI (pCreature);
+        return GetUlduarAI<boss_thorim_lightning_orbAI>(pCreature);
     }
 
     struct boss_thorim_lightning_orbAI : public npc_escortAI
@@ -938,7 +938,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            Start(false, true, 0);
+            Start(false, true);
         }
 
         uint32 Timer;
@@ -977,7 +977,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_thorim_trapAI (pCreature);
+        return GetUlduarAI<boss_thorim_trapAI>(pCreature);
     }
 
     struct boss_thorim_trapAI : public NullCreatureAI
@@ -1015,7 +1015,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_thorim_sif_blizzardAI (pCreature);
+        return GetUlduarAI<boss_thorim_sif_blizzardAI>(pCreature);
     }
 
     struct boss_thorim_sif_blizzardAI : public npc_escortAI
@@ -1024,7 +1024,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            Start(false, true, 0);
+            Start(false, true);
             SetDespawnAtEnd(false);
         }
 
@@ -1064,7 +1064,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_thorim_pillarAI (pCreature);
+        return GetUlduarAI<boss_thorim_pillarAI>(pCreature);
     }
 
     struct boss_thorim_pillarAI : public NullCreatureAI
@@ -1107,7 +1107,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_thorim_start_npcsAI (pCreature);
+        return GetUlduarAI<boss_thorim_start_npcsAI>(pCreature);
     }
 
     struct boss_thorim_start_npcsAI : public ScriptedAI
@@ -1130,10 +1130,10 @@ public:
 
         void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
         {
-            if (!_playerAttack && who && (who->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(who->GetOwnerGUID())))
+            if (!_playerAttack && who && (who->GetTypeId() == TYPEID_PLAYER || who->GetOwnerGUID().IsPlayer()))
             {
                 if (me->GetInstanceScript())
-                    if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_THORIM)))
+                    if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
                     {
                         if (!thorim->IsInCombat())
                         {
@@ -1154,7 +1154,7 @@ public:
         void JustDied(Unit*) override
         {
             if (me->GetInstanceScript())
-                if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_THORIM)))
+                if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
                     thorim->AI()->DoAction(ACTION_START_TRASH_DIED);
         }
 
@@ -1261,7 +1261,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_thorim_gauntlet_npcsAI (pCreature);
+        return GetUlduarAI<boss_thorim_gauntlet_npcsAI>(pCreature);
     }
 
     struct boss_thorim_gauntlet_npcsAI : public ScriptedAI
@@ -1368,7 +1368,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_thorim_runic_colossusAI (pCreature);
+        return GetUlduarAI<boss_thorim_runic_colossusAI>(pCreature);
     }
 
     struct boss_thorim_runic_colossusAI : public ScriptedAI
@@ -1379,7 +1379,7 @@ public:
         bool _leftHand;
         bool _checkTarget;
         float _nextTriggerPos;
-        uint64 _triggerLeftGUID[2], _triggerRightGUID[2];
+        ObjectGuid _triggerLeftGUID[2], _triggerRightGUID[2];
 
         void Reset() override
         {
@@ -1404,7 +1404,7 @@ public:
         void JustDied(Unit*) override
         {
             if (me->GetInstanceScript())
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript()->GetData64(DATA_THORIM_FIRST_DOORS)))
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript()->GetGuidData(DATA_THORIM_FIRST_DOORS)))
                     go->SetGoState(GO_STATE_ACTIVE);
         }
 
@@ -1502,7 +1502,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_thorim_ancient_rune_giantAI (pCreature);
+        return GetUlduarAI<boss_thorim_ancient_rune_giantAI>(pCreature);
     }
 
     struct boss_thorim_ancient_rune_giantAI : public ScriptedAI
@@ -1533,10 +1533,10 @@ public:
         {
             if (InstanceScript* pInstance = me->GetInstanceScript())
             {
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(DATA_THORIM_SECOND_DOORS)))
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(DATA_THORIM_SECOND_DOORS)))
                     go->SetGoState(GO_STATE_ACTIVE);
 
-                if (Creature* thorim = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_THORIM)))
+                if (Creature* thorim = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_THORIM)))
                     thorim->AI()->DoAction(ACTION_ALLOW_HIT);
             }
         }
@@ -1587,7 +1587,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_thorim_arena_npcsAI (pCreature);
+        return GetUlduarAI<boss_thorim_arena_npcsAI>(pCreature);
     }
 
     struct boss_thorim_arena_npcsAI : public ScriptedAI
@@ -1805,7 +1805,7 @@ public:
     bool OnCheck(Player* player, Unit*) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetData64(TYPE_THORIM)))
+            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetGuidData(TYPE_THORIM)))
                 return cr->AI()->GetData(DATA_HIT_BY_LIGHTNING);
 
         return false;
@@ -1820,7 +1820,7 @@ public:
     bool OnCheck(Player* player, Unit*) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetData64(TYPE_THORIM)))
+            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetGuidData(TYPE_THORIM)))
                 return cr->AI()->GetData(DATA_LOSE_YOUR_ILLUSION);
 
         return false;

@@ -2,13 +2,13 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "ulduar.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
-#include "Player.h"
+#include "SpellScript.h"
+#include "ulduar.h"
 
 class npc_ulduar_keeper : public CreatureScript
 {
@@ -94,7 +94,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_ulduar_snow_moundAI(creature);
+        return GetUlduarAI<npc_ulduar_snow_moundAI>(creature);
     }
 
     struct npc_ulduar_snow_moundAI : public ScriptedAI
@@ -141,18 +141,18 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_ulduar_storm_tempered_keeperAI(creature);
+        return GetUlduarAI<npc_ulduar_storm_tempered_keeperAI>(creature);
     }
 
     struct npc_ulduar_storm_tempered_keeperAI : public ScriptedAI
     {
         npc_ulduar_storm_tempered_keeperAI(Creature* creature) : ScriptedAI(creature)
         {
-            otherGUID = 0;
+            otherGUID.Clear();
         }
 
         EventMap events;
-        uint64 otherGUID;
+        ObjectGuid otherGUID;
 
         void Reset() override
         {
@@ -230,7 +230,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_ulduar_arachnopod_destroyerAI(creature);
+        return GetUlduarAI<npc_ulduar_arachnopod_destroyerAI>(creature);
     }
 
     struct npc_ulduar_arachnopod_destroyerAI : public ScriptedAI

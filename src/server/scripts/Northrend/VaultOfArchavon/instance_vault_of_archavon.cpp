@@ -1,16 +1,16 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "vault_of_archavon.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
-#include "SpellAuras.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "vault_of_archavon.h"
 
 /* Vault of Archavon encounters:
 1 - Archavon the Stone Watcher event
@@ -33,7 +33,6 @@ public:
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-            memset(&bossGUIDs, 0, sizeof(bossGUIDs));
 
             ArchavonDeath = 0;
             EmalonDeath = 0;
@@ -147,11 +146,12 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             if (identifier < MAX_ENCOUNTER)
                 return bossGUIDs[identifier];
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         uint32 GetData(uint32 identifier) const override
@@ -266,7 +266,7 @@ public:
         bool stoned;
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
-        uint64 bossGUIDs[MAX_ENCOUNTER];
+        ObjectGuid bossGUIDs[MAX_ENCOUNTER];
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

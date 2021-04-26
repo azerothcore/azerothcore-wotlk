@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -19,16 +19,16 @@ npc_clintar_spirit
 npc_clintar_dreamwalker
 EndContentData */
 
-#include "ScriptMgr.h"
+#include "Cell.h"
+#include "CellImpl.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "Cell.h"
-#include "CellImpl.h"
 
 /*######
 ## npc_bunthen_plainswind
@@ -283,7 +283,7 @@ public:
     public:
         npc_clintar_spiritAI(Creature* creature) : npc_escortAI(creature)
         {
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
         }
 
         uint8 Step;
@@ -291,7 +291,7 @@ public:
         uint32 EventTimer;
         uint32 checkPlayerTimer;
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         bool EventOnWait;
 
@@ -302,7 +302,7 @@ public:
                 Step = 0;
                 CurrWP = 0;
                 EventTimer = 0;
-                PlayerGUID = 0;
+                PlayerGUID.Clear();
                 checkPlayerTimer = 1000;
                 EventOnWait = false;
             }
@@ -339,7 +339,7 @@ public:
             if (player && player->GetQuestStatus(10965) == QUEST_STATUS_INCOMPLETE)
             {
                 player->FailQuest(10965);
-                PlayerGUID = 0;
+                PlayerGUID.Clear();
                 Reset();
             }
         }
@@ -518,7 +518,7 @@ public:
                                 break;
                             case 2:
                                 player->TalkedToCreature(me->GetEntry(), me->GetGUID());
-                                PlayerGUID = 0;
+                                PlayerGUID.Clear();
                                 Reset();
                                 me->setDeathState(JUST_DIED);
                                 break;

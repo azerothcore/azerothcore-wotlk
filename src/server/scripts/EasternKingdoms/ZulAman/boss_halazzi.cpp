@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "zulaman.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
+#include "zulaman.h"
 
 enum Spells
 {
@@ -77,14 +77,14 @@ public:
         uint32 BerserkTimer;
         uint32 TransformCount;
 
-        uint64 LynxGUID;
+        ObjectGuid LynxGUID;
 
         void Reset() override
         {
             instance->SetData(DATA_HALAZZIEVENT, NOT_STARTED);
             summons.DespawnAll();
 
-            LynxGUID = 0;
+            LynxGUID.Clear();
             TransformCount = 0;
             BerserkTimer = 600000;
             CheckTimer = 1000;
@@ -305,7 +305,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_halazziAI>(creature);
+        return GetZulAmanAI<boss_halazziAI>(creature);
     }
 };
 
@@ -367,7 +367,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_halazzi_lynxAI(creature);
+        return GetZulAmanAI<npc_halazzi_lynxAI>(creature);
     }
 };
 

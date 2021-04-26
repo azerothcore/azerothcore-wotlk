@@ -1,8 +1,8 @@
-#include "WhoListCache.h"
-#include "World.h"
+#include "GuildMgr.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
-#include "GuildMgr.h"
+#include "WhoListCache.h"
+#include "World.h"
 
 std::vector<WhoListPlayerInfo> WhoListCacheMgr::m_whoOpcodeList;
 
@@ -12,8 +12,8 @@ void WhoListCacheMgr::Update()
     m_whoOpcodeList.clear();
     m_whoOpcodeList.reserve(sWorld->GetPlayerCount() + 1);
 
-    ACORE_READ_GUARD(HashMapHolder<Player>::LockType, *HashMapHolder<Player>::GetLock());
-    HashMapHolder<Player>::MapType const& m = sObjectAccessor->GetPlayers();
+    std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
+    HashMapHolder<Player>::MapType const& m = ObjectAccessor::GetPlayers();
     for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
     {
         if (!itr->second->FindMap() || itr->second->GetSession()->PlayerLoading())

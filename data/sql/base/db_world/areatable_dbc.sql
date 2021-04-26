@@ -6,20 +6,20 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `areatable_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `areatable_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
-  `ContinentID` int(11) NOT NULL DEFAULT 0,
-  `ParentAreaID` int(11) NOT NULL DEFAULT 0,
-  `AreaBit` int(11) NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
-  `SoundProviderPref` int(11) NOT NULL DEFAULT 0,
-  `SoundProviderPrefUnderwater` int(11) NOT NULL DEFAULT 0,
-  `AmbienceID` int(11) NOT NULL DEFAULT 0,
-  `ZoneMusic` int(11) NOT NULL DEFAULT 0,
-  `IntroSound` int(11) NOT NULL DEFAULT 0,
-  `ExplorationLevel` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
+  `ContinentID` INT NOT NULL DEFAULT 0,
+  `ParentAreaID` INT NOT NULL DEFAULT 0,
+  `AreaBit` INT NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
+  `SoundProviderPref` INT NOT NULL DEFAULT 0,
+  `SoundProviderPrefUnderwater` INT NOT NULL DEFAULT 0,
+  `AmbienceID` INT NOT NULL DEFAULT 0,
+  `ZoneMusic` INT NOT NULL DEFAULT 0,
+  `IntroSound` INT NOT NULL DEFAULT 0,
+  `ExplorationLevel` INT NOT NULL DEFAULT 0,
   `AreaName_Lang_enUS` varchar(100) DEFAULT NULL,
   `AreaName_Lang_enGB` varchar(100) DEFAULT NULL,
   `AreaName_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -36,17 +36,17 @@ CREATE TABLE `areatable_dbc`
   `AreaName_Lang_ptBR` varchar(100) DEFAULT NULL,
   `AreaName_Lang_itIT` varchar(100) DEFAULT NULL,
   `AreaName_Lang_Unk` varchar(100) DEFAULT NULL,
-  `AreaName_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
-  `FactionGroupMask` int(11) NOT NULL DEFAULT 0,
-  `LiquidTypeID_1` int(11) NOT NULL DEFAULT 0,
-  `LiquidTypeID_2` int(11) NOT NULL DEFAULT 0,
-  `LiquidTypeID_3` int(11) NOT NULL DEFAULT 0,
-  `LiquidTypeID_4` int(11) NOT NULL DEFAULT 0,
+  `AreaName_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
+  `FactionGroupMask` INT NOT NULL DEFAULT 0,
+  `LiquidTypeID_1` INT NOT NULL DEFAULT 0,
+  `LiquidTypeID_2` INT NOT NULL DEFAULT 0,
+  `LiquidTypeID_3` INT NOT NULL DEFAULT 0,
+  `LiquidTypeID_4` INT NOT NULL DEFAULT 0,
   `MinElevation` float NOT NULL DEFAULT 0,
   `Ambient_Multiplier` float NOT NULL DEFAULT 0,
-  `Lightid` int(11) NOT NULL DEFAULT 0,
+  `Lightid` INT NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `areatable_dbc` WRITE;

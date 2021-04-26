@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "halls_of_lightning.h"
+#include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "ScriptMgr.h"
 
 enum BjarngrimSpells
 {
@@ -100,7 +100,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_bjarngrimAI (creature);
+        return GetHallsOfLightningAI<boss_bjarngrimAI>(creature);
     }
 
     struct boss_bjarngrimAI : public npc_escortAI
@@ -125,7 +125,7 @@ public:
             AddWaypoint(13, 1281.2f, -26.8f, 33.5f, 0);
             AddWaypoint(14, 1262, -26.9f, 33.5f, 0);
 
-            Start(true, false, 0, NULL, false, true);
+            Start(true, false, ObjectGuid::Empty, nullptr, false, true);
         }
 
         InstanceScript* m_pInstance;
@@ -364,7 +364,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_stormforged_lieutenantAI (creature);
+        return GetHallsOfLightningAI<npc_stormforged_lieutenantAI>(creature);
     }
 
     struct npc_stormforged_lieutenantAI : public ScriptedAI
@@ -372,14 +372,14 @@ public:
         npc_stormforged_lieutenantAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
-        uint64 BjarngrimGUID;
+        ObjectGuid BjarngrimGUID;
 
         void Reset() override
         {
             if (me->IsSummon())
                 BjarngrimGUID = me->ToTempSummon()->GetSummonerGUID();
             else
-                BjarngrimGUID = 0;
+                BjarngrimGUID.Clear();
         }
 
         void EnterCombat(Unit*) override

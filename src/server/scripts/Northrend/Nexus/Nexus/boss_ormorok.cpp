@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "nexus.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum eEnums
 {
@@ -54,7 +54,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_ormorokAI>(creature);
+        return GetNexusAI<boss_ormorokAI>(creature);
     }
 
     struct boss_ormorokAI : public BossAI
@@ -153,7 +153,7 @@ public:
                         float o = rand_norm() * 2.0f * M_PI;
                         float x = me->GetPositionX() + 5.0f * _spikesCount * cos(o);
                         float y = me->GetPositionY() + 5.0f * _spikesCount * sin(o);
-                        float h = me->GetMap()->GetHeight(x, y, me->GetPositionZ() + 5.0f);
+                        float h = me->GetMapHeight(x, y, me->GetPositionZ());
 
                         if (h != INVALID_HEIGHT)
                             me->SummonCreature(NPC_CRYSTAL_SPIKE, x, y, h, 0, TEMPSUMMON_TIMED_DESPAWN, 7000);
@@ -174,7 +174,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return GetInstanceAI<npc_crystal_spikeAI>(pCreature);
+        return GetNexusAI<npc_crystal_spikeAI>(pCreature);
     }
 
     struct npc_crystal_spikeAI : public NullCreatureAI
@@ -184,7 +184,7 @@ public:
         }
 
         int32 _damageTimer;
-        uint64 _gameObjectGUID;
+        ObjectGuid _gameObjectGUID;
 
         void Reset() override
         {

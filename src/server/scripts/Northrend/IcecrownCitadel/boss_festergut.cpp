@@ -2,11 +2,11 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuras.h"
 #include "icecrown_citadel.h"
+#include "ObjectMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
 
 enum ScriptTexts
 {
@@ -74,10 +74,10 @@ public:
     {
         boss_festergutAI(Creature* creature) : BossAI(creature, DATA_FESTERGUT)
         {
-            _gasDummyGUID = 0;
+            _gasDummyGUID.Clear();
         }
 
-        uint64 _gasDummyGUID;
+        ObjectGuid _gasDummyGUID;
         uint32 _maxInoculatedStack;
         uint32 _inhaleCounter;
 
@@ -118,7 +118,7 @@ public:
 
             if (Creature* gasDummy = me->FindNearestCreature(NPC_GAS_DUMMY, 100.0f, true))
                 _gasDummyGUID = gasDummy->GetGUID();
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                 professor->AI()->DoAction(ACTION_FESTERGUT_COMBAT);
         }
 
@@ -126,7 +126,7 @@ public:
         {
             _JustDied();
             Talk(SAY_DEATH);
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                 professor->AI()->DoAction(ACTION_FESTERGUT_DEATH);
 
             RemoveBlight();
@@ -141,7 +141,7 @@ public:
         void EnterEvadeMode() override
         {
             ScriptedAI::EnterEvadeMode();
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                 professor->AI()->EnterEvadeMode();
         }
 
@@ -238,7 +238,7 @@ public:
                     break;
                 case EVENT_FESTERGUT_GOO:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankTargetSelector(me)))
-                        if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+                        if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                             professor->CastSpell(target, SPELL_MALLABLE_GOO_H, true);
                     events.ScheduleEvent(EVENT_FESTERGUT_GOO, urand(15000, 20000));
                 default:
@@ -297,7 +297,7 @@ public:
             caster->ToCreature()->AI()->Talk(EMOTE_PUNGENT_BLIGHT);
 
             if (InstanceScript* inst = caster->GetInstanceScript())
-                if (Creature* professor = ObjectAccessor::GetCreature(*caster, inst->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+                if (Creature* professor = ObjectAccessor::GetCreature(*caster, inst->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                     professor->AI()->DoAction(ACTION_FESTERGUT_GAS);
         }
 
@@ -324,9 +324,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_INOCULATED))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_INOCULATED });
         }
 
         void ExtraEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -344,7 +342,7 @@ public:
             }
             GetTarget()->CastSpell(GetTarget(), SPELL_INOCULATED, true);
             if (InstanceScript* instance = GetTarget()->GetInstanceScript())
-                if (Creature* festergut = ObjectAccessor::GetCreature(*GetTarget(), instance->GetData64(DATA_FESTERGUT)))
+                if (Creature* festergut = ObjectAccessor::GetCreature(*GetTarget(), instance->GetGuidData(DATA_FESTERGUT)))
                     festergut->AI()->SetData(DATA_INOCULATED_STACK, inoculatedStack);
         }
 
@@ -371,9 +369,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_GASTRIC_EXPLOSION))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_GASTRIC_EXPLOSION });
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)
@@ -467,7 +463,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (InstanceScript* _instance = me->GetInstanceScript())
-                if (Creature* festergut = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_FESTERGUT)))
+                if (Creature* festergut = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_FESTERGUT)))
                     if (festergut->IsAlive())
                         festergut->AI()->Talk(SAY_STINKY_DEAD);
         }

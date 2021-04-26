@@ -2,12 +2,12 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "trial_of_the_crusader.h"
-#include "SpellScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellScript.h"
+#include "trial_of_the_crusader.h"
 
 enum AnubTexts
 {
@@ -137,7 +137,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_anubarak_trialAI(pCreature);
+        return GetTrialOfTheCrusaderAI<boss_anubarak_trialAI>(pCreature);
     };
 
     struct boss_anubarak_trialAI : public ScriptedAI
@@ -157,8 +157,8 @@ public:
         EventMap events;
         bool bIntro;
         bool bPhase3;
-        uint64 SphereGUID[6];
-        uint64 BurrowGUID[4];
+        ObjectGuid SphereGUID[6];
+        ObjectGuid BurrowGUID[4];
 
         void Reset() override
         {
@@ -200,9 +200,9 @@ public:
             if( !IsHeroic() )
                 events.RescheduleEvent(EVENT_RESPAWN_SPHERE, 4000);
 
-            for( std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr )
+            for (ObjectGuid guid : summons)
                 if (pInstance)
-                    if(Creature* c = pInstance->instance->GetCreature(*itr) )
+                    if (Creature* c = pInstance->instance->GetCreature(guid))
                     {
                         c->GetMotionMaster()->MoveIdle();
                         c->StopMoving();
@@ -246,7 +246,7 @@ public:
                 events.CancelEvent(EVENT_EMERGE_2);
                 if( !IsHeroic() )
                     events.CancelEvent(EVENT_SUMMON_NERUBIAN);
-                me->CastSpell((Unit*)NULL, SPELL_LEECHING_SWARM, false);
+                me->CastSpell((Unit*)nullptr, SPELL_LEECHING_SWARM, false);
                 Talk(EMOTE_LEECHING_SWARM);
                 Talk(SAY_LEECHING_SWARM);
                 return;
@@ -434,7 +434,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_swarm_scarabAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_swarm_scarabAI>(pCreature);
     };
 
     struct npc_swarm_scarabAI : public ScriptedAI
@@ -523,7 +523,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_frost_sphereAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_frost_sphereAI>(pCreature);
     };
 
     struct npc_frost_sphereAI : public NullCreatureAI
@@ -612,7 +612,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_nerubian_burrowerAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_nerubian_burrowerAI>(pCreature);
     };
 
     struct npc_nerubian_burrowerAI : public ScriptedAI
@@ -621,7 +621,7 @@ public:
         {
             // I am summoned by another npc (SPELL_EFFECT_FORCE_CAST), inform Anub'arak
             if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (uint64 guid = pInstance->GetData64(TYPE_ANUBARAK))
+                if (ObjectGuid guid = pInstance->GetGuidData(TYPE_ANUBARAK))
                     if (Creature* anub = pInstance->instance->GetCreature(guid))
                         CAST_AI(boss_anubarak_trial::boss_anubarak_trialAI, anub->AI())->JustSummoned(me);
         }
@@ -731,7 +731,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_anubarak_spikeAI(pCreature);
+        return GetTrialOfTheCrusaderAI<npc_anubarak_spikeAI>(pCreature);
     };
 
     struct npc_anubarak_spikeAI : public ScriptedAI
@@ -743,7 +743,7 @@ public:
         }
 
         EventMap events;
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
 
         void DoAction(int32 param) override
         {
@@ -751,7 +751,7 @@ public:
             {
                 if( Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID) )
                     target->RemoveAura(SPELL_MARK);
-                TargetGUID = 0;
+                TargetGUID.Clear();
                 me->RemoveAllAuras();
                 me->GetMotionMaster()->MoveIdle();
                 events.Reset();
@@ -764,7 +764,7 @@ public:
             if (TargetGUID)
                 if( Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID) )
                     target->RemoveAura(SPELL_MARK);
-            TargetGUID = 0;
+            TargetGUID.Clear();
             if (!next)
             {
                 events.Reset();
@@ -855,7 +855,7 @@ public:
                     Remove();
                     return;
                 }
-                target->CastSpell((Unit*)NULL, SPELL_IMPALE, true);
+                target->CastSpell((Unit*)nullptr, SPELL_IMPALE, true);
             }
         }
 
@@ -889,11 +889,7 @@ public:
 
         bool Validate(SpellInfo const* /*spellEntry*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_LEECHING_SWARM_DMG))
-                return false;
-            if (!sSpellMgr->GetSpellInfo(SPELL_LEECHING_SWARM_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_LEECHING_SWARM_DMG, SPELL_LEECHING_SWARM_HEAL });
         }
 
         void HandleEffectPeriodic(AuraEffect const* aurEff)

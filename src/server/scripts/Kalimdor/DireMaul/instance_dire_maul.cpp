@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
 #include "dire_maul.h"
+#include "InstanceScript.h"
+#include "ScriptMgr.h"
 
 class instance_dire_maul : public InstanceMapScript
 {
@@ -22,7 +22,6 @@ public:
             _pylonsState = 0;
             _northWingProgress = 0;
             _northWingBosses = 0;
-            _immoltharGUID = 0;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -140,7 +139,7 @@ public:
         uint32 _northWingProgress;
         uint32 _northWingBosses;
 
-        uint64 _immoltharGUID;
+        ObjectGuid _immoltharGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

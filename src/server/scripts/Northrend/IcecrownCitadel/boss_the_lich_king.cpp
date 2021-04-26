@@ -2,20 +2,20 @@
  * Originally written by Pussywizard - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ObjectMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "SpellAuraEffects.h"
-#include "Spell.h"
-#include "Vehicle.h"
-#include "Unit.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CreatureTextMgr.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "CreatureTextMgr.h"
 #include "icecrown_citadel.h"
+#include "ObjectMgr.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "Spell.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "Unit.h"
+#include "Vehicle.h"
 
 enum Texts
 {
@@ -452,7 +452,7 @@ public:
         switch (go->GetEntry())
         {
             case GO_ARTHAS_PLATFORM:
-                go->SetDestructibleState(GO_DESTRUCTIBLE_INTACT, NULL, true);
+                go->SetDestructibleState(GO_DESTRUCTIBLE_INTACT, nullptr, true);
                 break;
             case GO_DOODAD_ICECROWN_THRONEFROSTYWIND01:
                 go->SetGoState(GO_STATE_ACTIVE);
@@ -509,7 +509,7 @@ public:
     {
         _owner->SetReactState(REACT_AGGRESSIVE);
         _owner->CastSpell(_owner, SPELL_VILE_SPIRIT_MOVE_SEARCH, true);
-        _owner->CastSpell((Unit*)NULL, SPELL_VILE_SPIRIT_DAMAGE_SEARCH, true);
+        _owner->CastSpell((Unit*)nullptr, SPELL_VILE_SPIRIT_DAMAGE_SEARCH, true);
         return true;
     }
 
@@ -527,7 +527,7 @@ public:
 
     bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
-        _owner->CastCustomSpell(SPELL_TRIGGER_VILE_SPIRIT_HEROIC, SPELLVALUE_MAX_TARGETS, 1, NULL, true);
+        _owner->CastCustomSpell(SPELL_TRIGGER_VILE_SPIRIT_HEROIC, SPELLVALUE_MAX_TARGETS, 1, nullptr, true);
 
         if (--_counter)
         {
@@ -566,7 +566,7 @@ public:
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
-        _owner.CastSpell((Unit*)NULL, SPELL_PLAY_MOVIE, false);
+        _owner.CastSpell((Unit*)nullptr, SPELL_PLAY_MOVIE, false);
         return true;
     }
 
@@ -726,10 +726,10 @@ public:
                     events.ScheduleEvent(EVENT_START_ATTACK, 5250);
                     break;
                 case ACTION_BREAK_FROSTMOURNE:
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_BROKEN_FROSTMOURNE, true);
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_BROKEN_FROSTMOURNE_2, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_BROKEN_FROSTMOURNE, true);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_BROKEN_FROSTMOURNE_2, false);
                     SetEquipmentSlots(false, EQUIP_BROKEN_FROSTMOURNE);
-                    if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_HIGHLORD_TIRION_FORDRING)))
+                    if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                         tirion->AI()->DoAction(ACTION_BREAK_FROSTMOURNE);
                     break;
                 case ACTION_TELEPORT_BACK:
@@ -788,23 +788,22 @@ public:
                 me->AttackStop();
                 me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_FURY_OF_FROSTMOURNE);
                 me->InterruptNonMeleeSpells(true);
-                me->CastSpell((Unit*)NULL, SPELL_FURY_OF_FROSTMOURNE, false);
+                me->CastSpell((Unit*)nullptr, SPELL_FURY_OF_FROSTMOURNE, false);
                 me->SetWalk(true);
 
-                if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_HIGHLORD_TIRION_FORDRING)))
+                if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                     tirion->AI()->DoAction(ACTION_OUTRO);
                 return;
             }
 
             if (_phase == PHASE_OUTRO)
             {
-                if (!me->HasByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER))
+                if (!me->IsLevitating())
                     damage = me->GetHealth() > 1 ? 1 : 0;
                 else if (damage >= me->GetHealth()) // dying...
                 {
                     damage = me->GetHealth() - 1;
                     me->SetDisableGravity(false);
-                    me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
                     me->SendMonsterMove(me->GetPositionX() + 0.25f, me->GetPositionY(), 840.86f, 300, SPLINEFLAG_FALLING);
                     me->m_positionZ = 840.86f;
                     me->SetOrientation(0.0f);
@@ -820,7 +819,7 @@ public:
                 if (!_bFordringMustFallYell && me->GetHealth() < 500000)
                 {
                     _bFordringMustFallYell = true;
-                    if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_HIGHLORD_TIRION_FORDRING)))
+                    if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                     {
                         tirion->MonsterYell("The Lich King must fall!", LANG_UNIVERSAL, 0);
                         tirion->PlayDirectSound(17389);
@@ -1008,7 +1007,7 @@ public:
                     me->InterruptNonMeleeSpells(false);
                     me->ClearUnitState(UNIT_STATE_CASTING);
                     me->SetFacingTo(0.0f);
-                    me->CastSpell((Unit*)NULL, SPELL_QUAKE, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_QUAKE, false);
                     me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                     Talk(SAY_LK_QUAKE);
                     break;
@@ -1023,7 +1022,7 @@ public:
                     me->InterruptNonMeleeSpells(false);
                     me->ClearUnitState(UNIT_STATE_CASTING);
                     me->SetFacingTo(0.0f);
-                    me->CastSpell((Unit*)NULL, SPELL_QUAKE, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_QUAKE, false);
                     me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                     Talk(SAY_LK_QUAKE);
                     break;
@@ -1067,7 +1066,7 @@ public:
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, (IsHeroic() ? urand(1250, 1750) : urand(1750, 2250)), EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SUMMON_ICE_SPHERE:
-                    me->CastSpell((Unit*)NULL, SPELL_SUMMON_ICE_SPHERE, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_ICE_SPHERE, false);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 7500, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SUMMON_RAGING_SPIRIT:
@@ -1124,7 +1123,7 @@ public:
                     {
                         me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                         Talk(SAY_LK_SUMMON_VALKYR);
-                        me->CastSpell((Unit*)NULL, SUMMON_VALKYR, false);
+                        me->CastSpell((Unit*)nullptr, SUMMON_VALKYR, false);
                         events.ScheduleEvent(EVENT_SUMMON_VALKYR, 45000, EVENT_GROUP_ABILITIES);
 
                         // schedule a defile (or reschedule it) if next defile event
@@ -1139,7 +1138,7 @@ public:
                     break;
                 case EVENT_VILE_SPIRITS:
                     me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
-                    me->CastSpell((Unit*)NULL, SPELL_VILE_SPIRITS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_VILE_SPIRITS, false);
                     events.ScheduleEvent(EVENT_VILE_SPIRITS, 30000, EVENT_GROUP_VILE_SPIRITS);
                     break;
                 case EVENT_HARVEST_SOUL:
@@ -1154,7 +1153,7 @@ public:
                     break;
                 case EVENT_HARVEST_SOULS:
                     Talk(SAY_LK_HARVEST_SOUL);
-                    me->CastSpell((Unit*)NULL, SPELL_HARVEST_SOULS, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_HARVEST_SOULS, false);
                     _phase = PHASE_FROSTMOURNE;
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
@@ -1188,7 +1187,7 @@ public:
                     break;
                 case EVENT_FROSTMOURNE_HEROIC:
                     _bFrostmournePhase = true;
-                    if (TempSummon* terenas = me->GetMap()->SummonCreature(NPC_TERENAS_MENETHIL_FROSTMOURNE_H, TerenasSpawnHeroic, NULL, 55000))
+                    if (TempSummon* terenas = me->GetMap()->SummonCreature(NPC_TERENAS_MENETHIL_FROSTMOURNE_H, TerenasSpawnHeroic, nullptr, 55000))
                     {
                         terenas->AI()->DoAction(ACTION_FROSTMOURNE_INTRO);
                         if (Creature* spawner = terenas->FindNearestCreature(NPC_WORLD_TRIGGER_INFINITE_AOI, 100.0f, true))
@@ -1246,11 +1245,11 @@ public:
             EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
             summons.DoAction(ACTION_TELEPORT_BACK, pred);
             instance->SetBossState(DATA_THE_LICH_KING, FAIL);
-            me->CastSpell((Unit*)NULL, SPELL_KILL_FROSTMOURNE_PLAYERS, true);
+            me->CastSpell((Unit*)nullptr, SPELL_KILL_FROSTMOURNE_PLAYERS, true);
             BossAI::EnterEvadeMode();
             me->SetReactState(REACT_AGGRESSIVE);
 
-            if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_HIGHLORD_TIRION_FORDRING)))
+            if (Creature* tirion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_HIGHLORD_TIRION_FORDRING)))
                 tirion->AI()->EnterEvadeMode();
         }
     };
@@ -1286,7 +1285,7 @@ public:
             switch (id)
             {
                 case POINT_TIRION_INTRO:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         if (!theLichKing->IsAlive() || !theLichKing->IsVisible())
                             break;
@@ -1352,7 +1351,7 @@ public:
 
         void sGossipSelect(Player* /*player*/, uint32 sender, uint32 action) override
         {
-            Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING));
+            Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING));
             if (me->GetCreatureTemplate()->GossipMenuId == sender && !action && me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && theLichKing && !theLichKing->IsInEvadeMode())
             {
                 if (me->GetMap()->IsHeroic() && !_instance->GetData(DATA_LK_HC_AVAILABLE))
@@ -1380,7 +1379,7 @@ public:
             switch (_events.ExecuteEvent())
             {
                 case EVENT_INTRO_LK_MOVE:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         Movement::PointsArray path;
                         path.push_back(G3D::Vector3(theLichKing->GetPositionX(), theLichKing->GetPositionY(), theLichKing->GetPositionZ()));
@@ -1392,7 +1391,7 @@ public:
                     }
                     break;
                 case EVENT_INTRO_LK_TALK_1:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->AI()->Talk(SAY_LK_INTRO_2);
                         theLichKing->HandleEmoteCommand(EMOTE_ONESHOT_TALK_NO_SHEATHE);
@@ -1403,18 +1402,18 @@ public:
                     }
                     break;
                 case EVENT_INTRO_LK_EMOTE_CAST_SHOUT:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                         theLichKing->CastSpell(theLichKing, SPELL_EMOTE_SHOUT_NO_SHEATH, false);
                     break;
                 case EVENT_INTRO_LK_EMOTE_1:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                         theLichKing->HandleEmoteCommand(EMOTE_ONESHOT_POINT_NO_SHEATHE);
                     break;
                 case EVENT_INTRO_LK_CAST_FREEZE:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->AI()->Talk(SAY_LK_INTRO_3);
-                        theLichKing->CastSpell((Unit*)NULL, SPELL_ICE_LOCK, false);
+                        theLichKing->CastSpell((Unit*)nullptr, SPELL_ICE_LOCK, false);
                         _events.ScheduleEvent(EVENT_INTRO_FINISH, 1000);
                     }
                     break;
@@ -1440,7 +1439,7 @@ public:
                     me->GetMotionMaster()->MovePoint(0, TirionCharge);
                     break;
                 case EVENT_INTRO_FINISH:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->SetWalk(false);
                         theLichKing->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
@@ -1452,10 +1451,10 @@ public:
                     break;
 
                 case EVENT_OUTRO_LK_TALK_1:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->AI()->Talk(SAY_LK_OUTRO_1);
-                        theLichKing->CastSpell((Unit*)NULL, SPELL_FURY_OF_FROSTMOURNE_NO_REZ, true);
+                        theLichKing->CastSpell((Unit*)nullptr, SPELL_FURY_OF_FROSTMOURNE_NO_REZ, true);
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
@@ -1464,25 +1463,25 @@ public:
                     }
                     break;
                 case EVENT_OUTRO_LK_TALK_2:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->AI()->Talk(SAY_LK_OUTRO_2);
-                        theLichKing->CastSpell((Unit*)NULL, SPELL_EMOTE_QUESTION_NO_SHEATH, false);
+                        theLichKing->CastSpell((Unit*)nullptr, SPELL_EMOTE_QUESTION_NO_SHEATH, false);
                     }
                     break;
                 case EVENT_OUTRO_LK_EMOTE_TALK:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                         theLichKing->HandleEmoteCommand(EMOTE_ONESHOT_TALK_NO_SHEATHE);
                     break;
                 case EVENT_OUTRO_LK_TALK_3:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->SetFacingToObject(me);
                         theLichKing->AI()->Talk(SAY_LK_OUTRO_3);
                     }
                     break;
                 case EVENT_OUTRO_LK_MOVE_CENTER:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->GetMotionMaster()->MovePoint(0, CenterPosition);
                         uint32 travelTime = 1000 * theLichKing->GetExactDist(&CenterPosition) / theLichKing->GetSpeed(MOVE_WALK) + 1000;
@@ -1493,22 +1492,22 @@ public:
                     }
                     break;
                 case EVENT_OUTRO_LK_TALK_4:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->SetFacingTo(0.01745329f);
                         theLichKing->AI()->Talk(SAY_LK_OUTRO_4);
                     }
                     break;
                 case EVENT_OUTRO_LK_RAISE_DEAD:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
-                        theLichKing->CastSpell((Unit*)NULL, SPELL_RAISE_DEAD, false);
+                        theLichKing->CastSpell((Unit*)nullptr, SPELL_RAISE_DEAD, false);
                         theLichKing->ClearUnitState(UNIT_STATE_CASTING);
                         me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_FINAL);
                     }
                     break;
                 case EVENT_OUTRO_LK_TALK_5:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->AI()->Talk(SAY_LK_OUTRO_5);
                         _events.ScheduleEvent(EVENT_OUTRO_FORDRING_TALK_1, 7000);
@@ -1518,12 +1517,12 @@ public:
                     }
                     break;
                 case EVENT_OUTRO_LK_TALK_6:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         theLichKing->AI()->Talk(SAY_LK_OUTRO_6);
                         me->SetFacingToObject(theLichKing);
                         theLichKing->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, EQUIP_UNEQUIP);
-                        theLichKing->CastSpell((Unit*)NULL, SPELL_SUMMON_BROKEN_FROSTMOURNE_3, true);
+                        theLichKing->CastSpell((Unit*)nullptr, SPELL_SUMMON_BROKEN_FROSTMOURNE_3, true);
                         me->GetMap()->SetZoneOverrideLight(AREA_THE_FROZEN_THRONE, LIGHT_SOULSTORM, 10000);
                         me->GetMap()->SetZoneWeather(AREA_THE_FROZEN_THRONE, WEATHER_STATE_BLACKSNOW, 0.5f);
 
@@ -1534,19 +1533,18 @@ public:
                     break;
                 case EVENT_OUTRO_AFTER_SUMMON_BROKEN_FROSTMOURNE:
                     if (Creature* frostmourne = me->FindNearestCreature(NPC_FROSTMOURNE_TRIGGER, 50.0f))
-                        frostmourne->CastSpell((Unit*)NULL, SPELL_BROKEN_FROSTMOURNE, true);
+                        frostmourne->CastSpell((Unit*)nullptr, SPELL_BROKEN_FROSTMOURNE, true);
                     break;
                 case EVENT_OUTRO_KNOCK_BACK:
                     if (Creature* frostmourne = me->FindNearestCreature(NPC_FROSTMOURNE_TRIGGER, 50.0f))
-                        frostmourne->CastSpell((Unit*)NULL, SPELL_BROKEN_FROSTMOURNE_KNOCK, false);
+                        frostmourne->CastSpell((Unit*)nullptr, SPELL_BROKEN_FROSTMOURNE_KNOCK, false);
                     break;
                 case EVENT_OUTRO_SOUL_BARRAGE:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
-                        theLichKing->CastSpell((Unit*)NULL, SPELL_SOUL_BARRAGE, TRIGGERED_IGNORE_CAST_IN_PROGRESS);
+                        theLichKing->CastSpell((Unit*)nullptr, SPELL_SOUL_BARRAGE, TRIGGERED_IGNORE_CAST_IN_PROGRESS);
                         sCreatureTextMgr->SendSound(theLichKing, SOUND_PAIN, CHAT_MSG_MONSTER_YELL, 0, TEXT_RANGE_NORMAL, TEAM_NEUTRAL, false);
                         theLichKing->SetDisableGravity(true);
-                        theLichKing->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALWAYS_STAND | UNIT_BYTE1_FLAG_HOVER);
                         theLichKing->GetMotionMaster()->MovePoint(0, OutroFlying);
 
                         _events.ScheduleEvent(EVENT_OUTRO_AFTER_SOUL_BARRAGE, 3000);
@@ -1559,7 +1557,7 @@ public:
                 case EVENT_OUTRO_SUMMON_TERENAS:
                     if (Creature* frostmourne = me->FindNearestCreature(NPC_FROSTMOURNE_TRIGGER, 50.0f))
                     {
-                        frostmourne->CastSpell((Unit*)NULL, SPELL_SUMMON_TERENAS, false);
+                        frostmourne->CastSpell((Unit*)nullptr, SPELL_SUMMON_TERENAS, false);
                         if (Creature* terenas = me->FindNearestCreature(NPC_TERENAS_MENETHIL_OUTRO, 50.0f))
                             terenas->SetFacingToObject(frostmourne);
                     }
@@ -1574,8 +1572,8 @@ public:
                     if (Creature* terenas = me->FindNearestCreature(NPC_TERENAS_MENETHIL_OUTRO, 50.0f))
                     {
                         terenas->AI()->Talk(SAY_TERENAS_OUTRO_2);
-                        terenas->CastSpell((Unit*)NULL, SPELL_MASS_RESURRECTION, false);
-                        if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                        terenas->CastSpell((Unit*)nullptr, SPELL_MASS_RESURRECTION, false);
+                        if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                         {
                             lichKing->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
@@ -1589,11 +1587,11 @@ public:
                     }
                     break;
                 case EVENT_OUTRO_LK_TALK_7:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                         theLichKing->AI()->Talk(SAY_LK_OUTRO_7);
                     break;
                 case EVENT_OUTRO_LK_TALK_8:
-                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                         theLichKing->AI()->Talk(SAY_LK_OUTRO_8);
                     break;
                 case EVENT_OUTRO_FORDRING_TALK_1:
@@ -1605,7 +1603,7 @@ public:
                 case EVENT_OUTRO_FORDRING_REMOVE_ICE:
                     me->RemoveAurasDueToSpell(SPELL_ICE_LOCK);
                     SetEquipmentSlots(false, EQUIP_ASHBRINGER_GLOWING);
-                    if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     {
                         me->SetFacingToObject(lichKing);
                         me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_FINAL);
@@ -1615,7 +1613,7 @@ public:
                     me->GetMotionMaster()->MovePoint(POINT_TIRION_OUTRO, OutroPosition1);
                     break;
                 case EVENT_OUTRO_FORDRING_JUMP:
-                    me->CastSpell((Unit*)NULL, SPELL_JUMP, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_JUMP, false);
                     break;
 
                 default:
@@ -1630,7 +1628,7 @@ public:
             if (!me->IsAlive())
                 return;
 
-            if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+            if (Creature* theLichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                 if (theLichKing->IsInEvadeMode())
                 {
                     ScriptedAI::EnterEvadeMode();
@@ -1673,7 +1671,7 @@ public:
 
         void FilterTargets(std::list<WorldObject*>& targets)
         {
-            if (GameObject* platform = ObjectAccessor::GetGameObject(*GetCaster(), GetCaster()->GetInstanceScript()->GetData64(DATA_ARTHAS_PLATFORM)))
+            if (GameObject* platform = ObjectAccessor::GetGameObject(*GetCaster(), GetCaster()->GetInstanceScript()->GetGuidData(DATA_ARTHAS_PLATFORM)))
                 targets.remove_if(HeightDifferenceCheck(platform, 5.0f, false));
         }
 
@@ -1710,7 +1708,7 @@ public:
             PreventHitDefaultEffect(effIndex);
             GetHitUnit()->RemoveAurasDueToSpell(SPELL_RAISE_DEAD);
             GetHitUnit()->InterruptNonMeleeSpells(true);
-            GetHitUnit()->CastSpell((Unit*)NULL, SPELL_JUMP_2, true);
+            GetHitUnit()->CastSpell((Unit*)nullptr, SPELL_JUMP_2, true);
             if (Creature* creature = GetHitCreature())
                 creature->AI()->DoAction(ACTION_BREAK_FROSTMOURNE);
         }
@@ -1912,9 +1910,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_NECROTIC_PLAGUE_JUMP))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_NECROTIC_PLAGUE_JUMP });
         }
 
         void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1934,7 +1930,7 @@ public:
             CustomSpellValues values;
             if (dispel)
                 values.AddSpellMod(SPELLVALUE_BASE_POINT1, AURA_REMOVE_BY_ENEMY_SPELL); // add as marker (spell has no effect 1)
-            GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, NULL, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
+            GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
 
             if (Unit* caster = GetCaster())
                 caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
@@ -2041,7 +2037,7 @@ public:
 
             CustomSpellValues values;
             values.AddSpellMod(SPELLVALUE_AURA_STACK, GetStackAmount());
-            GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, NULL, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
+            GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
             if (Unit* caster = GetCaster())
                 caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
         }
@@ -2060,7 +2056,7 @@ public:
             CustomSpellValues values;
             values.AddSpellMod(SPELLVALUE_AURA_STACK, GetStackAmount());
             values.AddSpellMod(SPELLVALUE_BASE_POINT1, AURA_REMOVE_BY_ENEMY_SPELL); // add as marker (spell has no effect 1)
-            GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, NULL, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
+            GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
             if (Unit* caster = GetCaster())
                 caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
 
@@ -2130,7 +2126,7 @@ public:
             if (targets.empty())
                 return;
 
-            GetCaster()->CastSpell((Unit*)NULL, SPELL_SHADOW_TRAP_KNOCKBACK, true);
+            GetCaster()->CastSpell((Unit*)nullptr, SPELL_SHADOW_TRAP_KNOCKBACK, true);
             if (Aura* a = GetCaster()->GetAura(SPELL_SHADOW_TRAP_AURA))
                 a->SetDuration(0);
             if (GetCaster()->GetTypeId() == TYPEID_UNIT)
@@ -2160,9 +2156,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_ICE_BURST))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_ICE_BURST });
         }
 
         void CheckTargetCount(std::list<WorldObject*>& unitList)
@@ -2195,12 +2189,12 @@ public:
     {
         npc_icc_ice_sphereAI(Creature* creature) : ScriptedAI(creature)
         {
-            targetGUID = 0;
+            targetGUID.Clear();
             timer = 250;
             me->SetReactState(REACT_PASSIVE);
         }
 
-        uint64 targetGUID;
+        ObjectGuid targetGUID;
         uint16 timer;
 
         void DoAction(int32 a) override
@@ -2210,7 +2204,7 @@ public:
                 me->RemoveAllAuras();
                 me->CastSpell(me, SPELL_ICE_BURST, true);
                 me->DespawnOrUnsummon(1000);
-                targetGUID = 0;
+                targetGUID.Clear();
                 timer = 9999;
                 me->InterruptNonMeleeSpells(true);
                 me->AttackStop();
@@ -2223,7 +2217,7 @@ public:
         {
             if (!me->HasAura(SPELL_ICE_SPHERE))
                 me->CastSpell(me, SPELL_ICE_SPHERE, true);
-            targetGUID = 0;
+            targetGUID.Clear();
             me->InterruptNonMeleeSpells(true);
             me->AttackStop();
             me->GetMotionMaster()->Clear();
@@ -2331,13 +2325,13 @@ public:
         void IsSummonedBy(Unit* /*summoner*/) override
         {
             // player is the spellcaster so register summon manually
-            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                 lichKing->AI()->JustSummoned(me);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                 lichKing->AI()->SummonedCreatureDespawn(me);
             if (TempSummon* summon = me->ToTempSummon())
             {
@@ -2476,9 +2470,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_SOUL_REAPER_BUFF))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_SOUL_REAPER_BUFF });
         }
 
         void OnPeriodic(AuraEffect const* /*aurEff*/)
@@ -2506,7 +2498,7 @@ public:
 
     struct npc_valkyr_shadowguardAI : public NullCreatureAI
     {
-        npc_valkyr_shadowguardAI(Creature* creature) : NullCreatureAI(creature), _grabbedPlayer(0), didbelow50pct(false), dropped(false), _instance(creature->GetInstanceScript())
+        npc_valkyr_shadowguardAI(Creature* creature) : NullCreatureAI(creature), didbelow50pct(false), dropped(false), _instance(creature->GetInstanceScript())
         {
             me->SetReactState(REACT_PASSIVE);
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
@@ -2518,7 +2510,7 @@ public:
 
         EventMap _events;
         Position _destPoint;
-        uint64 _grabbedPlayer;
+        ObjectGuid _grabbedPlayer;
         bool didbelow50pct;
         bool dropped;
         InstanceScript* _instance;
@@ -2528,7 +2520,7 @@ public:
         void GoSiphon()
         {
             didbelow50pct = true;
-            me->CastSpell((Unit*)NULL, SPELL_EJECT_ALL_PASSENGERS, false);
+            me->CastSpell((Unit*)nullptr, SPELL_EJECT_ALL_PASSENGERS, false);
             float dist = rand_norm() * 10.0f + 5.0f;
             float angle = CenterPosition.GetAngle(me);
             _destPoint.Relocate(CenterPosition.GetPositionX() + dist * cos(angle), CenterPosition.GetPositionY() + dist * sin(angle), 855.0f + frand(0.0f, 4.0f), 0.0f);
@@ -2573,7 +2565,7 @@ public:
                         bool valid = false;
                         if (Player* target = ObjectAccessor::GetPlayer(*me, _grabbedPlayer))
                             if (target->FindMap() == me->GetMap() && target->GetExactDist(me) < 15.0f && !target->GetVehicle())
-                                if (GameObject* platform = ObjectAccessor::GetGameObject(*me, _instance->GetData64(DATA_ARTHAS_PLATFORM)))
+                                if (GameObject* platform = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(DATA_ARTHAS_PLATFORM)))
                                 {
                                     std::list<Creature*> triggers;
                                     GetCreatureListWithEntryInGrid(triggers, me, NPC_WORLD_TRIGGER, 150.0f);
@@ -2597,7 +2589,7 @@ public:
                         {
                             _events.Reset();
                             _events.ScheduleEvent(EVENT_GRAB_PLAYER, 500);
-                            _grabbedPlayer = 0;
+                            _grabbedPlayer.Clear();
                         }
                     }
                     break;
@@ -2617,7 +2609,7 @@ public:
                         if (Vehicle* v = me->GetVehicleKit())
                             if (Unit* passenger = v->GetPassenger(0))
                                 p = passenger->ToPlayer();*/
-                        me->CastSpell((Unit*)NULL, SPELL_EJECT_ALL_PASSENGERS, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_EJECT_ALL_PASSENGERS, false);
 
                         if (IsHeroic())
                             GoSiphon();
@@ -2639,7 +2631,7 @@ public:
             }
         }
 
-        void SetGUID(uint64 guid, int32 /* = 0*/) override
+        void SetGUID(ObjectGuid guid, int32 /* = 0*/) override
         {
             _grabbedPlayer = guid;
         }
@@ -2656,15 +2648,14 @@ public:
                 case EVENT_GRAB_PLAYER:
                     if (!_grabbedPlayer)
                     {
-                        me->CastSpell((Unit*)NULL, SPELL_VALKYR_TARGET_SEARCH, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_VALKYR_TARGET_SEARCH, false);
                         _events.ScheduleEvent(EVENT_GRAB_PLAYER, 2000);
                     }
                     break;
                 case EVENT_MOVE_TO_DROP_POS:
                     me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-                    me->SetDisableGravity(false);
-                    me->SetHover(false);
                     me->SetCanFly(false);
+                    me->SetDisableGravity(false);
                     me->GetMotionMaster()->MovePoint(POINT_DROP_PLAYER, _destPoint, false);
                     me->SetDisableGravity(true, true);
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -2672,9 +2663,8 @@ public:
                 case EVENT_MOVE_TO_SIPHON_POS:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE); // just in case if passenger disappears so quickly that EVENT_MOVE_TO_DROP_POS is never executed
                     { int32 bp0 = 80; me->CastCustomSpell(me, 1557, &bp0, nullptr, nullptr, true); }
-                    me->SetDisableGravity(true);
-                    me->SetHover(true);
                     me->SetCanFly(true);
+                    me->SetDisableGravity(true);
                     me->SendMovementFlagUpdate();
                     me->GetMotionMaster()->MovePoint(POINT_START_SIPHON, _destPoint);
                     break;
@@ -2691,7 +2681,7 @@ public:
                                         break;
                                     }
                         if (!target)
-                            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                                 target = lichKing->AI()->SelectTarget(SELECT_TARGET_RANDOM, 0, NonTankLKTargetSelector(lichKing, true, false, 100.0f));
                         if (target)
                             me->CastSpell(target, SPELL_LIFE_SIPHON, false);
@@ -2814,7 +2804,7 @@ public:
             targets.remove_if(acore::UnitAuraCheck(true, SPELL_BOSS_HITTIN_YA_AURA)); // done in dbc, but just to be sure xd
             targets.remove_if(acore::UnitAuraCheck(true, SPELL_HARVEST_SOUL_VALKYR));
             if (InstanceScript* _instance = caster->GetInstanceScript())
-                if (Creature* lichKing = ObjectAccessor::GetCreature(*caster, _instance->GetData64(DATA_THE_LICH_KING)))
+                if (Creature* lichKing = ObjectAccessor::GetCreature(*caster, _instance->GetGuidData(DATA_THE_LICH_KING)))
                     if (Spell* s = lichKing->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                         if (s->GetSpellInfo()->Id == SPELL_DEFILE && s->m_targets.GetUnitTarget())
                             targets.remove(s->m_targets.GetUnitTarget());
@@ -2897,9 +2887,7 @@ public:
 
         bool Validate(SpellInfo const* /*spell*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_LIFE_SIPHON_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_LIFE_SIPHON_HEAL });
         }
 
         void TriggerHeal()
@@ -2937,7 +2925,7 @@ public:
         void OnPeriodic(AuraEffect const* aurEff)
         {
             if (_is25Man || ((aurEff->GetTickNumber() - 1) % 5))
-                GetTarget()->CastSpell((Unit*)NULL, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, NULL, aurEff, GetCasterGUID());
+                GetTarget()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, nullptr, aurEff, GetCasterGUID());
         }
 
         void Register() override
@@ -3053,7 +3041,7 @@ public:
                 c->RemoveAurasDueToSpell(SPELL_VILE_SPIRIT_DAMAGE_SEARCH);
                 c->GetMotionMaster()->Clear(true);
                 c->StopMoving();
-                c->CastSpell((Unit*)NULL, SPELL_SPIRIT_BURST, true);
+                c->CastSpell((Unit*)nullptr, SPELL_SPIRIT_BURST, true);
                 c->DespawnOrUnsummon(3000);
                 c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             }
@@ -3089,7 +3077,7 @@ public:
         {
             // m_originalCaster to allow stacking from different casters, meh
             if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                GetTarget()->CastSpell((Unit*)NULL, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, GetTarget()->GetInstanceScript()->GetData64(DATA_THE_LICH_KING));
+                GetTarget()->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, GetTarget()->GetInstanceScript()->GetGuidData(DATA_THE_LICH_KING));
         }
 
         void Register() override
@@ -3121,7 +3109,7 @@ public:
             if (!summoner)
                 return;
 
-            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
             {
                 me->SetWalk(false);
                 Movement::PointsArray path;
@@ -3129,8 +3117,8 @@ public:
                 path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), 843.0f));
                 me->GetMotionMaster()->MoveSplinePath(&path);
 
-                uint64 petGUID = summoner->GetPetGUID();
-                summoner->SetPetGUID(0);
+                ObjectGuid petGUID = summoner->GetPetGUID();
+                summoner->SetPetGUID(ObjectGuid::Empty);
                 summoner->StopMoving();
                 me->CastSpell(summoner, SPELL_HARVEST_SOUL_VEHICLE, true);
                 //summoner->ClearUnitState(UNIT_STATE_ONVEHICLE);
@@ -3167,24 +3155,24 @@ public:
                     if (summoner->GetTypeId() == TYPEID_PLAYER && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
                     {
                         if (buff)
-                            summoner->CastSpell((Unit*)NULL, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, _instance->GetData64(DATA_THE_LICH_KING));
+                            summoner->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, _instance->GetGuidData(DATA_THE_LICH_KING));
 
                         me->CastSpell(summoner, SPELL_HARVEST_SOUL_TELEPORT_BACK, false);
                     }
                     else if (buff)
-                        me->CastSpell((Unit*)NULL, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, _instance->GetData64(DATA_THE_LICH_KING));
+                        me->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, _instance->GetGuidData(DATA_THE_LICH_KING));
 
                     summoner->RemoveAurasDueToSpell(IsHeroic() ? SPELL_HARVEST_SOULS_TELEPORT : SPELL_HARVEST_SOUL_TELEPORT);
                 }
                 else
-                    me->CastSpell((Unit*)NULL, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, _instance->GetData64(DATA_THE_LICH_KING));
+                    me->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, _instance->GetGuidData(DATA_THE_LICH_KING));
             }
 
             _events.Reset();
             me->RemoveAllAuras();
             me->DespawnOrUnsummon(500);
 
-            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+            if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                 lichKing->AI()->SummonedCreatureDespawn(me);
         }
 
@@ -3202,7 +3190,7 @@ public:
                         {
                             if (summoner->IsAlive() && summoner->GetTypeId() == TYPEID_PLAYER)
                             {
-                                summoner->CastSpell((Unit*)NULL, SPELL_HARVEST_SOUL_VISUAL, true);
+                                summoner->CastSpell((Unit*)nullptr, SPELL_HARVEST_SOUL_VISUAL, true);
                                 summoner->ExitVehicle(summoner);
                                 me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), 840.87f, me->GetOrientation(), true);
                                 me->StopMovingOnCurrentPos();
@@ -3219,7 +3207,7 @@ public:
                         }
                     break;
                 case EVENT_MOVE_TO_LICH_KING:
-                    if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                         if (me->GetExactDist(lichKing) > 8.0f)
                         {
                             float dist = float(rand_norm()) * 5.0f + 8.0f;
@@ -3231,7 +3219,7 @@ public:
                         }
                     break;
                 case EVENT_DESPAWN_SELF:
-                    if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                         lichKing->AI()->SummonedCreatureDespawn(me);
                     me->DespawnOrUnsummon(1);
                     break;
@@ -3280,7 +3268,7 @@ public:
                     if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE))
                     {
                         _events.Reset();
-                        me->CastSpell((Unit*)NULL, SPELL_RESTORE_SOUL, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_RESTORE_SOUL, false);
                         me->DespawnOrUnsummon(3000);
                     }
                     break;
@@ -3300,7 +3288,7 @@ public:
                     _events.ScheduleEvent(EVENT_TELEPORT_BACK, 1000);
                     if (Creature* warden = me->FindNearestCreature(NPC_SPIRIT_WARDEN, 20.0f))
                     {
-                        warden->CastSpell((Unit*)NULL, SPELL_DESTROY_SOUL, false);
+                        warden->CastSpell((Unit*)nullptr, SPELL_DESTROY_SOUL, false);
                         warden->DespawnOrUnsummon(2000);
                     }
                     me->CastSpell(me, SPELL_TERENAS_LOSES_INSIDE, false);
@@ -3325,7 +3313,7 @@ public:
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     Talk(SAY_TERENAS_INTRO_1);
                     if (IsHeroic())
-                        me->CastSpell((Unit*)NULL, SPELL_RESTORE_SOULS, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_RESTORE_SOULS, false);
                     break;
                 case EVENT_FROSTMOURNE_TALK_2:
                     Talk(SAY_TERENAS_INTRO_2);
@@ -3335,7 +3323,7 @@ public:
                     break;
                 case EVENT_DESTROY_SOUL:
                     if (Creature* warden = me->FindNearestCreature(NPC_SPIRIT_WARDEN, 20.0f))
-                        warden->CastSpell((Unit*)NULL, SPELL_DESTROY_SOUL, false);
+                        warden->CastSpell((Unit*)nullptr, SPELL_DESTROY_SOUL, false);
                     me->CastSpell(me, SPELL_TERENAS_LOSES_INSIDE, false);
                     me->SetDisplayId(16946);
                     me->SetReactState(REACT_PASSIVE);
@@ -3345,7 +3333,7 @@ public:
                     _events.ScheduleEvent(EVENT_TELEPORT_BACK, 1000);
                     break;
                 case EVENT_TELEPORT_BACK:
-                    if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_THE_LICH_KING)))
+                    if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                         lichKing->AI()->DoAction(ACTION_TELEPORT_BACK);
                     break;
                 default:
@@ -3433,7 +3421,7 @@ public:
             for (std::list<WorldObject*>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
                 if (Unit* target = (*itr)->ToUnit())
                     target->RemoveAurasDueToSpell(target->GetMap()->IsHeroic() ? SPELL_HARVEST_SOULS_TELEPORT : SPELL_HARVEST_SOUL_TELEPORT);
-            if (Creature* lichKing = ObjectAccessor::GetCreature(*GetCaster(), _instance->GetData64(DATA_THE_LICH_KING)))
+            if (Creature* lichKing = ObjectAccessor::GetCreature(*GetCaster(), _instance->GetGuidData(DATA_THE_LICH_KING)))
                 lichKing->AI()->DoAction(ACTION_TELEPORT_BACK);
             if (Creature* spawner = GetCaster()->FindNearestCreature(NPC_WORLD_TRIGGER_INFINITE_AOI, 50.0f, true))
             {
@@ -3486,7 +3474,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (Creature* terenas = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_TERENAS_MENETHIL)))
+            if (Creature* terenas = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_TERENAS_MENETHIL)))
                 terenas->AI()->DoAction(ACTION_TELEPORT_BACK);
         }
 
@@ -3524,16 +3512,14 @@ public:
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_DARK_HUNGER_HEAL))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_DARK_HUNGER_HEAL });
         }
 
         void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
         {
             PreventDefaultAction();
             int32 heal = int32(eventInfo.GetDamageInfo()->GetDamage() / 2);
-            GetTarget()->CastCustomSpell(SPELL_DARK_HUNGER_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), true, NULL, aurEff);
+            GetTarget()->CastCustomSpell(SPELL_DARK_HUNGER_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), true, nullptr, aurEff);
         }
 
         void Register() override
@@ -3562,7 +3548,7 @@ public:
             PreventDefaultAction();
             // shouldn't be needed, this is channeled
             if (Unit* caster = GetCaster())
-                caster->CastCustomSpell(SPELL_SOUL_RIP_DAMAGE, SPELLVALUE_BASE_POINT0, 5000 * aurEff->GetTickNumber(), GetTarget(), true, NULL, aurEff, GetCasterGUID());
+                caster->CastCustomSpell(SPELL_SOUL_RIP_DAMAGE, SPELLVALUE_BASE_POINT0, 5000 * aurEff->GetTickNumber(), GetTarget(), true, nullptr, aurEff, GetCasterGUID());
         }
 
         void Register() override
@@ -3610,7 +3596,7 @@ public:
         void HandleScript(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->CastSpell((Unit*)NULL, uint32(GetEffectValue()), true);
+            GetHitUnit()->CastSpell((Unit*)nullptr, uint32(GetEffectValue()), true);
         }
 
         void Register() override
@@ -3667,7 +3653,7 @@ public:
                 {
                     timer = 0;
                     me->RemoveAllAuras();
-                    me->CastSpell((Unit*)NULL, SPELL_EXPLOSION, false);
+                    me->CastSpell((Unit*)nullptr, SPELL_EXPLOSION, false);
                     me->DespawnOrUnsummon(1000);
                 }
                 else

@@ -2,23 +2,22 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
 #include "hellfire_ramparts.h"
+#include "InstanceScript.h"
+#include "ScriptMgr.h"
 
-class instance_ramparts : public InstanceMapScript
+class instance_hellfire_ramparts : public InstanceMapScript
 {
 public:
-    instance_ramparts() : InstanceMapScript("instance_ramparts", 543) { }
+    instance_hellfire_ramparts() : InstanceMapScript("instance_hellfire_ramparts", 543) { }
 
-    struct instance_ramparts_InstanceMapScript : public InstanceScript
+    struct instance_hellfire_ramparts_InstanceMapScript : public InstanceScript
     {
-        instance_ramparts_InstanceMapScript(Map* map) : InstanceScript(map) { }
+        instance_hellfire_ramparts_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
         void Initialize() override
         {
             SetBossNumber(MAX_ENCOUNTERS);
-            felIronChestGUID = 0;
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -74,16 +73,16 @@ public:
         }
 
     protected:
-        uint64 felIronChestGUID;
+        ObjectGuid felIronChestGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
-        return new instance_ramparts_InstanceMapScript(map);
+        return new instance_hellfire_ramparts_InstanceMapScript(map);
     }
 };
 
-void AddSC_instance_ramparts()
+void AddSC_instance_hellfire_ramparts()
 {
-    new instance_ramparts();
+    new instance_hellfire_ramparts();
 }

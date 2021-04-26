@@ -2,8 +2,8 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "shattered_halls.h"
 
 enum Says
@@ -56,7 +56,7 @@ public:
         {
             BossAI::InitializeAI();
             if (instance)
-                if (Creature* executioner = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_EXECUTIONER)))
+                if (Creature* executioner = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EXECUTIONER)))
                     executioner->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
@@ -66,7 +66,7 @@ public:
             _JustDied();
 
             if (instance)
-                if (Creature* executioner = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_EXECUTIONER)))
+                if (Creature* executioner = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EXECUTIONER)))
                     executioner->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
 
@@ -167,7 +167,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_warchief_kargath_bladefistAI>(creature);
+        return GetShatteredHallsAI<boss_warchief_kargath_bladefistAI>(creature);
     }
 };
 

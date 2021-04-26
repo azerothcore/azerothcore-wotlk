@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "InstanceScript.h"
 #include "blackfathom_deeps.h"
+#include "InstanceScript.h"
+#include "ScriptMgr.h"
 
 class instance_blackfathom_deeps : public InstanceMapScript
 {
@@ -23,7 +23,6 @@ public:
         void Initialize() override
         {
             memset(&_encounters, 0, sizeof(_encounters));
-            _akumaiPortalGUID = 0;
             _requiredDeaths = 0;
         }
 
@@ -69,7 +68,7 @@ public:
                     break;
                 case GO_AKU_MAI_DOOR:
                     if (_encounters[TYPE_FIRE1] == DONE && _encounters[TYPE_FIRE2] == DONE && _encounters[TYPE_FIRE3] == DONE && _encounters[TYPE_FIRE4] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     _akumaiPortalGUID = gameobject->GetGUID();
                     break;
             }
@@ -121,7 +120,7 @@ public:
 
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
-        uint64 _akumaiPortalGUID;
+        ObjectGuid _akumaiPortalGUID;
         uint8 _requiredDeaths;
     };
 };

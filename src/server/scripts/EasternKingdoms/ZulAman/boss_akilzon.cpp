@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -13,14 +13,14 @@ SQLUpdate:
 
 EndScriptData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Cell.h"
 #include "CellImpl.h"
-#include "zulaman.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "Weather.h"
+#include "zulaman.h"
 
 enum Spells
 {
@@ -76,17 +76,19 @@ public:
     {
         boss_akilzonAI(Creature* creature) : BossAI(creature, DATA_AKILZONEVENT)
         {
-            memset(BirdGUIDs, 0, sizeof(BirdGUIDs));
         }
 
         void Reset() override
         {
             _Reset();
 
-            TargetGUID = 0;
-            CloudGUID = 0;
-            CycloneGUID = 0;
-            memset(BirdGUIDs, 0, sizeof(BirdGUIDs));
+            TargetGUID.Clear();
+            CloudGUID.Clear();
+            CycloneGUID.Clear();
+
+            for (uint8 i = 0; i < 8; ++i)
+                BirdGUIDs[i].Clear();
+
             StormCount = 0;
             isRaining = false;
 
@@ -200,9 +202,9 @@ public:
                 StormCount = 0; // finish
                 events.ScheduleEvent(EVENT_SUMMON_EAGLES, 5000);
                 me->InterruptNonMeleeSpells(false);
-                CloudGUID = 0;
+                CloudGUID.Clear();
                 if (Cloud)
-                    Unit::DealDamage(Cloud, Cloud, Cloud->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    Unit::DealDamage(Cloud, Cloud, Cloud->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                 SetWeather(WEATHER_STATE_FINE, 0.0f);
                 isRaining = false;
             }
@@ -353,17 +355,17 @@ public:
         }
 
     private:
-        uint64 BirdGUIDs[8];
-        uint64 TargetGUID;
-        uint64 CycloneGUID;
-        uint64 CloudGUID;
+        ObjectGuid BirdGUIDs[8];
+        ObjectGuid TargetGUID;
+        ObjectGuid CycloneGUID;
+        ObjectGuid CloudGUID;
         uint8  StormCount;
         bool   isRaining;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_akilzonAI>(creature);
+        return GetZulAmanAI<boss_akilzonAI>(creature);
     }
 };
 
@@ -378,13 +380,13 @@ public:
 
         uint32 EagleSwoop_Timer;
         bool arrived;
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
 
         void Reset() override
         {
             EagleSwoop_Timer = urand(5000, 10000);
             arrived = true;
-            TargetGUID = 0;
+            TargetGUID.Clear();
             me->SetDisableGravity(true);
         }
 
@@ -402,7 +404,7 @@ public:
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, TargetGUID))
                     DoCast(target, SPELL_EAGLE_SWOOP, true);
-                TargetGUID = 0;
+                TargetGUID.Clear();
                 me->SetSpeed(MOVE_RUN, 1.2f);
                 EagleSwoop_Timer = urand(5000, 10000);
             }
@@ -444,7 +446,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_akilzon_eagleAI(creature);
+        return GetZulAmanAI<npc_akilzon_eagleAI>(creature);
     }
 };
 

@@ -6,6 +6,9 @@
 #define DEF_STEAM_VAULT_H
 
 #include "PassiveAI.h"
+#include "CreatureAIImpl.h"
+
+#define SteamVaultScriptName "instance_steam_vault"
 
 enum steamVault
 {
@@ -24,5 +27,11 @@ enum steamVaultNPCGO
     NPC_MEKGINEER_STEAMRIGGER           = 17796,
     NPC_WARLORD_KALITHRESH              = 17798,
 };
+
+template <class AI, class T>
+inline AI* GetSteamVaultAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, SteamVaultScriptName);
+}
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,11 +17,11 @@ npc_ranshalla
 go_elune_fire
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "WorldSession.h"
 
 // Ours
@@ -89,7 +89,7 @@ public:
             }
         }
 
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         EventMap events;
         uint32 changeEntry;
         bool damaged;
@@ -100,7 +100,7 @@ public:
                 me->UpdateEntry(me->GetOriginalEntry());
 
             events.Reset();
-            playerGUID = 0;
+            playerGUID.Clear();
             damaged = false;
         }
 
@@ -108,7 +108,7 @@ public:
         {
             if (!damaged)
             {
-                if (who && who->GetGUID() != playerGUID && (who->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(who->GetOwnerGUID())))
+                if (who && who->GetGUID() != playerGUID && (who->GetTypeId() == TYPEID_PLAYER || who->GetOwnerGUID().IsPlayer()))
                 {
                     damaged = true;
                     me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
@@ -497,11 +497,11 @@ public:
 
         uint32 _delayTimer;
 
-        uint64 _firstPriestessGUID;
-        uint64 _secondPriestessGUID;
-        uint64 _guardEluneGUID;
-        uint64 _voiceEluneGUID;
-        uint64 _altarGUID;
+        ObjectGuid _firstPriestessGUID;
+        ObjectGuid _secondPriestessGUID;
+        ObjectGuid _guardEluneGUID;
+        ObjectGuid _voiceEluneGUID;
+        ObjectGuid _altarGUID;
 
         void Reset() override
         {

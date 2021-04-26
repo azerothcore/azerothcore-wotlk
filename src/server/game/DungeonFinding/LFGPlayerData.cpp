@@ -1,17 +1,17 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "LFGPlayerData.h"
 #include "LFGMgr.h"
+#include "LFGPlayerData.h"
 
 namespace lfg
 {
 
     LfgPlayerData::LfgPlayerData(): m_State(LFG_STATE_NONE), m_OldState(LFG_STATE_NONE), m_canOverrideRBState(false),
-        m_TeamId(TEAM_ALLIANCE), m_Group(0), m_Roles(0), m_Comment("")
+        m_TeamId(TEAM_ALLIANCE), m_Roles(0), m_Comment("")
     {}
 
     LfgPlayerData::~LfgPlayerData()
@@ -62,7 +62,7 @@ namespace lfg
         m_TeamId = teamId;
     }
 
-    void LfgPlayerData::SetGroup(uint64 group)
+    void LfgPlayerData::SetGroup(ObjectGuid group)
     {
         m_Group = group;
     }
@@ -112,7 +112,7 @@ namespace lfg
         return m_TeamId;
     }
 
-    uint64 LfgPlayerData::GetGroup() const
+    ObjectGuid LfgPlayerData::GetGroup() const
     {
         return m_Group;
     }

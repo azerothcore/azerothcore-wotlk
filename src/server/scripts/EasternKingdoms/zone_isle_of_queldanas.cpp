@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -16,12 +16,12 @@ npc_converted_sentry
 npc_greengill_slave
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "Player.h"
-#include "Pet.h"
-#include "SpellInfo.h"
 #include "PassiveAI.h"
+#include "Pet.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellInfo.h"
 #include "SpellScript.h"
 
 /*###### OUR: ######*/
@@ -122,8 +122,8 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
-        uint64 morlenGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid morlenGUID;
 
         void Reset() override
         {
@@ -131,8 +131,8 @@ public:
             me->SetRegeneratingHealth(true);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            playerGUID = 0;
-            morlenGUID = 0;
+            playerGUID.Clear();
+            morlenGUID.Clear();
             summons.DespawnAll();
             if (Creature* c = me->FindNearestCreature(NPC_THALORIEN_REMAINS, 100.0f, true))
                 c->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -378,7 +378,7 @@ public:
                     break;
                 case EVENT_OUTRO_KNEEL:
                     if (Player* p = ObjectAccessor::GetPlayer(*me, playerGUID))
-                        p->KilledMonsterCredit(NPC_THALORIEN_KILL_CREDIT, 0);
+                        p->KilledMonsterCredit(NPC_THALORIEN_KILL_CREDIT);
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     events.ScheduleEvent(EVENT_DISAPPEAR, 6000);
                     break;
@@ -492,13 +492,13 @@ public:
         npc_grand_magister_rommathAI(Creature* c) : NullCreatureAI(c)
         {
             announced = false;
-            playerGUID = 0;
+            playerGUID.Clear();
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
         EventMap events;
         bool announced;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
 
         void MoveInLineOfSight(Unit* who) override
         {

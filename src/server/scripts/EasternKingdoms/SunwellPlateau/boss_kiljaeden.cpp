@@ -2,11 +2,11 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "sunwell_plateau.h"
-#include "MoveSplineInit.h"
 #include "CreatureTextMgr.h"
+#include "MoveSplineInit.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "sunwell_plateau.h"
 
 enum Yells
 {
@@ -153,7 +153,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_kiljaeden_controllerAI>(creature);
+        return GetSunwellPlateauAI<npc_kiljaeden_controllerAI>(creature);
     }
 
     struct npc_kiljaeden_controllerAI : public NullCreatureAI
@@ -170,7 +170,7 @@ public:
         void ResetOrbs()
         {
             for (uint8 i = 0; i < 4; ++i)
-                if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
+                if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
                     orb->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
         }
 
@@ -313,7 +313,7 @@ public:
         {
             if (damage >= me->GetHealth())
             {
-                me->SetTarget(0);
+                me->SetTarget();
                 me->SetReactState(REACT_PASSIVE);
                 me->RemoveAllAuras();
                 me->DeleteThreatList();
@@ -332,7 +332,7 @@ public:
         {
             Talk(SAY_KJ_DEATH);
             instance->SetBossState(DATA_KILJAEDEN, DONE);
-            if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KILJAEDEN_CONTROLLER)))
+            if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KILJAEDEN_CONTROLLER)))
                 Unit::Kill(controller, controller);
         }
 
@@ -370,8 +370,8 @@ public:
         {
             if (summon->GetEntry() == NPC_ARMAGEDDON_TARGET)
             {
-                summon->SetDisableGravity(true);
                 summon->SetCanFly(true);
+                summon->SetDisableGravity(true);
                 summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
                 summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
                 summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
@@ -392,17 +392,17 @@ public:
                     me->CastSpell(me, SPELL_REBIRTH, false);
                     break;
                 case EVENT_EMPOWER_ORBS1:
-                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS_KJ)))
+                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
                         kalec->AI()->Talk(SAY_KALECGOS_READY1);
                     EmpowerOrb(false);
                     break;
                 case EVENT_EMPOWER_ORBS2:
-                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS_KJ)))
+                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
                         kalec->AI()->Talk(SAY_KALECGOS_READY2);
                     EmpowerOrb(false);
                     break;
                 case EVENT_EMPOWER_ORBS3:
-                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS_KJ)))
+                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
                         kalec->AI()->Talk(SAY_KALECGOS_READY_ALL);
                     EmpowerOrb(true);
                     break;
@@ -412,56 +412,56 @@ public:
                     me->SetInCombatWithZone();
                     return;
                 case EVENT_TEXT_SPEACH11:
-                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS_KJ)))
+                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
                         kalec->AI()->Talk(SAY_KALECGOS_JOIN);
                     break;
                 case EVENT_TEXT_SPEACH21:
-                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS_KJ)))
+                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
                         kalec->AI()->Talk(SAY_KALECGOS_AWAKEN);
                     break;
                 case EVENT_TEXT_SPEACH22:
-                    if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ANVEENA)))
-                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_IMPRISONED, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+                    if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ANVEENA)))
+                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_IMPRISONED, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
                     break;
                 case EVENT_TEXT_SPEACH23:
                     Talk(SAY_KJ_PHASE3);
                     break;
                 case EVENT_TEXT_SPEACH31:
-                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS_KJ)))
+                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
                         kalec->AI()->Talk(SAY_KALECGOS_LETGO);
                     break;
                 case EVENT_TEXT_SPEACH32:
-                    if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ANVEENA)))
-                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_LOST, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+                    if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ANVEENA)))
+                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_LOST, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
                     break;
                 case EVENT_TEXT_SPEACH33:
                     Talk(SAY_KJ_PHASE4);
                     break;
                 case EVENT_TEXT_SPEACH41:
-                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS_KJ)))
+                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
                         kalec->AI()->Talk(SAY_KALECGOS_FOCUS);
                     break;
                 case EVENT_TEXT_SPEACH42:
-                    if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ANVEENA)))
-                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_KALEC, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+                    if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ANVEENA)))
+                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_KALEC, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
                     break;
                 case EVENT_TEXT_SPEACH43:
-                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KALECGOS_KJ)))
+                    if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
                         kalec->AI()->Talk(SAY_KALECGOS_FATE);
                     break;
                 case EVENT_TEXT_SPEACH44:
-                    if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ANVEENA)))
-                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_GOODBYE, NULL, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
+                    if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ANVEENA)))
+                        sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_GOODBYE, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
                     break;
                 case EVENT_TEXT_SPEACH45:
-                    if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ANVEENA)))
+                    if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ANVEENA)))
                     {
                         anveena->RemoveAllAuras();
                         anveena->DespawnOrUnsummon(3500);
                     }
                     break;
                 case EVENT_TEXT_SPEACH46:
-                    if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_ANVEENA)))
+                    if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ANVEENA)))
                     {
                         anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
                         me->CastSpell(me, SPELL_CUSTOM_08_STATE, true);
@@ -628,7 +628,7 @@ public:
         {
             for (uint8 i = 0; i < 4; ++i)
             {
-                if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetData64(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
+                if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
                 {
                     if (orb->HasFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE))
                     {
@@ -636,7 +636,7 @@ public:
                         if (Creature* trigger = me->SummonTrigger(orb->GetPositionX(), orb->GetPositionY(), orb->GetPositionZ(), 0, 10 * MINUTE * IN_MILLISECONDS))
                         {
                             trigger->CastSpell(trigger, SPELL_RING_OF_BLUE_FLAMES, true, nullptr, nullptr, trigger->GetGUID());
-                            if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_KILJAEDEN_CONTROLLER)))
+                            if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KILJAEDEN_CONTROLLER)))
                                 controller->AI()->JustSummoned(trigger);
                         }
 
@@ -650,7 +650,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kiljaedenAI>(creature);
+        return GetSunwellPlateauAI<boss_kiljaedenAI>(creature);
     }
 };
 
@@ -762,7 +762,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_kalecgos_kjAI>(creature);
+        return GetSunwellPlateauAI<npc_kalecgos_kjAI>(creature);
     }
 
     struct npc_kalecgos_kjAI : public NullCreatureAI
@@ -786,8 +786,8 @@ public:
         {
             if (param == ACTION_START_POST_EVENT)
             {
-                me->SetDisableGravity(false);
                 me->SetCanFly(false);
+                me->SetDisableGravity(false);
                 me->CastSpell(me, SPELL_TELEPORT_AND_TRANSFORM, true);
                 events.ScheduleEvent(EVENT_SCENE_01, 35000);
             }

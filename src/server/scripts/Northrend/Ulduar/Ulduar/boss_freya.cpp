@@ -2,12 +2,12 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ulduar.h"
-#include "SpellAuras.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "ulduar.h"
 
 enum FreyaSpells
 {
@@ -249,7 +249,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freyaAI (pCreature);
+        return GetUlduarAI<boss_freyaAI>(pCreature);
     }
 
     struct boss_freyaAI : public ScriptedAI
@@ -260,7 +260,6 @@ public:
             if (!me->IsAlive())
                 if (m_pInstance)
                     m_pInstance->SetData(TYPE_FREYA, DONE);
-            memset(_elderGUID, 0, sizeof(_elderGUID));
         }
 
         InstanceScript* m_pInstance;
@@ -275,7 +274,7 @@ public:
         bool _backToNature;
         uint8 _deforestation;
 
-        uint64 _elderGUID[3];
+        ObjectGuid _elderGUID[3];
 
         void Reset() override
         {
@@ -292,7 +291,8 @@ public:
 
                 if (Creature* elder = ObjectAccessor::GetCreature(*me, _elderGUID[i]))
                     elder->AI()->EnterEvadeMode();
-                _elderGUID[i] = 0;
+
+                _elderGUID[i].Clear();
             }
 
             _lumberjacked = 0;
@@ -387,16 +387,16 @@ public:
             {
                 me->MonsterYell("Children, assist me!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_TRIO);
-                me->SummonCreature(NPC_ANCIENT_WATER_SPIRIT, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT));
-                me->SummonCreature(NPC_STORM_LASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT));
-                me->SummonCreature(NPC_SNAPLASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT));
+                me->SummonCreature(NPC_ANCIENT_WATER_SPIRIT, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                me->SummonCreature(NPC_STORM_LASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                me->SummonCreature(NPC_SNAPLASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
             }
             // Ancient Conservator
             else if (_waveNumber == 2)
             {
                 me->MonsterYell("Eonar, your servant requires aid!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_CONSERVATOR);
-                me->SummonCreature(NPC_ANCIENT_CONSERVATOR, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_CORPSE_DESPAWN);
+                me->SummonCreature(NPC_ANCIENT_CONSERVATOR, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
             }
             // Detonating Lashers
             else if (_waveNumber == 3)
@@ -404,7 +404,7 @@ public:
                 me->MonsterYell("The swarm of the elements shall overtake you!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(SOUND_DETONATING);
                 for (uint8 i = 0; i < 10; ++i)
-                    me->SummonCreature(NPC_DETONATING_LASHER, me->GetPositionX() + urand(5, 20), me->GetPositionY() + urand(5, 20), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_CORPSE_DESPAWN);
+                    me->SummonCreature(NPC_DETONATING_LASHER, me->GetPositionX() + urand(5, 20), me->GetPositionY() + urand(5, 20), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
             }
         }
 
@@ -503,7 +503,7 @@ public:
 
             // HARD MODE CHECKS
             Creature* elder = nullptr;
-            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_ELDER_STONEBARK));
+            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_ELDER_STONEBARK));
             if (elder && elder->IsAlive())
             {
                 elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -514,7 +514,7 @@ public:
                 _elderGUID[0] = elder->GetGUID();
             }
 
-            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_ELDER_IRONBRANCH));
+            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_ELDER_IRONBRANCH));
             if (elder && elder->IsAlive())
             {
                 elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -525,7 +525,7 @@ public:
                 _elderGUID[1] = elder->GetGUID();
             }
 
-            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_ELDER_BRIGHTLEAF));
+            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_ELDER_BRIGHTLEAF));
             if (elder && elder->IsAlive())
             {
                 elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -586,7 +586,7 @@ public:
                         {
                             x = me->GetPositionX() + urand(7, 25);
                             y = me->GetPositionY() + urand(7, 25);
-                            z = me->GetMap()->GetHeight(x, y, MAX_HEIGHT) + 0.5f;
+                            z = me->GetMapHeight(x, y, me->GetPositionZ());
                             if (me->IsWithinLOS(x, y, z))
                             {
                                 me->CastSpell(x, y, z, SPELL_SUMMON_LIFEBINDER, true);
@@ -641,11 +641,11 @@ public:
                     events.RepeatEvent(45000 + urand(0, 10000));
                     break;
                 case EVENT_FREYA_UNSTABLE_SUN_BEAM:
-                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
                     if (Is25ManRaid())
                     {
-                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                        me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
                     }
                     events.RepeatEvent(38000 + urand(0, 10000));
                     break;
@@ -669,7 +669,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_elder_stonebarkAI (pCreature);
+        return GetUlduarAI<boss_freya_elder_stonebarkAI>(pCreature);
     }
 
     struct boss_freya_elder_stonebarkAI : public ScriptedAI
@@ -713,7 +713,7 @@ public:
 
             // Lumberjacked
             if (me->GetInstanceScript())
-                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_FREYA)))
+                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_FREYA)))
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
@@ -775,7 +775,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_elder_brightleafAI (pCreature);
+        return GetUlduarAI<boss_freya_elder_brightleafAI>(pCreature);
     }
 
     struct boss_freya_elder_brightleafAI : public ScriptedAI
@@ -819,7 +819,7 @@ public:
 
             // Lumberjacked
             if (me->GetInstanceScript())
-                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_FREYA)))
+                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_FREYA)))
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
@@ -898,7 +898,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_elder_ironbranchAI (pCreature);
+        return GetUlduarAI<boss_freya_elder_ironbranchAI>(pCreature);
     }
 
     struct boss_freya_elder_ironbranchAI : public ScriptedAI
@@ -940,7 +940,7 @@ public:
 
             // Lumberjacked
             if (me->GetInstanceScript())
-                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_FREYA)))
+                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_FREYA)))
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
@@ -992,7 +992,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_iron_rootAI (pCreature);
+        return GetUlduarAI<boss_freya_iron_rootAI>(pCreature);
     }
 
     struct boss_freya_iron_rootAI : public NullCreatureAI
@@ -1022,7 +1022,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_lifebinderAI (pCreature);
+        return GetUlduarAI<boss_freya_lifebinderAI>(pCreature);
     }
 
     struct boss_freya_lifebinderAI : public NullCreatureAI
@@ -1062,7 +1062,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_healthy_sporeAI (pCreature);
+        return GetUlduarAI<boss_freya_healthy_sporeAI>(pCreature);
     }
 
     struct boss_freya_healthy_sporeAI : public NullCreatureAI
@@ -1101,20 +1101,20 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_summonsAI (pCreature);
+        return GetUlduarAI<boss_freya_summonsAI>(pCreature);
     }
 
     struct boss_freya_summonsAI : public ScriptedAI
     {
         boss_freya_summonsAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            _freyaGUID = me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(TYPE_FREYA) : 0;
+            _freyaGUID = me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(TYPE_FREYA) : ObjectGuid::Empty;
             _isTrio = me->GetEntry() == NPC_ANCIENT_WATER_SPIRIT || me->GetEntry() == NPC_STORM_LASHER || me->GetEntry() == NPC_SNAPLASHER;
             _hasDied = false;
         }
 
         EventMap events;
-        uint64 _freyaGUID;
+        ObjectGuid _freyaGUID;
         uint8 _stackCount;
         bool _hasDied;
         bool _isTrio;
@@ -1244,17 +1244,17 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_nature_bombAI (pCreature);
+        return GetUlduarAI<boss_freya_nature_bombAI>(pCreature);
     }
 
     struct boss_freya_nature_bombAI : public NullCreatureAI
     {
         boss_freya_nature_bombAI(Creature* pCreature) : NullCreatureAI(pCreature)
         {
-            _goGUID = 0;
+            _goGUID.Clear();
         }
 
-        uint64 _goGUID;
+        ObjectGuid _goGUID;
         uint32 _explodeTimer;
 
         void Reset() override

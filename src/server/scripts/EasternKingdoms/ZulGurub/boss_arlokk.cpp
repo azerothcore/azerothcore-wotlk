@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -13,8 +13,8 @@ TCComment: Can't test LOS until mmaps.
 TCCategory: Zul'Gurub
 EndScriptData */
 
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "zulgurub.h"
 
@@ -142,7 +142,7 @@ public:
         void EnterEvadeMode() override
         {
             BossAI::EnterEvadeMode();
-            if (GameObject* object = ObjectAccessor::GetGameObject(*me, instance->GetData64(GO_GONG_OF_BETHEKK)))
+            if (GameObject* object = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_GONG_OF_BETHEKK)))
                 object->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
             me->DespawnOrUnsummon(4000);
         }
@@ -285,8 +285,8 @@ public:
     private:
         uint8 _summonCountA;
         uint8 _summonCountB;
-        uint64 _triggersSideAGUID[5];
-        uint64 _triggersSideBGUID[5];
+        ObjectGuid _triggersSideAGUID[5];
+        ObjectGuid _triggersSideBGUID[5];
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -335,7 +335,7 @@ public:
             DoCast(me, SPELL_SNEAK_RANK_1_1);
             DoCast(me, SPELL_SNEAK_RANK_1_2);
 
-            if (Unit* arlokk = ObjectAccessor::GetUnit(*me, _instance->GetData64(NPC_ARLOKK)))
+            if (Unit* arlokk = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(NPC_ARLOKK)))
                 me->GetMotionMaster()->MovePoint(0, arlokk->GetPositionX(), arlokk->GetPositionY(), arlokk->GetPositionZ());
             _events.ScheduleEvent(EVENT_ATTACK, 6000);
         }
@@ -355,7 +355,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (Unit* arlokk = ObjectAccessor::GetUnit(*me, _instance->GetData64(NPC_ARLOKK)))
+            if (Unit* arlokk = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(NPC_ARLOKK)))
             {
                 if (arlokk->IsAlive())
                     arlokk->GetAI()->SetData(_sideData, 0);

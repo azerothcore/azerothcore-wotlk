@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -9,16 +9,16 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_gen_".
  */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "Player.h"
-#include "Group.h"
 #include "CreatureTextMgr.h"
-#include "PetAI.h"
+#include "Group.h"
 #include "PassiveAI.h"
+#include "PetAI.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "SpellScript.h"
+#include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
 
 enum Mojo
 {
@@ -39,7 +39,7 @@ public:
 
         void Reset() override
         {
-            _victimGUID = 0;
+            _victimGUID.Clear();
 
             if (Unit* owner = me->GetOwner())
                 me->GetMotionMaster()->MoveFollow(owner, 0.0f, 0.0f);
@@ -72,7 +72,7 @@ public:
         }
 
     private:
-        uint64 _victimGUID;
+        ObjectGuid _victimGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -100,7 +100,7 @@ public:
 
     struct npc_pet_gen_soul_trader_beaconAI : public ScriptedAI
     {
-        uint64 ownerGUID;
+        ObjectGuid ownerGUID;
         EventMap events;
         npc_pet_gen_soul_trader_beaconAI(Creature* c) : ScriptedAI(c)
         {
@@ -606,8 +606,8 @@ public:
         {
             if (GetHitUnit() != GetCaster())
             {
-                std::list<Spell::TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-                for (std::list<Spell::TargetInfo>::iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+                std::list<TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+                for (std::list<TargetInfo>::iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
                     if (ihit->targetGUID == GetCaster()->GetGUID())
                         ihit->damage = -int32(GetHitDamage() * 0.25f);
             }
@@ -635,13 +635,13 @@ public:
         npc_pet_gen_imp_in_a_bottleAI(Creature* c) : NullCreatureAI(c)
         {
             _talkTimer = 0;
-            _ownerGUID = 0;
+            _ownerGUID.Clear();
             _hasParty = false;
         }
 
         WorldPacket _data;
         uint32 _talkTimer;
-        uint64 _ownerGUID;
+        ObjectGuid _ownerGUID;
         bool _hasParty;
 
         void InitializeAI() override
@@ -661,7 +661,7 @@ public:
                             _data.Initialize(SMSG_MESSAGECHAT, 200);                // guess size
                             _data << uint8(CHAT_MSG_MONSTER_PARTY);
                             _data << uint32(LANG_UNIVERSAL);
-                            _data << uint64(me->GetGUID());
+                            _data << me->GetGUID();
                             _data << uint32(0);
                             _data << uint32(me->GetName().size() + 1);
                             _data << me->GetName();
@@ -686,7 +686,7 @@ public:
                 {
                     uint8 limit = 0;
                     if (player->GetGroup())
-                        for (GroupReference* itr = player->GetGroup()->GetFirstMember(); itr != NULL && limit < 4; itr = itr->next(), ++limit)
+                        for (GroupReference* itr = player->GetGroup()->GetFirstMember(); itr != nullptr && limit < 4; itr = itr->next(), ++limit)
                             if (Player* groupPlayer = itr->GetSource())
                                 if (groupPlayer != player)
                                     groupPlayer->GetSession()->SendPacket(&_data);
@@ -769,13 +769,13 @@ public:
     {
         npc_pet_gen_plump_turkeyAI(Creature* c) : PassiveAI(c)
         {
-            goGUID = 0;
+            goGUID.Clear();
             jumpTimer = 0;
             checkTimer = 0;
             jumping = false;
         }
 
-        uint64 goGUID;
+        ObjectGuid goGUID;
         uint32 jumpTimer;
         uint32 checkTimer;
         bool jumping;
@@ -893,7 +893,7 @@ public:
         }
 
         uint32 checkTimer;
-        uint64 targetGUID;
+        ObjectGuid targetGUID;
 
         void IsSummonedBy(Unit* summoner) override
         {
@@ -902,7 +902,7 @@ public:
 
             me->SetOwnerGUID(summoner->GetGUID());
             checkTimer = 0;
-            targetGUID = 0;
+            targetGUID.Clear();
             me->CastSpell(me, 48649 /*SPELL_PET_TOY_FETCH_BALL_COME_HERE*/, true);
         }
 

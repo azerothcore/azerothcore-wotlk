@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -16,15 +16,15 @@ npcs_rutgar_and_frankal
 quest_a_pawn_on_the_eternal_pawn
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
+#include "AccountMgr.h"
+#include "BanManager.h"
 #include "Group.h"
 #include "Player.h"
-#include "AccountMgr.h"
-#include "SpellInfo.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
-#include "BanManager.h"
+#include "SpellInfo.h"
 
 /*###
 ## npcs_rutgar_and_frankal
@@ -89,7 +89,7 @@ public:
             case GOSSIP_ACTION_INFO_DEF + 6:
                 SendGossipMenuFor(player, 7761, creature->GetGUID());
                 //'kill' our trigger to update quest status
-                player->KilledMonsterCredit(TRIGGER_RUTGAR, 0);
+                player->KilledMonsterCredit(TRIGGER_RUTGAR);
                 break;
 
             case GOSSIP_ACTION_INFO_DEF + 9:
@@ -115,7 +115,7 @@ public:
             case GOSSIP_ACTION_INFO_DEF + 14:
                 SendGossipMenuFor(player, 7767, creature->GetGUID());
                 //'kill' our trigger to update quest status
-                player->KilledMonsterCredit(TRIGGER_FRANKAL, 0);
+                player->KilledMonsterCredit(TRIGGER_FRANKAL);
                 break;
         }
         return true;
@@ -417,24 +417,24 @@ public:
         uint32 AnimationTimer;
         uint8 AnimationCount;
 
-        uint64 AnachronosQuestTriggerGUID;
-        uint64 MerithraGUID;
-        uint64 ArygosGUID;
-        uint64 CaelestraszGUID;
-        uint64 FandralGUID;
-        uint64 PlayerGUID;
+        ObjectGuid AnachronosQuestTriggerGUID;
+        ObjectGuid MerithraGUID;
+        ObjectGuid ArygosGUID;
+        ObjectGuid CaelestraszGUID;
+        ObjectGuid FandralGUID;
+        ObjectGuid PlayerGUID;
         bool eventEnd;
 
         void Reset() override
         {
             AnimationTimer = 1500;
             AnimationCount = 0;
-            AnachronosQuestTriggerGUID = 0;
-            MerithraGUID = 0;
-            ArygosGUID = 0;
-            CaelestraszGUID = 0;
-            FandralGUID = 0;
-            PlayerGUID = 0;
+            AnachronosQuestTriggerGUID.Clear();
+            MerithraGUID.Clear();
+            ArygosGUID.Clear();
+            CaelestraszGUID.Clear();
+            FandralGUID.Clear();
+            PlayerGUID.Clear();
             eventEnd = false;
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -467,7 +467,7 @@ public:
                         Fandral->AI()->Talk(FANDRAL_SAY_1, me);
                         break;
                     case 2:
-                        Fandral->SetTarget(0);
+                        Fandral->SetTarget();
                         Merithra->AI()->Talk(MERITHRA_EMOTE_1);
                         break;
                     case 3:
@@ -484,7 +484,7 @@ public:
                         Merithra->AI()->Talk(MERITHRA_SAY_2);
                         break;
                     case 7:
-                        Caelestrasz->SetTarget(0);
+                        Caelestrasz->SetTarget();
                         Merithra->GetMotionMaster()->MoveCharge(-8065, 1530, 2.61f, 10);
                         break;
                     case 8:
@@ -741,16 +741,16 @@ public:
     {
         npc_qiraj_war_spawnAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 MobGUID;
-        uint64 PlayerGUID;
+        ObjectGuid MobGUID;
+        ObjectGuid PlayerGUID;
         uint32 SpellTimer1, SpellTimer2, SpellTimer3, SpellTimer4;
         bool Timers;
         bool hasTarget;
 
         void Reset() override
         {
-            MobGUID = 0;
-            PlayerGUID = 0;
+            MobGUID.Clear();
+            PlayerGUID.Clear();
             Timers = false;
             hasTarget = false;
         }
@@ -857,7 +857,7 @@ public:
     {
         npc_anachronos_quest_triggerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         uint32 WaveTimer;
         uint32 AnnounceTimer;
@@ -871,7 +871,7 @@ public:
 
         void Reset() override
         {
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
 
             WaveTimer = 2000;
             AnnounceTimer = 1000;

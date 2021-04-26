@@ -5,13 +5,16 @@
 #ifndef RUBY_SANCTUM_H_
 #define RUBY_SANCTUM_H_
 
+#include "Creature.h"
+#include "CreatureAIImpl.h"
+#include "GameObjectAI.h"
+#include "Map.h"
+#include "Opcodes.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "SpellScript.h"
-#include "Map.h"
-#include "Creature.h"
-#include "GameObjectAI.h"
-#include "PassiveAI.h"
-#include "Opcodes.h"
+
+#define RubySanctumScriptName "instance_ruby_sanctum"
 
 enum DataTypes
 {
@@ -96,5 +99,11 @@ enum InstanceSpell
     SPELL_BERSERK                       = 26662,
     SPELL_RALLY                         = 75416
 };
+
+template <class AI, class T>
+inline AI* GetRubySanctumAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, RubySanctumScriptName);
+}
 
 #endif // RUBY_SANCTUM_H_

@@ -2,9 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "blood_furnace.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum eEnums
 {
@@ -47,7 +47,7 @@ public:
                 return;
 
             instance->SetData(DATA_THE_MAKER, NOT_STARTED);
-            instance->HandleGameObject(instance->GetData64(DATA_DOOR2), true);
+            instance->HandleGameObject(instance->GetGuidData(DATA_DOOR2), true);
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -62,7 +62,7 @@ public:
                 return;
 
             instance->SetData(DATA_THE_MAKER, IN_PROGRESS);
-            instance->HandleGameObject(instance->GetData64(DATA_DOOR2), false);
+            instance->HandleGameObject(instance->GetGuidData(DATA_DOOR2), false);
         }
 
         void KilledUnit(Unit* victim) override
@@ -79,8 +79,8 @@ public:
                 return;
 
             instance->SetData(DATA_THE_MAKER, DONE);
-            instance->HandleGameObject(instance->GetData64(DATA_DOOR2), true);
-            instance->HandleGameObject(instance->GetData64(DATA_DOOR3), true);
+            instance->HandleGameObject(instance->GetGuidData(DATA_DOOR2), true);
+            instance->HandleGameObject(instance->GetGuidData(DATA_DOOR3), true);
         }
 
         void UpdateAI(uint32 diff) override
@@ -120,7 +120,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_the_makerAI(creature);
+        return GetBloodFurnaceAI<boss_the_makerAI>(creature);
     }
 };
 

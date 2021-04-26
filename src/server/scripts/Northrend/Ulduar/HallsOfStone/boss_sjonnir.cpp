@@ -2,10 +2,10 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "halls_of_stone.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spells
 {
@@ -98,7 +98,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_sjonnirAI (pCreature);
+        return GetHallsOfStoneAI<boss_sjonnirAI>(pCreature);
     }
 
     struct boss_sjonnirAI : public ScriptedAI
@@ -132,13 +132,13 @@ public:
                 if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
                 {
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    if (GameObject* doors = me->GetMap()->GetGameObject(pInstance->GetData64(GO_SJONNIR_DOOR)))
+                    if (GameObject* doors = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_SJONNIR_DOOR)))
                         doors->SetGoState(GO_STATE_ACTIVE);
 
-                    if (GameObject* console = me->GetMap()->GetGameObject( pInstance->GetData64(GO_SJONNIR_CONSOLE)))
+                    if (GameObject* console = me->GetMap()->GetGameObject( pInstance->GetGuidData(GO_SJONNIR_CONSOLE)))
                         console->SetGoState(GO_STATE_READY);
 
-                    if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                    if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                     {
                         brann->setDeathState(JUST_DIED);
                         brann->Respawn();
@@ -165,11 +165,11 @@ public:
             {
                 pInstance->SetData(BOSS_SJONNIR, IN_PROGRESS);
 
-                if (GameObject* doors = me->GetMap()->GetGameObject(pInstance->GetData64(GO_SJONNIR_DOOR)))
+                if (GameObject* doors = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_SJONNIR_DOOR)))
                     doors->SetGoState(GO_STATE_READY);
 
                 if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
-                    if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                    if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                         brann->AI()->DoAction(3);
             }
         }
@@ -205,7 +205,7 @@ public:
                             events.ScheduleEvent(EVENT_SUMMON, 1500);
 
                             if (pInstance)
-                                if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                                if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                                 {
                                     brann->MonsterYell("What in the name o' Madoran did THAT do? Oh! Wait: I just about got it...", LANG_UNIVERSAL, 0);
                                     brann->PlayDirectSound(14276);
@@ -214,7 +214,7 @@ public:
 
                         if (HealthBelowPct(20))
                         {
-                            if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                            if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                             {
                                 brann->MonsterYell("Ha, that did it! Help's a-comin'! Take this, ya glowin' iron brute!", LANG_UNIVERSAL, 0);
                                 brann->PlayDirectSound(14277);
@@ -261,7 +261,7 @@ public:
                     }
                 case EVENT_SUMMON_SPEACH:
                     {
-                        if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                        if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                         {
                             brann->MonsterYell("This is a wee bit trickier that before... Oh, bloody--incomin'!", LANG_UNIVERSAL, 0);
                             brann->PlayDirectSound(14275);
@@ -314,10 +314,10 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(BOSS_SJONNIR, DONE);
-                if (GameObject* sd = me->GetMap()->GetGameObject(pInstance->GetData64(GO_SJONNIR_DOOR)))
+                if (GameObject* sd = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_SJONNIR_DOOR)))
                     sd->SetGoState(GO_STATE_ACTIVE);
 
-                if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_BRANN)))
+                if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                     brann->AI()->DoAction(4);
             }
         }
@@ -333,7 +333,7 @@ public:
         void ActivatePipe(uint8 side)
         {
             if (pInstance)
-                if (GameObject* pipe = me->GetMap()->GetGameObject(pInstance->GetData64(side == POS_GEN_RIGHT ? GO_RIGHT_PIPE : GO_LEFT_PIPE)))
+                if (GameObject* pipe = me->GetMap()->GetGameObject(pInstance->GetGuidData(side == POS_GEN_RIGHT ? GO_RIGHT_PIPE : GO_LEFT_PIPE)))
                     pipe->SendCustomAnim(0);
         }
 
@@ -379,7 +379,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_sjonnir_dwarfAI (pCreature);
+        return GetHallsOfStoneAI<boss_sjonnir_dwarfAI>(pCreature);
     }
 
     struct boss_sjonnir_dwarfAI : public ScriptedAI
@@ -403,7 +403,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_sjonnir_iron_sludgeAI (pCreature);
+        return GetHallsOfStoneAI<boss_sjonnir_iron_sludgeAI>(pCreature);
     }
 
     struct boss_sjonnir_iron_sludgeAI : public ScriptedAI
@@ -423,7 +423,7 @@ public:
         void JustDied(Unit*  /*killer*/) override
         {
             if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (Creature* sjonnir = ObjectAccessor::GetCreature(*me, pInstance->GetData64(NPC_SJONNIR)))
+                if (Creature* sjonnir = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_SJONNIR)))
                     sjonnir->AI()->DoAction(ACTION_SLUG_KILLED);
         }
         void UpdateAI(uint32 diff) override
@@ -459,7 +459,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_sjonnir_malformed_oozeAI (pCreature);
+        return GetHallsOfStoneAI<boss_sjonnir_malformed_oozeAI>(pCreature);
     }
 
     struct boss_sjonnir_malformed_oozeAI : public ScriptedAI

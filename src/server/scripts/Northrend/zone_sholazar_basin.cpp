@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -17,18 +17,17 @@ npc_vekjik
 avatar_of_freya
 EndContentData */
 
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "ScriptedEscortAI.h"
-#include "SpellScript.h"
-#include "SpellAuras.h"
+#include "CombatAI.h"
+#include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "ScriptMgr.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 #include "Vehicle.h"
 #include "WaypointManager.h"
-#include "PassiveAI.h"
-#include "CombatAI.h"
-
 // Ours
 enum songOfWindandWater
 {
@@ -55,9 +54,9 @@ public:
                 cr->SetDisplayId(cr->GetDisplayId() == NPC_SOWAW_WATER_MODEL ? NPC_SOWAW_WIND_MODEL : NPC_SOWAW_WATER_MODEL);
                 if (Player* player = cr->GetCharmerOrOwnerPlayerOrPlayerItself())
                 {
-                    player->KilledMonsterCredit(cr->GetDisplayId() == NPC_SOWAW_WATER_MODEL ? 29008 : 29009, 0);
+                    player->KilledMonsterCredit(cr->GetDisplayId() == NPC_SOWAW_WATER_MODEL ? 29008 : 29009);
                     CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(cr->GetDisplayId() == NPC_SOWAW_WIND_MODEL ? NPC_SOWAW_WIND_ELEMENTAL : NPC_SOWAW_WATER_ELEMENTAL);
-                    for (uint8 i = 0; i < CREATURE_MAX_SPELLS; ++i)
+                    for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
                         cr->m_spells[i] = ct->spells[i];
 
                     player->VehicleSpellInitialize();
@@ -177,9 +176,9 @@ public:
                 if (action == ACTION_BIND_MINIONS)
                     me->CastSpell(me, SPELL_ARTRUIS_BINDING, true);
 
-                for (std::list<uint64>::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                for (ObjectGuid const guid : summons)
                 {
-                    Creature* minion = ObjectAccessor::GetCreature(*me, *itr);
+                    Creature* minion = ObjectAccessor::GetCreature(*me, guid);
                     if (minion && minion->IsAlive())
                     {
                         if (action == ACTION_BIND_MINIONS)
@@ -297,8 +296,8 @@ public:
     {
         bool running;
         bool success;
-        uint64 playerGUID;
-        uint64 thunderbrewGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid thunderbrewGUID;
         int32 tensecstimer;
         int32 timer;
         uint8 stepcount;
@@ -312,8 +311,8 @@ public:
         {
             running = false;
             success = false;
-            playerGUID = 0;
-            thunderbrewGUID = 0;
+            playerGUID.Clear();
+            thunderbrewGUID.Clear();
             tensecstimer = 0;
             timer = 0;
             stepcount = 0;
@@ -343,7 +342,7 @@ public:
             Say(MCM_TEXT_START);
         }
 
-        void CheckAction(uint8 a, uint64 guid)
+        void CheckAction(uint8 a, ObjectGuid guid)
         {
             if (guid != playerGUID)
                 return;
@@ -882,8 +881,8 @@ public:
             sayStep = 0;
             timer = 0;
             phase = 0;
-            playerGUID = 0;
-            orphanGUID = 0;
+            playerGUID.Clear();
+            orphanGUID.Clear();
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -1014,7 +1013,7 @@ public:
                 if (itr->second.CreatureOrGOCount[i] != 0)
                     continue;
 
-                player->KilledMonsterCredit(me->GetEntry(), 0);
+                player->KilledMonsterCredit(me->GetEntry());
                 player->MonsterSay(SAY_OFFER, LANG_UNIVERSAL, me);
                 sayStep = 1;
                 break;
@@ -1026,8 +1025,8 @@ public:
         uint8 sayStep;
         uint32 timer;
         int8 phase;
-        uint64 playerGUID;
-        uint64 orphanGUID;
+        ObjectGuid playerGUID;
+        ObjectGuid orphanGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1289,7 +1288,7 @@ public:
 
                             Unit::Kill(bird, bird);
                             crunchy->GetMotionMaster()->MovePoint(0, bird->GetPositionX(), bird->GetPositionY(),
-                                                                  bird->GetMap()->GetWaterOrGroundLevel(bird->GetPhaseMask(), bird->GetPositionX(), bird->GetPositionY(), bird->GetPositionZ()));
+                                                                  bird->GetMapWaterOrGroundLevel(bird->GetPositionX(), bird->GetPositionY(), bird->GetPositionZ()));
                             /// @todo Make crunchy perform emote eat when he reaches the bird
 
                             break;
@@ -1309,7 +1308,7 @@ public:
                         apple->CastSpell(apple, SPELL_APPLE_FALL);
                         wilhelm->AI()->Talk(SAY_WILHELM_HIT);
                         if (Player* player = shooter->ToPlayer())
-                            player->KilledMonsterCredit(NPC_APPLE, 0);
+                            player->KilledMonsterCredit(NPC_APPLE);
                         //apple->DespawnOrUnsummon(); zomg!
 
                         break;

@@ -1,14 +1,14 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
 #include "Common.h"
+#include "DBCStores.h"
 #include "GroupMgr.h"
 #include "InstanceSaveMgr.h"
 #include "World.h"
-#include "DBCStores.h"
 
 GroupMgr::GroupMgr()
 {
@@ -50,23 +50,23 @@ void GroupMgr::RegisterGroupId(uint32 groupId)
         ++_nextGroupId;
 }
 
-uint32 GroupMgr::GenerateGroupId()
+ObjectGuid::LowType GroupMgr::GenerateGroupId()
 {
-    uint32 newGroupId = _nextGroupId;
+    ObjectGuid::LowType newGroupId = _nextGroupId;
 
     // find the lowest available id starting from the current _nextGroupId
     while (_nextGroupId < 0xFFFFFFFF && ++_nextGroupId < _groupIds.size() && _groupIds[_nextGroupId]);
 
     if (_nextGroupId == 0xFFFFFFFF)
     {
-        sLog->outError("Group ID overflow!! Can't continue, shutting down server.");
+        LOG_ERROR("server", "Group ID overflow!! Can't continue, shutting down server.");
         World::StopNow(ERROR_EXIT_CODE);
     }
 
     return newGroupId;
 }
 
-Group* GroupMgr::GetGroupByGUID(uint32 groupId) const
+Group* GroupMgr::GetGroupByGUID(ObjectGuid::LowType groupId) const
 {
     GroupContainer::const_iterator itr = GroupStore.find(groupId);
     if (itr != GroupStore.end())
@@ -77,12 +77,12 @@ Group* GroupMgr::GetGroupByGUID(uint32 groupId) const
 
 void GroupMgr::AddGroup(Group* group)
 {
-    GroupStore[group->GetLowGUID()] = group;
+    GroupStore[group->GetGUID().GetCounter()] = group;
 }
 
 void GroupMgr::RemoveGroup(Group* group)
 {
-    GroupStore.erase(group->GetLowGUID());
+    GroupStore.erase(group->GetGUID().GetCounter());
 }
 
 void GroupMgr::LoadGroups()
@@ -109,8 +109,8 @@ void GroupMgr::LoadGroups()
 
         if (!result)
         {
-            sLog->outString(">> Loaded 0 group definitions. DB table `groups` is empty!");
-            sLog->outString();
+            LOG_INFO("server", ">> Loaded 0 group definitions. DB table `groups` is empty!");
+            LOG_INFO("server", " ");
         }
         else
         {
@@ -126,17 +126,17 @@ void GroupMgr::LoadGroups()
                 }
                 AddGroup(group);
 
-                RegisterGroupId(group->GetLowGUID());
+                RegisterGroupId(group->GetGUID().GetCounter());
 
                 ++count;
             } while (result->NextRow());
 
-            sLog->outString(">> Loaded %u group definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            sLog->outString();
+            LOG_INFO("server", ">> Loaded %u group definitions in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server", " ");
         }
     }
 
-    sLog->outString("Loading Group members...");
+    LOG_INFO("server", "Loading Group members...");
     {
         uint32 oldMSTime = getMSTime();
 
@@ -149,8 +149,8 @@ void GroupMgr::LoadGroups()
         QueryResult result = CharacterDatabase.Query("SELECT guid, memberGuid, memberFlags, subgroup, roles FROM group_member ORDER BY guid");
         if (!result)
         {
-            sLog->outString(">> Loaded 0 group members. DB table `group_member` is empty!");
-            sLog->outString();
+            LOG_INFO("server", ">> Loaded 0 group members. DB table `group_member` is empty!");
+            LOG_INFO("server", " ");
         }
         else
         {
@@ -163,13 +163,13 @@ void GroupMgr::LoadGroups()
                 if (group)
                     group->LoadMemberFromDB(fields[1].GetUInt32(), fields[2].GetUInt8(), fields[3].GetUInt8(), fields[4].GetUInt8());
                 //else
-                //    sLog->outError("GroupMgr::LoadGroups: Consistency failed, can't find group (storage id: %u)", fields[0].GetUInt32());
+                //    LOG_ERROR("server", "GroupMgr::LoadGroups: Consistency failed, can't find group (storage id: %u)", fields[0].GetUInt32());
 
                 ++count;
             } while (result->NextRow());
 
-            sLog->outString(">> Loaded %u group members in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-            sLog->outString();
+            LOG_INFO("server", ">> Loaded %u group members in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+            LOG_INFO("server", " ");
         }
     }
 }

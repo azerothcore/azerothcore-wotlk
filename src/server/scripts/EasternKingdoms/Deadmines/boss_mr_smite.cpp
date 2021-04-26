@@ -2,8 +2,9 @@
  * Originally written by Xinef - Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
 */
 
-#include "ScriptMgr.h"
+#include "deadmines.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 
 enum Spels
 {
@@ -33,7 +34,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_mr_smiteAI>(creature);
+        return GetDeadminesAI<boss_mr_smiteAI>(creature);
     }
 
     struct boss_mr_smiteAI : public ScriptedAI
@@ -138,7 +139,7 @@ public:
             if (type != POINT_MOTION_TYPE)
                 return;
 
-            me->SetTarget(0);
+            me->SetTarget();
             me->SetFacingTo(5.558f);
             me->SetStandState(UNIT_STAND_STATE_KNEEL);
             events.ScheduleEvent(point == EQUIP_TWO_SWORDS ? EVENT_SWAP_WEAPON1 : EVENT_SWAP_WEAPON2, 1500);
