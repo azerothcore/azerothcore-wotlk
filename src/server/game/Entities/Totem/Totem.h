@@ -21,10 +21,12 @@ enum TotemType
 #define SENTRY_TOTEM_ENTRY    3968
 #define EARTHBIND_TOTEM_ENTRY 2630
 
+constexpr uint32 SPELL_CYCLONE = 33786;
+
 class Totem : public Minion
 {
 public:
-    explicit Totem(SummonPropertiesEntry const* properties, uint64 owner);
+    explicit Totem(SummonPropertiesEntry const* properties, ObjectGuid owner);
     ~Totem() override {};
     void Update(uint32 time) override;
     void InitStats(uint32 duration) override;
