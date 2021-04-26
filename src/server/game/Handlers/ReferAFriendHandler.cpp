@@ -16,10 +16,10 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: CMSG_GRANT_LEVEL");
 #endif
 
-    uint64 guid;
-    recvData.readPackGUID(guid);
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
 
-    Player* target = ObjectAccessor::GetObjectInWorld(guid, _player);
+    Player* target = ObjectAccessor::GetPlayer(*_player, guid);
 
     // check cheating
     uint8 levels = _player->GetGrantableLevels();
@@ -51,7 +51,7 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
     }
 
     WorldPacket data2(SMSG_PROPOSE_LEVEL_GRANT, 8);
-    data2.append(_player->GetPackGUID());
+    data2 << _player->GetPackGUID();
     target->GetSession()->SendPacket(&data2);
 }
 
@@ -61,10 +61,10 @@ void WorldSession::HandleAcceptGrantLevel(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: CMSG_ACCEPT_LEVEL_GRANT");
 #endif
 
-    uint64 guid;
-    recvData.readPackGUID(guid);
+    ObjectGuid guid;
+    recvData >> guid.ReadAsPacked();
 
-    Player* other = ObjectAccessor::GetObjectInWorld(guid, _player);
+    Player* other = ObjectAccessor::GetPlayer(*_player, guid);
     if (!other)
         return;
 

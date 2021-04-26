@@ -19,7 +19,7 @@ jobs:
       - name: Semicolon check
         run: |
          for i in `find data/sql/updates/pending* -name "*.sql" -type f`; do
-         if [[ $(cat "$i"|sed 's/ --.*$//'|tr -d '\n'|tail -c 1) != ";"  ]]; then
+         if [[ $(cat "$i"|sed 's/ --.*$//'|tr -d '\n'|tr -d " "|tail -c 1) != ";"  ]]; then
             echo "Missing Semicolon (;) or multiple newlines at the end of the file."
             exit 1
          else

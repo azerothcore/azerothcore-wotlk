@@ -140,7 +140,7 @@ class AbominationDespawner
 public:
     explicit AbominationDespawner(Unit* owner) : _owner(owner) { }
 
-    bool operator()(uint64 guid)
+    bool operator()(ObjectGuid guid)
     {
         if (Unit* summon = ObjectAccessor::GetUnit(*_owner, guid))
         {
@@ -411,7 +411,7 @@ public:
             switch (id)
             {
                 case POINT_FESTERGUT:
-                    if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_FESTERGUT)))
+                    if (Creature* c = instance->instance->GetCreature(instance->GetGuidData(DATA_FESTERGUT)))
                     {
                         if (c->IsInCombat())
                         {
@@ -427,7 +427,7 @@ public:
                     }
                     break;
                 case POINT_ROTFACE:
-                    if (Creature* c = instance->instance->GetCreature(instance->GetData64(DATA_ROTFACE)))
+                    if (Creature* c = instance->instance->GetCreature(instance->GetGuidData(DATA_ROTFACE)))
                     {
                         if (c->IsInCombat())
                         {
@@ -730,13 +730,12 @@ public:
     npc_putricide_oozeAI(Creature* creature, uint32 hitTargetSpellId) : ScriptedAI(creature),
         _hitTargetSpellId(hitTargetSpellId), _newTargetSelectTimer(0)
     {
-        targetGUID = 0;
         me->SetReactState(REACT_PASSIVE);
     }
 
-    uint64 targetGUID;
+    ObjectGuid targetGUID;
 
-    void SetGUID(uint64 guid, int32 type) override
+    void SetGUID(ObjectGuid guid, int32 type) override
     {
         if (type == -1)
             targetGUID = guid;
@@ -745,7 +744,7 @@ public:
     void IsSummonedBy(Unit* /*summoner*/) override
     {
         if (InstanceScript* instance = me->GetInstanceScript())
-            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+            if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
             {
                 if (!professor->IsInCombat())
                     me->DespawnOrUnsummon(1);
@@ -756,7 +755,7 @@ public:
 
     void SelectNewTarget()
     {
-        targetGUID = 0;
+        targetGUID.Clear();
         me->InterruptNonMeleeSpells(true);
         me->AttackStop();
         me->GetMotionMaster()->Clear();
@@ -1274,7 +1273,7 @@ public:
 
             if (!GetHitUnit()->HasAura(plagueId))
             {
-                if (Creature* professor = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(DATA_PROFESSOR_PUTRICIDE)))
+                if (Creature* professor = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
                 {
                     if (Aura* oldPlague = GetCaster()->GetAura(plagueId, professor->GetGUID()))
                     {
@@ -1414,7 +1413,7 @@ public:
             if (!instance)
                 return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
 
-            Creature* professor = ObjectAccessor::GetCreature(*GetExplTargetUnit(), instance->GetData64(DATA_PROFESSOR_PUTRICIDE));
+            Creature* professor = ObjectAccessor::GetCreature(*GetExplTargetUnit(), instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE));
             if (!professor)
                 return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
 
@@ -1508,7 +1507,7 @@ public:
             if (!instance)
                 return;
 
-            Creature* putricide = ObjectAccessor::GetCreature(*caster, instance->GetData64(DATA_PROFESSOR_PUTRICIDE));
+            Creature* putricide = ObjectAccessor::GetCreature(*caster, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE));
             if (!putricide)
                 return;
 
