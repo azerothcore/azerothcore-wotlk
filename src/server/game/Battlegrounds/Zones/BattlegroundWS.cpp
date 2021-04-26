@@ -142,6 +142,24 @@ void BattlegroundWS::RespawnFlagAfterDrop(TeamId teamId)
     _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT10);
     _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT15);
     RemoveAssaultAuras();
+
+    CheckFlagKeeperInArea(teamId == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
+}
+
+void BattlegroundWS::CheckFlagKeeperInArea(TeamId teamId)
+{
+    if (GetStatus() != STATUS_IN_PROGRESS || GetFlagState(teamId) != BG_WS_FLAG_STATE_ON_PLAYER)
+        return;
+
+    uint32 triggerId = teamId == TEAM_ALLIANCE ? 3647 : 3646;
+    AreaTrigger const* areaTrigger = sObjectMgr->GetAreaTrigger(triggerId);
+    if (Player* player = ObjectAccessor::GetPlayer(FindBgMap(), GetFlagPickerGUID(teamId)))
+    {
+        if (areaTrigger && player->IsInAreaTriggerRadius(areaTrigger))
+        {
+            HandleAreaTrigger(player, triggerId);
+        }
+    }
 }
 
 void BattlegroundWS::EventPlayerCapturedFlag(Player* player)
@@ -287,6 +305,8 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
             _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT10);
             _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT15);
             RemoveAssaultAuras();
+
+            CheckFlagKeeperInArea(TEAM_HORDE);
             return;
         }
         else
@@ -318,6 +338,8 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
             _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT10);
             _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT15);
             RemoveAssaultAuras();
+
+            CheckFlagKeeperInArea(TEAM_ALLIANCE);
             return;
         }
         else

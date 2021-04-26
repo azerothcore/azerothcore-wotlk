@@ -163,6 +163,7 @@ public:
     void SetFlagPicker(ObjectGuid guid, TeamId teamId) { _flagKeepers[teamId] = guid; }
     void RespawnFlagAfterDrop(TeamId teamId);
     uint8 GetFlagState(TeamId teamId) const { return _flagState[teamId]; }
+    void CheckFlagKeeperInArea(TeamId teamId);
 
     /* Battleground Events */
     void EventPlayerDroppedFlag(Player* player) override;
