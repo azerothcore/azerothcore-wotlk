@@ -22,19 +22,15 @@ public:
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
 
-        uint64 m_uiHellmawGUID;
-        uint64 m_uiRefectoryDoorGUID;
-        uint64 m_uiScreamingHallDoorGUID;
+        ObjectGuid m_uiHellmawGUID;
+        ObjectGuid m_uiRefectoryDoorGUID;
+        ObjectGuid m_uiScreamingHallDoorGUID;
 
         uint32 m_uiFelOverseerCount;
 
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-
-            m_uiHellmawGUID = 0;
-            m_uiRefectoryDoorGUID = 0;
-            m_uiScreamingHallDoorGUID = 0;
 
             m_uiFelOverseerCount = 0;
         }

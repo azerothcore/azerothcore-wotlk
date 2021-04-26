@@ -1,79 +1,147 @@
-version: '3.2'
+version: '3.9'
+
+# extension field: https://docs.docker.com/compose/compose-file/compose-file-v3/#extension-fields
+x-networks: &networks
+  networks:
+    - ac-network
+
+x-ac-shared-conf: &ac-shared-conf
+  <<: *networks
+  working_dir: /azerothcore
+  depends_on:
+    ac-database:
+      condition: service_healthy
 
 services:
+#============================
+#
+# Abstract services to extend
+#
+#============================
+
+  abstract-bind:
+    image: local/azerothcore/abstract-bind
+    volumes:
+      - .:/azerothcore/
+      # env dir shared between services
+      # we cannot use /env/dist to avoid permission issues
+      - ac-env:/azerothcore/env
+      # expose some dist folder outside allowing the host to use them
+      - ${DOCKER_CONF:-./conf}:/azerothcore/conf
+      - ${DOCKER_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
+      # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
+      - ${DOCKER_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+      - ${DOCKER_DATA:-./env/docker/data}:/azerothcore/env/dist/data:delegated
+    profiles: [abstract-service] # do not run this
+
+  abstract-no-bind:
+    image: local/azerothcore/abstract-no-bind
+    volumes:
+      - ac-proj:/azerothcore/
+    profiles: [abstract-service] # do not run this
+
+#=======================
+#
+# Applications
+#
+#=======================
+
 
   ac-database:
-    image: azerothcore/database
+    <<: *networks
+    image: mysql:8.0
     restart: unless-stopped
-    build:
-      context: .
-      dockerfile: ./docker/database/Dockerfile
-    networks:
-      - ac-network
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
     ports:
-      - ${DB_EXTERNAL_PORT:-3306}:3306
+      - ${DOCKER_DB_EXTERNAL_PORT:-3306}:3306
     environment:
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-password}
+      - MYSQL_ROOT_PASSWORD=${DOCKER_DB_ROOT_PASSWORD:-password}
     volumes:
       - type: volume
         source: ac-database
         target: /var/lib/mysql
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
+      interval: 2s
+      timeout: 20s
+      retries: 10
+
 
   ac-worldserver:
+    <<: *ac-shared-conf
+    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     stdin_open: true
     tty: true
-    image: azerothcore/worldserver
+    command: ./acore.sh run-worldserver
+    image: acore/worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     privileged: true
     build:
-      context: ./docker/worldserver
-      dockerfile: Dockerfile
-    networks:
-      - ac-network
+      context: .
+      target: ${DOCKER_BUILD_WORLD_TARGET:-dev}
+      dockerfile: ./apps/docker/Dockerfile
     ports:
-      - ${WORLD_EXTERNAL_PORT:-8085}:8085
-      - ${SOAP_EXTERNAL_PORT:-7878}:7878
-    volumes:
-      - type: bind
-        source: ./docker/worldserver/bin
-        target: /azeroth-server/bin
-      - type: bind
-        source: ${WORLDSERVER_ETC:-./docker/worldserver/etc}
-        target: /azeroth-server/etc
-      - type: bind
-        source: ${WORLDSERVER_LOGS:-./docker/worldserver/logs}
-        target: /azeroth-server/logs
-      - type: bind
-        source: ${WORLDSERVER_DATA:-./docker/worldserver/data}
-        target: /azeroth-server/data
-    depends_on:
-      - ac-database
+      - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
+      - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
+    profiles: [all, app, worldserver]
 
   ac-authserver:
-    image: azerothcore/authserver
+    <<: *ac-shared-conf
+    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
+    tty: true
+    command: ./acore.sh run-authserver
+    image: acore/authserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     build:
-      context: ./docker/authserver
-      dockerfile: Dockerfile
-    networks:
-      - ac-network
+      context: .
+      target: ${DOCKER_BUILD_AUTH_TARGET:-dev}
+      dockerfile: ./apps/docker/Dockerfile
     ports:
-      - ${AUTH_EXTERNAL_PORT:-3724}:3724
+      - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
+    profiles: [all, app, authserver]
+
+#======================
+#
+# Dev services
+#
+#======================
+
+  ac-dev-server:
+    <<: *ac-shared-conf
+    tty: true
+    image: acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+    security_opt:
+      - seccomp:unconfined
+    build:
+      context: .
+      target: dev
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    environment:
+        DBLIST: AUTH,CHARACTERS,WORLD
+    ports:
+      - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
+      - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
+      - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
-      - type: bind
-        source: ./docker/authserver/bin
-        target: /azeroth-server/bin
-      - type: bind
-        source: ${AUTHSERVER_ETC:-./docker/authserver/etc}
-        target: /azeroth-server/etc
-      - type: bind
-        source: ${AUTHSERVER_LOGS:-./docker/authserver/logs}
-        target: /azeroth-server/logs
-    depends_on:
-      - ac-database
+      - ac-build:/azerothcore/var/build
+    profiles: [all, dev]
 
 volumes:
   ac-database:
+  ac-env:
+  ac-build:
+  ac-proj:
 
 networks:
   ac-network:
