@@ -946,7 +946,7 @@ public:
     virtual void OnBeforeLootItem(Player* /*player*/, LootItem* /*item*/, uint64 /*lootguid*/) { }
 
     //After looting item
-    virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, uint64 /*lootguid*/) { }
+    virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
 	
     //After looting item
     virtual void OnLootGold(Player* /*player*/, uint32& /*amount*/) { }
