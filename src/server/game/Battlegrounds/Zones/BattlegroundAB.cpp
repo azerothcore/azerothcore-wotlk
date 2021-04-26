@@ -294,7 +294,7 @@ void BattlegroundAB::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
 
     if (_capturePointInfo[node]._state == BG_AB_NODE_STATE_NEUTRAL)
     {
-        player->KilledMonsterCredit(BG_AB_QUEST_CREDIT_BASE + node, 0);
+        player->KilledMonsterCredit(BG_AB_QUEST_CREDIT_BASE + node);
         UpdatePlayerScore(player, SCORE_BASES_ASSAULTED, 1);
         _capturePointInfo[node]._state = BG_AB_NODE_STATE_ALLY_CONTESTED + player->GetTeamId();
         _capturePointInfo[node]._ownerTeamId = TEAM_NEUTRAL;
@@ -307,7 +307,7 @@ void BattlegroundAB::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     {
         if (!_capturePointInfo[node]._captured)
         {
-            player->KilledMonsterCredit(BG_AB_QUEST_CREDIT_BASE + node, 0);
+            player->KilledMonsterCredit(BG_AB_QUEST_CREDIT_BASE + node);
             UpdatePlayerScore(player, SCORE_BASES_ASSAULTED, 1);
             _capturePointInfo[node]._state = BG_AB_NODE_STATE_ALLY_CONTESTED + player->GetTeamId();
             _capturePointInfo[node]._ownerTeamId = TEAM_NEUTRAL;
@@ -327,7 +327,7 @@ void BattlegroundAB::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     }
     else
     {
-        player->KilledMonsterCredit(BG_AB_QUEST_CREDIT_BASE + node, 0);
+        player->KilledMonsterCredit(BG_AB_QUEST_CREDIT_BASE + node);
         UpdatePlayerScore(player, SCORE_BASES_ASSAULTED, 1);
         NodeDeoccupied(node); // before setting team owner to neutral
 
@@ -379,14 +379,14 @@ bool BattlegroundAB::SetupBattleground()
     AddSpiritGuide(BG_AB_SPIRIT_HORDE, BG_AB_SpiritGuidePos[BG_AB_SPIRIT_HORDE][0], BG_AB_SpiritGuidePos[BG_AB_SPIRIT_HORDE][1], BG_AB_SpiritGuidePos[BG_AB_SPIRIT_HORDE][2], BG_AB_SpiritGuidePos[BG_AB_SPIRIT_HORDE][3], TEAM_HORDE);
 
     for (uint32 i = BG_AB_OBJECT_BANNER_NEUTRAL; i < BG_AB_OBJECT_MAX; ++i)
-        if (BgObjects[i] == 0)
+        if (!BgObjects[i])
         {
             LOG_ERROR("sql.sql", "BatteGroundAB: Failed to spawn some object Battleground not created!");
             return false;
         }
 
     for (uint32 i = BG_AB_SPIRIT_ALIANCE; i <= BG_AB_SPIRIT_HORDE; ++i)
-        if (BgCreatures[i] == 0)
+        if (!BgCreatures[i])
         {
             LOG_ERROR("sql.sql", "BatteGroundAB: Failed to spawn spirit guides Battleground not created!");
             return false;
