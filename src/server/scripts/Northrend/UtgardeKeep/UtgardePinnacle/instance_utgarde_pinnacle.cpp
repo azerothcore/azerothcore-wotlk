@@ -20,20 +20,20 @@ public:
     {
         instance_utgarde_pinnacle_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
 
-        uint64 SvalaSorrowgrave;
-        uint64 GortokPalehoof;
-        uint64 SkadiRuthless;
-        uint64 KingYmiron;
-        uint64 FrenziedWorgen;
-        uint64 RavenousFurbolg;
-        uint64 MassiveJormungar;
-        uint64 FerociousRhino;
-        uint64 Grauf;
+        ObjectGuid SvalaSorrowgrave;
+        ObjectGuid GortokPalehoof;
+        ObjectGuid SkadiRuthless;
+        ObjectGuid KingYmiron;
+        ObjectGuid FrenziedWorgen;
+        ObjectGuid RavenousFurbolg;
+        ObjectGuid MassiveJormungar;
+        ObjectGuid FerociousRhino;
+        ObjectGuid Grauf;
 
-        uint64 SvalaMirrorGUID;
-        uint64 SkadiRuthlessDoor;
-        uint64 YmironDoor;
-        uint64 StatisGenerator;
+        ObjectGuid SvalaMirrorGUID;
+        ObjectGuid SkadiRuthlessDoor;
+        ObjectGuid YmironDoor;
+        ObjectGuid StatisGenerator;
         uint32 FightStatus;
         uint32 Encounters[MAX_ENCOUNTERS];
         uint8 SkadiHits;
@@ -45,22 +45,8 @@ public:
 
         void Initialize() override
         {
-            SvalaSorrowgrave = 0;
-            GortokPalehoof   = 0;
-            SkadiRuthless    = 0;
-            KingYmiron       = 0;
-            FrenziedWorgen   = 0;
-            RavenousFurbolg  = 0;
-            MassiveJormungar = 0;
-            FerociousRhino   = 0;
-            Grauf            = 0;
-
-            SvalaMirrorGUID  = 0;
-            StatisGenerator  = 0;
             SkadiHits        = 0;
             SkadiInRange     = 0;
-            SkadiRuthlessDoor = 0;
-            YmironDoor       = 0;
             FightStatus      = 0;
 
             svalaAchievement = false;
@@ -120,12 +106,12 @@ public:
                 case GO_SKADI_THE_RUTHLESS_DOOR:
                     SkadiRuthlessDoor = pGo->GetGUID();
                     if (Encounters[DATA_SKADI_THE_RUTHLESS] == DONE)
-                        HandleGameObject(0, true, pGo);
+                        HandleGameObject(ObjectGuid::Empty, true, pGo);
                     break;
                 case GO_KING_YMIRON_DOOR:
                     YmironDoor = pGo->GetGUID();
                     if (Encounters[DATA_KING_YMIRON] == DONE)
-                        HandleGameObject(0, true, pGo);
+                        HandleGameObject(ObjectGuid::Empty, true, pGo);
                     break;
                 case GO_GORK_PALEHOOF_SPHERE:
                     StatisGenerator = pGo->GetGUID();
@@ -254,9 +240,9 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
-            switch(identifier)
+            switch (identifier)
             {
                 case DATA_SVALA_SORROWGRAVE:
                     return SvalaSorrowgrave;
@@ -286,7 +272,7 @@ public:
                     return SvalaMirrorGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
     };
 };

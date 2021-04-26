@@ -79,7 +79,7 @@ public:
                 case 19:
                     me->MonsterTextEmote("The frosthound has located the thief's hiding place. Confront him!", 0, true);
                     if (Unit* summoner = me->ToTempSummon()->GetSummoner())
-                        summoner->ToPlayer()->KilledMonsterCredit(29677, 0);
+                        summoner->ToPlayer()->KilledMonsterCredit(29677);
                     break;
             }
         }
@@ -145,7 +145,7 @@ public:
                 {
                     me->RemoveAllAurasExceptType(SPELL_AURA_MECHANIC_IMMUNITY);
                     Talk(1);
-                    caster->ToPlayer()->KilledMonsterCredit(me->GetEntry(), 0);
+                    caster->ToPlayer()->KilledMonsterCredit(me->GetEntry());
                     me->DespawnOrUnsummon(8000);
                     me->GetMotionMaster()->MoveJump(8721.94f, -1955, 963, 70.0f, 30.0f);
                 }
@@ -233,7 +233,7 @@ public:
         void RollPath()
         {
             me->SetEntry(NPC_TIME_LOST_PROTO_DRAKE);
-            Start(true, true, 0, 0, false, true, true);
+            Start(true, true, ObjectGuid::Empty, 0, false, true, true);
             SetNextWaypoint(urand(0, 250), true);
             me->UpdateEntry(roll_chance_i(25) ? NPC_TIME_LOST_PROTO_DRAKE : NPC_VYRAGOSA, 0, false);
         }
@@ -329,7 +329,7 @@ public:
     {
         npc_wild_wyrmAI(Creature* creature) : ScriptedAI(creature) {}
 
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         uint32 checkTimer;
         uint32 announceAttackTimer;
         uint32 attackTimer;
@@ -352,7 +352,7 @@ public:
             switching = false;
             startPath = false;
             checkTimer = 0;
-            playerGUID = 0;
+            playerGUID.Clear();
             attackTimer = 0;
             announceAttackTimer = 0;
             me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
@@ -430,7 +430,7 @@ public:
                 {
                     if (Player* player = GetValidPlayer())
                     {
-                        player->KilledMonsterCredit(30415, 0);
+                        player->KilledMonsterCredit(30415);
                         player->RemoveAurasDueToSpell(SPELL_JAWS_OF_DEATH);
                     }
                     me->SetStandState(UNIT_STAND_STATE_DEAD);
