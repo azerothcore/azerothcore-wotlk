@@ -9,6 +9,7 @@
 #include "ConditionMgr.h"
 #include "DBCStores.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
@@ -1418,7 +1419,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
         shapeInfo = sSpellShapeshiftStore.LookupEntry(form);
         if (!shapeInfo)
         {
-            sLog->outError("GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
+            LOG_ERROR("server", "GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
             return SPELL_CAST_OK;
         }
         actAsShifted = !(shapeInfo->flags1 & 1);            // shapeshift acts as normal form for spells
@@ -2020,18 +2021,6 @@ AuraStateType SpellInfo::LoadAuraState() const
     if (SpellFamilyName == SPELLFAMILY_DRUID && SpellFamilyFlags[0] & 0x400)
         return AURA_STATE_FAERIE_FIRE;
 
-    // Any Spells that prevent spells can be added here.
-    uint32 StealthPreventionSpellList[] = { 9991, 35331, 9806, 35325 };
-
-    // Goes through each of the spells and identifies them as Stealth Prevention Spell.
-    for (uint32 i = 0; i < sizeof(StealthPreventionSpellList) / sizeof(uint32); i++)
-    {
-        if (Id == StealthPreventionSpellList[i])
-        {
-            return AURA_STATE_FAERIE_FIRE;
-        }
-    }
-
     // Sting (hunter's pet ability)
     if (GetCategory() == 1133)
         return AURA_STATE_FAERIE_FIRE;
@@ -2067,6 +2056,12 @@ AuraStateType SpellInfo::LoadAuraState() const
         case 71465: // Divine Surge
         case 50241: // Oculus, Drake spell Evasive Maneuvers
             return AURA_STATE_UNKNOWN22;
+        case 9991:  // Touch of Zanzil
+        case 35331: // Black Blood
+        case 9806:  // Phantom Strike
+        case 35325: // Glowing Blood
+        case 16498: // Faerie Fire
+            return AURA_STATE_FAERIE_FIRE;
         default:
             break;
     }
@@ -2348,7 +2343,7 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
         // Else drain all power
         if (PowerType < MAX_POWERS)
             return caster->GetPower(Powers(PowerType));
-        sLog->outError("SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
+        LOG_ERROR("server", "SpellInfo::CalcPowerCost: Unknown power type '%d' in spell %d", PowerType, Id);
         return 0;
     }
 
@@ -2375,11 +2370,11 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
             case POWER_RUNE:
             case POWER_RUNIC_POWER:
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "CalculateManaCost: Not implemented yet!");
+                LOG_DEBUG("spells.aura", "CalculateManaCost: Not implemented yet!");
 #endif
                 break;
             default:
-                sLog->outError("CalculateManaCost: Unknown power type '%d' in spell %d", PowerType, Id);
+                LOG_ERROR("server", "CalculateManaCost: Unknown power type '%d' in spell %d", PowerType, Id);
                 return 0;
         }
     }
@@ -2487,7 +2482,14 @@ SpellInfo const* SpellInfo::GetAuraRankForLevel(uint8 level) const
     if (!needRankSelection)
         return this;
 
-    for (SpellInfo const* nextSpellInfo = this; nextSpellInfo != nullptr; nextSpellInfo = nextSpellInfo->GetPrevRankSpell())
+    SpellInfo const* nextSpellInfo = nullptr;
+
+    sScriptMgr->OnBeforeAuraRankForLevel(this, nextSpellInfo, level);
+
+    if (nextSpellInfo != nullptr)
+        return nextSpellInfo;
+
+    for (nextSpellInfo = this; nextSpellInfo != nullptr; nextSpellInfo = nextSpellInfo->GetPrevRankSpell())
     {
         // if found appropriate level
         if (uint32(level + 10) >= nextSpellInfo->SpellLevel)

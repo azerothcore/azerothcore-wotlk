@@ -220,7 +220,7 @@ public:
             if (pSummoned)
             {
                 listOfMobs.Summon(pSummoned);
-                pInstance->SetData64(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
+                pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
@@ -229,7 +229,7 @@ public:
             if (pSummoned)
             {
                 listOfMobs.Despawn(pSummoned);
-                pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
+                pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
             }
         }
     };
@@ -258,7 +258,7 @@ struct violet_hold_trashAI : public npc_escortAI
     void ClearDoorSealAura()
     {
         if (pInstance)
-            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_DOOR_SEAL_GUID)))
+            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_DOOR_SEAL_GUID)))
                 c->RemoveAura(SPELL_DESTROY_DOOR_SEAL, me->GetGUID());
     }
 
@@ -352,7 +352,7 @@ struct violet_hold_trashAI : public npc_escortAI
     void JustDied(Unit* /*unit*/) override
     {
         if (pInstance)
-            if (Creature* portal = ObjectAccessor::GetCreature((*me), pInstance->GetData64(DATA_TELEPORTATION_PORTAL_GUID)))
+            if (Creature* portal = ObjectAccessor::GetCreature((*me), pInstance->GetGuidData(DATA_TELEPORTATION_PORTAL_GUID)))
                 CAST_AI(npc_vh_teleportation_portal::npc_vh_teleportation_portalAI, portal->AI())->SummonedMobDied(me);
     }
 
@@ -1167,7 +1167,7 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if (GameObject* gate = go->GetMap()->GetGameObject(MAKE_NEW_GUID(61606, 193019, HIGHGUID_GAMEOBJECT)))
+        if (GameObject* gate = go->GetMap()->GetGameObject(ObjectGuid::Create<HighGuid::GameObject>(193019, 61606)))
             if (gate->getLootState() == GO_READY)
                 gate->UseDoorOrButton(0, false, player);
 

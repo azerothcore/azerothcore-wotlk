@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 export CCACHE_CPP2=true
-export CCACHE_MAXSIZE='2G'
+export CCACHE_MAXSIZE='1G'
 export CCACHE_COMPRESS=9
 ccache -s
 
@@ -23,6 +23,8 @@ time cmake ../../../ \
 -DCMAKE_CXX_FLAGS="-Werror" \
 -DCMAKE_C_COMPILER_LAUNCHER=ccache \
 -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+-DUSE_SCRIPTPCH=0 \
+-DUSE_COREPCH=0 \
 ;
 
 time make -j $(($(sysctl -n hw.ncpu ) + 2))
