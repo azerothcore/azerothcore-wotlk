@@ -24,12 +24,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Do not use acore dashboard to install
 # since it's not cacheable by docker
-RUN apt-get update
-RUN apt-get install -y gdb gdbserver git dos2unix lsb-core sudo curl unzip \
+RUN apt-get update && apt-get install -y gdb gdbserver git dos2unix lsb-core sudo curl unzip \
   make cmake clang libmysqlclient-dev libace-dev \
   build-essential libtool cmake-data openssl libgoogle-perftools-dev \
   libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client \
-  libncurses5-dev ccache
+  libncurses5-dev ccache \
+  && rm -rf /var/lib/apt/lists/*
 
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
@@ -156,6 +156,5 @@ FROM worldserver-without-data as worldserver
 ENV DATAPATH=/azerothcore/env/dist/data
 
 RUN /azerothcore/acore.sh client-data
-
 
 
