@@ -1731,7 +1731,7 @@ void ScriptMgr::OnBeforeLootItem(Player* player, LootItem* item, uint64 lootguid
     FOREACH_SCRIPT(PlayerScript)->OnBeforeLootItem(player, item, lootguid);
 }
 
-void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, uint64 lootguid)
+void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid)
 {
     FOREACH_SCRIPT(PlayerScript)->OnLootItem(player, item, count, lootguid);
 }
