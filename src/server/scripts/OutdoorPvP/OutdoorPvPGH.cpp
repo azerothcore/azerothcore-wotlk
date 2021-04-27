@@ -6,6 +6,7 @@
 
 #include "GameEventMgr.h"
 #include "Language.h"
+#include "MapManager.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPGH.h"
 #include "OutdoorPvPMgr.h"
@@ -22,6 +23,8 @@ OutdoorPvPGH::OutdoorPvPGH()
 bool OutdoorPvPGH::SetupOutdoorPvP()
 {
     RegisterZone(GH_ZONE);
+    SetMapFromZone(GH_ZONE);
+
     if ((m_obj = new OPvPCapturePointGH(this)))
     {
         AddCapturePoint(m_obj);
@@ -99,8 +102,10 @@ void OPvPCapturePointGH::ChangeState()
             break;
     }
 
-    if (GameObject* flag = HashMapHolder<GameObject>::Find(m_capturePointGUID))
-        flag->SetGoArtKit(artkit);
+    Map* map = sMapMgr->FindMap(571, 0);
+    auto bounds = map->GetGameObjectBySpawnIdStore().equal_range(m_capturePointSpawnId);
+    for (auto itr = bounds.first; itr != bounds.second; ++itr)
+        itr->second->SetGoArtKit(artkit);
 }
 
 class OutdoorPvP_grizzly_hills : public OutdoorPvPScript
