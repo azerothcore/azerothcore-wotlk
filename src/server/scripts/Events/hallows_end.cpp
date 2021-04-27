@@ -368,13 +368,13 @@ public:
 
         uint32 eventStarted;
         bool allowQuest;
-        uint64 horseGUID;
+        ObjectGuid horseGUID;
 
         void Reset() override
         {
             eventStarted = 0;
             allowQuest = false;
-            horseGUID = 0;
+            horseGUID.Clear();
         }
 
         void GetInitXYZ(float& x, float& y, float& z, float& o, uint32& path)
@@ -606,7 +606,7 @@ public:
         bool Unmount;
         EventMap events;
         uint32 counter;
-        std::list<uint64> unitList;
+        GuidList unitList;
         int32 pos;
         void EnterCombat(Unit*) override {}
         void MoveInLineOfSight(Unit*  /*who*/) override {}
@@ -699,8 +699,8 @@ public:
                             if (counter > 12)
                             {
                                 bool failed = false;
-                                for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                                    if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
+                                for (ObjectGuid const guid : unitList)
+                                    if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                                         if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
                                         {
                                             failed = true;
@@ -753,8 +753,8 @@ public:
         Unit* getTrigger()
         {
             std::list<Unit*> tmpList;
-            for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
+            for (ObjectGuid const guid : unitList)
+                if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                     if (!c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
                         tmpList.push_back(c);
 
@@ -772,8 +772,8 @@ public:
             {
                 me->MonsterYell("Fire consumes! You've tried and failed. Let there be no doubt, justice prevailed!", LANG_UNIVERSAL, 0);
                 me->PlayDirectSound(11967);
-                for (std::list<uint64>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                    if (Unit* c = ObjectAccessor::GetUnit(*me, *itr))
+                for (ObjectGuid const guid : unitList)
+                    if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                         c->RemoveAllAuras();
 
                 me->DespawnOrUnsummon(1);
@@ -867,7 +867,7 @@ public:
                     else
                         me->RemoveAllAuras();
 
-                    caster->ToPlayer()->KilledMonsterCredit(me->GetEntry(), 0);
+                    caster->ToPlayer()->KilledMonsterCredit(me->GetEntry());
                 }
             }
         }
@@ -954,7 +954,7 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         uint8 talkCount;
         bool inFight;
         uint8 phase;
@@ -1079,7 +1079,7 @@ public:
         {
             events.Reset();
             summons.DespawnAll();
-            playerGUID = 0;
+            playerGUID.Clear();
             talkCount = 0;
             phase = 0;
             inFight = false;
