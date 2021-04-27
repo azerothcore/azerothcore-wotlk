@@ -52,7 +52,7 @@ shellCommandFactory(
   "build:compile",
   "Run the compilation process only, without rebuilding docker and importing db",
   [
-    "docker-compose run --rm ac-build acore.sh compiler build",
+    "docker-compose run --rm ac-build bash acore.sh compiler build",
   ],
 );
 
