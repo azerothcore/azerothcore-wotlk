@@ -158,6 +158,8 @@ RUN bash bin/acore-docker-build
 #=================================================================
 FROM authserver-local as authserver
 
+ARG DOCKER_USER=acore
+
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/etc /azerothcore/env/dist/etc
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/authserver /azerothcore/env/dist/bin/authserver
 
@@ -168,6 +170,8 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/au
 #
 #=================================================================
 FROM authserver-local as worldserver
+
+ARG DOCKER_USER=acore
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/etc /azerothcore/env/dist/etc
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/worldserver /azerothcore/env/dist/bin/worldserver
