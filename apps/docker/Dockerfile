@@ -95,6 +95,12 @@ RUN addgroup --gid $GROUP_ID acore && \
     passwd -d acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
+# install the required dependencies to run the server
+RUN apt-get update && apt-get install -y gdb gdbserver net-tools tzdata libmysqlclient-dev libace-dev mysql-client curl unzip && rm -rf /var/lib/apt/lists/* ;
+
+# change timezone in container
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
+
 # copy the sources from the host machine
 COPY --chown=$DOCKER_USER:$DOCKER_USER apps /azerothcore/apps
 COPY --chown=$DOCKER_USER:$DOCKER_USER bin /azerothcore/bin
@@ -103,12 +109,6 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER data /azerothcore/data
 COPY --chown=$DOCKER_USER:$DOCKER_USER deps /azerothcore/deps
 COPY --chown=$DOCKER_USER:$DOCKER_USER acore.json /azerothcore/acore.json
 COPY --chown=$DOCKER_USER:$DOCKER_USER acore.sh /azerothcore/acore.sh
-
-# install the required dependencies to run the server
-RUN apt-get update && apt-get install -y gdb gdbserver net-tools tzdata libmysqlclient-dev libace-dev mysql-client curl unzip && rm -rf /var/lib/apt/lists/* ;
-
-# change timezone in container
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
 # must be created to set the correct permissions on them
 RUN mkdir -p /azerothcore/env/dist/data

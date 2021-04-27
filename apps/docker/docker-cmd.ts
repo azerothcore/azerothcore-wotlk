@@ -49,6 +49,14 @@ shellCommandFactory(
 );
 
 shellCommandFactory(
+  "build:compile",
+  "Run the compilation process only, without rebuilding docker and importing db",
+  [
+    "docker-compose run --rm ac-build acore.sh compiler build",
+  ],
+);
+
+shellCommandFactory(
   "client-data",
   "Download client data inside the ac-data volume",
   ["docker-compose run --rm ac-worldserver bash acore.sh client-data"],
@@ -162,12 +170,12 @@ while (true) {
     const command = await Input.prompt({
       message: "Enter the command:",
     });
-    await program.parseAsync(command.split(" ")).catch((reason)=> {
-        throw new Error(reason);
-    });;
+    await program.parseAsync(command.split(" ")).catch((reason) => {
+      throw new Error(reason);
+    });
   } else {
-    await program.parseAsync(Deno.args).catch((reason)=> {
-        throw new Error(reason);
+    await program.parseAsync(Deno.args).catch((reason) => {
+      throw new Error(reason);
     });
     process.exit(0);
   }
