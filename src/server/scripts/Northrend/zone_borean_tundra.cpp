@@ -112,13 +112,13 @@ public:
 
         uint32 phaseTimer;
         uint8  phase;
-        uint64 casterGuid;
+        ObjectGuid casterGuid;
 
         void Reset() override
         {
             phaseTimer = 30000;
             phase = 0;
-            casterGuid = 0;
+            casterGuid.Clear();
         }
 
         void SpellHit(Unit* caster, const SpellInfo* spell) override
@@ -387,7 +387,7 @@ public:
                 if (uiRand < 40)
                 {
                     player->CastSpell(me, SPELL_FREED_WARSONG_PEON, true);
-                    player->KilledMonsterCredit(NPC_WARSONG_PEON, 0);
+                    player->KilledMonsterCredit(NPC_WARSONG_PEON);
                 }
                 else if (uiRand < 80)
                 {
@@ -590,7 +590,7 @@ public:
                 me->DespawnOrUnsummon(45000);
 
                 if (Player* player = pCaster->ToPlayer())
-                    player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER, 0);
+                    player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
 
                 bEnslaved = true;
             }
@@ -697,7 +697,7 @@ public:
             }
         }
 
-        void GotStinged(uint64 casterGUID)
+        void GotStinged(ObjectGuid casterGUID)
         {
             if (Player* caster = ObjectAccessor::GetPlayer(*me, casterGUID))
             {
@@ -724,7 +724,7 @@ public:
                         break;
                     case 7:
                         Talk(SAY_IMPRISIONED_BERYL_7);
-                        caster->KilledMonsterCredit(NPC_IMPRISONED_BERYL_SORCERER, 0);
+                        caster->KilledMonsterCredit(NPC_IMPRISONED_BERYL_SORCERER);
                         break;
                 }
             }
@@ -1109,7 +1109,7 @@ public:
         uint32 uiEventTimer;
         uint8 uiEventPhase;
 
-        uint64 uiPlayerGUID;
+        ObjectGuid uiPlayerGUID;
 
         void Reset() override
         {
@@ -1122,7 +1122,7 @@ public:
             uiEventTimer = 0;
             uiEventPhase = 0;
 
-            uiPlayerGUID = 0;
+            uiPlayerGUID.Clear();
 
             DoCast(SPELL_SHROUD_OF_THE_DEATH_CULTIST);
 
@@ -1139,7 +1139,7 @@ public:
             uiEventPhase = 1;
         }
 
-        void SetGUID(uint64 uiGuid, int32 /*iId*/) override
+        void SetGUID(ObjectGuid uiGuid, int32 /*iId*/) override
         {
             uiPlayerGUID = uiGuid;
         }
@@ -1322,10 +1322,10 @@ public:
         void Reset() override
         {
             _events.Reset();
-            _playerGUID = 0;
+            _playerGUID.Clear();
         }
 
-        void SetGUID(uint64 guid, int32 /*action*/) override
+        void SetGUID(ObjectGuid guid, int32 /*action*/) override
         {
             if (_playerGUID)
                 return;
@@ -1355,7 +1355,7 @@ public:
                     case EVENT_TALK:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                             Talk(SAY_BLOODMAGE_LAURITH, player);
-                        _playerGUID = 0;
+                        _playerGUID.Clear();
                         _events.ScheduleEvent(EVENT_RESET_ORIENTATION, 5000);
                         break;
                     case EVENT_RESET_ORIENTATION:
@@ -1367,7 +1367,7 @@ public:
 
     private:
         EventMap _events;
-        uint64 _playerGUID;
+        ObjectGuid _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
