@@ -5572,19 +5572,6 @@ SpellCastResult Spell::CheckCast(bool strict)
                                 return SPELL_FAILED_TARGET_NOT_DEAD;
                         }
                     }
-                    else if (m_spellInfo->Id == 53271) // Master's Call
-                    {
-                        if (!m_caster->ToPlayer())
-                            return SPELL_FAILED_BAD_TARGETS;
-
-                        Unit* target = m_targets.GetUnitTarget();
-                        Pet* pet = m_caster->ToPlayer()->GetPet();
-                        if (!target || !pet || pet->isDead() || target->isDead())
-                            return SPELL_FAILED_BAD_TARGETS;
-
-                        if (!pet->IsWithinLOSInMap(target, LINEOFSIGHT_ALL_CHECKS))
-                            return SPELL_FAILED_LINE_OF_SIGHT;
-                    }
                     break;
                 }
             case SPELL_EFFECT_LEARN_SPELL:
