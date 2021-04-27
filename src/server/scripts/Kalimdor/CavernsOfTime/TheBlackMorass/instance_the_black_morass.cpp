@@ -32,16 +32,15 @@ public:
     {
         instance_the_black_morass_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        std::set<uint64> encounterNPCs;
+        GuidSet encounterNPCs;
         uint32 encounters[MAX_ENCOUNTER];
-        uint64 _medivhGUID;
+        ObjectGuid _medivhGUID;
         uint8  _currentRift;
         uint8  _shieldPercent;
 
         void Initialize() override
         {
             memset(&encounters, 0, sizeof(encounters));
-            _medivhGUID = 0;
             _currentRift = 0;
             _shieldPercent = 100;
             encounterNPCs.clear();
@@ -60,9 +59,9 @@ public:
                 medivh->SetRespawnTime(3);
             }
 
-            std::set<uint64> eCopy = encounterNPCs;
-            for (std::set<uint64>::const_iterator itr = eCopy.begin(); itr != eCopy.end(); ++itr)
-                if (Creature* creature = instance->GetCreature(*itr))
+            GuidSet eCopy = encounterNPCs;
+            for (ObjectGuid const guid : eCopy)
+                if (Creature* creature = instance->GetCreature(guid))
                     creature->DespawnOrUnsummon();
         }
 
@@ -184,9 +183,9 @@ public:
                                 Unit::Kill(medivh, medivh);
 
                                 // Xinef: delete all spawns
-                                std::set<uint64> eCopy = encounterNPCs;
-                                for (std::set<uint64>::iterator itr = eCopy.begin(); itr != eCopy.end(); ++itr)
-                                    if (Creature* creature = instance->GetCreature(*itr))
+                                GuidSet eCopy = encounterNPCs;
+                                for (ObjectGuid guid : eCopy)
+                                    if (Creature* creature = instance->GetCreature(guid))
                                         creature->DespawnOrUnsummon();
                             }
                     break;
@@ -209,7 +208,7 @@ public:
             return 0;
         }
 
-        void SetData64(uint32 type, uint64 data) override
+        void SetGuidData(uint32 type, ObjectGuid data) override
         {
             if (type == DATA_SUMMONED_NPC)
                 encounterNPCs.insert(data);
@@ -217,19 +216,19 @@ public:
                 encounterNPCs.erase(data);
         }
 
-        uint64 GetData64(uint32 data) const override
+        ObjectGuid GetGuidData(uint32 data) const override
         {
             if (data == DATA_MEDIVH)
                 return _medivhGUID;
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void SummonPortalKeeper()
         {
             Creature* rift = nullptr;
-            for (std::set<uint64>::const_iterator itr = encounterNPCs.begin(); itr != encounterNPCs.end(); ++itr)
-                if (Creature* summon = instance->GetCreature(*itr))
+            for (ObjectGuid const guid : encounterNPCs)
+                if (Creature* summon = instance->GetCreature(guid))
                     if (summon->GetEntry() == NPC_TIME_RIFT)
                     {
                         rift = summon;

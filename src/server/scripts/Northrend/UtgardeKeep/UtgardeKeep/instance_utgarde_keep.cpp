@@ -25,19 +25,19 @@ public:
         uint32 ForgeEventMask;
         std::string str_data;
 
-        uint64 GO_ForgeBellowGUID[3];
-        uint64 GO_ForgeFireGUID[3];
-        uint64 GO_ForgeAnvilGUID[3];
-        uint64 GO_PortcullisGUID[2];
+        ObjectGuid GO_ForgeBellowGUID[3];
+        ObjectGuid GO_ForgeFireGUID[3];
+        ObjectGuid GO_ForgeAnvilGUID[3];
+        ObjectGuid GO_PortcullisGUID[2];
 
-        uint64 NPC_KelesethGUID;
-        uint64 NPC_DalronnGUID;
-        uint64 NPC_SkarvaldGUID;
-        uint64 NPC_DalronnGhostGUID;
-        uint64 NPC_SkarvaldGhostGUID;
-        uint64 NPC_IngvarGUID;
-        uint64 NPC_DarkRangerMarrahGUID;
-        uint64 NPC_SpecialDrakeGUID;
+        ObjectGuid NPC_KelesethGUID;
+        ObjectGuid NPC_DalronnGUID;
+        ObjectGuid NPC_SkarvaldGUID;
+        ObjectGuid NPC_DalronnGhostGUID;
+        ObjectGuid NPC_SkarvaldGhostGUID;
+        ObjectGuid NPC_IngvarGUID;
+        ObjectGuid NPC_DarkRangerMarrahGUID;
+        ObjectGuid NPC_SpecialDrakeGUID;
         bool bRocksAchiev;
 
         void Initialize() override
@@ -45,19 +45,6 @@ public:
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             ForgeEventMask = 0;
 
-            memset(&GO_ForgeBellowGUID, 0, sizeof(GO_ForgeBellowGUID));
-            memset(&GO_ForgeFireGUID, 0, sizeof(GO_ForgeFireGUID));
-            memset(&GO_ForgeAnvilGUID, 0, sizeof(GO_ForgeAnvilGUID));
-            memset(&GO_PortcullisGUID, 0, sizeof(GO_PortcullisGUID));
-
-            NPC_KelesethGUID = 0;
-            NPC_DalronnGUID = 0;
-            NPC_SkarvaldGUID = 0;
-            NPC_DalronnGhostGUID = 0;
-            NPC_SkarvaldGhostGUID = 0;
-            NPC_IngvarGUID = 0;
-            NPC_DarkRangerMarrahGUID = 0;
-            NPC_SpecialDrakeGUID = 0;
             bRocksAchiev = true;
         }
 
@@ -123,47 +110,47 @@ public:
             {
                 case GO_BELLOW_1:
                     GO_ForgeBellowGUID[0] = go->GetGUID();
-                    if (ForgeEventMask & 1) HandleGameObject(0, true, go);
+                    if (ForgeEventMask & 1) HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_BELLOW_2:
                     GO_ForgeBellowGUID[1] = go->GetGUID();
-                    if (ForgeEventMask & 2) HandleGameObject(0, true, go);
+                    if (ForgeEventMask & 2) HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_BELLOW_3:
                     GO_ForgeBellowGUID[2] = go->GetGUID();
-                    if (ForgeEventMask & 4) HandleGameObject(0, true, go);
+                    if (ForgeEventMask & 4) HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_FORGEFIRE_1:
                     GO_ForgeFireGUID[0] = go->GetGUID();
-                    if (ForgeEventMask & 1) HandleGameObject(0, true, go);
+                    if (ForgeEventMask & 1) HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_FORGEFIRE_2:
                     GO_ForgeFireGUID[1] = go->GetGUID();
-                    if (ForgeEventMask & 2) HandleGameObject(0, true, go);
+                    if (ForgeEventMask & 2) HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_FORGEFIRE_3:
                     GO_ForgeFireGUID[2] = go->GetGUID();
-                    if (ForgeEventMask & 4) HandleGameObject(0, true, go);
+                    if (ForgeEventMask & 4) HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_GLOWING_ANVIL_1:
                     GO_ForgeAnvilGUID[0] = go->GetGUID();
-                    if (ForgeEventMask & 1) HandleGameObject(0, true, go);
+                    if (ForgeEventMask & 1) HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_GLOWING_ANVIL_2:
                     GO_ForgeAnvilGUID[1] = go->GetGUID();
-                    if (ForgeEventMask & 2) HandleGameObject(0, true, go);
+                    if (ForgeEventMask & 2) HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_GLOWING_ANVIL_3:
                     GO_ForgeAnvilGUID[2] = go->GetGUID();
-                    if (ForgeEventMask & 4) HandleGameObject(0, true, go);
+                    if (ForgeEventMask & 4) HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_GIANT_PORTCULLIS_1:
                     GO_PortcullisGUID[0] = go->GetGUID();
-                    if (m_auiEncounter[2] == DONE) HandleGameObject(0, true, go);
+                    if (m_auiEncounter[2] == DONE) HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
                 case GO_GIANT_PORTCULLIS_2:
                     GO_PortcullisGUID[1] = go->GetGUID();
-                    if (m_auiEncounter[2] == DONE) HandleGameObject(0, true, go);
+                    if (m_auiEncounter[2] == DONE) HandleGameObject(ObjectGuid::Empty, true, go);
                     break;
             }
         }
@@ -197,10 +184,10 @@ public:
                             c->AI()->DoAction(-1);
                             c->DespawnOrUnsummon();
                         }
-                        NPC_DalronnGhostGUID = 0;
+                        NPC_DalronnGhostGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_SkarvaldGhostGUID) )
                             c->DespawnOrUnsummon();
-                        NPC_SkarvaldGhostGUID = 0;
+                        NPC_SkarvaldGhostGUID.Clear();
                     }
                     if (data == DONE)
                     {
@@ -209,10 +196,10 @@ public:
                             c->AI()->DoAction(-1);
                             c->DespawnOrUnsummon();
                         }
-                        NPC_DalronnGhostGUID = 0;
+                        NPC_DalronnGhostGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_SkarvaldGhostGUID) )
                             c->DespawnOrUnsummon();
-                        NPC_SkarvaldGhostGUID = 0;
+                        NPC_SkarvaldGhostGUID.Clear();
                     }
 
                     m_auiEncounter[1] = data;
@@ -284,9 +271,9 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 id) const override
+        ObjectGuid GetGuidData(uint32 id) const override
         {
-            switch(id)
+            switch (id)
             {
                 case DATA_KELESETH:
                     return NPC_KelesethGUID;
@@ -297,12 +284,13 @@ public:
                 case DATA_INGVAR:
                     return NPC_IngvarGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         uint32 GetData(uint32 id) const override
         {
-            switch(id)
+            switch (id)
             {
                 case DATA_KELESETH:
                 case DATA_DALRONN_AND_SKARVALD:
@@ -313,6 +301,7 @@ public:
                 case DATA_FORGE_3:
                     return ForgeEventMask & (uint32)(1 << (id - 100));
             }
+
             return 0;
         }
 

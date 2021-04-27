@@ -33,7 +33,6 @@ public:
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-            memset(&bossGUIDs, 0, sizeof(bossGUIDs));
 
             ArchavonDeath = 0;
             EmalonDeath = 0;
@@ -147,11 +146,12 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             if (identifier < MAX_ENCOUNTER)
                 return bossGUIDs[identifier];
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         uint32 GetData(uint32 identifier) const override
@@ -266,7 +266,7 @@ public:
         bool stoned;
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
-        uint64 bossGUIDs[MAX_ENCOUNTER];
+        ObjectGuid bossGUIDs[MAX_ENCOUNTER];
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
