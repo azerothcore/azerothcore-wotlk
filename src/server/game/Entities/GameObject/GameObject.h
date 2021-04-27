@@ -738,7 +738,7 @@ public:
     void RemoveFromWorld() override;
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
-    virtual bool Create(uint32 guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
+    virtual bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0);
     void Update(uint32 p_time) override;
     [[nodiscard]] GameObjectTemplate const* GetGOInfo() const { return m_goInfo; }
     [[nodiscard]] GameObjectTemplateAddon const* GetTemplateAddon() const;
@@ -748,7 +748,7 @@ public:
     [[nodiscard]] bool IsTransport() const;
     [[nodiscard]] bool IsDestructibleBuilding() const;
 
-    [[nodiscard]] uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
+    [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
     // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
     void SetWorldRotationAngles(float z_rot, float y_rot, float x_rot);
@@ -761,11 +761,11 @@ public:
 
     void SaveToDB();
     void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
-    bool LoadFromDB(uint32 guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
-    bool LoadGameObjectFromDB(uint32 guid, Map* map, bool addToMap = true);
+    bool LoadFromDB(ObjectGuid::LowType guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
+    bool LoadGameObjectFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true);
     void DeleteFromDB();
 
-    void SetOwnerGUID(uint64 owner)
+    void SetOwnerGUID(ObjectGuid owner)
     {
         // Owner already found and different than expected owner - remove object from old owner
         if (owner && GetOwnerGUID() && GetOwnerGUID() != owner)
@@ -773,9 +773,9 @@ public:
             ABORT();
         }
         m_spawnedByDefault = false;                     // all object with owner is despawned after delay
-        SetUInt64Value(OBJECT_FIELD_CREATED_BY, owner);
+        SetGuidValue(OBJECT_FIELD_CREATED_BY, owner);
     }
-    [[nodiscard]] uint64 GetOwnerGUID() const { return GetUInt64Value(OBJECT_FIELD_CREATED_BY); }
+    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(OBJECT_FIELD_CREATED_BY); }
     [[nodiscard]] Unit* GetOwner() const;
 
     void SetSpellId(uint32 id)
@@ -822,7 +822,7 @@ public:
     void SetGoArtKit(uint8 artkit);
     [[nodiscard]] uint8 GetGoAnimProgress() const { return GetByteValue(GAMEOBJECT_BYTES_1, 3); }
     void SetGoAnimProgress(uint8 animprogress) { SetByteValue(GAMEOBJECT_BYTES_1, 3, animprogress); }
-    static void SetGoArtKit(uint8 artkit, GameObject* go, uint32 lowguid = 0);
+    static void SetGoArtKit(uint8 artkit, GameObject* go, ObjectGuid::LowType lowguid = 0);
 
     void SetPhaseMask(uint32 newPhaseMask, bool update) override;
     void EnableCollision(bool enable);
@@ -840,11 +840,11 @@ public:
     void RemoveLootMode(uint16 lootMode) { m_LootMode &= ~lootMode; }
     void ResetLootMode() { m_LootMode = LOOT_MODE_DEFAULT; }
 
-    void AddToSkillupList(uint32 PlayerGuidLow) { m_SkillupList.push_back(PlayerGuidLow); }
-    [[nodiscard]] bool IsInSkillupList(uint32 PlayerGuidLow) const
+    void AddToSkillupList(ObjectGuid playerGuid) { m_SkillupList.push_back(playerGuid); }
+    [[nodiscard]] bool IsInSkillupList(ObjectGuid playerGuid) const
     {
-        for (unsigned int i : m_SkillupList)
-            if (i == PlayerGuidLow)
+        for (ObjectGuid const guid : m_SkillupList)
+            if (guid == playerGuid)
                 return true;
 
         return false;
@@ -961,16 +961,16 @@ protected:
     bool        m_spawnedByDefault;
     uint32       m_cooldownTime;                         // used as internal reaction delay time store (not state change reaction).
     // For traps this: spell casting cooldown, for doors/buttons: reset time.
-    std::list<uint32> m_SkillupList;
+    GuidList m_SkillupList;
 
-    uint32 m_ritualOwnerGUIDLow;                              // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
-    std::set<uint64> m_unique_users;
+    ObjectGuid m_ritualOwnerGUID;                       // used for GAMEOBJECT_TYPE_SUMMONING_RITUAL where GO is not summoned (no owner)
+    GuidSet m_unique_users;
     uint32 m_usetimes;
 
-    typedef std::map<uint32, uint64> ChairSlotAndUser;
+    typedef std::map<uint32, ObjectGuid> ChairSlotAndUser;
     ChairSlotAndUser ChairListSlots;
 
-    uint32 m_DBTableGuid;                               ///< For new or temporary gameobjects is 0 for saved it is lowguid
+    ObjectGuid::LowType m_spawnId;                            ///< For new or temporary gameobjects is 0 for saved it is lowguid
     GameObjectTemplate const* m_goInfo;
     GameObjectData const* m_goData;
     GameObjectValue m_goValue;
@@ -980,7 +980,7 @@ protected:
     G3D::Quat m_worldRotation;
     Position m_stationaryPosition;
 
-    uint64 m_lootRecipient;
+    ObjectGuid m_lootRecipient;
     uint32 m_lootRecipientGroup;
     uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
     uint32 m_lootGenerationTime;

@@ -486,7 +486,7 @@ void AchievementMgr::Reset()
 
     m_completedAchievements.clear();
     m_criteriaProgress.clear();
-    DeleteFromDB(m_player->GetGUIDLow());
+    DeleteFromDB(m_player->GetGUID().GetCounter());
 
     // re-fill data
     CheckAllAchievementCriteria();
@@ -519,7 +519,7 @@ void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condi
     }
 }
 
-void AchievementMgr::DeleteFromDB(uint32 lowguid)
+void AchievementMgr::DeleteFromDB(ObjectGuid::LowType lowguid)
 {
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -545,11 +545,11 @@ void AchievementMgr::SaveToDB(SQLTransaction& trans)
 
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENT_BY_ACHIEVEMENT);
             stmt->setUInt16(0, iter->first);
-            stmt->setUInt32(1, GetPlayer()->GetGUID());
+            stmt->setUInt32(1, GetPlayer()->GetGUID().GetCounter());
             trans->Append(stmt);
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACHIEVEMENT);
-            stmt->setUInt32(0, GetPlayer()->GetGUID());
+            stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
             stmt->setUInt16(1, iter->first);
             stmt->setUInt32(2, uint32(iter->second.date));
             trans->Append(stmt);
@@ -568,7 +568,7 @@ void AchievementMgr::SaveToDB(SQLTransaction& trans)
                 continue;
 
             PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENT_PROGRESS_BY_CRITERIA);
-            stmt->setUInt32(0, GetPlayer()->GetGUID());
+            stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
             stmt->setUInt16(1, iter->first);
             trans->Append(stmt);
 
@@ -576,7 +576,7 @@ void AchievementMgr::SaveToDB(SQLTransaction& trans)
             if (iter->second.counter)
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACHIEVEMENT_PROGRESS);
-                stmt->setUInt32(0, GetPlayer()->GetGUID());
+                stmt->setUInt32(0, GetPlayer()->GetGUID().GetCounter());
                 stmt->setUInt16(1, iter->first);
                 stmt->setUInt32(2, iter->second.counter);
                 stmt->setUInt32(3, uint32(iter->second.date));
@@ -681,7 +681,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
         {
             WorldPacket data(SMSG_SERVER_FIRST_ACHIEVEMENT, guild->GetName().size() + 1 + 8 + 4 + 4);
             data << guild->GetName();
-            data << uint64(GetPlayer()->GetGUID());
+            data << GetPlayer()->GetGUID();
             data << uint32(achievement->ID);
             data << uint32(0);                                  // display name as plain string in chat (always 0 for guild)
             sWorld->SendGlobalMessage(&data);
@@ -693,7 +693,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
             // broadcast realm first reached
             WorldPacket data(SMSG_SERVER_FIRST_ACHIEVEMENT, GetPlayer()->GetName().size() + 1 + 8 + 4 + 4);
             data << GetPlayer()->GetName();
-            data << uint64(GetPlayer()->GetGUID());
+            data << GetPlayer()->GetGUID();
             data << uint32(achievement->ID);
             std::size_t linkTypePos = data.wpos();
             data << uint32(1);                                  // display name as clickable link in chat
@@ -719,7 +719,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     }
 
     WorldPacket data(SMSG_ACHIEVEMENT_EARNED, 8 + 4 + 8);
-    data.append(GetPlayer()->GetPackGUID());
+    data << GetPlayer()->GetPackGUID();
     data << uint32(achievement->ID);
     data.AppendPackedTime(time(nullptr));
     data << uint32(0);
@@ -734,7 +734,7 @@ void AchievementMgr::SendCriteriaUpdate(AchievementCriteriaEntry const* entry, C
     // the counter is packed like a packed Guid
     data.appendPackGUID(progress->counter);
 
-    data.append(GetPlayer()->GetPackGUID());
+    data << GetPlayer()->GetPackGUID();
     if (!entry->timeLimit)
         data << uint32(0);
     else
@@ -2026,7 +2026,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
         return;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("achievement", "AchievementMgr::SetCriteriaProgress(%u, %u) for (GUID:%u)", entry->ID, changeValue, m_player->GetGUIDLow());
+    LOG_DEBUG("achievement", "AchievementMgr::SetCriteriaProgress(%u, %u) for %s", entry->ID, changeValue, m_player->GetGUID().ToString().c_str());
 #endif
 
     CriteriaProgress* progress = GetCriteriaProgress(entry);
@@ -2289,7 +2289,7 @@ void AchievementMgr::SendAllAchievementData() const
 void AchievementMgr::SendRespondInspectAchievements(Player* player) const
 {
     WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 9 + m_completedAchievements.size() * 8 + 4 + 4);
-    data.append(GetPlayer()->GetPackGUID());
+    data << GetPlayer()->GetPackGUID();
     BuildAllDataPacket(&data, true);
     player->GetSession()->SendPacket(&data);
 }
@@ -2320,7 +2320,7 @@ void AchievementMgr::BuildAllDataPacket(WorldPacket* data, bool inspect) const
         {
             *data << uint32(iter->first);
             data->appendPackGUID(iter->second.counter);
-            data->append(GetPlayer()->GetPackGUID());
+            *data << GetPlayer()->GetPackGUID();
             *data << uint32(0);
             data->AppendPackedTime(iter->second.date);
             *data << uint32(0);
