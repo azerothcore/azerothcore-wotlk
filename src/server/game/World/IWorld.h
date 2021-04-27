@@ -7,6 +7,7 @@
 
 #include "Callback.h"
 #include "Common.h"
+#include "ObjectGuid.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
 #include "Timer.h"
@@ -15,6 +16,7 @@
 #include <map>
 #include <set>
 
+class WorldPacket;
 class WorldSession;
 class Player;
 
@@ -125,15 +127,6 @@ enum WorldBoolConfigs
     CONFIG_SHOW_KICK_IN_WORLD,
     CONFIG_SHOW_MUTE_IN_WORLD,
     CONFIG_SHOW_BAN_IN_WORLD,
-    CONFIG_CHATLOG_CHANNEL,
-    CONFIG_CHATLOG_WHISPER,
-    CONFIG_CHATLOG_SYSCHAN,
-    CONFIG_CHATLOG_PARTY,
-    CONFIG_CHATLOG_RAID,
-    CONFIG_CHATLOG_GUILD,
-    CONFIG_CHATLOG_PUBLIC,
-    CONFIG_CHATLOG_ADDON,
-    CONFIG_CHATLOG_BGROUND,
     CONFIG_AUTOBROADCAST,
     CONFIG_ALLOW_TICKETS,
     CONFIG_DELETE_CHARACTER_TICKET_TRACE,
@@ -476,7 +469,7 @@ enum Rates
 // xinef: global storage
 struct GlobalPlayerData
 {
-    uint32 guidLow;
+    ObjectGuid::LowType guidLow;
     uint32 accountId;
     std::string name;
     uint8 race;
@@ -495,7 +488,7 @@ public:
     virtual ~IWorld() {}
     virtual WorldSession* FindSession(uint32 id) const = 0;
     virtual WorldSession* FindOfflineSession(uint32 id) const = 0;
-    virtual WorldSession* FindOfflineSessionForCharacterGUID(uint32 guidLow) const = 0;
+    virtual WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const = 0;
     virtual void AddSession(WorldSession* s) = 0;
     virtual void SendAutoBroadcast() = 0;
     virtual bool KickSession(uint32 id) = 0;
@@ -571,16 +564,16 @@ public:
     virtual void KickAllLess(AccountTypes sec) = 0;
     virtual uint32 GetNextWhoListUpdateDelaySecs() = 0;
     virtual void LoadGlobalPlayerDataStore() = 0;
-    virtual uint32 GetGlobalPlayerGUID(std::string const& name) const = 0;
-    virtual GlobalPlayerData const* GetGlobalPlayerData(uint32 guid) const = 0;
-    virtual void AddGlobalPlayerData(uint32 guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId) = 0;
-    virtual void UpdateGlobalPlayerData(uint32 guid, uint8 mask, std::string const& name, uint8 level = 0, uint8 gender = 0, uint8 race = 0, uint8 playerClass = 0) = 0;
-    virtual void UpdateGlobalPlayerMails(uint32 guid, int16 count, bool add = true) = 0;
-    virtual void UpdateGlobalPlayerGuild(uint32 guid, uint32 guildId) = 0;
-    virtual void UpdateGlobalPlayerGroup(uint32 guid, uint32 groupId) = 0;
-    virtual void UpdateGlobalPlayerArenaTeam(uint32 guid, uint8 slot, uint32 arenaTeamId) = 0;
-    virtual void UpdateGlobalNameData(uint32 guidLow, std::string const& oldName, std::string const& newName) = 0;
-    virtual void DeleteGlobalPlayerData(uint32 guid, std::string const& name) = 0;
+    virtual ObjectGuid GetGlobalPlayerGUID(std::string const& name) const = 0;
+    virtual GlobalPlayerData const* GetGlobalPlayerData(ObjectGuid::LowType guid) const = 0;
+    virtual void AddGlobalPlayerData(ObjectGuid::LowType guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId) = 0;
+    virtual void UpdateGlobalPlayerData(ObjectGuid::LowType guid, uint8 mask, std::string const& name, uint8 level = 0, uint8 gender = 0, uint8 race = 0, uint8 playerClass = 0) = 0;
+    virtual void UpdateGlobalPlayerMails(ObjectGuid::LowType guid, int16 count, bool add = true) = 0;
+    virtual void UpdateGlobalPlayerGuild(ObjectGuid::LowType guid, uint32 guildId) = 0;
+    virtual void UpdateGlobalPlayerGroup(ObjectGuid::LowType guid, uint32 groupId) = 0;
+    virtual void UpdateGlobalPlayerArenaTeam(ObjectGuid::LowType guid, uint8 slot, uint32 arenaTeamId) = 0;
+    virtual void UpdateGlobalNameData(ObjectGuid::LowType guidLow, std::string const& oldName, std::string const& newName) = 0;
+    virtual void DeleteGlobalPlayerData(ObjectGuid::LowType guid, std::string const& name) = 0;
     virtual void ProcessCliCommands() = 0;
     virtual void QueueCliCommand(CliCommandHolder* commandHolder) = 0;
     virtual void ForceGameEventUpdate() = 0;
@@ -597,6 +590,7 @@ public:
     virtual time_t GetNextTimeWithMonthAndHour(int8 month, int8 hour) = 0;
     virtual std::string const& GetRealmName() const = 0;
     virtual void SetRealmName(std::string name) = 0;
+    virtual void RemoveOldCorpses() = 0;
 };
 
 #endif //AZEROTHCORE_IWORLD_H
