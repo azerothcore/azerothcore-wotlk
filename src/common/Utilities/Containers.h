@@ -222,7 +222,7 @@ namespace acore::Containers
             {
                 ++it;
             }
-        }       
+        }
     }
 }
 
