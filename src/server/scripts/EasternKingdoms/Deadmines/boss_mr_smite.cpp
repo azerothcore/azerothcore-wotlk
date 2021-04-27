@@ -110,7 +110,7 @@ public:
                         events.ScheduleEvent(EVENT_SMITE_SLAM, 6000);
                         break;
                     }
-                    events.ScheduleEvent(EVENT_SMITE_SLAM, 500)
+                    events.ScheduleEvent(EVENT_SMITE_SLAM, 500);
                     break;
                 case EVENT_SWAP_WEAPON1:
                     me->LoadEquipment(EQUIP_TWO_SWORDS);
