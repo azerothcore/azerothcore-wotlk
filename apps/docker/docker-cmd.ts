@@ -24,32 +24,29 @@ shellCommandFactory(
   ["docker-compose --profile app up -d"],
 );
 
-shellCommandFactory(
-  "start:dev",
-  "Startup the dev server",
-  ["docker-compose --profile dev up"],
-);
-
 shellCommandFactory("build", "Build the authserver and worldserver", [
   "docker-compose --profile all build",
   "docker-compose run --rm ac-build bash bin/acore-docker-update",
 ]);
 
 shellCommandFactory(
-    "build:clean",
-    "Clean and run build",
-    [
-      "docker-compose --profile all build",
-      `docker-compose run --rm ac-build bash acore.sh compiler clean`,
-      "docker-compose run --rm ac-build bash bin/acore-docker-update",
-    ],
-  );
+  "build:clean",
+  "Clean and run build",
+  [
+    "docker-compose --profile all build",
+    `docker-compose run --rm ac-build bash acore.sh compiler clean`,
+    "docker-compose run --rm ac-build bash bin/acore-docker-update",
+  ],
+);
 
-
-shellCommandFactory("build:nocache", "Build the authserver and worldserver without docker cache", [
+shellCommandFactory(
+  "build:nocache",
+  "Build the authserver and worldserver without docker cache",
+  [
     "docker-compose --profile all build --no-cache",
     "docker-compose run --rm ac-build bash bin/acore-docker-update",
-]);
+  ],
+);
 
 shellCommandFactory(
   "client-data",
@@ -64,9 +61,27 @@ shellCommandFactory(
 );
 
 shellCommandFactory(
-  "dashboard [args...]",
+  "dev:up",
+  "Start the dev server container",
+  ["docker-compose up ac-dev-server"],
+);
+
+shellCommandFactory(
+  "dev:build",
+  "Build using the dev server, it uses volumes to compile which can be faster on linux & WSL",
+  ["docker-compose run --rm ac-dev-server bash acore.sh compiler build"],
+);
+
+shellCommandFactory(
+  "dev:dash [args...]",
   "Execute acore dashboard within a running ac-dev-server",
   ["docker-compose run --rm ac-dev-server bash acore.sh"],
+);
+
+shellCommandFactory(
+  "dev:shell [args...]",
+  "Open an interactive shell within the dev server",
+  ["docker-compose run --rm ac-dev-server bash"],
 );
 
 program
@@ -147,9 +162,13 @@ while (true) {
     const command = await Input.prompt({
       message: "Enter the command:",
     });
-    await program.parseAsync(command.split(" "));
+    await program.parseAsync(command.split(" ")).catch((reason)=> {
+        throw new Error(reason);
+    });;
   } else {
-    await program.parseAsync(Deno.args);
+    await program.parseAsync(Deno.args).catch((reason)=> {
+        throw new Error(reason);
+    });
     process.exit(0);
   }
 }
@@ -197,7 +216,9 @@ function shellCommandFactory(
         const status = await shellCmd.status();
 
         if (!status.success) {
-          throw new Error(`Failed with error: ${status.code}`);
+          throw new Error(`Failed with error: ${status.code}, however,
+            it's not related to this command directly. An error occurred within
+            the script called by the command itself`);
         }
 
         shellCmd.close();
