@@ -82,13 +82,14 @@ services:
     privileged: true
     build:
       context: .
-      target: worldserver-without-data
+      target: ${DOCKER_BUILD_WORLD_TARGET:-worldserver-local}
       dockerfile: ./apps/docker/Dockerfile
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-        SKIP_SRV_BUILD: ${SKIP_SRV_BUILD:-1}
+      cache_from:
+        - acore/authserver:${DOCKER_IMAGE_TAG:-master}
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
@@ -106,13 +107,14 @@ services:
     user: ${DOCKER_USER:-acore}
     build:
       context: .
-      target: authserver
+      target: ${DOCKER_BUILD_AUTH_TARGET:-authserver-local}
       dockerfile: ./apps/docker/Dockerfile
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-        SKIP_SRV_BUILD: ${SKIP_SRV_BUILD:-1}
+      cache_from:
+        - acore/worldserver:${DOCKER_IMAGE_TAG:-master}
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [all, app, authserver]
@@ -133,6 +135,8 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
+      cache_from:
+        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     working_dir: /azerothcore/
@@ -146,6 +150,16 @@ services:
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     tty: true
     image: acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+    build:
+      context: .
+      target: dev
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      cache_from:
+        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
     security_opt:
       - seccomp:unconfined
     env_file:
@@ -163,8 +177,6 @@ services:
     depends_on:
       ac-database:
         condition: service_healthy
-      ac-build:
-        condition: service_started
 
 volumes:
   ac-database:

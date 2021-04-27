@@ -5,7 +5,7 @@
 #
 #=================================================================
 
-FROM ubuntu:20.04 as dev
+FROM ubuntu:20.04 as base
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 ARG DOCKER_USER=acore
@@ -57,21 +57,17 @@ USER $DOCKER_USER
 # copy everything so we can work directly within the container
 # using tools such as vscode dev-container
 # NOTE: this folder is different by the /azerothcore (which is binded instead)
-COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
-
-#================================================================
-#
-# BUILD: compile sources
-#
-#=================================================================
-
-FROM dev as build
-
-ARG SKIP_SRV_BUILD=0
+COPY . /azerothcore
 
 WORKDIR /azerothcore
 
-RUN if [ "$SKIP_SRV_BUILD" != "1" ]; then bin/acore-docker-build; fi
+#================================================================
+#
+# Dev: create dev server image
+#
+#=================================================================
+
+FROM base as dev
 
 #================================================================
 #
@@ -98,8 +94,6 @@ RUN addgroup --gid $GROUP_ID acore && \
     adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
     passwd -d acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
-
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env /azerothcore/env
 
 # copy the sources from the host machine
 COPY --chown=$DOCKER_USER:$DOCKER_USER apps /azerothcore/apps
@@ -133,25 +127,49 @@ WORKDIR /azerothcore/
 
 #================================================================
 #
-# AUTH SERVICE: create a ready-to-use authserver image
+# AUTH & WORLD local: images used for local services
+# These images don't include binaries by default
 #
 #=================================================================
 
-FROM servicebase as authserver
+FROM servicebase as authserver-local
 
 CMD ./acore.sh run-authserver
+
+FROM servicebase as worldserver-local
+
+CMD ./acore.sh run-worldserver
+
+#================================================================
+#
+# BUILD: compile sources
+#
+#=================================================================
+FROM base as build
+
+RUN bash bin/acore-docker-build
+
+#================================================================
+#
+# AUTH SERVICE: create a ready-to-use authserver image
+# with binaries included
+#
+#=================================================================
+FROM authserver-local as authserver
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/etc /azerothcore/env/etc
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/bin/authserver /azerothcore/env/bin/authserver
 
 #================================================================
 #
 # WORLD SERVICE: create a ready-to-use worldserver image
+# with binaries and data included
 #
 #=================================================================
+FROM authserver-local as worldserver
 
-FROM servicebase as worldserver-without-data
-
-CMD ./acore.sh run-worldserver
-
-FROM worldserver-without-data as worldserver
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/etc /azerothcore/env/etc
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/bin/worldserver /azerothcore/env/bin/worldserver
 
 ENV DATAPATH=/azerothcore/env/dist/data
 
