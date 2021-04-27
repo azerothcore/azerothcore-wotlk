@@ -217,7 +217,7 @@ function shellCommandFactory(
 
         if (!status.success) {
           throw new Error(`Failed with error: ${status.code}, however,
-            it's not related to this command directly. An error occurred within
+            it's not related to this Deno script directly. An error occurred within
             the script called by the command itself`);
         }
 
