@@ -79,7 +79,7 @@ void GmTicket::SaveToDB(SQLTransaction& trans) const
     stmt->setFloat (++index, _posY);
     stmt->setFloat (++index, _posZ);
     stmt->setUInt32(++index, uint32(_lastModifiedTime));
-    stmt->setInt32 (++index, _closedBy.GetCounter());
+    stmt->setInt32 (++index, int32(_closedBy.GetCounter()));
     stmt->setUInt32(++index, _assignedTo.GetCounter());
     stmt->setString(++index, _comment);
     stmt->setString(++index, _response);
@@ -87,7 +87,7 @@ void GmTicket::SaveToDB(SQLTransaction& trans) const
     stmt->setUInt8 (++index, uint8(_escalatedStatus));
     stmt->setBool  (++index, _viewed);
     stmt->setBool  (++index, _needMoreHelp);
-    stmt->setInt32 (++index, _resolvedBy.GetCounter());
+    stmt->setInt32 (++index, int32(_resolvedBy.GetCounter()));
 
     CharacterDatabase.ExecuteOrAppend(trans, stmt);
 }
