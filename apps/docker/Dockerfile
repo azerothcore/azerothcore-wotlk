@@ -57,7 +57,7 @@ USER $DOCKER_USER
 # copy everything so we can work directly within the container
 # using tools such as vscode dev-container
 # NOTE: this folder is different by the /azerothcore (which is binded instead)
-COPY . /azerothcore
+COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
 
 WORKDIR /azerothcore
 
@@ -114,6 +114,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone &
 RUN mkdir -p /azerothcore/env/dist/data
 RUN mkdir -p /azerothcore/env/dist/logs
 RUN mkdir -p /azerothcore/env/dist/etc
+RUN mkdir -p /azerothcore/env/dist/bin
 
 # Correct permissions for non-root operations
 RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore
@@ -157,8 +158,8 @@ RUN bash bin/acore-docker-build
 #=================================================================
 FROM authserver-local as authserver
 
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/etc /azerothcore/env/etc
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/bin/authserver /azerothcore/env/bin/authserver
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/etc /azerothcore/env/dist/etc
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/authserver /azerothcore/env/dist/bin/authserver
 
 #================================================================
 #
@@ -168,8 +169,8 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/bin/authser
 #=================================================================
 FROM authserver-local as worldserver
 
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/etc /azerothcore/env/etc
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/bin/worldserver /azerothcore/env/bin/worldserver
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/etc /azerothcore/env/dist/etc
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/worldserver /azerothcore/env/dist/bin/worldserver
 
 ENV DATAPATH=/azerothcore/env/dist/data
 
