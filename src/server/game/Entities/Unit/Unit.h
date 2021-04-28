@@ -135,6 +135,10 @@ enum SpellFacingFlags
 #define BASE_MAXDAMAGE 2.0f
 #define BASE_ATTACK_TIME 2000
 
+constexpr uint32 HAND_OF_SACRIFICE = 6940;
+constexpr uint32 DIVINE_SACRIFICE  = 64205;
+constexpr uint32 HUNGERING_COLD    = 51209;
+
 enum UnitBytes1Offsets : uint8
 {
     UNIT_BYTES_1_OFFSET_STAND_STATE = 0,

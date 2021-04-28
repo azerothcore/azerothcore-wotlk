@@ -2073,6 +2073,17 @@ void Unit::CalcAbsorbResist(Unit* attacker, Unit* victim, SpellSchoolMask school
                 if (!caster->IsWithinLOSInMap(victim) || !caster->IsWithinDist(victim, splitSpellInfo->GetMaxRange(splitSpellInfo->IsPositive(), caster)))
                     continue;
 
+			switch ((*itr)->GetId())
+            {
+				case HAND_OF_SACRIFICE:
+                case DIVINE_SACRIFICE:
+                {
+					if (caster->HasAura(HUNGERING_COLD))
+						caster->RemoveAura(HUNGERING_COLD);
+                    break;
+                }
+            }
+
             uint32 splitDamage = CalculatePct(dmgInfo.GetDamage(), (*itr)->GetAmount());
             SpellSchoolMask splitSchoolMask  = schoolMask;
 
