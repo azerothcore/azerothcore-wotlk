@@ -1726,7 +1726,7 @@ void ScriptMgr::OnGetMaxPersonalArenaRatingRequirement(const Player* player, uin
     FOREACH_SCRIPT(PlayerScript)->OnGetMaxPersonalArenaRatingRequirement(player, minSlot, maxArenaRating);
 }
 
-void ScriptMgr::OnBeforeLootItem(Player* player, LootItem* item, uint64 lootguid)
+void ScriptMgr::OnBeforeLootItem(Player* player, LootItem* item, ObjectGuid lootguid)
 {
     FOREACH_SCRIPT(PlayerScript)->OnBeforeLootItem(player, item, lootguid);
 }
