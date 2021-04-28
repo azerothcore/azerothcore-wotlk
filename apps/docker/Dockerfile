@@ -126,6 +126,9 @@ USER $DOCKER_USER
 
 WORKDIR /azerothcore/
 
+RUN dos2unix acore.sh
+RUN dos2unix apps/startup-scripts/simple-restarter
+
 #================================================================
 #
 # AUTH & WORLD local: images used for local services
