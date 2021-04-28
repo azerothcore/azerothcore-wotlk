@@ -34,24 +34,24 @@ public:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string str_data;
 
-        std::list<uint64> VehicleList;
+        GuidList VehicleList;
         EventMap events;
         uint8 Counter;
         uint8 temp1, temp2;
         bool shortver;
         bool bAchievIveHadWorse;
 
-        uint64 NPC_AnnouncerGUID;
-        uint64 NPC_TirionGUID;
-        uint64 NPC_GrandChampionGUID[3];
-        uint64 NPC_GrandChampionMinionsGUID[3][3];
-        uint64 NPC_ArgentChampionGUID;
-        uint64 NPC_ArgentSoldierGUID[3][3];
-        uint64 NPC_MemoryEntry;
-        uint64 NPC_BlackKnightVehicleGUID;
-        uint64 NPC_BlackKnightGUID;
-        uint64 GO_MainGateGUID;
-        uint64 GO_EnterGateGUID;
+        ObjectGuid NPC_AnnouncerGUID;
+        ObjectGuid NPC_TirionGUID;
+        ObjectGuid NPC_GrandChampionGUID[3];
+        ObjectGuid NPC_GrandChampionMinionsGUID[3][3];
+        ObjectGuid NPC_ArgentChampionGUID;
+        ObjectGuid NPC_ArgentSoldierGUID[3][3];
+        uint32 NPC_MemoryEntry;
+        ObjectGuid NPC_BlackKnightVehicleGUID;
+        ObjectGuid NPC_BlackKnightGUID;
+        ObjectGuid GO_MainGateGUID;
+        ObjectGuid GO_EnterGateGUID;
 
         void Initialize() override
         {
@@ -68,18 +68,6 @@ public:
             temp2 = 0;
             shortver = false;
             bAchievIveHadWorse = true;
-
-            NPC_AnnouncerGUID = 0;
-            NPC_TirionGUID = 0;
-            memset(&NPC_GrandChampionGUID, 0, sizeof(NPC_GrandChampionGUID));
-            memset(&NPC_GrandChampionMinionsGUID, 0, sizeof(NPC_GrandChampionMinionsGUID));
-            memset(&NPC_ArgentSoldierGUID, 0, sizeof(NPC_ArgentSoldierGUID));
-            NPC_ArgentChampionGUID = 0;
-            NPC_MemoryEntry = 0;
-            NPC_BlackKnightVehicleGUID = 0;
-            NPC_BlackKnightGUID = 0;
-            GO_MainGateGUID = 0;
-            GO_EnterGateGUID = 0;
         }
 
         bool IsEncounterInProgress() const override
@@ -291,8 +279,8 @@ public:
                 case INSTANCE_PROGRESS_CHAMPION_GROUP_DIED_3:
                     // revert to INSTANCE_PROGRESS_INITIAL
                     {
-                        for( std::list<uint64>::const_iterator itr = VehicleList.begin(); itr != VehicleList.end(); ++itr )
-                            if( Creature* veh = instance->GetCreature(*itr) )
+                        for (ObjectGuid const guid : VehicleList)
+                            if (Creature* veh = instance->GetCreature(guid))
                             {
                                 veh->DespawnOrUnsummon();
                                 veh->SetRespawnTime(3);
@@ -303,11 +291,11 @@ public:
                             {
                                 if( Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[i][j]) )
                                     c->DespawnOrUnsummon();
-                                NPC_GrandChampionMinionsGUID[i][j] = 0;
+                                NPC_GrandChampionMinionsGUID[i][j].Clear();
                             }
                             if( Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
                                 c->DespawnOrUnsummon();
-                            NPC_GrandChampionGUID[i] = 0;
+                            NPC_GrandChampionGUID[i].Clear();
                         }
                         if( Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
                         {
@@ -372,14 +360,14 @@ public:
                             {
                                 if( Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]) )
                                     c->DespawnOrUnsummon();
-                                NPC_ArgentSoldierGUID[i][j] = 0;
+                                NPC_ArgentSoldierGUID[i][j].Clear();
                             }
                         if( Creature* c = instance->GetCreature(NPC_ArgentChampionGUID) )
                         {
                             c->AI()->DoAction(-1); // paletress despawn memory
                             c->DespawnOrUnsummon();
                         }
-                        NPC_ArgentChampionGUID = 0;
+                        NPC_ArgentChampionGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
                         {
                             c->DespawnOrUnsummon();
@@ -397,13 +385,13 @@ public:
                     {
                         if( Creature* c = instance->GetCreature(NPC_BlackKnightVehicleGUID) )
                             c->DespawnOrUnsummon();
-                        NPC_BlackKnightVehicleGUID = 0;
+                        NPC_BlackKnightVehicleGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_BlackKnightGUID) )
                         {
                             c->AI()->DoAction(-1);
                             c->DespawnOrUnsummon();
                         }
-                        NPC_BlackKnightGUID = 0;
+                        NPC_BlackKnightGUID.Clear();
                         if( Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
                         {
                             c->DespawnOrUnsummon();
@@ -444,7 +432,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 uiData) const override
+        ObjectGuid GetGuidData(uint32 uiData) const override
         {
             switch( uiData )
             {
@@ -454,7 +442,7 @@ public:
                     return NPC_ArgentChampionGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void SetData(uint32 uiType, uint32 uiData) override
@@ -579,8 +567,8 @@ public:
                             {
                                 Counter = 0;
                                 InstanceProgress = INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED;
-                                for( std::list<uint64>::const_iterator itr = VehicleList.begin(); itr != VehicleList.end(); ++itr )
-                                    if( Creature* veh = instance->GetCreature(*itr) )
+                                for (ObjectGuid const guid : VehicleList)
+                                    if (Creature* veh = instance->GetCreature(guid))
                                         veh->DespawnOrUnsummon();
                                 events.ScheduleEvent(EVENT_GRAND_CHAMPIONS_MOVE_SIDE, 0);
                             }

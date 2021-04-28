@@ -30,8 +30,8 @@ public:
 
     // Pass parameters between AI
     virtual void DoAction(int32 /*param = 0 */) {}
-    virtual void SetGUID(uint64 /*guid*/, int32 /*id = 0 */) {}
-    virtual uint64 GetGUID(int32 /*id = 0 */) const { return 0; }
+    virtual void SetGUID(ObjectGuid /*guid*/, int32 /*id = 0 */) {}
+    virtual ObjectGuid GetGUID(int32 /*id = 0 */) const { return ObjectGuid::Empty; }
 
     static int Permissible(GameObject const* go);
 
@@ -43,8 +43,6 @@ public:
     virtual uint32 GetDialogStatus(Player* /*player*/) { return DIALOG_STATUS_SCRIPTED_NO_STATUS; }
     virtual void Destroyed(Player* /*player*/, uint32 /*eventId*/) {}
     virtual uint32 GetData(uint32 /*id*/) const { return 0; }
-    virtual void SetData64(uint32 /*id*/, uint64 /*value*/) {}
-    virtual uint64 GetData64(uint32 /*id*/) const { return 0; }
     virtual void SetData(uint32 /*id*/, uint32 /*value*/) {}
     virtual void OnGameEvent(bool /*start*/, uint16 /*eventId*/) {}
     virtual void OnStateChanged(uint32 /*state*/, Unit* /*unit*/) {}
