@@ -14,20 +14,20 @@ INSERT INTO `pool_template` (`entry`,`max_limit`,`description`) VALUES (@POOL,@P
 -- Add gameobjects to pools
 DELETE FROM `pool_gameobject` WHERE FIND_IN_SET (`guid`,@GUID);
 INSERT INTO `pool_gameobject` (`guid`,`pool_entry`,`chance`,`description`) VALUES
-(16648,@POOL,0,@POOLDESC),
-(100067,@POOL,0,@POOLDESC),
-(16950,@POOL,0,@POOLDESC),
-(85851,@POOL,0,@POOLDESC),
-(100068,@POOL,0,@POOLDESC),
-(16946,@POOL,0,@POOLDESC),
-(87385,@POOL,0,@POOLDESC),
-(85710,@POOL,0,@POOLDESC),
-(16794,@POOL,0,@POOLDESC),
-(16949,@POOL,0,@POOLDESC),
-(100070,@POOL,0,@POOLDESC),
-(16978,@POOL,0,@POOLDESC),
-(16789,@POOL,0,@POOLDESC),
-(16977,@POOL,0,@POOLDESC);
+(16648,@POOL,0,'Solid Chest, Arathi Highlands, node 1'),
+(100067,@POOL,0,'Solid Chest, Arathi Highlands, node 2'),
+(16950,@POOL,0,'Solid Chest, Arathi Highlands, node 3'),
+(85851,@POOL,0,'Solid Chest, Arathi Highlands, node 4'),
+(100068,@POOL,0,'Solid Chest, Arathi Highlands, node 5'),
+(16946,@POOL,0,'Solid Chest, Arathi Highlands, node 6'),
+(87385,@POOL,0,'Solid Chest, Arathi Highlands, node 7'),
+(85710,@POOL,0,'Solid Chest, Arathi Highlands, node 8'),
+(16794,@POOL,0,'Solid Chest, Arathi Highlands, node 9'),
+(16949,@POOL,0,'Solid Chest, Arathi Highlands, node 10'),
+(100070,@POOL,0,'Solid Chest, Arathi Highlands, node 11'),
+(16978,@POOL,0,'Solid Chest, Arathi Highlands, node 12'),
+(16789,@POOL,0,'Solid Chest, Arathi Highlands, node 13'),
+(16977,@POOL,0,'Solid Chest, Arathi Highlands, node 14');
 
 -- Respawn rates of gameobjects
 UPDATE `gameobject` SET `spawntimesecs`=@RESPAWN WHERE FIND_IN_SET (`guid`,@GUID);
