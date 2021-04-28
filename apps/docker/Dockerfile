@@ -10,7 +10,7 @@ ARG USER_ID=1000
 ARG GROUP_ID=1000
 ARG DOCKER_USER=acore
 
-LABEL description="AC Worldserver Debug Container for use with Visual Studio"
+LABEL description="AC base image for dev containers"
 
 # List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
@@ -69,6 +69,8 @@ WORKDIR /azerothcore
 
 FROM base as dev
 
+LABEL description="AC dev image for dev containers"
+
 #================================================================
 #
 # SERVICE BASE: prepare the OS for the production-ready services
@@ -80,6 +82,8 @@ FROM ubuntu:20.04 as servicebase
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 ARG DOCKER_USER=acore
+
+LABEL description="AC service image for server applications"
 
 # List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
@@ -115,6 +119,8 @@ RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore
 RUN chown -R $DOCKER_USER:$DOCKER_USER /run
 RUN chown -R $DOCKER_USER:$DOCKER_USER /opt
 
+RUN chown $DOCKER_USER:$DOCKER_USER /azerothcore
+
 USER $DOCKER_USER
 
 # must be created to avoid permissions errors
@@ -134,9 +140,13 @@ WORKDIR /azerothcore/
 
 FROM servicebase as authserver-local
 
+LABEL description="AC authserver image for local environment"
+
 CMD ./acore.sh run-authserver
 
 FROM servicebase as worldserver-local
+
+LABEL description="AC worldserver image for local environment"
 
 CMD ./acore.sh run-worldserver
 
@@ -147,6 +157,8 @@ CMD ./acore.sh run-worldserver
 #=================================================================
 FROM base as build
 
+LABEL description="AC Image used by the build stage to generate production images"
+
 RUN bash bin/acore-docker-build
 
 #================================================================
@@ -156,6 +168,8 @@ RUN bash bin/acore-docker-build
 #
 #=================================================================
 FROM authserver-local as authserver
+
+LABEL description="AC Production ready authserver"
 
 ARG DOCKER_USER=acore
 
@@ -169,6 +183,8 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/au
 #
 #=================================================================
 FROM authserver-local as worldserver
+
+LABEL description="AC Production ready worldserver"
 
 ARG DOCKER_USER=acore
 
