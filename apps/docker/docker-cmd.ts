@@ -123,6 +123,9 @@ program
 
     let services = new TextDecoder().decode(output).split("\n");
 
+    if (!services)
+      console.error("No services available!");
+
     services.pop();
     services = services.slice(2);
 
@@ -175,13 +178,10 @@ while (true) {
     const command = await Input.prompt({
       message: "Enter the command:",
     });
-    await program.parseAsync(command.split(" ")).catch((reason) => {
-      throw new Error(reason);
-    });
+    console.log(command)
+    await program.parseAsync(command.split(" "));
   } else {
-    await program.parseAsync(Deno.args).catch((reason) => {
-      throw new Error(reason);
-    });
+    await program.parseAsync(Deno.args);
     process.exit(0);
   }
 }
