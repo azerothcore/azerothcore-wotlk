@@ -96,7 +96,7 @@ RUN addgroup --gid $GROUP_ID acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
 # install the required dependencies to run the server
-RUN apt-get update && apt-get install -y gdb gdbserver net-tools tzdata libmysqlclient-dev libace-dev mysql-client curl unzip && rm -rf /var/lib/apt/lists/* ;
+RUN apt-get update && apt-get install -y dos2unix gdb gdbserver net-tools tzdata libmysqlclient-dev libace-dev mysql-client curl unzip && rm -rf /var/lib/apt/lists/* ;
 
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
