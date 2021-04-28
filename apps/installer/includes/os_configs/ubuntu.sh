@@ -15,7 +15,7 @@ if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client \
   libncurses5-dev ccache curl unzip
 else
-  sudo apt-get install -y git gcc g++ \
+  sudo apt-get install -y git gcc g++ gdb gdbserver \
   libssl-dev libbz2-dev libreadline-dev libncurses-dev \
   mysql-server libace-6.*
 fi
