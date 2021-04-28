@@ -72,7 +72,7 @@ struct TargetInfo;
 
 #define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
 
-// Check out our guide on how to create new hooks in our wiki!
+// Check out our guide on how to create new hooks in our wiki! https://www.azerothcore.org/wiki/hooks-script
 /*
     TODO: Add more script type classes.
 
