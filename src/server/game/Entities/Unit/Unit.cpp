@@ -17294,7 +17294,9 @@ void Unit::SetControlled(bool apply, UnitState state)
         }
 
         if (GetTypeId() == TYPEID_PLAYER)
+        {
             sScriptMgr->AnticheatSetRootACKUpd(ToPlayer());
+        }
     }
     else
     {
@@ -17513,7 +17515,9 @@ void Unit::SetFeared(bool apply)
         GetMotionMaster()->MoveFleeing(caster, fearAuras.empty() ? sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_FLEE_DELAY) : 0);             // caster == nullptr processed in MoveFleeing
 
         if (GetTypeId() == TYPEID_PLAYER)
+        {
             sScriptMgr->AnticheatSetSkipOnePacketForASH(ToPlayer(), true);
+        }
     }
     else
     {
@@ -17548,7 +17552,9 @@ void Unit::SetConfused(bool apply)
         GetMotionMaster()->MoveConfused();
 
         if (GetTypeId() == TYPEID_PLAYER)
+        {
             sScriptMgr->AnticheatSetSkipOnePacketForASH(ToPlayer(), true);
+        }
     }
     else
     {
@@ -17878,7 +17884,9 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     }
 
     if (Player* player = ToPlayer())
+    {
         sScriptMgr->AnticheatSetUnderACKmount(player);
+    }
 
     // xinef: restore threat
     for (CharmThreatMap::const_iterator itr = _charmThreatInfo.begin(); itr != _charmThreatInfo.end(); ++itr)

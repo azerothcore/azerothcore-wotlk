@@ -1115,7 +1115,9 @@ void Spell::EffectJump(SpellEffIndex effIndex)
     m_caster->GetMotionMaster()->MoveJump(*unitTarget, speedXY, speedZ);
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
         sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+    }
 }
 
 void Spell::EffectJumpDest(SpellEffIndex effIndex)
@@ -1147,7 +1149,9 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
         m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ, 0, ObjectAccessor::GetUnit(*m_caster, m_caster->GetGuidValue(UNIT_FIELD_TARGET)));
 
         if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        {
             sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+        }
 
         return;
     }
@@ -1165,7 +1169,9 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
         sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+    }
 }
 
 void Spell::CalculateJumpSpeeds(uint8 i, float dist, float& speedXY, float& speedZ)
@@ -1188,7 +1194,9 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
         return;
 
     if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    {
         sScriptMgr->AnticheatSetUnderACKmount(unitTarget->ToPlayer());
+    }
 
     // Pre effects
     switch (m_spellInfo->Id)
@@ -5070,7 +5078,9 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             return;
 
         if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        {
             sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
+        }
 
         // charge changes fall time
         if( m_caster->GetTypeId() == TYPEID_PLAYER )
@@ -5081,7 +5091,9 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             m_caster->GetMotionMaster()->MoveCharge(m_pathFinder->GetEndPosition().x, m_pathFinder->GetEndPosition().y, m_pathFinder->GetEndPosition().z, 42.0f, EVENT_CHARGE, &m_pathFinder->GetPath());
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
+            {
                 sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+            }
 
             m_caster->AddUnitState(UNIT_STATE_CHARGING);
         }
@@ -5100,7 +5112,9 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
             m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ + Z_OFFSET_FIND_HEIGHT);
 
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
+            {
                 sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+            }
 
             m_caster->AddUnitState(UNIT_STATE_CHARGING);
         }
@@ -5114,7 +5128,9 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         m_caster->ClearUnitState(UNIT_STATE_CHARGING);
 
         if (m_caster->ToPlayer())
+        {
             sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
+        }
 
         // not all charge effects used in negative spells
         if (!m_spellInfo->IsPositive() && m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -5128,7 +5144,9 @@ void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
         return;
 
     if (m_caster->ToPlayer())
+    {
         sScriptMgr->AnticheatSetSkipOnePacketForASH(m_caster->ToPlayer(), true);
+    }
 
     if (m_targets.HasDst())
     {
@@ -5145,7 +5163,9 @@ void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
         m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
 
         if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        {
             sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+        }
     }
 }
 
@@ -5201,7 +5221,9 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
     unitTarget->KnockbackFrom(x, y, speedxy, speedz);
 
     if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    {
         sScriptMgr->AnticheatSetUnderACKmount(unitTarget->ToPlayer());
+    }
 }
 
 void Spell::EffectLeapBack(SpellEffIndex effIndex)
@@ -5218,7 +5240,9 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
     m_caster->JumpTo(speedxy, speedz, m_spellInfo->SpellFamilyName != SPELLFAMILY_HUNTER);
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
         sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
+    }
 
     // xinef: changes fall time
     if (m_caster->GetTypeId() == TYPEID_PLAYER)

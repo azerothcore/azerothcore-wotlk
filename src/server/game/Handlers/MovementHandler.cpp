@@ -472,7 +472,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LANDING); // Parachutes
 
         if (plrMover)
+        {
             sScriptMgr->AnticheatSetJumpingbyOpcode(plrMover, false);
+        }
     }
 
     if (plrMover && ((movementInfo.flags & MOVEMENTFLAG_SWIMMING) != 0) != plrMover->IsInWater())
