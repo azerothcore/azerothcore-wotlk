@@ -7579,7 +7579,6 @@ void Player::SetArenaPoints(uint32 value)
 
 void Player::ModifyHonorPoints(int32 value, SQLTransaction* trans /*=nullptr*/)
 {
-
     sScriptMgr->OnPlayerHonorChange(this, value);
 
     int32 newValue = int32(GetHonorPoints()) + value;
@@ -7598,7 +7597,6 @@ void Player::ModifyHonorPoints(int32 value, SQLTransaction* trans /*=nullptr*/)
 
 void Player::ModifyArenaPoints(int32 value, SQLTransaction* trans /*=nullptr*/)
 {
-
     sScriptMgr->OnPlayerArenaPointsChange(this, value);
 
     int32 newValue = int32(GetArenaPoints()) + value;
