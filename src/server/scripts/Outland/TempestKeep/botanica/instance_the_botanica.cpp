@@ -105,8 +105,8 @@ public:
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            for (std::set<uint64>::const_iterator itr = _falconSet.begin(); itr != _falconSet.end(); ++itr)
-                if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), *itr))
+            for (ObjectGuid const guid : _falconSet)
+                if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
                 {
                     falcon->TauntFadeOut(GetUnitOwner());
                     falcon->AddThreat(GetUnitOwner(), -10000000.0f);
@@ -120,7 +120,7 @@ public:
         }
 
     private:
-        std::set<uint64> _falconSet;
+        GuidSet _falconSet;
     };
 
     AuraScript* GetAuraScript() const override

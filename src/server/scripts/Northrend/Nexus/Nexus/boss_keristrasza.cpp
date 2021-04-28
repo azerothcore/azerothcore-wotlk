@@ -152,7 +152,7 @@ public:
                         for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
                             if (Aura* aur = itr->GetSource()->GetAura(SPELL_INTENSE_COLD_TRIGGER))
                                 if (aur->GetStackAmount() > 2)
-                                    aGuids.insert(itr->GetSource()->GetGUIDLow());
+                                    aGuids.insert(itr->GetSource()->GetGUID().GetCounter());
                         events.ScheduleEvent(EVENT_ACHIEVEMENT_CHECK, 500);
                         break;
                     }
@@ -191,7 +191,7 @@ public:
         if (!target)
             return false;
 
-        return target->GetAI()->GetData(player->GetGUIDLow());
+        return target->GetAI()->GetData(player->GetGUID().GetCounter());
     }
 };
 
