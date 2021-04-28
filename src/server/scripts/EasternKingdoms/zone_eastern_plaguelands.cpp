@@ -74,7 +74,7 @@ public:
 
         SummonList summons;
         EventMap events;
-        uint64 _playerGUID;
+        ObjectGuid _playerGUID;
         uint8 _counter;
         uint8 _savedCount;
         uint8 _deathCount;
@@ -88,7 +88,7 @@ public:
             _savedCount = 0;
             _deathCount = 0;
             _counter = 0;
-            _playerGUID = 0;
+            _playerGUID.Clear();
             events.Reset();
             summons.DespawnAll();
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
@@ -99,7 +99,7 @@ public:
             _faction = faction;
         }
 
-        void SetGUID(uint64 guid, int32) override
+        void SetGUID(ObjectGuid guid, int32) override
         {
             _playerGUID = guid;
             me->SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
@@ -242,7 +242,7 @@ public:
 
     struct npc_balance_of_light_and_shadowAI : public NullCreatureAI
     {
-        npc_balance_of_light_and_shadowAI(Creature* creature) : NullCreatureAI(creature) { timer = 0; _targetGUID = 0; }
+        npc_balance_of_light_and_shadowAI(Creature* creature) : NullCreatureAI(creature) { timer = 0; _targetGUID.Clear(); }
 
         bool CanBeSeen(Player const* player) override
         {
@@ -251,7 +251,7 @@ public:
         }
 
         uint32 timer;
-        uint64 _targetGUID;
+        ObjectGuid _targetGUID;
 
         void SpellHit(Unit*, const SpellInfo* spellInfo) override
         {

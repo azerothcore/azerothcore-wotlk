@@ -85,6 +85,7 @@ Map* MapManager::CreateBaseMap(uint32 id)
             {
                 map = new Map(id, 0, REGULAR_DIFFICULTY);
                 map->LoadRespawnTimes();
+                map->LoadCorpseData();
             }
 
             i_maps[id] = map;
@@ -184,10 +185,10 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
 
     if (!player->IsAlive())
     {
-        if (Corpse* corpse = player->GetCorpse())
+        if (player->HasCorpse())
         {
             // let enter in ghost mode in instance that connected to inner instance with corpse
-            uint32 corpseMap = corpse->GetMapId();
+            uint32 corpseMap = player->GetCorpseLocation().GetMapId();
             do
             {
                 if (corpseMap == mapid)
@@ -209,8 +210,6 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
             LOG_DEBUG("maps", "MAP: Player '%s' has corpse in instance '%s' and can enter.", player->GetName().c_str(), mapName);
 #endif
-            player->ResurrectPlayer(0.5f, false);
-            player->SpawnCorpseBones();
         }
         else
         {
@@ -234,7 +233,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player, bool loginCheck)
     if (entry->IsDungeon() && (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance()))
     {
         uint32 instaceIdToCheck = 0;
-        if (InstanceSave* save = sInstanceSaveMgr->PlayerGetInstanceSave(player->GetGUIDLow(), mapid, player->GetDifficulty(entry->IsRaid())))
+        if (InstanceSave* save = sInstanceSaveMgr->PlayerGetInstanceSave(player->GetGUID(), mapid, player->GetDifficulty(entry->IsRaid())))
             instaceIdToCheck = save->GetInstanceId();
 
         // instaceIdToCheck can be 0 if save not found - means no bind so the instance is new
@@ -281,8 +280,6 @@ void MapManager::Update(uint32 diff)
     if (m_updater.activated())
         m_updater.wait();
 
-    sObjectAccessor->ProcessDelayedCorpseActions();
-
     if (mapUpdateStep < 3)
     {
         for (iter = i_maps.begin(); iter != i_maps.end(); ++iter)
@@ -295,8 +292,6 @@ void MapManager::Update(uint32 diff)
         i_timer[mapUpdateStep].SetCurrent(0);
         ++mapUpdateStep;
     }
-
-    sObjectAccessor->Update(0);
 
     if (mapUpdateStep == 3 && i_timer[3].Passed())
     {

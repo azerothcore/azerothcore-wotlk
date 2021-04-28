@@ -356,13 +356,13 @@ public:
             me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
             me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
             me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
-            instance->HandleGameObject(instance->GetData64(DATA_WARDENS_SHIELD), true);
+            instance->HandleGameObject(instance->GetGuidData(DATA_WARDENS_SHIELD), true);
             instance->SetBossState(DATA_WARDEN_MELLICHAR, NOT_STARTED);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (attacker && IS_PLAYER_GUID(attacker->GetCharmerOrOwnerOrOwnGUID()) && damage > 0 && !me->isActiveObject())
+            if (attacker && attacker->GetCharmerOrOwnerOrOwnGUID().IsPlayer() && damage > 0 && !me->isActiveObject())
             {
                 me->setActive(true);
                 me->InterruptNonMeleeSpells(false);
@@ -418,7 +418,7 @@ public:
                     events.ScheduleEvent(EVENT_WARDEN_INTRO2, 1400);
                     break;
                 case EVENT_WARDEN_INTRO2:
-                    instance->HandleGameObject(instance->GetData64(DATA_WARDENS_SHIELD), false);
+                    instance->HandleGameObject(instance->GetGuidData(DATA_WARDENS_SHIELD), false);
                     events.ScheduleEvent(EVENT_WARDEN_INTRO3, 20000);
                     break;
                 case EVENT_WARDEN_INTRO3:
@@ -537,7 +537,7 @@ public:
                     events.ScheduleEvent(EVENT_WARDEN_INTRO28, 5000);
                     break;
                 case EVENT_WARDEN_INTRO28:
-                    instance->HandleGameObject(instance->GetData64(DATA_WARDENS_SHIELD), true);
+                    instance->HandleGameObject(instance->GetGuidData(DATA_WARDENS_SHIELD), true);
                     if (Creature* creature = summons.GetCreatureWithEntry(NPC_HARBINGER_SKYRISS))
                         creature->CastSpell((Unit*)nullptr, SPELL_MIND_REND, false);
                     events.ScheduleEvent(EVENT_WARDEN_INTRO29, 4000);
