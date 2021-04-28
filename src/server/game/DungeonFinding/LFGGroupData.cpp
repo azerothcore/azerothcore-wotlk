@@ -11,7 +11,7 @@ namespace lfg
 {
 
     LfgGroupData::LfgGroupData(): m_State(LFG_STATE_NONE), m_OldState(LFG_STATE_NONE),
-        m_Leader(0), m_Dungeon(0), m_KicksLeft(LFG_GROUP_MAX_KICKS)
+        m_Dungeon(0), m_KicksLeft(LFG_GROUP_MAX_KICKS)
     { }
 
     LfgGroupData::~LfgGroupData()
@@ -44,12 +44,12 @@ namespace lfg
         m_State = m_OldState;
     }
 
-    void LfgGroupData::AddPlayer(uint64 guid)
+    void LfgGroupData::AddPlayer(ObjectGuid guid)
     {
         m_Players.insert(guid);
     }
 
-    uint8 LfgGroupData::RemovePlayer(uint64 guid)
+    uint8 LfgGroupData::RemovePlayer(ObjectGuid guid)
     {
         LfgGuidSet::iterator it = m_Players.find(guid);
         if (it != m_Players.end())
@@ -62,7 +62,7 @@ namespace lfg
         m_Players.clear();
     }
 
-    void LfgGroupData::SetLeader(uint64 guid)
+    void LfgGroupData::SetLeader(ObjectGuid guid)
     {
         m_Leader = guid;
     }
@@ -98,7 +98,7 @@ namespace lfg
         return m_Players.size();
     }
 
-    uint64 LfgGroupData::GetLeader() const
+    ObjectGuid LfgGroupData::GetLeader() const
     {
         return m_Leader;
     }

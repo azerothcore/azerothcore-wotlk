@@ -1,0 +1,37 @@
+name: macos-build
+on:
+  push:
+    branches:
+      - '**'         # matches every branch
+      - '!coverity_scan'   # excludes coverity_scan
+  pull_request:
+
+jobs:
+  macos-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - macos-10.15
+ #         - macos-11.0
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/Library/Caches/ccache
+          key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}
+          restore-keys: |
+            ccache:${{ matrix.os }}:${{ github.ref }}
+            ccache:${{ matrix.os }}
+      - name: Install latest bash
+        run: brew install bash
+      - name: Configure OS
+        run: source ./acore.sh install-deps
+      - name: Build
+        run: source ./apps/ci/mac/ci-compile.sh
+      - name: Run unit tests
+        run: source ./apps/ci/ci-run-unit-tests.sh

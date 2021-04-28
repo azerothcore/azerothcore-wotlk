@@ -18,7 +18,7 @@
 #include "ScriptMgr.h"
 #include <unordered_map>
 
-std::unordered_map<uint64, uint32> BGSpamProtection;
+std::unordered_map<ObjectGuid, uint32> BGSpamProtection;
 
 /*********************************************************/
 /***            BATTLEGROUND QUEUE SYSTEM              ***/
@@ -240,11 +240,11 @@ uint32 BattlegroundQueue::GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const
 }
 
 //remove player from queue and from group info, if group info is empty then remove it too
-void BattlegroundQueue::RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQueueSlot)
+void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool sentToBg, uint32 playerQueueSlot)
 {
     // pussywizard: leave queue packet
     if (playerQueueSlot < PLAYER_MAX_BATTLEGROUND_QUEUES)
-        if (Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+        if (Player* p = ObjectAccessor::FindConnectedPlayer(guid))
         {
             WorldPacket data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, nullptr, playerQueueSlot, STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
@@ -302,7 +302,7 @@ void BattlegroundQueue::RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQu
     if (groupInfo->IsInvitedToBGInstanceGUID && groupInfo->IsRated && !sentToBg)
         if (ArenaTeam* at = sArenaTeamMgr->GetArenaTeamById(groupInfo->ArenaTeamId))
         {
-            if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+            if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
                 at->MemberLost(player, groupInfo->OpponentsMatchmakerRating);
             at->SaveToDB();
         }
@@ -321,7 +321,7 @@ void BattlegroundQueue::RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQu
     {
         uint32 queueSlot = PLAYER_MAX_BATTLEGROUND_QUEUES;
 
-        if (Player* plr = ObjectAccessor::FindPlayerInOrOutOfWorld(*(groupInfo->Players.begin())))
+        if (Player* plr = ObjectAccessor::FindConnectedPlayer(*(groupInfo->Players.begin())))
         {
             BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(groupInfo->BgTypeId, groupInfo->ArenaType);
             queueSlot = plr->GetBattlegroundQueueIndex(bgQueueTypeId);
@@ -338,20 +338,20 @@ void BattlegroundQueue::AddEvent(BasicEvent* Event, uint64 e_time)
     m_events.AddEvent(Event, m_events.CalculateTime(e_time));
 }
 
-bool BattlegroundQueue::IsPlayerInvitedToRatedArena(uint64 pl_guid)
+bool BattlegroundQueue::IsPlayerInvitedToRatedArena(ObjectGuid pl_guid)
 {
     auto qItr = m_QueuedPlayers.find(pl_guid);
     return qItr != m_QueuedPlayers.end() && qItr->second->IsRated && qItr->second->IsInvitedToBGInstanceGUID;
 }
 
 //returns true when player pl_guid is in queue and is invited to bgInstanceGuid
-bool BattlegroundQueue::IsPlayerInvited(uint64 pl_guid, const uint32 bgInstanceGuid, const uint32 removeTime)
+bool BattlegroundQueue::IsPlayerInvited(ObjectGuid pl_guid, const uint32 bgInstanceGuid, const uint32 removeTime)
 {
     auto qItr = m_QueuedPlayers.find(pl_guid);
     return qItr != m_QueuedPlayers.end() && qItr->second->IsInvitedToBGInstanceGUID == bgInstanceGuid && qItr->second->RemoveInviteTime == removeTime;
 }
 
-bool BattlegroundQueue::GetPlayerGroupInfoData(uint64 guid, GroupQueueInfo* ginfo)
+bool BattlegroundQueue::GetPlayerGroupInfoData(ObjectGuid guid, GroupQueueInfo* ginfo)
 {
     auto qItr = m_QueuedPlayers.find(guid);
     if (qItr == m_QueuedPlayers.end())
@@ -1034,7 +1034,7 @@ void BattlegroundQueue::SendMessageArenaQueue(GroupQueueInfo* ginfo, bool IsJoin
 
 bool BGQueueInviteEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(m_PlayerGuid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(m_PlayerGuid);
 
     // player logged off, so he is no longer in queue
     if (!player)
@@ -1072,7 +1072,7 @@ void BGQueueInviteEvent::Abort(uint64 /*e_time*/)
 
 bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(m_PlayerGuid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(m_PlayerGuid);
 
     // player logged off, so he is no longer in queue
     if (!player)
@@ -1096,7 +1096,7 @@ bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
                 if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
                 {
                     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
-                    stmt->setUInt32(0, player->GetGUIDLow());
+                    stmt->setUInt32(0, player->GetGUID().GetCounter());
                     stmt->setUInt8(1, BG_DESERTION_TYPE_NO_ENTER_BUTTON);
                     CharacterDatabase.Execute(stmt);
                 }
