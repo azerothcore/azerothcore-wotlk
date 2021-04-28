@@ -14,12 +14,12 @@ INSERT INTO `pool_template` (`entry`,`max_limit`,`description`) VALUES (@POOL,@P
 -- Add gameobjects to pools
 DELETE FROM `pool_gameobject` WHERE FIND_IN_SET (`guid`,@GUID);
 INSERT INTO `pool_gameobject` (`guid`,`pool_entry`,`chance`,`description`) VALUES
-(33304,@POOL,0,@POOLDESC),
-(33206,@POOL,0,@POOLDESC),
-(33207,@POOL,0,@POOLDESC),
-(33200,@POOL,0,@POOLDESC),
-(33193,@POOL,0,@POOLDESC),
-(33208,@POOL,0,@POOLDESC);
+(33304,@POOL,0,'Solid Chest, Alterac Mountains, node 1'),
+(33206,@POOL,0,'Solid Chest, Alterac Mountains, node 2'),
+(33207,@POOL,0,'Solid Chest, Alterac Mountains, node 3'),
+(33200,@POOL,0,'Solid Chest, Alterac Mountains, node 4'),
+(33193,@POOL,0,'Solid Chest, Alterac Mountains, node 5'),
+(33208,@POOL,0,'Solid Chest, Alterac Mountains, node 6');
 
 -- Respawn rates of gameobjects
 UPDATE `gameobject` SET `spawntimesecs`=@RESPAWN WHERE FIND_IN_SET (`guid`,@GUID);
