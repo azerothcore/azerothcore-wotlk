@@ -123,8 +123,10 @@ program
 
     let services = new TextDecoder().decode(output).split("\n");
 
-    if (!services)
+    if (!services) {
       console.error("No services available!");
+      return
+    }
 
     services.pop();
     services = services.slice(2);
@@ -139,6 +141,11 @@ program
       });
     } else {
       selService = services[0];
+    }
+
+    if (!selService) {
+        console.log(`Service ${service} is not available`)
+        return;
     }
 
     command = `docker attach ${selService.split(" ")[0]}`;
