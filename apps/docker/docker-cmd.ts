@@ -26,6 +26,7 @@ shellCommandFactory(
 
 shellCommandFactory("build", "Build the authserver and worldserver", [
   "docker-compose --profile all build",
+  "docker image prune -f",
   "docker-compose run --rm ac-build bash bin/acore-docker-update",
 ]);
 
@@ -34,6 +35,7 @@ shellCommandFactory(
   "Clean and run build",
   [
     "docker-compose --profile all build",
+    "docker image prune -f",
     `docker-compose run --rm ac-build bash acore.sh compiler clean`,
     "docker-compose run --rm ac-build bash bin/acore-docker-update",
   ],
@@ -44,6 +46,7 @@ shellCommandFactory(
   "Build the authserver and worldserver without docker cache",
   [
     "docker-compose --profile all build --no-cache",
+    "docker image prune -f",
     "docker-compose run --rm ac-build bash bin/acore-docker-update",
   ],
 );
@@ -53,6 +56,7 @@ shellCommandFactory(
   "Run the compilation process only, without rebuilding all docker images and importing db",
   [
     "docker-compose build ac-build",
+    "docker image prune -f",
     "docker-compose run --rm ac-build bash acore.sh compiler build",
   ],
 );

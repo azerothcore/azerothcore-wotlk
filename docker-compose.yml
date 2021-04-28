@@ -63,9 +63,9 @@ services:
         target: /var/lib/mysql
     healthcheck:
       test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
-      interval: 10s
+      interval: 5s
       timeout: 10s
-      retries: 20
+      retries: 40
 
 
   ac-worldserver:
