@@ -17,38 +17,38 @@ enum Spells
     SPELL_DECIMATE_25                   = 54426,
     SPELL_BERSERK                       = 26662,
     SPELL_INFECTED_WOUND                = 29306,
-    SPELL_CHOW_SEARCHER                 = 28404,
+    SPELL_CHOW_SEARCHER                 = 28404
 };
 
 enum Events
 {
-    EVENT_SPELL_MORTAL_WOUND            = 1,
-    EVENT_SPELL_ENRAGE                  = 2,
-    EVENT_SPELL_DECIMATE                = 3,
-    EVENT_SPELL_BERSERK                 = 4,
+    EVENT_MORTAL_WOUND                  = 1,
+    EVENT_ENRAGE                        = 2,
+    EVENT_DECIMATE                      = 3,
+    EVENT_BERSERK                       = 4,
     EVENT_SUMMON_ZOMBIE                 = 5,
-    EVENT_CAN_EAT_ZOMBIE                = 6,
+    EVENT_CAN_EAT_ZOMBIE                = 6
 };
 
 enum Misc
 {
-    NPC_ZOMBIE_CHOW                     = 16360,
+    NPC_ZOMBIE_CHOW                     = 16360
 };
 
 enum Emotes
 {
-    EMOTE_SPOTS_ONE   = 0,
-    EMOTE_DECIMATE    = 1,
-    EMOTE_ENRAGE      = 2,
-    EMOTE_DEVOURS_ALL = 3,
-    EMOTE_BERSERK     = 4
+    EMOTE_SPOTS_ONE                     = 0,
+    EMOTE_DECIMATE                      = 1,
+    EMOTE_ENRAGE                        = 2,
+    EMOTE_DEVOURS_ALL                   = 3,
+    EMOTE_BERSERK                       = 4
 };
 
 const Position zombiePos[3] =
 {
     {3267.9f, -3172.1f, 297.42f, 0.94f},
     {3253.2f, -3132.3f, 297.42f, 0},
-    {3308.3f, -3185.8f, 297.42f, 1.58f},
+    {3308.3f, -3185.8f, 297.42f, 1.58f}
 };
 
 class boss_gluth : public CreatureScript
@@ -58,7 +58,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_gluthAI (pCreature);
+        return GetNaxxramasAI<boss_gluthAI>(pCreature);
     }
 
     struct boss_gluthAI : public BossAI
@@ -91,7 +91,9 @@ public:
                     Talk(EMOTE_SPOTS_ONE);
                 }
                 else
+                {
                     ScriptedAI::MoveInLineOfSight(who);
+                }
             }
         }
 
@@ -99,10 +101,10 @@ public:
         {
             BossAI::EnterCombat(who);
             me->SetInCombatWithZone();
-            events.ScheduleEvent(EVENT_SPELL_MORTAL_WOUND, 10000);
-            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 30000);
-            events.ScheduleEvent(EVENT_SPELL_DECIMATE, 105000);
-            events.ScheduleEvent(EVENT_SPELL_BERSERK, 8 * 60000);
+            events.ScheduleEvent(EVENT_MORTAL_WOUND, 10000);
+            events.ScheduleEvent(EVENT_ENRAGE, 22000);
+            events.ScheduleEvent(EVENT_DECIMATE, RAID_MODE(110000, 90000));
+            events.ScheduleEvent(EVENT_BERSERK, 360000);
             events.ScheduleEvent(EVENT_SUMMON_ZOMBIE, 10000);
             events.ScheduleEvent(EVENT_CAN_EAT_ZOMBIE, 1000);
         }
@@ -110,8 +112,9 @@ public:
         void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_ZOMBIE_CHOW)
+            {
                 summon->AI()->AttackStart(me);
-
+            }
             summons.Summon(summon);
         }
 
@@ -120,10 +123,13 @@ public:
         void KilledUnit(Unit* who) override
         {
             if (me->IsAlive() && who->GetEntry() == NPC_ZOMBIE_CHOW)
+            {
                 me->ModifyHealth(int32(me->GetMaxHealth() * 0.05f));
-
+            }
             if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
+            {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
+            }
         }
 
         void JustDied(Unit*  killer) override
@@ -143,13 +149,13 @@ public:
                 Player* player = itr.GetSource();
                 if (!player || !player->IsAlive())
                     continue;
+
                 if (player->GetPositionZ() > 300.0f || me->GetExactDist(player) > 50.0f)
                     continue;
 
                 AttackStart(player);
                 return true;
             }
-
             return false;
         }
 
@@ -164,23 +170,22 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_SPELL_BERSERK:
+                case EVENT_BERSERK:
                     me->CastSpell(me, SPELL_BERSERK, true);
-
                     break;
-                case EVENT_SPELL_ENRAGE:
+                case EVENT_ENRAGE:
                     Talk(EMOTE_ENRAGE);
                     me->CastSpell(me, RAID_MODE(SPELL_ENRAGE_10, SPELL_ENRAGE_25), true);
-                    events.RepeatEvent(30000);
+                    events.RepeatEvent(22000);
                     break;
-                case EVENT_SPELL_MORTAL_WOUND:
+                case EVENT_MORTAL_WOUND:
                     me->CastSpell(me->GetVictim(), SPELL_MORTAL_WOUND, false);
                     events.RepeatEvent(10000);
                     break;
-                case EVENT_SPELL_DECIMATE:
+                case EVENT_DECIMATE:
                     Talk(EMOTE_DECIMATE);
                     me->CastSpell(me, RAID_MODE(SPELL_DECIMATE_10, SPELL_DECIMATE_25), false);
-                    events.RepeatEvent(105000);
+                    events.RepeatEvent(RAID_MODE(110000, 90000));
                     break;
                 case EVENT_SUMMON_ZOMBIE:
                     {
@@ -191,12 +196,15 @@ public:
                             // \1 |0 /2 pos
                             // In 25 man raid - should spawn from all 3 gates
                             if (me->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_NORMAL)
+                            {
                                 me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[0]);
+                            }
                             else
+                            {
                                 me->SummonCreature(NPC_ZOMBIE_CHOW, zombiePos[urand(0, 2)]);
+                            }
                             (rand == 2 ? rand = 0 : rand++);
                         }
-
                         events.RepeatEvent(10000);
                         break;
                     }
@@ -210,7 +218,6 @@ public:
                     }
                     break;
             }
-
             DoMeleeAttackIfReady();
         }
     };
@@ -241,7 +248,6 @@ public:
                     Unit::DealDamage(GetCaster(), cTarget, damage);
                     return;
                 }
-
                 GetCaster()->CastCustomSpell(28375, SPELLVALUE_BASE_POINT0, damage, unitTarget);
             }
         }

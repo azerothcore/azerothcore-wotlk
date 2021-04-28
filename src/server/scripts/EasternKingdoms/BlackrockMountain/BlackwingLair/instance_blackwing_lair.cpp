@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -75,7 +75,7 @@ public:
                 case NPC_BLACKWING_TASKMASTER:
                 case NPC_BLACKWING_LEGIONAIRE:
                 case NPC_BLACKWING_WARLOCK:
-                    if (Creature* razor = instance->GetCreature(DATA_RAZORGORE_THE_UNTAMED))
+                    if (Creature* razor = instance->GetCreature(GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
                         if (CreatureAI* razorAI = razor->AI())
                             razorAI->JustSummoned(creature);
                     break;
@@ -169,8 +169,8 @@ public:
                 case DATA_RAZORGORE_THE_UNTAMED:
                     if (state == DONE)
                     {
-                        for (std::list<uint64>::const_iterator itr = EggList.begin(); itr != EggList.end(); ++itr)
-                            if (GameObject* egg = instance->GetGameObject((*itr)))
+                        for (ObjectGuid const guid : EggList)
+                            if (GameObject* egg = instance->GetGameObject(guid))
                                 egg->SetPhaseMask(2, true);
                     }
                     SetData(DATA_EGG_EVENT, NOT_STARTED);
@@ -179,7 +179,7 @@ public:
                     switch (state)
                     {
                         case NOT_STARTED:
-                            if (Creature* nefarian = instance->GetCreature(DATA_NEFARIAN))
+                            if (Creature* nefarian = instance->GetCreature(GetGuidData(DATA_NEFARIAN)))
                                 nefarian->DespawnOrUnsummon();
                             break;
                         case FAIL:
@@ -213,7 +213,7 @@ public:
                     case SPECIAL:
                         if (++EggCount == 15)
                         {
-                            if (Creature* razor = instance->GetCreature(DATA_RAZORGORE_THE_UNTAMED))
+                            if (Creature* razor = instance->GetCreature(GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
                             {
                                 SetData(DATA_EGG_EVENT, DONE);
                                 razor->RemoveAurasDueToSpell(42013); // MindControl
@@ -255,11 +255,11 @@ public:
                         break;
                     case EVENT_RAZOR_PHASE_TWO:
                         _events.CancelEvent(EVENT_RAZOR_SPAWN);
-                        if (Creature* razor = instance->GetCreature(DATA_RAZORGORE_THE_UNTAMED))
+                        if (Creature* razor = instance->GetCreature(GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
                             razor->AI()->DoAction(ACTION_PHASE_TWO);
                         break;
                     case EVENT_RESPAWN_NEFARIUS:
-                        if (Creature* nefarius = instance->GetCreature(DATA_LORD_VICTOR_NEFARIUS))
+                        if (Creature* nefarius = instance->GetCreature(GetGuidData(DATA_LORD_VICTOR_NEFARIUS)))
                         {
                             nefarius->SetPhaseMask(1, true);
                             nefarius->setActive(true);
@@ -278,7 +278,7 @@ public:
         // Razorgore
         uint8 EggCount;
         uint32 EggEvent;
-        std::list<uint64> EggList;
+        GuidList EggList;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const

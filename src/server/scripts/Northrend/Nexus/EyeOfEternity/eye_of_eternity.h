@@ -8,6 +8,8 @@
 #include "Chat.h"
 #include "CreatureAIImpl.h"
 
+#define EyeOfEternityScriptName "instance_eye_of_eternity"
+
 enum Objects
 {
     GO_NEXUS_PLATFORM           = 193070,
@@ -94,11 +96,17 @@ const uint32 MalygosIntroIntervals[] = {18000, 19000, 21000, 18000, 15000};
 class EoEDrakeEnterVehicleEvent : public BasicEvent
 {
 public:
-    EoEDrakeEnterVehicleEvent(Creature& owner, uint64 playerGUID) : _owner(owner), _playerGUID(playerGUID) { }
+    EoEDrakeEnterVehicleEvent(Creature& owner, ObjectGuid playerGUID) : _owner(owner), _playerGUID(playerGUID) { }
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override;
 private:
     Creature& _owner;
-    uint64 _playerGUID;
+    ObjectGuid _playerGUID;
 };
+
+template <class AI, class T>
+inline AI* GetEyeOfEternityAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, EyeOfEternityScriptName);
+}
 
 #endif

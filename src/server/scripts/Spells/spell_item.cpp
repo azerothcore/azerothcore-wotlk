@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -205,7 +205,7 @@ public:
 
             if (Player* target = GetHitPlayer())
             {
-                target->KilledMonsterCredit(29579, 0); // Brann's entry
+                target->KilledMonsterCredit(29579); // Brann's entry
                 target->CastSpell(target, 55038, true); // Brann summoning spell
             }
         }
@@ -1764,10 +1764,6 @@ public:
 
         bool CheckProc(ProcEventInfo& eventInfo)
         {
-            SpellInfo const* spellInfo = eventInfo.GetHealInfo()->GetSpellInfo();
-            if (!spellInfo || !spellInfo->HasEffect(SPELL_EFFECT_HEAL))
-                return false;
-
             return eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetHeal() > 0;
         }
 

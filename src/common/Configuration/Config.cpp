@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
@@ -27,7 +27,7 @@ namespace
         {
             if (!replace)
             {
-                sLog->outError("> Config: Option '%s' is exist! Option key - '%s'", optionName.c_str(), itr->second.c_str());
+                LOG_ERROR("server", "> Config: Option '%s' is exist! Option key - '%s'", optionName.c_str(), itr->second.c_str());
                 return;
             }
 
@@ -35,8 +35,6 @@ namespace
         }
 
         _configOptions.emplace(optionName, optionKey);
-
-        //sLog->outError("> Config: Add '%s' - '%s'\n", optionName.c_str(), optionKey.c_str());
     }
 
     void ParseFile(std::string const& file)
@@ -56,19 +54,23 @@ namespace
             if (line.empty())
                 continue;
 
-            line = acore::String::Reduce(line);
+            line = acore::String::Trim(line, in.getloc());
 
             // comments
             if (line[0] == '#' || line[0] == '[')
                 continue;
+
+            size_t found = line.find_first_of('#');
+            if (found != std::string::npos)
+                line = line.substr(0, found);
 
             auto const equal_pos = line.find('=');
 
             if (equal_pos == std::string::npos || equal_pos == line.length())
                 return;
 
-            auto entry = acore::String::Reduce(line.substr(0, equal_pos));
-            auto value = acore::String::Reduce(line.substr(equal_pos + 1));
+            auto entry = acore::String::Trim(line.substr(0, equal_pos), in.getloc());
+            auto value = acore::String::Trim(line.substr(equal_pos + 1), in.getloc());
 
             value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
 
@@ -90,7 +92,7 @@ namespace
         }
         catch (const std::exception& e)
         {
-            sLog->outError("> Config: %s", e.what());
+            LOG_ERROR("server", "> Config: %s", e.what());
         }
 
         return false;
@@ -132,7 +134,7 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            sLog->outError("> Config: Missing name %s in config, add \"%s = %s\"",
+            LOG_ERROR("server", "> Config: Missing name %s in config, add \"%s = %s\"",
                 name.c_str(), name.c_str(), acore::ToString(def).c_str());
         }
 
@@ -144,7 +146,7 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            sLog->outError("> Config: Bad value defined for name '%s', going to use '%s' instead",
+            LOG_ERROR("server", "> Config: Bad value defined for name '%s', going to use '%s' instead",
                 name.c_str(), acore::ToString(def).c_str());
         }
 
@@ -162,7 +164,7 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
     {
         if (showLogs)
         {
-            sLog->outError("> Config: Missing name %s in config, add \"%s = %s\"",
+            LOG_ERROR("server", "> Config: Missing name %s in config, add \"%s = %s\"",
                 name.c_str(), name.c_str(), def.c_str());
         }
 
@@ -188,7 +190,7 @@ bool ConfigMgr::GetOption<bool>(std::string const& name, bool const& def, bool s
     {
         if (showLogs)
         {
-            sLog->outError("> Config: Bad value defined for name '%s', going to use '%s' instead",
+            LOG_ERROR("server", "> Config: Bad value defined for name '%s', going to use '%s' instead",
                 name.c_str(), def ? "true" : "false");
         }
 
@@ -297,13 +299,13 @@ bool ConfigMgr::LoadModulesConfigs()
         return false;
 
     // Print modules configurations
-    sLog->outString();
-    sLog->outString("Using modules configuration:");
+    LOG_INFO("server", " ");
+    LOG_INFO("server", "Using modules configuration:");
 
     for (auto const& itr : moduleConfigFiles)
-        sLog->outString("> %s", itr.c_str());
+        LOG_INFO("server", "> %s", itr.c_str());
 
-    sLog->outString("");
+    LOG_INFO("server", " ");
 
     return true;
 }

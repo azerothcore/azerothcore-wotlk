@@ -94,6 +94,7 @@ public:
         {
             if (rotateTimer)
             {
+                me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, 0);
                 rotateTimer += diff;
                 if (rotateTimer >= 3000)
                 {
@@ -146,7 +147,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_koralonAI(creature);
+        return GetVaultOfArchavonAI<boss_koralonAI>(creature);
     }
 };
 

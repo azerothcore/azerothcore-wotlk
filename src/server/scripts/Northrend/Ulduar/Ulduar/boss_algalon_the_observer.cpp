@@ -347,6 +347,11 @@ public:
                 me->SetInCombatWithZone();
                 return;
             }
+            else if (events.GetPhaseMask() & PHASE_NORMAL)
+            {
+                DoAction(ACTION_ASCEND);
+                return;
+            }
 
             ScriptedAI::EnterEvadeMode();
         }
@@ -386,7 +391,7 @@ public:
                 case ACTION_START_INTRO:
                     {
                         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                        me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_INSTANTLY_APPEAR_MODEL);
+                        me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_DO_NOT_FADE_IN);
                         me->SetDisableGravity(true);
                         me->CastSpell(me, SPELL_ARRIVAL, true);
                         me->CastSpell(me, SPELL_RIDE_THE_LIGHTNING, true);
@@ -596,9 +601,20 @@ public:
             }
         }
 
+        bool IsInRoom()
+        {
+            if (me->GetExactDist2d(&me->GetHomePosition()) > 45.f || me->GetPositionZ() < 410.f)
+            {
+                DoAction(ACTION_ASCEND);
+                return false;
+            }
+
+            return true;
+        }
+
         void UpdateAI(uint32 diff) override
         {
-            if ((!(events.GetPhaseMask() & PHASE_MASK_NO_UPDATE) && !UpdateVictim()) /*ZOMG!|| !CheckInRoom()*/)
+            if (!(events.GetPhaseMask() & PHASE_MASK_NO_UPDATE) && (!UpdateVictim() || !IsInRoom()))
                 return;
 
             events.Update(diff);
@@ -621,7 +637,7 @@ public:
                 case EVENT_INTRO_FINISH:
                     events.Reset();
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
-                    if (Creature* brann = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_BRANN_BRONZBEARD_ALG)))
+                    if (Creature* brann = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_BRANN_BRONZBEARD_ALG)))
                         brann->AI()->DoAction(ACTION_FINISH_INTRO);
                     break;
                 case EVENT_START_COMBAT:
@@ -777,7 +793,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_algalon_the_observerAI(creature);
+        return GetUlduarAI<boss_algalon_the_observerAI>(creature);
     }
 };
 
@@ -859,7 +875,7 @@ public:
                         me->GetMotionMaster()->MovePoint(_currentPoint, BrannIntroWaypoint[_currentPoint]);
                     break;
                 case EVENT_SUMMON_ALGALON:
-                    if (me->GetInstanceScript() && !me->GetInstanceScript()->GetData64(TYPE_ALGALON))
+                    if (me->GetInstanceScript() && !me->GetInstanceScript()->GetGuidData(TYPE_ALGALON))
                         if (Creature* algalon = me->GetMap()->SummonCreature(NPC_ALGALON, AlgalonSummonPos))
                             algalon->AI()->DoAction(ACTION_START_INTRO);
                     break;
@@ -875,7 +891,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_brann_bronzebeard_algalonAI(creature);
+        return GetUlduarAI<npc_brann_bronzebeard_algalonAI>(creature);
     }
 };
 
@@ -911,7 +927,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_collapsing_starAI(creature);
+        return GetUlduarAI<npc_collapsing_starAI>(creature);
     }
 };
 
@@ -1002,7 +1018,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_living_constellationAI(creature);
+        return GetUlduarAI<npc_living_constellationAI>(creature);
     }
 };
 
@@ -1026,6 +1042,17 @@ public:
             _summonTimer = urand(22000, 24000);
         }
 
+        void JustSummoned(Creature* summon) override
+        {
+            if (TempSummon* summ = me->ToTempSummon())
+            {
+                if (Creature* algalon = ObjectAccessor::GetCreature(*me, summ->GetSummonerGUID()))
+                {
+                    algalon->AI()->JustSummoned(summon);
+                }
+            }
+        }
+
         void UpdateAI(uint32 diff) override
         {
             _summonTimer += diff;
@@ -1039,7 +1066,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_algalon_worm_holeAI(creature);
+        return GetUlduarAI<npc_algalon_worm_holeAI>(creature);
     }
 };
 
@@ -1092,10 +1119,10 @@ public:
             if (InstanceScript* instance = go->GetInstanceScript())
             {
                 instance->SetData(DATA_ALGALON_SUMMON_STATE, 1);
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetData64(GO_DOODAD_UL_SIGILDOOR_01)))
+                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_01)))
                     sigil->SetGoState(GO_STATE_ACTIVE);
 
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetData64(GO_DOODAD_UL_SIGILDOOR_02)))
+                if (GameObject* sigil = ObjectAccessor::GetGameObject(*go, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_02)))
                     sigil->SetGoState(GO_STATE_ACTIVE);
             }
 

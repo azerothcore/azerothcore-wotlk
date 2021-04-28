@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -34,7 +34,7 @@ public:
     {
         npc_galen_goodwardAI(Creature* creature) : npc_escortAI(creature)
         {
-            galensCageGUID = 0;
+            galensCageGUID.Clear();
             Reset();
         }
 
@@ -123,7 +123,7 @@ public:
         }
 
     private:
-        uint64 galensCageGUID;
+        ObjectGuid galensCageGUID;
         uint32 periodicSay;
     };
 

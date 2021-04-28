@@ -65,8 +65,20 @@ case $COMPILER in
     echo "CCOMPILERCXX=\"clang++-10\"" >> ./conf/config.sh
     ;;
 
+  "clang11" )
+    time sudo apt-get install -y clang-11
+    echo "CCOMPILERC=\"clang-11\"" >> ./conf/config.sh
+    echo "CCOMPILERCXX=\"clang++-11\"" >> ./conf/config.sh
+    ;;
+
   * )
     echo "Unknown compiler $COMPILER"
     exit 1
     ;;
 esac
+
+if [[ $EXTRA_LOGS ]]; then
+  echo "CEXTRA_LOGS=1" >> ./conf/config.sh
+else
+  echo "CEXTRA_LOGS=0" >> ./conf/config.sh
+fi

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -926,7 +926,7 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x38D*/ { "CMSG_MOVE_CHNG_TRANSPORT",                                STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleMovementOpcodes                    },
     /*0x38E*/ { "MSG_PARTY_ASSIGNMENT",                                    STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandlePartyAssignmentOpcode              },
     /*0x38F*/ { "SMSG_OFFER_PETITION_ERROR",                               STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_ServerSide                        },
-    /*0x390*/ { "SMSG_TIME_SYNC_REQ",                                      STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_ServerSide                        },
+    /*0x390*/ { "SMSG_TIME_SYNC_REQ",                                      STATUS_NEVER,      PROCESS_THREADSAFE,     &WorldSession::Handle_ServerSide                        },
     /*0x391*/ { "CMSG_TIME_SYNC_RESP",                                     STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandleTimeSyncResp                       },
     /*0x392*/ { "CMSG_SEND_LOCAL_EVENT",                                   STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              },
     /*0x393*/ { "CMSG_SEND_GENERAL_TRIGGER",                               STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              },

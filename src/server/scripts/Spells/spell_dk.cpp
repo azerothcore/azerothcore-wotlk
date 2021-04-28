@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -430,8 +430,8 @@ public:
         {
             if (Unit* target = GetExplTargetUnit())
             {
-                std::list<Spell::TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-                for (std::list<Spell::TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+                std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+                for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
                     if (ihit->missCondition == SPELL_MISS_NONE && ihit->targetGUID == target->GetGUID())
                         GetCaster()->CastSpell(target, 55095 /*SPELL_FROST_FEVER*/, true);
             }
@@ -610,8 +610,8 @@ public:
 
         void RecalculateDamage()
         {
-            std::list<Spell::TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-            for (std::list<Spell::TargetInfo>::iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+            std::list<TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+            for (std::list<TargetInfo>::iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
                 if (ihit->targetGUID == GetCaster()->GetGUID())
                     ihit->crit = roll_chance_f(GetCaster()->GetFloatValue(PLAYER_CRIT_PERCENTAGE));
         }
@@ -1294,7 +1294,7 @@ public:
 class CorpseExplosionCheck
 {
 public:
-    explicit CorpseExplosionCheck(uint64 casterGUID, bool allowGhoul) : _casterGUID(casterGUID), _allowGhoul(allowGhoul) { }
+    explicit CorpseExplosionCheck(ObjectGuid casterGUID, bool allowGhoul) : _casterGUID(casterGUID), _allowGhoul(allowGhoul) { }
 
     bool operator()(WorldObject* obj) const
     {
@@ -1310,7 +1310,7 @@ public:
     }
 
 private:
-    uint64 _casterGUID;
+    ObjectGuid _casterGUID;
     bool _allowGhoul;
 };
 
@@ -2373,12 +2373,12 @@ public:
     {
         PrepareSpellScript(spell_dk_scourge_strike_SpellScript);
         float multiplier;
-        uint64 guid;
+        ObjectGuid guid;
 
         bool Load() override
         {
             multiplier = 1.0f;
-            guid = 0;
+            guid.Clear();
             return true;
         }
 

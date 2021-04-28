@@ -94,7 +94,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_ulduar_snow_moundAI(creature);
+        return GetUlduarAI<npc_ulduar_snow_moundAI>(creature);
     }
 
     struct npc_ulduar_snow_moundAI : public ScriptedAI
@@ -141,18 +141,18 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_ulduar_storm_tempered_keeperAI(creature);
+        return GetUlduarAI<npc_ulduar_storm_tempered_keeperAI>(creature);
     }
 
     struct npc_ulduar_storm_tempered_keeperAI : public ScriptedAI
     {
         npc_ulduar_storm_tempered_keeperAI(Creature* creature) : ScriptedAI(creature)
         {
-            otherGUID = 0;
+            otherGUID.Clear();
         }
 
         EventMap events;
-        uint64 otherGUID;
+        ObjectGuid otherGUID;
 
         void Reset() override
         {
@@ -230,7 +230,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_ulduar_arachnopod_destroyerAI(creature);
+        return GetUlduarAI<npc_ulduar_arachnopod_destroyerAI>(creature);
     }
 
     struct npc_ulduar_arachnopod_destroyerAI : public ScriptedAI

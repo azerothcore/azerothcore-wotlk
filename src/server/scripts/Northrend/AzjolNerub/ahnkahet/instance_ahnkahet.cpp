@@ -17,14 +17,14 @@ public:
     {
         instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
 
-        uint64 Elder_Nadox;
-        uint64 Prince_Taldaram;
-        uint64 Jedoga_Shadowseeker;
-        uint64 Herald_Volazj;
-        uint64 Amanitar;
+        ObjectGuid Elder_Nadox;
+        ObjectGuid Prince_Taldaram;
+        ObjectGuid Jedoga_Shadowseeker;
+        ObjectGuid Herald_Volazj;
+        ObjectGuid Amanitar;
 
-        uint64 Prince_TaldaramPlatform;
-        uint64 Prince_TaldaramGate;
+        ObjectGuid Prince_TaldaramPlatform;
+        ObjectGuid Prince_TaldaramGate;
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         uint32 spheres;
@@ -36,14 +36,6 @@ public:
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
-            Elder_Nadox = 0;
-            Prince_Taldaram = 0;
-            Jedoga_Shadowseeker = 0;
-            Herald_Volazj = 0;
-            Amanitar = 0;
-
-            Prince_TaldaramPlatform = 0;
-            Prince_TaldaramGate = 0;
             spheres = NOT_STARTED;
 
             nadoxAchievement = false;
@@ -87,7 +79,7 @@ public:
                 case 193564:
                     Prince_TaldaramPlatform = pGo->GetGUID();
                     if (m_auiEncounter[1] == DONE)
-                        HandleGameObject(0, true, pGo);
+                        HandleGameObject(ObjectGuid::Empty, true, pGo);
 
                     break;
                 case 193093:
@@ -113,13 +105,13 @@ public:
                 case 192236:
                     Prince_TaldaramGate = pGo->GetGUID(); // Web gate past Prince Taldaram
                     if (m_auiEncounter[1] == DONE)
-                        HandleGameObject(0, true, pGo);
+                        HandleGameObject(ObjectGuid::Empty, true, pGo);
 
                     break;
             }
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch(identifier)
             {
@@ -137,7 +129,7 @@ public:
                     return Prince_TaldaramPlatform;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override

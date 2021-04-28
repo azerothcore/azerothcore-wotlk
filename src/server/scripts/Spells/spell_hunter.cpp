@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -691,27 +691,54 @@ public:
             return ValidateSpellInfo({ SPELL_HUNTER_MASTERS_CALL_TRIGGERED });
         }
 
+        SpellCastResult DoCheckCast()
+        {
+            Guardian* pet = GetCaster()->ToPlayer()->GetGuardianPet();
+            ASSERT(pet); // checked in Spell::CheckCast
+
+            if (!pet->IsPet() || !pet->IsAlive())
+                return SPELL_FAILED_NO_PET;
+
+            // Do a mini Spell::CheckCasterAuras on the pet, no other way of doing this
+            SpellCastResult result = SPELL_CAST_OK;
+            uint32 const unitflag = pet->GetUInt32Value(UNIT_FIELD_FLAGS);
+            if (pet->GetCharmerGUID())
+                result = SPELL_FAILED_CHARMED;
+            else if (unitflag & UNIT_FLAG_STUNNED)
+                result = SPELL_FAILED_STUNNED;
+            else if (unitflag & UNIT_FLAG_FLEEING)
+                result = SPELL_FAILED_FLEEING;
+            else if (unitflag & UNIT_FLAG_CONFUSED)
+                result = SPELL_FAILED_CONFUSED;
+
+            if (result != SPELL_CAST_OK)
+                return result;
+
+            Unit* target = GetExplTargetUnit();
+            if (!target)
+                return SPELL_FAILED_BAD_TARGETS;
+
+            if (!pet->IsWithinLOSInMap(target))
+                return SPELL_FAILED_LINE_OF_SIGHT;
+
+            return SPELL_CAST_OK;
+        }
+
+        void HandleDummy(SpellEffIndex /*effIndex*/)
+        {
+            GetCaster()->ToPlayer()->GetPet()->CastSpell(GetHitUnit(), GetEffectValue(), true);
+        }
+
         void HandleScriptEffect(SpellEffIndex /*effIndex*/)
         {
-            if (Unit* target = GetHitUnit())
-            {
-                // Cannot be processed while pet is dead
-                TriggerCastFlags castMask = TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_CASTER_AURASTATE);
-                //target->CastSpell(target, GetEffectValue(), castMask);
-                target->CastSpell(target, SPELL_HUNTER_MASTERS_CALL_TRIGGERED, castMask);
-                // there is a possibility that this effect should access effect 0 (dummy) target, but i dubt that
-                // it's more likely that on on retail it's possible to call target selector based on dbc values
-                // anyways, we're using GetExplTargetUnit() here and it's ok
-                if (Unit* ally = GetExplTargetUnit())
-                {
-                    //target->CastSpell(ally, GetEffectValue(), castMask);
-                    target->CastSpell(ally, GetSpellInfo()->Effects[EFFECT_0].CalcValue(), castMask);
-                }
-            }
+            GetHitUnit()->CastSpell((Unit*)nullptr, SPELL_HUNTER_MASTERS_CALL_TRIGGERED, true);
         }
 
         void Register() override
         {
+            OnCheckCast += SpellCheckCastFn(spell_hun_masters_call_SpellScript::DoCheckCast);
+
+            OnEffectHitTarget += SpellEffectFn(spell_hun_masters_call_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
             OnEffectHitTarget += SpellEffectFn(spell_hun_masters_call_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
         }
     };

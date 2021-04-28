@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-GPL2
+ * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
  * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
@@ -84,7 +84,7 @@ namespace FactorySelector
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         // select NullCreatureAI if not another cases
         ainame = (ai_factory == nullptr) ? "NullCreatureAI" : ai_factory->key();
-        sLog->outDebug(LOG_FILTER_TSCR, "Creature %u used AI is %s.", creature->GetGUIDLow(), ainame.c_str());
+        LOG_DEBUG("scripts.ai", "Creature %s used AI is %s.", creature->GetGUID().ToString().c_str(), ainame.c_str());
 #endif
         return (ai_factory == nullptr ? new NullCreatureAI(creature) : ai_factory->Create(creature));
     }
@@ -131,7 +131,7 @@ namespace FactorySelector
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         std::string ainame = (ai_factory == nullptr || go->GetScriptId()) ? "NullGameObjectAI" : ai_factory->key();
-        sLog->outDebug(LOG_FILTER_TSCR, "GameObject %u used AI is %s.", go->GetGUIDLow(), ainame.c_str());
+        LOG_DEBUG("scripts.ai", "GameObject %s used AI is %s.", go->GetGUID().ToString().c_str(), ainame.c_str());
 #endif
 
         return (ai_factory == nullptr ? new NullGameObjectAI(go) : ai_factory->Create(go));

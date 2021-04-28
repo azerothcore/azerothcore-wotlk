@@ -6,6 +6,9 @@
 #define DEF_NAXXRAMAS_H
 
 #include "SpellScript.h"
+#include "CreatureAIImpl.h"
+
+#define NaxxramasScriptName "instance_naxxramas"
 
 enum Encouters
 {
@@ -29,47 +32,57 @@ enum Encouters
 
 enum NXData
 {
-    DATA_HEIGAN_ERUPTION            = 100,
-    DATA_HEIGAN_ENTER_GATE          = 101,
-    DATA_LOATHEB_GATE               = 102,
-    DATA_ANUB_GATE                  = 103,
-    DATA_MAEXXNA_GATE               = 104,
-    DATA_THADDIUS_BOSS              = 105,
-    DATA_STALAGG_BOSS               = 106,
-    DATA_FEUGEN_BOSS                = 107,
-    DATA_GOTHIK_ENTER_GATE          = 108,
-    DATA_GOTHIK_INNER_GATE          = 109,
-    DATA_GOTHIK_EXIT_GATE           = 110,
-    DATA_LICH_KING_BOSS             = 111,
-    DATA_KELTHUZAD_FLOOR            = 112,
-    DATA_ABOMINATION_KILLED         = 113,
-    DATA_FRENZY_REMOVED             = 114,
-    DATA_CHARGES_CROSSED            = 115,
-    DATA_SPORE_KILLED               = 116,
-    DATA_HUNDRED_CLUB               = 117,
-    DATA_DANCE_FAIL                 = 118,
-    DATA_IMMORTAL_FAIL              = 119,
-    DATA_KELTHUZAD_GATE             = 120,
-    DATA_HAD_THADDIUS_GREET         = 121,
+    DATA_NOTH_ENTRY_GATE            = 100,
+    DATA_HEIGAN_ERUPTION            = 101,
+    DATA_HEIGAN_ENTER_GATE          = 102,
+    DATA_LOATHEB_GATE               = 103,
+    DATA_ANUB_GATE                  = 104,
+    DATA_FAERLINA_WEB               = 105,
+    DATA_MAEXXNA_GATE               = 106,
+    DATA_THADDIUS_BOSS              = 107,
+    DATA_STALAGG_BOSS               = 108,
+    DATA_FEUGEN_BOSS                = 109,
+    DATA_THADDIUS_GATE              = 110,
+    DATA_GOTHIK_ENTER_GATE          = 111,
+    DATA_GOTHIK_INNER_GATE          = 112,
+    DATA_GOTHIK_EXIT_GATE           = 113,
+    DATA_HORSEMEN_GATE              = 114,
+    DATA_LICH_KING_BOSS             = 115,
+    DATA_KELTHUZAD_FLOOR            = 116,
+    DATA_ABOMINATION_KILLED         = 117,
+    DATA_FRENZY_REMOVED             = 118,
+    DATA_CHARGES_CROSSED            = 119,
+    DATA_SPORE_KILLED               = 120,
+    DATA_HUNDRED_CLUB               = 121,
+    DATA_DANCE_FAIL                 = 122,
+    DATA_IMMORTAL_FAIL              = 123,
+    DATA_KELTHUZAD_GATE             = 124,
+    DATA_HAD_THADDIUS_GREET         = 125,
+    DATA_KELTHUZAD_PORTAL_1         = 126,
+    DATA_KELTHUZAD_PORTAL_2         = 127,
+    DATA_KELTHUZAD_PORTAL_3         = 128,
+    DATA_KELTHUZAD_PORTAL_4         = 129
 };
 
 enum NXGOs
 {
     GO_PATCHWERK_GATE               = 181123,
     GO_GLUTH_GATE                   = 181120,
-    GO_NOTH_GATE                    = 181201,
-    GO_HEIGAN_ENTERANCE_GATE        = 181202,
+    GO_NOTH_ENTRY_GATE              = 181200,
+    GO_NOTH_EXIT_GATE               = 181201,
+    GO_HEIGAN_ENTRY_GATE            = 181202,
     GO_HEIGAN_EXIT_GATE             = 181203,
     GO_LOATHEB_GATE                 = 181241,
     GO_ANUB_GATE                    = 181126,
     GO_ANUB_NEXT_GATE               = 181195,
+    GO_FAERLINA_WEB                 = 181235,
     GO_FAERLINA_GATE                = 194022,
     GO_MAEXXNA_GATE                 = 181209,
     GO_THADDIUS_GATE                = 181121,
     GO_GOTHIK_ENTER_GATE            = 181124,
     GO_GOTHIK_INNER_GATE            = 181170,
     GO_GOTHIK_EXIT_GATE             = 181125,
-    GO_HORSEMAN_GATE                = 181119,
+    GO_HORSEMEN_GATE                = 181119,
     GO_SAPPHIRON_GATE               = 181225,
 
     GO_HORSEMEN_CHEST_10            = 181366,
@@ -78,19 +91,27 @@ enum NXGOs
     GO_SAPPHIRON_BIRTH              = 181356,
     GO_KELTHUZAD_FLOOR              = 181444,
     GO_KELTHUZAD_GATE               = 181228,
+    GO_KELTHUZAD_PORTAL_1           = 181402,
+    GO_KELTHUZAD_PORTAL_2           = 181403,
+    GO_KELTHUZAD_PORTAL_3           = 181404,
+    GO_KELTHUZAD_PORTAL_4           = 181405,
 
-    GO_DEATHKNIGHT_WING             = 181577, //Loatheb portal
-    GO_THADDIUS_PORTAL              = 181576, //Thadius portal
-    GO_MAEXXNA_PORTAL               = 181575, //Maexxna portal
-    GO_HORSEMAN_PORTAL              = 181578, //Four Horseman portal
+    GO_LOATHEB_PORTAL               = 181577,
+    GO_THADDIUS_PORTAL              = 181576,
+    GO_MAEXXNA_PORTAL               = 181575,
+    GO_HORSEMAN_PORTAL              = 181578,
 
+    // "Glow" effect on center-side portal
     GO_DEATHKNIGHT_EYE_PORTAL       = 181210,
     GO_PLAGUE_EYE_PORTAL            = 181211,
     GO_SPIDER_EYE_PORTAL            = 181212,
     GO_ABOM_EYE_PORTAL              = 181213,
 
-    GO_CONS_NOX_TESLA_STALAGG       = 268049,
-    GO_CONS_NOX_TESLA_FEUGEN        = 268050
+    // "Glow" effect on boss-side portal
+    GO_ARAC_EYE_RAMP_BOSS           = 181233,
+    GO_PLAG_EYE_RAMP_BOSS           = 181231,
+    GO_MILI_EYE_RAMP_BOSS           = 181230,
+    GO_CONS_EYE_RAMP_BOSS           = 181232
 };
 
 enum NXNPCs
@@ -130,14 +151,11 @@ enum NXNPCs
 
 enum NXMisc
 {
-    // Spells
     SPELL_ERUPTION                  = 29371,
     SPELL_FROGGER_EXPLODE           = 28433,
 
-    // Actions
     ACTION_SAPPHIRON_BIRTH          = 1,
 
-    // Sounds
     // Background screams in instance if Thaddius still alive, four of them from 8873 to 8876
     SOUND_SCREAM                    = 8873
 };
@@ -156,8 +174,15 @@ enum NXSays
 
 enum NXEvents
 {
-    EVENT_THADDIUS_SCREAMS = 0,
-    EVENT_KELTHUZAD_WING_TAUNT
+    EVENT_THADDIUS_SCREAMS          = 0,
+    EVENT_KELTHUZAD_WING_TAUNT      = 1,
+    EVENT_FROSTWYRM_WATERFALL_DOOR  = 2
 };
+
+template <class AI, class T>
+inline AI* GetNaxxramasAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, NaxxramasScriptName);
+}
 
 #endif
