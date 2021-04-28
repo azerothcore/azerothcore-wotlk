@@ -194,7 +194,7 @@ namespace ArenaSpectator
 
     bool ShouldSendAura(Aura* aura, uint8 effMask, ObjectGuid targetGUID, bool remove)
     {
-        if (aura->GetSpellInfo()->SpellIconID == 1 || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR1_DONT_DISPLAY_IN_AURA_BAR))
+        if (aura->GetSpellInfo()->SpellIconID == 1 || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR1_NO_AURA_ICON))
             return false;
 
         if (remove || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_CU_AURA_CC) || aura->GetSpellInfo()->SpellFamilyName == SPELLFAMILY_GENERIC)
