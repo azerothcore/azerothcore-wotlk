@@ -3873,7 +3873,7 @@ void Player::_addTalentAurasAndSpells(uint32 spellId)
             if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL && !sSpellMgr->IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell))
                 _addSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, true);
     }
-    else if (spellInfo->IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_HIDDEN_CLIENTSIDE) && spellInfo->Stances))
+    else if (spellInfo->IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && spellInfo->Stances))
     {
         if (IsNeedCastPassiveSpellAtLearn(spellInfo))
             CastSpell(this, spellId, true);
@@ -3960,7 +3960,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
     // xinef: send packet so client can properly recognize this new spell
     // xinef: ignore passive spells and spells with learn effect
     // xinef: send spells with no aura effects (ie dual wield)
-    if (IsInWorld() && !isBeingLoaded() && temporary && (learnFromSkill || !spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_HIDDEN_CLIENTSIDE)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
+    if (IsInWorld() && !isBeingLoaded() && temporary && (learnFromSkill || !spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
         SendLearnPacket(spellInfo->Id, true);
 
     // xinef: DO NOT allow to learn spell with effect learn spell!
@@ -4030,7 +4030,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
         //ABORT();
     }
     // pussywizard: cast passive spells (including all talents without SPELL_EFFECT_LEARN_SPELL) with additional checks
-    else if (spellInfo->IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_HIDDEN_CLIENTSIDE) && spellInfo->Stances))
+    else if (spellInfo->IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && spellInfo->Stances))
     {
         if (IsNeedCastPassiveSpellAtLearn(spellInfo))
             CastSpell(this, spellId, true);
@@ -4134,7 +4134,7 @@ bool Player::IsNeedCastPassiveSpellAtLearn(SpellInfo const* spellInfo) const
     // talent dependent passives activated at form apply have proper stance data
     ShapeshiftForm form = GetShapeshiftForm();
     return (!spellInfo->Stances || (form && (spellInfo->Stances & (1 << (form - 1)))) ||
-            (!form && spellInfo->HasAttribute(SPELL_ATTR2_NOT_NEED_SHAPESHIFT)));
+            (!form && spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_WHILE_NOT_SHAPESHIFTED)));
 }
 
 void Player::learnSpell(uint32 spellId)
@@ -4318,7 +4318,7 @@ void Player::removeSpell(uint32 spellId, uint8 removeSpecMask, bool onlyTemporar
     }
 
     // pussywizard: remove from spell book (can't be replaced by previous rank, because such spells can't be unlearnt)
-    if (!onlyTemporary || ((!spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_HIDDEN_CLIENTSIDE)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL)))
+    if (!onlyTemporary || ((!spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)) || !spellInfo->HasAnyAura()) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL)))
     {
         sScriptMgr->OnPlayerForgotSpell(this, spellId);
         SendLearnPacket(spellId, false);
@@ -4393,7 +4393,7 @@ void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
         if (!spellInfo) // xinef: impossibru...
             continue;
 
-        if (spellInfo->HasAttribute(SPELL_ATTR4_USABLE_IN_ARENA))
+        if (spellInfo->HasAttribute(SPELL_ATTR4_IGNORE_DEFAULT_ARENA_RESTRICTIONS))
             RemoveSpellCooldown(itr->first, true);
         else if (spellInfo->RecoveryTime < 10 * MINUTE * IN_MILLISECONDS && spellInfo->CategoryRecoveryTime < 10 * MINUTE * IN_MILLISECONDS && itr->second.end < infTime// xinef: dont remove active cooldowns - bugz
                  && itr->second.maxduration < 10 * MINUTE * IN_MILLISECONDS) // xinef: dont clear cooldowns that have maxduration > 10 minutes (eg item cooldowns with no spell.dbc cooldown info)
@@ -7073,7 +7073,7 @@ void Player::CheckAreaExploreAndOutdoor()
     AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(areaId);
 
     if (sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK) && !isOutdoor)
-        RemoveAurasWithAttribute(SPELL_ATTR0_OUTDOORS_ONLY);
+        RemoveAurasWithAttribute(SPELL_ATTR0_ONLY_OUTDOORS);
 
     if (!sScriptMgr->CanAreaExploreAndOutdoor(this))
         return;
@@ -18842,7 +18842,7 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             }
 
             // negative effects should continue counting down after logout
-            if (remaintime != -1 && ((!spellInfo->IsPositive() && spellInfo->Id != 15007) || spellInfo->HasAttribute(SPELL_ATTR4_FADES_WHILE_LOGGED_OUT))) // Xinef: resurrection sickness should not tick when logged off
+            if (remaintime != -1 && ((!spellInfo->IsPositive() && spellInfo->Id != 15007) || spellInfo->HasAttribute(SPELL_ATTR4_AURA_EXPIRES_OFFLINE))) // Xinef: resurrection sickness should not tick when logged off
             {
                 if (remaintime / IN_MILLISECONDS <= int32(timediff))
                     continue;
@@ -22988,7 +22988,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
         if (rec > 0)
             ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, rec, spell);
 
-        if (catrec > 0 && !spellInfo->HasAttribute(SPELL_ATTR6_IGNORE_CATEGORY_COOLDOWN_MODS))
+        if (catrec > 0 && !spellInfo->HasAttribute(SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS))
             ApplySpellMod(spellInfo->Id, SPELLMOD_COOLDOWN, catrec, spell);
 
         if (int32 cooldownMod = GetTotalAuraModifier(SPELL_AURA_MOD_COOLDOWN))
@@ -23996,7 +23996,7 @@ void Player::ApplyEquipCooldown(Item* pItem)
             continue;
 
         // xinef: dont apply eqiup cooldown for spells with this attribute
-        if (spellInfo && spellInfo->HasAttribute(SPELL_ATTR0_CANT_USED_IN_COMBAT))
+        if (spellInfo && spellInfo->HasAttribute(SPELL_ATTR0_NOT_IN_COMBAT_ONLY_PEACEFUL))
             continue;
 
         AddSpellCooldown(spellData.SpellId, pItem->GetEntry(), 30 * IN_MILLISECONDS, true, true);
@@ -24586,8 +24586,8 @@ bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item cons
 
 bool Player::CanNoReagentCast(SpellInfo const* spellInfo) const
 {
-    // don't take reagents for spells with SPELL_ATTR5_NO_REAGENT_WHILE_PREP
-    if (spellInfo->HasAttribute(SPELL_ATTR5_NO_REAGENT_WHILE_PREP) && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREPARATION))
+    // don't take reagents for spells with SPELL_ATTR5_NO_REAGENT_COST_WITH_AURA
+    if (spellInfo->HasAttribute(SPELL_ATTR5_NO_REAGENT_COST_WITH_AURA) && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREPARATION))
         return true;
 
     // Check no reagent use mask
@@ -25953,7 +25953,7 @@ bool Player::canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell) c
 {
     // continent checked in SpellInfo::CheckLocation at cast and area update
     uint32 v_map = GetVirtualMapForMapAndZone(mapid, zone);
-    if (v_map == 571 && !bySpell->HasAttribute(SPELL_ATTR7_IGNORE_COLD_WEATHER_FLYING))
+    if (v_map == 571 && !bySpell->HasAttribute(SPELL_ATTR7_IGNORES_COLD_WEATHER_FLYING_REQUIREMENT))
     {
         if (!HasSpell(54197)) // 54197 = Cold Weather Flying
         {
@@ -27681,7 +27681,7 @@ void Player::PrepareCharmAISpells()
         if (!spellInfo)
             continue;
 
-        if (!spellInfo->SpellFamilyName || spellInfo->IsPassive() || spellInfo->NeedsComboPoints() || (spellInfo->Stances && !spellInfo->HasAttribute(SPELL_ATTR2_NOT_NEED_SHAPESHIFT)))
+        if (!spellInfo->SpellFamilyName || spellInfo->IsPassive() || spellInfo->NeedsComboPoints() || (spellInfo->Stances && !spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_WHILE_NOT_SHAPESHIFTED)))
             continue;
 
         float cast = spellInfo->CalcCastTime() / 1000.0f;
@@ -27722,7 +27722,7 @@ void Player::PrepareCharmAISpells()
                 }
                 break;
             }
-            else if (spellInfo->HasAttribute(SPELL_ATTR7_HAS_CHARGE_EFFECT))
+            else if (spellInfo->HasAttribute(SPELL_ATTR7_ATTACK_ON_CHARGE_TO_UNIT))
             {
                 m_charmAISpells[SPELL_T_CHARGE] = spellInfo->Id;
                 break;
