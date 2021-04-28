@@ -1040,8 +1040,7 @@ public:
                     _events.ScheduleEvent(EVENT_SPELL_BURNING_LIGHT, 4000);
                     break;
                 case EVENT_SPELL_CONSECRATION:
-                    if (me->FindNearestCreature(me->GetVictim()->GetGUID(), 10.0f, true))
-                        me->CastSpell(me, CONSECRATION, false);
+                    me->CastSpell(me->GetVictim(), CONSECRATION, false);
                     _events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 14000);
                     break;
             }
@@ -1098,8 +1097,8 @@ public:
         {
             if (!summons.empty())
             {
-                for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
+                for (ObjectGuid guid : summons)
+                    if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     {
                         float x, y, z, o;
                         cr->GetRespawnPosition(x, y, z, &o);
@@ -1126,7 +1125,7 @@ public:
             npc_escortAI::MoveInLineOfSight(who);
         }
 
-        void SetGUID(uint64 playerGUID, int32 type) override
+        void SetGUID(ObjectGuid playerGUID, int32 type) override
         {
             if (type == DATA_START_ENCOUNTER)
             {
@@ -1175,7 +1174,7 @@ public:
         void SummonsAction(Unit* who)
         {
             float i = 0;
-            for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr, i += 1.0f)
+            for (GuidList::iterator itr = summons.begin(); itr != summons.end(); ++itr, i += 1.0f)
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
                 {
                     if (who == nullptr)
@@ -1280,7 +1279,7 @@ public:
         if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
         {
             creature->AI()->SetGUID(player->GetGUID(), DATA_START_ENCOUNTER);
-            player->KilledMonsterCredit(creature->GetEntry(), 0);
+            player->KilledMonsterCredit(creature->GetEntry());
         }
         else if (uiAction == GOSSIP_ACTION_INFO_DEF + 2)
         {
@@ -1363,9 +1362,9 @@ public:
     {
         npc_commander_dawnforgeAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 PlayerGUID;
-        uint64 ardonisGUID;
-        uint64 pathaleonGUID;
+        ObjectGuid PlayerGUID;
+        ObjectGuid ardonisGUID;
+        ObjectGuid pathaleonGUID;
 
         uint32 Phase;
         uint32 PhaseSubphase;
@@ -1374,9 +1373,9 @@ public:
 
         void Reset() override
         {
-            PlayerGUID = 0;
-            ardonisGUID = 0;
-            pathaleonGUID = 0;
+            PlayerGUID.Clear();
+            ardonisGUID.Clear();
+            pathaleonGUID.Clear();
 
             Phase = 1;
             PhaseSubphase = 0;
@@ -1698,7 +1697,7 @@ public:
         bool Drained;
         uint8 WeakPercent;
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         uint32 ManaBurnTimer;
 
@@ -1709,7 +1708,7 @@ public:
             Drained = false;
             WeakPercent = 25 + (rand() % 16); // 25-40
 
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
 
             ManaBurnTimer = 5000 + (rand() % 3 * 1000); // 5-8 sec cd
 
