@@ -23,3 +23,4 @@ INSERT INTO `pool_gameobject` (`guid`,`pool_entry`,`chance`,`description`) VALUE
 
 -- Respawn rates of gameobjects
 UPDATE `gameobject` SET `spawntimesecs`=@RESPAWN WHERE FIND_IN_SET (`guid`,@GUID);
+
