@@ -446,7 +446,9 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         {
             GameObject* go = mover->GetMap()->GetGameObject(movementInfo.transport.guid);
             if (!go || go->GetGoType() != GAMEOBJECT_TYPE_TRANSPORT)
+            {
                 movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+            }
         }
     }
     else if (plrMover && plrMover->GetTransport()) // if we were on a transport, leave
