@@ -115,7 +115,7 @@ namespace DisableMgr
                     if (flags & SPELL_DISABLE_LOS)
                     {
                         SpellInfo* spellInfo = const_cast<SpellInfo*>(sSpellMgr->GetSpellInfo(entry));
-                        spellInfo->AttributesEx2 |= SPELL_ATTR2_CAN_TARGET_NOT_IN_LOS;
+                        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
                     }
 
                     break;
