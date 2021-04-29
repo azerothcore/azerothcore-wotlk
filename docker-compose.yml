@@ -27,11 +27,11 @@ services:
       # we cannot use /env/dist to avoid permission issues
       - ac-env:/azerothcore/env
       # expose some dist folder outside allowing the host to use them
-      - ${DOCKER_CONF:-./conf}:/azerothcore/conf
-      - ${DOCKER_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
+      - ${DOCKER_VOL_CONF:-./conf}:/azerothcore/conf
+      - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
       # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
-      - ${DOCKER_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
-      - ${DOCKER_DATA:-./env/docker/data}:/azerothcore/env/dist/data:delegated
+      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+      - ${DOCKER_VOL_DATA:-./env/docker/data}:/azerothcore/env/dist/data:delegated
     profiles: [abstract-service] # do not run this
 
   abstract-no-bind:
@@ -63,9 +63,9 @@ services:
         target: /var/lib/mysql
     healthcheck:
       test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
-      interval: 2s
-      timeout: 20s
-      retries: 10
+      interval: 5s
+      timeout: 10s
+      retries: 40
 
 
   ac-worldserver:
@@ -78,11 +78,19 @@ services:
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-acore}
     privileged: true
     build:
       context: .
-      target: ${DOCKER_BUILD_WORLD_TARGET:-dev}
+      target: ${DOCKER_BUILD_WORLD_TARGET:-worldserver-local}
       dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      cache_from:
+        - acore/authserver:${DOCKER_IMAGE_TAG:-master}
+        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
@@ -97,10 +105,18 @@ services:
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-acore}
     build:
       context: .
-      target: ${DOCKER_BUILD_AUTH_TARGET:-dev}
+      target: ${DOCKER_BUILD_AUTH_TARGET:-authserver-local}
       dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      cache_from:
+        - acore/worldserver:${DOCKER_IMAGE_TAG:-master}
+        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [all, app, authserver]
@@ -110,13 +126,10 @@ services:
 # Dev services
 #
 #======================
-
-  ac-dev-server:
+  ac-build:
     <<: *ac-shared-conf
-    tty: true
+    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     image: acore/dev-server:${DOCKER_IMAGE_TAG:-master}
-    security_opt:
-      - seccomp:unconfined
     build:
       context: .
       target: dev
@@ -124,9 +137,40 @@ services:
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      cache_from:
+        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    working_dir: /azerothcore/
+    volumes:
+        - ac-build:/azerothcore/var/build
+         # use internal copied files instead of volumes
+        - /azerothcore/src
+        - /azerothcore/data
+        - /azerothcore/modules
+    profiles: [all, build]
+
+  ac-dev-server:
+    <<: *ac-shared-conf
+    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
+    tty: true
+    image: acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+    build:
+      context: .
+      target: dev
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      cache_from:
+        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+    security_opt:
+      - seccomp:unconfined
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-acore}
     environment:
         DBLIST: AUTH,CHARACTERS,WORLD
     ports:
@@ -134,14 +178,24 @@ services:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
-      - ac-build:/azerothcore/var/build
+      - ac-build-dev:/azerothcore/var/build
     profiles: [all, dev]
+    depends_on:
+      ac-database:
+        condition: service_healthy
 
 volumes:
   ac-database:
   ac-env:
+  ac-build-dev:
   ac-build:
   ac-proj:
+  # not used, but you can use them by setting
+  # the DOCKER_VOL_* env variabiles
+  ac-conf:
+  ac-etc:
+  ac-logs:
+  ac-client-data:
 
 networks:
   ac-network:

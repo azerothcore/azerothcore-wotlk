@@ -1,16 +1,11 @@
 
 function comp_clean() {
-  echo "Cleaning build files"
+  DIRTOCLEAN=${BUILDPATH:-var/build/obj}
+  PATTERN="$DIRTOCLEAN/*"
 
-  CWD=$(pwd)
+  echo "Cleaning build files in $DIRTOCLEAN"
 
-  cd $BUILDPATH
-
-  make -f Makefile clean || true
-  make clean || true
-  find -iname '*cmake*' -not -name CMakeLists.txt -exec rm -rf {} \+
-
-  cd $CWD
+  [ -d "$DIRTOCLEAN" ] && rm -rf $PATTERN
 }
 
 function comp_configure() {
