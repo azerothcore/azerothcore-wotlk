@@ -53,7 +53,7 @@ public:
         m->GetZoneAndAreaId(zoneid, areaid, x, y, z);
     }
 
-    void Initialize(void);
+    void Initialize();
     void Update(uint32);
 
     void SetMapUpdateInterval(uint32 t)
