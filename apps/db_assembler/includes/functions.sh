@@ -12,7 +12,7 @@ function dbasm_waitMysqlConn() {
             echo "DBASM Timeout: Cannot ping mysql!" 1>&2
             exit 64
         fi
-        echo "Cannot ping mysql, retry in $DBASM_WAIT_TIMEOUT seconds (remaining: $COUNT/$DBASM_WAIT_RETRIES)..."
+        echo "Cannot ping mysql on $DBHOST:$DBPORT, retry in $DBASM_WAIT_TIMEOUT seconds (remaining: $COUNT/$DBASM_WAIT_RETRIES)..."
         sleep $DBASM_WAIT_TIMEOUT
     done
 }

@@ -267,10 +267,10 @@ enum ComputerTalks
     TALK_COMPUTER_ZERO = 12,
 };
 
-#define GetMimiron() ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_MIMIRON))
-#define GetLMK2() ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MIMIRON_LEVIATHAN_MKII))
-#define GetVX001() ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MIMIRON_VX001))
-#define GetACU() ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MIMIRON_ACU))
+#define GetMimiron() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_MIMIRON))
+#define GetLMK2() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_LEVIATHAN_MKII))
+#define GetVX001() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_VX001))
+#define GetACU() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_ACU))
 
 class boss_mimiron : public CreatureScript
 {
@@ -779,7 +779,7 @@ public:
 
                         if( pInstance )
                             for( uint16 i = 0; i < 3; ++i )
-                                if( uint64 guid = pInstance->GetData64(DATA_GO_MIMIRON_DOOR_1 + i) )
+                                if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                                     if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                                         if( door->GetGoState() != GO_STATE_ACTIVE )
                                         {
@@ -862,7 +862,7 @@ public:
         {
             if( pInstance )
                 for( uint16 i = 0; i < 3; ++i )
-                    if( uint64 guid = pInstance->GetData64(DATA_GO_MIMIRON_DOOR_1 + i) )
+                    if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                         if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                             if( door->GetGoState() != GO_STATE_ACTIVE )
                             {
@@ -893,7 +893,7 @@ public:
         {
             if( pInstance )
                 for( uint16 i = 0; i < 3; ++i )
-                    if( uint64 guid = pInstance->GetData64(DATA_GO_MIMIRON_DOOR_1 + i) )
+                    if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                         if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                             if( door->GetGoState() != GO_STATE_READY )
                             {
@@ -2257,7 +2257,7 @@ public:
             if(instance->GetData(TYPE_MIMIRON) != NOT_STARTED)
                 return false;
 
-            if (Creature* c = ObjectAccessor::GetCreature(*go, instance->GetData64(TYPE_MIMIRON)))
+            if (Creature* c = ObjectAccessor::GetCreature(*go, instance->GetGuidData(TYPE_MIMIRON)))
             {
                 c->AI()->SetData(0, 7);
                 c->AI()->AttackStart(player);
@@ -2292,7 +2292,7 @@ public:
             }
         }
 
-        std::list<uint64> FlameList;
+        GuidList FlameList;
         EventMap events;
         uint32 CreateTime;
 
@@ -2314,15 +2314,15 @@ public:
             }
         }
 
-        void RemoveFlame(uint64 guid)
+        void RemoveFlame(ObjectGuid guid)
         {
             FlameList.remove(guid);
         }
 
         void RemoveAll()
         {
-            for( std::list<uint64>::iterator itr = FlameList.begin(); itr != FlameList.end(); ++itr )
-                if (Creature* c = ObjectAccessor::GetCreature(*me, (*itr)))
+            for (ObjectGuid guid : FlameList)
+                if (Creature* c = ObjectAccessor::GetCreature(*me, guid))
                     c->DespawnOrUnsummon();
             FlameList.clear();
             me->DespawnOrUnsummon();
