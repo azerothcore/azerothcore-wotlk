@@ -525,13 +525,10 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     {
         if (VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(mover))
         {
-            if (seat->m_flags & VEHICLE_SEAT_FLAG_ALLOW_TURNING)
+            if (seat->m_flags & VEHICLE_SEAT_FLAG_ALLOW_TURNING && movementInfo.pos.GetOrientation() != mover->GetOrientation())
             {
-                if (movementInfo.pos.GetOrientation() != mover->GetOrientation())
-                {
-                    mover->SetOrientation(movementInfo.pos.GetOrientation());
-                    mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
-                }
+                mover->SetOrientation(movementInfo.pos.GetOrientation());
+                mover->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TURNING);
             }
         }
 

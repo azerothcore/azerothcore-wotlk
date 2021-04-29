@@ -1637,14 +1637,7 @@ void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
 
     recv_data.read_skip<float>();                           // unk2
 
-    if (movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY))
-    {
-        sScriptMgr->AnticheatSetCanFlybyServer(_player, true);
-    }
-    else
-    {
-        sScriptMgr->AnticheatSetCanFlybyServer(_player, false);
-    }
+    sScriptMgr->AnticheatSetCanFlybyServer(_player, movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY));
 
     _player->m_mover->m_movementInfo.flags = movementInfo.GetMovementFlags();
 }
