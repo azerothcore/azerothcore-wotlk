@@ -1414,11 +1414,11 @@ public:
 
                 do
                 {
-                    Field* characterFields  = result2->Fetch();
-                    uint32 guid             = characterFields[0].GetUInt32();
-                    std::string name        = characterFields[1].GetString();
+                    Field* characterFields   = result2->Fetch();
+                    ObjectGuid::LowType guid = characterFields[0].GetUInt32();
+                    std::string name         = characterFields[1].GetString();
                     uint8 plevel = 0, prace = 0, pclass = 0;
-                    bool online = (ObjectAccessor::FindPlayerInOrOutOfWorld(MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER)) != nullptr);
+                    bool online = ObjectAccessor::FindPlayerByLowGUID(guid) != nullptr;
 
                     if (const GlobalPlayerData* gpd = sWorld->GetGlobalPlayerData(guid))
                     {

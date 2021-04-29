@@ -69,7 +69,7 @@ enum Events
 class DealDebrisDamage : public BasicEvent
 {
 public:
-    DealDebrisDamage(Creature& creature, uint64 targetGUID) : _owner(creature), _targetGUID(targetGUID) { }
+    DealDebrisDamage(Creature& creature, ObjectGuid targetGUID) : _owner(creature), _targetGUID(targetGUID) { }
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
@@ -80,7 +80,7 @@ public:
 
 private:
     Creature& _owner;
-    uint64 _targetGUID;
+    ObjectGuid _targetGUID;
 };
 
 class boss_magtheridon : public CreatureScript

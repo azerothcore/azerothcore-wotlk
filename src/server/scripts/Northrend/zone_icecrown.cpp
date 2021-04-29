@@ -105,20 +105,19 @@ public:
     {
         npc_battle_at_valhalasAI(Creature* creature) : ScriptedAI(creature), summons(me)
         {
-            playerGUID2 = 0;
         }
 
         EventMap events;
         SummonList summons;
-        uint64 playerGUID;
-        uint64 playerGUID2;
+        ObjectGuid playerGUID;
+        ObjectGuid playerGUID2;
         uint32 currentQuest;
 
         void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            playerGUID = 0;
+            playerGUID.Clear();
             currentQuest = 0;
             me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         }
@@ -161,7 +160,7 @@ public:
             }
         }
 
-        void StartBattle(uint64 guid, uint32 questId)
+        void StartBattle(ObjectGuid guid, uint32 questId)
         {
             events.ScheduleEvent(EVENT_VALHALAS_FIRST, 6000);
             events.ScheduleEvent(EVENT_VALHALAS_CHECK_PLAYER, 30000);
@@ -172,8 +171,8 @@ public:
         void CheckSummons()
         {
             bool allow = true;
-            for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, *itr))
+            for (ObjectGuid guid : summons)
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     if (cr->IsAlive())
                         allow = false;
 
@@ -448,13 +447,13 @@ public:
         npc_lord_areteAI(Creature* creature) : ScriptedAI(creature) {}
 
         EventMap events;
-        uint64 _landgrenGUID;
-        uint64 _landgrenSoulGUID;
+        ObjectGuid _landgrenGUID;
+        ObjectGuid _landgrenSoulGUID;
 
         void InitializeAI() override
         {
-            _landgrenGUID = 0;
-            _landgrenSoulGUID = 0;
+            _landgrenGUID.Clear();
+            _landgrenSoulGUID.Clear();
 
             events.Reset();
             events.RescheduleEvent(EVENT_START, 1000);
@@ -1731,10 +1730,10 @@ public:
 
         SummonList Summons;
 
-        uint64 guidDalfors;
-        uint64 guidPriest[3];
-        uint64 guidMason[3];
-        uint64 guidHalof;
+        ObjectGuid guidDalfors;
+        ObjectGuid guidPriest[3];
+        ObjectGuid guidMason[3];
+        ObjectGuid guidHalof;
 
         void Reset() override
         {

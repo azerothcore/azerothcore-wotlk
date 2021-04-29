@@ -64,8 +64,8 @@ public:
 
         EventMap events;
         bool PartyTime;
-        uint64 PlayerGUID;
-        uint64 CannonGUID;
+        ObjectGuid PlayerGUID;
+        ObjectGuid CannonGUID;
         uint8 count;
 
         void Reset() override
@@ -77,8 +77,8 @@ public:
         void Initialize()
         {
             PartyTime = false;
-            PlayerGUID = 0;
-            CannonGUID = 0;
+            PlayerGUID.Clear();
+            CannonGUID.Clear();
             count = 0;
         }
 
@@ -106,9 +106,9 @@ public:
                     if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                     {
                         if (GetClosestCreatureWithEntry(me, NPC_SOUTH_GATE, 200.0f))
-                            player->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT, TRIGGERED_NONE);
+                            player->KilledMonsterCredit(NPC_SOUTH_GATE_CREDIT);
                         else if (GetClosestCreatureWithEntry(me, NPC_NORTH_GATE, 200.0f))
-                            player->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT, TRIGGERED_NONE);
+                            player->KilledMonsterCredit(NPC_NORTH_GATE_CREDIT);
                         // complete quest part
                         if (Creature* bunny = GetClosestCreatureWithEntry(me, NPC_EXPLOSION_BUNNY, 200.0f))
                             bunny->CastSpell(nullptr, SPELL_EXPLOSION, TRIGGERED_NONE);
@@ -560,7 +560,7 @@ public:
         uint8 gameLevel;
         uint8 fails;
         uint8 gameTicks;
-        uint64 playerGUID;
+        ObjectGuid playerGUID;
         uint32 clusterIds[SIMON_MAX_COLORS];
         float zCoordCorrection;
         float searchDistance;
@@ -670,7 +670,7 @@ public:
         }
 
         // Used for getting involved player guid. Parameter id is used for defining if is a large(Monument) or small(Relic) node
-        void SetGUID(uint64 guid, int32 id) override
+        void SetGUID(ObjectGuid guid, int32 id) override
         {
             me->SetCanFly(true);
 
@@ -1073,7 +1073,7 @@ public:
     {
         npc_oscillating_frequency_scanner_master_bunnyAI(Creature* creature) : ScriptedAI(creature)
         {
-            playerGuid = 0;
+            playerGuid.Clear();
             timer = 500;
         }
 
@@ -1112,7 +1112,7 @@ public:
         }
 
     private:
-        uint64 playerGuid;
+        ObjectGuid playerGuid;
         uint32 timer;
     };
 
