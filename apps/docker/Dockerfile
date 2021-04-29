@@ -182,7 +182,7 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/au
 # with binaries and data included
 #
 #=================================================================
-FROM authserver-local as worldserver
+FROM worldserver-local as worldserver
 
 LABEL description="AC Production ready worldserver"
 
