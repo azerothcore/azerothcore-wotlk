@@ -24857,7 +24857,7 @@ void Player::ResurectUsingRequestData()
 void Player::SetClientControl(Unit* target, bool allowMove, bool packetOnly /*= false*/)
 {
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size() + 1);
-    data.append(target->GetPackGUID());
+    data << target->GetPackGUID();
     data << uint8((allowMove && !target->HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED)) ? 1 : 0);
     GetSession()->SendPacket(&data);
 
