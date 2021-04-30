@@ -166,7 +166,7 @@ LABEL description="AC Image used by the build stage to generate production image
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc /azerothcore/env/dist/etc
 
-RUN --mount=type=cache,target=/home/acore/.ccache/,uid=1000,gid=1000 bash apps/docker/docker-build-prod.sh
+RUN --mount=id=ac-wotlk-ccache,type=cache,target=/home/acore/.ccache/,uid=1000,gid=1000 bash apps/docker/docker-build-prod.sh
 
 #================================================================
 #
@@ -212,7 +212,7 @@ ARG DOCKER_USER=acore
 
 USER $DOCKER_USER
 
-RUN mkdir -p /azerothcore/env/dist/data
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/docker/data /azerothcore/env/dist/data
 
 ENV DATAPATH=/azerothcore/env/dist/data
 

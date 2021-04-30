@@ -3,7 +3,6 @@
 /var/*
 /env/dist/*
 /env/user/*
-/env/docker/data/*
 /env/docker/logs/*
 /env/docker/etc/*
 !/env/docker/etc/authserver.conf.dockerdist
