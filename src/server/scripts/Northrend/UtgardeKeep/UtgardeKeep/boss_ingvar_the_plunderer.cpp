@@ -106,13 +106,13 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 ValkyrGUID;
-        uint64 ThrowGUID;
+        ObjectGuid ValkyrGUID;
+        ObjectGuid ThrowGUID;
 
         void Reset() override
         {
-            ValkyrGUID = 0;
-            ThrowGUID = 0;
+            ValkyrGUID.Clear();
+            ThrowGUID.Clear();
             events.Reset();
             summons.DespawnAll();
             me->SetDisplayId(DISPLAYID_DEFAULT);
@@ -367,7 +367,7 @@ public:
                         c->DespawnOrUnsummon();
                         summons.DespawnAll();
                     }
-                    ThrowGUID = 0;
+                    ThrowGUID.Clear();
                     SetEquipmentSlots(true);
                     break;
             }

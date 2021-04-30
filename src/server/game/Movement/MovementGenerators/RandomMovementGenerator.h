@@ -34,6 +34,7 @@ public:
         for (uint8 i = 0; i < RANDOM_POINTS_NUMBER; ++i)
             _validPointsVector[RANDOM_POINTS_NUMBER].push_back(i);
     }
+    ~RandomMovementGenerator();
 
     void _setRandomLocation(T*);
     void DoInitialize(T*);

@@ -89,6 +89,12 @@ struct MinionData
     uint32 entry, bossId;
 };
 
+struct ObjectData
+{
+    uint32 entry;
+    uint32 type;
+};
+
 struct BossInfo
 {
     BossInfo() : state(TO_BE_DECIDED) {}
@@ -153,15 +159,15 @@ public:
     virtual void OnPlayerAreaUpdate(Player* /*player*/, uint32 /*oldArea*/, uint32 /*newArea*/) {}
 
     //Handle open / close objects
-    //use HandleGameObject(0, boolen, GO); in OnObjectCreate in instance scripts
+    //use HandleGameObject(ObjectGuid::Empty, boolen, GO); in OnObjectCreate in instance scripts
     //use HandleGameObject(GUID, boolen, nullptr); in any other script
-    void HandleGameObject(uint64 guid, bool open, GameObject* go = nullptr);
+    void HandleGameObject(ObjectGuid guid, bool open, GameObject* go = nullptr);
 
     //change active state of doors or buttons
-    void DoUseDoorOrButton(uint64 guid, uint32 withRestoreTime = 0, bool useAlternativeState = false);
+    void DoUseDoorOrButton(ObjectGuid guid, uint32 withRestoreTime = 0, bool useAlternativeState = false);
 
     //Respawns a GO having negative spawntimesecs in gameobject-table
-    void DoRespawnGameObject(uint64 guid, uint32 timeToDespawn = MINUTE);
+    void DoRespawnGameObject(ObjectGuid guid, uint32 timeToDespawn = MINUTE);
 
     //sends world state update to all players in instance
     void DoUpdateWorldState(uint32 worldstateId, uint32 worldstateValue);

@@ -85,10 +85,10 @@ public:
             if (IsHeroic())
                 events.RescheduleEvent(EVENT_SPELL_STORMSTRIKE, 3000);
 
-            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_1_GUID)))
+            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_EREKEM_GUARD_1_GUID)))
                 if (!c->IsInCombat())
                     c->AI()->AttackStart(who);
-            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_2_GUID)))
+            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_EREKEM_GUARD_2_GUID)))
                 if (!c->IsInCombat())
                     c->AI()->AttackStart(who);
         }
@@ -116,14 +116,14 @@ public:
                     events.RepeatEvent(urand(16000, 22000));
                     break;
                 case EVENT_SPELL_CHAIN_HEAL:
-                    if (uint64 TargetGUID = GetChainHealTargetGUID())
+                    if (ObjectGuid TargetGUID = GetChainHealTargetGUID())
                         if (pInstance)
                         {
                             if (Creature* target = pInstance->instance->GetCreature(TargetGUID))
                                 me->CastSpell(target, SPELL_CHAIN_HEAL, false);
 
-                            Creature* pGuard1 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_1_GUID));
-                            Creature* pGuard2 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_2_GUID));
+                            Creature* pGuard1 = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_EREKEM_GUARD_1_GUID));
+                            Creature* pGuard2 = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_EREKEM_GUARD_2_GUID));
                             if ((pGuard1 && !pGuard1->IsAlive()) || (pGuard2 && !pGuard2->IsAlive()))
                             {
                                 events.RepeatEvent(urand(3000, 6000));
@@ -147,8 +147,8 @@ public:
                     break;
                 case EVENT_SPELL_STORMSTRIKE:
                     {
-                        Creature* pGuard1 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_1_GUID));
-                        Creature* pGuard2 = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_2_GUID));
+                        Creature* pGuard1 = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_EREKEM_GUARD_1_GUID));
+                        Creature* pGuard2 = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_EREKEM_GUARD_2_GUID));
                         if (pGuard1 && !pGuard1->IsAlive() && pGuard2 && !pGuard2->IsAlive()) // both dead
                             me->CastSpell(me->GetVictim(), SPELL_STORMSTRIKE, false);
                         events.RepeatEvent(3000);
@@ -184,18 +184,18 @@ public:
                 pInstance->SetData(DATA_FAILED, 1);
         }
 
-        uint64 GetChainHealTargetGUID()
+        ObjectGuid GetChainHealTargetGUID()
         {
             if (HealthBelowPct(85))
                 return me->GetGUID();
 
             if (pInstance)
             {
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_1_GUID)))
+                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_EREKEM_GUARD_1_GUID)))
                     if (c->IsAlive() && !c->HealthAbovePct(75))
                         return c->GetGUID();
 
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUARD_2_GUID)))
+                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_EREKEM_GUARD_2_GUID)))
                     if (c->IsAlive() && !c->HealthAbovePct(75))
                         return c->GetGUID();
             }
@@ -252,7 +252,7 @@ public:
             events.RescheduleEvent(EVENT_SPELL_HOWLING_SCREECH, urand(8000, 13000));
             events.RescheduleEvent(EVENT_SPELL_STRIKE, urand(4000, 8000));
 
-            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_EREKEM_GUID)))
+            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_EREKEM_GUID)))
                 if (!c->IsInCombat())
                     c->AI()->AttackStart(who);
         }
