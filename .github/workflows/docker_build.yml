@@ -18,8 +18,6 @@ jobs:
       DOCKER_BUILD_AUTH_TARGET: authserver
       COMPOSE_DOCKER_CLI_BUILD: 1
       DOCKER_BUILDKIT: 1
-      IMAGE_CACHE_DIR: /tmp/cache/docker-image
-      IMAGE_CACHE_KEY: cache-image
 
     steps:
       - name: Extract branch name
@@ -33,20 +31,6 @@ jobs:
         run: |
           docker --version
           docker-compose --version
-
-      - name: Cache docker image
-        id: cache-docker-image
-        uses: actions/cache@v2
-        with:
-          path: ${{ env.IMAGE_CACHE_DIR }}
-          key: ${{ runner.os }}-${{ env.IMAGE_CACHE_KEY }}-docker-${{ hashFiles('Dockerfile') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.IMAGE_CACHE_KEY }}-docker-
-
-      - name: Docker load
-        id: docker-load
-        if: steps.cache-docker-image.outputs.cache-hit == 'true'
-        run: docker image load -i ${IMAGE_CACHE_DIR}/image.tar
 
       - name: Build
         #env:
