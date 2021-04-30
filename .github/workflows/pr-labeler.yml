@@ -1,0 +1,46 @@
+on: [pull_request_target]
+
+jobs:
+  pr_labeler:
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          src:
+            - 'src/**.cpp'
+            - 'src/**.h'
+          script:
+            - 'src/server/scripts/**.cpp'
+            - 'src/server/scripts/**.h'
+          db:
+            - 'data/**.sql'
+          workflow:
+            - '**.yml'
+            
+    - name: source label
+      if: steps.filter.outputs.src == 'true'
+      uses: AzerothCore/Github-Actions@source-labeler-1.0.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: script label
+      if: steps.filter.outputs.script == 'true'
+      uses: AzerothCore/Github-Actions@script-labeler-1.0.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+ 
+    - name: db label
+      if: steps.filter.outputs.db == 'true'
+      uses: AzerothCore/Github-Actions@db-labeler-1.0.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: workflow label
+      if: steps.filter.outputs.workflow == 'true'
+      uses: AzerothCore/Github-Actions@workflow-labeler-1.0.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
