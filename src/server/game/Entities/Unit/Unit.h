@@ -137,8 +137,8 @@ enum SpellFacingFlags
 #define BASE_ATTACK_TIME 2000
 
 constexpr uint32 HAND_OF_SACRIFICE = 6940;
-constexpr uint32 DIVINE_SACRIFICE  = 64205;
-constexpr uint32 HUNGERING_COLD    = 51209;
+constexpr uint32 DIVINE_SACRIFICE = 64205;
+constexpr uint32 HUNGERING_COLD = 51209;
 
 enum UnitBytes1Offsets : uint8
 {
