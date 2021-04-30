@@ -50,5 +50,3 @@ jobs:
         if: ${{ steps.extract_branch.outputs.branch == 'master' }}
         run: |
           docker-compose --profile all --profile prod push
-
-
