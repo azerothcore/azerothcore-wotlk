@@ -51,16 +51,6 @@ public:
 
             m_uiAncientGemGUID.clear();
 
-            RageWinterchill    = 0;
-            Anetheron          = 0;
-            Kazrogal           = 0;
-            Azgalor            = 0;
-            Archimonde         = 0;
-            JainaProudmoore    = 0;
-            Thrall             = 0;
-            TyrandeWhisperwind = 0;
-            HordeGate          = 0;
-            ElfGate            = 0;
             RaidDamage         = 0;
             Trash              = 0;
             hordeRetreat       = 0;
@@ -85,16 +75,16 @@ public:
                 case GO_HORDE_ENCAMPMENT_PORTAL:
                     HordeGate = go->GetGUID();
                     if (allianceRetreat)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     else
-                        HandleGameObject(0, false, go);
+                        HandleGameObject(ObjectGuid::Empty, false, go);
                     break;
                 case GO_NIGHT_ELF_VILLAGE_PORTAL:
                     ElfGate = go->GetGUID();
                     if (hordeRetreat)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     else
-                        HandleGameObject(0, false, go);
+                        HandleGameObject(ObjectGuid::Empty, false, go);
                     break;
                 case GO_ANCIENT_GEM:
                     m_uiAncientGemGUID.push_back(go->GetGUID());
@@ -133,7 +123,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -155,7 +145,7 @@ public:
                     return TyrandeWhisperwind;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -230,10 +220,10 @@ public:
                     {
                         if (!m_uiAncientGemGUID.empty())
                         {
-                            for (std::list<uint64>::const_iterator itr = m_uiAncientGemGUID.begin(); itr != m_uiAncientGemGUID.end(); ++itr)
+                            for (ObjectGuid const guid : m_uiAncientGemGUID)
                             {
                                 //don't know how long it expected
-                                DoRespawnGameObject(*itr, DAY);
+                                DoRespawnGameObject(guid, DAY);
                             }
                         }
                     }
@@ -328,17 +318,17 @@ public:
     protected:
         uint32 m_auiEncounter[EncounterCount];
         std::string str_data;
-        std::list<uint64> m_uiAncientGemGUID;
-        uint64 RageWinterchill;
-        uint64 Anetheron;
-        uint64 Kazrogal;
-        uint64 Azgalor;
-        uint64 Archimonde;
-        uint64 JainaProudmoore;
-        uint64 Thrall;
-        uint64 TyrandeWhisperwind;
-        uint64 HordeGate;
-        uint64 ElfGate;
+        GuidList m_uiAncientGemGUID;
+        ObjectGuid RageWinterchill;
+        ObjectGuid Anetheron;
+        ObjectGuid Kazrogal;
+        ObjectGuid Azgalor;
+        ObjectGuid Archimonde;
+        ObjectGuid JainaProudmoore;
+        ObjectGuid Thrall;
+        ObjectGuid TyrandeWhisperwind;
+        ObjectGuid HordeGate;
+        ObjectGuid ElfGate;
         uint32 Trash;
         uint32 hordeRetreat;
         uint32 allianceRetreat;

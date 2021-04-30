@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 
-bash acore.sh compiler build && bash acore.sh db-assembler import-all
+cd /azerothcore
 
-CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-ENV_PATH=$(readlink -f "$CUR_PATH/../env")
+bash acore.sh compiler build
 
 echo "Generating confs..."
-cp -n "$ENV_PATH/docker/etc/worldserver.conf.dockerdist" "$ENV_PATH/dist/etc/worldserver.conf"
-cp -n "$ENV_PATH/docker/etc/authserver.conf.dockerdist" "$ENV_PATH/dist/etc/authserver.conf"
+cp -n "env/dist/etc/worldserver.conf.dockerdist" "env/dist/etc/worldserver.conf"
+cp -n "env/dist/etc/authserver.conf.dockerdist" "env/dist/etc/authserver.conf"
 
 echo "Fixing EOL..."
-dos2unix "$ENV_PATH/dist/etc/"*
+# using -n (new file mode) should also fix the issue
+# when the file is created with the default acore user but you
+# set a different user into the docker configurations
+for file in "env/dist/etc/"*
+do
+    dos2unix -n $file $file
+done
+
 

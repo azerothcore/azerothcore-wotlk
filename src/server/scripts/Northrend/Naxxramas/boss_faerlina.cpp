@@ -92,7 +92,7 @@ public:
             SummonHelpers();
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_FAERLINA_WEB)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_FAERLINA_WEB)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
@@ -111,7 +111,7 @@ public:
             events.SetPhase(1);
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_FAERLINA_WEB)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_FAERLINA_WEB)))
                 {
                     go->SetGoState(GO_STATE_READY);
                 }
@@ -149,7 +149,7 @@ public:
             Talk(SAY_DEATH);
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_FAERLINA_WEB)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_FAERLINA_WEB)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
@@ -160,7 +160,7 @@ public:
         {
             if (!me->IsInCombat() && sayGreet)
             {
-                for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                for (SummonList::iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 {
                     if (pInstance)
                     {

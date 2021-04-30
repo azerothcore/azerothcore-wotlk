@@ -41,7 +41,7 @@ public:
             _despawnTimer = 36000; // 30 secs + 4 fly out + 2 initial attack timer
             _despawning = false;
             _initialSelection = true;
-            _targetGUID = 0;
+            _targetGUID.Clear();
         }
 
         void MovementInform(uint32 type, uint32 point) override
@@ -199,7 +199,7 @@ public:
         }
 
     private:
-        uint64 _targetGUID;
+        ObjectGuid _targetGUID;
         uint32 _despawnTimer;
         uint32 _selectionTimer;
         uint32 _initialCastTimer;
