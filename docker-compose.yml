@@ -74,7 +74,7 @@ services:
     stdin_open: true
     tty: true
     command: ./acore.sh run-worldserver
-    image: acore/worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    image: acore/worldserver-local:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
@@ -82,7 +82,7 @@ services:
     privileged: true
     build:
       context: .
-      target: ${DOCKER_BUILD_WORLD_TARGET:-worldserver-local}
+      target: worldserver-local
       dockerfile: ./apps/docker/Dockerfile
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
@@ -101,14 +101,14 @@ services:
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     tty: true
     command: ./acore.sh run-authserver
-    image: acore/authserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    image: acore/authserver-local:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     user: ${DOCKER_USER:-acore}
     build:
       context: .
-      target: ${DOCKER_BUILD_AUTH_TARGET:-authserver-local}
+      target: authserver-local
       dockerfile: ./apps/docker/Dockerfile
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
@@ -180,9 +180,65 @@ services:
     volumes:
       - ac-build-dev:/azerothcore/var/build
     profiles: [all, dev]
-    depends_on:
-      ac-database:
-        condition: service_healthy
+
+#======================
+#
+# Production services
+#
+#======================
+
+  ac-worldserver-prod:
+    <<: *ac-shared-conf
+    stdin_open: true
+    tty: true
+    command: ./acore.sh run-worldserver
+    image: acore/worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    restart: unless-stopped
+    env_file:
+      ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-acore}
+    privileged: true
+    build:
+      context: .
+      target: worldserver
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      cache_from:
+        - acore/authserver:${DOCKER_IMAGE_TAG:-master}
+        - acore/worldserver-local:${DOCKER_IMAGE_TAG:-master}
+        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+    ports:
+      - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
+      - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
+    profiles: [prod]
+
+  ac-authserver-prod:
+    <<: *ac-shared-conf
+    tty: true
+    command: ./acore.sh run-authserver
+    image: acore/authserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    restart: unless-stopped
+    env_file:
+      ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-acore}
+    build:
+      context: .
+      target: authserver
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      cache_from:
+        - acore/worldserver:${DOCKER_IMAGE_TAG:-master}
+        - acore/authserver-local:${DOCKER_IMAGE_TAG:-master}
+        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+    ports:
+      - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
+    profiles: [prod]
 
 volumes:
   ac-database:
