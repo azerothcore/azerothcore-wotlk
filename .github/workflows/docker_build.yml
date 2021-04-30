@@ -18,6 +18,7 @@ jobs:
       DOCKER_BUILD_AUTH_TARGET: authserver
       COMPOSE_DOCKER_CLI_BUILD: 1
       DOCKER_BUILDKIT: 1
+      BUILDKIT_INLINE_CACHE: 1
 
     steps:
       - name: Extract branch name
@@ -36,7 +37,7 @@ jobs:
         #env:
         #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
         run: |
-           docker-compose --profile all build --build-arg BUILDKIT_INLINE_CACHE=1
+           docker-compose --profile all build
 
       - name: Login to Docker Hub
         if: ${{ steps.extract_branch.outputs.branch == 'master' }}
