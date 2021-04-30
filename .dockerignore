@@ -10,3 +10,4 @@
 !/env/docker/etc/worldserver.conf.dockerdist
 /.env*
 .idea
+!.gitkeep
