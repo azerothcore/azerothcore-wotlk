@@ -21,20 +21,20 @@ void WorldSession::HandleTaxiNodeStatusQueryOpcode(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: Received CMSG_TAXINODE_STATUS_QUERY");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
     SendTaxiStatus(guid);
 }
 
-void WorldSession::SendTaxiStatus(uint64 guid)
+void WorldSession::SendTaxiStatus(ObjectGuid guid)
 {
     // cheating checks
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "WorldSession::SendTaxiStatus - Unit (GUID: %u) not found.", uint32(GUID_LOPART(guid)));
+        LOG_DEBUG("network", "WorldSession::SendTaxiStatus - Unit (%s) not found.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -64,7 +64,7 @@ void WorldSession::HandleTaxiQueryAvailableNodes(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: Received CMSG_TAXIQUERYAVAILABLENODES");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     // cheating checks
@@ -72,7 +72,7 @@ void WorldSession::HandleTaxiQueryAvailableNodes(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "WORLD: HandleTaxiQueryAvailableNodes - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
+        LOG_DEBUG("network", "WORLD: HandleTaxiQueryAvailableNodes - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -106,7 +106,7 @@ void WorldSession::SendTaxiMenu(Creature* unit)
 
     WorldPacket data(SMSG_SHOWTAXINODES, (4 + 8 + 4 + 8 * 4));
     data << uint32(1);
-    data << uint64(unit->GetGUID());
+    data << unit->GetGUID();
     data << uint32(curloc);
     GetPlayer()->m_taxi.AppendTaximaskTo(data, GetPlayer()->isTaxiCheater());
     SendPacket(&data);
@@ -147,7 +147,7 @@ bool WorldSession::SendLearnNewTaxiNode(Creature* unit)
         SendPacket(&msg);
 
         WorldPacket update(SMSG_TAXINODE_STATUS, 9);
-        update << uint64(unit->GetGUID());
+        update << unit->GetGUID();
         update << uint8(1);
         SendPacket(&update);
 
@@ -172,7 +172,7 @@ void WorldSession::HandleActivateTaxiExpressOpcode (WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: Received CMSG_ACTIVATETAXIEXPRESS");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     uint32 node_count;
 
     recvData >> guid >> node_count;
@@ -181,7 +181,7 @@ void WorldSession::HandleActivateTaxiExpressOpcode (WorldPacket& recvData)
     if (!npc)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "WORLD: HandleActivateTaxiExpressOpcode - Unit (GUID: %u) not found or you can't interact with it.", uint32(GUID_LOPART(guid)));
+        LOG_DEBUG("network", "WORLD: HandleActivateTaxiExpressOpcode - Unit (%s) not found or you can't interact with it.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -218,8 +218,8 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: Received CMSG_MOVE_SPLINE_DONE");
 #endif
 
-    uint64 guid; // used only for proper packet read
-    recvData.readPackGUID(guid);
+    ObjectGuid guid; // used only for proper packet read
+    recvData >> guid.ReadAsPacked();
 
     MovementInfo movementInfo;                              // used only for proper packet read
     movementInfo.guid = guid;
@@ -234,7 +234,7 @@ void WorldSession::HandleActivateTaxiOpcode(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: Received CMSG_ACTIVATETAXI");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     std::vector<uint32> nodes;
     nodes.resize(2);
 
@@ -246,7 +246,7 @@ void WorldSession::HandleActivateTaxiOpcode(WorldPacket& recvData)
     if (!npc)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "WORLD: HandleActivateTaxiOpcode - Unit (GUID: %u) not found or you can't interact with it.", uint32(GUID_LOPART(guid)));
+        LOG_DEBUG("network", "WORLD: HandleActivateTaxiOpcode - Unit (%s) not found or you can't interact with it.", guid.ToString().c_str());
 #endif
         return;
     }

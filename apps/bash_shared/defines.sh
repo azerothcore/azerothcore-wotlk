@@ -14,6 +14,11 @@ else
    AC_PATH_ROOT=$(readlink -f "$AC_PATH_APPS/../")
 fi
 
+case $AC_PATH_ROOT in
+  /*) AC_PATH_ROOT=$AC_PATH_ROOT;;
+  *) AC_PATH_ROOT=$PWD/$AC_PATH_ROOT;;
+esac
+
 AC_PATH_CONF="$AC_PATH_ROOT/conf"
 
 AC_PATH_MODULES="$AC_PATH_ROOT/modules"

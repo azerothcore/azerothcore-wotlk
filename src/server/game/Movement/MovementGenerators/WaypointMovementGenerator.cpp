@@ -27,7 +27,8 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature* creature)
     if (!i_path)
     {
         // No movement found for entry
-        LOG_ERROR("sql.sql", "WaypointMovementGenerator::LoadPath: creature %s (Entry: %u GUID: %u) doesn't have waypoint path id: %u", creature->GetName().c_str(), creature->GetEntry(), creature->GetGUIDLow(), path_id);
+        LOG_ERROR("sql.sql", "WaypointMovementGenerator::LoadPath: creature %s (%s) doesn't have waypoint path id: %u",
+            creature->GetName().c_str(), creature->GetGUID().ToString().c_str(), path_id);
         return;
     }
 
@@ -65,7 +66,8 @@ void WaypointMovementGenerator<Creature>::OnArrived(Creature* creature)
     if (i_path->at(i_currentNode)->event_id && urand(0, 99) < i_path->at(i_currentNode)->event_chance)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("maps.script", "Creature movement start script %u at point %u for " UI64FMTD ".", i_path->at(i_currentNode)->event_id, i_currentNode, creature->GetGUID());
+        LOG_DEBUG("maps.script", "Creature movement start script %u at point %u for %s.",
+            i_path->at(i_currentNode)->event_id, i_currentNode, creature->GetGUID().ToString().c_str());
 #endif
         creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
         creature->GetMap()->ScriptsStart(sWaypointScripts, i_path->at(i_currentNode)->event_id, creature, nullptr);
@@ -363,7 +365,8 @@ bool FlightPathMovementGenerator::DoUpdate(Player* player, uint32 /*diff*/)
         {
             if (i_currentNode >= i_path.size())
             {
-                LOG_INFO("misc", "TAXI NODE WAS GREATER THAN PATH SIZE, GUID: %u, POINTID: %u, NODESIZE: %lu, CURRENT: %u", player->GetGUIDLow(), pointId, i_path.size(), i_currentNode);
+                LOG_INFO("misc", "TAXI NODE WAS GREATER THAN PATH SIZE, %s, POINTID: %u, NODESIZE: %lu, CURRENT: %u",
+                    player->GetGUID().ToString().c_str(), pointId, i_path.size(), i_currentNode);
                 player->CleanupAfterTaxiFlight();
                 return false;
             }
