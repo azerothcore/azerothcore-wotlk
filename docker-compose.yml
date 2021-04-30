@@ -222,6 +222,7 @@ services:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
+      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
       - ac-client-data-prod:/azerothcore/env/dist/data:nocopy
     profiles: [prod]
 
@@ -243,6 +244,8 @@ services:
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
       <<: *cache-from
+    volumes:
+      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [prod]
@@ -276,11 +279,7 @@ services:
         DOCKER_USER: ${DOCKER_USER:-acore}
       <<: *cache-from
     volumes:
-      - ${DOCKER_CLIENT_FOLDER:-./var}:/azerothcore/env/client
-      - /azerothcore/env/client/mapextractor
-      - /azerothcore/env/client/mmaps_generator
-      - /azerothcore/env/client/vmap4assembler
-      - /azerothcore/env/client/vmap4extractor
+      - ${DOCKER_CLIENT_FOLDER:-./var}:/azerothcore/env/client/data
     profiles: [prod]
 
 volumes:
