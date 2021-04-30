@@ -1,4 +1,5 @@
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1618750411311383100');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1619821428598508300');
+
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 16287;
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16287) AND (`source_type` = 0) AND (`id` IN (0, 1, 2));
@@ -6,4 +7,3 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (16287, 0, 0, 1, 62, 0, 100, 0, 7178, 0, 0, 0, 0, 56, 30632, 1, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ambassador Sunsorrow - On Gossip Option 0 Selected - Add Item \'Lament of the Highborne\' 1 Time'),
 (16287, 0, 1, 0, 61, 0, 100, 0, 7178, 0, 0, 0, 0, 98, 7178, 10378, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ambassador Sunsorrow - On Gossip Option 0 Selected - Send Gossip'),
 (16287, 0, 2, 0, 64, 0, 100, 0, 0, 0, 0, 0, 0, 98, 7178, 8458, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ambassador Sunsorrow - On Gossip Hello - Send Gossip');
-
