@@ -2234,24 +2234,24 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType, bool extr
     }
 }
 
-Position* Unit::GetMeleeAttackPoint(Unit* attacker)
+bool Unit::GetMeleeAttackPoint(Unit* attacker, Position& pos)
 {
     if (!attacker)
     {
-        return nullptr;
+        return false;
     }
 
     AttackerSet attackers = getAttackers();
 
     if (attackers.size() <= 1) // if the attackers are not more than one
     {
-        return nullptr;
+        return false;
     }
 
     float meleeReach = GetExactDist2d(attacker);
     if (meleeReach <= 0)
     {
-        return nullptr;
+        return false;
     }
 
     float minAngle = 0;
@@ -2263,17 +2263,13 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     for (const auto& otherAttacker: attackers)
     {
         // if the otherAttacker is not valid, skip
-        if (!otherAttacker ||
-            otherAttacker->GetGUID() == attacker->GetGUID() ||
-            !otherAttacker->IsWithinMeleeRange(this) ||
-            otherAttacker->isMoving()
-        )
+        if (!otherAttacker || otherAttacker->GetGUID() == attacker->GetGUID() ||
+            !otherAttacker->IsWithinMeleeRange(this) || otherAttacker->isMoving())
         {
             continue;
         }
 
         float curretAngle = atan(attacker->GetExactDist2d(otherAttacker) / meleeReach);
-
         if (minAngle == 0 || curretAngle < minAngle)
         {
             minAngle = curretAngle;
@@ -2284,7 +2280,9 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
     }
 
     if (!validAttackers || !refUnit)
-        return nullptr;
+    {
+        return false;
+    }
 
     float contactDist = attackerSize + refUnit->GetCollisionRadius();
     float requiredAngle = atan(contactDist / meleeReach);
@@ -2296,7 +2294,7 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 
     if (attackersAngle > angleTollerance)
     {
-        return nullptr;
+        return false;
     }
 
     double angle = atan(contactDist / meleeReach);
@@ -2316,11 +2314,13 @@ Position* Unit::GetMeleeAttackPoint(Unit* attacker)
 
         if (!GetMap()->CanReachPositionAndGetValidCoords(this, x, y, z, true, true))
         {
-            return nullptr;
+            return false;
         }
     }
 
-    return new Position(x,y,z);
+    pos.Relocate(x, y, z);
+
+    return true;
 }
 
 void Unit::HandleProcExtraAttackFor(Unit* victim)
