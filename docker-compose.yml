@@ -5,6 +5,16 @@ x-networks: &networks
   networks:
     - ac-network
 
+x-cache-from: &cache-from
+  cache_from:
+    - acore/ac-wotlk-authserver:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-authserver-local:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-extractors:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-client-data-server:${DOCKER_IMAGE_TAG:-master}
+
 x-ac-shared-conf: &ac-shared-conf
   <<: *networks
   working_dir: /azerothcore
@@ -42,7 +52,7 @@ services:
 
 #=======================
 #
-# Applications
+# DATABASE
 #
 #=======================
 
@@ -67,6 +77,11 @@ services:
       timeout: 10s
       retries: 40
 
+#=======================
+#
+# APP Services
+#
+#=======================
 
   ac-worldserver:
     <<: *ac-shared-conf
@@ -88,9 +103,7 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-      cache_from:
-        - acore/ac-wotlk-authserver:${DOCKER_IMAGE_TAG:-master}
-        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+      <<: *cache-from
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
@@ -114,9 +127,7 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-      cache_from:
-        - acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
-        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+      <<: *cache-from
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [all, app, authserver]
@@ -138,8 +149,7 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-      cache_from:
-        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+      <<: *cache-from
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     working_dir: /azerothcore/
@@ -164,8 +174,7 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-      cache_from:
-        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+      <<: *cache-from
     security_opt:
       - seccomp:unconfined
     env_file:
@@ -206,10 +215,7 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-      cache_from:
-        - acore/ac-wotlk-authserver:${DOCKER_IMAGE_TAG:-master}
-        - acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master}
-        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+      <<: *cache-from
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
@@ -234,10 +240,7 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-      cache_from:
-        - acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
-        - acore/ac-wotlk-authserver-local:${DOCKER_IMAGE_TAG:-master}
-        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+      <<: *cache-from
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [prod]
@@ -253,16 +256,13 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-      cache_from:
-        - acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
-        - acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master}
-        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+      <<: *cache-from
     volumes:
       - ac-client-data-prod:/azerothcore/env/dist/data
     profiles: [prod]
 
-  ac-extractor:
-    image: acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+  ac-extractors:
+    image: acore/ac-wotlk-extractors:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     user: ${DOCKER_USER:-acore}
     build:
       context: .
@@ -272,12 +272,13 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-      cache_from:
-        - acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
-        - acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master}
-        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+      <<: *cache-from
     volumes:
-      - ac-client-data-prod:/azerothcore/env/dist/data
+      - ${DOCKER_CLIENT_FOLDER:-./var}:/azerothcore/env/client
+      - /azerothcore/env/client/mapextractor
+      - /azerothcore/env/client/mmaps_generator
+      - /azerothcore/env/client/vmap4assembler
+      - /azerothcore/env/client/vmap4extractor
     profiles: [prod]
 
 volumes:

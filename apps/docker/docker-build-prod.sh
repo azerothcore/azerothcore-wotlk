@@ -7,7 +7,6 @@ export CCACHE_MAXSIZE='500MB'
 export CCACHE_COMPRESS=1
 
 export CTOOLS=ON
-export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
 
 ccache -s
 bash acore.sh compiler build

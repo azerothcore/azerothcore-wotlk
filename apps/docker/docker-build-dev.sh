@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 
-cd /azerothcore
+CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-bash acore.sh compiler build
-
-echo "Generating confs..."
-cp -n "env/dist/etc/worldserver.conf.dockerdist" "env/dist/etc/worldserver.conf"
-cp -n "env/dist/etc/authserver.conf.dockerdist" "env/dist/etc/authserver.conf"
+source "$CUR_PATH/docker-build-prod.sh"
 
 echo "Fixing EOL..."
 # using -n (new file mode) should also fix the issue
