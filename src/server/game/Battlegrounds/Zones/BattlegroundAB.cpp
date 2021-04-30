@@ -96,8 +96,16 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                             RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, 10, teamId);
                         if (information < uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE))
                         {
-                            SendMessageToAll(teamId == TEAM_ALLIANCE ? LANG_BG_AB_A_NEAR_VICTORY : LANG_BG_AB_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
-                            PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY);
+                            if (teamId == TEAM_ALLIANCE)
+                            {
+                                SendMessageToAll(LANG_BG_AB_A_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+                                PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY_ALLIANCE);
+                            }
+                            else
+                            {
+                                SendMessageToAll(LANG_BG_AB_H_NEAR_VICTORY, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+                                PlaySoundToAll(BG_AB_SOUND_NEAR_VICTORY_HORDE);
+                            }
                         }
 
                         UpdateWorldState(teamId == TEAM_ALLIANCE ? BG_AB_OP_RESOURCES_ALLY : BG_AB_OP_RESOURCES_HORDE, m_TeamScores[teamId]);
