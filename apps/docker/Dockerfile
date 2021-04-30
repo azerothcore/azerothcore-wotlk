@@ -124,6 +124,7 @@ RUN chown $DOCKER_USER:$DOCKER_USER /azerothcore
 USER $DOCKER_USER
 
 # must be created to avoid permissions errors
+RUN mkdir -p /home/acore/.ccache
 RUN mkdir -p /azerothcore/env/dist/data
 RUN mkdir -p /azerothcore/env/dist/logs
 RUN mkdir -p /azerothcore/env/dist/etc
@@ -159,11 +160,13 @@ FROM base as build
 
 ARG DOCKER_USER=acore
 
+USER $DOCKER_USER
+
 LABEL description="AC Image used by the build stage to generate production images"
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc /azerothcore/env/dist/etc
 
-RUN bash bin/acore-docker-build
+RUN --mount=type=cache,target=/home/acore/.ccache/,uid=1000,gid=1000 bash apps/docker/docker-build-prod.sh
 
 #================================================================
 #
@@ -173,7 +176,7 @@ RUN bash bin/acore-docker-build
 #=================================================================
 FROM authserver-local as authserver
 
-LABEL description="AC Production ready authserver"
+LABEL description="AC Production: authserver"
 
 ARG DOCKER_USER=acore
 
@@ -188,14 +191,38 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/au
 #=================================================================
 FROM worldserver-local as worldserver
 
-LABEL description="AC Production ready worldserver"
+LABEL description="AC Production: worldserver"
 
 ARG DOCKER_USER=acore
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/etc /azerothcore/env/dist/etc
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/worldserver /azerothcore/env/dist/bin/worldserver
 
+
+FROM worldserver-local as client-data
+
+LABEL description="AC Production: client-data"
+
+ARG DOCKER_USER=acore
+
+USER $DOCKER_USER
+
+RUN mkdir -p /azerothcore/env/dist/data
+
 ENV DATAPATH=/azerothcore/env/dist/data
 
 RUN /azerothcore/acore.sh client-data
+
+FROM worldserver-local as extractors
+
+LABEL description="AC Production: extractors"
+
+ARG DOCKER_USER=acore
+
+RUN mkdir -p /azerothcore/env/client/
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mapextractor /azerothcore/env/client/mapextractor
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/client/mmaps_generator
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4assembler /azerothcore/env/client/vmap4assembler
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/vmap4extractor /azerothcore/env/client/vmap4extractor
 

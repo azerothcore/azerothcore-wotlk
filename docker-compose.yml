@@ -74,7 +74,7 @@ services:
     stdin_open: true
     tty: true
     command: ./acore.sh run-worldserver
-    image: acore/worldserver-local:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    image: acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
@@ -89,8 +89,8 @@ services:
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
       cache_from:
-        - acore/authserver:${DOCKER_IMAGE_TAG:-master}
-        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-authserver:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
@@ -101,7 +101,7 @@ services:
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     tty: true
     command: ./acore.sh run-authserver
-    image: acore/authserver-local:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    image: acore/ac-wotlk-authserver-local:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
@@ -115,8 +115,8 @@ services:
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
       cache_from:
-        - acore/worldserver:${DOCKER_IMAGE_TAG:-master}
-        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
     profiles: [all, app, authserver]
@@ -129,7 +129,7 @@ services:
   ac-build:
     <<: *ac-shared-conf
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
-    image: acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+    image: acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
     build:
       context: .
       target: dev
@@ -139,7 +139,7 @@ services:
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
       cache_from:
-        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
     env_file:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     working_dir: /azerothcore/
@@ -155,7 +155,7 @@ services:
     <<: *ac-shared-conf
     extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     tty: true
-    image: acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+    image: acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
     build:
       context: .
       target: dev
@@ -165,7 +165,7 @@ services:
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
       cache_from:
-        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
     security_opt:
       - seccomp:unconfined
     env_file:
@@ -189,11 +189,10 @@ services:
 
   ac-worldserver-prod:
     <<: *ac-shared-conf
-    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     stdin_open: true
     tty: true
     command: ./acore.sh run-worldserver
-    image: acore/worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    image: acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
       ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
@@ -208,20 +207,21 @@ services:
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
       cache_from:
-        - acore/authserver:${DOCKER_IMAGE_TAG:-master}
-        - acore/worldserver-local:${DOCKER_IMAGE_TAG:-master}
-        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-authserver:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
+    volumes:
+      - ac-client-data-prod:/azerothcore/env/dist/data:nocopy
     profiles: [prod]
 
   ac-authserver-prod:
     <<: *ac-shared-conf
-    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     tty: true
     command: ./acore.sh run-authserver
-    image: acore/authserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    image: acore/ac-wotlk-authserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
     env_file:
       ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
@@ -235,11 +235,49 @@ services:
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
       cache_from:
-        - acore/worldserver:${DOCKER_IMAGE_TAG:-master}
-        - acore/authserver-local:${DOCKER_IMAGE_TAG:-master}
-        - acore/dev-server:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-authserver-local:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
+    profiles: [prod]
+
+  ac-client-data-server:
+    image: acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    user: ${DOCKER_USER:-acore}
+    build:
+      context: .
+      target: client-data
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      cache_from:
+        - acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+    volumes:
+      - ac-client-data-prod:/azerothcore/env/dist/data
+    profiles: [none]
+
+  ac-extractor:
+    image: acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    user: ${DOCKER_USER:-acore}
+    build:
+      context: .
+      target: extractor
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      cache_from:
+        - acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master}
+        - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+    volumes:
+      - ac-client-data-prod:/azerothcore/env/dist/data
     profiles: [prod]
 
 volumes:
@@ -254,6 +292,7 @@ volumes:
   ac-etc:
   ac-logs:
   ac-client-data:
+  ac-client-data-prod:
 
 networks:
   ac-network:

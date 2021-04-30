@@ -79,7 +79,7 @@ CDISABLED_AC_MODULES=""
 # you can add your custom definitions here ( -D )
 # example:  CCUSTOMOPTIONS=" -DWITH_PERFTOOLS=ON -DENABLE_EXTRA_LOGS=ON"
 #
-CCUSTOMOPTIONS=""
+CCUSTOMOPTIONS=${CCUSTOMOPTIONS:-''}
 
 
 ##############################################
