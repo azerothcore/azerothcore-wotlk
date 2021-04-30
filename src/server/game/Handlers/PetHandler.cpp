@@ -414,7 +414,7 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
     {
         // xinef: allow dissmis dead pets
         SpellInfo const* spell = (flag == ACT_ENABLED || flag == ACT_PASSIVE) ? sSpellMgr->GetSpellInfo(spellid) : nullptr;
-        if ((flag != ACT_COMMAND || spellid != COMMAND_ABANDON) && (!spell || !spell->HasAttribute(SPELL_ATTR0_CASTABLE_WHILE_DEAD)))
+        if ((flag != ACT_COMMAND || spellid != COMMAND_ABANDON) && (!spell || !spell->HasAttribute(SPELL_ATTR0_ALLOW_CAST_WHILE_DEAD)))
             return;
     }
 
