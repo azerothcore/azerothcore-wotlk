@@ -63,9 +63,9 @@ CSCRIPTS=${CSCRIPTS:-ON}
 # compile unit tests
 CBUILD_TESTING=OFF
 # compile server
-CSERVERS=ON
+CSERVERS=${CSERVERS:-ON}
 # compile tools
-CTOOLS=OFF
+CTOOLS=${CTOOLS:-OFF}
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
 CSCRIPTPCH=ON
 CCOREPCH=ON

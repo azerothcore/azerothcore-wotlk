@@ -189,6 +189,7 @@ services:
 
   ac-worldserver-prod:
     <<: *ac-shared-conf
+    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     stdin_open: true
     tty: true
     command: ./acore.sh run-worldserver
@@ -217,6 +218,7 @@ services:
 
   ac-authserver-prod:
     <<: *ac-shared-conf
+    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     tty: true
     command: ./acore.sh run-authserver
     image: acore/authserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally

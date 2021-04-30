@@ -157,7 +157,11 @@ CMD ./acore.sh run-worldserver
 #=================================================================
 FROM base as build
 
+ARG DOCKER_USER=acore
+
 LABEL description="AC Image used by the build stage to generate production images"
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc /azerothcore/env/dist/etc
 
 RUN bash bin/acore-docker-build
 
