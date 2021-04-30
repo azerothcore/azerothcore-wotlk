@@ -34,7 +34,7 @@ jobs:
       - name: Cache
         uses: actions/cache@v2
         with:
-          path: /home/runner/.ccache
+          path: /var/lib/docker
           key: ccache:ubuntu-20.04:clang:without-modules:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
             ccache:ubuntu-20.04:clang:without-modules:${{ github.ref }}
