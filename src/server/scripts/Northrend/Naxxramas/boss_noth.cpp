@@ -70,7 +70,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_nothAI (pCreature);
+        return GetNaxxramasAI<boss_nothAI>(pCreature);
     }
 
     struct boss_nothAI : public BossAI
@@ -140,7 +140,7 @@ public:
             timesInBalcony = 0;
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_NOTH_ENTRY_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_NOTH_ENTRY_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
@@ -160,7 +160,7 @@ public:
             StartGroundPhase();
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_NOTH_ENTRY_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_NOTH_ENTRY_GATE)))
                 {
                     go->SetGoState(GO_STATE_READY);
                 }
@@ -184,7 +184,7 @@ public:
             Talk(SAY_DEATH);
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_NOTH_ENTRY_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_NOTH_ENTRY_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }

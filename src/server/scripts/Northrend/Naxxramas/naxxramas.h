@@ -6,6 +6,9 @@
 #define DEF_NAXXRAMAS_H
 
 #include "SpellScript.h"
+#include "CreatureAIImpl.h"
+
+#define NaxxramasScriptName "instance_naxxramas"
 
 enum Encouters
 {
@@ -175,5 +178,11 @@ enum NXEvents
     EVENT_KELTHUZAD_WING_TAUNT      = 1,
     EVENT_FROSTWYRM_WATERFALL_DOOR  = 2
 };
+
+template <class AI, class T>
+inline AI* GetNaxxramasAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, NaxxramasScriptName);
+}
 
 #endif

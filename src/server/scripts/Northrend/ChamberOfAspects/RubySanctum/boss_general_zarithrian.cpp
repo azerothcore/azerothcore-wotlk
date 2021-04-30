@@ -140,16 +140,16 @@ public:
             {
                 case EVENT_SUMMON_ADDS1:
                     Talk(SAY_ADDS);
-                    if (Creature* stalker1 = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ZARITHRIAN_SPAWN_STALKER_1)))
+                    if (Creature* stalker1 = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ZARITHRIAN_SPAWN_STALKER_1)))
                         stalker1->CastSpell(stalker1, SPELL_SUMMON_FLAMECALLER, false);
-                    if (Creature* stalker2 = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ZARITHRIAN_SPAWN_STALKER_2)))
+                    if (Creature* stalker2 = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ZARITHRIAN_SPAWN_STALKER_2)))
                         stalker2->CastSpell(stalker2, SPELL_SUMMON_FLAMECALLER, false);
                     events.ScheduleEvent(EVENT_SUMMON_ADDS1, 40000);
                     break;
                 case EVENT_SUMMON_ADDS2:
-                    if (Creature* stalker1 = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ZARITHRIAN_SPAWN_STALKER_1)))
+                    if (Creature* stalker1 = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ZARITHRIAN_SPAWN_STALKER_1)))
                         stalker1->CastSpell(stalker1, SPELL_SUMMON_FLAMECALLER, false);
-                    if (Creature* stalker2 = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_ZARITHRIAN_SPAWN_STALKER_2)))
+                    if (Creature* stalker2 = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ZARITHRIAN_SPAWN_STALKER_2)))
                         stalker2->CastSpell(stalker2, SPELL_SUMMON_FLAMECALLER, false);
                     events.ScheduleEvent(EVENT_SUMMON_ADDS2, 40000);
                     break;
@@ -175,7 +175,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_general_zarithrianAI>(creature);
+        return GetRubySanctumAI<boss_general_zarithrianAI>(creature);
     }
 };
 
@@ -213,7 +213,7 @@ public:
         void IsSummonedBy(Unit* /*summoner*/) override
         {
             // Let Zarithrian count as summoner. _instance cant be null since we got GetRubySanctumAI
-            if (Creature* zarithrian = ObjectAccessor::GetCreature(*me, _instance->GetData64(NPC_GENERAL_ZARITHRIAN)))
+            if (Creature* zarithrian = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_GENERAL_ZARITHRIAN)))
                 zarithrian->AI()->JustSummoned(me);
         }
 
@@ -275,7 +275,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_onyx_flamecallerAI>(creature);
+        return GetRubySanctumAI<npc_onyx_flamecallerAI>(creature);
     }
 };
 

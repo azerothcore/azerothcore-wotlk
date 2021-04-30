@@ -14,6 +14,7 @@
 #include "LootMgr.h"
 #include "Unit.h"
 #include "UpdateMask.h"
+#include "World.h"
 #include <list>
 
 class SpellInfo;
@@ -27,45 +28,44 @@ class CreatureGroup;
 enum CreatureFlagsExtra : uint32
 {
     // TODO: Implement missing flags from TC in places that custom flags from xinef&pussywizzard use flag values.
-    CREATURE_FLAG_EXTRA_INSTANCE_BIND       = 0x00000001,   // creature kill bind instance with killer and killer's group
-    CREATURE_FLAG_EXTRA_CIVILIAN            = 0x00000002,   // not aggro (ignore faction/reputation hostility)
-    CREATURE_FLAG_EXTRA_NO_PARRY            = 0x00000004,   // creature can't parry
-    CREATURE_FLAG_EXTRA_NO_PARRY_HASTEN     = 0x00000008,   // creature can't counter-attack at parry
-    CREATURE_FLAG_EXTRA_NO_BLOCK            = 0x00000010,   // creature can't block
-    CREATURE_FLAG_EXTRA_NO_CRUSH            = 0x00000020,   // creature can't do crush attacks
-    CREATURE_FLAG_EXTRA_NO_XP_AT_KILL       = 0x00000040,   // creature kill not provide XP
-    CREATURE_FLAG_EXTRA_TRIGGER             = 0x00000080,   // trigger creature
-    CREATURE_FLAG_EXTRA_NO_TAUNT            = 0x00000100,   // creature is immune to taunt auras and effect attack me
-    CREATURE_FLAG_EXTRA_UNUSED_10           = 0x00000200,   // TODO: Implement CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE (creature won't update movement flags)
-    CREATURE_FLAG_EXTRA_GHOST_VISIBILITY    = 0x00000400,   // creature will be only visible for dead players
-    CREATURE_FLAG_EXTRA_UNUSED_12           = 0x00000800,   // TODO: Implement CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK (creature will use offhand attacks)
-    CREATURE_FLAG_EXTRA_NO_SELL_VENDOR      = 0x00001000,   // players can't sell items to this vendor
-    CREATURE_FLAG_EXTRA_UNUSED_14           = 0x00002000,
-    CREATURE_FLAG_EXTRA_WORLDEVENT          = 0x00004000,   // custom flag for world event creatures (left room for merging)
-    CREATURE_FLAG_EXTRA_GUARD               = 0x00008000,   // Creature is guard
-    CREATURE_FLAG_EXTRA_UNUSED_17           = 0x00010000,
-    CREATURE_FLAG_EXTRA_NO_CRIT             = 0x00020000,   // creature can't do critical strikes
-    CREATURE_FLAG_EXTRA_NO_SKILLGAIN        = 0x00040000,   // creature won't increase weapon skills
-    CREATURE_FLAG_EXTRA_TAUNT_DIMINISH      = 0x00080000,   // Taunt is a subject to diminishing returns on this creautre
-    CREATURE_FLAG_EXTRA_ALL_DIMINISH        = 0x00100000,   // Creature is subject to all diminishing returns as player are
-    CREATURE_FLAG_EXTRA_UNUSED_22           = 0x00200000,
-    CREATURE_FLAG_EXTRA_AVOID_AOE           = 0x00400000,   // pussywizard: ignored by aoe attacks (for icc blood prince council npc - Dark Nucleus)
-    CREATURE_FLAG_EXTRA_NO_DODGE            = 0x00800000,   // xinef: target cannot dodge
-    CREATURE_FLAG_EXTRA_UNUSED_25           = 0x01000000,
-    CREATURE_FLAG_EXTRA_UNUSED_26           = 0x02000000,
-    CREATURE_FLAG_EXTRA_UNUSED_27           = 0x04000000,
-    CREATURE_FLAG_EXTRA_UNUSED_28           = 0x08000000,
-    CREATURE_FLAG_EXTRA_DUNGEON_BOSS        = 0x10000000,   // creature is a dungeon boss (SET DYNAMICALLY, DO NOT ADD IN DB)
-    CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING  = 0x20000000,   // creature ignore pathfinding
-    CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK  = 0x40000000,   // creature is immune to knockback effects
-    CREATURE_FLAG_EXTRA_UNUSED_32           = 0x80000000,
+    CREATURE_FLAG_EXTRA_INSTANCE_BIND                   = 0x00000001,   // creature kill bind instance with killer and killer's group
+    CREATURE_FLAG_EXTRA_CIVILIAN                        = 0x00000002,   // not aggro (ignore faction/reputation hostility)
+    CREATURE_FLAG_EXTRA_NO_PARRY                        = 0x00000004,   // creature can't parry
+    CREATURE_FLAG_EXTRA_NO_PARRY_HASTEN                 = 0x00000008,   // creature can't counter-attack at parry
+    CREATURE_FLAG_EXTRA_NO_BLOCK                        = 0x00000010,   // creature can't block
+    CREATURE_FLAG_EXTRA_NO_CRUSHING_BLOWS               = 0x00000020,   // creature can't do crush attacks
+    CREATURE_FLAG_EXTRA_NO_XP                           = 0x00000040,   // creature kill does not provide XP
+    CREATURE_FLAG_EXTRA_TRIGGER                         = 0x00000080,   // trigger creature
+    CREATURE_FLAG_EXTRA_NO_TAUNT                        = 0x00000100,   // creature is immune to taunt auras and 'attack me' effects
+    CREATURE_FLAG_EXTRA_UNUSED_10                       = 0x00000200,   // TODO: Implement CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE (creature won't update movement flags)
+    CREATURE_FLAG_EXTRA_GHOST_VISIBILITY                = 0x00000400,   // creature will only be visible to dead players
+    CREATURE_FLAG_EXTRA_UNUSED_12                       = 0x00000800,   // TODO: Implement CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK (creature will use offhand attacks)
+    CREATURE_FLAG_EXTRA_NO_SELL_VENDOR                  = 0x00001000,   // players can't sell items to this vendor
+    CREATURE_FLAG_EXTRA_IGNORE_COMBAT                   = 0x00002000,
+    CREATURE_FLAG_EXTRA_WORLDEVENT                      = 0x00004000,   // custom flag for world event creatures (left room for merging)
+    CREATURE_FLAG_EXTRA_GUARD                           = 0x00008000,   // Creature is guard
+    CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH              = 0x00010000,   // creature ignores feign death
+    CREATURE_FLAG_EXTRA_NO_CRIT                         = 0x00020000,   // creature can't do critical strikes
+    CREATURE_FLAG_EXTRA_NO_SKILL_GAINS                  = 0x00040000,   // creature won't increase weapon skills
+    CREATURE_FLAG_EXTRA_OBEYS_TAUNT_DIMINISHING_RETURNS = 0x00080000,   // Taunt is subject to diminishing returns on this creature
+    CREATURE_FLAG_EXTRA_ALL_DIMINISH                    = 0x00100000,   // creature is subject to all diminishing returns as players are
+    CREATURE_FLAG_EXTRA_UNUSED_22                       = 0x00200000,
+    CREATURE_FLAG_EXTRA_AVOID_AOE                       = 0x00400000,   // pussywizard: ignored by aoe attacks (for icc blood prince council npc - Dark Nucleus)
+    CREATURE_FLAG_EXTRA_NO_DODGE                        = 0x00800000,   // xinef: target cannot dodge
+    CREATURE_FLAG_EXTRA_UNUSED_25                       = 0x01000000,
+    CREATURE_FLAG_EXTRA_UNUSED_26                       = 0x02000000,
+    CREATURE_FLAG_EXTRA_UNUSED_27                       = 0x04000000,
+    CREATURE_FLAG_EXTRA_UNUSED_28                       = 0x08000000,
+    CREATURE_FLAG_EXTRA_DUNGEON_BOSS                    = 0x10000000,   // creature is a dungeon boss (SET DYNAMICALLY, DO NOT ADD IN DB)
+    CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING              = 0x20000000,   // creature ignore pathfinding
+    CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK              = 0x40000000,   // creature is immune to knockback effects
+    CREATURE_FLAG_EXTRA_UNUSED_32                       = 0x80000000,
 
     // Masks
-    CREATURE_FLAG_EXTRA_UNUSED              = (CREATURE_FLAG_EXTRA_UNUSED_10 | CREATURE_FLAG_EXTRA_UNUSED_12 |
-                                               CREATURE_FLAG_EXTRA_UNUSED_14 | CREATURE_FLAG_EXTRA_UNUSED_17 | CREATURE_FLAG_EXTRA_UNUSED_22 |
-                                               CREATURE_FLAG_EXTRA_UNUSED_25 | CREATURE_FLAG_EXTRA_UNUSED_26 | CREATURE_FLAG_EXTRA_UNUSED_27 |
-                                               CREATURE_FLAG_EXTRA_UNUSED_28 | CREATURE_FLAG_EXTRA_UNUSED_32),
-    CREATURE_FLAG_EXTRA_DB_ALLOWED          = (0xFFFFFFFF & ~(CREATURE_FLAG_EXTRA_UNUSED | CREATURE_FLAG_EXTRA_DUNGEON_BOSS))
+    CREATURE_FLAG_EXTRA_UNUSED                          = (CREATURE_FLAG_EXTRA_UNUSED_10 | CREATURE_FLAG_EXTRA_UNUSED_12 |
+                                                           CREATURE_FLAG_EXTRA_UNUSED_22 | CREATURE_FLAG_EXTRA_UNUSED_25 | CREATURE_FLAG_EXTRA_UNUSED_26 |
+                                                           CREATURE_FLAG_EXTRA_UNUSED_27 | CREATURE_FLAG_EXTRA_UNUSED_28 | CREATURE_FLAG_EXTRA_UNUSED_32),
+    CREATURE_FLAG_EXTRA_DB_ALLOWED                      = (0xFFFFFFFF & ~(CREATURE_FLAG_EXTRA_UNUSED | CREATURE_FLAG_EXTRA_DUNGEON_BOSS))
 };
 
 #define MAX_AGGRO_RESET_TIME 10 // in seconds
@@ -146,11 +146,11 @@ struct CreatureTemplate
     // helpers
     [[nodiscard]] SkillType GetRequiredLootSkill() const
     {
-        if (type_flags & CREATURE_TYPE_FLAG_HERB_SKINNING_SKILL)
+        if (type_flags & CREATURE_TYPE_FLAG_SKIN_WITH_HERBALISM)
             return SKILL_HERBALISM;
-        else if (type_flags & CREATURE_TYPE_FLAG_MINING_SKINNING_SKILL)
+        else if (type_flags & CREATURE_TYPE_FLAG_SKIN_WITH_MINING)
             return SKILL_MINING;
-        else if (type_flags & CREATURE_TYPE_FLAG_ENGINEERING_SKINNING_SKILL)
+        else if (type_flags & CREATURE_TYPE_FLAG_SKIN_WITH_ENGINEERING)
             return SKILL_ENGINEERING;
         else
             return SKILL_SKINNING;                          // normal case
@@ -158,16 +158,16 @@ struct CreatureTemplate
 
     [[nodiscard]] bool IsExotic() const
     {
-        return (type_flags & CREATURE_TYPE_FLAG_EXOTIC_PET) != 0;
+        return (type_flags & CREATURE_TYPE_FLAG_TAMEABLE_EXOTIC) != 0;
     }
 
     [[nodiscard]] bool IsTameable(bool exotic) const
     {
-        if (type != CREATURE_TYPE_BEAST || family == 0 || (type_flags & CREATURE_TYPE_FLAG_TAMEABLE_PET) == 0)
+        if (type != CREATURE_TYPE_BEAST || family == 0 || (type_flags & CREATURE_TYPE_FLAG_TAMEABLE) == 0)
             return false;
 
         // if can tame exotic then can tame any tameable
-        return exotic || (type_flags & CREATURE_TYPE_FLAG_EXOTIC_PET) == 0;
+        return exotic || (type_flags & CREATURE_TYPE_FLAG_TAMEABLE_EXOTIC) == 0;
     }
 
     void InitializeQueryData();
@@ -444,12 +444,12 @@ public:
 
     void DisappearAndDie();
 
-    bool Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
+    bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
     bool LoadCreaturesAddon(bool reload = false);
     void SelectLevel(bool changelevel = true);
     void LoadEquipment(int8 id = 1, bool force = false);
 
-    [[nodiscard]] uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
+    [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
     void Update(uint32 time) override;                         // overwrited Unit::Update
     void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr, float* dist = nullptr) const;
@@ -527,7 +527,7 @@ public:
     {
         ::Spell const* Spell = nullptr;
         uint32 Delay = 0;         // ms until the creature's target should snap back (0 = no snapback scheduled)
-        uint64 Target;            // the creature's "real" target while casting
+        ObjectGuid Target;        // the creature's "real" target while casting
         float Orientation = 0.0f; // the creature's "real" orientation while casting
     } _spellFocusInfo;
 
@@ -584,15 +584,15 @@ public:
 
     void setDeathState(DeathState s, bool despawn = false) override;                   // override virtual Unit::setDeathState
 
-    bool LoadFromDB(uint32 guid, Map* map) { return LoadCreatureFromDB(guid, map, false, true); }
-    bool LoadCreatureFromDB(uint32 guid, Map* map, bool addToMap = true, bool gridLoad = false);
+    bool LoadFromDB(ObjectGuid::LowType guid, Map* map, bool allowDuplicate = false) { return LoadCreatureFromDB(guid, map, false, true, allowDuplicate); }
+    bool LoadCreatureFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true, bool gridLoad = false, bool allowDuplicate = false);
     void SaveToDB();
     // overriden in Pet
     virtual void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
     virtual void DeleteFromDB();                        // overriden in Pet
 
     Loot loot;
-    [[nodiscard]] uint64 GetLootRecipientGUID() const { return m_lootRecipient; }
+    [[nodiscard]] ObjectGuid GetLootRecipientGUID() const { return m_lootRecipient; }
     [[nodiscard]] Player* GetLootRecipient() const;
     [[nodiscard]] Group* GetLootRecipientGroup() const;
     [[nodiscard]] bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
@@ -635,6 +635,7 @@ public:
     bool HasSearchedAssistance() { return m_AlreadySearchedAssistance; }
     bool CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction = true) const;
     bool _IsTargetAcceptable(const Unit* target) const;
+    bool CanIgnoreFeignDeath() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH) != 0; }
     bool _CanDetectFeignDeathOf(const Unit* target) const; // pussywizard
 
     // pussywizard: updated at faction change, disable move in line of sight if actual faction is not hostile to anyone
@@ -733,14 +734,16 @@ public:
     bool m_isTempWorldObject; //true when possessed
 
     // Handling caster facing during spellcast
-    void SetTarget(uint64 guid) override;
+    void SetTarget(ObjectGuid guid = ObjectGuid::Empty) override;
     void FocusTarget(Spell const* focusSpell, WorldObject const* target);
     void ReleaseFocus(Spell const* focusSpell);
     bool IsMovementPreventedByCasting() const;
 
     // Part of Evade mechanics
-    [[nodiscard]] time_t GetLastDamagedTime() const { return _lastDamagedTime; }
-    void SetLastDamagedTime(time_t val) { _lastDamagedTime = val; }
+    [[nodiscard]] time_t GetLastDamagedTime() const;
+    [[nodiscard]] std::shared_ptr<time_t> const& GetLastDamagedTimePtr() const;
+    void SetLastDamagedTime(time_t val);
+    void SetLastDamagedTimePtr(std::shared_ptr<time_t> const& val);
 
     bool IsFreeToMove();
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
@@ -755,7 +758,7 @@ public:
     void RefreshSwimmingFlag(bool recheck = false);
 
 protected:
-    bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
+    bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
     bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
 
     // vendor items
@@ -763,7 +766,7 @@ protected:
 
     static float _GetHealthMod(int32 Rank);
 
-    uint64 m_lootRecipient;
+    ObjectGuid m_lootRecipient;
     uint32 m_lootRecipientGroup;
 
     /// Timers
@@ -780,7 +783,7 @@ protected:
     void RegenerateHealth();
     void Regenerate(Powers power);
     MovementGeneratorType m_defaultMovementType;
-    uint32 m_DBTableGuid;                               ///< For new or temporary creatures is 0 for saved it is lowguid
+    ObjectGuid::LowType m_spawnId;                      ///< For new or temporary creatures is 0 for saved it is lowguid
     uint8 m_equipmentId;
     int8 m_originalEquipmentId; // can be -1
 
@@ -821,7 +824,7 @@ private:
     CreatureGroup* m_formation;
     bool TriggerJustRespawned;
 
-    time_t _lastDamagedTime; // Part of Evade mechanics
+    mutable std::shared_ptr<time_t> _lastDamagedTime; // Part of Evade mechanics
 
     bool m_cannotReachTarget;
     uint32 m_cannotReachTimer;
@@ -836,16 +839,17 @@ private:
 class AssistDelayEvent : public BasicEvent
 {
 public:
-    AssistDelayEvent(uint64 victim, Unit& owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
+    AssistDelayEvent(ObjectGuid victim, Creature* owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
 
     bool Execute(uint64 e_time, uint32 p_time) override;
-    void AddAssistant(uint64 guid) { m_assistants.push_back(guid); }
+    void AddAssistant(ObjectGuid guid) { m_assistants.push_back(guid); }
+
 private:
     AssistDelayEvent();
 
-    uint64            m_victim;
-    std::list<uint64> m_assistants;
-    Unit&             m_owner;
+    ObjectGuid        m_victim;
+    GuidList          m_assistants;
+    Creature*         m_owner;
 };
 
 class ForcedDespawnDelayEvent : public BasicEvent

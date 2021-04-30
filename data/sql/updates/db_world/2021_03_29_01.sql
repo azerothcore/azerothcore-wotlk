@@ -30,16 +30,16 @@ DROP INDEX `id`;
 
 -- New table
 CREATE TABLE `dungeon_access_requirements` (
-  `dungeon_access_id` tinyint unsigned NOT NULL COMMENT 'ID from dungeon_access_template',
-  `requirement_type` tinyint unsigned NOT NULL COMMENT '0 = achiev, 1 = quest, 2 = item',
-  `requirement_id` mediumint unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
-  `requirement_note` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
-  `faction` tinyint unsigned NOT NULL DEFAULT 2 COMMENT '0 = Alliance, 1 = Horde, 2 = Both factions',
-  `priority` tinyint unsigned NULL COMMENT 'Priority order for the requirement, sorted by type. 0 is the highest priority',
-  `leader_only` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '0 = check the requirement for the player trying to enter, 1 = check the requirement for the party leader',
-  `comment` varchar(255) COLLATE 'utf8_general_ci' NULL,
+  `dungeon_access_id` TINYINT unsigned NOT NULL COMMENT 'ID from dungeon_access_template',
+  `requirement_type` TINYINT unsigned NOT NULL COMMENT '0 = achiev, 1 = quest, 2 = item',
+  `requirement_id` MEDIUMINT unsigned NOT NULL COMMENT 'Achiev/quest/item ID',
+  `requirement_note` varchar(255) COLLATE 'utf8mb4_general_ci' NULL COMMENT 'Optional msg shown ingame to player if he cannot enter. You can add extra info',
+  `faction` TINYINT unsigned NOT NULL DEFAULT 2 COMMENT '0 = Alliance, 1 = Horde, 2 = Both factions',
+  `priority` TINYINT unsigned NULL COMMENT 'Priority order for the requirement, sorted by type. 0 is the highest priority',
+  `leader_only` TINYINT NOT NULL DEFAULT 0 COMMENT '0 = check the requirement for the player trying to enter, 1 = check the requirement for the party leader',
+  `comment` varchar(255) COLLATE 'utf8mb4_general_ci' NULL,
   PRIMARY KEY (`dungeon_access_id`, `requirement_type`, `requirement_id`)
-) COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid' ENGINE='MyISAM' COLLATE 'utf8_general_ci';
+) COMMENT='Add (multiple) requirements before being able to enter a dungeon/raid' ENGINE='MyISAM' COLLATE 'utf8mb4_general_ci';
 
 -- Transfer from old table to new table:
 -- ------------------- ITEMS
@@ -139,12 +139,12 @@ COMMENT='Dungeon/raid access template and single requirements';
 
 -- Rename columns
 ALTER TABLE `dungeon_access_template`
-CHANGE `mapId` `map_id` mediumint unsigned NOT NULL COMMENT 'Map ID from instance_template' AFTER `id`,
-CHANGE `difficulty` `difficulty` tinyint unsigned NOT NULL DEFAULT 0 COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic' AFTER `map_id`,
-CHANGE `level_min` `min_level` tinyint unsigned NULL AFTER `difficulty`,
-CHANGE `level_max` `max_level` tinyint unsigned NULL AFTER `min_level`,
-CHANGE `item_level` `min_avg_item_level` smallint unsigned NULL COMMENT 'Min average ilvl required to enter' AFTER `max_level`,
-CHANGE `comment` `comment` varchar(255) COLLATE 'utf8_general_ci' NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic' AFTER `min_avg_item_level`;
+CHANGE `mapId` `map_id` MEDIUMINT unsigned NOT NULL COMMENT 'Map ID from instance_template' AFTER `id`,
+CHANGE `difficulty` `difficulty` TINYINT unsigned NOT NULL DEFAULT 0 COMMENT '5 man: 0 = normal, 1 = heroic, 2 = epic (not implemented) | 10 man: 0 = normal, 2 = heroic | 25 man: 1 = normal, 3 = heroic' AFTER `map_id`,
+CHANGE `level_min` `min_level` TINYINT unsigned NULL AFTER `difficulty`,
+CHANGE `level_max` `max_level` TINYINT unsigned NULL AFTER `min_level`,
+CHANGE `item_level` `min_avg_item_level` SMALLINT unsigned NULL COMMENT 'Min average ilvl required to enter' AFTER `max_level`,
+CHANGE `comment` `comment` varchar(255) COLLATE 'utf8mb4_general_ci' NULL COMMENT 'Dungeon Name 5/10/25/40 man - Normal/Heroic' AFTER `min_avg_item_level`;
 
 -- Add KEY CONSTRAINTS
 ALTER TABLE `dungeon_access_template` ADD CONSTRAINT `FK_dungeon_access_template__instance_template` FOREIGN KEY (`map_id`) REFERENCES `instance_template` (`map`) ON DELETE CASCADE ON UPDATE CASCADE;

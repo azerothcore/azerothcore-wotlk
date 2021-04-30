@@ -18,7 +18,7 @@
 #include "ScriptMgr.h"
 #include <unordered_map>
 
-std::unordered_map<uint64, uint32> BGSpamProtection;
+std::unordered_map<ObjectGuid, uint32> BGSpamProtection;
 
 /*********************************************************/
 /***            BATTLEGROUND QUEUE SYSTEM              ***/
@@ -152,9 +152,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, PvPDiffi
     ginfo->_groupType = index;
 
     // announce world (this doesn't need mutex)
-    if (isRated && sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE))
-        if (ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(arenateamid))
-            sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN, team->GetName().c_str(), ginfo->ArenaType, ginfo->ArenaType, ginfo->ArenaTeamRating);
+    SendMessageArenaQueue(ginfo, true);
 
     //add players from group to ginfo
     if (grp)
@@ -185,7 +183,7 @@ GroupQueueInfo* BattlegroundQueue::AddGroup(Player* leader, Group* grp, PvPDiffi
         return ginfo;
 
     if (!isRated && !isPremade && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
-        SendMessageQueue(leader, bg, bracketEntry);
+        SendMessageBGQueue(leader, bg, bracketEntry);
 
     return ginfo;
 }
@@ -242,11 +240,11 @@ uint32 BattlegroundQueue::GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const
 }
 
 //remove player from queue and from group info, if group info is empty then remove it too
-void BattlegroundQueue::RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQueueSlot)
+void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool sentToBg, uint32 playerQueueSlot)
 {
     // pussywizard: leave queue packet
     if (playerQueueSlot < PLAYER_MAX_BATTLEGROUND_QUEUES)
-        if (Player* p = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+        if (Player* p = ObjectAccessor::FindConnectedPlayer(guid))
         {
             WorldPacket data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, nullptr, playerQueueSlot, STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
@@ -298,15 +296,13 @@ void BattlegroundQueue::RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQu
     m_QueuedPlayers.erase(itr);
 
     // announce to world if arena team left queue for rated match, show only once
-    if (groupInfo->ArenaType && groupInfo->IsRated && groupInfo->Players.empty() && sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE))
-        if (ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(groupInfo->ArenaTeamId))
-            sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT, team->GetName().c_str(), groupInfo->ArenaType, groupInfo->ArenaType, groupInfo->ArenaTeamRating);
+    SendMessageArenaQueue(groupInfo, false);
 
     // if player leaves queue and he is invited to a rated arena match, then count it as he lost
     if (groupInfo->IsInvitedToBGInstanceGUID && groupInfo->IsRated && !sentToBg)
         if (ArenaTeam* at = sArenaTeamMgr->GetArenaTeamById(groupInfo->ArenaTeamId))
         {
-            if (Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(guid))
+            if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
                 at->MemberLost(player, groupInfo->OpponentsMatchmakerRating);
             at->SaveToDB();
         }
@@ -325,7 +321,7 @@ void BattlegroundQueue::RemovePlayer(uint64 guid, bool sentToBg, uint32 playerQu
     {
         uint32 queueSlot = PLAYER_MAX_BATTLEGROUND_QUEUES;
 
-        if (Player* plr = ObjectAccessor::FindPlayerInOrOutOfWorld(*(groupInfo->Players.begin())))
+        if (Player* plr = ObjectAccessor::FindConnectedPlayer(*(groupInfo->Players.begin())))
         {
             BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(groupInfo->BgTypeId, groupInfo->ArenaType);
             queueSlot = plr->GetBattlegroundQueueIndex(bgQueueTypeId);
@@ -342,20 +338,20 @@ void BattlegroundQueue::AddEvent(BasicEvent* Event, uint64 e_time)
     m_events.AddEvent(Event, m_events.CalculateTime(e_time));
 }
 
-bool BattlegroundQueue::IsPlayerInvitedToRatedArena(uint64 pl_guid)
+bool BattlegroundQueue::IsPlayerInvitedToRatedArena(ObjectGuid pl_guid)
 {
     auto qItr = m_QueuedPlayers.find(pl_guid);
     return qItr != m_QueuedPlayers.end() && qItr->second->IsRated && qItr->second->IsInvitedToBGInstanceGUID;
 }
 
 //returns true when player pl_guid is in queue and is invited to bgInstanceGuid
-bool BattlegroundQueue::IsPlayerInvited(uint64 pl_guid, const uint32 bgInstanceGuid, const uint32 removeTime)
+bool BattlegroundQueue::IsPlayerInvited(ObjectGuid pl_guid, const uint32 bgInstanceGuid, const uint32 removeTime)
 {
     auto qItr = m_QueuedPlayers.find(pl_guid);
     return qItr != m_QueuedPlayers.end() && qItr->second->IsInvitedToBGInstanceGUID == bgInstanceGuid && qItr->second->RemoveInviteTime == removeTime;
 }
 
-bool BattlegroundQueue::GetPlayerGroupInfoData(uint64 guid, GroupQueueInfo* ginfo)
+bool BattlegroundQueue::GetPlayerGroupInfoData(ObjectGuid guid, GroupQueueInfo* ginfo)
 {
     auto qItr = m_QueuedPlayers.find(guid);
     if (qItr == m_QueuedPlayers.end())
@@ -726,6 +722,8 @@ void BattlegroundQueue::BattlegroundQueueUpdate(BattlegroundBracketId bracket_id
         MaxPlayersPerTeam = m_arenaType;
     }
 
+    sScriptMgr->OnQueueUpdate(this, bracket_id, isRated, arenaRatedTeamId);
+
     // check if can start new premade battleground
     if (bg_template->isBattleground() && m_bgTypeId != BATTLEGROUND_RB)
         if (CheckPremadeMatch(bracket_id, MinPlayersPerTeam, MaxPlayersPerTeam))
@@ -963,9 +961,9 @@ bool BattlegroundQueue::IsAllQueuesEmpty(BattlegroundBracketId bracket_id)
     return queueEmptyCount == BG_QUEUE_MAX;
 }
 
-void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
+void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
 {
-    if (!sScriptMgr->CanSendMessageQueue(this, leader, bg, bracketEntry))
+    if (!sScriptMgr->CanSendMessageBGQueue(this, leader, bg, bracketEntry))
         return;
 
     BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
@@ -976,6 +974,7 @@ void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDi
     uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32)80);
     uint32 qHorde = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_HORDE);
     uint32 qAlliance = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_ALLIANCE);
+    uint32 leftPlayers = MaxPlayers - qHorde - qAlliance;
 
     // Show queue status to player only (when joining battleground queue or Arena and arena world announcer is disabled)
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY) || (bg->isArena() && !sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE)))
@@ -990,12 +989,43 @@ void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDi
         if (searchGUID == BGSpamProtection.end())
             BGSpamProtection[leader->GetGUID()] = 0; // Leader GUID not found, initialize with 0
 
-        if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] >= 30)
-        {
-            BGSpamProtection[leader->GetGUID()] = sWorld->GetGameTime();
-            sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
-        }
+        // Skip if spam time < 30 secs (default)
+        if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] < sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY))
+            return;
+
+        // If left players > 1 - skip announce
+        if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMITED_ENABLE) && leftPlayers != 1)
+            return;
+
+        BGSpamProtection[leader->GetGUID()] = sWorld->GetGameTime();
+        sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
     }
+}
+
+void BattlegroundQueue::SendMessageArenaQueue(GroupQueueInfo* ginfo, bool IsJoin)
+{
+    if (!sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE))
+        return;
+
+    if (!sScriptMgr->CanSendMessageArenaQueue(this, ginfo, IsJoin))
+        return;
+
+    ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(ginfo->ArenaTeamId);
+    if (!team)
+        return;
+
+    if (!ginfo->IsRated)
+        return;
+
+    uint8 ArenaType = ginfo->ArenaType;
+    uint32 ArenaTeamRating = ginfo->ArenaTeamRating;
+    std::string TeamName = team->GetName();
+
+    if (IsJoin)
+        sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
+
+    if (!IsJoin && ArenaType && ginfo->Players.empty())
+        sWorld->SendWorldText(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
 }
 
 /*********************************************************/
@@ -1004,7 +1034,7 @@ void BattlegroundQueue::SendMessageQueue(Player* leader, Battleground* bg, PvPDi
 
 bool BGQueueInviteEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(m_PlayerGuid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(m_PlayerGuid);
 
     // player logged off, so he is no longer in queue
     if (!player)
@@ -1042,7 +1072,7 @@ void BGQueueInviteEvent::Abort(uint64 /*e_time*/)
 
 bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    Player* player = ObjectAccessor::FindPlayerInOrOutOfWorld(m_PlayerGuid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(m_PlayerGuid);
 
     // player logged off, so he is no longer in queue
     if (!player)
@@ -1066,7 +1096,7 @@ bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
                 if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_TRACK_DESERTERS))
                 {
                     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_DESERTER_TRACK);
-                    stmt->setUInt32(0, player->GetGUIDLow());
+                    stmt->setUInt32(0, player->GetGUID().GetCounter());
                     stmt->setUInt8(1, BG_DESERTION_TYPE_NO_ENTER_BUTTON);
                     CharacterDatabase.Execute(stmt);
                 }

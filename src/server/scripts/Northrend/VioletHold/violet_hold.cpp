@@ -104,7 +104,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_vh_teleportation_portalAI(creature);
+        return GetVioletHoldAI<npc_vh_teleportation_portalAI>(creature);
     }
 
     struct npc_vh_teleportation_portalAI : public NullCreatureAI
@@ -220,7 +220,7 @@ public:
             if (pSummoned)
             {
                 listOfMobs.Summon(pSummoned);
-                pInstance->SetData64(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
+                pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
@@ -229,7 +229,7 @@ public:
             if (pSummoned)
             {
                 listOfMobs.Despawn(pSummoned);
-                pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
+                pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
             }
         }
     };
@@ -258,7 +258,7 @@ struct violet_hold_trashAI : public npc_escortAI
     void ClearDoorSealAura()
     {
         if (pInstance)
-            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_DOOR_SEAL_GUID)))
+            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_DOOR_SEAL_GUID)))
                 c->RemoveAura(SPELL_DESTROY_DOOR_SEAL, me->GetGUID());
     }
 
@@ -352,7 +352,7 @@ struct violet_hold_trashAI : public npc_escortAI
     void JustDied(Unit* /*unit*/) override
     {
         if (pInstance)
-            if (Creature* portal = ObjectAccessor::GetCreature((*me), pInstance->GetData64(DATA_TELEPORTATION_PORTAL_GUID)))
+            if (Creature* portal = ObjectAccessor::GetCreature((*me), pInstance->GetGuidData(DATA_TELEPORTATION_PORTAL_GUID)))
                 CAST_AI(npc_vh_teleportation_portal::npc_vh_teleportation_portalAI, portal->AI())->SummonedMobDied(me);
     }
 
@@ -474,7 +474,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_azure_invaderAI (creature);
+        return GetVioletHoldAI<npc_azure_invaderAI>(creature);
     }
 
     struct npc_azure_invaderAI : public violet_hold_trashAI
@@ -549,7 +549,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_azure_binderAI (creature);
+        return GetVioletHoldAI<npc_azure_binderAI>(creature);
     }
 
     struct npc_azure_binderAI : public violet_hold_trashAI
@@ -626,7 +626,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_azure_mage_slayerAI (creature);
+        return GetVioletHoldAI<npc_azure_mage_slayerAI>(creature);
     }
 
     struct npc_azure_mage_slayerAI : public violet_hold_trashAI
@@ -683,7 +683,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_azure_raiderAI (creature);
+        return GetVioletHoldAI<npc_azure_raiderAI> (creature);
     }
 
     struct npc_azure_raiderAI : public violet_hold_trashAI
@@ -732,7 +732,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_azure_stalkerAI (creature);
+        return GetVioletHoldAI<npc_azure_stalkerAI>(creature);
     }
 
     struct npc_azure_stalkerAI : public violet_hold_trashAI
@@ -794,7 +794,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_azure_spellbreakerAI (creature);
+        return GetVioletHoldAI<npc_azure_spellbreakerAI>(creature);
     }
 
     struct npc_azure_spellbreakerAI : public violet_hold_trashAI
@@ -873,7 +873,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_azure_captainAI (creature);
+        return GetVioletHoldAI<npc_azure_captainAI>(creature);
     }
 
     struct  npc_azure_captainAI : public violet_hold_trashAI
@@ -922,7 +922,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_azure_sorcerorAI (creature);
+        return GetVioletHoldAI<npc_azure_sorcerorAI>(creature);
     }
 
     struct  npc_azure_sorcerorAI : public violet_hold_trashAI
@@ -987,7 +987,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_azure_saboteurAI (creature);
+        return GetVioletHoldAI<npc_azure_saboteurAI>(creature);
     }
 
     struct npc_azure_saboteurAI : public npc_escortAI
@@ -1167,7 +1167,7 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if (GameObject* gate = go->GetMap()->GetGameObject(MAKE_NEW_GUID(61606, 193019, HIGHGUID_GAMEOBJECT)))
+        if (GameObject* gate = go->GetMap()->GetGameObject(ObjectGuid::Create<HighGuid::GameObject>(193019, 61606)))
             if (gate->getLootState() == GO_READY)
                 gate->UseDoorOrButton(0, false, player);
 

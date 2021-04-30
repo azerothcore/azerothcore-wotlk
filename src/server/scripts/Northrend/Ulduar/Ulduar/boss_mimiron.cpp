@@ -267,10 +267,10 @@ enum ComputerTalks
     TALK_COMPUTER_ZERO = 12,
 };
 
-#define GetMimiron() ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_MIMIRON))
-#define GetLMK2() ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MIMIRON_LEVIATHAN_MKII))
-#define GetVX001() ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MIMIRON_VX001))
-#define GetACU() ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_MIMIRON_ACU))
+#define GetMimiron() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_MIMIRON))
+#define GetLMK2() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_LEVIATHAN_MKII))
+#define GetVX001() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_VX001))
+#define GetACU() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_ACU))
 
 class boss_mimiron : public CreatureScript
 {
@@ -279,7 +279,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_mimironAI (pCreature);
+        return GetUlduarAI<boss_mimironAI>(pCreature);
     }
 
     struct boss_mimironAI : public ScriptedAI
@@ -779,7 +779,7 @@ public:
 
                         if( pInstance )
                             for( uint16 i = 0; i < 3; ++i )
-                                if( uint64 guid = pInstance->GetData64(DATA_GO_MIMIRON_DOOR_1 + i) )
+                                if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                                     if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                                         if( door->GetGoState() != GO_STATE_ACTIVE )
                                         {
@@ -862,7 +862,7 @@ public:
         {
             if( pInstance )
                 for( uint16 i = 0; i < 3; ++i )
-                    if( uint64 guid = pInstance->GetData64(DATA_GO_MIMIRON_DOOR_1 + i) )
+                    if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                         if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                             if( door->GetGoState() != GO_STATE_ACTIVE )
                             {
@@ -893,7 +893,7 @@ public:
         {
             if( pInstance )
                 for( uint16 i = 0; i < 3; ++i )
-                    if( uint64 guid = pInstance->GetData64(DATA_GO_MIMIRON_DOOR_1 + i) )
+                    if( ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
                         if( GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
                             if( door->GetGoState() != GO_STATE_READY )
                             {
@@ -986,7 +986,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_leviathan_mkiiAI (pCreature);
+        return GetUlduarAI<npc_ulduar_leviathan_mkiiAI>(pCreature);
     }
 
     struct npc_ulduar_leviathan_mkiiAI : public ScriptedAI
@@ -1268,7 +1268,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_vx001AI (pCreature);
+        return GetUlduarAI<npc_ulduar_vx001AI>(pCreature);
     }
 
     struct npc_ulduar_vx001AI : public ScriptedAI
@@ -1613,7 +1613,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_aerial_command_unitAI (pCreature);
+        return GetUlduarAI<npc_ulduar_aerial_command_unitAI>(pCreature);
     }
 
     struct npc_ulduar_aerial_command_unitAI : public ScriptedAI
@@ -1942,7 +1942,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_proximity_mineAI (pCreature);
+        return GetUlduarAI<npc_ulduar_proximity_mineAI>(pCreature);
     }
 
     struct npc_ulduar_proximity_mineAI : public ScriptedAI
@@ -2007,7 +2007,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_mimiron_rocketAI (pCreature);
+        return GetUlduarAI<npc_ulduar_mimiron_rocketAI>(pCreature);
     }
 
     struct npc_ulduar_mimiron_rocketAI : public NullCreatureAI
@@ -2050,7 +2050,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_magnetic_coreAI (pCreature);
+        return GetUlduarAI<npc_ulduar_magnetic_coreAI>(pCreature);
     }
 
     struct npc_ulduar_magnetic_coreAI : public NullCreatureAI
@@ -2099,7 +2099,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_bot_summon_triggerAI (pCreature);
+        return GetUlduarAI<npc_ulduar_bot_summon_triggerAI>(pCreature);
     }
 
     struct npc_ulduar_bot_summon_triggerAI : public NullCreatureAI
@@ -2257,7 +2257,7 @@ public:
             if(instance->GetData(TYPE_MIMIRON) != NOT_STARTED)
                 return false;
 
-            if (Creature* c = ObjectAccessor::GetCreature(*go, instance->GetData64(TYPE_MIMIRON)))
+            if (Creature* c = ObjectAccessor::GetCreature(*go, instance->GetGuidData(TYPE_MIMIRON)))
             {
                 c->AI()->SetData(0, 7);
                 c->AI()->AttackStart(player);
@@ -2275,7 +2275,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_flames_initialAI (pCreature);
+        return GetUlduarAI<npc_ulduar_flames_initialAI>(pCreature);
     }
 
     struct npc_ulduar_flames_initialAI : public NullCreatureAI
@@ -2292,7 +2292,7 @@ public:
             }
         }
 
-        std::list<uint64> FlameList;
+        GuidList FlameList;
         EventMap events;
         uint32 CreateTime;
 
@@ -2314,15 +2314,15 @@ public:
             }
         }
 
-        void RemoveFlame(uint64 guid)
+        void RemoveFlame(ObjectGuid guid)
         {
             FlameList.remove(guid);
         }
 
         void RemoveAll()
         {
-            for( std::list<uint64>::iterator itr = FlameList.begin(); itr != FlameList.end(); ++itr )
-                if (Creature* c = ObjectAccessor::GetCreature(*me, (*itr)))
+            for (ObjectGuid guid : FlameList)
+                if (Creature* c = ObjectAccessor::GetCreature(*me, guid))
                     c->DespawnOrUnsummon();
             FlameList.clear();
             me->DespawnOrUnsummon();
@@ -2395,7 +2395,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_flames_spreadAI (pCreature);
+        return GetUlduarAI<npc_ulduar_flames_spreadAI>(pCreature);
     }
 
     struct npc_ulduar_flames_spreadAI : public NullCreatureAI
@@ -2437,7 +2437,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_emergency_fire_botAI (pCreature);
+        return GetUlduarAI<npc_ulduar_emergency_fire_botAI>(pCreature);
     }
 
     struct npc_ulduar_emergency_fire_botAI : public ScriptedAI
@@ -2494,7 +2494,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_rocket_strike_triggerAI (pCreature);
+        return GetUlduarAI<npc_ulduar_rocket_strike_triggerAI>(pCreature);
     }
 
     struct npc_ulduar_rocket_strike_triggerAI : public NullCreatureAI

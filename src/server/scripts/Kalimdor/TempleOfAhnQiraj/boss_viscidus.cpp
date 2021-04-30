@@ -236,7 +236,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_viscidusAI(creature);
+        return GetTempleOfAhnQirajAI<boss_viscidusAI>(creature);
     }
 };
 
@@ -253,7 +253,7 @@ public:
         {
             InstanceScript* Instance = me->GetInstanceScript();
 
-            if (Creature* Viscidus = me->GetMap()->GetCreature(Instance->GetData64(DATA_VISCIDUS)))
+            if (Creature* Viscidus = me->GetMap()->GetCreature(Instance->GetGuidData(DATA_VISCIDUS)))
             {
                 if (BossAI* ViscidusAI = dynamic_cast<BossAI*>(Viscidus->GetAI()))
                     ViscidusAI->SummonedCreatureDespawn(me);
@@ -284,7 +284,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_glob_of_viscidusAI>(creature);
+        return GetTempleOfAhnQirajAI<npc_glob_of_viscidusAI>(creature);
     }
 };
 

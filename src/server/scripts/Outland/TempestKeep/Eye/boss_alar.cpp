@@ -327,7 +327,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_alarAI>(creature);
+        return GetTheEyeAI<boss_alarAI>(creature);
     }
 };
 
@@ -395,7 +395,7 @@ public:
         {
             PreventHitEffect(effIndex);
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                if (Creature* alar = ObjectAccessor::GetCreature(*GetCaster(), instance->GetData64(NPC_ALAR)))
+                if (Creature* alar = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_ALAR)))
                     Unit::DealDamage(GetCaster(), alar, alar->CountPctFromMaxHealth(2));
         }
 
