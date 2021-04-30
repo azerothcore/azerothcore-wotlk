@@ -41,6 +41,7 @@ RUN addgroup --gid $GROUP_ID acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
 # must be created to set the correct permissions on them
+RUN mkdir -p /home/acore/.ccache
 RUN mkdir -p /azerothcore/env/dist/data
 RUN mkdir -p /azerothcore/env/dist/logs
 RUN mkdir -p /azerothcore/env/dist/etc

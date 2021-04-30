@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-CTOOLS=${CTOOLS:-OFF}
+CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+export CTOOLS=${CTOOLS:-OFF}
 source "$CUR_PATH/docker-build-prod.sh"
 
 echo "Fixing EOL..."

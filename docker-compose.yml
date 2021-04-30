@@ -155,6 +155,7 @@ services:
     working_dir: /azerothcore/
     volumes:
         - ac-build:/azerothcore/var/build
+        - ac-ccache:/home/acore/.ccache/
          # use internal copied files instead of volumes
         - /azerothcore/src
         - /azerothcore/data
@@ -188,6 +189,7 @@ services:
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
       - ac-build-dev:/azerothcore/var/build
+      - ac-ccache-dev:/home/acore/.ccache/
     profiles: [all, dev]
 
 #======================
@@ -286,6 +288,8 @@ volumes:
   ac-env:
   ac-build-dev:
   ac-build:
+  ac-ccache-dev:
+  ac-ccache:
   ac-proj:
   # not used, but you can use them by setting
   # the DOCKER_VOL_* env variabiles
