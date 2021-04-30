@@ -198,6 +198,11 @@ ARG DOCKER_USER=acore
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/etc /azerothcore/env/dist/etc
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/worldserver /azerothcore/env/dist/bin/worldserver
 
+#================================================================
+#
+# CLIENT DATA
+#
+#=================================================================
 
 FROM worldserver-local as client-data
 
@@ -212,6 +217,12 @@ RUN mkdir -p /azerothcore/env/dist/data
 ENV DATAPATH=/azerothcore/env/dist/data
 
 RUN /azerothcore/acore.sh client-data
+
+#================================================================
+#
+# EXTRACTORS
+#
+#=================================================================
 
 FROM worldserver-local as extractors
 

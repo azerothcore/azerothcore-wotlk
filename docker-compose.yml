@@ -259,14 +259,14 @@ services:
         - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
     volumes:
       - ac-client-data-prod:/azerothcore/env/dist/data
-    profiles: [none]
+    profiles: [prod]
 
   ac-extractor:
     image: acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     user: ${DOCKER_USER:-acore}
     build:
       context: .
-      target: extractor
+      target: extractors
       dockerfile: ./apps/docker/Dockerfile
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
