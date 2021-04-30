@@ -364,14 +364,14 @@ void MotionMaster::MoveCircleTarget(Unit* target)
         return;
     }
 
-    Position* point = target->GetMeleeAttackPoint(_owner);
-    if (point == nullptr)
+    Position pos;
+    if (!target->GetMeleeAttackPoint(_owner, pos))
     {
         return;
     }
 
     Movement::MoveSplineInit init(_owner);
-    init.MoveTo(point->m_positionX, point->m_positionY, point->m_positionZ, false);
+    init.MoveTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), false);
     init.SetWalk(true);
     init.SetFacing(target);
     init.Launch();
