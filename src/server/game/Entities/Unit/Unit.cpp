@@ -2075,13 +2075,15 @@ void Unit::CalcAbsorbResist(Unit* attacker, Unit* victim, SpellSchoolMask school
 
 			switch ((*itr)->GetId())
             {
-				case HAND_OF_SACRIFICE:
-                case DIVINE_SACRIFICE:
-                {
-					if (caster->HasAura(HUNGERING_COLD))
-						caster->RemoveAura(HUNGERING_COLD);
+			    case HAND_OF_SACRIFICE:
+			    case DIVINE_SACRIFICE:
+				    if (caster->HasAura(HUNGERING_COLD))
+				    {
+				        caster->RemoveAura(HUNGERING_COLD);
+			        }
+			        break;
+                default:
                     break;
-                }
             }
 
             uint32 splitDamage = CalculatePct(dmgInfo.GetDamage(), (*itr)->GetAmount());
