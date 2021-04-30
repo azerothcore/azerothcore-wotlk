@@ -31,6 +31,15 @@ jobs:
           docker --version
           docker-compose --version
 
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: /home/runner/.ccache
+          key: ccache:ubuntu-20.04:clang:without-modules:${{ github.ref }}:${{ github.sha }}
+          restore-keys: |
+            ccache:ubuntu-20.04:clang:without-modules:${{ github.ref }}
+            ccache:ubuntu-20.04:clang:without-modules
+
       - name: Build
         #env:
         #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
