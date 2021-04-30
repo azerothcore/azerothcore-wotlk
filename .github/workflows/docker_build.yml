@@ -52,7 +52,7 @@ jobs:
         #env:
         #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
         run: |
-           docker-compose --build-arg BUILDKIT_INLINE_CACHE=1 --profile all build
+           docker-compose --profile all build --build-arg BUILDKIT_INLINE_CACHE=1
 
       - name: Login to Docker Hub
         if: ${{ steps.extract_branch.outputs.branch == 'master' }}
