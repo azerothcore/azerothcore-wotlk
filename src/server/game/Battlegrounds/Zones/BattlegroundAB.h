@@ -153,12 +153,6 @@ enum BG_AB_Sounds
     BG_AB_SOUND_NEAR_VICTORY_HORDE      = 8457
 };
 
-enum BG_AB_BroadcastTexts
-{
-    BG_AB_TEXT_ALLIANCE_NEAR_VICTORY    = 10598,
-    BG_AB_TEXT_HORDE_NEAR_VICTORY       = 10599,
-};
-
 enum BG_AB_Misc
 {
     BG_AB_OBJECTIVE_ASSAULT_BASE        = 122,
