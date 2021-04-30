@@ -1,3 +1,19 @@
+-- DB update 2021_04_30_03 -> 2021_04_30_04
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_04_30_03';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_04_30_03 2021_04_30_04 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1617859274362409300'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1617859274362409300');
 
 DELETE FROM `gameobject` WHERE (`id` = 153454);
@@ -45,3 +61,12 @@ INSERT INTO `smart_scripts` VALUES
 (9452, 0, 0, 0, 0, 0, 100, 0, 0, 0, 3400, 4800, 0, 11, 25055, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Enchanter - In Combat - Cast \'Arcane Bolt\''),
 (9452, 0, 1, 0, 0, 0, 100, 0, 7000, 10000, 18000, 22000, 0, 11, 15970, 1, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Enchanter - In Combat - Cast \'Sleep\''),
 (9452, 0, 2, 0, 1, 0, 100, 0, 100, 100, 3000, 3000, 0, 49, 0, 0, 0, 0, 0, 0, 21, 10, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Enchanter - Out of Combat - Start Attacking');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
