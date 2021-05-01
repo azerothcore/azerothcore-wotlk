@@ -1467,7 +1467,7 @@ public:
     bool AttackStop();
     void RemoveAllAttackers();
     [[nodiscard]] AttackerSet const& getAttackers() const { return m_attackers; }
-    [[nodiscard]] Position* GetMeleeAttackPoint(Unit* attacker);
+    [[nodiscard]] bool GetMeleeAttackPoint(Unit* attacker, Position& pos);
     [[nodiscard]] bool isAttackingPlayer() const;
     [[nodiscard]] Unit* GetVictim() const { return m_attacking; }
 
@@ -2620,6 +2620,8 @@ private:
 
     uint32 _oldFactionId;           ///< faction before charm
     bool m_petCatchUp;
+
+    float processDummyAuras(float TakenTotalMod) const;
 };
 
 namespace acore
