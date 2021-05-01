@@ -210,7 +210,7 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/wo
 #
 #=================================================================
 
-FROM alpine:latest as client-data
+FROM alpine:3.13.5 as client-data
 
 LABEL description="AC Production: client-data"
 
@@ -229,7 +229,7 @@ RUN /azerothcore/acore.sh client-data
 #
 #=================================================================
 
-FROM alpine:latest as tools
+FROM alpine:3.13.5 as tools
 
 LABEL description="AC Production: tools"
 
