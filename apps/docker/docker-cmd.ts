@@ -10,7 +10,6 @@ const program = new Command();
 const envProd = {
   COMPOSE_DOCKER_CLI_BUILD: "1",
   DOCKER_BUILDKIT: "1",
-  DOCKER_VOL_CCACHE: "./var/docker/ccache",
 };
 
 program
@@ -268,7 +267,7 @@ function shellCommandFactory(
         const shellCmd = run({
           cmd,
           cwd: process.cwd(),
-          env,
+          env: {...process.env, ...env},
         });
 
         const status = await shellCmd.status();
