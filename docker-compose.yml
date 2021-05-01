@@ -154,7 +154,8 @@ services:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     working_dir: /azerothcore/
     volumes:
-        - ac-build:/azerothcore/var/build
+        - ${DOCKER_VOL_BUILD:-ac-build}:/azerothcore/var/build
+        # with this conf you can use an external path for it (useful for CI)
         - ${DOCKER_VOL_CCACHE:-ac-ccache}:/azerothcore/var/ccache:delegated
          # use internal copied files instead of volumes
         - /azerothcore/src

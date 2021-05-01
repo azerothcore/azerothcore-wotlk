@@ -167,8 +167,6 @@ LABEL description="AC Image used by the build stage to generate production image
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc /azerothcore/env/dist/etc
 
-ENV AC_CCACHE_DIR=/tmp/azerothcore
-
 # check pre-generated var/docker folder
 COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker /var
 

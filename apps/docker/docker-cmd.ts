@@ -36,17 +36,6 @@ shellCommandFactory("build", "Build the authserver and worldserver", [
 ]);
 
 shellCommandFactory(
-  "build:clean",
-  "Clean and run build",
-  [
-    "docker-compose --profile all build --parallel",
-    "docker image prune -f",
-    `docker-compose run --rm ac-build bash acore.sh compiler clean`,
-    "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
-  ],
-);
-
-shellCommandFactory(
   "build:nocache",
   "Build the authserver and worldserver without docker cache",
   [
@@ -63,6 +52,15 @@ shellCommandFactory(
     "docker-compose build  --parallel ac-build",
     "docker image prune -f",
     "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
+  ],
+);
+
+shellCommandFactory(
+  "clean:build",
+  "Clean build files",
+  [
+    "docker image prune -f",
+    `docker-compose run --rm ac-build bash acore.sh compiler clean`,
   ],
 );
 
@@ -267,7 +265,7 @@ function shellCommandFactory(
         const shellCmd = run({
           cmd,
           cwd: process.cwd(),
-          env: {...process.env, ...env},
+          env: { ...process.env, ...env },
         });
 
         const status = await shellCmd.status();
