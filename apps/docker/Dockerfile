@@ -220,8 +220,7 @@ ARG DOCKER_USER=acore
 USER $DOCKER_USER
 
 ENV DATAPATH=/azerothcore/env/dist/data
-
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=client-data /azerothcore/env/dist/data /azerothcore/env/dist/data
+ENV DATAPATH_ZIP=/tmp/data.zip
 
 RUN /azerothcore/acore.sh client-data
 
