@@ -26,7 +26,7 @@ uint32 PlayerSocial::GetNumberOfSocialsWithFlag(SocialFlag flag) const
     return counter;
 }
 
-bool PlayerSocial::AddToSocialList(uint64 friendGuid, SocialFlag flag)
+bool PlayerSocial::AddToSocialList(ObjectGuid friendGuid, SocialFlag flag)
 {
     // check client limits
     if (GetNumberOfSocialsWithFlag(flag) >= (((flag & SOCIAL_FLAG_FRIEND) != 0) ? SOCIALMGR_FRIEND_LIMIT : SOCIALMGR_IGNORE_LIMIT))
@@ -40,8 +40,8 @@ bool PlayerSocial::AddToSocialList(uint64 friendGuid, SocialFlag flag)
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_CHARACTER_SOCIAL_FLAGS);
 
         stmt->setUInt8(0, itr->second.Flags);
-        stmt->setUInt32(1, GetPlayerGUID());
-        stmt->setUInt32(2, friendGuid);
+        stmt->setUInt32(1, GetPlayerGUID().GetCounter());
+        stmt->setUInt32(2, friendGuid.GetCounter());
 
         CharacterDatabase.Execute(stmt);
     }
@@ -51,8 +51,8 @@ bool PlayerSocial::AddToSocialList(uint64 friendGuid, SocialFlag flag)
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_SOCIAL);
 
-        stmt->setUInt32(0, GetPlayerGUID());
-        stmt->setUInt32(1, friendGuid);
+        stmt->setUInt32(0, GetPlayerGUID().GetCounter());
+        stmt->setUInt32(1, friendGuid.GetCounter());
         stmt->setUInt8(2, flag);
 
         CharacterDatabase.Execute(stmt);
@@ -60,7 +60,7 @@ bool PlayerSocial::AddToSocialList(uint64 friendGuid, SocialFlag flag)
     return true;
 }
 
-void PlayerSocial::RemoveFromSocialList(uint64 friendGuid, SocialFlag flag)
+void PlayerSocial::RemoveFromSocialList(ObjectGuid friendGuid, SocialFlag flag)
 {
     auto itr = m_playerSocialMap.find(friendGuid);
     if (itr == m_playerSocialMap.end())                     // not exist
@@ -72,8 +72,8 @@ void PlayerSocial::RemoveFromSocialList(uint64 friendGuid, SocialFlag flag)
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SOCIAL);
 
-        stmt->setUInt32(0, GetPlayerGUID());
-        stmt->setUInt32(1, friendGuid);
+        stmt->setUInt32(0, GetPlayerGUID().GetCounter());
+        stmt->setUInt32(1, friendGuid.GetCounter());
 
         CharacterDatabase.Execute(stmt);
 
@@ -84,14 +84,14 @@ void PlayerSocial::RemoveFromSocialList(uint64 friendGuid, SocialFlag flag)
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_REM_CHARACTER_SOCIAL_FLAGS);
 
         stmt->setUInt8(0, flag);
-        stmt->setUInt32(1, GetPlayerGUID());
-        stmt->setUInt32(2, friendGuid);
+        stmt->setUInt32(1, GetPlayerGUID().GetCounter());
+        stmt->setUInt32(2, friendGuid.GetCounter());
 
         CharacterDatabase.Execute(stmt);
     }
 }
 
-void PlayerSocial::SetFriendNote(uint64 friendGuid, std::string note)
+void PlayerSocial::SetFriendNote(ObjectGuid friendGuid, std::string note)
 {
     auto itr = m_playerSocialMap.find(friendGuid);
     if (itr == m_playerSocialMap.end())                     // not exist
@@ -102,8 +102,8 @@ void PlayerSocial::SetFriendNote(uint64 friendGuid, std::string note)
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHARACTER_SOCIAL_NOTE);
 
     stmt->setString(0, note);
-    stmt->setUInt32(1, GetPlayerGUID());
-    stmt->setUInt32(2, friendGuid);
+    stmt->setUInt32(1, GetPlayerGUID().GetCounter());
+    stmt->setUInt32(2, friendGuid.GetCounter());
 
     CharacterDatabase.Execute(stmt);
 
@@ -145,7 +145,7 @@ void PlayerSocial::SendSocialList(Player* player, uint32 flags)
 
         sSocialMgr->GetFriendInfo(player, itr.first, friendInfo);
 
-        data << uint64(itr.first);                            // player guid
+        data << itr.first;                                    // player guid
         data << uint32(contactFlags);                         // player flag (0x1 = Friend, 0x2 = Ignored, 0x4 = Muted)
         data << friendInfo.Note;                              // string note
         if (contactFlags & SOCIAL_FLAG_FRIEND)                // if IsFriend()
@@ -165,7 +165,7 @@ void PlayerSocial::SendSocialList(Player* player, uint32 flags)
     LOG_DEBUG("network", "WORLD: Sent SMSG_CONTACT_LIST");
 }
 
-bool PlayerSocial::_checkContact(uint64 guid, SocialFlag flags) const
+bool PlayerSocial::_checkContact(ObjectGuid guid, SocialFlag flags) const
 {
     const auto& itr = m_playerSocialMap.find(guid);
     if (itr != m_playerSocialMap.end())
@@ -174,12 +174,12 @@ bool PlayerSocial::_checkContact(uint64 guid, SocialFlag flags) const
     return false;
 }
 
-bool PlayerSocial::HasFriend(uint64 friend_guid) const
+bool PlayerSocial::HasFriend(ObjectGuid friend_guid) const
 {
     return _checkContact(friend_guid, SOCIAL_FLAG_FRIEND);
 }
 
-bool PlayerSocial::HasIgnore(uint64 ignore_guid) const
+bool PlayerSocial::HasIgnore(ObjectGuid ignore_guid) const
 {
     return _checkContact(ignore_guid, SOCIAL_FLAG_IGNORED);
 }
@@ -198,7 +198,7 @@ SocialMgr* SocialMgr::instance()
     return &instance;
 }
 
-void SocialMgr::GetFriendInfo(Player* player, uint64 friendGUID, FriendInfo& friendInfo)
+void SocialMgr::GetFriendInfo(Player* player, ObjectGuid friendGUID, FriendInfo& friendInfo)
 {
     if (!player)
         return;
@@ -208,7 +208,7 @@ void SocialMgr::GetFriendInfo(Player* player, uint64 friendGUID, FriendInfo& fri
     friendInfo.Level = 0;
     friendInfo.Class = 0;
 
-    Player* pFriend = ObjectAccessor::FindPlayerInOrOutOfWorld(friendGUID);
+    Player* pFriend = ObjectAccessor::FindConnectedPlayer(friendGUID);
     if (!pFriend || AccountMgr::IsGMAccount(pFriend->GetSession()->GetSecurity()))
         return;
 
@@ -236,14 +236,14 @@ void SocialMgr::GetFriendInfo(Player* player, uint64 friendGUID, FriendInfo& fri
     }
 }
 
-void SocialMgr::MakeFriendStatusPacket(FriendsResult result, uint64 guid, WorldPacket* data)
+void SocialMgr::MakeFriendStatusPacket(FriendsResult result, ObjectGuid guid, WorldPacket* data)
 {
     data->Initialize(SMSG_FRIEND_STATUS, 9);
     *data << uint8(result);
-    *data << uint64(guid);
+    *data << guid;
 }
 
-void SocialMgr::SendFriendStatus(Player* player, FriendsResult result, uint64 friendGuid, bool broadcast)
+void SocialMgr::SendFriendStatus(Player* player, FriendsResult result, ObjectGuid friendGuid, bool broadcast)
 {
     FriendInfo fi;
     GetFriendInfo(player, friendGuid, fi);
@@ -287,16 +287,15 @@ void SocialMgr::BroadcastToFriendListers(Player* player, WorldPacket* packet)
 
     TeamId teamId = player->GetTeamId();
     AccountTypes security = player->GetSession()->GetSecurity();
-    uint32 guid = player->GetGUIDLow();
     bool allowTwoSideWhoList = sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_WHO_LIST);
     AccountTypes gmLevelInWhoList = AccountTypes(sWorld->getIntConfig(CONFIG_GM_LEVEL_IN_WHO_LIST));
 
     for (auto const& itr : m_socialMap)
     {
-        auto const& itr2 = itr.second.m_playerSocialMap.find(guid);
+        auto const& itr2 = itr.second.m_playerSocialMap.find(player->GetGUID());
         if (itr2 != itr.second.m_playerSocialMap.end() && (itr2->second.Flags & SOCIAL_FLAG_FRIEND))
         {
-            Player* pFriend = ObjectAccessor::FindPlayer(MAKE_NEW_GUID(itr.first, 0, HIGHGUID_PLAYER));
+            Player* pFriend = ObjectAccessor::FindPlayer(itr.first);
 
             // PLAYER see his team only and PLAYER can't see MODERATOR, GAME MASTER, ADMINISTRATOR characters
             // MODERATOR, GAME MASTER, ADMINISTRATOR can see all
@@ -306,7 +305,7 @@ void SocialMgr::BroadcastToFriendListers(Player* player, WorldPacket* packet)
     }
 }
 
-PlayerSocial* SocialMgr::LoadFromDB(PreparedQueryResult result, uint64 guid)
+PlayerSocial* SocialMgr::LoadFromDB(PreparedQueryResult result, ObjectGuid guid)
 {
     PlayerSocial* social = &m_socialMap[guid];
     social->SetPlayerGUID(guid);
@@ -318,7 +317,7 @@ PlayerSocial* SocialMgr::LoadFromDB(PreparedQueryResult result, uint64 guid)
     {
         Field* fields = result->Fetch();
 
-        auto friendGuid = fields[0].GetUInt32();
+        auto friendGuid = ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32());
         auto flags = fields[1].GetUInt8();
         auto note = fields[2].GetString();
 

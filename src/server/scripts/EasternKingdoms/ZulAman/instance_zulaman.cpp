@@ -56,19 +56,19 @@ public:
     {
         instance_zulaman_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
-        uint64 HarkorsSatchelGUID;
-        uint64 TanzarsTrunkGUID;
-        uint64 AshlisBagGUID;
-        uint64 KrazsPackageGUID;
-        uint64 StrangeGongGUID;
-        uint64 HarrisonJonesGUID;
+        ObjectGuid HarkorsSatchelGUID;
+        ObjectGuid TanzarsTrunkGUID;
+        ObjectGuid AshlisBagGUID;
+        ObjectGuid KrazsPackageGUID;
+        ObjectGuid StrangeGongGUID;
+        ObjectGuid HarrisonJonesGUID;
 
-        uint64 HexLordGateGUID;
-        uint64 ZulJinGateGUID;
-        uint64 MassiveGateGUID;
-        uint64 AkilzonDoorGUID;
-        uint64 ZulJinDoorGUID;
-        uint64 HalazziDoorGUID;
+        ObjectGuid HexLordGateGUID;
+        ObjectGuid ZulJinGateGUID;
+        ObjectGuid MassiveGateGUID;
+        ObjectGuid AkilzonDoorGUID;
+        ObjectGuid ZulJinDoorGUID;
+        ObjectGuid HalazziDoorGUID;
 
         uint32 QuestTimer;
         uint16 BossKilled;
@@ -81,20 +81,6 @@ public:
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-
-            HarkorsSatchelGUID = 0;
-            TanzarsTrunkGUID = 0;
-            AshlisBagGUID = 0;
-            KrazsPackageGUID = 0;
-            StrangeGongGUID = 0;
-            HexLordGateGUID = 0;
-            ZulJinGateGUID = 0;
-            MassiveGateGUID = 0;
-            AkilzonDoorGUID = 0;
-            HalazziDoorGUID = 0;
-            ZulJinDoorGUID = 0;
-
-            HarrisonJonesGUID = 0;
 
             QuestTimer = 0;
             QuestMinute = 0;
@@ -380,7 +366,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -390,7 +376,7 @@ public:
                     return MassiveGateGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
     };
 

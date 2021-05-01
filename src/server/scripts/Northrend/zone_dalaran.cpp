@@ -136,7 +136,7 @@ public:
         void Reset() override
         {
             _events.Reset();
-            _aquanosGUID = 0;
+            _aquanosGUID.Clear();
         }
 
         void SetData(uint32 type, uint32 /*data*/) override
@@ -221,7 +221,7 @@ public:
 
     private:
         EventMap _events;
-        uint64 _aquanosGUID;
+        ObjectGuid _aquanosGUID;
         uint8 _lCount;
         uint32 _lSource;
 
@@ -313,7 +313,7 @@ public:
         npc_archmage_landalockAI(Creature* creature) : ScriptedAI(creature)
         {
             _switchImageTimer = MINUTE * IN_MILLISECONDS;
-            _summonGUID = 0;
+            _summonGUID.Clear();
         }
 
         uint32 GetImageEntry(uint32 QuestId)
@@ -372,7 +372,7 @@ public:
                         continue;
 
                     uint32 newEntry = GetImageEntry(questId);
-                    if (GUID_ENPART(_summonGUID) != newEntry)
+                    if (_summonGUID.GetEntry() != newEntry)
                     {
                         if (Creature* image = ObjectAccessor::GetCreature(*me, _summonGUID))
                             image->DespawnOrUnsummon();
@@ -387,7 +387,7 @@ public:
         }
     private:
         uint32 _switchImageTimer;
-        uint64 _summonGUID;
+        ObjectGuid _summonGUID;
     };
 };
 
