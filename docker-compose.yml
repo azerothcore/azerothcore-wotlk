@@ -12,7 +12,7 @@ x-cache-from: &cache-from
     - acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
     - acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master}
     - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
-    - acore/ac-wotlk-extractors:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master}
     - acore/ac-wotlk-client-data-server:${DOCKER_IMAGE_TAG:-master}
 
 x-ac-shared-conf: &ac-shared-conf
@@ -223,7 +223,8 @@ services:
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
       - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
-      - ac-client-data-prod:/azerothcore/env/dist/data:nocopy
+    volumes_from:
+      - ac-client-data-server:ro
     profiles: [prod]
 
   ac-authserver-prod:
@@ -263,24 +264,29 @@ services:
         DOCKER_USER: ${DOCKER_USER:-acore}
       <<: *cache-from
     volumes:
-      - ac-client-data-prod:/azerothcore/env/dist/data
+      - /azerothcore/env/dist/data
     profiles: [prod]
 
-  ac-extractors:
-    image: acore/ac-wotlk-extractors:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+  ac-tools:
+    image: acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     user: ${DOCKER_USER:-acore}
     build:
       context: .
-      target: extractors
+      target: tools
       dockerfile: ./apps/docker/Dockerfile
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
       <<: *cache-from
+    working_dir: /azerothcore/env/client/
     volumes:
-      - ${DOCKER_CLIENT_FOLDER:-./var}:/azerothcore/env/client/data
-    profiles: [prod]
+      - ${DOCKER_CLIENT_DATA_FOLDER:-./var/client}:/azerothcore/env/client/Data
+      - ${DOCKER_VOL_TOOLS_DBC:-./var/dbc}:/azerothcore/env/client/dbc
+      - ${DOCKER_VOL_TOOLS_MAPS:-./var/maps}:/azerothcore/env/client/maps
+      - ${DOCKER_VOL_TOOLS_VMAPS:-./var/vmaps}:/azerothcore/env/client/vmaps
+      - ${DOCKER_VOL_TOOLS_MMAPS:-./var/mmaps}:/azerothcore/env/client/mmaps
+    profiles: [tools]
 
 volumes:
   ac-database:

@@ -167,7 +167,7 @@ LABEL description="AC Image used by the build stage to generate production image
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc /azerothcore/env/dist/etc
 
-RUN --mount=id=ac-wotlk-ccache,type=cache,target=/home/acore/.ccache/,uid=1000,gid=1000 bash apps/docker/docker-build-prod.sh
+RUN --mount=type=bind,source=/tmp/ac-wotlk-ccache,target=/home/acore/.ccache/ bash apps/docker/docker-build-prod.sh
 
 #================================================================
 #
@@ -221,13 +221,13 @@ RUN /azerothcore/acore.sh client-data
 
 #================================================================
 #
-# EXTRACTORS
+# TOOLS
 #
 #=================================================================
 
-FROM worldserver-local as extractors
+FROM worldserver-local as tools
 
-LABEL description="AC Production: extractors"
+LABEL description="AC Production: tools"
 
 ARG DOCKER_USER=acore
 

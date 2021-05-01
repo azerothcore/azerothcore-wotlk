@@ -34,7 +34,7 @@ jobs:
       - name: Cache
         uses: actions/cache@v2
         with:
-          path: /var/lib/docker
+          path: /tmp/ac-wotlk-ccache
           key: ccache:ubuntu-20.04:clang:without-modules:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
             ccache:ubuntu-20.04:clang:without-modules:${{ github.ref }}
