@@ -3,7 +3,7 @@
 SRCPATH="$AC_PATH_ROOT"
 
 # absolute path where build files must be stored
-BUILDPATH="$AC_PATH_VAR/build/obj"
+BUILDPATH=${BUILDPATH:-"$AC_PATH_VAR/build/obj"}
 
 # absolute path where azerothcore will be installed
 # NOTE: on linux the binaries are stored in a subfolder (/bin)

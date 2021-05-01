@@ -47,7 +47,9 @@ jobs:
           export DOCKER_GROUP_ID=$(id -u)
           export DOCKER_VOL_CCACHE=./var/docker/ccache
           export DOCKER_VOL_BUILD=./var/docker/build
-          ./acore.sh docker prod:build
+          docker-compose --profile all build --parallel ac-build
+          docker-compose run --rm ac-build bash apps/docker/docker-build-prod.sh
+          docker-compose --profile prod build --parallel
 
       - name: Login to Docker Hub
         if: ${{ steps.extract_branch.outputs.branch == 'master' }}

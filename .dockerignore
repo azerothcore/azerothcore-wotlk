@@ -1,7 +1,8 @@
 /cmake-build-debug/*
 /build*/
 # do not ignore the docker folder
-/var/build
+/var/*
+!/var/docker
 /env/dist/*
 /env/user/*
 /env/docker/data/*

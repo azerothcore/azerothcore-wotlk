@@ -43,7 +43,6 @@ RUN addgroup --gid $GROUP_ID acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
 # must be created to set the correct permissions on them
-RUN mkdir -p /home/acore/.ccache
 RUN mkdir -p /azerothcore/env/dist/data
 RUN mkdir -p /azerothcore/env/dist/logs
 RUN mkdir -p /azerothcore/env/dist/etc
@@ -127,7 +126,6 @@ RUN chown $DOCKER_USER:$DOCKER_USER /azerothcore
 USER $DOCKER_USER
 
 # must be created to avoid permissions errors
-RUN mkdir -p /home/acore/.ccache
 RUN mkdir -p /azerothcore/env/dist/data
 RUN mkdir -p /azerothcore/env/dist/logs
 RUN mkdir -p /azerothcore/env/dist/etc
@@ -167,8 +165,13 @@ LABEL description="AC Image used by the build stage to generate production image
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc /azerothcore/env/dist/etc
 
+ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
+ENV CTYPE=RelWithDebInfo
+ENV AC_CCACHE=true
+ENV AC_CCACHE_DIR=/azerothcore/var/docker/ccache
+ENV BUILDPATH=/azerothcore/var/docker/build/obj
 # check pre-generated var/docker folder
-COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker /var
+COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker /azerothcore/var/docker
 
 RUN bash apps/docker/docker-build-prod.sh
 
@@ -208,9 +211,9 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/wo
 #
 #=================================================================
 
-FROM alpine:3.13.5 as client-data
+FROM worldserver-local as client-data-downloader
 
-LABEL description="AC Production: client-data"
+LABEL description="AC Production: client-data downloader"
 
 ARG DOCKER_USER=acore
 
@@ -221,19 +224,45 @@ ENV DATAPATH_ZIP=/tmp/data.zip
 
 RUN /azerothcore/acore.sh client-data
 
+FROM alpine:3.13.5 as client-data
+
+LABEL description="AC Production: client-data"
+
+COPY --from=client-data-downloader /azerothcore/env/dist/data /azerothcore/env/dist/data
+
 #================================================================
 #
 # TOOLS
 #
 #=================================================================
 
-FROM alpine:3.13.5 as tools
+FROM debian:10-slim as tools
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+ARG DOCKER_USER=acore
 
 LABEL description="AC Production: tools"
 
-ARG DOCKER_USER=acore
+# List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+# set timezone environment variable
+ENV TZ=Etc/UTC
+
+# set noninteractive mode so tzdata doesn't ask to set timezone on install
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y libace-6.* libace-dev g++ gcc default-libmysqlclient-dev sudo && apt-get clean
+
+# Create a non-root user
+RUN addgroup --gid $GROUP_ID acore && \
+    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
+    passwd -d acore && \
+    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
 RUN mkdir -p /azerothcore/env/client/
+RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
+
+USER $DOCKER_USER
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mapextractor /azerothcore/env/client/mapextractor
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/client/mmaps_generator

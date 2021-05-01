@@ -104,8 +104,6 @@ shellCommandFactory(
   "prod:build",
   "Build producion services",
   [
-    "docker-compose --profile all build --parallel",
-    "docker-compose run --rm ac-build bash apps/docker/docker-build-prod.sh",
     "docker-compose --profile prod build --parallel",
     "docker image prune -f",
   ],
