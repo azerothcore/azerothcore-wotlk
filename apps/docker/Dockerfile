@@ -167,7 +167,6 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc /azerothcore/env/dist/etc
 
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
-ENV CSCRIPTS=OFF
 ENV AC_CCACHE=true
 ENV CCACHE_DIR=/azerothcore/var/docker/ccache
 ENV BUILDPATH=/azerothcore/var/docker/build/obj
