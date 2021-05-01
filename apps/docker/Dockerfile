@@ -169,9 +169,8 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc /azerothcore/env/dist/etc
 
 ENV AC_CCACHE_DIR=/tmp/azerothcore
 
-LABEL description="AC Image used by the build stage to generate production images"
-
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc /azerothcore/env/dist/etc
+# check pre-generated var/prod folder
+COPY --chown=$DOCKER_USER:$DOCKER_USER var/prod /var
 
 RUN bash apps/docker/docker-build-prod.sh
 
@@ -211,7 +210,7 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/wo
 #
 #=================================================================
 
-FROM worldserver-local as client-data
+FROM alpine:latest as client-data
 
 LABEL description="AC Production: client-data"
 
@@ -230,7 +229,7 @@ RUN /azerothcore/acore.sh client-data
 #
 #=================================================================
 
-FROM worldserver-local as tools
+FROM alpine:latest as tools
 
 LABEL description="AC Production: tools"
 

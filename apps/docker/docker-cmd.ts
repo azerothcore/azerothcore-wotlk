@@ -7,9 +7,11 @@ import {
 
 const program = new Command();
 
-const envBuild = {
+const envProd = {
   COMPOSE_DOCKER_CLI_BUILD: "1",
   DOCKER_BUILDKIT: "1",
+  DOCKER_VOL_CCACHE: "./var/prod/ccache",
+  DOCKER_VOL_BUILD: "/var/prod/build"
 };
 
 program
@@ -105,8 +107,12 @@ shellCommandFactory(
 shellCommandFactory(
   "prod:build",
   "Build producion services",
-  ["docker-compose --profile prod build"],
-  envBuild,
+  [
+    "docker-compose --profile all build --parallel",
+    "docker-compose run --rm ac-build bash apps/docker/docker-build-prod.sh",
+    "docker-compose --profile prod build --parallel",
+  ],
+  envProd,
 );
 
 shellCommandFactory(

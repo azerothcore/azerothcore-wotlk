@@ -154,8 +154,8 @@ services:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     working_dir: /azerothcore/
     volumes:
-        - ac-build:/azerothcore/var/build
-        - ac-ccache:/home/acore/.ccache/
+        - ${DOCKER_VOL_BUILD:-ac-build}:/azerothcore/var/build
+        - ${DOCKER_VOL_CCACHE:-ac-ccache}:/azerothcore/var/ccache
          # use internal copied files instead of volumes
         - /azerothcore/src
         - /azerothcore/data
@@ -189,7 +189,7 @@ services:
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
       - ac-build-dev:/azerothcore/var/build
-      - ac-ccache-dev:/home/acore/.ccache/
+      - ac-ccache-dev:/azerothcore/var/ccache
       # this is not the directory of the extracted data! It's the client folder used by the extractors
       - ${DOCKER_CLIENT_DATA_FOLDER:-./var/client}:/azerothcore/env/dist/bin/Data
     profiles: [all, dev]
@@ -267,7 +267,7 @@ services:
       <<: *cache-from
     volumes:
       - /azerothcore/env/dist/data
-    profiles: [prod]
+    profiles: [prod, clientdata]
 
   ac-tools:
     image: acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
@@ -288,7 +288,7 @@ services:
       - ${DOCKER_VOL_TOOLS_MAPS:-./var/maps}:/azerothcore/env/client/maps
       - ${DOCKER_VOL_TOOLS_VMAPS:-./var/vmaps}:/azerothcore/env/client/vmaps
       - ${DOCKER_VOL_TOOLS_MMAPS:-./var/mmaps}:/azerothcore/env/client/mmaps
-    profiles: [tools]
+    profiles: [prod, tools]
 
 volumes:
   ac-database:
