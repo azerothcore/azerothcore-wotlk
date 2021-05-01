@@ -1,8 +1,8 @@
 /cmake-build-debug/*
 /build*/
-# do not ignore the prod folder
+# do not ignore the docker folder
 /var/*
-!/var/prod
+!/var/docker
 /env/dist/*
 /env/user/*
 /env/docker/data/*

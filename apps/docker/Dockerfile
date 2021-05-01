@@ -47,7 +47,7 @@ RUN mkdir -p /home/acore/.ccache
 RUN mkdir -p /azerothcore/env/dist/data
 RUN mkdir -p /azerothcore/env/dist/logs
 RUN mkdir -p /azerothcore/env/dist/etc
-RUN mkdir -p /azerothcore/var/build
+RUN mkdir -p /azerothcore/var/build/obj
 
 # Correct permissions for non-root operations
 RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore
