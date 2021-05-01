@@ -285,10 +285,10 @@ services:
     working_dir: /azerothcore/env/client/
     volumes:
       - ${DOCKER_CLIENT_DATA_FOLDER:-./var/client}:/azerothcore/env/client/Data
-      - ${DOCKER_VOL_TOOLS_DBC:-./var/dbc}:/azerothcore/env/client/dbc
-      - ${DOCKER_VOL_TOOLS_MAPS:-./var/maps}:/azerothcore/env/client/maps
-      - ${DOCKER_VOL_TOOLS_VMAPS:-./var/vmaps}:/azerothcore/env/client/vmaps
-      - ${DOCKER_VOL_TOOLS_MMAPS:-./var/mmaps}:/azerothcore/env/client/mmaps
+      - ${DOCKER_VOL_TOOLS_DBC:-./var/extractors/dbc}:/azerothcore/env/client/dbc
+      - ${DOCKER_VOL_TOOLS_MAPS:-./var/extractors/maps}:/azerothcore/env/client/maps
+      - ${DOCKER_VOL_TOOLS_VMAPS:-./var/extractors/vmaps}:/azerothcore/env/client/vmaps
+      - ${DOCKER_VOL_TOOLS_MMAPS:-./var/extractors/mmaps}:/azerothcore/env/client/mmaps
     profiles: [prod, tools]
 
 volumes:
