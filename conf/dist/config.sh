@@ -27,6 +27,7 @@ BINPATH="$AC_PATH_ROOT/env/dist"
 # by the AC dashboard
 # default: the system will use binpath by default
 # DATAPATH="$BINPATH/bin"
+# DATAPATH_ZIP="$DATAPATH/data.zip"
 
 ##############################################
 #
