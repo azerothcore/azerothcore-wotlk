@@ -105,7 +105,7 @@ shellCommandFactory(
 shellCommandFactory(
   "prod:build",
   "Build producion services",
-  ["docker-compose --profile prod build --parallel"],
+  ["docker-compose --profile prod build"],
   envBuild,
 );
 

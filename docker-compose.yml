@@ -190,6 +190,8 @@ services:
     volumes:
       - ac-build-dev:/azerothcore/var/build
       - ac-ccache-dev:/home/acore/.ccache/
+      # this is not the directory of the extracted data! It's the client folder used by the extractors
+      - ${DOCKER_CLIENT_DATA_FOLDER:-./var/client}:/azerothcore/env/dist/bin/Data
     profiles: [all, dev]
 
 #======================

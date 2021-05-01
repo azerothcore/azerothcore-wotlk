@@ -8,6 +8,30 @@ function comp_clean() {
   [ -d "$DIRTOCLEAN" ] && rm -rf $PATTERN
 }
 
+function comp_ccacheEnable() {
+    [ "$AC_CCACHE" != true ] && return
+
+    export CCACHE_CPP2=true
+    export CCACHE_MAXSIZE='500MB'
+    export CCACHE_COMPRESS=1
+    export CCACHE_NODIRECT=1
+    export CCACHE_DIR="$AC_CCACHE_DIR"
+
+    export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+}
+
+function comp_ccacheClean() {
+    [ "$AC_CCACHE" != true ] && return
+
+    ccache -C
+}
+
+function comp_ccacheShowStats() {
+    [ "$AC_CCACHE" != true ] && return
+
+    ccache -s
+}
+
 function comp_configure() {
   CWD=$(pwd)
 
@@ -16,6 +40,7 @@ function comp_configure() {
   echo "Build path: $BUILDPATH"
   echo "DEBUG info: $CDEBUG"
   echo "Compilation type: $CTYPE"
+  echo "CCache: $AC_CCACHE"
   # -DCMAKE_BUILD_TYPE=$CCTYPE disable optimization "slow and huge amount of ram"
   # -DWITH_COREDEBUG=$CDEBUG compiled with debug information
 
@@ -27,6 +52,8 @@ function comp_configure() {
   if [ ! -z "$CONFDIR" ]; then
     DCONF="-DCONF_DIR=$CONFDIR"
   fi
+
+  comp_ccacheEnable
 
   cmake $SRCPATH -DCMAKE_INSTALL_PREFIX=$BINPATH $DCONF -DSERVERS=$CSERVERS \
   -DSCRIPTS=$CSCRIPTS \
@@ -49,8 +76,12 @@ function comp_compile() {
 
   cd $BUILDPATH
 
+  comp_ccacheShowStats
+
   time make -j $MTHREADS
   make -j $MTHREADS install
+
+  comp_ccacheShowStats
 
   cd $CWD
 

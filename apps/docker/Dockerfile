@@ -1,3 +1,5 @@
+#syntax=docker/dockerfile:1.2
+
 #================================================================
 #
 # DEV: Stage used for the development environment
@@ -161,13 +163,17 @@ FROM base as build
 
 ARG DOCKER_USER=acore
 
-USER $DOCKER_USER
+LABEL description="AC Image used by the build stage to generate production images"
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc /azerothcore/env/dist/etc
+
+ENV AC_CCACHE_DIR=/tmp/azerothcore
 
 LABEL description="AC Image used by the build stage to generate production images"
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc /azerothcore/env/dist/etc
 
-RUN --mount=type=bind,source=/tmp/ac-wotlk-ccache,target=/home/acore/.ccache/ bash apps/docker/docker-build-prod.sh
+RUN bash apps/docker/docker-build-prod.sh
 
 #================================================================
 #
@@ -213,9 +219,9 @@ ARG DOCKER_USER=acore
 
 USER $DOCKER_USER
 
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/docker/data /azerothcore/env/dist/data
-
 ENV DATAPATH=/azerothcore/env/dist/data
+
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=client-data /azerothcore/env/dist/data /azerothcore/env/dist/data
 
 RUN /azerothcore/acore.sh client-data
 

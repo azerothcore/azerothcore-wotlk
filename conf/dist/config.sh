@@ -3,7 +3,7 @@
 SRCPATH="$AC_PATH_ROOT"
 
 # absolute path where build files must be stored
-BUILDPATH="$AC_PATH_ROOT/var/build/obj"
+BUILDPATH="$AC_PATH_VAR/build/obj"
 
 # absolute path where azerothcore will be installed
 # NOTE: on linux the binaries are stored in a subfolder (/bin)
@@ -80,6 +80,12 @@ CDISABLED_AC_MODULES=""
 # example:  CCUSTOMOPTIONS=" -DWITH_PERFTOOLS=ON -DENABLE_EXTRA_LOGS=ON"
 #
 CCUSTOMOPTIONS=${CCUSTOMOPTIONS:-''}
+
+# Enable ccache to speedup
+# recompilations
+#
+AC_CCACHE=${AC_CCACHE:-true}
+AC_CCACHE_DIR=${AC_CCACHE_DIR:-"$AC_PATH_VAR/ccache"}
 
 
 ##############################################
