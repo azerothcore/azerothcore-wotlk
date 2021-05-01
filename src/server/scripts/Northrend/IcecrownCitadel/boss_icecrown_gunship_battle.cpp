@@ -2208,7 +2208,7 @@ public:
         void SelectTarget(std::list<WorldObject*>& targets)
         {
             targets.remove_if(IgbExplosionCheck(GetCaster()));
-            acore::Containers::RandomResizeList(targets, 1);
+            acore::Containers::RandomResize(targets, 1);
         }
 
         void Register() override

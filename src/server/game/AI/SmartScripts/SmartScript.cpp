@@ -734,7 +734,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     caster = unit->SummonTrigger(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), unit->GetOrientation(), 5000);
 
                 if (e.action.cast.targetsLimit > 0 && targets->size() > e.action.cast.targetsLimit)
-                    acore::Containers::RandomResizeList(*targets, e.action.cast.targetsLimit);
+                    acore::Containers::RandomResize(*targets, e.action.cast.targetsLimit);
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                 {
@@ -793,7 +793,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     break;
 
                 if (e.action.cast.targetsLimit > 0 && targets->size() > e.action.cast.targetsLimit)
-                    acore::Containers::RandomResizeList(*targets, e.action.cast.targetsLimit);
+                    acore::Containers::RandomResize(*targets, e.action.cast.targetsLimit);
 
                 for (ObjectList::const_iterator itr = targets->begin(); itr != targets->end(); ++itr)
                 {
@@ -3680,7 +3680,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                                 l->push_back(*itr);
 
                     if (e.target.playerRange.maxCount > 0)
-                        acore::Containers::RandomResizeList(*l, e.target.playerRange.maxCount);
+                        acore::Containers::RandomResize(*l, e.target.playerRange.maxCount);
                 }
 
                 delete units;
@@ -3800,7 +3800,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                                 l->push_back(*itr);
 
                 if (e.target.o > 0)
-                    acore::Containers::RandomResizeList(*l, e.target.o);
+                    acore::Containers::RandomResize(*l, e.target.o);
 
                 delete units;
                 break;
@@ -3842,7 +3842,7 @@ ObjectList* SmartScript::GetTargets(SmartScriptHolder const& e, Unit* invoker /*
                         }
 
                 if (e.target.roleSelection.resize > 0)
-                    acore::Containers::RandomResizeList(*l, e.target.roleSelection.resize);
+                    acore::Containers::RandomResize(*l, e.target.roleSelection.resize);
 
                 delete units;
                 break;

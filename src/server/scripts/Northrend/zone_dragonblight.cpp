@@ -1193,7 +1193,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove_if(GhoulTargetCheck(GetSpellInfo()->Id == 70790));
-            acore::Containers::RandomResizeList(targets, 2);
+            acore::Containers::RandomResize(targets, 2);
         }
 
         void HandleScript(SpellEffIndex effIndex)

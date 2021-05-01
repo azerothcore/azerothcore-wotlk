@@ -768,7 +768,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove(GetCaster());
-            acore::Containers::RandomResizeList(targets, _count);
+            acore::Containers::RandomResize(targets, _count);
         }
 
         void Register() override

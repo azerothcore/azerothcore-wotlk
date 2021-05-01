@@ -1368,7 +1368,7 @@ public:
                     return;
                 summoners = list_copy;
             }
-            acore::Containers::RandomResizeList(summoners, 2);
+            acore::Containers::RandomResize(summoners, 2);
 
             for (uint32 i = 0; i < 3; ++i)
                 caster->CastSpell(summoners.front(), SPELL_SUMMON_SUPPRESSER, true);
