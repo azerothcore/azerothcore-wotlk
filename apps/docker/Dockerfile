@@ -169,8 +169,8 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc /azerothcore/env/dist/etc
 
 ENV AC_CCACHE_DIR=/tmp/azerothcore
 
-# check pre-generated var/prod folder
-COPY --chown=$DOCKER_USER:$DOCKER_USER var/prod /var
+# check pre-generated var/docker folder
+COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker /var
 
 RUN bash apps/docker/docker-build-prod.sh
 
