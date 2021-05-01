@@ -29,7 +29,7 @@ class ChaseMovementGenerator : public MovementGeneratorMedium<T, ChaseMovementGe
 public:
     ChaseMovementGenerator(Unit* target, std::optional<ChaseRange> range = {}, std::optional<ChaseAngle> angle = {})
         : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle) {}
-    ~ChaseMovementGenerator() {}
+    ~ChaseMovementGenerator() { delete i_path; }
 
     MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }
 
@@ -65,7 +65,7 @@ class FollowMovementGenerator : public MovementGeneratorMedium<T, FollowMovement
 public:
     FollowMovementGenerator(Unit* target, float range, ChaseAngle angle)
         : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle) {}
-    ~FollowMovementGenerator() {}
+    ~FollowMovementGenerator() { delete i_path; }
 
     MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }
 
