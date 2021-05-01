@@ -167,8 +167,9 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc /azerothcore/env/dist/etc
 
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
+ENV CSCRIPTS=OFF
 ENV AC_CCACHE=true
-ENV AC_CCACHE_DIR=/azerothcore/var/docker/ccache
+ENV CCACHE_DIR=/azerothcore/var/docker/ccache
 ENV BUILDPATH=/azerothcore/var/docker/build/obj
 # check pre-generated var/docker folder
 COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker /azerothcore/var/docker
@@ -236,7 +237,7 @@ COPY --from=client-data-downloader /azerothcore/env/dist/data /azerothcore/env/d
 #
 #=================================================================
 
-FROM debian:10-slim as tools
+FROM ubuntu:20.04 as tools
 ARG USER_ID=1000
 ARG GROUP_ID=1000
 ARG DOCKER_USER=acore
@@ -251,7 +252,7 @@ ENV TZ=Etc/UTC
 # set noninteractive mode so tzdata doesn't ask to set timezone on install
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y libace-6.* libace-dev g++ gcc default-libmysqlclient-dev sudo && apt-get clean
+RUN apt-get update && apt-get install -y libmysqlclient-dev libace-dev libssl-dev libbz2-dev sudo && rm -rf /var/lib/apt/lists/* ;
 
 # Create a non-root user
 RUN addgroup --gid $GROUP_ID acore && \
@@ -263,6 +264,13 @@ RUN mkdir -p /azerothcore/env/client/
 RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 
 USER $DOCKER_USER
+
+WORKDIR /azerothcore/env/client/
+
+RUN mkdir -p /azerothcore/env/client/dbc
+RUN mkdir -p /azerothcore/env/client/maps
+RUN mkdir -p /azerothcore/env/client/mmaps
+RUN mkdir -p /azerothcore/env/client/vmaps
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mapextractor /azerothcore/env/client/mapextractor
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/mmaps_generator /azerothcore/env/client/mmaps_generator

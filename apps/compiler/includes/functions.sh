@@ -12,10 +12,9 @@ function comp_ccacheEnable() {
     [ "$AC_CCACHE" != true ] && return
 
     export CCACHE_CPP2=true
-    export CCACHE_MAXSIZE='500MB'
-    export CCACHE_COMPRESS=1
-    export CCACHE_NODIRECT=1
-    export CCACHE_DIR="$AC_CCACHE_DIR"
+    #export CCACHE_MAXSIZE='500MB'
+    #export CCACHE_COMPRESS=1
+    #export CCACHE_COMPRESSLEVEL=9
 
     export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
 }

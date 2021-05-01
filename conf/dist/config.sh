@@ -85,8 +85,8 @@ CCUSTOMOPTIONS=${CCUSTOMOPTIONS:-''}
 # Enable ccache to speedup
 # recompilations
 #
-AC_CCACHE=${AC_CCACHE:-true}
-AC_CCACHE_DIR=${AC_CCACHE_DIR:-"$AC_PATH_VAR/ccache"}
+AC_CCACHE=${AC_CCACHE:-false}
+export CCACHE_DIR=${CCACHE_DIR:-"$AC_PATH_VAR/ccache"}
 
 
 ##############################################
