@@ -45,7 +45,7 @@ jobs:
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
-          docker-compose --profile all --profile prod build --progress plain
+          docker-compose --profile all --profile prod build --parallel
           docker-compose run --name build ac-build echo "done"
           docker cp build:/azerothcore/var/ccache var/docker/
 
