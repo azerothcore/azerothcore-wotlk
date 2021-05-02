@@ -1,6 +1,5 @@
 name: check-codestyle
 on:
-  push:
   pull_request:
 
 jobs:

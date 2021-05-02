@@ -3721,23 +3721,23 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
 
     bool isWaterNext = IsInWater(destX, destY, destZ);
 
-    PathGenerator* path = new PathGenerator(source);
+    PathGenerator path(source);
 
     // Use a detour raycast to get our first collision point
-    path->SetUseRaycast(true);
-    bool result = path->CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
+    path.SetUseRaycast(true);
+    bool result = path.CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
 
     const Unit* unit = source->ToUnit();
-    bool notOnGround = path->GetPathType() & PATHFIND_NOT_USING_PATH
+    bool notOnGround = path.GetPathType() & PATHFIND_NOT_USING_PATH
         || isWaterNext || (unit && unit->IsFlying());
 
     // Check for valid path types before we proceed
-    if (!result || (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)))
+    if (!result || (!notOnGround && path.GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)))
     {
         return false;
     }
 
-    G3D::Vector3 endPos = path->GetPath().back();
+    G3D::Vector3 endPos = path.GetPath().back();
     destX = endPos.x;
     destY = endPos.y;
     destZ = endPos.z;
@@ -3790,7 +3790,9 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
         if (gridHeight > INVALID_HEIGHT)
         {
             destZ = gridHeight + unit->GetHoverHeight();
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
