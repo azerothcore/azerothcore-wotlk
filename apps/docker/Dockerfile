@@ -222,6 +222,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 USER $DOCKER_USER
 
+RUN addgroup --gid $GROUP_ID acore && \
+    adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
+    passwd -d acore && \
+    echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+RUN mkdir -p /azerothcore/env/dist/data
+RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
+
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/data /azerothcore/env/dist/data
 
 ENV DATAPATH=/azerothcore/env/dist/data
