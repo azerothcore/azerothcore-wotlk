@@ -10,7 +10,7 @@ const program = new Command();
 const env = {
   COMPOSE_DOCKER_CLI_BUILD: "1",
   DOCKER_BUILDKIT: "1",
-  BUILDKIT_INLINE_CACHE: "1"
+  BUILDKIT_INLINE_CACHE: "1",
 };
 
 program
@@ -22,22 +22,21 @@ shellCommandFactory(
   "start:app",
   "Startup the authserver and worldserver apps",
   ["docker-compose --profile app up"],
-  env
+  env,
 );
 
 shellCommandFactory(
   "start:app:d",
   "Startup the authserver and worldserver apps in detached mode",
   ["docker-compose --profile app up -d"],
-  env
+  env,
 );
 
 shellCommandFactory("build", "Build the authserver and worldserver", [
   "docker-compose --profile all build --parallel",
   "docker image prune -f",
   "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
-  env
-]);
+], env);
 
 shellCommandFactory(
   "build:nocache",
@@ -47,7 +46,7 @@ shellCommandFactory(
     "docker image prune -f",
     "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
   ],
-  env
+  env,
 );
 
 shellCommandFactory(
@@ -58,7 +57,7 @@ shellCommandFactory(
     "docker image prune -f",
     "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
   ],
-  env
+  env,
 );
 
 shellCommandFactory(
@@ -68,49 +67,49 @@ shellCommandFactory(
     "docker image prune -f",
     `docker-compose run --rm ac-build bash acore.sh compiler clean`,
   ],
-  env
+  env,
 );
 
 shellCommandFactory(
   "client-data",
   "Download client data inside the ac-data volume",
   ["docker-compose run --rm ac-build bash bash acore.sh client-data"],
-  env
+  env,
 );
 
 shellCommandFactory(
   "db-import",
   "Create and upgrade the database with latest updates",
   ["docker-compose run --rm ac-build bash acore.sh db-assembler import-all"],
-  env
+  env,
 );
 
 shellCommandFactory(
   "dev:up",
   "Start the dev server container",
   ["docker-compose up ac-dev-server"],
-  env
+  env,
 );
 
 shellCommandFactory(
   "dev:build",
   "Build using the dev server, it uses volumes to compile which can be faster on linux & WSL",
   ["docker-compose run --rm ac-dev-server bash acore.sh compiler build"],
-  env
+  env,
 );
 
 shellCommandFactory(
   "dev:dash [args...]",
   "Execute acore dashboard within a running ac-dev-server",
   ["docker-compose run --rm ac-dev-server bash acore.sh"],
-  env
+  env,
 );
 
 shellCommandFactory(
   "dev:shell [args...]",
   "Open an interactive shell within the dev server",
   ["docker-compose run --rm ac-dev-server bash"],
-  env
+  env,
 );
 
 shellCommandFactory(
@@ -120,28 +119,28 @@ shellCommandFactory(
     "docker-compose --profile prod build --parallel",
     "docker image prune -f",
   ],
-  env
+  env,
 );
 
 shellCommandFactory(
   "prod:pull",
   "Pull production services from the remote registry",
   ["docker-compose --profile prod pull"],
-  env
+  env,
 );
 
 shellCommandFactory(
   "prod:up",
   "Start production services (foreground)",
   ["docker-compose --profile prod up"],
-  env
+  env,
 );
 
 shellCommandFactory(
   "prod:up:d",
   "Start production services (background)",
   ["docker-compose --profile prod up -d"],
-  env
+  env,
 );
 
 program
