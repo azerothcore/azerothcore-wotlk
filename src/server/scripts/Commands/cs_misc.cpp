@@ -1541,15 +1541,19 @@ public:
         // Subtract
         if (count < 0)
         {
-            if (!playerTarget->HasItemCount(itemId, 0))
+            // Only have scam check on player accounts
+            if (playerTarget->GetSession()->GetSecurity() == SEC_PLAYER)
             {
-                // output that player don't have any items to destroy
-                handler->PSendSysMessage(LANG_REMOVEITEM_FAILURE, handler->GetNameLink(playerTarget).c_str(), itemId);
-            }
-            else if (!playerTarget->HasItemCount(itemId, -count))
-            {
-                // output that player don't have as many items that you want to destroy
-                handler->PSendSysMessage(LANG_REMOVEITEM_ERROR, handler->GetNameLink(playerTarget).c_str(), itemId);
+                if (!playerTarget->HasItemCount(itemId, 0))
+                {
+                    // output that player don't have any items to destroy
+                    handler->PSendSysMessage(LANG_REMOVEITEM_FAILURE, handler->GetNameLink(playerTarget).c_str(), itemId);
+                }
+                else if (!playerTarget->HasItemCount(itemId, -count))
+                {
+                    // output that player don't have as many items that you want to destroy
+                    handler->PSendSysMessage(LANG_REMOVEITEM_ERROR, handler->GetNameLink(playerTarget).c_str(), itemId);
+                }
             }
             else
             {
@@ -1560,14 +1564,6 @@ public:
 
             return true;
         }
-
-        /* [AC] Sunwell hack
-        if (handler->GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
-               {
-                   handler->PSendSysMessage("You may only remove items. Adding items is available for higher GMLevel.");
-                   return false;
-               }
-               */
 
         // Adding items
         uint32 noSpaceForCount = 0;
