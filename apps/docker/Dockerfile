@@ -212,7 +212,13 @@ LABEL description="AC Production: client-data"
 
 ARG DOCKER_USER=acore
 
-RUN apt-get install -y curl
+RUN apt-get update && apt-get install -y tzdata curl unzip && rm -rf /var/lib/apt/lists/* ;
+
+# set timezone environment variable
+ENV TZ=Etc/UTC
+
+# set noninteractive mode so tzdata doesn't ask to set timezone on install
+ENV DEBIAN_FRONTEND=noninteractive
 
 USER $DOCKER_USER
 
