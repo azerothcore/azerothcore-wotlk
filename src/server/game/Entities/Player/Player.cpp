@@ -449,11 +449,12 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 // 1. Initialize internal variables to default values.
 // 2. In case when player is in group, initialize variables necessary for group calculations:
 // 2.1. _count - number of alive group members within reward distance;
-// 2.2. _sumLevel - sum of levels of alive group members within reward distance;
-// 2.3. _maxLevel - maximum level of alive group member within reward distance;
-// 2.4. _maxNotGrayMember - maximum level of alive group member within reward distance,
+// 2.2. _aliveSumLevel - sum of levels of alive group members within reward distance;
+// 2.3. _sumLevel - sum of levels of group members within reward distance;
+// 2.4. _maxLevel - maximum level of alive group member within reward distance;
+// 2.5. _maxNotGrayMember - maximum level of alive group member within reward distance,
 //      for whom victim is not gray;
-// 2.5. _isFullXP - flag identifying that for all group members victim is not gray,
+// 2.6. _isFullXP - flag identifying that for all group members victim is not gray,
 //      so 100% XP will be rewarded (50% otherwise).
 // 3. Reward killer (and group, if necessary).
 // 3.1. If killer is in group, reward group.
@@ -479,7 +480,7 @@ void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
 KillRewarder::KillRewarder(Player* killer, Unit* victim, bool isBattleGround) :
     // 1. Initialize internal variables to default values.
     _killer(killer), _victim(victim), _group(killer->GetGroup()),
-    _groupRate(1.0f), _maxNotGrayMember(nullptr), _count(0), _sumLevel(0), _xp(0),
+    _groupRate(1.0f), _maxNotGrayMember(nullptr), _count(0), _aliveSumLevel(0), _sumLevel(0), _xp(0),
     _isFullXP(false), _maxLevel(0), _isBattleGround(isBattleGround), _isPvP(false)
 {
     // mark the credit as pvp if victim is player
@@ -499,23 +500,32 @@ inline void KillRewarder::_InitGroupData()
         // 2. In case when player is in group, initialize variables necessary for group calculations:
         for (GroupReference* itr = _group->GetFirstMember(); itr != nullptr; itr = itr->next())
             if (Player* member = itr->GetSource())
-                if ((_killer == member || member->IsAtGroupRewardDistance(_victim)) && member->IsAlive())
+                if ((_killer == member || member->IsAtGroupRewardDistance(_victim)))
                 {
                     const uint8 lvl = member->getLevel();
-                    // 2.1. _count - number of alive group members within reward distance;
-                    ++_count;
-                    // 2.2. _sumLevel - sum of levels of alive group members within reward distance;
+                    if (member->IsAlive())
+                    {
+                        // 2.1. _count - number of alive group members within reward distance;
+                        ++_count;
+                        // 2.2. _aliveSumLevel - sum of levels of alive group members within reward distance;
+                        _aliveSumLevel += lvl;
+                        // 2.3. _maxLevel - maximum level of alive group member within reward distance;
+                        if (_maxLevel < lvl)
+                        {
+                            _maxLevel = lvl;
+                        }
+                        // 2.4. _maxNotGrayMember - maximum level of alive group member within reward distance,
+                        //      for whom victim is not gray;
+                        uint32 grayLevel = acore::XP::GetGrayLevel(lvl);
+                        if (_victim->getLevel() > grayLevel && (!_maxNotGrayMember || _maxNotGrayMember->getLevel() < lvl))
+                        {
+                            _maxNotGrayMember = member;
+                        }
+                    }
+                    // 2.5. _sumLevel - sum of levels of group members within reward distance;
                     _sumLevel += lvl;
-                    // 2.3. _maxLevel - maximum level of alive group member within reward distance;
-                    if (_maxLevel < lvl)
-                        _maxLevel = lvl;
-                    // 2.4. _maxNotGrayMember - maximum level of alive group member within reward distance,
-                    //      for whom victim is not gray;
-                    uint32 grayLevel = acore::XP::GetGrayLevel(lvl);
-                    if (_victim->getLevel() > grayLevel && (!_maxNotGrayMember || _maxNotGrayMember->getLevel() < lvl))
-                        _maxNotGrayMember = member;
                 }
-        // 2.5. _isFullXP - flag identifying that for all group members victim is not gray,
+        // 2.6. _isFullXP - flag identifying that for all group members victim is not gray,
         //      so 100% XP will be rewarded (50% otherwise).
         _isFullXP = _maxNotGrayMember && (_maxLevel == _maxNotGrayMember->getLevel());
     }
@@ -611,16 +621,19 @@ void KillRewarder::_RewardPlayer(Player* player, bool isDungeon)
     // Give reputation and kill credit only in PvE.
     if (!_isPvP || _isBattleGround)
     {
-        float rate = _group ? _groupRate * float(player->getLevel()) / _sumLevel : /*Personal rate is 100%.*/ 1.0f; // Group rate depends on summary level.
+        float xpRate = _group ? _groupRate * float(player->getLevel()) / _aliveSumLevel : /*Personal rate is 100%.*/ 1.0f; // Group rate depends on the sum of levels.
+        float reputationRate = _group ? _groupRate * float(player->getLevel()) / _sumLevel : /*Personal rate is 100%.*/ 1.0f; // Group rate depends on the sum of levels.
+        sScriptMgr->OnRewardKillRewarder(player, isDungeon, xpRate);                                              // Personal rate is 100%.
 
-        sScriptMgr->OnRewardKillRewarder(player, isDungeon, rate);                                              // Personal rate is 100%.
         if (_xp)
+        {
             // 4.2. Give XP.
-            _RewardXP(player, rate);
+            _RewardXP(player, xpRate);
+        }
         if (!_isBattleGround)
         {
             // If killer is in dungeon then all members receive full reputation at kill.
-            _RewardReputation(player, isDungeon ? 1.0f : rate);
+            _RewardReputation(player, isDungeon ? 1.0f : reputationRate);
             _RewardKillCredit(player);
         }
     }
