@@ -47,7 +47,7 @@ jobs:
           export DOCKER_GROUP_ID=$(id -u)
           docker-compose --profile prod build --parallel
           docker-compose run --name build ac-build echo "done"
-          docker cp build:/azerothcore/var/docker/ccache var/docker/ccache
+          docker cp build:/azerothcore/var/docker/ccache var/docker/
 
       - name: Login to Docker Hub
         if: ${{ steps.extract_branch.outputs.branch == 'master' }}
