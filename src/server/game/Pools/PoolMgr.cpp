@@ -293,7 +293,6 @@ void PoolGroup<Pool>::RemoveOneRelation(uint32 child_pool_id)
 template <class T>
 void PoolGroup<T>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 triggerFrom)
 {
-    uint32 lastDespawned = 0;
     int count = limit - spawns.GetActiveObjectCount(poolId);
 
     // If triggered from some object respawn this object is still marked as spawned
