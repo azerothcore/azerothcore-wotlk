@@ -45,6 +45,8 @@ jobs:
           DOCKER_VOL_CCACHE: ./var/docker/ccache
           DOCKER_VOL_BUILD: ./var/docker/build
           DOCKER_VOL_BIN: ./env/dist/bin
+          DOCKER_VOL_ETC: ./env/docker/etc
+          DOCKER_PROD_SKIP_BUILD: 1
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)

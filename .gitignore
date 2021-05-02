@@ -11,6 +11,7 @@
 /var/*
 /env/dist/*
 /env/user/*
+/env/docker/bin/*
 /env/docker/data/*
 /env/docker/logs/*
 /env/docker/etc/*

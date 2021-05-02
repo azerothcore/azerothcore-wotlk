@@ -164,7 +164,7 @@ ARG SKIP_BUILD=0
 
 LABEL description="AC Image used by the build stage to generate production images"
 
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/dist /azerothcore/env/dist
+COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker /azerothcore/env/dist
 
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
