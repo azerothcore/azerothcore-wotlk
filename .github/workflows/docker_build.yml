@@ -63,7 +63,7 @@ jobs:
         #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
         if: ${{ steps.extract_branch.outputs.branch == 'master' }}
         run: |
-          docker-compose --profile build --profile prod --profile clientdata push
+          docker-compose --profile build --profile prod push
           docker system prune -f
 
       - name: Build Client Data
