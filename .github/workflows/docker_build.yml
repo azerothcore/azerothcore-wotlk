@@ -40,7 +40,7 @@ jobs:
             ccache:ubuntu-20.04:clang:without-modules
 
       - name: Build
-        env:
+        #env:
           #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
         run: |
           export DOCKER_USER_ID=$(id -u)
