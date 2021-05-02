@@ -40,8 +40,9 @@ jobs:
             ccache:ubuntu-20.04:clang:without-modules
 
       - name: Build
-        #env:
+        env:
           #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
+          DOCKER_AC_BUILD_TARGET: build
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
@@ -49,7 +50,7 @@ jobs:
           docker-compose run --no-deps --name build ac-build echo "image created"
           docker cp build:/azerothcore/var/ccache var/docker/
           echo "ccache exported"
-
+          docker system prune -f
       - name: Client Data
         #env:
           #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
