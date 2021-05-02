@@ -152,9 +152,9 @@ services:
         ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
     working_dir: /azerothcore/
     volumes:
-        - ${DOCKER_VOL_BUILD:-ac-build}:/azerothcore/var/docker/build
+        - ${DOCKER_VOL_BUILD:-ac-build}:/azerothcore/var/build
         # with this conf you can use an external path for it (useful for CI)
-        - ${DOCKER_VOL_CCACHE:-ac-ccache}:/azerothcore/var/docker/ccache
+        - ${DOCKER_VOL_CCACHE:-ac-ccache}:/azerothcore/var/ccache
          # use internal copied files instead of volumes
         - /azerothcore/src
         - /azerothcore/data
@@ -187,8 +187,8 @@ services:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
     volumes:
-      - ac-build-dev:/azerothcore/var/docker/build
-      - ac-ccache-dev:/azerothcore/var/docker/ccache
+      - ac-build-dev:/azerothcore/var/build
+      - ac-ccache-dev:/azerothcore/var/ccache
       # this is not the directory of the extracted data! It's the client folder used by the extractors
       - ${DOCKER_CLIENT_DATA_FOLDER:-./var/client}:/azerothcore/env/dist/bin/Data
     profiles: [all, dev]

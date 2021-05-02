@@ -169,8 +169,6 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker /azerothcore/env/dist
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
 ENV AC_CCACHE=true
-ENV CCACHE_DIR=/azerothcore/var/docker/ccache
-ENV BUILDPATH=/azerothcore/var/docker/build/obj
 RUN if [ $SKIP_BUILD = 0 ]; then bash apps/docker/docker-build-prod.sh; fi
 
 #================================================================
@@ -217,7 +215,7 @@ ARG DOCKER_USER=acore
 
 USER $DOCKER_USER
 
-COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build env/dist/data /azerothcore/env/dist/data
+COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/data /azerothcore/env/dist/data
 
 ENV DATAPATH=/azerothcore/env/dist/data
 ENV DATAPATH_ZIP=/tmp/data.zip
