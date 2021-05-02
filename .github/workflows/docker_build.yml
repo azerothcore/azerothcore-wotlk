@@ -56,7 +56,7 @@ jobs:
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
-          docker-compose --profile clientdata build --parallel
+          #docker-compose --profile clientdata build --parallel
 
       - name: Login to Docker Hub
         if: ${{ steps.extract_branch.outputs.branch == 'master' }}
