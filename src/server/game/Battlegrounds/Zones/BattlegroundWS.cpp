@@ -149,7 +149,9 @@ void BattlegroundWS::RespawnFlagAfterDrop(TeamId teamId)
 void BattlegroundWS::CheckFlagKeeperInArea(TeamId teamId)
 {
     if (GetStatus() != STATUS_IN_PROGRESS || GetFlagState(teamId) != BG_WS_FLAG_STATE_ON_PLAYER)
+    {
         return;
+    }
 
     uint32 triggerId = teamId == TEAM_ALLIANCE ? BG_WS_TRIGGER_HORDE_FLAG_SPAWN : BG_WS_TRIGGER_ALLIANCE_FLAG_SPAWN;
     AreaTrigger const* areaTrigger = sObjectMgr->GetAreaTrigger(triggerId);
