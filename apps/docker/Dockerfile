@@ -163,7 +163,9 @@ ARG DOCKER_USER=acore
 
 LABEL description="AC Image used by the build stage to generate production images"
 
+# check if we have pre-built files
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker /azerothcore/env/dist
+COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker/ccache /azerothcore/var/ccache
 
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo

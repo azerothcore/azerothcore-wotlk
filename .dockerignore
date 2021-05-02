@@ -2,6 +2,7 @@
 /build*/
 # do not ignore the docker folder
 /var/*
+!/var/docker/ccache
 /env/dist/*
 /env/user/*
 /env/docker/logs/*
