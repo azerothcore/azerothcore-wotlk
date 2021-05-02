@@ -168,6 +168,10 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker /azerothcore/env/dist
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
 ENV AC_CCACHE=true
+ENV CCACHE_CPP2=true
+ENV CCACHE_MAXSIZE='500M'
+ENV CCACHE_COMPRESS=1
+ENV CCACHE_COMPRESSLEVEL=9
 RUN bash apps/docker/docker-build-prod.sh
 
 #================================================================
