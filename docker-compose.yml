@@ -266,7 +266,7 @@ services:
       <<: *cache-from
     volumes:
       - /azerothcore/env/dist/data
-    profiles: [disable, clientdata]
+    profiles: [prod, clientdata]
 
   ac-tools:
     image: acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
