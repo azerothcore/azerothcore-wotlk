@@ -33,11 +33,9 @@ services:
     image: local/azerothcore/abstract-bind
     volumes:
       - .:/azerothcore/
-      # env dir shared between services
-      # we cannot use /env/dist to avoid permission issues
-      - ac-env:/azerothcore/env
       # expose some dist folder outside allowing the host to use them
       - ${DOCKER_VOL_CONF:-./conf}:/azerothcore/conf
+      - ${DOCKER_VOL_BIN:-ac-bin}:/azerothcore/env/dist/bin
       - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
       # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
       - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
@@ -220,6 +218,7 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
+        SKIP_BUILD: ${SKIP_BUILD:-0} # to use when you have pre-built binaries
       <<: *cache-from
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
@@ -247,6 +246,7 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
+        SKIP_BUILD: ${SKIP_BUILD:-0} # to use when you have pre-built binaries
       <<: *cache-from
     volumes:
       - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
@@ -265,6 +265,7 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
+        SKIP_BUILD: ${SKIP_BUILD:-0}
       <<: *cache-from
     volumes:
       - /azerothcore/env/dist/data
@@ -281,6 +282,7 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
+        SKIP_BUILD: ${SKIP_BUILD:-0} # to use when you have pre-built binaries
       <<: *cache-from
     working_dir: /azerothcore/env/client/
     volumes:
@@ -293,7 +295,7 @@ services:
 
 volumes:
   ac-database:
-  ac-env:
+  ac-bin:
   ac-build-dev:
   ac-build:
   ac-ccache-dev:
