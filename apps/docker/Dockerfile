@@ -47,9 +47,6 @@ RUN mkdir -p /azerothcore/env/dist/data
 RUN mkdir -p /azerothcore/env/dist/logs
 RUN mkdir -p /azerothcore/env/dist/etc
 RUN mkdir -p /azerothcore/var/build/obj
-RUN mkdir -p /azerothcore/var/ccache
-RUN mkdir -p /azerothcore/var/docker/build/obj
-RUN mkdir -p /azerothcore/var/docker/ccache
 
 # Correct permissions for non-root operations
 RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore
@@ -172,8 +169,6 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker/ccache /azerothcore/var/ccache
 
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
-ENV CTOOLS=OFF
-ENV CSCRIPTS=OFF
 ENV AC_CCACHE=true
 ENV CCACHE_CPP2=true
 ENV CCACHE_MAXSIZE='500M'

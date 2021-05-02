@@ -56,48 +56,14 @@ jobs:
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
-          docker-compose --profile build --profile prod build --parallel
+          docker-compose --profile all --profile prod build --parallel
           docker-compose run --no-deps --name build ac-build echo "image created"
           docker cp build:/azerothcore/var/ccache var/docker/
           echo "ccache exported"
 
-      - name: Deploy Prod
+      - name: Deploy
         #env:
         #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
         if: ${{ steps.extract_branch.outputs.branch == 'master' }}
         run: |
-          docker-compose --profile build --profile prod push
-          docker system prune -f
-
-      - name: Build Client Data
-        #env:
-          #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-        run: |
-          export DOCKER_USER_ID=$(id -u)
-          export DOCKER_GROUP_ID=$(id -u)
-          docker-compose --profile clientdata build --parallel
-
-      - name: Deploy Client Data
-        #env:
-        #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
-        run: |
-          docker-compose --profile clientdata push
-          docker system prune -f
-
-      - name: Build Dev & App-local
-        #env:
-          #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-        run: |
-          export DOCKER_USER_ID=$(id -u)
-          export DOCKER_GROUP_ID=$(id -u)
-          docker-compose --profile app --profile dev build --parallel
-
-      - name: Deploy Dev & App-local
-        #env:
-        #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
-        run: |
-          docker-compose --profile app --profile dev  push
-          docker system prune -f
-
+          docker-compose --profile all --profile prod push
