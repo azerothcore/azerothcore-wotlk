@@ -287,7 +287,7 @@ services:
       - ${DOCKER_VOL_TOOLS_MAPS:-./var/extractors/maps}:/azerothcore/env/client/maps
       - ${DOCKER_VOL_TOOLS_VMAPS:-./var/extractors/vmaps}:/azerothcore/env/client/vmaps
       - ${DOCKER_VOL_TOOLS_MMAPS:-./var/extractors/mmaps}:/azerothcore/env/client/mmaps
-    profiles: [prod, tools]
+    profiles: [none, tools]
 
 volumes:
   ac-database:
