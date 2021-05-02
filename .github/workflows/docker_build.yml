@@ -30,6 +30,13 @@ jobs:
           docker --version
           docker-compose --version
 
+      - name: Login to Docker Hub
+        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Cache
         uses: actions/cache@v2
         with:
@@ -39,36 +46,55 @@ jobs:
             ccache:ubuntu-20.04:clang:without-modules:${{ github.ref }}
             ccache:ubuntu-20.04:clang:without-modules
 
-      - name: Build
+      - name: Build Prod
         env:
           #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
           DOCKER_AC_BUILD_TARGET: build
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
-          docker-compose --profile all --profile prod build --parallel
+          docker-compose --profile build --profile prod build --parallel
           docker-compose run --no-deps --name build ac-build echo "image created"
           docker cp build:/azerothcore/var/ccache var/docker/
           echo "ccache exported"
+
+      - name: Deploy Prod
+        #env:
+        #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
+        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
+        run: |
+          docker-compose --profile build --profile prod --profile clientdata push
           docker system prune -f
-      - name: Client Data
+
+      - name: Build Client Data
         #env:
           #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
-          #docker-compose --profile clientdata build --parallel
+          docker-compose --profile clientdata build --parallel
 
-      - name: Login to Docker Hub
-        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Deploy
+      - name: Deploy Client Data
         #env:
         #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
         if: ${{ steps.extract_branch.outputs.branch == 'master' }}
         run: |
-          docker-compose --profile all --profile prod --profile clientdata push
+          docker-compose --profile clientdata push
+          docker system prune -f
+
+      - name: Build Dev & App-local
+        #env:
+          #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
+        run: |
+          export DOCKER_USER_ID=$(id -u)
+          export DOCKER_GROUP_ID=$(id -u)
+          docker-compose --profile app --profile dev build --parallel
+
+      - name: Deploy Dev & App-local
+        #env:
+        #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
+        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
+        run: |
+          docker-compose --profile app --profile dev  push
+          docker system prune -f
+
