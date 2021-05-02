@@ -207,10 +207,11 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/wo
 #=================================================================
 
 FROM ubuntu:20.04 as client-data
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+ARG DOCKER_USER=acore
 
 LABEL description="AC Production: client-data"
-
-ARG DOCKER_USER=acore
 
 RUN apt-get update && apt-get install -y tzdata curl unzip && rm -rf /var/lib/apt/lists/* ;
 
@@ -220,23 +221,23 @@ ENV TZ=Etc/UTC
 # set noninteractive mode so tzdata doesn't ask to set timezone on install
 ENV DEBIAN_FRONTEND=noninteractive
 
-USER $DOCKER_USER
-
 RUN addgroup --gid $GROUP_ID acore && \
     adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
     passwd -d acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
-
-RUN mkdir -p /azerothcore/env/dist/data
-RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/data /azerothcore/env/dist/data
 
 ENV DATAPATH=/azerothcore/env/dist/data
 ENV DATAPATH_ZIP=/tmp/data.zip
 
-RUN /azerothcore/acore.sh client-data
+RUN --mount=type=bind,target=/azerothcore-temp,readwrite /azerothcore-temp/acore.sh client-data
 
+RUN apt-get remove --purge -y tzdata curl unzip && apt-get autoremove -y
+
+RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
+
+USER $DOCKER_USER
 
 #================================================================
 #
