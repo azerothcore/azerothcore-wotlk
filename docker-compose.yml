@@ -141,7 +141,7 @@ services:
     image: acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
     build:
       context: .
-      target: dev
+      target: ${DOCKER_AC_BUILD_TARGET:-dev}
       dockerfile: ./apps/docker/Dockerfile
       args:
         USER_ID: ${DOCKER_USER_ID:-1000}
@@ -218,7 +218,6 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-        SKIP_BUILD: ${DOCKER_PROD_SKIP_BUILD:-0} # to use when you have pre-built binaries
       <<: *cache-from
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
@@ -246,7 +245,6 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-        SKIP_BUILD: ${DOCKER_PROD_SKIP_BUILD:-0} # to use when you have pre-built binaries
       <<: *cache-from
     volumes:
       - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
@@ -265,7 +263,6 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-        SKIP_BUILD: ${DOCKER_PROD_SKIP_BUILD:-0}
       <<: *cache-from
     volumes:
       - /azerothcore/env/dist/data
@@ -282,7 +279,6 @@ services:
         USER_ID: ${DOCKER_USER_ID:-1000}
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
-        SKIP_BUILD: ${DOCKER_PROD_SKIP_BUILD:-0} # to use when you have pre-built binaries
       <<: *cache-from
     working_dir: /azerothcore/env/client/
     volumes:

@@ -42,18 +42,12 @@ jobs:
       - name: Build
         env:
           #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-          DOCKER_VOL_CCACHE: ./var/docker/ccache
-          DOCKER_VOL_BUILD: ./var/docker/build
-          DOCKER_VOL_BIN: ./env/dist/bin
-          DOCKER_VOL_ETC: ./env/docker/etc
-          DOCKER_PROD_SKIP_BUILD: 1
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
-
-          docker-compose --profile all build --parallel ac-build
-          docker-compose run --rm ac-build bash apps/docker/docker-build-prod.sh
           docker-compose --profile prod build --parallel
+          docker-compose run --name build ac-build echo "done"
+          docker cp build:/azerothcore/var/docker/ccache var/docker/ccache
 
       - name: Login to Docker Hub
         if: ${{ steps.extract_branch.outputs.branch == 'master' }}

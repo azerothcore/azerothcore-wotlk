@@ -160,7 +160,6 @@ CMD ./acore.sh run-worldserver
 FROM base as build
 
 ARG DOCKER_USER=acore
-ARG SKIP_BUILD=0
 
 LABEL description="AC Image used by the build stage to generate production images"
 
@@ -169,7 +168,7 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker /azerothcore/env/dist
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
 ENV AC_CCACHE=true
-RUN if [ $SKIP_BUILD = 0 ]; then bash apps/docker/docker-build-prod.sh; fi
+RUN bash apps/docker/docker-build-prod.sh
 
 #================================================================
 #
@@ -207,11 +206,13 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/wo
 #
 #=================================================================
 
-FROM worldserver-local as client-data-downloader
+FROM ubuntu:20.04 as client-data
 
-LABEL description="AC Production: client-data downloader"
+LABEL description="AC Production: client-data"
 
 ARG DOCKER_USER=acore
+
+RUN apt-get install -y curl
 
 USER $DOCKER_USER
 
@@ -222,11 +223,6 @@ ENV DATAPATH_ZIP=/tmp/data.zip
 
 RUN /azerothcore/acore.sh client-data
 
-FROM alpine:3.13.5 as client-data
-
-LABEL description="AC Production: client-data"
-
-COPY --from=client-data-downloader /azerothcore/env/dist/data /azerothcore/env/dist/data
 
 #================================================================
 #
