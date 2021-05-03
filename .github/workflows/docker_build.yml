@@ -42,7 +42,7 @@ jobs:
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
-          docker-compose --profile dev --profile local build
+          docker-compose --profile dev --profile local build --parallel
 
       - name: Deploy Dev
         #env:
