@@ -86,8 +86,8 @@ shellCommandFactory(
 
 shellCommandFactory(
   "dev:up",
-  "Start the dev server container",
-  ["docker-compose up ac-dev-server"],
+  "Start the dev server container in background",
+  ["docker-compose up -d ac-dev-server"],
   env,
 );
 
