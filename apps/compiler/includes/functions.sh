@@ -13,9 +13,10 @@ function comp_ccacheEnable() {
 
     export CCACHE_MAXSIZE=${CCACHE_MAXSIZE:-'1000MB'}
     #export CCACHE_DEPEND=true
-    export CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
-    export CCACHE_COMPRESS=1
-    export CCACHE_COMPRESSLEVEL=9
+    export CCACHE_SLOPPINESS=${CCACHE_SLOPPINESS:-pch_defines,time_macros,include_file_mtime}
+    export CCACHE_CPP2=${CCACHE_CPP2:-true} # optimization for clang
+    export CCACHE_COMPRESS=${CCACHE_COMPRESS:-1}
+    export CCACHE_COMPRESSLEVEL=${CCACHE_COMPRESSLEVEL:-9}
     #export CCACHE_NODIRECT=true
 
     export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
