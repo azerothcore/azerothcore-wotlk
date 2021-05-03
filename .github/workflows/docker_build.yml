@@ -31,6 +31,12 @@ jobs:
           docker --version
           docker-compose --version
 
+      - uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          compose_file: docker-compose.yml
+
       # before cache
       # needed to avoid ccache injected into these images
       - name: Build Dev
