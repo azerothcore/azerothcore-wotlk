@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1620067514646031100');
 
-UPDATE `creature` SET `spawntimesecs`=300 WHERE `id` IN (
+UPDATE `creature` SET `spawntimesecs`=240 WHERE `id` IN (
 877, -- Saltscale Forager
 879, -- Saltscale Hunter
 871, -- Saltscale Warrior
