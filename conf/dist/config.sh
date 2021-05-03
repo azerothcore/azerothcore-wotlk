@@ -86,7 +86,7 @@ CCUSTOMOPTIONS=${CCUSTOMOPTIONS:-''}
 # recompilations
 #
 AC_CCACHE=${AC_CCACHE:-false}
-export CCACHE_DIR=${CCACHE_DIR:-"$AC_PATH_VAR/ccache"}
+export CCACHE_DIR=${CCACHE_DIR:-"$AC_PATH_VAR/ccache/files"}
 
 
 ##############################################
