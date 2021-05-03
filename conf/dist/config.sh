@@ -46,7 +46,7 @@ CCOMPILERCXX="/usr/bin/clang++"
 
 
 # how many thread must be used for compilation ( leave zero to use all available )
-MTHREADS=0
+MTHREADS=${MTHREADS:-0}
 # enable/disable warnings during compilation
 CWARNINGS=ON
 # enable/disable some debug informations ( it's not a debug compilation )
