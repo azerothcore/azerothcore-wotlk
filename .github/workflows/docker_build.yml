@@ -37,8 +37,8 @@ jobs:
         env:
           #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
           DOCKER_EXTENDS_BIND: abstract-no-bind
-          DOCKER_CLIENT_TIMEOUT: 220
-          COMPOSE_HTTP_TIMEOUT: 220
+          DOCKER_CLIENT_TIMEOUT: 400
+          COMPOSE_HTTP_TIMEOUT: 400
         run: |
           export DOCKER_USER_ID=$(id -u)
           export DOCKER_GROUP_ID=$(id -u)
