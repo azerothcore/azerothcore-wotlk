@@ -177,8 +177,8 @@ ENV CCACHE_CPP2=true
 ENV CCACHE_MAXSIZE='500M'
 ENV CCACHE_COMPRESS=1
 ENV CCACHE_COMPRESSLEVEL=9
-ENV CCACHE_DEPEND=true
-ENV CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
+ENV CSCRIPTPCH=OFF
+ENV CCOREPCH=OFF
 RUN bash apps/docker/docker-build-prod.sh
 
 #================================================================
