@@ -1,11 +1,11 @@
 /cmake-build-debug/*
 /build*/
-# do not ignore the docker folder
 /var/*
+# do not ignore the ccache folder (used by the ci)
 !/var/docker/ccache
 /env/dist/*
 /env/user/*
-/env/docker/logs/*
+/env/docker/*
 !/env/docker/etc/authserver.conf.dockerdist
 !/env/docker/etc/worldserver.conf.dockerdist
 /.env*

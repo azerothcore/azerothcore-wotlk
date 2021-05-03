@@ -163,9 +163,12 @@ ARG DOCKER_USER=acore
 
 LABEL description="AC Image used by the build stage to generate production images"
 
-# check if we have pre-built files
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker /azerothcore/env/dist
+RUN mkdir -p /azerothcore/env/etc/
+
+# check if we have ccache files available outside
 COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker/ccache /azerothcore/var/ccache
+COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/authserver.conf.dockerdist /azerothcore/env/etc/authserver.conf.dockerdist
+COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdist /azerothcore/env/etc/worldserver.conf.dockerdist
 
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
@@ -231,8 +234,6 @@ RUN addgroup --gid $GROUP_ID acore && \
     adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID acore && \
     passwd -d acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
-
-COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/data /azerothcore/env/dist/data
 
 ENV DATAPATH=/azerothcore/env/dist/data
 ENV DATAPATH_ZIP=/tmp/data.zip
