@@ -13,7 +13,7 @@ x-cache-from: &cache-from
     - acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master}
     - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
     - acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master}
-    - acore/ac-wotlk-client-data-server:${DOCKER_IMAGE_TAG:-master}
+    #- acore/ac-wotlk-client-data-server:${DOCKER_IMAGE_TAG:-master}
 
 x-ac-shared-conf: &ac-shared-conf
   <<: *networks
@@ -105,7 +105,7 @@ services:
     ports:
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
       - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
-    profiles: [all, app, worldserver]
+    profiles: [local, app, worldserver]
 
   ac-authserver:
     <<: *ac-shared-conf
@@ -128,7 +128,7 @@ services:
       <<: *cache-from
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
-    profiles: [all, app, authserver]
+    profiles: [local, app, authserver]
 
 #======================
 #
@@ -159,7 +159,7 @@ services:
         - /azerothcore/src
         - /azerothcore/data
         - /azerothcore/modules
-    profiles: [all, build]
+    profiles: [local, build]
 
   ac-dev-server:
     <<: *ac-shared-conf
@@ -191,7 +191,7 @@ services:
       - ac-ccache-dev:/azerothcore/var/ccache
       # this is not the directory of the extracted data! It's the client folder used by the extractors
       - ${DOCKER_CLIENT_DATA_FOLDER:-./var/client}:/azerothcore/env/dist/bin/Data
-    profiles: [all, dev]
+    profiles: [dev]
 
 #======================
 #
@@ -226,7 +226,9 @@ services:
       - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
     volumes_from:
       - ac-client-data-server:ro
-    profiles: [prod]
+    depends_on:
+      - ac-client-data-server
+    profiles: [prod, prod-app, prod-worldserver]
 
   ac-authserver-prod:
     <<: *ac-shared-conf
@@ -250,7 +252,7 @@ services:
       - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
-    profiles: [prod]
+    profiles: [prod, prod-app, prod-authserver]
 
   ac-client-data-server:
     image: acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
@@ -266,7 +268,7 @@ services:
       <<: *cache-from
     volumes:
       - /azerothcore/env/dist/data
-    profiles: [prod, clientdata]
+    profiles: [prod, prod-app, clientdata]
 
   ac-tools:
     image: acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally

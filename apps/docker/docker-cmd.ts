@@ -33,7 +33,7 @@ shellCommandFactory(
 );
 
 shellCommandFactory("build", "Build the authserver and worldserver", [
-  "docker-compose --profile all build --parallel",
+  "docker-compose --profile local build --parallel",
   "docker image prune -f",
   "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
 ], env);
@@ -42,7 +42,7 @@ shellCommandFactory(
   "build:nocache",
   "Build the authserver and worldserver without docker cache",
   [
-    "docker-compose --profile all build --no-cache --parallel",
+    "docker-compose --profile local build --no-cache --parallel",
     "docker image prune -f",
     "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
   ],
@@ -132,14 +132,14 @@ shellCommandFactory(
 shellCommandFactory(
   "prod:up",
   "Start production services (foreground)",
-  ["docker-compose --profile prod up"],
+  ["docker-compose --profile prod-app up"],
   env,
 );
 
 shellCommandFactory(
   "prod:up:d",
   "Start production services (background)",
-  ["docker-compose --profile prod up -d"],
+  ["docker-compose --profile prod-app up -d"],
   env,
 );
 
