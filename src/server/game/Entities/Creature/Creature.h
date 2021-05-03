@@ -44,7 +44,7 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_IGNORE_COMBAT                   = 0x00002000,
     CREATURE_FLAG_EXTRA_WORLDEVENT                      = 0x00004000,   // custom flag for world event creatures (left room for merging)
     CREATURE_FLAG_EXTRA_GUARD                           = 0x00008000,   // Creature is guard
-    CREATURE_FLAG_EXTRA_UNUSED_17                       = 0x00010000,
+    CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH              = 0x00010000,   // creature ignores feign death
     CREATURE_FLAG_EXTRA_NO_CRIT                         = 0x00020000,   // creature can't do critical strikes
     CREATURE_FLAG_EXTRA_NO_SKILL_GAINS                  = 0x00040000,   // creature won't increase weapon skills
     CREATURE_FLAG_EXTRA_OBEYS_TAUNT_DIMINISHING_RETURNS = 0x00080000,   // Taunt is subject to diminishing returns on this creature
@@ -62,7 +62,7 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_UNUSED_32                       = 0x80000000,
 
     // Masks
-    CREATURE_FLAG_EXTRA_UNUSED                          = (CREATURE_FLAG_EXTRA_UNUSED_10 | CREATURE_FLAG_EXTRA_UNUSED_12 | CREATURE_FLAG_EXTRA_UNUSED_17 |
+    CREATURE_FLAG_EXTRA_UNUSED                          = (CREATURE_FLAG_EXTRA_UNUSED_10 | CREATURE_FLAG_EXTRA_UNUSED_12 |
                                                            CREATURE_FLAG_EXTRA_UNUSED_22 | CREATURE_FLAG_EXTRA_UNUSED_25 | CREATURE_FLAG_EXTRA_UNUSED_26 |
                                                            CREATURE_FLAG_EXTRA_UNUSED_27 | CREATURE_FLAG_EXTRA_UNUSED_28 | CREATURE_FLAG_EXTRA_UNUSED_32),
     CREATURE_FLAG_EXTRA_DB_ALLOWED                      = (0xFFFFFFFF & ~(CREATURE_FLAG_EXTRA_UNUSED | CREATURE_FLAG_EXTRA_DUNGEON_BOSS))
@@ -635,6 +635,7 @@ public:
     bool HasSearchedAssistance() { return m_AlreadySearchedAssistance; }
     bool CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction = true) const;
     bool _IsTargetAcceptable(const Unit* target) const;
+    bool CanIgnoreFeignDeath() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH) != 0; }
     bool _CanDetectFeignDeathOf(const Unit* target) const; // pussywizard
 
     // pussywizard: updated at faction change, disable move in line of sight if actual faction is not hostile to anyone
