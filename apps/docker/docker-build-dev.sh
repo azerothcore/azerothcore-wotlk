@@ -2,7 +2,8 @@
 
 CUR_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-export CTOOLS=${CTOOLS:-OFF}
+IMPORT_DB=$1
+
 source "$CUR_PATH/docker-build-prod.sh"
 
 echo "Fixing EOL..."
@@ -14,4 +15,4 @@ do
     dos2unix -n $file $file
 done
 
-bash acore.sh db-assembler import-all
+[ $IMPORT_DB != 0 ] && bash acore.sh db-assembler import-all

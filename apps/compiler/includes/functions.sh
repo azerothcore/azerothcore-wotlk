@@ -6,6 +6,8 @@ function comp_clean() {
   echo "Cleaning build files in $DIRTOCLEAN"
 
   [ -d "$DIRTOCLEAN" ] && rm -rf $PATTERN
+
+  comp_ccacheClean
 }
 
 function comp_ccacheEnable() {
@@ -20,8 +22,9 @@ function comp_ccacheEnable() {
 
 function comp_ccacheClean() {
     [ "$AC_CCACHE" != true ] && return
-
+    echo "Cleaning ccache"
     ccache -C
+    ccache -s
 }
 
 function comp_ccacheShowStats() {

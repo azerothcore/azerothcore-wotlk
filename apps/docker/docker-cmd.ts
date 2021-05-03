@@ -55,7 +55,7 @@ shellCommandFactory(
   [
     "docker-compose build --parallel ac-build",
     "docker image prune -f",
-    "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh",
+    "docker-compose run --rm ac-build bash apps/docker/docker-build-dev.sh 0",
   ],
   env,
 );

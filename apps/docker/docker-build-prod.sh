@@ -2,8 +2,6 @@
 
 cd /azerothcore
 
-export CTOOLS=${CTOOLS:-ON}
-
 bash acore.sh compiler build
 
 echo "Generating confs..."

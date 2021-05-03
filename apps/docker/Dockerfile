@@ -174,11 +174,12 @@ ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
 ENV AC_CCACHE=true
 ENV CCACHE_CPP2=true
-ENV CCACHE_MAXSIZE='500M'
+ENV CCACHE_MAXSIZE='2500M'
 ENV CCACHE_COMPRESS=1
 ENV CCACHE_COMPRESSLEVEL=9
 ENV CSCRIPTPCH=OFF
 ENV CCOREPCH=OFF
+ENV CTOOLS=ON
 RUN bash apps/docker/docker-build-prod.sh
 
 #================================================================
