@@ -32,6 +32,7 @@ jobs:
 
       - uses: whoan/docker-build-with-cache-action@v5
         with:
+          image_tag: master
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           compose_file: docker-compose.yml
