@@ -68,8 +68,8 @@ CSERVERS=${CSERVERS:-ON}
 # compile tools
 CTOOLS=${CTOOLS:-OFF}
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
-CSCRIPTPCH=ON
-CCOREPCH=ON
+CSCRIPTPCH=${CSCRIPTPCH:-ON}
+CCOREPCH=${CCOREPCH:-ON}
 # enable/disable extra logs
 CEXTRA_LOGS=0
 
