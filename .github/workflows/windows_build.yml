@@ -2,8 +2,7 @@ name: windows-build
 on:
   push:
     branches:
-      - '**'         # matches every branch
-      - '!coverity_scan'   # excludes coverity_scan
+      - 'master'
   pull_request:
 
 jobs:
