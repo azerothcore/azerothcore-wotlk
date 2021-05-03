@@ -818,32 +818,6 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang)
     SendToAll(&data, pinfo.IsModerator() ? ObjectGuid::Empty : guid);
 }
 
-void Channel::EveryoneSayToSelf(const char* what)
-{
-    if (!what)
-        return;
-
-    uint32 messageLength = strlen(what) + 1;
-
-    WorldPacket data(SMSG_MESSAGECHAT, 1 + 4 + 8 + 4 + _name.size() + 1 + 8 + 4 + messageLength + 1);
-    data << (uint8)CHAT_MSG_CHANNEL;
-    data << (uint32)LANG_UNIVERSAL;
-    data << uint64(0); // put player guid here
-    data << uint32(0);
-    data << _name;
-    data << uint64(0); // put player guid here
-    data << messageLength;
-    data << what;
-    data << uint8(0);
-
-    for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
-    {
-        data.put(5, i->first);
-        data.put(17 + _name.size() + 1, i->first);
-        i->second.plrPtr->GetSession()->SendPacket(&data);
-    }
-}
-
 void Channel::Invite(Player const* player, std::string const& newname)
 {
     ObjectGuid guid = player->GetGUID();

@@ -24,6 +24,7 @@
 #include "RealmList.h"
 #include "RealmAcceptor.h"
 #include "DatabaseLoader.h"
+#include "Util.h"
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/TP_Reactor.h>
 #include <ace/ACE.h>

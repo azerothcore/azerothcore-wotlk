@@ -422,7 +422,7 @@ public:
             }
         }
 
-        data.hexlike(true);
+        data.hexlike();
         player->GetSession()->SendPacket(&data);
         handler->PSendSysMessage(LANG_COMMAND_OPCODESENT, data.GetOpcode(), unit->GetName().c_str());
         return true;

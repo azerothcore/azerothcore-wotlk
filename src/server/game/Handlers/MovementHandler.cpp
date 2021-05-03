@@ -34,10 +34,10 @@ void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& /*recvData*/)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: got MSG_MOVE_WORLDPORT_ACK.");
 #endif
-    HandleMoveWorldportAckOpcode();
+    HandleMoveWorldportAck();
 }
 
-void WorldSession::HandleMoveWorldportAckOpcode()
+void WorldSession::HandleMoveWorldportAck()
 {
     // ignore unexpected far teleports
     if (!GetPlayer()->IsBeingTeleportedFar())

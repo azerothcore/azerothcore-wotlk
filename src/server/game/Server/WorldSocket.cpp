@@ -654,9 +654,9 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     ASSERT(new_pct);
 
     // manage memory ;)
-    std::unique_ptr<WorldPacket> aptr (new_pct);
+    std::unique_ptr<WorldPacket> aptr(new_pct);
 
-    const uint16 opcode = new_pct->GetOpcode();
+    OpcodeClient opcode = static_cast<OpcodeClient>(aptr->GetOpcode());
 
     if (closing_)
         return -1;
@@ -708,6 +708,13 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     }
 
     std::lock_guard<std::mutex> guard(m_SessionLock);
+
+    OpcodeHandler const* handler = opcodeTable[opcode];
+    if (!handler)
+    {
+        LOG_ERROR("network.opcode", "No defined handler for opcode %s sent by %s", GetOpcodeNameForLogging(static_cast<OpcodeClient>(aptr->GetOpcode())).c_str(), m_Session->GetPlayerInfo().c_str());
+        return -1;
+    }
 
     if (m_Session != nullptr)
     {
