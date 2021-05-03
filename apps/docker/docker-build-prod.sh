@@ -3,7 +3,3 @@
 cd /azerothcore
 
 bash acore.sh compiler build
-
-
-
-
