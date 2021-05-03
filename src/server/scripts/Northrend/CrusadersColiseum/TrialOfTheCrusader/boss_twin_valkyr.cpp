@@ -115,9 +115,8 @@ struct boss_twin_valkyrAI : public ScriptedAI
         if( IsHeroic() )
             events.RescheduleEvent(EVENT_SPELL_TOUCH, urand(10000, 25000), 1);
 
-        me->SetDisableGravity(true);
-        me->SetHover(true);
         me->SetCanFly(true);
+        me->SetDisableGravity(true);
     }
 
     InstanceScript* pInstance;
@@ -188,7 +187,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     Creature* GetSister()
     {
-        return ObjectAccessor::GetCreature(*me, pInstance->GetData64(me->GetEntry() == NPC_DARKBANE ? NPC_LIGHTBANE : NPC_DARKBANE));
+        return ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(me->GetEntry() == NPC_DARKBANE ? NPC_LIGHTBANE : NPC_DARKBANE));
     }
 
     /*void AttackStart(Unit* victim)
@@ -372,7 +371,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     events.RepeatEvent(urand(45000,50000));
                     */
 
-                    std::vector<uint64> tList;
+                    GuidVector tList;
                     Map::PlayerList const& pList = me->GetMap()->GetPlayers();
                     if (pList.getSize())
                     {
