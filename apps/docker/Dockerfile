@@ -173,8 +173,9 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdis
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
 ENV AC_CCACHE=true
-#ENV CSCRIPTPCH=OFF
-#ENV CCOREPCH=OFF
+ENV CCACHE_CPP2=true
+ENV CSCRIPTPCH=OFF
+ENV CCOREPCH=OFF
 ENV CTOOLS=ON
 RUN bash apps/docker/docker-build-prod.sh
 
