@@ -10,6 +10,7 @@
         "mhutchie.git-graph",
         "github.vscode-pull-request-github",
         "eamodio.gitlens",
-        "cschlosser.doxdocgen"
+        "cschlosser.doxdocgen",
+        "sanaajani.taskrunnercode"
     ]
 }
