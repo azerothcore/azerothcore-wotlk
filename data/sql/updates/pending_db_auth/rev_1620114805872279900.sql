@@ -1,6 +1,6 @@
 INSERT INTO `version_db_auth` (`sql_rev`) VALUES ('1620114805872279900');
 
--
+--
 -- Table structure for table `build_info`
 --
 DROP TABLE IF EXISTS `build_info`;
