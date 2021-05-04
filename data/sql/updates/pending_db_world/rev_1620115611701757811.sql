@@ -1,4 +1,4 @@
--- INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1620115611701757811');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1620115611701757811');
 
 -- Copper Vein
 UPDATE `gameobject_loot_template` SET `MaxCount`=7 WHERE FIND_IN_SET (`Entry`,'1502,1735,2626,18092') AND Item = 2835; -- Rough Stone
