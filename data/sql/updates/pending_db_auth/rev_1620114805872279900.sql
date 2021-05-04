@@ -6,15 +6,15 @@ INSERT INTO `version_db_auth` (`sql_rev`) VALUES ('1620114805872279900');
 DROP TABLE IF EXISTS `build_info`;
 CREATE TABLE `build_info` (
   `build` int(11) NOT NULL,
-  `majorVersion` int(11) DEFAULT NULL,
-  `minorVersion` int(11) DEFAULT NULL,
-  `bugfixVersion` int(11) DEFAULT NULL,
-  `hotfixVersion` char(3) DEFAULT NULL,
-  `winAuthSeed` varchar(32) DEFAULT NULL,
-  `win64AuthSeed` varchar(32) DEFAULT NULL,
-  `mac64AuthSeed` varchar(32) DEFAULT NULL,
-  `winChecksumSeed` varchar(40) DEFAULT NULL,
-  `macChecksumSeed` varchar(40) DEFAULT NULL,
+  `majorVersion` INT DEFAULT NULL,
+  `minorVersion` INT DEFAULT NULL,
+  `bugfixVersion` INT DEFAULT NULL,
+  `hotfixVersion` CHAR(3) DEFAULT NULL,
+  `winAuthSeed` VARCHAR(32) DEFAULT NULL,
+  `win64AuthSeed` VARCHAR(32) DEFAULT NULL,
+  `mac64AuthSeed` VARCHAR(32) DEFAULT NULL,
+  `winChecksumSeed` VARCHAR(40) DEFAULT NULL,
+  `macChecksumSeed` VARCHAR(40) DEFAULT NULL,
   PRIMARY KEY (`build`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
