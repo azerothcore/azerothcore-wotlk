@@ -13,13 +13,10 @@
         "problemMatcher": []
       },
       {
-        "label": "AzerothCore: Build",
+        "label": "AzerothCore: Import/update database",
         "type": "shell",
-        "command": "./acore.sh compiler build",
-        "group": {
-          "kind": "build",
-          "isDefault": true
-        },
+        "command": "./acore.sh db-assembler import-all",
+        "group": "build",
         "presentation": {
           "reveal": "always",
           "panel": "new"
@@ -27,10 +24,10 @@
         "problemMatcher": []
       },
       {
-        "label": "AzerothCore: Import/update database",
+        "label": "AzerothCore: download client-data",
         "type": "shell",
-        "command": "./acore.sh db-assembler import-all",
-        "group": "build",
+        "command": "./acore.sh client-data",
+        "group": "none",
         "presentation": {
           "reveal": "always",
           "panel": "new"
@@ -49,10 +46,13 @@
         "problemMatcher": []
       },
       {
-        "label": "AzerothCore: Run worldserver (restarter)",
+        "label": "AzerothCore: Build",
         "type": "shell",
-        "command": "./acore.sh run-worldserver",
-        "group": "none",
+        "command": "./acore.sh compiler build",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
         "presentation": {
           "reveal": "always",
           "panel": "new"
@@ -63,6 +63,17 @@
         "label": "AzerothCore: Run authserver (restarter)",
         "type": "shell",
         "command": "./acore.sh run-authserver",
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "AzerothCore: Run worldserver (restarter)",
+        "type": "shell",
+        "command": "./acore.sh run-worldserver",
         "group": "none",
         "presentation": {
           "reveal": "always",

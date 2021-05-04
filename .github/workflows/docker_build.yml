@@ -74,7 +74,7 @@ jobs:
             ccache:ubuntu-20.04:clang:without-modules:${{ github.ref }}
             ccache:ubuntu-20.04:clang:without-modules
 
-      - name: Deploy Production images
+      - name: Build Production images
         env:
           #DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
           DOCKER_EXTENDS_BIND: abstract-no-bind
