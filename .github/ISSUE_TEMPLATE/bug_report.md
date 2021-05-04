@@ -7,8 +7,8 @@ assignees: ''
 
 ---
 
-<!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE)
-     You should always read how to properly fill out the bug report before continuing. https://www.azerothcore.org/wiki/issue-tracker-standards)
+<!-- IF YOU DO NOT FILL THIS TEMPLATE OUT, WE WILL CLOSE YOUR ISSUE
+     You should always read how to properly fill out the bug report before continuing. https://www.azerothcore.org/wiki/issue-tracker-standards
      For issues containing a fix, please create a Pull Request following this tutorial: https://www.azerothcore.org/wiki/How-to-create-a-PR -->
 
 **CURRENT BEHAVIOUR:**
