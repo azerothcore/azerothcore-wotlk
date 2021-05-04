@@ -13,6 +13,7 @@
 #include "Database/DatabaseEnv.h"
 #include "ByteBuffer.h"
 #include "Configuration/Config.h"
+#include "IPLocation.h"
 #include "Log.h"
 #include "RealmList.h"
 #include "AuthSocket.h"
@@ -409,32 +410,20 @@ bool AuthSocket::_HandleLogonChallenge()
             }
             else
             {
-                LOG_DEBUG("network", "[AuthChallenge] Account '%s' is not locked to ip", _login.c_str());
-                std::string accountCountry = fields[2].GetString();
-                if (accountCountry.empty() || accountCountry == "00")
-                    LOG_DEBUG("network", "[AuthChallenge] Account '%s' is not locked to country", _login.c_str());
-                else if (!accountCountry.empty())
-                {
-                    uint32 ip = inet_addr(ip_address.c_str());
-                    EndianConvertReverse(ip);
+                if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(ip_address))
+                    _ipCountry = location->CountryCode;
 
-                    stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGON_COUNTRY);
-                    stmt->setUInt32(0, ip);
-                    if (PreparedQueryResult sessionCountryQuery = LoginDatabase.Query(stmt))
+                LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' is not locked to ip", _login.c_str());
+                if (_accountInfo.LockCountry.empty() || _accountInfo.LockCountry == "00")
+                    LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' is not locked to country", _login.c_str());
+                else if (!_ipCountry.empty())
+                {
+                    LOG_DEBUG("server.authserver", "[AuthChallenge] Account '%s' is locked to country: '%s' Player country is '%s'", _login.c_str(), _accountInfo.LockCountry.c_str(), _ipCountry.c_str());
+                    if (_ipCountry != _accountInfo.LockCountry)
                     {
-                        std::string loginCountry = (*sessionCountryQuery)[0].GetString();
-                        LOG_DEBUG("network", "[AuthChallenge] Account '%s' is locked to country: '%s' Player country is '%s'", _login.c_str(), accountCountry.c_str(), loginCountry.c_str());
-                        if (loginCountry != accountCountry)
-                        {
-                            LOG_DEBUG("network", "[AuthChallenge] Account country differs.");
-                            pkt << uint8(WOW_FAIL_UNLOCKABLE_LOCK);
-                            locked = true;
-                        }
-                        else
-                            LOG_DEBUG("network", "[AuthChallenge] Account country matches");
+                        pkt << uint8(WOW_FAIL_UNLOCKABLE_LOCK);
+                        locked = true;
                     }
-                    else
-                        LOG_DEBUG("network", "[AuthChallenge] IP2NATION Table empty");
                 }
             }
 

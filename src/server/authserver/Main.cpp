@@ -24,6 +24,7 @@
 #include "RealmList.h"
 #include "RealmAcceptor.h"
 #include "DatabaseLoader.h"
+#include "IPLocation.h"
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/TP_Reactor.h>
 #include <ace/ACE.h>
@@ -123,6 +124,9 @@ extern int main(int argc, char** argv)
     // Initialize the database connection
     if (!StartDB())
         return 1;
+
+    // Load IP Location Database
+    sIPLocation->Load();
 
     // Get the list of realms for the server
     sRealmList->Initialize(sConfigMgr->GetOption<int32>("RealmsStateUpdateDelay", 20));
