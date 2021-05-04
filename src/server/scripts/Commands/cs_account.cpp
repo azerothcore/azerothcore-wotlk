@@ -15,6 +15,7 @@ EndScriptData */
 #include "Chat.h"
 #include "Language.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ScriptMgr.h"
 
 class account_commandscript : public CommandScript
@@ -539,7 +540,7 @@ public:
             }
         }
 
-        // Check if provided realmID has a negative value other than -1
+        // Check if provided realm.Id.Realm has a negative value other than -1
         if (gmRealmID < -1)
         {
             handler->SendSysMessage(LANG_INVALID_REALMID);
@@ -547,7 +548,7 @@ public:
             return false;
         }
 
-        // If gmRealmID is -1, delete all values for the account id, else, insert values for the specific realmID
+        // If gmRealmID is -1, delete all values for the account id, else, insert values for the specific realm.Id.Realm
         PreparedStatement* stmt;
 
         if (gmRealmID == -1)
@@ -561,7 +562,7 @@ public:
             stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS_BY_REALM);
 
             stmt->setUInt32(0, targetAccountId);
-            stmt->setUInt32(1, realmID);
+            stmt->setUInt32(1, realm.Id.Realm);
         }
 
         LoginDatabase.Execute(stmt);

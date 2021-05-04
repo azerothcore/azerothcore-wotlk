@@ -17,6 +17,7 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ScriptMgr.h"
 #include "TicketMgr.h"
 
@@ -84,7 +85,7 @@ public:
         // Get target information
         ObjectGuid targetGuid = sObjectMgr->GetPlayerGUIDByName(target.c_str());
         uint32 targetAccountId = sObjectMgr->GetPlayerAccountIdByGUID(targetGuid.GetCounter());
-        uint32 targetGmLevel = AccountMgr::GetSecurity(targetAccountId, realmID);
+        uint32 targetGmLevel = AccountMgr::GetSecurity(targetAccountId, realm.Id.Realm);
 
         // Target must exist and have administrative rights
         if (!targetGuid || AccountMgr::IsPlayerAccount(targetGmLevel))
@@ -382,7 +383,7 @@ public:
         {
             ObjectGuid guid = ticket->GetAssignedToGUID();
             uint32 accountId = sObjectMgr->GetPlayerAccountIdByGUID(guid.GetCounter());
-            security = AccountMgr::GetSecurity(accountId, realmID);
+            security = AccountMgr::GetSecurity(accountId, realm.Id.Realm);
         }
 
         // Check security

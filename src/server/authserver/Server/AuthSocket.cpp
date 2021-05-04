@@ -161,6 +161,8 @@ private:
     Patches _patches;
 };
 
+std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
+
 const AuthHandler table[] =
 {
     { AUTH_LOGON_CHALLENGE,     STATUS_CHALLENGE,   &AuthSocket::_HandleLogonChallenge      },
@@ -349,8 +351,6 @@ bool AuthSocket::_HandleLogonChallenge()
     EndianConvert(ch->timezone_bias);
     EndianConvert(ch->ip);
 
-    ByteBuffer pkt;
-
     _login = (const char*)ch->I;
     _build = ch->build;
     _expversion = uint8(AuthHelper::IsPostBCAcceptedClientBuild(_build) ? POST_BC_EXP_FLAG : (AuthHelper::IsPreBCAcceptedClientBuild(_build) ? PRE_BC_EXP_FLAG : NO_VALID_EXP_FLAG));
@@ -362,6 +362,7 @@ bool AuthSocket::_HandleLogonChallenge()
     // Restore string order as its byte order is reversed
     std::reverse(_os.begin(), _os.end());
 
+    ByteBuffer pkt;
     pkt << uint8(AUTH_LOGON_CHALLENGE);
     pkt << uint8(0x00);
 
@@ -385,6 +386,10 @@ bool AuthSocket::_HandleLogonChallenge()
         // No SQL injection (prepared statement)
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGONCHALLENGE);
         stmt->setString(0, _login);
+
+        _localizationName.resize(4);
+        for (int i = 0; i < 4; ++i)
+            _localizationName[i] = ch->country[4 - i - 1];
 
         PreparedQueryResult res2 = LoginDatabase.Query(stmt);
         if (res2)
@@ -464,62 +469,57 @@ bool AuthSocket::_HandleLogonChallenge()
                 {
                     _srp6.emplace(_login, fields[5].GetBinary<acore::Crypto::SRP6::SALT_LENGTH>(), fields[6].GetBinary<acore::Crypto::SRP6::VERIFIER_LENGTH>());
 
-                    BigNumber unk3;
-                    unk3.SetRand(16 * 8);
-
                     // Fill the response packet with the result
                     if (AuthHelper::IsAcceptedClientBuild(_build))
+                    {
                         pkt << uint8(WOW_SUCCESS);
-                    else
-                        pkt << uint8(WOW_FAIL_VERSION_INVALID);
 
-                    // B may be calculated < 32B so we force minimal length to 32B
-                    pkt.append(_srp6->B);
-                    pkt << uint8(1);
-                    pkt.append(_srp6->g);
-                    pkt << uint8(32);
-                    pkt.append(_srp6->N);
-                    pkt.append(_srp6->s);
-                    pkt.append(unk3.ToByteArray<16>());
-                    uint8 securityFlags = 0;
-
-                    // Check if token is used
-                    _tokenKey = fields[7].GetString();
-                    if (!_tokenKey.empty())
-                        securityFlags = 4;
-
-                    pkt << uint8(securityFlags);            // security flags (0x0...0x04)
-
-                    if (securityFlags & 0x01)               // PIN input
-                    {
-                        pkt << uint32(0);
-                        pkt << uint64(0) << uint64(0);      // 16 bytes hash?
-                    }
-
-                    if (securityFlags & 0x02)               // Matrix input
-                    {
-                        pkt << uint8(0);
-                        pkt << uint8(0);
-                        pkt << uint8(0);
-                        pkt << uint8(0);
-                        pkt << uint64(0);
-                    }
-
-                    if (securityFlags & 0x04)               // Security token input
+                        // B may be calculated < 32B so we force minimal length to 32B
+                        pkt.append(_srp6->B);
                         pkt << uint8(1);
+                        pkt.append(_srp6->g);
+                        pkt << uint8(32);
+                        pkt.append(_srp6->N);
+                        pkt.append(_srp6->s);
+                        pkt.append(VersionChallenge.data(), VersionChallenge.size());
+                        uint8 securityFlags = 0;
 
-                    uint8 secLevel = fields[4].GetUInt8();
-                    _accountSecurityLevel = secLevel <= SEC_ADMINISTRATOR ? AccountTypes(secLevel) : SEC_ADMINISTRATOR;
+                        // Check if token is used
+                        _tokenKey = fields[7].GetString();
+                        if (!_tokenKey.empty())
+                            securityFlags = 4;
 
-                    _localizationName.resize(4);
-                    for (int i = 0; i < 4; ++i)
-                        _localizationName[i] = ch->country[4 - i - 1];
+                        pkt << uint8(securityFlags);            // security flags (0x0...0x04)
+
+                        if (securityFlags & 0x01)               // PIN input
+                        {
+                            pkt << uint32(0);
+                            pkt << uint64(0) << uint64(0);      // 16 bytes hash?
+                        }
+
+                        if (securityFlags & 0x02)               // Matrix input
+                        {
+                            pkt << uint8(0);
+                            pkt << uint8(0);
+                            pkt << uint8(0);
+                            pkt << uint8(0);
+                            pkt << uint64(0);
+                        }
+
+                        if (securityFlags & 0x04)               // Security token input
+                            pkt << uint8(1);
+
+                        uint8 secLevel = fields[4].GetUInt8();
+                        _accountSecurityLevel = secLevel <= SEC_ADMINISTRATOR ? AccountTypes(secLevel) : SEC_ADMINISTRATOR;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                    LOG_DEBUG("network", "'%s:%d' [AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str (), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName) );
+                        LOG_DEBUG("network", "'%s:%d' [AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
 #endif
-                    ///- All good, await client's proof
-                    _status = STATUS_LOGON_PROOF;
+                        ///- All good, await client's proof
+                        _status = STATUS_LOGON_PROOF;
+                    }                        
+                    else
+                        pkt << uint8(WOW_FAIL_VERSION_INVALID);
                 }
             }
         }
@@ -772,7 +772,7 @@ bool AuthSocket::_HandleReconnectChallenge()
     pkt << uint8(AUTH_RECONNECT_CHALLENGE);
     pkt << uint8(0x00);
     pkt.append(_reconnectProof);        // 16 bytes random
-    pkt << uint64(0x00) << uint64(0x00);                    // 16 bytes zeros
+    pkt.append(VersionChallenge.data(), VersionChallenge.size());
     socket().send((char const*)pkt.contents(), pkt.size());
     return true;
 }
@@ -831,20 +831,20 @@ ACE_INET_Addr const& AuthSocket::GetAddressForClient(Realm const& realm, ACE_INE
     if (clientAddr.is_loopback())
     {
         // Try guessing if realm is also connected locally
-        if (realm.LocalAddress.is_loopback() || realm.ExternalAddress.is_loopback())
+        if (realm.LocalAddress->is_loopback() || realm.ExternalAddress->is_loopback())
             return clientAddr;
 
         // Assume that user connecting from the machine that authserver is located on
         // has all realms available in his local network
-        return realm.LocalAddress;
+        return *realm.LocalAddress;
     }
 
     // Check if connecting client is in the same network
-    if (IsIPAddrInNetwork(realm.LocalAddress, clientAddr, realm.LocalSubnetMask))
-        return realm.LocalAddress;
+    if (IsIPAddrInNetwork(*realm.LocalAddress, clientAddr, *realm.LocalSubnetMask))
+        return *realm.LocalAddress;
 
     // Return external IP
-    return realm.ExternalAddress;
+    return *realm.ExternalAddress;
 }
 
 // Realm List command handler
@@ -881,17 +881,17 @@ bool AuthSocket::_HandleRealmList()
 
     // Circle through realms in the RealmList and construct the return packet (including # of user characters in each realm)
     ByteBuffer pkt;
-
     size_t RealmListSize = 0;
-    for (RealmList::RealmMap::const_iterator i = sRealmList->begin(); i != sRealmList->end(); ++i)
+
+    for (auto& [realmHandle, realm] : sRealmList->GetRealms())
     {
-        const Realm& realm = i->second;
         // don't work with realms which not compatible with the client
-        bool okBuild = ((_expversion & POST_BC_EXP_FLAG) && realm.gamebuild == _build) || ((_expversion & PRE_BC_EXP_FLAG) && !AuthHelper::IsPreBCAcceptedClientBuild(realm.gamebuild));
+        bool okBuild = ((_expversion & POST_BC_EXP_FLAG) && realm.Build == _build) || ((_expversion & PRE_BC_EXP_FLAG) && !AuthHelper::IsPreBCAcceptedClientBuild(realm.Build));
 
         // No SQL injection. id of realm is controlled by the database.
-        uint32 flag = realm.flag;
-        RealmBuildInfo const* buildInfo = AuthHelper::GetBuildInfo(realm.gamebuild);
+        uint32 flag = realm.Flags;
+
+        RealmBuildInfo const* buildInfo = sRealmList->GetBuildInfo(realm.Build);
         if (!okBuild)
         {
             if (!buildInfo)
@@ -903,7 +903,7 @@ bool AuthSocket::_HandleRealmList()
         if (!buildInfo)
             flag &= ~REALM_FLAG_SPECIFYBUILD;
 
-        std::string name = i->first;
+        std::string name = realm.Name;
         if (_expversion & PRE_BC_EXP_FLAG && flag & REALM_FLAG_SPECIFYBUILD)
         {
             std::ostringstream ss;
@@ -912,29 +912,29 @@ bool AuthSocket::_HandleRealmList()
         }
 
         // We don't need the port number from which client connects with but the realm's port
-        clientAddr.set_port_number(realm.ExternalAddress.get_port_number());
+        clientAddr.set_port_number(realm.ExternalAddress->get_port_number());
 
-        uint8 lock = (realm.allowedSecurityLevel > _accountSecurityLevel) ? 1 : 0;
+        uint8 lock = (realm.AllowedSecurityLevel > _accountSecurityLevel) ? 1 : 0;
 
         uint8 AmountOfCharacters = 0;
         stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_NUM_CHARS_ON_REALM);
-        stmt->setUInt32(0, realm.m_ID);
+        stmt->setUInt32(0, realm.Id.Realm);
         stmt->setUInt32(1, id);
         result = LoginDatabase.Query(stmt);
         if (result)
             AmountOfCharacters = (*result)[0].GetUInt8();
 
-        pkt << realm.icon;                                  // realm type
+        pkt << realm.Type;                                  // realm type
         if (_expversion & POST_BC_EXP_FLAG)                 // only 2.x and 3.x clients
             pkt << lock;                                    // if 1, then realm locked
         pkt << uint8(flag);                                 // RealmFlags
         pkt << name;
         pkt << GetAddressString(GetAddressForClient(realm, clientAddr));
-        pkt << realm.populationLevel;
+        pkt << realm.PopulationLevel;
         pkt << AmountOfCharacters;
-        pkt << realm.timezone;                              // realm category
+        pkt << realm.Timezone;                              // realm category
         if (_expversion & POST_BC_EXP_FLAG)                 // 2.x and 3.x clients
-            pkt << uint8(realm.m_ID);
+            pkt << uint8(realm.Id.Realm);
         else
             pkt << uint8(0x0);                              // 1.12.1 and 1.12.2 clients
 

@@ -15,6 +15,7 @@
 #include "Opcodes.h"
 #include "PacketLog.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "Util.h"
@@ -731,7 +732,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
 int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 {
     // NOTE: ATM the socket is singlethread, have this in mind ...
-    uint32 loginServerID, loginServerType, regionID, battlegroupID, realm;
+    uint32 loginServerID, loginServerType, regionID, battlegroupID, realmid;
     uint64 DosResponse;
     uint32 BuiltNumberClient;
     uint32 id, security;
@@ -764,7 +765,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     recvPacket.read(clientSeed);
     recvPacket >> regionID;
     recvPacket >> battlegroupID;
-    recvPacket >> realm;
+    recvPacket >> realmid;
     recvPacket >> DosResponse;
     recvPacket.read(digest);
 
@@ -876,7 +877,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_GMLEVEL_BY_REALMID);
 
     stmt->setUInt32(0, id);
-    stmt->setInt32(1, int32(realmID));
+    stmt->setInt32(1, int32(realm.Id.Realm));
 
     result = LoginDatabase.Query(stmt);
 
@@ -992,14 +993,14 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         return -1;
     }
 
-    if (realm != realmID)
+    if (realmid != realm.Id.Realm)
     {
         packet.Initialize (SMSG_AUTH_RESPONSE, 1);
         packet << uint8 (REALM_LIST_REALM_NOT_FOUND);
         SendPacket(packet);
 
         LOG_ERROR("server", "WorldSocket::HandleAuthSession: Client %s requested connecting with realm id %u but this realm has id %u set in config.",
-                       address.c_str(), realm, realmID);
+                       address.c_str(), realmid, realm.Id.Realm);
         sScriptMgr->OnFailedAccountLogin(id);
         return -1;
     }
