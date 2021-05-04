@@ -171,6 +171,9 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER var/docker/ccache /azerothcore/var/ccache
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/authserver.conf.dockerdist /azerothcore/env/dist/etc/authserver.conf.dockerdist
 COPY --chown=$DOCKER_USER:$DOCKER_USER env/docker/etc/worldserver.conf.dockerdist /azerothcore/env/dist/etc/worldserver.conf.dockerdist
 
+# install eluna
+RUN git clone --depth=1 --branch=master --recursive https://github.com/azerothcore/mod-eluna-lua-engine.git /azerothcore/modules/mod-eluna-lua-engine
+
 ENV USER_CONF_PATH=/azerothcore/apps/docker/config-docker.sh
 ENV CTYPE=RelWithDebInfo
 ENV AC_CCACHE=true
@@ -207,8 +210,10 @@ LABEL description="AC Production: worldserver"
 
 ARG DOCKER_USER=acore
 
+RUN mkdir -p /azerothcore/env/dist/bin/lua_scripts
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/etc /azerothcore/env/dist/etc
 COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/worldserver /azerothcore/env/dist/bin/worldserver
+COPY --chown=$DOCKER_USER:$DOCKER_USER --from=build /azerothcore/env/dist/bin/lua_scripts /azerothcore/env/dist/bin/lua_scripts
 
 #================================================================
 #
