@@ -1,37 +1,37 @@
-[//]: # (First of all, THANK YOU for your contribution.)
+<!-- First of all, THANK YOU for your contribution. -->
 
 ## Changes Proposed:
 -  
 -  
 
 ## Issues Addressed:
-[//]: # (If your fix has a relating issue, link it below)
+<!-- If your fix has a relating issue, link it below -->
 - Closes 
 
 ## SOURCE:
-[//]: # (If you can, include a source that can strengthen your claim)
+<!-- If you can, include a source that can strengthen your claim -->
 
 ## Tests Performed:
-[//]: # (Does it build without errors? Did you test in-game? What did you test? On which OS did you test? Describe any other tests performed)
+<!-- Does it build without errors? Did you test in-game? What did you test? On which OS did you test? Describe any other tests performed -->
 - 
 - 
 
 
 ## How to Test the Changes:
-[//]: # (Describe in a detailed step-by-step order how to test the changes)
+<!-- Describe in a detailed step-by-step order how to test the changes -->
 
 1.
 2.
 3.
 
 ## Known Issues and TODO List:
-[//]: # (Is there anything else left to do after this PR?)
+<!-- Is there anything else left to do after this PR? -->
 
 - [ ]
 - [ ]
 
-[//]: # (If you intend to contribute repeatedly to our project, it is a good idea to join our discord channel. We set ranks for our contributors and give them access to special resources or knowledge: https://discord.com/invite/DasJqPba)
-[//]: # (Do not remove the instructions below about testing, they will help users to test your PR)
+<!-- If you intend to contribute repeatedly to our project, it is a good idea to join our discord channel. We set ranks for our contributors and give them access to special resources or knowledge: https://discord.com/invite/DasJqPba)
+     Do not remove the instructions below about testing, they will help users to test your PR -->
 ## How to Test AzerothCore PRs
  
 When a PR is ready to be tested, it will be marked as **[WAITING TO BE TESTED]**.
