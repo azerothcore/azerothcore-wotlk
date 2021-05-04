@@ -15,4 +15,4 @@ do
     dos2unix -n $file $file
 done
 
-[ $IMPORT_DB != 0 ] && bash acore.sh db-assembler import-all || true
+[[ $IMPORT_DB != 0 ]] && bash acore.sh db-assembler import-all || true
