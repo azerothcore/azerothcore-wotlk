@@ -151,7 +151,7 @@ void CliRunnable::run()
         char commandbuf[256];
         command_str = fgets(commandbuf, sizeof(commandbuf), stdin);
 #else
-        char* command_str = readline(CLI_PREFIX);
+        command_str = readline(CLI_PREFIX);
         rl_bind_key('\t', rl_complete);
 #endif
 
