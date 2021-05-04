@@ -517,7 +517,7 @@ bool AuthSocket::_HandleLogonChallenge()
 #endif
                         ///- All good, await client's proof
                         _status = STATUS_LOGON_PROOF;
-                    }                        
+                    }
                     else
                         pkt << uint8(WOW_FAIL_VERSION_INVALID);
                 }

@@ -467,7 +467,7 @@ bool LoadRealmInfo()
     realm.ExternalAddress = std::make_unique<ACE_INET_Addr>(*externalAddress);
     realm.LocalAddress = std::make_unique<ACE_INET_Addr>(*localAddress);
     realm.LocalSubnetMask = std::make_unique<ACE_INET_Addr>(*localSubmask);
-    
+
     realm.Type = fields[6].GetUInt8();
     realm.Flags = RealmFlags(fields[7].GetUInt8());
     realm.Timezone = fields[8].GetUInt8();

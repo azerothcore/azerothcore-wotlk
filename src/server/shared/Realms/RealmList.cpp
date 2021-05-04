@@ -83,17 +83,17 @@ void RealmList::UpdateRealm(RealmHandle const& id, uint32 build, std::string con
     if (!realm.ExternalAddress || *realm.ExternalAddress != address)
     {
         realm.ExternalAddress = std::make_unique<ACE_INET_Addr>(std::move(address));
-    }  
+    }
 
     if (!realm.LocalAddress || *realm.LocalAddress != localAddr)
     {
         realm.LocalAddress = std::make_unique<ACE_INET_Addr>(std::move(localAddr));
-    } 
+    }
 
     if (!realm.LocalSubnetMask || *realm.LocalSubnetMask != localSubmask)
     {
         realm.LocalSubnetMask = std::make_unique<ACE_INET_Addr>(std::move(localSubmask));
-    }  
+    }
 
     realm.Port = port;
 }

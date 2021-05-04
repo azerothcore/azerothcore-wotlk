@@ -3464,4 +3464,3 @@ bool World::IsFFAPvPRealm() const
 {
     return getIntConfig(CONFIG_GAME_TYPE) == REALM_TYPE_FFA_PVP;
 }
-
