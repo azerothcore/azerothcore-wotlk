@@ -244,11 +244,9 @@ RUN addgroup --gid $GROUP_ID acore && \
 ENV DATAPATH=/azerothcore/env/dist/data
 ENV DATAPATH_ZIP=/tmp/data.zip
 
-RUN --mount=type=bind,target=/azerothcore-temp,readwrite /azerothcore-temp/acore.sh client-data
+RUN --mount=type=bind,target=/azerothcore-temp,readwrite /azerothcore-temp/acore.sh client-data && chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 
 RUN apt-get remove --purge -y tzdata curl unzip && apt-get autoremove -y
-
-RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 
 USER $DOCKER_USER
 
