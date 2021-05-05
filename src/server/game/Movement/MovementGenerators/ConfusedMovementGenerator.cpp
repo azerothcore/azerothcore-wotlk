@@ -40,7 +40,7 @@ void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
         acore::NormalizeMapCoord(wanderX);
         acore::NormalizeMapCoord(wanderY);
 
-        float new_z = map->GetHeight(unit->GetPhaseMask(), wanderX, wanderY, z, true);
+        float new_z = unit->GetMapHeight(wanderX, wanderY, z);
         if (new_z <= INVALID_HEIGHT || fabs(z - new_z) > 3.0f) // pussywizard
         {
             i_waypoints[idx][0] = idx > 0 ? i_waypoints[idx - 1][0] : x;
@@ -138,7 +138,7 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
             float y = i_waypoints[i_nextMove][1];
             float z = i_waypoints[i_nextMove][2];
             Movement::MoveSplineInit init(unit);
-            init.MoveTo(x, y, z);
+            init.MoveTo(x, y, z, true);
             init.Launch();
         }
     }
