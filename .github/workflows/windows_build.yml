@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - 'master'
+  pull_request:
   issue_comment:
     types: [created]
 
