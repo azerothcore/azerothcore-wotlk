@@ -3,7 +3,8 @@ on:
   push:
     branches:
       - 'master'
-  pull_request:
+  issue_comment:
+    types: [created]
 
 jobs:
   windows-build:
@@ -13,6 +14,15 @@ jobs:
     name: windows-2019-MSVC16
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
+      - uses: khan/pull-request-comment-trigger@master
+        id: check
+        with:
+          trigger: '/run-build'
+          reaction: rocket
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+      - run: 'echo Running Build Now!'
+        if: steps.check.outputs.triggered == 'true'
       - uses: actions/checkout@v2
       - name: Configure OS
         run: choco install --no-progress openssl
