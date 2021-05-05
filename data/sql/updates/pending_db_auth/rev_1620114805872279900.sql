@@ -5,7 +5,7 @@ INSERT INTO `version_db_auth` (`sql_rev`) VALUES ('1620114805872279900');
 --
 DROP TABLE IF EXISTS `build_info`;
 CREATE TABLE `build_info` (
-  `build` int(11) NOT NULL,
+  `build` INT NOT NULL,
   `majorVersion` INT DEFAULT NULL,
   `minorVersion` INT DEFAULT NULL,
   `bugfixVersion` INT DEFAULT NULL,
