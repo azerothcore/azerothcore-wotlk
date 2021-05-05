@@ -20,16 +20,17 @@ jobs:
     steps:
       - uses: khan/pull-request-comment-trigger@master
         id: check
+        if: {{ github.ref != 'ref/head/master' }}
         with:
           trigger: 'run-build'
           reaction: rocket
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@v2
-        if: steps.check.outputs.triggered == 'true'
+        if: steps.check.outputs.triggered == 'true' || {{ github.ref == 'ref/head/master' }}
       - name: Cache
         uses: actions/cache@v2
-        if: steps.check.outputs.triggered == 'true'
+        if: steps.check.outputs.triggered == 'true' || {{ github.ref == 'ref/head/master' }}
         with:
           path: ~/Library/Caches/ccache
           key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}
@@ -37,14 +38,14 @@ jobs:
             ccache:${{ matrix.os }}:${{ github.ref }}
             ccache:${{ matrix.os }}
       - name: Install latest bash
-        if: steps.check.outputs.triggered == 'true'
+        if: steps.check.outputs.triggered == 'true' || {{ github.ref == 'ref/head/master' }}
         run: brew install bash
       - name: Configure OS
-        if: steps.check.outputs.triggered == 'true'
+        if: steps.check.outputs.triggered == 'true' || {{ github.ref == 'ref/head/master' }}
         run: source ./acore.sh install-deps
       - name: Build
-        if: steps.check.outputs.triggered == 'true'
+        if: steps.check.outputs.triggered == 'true' || {{ github.ref == 'ref/head/master' }}
         run: source ./apps/ci/mac/ci-compile.sh
       - name: Run unit tests
-        if: steps.check.outputs.triggered == 'true'
+        if: steps.check.outputs.triggered == 'true' || {{ github.ref == 'ref/head/master' }}
         run: source ./apps/ci/ci-run-unit-tests.sh
