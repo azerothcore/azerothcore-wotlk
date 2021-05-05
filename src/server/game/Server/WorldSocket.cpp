@@ -475,11 +475,10 @@ int WorldSocket::handle_input_header(void)
     EndianConvertReverse(header.size);
     EndianConvert(header.cmd);
 
-    if ((header.size < 4) || (header.size > 10240) || (header.cmd  > 10240))
+    if ((header.size < 4) || (header.size > 10240) || (header.cmd > 10240))
     {
-        Player* _player = m_Session ? m_Session->GetPlayer() : nullptr;
-        LOG_ERROR("server", "WorldSocket::handle_input_header(): client (account: %u, char [%s, name: %s]) sent malformed packet (size: %d, cmd: %d)",
-            m_Session ? m_Session->GetAccountId() : 0, _player ? _player->GetGUID().ToString().c_str() : "", _player ? _player->GetName().c_str() : "<none>", header.size, header.cmd);
+        LOG_ERROR("server", "WorldSocket::handle_input_header(): client (%s) sent malformed packet (size: %hd, cmd: %d)",
+            GetRemoteAddress().c_str(), header.size, header.cmd);
 
         errno = EINVAL;
         return -1;
