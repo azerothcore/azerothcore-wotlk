@@ -440,7 +440,7 @@ bool LoadRealmInfo()
     {
         LOG_ERROR("server.worldserver", "> Not found realm with ID %u", realm.Id.Realm);
         return false;
-    } 
+    }
 
     Field* fields = result->Fetch();
     realm.Name = fields[1].GetString();

@@ -514,7 +514,7 @@ bool AuthSocket::_HandleLogonChallenge()
                         uint8 secLevel = fields[4].GetUInt8();
                         _accountSecurityLevel = secLevel <= SEC_ADMINISTRATOR ? AccountTypes(secLevel) : SEC_ADMINISTRATOR;
 
-                        LOG_DEBUG("network", "[AuthChallenge]: '%s:%d' account %s is using '%c%c%c%c' locale (%u)", 
+                        LOG_DEBUG("network", "[AuthChallenge]: '%s:%d' account %s is using '%c%c%c%c' locale (%u)",
                             socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
 
                         ///- All good, await client's proof
@@ -523,7 +523,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     else
                     {
                         pkt << uint8(WOW_FAIL_VERSION_INVALID);
-                    }  
+                    }
                 }
             }
         }

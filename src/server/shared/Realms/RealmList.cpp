@@ -51,7 +51,7 @@ void RealmList::LoadBuildInfo()
             else
             {
                 std::fill(hotfixVersion.begin(), hotfixVersion.end(), '\0');
-            } 
+            }
 
             build.Build = fields[4].GetUInt32();
             std::string windowsHash = fields[5].GetString();
@@ -59,7 +59,7 @@ void RealmList::LoadBuildInfo()
             if (windowsHash.length() == build.WindowsHash.size() * 2)
             {
                 HexStrToByteArray(windowsHash, build.WindowsHash);
-            } 
+            }
 
             std::string macHash = fields[6].GetString();
 
