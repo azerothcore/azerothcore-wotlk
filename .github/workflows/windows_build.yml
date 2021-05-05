@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - 'master'
-  pull_request:
   issue_comment:
     types: [created]
 
@@ -22,8 +21,6 @@ jobs:
           reaction: rocket
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: 'echo Running Build Now!'
-        if: steps.check.outputs.triggered == 'true'
       - uses: actions/checkout@v2
         if: steps.check.outputs.triggered == 'true'
       - name: Configure OS
