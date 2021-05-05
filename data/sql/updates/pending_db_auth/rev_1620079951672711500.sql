@@ -6,8 +6,8 @@ INSERT INTO `version_db_auth` (`sql_rev`) VALUES ('1620079951672711500');
 
 DROP TABLE IF EXISTS `secret_digest`;
 CREATE TABLE `secret_digest` (
-  `id` int(10) unsigned not null,
-  `digest` varchar(100) not null,
+  `id` INT UNSIGNED NOT NULL,
+  `digest` VARCHAR(100) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
