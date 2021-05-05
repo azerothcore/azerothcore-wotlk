@@ -509,7 +509,7 @@ bool AuthSocket::_HandleLogonChallenge()
         pkt << uint8(WOW_FAIL_VERSION_INVALID);
         SendAuthPacket();
         return true;
-    }        
+    }
 
     pkt << uint8(WOW_SUCCESS);
 
