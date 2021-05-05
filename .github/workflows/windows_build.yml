@@ -17,10 +17,10 @@ jobs:
       - uses: khan/pull-request-comment-trigger@master
         id: check
         with:
-          trigger: '/run-build'
+          trigger: 'run-build'
           reaction: rocket
         env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: 'echo Running Build Now!'
         if: steps.check.outputs.triggered == 'true'
       - uses: actions/checkout@v2
