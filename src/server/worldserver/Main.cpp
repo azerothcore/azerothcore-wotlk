@@ -15,6 +15,7 @@
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
 #include "Master.h"
+#include "SharedDefines.h"
 #include <ace/Version.h>
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
@@ -56,6 +57,8 @@ void usage(const char* prog)
 /// Launch the Trinity server
 extern int main(int argc, char** argv)
 {
+    acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_WORLDSERVER;
+
     ///- Command line parsing to get the configuration file name
     std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_CORE_CONFIG);
     int c = 1;

@@ -75,7 +75,7 @@ std::optional<SessionKey> SRP6::VerifyChallengeResponse(EphemeralKey const& A, S
     _used = true;
 
     BigNumber const _A(A);
-    if ((_A % _N).isZero())
+    if ((_A % _N).IsZero())
         return std::nullopt;
 
     BigNumber const u(SHA1::GetDigestOf(A, B));

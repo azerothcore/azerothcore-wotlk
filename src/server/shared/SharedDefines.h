@@ -3605,4 +3605,23 @@ enum NavTerrain
                   // we only have 8 bits
 };
 
+enum ServerProcessTypes
+{
+    SERVER_PROCESS_AUTHSERVER = 0,
+    SERVER_PROCESS_WORLDSERVER = 1,
+
+    NUM_SERVER_PROCESS_TYPES
+};
+
+namespace acore::Impl
+{
+    struct AC_SHARED_API CurrentServerProcessHolder
+    {
+        static ServerProcessTypes type() { return _type; }
+        static ServerProcessTypes _type;
+    };
+}
+
+#define THIS_SERVER_PROCESS (acore::Impl::CurrentServerProcessHolder::type())
+
 #endif
