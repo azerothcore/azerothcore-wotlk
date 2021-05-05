@@ -151,6 +151,11 @@ public:
     {
         PrepareSpellScript(spell_magmadar_lava_bomb_SpellScript);
 
+        bool Validate(SpellInfo const* /*spellInfo*/) override
+        {
+            return ValidateSpellInfo({ SPELL_LAVA_BOMB_EFFECT, SPELL_LAVA_BOMB_RANGED_EFFECT });
+        }
+
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if (Unit* target = GetHitUnit())
@@ -173,7 +178,7 @@ public:
                         return;
                     }
                 }
-                target->CastSpell(target, spellId, true, nullptr, nullptr, GetCaster() ? GetCaster()->GetGUID() : 0);
+                target->CastSpell(target, spellId, true, nullptr, nullptr, GetCaster()->GetGUID());
             }
         }
 
