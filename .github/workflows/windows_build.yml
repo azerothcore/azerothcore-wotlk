@@ -25,21 +25,26 @@ jobs:
       - run: 'echo Running Build Now!'
         if: steps.check.outputs.triggered == 'true'
       - uses: actions/checkout@v2
+        if: steps.check.outputs.triggered == 'true'
       - name: Configure OS
         run: choco install --no-progress openssl
+        if: steps.check.outputs.triggered == 'true'
       - name: Build
         shell: bash
+        if: steps.check.outputs.triggered == 'true'
         run: |
           mkdir -p build && cd build
           cmake .. -DTOOLS=ON
           cmake --build . --config Release --parallel 4
       - name: Copy dll files
         shell: bash
+        if: steps.check.outputs.triggered == 'true'
         run: |
           cp "/c/mysql-5.7.21-winx64/lib/libmysql.dll" "build/bin/Release/"
           cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "build/bin/Release/"
           cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "build/bin/Release/"
       - uses: actions/upload-artifact@v2
+        if: steps.check.outputs.triggered == 'true'
         with:
           name: windows-2019-MSVC16-release
           path: build/bin/Release
