@@ -389,7 +389,9 @@ bool AuthSocket::_HandleLogonChallenge()
 
         _localizationName.resize(4);
         for (int i = 0; i < 4; ++i)
+        {
             _localizationName[i] = ch->country[4 - i - 1];
+        }
 
         PreparedQueryResult res2 = LoginDatabase.Query(stmt);
         if (res2)
@@ -512,14 +514,16 @@ bool AuthSocket::_HandleLogonChallenge()
                         uint8 secLevel = fields[4].GetUInt8();
                         _accountSecurityLevel = secLevel <= SEC_ADMINISTRATOR ? AccountTypes(secLevel) : SEC_ADMINISTRATOR;
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-                        LOG_DEBUG("network", "'%s:%d' [AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
-#endif
+                        LOG_DEBUG("network", "[AuthChallenge]: '%s:%d' account %s is using '%c%c%c%c' locale (%u)", 
+                            socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
+
                         ///- All good, await client's proof
                         _status = STATUS_LOGON_PROOF;
                     }
                     else
+                    {
                         pkt << uint8(WOW_FAIL_VERSION_INVALID);
+                    }  
                 }
             }
         }
@@ -841,7 +845,9 @@ ACE_INET_Addr const& AuthSocket::GetAddressForClient(Realm const& realm, ACE_INE
 
     // Check if connecting client is in the same network
     if (IsIPAddrInNetwork(*realm.LocalAddress, clientAddr, *realm.LocalSubnetMask))
+    {
         return *realm.LocalAddress;
+    }
 
     // Return external IP
     return *realm.ExternalAddress;

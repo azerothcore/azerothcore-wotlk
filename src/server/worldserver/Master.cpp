@@ -437,7 +437,10 @@ bool LoadRealmInfo()
 {
     QueryResult result = LoginDatabase.PQuery("SELECT id, name, address, localAddress, localSubnetMask, port, icon, flag, timezone, allowedSecurityLevel, population, gamebuild FROM realmlist WHERE id = %u", realm.Id.Realm);
     if (!result)
+    {
+        LOG_ERROR("server.worldserver", "> Not found realm with ID %u", realm.Id.Realm);
         return false;
+    } 
 
     Field* fields = result->Fetch();
     realm.Name = fields[1].GetString();

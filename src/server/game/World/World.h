@@ -324,8 +324,8 @@ public:
     void LoadWorldStates();
 
     /// Are we on a "Player versus Player" server?
-    bool IsPvPRealm() const;
-    bool IsFFAPvPRealm() const;
+    [[nodiscard]] bool IsPvPRealm() const;
+    [[nodiscard]] bool IsFFAPvPRealm() const;
 
     void KickAll();
     void KickAllLess(AccountTypes sec);

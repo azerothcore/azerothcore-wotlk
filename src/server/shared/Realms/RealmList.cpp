@@ -45,20 +45,28 @@ void RealmList::LoadBuildInfo()
             std::string hotfixVersion = fields[3].GetString();
 
             if (hotfixVersion.length() < build.HotfixVersion.size())
+            {
                 std::copy(hotfixVersion.begin(), hotfixVersion.end(), build.HotfixVersion.begin());
+            }
             else
+            {
                 std::fill(hotfixVersion.begin(), hotfixVersion.end(), '\0');
+            } 
 
             build.Build = fields[4].GetUInt32();
             std::string windowsHash = fields[5].GetString();
 
             if (windowsHash.length() == build.WindowsHash.size() * 2)
+            {
                 HexStrToByteArray(windowsHash, build.WindowsHash);
+            } 
 
             std::string macHash = fields[6].GetString();
 
             if (macHash.length() == build.MacHash.size() * 2)
+            {
                 HexStrToByteArray(macHash, build.MacHash);
+            }
 
         } while (result->NextRow());
     }
@@ -102,7 +110,9 @@ void RealmList::UpdateIfNeed()
 {
     // maybe disabled or updated recently
     if (!_updateInterval || _nextUpdateTime > time(nullptr))
+    {
         return;
+    }
 
     _nextUpdateTime = time(nullptr) + _updateInterval;
 
@@ -119,7 +129,9 @@ void RealmList::UpdateRealms()
 
     std::map<RealmHandle, std::string> existingRealms;
     for (auto const& [handle, realm] : _realms)
+    {
         existingRealms[handle] = realm.Name;
+    }
 
     _realms.clear();
 
@@ -181,9 +193,13 @@ void RealmList::UpdateRealms()
                 timezone, (allowedSecurityLevel <= SEC_ADMINISTRATOR ? AccountTypes(allowedSecurityLevel) : SEC_ADMINISTRATOR), pop);
 
             if (!existingRealms.count(id))
+            {
                 LOG_INFO("server.authserver", "Added realm \"%s\" at %s:%u.", name.c_str(), externalAddressString.c_str(), port);
+            }
             else
+            {
                 LOG_DEBUG("server.authserver", "Updating realm \"%s\" at %s:%u.", name.c_str(), externalAddressString.c_str(), port);
+            }
 
             existingRealms.erase(id);
         } while (result->NextRow());
@@ -194,7 +210,9 @@ Realm const* RealmList::GetRealm(RealmHandle const& id) const
 {
     auto itr = _realms.find(id);
     if (itr != _realms.end())
+    {
         return &itr->second;
+    }
 
     return nullptr;
 }
@@ -202,8 +220,12 @@ Realm const* RealmList::GetRealm(RealmHandle const& id) const
 RealmBuildInfo const* RealmList::GetBuildInfo(uint32 build) const
 {
     for (RealmBuildInfo const& clientBuild : _builds)
+    {
         if (clientBuild.Build == build)
+        {
             return &clientBuild;
+        }
+    }
 
     return nullptr;
 }
