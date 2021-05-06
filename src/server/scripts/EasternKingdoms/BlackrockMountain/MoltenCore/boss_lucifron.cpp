@@ -40,7 +40,7 @@ public:
         {
         }
 
-        void EnterCombat(Unit* /*attacker*/) override
+        void EnterCombat(Unit* /*victim*/) override
         {
             _EnterCombat();
             events.ScheduleEvent(EVENT_IMPENDING_DOOM, urand(6000, 11000));
