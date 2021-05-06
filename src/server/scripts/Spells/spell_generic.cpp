@@ -194,7 +194,7 @@ public:
                 }
 
                 if (entry)
-                    target->ToPlayer()->KilledMonsterCredit(entry, 0);
+                    target->ToPlayer()->KilledMonsterCredit(entry);
             }
         }
 
@@ -2373,7 +2373,7 @@ public:
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             // Remove all auras with spell id 46221, except the one currently being applied
-            while (Aura* aur = GetUnitOwner()->GetOwnedAura(SPELL_ANIMAL_BLOOD, 0, 0, 0, GetAura()))
+            while (Aura* aur = GetUnitOwner()->GetOwnedAura(SPELL_ANIMAL_BLOOD, ObjectGuid::Empty, ObjectGuid::Empty, 0, GetAura()))
                 GetUnitOwner()->RemoveOwnedAura(aur);
         }
 
@@ -3148,7 +3148,7 @@ public:
             if (Unit* target = GetHitUnit())
             {
                 WorldPacket data(SMSG_SPIRIT_HEALER_CONFIRM, 8);
-                data << uint64(target->GetGUID());
+                data << target->GetGUID();
                 originalCaster->GetSession()->SendPacket(&data);
             }
         }
@@ -4549,7 +4549,7 @@ public:
                 target->SetTemporaryUnsummonedPetNumber(0);
 
                 // Prevent stacking of mounts and client crashes upon dismounting
-                target->RemoveAurasByType(SPELL_AURA_MOUNTED, 0, GetHitAura());
+                target->RemoveAurasByType(SPELL_AURA_MOUNTED, ObjectGuid::Empty, GetHitAura());
 
                 // Triggered spell id dependent on riding skill and zone
                 bool canFly = false;
@@ -5096,7 +5096,7 @@ public:
             bool instant_exit = true;
             if (Player* pCaster = caster->ToPlayer()) // if is a creature instant exits combat, else check if someone in party is in combat in visibility distance
             {
-                uint64 myGUID = pCaster->GetGUID();
+                ObjectGuid myGUID = pCaster->GetGUID();
                 float visibilityRange = pCaster->GetMap()->GetVisibilityRange();
                 if (Group* pGroup = pCaster->GetGroup())
                 {
