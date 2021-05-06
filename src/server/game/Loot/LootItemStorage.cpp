@@ -40,7 +40,7 @@ void LootItemStorage::LoadStorageFromDB()
     {
         Field* fields = result->Fetch();
 
-        StoredLootItemList& itemList = lootItemStore[fields[0].GetUInt32()];
+        StoredLootItemList& itemList = lootItemStore[ObjectGuid::Create<HighGuid::Item>(fields[0].GetUInt32())];
         itemList.push_back(StoredLootItem(fields[1].GetUInt32(), fields[2].GetUInt32(), fields[3].GetInt32(), fields[4].GetUInt32()));
 
         ++count;
@@ -50,11 +50,12 @@ void LootItemStorage::LoadStorageFromDB()
     LOG_INFO("server", " ");
 }
 
-void LootItemStorage::RemoveEntryFromDB(uint32 containerId, uint32 itemid, uint32 count)
+void LootItemStorage::RemoveEntryFromDB(ObjectGuid containerGUID, uint32 itemid, uint32 count)
 {
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEMCONTAINER_SINGLE_ITEM);
-    stmt->setUInt32(0, containerId);
+    stmt->setUInt32(0, containerGUID.GetCounter());
     stmt->setUInt32(1, itemid);
     stmt->setUInt32(2, count);
     trans->Append(stmt);
@@ -64,16 +65,16 @@ void LootItemStorage::RemoveEntryFromDB(uint32 containerId, uint32 itemid, uint3
 
 void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
 {
-    if (lootItemStore.find(loot->containerId) != lootItemStore.end())
+    if (lootItemStore.find(loot->containerGUID) != lootItemStore.end())
     {
-        LOG_INFO("misc", "LootItemStorage::AddNewStoredLoot (A1) - %u!", loot->containerId);
+        LOG_INFO("misc", "LootItemStorage::AddNewStoredLoot (A1) - %s!", loot->containerGUID.ToString().c_str());
         return;
     }
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
     PreparedStatement* stmt = nullptr;
 
-    StoredLootItemList& itemList = lootItemStore[loot->containerId];
+    StoredLootItemList& itemList = lootItemStore[loot->containerGUID];
 
     // Gold at first
     if (loot->gold)
@@ -81,7 +82,7 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
         itemList.push_back(StoredLootItem(0, loot->gold, 0, 0));
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEMCONTAINER_SINGLE_ITEM);
-        stmt->setUInt32(0, loot->containerId);
+        stmt->setUInt32(0, loot->containerGUID.GetCounter());
         stmt->setUInt32(1, 0);
         stmt->setUInt32(2, loot->gold);
         stmt->setInt32(3, 0);
@@ -106,7 +107,7 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
             itemList.push_back(StoredLootItem(li->itemid, li->count, li->randomPropertyId, li->randomSuffix));
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEMCONTAINER_SINGLE_ITEM);
-            stmt->setUInt32(0, loot->containerId);
+            stmt->setUInt32(0, loot->containerGUID.GetCounter());
             stmt->setUInt32(1, li->itemid);
             stmt->setUInt32(2, li->count);
             stmt->setInt32 (3, li->randomPropertyId);
@@ -120,7 +121,7 @@ void LootItemStorage::AddNewStoredLoot(Loot* loot, Player* /*player*/)
 bool LootItemStorage::LoadStoredLoot(Item* item)
 {
     Loot* loot = &item->loot;
-    LootItemContainer::iterator itr = lootItemStore.find(loot->containerId);
+    LootItemContainer::iterator itr = lootItemStore.find(loot->containerGUID);
     if (itr == lootItemStore.end())
         return false;
 
@@ -145,7 +146,7 @@ bool LootItemStorage::LoadStoredLoot(Item* item)
         li.needs_quest = false;
         li.randomPropertyId = it2->randomPropertyId;
         li.randomSuffix = it2->randomSuffix;
-        li.rollWinnerGUID = 0;
+        li.rollWinnerGUID = ObjectGuid::Empty;
 
         loot->items.push_back(li);
         loot->unlootedCount++;
@@ -156,9 +157,9 @@ bool LootItemStorage::LoadStoredLoot(Item* item)
     return true;
 }
 
-void LootItemStorage::RemoveStoredLootItem(uint32 containerId, uint32 itemid, uint32 count, Loot* loot)
+void LootItemStorage::RemoveStoredLootItem(ObjectGuid containerGUID, uint32 itemid, uint32 count, Loot* loot)
 {
-    LootItemContainer::iterator itr = lootItemStore.find(containerId);
+    LootItemContainer::iterator itr = lootItemStore.find(containerGUID);
     if (itr == lootItemStore.end())
         return;
 
@@ -166,7 +167,7 @@ void LootItemStorage::RemoveStoredLootItem(uint32 containerId, uint32 itemid, ui
     for (StoredLootItemList::iterator it2 = itemList.begin(); it2 != itemList.end(); ++it2)
         if (it2->itemid == itemid && it2->count == count)
         {
-            RemoveEntryFromDB(containerId, itemid, count);
+            RemoveEntryFromDB(containerGUID, itemid, count);
             itemList.erase(it2);
             break;
         }
@@ -177,9 +178,9 @@ void LootItemStorage::RemoveStoredLootItem(uint32 containerId, uint32 itemid, ui
         lootItemStore.erase(itr);
 }
 
-void LootItemStorage::RemoveStoredLootMoney(uint32 containerId, Loot* loot)
+void LootItemStorage::RemoveStoredLootMoney(ObjectGuid containerGUID, Loot* loot)
 {
-    LootItemContainer::iterator itr = lootItemStore.find(containerId);
+    LootItemContainer::iterator itr = lootItemStore.find(containerGUID);
     if (itr == lootItemStore.end())
         return;
 
@@ -187,7 +188,7 @@ void LootItemStorage::RemoveStoredLootMoney(uint32 containerId, Loot* loot)
     for (StoredLootItemList::iterator it2 = itemList.begin(); it2 != itemList.end(); ++it2)
         if (it2->itemid == 0)
         {
-            RemoveEntryFromDB(containerId, 0, it2->count);
+            RemoveEntryFromDB(containerGUID, 0, it2->count);
             itemList.erase(it2);
             break;
         }
@@ -198,13 +199,14 @@ void LootItemStorage::RemoveStoredLootMoney(uint32 containerId, Loot* loot)
         lootItemStore.erase(itr);
 }
 
-void LootItemStorage::RemoveStoredLoot(uint32 containerId)
+void LootItemStorage::RemoveStoredLoot(ObjectGuid containerGUID)
 {
-    lootItemStore.erase(containerId);
+    lootItemStore.erase(containerGUID);
 
     SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEMCONTAINER_CONTAINER);
-    stmt->setUInt32(0, containerId);
+    stmt->setUInt32(0, containerGUID.GetCounter());
     trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);

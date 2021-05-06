@@ -54,7 +54,7 @@ public:
         if (creature->AI()->GetData(1))
         {
             creature->CastSpell(player, SPELL_MARK_OF_BITE, true);
-            player->KilledMonsterCredit(creature->GetEntry(), 0);
+            player->KilledMonsterCredit(creature->GetEntry());
             creature->DespawnOrUnsummon(1000);
         }
         else

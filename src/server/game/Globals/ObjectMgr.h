@@ -461,14 +461,12 @@ struct BroadcastText
 
 typedef std::unordered_map<uint32, BroadcastText> BroadcastTextContainer;
 
-typedef std::set<uint32> CellGuidSet;
-typedef std::unordered_map<uint32/*player guid*/, uint32/*instance*/> CellCorpseSet;
+typedef std::set<ObjectGuid::LowType> CellGuidSet;
 
 struct CellObjectGuids
 {
     CellGuidSet creatures;
     CellGuidSet gameobjects;
-    CellCorpseSet corpses;
 };
 
 typedef std::unordered_map<uint32/*cell_id*/, CellObjectGuids> CellObjectGuidsMap;
@@ -488,9 +486,9 @@ struct AcoreString
     StringVector Content;
 };
 
-typedef std::map<uint64, uint64> LinkedRespawnContainer;
-typedef std::unordered_map<uint32, CreatureData> CreatureDataContainer;
-typedef std::unordered_map<uint32, GameObjectData> GameObjectDataContainer;
+typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;
+typedef std::unordered_map<ObjectGuid::LowType, CreatureData> CreatureDataContainer;
+typedef std::unordered_map<ObjectGuid::LowType, GameObjectData> GameObjectDataContainer;
 typedef std::map<TempSummonGroupKey, std::vector<TempSummonData> > TempSummonDataContainer;
 typedef std::unordered_map<uint32, CreatureLocale> CreatureLocaleContainer;
 typedef std::unordered_map<uint32, GameObjectLocale> GameObjectLocaleContainer;
@@ -716,8 +714,6 @@ public:
 
     typedef std::map<uint32, uint32> CharacterConversionMap;
 
-    [[nodiscard]] Player* GetPlayerByLowGUID(uint32 lowguid) const;
-
     GameObjectTemplate const* GetGameObjectTemplate(uint32 entry);
     bool IsGameObjectStaticTransport(uint32 entry);
     [[nodiscard]] GameObjectTemplateContainer const* GetGameObjectTemplates() const { return &_gameObjectTemplateStore; }
@@ -734,8 +730,8 @@ public:
     static uint32 ChooseDisplayId(CreatureTemplate const* cinfo, CreatureData const* data = nullptr);
     static void ChooseCreatureFlags(CreatureTemplate const* cinfo, uint32& npcflag, uint32& unit_flags, uint32& dynamicflags, CreatureData const* data = nullptr);
     EquipmentInfo const* GetEquipmentInfo(uint32 entry, int8& id);
-    CreatureAddon const* GetCreatureAddon(uint32 lowguid);
-    GameObjectAddon const* GetGameObjectAddon(uint32 lowguid);
+    CreatureAddon const* GetCreatureAddon(ObjectGuid::LowType lowguid);
+    GameObjectAddon const* GetGameObjectAddon(ObjectGuid::LowType lowguid);
     [[nodiscard]] GameObjectTemplateAddon const* GetGameObjectTemplateAddon(uint32 entry) const;
     CreatureAddon const* GetCreatureTemplateAddon(uint32 entry);
     ItemTemplate const* GetItemTemplate(uint32 entry);
@@ -766,10 +762,10 @@ public:
 
     void GetPlayerLevelInfo(uint32 race, uint32 class_, uint8 level, PlayerLevelInfo* info) const;
 
-    [[nodiscard]] uint64 GetPlayerGUIDByName(std::string const& name) const;
-    bool GetPlayerNameByGUID(uint64 guid, std::string& name) const;
-    [[nodiscard]] TeamId GetPlayerTeamIdByGUID(uint64 guid) const;
-    [[nodiscard]] uint32 GetPlayerAccountIdByGUID(uint64 guid) const;
+    [[nodiscard]] ObjectGuid GetPlayerGUIDByName(std::string const& name) const;
+    bool GetPlayerNameByGUID(ObjectGuid::LowType lowGuid, std::string& name) const;
+    [[nodiscard]] TeamId GetPlayerTeamIdByGUID(ObjectGuid::LowType guid) const;
+    [[nodiscard]] uint32 GetPlayerAccountIdByGUID(ObjectGuid::LowType guid) const;
     [[nodiscard]] uint32 GetPlayerAccountIdByPlayerName(std::string const& name) const;
 
     uint32 GetNearestTaxiNode(float x, float y, float z, uint32 mapid, uint32 teamId);
@@ -988,7 +984,7 @@ public:
     void LoadTempSummons();
     void LoadCreatures();
     void LoadLinkedRespawn();
-    bool SetCreatureLinkedRespawn(uint32 guid, uint32 linkedGuid);
+    bool SetCreatureLinkedRespawn(ObjectGuid::LowType guid, ObjectGuid::LowType linkedGuid);
     void LoadCreatureAddons();
     void LoadGameObjectAddons();
     void LoadCreatureModelInfo();
@@ -1030,7 +1026,6 @@ public:
     void LoadExplorationBaseXP();
     void LoadPetNames();
     void LoadPetNumber();
-    void LoadCorpses();
     void LoadFishingBaseSkillLevel();
     void ChangeFishingBaseSkillLevel(uint32 entry, int32 skill);
 
@@ -1067,12 +1062,20 @@ public:
     CreatureBaseStats const* GetCreatureBaseStats(uint8 level, uint8 unitClass);
 
     void SetHighestGuids();
-    uint32 GenerateLowGuid(HighGuid guidhigh);
-    uint32 GenerateRecycledLowGuid(HighGuid guidHigh);
+
+    template<HighGuid type>
+    inline ObjectGuidGeneratorBase& GetGenerator()
+    {
+        static_assert(ObjectGuidTraits<type>::Global, "Only global guid can be generated in ObjectMgr context");
+        return GetGuidSequenceGenerator<type>();
+    }
+
     uint32 GenerateAuctionID();
     uint64 GenerateEquipmentSetGuid();
     uint32 GenerateMailID();
     uint32 GeneratePetNumber();
+    ObjectGuid::LowType GenerateCreatureSpawnId();
+    ObjectGuid::LowType GenerateGameObjectSpawnId();
 
     typedef std::multimap<int32, uint32> ExclusiveQuestGroups;
     typedef std::pair<ExclusiveQuestGroups::const_iterator, ExclusiveQuestGroups::const_iterator> ExclusiveQuestGroupsBounds;
@@ -1137,26 +1140,27 @@ public:
             return &itr->second;
         return nullptr;
     }
-    [[nodiscard]] CreatureData const* GetCreatureData(uint32 guid) const
+    [[nodiscard]] CreatureData const* GetCreatureData(ObjectGuid::LowType spawnId) const
     {
-        CreatureDataContainer::const_iterator itr = _creatureDataStore.find(guid);
+        CreatureDataContainer::const_iterator itr = _creatureDataStore.find(spawnId);
         if (itr == _creatureDataStore.end()) return nullptr;
         return &itr->second;
     }
-    CreatureData& NewOrExistCreatureData(uint32 guid) { return _creatureDataStore[guid]; }
-    void DeleteCreatureData(uint32 guid);
-    [[nodiscard]] uint64 GetLinkedRespawnGuid(uint64 guid) const
+    CreatureData& NewOrExistCreatureData(ObjectGuid::LowType spawnId) { return _creatureDataStore[spawnId]; }
+    void DeleteCreatureData(ObjectGuid::LowType spawnId);
+    [[nodiscard]] ObjectGuid GetLinkedRespawnGuid(ObjectGuid guid) const
     {
         LinkedRespawnContainer::const_iterator itr = _linkedRespawnStore.find(guid);
-        if (itr == _linkedRespawnStore.end()) return 0;
+        if (itr == _linkedRespawnStore.end())
+            return ObjectGuid::Empty;
         return itr->second;
     }
 
-    [[nodiscard]] GameObjectData const* GetGOData(uint32 guid) const
+    [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
     {
-        GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(guid);
+        GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
         if (itr == _gameObjectDataStore.end()) return nullptr;
-        return &itr->second;
+            return &itr->second;
     }
     [[nodiscard]] CreatureLocale const* GetCreatureLocale(uint32 entry) const
     {
@@ -1224,8 +1228,8 @@ public:
         if (itr == _npcTextLocaleStore.end()) return nullptr;
         return &itr->second;
     }
-    GameObjectData& NewGOData(uint32 guid) { return _gameObjectDataStore[guid]; }
-    void DeleteGOData(uint32 guid);
+    GameObjectData& NewGOData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
+    void DeleteGOData(ObjectGuid::LowType guid);
 
     [[nodiscard]] AcoreString const* GetAcoreString(uint32 entry) const
     {
@@ -1240,17 +1244,13 @@ public:
     [[nodiscard]] LocaleConstant GetDBCLocaleIndex() const { return DBCLocaleIndex; }
     void SetDBCLocaleIndex(LocaleConstant locale) { DBCLocaleIndex = locale; }
 
-    void AddCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_guid, uint32 instance);
-    void DeleteCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_guid);
-
     // grid objects
-    void AddCreatureToGrid(uint32 guid, CreatureData const* data);
-    void RemoveCreatureFromGrid(uint32 guid, CreatureData const* data);
-    void AddGameobjectToGrid(uint32 guid, GameObjectData const* data);
-    void RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data);
+    void AddCreatureToGrid(ObjectGuid::LowType guid, CreatureData const* data);
+    void RemoveCreatureFromGrid(ObjectGuid::LowType guid, CreatureData const* data);
+    void AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData const* data);
+    void RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectData const* data);
     uint32 AddGOData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0, float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
     uint32 AddCreData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
-    bool MoveCreData(uint32 guid, uint32 map, Position pos);
 
     // reserved names
     void LoadReservedPlayersNames();
@@ -1351,35 +1351,26 @@ private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread
     uint64 _equipmentSetGuid; // pussywizard: accessed by a single thread
-    uint32 _itemTextId; // pussywizard: unused? xD
     uint32 _mailId;
     std::mutex _mailIdMutex;
     uint32 _hiPetNumber;
     std::mutex _hiPetNumberMutex;
 
-    // first free low guid for selected guid type
-    uint32 _hiCharGuid; // pussywizard: accessed by a single thread
-    uint32 _hiCreatureGuid;
-    std::mutex _hiCreatureGuidMutex;
-    uint32 _hiPetGuid;
-    std::mutex _hiPetGuidMutex;
-    uint32 _hiVehicleGuid;
-    std::mutex _hiVehicleGuidMutex;
-    uint32 _hiItemGuid;
-    std::mutex _hiItemGuidMutex;
-    uint32 _hiGoGuid;
-    std::mutex _hiGoGuidMutex;
-    uint32 _hiDoGuid;
-    std::mutex _hiDoGuidMutex;
-    uint32 _hiCorpseGuid;
-    std::mutex _hiCorpseGuidMutex;
-    uint32 _hiMoTransGuid;
-    std::mutex _hiMoTransGuidMutex;
+    ObjectGuid::LowType _creatureSpawnId;
+    ObjectGuid::LowType _gameObjectSpawnId;
 
-    uint32 _hiCreatureRecycledGuidMax;
-    uint32 _hiCreatureRecycledGuid;
-    uint32 _hiGoRecycledGuidMax;
-    uint32 _hiGoRecycledGuid;
+    // first free low guid for selected guid type
+    template<HighGuid high>
+    inline ObjectGuidGeneratorBase& GetGuidSequenceGenerator()
+    {
+        auto itr = _guidGenerators.find(high);
+        if (itr == _guidGenerators.end())
+            itr = _guidGenerators.insert(std::make_pair(high, std::unique_ptr<ObjectGuidGenerator<high>>(new ObjectGuidGenerator<high>()))).first;
+
+        return *itr->second;
+    }
+
+    std::map<HighGuid, std::unique_ptr<ObjectGuidGeneratorBase>> _guidGenerators;
 
     QuestMap _questTemplates;
     std::vector<Quest*> _questTemplatesFast; // pussywizard
