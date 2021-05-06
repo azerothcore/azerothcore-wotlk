@@ -128,6 +128,12 @@ void SmartAIMgr::LoadSmartAIFromDB()
         SmartScriptHolder temp;
 
         temp.entryOrGuid = fields[0].GetInt32();
+        if (!temp.entryOrGuid)
+        {
+            LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: invalid entryorguid (0), skipped loading.");
+            continue;
+        }
+
         SmartScriptType source_type = (SmartScriptType)fields[1].GetUInt8();
         if (source_type >= SMART_SCRIPT_TYPE_MAX)
         {
