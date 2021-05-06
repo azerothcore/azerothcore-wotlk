@@ -1,3 +1,19 @@
+-- DB update 2021_05_05_02 -> 2021_05_06_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_05_02';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_05_02 2021_05_06_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1619501292588526500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1619501292588526500');
 
 DELETE FROM `spell_dbc` WHERE `ID` IN (5143,5144,5145,8416,8417,10211,10212,25345,27075,38699,38704,42843,42846);
@@ -18,3 +34,12 @@ INSERT IGNORE INTO `spell_dbc` (`ID`, `Category`, `DispelType`, `Mechanic`, `Att
 (42846,0,0,0,536936704,335561860,0,0,134217728,8192,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,15,0,31756,0,101,0,83,79,79,28,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,6,6,0,0,0,0,0,0,0,0,0,0,0,0,0,6,1,0,0,0,0,0,0,0,4,23,0,0,1000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,42845,0,0,0,0,0,0,0,0,0,0,0,0,0,262,0,225,0,50,"Arcane Missiles","","","","","","","","","","","","","","","",16712190,"Rank 13","","","","","","","","","","","","","","","",16712190,"Launches Arcane Missiles at the enemy, causing $42845s1 Arcane damage every $t2 sec for $d.","","","","","","","","","","","","","","","",16712190,"","","","","","","","","","","","","","","","",16712188,31,133,1500,0,3,2048,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,64,0,0,0,0,0,0,0,0,0,0); 
 
 UPDATE `spell_dbc` SET `AttributesEx3`=131072 WHERE `ID` IN (5143,5144,5145,8416,8417,10211,10212,25345,27075,38699,38704,42843,42846);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
