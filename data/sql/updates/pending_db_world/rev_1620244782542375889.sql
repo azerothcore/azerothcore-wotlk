@@ -10,6 +10,5 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (20474, 'spell_magmadar_lava_bomb');
 
 -- Renamed Core Hound script
-update creature_template set `ScriptName`='npc_mc_core_hound' WHERE entry=11671;
-
+update `creature_template` SET `ScriptName`='npc_mc_core_hound' WHERE `entry`=11671;
 

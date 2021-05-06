@@ -11,9 +11,9 @@ SDComment: Conflag on ground nyi
 SDCategory: Molten Core
 EndScriptData */
 
+#include "molten_core.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "molten_core.h"
 #include "SpellScript.h"
 
 enum Texts
