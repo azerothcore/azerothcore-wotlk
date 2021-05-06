@@ -25,7 +25,7 @@ enum Spells
 {
     SPELL_FRENZY                    = 19451,
     SPELL_MAGMA_SPIT                = 19449,
-    SPELL_PANIC                     = 19408,                    // Aoe fear
+    SPELL_PANIC                     = 19408,
     SPELL_LAVA_BOMB                 = 19411,                    // This calls a dummy server side effect that cast spell 20494 to spawn GO 177704 for 30s
     SPELL_LAVA_BOMB_EFFECT          = 20494,                    // Spawns trap GO 177704 which triggers 19428
     SPELL_LAVA_BOMB_RANGED          = 20474,                    // This calls a dummy server side effect that cast spell 20495 to spawn GO 177704 for 60s
