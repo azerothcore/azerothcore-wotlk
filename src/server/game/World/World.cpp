@@ -427,8 +427,8 @@ void World::LoadConfigSettings(bool reload)
         sLog->LoadFromConfig();
     }
 
-    if (uint32 realmId = sConfigMgr->GetOption<uint32>("RealmID", 0)) // 0 reserved for auth
-        sLog->SetRealmId(realmId);
+    // Set realm id and enable db logging
+    sLog->SetRealmId(realmID);
 
 #ifdef ELUNA
     ///- Initialize Lua Engine
