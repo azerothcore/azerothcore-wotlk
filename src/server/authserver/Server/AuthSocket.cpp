@@ -591,7 +591,7 @@ bool AuthSocket::_HandleLogonProof()
     {
         _sessionKey = *K;
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "'%s:%d' User '%s' successfully authenticated", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str());
+        LOG_DEBUG("network", "'%s:%d' User '%s' successfully authenticated", socket().getRemoteAddress().c_str(), socket().getRemotePort(), _accountInfo.Login.c_str());
 #endif
 
         // Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
