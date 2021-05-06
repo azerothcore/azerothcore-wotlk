@@ -221,7 +221,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_elder_nadoxAI(creature);
+        return GetAhnkahetAI<boss_elder_nadoxAI>(creature);
     }
 };
 
@@ -253,7 +253,7 @@ public:
             if (me->GetEntry() == NPC_AHNKAHAR_GUARDIAN_ENTRY)
             {
                 if (InstanceScript* pInstance = me->GetInstanceScript())
-                    if (Creature* nadox = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_ELDER_NADOX)))
+                    if (Creature* nadox = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_ELDER_NADOX)))
                         nadox->AI()->DoAction(ACTION_GUARDIAN_DIED);
 
                 me->RemoveAllAuras();
@@ -279,7 +279,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_ahnkahar_nerubianAI(creature);
+        return GetAhnkahetAI<npc_ahnkahar_nerubianAI>(creature);
     }
 };
 

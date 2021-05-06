@@ -247,16 +247,14 @@ public:
         {
             instance = creature->GetInstanceScript();
             SelectAddEntry();
-            for (uint8 i = 0; i < 4; ++i)
-                AddGUID[i] = 0;
         }
 
         InstanceScript* instance;
 
-        uint64 AddGUID[4];
+        ObjectGuid AddGUID[4];
         uint32 AddEntry[4];
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         uint32 SpiritBolts_Timer;
         uint32 DrainPower_Timer;
@@ -433,7 +431,7 @@ public:
                     trigger->GetMotionMaster()->MoveChase(me);
 
                     //DoCast(target, SPELL_SIPHON_SOUL, true);
-                    //me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, target->GetGUID());
+                    //me->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, target->GetGUID());
                     //me->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_SIPHON_SOUL);
 
                     PlayerGUID = target->GetGUID();
@@ -498,7 +496,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_hex_lord_malacrassAI>(creature);
+        return GetZulAmanAI<boss_hex_lord_malacrassAI>(creature);
     }
 };
 
@@ -555,7 +553,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_thurgAI>(creature);
+        return GetZulAmanAI<boss_thurgAI>(creature);
     }
 };
 
@@ -652,7 +650,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_alyson_antilleAI>(creature);
+        return GetZulAmanAI<boss_alyson_antilleAI>(creature);
     }
 };
 
@@ -746,7 +744,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_lord_raadanAI>(creature);
+        return GetZulAmanAI<boss_lord_raadanAI>(creature);
     }
 };
 
@@ -787,7 +785,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_darkheartAI>(creature);
+        return GetZulAmanAI<boss_darkheartAI>(creature);
     }
 };
 
@@ -845,7 +843,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_slitherAI>(creature);
+        return GetZulAmanAI<boss_slitherAI>(creature);
     }
 };
 
@@ -887,7 +885,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_fenstalkerAI>(creature);
+        return GetZulAmanAI<boss_fenstalkerAI>(creature);
     }
 };
 
@@ -935,7 +933,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_koraggAI>(creature);
+        return GetZulAmanAI<boss_koraggAI>(creature);
     }
 };
 

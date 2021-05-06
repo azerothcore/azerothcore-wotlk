@@ -66,7 +66,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             _JustDied();
-            if (Creature* Ossirian = me->GetMap()->GetCreature(instance->GetData64(DATA_OSSIRIAN)))
+            if (Creature* Ossirian = me->GetMap()->GetCreature(instance->GetGuidData(DATA_OSSIRIAN)))
                 sCreatureTextMgr->SendChat(Ossirian, SAY_KURINAXX_DEATH, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
         }
 
@@ -116,7 +116,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_kurinnaxxAI>(creature);
+        return GetRuinsOfAhnQirajAI<boss_kurinnaxxAI>(creature);
     }
 };
 

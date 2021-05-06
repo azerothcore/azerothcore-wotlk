@@ -64,8 +64,6 @@ void WorldRunnable::run()
 #endif
     }
 
-    sLog->SetLogDB(false);
-
     sScriptMgr->OnShutdown();
 
     sWorld->KickAll();                                       // save and kick all players
@@ -77,9 +75,8 @@ void WorldRunnable::run()
     sWorldSocketMgr->StopNetwork();
 
     sMapMgr->UnloadAll();                     // unload all grids (including locked in memory)
-    sObjectAccessor->UnloadAll();             // unload 'i_player2corpse' storage and remove from world
-    sScriptMgr->Unload();
     sOutdoorPvPMgr->Die();
+    sScriptMgr->Unload();
 #ifdef ELUNA
     Eluna::Uninitialize();
 #endif
@@ -87,7 +84,7 @@ void WorldRunnable::run()
 
 void AuctionListingRunnable::run()
 {
-    sLog->outString("Starting up Auction House Listing thread...");
+    LOG_INFO("server", "Starting up Auction House Listing thread...");
     while (!World::IsStopped())
     {
         if (AsyncAuctionListingMgr::IsAuctionListingAllowed())
@@ -97,10 +94,10 @@ void AuctionListingRunnable::run()
 
             if (AsyncAuctionListingMgr::GetTempList().size() || AsyncAuctionListingMgr::GetList().size())
             {
-                ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetLock());
+                std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetLock());
 
                 {
-                    ACORE_GUARD(ACE_Thread_Mutex, AsyncAuctionListingMgr::GetTempLock());
+                    std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
                     for (std::list<AuctionListItemsDelayEvent>::iterator itr = AsyncAuctionListingMgr::GetTempList().begin(); itr != AsyncAuctionListingMgr::GetTempList().end(); ++itr)
                         AsyncAuctionListingMgr::GetList().push_back( (*itr) );
                     AsyncAuctionListingMgr::GetTempList().clear();
@@ -125,5 +122,5 @@ void AuctionListingRunnable::run()
         }
         acore::Thread::Sleep(1);
     }
-    sLog->outString("Auction House Listing thread exiting without problems.");
+    LOG_INFO("server", "Auction House Listing thread exiting without problems.");
 }

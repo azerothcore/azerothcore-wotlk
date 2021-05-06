@@ -14,6 +14,7 @@ EndScriptData */
 #include "ScriptedCreature.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "the_underbog.h"
 
 enum eBlackStalker
 {
@@ -43,7 +44,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_the_black_stalkerAI (creature);
+        return GetTheUnderbogAI<boss_the_black_stalkerAI>(creature);
     }
 
     struct boss_the_black_stalkerAI : public ScriptedAI
@@ -54,13 +55,13 @@ public:
 
         EventMap events;
         SummonList summons;
-        uint64 lTarget;
+        ObjectGuid lTarget;
 
         void Reset() override
         {
             events.Reset();
             summons.DespawnAll();
-            lTarget = 0;
+            lTarget.Clear();
         }
 
         void EnterCombat(Unit*) override
@@ -141,7 +142,7 @@ public:
                     if (Unit* target = ObjectAccessor::GetUnit(*me, lTarget))
                     {
                         if (!target->HasAura(SPELL_LEVITATE))
-                            lTarget = 0;
+                            lTarget.Clear();
                         else
                         {
                             target->CastSpell(target, SPELL_MAGNETIC_PULL, true);
@@ -153,11 +154,11 @@ public:
                     if (Unit* target = ObjectAccessor::GetUnit(*me, lTarget))
                     {
                         if (!target->HasAura(SPELL_LEVITATE))
-                            lTarget = 0;
+                            lTarget.Clear();
                         else
                         {
                             target->AddAura(SPELL_SUSPENSION, target);
-                            lTarget = 0;
+                            lTarget.Clear();
                         }
                     }
                     break;

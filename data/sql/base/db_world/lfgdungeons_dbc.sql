@@ -6,10 +6,10 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `lfgdungeons_dbc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = UTF8MB4 */;
 CREATE TABLE `lfgdungeons_dbc` 
 (
-  `ID` int(11) NOT NULL DEFAULT 0,
+  `ID` INT NOT NULL DEFAULT 0,
   `Name_Lang_enUS` varchar(100) DEFAULT NULL,
   `Name_Lang_enGB` varchar(100) DEFAULT NULL,
   `Name_Lang_koKR` varchar(100) DEFAULT NULL,
@@ -26,21 +26,21 @@ CREATE TABLE `lfgdungeons_dbc`
   `Name_Lang_ptBR` varchar(100) DEFAULT NULL,
   `Name_Lang_itIT` varchar(100) DEFAULT NULL,
   `Name_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Name_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
-  `MinLevel` int(11) NOT NULL DEFAULT 0,
-  `MaxLevel` int(11) NOT NULL DEFAULT 0,
-  `Target_Level` int(11) NOT NULL DEFAULT 0,
-  `Target_Level_Min` int(11) NOT NULL DEFAULT 0,
-  `Target_Level_Max` int(11) NOT NULL DEFAULT 0,
-  `MapID` int(11) NOT NULL DEFAULT 0,
-  `Difficulty` int(11) NOT NULL DEFAULT 0,
-  `Flags` int(11) NOT NULL DEFAULT 0,
-  `TypeID` int(11) NOT NULL DEFAULT 0,
-  `Faction` int(11) NOT NULL DEFAULT 0,
+  `Name_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
+  `MinLevel` INT NOT NULL DEFAULT 0,
+  `MaxLevel` INT NOT NULL DEFAULT 0,
+  `Target_Level` INT NOT NULL DEFAULT 0,
+  `Target_Level_Min` INT NOT NULL DEFAULT 0,
+  `Target_Level_Max` INT NOT NULL DEFAULT 0,
+  `MapID` INT NOT NULL DEFAULT 0,
+  `Difficulty` INT NOT NULL DEFAULT 0,
+  `Flags` INT NOT NULL DEFAULT 0,
+  `TypeID` INT NOT NULL DEFAULT 0,
+  `Faction` INT NOT NULL DEFAULT 0,
   `TextureFilename` varchar(100) DEFAULT NULL,
-  `ExpansionLevel` int(11) NOT NULL DEFAULT 0,
-  `Order_Index` int(11) NOT NULL DEFAULT 0,
-  `Group_Id` int(11) NOT NULL DEFAULT 0,
+  `ExpansionLevel` INT NOT NULL DEFAULT 0,
+  `Order_Index` INT NOT NULL DEFAULT 0,
+  `Group_Id` INT NOT NULL DEFAULT 0,
   `Description_Lang_enUS` varchar(200) DEFAULT NULL,
   `Description_Lang_enGB` varchar(200) DEFAULT NULL,
   `Description_Lang_koKR` varchar(200) DEFAULT NULL,
@@ -57,9 +57,9 @@ CREATE TABLE `lfgdungeons_dbc`
   `Description_Lang_ptBR` varchar(200) DEFAULT NULL,
   `Description_Lang_itIT` varchar(200) DEFAULT NULL,
   `Description_Lang_Unk` varchar(100) DEFAULT NULL,
-  `Description_Lang_Mask` int(10) unsigned NOT NULL DEFAULT 0,
+  `Description_Lang_Mask` INT unsigned NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=UTF8MB4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 LOCK TABLES `lfgdungeons_dbc` WRITE;

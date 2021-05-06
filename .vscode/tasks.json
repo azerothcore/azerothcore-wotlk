@@ -1,0 +1,85 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "AzerothCore: Dashboard",
+        "type": "shell",
+        "command": "./acore.sh",
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "AzerothCore: Import/update database",
+        "type": "shell",
+        "command": "./acore.sh db-assembler import-all",
+        "group": "build",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "AzerothCore: download client-data",
+        "type": "shell",
+        "command": "./acore.sh client-data",
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "AzerothCore: Clean build",
+        "type": "shell",
+        "command": "./acore.sh compiler clean",
+        "group": "build",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "AzerothCore: Build",
+        "type": "shell",
+        "command": "./acore.sh compiler build",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "AzerothCore: Run authserver (restarter)",
+        "type": "shell",
+        "command": "./acore.sh run-authserver",
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "AzerothCore: Run worldserver (restarter)",
+        "type": "shell",
+        "command": "./acore.sh run-worldserver",
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        },
+        "problemMatcher": []
+      }
+    ]
+  }

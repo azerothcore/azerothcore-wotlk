@@ -142,6 +142,19 @@ namespace acore
                 }
             }
         }
+
+        template<class K, class V, template<class, class, class...> class M, class... Rest>
+        void MultimapErasePair(M<K, V, Rest...>& multimap, K const& key, V const& value)
+        {
+            auto range = multimap.equal_range(key);
+            for (auto itr = range.first; itr != range.second;)
+            {
+                if (itr->second == value)
+                    itr = multimap.erase(itr);
+                else
+                    ++itr;
+            }
+        }
     }
     //! namespace Containers
 }

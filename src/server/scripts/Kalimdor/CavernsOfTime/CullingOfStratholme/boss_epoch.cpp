@@ -43,7 +43,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_epochAI (creature);
+        return GetCullingOfStratholmeAI<boss_epochAI>(creature);
     }
 
     struct boss_epochAI : public ScriptedAI

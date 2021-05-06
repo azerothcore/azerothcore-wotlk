@@ -52,7 +52,7 @@ public:
     bool _HandleXferAccept();
 
     FILE* pPatch;
-    ACE_Thread_Mutex patcherLock;
+    std::mutex patcherLock;
 
 private:
     RealmSocket& socket_;

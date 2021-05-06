@@ -249,7 +249,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freyaAI (pCreature);
+        return GetUlduarAI<boss_freyaAI>(pCreature);
     }
 
     struct boss_freyaAI : public ScriptedAI
@@ -260,7 +260,6 @@ public:
             if (!me->IsAlive())
                 if (m_pInstance)
                     m_pInstance->SetData(TYPE_FREYA, DONE);
-            memset(_elderGUID, 0, sizeof(_elderGUID));
         }
 
         InstanceScript* m_pInstance;
@@ -275,7 +274,7 @@ public:
         bool _backToNature;
         uint8 _deforestation;
 
-        uint64 _elderGUID[3];
+        ObjectGuid _elderGUID[3];
 
         void Reset() override
         {
@@ -292,7 +291,8 @@ public:
 
                 if (Creature* elder = ObjectAccessor::GetCreature(*me, _elderGUID[i]))
                     elder->AI()->EnterEvadeMode();
-                _elderGUID[i] = 0;
+
+                _elderGUID[i].Clear();
             }
 
             _lumberjacked = 0;
@@ -503,7 +503,7 @@ public:
 
             // HARD MODE CHECKS
             Creature* elder = nullptr;
-            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_ELDER_STONEBARK));
+            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_ELDER_STONEBARK));
             if (elder && elder->IsAlive())
             {
                 elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -514,7 +514,7 @@ public:
                 _elderGUID[0] = elder->GetGUID();
             }
 
-            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_ELDER_IRONBRANCH));
+            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_ELDER_IRONBRANCH));
             if (elder && elder->IsAlive())
             {
                 elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -525,7 +525,7 @@ public:
                 _elderGUID[1] = elder->GetGUID();
             }
 
-            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_ELDER_BRIGHTLEAF));
+            elder = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_ELDER_BRIGHTLEAF));
             if (elder && elder->IsAlive())
             {
                 elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -669,7 +669,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_elder_stonebarkAI (pCreature);
+        return GetUlduarAI<boss_freya_elder_stonebarkAI>(pCreature);
     }
 
     struct boss_freya_elder_stonebarkAI : public ScriptedAI
@@ -713,7 +713,7 @@ public:
 
             // Lumberjacked
             if (me->GetInstanceScript())
-                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_FREYA)))
+                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_FREYA)))
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
@@ -775,7 +775,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_elder_brightleafAI (pCreature);
+        return GetUlduarAI<boss_freya_elder_brightleafAI>(pCreature);
     }
 
     struct boss_freya_elder_brightleafAI : public ScriptedAI
@@ -819,7 +819,7 @@ public:
 
             // Lumberjacked
             if (me->GetInstanceScript())
-                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_FREYA)))
+                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_FREYA)))
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
@@ -898,7 +898,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_elder_ironbranchAI (pCreature);
+        return GetUlduarAI<boss_freya_elder_ironbranchAI>(pCreature);
     }
 
     struct boss_freya_elder_ironbranchAI : public ScriptedAI
@@ -940,7 +940,7 @@ public:
 
             // Lumberjacked
             if (me->GetInstanceScript())
-                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_FREYA)))
+                if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_FREYA)))
                     freya->AI()->DoAction(ACTION_LUMBERJACKED);
         }
 
@@ -992,7 +992,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_iron_rootAI (pCreature);
+        return GetUlduarAI<boss_freya_iron_rootAI>(pCreature);
     }
 
     struct boss_freya_iron_rootAI : public NullCreatureAI
@@ -1022,7 +1022,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_lifebinderAI (pCreature);
+        return GetUlduarAI<boss_freya_lifebinderAI>(pCreature);
     }
 
     struct boss_freya_lifebinderAI : public NullCreatureAI
@@ -1062,7 +1062,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_healthy_sporeAI (pCreature);
+        return GetUlduarAI<boss_freya_healthy_sporeAI>(pCreature);
     }
 
     struct boss_freya_healthy_sporeAI : public NullCreatureAI
@@ -1101,20 +1101,20 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_summonsAI (pCreature);
+        return GetUlduarAI<boss_freya_summonsAI>(pCreature);
     }
 
     struct boss_freya_summonsAI : public ScriptedAI
     {
         boss_freya_summonsAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            _freyaGUID = me->GetInstanceScript() ? me->GetInstanceScript()->GetData64(TYPE_FREYA) : 0;
+            _freyaGUID = me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(TYPE_FREYA) : ObjectGuid::Empty;
             _isTrio = me->GetEntry() == NPC_ANCIENT_WATER_SPIRIT || me->GetEntry() == NPC_STORM_LASHER || me->GetEntry() == NPC_SNAPLASHER;
             _hasDied = false;
         }
 
         EventMap events;
-        uint64 _freyaGUID;
+        ObjectGuid _freyaGUID;
         uint8 _stackCount;
         bool _hasDied;
         bool _isTrio;
@@ -1244,17 +1244,17 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_freya_nature_bombAI (pCreature);
+        return GetUlduarAI<boss_freya_nature_bombAI>(pCreature);
     }
 
     struct boss_freya_nature_bombAI : public NullCreatureAI
     {
         boss_freya_nature_bombAI(Creature* pCreature) : NullCreatureAI(pCreature)
         {
-            _goGUID = 0;
+            _goGUID.Clear();
         }
 
-        uint64 _goGUID;
+        ObjectGuid _goGUID;
         uint32 _explodeTimer;
 
         void Reset() override

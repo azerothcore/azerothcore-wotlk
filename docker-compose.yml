@@ -1,79 +1,311 @@
-version: '3.2'
+version: '3.9'
+
+# extension field: https://docs.docker.com/compose/compose-file/compose-file-v3/#extension-fields
+x-networks: &networks
+  networks:
+    - ac-network
+
+x-cache-from: &cache-from
+  cache_from:
+    - acore/ac-wotlk-authserver:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-authserver-local:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+    - acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master}
+    #- acore/ac-wotlk-client-data-server:${DOCKER_IMAGE_TAG:-master}
+
+x-ac-shared-conf: &ac-shared-conf
+  <<: *networks
+  working_dir: /azerothcore
+  depends_on:
+    ac-database:
+      condition: service_healthy
 
 services:
+#============================
+#
+# Abstract services to extend
+#
+#============================
+
+  abstract-bind:
+    image: local/azerothcore/abstract-bind
+    volumes:
+      - .:/azerothcore/
+      # expose some dist folder outside allowing the host to use them
+      - ${DOCKER_VOL_CONF:-./conf}:/azerothcore/conf
+      - ${DOCKER_VOL_BIN:-ac-bin}:/azerothcore/env/dist/bin
+      - ${DOCKER_VOL_ETC:-./env/docker/etc}:/azerothcore/env/dist/etc
+      # [osxfs optimization]: https://stackoverflow.com/a/63437557/1964544
+      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+      - ${DOCKER_VOL_DATA:-./env/docker/data}:/azerothcore/env/dist/data:delegated
+    profiles: [abstract-service] # do not run this
+
+  abstract-no-bind:
+    image: local/azerothcore/abstract-no-bind
+    volumes:
+      - ac-proj:/azerothcore/
+    profiles: [abstract-service] # do not run this
+
+#=======================
+#
+# DATABASE
+#
+#=======================
+
 
   ac-database:
-    image: azerothcore/database
+    <<: *networks
+    image: mysql:8.0
     restart: unless-stopped
-    build:
-      context: .
-      dockerfile: ./docker/database/Dockerfile
-    networks:
-      - ac-network
+    cap_add:
+      - SYS_NICE  # CAP_SYS_NICE
     ports:
-      - ${DB_EXTERNAL_PORT:-3306}:3306
+      - ${DOCKER_DB_EXTERNAL_PORT:-3306}:3306
     environment:
-      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD:-password}
+      - MYSQL_ROOT_PASSWORD=${DOCKER_DB_ROOT_PASSWORD:-password}
     volumes:
       - type: volume
         source: ac-database
         target: /var/lib/mysql
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
+      interval: 5s
+      timeout: 10s
+      retries: 40
+
+#=======================
+#
+# APP Services
+#
+#=======================
 
   ac-worldserver:
+    <<: *ac-shared-conf
+    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
     stdin_open: true
     tty: true
-    image: azerothcore/worldserver
+    command: ./acore.sh run-worldserver
+    image: acore/ac-wotlk-worldserver-local:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-acore}
     privileged: true
     build:
-      context: ./docker/worldserver
-      dockerfile: Dockerfile
-    networks:
-      - ac-network
+      context: .
+      target: worldserver-local
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      <<: *cache-from
     ports:
-      - ${WORLD_EXTERNAL_PORT:-8085}:8085
-      - ${SOAP_EXTERNAL_PORT:-7878}:7878
-    volumes:
-      - type: bind
-        source: ./docker/worldserver/bin
-        target: /azeroth-server/bin
-      - type: bind
-        source: ${WORLDSERVER_ETC:-./docker/worldserver/etc}
-        target: /azeroth-server/etc
-      - type: bind
-        source: ${WORLDSERVER_LOGS:-./docker/worldserver/logs}
-        target: /azeroth-server/logs
-      - type: bind
-        source: ${WORLDSERVER_DATA:-./docker/worldserver/data}
-        target: /azeroth-server/data
-    depends_on:
-      - ac-database
+      - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
+      - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
+    profiles: [local, app, worldserver]
 
   ac-authserver:
-    image: azerothcore/authserver
+    <<: *ac-shared-conf
+    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
+    tty: true
+    command: ./acore.sh run-authserver
+    image: acore/ac-wotlk-authserver-local:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
     restart: unless-stopped
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-acore}
     build:
-      context: ./docker/authserver
-      dockerfile: Dockerfile
-    networks:
-      - ac-network
+      context: .
+      target: authserver-local
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      <<: *cache-from
     ports:
-      - ${AUTH_EXTERNAL_PORT:-3724}:3724
+      - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
+    profiles: [local, app, authserver]
+
+#======================
+#
+# Dev services
+#
+#======================
+  ac-build:
+    <<: *ac-shared-conf
+    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
+    image: acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+    build:
+      context: .
+      target: ${DOCKER_AC_BUILD_TARGET:-dev}
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      <<: *cache-from
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    working_dir: /azerothcore/
     volumes:
-      - type: bind
-        source: ./docker/authserver/bin
-        target: /azeroth-server/bin
-      - type: bind
-        source: ${AUTHSERVER_ETC:-./docker/authserver/etc}
-        target: /azeroth-server/etc
-      - type: bind
-        source: ${AUTHSERVER_LOGS:-./docker/authserver/logs}
-        target: /azeroth-server/logs
+        - ${DOCKER_VOL_BUILD:-ac-build}:/azerothcore/var/build
+        # with this conf you can use an external path for it (useful for CI)
+        - ${DOCKER_VOL_CCACHE:-ac-ccache}:/azerothcore/var/ccache
+         # use internal copied files instead of volumes
+        - /azerothcore/src
+        - /azerothcore/data
+        - /azerothcore/modules
+    profiles: [local, build]
+
+  ac-dev-server:
+    <<: *ac-shared-conf
+    extends: ${DOCKER_EXTENDS_BIND:-abstract-bind}
+    tty: true
+    image: acore/ac-wotlk-dev-server:${DOCKER_IMAGE_TAG:-master}
+    build:
+      context: .
+      target: dev
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      <<: *cache-from
+    security_opt:
+      - seccomp:unconfined
+    env_file:
+        ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-acore}
+    environment:
+        DBLIST: AUTH,CHARACTERS,WORLD
+    ports:
+      - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
+      - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
+      - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
+    volumes:
+      - ac-build-dev:/azerothcore/var/build
+      - ac-ccache-dev:/azerothcore/var/ccache
+      # this is not the directory of the extracted data! It's the client folder used by the extractors
+      - ${DOCKER_CLIENT_DATA_FOLDER:-./var/client}:/azerothcore/env/dist/bin/Data
+    profiles: [dev]
+
+#======================
+#
+# Production services
+#
+#======================
+
+  ac-worldserver-prod:
+    <<: *ac-shared-conf
+    stdin_open: true
+    tty: true
+    command: ./acore.sh run-worldserver
+    image: acore/ac-wotlk-worldserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    restart: unless-stopped
+    env_file:
+      ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-acore}
+    privileged: true
+    build:
+      context: .
+      target: worldserver
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      <<: *cache-from
+    ports:
+      - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085
+      - ${DOCKER_SOAP_EXTERNAL_PORT:-7878}:7878
+    volumes:
+      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+    volumes_from:
+      - ac-client-data-server:ro
     depends_on:
-      - ac-database
+      - ac-client-data-server
+    profiles: [prod, prod-app, prod-worldserver]
+
+  ac-authserver-prod:
+    <<: *ac-shared-conf
+    tty: true
+    command: ./acore.sh run-authserver
+    image: acore/ac-wotlk-authserver:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    restart: unless-stopped
+    env_file:
+      ${DOCKER_AC_ENV_FILE:-conf/dist/env.ac}
+    user: ${DOCKER_USER:-acore}
+    build:
+      context: .
+      target: authserver
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      <<: *cache-from
+    volumes:
+      - ${DOCKER_VOL_LOGS:-./env/docker/logs}:/azerothcore/env/dist/logs:delegated
+    ports:
+      - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
+    profiles: [prod, prod-app, prod-authserver]
+
+  ac-client-data-server:
+    image: acore/ac-wotlk-client-data:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    user: ${DOCKER_USER:-acore}
+    build:
+      context: .
+      target: client-data
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      <<: *cache-from
+    volumes:
+      - /azerothcore/env/dist/data
+    profiles: [prod, prod-app, clientdata]
+
+  ac-tools:
+    image: acore/ac-wotlk-tools:${DOCKER_IMAGE_TAG:-master} # name of the generated image after built locally
+    user: ${DOCKER_USER:-acore}
+    build:
+      context: .
+      target: tools
+      dockerfile: ./apps/docker/Dockerfile
+      args:
+        USER_ID: ${DOCKER_USER_ID:-1000}
+        GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+        DOCKER_USER: ${DOCKER_USER:-acore}
+      <<: *cache-from
+    working_dir: /azerothcore/env/client/
+    volumes:
+      - ${DOCKER_CLIENT_DATA_FOLDER:-./var/client}:/azerothcore/env/client/Data
+      - ${DOCKER_VOL_TOOLS_DBC:-./var/extractors/dbc}:/azerothcore/env/client/dbc
+      - ${DOCKER_VOL_TOOLS_MAPS:-./var/extractors/maps}:/azerothcore/env/client/maps
+      - ${DOCKER_VOL_TOOLS_VMAPS:-./var/extractors/vmaps}:/azerothcore/env/client/vmaps
+      - ${DOCKER_VOL_TOOLS_MMAPS:-./var/extractors/mmaps}:/azerothcore/env/client/mmaps
+    profiles: [prod, tools]
 
 volumes:
   ac-database:
+  ac-bin:
+  ac-build-dev:
+  ac-build:
+  ac-ccache-dev:
+  ac-ccache:
+  ac-proj:
+  # not used, but you can use them by setting
+  # the DOCKER_VOL_* env variabiles
+  ac-conf:
+  ac-etc:
+  ac-logs:
+  ac-client-data:
+  ac-client-data-prod:
 
 networks:
   ac-network:

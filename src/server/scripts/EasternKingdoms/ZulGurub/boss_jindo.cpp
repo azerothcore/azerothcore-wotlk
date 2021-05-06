@@ -167,7 +167,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_jindoAI(creature);
+        return GetZulGurubAI<boss_jindoAI>(creature);
     }
 };
 
@@ -205,7 +205,7 @@ public:
             //Heal_Timer
             if (Heal_Timer <= diff)
             {
-                Unit* pJindo = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_JINDO));
+                Unit* pJindo = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_JINDO));
                 if (pJindo)
                     DoCast(pJindo, SPELL_HEAL);
                 Heal_Timer = 3000;
@@ -218,7 +218,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_healing_wardAI>(creature);
+        return GetZulGurubAI<npc_healing_wardAI>(creature);
     }
 };
 
@@ -261,7 +261,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_shade_of_jindoAI(creature);
+        return GetZulGurubAI<npc_shade_of_jindoAI>(creature);
     }
 };
 
