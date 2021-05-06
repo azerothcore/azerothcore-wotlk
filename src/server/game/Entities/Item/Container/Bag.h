@@ -22,7 +22,7 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
-    bool Create(uint32 guidlow, uint32 itemid, Player const* owner) override;
+    bool Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner) override;
 
     void Clear();
     void StoreItem(uint8 slot, Item* pItem, bool update);
@@ -32,7 +32,7 @@ public:
     uint32 GetItemCount(uint32 item, Item* eItem = nullptr) const;
     uint32 GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem = nullptr) const;
 
-    [[nodiscard]] uint8 GetSlotByItemGUID(uint64 guid) const;
+    [[nodiscard]] uint8 GetSlotByItemGUID(ObjectGuid guid) const;
     [[nodiscard]] bool IsEmpty() const;
     [[nodiscard]] uint32 GetFreeSlots() const;
     [[nodiscard]] uint32 GetBagSize() const { return GetUInt32Value(CONTAINER_FIELD_NUM_SLOTS); }
@@ -41,7 +41,7 @@ public:
     // overwrite virtual Item::SaveToDB
     void SaveToDB(SQLTransaction& trans) override;
     // overwrite virtual Item::LoadFromDB
-    bool LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entry) override;
+    bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry) override;
     // overwrite virtual Item::DeleteFromDB
     void DeleteFromDB(SQLTransaction& trans) override;
 

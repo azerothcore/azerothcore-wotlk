@@ -393,8 +393,13 @@ public:
     void ResetSlots(TeamId teamId, MotionTransport* t)
     {
         _transport = t;
-        memset(_controlledSlots, 0, sizeof(uint64)* MAX_SLOTS);
-        memset(_respawnCooldowns, 0, sizeof(time_t)* MAX_SLOTS);
+
+        for (uint8 i = 0; i < MAX_SLOTS; ++i)
+        {
+            _controlledSlots[i].Clear();
+            _respawnCooldowns[i] = time_t(0);
+        }
+
         _spawnPoint = teamId == TEAM_HORDE ? &OrgrimsHammerAddsSpawnPos : &SkybreakerAddsSpawnPos;
         _slotInfo = teamId == TEAM_HORDE ? OrgrimsHammerSlotInfo : SkybreakerSlotInfo;
     }
@@ -440,7 +445,7 @@ public:
 
     void ClearSlot(PassengerSlots slot)
     {
-        _controlledSlots[slot] = 0;
+        _controlledSlots[slot].Clear();
         _respawnCooldowns[slot] = time(nullptr) + _slotInfo[slot].Cooldown;
     }
 
@@ -457,7 +462,7 @@ private:
         return newPos;
     }
 
-    uint64 _controlledSlots[MAX_SLOTS];
+    ObjectGuid _controlledSlots[MAX_SLOTS];
     time_t _respawnCooldowns[MAX_SLOTS];
     MotionTransport* _transport;
     Position const* _spawnPoint;
@@ -489,7 +494,7 @@ private:
 class ResetEncounterEvent : public BasicEvent
 {
 public:
-    ResetEncounterEvent(Unit* caster, uint32 spellId, uint64 otherTransport) : _caster(caster), _spellId(spellId), _otherTransport(otherTransport) { }
+    ResetEncounterEvent(Unit* caster, uint32 spellId, ObjectGuid otherTransport) : _caster(caster), _spellId(spellId), _otherTransport(otherTransport) { }
 
     bool Execute(uint64, uint32) override
     {
@@ -497,10 +502,10 @@ public:
         _caster->GetTransport()->ToMotionTransport()->UnloadNonStaticPassengers();
         _caster->GetTransport()->AddObjectToRemoveList();
 
-        if (GameObject* go = HashMapHolder<GameObject>::Find(_otherTransport))
+        if (Transport* transport = ObjectAccessor::GetTransport(*_caster, _otherTransport))
         {
-            go->ToMotionTransport()->UnloadNonStaticPassengers();
-            go->AddObjectToRemoveList();
+            transport->ToMotionTransport()->UnloadNonStaticPassengers();
+            transport->AddObjectToRemoveList();
         }
 
         return true;
@@ -509,7 +514,7 @@ public:
 private:
     Unit* _caster;
     uint32 _spellId;
-    uint64 _otherTransport;
+    ObjectGuid _otherTransport;
 };
 
 class npc_gunship : public CreatureScript
@@ -586,7 +591,7 @@ public:
             }
 
             uint32 cannonEntry = _teamIdInInstance == TEAM_HORDE ? NPC_HORDE_GUNSHIP_CANNON : NPC_ALLIANCE_GUNSHIP_CANNON;
-            if (GameObject* go = _instance->instance->GetGameObject(_instance->GetData64(DATA_ICECROWN_GUNSHIP_BATTLE)))
+            if (GameObject* go = _instance->instance->GetGameObject(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
                 if (MotionTransport* t = go->ToMotionTransport())
                 {
                     Transport::PassengerSet const& passengers = t->GetStaticPassengers();
@@ -598,7 +603,7 @@ public:
                         cannon->CastSpell(cannon, SPELL_EJECT_ALL_PASSENGERS, true);
 
                         WorldPacket data(SMSG_PLAYER_VEHICLE_DATA, cannon->GetPackGUID().size() + 4);
-                        data.append(cannon->GetPackGUID());
+                        data << cannon->GetPackGUID();
                         data << uint32(0);
                         cannon->SendMessageToSet(&data, true);
 
@@ -618,8 +623,8 @@ public:
 
             if (isVictory)
             {
-                if (GameObject* go = HashMapHolder<GameObject>::Find(_instance->GetData64(DATA_ICECROWN_GUNSHIP_BATTLE)))
-                    if (MotionTransport* otherTransport = go->ToMotionTransport())
+                if (Transport * transport = _instance->instance->GetTransport(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                    if (MotionTransport* otherTransport = transport->ToMotionTransport())
                         otherTransport->EnableMovement(true);
 
                 me->GetTransport()->ToMotionTransport()->EnableMovement(true);
@@ -632,7 +637,7 @@ public:
                 }
 
                 for (uint8 i = 0; i < 2; ++i)
-                    if (GameObject* go = _instance->instance->GetGameObject(_instance->GetData64(i == 0 ? DATA_ICECROWN_GUNSHIP_BATTLE : DATA_ENEMY_GUNSHIP)))
+                    if (GameObject* go = _instance->instance->GetGameObject(_instance->GetGuidData(i == 0 ? DATA_ICECROWN_GUNSHIP_BATTLE : DATA_ENEMY_GUNSHIP)))
                         if (MotionTransport* t = go->ToMotionTransport())
                         {
                             Transport::PassengerSet const& passengers = t->GetPassengers();
@@ -649,16 +654,16 @@ public:
             else
             {
                 uint32 teleportSpellId = _teamIdInInstance == TEAM_HORDE ? SPELL_TELEPORT_PLAYERS_ON_RESET_H : SPELL_TELEPORT_PLAYERS_ON_RESET_A;
-                me->m_Events.AddEvent(new ResetEncounterEvent(me, teleportSpellId, _instance->GetData64(DATA_ENEMY_GUNSHIP)), me->m_Events.CalculateTime(8000));
+                me->m_Events.AddEvent(new ResetEncounterEvent(me, teleportSpellId, _instance->GetGuidData(DATA_ENEMY_GUNSHIP)), me->m_Events.CalculateTime(8000));
             }
         }
 
-        void SetGUID(uint64 guid, int32 id/* = 0*/) override
+        void SetGUID(ObjectGuid guid, int32 id/* = 0*/) override
         {
             if (id != ACTION_SHIP_VISITS_ENEMY && id != ACTION_SHIP_VISITS_SELF)
                 return;
 
-            std::map<uint64, uint32>::iterator itr = _shipVisits.find(guid);
+            std::map<ObjectGuid, uint32>::iterator itr = _shipVisits.find(guid);
             if (itr == _shipVisits.end())
             {
                 if (id == ACTION_SHIP_VISITS_ENEMY)
@@ -693,7 +698,7 @@ public:
             if (id != ACTION_SHIP_VISITS_ENEMY)
                 return 0;
 
-            for (std::map<uint64, uint32>::const_iterator itr = _shipVisits.begin(); itr != _shipVisits.end(); ++itr)
+            for (std::map<ObjectGuid, uint32>::const_iterator itr = _shipVisits.begin(); itr != _shipVisits.end(); ++itr)
                 if (itr->second == 0)
                     return 0;
 
@@ -703,7 +708,7 @@ public:
     private:
         InstanceScript* _instance;
         TeamId _teamIdInInstance;
-        std::map<uint64, uint32> _shipVisits;
+        std::map<ObjectGuid, uint32> _shipVisits;
         bool _died;
         bool _summonedFirstMage;
     };
@@ -951,8 +956,8 @@ public:
                         me->SummonCreature(NPC_TELEPORT_PORTAL, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN, 21000);
                     }
 
-                    if (GameObject* go = HashMapHolder<GameObject>::Find(_instance->GetData64(DATA_ICECROWN_GUNSHIP_BATTLE)))
-                        if (MotionTransport* skybreaker = go->ToMotionTransport())
+                    if (Transport* transport = _instance->instance->GetTransport(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                        if (MotionTransport* skybreaker = transport->ToMotionTransport())
                         {
                             float x, y, z, o;
                             SkybreakerTeleportExit.GetPosition(x, y, z, o);
@@ -1290,8 +1295,8 @@ public:
                         me->SummonCreature(NPC_TELEPORT_PORTAL, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN, 21000);
                     }
 
-                    if (GameObject* go = HashMapHolder<GameObject>::Find(_instance->GetData64(DATA_ICECROWN_GUNSHIP_BATTLE)))
-                        if (MotionTransport* orgrimsHammer = go->ToMotionTransport())
+                    if (Transport* transport = _instance->instance->GetTransport(_instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                        if (MotionTransport* orgrimsHammer = transport->ToMotionTransport())
                         {
                             float x, y, z, o;
                             OrgrimsHammerTeleportExit.GetPosition(x, y, z, o);
@@ -1570,8 +1575,8 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
             if (!myTransport)
                 return;
 
-            if (GameObject* go = HashMapHolder<GameObject>::Find(Instance->GetData64(DATA_ICECROWN_GUNSHIP_BATTLE)))
-                if (Transport* destTransport = go->ToTransport())
+            if (Transport* transport = Instance->instance->GetTransport(Instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+                if (Transport* destTransport = transport->ToTransport())
                     destTransport->CalculatePassengerPosition(x, y, z, &o);
 
             float angle = frand(0, M_PI * 2.0f);
@@ -2119,7 +2124,7 @@ public:
         void SelectTransport(WorldObject*& target)
         {
             if (InstanceScript* instance = target->GetInstanceScript())
-                target = HashMapHolder<GameObject>::Find(instance->GetData64(DATA_ICECROWN_GUNSHIP_BATTLE));
+                target = instance->instance->GetTransport(instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE));
         }
 
         void RelocateDest(SpellEffIndex /*effIndex*/)
@@ -2225,7 +2230,7 @@ public:
 
     bool operator()(WorldObject* unit)
     {
-        return unit->GetTransGUID() != _inst->GetData64(DATA_ENEMY_GUNSHIP);
+        return unit->GetTransGUID() != _inst->GetGuidData(DATA_ENEMY_GUNSHIP);
     }
 
 private:
@@ -2316,7 +2321,7 @@ public:
                     if (Player* player = passenger->ToPlayer())
                     {
                         WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, GetUnitOwner()->GetPackGUID().size() + 1);
-                        data.append(GetUnitOwner()->GetPackGUID());
+                        data << GetUnitOwner()->GetPackGUID();
                         data << uint8(value);
                         player->GetSession()->SendPacket(&data);
                     }

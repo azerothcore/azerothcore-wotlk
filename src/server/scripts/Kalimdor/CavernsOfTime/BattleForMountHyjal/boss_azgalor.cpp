@@ -88,7 +88,7 @@ public:
         {
             if (waypointId == 7 && instance)
             {
-                Unit* target = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_THRALL));
+                Unit* target = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_THRALL));
                 if (target && target->IsAlive())
                     me->AddThreat(target, 0.0f);
             }
@@ -185,13 +185,13 @@ public:
         npc_lesser_doomguardAI(Creature* creature) : hyjal_trashAI(creature)
         {
             instance = creature->GetInstanceScript();
-            AzgalorGUID = instance->GetData64(DATA_AZGALOR);
+            AzgalorGUID = instance->GetGuidData(DATA_AZGALOR);
         }
 
         uint32 CrippleTimer;
         uint32 WarstompTimer;
         uint32 CheckTimer;
-        uint64 AzgalorGUID;
+        ObjectGuid AzgalorGUID;
         InstanceScript* instance;
 
         void Reset() override

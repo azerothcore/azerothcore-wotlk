@@ -107,7 +107,7 @@ public:
             {
                 killCount = 0;
                 events.ScheduleEvent(EVENT_CHECK_START, 1000);
-                if (Creature* speaker = ObjectAccessor::GetCreature(*me, instance->GetData64(NPC_VILEBRANCH_SPEAKER)))
+                if (Creature* speaker = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_VILEBRANCH_SPEAKER)))
                     if (!speaker->IsAlive())
                         speaker->Respawn(true);
             }
@@ -157,7 +157,7 @@ public:
             if (++killCount == 3)
             {
                 Talk(SAY_DING_KILL);
-                if (Creature* jindo = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_JINDO)))
+                if (Creature* jindo = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_JINDO)))
                     if (jindo->IsAlive())
                         jindo->AI()->Talk(SAY_GRATS_JINDO);
                 DoCast(me, SPELL_LEVEL_UP, true);
@@ -261,7 +261,7 @@ public:
 
     private:
         uint8 killCount;
-        uint64 chainedSpirtGUIDs[CHAINED_SPIRT_COUNT];
+        ObjectGuid chainedSpirtGUIDs[CHAINED_SPIRT_COUNT];
     };
 
     CreatureAI* GetAI(Creature* creature) const override

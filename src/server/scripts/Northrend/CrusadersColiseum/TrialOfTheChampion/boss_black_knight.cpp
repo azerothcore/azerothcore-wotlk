@@ -141,7 +141,7 @@ public:
                 summons.clear();
 
                 me->CastSpell(me, SPELL_BK_FEIGN_DEATH, true);
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                 me->SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                 me->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                 me->AddUnitState(UNIT_STATE_DIED);
@@ -162,7 +162,7 @@ public:
                 pInstance->SetData(BOSS_BLACK_KNIGHT, IN_PROGRESS);
                 Talk(TEXT_BK_AGGRO);
                 me->CastSpell((Unit*)nullptr, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
-                if( Creature* announcer = pInstance->instance->GetCreature(pInstance->GetData64(DATA_ANNOUNCER)) )
+                if( Creature* announcer = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ANNOUNCER)) )
                     announcer->DespawnOrUnsummon();
 
                 events.Reset();
@@ -183,7 +183,7 @@ public:
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
 
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                     me->RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_FEIGN_DEATH);
                     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
                     me->ClearUnitState(UNIT_STATE_DIED);
@@ -327,7 +327,7 @@ public:
 
         void Reset() override
         {
-            Start(false, true, 0, nullptr);
+            Start(false, true, ObjectGuid::Empty, nullptr);
             SetDespawnAtEnd(true);
         }
 
