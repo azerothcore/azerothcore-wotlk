@@ -732,7 +732,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
         return 0;
     }
 
-    LOG_ERROR("server", "WorldSocket::ProcessIncoming: Client not authed opcode = %u", uint32(opcode));
+    LOG_ERROR("server", "WorldSocket::ProcessIncoming: Client not authed opcode = %u", aptr->GetOpcode());
     return -1;
 }
 

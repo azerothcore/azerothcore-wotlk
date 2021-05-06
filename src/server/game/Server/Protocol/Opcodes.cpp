@@ -71,13 +71,13 @@ void OpcodeTable::ValidateAndSetClientOpcode(OpcodeClient opcode, char const* na
 
     if (uint32(opcode) >= NUM_OPCODE_HANDLERS)
     {
-        LOG_ERROR("network", "Tried to set handler for an invalid opcode %d", opcode);
+        LOG_ERROR("network", "Tried to set handler for an invalid opcode %u", uint32(opcode));
         return;
     }
 
     if (_internalTableClient[opcode] != nullptr)
     {
-        LOG_ERROR("network", "Tried to override client handler of %s with %s (opcode %u)", opcodeTable[opcode]->Name, name, opcode);
+        LOG_ERROR("network", "Tried to override client handler of %s with %s (opcode %u)", opcodeTable[opcode]->Name, name, uint32(opcode));
         return;
     }
 
@@ -94,13 +94,13 @@ void OpcodeTable::ValidateAndSetServerOpcode(OpcodeServer opcode, char const* na
 
     if (uint32(opcode) >= NUM_OPCODE_HANDLERS)
     {
-        LOG_ERROR("network", "Tried to set handler for an invalid opcode %d", opcode);
+        LOG_ERROR("network", "Tried to set handler for an invalid opcode %u", uint32(opcode));
         return;
     }
 
     if (_internalTableClient[opcode] != nullptr)
     {
-        LOG_ERROR("network", "Tried to override server handler of %s with %s (opcode %u)", opcodeTable[opcode]->Name, name, opcode);
+        LOG_ERROR("network", "Tried to override server handler of %s with %s (opcode %u)", opcodeTable[opcode]->Name, name, uint32(opcode));
         return;
     }
 
