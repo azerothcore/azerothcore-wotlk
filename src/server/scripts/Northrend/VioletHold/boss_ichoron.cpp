@@ -209,8 +209,8 @@ public:
                         bool bIsWaterElementsAlive = false;
                         if (!globules.empty())
                         {
-                            for (std::list<uint64>::const_iterator itr = globules.begin(); itr != globules.end(); ++itr)
-                                if (Creature* pTemp = ObjectAccessor::GetCreature(*me, *itr))
+                            for (ObjectGuid const guid : globules)
+                                if (Creature* pTemp = ObjectAccessor::GetCreature(*me, guid))
                                     if (pTemp->IsAlive())
                                     {
                                         bIsWaterElementsAlive = true;
@@ -247,7 +247,7 @@ public:
                 me->CastSpell(pSummoned, SPELL_CREATE_GLOBULE_VISUAL, true); // triggered should ignore los
                 globules.Summon(pSummoned);
                 if (pInstance)
-                    pInstance->SetData64(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
@@ -257,7 +257,7 @@ public:
             {
                 globules.Despawn(pSummoned);
                 if (pInstance)
-                    pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
@@ -323,7 +323,7 @@ public:
             if (uiRangeCheck_Timer < uiDiff)
             {
                 if (pInstance)
-                    if (Creature* pIchoron = pInstance->instance->GetCreature(pInstance->GetData64(DATA_ICHORON_GUID)))
+                    if (Creature* pIchoron = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ICHORON_GUID)))
                         if (me->IsWithinDist(pIchoron, 2.0f, false))
                         {
                             if (pIchoron->AI())
@@ -339,7 +339,7 @@ public:
         {
             me->CastSpell(me, SPELL_SPLASH, true);
             if (pInstance)
-                if (Creature* pIchoron = pInstance->instance->GetCreature(pInstance->GetData64(DATA_ICHORON_GUID)))
+                if (Creature* pIchoron = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ICHORON_GUID)))
                     if (pIchoron->AI())
                         pIchoron->AI()->DoAction(ACTION_WATER_ELEMENT_KILLED);
             me->DespawnOrUnsummon(2500);

@@ -114,7 +114,7 @@ public:
         InstanceScript* m_pInstance;
         EventMap events;
         SummonList summons;
-        uint64 OrbGUID;
+        ObjectGuid OrbGUID;
         uint8 Counter;
         uint8 RandomUnfreeze[4];
 
@@ -140,7 +140,7 @@ public:
             events.Reset();
             summons.DoAction(ACTION_DESPAWN_ADDS);
             summons.DespawnAll();
-            OrbGUID = 0;
+            OrbGUID.Clear();
             Counter = 0;
             me->CastSpell(me, SPELL_FREEZE, true);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
@@ -151,7 +151,7 @@ public:
                 m_pInstance->SetData(DATA_GORTOK_PALEHOOF, NOT_STARTED);
 
                 // Reset statue
-                if (GameObject* statisGenerator = m_pInstance->instance->GetGameObject(m_pInstance->GetData64(STATIS_GENERATOR)))
+                if (GameObject* statisGenerator = m_pInstance->instance->GetGameObject(m_pInstance->GetGuidData(STATIS_GENERATOR)))
                 {
                     statisGenerator->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NOT_SELECTABLE);
                     statisGenerator->SetGoState(GO_STATE_READY);
@@ -160,7 +160,7 @@ public:
                 // Reset mini bosses
                 for(uint8 i = 0; i < 4; ++i)
                 {
-                    if(Creature* Animal = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_NPC_FRENZIED_WORGEN + i)))
+                    if(Creature* Animal = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(DATA_NPC_FRENZIED_WORGEN + i)))
                     {
                         Animal->SetPosition(Animal->GetHomePosition());
                         Animal->StopMovingOnCurrentPos();
@@ -228,7 +228,7 @@ public:
                     {
                         if (Creature* orb = ObjectAccessor::GetCreature(*me, OrbGUID))
                         {
-                            if (Creature* miniBoss = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_NPC_FRENZIED_WORGEN + RandomUnfreeze[Counter])))
+                            if (Creature* miniBoss = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(DATA_NPC_FRENZIED_WORGEN + RandomUnfreeze[Counter])))
                             {
                                 Counter++;
                                 miniBoss->AI()->DoAction(ACTION_UNFREEZE);
@@ -244,7 +244,7 @@ public:
                     {
                         if (Creature* orb = ObjectAccessor::GetCreature(*me, OrbGUID))
                         {
-                            if (Creature* miniBoss = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_NPC_FRENZIED_WORGEN + RandomUnfreeze[Counter - 1])))
+                            if (Creature* miniBoss = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(DATA_NPC_FRENZIED_WORGEN + RandomUnfreeze[Counter - 1])))
                             {
                                 miniBoss->AI()->DoAction(ACTION_UNFREEZE2);
                                 orb->RemoveAurasDueToSpell(SPELL_AWAKEN_SUBBOSS);
@@ -443,7 +443,7 @@ public:
         {
             if (m_pInstance)
             {
-                if (Creature* palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
+                if (Creature* palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(DATA_GORTOK_PALEHOOF)))
                     palehoof->AI()->DoAction(ACTION_MINIBOSS_DIED);
             }
         }
@@ -553,7 +553,7 @@ public:
         {
             if (m_pInstance)
             {
-                if (Creature* palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
+                if (Creature* palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(DATA_GORTOK_PALEHOOF)))
                     palehoof->AI()->DoAction(ACTION_MINIBOSS_DIED);
             }
         }
@@ -661,7 +661,7 @@ public:
         {
             if (m_pInstance)
             {
-                if (Creature* palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
+                if (Creature* palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(DATA_GORTOK_PALEHOOF)))
                     palehoof->AI()->DoAction(ACTION_MINIBOSS_DIED);
             }
         }
@@ -769,7 +769,7 @@ public:
         {
             if (m_pInstance)
             {
-                if (Creature* palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(DATA_GORTOK_PALEHOOF)))
+                if (Creature* palehoof = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(DATA_GORTOK_PALEHOOF)))
                     palehoof->AI()->DoAction(ACTION_MINIBOSS_DIED);
             }
         }
@@ -785,7 +785,7 @@ public:
     {
         InstanceScript* pInstance = go->GetInstanceScript();
 
-        Creature* pPalehoof = ObjectAccessor::GetCreature(*go, pInstance ? pInstance->GetData64(DATA_GORTOK_PALEHOOF) : 0);
+        Creature* pPalehoof = ObjectAccessor::GetCreature(*go, pInstance ? pInstance->GetGuidData(DATA_GORTOK_PALEHOOF) : ObjectGuid::Empty);
         if (pPalehoof && pPalehoof->IsAlive())
         {
             // maybe these are hacks :(

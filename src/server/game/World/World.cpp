@@ -215,13 +215,15 @@ WorldSession* World::FindOfflineSession(uint32 id) const
         return nullptr;
 }
 
-WorldSession* World::FindOfflineSessionForCharacterGUID(uint32 guidLow) const
+WorldSession* World::FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const
 {
     if (m_offlineSessions.empty())
         return nullptr;
+
     for (SessionMap::const_iterator itr = m_offlineSessions.begin(); itr != m_offlineSessions.end(); ++itr)
         if (itr->second->GetGuidLow() == guidLow)
             return itr->second;
+
     return nullptr;
 }
 
@@ -1415,8 +1417,6 @@ void World::LoadConfigSettings(bool reload)
     sScriptMgr->OnAfterConfigLoad(reload);
 }
 
-extern void LoadGameObjectModelList();
-
 /// Initialize the World
 void World::SetInitialWorldSettings()
 {
@@ -1433,10 +1433,9 @@ void World::SetInitialWorldSettings()
     sScriptMgr->Initialize();
 
     ///- Initialize VMapManager function pointers (to untangle game/collision circular deps)
-    if (VMAP::VMapManager2* vmmgr2 = dynamic_cast<VMAP::VMapManager2*>(VMAP::VMapFactory::createOrGetVMapManager()))
-    {
-        vmmgr2->GetLiquidFlagsPtr = &GetLiquidFlags;
-    }
+    VMAP::VMapManager2* vmmgr2 = VMAP::VMapFactory::createOrGetVMapManager();
+    vmmgr2->GetLiquidFlagsPtr = &GetLiquidFlags;
+    vmmgr2->IsVMAPDisabledForPtr = &DisableMgr::IsVMAPDisabledFor;
 
     ///- Initialize config settings
     LoadConfigSettings();
@@ -1490,11 +1489,6 @@ void World::SetInitialWorldSettings()
 
     LoginDatabase.PExecute("UPDATE realmlist SET icon = %u, timezone = %u WHERE id = '%d'", server_type, realm_zone, realmID);      // One-time query
 
-    ///- Remove the bones (they should not exist in DB though) and old corpses after a restart
-    PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_OLD_CORPSES);
-    stmt->setUInt32(0, 3 * DAY);
-    CharacterDatabase.Execute(stmt);
-
     ///- Custom Hook for loading DB items
     sScriptMgr->OnLoadCustomDatabaseTable();
 
@@ -1502,6 +1496,15 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server", "Initialize data stores...");
     LoadDBCStores(m_dataPath);
     DetectDBCLang();
+
+    std::vector<uint32> mapIds;
+    for (auto const& map : sMapStore)
+        mapIds.emplace_back(map->MapID);
+
+    vmmgr2->InitializeThreadUnsafe(mapIds);
+
+    MMAP::MMapManager* mmmgr = MMAP::MMapFactory::createOrGetMMapManager();
+    mmmgr->InitializeThreadUnsafe(mapIds);
 
     LOG_INFO("server", "Loading Game Graveyard...");
     sGraveyard->LoadGraveyardFromDB();
@@ -1525,7 +1528,7 @@ void World::SetInitialWorldSettings()
     sSpellMgr->LoadSpellCustomAttr();
 
     LOG_INFO("server", "Loading GameObject models...");
-    LoadGameObjectModelList();
+    LoadGameObjectModelList(m_dataPath);
 
     LOG_INFO("server", "Loading Script Names...");
     sObjectMgr->LoadScriptNames();
@@ -1769,9 +1772,6 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server", "Loading pet level stats...");
     sObjectMgr->LoadPetLevelInfo();
-
-    LOG_INFO("server", "Loading Player Corpses...");
-    sObjectMgr->LoadCorpses();
 
     LOG_INFO("server", "Loading Player level dependent mail rewards...");
     sObjectMgr->LoadMailLevelRewards();
@@ -2325,7 +2325,10 @@ void World::Update(uint32 diff)
     if (m_timers[WUPDATE_CORPSES].Passed())
     {
         m_timers[WUPDATE_CORPSES].Reset();
-        sObjectAccessor->RemoveOldCorpses();
+        sMapMgr->DoForAllMaps([](Map* map)
+        {
+            map->RemoveOldCorpses();
+        });
     }
 
     ///- Process Game events when necessary
@@ -3218,7 +3221,7 @@ void World::LoadGlobalPlayerDataStore()
     do
     {
         Field* fields = result->Fetch();
-        uint32 guidLow = fields[0].GetUInt32();
+        ObjectGuid::LowType guidLow = fields[0].GetUInt32();
 
         // count mails
         uint16 mailCount = 0;
@@ -3244,7 +3247,7 @@ void World::LoadGlobalPlayerDataStore()
     LOG_INFO("server", " ");
 }
 
-void World::AddGlobalPlayerData(uint32 guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId)
+void World::AddGlobalPlayerData(ObjectGuid::LowType guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId)
 {
     GlobalPlayerData data;
 
@@ -3266,7 +3269,7 @@ void World::AddGlobalPlayerData(uint32 guid, uint32 accountId, std::string const
     _globalPlayerNameStore[name] = guid;
 }
 
-void World::UpdateGlobalPlayerData(uint32 guid, uint8 mask, std::string const& name, uint8 level, uint8 gender, uint8 race, uint8 playerClass)
+void World::UpdateGlobalPlayerData(ObjectGuid::LowType guid, uint8 mask, std::string const& name, uint8 level, uint8 gender, uint8 race, uint8 playerClass)
 {
     GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
     if (itr == _globalPlayerDataStore.end())
@@ -3284,11 +3287,11 @@ void World::UpdateGlobalPlayerData(uint32 guid, uint8 mask, std::string const& n
         itr->second.name = name;
 
     WorldPacket data(SMSG_INVALIDATE_PLAYER, 8);
-    data << MAKE_NEW_GUID(guid, 0, HIGHGUID_PLAYER);
+    data << guid;
     SendGlobalMessage(&data);
 }
 
-void World::UpdateGlobalPlayerMails(uint32 guid, int16 count, bool add)
+void World::UpdateGlobalPlayerMails(ObjectGuid::LowType guid, int16 count, bool add)
 {
     GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
     if (itr == _globalPlayerDataStore.end())
@@ -3306,7 +3309,7 @@ void World::UpdateGlobalPlayerMails(uint32 guid, int16 count, bool add)
     itr->second.mailCount = uint16(icount + count); // addition or subtraction
 }
 
-void World::UpdateGlobalPlayerGuild(uint32 guid, uint32 guildId)
+void World::UpdateGlobalPlayerGuild(ObjectGuid::LowType guid, uint32 guildId)
 {
     GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
     if (itr == _globalPlayerDataStore.end())
@@ -3314,7 +3317,7 @@ void World::UpdateGlobalPlayerGuild(uint32 guid, uint32 guildId)
 
     itr->second.guildId = guildId;
 }
-void World::UpdateGlobalPlayerGroup(uint32 guid, uint32 groupId)
+void World::UpdateGlobalPlayerGroup(ObjectGuid::LowType guid, uint32 groupId)
 {
     GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
     if (itr == _globalPlayerDataStore.end())
@@ -3323,7 +3326,7 @@ void World::UpdateGlobalPlayerGroup(uint32 guid, uint32 groupId)
     itr->second.groupId = groupId;
 }
 
-void World::UpdateGlobalPlayerArenaTeam(uint32 guid, uint8 slot, uint32 arenaTeamId)
+void World::UpdateGlobalPlayerArenaTeam(ObjectGuid::LowType guid, uint8 slot, uint32 arenaTeamId)
 {
     GlobalPlayerDataMap::iterator itr = _globalPlayerDataStore.find(guid);
     if (itr == _globalPlayerDataStore.end())
@@ -3332,13 +3335,13 @@ void World::UpdateGlobalPlayerArenaTeam(uint32 guid, uint8 slot, uint32 arenaTea
     itr->second.arenaTeamId[slot] = arenaTeamId;
 }
 
-void World::UpdateGlobalNameData(uint32 guidLow, std::string const& oldName, std::string const& newName)
+void World::UpdateGlobalNameData(ObjectGuid::LowType guidLow, std::string const& oldName, std::string const& newName)
 {
     _globalPlayerNameStore.erase(oldName);
     _globalPlayerNameStore[newName] = guidLow;
 }
 
-void World::DeleteGlobalPlayerData(uint32 guid, std::string const& name)
+void World::DeleteGlobalPlayerData(ObjectGuid::LowType guid, std::string const& name)
 {
     if (guid)
         _globalPlayerDataStore.erase(guid);
@@ -3346,7 +3349,7 @@ void World::DeleteGlobalPlayerData(uint32 guid, std::string const& name)
         _globalPlayerNameStore.erase(name);
 }
 
-GlobalPlayerData const* World::GetGlobalPlayerData(uint32 guid) const
+GlobalPlayerData const* World::GetGlobalPlayerData(ObjectGuid::LowType guid) const
 {
     // Get data from global storage
     GlobalPlayerDataMap::const_iterator itr = _globalPlayerDataStore.find(guid);
@@ -3394,12 +3397,12 @@ GlobalPlayerData const* World::GetGlobalPlayerData(uint32 guid) const
     return nullptr;
 }
 
-uint32 World::GetGlobalPlayerGUID(std::string const& name) const
+ObjectGuid World::GetGlobalPlayerGUID(std::string const& name) const
 {
     // Get data from global storage
     GlobalPlayerNameMap::const_iterator itr = _globalPlayerNameStore.find(name);
     if (itr != _globalPlayerNameStore.end())
-        return itr->second;
+        return ObjectGuid::Create<HighGuid::Player>(itr->second);
 
     // Player is not in the global storage, try to get it from the Database
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_DATA_BY_NAME);
@@ -3414,7 +3417,7 @@ uint32 World::GetGlobalPlayerGUID(std::string const& name) const
         // Let's add it to the global storage
         Field* fields = result->Fetch();
 
-        uint32 guidLow = fields[0].GetUInt32();
+        ObjectGuid::LowType guidLow = fields[0].GetUInt32();
 
         LOG_INFO("server", "Player %s [GUID: %u] was not found in the global storage, but it was found in the database.", name.c_str(), guidLow);
 
@@ -3435,10 +3438,16 @@ uint32 World::GetGlobalPlayerGUID(std::string const& name) const
         {
             LOG_INFO("server", "Player %s [GUID: %u] added to the global storage.", name.c_str(), guidLow);
 
-            return guidLow;
+            return ObjectGuid::Create<HighGuid::Player>(guidLow);
         }
     }
 
     // Player not found
-    return 0;
+    return ObjectGuid::Empty;
 }
+
+void World::RemoveOldCorpses()
+{
+    m_timers[WUPDATE_CORPSES].SetCurrent(m_timers[WUPDATE_CORPSES].GetInterval());
+}
+
