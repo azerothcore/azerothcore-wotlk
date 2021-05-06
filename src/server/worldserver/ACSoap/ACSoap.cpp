@@ -25,11 +25,11 @@ void ACSoapThread(const std::string& host, uint16 port)
 
     if (!soap_valid_socket(soap_bind(&soap, host.c_str(), port, 100)))
     {
-        LOG_ERROR("server", "ACSoap: couldn't bind to %s:%d", _host.c_str(), _port);
+        LOG_ERROR("server", "ACSoap: couldn't bind to %s:%d", host.c_str(), port);
         exit(-1);
     }
 
-    LOG_INFO("server", "ACSoap: bound to http://%s:%d", _host.c_str(), _port);
+    LOG_INFO("server", "ACSoap: bound to http://%s:%d", host.c_str(), port);
 
     while (!World::IsStopped())
     {
