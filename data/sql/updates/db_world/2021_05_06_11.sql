@@ -1,3 +1,19 @@
+-- DB update 2021_05_06_10 -> 2021_05_06_11
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_06_10';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_06_10 2021_05_06_11 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1619958638373648000'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1619958638373648000');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 15402;
@@ -33,3 +49,12 @@ INSERT INTO `smart_scripts` VALUES
 (1540202, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 2, 1604, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apprentice Mirveda - Actionlist - Set Faction 1604'),
 (1540202, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 18, 512, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apprentice Mirveda - Actionlist - Set Flags Immune To NPC\'s'),
 (1540202, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Apprentice Mirveda - Actionlist - Set Event Phase 0');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

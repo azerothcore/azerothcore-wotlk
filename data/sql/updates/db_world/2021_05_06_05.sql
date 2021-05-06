@@ -1,3 +1,19 @@
+-- DB update 2021_05_06_04 -> 2021_05_06_05
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_06_04';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_06_04 2021_05_06_05 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1619817090623034700'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1619817090623034700');
 
 -- 9059 Las manoplas de acechacriptas
@@ -727,3 +743,11 @@ DELETE FROM `quest_offer_reward_locale` WHERE `id` = @ID AND `locale` IN('esES',
 INSERT INTO `quest_offer_reward_locale` (`id`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
 (@ID, 'esES', 'Está bien, la cosa funciona así: por cada muestra de valor que me traigas, yo te daré una libranza. Completas la orden de esa libranza y entregas el pedido al maestro de manada Mazadura. ¿Lo pillas? Bien. Ahora, largo de aquí.', 0),
 (@ID, 'esMX', 'Está bien, la cosa funciona así: por cada muestra de valor que me traigas, yo te daré una libranza. Completas la orden de esa libranza y entregas el pedido al maestro de manada Mazadura. ¿Lo pillas? Bien. Ahora, largo de aquí.', 0);
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
