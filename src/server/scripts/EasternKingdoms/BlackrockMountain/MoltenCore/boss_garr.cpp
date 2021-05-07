@@ -71,7 +71,7 @@ public:
             me->GetCreatureListWithEntryInGrid(fireworns, NPC_FIRESWORN, 240.0f);
             if (!fireworns.empty())
             {
-                for (Creature* fireworn : fireworns)
+                for (auto fireworn : fireworns)
                 {
                     if (fireworn && fireworn->isDead())
                     {
