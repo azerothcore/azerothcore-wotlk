@@ -10,6 +10,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "UpdateMask.h"
 #include "WaypointMovementGenerator.h"
 #include "WorldPacket.h"
@@ -131,6 +132,8 @@ void WorldSession::SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathN
         GetPlayer()->Mount(mountDisplayId);
 
     GetPlayer()->GetMotionMaster()->MoveTaxiFlight(path, pathNode);
+
+    sScriptMgr->AnticheatSetSkipOnePacketForASH(GetPlayer(), true);
 }
 
 bool WorldSession::SendLearnNewTaxiNode(Creature* unit)
