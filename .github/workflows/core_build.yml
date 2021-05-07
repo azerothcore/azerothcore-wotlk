@@ -41,6 +41,10 @@ jobs:
             compiler: gcc10
             modules: without
             extra_logs: false
+            - os: ubuntu-18.04
+            compiler: clang7
+            modules: without
+            extra_logs: false
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.modules }}-modules-extra_logs-${{ matrix.extra_logs }}
     env:
