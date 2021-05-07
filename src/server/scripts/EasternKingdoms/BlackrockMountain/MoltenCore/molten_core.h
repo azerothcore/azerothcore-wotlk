@@ -37,7 +37,7 @@ enum Actions
 Position const RagnarosTelePos   = {829.159f, -815.773f, -228.972f, 5.30500f};
 Position const RagnarosSummonPos = {838.510f, -829.840f, -232.000f, 2.00000f};
 
-enum Creatures
+enum MCCreatures
 {
     NPC_LUCIFRON                    = 12118,
     NPC_MAGMADAR                    = 11982,
