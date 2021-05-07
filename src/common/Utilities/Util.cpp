@@ -8,8 +8,6 @@
 #include "Common.h"
 #include "utf8.h"
 #include "Log.h"
-#include "DatabaseWorker.h"
-#include "SQLOperation.h"
 #include "Errors.h"
 #include "TypeList.h"
 #include "Errors.h" // for ASSERT
