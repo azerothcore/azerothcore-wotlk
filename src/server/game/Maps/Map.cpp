@@ -7,6 +7,7 @@
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "DisableMgr.h"
 #include "DynamicTree.h"
 #include "Geometry.h"
 #include "GridNotifiers.h"
@@ -24,6 +25,7 @@
 #include "Transport.h"
 #include "Vehicle.h"
 #include "VMapFactory.h"
+#include "VMapManager2.h"
 
 #ifdef ELUNA
 #include "LuaEngine.h"
@@ -111,7 +113,7 @@ bool Map::ExistVMap(uint32 mapid, int gx, int gy)
 
 void Map::LoadMMap(int gx, int gy)
 {
-    if (!MMAP::MMapFactory::IsPathfindingEnabled(this)) // pussywizard
+    if (!DisableMgr::IsPathfindingEnabled(this)) // pussywizard
         return;
 
     int mmapLoadResult = MMAP::MMapFactory::createOrGetMMapManager()->loadMap(GetId(), gx, gy);
@@ -138,7 +140,7 @@ void Map::LoadMMap(int gx, int gy)
 void Map::LoadVMap(int gx, int gy)
 {
     // x and y are swapped !!
-    int vmapLoadResult = VMAP::VMapFactory::createOrGetVMapManager()->loadMap((sWorld->GetDataPath() + "vmaps").c_str(),  GetId(), gx, gy);
+    int vmapLoadResult = VMAP::VMapFactory::createOrGetVMapManager()->loadMap((sWorld->GetDataPath() + "vmaps").c_str(), GetId(), gx, gy);
     switch (vmapLoadResult)
     {
         case VMAP::VMAP_LOAD_RESULT_OK:
@@ -3721,23 +3723,23 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
 
     bool isWaterNext = IsInWater(destX, destY, destZ);
 
-    PathGenerator* path = new PathGenerator(source);
+    PathGenerator path(source);
 
     // Use a detour raycast to get our first collision point
-    path->SetUseRaycast(true);
-    bool result = path->CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
+    path.SetUseRaycast(true);
+    bool result = path.CalculatePath(startX, startY, startZ, destX, destY, destZ, false);
 
     const Unit* unit = source->ToUnit();
-    bool notOnGround = path->GetPathType() & PATHFIND_NOT_USING_PATH
+    bool notOnGround = path.GetPathType() & PATHFIND_NOT_USING_PATH
         || isWaterNext || (unit && unit->IsFlying());
 
     // Check for valid path types before we proceed
-    if (!result || (!notOnGround && path->GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)))
+    if (!result || (!notOnGround && path.GetPathType() & ~(PATHFIND_NORMAL | PATHFIND_SHORTCUT | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)))
     {
         return false;
     }
 
-    G3D::Vector3 endPos = path->GetPath().back();
+    G3D::Vector3 endPos = path.GetPath().back();
     destX = endPos.x;
     destY = endPos.y;
     destZ = endPos.z;
@@ -3790,7 +3792,9 @@ bool Map::CheckCollisionAndGetValidCoords(const WorldObject* source, float start
         if (gridHeight > INVALID_HEIGHT)
         {
             destZ = gridHeight + unit->GetHoverHeight();
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
