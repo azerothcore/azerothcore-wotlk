@@ -450,6 +450,10 @@ bool WorldSession::HandleSocketClosed()
     return false;
 }
 
+bool WorldSession::IsSocketClosed() const {
+    return !m_Socket || m_Socket->IsClosed();
+}
+
 void WorldSession::HandleTeleportTimeout(bool updateInSessions)
 {
     // pussywizard: handle teleport ack timeout

@@ -24,7 +24,7 @@ PathGenerator::PathGenerator(WorldObject const* owner) :
     memset(_pathPolyRefs, 0, sizeof(_pathPolyRefs));
 
     uint32 mapId = _source->GetMapId();
-    //if (MMAP::MMapFactory::IsPathfindingEnabled(_sourceUnit->FindMap()))
+    //if (DisableMgr::IsPathfindingEnabled(_sourceUnit->FindMap()))
     {
         MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
         _navMesh = mmap->GetNavMesh(mapId);

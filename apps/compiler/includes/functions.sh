@@ -8,6 +8,40 @@ function comp_clean() {
   [ -d "$DIRTOCLEAN" ] && rm -rf $PATTERN
 }
 
+function comp_ccacheEnable() {
+    [ "$AC_CCACHE" != true ] && return
+
+    export CCACHE_MAXSIZE=${CCACHE_MAXSIZE:-'1000MB'}
+    #export CCACHE_DEPEND=true
+    export CCACHE_SLOPPINESS=${CCACHE_SLOPPINESS:-pch_defines,time_macros,include_file_mtime}
+    export CCACHE_CPP2=${CCACHE_CPP2:-true} # optimization for clang
+    export CCACHE_COMPRESS=${CCACHE_COMPRESS:-1}
+    export CCACHE_COMPRESSLEVEL=${CCACHE_COMPRESSLEVEL:-9}
+    #export CCACHE_NODIRECT=true
+
+    export CCUSTOMOPTIONS="$CCUSTOMOPTIONS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+}
+
+function comp_ccacheClean() {
+    [ "$AC_CCACHE" != true ] && echo "ccache is disabled" && return
+
+    echo "Cleaning ccache"
+    ccache -C
+    ccache -s
+}
+
+function comp_ccacheResetStats() {
+    [ "$AC_CCACHE" != true ] && return
+
+    ccache -zc
+}
+
+function comp_ccacheShowStats() {
+    [ "$AC_CCACHE" != true ] && return
+
+    ccache -s
+}
+
 function comp_configure() {
   CWD=$(pwd)
 
@@ -16,6 +50,7 @@ function comp_configure() {
   echo "Build path: $BUILDPATH"
   echo "DEBUG info: $CDEBUG"
   echo "Compilation type: $CTYPE"
+  echo "CCache: $AC_CCACHE"
   # -DCMAKE_BUILD_TYPE=$CCTYPE disable optimization "slow and huge amount of ram"
   # -DWITH_COREDEBUG=$CDEBUG compiled with debug information
 
@@ -27,6 +62,8 @@ function comp_configure() {
   if [ ! -z "$CONFDIR" ]; then
     DCONF="-DCONF_DIR=$CONFDIR"
   fi
+
+  comp_ccacheEnable
 
   cmake $SRCPATH -DCMAKE_INSTALL_PREFIX=$BINPATH $DCONF -DSERVERS=$CSERVERS \
   -DSCRIPTS=$CSCRIPTS \
@@ -49,10 +86,20 @@ function comp_compile() {
 
   cd $BUILDPATH
 
+  comp_ccacheResetStats
+
   time make -j $MTHREADS
   make -j $MTHREADS install
 
+  comp_ccacheShowStats
+
   cd $CWD
+
+  if [ $DOCKER = 1 ]; then
+    echo "Generating confs..."
+    cp -n "env/dist/etc/worldserver.conf.dockerdist" "env/dist/etc/worldserver.conf"
+    cp -n "env/dist/etc/authserver.conf.dockerdist" "env/dist/etc/authserver.conf"
+  fi
 
   runHooks "ON_AFTER_BUILD"
 }

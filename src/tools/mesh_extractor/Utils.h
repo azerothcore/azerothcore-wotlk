@@ -6,6 +6,7 @@
 
 #ifndef UTILS_H
 #define UTILS_H
+
 #include <cstdio>
 #include <string>
 #include <sstream>
@@ -336,9 +337,6 @@ public:
     Vector3 Rotation;
     virtual float Scale() const { return 1.0f; };
 };
-
-#define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 10
 
 struct MmapTileHeader
 {
