@@ -1,3 +1,19 @@
+-- DB update 2021_05_06_00 -> 2021_05_06_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_06_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_06_00 2021_05_06_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1619616883919180600'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1619616883919180600');
 
 -- 8554 Enfréntate a Negolash
@@ -1093,3 +1109,12 @@ DELETE FROM `quest_offer_reward_locale` WHERE `id` = @ID AND `locale` IN('esES',
 INSERT INTO `quest_offer_reward_locale` (`id`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
 (@ID, 'esES', 'El alma de Vaelastrasz está en paz, $gcampeón:campeona;. Todos los Aspectos observan tu progreso con gran interés. Debes saber que tiene aliados poderosos.$B$BSe me ordenó que te conceda algo que te ayude en esta lucha. Úsalo bien...', 0),
 (@ID, 'esMX', 'El alma de Vaelastrasz está en paz, $gcampeón:campeona;. Todos los Aspectos observan tu progreso con gran interés. Debes saber que tiene aliados poderosos.$B$BSe me ordenó que te conceda algo que te ayude en esta lucha. Úsalo bien...', 0);
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
