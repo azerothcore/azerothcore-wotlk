@@ -1,6 +1,9 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1619259290727738768');
 
 SET @INCENDIA_AGAVE_ENTRY := 175928;
+
+DELETE FROM `gameobject` WHERE (`id` = @INCENDIA_AGAVE_ENTRY) AND (`guid` IN (2135276, 2135277, 2135278, 2135279));
+
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
 (2135276, @INCENDIA_AGAVE_ENTRY, 1, 0, 0, 1, 1, -5028.19, -2001.47, -53.28, 5.32135, 0, 0, -0.462591, 0.886572, 180, 100, 1, '', 0),
 (2135277, @INCENDIA_AGAVE_ENTRY, 1, 0, 0, 1, 1, -4989.31, -1968.82, -53.3953, 0.884641, 0, 0, -0.428038, -0.903761, 180, 100, 1, '', 0),
