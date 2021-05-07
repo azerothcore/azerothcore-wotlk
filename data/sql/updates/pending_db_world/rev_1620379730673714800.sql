@@ -1,9 +1,9 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1620379730673714800');
 
---Adjust z-position of Feero Ironhand WP 29
+-- Adjust z-position of Feero Ironhand WP 29
 UPDATE `waypoints` SET `position_z`='10.25865' WHERE  `entry`=4484 AND `pointid`=29;
 
---Adjust Feero Ironhand AI
+-- Adjust Feero Ironhand AI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 4484;
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 4484) AND (`source_type` = 0) AND (`id` IN (28, 29));
