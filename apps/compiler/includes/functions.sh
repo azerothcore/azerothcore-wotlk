@@ -102,6 +102,9 @@ function comp_compile() {
   fi
 
   runHooks "ON_AFTER_BUILD"
+
+  # set worldserver SUID bit
+  sudo chmod u+s env/dist/bin/worldserver
 }
 
 function comp_build() {
