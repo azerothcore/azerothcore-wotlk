@@ -179,7 +179,7 @@ public:
     {
         npc_fireswornAI(Creature* creature) : ScriptedAI(creature),
                                               instance(creature->GetInstanceScript()),
-                                              aniexityTimer(10000),
+                                              anxietyTimer(10000),
                                               canErrupt(true)
         {
         }
@@ -221,7 +221,7 @@ public:
                 return;
             }
 
-            if (aniexityTimer <= diff)
+            if (anxietyTimer <= diff)
             {
                 if (!me->HasAura(SPELL_SEPARATION_ANXIETY))
                 {
@@ -234,18 +234,18 @@ public:
                     }
                 }
 
-                aniexityTimer = 250;
+                anxietyTimer = 250;
             }
             else
             {
-                aniexityTimer -= diff;
+                anxietyTimer -= diff;
             }
 
             DoMeleeAttackIfReady();
         }
     private:
         InstanceScript const* instance;
-        uint32 aniexityTimer;
+        uint32 anxietyTimer;
         bool canErrupt;
     };
 
