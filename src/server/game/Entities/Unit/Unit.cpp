@@ -9816,7 +9816,7 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     }
 
     // creatures should not try to attack the player during polymorph
-    if (creature != nullptr && creature->IsPolymorphed())
+    if (creature && creature->IsPolymorphed())
     {
         return false;
     }
