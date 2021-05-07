@@ -31,8 +31,6 @@ enum Spells
     SPELL_ENRAGE                = 19516,
 
     // Fireworn
-    SPELL_THRASH                = 8876,
-    SPELL_IMMOLATE              = 15733,
     SPELL_SEPARATION_ANXIETY    = 23492,
     SPELL_ERUPTION              = 19497,
     SPELL_MASSIVE_ERUPTION      = 20483,
@@ -188,8 +186,6 @@ public:
 
         void EnterCombat(Unit* /*attacker*/) override
         {
-            DoCastSelf(SPELL_THRASH);
-            DoCastSelf(SPELL_IMMOLATE);
         }
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
