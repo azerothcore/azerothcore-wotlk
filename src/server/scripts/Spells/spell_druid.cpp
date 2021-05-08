@@ -1347,6 +1347,48 @@ public:
     }
 };
 
+// -50334 - Berserk
+class spell_dru_berserk : public SpellScriptLoader
+{
+public:
+    spell_dru_berserk() : SpellScriptLoader("spell_dru_berserk") { }
+
+    class spell_dru_berserk_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_dru_berserk_SpellScript);
+
+        void HandleAfterCast()
+        {
+            Unit* caster = GetCaster();
+
+            if (caster->GetTypeId() == TYPEID_PLAYER)
+            {
+                // Remove tiger fury / mangle(bear)
+                const uint32 TigerFury[6] = { 5217, 6793, 9845, 9846, 50212, 50213 };
+                const uint32 DireMaul[6] = { 33878, 33986, 33987, 48563, 48564 };
+
+                // remove aura
+                for (auto& i : TigerFury)
+                    caster->RemoveAurasDueToSpell(i);
+
+                // reset dire bear maul cd
+                for (auto& i : DireMaul)
+                    caster->ToPlayer()->RemoveSpellCooldown(i, true);
+            }
+        }
+
+        void Register() override
+        {
+            AfterCast += SpellCastFn(spell_dru_berserk_SpellScript::HandleAfterCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const
+    {
+        return new spell_dru_berserk_SpellScript();
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     // Ours
@@ -1357,6 +1399,7 @@ void AddSC_druid_spell_scripts()
     new spell_dru_brambles_treant();
     new spell_dru_barkskin();
     new spell_dru_treant_scaling();
+    new spell_dru_berserk();
 
     // Theirs
     new spell_dru_dash();
