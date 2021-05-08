@@ -4364,7 +4364,7 @@ void Spell::SendSpellStart()
         castFlags |= CAST_FLAG_PENDING;
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
-        castFlags |= CAST_FLAG_PROJECTILE;
+        castFlags |= CAST_FLAG_AMMO;
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
             (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
             && m_spellInfo->PowerType != POWER_HEALTH)
@@ -4420,7 +4420,7 @@ void Spell::SendSpellGo()
         castFlags |= CAST_FLAG_PENDING;
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) || m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NEEDS_AMMO_DATA))
-        castFlags |= CAST_FLAG_PROJECTILE;                        // arrows/bullets visual
+        castFlags |= CAST_FLAG_AMMO;                        // arrows/bullets visual
 
     if ((m_caster->GetTypeId() == TYPEID_PLAYER ||
             (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->IsPet()))
