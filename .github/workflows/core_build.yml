@@ -30,6 +30,10 @@ jobs:
             modules: without
             extra_logs: false
           - os: ubuntu-18.04
+            compiler: clang7
+            modules: without
+            extra_logs: false
+          - os: ubuntu-18.04
             compiler: gcc8
             modules: without
             extra_logs: false
@@ -39,10 +43,6 @@ jobs:
             extra_logs: false
           - os: ubuntu-20.04
             compiler: gcc10
-            modules: without
-            extra_logs: false
-            - os: ubuntu-18.04
-            compiler: clang7
             modules: without
             extra_logs: false
     runs-on: ${{ matrix.os }}
