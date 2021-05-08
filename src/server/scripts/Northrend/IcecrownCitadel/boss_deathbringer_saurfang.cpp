@@ -1315,7 +1315,7 @@ public:
                 targets.push_back(target);
             }
             else
-                acore::Containers::RandomResizeList(targets, 3);
+                acore::Containers::RandomResize(targets, 3);
         }
 
         void Register() override
