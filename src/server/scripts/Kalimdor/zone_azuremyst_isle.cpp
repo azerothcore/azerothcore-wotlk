@@ -297,7 +297,7 @@ public:
                         _events.ScheduleEvent(EVENT_STAND, 2000);
                         break;
                     case EVENT_STAND: // Remove kneel standstate. Using a separate delayed event because it causes unwanted delay before starting waypoint movement.
-                        me->SetByteValue(UNIT_FIELD_BYTES_1, 0, 0);
+                        me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND);
                         break;
                     case EVENT_TALK_END:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _player))
