@@ -1,7 +1,7 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1620443413425226200');
 
 DROP TABLE IF EXISTS `spellvisual_dbc`; 
-CREATE TABLE `spellvisual_dbc` (
+CREATE TABLE IF NOT EXIST `spellvisual_dbc` (
   `ID` INT NOT NULL DEFAULT 0,
   `PrecastKit` INT NOT NULL DEFAULT 0,
   `CastKit` INT NOT NULL DEFAULT 0,
