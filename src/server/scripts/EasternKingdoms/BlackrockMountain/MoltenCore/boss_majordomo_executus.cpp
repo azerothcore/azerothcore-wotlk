@@ -11,12 +11,11 @@ SDComment: Correct spawning and Event NYI
 SDCategory: Molten Core
 EndScriptData */
 
-#include "molten_core.h"
-#include "ObjectMgr.h"
-#include "Player.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "molten_core.h"
+#include "Player.h"
+#include "ScriptedGossip.h"
 
 enum Texts
 {
@@ -40,18 +39,22 @@ enum Spells
     SPELL_SUMMON_RAGNAROS   = 19774,
 };
 
-#define GOSSIP_HELLO 4995
-
 enum Events
 {
     EVENT_MAGIC_REFLECTION  = 1,
-    EVENT_DAMAGE_REFLECTION = 2,
-    EVENT_BLAST_WAVE        = 3,
-    EVENT_TELEPORT          = 4,
+    EVENT_DAMAGE_REFLECTION,
+    EVENT_BLAST_WAVE,
+    EVENT_TELEPORT,
 
-    EVENT_OUTRO_1           = 5,
-    EVENT_OUTRO_2           = 6,
-    EVENT_OUTRO_3           = 7,
+    EVENT_OUTRO_1,
+    EVENT_OUTRO_2,
+    EVENT_OUTRO_3,
+};
+
+enum Misc
+{
+    GOSSIP_HELLO        = 4995,
+    FACTION_FRIENDLY    = 35,
 };
 
 class boss_majordomo : public CreatureScript
@@ -65,20 +68,23 @@ public:
         {
         }
 
-        void KilledUnit(Unit* /*victim*/) override
+        void KilledUnit(Unit* victim) override
         {
-            if (urand(0, 99) < 25)
+            if (roll_chance_i(25) && victim->GetTypeId() == TYPEID_PLAYER)
+            {
                 Talk(SAY_SLAY);
+            }
         }
 
-        void EnterCombat(Unit* who) override
+        void EnterCombat(Unit* /*who*/) override
         {
-            BossAI::EnterCombat(who);
+            _EnterCombat();
             Talk(SAY_AGGRO);
             events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000);
             events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 15000);
             events.ScheduleEvent(EVENT_BLAST_WAVE, 10000);
             events.ScheduleEvent(EVENT_TELEPORT, 20000);
+
             // Call every flamewaker around him
             me->CallForHelp(30);
         }
@@ -88,14 +94,16 @@ public:
             if (instance->GetBossState(BOSS_MAJORDOMO_EXECUTUS) != DONE)
             {
                 if (!UpdateVictim())
+                {
                     return;
+                }
 
                 events.Update(diff);
 
                 if (!me->FindNearestCreature(NPC_FLAMEWAKER_HEALER, 100.0f) && !me->FindNearestCreature(NPC_FLAMEWAKER_ELITE, 100.0f))
                 {
                     me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
-                    me->setFaction(35);
+                    me->setFaction(FACTION_FRIENDLY);
                     EnterEvadeMode();
                     Talk(SAY_DEFEAT);
                     _JustDied();
@@ -104,34 +112,48 @@ public:
                 }
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
                     return;
+                }
 
+                // TODO: inspect this
                 if (HealthBelowPct(50))
-                    DoCast(me, SPELL_AEGIS_OF_RAGNAROS, true);
+                {
+                    DoCastSelf(SPELL_AEGIS_OF_RAGNAROS, true);
+                }
 
-                while (uint32 eventId = events.ExecuteEvent())
+                while (uint32 const eventId = events.ExecuteEvent())
                 {
                     switch (eventId)
                     {
                         case EVENT_MAGIC_REFLECTION:
-                            DoCast(me, SPELL_MAGIC_REFLECTION);
-                            events.ScheduleEvent(EVENT_MAGIC_REFLECTION, 30000);
+                        {
+                            DoCastSelf(SPELL_MAGIC_REFLECTION);
+                            events.RepeatEvent(30000);
                             break;
+                        }
                         case EVENT_DAMAGE_REFLECTION:
-                            DoCast(me, SPELL_DAMAGE_REFLECTION);
-                            events.ScheduleEvent(EVENT_DAMAGE_REFLECTION, 30000);
+                        {
+                            DoCastSelf(SPELL_DAMAGE_REFLECTION);
+                            events.RepeatEvent(30000);
                             break;
+                        }
                         case EVENT_BLAST_WAVE:
+                        {
                             DoCastVictim(SPELL_BLAST_WAVE);
                             events.ScheduleEvent(EVENT_BLAST_WAVE, 10000);
                             break;
+                        }
                         case EVENT_TELEPORT:
-                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
+                        {
+                            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 0.0f, true))
+                            {
                                 DoCast(target, SPELL_TELEPORT);
-                            events.ScheduleEvent(EVENT_TELEPORT, 20000);
+                            }
+
+                            events.RepeatEvent(20000);
                             break;
-                        default:
-                            break;
+                        }
                     }
                 }
 
