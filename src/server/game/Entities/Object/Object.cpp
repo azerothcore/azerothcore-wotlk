@@ -839,7 +839,7 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 
 bool Object::PrintIndexError(uint32 index, bool set) const
 {
-    LOG_INFO("misc", "Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u", 
+    LOG_INFO("misc", "Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u",
         (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
 
     // ASSERT must fail after function call
@@ -926,7 +926,7 @@ void MovementInfo::OutDebug()
         LOG_INFO("movement", "position: `%s`", transport.pos.ToString().c_str());
         LOG_INFO("movement", "seat: %i", transport.seat);
         LOG_INFO("movement", "time: %u", transport.time);
- 
+
         if (flags2 & MOVEMENTFLAG2_INTERPOLATED_MOVEMENT)
         {
             LOG_INFO("movement", "time2: %u", transport.time2);

@@ -1617,7 +1617,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
     float a = (srcToDestDelta - dist2d * b) / (dist2d * dist2d);
     if (a > -0.0001f)
         a = 0;
-    
+
     LOG_ERROR("spells", "Spell::SelectTrajTargets: a %f b %f", a, b);
 
     // Xinef: hack for distance, many trajectory spells have RangeEntry 1 (self)
@@ -1637,14 +1637,14 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
         const float objDist2d = fabs(m_targets.GetSrcPos()->GetExactDist2d(*itr) * cos(m_targets.GetSrcPos()->GetRelativeAngle(*itr)));
         const float dz = fabs((*itr)->GetPositionZ() - m_targets.GetSrcPos()->m_positionZ);
 
-        LOG_ERROR("spells", "Spell::SelectTrajTargets: check %u, dist between %f %f, height between %f %f.", 
+        LOG_ERROR("spells", "Spell::SelectTrajTargets: check %u, dist between %f %f, height between %f %f.",
             (*itr)->GetEntry(), objDist2d - size, objDist2d + size, dz - size, dz + size);
 
         float dist = objDist2d - size;
         float height = dist * (a * dist + b);
-        
+
         LOG_ERROR("spells", "Spell::SelectTrajTargets: dist %f, height %f.", dist, height);
-        
+
         if (dist < bestDist && height < dz + size && height > dz - size)
         {
             bestDist = dist > 0 ? dist : 0;

@@ -218,7 +218,7 @@ public:
             char dataHead; // S
             uint16 data1, data2, data3;
             ss >> dataHead >> data1 >> data2 >> data3;
-            
+
             if (dataHead == 'S')
             {
                 BossKilled = data1;

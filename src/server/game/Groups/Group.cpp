@@ -71,12 +71,12 @@ Group::~Group()
         if (m_bgGroup->GetBgRaid(TEAM_ALLIANCE) == this)
         {
             m_bgGroup->SetBgRaid(TEAM_ALLIANCE, nullptr);
-        }            
+        }
         else if (m_bgGroup->GetBgRaid(TEAM_HORDE) == this)
         {
             m_bgGroup->SetBgRaid(TEAM_HORDE, nullptr);
         }
-        else 
+        else
             LOG_ERROR("bg.battleground", "Group::~Group: battleground group is not linked to the correct battleground.");
     }
 

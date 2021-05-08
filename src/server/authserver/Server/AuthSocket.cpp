@@ -642,7 +642,7 @@ bool AuthSocket::_HandleLogonProof()
                         stmt->setUInt32(1, WrongPassBanTime);
                         LoginDatabase.Execute(stmt);
 
-                        LOG_DEBUG("server.authserver", "'%s:%d' [AuthChallenge] account %s got banned for '%u' seconds because it failed to authenticate '%u' times", 
+                        LOG_DEBUG("server.authserver", "'%s:%d' [AuthChallenge] account %s got banned for '%u' seconds because it failed to authenticate '%u' times",
                             socket().getRemoteAddress().c_str(), socket().getRemotePort(), _login.c_str(), WrongPassBanTime, failed_logins);
                     }
                     else
