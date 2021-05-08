@@ -265,7 +265,9 @@ public:
                         break;
                     case 29:
                         if (Creature* cowlen = me->FindNearestCreature(NPC_COWLEN, 50.0f, true))
+                            {
                             Talk(EMOTE_HUG, cowlen);
+                            }
                         Talk(SAY_END2, player);
                         break;
                 }
@@ -282,13 +284,17 @@ public:
                 {
                     case EVENT_ACCEPT_QUEST:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _player))
+                            {
                             Talk(SAY_START, player);
+                            }
                         me->setFaction(FACTION_QUEST);
                         _events.ScheduleEvent(EVENT_START_ESCORT, 1000);
                         break;
                     case EVENT_START_ESCORT:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _player))
+                            {
                             npc_escortAI::Start(true, false, player->GetGUID());
+                            }
                         _events.ScheduleEvent(EVENT_STAND, 2000);
                         break;
                     case EVENT_STAND: // Remove kneel standstate. Using a separate delayed event because it causes unwanted delay before starting waypoint movement.
@@ -296,12 +302,16 @@ public:
                         break;
                     case EVENT_TALK_END:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _player))
+                            {
                             Talk(SAY_END1, player);
+                            }
                         _events.ScheduleEvent(EVENT_COWLEN_TALK, 2000);
                         break;
                     case EVENT_COWLEN_TALK:
                         if (Creature* cowlen = me->FindNearestCreature(NPC_COWLEN, 50.0f, true))
+                            {
                             cowlen->AI()->Talk(SAY_COWLEN);
+                            }
                         break;
                 }
             }
