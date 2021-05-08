@@ -52,7 +52,7 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20611;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 20611);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (20611, 0, 0, 0, 0, 0, 100, 0, 2500, 4000, 8500, 9500, 11, 32914, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Shimmerwing Moth - In Combat - Cast \'32914\''),
-(20611, 0, 1, 0, 2, 0, 100, 1, 10, 30, 0, 0, 11, 36952, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Shimmerwing Moth - Between 10-30% Health - Cast \'36952\' (No Repeat)');
+(20611, 0, 1, 0, 2, 0, 100, 1, 10, 30, 0, 0, 11, 36592, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Shimmerwing Moth - Between 10-30% Health - Cast \'36592\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20854;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 20854);
@@ -84,9 +84,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20474;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 20474);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(20474, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Ethereum Nexus-Stalker - On respawn - Say 0'),
-(20474, 0, 1, 0, 0, 0, 100, 0, 200, 200, 5000, 5000, 11, 36515, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Ethereum Nexus-Stalker - In Combat - Cast \'36515\''),
-(20474, 0, 2, 0, 0, 0, 100, 0, 500, 2000, 10000, 12000, 11, 36517, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Ethereum Nexus-Stalker -In Combat - Cast \'36517\'');
+(20474, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Ethereum Nexus-Stalker - On Just Summoned - Say Line 0'),
+(20474, 0, 1, 0, 1, 0, 100, 1, 1000, 1500, 0, 0, 11, 36515, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Ethereum Nexus-Stalker - Out of Combat - Cast \'36515\' (No Repeat)'),
+(20474, 0, 2, 0, 0, 0, 100, 0, 2500, 5000, 10000, 12500, 11, 36517, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Ethereum Nexus-Stalker - In Combat - Cast \'36517\'');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20779;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 20779);
@@ -168,8 +168,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20929;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 20929);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(20929, 0, 0, 0, 4, 0, 100, 1, 0, 0, 0, 0, 11, 30798, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Wrath Lord - On Aggro - Cast \'30798\' (No Repeat)'),
-(20929, 0, 1, 0, 0, 0, 100, 0, 2300, 4100, 7400, 9200, 11, 15496, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Wrath Lord - In Combat - Cast \'15496\'');
+(20929, 0, 0, 0, 0, 0, 100, 0, 2300, 4100, 7400, 9200, 11, 15496, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Wrath Lord - In Combat - Cast \'15496\'');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20930;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 20930);
@@ -186,7 +185,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21267;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21267);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(21267, 0, 0, 0, 0, 0, 100, 0, 2300, 4000, 9600, 11000, 11, 36484, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Mana Beast - In Combat - Cast \'36484\'');
+(21267, 0, 0, 0, 2, 0, 100, 1, 20, 80, 0, 0, 11, 36484, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Mana Beast - Between 20-80% Health - Cast \'36484\' (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21089;
 DELETE FROM `smart_scripts` WHERE (source_type = 0 AND entryorguid = 21089);
