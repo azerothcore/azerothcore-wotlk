@@ -41,6 +41,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 
 -- Captured Farmer waypoints:
+DELETE FROM `waypoints` WHERE `entry` IN (1589100, 1589200, 1589300);
 INSERT INTO `waypoints` (`entry`,`pointid`,`position_x`,`position_y`,`position_z`) VALUES
 (1589100, 1, 0.350253, -946.004, 61.9387),
 (1589100, 2, 2.42399, -942.742, 61.9396),
