@@ -423,14 +423,15 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
         uint16 MenuID           = fields[0].GetUInt16();
         uint16 OptionID         = fields[1].GetUInt16();
         std::string LocaleName  = fields[2].GetString();
-        std::string OptionText  = fields[3].GetString();
-        std::string BoxText     = fields[4].GetString();
 
-        GossipMenuItemsLocale& data = _gossipMenuItemsLocaleStore[MAKE_PAIR32(MenuID, OptionID)];
         LocaleConstant locale   = GetLocaleByName(LocaleName);
         if (locale == LOCALE_enUS)
             continue;
 
+        std::string OptionText = fields[3].GetString();
+        std::string BoxText = fields[4].GetString();
+
+        GossipMenuItemsLocale& data = _gossipMenuItemsLocaleStore[MAKE_PAIR32(MenuID, OptionID)];
         AddLocaleString(OptionText, locale, data.OptionText);
         AddLocaleString(BoxText, locale, data.BoxText);
     } while (result->NextRow());
