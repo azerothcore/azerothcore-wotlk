@@ -4,16 +4,12 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include "Player.h"
-
 #ifndef DEF_MOLTEN_CORE_H
 #define DEF_MOLTEN_CORE_H
 
-#include "CreatureAIImpl.h"
-
 #define MCScriptName "instance_molten_core"
 
-enum Encounters
+enum MCData
 {
     BOSS_LUCIFRON                   = 0,
     BOSS_MAGMADAR                   = 1,
@@ -25,19 +21,19 @@ enum Encounters
     BOSS_GOLEMAGG_THE_INCINERATOR   = 7,
     BOSS_MAJORDOMO_EXECUTUS         = 8,
     BOSS_RAGNAROS                   = 9,
-    MAX_ENCOUNTER,
+    MAX_ENCOUNTER                   = 10,
 };
 
-enum Actions
+enum MCActions
 {
-    ACTION_START_RAGNAROS       = 0,
-    ACTION_START_RAGNAROS_ALT   = 1,
+    ACTION_START_RAGNAROS           = -1,
+    ACTION_START_RAGNAROS_ALT       = -2,
 };
 
 Position const RagnarosTelePos   = {829.159f, -815.773f, -228.972f, 5.30500f};
 Position const RagnarosSummonPos = {838.510f, -829.840f, -232.000f, 2.00000f};
 
-enum Creatures
+enum MCCreatures
 {
     NPC_LUCIFRON                    = 12118,
     NPC_MAGMADAR                    = 11982,
@@ -55,7 +51,7 @@ enum Creatures
     NPC_CORE_HOUND                  = 11671,
 };
 
-enum GameObjects
+enum MCGameObjects
 {
     GO_CACHE_OF_THE_FIRELORD        = 179703,
     GO_CIRCLE_SULFURON              = 178187,
@@ -65,11 +61,6 @@ enum GameObjects
     GO_CIRCLE_GARR                  = 178191,
     GO_CIRCLE_MAGMADAR              = 178192,
     GO_CIRCLE_GEHENNAS              = 178193,
-};
-
-enum Data
-{
-    DATA_RAGNAROS_ADDS  = 0,
 };
 
 template <class AI, class T>
