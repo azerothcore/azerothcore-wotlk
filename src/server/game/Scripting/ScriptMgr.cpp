@@ -1549,6 +1549,11 @@ void ScriptMgr::OnBeforePlayerUpdate(Player* player, uint32 p_time)
     FOREACH_SCRIPT(PlayerScript)->OnBeforeUpdate(player, p_time);
 }
 
+void ScriptMgr::OnPlayerUpdate(Player* player, uint32 p_time)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnUpdate(player, p_time);
+}
+
 void ScriptMgr::OnPlayerLogin(Player* player)
 {
 #ifdef ELUNA
@@ -2630,6 +2635,58 @@ void ScriptMgr::OnSetServerSideVisibility(Player* player, ServerSideVisibilityTy
 void ScriptMgr::OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec)
 {
     FOREACH_SCRIPT(PlayerScript)->OnSetServerSideVisibilityDetect(player, type, sec);
+}
+
+void ScriptMgr::AnticheatSetSkipOnePacketForASH(Player* player, bool apply)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetSkipOnePacketForASH(player, apply);
+}
+
+void ScriptMgr::AnticheatSetCanFlybyServer(Player* player, bool apply)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetCanFlybyServer(player, apply);
+}
+
+void ScriptMgr::AnticheatSetUnderACKmount(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetUnderACKmount(player);
+}
+
+void ScriptMgr::AnticheatSetRootACKUpd(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetRootACKUpd(player);
+}
+
+void ScriptMgr::AnticheatSetJumpingbyOpcode(Player* player, bool jump)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatSetJumpingbyOpcode(player, jump);
+}
+
+void ScriptMgr::AnticheatUpdateMovementInfo(Player* player, MovementInfo const& movementInfo)
+{
+    FOREACH_SCRIPT(PlayerScript)->AnticheatUpdateMovementInfo(player, movementInfo);
+}
+
+bool ScriptMgr::AnticheatHandleDoubleJump(Player* player, Unit* mover)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->AnticheatHandleDoubleJump(player, mover))
+            ret = false; // we change ret value only when scripts return true
+
+    return ret;
+}
+
+bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump)
+{
+    bool ret = true;
+
+    FOR_SCRIPTS_RET(PlayerScript, itr, end, ret) // return true by default if not scripts
+        if (!itr->second->AnticheatCheckMovementInfo(player, movementInfo, mover, jump))
+            ret = false; // we change ret value only when scripts return true
+
+    return ret;
 }
 
 bool ScriptMgr::CanGuildSendBankList(Guild const* guild, WorldSession* session, uint8 tabId, bool sendAllSlots)
