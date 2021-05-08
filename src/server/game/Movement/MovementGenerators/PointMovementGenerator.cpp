@@ -17,6 +17,14 @@
 template<class T>
 void PointMovementGenerator<T>::DoInitialize(T* unit)
 {
+    if (unit->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+    {
+        // the next line is to ensure that a new spline is created in DoUpdate() once the unit is no longer rooted/stunned
+        // todo: rename this flag to something more appropriate since it is set to true even without speed change now.
+        i_recalculateSpeed = true;
+        return;
+    }
+
     if (!unit->IsStopped())
         unit->StopMoving();
 
