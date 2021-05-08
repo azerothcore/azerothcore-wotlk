@@ -11,10 +11,10 @@ SDComment: Timers need to be confirmed, Golemagg's Trust need to be checked
 SDCategory: Molten Core
 EndScriptData */
 
-#include "molten_core.h"
-#include "ObjectMgr.h"
-#include "ScriptedCreature.h"
 #include "ScriptMgr.h"
+#include "ScriptedCreature.h"
+#include "molten_core.h"
+#include "ObjectAccessor.h"
 
 enum Texts
 {
@@ -37,7 +37,7 @@ enum Spells
 enum Events
 {
     EVENT_PYROBLAST     = 1,
-    EVENT_EARTHQUAKE    = 2,
+    EVENT_EARTHQUAKE,
 };
 
 class boss_golemagg : public CreatureScript
@@ -53,61 +53,79 @@ public:
 
         void Reset() override
         {
-            BossAI::Reset();
-            DoCast(me, SPELL_MAGMASPLASH, true);
+            _Reset();
+            // TODO: move to creature_template_addon
+            DoCastSelf(SPELL_MAGMASPLASH, true);
         }
 
         void EnterCombat(Unit* victim) override
         {
-            BossAI::EnterCombat(victim);
-            events.ScheduleEvent(EVENT_PYROBLAST, 7000);
+            _EnterCombat();
+            events.ScheduleEvent(EVENT_PYROBLAST, urand(3000, 7000));
 
             // The two ragers should join the fight alongside me against my foes.
             std::list<Creature*> ragers;
             me->GetCreaturesWithEntryInRange(ragers, 100, NPC_CORE_RAGER);
-            for (Creature* i : ragers)
+            if (!ragers.empty())
             {
-                if (i && i->IsAlive() && !i->IsInCombat())
+                for (Creature* rager : ragers)
                 {
-                    i->AI()->AttackStart(victim);
+                    if (rager && rager->IsAlive() && !rager->IsInCombat())
+                    {
+                        rager->AI()->AttackStart(victim);
+                    }
                 }
             }
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
         {
-            if (!HealthBelowPct(10) || me->HasAura(SPELL_ENRAGE))
-                return;
-
-            DoCast(me, SPELL_ENRAGE, true);
-            events.ScheduleEvent(EVENT_EARTHQUAKE, 3000);
+            if (me->HealthBelowPctDamaged(10, damage) && me->HasAura(SPELL_ENRAGE))
+            {
+                DoCastSelf(SPELL_ENRAGE, true);
+                events.RescheduleEvent(EVENT_EARTHQUAKE, 3000);
+            }
         }
 
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
+            {
                 return;
+            }
 
-            while (uint32 eventId = events.ExecuteEvent())
+            while (uint32 const eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
                     case EVENT_PYROBLAST:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    {
+                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0.0f, true))
+                        {
                             DoCast(target, SPELL_PYROBLAST);
-                        events.ScheduleEvent(EVENT_PYROBLAST, 7000);
+                        }
+
+                        events.RepeatEvent(urand(3000, 7000));
                         break;
+                    }
                     case EVENT_EARTHQUAKE:
+                    {
                         DoCastVictim(SPELL_EARTHQUAKE);
-                        events.ScheduleEvent(EVENT_EARTHQUAKE, 3000);
+                        events.RepeatEvent(5000);
                         break;
-                    default:
-                        break;
+                    }
+                }
+
+                if (me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    return;
                 }
             }
 
@@ -128,27 +146,27 @@ public:
 
     struct npc_core_ragerAI : public ScriptedAI
     {
-        npc_core_ragerAI(Creature* creature) : ScriptedAI(creature)
+        npc_core_ragerAI(Creature* creature) : ScriptedAI(creature),
+                                               instance(creature->GetInstanceScript()),
+                                               mangleTimer(urand(6000, 10000))
         {
-            instance = creature->GetInstanceScript();
         }
 
         void Reset() override
         {
-            mangleTimer = 7 * IN_MILLISECONDS;               // These times are probably wrong
+            mangleTimer = urand(6000, 10000);
         }
 
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
         {
-            if (HealthAbovePct(50) || !instance)
-                return;
-
-            if (Creature* pGolemagg = instance->instance->GetCreature(instance->GetGuidData(BOSS_GOLEMAGG_THE_INCINERATOR)))
+            if (me->HealthBelowPctDamaged(50, damage))
             {
-                if (pGolemagg->IsAlive())
+                Creature const* pGolemagg = ObjectAccessor::GetCreature(*me, instance->GetGuidData(BOSS_GOLEMAGG_THE_INCINERATOR));
+                if (pGolemagg && pGolemagg->IsAlive())
                 {
-                    me->AddAura(SPELL_GOLEMAGG_TRUST, me);
+                    damage = 0;
                     Talk(EMOTE_LOWHP);
+                    me->AddAura(SPELL_GOLEMAGG_TRUST, me);
                     me->SetFullHealth();
                 }
             }
@@ -157,16 +175,20 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
+            {
                 return;
+            }
 
             // Mangle
             if (mangleTimer <= diff)
             {
                 DoCastVictim(SPELL_MANGLE);
-                mangleTimer = 10 * IN_MILLISECONDS;
+                mangleTimer = 20000;
             }
             else
+            {
                 mangleTimer -= diff;
+            }
 
             DoMeleeAttackIfReady();
         }
