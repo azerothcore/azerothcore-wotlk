@@ -248,7 +248,7 @@ void BattlegroundMgr::BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg)
         itr2 = itr++;
         if (!bg->IsPlayerInBattleground(itr2->first))
         {
-            LOG_ERROR("server", "Player %s has scoreboard entry for battleground %u but is not in battleground!", itr->first.ToString().c_str(), bg->GetBgTypeID());
+            LOG_ERROR("bg.battleground", "Player %s has scoreboard entry for battleground %u but is not in battleground!", itr->first.ToString().c_str(), bg->GetBgTypeID());
             continue;
         }
 
@@ -519,7 +519,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
 
     if (!result)
     {
-        LOG_ERROR("server", ">> Loaded 0 battlegrounds. DB table `battleground_template` is empty.");
+        LOG_ERROR("bg.battleground", ">> Loaded 0 battlegrounds. DB table `battleground_template` is empty.");
         return;
     }
 
@@ -538,7 +538,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
         BattlemasterListEntry const* bl = sBattlemasterListStore.LookupEntry(bgTypeId);
         if (!bl)
         {
-            LOG_ERROR("server", "Battleground ID %u not found in BattlemasterList.dbc. Battleground not created.", bgTypeId);
+            LOG_ERROR("bg.battleground", "Battleground ID %u not found in BattlemasterList.dbc. Battleground not created.", bgTypeId);
             continue;
         }
 
@@ -559,14 +559,14 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
 
         if (data.MaxPlayersPerTeam == 0 || data.MinPlayersPerTeam > data.MaxPlayersPerTeam)
         {
-            LOG_ERROR("server", "Table `battleground_template` for id %u has bad values for MinPlayersPerTeam (%u) and MaxPlayersPerTeam(%u)",
+            LOG_ERROR("bg.battleground", "Table `battleground_template` for id %u has bad values for MinPlayersPerTeam (%u) and MaxPlayersPerTeam(%u)",
                            data.bgTypeId, data.MinPlayersPerTeam, data.MaxPlayersPerTeam);
             continue;
         }
 
         if (data.LevelMin == 0 || data.LevelMax == 0 || data.LevelMin > data.LevelMax)
         {
-            LOG_ERROR("server", "Table `battleground_template` for id %u has bad values for LevelMin (%u) and LevelMax(%u)",
+            LOG_ERROR("bg.battleground", "Table `battleground_template` for id %u has bad values for LevelMin (%u) and LevelMax(%u)",
                            data.bgTypeId, data.LevelMin, data.LevelMax);
             continue;
         }
@@ -594,7 +594,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
             }
             else
             {
-                LOG_ERROR("server", "Table `battleground_template` for id %u have non-existed `game_graveyard` table id %u in field `AllianceStartLoc`. BG not created.", data.bgTypeId, startId);
+                LOG_ERROR("bg.battleground", "Table `battleground_template` for id %u have non-existed `game_graveyard` table id %u in field `AllianceStartLoc`. BG not created.", data.bgTypeId, startId);
                 continue;
             }
 
@@ -608,7 +608,7 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
             }
             else
             {
-                LOG_ERROR("server", "Table `battleground_template` for id %u have non-existed `game_graveyard` table id %u in field `HordeStartLoc`. BG not created.", data.bgTypeId, startId);
+                LOG_ERROR("bg.battleground", "Table `battleground_template` for id %u have non-existed `game_graveyard` table id %u in field `HordeStartLoc`. BG not created.", data.bgTypeId, startId);
                 continue;
             }
         }
@@ -624,8 +624,8 @@ void BattlegroundMgr::CreateInitialBattlegrounds()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server", ">> Loaded %u battlegrounds in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u battlegrounds in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void BattlegroundMgr::InitAutomaticArenaPointDistribution()
@@ -635,15 +635,15 @@ void BattlegroundMgr::InitAutomaticArenaPointDistribution()
 
     time_t wstime = time_t(sWorld->getWorldState(WS_ARENA_DISTRIBUTION_TIME));
     time_t curtime = time(nullptr);
-    LOG_INFO("server", "AzerothCore Battleground: Initializing Automatic Arena Point Distribution");
+    LOG_INFO("server.loading", "Initializing Automatic Arena Point Distribution");
     if (wstime < curtime)
     {
         m_NextAutoDistributionTime = curtime;           // reset will be called in the next update
-        LOG_INFO("server", "AzerothCore Battleground: Next arena point distribution time in the past, reseting it now.");
+        LOG_INFO("server.loading", "Next arena point distribution time in the past, reseting it now.");
     }
     else
         m_NextAutoDistributionTime = wstime;
-    LOG_INFO("server", "AzerothCore Battleground: Automatic Arena Point Distribution initialized.");
+    LOG_INFO("server.loading", "Automatic Arena Point Distribution initialized.");
 }
 
 void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, ObjectGuid guid, Player* player, BattlegroundTypeId bgTypeId, uint8 fromWhere)
@@ -848,8 +848,8 @@ void BattlegroundMgr::LoadBattleMastersEntry()
 
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 battlemaster entries. DB table `battlemaster_entry` is empty!");
-        LOG_INFO("server", " ");
+        LOG_INFO("server.loading", ">> Loaded 0 battlemaster entries. DB table `battlemaster_entry` is empty!");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -885,8 +885,8 @@ void BattlegroundMgr::LoadBattleMastersEntry()
 
     CheckBattleMasters();
 
-    LOG_INFO("server", ">> Loaded %u battlemaster entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u battlemaster entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void BattlegroundMgr::CheckBattleMasters()

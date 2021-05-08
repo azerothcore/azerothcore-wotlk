@@ -78,7 +78,7 @@ public:
         if (!_delayTime)
             return;
 
-        LOG_INFO("server", "Starting up anti-freeze thread (%u seconds max stuck time)...", _delayTime / 1000);
+        LOG_INFO("server.worldserver", "Starting up anti-freeze thread (%u seconds max stuck time)...", _delayTime / 1000);
         while (!World::IsStopped())
         {
             uint32 curtime = getMSTime();
@@ -89,13 +89,13 @@ public:
             }
             else if (getMSTimeDiff(_lastChange, curtime) > _delayTime)
             {
-                LOG_INFO("server", "World Thread hangs, kicking out server!");
+                LOG_INFO("server.worldserver", "World Thread hangs, kicking out server!");
                 ABORT();
             }
 
             acore::Thread::Sleep(1000);
         }
-        LOG_INFO("server", "Anti-freeze thread exiting without problems.");
+        LOG_INFO("server.worldserver", "Anti-freeze thread exiting without problems.");
     }
 };
 
@@ -117,10 +117,10 @@ int Master::Run()
     if (!pidFile.empty())
     {
         if (uint32 pid = CreatePIDFile(pidFile))
-            LOG_ERROR("server", "Daemon PID: %u\n", pid); // outError for red color in console
+            LOG_ERROR("server.worldserver", "Daemon PID: %u\n", pid); // outError for red color in console
         else
         {
-            LOG_ERROR("server", "Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
+            LOG_ERROR("server.worldserver", "Cannot create PID file %s (possible error: permission)\n", pidFile.c_str());
             return 1;
         }
     }
@@ -192,20 +192,20 @@ int Master::Run()
             ULONG_PTR currentAffinity = affinity & appAff;            // remove non accessible processors
 
             if (!currentAffinity)
-                LOG_ERROR("server", "Processors marked in UseProcessors bitmask (hex) %x are not accessible for the worldserver. Accessible processors bitmask (hex): %x", affinity, appAff);
+                LOG_ERROR("server.worldserver", "Processors marked in UseProcessors bitmask (hex) %x are not accessible for the worldserver. Accessible processors bitmask (hex): %x", affinity, appAff);
             else if (SetProcessAffinityMask(hProcess, currentAffinity))
-                LOG_INFO("server", "Using processors (bitmask, hex): %x", currentAffinity);
+                LOG_INFO("server.worldserver", "Using processors (bitmask, hex): %x", currentAffinity);
             else
-                LOG_ERROR("server", "Can't set used processors (hex): %x", currentAffinity);
+                LOG_ERROR("server.worldserver", "Can't set used processors (hex): %x", currentAffinity);
         }
     }
 
     if (highPriority)
     {
         if (SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS))
-            LOG_INFO("server", "worldserver process priority class set to HIGH");
+            LOG_INFO("server.worldserver", "worldserver process priority class set to HIGH");
         else
-            LOG_ERROR("server", "Can't set worldserver process priority class.");
+            LOG_ERROR("server.worldserver", "Can't set worldserver process priority class.");
     }
 
 #else // Linux
@@ -220,21 +220,21 @@ int Master::Run()
                 CPU_SET(i, &mask);
 
         if (sched_setaffinity(0, sizeof(mask), &mask))
-            LOG_ERROR("server", "Can't set used processors (hex): %x, error: %s", affinity, strerror(errno));
+            LOG_ERROR("server.worldserver", "Can't set used processors (hex): %x, error: %s", affinity, strerror(errno));
         else
         {
             CPU_ZERO(&mask);
             sched_getaffinity(0, sizeof(mask), &mask);
-            LOG_INFO("server", "Using processors (bitmask, hex): %lx", *(__cpu_mask*)(&mask));
+            LOG_INFO("server.worldserver", "Using processors (bitmask, hex): %lx", *(__cpu_mask*)(&mask));
         }
     }
 
     if (highPriority)
     {
         if (setpriority(PRIO_PROCESS, 0, PROCESS_HIGH_PRIORITY))
-            LOG_ERROR("server", "Can't set worldserver process priority class, error: %s", strerror(errno));
+            LOG_ERROR("server.worldserver", "Can't set worldserver process priority class, error: %s", strerror(errno));
         else
-            LOG_INFO("server", "worldserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
+            LOG_INFO("server.worldserver", "worldserver process priority class set to %i", getpriority(PRIO_PROCESS, 0));
     }
 
 #endif
@@ -263,7 +263,7 @@ int Master::Run()
     std::string bindIp = sConfigMgr->GetOption<std::string>("BindIP", "0.0.0.0");
     if (sWorldSocketMgr->StartNetwork(worldPort, bindIp.c_str()) == -1)
     {
-        LOG_ERROR("server", "Failed to start network");
+        LOG_ERROR("server.worldserver", "Failed to start network");
         World::StopNow(ERROR_EXIT_CODE);
         // go down and shutdown the server
     }
@@ -271,7 +271,7 @@ int Master::Run()
     // set server online (allow connecting now)
     LoginDatabase.DirectPExecute("UPDATE realmlist SET flag = flag & ~%u, population = 0 WHERE id = '%u'", REALM_FLAG_INVALID, realmID);
 
-    LOG_INFO("server", "%s (worldserver-daemon) ready...", GitRevision::GetFullVersion());
+    LOG_INFO("server.worldserver", "%s (worldserver-daemon) ready...", GitRevision::GetFullVersion());
 
     // when the main thread closes the singletons get unloaded
     // since worldrunnable uses them, it will crash if unloaded after master
@@ -300,7 +300,7 @@ int Master::Run()
 
     _StopDB();
 
-    LOG_INFO("server", "Halting process...");
+    LOG_INFO("server.worldserver", "Halting process...");
 
     if (cliThread)
     {
@@ -380,7 +380,7 @@ bool Master::_StartDB()
     realmID = sConfigMgr->GetOption<int32>("RealmID", 0);
     if (!realmID)
     {
-        LOG_ERROR("server", "Realm ID not defined in configuration file");
+        LOG_ERROR("server.worldserver", "Realm ID not defined in configuration file");
         return false;
     }
     else if (realmID > 255)
@@ -390,11 +390,11 @@ bool Master::_StartDB()
          * with a size of uint8 we can "only" store up to 255 realms
          * anything further the client will behave anormaly
         */
-        LOG_ERROR("server", "Realm ID must range from 1 to 255");
+        LOG_ERROR("server.worldserver", "Realm ID must range from 1 to 255");
         return false;
     }
 
-    LOG_INFO("server", "Realm running as realm ID %d", realmID);
+    LOG_INFO("server.worldserver", "Realm running as realm ID %d", realmID);
 
     ///- Clean the database before starting
     ClearOnlineAccounts();
@@ -404,7 +404,7 @@ bool Master::_StartDB()
 
     sWorld->LoadDBVersion();
 
-    LOG_INFO("server", "Using World DB: %s", sWorld->GetDBVersion());
+    LOG_INFO("server.worldserver", "Using World DB: %s", sWorld->GetDBVersion());
     return true;
 }
 

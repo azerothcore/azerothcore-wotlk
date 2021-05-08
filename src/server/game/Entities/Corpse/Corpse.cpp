@@ -64,8 +64,8 @@ bool Corpse::Create(ObjectGuid::LowType guidlow, Player* owner)
 
     if (!IsPositionValid())
     {
-        LOG_ERROR("server", "Corpse (guidlow %d, owner %s) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
-                       guidlow, owner->GetName().c_str(), owner->GetPositionX(), owner->GetPositionY());
+        LOG_ERROR("entities.player", "Corpse (guidlow %d, owner %s) not created. Suggested coordinates isn't valid (X: %f Y: %f)",
+            guidlow, owner->GetName().c_str(), owner->GetPositionX(), owner->GetPositionY());
         return false;
     }
 
@@ -157,8 +157,8 @@ bool Corpse::LoadCorpseFromDB(ObjectGuid::LowType guid, Field* fields)
 
     if (!IsPositionValid())
     {
-        LOG_ERROR("server", "Corpse ( %s, owner: %s) is not created, given coordinates are not valid (X: %f, Y: %f, Z: %f)",
-                       GetGUID().ToString().c_str(), GetOwnerGUID().ToString().c_str(), posX, posY, posZ);
+        LOG_ERROR("entities.player", "Corpse ( %s, owner: %s) is not created, given coordinates are not valid (X: %f, Y: %f, Z: %f)",
+            GetGUID().ToString().c_str(), GetOwnerGUID().ToString().c_str(), posX, posY, posZ);
         return false;
     }
 

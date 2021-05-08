@@ -39,9 +39,7 @@ void GuardAI::EnterEvadeMode()
         return;
     }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("entities.unit", "Guard entry: %u enters evade mode.", me->GetEntry());
-#endif
 
     me->RemoveAllAuras();
     me->DeleteThreatList();

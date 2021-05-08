@@ -54,11 +54,11 @@ void RARunnable::run()
 
     if (acceptor.open(listenAddress, m_Reactor) == -1)
     {
-        LOG_ERROR("server", "Trinity RA can not bind to port %d on %s (possible error: port already in use)", raPort, stringIp.c_str());
+        LOG_ERROR("network", "Trinity RA can not bind to port %d on %s (possible error: port already in use)", raPort, stringIp.c_str());
         return;
     }
 
-    LOG_INFO("server", "Starting Trinity RA on port %d on %s", raPort, stringIp.c_str());
+    LOG_INFO("network", "Starting Azeroth RA on port %d on %s", raPort, stringIp.c_str());
 
     while (!World::IsStopped())
     {
@@ -67,7 +67,5 @@ void RARunnable::run()
             break;
     }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    LOG_DEBUG("server", "Trinity RA thread exiting");
-#endif
+    LOG_DEBUG("network", "Trinity RA thread exiting");
 }

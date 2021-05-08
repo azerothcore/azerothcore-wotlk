@@ -33,7 +33,7 @@ int RASocket::open(void*)
 
     if (peer().get_remote_addr(remoteAddress) == -1)
     {
-        LOG_ERROR("server", "RASocket::open: peer().get_remote_addr error is %s", ACE_OS::strerror(errno));
+        LOG_ERROR("network", "RASocket::open: peer().get_remote_addr error is %s", ACE_OS::strerror(errno));
         return -1;
     }
 

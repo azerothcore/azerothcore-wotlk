@@ -96,9 +96,7 @@ void Channel::UpdateChannelInDB() const
         stmt->setUInt32(2, _channelDBId);
         CharacterDatabase.Execute(stmt);
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
         LOG_DEBUG("chat.system", "Channel(%s) updated in database", _name.c_str());
-#endif
     }
 }
 
@@ -696,9 +694,7 @@ void Channel::List(Player const* player)
         return;
     }
 
-#if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("chat.system", "SMSG_CHANNEL_LIST %s Channel: %s", player->GetSession()->GetPlayerInfo().c_str(), GetName().c_str());
-#endif
     WorldPacket data(SMSG_CHANNEL_LIST, 1 + (GetName().size() + 1) + 1 + 4 + playersStore.size() * (8 + 1));
     data << uint8(1);                                   // channel type?
     data << GetName();                                  // channel name

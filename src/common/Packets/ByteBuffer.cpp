@@ -65,5 +65,5 @@ void ByteBuffer::hexlike(bool outString) const
     }
     o << " ";
 
-    LOG_INFO("server", "%s", o.str().c_str());
+    LOG_TRACE("network", "%s", o.str().c_str());
 }
