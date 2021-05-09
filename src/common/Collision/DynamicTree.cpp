@@ -5,16 +5,12 @@
  */
 
 #include "DynamicTree.h"
-//#include "QuadTree.h"
-//#include "RegularGrid.h"
 #include "BoundingIntervalHierarchyWrapper.h"
-
 #include "Log.h"
 #include "RegularGrid.h"
 #include "Timer.h"
 #include "GameObjectModel.h"
 #include "ModelInstance.h"
-
 #include <G3D/AABox.h>
 #include <G3D/Ray.h>
 #include <G3D/Vector3.h>
@@ -23,10 +19,8 @@ using VMAP::ModelInstance;
 
 namespace
 {
-
     int CHECK_TREE_PERIOD = 200;
-
-} // namespace
+}
 
 template<> struct HashTrait< GameObjectModel>
 {
@@ -44,15 +38,9 @@ template<> struct BoundsTrait< GameObjectModel>
     static void getBounds2(const GameObjectModel* g, G3D::AABox& out) { out = g->getBounds();}
 };
 
-/*
-static bool operator == (const GameObjectModel& mdl, const GameObjectModel& mdl2){
-    return &mdl == &mdl2;
-}
-*/
-
 typedef RegularGrid2D<GameObjectModel, BIHWrap<GameObjectModel>> ParentTree;
 
-struct DynTreeImpl : public ParentTree/*, public Intersectable*/
+struct DynTreeImpl : public ParentTree
 {
     typedef GameObjectModel Model;
     typedef ParentTree base;
