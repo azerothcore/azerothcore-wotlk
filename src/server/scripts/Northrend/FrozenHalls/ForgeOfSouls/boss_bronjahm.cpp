@@ -221,7 +221,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (pInstance)
-                if (Creature* b = pInstance->instance->GetCreature(pInstance->GetData64(DATA_BRONJAHM)))
+                if (Creature* b = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_BRONJAHM)))
                 {
                     if (me->GetExactDist2d(b) <= 2.0f)
                     {

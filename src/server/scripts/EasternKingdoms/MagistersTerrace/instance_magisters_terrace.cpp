@@ -17,29 +17,19 @@ public:
 
         uint32 Encounter[MAX_ENCOUNTER];
 
-        uint64 VexallusDoorGUID;
-        uint64 SelinDoorGUID;
-        uint64 SelinEncounterDoorGUID;
-        uint64 DelrissaDoorGUID;
-        uint64 KaelDoorGUID;
-        uint64 EscapeOrbGUID;
+        ObjectGuid VexallusDoorGUID;
+        ObjectGuid SelinDoorGUID;
+        ObjectGuid SelinEncounterDoorGUID;
+        ObjectGuid DelrissaDoorGUID;
+        ObjectGuid KaelDoorGUID;
+        ObjectGuid EscapeOrbGUID;
 
-        uint64 DelrissaGUID;
-        uint64 KaelGUID;
+        ObjectGuid DelrissaGUID;
+        ObjectGuid KaelGUID;
 
         void Initialize() override
         {
             memset(&Encounter, 0, sizeof(Encounter));
-
-            VexallusDoorGUID = 0;
-            SelinDoorGUID = 0;
-            SelinEncounterDoorGUID = 0;
-            DelrissaDoorGUID = 0;
-            KaelDoorGUID = 0;
-            EscapeOrbGUID = 0;
-
-            DelrissaGUID = 0;
-            KaelGUID = 0;
         }
 
         bool IsEncounterInProgress() const override
@@ -118,7 +108,7 @@ public:
             {
                 case GO_SELIN_DOOR:
                     if (GetData(DATA_SELIN_EVENT) == DONE)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     SelinDoorGUID = go->GetGUID();
                     break;
                 case GO_SELIN_ENCOUNTER_DOOR:
@@ -127,13 +117,13 @@ public:
 
                 case GO_VEXALLUS_DOOR:
                     if (GetData(DATA_VEXALLUS_EVENT) == DONE)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     VexallusDoorGUID = go->GetGUID();
                     break;
 
                 case GO_DELRISSA_DOOR:
                     if (GetData(DATA_DELRISSA_EVENT) == DONE)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(ObjectGuid::Empty, true, go);
                     DelrissaDoorGUID = go->GetGUID();
                     break;
                 case GO_KAEL_DOOR:
@@ -182,14 +172,15 @@ public:
             OUT_LOAD_INST_DATA_COMPLETE;
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
                 case NPC_DELRISSA:
                     return DelrissaGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
     };
 

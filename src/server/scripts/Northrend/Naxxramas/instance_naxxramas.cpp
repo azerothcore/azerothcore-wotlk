@@ -55,54 +55,8 @@ public:
             for (auto& i : HeiganEruption)
                 i.clear();
 
-            // GOs
-            _patchwerkGateGUID = 0;
-            _gluthGateGUID = 0;
-            _nothEntryGateGUID = 0;
-            _nothExitGateGUID = 0;
-            _heiganGateGUID = 0;
-            _heiganGateExitGUID = 0;
-            _loathebGateGUID = 0;
-            _anubGateGUID = 0;
-            _anubNextGateGUID = 0;
-            _faerlinaWebGUID = 0;
-            _faerlinaGateGUID = 0;
-            _maexxnaGateGUID = 0;
-            _thaddiusGateGUID = 0;
-            _horsemanGateGUID = 0;
-            _kelthuzadFloorGUID = 0;
-            _kelthuzadGateGUID = 0;
-            _kelthuzadPortal1GUID = 0;
-            _kelthuzadPortal2GUID = 0;
-            _kelthuzadPortal3GUID = 0;
-            _kelthuzadPortal4GUID = 0;
-            _sapphironGateGUID = 0;
-            _horsemanPortalGUID = 0;
-            _loathebPortalGUID = 0;
-            _maexxnaPortalGUID = 0;
-            _thaddiusPortalGUID = 0;
-            _deathknightEyePortalGUID = 0;
-            _plagueEyePortalGUID = 0;
-            _spiderEyePortalGUID = 0;
-            _abomEyePortalGUID = 0;
-            _deathknightGlowEyePortalGUID = 0;
-            _plagueGlowEyePortalGUID = 0;
-            _spiderGlowEyePortalGUID = 0;
-            _abomGlowEyePortalGUID = 0;
-
             // NPCs
             PatchwerkRoomTrash.clear();
-            _patchwerkGUID = 0;
-            _thaddiusGUID = 0;
-            _stalaggGUID = 0;
-            _feugenGUID = 0;
-            _zeliekGUID = 0;
-            _rivendareGUID = 0;
-            _blaumeuxGUID = 0;
-            _korthazzGUID = 0;
-            _sapphironGUID = 0;
-            _kelthuzadGUID = 0;
-            _lichkingGUID = 0;
 
             // Controls
             _horsemanKilled = 0;
@@ -126,56 +80,56 @@ public:
         std::set<GameObject*> HeiganEruption[4];
 
         // GOs
-        uint64 _patchwerkGateGUID;
-        uint64 _gluthGateGUID;
-        uint64 _nothEntryGateGUID;
-        uint64 _nothExitGateGUID;
-        uint64 _heiganGateGUID;
-        uint64 _heiganGateExitGUID;
-        uint64 _loathebGateGUID;
-        uint64 _anubGateGUID;
-        uint64 _anubNextGateGUID;
-        uint64 _faerlinaWebGUID;
-        uint64 _faerlinaGateGUID;
-        uint64 _maexxnaGateGUID;
-        uint64 _thaddiusGateGUID;
-        uint64 _gothikEnterGateGUID{};
-        uint64 _gothikInnerGateGUID{};
-        uint64 _gothikExitGateGUID{};
-        uint64 _horsemanGateGUID;
-        uint64 _kelthuzadFloorGUID;
-        uint64 _kelthuzadGateGUID;
-        uint64 _kelthuzadPortal1GUID;
-        uint64 _kelthuzadPortal2GUID;
-        uint64 _kelthuzadPortal3GUID;
-        uint64 _kelthuzadPortal4GUID;
-        uint64 _sapphironGateGUID;
-        uint64 _horsemanPortalGUID;
-        uint64 _loathebPortalGUID;
-        uint64 _maexxnaPortalGUID;
-        uint64 _thaddiusPortalGUID;
-        uint64 _deathknightEyePortalGUID;
-        uint64 _plagueEyePortalGUID;
-        uint64 _spiderEyePortalGUID;
-        uint64 _abomEyePortalGUID;
-        uint64 _deathknightGlowEyePortalGUID;
-        uint64 _plagueGlowEyePortalGUID;
-        uint64 _spiderGlowEyePortalGUID;
-        uint64 _abomGlowEyePortalGUID;
+        ObjectGuid _patchwerkGateGUID;
+        ObjectGuid _gluthGateGUID;
+        ObjectGuid _nothEntryGateGUID;
+        ObjectGuid _nothExitGateGUID;
+        ObjectGuid _heiganGateGUID;
+        ObjectGuid _heiganGateExitGUID;
+        ObjectGuid _loathebGateGUID;
+        ObjectGuid _anubGateGUID;
+        ObjectGuid _anubNextGateGUID;
+        ObjectGuid _faerlinaWebGUID;
+        ObjectGuid _faerlinaGateGUID;
+        ObjectGuid _maexxnaGateGUID;
+        ObjectGuid _thaddiusGateGUID;
+        ObjectGuid _gothikEnterGateGUID;
+        ObjectGuid _gothikInnerGateGUID;
+        ObjectGuid _gothikExitGateGUID{};
+        ObjectGuid _horsemanGateGUID;
+        ObjectGuid _kelthuzadFloorGUID;
+        ObjectGuid _kelthuzadGateGUID;
+        ObjectGuid _kelthuzadPortal1GUID;
+        ObjectGuid _kelthuzadPortal2GUID;
+        ObjectGuid _kelthuzadPortal3GUID;
+        ObjectGuid _kelthuzadPortal4GUID;
+        ObjectGuid _sapphironGateGUID;
+        ObjectGuid _horsemanPortalGUID;
+        ObjectGuid _loathebPortalGUID;
+        ObjectGuid _maexxnaPortalGUID;
+        ObjectGuid _thaddiusPortalGUID;
+        ObjectGuid _deathknightEyePortalGUID;
+        ObjectGuid _plagueEyePortalGUID;
+        ObjectGuid _spiderEyePortalGUID;
+        ObjectGuid _abomEyePortalGUID;
+        ObjectGuid _deathknightGlowEyePortalGUID;
+        ObjectGuid _plagueGlowEyePortalGUID;
+        ObjectGuid _spiderGlowEyePortalGUID;
+        ObjectGuid _abomGlowEyePortalGUID;
 
         // NPCs
-        std::list<uint64> PatchwerkRoomTrash;
-        uint64 _patchwerkGUID;
-        uint64 _thaddiusGUID;
-        uint64 _stalaggGUID;
-        uint64 _feugenGUID;
-        uint64 _zeliekGUID;
-        uint64 _rivendareGUID;
-        uint64 _blaumeuxGUID;
-        uint64 _korthazzGUID;
-        uint64 _sapphironGUID;
-        uint64 _kelthuzadGUID;
-        uint64 _lichkingGUID;
+        GuidList PatchwerkRoomTrash;
+        ObjectGuid _patchwerkGUID;
+        ObjectGuid _thaddiusGUID;
+        ObjectGuid _stalaggGUID;
+        ObjectGuid _feugenGUID;
+        ObjectGuid _zeliekGUID;
+        ObjectGuid _rivendareGUID;
+        ObjectGuid _blaumeuxGUID;
+        ObjectGuid _korthazzGUID;
+        ObjectGuid _sapphironGUID;
+        ObjectGuid _kelthuzadGUID;
+        ObjectGuid _lichkingGUID;
 
         // Controls
         uint8 _horsemanKilled;
@@ -1075,7 +1029,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 id) const override
+        ObjectGuid GetGuidData(uint32 id) const override
         {
             switch (id)
             {
@@ -1124,10 +1078,11 @@ public:
                     return _feugenGUID;
                 case DATA_LICH_KING_BOSS:
                     return _lichkingGUID;
-
                 default:
-                    return 0;
+                    break;
             }
+
+            return ObjectGuid::Empty;
         }
 
         std::string GetSaveData() override

@@ -180,15 +180,15 @@ public:
                         if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 0, true))
                         {
                             DoCast(target, SPELL_PARALYZE);
-                            instance->SetData64(DATA_PARALYZED, target->GetGUID());
+                            instance->SetGuidData(DATA_PARALYZED, target->GetGUID());
                             uint8 Index = urand(0, 1);
                             me->SummonCreature(NPC_LARVA, LarvaPos[Index], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
                         }
                         events.ScheduleEvent(EVENT_PARALYZE, 15000);
                         break;
                     case EVENT_SWARMER_ATTACK:
-                        for (std::list<uint64>::iterator i = _swarmers.begin(); i != _swarmers.end(); ++i)
-                            if (Creature* swarmer = me->GetMap()->GetCreature(*i))
+                        for (ObjectGuid guid : _swarmers)
+                            if (Creature* swarmer = me->GetMap()->GetCreature(guid))
                                 if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
                                     swarmer->AI()->AttackStart(target);
 
@@ -215,7 +215,7 @@ public:
             }
         }
     private:
-        std::list<uint64> _swarmers;
+        GuidList _swarmers;
         uint8 _phase;
         bool _enraged;
     };
@@ -242,7 +242,7 @@ public:
         {
             if (type == POINT_MOTION_TYPE)
                 if (id == POINT_PARALYZE)
-                    if (Player* target = ObjectAccessor::GetPlayer(*me, _instance->GetData64(DATA_PARALYZED)))
+                    if (Player* target = ObjectAccessor::GetPlayer(*me, _instance->GetGuidData(DATA_PARALYZED)))
                         DoCast(target, SPELL_FEED); // Omnomnom
         }
 

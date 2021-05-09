@@ -247,16 +247,14 @@ public:
         {
             instance = creature->GetInstanceScript();
             SelectAddEntry();
-            for (uint8 i = 0; i < 4; ++i)
-                AddGUID[i] = 0;
         }
 
         InstanceScript* instance;
 
-        uint64 AddGUID[4];
+        ObjectGuid AddGUID[4];
         uint32 AddEntry[4];
 
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         uint32 SpiritBolts_Timer;
         uint32 DrainPower_Timer;
@@ -433,7 +431,7 @@ public:
                     trigger->GetMotionMaster()->MoveChase(me);
 
                     //DoCast(target, SPELL_SIPHON_SOUL, true);
-                    //me->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, target->GetGUID());
+                    //me->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, target->GetGUID());
                     //me->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_SIPHON_SOUL);
 
                     PlayerGUID = target->GetGUID();

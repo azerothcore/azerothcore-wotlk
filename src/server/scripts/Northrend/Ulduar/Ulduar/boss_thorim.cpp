@@ -355,7 +355,7 @@ public:
         GameObject* GetThorimObject(uint32 entry)
         {
             if (m_pInstance)
-                return ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(entry));
+                return ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(entry));
             return nullptr;
         }
 
@@ -845,7 +845,7 @@ public:
             else if (param == ACTION_SIF_START_DOMINION)
             {
                 if (me->GetInstanceScript())
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_THORIM)))
+                    if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
                         me->CastSpell(cr, SPELL_TOUCH_OF_DOMINION, false);
 
                 events.ScheduleEvent(EVENT_SIF_FINISH_DOMINION, 150000);
@@ -938,7 +938,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            Start(false, true, 0);
+            Start(false, true);
         }
 
         uint32 Timer;
@@ -1024,7 +1024,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            Start(false, true, 0);
+            Start(false, true);
             SetDespawnAtEnd(false);
         }
 
@@ -1130,10 +1130,10 @@ public:
 
         void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
         {
-            if (!_playerAttack && who && (who->GetTypeId() == TYPEID_PLAYER || IS_PLAYER_GUID(who->GetOwnerGUID())))
+            if (!_playerAttack && who && (who->GetTypeId() == TYPEID_PLAYER || who->GetOwnerGUID().IsPlayer()))
             {
                 if (me->GetInstanceScript())
-                    if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_THORIM)))
+                    if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
                     {
                         if (!thorim->IsInCombat())
                         {
@@ -1154,7 +1154,7 @@ public:
         void JustDied(Unit*) override
         {
             if (me->GetInstanceScript())
-                if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_THORIM)))
+                if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
                     thorim->AI()->DoAction(ACTION_START_TRASH_DIED);
         }
 
@@ -1379,7 +1379,7 @@ public:
         bool _leftHand;
         bool _checkTarget;
         float _nextTriggerPos;
-        uint64 _triggerLeftGUID[2], _triggerRightGUID[2];
+        ObjectGuid _triggerLeftGUID[2], _triggerRightGUID[2];
 
         void Reset() override
         {
@@ -1404,7 +1404,7 @@ public:
         void JustDied(Unit*) override
         {
             if (me->GetInstanceScript())
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript()->GetData64(DATA_THORIM_FIRST_DOORS)))
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript()->GetGuidData(DATA_THORIM_FIRST_DOORS)))
                     go->SetGoState(GO_STATE_ACTIVE);
         }
 
@@ -1533,10 +1533,10 @@ public:
         {
             if (InstanceScript* pInstance = me->GetInstanceScript())
             {
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, pInstance->GetData64(DATA_THORIM_SECOND_DOORS)))
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(DATA_THORIM_SECOND_DOORS)))
                     go->SetGoState(GO_STATE_ACTIVE);
 
-                if (Creature* thorim = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_THORIM)))
+                if (Creature* thorim = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_THORIM)))
                     thorim->AI()->DoAction(ACTION_ALLOW_HIT);
             }
         }
@@ -1805,7 +1805,7 @@ public:
     bool OnCheck(Player* player, Unit*) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetData64(TYPE_THORIM)))
+            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetGuidData(TYPE_THORIM)))
                 return cr->AI()->GetData(DATA_HIT_BY_LIGHTNING);
 
         return false;
@@ -1820,7 +1820,7 @@ public:
     bool OnCheck(Player* player, Unit*) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetData64(TYPE_THORIM)))
+            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetGuidData(TYPE_THORIM)))
                 return cr->AI()->GetData(DATA_LOSE_YOUR_ILLUSION);
 
         return false;

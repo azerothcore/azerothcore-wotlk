@@ -37,20 +37,16 @@ public:
         uint32 EncounterStatus;
         std::string str_data;
 
-        uint64 NPC_MalygosGUID;
-        uint64 GO_IrisGUID;
-        uint64 GO_ExitPortalGUID;
-        uint64 GO_PlatformGUID;
+        ObjectGuid NPC_MalygosGUID;
+        ObjectGuid GO_IrisGUID;
+        ObjectGuid GO_ExitPortalGUID;
+        ObjectGuid GO_PlatformGUID;
         bool bPokeAchiev;
 
         void Initialize() override
         {
             EncounterStatus = NOT_STARTED;
 
-            NPC_MalygosGUID = 0;
-            GO_IrisGUID = 0;
-            GO_ExitPortalGUID = 0;
-            GO_PlatformGUID = 0;
             bPokeAchiev = false;
         }
 
@@ -173,14 +169,15 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch(type)
             {
                 case DATA_MALYGOS_GUID:
                     return NPC_MalygosGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         void ProcessEvent(WorldObject* /*unit*/, uint32 eventId) override

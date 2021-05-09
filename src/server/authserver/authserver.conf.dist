@@ -34,7 +34,7 @@
 #        Description: Logs directory setting.
 #        Important:   LogsDir needs to be quoted, as the string might contain space characters.
 #                     Logs directory must exists, or log file creation will be disabled.
-#        Example:     "/home/youruser/azeroth-server/logs"
+#        Example:     "/home/youruser/azerothcore/logs"
 #        Default:     "" - (Log files will be stored in the current path)
 
 LogsDir = ""
@@ -256,7 +256,7 @@ Appender.Auth=2,5,0,Auth.log,w
 #                     (Using spaces as separator).
 #
 
-Logger.root=5,Console Auth
+Logger.root=4,Console Auth
 
 #
 ###################################################################################################

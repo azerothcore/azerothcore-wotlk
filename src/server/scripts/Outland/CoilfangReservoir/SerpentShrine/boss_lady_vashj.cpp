@@ -75,7 +75,7 @@ public:
     bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         if (InstanceScript* instance = _owner->GetInstanceScript())
-            if (Creature* vashj = ObjectAccessor::GetCreature(*_owner, instance->GetData64(NPC_LADY_VASHJ)))
+            if (Creature* vashj = ObjectAccessor::GetCreature(*_owner, instance->GetGuidData(NPC_LADY_VASHJ)))
                 _owner->GetMotionMaster()->MoveFollow(vashj, 3.0f, vashj->GetAngle(_owner), MOTION_SLOT_CONTROLLED);
         return true;
     }
@@ -363,7 +363,7 @@ public:
             if (CheckTimer <= diff)
             {
                 // check if vashj is death
-                Unit* Vashj = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_LADYVASHJ));
+                Unit* Vashj = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_LADYVASHJ));
                 if (!Vashj || !Vashj->IsAlive() || CAST_AI(boss_lady_vashj::boss_lady_vashjAI, Vashj->ToCreature()->AI())->Phase != 3)
                 {
                     // remove

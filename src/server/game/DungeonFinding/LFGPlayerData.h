@@ -27,7 +27,7 @@ namespace lfg
         void RestoreState();
         void SetLockedDungeons(LfgLockMap const& lock);
         void SetTeam(TeamId teamId);
-        void SetGroup(uint64 group);
+        void SetGroup(ObjectGuid group);
         void SetRandomPlayersCount(uint8 count);
 
         // Queue
@@ -40,7 +40,7 @@ namespace lfg
         LfgState GetOldState() const;
         LfgLockMap const& GetLockedDungeons() const;
         TeamId GetTeam() const;
-        uint64 GetGroup() const;
+        ObjectGuid GetGroup() const;
         uint8 GetRandomPlayersCount() const;
         void SetCanOverrideRBState(bool val) { m_canOverrideRBState = val; }
         bool CanOverrideRBState() const { return m_canOverrideRBState; }
@@ -58,7 +58,7 @@ namespace lfg
         // Player
         LfgLockMap m_LockedDungeons;                       ///< Dungeons player can't do and reason
         TeamId m_TeamId;                                   ///< Player team - determines the queue to join
-        uint64 m_Group;                                    ///< Original group of player when joined LFG
+        ObjectGuid m_Group;                                ///< Original group of player when joined LFG
         uint8 m_randomPlayers;                             ///< Xinef: Amount of random players you raid with
 
         // Queue

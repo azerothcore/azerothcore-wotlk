@@ -139,7 +139,7 @@ public:
                 summons.Summon(pSummoned);
                 pSummoned->SetPhaseMask(16, true);
                 if (pInstance)
-                    pInstance->SetData64(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
@@ -151,7 +151,7 @@ public:
                 if (pSummoned->IsAIEnabled)
                     pSummoned->AI()->DoAction(-1337);
                 if (pInstance)
-                    pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
+                    pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
@@ -183,19 +183,19 @@ public:
         npc_vh_void_sentryAI(Creature* c) : NullCreatureAI(c)
         {
             pInstance = c->GetInstanceScript();
-            SummonedGUID = 0;
+            SummonedGUID.Clear();
             checkTimer = 5000;
             //me->CastSpell(me, SPELL_SUMMON_VOID_SENTRY_BALL, true);
             if (Creature* pSummoned = me->SummonCreature(NPC_VOID_SENTRY_BALL, *me, TEMPSUMMON_TIMED_DESPAWN, 300000))
             {
                 pSummoned->SetPhaseMask(1, true);
                 SummonedGUID = pSummoned->GetGUID();
-                pInstance->SetData64(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
+                pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
             }
         }
 
         InstanceScript* pInstance;
-        uint64 SummonedGUID;
+        ObjectGuid SummonedGUID;
         uint16 checkTimer;
 
         void DoAction(int32 a) override
@@ -219,7 +219,7 @@ public:
         void SummonedCreatureDespawn(Creature* pSummoned) override
         {
             if (pSummoned)
-                pInstance->SetData64(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
+                pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
         }
 
         void UpdateAI(uint32 diff) override

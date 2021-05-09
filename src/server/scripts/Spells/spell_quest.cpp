@@ -64,7 +64,7 @@ public:
                 {
                     Player* player = GetCaster()->ToPlayer();
 
-                    player->KilledMonsterCredit(23343, 0);
+                    player->KilledMonsterCredit(23343);
                     if (Creature* cr = GetCaster()->SummonCreature(23343, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), ar->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 180000))
                     {
                         cr->CastSpell(player, 40926, true);
@@ -241,7 +241,7 @@ public:
             if (Unit* target = GetHitUnit())
                 if (Unit* owner = target->ToTempSummon()->GetSummoner())
                     if (owner->GetTypeId() == TYPEID_PLAYER)
-                        owner->ToPlayer()->KilledMonsterCredit(23327, 0); // Some trigger, just count
+                        owner->ToPlayer()->KilledMonsterCredit(23327); // Some trigger, just count
         }
 
         void Register() override
@@ -348,12 +348,12 @@ public:
         void HandleDummy(SpellEffIndex /*effIndex*/)
         {
             if (Creature* target = GetHitCreature())
-                if (target->GetDBTableGUIDLow() == 77757 || target->GetDBTableGUIDLow() == 78693)
+                if (target->GetSpawnId() == 77757 || target->GetSpawnId() == 78693)
                 {
                     count++;
                     if (count == 2)
                         if (GetCaster() && GetCaster()->ToPlayer())
-                            GetCaster()->ToPlayer()->KilledMonsterCredit(22383, 0);
+                            GetCaster()->ToPlayer()->KilledMonsterCredit(22383);
                 }
         }
 
@@ -382,7 +382,7 @@ public:
         {
             if (GetCaster() && GetHitUnit())
                 if (Player* player = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself())
-                    player->KilledMonsterCredit(GetHitUnit()->GetEntry(), 0);
+                    player->KilledMonsterCredit(GetHitUnit()->GetEntry());
         }
 
         void Register() override
@@ -536,7 +536,7 @@ public:
             if (Unit* target = GetHitUnit())
                 if (Player* player = target->GetCharmerOrOwnerPlayerOrPlayerItself())
                     if (player->HasAura(38224))
-                        player->KilledMonsterCredit(22051, 0);
+                        player->KilledMonsterCredit(22051);
         }
 
         void Register() override
@@ -1201,7 +1201,7 @@ public:
                     {
                         creatureTarget->UpdateEntry(newEntry);
                         creatureTarget->DespawnOrUnsummon(DESPAWN_TIME);
-                        caster->KilledMonsterCredit(newEntry, 0);
+                        caster->KilledMonsterCredit(newEntry);
                     }
                 }
         }
@@ -1738,7 +1738,7 @@ public:
             if (Creature* target = GetHitCreature())
             {
                 caster->CastSpell(caster, SPELL_TRIGGER_AID_OF_THE_EARTHEN, true, nullptr);
-                caster->KilledMonsterCredit(NPC_FALLEN_EARTHEN_DEFENDER, 0);
+                caster->KilledMonsterCredit(NPC_FALLEN_EARTHEN_DEFENDER);
                 target->DespawnOrUnsummon();
             }
         }
@@ -1872,7 +1872,7 @@ public:
             if (Creature* target = GetHitCreature())
             {
                 target->DespawnOrUnsummon();
-                caster->KilledMonsterCredit(NPC_SCALPS_KC_BUNNY, 0);
+                caster->KilledMonsterCredit(NPC_SCALPS_KC_BUNNY);
             }
         }
 
@@ -1916,7 +1916,7 @@ public:
             if (Creature* target = GetHitCreature())
                 if (target && !target->HasAura(SPELL_FLAMES))
                 {
-                    caster->KilledMonsterCredit(NPC_VILLAGER_KILL_CREDIT, 0);
+                    caster->KilledMonsterCredit(NPC_VILLAGER_KILL_CREDIT);
                     target->CastSpell(target, SPELL_FLAMES, true);
                     target->DespawnOrUnsummon(20000);
                 }
@@ -1960,7 +1960,7 @@ public:
             Player* caster = GetCaster()->ToPlayer();
             if (Creature* target = GetHitCreature())
             {
-                caster->KilledMonsterCredit(NPC_SHARD_KILL_CREDIT, 0);
+                caster->KilledMonsterCredit(NPC_SHARD_KILL_CREDIT);
                 target->CastSpell(target, uint32(GetEffectValue()), true);
                 target->DespawnOrUnsummon(2000);
             }
@@ -2003,7 +2003,7 @@ public:
             Unit* caster = GetCaster();
             if (caster->IsVehicle())
                 if (Unit* player = caster->GetVehicleKit()->GetPassenger(0))
-                    player->ToPlayer()->KilledMonsterCredit(NPC_KING_OF_THE_MOUNTAINT_KC, 0);
+                    player->ToPlayer()->KilledMonsterCredit(NPC_KING_OF_THE_MOUNTAINT_KC);
         }
 
         void Register() override
@@ -2154,7 +2154,7 @@ public:
                 if (Creature* trigger = target->FindNearestCreature(NPC_ICE_SPIKE_BUNNY, 25.0f))
                 {
                     sCreatureTextMgr->SendChat(trigger, SAY_1, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
-                    target->KilledMonsterCredit(NPC_KILLCREDIT, 0);
+                    target->KilledMonsterCredit(NPC_KILLCREDIT);
                     sCreatureTextMgr->SendChat(trigger, SAY_2, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
                 }
             }

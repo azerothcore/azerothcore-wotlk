@@ -45,9 +45,11 @@ namespace
             throw ConfigException(acore::StringFormat("Config::LoadFile: Failed open file '%s'", file.c_str()));
 
         uint32 count = 0;
+        uint32 lineNumber = 0;
 
         while (in.good())
         {
+            lineNumber++;
             std::string line;
             std::getline(in, line);
 
@@ -67,7 +69,9 @@ namespace
             auto const equal_pos = line.find('=');
 
             if (equal_pos == std::string::npos || equal_pos == line.length())
-                return;
+            {
+                ABORT_MSG("> Config::LoadFile: Failure to read line number %u. Don't use only whitespace lines", lineNumber);
+            }
 
             auto entry = acore::String::Trim(line.substr(0, equal_pos), in.getloc());
             auto value = acore::String::Trim(line.substr(equal_pos + 1), in.getloc());

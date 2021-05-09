@@ -341,7 +341,7 @@ public:
         SummonList summons;
 
         uint32 _initFight;
-        uint64 _keepersGUID[4];
+        ObjectGuid _keepersGUID[4];
         uint8 _summonedGuardiansCount;
         uint32 _p2TalkTimer;
         bool _secondPhase;
@@ -427,7 +427,10 @@ public:
             SpawnClouds();
 
             _initFight = 1;
-            memset(_keepersGUID, 0, sizeof(_keepersGUID));
+
+            for (uint8 i = 0; i < 4; ++i)
+                _keepersGUID[i].Clear();
+
             _summonedGuardiansCount = 0;
             _p2TalkTimer = 0;
             _secondPhase = false;
@@ -440,7 +443,7 @@ public:
                 m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, CRITERIA_NOT_GETTING_OLDER);
                 m_pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SANITY);
                 m_pInstance->SetData(TYPE_YOGGSARON, NOT_STARTED);
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_YOGG_SARON_DOORS)))
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_YOGG_SARON_DOORS)))
                     go->SetGoState(GO_STATE_ACTIVE);
             }
         }
@@ -766,7 +769,7 @@ public:
                     me->SummonCreature(NPC_VOICE_OF_YOGG_SARON, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
 
                     if (m_pInstance)
-                        if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_YOGG_SARON_DOORS)))
+                        if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_YOGG_SARON_DOORS)))
                             go->SetGoState(GO_STATE_READY);
 
                     events.ScheduleEvent(EVENT_SARA_P1_SPELLS, 0, 1, EVENT_PHASE_ONE);
@@ -883,7 +886,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            Start(false, true, 0, 0, false, true);
+            Start(false, true, ObjectGuid::Empty, nullptr, false, true);
         }
 
         uint32 _checkTimer;
@@ -895,7 +898,7 @@ public:
 
             _isSummoning = false;
             if (me->GetInstanceScript())
-                if (Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(NPC_SARA)))
+                if (Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(NPC_SARA)))
                     sara->AI()->JustSummoned(cr);
         }
 
@@ -1069,9 +1072,9 @@ public:
             if (m_pInstance)
             {
                 m_pInstance->SetData(TYPE_YOGGSARON, DONE);
-                if (Creature* sara = ObjectAccessor::GetCreature(*me, m_pInstance->GetData64(NPC_SARA)))
+                if (Creature* sara = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_SARA)))
                     sara->AI()->DoAction(ACTION_YOGG_SARON_DEATH);
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetData64(GO_YOGG_SARON_DOORS)))
+                if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_YOGG_SARON_DOORS)))
                     go->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -1345,7 +1348,7 @@ public:
                 {
                     // Stun
                     if (me->GetInstanceScript())
-                        if(Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(NPC_SARA)))
+                        if(Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(NPC_SARA)))
                             sara->AI()->DoAction(MINUTE * IN_MILLISECONDS - std::min((uint32)MINUTE * IN_MILLISECONDS, _induceTimer));
 
                     _induceTimer = 0;
@@ -1412,7 +1415,7 @@ public:
 
                     me->CastSpell(me, SPELL_BRAIN_HURT_VISUAL, true);
                     if (me->GetInstanceScript())
-                        if(Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(NPC_SARA)))
+                        if(Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(NPC_SARA)))
                             sara->AI()->DoAction(ACTION_BRAIN_DAMAGED);
                 }
             }
@@ -1601,11 +1604,11 @@ public:
         {
             SetCombatMovement(false);
             _checkTimer = 1;
-            _playerGUID = 0;
+            _playerGUID.Clear();
         }
 
         uint32 _checkTimer;
-        uint64 _playerGUID;
+        ObjectGuid _playerGUID;
 
         Unit* SelectConstrictTarget()
         {
@@ -1877,17 +1880,17 @@ public:
         bool _running;
         int32 _checkTimer;
         uint8 _step;
-        uint64 _championGUID;
-        uint64 _yoggGUID;
+        ObjectGuid _championGUID;
+        ObjectGuid _yoggGUID;
 
         void Reset() override
         {
             _running = true;
             _checkTimer = 0;
             _step = 0;
-            _championGUID = 0;
+            _championGUID.Clear();
             if (me->GetInstanceScript())
-                _yoggGUID = me->GetInstanceScript()->GetData64(TYPE_YOGGSARON);
+                _yoggGUID = me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON);
         }
 
         void NextStep(const uint32 time)
@@ -1896,7 +1899,7 @@ public:
             _checkTimer = time;
         }
 
-        void Say(std::string text, uint64 guid, bool yell, uint32 soundId)
+        void Say(std::string text, ObjectGuid guid, bool yell, uint32 soundId)
         {
             Creature* creature = guid ? ObjectAccessor::GetCreature(*me, guid) : me;
             if (!creature)
@@ -1946,7 +1949,7 @@ public:
                     case 1:
                         if (Creature* cr = me->FindNearestCreature(NPC_IMMOLATED_CHAMPION, 50))
                             _championGUID = cr->GetGUID();
-                        Say("Your resilience is admirable.", 0, false, LK_1);
+                        Say("Your resilience is admirable.", ObjectGuid::Empty, false, LK_1);
                         NextStep(7000);
                         break;
                     case 2:
@@ -1958,7 +1961,7 @@ public:
                         NextStep(6500);
                         break;
                     case 4:
-                        Say("I will break you as I broke him.", 0, false, LK_2);
+                        Say("I will break you as I broke him.", ObjectGuid::Empty, false, LK_2);
                         NextStep(7500);
                         break;
                     case 5:
@@ -1991,17 +1994,17 @@ public:
         bool _running;
         int32 _checkTimer;
         uint8 _step;
-        uint64 _garonaGUID;
-        uint64 _yoggGUID;
+        ObjectGuid _garonaGUID;
+        ObjectGuid _yoggGUID;
 
         void Reset() override
         {
             _running = true;
             _checkTimer = 0;
             _step = 0;
-            _garonaGUID = 0;
+            _garonaGUID.Clear();
             if (me->GetInstanceScript())
-                _yoggGUID = me->GetInstanceScript()->GetData64(TYPE_YOGGSARON);
+                _yoggGUID = me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON);
         }
 
         void NextStep(const uint32 time)
@@ -2010,7 +2013,7 @@ public:
             _checkTimer = time;
         }
 
-        void Say(std::string text, uint64 guid, bool yell, uint32 soundId)
+        void Say(std::string text, ObjectGuid guid, bool yell, uint32 soundId)
         {
             Creature* creature = guid ? ObjectAccessor::GetCreature(*me, guid) : me;
             if (!creature)
@@ -2080,7 +2083,7 @@ public:
                         NextStep(2500);
                         break;
                     case 6:
-                        Say("We will hold until the reinforcements come. As long as men with stout hearts are manning the walls and throne Stormwind will hold.", 0, false, LL_1);
+                        Say("We will hold until the reinforcements come. As long as men with stout hearts are manning the walls and throne Stormwind will hold.", ObjectGuid::Empty, false, LL_1);
                         NextStep(10000);
                         break;
                     case 7:
@@ -2113,7 +2116,7 @@ public:
         bool _running;
         int32 _checkTimer;
         uint8 _step;
-        uint64 _yoggGUID;
+        ObjectGuid _yoggGUID;
 
         void Reset() override
         {
@@ -2121,7 +2124,7 @@ public:
             _checkTimer = 0;
             _step = 0;
             if (me->GetInstanceScript())
-                _yoggGUID = me->GetInstanceScript()->GetData64(TYPE_YOGGSARON);
+                _yoggGUID = me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON);
         }
 
         void NextStep(const uint32 time)
@@ -2130,9 +2133,9 @@ public:
             _checkTimer = time;
         }
 
-        void Say(std::string text, uint64 guid, bool yell, uint32 soundId)
+        void Say(std::string text, ObjectGuid guid, bool yell, uint32 soundId)
         {
-            Creature* creature = guid ? ObjectAccessor::GetCreature(*me, guid) : me;
+            Creature* creature = !guid ? ObjectAccessor::GetCreature(*me, guid) : me;
             if (!creature)
                 return;
 
@@ -2178,7 +2181,7 @@ public:
                         NextStep(5000);
                         break;
                     case 1:
-                        Say("It is done... All have been given that which must be given. I now seal the Dragon Soul forever...", 0, false, NEL_1);
+                        Say("It is done... All have been given that which must be given. I now seal the Dragon Soul forever...", ObjectGuid::Empty, false, NEL_1);
                         NextStep(10000);
                         break;
                     case 2:
@@ -2187,7 +2190,7 @@ public:
                         NextStep(4000);
                         break;
                     case 3:
-                        Say("For it to be as it must, yes.", 0, false, NEL_2);
+                        Say("For it to be as it must, yes.", ObjectGuid::Empty, false, NEL_2);
                         NextStep(4000);
                         break;
                     case 4:
@@ -2223,7 +2226,7 @@ public:
         }
 
         EventMap events;
-        std::vector<uint64> _targets;
+        GuidVector _targets;
         uint32 _current;
 
         void Reset() override
@@ -2237,7 +2240,7 @@ public:
             {
                 // Drive Me Crazy achievement failed
                 if (me->GetInstanceScript())
-                    if (Creature* yogg = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetData64(TYPE_YOGGSARON)))
+                    if (Creature* yogg = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON)))
                         yogg->AI()->DoAction(ACTION_FAILED_DRIVE_ME_CRAZY);
 
                 events.ScheduleEvent(40, 8000);
@@ -2252,7 +2255,7 @@ public:
             {
                 case 40:
                     {
-                        uint64 _guid = _targets.at(_current);
+                        ObjectGuid _guid = _targets.at(_current);
                         ++_current;
 
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _guid))
@@ -2365,7 +2368,7 @@ public:
         }
 
     protected:
-        uint64 _targetGUID;
+        ObjectGuid _targetGUID;
     };
 
     AuraScript* GetAuraScript() const override
@@ -2969,7 +2972,7 @@ public:
     bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/) override
     {
         if (player->GetInstanceScript())
-            if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetData64(NPC_SARA)))
+            if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetGuidData(NPC_SARA)))
                 return sara->GetAI()->GetData(DATA_GET_KEEPERS_COUNT) <= _keepersCount;
 
         return false;
@@ -2990,7 +2993,7 @@ public:
     bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/) override
     {
         if (player->GetInstanceScript())
-            if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetData64(NPC_BRAIN_OF_YOGG_SARON)))
+            if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetGuidData(NPC_BRAIN_OF_YOGG_SARON)))
                 return sara->GetAI()->GetData(DATA_GET_CURRENT_ILLUSION) == _requiredIllusion;
 
         return false;

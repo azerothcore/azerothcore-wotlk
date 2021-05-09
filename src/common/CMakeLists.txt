@@ -49,12 +49,9 @@ target_include_directories(common
     ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(common
-  PRIVATE
-    game-interface
   PUBLIC
     acore-core-interface
     ace
-    mysql
     g3dlib
     Detour
     sfmt

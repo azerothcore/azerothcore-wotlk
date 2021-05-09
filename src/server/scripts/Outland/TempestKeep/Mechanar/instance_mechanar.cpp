@@ -26,7 +26,6 @@ public:
             SetBossNumber(MAX_ENCOUNTER);
             LoadDoorData(doorData);
 
-            _pathaleonGUID = 0;
             _passageEncounter = 0;
             _passageTimer = 0;
             _passageGUIDs.clear();
@@ -237,10 +236,10 @@ public:
         }
 
     private:
-        uint64 _pathaleonGUID;
+        ObjectGuid _pathaleonGUID;
         uint32 _passageTimer;
         uint32 _passageEncounter;
-        std::set<uint64> _passageGUIDs;
+        GuidSet _passageGUIDs;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

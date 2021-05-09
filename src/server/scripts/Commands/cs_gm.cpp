@@ -88,15 +88,21 @@ public:
 
         WorldPacket data(12);
         if (strncmp(args, "on", 3) == 0)
+        {
             data.SetOpcode(SMSG_MOVE_SET_CAN_FLY);
+            sScriptMgr->AnticheatSetCanFlybyServer(target, true);
+        }
         else if (strncmp(args, "off", 4) == 0)
+        {
             data.SetOpcode(SMSG_MOVE_UNSET_CAN_FLY);
+            sScriptMgr->AnticheatSetCanFlybyServer(target, false);
+        }
         else
         {
             handler->SendSysMessage(LANG_USE_BOL);
             return false;
         }
-        data.append(target->GetPackGUID());
+        data << target->GetPackGUID();
         data << uint32(0);                                      // unknown
         target->SendMessageToSet(&data, true);
         handler->PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, handler->GetNameLink(target).c_str(), args);
@@ -110,8 +116,7 @@ public:
         bool footer = false;
 
         std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
-
-        HashMapHolder<Player>::MapType const& m = sObjectAccessor->GetPlayers();
+        HashMapHolder<Player>::MapType const& m = ObjectAccessor::GetPlayers();
         for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
         {
             AccountTypes itrSec = itr->second->GetSession()->GetSecurity();

@@ -205,7 +205,7 @@ public:
             //Heal_Timer
             if (Heal_Timer <= diff)
             {
-                Unit* pJindo = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_JINDO));
+                Unit* pJindo = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_JINDO));
                 if (pJindo)
                     DoCast(pJindo, SPELL_HEAL);
                 Heal_Timer = 3000;

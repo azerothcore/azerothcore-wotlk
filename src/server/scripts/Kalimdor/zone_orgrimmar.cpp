@@ -58,7 +58,7 @@ public:
         bool CanEmote;
         uint32 SaluteTimer;
         uint32 ResetTimer;
-        uint64 PlayerGUID;
+        ObjectGuid PlayerGUID;
 
         void Reset() override
         {
@@ -66,7 +66,7 @@ public:
             CanEmote = false;
             SaluteTimer = 6000;
             ResetTimer = 0;
-            PlayerGUID = 0;
+            PlayerGUID.Clear();
         }
 
         void EnterCombat(Unit* /*who*/) override { }

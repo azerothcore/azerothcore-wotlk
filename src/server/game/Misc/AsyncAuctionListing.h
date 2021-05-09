@@ -4,11 +4,12 @@
 #include "Common.h"
 #include "EventProcessor.h"
 #include "WorldPacket.h"
+#include "ObjectGuid.h"
 
 class AuctionListOwnerItemsDelayEvent : public BasicEvent
 {
 public:
-    AuctionListOwnerItemsDelayEvent(uint64 _creatureGuid, uint64 guid, bool o) : creatureGuid(_creatureGuid), playerguid(guid), owner(o) {}
+    AuctionListOwnerItemsDelayEvent(ObjectGuid _creatureGuid, ObjectGuid guid, bool o) : creatureGuid(_creatureGuid), playerguid(guid), owner(o) {}
     ~AuctionListOwnerItemsDelayEvent() override {}
 
     bool Execute(uint64 e_time, uint32 p_time) override;
@@ -16,22 +17,22 @@ public:
     bool getOwner() { return owner; }
 
 private:
-    uint64 creatureGuid;
-    uint64 playerguid;
+    ObjectGuid creatureGuid;
+    ObjectGuid playerguid;
     bool owner;
 };
 
 class AuctionListItemsDelayEvent
 {
 public:
-    AuctionListItemsDelayEvent(uint32 msTimer, uint64 playerguid, uint64 creatureguid, std::string searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable, uint32 auctionSlotID, uint32 auctionMainCategory, uint32 auctionSubCategory, uint32 quality, uint8 getAll) :
+    AuctionListItemsDelayEvent(uint32 msTimer, ObjectGuid playerguid, ObjectGuid creatureguid, std::string searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable, uint32 auctionSlotID, uint32 auctionMainCategory, uint32 auctionSubCategory, uint32 quality, uint8 getAll) :
         _msTimer(msTimer), _playerguid(playerguid), _creatureguid(creatureguid), _searchedname(searchedname), _listfrom(listfrom), _levelmin(levelmin), _levelmax(levelmax), _usable(usable), _auctionSlotID(auctionSlotID), _auctionMainCategory(auctionMainCategory), _auctionSubCategory(auctionSubCategory), _quality(quality), _getAll(getAll) { }
 
     bool Execute();
 
     uint32 _msTimer;
-    uint64 _playerguid;
-    uint64 _creatureguid;
+    ObjectGuid _playerguid;
+    ObjectGuid _creatureguid;
     std::string _searchedname;
     uint32 _listfrom;
     uint8 _levelmin;
