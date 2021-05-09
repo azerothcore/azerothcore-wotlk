@@ -517,9 +517,15 @@ public:
 
                                             pPlayer->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
                                             pPlayer->SetDisableGravity(true, true);
+
+                                            sScriptMgr->AnticheatSetCanFlybyServer(pPlayer, true);
+
                                             WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
                                             data << pPlayer->GetPackGUID();
                                             pPlayer->SendMessageToSet(&data, true);
+
+                                            sScriptMgr->AnticheatSetUnderACKmount(pPlayer);
+                                            sScriptMgr->AnticheatSetSkipOnePacketForASH(pPlayer, true);
 
                                             pPlayer->SetGuidValue(PLAYER_FARSIGHT, vp->GetGUID());
                                             c->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -704,6 +710,9 @@ public:
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                 if (Player* pPlayer = i->GetSource())
                                 {
+                                    sScriptMgr->AnticheatSetUnderACKmount(pPlayer);
+                                    sScriptMgr->AnticheatSetSkipOnePacketForASH(pPlayer, true);
+
                                     if (!pPlayer->IsAlive() || pPlayer->IsGameMaster())
                                         continue;
 
@@ -884,6 +893,10 @@ public:
                 plr->RemoveAura(SPELL_FREEZE_ANIM);
                 plr->SetDisableGravity(false, true);
                 plr->SetGuidValue(PLAYER_FARSIGHT, ObjectGuid::Empty);
+
+                sScriptMgr->AnticheatSetCanFlybyServer(plr, false);
+                sScriptMgr->AnticheatSetUnderACKmount(plr);
+                sScriptMgr->AnticheatSetSkipOnePacketForASH(plr, true);
             }
         }
 
@@ -921,6 +934,10 @@ public:
                             {
                                 bUpdatedFlying = true;
                                 plr->SetDisableGravity(true, true);
+
+                                sScriptMgr->AnticheatSetCanFlybyServer(plr, true);
+                                sScriptMgr->AnticheatSetSkipOnePacketForASH(plr, true);
+                                sScriptMgr->AnticheatSetUnderACKmount(plr);
                             }
 
                             plr->SendMonsterMove(me->GetPositionX() + dist * cos(arcangle), me->GetPositionY() + dist * sin(arcangle), me->GetPositionZ(), VORTEX_DEFAULT_DIFF * 2, SPLINEFLAG_FLYING);
