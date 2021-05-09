@@ -62,6 +62,9 @@ USER $DOCKER_USER
 # NOTE: this folder is different by the /azerothcore (which is binded instead)
 COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
 
+# Download deno and make sure the dashboard works
+RUN bash /azerothcore/acore.sh quit
+
 WORKDIR /azerothcore
 
 #================================================================
@@ -131,6 +134,9 @@ RUN mkdir -p /azerothcore/env/dist/data
 RUN mkdir -p /azerothcore/env/dist/logs
 RUN mkdir -p /azerothcore/env/dist/etc
 RUN mkdir -p /azerothcore/env/dist/bin
+
+# Download deno and make sure the dashboard works
+RUN bash /azerothcore/acore.sh quit
 
 WORKDIR /azerothcore/
 
@@ -244,11 +250,9 @@ RUN addgroup --gid $GROUP_ID acore && \
 ENV DATAPATH=/azerothcore/env/dist/data
 ENV DATAPATH_ZIP=/tmp/data.zip
 
-RUN --mount=type=bind,target=/azerothcore-temp,readwrite /azerothcore-temp/acore.sh client-data
+RUN --mount=type=bind,target=/azerothcore-temp,readwrite /azerothcore-temp/acore.sh client-data && chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 
 RUN apt-get remove --purge -y tzdata curl unzip && apt-get autoremove -y
-
-RUN chown -R $DOCKER_USER:$DOCKER_USER /azerothcore
 
 USER $DOCKER_USER
 
