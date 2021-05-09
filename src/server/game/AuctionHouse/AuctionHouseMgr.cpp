@@ -784,7 +784,7 @@ std::string AuctionEntry::BuildAuctionMailBody(ObjectGuid guid, uint32 bid, uint
 {
     std::ostringstream strm;
     strm.width(16);
-    strm << guid.ToString();
+    strm << std::right << std::hex << guid.GetRawValue();
     strm << std::dec << ':' << bid << ':' << buyout;
     strm << ':' << deposit << ':' << cut;
     return strm.str();
