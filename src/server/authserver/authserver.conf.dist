@@ -256,7 +256,7 @@ Appender.Auth=2,5,0,Auth.log,w
 #                     (Using spaces as separator).
 #
 
-Logger.root=5,Console Auth
+Logger.root=4,Console Auth
 
 #
 ###################################################################################################

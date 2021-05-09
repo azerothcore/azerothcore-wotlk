@@ -993,7 +993,7 @@ public:
                     targetList.push_back(target);
             }
 
-            acore::Containers::RandomResizeList(targetList, 5);
+            acore::Containers::RandomResize(targetList, 5);
             for (std::list<Unit*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                 GetCaster()->CastSpell(*itr, SPELL_NETHER_BEAM_DAMAGE, true);
         }
