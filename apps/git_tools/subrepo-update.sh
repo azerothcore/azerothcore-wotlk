@@ -15,7 +15,7 @@
 #######################
 
 set -e
-ROOT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../"
+ROOT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../../"
 # update all submodules
 git submodule update --init --recursive
 git submodule foreach git pull origin master

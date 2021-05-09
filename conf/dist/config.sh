@@ -3,7 +3,7 @@
 SRCPATH="$AC_PATH_ROOT"
 
 # absolute path where build files must be stored
-BUILDPATH="$AC_PATH_ROOT/var/build/obj"
+BUILDPATH=${BUILDPATH:-"$AC_PATH_VAR/build/obj"}
 
 # absolute path where azerothcore will be installed
 # NOTE: on linux the binaries are stored in a subfolder (/bin)
@@ -27,6 +27,7 @@ BINPATH="$AC_PATH_ROOT/env/dist"
 # by the AC dashboard
 # default: the system will use binpath by default
 # DATAPATH="$BINPATH/bin"
+# DATAPATH_ZIP="$DATAPATH/data.zip"
 
 ##############################################
 #
@@ -45,7 +46,7 @@ CCOMPILERCXX="/usr/bin/clang++"
 
 
 # how many thread must be used for compilation ( leave zero to use all available )
-MTHREADS=0
+MTHREADS=${MTHREADS:-0}
 # enable/disable warnings during compilation
 CWARNINGS=ON
 # enable/disable some debug informations ( it's not a debug compilation )
@@ -63,12 +64,12 @@ CSCRIPTS=${CSCRIPTS:-ON}
 # compile unit tests
 CBUILD_TESTING=OFF
 # compile server
-CSERVERS=ON
+CSERVERS=${CSERVERS:-ON}
 # compile tools
-CTOOLS=OFF
+CTOOLS=${CTOOLS:-OFF}
 # use precompiled headers ( fatest compilation but not optimized if you change headers often )
-CSCRIPTPCH=ON
-CCOREPCH=ON
+CSCRIPTPCH=${CSCRIPTPCH:-ON}
+CCOREPCH=${CCOREPCH:-ON}
 # enable/disable extra logs
 CEXTRA_LOGS=0
 
@@ -79,7 +80,13 @@ CDISABLED_AC_MODULES=""
 # you can add your custom definitions here ( -D )
 # example:  CCUSTOMOPTIONS=" -DWITH_PERFTOOLS=ON -DENABLE_EXTRA_LOGS=ON"
 #
-CCUSTOMOPTIONS=""
+CCUSTOMOPTIONS=${CCUSTOMOPTIONS:-''}
+
+# Enable ccache to speedup
+# recompilations
+#
+AC_CCACHE=${AC_CCACHE:-false}
+export CCACHE_DIR=${CCACHE_DIR:-"$AC_PATH_VAR/ccache"}
 
 
 ##############################################

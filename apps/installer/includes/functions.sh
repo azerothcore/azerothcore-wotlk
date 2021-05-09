@@ -227,6 +227,7 @@ function inst_download_client_data {
 
     # first check if it's defined in env, otherwise use the default
     local path="${DATAPATH:-$AC_BINPATH_FULL}"
+    local zipPath="${DATAPATH_ZIP:-"$DATAPATH/data.zip"}"
 
     dataVersionFile="$path/data-version"
 
@@ -240,9 +241,9 @@ function inst_download_client_data {
         return
     fi
 
-    echo "Downloading client data in: $path/data.zip ..."
-    curl -L https://github.com/wowgaming/client-data/releases/download/$VERSION/data.zip > "$path/data.zip" \
-        && echo "unzip downloaded file..." && unzip -q -o "$path/data.zip" -d "$path/" \
-        && echo "Remove downloaded file" && rm "$path/data.zip" \
+    echo "Downloading client data in: $zipPath ..."
+    curl -L https://github.com/wowgaming/client-data/releases/download/$VERSION/data.zip > "$zipPath" \
+        && echo "unzip downloaded file in $path..." && unzip -q -o "$zipPath" -d "$path/" \
+        && echo "Remove downloaded file" && rm "$zipPath" \
         && echo "INSTALLED_VERSION=$VERSION" > "$dataVersionFile"
 }
