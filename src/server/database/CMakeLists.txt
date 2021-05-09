@@ -40,8 +40,8 @@ target_include_directories(database
     ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(database
-  # PRIVATE
-    # acore-core-interface
+  PRIVATE
+    acore-core-interface
     # mysql
   PUBLIC
     common
