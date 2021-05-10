@@ -462,7 +462,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     {
         SetHealth(previousHealth);
 
-        if (previousHealth > GetMaxHealth())
+        if (previousMaxHealth > GetMaxHealth())
             m_PlayerDamageReq = (uint32)(previousPlayerDamageReq * GetMaxHealth() / previousMaxHealth);
         else
             m_PlayerDamageReq = previousPlayerDamageReq;
