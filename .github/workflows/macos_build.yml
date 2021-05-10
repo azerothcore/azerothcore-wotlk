@@ -2,9 +2,9 @@ name: macos-build
 on:
   push:
     branches:
-      - '**'         # matches every branch
-      - '!coverity_scan'   # excludes coverity_scan
-  pull_request:
+      - 'master'
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   macos-build:

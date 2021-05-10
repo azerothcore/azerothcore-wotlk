@@ -4,9 +4,10 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
+#include "HomeMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "HomeMovementGenerator.h"
+#include "DisableMgr.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "WorldPacket.h"
@@ -55,7 +56,7 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature* owner)
     }
 
     owner->UpdateAllowedPositionZ(x, y, z);
-    init.MoveTo(x, y, z, MMAP::MMapFactory::IsPathfindingEnabled(owner->FindMap()), true);
+    init.MoveTo(x, y, z, DisableMgr::IsPathfindingEnabled(owner->FindMap()), true);
     init.SetWalk(false);
     init.Launch();
 

@@ -107,7 +107,7 @@ public:
 
         // We need to use a copy of SummonList here, otherwise original SummonList would be modified
         StorageType listCopy = storage_;
-        acore::Containers::RandomResizeList<ObjectGuid, Predicate>(listCopy, predicate, max);
+        acore::Containers::RandomResize(listCopy, predicate, max);
         for (StorageType::iterator i = listCopy.begin(); i != listCopy.end(); ++i)
         {
             Creature* summon = ObjectAccessor::GetCreature(*me, *i);
