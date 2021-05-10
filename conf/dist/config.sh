@@ -105,7 +105,7 @@ export CCACHE_DIR=${CCACHE_DIR:-"$AC_PATH_VAR/ccache"}
 #  3. run the worldserver with the "./acore.sh run-worldserver"
 #  4. run "killall -12 worldserver"  This command will start the monitoring process. Run "killall -12 worldserver" again to stop the process when you want
 #  5. At this time you will have the .prof file ready in the folder configured below.
-#  Run "pprof --callgrind <path/of/worldserver/bin> /path/of/prof/file" This will generate a callgrind file that can be read with
+#  Run "google-pprof --callgrind <path/of/worldserver/bin> </path/of/prof/file>" This will generate a callgrind file that can be read with
 #  QCacheGrind, KCacheGrind and any other compatible tools
 #
 ##############################################
