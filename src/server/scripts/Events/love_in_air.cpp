@@ -571,7 +571,7 @@ public:
 
         void PeriodicTick(AuraEffect const* /*aurEff*/)
         {
-            uint64 guid = (GetCaster() ? GetCaster()->GetGUID() : 0);
+            ObjectGuid guid = GetCaster() ? GetCaster()->GetGUID() : ObjectGuid::Empty;
             if (Unit* target = GetTarget())
             {
                 uint32 spellId = (GetId() == SPELL_THROW_COLOGNE ? 68934 : 68927);

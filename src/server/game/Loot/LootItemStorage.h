@@ -24,7 +24,7 @@ struct StoredLootItem
 };
 
 typedef std::list<StoredLootItem> StoredLootItemList;
-typedef std::unordered_map<uint32, StoredLootItemList> LootItemContainer;
+typedef std::unordered_map<ObjectGuid, StoredLootItemList> LootItemContainer;
 
 class LootItemStorage
 {
@@ -36,14 +36,14 @@ public:
     static LootItemStorage* instance();
 
     void LoadStorageFromDB();
-    void RemoveEntryFromDB(uint32 containerId, uint32 itemid, uint32 count);
+    void RemoveEntryFromDB(ObjectGuid containerGUID, uint32 itemid, uint32 count);
 
     void AddNewStoredLoot(Loot* loot, Player* player);
     bool LoadStoredLoot(Item* item);
 
-    void RemoveStoredLootItem(uint32 containerId, uint32 itemid, uint32 count, Loot* loot);
-    void RemoveStoredLootMoney(uint32 containerId, Loot* loot);
-    void RemoveStoredLoot(uint32 containerId);
+    void RemoveStoredLootItem(ObjectGuid containerGUID, uint32 itemid, uint32 count, Loot* loot);
+    void RemoveStoredLootMoney(ObjectGuid containerGUID, Loot* loot);
+    void RemoveStoredLoot(ObjectGuid containerGUID);
 
 private:
     LootItemContainer lootItemStore;

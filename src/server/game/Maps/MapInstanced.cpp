@@ -202,6 +202,7 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
     ASSERT(map->IsDungeon());
 
     map->LoadRespawnTimes();
+    map->LoadCorpseData();
 
     if (save)
         map->CreateInstanceScript(true, save->GetInstanceData(), save->GetCompletedEncounterMask());

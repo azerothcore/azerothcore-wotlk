@@ -127,8 +127,8 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 ExpeditionEngineerGUIDs[3];
-        uint64 CommanderGUID;
+        ObjectGuid ExpeditionEngineerGUIDs[3];
+        ObjectGuid CommanderGUID;
         float cords[4][2];
         bool bGroundPhase;
         bool startPath;
@@ -138,8 +138,11 @@ public:
         {
             events.Reset();
             summons.DespawnAll();
-            memset(&ExpeditionEngineerGUIDs, 0, sizeof(ExpeditionEngineerGUIDs));
-            CommanderGUID = 0;
+
+            for (uint8 i = 0; i < 3; ++i)
+                ExpeditionEngineerGUIDs[i].Clear();
+
+            CommanderGUID.Clear();
             bGroundPhase = false;
             flyTimes = 0;
 
@@ -206,11 +209,11 @@ public:
                 case SPELL_LAUNCH_CHAIN:
                     {
                         uint32 spell = 0;
-                        if( caster->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1) )
+                        if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1) )
                             spell = SPELL_CHAIN_1;
-                        else if( caster->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_2) )
+                        else if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2) )
                             spell = SPELL_CHAIN_2;
-                        else if( caster->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_3) )
+                        else if( caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3) )
                             spell = SPELL_CHAIN_3;
                         else
                             spell = SPELL_CHAIN_4;
@@ -243,7 +246,7 @@ public:
                             events.CancelEvent(EVENT_SPELL_FIREBALL);
                             events.CancelEvent(EVENT_SPELL_DEVOURING_FLAME);
                             events.CancelEvent(EVENT_SUMMON_MOLE_MACHINES);
-                            me->SetTarget(0);
+                            me->SetTarget();
                             me->SendMeleeAttackStop(me->GetVictim());
                             me->GetMotionMaster()->MoveLand(0, CORDS_GROUND, 25.0f);
                         }
@@ -444,7 +447,7 @@ public:
                     me->SetInCombatWithZone(); // just in case
                     if (pInstance)
                         for( int i = 0; i < 4; ++i )
-                            if( uint64 guid = pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1 + i) )
+                            if( ObjectGuid guid = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i) )
                                 if( Creature* hfs = ObjectAccessor::GetCreature(*me, guid) )
                                 {
                                     me->SummonCreature(34188, hfs->GetPositionX(), hfs->GetPositionY(), hfs->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 22000);
@@ -594,7 +597,7 @@ public:
         if (instance->GetData(TYPE_RAZORSCALE) == DONE)
             return true;
 
-        Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetData64(TYPE_RAZORSCALE));
+        Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(TYPE_RAZORSCALE));
         if (!razorscale || razorscale->IsInCombat())
             return true;
 
@@ -614,12 +617,12 @@ public:
             if (!instance || instance->GetData(TYPE_RAZORSCALE) == DONE)
                 return true;
 
-            Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetData64(TYPE_RAZORSCALE));
+            Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(TYPE_RAZORSCALE));
             if (razorscale && !razorscale->IsInCombat())
             {
                 // reset npcs NPC_HARPOON_FIRE_STATE
                 for (uint8 i = 0; i < 4; ++i)
-                    if (Creature* hfs = ObjectAccessor::GetCreature(*creature, instance->GetData64(DATA_HARPOON_FIRE_STATE_1 + i)))
+                    if (Creature* hfs = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i)))
                         hfs->AI()->SetData(1, 0);
 
                 if (razorscale->AI())
@@ -696,11 +699,11 @@ public:
         {
             if (pInstance)
             {
-                if( me->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1) )
+                if( me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1) )
                     return GO_HARPOON_GUN_1;
-                else if( me->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_2) )
+                else if( me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2) )
                     return GO_HARPOON_GUN_2;
-                else if( me->GetGUID() == pInstance->GetData64(DATA_HARPOON_FIRE_STATE_3) )
+                else if( me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3) )
                     return GO_HARPOON_GUN_3;
                 else
                     return GO_HARPOON_GUN_4;
@@ -745,7 +748,7 @@ public:
                 case 3: // shoot
                     if (pInstance)
                     {
-                        Creature* razorscale = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_RAZORSCALE));
+                        Creature* razorscale = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_RAZORSCALE));
                         if (!razorscale)
                             return;
                         if (!razorscale->HasAura(value))
@@ -787,13 +790,13 @@ public:
         InstanceScript* pInstance;
         bool working;
         uint16 timer;
-        uint64 fixingGUID;
+        ObjectGuid fixingGUID;
 
         void Reset() override
         {
             working = false;
             timer = 0;
-            fixingGUID = 0;
+            fixingGUID.Clear();
         }
 
         void SetData(uint32 id, uint32  /*value*/) override
@@ -803,7 +806,7 @@ public:
                 case 1: // start/resume repairing
                     working = true;
                     timer = 0;
-                    fixingGUID = 0;
+                    fixingGUID.Clear();
                     break;
                 case 2: // stop repairing
                     Reset();
@@ -834,14 +837,14 @@ public:
 
                                 c->AI()->SetData(2, 0);
                                 if (c->AI()->GetData(2))
-                                    fixingGUID = 0;
+                                    fixingGUID.Clear();
                             }
                     }
 
                     if (!fixingGUID)
                     {
                         Creature* razorscale = nullptr;
-                        if( uint64 rsGUID = pInstance->GetData64(TYPE_RAZORSCALE) )
+                        if( ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE) )
                             razorscale = ObjectAccessor::GetCreature(*me, rsGUID);
 
                         if( !razorscale || !razorscale->IsInCombat() )
@@ -852,7 +855,7 @@ public:
                         }
 
                         for( int i = 0; i < 4; ++i )
-                            if( uint64 fs_GUID = pInstance->GetData64(DATA_HARPOON_FIRE_STATE_1 + i) )
+                            if( ObjectGuid fs_GUID = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i) )
                                 if( Creature* fs = ObjectAccessor::GetCreature(*me, fs_GUID) )
                                     if (!fs->AI()->GetData(2))
                                     {
@@ -890,7 +893,7 @@ public:
             return true;
 
         Creature* rs = nullptr;
-        if( uint64 rsGUID = pInstance->GetData64(TYPE_RAZORSCALE) )
+        if( ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE) )
             rs = ObjectAccessor::GetCreature(*go, rsGUID);
 
         if( !rs || !rs->IsInCombat() )
@@ -922,7 +925,7 @@ public:
                 break;
         }
 
-        if( uint64 g = pInstance->GetData64(npc) )
+        if( ObjectGuid g = pInstance->GetGuidData(npc) )
             if( Creature* hfs = ObjectAccessor::GetCreature(*go, g) )
                 hfs->AI()->SetData(3, spell);
 

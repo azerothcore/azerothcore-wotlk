@@ -101,18 +101,18 @@ public:
         npc_ancient_wispAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
-            ArchimondeGUID = 0;
+            ArchimondeGUID.Clear();
         }
 
         InstanceScript* instance;
-        uint64 ArchimondeGUID;
+        ObjectGuid ArchimondeGUID;
         uint32 CheckTimer;
 
         void Reset() override
         {
             CheckTimer = 1000;
 
-            ArchimondeGUID = instance->GetData64(DATA_ARCHIMONDE);
+            ArchimondeGUID = instance->GetGuidData(DATA_ARCHIMONDE);
 
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
@@ -187,12 +187,12 @@ public:
     {
         npc_doomfire_targettingAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 TargetGUID;
+        ObjectGuid TargetGUID;
         uint32 ChangeTargetTimer;
 
         void Reset() override
         {
-            TargetGUID = 0;
+            TargetGUID.Clear();
             ChangeTargetTimer = 5000;
         }
 
@@ -219,7 +219,7 @@ public:
                 if (Unit* temp = ObjectAccessor::GetUnit(*me, TargetGUID))
                 {
                     me->GetMotionMaster()->MoveFollow(temp, 0.0f, 0.0f);
-                    TargetGUID = 0;
+                    TargetGUID.Clear();
                 }
                 else
                 {
@@ -264,8 +264,8 @@ public:
         InstanceScript* instance;
         EventMap events;
 
-        uint64 DoomfireSpiritGUID;
-        uint64 WorldTreeGUID;
+        ObjectGuid DoomfireSpiritGUID;
+        ObjectGuid WorldTreeGUID;
 
         uint8 SoulChargeCount;
         uint8 WispCount;
@@ -283,8 +283,8 @@ public:
         {
             instance->SetData(DATA_ARCHIMONDEEVENT, NOT_STARTED);
 
-            DoomfireSpiritGUID = 0;
-            WorldTreeGUID = 0;
+            DoomfireSpiritGUID.Clear();
+            WorldTreeGUID.Clear();
             WispCount = 0;
             Enraged = false;
             BelowTenPercent = false;
@@ -472,7 +472,7 @@ public:
                 if (Unit* DoomfireSpirit = ObjectAccessor::GetUnit(*me, DoomfireSpiritGUID))
                 {
                     summoned->GetMotionMaster()->MoveFollow(DoomfireSpirit, 0.0f, 0.0f);
-                    DoomfireSpiritGUID = 0;
+                    DoomfireSpiritGUID.Clear();
                 }
             }
         }

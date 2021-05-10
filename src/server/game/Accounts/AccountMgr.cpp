@@ -69,8 +69,7 @@ namespace AccountMgr
         {
             do
             {
-                uint32 guidLow = (*result)[0].GetUInt32();
-                uint64 guid = MAKE_NEW_GUID(guidLow, 0, HIGHGUID_PLAYER);
+                ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>((*result)[0].GetUInt32());
 
                 // Kick if player is online
                 if (Player* p = ObjectAccessor::FindPlayer(guid))
@@ -80,7 +79,7 @@ namespace AccountMgr
                     s->LogoutPlayer(false);                     // logout player without waiting next session list update
                 }
 
-                Player::DeleteFromDB(guid, accountId, false, true);       // no need to update realm characters
+                Player::DeleteFromDB(guid.GetCounter(), accountId, false, true);       // no need to update realm characters
             } while (result->NextRow());
         }
 

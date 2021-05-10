@@ -2,8 +2,7 @@ name: core-build
 on:
   push:
     branches:
-      - '**'         # matches every branch
-      - '!coverity_scan'   # excludes coverity_scan
+      - 'master'
   pull_request:
 
 jobs:
@@ -60,7 +59,7 @@ jobs:
       - name: Cache
         uses: actions/cache@v2
         with:
-          path: /home/runner/.ccache
+          path: var/ccache
           key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
           restore-keys: |
             ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
@@ -81,41 +80,3 @@ jobs:
         run: source ./apps/ci/ci-error-check.sh
       - name: Run unit tests
         run: source ./apps/ci/ci-run-unit-tests.sh
-
-  docker-build-n-deploy:
-    strategy:
-      fail-fast: true
-    runs-on: ubuntu-20.04
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-    env:
-      DOCKER_EXTENDS_BIND: abstract-no-bind
-      DOCKER_BUILD_WORLD_TARGET: worldserver
-      DOCKER_BUILD_AUTH_TARGET: authserver
-    steps:
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
-      - uses: actions/checkout@v2
-      - name: Configure
-        run: |
-          docker --version
-          docker-compose --version
-      - name: Build
-        #env:
-        #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-        run: |
-           docker-compose --profile all build
-      - name: Login to Docker Hub
-        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Deploy
-        #env:
-        #  DOCKER_IMAGE_TAG: ${{ steps.extract_branch.outputs.branch }}
-        if: ${{ steps.extract_branch.outputs.branch == 'master' }}
-        run: |
-          docker-compose --profile all push
-

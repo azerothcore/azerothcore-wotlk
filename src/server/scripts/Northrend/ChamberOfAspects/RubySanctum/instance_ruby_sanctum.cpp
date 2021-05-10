@@ -34,17 +34,6 @@ public:
         {
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
-
-            BaltharusTheWarbornGUID  = 0;
-            XerestraszaGUID          = 0;
-            GeneralZarithrianGUID    = 0;
-            memset(ZarithrianSpawnStalkerGUID, 0, 2 * sizeof(uint64));
-
-            HalionGUID               = 0;
-            TwilightHalionGUID       = 0;
-            OrbCarrierGUID           = 0;
-            HalionControllerGUID     = 0;
-            FlameRingGUID            = 0;
         }
 
         void OnPlayerEnter(Player* /*player*/) override
@@ -138,7 +127,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -164,7 +153,7 @@ public:
                     return FlameRingGUID;
             }
 
-            return 0;
+            return ObjectGuid::Empty;
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -255,16 +244,16 @@ public:
         }
 
     protected:
-        uint64 BaltharusTheWarbornGUID;
-        uint64 XerestraszaGUID;
-        uint64 GeneralZarithrianGUID;
-        uint64 ZarithrianSpawnStalkerGUID[2];
+        ObjectGuid BaltharusTheWarbornGUID;
+        ObjectGuid XerestraszaGUID;
+        ObjectGuid GeneralZarithrianGUID;
+        ObjectGuid ZarithrianSpawnStalkerGUID[2];
 
-        uint64 HalionGUID;
-        uint64 TwilightHalionGUID;
-        uint64 HalionControllerGUID;
-        uint64 OrbCarrierGUID;
-        uint64 FlameRingGUID;
+        ObjectGuid HalionGUID;
+        ObjectGuid TwilightHalionGUID;
+        ObjectGuid HalionControllerGUID;
+        ObjectGuid OrbCarrierGUID;
+        ObjectGuid FlameRingGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

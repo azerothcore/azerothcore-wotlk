@@ -127,9 +127,9 @@ public:
         }
         InstanceScript* instance;
 
-        uint64 SpiritGUID[4];
-        uint64 ClawTargetGUID;
-        uint64 TankGUID;
+        ObjectGuid SpiritGUID[4];
+        ObjectGuid ClawTargetGUID;
+        ObjectGuid TankGUID;
 
         uint32 Phase;
         uint32 health_20;
@@ -180,8 +180,8 @@ public:
             Flame_Breath_Timer = 6000;
             Pillar_Of_Fire_Timer = 7000;
 
-            ClawTargetGUID = 0;
-            TankGUID = 0;
+            ClawTargetGUID.Clear();
+            TankGUID.Clear();
 
             Summons.DespawnAll();
 
@@ -278,7 +278,7 @@ public:
                         temp->setDeathState(DEAD);
                     }
                 }
-                SpiritGUID[i] = 0;
+                SpiritGUID[i].Clear();
             }
         }
 
@@ -449,7 +449,7 @@ public:
                                             Claw_Rage_Timer = urand(15000, 20000);
                                             me->SetSpeed(MOVE_RUN, 1.2f);
                                             AttackStart(ObjectAccessor::GetUnit(*me, TankGUID));
-                                            TankGUID = 0;
+                                            TankGUID.Clear();
                                             return;
                                         }
                                         else
@@ -499,7 +499,7 @@ public:
                                         Lynx_Rush_Timer = urand(15000, 20000);
                                         me->SetSpeed(MOVE_RUN, 1.2f);
                                         AttackStart(ObjectAccessor::GetUnit(*me, TankGUID));
-                                        TankGUID = 0;
+                                        TankGUID.Clear();
                                     }
                                     else
                                         AttackStart(SelectTarget(SELECT_TARGET_RANDOM, 0));

@@ -60,7 +60,7 @@ public:
         }
 
         uint8 phaseCounter;
-        std::set<uint64> impaledList;
+        GuidSet impaledList;
 
         void Reset() override
         {

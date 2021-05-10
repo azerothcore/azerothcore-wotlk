@@ -39,7 +39,7 @@ void PetitionMgr::LoadPetitions()
     do
     {
         Field* fields = result->Fetch();
-        AddPetition(fields[1].GetUInt32(), fields[0].GetUInt32(), fields[2].GetString(), fields[3].GetUInt8());
+        AddPetition(ObjectGuid::Create<HighGuid::Item>(fields[1].GetUInt32()), ObjectGuid::Create<HighGuid::Player>(fields[0].GetUInt32()), fields[2].GetString(), fields[3].GetUInt8());
         ++count;
     } while (result->NextRow());
 
@@ -64,7 +64,7 @@ void PetitionMgr::LoadSignatures()
     do
     {
         Field* fields = result->Fetch();
-        AddSignature(fields[0].GetUInt32(), fields[2].GetUInt32(), fields[1].GetUInt32());
+        AddSignature(ObjectGuid::Create<HighGuid::Item>(fields[0].GetUInt32()), fields[2].GetUInt32(), ObjectGuid::Create<HighGuid::Player>(fields[1].GetUInt32()));
         ++count;
     } while (result->NextRow());
 
@@ -72,28 +72,28 @@ void PetitionMgr::LoadSignatures()
     LOG_INFO("server", " ");
 }
 
-void PetitionMgr::AddPetition(uint32 petitionId, uint32 ownerGuid, std::string const& name, uint8 type)
+void PetitionMgr::AddPetition(ObjectGuid petitionGUID, ObjectGuid ownerGuid, std::string const& name, uint8 type)
 {
-    Petition& p = PetitionStore[petitionId];
-    p.petitionGuid = petitionId;
+    Petition& p = PetitionStore[petitionGUID];
+    p.petitionGuid = petitionGUID;
     p.ownerGuid = ownerGuid;
     p.petitionName = name;
     p.petitionType = type;
 
-    Signatures& s = SignatureStore[petitionId];
-    s.petitionGuid = petitionId;
+    Signatures& s = SignatureStore[petitionGUID];
+    s.petitionGuid = petitionGUID;
     s.signatureMap.clear();
 }
 
-void PetitionMgr::RemovePetition(uint32 petitionId)
+void PetitionMgr::RemovePetition(ObjectGuid petitionGUID)
 {
-    PetitionStore.erase(petitionId);
+    PetitionStore.erase(petitionGUID);
 
     // remove signatures
-    SignatureStore.erase(petitionId);
+    SignatureStore.erase(petitionGUID);
 }
 
-void PetitionMgr::RemovePetitionByOwnerAndType(uint32 ownerGuid, uint8 type)
+void PetitionMgr::RemovePetitionByOwnerAndType(ObjectGuid ownerGuid, uint8 type)
 {
     for (PetitionContainer::iterator itr = PetitionStore.begin(); itr != PetitionStore.end();)
     {
@@ -108,15 +108,15 @@ void PetitionMgr::RemovePetitionByOwnerAndType(uint32 ownerGuid, uint8 type)
     }
 }
 
-Petition const* PetitionMgr::GetPetition(uint32 petitionId) const
+Petition const* PetitionMgr::GetPetition(ObjectGuid petitionGUID) const
 {
-    PetitionContainer::const_iterator itr = PetitionStore.find(petitionId);
+    PetitionContainer::const_iterator itr = PetitionStore.find(petitionGUID);
     if (itr != PetitionStore.end())
         return &itr->second;
     return nullptr;
 }
 
-Petition const* PetitionMgr::GetPetitionByOwnerWithType(uint32 ownerGuid, uint8 type) const
+Petition const* PetitionMgr::GetPetitionByOwnerWithType(ObjectGuid ownerGuid, uint8 type) const
 {
     for (PetitionContainer::const_iterator itr = PetitionStore.begin(); itr != PetitionStore.end(); ++itr)
         if (itr->second.ownerGuid == ownerGuid && itr->second.petitionType == type)
@@ -125,21 +125,21 @@ Petition const* PetitionMgr::GetPetitionByOwnerWithType(uint32 ownerGuid, uint8 
     return nullptr;
 }
 
-void PetitionMgr::AddSignature(uint32 petitionId, uint32 accountId, uint32 playerGuid)
+void PetitionMgr::AddSignature(ObjectGuid petitionGUID, uint32 accountId, ObjectGuid playerGuid)
 {
-    Signatures& s = SignatureStore[petitionId];
+    Signatures& s = SignatureStore[petitionGUID];
     s.signatureMap[playerGuid] = accountId;
 }
 
-Signatures const* PetitionMgr::GetSignature(uint32 petitionId) const
+Signatures const* PetitionMgr::GetSignature(ObjectGuid petitionGUID) const
 {
-    SignatureContainer::const_iterator itr = SignatureStore.find(petitionId);
+    SignatureContainer::const_iterator itr = SignatureStore.find(petitionGUID);
     if (itr != SignatureStore.end())
         return &itr->second;
     return nullptr;
 }
 
-void PetitionMgr::RemoveSignaturesByPlayer(uint32 playerGuid)
+void PetitionMgr::RemoveSignaturesByPlayer(ObjectGuid playerGuid)
 {
     for (SignatureContainer::iterator itr = SignatureStore.begin(); itr != SignatureStore.end(); ++itr)
     {
@@ -149,7 +149,7 @@ void PetitionMgr::RemoveSignaturesByPlayer(uint32 playerGuid)
     }
 }
 
-void PetitionMgr::RemoveSignaturesByPlayerAndType(uint32 playerGuid, uint8 type)
+void PetitionMgr::RemoveSignaturesByPlayerAndType(ObjectGuid playerGuid, uint8 type)
 {
     for (SignatureContainer::iterator itr = SignatureStore.begin(); itr != SignatureStore.end(); ++itr)
     {

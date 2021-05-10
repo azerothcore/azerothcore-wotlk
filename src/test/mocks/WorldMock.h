@@ -21,7 +21,7 @@ public:
     ~WorldMock() override {}
     MOCK_METHOD(WorldSession*, FindSession, (uint32 id), (const));
     MOCK_METHOD(WorldSession*, FindOfflineSession, (uint32 id), (const));
-    MOCK_METHOD(WorldSession*, FindOfflineSessionForCharacterGUID, (uint32 guidLow),(const));
+    MOCK_METHOD(WorldSession*, FindOfflineSessionForCharacterGUID, (ObjectGuid::LowType guidLow),(const));
     MOCK_METHOD(void, AddSession, (WorldSession* s), ());
     MOCK_METHOD(void, SendAutoBroadcast, ());
     MOCK_METHOD(bool, KickSession, (uint32 id), ());
@@ -97,16 +97,16 @@ public:
     MOCK_METHOD(void, KickAllLess, (AccountTypes sec), ());
     MOCK_METHOD(uint32, GetNextWhoListUpdateDelaySecs, ());
     MOCK_METHOD(void, LoadGlobalPlayerDataStore, ());
-    MOCK_METHOD(uint32, GetGlobalPlayerGUID, (std::string const& name), (const));
-    MOCK_METHOD(GlobalPlayerData const*, GetGlobalPlayerData, (uint32 guid), (const));
-    MOCK_METHOD(void, AddGlobalPlayerData, (uint32 guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId), ());
-    MOCK_METHOD(void, UpdateGlobalPlayerData, (uint32 guid, uint8 mask, std::string const& name, uint8 level, uint8 gender, uint8 race, uint8 playerClass), ());
-    MOCK_METHOD(void, UpdateGlobalPlayerMails, (uint32 guid, int16 count, bool add), ());
-    MOCK_METHOD(void, UpdateGlobalPlayerGuild, (uint32 guid, uint32 guildId), ());
-    MOCK_METHOD(void, UpdateGlobalPlayerGroup, (uint32 guid, uint32 groupId), ());
-    MOCK_METHOD(void, UpdateGlobalPlayerArenaTeam, (uint32 guid, uint8 slot, uint32 arenaTeamId), ());
-    MOCK_METHOD(void, UpdateGlobalNameData, (uint32 guidLow, std::string const& oldName, std::string const& newName), ());
-    MOCK_METHOD(void, DeleteGlobalPlayerData, (uint32 guid, std::string const& name), ());
+    MOCK_METHOD(ObjectGuid, GetGlobalPlayerGUID, (std::string const& name), (const));
+    MOCK_METHOD(GlobalPlayerData const*, GetGlobalPlayerData, (ObjectGuid::LowType guid), (const));
+    MOCK_METHOD(void, AddGlobalPlayerData, (ObjectGuid::LowType guid, uint32 accountId, std::string const& name, uint8 gender, uint8 race, uint8 playerClass, uint8 level, uint16 mailCount, uint32 guildId), ());
+    MOCK_METHOD(void, UpdateGlobalPlayerData, (ObjectGuid::LowType guid, uint8 mask, std::string const& name, uint8 level, uint8 gender, uint8 race, uint8 playerClass), ());
+    MOCK_METHOD(void, UpdateGlobalPlayerMails, (ObjectGuid::LowType guid, int16 count, bool add), ());
+    MOCK_METHOD(void, UpdateGlobalPlayerGuild, (ObjectGuid::LowType guid, uint32 guildId), ());
+    MOCK_METHOD(void, UpdateGlobalPlayerGroup, (ObjectGuid::LowType guid, uint32 groupId), ());
+    MOCK_METHOD(void, UpdateGlobalPlayerArenaTeam, (ObjectGuid::LowType guid, uint8 slot, uint32 arenaTeamId), ());
+    MOCK_METHOD(void, UpdateGlobalNameData, (ObjectGuid::LowType guidLow, std::string const& oldName, std::string const& newName), ());
+    MOCK_METHOD(void, DeleteGlobalPlayerData, (ObjectGuid::LowType guid, std::string const& name), ());
     MOCK_METHOD(void, ProcessCliCommands, ());
     MOCK_METHOD(void, QueueCliCommand, (CliCommandHolder* commandHolder), ());
     MOCK_METHOD(void, ForceGameEventUpdate, ());
@@ -123,6 +123,7 @@ public:
     MOCK_METHOD(time_t, GetNextTimeWithMonthAndHour, (int8 month, int8 hour), ());
     MOCK_METHOD(std::string const&, GetRealmName, (), (const));
     MOCK_METHOD(void, SetRealmName, (std::string name), ());
+    MOCK_METHOD(void, RemoveOldCorpses, ());
 };
 #pragma GCC diagnostic pop
 
