@@ -1047,25 +1047,6 @@ public:
     }
 };
 
-// http://www.wowhead.com/quest=55 Morbent Fel
-// 8913 Sacred Cleansing
-enum Quest55Data
-{
-    NPC_MORBENT             = 1200,
-    NPC_WEAKENED_MORBENT    = 24782,
-};
-
-class spell_q55_sacred_cleansing : public SpellScriptLoader
-{
-public:
-    spell_q55_sacred_cleansing() : SpellScriptLoader("spell_q55_sacred_cleansing") { }
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_generic_quest_update_entry_SpellScript(SPELL_EFFECT_DUMMY, EFFECT_1, NPC_MORBENT, NPC_WEAKENED_MORBENT, true);
-    }
-};
-
 // 9712 - Thaumaturgy Channel
 enum ThaumaturgyChannel
 {
@@ -3092,7 +3073,6 @@ void AddSC_quest_spell_scripts()
     new spell_q9718_crow_transform();
 
     // Theirs
-    new spell_q55_sacred_cleansing();
     new spell_q2203_thaumaturgy_channel();
     new spell_q5206_test_fetid_skull();
     new spell_q6124_6129_apply_salve();
