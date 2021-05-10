@@ -108,7 +108,10 @@ shellCommandFactory(
 shellCommandFactory(
   "dev:shell [args...]",
   "Open an interactive shell within the dev server",
-  ["docker-compose run --rm ac-dev-server bash"],
+  [
+    "docker-compose up -d ac-dev-server",
+    "docker-compose exec ac-dev-server bash",
+  ],
   env,
 );
 
