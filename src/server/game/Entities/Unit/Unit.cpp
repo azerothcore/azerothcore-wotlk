@@ -20304,5 +20304,5 @@ float Unit::GetCollisionHeight() const
     else
         collisionHeight = scaleMod * modelData->CollisionHeight * modelData->Scale * displayInfo->scale;
 
-    return G3D::fuzzyEq(collisionHeight,0.0f) ? DEFAULT_COLLISION_HEIGHT : collisionHeight;
+    return collisionHeight == 0.0f ? defaultHeight : collisionHeight;
 }
