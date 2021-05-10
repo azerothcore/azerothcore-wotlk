@@ -80,4 +80,10 @@ enum BWLMisc
     SAY_NEFARIAN_VAEL_INTRO     = 100003, // latest id in broadcast_text atm
 };
 
+template <class AI, class T>
+inline AI* GetBlackwingLairAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, BWLScriptName);
+}
+
 #endif

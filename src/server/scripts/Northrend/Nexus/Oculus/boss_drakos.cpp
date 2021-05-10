@@ -49,7 +49,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_drakosAI (pCreature);
+        return GetOculusAI<boss_drakosAI>(pCreature);
     }
 
     struct boss_drakosAI : public ScriptedAI
@@ -92,7 +92,7 @@ public:
             {
                 pInstance->SetData(DATA_DRAKOS, DONE);
                 for( uint8 i = 0; i < 3; ++i )
-                    if( uint64 guid = pInstance->GetData64(DATA_DCD_1 + i) )
+                    if( ObjectGuid guid = pInstance->GetGuidData(DATA_DCD_1 + i) )
                         if( GameObject* pGo = ObjectAccessor::GetGameObject(*me, guid) )
                             if( pGo->GetGoState() != GO_STATE_ACTIVE )
                             {
@@ -174,7 +174,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_oculus_unstable_sphereAI (pCreature);
+        return GetOculusAI<npc_oculus_unstable_sphereAI>(pCreature);
     }
 
     struct npc_oculus_unstable_sphereAI : public ScriptedAI

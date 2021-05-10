@@ -90,7 +90,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_halyconAI(creature);
+        return GetBlackrockSpireAI<boss_halyconAI>(creature);
     }
 };
 

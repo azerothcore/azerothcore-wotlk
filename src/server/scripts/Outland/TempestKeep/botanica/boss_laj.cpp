@@ -133,7 +133,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_lajAI(creature);
+        return GetTheBotanicaAI<boss_lajAI>(creature);
     }
 };
 

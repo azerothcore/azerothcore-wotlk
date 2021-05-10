@@ -217,7 +217,7 @@ void AddSC_redridge_mountains();
 void AddSC_silverpine_forest();
 void AddSC_stormwind_city();
 void AddSC_stranglethorn_vale();
-void AddSC_swamp_of_sorrows();
+//void AddSC_swamp_of_sorrows();
 void AddSC_tirisfal_glades();
 void AddSC_undercity();
 void AddSC_western_plaguelands();
@@ -522,7 +522,7 @@ void AddSC_instance_shattered_halls();
 void AddSC_boss_watchkeeper_gargolmar();     //HC Ramparts
 void AddSC_boss_omor_the_unscarred();
 void AddSC_boss_vazruden_the_herald();
-void AddSC_instance_ramparts();
+void AddSC_instance_hellfire_ramparts();
 void AddSC_arcatraz();                       //TK Arcatraz
 void AddSC_boss_harbinger_skyriss();
 void AddSC_boss_wrath_scryer_soccothrates();
@@ -807,7 +807,7 @@ void AddEasternKingdomsScripts()
     AddSC_silverpine_forest();
     AddSC_stormwind_city();
     AddSC_stranglethorn_vale();
-    AddSC_swamp_of_sorrows();
+    //AddSC_swamp_of_sorrows();
     AddSC_tirisfal_glades();
     AddSC_undercity();
     AddSC_western_plaguelands();
@@ -957,7 +957,7 @@ void AddOutlandScripts()
     AddSC_boss_watchkeeper_gargolmar();     //HC Ramparts
     AddSC_boss_omor_the_unscarred();
     AddSC_boss_vazruden_the_herald();
-    AddSC_instance_ramparts();
+    AddSC_instance_hellfire_ramparts();
     AddSC_arcatraz();                       //TK Arcatraz
     AddSC_boss_harbinger_skyriss();
     AddSC_boss_wrath_scryer_soccothrates();

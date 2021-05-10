@@ -69,7 +69,7 @@ void BattlegroundRL::HandleKillPlayer(Player* player, Player* killer)
 
     if (!killer)
     {
-        sLog->outError("Killer player not found");
+        LOG_ERROR("server", "Killer player not found");
         return;
     }
 
@@ -154,7 +154,7 @@ bool BattlegroundRL::SetupBattleground()
             || !AddObject(BG_RL_OBJECT_READY_MARKER_1, ARENA_READY_MARKER_ENTRY, 1298.61f, 1598.59f, 31.62f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
             || !AddObject(BG_RL_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 1273.71f, 1734.05f, 31.61f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
     {
-        sLog->outErrorDb("BatteGroundRL: Failed to spawn some object!");
+        LOG_ERROR("sql.sql", "BatteGroundRL: Failed to spawn some object!");
         return false;
     }
 

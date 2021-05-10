@@ -126,7 +126,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_mechano_lord_capacitusAI(creature);
+        return GetMechanarAI<boss_mechano_lord_capacitusAI>(creature);
     }
 };
 

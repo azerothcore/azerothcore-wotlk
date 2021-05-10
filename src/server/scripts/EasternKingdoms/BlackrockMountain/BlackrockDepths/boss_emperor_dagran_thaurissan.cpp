@@ -27,7 +27,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_draganthaurissanAI>(creature);
+        return GetBlackrockDepthsAI<boss_draganthaurissanAI>(creature);
     }
 
     struct boss_draganthaurissanAI : public ScriptedAI
@@ -62,7 +62,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (Creature* Moira = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MOIRA)))
+            if (Creature* Moira = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOIRA)))
             {
                 Moira->AI()->EnterEvadeMode();
                 Moira->setFaction(35);

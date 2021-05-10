@@ -50,7 +50,7 @@ public:
     {
         npc_draenei_survivorAI(Creature* creature) : ScriptedAI(creature) { }
 
-        uint64 pCaster;
+        ObjectGuid pCaster;
 
         uint32 SayThanksTimer;
         uint32 RunAwayTimer;
@@ -60,7 +60,7 @@ public:
 
         void Reset() override
         {
-            pCaster = 0;
+            pCaster.Clear();
 
             SayThanksTimer = 0;
             RunAwayTimer = 0;
@@ -94,7 +94,7 @@ public:
         {
             if (Spell->SpellFamilyFlags[2] & 0x080000000)
             {
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
 
                 DoCast(me, SPELL_STUNNED, true);
@@ -384,7 +384,7 @@ public:
                 cage->SetGoState(GO_STATE_READY);
             }
             _events.Reset();
-            _playerGUID = 0;
+            _playerGUID.Clear();
             _movementComplete = false;
         }
 
@@ -424,7 +424,7 @@ public:
         }
 
     private:
-        uint64 _playerGUID;
+        ObjectGuid _playerGUID;
         EventMap _events;
         bool _movementComplete;
     };

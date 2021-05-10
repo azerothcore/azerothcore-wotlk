@@ -91,7 +91,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_gizrul_the_slavenerAI(creature);
+        return GetBlackrockSpireAI<boss_gizrul_the_slavenerAI>(creature);
     }
 };
 

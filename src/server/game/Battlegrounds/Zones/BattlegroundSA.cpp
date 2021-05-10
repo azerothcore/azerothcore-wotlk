@@ -169,7 +169,7 @@ bool BattlegroundSA::ResetObjs()
 
         if (!sg)
         {
-            sLog->outError("SOTA: Can't find GY entry %u", BG_SA_GYEntries[i]);
+            LOG_ERROR("server", "SOTA: Can't find GY entry %u", BG_SA_GYEntries[i]);
             return false;
         }
 
@@ -182,7 +182,7 @@ bool BattlegroundSA::ResetObjs()
         {
             GraveyardStatus[i] = GetOtherTeamId(Attackers);
             if (!AddSpiritGuide(i + BG_SA_MAXNPC, sg->x, sg->y, sg->z, BG_SA_GYOrientation[i], GetOtherTeamId(Attackers)))
-                sLog->outError("SOTA: couldn't spawn GY: %u", i);
+                LOG_ERROR("server", "SOTA: couldn't spawn GY: %u", i);
         }
     }
 
@@ -886,13 +886,13 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
 
     GraveyardStatus[i] = Source->GetTeamId();
     // Those who are waiting to resurrect at this node are taken to the closest own node's graveyard
-    std::vector<uint64> ghost_list = m_ReviveQueue[BgCreatures[BG_SA_MAXNPC + i]];
+    GuidVector& ghost_list = m_ReviveQueue[BgCreatures[BG_SA_MAXNPC + i]];
     if (!ghost_list.empty())
     {
         GraveyardStruct const* ClosestGrave = nullptr;
-        for (std::vector<uint64>::const_iterator itr = ghost_list.begin(); itr != ghost_list.end(); ++itr)
+        for (ObjectGuid const guid : ghost_list)
         {
-            Player* player = ObjectAccessor::FindPlayer(*itr);
+            Player* player = ObjectAccessor::FindPlayer(guid);
             if (!player)
                 continue;
 
@@ -902,8 +902,9 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
             if (ClosestGrave)
                 player->TeleportTo(GetMapId(), ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, player->GetOrientation());
         }
+
         // xinef: clear resurrect queue for this creature
-        m_ReviveQueue[BgCreatures[BG_SA_MAXNPC + i]].clear();
+        ghost_list.clear();
     }
 
     DelCreature(BG_SA_MAXNPC + i);
@@ -911,7 +912,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
     GraveyardStruct const* sg = sGraveyard->GetGraveyard(BG_SA_GYEntries[i]);
     if (!sg)
     {
-        sLog->outError("BattlegroundSA::CaptureGraveyard: non-existant GY entry: %u", BG_SA_GYEntries[i]);
+        LOG_ERROR("server", "BattlegroundSA::CaptureGraveyard: non-existant GY entry: %u", BG_SA_GYEntries[i]);
         return;
     }
 

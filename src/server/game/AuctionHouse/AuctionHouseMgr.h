@@ -11,6 +11,7 @@
 #include "DatabaseEnv.h"
 #include "DBCStructure.h"
 #include "EventProcessor.h"
+#include "ObjectGuid.h"
 #include "WorldPacket.h"
 
 class Item;
@@ -50,35 +51,39 @@ enum MailAuctionAnswers
     AUCTION_SALE_PENDING        = 6
 };
 
+enum AuctionHouses
+{
+    AUCTIONHOUSE_ALLIANCE       = 2,
+    AUCTIONHOUSE_HORDE          = 6,
+    AUCTIONHOUSE_NEUTRAL        = 7
+};
+
 struct AuctionEntry
 {
     uint32 Id;
-    uint32 auctioneer;                                      // creature low guid
-    uint32 item_guidlow;
+    uint8 houseId;
+    ObjectGuid item_guid;
     uint32 item_template;
     uint32 itemCount;
-    uint32 owner;
+    ObjectGuid owner;
     uint32 startbid;                                        //maybe useless
     uint32 bid;
     uint32 buyout;
     time_t expire_time;
-    uint32 bidder;
+    ObjectGuid bidder;
     uint32 deposit;                                         //deposit can be calculated only when creating auction
     AuctionHouseEntry const* auctionHouseEntry;             // in AuctionHouse.dbc
-    uint32 factionTemplateId;
 
     // helpers
-    [[nodiscard]] uint32 GetHouseId() const { return auctionHouseEntry->houseId; }
-    [[nodiscard]] uint32 GetHouseFaction() const { return auctionHouseEntry->faction; }
+    [[nodiscard]] uint8 GetHouseId() const { return houseId; }
     [[nodiscard]] uint32 GetAuctionCut() const;
     [[nodiscard]] uint32 GetAuctionOutBid() const;
     bool BuildAuctionInfo(WorldPacket& data) const;
     void DeleteFromDB(SQLTransaction& trans) const;
     void SaveToDB(SQLTransaction& trans) const;
     bool LoadFromDB(Field* fields);
-    bool LoadFromFieldList(Field* fields);
     [[nodiscard]] std::string BuildAuctionMailSubject(MailAuctionAnswers response) const;
-    static std::string BuildAuctionMailBody(uint32 lowGuid, uint32 bid, uint32 buyout, uint32 deposit, uint32 cut);
+    static std::string BuildAuctionMailBody(ObjectGuid guid, uint32 bid, uint32 buyout, uint32 deposit, uint32 cut);
 };
 
 //this class is used as auctionhouse instance
@@ -133,16 +138,17 @@ private:
     ~AuctionHouseMgr();
 
 public:
-    typedef std::unordered_map<uint32, Item*> ItemMap;
+    typedef std::unordered_map<ObjectGuid, Item*> ItemMap;
 
     static AuctionHouseMgr* instance();
 
     AuctionHouseObject* GetAuctionsMap(uint32 factionTemplateId);
+    AuctionHouseObject* GetAuctionsMapByHouseId(uint8 auctionHouseId);
     AuctionHouseObject* GetBidsMap(uint32 factionTemplateId);
 
-    Item* GetAItem(uint32 id)
+    Item* GetAItem(ObjectGuid itemGuid)
     {
-        ItemMap::const_iterator itr = mAitems.find(id);
+        ItemMap::const_iterator itr = mAitems.find(itemGuid);
         if (itr != mAitems.end())
             return itr->second;
 
@@ -159,6 +165,7 @@ public:
 
     static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem, uint32 count);
     static AuctionHouseEntry const* GetAuctionHouseEntry(uint32 factionTemplateId);
+    static AuctionHouseEntry const* GetAuctionHouseEntryFromHouse(uint8 houseId);
 
 public:
     //load first auction items, because of check if item exists, when loading
@@ -166,7 +173,7 @@ public:
     void LoadAuctions();
 
     void AddAItem(Item* it);
-    bool RemoveAItem(uint32 id, bool deleteFromDB = false);
+    bool RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB = false);
 
     void Update();
 

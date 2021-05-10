@@ -54,11 +54,11 @@ void RARunnable::run()
 
     if (acceptor.open(listenAddress, m_Reactor) == -1)
     {
-        sLog->outError("Trinity RA can not bind to port %d on %s (possible error: port already in use)", raPort, stringIp.c_str());
+        LOG_ERROR("server", "Trinity RA can not bind to port %d on %s (possible error: port already in use)", raPort, stringIp.c_str());
         return;
     }
 
-    sLog->outString("Starting Trinity RA on port %d on %s", raPort, stringIp.c_str());
+    LOG_INFO("server", "Starting Trinity RA on port %d on %s", raPort, stringIp.c_str());
 
     while (!World::IsStopped())
     {
@@ -68,6 +68,6 @@ void RARunnable::run()
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outStaticDebug("Trinity RA thread exiting");
+    LOG_DEBUG("server", "Trinity RA thread exiting");
 #endif
 }

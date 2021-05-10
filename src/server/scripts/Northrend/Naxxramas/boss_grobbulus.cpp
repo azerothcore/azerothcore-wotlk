@@ -50,7 +50,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_grobbulusAI (pCreature);
+        return GetNaxxramasAI<boss_grobbulusAI>(pCreature);
     }
 
     struct boss_grobbulusAI : public BossAI
@@ -79,10 +79,7 @@ public:
             me->GetCreaturesWithEntryInRange(StichedGiants, 300.0f, NPC_STICHED_GIANT);
             for (std::list<Creature*>::const_iterator itr = StichedGiants.begin(); itr != StichedGiants.end(); ++itr)
             {
-                if ((*itr)->GetGUID())
-                {
-                    (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
-                }
+                (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
             }
         }
 
@@ -186,7 +183,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_grobbulus_poison_cloudAI(pCreature);
+        return GetNaxxramasAI<boss_grobbulus_poison_cloudAI>(pCreature);
     }
 
     struct boss_grobbulus_poison_cloudAI : public NullCreatureAI

@@ -157,7 +157,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_gythAI>(creature);
+        return GetBlackrockSpireAI<boss_gythAI>(creature);
     }
 };
 

@@ -7,6 +7,10 @@
 #ifndef DEF_OBSIDIAN_SANCTUM_H
 #define DEF_OBSIDIAN_SANCTUM_H
 
+#include "CreatureAIImpl.h"
+
+#define ObsidianSanctumScriptName "instance_obsidian_sanctum"
+
 enum Data : uint32
 {
     // Encounters
@@ -42,4 +46,11 @@ enum OSActions
     ACTION_CLEAR_PORTAL               = -1,
     ACTION_ADD_PORTAL                 = -2,
 };
+
+template <class AI, class T>
+inline AI* GetObsidianSanctumAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, ObsidianSanctumScriptName);
+}
+
 #endif

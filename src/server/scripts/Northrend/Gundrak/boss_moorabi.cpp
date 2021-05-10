@@ -50,7 +50,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_moorabiAI>(creature);
+        return GetGundrakAI<boss_moorabiAI>(creature);
     }
 
     struct boss_moorabiAI : public BossAI

@@ -8,6 +8,8 @@
 /// @{
 /// \file
 
+#include "AppenderDB.h"
+#include "Banner.h"
 #include "Common.h"
 #include "Configuration/Config.h"
 #include "Database/DatabaseEnv.h"
@@ -34,10 +36,6 @@ char serviceDescription[] = "AzerothCore World of Warcraft emulator world servic
  */
 int m_ServiceStatus = -1;
 #endif
-
-WorldDatabaseWorkerPool WorldDatabase;                      ///< Accessor to the world database
-CharacterDatabaseWorkerPool CharacterDatabase;              ///< Accessor to the character database
-LoginDatabaseWorkerPool LoginDatabase;                      ///< Accessor to the realm/login database
 
 uint32 realmID;                                             ///< Id of the realm
 
@@ -122,9 +120,21 @@ extern int main(int argc, char** argv)
     if (!sConfigMgr->LoadAppConfigs())
         return 1;
 
-    sLog->outString("Using configuration file %s.", configFile.c_str());
-    sLog->outString("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
-    sLog->outString("Using ACE version: %s", ACE_VERSION);
+    sLog->RegisterAppender<AppenderDB>();
+    sLog->Initialize();
+
+    acore::Banner::Show("worldserver-daemon",
+        [](char const* text)
+        {
+            LOG_INFO("server.worldserver", "%s", text);
+        },
+        []()
+        {
+            LOG_INFO("server.worldserver", "> Using configuration file       %s.", sConfigMgr->GetFilename().c_str());
+            LOG_INFO("server.worldserver", "> Using SSL version:             %s (library: %s)", OPENSSL_VERSION_TEXT, SSLeay_version(SSLEAY_VERSION));
+            LOG_INFO("server.worldserver", "> Using ACE version:             %s", ACE_VERSION);
+        }
+    );
 
     ///- and run the 'Master'
     /// @todo Why do we need this 'Master'? Can't all of this be in the Main as for Realmd?

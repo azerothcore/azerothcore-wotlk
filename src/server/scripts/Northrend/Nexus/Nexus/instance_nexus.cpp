@@ -185,7 +185,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_crystalline_frayerAI>(creature);
+        return GetNexusAI<npc_crystalline_frayerAI>(creature);
     }
 
     struct npc_crystalline_frayerAI : public ScriptedAI

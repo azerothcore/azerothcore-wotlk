@@ -193,7 +193,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_hodirAI (pCreature);
+        return GetUlduarAI<boss_hodirAI>(pCreature);
     }
 
     struct boss_hodirAI : public ScriptedAI
@@ -209,12 +209,16 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        uint64 Helpers[8]{ };
+        ObjectGuid Helpers[8];
         bool berserk{ false };
         bool bAchievCheese{ true };
         bool bAchievGettingCold{ true };
         bool bAchievCoolestFriends{ true };
         uint16 addSpawnTimer{ 0 };
+
+        // Used to make Hodir disengage whenever he leaves his room
+        const Position ENTRANCE_DOOR{ 1999.160034f, -297.792999f, 431.960999f, 0 };
+        const Position EXIT_DOOR{ 1999.709961f, -166.259003f, 432.822998f, 0 };
 
         void Reset() override
         {
@@ -369,22 +373,12 @@ public:
             }
         }
 
-        bool IsInRoom()
-        {
-            // Calculate the distance between his home position to the gate
-            if (me->GetExactDist(me->GetHomePosition().GetPositionX(),
-                me->GetHomePosition().GetPositionY(),
-                me->GetHomePosition().GetPositionZ()) > 80.0f)
-            {
-                EnterEvadeMode();
-                return false;
-            }
-            return true;
-        }
-
         void UpdateAI(uint32 diff) override
         {
-            if (!IsInRoom()) { return; }
+            if (!IsInRoom(&ENTRANCE_DOOR, Axis::AXIS_Y, false) || !IsInRoom(&EXIT_DOOR, Axis::AXIS_Y, true))
+            {
+                return;
+            }
 
             if (!UpdateVictim())
             {
@@ -397,9 +391,6 @@ public:
                 }
                 return;
             }
-
-            if( !berserk && (me->GetPositionX() < 1940.0f || me->GetPositionX() > 2070.0f || me->GetPositionY() < -300.0f || me->GetPositionY() > -155.0f) )
-                events.RescheduleEvent(EVENT_BERSERK, 1);
 
             events.Update(diff);
 
@@ -435,7 +426,7 @@ public:
                             targets.push_back(itr->GetSource());
                         targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
                         targets.remove_if(acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-                        acore::Containers::RandomResizeList(targets, (RAID_MODE(2,3)));
+                        acore::Containers::RandomResize(targets, (RAID_MODE(2,3)));
                         for (std::list<Unit*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
                         {
                             float prevZ = (*itr)->GetPositionZ();
@@ -481,7 +472,7 @@ public:
 
         Creature* GetHelper(uint8 index)
         {
-            return (Helpers[index] ? ObjectAccessor::GetCreature(*me, Helpers[index]) : nullptr);
+            return Helpers[index] ? ObjectAccessor::GetCreature(*me, Helpers[index]) : nullptr;
         }
 
         void SpawnHelpers()
@@ -595,7 +586,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_icicleAI (pCreature);
+        return GetUlduarAI<npc_ulduar_icicleAI>(pCreature);
     }
 
     struct npc_ulduar_icicleAI : public NullCreatureAI
@@ -638,7 +629,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_flash_freezeAI (pCreature);
+        return GetUlduarAI<npc_ulduar_flash_freezeAI>(pCreature);
     }
 
     struct npc_ulduar_flash_freezeAI : public NullCreatureAI
@@ -656,7 +647,7 @@ public:
         {
             if (pInstance && doneBy)
                 if (pInstance->GetData(TYPE_HODIR) == NOT_STARTED)
-                    if (Creature* hodir = ObjectAccessor::GetCreature(*me, pInstance->GetData64(TYPE_HODIR)))
+                    if (Creature* hodir = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_HODIR)))
                         hodir->AI()->AttackStart(doneBy);
         }
 
@@ -698,7 +689,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_toasty_fireAI (pCreature);
+        return GetUlduarAI<npc_ulduar_toasty_fireAI>(pCreature);
     }
 
     struct npc_ulduar_toasty_fireAI : public NullCreatureAI
@@ -714,7 +705,7 @@ public:
             {
                 if( GameObject* fire = me->FindNearestGameObject(194300, 1.0f) )
                 {
-                    fire->SetOwnerGUID(0);
+                    fire->SetOwnerGUID(ObjectGuid::Empty);
                     fire->Delete();
                 }
                 me->DespawnOrUnsummon(); // this will remove DynObjects
@@ -741,7 +732,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_hodir_priestAI (pCreature);
+        return GetUlduarAI<npc_ulduar_hodir_priestAI>(pCreature);
     }
 
     struct npc_ulduar_hodir_priestAI : public ScriptedAI
@@ -792,7 +783,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( uint64 g = pInstance->GetData64(TYPE_HODIR) )
+                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -825,7 +816,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
-                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetData64(TYPE_HODIR)))
+                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
                     hodir->AI()->SetData(4, 1);
         }
     };
@@ -838,7 +829,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_hodir_druidAI (pCreature);
+        return GetUlduarAI<npc_ulduar_hodir_druidAI>(pCreature);
     }
 
     struct npc_ulduar_hodir_druidAI : public ScriptedAI
@@ -888,7 +879,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( uint64 g = pInstance->GetData64(TYPE_HODIR) )
+                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -922,7 +913,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
-                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetData64(TYPE_HODIR)))
+                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
                     hodir->AI()->SetData(4, 1);
         }
     };
@@ -935,7 +926,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_hodir_shamanAI (pCreature);
+        return GetUlduarAI<npc_ulduar_hodir_shamanAI>(pCreature);
     }
 
     struct npc_ulduar_hodir_shamanAI : public ScriptedAI
@@ -992,7 +983,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( uint64 g = pInstance->GetData64(TYPE_HODIR) )
+                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -1022,7 +1013,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
-                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetData64(TYPE_HODIR)))
+                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
                     hodir->AI()->SetData(4, 1);
         }
     };
@@ -1035,7 +1026,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_ulduar_hodir_mageAI (pCreature);
+        return GetUlduarAI<npc_ulduar_hodir_mageAI>(pCreature);
     }
 
     struct npc_ulduar_hodir_mageAI : public ScriptedAI
@@ -1086,7 +1077,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( uint64 g = pInstance->GetData64(TYPE_HODIR) )
+                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -1137,7 +1128,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             if (pInstance)
-                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetData64(TYPE_HODIR)))
+                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
                     hodir->AI()->SetData(4, 1);
         }
     };
@@ -1245,7 +1236,7 @@ public:
                     {
                         if (GetStackAmount() == 2) // increasing from 2 to 3 (not checking >= to improve performance)
                             if (InstanceScript* pInstance = target->GetInstanceScript())
-                                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetData64(TYPE_HODIR)))
+                                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
                                     hodir->AI()->SetData(2, 1);
                         ModStackAmount(1);
                         counter = 0;
@@ -1282,7 +1273,7 @@ public:
         {
             targets.remove_if(acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
             targets.remove_if(acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-            acore::Containers::RandomResizeList(targets, 1);
+            acore::Containers::RandomResize(targets, 1);
         }
 
         void Register() override

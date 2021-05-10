@@ -178,7 +178,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_gothikAI (pCreature);
+        return GetNaxxramasAI<boss_gothikAI>(pCreature);
     }
 
     struct boss_gothikAI : public BossAI
@@ -217,15 +217,15 @@ public:
             me->NearTeleportTo(2642.139f, -3386.959f, 285.492f, 6.265f);
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_ENTER_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_GOTHIK_ENTER_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_INNER_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_GOTHIK_INNER_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_EXIT_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_GOTHIK_EXIT_GATE)))
                 {
                     go->SetGoState(GO_STATE_READY);
                 }
@@ -245,11 +245,11 @@ public:
             events.ScheduleEvent(EVENT_CHECK_PLAYERS, 120000);
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_ENTER_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_GOTHIK_ENTER_GATE)))
                 {
                     go->SetGoState(GO_STATE_READY);
                 }
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_INNER_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_GOTHIK_INNER_GATE)))
                 {
                     go->SetGoState(GO_STATE_READY);
                 }
@@ -263,13 +263,10 @@ public:
             {
                 summons.DoZoneInCombat();
             }
-            else
+            else if (Unit* target = me->SelectNearestTarget(50.0f))
             {
-                if (Unit* target = me->SelectNearestTarget(50.0f))
-                {
-                    AttackStart(target);
-                    DoZoneInCombat();
-                }
+                AttackStart(target);
+                DoZoneInCombat();
             }
         }
 
@@ -297,15 +294,15 @@ public:
             summons.DespawnAll();
             if (pInstance)
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_ENTER_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_GOTHIK_ENTER_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_INNER_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_GOTHIK_INNER_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_EXIT_GATE)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_GOTHIK_EXIT_GATE)))
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
@@ -450,7 +447,7 @@ public:
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(30) && pInstance)
                     {
-                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_INNER_GATE)))
+                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_GOTHIK_INNER_GATE)))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
@@ -485,7 +482,7 @@ public:
                 case EVENT_CHECK_PLAYERS:
                     if (!CheckGroupSplitted())
                     {
-                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetData64(DATA_GOTHIK_INNER_GATE)))
+                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_GOTHIK_INNER_GATE)))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
@@ -507,7 +504,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new npc_boss_gothik_minionAI (pCreature);
+        return GetNaxxramasAI<npc_boss_gothik_minionAI>(pCreature);
     }
 
     struct npc_boss_gothik_minionAI : public CombatAI

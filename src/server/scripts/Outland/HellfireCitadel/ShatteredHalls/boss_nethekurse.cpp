@@ -240,7 +240,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_grand_warlock_nethekurseAI>(creature);
+        return GetShatteredHallsAI<boss_grand_warlock_nethekurseAI>(creature);
     }
 };
 

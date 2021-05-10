@@ -124,7 +124,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_reliquary_of_soulsAI>(creature);
+        return GetBlackTempleAI<boss_reliquary_of_soulsAI>(creature);
     }
 
     struct boss_reliquary_of_soulsAI : public BossAI
@@ -255,7 +255,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_essence_of_sufferingAI(creature);
+        return GetBlackTempleAI<boss_essence_of_sufferingAI>(creature);
     }
 
     struct boss_essence_of_sufferingAI : public ScriptedAI
@@ -285,7 +285,7 @@ public:
                 return;
 
             me->m_Events.AddEvent(new SuckBackEvent(*me, ACTION_ESSENCE_OF_SUFFERING), me->m_Events.CalculateTime(1500));
-            me->SetTarget(0);
+            me->SetTarget();
             me->SetFacingTo(M_PI / 2.0f);
         }
 
@@ -366,7 +366,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_essence_of_desireAI(creature);
+        return GetBlackTempleAI<boss_essence_of_desireAI>(creature);
     }
 
     struct boss_essence_of_desireAI : public ScriptedAI
@@ -396,7 +396,7 @@ public:
                 return;
 
             me->m_Events.AddEvent(new SuckBackEvent(*me, ACTION_ESSENCE_OF_DESIRE), me->m_Events.CalculateTime(1500));
-            me->SetTarget(0);
+            me->SetTarget();
             me->SetFacingTo(M_PI / 2.0f);
         }
 
@@ -475,7 +475,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_essence_of_angerAI(creature);
+        return GetBlackTempleAI<boss_essence_of_angerAI>(creature);
     }
 
     struct boss_essence_of_angerAI : public ScriptedAI
@@ -483,11 +483,11 @@ public:
         boss_essence_of_angerAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
-        uint64 targetGUID;
+        ObjectGuid targetGUID;
 
         void Reset() override
         {
-            targetGUID = 0;
+            targetGUID.Clear();
             events.Reset();
         }
 
@@ -552,7 +552,7 @@ public:
                 case EVENT_ANGER_SEETHE:
                     if (Unit* victim = me->GetVictim())
                     {
-                        uint64 victimGUID = victim->GetGUID();
+                        ObjectGuid victimGUID = victim->GetGUID();
                         if (targetGUID && targetGUID != victimGUID)
                             me->CastSpell(me, SPELL_SEETHE, false);
                         // victim can be lost

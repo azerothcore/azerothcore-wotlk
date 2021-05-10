@@ -9,6 +9,7 @@
 #include <cstdio>
 #include <iostream>
 #include <list>
+#include <map>
 #include <vector>
 #include <sys/stat.h>
 
@@ -51,19 +52,24 @@ typedef struct
     unsigned int id;
 } map_id;
 
-map_id* map_ids;
-uint16* LiqType = nullptr;
+std::vector<map_id> map_ids;
 uint32 map_count;
 char output_path[128] = ".";
 char input_path[1024] = ".";
 bool hasInputPathParam = false;
 bool preciseVectorData = false;
+std::unordered_map<std::string, WMODoodadData> WmoDoodads;
 
 // Constants
 
-//static const char * szWorkDirMaps = ".\\Maps";
-const char* szWorkDirWmo = "./Buildings";
-const char* szRawVMAPMagic = "VMAP044";
+char const* szWorkDirWmo = "./Buildings";
+
+std::map<std::pair<uint32, uint16>, uint32> uniqueObjectIds;
+
+uint32 GenerateUniqueObjectId(uint32 clientId, uint16 clientDoodadId)
+{
+    return uniqueObjectIds.emplace(std::make_pair(clientId, clientDoodadId), uint32(uniqueObjectIds.size() + 1)).first->second;
+}
 
 // Local testing functions
 
@@ -86,60 +92,16 @@ void strToLower(char* str)
     }
 }
 
-// copied from contrib/extractor/System.cpp
-void ReadLiquidTypeTableDBC()
-{
-    printf("Read LiquidType.dbc file...");
-    DBCFile dbc("DBFilesClient\\LiquidType.dbc");
-    if (!dbc.open())
-    {
-        printf("Fatal error: Invalid LiquidType.dbc file format!\n");
-        exit(1);
-    }
-
-    size_t LiqType_count = dbc.getRecordCount();
-    size_t LiqType_maxid = dbc.getRecord(LiqType_count - 1).getUInt(0);
-    LiqType = new uint16[LiqType_maxid + 1];
-    memset(LiqType, 0xff, (LiqType_maxid + 1) * sizeof(uint16));
-
-    for (uint32 x = 0; x < LiqType_count; ++x)
-        LiqType[dbc.getRecord(x).getUInt(0)] = dbc.getRecord(x).getUInt(3);
-
-    printf("Done! (%u LiqTypes loaded)\n", (unsigned int)LiqType_count);
-}
-
-bool ExtractWmo()
-{
-    bool success = true;
-
-    //const char* ParsArchiveNames[] = {"patch-2.MPQ", "patch.MPQ", "common.MPQ", "expansion.MPQ"};
-
-    for (ArchiveSet::const_iterator ar_itr = gOpenArchives.begin(); ar_itr != gOpenArchives.end() && success; ++ar_itr)
-    {
-        vector<string> filelist;
-
-        (*ar_itr)->GetFileListTo(filelist);
-        for (vector<string>::iterator fname = filelist.begin(); fname != filelist.end() && success; ++fname)
-        {
-            if (fname->find(".wmo") != string::npos)
-                success = ExtractSingleWmo(*fname);
-        }
-    }
-
-    if (success)
-        printf("\nExtract wmo complete (No (fatal) errors)\n");
-
-    return success;
-}
-
 bool ExtractSingleWmo(std::string& fname)
 {
     // Copy files from archive
+    std::string originalName = fname;
 
     char szLocalFile[1024];
-    const char* plain_name = GetPlainName(fname.c_str());
+    char* plain_name = GetPlainName(&fname[0]);
+    fixnamen(plain_name, strlen(plain_name));
+    fixname2(plain_name, strlen(plain_name));
     sprintf(szLocalFile, "%s/%s", szWorkDirWmo, plain_name);
-    fixnamen(szLocalFile, strlen(szLocalFile));
 
     if (FileExists(szLocalFile))
         return true;
@@ -162,12 +124,12 @@ bool ExtractSingleWmo(std::string& fname)
         return true;
 
     bool file_ok = true;
-    std::cout << "Extracting " << fname << std::endl;
-    WMORoot froot(fname);
+    printf("Extracting %s\n", originalName.c_str());
+    WMORoot froot(originalName);
     if (!froot.open())
     {
         printf("Couldn't open RootWmo!!!\n");
-        return true;
+        return false;
     }
     FILE* output = fopen(szLocalFile, "wb");
     if (!output)
@@ -176,6 +138,8 @@ bool ExtractSingleWmo(std::string& fname)
         return false;
     }
     froot.ConvertToVMAPRootWmo(output);
+    WMODoodadData& doodads = WmoDoodads[plain_name];
+    std::swap(doodads, froot.DoodadData);
     int Wmo_nVertices = 0;
     //printf("root has %d groups\n", froot->nGroups);
     if (froot.nGroups != 0)
@@ -204,6 +168,17 @@ bool ExtractSingleWmo(std::string& fname)
             }
 
             Wmo_nVertices += fgroup.ConvertToVMAPGroupWmo(output, &froot, preciseVectorData);
+            for (uint16 groupReference : fgroup.DoodadReferences)
+            {
+                if (groupReference >= doodads.Spawns.size())
+                    continue;
+
+                uint32 doodadNameIndex = doodads.Spawns[groupReference].NameIndex;
+                if (froot.ValidDoodadNames.find(doodadNameIndex) == froot.ValidDoodadNames.end())
+                    continue;
+
+                doodads.References.insert(groupReference);
+            }
         }
     }
 
@@ -221,13 +196,11 @@ void ParsMapFiles()
 {
     char fn[512];
     //char id_filename[64];
-    char id[10];
     for (unsigned int i = 0; i < map_count; ++i)
     {
-        sprintf(id, "%03u", map_ids[i].id);
-        snprintf(fn, sizeof(fn), R"(World\Maps\%s\%s.wdt)", map_ids[i].name, map_ids[i].name);
-        WDTFile WDT(fn, map_ids[i].name);
-        if (WDT.init(id, map_ids[i].id))
+        sprintf(fn,"World\\Maps\\%s\\%s.wdt", map_ids[i].name, map_ids[i].name);
+        WDTFile WDT(fn,map_ids[i].name);
+        if (WDT.init(map_ids[i].id))
         {
             printf("Processing Map %u\n[", map_ids[i].id);
             for (int x = 0; x < 64; ++x)
@@ -490,11 +463,6 @@ int main(int argc, char** argv)
         printf("FATAL ERROR: None MPQ archive found by path '%s'. Use -d option with proper path.\n", input_path);
         return 1;
     }
-    ReadLiquidTypeTableDBC();
-
-    // extract data
-    if (success)
-        success = ExtractWmo();
 
     //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     //map.dbc
@@ -507,18 +475,28 @@ int main(int argc, char** argv)
             printf("FATAL ERROR: Map.dbc not found in data file.\n");
             return 1;
         }
-        map_count = dbc->getRecordCount ();
-        map_ids = new map_id[map_count];
+        map_count = dbc->getRecordCount();
+        map_ids.resize(map_count);
         for (unsigned int x = 0; x < map_count; ++x)
         {
-            map_ids[x].id = dbc->getRecord (x).getUInt(0);
-            strcpy(map_ids[x].name, dbc->getRecord(x).getString(1));
+            map_ids[x].id = dbc->getRecord(x).getUInt(0);
+
+            char const* map_name = dbc->getRecord(x).getString(1);
+            size_t max_map_name_length = sizeof(map_ids[x].name);
+            if (strlen(map_name) >= max_map_name_length)
+            {
+                delete dbc;
+                printf("FATAL ERROR: Map name too long.\n");
+                return 1;
+            }
+
+            strncpy(map_ids[x].name, map_name, max_map_name_length);
+            map_ids[x].name[max_map_name_length - 1] = '\0';
             printf("Map - %s\n", map_ids[x].name);
         }
 
         delete dbc;
         ParsMapFiles();
-        delete [] map_ids;
         //nError = ERROR_SUCCESS;
         // Extract models, listed in DameObjectDisplayInfo.dbc
         ExtractGameobjectModels();
@@ -532,6 +510,5 @@ int main(int argc, char** argv)
     }
 
     printf("Extract %s. Work complete. No errors.\n", versionString);
-    delete [] LiqType;
     return 0;
 }

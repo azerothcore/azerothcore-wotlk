@@ -47,7 +47,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_ambassador_flamelashAI>(creature);
+        return GetBlackrockDepthsAI<boss_ambassador_flamelashAI>(creature);
     }
 
     struct boss_ambassador_flamelashAI : public BossAI
@@ -208,7 +208,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_burning_spiritAI>(creature);
+        return GetBlackrockDepthsAI<npc_burning_spiritAI>(creature);
     }
 
     struct npc_burning_spiritAI : public CreatureAI

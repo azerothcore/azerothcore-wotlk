@@ -114,7 +114,7 @@ public:
             {
                 phase = 1;
                 me->SetReactState(REACT_PASSIVE);
-                me->SetTarget(0);
+                me->SetTarget();
                 me->SendMeleeAttackStop(me->GetVictim());
                 events.DelayEvents(8000);
                 me->CastSpell(me, SPELL_THUNDERING_STOMP, false);
@@ -127,7 +127,7 @@ public:
                 events.CancelEvent(EVENT_SPELL_CHILLING_WAVE);
                 phase = 2;
                 me->SetReactState(REACT_PASSIVE);
-                me->SetTarget(0);
+                me->SetTarget();
                 me->SendMeleeAttackStop(me->GetVictim());
                 events.DelayEvents(8000);
                 me->CastSpell(me, SPELL_THUNDERING_STOMP, false);
@@ -286,7 +286,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_garfrostAI(creature);
+        return GetPitOfSaronAI<boss_garfrostAI>(creature);
     }
 };
 

@@ -165,7 +165,7 @@ class boss_archavon : public CreatureScript
 
         CreatureAI* GetAI(Creature* creature) const override
         {
-            return new boss_archavonAI(creature);
+            return GetVaultOfArchavonAI<boss_archavonAI>(creature);
         }
 };
 

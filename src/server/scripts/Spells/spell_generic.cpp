@@ -194,7 +194,7 @@ public:
                 }
 
                 if (entry)
-                    target->ToPlayer()->KilledMonsterCredit(entry, 0);
+                    target->ToPlayer()->KilledMonsterCredit(entry);
             }
         }
 
@@ -768,7 +768,7 @@ public:
         void FilterTargets(std::list<WorldObject*>& targets)
         {
             targets.remove(GetCaster());
-            acore::Containers::RandomResizeList(targets, _count);
+            acore::Containers::RandomResize(targets, _count);
         }
 
         void Register() override
@@ -1745,6 +1745,40 @@ public:
     }
 };
 
+// 34098 - ClearAllDebuffs
+class spell_gen_clear_debuffs : public SpellScriptLoader
+{
+public:
+    spell_gen_clear_debuffs() : SpellScriptLoader("spell_gen_clear_debuffs") { }
+
+    class spell_gen_clear_debuffs_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_gen_clear_debuffs_SpellScript);
+
+        void HandleScript(SpellEffIndex /*effIndex*/)
+        {
+            if (Unit* target = GetHitUnit())
+            {
+                target->RemoveOwnedAuras([](Aura const* aura)
+                {
+                    SpellInfo const* spellInfo = aura->GetSpellInfo();
+                    return !spellInfo->IsPositive() && !spellInfo->IsPassive();
+                });
+            }
+        }
+
+        void Register() override
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_gen_clear_debuffs_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_gen_clear_debuffs_SpellScript();
+    }
+};
+
 // 63845 - Create Lance
 enum CreateLanceSpells
 {
@@ -2339,7 +2373,7 @@ public:
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
             // Remove all auras with spell id 46221, except the one currently being applied
-            while (Aura* aur = GetUnitOwner()->GetOwnedAura(SPELL_ANIMAL_BLOOD, 0, 0, 0, GetAura()))
+            while (Aura* aur = GetUnitOwner()->GetOwnedAura(SPELL_ANIMAL_BLOOD, ObjectGuid::Empty, ObjectGuid::Empty, 0, GetAura()))
                 GetUnitOwner()->RemoveOwnedAura(aur);
         }
 
@@ -3114,7 +3148,7 @@ public:
             if (Unit* target = GetHitUnit())
             {
                 WorldPacket data(SMSG_SPIRIT_HEALER_CONFIRM, 8);
-                data << uint64(target->GetGUID());
+                data << target->GetGUID();
                 originalCaster->GetSession()->SendPacket(&data);
             }
         }
@@ -4515,7 +4549,7 @@ public:
                 target->SetTemporaryUnsummonedPetNumber(0);
 
                 // Prevent stacking of mounts and client crashes upon dismounting
-                target->RemoveAurasByType(SPELL_AURA_MOUNTED, 0, GetHitAura());
+                target->RemoveAurasByType(SPELL_AURA_MOUNTED, ObjectGuid::Empty, GetHitAura());
 
                 // Triggered spell id dependent on riding skill and zone
                 bool canFly = false;
@@ -5062,7 +5096,7 @@ public:
             bool instant_exit = true;
             if (Player* pCaster = caster->ToPlayer()) // if is a creature instant exits combat, else check if someone in party is in combat in visibility distance
             {
-                uint64 myGUID = pCaster->GetGUID();
+                ObjectGuid myGUID = pCaster->GetGUID();
                 float visibilityRange = pCaster->GetMap()->GetVisibilityRange();
                 if (Group* pGroup = pCaster->GetGroup())
                 {
@@ -5077,13 +5111,11 @@ public:
                 pCaster->SendAttackSwingCancelAttack();
             }
 
-            if (!caster->GetInstanceScript() || !caster->GetInstanceScript()->IsEncounterInProgress()) //Don't leave combat if you are in combat with a boss
+            if (instant_exit)
             {
-                if (!instant_exit) {
-                    caster->getHostileRefManager().deleteReferences(); // exit combat after 6 seconds
-                }
-                else caster->CombatStop(); // isn't necessary to call AttackStop because is just called in CombatStop
+                caster->getHostileRefManager().deleteReferences();
             }
+            caster->CombatStop();
         }
 
         void Register() override
@@ -5154,6 +5186,7 @@ void AddSC_generic_spell_scripts()
     new spell_gen_av_drekthar_presence();
     new spell_gen_burn_brutallus();
     new spell_gen_cannibalize();
+    new spell_gen_clear_debuffs();
     new spell_gen_create_lance();
     new spell_gen_netherbloom();
     new spell_gen_nightmare_vine();

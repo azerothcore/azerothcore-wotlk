@@ -60,7 +60,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_skarvald_the_constructorAI (pCreature);
+        return GetUtgardeKeepAI<boss_skarvald_the_constructorAI>(pCreature);
     }
 
     struct boss_skarvald_the_constructorAI : public ScriptedAI
@@ -120,7 +120,7 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(DATA_DALRONN_AND_SKARVALD, IN_PROGRESS);
-                if (Creature* dalronn = pInstance->instance->GetCreature(pInstance->GetData64(DATA_DALRONN)))
+                if (Creature* dalronn = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_DALRONN)))
                 {
                     if (!dalronn->IsInCombat() && who)
                     {
@@ -146,7 +146,7 @@ public:
 
             if (pInstance)
             {
-                if (Creature* dalronn = pInstance->instance->GetCreature(pInstance->GetData64(DATA_DALRONN)))
+                if (Creature* dalronn = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_DALRONN)))
                 {
                     if (dalronn->isDead())
                     {
@@ -223,7 +223,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_dalronn_the_controllerAI (pCreature);
+        return GetUtgardeKeepAI<boss_dalronn_the_controllerAI>(pCreature);
     }
 
     struct boss_dalronn_the_controllerAI : public ScriptedAI
@@ -288,7 +288,7 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(DATA_DALRONN_AND_SKARVALD, IN_PROGRESS);
-                if (Creature* skarvald = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SKARVALD)))
+                if (Creature* skarvald = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_SKARVALD)))
                 {
                     if (!skarvald->IsInCombat() && who)
                     {
@@ -320,7 +320,7 @@ public:
 
             if (pInstance)
             {
-                if (Creature* skarvald = pInstance->instance->GetCreature(pInstance->GetData64(DATA_SKARVALD)))
+                if (Creature* skarvald = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_SKARVALD)))
                 {
                     if (skarvald->isDead())
                     {

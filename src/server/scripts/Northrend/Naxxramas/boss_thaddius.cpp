@@ -92,8 +92,7 @@ enum Misc
     ACTION_RESTORE                      = 3,
     GO_TESLA_COIL_LEFT                  = 181478,
     GO_TESLA_COIL_RIGHT                 = 181477,
-    NPC_TESLA_COIL                      = 16218,
-    THADDIUS_ROOM_DOOR                  = 181121
+    NPC_TESLA_COIL                      = 16218
 };
 
 class boss_thaddius : public CreatureScript
@@ -103,7 +102,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_thaddiusAI (pCreature);
+        return GetNaxxramasAI<boss_thaddiusAI>(pCreature);
     }
 
     struct boss_thaddiusAI : public BossAI
@@ -177,9 +176,15 @@ public:
             {
                 go->SetGoState(GO_STATE_ACTIVE);
             }
-            if (GameObject* go = me->FindNearestGameObject(THADDIUS_ROOM_DOOR, 200.0f))
+            if (pInstance)
             {
-                go->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_THADDIUS_GATE)))
+                {
+                    if (pInstance->GetBossState(BOSS_GLUTH) == DONE)
+                    {
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    }
+                }
             }
         }
 
@@ -203,10 +208,10 @@ public:
             {
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(28059);
                 pInstance->DoRemoveAurasDueToSpellOnPlayers(28084);
-            }
-            if (GameObject* go = me->FindNearestGameObject(THADDIUS_ROOM_DOOR, 200.0f))
-            {
-                go->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_THADDIUS_GATE)))
+                {
+                    go->SetGoState(GO_STATE_ACTIVE);
+                }
             }
         }
 
@@ -351,7 +356,7 @@ public:
 
     CreatureAI* GetAI(Creature* pCreature) const override
     {
-        return new boss_thaddius_summonAI (pCreature);
+        return GetNaxxramasAI<boss_thaddius_summonAI>(pCreature);
     }
 
     struct boss_thaddius_summonAI : public ScriptedAI
@@ -360,7 +365,6 @@ public:
         {
             pInstance = me->GetInstanceScript();
             overload = false;
-            myCoil = 0;
         }
 
         InstanceScript* pInstance;
@@ -368,7 +372,7 @@ public:
         uint32 pullTimer{};
         uint32 visualTimer{};
         bool overload;
-        uint64 myCoil;
+        ObjectGuid myCoil;
 
         void Reset() override
         {
@@ -394,10 +398,6 @@ public:
         void EnterCombat(Unit* pWho) override
         {
             me->SetInCombatWithZone();
-            if (GameObject* go = me->FindNearestGameObject(THADDIUS_ROOM_DOOR, 200.0f))
-            {
-                go->SetGoState(GO_STATE_READY);
-            }
             if (Creature* cr = me->FindNearestCreature(NPC_TESLA_COIL, 150.f, true))
             {
                 myCoil = cr->GetGUID();
@@ -420,7 +420,11 @@ public:
             }
             if (pInstance)
             {
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_THADDIUS_BOSS)))
+                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_THADDIUS_GATE)))
+                {
+                    go->SetGoState(GO_STATE_READY);
+                }
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_THADDIUS_BOSS)))
                 {
                     cr->AI()->AttackStart(pWho);
                     cr->AddThreat(pWho, 10.0f);
@@ -456,7 +460,7 @@ public:
             Talk(me->GetEntry() == NPC_STALAGG ? EMOTE_STAL_DEATH : EMOTE_FEUG_DEATH);
             if (pInstance)
             {
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_THADDIUS_BOSS)))
+                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_THADDIUS_BOSS)))
                 {
                     cr->AI()->DoAction(ACTION_SUMMON_DIED);
                 }
@@ -525,7 +529,7 @@ public:
                     events.RepeatEvent(20000);
                     if (pInstance)
                     {
-                        if (Creature* feugen = ObjectAccessor::GetCreature(*me, pInstance->GetData64(DATA_FEUGEN_BOSS)))
+                        if (Creature* feugen = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_FEUGEN_BOSS)))
                         {
                             if (!feugen->IsAlive() || !feugen->GetVictim() || !me->GetVictim())
                                 return;
@@ -609,14 +613,7 @@ public:
             if (count)
             {
                 uint32 spellId = 0;
-                if (GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE)
-                {
-                    spellId = SPELL_POSITIVE_CHARGE_STACK;
-                }
-                else // if (GetSpellInfo()->Id == SPELL_NEGATIVE_CHARGE)
-                {
-                    spellId = SPELL_NEGATIVE_CHARGE_STACK;
-                }
+                spellId = GetSpellInfo()->Id == SPELL_POSITIVE_CHARGE ? SPELL_NEGATIVE_CHARGE_STACK : SPELL_NEGATIVE_CHARGE_STACK;
                 GetCaster()->SetAuraStack(spellId, GetCaster(), count);
             }
         }
@@ -711,7 +708,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<npc_teslaAI>(creature);
+        return GetNaxxramasAI<npc_teslaAI>(creature);
     }
 
     struct npc_teslaAI : public ScriptedAI
@@ -736,7 +733,7 @@ public:
         if (!instance || instance->GetData(DATA_HAD_THADDIUS_GREET) || instance->GetBossState(BOSS_THADDIUS) == DONE)
             return true;
 
-        if (Creature* thaddius = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_THADDIUS_BOSS)))
+        if (Creature* thaddius = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_THADDIUS_BOSS)))
         {
             thaddius->AI()->Talk(SAY_GREET);
         }

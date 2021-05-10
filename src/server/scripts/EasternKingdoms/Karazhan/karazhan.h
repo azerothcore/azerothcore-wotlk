@@ -21,6 +21,9 @@
 #ifndef DEF_KARAZHAN_H
 #define DEF_KARAZHAN_H
 
+#include "CreatureAIImpl.h"
+
+#define KarazhanScriptName "instance_karazhan"
 #define DataHeader "KZ"
 
 uint32 const EncounterCount = 12;
@@ -120,5 +123,11 @@ enum KarazhanSpells
     SPELL_OVERLOAD = 29766,
     SPELL_BLINK = 29884
 };
+
+template <class AI, class T>
+inline AI* GetKarazhanAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, KarazhanScriptName);
+}
 
 #endif

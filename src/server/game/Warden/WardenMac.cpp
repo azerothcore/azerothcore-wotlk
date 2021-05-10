@@ -46,19 +46,20 @@ void WardenMac::Init(WorldSession* pClient, SessionKey const& K)
 
     _inputCrypto.Init(_inputKey);
     _outputCrypto.Init(_outputKey);
+
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Server side warden for client %u initializing...", pClient->GetAccountId());
-    sLog->outDebug(LOG_FILTER_WARDEN, "C->S Key: %s", acore::Impl::ByteArrayToHexStr(_inputKey).c_str());
-    sLog->outDebug(LOG_FILTER_WARDEN, "S->C Key: %s", acore::Impl::ByteArrayToHexStr(_outputKey).c_str());
-    sLog->outDebug(LOG_FILTER_WARDEN, "  Seed: %s", acore::Impl::ByteArrayToHexStr(_seed).c_str());
-    sLog->outDebug(LOG_FILTER_WARDEN, "Loading Module...");
+    LOG_DEBUG("warden", "Server side warden for client %u initializing...", pClient->GetAccountId());
+    LOG_DEBUG("warden", "C->S Key: %s", acore::Impl::ByteArrayToHexStr(_inputKey, 16).c_str());
+    LOG_DEBUG("warden", "S->C Key: %s", acore::Impl::ByteArrayToHexStr(_outputKey, 16 ).c_str());
+    LOG_DEBUG("warden", "  Seed: %s", acore::Impl::ByteArrayToHexStr(_seed, 16).c_str());
+    LOG_DEBUG("warden", "Loading Module...");
 #endif
 
     _module = GetModuleForClient();
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Module Key: %s", acore::Impl::ByteArrayToHexStr(_module->Key).c_str());
-    sLog->outDebug(LOG_FILTER_WARDEN, "Module ID: %s", acore::Impl::ByteArrayToHexStr(_module->Id).c_str());
+    LOG_DEBUG("warden", "Module Key: %s", acore::Impl::ByteArrayToHexStr(_module->Key, 16).c_str());
+    LOG_DEBUG("warden", "Module ID: %s", acore::Impl::ByteArrayToHexStr(_module->Id, 16).c_str());
 #endif
     RequestModule();
 }
@@ -87,14 +88,14 @@ ClientWardenModule* WardenMac::GetModuleForClient()
 void WardenMac::InitializeModule()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Initialize module");
+    LOG_DEBUG("warden", "Initialize module");
 #endif
 }
 
 void WardenMac::RequestHash()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Request hash");
+    LOG_DEBUG("warden", "Request hash");
 #endif
 
     // Create packet structure
@@ -164,14 +165,14 @@ void WardenMac::HandleHashResult(ByteBuffer& buff)
     if (memcmp(buff.contents() + 1, sha1.GetDigest().data(), 20) != 0)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_WARDEN, "Request hash reply: failed");
+        LOG_DEBUG("warden", "Request hash reply: failed");
 #endif
         ApplyPenalty(0, "Request hash reply: failed");
         return;
     }
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Request hash reply: succeed");
+    LOG_DEBUG("warden", "Request hash reply: succeed");
 #endif
 
     // client 7F96EEFDA5B63D20A4DF8E00CBF48304
@@ -193,7 +194,7 @@ void WardenMac::HandleHashResult(ByteBuffer& buff)
 void WardenMac::RequestChecks()
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Request data");
+    LOG_DEBUG("warden", "Request data");
 #endif
 
     ByteBuffer buff;
@@ -219,7 +220,7 @@ void WardenMac::RequestChecks()
 void WardenMac::HandleData(ByteBuffer& buff)
 {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-    sLog->outDebug(LOG_FILTER_WARDEN, "Handle data");
+    LOG_DEBUG("warden", "Handle data");
 #endif
 
     _dataSent = false;
@@ -254,7 +255,7 @@ void WardenMac::HandleData(ByteBuffer& buff)
     if (sha1Hash != sha1.GetDigest())
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_WARDEN, "Handle data failed: SHA1 hash is wrong!");
+        LOG_DEBUG("warden", "Handle data failed: SHA1 hash is wrong!");
 #endif
         //found = true;
     }
@@ -271,7 +272,7 @@ void WardenMac::HandleData(ByteBuffer& buff)
     if (memcmp(ourMD5Hash, theirsMD5Hash, 16))
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        sLog->outDebug(LOG_FILTER_WARDEN, "Handle data failed: MD5 hash is wrong!");
+        LOG_DEBUG("warden", "Handle data failed: MD5 hash is wrong!");
 #endif
         //found = true;
     }

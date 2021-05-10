@@ -16,7 +16,7 @@ CollectSourceFiles(
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
 if( WIN32 )
-  list(APPEND PRIVATE_SOURCES ${winDebugging})
+  list(APPEND PRIVATE_SOURCES ${winDebugging} ${winService})
   if ( MSVC )
     list(APPEND PRIVATE_SOURCES worldserver.rc)
   endif()

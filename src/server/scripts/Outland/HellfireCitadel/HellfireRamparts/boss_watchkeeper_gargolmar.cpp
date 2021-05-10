@@ -143,7 +143,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_watchkeeper_gargolmarAI(creature);
+        return GetHellfireRampartsAI<boss_watchkeeper_gargolmarAI>(creature);
     }
 };
 

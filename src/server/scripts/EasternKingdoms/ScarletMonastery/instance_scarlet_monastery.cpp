@@ -4,6 +4,7 @@
 REWRITTEN BY XINEF
 */
 
+#include "scarletmonastery.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
@@ -146,7 +147,7 @@ public:
             }
         }
 
-        uint64 GetData64(uint32 type) const override
+        ObjectGuid GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -157,7 +158,8 @@ public:
                 case DATA_DOOR_WHITEMANE:
                     return DoorHighInquisitorGUID;
             }
-            return 0;
+
+            return ObjectGuid::Empty;
         }
 
         uint32 GetData(uint32 type) const override
@@ -167,9 +169,9 @@ public:
             return 0;
         }
     private:
-        uint64 DoorHighInquisitorGUID;
-        uint64 MograineGUID;
-        uint64 WhitemaneGUID;
+        ObjectGuid DoorHighInquisitorGUID;
+        ObjectGuid MograineGUID;
+        ObjectGuid WhitemaneGUID;
         uint32 encounter;
     };
 };
@@ -227,7 +229,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_scarlet_guardAI(creature);
+        return GetScarletMonasteryAI<npc_scarlet_guardAI>(creature);
     }
 };
 
@@ -394,7 +396,7 @@ public:
                 return;
 
             //On first death, fake death and open door, as well as initiate whitemane if exist
-            if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_WHITEMANE)))
+            if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
             {
                 instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, IN_PROGRESS);
                 Whitemane->GetMotionMaster()->MovePoint(1, 1163.113370f, 1398.856812f, 32.527786f);
@@ -412,7 +414,7 @@ public:
                 hasDied = true;
                 fakeDeath = true;
                 damage = 0;
-                ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_WHITEMANE))->SetInCombatWithZone();
+                ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_WHITEMANE))->SetInCombatWithZone();
             }
         }
 
@@ -450,7 +452,7 @@ public:
             if (hasDied && !heal && instance->GetData(TYPE_MOGRAINE_AND_WHITE_EVENT) == SPECIAL)
             {
                 //On resurrection, stop fake death and heal whitemane and resume fight
-                if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetData64(DATA_WHITEMANE)))
+                if (Unit* Whitemane = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_WHITEMANE)))
                 {
                     //Incase wipe during phase that mograine fake death
                     me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -504,7 +506,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_mograineAI(creature);
+        return GetScarletMonasteryAI<npc_mograineAI>(creature);
     }
 };
 
@@ -562,7 +564,7 @@ public:
                 //When casting resuruction make sure to delay so on rez when reinstate battle deepsleep runs out
                 if (Wait_Timer <= diff)
                 {
-                    if (ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MOGRAINE)))
+                    if (ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOGRAINE)))
                     {
                         DoCast(SPELL_SCARLET_RESURRECTION);
                         Talk(SAY_WH_RESURRECT);
@@ -596,7 +598,7 @@ public:
                 if (!HealthAbovePct(75))
                     target = me;
 
-                if (Creature* mograine = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MOGRAINE)))
+                if (Creature* mograine = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOGRAINE)))
                 {
                     // checking canResurrectCheck prevents her healing Mograine while he is "faking death"
                     if (canResurrectCheck && mograine->IsAlive() && !mograine->HealthAbovePct(75))
@@ -646,7 +648,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new boss_high_inquisitor_whitemaneAI(creature);
+        return GetScarletMonasteryAI<boss_high_inquisitor_whitemaneAI>(creature);
     }
 };
 
@@ -787,7 +789,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return new npc_fairbanksAI(creature);
+        return GetScarletMonasteryAI<npc_fairbanksAI>(creature);
     }
 };
 

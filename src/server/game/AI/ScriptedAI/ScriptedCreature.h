@@ -21,7 +21,7 @@ class InstanceScript;
 class SummonList
 {
 public:
-    typedef std::list<uint64> StorageType;
+    typedef GuidList StorageType;
     typedef StorageType::iterator iterator;
     typedef StorageType::const_iterator const_iterator;
     typedef StorageType::size_type size_type;
@@ -107,7 +107,7 @@ public:
 
         // We need to use a copy of SummonList here, otherwise original SummonList would be modified
         StorageType listCopy = storage_;
-        acore::Containers::RandomResizeList<uint64, Predicate>(listCopy, predicate, max);
+        acore::Containers::RandomResize(listCopy, predicate, max);
         for (StorageType::iterator i = listCopy.begin(); i != listCopy.end(); ++i)
         {
             Creature* summon = ObjectAccessor::GetCreature(*me, *i);
@@ -137,7 +137,7 @@ class EntryCheckPredicate
 {
 public:
     EntryCheckPredicate(uint32 entry) : _entry(entry) {}
-    bool operator()(uint64 guid) { return GUID_ENPART(guid) == _entry; }
+    bool operator()(ObjectGuid guid) { return guid.GetEntry() == _entry; }
 
 private:
     uint32 _entry;
@@ -149,7 +149,7 @@ public:
     bool operator() (WorldObject* unit) const
     {
         if (unit->GetTypeId() != TYPEID_PLAYER)
-            if (!IS_PLAYER_GUID(unit->ToUnit()->GetOwnerGUID()))
+            if (!unit->ToUnit()->GetOwnerGUID().IsPlayer())
                 return true;
 
         return false;
@@ -196,6 +196,51 @@ struct ScriptedAI : public CreatureAI
 
     // Called when AI is temporarily replaced or put back when possess is applied or removed
     void OnPossess(bool /*apply*/) {}
+
+    enum class Axis
+    {
+        AXIS_X,
+        AXIS_Y
+    };
+
+    /* This is called for bosses whenever an encounter is happening.
+     * - Arguments:
+     * - Position has to be passed as a constant pointer (&Position)
+     * - Axis is the X or Y axis that is used to decide the position threshold
+     * - Above decides if the boss position should be above the passed position
+     *   or below.
+     * Example:
+     * Hodir is in room until his Y position is below the Door position:
+     * IsInRoom(doorPosition, AXIS_Y, false);
+     */
+    bool IsInRoom(const Position* pos, Axis axis, bool above)
+    {
+        if (!pos)
+        {
+            return true;
+        }
+
+        switch (axis)
+        {
+            case Axis::AXIS_X:
+                if ((!above && me->GetPositionX() < pos->GetPositionX()) || me->GetPositionX() > pos->GetPositionX())
+                {
+                    EnterEvadeMode();
+                    return false;
+                }
+                break;
+            case Axis::AXIS_Y:
+                if ((!above && me->GetPositionY() < pos->GetPositionY())  || me->GetPositionY() > pos->GetPositionY())
+                {
+                    EnterEvadeMode();
+                    return false;
+                }
+
+                break;
+        }
+
+        return true;
+    }
 
     // *************
     // Variables

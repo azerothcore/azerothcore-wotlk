@@ -61,14 +61,14 @@ public:
 
     /* Packet Building */
     void BuildPlayerJoinedBattlegroundPacket(WorldPacket* data, Player* player);
-    void BuildPlayerLeftBattlegroundPacket(WorldPacket* data, uint64 guid);
-    void BuildBattlegroundListPacket(WorldPacket* data, uint64 guid, Player* player, BattlegroundTypeId bgTypeId, uint8 fromWhere);
+    void BuildPlayerLeftBattlegroundPacket(WorldPacket* data, ObjectGuid guid);
+    void BuildBattlegroundListPacket(WorldPacket* data, ObjectGuid guid, Player* player, BattlegroundTypeId bgTypeId, uint8 fromWhere);
     void BuildGroupJoinedBattlegroundPacket(WorldPacket* data, GroupJoinBattlegroundResult result);
     void BuildUpdateWorldStatePacket(WorldPacket* data, uint32 field, uint32 value);
     void BuildPvpLogDataPacket(WorldPacket* data, Battleground* bg);
     void BuildBattlegroundStatusPacket(WorldPacket* data, Battleground* bg, uint8 queueSlot, uint8 statusId, uint32 time1, uint32 time2, uint8 arenaType, TeamId teamId, bool isRated = false, BattlegroundTypeId forceBgTypeId = BATTLEGROUND_TYPE_NONE);
     void BuildPlaySoundPacket(WorldPacket* data, uint32 soundid);
-    void SendAreaSpiritHealerQueryOpcode(Player* player, Battleground* bg, uint64 guid);
+    void SendAreaSpiritHealerQueryOpcode(Player* player, Battleground* bg, ObjectGuid guid);
 
     /* Battlegrounds */
     Battleground* GetBattleground(uint32 InstanceID);
@@ -127,6 +127,8 @@ public:
     static std::unordered_map<int, bgRef> bgTypeToTemplate;                 // BattlegroundTypeId -> bgRef
     static std::unordered_map<int, bgMapRef> getBgFromMap;                  // BattlegroundMapID -> bgMapRef
     static std::unordered_map<int, bgTypeRef> getBgFromTypeID;              // BattlegroundTypeID -> bgTypeRef
+    static std::unordered_map<uint32, BattlegroundQueueTypeId> ArenaTypeToQueue;    // ArenaType -> BattlegroundQueueTypeId
+    static std::unordered_map<uint32, ArenaType> QueueToArenaType;                  // BattlegroundQueueTypeId -> ArenaType
 
 private:
     bool CreateBattleground(CreateBattlegroundData& data);

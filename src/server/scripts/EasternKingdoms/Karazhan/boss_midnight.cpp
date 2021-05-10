@@ -186,7 +186,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_midnightAI>(creature);
+        return GetKarazhanAI<boss_midnightAI>(creature);
     }
 };
 
@@ -299,7 +299,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_attumenAI>(creature);
+        return GetKarazhanAI<boss_attumenAI>(creature);
     }
 };
 
@@ -404,7 +404,7 @@ public:
 
     CreatureAI* GetAI(Creature* creature) const override
     {
-        return GetInstanceAI<boss_attumen_midnightAI>(creature);
+        return GetKarazhanAI<boss_attumen_midnightAI>(creature);
     }
 };
 

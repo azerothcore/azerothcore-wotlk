@@ -5,12 +5,17 @@
 #ifndef DEF_NEXUS_H
 #define DEF_NEXUS_H
 
+#include "CreatureAIImpl.h"
 #include "GameEventMgr.h"
+#include "GameEventMgr.h"
+#include "GridNotifiers.h"
 #include "GridNotifiers.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+
+#define NexusScriptName "instance_nexus"
 
 enum eTypes
 {
@@ -43,5 +48,11 @@ enum Npcs
     GO_ANOMALUS_SPHERE              = 188527,
     GO_ORMOROK_SPHERE               = 188528
 };
+
+template <class AI, class T>
+inline AI* GetNexusAI(T* obj)
+{
+    return GetInstanceAI<AI>(obj, NexusScriptName);
+}
 
 #endif
