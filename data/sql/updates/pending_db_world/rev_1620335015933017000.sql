@@ -6,3 +6,4 @@ INSERT IGNORE INTO `spell_dbc` VALUES
 
 UPDATE `spell_dbc` SET `ProcTypeMask` = 0, `ProcChance` = 101 WHERE `ID` = 17154; 
 UPDATE `spell_dbc` SET `DurationIndex` = 0, `AuraDescription_Lang_Mask` = 16712190, `NameSubtext_Lang_Mask` = 16712190 WHERE `ID` = 18097;
+
