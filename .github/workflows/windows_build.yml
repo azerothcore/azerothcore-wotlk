@@ -26,7 +26,7 @@ jobs:
       - name: Copy dll files
         shell: bash
         run: |
-          cp "/c/Program Files/MySQL/MySQL Server 8.0/lib/libmysql.lib" "build/bin/Release/"
+          cp "/c/Program Files/MySQL/MySQL Server 8.0/lib/libmysql.dll" "build/bin/Release/"
           cp "/c/Program Files/OpenSSL-Win64/bin/libcrypto-1_1-x64.dll" "build/bin/Release/"
           cp "/c/Program Files/OpenSSL-Win64/bin/libssl-1_1-x64.dll" "build/bin/Release/"
       - uses: actions/upload-artifact@v2
