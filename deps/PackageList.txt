@@ -4,6 +4,10 @@ ACE (ADAPTIVE Communication Environment)
   http://www.cs.wustl.edu/~schmidt/ACE.html
   Version: 6.1.4
 
+Boost (external)
+  http://www.boost.org
+  Version: external
+
 bzip2 (a freely available, patent free, high-quality data compressor)
   http://www.bzip.org/
   Version: 1.0.6
