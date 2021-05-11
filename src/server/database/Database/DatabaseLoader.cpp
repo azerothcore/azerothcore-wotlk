@@ -39,26 +39,18 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
             // Try reconnect
             if (error == CR_CONNECTION_ERROR)
             {
-                // Possible improvement for future: make ATTEMPTS and SECONDS configurable values
-                uint32 const ATTEMPTS = 5;
-                Seconds durationSecs = 5s;
-                uint32 count = 1;
+                uint8 const ATTEMPTS = sConfigMgr->GetOption<uint8>("Database.Reconnect.Attempts", 20);
+                Seconds RECONNECT_SECONDS = Seconds(sConfigMgr->GetOption<uint8>("Database.Reconnect.Seconds", 15));
+                uint8 count = 0;
 
-                auto sleepThread = [&]()
+                while (count < ATTEMPTS)
                 {
-                    LOG_INFO("sql.driver", "> Retrying after %u seconds", static_cast<uint32>(durationSecs.count()));
-                    std::this_thread::sleep_for(durationSecs);
-                };
-
-                sleepThread();
-
-                do
-                {
+                    LOG_INFO("sql.driver", "> Retrying after %u seconds", static_cast<uint32>(RECONNECT_SECONDS.count()));
+                    std::this_thread::sleep_for(RECONNECT_SECONDS);
                     error = pool.Open();
 
                     if (error == CR_CONNECTION_ERROR)
                     {
-                        sleepThread();
                         count++;
                     }
                     else
@@ -66,7 +58,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
                         break;
                     }
 
-                } while (count < ATTEMPTS);
+                }
             }
 
             // If the error wasn't handled quit
