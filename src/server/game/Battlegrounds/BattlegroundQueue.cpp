@@ -999,7 +999,7 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
             return;
         }
 
-        // When limited, it announces only if one more player is needed to start the BG
+        // When limited, it announces only if there are at least CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS in queue
         auto limitQueueMinLevel = sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_LEVEL);
         if (limitQueueMinLevel != 0 && limitQueueMinLevel >= q_min_level)
         {
