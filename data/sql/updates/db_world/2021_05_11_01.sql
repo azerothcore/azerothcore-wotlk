@@ -1,3 +1,19 @@
+-- DB update 2021_05_11_00 -> 2021_05_11_01
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_11_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_11_00 2021_05_11_01 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1618834215629926428'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1618834215629926428');
 
 -- Dusty rug SAI:
@@ -67,3 +83,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@CAPTURED_FARMER_ENTRY, 0, 7, 0, 59, 0, 100, 0, 2, 0, 0, 0, 0, 1, 1, 4000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captured Farmer - On Timed Event 2 Triggered - Say Line 1'),
 (@CAPTURED_FARMER_ENTRY, 0, 8, 0, 38, 0, 100, 1, 1, 3, 0, 0, 0, 53, 0, 1589100, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captured Farmer - On Data Set 1 3 - Start Waypoint (No Repeat)'),
 (@CAPTURED_FARMER_ENTRY, 0, 9, 0, 40, 0, 100, 0, 2, 1589100, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 2.82591, 'Captured Farmer - On Waypoint 2 Reached - Set Orientation 2.82591');
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
