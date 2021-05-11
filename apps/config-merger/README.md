@@ -9,7 +9,7 @@ Your new config will be found under $basedir/session_id/newconfig.conf.merge
 
 If you do not run a PHP server on your machiene you can read this guide on ["How to execute PHP code using command line?"](https://www.geeksforgeeks.org/how-to-execute-php-code-using-command-line/) on geeksforgeeks.org.
 
-```php
+```
 php -S localhost:port -t E:\Azerothcore-wotlk\apps\config-merger\
 ```
 
