@@ -14,6 +14,7 @@
 #include <array>
 #include <cwchar>
 #include <string>
+#include <ace/Default_Constants.h>
 
 Tokenizer::Tokenizer(const std::string& src, const char sep, uint32 vectorReserve)
 {
