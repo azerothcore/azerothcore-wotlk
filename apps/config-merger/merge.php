@@ -6,7 +6,10 @@
  * Copyright: Paradox
  * Email: iamparadox@netscape.net (paypal email)
  * License: GNU General Public License v2(GPL)
- */
+ */ 
+
+error_reporting(0);
+
 if (!empty($_FILES['File1']) && !empty($_FILES['File2']))
 {
     session_id();
@@ -23,8 +26,15 @@ if (!empty($_FILES['File1']) && !empty($_FILES['File2']))
         mkdir($basedir."/".session_id());
     $upload1 = $basedir."/".session_id()."/".basename($_FILES['File1']['name']);
     $upload2 = $basedir."/".session_id()."/".basename($_FILES['File2']['name']);
-    $newconfig = $basedir."/".session_id()."/trinitycore.conf.merged";
-    $out_file = fopen($newconfig, w);
+
+    if (strpos($upload1, "worldserver") !== false)
+        $newconfig = $basedir."/".session_id()."/worldserver.conf.merge";
+    else if (strpos($upload1, "authserver") !== false)
+        $newconfig = $basedir."/".session_id()."/authserver.conf.merge";
+    else
+        $newconfig = $basedir."/".session_id()."/UnkownConfigFile.conf.merge";
+
+    $out_file = fopen($newconfig, "w");
     $success = false;
     if (move_uploaded_file($_FILES['File1']['tmp_name'], $upload1))
     {
@@ -46,8 +56,8 @@ if (!empty($_FILES['File1']) && !empty($_FILES['File2']))
     if ($success)
     {
         $custom_found = false;
-        $in_file1 = fopen($upload1,r);
-        $in_file2 = fopen($upload2,r);
+        $in_file1 = fopen($upload1,"r");
+        $in_file2 = fopen($upload2,"r");
         $array1 = array();
         $array2 = array();
         $line = trim(fgets($in_file1));
@@ -86,7 +96,7 @@ if (!empty($_FILES['File1']) && !empty($_FILES['File2']))
                 unset($array2[$k]);
             }
         }
-        $in_file1 = fopen($upload1,r);
+        $in_file1 = fopen($upload1,"r");
         $line = trim(fgets($in_file1));
         while (!feof($in_file1))
         {
@@ -140,6 +150,16 @@ if (!empty($_FILES['File1']) && !empty($_FILES['File2']))
             }
             fwrite($out_file, "#          ".$k."=".$v.$eol);
         }
+
+        if (strpos($upload1, "worldserver") !== false)
+        {
+            file_put_contents($newconfig, str_replace("]=","]",file_get_contents($newconfig)));
+        }
+        else if (strpos($upload1, "authserver") !== false)
+        {
+            file_put_contents($newconfig, str_replace("]=","]",file_get_contents($newconfig)));
+        }
+
         unset($array1);
         unset($array2);
         fclose($in_file1);

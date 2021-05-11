@@ -1,6 +1,6 @@
 <?php
 /*
- * Project Name: Config File Merge For Mangos/Trinity Server
+ * Project Name: Config File Merge For Mangos/Trinity/AzerothCore Server
  * Date: 01.01.2010 inital version (0.0.1a)
  * Author: Paradox
  * Copyright: Paradox
@@ -10,18 +10,22 @@
 ?>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
 <FORM enctype="multipart/form-data" ACTION="merge.php" METHOD="POST">
-Dist File
+Dist File (.conf.dist)
 <br />
 <INPUT name="File1" TYPE="file">
 <br />
-Current Conf File
+<br />
+Current Conf File (.conf)
 <br />
 <INPUT name="File2" TYPE="file">
 <br />
-<INPUT TYPE=RADIO NAME="eol" VALUE="0" CHECKED >Win32 -
+<br />
+<INPUT TYPE=RADIO NAME="eol" VALUE="0" CHECKED >Windows -
 <INPUT TYPE=RADIO NAME="eol" VALUE="1"         >UNIX/Linux
 <br />
+<br />
 <INPUT TYPE="submit" VALUE="Submit">
+<br />
 <br />
 If you have any custom settings, such as from patches,
 <br />
