@@ -10,7 +10,7 @@
 
 #define RANDOM_POINTS_NUMBER        12
 #define RANDOM_LINKS_COUNT          7
-#define MIN_WANDER_DISTANCE_GROUND  6.0f
+#define MIN_WANDER_DISTANCE_GROUND  1.0f
 #define MIN_WANDER_DISTANCE_AIR     10.0f
 #define MAX_PATH_LENGHT_FACTOR      1.85f
 
@@ -34,6 +34,7 @@ public:
         for (uint8 i = 0; i < RANDOM_POINTS_NUMBER; ++i)
             _validPointsVector[RANDOM_POINTS_NUMBER].push_back(i);
     }
+    ~RandomMovementGenerator();
 
     void _setRandomLocation(T*);
     void DoInitialize(T*);

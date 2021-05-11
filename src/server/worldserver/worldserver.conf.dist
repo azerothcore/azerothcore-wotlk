@@ -61,7 +61,7 @@ RealmID = 1
 #    DataDir
 #        Description: Data directory setting.
 #        Important:   DataDir needs to be quoted, as the string might contain space characters.
-#        Example:     "/home/youruser/azeroth-server/data"
+#        Example:     "/home/youruser/azerothcore/data"
 #        Default:     "."
 
 DataDir = "."
@@ -71,7 +71,7 @@ DataDir = "."
 #        Description: Logs directory setting.
 #        Important:   LogsDir needs to be quoted, as the string might contain space characters.
 #                     Logs directory must exists, or log file creation will be disabled.
-#        Example:     "/home/youruser/azeroth-server/logs"
+#        Example:     "/home/youruser/azerothcore/logs"
 #        Default:     "" - (Log files will be stored in the current path)
 
 LogsDir = ""
@@ -94,6 +94,18 @@ LogsDir = ""
 LoginDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_auth"
 WorldDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_world"
 CharacterDatabaseInfo = "127.0.0.1;3306;acore;acore;acore_characters"
+
+#
+#    Database.Reconnect.Seconds
+#    Database.Reconnect.Attempts
+#
+#        Description: How many seconds between every reconnection attempt
+#                     and how many attempts will be performed in total
+#        Default:     20 attempts every 15 seconds
+#
+
+Database.Reconnect.Seconds = 15
+Database.Reconnect.Attempts = 20
 
 #
 #    LoginDatabase.WorkerThreads
@@ -3412,7 +3424,7 @@ Logger.server=4,Console Server
 Logger.commands.gm=4,Console GM
 Logger.scripts.hotswap=4,Console Server
 Logger.sql.sql=2,Console DBErrors
-Logger.sql.updates=4,Console Server
+Logger.sql=4,Console Server
 Logger.mmaps=4,Server
 
 #Logger.achievement=4,Console Server

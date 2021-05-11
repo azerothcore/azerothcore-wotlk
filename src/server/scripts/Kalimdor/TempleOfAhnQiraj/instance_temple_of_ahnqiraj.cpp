@@ -33,12 +33,12 @@ public:
         bool IsBossDied[3];
 
         //Storing Skeram, Vem and Kri.
-        uint64 SkeramGUID;
-        uint64 VemGUID;
-        uint64 KriGUID;
-        uint64 VeklorGUID;
-        uint64 VeknilashGUID;
-        uint64 ViscidusGUID;
+        ObjectGuid SkeramGUID;
+        ObjectGuid VemGUID;
+        ObjectGuid KriGUID;
+        ObjectGuid VeklorGUID;
+        ObjectGuid VeknilashGUID;
+        ObjectGuid ViscidusGUID;
 
         uint32 BugTrioDeathCount;
 
@@ -49,13 +49,6 @@ public:
             IsBossDied[0] = false;
             IsBossDied[1] = false;
             IsBossDied[2] = false;
-
-            SkeramGUID = 0;
-            VemGUID = 0;
-            KriGUID = 0;
-            VeklorGUID = 0;
-            VeknilashGUID = 0;
-            ViscidusGUID = 0;
 
             BugTrioDeathCount = 0;
 
@@ -121,7 +114,7 @@ public:
             return 0;
         }
 
-        uint64 GetData64(uint32 identifier) const override
+        ObjectGuid GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -138,8 +131,9 @@ public:
                 case DATA_VISCIDUS:
                     return ViscidusGUID;
             }
-            return 0;
-        }                                                       // end GetData64
+
+            return ObjectGuid::Empty;
+        }
 
         void SetData(uint32 type, uint32 data) override
         {

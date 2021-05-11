@@ -9,6 +9,7 @@
 
 #include "Common.h"
 #include "ByteBuffer.h"
+#include "Duration.h"
 
 class WorldPacket : public ByteBuffer
 {
@@ -18,6 +19,11 @@ public:
     {
     }
     explicit WorldPacket(uint16 opcode, size_t res = 200) : ByteBuffer(res), m_opcode(opcode) { }
+
+    WorldPacket(WorldPacket&& packet, TimePoint receivedTime) : ByteBuffer(std::move(packet)), m_opcode(packet.m_opcode), m_receivedTime(receivedTime)
+    {
+    }
+
     // copy constructor
     WorldPacket(const WorldPacket& packet)              : ByteBuffer(packet), m_opcode(packet.m_opcode)
     {
@@ -39,7 +45,10 @@ public:
     [[nodiscard]] uint16 GetOpcode() const { return m_opcode; }
     void SetOpcode(uint16 opcode) { m_opcode = opcode; }
 
+    [[nodiscard]] TimePoint GetReceivedTime() const { return m_receivedTime; }
+
 protected:
     uint16 m_opcode{0};
+    TimePoint m_receivedTime; // only set for a specific set of opcodes, for performance reasons.
 };
 #endif

@@ -326,14 +326,14 @@ public:
     void StartingEventOpenDoors() override;
 
     /* BG Flags */
-    uint64 GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const override    { return _flagKeeperGUID; }
-    void SetFlagPicker(uint64 guid)     { _flagKeeperGUID = guid; }
+    ObjectGuid GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const override    { return _flagKeeperGUID; }
+    void SetFlagPicker(ObjectGuid guid)     { _flagKeeperGUID = guid; }
     uint8 GetFlagState() const          { return _flagState; }
     void RespawnFlag();
     void RespawnFlagAfterDrop();
 
     void RemovePlayer(Player* player) override;
-    void HandleBuffUse(uint64 buff_guid);
+    void HandleBuffUse(ObjectGuid buff_guid);
     void HandleAreaTrigger(Player* player, uint32 trigger) override;
     void HandleKillPlayer(Player* player, Player* killer) override;
     GraveyardStruct const* GetClosestGraveyard(Player* player) override;
@@ -342,8 +342,8 @@ public:
     void EndBattleground(TeamId winnerTeamId) override;
     void UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
     void FillInitialWorldStates(WorldPacket& data) override;
-    void SetDroppedFlagGUID(uint64 guid, TeamId /*teamId*/ = TEAM_NEUTRAL) override  { _droppedFlagGUID = guid; }
-    uint64 GetDroppedFlagGUID() const { return _droppedFlagGUID; }
+    void SetDroppedFlagGUID(ObjectGuid guid, TeamId /*teamId*/ = TEAM_NEUTRAL) override  { _droppedFlagGUID = guid; }
+    ObjectGuid GetDroppedFlagGUID() const { return _droppedFlagGUID; }
 
     /* Battleground Events */
     void EventPlayerClickedOnFlag(Player* player, GameObject* gameObject) override;
@@ -390,8 +390,8 @@ private:
     EventMap _bgEvents;
     uint32 _honorTics;
     uint8 _ownedPointsCount[BG_TEAMS_COUNT];
-    uint64 _flagKeeperGUID;
-    uint64 _droppedFlagGUID;
+    ObjectGuid _flagKeeperGUID;
+    ObjectGuid _droppedFlagGUID;
     uint8 _flagState;
     uint32 _flagCapturedObject;
 };

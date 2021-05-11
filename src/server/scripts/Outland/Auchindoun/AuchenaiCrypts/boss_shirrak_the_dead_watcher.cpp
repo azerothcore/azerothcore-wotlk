@@ -50,7 +50,7 @@ public:
         }
 
         EventMap events;
-        uint64 focusGUID;
+        ObjectGuid focusGUID;
 
         void EnterEvadeMode() override
         {
@@ -61,7 +61,7 @@ public:
         void Reset() override
         {
             events.Reset();
-            focusGUID = 0;
+            focusGUID.Clear();
             me->SetControlled(false, UNIT_STATE_ROOT);
         }
 

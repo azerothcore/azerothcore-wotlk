@@ -200,9 +200,9 @@ public:
             }
 
             uint16 phase = 1;
-            for (std::list<uint64>::iterator itr = summons.begin(); itr != summons.end(); ++itr)
+            for (ObjectGuid guid : summons)
             {
-                if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
                     phase |= summon->GetPhaseMask();
             }
 

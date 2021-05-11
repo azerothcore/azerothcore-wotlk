@@ -22,7 +22,7 @@ int TotemAI::Permissible(Creature const* creature)
     return PERMIT_BASE_NO;
 }
 
-TotemAI::TotemAI(Creature* c) : CreatureAI(c), i_victimGuid(0)
+TotemAI::TotemAI(Creature* c) : CreatureAI(c)
 {
     ASSERT(c->IsTotem());
 }
@@ -76,6 +76,12 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
         me->VisitNearbyObject(max_range, checker);
     }
 
+
+    if (!victim && me->GetCharmerOrOwnerOrSelf()->IsInCombat())
+    {
+        victim = me->GetCharmerOrOwnerOrSelf()->GetVictim();
+    }
+
     // If have target
     if (victim)
     {
@@ -87,7 +93,7 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
         me->CastSpell(victim, me->ToTotem()->GetSpell(), false);
     }
     else
-        i_victimGuid = 0;
+        i_victimGuid.Clear();
 }
 
 void TotemAI::AttackStart(Unit* /*victim*/)

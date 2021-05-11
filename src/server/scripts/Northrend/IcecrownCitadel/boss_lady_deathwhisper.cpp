@@ -230,13 +230,13 @@ public:
 
     struct boss_lady_deathwhisperAI : public BossAI
     {
-        boss_lady_deathwhisperAI(Creature* creature) : BossAI(creature, DATA_LADY_DEATHWHISPER), _introDone(false), _darnavanGUID(0) { }
+        boss_lady_deathwhisperAI(Creature* creature) : BossAI(creature, DATA_LADY_DEATHWHISPER), _introDone(false) { }
 
         void Reset() override
         {
             if (Creature* darnavan = ObjectAccessor::GetCreature(*me, _darnavanGUID))
                 darnavan->DespawnOrUnsummon();
-            _darnavanGUID = 0;
+            _darnavanGUID.Clear();
             _waveCounter = 0;
             _Reset();
             me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
@@ -369,8 +369,8 @@ public:
                                     {
                                         // shouldn't be casted on any victim of summoned mobs
                                         bool valid = true;
-                                        for (std::list<uint64>::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                                            if (Creature* c = ObjectAccessor::GetCreature(*me, (*itr)))
+                                        for (ObjectGuid const guid : summons)
+                                            if (Creature* c = ObjectAccessor::GetCreature(*me, guid))
                                                 if (c->IsAlive() && c->GetVictim() && c->GetVictim()->GetGUID() == plr->GetGUID())
                                                 {
                                                     valid = false;
@@ -516,10 +516,10 @@ public:
                             for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                                 if (Player* member = itr->GetSource())
                                     if (member->IsInMap(owner))
-                                        member->KilledMonsterCredit(NPC_DARNAVAN_CREDIT, 0);
+                                        member->KilledMonsterCredit(NPC_DARNAVAN_CREDIT);
                         }
                         else
-                            owner->KilledMonsterCredit(NPC_DARNAVAN_CREDIT, 0);
+                            owner->KilledMonsterCredit(NPC_DARNAVAN_CREDIT);
                     }
                 }
             }
@@ -642,7 +642,7 @@ public:
 
     private:
         bool _introDone;
-        uint64 _darnavanGUID;
+        ObjectGuid _darnavanGUID;
         uint32 _waveCounter;
     };
 
@@ -739,7 +739,7 @@ public:
                     DoZoneInCombat(me);
                     me->CastSpell(me, SPELL_FANATIC_S_DETERMINATION);
 
-                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_LADY_DEATHWHISPER)))
+                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_LADY_DEATHWHISPER)))
                         ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
                     break;
                 case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
@@ -860,7 +860,7 @@ public:
                     DoZoneInCombat(me);
                     me->CastSpell(me, SPELL_ADHERENT_S_DETERMINATION);
 
-                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetData64(DATA_LADY_DEATHWHISPER)))
+                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_LADY_DEATHWHISPER)))
                         ladyDeathwhisper->AI()->Talk(SAY_ANIMATE_DEAD);
                     break;
                 case EVENT_SPELL_CULTIST_DARK_MARTYRDOM:
@@ -898,11 +898,11 @@ public:
         {
             me->SetControlled(true, UNIT_STATE_ROOT);
             unroot_timer = 500;
-            targetGUID = 0;
+            targetGUID.Clear();
         }
 
         uint16 unroot_timer;
-        uint64 targetGUID;
+        ObjectGuid targetGUID;
 
         void Reset() override
         {
@@ -1140,7 +1140,7 @@ public:
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(DATA_LADY_DEATHWHISPER) != DONE)
                 if (!player->IsGameMaster())
-                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*player, instance->GetData64(DATA_LADY_DEATHWHISPER)))
+                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_LADY_DEATHWHISPER)))
                         ladyDeathwhisper->AI()->DoAction(ACTION_START_INTRO);
         return true;
     }

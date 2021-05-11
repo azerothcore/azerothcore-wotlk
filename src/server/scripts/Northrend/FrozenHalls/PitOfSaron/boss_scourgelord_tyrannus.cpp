@@ -51,7 +51,7 @@ public:
         {
             pInstance = me->GetInstanceScript();
             me->SetReactState(REACT_PASSIVE);
-            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_RIMEFANG_GUID)))
+            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
             {
                 c->SetCanFly(true);
             }
@@ -68,13 +68,13 @@ public:
             {
                 if (!pInstance)
                     return;
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_MARTIN_OR_GORKUN_GUID)))
+                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
                 {
                     c->AI()->DoAction(1);
                     c->DespawnOrUnsummon();
-                    pInstance->SetData64(DATA_MARTIN_OR_GORKUN_GUID, 0);
+                    pInstance->SetGuidData(DATA_MARTIN_OR_GORKUN_GUID, ObjectGuid::Empty);
                 }
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_RIMEFANG_GUID)))
+                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
                 {
                     c->GetMotionMaster()->Clear();
                     c->GetMotionMaster()->MoveIdle();
@@ -93,7 +93,7 @@ public:
             if (param == 1)
             {
                 Position exitPos = {1023.46f, 159.12f, 628.2f, 5.23f};
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_RIMEFANG_GUID)))
+                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
                 {
                     c->RemoveAura(46598);
                     c->GetMotionMaster()->Clear();
@@ -166,13 +166,13 @@ public:
                     break;
                 case EVENT_RIMEFANG_SPELL_ICY_BLAST:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 190.0f, true))
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_RIMEFANG_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
                             c->CastSpell(target, RIMEFANG_SPELL_ICY_BLAST, false);
                     events.RepeatEvent(5000);
                     break;
                 case EVENT_SPELL_MARK_OF_RIMEFANG:
                     if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 190.0f, true))
-                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetData64(DATA_RIMEFANG_GUID)))
+                        if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
                         {
                             Talk(SAY_MARK);
                             c->AI()->Talk(EMOTE_RIMEFANG_ICEBOLT, target);

@@ -52,7 +52,7 @@ BattlegroundIC::~BattlegroundIC()
 {
 }
 
-void BattlegroundIC::DoAction(uint32 action, uint64 guid)
+void BattlegroundIC::DoAction(uint32 action, ObjectGuid guid)
 {
     if (action != ACTION_TELEPORT_PLAYER_TO_TRANSPORT)
         return;
@@ -127,7 +127,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                             if (!catapult->IsAlive())
                             {
                                 // Check if creature respawn time is properly saved
-                                RespawnMap::iterator itr = respawnMap.find(catapult->GetGUIDLow());
+                                RespawnMap::iterator itr = respawnMap.find(catapult->GetGUID());
                                 if (itr == respawnMap.end() || time(nullptr) < itr->second)
                                     continue;
 
@@ -145,7 +145,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                             if (!glaiveThrower->IsAlive())
                             {
                                 // Check if creature respawn time is properly saved
-                                RespawnMap::iterator itr = respawnMap.find(glaiveThrower->GetGUIDLow());
+                                RespawnMap::iterator itr = respawnMap.find(glaiveThrower->GetGUID());
                                 if (itr == respawnMap.end() || time(nullptr) < itr->second)
                                     continue;
 
@@ -174,7 +174,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                         if (!siege->IsAlive())
                         {
                             // Check if creature respawn time is properly saved
-                            RespawnMap::iterator itr = respawnMap.find(siege->GetGUIDLow());
+                            RespawnMap::iterator itr = respawnMap.find(siege->GetGUID());
                             if (itr == respawnMap.end() || time(nullptr) < itr->second)
                                 continue;
 
@@ -191,7 +191,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                             if (!demolisher->IsAlive())
                             {
                                 // Check if creature respawn time is properly saved
-                                RespawnMap::iterator itr = respawnMap.find(demolisher->GetGUIDLow());
+                                RespawnMap::iterator itr = respawnMap.find(demolisher->GetGUID());
                                 if (itr == respawnMap.end() || time(nullptr) < itr->second)
                                     continue;
 
@@ -521,7 +521,7 @@ void BattlegroundIC::HandleKillUnit(Creature* unit, Player* killer)
         // Xinef: Add to respawn list
         if (entry == NPC_DEMOLISHER || entry == NPC_SIEGE_ENGINE_H || entry == NPC_SIEGE_ENGINE_A ||
                 entry == NPC_GLAIVE_THROWER_A || entry == NPC_GLAIVE_THROWER_H || entry == NPC_CATAPULT)
-            respawnMap[unit->GetGUIDLow()] = time(nullptr) + VEHICLE_RESPAWN_TIME;
+            respawnMap[unit->GetGUID()] = time(nullptr) + VEHICLE_RESPAWN_TIME;
     }
 }
 
@@ -868,7 +868,7 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint* nodePoint, bool recapture)
                                 if (!siegeVehicle->IsVehicleInUse())
                                     Unit::Kill(siegeEngine, siegeEngine);
 
-                        respawnMap[siegeEngine->GetGUIDLow()] = time(nullptr) + VEHICLE_RESPAWN_TIME;
+                        respawnMap[siegeEngine->GetGUID()] = time(nullptr) + VEHICLE_RESPAWN_TIME;
                     }
                 }
 

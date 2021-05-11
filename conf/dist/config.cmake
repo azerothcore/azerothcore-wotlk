@@ -12,6 +12,19 @@ option(WITHOUT_GIT         "Disable the GIT testing routines"                   
 option(ENABLE_EXTRAS       "Set to 0 to disable extra features optimizing performances"  1)
 option(ENABLE_VMAP_CHECKS  "Enable Checks relative to DisableMgr system on vmap"         1)
 option(ENABLE_EXTRA_LOGS   "Enable extra log functions that can be CPU intensive"        0)
+option(WITH_DYNAMIC_LINKING "Enable dynamic library linking."                            0)
+
+IsDynamicLinkingRequired(WITH_DYNAMIC_LINKING_FORCED)
+
+if(WITH_DYNAMIC_LINKING AND WITH_DYNAMIC_LINKING_FORCED)
+  set(WITH_DYNAMIC_LINKING_FORCED OFF)
+endif()
+
+if(WITH_DYNAMIC_LINKING OR WITH_DYNAMIC_LINKING_FORCED)
+  set(BUILD_SHARED_LIBS ON)
+else()
+  set(BUILD_SHARED_LIBS OFF)
+endif()
 
 # Source tree in IDE
 set(WITH_SOURCE_TREE       "hierarchical" CACHE STRING "Build the source tree for IDE's.")
