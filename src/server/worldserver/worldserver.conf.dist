@@ -2366,7 +2366,7 @@ Battleground.QueueAnnouncer.Enable = 0
 #
 #    Battleground.QueueAnnouncer.Limit.MinLevel
 #        Description: Limit the QueueAnnouncer starting from a certain level.
-#                     When limited, it announces only if one more player is needed to start the BG.
+#                     When limited, it announces only if there are at least MinPlayers queued (see below)
 #                     At 80 it only limits RBG, at lower level only limits Warsong Gulch.
 #        Default:     0 - (Disabled, no limits)
 #                     10 - (Enabled for all, because BGs start at 10)
