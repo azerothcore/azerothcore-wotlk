@@ -46,7 +46,7 @@ namespace
         if (IsAppConfig(filename))
         {
             printf("%s\n", message.c_str());
-        }            
+        }
         else
         {
             LOG_ERROR("server.loading", "%s", message.c_str());
@@ -105,7 +105,7 @@ namespace
             if (!in.good() && !in.eof())
             {
                 throw ConfigException(acore::StringFormat("> Config::LoadFile: Failure to read line number %u in file '%s'", lineNumber, file.c_str()));
-            }  
+            }
 
             // remove whitespace in line
             line = acore::String::Trim(line, in.getloc());
