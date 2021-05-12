@@ -20,15 +20,20 @@ namespace
     std::unordered_map<std::string /*name*/, std::string /*value*/> _configOptions;
     std::mutex _configLock;
 
+    // Check system configs like *server.conf*
     bool IsAppConfig(std::string_view fileName)
     {
         size_t found = fileName.find_first_of("authserver.conf");
         if (found != std::string::npos)
+        {
             return true;
+        }
 
         found = fileName.find_first_of("worldserver.conf");
         if (found != std::string::npos)
+        {
             return true;
+        }
 
         return false;
     }
@@ -39,9 +44,13 @@ namespace
         std::string message = acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
 
         if (IsAppConfig(filename))
+        {
             printf("%s\n", message.c_str());
+        }            
         else
+        {
             LOG_ERROR("server.loading", "%s", message.c_str());
+        }
     }
 
     void AddKey(std::string const& optionName, std::string const& optionKey, bool replace = true)
@@ -66,7 +75,9 @@ namespace
         std::ifstream in(file);
 
         if (in.fail())
+        {
             throw ConfigException(acore::StringFormat("Config::LoadFile: Failed open file '%s'", file.c_str()));
+        }
 
         uint32 count = 0;
         uint32 lineNumber = 0;
@@ -100,15 +111,21 @@ namespace
             line = acore::String::Trim(line, in.getloc());
 
             if (line.empty())
+            {
                 continue;
+            }
 
             // comments
             if (line[0] == '#' || line[0] == '[')
+            {
                 continue;
+            }
 
             size_t found = line.find_first_of('#');
             if (found != std::string::npos)
+            {
                 line = line.substr(0, found);
+            }
 
             auto const equal_pos = line.find('=');
 
@@ -129,6 +146,8 @@ namespace
                 continue;
             }
 
+            // Add to temp container
+            fileConfigs.emplace(entry, value);
             count++;
         }
 
@@ -140,7 +159,7 @@ namespace
         for (auto const& [entry, key] : fileConfigs)
         {
             AddKey(entry, key);
-        } 
+        }
     }
 
     bool LoadFile(std::string const& file)
