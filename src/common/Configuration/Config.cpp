@@ -70,6 +70,19 @@ namespace
 
         uint32 count = 0;
         uint32 lineNumber = 0;
+        std::unordered_map<std::string /*name*/, std::string /*value*/> fileConfigs;
+
+        auto IsDuplicateOption = [&](std::string const& confOption)
+        {
+            auto const& itr = fileConfigs.find(confOption);
+            if (itr != fileConfigs.end())
+            {
+                PrintError(file, "> Config::LoadFile: Dublicate key name '%s' in config file '%s'", std::string(confOption).c_str(), file.c_str());
+                return true;
+            }
+
+            return false;
+        };
 
         while (in.good())
         {
@@ -77,10 +90,17 @@ namespace
             std::string line;
             std::getline(in, line);
 
+            // read line error
+            if (!in.good() && !in.eof())
+            {
+                throw ConfigException(acore::StringFormat("> Config::LoadFile: Failure to read line number %u in file '%s'", lineNumber, file.c_str()));
+            }  
+
+            // remove whitespace in line
+            line = acore::String::Trim(line, in.getloc());
+
             if (line.empty())
                 continue;
-
-            line = acore::String::Trim(line, in.getloc());
 
             // comments
             if (line[0] == '#' || line[0] == '[')
@@ -99,17 +119,28 @@ namespace
             }
 
             auto entry = acore::String::Trim(line.substr(0, equal_pos), in.getloc());
-            auto value = acore::String::Trim(line.substr(equal_pos + 1), in.getloc());
+            auto value = acore::String::Trim(line.substr(equal_pos + 1, std::string::npos), in.getloc());
 
             value.erase(std::remove(value.begin(), value.end(), '"'), value.end());
 
-            AddKey(entry, value);
+            // Skip if 2+ same options in one config file
+            if (IsDuplicateOption(entry))
+            {
+                continue;
+            }
 
             count++;
         }
 
+        // No lines read
         if (!count)
             throw ConfigException(acore::StringFormat("Config::LoadFile: Empty file '%s'", file.c_str()));
+
+        // Add correct keys if file load without errors
+        for (auto const& [entry, key] : fileConfigs)
+        {
+            AddKey(entry, key);
+        } 
     }
 
     bool LoadFile(std::string const& file)
