@@ -39,7 +39,7 @@ namespace
         std::string message = acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
 
         if (IsAppConfig(filename))
-            printf("%s", message.c_str());
+            printf("%s\n", message.c_str());
         else
             LOG_ERROR("server.loading", "%s", message.c_str());
     }
