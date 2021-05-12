@@ -1,6 +1,6 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1620594734059183600');
 
-DELETE FROM `gossip_menu` WHERE (`MenuID` = 1013) AND (`TextID` IN (5822));
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 1013) AND `TextID` IN (5822);
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 (1013, 5822);
 
