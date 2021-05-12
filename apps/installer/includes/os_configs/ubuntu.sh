@@ -12,8 +12,8 @@ sudo apt update
 # shared deps
 sudo apt-get -y install make cmake clang curl unzip libmysqlclient-dev libace-dev ccache google-perftools
 
-# Insstall boost 1.73 from ppa:mhier/libboost-latest for all os versions
-sudo apt-get -y install libboost1.73-dev
+# Insstall boost 1.74 from ppa:mhier/libboost-latest for all os versions
+sudo apt-get -y install libboost1.74-dev
 
 if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   sudo apt-get -y install build-essential libtool cmake-data openssl libgoogle-perftools-dev \
