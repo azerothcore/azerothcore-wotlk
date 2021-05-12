@@ -1001,7 +1001,7 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
 
         // When limited, it announces only if there are at least CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS in queue
         auto limitQueueMinLevel = sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_LEVEL);
-        if (limitQueueMinLevel != 0 && limitQueueMinLevel >= q_min_level)
+        if (limitQueueMinLevel != 0 && q_min_level >= limitQueueMinLevel)
         {
             // limit only RBG for 80, WSG for lower levels
             auto bgTypeToLimit = q_min_level == 80 ? BATTLEGROUND_RB : BATTLEGROUND_WS;
