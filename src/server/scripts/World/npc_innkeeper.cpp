@@ -12,7 +12,8 @@ enum eTrickOrTreatSpells
     SPELL_TREAT                 = 24715,
     SPELL_TRICKED_OR_TREATED    = 24755,
     HALLOWEEN_EVENTID           = 12,
-    GOSSIP_MENU                 = 9733
+    GOSSIP_MENU                 = 9733,
+    GOSSIP_MENU_EVENT           = 342
 };
 
 class npc_innkeeper : public CreatureScript
@@ -24,7 +25,7 @@ public:
     {
         if (IsEventActive(HALLOWEEN_EVENTID) && !player->HasAura(SPELL_TRICKED_OR_TREATED))
         {
-            AddGossipItemFor(player, 342, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + HALLOWEEN_EVENTID);
+            AddGossipItemFor(player, GOSSIP_MENU_EVENT, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + HALLOWEEN_EVENTID);
         }
 
         if (creature->IsQuestGiver())
