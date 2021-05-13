@@ -1,5 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1620897388675421400');
--- Remaining with Blue Dragonscale
+
 UPDATE `creature_template` SET `skinloot` = 60028 WHERE `entry` IN (6109);
 UPDATE `creature_template` SET `skinloot` = 60029 WHERE `entry` IN (193,6129,6130,6131,7435);
 UPDATE `creature_template` SET `skinloot` = 60030 WHERE `entry` IN (7436,7437,10662,10663,10664,10196,10202);
@@ -27,7 +27,7 @@ INSERT INTO `skinning_loot_template` (`Entry`,`Item`,`Reference`,`Chance`,`Quest
 (60031,8171,0,4,0,1,1,1,1,"Rugged Hide"),
 (60031,15415,0,3,0,1,1,1,1,"Blue Dragonscale");
 
--- Remaining with Green Dragonscale
+
 UPDATE `creature_template` SET `skinloot` = 60032 WHERE `entry` IN (14887,14888,14889,14890);
 UPDATE `creature_template` SET `skinloot` = 60033 WHERE `entry` IN (742,743,744,745,746);
 UPDATE `creature_template` SET `skinloot` = 60034 WHERE `entry` IN (5709);
@@ -48,7 +48,7 @@ INSERT INTO `skinning_loot_template` (`Entry`,`Item`,`Reference`,`Chance`,`Quest
 (60033,8165,0,5,0,1,1,1,2,"Worn Dragonscale"),
 (60033,8169,0,5,0,1,1,1,1,"Thick Hide"),
 (60033,15412,0,15,0,1,1,1,1,"Green Dragonscale"),
--- May be slightly different
+
 (60034,4304,0,27,0,1,1,1,2,"Thick Leather"),
 (60034,8165,0,10,0,1,1,1,1,"Worn Dragonscale"),
 (60034,8169,0,3,0,1,1,1,1,"Thick Hide"),
@@ -64,7 +64,7 @@ INSERT INTO `skinning_loot_template` (`Entry`,`Item`,`Reference`,`Chance`,`Quest
 (60036,8169,0,20,0,1,0,1,1,"Thick Hide"),
 (60036,8170,0,100,0,1,0,2,3,"Rugged Leather"),
 (60036,15412,0,100,0,1,0,2,3,"Green Dragonscale"),
--- May be slightly different. Completely dead-end case, we'll never know correct chance
+
 (60037,4304,0,68,0,1,1,1,1,"Thick Leather"),
 (60037,8165,0,5,0,1,1,1,1,"Worn Dragonscale"),
 (60037,8169,0,3,0,1,1,1,1,"Thick Hide"),
@@ -75,14 +75,13 @@ INSERT INTO `skinning_loot_template` (`Entry`,`Item`,`Reference`,`Chance`,`Quest
 (60038,8169,0,3,0,1,1,1,1,"Thick Hide"),
 (60038,8170,0,20,0,1,1,1,2,"Rugged Leather"),
 (60038,15412,0,4,0,1,1,1,1,"Green Dragonscale"),
--- Another completely dead-end case, may be different
 (60039,4304,0,5,0,1,1,1,2,"Thick Leather"),
 (60039,8165,0,10,0,1,1,1,1,"Worn Dragonscale"),
 (60039,8170,0,40,0,1,1,1,2,"Rugged Leather"),
 (60039,8171,0,5,0,1,1,1,1,"Rugged Hide"),
 (60039,15412,0,40,0,1,1,1,1,"Green Dragonscale");
 
--- Remaining with Red Dragonscale
+
 UPDATE `creature_template` SET `skinloot` = 0 WHERE `entry` IN (15414);
 UPDATE `creature_template` SET `skinloot` = 60040 WHERE `entry` IN (1045,1046,1047,1048,1049,1050,12899);
 
@@ -94,7 +93,7 @@ INSERT INTO `skinning_loot_template` (`Entry`,`Item`,`Reference`,`Chance`,`Quest
 (60040,8171,0,5,0,1,1,1,1,"Rugged Hide"),
 (60040,15414,0,25,0,1,1,1,2,"Red Dragonscale");
 
--- Remaining with Worn Dragonscale
+
 UPDATE `creature_template` SET `skinloot` = 60041 WHERE `entry` IN (2725,4323,4324,5278,7997,23687);
 UPDATE `creature_template` SET `skinloot` = 60042 WHERE `entry` IN (2447,2726,4328,4329,4331,4334,4339);
 UPDATE `creature_template` SET `skinloot` = 60043 WHERE `entry` IN (10678,14398);
@@ -121,10 +120,8 @@ INSERT INTO `skinning_loot_template` (`Entry`,`Item`,`Reference`,`Chance`,`Quest
 (60043,8165,0,5,0,1,1,1,1,"Worn Dragonscale"),
 (60043,8170,0,75,0,1,1,1,1,"Rugged Leather"),
 (60043,8171,0,5,0,1,1,1,1,"Rugged Hide"),
--- Hm, interesting https://www.wowhead.com/npc=12129/onyxian-warder#comments:id=1061033
 (60044,8170,0,80,0,1,1,1,20,"Rugged Leather"),
 (60044,8171,0,20,0,1,1,5,10,"Rugged Hide"),
--- Below 100% are not accurate, completely dead-end cases
 (60045,4304,0,77,0,1,1,1,1,"Thick Leather"),
 (60045,8165,0,3,0,1,1,1,1,"Worn Dragonscale"),
 (60045,8169,0,3,0,1,1,1,1,"Thick Hide"),
@@ -142,4 +139,3 @@ INSERT INTO `skinning_loot_template` (`Entry`,`Item`,`Reference`,`Chance`,`Quest
 (60048,8169,0,3,0,1,1,1,1,"Thick Hide"),
 (60048,8170,0,44,0,1,1,1,2,"Rugged Leather"),
 (60048,8171,0,3,0,1,1,1,1,"Rugged Hide");
-
