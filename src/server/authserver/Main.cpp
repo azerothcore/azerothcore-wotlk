@@ -24,6 +24,8 @@
 #include "RealmList.h"
 #include "RealmAcceptor.h"
 #include "DatabaseLoader.h"
+#include "SecretMgr.h"
+#include "SharedDefines.h"
 #include "Util.h"
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/TP_Reactor.h>
@@ -58,6 +60,8 @@ void usage(const char* prog)
 /// Launch the auth server
 extern int main(int argc, char** argv)
 {
+    acore::Impl::CurrentServerProcessHolder::_type = SERVER_PROCESS_AUTHSERVER;
+
     // Command line parsing to get the configuration file name
     std::string configFile = sConfigMgr->GetConfigPath() + std::string(_ACORE_REALM_CONFIG);
     int count = 1;
@@ -124,6 +128,8 @@ extern int main(int argc, char** argv)
     // Initialize the database connection
     if (!StartDB())
         return 1;
+
+    sSecretMgr->Initialize();
 
     // Get the list of realms for the server
     sRealmList->Initialize(sConfigMgr->GetOption<int32>("RealmsStateUpdateDelay", 20));
