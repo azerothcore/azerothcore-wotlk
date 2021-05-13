@@ -4,7 +4,7 @@ UPDATE `creature_template_addon` SET `auras`='' WHERE `entry` = 21506;
 DELETE FROM `creature_addon` WHERE `guid` = 75420;
 UPDATE `creature_template` SET `unit_flags`=32768 WHERE `entry` = 21506;
 
-DELETE FROM `smart_scripts` WHERE `entryorguid` = 21503;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 21503);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (21503, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 28, 37833, 0, 0, 0, 0, 0, 19, 21506, 0, 0, 0, 0, 0, 0, 'Sunfury Warlock - On reset - Remove aura'),
 (21503, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 11, 38722, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Sunfury Warlock - On reset - Cast Channel'),
