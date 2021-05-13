@@ -403,22 +403,10 @@ bool AuthSocket::_HandleLogonChallenge()
 
     std::string const& ipAddress = socket().getRemoteAddress();
     uint32 port = socket().getRemotePort();
-
-    PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED);
-    stmt->setString(0, ipAddress);
-
-    PreparedQueryResult result = LoginDatabase.Query(stmt);
-    if (result)
-    {
-        LOG_DEBUG("network", "'%s:%d' [AuthChallenge] Banned ip tries to login!", socket().getRemoteAddress().c_str(), socket().getRemotePort());
-        pkt << uint8(WOW_FAIL_BANNED);
-        SendAuthPacket();
-        return true;
-    }
-
+    
     // Get the account details from the account table
     // No SQL injection (prepared statement)
-    stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGONCHALLENGE);
+    auto stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGONCHALLENGE);
     stmt->setString(0, login);
 
     PreparedQueryResult res2 = LoginDatabase.Query(stmt);
@@ -496,11 +484,30 @@ bool AuthSocket::_HandleLogonChallenge()
         return true;
     }
 
+    uint8 securityFlags = 0;
+    _totpSecret = fields[7].GetBinary();
+
+    // Check if a TOTP token is needed
+    if (!_totpSecret || !_totpSecret.value().empty())
+    {
+        securityFlags = 4;
+        if (auto const& secret = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY))
+        {
+            bool success = acore::Crypto::AEDecrypt<acore::Crypto::AES>(*_totpSecret, *secret);
+            if (!success)
+            {
+                pkt << uint8(WOW_FAIL_DB_BUSY);
+                LOG_ERROR("server.authserver", "[AuthChallenge] Account '%s' has invalid ciphertext for TOTP token key stored", _accountInfo.Login.c_str());
+                SendAuthPacket();
+                return;
+            }
+        }
+    }
+
     _srp6.emplace(
         _accountInfo.Login,
         fields[10].GetBinary<acore::Crypto::SRP6::SALT_LENGTH>(),
-        fields[11].GetBinary<acore::Crypto::SRP6::VERIFIER_LENGTH>()
-    );
+        fields[11].GetBinary<acore::Crypto::SRP6::VERIFIER_LENGTH>());
 
     BigNumber unk3;
     unk3.SetRand(16 * 8);
@@ -524,11 +531,6 @@ bool AuthSocket::_HandleLogonChallenge()
     pkt.append(_srp6->s);
     pkt.append(unk3.ToByteArray<16>());
     uint8 securityFlags = 0;
-
-    // Check if token is used
-    _tokenKey = fields[7].GetString();
-    if (!_tokenKey.empty())
-        securityFlags = 4;
 
     pkt << uint8(securityFlags);            // security flags (0x0...0x04)
 
