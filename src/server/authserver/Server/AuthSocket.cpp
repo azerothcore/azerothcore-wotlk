@@ -4,21 +4,23 @@
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  */
 
-#include <algorithm>
-#include <openssl/md5.h>
-
+#include "AES.h"
 #include "Common.h"
+#include "CryptoGenerics.h"
 #include "CryptoRandom.h"
 #include "CryptoHash.h"
-#include "Database/DatabaseEnv.h"
+#include "DatabaseEnv.h"
 #include "ByteBuffer.h"
-#include "Configuration/Config.h"
+#include "Config.h"
 #include "Log.h"
 #include "RealmList.h"
 #include "AuthSocket.h"
 #include "AuthCodes.h"
+#include "SecretMgr.h"
 #include "TOTP.h"
-#include "openssl/crypto.h"
+#include <algorithm>
+#include <openssl/crypto.h>
+#include <openssl/md5.h>
 
 #define ChunkSize 2048
 
@@ -608,23 +610,24 @@ bool AuthSocket::_HandleLogonProof()
         acore::Crypto::SHA1::Digest M2 = acore::Crypto::SRP6::GetSessionVerifier(lp.A, lp.clientM, _sessionKey);
 
         // Check auth token
-        if ((lp.securityFlags & 0x04) || !_tokenKey.empty())
+        bool tokenSuccess = false;
+        bool sentToken = (lp.securityFlags & 0x04);
+
+        if (sentToken && _totpSecret)
         {
             uint8 size;
             socket().recv((char*)&size, 1);
             char* token = new char[size + 1];
             token[size] = '\0';
             socket().recv(token, size);
-            unsigned int validToken = TOTP::GenerateToken(_tokenKey.c_str());
             unsigned int incomingToken = atoi(token);
             delete[] token;
-            if (validToken != incomingToken)
-            {
-                char data[] = { AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT, 3, 0 };
-                socket().send(data, sizeof(data));
-                return false;
-            }
+
+            tokenSuccess = acore::Crypto::TOTP::ValidateToken(*_totpSecret, incomingToken);
+            memset(_totpSecret->data(), 0, _totpSecret->size());
         }
+        else if (!sentToken && !_totpSecret)
+            tokenSuccess = true;
 
         if (_expversion & POST_BC_EXP_FLAG)                 // 2.x and 3.x clients
         {
@@ -645,6 +648,12 @@ bool AuthSocket::_HandleLogonProof()
             proof.error = 0;
             proof.unk2 = 0x00;
             socket().send((char*)&proof, sizeof(proof));
+        }
+
+        if (!tokenSuccess)
+        {
+            char data[4] = { AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT, 3, 0 };
+            socket().send(data, sizeof(data));
         }
 
         ///- Set _status to authed!
