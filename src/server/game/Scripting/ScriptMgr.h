@@ -732,6 +732,7 @@ public:
 
     // Called for player::update
     virtual void OnBeforeUpdate(Player* /*player*/, uint32 /*p_time*/) { }
+    virtual void OnUpdate(Player* /*player*/, uint32 /*p_time*/) { }
 
     // Called when a player's money is modified (before the modification is done)
     virtual void OnMoneyChanged(Player* /*player*/, int32& /*amount*/) { }
@@ -1014,6 +1015,16 @@ public:
     virtual void OnSetServerSideVisibility(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
 
     virtual void OnSetServerSideVisibilityDetect(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
+
+    // Passive Anticheat System
+    virtual void AnticheatSetSkipOnePacketForASH(Player* /*player*/, bool /*apply*/) { }
+    virtual void AnticheatSetCanFlybyServer(Player* /*player*/, bool /*apply*/) { }
+    virtual void AnticheatSetUnderACKmount(Player* /*player*/) { }
+    virtual void AnticheatSetRootACKUpd(Player* /*player*/) { }
+    virtual void AnticheatSetJumpingbyOpcode(Player* /*player*/, bool /*jump*/) { }
+    virtual void AnticheatUpdateMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/) { }
+    [[nodiscard]] virtual bool AnticheatHandleDoubleJump(Player* /*player*/, Unit* /*mover*/) { return true; }
+    [[nodiscard]] virtual bool AnticheatCheckMovementInfo(Player* /*player*/, MovementInfo const& /*movementInfo*/, Unit* /*mover*/, bool /*jump*/) { return true; }
 };
 
 class AccountScript : public ScriptObject
@@ -1542,6 +1553,7 @@ public: /* AchievementCriteriaScript */
 
 public: /* PlayerScript */
     void OnBeforePlayerUpdate(Player* player, uint32 p_time);
+    void OnPlayerUpdate(Player* player, uint32 p_time);
     void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerReleasedGhost(Player* player);
     void OnPVPKill(Player* killer, Player* killed);
@@ -1667,6 +1679,14 @@ public: /* PlayerScript */
     bool CanInitTrade(Player* player, Player* target);
     void OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
+    void AnticheatSetSkipOnePacketForASH(Player* player, bool apply);
+    void AnticheatSetCanFlybyServer(Player* player, bool apply);
+    void AnticheatSetUnderACKmount(Player* player);
+    void AnticheatSetRootACKUpd(Player* player);
+    void AnticheatUpdateMovementInfo(Player* player, MovementInfo const& movementInfo);
+    void AnticheatSetJumpingbyOpcode(Player* player, bool jump);
+    bool AnticheatHandleDoubleJump(Player* player, Unit* mover);
+    bool AnticheatCheckMovementInfo(Player* player, MovementInfo const& movementInfo, Unit* mover, bool jump);
 
 public: /* AccountScript */
     void OnAccountLogin(uint32 accountId);

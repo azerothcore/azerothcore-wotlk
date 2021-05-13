@@ -926,6 +926,7 @@ public:                                                 // opcodes handlers
     void SetKicked(bool val) { _kicked = val; }
     void SetShouldSetOfflineInDB(bool val) { _shouldSetOfflineInDB = val; }
     bool GetShouldSetOfflineInDB() const { return _shouldSetOfflineInDB; }
+    bool IsSocketClosed() const;
 
     /***
     CALLBACKS
