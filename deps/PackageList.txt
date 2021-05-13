@@ -4,6 +4,10 @@ ACE (ADAPTIVE Communication Environment)
   http://www.cs.wustl.edu/~schmidt/ACE.html
   Version: 6.1.4
 
+argon2
+  https://github.com/P-H-C/phc-winner-argon2
+  Version: 62358ba
+
 bzip2 (a freely available, patent free, high-quality data compressor)
   http://www.bzip.org/
   Version: 1.0.6

@@ -27,6 +27,7 @@ if(SERVERS OR TOOLS)
   add_subdirectory(SFMT)
   add_subdirectory(utf8cpp)
   add_subdirectory(openssl)
+  add_subdirectory(argon2)
 endif()
 
 if(SERVERS)
