@@ -1,3 +1,19 @@
+-- DB update 2021_03_23_00 -> 2021_05_13_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_auth' AND COLUMN_NAME = '2021_03_23_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_auth CHANGE COLUMN 2021_03_23_00 2021_05_13_00 bit;
+SELECT sql_rev INTO OK FROM version_db_auth WHERE sql_rev = '1620079951672711500'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 --
 
 START TRANSACTION; -- we're messing with the accounts table here, let's play it safe
@@ -295,3 +311,12 @@ UPDATE `account` a LEFT JOIN `_temp_totp_conversion` c ON a.`token_key`=c.`origi
 ALTER TABLE `account` DROP COLUMN `token_key`;
 
 COMMIT; -- safety gloves off
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;

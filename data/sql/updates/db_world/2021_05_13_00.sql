@@ -1,3 +1,19 @@
+-- DB update 2021_05_12_00 -> 2021_05_13_00
+DROP PROCEDURE IF EXISTS `updateDb`;
+DELIMITER //
+CREATE PROCEDURE updateDb ()
+proc:BEGIN DECLARE OK VARCHAR(100) DEFAULT 'FALSE';
+SELECT COUNT(*) INTO @COLEXISTS
+FROM information_schema.COLUMNS
+WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'version_db_world' AND COLUMN_NAME = '2021_05_12_00';
+IF @COLEXISTS = 0 THEN LEAVE proc; END IF;
+START TRANSACTION;
+ALTER TABLE version_db_world CHANGE COLUMN 2021_05_12_00 2021_05_13_00 bit;
+SELECT sql_rev INTO OK FROM version_db_world WHERE sql_rev = '1620079973240388200'; IF OK <> 'FALSE' THEN LEAVE proc; END IF;
+--
+-- START UPDATING QUERIES
+--
+
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1620079973240388200');
 
 -- 
@@ -30,3 +46,12 @@ Once you have set up your device, confirm by running .account 2fa setup <token> 
 (188, "The provided two-factor authentication secret is too long."),
 (189, "The provided two-factor authentication secret is not valid."),
 (190, "Successfully enabled two-factor authentication for '%s' with the specified secret."); 
+
+--
+-- END UPDATING QUERIES
+--
+COMMIT;
+END //
+DELIMITER ;
+CALL updateDb();
+DROP PROCEDURE IF EXISTS `updateDb`;
