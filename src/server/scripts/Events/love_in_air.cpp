@@ -33,6 +33,11 @@ enum Quests
     QUEST_PILGRIM_ALLIANCE          = 24656
 };
 
+enum SupplySentrySay
+{
+    SAY_SUPPLY_SENTRY_0 = 0
+};
+
 class npc_love_in_air_supply_sentry : public CreatureScript
 {
 public:
@@ -53,11 +58,11 @@ public:
                 lock = 0;
                 if (urand(0, 1))
                 {
-                    me->AI()->Talk(0, who->ToPlayer());
+                    me->AI()->Talk(SAY_SUPPLY_SENTRY_0, who->ToPlayer());
                 }
                 else
                 {
-                    me->AI()->Talk(0, who->ToPlayer());
+                    me->AI()->Talk(SAY_SUPPLY_SENTRY_0, who->ToPlayer());
                 }
 
                 if (who->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
@@ -159,6 +164,14 @@ public:
     }
 };
 
+enum SnivelRealSay
+{
+    SAY_SNIVEL_REAL_0 = 0,
+    SAY_SNIVEL_REAL_1 = 1,
+    SAY_SNIVEL_REAL_2 = 2,
+    SAY_SNIVEL_REAL_3 = 3
+};
+
 class npc_love_in_air_snivel_real : public CreatureScript
 {
 public:
@@ -185,10 +198,10 @@ public:
                         switch (time)
                         {
                             case 1:
-                                me->AI()->Talk(0, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_0, nullptr);
                                 return false;
                             case 2:
-                                me->AI()->Talk(1, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_1, nullptr);
                                 return true;
                         }
                         break;
@@ -199,13 +212,13 @@ public:
                         switch (time)
                         {
                             case 1:
-                                me->AI()->Talk(0, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_0, nullptr);
                                 return false;
                             case 2:
-                                me->AI()->Talk(1, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_1, nullptr);
                                 return false;
                             case 3:
-                                me->AI()->Talk(2, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_2, nullptr);
                                 return true;
                         }
                         break;
@@ -217,16 +230,16 @@ public:
                         switch (time)
                         {
                             case 1:
-                                me->AI()->Talk(0, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_0, nullptr);
                                 return false;
                             case 2:
-                                me->AI()->Talk(1, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_1, nullptr);
                                 return false;
                             case 3:
-                                me->AI()->Talk(2, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_2, nullptr);
                                 return false;
                             case 4:
-                                me->AI()->Talk(3, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_3, nullptr);
                                 return true;
                         }
                         break;
@@ -294,6 +307,14 @@ enum hummel
     EVENT_SPELL_THROW               = 5,
 };
 
+enum HummelSay
+{
+    SAY_HUMMEL_0 = 0,
+    SAY_HUMMEL_1 = 1,
+    SAY_HUMMEL_2 = 2,
+    SAY_HUMMEL_5 = 5
+};
+
 class npc_love_in_air_hummel : public CreatureScript
 {
 public:
@@ -327,7 +348,7 @@ public:
 
         void JustDied(Unit* ) override
         {
-            me->AI()->Talk(5, nullptr);
+            me->AI()->Talk(SAY_HUMMEL_5, nullptr);
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
                 sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 288, me->FindMap());
@@ -348,17 +369,17 @@ public:
                 speachTimer += diff;
                 if (speachTimer < 10000)
                 {
-                    me->AI()->Talk(0, nullptr);
+                    me->AI()->Talk(SAY_HUMMEL_0, nullptr);
                     speachTimer = 10000;
                 }
                 else if (speachTimer >= 16000 && speachTimer < 20000)
                 {
-                    me->AI()->Talk(1, nullptr);
+                    me->AI()->Talk(SAY_HUMMEL_1, nullptr);
                     speachTimer = 20000;
                 }
                 else if (speachTimer >= 26000 && speachTimer < 30000)
                 {
-                    me->AI()->Talk(2, nullptr);
+                    me->AI()->Talk(SAY_HUMMEL_2, nullptr);
                     speachTimer = 0;
                     me->setFaction(16);
                     me->SetInCombatWithZone();
@@ -427,6 +448,11 @@ public:
     }
 };
 
+enum HummelHelperSay
+{
+    SAY_HUMMEL_HELPER_SAY_5 = 5,
+};
+
 class npc_love_in_air_hummel_helper : public CreatureScript
 {
 public:
@@ -467,7 +493,7 @@ public:
 
         void JustDied(Unit* ) override
         {
-            me->AI()->Talk(5, nullptr);
+            me->AI()->Talk(SAY_HUMMEL_HELPER_SAY_5, nullptr);
         }
 
         void UpdateAI(uint32 diff) override
