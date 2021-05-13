@@ -111,7 +111,6 @@ set(scripts_STAT_SRCS
   ${AC_SCRIPTS_DIR}/EasternKingdoms/MagistersTerrace/boss_vexallus.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Uldaman/uldaman.h
   ${AC_SCRIPTS_DIR}/EasternKingdoms/Uldaman/instance_uldaman.cpp
-  ${AC_SCRIPTS_DIR}/EasternKingdoms/zone_swamp_of_sorrows.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/SunwellPlateau/boss_eredar_twins.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/SunwellPlateau/boss_kiljaeden.cpp
   ${AC_SCRIPTS_DIR}/EasternKingdoms/SunwellPlateau/sunwell_plateau.h

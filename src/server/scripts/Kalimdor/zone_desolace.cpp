@@ -446,6 +446,7 @@ public:
             {
                 me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
                 me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveIdle();
 
                 DoCast(me, SPELL_KODO_KOMBO_GOSSIP, true);
                 if (Creature* smeed = who->ToCreature())
