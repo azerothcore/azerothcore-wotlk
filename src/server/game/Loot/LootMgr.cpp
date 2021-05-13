@@ -500,6 +500,7 @@ void Loot::AddItem(LootStoreItem const& item)
 
         if (!canSeeItemInLootWindow)
         {
+            LOG_DEBUG("loot", "Skipping ++unlootedCount for unlootable item: %u", item.itemid);
             continue;
         }
 
