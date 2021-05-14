@@ -133,7 +133,9 @@ namespace WorldPackets
         void resize(size_type newSize)
         {
             if (newSize > _limit)
+            {
                 throw PacketArrayMaxCapacityException(newSize, _limit);
+            }
 
             _storage.resize(newSize);
         }
@@ -141,7 +143,9 @@ namespace WorldPackets
         void reserve(size_type newSize)
         {
             if (newSize > _limit)
+            {
                 throw PacketArrayMaxCapacityException(newSize, _limit);
+            }
 
             _storage.reserve(newSize);
         }
@@ -149,7 +153,9 @@ namespace WorldPackets
         void push_back(value_type const& value)
         {
             if (_storage.size() >= _limit)
+            {
                 throw PacketArrayMaxCapacityException(_storage.size() + 1, _limit);
+            }
 
             _storage.push_back(value);
         }
@@ -157,7 +163,9 @@ namespace WorldPackets
         void push_back(value_type&& value)
         {
             if (_storage.size() >= _limit)
+            {
                 throw PacketArrayMaxCapacityException(_storage.size() + 1, _limit);
+            }
 
             _storage.push_back(std::forward<value_type>(value));
         }
@@ -208,8 +216,12 @@ namespace WorldPackets
             CheckCompactArrayMaskOverflow(index, sizeof(_mask) * 8);
 
             _mask |= 1 << index;
+
             if (_contents.size() <= index)
+            {
                 _contents.resize(index + 1);
+            }
+
             _contents[index] = value;
         }
 
@@ -222,7 +234,9 @@ namespace WorldPackets
         bool operator==(CompactArray const& r) const
         {
             if (_mask != r._mask)
+            {
                 return false;
+            }
 
             return _contents == r._contents;
         }
@@ -239,9 +253,14 @@ namespace WorldPackets
     {
         uint32 mask = v.GetMask();
         data << uint32(mask);
+
         for (std::size_t i = 0; i < v.GetSize(); ++i)
+        {
             if (mask & (1 << i))
+            {
                 data << v[i];
+            }
+        }
 
         return data;
     }
@@ -253,8 +272,12 @@ namespace WorldPackets
         data >> mask;
 
         for (std::size_t index = 0; mask != 0; mask >>= 1, ++index)
+        {
             if ((mask & 1) != 0)
+            {
                 v.Insert(index, data.read<T>());
+            }
+        }
 
         return data;
     }

@@ -25,11 +25,11 @@ public:
         _storage.resize(initialSize);
     }
 
-    MessageBuffer(MessageBuffer const& right) : _wpos(right._wpos), _rpos(right._rpos), _storage(right._storage)
-    {
-    }
+    MessageBuffer(MessageBuffer const& right) :
+        _wpos(right._wpos), _rpos(right._rpos), _storage(right._storage) { }
 
-    MessageBuffer(MessageBuffer&& right) : _wpos(right._wpos), _rpos(right._rpos), _storage(right.Move()) { }
+    MessageBuffer(MessageBuffer&& right) :
+        _wpos(right._wpos), _rpos(right._rpos), _storage(right.Move()) { }
 
     void Reset()
     {
@@ -64,7 +64,10 @@ public:
         if (_rpos)
         {
             if (_rpos != _wpos)
+            {
                 memmove(GetBasePointer(), GetReadPointer(), GetActiveSize());
+            }
+
             _wpos -= _rpos;
             _rpos = 0;
         }
@@ -75,7 +78,9 @@ public:
     {
         // resize buffer if it's already full
         if (GetRemainingSpace() == 0)
+        {
             _storage.resize(_storage.size() * 3 / 2);
+        }
     }
 
     void Write(void const* data, std::size_t size)
@@ -91,6 +96,7 @@ public:
     {
         _wpos = 0;
         _rpos = 0;
+
         return std::move(_storage);
     }
 
