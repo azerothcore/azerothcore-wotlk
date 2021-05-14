@@ -1326,7 +1326,7 @@ public:
         return _gossipMenuItemsStore.equal_range(uiMenuId);
     }
 
-    static void AddLocaleString(std::string const& s, LocaleConstant locale, StringVector& data);
+    static void AddLocaleString(std::string&& s, LocaleConstant locale, StringVector& data);
     static inline void GetLocaleString(const StringVector& data, int loc_idx, std::string& value)
     {
         if (data.size() > size_t(loc_idx) && !data[loc_idx].empty())
