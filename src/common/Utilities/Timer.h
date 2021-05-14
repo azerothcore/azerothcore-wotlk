@@ -14,7 +14,11 @@ inline TimePoint GetApplicationStartTime()
 {
     using namespace std::chrono;
 
+    LOG_INFO("server", "DEBUG CI: 1");
+
     static const steady_clock::time_point ApplicationStartTime = steady_clock::now();
+
+    LOG_INFO("server", "DEBUG CI: 2");
 
     return ApplicationStartTime;
 }
