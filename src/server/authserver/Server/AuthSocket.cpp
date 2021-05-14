@@ -403,7 +403,7 @@ bool AuthSocket::_HandleLogonChallenge()
 
     std::string const& ipAddress = socket().getRemoteAddress();
     uint32 port = socket().getRemotePort();
-    
+
     // Get the account details from the account table
     // No SQL injection (prepared statement)
     auto stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_LOGONCHALLENGE);
@@ -499,7 +499,7 @@ bool AuthSocket::_HandleLogonChallenge()
                 pkt << uint8(WOW_FAIL_DB_BUSY);
                 LOG_ERROR("server.authserver", "[AuthChallenge] Account '%s' has invalid ciphertext for TOTP token key stored", _accountInfo.Login.c_str());
                 SendAuthPacket();
-                return;
+                return true;
             }
         }
     }
@@ -530,7 +530,6 @@ bool AuthSocket::_HandleLogonChallenge()
     pkt.append(_srp6->N);
     pkt.append(_srp6->s);
     pkt.append(unk3.ToByteArray<16>());
-    uint8 securityFlags = 0;
 
     pkt << uint8(securityFlags);            // security flags (0x0...0x04)
 

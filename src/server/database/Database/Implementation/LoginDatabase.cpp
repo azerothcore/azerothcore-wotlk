@@ -12,7 +12,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
         m_stmts.resize(MAX_LOGINDATABASE_STATEMENTS);
 
     PrepareStatement(LOGIN_SEL_LOGONCHALLENGE, "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins, ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, "
-        "ab.unbandate = ab.bandate, aa.gmlevel, a.token_key, a.salt, a.verifier "
+        "ab.unbandate = ab.bandate, aa.gmlevel, a.totp_secret, a.salt, a.verifier "
         "FROM account a LEFT JOIN account_access aa ON a.id = aa.id LEFT JOIN account_banned ab ON ab.id = a.id AND ab.active = 1 WHERE a.username = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_RECONNECTCHALLENGE, "SELECT a.id, UPPER(a.username), a.locked, a.lock_country, a.last_ip, a.failed_logins, ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, "
         "ab.unbandate = ab.bandate, aa.gmlevel, a.session_key "
