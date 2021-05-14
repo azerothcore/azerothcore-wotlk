@@ -1,5 +1,4 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1621006948502272600');
-INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1621006207136934630');
 DELETE FROM `skinning_loot_template` WHERE (`Entry` = 4329) AND (`Item` IN (4234, 4235, 4304, 8165, 8169));
 INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (4329, 4234, 0, 34, 0, 1, 0, 1, 2, 'Firemane Scout - Heavy Leather'),
