@@ -2038,7 +2038,7 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Load Channel Rights...");
     ChannelMgr::LoadChannelRights();
 
-    LOG_INFO("server", "Load Channels...");
+    LOG_INFO("server.loading", "Load Channels...");
     ChannelMgr::LoadChannels();
 
 #ifdef ELUNA

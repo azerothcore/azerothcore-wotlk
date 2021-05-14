@@ -42,7 +42,7 @@ void ChannelMgr::LoadChannels()
     QueryResult result = CharacterDatabase.PQuery("SELECT channelId, name, team, announce, ownership, password FROM channels ORDER BY channelId ASC");
     if (!result)
     {
-        LOG_INFO("server", ">> Loaded 0 channels. DB table `channels` is empty.");
+        LOG_INFO("server.loading", ">> Loaded 0 channels. DB table `channels` is empty.");
         return;
     }
 
@@ -100,8 +100,8 @@ void ChannelMgr::LoadChannels()
         CharacterDatabase.Execute(stmt);
     }
 
-    LOG_INFO("server", ">> Loaded %u channels in %ums", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server", " ");
+    LOG_INFO("server.loading", ">> Loaded %u channels in %ums", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 Channel* ChannelMgr::GetJoinChannel(std::string const& name, uint32 channelId)
