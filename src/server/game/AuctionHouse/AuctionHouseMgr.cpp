@@ -142,7 +142,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, SQLTransaction& 
             .SendMailTo(trans, MailReceiver(bidder, auction->bidder.GetCounter()), auction, MAIL_CHECK_MASK_COPIED);
     }
     else
-        sAuctionMgr->RemoveAItem(auction->item_guid, true);
+        sAuctionMgr->RemoveAItem(auction->item_guid, true, &trans);
 }
 
 void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, SQLTransaction& trans, bool sendMail)
@@ -229,7 +229,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, SQLTransacti
             .SendMailTo(trans, MailReceiver(owner, auction->owner.GetCounter()), auction, MAIL_CHECK_MASK_COPIED, 0);
     }
     else
-        sAuctionMgr->RemoveAItem(auction->item_guid, true);
+        sAuctionMgr->RemoveAItem(auction->item_guid, true, &trans);
 }
 
 //this function sends mail to old bidder
@@ -377,7 +377,7 @@ void AuctionHouseMgr::AddAItem(Item* it)
     mAitems[it->GetGUID()] = it;
 }
 
-bool AuctionHouseMgr::RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB)
+bool AuctionHouseMgr::RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB, SQLTransaction* trans /*= nullptr*/)
 {
     ItemMap::iterator i = mAitems.find(itemGuid);
     if (i == mAitems.end())
@@ -385,10 +385,9 @@ bool AuctionHouseMgr::RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB)
 
     if (deleteFromDB)
     {
-        SQLTransaction trans = CharacterDatabase.BeginTransaction();
+        ASSERT(trans);
         i->second->FSetState(ITEM_REMOVED);
-        i->second->SaveToDB(trans);
-        CharacterDatabase.CommitTransaction(trans);
+        i->second->SaveToDB(*trans);
     }
 
     mAitems.erase(i);

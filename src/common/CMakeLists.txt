@@ -53,6 +53,7 @@ target_link_libraries(common
     acore-core-interface
     ace
     boost
+    argon2
     g3dlib
     Detour
     sfmt

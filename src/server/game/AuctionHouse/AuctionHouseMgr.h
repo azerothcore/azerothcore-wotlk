@@ -173,7 +173,7 @@ public:
     void LoadAuctions();
 
     void AddAItem(Item* it);
-    bool RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB = false);
+    bool RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB = false, SQLTransaction* trans = nullptr);
 
     void Update();
 
