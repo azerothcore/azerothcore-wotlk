@@ -11,4 +11,4 @@ INSERT INTO `skinning_loot_template` (`Entry`,`Item`,`Reference`,`Chance`,`Quest
 (60042,4235,0,5,0,1,1,1,1,"Heavy Hide"),
 (60042,4304,0,50,0,1,1,1,2,"Thick Leather"),
 (60042,8165,0,5,0,1,1,1,2,"Worn Dragonscale"),
-(60042,8169,0,5,0,1,1,1,1,"Thick Hide"),
+(60042,8169,0,5,0,1,1,1,1,"Thick Hide");
