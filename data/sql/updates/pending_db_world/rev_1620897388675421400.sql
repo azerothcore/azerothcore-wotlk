@@ -1,9 +1,5 @@
 INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1620897388675421400');
 
-
-UPDATE `creature_template` SET `skinloot` = 60042 WHERE `entry` IN (2447,2726,4328,4329,4331,4334,4339);
-
-
 DELETE FROM `skinning_loot_template` WHERE `Entry` BETWEEN 60041 AND 60048;
 DELETE FROM `skinning_loot_template` WHERE `Entry` IN (2725,4323,4324,5278,2447,2726,4328,4329,4331,4334,4339,10678,14398,12129,5276,8196,8197,8198);
 INSERT INTO `skinning_loot_template` (`Entry`,`Item`,`Reference`,`Chance`,`QuestRequired`,`LootMode`,`GroupId`,`MinCount`,`MaxCount`,`Comment`) VALUES
