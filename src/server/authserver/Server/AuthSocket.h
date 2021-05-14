@@ -9,6 +9,7 @@
 
 #include "Common.h"
 #include "CryptoHash.h"
+#include "Optional.h"
 #include "RealmSocket.h"
 #include "SRP6.h"
 
@@ -65,7 +66,7 @@ private:
     eStatus _status;
 
     std::string _login;
-    std::string _tokenKey;
+    Optional<std::vector<uint8>> _totpSecret;
 
     // Since GetLocaleByName() is _NOT_ bijective, we have to store the locale as a string. Otherwise we can't differ
     // between enUS and enGB, which is important for the patch system
