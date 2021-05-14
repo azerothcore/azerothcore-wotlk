@@ -28,7 +28,6 @@ inline T standard_deviation(Container&& c)
     return std::sqrt(accum / (size - 1));
 }
 
-
 template <typename Container, typename T = typename std::decay<decltype(*std::begin(std::declval<Container>()))>::type>
 inline T mean(Container&& c)
 {
