@@ -2042,10 +2042,7 @@ void World::SetInitialWorldSettings()
     ChannelMgr::LoadChannelRights();
 
     LOG_INFO("server", "Load Channels...");
-    ChannelMgr* mgr = ChannelMgr::forTeam(TEAM_ALLIANCE);
-    mgr->LoadChannels();
-    mgr = ChannelMgr::forTeam(TEAM_HORDE);
-    mgr->LoadChannels();
+    ChannelMgr::LoadChannels();
 
 #ifdef ELUNA
     ///- Run eluna scripts.
