@@ -508,12 +508,6 @@ bool AuthSocket::_HandleLogonChallenge()
                         pkt.append(_srp6->N);
                         pkt.append(_srp6->s);
                         pkt.append(VersionChallenge.data(), VersionChallenge.size());
-                        uint8 securityFlags = 0;
-
-                        // Check if token is used
-                        _tokenKey = fields[7].GetString();
-                        if (!_tokenKey.empty())
-                            securityFlags = 4;
 
                         pkt << uint8(securityFlags);            // security flags (0x0...0x04)
 
