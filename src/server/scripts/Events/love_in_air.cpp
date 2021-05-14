@@ -198,10 +198,10 @@ public:
                         switch (time)
                         {
                             case 1:
-                                me->AI()->Talk(SAY_SNIVEL_REAL_0, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_0);
                                 return false;
                             case 2:
-                                me->AI()->Talk(SAY_SNIVEL_REAL_1, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_1);
                                 return true;
                         }
                         break;
@@ -212,13 +212,13 @@ public:
                         switch (time)
                         {
                             case 1:
-                                me->AI()->Talk(SAY_SNIVEL_REAL_0, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_0);
                                 return false;
                             case 2:
-                                me->AI()->Talk(SAY_SNIVEL_REAL_1, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_1);
                                 return false;
                             case 3:
-                                me->AI()->Talk(SAY_SNIVEL_REAL_2, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_2);
                                 return true;
                         }
                         break;
@@ -230,16 +230,16 @@ public:
                         switch (time)
                         {
                             case 1:
-                                me->AI()->Talk(SAY_SNIVEL_REAL_0, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_0);
                                 return false;
                             case 2:
-                                me->AI()->Talk(SAY_SNIVEL_REAL_1, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_1);
                                 return false;
                             case 3:
-                                me->AI()->Talk(SAY_SNIVEL_REAL_2, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_2);
                                 return false;
                             case 4:
-                                me->AI()->Talk(SAY_SNIVEL_REAL_3, nullptr);
+                                me->AI()->Talk(SAY_SNIVEL_REAL_3);
                                 return true;
                         }
                         break;
@@ -348,7 +348,7 @@ public:
 
         void JustDied(Unit* ) override
         {
-            me->AI()->Talk(SAY_HUMMEL_5, nullptr);
+            me->AI()->Talk(SAY_HUMMEL_5);
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             if (!players.isEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
                 sLFGMgr->FinishDungeon(players.begin()->GetSource()->GetGroup()->GetGUID(), 288, me->FindMap());
@@ -369,17 +369,17 @@ public:
                 speachTimer += diff;
                 if (speachTimer < 10000)
                 {
-                    me->AI()->Talk(SAY_HUMMEL_0, nullptr);
+                    me->AI()->Talk(SAY_HUMMEL_0);
                     speachTimer = 10000;
                 }
                 else if (speachTimer >= 16000 && speachTimer < 20000)
                 {
-                    me->AI()->Talk(SAY_HUMMEL_1, nullptr);
+                    me->AI()->Talk(SAY_HUMMEL_1);
                     speachTimer = 20000;
                 }
                 else if (speachTimer >= 26000 && speachTimer < 30000)
                 {
-                    me->AI()->Talk(SAY_HUMMEL_2, nullptr);
+                    me->AI()->Talk(SAY_HUMMEL_2);
                     speachTimer = 0;
                     me->setFaction(16);
                     me->SetInCombatWithZone();
@@ -493,7 +493,7 @@ public:
 
         void JustDied(Unit* ) override
         {
-            me->AI()->Talk(SAY_HUMMEL_HELPER_SAY_5, nullptr);
+            me->AI()->Talk(SAY_HUMMEL_HELPER_SAY_5);
         }
 
         void UpdateAI(uint32 diff) override
