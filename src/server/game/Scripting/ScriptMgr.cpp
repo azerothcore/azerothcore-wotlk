@@ -144,27 +144,43 @@ void ScriptMgr::Unload()
 
 void ScriptMgr::LoadDatabase()
 {
+    LOG_INFO("server", "DEBUG CI: 1");
     uint32 oldMSTime = getMSTime();
-
+    LOG_INFO("server", "DEBUG CI: 2");
     sScriptSystemMgr->LoadScriptWaypoints();
-
+    LOG_INFO("server", "DEBUG CI: 3");
     // Add all scripts that must be loaded after db/maps
     ScriptRegistry<WorldMapScript>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 4");
     ScriptRegistry<BattlegroundMapScript>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 5");
     ScriptRegistry<InstanceMapScript>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 6");
     ScriptRegistry<SpellScriptLoader>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 7");
     ScriptRegistry<ItemScript>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 8");
     ScriptRegistry<CreatureScript>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 9");
     ScriptRegistry<GameObjectScript>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 10");
     ScriptRegistry<AreaTriggerScript>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 11");
     ScriptRegistry<BattlegroundScript>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 12");
     ScriptRegistry<OutdoorPvPScript>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 13");
     ScriptRegistry<WeatherScript>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 14");
     ScriptRegistry<ConditionScript>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 15");
     ScriptRegistry<TransportScript>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 16");
     ScriptRegistry<AchievementCriteriaScript>::AddALScripts();
+    LOG_INFO("server", "DEBUG CI: 17");
 
     FillSpellSummary();
+    LOG_INFO("server", "DEBUG CI: 18");
 
     CheckIfScriptsInDatabaseExist();
 
