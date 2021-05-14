@@ -7,6 +7,7 @@
 #ifndef ACORE_TIMER_H
 #define ACORE_TIMER_H
 
+#include <iostream>
 #include "Common.h"
 #include "Duration.h"
 
@@ -14,11 +15,11 @@ inline TimePoint GetApplicationStartTime()
 {
     using namespace std::chrono;
 
-    LOG_INFO("server", "DEBUG CI: 1");
+    std::cout << "DEBUG CI 1" << std::endl;
 
     static const steady_clock::time_point ApplicationStartTime = steady_clock::now();
 
-    LOG_INFO("server", "DEBUG CI: 2");
+    std::cout << "DEBUG CI 2" << std::endl;
 
     return ApplicationStartTime;
 }
