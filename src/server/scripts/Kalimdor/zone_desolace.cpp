@@ -13,7 +13,6 @@ EndScriptData */
 
 /* ContentData
 npc_aged_dying_ancient_kodo
-npc_dalinda_malem
 go_demon_portal
 EndContentData */
 
@@ -497,81 +496,6 @@ public:
 };
 
 /*######
-## npc_dalinda_malem. Quest 1440
-######*/
-
-enum Dalinda
-{
-    QUEST_RETURN_TO_VAHLARRIEL      = 1440
-};
-
-class npc_dalinda : public CreatureScript
-{
-public:
-    npc_dalinda() : CreatureScript("npc_dalinda") { }
-
-    struct npc_dalindaAI : public npc_escortAI
-    {
-        npc_dalindaAI(Creature* creature) : npc_escortAI(creature) { }
-
-        void Reset() override { }
-
-        void EnterCombat(Unit* /*who*/) override { }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (Player* player = GetPlayerForEscort())
-                player->FailQuest(QUEST_RETURN_TO_VAHLARRIEL);
-            return;
-        }
-
-        void WaypointReached(uint32 waypointId) override
-        {
-            Player* player = GetPlayerForEscort();
-
-            switch (waypointId)
-            {
-                case 1:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    break;
-                case 15:
-                    if (player)
-                        player->GroupEventHappens(QUEST_RETURN_TO_VAHLARRIEL, me);
-                    break;
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            npc_escortAI::UpdateAI(diff);
-
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_RETURN_TO_VAHLARRIEL)
-        {
-            if (npc_escortAI* escortAI = CAST_AI(npc_dalinda::npc_dalindaAI, creature->AI()))
-            {
-                escortAI->Start(true, false, player->GetGUID());
-                creature->setFaction(113);
-            }
-        }
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_dalindaAI(creature);
-    }
-};
-
-/*######
 ## go_demon_portal
 ######*/
 
@@ -605,6 +529,5 @@ void AddSC_desolace()
 
     // Theirs
     new npc_aged_dying_ancient_kodo();
-    new npc_dalinda();
     new go_demon_portal();
 }

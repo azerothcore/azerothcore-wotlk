@@ -60,7 +60,7 @@ target_link_libraries(worldserver
     game
     gsoap
     readline
-    ${GPERFTOOLS_LIBRARIES})
+    gperftools)
 
 set_target_properties(worldserver
   PROPERTIES
