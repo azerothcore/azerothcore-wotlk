@@ -30,7 +30,7 @@ enum LoginDatabaseStatements
         When updating more than one field, consider looking at the calling function
         name for a suiting suffix.
     */
-
+    LOGIN_SET_ACCOUNT_PREMIUM,
     LOGIN_SEL_REALMLIST,
     LOGIN_DEL_EXPIRED_IP_BANS,
     LOGIN_UPD_EXPIRED_ACCOUNT_BANS,

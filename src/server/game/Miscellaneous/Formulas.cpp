@@ -83,7 +83,26 @@ uint32 acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
             // xpMod *= creature->GetCreatureTemplate()->ModExperience;
         }
 
-        xpMod *= isBattleGround ? sWorld->getRate(RATE_XP_BG_KILL) : sWorld->getRate(RATE_XP_KILL);
+        if (player->GetSession()->IsPremium())
+        {
+            xpMod *= isBattleGround ? sWorld->getRate(RATE_XP_BG_KILL) : sWorld->getRate(RATE_XP_KILL_PREMIUM);
+        }
+        else
+
+        {
+            xpMod *= isBattleGround ? sWorld->getRate(RATE_XP_BG_KILL) : sWorld->getRate(RATE_XP_KILL);
+        }
+
+
+
+        
+
+
+       /// float premium_rate = player->GetSession()->IsPremium() ? sWorld->getRate(RATE_XP_KILL_PREMIUM) : 1.0f;
+        
+          //  return uint32(gain * sWorld->getRate(RATE_XP_KILL) * premium_rate);
+
+
         gain = uint32(gain * xpMod);
     }
 

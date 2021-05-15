@@ -197,7 +197,7 @@ struct PacketCounter
 class WorldSession
 {
 public:
-    WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
+    WorldSession(uint32 id, WorldSocket* sock, AccountTypes sec, bool ispremium, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
 
     bool PlayerLoading() const { return m_playerLoading; }
@@ -223,6 +223,7 @@ public:
     void SendClientCacheVersion(uint32 version);
 
     AccountTypes GetSecurity() const { return _security; }
+    bool IsPremium() const { return _ispremium; }
     bool CanSkipQueue() const { return _skipQueue; }
     uint32 GetAccountId() const { return _accountId; }
     Player* GetPlayer() const { return _player; }
@@ -1018,6 +1019,7 @@ private:
     bool _skipQueue;
     uint32 _accountId;
     uint8 m_expansion;
+    bool _ispremium;
     uint32 m_total_time;
 
     typedef std::list<AddonInfo> AddonsList;

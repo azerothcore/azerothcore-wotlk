@@ -368,6 +368,8 @@ bool AuthSocket::_HandleLogonChallenge()
     // Verify that this IP is not in the ip_banned table
     LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_DEL_EXPIRED_IP_BANS));
 
+    LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_SET_ACCOUNT_PREMIUM));
+
     std::string const& ip_address = socket().getRemoteAddress();
     PreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_BANNED);
     stmt->setString(0, ip_address);
