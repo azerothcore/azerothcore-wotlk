@@ -3173,6 +3173,7 @@ ALTER TABLE `creature_template` DROP `attackpower`;
 ALTER TABLE `creature_template` DROP `rangedattackpower`;
 ALTER TABLE `creature_template` ADD COLUMN `BaseVariance` FLOAT DEFAULT 1 NOT NULL AFTER `RangeAttackTime`;
 ALTER TABLE `creature_template` ADD COLUMN `RangeVariance` FLOAT DEFAULT 1 NOT NULL AFTER `BaseVariance`;
+
 --
 -- END UPDATING QUERIES
 --
