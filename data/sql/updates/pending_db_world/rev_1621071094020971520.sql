@@ -1,4 +1,4 @@
--- INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1621071094020971520');
+INSERT INTO `version_db_world` (`sql_rev`) VALUES ('1621071094020971520');
 
 DELETE FROM `gossip_menu` WHERE `MenuID` IN (281, 283,433);
 DELETE FROM `gossip_menu` WHERE `MenuID`=231 AND `TextID`=739;
