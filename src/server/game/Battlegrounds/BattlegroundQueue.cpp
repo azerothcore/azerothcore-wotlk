@@ -952,7 +952,7 @@ uint32 BattlegroundQueue::GetPlayersCountInGroupsQueue(BattlegroundBracketId bra
 
 bool BattlegroundQueue::IsAllQueuesEmpty(BattlegroundBracketId bracket_id)
 {
-    uint32 queueEmptyCount = 0;
+    uint8 queueEmptyCount = 0;
 
     for (uint8 i = 0; i < BG_QUEUE_MAX; i++)
         if (m_QueuedGroups[bracket_id][i].empty())
@@ -964,7 +964,9 @@ bool BattlegroundQueue::IsAllQueuesEmpty(BattlegroundBracketId bracket_id)
 void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvPDifficultyEntry const* bracketEntry)
 {
     if (!sScriptMgr->CanSendMessageBGQueue(this, leader, bg, bracketEntry))
+    {
         return;
+    }
 
     BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
     char const* bgName = bg->GetName();
@@ -974,7 +976,7 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
     uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32)80);
     uint32 qHorde = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_HORDE);
     uint32 qAlliance = GetPlayersCountInGroupsQueue(bracketId, BG_QUEUE_NORMAL_ALLIANCE);
-    uint32 leftPlayers = MaxPlayers - qHorde - qAlliance;
+    auto qTotal = qHorde + qAlliance;
 
     // Show queue status to player only (when joining battleground queue or Arena and arena world announcer is disabled)
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_PLAYERONLY) || (bg->isArena() && !sWorld->getBoolConfig(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE)))
@@ -987,15 +989,28 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
         auto searchGUID = BGSpamProtection.find(leader->GetGUID());
 
         if (searchGUID == BGSpamProtection.end())
+        {
             BGSpamProtection[leader->GetGUID()] = 0; // Leader GUID not found, initialize with 0
+        }
 
         // Skip if spam time < 30 secs (default)
         if (sWorld->GetGameTime() - BGSpamProtection[leader->GetGUID()] < sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY))
+        {
             return;
+        }
 
-        // If left players > 1 - skip announce
-        if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMITED_ENABLE) && leftPlayers != 1)
-            return;
+        // When limited, it announces only if there are at least CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS in queue
+        auto limitQueueMinLevel = sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_LEVEL);
+        if (limitQueueMinLevel != 0 && q_min_level >= limitQueueMinLevel)
+        {
+            // limit only RBG for 80, WSG for lower levels
+            auto bgTypeToLimit = q_min_level == 80 ? BATTLEGROUND_RB : BATTLEGROUND_WS;
+
+            if (bg->GetBgTypeID() == bgTypeToLimit && qTotal < sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS))
+            {
+                return;
+            }
+        }
 
         BGSpamProtection[leader->GetGUID()] = sWorld->GetGameTime();
         sWorld->SendWorldText(LANG_BG_QUEUE_ANNOUNCE_WORLD, bgName, q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
