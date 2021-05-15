@@ -3446,6 +3446,7 @@ Logger.scripts.hotswap=4,Console Server
 Logger.sql.sql=2,Console DBErrors
 Logger.sql=4,Console Server
 Logger.mmaps=4,Server
+Logger.sql.driver=4, DBErrors
 
 #Logger.achievement=4,Console Server
 #Logger.addon=4,Console Server
