@@ -19259,7 +19259,6 @@ void Player::_LoadMailedItems(Mail* mail)
         }
 
         Item* item = NewItemOrBag(proto);
-
         if (!item->LoadFromDB(itemGuid, ObjectGuid::Create<HighGuid::Player>(fields[13].GetUInt32()), fields, itemTemplate))
         {
             LOG_ERROR("server", "Player::_LoadMailedItems - Item in mail (%u) doesn't exist !!!! - item guid: %u, deleted from mail", mail->messageID, itemGuid);
@@ -19324,6 +19323,13 @@ void Player::_LoadMail()
             delete m;
         itr = GetMailBegin();
     }
+
+    // Delete mailed items aswell
+    // Created again below in Player::_LoadMailedItems
+    for (ItemMap::iterator iter = mMitems.begin(); iter != mMitems.end(); ++iter)
+        delete iter->second;
+
+    mMitems.clear();
 
     //Now load the new ones
     m_mailCache.clear();

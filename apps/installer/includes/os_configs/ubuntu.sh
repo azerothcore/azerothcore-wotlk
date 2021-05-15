@@ -8,7 +8,7 @@ UBUNTU_VERSION=$(lsb_release -sr);
 sudo apt-get update -y
 
 # shared deps
-sudo apt-get -y install make cmake clang curl unzip libmysqlclient-dev libace-dev ccache
+sudo apt-get -y install make cmake clang curl unzip libmysqlclient-dev libace-dev ccache google-perftools
 
 if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   sudo apt-get -y install build-essential libtool cmake-data openssl libgoogle-perftools-dev \
