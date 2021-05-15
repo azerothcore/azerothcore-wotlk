@@ -7,8 +7,8 @@
 #ifndef NPCPackets_h__
 #define NPCPackets_h__
 
-#include "WorldPacket.h"
-#include "ObjectMgr.h"
+#include "Packet.h"
+#include "ObjectGuid.h"
 #include <array>
 
 namespace WorldPackets
@@ -28,7 +28,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            uint32 Unit;
+            ObjectGuid Unit;
         };
 
         struct TrainerListSpell
@@ -51,7 +51,7 @@ namespace WorldPackets
 
             WorldPacket const* Write();
 
-            uint32 TrainerGUID;
+            ObjectGuid TrainerGUID;
             int32 TrainerType = 0;
             std::vector<TrainerListSpell> Spells;
             std::string Greeting;
@@ -64,7 +64,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            uint32 TrainerGUID;
+            ObjectGuid TrainerGUID;
             int32 SpellID = 0;
         };
 
@@ -75,7 +75,7 @@ namespace WorldPackets
 
             WorldPacket const* Write() override;
 
-            uint32 TrainerGUID;
+            ObjectGuid TrainerGUID;
             int32 SpellID             = 0;
             int32 TrainerFailedReason = 0;
         };
@@ -87,7 +87,7 @@ namespace WorldPackets
 
             WorldPacket const* Write() override;
 
-            uint32 TrainerGUID;
+            ObjectGuid TrainerGUID;
             int32 SpellID = 0;
         };
     }

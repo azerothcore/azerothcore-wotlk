@@ -1789,7 +1789,7 @@ public:
     Aura* AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target);
     void SetAuraStack(uint32 spellId, Unit* target, uint32 stack);
     void SendPlaySpellVisual(uint32 id) const;
-    void SendPlaySpellImpact(uint64 guid, uint32 id) const;
+    void SendPlaySpellImpact(ObjectGuid guid, uint32 id) const;
     void BuildCooldownPacket(WorldPacket& data, uint8 flags, uint32 spellId, uint32 cooldown);
     void BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns const& cooldowns);
 

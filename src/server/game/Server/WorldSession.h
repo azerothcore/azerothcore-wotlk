@@ -585,8 +585,8 @@ public:                                                 // opcodes handlers
     void HandleTabardVendorActivateOpcode(WorldPacket& recvPacket);
     void HandleBankerActivateOpcode(WorldPacket& recvPacket);
     void HandleBuyBankSlotOpcode(WorldPacket& recvPacket);
-    void HandleTrainerListOpcode(WorldPackets::NPC::Hello& recvPacket);
-    void HandleTrainerBuySpellOpcode(WorldPackets::NPC::TrainerBuySpell& recvPacket);
+    void HandleTrainerListOpcode(WorldPackets::NPC::Hello& packet);
+    void HandleTrainerBuySpellOpcode(WorldPackets::NPC::TrainerBuySpell& packet);
     void HandlePetitionShowListOpcode(WorldPacket& recvPacket);
     void HandleGossipHelloOpcode(WorldPacket& recvPacket);
     void HandleGossipSelectOptionOpcode(WorldPacket& recvPacket);
