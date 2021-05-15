@@ -3165,7 +3165,7 @@ UPDATE `creature_template` SET `DamageModifier` = 9.1 WHERE `entry` = 40683;
 UPDATE `creature_template` SET `DamageModifier` = 12.8 WHERE `entry` = 40684;
 UPDATE `creature_template` SET `DamageModifier` = 20 WHERE `entry` = 40870;
 
-ALTER TABLE `creature_template`DROP `mindmg`;
+ALTER TABLE `creature_template` DROP `mindmg`;
 ALTER TABLE `creature_template` DROP `maxdmg`;
 ALTER TABLE `creature_template` DROP `minrangedmg`;
 ALTER TABLE `creature_template` DROP `maxrangedmg`;
