@@ -3170,7 +3170,7 @@ ALTER TABLE `creature_template` DROP `maxdmg`;
 ALTER TABLE `creature_template` DROP `minrangedmg`;
 ALTER TABLE `creature_template` DROP `maxrangedmg`;
 ALTER TABLE `creature_template` DROP `attackpower`;
-ALTER TABLE `creature_template` DROP ranged`attackpower`;
+ALTER TABLE `creature_template` DROP `rangedattackpower`;
 ALTER TABLE `creature_template` ADD COLUMN `BaseVariance` FLOAT DEFAULT 1 NOT NULL AFTER `RangeAttackTime`;
 ALTER TABLE `creature_template` ADD COLUMN `RangeVariance` FLOAT DEFAULT 1 NOT NULL AFTER `BaseVariance`;
 --
