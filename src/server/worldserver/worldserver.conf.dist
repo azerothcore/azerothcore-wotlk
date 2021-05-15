@@ -2396,12 +2396,24 @@ Battleground.CastDeserter = 1
 Battleground.QueueAnnouncer.Enable = 0
 
 #
-#    Battleground.QueueAnnouncer.Limited.Enable
-#        Description: Show announce only if left players in queue = 1
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
+#    Battleground.QueueAnnouncer.Limit.MinLevel
+#        Description: Limit the QueueAnnouncer starting from a certain level.
+#                     When limited, it announces only if there are at least MinPlayers queued (see below)
+#                     At 80 it only limits RBG, at lower level only limits Warsong Gulch.
+#        Default:     0 - (Disabled, no limits)
+#                     10 - (Enabled for all, because BGs start at 10)
+#                     20 - (Enabled for 20 and higher)
+#                     80 - (Enabled only for 80)
 
-Battleground.QueueAnnouncer.Limited.Enable = 0
+Battleground.QueueAnnouncer.Limit.MinLevel = 0
+
+#
+#    Battleground.QueueAnnouncer.Limit.MinPlayers
+#        Description: When the Battleground.QueueAnnouncer.Limit.MinLevel limit is enabled (not 0)
+#                     only show when at least MinPlayers are queued.
+#        Default:     3 - (Show only when 3 or more players are queued)
+
+Battleground.QueueAnnouncer.Limit.MinPlayers = 3
 
 #
 #    Battleground.QueueAnnouncer.SpamProtection.Delay
