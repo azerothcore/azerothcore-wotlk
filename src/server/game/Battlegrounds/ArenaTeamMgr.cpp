@@ -82,7 +82,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(std::string const& arenaTeamName, co
     return nullptr;
 }
 
-ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid) const
+ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(ObjectGuid guid) const
 {
     for (ArenaTeamContainer::const_iterator itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
     {
@@ -94,7 +94,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid) const
     return nullptr;
 }
 
-ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(uint64 guid, const uint32 type) const
+ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(ObjectGuid guid, const uint32 type) const
 {
     for (ArenaTeamContainer::const_iterator itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
     {
@@ -191,7 +191,7 @@ void ArenaTeamMgr::DistributeArenaPoints()
     sWorld->SendWorldText(LANG_DIST_ARENA_POINTS_ONLINE_START);
 
     // Temporary structure for storing maximum points to add values for all players
-    std::map<uint32, uint32> PlayerPoints;
+    std::map<ObjectGuid, uint32> PlayerPoints;
 
     // At first update all points for all team members
     for (ArenaTeamContainer::iterator teamItr = GetArenaTeamMapBegin(); teamItr != GetArenaTeamMapEnd(); ++teamItr)
@@ -206,16 +206,16 @@ void ArenaTeamMgr::DistributeArenaPoints()
     PreparedStatement* stmt;
 
     // Cycle that gives points to all players
-    for (std::map<uint32, uint32>::iterator playerItr = PlayerPoints.begin(); playerItr != PlayerPoints.end(); ++playerItr)
+    for (std::map<ObjectGuid, uint32>::iterator playerItr = PlayerPoints.begin(); playerItr != PlayerPoints.end(); ++playerItr)
     {
         // Add points to player if online
-        if (Player* player = HashMapHolder<Player>::Find(playerItr->first))
+        if (Player* player = ObjectAccessor::FindPlayer(playerItr->first))
             player->ModifyArenaPoints(playerItr->second, &trans);
         else    // Update database
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_ARENA_POINTS);
             stmt->setUInt32(0, playerItr->second);
-            stmt->setUInt32(1, playerItr->first);
+            stmt->setUInt32(1, playerItr->first.GetCounter());
             trans->Append(stmt);
         }
     }

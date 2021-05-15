@@ -55,7 +55,7 @@ public:
     bool HandleCustomSpell(Player* player, uint32 spellId, GameObject* go);
 
     // handle custom go if registered
-    bool HandleOpenGo(Player* player, uint64 guid);
+    bool HandleOpenGo(Player* player, GameObject* go);
 
     ZoneScript* GetZoneScript(uint32 zoneId);
 
@@ -63,7 +63,7 @@ public:
 
     void Update(uint32 diff);
 
-    void HandleGossipOption(Player* player, uint64 guid, uint32 gossipid);
+    void HandleGossipOption(Player* player, Creature* creatured, uint32 gossipid);
 
     bool CanTalkTo(Player* player, Creature* creature, GossipMenuItems const& gso);
 

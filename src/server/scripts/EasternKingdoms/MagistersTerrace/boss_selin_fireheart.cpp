@@ -59,7 +59,7 @@ public:
         InstanceScript* instance;
         EventMap events;
         SummonList summons;
-        uint64 CrystalGUID;
+        ObjectGuid CrystalGUID;
 
         bool CanAIAttack(const Unit* who) const override
         {
@@ -94,7 +94,7 @@ public:
             summons.DespawnAll();
             SpawnCrystals();
             instance->SetData(DATA_SELIN_EVENT, NOT_STARTED);
-            CrystalGUID = 0;
+            CrystalGUID.Clear();
             me->SetPower(POWER_MANA, 0);
         }
 
@@ -130,7 +130,7 @@ public:
             if (summons.empty())
                 return;
 
-            CrystalGUID = 0;
+            CrystalGUID.Clear();
             Unit* crystal = nullptr;
             for (SummonList::const_iterator i = summons.begin(); i != summons.end(); )
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, *i++))

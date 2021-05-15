@@ -13,6 +13,7 @@
  */
 
 #include <map>
+#include <unordered_map>
 #include <vector>
 #include "Define.h"
 #include "Dynamic/TypeList.h"
@@ -23,37 +24,41 @@
  * By itself its meaningless but collaborate along with TypeContainers,
  * it become the most powerfully container in the whole system.
  */
-template<class OBJECT> struct ContainerMapList
+template<class OBJECT>
+struct ContainerMapList
 {
     //std::map<OBJECT_HANDLE, OBJECT *> _element;
     GridRefManager<OBJECT> _element;
 };
 
-template<> struct ContainerMapList<TypeNull>                /* nothing is in type null */
+template<>
+struct ContainerMapList<TypeNull>                /* nothing is in type null */
 {
 };
-template<class H, class T> struct ContainerMapList<TypeList<H, T>>
+
+template<class H, class T>
+struct ContainerMapList<TypeList<H, T>>
 {
     ContainerMapList<H> _elements;
     ContainerMapList<T> _TailElements;
 };
 
-/*
- * @class ContaierArrayList is a multi-type container for
- * array of elements.
- */
-template<class OBJECT> struct ContainerArrayList
+template<class OBJECT, class KEY_TYPE>
+struct ContainerUnorderedMap
 {
-    std::vector<OBJECT> _element;
+    std::unordered_map<KEY_TYPE, OBJECT*> _element;
 };
 
-// termination condition
-template<> struct ContainerArrayList<TypeNull> { };
-// recursion
-template<class H, class T> struct ContainerArrayList<TypeList<H, T>>
+template<class KEY_TYPE>
+struct ContainerUnorderedMap<TypeNull, KEY_TYPE>
 {
-    ContainerArrayList<H> _elements;
-    ContainerArrayList<T> _TailElements;
+};
+
+template<class H, class T, class KEY_TYPE>
+struct ContainerUnorderedMap<TypeList<H, T>, KEY_TYPE>
+{
+    ContainerUnorderedMap<H, KEY_TYPE> _elements;
+    ContainerUnorderedMap<T, KEY_TYPE> _TailElements;
 };
 
 /*
@@ -89,14 +94,16 @@ public:
     template<class SPECIFIC_TYPE> [[nodiscard]] size_t Count() const { return acore::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
 
     /// inserts a specific object into the container
-    template<class SPECIFIC_TYPE> bool insert(SPECIFIC_TYPE* obj)
+    template<class SPECIFIC_TYPE>
+    bool insert(SPECIFIC_TYPE* obj)
     {
         SPECIFIC_TYPE* t = acore::Insert(i_elements, obj);
         return (t != nullptr);
     }
 
     ///  Removes the object from the container, and returns the removed object
-    //template<class SPECIFIC_TYPE> bool remove(SPECIFIC_TYPE* obj)
+    //template<class SPECIFIC_TYPE>
+    // bool remove(SPECIFIC_TYPE* obj)
     //{
     //    SPECIFIC_TYPE* t = acore::Remove(i_elements, obj);
     //    return (t != nullptr);
@@ -108,4 +115,34 @@ public:
 private:
     ContainerMapList<OBJECT_TYPES> i_elements;
 };
+
+template<class OBJECT_TYPES, class KEY_TYPE>
+class TypeUnorderedMapContainer
+{
+public:
+    template<class SPECIFIC_TYPE>
+    bool Insert(KEY_TYPE const& handle, SPECIFIC_TYPE* obj)
+    {
+        return acore::Insert(_elements, handle, obj);
+    }
+
+    template<class SPECIFIC_TYPE>
+    bool Remove(KEY_TYPE const& handle)
+    {
+        return acore::Remove(_elements, handle, (SPECIFIC_TYPE*)nullptr);
+    }
+
+    template<class SPECIFIC_TYPE>
+    SPECIFIC_TYPE* Find(KEY_TYPE const& handle)
+    {
+        return acore::Find(_elements, handle, (SPECIFIC_TYPE*)nullptr);
+    }
+
+    ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE>& GetElements() { return _elements; }
+    ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE> const& GetElements() const { return _elements; }
+
+private:
+    ContainerUnorderedMap<OBJECT_TYPES, KEY_TYPE> _elements;
+};
+
 #endif

@@ -83,7 +83,7 @@ void AddGossipItemFor(Player* player, uint32 icon, std::string const& text, uint
 void AddGossipItemFor(Player* player, uint32 gossipMenuID, uint32 gossipMenuItemID, uint32 sender, uint32 action);
 
 // Send menu text
-void SendGossipMenuFor(Player* player, uint32 npcTextID, uint64 const& guid);
+void SendGossipMenuFor(Player* player, uint32 npcTextID, ObjectGuid const guid);
 void SendGossipMenuFor(Player* player, uint32 npcTextID, Creature const* creature);
 
 // Close menu
@@ -100,7 +100,7 @@ void CloseGossipMenuFor(Player* player);
 #define ADD_GOSSIP_ITEM(a, b, c, d) PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, a, b, c, d, "", 0)
 #define ADD_GOSSIP_ITEM_EXTENDED(a, b, c, d, e, f, g)   PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, a, b, c, d, e, f, g)
 
-// This fuction Sends the current menu to show to client, a - NPCTEXTID(uint32), b - npc guid(uint64)
+// This fuction Sends the current menu to show to client, a - NPCTEXTID(uint32), b - npc guid(ObjectGuid)
 #define SEND_GOSSIP_MENU(a, b)  PlayerTalkClass->SendGossipMenu(a, b)
 
 // Closes the Menu

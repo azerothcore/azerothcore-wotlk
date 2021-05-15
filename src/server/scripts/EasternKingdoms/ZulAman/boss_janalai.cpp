@@ -126,7 +126,7 @@ public:
 
         bool isFlameBreathing;
 
-        uint64 FireBombGUIDs[40];
+        ObjectGuid FireBombGUIDs[40];
 
         void Reset() override
         {
@@ -146,7 +146,7 @@ public:
             isFlameBreathing = false;
 
             for (uint8 i = 0; i < 40; ++i)
-                FireBombGUIDs[i] = 0;
+                FireBombGUIDs[i].Clear();
 
             HatchAllEggs(1);
         }

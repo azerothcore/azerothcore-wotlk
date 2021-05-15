@@ -42,14 +42,14 @@ public:
         npc_water_elementalAI(Creature* creature) : ScriptedAI(creature) { }
 
         uint32 waterBoltTimer;
-        uint64 balindaGUID;
+        ObjectGuid balindaGUID;
         uint32 resetTimer;
 
         void Reset() override
         {
             waterBoltTimer            = 3 * IN_MILLISECONDS;
             resetTimer                = 5 * IN_MILLISECONDS;
-            balindaGUID = 0;
+            balindaGUID.Clear();
         }
 
         void UpdateAI(uint32 diff) override

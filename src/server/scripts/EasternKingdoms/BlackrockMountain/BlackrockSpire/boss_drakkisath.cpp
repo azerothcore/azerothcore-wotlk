@@ -72,8 +72,7 @@ public:
             me->GetCreaturesWithEntryInRange(ChromaticEliteGuards, 15.0f, ChromaticEliteGuardEntry);
             for (std::list<Creature*>::const_iterator itr = ChromaticEliteGuards.begin(); itr != ChromaticEliteGuards.end(); ++itr)
             {
-                if ((*itr)->GetGUID())
-                    (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
+                (*itr)->ToCreature()->AI()->AttackStart(me->GetVictim());
             }
         }
 
@@ -145,16 +144,14 @@ public:
             me->GetCreaturesWithEntryInRange(GeneralDrakkisath, 15.0f, GeneralDrakkisathEntry);
             for (std::list<Creature*>::const_iterator itr = GeneralDrakkisath.begin(); itr != GeneralDrakkisath.end(); ++itr)
             {
-                if ((*itr)->GetGUID())
-                    (*itr)->ToCreature()->AI()->AttackStart(who);
+                (*itr)->ToCreature()->AI()->AttackStart(who);
             }
 
             std::list<Creature*> ChromaticEliteGuards;
             me->GetCreaturesWithEntryInRange(ChromaticEliteGuards, 15.0f, ChromaticEliteGuardEntry);
             for (std::list<Creature*>::const_iterator itr = ChromaticEliteGuards.begin(); itr != ChromaticEliteGuards.end(); ++itr)
             {
-                if ((*itr)->GetGUID())
-                    (*itr)->ToCreature()->AI()->AttackStart(who);
+                (*itr)->ToCreature()->AI()->AttackStart(who);
             }
         }
 

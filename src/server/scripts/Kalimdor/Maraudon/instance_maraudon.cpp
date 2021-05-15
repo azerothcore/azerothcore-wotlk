@@ -28,7 +28,7 @@ public:
             {
                 case GO_CORRUPTION_SPEWER:
                     if (_encounters[TYPE_NOXXION] == DONE)
-                        HandleGameObject(0, true, gameobject);
+                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
                     break;
             }
         }

@@ -62,7 +62,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (Creature* Moira = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_MOIRA)))
+            if (Creature* Moira = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MOIRA)))
             {
                 Moira->AI()->EnterEvadeMode();
                 Moira->setFaction(35);

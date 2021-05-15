@@ -96,7 +96,7 @@ public:
     {
         npc_pilgrims_bounty_chairAI(Creature* creature) : VehicleAI(creature)
         {
-            plateGUID = 0;
+            plateGUID.Clear();
             timerSpawnPlate = 1;
             timerRotateChair = 0;
             me->SetReactState(REACT_PASSIVE);
@@ -111,7 +111,7 @@ public:
                 who->ToPlayer()->SetClientControl(me, 0, true);
         }
 
-        uint64 plateGUID;
+        ObjectGuid plateGUID;
         uint32 timerSpawnPlate;
         uint32 timerRotateChair;
 

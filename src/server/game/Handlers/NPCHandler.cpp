@@ -42,14 +42,14 @@ enum StableResultCode
 
 void WorldSession::HandleTabardVendorActivateOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TABARDDESIGNER);
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "WORLD: HandleTabardVendorActivateOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
+        LOG_DEBUG("network", "WORLD: HandleTabardVendorActivateOpcode - Unit (%s) not found or you can not interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -61,7 +61,7 @@ void WorldSession::HandleTabardVendorActivateOpcode(WorldPacket& recvData)
     SendTabardVendorActivate(guid);
 }
 
-void WorldSession::SendTabardVendorActivate(uint64 guid)
+void WorldSession::SendTabardVendorActivate(ObjectGuid guid)
 {
     WorldPacket data(MSG_TABARDVENDOR_ACTIVATE, 8);
     data << guid;
@@ -70,7 +70,7 @@ void WorldSession::SendTabardVendorActivate(uint64 guid)
 
 void WorldSession::HandleBankerActivateOpcode(WorldPacket& recvData)
 {
-    uint64 guid;
+    ObjectGuid guid;
 
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Received CMSG_BANKER_ACTIVATE");
@@ -82,7 +82,7 @@ void WorldSession::HandleBankerActivateOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "WORLD: HandleBankerActivateOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
+        LOG_DEBUG("network", "WORLD: HandleBankerActivateOpcode - Unit (%s) not found or you can not interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -94,7 +94,7 @@ void WorldSession::HandleBankerActivateOpcode(WorldPacket& recvData)
     SendShowBank(guid);
 }
 
-void WorldSession::SendShowBank(uint64 guid)
+void WorldSession::SendShowBank(ObjectGuid guid)
 {
     WorldPacket data(SMSG_SHOW_BANK, 8);
     data << guid;
@@ -102,7 +102,7 @@ void WorldSession::SendShowBank(uint64 guid)
     SendPacket(&data);
 }
 
-void WorldSession::SendShowMailBox(uint64 guid)
+void WorldSession::SendShowMailBox(ObjectGuid guid)
 {
     WorldPacket data(SMSG_SHOW_MAILBOX, 8);
     data << guid;
@@ -174,14 +174,14 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: Received CMSG_GOSSIP_HELLO");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
     recvData >> guid;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "WORLD: HandleGossipHelloOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
+        LOG_DEBUG("network", "WORLD: HandleGossipHelloOpcode - Unit (%s) not found or you can not interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -239,7 +239,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
 
     uint32 option;
     uint32 unk;
-    uint64 guid;
+    ObjectGuid guid;
     std::string code = "";
 
     recvData >> guid >> unk >> option;
@@ -259,7 +259,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network.opcode", "WORLD: HandleGossipSelectOptionOpcode - Unit (GUID: %u) not found or you can't interact with him.", uint32(GUID_LOPART(guid)));
+        LOG_DEBUG("network.opcode", "WORLD: HandleGossipSelectOptionOpcode - Unit (%s) not found or you can't interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -286,7 +286,7 @@ void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: CMSG_SPIRIT_HEALER_ACTIVATE");
 #endif
 
-    uint64 guid;
+    ObjectGuid guid;
 
     recvData >> guid;
 
@@ -294,7 +294,7 @@ void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "WORLD: HandleSpiritHealerActivateOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
+        LOG_DEBUG("network", "WORLD: HandleSpiritHealerActivateOpcode - Unit (%s) not found or you can not interact with him.", guid.ToString().c_str());
 #endif
         return;
     }
@@ -314,9 +314,12 @@ void WorldSession::SendSpiritResurrect()
 
     // get corpse nearest graveyard
     GraveyardStruct const* corpseGrave = nullptr;
-    Corpse* corpse = _player->GetCorpse();
-    if (corpse)
-        corpseGrave = sGraveyard->GetClosestGraveyard(corpse->GetPositionX(), corpse->GetPositionY(), corpse->GetPositionZ(), corpse->GetMapId(), _player->GetTeamId());
+    WorldLocation corpseLocation = _player->GetCorpseLocation();
+    if (_player->HasCorpse())
+    {
+        corpseGrave = sGraveyard->GetClosestGraveyard(corpseLocation.GetPositionX(), corpseLocation.GetPositionY(),
+            corpseLocation.GetPositionZ(), corpseLocation.GetMapId(), _player->GetTeamId());
+    }
 
     // now can spawn bones
     _player->SpawnCorpseBones();
@@ -339,7 +342,7 @@ void WorldSession::SendSpiritResurrect()
 
 void WorldSession::HandleBinderActivateOpcode(WorldPacket& recvData)
 {
-    uint64 npcGUID;
+    ObjectGuid npcGUID;
     recvData >> npcGUID;
 
     if (!GetPlayer()->IsInWorld() || !GetPlayer()->IsAlive())
@@ -349,7 +352,7 @@ void WorldSession::HandleBinderActivateOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "WORLD: HandleBinderActivateOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(npcGUID)));
+        LOG_DEBUG("network", "WORLD: HandleBinderActivateOpcode - Unit (%s) not found or you can not interact with him.", npcGUID.ToString().c_str());
 #endif
         return;
     }
@@ -373,7 +376,7 @@ void WorldSession::SendBindPoint(Creature* npc)
     npc->CastSpell(_player, bindspell, true);
 
     WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, (8 + 4));
-    data << uint64(npc->GetGUID());
+    data << npc->GetGUID();
     data << uint32(bindspell);
     SendPacket(&data);
 
@@ -385,7 +388,7 @@ void WorldSession::HandleListStabledPetsOpcode(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Recv MSG_LIST_STABLED_PETS");
 #endif
-    uint64 npcGUID;
+    ObjectGuid npcGUID;
 
     recvData >> npcGUID;
 
@@ -403,11 +406,11 @@ void WorldSession::HandleListStabledPetsOpcode(WorldPacket& recvData)
     SendStablePet(npcGUID);
 }
 
-void WorldSession::SendStablePet(uint64 guid)
+void WorldSession::SendStablePet(ObjectGuid guid)
 {
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOTS_DETAIL);
 
-    stmt->setUInt32(0, _player->GetGUIDLow());
+    stmt->setUInt32(0, _player->GetGUID().GetCounter());
     stmt->setUInt8(1, PET_SAVE_FIRST_STABLE_SLOT);
     stmt->setUInt8(2, PET_SAVE_LAST_STABLE_SLOT);
 
@@ -415,7 +418,7 @@ void WorldSession::SendStablePet(uint64 guid)
     _sendStabledPetCallback.SetFutureResult(CharacterDatabase.AsyncQuery(stmt));
 }
 
-void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid)
+void WorldSession::SendStablePetCallback(PreparedQueryResult result, ObjectGuid guid)
 {
     if (!GetPlayer())
         return;
@@ -426,7 +429,7 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
 
     WorldPacket data(MSG_LIST_STABLED_PETS, 200);           // guess size
 
-    data << uint64 (guid);
+    data << guid;
 
     Pet* pet = _player->GetPet();
 
@@ -450,7 +453,7 @@ void WorldSession::SendStablePetCallback(PreparedQueryResult result, uint64 guid
     else if (_player->IsPetDismissed() || _player->GetTemporaryUnsummonedPetNumber())
     {
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_PET_BY_ENTRY_AND_SLOT);
-        stmt->setUInt32(0, _player->GetGUIDLow());
+        stmt->setUInt32(0, _player->GetGUID().GetCounter());
         stmt->setUInt8(1, uint8(_player->GetTemporaryUnsummonedPetNumber() ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
 
         if (PreparedQueryResult _result = CharacterDatabase.AsyncQuery(stmt))
@@ -498,7 +501,7 @@ void WorldSession::HandleStablePet(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Recv CMSG_STABLE_PET");
 #endif
-    uint64 npcGUID;
+    ObjectGuid npcGUID;
 
     recvData >> npcGUID;
 
@@ -541,7 +544,7 @@ void WorldSession::HandleStablePet(WorldPacket& recvData)
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOTS);
 
-    stmt->setUInt32(0, _player->GetGUIDLow());
+    stmt->setUInt32(0, _player->GetGUID().GetCounter());
     stmt->setUInt8(1, PET_SAVE_FIRST_STABLE_SLOT);
     stmt->setUInt8(2, PET_SAVE_LAST_STABLE_SLOT);
 
@@ -586,7 +589,7 @@ void WorldSession::HandleStablePetCallback(PreparedQueryResult result)
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT);
         stmt->setUInt8(0, freeSlot);
-        stmt->setUInt32(1, _player->GetGUIDLow());
+        stmt->setUInt32(1, _player->GetGUID().GetCounter());
         stmt->setUInt8(2, uint8(_player->GetTemporaryUnsummonedPetNumber() ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
         trans->Append(stmt);
 
@@ -605,7 +608,7 @@ void WorldSession::HandleUnstablePet(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Recv CMSG_UNSTABLE_PET.");
 #endif
-    uint64 npcGUID;
+    ObjectGuid npcGUID;
     uint32 petnumber;
 
     recvData >> npcGUID >> petnumber;
@@ -622,7 +625,7 @@ void WorldSession::HandleUnstablePet(WorldPacket& recvData)
 
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_ENTRY);
 
-    stmt->setUInt32(0, _player->GetGUIDLow());
+    stmt->setUInt32(0, _player->GetGUID().GetCounter());
     stmt->setUInt32(1, petnumber);
     stmt->setUInt8(2, PET_SAVE_FIRST_STABLE_SLOT);
     stmt->setUInt8(3, PET_SAVE_LAST_STABLE_SLOT);
@@ -688,7 +691,7 @@ void WorldSession::HandleUnstablePetCallback(PreparedQueryResult result, uint32 
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT);
         stmt->setUInt8(0, slot);
-        stmt->setUInt32(1, _player->GetGUIDLow());
+        stmt->setUInt32(1, _player->GetGUID().GetCounter());
         stmt->setUInt8(2, uint8(_player->GetTemporaryUnsummonedPetNumber() ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
         trans->Append(stmt);
 
@@ -708,7 +711,7 @@ void WorldSession::HandleBuyStableSlot(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Recv CMSG_BUY_STABLE_SLOT.");
 #endif
-    uint64 npcGUID;
+    ObjectGuid npcGUID;
 
     recvData >> npcGUID;
 
@@ -750,7 +753,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
     LOG_DEBUG("network", "WORLD: Recv CMSG_STABLE_SWAP_PET.");
 #endif
-    uint64 npcGUID;
+    ObjectGuid npcGUID;
     uint32 petId;
 
     recvData >> npcGUID >> petId;
@@ -789,7 +792,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket& recvData)
     // Find swapped pet slot in stable
     PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PET_SLOT_BY_ID);
 
-    stmt->setUInt32(0, _player->GetGUIDLow());
+    stmt->setUInt32(0, _player->GetGUID().GetCounter());
     stmt->setUInt32(1, petId);
 
     _stableSwapCallback.SetParam(petId);
@@ -841,7 +844,7 @@ void WorldSession::HandleStableSwapPetCallback(PreparedQueryResult result, uint3
 
         PreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_PET_SLOT_BY_SLOT);
         stmt->setUInt8(0, slot);
-        stmt->setUInt32(1, _player->GetGUIDLow());
+        stmt->setUInt32(1, _player->GetGUID().GetCounter());
         stmt->setUInt8(2, uint8(_player->GetTemporaryUnsummonedPetNumber() ? PET_SAVE_AS_CURRENT : PET_SAVE_NOT_IN_SLOT));
         trans->Append(stmt);
 
@@ -864,7 +867,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: CMSG_REPAIR_ITEM");
 #endif
 
-    uint64 npcGUID, itemGUID;
+    ObjectGuid npcGUID, itemGUID;
     uint8 guildBank;                                        // new in 2.3.2, bool that means from guild bank money
 
     recvData >> npcGUID >> itemGUID >> guildBank;
@@ -873,7 +876,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
     if (!unit)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "WORLD: HandleRepairItemOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(npcGUID)));
+        LOG_DEBUG("network", "WORLD: HandleRepairItemOpcode - Unit (%s) not found or you can not interact with him.", npcGUID.ToString().c_str());
 #endif
         return;
     }
@@ -890,7 +893,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
     if (itemGUID)
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "ITEM: Repair item, itemGUID = %u, npcGUID = %u", GUID_LOPART(itemGUID), GUID_LOPART(npcGUID));
+        LOG_DEBUG("network", "ITEM: Repair item, item %s, npc %s", itemGUID.ToString().c_str(), npcGUID.ToString().c_str());
 #endif
 
         Item* item = _player->GetItemByGuid(itemGUID);
@@ -900,7 +903,7 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
     else
     {
 #if defined(ENABLE_EXTRAS) && defined(ENABLE_EXTRA_LOGS)
-        LOG_DEBUG("network", "ITEM: Repair all items, npcGUID = %u", GUID_LOPART(npcGUID));
+        LOG_DEBUG("network", "ITEM: Repair all items, npc %s", npcGUID.ToString().c_str());
 #endif
         _player->DurabilityRepairAll(true, discountMod, guildBank);
     }

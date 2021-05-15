@@ -44,7 +44,7 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_IGNORE_COMBAT                   = 0x00002000,
     CREATURE_FLAG_EXTRA_WORLDEVENT                      = 0x00004000,   // custom flag for world event creatures (left room for merging)
     CREATURE_FLAG_EXTRA_GUARD                           = 0x00008000,   // Creature is guard
-    CREATURE_FLAG_EXTRA_UNUSED_17                       = 0x00010000,
+    CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH              = 0x00010000,   // creature ignores feign death
     CREATURE_FLAG_EXTRA_NO_CRIT                         = 0x00020000,   // creature can't do critical strikes
     CREATURE_FLAG_EXTRA_NO_SKILL_GAINS                  = 0x00040000,   // creature won't increase weapon skills
     CREATURE_FLAG_EXTRA_OBEYS_TAUNT_DIMINISHING_RETURNS = 0x00080000,   // Taunt is subject to diminishing returns on this creature
@@ -62,7 +62,7 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_UNUSED_32                       = 0x80000000,
 
     // Masks
-    CREATURE_FLAG_EXTRA_UNUSED                          = (CREATURE_FLAG_EXTRA_UNUSED_10 | CREATURE_FLAG_EXTRA_UNUSED_12 | CREATURE_FLAG_EXTRA_UNUSED_17 |
+    CREATURE_FLAG_EXTRA_UNUSED                          = (CREATURE_FLAG_EXTRA_UNUSED_10 | CREATURE_FLAG_EXTRA_UNUSED_12 |
                                                            CREATURE_FLAG_EXTRA_UNUSED_22 | CREATURE_FLAG_EXTRA_UNUSED_25 | CREATURE_FLAG_EXTRA_UNUSED_26 |
                                                            CREATURE_FLAG_EXTRA_UNUSED_27 | CREATURE_FLAG_EXTRA_UNUSED_28 | CREATURE_FLAG_EXTRA_UNUSED_32),
     CREATURE_FLAG_EXTRA_DB_ALLOWED                      = (0xFFFFFFFF & ~(CREATURE_FLAG_EXTRA_UNUSED | CREATURE_FLAG_EXTRA_DUNGEON_BOSS))
@@ -408,12 +408,12 @@ public:
 
     void DisappearAndDie();
 
-    bool Create(uint32 guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
+    bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
     bool LoadCreaturesAddon(bool reload = false);
     void SelectLevel(bool changelevel = true);
     void LoadEquipment(int8 id = 1, bool force = false);
 
-    [[nodiscard]] uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
+    [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
     void Update(uint32 time) override;                         // overwrited Unit::Update
     void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr, float* dist = nullptr) const;
@@ -490,7 +490,7 @@ public:
     {
         ::Spell const* Spell = nullptr;
         uint32 Delay = 0;         // ms until the creature's target should snap back (0 = no snapback scheduled)
-        uint64 Target;            // the creature's "real" target while casting
+        ObjectGuid Target;        // the creature's "real" target while casting
         float Orientation = 0.0f; // the creature's "real" orientation while casting
     } _spellFocusInfo;
 
@@ -545,15 +545,15 @@ public:
 
     void setDeathState(DeathState s, bool despawn = false) override;                   // override virtual Unit::setDeathState
 
-    bool LoadFromDB(uint32 guid, Map* map) { return LoadCreatureFromDB(guid, map, false, true); }
-    bool LoadCreatureFromDB(uint32 guid, Map* map, bool addToMap = true, bool gridLoad = false);
+    bool LoadFromDB(ObjectGuid::LowType guid, Map* map, bool allowDuplicate = false) { return LoadCreatureFromDB(guid, map, false, true, allowDuplicate); }
+    bool LoadCreatureFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true, bool gridLoad = false, bool allowDuplicate = false);
     void SaveToDB();
     // overriden in Pet
     virtual void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
     virtual void DeleteFromDB();                        // overriden in Pet
 
     Loot loot;
-    [[nodiscard]] uint64 GetLootRecipientGUID() const { return m_lootRecipient; }
+    [[nodiscard]] ObjectGuid GetLootRecipientGUID() const { return m_lootRecipient; }
     [[nodiscard]] Player* GetLootRecipient() const;
     [[nodiscard]] Group* GetLootRecipientGroup() const;
     [[nodiscard]] bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
@@ -596,6 +596,7 @@ public:
     bool HasSearchedAssistance() { return m_AlreadySearchedAssistance; }
     bool CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction = true) const;
     bool _IsTargetAcceptable(const Unit* target) const;
+    bool CanIgnoreFeignDeath() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH) != 0; }
     bool _CanDetectFeignDeathOf(const Unit* target) const; // pussywizard
 
     // pussywizard: updated at faction change, disable move in line of sight if actual faction is not hostile to anyone
@@ -694,7 +695,7 @@ public:
     bool m_isTempWorldObject; //true when possessed
 
     // Handling caster facing during spellcast
-    void SetTarget(uint64 guid) override;
+    void SetTarget(ObjectGuid guid = ObjectGuid::Empty) override;
     void FocusTarget(Spell const* focusSpell, WorldObject const* target);
     void ReleaseFocus(Spell const* focusSpell);
     bool IsMovementPreventedByCasting() const;
@@ -718,7 +719,7 @@ public:
     void RefreshSwimmingFlag(bool recheck = false);
 
 protected:
-    bool CreateFromProto(uint32 guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
+    bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
     bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
 
     // vendor items
@@ -726,7 +727,7 @@ protected:
 
     static float _GetHealthMod(int32 Rank);
 
-    uint64 m_lootRecipient;
+    ObjectGuid m_lootRecipient;
     uint32 m_lootRecipientGroup;
 
     /// Timers
@@ -743,7 +744,7 @@ protected:
     void RegenerateHealth();
     void Regenerate(Powers power);
     MovementGeneratorType m_defaultMovementType;
-    uint32 m_DBTableGuid;                               ///< For new or temporary creatures is 0 for saved it is lowguid
+    ObjectGuid::LowType m_spawnId;                      ///< For new or temporary creatures is 0 for saved it is lowguid
     uint8 m_equipmentId;
     int8 m_originalEquipmentId; // can be -1
 
@@ -799,15 +800,16 @@ private:
 class AssistDelayEvent : public BasicEvent
 {
 public:
-    AssistDelayEvent(uint64 victim, Creature* owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
+    AssistDelayEvent(ObjectGuid victim, Creature* owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
 
     bool Execute(uint64 e_time, uint32 p_time) override;
-    void AddAssistant(uint64 guid) { m_assistants.push_back(guid); }
+    void AddAssistant(ObjectGuid guid) { m_assistants.push_back(guid); }
+
 private:
     AssistDelayEvent();
 
-    uint64            m_victim;
-    std::list<uint64> m_assistants;
+    ObjectGuid        m_victim;
+    GuidList          m_assistants;
     Creature*         m_owner;
 };
 

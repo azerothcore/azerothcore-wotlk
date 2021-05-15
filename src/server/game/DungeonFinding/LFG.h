@@ -9,8 +9,11 @@
 
 #include "Common.h"
 #include "ObjectDefines.h"
+#include "ObjectGuid.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
+
+#include <array>
 
 namespace lfg
 {
@@ -93,68 +96,68 @@ namespace lfg
     typedef std::list<Lfg5Guids> Lfg5GuidsList;
     typedef std::set<uint32> LfgDungeonSet;
     typedef std::map<uint32, uint32> LfgLockMap;
-    typedef std::map<uint64, LfgLockMap> LfgLockPartyMap;
-    typedef std::set<uint64> LfgGuidSet;
-    typedef std::list<uint64> LfgGuidList;
-    typedef std::map<uint64, uint8> LfgRolesMap;
-    typedef std::map<uint64, uint64> LfgGroupsMap;
+    typedef std::map<ObjectGuid, LfgLockMap> LfgLockPartyMap;
+    typedef GuidSet LfgGuidSet;
+    typedef GuidList LfgGuidList;
+    typedef std::map<ObjectGuid, uint8> LfgRolesMap;
+    typedef std::map<ObjectGuid, ObjectGuid> LfgGroupsMap;
 
     class Lfg5Guids
     {
     public:
-        uint64 guid[5];
+        std::array<ObjectGuid, 5> guids = { };
         LfgRolesMap* roles;
         Lfg5Guids()
         {
-            memset(&guid, 0, 5 * 8);
+            guids.fill(ObjectGuid::Empty);
             roles = nullptr;
         }
 
-        Lfg5Guids(uint64 g)
+        Lfg5Guids(ObjectGuid g)
         {
-            memset(&guid, 0, 5 * 8);
-            guid[0] = g;
+            guids.fill(ObjectGuid::Empty);
+            guids[0] = g;
             roles = nullptr;
         }
 
         Lfg5Guids(Lfg5Guids const& x)
         {
-            memcpy(guid, x.guid, 5 * 8);
+            guids = x.guids;
             roles = x.roles ? (new LfgRolesMap(*(x.roles))) : nullptr;
         }
 
         Lfg5Guids(Lfg5Guids const& x, bool /*copyRoles*/)
         {
-            memcpy(guid, x.guid, 5 * 8);
+            guids = x.guids;
             roles = nullptr;
         }
 
         ~Lfg5Guids() { delete roles; }
         void addRoles(LfgRolesMap const& r) { roles = new LfgRolesMap(r); }
-        void clear() { memset(&guid, 0, 5 * 8); }
-        bool empty() const { return guid[0] == 0; }
-        uint64 front() const { return guid[0]; }
+        void clear() { guids.fill(ObjectGuid::Empty); }
+        bool empty() const { return guids[0] == ObjectGuid::Empty; }
+        ObjectGuid front() const { return guids[0]; }
 
         uint8 size() const
         {
-            if (guid[2])
+            if (guids[2])
             {
-                if (guid[4])
+                if (guids[4])
                 {
                     return 5;
                 }
-                else if (guid[3])
+                else if (guids[3])
                 {
                     return 4;
                 }
 
                 return 3;
             }
-            else if (guid[1])
+            else if (guids[1])
             {
                 return 2;
             }
-            else if (guid[0])
+            else if (guids[0])
             {
                 return 1;
             }
@@ -162,289 +165,289 @@ namespace lfg
             return 0;
         }
 
-        void insert(const uint64& g)
+        void insert(const ObjectGuid& g)
         {
             // avoid loops for performance
-            if (guid[0] == 0)
+            if (!guids[0])
             {
-                guid[0] = g;
+                guids[0] = g;
                 return;
             }
 
-            if (g <= guid[0])
+            if (g <= guids[0])
             {
-                if (guid[3])
+                if (guids[3])
                 {
-                    guid[4] = guid[3];
+                    guids[4] = guids[3];
                 }
 
-                if (guid[2])
+                if (guids[2])
                 {
-                    guid[3] = guid[2];
+                    guids[3] = guids[2];
                 }
 
-                if (guid[1])
+                if (guids[1])
                 {
-                    guid[2] = guid[1];
+                    guids[2] = guids[1];
                 }
 
-                guid[1] = guid[0];
-                guid[0] = g;
+                guids[1] = guids[0];
+                guids[0] = g;
 
                 return;
             }
 
-            if (guid[1] == 0)
+            if (!guids[1])
             {
-                guid[1] = g;
+                guids[1] = g;
                 return;
             }
 
-            if (g <= guid[1])
+            if (g <= guids[1])
             {
-                if (guid[3])
+                if (guids[3])
                 {
-                    guid[4] = guid[3];
+                    guids[4] = guids[3];
                 }
 
-                if (guid[2])
+                if (guids[2])
                 {
-                    guid[3] = guid[2];
+                    guids[3] = guids[2];
                 }
 
-                guid[2] = guid[1];
-                guid[1] = g;
+                guids[2] = guids[1];
+                guids[1] = g;
 
                 return;
             }
 
-            if (guid[2] == 0)
+            if (!guids[2])
             {
-                guid[2] = g;
+                guids[2] = g;
                 return;
             }
 
-            if (g <= guid[2])
+            if (g <= guids[2])
             {
-                if (guid[3])
+                if (guids[3])
                 {
-                    guid[4] = guid[3];
+                    guids[4] = guids[3];
                 }
 
-                guid[3] = guid[2];
-                guid[2] = g;
+                guids[3] = guids[2];
+                guids[2] = g;
 
                 return;
             }
 
-            if (guid[3] == 0)
+            if (!guids[3])
             {
-                guid[3] = g;
+                guids[3] = g;
                 return;
             }
 
-            if (g <= guid[3])
+            if (g <= guids[3])
             {
-                guid[4] = guid[3];
-                guid[3] = g;
+                guids[4] = guids[3];
+                guids[3] = g;
                 return;
             }
 
-            guid[4] = g;
+            guids[4] = g;
         }
 
-        void force_insert_front(const uint64& g)
+        void force_insert_front(const ObjectGuid& g)
         {
-            if (guid[3])
+            if (guids[3])
             {
-                guid[4] = guid[3];
+                guids[4] = guids[3];
             }
 
-            if (guid[2])
+            if (guids[2])
             {
-                guid[3] = guid[2];
+                guids[3] = guids[2];
             }
 
-            if (guid[1])
+            if (guids[1])
             {
-                guid[2] = guid[1];
+                guids[2] = guids[1];
             }
 
-            guid[1] = guid[0];
-            guid[0] = g;
+            guids[1] = guids[0];
+            guids[0] = g;
         }
 
-        void remove(const uint64& g)
+        void remove(const ObjectGuid& g)
         {
             // avoid loops for performance
-            if (guid[0] == g)
+            if (guids[0] == g)
             {
-                if (guid[1])
+                if (guids[1])
                 {
-                    guid[0] = guid[1];
+                    guids[0] = guids[1];
                 }
                 else
                 {
-                    guid[0] = 0;
+                    guids[0].Clear();
                     return;
                 }
 
-                if (guid[2])
+                if (guids[2])
                 {
-                    guid[1] = guid[2];
+                    guids[1] = guids[2];
                 }
                 else
                 {
-                    guid[1] = 0;
+                    guids[1].Clear();
                     return;
                 }
 
-                if (guid[3])
+                if (guids[3])
                 {
-                    guid[2] = guid[3];
+                    guids[2] = guids[3];
                 }
                 else
                 {
-                    guid[2] = 0;
+                    guids[2].Clear();
                     return;
                 }
 
-                if (guid[4])
+                if (guids[4])
                 {
-                    guid[3] = guid[4];
+                    guids[3] = guids[4];
                 }
                 else
                 {
-                    guid[3] = 0;
+                    guids[3].Clear();
                     return;
                 }
 
-                guid[4] = 0;
+                guids[4].Clear();
                 return;
             }
 
-            if (guid[1] == g)
+            if (guids[1] == g)
             {
-                if (guid[2])
+                if (guids[2])
                 {
-                    guid[1] = guid[2];
+                    guids[1] = guids[2];
                 }
                 else
                 {
-                    guid[1] = 0;
+                    guids[1].Clear();
                     return;
                 }
 
-                if (guid[3])
+                if (guids[3])
                 {
-                    guid[2] = guid[3];
+                    guids[2] = guids[3];
                 }
                 else
                 {
-                    guid[2] = 0;
+                    guids[2].Clear();
                     return;
                 }
 
-                if (guid[4])
+                if (guids[4])
                 {
-                    guid[3] = guid[4];
+                    guids[3] = guids[4];
                 }
                 else
                 {
-                    guid[3] = 0;
+                    guids[3].Clear();
                     return;
                 }
 
-                guid[4] = 0;
+                guids[4].Clear();
                 return;
             }
 
-            if (guid[2] == g)
+            if (guids[2] == g)
             {
-                if (guid[3])
+                if (guids[3])
                 {
-                    guid[2] = guid[3];
+                    guids[2] = guids[3];
                 }
                 else
                 {
-                    guid[2] = 0;
+                    guids[2].Clear();
                     return;
                 }
 
-                if (guid[4])
+                if (guids[4])
                 {
-                    guid[3] = guid[4];
+                    guids[3] = guids[4];
                 }
                 else
                 {
-                    guid[3] = 0;
+                    guids[3].Clear();
                     return;
                 }
 
-                guid[4] = 0;
+                guids[4].Clear();
                 return;
             }
 
-            if (guid[3] == g)
+            if (guids[3] == g)
             {
-                if (guid[4])
+                if (guids[4])
                 {
-                    guid[3] = guid[4];
+                    guids[3] = guids[4];
                 }
                 else
                 {
-                    guid[3] = 0;
+                    guids[3].Clear();
                     return;
                 }
 
-                guid[4] = 0;
+                guids[4].Clear();
                 return;
             }
 
-            if (guid[4] == g)
+            if (guids[4] == g)
             {
-                guid[4] = 0;
+                guids[4].Clear();
             }
         }
 
-        bool hasGuid(const uint64& g) const
+        bool hasGuid(const ObjectGuid& g) const
         {
-            return g && (guid[0] == g || guid[1] == g || guid[2] == g || guid[3] == g || guid[4] == g);
+            return g && (guids[0] == g || guids[1] == g || guids[2] == g || guids[3] == g || guids[4] == g);
         }
 
         bool operator<(const Lfg5Guids& x) const
         {
-            if (guid[0] <= x.guid[0])
+            if (guids[0] <= x.guids[0])
             {
-                if (guid[0] != x.guid[0])
+                if (guids[0] != x.guids[0])
                 {
                     return true;
                 }
 
-                if (guid[1] <= x.guid[1])
+                if (guids[1] <= x.guids[1])
                 {
-                    if (guid[1] != x.guid[1])
+                    if (guids[1] != x.guids[1])
                     {
                         return true;
                     }
 
-                    if (guid[2] <= x.guid[2])
+                    if (guids[2] <= x.guids[2])
                     {
-                        if (guid[2] != x.guid[2])
+                        if (guids[2] != x.guids[2])
                         {
                             return true;
                         }
 
-                        if (guid[3] <= x.guid[3])
+                        if (guids[3] <= x.guids[3])
                         {
-                            if (guid[3] != x.guid[3])
+                            if (guids[3] != x.guids[3])
                             {
                                 return true;
                             }
 
-                            if (guid[4] <= x.guid[4])
+                            if (guids[4] <= x.guids[4])
                             {
-                                return !(guid[4] == x.guid[4]);
+                                return !(guids[4] == x.guids[4]);
                             }
                         }
                     }
@@ -456,12 +459,12 @@ namespace lfg
 
         bool operator==(const Lfg5Guids& x) const
         {
-            return guid[0] == x.guid[0] && guid[1] == x.guid[1] && guid[2] == x.guid[2] && guid[3] == x.guid[3] && guid[4] == x.guid[4];
+            return guids[0] == x.guids[0] && guids[1] == x.guids[1] && guids[2] == x.guids[2] && guids[3] == x.guids[3] && guids[4] == x.guids[4];
         }
 
         void operator=(const Lfg5Guids& x)
         {
-            memcpy(guid, x.guid, 5 * 8);
+            guids = x.guids;
             delete roles;
             roles = x.roles ? (new LfgRolesMap(*(x.roles))) : nullptr;
         }
@@ -469,7 +472,7 @@ namespace lfg
         std::string toString() const // for debugging
         {
             std::ostringstream o;
-            o << GUID_LOPART(guid[0]) << "," << GUID_LOPART(guid[1]) << "," << GUID_LOPART(guid[2]) << "," << GUID_LOPART(guid[3]) << "," << GUID_LOPART(guid[4]) << ":" << (roles ? 1 : 0);
+            o << guids[0].ToString().c_str() << "," << guids[1].ToString().c_str() << "," << guids[2].ToString().c_str() << "," << guids[3].ToString().c_str() << "," << guids[4].ToString().c_str() << ":" << (roles ? 1 : 0);
             return o.str();
         }
     };

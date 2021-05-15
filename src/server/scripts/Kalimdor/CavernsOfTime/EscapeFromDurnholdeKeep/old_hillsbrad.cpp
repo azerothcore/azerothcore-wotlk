@@ -387,7 +387,7 @@ public:
                     SetEscortPaused(true);
                     SetRun(true);
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_TARETHA_MEET);
-                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TARETHA_GUID)))
+                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                         Taretha->AI()->Talk(SAY_TARETHA_ESCAPED);
                     events.ScheduleEvent(EVENT_THRALL_TALK, 2000);
                     break;
@@ -618,7 +618,7 @@ public:
                 case EVENT_TARETHA_FALL:
                     if (Creature* epoch = summons.GetCreatureWithEntry(NPC_EPOCH_HUNTER))
                         epoch->AI()->Talk(SAY_EPOCH_ENTER2);
-                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TARETHA_GUID)))
+                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                     {
                         Taretha->CastSpell(Taretha, SPELL_SHADOW_SPIKE);
                         Taretha->SetStandState(UNIT_STAND_STATE_DEAD);
@@ -700,7 +700,7 @@ public:
                         if (!players.isEmpty())
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                                 if (Player* player = itr->GetSource())
-                                    player->KilledMonsterCredit(20156, 0);
+                                    player->KilledMonsterCredit(20156);
 
                         me->SetFacingTo(5.76f);
                         break;
@@ -709,7 +709,7 @@ public:
                     Talk(SAY_GREET_TARETHA);
                     break;
                 case EVENT_TARETHA_TALK_1:
-                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TARETHA_GUID)))
+                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                         Taretha->AI()->Talk(SAY_TARETHA_TALK1);
                     break;
                 case EVENT_THRALL_TALK_5:
@@ -751,7 +751,7 @@ public:
                     SetEscortPaused(false);
                     break;
                 case EVENT_TARETHA_TALK_2:
-                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TARETHA_GUID)))
+                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                     {
                         Taretha->SetFacingTo(4.233f);
                         Taretha->AI()->Talk(SAY_TARETHA_TALK2);
@@ -827,7 +827,7 @@ public:
                     break;
                 case ENCOUNTER_PROGRESS_TARETHA_MEET:
                     SetNextWaypoint(95, false);
-                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_TARETHA_GUID)))
+                    if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                         Taretha->SetStandState(UNIT_STAND_STATE_STAND);
                     break;
             }
@@ -881,7 +881,7 @@ public:
                 SetRun(false);
                 Talk(SAY_TARETHA_FREE);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
-                if (Creature* thrall = ObjectAccessor::GetCreature(*me, instance->GetData64(DATA_THRALL_GUID)))
+                if (Creature* thrall = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_THRALL_GUID)))
                     thrall->AI()->DoAction(me->GetEntry());
             }
             else if (waypointId == 9)
