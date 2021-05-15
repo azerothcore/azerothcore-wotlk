@@ -28,7 +28,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # since it's not cacheable by docker
 RUN apt-get update && apt-get install -y gdb gdbserver git dos2unix lsb-core sudo curl unzip \
   make cmake clang libmysqlclient-dev libace-dev \
-  build-essential libtool cmake-data openssl libgoogle-perftools-dev \
+  build-essential libtool cmake-data openssl libgoogle-perftools-dev google-perftools \
   libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client \
   libncurses5-dev ccache \
   && rm -rf /var/lib/apt/lists/*
@@ -61,6 +61,9 @@ USER $DOCKER_USER
 # using tools such as vscode dev-container
 # NOTE: this folder is different by the /azerothcore (which is binded instead)
 COPY --chown=$DOCKER_USER:$DOCKER_USER . /azerothcore
+
+# Download deno and make sure the dashboard works
+RUN bash /azerothcore/acore.sh quit
 
 WORKDIR /azerothcore
 
@@ -103,7 +106,8 @@ RUN addgroup --gid $GROUP_ID acore && \
     echo 'acore ALL=(ALL:ALL) NOPASSWD: ALL' >> /etc/sudoers
 
 # install the required dependencies to run the server
-RUN apt-get update && apt-get install -y dos2unix gdb gdbserver net-tools tzdata libmysqlclient-dev libace-dev mysql-client curl unzip && rm -rf /var/lib/apt/lists/* ;
+RUN apt-get update && apt-get install -y dos2unix gdb gdbserver google-perftools libgoogle-perftools-dev net-tools \
+    tzdata libmysqlclient-dev libace-dev mysql-client curl unzip && rm -rf /var/lib/apt/lists/* ;
 
 # change timezone in container
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
@@ -131,6 +135,9 @@ RUN mkdir -p /azerothcore/env/dist/data
 RUN mkdir -p /azerothcore/env/dist/logs
 RUN mkdir -p /azerothcore/env/dist/etc
 RUN mkdir -p /azerothcore/env/dist/bin
+
+# Download deno and make sure the dashboard works
+RUN bash /azerothcore/acore.sh quit
 
 WORKDIR /azerothcore/
 
