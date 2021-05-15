@@ -1030,7 +1030,9 @@ bool Creature::CanResetTalents(Player* player) const
     if (!trainer)
         return false;
 
-    return player->getLevel() >= 10 && trainer->IsTrainerValidForPlayer(player);
+    return player->GetLevel() >= 10 &&
+        (trainer->GetTrainerType() == (pet ? Trainer::Type::Pet : Trainer::Type::Class)) &&
+        trainer->IsTrainerValidForPlayer(player);
 }
 
 Player* Creature::GetLootRecipient() const
