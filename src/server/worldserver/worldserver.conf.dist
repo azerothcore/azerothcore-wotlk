@@ -9,7 +9,6 @@
 #    EXAMPLE CONFIG
 #    CONNECTIONS AND DIRECTORIES
 #    PERFORMANCE SETTINGS
-#    SERVER LOGGING
 #    SERVER SETTINGS
 #    CRYPTOGRAPHY
 #    WARDEN SETTINGS
@@ -28,6 +27,7 @@
 #    CHARACTER DELETE OPTIONS
 #    ITEM DELETE OPTIONS
 #    CUSTOM SERVER OPTIONS
+#    LOGGING SYSTEM SETTINGS
 #    PACKET SPOOF PROTECTION SETTINGS
 #    DEBUG
 #
@@ -66,6 +66,14 @@ RealmID = 1
 #        Default:     "."
 
 DataDir = "."
+
+#
+#    PidFile
+#        Description: World daemon PID file
+#        Example:     "./world.pid" - (Enabled)
+#        Default:     ""            - (Disabled)
+
+PidFile = ""
 
 #
 #    LogsDir
@@ -450,25 +458,6 @@ PreloadAllNonInstancedMapGrids = 0
 SetAllCreaturesWithWaypointMovementActive = 0
 
 #
-###################################################################################################
-
-###################################################################################################
-# SERVER LOGGING
-#
-#    PidFile
-#        Description: World daemon PID file
-#        Example:     "./world.pid" - (Enabled)
-#        Default:     ""            - (Disabled)
-
-PidFile = ""
-
-#
-#    EnableLogDB
-#        Description: Write log messages to database (LogDatabaseInfo).
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-EnableLogDB = 0
 ###################################################################################################
 
 ###################################################################################################
@@ -1835,14 +1824,6 @@ GM.InGMList.Level = 3
 #                     2 - (Only gamemasters)
 
 GM.InWhoList.Level = 3
-
-#
-#    GM.LogTrade
-#        Description: Include GM trade and trade slot enchanting operations in GM log.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-GM.LogTrade = 1
 
 #
 #    GM.StartLevel
@@ -3251,17 +3232,19 @@ MoveMaps.Enable = 1
 Minigob.Manabonk.Enable = 1
 
 #
-
 #    Allow.IP.Based.Action.Logging
 #        Description: Logs actions, e.g. account login and logout to name a few, based on IP of current session.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
+#
 
 Allow.IP.Based.Action.Logging = 0
 
+#
 #     Calculate.Creature.Zone.Area.Data
 #        Description: Calculate at loading creature zoneId / areaId and save in creature table (WARNING: SLOW WORLD SERVER STARTUP)
 #        Default:     0  - (Do not show)
+#
 
 Calculate.Creature.Zone.Area.Data = 0
 
@@ -3269,14 +3252,17 @@ Calculate.Creature.Zone.Area.Data = 0
 #     Calculate.Gameoject.Zone.Area.Data
 #        Description: Calculate at loading gameobject zoneId / areaId and save in gameobject table (WARNING: SLOW WORLD SERVER STARTUP)
 #        Default:     0  - (Do not show)
+#
 
 Calculate.Gameoject.Zone.Area.Data = 0
 
-#    LFG SETTINGS
+#
+#    LFG.Location.All
 #
 #     Includes satellite to search for work elsewhere LFG
 #        Default: 0 - Disable
 #                 1 - Enable
+#
 
 LFG.Location.All = 0
 
@@ -3432,6 +3418,7 @@ Appender.Console=1,4,0,"1 9 3 6 5 8"
 Appender.Server=2,5,0,Server.log,w
 Appender.GM=2,5,15,gm_%s.log
 Appender.DBErrors=2,5,0,DBErrors.log
+# Appender.DB=3,5,0
 
 #  Logger config values: Given a logger "name"
 #    Logger.name
